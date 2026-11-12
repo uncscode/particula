@@ -465,6 +465,10 @@ class CondensationStrategy(ABC):
             raise ValueError("particle activity must be finite and nonnegative")
         delta = np.zeros_like(particle.masses[0])
         equilibrium = np.zeros_like(delta)
+        if particle.n_particles == 0:
+            # Gas and activity configuration were validated above. There are
+            # no material radii on which to evaluate the Kelvin correction.
+            return delta, equilibrium
         for source, target in zip(sources, targets, strict=True):
             kelvin = np.asarray(
                 surface.kelvin_term(

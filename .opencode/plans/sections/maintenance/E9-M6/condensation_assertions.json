@@ -1,21 +1,21 @@
 {
-  "status": "baseline assertions preserved; successor mapping pending source-level review",
+  "status": "All 144 original tests have reviewed native successors or explicit facade-only dispositions; shared production compatibility removal still pending.",
   "tests": [
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_validate_time_step_allows_zero_and_rejects_invalid",
       "assertions": [
         "self.assertRaisesRegex(ValueError, \"time_step must be finite\")"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_validate_time_step_allows_zero_and_rejects_invalid"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_mean_free_path",
       "assertions": [
         "self.assertIsNotNone(result)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_mean_free_path"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_unwrap_helpers_accept_legacy_and_data",
@@ -29,8 +29,8 @@
         "self.assertFalse(particle_is_legacy)",
         "self.assertFalse(gas_is_legacy)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates. Obsolete wrapper flags have no native meaning: replacement checks native identity and invalid-container admission without mutation.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_native_step_preserves_input_types_and_identity"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_unwrap_helpers_invalid_type_raises",
@@ -38,24 +38,24 @@
         "self.assertRaises(TypeError)",
         "self.assertRaises(TypeError)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates. Obsolete wrapper flags have no native meaning: replacement checks native identity and invalid-container admission without mutation.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_native_rate_rejects_invalid_container_types"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_require_matching_types_raises_on_mismatch",
       "assertions": [
         "self.assertRaises(TypeError)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates. Obsolete wrapper flags have no native meaning: replacement checks native identity and invalid-container admission without mutation.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_native_step_rejects_invalid_container_types"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_require_single_box_raises_for_multi_box",
       "assertions": [
         "self.assertRaises(ValueError)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_require_single_box_raises_for_multi_box"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_vapor_pressure_helpers_handle_sequence_and_single",
@@ -66,80 +66,80 @@
         "self.assertIsInstance(partial_single, np.ndarray)",
         "self.assertEqual(partial_single.shape, ())"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_vapor_pressure_helpers_handle_sequence_and_single"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_data_only_requires_strategy_configuration",
       "assertions": [
         "self.assertRaises(TypeError)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_data_only_requires_strategy_configuration"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_data_only_missing_vapor_pressure_strategy_raises",
       "assertions": [
         "self.assertRaises(TypeError)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_data_only_missing_vapor_pressure_strategy_raises"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_rate_rejects_mixed_legacy_and_data_inputs",
       "assertions": [
         "self.assertRaises(TypeError)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_rate_rejects_untagged_population"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_mass_transfer_rate_rejects_multi_box_data_inputs",
       "assertions": [
         "self.assertRaisesRegex(\n            ValueError,\n            \"ParticleData must have n_boxes=1 for condensation strategies, \"\n            \"got n_boxes=2.\",\n        )"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_mass_transfer_rate_rejects_multi_box_data_inputs"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_step_rejects_multi_box_data_inputs",
       "assertions": [
         "self.assertRaisesRegex(\n            ValueError,\n            \"ParticleData must have n_boxes=1 for condensation strategies, \"\n            \"got n_boxes=2.\",\n        )"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_step_rejects_multi_box_data_inputs"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_knudsen_number",
       "assertions": [
         "self.assertIsNotNone(result)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_knudsen_number"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_first_order_mass_transport",
       "assertions": [
         "self.assertIsNotNone(result)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_first_order_mass_transport"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_normalize_first_order_mass_transport_2d",
       "assertions": [
         "self.assertEqual(normalized.shape, (3, 1))"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_normalize_first_order_mass_transport_2d"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_step_rejects_invalid_time_step",
       "assertions": [
         "self.assertRaisesRegex(ValueError, \"time_step must be finite\")"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_step_rejects_invalid_time_step"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_fill_zero_radius",
@@ -147,16 +147,16 @@
         "self.assertTrue(np.all(filled != 0.0))",
         "self.assertEqual(filled[0], np.max(radii))"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates. Legacy maximum/one-metre radius replacement and warning are intentionally obsolete; free slots instead have exact finite zero rates, without warning.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_inactive_zero_radius_has_zero_rate"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_fill_zero_radius_all_zeros_warns",
       "assertions": [
         "self.assertWarns(RuntimeWarning)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates. Legacy maximum/one-metre radius replacement and warning are intentionally obsolete; free slots instead have exact finite zero rates, without warning.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_all_inactive_zero_radii_are_safe_without_warning"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_rate_respects_skip_indices",
@@ -164,8 +164,8 @@
         "self.assertTrue(np.allclose(rates_skip[..., 0], 0.0))",
         "self.assertTrue(np.any(rates_noskip[..., 0] != 0.0))"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_rate_respects_skip_indices"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_step_skip_preserves_skipped_species",
@@ -175,8 +175,8 @@
         "np.testing.assert_allclose(\n            final_particle_mass[..., skip_idx],\n            initial_particle_mass[..., skip_idx],\n        )",
         "self.assertAlmostEqual(\n            final_gas_conc[skip_idx], initial_gas_conc[skip_idx]\n        )"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_step_skip_preserves_skipped_species"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_apply_skip_partitioning_direct",
@@ -186,24 +186,24 @@
         "self.assertIs(returned_2d, array_2d)",
         "np.testing.assert_array_equal(array_2d, expected_2d)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_apply_skip_partitioning_direct"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_apply_skip_partitioning_rejects_non_integer_indices",
       "assertions": [
         "self.assertRaises(TypeError)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_apply_skip_partitioning_rejects_non_integer_indices"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_apply_skip_partitioning_out_of_bounds_raises",
       "assertions": [
         "self.assertRaises(IndexError)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_apply_skip_partitioning_out_of_bounds_raises"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_isothermal_step_with_particle_data_gas_data",
@@ -212,8 +212,8 @@
         "self.assertIsInstance(gas_new, GasData)",
         "self.assertEqual(particle_new.masses.shape, particle_data.masses.shape)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_isothermal_step_with_particle_data_gas_data"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_isothermal_step_returns_matching_types",
@@ -223,8 +223,8 @@
         "self.assertIsInstance(particle_new, ParticleData)",
         "self.assertIsInstance(gas_new, GasData)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_isothermal_step_returns_matching_types"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_isothermal_step_numerical_parity",
@@ -232,16 +232,16 @@
         "np.testing.assert_allclose(\n            data_mass,\n            legacy_mass,\n            rtol=1e-10,\n            err_msg=\"Particle mass diverges between legacy and data paths\",\n        )",
         "np.testing.assert_allclose(\n            data_gas,\n            legacy_gas,\n            rtol=1e-10,\n            err_msg=\"Gas concentration diverges between legacy and data paths\",\n        )"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Removed facade-only equality comparison between legacy and untagged compatibility routes, which are being deleted. Enduring particle/gas numerical behavior is retained in existing independent native physics/scalar oracles across distributions, volume, uptake/evaporation, and gas coupling; those oracle assertions and tolerances are unchanged. No self-comparison of copied native inputs substituted.",
+      "native_successor": "particula/dynamics/condensation/tests/native_step_test.py::test_native_single_step_against_independent_physics"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_isothermal_rate_numerical_parity",
       "assertions": [
         "np.testing.assert_allclose(\n            data_rate,\n            legacy_rate,\n            rtol=1e-10,\n            err_msg=\"rate() diverges between legacy and data paths\",\n        )"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Removed facade-only equality comparison between legacy and untagged compatibility routes, which are being deleted. Enduring particle/gas numerical behavior is retained in existing independent native physics/scalar oracles across distributions, volume, uptake/evaporation, and gas coupling; those oracle assertions and tolerances are unchanged. No self-comparison of copied native inputs substituted.",
+      "native_successor": "particula/dynamics/condensation/tests/native_step_test.py::test_native_single_step_against_independent_physics"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_isothermal_rate_with_particle_data",
@@ -249,8 +249,8 @@
         "self.assertIsInstance(rate, np.ndarray)",
         "self.assertEqual(rate.shape, particle_data.masses[0].shape)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_isothermal_rate_with_particle_data"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_isothermal_mass_transfer_rate_with_particle_data",
@@ -258,8 +258,8 @@
         "self.assertIsInstance(mass_rate, np.ndarray)",
         "self.assertEqual(mass_rate.shape, particle_data.masses[0].shape)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_isothermal_mass_transfer_rate_with_particle_data"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_calculate_pressure_delta_with_particle_data",
@@ -268,8 +268,8 @@
         "self.assertEqual(pressure_delta.shape[0], radius.shape[0])",
         "self.assertTrue(np.all(np.isfinite(pressure_delta)))"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermal::test_calculate_pressure_delta_with_particle_data"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_defaults",
@@ -323,8 +323,8 @@
         "self.assertEqual(\n            mass_rate.shape, self.particle.get_species_mass().shape\n        )",
         "self.assertTrue(np.all(np.isfinite(mass_rate)))"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_mass_transfer_rate_returns_array"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_rate_returns_array_and_respects_skip",
@@ -334,8 +334,8 @@
         "np.testing.assert_array_equal(rate[..., 0], np.zeros_like(rate[..., 0]))",
         "self.assertTrue(np.all(np.isfinite(rate)))"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_rate_returns_array_and_respects_skip"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_rate_api_accepts_positional_arguments",
@@ -343,8 +343,8 @@
         "self.assertIsInstance(rate_positional, np.ndarray)",
         "self.assertEqual(\n            rate_positional.shape, self.particle.get_species_mass().shape\n        )"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_rate_api_accepts_positional_arguments"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_get_theta_values_half_mode_returns_half",
@@ -556,8 +556,8 @@
         "self.assertEqual(mass_change.shape, (species_count,))",
         "self.assertTrue(np.all(np.isfinite(mass_change)))"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates. Obsolete single-particle legacy helper replaced by native full-species rate validation, including scalar-vs-full-gas transport equivalence.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_native_single_particle_rate_default_transport"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_calculate_single_particle_transfer_scalar_transport",
@@ -565,8 +565,8 @@
         "self.assertEqual(mass_change.shape, (species_count,))",
         "self.assertTrue(np.all(np.isfinite(mass_change)))"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates. Obsolete single-particle legacy helper replaced by native full-species rate validation, including scalar-vs-full-gas transport equivalence.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_native_single_particle_scalar_transport_matches_full_gas"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_step_half_mode_produces_valid_output",
@@ -574,8 +574,8 @@
         "self.assertIsNotNone(particle_new)",
         "self.assertIsNotNone(gas_new)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_step_half_mode_produces_valid_output"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_staggered_step_with_particle_data_gas_data",
@@ -584,16 +584,16 @@
         "self.assertIsInstance(gas_new, GasData)",
         "self.assertEqual(particle_new.masses.shape, particle_data.masses.shape)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_staggered_step_with_particle_data_gas_data"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_staggered_step_rejects_multi_box_data_inputs",
       "assertions": [
         "self.assertRaisesRegex(\n            ValueError,\n            \"ParticleData must have n_boxes=1 for condensation strategies, \"\n            \"got n_boxes=2.\",\n        )"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_staggered_step_rejects_multi_box_data_inputs"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_staggered_step_returns_matching_types",
@@ -603,8 +603,8 @@
         "self.assertIsInstance(particle_new, ParticleData)",
         "self.assertIsInstance(gas_new, GasData)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_staggered_step_returns_matching_types"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_staggered_step_numerical_parity",
@@ -612,16 +612,16 @@
         "np.testing.assert_allclose(\n            data_mass,\n            legacy_mass,\n            rtol=1e-10,\n            err_msg=(\n                \"Staggered particle mass diverges between legacy and data paths\"\n            ),\n        )",
         "np.testing.assert_allclose(\n            data_gas,\n            legacy_gas,\n            rtol=1e-10,\n            err_msg=(\n                \"Staggered gas concentration diverges between legacy \"\n                \"and data paths\"\n            ),\n        )"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Removed facade-only equality comparison between legacy and untagged compatibility routes, which are being deleted. Enduring particle/gas numerical behavior is retained in existing independent native physics/scalar oracles across distributions, volume, uptake/evaporation, and gas coupling; those oracle assertions and tolerances are unchanged. No self-comparison of copied native inputs substituted.",
+      "native_successor": "particula/dynamics/condensation/tests/native_staggered_test.py::test_native_staggered_scalar_oracle"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_staggered_rate_numerical_parity",
       "assertions": [
         "np.testing.assert_allclose(\n            data_rate,\n            legacy_rate,\n            rtol=1e-10,\n            err_msg=\"Staggered rate() diverges between legacy and data paths\",\n        )"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Removed facade-only equality comparison between legacy and untagged compatibility routes, which are being deleted. Enduring particle/gas numerical behavior is retained in existing independent native physics/scalar oracles across distributions, volume, uptake/evaporation, and gas coupling; those oracle assertions and tolerances are unchanged. No self-comparison of copied native inputs substituted.",
+      "native_successor": "particula/dynamics/condensation/tests/native_staggered_test.py::test_native_staggered_scalar_oracle"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_staggered_rate_with_particle_data",
@@ -630,8 +630,8 @@
         "self.assertEqual(rate.shape, particle_data.masses[0].shape)",
         "self.assertTrue(np.all(np.isfinite(rate)))"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_staggered_rate_with_particle_data"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_staggered_mass_transfer_rate_with_particle_data",
@@ -640,8 +640,8 @@
         "self.assertEqual(mass_rate.shape, particle_data.masses[0].shape)",
         "self.assertTrue(np.all(np.isfinite(mass_rate)))"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_staggered_mass_transfer_rate_with_particle_data"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_step_random_mode_produces_valid_output",
@@ -649,8 +649,8 @@
         "self.assertIsNotNone(particle_new)",
         "self.assertIsNotNone(gas_new)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_step_random_mode_produces_valid_output"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_step_batch_mode_produces_valid_output",
@@ -658,8 +658,8 @@
         "self.assertIsNotNone(particle_new)",
         "self.assertIsNotNone(gas_new)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_step_batch_mode_produces_valid_output"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_step_non_negative_masses_and_gas",
@@ -667,16 +667,16 @@
         "self.assertTrue(np.all(particle_new.get_species_mass() >= 0.0))",
         "self.assertTrue(np.all(gas_new.get_concentration() >= 0.0))"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_step_non_negative_masses_and_gas"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_step_basic_mass_conservation",
       "assertions": [
         "np.testing.assert_allclose(initial_total, final_total, rtol=1e-10)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates. Corrected original mixed-unit total: particle mass density and gas concentration are summed consistently; rtol=1e-10 retained.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_step_basic_mass_conservation"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_step_respects_skip_partitioning_indices",
@@ -684,8 +684,8 @@
         "np.testing.assert_allclose(\n            particle_new.get_species_mass()[..., skip_idx],\n            initial_mass[..., skip_idx],\n        )",
         "np.testing.assert_allclose(\n            gas_new.get_concentration()[skip_idx], initial_gas[skip_idx]\n        )"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_step_respects_skip_partitioning_indices"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_step_positional_api_matches_signature",
@@ -694,8 +694,8 @@
         "self.assertIsNotNone(gas_new)",
         "self.assertEqual(\n            particle_new.get_species_mass().shape,\n            self.particle.get_species_mass().shape,\n        )"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_step_positional_api_matches_signature"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_step_zero_time_step_returns_inputs",
@@ -703,8 +703,8 @@
         "np.testing.assert_allclose(\n            particle_new.get_species_mass(), initial_mass\n        )",
         "np.testing.assert_allclose(gas_new.get_concentration(), initial_gas)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_step_zero_time_step_returns_inputs"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_step_empty_particles_noop",
@@ -712,8 +712,8 @@
         "self.assertEqual(particle_new.get_species_mass().shape[0], 0)",
         "np.testing.assert_allclose(\n            gas_new.get_concentration(), self.gas_species.get_concentration()\n        )"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates. Gas assertion uses independent pre-step snapshot instead of comparing mutated aliases; empty multi-species Kelvin regression covered across all three strategies.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_step_empty_particles_noop"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_step_updates_gas_between_batches",
@@ -723,8 +723,8 @@
         "self.assertTrue(np.all(np.isfinite(gas_inputs[-1])))",
         "self.assertTrue(np.all(gas_inputs[-1] >= 0.0))"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_step_updates_gas_between_batches"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_step_num_batches_changes_outcome",
@@ -734,8 +734,8 @@
         "self.assertTrue(np.all(np.isfinite(particle_many.get_species_mass())))",
         "self.assertTrue(np.all(particle_many.get_species_mass() >= 0.0))"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_step_num_batches_changes_outcome"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_step_batch_order_affects_result",
@@ -743,8 +743,8 @@
         "self.assertGreater(gas_delta, 0.0)",
         "self.assertGreater(particle_delta, 0.0)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_step_batch_order_affects_result"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_step_num_batches_exceeds_particle_count_clips",
@@ -753,8 +753,8 @@
         "np.testing.assert_allclose(\n            particle_high.get_species_mass(), particle_exact.get_species_mass()\n        )",
         "self.assertTrue(np.all(gas_high.get_concentration() >= 0.0))"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_step_num_batches_exceeds_particle_count_clips"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_step_batch_with_theta_modes",
@@ -764,8 +764,8 @@
         "self.assertTrue(np.all(particle_new.get_species_mass() >= 0.0))",
         "self.assertTrue(np.all(np.isfinite(gas_new.get_concentration())))"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged resolved fixture and explicit process-owned physics/species map. Full gas molar masses replace legacy scalar ambiguity; count/volume normalization is explicit. Retain scientific tolerances and shape/finite/skip/identity/gas-coupling assertions. Batch mocks target native rate evaluation and record active gas updates.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_step_batch_with_theta_modes"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationIsothermalStaggered::test_num_batches_exceeds_particles_clips_and_logs_info",

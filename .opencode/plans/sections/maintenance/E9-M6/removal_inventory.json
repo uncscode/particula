@@ -1621,7 +1621,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "All main condensation fixtures migrated native; all original tests mapped in condensation_assertions.json, including extracted controls, binned and latent suites. Four facade-only dual-route comparisons removed with independent native numerical successors.",
       "test_nodes": [
         {
           "name": "test_validate_time_step_allows_zero_and_rejects_invalid",
