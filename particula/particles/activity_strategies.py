@@ -31,9 +31,6 @@ class ActivityStrategy(ABC):
     and partial pressures. General methods include activity() and
     partial_pressure().
 
-    Attributes:
-        - None
-
     Methods:
     - get_name : Return the type of the activity strategy.
     - activity : Calculate the activity of a species. (abstract method)
@@ -62,11 +59,11 @@ class ActivityStrategy(ABC):
     ) -> Union[float, NDArray[np.float64]]:
         """Calculate the activity of a species based on its mass concentration.
 
-        Arguments:
-            - mass_concentration : Concentration of the species in kg/m^3.
+        Args:
+            mass_concentration: Concentration of the species in kg/m^3.
 
         Returns:
-            - Activity of the species, unitless.
+            Activity of the species, unitless.
         """
 
     def get_name(self) -> str:
@@ -80,12 +77,12 @@ class ActivityStrategy(ABC):
     ) -> Union[float, NDArray[np.float64]]:
         """Calculate the vapor pressure of species in the particle phase.
 
-        Arguments:
-            - pure_vapor_pressure : Pure vapor pressure of the species in Pa.
-            - mass_concentration : Concentration of the species in kg/m^3.
+        Args:
+            pure_vapor_pressure: Pure vapor pressure of the species in Pa.
+            mass_concentration: Concentration of the species in kg/m^3.
 
         Returns:
-            - Vapor pressure of the particle in Pa.
+            Vapor pressure of the particle in Pa.
         """
         return get_surface_partial_pressure(
             pure_vapor_pressure=pure_vapor_pressure,
@@ -97,11 +94,11 @@ class ActivityIdealMolar(ActivityStrategy):
     """Calculate ideal activity based on mole fractions (Raoult's Law).
 
     Attributes:
-        - molar_mass : Molar mass of the species in kg/mol.
+        molar_mass: Molar mass of the species in kg/mol.
 
     Methods:
         - activity : Computes ideal activity from mass concentration
-          and molar mass.
+            and molar mass.
 
     Examples:
         ```py title="Example Usage"
@@ -120,8 +117,8 @@ class ActivityIdealMolar(ActivityStrategy):
     def __init__(self, molar_mass: Union[float, NDArray[np.float64]] = 0.0):
         """Initialize the ActivityIdealMolar strategy.
 
-        Arguments:
-            - molar_mass : Molar mass in kg/mol.
+        Args:
+            molar_mass: Molar mass in kg/mol.
         """
         self.molar_mass = molar_mass
 
@@ -130,11 +127,11 @@ class ActivityIdealMolar(ActivityStrategy):
     ) -> Union[float, NDArray[np.float64]]:
         """Calculate the activity of a species based on mass concentration.
 
-        Arguments:
-            - mass_concentration : Concentration of the species in kg/m^3.
+        Args:
+            mass_concentration: Concentration of the species in kg/m^3.
 
         Returns:
-            - Activity of the species, unitless.
+            Activity of the species, unitless.
         """
         return get_ideal_activity_molar(
             mass_concentration=mass_concentration, molar_mass=self.molar_mass
@@ -143,9 +140,6 @@ class ActivityIdealMolar(ActivityStrategy):
 
 class ActivityIdealMass(ActivityStrategy):
     """Calculate ideal activity based on mass fractions (Raoult's Law).
-
-    Attributes:
-        - None
 
     Methods:
     - activity : Computes activity from mass concentration,
@@ -169,11 +163,11 @@ class ActivityIdealMass(ActivityStrategy):
     ) -> Union[float, NDArray[np.float64]]:
         """Calculate the activity of a species based on mass concentration.
 
-        Arguments:
-            - mass_concentration : Concentration of the species in kg/m^3.
+        Args:
+            mass_concentration: Concentration of the species in kg/m^3.
 
         Returns:
-            - Activity of the species, unitless.
+            Activity of the species, unitless.
         """
         return get_ideal_activity_mass(mass_concentration=mass_concentration)
 
@@ -182,8 +176,8 @@ class ActivityIdealVolume(ActivityStrategy):
     """Calculate ideal activity based on volume fractions (Raoult's Law).
 
     Attributes:
-        - density : The density of the species in kg/m^3, used to
-          derive volume fractions from mass concentrations.
+        density: The density of the species in kg/m^3, used to
+            derive volume fractions from mass concentrations.
 
     Methods:
     - activity : Computes activity from mass concentration and density.
@@ -203,8 +197,8 @@ class ActivityIdealVolume(ActivityStrategy):
     def __init__(self, density: Union[float, NDArray[np.float64]] = 0.0):
         """Initialize the ActivityIdealVolume strategy.
 
-        Arguments:
-            - density : Density of the species in kg/m^3.
+        Args:
+            density: Density of the species in kg/m^3.
         """
         self.density = density
 
@@ -213,12 +207,11 @@ class ActivityIdealVolume(ActivityStrategy):
     ) -> Union[float, NDArray[np.float64]]:
         """Calculate the activity of a species based on mass concentration.
 
-        Arguments:
-            - mass_concentration : Concentration of the species in kg/m^3.
-            - density : Density of the species in kg/m^3.
+        Args:
+            mass_concentration: Concentration of the species in kg/m^3.
 
         Returns:
-            - Activity of the species, unitless.
+            Activity of the species, unitless.
         """
         return get_ideal_activity_volume(
             mass_concentration=mass_concentration, density=self.density
@@ -339,10 +332,10 @@ class ActivityKappaParameter(ActivityStrategy):
     """Non-ideal activity strategy using the kappa hygroscopic parameter.
 
     Attributes:
-        - kappa : Kappa hygroscopic parameters (array or scalar).
-        - density : Densities (array or scalar) in kg/m^3.
-        - molar_mass : Molar masses (array or scalar) in kg/mol.
-        - water_index : Index identifying the water species in arrays.
+        kappa: Kappa hygroscopic parameters (array or scalar).
+        density: Densities (array or scalar) in kg/m^3.
+        molar_mass: Molar masses (array or scalar) in kg/mol.
+        water_index: Index identifying the water species in arrays.
 
     Methods:
     - activity : Computes non-ideal activity using kappa
@@ -378,11 +371,11 @@ class ActivityKappaParameter(ActivityStrategy):
     ):
         """Initialize the ActivityKappaParameter strategy.
 
-        Arguments:
-            - kappa : Kappa hygroscopic parameters (array or scalar).
-            - density : Densities in kg/m^3 (array or scalar).
-            - molar_mass : Molar masses in kg/mol (array or scalar).
-            - water_index : Index of the water species.
+        Args:
+            kappa: Kappa hygroscopic parameters (array or scalar).
+            density: Densities in kg/m^3 (array or scalar).
+            molar_mass: Molar masses in kg/mol (array or scalar).
+            water_index: Index of the water species.
         """
         self.kappa = (
             kappa if kappa is not None else np.array([0.0], dtype=np.float64)
@@ -404,11 +397,11 @@ class ActivityKappaParameter(ActivityStrategy):
     ) -> Union[float, NDArray[np.float64]]:
         """Calculate the activity of a species based on mass concentration.
 
-        Arguments:
-            - mass_concentration : Concentration of the species in kg/m^3.
+        Args:
+            mass_concentration: Concentration of the species in kg/m^3.
 
         Returns:
-            - Activity of the species, unitless.
+            Activity of the species, unitless.
 
         References:
             - Petters, M. D., & Kreidenweis, S. M. (2007). A single parameter

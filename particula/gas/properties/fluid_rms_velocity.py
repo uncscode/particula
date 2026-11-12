@@ -34,14 +34,14 @@ def get_fluid_rms_velocity(
         - ε (turbulent_dissipation) is Turbulent energy dissipation rate [m²/s³]
 
 
-    Arguments:
-        - re_lambda : Taylor-microscale Reynolds number [-]
-        - kinematic_viscosity : Kinematic viscosity of the fluid [m²/s]
-        - turbulent_dissipation : Rate of dissipation of turbulent kinetic
+    Args:
+        re_lambda: Taylor-microscale Reynolds number [-]
+        kinematic_viscosity: Kinematic viscosity of the fluid [m²/s]
+        turbulent_dissipation: Rate of dissipation of turbulent kinetic
             energy [m²/s³]
 
     Returns:
-        - Fluid RMS fluctuation velocity [m/s]
+        Fluid RMS fluctuation velocity [m/s]
 
     Examples:
         ``` py title="Example Usage"

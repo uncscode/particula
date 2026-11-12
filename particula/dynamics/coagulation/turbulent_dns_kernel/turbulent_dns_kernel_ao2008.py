@@ -49,19 +49,19 @@ def get_turbulent_dns_kernel_ao2008(
         - wᵣ is radial relative velocity [m/s].
         - g₁₂ is radial distribution function [dimensionless].
 
-    Arguments:
-        - particle_radius : Particle radius [m].
-        - velocity_dispersion : Velocity dispersion [m/s].
-        - particle_inertia_time : Particle inertia time [s].
-        - stokes_number : Stokes number [-].
-        - kolmogorov_length_scale : Kolmogorov length scale [m].
-        - reynolds_lambda : Reynolds number [-].
-        - normalized_accel_variance : Normalized acceleration variance [-].
-        - kolmogorov_velocity : Kolmogorov velocity [m/s].
-        - kolmogorov_time : Kolmogorov time [s].
+    Args:
+        particle_radius: Particle radius [m].
+        velocity_dispersion: Velocity dispersion [m/s].
+        particle_inertia_time: Particle inertia time [s].
+        stokes_number: Stokes number [-].
+        kolmogorov_length_scale: Kolmogorov length scale [m].
+        reynolds_lambda: Reynolds number [-].
+        normalized_accel_variance: Normalized acceleration variance [-].
+        kolmogorov_velocity: Kolmogorov velocity [m/s].
+        kolmogorov_time: Kolmogorov time [s].
 
     Returns:
-        - Collision kernel Γ₁₂ [m³/s].
+        Collision kernel Γ₁₂ [m³/s].
 
 
 
@@ -119,22 +119,22 @@ def get_turbulent_dns_kernel_ao2008_via_system_state(
     the collision kernel, Γ₁₂ [m³/s], which describes collision frequency
     under turbulence.
 
-    Arguments:
-        - particle_radius : Radius of the particles [m]. If an array is given,
+    Args:
+        particle_radius: Radius of the particles [m]. If an array is given,
             it is assumed to represent multiple particle sizes.
-        - particle_density : Density of the particles [kg/m³]. Must match the
+        particle_density: Density of the particles [kg/m³]. Must match the
             dimensionality of `particle_radius` if both are arrays.
-        - fluid_density : Density of the surrounding fluid [kg/m³].
-        - temperature : Temperature of the fluid [K].
-        - re_lambda : Turbulent Reynolds number based on the Taylor microscale.
-        - relative_velocity : Mean relative velocity between the particle and
+        fluid_density: Density of the surrounding fluid [kg/m³].
+        temperature: Temperature of the fluid [K].
+        re_lambda: Turbulent Reynolds number based on the Taylor microscale.
+        relative_velocity: Mean relative velocity between the particle and
             fluid [m/s]. Can be a single value or an array of the same
             dimensionality as `particle_radius`.
-        - turbulent_dissipation : Turbulent kinetic energy dissipation rate
+        turbulent_dissipation: Turbulent kinetic energy dissipation rate
             [m²/s³].
 
     Returns:
-        - Collision kernel Γ₁₂ [m³/s].
+        Collision kernel Γ₁₂ [m³/s].
 
     Examples:
         ```py

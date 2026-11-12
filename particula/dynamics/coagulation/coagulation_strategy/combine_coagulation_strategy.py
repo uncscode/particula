@@ -5,7 +5,7 @@ kernel. All strategies must share the same distribution type.
 
 Classes:
     - CombineCoagulationStrategy : Inherits from CoagulationStrategyABC
-      and aggregates multiple strategies.
+        and aggregates multiple strategies.
 
 """
 
@@ -29,10 +29,10 @@ class CombineCoagulationStrategy(CoagulationStrategyABC):
     distribution type.
 
     Attributes:
-        distribution_type : Matches the distribution_type of the first
-        strategy.
-        strategies : A list of individual CoagulationStrategyABC
-        instances.
+        distribution_type: Matches the distribution_type of the first
+            strategy.
+        strategies: A list of individual CoagulationStrategyABC
+            instances.
 
     Methods:
     - dimensionless_kernel : Raises NotImplementedError, as not supported here.
@@ -64,16 +64,16 @@ class CombineCoagulationStrategy(CoagulationStrategyABC):
     def __init__(self, strategies: List[CoagulationStrategyABC]):
         """Initialize the combined coagulation strategy.
 
-        Arguments:
-            - strategies : A list of CoagulationStrategyABC instances to
-              combine.
+        Args:
+            strategies: A list of CoagulationStrategyABC instances to
+                combine.
 
         Returns:
-            - None
+            result (None): No return value.
 
         Raises:
-            - ValueError : If no strategies are provided or if they have
-              mismatched distribution types.
+            ValueError: If no strategies are provided or if they have
+                mismatched distribution types.
         """
         if not strategies:
             raise ValueError("At least one strategy must be provided.")
@@ -99,15 +99,15 @@ class CombineCoagulationStrategy(CoagulationStrategyABC):
         Dimensionless kernels must be handled individually by the underlying
         strategies. This method logs an error and raises NotImplementedError.
 
-        Arguments:
-            - diffusive_knudsen : The diffusive Knudsen number(s)
-              [dimensionless].
-            - coulomb_potential_ratio : The Coulomb potential ratio(s)
-              [dimensionless].
+        Args:
+            diffusive_knudsen: The diffusive Knudsen number(s)
+                [dimensionless].
+            coulomb_potential_ratio: The Coulomb potential ratio(s)
+                [dimensionless].
 
         Raises:
-            - NotImplementedError : This method is not supported in the
-              combined strategy.
+            NotImplementedError: This method is not supported in the
+                combined strategy.
         """
         message = (
             "Dimensionless kernel not implemented in combined "
@@ -126,15 +126,15 @@ class CombineCoagulationStrategy(CoagulationStrategyABC):
         """Compute the total coagulation kernel by summing the kernels from all
         underlying strategies.
 
-        Arguments:
-            - particle : The particle data instance containing
-              particle data (radii, distribution, etc.).
-            - temperature : The temperature in Kelvin [K].
-            - pressure : The pressure in Pascals [Pa].
+        Args:
+            particle: The particle data instance containing
+                particle data (radii, distribution, etc.).
+            temperature: The temperature in Kelvin [K].
+            pressure: The pressure in Pascals [Pa].
 
         Returns:
-            - float or NDArray[np.float64] : The combined coagulation kernel,
-              equal to the sum of each strategy's kernel.
+            float or NDArray[np.float64]: The combined coagulation kernel,
+                equal to the sum of each strategy's kernel.
 
         Examples:
             ```py

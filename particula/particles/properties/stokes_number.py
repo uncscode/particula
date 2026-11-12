@@ -31,12 +31,12 @@ def get_stokes_number(
         - τ_p : Particle inertia time [s],
         - τ_k : Kolmogorov timescale [s].
 
-    Arguments:
-        - particle_inertia_time : Particle inertia time in seconds (s).
-        - kolmogorov_time : Kolmogorov timescale in seconds (s).
+    Args:
+        particle_inertia_time: Particle inertia time in seconds (s).
+        kolmogorov_time: Kolmogorov timescale in seconds (s).
 
     Returns:
-        - Dimensionless Stokes number (float or NDArray[np.float64]).
+        Dimensionless Stokes number (float or NDArray[np.float64]).
 
     Examples:
         ``` py title="Example"

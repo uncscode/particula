@@ -28,18 +28,18 @@ def get_particle_resolved_binned_radius(
     maximum radii and either a total number of bins or bins per radius
     decade.
 
-    Arguments:
-        - particle : The ParticleRepresentation instance for radius binning.
-        - bin_radius : Optional array of radius bin edges in meters.
-        - total_bins : Exact number of bins to generate, if set.
-        - bins_per_radius_decade : Number of bins per decade of radius,
-          used only if total_bins is None.
+    Args:
+        particle: The ParticleRepresentation instance for radius binning.
+        bin_radius: Optional array of radius bin edges in meters.
+        total_bins: Exact number of bins to generate, if set.
+        bins_per_radius_decade: Number of bins per decade of radius,
+            used only if total_bins is None.
 
     Returns:
-        - NDArray[np.float64] : The bin edges (radii) in meters.
+        NDArray[np.float64]: The bin edges (radii) in meters.
 
     Raises:
-        - ValueError : If finite radii cannot be determined for binning.
+        ValueError: If finite radii cannot be determined for binning.
     """
     # if the bin radius is set, return it
     if bin_radius is not None:
@@ -87,13 +87,13 @@ def get_speciated_mass_representation_from_particle_resolved(
     values in each bin. The distribution_strategy is switched to
     SpeciatedMassMovingBin.
 
-    Arguments:
-        - particle : The ParticleRepresentation to convert.
-        - bin_radius : Array of radius bin edges in meters.
+    Args:
+        particle: The ParticleRepresentation to convert.
+        bin_radius: Array of radius bin edges in meters.
 
     Returns:
-        - ParticleRepresentation : A new representation with binned
-          mass and concentration for each species.
+        ParticleRepresentation: A new representation with binned
+            mass and concentration for each species.
     """
     # deep copy the particle to avoid modifying the original
     new_particle = deepcopy(particle)

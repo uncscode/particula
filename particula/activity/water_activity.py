@@ -35,15 +35,15 @@ def biphasic_water_activity_point(
     """Computes the biphasic to single phase water activity (RH*100).
 
     Args:
-        - oxygen2carbon : The oxygen to carbon ratio.
-        - hydrogen2carbon : The hydrogen to carbon ratio.
-        - molar_mass_ratio : The molar mass ratio of water to organic
-          matter.
-        - functional_group : Optional functional group(s) of the organic
-          compound, if applicable.
+        oxygen2carbon: The oxygen to carbon ratio.
+        hydrogen2carbon: The hydrogen to carbon ratio.
+        molar_mass_ratio: The molar mass ratio of water to organic
+            matter.
+        functional_group: Optional functional group(s) of the organic
+            compound, if applicable.
 
     Returns:
-        - The RH cross point array.
+        The RH cross point array.
     """
     oxygen2carbon = np.asarray(oxygen2carbon, dtype=np.float64)
     hydrogen2carbon = np.asarray(hydrogen2carbon, dtype=np.float64)
@@ -114,15 +114,15 @@ def fixed_water_activity(
     determines phase separations if they occur.
 
     Args:
-        - water_activity : An array of water activity values.
-        - molar_mass_ratio : Array of molar mass ratios of the components.
-        - oxygen2carbon : Array of oxygen-to-carbon ratios.
-        - density : Array of densities of the mixture, in kg/m^3.
+        water_activity: An array of water activity values.
+        molar_mass_ratio: Array of molar mass ratios of the components.
+        oxygen2carbon: Array of oxygen-to-carbon ratios.
+        density: Array of densities of the mixture, in kg/m^3.
 
     Returns:
-        - A tuple containing the activity coefficients for alpha and beta
-          phases, and the q_alpha (phase separation) value.
-          If no phase separation occurs, the beta phase values are None.
+        A tuple containing the activity coefficients for alpha and beta
+            phases, and the q_alpha (phase separation) value.
+            If no phase separation occurs, the beta phase values are None.
     """
     # pylint: disable=too-many-locals
 

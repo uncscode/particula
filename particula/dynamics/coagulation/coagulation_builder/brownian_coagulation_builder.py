@@ -34,8 +34,8 @@ class BrownianCoagulationBuilder(
     the required parameters are set before building the strategy.
 
     Attributes:
-        - distribution_type : Representation of the particle
-          size distribution.
+        distribution_type: Representation of the particle
+            size distribution.
 
     Methods:
     - set_distribution_type : Assign the distribution type.

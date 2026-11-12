@@ -44,16 +44,16 @@ def get_diffusive_knudsen_number(
         - Γ_c is the continuum-limit Coulomb enhancement factor(dimensionless).
         - Γ_k is the kinetic-limit Coulomb enhancement factor (dimensionless).
 
-    Arguments:
-        - particle_radius : Radius of the particle(s) in meters (m).
-        - particle_mass : Mass of the particle(s) in kilograms (kg).
-        - friction_factor : Friction factor(s) (dimensionless).
-        - coulomb_potential_ratio : Coulomb potential ratio (dimensionless),
-          zero if no charge.
-        - temperature : Temperature of the system in Kelvin (K).
+    Args:
+        particle_radius: Radius of the particle(s) in meters (m).
+        particle_mass: Mass of the particle(s) in kilograms (kg).
+        friction_factor: Friction factor(s) (dimensionless).
+        coulomb_potential_ratio: Coulomb potential ratio (dimensionless),
+            zero if no charge.
+        temperature: Temperature of the system in Kelvin (K).
 
     Returns:
-        - The diffusive Knudsen number, either a float or NDArray[np.float64].
+        The diffusive Knudsen number, either a float or NDArray[np.float64].
 
     Examples:
         ```py title="Single Particle Example"

@@ -61,17 +61,17 @@ class ConversionStrategy:
     ) -> np.ndarray:
         """Convert distribution data from one scale to another.
 
-        Arguments:
-            - diameters : Array of particle diameters.
-            - concentration : The distribution data corresponding to these
+        Args:
+            diameters: Array of particle diameters.
+            concentration: The distribution data corresponding to these
                 diameters.
-            - inverse : If True, reverse the direction of the conversion.
+            inverse: If True, reverse the direction of the conversion.
 
         Returns:
-            - np.ndarray of converted distribution data.
+            np.ndarray of converted distribution data.
 
         Raises:
-            - NotImplementedError : If not overridden by a subclass.
+            NotImplementedError: If not overridden by a subclass.
         """
         raise NotImplementedError(
             "This method should be overridden by subclasses."
@@ -100,13 +100,13 @@ class SameScaleConversionStrategy(ConversionStrategy):
     ) -> np.ndarray:
         """Return the concentration unchanged, since no conversion is needed.
 
-        Arguments:
-            - diameters : Array of particle diameters (unused).
-            - concentration : The original distribution data.
-            - inverse : Flag indicating direction (unused).
+        Args:
+            diameters: Array of particle diameters (unused).
+            concentration: The original distribution data.
+            inverse: Flag indicating direction (unused).
 
         Returns:
-            - np.ndarray identical to the input concentration.
+            np.ndarray identical to the input concentration.
         """
         return concentration
 
@@ -130,14 +130,14 @@ class DNdlogDPtoPMFConversionStrategy(ConversionStrategy):
     ) -> np.ndarray:
         """Perform the conversion between dn/dlogdp and PMF formats.
 
-        Arguments:
-            - diameters : Array of particle diameters.
-            - concentration : Distribution data in dn/dlogdp or PMF format.
-            - inverse : If True, convert from PMF to dn/dlogdp; otherwise the
+        Args:
+            diameters: Array of particle diameters.
+            concentration: Distribution data in dn/dlogdp or PMF format.
+            inverse: If True, convert from PMF to dn/dlogdp; otherwise the
                 opposite.
 
         Returns:
-            - np.ndarray of the distribution in the target format.
+            np.ndarray of the distribution in the target format.
         """
         return get_distribution_in_dn(diameters, concentration, inverse=inverse)
 
@@ -161,14 +161,14 @@ class PMFtoPDFConversionStrategy(ConversionStrategy):
     ) -> np.ndarray:
         """Perform the conversion between PMF and PDF formats.
 
-        Arguments:
-            - diameters : Array of particle diameters.
-            - concentration : Distribution data in PMF or PDF format.
-            - inverse : If True, convert from PDF to PMF; otherwise from PMF
+        Args:
+            diameters: Array of particle diameters.
+            concentration: Distribution data in PMF or PDF format.
+            inverse: If True, convert from PDF to PMF; otherwise from PMF
                 to PDF.
 
         Returns:
-            - np.ndarray of the distribution in the target format.
+            np.ndarray of the distribution in the target format.
         """
         return get_pdf_distribution_in_pmf(
             diameters, concentration, to_pdf=not inverse
@@ -200,14 +200,14 @@ class DNdlogDPtoPDFConversionStrategy(ConversionStrategy):
         This method first converts dn/dlogdp to PMF, then to PDF, or the
         reverse if inverse is True.
 
-        Arguments:
-            - diameters : Array of particle diameters.
-            - concentration : Distribution data in dn/dlogdp or PDF format.
-            - inverse : If True, convert from PDF to dn/dlogdp; otherwise the
+        Args:
+            diameters: Array of particle diameters.
+            concentration: Distribution data in dn/dlogdp or PDF format.
+            inverse: If True, convert from PDF to dn/dlogdp; otherwise the
                 opposite.
 
         Returns:
-            - np.ndarray of the distribution in the target format.
+            np.ndarray of the distribution in the target format.
         """
         if inverse:
             concentration_pmf = get_pdf_distribution_in_pmf(
@@ -260,14 +260,14 @@ class SizerConverter:
     ) -> np.ndarray:
         """Convert the particle size distribution data.
 
-        Arguments:
-            - diameters : Array of particle diameters.
-            - concentration : Distribution data.
-            - inverse : If True, reverse the conversion direction
+        Args:
+            diameters: Array of particle diameters.
+            concentration: Distribution data.
+            inverse: If True, reverse the conversion direction
                 (if supported).
 
         Returns:
-            - np.ndarray of the converted distribution.
+            np.ndarray of the converted distribution.
         """
         return self.strategy.convert(diameters, concentration, inverse=inverse)
 
@@ -277,17 +277,17 @@ def get_distribution_conversion_strategy(
 ) -> ConversionStrategy:
     """Factory function to obtain a conversion strategy.
 
-    Arguments:
-        - input_scale : Scale of the input distribution, e.g.
+    Args:
+        input_scale: Scale of the input distribution, e.g.
             'dn/dlogdp' or 'pmf'.
-        - output_scale : Desired scale of the output distribution, e.g.
+        output_scale: Desired scale of the output distribution, e.g.
             'pmf' or 'pdf'.
 
     Returns:
-        - A ConversionStrategy object supporting the requested conversion.
+        A ConversionStrategy object supporting the requested conversion.
 
     Raises:
-        - ValueError : If scales are invalid or unsupported.
+        ValueError: If scales are invalid or unsupported.
 
     Examples:
         ``` py title="Example Usage"
@@ -345,14 +345,14 @@ def get_distribution_in_dn(
     If inverse=True, it reverts:
     - dn/dlogdp = d_num / (log10(upper / lower))
 
-    Arguments:
-        - diameter : Array of particle diameters.
-        - dn_dlogdp : Array representing either dn/dlogdp or d_num.
-        - inverse : If True, converts from d_num to dn/dlogdp; otherwise the
+    Args:
+        diameter: Array of particle diameters.
+        dn_dlogdp: Array representing either dn/dlogdp or d_num.
+        inverse: If True, converts from d_num to dn/dlogdp; otherwise the
             opposite.
 
     Returns:
-        - A np.ndarray of the converted distribution.
+        A np.ndarray of the converted distribution.
 
     Examples:
         ```py
@@ -402,13 +402,13 @@ def get_pdf_distribution_in_pmf(
     - y_PMF = y_pdf * Δx
       - Δx is the bin width, determined by consecutive differences in x_array.
 
-    Arguments:
-        - x_array : An array of diameters/radii for the distribution bins.
-        - distribution : The original distribution data (PMF or PDF).
-        - to_pdf : If True, convert from PMF to PDF; if False, from PDF to PMF.
+    Args:
+        x_array: An array of diameters/radii for the distribution bins.
+        distribution: The original distribution data (PMF or PDF).
+        to_pdf: If True, convert from PMF to PDF; if False, from PDF to PMF.
 
     Returns:
-        - A np.ndarray of the converted distribution data.
+        A np.ndarray of the converted distribution data.
 
     Examples:
         ```py

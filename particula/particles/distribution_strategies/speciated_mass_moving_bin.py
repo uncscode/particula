@@ -184,12 +184,12 @@ class SpeciatedMassMovingBin(DistributionStrategy):
         strategies where particles are represented by fixed mass bins with
         concentrations.
 
-        Arguments:
-            - distribution : The speciated mass distribution array.
-            - concentration : The concentration array.
-            - density : The density array.
-            - indices : Collision pair indices array of shape (K, 2).
-            - charge : Optional charge array (unused in this strategy).
+        Args:
+            distribution: The speciated mass distribution array.
+            concentration: The concentration array.
+            density: The density array.
+            indices: Collision pair indices array of shape (K, 2).
+            charge: Optional charge array (unused in this strategy).
 
         Raises:
             NotImplementedError: Always raised as method is not applicable.

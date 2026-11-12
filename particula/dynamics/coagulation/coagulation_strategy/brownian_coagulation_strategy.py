@@ -30,8 +30,8 @@ class BrownianCoagulationStrategy(CoagulationStrategyABC):
     as temperature, pressure, and particle radius.
 
     Attributes:
-        - distribution_type : Defines how particles are represented
-          (e.g., "discrete", "continuous_pdf", or "particle_resolved").
+        distribution_type: Defines how particles are represented
+            (e.g., "discrete", "continuous_pdf", or "particle_resolved").
 
     Methods:
     - kernel : Calculate the Brownian coagulation kernel (dimensioned).
@@ -66,9 +66,9 @@ class BrownianCoagulationStrategy(CoagulationStrategyABC):
     def __init__(self, distribution_type: str):
         """Initialize the BrownianCoagulationStrategy.
 
-        Arguments:
-            - distribution_type : String specifying the distribution type
-              (e.g., "discrete", "continuous_pdf", "particle_resolved").
+        Args:
+            distribution_type: String specifying the distribution type
+                (e.g., "discrete", "continuous_pdf", "particle_resolved").
         """
         super().__init__(distribution_type=distribution_type)
 
@@ -82,13 +82,13 @@ class BrownianCoagulationStrategy(CoagulationStrategyABC):
         This method raises NotImplementedError since dimensionless
         Brownian kernels are not defined here.
 
-        Arguments:
-            - diffusive_knudsen : Knudsen number array (unused).
-            - coulomb_potential_ratio : Coulomb ratio array (unused).
+        Args:
+            diffusive_knudsen: Knudsen number array (unused).
+            coulomb_potential_ratio: Coulomb ratio array (unused).
 
         Raises:
-            - NotImplementedError : Always, as no dimensionless kernel is
-            provided.
+            NotImplementedError: Always, as no dimensionless kernel is
+                provided.
         """
         message = (
             "Dimensionless kernel not implemented in simple "
@@ -110,15 +110,15 @@ class BrownianCoagulationStrategy(CoagulationStrategyABC):
         compute the kernel, which accounts for particle size, temperature,
         and pressure. The kernel typically has units of volume per time.
 
-        Arguments:
-            - particle : Particle data containing the distribution
-              and density or mass data needed for the kernel calculation.
-            - temperature : System temperature in Kelvin.
-            - pressure : System pressure in Pascals.
+        Args:
+            particle: Particle data containing the distribution
+                and density or mass data needed for the kernel calculation.
+            temperature: System temperature in Kelvin.
+            pressure: System pressure in Pascals.
 
         Returns:
-            - Brownian coagulation kernel values. Shape depends on the
-              underlying distribution.
+            Brownian coagulation kernel values. Shape depends on the
+                underlying distribution.
 
         Examples:
             ```py

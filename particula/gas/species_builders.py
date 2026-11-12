@@ -39,12 +39,12 @@ class GasSpeciesBuilder(
         - build : Validate parameters and return a GasSpecies object.
 
     Attributes:
-        - name : The name of the gas species.
-        - molar_mass : The molar mass of the gas species in kg/mol.
-        - vapor_pressure_strategy : The vapor pressure strategy for the
+        name: The name of the gas species.
+        molar_mass: The molar mass of the gas species in kg/mol.
+        vapor_pressure_strategy: The vapor pressure strategy for the
             gas species.
-        - partitioning : Whether the gas species can partition.
-        - concentration : The concentration of the gas species in the
+        partitioning: Whether the gas species can partition.
+        concentration: The concentration of the gas species in the
             mixture, in kg/m^3.
 
     Methods:
@@ -102,11 +102,11 @@ class GasSpeciesBuilder(
     ) -> "GasSpeciesBuilder":
         """Set the name of the gas species.
 
-        Arguments:
-            - name : The name of the gas species.
+        Args:
+            name: The name of the gas species.
 
         Returns:
-            - This builder instance.
+            This builder instance.
         """
         self.name = name
         return self
@@ -117,11 +117,11 @@ class GasSpeciesBuilder(
     ) -> "GasSpeciesBuilder":
         """Set the vapor pressure strategy for the gas species.
 
-        Arguments:
-            - strategy : The vapor pressure strategy (or list of strategies).
+        Args:
+            strategy: The vapor pressure strategy (or list of strategies).
 
         Returns:
-            - This builder instance.
+            This builder instance.
         """
         self.vapor_pressure_strategy = strategy
         return self
@@ -132,11 +132,11 @@ class GasSpeciesBuilder(
     ) -> "GasSpeciesBuilder":
         """Set whether the gas species can partition.
 
-        Arguments:
-            - partitioning : Boolean flag.
+        Args:
+            partitioning: Boolean flag.
 
         Returns:
-            - This builder instance.
+            This builder instance.
         """
         self.partitioning = partitioning
         return self
@@ -145,10 +145,10 @@ class GasSpeciesBuilder(
         """Validate parameters and return a GasSpecies object.
 
         Returns:
-            - The constructed GasSpecies instance.
+            The constructed GasSpecies instance.
 
         Raises:
-            - ValueError : If any required parameters are missing or invalid.
+            ValueError: If any required parameters are missing or invalid.
         """
         return GasSpecies(
             name=self.name,  # type: ignore
@@ -193,7 +193,7 @@ class PresetGasSpeciesBuilder(
         defaults.
 
         Returns:
-            - GasSpecies : The constructed GasSpecies instance.
+            GasSpecies: The constructed GasSpecies instance.
         """
         return GasSpecies(
             name=self.name,  # type: ignore

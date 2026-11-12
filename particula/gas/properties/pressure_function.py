@@ -30,13 +30,13 @@ def get_partial_pressure(
         - T is Temperature [K].
         - M is Molar mass [kg/mol].
 
-    Arguments:
-        - concentration : Concentration of the gas [kg/m³].
-        - molar_mass : Molar mass of the gas [kg/mol].
-        - temperature : Temperature [K].
+    Args:
+        concentration: Concentration of the gas [kg/m³].
+        molar_mass: Molar mass of the gas [kg/mol].
+        temperature: Temperature [K].
 
     Returns:
-        - Partial pressure of the gas [Pa].
+        Partial pressure of the gas [Pa].
 
     Examples:
         ```py title="Example usage"
@@ -74,12 +74,12 @@ def get_saturation_ratio_from_pressure(
         - p is Partial pressure [Pa].
         - p_vap is Pure vapor pressure [Pa].
 
-    Arguments:
-        - partial_pressure : Partial pressure [Pa].
-        - pure_vapor_pressure : Pure vapor pressure [Pa].
+    Args:
+        partial_pressure: Partial pressure [Pa].
+        pure_vapor_pressure: Pure vapor pressure [Pa].
 
     Returns:
-        - Saturation ratio of the gas (dimensionless).
+        Saturation ratio of the gas (dimensionless).
 
     Examples:
         ```py title="Example usage"

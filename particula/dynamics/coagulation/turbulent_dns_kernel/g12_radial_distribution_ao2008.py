@@ -45,18 +45,18 @@ def get_g12_radial_distribution_ao2008(
         - C₁ is a dimensionless function dependent on the Stokes numbers,
           Reynolds number, etc.
 
-    Arguments:
-        - particle_radius : Array of particle radii in meters.
-        - stokes_number : Array of particle Stokes numbers (dimensionless).
-        - kolmogorov_length_scale : Kolmogorov length scale in meters.
-        - reynolds_lambda : Taylor-microscale Reynolds number (dimensionless).
-        - normalized_accel_variance : Normalized acceleration variance
+    Args:
+        particle_radius: Array of particle radii in meters.
+        stokes_number: Array of particle Stokes numbers (dimensionless).
+        kolmogorov_length_scale: Kolmogorov length scale in meters.
+        reynolds_lambda: Taylor-microscale Reynolds number (dimensionless).
+        normalized_accel_variance: Normalized acceleration variance
             (dimensionless).
-        - kolmogorov_velocity : Kolmogorov velocity scale in m/s.
-        - kolmogorov_time : Kolmogorov timescale in seconds.
+        kolmogorov_velocity: Kolmogorov velocity scale in m/s.
+        kolmogorov_time: Kolmogorov timescale in seconds.
 
     Returns:
-        - The radial distribution function g₁₂ (dimensionless).
+        The radial distribution function g₁₂ (dimensionless).
 
     Examples:
         ```py title="Example Usage"

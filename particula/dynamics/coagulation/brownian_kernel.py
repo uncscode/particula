@@ -36,19 +36,19 @@ def get_brownian_kernel(
         - v is the mean thermal speed of the particles [m/s].
         - α is the collision efficiency of the particles [dimensionless].
 
-    Arguments:
-        - particle_radius : The radius of the particles [m].
-        - diffusivity_particle : The diffusivity of the particles [m²/s].
-        - g_collection_term_particle : The collection term for Brownian
-          coagulation [dimensionless].
-        - mean_thermal_speed_particle : The mean thermal speed of the
-          particles [m/s].
-        - alpha_collision_efficiency : The collision efficiency of the
-          particles [dimensionless].
+    Args:
+        particle_radius: The radius of the particles [m].
+        diffusivity_particle: The diffusivity of the particles [m²/s].
+        g_collection_term_particle: The collection term for Brownian
+            coagulation [dimensionless].
+        mean_thermal_speed_particle: The mean thermal speed of the
+            particles [m/s].
+        alpha_collision_efficiency: The collision efficiency of the
+            particles [dimensionless].
 
     Returns:
-        - Square matrix of Brownian coagulation kernel for aerosol particles
-          [m³/s].
+        Square matrix of Brownian coagulation kernel for aerosol particles
+            [m³/s].
 
     References:
         - Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
@@ -117,17 +117,17 @@ def get_brownian_kernel_via_system_state(
         - v is the mean thermal speed of the particles [m/s].
         - α is the collision efficiency of the particles [dimensionless].
 
-    Arguments:
-        - particle_radius : The radius of the particles [m].
-        - particle_mass : The mass of the particles [kg].
-        - temperature : The temperature of the air [K].
-        - pressure : The pressure of the air [Pa].
-        - alpha_collision_efficiency : The collision efficiency of the
-          particles [dimensionless].
+    Args:
+        particle_radius: The radius of the particles [m].
+        particle_mass: The mass of the particles [kg].
+        temperature: The temperature of the air [K].
+        pressure: The pressure of the air [Pa].
+        alpha_collision_efficiency: The collision efficiency of the
+            particles [dimensionless].
 
     Returns:
-        - Square matrix of Brownian coagulation kernel for aerosol particles
-          [m³/s].
+        Square matrix of Brownian coagulation kernel for aerosol particles
+            [m³/s].
 
     References:
         - Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
@@ -196,13 +196,13 @@ def _mean_free_path_l(
         - D is the diffusivity of the particles [m²/s].
         - v is the mean thermal speed of the particles [m/s].
 
-    Arguments:
-        - diffusivity_particle : The diffusivity of the particles [m²/s].
-        - mean_thermal_speed_particle : The mean thermal speed of the
-          particles [m/s].
+    Args:
+        diffusivity_particle: The diffusivity of the particles [m²/s].
+        mean_thermal_speed_particle: The mean thermal speed of the
+            particles [m/s].
 
     Returns:
-        - The mean free path of the particles [m].
+        The mean free path of the particles [m].
 
     References:
         - Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
@@ -227,12 +227,12 @@ def _g_collection_term(
         - λ is the mean free path of the particles [m].
         - r is the radius of the particles [m].
 
-    Arguments:
-        - mean_free_path_particle : The mean free path of the particles [m].
-        - particle_radius : The radius of the particles [m].
+    Args:
+        mean_free_path_particle: The mean free path of the particles [m].
+        particle_radius: The radius of the particles [m].
 
     Returns:
-        - The collection term for Brownian coagulation [dimensionless].
+        The collection term for Brownian coagulation [dimensionless].
 
     References:
         - Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
@@ -266,13 +266,13 @@ def _brownian_diffusivity(
         - T is the temperature of the air [K].
         - B is the aerodynamic mobility of the particles [m²/s].
 
-    Arguments:
-        - temperature : The temperature of the air [K].
-        - aerodynamic_mobility : The aerodynamic mobility of the particles
-          [m²/s].
+    Args:
+        temperature: The temperature of the air [K].
+        aerodynamic_mobility: The aerodynamic mobility of the particles
+            [m²/s].
 
     Returns:
-        - The diffusivity of the particles due to Brownian motion [m²/s].
+        The diffusivity of the particles due to Brownian motion [m²/s].
 
     References:
         - Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and

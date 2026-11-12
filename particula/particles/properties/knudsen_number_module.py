@@ -31,12 +31,12 @@ def get_knudsen_number(
         - λ is the mean free path in meters (m),
         - r is the particle radius in meters (m).
 
-    Arguments:
-        - mean_free_path : Mean free path of the gas molecules in meters (m).
-        - particle_radius : Radius of the particle in meters (m).
+    Args:
+        mean_free_path: Mean free path of the gas molecules in meters (m).
+        particle_radius: Radius of the particle in meters (m).
 
     Returns:
-        - The Knudsen number, which is the ratio of the mean free path to the
+        The Knudsen number, which is the ratio of the mean free path to the
             particle radius.
 
     Examples:

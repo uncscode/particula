@@ -43,12 +43,12 @@ def get_kinematic_viscosity(
         - μ is Dynamic viscosity [Pa·s].
         - ρ is Fluid density [kg/m³].
 
-    Arguments:
-        - dynamic_viscosity : Dynamic viscosity of the fluid [Pa·s].
-        - fluid_density : Density of the fluid [kg/m³].
+    Args:
+        dynamic_viscosity: Dynamic viscosity of the fluid [Pa·s].
+        fluid_density: Density of the fluid [kg/m³].
 
     Returns:
-        - The kinematic viscosity [m²/s].
+        The kinematic viscosity [m²/s].
 
     Examples:
         ```py title="Example usage"
@@ -87,14 +87,14 @@ def get_kinematic_viscosity_via_system_state(
         - μ is Dynamic viscosity [Pa·s].
         - ρ is Fluid density [kg/m³].
 
-    Arguments:
-        - temperature : Desired air temperature [K]. Must be > 0.
-        - fluid_density : Density of the fluid [kg/m³].
-        - reference_viscosity : Reference dynamic viscosity [Pa·s].
-        - reference_temperature : Reference temperature [K].
+    Args:
+        temperature: Desired air temperature [K]. Must be > 0.
+        fluid_density: Density of the fluid [kg/m³].
+        reference_viscosity: Reference dynamic viscosity [Pa·s].
+        reference_temperature: Reference temperature [K].
 
     Returns:
-        - The kinematic viscosity of air [m²/s].
+        The kinematic viscosity of air [m²/s].
 
     Examples:
         ```py title="Example usage"

@@ -26,19 +26,19 @@ def _super_droplet_update_step(
     radii are computed via volume conservation, and an event counter
     tracks how many coagulation events each particle has undergone.
 
-    Arguments:
-        - particle_radius : Array of particle radii (m).
-        - concentration : Array representing the concentration of each
-          particle (number or mass, depending on usage).
-        - single_event_counter : Tracks the number of coagulation events
-          each particle has experienced in the current iteration.
-        - small_index : Indices for smaller particles in a coagulation event.
-        - large_index : Indices for larger particles in a coagulation event.
+    Args:
+        particle_radius: Array of particle radii (m).
+        concentration: Array representing the concentration of each
+            particle (number or mass, depending on usage).
+        single_event_counter: Tracks the number of coagulation events
+            each particle has experienced in the current iteration.
+        small_index: Indices for smaller particles in a coagulation event.
+        large_index: Indices for larger particles in a coagulation event.
 
     Returns:
-        - An updated array of particle radii (m) following coagulation.
-        - An updated array representing the concentration of particles.
-        - An updated array tracking the index-wise number of events.
+        An updated array of particle radii (m) following coagulation.
+        An updated array representing the concentration of particles.
+        An updated array tracking the index-wise number of events.
 
     Examples:
         ```py
@@ -128,15 +128,15 @@ def _event_pairs(
     are the same, a correction factor is applied to avoid double-counting
     pairs.
 
-    Arguments:
-        - lower_bin : Index of the lower bin in the distribution.
-        - upper_bin : Index of the upper bin in the distribution.
-        - kernel_max : Maximum kernel value used to weight collisions.
-        - number_in_bins : The population of particles per bin.
+    Args:
+        lower_bin: Index of the lower bin in the distribution.
+        upper_bin: Index of the upper bin in the distribution.
+        kernel_max: Maximum kernel value used to weight collisions.
+        number_in_bins: The population of particles per bin.
 
     Returns:
-        - A float representing the expected number of particle-pair
-          collision events.
+        A float representing the expected number of particle-pair
+            collision events.
 
     Examples:
         ```py
@@ -173,17 +173,17 @@ def _sample_events(
     samples from a Poisson distribution to obtain the actual number of
     collisions happening within the current `time_step`.
 
-    Arguments:
-        - events : The calculated number of particle pairs that could
-          interact.
-        - volume : The volume of the simulation space (m³).
-        - time_step : The time span (seconds) over which collisions are
-          considered.
-        - generator : A NumPy random Generator to sample the Poisson
-          distribution.
+    Args:
+        events: The calculated number of particle pairs that could
+            interact.
+        volume: The volume of the simulation space (m³).
+        time_step: The time span (seconds) over which collisions are
+            considered.
+        generator: A NumPy random Generator to sample the Poisson
+            distribution.
 
     Returns:
-        - The sampled number of coagulation events as an integer.
+        The sampled number of coagulation events as an integer.
 
     Examples:
         ```py
@@ -217,18 +217,18 @@ def random_choice_indices(
     It uses the provided random generator to perform the sampling
     with replacement if needed.
 
-    Arguments:
-        - lower_bin : Index of the lower bin to filter particles from.
-        - upper_bin : Index of the upper bin to filter particles from.
-        - events : Number of events (indices) to sample for each bin.
-        - particle_radius : Array of particle radii; only those > 0
-          are considered valid.
-        - bin_indices : Array of bin labels corresponding to each particle.
-        - generator : Random number generator used for index selection.
+    Args:
+        lower_bin: Index of the lower bin to filter particles from.
+        upper_bin: Index of the upper bin to filter particles from.
+        events: Number of events (indices) to sample for each bin.
+        particle_radius: Array of particle radii; only those > 0
+            are considered valid.
+        bin_indices: Array of bin labels corresponding to each particle.
+        generator: Random number generator used for index selection.
 
     Returns:
-        - Indices of particles from the lower bin.
-        - Indices of particles from the upper bin.
+        Indices of particles from the lower bin.
+        Indices of particles from the upper bin.
 
     Examples:
         ```py
@@ -273,16 +273,16 @@ def _select_random_indices(
     (those may happen later). The result is two arrays of equal size,
     each containing random picks within the respective bins.
 
-    Arguments:
-        - lower_bin : Index for the "smaller" bin.
-        - upper_bin : Index for the "larger" bin.
-        - events : How many pairs to select.
-        - number_in_bins : Array with the count of particles in each bin.
-        - generator : Random number generator to draw the indices.
+    Args:
+        lower_bin: Index for the "smaller" bin.
+        upper_bin: Index for the "larger" bin.
+        events: How many pairs to select.
+        number_in_bins: Array with the count of particles in each bin.
+        generator: Random number generator to draw the indices.
 
     Returns:
-        - An array of size `events` with random picks from `lower_bin`.
-        - An array of size `events` with random picks from `upper_bin`.
+        An array of size `events` with random picks from `lower_bin`.
+        An array of size `events` with random picks from `upper_bin`.
 
     Examples:
         ```py
@@ -334,20 +334,20 @@ def _bin_to_particle_indices(
     particles occupy positions [0..9], this method adds that offset to
     each index in `lower_indices`.
 
-    Arguments:
-        - lower_indices : Relative indices (local to the bin) of smaller
+    Args:
+        lower_indices: Relative indices (local to the bin) of smaller
             particles.
-        - upper_indices : Relative indices (local to the bin) of larger
+        upper_indices: Relative indices (local to the bin) of larger
             particles.
-        - lower_bin : The bin representing the smaller particles.
-        - upper_bin : The bin representing the larger particles.
-        - bin_indices : Cumulative offsets to determine where each bin begins.
+        lower_bin: The bin representing the smaller particles.
+        upper_bin: The bin representing the larger particles.
+        bin_indices: Cumulative offsets to determine where each bin begins.
 
     Returns:
-        - `small_index` : Absolute positions of smaller particles in the
-          sorted particle array.
-        - `large_index` : Absolute positions of the larger particles in
-          the sorted array.
+        `small_index`: Absolute positions of smaller particles in the
+            sorted particle array.
+        `large_index`: Absolute positions of the larger particles in
+            the sorted array.
 
     Examples:
         ```py
@@ -385,17 +385,17 @@ def _filter_valid_indices(
     enforces that each particle has had < 1 event so far (or you can
     define your own threshold). The pairs failing these checks are removed.
 
-    Arguments:
-        - small_index : Indices for the smaller particles in each pair.
-        - large_index : Indices for the larger particles in each pair.
-        - particle_radius : Array of radii for each particle.
-        - single_event_counter : Optional array counting how many events
-          each particle has undergone. If provided, only particles with
-          counter < 1 pass the filter.
+    Args:
+        small_index: Indices for the smaller particles in each pair.
+        large_index: Indices for the larger particles in each pair.
+        particle_radius: Array of radii for each particle.
+        single_event_counter: Optional array counting how many events
+            each particle has undergone. If provided, only particles with
+            counter < 1 pass the filter.
 
     Returns:
-        - Filtered `small_index` with only valid pairs.
-        - Filtered `large_index` that corresponds to valid pairs.
+        Filtered `small_index` with only valid pairs.
+        Filtered `large_index` that corresponds to valid pairs.
 
     Examples:
         ```py
@@ -443,17 +443,17 @@ def _coagulation_events(
     large_index)` pair by taking the ratio of `kernel_values / kernel_max`.
     Next, a random uniform draw decides if each collision occurs.
 
-    Arguments:
-        - small_index : Array of indices representing smaller particles.
-        - large_index : Array of indices representing larger particles.
-        - kernel_values : Collision kernel values for each pair.
-        - kernel_max : A maximum kernel value used for normalization.
-        - generator : Random generator to compare probabilities vs.
-          uniform draws.
+    Args:
+        small_index: Array of indices representing smaller particles.
+        large_index: Array of indices representing larger particles.
+        kernel_values: Collision kernel values for each pair.
+        kernel_max: A maximum kernel value used for normalization.
+        generator: Random generator to compare probabilities vs.
+            uniform draws.
 
     Returns:
-        - Filtered `small_index` containing only those that coagulated.
-        - Filtered `large_index` containing only those that coagulated.
+        Filtered `small_index` containing only those that coagulated.
+        Filtered `large_index` containing only those that coagulated.
 
     Examples:
         ```py
@@ -493,16 +493,16 @@ def _sort_particles(
     The function returns an array of `unsort_indices` that can be used
     to restore the particles to their original order after manipulations.
 
-    Arguments:
-        - particle_radius : 1D NumPy array of particle radii.
-        - particle_concentration : Optional array of corresponding
-          concentrations.
+    Args:
+        particle_radius: 1D NumPy array of particle radii.
+        particle_concentration: Optional array of corresponding
+            concentrations.
 
     Returns:
-        - `unsort_indices` : Indices to revert sorting to the original order.
-        - `sorted_radius` : Sorted array of radii in ascending order.
-        - `sorted_concentration` : Sorted array of concentrations, if
-          provided; otherwise `None`.
+        `unsort_indices`: Indices to revert sorting to the original order.
+        `sorted_radius`: Sorted array of radii in ascending order.
+        `sorted_concentration`: Sorted array of concentrations, if
+            provided; otherwise `None`.
 
     Examples:
         ```py
@@ -543,13 +543,13 @@ def _bin_particles(
     with the number of particles in each bin, and (2) an array of per-particle
     bin indices.
 
-    Arguments:
-        - particle_radius : Array of sorted particle radii.
-        - radius_bins : Edges used to define the bins.
+    Args:
+        particle_radius: Array of sorted particle radii.
+        radius_bins: Edges used to define the bins.
 
     Returns:
-        - `number_in_bins` : Counts of how many radii lie in each bin.
-        - `bin_indices` : The bin index assigned to each particle.
+        `number_in_bins`: Counts of how many radii lie in each bin.
+        `bin_indices`: The bin index assigned to each particle.
 
     Examples:
         ```py
@@ -582,13 +582,13 @@ def _get_bin_pairs(
     (including binA == binB) for collision computations. The combination
     ensures each pair is returned only once.
 
-    Arguments:
-        - bin_indices : Array of bin indices for each particle (though
-          only the unique values matter).
+    Args:
+        bin_indices: Array of bin indices for each particle (though
+            only the unique values matter).
 
     Returns:
-        - A list of (lower_bin, upper_bin) pairs covering all unique
-          bins in `bin_indices`.
+        A list of (lower_bin, upper_bin) pairs covering all unique
+            bins in `bin_indices`.
 
     Examples:
         ```py
@@ -613,15 +613,15 @@ def _calculate_concentration_in_bins(
     fall into each bin. The `number_in_bins` array is used mainly for
     shape reference but can also confirm the count of particles.
 
-    Arguments:
-        - bin_indices : Array of bin indices for each particle.
-        - particle_concentration : 1D array of concentrations matching
-          each particle.
-        - number_in_bins : Array with the count of particles in each bin.
+    Args:
+        bin_indices: Array of bin indices for each particle.
+        particle_concentration: 1D array of concentrations matching
+            each particle.
+        number_in_bins: Array with the count of particles in each bin.
 
     Returns:
-        - A 1D array whose length is the number of unique bins, containing
-          the summed concentration per bin.
+        A 1D array whose length is the number of unique bins, containing
+            the summed concentration per bin.
 
     Examples:
         ```py
@@ -661,19 +661,19 @@ def get_super_droplet_coagulation_step(
     the particle radii/concentrations, then unsorts them back to the original
     order.
 
-    Arguments:
-        - particle_radius : Array of particle radii (m).
-        - particle_concentration : Array of per-particle concentration.
-        - kernel : 2D matrix of coagulation kernel values, dimension
-          ~ len(kernel_radius) × len(kernel_radius).
-        - kernel_radius : Array of radius points defining the kernel dimension.
-        - volume : System volume or domain size in m³.
-        - time_step : The length of this coagulation iteration in seconds.
-        - random_generator : Random number generator for sampling collisions.
+    Args:
+        particle_radius: Array of particle radii (m).
+        particle_concentration: Array of per-particle concentration.
+        kernel: 2D matrix of coagulation kernel values, dimension
+            ~ len(kernel_radius) × len(kernel_radius).
+        kernel_radius: Array of radius points defining the kernel dimension.
+        volume: System volume or domain size in m³.
+        time_step: The length of this coagulation iteration in seconds.
+        random_generator: Random number generator for sampling collisions.
 
     Returns:
-        - Updated radii array after processing coagulation.
-        - Updated concentrations array after processing coagulation.
+        Updated radii array after processing coagulation.
+        Updated concentrations array after processing coagulation.
 
     Examples:
         ```py

@@ -36,9 +36,6 @@ class VaporPressureStrategy(ABC):
     pressure. Subclasses must implement the pure_vapor_pressure method
     with specific formulae or empirical correlations for vapor pressure.
 
-    Attributes:
-        - None
-
     Methods:
     - partial_pressure: Compute partial pressure from concentration.
     - concentration: Compute concentration from partial pressure.
@@ -68,10 +65,10 @@ class VaporPressureStrategy(ABC):
     ) -> Union[float, NDArray[np.float64]]:
         """Calculate partial pressure from concentration, molar mass, T.
 
-        Arguments:
-            - concentration : Concentration of the gas in kg/m^3.
-            - molar_mass : Molar mass of the gas in kg/mol.
-            - temperature : Temperature in Kelvin.
+        Args:
+            concentration: Concentration of the gas in kg/m^3.
+            molar_mass: Molar mass of the gas in kg/mol.
+            temperature: Temperature in Kelvin.
 
         Returns:
             Partial pressure of the gas in Pascals.
@@ -96,10 +93,10 @@ class VaporPressureStrategy(ABC):
         """Calculate the concentration of the gas at a given pressure and
         temperature.
 
-        Arguments:
-            - partial_pressure: Pressure in Pascals.
-            - molar_mass: Molar mass of the gas in kg/mol.
-            - temperature: Temperature in Kelvin.
+        Args:
+            partial_pressure: Pressure in Pascals.
+            molar_mass: Molar mass of the gas in kg/mol.
+            temperature: Temperature in Kelvin.
 
         Returns:
             The concentration of the gas in kg/m^3.
@@ -126,10 +123,10 @@ class VaporPressureStrategy(ABC):
         """Calculate the saturation ratio of the gas from its concentration and
         molar mass at a given temperature.
 
-        Arguments:
-            - concentration : Concentration of the gas in kg/m^3.
-            - molar_mass : Molar mass of the gas in kg/mol.
-            - temperature : Temperature in Kelvin.
+        Args:
+            concentration: Concentration of the gas in kg/m^3.
+            molar_mass: Molar mass of the gas in kg/mol.
+            temperature: Temperature in Kelvin.
 
         Returns:
             The saturation ratio of the gas.
@@ -155,9 +152,9 @@ class VaporPressureStrategy(ABC):
         """Calculate the saturation concentration of the gas at a given
         temperature.
 
-        Arguments:
-            - molar_mass : Molar mass of the gas in kg/mol.
-            - temperature : Temperature in Kelvin.
+        Args:
+            molar_mass: Molar mass of the gas in kg/mol.
+            temperature: Temperature in Kelvin.
 
         Returns:
             The saturation concentration of the gas in kg/m^3.
@@ -181,8 +178,8 @@ class VaporPressureStrategy(ABC):
         """Calculate the pure (saturation) vapor pressure at a given
         temperature. Units are in Pascals Pa=kg/(m·s²).
 
-        Arguments:
-            - temperature : Temperature in Kelvin.
+        Args:
+            temperature: Temperature in Kelvin.
         """
 
 
@@ -194,7 +191,7 @@ class ConstantVaporPressureStrategy(VaporPressureStrategy):
     model.
 
     Attributes:
-        - vapor_pressure : The constant vapor pressure in Pascals.
+        vapor_pressure: The constant vapor pressure in Pascals.
 
     Methods:
     - partial_pressure: Compute partial pressure from concentration.
@@ -219,7 +216,7 @@ class ConstantVaporPressureStrategy(VaporPressureStrategy):
     def __init__(self, vapor_pressure: Union[float, NDArray[np.float64]]):
         """Initialize the Constant Vapor Pressure strategy.
 
-        Arguments:
+        Args:
             vapor_pressure: The constant vapor pressure value in Pascals.
         """
         self.vapor_pressure = vapor_pressure
@@ -229,8 +226,8 @@ class ConstantVaporPressureStrategy(VaporPressureStrategy):
     ) -> Union[float, NDArray[np.float64]]:
         """Return the constant vapor pressure value.
 
-        Arguments:
-            - temperature : Not used.
+        Args:
+            temperature: Not used.
 
         Returns:
             The constant vapor pressure value in Pascals.
@@ -253,9 +250,9 @@ class AntoineVaporPressureStrategy(VaporPressureStrategy):
     which relates temperature in Kelvin to the logarithm of vapor pressure.
 
     Attributes:
-        - a : Coefficient "a" in the Antoine equation.
-        - b : Coefficient "b" in the Antoine equation.
-        - c : Coefficient "c" in the Antoine equation.
+        a: Coefficient "a" in the Antoine equation.
+        b: Coefficient "b" in the Antoine equation.
+        c: Coefficient "c" in the Antoine equation.
 
     Methods:
     - partial_pressure: Compute partial pressure from concentration.
@@ -292,7 +289,7 @@ class AntoineVaporPressureStrategy(VaporPressureStrategy):
     ):
         """Initialize the Antoine Vapor Pressure strategy.
 
-        Arguments:
+        Args:
             a: Coefficient 'a' in the Antoine equation.
             b: Coefficient 'b' in the Antoine equation (K).
             c: Coefficient 'c' in the Antoine equation (K).
@@ -306,8 +303,8 @@ class AntoineVaporPressureStrategy(VaporPressureStrategy):
     ) -> Union[float, NDArray[np.float64]]:
         """Calculate vapor pressure using the Antoine equation.
 
-        Arguments:
-            - temperature : Temperature in Kelvin.
+        Args:
+            temperature: Temperature in Kelvin.
 
         Returns:
             Vapor pressure in Pascals.
@@ -338,9 +335,9 @@ class ClausiusClapeyronStrategy(VaporPressureStrategy):
     with temperature, given latent heat data and a reference point.
 
     Attributes:
-        - latent_heat : Latent heat of vaporization (J/mol).
-        - temperature_initial : Reference temperature (K).
-        - pressure_initial : Reference pressure (Pa).
+        latent_heat: Latent heat of vaporization (J/mol).
+        temperature_initial: Reference temperature (K).
+        pressure_initial: Reference pressure (Pa).
 
     Methods:
     - partial_pressure: Compute partial pressure from concentration.
@@ -375,10 +372,10 @@ class ClausiusClapeyronStrategy(VaporPressureStrategy):
         """Initializes the Clausius-Clapeyron strategy with the specific latent
         heat of vaporization and the specific gas constant of the substance.
 
-        Arguments:
-            - latent_heat : Latent heat of vaporization in J/mol.
-            - temperature_initial : Initial temperature in Kelvin.
-            - pressure_initial : Initial vapor pressure in Pascals.
+        Args:
+            latent_heat: Latent heat of vaporization in J/mol.
+            temperature_initial: Initial temperature in Kelvin.
+            pressure_initial: Initial vapor pressure in Pascals.
         """
         self.latent_heat = latent_heat
         self.temperature_initial = temperature_initial
@@ -389,8 +386,8 @@ class ClausiusClapeyronStrategy(VaporPressureStrategy):
     ) -> Union[float, NDArray[np.float64]]:
         """Calculate vapor pressure using Clausius-Clapeyron equation.
 
-        Arguments:
-            - temperature : Final temperature in Kelvin.
+        Args:
+            temperature: Final temperature in Kelvin.
 
         Returns:
             Pure vapor pressure in Pascals.
@@ -447,8 +444,8 @@ class WaterBuckStrategy(VaporPressureStrategy):
     ) -> Union[float, NDArray[np.float64]]:
         """Calculate vapor pressure using the Buck equation for water vapor.
 
-        Arguments:
-            - temperature: Temperature in Kelvin.
+        Args:
+            temperature: Temperature in Kelvin.
 
         Returns:
             Vapor pressure in Pascals.
@@ -477,10 +474,10 @@ class TableVaporPressureStrategy(VaporPressureStrategy):
     the vapor pressure at arbitrary temperatures.
 
     Attributes:
-        - vapor_pressures: NDArray[np.float64]
-          Vapor pressure values in Pascals.
-        - temperatures: NDArray[np.float64]
-          Temperatures in Kelvin corresponding to the vapor pressures.
+        vapor_pressures: NDArray[np.float64]
+            Vapor pressure values in Pascals.
+        temperatures: NDArray[np.float64]
+            Temperatures in Kelvin corresponding to the vapor pressures.
 
     Methods:
     - partial_pressure: Compute partial pressure from concentration.
@@ -513,7 +510,7 @@ class TableVaporPressureStrategy(VaporPressureStrategy):
     ) -> None:
         """Initialize the Table Vapor Pressure strategy.
 
-        Arguments:
+        Args:
             vapor_pressures: Array of vapor pressure values in Pascals.
             temperatures: Array of corresponding temperatures in Kelvin.
 
@@ -568,8 +565,8 @@ class ArblasterLiquidVaporPressureStrategy(VaporPressureStrategy):
     def __init__(self, coefficients: tuple[float, float, float, float, float]):
         """Initialize with the 5-term polynomial coefficients.
 
-        Arguments:
-            - coefficients : Tuple ``(A, B, C, D, E)`` for the correlation.
+        Args:
+            coefficients: Tuple ``(A, B, C, D, E)`` for the correlation.
         """
         self.coefficients = coefficients
 
@@ -578,8 +575,8 @@ class ArblasterLiquidVaporPressureStrategy(VaporPressureStrategy):
     ) -> Union[float, NDArray[np.float64]]:
         """Calculate vapor pressure from the 5-term polynomial.
 
-        Arguments:
-            - temperature : Temperature in Kelvin.
+        Args:
+            temperature: Temperature in Kelvin.
 
         Returns:
             Vapor pressure in Pascals.
@@ -622,13 +619,13 @@ class LiquidClausiusHybridStrategy(VaporPressureStrategy):
     ) -> None:
         """Initialize the hybrid vapor pressure strategy.
 
-        Arguments:
-            - coefficients : Polynomial coefficients ``(A, B, C, D, E)``.
-            - latent_heat : Latent heat of vaporization in J/mol.
-            - temperature_initial : Reference temperature in Kelvin.
-            - pressure_initial : Reference pressure in Pascals.
-            - boiling_point : Temperature where weighting is 0.5.
-            - transition_width : Width of the logistic transition in Kelvin.
+        Args:
+            coefficients: Polynomial coefficients ``(A, B, C, D, E)``.
+            latent_heat: Latent heat of vaporization in J/mol.
+            temperature_initial: Reference temperature in Kelvin.
+            pressure_initial: Reference pressure in Pascals.
+            boiling_point: Temperature where weighting is 0.5.
+            transition_width: Width of the logistic transition in Kelvin.
         """
         self.liquid_strategy = ArblasterLiquidVaporPressureStrategy(
             coefficients
@@ -644,8 +641,8 @@ class LiquidClausiusHybridStrategy(VaporPressureStrategy):
     ) -> Union[float, NDArray[np.float64]]:
         """Smoothly combine liquid and Clausius–Clapeyron approaches.
 
-        Arguments:
-            - temperature : Temperature in Kelvin.
+        Args:
+            temperature: Temperature in Kelvin.
 
         Returns:
             Vapor pressure in Pascals.

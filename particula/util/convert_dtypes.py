@@ -18,15 +18,15 @@ def get_coerced_type(data, dtype):
     """Coerce the given data to the specified dtype if it is not already of that
     type.
 
-    Arguments:
-        - data : The data to be coerced (any type).
-        - dtype : The desired data type, e.g. float, int, or np.ndarray.
+    Args:
+        data (Any): The data to be coerced (any type).
+        dtype (type): The desired data type, e.g. float, int, or np.ndarray.
 
     Returns:
-        - The data converted to the specified type.
+        result (Any): The data converted to the specified type.
 
     Raises:
-        - ValueError : If the data cannot be coerced to the desired dtype.
+        ValueError: If the data cannot be coerced to the desired dtype.
 
     Examples:
         ``` py title="Coerce integer to float"
@@ -59,14 +59,14 @@ def get_dict_from_list(list_of_str: list) -> dict:
     """Convert a list of strings into a dictionary mapping each string to its
     index.
 
-    Arguments:
-        - list_of_str : A non-empty list of strings.
+    Args:
+        list_of_str: A non-empty list of strings.
 
     Returns:
-        - A dict where keys are the strings and values are their indices.
+        A dict where keys are the strings and values are their indices.
 
     Raises:
-        - TypeError : If the list is empty or contains non-string items.
+        TypeError: If the list is empty or contains non-string items.
 
     Examples:
         ``` py title="Convert list of strings to dictionary"
@@ -98,15 +98,15 @@ def get_values_of_dict(
 ) -> List[Any]:
     """Retrieve a list of index values from a dictionary for the specified keys.
 
-    Arguments:
-        - key_list : The keys to look up in the dictionary.
-        - dict_to_check : The dictionary from which values are retrieved.
+    Args:
+        key_list: The keys to look up in the dictionary.
+        dict_to_check: The dictionary from which values are retrieved.
 
     Returns:
-        - A list of values corresponding to the given keys.
+        A list of values corresponding to the given keys.
 
     Raises:
-        - KeyError : If any key in key_list is not found in dict_to_check.
+        KeyError: If any key in key_list is not found in dict_to_check.
 
     Examples:
         ``` py
@@ -140,18 +140,18 @@ def get_shape_check(
     If data is 2D, the function attempts to align the time dimension with one
     of the axes. If data is 1D, the header list must have exactly one entry.
 
-    Arguments:
-        - time : 1D array of time values.
-        - data : 1D or 2D array of data values.
-        - header : List of headers corresponding to the data dimensions.
+    Args:
+        time: 1D array of time values.
+        data (Any): 1D or 2D array of data values.
+        header: List of headers corresponding to the data dimensions.
 
     Returns:
-        - A possibly reshaped data array ensuring alignment with time and
-          header constraints.
+        A possibly reshaped data array ensuring alignment with time and
+            header constraints.
 
     Raises:
-        - ValueError : If the header length does not match the data shape,
-          or if data is 1D but header has more than one entry.
+        ValueError: If the header length does not match the data shape,
+            or if data is 1D but header has more than one entry.
 
     Examples:
         ``` py

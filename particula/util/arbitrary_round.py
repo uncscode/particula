@@ -22,15 +22,15 @@ def get_arbitrary_round(
     The function supports "round", "floor", or "ceil" modes, and can retain
     original nonzero values if rounding returns zero.
 
-    Arguments:
-        - values : The values to be rounded.
-        - base : Positive float indicating the rounding interval.
-        - mode : Rounding mode, one of ['round', 'floor', 'ceil'].
-        - nonzero_edge : If True, zeros after rounding are replaced with the
+    Args:
+        values: The values to be rounded.
+        base: Positive float indicating the rounding interval.
+        mode: Rounding mode, one of ['round', 'floor', 'ceil'].
+        nonzero_edge: If True, zeros after rounding are replaced with the
             original values.
 
     Returns:
-        - The input values rounded according to the specified base and mode.
+        The input values rounded according to the specified base and mode.
 
     Examples:
         ``` py title="Example Usage"

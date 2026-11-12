@@ -44,20 +44,20 @@ def _system_state_properties(
 ]:
     """Get the system state properties for charged particles.
 
-    Arguments:
-        - particle_radius : The radius of the particles [m].
-        - particle_mass : The mass of the particles [kg].
-        - particle_charge : The charge of the particles [C].
-        - temperature : The temperature of the system [K].
-        - pressure : The pressure of the system [Pa].
+    Args:
+        particle_radius: The radius of the particles [m].
+        particle_mass: The mass of the particles [kg].
+        particle_charge: The charge of the particles [C].
+        temperature: The temperature of the system [K].
+        pressure: The pressure of the system [Pa].
 
     Returns:
-        - coulomb_potential_ratio : The Coulomb potential ratio
+        coulomb_potential_ratio: The Coulomb potential ratio
             [dimensionless].
-        - diffusive_knudsen : The diffusive knudsen number [dimensionless].
-        - sum_of_radii : The sum of the radii of the particles [m].
-        - reduced_mass : The reduced mass of the particles [kg].
-        - reduced_friction_factor : The reduced friction factor of the
+        diffusive_knudsen: The diffusive knudsen number [dimensionless].
+        sum_of_radii: The sum of the radii of the particles [m].
+        reduced_mass: The reduced mass of the particles [kg].
+        reduced_friction_factor: The reduced friction factor of the
             particles [dimensionless].
 
     Examples: (This is an internal helper and typically not called directly.)
@@ -139,15 +139,15 @@ def get_hard_sphere_kernel_via_system_state(
     These are used to calculate the dimensionless kernel, which is then
     converted to the dimensioned kernel.
 
-    Arguments:
-        - particle_radius : The radius of the particles [m].
-        - particle_mass : The mass of the particles [kg].
-        - particle_charge : The charge of the particles [C].
-        - temperature : The temperature of the system [K].
-        - pressure : The pressure of the system [Pa].
+    Args:
+        particle_radius: The radius of the particles [m].
+        particle_mass: The mass of the particles [kg].
+        particle_charge: The charge of the particles [C].
+        temperature: The temperature of the system [K].
+        pressure: The pressure of the system [Pa].
 
     Returns:
-        - The dimensioned coagulation kernel, as a square matrix, of all
+        The dimensioned coagulation kernel, as a square matrix, of all
             particle-particle interactions [m^3/s].
 
     Examples:
@@ -207,16 +207,16 @@ def get_coulomb_kernel_dyachkov2007_via_system_state(
 ) -> NDArray[np.float64]:
     """The dimensioned coagulation kernel via Dyachkov (2007).
 
-    Arguments:
-        - particle_radius : The radius of the particles [m].
-        - particle_mass : The mass of the particles [kg].
-        - particle_charge : The charge of the particles [C].
-        - temperature : The temperature of the system [K].
-        - pressure : The pressure of the system [Pa].
+    Args:
+        particle_radius: The radius of the particles [m].
+        particle_mass: The mass of the particles [kg].
+        particle_charge: The charge of the particles [C].
+        temperature: The temperature of the system [K].
+        pressure: The pressure of the system [Pa].
 
     Returns:
-        - The dimensioned coagulation kernel, as a square matrix,
-          [m^3/s].
+        The dimensioned coagulation kernel, as a square matrix,
+            [m^3/s].
 
     Examples:
         ``` py title="Example Usage"
@@ -274,16 +274,16 @@ def get_coulomb_kernel_gatti2008_via_system_state(
 ) -> NDArray[np.float64]:
     """The dimensioned coagulation kernel via system state using Gatti (2008).
 
-    Arguments:
-        - particle_radius : The radius of the particles [m].
-        - particle_mass : The mass of the particles [kg].
-        - particle_charge : The charge of the particles [C].
-        - temperature : The temperature of the system [K].
-        - pressure : The pressure of the system [Pa].
+    Args:
+        particle_radius: The radius of the particles [m].
+        particle_mass: The mass of the particles [kg].
+        particle_charge: The charge of the particles [C].
+        temperature: The temperature of the system [K].
+        pressure: The pressure of the system [Pa].
 
     Returns:
-        - The dimensioned coagulation kernel, as a square matrix,
-          [m^3/s].
+        The dimensioned coagulation kernel, as a square matrix,
+            [m^3/s].
 
     Examples:
         ``` py title="Example Usage"
@@ -341,16 +341,16 @@ def get_coulomb_kernel_gopalakrishnan2012_via_system_state(
 ) -> NDArray[np.float64]:
     """Gopalakrishnan (2012) dimensioned coagulation kernel via system state.
 
-    Arguments:
-        - particle_radius : The radius of the particles [m].
-        - particle_mass : The mass of the particles [kg].
-        - particle_charge : The charge of the particles [C].
-        - temperature : The temperature of the system [K].
-        - pressure : The pressure of the system [Pa].
+    Args:
+        particle_radius: The radius of the particles [m].
+        particle_mass: The mass of the particles [kg].
+        particle_charge: The charge of the particles [C].
+        temperature: The temperature of the system [K].
+        pressure: The pressure of the system [Pa].
 
     Returns:
-        - The dimensioned coagulation kernel, as a square matrix,
-          [m^3/s].
+        The dimensioned coagulation kernel, as a square matrix,
+            [m^3/s].
 
     Examples:
         ``` py title="Example Usage"
@@ -408,16 +408,16 @@ def get_coulomb_kernel_chahl2019_via_system_state(
 ) -> NDArray[np.float64]:
     """Chahl (2019) dimensioned coagulation kernel via system state.
 
-    Arguments:
-        - particle_radius : The radius of the particles [m].
-        - particle_mass : The mass of the particles [kg].
-        - particle_charge : The charge of the particles [C].
-        - temperature : The temperature of the system [K].
-        - pressure : The pressure of the system [Pa].
+    Args:
+        particle_radius: The radius of the particles [m].
+        particle_mass: The mass of the particles [kg].
+        particle_charge: The charge of the particles [C].
+        temperature: The temperature of the system [K].
+        pressure: The pressure of the system [Pa].
 
     Returns:
-        - The dimensioned coagulation kernel, as a square matrix,
-          [m^3/s].
+        The dimensioned coagulation kernel, as a square matrix,
+            [m^3/s].
 
     Examples:
         ``` py title="Example Usage"

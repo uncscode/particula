@@ -17,11 +17,11 @@ def get_safe_exp(value: ArrayLike) -> np.ndarray:
     The exponential is calculated using:
         - y = exp(x), where x is clipped to avoid exceeding machine limits.
 
-    Arguments:
-        - value : Array-like of values to exponentiate.
+    Args:
+        value: Array-like of values to exponentiate.
 
     Returns:
-        - np.ndarray of exponentiated values, with machine-level clipping.
+        np.ndarray of exponentiated values, with machine-level clipping.
 
     Examples:
         ``` py title="Example Usage"
@@ -48,11 +48,11 @@ def get_safe_log(value: ArrayLike) -> np.ndarray:
     The natural log is calculated using:
         - y = ln(x), where x is clipped away from zero to maintain positivity.
 
-    Arguments:
-        - value : Array-like of values for logarithm calculation.
+    Args:
+        value: Array-like of values for logarithm calculation.
 
     Returns:
-        - np.ndarray of natural logarithms, with machine-level clipping.
+        np.ndarray of natural logarithms, with machine-level clipping.
 
     Examples:
         ``` py title="Example Usage"
@@ -79,11 +79,11 @@ def get_safe_log10(value: ArrayLike) -> np.ndarray:
     The base-10 log is calculated using:
         - y = log10(x), x clipped from zero to maintain positivity.
 
-    Arguments:
-        - value : Array-like of values for base-10 logarithm calculation.
+    Args:
+        value: Array-like of values for base-10 logarithm calculation.
 
     Returns:
-        - np.ndarray of base-10 logarithms, with machine-level clipping.
+        np.ndarray of base-10 logarithms, with machine-level clipping.
 
     Examples:
         ``` py title="Example Usage"
@@ -116,12 +116,12 @@ def get_safe_power(base: ArrayLike, exponent: ArrayLike) -> np.ndarray:
     machine limits. This function assumes that `base` contains positive values.
     The behavior for non-positive bases is undefined.
 
-    Arguments:
-        - base : Array-like of positive base values.
-        - exponent : Array-like of exponents.
+    Args:
+        base: Array-like of positive base values.
+        exponent: Array-like of exponents.
 
     Returns:
-        - np.ndarray of power values, computed with machine-level clipping.
+        np.ndarray of power values, computed with machine-level clipping.
 
     Examples:
         ``` py title="Example Usage"

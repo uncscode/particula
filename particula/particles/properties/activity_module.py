@@ -31,12 +31,12 @@ def get_ideal_activity_molar(
     - aᵢ = Xᵢ
         - Xᵢ is the mole fraction of species i.
 
-    Arguments:
-        - mass_concentration : Mass concentration of the species in kg/m³.
-        - molar_mass : Molar mass of the species in kg/mol.
+    Args:
+        mass_concentration: Mass concentration of the species in kg/m³.
+        molar_mass: Molar mass of the species in kg/mol.
 
     Returns:
-        - Ideal activity of the species as a dimensionless value.
+        Ideal activity of the species as a dimensionless value.
 
     Examples:
         ``` py title="Example"
@@ -78,12 +78,12 @@ def get_ideal_activity_volume(
     - aᵢ = φᵢ
         - φᵢ is the volume fraction of species i.
 
-    Arguments:
-        - mass_concentration : Mass concentration of the species in kg/m³.
-        - density : Density of the species in kg/m³.
+    Args:
+        mass_concentration: Mass concentration of the species in kg/m³.
+        density: Density of the species in kg/m³.
 
     Returns:
-        - Ideal activity of the species as a dimensionless value.
+        Ideal activity of the species as a dimensionless value.
 
     Examples:
         ``` py title="Example"
@@ -123,11 +123,11 @@ def get_ideal_activity_mass(
     - aᵢ = wᵢ
         - wᵢ is the mass fraction of species i.
 
-    Arguments:
-        - mass_concentration : Mass concentration of the species in kg/m³.
+    Args:
+        mass_concentration: Mass concentration of the species in kg/m³.
 
     Returns:
-        - Ideal activity of the species as a dimensionless value.
+        Ideal activity of the species as a dimensionless value.
 
     Examples:
         ``` py title="Example"
@@ -174,15 +174,15 @@ def get_kappa_activity(
         - Vₛ is the total solute volume fraction (all species except water).
         - Vₐ is the water volume fraction.
 
-    Arguments:
-        - mass_concentration : Array of mass concentrations in kg/m³.
-        - kappa : Array of κ (kappa) hygroscopic parameters, dimensionless.
-        - density : Array of densities in kg/m³ for each species.
-        - molar_mass : Array of molar masses in kg/mol for each species.
-        - water_index : Index of the water component in the arrays.
+    Args:
+        mass_concentration: Array of mass concentrations in kg/m³.
+        kappa: Array of κ (kappa) hygroscopic parameters, dimensionless.
+        density: Array of densities in kg/m³ for each species.
+        molar_mass: Array of molar masses in kg/mol for each species.
+        water_index: Index of the water component in the arrays.
 
     Returns:
-        - Array of species activities, dimensionless.
+        Array of species activities, dimensionless.
 
     Examples:
         ``` py title="Example"
@@ -275,12 +275,12 @@ def get_surface_partial_pressure(
 
     - pᵢ = aᵢ × pᵢ*
 
-    Arguments:
-        - pure_vapor_pressure : Pure vapor pressure of the species in Pa.
-        - activity : Activity of the species, dimensionless.
+    Args:
+        pure_vapor_pressure: Pure vapor pressure of the species in Pa.
+        activity: Activity of the species, dimensionless.
 
     Returns:
-        - Partial pressure of the species in Pa.
+        Partial pressure of the species in Pa.
 
     Examples:
         ``` py title="Example"

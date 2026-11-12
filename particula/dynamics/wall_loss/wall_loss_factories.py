@@ -60,7 +60,7 @@ class WallLossFactory(StrategyFactoryABC):
                 entries, and ``distribution_type`` when needed.
 
         Returns:
-            Built wall loss strategy instance.
+            result (WallLossStrategy): Built wall loss strategy instance.
 
         Raises:
             ValueError: If ``strategy_type`` is unknown or parameters are

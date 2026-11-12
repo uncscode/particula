@@ -38,12 +38,12 @@ class DistributionStrategy(ABC):
     ) -> NDArray[np.float64]:
         """Return the mass per species in the distribution.
 
-        Arguments:
-            - distribution : The distribution of particle sizes or masses.
-            - density : The density of the particles.
+        Args:
+            distribution: The distribution of particle sizes or masses.
+            density: The density of the particles.
 
         Returns:
-            - The mass of the particles (per species).
+            The mass of the particles (per species).
         """
 
     def get_mass(
@@ -51,12 +51,12 @@ class DistributionStrategy(ABC):
     ) -> NDArray[np.float64]:
         """Calculate the mass of the particles or bin.
 
-        Arguments:
-            - distribution : The distribution of particle sizes or masses.
-            - density : The density of the particles.
+        Args:
+            distribution: The distribution of particle sizes or masses.
+            density: The density of the particles.
 
         Returns:
-            - The mass of the particles.
+            The mass of the particles.
         """
         if distribution.ndim == 1:
             return self.get_species_mass(distribution, density)
@@ -70,14 +70,14 @@ class DistributionStrategy(ABC):
     ) -> np.float64:
         """Calculate the total mass of all particles (or bin).
 
-        Arguments:
-            - distribution : The distribution of particle sizes or masses.
-            - concentration : The concentration of each particle
-              size or mass in the distribution.
-            - density : The density of the particles.
+        Args:
+            distribution: The distribution of particle sizes or masses.
+            concentration: The concentration of each particle
+                size or mass in the distribution.
+            density: The density of the particles.
 
         Returns:
-            - The total mass of the particles.
+            The total mass of the particles.
         """
         masses = self.get_mass(distribution, density)
         return np.sum(masses * concentration)
@@ -88,12 +88,12 @@ class DistributionStrategy(ABC):
     ) -> NDArray[np.float64]:
         """Calculate the radius of the particles.
 
-        Arguments:
-            - distribution : The distribution of particle sizes or masses.
-            - density : The density of the particles.
+        Args:
+            distribution: The distribution of particle sizes or masses.
+            density: The density of the particles.
 
         Returns:
-            - The radius of the particles in meters.
+            The radius of the particles in meters.
         """
 
     @abstractmethod
@@ -106,16 +106,16 @@ class DistributionStrategy(ABC):
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
         """Add mass to the distribution of particles.
 
-        Arguments:
-            - distribution : The distribution of particle sizes or masses.
-            - concentration : The concentration of each particle
-              size or mass.
-            - density : The density of the particles.
-            - added_mass : The mass to be added per distribution bin.
+        Args:
+            distribution: The distribution of particle sizes or masses.
+            concentration: The concentration of each particle
+                size or mass.
+            density: The density of the particles.
+            added_mass: The mass to be added per distribution bin.
 
         Returns:
-            - The updated distribution array.
-            - The updated concentration array.
+            The updated distribution array.
+            The updated concentration array.
         """
 
     @abstractmethod
@@ -134,20 +134,20 @@ class DistributionStrategy(ABC):
     ]:
         """Add concentration to the distribution of particles.
 
-        Arguments:
-            - distribution : The distribution of particle sizes or masses.
-            - concentration : The concentration of each particle
-              size or mass.
-            - added_distribution : The distribution to be added.
-            - added_concentration : The concentration to be added.
-            - charge : Optional charge array to update alongside
-              concentration. If None, charge is ignored and returned None.
-            - added_charge : Optional charge array for added particles.
+        Args:
+            distribution: The distribution of particle sizes or masses.
+            concentration: The concentration of each particle
+                size or mass.
+            added_distribution: The distribution to be added.
+            added_concentration: The concentration to be added.
+            charge: Optional charge array to update alongside
+                concentration. If None, charge is ignored and returned None.
+            added_charge: Optional charge array for added particles.
 
         Returns:
-            - The updated distribution array.
-            - The updated concentration array.
-            - The updated charge array, or None if charge input was None.
+            The updated distribution array.
+            The updated concentration array.
+            The updated charge array, or None if charge input was None.
         """
 
     @abstractmethod
@@ -168,13 +168,13 @@ class DistributionStrategy(ABC):
         particle (second index), with mass being summed and concentration of
         the smaller particle set to zero.
 
-        Arguments:
-            - distribution : The distribution of particle sizes or masses.
-            - concentration : The concentration of each particle size or mass.
-            - density : The density of the particles.
-            - indices : The indices of the particle pairs to collide, shape
+        Args:
+            distribution: The distribution of particle sizes or masses.
+            concentration: The concentration of each particle size or mass.
+            density: The density of the particles.
+            indices: The indices of the particle pairs to collide, shape
                 (N, 2) where each row is [small_index, large_index].
-            - charge : Optional charge array. If provided and contains non-zero
+            charge: Optional charge array. If provided and contains non-zero
                 values in colliding pairs, charges will be summed during
                 collisions. If None, charge handling is skipped.
 

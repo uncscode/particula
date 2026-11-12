@@ -32,12 +32,12 @@ def get_radial_relative_velocity_dz2002(
         - b = (g × |τₚᵢ - τₚⱼ|) / (√2 × σ),
         - f(b) = ½√π (b + 0.5 / b) erf(b) + ½ exp(-b²).
 
-    Arguments:
-        - velocity_dispersion : Turbulence velocity dispersion (σ) in m/s.
-        - particle_inertia_time : Inertia timescale(s) (τₚ) in seconds.
+    Args:
+        velocity_dispersion: Turbulence velocity dispersion (σ) in m/s.
+        particle_inertia_time: Inertia timescale(s) (τₚ) in seconds.
 
     Returns:
-        - The radial relative velocity ⟨|wᵣ|⟩ in m/s.
+        The radial relative velocity ⟨|wᵣ|⟩ in m/s.
 
     Examples:
         ```py
@@ -94,12 +94,12 @@ def get_radial_relative_velocity_ao2008(
         - τₚ₁, τₚ₂ are the inertia timescales (s),
         - g is the gravitational acceleration (m/s²).
 
-    Arguments:
-        - velocity_dispersion : Turbulence velocity dispersion (σ) in m/s.
-        - particle_inertia_time : Inertia timescale(s) of particles [s].
+    Args:
+        velocity_dispersion: Turbulence velocity dispersion (σ) in m/s.
+        particle_inertia_time: Inertia timescale(s) of particles [s].
 
     Returns:
-        - The radial relative velocity ⟨|wᵣ|⟩ in m/s.
+        The radial relative velocity ⟨|wᵣ|⟩ in m/s.
 
     Examples:
         ```py

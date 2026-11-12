@@ -18,16 +18,16 @@ def get_sorted_bins_by_radius(
 ]:
     """Ensure distribution bins are sorted by increasing radius.
 
-    Arguments:
-        - radius : The radii of the particles.
-        - distribution : The distribution of particle sizes or masses.
-        - concentration : The concentration of each particle size or mass.
-        - charge : (Optional) charge per particle; scalar or NumPy array.
+    Args:
+        radius: The radii of the particles.
+        distribution: The distribution of particle sizes or masses.
+        concentration: The concentration of each particle size or mass.
+        charge: (Optional) charge per particle; scalar or NumPy array.
 
     Returns:
-        - distribution : The sorted distribution of particle sizes or masses.
-        - concentration : The sorted concentration of each particle size/mass.
-        - charge : The sorted charge of each particle size/mass.
+        distribution: The sorted distribution of particle sizes or masses.
+        concentration: The sorted concentration of each particle size/mass.
+        charge: The sorted charge of each particle size/mass.
     """
     order = np.argsort(radius)
     is_sorted = np.array_equal(order, np.arange(radius.size))

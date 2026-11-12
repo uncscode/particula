@@ -554,7 +554,7 @@ class WarpCondensationState:
         Args:
             wp: Imported Warp module used for dtype metadata.
             boxes: Number of validated boxes in the primary state.
-            particles: Number of validated particles in the primary state.
+            particle_count: Number of validated particles in the primary state.
             species: Number of validated species in the primary state.
             device: Device metadata from the validated mass storage.
         """

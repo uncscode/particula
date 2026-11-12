@@ -36,7 +36,7 @@ def _ensure_warp_available():
     """Ensure Warp is available, raise RuntimeError if not.
 
     Returns:
-        The warp module if available.
+        result (ModuleType): The warp module if available.
 
     Raises:
         RuntimeError: If Warp is not installed.
@@ -55,11 +55,11 @@ def _validate_device(wp, device: str):
     """Validate device string and return device object.
 
     Args:
-        wp: The warp module.
+        wp (ModuleType): The warp module.
         device: Device string (e.g., "cuda", "cuda:0", "cpu").
 
     Returns:
-        Warp device object.
+        result (warp.context.Device): Warp device object.
 
     Raises:
         RuntimeError: If device is not found.

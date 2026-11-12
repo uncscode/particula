@@ -61,14 +61,14 @@ def get_phi_ao2008(
       - α: Turbulent interaction parameter (dimensionless).
       - φ: Characteristic velocity (m/s).
 
-    Arguments:
-        - alpha : Turbulence/droplet interaction parameter (dimensionless).
-        - phi : Characteristic velocity parameter (m/s).
-        - particle_inertia_time : Inertia timescales τₚ₁ and τₚ₂ (s).
-        - particle_velocity : Velocities vₚ₁ and vₚ₂ (m/s).
+    Args:
+        alpha: Turbulence/droplet interaction parameter (dimensionless).
+        phi: Characteristic velocity parameter (m/s).
+        particle_inertia_time: Inertia timescales τₚ₁ and τₚ₂ (s).
+        particle_velocity: Velocities vₚ₁ and vₚ₂ (m/s).
 
     Returns:
-        - The computed Φ(α, φ) (dimensionless).
+        The computed Φ(α, φ) (dimensionless).
 
     Examples:
         ```py

@@ -6,15 +6,15 @@ including effects of the Coulomb potential between charged particles.
 
 Classes:
     - ChargedKernelStrategyABC : Abstract base class defining the interface
-      for dimensionless coagulation strategies.
+        for dimensionless coagulation strategies.
     - HardSphereKernelStrategy : Hard sphere idealized Coulomb forces.
     - CoulombDyachkov2007KernelStrategy : Dyachkov et al. (2007) approximation.
     - CoulombGatti2008KernelStrategy : Gatti and Kortshagen (2008)
-      approximation.
+        approximation.
     - CoulombGopalakrishnan2012KernelStrategy : Gopalakrishnan and Hogan (2012)
-      approximation.
+        approximation.
     - CoulumbChahl2019KernelStrategy : Chahl and Gopalakrishnan (2019)
-      approximation.
+        approximation.
 """
 
 from abc import ABC, abstractmethod
@@ -66,14 +66,14 @@ class ChargedKernelStrategyABC(ABC):
     ) -> NDArray[np.float64]:
         """Return the dimensionless coagulation kernel (H).
 
-        Arguments:
-            - diffusive_knudsen : The diffusive Knudsen number (KₙD)
-              [dimensionless].
-            - coulomb_potential_ratio : The Coulomb potential ratio (φ_E)
-              [dimensionless].
+        Args:
+            diffusive_knudsen: The diffusive Knudsen number (KₙD)
+                [dimensionless].
+            coulomb_potential_ratio: The Coulomb potential ratio (φ_E)
+                [dimensionless].
 
         Returns:
-            - NDArray[np.float64] : The dimensionless coagulation kernel (H).
+            NDArray[np.float64]: The dimensionless coagulation kernel (H).
 
         References:
             - Dyachkov, S. A., et al. (2007).
@@ -96,18 +96,18 @@ class ChargedKernelStrategyABC(ABC):
         Uses reduced mass, friction factors, and particle radii to obtain units
         of [m³/s] for each particle-particle interaction.
 
-        Arguments:
-            - dimensionless_kernel : The dimensionless coagulation kernel (H)
-              [dimensionless].
-            - coulomb_potential_ratio : The Coulomb potential ratio
-              [dimensionless].
-            - sum_of_radii : The sum of the two particle radii [m].
-            - reduced_mass : The reduced mass of the two particles [kg].
-            - reduced_friction_factor : The reduced friction factor
-              [dimensionless].
+        Args:
+            dimensionless_kernel: The dimensionless coagulation kernel (H)
+                [dimensionless].
+            coulomb_potential_ratio: The Coulomb potential ratio
+                [dimensionless].
+            sum_of_radii: The sum of the two particle radii [m].
+            reduced_mass: The reduced mass of the two particles [kg].
+            reduced_friction_factor: The reduced friction factor
+                [dimensionless].
 
         Returns:
-            - The dimensioned coagulation kernel [m³/s].
+            The dimensioned coagulation kernel [m³/s].
 
         Examples:
             ```py title="Kernel Conversion Example"

@@ -33,12 +33,12 @@ def get_vapor_transition_correction(
         - Kn is the Knudsen number (dimensionless),
         - α is the mass accommodation coefficient (dimensionless).
 
-    Arguments:
-        - knudsen_number : Dimensionless Knudsen number.
-        - mass_accommodation : Mass accommodation coefficient (dimensionless).
+    Args:
+        knudsen_number: Dimensionless Knudsen number.
+        mass_accommodation: Mass accommodation coefficient (dimensionless).
 
     Returns:
-        - Transition correction factor (float or NDArray[np.float64]).
+        Transition correction factor (float or NDArray[np.float64]).
 
     Examples:
         ``` py title="Example"

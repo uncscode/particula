@@ -16,12 +16,12 @@ class BuilderABC(ABC):
     """Abstract base class for builders to check keys and set parameters.
 
     Attributes:
-        - required_parameters: List of required parameters for the builder.
+        required_parameters: List of required parameters for the builder.
 
     Raises:
-        - ValueError: If any required key is missing during check_keys or
-          pre_build_check, or if trying to set an invalid parameter.
-        - Warning: If using default units for any parameter.
+        ValueError: If any required key is missing during check_keys or
+            pre_build_check, or if trying to set an invalid parameter.
+        Warning: If using default units for any parameter.
 
     Examples:
         ```py
@@ -53,12 +53,12 @@ class BuilderABC(ABC):
     def check_keys(self, parameters: dict[str, Any]) -> None:
         """Check if the keys are present and valid.
 
-        Arguments:
-            - parameters: The parameters dictionary to check.
+        Args:
+            parameters: The parameters dictionary to check.
 
         Raises:
-            - ValueError: If any required key is missing or if trying to set
-              an invalid parameter.
+            ValueError: If any required key is missing or if trying to set
+                an invalid parameter.
 
         Examples:
             ```py
@@ -96,15 +96,15 @@ class BuilderABC(ABC):
     def set_parameters(self, parameters: dict[str, Any]) -> "BuilderABC":
         """Set parameters from a dictionary, handling any '_units' suffix.
 
-        Arguments:
-            - parameters: The parameters dictionary to set.
+        Args:
+            parameters: The parameters dictionary to set.
 
         Returns:
             BuilderABC: This builder object with the set parameters.
 
         Raises:
-            - ValueError: If any required key is missing.
-            - Warning: If using default units for any parameter.
+            ValueError: If any required key is missing.
+            Warning: If using default units for any parameter.
 
         Examples:
             ```py
@@ -133,7 +133,7 @@ class BuilderABC(ABC):
         """Check if all required attribute parameters are set before building.
 
         Raises:
-            - ValueError: If any required parameter is missing.
+            ValueError: If any required parameter is missing.
 
         Examples:
             ```py

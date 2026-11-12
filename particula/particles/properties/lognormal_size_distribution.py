@@ -36,14 +36,14 @@ def get_lognormal_pdf_distribution(
     - PDFᵢ(x) = (1 / [x · ln(gsdᵢ) · √(2π)]) ×
                  exp(- [ln(x) - ln(modeᵢ)]² / [2 · (ln(gsdᵢ))² ])
 
-    Arguments:
-        - x_values : 1D array of the size points at which the PDF is evaluated.
-        - mode : Array of lognormal mode (scale) values for each mode.
-        - geometric_standard_deviation : Array of GSD values for each mode.
-        - number_of_particles : Number of particles in each mode.
+    Args:
+        x_values: 1D array of the size points at which the PDF is evaluated.
+        mode: Array of lognormal mode (scale) values for each mode.
+        geometric_standard_deviation: Array of GSD values for each mode.
+        number_of_particles: Number of particles in each mode.
 
     Returns:
-        - 1D array of the total PDF values summed across all modes.
+        1D array of the total PDF values summed across all modes.
 
     Examples:
         ```py title="Example"
@@ -111,14 +111,14 @@ def get_lognormal_pmf_distribution(
     integrating (or summing) over x_values. The result reflects discrete mass
     (probability) distribution across the given size points.
 
-    Arguments:
-        - x_values : 1D array of size points at which the PMF is evaluated.
-        - mode : Array of lognormal mode (scale) values for each mode.
-        - geometric_standard_deviation : Array of GSD values for each mode.
-        - number_of_particles : Number of particles in each mode.
+    Args:
+        x_values: 1D array of size points at which the PMF is evaluated.
+        mode: Array of lognormal mode (scale) values for each mode.
+        geometric_standard_deviation: Array of GSD values for each mode.
+        number_of_particles: Number of particles in each mode.
 
     Returns:
-        - 1D array of the total PMF values summed across all modes.
+        1D array of the total PMF values summed across all modes.
 
     Examples:
         ```py title="Example"
@@ -186,14 +186,14 @@ def get_lognormal_sample_distribution(
     with a specified scale (mode) and shape (GSD). The total samples are then
     combined according to the relative number of particles in each mode.
 
-    Arguments:
-        - mode : Array of lognormal mode (scale) values for each mode.
-        - geometric_standard_deviation : Array of GSD values for each mode.
-        - number_of_particles : Number of particles for each mode.
-        - number_of_samples : Total number of random samples to generate.
+    Args:
+        mode: Array of lognormal mode (scale) values for each mode.
+        geometric_standard_deviation: Array of GSD values for each mode.
+        number_of_particles: Number of particles for each mode.
+        number_of_samples: Total number of random samples to generate.
 
     Returns:
-        - 1D array of sampled particle sizes, combining all modes.
+        1D array of sampled particle sizes, combining all modes.
 
     Examples:
         ```py title="Example"

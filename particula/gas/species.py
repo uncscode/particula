@@ -43,12 +43,12 @@ class GasSpecies:
     """Facade for gas species behavior backed by GasData.
 
     Attributes:
-        - name : The name of the gas species.
-        - molar_mass : The molar mass of the gas species in kg/mol.
-        - pure_vapor_pressure_strategy : The strategy (or list of strategies)
-          for calculating the pure vapor pressure of the gas species.
-        - partitioning : Indicates whether the gas species can partition.
-        - concentration : The concentration of the gas species in kg/m^3.
+        name: The name of the gas species.
+        molar_mass: The molar mass of the gas species in kg/mol.
+        pure_vapor_pressure_strategy: The strategy (or list of strategies)
+            for calculating the pure vapor pressure of the gas species.
+        partitioning: Indicates whether the gas species can partition.
+        concentration: The concentration of the gas species in kg/m^3.
 
     Methods:
     - get_name : Return the name of the gas species.
@@ -102,16 +102,16 @@ class GasSpecies:
     ) -> None:
         """Initialize with name, molar mass, and vapor pressure strategy.
 
-        Arguments:
-            - name : The name of the gas species.
-            - molar_mass : The molar mass in kg/mol (must be > 0).
-            - vapor_pressure_strategy : A single or list of strategies for
-              calculating vapor pressure.
-            - partitioning : Whether the species can partition.
-            - concentration : The initial concentration in kg/m^3.
+        Args:
+            name: The name of the gas species.
+            molar_mass: The molar mass in kg/mol (must be > 0).
+            vapor_pressure_strategy: A single or list of strategies for
+                calculating vapor pressure.
+            partitioning: Whether the species can partition.
+            concentration: The initial concentration in kg/m^3.
 
         Raises:
-            - ValueError : If molar_mass is non-positive.
+            ValueError: If molar_mass is non-positive.
         """
         _warn_deprecated(stacklevel=2)
 
@@ -233,7 +233,7 @@ class GasSpecies:
         """Return a string representation of the GasSpecies object.
 
         Returns:
-            - str : The string name of the gas species.
+            result (str): The string name of the gas species.
         """
         return str(self.name)
 
@@ -241,7 +241,7 @@ class GasSpecies:
         """Return the number of gas species.
 
         Returns:
-            - float or int : Number of species (array length or 1).
+            result (int): Number of species (array length or 1).
 
         Examples:
             ```py title="Example of len()"
@@ -253,18 +253,18 @@ class GasSpecies:
     def __iadd__(self, other: "GasSpecies") -> "GasSpecies":
         """In-place addition: append another GasSpecies object to this one.
 
-        Arguments:
-            - other : The GasSpecies instance whose attributes will be
-              appended to the current object.
+        Args:
+            other: The GasSpecies instance whose attributes will be
+                appended to the current object.
 
         Returns:
-            - GasSpecies : The mutated object (`self`) containing the combined
-              attributes.
+            GasSpecies: The mutated object (`self`) containing the combined
+                attributes.
 
         Raises:
-            - TypeError : If *other* is not a GasSpecies instance.
-            - ValueError : If the two objects have different ``partitioning``
-              flags.
+            TypeError: If *other* is not a GasSpecies instance.
+            ValueError: If the two objects have different ``partitioning``
+                flags.
 
         Examples:
             ```py title="Using the += operator"
@@ -280,16 +280,16 @@ class GasSpecies:
         Creates and returns a new GasSpecies instance that contains the
         combined attributes of *self* and *other*.
 
-        Arguments:
-            - other : The GasSpecies instance to be combined with *self*.
+        Args:
+            other: The GasSpecies instance to be combined with *self*.
 
         Returns:
-            - GasSpecies : A new object with concatenated attributes.
+            GasSpecies: A new object with concatenated attributes.
 
         Raises:
-            - TypeError : If *other* is not a GasSpecies instance.
-            - ValueError : If the two objects have different ``partitioning``
-              flags.
+            TypeError: If *other* is not a GasSpecies instance.
+            ValueError: If the two objects have different ``partitioning``
+                flags.
 
         Examples:
             ```py title="Using the + operator"
@@ -304,7 +304,7 @@ class GasSpecies:
         """Return the name of the gas species.
 
         Returns:
-            - Name of the gas species.
+            Name of the gas species.
 
         Examples:
             ```py title="Example of get_name()"
@@ -317,7 +317,7 @@ class GasSpecies:
         """Return the molar mass of the gas species in kg/mol.
 
         Returns:
-            - Molar mass in kg/mol.
+            Molar mass in kg/mol.
 
         Examples:
             ```py title="Example of get_molar_mass()"
@@ -334,7 +334,7 @@ class GasSpecies:
         """Return the concentration of the gas species in kg/m^3.
 
         Returns:
-            - Species concentration.
+            Species concentration.
         """
         return self.concentration
 
@@ -343,14 +343,14 @@ class GasSpecies:
     ) -> Union[float, NDArray[np.float64]]:
         """Calculate the pure vapor pressure at a given temperature (K).
 
-        Arguments:
-            - temperature : The temperature in Kelvin.
+        Args:
+            temperature: The temperature in Kelvin.
 
         Returns:
-            - Pure vapor pressure in Pa.
+            Pure vapor pressure in Pa.
 
         Raises:
-            - ValueError : If no vapor pressure strategy is set.
+            ValueError: If no vapor pressure strategy is set.
 
         Examples:
             ```py title="Example"
@@ -378,14 +378,14 @@ class GasSpecies:
     ) -> Union[float, NDArray[np.float64]]:
         """Calculate the partial pressure of the gas at a given temperature (K).
 
-        Arguments:
-            - temperature : The temperature in Kelvin.
+        Args:
+            temperature: The temperature in Kelvin.
 
         Returns:
-            - Partial pressure in Pa.
+            Partial pressure in Pa.
 
         Raises:
-            - ValueError : If the vapor pressure strategy is not set.
+            ValueError: If the vapor pressure strategy is not set.
 
         Examples:
             ```py title="Example of get_partial_pressure()"
@@ -422,14 +422,14 @@ class GasSpecies:
     ) -> Union[float, NDArray[np.float64]]:
         """Calculate the saturation ratio of the gas at a given temperature (K).
 
-        Arguments:
-            - temperature : The temperature in Kelvin.
+        Args:
+            temperature: The temperature in Kelvin.
 
         Returns:
-            - The saturation ratio.
+            The saturation ratio.
 
         Raises:
-            - ValueError : If the vapor pressure strategy is not set.
+            ValueError: If the vapor pressure strategy is not set.
 
         Examples:
             ```py title="Example of get_saturation_ratio()"
@@ -466,14 +466,14 @@ class GasSpecies:
     ) -> Union[float, NDArray[np.float64]]:
         """Calculate the saturation concentration at a given temperature (K).
 
-        Arguments:
-            - temperature : The temperature in Kelvin.
+        Args:
+            temperature: The temperature in Kelvin.
 
         Returns:
-            - The saturation concentration in kg/m^3.
+            The saturation concentration in kg/m^3.
 
         Raises:
-            - ValueError : If the vapor pressure strategy is not set.
+            ValueError: If the vapor pressure strategy is not set.
 
         Examples:
             ```py title="Example of get_saturation_concentration()"
@@ -507,8 +507,8 @@ class GasSpecies:
     ) -> None:
         """Add concentration (kg/m^3) to the gas species.
 
-        Arguments:
-            - added_concentration : The amount to add in kg/m^3.
+        Args:
+            added_concentration: The amount to add in kg/m^3.
 
         Examples:
             ```py title="Example of add_concentration()"
@@ -522,8 +522,8 @@ class GasSpecies:
     ) -> None:
         """Overwrite the concentration of the gas species in kg/m^3.
 
-        Arguments:
-            - new_concentration : The new concentration value in kg/m^3.
+        Args:
+            new_concentration: The new concentration value in kg/m^3.
 
         Examples:
             ```py title="Example of set_concentration()"
@@ -535,16 +535,16 @@ class GasSpecies:
     def append(self, other: "GasSpecies") -> None:
         """Append another GasSpecies instance to this one (in-place).
 
-        Arguments:
-            - other : The GasSpecies object whose attributes will be
-              concatenated with those of the current object.
+        Args:
+            other: The GasSpecies object whose attributes will be
+                concatenated with those of the current object.
 
         Returns:
-            - None : The method mutates ``self`` and returns ``None``.
+            None: The method mutates ``self`` and returns ``None``.
 
         Raises:
-            - TypeError  : If *other* is not a GasSpecies instance.
-            - ValueError : If *other* has a different ``partitioning`` flag.
+            TypeError: If *other* is not a GasSpecies instance.
+            ValueError: If *other* has a different ``partitioning`` flag.
 
         Examples:
             ```py title="Appending two GasSpecies objects"
@@ -780,11 +780,11 @@ class GasSpecies:
     ) -> Union[float, NDArray[np.float64]]:
         """Ensure concentration is not negative.
 
-        Arguments:
-            - values : Concentration values to check.
+        Args:
+            values: Concentration values to check.
 
         Returns:
-            - Corrected concentration (≥ 0).
+            Corrected concentration (≥ 0).
         """
         if np.any(values < 0.0):
             message = "Negative concentration in gas species, set = 0."
@@ -798,12 +798,12 @@ class GasSpecies:
     ) -> None:
         """Raise an error if any value is non-positive.
 
-        Arguments:
-            - value : The numeric value(s) to check.
-            - name : Name of the parameter for the error message.
+        Args:
+            value: The numeric value(s) to check.
+            name: Name of the parameter for the error message.
 
         Raises:
-            - ValueError : If any value <= 0 is detected.
+            ValueError: If any value <= 0 is detected.
         """
         if np.any(value <= 0.0):
             message = f"Non-positive {name} in gas species, stopping."

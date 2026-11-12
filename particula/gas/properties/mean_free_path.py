@@ -48,15 +48,15 @@ def get_molecule_mean_free_path(
         - R is Universal gas constant [J/(mol·K)].
         - T is Gas temperature [K].
 
-    Arguments:
-        - molar_mass : The molar mass of the gas molecule [kg/mol].
-        - temperature : The temperature of the gas [K].
-        - pressure : The pressure of the gas [Pa].
-        - dynamic_viscosity : The dynamic viscosity of the gas [Pa·s].
+    Args:
+        molar_mass: The molar mass of the gas molecule [kg/mol].
+        temperature: The temperature of the gas [K].
+        pressure: The pressure of the gas [Pa].
+        dynamic_viscosity: The dynamic viscosity of the gas [Pa·s].
             If None, it will be calculated based on the temperature.
 
     Returns:
-        - Mean free path of the gas molecule in meters (m).
+        Mean free path of the gas molecule in meters (m).
 
     Examples:
         ```py title="Example usage"

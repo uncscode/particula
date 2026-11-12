@@ -31,8 +31,8 @@ class ChargedCoagulationStrategy(CoagulationStrategyABC):
     handling of Coulomb interactions under various regimes.
 
     Attributes:
-        kernel_strategy : Instance of ChargedKernelStrategyABC used to
-        calculate dimensionless and dimensioned kernels.
+        kernel_strategy: Instance of ChargedKernelStrategyABC used to
+            calculate dimensionless and dimensioned kernels.
 
     Methods:
     - dimensionless_kernel : Compute dimensionless kernel values for
@@ -72,18 +72,18 @@ class ChargedCoagulationStrategy(CoagulationStrategyABC):
     ):
         """Initialize the ChargedCoagulationStrategy.
 
-        Arguments:
-            distribution_type : The distribution type representing how
-            particles are tracked (e.g., "discrete", "continuous_pdf",
-            or "particle_resolved").
-            kernel_strategy : A ChargedKernelStrategyABC instance used to
+        Args:
+            distribution_type: The distribution type representing how
+                particles are tracked (e.g., "discrete", "continuous_pdf",
+                or "particle_resolved").
+            kernel_strategy: A ChargedKernelStrategyABC instance used to
                 calculate dimensionless/dimensioned kernels for charged
                 coagulation.
             use_direct_kernel: Whether to compute kernel values directly for
                 particle-resolved coagulation instead of using interpolation.
 
         Returns:
-            None
+            result (None): No return value.
         """
         super().__init__(
             distribution_type=distribution_type,
@@ -102,14 +102,14 @@ class ChargedCoagulationStrategy(CoagulationStrategyABC):
         returns the dimensionless kernel (H) as a function of the diffusive
         Knudsen number and the Coulomb potential ratio.
 
-        Arguments:
-            - diffusive_knudsen : Dimensionless Knudsen number(s) describing
-              particle diffusive behavior.
-            - coulomb_potential_ratio : Dimensionless ratio(s) incorporating
-              electrostatic interactions.
+        Args:
+            diffusive_knudsen: Dimensionless Knudsen number(s) describing
+                particle diffusive behavior.
+            coulomb_potential_ratio: Dimensionless ratio(s) incorporating
+                electrostatic interactions.
 
         Returns:
-            - NDArray[np.float64] : Array of dimensionless kernel values.
+            NDArray[np.float64]: Array of dimensionless kernel values.
 
         Examples:
             ```py title="Dimensionless Kernel Example"
@@ -137,15 +137,15 @@ class ChargedCoagulationStrategy(CoagulationStrategyABC):
         coagulation kernel by combining Coulomb parameters, the pairwise
         radii of particles, reduced mass, and friction factors.
 
-        Arguments:
-            - particle : Particle data containing
-              distribution, density, and concentration data.
-            - temperature : Float specifying the system temperature (K).
-            - pressure : Float specifying the system pressure (Pa).
+        Args:
+            particle: Particle data containing
+                distribution, density, and concentration data.
+            temperature: Float specifying the system temperature (K).
+            pressure: Float specifying the system pressure (Pa).
 
         Returns:
-            - float or NDArray[np.float64] : The dimensioned coagulation
-              kernel value(s).
+            float or NDArray[np.float64]: The dimensioned coagulation
+                kernel value(s).
 
         Examples:
             ```py title="Dimensioned Kernel Example"

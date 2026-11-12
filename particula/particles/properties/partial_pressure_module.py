@@ -21,16 +21,16 @@ def get_partial_pressure_delta(
         - p_particle is the partial pressure in the particle phase,
         - K is the Kelvin term (dimensionless).
 
-    Arguments:
-        - partial_pressure_gas : Partial pressure of the species in the gas
+    Args:
+        partial_pressure_gas: Partial pressure of the species in the gas
             phase.
-        - partial_pressure_particle : Partial pressure of the species in
+        partial_pressure_particle: Partial pressure of the species in
             the particle phase.
-        - kelvin_term : Dimensionless Kelvin effect factor due to particle
+        kelvin_term: Dimensionless Kelvin effect factor due to particle
             curvature.
 
     Returns:
-        - The difference in partial pressure, as either a float or
+        The difference in partial pressure, as either a float or
             NDArray[np.float64].
 
     Examples:

@@ -43,19 +43,19 @@ def get_unit_conversion(
     (e.g., temperatures), or if a value is supplied, a fully converted
     numeric value is returned instead.
 
-    Arguments:
-        - old : A string representing the current unit (e.g., "m", "degC").
-        - new : A string representing the target unit.
-        - value : An optional numeric value to convert. If omitted, returns the
+    Args:
+        old: A string representing the current unit (e.g., "m", "degC").
+        new: A string representing the target unit.
+        value: An optional numeric value to convert. If omitted, returns the
             conversion factor between old and new.
 
     Raises:
-        - ImportError : If Pint is not installed. Install it using:
+        ImportError: If Pint is not installed. Install it using:
             `pip install pint`.
 
     Returns:
-        - A float or ``numpy.ndarray`` representing either the conversion
-          factor or the fully converted value in the target unit.
+        A float or ``numpy.ndarray`` representing either the conversion
+            factor or the fully converted value in the target unit.
 
     Examples:
         ``` py title="Example Multi-Unit Conversion"

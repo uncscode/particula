@@ -34,14 +34,14 @@ def get_particle_inertia_time(
         - r is the particle radius (m).
         - ν is the kinematic viscosity of the fluid (m²/s).
 
-    Arguments:
-        - particle_radius : Particle radius in meters (m).
-        - particle_density : Density of the particle in kg/m³.
-        - fluid_density : Density of the fluid in kg/m³.
-        - kinematic_viscosity : Kinematic viscosity of the fluid in m²/s.
+    Args:
+        particle_radius: Particle radius in meters (m).
+        particle_density: Density of the particle in kg/m³.
+        fluid_density: Density of the fluid in kg/m³.
+        kinematic_viscosity: Kinematic viscosity of the fluid in m²/s.
 
     Returns:
-        - The particle inertia time in seconds (s). Returned as either a float
+        The particle inertia time in seconds (s). Returned as either a float
             or NDArray[np.float64].
 
     Examples:

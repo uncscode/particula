@@ -28,12 +28,12 @@ def get_coagulation_loss_rate_discrete(
 
     - loss_rate = ΣᵢΣⱼ [kernel(i, j) × concentration(i) × concentration(j)]
 
-    Arguments:
-        - concentration : The distribution of particles.
-        - kernel : The coagulation kernel matrix (NDArray[np.float64]).
+    Args:
+        concentration: The distribution of particles.
+        kernel: The coagulation kernel matrix (NDArray[np.float64]).
 
     Returns:
-        - The coagulation loss rate (float or NDArray[np.float64]).
+        The coagulation loss rate (float or NDArray[np.float64]).
 
     Examples:
         ```py
@@ -68,13 +68,13 @@ def get_coagulation_gain_rate_discrete(
     - gain_rate(r) = ∫ kernel(r, r') × PDF(r) × PDF(r') dr'
       (implemented via numeric integration)
 
-    Arguments:
-        - radius : The particle radius array [m].
-        - concentration : The particle distribution.
-        - kernel : Coagulation kernel matrix.
+    Args:
+        radius: The particle radius array [m].
+        concentration: The particle distribution.
+        kernel: Coagulation kernel matrix.
 
     Returns:
-        - The coagulation gain rate, matched to the shape of radius.
+        The coagulation gain rate, matched to the shape of radius.
 
     Examples:
         ```py
@@ -139,13 +139,13 @@ def get_coagulation_loss_rate_continuous(
 
     - loss_rate(r) = concentration(r) × ∫ kernel(r, r') × concentration(r') dr'
 
-    Arguments:
-        - radius : The particle radius array [m].
-        - concentration : The particle distribution.
-        - kernel : Coagulation kernel matrix (NDArray[np.float64]).
+    Args:
+        radius: The particle radius array [m].
+        concentration: The particle distribution.
+        kernel: Coagulation kernel matrix (NDArray[np.float64]).
 
     Returns:
-        - The coagulation loss rate.
+        The coagulation loss rate.
 
     Examples:
         ```py
@@ -184,13 +184,13 @@ def get_coagulation_gain_rate_continuous(
 
     - gain_rate(r) = ∫ kernel(r, r') × concentration(r) × concentration(r') dr'
 
-    Arguments:
-        - radius : The particle radius array [m].
-        - concentration : The particle distribution.
-        - kernel : Coagulation kernel matrix.
+    Args:
+        radius: The particle radius array [m].
+        concentration: The particle distribution.
+        kernel: Coagulation kernel matrix.
 
     Returns:
-        - The coagulation gain rate, in the shape of radius.
+        The coagulation gain rate, in the shape of radius.
 
     Examples:
         ```py

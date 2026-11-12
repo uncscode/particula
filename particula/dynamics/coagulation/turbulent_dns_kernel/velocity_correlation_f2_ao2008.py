@@ -43,13 +43,13 @@ def get_f2_longitudinal_velocity_correlation(
         - L_e (eulerian_integral_length) : Eulerian integral length scale
           [m].
 
-    Arguments:
-        - collisional_radius : Distance between two colliding droplets [m].
-        - taylor_microscale : Taylor microscale [m].
-        - eulerian_integral_length : Eulerian integral length scale [m].
+    Args:
+        collisional_radius: Distance between two colliding droplets [m].
+        taylor_microscale: Taylor microscale [m].
+        eulerian_integral_length: Eulerian integral length scale [m].
 
     Returns:
-        - f₂(R) value [dimensionless].
+        f₂(R) value [dimensionless].
 
     Examples:
         ```py

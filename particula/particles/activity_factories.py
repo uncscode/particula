@@ -87,8 +87,8 @@ class ActivityFactory(
         """Return a mapping of strategy types to their corresponding builders.
 
         Returns:
-            dict[str, Any]: A dictionary mapping the activity strategy type
-            to a builder instance.
+            result (dict): A dictionary mapping the activity strategy type
+            result (dict): to a builder instance.
 
         Supported types:
             - "mass_ideal": ActivityIdealMassBuilder (Raoult's Law, mass)

@@ -29,11 +29,11 @@ def get_normalized_accel_variance_ao2008(
         - ε (numerical_stability_epsilon) is Small number added to R_λ
           for numerical stability.
 
-    Arguments:
-        - re_lambda : Taylor-microscale Reynolds number [-]
+    Args:
+        re_lambda: Taylor-microscale Reynolds number [-]
 
     Returns:
-        - accel_variance : Normalized acceleration variance [-]
+        accel_variance: Normalized acceleration variance [-]
 
     Examples:
         ```py title="Example Usage"

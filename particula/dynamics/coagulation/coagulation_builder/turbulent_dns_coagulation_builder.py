@@ -44,12 +44,12 @@ class TurbulentDNSCoagulationBuilder(
     relative_velocity) are set prior to building the strategy.
 
     Attributes:
-        - distribution_type : The particle distribution type
-          ("discrete", "continuous_pdf", or "particle_resolved").
-        - turbulent_dissipation : Rate of turbulent energy dissipation (m²/s³).
-        - fluid_density : Fluid density in kg/m³ (e.g., air density).
-        - reynolds_lambda : Taylor-scale Reynolds number (dimensionless).
-        - relative_velocity : Relative velocity in m/s (particle vs. airflow).
+        distribution_type: The particle distribution type
+            ("discrete", "continuous_pdf", or "particle_resolved").
+        turbulent_dissipation: Rate of turbulent energy dissipation (m²/s³).
+        fluid_density: Fluid density in kg/m³ (e.g., air density).
+        reynolds_lambda: Taylor-scale Reynolds number (dimensionless).
+        relative_velocity: Relative velocity in m/s (particle vs. airflow).
 
     Methods:
     - set_distribution_type : Set the distribution type.
@@ -111,13 +111,14 @@ class TurbulentDNSCoagulationBuilder(
         When specifying units, only "dimensionless" is recognized here.
         Any other unit triggers a warning and is treated as dimensionless.
 
-        Arguments:
-            - reynolds_lambda : Numeric value for Reλ.
-            - reynolds_lambda_units : String indicating units
-              (default "dimensionless").
+        Args:
+            reynolds_lambda: Numeric value for Reλ.
+            reynolds_lambda_units: String indicating units
+                (default "dimensionless").
 
         Returns:
-            - self : The builder instance for chaining.
+            result (TurbulentDNSCoagulationBuilder): This instance for method
+                chaining.
 
         Examples:
             ```py
@@ -143,13 +144,14 @@ class TurbulentDNSCoagulationBuilder(
         This value is typically a background flow velocity or a
         sedimentation-adjusted velocity, excluding turbulence.
 
-        Arguments:
-            - relative_velocity : Numeric value of velocity.
-            - relative_velocity_units : Units of the velocity
-              (e.g., "m/s").
+        Args:
+            relative_velocity: Numeric value of velocity.
+            relative_velocity_units: Units of the velocity
+                (e.g., "m/s").
 
         Returns:
-            - self : The builder instance for chaining.
+            result (TurbulentDNSCoagulationBuilder): This instance for method
+                chaining.
         """
         if relative_velocity_units == "m/s":
             self.relative_velocity = relative_velocity

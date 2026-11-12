@@ -27,17 +27,17 @@ class TurbulentShearCoagulationBuilder(
     type, turbulent dissipation, and fluid density values are provided.
 
     Attributes:
-        - distribution_type : Type of the particle distribution
-          ("discrete", "continuous_pdf", or "particle_resolved").
-        - turbulent_dissipation : Turbulent energy dissipation rate (m²/s³).
-        - fluid_density : Fluid density (kg/m³) for the coagulation medium.
+        distribution_type: Type of the particle distribution
+            ("discrete", "continuous_pdf", or "particle_resolved").
+        turbulent_dissipation: Turbulent energy dissipation rate (m²/s³).
+        fluid_density: Fluid density (kg/m³) for the coagulation medium.
 
     Methods:
         - set_distribution_type : Set the distribution type.
         - set_turbulent_dissipation : Set turbulent dissipation rate.
         - set_fluid_density : Set fluid density.
         - build : Validate parameters and return a
-          TurbulentShearCoagulationStrategy.
+            TurbulentShearCoagulationStrategy.
 
     Examples:
         ```py title="Turbulent Shear Coagulation Builder Example"
@@ -60,7 +60,7 @@ class TurbulentShearCoagulationBuilder(
         """Initialize the TurbulentShearCoagulationBuilder.
 
         Returns:
-            - None
+            result (None): No return value.
 
         Note:
             Some default values may be set by the mixins to guide the user
@@ -85,7 +85,7 @@ class TurbulentShearCoagulationBuilder(
         TurbulentShearCoagulationStrategy.
 
         Returns:
-            - The resulting turbulent shear coagulation strategy object.
+            The resulting turbulent shear coagulation strategy object.
         """
         self.pre_build_check()
         return TurbulentShearCoagulationStrategy(

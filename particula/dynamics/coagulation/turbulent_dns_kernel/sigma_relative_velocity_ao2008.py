@@ -73,17 +73,17 @@ def get_relative_velocity_variance(
     - σ² = ⟨(v'²)⟩₁ + ⟨(v'²)⟩₂ - 2⟨v'¹ v'²⟩
         - v'¹, v'² are the fluctuating velocities for droplets 1 and 2.
 
-    Arguments:
-        - fluid_rms_velocity : Fluid RMS fluctuation velocity [m/s].
-        - collisional_radius : Distance between two colliding droplets [m].
-        - particle_inertia_time : Inertia timescale of droplet 1 [s].
-        - particle_velocity : Droplet velocity [m/s].
-        - taylor_microscale : Taylor microscale [m].
-        - eulerian_integral_length : Eulerian integral length scale [m].
-        - lagrangian_integral_time : Lagrangian integral time scale [s].
+    Args:
+        fluid_rms_velocity: Fluid RMS fluctuation velocity [m/s].
+        collisional_radius: Distance between two colliding droplets [m].
+        particle_inertia_time: Inertia timescale of droplet 1 [s].
+        particle_velocity: Droplet velocity [m/s].
+        taylor_microscale: Taylor microscale [m].
+        eulerian_integral_length: Eulerian integral length scale [m].
+        lagrangian_integral_time: Lagrangian integral time scale [s].
 
     Returns:
-        - σ² : Variance of the particle relative-velocity fluctuation [m²/s²].
+        σ²: Variance of the particle relative-velocity fluctuation [m²/s²].
 
     Examples:
         ```py
@@ -179,14 +179,14 @@ def _compute_rms_fluctuation_velocity(
             [s].
         - Ψ(c, e) : Function Ψ computed using `get_psi_ao2008`.
 
-    Arguments:
-        - fluid_rms_velocity : Fluid RMS fluctuation velocity [m/s].
-        - particle_inertia_time : Inertia timescale of the droplet k [s].
-        - particle_velocity : Droplet velocity [m/s].
-        - velocity_correlation_terms : Velocity correlation coefficients [-].
+    Args:
+        fluid_rms_velocity: Fluid RMS fluctuation velocity [m/s].
+        particle_inertia_time: Inertia timescale of the droplet k [s].
+        particle_velocity: Droplet velocity [m/s].
+        velocity_correlation_terms: Velocity correlation coefficients [-].
 
     Returns:
-        - RMS fluctuation velocity [m²/s²].
+        RMS fluctuation velocity [m²/s²].
 
     Examples:
         ```py
@@ -292,17 +292,17 @@ def _compute_cross_correlation_velocity(
         - f₂(R) : Longitudinal velocity correlation function.
         - Φ(c, e) : Function Φ computed using `get_phi_ao2008`.
 
-    Arguments:
-        - fluid_rms_velocity : Fluid RMS fluctuation velocity [m/s].
-        - collisional_radius : Distance between two colliding droplets [m].
-        - particle_inertia_time : Inertia timescale of droplet 1 [s].
-        - particle_velocity : Droplet velocity [m/s].
-        - taylor_microscale : Taylor microscale [m].
-        - eulerian_integral_length : Eulerian integral length scale [m].
-        - velocity_correlation_terms : Velocity correlation coefficients [-].
+    Args:
+        fluid_rms_velocity: Fluid RMS fluctuation velocity [m/s].
+        collisional_radius: Distance between two colliding droplets [m].
+        particle_inertia_time: Inertia timescale of droplet 1 [s].
+        particle_velocity: Droplet velocity [m/s].
+        taylor_microscale: Taylor microscale [m].
+        eulerian_integral_length: Eulerian integral length scale [m].
+        velocity_correlation_terms: Velocity correlation coefficients [-].
 
     Returns:
-        - Cross-correlation velocity [m²/s²].
+        Cross-correlation velocity [m²/s²].
 
     Examples:
         ```py

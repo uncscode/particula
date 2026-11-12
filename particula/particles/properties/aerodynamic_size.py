@@ -52,20 +52,20 @@ def get_aerodynamic_length(
         - ρ₀ is the reference density (kg/m³).
         - χ is the shape factor (dimensionless).
 
-    Arguments:
-        - physical_length : Physical length scale of the particle (m).
-        - physical_slip_correction_factor : Slip correction factor for the
+    Args:
+        physical_length: Physical length scale of the particle (m).
+        physical_slip_correction_factor: Slip correction factor for the
             particle's physical size (dimensionless).
-        - aerodynamic_slip_correction_factor : Slip correction factor for the
+        aerodynamic_slip_correction_factor: Slip correction factor for the
             particle's aerodynamic size (dimensionless).
-        - density : Density of the particle in kg/m³.
-        - reference_density : Reference density in kg/m³, typically water
+        density: Density of the particle in kg/m³.
+        reference_density: Reference density in kg/m³, typically water
             (1000 by default).
-        - aerodynamic_shape_factor : Shape factor
+        aerodynamic_shape_factor: Shape factor
             (dimensionless, 1.0 for spheres).
 
     Returns:
-        - Aerodynamic length scale (m).
+        Aerodynamic length scale (m).
 
     Examples:
         ``` py title="Example"
@@ -101,12 +101,12 @@ def get_aerodynamic_shape_factor(shape_key: str) -> float:
     calculations. For spheres, χ=1.0. Larger values indicate more deviation
     from spherical shape.
 
-    Arguments:
-        - shape_key : String representing the particle's shape
+    Args:
+        shape_key: String representing the particle's shape
             (e.g. "sphere", "sand").
 
     Returns:
-        - The shape factor (dimensionless).
+        The shape factor (dimensionless).
 
     Examples:
         ``` py title="Example"
@@ -115,7 +115,7 @@ def get_aerodynamic_shape_factor(shape_key: str) -> float:
         ```
 
     Raises:
-        - ValueError : If the shape key is not found in the predefined
+        ValueError: If the shape key is not found in the predefined
             dictionary.
 
     References:

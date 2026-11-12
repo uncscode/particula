@@ -26,16 +26,16 @@ def get_mass_fractions_from_moles(
         - Mᵢ is the molecular weight of component i (kg/mol),
         - Σⱼ(xⱼ × Mⱼ) is the total mass (per total moles).
 
-    Arguments:
-        mole_fractions : Mole fractions (unitless). Can be 1D or 2D.
+    Args:
+        mole_fractions: Mole fractions (unitless). Can be 1D or 2D.
             If 2D, each row is treated as a set of mole fractions for N
             components.
-        molecular_weights : Molecular weights (kg/mol). Must match the shape of
+        molecular_weights: Molecular weights (kg/mol). Must match the shape of
             ``mole_fractions`` in the last dimension.
 
     Returns:
-        - Mass fractions (unitless). Rows sum to 1 if input is 2D; returns 1D
-          mass fractions if input is 1D.
+        Mass fractions (unitless). Rows sum to 1 if input is 2D; returns 1D
+            mass fractions if input is 1D.
 
     Examples:
         ``` py title="Example 1: 1D"

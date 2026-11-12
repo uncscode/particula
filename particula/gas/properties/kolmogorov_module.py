@@ -33,13 +33,13 @@ def get_kolmogorov_time(
         - τ_K is the Kolmogorov time [s]
         - v is the kinematic viscosity of the fluid [m^2/s]
 
-    Arguments:
-        - kinematic_viscosity : Kinematic viscosity of the fluid [m^2/s]
-        - turbulent_dissipation : Rate of dissipation of turbulent kinetic
+    Args:
+        kinematic_viscosity: Kinematic viscosity of the fluid [m^2/s]
+        turbulent_dissipation: Rate of dissipation of turbulent kinetic
             energy [m^2/s^3]
 
     Returns:
-        - Kolmogorov time [s]
+        Kolmogorov time [s]
 
     Examples:
         ```py title="Kolmogorov time of a fluid"
@@ -79,13 +79,13 @@ def get_kolmogorov_length(
         - ν Kinematic viscosity of the fluid [m^2/s]
         - ε Rate of dissipation of turbulent kinetic energy [m^2/s^3]
 
-    Arguments:
-        - kinematic_viscosity : Kinematic viscosity of the fluid [m^2/s]
-        - turbulent_dissipation : Rate of dissipation of turbulent kinetic
+    Args:
+        kinematic_viscosity: Kinematic viscosity of the fluid [m^2/s]
+        turbulent_dissipation: Rate of dissipation of turbulent kinetic
             energy [m^2/s^3]
 
     Returns:
-        - Kolmogorov length scale [m]
+        Kolmogorov length scale [m]
 
     Examples:
         ```py title="Kolmogorov length scale of a fluid"
@@ -120,13 +120,13 @@ def get_kolmogorov_velocity(
         - v is the kinematic viscosity of the fluid [m^2/s]
         - ε is the rate of dissipation of turbulent kinetic energy [m^2/s^3]
 
-    Arguments:
-        - kinematic_viscosity : Kinematic viscosity of the fluid [m^2/s]
-        - turbulent_dissipation : Rate of dissipation of turbulent kinetic
+    Args:
+        kinematic_viscosity: Kinematic viscosity of the fluid [m^2/s]
+        turbulent_dissipation: Rate of dissipation of turbulent kinetic
             energy [m^2/s^3]
 
     Returns:
-        - Kolmogorov velocity scale [m/s]
+        Kolmogorov velocity scale [m/s]
 
     Examples:
         ```py title="Kolmogorov velocity scale of a fluid"
