@@ -6,7 +6,13 @@ from numpy.typing import NDArray
 from particula.dynamics.coagulation.coagulation_strategy import (
     coagulation_strategy_abc,
 )
-from particula.particles import PresetParticleRadiusBuilder
+from particula.dynamics.coagulation.particle_resolved_step import (
+    particle_resolved_method,
+)
+from particula.particles import (
+    PresetParticleRadiusBuilder,
+    create_lognormal_binned_particle_data,
+)
 from particula.particles.particle_data import ParticleData
 
 
@@ -599,9 +605,13 @@ def test_public_particle_data_api_rejects_multi_box_inputs(
     strategy = DummyCoagulationStrategy(distribution_type="discrete")
     data = _build_multi_box_particle_data()
 
+    if method_name == "step":
+        data.distribution_type = "discrete"
+        data.volume[:] = 1.0
+
     method = getattr(strategy, method_name)
 
-    with pytest.raises(ValueError, match=r"n_boxes=1.*n_boxes=2"):
+    with pytest.raises(ValueError, match="n_boxes=1"):
         method(data, *args, **kwargs)
 
 
@@ -629,6 +639,7 @@ def test_step_discrete_particle_data_updates_concentration_in_place(
 ) -> None:
     """Discrete ParticleData step should update concentration in place."""
     data = ParticleData(
+        distribution_type="discrete",
         masses=np.array([[[1e-18], [2e-18]]]),
         concentration=np.array([[3.0, 4.0]]),
         charge=np.array([[0.0, 0.0]]),
@@ -648,24 +659,26 @@ def test_step_discrete_particle_data_updates_concentration_in_place(
         particle=data,
         temperature=298.15,
         pressure=101325.0,
-        time_step=2.0,
+        time_step=1.0,
     )
 
     assert result is data
-    np.testing.assert_allclose(data.concentration[0], np.array([9.0, -2.0]))
+    np.testing.assert_allclose(data.concentration[0], np.array([6.0, 1.0]))
 
 
 def test_step_discrete_representation_updates_concentration_in_place(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Discrete legacy representations should use add_concentration."""
-    particle = PresetParticleRadiusBuilder().build()
+    """Native discrete populations retain additive in-place updates."""
+    particle = create_lognormal_binned_particle_data(
+        distribution_type="discrete"
+    )
     strategy = DummyCoagulationStrategy(distribution_type="discrete")
     monkeypatch.setattr(
         strategy,
         "net_rate",
         lambda particle, temperature, pressure: np.full_like(
-            particle.concentration,
+            particle.concentration[0],
             2.0,
             dtype=np.float64,
         ),
@@ -691,6 +704,7 @@ def test_step_particle_resolved_empty_loss_gain_indices_noop(
 ) -> None:
     """Particle-resolved step should no-op when no collision pairs exist."""
     data = ParticleData(
+        distribution_type="particle_resolved",
         masses=np.array([[[1e-18, 1e-18], [2e-18, 2e-18]]]),
         concentration=np.array([[1.0, 1.0]]),
         charge=np.array([[0.0, 1.0]]),
@@ -707,7 +721,7 @@ def test_step_particle_resolved_empty_loss_gain_indices_noop(
         return np.empty((0, 2), dtype=np.int64)
 
     monkeypatch.setattr(
-        coagulation_strategy_abc.particle_resolved_method,
+        particle_resolved_method,
         "get_particle_resolved_coagulation_step",
         _fake_step_func,
     )
@@ -733,29 +747,19 @@ def test_step_particle_resolved_zero_kernel_radius_raises(
 ) -> None:
     """Particle-resolved step should reject zero-valued kernel radii."""
     data = ParticleData(
+        distribution_type="particle_resolved",
         masses=np.array([[[1e-18, 1e-18], [2e-18, 2e-18]]]),
         concentration=np.array([[1.0, 1.0]]),
         charge=np.array([[0.0, 1.0]]),
         density=np.array([1000.0, 1200.0]),
         volume=np.array([1.0]),
     )
-    zero_kernel_data = ParticleData(
-        masses=np.zeros((1, 1, 2), dtype=np.float64),
-        concentration=np.ones((1, 1), dtype=np.float64),
-        charge=np.zeros((1, 1), dtype=np.float64),
-        density=np.array([1000.0, 1200.0]),
-        volume=np.array([1.0]),
-    )
     strategy = DummyCoagulationStrategy(distribution_type="particle_resolved")
-    strategy.particle_resolved_radius = np.array([1e-9, 2e-9], dtype=np.float64)
+    strategy.particle_resolved_radius = np.array([0.0, 2e-9])
 
-    monkeypatch.setattr(
-        coagulation_strategy_abc,
-        "_get_binned_kernel_data_from_particle_data",
-        lambda data, kernel_radius: zero_kernel_data,
-    )
-
-    with pytest.raises(ValueError, match="kernel radius cannot be zero"):
+    with pytest.raises(
+        ValueError, match="kernel radius edges must be positive"
+    ):
         strategy.step(
             particle=data,
             temperature=298.15,
@@ -767,6 +771,7 @@ def test_step_particle_resolved_zero_kernel_radius_raises(
 def test_step_rejects_invalid_distribution_type() -> None:
     """Invalid distribution types should fail in step()."""
     data = ParticleData(
+        distribution_type="discrete",
         masses=np.array([[[1e-18]]]),
         concentration=np.array([[1.0]]),
         charge=np.array([[0.0]]),
@@ -776,7 +781,7 @@ def test_step_rejects_invalid_distribution_type() -> None:
     strategy = DummyCoagulationStrategy(distribution_type="discrete")
     strategy.distribution_type = "invalid"
 
-    with pytest.raises(ValueError, match="Invalid distribution type"):
+    with pytest.raises(ValueError, match="distribution_type must match"):
         strategy.step(
             data, temperature=298.15, pressure=101325.0, time_step=1.0
         )
@@ -885,6 +890,7 @@ def test_step_particle_data_particle_resolved_updates_arrays(
 ) -> None:
     """ParticleData particle-resolved step should update arrays in place."""
     data = ParticleData(
+        distribution_type="particle_resolved",
         masses=np.array([[[1e-18, 1e-18], [2e-18, 2e-18], [3e-18, 3e-18]]]),
         concentration=np.array([[1.0, 1.0, 1.0]]),
         charge=np.array([[0.0, 1.0, -1.0]]),
@@ -901,7 +907,7 @@ def test_step_particle_data_particle_resolved_updates_arrays(
         return np.array([[0, 1]], dtype=np.int64)
 
     monkeypatch.setattr(
-        coagulation_strategy_abc.particle_resolved_method,
+        particle_resolved_method,
         "get_particle_resolved_coagulation_step",
         _fake_step_func,
     )
@@ -926,6 +932,7 @@ def test_step_particle_data_multi_box_raises_before_mutation(
 ) -> None:
     """Particle-resolved step should reject multi-box data before mutation."""
     data = ParticleData(
+        distribution_type="particle_resolved",
         masses=np.array(
             [
                 [[1e-18, 1e-18], [2e-18, 2e-18], [3e-18, 3e-18]],
@@ -947,7 +954,7 @@ def test_step_particle_data_multi_box_raises_before_mutation(
         return np.array([[0, 1]], dtype=np.int64)
 
     monkeypatch.setattr(
-        coagulation_strategy_abc.particle_resolved_method,
+        particle_resolved_method,
         "get_particle_resolved_coagulation_step",
         _fake_step_func,
     )
@@ -955,7 +962,7 @@ def test_step_particle_data_multi_box_raises_before_mutation(
     concentration_before = data.concentration.copy()
     charge_before = data.charge.copy()
 
-    with pytest.raises(ValueError, match=r"n_boxes=1.*n_boxes=2"):
+    with pytest.raises(ValueError, match="n_boxes=1"):
         strategy.step(
             particle=data,
             temperature=298.15,
@@ -973,6 +980,7 @@ def test_step_particle_data_zero_concentration_noop(
 ) -> None:
     """Zero concentration should short-circuit particle-resolved updates."""
     data = ParticleData(
+        distribution_type="particle_resolved",
         masses=np.array([[[1e-18, 1e-18], [2e-18, 2e-18]]]),
         concentration=np.array([[0.0, 0.0]]),
         charge=np.array([[0.0, 0.0]]),
@@ -989,7 +997,7 @@ def test_step_particle_data_zero_concentration_noop(
         return np.array([[0, 1]], dtype=np.int64)
 
     monkeypatch.setattr(
-        coagulation_strategy_abc.particle_resolved_method,
+        particle_resolved_method,
         "get_particle_resolved_coagulation_step",
         _fake_step_func,
     )
@@ -1012,6 +1020,7 @@ def test_step_particle_data_empty_particle_resolved_noop(
 ) -> None:
     """Empty single-box particle-resolved data should remain supported."""
     data = ParticleData(
+        distribution_type="particle_resolved",
         masses=np.zeros((1, 0, 2), dtype=np.float64),
         concentration=np.zeros((1, 0), dtype=np.float64),
         charge=np.zeros((1, 0), dtype=np.float64),
@@ -1027,7 +1036,7 @@ def test_step_particle_data_empty_particle_resolved_noop(
         )
 
     monkeypatch.setattr(
-        coagulation_strategy_abc.particle_resolved_method,
+        particle_resolved_method,
         "get_particle_resolved_coagulation_step",
         _unexpected_step_func,
     )
@@ -1046,3 +1055,58 @@ def test_step_particle_data_empty_particle_resolved_noop(
     np.testing.assert_allclose(data.masses, masses_before)
     np.testing.assert_allclose(data.concentration, concentration_before)
     np.testing.assert_allclose(data.charge, charge_before)
+
+
+@pytest.mark.parametrize("duration", [0.0, 1.0])
+def test_step_rejects_untagged_population_before_kernel(duration, monkeypatch):
+    """Raw material storage cannot silently become an executable population."""
+    data = ParticleData(
+        masses=np.array([[[1e-18], [2e-18]]]),
+        concentration=np.array([[1.0, 1.0]]),
+        charge=np.zeros((1, 2)),
+        density=np.array([1000.0]),
+        volume=np.array([1.0]),
+    )
+    before = [x.copy() for x in (data.masses, data.concentration, data.charge)]
+    strategy = DummyCoagulationStrategy("discrete")
+
+    def forbidden(*args, **kwargs):
+        pytest.fail("untagged population reached numerical dispatch")
+
+    monkeypatch.setattr(strategy, "net_rate", forbidden)
+    with pytest.raises(ValueError, match="requires explicit distribution_type"):
+        strategy.step(data, 298.15, 101325.0, duration)
+    for actual, expected in zip(
+        (data.masses, data.concentration, data.charge), before, strict=True
+    ):
+        np.testing.assert_array_equal(actual, expected)
+
+
+@pytest.mark.parametrize("candidate", [None, object()])
+def test_step_rejects_non_particle_data(candidate):
+    """Non-native objects reject before material or population access."""
+    with pytest.raises(TypeError, match="requires ParticleData"):
+        DummyCoagulationStrategy("discrete").step(candidate, 298, 101325, 1)
+
+
+def test_step_discrete_negative_proposal_preserves_state(monkeypatch):
+    """Retain the old two-second fixture as native rejection evidence."""
+    data = ParticleData(
+        masses=np.array([[[1e-18], [2e-18]]]),
+        concentration=np.array([[3.0, 4.0]]),
+        charge=np.zeros((1, 2)),
+        density=np.array([1000.0]),
+        volume=np.array([1.0]),
+        distribution_type="discrete",
+    )
+    strategy = DummyCoagulationStrategy("discrete")
+    monkeypatch.setattr(
+        strategy, "net_rate", lambda *args: np.array([3.0, -3.0])
+    )
+    before = [x.copy() for x in (data.masses, data.concentration, data.charge)]
+    with pytest.raises(ValueError, match="smaller finite time_step"):
+        strategy.step(data, 298.15, 101325.0, 2.0)
+    for actual, expected in zip(
+        (data.masses, data.concentration, data.charge), before, strict=True
+    ):
+        np.testing.assert_array_equal(actual, expected)

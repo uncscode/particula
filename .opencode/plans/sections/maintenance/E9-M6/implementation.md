@@ -387,3 +387,36 @@ Validation at this implementation revision:
 - Scoped Ruff/format and whitespace checks passed.
 - Base strict docs: passed in 1.86 seconds, `/tmp/m6-coag-runnable-docs.log`.
 The full publication and final-revision readiness gates remain separate.
+
+## Native-only shared coagulation step
+
+Removed the legacy and untagged branches of `CoagulationStrategyABC.step`,
+including their facade binning, getter mutation and duplicate collision paths.
+The method now requires ParticleData with explicit distribution metadata and
+calls the existing native step implementation unchanged. Zero-duration calls
+also require metadata; no population interpretation is inferred. Removed the
+now-unused legacy-step imports. Kernel/rate/helper compatibility is still
+pending and is not claimed removed by this commit.
+
+Nine original step-test bodies and native successors are preserved in
+`coagulation_step_assertions.json`. Existing collision arrays, no-collision,
+empty/zero-count, multibox rejection and additive-update assertions remain.
+The old two-second discrete fixture expected negative concentration; it now
+has a positive one-second update successor and a separate original-input
+rejection test checking exact state preservation. Zero-edge rejection now
+exercises the actual public controls rather than an injected legacy binning
+result. Added explicit untagged and non-container admission checks. Updated
+the stepping contract in source and user documentation.
+
+Validation:
+- Strategy suites after initial migration: **616 passed in 2.62s**.
+- Full coagulation + dynamics runnable + integration + CPU coagulation adapter
+  suites after boundary additions: **1718 passed, 3 skipped in 10.12s**,
+  `/tmp/m6-step-removal-broad.log`.
+- Entire source-example suite with `-Werror --no-cov`: **225 passed,
+  2 skipped in 52.77s**, `/tmp/m6-step-removal-examples.log`.
+- Full-package mypy passed for 552 files, `/tmp/m6-step-removal-mypy.log`.
+- Scoped Ruff/format and whitespace checks passed; base strict documentation
+  passed in 1.62 seconds, `/tmp/m6-step-removal-docs.log`.
+These checks do not replace final full coverage, notebook execution or full
+publication validation after all M6 removals.

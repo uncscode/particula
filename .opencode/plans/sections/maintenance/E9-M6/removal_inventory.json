@@ -621,7 +621,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Shared step legacy/untagged dispatch removed; native step retained. Kernel/rate/material helper legacy branches remain pending.",
       "test_nodes": []
     },
     {
@@ -729,7 +729,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Step assertions migrated and recorded in coagulation_step_assertions.json; helper/rate fixture migration remains pending.",
       "test_nodes": [
         {
           "name": "test_resolve_radius_indices_unique_match",
