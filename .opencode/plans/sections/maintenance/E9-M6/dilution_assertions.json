@@ -1,0 +1,387 @@
+[
+  {
+    "file": "particula/dynamics/tests/dilution_test.py",
+    "test": "test_volume_dilution_coefficient_equation_and_broadcasting",
+    "original": "def test_volume_dilution_coefficient_equation_and_broadcasting(\n    volume, flow_rate\n):\n    \"\"\"Coefficient follows Q / V with scalar and array return conventions.\"\"\"\n    result = get_volume_dilution_coefficient(volume, flow_rate)\n    expected = np.asarray(flow_rate, dtype=np.float64) / np.asarray(\n        volume,\n        dtype=np.float64,\n    )\n\n    npt.assert_allclose(result, expected)\n    if np.ndim(volume) == 0 and np.ndim(flow_rate) == 0:\n        assert np.isscalar(result)\n    else:\n        assert isinstance(result, np.ndarray)\n        assert result.shape == expected.shape",
+    "successor": "test_volume_dilution_coefficient_equation_and_broadcasting",
+    "disposition": "unchanged independent numerical helper assertions"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_test.py",
+    "test": "test_dilution_rate_equation_and_broadcasting",
+    "original": "def test_dilution_rate_equation_and_broadcasting(coefficient, concentration):\n    \"\"\"Instantaneous rate follows -alpha c with broadcast output shape.\"\"\"\n    result = get_dilution_rate(coefficient, concentration)\n    expected = -np.asarray(coefficient, dtype=np.float64) * np.asarray(\n        concentration,\n        dtype=np.float64,\n    )\n\n    npt.assert_allclose(result, expected)\n    if np.ndim(coefficient) == 0 and np.ndim(concentration) == 0:\n        assert np.isscalar(result)\n    else:\n        assert isinstance(result, np.ndarray)\n        assert result.shape == expected.shape",
+    "successor": "test_dilution_rate_equation_and_broadcasting",
+    "disposition": "unchanged independent numerical helper assertions"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_test.py",
+    "test": "test_dilution_step_equation_and_broadcasting",
+    "original": "def test_dilution_step_equation_and_broadcasting(\n    coefficient, concentration, time_step\n):\n    \"\"\"Finite update follows the independent exact exponential expression.\"\"\"\n    result = get_dilution_step(coefficient, concentration, time_step)\n    expected = np.asarray(concentration, dtype=np.float64) * np.exp(\n        -np.asarray(coefficient, dtype=np.float64)\n        * np.asarray(time_step, dtype=np.float64)\n    )\n\n    npt.assert_allclose(result, expected)\n    if all(\n        np.ndim(value) == 0 for value in (coefficient, concentration, time_step)\n    ):\n        assert np.isscalar(result)\n    else:\n        assert isinstance(result, np.ndarray)\n        assert result.shape == expected.shape",
+    "successor": "test_dilution_step_equation_and_broadcasting",
+    "disposition": "unchanged independent numerical helper assertions"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_test.py",
+    "test": "test_dilution_step_extreme_finite_decay_is_warning_clean",
+    "original": "def test_dilution_step_extreme_finite_decay_is_warning_clean():\n    \"\"\"Finite coefficient-time overflow produces exact, finite zero decay.\"\"\"\n    result = get_dilution_step(\n        np.finfo(np.float64).max,\n        1.0,\n        np.finfo(np.float64).max,\n    )\n\n    assert result == 0.0\n    assert np.isfinite(result)\n    assert result >= 0.0",
+    "successor": "test_dilution_step_extreme_finite_decay_is_warning_clean",
+    "disposition": "unchanged independent numerical helper assertions"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_test.py",
+    "test": "test_dilution_helpers_preserve_zero_dimensional_array_results",
+    "original": "def test_dilution_helpers_preserve_zero_dimensional_array_results(\n    function, arguments, expected\n):\n    \"\"\"A zero-dimensional ndarray input produces a zero-dimensional ndarray.\"\"\"\n    result = function(*arguments)\n\n    assert isinstance(result, np.ndarray)\n    assert result.shape == ()\n    npt.assert_allclose(result, expected)",
+    "successor": "test_dilution_helpers_preserve_zero_dimensional_array_results",
+    "disposition": "unchanged independent numerical helper assertions"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_test.py",
+    "test": "test_dilution_rate_uint64_inputs_do_not_wrap_positive",
+    "original": "def test_dilution_rate_uint64_inputs_do_not_wrap_positive():\n    \"\"\"Unsigned inputs are converted before signed rate arithmetic.\"\"\"\n    coefficient = np.uint64(2**63)\n    concentration = np.uint64(2)\n\n    result = get_dilution_rate(coefficient, concentration)\n    expected = -np.float64(coefficient) * np.float64(concentration)\n\n    assert result <= 0.0\n    npt.assert_allclose(result, expected)",
+    "successor": "test_dilution_rate_uint64_inputs_do_not_wrap_positive",
+    "disposition": "unchanged independent numerical helper assertions"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_test.py",
+    "test": "test_dilution_helpers_reject_overflowed_results_warning_cleanly",
+    "original": "def test_dilution_helpers_reject_overflowed_results_warning_cleanly(\n    function, arguments, quantity\n):\n    \"\"\"Overflowed helper results fail clearly without emitting warnings.\"\"\"\n    with pytest.raises(ValueError, match=f\"Computed {quantity} must be finite\"):\n        function(*arguments)",
+    "successor": "test_dilution_helpers_reject_overflowed_results_warning_cleanly",
+    "disposition": "unchanged independent numerical helper assertions"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_test.py",
+    "test": "test_dilution_step_uint64_inputs_decay_without_overflow",
+    "original": "def test_dilution_step_uint64_inputs_decay_without_overflow():\n    \"\"\"Unsigned inputs are converted before exponential step arithmetic.\"\"\"\n    coefficient = np.uint64(2**63)\n    concentration = np.uint64(3)\n    time_step = np.uint64(2)\n\n    result = get_dilution_step(coefficient, concentration, time_step)\n    expected = np.float64(concentration) * np.exp(\n        -np.float64(coefficient) * np.float64(time_step)\n    )\n\n    assert np.isfinite(result)\n    assert 0.0 <= result <= concentration\n    npt.assert_allclose(result, expected)",
+    "successor": "test_dilution_step_uint64_inputs_decay_without_overflow",
+    "disposition": "unchanged independent numerical helper assertions"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_test.py",
+    "test": "test_dilution_helpers_reject_invalid_numeric_domains",
+    "original": "def test_dilution_helpers_reject_invalid_numeric_domains(\n    function, arguments, message\n):\n    \"\"\"Each numeric domain rejects zero where needed and nonfinite values.\"\"\"\n    with pytest.raises(ValueError, match=message):\n        function(*arguments)",
+    "successor": "test_dilution_helpers_reject_invalid_numeric_domains",
+    "disposition": "unchanged independent numerical helper assertions"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_test.py",
+    "test": "test_dilution_helpers_validate_every_array_element",
+    "original": "def test_dilution_helpers_validate_every_array_element(function, arguments):\n    \"\"\"Invalid elements in otherwise compatible arrays fail validation.\"\"\"\n    with pytest.raises(ValueError):\n        function(*arguments)",
+    "successor": "test_dilution_helpers_validate_every_array_element",
+    "disposition": "unchanged independent numerical helper assertions"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_test.py",
+    "test": "test_dilution_helpers_reject_none",
+    "original": "def test_dilution_helpers_reject_none(function, arguments, none_name):\n    \"\"\"Explicit None guards provide deterministic argument-specific errors.\"\"\"\n    with pytest.raises(\n        TypeError, match=f\"Argument '{none_name}' must not be None\"\n    ):\n        function(*arguments)",
+    "successor": "test_dilution_helpers_reject_none",
+    "disposition": "unchanged independent numerical helper assertions"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_test.py",
+    "test": "test_dilution_helpers_reject_unsupported_values",
+    "original": "def test_dilution_helpers_reject_unsupported_values(function, arguments):\n    \"\"\"Strings and object-valued inputs fail with TypeError.\"\"\"\n    with pytest.raises(TypeError):\n        function(*arguments)",
+    "successor": "test_dilution_helpers_reject_unsupported_values",
+    "disposition": "unchanged independent numerical helper assertions"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_test.py",
+    "test": "test_dilution_helpers_preflight_incompatible_shapes",
+    "original": "def test_dilution_helpers_preflight_incompatible_shapes(function, arguments):\n    \"\"\"Incompatible operand shapes fail before arithmetic returns a result.\"\"\"\n    with pytest.raises(ValueError):\n        function(*arguments)",
+    "successor": "test_dilution_helpers_preflight_incompatible_shapes",
+    "disposition": "unchanged independent numerical helper assertions"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_test.py",
+    "test": "test_dilution_no_ops_are_exact",
+    "original": "def test_dilution_no_ops_are_exact(function, arguments, expected):\n    \"\"\"Zero flow, coefficient, concentration, or duration preserve exact no-ops.\"\"\"\n    result = function(*arguments)\n    npt.assert_array_equal(result, np.asarray(expected, dtype=np.float64))",
+    "successor": "test_dilution_no_ops_are_exact",
+    "disposition": "unchanged independent numerical helper assertions"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_test.py",
+    "test": "test_dilution_helpers_do_not_mutate_successful_inputs",
+    "original": "def test_dilution_helpers_do_not_mutate_successful_inputs(function, arguments):\n    \"\"\"Successful vectorized operations leave caller-owned arrays unchanged.\"\"\"\n    snapshots = [\n        value.copy() for value in arguments if isinstance(value, np.ndarray)\n    ]\n    function(*arguments)\n    for value, snapshot in zip(\n        (value for value in arguments if isinstance(value, np.ndarray)),\n        snapshots,\n        strict=True,\n    ):\n        npt.assert_array_equal(value, snapshot)",
+    "successor": "test_dilution_helpers_do_not_mutate_successful_inputs",
+    "disposition": "unchanged independent numerical helper assertions"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_test.py",
+    "test": "test_dilution_helpers_do_not_mutate_failed_inputs",
+    "original": "def test_dilution_helpers_do_not_mutate_failed_inputs():\n    \"\"\"Validation and broadcast failures leave their input arrays unchanged.\"\"\"\n    invalid = np.array([1.0, np.nan])\n    incompatible = np.ones((2, 2))\n    valid = np.ones(3)\n    snapshots = (invalid.copy(), incompatible.copy(), valid.copy())\n\n    with pytest.raises(ValueError):\n        get_dilution_rate(1.0, invalid)\n    with pytest.raises(ValueError):\n        get_dilution_step(incompatible, valid, 1.0)\n\n    npt.assert_array_equal(invalid, snapshots[0])\n    npt.assert_array_equal(incompatible, snapshots[1])\n    npt.assert_array_equal(valid, snapshots[2])",
+    "successor": "test_dilution_helpers_do_not_mutate_failed_inputs",
+    "disposition": "unchanged independent numerical helper assertions"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_test.py",
+    "test": "test_dilution_package_surface_remains_limited_to_existing_helpers",
+    "original": "def test_dilution_package_surface_remains_limited_to_existing_helpers():\n    \"\"\"P1 keeps the finite-step helper concrete-module-only.\"\"\"\n    assert (\n        dynamics.get_volume_dilution_coefficient\n        is get_volume_dilution_coefficient\n    )\n    assert dynamics.get_dilution_rate is get_dilution_rate\n    assert not hasattr(dynamics, \"get_dilution_step\")\n    assert not hasattr(dynamics, \"dilute_aerosol\")",
+    "successor": "test_dilution_package_surface_remains_limited_to_existing_helpers",
+    "disposition": "migrated native fixture; assertions retained or translated to native storage"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_test.py",
+    "test": "test_dilute_aerosol_updates_physical_particle_and_gas_concentrations",
+    "original": "def test_dilute_aerosol_updates_physical_particle_and_gas_concentrations():\n    \"\"\"Container dilution uses physical particle concentrations and returns identity.\"\"\"\n    aerosol = _make_aerosol()\n    particle = aerosol.particles\n    partitioning = aerosol.atmosphere.partitioning_species\n    gas_only = aerosol.atmosphere.gas_only_species\n    particle_source = particle.get_concentration().copy()\n    partitioning_source = partitioning.get_concentration()\n    gas_only_source = gas_only.get_concentration().copy()\n    decay = np.exp(-0.25 * 4.0)\n\n    result = dilute_aerosol(aerosol, 0.25, 4.0)\n\n    assert result is aerosol\n    assert aerosol.particles is particle\n    assert aerosol.atmosphere.partitioning_species is partitioning\n    assert aerosol.atmosphere.gas_only_species is gas_only\n    npt.assert_allclose(particle.get_concentration(), particle_source * decay)\n    npt.assert_allclose(\n        partitioning.get_concentration(), partitioning_source * decay\n    )\n    npt.assert_allclose(gas_only.get_concentration(), gas_only_source * decay)\n    assert np.all(np.isfinite(particle.get_concentration()))\n    assert np.all(particle.get_concentration() >= 0.0)",
+    "successor": "test_dilute_aerosol_updates_physical_particle_and_gas_concentrations",
+    "disposition": "migrated native fixture; assertions retained or translated to native storage"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_test.py",
+    "test": "test_dilute_aerosol_supports_speciated_particle_representation",
+    "original": "def test_dilute_aerosol_supports_speciated_particle_representation():\n    \"\"\"Dilution updates a supported speciated representation in physical units.\"\"\"\n    aerosol = _make_aerosol(SpeciatedMassMovingBin())\n    source = aerosol.particles.get_concentration().copy()\n\n    dilute_aerosol(aerosol, 0.5, 2.0)\n\n    npt.assert_allclose(aerosol.particles.get_concentration(), source / np.e)",
+    "successor": "test_dilute_aerosol_supports_speciated_particle_representation",
+    "disposition": "migrated native fixture; assertions retained or translated to native storage"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_test.py",
+    "test": "test_dilute_aerosol_preserves_container_metadata_and_particle_state",
+    "original": "def test_dilute_aerosol_preserves_container_metadata_and_particle_state():\n    \"\"\"Dilution changes concentrations only, retaining container state.\"\"\"\n    aerosol = _make_aerosol()\n    particle = aerosol.particles\n    atmosphere = aerosol.atmosphere\n    partitioning = atmosphere.partitioning_species\n    gas_only = atmosphere.gas_only_species\n    protected_particle_state = (\n        particle.get_species_mass().copy(),\n        particle.get_effective_density().copy(),\n        particle.get_charge(clone=True),\n        particle.get_volume(),\n    )\n    protected_gas_state = (\n        partitioning.name,\n        partitioning.molar_mass,\n        partitioning.partitioning,\n        gas_only.name.copy(),\n        gas_only.molar_mass.copy(),\n        gas_only.partitioning,\n        atmosphere.temperature,\n        atmosphere.total_pressure,\n    )\n\n    dilute_aerosol(aerosol, 0.25, 4.0)\n\n    npt.assert_array_equal(\n        particle.get_species_mass(), protected_particle_state[0]\n    )\n    npt.assert_array_equal(\n        particle.get_effective_density(), protected_particle_state[1]\n    )\n    npt.assert_array_equal(particle.get_charge(), protected_particle_state[2])\n    assert particle.get_volume() == protected_particle_state[3]\n    assert partitioning.name == protected_gas_state[0]\n    assert partitioning.molar_mass == protected_gas_state[1]\n    assert partitioning.partitioning is protected_gas_state[2]\n    npt.assert_array_equal(gas_only.name, protected_gas_state[3])\n    npt.assert_array_equal(gas_only.molar_mass, protected_gas_state[4])\n    assert gas_only.partitioning is protected_gas_state[5]\n    assert atmosphere.temperature == protected_gas_state[6]\n    assert atmosphere.total_pressure == protected_gas_state[7]",
+    "successor": "test_dilute_aerosol_preserves_container_metadata_and_particle_state",
+    "disposition": "Retains masses, effective density, charge, volume, names, molar masses, partitioning, temperature and pressure; additionally checks saturation ratio and explicit population tag."
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_test.py",
+    "test": "test_dilute_aerosol_zero_coefficient_or_duration_is_exact_no_op",
+    "original": "def test_dilute_aerosol_zero_coefficient_or_duration_is_exact_no_op(\n    coefficient, time_step\n):\n    \"\"\"Zero coefficient or duration retains all concentration values exactly.\"\"\"\n    aerosol = _make_aerosol()\n    sources = (\n        aerosol.particles.get_concentration().copy(),\n        np.asarray(\n            aerosol.atmosphere.partitioning_species.get_concentration()\n        ).copy(),\n        aerosol.atmosphere.gas_only_species.get_concentration().copy(),\n    )\n\n    assert dilute_aerosol(aerosol, coefficient, time_step) is aerosol\n\n    npt.assert_array_equal(aerosol.particles.get_concentration(), sources[0])\n    npt.assert_array_equal(\n        aerosol.atmosphere.partitioning_species.get_concentration(), sources[1]\n    )\n    npt.assert_array_equal(\n        aerosol.atmosphere.gas_only_species.get_concentration(), sources[2]\n    )",
+    "successor": "test_dilute_aerosol_zero_coefficient_or_duration_is_exact_no_op",
+    "disposition": "migrated native fixture; assertions retained or translated to native storage"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_test.py",
+    "test": "test_dilute_aerosol_no_op_does_not_call_concentration_setters",
+    "original": "def test_dilute_aerosol_no_op_does_not_call_concentration_setters(\n    monkeypatch, coefficient, time_step\n):\n    \"\"\"A valid no-op preflights state without transient concentration writes.\"\"\"\n    aerosol = _make_aerosol()\n    particle = aerosol.particles\n    setter_calls: list[str] = []\n    concentration = type(particle).concentration\n\n    def record_particle_setter(instance, candidate):\n        setter_calls.append(\"particle\")\n        concentration.fset(instance, candidate)\n\n    monkeypatch.setattr(\n        type(particle),\n        \"concentration\",\n        property(concentration.fget, record_particle_setter),\n    )\n    for name, gas in (\n        (\"partitioning\", aerosol.atmosphere.partitioning_species),\n        (\"gas_only\", aerosol.atmosphere.gas_only_species),\n    ):\n        monkeypatch.setattr(\n            gas,\n            \"set_concentration\",\n            lambda _candidate, name=name: setter_calls.append(name),\n        )\n\n    assert dilute_aerosol(aerosol, coefficient, time_step) is aerosol\n\n    assert setter_calls == []",
+    "successor": "test_dilute_aerosol_no_op_does_not_call_concentration_setters",
+    "disposition": "migrated native fixture; assertions retained or translated to native storage"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_test.py",
+    "test": "test_dilute_aerosol_zero_source_is_an_exact_no_op",
+    "original": "def test_dilute_aerosol_zero_source_is_an_exact_no_op():\n    \"\"\"A zero physical particle and gas source remains exactly zero.\"\"\"\n    aerosol = _make_aerosol()\n    aerosol.particles.concentration = np.zeros(2)\n    aerosol.atmosphere.partitioning_species.set_concentration(0.0)\n    aerosol.atmosphere.gas_only_species.set_concentration(np.zeros(2))\n\n    dilute_aerosol(aerosol, 1.0, 2.0)\n\n    npt.assert_array_equal(aerosol.particles.get_concentration(), np.zeros(2))\n    assert aerosol.atmosphere.partitioning_species.get_concentration() == 0.0\n    npt.assert_array_equal(\n        aerosol.atmosphere.gas_only_species.get_concentration(), np.zeros(2)\n    )",
+    "successor": "test_dilute_aerosol_zero_source_is_an_exact_no_op",
+    "disposition": "migrated native fixture; assertions retained or translated to native storage"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_test.py",
+    "test": "test_dilute_aerosol_rejects_invalid_scalars_without_mutation",
+    "original": "def test_dilute_aerosol_rejects_invalid_scalars_without_mutation(\n    coefficient, time_step, exception, message\n):\n    \"\"\"Scalar validation precedes every container access or assignment.\"\"\"\n    aerosol = _make_aerosol()\n    snapshots = (\n        aerosol.particles.get_concentration().copy(),\n        np.asarray(\n            aerosol.atmosphere.partitioning_species.get_concentration()\n        ).copy(),\n        np.asarray(\n            aerosol.atmosphere.gas_only_species.get_concentration()\n        ).copy(),\n    )\n\n    with pytest.raises(exception, match=message):\n        dilute_aerosol(aerosol, coefficient, time_step)\n\n    npt.assert_array_equal(aerosol.particles.get_concentration(), snapshots[0])\n    npt.assert_array_equal(\n        aerosol.atmosphere.partitioning_species.get_concentration(),\n        snapshots[1],\n    )\n    npt.assert_array_equal(\n        aerosol.atmosphere.gas_only_species.get_concentration(), snapshots[2]\n    )",
+    "successor": "test_dilute_aerosol_rejects_invalid_scalars_without_mutation",
+    "disposition": "migrated native fixture; assertions retained or translated to native storage"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_test.py",
+    "test": "test_dilute_aerosol_rejects_complex_coefficient_warning_cleanly",
+    "original": "def test_dilute_aerosol_rejects_complex_coefficient_warning_cleanly(\n    coefficient,\n):\n    \"\"\"Complex coefficients fail before conversion or concentration mutation.\"\"\"\n    aerosol = _make_aerosol()\n    snapshots = (\n        aerosol.particles.data.concentration.copy(),\n        aerosol.atmosphere.partitioning_species.data.concentration.copy(),\n        aerosol.atmosphere.gas_only_species.data.concentration.copy(),\n    )\n\n    with pytest.raises(TypeError, match=\"coefficient.*real-valued\"):\n        dilute_aerosol(aerosol, coefficient, 1.0)\n\n    npt.assert_array_equal(aerosol.particles.data.concentration, snapshots[0])\n    npt.assert_array_equal(\n        aerosol.atmosphere.partitioning_species.data.concentration, snapshots[1]\n    )\n    npt.assert_array_equal(\n        aerosol.atmosphere.gas_only_species.data.concentration, snapshots[2]\n    )",
+    "successor": "test_dilute_aerosol_rejects_complex_coefficient_warning_cleanly",
+    "disposition": "migrated native fixture; assertions retained or translated to native storage"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_test.py",
+    "test": "test_dilute_aerosol_rejects_multi_box_particles_before_mutation",
+    "original": "def test_dilute_aerosol_rejects_multi_box_particles_before_mutation():\n    \"\"\"Unsupported multi-box particle state fails without changing any domain.\"\"\"\n    aerosol = _make_aerosol()\n    data = aerosol.particles.data\n    aerosol.particles._data = ParticleData(\n        masses=np.repeat(data.masses, 2, axis=0),\n        concentration=np.repeat(data.concentration, 2, axis=0),\n        charge=np.repeat(data.charge, 2, axis=0),\n        density=data.density.copy(),\n        volume=np.repeat(data.volume, 2),\n    )\n    snapshots = (\n        aerosol.particles.data.concentration.copy(),\n        aerosol.atmosphere.partitioning_species.data.concentration.copy(),\n        aerosol.atmosphere.gas_only_species.data.concentration.copy(),\n    )\n\n    with pytest.raises(ValueError, match=\"exactly one particle box\"):\n        dilute_aerosol(aerosol, 0.5, 1.0)\n\n    npt.assert_array_equal(aerosol.particles.data.concentration, snapshots[0])\n    npt.assert_array_equal(\n        aerosol.atmosphere.partitioning_species.data.concentration, snapshots[1]\n    )\n    npt.assert_array_equal(\n        aerosol.atmosphere.gas_only_species.data.concentration, snapshots[2]\n    )",
+    "successor": "test_dilute_aerosol_rejects_multi_box_particles_before_mutation",
+    "disposition": "migrated native fixture; assertions retained or translated to native storage"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_test.py",
+    "test": "test_dilute_aerosol_accepts_zero_dimensional_scalars_and_underflows",
+    "original": "def test_dilute_aerosol_accepts_zero_dimensional_scalars_and_underflows():\n    \"\"\"Zero-dimensional numeric scalars are accepted and finite decay underflows.\"\"\"\n    aerosol = _make_aerosol()\n\n    result = dilute_aerosol(\n        aerosol,\n        np.array(np.finfo(np.float64).max),\n        np.array(np.finfo(np.float64).max),\n    )\n\n    assert result is aerosol\n    npt.assert_array_equal(aerosol.particles.get_concentration(), np.zeros(2))\n    assert aerosol.atmosphere.partitioning_species.get_concentration() == 0.0\n    npt.assert_array_equal(\n        aerosol.atmosphere.gas_only_species.get_concentration(), np.zeros(2)\n    )",
+    "successor": "test_dilute_aerosol_accepts_zero_dimensional_scalars_and_underflows",
+    "disposition": "migrated native fixture; assertions retained or translated to native storage"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_test.py",
+    "test": "test_dilute_aerosol_preserves_subnormal_particle_storage",
+    "original": "def test_dilute_aerosol_preserves_subnormal_particle_storage():\n    \"\"\"Storage decay avoids erasing a representable count through volume scaling.\"\"\"\n    aerosol = _make_aerosol()\n    aerosol.particles.data.concentration[0, 0] = np.nextafter(0.0, 1.0)\n    aerosol.particles.data.volume[0] = 1e308\n\n    dilute_aerosol(aerosol, 0.5, 1.0)\n\n    assert aerosol.particles.data.concentration[0, 0] > 0.0",
+    "successor": "test_dilute_aerosol_preserves_subnormal_particle_storage",
+    "disposition": "migrated native fixture; assertions retained or translated to native storage"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_test.py",
+    "test": "test_dilute_aerosol_zero_dimensional_scalars_apply_normal_decay",
+    "original": "def test_dilute_aerosol_zero_dimensional_scalars_apply_normal_decay():\n    \"\"\"Zero-dimensional numeric inputs retain their documented scalar behavior.\"\"\"\n    aerosol = _make_aerosol()\n    decay = np.exp(-np.float64(0.5) * np.float64(2.0))\n\n    assert dilute_aerosol(aerosol, np.array(0.5), np.array(2.0)) is aerosol\n\n    npt.assert_allclose(\n        aerosol.particles.get_concentration(), np.array([2.0, 4.0]) * decay\n    )\n    npt.assert_allclose(\n        aerosol.atmosphere.partitioning_species.get_concentration(), 3.0 * decay\n    )\n    npt.assert_allclose(\n        aerosol.atmosphere.gas_only_species.get_concentration(),\n        np.array([5.0, 7.0]) * decay,\n    )",
+    "successor": "test_dilute_aerosol_zero_dimensional_scalars_apply_normal_decay",
+    "disposition": "migrated native fixture; assertions retained or translated to native storage"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_test.py",
+    "test": "test_dilute_aerosol_invalid_source_preflight_is_atomic",
+    "original": "def test_dilute_aerosol_invalid_source_preflight_is_atomic(invalid_group):\n    \"\"\"Nonfinite sources in every concentration domain fail before mutation.\"\"\"\n    aerosol = _make_aerosol()\n    particle = aerosol.particles\n    partitioning = aerosol.atmosphere.partitioning_species\n    gas_only = aerosol.atmosphere.gas_only_species\n    if invalid_group == \"particle\":\n        particle.data.concentration[0, 0] = np.nan\n    elif invalid_group == \"partitioning\":\n        partitioning.data.concentration[0, 0] = np.nan\n    else:\n        gas_only.data.concentration[0, 0] = np.nan\n    snapshots = (\n        particle.get_concentration().copy(),\n        np.asarray(partitioning.get_concentration()).copy(),\n        gas_only.get_concentration().copy(),\n    )\n\n    with pytest.raises(ValueError):\n        dilute_aerosol(aerosol, 0.5, 1.0)\n\n    npt.assert_allclose(\n        particle.get_concentration(), snapshots[0], equal_nan=True\n    )\n    npt.assert_allclose(\n        partitioning.get_concentration(), snapshots[1], equal_nan=True\n    )\n    npt.assert_allclose(\n        gas_only.get_concentration(), snapshots[2], equal_nan=True\n    )",
+    "successor": "test_dilute_aerosol_invalid_source_preflight_is_atomic",
+    "disposition": "migrated native fixture; assertions retained or translated to native storage"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_test.py",
+    "test": "test_dilute_aerosol_rejects_invalid_sources_before_writes",
+    "original": "def test_dilute_aerosol_rejects_invalid_sources_before_writes(\n    invalid_group, value, coefficient, time_step, exception, message\n):\n    \"\"\"Invalid sources fail before writes even when decay is a no-op.\"\"\"\n    aerosol = _make_aerosol()\n    particle = aerosol.particles\n    partitioning = aerosol.atmosphere.partitioning_species\n    gas_only = aerosol.atmosphere.gas_only_species\n    if isinstance(value, str):\n        if invalid_group == \"particle\":\n            particle.data.concentration = particle.data.concentration.astype(\n                object\n            )\n        elif invalid_group == \"partitioning\":\n            partitioning.data.concentration = (\n                partitioning.data.concentration.astype(object)\n            )\n        else:\n            gas_only.data.concentration = gas_only.data.concentration.astype(\n                object\n            )\n    if invalid_group == \"particle\":\n        particle.data.concentration[0, 0] = value\n    elif invalid_group == \"partitioning\":\n        partitioning.data.concentration[0, 0] = value\n    else:\n        gas_only.data.concentration[0, 0] = value\n    particle_snapshot = particle.data.concentration.copy()\n    partitioning_snapshot = partitioning.data.concentration.copy()\n    gas_only_snapshot = gas_only.data.concentration.copy()\n\n    with pytest.raises(exception, match=message):\n        dilute_aerosol(aerosol, coefficient, time_step)\n\n    npt.assert_array_equal(particle.data.concentration, particle_snapshot)\n    npt.assert_array_equal(\n        partitioning.data.concentration, partitioning_snapshot\n    )\n    npt.assert_array_equal(gas_only.data.concentration, gas_only_snapshot)",
+    "successor": "test_dilute_aerosol_rejects_invalid_sources_before_writes",
+    "disposition": "Expanded particle/partitioning/inert lane matrix covers negative, NaN, infinity and nonnumeric sources for both zero-time and zero-coefficient calls, with exact preservation and no writer invocation. Native schema errors replace facade-specific errors."
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_test.py",
+    "test": "test_dilute_aerosol_rejects_candidate_shape_before_writes",
+    "original": "def test_dilute_aerosol_rejects_candidate_shape_before_writes(\n    monkeypatch, call_index, candidate, message\n):\n    \"\"\"Preflight rejects candidate shapes before any concentration mutation.\"\"\"\n    aerosol = _make_aerosol()\n    snapshots = (\n        aerosol.particles.data.concentration.copy(),\n        aerosol.atmosphere.partitioning_species.data.concentration.copy(),\n        aerosol.atmosphere.gas_only_species.data.concentration.copy(),\n    )\n    original_step = dilution_module.get_dilution_step\n    calls = 0\n\n    def malformed_step(*args):\n        nonlocal calls\n        result = candidate if calls == call_index else original_step(*args)\n        calls += 1\n        return result\n\n    monkeypatch.setattr(dilution_module, \"get_dilution_step\", malformed_step)\n\n    with pytest.raises(ValueError, match=message):\n        dilute_aerosol(aerosol, 0.5, 1.0)\n\n    npt.assert_array_equal(aerosol.particles.data.concentration, snapshots[0])\n    npt.assert_array_equal(\n        aerosol.atmosphere.partitioning_species.data.concentration, snapshots[1]\n    )\n    npt.assert_array_equal(\n        aerosol.atmosphere.gas_only_species.data.concentration, snapshots[2]\n    )",
+    "successor": "test_dilute_aerosol_rejects_candidate_shape_before_writes",
+    "disposition": "Native candidates are particle (1,2) and full gas (1,3): both candidate shapes reject before writes. Separate partitioning/gas-only setter candidates no longer exist."
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_test.py",
+    "test": "test_dilute_aerosol_invalid_volume_preflight_is_atomic",
+    "original": "def test_dilute_aerosol_invalid_volume_preflight_is_atomic(\n    monkeypatch, volume, exception, message\n):\n    \"\"\"Invalid representation volume fails before any concentration commit.\"\"\"\n    aerosol = _make_aerosol()\n    particle = aerosol.particles\n    sources = (\n        particle.get_concentration().copy(),\n        np.asarray(\n            aerosol.atmosphere.partitioning_species.get_concentration()\n        ).copy(),\n        aerosol.atmosphere.gas_only_species.get_concentration().copy(),\n    )\n    monkeypatch.setattr(particle, \"get_volume\", lambda: volume)\n\n    with pytest.raises(exception, match=message):\n        dilute_aerosol(aerosol, 0.5, 1.0)\n\n    npt.assert_array_equal(particle.get_concentration(), sources[0])\n    npt.assert_array_equal(\n        aerosol.atmosphere.partitioning_species.get_concentration(), sources[1]\n    )\n    npt.assert_array_equal(\n        aerosol.atmosphere.gas_only_species.get_concentration(), sources[2]\n    )",
+    "successor": "test_dilute_aerosol_invalid_volume_preflight_is_atomic",
+    "disposition": "Native volume array schema replaces facade scalar getter; NaN, nonpositive, wrong-rank and nonnumeric storage reject before writes. Scalar inputs still tested on numeric helpers."
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_test.py",
+    "test": "test_dilute_aerosol_rejects_invalid_particle_storage_before_writes",
+    "original": "def test_dilute_aerosol_rejects_invalid_particle_storage_before_writes(\n    monkeypatch, storage, exception, message\n):\n    \"\"\"Storage shape and numeric failures are atomic concrete preflight errors.\"\"\"\n    aerosol = _make_aerosol()\n    particle = aerosol.particles\n    sources = (\n        particle.get_concentration().copy(),\n        np.asarray(\n            aerosol.atmosphere.partitioning_species.get_concentration()\n        ).copy(),\n        aerosol.atmosphere.gas_only_species.get_concentration().copy(),\n    )\n    original_source = particle.get_concentration()\n    particle.data.concentration = storage\n    storage_snapshot = storage.copy()\n    monkeypatch.setattr(particle, \"get_concentration\", lambda: original_source)\n\n    with pytest.raises(exception, match=message):\n        dilute_aerosol(aerosol, 0.5, 1.0)\n\n    npt.assert_array_equal(\n        aerosol.atmosphere.partitioning_species.get_concentration(), sources[1]\n    )\n    npt.assert_array_equal(\n        aerosol.atmosphere.gas_only_species.get_concentration(), sources[2]\n    )\n    npt.assert_array_equal(particle.data.concentration, storage_snapshot)",
+    "successor": "test_dilute_aerosol_rejects_invalid_particle_storage_before_writes",
+    "disposition": "migrated native fixture; assertions retained or translated to native storage"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_test.py",
+    "test": "test_dilute_aerosol_invalid_backing_storage_has_no_setter_writes",
+    "original": "def test_dilute_aerosol_invalid_backing_storage_has_no_setter_writes(\n    monkeypatch, storage\n):\n    \"\"\"Invalid backing storage fails before a particle or gas setter is called.\"\"\"\n    aerosol = _make_aerosol()\n    particle = aerosol.particles\n    source = particle.get_concentration().copy()\n    particle.data.concentration[0] = storage\n    calls: list[str] = []\n    concentration = type(particle).concentration\n\n    def record_particle_setter(instance, candidate):\n        calls.append(\"particle\")\n        concentration.fset(instance, candidate)\n\n    monkeypatch.setattr(particle, \"get_concentration\", lambda: source)\n    monkeypatch.setattr(\n        type(particle),\n        \"concentration\",\n        property(concentration.fget, record_particle_setter),\n    )\n    for name, gas in (\n        (\"partitioning\", aerosol.atmosphere.partitioning_species),\n        (\"gas_only\", aerosol.atmosphere.gas_only_species),\n    ):\n        monkeypatch.setattr(\n            gas,\n            \"set_concentration\",\n            lambda _candidate, name=name: calls.append(name),\n        )\n\n    with pytest.raises(ValueError, match=\"particle concentration storage\"):\n        dilute_aerosol(aerosol, 0.5, 1.0)\n\n    assert calls == []",
+    "successor": "test_dilute_aerosol_invalid_backing_storage_has_no_setter_writes",
+    "disposition": "migrated native fixture; assertions retained or translated to native storage"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_test.py",
+    "test": "test_dilute_aerosol_restores_particle_after_partial_setter_failure",
+    "original": "def test_dilute_aerosol_restores_particle_after_partial_setter_failure(\n    monkeypatch,\n):\n    \"\"\"Particle backing state is restored without retrying a failing setter.\"\"\"\n    aerosol = _make_aerosol()\n    particle = aerosol.particles\n    original_data = particle.data\n    original_concentration = original_data.concentration.copy()\n    partitioning_snapshot = (\n        aerosol.atmosphere.partitioning_species.get_concentration()\n    )\n    gas_only_snapshot = (\n        aerosol.atmosphere.gas_only_species.get_concentration().copy()\n    )\n    replacement_data = copy.deepcopy(original_data)\n    concentration = type(particle).concentration\n\n    def write_then_fail(instance, candidate):\n        instance._data = replacement_data\n        instance._data.concentration[0] = candidate\n        raise RuntimeError(\"partially mutating particle setter failure\")\n\n    monkeypatch.setattr(\n        type(particle),\n        \"concentration\",\n        property(concentration.fget, write_then_fail),\n    )\n\n    with pytest.raises(\n        RuntimeError, match=\"partially mutating particle setter\"\n    ):\n        dilute_aerosol(aerosol, 0.5, 1.0)\n\n    assert particle.data is original_data\n    npt.assert_array_equal(particle.data.concentration, original_concentration)\n    assert (\n        aerosol.atmosphere.partitioning_species.get_concentration()\n        == partitioning_snapshot\n    )\n    npt.assert_array_equal(\n        aerosol.atmosphere.gas_only_species.get_concentration(),\n        gas_only_snapshot,\n    )",
+    "successor": "test_dilute_aerosol_restores_failed_native_writes",
+    "disposition": "native array-writer failure matrix retains pre-write and partial-write restoration for particle and all gas lanes; facade backing-object/mode replacement and separate gas setters removed with their API"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_test.py",
+    "test": "test_dilute_aerosol_rolls_back_particle_after_gas_setter_failure",
+    "original": "def test_dilute_aerosol_rolls_back_particle_after_gas_setter_failure(\n    monkeypatch,\n):\n    \"\"\"A later commit failure restores the physical particle concentration.\"\"\"\n    aerosol = _make_aerosol()\n    particle_snapshot = aerosol.particles.get_concentration().copy()\n    gas_only_snapshot = (\n        aerosol.atmosphere.gas_only_species.get_concentration().copy()\n    )\n    failing_gas = aerosol.atmosphere.partitioning_species\n\n    def fail_setter(_):\n        raise RuntimeError(\"setter failure\")\n\n    monkeypatch.setattr(failing_gas, \"set_concentration\", fail_setter)\n    with pytest.raises(RuntimeError, match=\"setter failure\"):\n        dilute_aerosol(aerosol, 0.5, 1.0)\n\n    npt.assert_array_equal(\n        aerosol.particles.get_concentration(), particle_snapshot\n    )\n    npt.assert_array_equal(\n        aerosol.atmosphere.gas_only_species.get_concentration(),\n        gas_only_snapshot,\n    )",
+    "successor": "test_dilute_aerosol_restores_failed_native_writes",
+    "disposition": "native array-writer failure matrix retains pre-write and partial-write restoration for particle and all gas lanes; facade backing-object/mode replacement and separate gas setters removed with their API"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_test.py",
+    "test": "test_dilute_aerosol_rolls_back_first_gas_after_second_gas_failure",
+    "original": "def test_dilute_aerosol_rolls_back_first_gas_after_second_gas_failure(\n    monkeypatch,\n):\n    \"\"\"A later gas setter failure restores particle and prior gas updates.\"\"\"\n    aerosol = _make_aerosol()\n    particle_snapshot = aerosol.particles.get_concentration().copy()\n    partitioning_snapshot = (\n        aerosol.atmosphere.partitioning_species.get_concentration()\n    )\n    gas_only_snapshot = (\n        aerosol.atmosphere.gas_only_species.get_concentration().copy()\n    )\n\n    def fail_setter(_):\n        raise RuntimeError(\"second setter failure\")\n\n    monkeypatch.setattr(\n        aerosol.atmosphere.gas_only_species, \"set_concentration\", fail_setter\n    )\n    with pytest.raises(RuntimeError, match=\"second setter failure\"):\n        dilute_aerosol(aerosol, 0.5, 1.0)\n\n    npt.assert_array_equal(\n        aerosol.particles.get_concentration(), particle_snapshot\n    )\n    assert (\n        aerosol.atmosphere.partitioning_species.get_concentration()\n        == partitioning_snapshot\n    )\n    npt.assert_array_equal(\n        aerosol.atmosphere.gas_only_species.get_concentration(),\n        gas_only_snapshot,\n    )",
+    "successor": "test_dilute_aerosol_restores_failed_native_writes",
+    "disposition": "native array-writer failure matrix retains pre-write and partial-write restoration for particle and all gas lanes; facade backing-object/mode replacement and separate gas setters removed with their API"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_test.py",
+    "test": "test_dilute_aerosol_restores_partially_mutating_failing_gas_setter",
+    "original": "def test_dilute_aerosol_restores_partially_mutating_failing_gas_setter(\n    monkeypatch,\n):\n    \"\"\"Rollback bypasses a gas setter that writes before raising an error.\"\"\"\n    aerosol = _make_aerosol()\n    particle_snapshot = aerosol.particles.get_concentration().copy()\n    partitioning_snapshot = (\n        aerosol.atmosphere.partitioning_species.get_concentration()\n    )\n    gas_only_snapshot = (\n        aerosol.atmosphere.gas_only_species.get_concentration().copy()\n    )\n    failing_gas = aerosol.atmosphere.gas_only_species\n\n    def write_then_fail(candidate):\n        failing_gas.data.concentration[...] = np.asarray(candidate).reshape(\n            1,\n            -1,\n        )\n        raise RuntimeError(\"partially mutating setter failure\")\n\n    monkeypatch.setattr(failing_gas, \"set_concentration\", write_then_fail)\n    with pytest.raises(RuntimeError, match=\"partially mutating setter failure\"):\n        dilute_aerosol(aerosol, 0.5, 1.0)\n\n    npt.assert_array_equal(\n        aerosol.particles.get_concentration(),\n        particle_snapshot,\n    )\n    assert (\n        aerosol.atmosphere.partitioning_species.get_concentration()\n        == partitioning_snapshot\n    )\n    npt.assert_array_equal(\n        aerosol.atmosphere.gas_only_species.get_concentration(),\n        gas_only_snapshot,\n    )",
+    "successor": "test_dilute_aerosol_restores_failed_native_writes",
+    "disposition": "native array-writer failure matrix retains pre-write and partial-write restoration for particle and all gas lanes; facade backing-object/mode replacement and separate gas setters removed with their API"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_test.py",
+    "test": "test_dilute_aerosol_restores_replaced_gas_backing_state",
+    "original": "def test_dilute_aerosol_restores_replaced_gas_backing_state(monkeypatch):\n    \"\"\"Rollback restores a gas backing object and concentration-mode metadata.\"\"\"\n    aerosol = _make_aerosol()\n    failing_gas = aerosol.atmosphere.partitioning_species\n    original_data = failing_gas.data\n    original_mode = failing_gas._single_species_concentration_mode\n    original_concentration = failing_gas.get_concentration()\n    replacement_data = copy.deepcopy(original_data)\n\n    def replace_then_fail(_):\n        failing_gas._data = replacement_data\n        failing_gas._single_species_concentration_mode = \"array\"\n        raise RuntimeError(\"backing-state setter failure\")\n\n    monkeypatch.setattr(failing_gas, \"set_concentration\", replace_then_fail)\n\n    with pytest.raises(RuntimeError, match=\"backing-state setter failure\"):\n        dilute_aerosol(aerosol, 0.5, 1.0)\n\n    assert failing_gas.data is original_data\n    assert failing_gas._single_species_concentration_mode == original_mode\n    assert failing_gas.get_concentration() == original_concentration",
+    "successor": "test_dilute_aerosol_restores_failed_native_writes",
+    "disposition": "native array-writer failure matrix retains pre-write and partial-write restoration for particle and all gas lanes; facade backing-object/mode replacement and separate gas setters removed with their API"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_runnable_test.py",
+    "test": "test_dilution_strategy_rejects_invalid_coefficients",
+    "original": "def test_dilution_strategy_rejects_invalid_coefficients(\n    coefficient, exception, message\n):\n    \"\"\"Strategy construction preserves the scalar coefficient contract.\"\"\"\n    with pytest.raises(exception, match=message):\n        DilutionStrategy(coefficient)",
+    "successor": "test_dilution_strategy_rejects_invalid_coefficients",
+    "disposition": "migrated native fixture; assertions retained or translated to native storage"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_runnable_test.py",
+    "test": "test_dilution_strategy_retains_valid_coefficients",
+    "original": "def test_dilution_strategy_retains_valid_coefficients(coefficient):\n    \"\"\"Python and NumPy scalar coefficients become finite nonnegative values.\"\"\"\n    strategy = DilutionStrategy(coefficient)\n\n    assert np.isfinite(strategy.coefficient)\n    assert strategy.coefficient >= 0.0\n    assert strategy.coefficient == coefficient",
+    "successor": "test_dilution_strategy_retains_valid_coefficients",
+    "disposition": "migrated native fixture; assertions retained or translated to native storage"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_runnable_test.py",
+    "test": "test_dilution_strategy_rate_and_step_follow_primitive_contract",
+    "original": "def test_dilution_strategy_rate_and_step_follow_primitive_contract():\n    \"\"\"Rate uses physical concentration and step decays all domains in place.\"\"\"\n    aerosol = _make_aerosol()\n    strategy = DilutionStrategy(0.25)\n    sources = _concentrations(aerosol)\n\n    npt.assert_allclose(\n        strategy.rate(aerosol),\n        get_dilution_rate(0.25, sources[0]),\n    )\n    assert strategy.step(aerosol, 4.0) is aerosol\n\n    decay = np.exp(-0.25 * 4.0)\n    for result, source in zip(_concentrations(aerosol), sources, strict=True):\n        npt.assert_allclose(result, source * decay, rtol=1e-12, atol=0.0)",
+    "successor": "test_dilution_strategy_rate_and_step_follow_primitive_contract",
+    "disposition": "migrated native fixture; assertions retained or translated to native storage"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_runnable_test.py",
+    "test": "test_dilution_strategy_step_propagates_validation_without_mutation",
+    "original": "def test_dilution_strategy_step_propagates_validation_without_mutation(\n    time_step, exception, message\n):\n    \"\"\"Direct steps retain P2 validation and atomicity unchanged.\"\"\"\n    aerosol = _make_aerosol()\n    sources = _concentrations(aerosol)\n\n    with pytest.raises(exception, match=message):\n        DilutionStrategy(0.25).step(aerosol, time_step)\n\n    for result, source in zip(_concentrations(aerosol), sources, strict=True):\n        npt.assert_array_equal(result, source)",
+    "successor": "test_dilution_strategy_step_propagates_validation_without_mutation",
+    "disposition": "migrated native fixture; assertions retained or translated to native storage"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_runnable_test.py",
+    "test": "test_dilution_execute_substeps_matches_exact_decay",
+    "original": "def test_dilution_execute_substeps_matches_exact_decay(sub_steps):\n    \"\"\"Repeated equal steps yield the expected finite exponential decay.\"\"\"\n    aerosol = _make_aerosol()\n    sources = _concentrations(aerosol)\n    coefficient = 0.25\n    total_time_step = 4.0\n\n    assert (\n        Dilution(DilutionStrategy(coefficient)).execute(\n            aerosol,\n            total_time_step,\n            sub_steps,\n        )\n        is aerosol\n    )\n\n    decay = np.exp(-coefficient * total_time_step)\n    for result, source in zip(_concentrations(aerosol), sources, strict=True):\n        npt.assert_allclose(result, source * decay, rtol=1e-12, atol=0.0)",
+    "successor": "test_dilution_execute_substeps_matches_exact_decay",
+    "disposition": "migrated native fixture; assertions retained or translated to native storage"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_runnable_test.py",
+    "test": "test_concrete_dilution_executes_one_total_duration_step",
+    "original": "def test_concrete_dilution_executes_one_total_duration_step(monkeypatch):\n    \"\"\"Concrete exact dilution avoids partial mutations across substeps.\"\"\"\n    aerosol = _make_aerosol()\n    strategy = DilutionStrategy(0.25)\n    calls: list[float] = []\n    original_step = strategy.step\n\n    def record_step(step_aerosol, step_time):\n        calls.append(step_time)\n        return original_step(step_aerosol, step_time)\n\n    monkeypatch.setattr(strategy, \"step\", record_step)\n\n    assert Dilution(strategy).execute(aerosol, 4.0, sub_steps=4) is aerosol\n\n    npt.assert_allclose(calls, [4.0])",
+    "successor": "test_concrete_dilution_executes_equal_native_substeps",
+    "disposition": "legacy whole-call shortcut removed; native equal-substep dispatch asserted with unchanged total decay"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_runnable_test.py",
+    "test": "test_dilution_execute_no_ops_are_exact",
+    "original": "def test_dilution_execute_no_ops_are_exact(coefficient, time_step):\n    \"\"\"Zero coefficient or duration leaves every concentration unchanged.\"\"\"\n    aerosol = _make_aerosol()\n    sources = _concentrations(aerosol)\n\n    Dilution(DilutionStrategy(coefficient)).execute(aerosol, time_step, 2)\n\n    for result, source in zip(_concentrations(aerosol), sources, strict=True):\n        npt.assert_array_equal(result, source)",
+    "successor": "test_dilution_execute_no_ops_are_exact",
+    "disposition": "migrated native fixture; assertions retained or translated to native storage"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_runnable_test.py",
+    "test": "test_concrete_dilution_preflights_before_first_substep",
+    "original": "def test_concrete_dilution_preflights_before_first_substep(\n    monkeypatch, time_step\n):\n    \"\"\"Malformed concrete state raises before runnable strategy delegation.\"\"\"\n    aerosol = _make_aerosol()\n    aerosol.particles.data.concentration[0, 0] = np.nan\n    strategy = DilutionStrategy(0.25)\n    calls: list[float] = []\n    original_step = strategy.step\n\n    def record_step(step_aerosol, step_time):\n        calls.append(step_time)\n        return original_step(step_aerosol, step_time)\n\n    monkeypatch.setattr(strategy, \"step\", record_step)\n\n    with pytest.raises(ValueError, match=\"particle concentration\"):\n        Dilution(strategy).execute(aerosol, time_step, sub_steps=2)\n\n    assert calls == []",
+    "successor": "test_concrete_dilution_preflights_before_first_substep",
+    "disposition": "migrated native fixture; assertions retained or translated to native storage"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_runnable_test.py",
+    "test": "test_dilution_execute_large_finite_decay_remains_physical",
+    "original": "def test_dilution_execute_large_finite_decay_remains_physical(\n    coefficient, time_step\n):\n    \"\"\"Large finite products underflow cleanly without negative concentrations.\"\"\"\n    aerosol = _make_aerosol()\n\n    Dilution(DilutionStrategy(coefficient)).execute(aerosol, time_step)\n\n    for concentration in _concentrations(aerosol):\n        assert np.all(np.isfinite(concentration))\n        assert np.all(concentration >= 0.0)",
+    "successor": "test_dilution_execute_large_finite_decay_remains_physical",
+    "disposition": "migrated native fixture; assertions retained or translated to native storage"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_runnable_test.py",
+    "test": "test_dilution_delegates_rate_and_equal_substeps",
+    "original": "def test_dilution_delegates_rate_and_equal_substeps():\n    \"\"\"Runnable returns the exact rate object and calls the strategy per step.\"\"\"\n    aerosol = _make_aerosol()\n    rate_result = np.array([-1.0, -2.0])\n    strategy = SpyStrategy(rate_result)\n    dilution = Dilution(strategy)\n\n    assert dilution.rate(aerosol) is rate_result\n    assert dilution.execute(aerosol, 3.0, 3) is aerosol\n    assert [call[0] for call in strategy.calls] == [aerosol] * 3\n    npt.assert_allclose([call[1] for call in strategy.calls], [1.0, 1.0, 1.0])",
+    "successor": "test_dilution_delegates_rate_and_equal_substeps",
+    "disposition": "migrated native fixture; assertions retained or translated to native storage"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_runnable_test.py",
+    "test": "test_dilution_rejects_invalid_substeps_before_delegation",
+    "original": "def test_dilution_rejects_invalid_substeps_before_delegation(sub_steps):\n    \"\"\"Invalid substep counts fail before strategy calls or mutation.\"\"\"\n    aerosol = _make_aerosol()\n    sources = _concentrations(aerosol)\n    strategy = SpyStrategy(0.0)\n\n    with pytest.raises(ValueError, match=\"sub_steps.*positive integer\"):\n        Dilution(strategy).execute(aerosol, 1.0, sub_steps)  # type: ignore[arg-type]\n\n    assert strategy.calls == []\n    for result, source in zip(_concentrations(aerosol), sources, strict=True):\n        npt.assert_array_equal(result, source)",
+    "successor": "test_dilution_rejects_invalid_substeps_before_delegation",
+    "disposition": "migrated native fixture; assertions retained or translated to native storage"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_runnable_test.py",
+    "test": "test_dilution_rejects_invalid_duration_before_delegation",
+    "original": "def test_dilution_rejects_invalid_duration_before_delegation(\n    time_step, exception, message\n):\n    \"\"\"Invalid total durations fail before a strategy call or mutation.\"\"\"\n    aerosol = _make_aerosol()\n    sources = _concentrations(aerosol)\n    strategy = SpyStrategy(0.0)\n\n    with pytest.raises(exception, match=message):\n        Dilution(strategy).execute(aerosol, time_step)  # type: ignore[arg-type]\n\n    assert strategy.calls == []\n    for result, source in zip(_concentrations(aerosol), sources, strict=True):\n        npt.assert_array_equal(result, source)",
+    "successor": "test_dilution_rejects_invalid_duration_before_delegation",
+    "disposition": "migrated native fixture; assertions retained or translated to native storage"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_runnable_test.py",
+    "test": "test_concrete_dilution_execute_rejects_boolean_duration_without_mutation",
+    "original": "def test_concrete_dilution_execute_rejects_boolean_duration_without_mutation(\n    time_step,\n):\n    \"\"\"Concrete runnable execution rejects booleans before preflight writes.\"\"\"\n    aerosol = _make_aerosol()\n    sources = _concentrations(aerosol)\n\n    with pytest.raises(TypeError, match=\"time_step.*boolean\"):\n        Dilution(DilutionStrategy(0.25)).execute(aerosol, time_step, 2)\n\n    for result, source in zip(_concentrations(aerosol), sources, strict=True):\n        npt.assert_array_equal(result, source)",
+    "successor": "test_concrete_dilution_execute_rejects_boolean_duration_without_mutation",
+    "disposition": "migrated native fixture; assertions retained or translated to native storage"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_runnable_test.py",
+    "test": "test_dilution_ignores_nonconforming_strategy_return_value",
+    "original": "def test_dilution_ignores_nonconforming_strategy_return_value():\n    \"\"\"Runnable always retains the input aerosol across strategy calls.\"\"\"\n    aerosol = _make_aerosol()\n    alternate = _make_aerosol()\n    strategy = NonconformingStrategy(alternate)\n\n    assert Dilution(strategy).execute(aerosol, 2.0, 2) is aerosol\n    assert all(call_aerosol is aerosol for call_aerosol, _ in strategy.calls)\n    assert alternate is not aerosol",
+    "successor": "test_dilution_ignores_nonconforming_strategy_return_value",
+    "disposition": "migrated native fixture; assertions retained or translated to native storage"
+  },
+  {
+    "file": "particula/dynamics/tests/dilution_runnable_test.py",
+    "test": "test_dilution_composes_in_runnable_sequence_order",
+    "original": "def test_dilution_composes_in_runnable_sequence_order():\n    \"\"\"Sequences interleave dilution and following processes per outer step.\"\"\"\n    aerosol = _make_aerosol()\n    calls: list[str] = []\n    strategy = OrderedSpyStrategy(calls)\n    marker = Marker(calls)\n    dilution = Dilution(strategy)  # type: ignore[arg-type]\n\n    assert (dilution | marker).execute(aerosol, 1.0) is aerosol\n    assert calls == [\"dilution\", \"marker\"]\n\n    calls.clear()\n    strategy.calls.clear()\n    sequence = RunnableSequence()\n    sequence.add_process(dilution)\n    sequence.add_process(marker)\n    assert sequence.execute(aerosol, 4.0, sub_steps=2) is aerosol\n\n    assert calls == [\"dilution\", \"marker\", \"dilution\", \"marker\"]\n    assert len(strategy.calls) == 2\n    npt.assert_allclose([call[1] for call in strategy.calls], [2.0, 2.0])",
+    "successor": "test_dilution_composes_in_runnable_sequence_order",
+    "disposition": "migrated native fixture; assertions retained or translated to native storage"
+  }
+]

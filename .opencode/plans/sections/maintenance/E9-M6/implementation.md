@@ -188,3 +188,39 @@ bin-count experiment was reverted.
 
 Facade definitions and most CPU/GPU legacy branches still remain. Inventories
 are pending disposition, final validation is pending, and no PR exists yet.
+
+## CPU dilution legacy removal
+
+Removed legacy aggregate admission, split gas setter machinery, facade snapshot
+and rollback helpers, and the legacy whole-duration runnable shortcut. Native
+per-substep behavior, preflight, raw-storage decay, normalized rate and rollback
+remain unchanged. Explicit admission rejects non-native aggregate shapes before
+reading fields. Updated public strategy/protocol/runnable annotations and the
+AGENTS write-failure description.
+
+Migrated the dilution helper and runnable fixtures to native containers with
+non-unit volume and independent material/gas widths. `dilution_assertions.json`
+preserves all **55 original test functions** and maps each to a current successor.
+Numerical helper assertions remain unchanged. Facade setter and backing-object
+replacement tests now map to native writer failure tests: before/partial failure
+at both particle and full-gas writes, exact restoration, and held-array identity.
+Native full gas has one writer, so the obsolete second gas-setter boundary is
+not reproduced. No tolerance or coverage threshold changed. Broader source
+admission matrices cover both no-work modes and every gas category.
+
+Validation (repository .venv, writable Warp cache where applicable):
+
+- Dilution helper/runnable/native runnable and native scientific/sequence
+  integrations: **278 passed in 1.30s**, `/tmp/m6-dilution-removal4.log`.
+- All `particula/dynamics/tests/`: **753 passed in 1.43s**,
+  `/tmp/m6-dilution-broad2.log`.
+- Dilution example and native process guides, `-Werror --no-cov`:
+  **29 passed in 5.70s**, `/tmp/m6-dilution-examples.log`.
+- Full-package mypy clean (552 files), `/tmp/m6-dilution-mypy2.log`;
+  scoped Ruff check and format check passed.
+- Earlier diagnostic runs had native-message expectation mismatches; two
+  attempted groups used nonexistent test paths and ran no tests. Neither is
+  counted as passing evidence. The corrected explicit paths above passed.
+
+Remaining facade consumers, definition deletion, GPU untagged removal,
+publication warning cleanup and final frozen-revision gates remain pending.

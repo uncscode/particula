@@ -109,14 +109,10 @@ def _native_duration(time_step: object, sub_steps: object) -> float:
 class DilutionStrategyProtocol(Protocol):
     """Structural contract for strategies compatible with ``Dilution``."""
 
-    def rate(
-        self, aerosol: Aerosol | LegacyAerosol
-    ) -> float | NDArray[np.float64]:
+    def rate(self, aerosol: Aerosol) -> float | NDArray[np.float64]:
         """Return the particle-number concentration rate."""
 
-    def step(
-        self, aerosol: Aerosol | LegacyAerosol, time_step: float
-    ) -> Aerosol | LegacyAerosol:
+    def step(self, aerosol: Aerosol, time_step: float) -> Aerosol:
         """Apply one dilution step to an aerosol."""
 
 
@@ -1040,9 +1036,7 @@ class Dilution(RunnableABC):
         """
         self.dilution_strategy = dilution_strategy
 
-    def rate(
-        self, aerosol: Aerosol | LegacyAerosol
-    ) -> float | NDArray[np.float64]:
+    def rate(self, aerosol: Aerosol) -> float | NDArray[np.float64]:
         """Delegate particle-number dilution-rate evaluation to the strategy.
 
         Args:
@@ -1056,22 +1050,21 @@ class Dilution(RunnableABC):
 
     def execute(
         self,
-        aerosol: _AerosolT,
+        aerosol: Aerosol,
         time_step: float | np.number,
         sub_steps: int | np.integer = 1,
-    ) -> _AerosolT:
+    ) -> Aerosol:
         """Apply dilution as equal, sequential substeps over a total duration.
 
         The runnable validates the total duration and substep count before
         calling the strategy. A ``DilutionStrategy`` validates and executes one
         preflight before the first equal native substep. Each substep is atomic;
-        prior successful steps persist if a later step fails. The isolated
-        legacy path retains its historical total-duration exact step.
+        prior successful steps persist if a later step fails.
         Custom strategies are not inspected and retain equal-substep delegation
         with responsibility for aerosol validation, mutation, and atomicity.
 
         Args:
-            aerosol: Aerosol | LegacyAerosol to mutate in place.
+            aerosol: Aerosol to mutate in place.
             time_step: Total elapsed time [s], finite and nonnegative.
             sub_steps: Positive count of equal internal dilution steps.
 
@@ -1098,10 +1091,6 @@ class Dilution(RunnableABC):
         )
         if isinstance(self.dilution_strategy, DilutionStrategy):
             self.dilution_strategy._preflight(aerosol, validated_time_step)
-            if not isinstance(aerosol, Aerosol):
-                # Retained legacy whole-call behavior until M6 deletion.
-                self.dilution_strategy.step(aerosol, validated_time_step)
-                return aerosol
         sub_step_time_step = validated_time_step / sub_steps
         for _ in range(sub_steps):
             self.dilution_strategy.step(aerosol, sub_step_time_step)

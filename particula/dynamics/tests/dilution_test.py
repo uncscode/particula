@@ -1,29 +1,19 @@
 """Numerical-contract tests for chamber dilution helpers."""
 
-import copy
-
 import numpy as np
 import numpy.testing as npt
 import particula.dynamics as dynamics
 import particula.dynamics.dilution as dilution_module
 import pytest
-from particula._legacy_aerosol import Aerosol
+from particula.aerosol import Aerosol
 from particula.dynamics.dilution import (
     dilute_aerosol,
     get_dilution_rate,
     get_dilution_step,
     get_volume_dilution_coefficient,
 )
-from particula.gas.atmosphere import Atmosphere
-from particula.gas.species import GasSpecies
-from particula.particles.activity_strategies import ActivityIdealMass
-from particula.particles.distribution_strategies import (
-    MassBasedMovingBin,
-    SpeciatedMassMovingBin,
-)
+from particula.gas import EnvironmentData, GasData
 from particula.particles.particle_data import ParticleData
-from particula.particles.representation import ParticleRepresentation
-from particula.particles.surface_strategies import SurfaceStrategyVolume
 
 
 @pytest.mark.parametrize(
@@ -368,123 +358,120 @@ def test_dilution_package_surface_remains_limited_to_existing_helpers():
     assert not hasattr(dynamics, "dilute_aerosol")
 
 
-def _make_aerosol(
-    strategy: MassBasedMovingBin | SpeciatedMassMovingBin | None = None,
-) -> Aerosol:
-    """Build a container fixture with scalar and vector gas modes."""
-    strategy = MassBasedMovingBin() if strategy is None else strategy
-    distribution = np.array([1e-18, 2e-18])
-    if isinstance(strategy, SpeciatedMassMovingBin):
-        distribution = distribution[:, np.newaxis]
-    particles = ParticleRepresentation(
-        strategy=strategy,
-        activity=ActivityIdealMass(),
-        surface=SurfaceStrategyVolume(),
-        distribution=distribution,
-        density=np.array([1000.0]),
-        concentration=np.array([4.0, 8.0]),
-        charge=np.array([1.0, -1.0]),
-        volume=2.0,
+def _make_aerosol(n_species=1, n_boxes=1) -> Aerosol:
+    """Build explicit resolved counts and independent full-gas lanes."""
+    return Aerosol(
+        particles=ParticleData(
+            masses=np.tile(
+                np.array([1e-18, 2e-18])[None, :, None], (n_boxes, 1, n_species)
+            ),
+            concentration=np.tile([[4.0, 8.0]], (n_boxes, 1)),
+            charge=np.tile([[1.0, -1.0]], (n_boxes, 1)),
+            density=np.full(n_species, 1000.0),
+            volume=np.full(n_boxes, 2.0),
+            distribution_type="particle_resolved",
+        ),
+        gas=GasData(
+            name=["partitioning", "gas_a", "gas_b"],
+            molar_mass=np.array([0.1, 0.02, 0.03]),
+            concentration=np.tile([[3.0, 5.0, 7.0]], (n_boxes, 1)),
+            partitioning=np.array([True, False, False]),
+        ),
+        environment=EnvironmentData(
+            temperature=np.full(n_boxes, 298.15),
+            pressure=np.full(n_boxes, 101325.0),
+            saturation_ratio=np.ones((n_boxes, 3)),
+        ),
     )
-    partitioning = GasSpecies(
-        name="partitioning",
-        molar_mass=0.1,
-        concentration=3.0,
-        partitioning=True,
+
+
+def _concentrations(aerosol):
+    """Copy normalized particle concentration and the two gas categories."""
+    return (
+        (
+            aerosol.particles.concentration[0] / aerosol.particles.volume[0]
+        ).copy(),
+        aerosol.gas.concentration[0, :1].copy(),
+        aerosol.gas.concentration[0, 1:].copy(),
     )
-    gas_only = GasSpecies(
-        name=np.array(["gas_a", "gas_b"]),
-        molar_mass=np.array([0.02, 0.03]),
-        concentration=np.array([5.0, 7.0]),
-        partitioning=False,
-    )
-    atmosphere = Atmosphere(
-        temperature=298.15,
-        total_pressure=101325.0,
-        partitioning_species=partitioning,
-        gas_only_species=gas_only,
-    )
-    return Aerosol(atmosphere=atmosphere, particles=particles)
+
+
+def _storage(aerosol):
+    """Return the authoritative concentration arrays."""
+    return (aerosol.particles.concentration, aerosol.gas.concentration)
+
+
+def _assert_unchanged(aerosol, snapshots):
+    """Require exact unchanged primary concentration storage."""
+    for actual, expected in zip(_storage(aerosol), snapshots, strict=True):
+        npt.assert_array_equal(actual, expected)
 
 
 def test_dilute_aerosol_updates_physical_particle_and_gas_concentrations():
-    """Container dilution uses physical particle concentrations and returns identity."""
+    """All gas lanes and physical particle density decay with held identities."""
     aerosol = _make_aerosol()
-    particle = aerosol.particles
-    partitioning = aerosol.atmosphere.partitioning_species
-    gas_only = aerosol.atmosphere.gas_only_species
-    particle_source = particle.get_concentration().copy()
-    partitioning_source = partitioning.get_concentration()
-    gas_only_source = gas_only.get_concentration().copy()
-    decay = np.exp(-0.25 * 4.0)
-
-    result = dilute_aerosol(aerosol, 0.25, 4.0)
-
-    assert result is aerosol
-    assert aerosol.particles is particle
-    assert aerosol.atmosphere.partitioning_species is partitioning
-    assert aerosol.atmosphere.gas_only_species is gas_only
-    npt.assert_allclose(particle.get_concentration(), particle_source * decay)
-    npt.assert_allclose(
-        partitioning.get_concentration(), partitioning_source * decay
+    containers = (aerosol.particles, aerosol.gas, aerosol.environment)
+    arrays = _storage(aerosol)
+    sources = _concentrations(aerosol)
+    assert dilute_aerosol(aerosol, 0.25, 4.0) is aerosol
+    assert all(
+        a is b
+        for a, b in zip(
+            containers,
+            (aerosol.particles, aerosol.gas, aerosol.environment),
+            strict=True,
+        )
     )
-    npt.assert_allclose(gas_only.get_concentration(), gas_only_source * decay)
-    assert np.all(np.isfinite(particle.get_concentration()))
-    assert np.all(particle.get_concentration() >= 0.0)
+    assert all(a is b for a, b in zip(arrays, _storage(aerosol), strict=True))
+    for result, source in zip(_concentrations(aerosol), sources, strict=True):
+        npt.assert_allclose(result, source * np.exp(-0.25 * 4.0))
+        assert np.all(np.isfinite(result))
+        assert np.all(result >= 0)
 
 
 def test_dilute_aerosol_supports_speciated_particle_representation():
     """Dilution updates a supported speciated representation in physical units."""
-    aerosol = _make_aerosol(SpeciatedMassMovingBin())
-    source = aerosol.particles.get_concentration().copy()
+    aerosol = _make_aerosol(n_species=2)
+    source = (
+        aerosol.particles.concentration[0] / aerosol.particles.volume[0]
+    ).copy()
 
     dilute_aerosol(aerosol, 0.5, 2.0)
 
-    npt.assert_allclose(aerosol.particles.get_concentration(), source / np.e)
+    npt.assert_allclose(
+        (aerosol.particles.concentration[0] / aerosol.particles.volume[0]),
+        source / np.e,
+    )
 
 
 def test_dilute_aerosol_preserves_container_metadata_and_particle_state():
-    """Dilution changes concentrations only, retaining container state."""
-    aerosol = _make_aerosol()
-    particle = aerosol.particles
-    atmosphere = aerosol.atmosphere
-    partitioning = atmosphere.partitioning_species
-    gas_only = atmosphere.gas_only_species
-    protected_particle_state = (
-        particle.get_species_mass().copy(),
-        particle.get_effective_density().copy(),
-        particle.get_charge(clone=True),
-        particle.get_volume(),
+    """Only concentrations change; every other native field is preserved."""
+    aerosol = _make_aerosol(n_species=2)
+    particle, gas, environment = (
+        aerosol.particles,
+        aerosol.gas,
+        aerosol.environment,
     )
-    protected_gas_state = (
-        partitioning.name,
-        partitioning.molar_mass,
-        partitioning.partitioning,
-        gas_only.name.copy(),
-        gas_only.molar_mass.copy(),
-        gas_only.partitioning,
-        atmosphere.temperature,
-        atmosphere.total_pressure,
-    )
-
+    fields = [
+        particle.masses,
+        particle.density,
+        particle.charge,
+        particle.volume,
+        gas.molar_mass,
+        gas.partitioning,
+        environment.temperature,
+        environment.pressure,
+        environment.saturation_ratio,
+    ]
+    snapshots = [field.copy() for field in fields]
+    density = particle.effective_density.copy()
+    names = list(gas.name)
     dilute_aerosol(aerosol, 0.25, 4.0)
-
-    npt.assert_array_equal(
-        particle.get_species_mass(), protected_particle_state[0]
-    )
-    npt.assert_array_equal(
-        particle.get_effective_density(), protected_particle_state[1]
-    )
-    npt.assert_array_equal(particle.get_charge(), protected_particle_state[2])
-    assert particle.get_volume() == protected_particle_state[3]
-    assert partitioning.name == protected_gas_state[0]
-    assert partitioning.molar_mass == protected_gas_state[1]
-    assert partitioning.partitioning is protected_gas_state[2]
-    npt.assert_array_equal(gas_only.name, protected_gas_state[3])
-    npt.assert_array_equal(gas_only.molar_mass, protected_gas_state[4])
-    assert gas_only.partitioning is protected_gas_state[5]
-    assert atmosphere.temperature == protected_gas_state[6]
-    assert atmosphere.total_pressure == protected_gas_state[7]
+    for field, before in zip(fields, snapshots, strict=True):
+        npt.assert_array_equal(field, before)
+    npt.assert_array_equal(particle.effective_density, density)
+    assert list(gas.name) == names
+    assert particle.distribution_type == "particle_resolved"
 
 
 @pytest.mark.parametrize("coefficient, time_step", [(0.0, 1.0), (1.0, 0.0)])
@@ -494,72 +481,47 @@ def test_dilute_aerosol_zero_coefficient_or_duration_is_exact_no_op(
     """Zero coefficient or duration retains all concentration values exactly."""
     aerosol = _make_aerosol()
     sources = (
-        aerosol.particles.get_concentration().copy(),
-        np.asarray(
-            aerosol.atmosphere.partitioning_species.get_concentration()
+        (
+            aerosol.particles.concentration[0] / aerosol.particles.volume[0]
         ).copy(),
-        aerosol.atmosphere.gas_only_species.get_concentration().copy(),
+        np.asarray(aerosol.gas.concentration[0, :1]).copy(),
+        aerosol.gas.concentration[0, 1:].copy(),
     )
 
     assert dilute_aerosol(aerosol, coefficient, time_step) is aerosol
 
-    npt.assert_array_equal(aerosol.particles.get_concentration(), sources[0])
     npt.assert_array_equal(
-        aerosol.atmosphere.partitioning_species.get_concentration(), sources[1]
+        (aerosol.particles.concentration[0] / aerosol.particles.volume[0]),
+        sources[0],
     )
-    npt.assert_array_equal(
-        aerosol.atmosphere.gas_only_species.get_concentration(), sources[2]
-    )
+    npt.assert_array_equal(aerosol.gas.concentration[0, :1], sources[1])
+    npt.assert_array_equal(aerosol.gas.concentration[0, 1:], sources[2])
 
 
 @pytest.mark.parametrize("coefficient, time_step", [(0.0, 1.0), (1.0, 0.0)])
 def test_dilute_aerosol_no_op_does_not_call_concentration_setters(
     monkeypatch, coefficient, time_step
 ):
-    """A valid no-op preflights state without transient concentration writes."""
+    """A valid native no-op performs no copy into concentration storage."""
     aerosol = _make_aerosol()
-    particle = aerosol.particles
-    setter_calls: list[str] = []
-    concentration = type(particle).concentration
-
-    def record_particle_setter(instance, candidate):
-        setter_calls.append("particle")
-        concentration.fset(instance, candidate)
-
+    calls = []
     monkeypatch.setattr(
-        type(particle),
-        "concentration",
-        property(concentration.fget, record_particle_setter),
+        dilution_module.np, "copyto", lambda *args: calls.append(args)
     )
-    for name, gas in (
-        ("partitioning", aerosol.atmosphere.partitioning_species),
-        ("gas_only", aerosol.atmosphere.gas_only_species),
-    ):
-        monkeypatch.setattr(
-            gas,
-            "set_concentration",
-            lambda _candidate, name=name: setter_calls.append(name),
-        )
-
     assert dilute_aerosol(aerosol, coefficient, time_step) is aerosol
-
-    assert setter_calls == []
+    assert calls == []
 
 
 def test_dilute_aerosol_zero_source_is_an_exact_no_op():
-    """A zero physical particle and gas source remains exactly zero."""
+    """A canonical free population and zero gas remain exactly zero."""
     aerosol = _make_aerosol()
-    aerosol.particles.concentration = np.zeros(2)
-    aerosol.atmosphere.partitioning_species.set_concentration(0.0)
-    aerosol.atmosphere.gas_only_species.set_concentration(np.zeros(2))
-
+    aerosol.particles.concentration[:] = 0
+    aerosol.particles.masses[:] = 0
+    aerosol.particles.charge[:] = 0
+    aerosol.gas.concentration[:] = 0
+    snapshots = [x.copy() for x in _storage(aerosol)]
     dilute_aerosol(aerosol, 1.0, 2.0)
-
-    npt.assert_array_equal(aerosol.particles.get_concentration(), np.zeros(2))
-    assert aerosol.atmosphere.partitioning_species.get_concentration() == 0.0
-    npt.assert_array_equal(
-        aerosol.atmosphere.gas_only_species.get_concentration(), np.zeros(2)
-    )
+    _assert_unchanged(aerosol, snapshots)
 
 
 @pytest.mark.parametrize(
@@ -593,26 +555,25 @@ def test_dilute_aerosol_rejects_invalid_scalars_without_mutation(
     """Scalar validation precedes every container access or assignment."""
     aerosol = _make_aerosol()
     snapshots = (
-        aerosol.particles.get_concentration().copy(),
-        np.asarray(
-            aerosol.atmosphere.partitioning_species.get_concentration()
+        (
+            aerosol.particles.concentration[0] / aerosol.particles.volume[0]
         ).copy(),
-        np.asarray(
-            aerosol.atmosphere.gas_only_species.get_concentration()
-        ).copy(),
+        np.asarray(aerosol.gas.concentration[0, :1]).copy(),
+        np.asarray(aerosol.gas.concentration[0, 1:]).copy(),
     )
 
     with pytest.raises(exception, match=message):
         dilute_aerosol(aerosol, coefficient, time_step)
 
-    npt.assert_array_equal(aerosol.particles.get_concentration(), snapshots[0])
     npt.assert_array_equal(
-        aerosol.atmosphere.partitioning_species.get_concentration(),
+        (aerosol.particles.concentration[0] / aerosol.particles.volume[0]),
+        snapshots[0],
+    )
+    npt.assert_array_equal(
+        aerosol.gas.concentration[0, :1],
         snapshots[1],
     )
-    npt.assert_array_equal(
-        aerosol.atmosphere.gas_only_species.get_concentration(), snapshots[2]
-    )
+    npt.assert_array_equal(aerosol.gas.concentration[0, 1:], snapshots[2])
 
 
 @pytest.mark.parametrize(
@@ -624,50 +585,26 @@ def test_dilute_aerosol_rejects_complex_coefficient_warning_cleanly(
     """Complex coefficients fail before conversion or concentration mutation."""
     aerosol = _make_aerosol()
     snapshots = (
-        aerosol.particles.data.concentration.copy(),
-        aerosol.atmosphere.partitioning_species.data.concentration.copy(),
-        aerosol.atmosphere.gas_only_species.data.concentration.copy(),
+        aerosol.particles.concentration.copy(),
+        aerosol.gas.concentration[:, :1].copy(),
+        aerosol.gas.concentration[:, 1:].copy(),
     )
 
     with pytest.raises(TypeError, match="coefficient.*real-valued"):
         dilute_aerosol(aerosol, coefficient, 1.0)
 
-    npt.assert_array_equal(aerosol.particles.data.concentration, snapshots[0])
-    npt.assert_array_equal(
-        aerosol.atmosphere.partitioning_species.data.concentration, snapshots[1]
-    )
-    npt.assert_array_equal(
-        aerosol.atmosphere.gas_only_species.data.concentration, snapshots[2]
-    )
+    npt.assert_array_equal(aerosol.particles.concentration, snapshots[0])
+    npt.assert_array_equal(aerosol.gas.concentration[:, :1], snapshots[1])
+    npt.assert_array_equal(aerosol.gas.concentration[:, 1:], snapshots[2])
 
 
 def test_dilute_aerosol_rejects_multi_box_particles_before_mutation():
-    """Unsupported multi-box particle state fails without changing any domain."""
-    aerosol = _make_aerosol()
-    data = aerosol.particles.data
-    aerosol.particles._data = ParticleData(
-        masses=np.repeat(data.masses, 2, axis=0),
-        concentration=np.repeat(data.concentration, 2, axis=0),
-        charge=np.repeat(data.charge, 2, axis=0),
-        density=data.density.copy(),
-        volume=np.repeat(data.volume, 2),
-    )
-    snapshots = (
-        aerosol.particles.data.concentration.copy(),
-        aerosol.atmosphere.partitioning_species.data.concentration.copy(),
-        aerosol.atmosphere.gas_only_species.data.concentration.copy(),
-    )
-
-    with pytest.raises(ValueError, match="exactly one particle box"):
+    """A structurally valid multi-box aggregate is rejected before writes."""
+    aerosol = _make_aerosol(n_boxes=2)
+    snapshots = [x.copy() for x in _storage(aerosol)]
+    with pytest.raises(ValueError, match="exactly one box"):
         dilute_aerosol(aerosol, 0.5, 1.0)
-
-    npt.assert_array_equal(aerosol.particles.data.concentration, snapshots[0])
-    npt.assert_array_equal(
-        aerosol.atmosphere.partitioning_species.data.concentration, snapshots[1]
-    )
-    npt.assert_array_equal(
-        aerosol.atmosphere.gas_only_species.data.concentration, snapshots[2]
-    )
+    _assert_unchanged(aerosol, snapshots)
 
 
 def test_dilute_aerosol_accepts_zero_dimensional_scalars_and_underflows():
@@ -681,22 +618,23 @@ def test_dilute_aerosol_accepts_zero_dimensional_scalars_and_underflows():
     )
 
     assert result is aerosol
-    npt.assert_array_equal(aerosol.particles.get_concentration(), np.zeros(2))
-    assert aerosol.atmosphere.partitioning_species.get_concentration() == 0.0
     npt.assert_array_equal(
-        aerosol.atmosphere.gas_only_species.get_concentration(), np.zeros(2)
+        (aerosol.particles.concentration[0] / aerosol.particles.volume[0]),
+        np.zeros(2),
     )
+    assert aerosol.gas.concentration[0, :1] == 0.0
+    npt.assert_array_equal(aerosol.gas.concentration[0, 1:], np.zeros(2))
 
 
 def test_dilute_aerosol_preserves_subnormal_particle_storage():
     """Storage decay avoids erasing a representable count through volume scaling."""
     aerosol = _make_aerosol()
-    aerosol.particles.data.concentration[0, 0] = np.nextafter(0.0, 1.0)
-    aerosol.particles.data.volume[0] = 1e308
+    aerosol.particles.concentration[0, 0] = np.nextafter(0.0, 1.0)
+    aerosol.particles.volume[0] = 1e308
 
     dilute_aerosol(aerosol, 0.5, 1.0)
 
-    assert aerosol.particles.data.concentration[0, 0] > 0.0
+    assert aerosol.particles.concentration[0, 0] > 0.0
 
 
 def test_dilute_aerosol_zero_dimensional_scalars_apply_normal_decay():
@@ -707,13 +645,12 @@ def test_dilute_aerosol_zero_dimensional_scalars_apply_normal_decay():
     assert dilute_aerosol(aerosol, np.array(0.5), np.array(2.0)) is aerosol
 
     npt.assert_allclose(
-        aerosol.particles.get_concentration(), np.array([2.0, 4.0]) * decay
+        (aerosol.particles.concentration[0] / aerosol.particles.volume[0]),
+        np.array([2.0, 4.0]) * decay,
     )
+    npt.assert_allclose(aerosol.gas.concentration[0, :1], 3.0 * decay)
     npt.assert_allclose(
-        aerosol.atmosphere.partitioning_species.get_concentration(), 3.0 * decay
-    )
-    npt.assert_allclose(
-        aerosol.atmosphere.gas_only_species.get_concentration(),
+        aerosol.gas.concentration[0, 1:],
         np.array([5.0, 7.0]) * decay,
     )
 
@@ -722,180 +659,64 @@ def test_dilute_aerosol_zero_dimensional_scalars_apply_normal_decay():
     "invalid_group", ["particle", "partitioning", "gas_only"]
 )
 def test_dilute_aerosol_invalid_source_preflight_is_atomic(invalid_group):
-    """Nonfinite sources in every concentration domain fail before mutation."""
+    """A nonfinite concentration in any lane rejects without mutation."""
     aerosol = _make_aerosol()
-    particle = aerosol.particles
-    partitioning = aerosol.atmosphere.partitioning_species
-    gas_only = aerosol.atmosphere.gas_only_species
-    if invalid_group == "particle":
-        particle.data.concentration[0, 0] = np.nan
-    elif invalid_group == "partitioning":
-        partitioning.data.concentration[0, 0] = np.nan
-    else:
-        gas_only.data.concentration[0, 0] = np.nan
-    snapshots = (
-        particle.get_concentration().copy(),
-        np.asarray(partitioning.get_concentration()).copy(),
-        gas_only.get_concentration().copy(),
-    )
-
+    target = aerosol.particles if invalid_group == "particle" else aerosol.gas
+    lane = 1 if invalid_group == "gas_only" else 0
+    target.concentration[0, lane] = np.nan
+    snapshots = [x.copy() for x in _storage(aerosol)]
     with pytest.raises(ValueError):
         dilute_aerosol(aerosol, 0.5, 1.0)
-
-    npt.assert_allclose(
-        particle.get_concentration(), snapshots[0], equal_nan=True
-    )
-    npt.assert_allclose(
-        partitioning.get_concentration(), snapshots[1], equal_nan=True
-    )
-    npt.assert_allclose(
-        gas_only.get_concentration(), snapshots[2], equal_nan=True
-    )
+    _assert_unchanged(aerosol, snapshots)
 
 
 @pytest.mark.parametrize(
-    (
-        "invalid_group",
-        "value",
-        "coefficient",
-        "time_step",
-        "exception",
-        "message",
-    ),
-    [
-        (
-            "particle",
-            -1.0,
-            0.5,
-            0.0,
-            ValueError,
-            "particle concentration",
-        ),
-        (
-            "partitioning",
-            -1.0,
-            0.5,
-            0.0,
-            ValueError,
-            "partitioning gas concentration",
-        ),
-        (
-            "gas_only",
-            -1.0,
-            0.0,
-            1.0,
-            ValueError,
-            "gas-only concentration",
-        ),
-        (
-            "particle",
-            np.nan,
-            0.0,
-            1.0,
-            ValueError,
-            "particle concentration",
-        ),
-        (
-            "partitioning",
-            np.inf,
-            0.5,
-            0.0,
-            ValueError,
-            "partitioning gas concentration",
-        ),
-        (
-            "gas_only",
-            np.nan,
-            0.0,
-            1.0,
-            ValueError,
-            "gas-only concentration",
-        ),
-        (
-            "particle",
-            "invalid",
-            0.5,
-            0.0,
-            TypeError,
-            "particle concentration",
-        ),
-        (
-            "partitioning",
-            "invalid",
-            0.5,
-            0.0,
-            TypeError,
-            "partitioning gas concentration",
-        ),
-        (
-            "gas_only",
-            "invalid",
-            0.0,
-            1.0,
-            TypeError,
-            "gas-only concentration",
-        ),
-    ],
+    "invalid_group", ["particle", "partitioning", "gas_only"]
 )
+@pytest.mark.parametrize("value", [-1.0, np.nan, np.inf, "invalid"])
+@pytest.mark.parametrize("coefficient, time_step", [(0.5, 0.0), (0.0, 1.0)])
 def test_dilute_aerosol_rejects_invalid_sources_before_writes(
-    invalid_group, value, coefficient, time_step, exception, message
+    invalid_group, value, coefficient, time_step, monkeypatch
 ):
-    """Invalid sources fail before writes even when decay is a no-op."""
+    """Even no-work calls validate every category before a writer is invoked."""
     aerosol = _make_aerosol()
-    particle = aerosol.particles
-    partitioning = aerosol.atmosphere.partitioning_species
-    gas_only = aerosol.atmosphere.gas_only_species
+    target = aerosol.particles if invalid_group == "particle" else aerosol.gas
+    lane = 1 if invalid_group == "gas_only" else 0
     if isinstance(value, str):
-        if invalid_group == "particle":
-            particle.data.concentration = particle.data.concentration.astype(
-                object
-            )
-        elif invalid_group == "partitioning":
-            partitioning.data.concentration = (
-                partitioning.data.concentration.astype(object)
-            )
-        else:
-            gas_only.data.concentration = gas_only.data.concentration.astype(
-                object
-            )
-    if invalid_group == "particle":
-        particle.data.concentration[0, 0] = value
-    elif invalid_group == "partitioning":
-        partitioning.data.concentration[0, 0] = value
-    else:
-        gas_only.data.concentration[0, 0] = value
-    particle_snapshot = particle.data.concentration.copy()
-    partitioning_snapshot = partitioning.data.concentration.copy()
-    gas_only_snapshot = gas_only.data.concentration.copy()
-
+        target.concentration = target.concentration.astype(object)
+    target.concentration[0, lane] = value
+    snapshots = [x.copy() for x in _storage(aerosol)]
+    calls = []
+    monkeypatch.setattr(
+        dilution_module.np, "copyto", lambda *args: calls.append(args)
+    )
+    message = (
+        (
+            "particle data arrays must have float64 schema"
+            if isinstance(value, str)
+            else "particle data must have finite physical values"
+        )
+        if invalid_group == "particle"
+        else "concentration"
+    )
+    exception = (
+        TypeError
+        if isinstance(value, str) and invalid_group != "particle"
+        else ValueError
+    )
     with pytest.raises(exception, match=message):
         dilute_aerosol(aerosol, coefficient, time_step)
-
-    npt.assert_array_equal(particle.data.concentration, particle_snapshot)
-    npt.assert_array_equal(
-        partitioning.data.concentration, partitioning_snapshot
-    )
-    npt.assert_array_equal(gas_only.data.concentration, gas_only_snapshot)
+    _assert_unchanged(aerosol, snapshots)
+    assert calls == []
 
 
-@pytest.mark.parametrize(
-    ("call_index", "candidate", "message"),
-    [
-        (0, np.array([1.0, 2.0]), "partitioning gas concentration"),
-        (1, 1.0, "gas-only concentration"),
-        (2, np.ones((2, 2)), "stored particle concentration"),
-    ],
-)
+@pytest.mark.parametrize("call_index, candidate", [(0, np.ones(2)), (1, 1.0)])
 def test_dilute_aerosol_rejects_candidate_shape_before_writes(
-    monkeypatch, call_index, candidate, message
+    monkeypatch, call_index, candidate
 ):
-    """Preflight rejects candidate shapes before any concentration mutation."""
+    """Both native update candidates must retain their original array shape."""
     aerosol = _make_aerosol()
-    snapshots = (
-        aerosol.particles.data.concentration.copy(),
-        aerosol.atmosphere.partitioning_species.data.concentration.copy(),
-        aerosol.atmosphere.gas_only_species.data.concentration.copy(),
-    )
+    snapshots = [x.copy() for x in _storage(aerosol)]
     original_step = dilution_module.get_dilution_step
     calls = 0
 
@@ -906,95 +727,49 @@ def test_dilute_aerosol_rejects_candidate_shape_before_writes(
         return result
 
     monkeypatch.setattr(dilution_module, "get_dilution_step", malformed_step)
-
-    with pytest.raises(ValueError, match=message):
+    with pytest.raises(ValueError, match="concentration candidate"):
         dilute_aerosol(aerosol, 0.5, 1.0)
-
-    npt.assert_array_equal(aerosol.particles.data.concentration, snapshots[0])
-    npt.assert_array_equal(
-        aerosol.atmosphere.partitioning_species.data.concentration, snapshots[1]
-    )
-    npt.assert_array_equal(
-        aerosol.atmosphere.gas_only_species.data.concentration, snapshots[2]
-    )
+    _assert_unchanged(aerosol, snapshots)
 
 
 @pytest.mark.parametrize(
-    ("volume", "exception", "message"),
+    "volume",
     [
-        (np.nan, ValueError, "particle volume"),
-        (0.0, ValueError, "particle volume"),
-        (-1.0, ValueError, "particle volume"),
-        (np.array([2.0]), ValueError, "particle volume"),
-        ("invalid", TypeError, "particle volume"),
+        np.array([np.nan]),
+        np.array([0.0]),
+        np.array([-1.0]),
+        np.ones((1, 1)),
+        np.array(["invalid"], dtype=object),
     ],
 )
-def test_dilute_aerosol_invalid_volume_preflight_is_atomic(
-    monkeypatch, volume, exception, message
-):
-    """Invalid representation volume fails before any concentration commit."""
+def test_dilute_aerosol_invalid_volume_preflight_is_atomic(volume):
+    """Invalid physical volume or volume storage rejects before writes."""
     aerosol = _make_aerosol()
-    particle = aerosol.particles
-    sources = (
-        particle.get_concentration().copy(),
-        np.asarray(
-            aerosol.atmosphere.partitioning_species.get_concentration()
-        ).copy(),
-        aerosol.atmosphere.gas_only_species.get_concentration().copy(),
-    )
-    monkeypatch.setattr(particle, "get_volume", lambda: volume)
-
-    with pytest.raises(exception, match=message):
+    aerosol.particles.volume = volume
+    snapshots = [x.copy() for x in _storage(aerosol)]
+    with pytest.raises(
+        ValueError, match="volume|particle data.*(schema|physical)"
+    ):
         dilute_aerosol(aerosol, 0.5, 1.0)
-
-    npt.assert_array_equal(particle.get_concentration(), sources[0])
-    npt.assert_array_equal(
-        aerosol.atmosphere.partitioning_species.get_concentration(), sources[1]
-    )
-    npt.assert_array_equal(
-        aerosol.atmosphere.gas_only_species.get_concentration(), sources[2]
-    )
+    _assert_unchanged(aerosol, snapshots)
+    npt.assert_array_equal(aerosol.particles.volume, volume)
 
 
 @pytest.mark.parametrize(
-    ("storage", "exception", "message"),
-    [
-        (np.array([1.0]), ValueError, "stored particle concentration"),
-        (
-            np.array([["invalid", "invalid"]], dtype=object),
-            TypeError,
-            "particle concentration storage",
-        ),
-    ],
+    "storage",
+    [np.array([1.0]), np.array([["invalid", "invalid"]], dtype=object)],
 )
-def test_dilute_aerosol_rejects_invalid_particle_storage_before_writes(
-    monkeypatch, storage, exception, message
-):
-    """Storage shape and numeric failures are atomic concrete preflight errors."""
+def test_dilute_aerosol_rejects_invalid_particle_storage_before_writes(storage):
+    """Native concentration shape and dtype failures preserve all storage."""
     aerosol = _make_aerosol()
-    particle = aerosol.particles
-    sources = (
-        particle.get_concentration().copy(),
-        np.asarray(
-            aerosol.atmosphere.partitioning_species.get_concentration()
-        ).copy(),
-        aerosol.atmosphere.gas_only_species.get_concentration().copy(),
-    )
-    original_source = particle.get_concentration()
-    particle.data.concentration = storage
-    storage_snapshot = storage.copy()
-    monkeypatch.setattr(particle, "get_concentration", lambda: original_source)
-
-    with pytest.raises(exception, match=message):
+    aerosol.particles.concentration = storage
+    snapshots = [x.copy() for x in _storage(aerosol)]
+    with pytest.raises(
+        ValueError,
+        match="concentration|particle data arrays must have float64 schema",
+    ):
         dilute_aerosol(aerosol, 0.5, 1.0)
-
-    npt.assert_array_equal(
-        aerosol.atmosphere.partitioning_species.get_concentration(), sources[1]
-    )
-    npt.assert_array_equal(
-        aerosol.atmosphere.gas_only_species.get_concentration(), sources[2]
-    )
-    npt.assert_array_equal(particle.data.concentration, storage_snapshot)
+    _assert_unchanged(aerosol, snapshots)
 
 
 @pytest.mark.parametrize(
@@ -1003,205 +778,72 @@ def test_dilute_aerosol_rejects_invalid_particle_storage_before_writes(
 def test_dilute_aerosol_invalid_backing_storage_has_no_setter_writes(
     monkeypatch, storage
 ):
-    """Invalid backing storage fails before a particle or gas setter is called."""
+    """Malformed backing arrays reject before the native writer is called."""
     aerosol = _make_aerosol()
-    particle = aerosol.particles
-    source = particle.get_concentration().copy()
-    particle.data.concentration[0] = storage
-    calls: list[str] = []
-    concentration = type(particle).concentration
-
-    def record_particle_setter(instance, candidate):
-        calls.append("particle")
-        concentration.fset(instance, candidate)
-
-    monkeypatch.setattr(particle, "get_concentration", lambda: source)
+    aerosol.particles.concentration[0] = storage
+    snapshots = [x.copy() for x in _storage(aerosol)]
+    calls = []
     monkeypatch.setattr(
-        type(particle),
-        "concentration",
-        property(concentration.fget, record_particle_setter),
+        dilution_module.np, "copyto", lambda *args: calls.append(args)
     )
-    for name, gas in (
-        ("partitioning", aerosol.atmosphere.partitioning_species),
-        ("gas_only", aerosol.atmosphere.gas_only_species),
-    ):
-        monkeypatch.setattr(
-            gas,
-            "set_concentration",
-            lambda _candidate, name=name: calls.append(name),
-        )
-
-    with pytest.raises(ValueError, match="particle concentration storage"):
-        dilute_aerosol(aerosol, 0.5, 1.0)
-
-    assert calls == []
-
-
-def test_dilute_aerosol_restores_particle_after_partial_setter_failure(
-    monkeypatch,
-):
-    """Particle backing state is restored without retrying a failing setter."""
-    aerosol = _make_aerosol()
-    particle = aerosol.particles
-    original_data = particle.data
-    original_concentration = original_data.concentration.copy()
-    partitioning_snapshot = (
-        aerosol.atmosphere.partitioning_species.get_concentration()
-    )
-    gas_only_snapshot = (
-        aerosol.atmosphere.gas_only_species.get_concentration().copy()
-    )
-    replacement_data = copy.deepcopy(original_data)
-    concentration = type(particle).concentration
-
-    def write_then_fail(instance, candidate):
-        instance._data = replacement_data
-        instance._data.concentration[0] = candidate
-        raise RuntimeError("partially mutating particle setter failure")
-
-    monkeypatch.setattr(
-        type(particle),
-        "concentration",
-        property(concentration.fget, write_then_fail),
-    )
-
     with pytest.raises(
-        RuntimeError, match="partially mutating particle setter"
+        ValueError, match="particle data must have finite physical values"
     ):
         dilute_aerosol(aerosol, 0.5, 1.0)
-
-    assert particle.data is original_data
-    npt.assert_array_equal(particle.data.concentration, original_concentration)
-    assert (
-        aerosol.atmosphere.partitioning_species.get_concentration()
-        == partitioning_snapshot
-    )
-    npt.assert_array_equal(
-        aerosol.atmosphere.gas_only_species.get_concentration(),
-        gas_only_snapshot,
-    )
+    assert calls == []
+    _assert_unchanged(aerosol, snapshots)
 
 
-def test_dilute_aerosol_rolls_back_particle_after_gas_setter_failure(
-    monkeypatch,
+@pytest.mark.parametrize("fail_index", [0, 1])
+@pytest.mark.parametrize("partial_write", [False, True])
+def test_dilute_aerosol_restores_failed_native_writes(
+    monkeypatch, fail_index, partial_write
 ):
-    """A later commit failure restores the physical particle concentration."""
+    """Rollback restores all domains, including a partially written target."""
     aerosol = _make_aerosol()
-    particle_snapshot = aerosol.particles.get_concentration().copy()
-    gas_only_snapshot = (
-        aerosol.atmosphere.gas_only_species.get_concentration().copy()
-    )
-    failing_gas = aerosol.atmosphere.partitioning_species
+    arrays = _storage(aerosol)
+    snapshots = [x.copy() for x in arrays]
+    original_copy = np.copyto
+    calls = 0
 
-    def fail_setter(_):
-        raise RuntimeError("setter failure")
+    def copy_then_fail(target, candidate):
+        nonlocal calls
+        index = calls
+        calls += 1
+        if index == fail_index:
+            if partial_write:
+                target.flat[0] = candidate.flat[0]
+            raise RuntimeError("native concentration write failure")
+        original_copy(target, candidate)
 
-    monkeypatch.setattr(failing_gas, "set_concentration", fail_setter)
-    with pytest.raises(RuntimeError, match="setter failure"):
+    monkeypatch.setattr(dilution_module.np, "copyto", copy_then_fail)
+    with pytest.raises(
+        RuntimeError, match="native concentration write failure"
+    ):
         dilute_aerosol(aerosol, 0.5, 1.0)
-
-    npt.assert_array_equal(
-        aerosol.particles.get_concentration(), particle_snapshot
-    )
-    npt.assert_array_equal(
-        aerosol.atmosphere.gas_only_species.get_concentration(),
-        gas_only_snapshot,
-    )
+    _assert_unchanged(aerosol, snapshots)
+    assert calls == fail_index + 1
+    assert all(a is b for a, b in zip(arrays, _storage(aerosol), strict=True))
 
 
-def test_dilute_aerosol_rolls_back_first_gas_after_second_gas_failure(
-    monkeypatch,
-):
-    """A later gas setter failure restores particle and prior gas updates."""
-    aerosol = _make_aerosol()
-    particle_snapshot = aerosol.particles.get_concentration().copy()
-    partitioning_snapshot = (
-        aerosol.atmosphere.partitioning_species.get_concentration()
-    )
-    gas_only_snapshot = (
-        aerosol.atmosphere.gas_only_species.get_concentration().copy()
-    )
+@pytest.mark.parametrize("operation", ["primitive", "rate", "step", "execute"])
+def test_dilution_rejects_non_native_aggregate_before_access(operation):
+    """Legacy-shaped objects cannot enter the supported native boundary."""
+    from types import SimpleNamespace
 
-    def fail_setter(_):
-        raise RuntimeError("second setter failure")
+    from particula.dynamics import Dilution, DilutionStrategy
 
-    monkeypatch.setattr(
-        aerosol.atmosphere.gas_only_species, "set_concentration", fail_setter
-    )
-    with pytest.raises(RuntimeError, match="second setter failure"):
-        dilute_aerosol(aerosol, 0.5, 1.0)
-
-    npt.assert_array_equal(
-        aerosol.particles.get_concentration(), particle_snapshot
-    )
-    assert (
-        aerosol.atmosphere.partitioning_species.get_concentration()
-        == partitioning_snapshot
-    )
-    npt.assert_array_equal(
-        aerosol.atmosphere.gas_only_species.get_concentration(),
-        gas_only_snapshot,
-    )
-
-
-def test_dilute_aerosol_restores_partially_mutating_failing_gas_setter(
-    monkeypatch,
-):
-    """Rollback bypasses a gas setter that writes before raising an error."""
-    aerosol = _make_aerosol()
-    particle_snapshot = aerosol.particles.get_concentration().copy()
-    partitioning_snapshot = (
-        aerosol.atmosphere.partitioning_species.get_concentration()
-    )
-    gas_only_snapshot = (
-        aerosol.atmosphere.gas_only_species.get_concentration().copy()
-    )
-    failing_gas = aerosol.atmosphere.gas_only_species
-
-    def write_then_fail(candidate):
-        failing_gas.data.concentration[...] = np.asarray(candidate).reshape(
-            1,
-            -1,
-        )
-        raise RuntimeError("partially mutating setter failure")
-
-    monkeypatch.setattr(failing_gas, "set_concentration", write_then_fail)
-    with pytest.raises(RuntimeError, match="partially mutating setter failure"):
-        dilute_aerosol(aerosol, 0.5, 1.0)
-
-    npt.assert_array_equal(
-        aerosol.particles.get_concentration(),
-        particle_snapshot,
-    )
-    assert (
-        aerosol.atmosphere.partitioning_species.get_concentration()
-        == partitioning_snapshot
-    )
-    npt.assert_array_equal(
-        aerosol.atmosphere.gas_only_species.get_concentration(),
-        gas_only_snapshot,
-    )
-
-
-def test_dilute_aerosol_restores_replaced_gas_backing_state(monkeypatch):
-    """Rollback restores a gas backing object and concentration-mode metadata."""
-    aerosol = _make_aerosol()
-    failing_gas = aerosol.atmosphere.partitioning_species
-    original_data = failing_gas.data
-    original_mode = failing_gas._single_species_concentration_mode
-    original_concentration = failing_gas.get_concentration()
-    replacement_data = copy.deepcopy(original_data)
-
-    def replace_then_fail(_):
-        failing_gas._data = replacement_data
-        failing_gas._single_species_concentration_mode = "array"
-        raise RuntimeError("backing-state setter failure")
-
-    monkeypatch.setattr(failing_gas, "set_concentration", replace_then_fail)
-
-    with pytest.raises(RuntimeError, match="backing-state setter failure"):
-        dilute_aerosol(aerosol, 0.5, 1.0)
-
-    assert failing_gas.data is original_data
-    assert failing_gas._single_species_concentration_mode == original_mode
-    assert failing_gas.get_concentration() == original_concentration
+    native = _make_aerosol()
+    old_shape = SimpleNamespace(particles=native.particles, atmosphere=object())
+    snapshots = [x.copy() for x in _storage(native)]
+    strategy = DilutionStrategy(0.5)
+    with pytest.raises(TypeError, match="dilution requires a native Aerosol"):
+        if operation == "primitive":
+            dilute_aerosol(old_shape, 0.5, 1.0)
+        elif operation == "rate":
+            strategy.rate(old_shape)
+        elif operation == "step":
+            strategy.step(old_shape, 1.0)
+        else:
+            Dilution(strategy).execute(old_shape, 1.0, 2)
+    _assert_unchanged(native, snapshots)

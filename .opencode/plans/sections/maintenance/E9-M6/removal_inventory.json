@@ -2559,7 +2559,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Legacy aggregate import, admission, setter commit and facade backing-state rollback removed. Native numeric helpers, array rollback, concentration preflight and public strategy retained; dilution_assertions.json records test migration.",
       "test_nodes": []
     },
     {
@@ -2705,7 +2705,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Migrated to native containers; original test functions and native successors recorded in dilution_assertions.json. Legacy whole-duration runnable shortcut replaced by native equal-substep contract.",
       "test_nodes": [
         {
           "name": "test_dilution_strategy_rejects_invalid_coefficients",
@@ -2836,7 +2836,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Migrated to native containers; original test functions and native successors recorded in dilution_assertions.json. Legacy whole-duration runnable shortcut replaced by native equal-substep contract.",
       "test_nodes": [
         {
           "name": "test_volume_dilution_coefficient_equation_and_broadcasting",
