@@ -70,6 +70,7 @@ def _materialize_public_particles(
             if volume is None
             else np.asarray(volume, dtype=np.float64)
         ),
+        distribution_type="particle_resolved",
     )
 
 

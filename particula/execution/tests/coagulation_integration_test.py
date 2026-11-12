@@ -174,6 +174,7 @@ def _warp_bundle(fixture: _Fixture, device: str = "cpu") -> Any:
         fixture.charge.copy(),
         fixture.density.copy(),
         fixture.volume.copy(),
+        distribution_type="particle_resolved",
     )
     environment_data = EnvironmentData(
         fixture.temperature.copy(),
