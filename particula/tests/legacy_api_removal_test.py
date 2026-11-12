@@ -8,7 +8,13 @@ from particula import Aerosol, AerosolBuilder
 from particula.tests.aerosol_test import native_triple
 
 
-@pytest.mark.parametrize("module_name", ["particula._legacy_aerosol"])
+@pytest.mark.parametrize(
+    "module_name",
+    [
+        "particula._legacy_aerosol",
+        "particula.particles.change_particle_representation",
+    ],
+)
 def test_removed_concrete_module(module_name):
     """Absence must name the removed module, not an unrelated dependency."""
     assert importlib.util.find_spec(module_name) is None

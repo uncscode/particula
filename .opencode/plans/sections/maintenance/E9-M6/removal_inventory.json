@@ -7235,7 +7235,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Removed obsolete facade binning wrapper; three original tests mapped in representation_binning_assertions.json to native one/two-material grid, positivity and weighted inventory checks.",
       "test_nodes": []
     },
     {
@@ -7541,7 +7541,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Removed obsolete facade binning wrapper; three original tests mapped in representation_binning_assertions.json to native one/two-material grid, positivity and weighted inventory checks.",
       "test_nodes": [
         {
           "name": "test_get_particle_resolved_binned_radius",
