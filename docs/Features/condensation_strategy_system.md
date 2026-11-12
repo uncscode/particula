@@ -1014,7 +1014,7 @@ and its [GPU thermodynamics and condensation refresh record](data-containers-and
 | --- | --- |
 | CPU semantic catalogue | All 36 equal-step/staggered, latent, activity, and surface semantic combinations are declared, including `NONREPRESENTABLE` categories. This is catalogue support only. |
 | Selected CPU execution | The concrete adapter accepts declared catalogue metadata but does not bind it to the supplied runnable; it is isothermal only (`latent_heat=False`) and calls the caller-owned `MassCondensation` once. Equal-step or staggered semantics remain CPU-side. |
-| Selected Warp execution | Exactly 8 declared profiles: equal-step, latent heat enabled or disabled, ideal or kappa activity, and static or composition-weighted surface tension. Profiles are capability/catalogue selection and do not validate supplied sidecars against their semantics. |
+| Selected Warp execution | Exactly 8 declared profiles: equal-step, latent heat enabled or disabled, ideal or kappa activity, and static or composition-weighted surface tension. Profile preflight requires enabled latent-heat storage, checks activity/surface mode selectors, and validates their particle-width arrays. Native species bindings validate exact carrier ownership separately. |
 | Unavailable selected Warp mapping | Staggered/Gauss-Seidel and every `NONREPRESENTABLE`/BAT activity or surface mapping reject during capability-profile preflight before lazy kernel resolution, native dispatch, or adapter-driven writes; no conversion, approximation, or fallback occurs. |
 
 Warp delegation executes exactly four equal `time_step / 4.0` substeps. Each
@@ -1035,8 +1035,8 @@ installed-Warp baseline, and CUDA rows are optional guarded evidence. This does
 not claim general
 CPU-strategy parity, performance, adaptive stepping, graph capture/replay,
 autodiff, multi-GPU, resizing, or full scheduler support. The
-[Epic G handoff](Roadmap/data-oriented-gpu.md#epic-g-backend-selection-and-gpu-resident-simulation)
-defers E7-F5 deterministic scheduling.
+[Epic G record](Roadmap/data-oriented-gpu.md#epic-g-backend-selection-and-gpu-resident-simulation)
+and resident guides define their separate scheduling and lifecycle scope.
 
 ## Limitations
 

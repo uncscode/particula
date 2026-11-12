@@ -621,3 +621,32 @@ after the initial diff check. Inventory now distinguishes historical proposals,
 standalone teaching patterns and the verified native helper. P6 remains open
 for foundations/backend/roadmap/API/navigation reconciliation; P7 and full
 final gates remain outstanding, and no PR has been opened.
+
+### P6 selected-backend reference checkpoint (2026-11-11)
+
+Verified the backend guide's exact stable export inventory against current
+execution.__all__ and ran its selection-only snippet without adapter invocation.
+Its already labeled nonexecuted resident sketch is now a text fence rather than
+Python hidden behind WARP_AVAILABLE=False. No new execution API was exposed.
+
+Read current concrete condensation adapter ownership, execution and
+_validate_selected_warp_sidecars. Corrected foundations' legacy-only CPU claim
+and both foundations/condensation guides' claim that Warp profile sidecars are
+not checked: selected Warp requires enabled latent storage, validates mode
+selectors and particle-width arrays before kernel resolution. Native species
+bindings separately pin exact carriers; full gas width is independent. CPU
+semantic metadata still does not bind a runnable to its declared physics.
+Removed obsolete blanket claims that GPU nucleation/resident integration remain
+future work, linking their separate bounded contracts instead. The rest of the
+long foundations audit is still incomplete.
+
+Also corrected the recent nucleation guide's Warp partitioning shape to
+(B,Sg), confirmed by the active adapter schema; CPU partitioning remains (Sg,).
+This repairs documentation, not array storage or conversion code.
+
+Validation: process-guide suite plus condensation_adapter_test.py and
+condensation_integration_test.py report **96 passed, 3 skipped in 8.15s** on the
+installed-Warp host. Scoped Ruff check/format, git diff --check and strict
+MkDocs pass (`/tmp/m5-p6-selected-backend-mkdocs.log`). P6 remains In Progress;
+foundations, roadmap/API/navigation reconciliation, P7 and final full gates
+remain outstanding. No PR has been opened.
