@@ -3540,7 +3540,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Removed all facade imports/unions/overloads and coefficient/rate/step branches, plus implicit charge-cache reader. Population entry points delegate to existing native implementations. Neutral/charged laws and stochastic array helper retained. Both strategy suites were already native (M3 commit 3ca096650) and remain unchanged; added native boundary/cache regressions.",
       "test_nodes": []
     },
     {

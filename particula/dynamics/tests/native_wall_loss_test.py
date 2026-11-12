@@ -510,3 +510,63 @@ def test_array_geometry_and_field_retain_coefficients_and_ownership():
     assert strategy.wall_electric_field is field
     npt.assert_array_equal(dimensions, [1.0, 0.6, 0.3])
     npt.assert_array_equal(field, [10.0, 0.0, 0.0])
+
+
+@pytest.mark.parametrize("family", FAMILIES)
+@pytest.mark.parametrize(
+    "entry", ["loss_coefficient", "loss_rate", "rate", "step"]
+)
+def test_non_native_particles_reject_before_coefficient_or_writer(
+    family, entry, monkeypatch
+):
+    """Removed facade shapes cannot enter any population-based entry point."""
+    from types import SimpleNamespace
+
+    particle = _particle()
+    old_shape = SimpleNamespace(data=particle)
+    before = _snapshot(particle)
+    strategy = _strategy(family, "particle_resolved")
+
+    def unexpected(*args, **kwargs):
+        pytest.fail("coefficient calculation must not run")
+
+    monkeypatch.setattr(strategy, "loss_coefficient_for_particles", unexpected)
+    if "charged" in family:
+        monkeypatch.setattr(
+            strategy, "compute_coefficient_from_arrays", unexpected
+        )
+    args = (old_shape, 298.15, 101325) + ((1.0,) if entry == "step" else ())
+    with pytest.raises(
+        TypeError, match="wall loss requires native ParticleData"
+    ):
+        getattr(strategy, entry)(*args)
+    _unchanged(particle, before)
+
+
+@pytest.mark.parametrize("geometry", ["spherical", "rectangular"])
+def test_charge_free_array_interface_has_no_implicit_particle_charge(geometry):
+    """Charge must be supplied explicitly; preceding evaluations create no cache."""
+    particle = _particle()
+    strategy = _strategy("charged_" + geometry, "particle_resolved")
+    radius, density = particle.radii[0, :2], particle.effective_density[0, :2]
+    expected = strategy.compute_coefficient_from_arrays(
+        radius,
+        density,
+        np.zeros(2),
+        298.15,
+        101325,
+    )
+    strategy.loss_coefficient(particle, 298.15, 101325)
+    assert not hasattr(strategy, "_particle_charge_cache")
+    actual = strategy.loss_coefficient_for_particles(
+        radius, density, 298.15, 101325
+    )
+    npt.assert_allclose(actual, expected, rtol=1e-14, atol=0)
+    charged = strategy.compute_coefficient_from_arrays(
+        radius,
+        density,
+        np.ones(2),
+        298.15,
+        101325,
+    )
+    assert np.any(charged != actual)

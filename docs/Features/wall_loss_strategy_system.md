@@ -30,9 +30,14 @@ The neutral spherical/rectangular and charged spherical/rectangular strategies
 accept explicitly tagged, single-box `ParticleData` directly. Configuration
 remains on the strategy. Each coefficient, rate and step call revalidates the
 current representation, physical state, environment, geometry and field values.
-Native strategy and particle distribution types must agree. Legacy facade
-execution remains available for compatibility. Native runnables retain the
-held containers; see the composed examples below.
+Strategy and particle distribution types must agree. Facade execution has
+been removed; population-based entry points require native `ParticleData`.
+Native runnables retain the held containers; see the composed examples below.
+
+Charged coefficients read the current particle charge arrays. For independent
+array calculations, use `compute_coefficient_from_arrays` with explicit charge.
+The charge-free `loss_coefficient_for_particles` interface assumes neutral
+particles and does not inherit charge from earlier calls.
 
 | Representation | Stored population | Rate measure | Native step |
 |---|---|---|---|

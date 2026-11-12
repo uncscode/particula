@@ -2,14 +2,14 @@
 
 Defines abstract and concrete strategies for modeling particle wall
 loss processes in different chamber geometries. Strategies operate on
-:class:`~particula.particles.representation.ParticleRepresentation`
-objects and support multiple distribution types. Implementations are
+:class:`~particula.particles.particle_data.ParticleData`
+objects with explicit distribution metadata. Implementations are
 provided for spherical and rectangular chambers.
 
-Explicitly tagged single-box ``ParticleData`` is also supported directly.
+Strategies require explicitly tagged single-box ``ParticleData``.
 Native PMF/PDF values are densities at unit volume; resolved values are counts
 and rates use count/volume. Native steps preserve caller-owned arrays and stage
-updates before publication. Legacy facade dispatch remains separate.
+updates before publication. Facade inputs are no longer supported.
 
 The wall loss rate is modeled as a first-order size dependent loss
 process
@@ -29,7 +29,7 @@ References:
 """
 
 from abc import ABC, abstractmethod
-from typing import Callable, Tuple, Union, cast, overload
+from typing import Callable, Tuple, Union, cast
 
 import numpy as np
 from numpy.typing import NDArray
@@ -43,13 +43,10 @@ from particula.particles.particle_data import ParticleData
 from particula.particles.properties.coulomb_enhancement import (
     get_coulomb_enhancement_ratio,
 )
-from particula.particles.representation import ParticleRepresentation
 from particula.util.constants import ELEMENTARY_CHARGE_VALUE
 from particula.util.validate_inputs import validate_inputs
 
 from . import _native
-
-ParticleLike = Union[ParticleRepresentation, ParticleData]
 
 
 def get_particle_resolved_wall_loss_step(
@@ -182,14 +179,14 @@ class WallLossStrategy(ABC):
     @abstractmethod
     def loss_coefficient(
         self,
-        particle: ParticleLike,
+        particle: ParticleData,
         temperature: float,
         pressure: float,
     ) -> Union[float, NDArray[np.float64]]:
         """Return the wall loss coefficient for the given state.
 
         Args:
-            particle: Particle representation to evaluate.
+            particle: Native particle data to evaluate.
             temperature: Gas temperature [K].
             pressure: Gas pressure [Pa].
 
@@ -222,7 +219,7 @@ class WallLossStrategy(ABC):
 
     def loss_rate(
         self,
-        particle: ParticleLike,
+        particle: ParticleData,
         temperature: float,
         pressure: float,
     ) -> Union[float, NDArray[np.float64]]:
@@ -233,34 +230,25 @@ class WallLossStrategy(ABC):
         concentration.
 
         Args:
-            particle: Particle representation to evaluate.
+            particle: Native particle data to evaluate.
             temperature: Gas temperature [K].
             pressure: Gas pressure [Pa].
 
         Returns:
             Wall loss rate [#/m^3 s] (negative values indicate loss).
         """
-        if isinstance(particle, ParticleData):
-            return _native.rate(self, particle, temperature, pressure)
-
-        coefficient = self.loss_coefficient(
-            particle=particle,
-            temperature=temperature,
-            pressure=pressure,
-        )
-        concentration = particle.get_concentration()
-        return -np.asarray(coefficient) * np.asarray(concentration)
+        return _native.rate(self, particle, temperature, pressure)
 
     def rate(
         self,
-        particle: ParticleLike,
+        particle: ParticleData,
         temperature: float,
         pressure: float,
     ) -> NDArray[np.float64]:
         """Return the wall loss rate as an array.
 
         Args:
-            particle: Particle representation to evaluate.
+            particle: Native particle data to evaluate.
             temperature: Gas temperature [K].
             pressure: Gas pressure [Pa].
 
@@ -275,32 +263,14 @@ class WallLossStrategy(ABC):
             )
         )
 
-    @overload
     def step(
         self,
         particle: ParticleData,
         temperature: float,
         pressure: float,
         time_step: float,
-    ) -> ParticleData: ...
-
-    @overload
-    def step(
-        self,
-        particle: ParticleRepresentation,
-        temperature: float,
-        pressure: float,
-        time_step: float,
-    ) -> ParticleRepresentation: ...
-
-    def step(
-        self,
-        particle: ParticleLike,
-        temperature: float,
-        pressure: float,
-        time_step: float,
-    ) -> ParticleLike:
-        """Advance the particle representation by one wall loss step.
+    ) -> ParticleData:
+        """Advance the native particle data by one wall loss step.
 
         For ``"discrete"`` and ``"continuous_pdf"`` distributions, this
         applies a deterministic first-order loss to the number
@@ -309,77 +279,18 @@ class WallLossStrategy(ABC):
         based on survival probability.
 
         Args:
-            particle: Particle representation to update.
+            particle: Native particle data to update.
             temperature: Gas temperature [K].
             pressure: Gas pressure [Pa].
             time_step: Time step [s].
 
         Returns:
-            Updated particle representation (same instance).
+            Updated native particle data (same instance).
 
         Raises:
             ValueError: If ``distribution_type`` is not supported.
         """
-        if isinstance(particle, ParticleData):
-            return _native.step(
-                self, particle, temperature, pressure, time_step
-            )
-
-        if self.distribution_type in {"discrete", "continuous_pdf"}:
-            rate = self.rate(
-                particle=particle,
-                temperature=temperature,
-                pressure=pressure,
-            )
-            particle.add_concentration(rate * time_step)
-            return particle
-
-        if self.distribution_type == "particle_resolved":
-            # For particle-resolved representations, use stochastic removal
-            concentration = np.asarray(particle.get_concentration())
-            radius = np.asarray(particle.get_radius())
-            density = np.asarray(particle.get_effective_density())
-
-            # Create a closure that binds temperature and pressure
-            def coeff_func(r, d):
-                return self.loss_coefficient_for_particles(
-                    r, d, temperature, pressure
-                )
-
-            # Use the helper function to determine which particles survive
-            survived = get_particle_resolved_wall_loss_step(
-                particle_radius=radius,
-                particle_density=density,
-                concentration=concentration,
-                loss_coefficient_func=coeff_func,
-                time_step=time_step,
-                random_generator=self.random_generator,
-            )
-
-            # Update concentration: particles either survive (1) or are lost (0)
-            new_concentration = concentration * survived
-
-            # Map back to the internal concentration stored on the
-            # representation, which is defined per representation volume.
-            volume = particle.get_volume()
-            particle.concentration = new_concentration * volume
-
-            # Set particle mass to zero for particles that were lost
-            lost_particles = (concentration > 0) & (survived == 0)
-            if np.any(lost_particles):
-                if particle.distribution.ndim == 1:
-                    # 1D array: single species per particle
-                    particle.distribution[lost_particles] = 0.0
-                else:
-                    # 2D matrix: multiple species per particle
-                    particle.distribution[lost_particles, :] = 0.0
-
-            return particle
-
-        raise ValueError(
-            "Invalid distribution type. Must be one of 'discrete', "
-            + "'continuous_pdf', or 'particle_resolved'."
-        )
+        return _native.step(self, particle, temperature, pressure, time_step)
 
 
 class SphericalWallLossStrategy(WallLossStrategy):
@@ -446,7 +357,7 @@ class SphericalWallLossStrategy(WallLossStrategy):
 
     def loss_coefficient(
         self,
-        particle: ParticleLike,
+        particle: ParticleData,
         temperature: float,
         pressure: float,
     ) -> Union[float, NDArray[np.float64]]:
@@ -456,44 +367,14 @@ class SphericalWallLossStrategy(WallLossStrategy):
         :func:`get_spherical_wall_loss_coefficient_via_system_state`.
 
         Args:
-            particle: Particle representation providing radius and density.
+            particle: Native particle data providing radius and density.
             temperature: Gas temperature [K].
             pressure: Gas pressure [Pa].
 
         Returns:
             Wall loss coefficient [1/s].
         """
-        if isinstance(particle, ParticleData):
-            return _native.coefficient(self, particle, temperature, pressure)
-
-        radius = np.asarray(particle.get_radius())
-        density = np.asarray(particle.get_effective_density())
-
-        if self.distribution_type == "particle_resolved":
-            concentration = np.asarray(particle.get_concentration())
-            active = (radius > 0) & (concentration > 0)
-            coefficient = np.zeros_like(concentration, dtype=np.float64)
-            if np.any(active):
-                coefficient[active] = (
-                    get_spherical_wall_loss_coefficient_via_system_state(
-                        wall_eddy_diffusivity=self.wall_eddy_diffusivity,
-                        particle_radius=radius[active],
-                        particle_density=density[active],
-                        temperature=temperature,
-                        pressure=pressure,
-                        chamber_radius=self.chamber_radius,
-                    )
-                )
-            return coefficient
-
-        return get_spherical_wall_loss_coefficient_via_system_state(
-            wall_eddy_diffusivity=self.wall_eddy_diffusivity,
-            particle_radius=radius,
-            particle_density=density,
-            temperature=temperature,
-            pressure=pressure,
-            chamber_radius=self.chamber_radius,
-        )
+        return _native.coefficient(self, particle, temperature, pressure)
 
     def loss_coefficient_for_particles(
         self,
@@ -792,7 +673,7 @@ class ChargedWallLossStrategy(WallLossStrategy):
 
     def loss_coefficient(
         self,
-        particle: ParticleLike,
+        particle: ParticleData,
         temperature: float,
         pressure: float,
     ) -> Union[float, NDArray[np.float64]]:
@@ -804,7 +685,7 @@ class ChargedWallLossStrategy(WallLossStrategy):
         supports particle-resolved active subsets.
 
         Args:
-            particle: Particle representation providing radius, density, and
+            particle: Native particle data providing radius, density, and
                 charge.
             temperature: Gas temperature in kelvin.
             pressure: Gas pressure in pascals.
@@ -812,69 +693,7 @@ class ChargedWallLossStrategy(WallLossStrategy):
         Returns:
             Wall loss coefficient in 1/s as a scalar or array.
         """
-        if isinstance(particle, ParticleData):
-            return _native.coefficient(self, particle, temperature, pressure)
-
-        radius = np.asarray(particle.get_radius())
-        density = np.asarray(particle.get_effective_density())
-        charge = particle.get_charge()
-        charge_array = (
-            np.zeros_like(radius, dtype=np.float64)
-            if charge is None
-            else np.asarray(charge, dtype=np.float64)
-        )
-
-        if self.distribution_type == "particle_resolved":
-            concentration = np.asarray(particle.get_concentration())
-            active = (radius > 0) & (concentration > 0)
-            coefficient = np.zeros_like(concentration, dtype=np.float64)
-            if np.any(active):
-                neutral = self._neutral_coefficient(
-                    particle_radius=radius[active],
-                    particle_density=density[active],
-                    temperature=temperature,
-                    pressure=pressure,
-                )
-                electrostatic_factor = self._electrostatic_factor(
-                    particle_radius=radius[active],
-                    particle_charge=charge_array[active],
-                    temperature=temperature,
-                )
-                drift_term = self._drift_term(
-                    particle_radius=radius[active],
-                    particle_charge=charge_array[active],
-                    temperature=temperature,
-                    pressure=pressure,
-                )
-                coefficient[active] = self._combine_coefficients(
-                    neutral=neutral,
-                    electrostatic_factor=electrostatic_factor,
-                    drift_term=drift_term,
-                )
-            return coefficient
-
-        neutral = self._neutral_coefficient(
-            particle_radius=radius,
-            particle_density=density,
-            temperature=temperature,
-            pressure=pressure,
-        )
-        electrostatic_factor = self._electrostatic_factor(
-            particle_radius=radius,
-            particle_charge=charge_array,
-            temperature=temperature,
-        )
-        drift_term = self._drift_term(
-            particle_radius=radius,
-            particle_charge=charge_array,
-            temperature=temperature,
-            pressure=pressure,
-        )
-        return self._combine_coefficients(
-            neutral=neutral,
-            electrostatic_factor=electrostatic_factor,
-            drift_term=drift_term,
-        )
+        return _native.coefficient(self, particle, temperature, pressure)
 
     def loss_coefficient_for_particles(
         self,
@@ -885,9 +704,9 @@ class ChargedWallLossStrategy(WallLossStrategy):
     ) -> NDArray[np.float64]:
         """Compute charged wall loss coefficient for provided particle arrays.
 
-        Uses cached particle charges when available. Applies image-charge
-        enhancement even at zero wall potential and adds drift only when the
-        resolved electric field is non-zero.
+        This charge-free interface assumes neutral particles. For charged
+        material, use ``compute_coefficient_from_arrays`` with explicit charge
+        arrays. No earlier particle evaluation supplies implicit charge state.
 
         Args:
             particle_radius: Particle radii in meters.
@@ -898,13 +717,7 @@ class ChargedWallLossStrategy(WallLossStrategy):
         Returns:
             Wall loss coefficient in 1/s for each particle.
         """
-        charge_cache = getattr(self, "_particle_charge_cache", None)
-        charge_array = (
-            charge_cache
-            if isinstance(charge_cache, np.ndarray)
-            and charge_cache.shape == particle_radius.shape
-            else np.zeros_like(particle_radius, dtype=np.float64)
-        )
+        charge_array = np.zeros_like(particle_radius, dtype=np.float64)
         neutral = self._neutral_coefficient(
             particle_radius=particle_radius,
             particle_density=particle_density,
@@ -974,31 +787,13 @@ class ChargedWallLossStrategy(WallLossStrategy):
             drift_term=drift_term,
         )
 
-    @overload
     def step(
         self,
         particle: ParticleData,
         temperature: float,
         pressure: float,
         time_step: float,
-    ) -> ParticleData: ...
-
-    @overload
-    def step(
-        self,
-        particle: ParticleRepresentation,
-        temperature: float,
-        pressure: float,
-        time_step: float,
-    ) -> ParticleRepresentation: ...
-
-    def step(
-        self,
-        particle: ParticleLike,
-        temperature: float,
-        pressure: float,
-        time_step: float,
-    ) -> ParticleLike:
+    ) -> ParticleData:
         """Advance particle-resolved concentration with charged wall loss.
 
         Computes survival probabilities using neutral, image-charge, and
@@ -1006,89 +801,15 @@ class ChargedWallLossStrategy(WallLossStrategy):
         updates particle concentrations and distributions.
 
         Args:
-            particle: Particle representation to update.
+            particle: Native particle data to update.
             temperature: Gas temperature in kelvin.
             pressure: Gas pressure in pascals.
             time_step: Time step in seconds.
 
         Returns:
-            Updated particle representation.
+            Updated native particle data.
         """
-        if isinstance(particle, ParticleData):
-            return _native.step(
-                self, particle, temperature, pressure, time_step
-            )
-
-        if self.distribution_type != "particle_resolved":
-            return super().step(
-                particle=particle,
-                temperature=temperature,
-                pressure=pressure,
-                time_step=time_step,
-            )
-
-        concentration = np.asarray(particle.get_concentration())
-        radius = np.asarray(particle.get_radius())
-        density = np.asarray(particle.get_effective_density())
-        charge = particle.get_charge()
-        charge_array = (
-            np.zeros_like(radius, dtype=np.float64)
-            if charge is None
-            else np.asarray(charge, dtype=np.float64)
-        )
-        active = (radius > 0) & (concentration > 0)
-        self._particle_charge_cache = charge_array
-        coefficient = np.zeros_like(concentration, dtype=np.float64)
-        if np.any(active):
-            neutral = self._neutral_coefficient(
-                particle_radius=radius[active],
-                particle_density=density[active],
-                temperature=temperature,
-                pressure=pressure,
-            )
-            electrostatic_factor = self._electrostatic_factor(
-                particle_radius=radius[active],
-                particle_charge=charge_array[active],
-                temperature=temperature,
-            )
-            drift_term = self._drift_term(
-                particle_radius=radius[active],
-                particle_charge=charge_array[active],
-                temperature=temperature,
-                pressure=pressure,
-            )
-            coefficient[active] = self._combine_coefficients(
-                neutral=neutral,
-                electrostatic_factor=electrostatic_factor,
-                drift_term=drift_term,
-            )
-
-        if not np.any(active):
-            particle.concentration = concentration * particle.get_volume()
-            return particle
-
-        survival_probability_active = np.exp(-coefficient[active] * time_step)
-        survival_probability_active = np.clip(
-            survival_probability_active, 0.0, 1.0
-        )
-
-        survived = np.zeros_like(concentration, dtype=np.float64)
-        survived[active] = self.random_generator.binomial(
-            n=1, p=survival_probability_active
-        )
-
-        new_concentration = concentration * survived
-        volume = particle.get_volume()
-        particle.concentration = new_concentration * volume
-
-        lost_particles = (concentration > 0) & (survived == 0)
-        if np.any(lost_particles):
-            if particle.distribution.ndim == 1:
-                particle.distribution[lost_particles] = 0.0
-            else:
-                particle.distribution[lost_particles, :] = 0.0
-
-        return particle
+        return _native.step(self, particle, temperature, pressure, time_step)
 
 
 class RectangularWallLossStrategy(WallLossStrategy):
@@ -1174,51 +895,21 @@ class RectangularWallLossStrategy(WallLossStrategy):
 
     def loss_coefficient(
         self,
-        particle: ParticleLike,
+        particle: ParticleData,
         temperature: float,
         pressure: float,
     ) -> Union[float, NDArray[np.float64]]:
         """Return the rectangular wall loss coefficient for the state.
 
         Args:
-            particle: Particle representation providing radius and density.
+            particle: Native particle data providing radius and density.
             temperature: Gas temperature [K].
             pressure: Gas pressure [Pa].
 
         Returns:
             Wall loss coefficient [1/s] for each particle bin.
         """
-        if isinstance(particle, ParticleData):
-            return _native.coefficient(self, particle, temperature, pressure)
-
-        radius = np.asarray(particle.get_radius())
-        density = np.asarray(particle.get_effective_density())
-
-        if self.distribution_type == "particle_resolved":
-            concentration = np.asarray(particle.get_concentration())
-            active = (radius > 0) & (concentration > 0)
-            coefficient = np.zeros_like(concentration, dtype=np.float64)
-            if np.any(active):
-                coefficient[active] = (
-                    get_rectangle_wall_loss_coefficient_via_system_state(
-                        wall_eddy_diffusivity=self.wall_eddy_diffusivity,
-                        particle_radius=radius[active],
-                        particle_density=density[active],
-                        temperature=temperature,
-                        pressure=pressure,
-                        chamber_dimensions=self.chamber_dimensions,
-                    )
-                )
-            return coefficient
-
-        return get_rectangle_wall_loss_coefficient_via_system_state(
-            wall_eddy_diffusivity=self.wall_eddy_diffusivity,
-            particle_radius=radius,
-            particle_density=density,
-            temperature=temperature,
-            pressure=pressure,
-            chamber_dimensions=self.chamber_dimensions,
-        )
+        return _native.coefficient(self, particle, temperature, pressure)
 
     def loss_coefficient_for_particles(
         self,
