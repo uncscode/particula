@@ -55,9 +55,6 @@ from particula.particles.representation_builders import (
     ResolvedParticleMassRepresentationBuilder,
     PresetResolvedParticleMassBuilder,
 )
-from particula.particles.representation_factories import (
-    ParticleRepresentationFactory,
-)
 from particula.particles.surface_strategies import (
     SurfaceStrategyVolume,
     SurfaceStrategyMass,

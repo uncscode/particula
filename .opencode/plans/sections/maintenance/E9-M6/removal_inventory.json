@@ -7498,7 +7498,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Removed legacy factory and export; six old tests mapped to native construction and removed-boundary successors in particle_factory_assertions.json.",
       "test_nodes": []
     },
     {
@@ -8412,7 +8412,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Removed legacy factory and export; six old tests mapped to native construction and removed-boundary successors in particle_factory_assertions.json.",
       "test_nodes": [
         {
           "name": "test_mass_based_build",

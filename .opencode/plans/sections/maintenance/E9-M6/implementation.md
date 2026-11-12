@@ -804,3 +804,32 @@ Validation:
 - All 16 successor symbols resolved; scoped Ruff/format and whitespace passed.
 Remaining particle facade definitions/builders/factory and gas/GPU compatibility
 are still pending. This does not replace final full coverage or publication.
+
+## Remove the obsolete particle representation factory
+
+Removed representation_factories.py and its package export after confirming
+there are no remaining production/example consumers. All six original tests
+are recorded in particle_factory_assertions.json with existing native or
+removed-boundary successors. Added explicit native discrete/resolved material
+construction retaining per-particle total mass, per-species density, scalar
+charge, concentration and volume. Explicit material axes replace the old
+ambiguous one-dimensional mass/multiple-density facade convention. Native
+radius initialization intentionally rejects unequal material density inputs;
+its existing rejection and sphere-law tests are retained.
+
+Added default/configured native binned and resolved preset checks using the
+original configured modal values and 1000-slot resolved size. Existing native
+independent quadrature and seeded sampler tests remain unchanged. New sample
+checks restore NumPy global RNG state. Removed concrete-module and exported
+factory-symbol tests cover the obsolete entry points; invalid factory-key
+handling has no surviving supported API.
+
+Validation:
+- Particle, removed-API and native-construction integration suites:
+  **497 passed in 0.22s**, `/tmp/m6-particle-factory-tests.log`.
+- Full-package mypy: **550 files passed**, `/tmp/m6-particle-factory-mypy.log`.
+- All six successor symbols resolved; scoped Ruff/format and whitespace passed.
+- Remaining factory references in package/docs/root publication sources are
+  only the explicit negative removal checks.
+Particle facade/builders, gas APIs, GPU admission and final publication/readiness
+remain pending.

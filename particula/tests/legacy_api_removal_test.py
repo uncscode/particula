@@ -13,6 +13,7 @@ from particula.tests.aerosol_test import native_triple
     [
         "particula._legacy_aerosol",
         "particula.particles.change_particle_representation",
+        "particula.particles.representation_factories",
     ],
 )
 def test_removed_concrete_module(module_name):
@@ -53,3 +54,15 @@ def test_native_aggregate_survives_legacy_removal():
         assert aerosol.gas is gas
         assert aerosol.environment is environment
         assert not hasattr(aerosol, "atmosphere")
+
+
+@pytest.mark.parametrize("module_name", ["particula", "particula.particles"])
+def test_removed_particle_factory(module_name):
+    """Particle construction no longer exports the obsolete facade factory."""
+    module = importlib.import_module(module_name)
+    assert not hasattr(module, "ParticleRepresentationFactory")
+    with pytest.raises(ImportError) as caught:
+        exec(  # noqa: S102
+            f"from {module_name} import ParticleRepresentationFactory", {}
+        )
+    assert caught.value.name == module_name

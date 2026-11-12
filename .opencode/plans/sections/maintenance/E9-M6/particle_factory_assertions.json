@@ -1,0 +1,44 @@
+[
+  {
+    "file": "particula/particles/tests/representation_factories_test.py",
+    "test": "test_mass_based_build",
+    "original": "def test_mass_based_build():\n    \"\"\"Test Factory and Build MassParticleRepresentation.\"\"\"\n    parameters = {\n        \"distribution_strategy\": MassBasedMovingBin(),\n        \"activity_strategy\": ActivityIdealMass(),\n        \"surface_strategy\": SurfaceStrategyVolume(),\n        \"mass\": np.array([1.0, 2.0, 3.0]),\n        \"mass_units\": \"kg\",\n        \"density\": np.array([1.0, 2.0, 3.0]),\n        \"density_units\": \"kg/m^3\",\n        \"concentration\": np.array([10, 20, 30]),\n        \"concentration_units\": \"1/m^3\",\n        \"charge\": 1.0,\n    }\n    particle_rep = ParticleRepresentationFactory().get_strategy(\n        \"mass\", parameters\n    )\n    assert isinstance(particle_rep, ParticleRepresentation)\n    assert np.array_equal(particle_rep.get_distribution(), parameters[\"mass\"])\n    assert np.array_equal(particle_rep.get_density(), parameters[\"density\"])\n    assert np.array_equal(\n        particle_rep.get_concentration(), parameters[\"concentration\"]\n    )\n    charge = particle_rep.get_charge()\n    assert charge is not None\n    np.testing.assert_allclose(charge, parameters[\"charge\"])",
+    "successor": "particula/particles/tests/native_particle_storage_test.py::test_explicit_mass_species_construction",
+    "disposition": "Native explicit diagonal material masses preserve per-particle total mass, species density, charge and concentration. Old ambiguous 1D mass/three-density facade inference is retired."
+  },
+  {
+    "file": "particula/particles/tests/representation_factories_test.py",
+    "test": "test_radii_based_build",
+    "original": "def test_radii_based_build():\n    \"\"\"Test factory and build for RadiusParticleRepresentationBuilder.\"\"\"\n    parameters = {\n        \"distribution_strategy\": RadiiBasedMovingBin(),\n        \"activity_strategy\": ActivityIdealMass(),\n        \"surface_strategy\": SurfaceStrategyVolume(),\n        \"radius\": np.array([1.0, 2.0, 3.0]),\n        \"radius_units\": \"m\",\n        \"density\": np.array([1.0, 2.0, 3.0]),\n        \"density_units\": \"kg/m^3\",\n        \"concentration\": np.array([10, 20, 30]),\n        \"concentration_units\": \"1/m^3\",\n        \"charge\": np.array([1.0, 2.0, 3.0]),\n    }\n    strategy = ParticleRepresentationFactory().get_strategy(\n        \"radius\", parameters\n    )\n    assert isinstance(strategy, ParticleRepresentation)\n    assert np.array_equal(strategy.get_distribution(), parameters[\"radius\"])\n    assert np.array_equal(strategy.get_density(), parameters[\"density\"])\n    assert np.array_equal(\n        strategy.get_concentration(), parameters[\"concentration\"]\n    )\n    charge = strategy.get_charge()\n    assert charge is not None\n    charge_array = np.asarray(charge, dtype=np.float64)\n    assert np.array_equal(charge_array, parameters[\"charge\"])",
+    "successor": "particula/particles/tests/native_particle_storage_test.py::test_explicit_radius_storage",
+    "disposition": "Native sphere conversion preserves radius, density, concentration and charge. Radius initialization requires one material density; unequal per-particle densities formerly stored by the facade are rejected by existing test_invalid_radius_inputs_do_not_mutate."
+  },
+  {
+    "file": "particula/particles/tests/representation_factories_test.py",
+    "test": "test_limited_radius_build",
+    "original": "def test_limited_radius_build():\n    \"\"\"Test factory and build for LimitedRadiusParticleBuilder.\"\"\"\n    # default values\n    particle_rep = ParticleRepresentationFactory().get_strategy(\"preset_radius\")\n    assert isinstance(particle_rep, ParticleRepresentation)\n\n    # set values\n    parameters = {\n        \"mode\": np.array([100, 2000]) * 1e-9,\n        \"mode_units\": \"m\",\n        \"geometric_standard_deviation\": np.array([1.4, 1.5]),\n        \"number_concentration\": np.array([1e3, 1e3]),\n        \"number_concentration_units\": \"1/m^3\",\n    }\n    particle_rep = ParticleRepresentationFactory().get_strategy(\n        \"preset_radius\", parameters\n    )\n    assert isinstance(particle_rep, ParticleRepresentation)",
+    "successor": "particula/particles/tests/native_particle_storage_test.py::test_native_presets_retain_factory_configurations",
+    "disposition": "Retain default and configured binned construction through explicit native distribution kind; native default number/mass quadrature tests remain unchanged."
+  },
+  {
+    "file": "particula/particles/tests/representation_factories_test.py",
+    "test": "test_resolved_mass_build",
+    "original": "def test_resolved_mass_build():\n    \"\"\"Test factory and build for ResolvedMassParticleRepresentationBuilder.\"\"\"\n    parameters = {\n        \"distribution_strategy\": ParticleResolvedSpeciatedMass(),\n        \"activity_strategy\": ActivityIdealMass(),\n        \"surface_strategy\": SurfaceStrategyVolume(),\n        \"mass\": np.array([1.0, 2.0, 3.0]),\n        \"mass_units\": \"kg\",\n        \"density\": np.array([1.0, 2.0, 3.0]),\n        \"density_units\": \"kg/m^3\",\n        \"charge\": 1.0,\n        \"volume\": 1,\n        \"volume_units\": \"m^3\",\n    }\n    particle_rep = ParticleRepresentationFactory().get_strategy(\n        \"resolved_mass\", parameters\n    )\n    assert isinstance(particle_rep, ParticleRepresentation)\n    assert np.array_equal(particle_rep.get_distribution(), parameters[\"mass\"])\n    assert np.array_equal(particle_rep.get_density(), parameters[\"density\"])\n    charge = particle_rep.get_charge()\n    assert charge is not None\n    np.testing.assert_allclose(charge, parameters[\"charge\"])\n    assert particle_rep.get_volume() == parameters[\"volume\"]",
+    "successor": "particula/particles/tests/native_particle_storage_test.py::test_explicit_mass_species_construction",
+    "disposition": "Retain mass, density, scalar charge and volume through native resolved construction; explicit species axes replace ambiguous facade shape inference."
+  },
+  {
+    "file": "particula/particles/tests/representation_factories_test.py",
+    "test": "test_preset_resolved_mass_build",
+    "original": "def test_preset_resolved_mass_build():\n    \"\"\"Test factory and build for PresetResolvedMassParticleBuilder.\"\"\"\n    # default values\n    particle_rep = ParticleRepresentationFactory().get_strategy(\n        \"preset_resolved_mass\"\n    )\n    assert isinstance(particle_rep, ParticleRepresentation)\n\n    parameters = {\n        \"volume\": 1,\n        \"volume_units\": \"m^3\",\n        \"mode\": np.array([100, 2000]) * 1e-9,\n        \"mode_units\": \"m\",\n        \"geometric_standard_deviation\": np.array([1.4, 1.5]),\n        \"number_concentration\": np.array([1e3, 1e3]),\n        \"number_concentration_units\": \"1/m^3\",\n        \"particle_resolved_count\": 1000,\n    }\n    particle_rep = ParticleRepresentationFactory().get_strategy(\n        \"preset_resolved_mass\", parameters\n    )\n    assert isinstance(particle_rep, ParticleRepresentation)\n    assert particle_rep.get_volume() == parameters[\"volume\"]",
+    "successor": "particula/particles/tests/native_particle_storage_test.py::test_native_presets_retain_factory_configurations",
+    "disposition": "Retain default and configured resolved construction and physical volume; existing seeded native sampler oracle remains unchanged."
+  },
+  {
+    "file": "particula/particles/tests/representation_factories_test.py",
+    "test": "test_invalid_strategy",
+    "original": "def test_invalid_strategy():\n    \"\"\"Test factory function for invalid type.\"\"\"\n    with pytest.raises(ValueError) as excinfo:\n        ParticleRepresentationFactory().get_strategy(\"invalid_type\")\n    assert \"Unknown strategy type: invalid_type\" in str(excinfo.value)",
+    "successor": "particula/tests/legacy_api_removal_test.py::test_removed_particle_factory",
+    "disposition": "Removed factory has no dispatch names. Exact removed-module and removed-symbol checks replace its invalid factory-key exception."
+  }
+]

@@ -4,9 +4,88 @@ import numpy as np
 import numpy.testing as npt
 import pytest
 from particula.particles import (
+    ParticleData,
+    ParticleDataBuilder,
+    create_lognormal_binned_particle_data,
+    create_lognormal_resolved_particle_data,
     create_particle_data_from_radii,
     create_resolved_particle_data,
 )
+
+
+@pytest.mark.parametrize("kind", ["discrete", "particle_resolved"])
+def test_explicit_mass_species_construction(kind):
+    """Explicit species axes retain mass, density, counts and scalar charge."""
+    masses = np.diag([1.0, 2.0, 3.0])
+    density = np.array([1.0, 2.0, 3.0])
+    counts = np.array([10.0, 20.0, 30.0])
+    if kind == "particle_resolved":
+        data = create_resolved_particle_data(
+            masses=masses,
+            density=density,
+            concentration=counts,
+            charge=1.0,
+            volume=1.0,
+        )
+    else:
+        data = (
+            ParticleDataBuilder()
+            .set_distribution_type(kind)
+            .set_masses(masses)
+            .set_density(density)
+            .set_concentration(counts, units="1/m^3")
+            .set_charge(np.ones(3))
+            .set_volume(np.array([1.0]))
+            .build()
+        )
+    assert isinstance(data, ParticleData)
+    npt.assert_array_equal(data.masses[0], masses)
+    npt.assert_array_equal(data.total_mass[0], [1.0, 2.0, 3.0])
+    npt.assert_array_equal(data.density, density)
+    npt.assert_array_equal(data.concentration[0], counts)
+    npt.assert_array_equal(data.charge[0], [1.0, 1.0, 1.0])
+    npt.assert_array_equal(data.volume, [1.0])
+
+
+@pytest.mark.parametrize("configured", [False, True])
+@pytest.mark.parametrize("resolved", [False, True])
+def test_native_presets_retain_factory_configurations(configured, resolved):
+    """Both preset families retain default and explicit modal construction."""
+    parameters = {}
+    if configured:
+        parameters = dict(
+            mode=np.array([100.0, 2000.0]) * 1e-9,
+            geometric_standard_deviation=np.array([1.4, 1.5]),
+            number_concentration=np.array([1e3, 1e3]),
+        )
+    if resolved:
+        saved = np.random.get_state()
+        try:
+            data = create_lognormal_resolved_particle_data(
+                **parameters,
+                particle_resolved_count=1000 if configured else 20000,
+            )
+        finally:
+            np.random.set_state(saved)
+        npt.assert_array_equal(
+            data.concentration, np.ones_like(data.concentration)
+        )
+        assert data.n_particles == (1000 if configured else 20000)
+    else:
+        data = create_lognormal_binned_particle_data(
+            **parameters,
+            distribution_type="discrete",
+        )
+        npt.assert_allclose(
+            data.number_density,
+            [2000 if configured else 1.1e10],
+            rtol=1e-12,
+            atol=0,
+        )
+    assert isinstance(data, ParticleData)
+    npt.assert_array_equal(data.volume, [1.0])
+    assert np.all(np.isfinite(data.masses))
+    assert np.all(data.masses > 0)
 
 
 @pytest.mark.parametrize("volume", [0.25, 1.0, 4.0])
