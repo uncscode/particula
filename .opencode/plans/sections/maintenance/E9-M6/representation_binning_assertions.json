@@ -1,0 +1,23 @@
+[
+  {
+    "file": "particula/particles/tests/change_particle_representation_test.py",
+    "test": "test_get_particle_resolved_binned_radius",
+    "original": "def test_get_particle_resolved_binned_radius(self):\n        \"\"\"Test the get_particle_resolved_binned_radius function.\n\n        Verifies that the function returns the correct binned radii.\n        \"\"\"\n        bin_radius = get_particle_resolved_binned_radius(\n            self.particle, total_bins=10\n        )\n        self.assertEqual(len(bin_radius), 10)\n        self.assertTrue(np.all(bin_radius > 0))",
+    "successor": "particula/dynamics/coagulation/coagulation_strategy/tests/native_coagulation_step_test.py::test_native_binning_retains_material_and_requested_grid",
+    "disposition": "Retain ten positive radius edges and nonnegative one/two-material output using native kernel binning. Obsolete facade type assertion becomes ParticleData identity/metadata checks; count-weighted native inventory conservation replaces legacy unweighted median/mean state conversion."
+  },
+  {
+    "file": "particula/particles/tests/change_particle_representation_test.py",
+    "test": "test_get_speciated_mass_representation_single",
+    "original": "def test_get_speciated_mass_representation_single(self):\n        \"\"\"Test the get_speciated_mass_representation_from_particle_resolved\n        function.\n\n        Verifies that the function returns a new ParticleRepresentation with\n        binned mass.\n        \"\"\"\n        bin_radius = get_particle_resolved_binned_radius(\n            self.particle, total_bins=10\n        )\n        new_particle = get_speciated_mass_representation_from_particle_resolved(\n            self.particle,\n            bin_radius,\n        )\n        self.assertIsInstance(new_particle, ParticleRepresentation)\n        self.assertTrue(np.all(new_particle.get_distribution() >= 0))",
+    "successor": "particula/dynamics/coagulation/coagulation_strategy/tests/native_coagulation_step_test.py::test_native_binning_retains_material_and_requested_grid",
+    "disposition": "Retain ten positive radius edges and nonnegative one/two-material output using native kernel binning. Obsolete facade type assertion becomes ParticleData identity/metadata checks; count-weighted native inventory conservation replaces legacy unweighted median/mean state conversion."
+  },
+  {
+    "file": "particula/particles/tests/change_particle_representation_test.py",
+    "test": "test_get_speciated_mass_representation_double",
+    "original": "def test_get_speciated_mass_representation_double(self):\n        \"\"\"Test the get_speciated_mass_representation_from_particle_resolved\n        function.\n\n        Verifies that the function returns a new ParticleRepresentation with\n        binned mass.\n        \"\"\"\n        bin_radius = get_particle_resolved_binned_radius(\n            self.particle, total_bins=10\n        )\n        self.particle.data.density = np.array([1.0, 1.0])\n        self.particle.distribution = np.column_stack(\n            (\n                self.particle.distribution,\n                self.particle.distribution,\n            )\n        )\n        new_particle = get_speciated_mass_representation_from_particle_resolved(\n            self.particle,\n            bin_radius,\n        )\n        self.assertIsInstance(new_particle, ParticleRepresentation)\n        self.assertTrue(np.all(new_particle.get_distribution() >= 0))",
+    "successor": "particula/dynamics/coagulation/coagulation_strategy/tests/native_coagulation_step_test.py::test_native_binning_retains_material_and_requested_grid",
+    "disposition": "Retain ten positive radius edges and nonnegative one/two-material output using native kernel binning. Obsolete facade type assertion becomes ParticleData identity/metadata checks; count-weighted native inventory conservation replaces legacy unweighted median/mean state conversion."
+  }
+]

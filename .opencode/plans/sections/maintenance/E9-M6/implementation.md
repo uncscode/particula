@@ -748,3 +748,29 @@ Validation:
   scoped Ruff/format and whitespace checks passed.
 Final full coverage, remaining facade/GPU removal, notebook publication and
 installed-wheel gates remain pending.
+
+## Remove the obsolete facade kernel-binning wrapper
+
+Deleted `particles/change_particle_representation.py` and its facade-only
+fixture after tracing all three original test bodies in
+`representation_binning_assertions.json`. Native coagulation already owns
+radius-grid generation and count-weighted material representatives. Its
+scientific implementation is unchanged. Added six cases covering one/two
+materials at V=0.25/1/4: exactly ten positive increasing radius edges,
+nonnegative finite masses, native result identity/metadata, unchanged input,
+total count and per-species extensive inventory with rtol=2e-15 and atol=0.
+Existing native tests retain zero-material lanes, median kernel-only charge,
+nonaliasing storage and invalid-edge admission. Legacy unweighted median/mean
+mass aggregation is not retained as a second population conversion API.
+
+Added the removed concrete module to negative import checks. The only remaining
+wrapper-module reference in package/docs/root publication sources is that
+negative check; no runtime consumers or package exports remained.
+
+Validation:
+- Coagulation, particle and removed-API suites: **1345 passed in 3.21s**,
+  `/tmp/m6-binning-removal.log`.
+- Full-package mypy: **551 files passed**, `/tmp/m6-binning-mypy.log`.
+- Scoped Ruff/format and whitespace checks passed.
+Particle representation definitions/builders/factories and facade bridges are
+still pending their assertion-level audits; this is not final M6 readiness.

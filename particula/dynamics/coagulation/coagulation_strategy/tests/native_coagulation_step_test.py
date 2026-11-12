@@ -460,3 +460,41 @@ def test_uniform_composition_inventory_error_converges_with_grid(kind):
     reduction = 0.55 if kind == "discrete" else 0.3
     assert np.all(errors[1:] < reduction * errors[:-1])
     assert np.all(errors[-1] < (0.007 if kind == "discrete" else 3e-5))
+
+
+@pytest.mark.parametrize("species", [1, 2])
+@pytest.mark.parametrize("volume", [0.25, 1.0, 4.0])
+def test_native_binning_retains_material_and_requested_grid(species, volume):
+    """Ten positive edges and native material bins preserve weighted inventory."""
+    particle = ParticleData(
+        masses=np.arange(1, 3 * species + 1, dtype=np.float64).reshape(
+            1, 3, species
+        )
+        * 1e-18,
+        concentration=np.array([[1.0, 2.0, 3.0]]),
+        charge=np.array([[0.0, 1.0, -1.0]]),
+        density=np.full(species, 1000.0),
+        volume=np.array([volume]),
+        distribution_type="particle_resolved",
+    )
+    before = _state(particle)
+    edges = _get_particle_resolved_kernel_radius_data(particle, total_bins=10)
+    assert edges.shape == (10,)
+    assert np.all(edges > 0)
+    assert np.all(np.diff(edges) > 0)
+    binned = _get_binned_kernel_data_from_particle_data(particle, edges)
+    assert isinstance(binned, ParticleData)
+    assert binned is not particle
+    assert binned.distribution_type == "particle_resolved"
+    assert binned.n_species == species
+    assert np.all(binned.masses >= 0)
+    assert np.all(np.isfinite(binned.masses))
+    npt.assert_array_equal(binned.volume, particle.volume)
+    npt.assert_allclose(
+        np.sum(binned.masses[0] * binned.concentration[0, :, None], axis=0),
+        np.sum(particle.masses[0] * particle.concentration[0, :, None], axis=0),
+        rtol=2e-15,
+        atol=0,
+    )
+    assert binned.concentration.sum() == particle.concentration.sum()
+    _unchanged(particle, before)
