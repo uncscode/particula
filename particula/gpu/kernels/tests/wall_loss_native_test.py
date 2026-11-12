@@ -255,9 +255,65 @@ def test_weighted_survival_matches_independent_rate_and_binomial_variance(
             )
 
 
+def _launch_retained_wall_loss_kernel(state, device):
+    """Wire the retained raw kernel independently of prepare/enqueue dispatch.
+
+    This control preserves the former three-step same-device stream comparison
+    without admitting untagged state through a removed execution boundary.
+    """
+    import warp as wp
+
+    from particula.gpu.kernels import wall_loss
+
+    p, config = state.p, state.config
+    boxes, slots, species = p.masses.shape
+    temperature = wp.full(boxes, 298.15, dtype=wp.float64, device=device)
+    pressure = wp.full(boxes, 101325.0, dtype=wp.float64, device=device)
+    inputs = [
+        p.masses,
+        p.concentration,
+        p.charge,
+        p.density,
+        temperature,
+        pressure,
+        state.kwargs["time_step"],
+        config.wall_eddy_diffusivity,
+    ]
+    dimensions = config.chamber_dimensions or (0.0, 0.0, 0.0)
+    if config.mode == "neutral":
+        kernel = wall_loss._wall_loss_remove
+        inputs.extend(
+            [
+                config.chamber_radius or 0.0,
+                *dimensions,
+                0 if config.geometry == "spherical" else 1,
+            ]
+        )
+    elif config.geometry == "spherical":
+        kernel = wall_loss._charged_spherical_wall_loss_remove
+        inputs.extend(
+            [
+                config.chamber_radius,
+                config.wall_potential,
+                config.wall_electric_field,
+            ]
+        )
+    else:
+        kernel = wall_loss._charged_rectangular_wall_loss_remove
+        inputs.extend(
+            [
+                *dimensions,
+                config.wall_potential,
+                config.wall_electric_field,
+            ]
+        )
+    inputs.extend([slots, species, state.rng, 42, 0])
+    wp.launch(kernel, dim=boxes, inputs=inputs, device=device)
+
+
 @pytest.mark.parametrize("family", FAMILIES)
 @pytest.mark.parametrize("mode", ["direct", "prepared"])
-def test_persistent_stream_and_removal_match_legacy_on_same_backend(
+def test_persistent_stream_and_removal_match_raw_kernel_on_same_backend(
     device, family, mode
 ):
     """Native admission changes neither the retained kernel nor its RNG draws."""
@@ -270,10 +326,9 @@ def test_persistent_stream_and_removal_match_legacy_on_same_backend(
         wall_loss_step_gpu,
     )
 
-    native, legacy = _state(device, family), _state(device, family)
-    legacy.p.distribution_kind = 0
+    native, control = _state(device, family), _state(device, family)
     prepared = None
-    for state in (native, legacy):
+    for state in (native, control):
         wp.launch(
             _initialize_rng_states,
             dim=3,
@@ -289,10 +344,10 @@ def test_persistent_stream_and_removal_match_legacy_on_same_backend(
             wall_loss_step_gpu(native.p, **native.kwargs)
         else:
             _enqueue_prepared_wall_loss_call(prepared)
-        wall_loss_step_gpu(legacy.p, **legacy.kwargs)
+        _launch_retained_wall_loss_kernel(control, device)
         after = _snapshot(native)
         _assert_sink(before, after)
-        expected = _snapshot(legacy)
+        expected = _snapshot(control)
         for name in after:
             npt.assert_array_equal(after[name], expected[name])
 
@@ -674,3 +729,40 @@ def test_native_selected_wall_loss_preserves_unselected_state_and_rng(
         lost[[0, 2]], before["concentration"][[0, 2]] > 0
     )
     assert after["rng"][1] == before["rng"][1]
+
+
+@pytest.mark.parametrize("metadata", [None, 0, 1, 2])
+@pytest.mark.parametrize(
+    "entry", ["direct", "prepared", "selected", "prepared_selected"]
+)
+def test_wall_loss_requires_resolved_metadata_before_array_access(
+    metadata, entry
+):
+    """Reject missing or unsupported semantics before setup or device work."""
+    pytest.importorskip("warp")
+    from particula.gpu.kernels import wall_loss
+
+    class MetadataOnly:
+        def __getattr__(self, name):
+            if name == "distribution_kind" and metadata is None:
+                raise AttributeError(name)
+            raise AssertionError(f"unexpected state access: {name}")
+
+    particles = MetadataOnly()
+    if metadata is not None:
+        particles.distribution_kind = metadata
+    kwargs = dict(
+        config=wall_loss.NeutralWallLossConfig(
+            "spherical", 0.01, chamber_radius=1.0
+        )
+    )
+    functions = {
+        "direct": wall_loss.wall_loss_step_gpu,
+        "prepared": wall_loss._prepare_wall_loss_step_gpu,
+        "selected": wall_loss.wall_loss_selected_boxes_step_gpu,
+        "prepared_selected": wall_loss._prepare_selected_wall_loss_call,
+    }
+    if "selected" in entry:
+        kwargs.update(rng_seed=0, rng_states=object(), selected_boxes=object())
+    with pytest.raises(ValueError, match="only particle_resolved"):
+        functions[entry](particles, None, None, 0.0, **kwargs)

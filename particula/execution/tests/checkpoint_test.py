@@ -106,6 +106,7 @@ def _real_dispatch_binding() -> tuple[Any, "GPUResourceRegistry", Any]:
         charge=np.zeros((1, 2)),
         density=np.array([1000.0]),
         volume=np.ones(1),
+        distribution_type="particle_resolved",
     )
     gas = GasData(
         name=["species"],

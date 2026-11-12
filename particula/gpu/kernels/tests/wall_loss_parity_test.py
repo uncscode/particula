@@ -89,7 +89,7 @@ def _masses_for_radius(radius: float) -> np.ndarray:
     return np.array([0.4 * volume * 1000.0, 0.6 * volume * 1500.0])
 
 
-def _particles(device: str, n_boxes: int = 2):
+def _particles(device: str, n_boxes: int = 2, *, native: bool = False):
     """Build explicit fp64 complete, inactive, and unusable fixed slots."""
     runtime_wp = _warp()
     from particula.gpu import WarpParticleData
@@ -98,13 +98,16 @@ def _particles(device: str, n_boxes: int = 2):
     for box in range(n_boxes):
         masses[box, 0] = _masses_for_radius(20.0e-9)
         masses[box, 1] = _masses_for_radius(2.0e-6)
-        masses[box, 3, 0] = np.nextafter(0.0, 1.0)
+        masses[box, 3, 0] = 0.0 if native else np.nextafter(0.0, 1.0)
     particles = WarpParticleData()
+    particles.distribution_kind = 3
     particles.masses = runtime_wp.array(
         masses, dtype=runtime_wp.float64, device=device
     )
     particles.concentration = runtime_wp.array(
-        np.tile(np.array([1.0, 1.0, 0.0, 1.0]), (n_boxes, 1)),
+        np.tile(
+            np.array([1.0, 1.0, 0.0, 0.0 if native else 1.0]), (n_boxes, 1)
+        ),
         dtype=runtime_wp.float64,
         device=device,
     )
@@ -133,6 +136,7 @@ def _one_species_particles(device: str, n_boxes: int = 2):
         masses[box, 1, 0] = _masses_for_radius(2.0e-6).sum()
         masses[box, 3, 0] = np.nextafter(0.0, 1.0)
     particles = WarpParticleData()
+    particles.distribution_kind = 3
     particles.masses = runtime_wp.array(
         masses, dtype=runtime_wp.float64, device=device
     )
@@ -576,7 +580,9 @@ def test_complete_slot_rates_match_independent_cpu_oracle(
     npt.assert_array_equal(particles.charge.numpy(), before[2])
 
 
-def _charged_matrix_particles(device: str, n_boxes: int) -> Any:
+def _charged_matrix_particles(
+    device: str, n_boxes: int, *, native: bool = False
+) -> Any:
     """Build four physical scales plus inactive and unusable protected slots."""
     runtime_wp = _warp()
     from particula.gpu import WarpParticleData
@@ -586,13 +592,25 @@ def _charged_matrix_particles(device: str, n_boxes: int) -> Any:
     for box in range(n_boxes):
         for particle, particle_radius in enumerate(radii):
             masses[box, particle] = _masses_for_radius(particle_radius)
-        masses[box, 6, 0] = np.nextafter(0.0, 1.0)
+        masses[box, 6, 0] = 0.0 if native else np.nextafter(0.0, 1.0)
     particles = WarpParticleData()
+    particles.distribution_kind = 3
     particles.masses = runtime_wp.array(
         masses, dtype=runtime_wp.float64, device=device
     )
     particles.concentration = runtime_wp.array(
-        np.tile([1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0], (n_boxes, 1)),
+        np.tile(
+            [
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                0.0,
+                0.0 if native else 1.0,
+                0.0 if native else 1.0,
+            ],
+            (n_boxes, 1),
+        ),
         dtype=runtime_wp.float64,
         device=device,
     )
@@ -740,8 +758,8 @@ def test_zero_charge_charged_mode_exactly_matches_neutral_diagnostics_and_state(
     runtime_wp = _warp()
     from particula.gpu.kernels import wall_loss_step_gpu
 
-    neutral_particles = _charged_matrix_particles(device, 2)
-    charged_particles = _charged_matrix_particles(device, 2)
+    neutral_particles = _charged_matrix_particles(device, 2, native=True)
+    charged_particles = _charged_matrix_particles(device, 2, native=True)
     zeros = np.zeros(neutral_particles.charge.shape, dtype=np.float64)
     for particles in (neutral_particles, charged_particles):
         particles.charge = runtime_wp.array(
@@ -802,14 +820,14 @@ def test_zero_charge_charged_mode_exactly_matches_neutral_diagnostics_and_state(
 def _homogeneous_particles(device: str, active: int = 32):
     """Create one-box active trials followed by two deliberately inactive slots."""
     runtime_wp = _warp()
-    particles = _particles(device, 1)
+    particles = _particles(device, 1, native=True)
     masses = np.zeros((1, active + 2, 2), dtype=np.float64)
     masses[0, :active] = _masses_for_radius(200.0e-9)
     particles.masses = runtime_wp.array(
         masses, dtype=runtime_wp.float64, device=device
     )
     particles.concentration = runtime_wp.array(
-        np.array([[*np.ones(active), 0.0, 1.0]]),
+        np.array([[*np.ones(active), 0.0, 0.0]]),
         dtype=runtime_wp.float64,
         device=device,
     )
@@ -864,13 +882,14 @@ def _charged_homogeneous_particles(
     from particula.gpu import WarpParticleData
 
     particles = WarpParticleData()
+    particles.distribution_kind = 3
     masses = np.zeros((1, active + 2, 2), dtype=np.float64)
     masses[0, :active] = _masses_for_radius(radius)
     particles.masses = runtime_wp.array(
         masses, dtype=runtime_wp.float64, device=device
     )
     particles.concentration = runtime_wp.array(
-        [[*np.ones(active), 0.0, 1.0]], dtype=runtime_wp.float64, device=device
+        [[*np.ones(active), 0.0, 0.0]], dtype=runtime_wp.float64, device=device
     )
     particles.charge = runtime_wp.array(
         [[*np.full(active, charge), 13.0, -17.0]],
@@ -1186,7 +1205,7 @@ def test_zero_time_and_all_inactive_are_exact_noops(device: str) -> None:
     from particula.gpu.kernels import wall_loss_step_gpu
 
     for time_step, inactive in ((0.0, False), (1.0, True)):
-        particles = _particles(device, 1)
+        particles = _particles(device, 1, native=True)
         if inactive:
             particles.concentration = runtime_wp.zeros(
                 (1, 4), dtype=runtime_wp.float64, device=device

@@ -27,6 +27,7 @@ def _particles(device: str = "cpu"):
     from particula.gpu import WarpParticleData
 
     particles = WarpParticleData()
+    particles.distribution_kind = 3
     particles.masses = wp.array(
         np.array([[[1.0, 2.0], [0.0, 0.0]], [[3.0, 4.0], [5.0, 6.0]]]),
         dtype=wp.float64,
@@ -53,7 +54,7 @@ def test_prepare_wall_loss_rejects_invalid_config_before_enqueue() -> None:
         TypeError, match="config must be a NeutralWallLossConfig"
     ):
         _prepare_wall_loss_step_gpu(
-            object(),
+            SimpleNamespace(distribution_kind=3),
             None,
             None,
             1.0,
@@ -73,6 +74,7 @@ def test_prepared_wall_loss_pins_device_without_container_reread(
 
     source_particles = _particles()
     particles = SimpleNamespace(
+        distribution_kind=3,
         masses=source_particles.masses,
         concentration=source_particles.concentration,
         charge=source_particles.charge,
@@ -321,7 +323,13 @@ def test_charged_scalar_configuration_rejects_before_particles(
         "spherical", 0.01, chamber_radius=1.0, **arguments
     )
     with pytest.raises(error, match=match):
-        wall_loss_step_gpu(object(), 298.15, 101325.0, 1.0, config=config)
+        wall_loss_step_gpu(
+            SimpleNamespace(distribution_kind=3),
+            298.15,
+            101325.0,
+            1.0,
+            config=config,
+        )
 
 
 @pytest.mark.parametrize(
@@ -471,7 +479,13 @@ def test_neutral_mode_rejects_rectangular_warp_field_before_particles() -> None:
     )
 
     with pytest.raises(TypeError, match="config.wall_electric_field"):
-        wall_loss_step_gpu(object(), 298.15, 101325.0, 1.0, config=config)
+        wall_loss_step_gpu(
+            SimpleNamespace(distribution_kind=3),
+            298.15,
+            101325.0,
+            1.0,
+            config=config,
+        )
 
 
 @pytest.mark.parametrize("geometry", ["spherical", "rectangular"])
@@ -602,7 +616,13 @@ def test_config_type_fails_before_particle_access() -> None:
     from particula.gpu.kernels import wall_loss_step_gpu
 
     with pytest.raises(TypeError, match="NeutralWallLossConfig"):
-        wall_loss_step_gpu(object(), 298.15, 101325.0, 1.0, config=object())
+        wall_loss_step_gpu(
+            SimpleNamespace(distribution_kind=3),
+            298.15,
+            101325.0,
+            1.0,
+            config=object(),
+        )
 
 
 def test_distribution_fails_before_particle_access() -> None:
@@ -614,7 +634,13 @@ def test_distribution_fails_before_particle_access() -> None:
         "spherical", 0.01, chamber_radius=1.0, distribution_type="discrete"
     )
     with pytest.raises(ValueError, match="distribution_type"):
-        wall_loss_step_gpu(object(), 298.15, 101325.0, 1.0, config=config)
+        wall_loss_step_gpu(
+            SimpleNamespace(distribution_kind=3),
+            298.15,
+            101325.0,
+            1.0,
+            config=config,
+        )
 
 
 @pytest.mark.parametrize(
@@ -649,7 +675,13 @@ def test_selector_rejections_use_stable_exact_messages(
     object.__setattr__(config, field, value)
 
     with pytest.raises(ValueError) as error:
-        wall_loss_step_gpu(object(), 298.15, 101325.0, 1.0, config=config)
+        wall_loss_step_gpu(
+            SimpleNamespace(distribution_kind=3),
+            298.15,
+            101325.0,
+            1.0,
+            config=config,
+        )
 
     assert str(error.value) == expected
 
@@ -688,7 +720,13 @@ def test_selector_requires_exact_string_before_particle_access(
     object.__setattr__(config, field, value)
 
     with pytest.raises(ValueError, match=match):
-        wall_loss_step_gpu(object(), 298.15, 101325.0, 1.0, config=config)
+        wall_loss_step_gpu(
+            SimpleNamespace(distribution_kind=3),
+            298.15,
+            101325.0,
+            1.0,
+            config=config,
+        )
 
 
 @pytest.mark.parametrize(
@@ -713,7 +751,13 @@ def test_huge_integer_config_scalar_raises_value_error(
     object.__setattr__(config, field, value)
 
     with pytest.raises(ValueError, match=match):
-        wall_loss_step_gpu(object(), 298.15, 101325.0, 1.0, config=config)
+        wall_loss_step_gpu(
+            SimpleNamespace(distribution_kind=3),
+            298.15,
+            101325.0,
+            1.0,
+            config=config,
+        )
 
 
 def test_huge_integer_time_step_raises_value_error() -> None:
@@ -760,6 +804,7 @@ def test_invalid_time_step_preserves_particles(time_step) -> None:
 
     valid_particles = _particles()
     particles = SimpleNamespace(
+        distribution_kind=3,
         masses=valid_particles.masses,
         concentration=valid_particles.concentration,
         charge=valid_particles.charge,
@@ -888,7 +933,11 @@ def test_config_validation_rejects_noncanonical_geometry_payloads(
     }
     with pytest.raises(error, match=match):
         wall_loss_step_gpu(
-            object(), 298.15, 101325.0, 1.0, config=configs[scenario]
+            SimpleNamespace(distribution_kind=3),
+            298.15,
+            101325.0,
+            1.0,
+            config=configs[scenario],
         )
 
 
@@ -927,7 +976,11 @@ def test_config_physical_payload_validation_fails_before_particles(
 
     with pytest.raises((TypeError, ValueError), match=re.escape(match)):
         wall_loss_step_gpu(
-            object(), 298.15, 101325.0, 1.0, config=configs[scenario]
+            SimpleNamespace(distribution_kind=3),
+            298.15,
+            101325.0,
+            1.0,
+            config=configs[scenario],
         )
 
 
@@ -967,6 +1020,7 @@ def test_particle_schema_rejection_is_atomic(field, values, match) -> None:
 
     valid_particles = _particles()
     particles = SimpleNamespace(
+        distribution_kind=3,
         masses=valid_particles.masses,
         concentration=valid_particles.concentration,
         charge=valid_particles.charge,
@@ -1204,6 +1258,17 @@ def test_large_time_step_removes_only_eligible_slots(geometry: str) -> None:
         device="cpu",
     )
     snapshot = _snapshot(particles)
+    with pytest.raises(ValueError, match="invalid native wall-loss"):
+        wall_loss_step_gpu(
+            particles, 298.15, 101325.0, 1.0e300, config=_config(geometry)
+        )
+    _assert_snapshot_unchanged(particles, snapshot)
+    # Native execution rejects positive counts with zero mass. Make that slot
+    # inactive before checking the valid large-duration removal behavior.
+    particles.concentration = _warp().array(
+        [[1.0, 0.0], [2.0, 0.0]], dtype=_warp().float64, device="cpu"
+    )
+    snapshot = _snapshot(particles)
 
     returned = wall_loss_step_gpu(
         particles,
@@ -1223,7 +1288,7 @@ def test_large_time_step_removes_only_eligible_slots(geometry: str) -> None:
     npt.assert_array_equal(particles.masses.numpy()[0, 1], [0.0, 0.0])
     assert particles.charge.numpy()[0, 1] == snapshot["charge"][1][0, 1]
     npt.assert_array_equal(particles.masses.numpy()[1, 1], [0.0, 0.0])
-    assert particles.concentration.numpy()[1, 1] == 3.0
+    assert particles.concentration.numpy()[1, 1] == 0.0
     assert particles.charge.numpy()[1, 1] == snapshot["charge"][1][1, 1]
     npt.assert_array_equal(particles.density.numpy(), snapshot["density"][1])
     npt.assert_array_equal(particles.volume.numpy(), snapshot["volume"][1])
@@ -1346,7 +1411,7 @@ def test_equal_inputs_and_explicit_reset_produce_equal_slot_updates() -> None:
 
 
 def test_subnormal_mass_slot_survives_without_transport_calculation() -> None:
-    """Keep an active slot unchanged when its derived volume underflows."""
+    """Reject underflowed geometry while preserving the active slot."""
     wp = _warp()
     from particula.gpu.kernels import wall_loss_step_gpu
 
@@ -1367,16 +1432,16 @@ def test_subnormal_mass_slot_survives_without_transport_calculation() -> None:
     )
     snapshot = _snapshot(particles)
 
-    returned = wall_loss_step_gpu(
-        particles,
-        298.15,
-        101325.0,
-        1.0e300,
-        config=_config(),
-        rng_seed=2**32 - 1,
-    )
+    with pytest.raises(ValueError, match="invalid native wall-loss"):
+        wall_loss_step_gpu(
+            particles,
+            298.15,
+            101325.0,
+            1.0e300,
+            config=_config(),
+            rng_seed=2**32 - 1,
+        )
 
-    assert returned is particles
     _assert_snapshot_unchanged(particles, snapshot)
 
 
@@ -1399,16 +1464,17 @@ def test_overflowed_derived_properties_do_not_reset_rng_sidecar() -> None:
     rng_states = wp.array([17], dtype=wp.uint32, device="cpu")
     snapshot = _snapshot(particles, rng_states)
 
-    wall_loss_step_gpu(
-        particles,
-        298.15,
-        101325.0,
-        1.0,
-        config=_charged_config(),
-        rng_seed=19,
-        rng_states=rng_states,
-        initialize_rng=True,
-    )
+    with pytest.raises(ValueError, match="invalid native wall-loss"):
+        wall_loss_step_gpu(
+            particles,
+            298.15,
+            101325.0,
+            1.0,
+            config=_charged_config(),
+            rng_seed=19,
+            rng_states=rng_states,
+            initialize_rng=True,
+        )
 
     _assert_snapshot_unchanged(particles, snapshot, rng_states)
 
@@ -1430,11 +1496,16 @@ def test_missing_particle_field_and_nonarray_field_have_stable_errors() -> None:
         ValueError, match="particles.masses must be a Warp array"
     ):
         wall_loss_step_gpu(
-            SimpleNamespace(), 298.15, 101325.0, 1.0, config=_config()
+            SimpleNamespace(distribution_kind=3),
+            298.15,
+            101325.0,
+            1.0,
+            config=_config(),
         )
 
     valid_particles = _particles()
     particles = SimpleNamespace(
+        distribution_kind=3,
         masses=valid_particles.masses,
         concentration=valid_particles.concentration,
         charge=np.zeros((2, 2), dtype=np.float64),
@@ -1629,6 +1700,7 @@ def test_rng_state_consumes_only_eligible_slots() -> None:
     from particula.gpu.kernels import wall_loss_step_gpu
 
     candidate = SimpleNamespace(
+        distribution_kind=3,
         masses=wp.array(
             [[[1.0, 2.0], [0.0, 0.0], [0.0, 0.0], [5e-324, 0.0]]],
             dtype=wp.float64,
@@ -1644,6 +1716,7 @@ def test_rng_state_consumes_only_eligible_slots() -> None:
         volume=wp.array([1.0], dtype=wp.float64, device="cpu"),
     )
     control = SimpleNamespace(
+        distribution_kind=3,
         masses=wp.array([[[1.0, 2.0]]], dtype=wp.float64, device="cpu"),
         concentration=wp.array([[1.0]], dtype=wp.float64, device="cpu"),
         charge=wp.array([[0.0]], dtype=wp.float64, device="cpu"),
@@ -1654,6 +1727,28 @@ def test_rng_state_consumes_only_eligible_slots() -> None:
     control_states = wp.zeros(1, dtype=wp.uint32, device="cpu")
     candidate_snapshot = _snapshot(candidate, candidate_states)
     tiny_time = np.nextafter(0.0, 1.0)
+    with pytest.raises(ValueError, match="invalid native wall-loss"):
+        wall_loss_step_gpu(
+            candidate,
+            298.15,
+            101325.0,
+            tiny_time,
+            config=_config(),
+            rng_states=candidate_states,
+            initialize_rng=True,
+        )
+    _assert_snapshot_unchanged(candidate, candidate_snapshot, candidate_states)
+    # Invalid zero/underflowed material rejects before RNG work. Use inactive
+    # zero-mass slots to retain the independent eligible-slot stream comparison.
+    candidate.masses = wp.array(
+        [[[1.0, 2.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0]]],
+        dtype=wp.float64,
+        device="cpu",
+    )
+    candidate.concentration = wp.array(
+        [[1.0, 0.0, 0.0, 0.0]], dtype=wp.float64, device="cpu"
+    )
+    candidate_snapshot = _snapshot(candidate, candidate_states)
     for particles, states in (
         (candidate, candidate_states),
         (control, control_states),
@@ -1687,6 +1782,7 @@ def _nanoparticle(charge: float = 1.0) -> SimpleNamespace:
     radius = 1.0e-9
     mass = 4.0 * np.pi * radius**3 * 1000.0 / 3.0
     return SimpleNamespace(
+        distribution_kind=3,
         masses=wp.array([[[mass]]], dtype=wp.float64, device="cpu"),
         concentration=wp.array([[1.0]], dtype=wp.float64, device="cpu"),
         charge=wp.array([[charge]], dtype=wp.float64, device="cpu"),

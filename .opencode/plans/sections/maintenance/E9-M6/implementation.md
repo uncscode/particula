@@ -1201,3 +1201,118 @@ The condensation removal unit is ready to commit. Next remove untagged GPU
 coagulation/wall-loss paths, then source/communication and lifecycle/checkpoint
 compatibility. Full-package, installed-wheel, exhaustive example, publication,
 and final PR gates remain pending.
+
+## GPU wall-loss removal in progress
+
+Removed untagged admission from direct, prepared, selected, and prepared-selected
+wall-loss boundaries. Native geometry and ownership validation now always apply;
+no stochastic kernel or coefficient formula changed. Added 16 metadata-only
+rejection cases for missing/zero/discrete/PDF semantics across the four paths,
+which reject before particle-array access. Original wall-loss test bodies and
+successors are preserved in `gpu_wall_loss_assertions.json`.
+
+Migrated direct fixture tags and metadata-only configuration/schema sentinels.
+Converted legacy silent skips of underflowed/overflowed geometry to native
+rejection with unchanged particle/RNG state. The large-duration and eligible-RNG
+cases first assert invalid-state rejection, then explicitly construct valid
+inactive slots to retain the original valid removal/stream assertions. No
+numerical tolerances changed.
+
+Validation checkpoint:
+- Full wall-loss/direct/parity/native diagnostic: **26 failed, 263 passed,
+  126 skipped in 1.49s**, `/tmp/m6-wall-native4.log`.
+- Current direct/native admission subset: **259 passed, 118 skipped,
+  16 deselected in 0.72s**, `/tmp/m6-wall-admission.log`. The deselected rows
+  are the former native-versus-legacy stream comparison, still to migrate;
+  this subset is not full unit acceptance.
+- Scoped Ruff passed; formatting applied.
+
+Next preserve raw coefficient diagnostic fixtures (which intentionally contain
+unusable slots) while providing valid inactive sentinels for their execution
+parity/statistical counterparts. Replace the removed legacy dispatch comparison
+with an independent retained low-level kernel/stream oracle, preserving all
+three-step RNG and sink assertions. Then run all wall-loss suites and dependent
+execution/source-example tests. This unit is uncommitted; coagulation removal,
+remaining GPU/lifecycle cleanup and final gates are still pending.
+
+## Wall-loss parity and execution fixture follow-up
+
+Separated raw coefficient diagnostic fixtures from native execution fixtures.
+Raw diagnostic cases still exercise unusable geometry; execution/statistical
+cases retain their active physical particles and use valid inactive sentinels.
+The former native-versus-legacy three-step stream test now compares native
+prepare/direct dispatch against an independently wired invocation of the retained
+raw kernels for all four geometry/charge families. It preserves exact per-step
+state/RNG comparisons and weighted sink accounting without a legacy admission
+path. Statistical intervals and numerical tolerances remain unchanged.
+
+Updated the public wall-loss feature contract to require explicit resolved
+metadata, including zero-duration and selected-box calls. Migrated the real
+checkpoint process fixture and logical-lane RNG fixtures (unit volume), and the
+selected-lane adapter fixture's no-work row to valid inactive storage.
+
+Validation:
+- All wall-loss direct/parity/native suites: **305 passed, 126 skipped in
+  1.06s**, `/tmp/m6-wall-native5.log`.
+- Source examples: **225 passed, 2 skipped in 46.36s**,
+  `/tmp/m6-wall-examples.log`, with `-Werror --no-cov`.
+- Full-package mypy before the final execution fixture changes: **534 files
+  passed**, `/tmp/m6-wall-mypy.log`.
+- Full execution plus GPU process-sequence and population-boundary diagnostic:
+  **20 failed, 1421 passed, 53 skipped in 84.97s**,
+  `/tmp/m6-wall-consumers1.log`. Nine execution failures were untagged fixture
+  construction and have since been repaired. Eleven GPU process-sequence rows
+  remain: they expose both condensation and wall-loss legacy setup.
+- Checkpoint, process-adapter and RNG-invariance follow-up: **108 passed,
+  10 skipped in 2.79s**, `/tmp/m6-wall-execution-fixes.log`.
+- Scoped Ruff/format and whitespace checks passed.
+
+Next migrate `particula/gpu/tests/process_sequence_test.py` with explicit
+population and condensation/nucleation species bindings, preserving independent
+inventory, zero-time, invalid-preflight and aggregate wall-loss assertions.
+Rerun broad dependent validation before committing wall-loss removal. No live
+validation processes remain at this checkpoint.
+
+## Native five-process sequence migration
+
+The direct sequence now explicitly stores resolved counts converted from the
+original density fixtures, with named identity condensation and nucleation maps
+prepared after any intentional storage replacement. Density-based independent
+inventory oracles normalize device counts by the current representative volume.
+The original sparse/unequal fixtures remain available for standalone assertions.
+
+Native coagulation requires equal positive counts in each box. The full-sequence
+derivative now preserves total particle number, per-species mass, and signed
+charge while forming equal weights; new independent tests enforce all three
+invariants. Separate tests verify the original unequal weights reject without
+mutation. The forced-collision call uses a large duration (1e30 s) consistent
+with the corrected low number-density rate so its original collision-buffer and
+no-more-pairs/RNG assertions still execute. This is a deterministic boundary
+fixture, not a physical integration-duration recommendation. Nucleation's target
+one-particle coefficient calculates target density rate before precursor
+normalization, avoiding a roundoff-induced nonintegral count without changing
+production validation or tolerances.
+
+Validation:
+- Process-sequence migration: **43 passed, 1 skipped in 0.62s**,
+  `/tmp/m6-process-sequence-native3.log`, before adding four derivative/rejection
+  cases.
+- Final wall-loss/direct/parity/native plus process-sequence suites:
+  **352 passed, 127 skipped in 1.68s**,
+  `/tmp/m6-wall-final-focused.log`.
+- Full-package mypy: **534 files passed**, `/tmp/m6-wall-mypy3.log`; fixed the
+  fixture's Warp distribution-kind annotation after the prior run reported it.
+- Standard strict docs: **built in 1.65s**, `/tmp/m6-wall-docs.log`.
+- Ruff check/format passed eight changed Python files; whitespace passed.
+- All **149 original assertion records** resolve to retained successor tests.
+
+The full execution/process-sequence/population-boundary rerun is recorded below
+when terminal; the wall-loss removal unit remains uncommitted until then.
+
+Full dependent rerun finished: **1445 passed, 53 skipped in 80.14s**,
+`/tmp/m6-wall-consumers2.log`. It covers the complete execution suite, the
+five-process direct sequence, and population-boundary tests. The only subsequent
+Python edit was the fixture's explicit `wp.int32(3)` annotation, covered by the
+final focused run and full mypy above. Wall-loss removal is ready to commit.
+GPU coagulation admission/selector cleanup is next; remaining source,
+communication, transfer/checkpoint cleanup and final publication gates remain.
