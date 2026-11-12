@@ -54,7 +54,9 @@ class ExampleRun:
         saturation_snapshot: Caller-owned saturation diagnostic with shape
             ``(3, 1)``.
         initial_total_mass: Initial particle-plus-gas extensive inventory.
-        conservation_residual: Final residual measured against that inventory.
+        conservation_residual: Net change against that inventory with zero
+            source/sink ledgers. Prescribed gas and wall removal make this an
+            open system; this diagnostic is not closed-system conservation.
         restart_gas_before_physics: Restarted gas observed before dispatch.
         restart_temperature_before_physics: Restarted temperature observed
             before dispatch.
@@ -131,7 +133,15 @@ def _load_enabled_runtime() -> SimpleNamespace:
 
 
 def _build_cpu_state() -> tuple[ParticleData, GasData, EnvironmentData]:
-    """Build a deterministic float64 three-box fixture for one source upload."""
+    """Build three native resolved boxes for one explicit source upload.
+
+    Preserve total number densities 1.5, 3 and 4.5 m⁻³, using equal counts
+    within each box as required by native coagulation. The former unequal
+    slot weights were unsupported. Stored counts are density times volume;
+    this fixture illustrates ownership and is not a calibrated population.
+    Wall loss uses resolved stochastic survival, matching the population tag,
+    rather than the former untagged density-style decay configuration.
+    """
     return (
         ParticleData(
             masses=np.array(
@@ -143,11 +153,12 @@ def _build_cpu_state() -> tuple[ParticleData, GasData, EnvironmentData]:
                 dtype=np.float64,
             ),
             concentration=np.array(
-                [[1.0, 0.5], [2.0, 1.0], [3.0, 1.5]], dtype=np.float64
+                [[0.75, 0.75], [3.0, 3.0], [6.75, 6.75]], dtype=np.float64
             ),
             charge=np.zeros((3, 2), dtype=np.float64),
             density=np.array([1000.0], dtype=np.float64),
             volume=np.array([1.0, 2.0, 3.0], dtype=np.float64),
+            distribution_type="particle_resolved",
         ),
         GasData(
             name=["water"],
@@ -339,6 +350,47 @@ def _resolved_graph(
     return graph, schedule, {node.node_id: node for node in graph.nodes}
 
 
+def _mass_species_map(session: Any) -> Any:
+    """Declare the complete water gas order and its particle material lane."""
+    from particula.dynamics.condensation.species_mapping import (
+        CondensationSpeciesMap,
+    )
+
+    return CondensationSpeciesMap(session.metadata.gas_names, ((0, 0),))
+
+
+def _prepare_species_bindings(session: Any) -> tuple[Any, Any]:
+    """Prepare new maps for this exact source or explicitly restarted session.
+
+    Restart creates fresh carriers and arrays; source bindings cannot be reused.
+    These explicit configuration uploads occur outside ordinary dispatch.
+    """
+    from particula.dynamics.nucleation.species_mapping import (
+        NucleationSpeciesMap,
+    )
+    from particula.gpu.nucleation_species_mapping import (
+        prepare_nucleation_species_map,
+    )
+    from particula.gpu.species_mapping import prepare_condensation_species_map
+
+    return (
+        prepare_condensation_species_map(
+            session.particles,
+            session.gas,
+            gas_names=session.metadata.gas_names,
+            species_map=_mass_species_map(session),
+        ),
+        prepare_nucleation_species_map(
+            session.particles,
+            session.gas,
+            gas_names=session.metadata.gas_names,
+            species_map=NucleationSpeciesMap(
+                session.metadata.gas_names, ((0, 0),)
+            ),
+        ),
+    )
+
+
 def _diagnostics_plan(
     runtime: SimpleNamespace,
     session: Any,
@@ -372,6 +424,7 @@ def _diagnostics_plan(
         diagnostics.ResidentDiagnosticRegistration(
             diagnostics.ResidentDiagnosticOperation.TOTAL_SPECIES_MASS,
             total,
+            species_map=_mass_species_map(session),
         ),
         diagnostics.ResidentDiagnosticRegistration(
             diagnostics.ResidentDiagnosticOperation.PARTICLE_NUMBER_CONCENTRATION,
@@ -419,6 +472,9 @@ def _request(
     execution = runtime.execution
     graph, schedule, nodes = _resolved_graph(runtime)
     device = session.particles.masses.device
+    condensation_binding, nucleation_binding = _prepare_species_bindings(
+        session
+    )
     communication_view = registry.get_communication_resources()
     if communication_view is None:
         map_data = runtime.communication.CommunicationMap(
@@ -480,6 +536,7 @@ def _request(
             session.environment,
             thermodynamics,
             scratch_buffers=condensation_view.scratch_buffers,
+            species_binding=condensation_binding,
         ),
         duration,
     )
@@ -574,7 +631,10 @@ def _request(
             registry,
             wall_loss_view,
             runtime.wall_loss.NeutralWallLossConfig(
-                "spherical", 1.0, chamber_radius=1.0
+                "spherical",
+                1.0,
+                chamber_radius=1.0,
+                distribution_type="particle_resolved",
             ),
             duration,
             enabled_box_indices=(0, 1, 2),
@@ -597,6 +657,7 @@ def _request(
             ),
             duration,
             runtime.nucleation.NucleationExhaustionControls(False, False),
+            species_binding=nucleation_binding,
         ),
         diagnostics,
         runtime.state_updates.ResidentEnvironmentUpdateRequest(
@@ -636,6 +697,9 @@ def run_example(device: str = "cpu") -> ExampleRun:
     Device arrays and diagnostic buffers remain caller-owned.  This example
     synchronizes only to observe diagnostics; setup, ordinary dispatch, and
     restart do not hide transfers or host inspection.
+    Gas is prescribed each step and wall loss can remove particles. The
+    residual uses zero ledgers and therefore reports net inventory change;
+    it is not a closed-system conservation assertion.
     """
     if not _warp_enabled():
         return ExampleRun(output=_disabled_output())
@@ -663,9 +727,9 @@ def run_example(device: str = "cpu") -> ExampleRun:
             "availability resolution returned a different request."
         )
     particles, gas, environment = _build_cpu_state()
-    initial_total_mass = particles.volume[:, None] * (
+    initial_total_mass = (
         np.sum(particles.masses * particles.concentration[:, :, None], axis=1)
-        + gas.concentration
+        + gas.concentration * particles.volume[:, None]
     )
     if not np.any(initial_total_mass > 0.0):
         raise RuntimeError(
@@ -723,15 +787,13 @@ def run_example(device: str = "cpu") -> ExampleRun:
             1.0,
             checkpoint.gas,
             checkpoint.environment,
-            checkpoint.particles.volume[:, None]
-            * (
-                np.sum(
-                    checkpoint.particles.masses
-                    * checkpoint.particles.concentration[:, :, None],
-                    axis=1,
-                )
-                + checkpoint.gas.concentration
-            ),
+            np.sum(
+                checkpoint.particles.masses
+                * checkpoint.particles.concentration[:, :, None],
+                axis=1,
+            )
+            + checkpoint.gas.concentration
+            * checkpoint.particles.volume[:, None],
         )
         runtime.warp.synchronize_device(
             restarted_session.particles.masses.device

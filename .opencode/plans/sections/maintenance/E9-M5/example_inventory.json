@@ -639,15 +639,15 @@
       "source": "docs/Examples/Nucleation/gpu_direct_nucleation.py",
       "notebook": null,
       "phase": "P5",
-      "disposition": "migrated native; P5 aggregate gate pending",
+      "disposition": "migrated native; P5 validated",
       "legacy_patterns": [],
       "regression": "examples_tests/gpu_direct_nucleation_example_test.py",
       "scientific_expectation": "Native resolved counts with explicit nucleation map; one- and two-m3 regression cases independently conserve particle mass times counts plus gas density times volume.",
       "execution": "passed on Warp CPU, 2026-11-11",
       "evidence": [
-        "Standalone published source executed successfully.",
-        "Five migrated P5 example suites: 61 passed in 11.92s; scoped Ruff and formatting passed.",
-        "Warp 1.11.1; no CUDA-capable device on this host."
+        "P5 combined example/conversion/export gate: 265 passed, 2 optional CUDA skips in 29.46s, 2026-11-11.",
+        "Scoped Ruff check/format, git diff --check and strict MkDocs passed.",
+        "Warp 1.11.1 CPU; native CUDA unavailable; no fallback or performance claim."
       ]
     },
     {
@@ -902,93 +902,105 @@
       "source": "docs/Examples/gpu_coagulation_direct.py",
       "notebook": null,
       "phase": "P5",
-      "disposition": "migrated native; P5 aggregate gate pending",
+      "disposition": "migrated native; P5 validated",
       "legacy_patterns": [],
       "regression": "examples_tests/gpu_coagulation_direct_example_test.py",
       "scientific_expectation": "Six unit-count active particles, two deliberately inactive noncanonical slots; extensive mass conserved across two selected Brownian dispatches; persistent RNG and sidecar identity retained.",
       "execution": "passed on Warp CPU, 2026-11-11",
       "evidence": [
-        "Standalone published source executed successfully.",
-        "Five migrated P5 example suites: 61 passed in 11.92s; scoped Ruff and formatting passed.",
-        "Warp 1.11.1; no CUDA-capable device on this host."
+        "P5 combined example/conversion/export gate: 265 passed, 2 optional CUDA skips in 29.46s, 2026-11-11.",
+        "Scoped Ruff check/format, git diff --check and strict MkDocs passed.",
+        "Warp 1.11.1 CPU; native CUDA unavailable; no fallback or performance claim."
       ]
     },
     {
       "source": "docs/Examples/gpu_complete_process_sequence.py",
       "notebook": null,
       "phase": "P5",
-      "disposition": "migrated native; P5 aggregate gate pending",
+      "disposition": "migrated native; P5 validated",
       "legacy_patterns": [],
       "regression": "examples_tests/gpu_complete_process_sequence_example_test.py",
       "scientific_expectation": "Five original process calls retained. Former unsupported unequal 2/5 counts corrected to equal 2/2. Stagewise species inventory conserved for condensation/coagulation/zero-time nucleation; dilution exp(-0.02), wall removal bounded; explicit maps and one final restore.",
       "execution": "passed on Warp CPU, 2026-11-11",
       "evidence": [
-        "Standalone published source executed successfully.",
-        "Five migrated P5 example suites: 61 passed in 11.92s; scoped Ruff and formatting passed.",
-        "Warp 1.11.1; no CUDA-capable device on this host."
+        "P5 combined example/conversion/export gate: 265 passed, 2 optional CUDA skips in 29.46s, 2026-11-11.",
+        "Scoped Ruff check/format, git diff --check and strict MkDocs passed.",
+        "Warp 1.11.1 CPU; native CUDA unavailable; no fallback or performance claim."
       ]
     },
     {
       "source": "docs/Examples/gpu_condensation_parity_walkthrough.py",
       "notebook": null,
       "phase": "P5",
-      "disposition": "pending audit",
+      "disposition": "migrated native; P5 validated",
       "legacy_patterns": [],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
-      "evidence": []
+      "regression": "examples_tests/gpu_condensation_parity_walkthrough_test.py",
+      "scientific_expectation": "Independent four-substep oracle retains number-density physics with native counts=template density*volume. Extensive signed energy weights raw counts; one- and three-times volume tests preserve per-particle/gas outcomes and scale energy.",
+      "execution": "passed standalone Warp CPU, 2026-11-11",
+      "evidence": [
+        "P5 combined example/conversion/export gate: 265 passed, 2 optional CUDA skips in 29.46s, 2026-11-11.",
+        "Scoped Ruff check/format, git diff --check and strict MkDocs passed.",
+        "Warp 1.11.1 CPU; native CUDA unavailable; no fallback or performance claim."
+      ]
     },
     {
       "source": "docs/Examples/gpu_direct_kernels_quick_start.py",
       "notebook": null,
       "phase": "P5",
-      "disposition": "migrated native; P5 aggregate gate pending",
+      "disposition": "migrated native; P5 validated",
       "legacy_patterns": [],
       "regression": "examples_tests/gpu_direct_kernels_example_test.py",
       "scientific_expectation": "Original number density preserved as count=density*volume; explicit same-carrier species binding reused; final-call energy is count-weighted extensive J and gas coupling uses counts/volume.",
       "execution": "passed on Warp CPU, 2026-11-11",
       "evidence": [
-        "Standalone published source executed successfully.",
-        "Five migrated P5 example suites: 61 passed in 11.92s; scoped Ruff and formatting passed.",
-        "Warp 1.11.1; no CUDA-capable device on this host."
+        "P5 combined example/conversion/export gate: 265 passed, 2 optional CUDA skips in 29.46s, 2026-11-11.",
+        "Scoped Ruff check/format, git diff --check and strict MkDocs passed.",
+        "Warp 1.11.1 CPU; native CUDA unavailable; no fallback or performance claim."
       ]
     },
     {
       "source": "docs/Examples/gpu_resident_graph_capture.py",
       "notebook": null,
       "phase": "P5",
-      "disposition": "pending audit",
+      "disposition": "migrated native; P5 validated",
       "legacy_patterns": [],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
-      "evidence": []
+      "regression": "examples_tests/gpu_resident_graph_capture_docs_test.py",
+      "scientific_expectation": "Shares migrated native resident fixture and mappings; count-weighted particle mass plus volume-weighted gas baseline. Capture remains native-CUDA-only; unavailable path performs no setup/upload/fallback. Native capture not executed on this host.",
+      "execution": "unavailable native CUDA; standalone no-work path passed, optional capture test skipped",
+      "evidence": [
+        "P5 combined example/conversion/export gate: 265 passed, 2 optional CUDA skips in 29.46s, 2026-11-11.",
+        "Scoped Ruff check/format, git diff --check and strict MkDocs passed.",
+        "Warp 1.11.1 CPU; native CUDA unavailable; no fallback or performance claim."
+      ]
     },
     {
       "source": "docs/Examples/gpu_resident_multi_timestep.py",
       "notebook": null,
       "phase": "P5",
-      "disposition": "pending audit",
+      "disposition": "migrated native; P5 validated",
       "legacy_patterns": [],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
-      "evidence": []
+      "regression": "examples_tests/gpu_resident_multi_timestep_docs_test.py",
+      "scientific_expectation": "Native equal-count resolved boxes retain total number densities; explicit fresh condensation/nucleation bindings after source setup and restart. Mapped diagnostics independently match extensive inventory and open-system net change; resolved stochastic wall survival replaces untagged density decay.",
+      "execution": "passed standalone Warp CPU, 2026-11-11",
+      "evidence": [
+        "P5 combined example/conversion/export gate: 265 passed, 2 optional CUDA skips in 29.46s, 2026-11-11.",
+        "Scoped Ruff check/format, git diff --check and strict MkDocs passed.",
+        "Warp 1.11.1 CPU; native CUDA unavailable; no fallback or performance claim."
+      ]
     },
     {
       "source": "docs/Examples/gpu_resident_session.py",
       "notebook": null,
       "phase": "P5",
-      "disposition": "migrated native; P5 aggregate gate pending",
+      "disposition": "migrated native; P5 validated",
       "legacy_patterns": [],
       "regression": "examples_tests/gpu_resident_session_example_test.py",
       "scientific_expectation": "One resolved particle in 1e-6 m3 survives explicit same-device checkpoint/restart with metadata and raw count unchanged; zero-duration lifecycle only, schema-v5 wording corrected.",
       "execution": "passed on Warp CPU, 2026-11-11",
       "evidence": [
-        "Standalone published source executed successfully.",
-        "Five migrated P5 example suites: 61 passed in 11.92s; scoped Ruff and formatting passed.",
-        "Warp 1.11.1; no CUDA-capable device on this host."
+        "P5 combined example/conversion/export gate: 265 passed, 2 optional CUDA skips in 29.46s, 2026-11-11.",
+        "Scoped Ruff check/format, git diff --check and strict MkDocs passed.",
+        "Warp 1.11.1 CPU; native CUDA unavailable; no fallback or performance claim."
       ]
     }
   ],

@@ -92,7 +92,8 @@ class ParityFixture:
 
     Particle mass arrays use ``(box, particle, species)`` and gas arrays use
     ``(box, species)``.  Species order is shared by masses, gas names, and all
-    species sidecars.
+    species sidecars. ``concentration`` is a number-density template in m⁻³;
+    builders multiply it by represented volume to store native resolved counts.
     """
 
     temperature: np.ndarray
@@ -316,10 +317,11 @@ def _particle_data(fixture: ParityFixture) -> ParticleData:
     """Build non-aliasing particle data with species-aligned mass columns."""
     return ParticleData(
         masses=fixture.masses.copy(),
-        concentration=fixture.concentration.copy(),
+        concentration=fixture.concentration * fixture.volume[:, None],
         charge=fixture.charge.copy(),
         density=fixture.density.copy(),
         volume=fixture.volume.copy(),
+        distribution_type="particle_resolved",
     )
 
 
@@ -356,6 +358,7 @@ def _copy_oracle_input(source: OracleInput) -> OracleInput:
             charge=source.particles.charge.copy(),
             density=source.particles.density.copy(),
             volume=source.particles.volume.copy(),
+            distribution_type=source.particles.distribution_type,
         ),
         gas=GasData(
             name=list(source.gas.name),
@@ -484,6 +487,7 @@ def _finalize_transfer(state: OracleInput, proposal: np.ndarray) -> np.ndarray:
                 weighted = (
                     bounded[box, particle, species]
                     * state.particles.concentration[box, particle]
+                    / state.particles.volume[box]
                 )
                 if weighted > 0.0:
                     demand += weighted
@@ -536,12 +540,16 @@ def run_oracle(source: OracleInput | None = None) -> OracleResult:
             )
         )
         state.particles.masses += applied
-        state.gas.concentration -= np.sum(
-            applied * state.particles.concentration[:, :, None], axis=1
+        state.gas.concentration -= (
+            np.sum(applied * state.particles.concentration[:, :, None], axis=1)
+            / state.particles.volume[:, None]
         )
         np.maximum(state.gas.concentration, 0.0, out=state.gas.concentration)
         total += applied
-    energy = np.sum(total, axis=1) * state.fixture.latent_heat[None, :]
+    energy = (
+        np.sum(total * state.particles.concentration[:, :, None], axis=1)
+        * state.fixture.latent_heat[None, :]
+    )
     return OracleResult(
         masses=state.particles.masses.copy(),
         gas_concentration=state.gas.concentration.copy(),
@@ -643,7 +651,12 @@ def evaluate_acceptance(
 
     def evaluate_energy() -> None:
         expected_energy = (
-            np.sum(observed_total_mass_transfer, axis=1)
+            np.sum(
+                observed_total_mass_transfer
+                * fixture.concentration[:, :, None]
+                * fixture.volume[:, None, None],
+                axis=1,
+            )
             * fixture.latent_heat[None, :]
         )
         np.testing.assert_allclose(
@@ -690,6 +703,21 @@ def _load_gpu_runtime() -> tuple[Any, Any, Any, Any]:
     )
 
 
+def _prepare_species_binding(particles: Any, gas: Any, names: list[str]) -> Any:
+    """Explicitly upload the two material-lane mappings after state transfer."""
+    from particula.dynamics.condensation.species_mapping import (
+        CondensationSpeciesMap,
+    )
+    from particula.gpu.species_mapping import prepare_condensation_species_map
+
+    return prepare_condensation_species_map(
+        particles,
+        gas,
+        gas_names=names,
+        species_map=CondensationSpeciesMap(tuple(names), ((0, 0), (1, 1))),
+    )
+
+
 def run_example(device: str = "cpu") -> ExampleRun:
     """Complete the oracle then optionally execute and synchronize Warp state.
 
@@ -730,6 +758,7 @@ def run_example(device: str = "cpu") -> ExampleRun:
     gas = to_warp_gas_data(
         source.gas, device=device, vapor_pressure=source.vapor_pressure
     )
+    species_binding = _prepare_species_binding(particles, gas, names)
     transfer_shape, box_shape, gas_shape = (2, 2, 2), (2,), (2, 2)
     scratch = scratch_type(
         work_mass_transfer=wp.zeros(
@@ -776,6 +805,7 @@ def run_example(device: str = "cpu") -> ExampleRun:
             wp, fixture.diffusion_coefficient_vapor, wp.float64, device
         ),
         thermodynamics=thermodynamics,
+        species_binding=species_binding,
         scratch_buffers=scratch,
         latent_heat=_warp_array(wp, fixture.latent_heat, wp.float64, device),
         energy_transfer=energy,
