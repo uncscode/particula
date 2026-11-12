@@ -444,3 +444,34 @@ quick-start edits and foundations edits both exit 0 (logs
 `/tmp/m5-p6-quickstarts-mkdocs.log` and
 `/tmp/m5-p6-foundations-mkdocs.log`). P6 remains In Progress, P7 and final gates
 remain outstanding, and no PR has been opened.
+
+### P6 wall-loss and coagulation guide checkpoint (2026-11-11)
+
+Migrated both process guides' executable CPU snippets to explicit native
+ParticleData and Aerosol construction. The previously undefined pipeline
+fixtures now use a documented truncated 50–500 nm, 64-bin PMF, 100 nm mode,
+GSD 1.5 and 1e8 m⁻³. The original elapsed pipeline durations are retained,
+with 0.25-second substeps. This newly specified fixture is illustrative,
+not a convergence or calibrated-atmosphere claim. Initial attempts to use
+default broad bins or a narrower GSD failed native positivity checks in tiny
+tails; no production clipping or timestep-policy change was introduced.
+The separate quick starts retain their original default two-mode PMF; wall
+loss's original 10 seconds now uses 40 equal steps to satisfy native positivity.
+
+Added full species/physics configuration for the condensation compositions,
+separate resolved-count samples instead of accidentally feeding PMF state to
+resolved coagulation, matching distribution kinds in the combined factory,
+and required DNS factory unit arguments. Corrected prose that promised
+clipping or still described resident integration as future M4 work.
+All 11 wall-loss and 21 coagulation Python fences execute in their documented
+shared context, including optional GPU declarations. Six focused regressions
+verify exact snippets, native pipeline outcomes, finite-step analytical wall
+loss decay and number loss with unchanged PMF bin masses. Existing PMF method
+limitations remain explicit; no exact coagulation inventory claim was added.
+
+Validation: `pytest examples_tests/native_process_guides_test.py -q --no-cov`
+reports **6 passed in 3.87s**; scoped Ruff check/format and git diff --check pass.
+Strict MkDocs exits 0 (`/tmp/m5-p6-process-guides-mkdocs.log`). Inventory now
+records completed quick-start and migration-page snippet work, these two guides,
+and the still-partial foundations-page audit. P6 remains in progress; remaining
+process/API/theory/navigation audits, P7 and final gates are not complete.
