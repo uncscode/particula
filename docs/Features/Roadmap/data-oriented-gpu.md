@@ -86,7 +86,7 @@ and the time-integration decisions in
 [Time-Scale Stiffness](#time-scale-stiffness). New particle formation is both
 a target process and a size-range driver. E6-F7 ships a bounded CPU-only,
 single-box nucleation process. E9-M4 adds native held-state execution to its
-public runnable; the compatibility adapter remains until M6. This CPU runnable
+public runnable; M6 removes its compatibility adapter. This CPU runnable
 is not a GPU path. E6-F8 ships package-exported direct-Warp
 `nucleation_step_gpu`; its callers own explicit transfer, sidecars, and
 synchronization. [Epic F](#epic-f-gpu-process-completeness) closed with E6-F9's
@@ -123,11 +123,10 @@ The core data-oriented model is implemented.
   partitioning flags with explicit box dimensions.
 - Native `Aerosol` holds particle, full-order gas and environment containers
   by identity. Validated replacement and process-owned physics/species maps
-  define the supported construction path; legacy bridges are compatibility
-  boundaries, not the native tutorial entrypoint.
-- Condensation and coagulation strategies accept the new data containers in
-  addition to legacy facades, but that compatibility is a container-boundary
-  statement and not proof of shipped CPU multi-box execution across every box.
+  define the supported construction path. Legacy facade bridges are removed.
+- Condensation and coagulation strategies use native data containers. Their
+  batched storage does not broaden CPU execution beyond the supported
+  single-box process boundary.
 - Migration documentation exists in
   [ParticleData and GasData Migration](../particle-data-migration/index.md).
 
@@ -143,9 +142,11 @@ The E9 v0.3.0 migration removes the compatibility facades. In the current
 development tree, `ParticleRepresentation`, `GasSpecies`, `Atmosphere`, their
 obsolete builders/factories, and facade conversion bridges have been removed.
 Use explicit native initialization and coordinated replacement when layouts
-change. Remaining GPU compatibility removal and final readiness validation
-belong to E9-M6. The historical 0.2.x compatibility policy is not the current
-API contract.
+change. GPU execution, transfers and resident lifecycle require explicit
+supported population metadata; untagged v5 checkpoints reject before setup.
+Final readiness validation and review belong to E9-M6; see the
+[native migration closeout](data-native-v030-closeout.md). The historical 0.2.x
+compatibility policy is not the current API contract.
 
 Data-model support and remaining boundaries:
 
@@ -331,19 +332,16 @@ the established container ownership, shape, and fp64 contracts. This supersedes
 the previous v1.0 facade-removal target. Epic I remains pending until after
 this migration. Neither version is released by this documentation update.
 
-### Post-E2 Data-Oriented Work
+### Native migration follow-through
 
-- Finish reducing dependence on legacy facade objects in new examples and
-  documentation.
-- Retain `ParticleRepresentation` and `GasSpecies` through 0.2.13 and remove
-  them in the 0.3.0 migration.
-- Keep strategy APIs consistent when accepting either legacy facades or data
-  containers.
-- Expand examples that start directly from `ParticleData` and `GasData` instead
-  of converting from legacy objects.
-- Expand implementation-facing examples and migration notes that point back to
-  the canonical shape-conventions section for single-box, multi-box, binned,
-  and particle-resolved simulations.
+- Validate the M6 removal against the full native scientific and installed-wheel
+  suites, retaining explicit CPU-Warp transfer and ownership contracts.
+- Keep supported examples on native constructors and process-owned physics/maps.
+- Document historical facade names only as migration references or intentional
+  removed-boundary tests, never as runnable current API instructions.
+- Keep single-box CPU execution, batched storage, and direct/resident GPU
+  capabilities distinct in examples and migration guidance.
+- Complete M6 evidence and maintainer review before release publication.
 
 #### Current container schema inventory
 
