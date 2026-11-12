@@ -39,7 +39,7 @@
 
 # %%
 # Install particula if needed (uncomment for Colab)
-# # !pip install particula --quiet
+# Use the selected E9 checkout: `python -m pip install -e ".[extra]"`
 
 import matplotlib.pyplot as plt
 import numpy as np

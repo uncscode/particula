@@ -673,3 +673,30 @@ git diff --check and strict MkDocs pass
 (`/tmp/m5-p6-foundations-snippets-mkdocs.log`). CUDA initialization reported no
 CUDA-capable device; all required work here used explicit Warp CPU, with no
 capture/performance claim. P6, P7 and final full gates remain outstanding.
+
+### P6 final native boundary and navigation checkpoint (2026-11-11)
+
+Reconciled independent particle-material and full-gas widths against native
+condensation source, including mapped count-weighted energy and full-gas
+scratch. Native exhaustion guidance distinguishes representative volume scaling
+from physical volume change. The focused native-condensation/CPU+GPU exhaustion
+suite passed **252 tests, 136 skipped in 1.02s** (CUDA unavailable and opt-in
+benchmark skips), logged at `/tmp/m5-p6-native-shapes-tests.log`. The previous
+process handle was no longer available after context restoration; this fresh
+terminal result is the evidence, not an inferred success from that handle.
+
+Final exact-snippet/native-access/quick-start/raw-rate-autodiff assertions:
+**51 passed, 1 optional CUDA skip in 12.97s**, logged at
+`/tmp/m5-p6-final-snippets.log`. The roadmap Tape teaching snippet uses explicit
+Warp CPU and independently checks [5,7,9]; undefined gradcheck and wall-loss
+recipe sketches are text, without promoting them to working aerosol APIs.
+Historical roadmap measurement and future differentiation claims remain bounded.
+
+Updated installation prose in 31 source/notebook pairs to the selected E9
+checkout. Every code-cell AST matched before preserving executed outputs;
+there was no calculation or workload change. Ruff check and format-check of
+all 60 example/test targets passed. Source links now point to GitHub because
+MkDocs excludes Python example files; repaired two stale anchors. API generator
+inputs still discover native modules directly from the package; no symbol
+rename or generator change is needed. Full publication build is being checked
+separately from the required fast strict build; final outcomes belong to P7.

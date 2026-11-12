@@ -45,7 +45,7 @@
 # %%
 # 🚧 Install Particula if you're running this in Google Colab
 # Remove the comment below to enable installation
-# # !pip install particula[extra] --quiet
+# Use the selected E9 checkout: `python -m pip install -e ".[extra]"`
 
 # 📦 Import necessary libraries
 import copy  # to safely duplicate Python objects

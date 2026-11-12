@@ -198,7 +198,7 @@ and [access and replacement](Features/particle-data-migration/containers.md).
   The step has no hidden transfer, CPU fallback, resize/compaction, GPU
   `Runnable`, scheduler/backend integration, or performance guarantee. See the
   [nucleation contract](Features/nucleation_strategy_system.md#direct-warp-low-level-step)
-  and [direct-Warp example](Examples/Nucleation/gpu_direct_nucleation.py).
+  and [direct-Warp example](https://github.com/uncscode/particula/blob/main/docs/Examples/Nucleation/gpu_direct_nucleation.py).
 - GPU dilution P1–P4 is a direct, low-level operation imported with
    `from particula.gpu.kernels import dilution_step_gpu`. It applies
    `c_new = c * exp(-alpha * time_step)` in place to particle and gas
@@ -328,5 +328,5 @@ and [access and replacement](Features/particle-data-migration/containers.md).
   are Shipped by maintainer decision; measured results remain unshipped
   pending reviewed evidence. E8-F7/T7 owns profiling and machine-bounded
   recommendations; E8-F8 owns the example, runbook, limitations, and closeout.
-  See the [native-CUDA example](Examples/gpu_resident_graph_capture.py),
+  See the [native-CUDA example](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_resident_graph_capture.py),
   [operator runbook](Features/gpu_graph_capture.md), and [roadmap closeout record](Features/Roadmap/graph-capture-closeout.md).

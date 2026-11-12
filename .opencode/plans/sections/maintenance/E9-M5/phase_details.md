@@ -75,8 +75,8 @@ Notebook sync/execution occurs in the owning phase, not deferred to P7.
     native CUDA-only rows pass or cleanly skip without fallback. Existing
     unavailable profiling/performance evidence remains unavailable.
 
-- [ ] **E9-M5-P6: Publish native API migration and advanced replacement guidance with executable fixtures**
-  - Issue: TBD | Size: S | Status: In Progress
+- [x] **E9-M5-P6: Publish native API migration and advanced replacement guidance with executable fixtures**
+  - Issue: TBD | Size: S | Status: Implemented and validated
   - Work: Rewrite particle-data-migration coexistence guidance for final native
     workflows, update affected API-reference inputs and topic links. Provide
     advanced field/derived access, individual and coordinated container
@@ -90,7 +90,7 @@ Notebook sync/execution occurs in the owning phase, not deferred to P7.
     passes; no native capabilities invented to make documentation convenient.
 
 - [ ] **E9-M5-P7: Update development documentation**
-  - Issue: TBD | Size: XS | Status: Not Started
+  - Issue: TBD | Size: XS | Status: In Progress
   - Work: Publish contributor example/pair maintenance guidance, close the
     inventory and legacy-history allowlist, and prepare the M6 handoff record.
   - Tests: Final integration audit of all supported entrypoints, snippets and

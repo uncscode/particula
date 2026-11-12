@@ -173,3 +173,20 @@ def test_warp_theory_native_environment_round_trip():
     np.testing.assert_array_equal(
         result.saturation_ratio, [[0.95, 1.05, 0.75], [0.8, 0.9, 1.1]]
     )
+
+
+def test_warp_roadmap_toy_gradient(tmp_path):
+    """The teaching Tape example differentiates its quadratic on Warp CPU."""
+    import runpy
+
+    import pytest
+
+    pytest.importorskip("warp")
+    page = ROOT / "docs/Features/Roadmap/warp-autodiff-limitations.md"
+    blocks = re.findall(r"```python\n(.*?)\n```", page.read_text(), re.DOTALL)
+    source = tmp_path / "warp_tape_example.py"
+    source.write_text(blocks[0])
+    namespace = runpy.run_path(str(source))
+    assert namespace["x"].device.is_cpu
+    np.testing.assert_allclose(namespace["gradient"], [5.0, 7.0, 9.0])
+    np.testing.assert_array_equal(namespace["x"].grad.numpy(), [0, 0, 0])

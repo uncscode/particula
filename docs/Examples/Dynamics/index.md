@@ -51,10 +51,10 @@ Charged coagulation tutorials are Jupytext-paired (`.py:percent` ⇄ `.ipynb`).
 Edit the `.py`, then sync and execute to refresh outputs for the site.
 
 - [Coagulation with Charge (functional)](Coagulation/Charge/Coagulation_with_Charge_functional.ipynb)
-  – Edit [the paired `.py`](Coagulation/Charge/Coagulation_with_Charge_functional.py);
+  – Edit [the paired `.py`](https://github.com/uncscode/particula/blob/main/docs/Examples/Dynamics/Coagulation/Charge/Coagulation_with_Charge_functional.py);
     executed outputs are present in the notebook.
 - [Coagulation with Charge (objects)](Coagulation/Charge/Coagulation_with_Charge_objects.ipynb)
-  – Edit [the paired `.py`](Coagulation/Charge/Coagulation_with_Charge_objects.py);
+  – Edit [the paired `.py`](https://github.com/uncscode/particula/blob/main/docs/Examples/Dynamics/Coagulation/Charge/Coagulation_with_Charge_objects.py);
     executed outputs are present in the notebook.
 
 ## Customization

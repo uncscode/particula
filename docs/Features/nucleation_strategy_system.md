@@ -89,7 +89,7 @@ source = NucleationSourceConfig(
 
 ## Getting started
 
-Use the [supported CPU example](../Examples/Nucleation/cpu_nucleation.py) as
+Use the [supported CPU example](https://github.com/uncscode/particula/blob/main/docs/Examples/Nucleation/cpu_nucleation.py) as
 the runnable starting point in the selected E9 checkout (`pip install -e .`).
 It constructs native `Aerosol`, unified `GasData` with precursor and inert lanes,
 fixed resolved particle capacity, aligned `EnvironmentData`, and
@@ -154,7 +154,7 @@ Kerminen--Kulmala calculation.
 
 See [Fixed-Capacity Slot Exhaustion Primitives](slot_exhaustion_policies.md),
 the [equations](../Theory/Technical/Dynamics/Nucleation_Equations.md), and the
-[supported CPU example](../Examples/Nucleation/cpu_nucleation.py).
+[supported CPU example](https://github.com/uncscode/particula/blob/main/docs/Examples/Nucleation/cpu_nucleation.py).
 
 ## Direct-Warp low-level step
 
@@ -212,7 +212,7 @@ orchestration, expanded physics, graph capture, autodiff, and performance
 guarantees. E6-F5 fixed-slot activation, E6-F6 exhaustion primitives, and E6-F7
 CPU nucleation are dependencies; E6-F9 is only a downstream explicit-transfer
 integration consumer. See the [equations](../Theory/Technical/Dynamics/Nucleation_Equations.md),
-[direct example](../Examples/Nucleation/gpu_direct_nucleation.py), and
+[direct example](https://github.com/uncscode/particula/blob/main/docs/Examples/Nucleation/gpu_direct_nucleation.py), and
 [GPU roadmap](Roadmap/data-oriented-gpu.md).
 
 Focused validation:

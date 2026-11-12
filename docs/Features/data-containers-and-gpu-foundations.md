@@ -18,7 +18,7 @@ python docs/Examples/data_containers_and_gpu_foundations.py
 ```
 
 For the low-level direct-kernel path, use the canonical quick-start at
-[`docs/Examples/gpu_direct_kernels_quick_start.py`](../Examples/gpu_direct_kernels_quick_start.py).
+[`docs/Examples/gpu_direct_kernels_quick_start.py`](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_direct_kernels_quick_start.py).
 That example keeps direct step imports explicit through `particula.gpu.kernels`
 while top-level `particula.gpu` stays focused on `WARP_AVAILABLE` and the
 `to_warp_*` / `from_warp_*` transfer helpers.
@@ -397,7 +397,7 @@ completed earlier substeps remain committed and documented vapor-pressure/work
 sidecars may already be written. Callers needing retry semantics must use their
 own snapshot/restore.
 
-The [direct-kernel quick start](../Examples/gpu_direct_kernels_quick_start.py)
+The [direct-kernel quick start](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_direct_kernels_quick_start.py)
 is the supported explicit-transfer path. It is separate from the bounded
 [GPU-resident session example](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_resident_session.py), which
 documents lifecycle ownership rather than process execution.
@@ -658,7 +658,7 @@ documented in [GPU resident checkpoints](gpu_resident_checkpoints.md).
 ### E7-F9 resident support validation matrix (2026-08-11)
 
 The supported resident example is the repository-relative
-[multi-timestep resident source](../Examples/gpu_resident_multi_timestep.py).
+[multi-timestep resident source](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_resident_multi_timestep.py).
 This closeout is scoped to [issue #1451](https://github.com/Gorkowski/particula/issues/1451).
 
 **Status: closeout validation pending.** The historical four-module evidence
@@ -1197,7 +1197,7 @@ trajectory replay.
 
 These direct wall-loss checks do not by themselves establish orchestration,
 capture, autodiff or performance evidence. Native resident integration has its
-own [walkthrough](../Examples/gpu_resident_multi_timestep.py), and direct GPU
+own [walkthrough](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_resident_multi_timestep.py), and direct GPU
 nucleation has its own [source contract](nucleation_strategy_system.md#direct-warp-low-level-step).
 The CPU-only, one-box `Nucleation` runnable remains a separate high-level path.
 
@@ -1502,12 +1502,15 @@ all non-water species use unit activity. Static tension uses the current
 species' supplied value, while composition-weighted tension computes one
 particle-wide value from the per-species tensions.
 
-`kappas` and `molar_mass_reference` must be same-device `wp.float64` arrays of
-shape `(n_species,)`. Kappas must be finite and nonnegative, and ordered molar
-masses must exactly match `gas.molar_mass`; this preserves the positional
-ordered-molar-mass compatibility contract. The frozen dataclass prevents field
-rebinding, not mutation of its arrays. Callers retain those arrays and must not
-mutate them concurrently with a launch.
+For native calls, let `Sp` be particle-material width and `Sg` full gas width.
+`kappas` and `molar_mass_reference` are same-device `wp.float64` arrays shaped
+`(Sp,)`. The water selector addresses a particle-material lane. Kappas are
+finite and nonnegative; reference molar masses are finite and positive.
+Every mapped particle reference must exactly equal its corresponding gas
+molar mass through the explicit species map; unmapped particle references
+remain particle-order data. Only the legacy equal-width path uses positional
+whole-array equality with `gas.molar_mass`. The frozen dataclass prevents
+rebinding, not array mutation; callers must not mutate storage during launch.
 
 Successful direct calls mutate particle masses and gas concentration in place,
 overwrite the derived GPU-only vapor-pressure buffer, and return the accumulated
@@ -1535,24 +1538,26 @@ strategies are not silently copied or approximated; passing
 
 `CondensationScratchBuffers` is a concrete-module-only optional sidecar at
 `particula.gpu.kernels.condensation`; it is not another step entry point.
-Particle mass, transfer, and scratch transfer arrays are active-device
-`wp.float64` with shape `(n_boxes, n_particles, n_species)`; gas concentration
-and energy arrays are active-device `wp.float64` with shape
-`(n_boxes, n_species)`; scratch property arrays are active-device `wp.float64`
-with shape `(n_boxes,)`; and latent heat and thermal work arrays are
-active-device `wp.float64` with shape `(n_species,)`. Supplied
-transfer fields must be active-device, stable-shape `wp.float64` arrays with
-shape `(n_boxes, n_particles, n_species)`, and supplied property fields must be
-active-device, stable-shape `wp.float64` arrays with shape `(n_boxes,)`.
-The P2 demand, release, and scale sidecars must likewise be caller-owned,
-active-device, stable-shape `wp.float64` arrays with shape
-`(n_boxes, n_species)`. Every supplied field is metadata-validated for its
-applicable shape, dtype, and active device before launch; each may be omitted
-independently, in which case the step allocates only that field's fallback
-storage. Supplied fields preserve identity and remain caller-owned, but
-successful calls intentionally write their mutable work/output storage. No new
-container field, sidecar API, host conversion, synchronization, or transfer is
-implied by this ownership contract.
+Native buffers use independent particle and gas widths:
+
+| Field family | Shape | Lane authority |
+| --- | --- | --- |
+| Particle mass, accumulated transfer, raw/finalized scratch transfer | `(B, N, Sp)` | Particle-material order |
+| Gas concentration, vapor pressure, energy output | `(B, Sg)` | Full gas order |
+| P2 demand, release, scale and gas accumulator | `(B, Sg)` | Full gas order |
+| Latent heat and deferred thermal work | `(Sg,)` | Full gas order |
+| Thermodynamic model codes/reference masses | `(Sg,)` | Full gas order |
+| Activity kappas/reference masses | `(Sp,)` | Particle-material order |
+| Scratch environment properties | `(B,)` | Box order |
+
+Numeric transfer/property/thermal storage is same-device `wp.float64`;
+thermodynamic model codes are `wp.int32`. `B` is box count and `N` is fixed
+particle capacity. Every supplied field is validated for its applicable shape,
+dtype and device. Independently omitted optional scratch fields use fallback
+allocations; supplied fields retain identity but mutable work/output storage is
+written on success. An explicit binding connects the two species orders; equal
+array widths alone do not establish chemical alignment. No implicit transfer,
+container replacement or automatic rebinding follows from these shapes.
 
 The direct condensation parity suite exercises all four activity/surface pairs
 (ideal/static, ideal/composition-weighted, kappa/static, and
@@ -1568,7 +1573,7 @@ direct-step contract, not a general CPU-strategy parity claim.
 ### Latent-rate correction and energy diagnostic
 
 The direct step accepts optional keyword-only caller-owned active-device
-`wp.float64` `latent_heat` with shape `(n_species,)`. For species `i`, its
+`wp.float64` `latent_heat` with shape `(Sg,)` in full gas order. For species `i`, its
 shipped latent-rate correction is
 `dm_i/dt = isothermal_rate_i / correction_i`, where
 `isothermal_rate_i = k_i * Delta_p_i * M_i / (R * T)`,
@@ -1580,10 +1585,10 @@ Here `p_surface_i` is the activity- and Kelvin-adjusted surface vapor pressure.
 An omitted sidecar, or exactly `L_i = 0`, follows the exact isothermal branch.
 
 Optional keyword-only `energy_transfer` is a caller-owned active-device
-`wp.float64`, `(n_boxes, n_species)`, write-only output. It requires valid
+`wp.float64`, `(B, Sg)`, write-only output in full gas order. It requires valid
 `latent_heat`, is overwritten only after successful preflight, and is not a
 third return value. Its signed whole-call diagnostic, shipped in issue #1272,
-is `Q[box, species] = sum_particles(count * Delta m_applied) * L[species]`
+is `Q[b,g] = sum_slots(count[b,n] * Delta m_applied[b,n,p(g)]) * L[g]`
 for native resolved storage: `Delta m`
 is applied transfer in kg, `L` is latent heat in J/kg, and `Q` is J. Thus
 condensation is positive and evaporation is negative. The strict #1272
@@ -1630,7 +1635,7 @@ than storage support.
 | Low-level GPU slot activation | Shipped fixed-capacity direct-kernel contract | `activate_slots_gpu` maps selected request prefixes to ascending free slots with caller-owned same-device sidecars; no hidden transfer, resizing, or high-level runnable is provided. |
 | Low-level GPU condensation direct-kernel path | Shipped bounded direct-kernel contract | Executes four fixed coupled substeps with active-device P2 inventory and gas coupling. This is direct-kernel evidence, not broad GPU-condensation support. |
 | Low-level GPU coagulation direct-kernel path | Direct, particle-resolved direct-kernel contract | Exact mask and rejection boundaries follow below. This path establishes no Runnable support, CPU parity, or performance claim. |
-| Resident execution and native CUDA capture | Explicit bounded lifecycle | See [resident example](../Examples/gpu_resident_multi_timestep.py) and [capture limitations](gpu_graph_capture.md); no implicit CPU fallback or measured performance claim. |
+| Resident execution and native CUDA capture | Explicit bounded lifecycle | See [resident example](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_resident_multi_timestep.py) and [capture limitations](gpu_graph_capture.md); no implicit CPU fallback or measured performance claim. |
 
 Additional shipped boundaries:
 
@@ -1702,7 +1707,7 @@ Additional shipped boundaries:
 ## Direct-kernel troubleshooting
 
 Use
-[`docs/Examples/gpu_direct_kernels_quick_start.py`](../Examples/gpu_direct_kernels_quick_start.py)
+[`docs/Examples/gpu_direct_kernels_quick_start.py`](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_direct_kernels_quick_start.py)
 as the canonical runnable reference when troubleshooting the low-level GPU
 path.
 
@@ -1797,7 +1802,7 @@ pytest particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py -q 
 This is additive to the required Warp `device="cpu"` baseline and skips
 cleanly when CUDA is unavailable.
 
-The [GPU condensation parity walkthrough](../Examples/gpu_condensation_parity_walkthrough.py)
+The [GPU condensation parity walkthrough](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_condensation_parity_walkthrough.py)
 and its [condensation parity walkthrough ownership record](Roadmap/condensation-parity-walkthrough.md)
 document bounded physics, conservation, and energy evidence only. They retain
 the fixed-four-substep low-level direct-kernel boundary: Warp CPU is the

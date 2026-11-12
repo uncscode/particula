@@ -4,7 +4,7 @@ Native resident graph capture is concrete, direct-import-only machinery in
 `particula.execution.graph_capture`; it is not a package or top-level API. The
 only eligible path is a caller-qualified, non-CPU native Warp CUDA device. CPU
 and Warp CPU are neither capture paths, capture evidence, nor fallback or
-emulation paths. The maintained [P1 walkthrough](../Examples/gpu_resident_graph_capture.py)
+emulation paths. The maintained [P1 walkthrough](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_resident_graph_capture.py)
 owns composition code; this runbook records operations rather than providing a
 second runnable recipe. Checkpoint and restart limits are defined by the
 [GPU resident checkpoint contract](gpu_resident_checkpoints.md).

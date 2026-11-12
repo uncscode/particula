@@ -47,6 +47,11 @@ most limitations below.
 
 ## Self-Contained Code Patterns
 
+These are standalone Warp teaching patterns, not native aerosol workflows.
+They do not establish differentiation through native state replacement,
+species binding, the public condensation step, or resident scheduling. Run
+kernel definitions from a Python file so Warp can inspect their source.
+
 These are the minimal Warp patterns needed to implement and validate a
 differentiable kernel. They are reproduced from the Warp 1.14 docs so no web
 access is required.
@@ -61,7 +66,7 @@ def kernel_func(x: wp.array(dtype=float), y: wp.array(dtype=float)):
     tid = wp.tid()
     y[tid] = x[tid] ** 2.0 + 3.0 * x[tid] + 1.0
 
-x = wp.array([1.0, 2.0, 3.0], dtype=float, requires_grad=True)
+x = wp.array([1.0, 2.0, 3.0], dtype=float, device="cpu", requires_grad=True)
 y = wp.zeros_like(x)
 
 tape = wp.Tape()
@@ -69,7 +74,8 @@ with tape:                                   # forward pass, recorded
     wp.launch(kernel_func, x.shape, inputs=[x], outputs=[y])
 
 tape.backward(grads={y: wp.ones_like(y)})    # reverse pass
-print(x.grad)                                # -> [5. 7. 9.]
+gradient = x.grad.numpy().copy()
+print(gradient)                              # -> [5. 7. 9.]
 
 # reuse buffers for another backward pass only after:
 tape.zero()
@@ -86,7 +92,10 @@ Notes:
 
 ### Validating gradients (parity test)
 
-```python
+Recipe sketch: supply your own kernel, dimensions and arrays. This is not
+a public aerosol-step gradient claim.
+
+```text
 import warp.autograd
 
 passed = wp.autograd.gradcheck(

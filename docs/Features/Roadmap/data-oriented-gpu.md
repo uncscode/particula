@@ -57,7 +57,7 @@ Quick links:
 - [Authoritative field ownership decisions](#authoritative-field-ownership-decisions)
 - [Shipped foundation guide](../data-containers-and-gpu-foundations.md)
 - [Runnable Data Containers example](../../Examples/Data_Containers/index.md)
-- [Native-CUDA resident graph-capture example](../../Examples/gpu_resident_graph_capture.py)
+- [Native-CUDA resident graph-capture example](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_resident_graph_capture.py)
 - [Resident graph-capture operator runbook](../gpu_graph_capture.md)
 - [Graph-capture closeout record](graph-capture-closeout.md)
 - [Final downstream handoff map for sibling features](#final-downstream-handoff-map-for-sibling-features)
@@ -85,8 +85,9 @@ decisions in
 and the time-integration decisions in
 [Time-Scale Stiffness](#time-scale-stiffness). New particle formation is both
 a target process and a size-range driver. E6-F7 ships a bounded CPU-only,
-single-box nucleation process; its public runnable adapts legacy `Aerosol`
-backing data and is not a GPU path. E6-F8 ships package-exported direct-Warp
+single-box nucleation process. E9-M4 adds native held-state execution to its
+public runnable; the compatibility adapter remains until M6. This CPU runnable
+is not a GPU path. E6-F8 ships package-exported direct-Warp
 `nucleation_step_gpu`; its callers own explicit transfer, sidecars, and
 synchronization. [Epic F](#epic-f-gpu-process-completeness) closed with E6-F9's
 integrated validation, explicit five-call illustration, documentation, and
@@ -120,7 +121,10 @@ The core data-oriented model is implemented.
   and box volumes with explicit batch dimensions.
 - `GasData` stores gas species names, molar masses, concentrations, and
   partitioning flags with explicit box dimensions.
-- Conversion helpers bridge legacy facades and new containers.
+- Native `Aerosol` holds particle, full-order gas and environment containers
+  by identity. Validated replacement and process-owned physics/species maps
+  define the supported construction path; legacy bridges are compatibility
+  boundaries, not the native tutorial entrypoint.
 - Condensation and coagulation strategies accept the new data containers in
   addition to legacy facades, but that compatibility is a container-boundary
   statement and not proof of shipped CPU multi-box execution across every box.
@@ -138,7 +142,7 @@ as the implementation walkthrough companion.
 The work is still a migration, not a full replacement. `ParticleRepresentation`
 and `GasSpecies` remain available for compatibility.
 
-Known data-model gaps:
+Data-model support and remaining boundaries:
 
 - `EnvironmentData` now provides a CPU-side home for per-box thermodynamic
   state, with `temperature -> (n_boxes,)`, `pressure -> (n_boxes,)`, and
@@ -856,7 +860,7 @@ Shipped scope:
    stochastic validation uses bounded aggregate expectations such as tolerance
    bands or `3-sigma` behavior rather than exact per-seed equality.
 7. The shipped canonical direct-kernel quick-start is
-   [`docs/Examples/gpu_direct_kernels_quick_start.py`](../../Examples/gpu_direct_kernels_quick_start.py).
+   [`docs/Examples/gpu_direct_kernels_quick_start.py`](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_direct_kernels_quick_start.py).
    It demonstrates the supported `ParticleData`/`GasData` path, explicit
    `to_warp_*` and `from_warp_*` transfer helpers, the `WARP_AVAILABLE`
    guard, and deferred `particula.gpu.kernels` imports so the CPU↔Warp
@@ -1099,7 +1103,7 @@ shipped, and Epic H is active.
 
 E5-F7 owns the [GPU coagulation validation record](coagulation-validation.md),
 E5-F8 owns the [condensation parity walkthrough ownership record](condensation-parity-walkthrough.md),
-and the [GPU condensation parity walkthrough](../../Examples/gpu_condensation_parity_walkthrough.py)
+and the [GPU condensation parity walkthrough](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_condensation_parity_walkthrough.py)
 is runnable source.
 
 Extend GPU coagulation beyond the Brownian kernel to the collision
@@ -1275,7 +1279,7 @@ that nucleation and graph capture depend on.
 
 The private
 [P2 sequence evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py)
-and [P3 published source](../../Examples/gpu_complete_process_sequence.py) cover
+and [P3 published source](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py) cover
 the fixed illustrative order: `condensation_step_gpu`,
 `coagulation_step_gpu`, `dilution_step_gpu`, `wall_loss_step_gpu`, then
 `nucleation_step_gpu`. This is illustrative, not a production coordinator;
@@ -1309,7 +1313,7 @@ Delivered bounded wall-loss P1–P6 scope:
   s. Spherical configurations require a positive radius and no dimensions;
   rectangular configurations require no radius and three positive dimensions.
 
-  ```python
+  ```text
   from particula.gpu.kernels import wall_loss_step_gpu
   from particula.gpu.kernels.wall_loss import NeutralWallLossConfig
 
@@ -1419,7 +1423,7 @@ Delivered nucleation boundaries and deferred GPU scope:
 1. E6-F7 ships bounded CPU-only, one-box nucleation/particle-source physics
    following the
    [nucleation equations](../../Theory/Technical/Dynamics/Nucleation_Equations.md).
-   Its public `Nucleation` runnable preserves legacy `Aerosol` identity and
+   Its public `Nucleation` runnable preserves native `Aerosol` identity and
    uses fixed-capacity slots, partitioning gas, and per-substep transactions.
    See the [CPU Nucleation Strategy System](../nucleation_strategy_system.md).
 2. E6-F8 ships the bounded, package-exported direct-Warp step:
@@ -1448,7 +1452,7 @@ Delivered nucleation boundaries and deferred GPU scope:
    scheduler/backend selection, expanded physics, graph capture, autodiff, and
    performance guarantees. See the [Nucleation Strategy
    System](../nucleation_strategy_system.md) and its
-   [direct example](../../Examples/Nucleation/gpu_direct_nucleation.py).
+   [direct example](https://github.com/uncscode/particula/blob/main/docs/Examples/Nucleation/gpu_direct_nucleation.py).
 3. E6-F9 shipped private sequence evidence, a direct-transfer illustration,
    documentation, and closeout. It does not own the shipped E6-F8 direct step
    or create a production coordinator.
@@ -1571,7 +1575,7 @@ direct-kernel contract. Any broader integration still follows the ordering.
   alone.
 - E7-F3 P6 has shipped bounded selected-Brownian adapter documentation and
   evidence in the [coagulation strategy guide](../coagulation_strategy_system.md)
-  and its [explicit-transfer example](../../Examples/gpu_coagulation_direct.py).
+  and its [explicit-transfer example](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_coagulation_direct.py).
    It preserves the direct-kernel contract. E7-F8's shipped resident-stream
    policy remains concrete-only and adds no public exports, fallback, or hidden
    transfer.
@@ -1717,7 +1721,7 @@ freezes small `(1, 16, 2)` and medium `(1000, 16, 2)` workloads, 100% activity,
 gas communication, replay counts 1/10/100/1000, and native-CUDA-only evidence
 with no CPU or Warp-CPU fallback. No reviewed normalized artifact or manifest
 is checked in, so profiling results and recommendations are unavailable and
-unshipped. E8-F8 owns the [native-CUDA example](../../Examples/gpu_resident_graph_capture.py),
+unshipped. E8-F8 owns the [native-CUDA example](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_resident_graph_capture.py),
 [operator runbook](../gpu_graph_capture.md), limitations, documentation
 reconciliation, and [closeout record](graph-capture-closeout.md). The closeout
 record is the sole P3 evidence authority. Its measured-evidence disposition

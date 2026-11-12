@@ -17,6 +17,20 @@ integration and broader policy orchestration remain deferred.
 For the supported one-box CPU consumer and its public construction boundary,
 see the [CPU Nucleation Strategy System](nucleation_strategy_system.md).
 
+## Native population boundary
+
+Native resampling and representative-volume scaling operate on explicitly
+tagged `particle_resolved` counts at a positive physical volume. PMF/PDF
+storage is not interchangeable with those counts. A selected scale multiplies
+existing counts, provisional source counts and volume together, preserving
+pre-existing number/mass density and gas concentration. This is distinct from
+physical volume evolution, which retains particle counts and dilutes gas.
+The native source consumer supplies explicit ordered species mapping; see
+[native source integration](native_scientific_processes.md#native-source-integration-m4).
+Legacy untagged compatibility remains separate and is not a native construction
+recipe. The two import snippets below require the selected E9 checkout, with
+Warp installed for the GPU imports.
+
 ## CPU planning contract
 
 The CPU resolver exposes planning records only:

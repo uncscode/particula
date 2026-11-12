@@ -19,7 +19,7 @@
 
 # %%
 # In Colab uncomment the following command to install particula:
-# #!pip install particula[extra] --quiet
+# Use the selected E9 checkout: `python -m pip install -e ".[extra]"`
 # Importing necessary libraries
 import matplotlib.pyplot as plt  # For creating plots and visualizations
 import numpy as np  # For numerical operations

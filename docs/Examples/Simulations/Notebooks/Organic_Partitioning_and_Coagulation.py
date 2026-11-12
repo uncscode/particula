@@ -59,7 +59,7 @@
 #     pass
 # else:
 #     # in Colab → install quietly
-#     get_ipython().system("pip install particula[extra] --quiet")
+# Use the selected E9 checkout: `python -m pip install -e ".[extra]"`
 # </details>
 
 # %%

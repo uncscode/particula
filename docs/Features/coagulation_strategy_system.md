@@ -641,7 +641,7 @@ performs no allocation, readback, synchronization, reset or host configuration
 resolution. Callers keep arrays alive and state compatible between enqueues;
 new bindings or semantics require preparation again. This is direct/prepared
 science evidence. Native resident continuation is illustrated in the
-[resident walkthrough](../Examples/gpu_resident_multi_timestep.py); it requires
+[resident walkthrough](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_resident_multi_timestep.py); it requires
 fresh exact-device containers and bindings after explicit restart.
 
 Native regression coverage uses resolved volumes 0.25/1/4 m³, common counts

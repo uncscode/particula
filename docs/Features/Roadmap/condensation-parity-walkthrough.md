@@ -5,7 +5,7 @@ from the bounded direct-condensation walkthrough.
 
 ## Supported evidence boundary
 
-The [walkthrough source](../../Examples/gpu_condensation_parity_walkthrough.py)
+The [walkthrough source](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_condensation_parity_walkthrough.py)
 compares an independent fp64, fixed-four-substep NumPy oracle with the low-level
 direct GPU kernel. Its [walkthrough regression test](https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_condensation_parity_walkthrough_test.py)
 keeps that bounded comparison executable.
@@ -14,7 +14,7 @@ Physics, conservation, and energy are separately evaluated evidence. Warp CPU
 is the supported baseline when installed; CUDA is optional, additive evidence.
 This record does not establish high-level CPU strategy parity, `Runnable`
 parity, or general CPU workflow parity. The
-[fixed-four direct-kernel evidence boundary](condensation-stiffness-study.md#p1--p4-production-hook-evidence-boundary)
+[fixed-four direct-kernel evidence boundary](condensation-stiffness-study.md#p1-p4-production-hook-evidence-boundary)
 states the related P1--P4 production-hook limit.
 
 ## Deferred capability ownership
