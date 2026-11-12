@@ -26,6 +26,20 @@ Pass `aerosol.particles`, `aerosol.gas`, and scalar values from
 `aerosol.environment` to the configured strategy:
 
 ```python
+import particula as par
+from docs.Examples.native_state_access import build_aerosol, build_condensation
+
+# Run from the selected E9 checkout; the fixture includes ordered inert gas.
+aerosol = build_aerosol()
+condensation = build_condensation(aerosol.gas).condensation_strategy
+coagulation = par.dynamics.BrownianCoagulationStrategy("particle_resolved")
+wall_loss = par.dynamics.SphericalWallLossStrategy(
+    wall_eddy_diffusivity=1e-3, chamber_radius=0.5,
+    distribution_type="particle_resolved",
+)
+time_step = 1.0
+initial_particle_mass = aerosol.particles.species_mass_inventory.copy()
+initial_gas = aerosol.gas.concentration.copy()
 temperature = float(aerosol.environment.temperature[0])
 pressure = float(aerosol.environment.pressure[0])
 
@@ -113,12 +127,13 @@ limitation, and wall-loss sinks. It keeps gas
 and environment protected across particle-only processes. The owning unit
 suites provide the wider mechanism, control, rejection and stochastic matrices.
 
-M4 owns high-level runnable composition, execution adapters, dilution/nucleation
-orchestration and resident/checkpoint schema integration. Their unsupported
-tagged-state boundaries currently reject. M5 owns broad tutorial/notebook
-migration. Temporary facades and untagged dispatch remain for those consumers;
-M6 owns deletion after downstream migration. This milestone does not authorize
-a release or establish resident/GPU performance claims.
+Native runnable composition, execution adapters, dilution/nucleation and
+resident/checkpoint integration are available under their bounded contracts.
+See the source, communication and resident sections below, the
+[migration guide](particle-data-migration/index.md), and the
+[complete direct sequence](../Examples/gpu_complete_process_sequence.py).
+Temporary facades and untagged compatibility dispatch remain until M6; these
+examples do not authorize deletion, a release, or GPU performance claims.
 
 ## Native source integration (M4)
 

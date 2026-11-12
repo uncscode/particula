@@ -147,3 +147,83 @@ def test_condensation_recipe_inventories(index):
             rtol=1e-10,
             atol=1e-20,
         )
+
+
+def test_dilution_guide_decay_and_held_state():
+    """Exact published decay scales counts and every gas lane at fixed volume."""
+    page, blocks = snippets("dilution")
+    namespace = {}
+    for block in blocks:
+        exec(compile(block, str(page), "exec"), namespace)  # noqa: S102
+    aerosol = namespace["result"]
+    assert aerosol is namespace["aerosol"]
+    assert aerosol.particles is namespace["particles"]
+    assert aerosol.gas is namespace["gas"]
+    assert aerosol.environment is namespace["environment"]
+    np.testing.assert_allclose(
+        aerosol.particles.concentration, [[4 / np.e, 8 / np.e]], rtol=1e-12
+    )
+    np.testing.assert_allclose(
+        aerosol.particles.number_density, [6 / np.e], rtol=1e-12
+    )
+    np.testing.assert_allclose(
+        aerosol.gas.concentration, [[3e-6 / np.e, 5e-6 / np.e]], rtol=1e-12
+    )
+    np.testing.assert_array_equal(aerosol.particles.volume, [2.0])
+    np.testing.assert_array_equal(
+        aerosol.particles.masses, [[[1e-18], [2e-18]]]
+    )
+    np.testing.assert_array_equal(aerosol.environment.temperature, [298.15])
+    np.testing.assert_array_equal(
+        aerosol.environment.saturation_ratio, [[1.0, 0.0]]
+    )
+
+
+def test_nucleation_guide_mapped_inventory():
+    """Published fixed-slot source conserves precursor mass and leaves inert gas."""
+    page, blocks = snippets("nucleation")
+    namespace = {}
+    for block in blocks:
+        if "particula.gpu" not in block:
+            exec(compile(block, str(page), "exec"), namespace)  # noqa: S102
+    aerosol = namespace["result"]
+    assert aerosol is namespace["aerosol"]
+    assert aerosol.particles is namespace["particles"]
+    assert aerosol.gas is namespace["gas"]
+    assert aerosol.environment is namespace["environment"]
+    particles = aerosol.particles
+    assert particles.masses.shape == (1, 3, 1)
+    assert np.any(particles.concentration > 0)
+    np.testing.assert_array_equal(particles.volume, [0.25])
+    assert 0 <= aerosol.gas.concentration[0, 0] < 1e-12
+    assert aerosol.gas.concentration[0, 1] == 2e-6
+    total = np.sum(particles.masses * particles.concentration[..., None])
+    total += aerosol.gas.concentration[0, 0] * 0.25
+    np.testing.assert_allclose(total, 2.5e-13, rtol=1e-12, atol=1e-30)
+
+
+def test_native_scientific_direct_calls():
+    """Direct native composition preserves inert gas and accounts for sinks."""
+    page = FEATURES / "native_scientific_processes.md"
+    blocks = re.findall(r"```python\n(.*?)\n```", page.read_text(), re.DOTALL)
+    namespace = {}
+    for block in blocks:
+        exec(compile(block, str(page), "exec"), namespace)  # noqa: S102
+    aerosol = namespace["aerosol"]
+    particles = aerosol.particles
+    np.testing.assert_array_equal(
+        aerosol.gas.concentration[:, 0], namespace["initial_gas"][:, 0]
+    )
+    initial = namespace["initial_particle_mass"] + (
+        namespace["initial_gas"][:, [2, 1]] * 0.25
+    )
+    final = (
+        np.sum(particles.masses * particles.concentration[..., None], axis=1)
+        + aerosol.gas.concentration[:, [2, 1]] * 0.25
+    )
+    assert np.all(final <= initial * (1 + 1e-12))
+    assert np.all(final >= 0)
+    assert 0 <= particles.number_density.item() <= 16.0
+    lost = particles.concentration == 0
+    assert np.all(particles.masses[lost] == 0)
+    assert np.all(particles.charge[lost] == 0)

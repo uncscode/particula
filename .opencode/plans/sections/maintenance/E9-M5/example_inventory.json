@@ -1435,23 +1435,26 @@
     {
       "path": "docs/Features/dilution_strategy_system.md",
       "python_fences": 1,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "native CPU snippets and state ownership reconciled; navigation and remaining cross-guide boundary audit pending",
+      "execution": "exact CPU snippets execute; 21 process-guide tests passed",
+      "phase": "P6",
+      "evidence": "examples_tests/native_process_guides_test.py"
     },
     {
       "path": "docs/Features/native_scientific_processes.md",
       "python_fences": 1,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "native CPU snippets and state ownership reconciled; navigation and remaining cross-guide boundary audit pending",
+      "execution": "exact CPU snippets execute; 21 process-guide tests passed",
+      "phase": "P6",
+      "evidence": "examples_tests/native_process_guides_test.py"
     },
     {
       "path": "docs/Features/nucleation_strategy_system.md",
       "python_fences": 4,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "native CPU snippets and state ownership reconciled; navigation and remaining cross-guide boundary audit pending",
+      "execution": "exact CPU snippets execute; 21 process-guide tests passed",
+      "phase": "P6",
+      "evidence": "examples_tests/native_process_guides_test.py"
     },
     {
       "path": "docs/Features/particle-data-migration/construction.md",

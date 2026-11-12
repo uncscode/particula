@@ -508,3 +508,33 @@ verifying every path is untracked and ignored; .gitignore:14 owns the ignore and
 mkdocs.yml excludes .assets/ from publication. No generated or supported files
 were deleted. P6 remains In Progress, with remaining process/API/theory and
 navigation audits outstanding; P7, final gates and PR creation remain pending.
+
+### P6 dilution, source and direct-call guide checkpoint (2026-11-11)
+
+Made dilution's public snippet self-contained with resolved counts at 2 m³ and
+unified partitioning/inert gas. Corrected raw population units, held array
+ownership and native CPU write restoration against dynamics/dilution.py.
+Made the nucleation guide executable with three fixed slots at 0.25 m³,
+precursor/inert gas, explicit ordered source mapping and concrete commit
+controls. Corrected legacy-Aerosol and equal-species-width statements, CPU
+count-weight packing, representative-volume scaling and GPU source binding/
+independent-width guidance using the existing native source contract. All
+original source coefficient, formation size, elapsed duration and substeps
+are retained; inert gas is explicitly unconsumed.
+
+The native scientific process page now constructs/configures its direct-call
+example through the existing native access fixture. Replaced its stale blanket
+M4 pending statement with current bounded integration pointers. During the
+cross-guide check, current wall_loss/_native.py confirmed removed occupied
+slots clear charge as well as mass/count. Corrected the wall-loss guide's
+remaining M3 charge-retention claim and protected-field description; untouched
+inactive storage is still not repaired. No production behavior changed.
+
+Three additional exact-snippet regressions check dilution's exp(-1) counts,
+number density and all gas lanes; precursor extensive mass conservation with
+inert gas unchanged; and direct composition's inert gas and bounded sink
+inventory. Current process-guide suite: **21 passed in 6.14s**. Scoped Ruff
+check/format and git diff --check pass. Strict MkDocs exits 0, built in 1.44s
+(`/tmp/m5-p6-native-source-guides-mkdocs.log`); informational navigation messages
+remain and are not claimed resolved. P6, P7 and final gates remain incomplete;
+no PR has been opened.

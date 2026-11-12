@@ -15,7 +15,22 @@ E6-F2 or CPU/GPU parity.
 Construct the public strategy and runnable through `particula.dynamics`:
 
 ```python
+import numpy as np
 import particula as par
+
+particles = par.particles.create_resolved_particle_data(
+    masses=[1e-18, 2e-18], density=1000.0,
+    concentration=[4.0, 8.0], volume=2.0,
+)
+gas = par.gas.GasData(
+    name=["vapor", "inert"], molar_mass=np.array([0.1, 0.04]),
+    concentration=np.array([[3e-6, 5e-6]]),
+    partitioning=np.array([True, False]),
+)
+environment = par.gas.EnvironmentData(
+    temperature=[298.15], pressure=[101325.0], saturation_ratio=[[1.0, 0.0]],
+)
+aerosol = par.Aerosol(particles=particles, gas=gas, environment=environment)
 
 strategy = par.dynamics.DilutionStrategy(coefficient=0.1)
 dilution = par.dynamics.Dilution(strategy)
@@ -30,11 +45,12 @@ the exact exponential update
 
 `c_new = c * exp(-alpha * time_step)`.
 
-Here `time_step` is in [s], particle number concentration is in [1/m³], and
-gas mass concentration is in [kg/m³]. The runnable operates on CPU scalar
-state: elementwise particle concentration, scalar partitioning gas
-concentration, and multi-species gas-only concentration are supported. This
-does not imply multi-box transport support.
+Here `time_step` is in s. Native resolved particle storage holds counts;
+PMF storage holds bin number density (m⁻³), and PDF storage holds `dn/dr`
+(m⁻⁴). All receive the same multiplicative decay at fixed volume. All lanes of
+the unified `GasData.concentration` (kg/m³) decay, regardless of partitioning.
+The native runnable supports one box; storage shapes do not imply multi-box
+transport support. Use the selected E9 checkout (`pip install -e .`).
 
 ## Execution, validation, and recovery
 
@@ -49,7 +65,8 @@ A zero coefficient or zero duration is an exact no-op, but supported state is
 still preflighted even for a no-op. Concrete CPU dilution supports exactly one
 particle box and validates state
 before mutation. If validation fails, state is unchanged; if an unexpected
-setter failure occurs, already-written concentration state is rolled back.
+CPU write failure occurs, it restores attempted concentration writes from
+snapshots. Held containers and destination-array identities are retained.
 These atomicity and retry-safe failure guarantees let callers correct input and
 retry safely. Extreme finite decay may underflow to zero, but outputs remain
 finite and nonnegative.
@@ -57,7 +74,7 @@ finite and nonnegative.
 Dilution changes only particle number concentration and gas mass
 concentrations. It protects particle distribution/mass, charge, density,
 representation volume, gas names, molar masses, partitioning metadata, and
-atmospheric temperature and pressure.
+environment temperature, pressure and saturation ratios.
 
 ## Boundaries and example
 

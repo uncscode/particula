@@ -14,7 +14,7 @@ empirical new-particle-formation model.
 
 ## Public API, equations, and units
 
-Use public imports only. `EnvironmentData` is the one-box thermodynamic input;
+Use public process imports and the concrete species-map configuration. `EnvironmentData` is the one-box thermodynamic input;
 `ExhaustionControls` selects fixed-capacity recovery behavior.
 
 ```python
@@ -26,7 +26,10 @@ from particula.dynamics import (
     NucleationCommitConfig,
     NucleationSourceConfig,
 )
-from particula.gas import EnvironmentData
+from particula import Aerosol
+from particula.gas import EnvironmentData, GasData
+from particula.particles import ParticleData
+from particula.dynamics.nucleation.species_mapping import NucleationSpeciesMap
 from particula.particles.exhaustion import ExhaustionControls
 ```
 
@@ -47,6 +50,19 @@ Build an immutable potential-rate strategy through the public builder or
 factory, then select its precursor lane in `NucleationSourceConfig`:
 
 ```python
+particles = ParticleData(
+    masses=np.zeros((1, 3, 1)), concentration=np.zeros((1, 3)),
+    charge=np.zeros((1, 3)), density=np.array([1000.0]),
+    volume=np.array([0.25]), distribution_type="particle_resolved",
+)
+gas = GasData(
+    name=["precursor", "inert"], molar_mass=np.array([0.1, 0.04]),
+    concentration=np.array([[1e-12, 2e-6]]), partitioning=np.array([True, False]),
+)
+environment = EnvironmentData(
+    temperature=[298.15], pressure=[101325.0], saturation_ratio=[[1.0, 1.0]],
+)
+aerosol = Aerosol(particles=particles, gas=gas, environment=environment)
 strategy = ActivationNucleationBuilder().set_parameters(
     {
         "coefficient": 1.0e-2,
@@ -60,19 +76,23 @@ strategy = ActivationNucleationBuilder().set_parameters(
         "temperature_lower_units": "K",
         "temperature_upper": 400.0,
         "temperature_upper_units": "K",
-        "injection_composition": [1],
+        "injection_composition": [1, 0],
         "formation_diameter": 1.0,
         "formation_diameter_units": "nm",
     }
 ).build()
-source = NucleationSourceConfig(strategy=strategy, precursor_index=0)
+source = NucleationSourceConfig(
+    strategy=strategy, precursor_index=0,
+    species_map=NucleationSpeciesMap(tuple(gas.name), ((0, 0),)),
+)
 ```
 
 ## Getting started
 
 Use the [supported CPU example](../Examples/Nucleation/cpu_nucleation.py) as
-the runnable starting point. It constructs the one-box legacy `Aerosol`, a
-partitioning `GasData` lane, fixed particle capacity, `EnvironmentData`, and
+the runnable starting point in the selected E9 checkout (`pip install -e .`).
+It constructs native `Aerosol`, unified `GasData` with precursor and inert lanes,
+fixed resolved particle capacity, aligned `EnvironmentData`, and
 the public `NucleationCommitConfig`. Its commit controls use
 `ExhaustionControls()` and one-element `float64` `requested_scale`,
 `minimum_scale`, and `minimum_volume` sidecars. Do not replace that setup with
@@ -80,13 +100,24 @@ imports from `nucleation.particle_source`.
 
 ## Execution, fixed capacity, and accounting
 
-The runnable adapts a legacy `Aerosol` backing `ParticleData` and partitioning
-`GasData` by identity. It supports exactly one box, fixed-capacity slots, and
-partitioning gas with matching particle/gas species widths. It does not resize
+The runnable retains the native aggregate and its containers by identity.
+It supports exactly one resolved box and fixed-capacity slots. Full ordered
+gas names and explicit gas-to-particle pairs define the source mapping; gas
+and particle widths may differ. Every positive injection lane must be mapped
+and partitioning-enabled; other gas lanes remain unchanged. It does not resize
 or compact slots. It divides the duration into equal sequential substeps and
 re-reads current gas after each successful substep:
 
 ```python
+nucleation = Nucleation(
+    source,
+    NucleationCommitConfig(
+        maximum_slot_weight=1e20, source_charge=0.0,
+        exhaustion_controls=ExhaustionControls(),
+        requested_scale=np.array([1.0]), minimum_scale=np.array([1.0]),
+        minimum_volume=np.array([0.01]),
+    ),
+)
 result = nucleation.execute(aerosol, time_step=1.0, sub_steps=2)
 assert result is aerosol
 ```
@@ -107,10 +138,11 @@ The source relies on E6-F5 slot activation and E6-F6 policy resolution. Demand
 is never silently truncated. On exhaustion, enabled resampling is considered
 first and representative-volume scaling is its fallback; if neither can
 represent the requested demand, the attempt raises rather than silently
-discarding it. Selected scaling scales pre-existing particle and gas state
-before source removal. Therefore an unscaled run conserves against its direct
-pre-step particle-plus-gas total, while a scaled row conserves against the
-selected scale times that pre-step total.
+discarding it. Native representative-volume scaling scales counts and volume together,
+preserving pre-existing particle density and gas concentration. It differs from
+physical volume evolution. The added source is accounted against that scaled
+extensive inventory. CPU admitted event density is multiplied by current
+volume; `maximum_slot_weight` bounds represented counts per new slot.
 
 ## Scope, dependencies, and example
 
@@ -145,10 +177,19 @@ Callers explicitly convert `ParticleData`, `GasData`, and `EnvironmentData`,
 place arrays on one Warp device, and call `wp.synchronize()` before host
 inspection. Fixed schemas use `B` boxes, `N` particle slots, and `S` species:
 particle masses are `(B, N, S)`, particle concentration/charge are `(B, N)`,
-gas concentration/partitioning are `(B, S)`, and temperature is `(B,)`.
+gas concentration is `(B, Sg)`, partitioning is `(Sg,)`, and temperature
+is `(B,)`. Native particle width `Sp` may differ from full gas width `Sg`.
+Tagged resolved inputs require a `NucleationSpeciesBinding` prepared with
+`prepare_nucleation_species_map` from
+`particula.gpu.nucleation_species_mapping`, using preserved full gas names and
+the explicit source map. Preparation binds the exact transferred arrays;
+replacement or restart needs fresh preparation. The direct GPU path uses
+integral int32 event counts and one unit-count slot per event; it does not
+implement the CPU weighted-slot packing scheme.
 Sidecars are caller-owned, same-device, contiguous `wp.float64` or `wp.int32`
 arrays with documented `(B,)`, `(B, N)`, `(B, S)`, and `(B, N, S)` schemas.
-P4 owns nested E6-F6 resampling/scaling sidecars; see
+Full-gas demand/transfer sidecars use gas width; resampling scratch uses
+particle width. P4 owns nested E6-F6 resampling/scaling sidecars; see
 [fixed-slot exhaustion](slot_exhaustion_policies.md) for their fields.
 Preflight and phase handoffs may perform bounded aggregate device-status
 readbacks for validation; these are not CPU state transfers or a fallback.
