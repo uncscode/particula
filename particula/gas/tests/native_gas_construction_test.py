@@ -134,3 +134,71 @@ def test_native_gas_rejects_invalid_species_lane_without_clamping(
     with pytest.raises(ValueError):
         getattr(GasDataBuilder(), f"set_{field}")(source)
     npt.assert_array_equal(source, values)
+
+
+@pytest.mark.parametrize(
+    ("initial", "delta", "expected"),
+    [
+        ([[0.5]], [[0.5]], [[1.0]]),
+        ([[0.5], [1.0]], [[0.5], [-1.0]], [[1.0], [0.0]]),
+        ([[1e-6]], [[2e-6]], [[3e-6]]),
+    ],
+)
+def test_native_gas_explicit_concentration_update(initial, delta, expected):
+    """Valid native array updates retain original concentration arithmetic."""
+    data = GasData(
+        name=["TestSpecies"],
+        molar_mass=np.array([0.044]),
+        concentration=np.array(initial),
+        partitioning=np.array([True]),
+    )
+    storage = data.concentration
+    data.concentration[:] += delta
+    assert data.concentration is storage
+    npt.assert_allclose(data.concentration, expected)
+    npt.assert_array_equal(data.molar_mass, [0.044])
+    npt.assert_array_equal(data.partitioning, [True])
+
+
+@pytest.mark.parametrize(
+    ("names", "masses", "concentrations"),
+    [
+        (["A", "B"], [0.01, 0.01], [1.0, 1.0]),
+        (["Water", "Ammonia"], [0.018, 0.017], [1e-6, 2e-6]),
+    ],
+)
+def test_native_gas_explicit_species_combination(names, masses, concentrations):
+    """Explicit combined storage preserves both original species containers."""
+    originals = [
+        GasData(
+            name=[name],
+            molar_mass=np.array([mass]),
+            concentration=np.array([[concentration]]),
+            partitioning=np.array([True]),
+        )
+        for name, mass, concentration in zip(
+            names, masses, concentrations, strict=True
+        )
+    ]
+    combined = GasData(
+        name=[name for gas in originals for name in gas.name],
+        molar_mass=np.concatenate([gas.molar_mass for gas in originals]),
+        concentration=np.concatenate(
+            [gas.concentration for gas in originals], axis=1
+        ),
+        partitioning=np.concatenate([gas.partitioning for gas in originals]),
+    )
+    assert combined.name == names
+    assert combined.n_species == 2
+    npt.assert_array_equal(combined.molar_mass, masses)
+    npt.assert_array_equal(combined.concentration, [concentrations])
+    for index, original in enumerate(originals):
+        assert combined is not original
+        assert original.name == [names[index]]
+        npt.assert_array_equal(original.molar_mass, [masses[index]])
+        npt.assert_array_equal(
+            original.concentration, [[concentrations[index]]]
+        )
+        assert not np.shares_memory(
+            combined.concentration, original.concentration
+        )

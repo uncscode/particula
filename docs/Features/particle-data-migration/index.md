@@ -48,6 +48,11 @@ bytes, not those inspection carriers, govern explicit compatible restart.
 
 The E8 closeout planned coexistence in 0.2.13 and a breaking native migration in
 0.3.0. These are release plans, not publication claims. This guide documents the
-native migration target; temporary legacy implementation still awaiting M6 is
-not endorsed for supported new examples. No performance qualification or
-cross-device continuation is implied.
+native development API: particle, gas species, and atmosphere facades and their
+obsolete constructors have been removed. Native gas storage uses explicit
+box/species axes and retains mixed partitioning masks; vapor-pressure strategies
+belong to processes. Construct validated gas input with `GasDataBuilder`;
+negative input is rejected instead of silently clamped. Raw array mutation
+remains caller-owned and does not provide transactional validation. Remaining
+GPU compatibility removal and final M6 readiness validation are pending.
+No performance qualification or cross-device continuation is implied.

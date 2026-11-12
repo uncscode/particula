@@ -3,222 +3,352 @@
     "file": "particula/gas/tests/species_test.py",
     "test": "test_gas_species_builder_single_species",
     "original": "def test_gas_species_builder_single_species():\n    \"\"\"Test building a single gas species with the GasSpeciesBuilder.\"\"\"\n    vapor_pressure_strategy = ConstantVaporPressureStrategy(\n        vapor_pressure=101325\n    )\n    name = \"Oxygen\"\n    molar_mass = 0.032  # kg/mol\n    partitioning = False\n    concentration = 1.2  # kg/m^3\n\n    gas_species = GasSpecies(\n        name=name,\n        molar_mass=molar_mass,\n        vapor_pressure_strategy=vapor_pressure_strategy,\n        partitioning=partitioning,\n        concentration=concentration,\n    )\n\n    assert gas_species.name == name\n    assert gas_species.get_molar_mass() == molar_mass\n    assert gas_species.get_partitioning() is partitioning\n    assert gas_species.get_concentration() == concentration\n    assert gas_species.get_pure_vapor_pressure(298) == 101325",
-    "status": "pending assertion-level successor review"
+    "successors": [
+      "particula/gas/tests/native_gas_construction_test.py::test_native_gas_preserves_species_facade_storage_cases",
+      "particula/gas/tests/native_gas_construction_test.py::test_vapor_pressure_science_without_gas_facade"
+    ],
+    "disposition": "Retain explicit native storage fields and ordered species; scalar/vector facade return modes and wrappers are removed. Original constant vapor pressures retained on the owning strategy, outside gas storage."
   },
   {
     "file": "particula/gas/tests/species_test.py",
     "test": "test_gas_species_builder_array_species",
     "original": "def test_gas_species_builder_array_species():\n    \"\"\"Test building an array of gas species with the GasSpeciesBuilder.\"\"\"\n    vapor_pressure_strategy = ConstantVaporPressureStrategy(\n        vapor_pressure=np.array([101325, 101325])\n    )\n    names = np.array([\"Oxygen\", \"Nitrogen\"])\n    molar_masses = np.array([0.032, 0.028])  # kg/mol\n    partitioning = False\n    concentrations = np.array([1.2, 0.8])  # kg/m^3\n\n    # Assuming the builder and GasSpecies class can handle array inputs\n    # directly.\n    gas_species = GasSpecies(\n        name=names,\n        molar_mass=molar_masses,\n        vapor_pressure_strategy=vapor_pressure_strategy,\n        partitioning=partitioning,\n        concentration=concentrations,\n    )\n\n    assert np.array_equal(gas_species.name, names)\n    assert np.array_equal(gas_species.get_molar_mass(), molar_masses)\n    assert gas_species.get_partitioning() is partitioning\n    assert np.array_equal(gas_species.get_concentration(), concentrations)\n    # This assumes get_pure_vapor_pressure can handle and return arrays\n    # correctly.\n    assert np.array_equal(\n        gas_species.get_pure_vapor_pressure(np.array([298, 300])),\n        np.array([101325, 101325]),\n    )",
-    "status": "pending assertion-level successor review"
+    "successors": [
+      "particula/gas/tests/native_gas_construction_test.py::test_native_gas_preserves_species_facade_storage_cases",
+      "particula/gas/tests/native_gas_construction_test.py::test_vapor_pressure_science_without_gas_facade"
+    ],
+    "disposition": "Retain explicit native storage fields and ordered species; scalar/vector facade return modes and wrappers are removed. Original constant vapor pressures retained on the owning strategy, outside gas storage."
   },
   {
     "file": "particula/gas/tests/species_test.py",
     "test": "test_gas_species_negative_molar_mass",
     "original": "def test_gas_species_negative_molar_mass():\n    \"\"\"Test gas species with negative molar mass.\"\"\"\n    with pytest.raises(ValueError):\n        GasSpecies(\n            name=\"NegativeMass\",\n            molar_mass=-1,\n            partitioning=False,\n            concentration=1e-10,\n        )\n\n    # array input\n    with pytest.raises(ValueError):\n        GasSpecies(\n            name=\"NegativeMass\",\n            molar_mass=np.array([-1, 1]),\n            partitioning=False,\n            concentration=np.array([1e-10, 1e-10]),\n        )",
-    "status": "pending assertion-level successor review"
+    "successors": [
+      "particula/gas/tests/native_gas_construction_test.py::test_native_gas_builder_rejects_invalid_fields",
+      "particula/gas/tests/native_gas_construction_test.py::test_native_gas_rejects_invalid_species_lane_without_clamping"
+    ],
+    "disposition": "Physical builder validation rejects invalid species lanes without input mutation. Facade negative-concentration clamping/logging is intentionally removed; raw GasData remains shape-validating storage."
   },
   {
     "file": "particula/gas/tests/species_test.py",
     "test": "test_gas_species_zero_molar_mass",
     "original": "def test_gas_species_zero_molar_mass():\n    \"\"\"Test gas species with zero molar mass.\"\"\"\n    with pytest.raises(ValueError):\n        GasSpecies(\n            name=\"ZeroMass\",\n            molar_mass=0,\n            partitioning=False,\n            concentration=1e-10,\n        )\n\n    # array input\n    with pytest.raises(ValueError):\n        GasSpecies(\n            name=\"ZeroMass\",\n            molar_mass=np.array([0, 1]),\n            partitioning=False,\n            concentration=np.array([1e-10, 1e-10]),\n        )",
-    "status": "pending assertion-level successor review"
+    "successors": [
+      "particula/gas/tests/native_gas_construction_test.py::test_native_gas_builder_rejects_invalid_fields",
+      "particula/gas/tests/native_gas_construction_test.py::test_native_gas_rejects_invalid_species_lane_without_clamping"
+    ],
+    "disposition": "Physical builder validation rejects invalid species lanes without input mutation. Facade negative-concentration clamping/logging is intentionally removed; raw GasData remains shape-validating storage."
   },
   {
     "file": "particula/gas/tests/species_test.py",
     "test": "test_gas_species_negative_concentration",
     "original": "def test_gas_species_negative_concentration(caplog):\n    \"\"\"Test gas species with negative concentration.\"\"\"\n    particula_logger = logging.getLogger(\"particula\")\n    old_propagate = particula_logger.propagate\n    particula_logger.propagate = True\n    caplog.set_level(logging.WARNING, logger=\"particula\")\n\n    caplog.clear()\n    gas_species = GasSpecies(\n        name=\"NegativeConcentration\",\n        molar_mass=1e10,\n        partitioning=False,\n        concentration=-1,\n    )\n    assert gas_species.get_concentration() == 0.0\n    assert \"Negative concentration\" in caplog.text\n\n    # array input\n    caplog.clear()\n    gas_species = GasSpecies(\n        name=\"NegativeConcentration\",\n        molar_mass=np.array([1, 1]),\n        partitioning=False,\n        concentration=np.array([-1, 1]),\n    )\n    assert np.array_equal(gas_species.get_concentration(), [0.0, 1.0])\n    assert \"Negative concentration\" in caplog.text\n\n    particula_logger.propagate = old_propagate",
-    "status": "pending assertion-level successor review"
+    "successors": [
+      "particula/gas/tests/native_gas_construction_test.py::test_native_gas_builder_rejects_invalid_fields",
+      "particula/gas/tests/native_gas_construction_test.py::test_native_gas_rejects_invalid_species_lane_without_clamping"
+    ],
+    "disposition": "Physical builder validation rejects invalid species lanes without input mutation. Facade negative-concentration clamping/logging is intentionally removed; raw GasData remains shape-validating storage."
   },
   {
     "file": "particula/gas/tests/species_test.py",
     "test": "test_gas_species_zero_concentration",
     "original": "def test_gas_species_zero_concentration():\n    \"\"\"Test gas species with zero concentration.\"\"\"\n    zero_concentration_species = GasSpecies(\n        name=\"ZeroConcentration\",\n        molar_mass=1e10,\n        partitioning=False,\n        concentration=0,\n    )\n\n    assert zero_concentration_species.get_molar_mass() == 1e10\n    assert zero_concentration_species.get_concentration() == 0\n\n    # array input\n    zero_concentration_species = GasSpecies(\n        name=\"ZeroConcentration\",\n        molar_mass=np.array([1, 1]),\n        partitioning=False,\n        concentration=np.array([0, 1]),\n    )\n\n    assert np.array_equal(zero_concentration_species.get_molar_mass(), [1, 1])\n    assert np.array_equal(\n        zero_concentration_species.get_concentration(), [0, 1]\n    )",
-    "status": "pending assertion-level successor review"
+    "successors": [
+      "particula/gas/tests/native_gas_construction_test.py::test_native_gas_preserves_species_facade_storage_cases"
+    ],
+    "disposition": "Retain explicit native storage fields and ordered species; scalar/vector facade return modes and wrappers are removed."
   },
   {
     "file": "particula/gas/tests/species_test.py",
     "test": "test_gas_species_get_methods",
     "original": "def test_gas_species_get_methods():\n    \"\"\"Test the get methods of GasSpecies.\"\"\"\n    gas_species = GasSpecies(\n        name=\"TestSpecies\",\n        molar_mass=0.044,\n        vapor_pressure_strategy=ConstantVaporPressureStrategy(1000),\n        partitioning=True,\n        concentration=0.5,\n    )\n    assert gas_species.get_name() == \"TestSpecies\"\n    assert gas_species.get_molar_mass() == 0.044\n    assert gas_species.get_partitioning() is True\n    assert gas_species.get_concentration() == 0.5",
-    "status": "pending assertion-level successor review"
+    "successors": [
+      "particula/gas/tests/native_gas_construction_test.py::test_native_gas_preserves_species_facade_storage_cases"
+    ],
+    "disposition": "Retain explicit native storage fields and ordered species; scalar/vector facade return modes and wrappers are removed."
   },
   {
     "file": "particula/gas/tests/species_test.py",
     "test": "test_gas_species_set_concentration",
     "original": "def test_gas_species_set_concentration():\n    \"\"\"Test the set_concentration method of GasSpecies.\"\"\"\n    gas_species = GasSpecies(\n        name=\"TestSpecies\",\n        molar_mass=0.044,\n        vapor_pressure_strategy=ConstantVaporPressureStrategy(1000),\n        partitioning=True,\n        concentration=0.5,\n    )\n    gas_species.set_concentration(1.0)\n    assert gas_species.get_concentration() == 1.0\n    gas_species.set_concentration(-1.0)\n    assert gas_species.get_concentration() == 0.0",
-    "status": "pending assertion-level successor review"
+    "successors": [
+      "particula/gas/tests/native_gas_construction_test.py::test_native_gas_explicit_concentration_update",
+      "particula/gas/tests/native_gas_construction_test.py::test_native_gas_rejects_invalid_species_lane_without_clamping"
+    ],
+    "disposition": "Retain valid concentration arithmetic with explicit native arrays. Implicit resizing and negative clamping are retired; validated builder input rejects negatives, and raw array mutation remains caller-owned."
   },
   {
     "file": "particula/gas/tests/species_test.py",
     "test": "test_gas_species_add_concentration",
     "original": "def test_gas_species_add_concentration():\n    \"\"\"Test the add_concentration method of GasSpecies.\"\"\"\n    gas_species = GasSpecies(\n        name=\"TestSpecies\",\n        molar_mass=0.044,\n        vapor_pressure_strategy=ConstantVaporPressureStrategy(1000),\n        partitioning=True,\n        concentration=0.5,\n    )\n    gas_species.add_concentration(0.5)\n    assert gas_species.get_concentration() == 1.0\n    gas_species.add_concentration(-3.0)\n    assert gas_species.get_concentration() == 0.0",
-    "status": "pending assertion-level successor review"
+    "successors": [
+      "particula/gas/tests/native_gas_construction_test.py::test_native_gas_explicit_concentration_update",
+      "particula/gas/tests/native_gas_construction_test.py::test_native_gas_rejects_invalid_species_lane_without_clamping"
+    ],
+    "disposition": "Retain valid concentration arithmetic with explicit native arrays. Implicit resizing and negative clamping are retired; validated builder input rejects negatives, and raw array mutation remains caller-owned."
   },
   {
     "file": "particula/gas/tests/species_test.py",
     "test": "test_gas_species_array_operations",
     "original": "def test_gas_species_array_operations():\n    \"\"\"Test array operations for concentration in GasSpecies.\"\"\"\n    gas_species = GasSpecies(\n        name=\"TestSpecies\",\n        molar_mass=0.044,\n        vapor_pressure_strategy=ConstantVaporPressureStrategy(1000),\n        partitioning=True,\n        concentration=0.5,\n    )\n    gas_species.set_concentration(np.array([0.5, 1.0]))\n    assert np.array_equal(gas_species.get_concentration(), [0.5, 1.0])\n    gas_species.add_concentration(np.array([0.5, -1.0]))\n    assert np.array_equal(gas_species.get_concentration(), [1.0, 0.0])",
-    "status": "pending assertion-level successor review"
+    "successors": [
+      "particula/gas/tests/native_gas_construction_test.py::test_native_gas_explicit_concentration_update",
+      "particula/gas/tests/native_gas_construction_test.py::test_native_gas_rejects_invalid_species_lane_without_clamping"
+    ],
+    "disposition": "Retain valid concentration arithmetic with explicit native arrays. Implicit resizing and negative clamping are retired; validated builder input rejects negatives, and raw array mutation remains caller-owned."
   },
   {
     "file": "particula/gas/tests/species_test.py",
     "test": "test_gas_species_append",
     "original": "def test_gas_species_append():\n    \"\"\"The append method should mutate *self* and concatenate attributes.\"\"\"\n    s1 = _simple_species(\"A\")\n    s2 = _simple_species(\"B\")\n\n    s1.append(s2)\n\n    assert np.array_equal(s1.get_name(), np.array([\"A\", \"B\"]))\n    assert len(s1) == 2\n    # concentration and molar-mass also doubled in length\n    assert s1.get_concentration().shape == (2,)\n    assert s1.get_molar_mass().shape == (2,)",
-    "status": "pending assertion-level successor review"
+    "successors": [
+      "particula/gas/tests/native_gas_construction_test.py::test_native_gas_explicit_species_combination",
+      "particula/gas/tests/native_gas_environment_test.py::test_native_gas_environment_construction_and_extension"
+    ],
+    "disposition": "Retain original combined names, masses, concentrations and non-mutating source ownership. Operator overloads/strategy-list concatenation retire; publishing a new species layout requires coordinated native replacement."
   },
   {
     "file": "particula/gas/tests/species_test.py",
     "test": "test_gas_species_iadd",
     "original": "def test_gas_species_iadd():\n    \"\"\"Using += should call append and mutate self.\"\"\"\n    s1 = _simple_species(\"A\")\n    s2 = _simple_species(\"B\")\n\n    s1 += s2  # in-place\n\n    assert np.array_equal(s1.get_name(), np.array([\"A\", \"B\"]))\n    assert len(s1) == 2",
-    "status": "pending assertion-level successor review"
+    "successors": [
+      "particula/gas/tests/native_gas_construction_test.py::test_native_gas_explicit_species_combination",
+      "particula/gas/tests/native_gas_environment_test.py::test_native_gas_environment_construction_and_extension"
+    ],
+    "disposition": "Retain original combined names, masses, concentrations and non-mutating source ownership. Operator overloads/strategy-list concatenation retire; publishing a new species layout requires coordinated native replacement."
   },
   {
     "file": "particula/gas/tests/species_test.py",
     "test": "test_gas_species_add",
     "original": "def test_gas_species_add():\n    \"\"\"Using + should return a NEW object and keep the originals unchanged.\"\"\"\n    s1 = _simple_species(\"A\")\n    s2 = _simple_species(\"B\")\n\n    merged = s1 + s2\n\n    # originals unchanged\n    assert s1.get_name() == \"A\"\n    assert s2.get_name() == \"B\"\n\n    # merged contains both\n    assert np.array_equal(merged.get_name(), np.array([\"A\", \"B\"]))\n    assert len(merged) == 2\n    # ensure it is a different object\n    assert merged is not s1 and merged is not s2",
-    "status": "pending assertion-level successor review"
+    "successors": [
+      "particula/gas/tests/native_gas_construction_test.py::test_native_gas_explicit_species_combination",
+      "particula/gas/tests/native_gas_environment_test.py::test_native_gas_environment_construction_and_extension"
+    ],
+    "disposition": "Retain original combined names, masses, concentrations and non-mutating source ownership. Operator overloads/strategy-list concatenation retire; publishing a new species layout requires coordinated native replacement."
   },
   {
     "file": "particula/gas/tests/species_test.py",
     "test": "test_gas_species_partitioning_mismatch_errors",
     "original": "def test_gas_species_partitioning_mismatch_errors():\n    \"\"\"Append / += / + must raise if partitioning flags differ.\"\"\"\n    s_true = _simple_species(\"A\", partitioning=True)\n    s_false = _simple_species(\"B\", partitioning=False)\n\n    # append\n    with pytest.raises(ValueError):\n        s_true.append(s_false)\n\n    # iadd\n    with pytest.raises(ValueError):\n        s_true += s_false  # type: ignore[operator]\n\n    # add\n    with pytest.raises(ValueError):\n        _ = s_true + s_false",
-    "status": "pending assertion-level successor review"
+    "successors": [
+      "particula/gas/tests/native_gas_construction_test.py::test_native_gas_preserves_species_facade_storage_cases"
+    ],
+    "disposition": "Uniform-only facade restriction is obsolete. Native explicit storage retains mixed masks without splitting gas authority."
   },
   {
     "file": "particula/gas/tests/species_facade_test.py",
     "test": "test_init_deprecation_log",
     "original": "def test_init_deprecation_log(_enable_particula_log_capture) -> None:\n    \"\"\"GasSpecies construction logs a deprecation info message.\"\"\"\n    caplog = _enable_particula_log_capture\n    strategy = ConstantVaporPressureStrategy(2330.0)\n    GasSpecies(\n        name=\"Water\",\n        molar_mass=0.018,\n        vapor_pressure_strategy=strategy,\n        partitioning=True,\n        concentration=1e-6,\n    )\n    assert _DEPRECATION_MESSAGE in caplog.text",
-    "status": "pending assertion-level successor review"
+    "successors": [
+      "particula/tests/legacy_api_removal_test.py::test_removed_gas_facade"
+    ],
+    "disposition": "Facade-only wrapping/deprecation behavior removed; supported native aggregate identity is covered by test_native_aggregate_survives_legacy_removal."
   },
   {
     "file": "particula/gas/tests/species_facade_test.py",
     "test": "test_data_property_returns_gas_data",
     "original": "def test_data_property_returns_gas_data() -> None:\n    \"\"\"Data property returns the wrapped GasData instance.\"\"\"\n    data = _make_single_box_data(\"Water\", 0.018, 1e-6)\n    strategy = ConstantVaporPressureStrategy(2330.0)\n    species = GasSpecies.from_data(data, strategy)\n\n    assert isinstance(species.data, GasData)",
-    "status": "pending assertion-level successor review"
+    "successors": [
+      "particula/tests/legacy_api_removal_test.py::test_removed_gas_facade"
+    ],
+    "disposition": "Facade-only wrapping/deprecation behavior removed; supported native aggregate identity is covered by test_native_aggregate_survives_legacy_removal."
   },
   {
     "file": "particula/gas/tests/species_facade_test.py",
     "test": "test_from_data_no_deprecation_log",
     "original": "def test_from_data_no_deprecation_log(\n    _enable_particula_log_capture,\n) -> None:\n    \"\"\"from_data() does not emit the deprecation log message.\"\"\"\n    caplog = _enable_particula_log_capture\n    data = _make_single_box_data(\"Water\", 0.018, 1e-6)\n    strategy = ConstantVaporPressureStrategy(2330.0)\n    caplog.clear()\n    _ = GasSpecies.from_data(data, strategy)\n    assert _DEPRECATION_MESSAGE not in caplog.text",
-    "status": "pending assertion-level successor review"
+    "successors": [
+      "particula/tests/legacy_api_removal_test.py::test_removed_gas_facade"
+    ],
+    "disposition": "Facade-only wrapping/deprecation behavior removed; supported native aggregate identity is covered by test_native_aggregate_survives_legacy_removal."
   },
   {
     "file": "particula/gas/tests/species_facade_test.py",
     "test": "test_facade_delegation_get_name",
     "original": "def test_facade_delegation_get_name() -> None:\n    \"\"\"Facade delegates name access to GasData.\"\"\"\n    data = _make_single_box_data(\"Water\", 0.018, 1e-6)\n    strategy = ConstantVaporPressureStrategy(2330.0)\n    species = GasSpecies.from_data(data, strategy)\n\n    assert species.get_name() == \"Water\"",
-    "status": "pending assertion-level successor review"
+    "successors": [
+      "particula/gas/tests/native_gas_construction_test.py::test_native_gas_preserves_species_facade_storage_cases"
+    ],
+    "disposition": "Retain explicit native storage fields and ordered species; scalar/vector facade return modes and wrappers are removed."
   },
   {
     "file": "particula/gas/tests/species_facade_test.py",
     "test": "test_facade_delegation_get_molar_mass",
     "original": "def test_facade_delegation_get_molar_mass() -> None:\n    \"\"\"Facade delegates molar mass access to GasData.\"\"\"\n    data = _make_single_box_data(\"Water\", 0.018, 1e-6)\n    strategy = ConstantVaporPressureStrategy(2330.0)\n    species = GasSpecies.from_data(data, strategy)\n\n    assert species.get_molar_mass() == pytest.approx(0.018)",
-    "status": "pending assertion-level successor review"
+    "successors": [
+      "particula/gas/tests/native_gas_construction_test.py::test_native_gas_preserves_species_facade_storage_cases"
+    ],
+    "disposition": "Retain explicit native storage fields and ordered species; scalar/vector facade return modes and wrappers are removed."
   },
   {
     "file": "particula/gas/tests/species_facade_test.py",
     "test": "test_facade_delegation_get_concentration",
     "original": "def test_facade_delegation_get_concentration() -> None:\n    \"\"\"Facade delegates concentration access to GasData.\"\"\"\n    data = _make_single_box_data(\"Water\", 0.018, 1e-6)\n    strategy = ConstantVaporPressureStrategy(2330.0)\n    species = GasSpecies.from_data(data, strategy)\n\n    assert species.get_concentration() == pytest.approx(1e-6)",
-    "status": "pending assertion-level successor review"
+    "successors": [
+      "particula/gas/tests/native_gas_construction_test.py::test_native_gas_preserves_species_facade_storage_cases"
+    ],
+    "disposition": "Retain explicit native storage fields and ordered species; scalar/vector facade return modes and wrappers are removed."
   },
   {
     "file": "particula/gas/tests/species_facade_test.py",
     "test": "test_add_concentration_updates_internal_data",
     "original": "def test_add_concentration_updates_internal_data() -> None:\n    \"\"\"add_concentration updates the internal GasData.\"\"\"\n    data = _make_single_box_data(\"Water\", 0.018, 1e-6)\n    strategy = ConstantVaporPressureStrategy(2330.0)\n    species = GasSpecies.from_data(data, strategy)\n\n    species.add_concentration(2e-6)\n\n    assert species.data.concentration.shape == (1, 1)\n    assert species.data.concentration[0, 0] == pytest.approx(3e-6)",
-    "status": "pending assertion-level successor review"
+    "successors": [
+      "particula/gas/tests/native_gas_construction_test.py::test_native_gas_explicit_concentration_update",
+      "particula/gas/tests/native_gas_construction_test.py::test_native_gas_rejects_invalid_species_lane_without_clamping"
+    ],
+    "disposition": "Retain valid concentration arithmetic with explicit native arrays. Implicit resizing and negative clamping are retired; validated builder input rejects negatives, and raw array mutation remains caller-owned."
   },
   {
     "file": "particula/gas/tests/species_facade_test.py",
     "test": "test_set_concentration_updates_internal_data",
     "original": "def test_set_concentration_updates_internal_data() -> None:\n    \"\"\"set_concentration updates the internal GasData.\"\"\"\n    data = _make_single_box_data(\"Water\", 0.018, 1e-6)\n    strategy = ConstantVaporPressureStrategy(2330.0)\n    species = GasSpecies.from_data(data, strategy)\n\n    species.set_concentration(np.array([2e-6, 4e-6]))\n\n    assert species.data.concentration.shape == (2, 1)\n    npt.assert_allclose(\n        species.data.concentration[:, 0], np.array([2e-6, 4e-6])\n    )\n    npt.assert_allclose(species.get_concentration(), np.array([2e-6, 4e-6]))",
-    "status": "pending assertion-level successor review"
+    "successors": [
+      "particula/gas/tests/native_gas_construction_test.py::test_native_gas_preserves_species_facade_storage_cases",
+      "particula/tests/aerosol_replacement_test.py::test_individual_layout_change_rejects_then_coordinated_succeeds"
+    ],
+    "disposition": "Retain original explicit multibox concentration values. Implicit facade resizing/mode caches are removed; native layout publication requires coordinated replacement."
   },
   {
     "file": "particula/gas/tests/species_facade_test.py",
     "test": "test_concentration_property_setter_updates_internal_data",
     "original": "def test_concentration_property_setter_updates_internal_data() -> None:\n    \"\"\"Concentration property setter updates the internal GasData.\"\"\"\n    data = _make_single_box_data(\"Water\", 0.018, 1e-6)\n    strategy = ConstantVaporPressureStrategy(2330.0)\n    species = GasSpecies.from_data(data, strategy)\n\n    species.concentration = np.array([5e-6, 6e-6])\n\n    assert species.data.concentration.shape == (2, 1)\n    npt.assert_allclose(\n        species.data.concentration[:, 0], np.array([5e-6, 6e-6])\n    )\n    npt.assert_allclose(species.get_concentration(), np.array([5e-6, 6e-6]))",
-    "status": "pending assertion-level successor review"
+    "successors": [
+      "particula/gas/tests/native_gas_construction_test.py::test_native_gas_preserves_species_facade_storage_cases",
+      "particula/tests/aerosol_replacement_test.py::test_individual_layout_change_rejects_then_coordinated_succeeds"
+    ],
+    "disposition": "Retain original explicit multibox concentration values. Implicit facade resizing/mode caches are removed; native layout publication requires coordinated replacement."
   },
   {
     "file": "particula/gas/tests/species_facade_test.py",
     "test": "test_append_updates_internal_data",
     "original": "def test_append_updates_internal_data() -> None:\n    \"\"\"Append updates GasData and extends strategies.\"\"\"\n    data1 = _make_single_box_data(\"Water\", 0.018, 1e-6)\n    data2 = _make_single_box_data(\"Ammonia\", 0.017, 2e-6)\n    strategy1 = ConstantVaporPressureStrategy(2330.0)\n    strategy2 = ConstantVaporPressureStrategy(1000.0)\n\n    species1 = GasSpecies.from_data(data1, strategy1)\n    species2 = GasSpecies.from_data(data2, strategy2)\n\n    species1.append(species2)\n\n    assert species1.data.n_species == 2\n    npt.assert_array_equal(\n        np.asarray(species1.data.name, dtype=str),\n        np.array([\"Water\", \"Ammonia\"]),\n    )\n    npt.assert_allclose(\n        species1.data.concentration,\n        np.array([[1e-6, 2e-6]]),\n    )\n    assert isinstance(species1.pure_vapor_pressure_strategy, list)\n    assert len(species1.pure_vapor_pressure_strategy) == 2",
-    "status": "pending assertion-level successor review"
+    "successors": [
+      "particula/gas/tests/native_gas_construction_test.py::test_native_gas_explicit_species_combination",
+      "particula/gas/tests/native_gas_environment_test.py::test_native_gas_environment_construction_and_extension"
+    ],
+    "disposition": "Retain original combined names, masses, concentrations and non-mutating source ownership. Operator overloads/strategy-list concatenation retire; publishing a new species layout requires coordinated native replacement."
   },
   {
     "file": "particula/gas/tests/species_facade_test.py",
     "test": "test_append_mismatched_box_counts_raises",
     "original": "def test_append_mismatched_box_counts_raises() -> None:\n    \"\"\"Append raises when both species have different box counts.\"\"\"\n    data1 = GasData(\n        name=[\"Water\"],\n        molar_mass=np.array([0.018]),\n        concentration=np.array([[1e-6], [2e-6]]),\n        partitioning=np.array([True]),\n    )\n    data2 = GasData(\n        name=[\"Ammonia\"],\n        molar_mass=np.array([0.017]),\n        concentration=np.array([[3e-6], [4e-6], [5e-6]]),\n        partitioning=np.array([True]),\n    )\n    strategy = ConstantVaporPressureStrategy(2330.0)\n\n    species1 = GasSpecies.from_data(data1, strategy)\n    species2 = GasSpecies.from_data(data2, strategy)\n\n    with pytest.raises(ValueError, match=\"box dimensions\"):\n        species1.append(species2)",
-    "status": "pending assertion-level successor review"
+    "successors": [
+      "particula/tests/aerosol_replacement_test.py::test_individual_layout_change_rejects_then_coordinated_succeeds"
+    ],
+    "disposition": "Facade append is removed. Native box-layout replacement rejects incompatible individual changes and accepts validated coordinated replacement, preserving old and candidate state."
   },
   {
     "file": "particula/gas/tests/species_facade_test.py",
     "test": "test_multi_species_facade",
     "original": "def test_multi_species_facade() -> None:\n    \"\"\"Facade works with multiple species in a single box.\"\"\"\n    data = GasData(\n        name=[\"Water\", \"Ammonia\"],\n        molar_mass=np.array([0.018, 0.017]),\n        concentration=np.array([[1e-6, 2e-6]]),\n        partitioning=np.array([True, True]),\n    )\n    strategies: list[VaporPressureStrategy] = [\n        ConstantVaporPressureStrategy(2330.0),\n        ConstantVaporPressureStrategy(1000.0),\n    ]\n    species = GasSpecies.from_data(\n        data, cast(list[VaporPressureStrategy], strategies)\n    )\n\n    npt.assert_array_equal(species.get_name(), np.array([\"Water\", \"Ammonia\"]))\n    npt.assert_allclose(species.get_molar_mass(), np.array([0.018, 0.017]))\n    npt.assert_allclose(species.get_concentration(), np.array([1e-6, 2e-6]))",
-    "status": "pending assertion-level successor review"
+    "successors": [
+      "particula/gas/tests/native_gas_construction_test.py::test_native_gas_preserves_species_facade_storage_cases"
+    ],
+    "disposition": "Retain explicit native storage fields and ordered species; scalar/vector facade return modes and wrappers are removed."
   },
   {
     "file": "particula/gas/tests/species_facade_test.py",
     "test": "test_from_data_mixed_partitioning_raises",
     "original": "def test_from_data_mixed_partitioning_raises() -> None:\n    \"\"\"from_data raises for mixed partitioning values.\"\"\"\n    data = GasData(\n        name=[\"Water\", \"Ammonia\"],\n        molar_mass=np.array([0.018, 0.017]),\n        concentration=np.array([[1e-6, 2e-6]]),\n        partitioning=np.array([True, False]),\n    )\n    strategies: list[VaporPressureStrategy] = [\n        ConstantVaporPressureStrategy(2330.0),\n        ConstantVaporPressureStrategy(1000.0),\n    ]\n\n    with pytest.raises(ValueError, match=\"mixed partitioning\"):\n        GasSpecies.from_data(\n            data, cast(list[VaporPressureStrategy], strategies)\n        )",
-    "status": "pending assertion-level successor review"
+    "successors": [
+      "particula/gas/tests/native_gas_construction_test.py::test_native_gas_preserves_species_facade_storage_cases"
+    ],
+    "disposition": "Uniform-only facade restriction is obsolete. Native explicit storage retains mixed masks without splitting gas authority."
   },
   {
     "file": "particula/gas/tests/species_private_test.py",
     "test": "test_infer_species_count_prefers_max_dimension",
     "original": "def test_infer_species_count_prefers_max_dimension() -> None:\n    \"\"\"_infer_species_count returns the maximum input species count.\"\"\"\n    species = _make_facade_single()\n    count = species._infer_species_count(\n        name=\"Water\",\n        molar_mass=np.array([0.018, 0.017]),\n        concentration=np.array([1e-6, 2e-6]),\n    )\n\n    assert count == 2",
-    "status": "pending assertion-level successor review"
+    "successors": [
+      "particula/gas/tests/gas_data_test.py::test_concentration_n_species_mismatch"
+    ],
+    "disposition": "Dimension guessing is removed; native storage rejects concentration width inconsistent with explicit species names."
   },
   {
     "file": "particula/gas/tests/species_private_test.py",
     "test": "test_normalize_names_str_and_array_modes",
     "original": "def test_normalize_names_str_and_array_modes() -> None:\n    \"\"\"_normalize_names returns list and mode for inputs.\"\"\"\n    species = _make_facade_single()\n\n    names, mode = species._normalize_names(\"Water\", n_species=2)\n    assert names == [\"Water\", \"Water\"]\n    assert mode == \"array\"\n\n    names, mode = species._normalize_names(\n        np.array([\"Water\", \"Ammonia\"]), n_species=2\n    )\n    assert names == [\"Water\", \"Ammonia\"]\n    assert mode == \"array\"",
-    "status": "pending assertion-level successor review"
+    "successors": [
+      "particula/gas/tests/native_gas_construction_test.py::test_native_gas_preserves_species_facade_storage_cases"
+    ],
+    "disposition": "Retain ordered explicit names. Scalar name duplication and scalar/array return-mode bookkeeping are facade-only and removed."
   },
   {
     "file": "particula/gas/tests/species_private_test.py",
     "test": "test_normalize_molar_mass_scalar_and_mismatch_error",
     "original": "def test_normalize_molar_mass_scalar_and_mismatch_error() -> None:\n    \"\"\"_normalize_molar_mass expands scalars and validates sizes.\"\"\"\n    species = _make_facade_single()\n\n    values, mode = species._normalize_molar_mass(0.018, n_species=2)\n    npt.assert_allclose(values, np.array([0.018, 0.018]))\n    assert mode == \"scalar\"\n\n    with pytest.raises(ValueError, match=\"molar_mass length\"):\n        species._normalize_molar_mass(np.array([0.018, 0.017]), n_species=3)",
-    "status": "pending assertion-level successor review"
+    "successors": [
+      "particula/gas/tests/gas_data_test.py::test_molar_mass_shape_mismatch",
+      "particula/gas/tests/native_gas_construction_test.py::test_native_gas_preserves_species_facade_storage_cases"
+    ],
+    "disposition": "Retain native shape mismatch rejection and explicit species mass values. Implicit facade scalar expansion/mode bookkeeping is removed."
   },
   {
     "file": "particula/gas/tests/species_private_test.py",
     "test": "test_normalize_concentration_scalar_and_array_modes",
     "original": "def test_normalize_concentration_scalar_and_array_modes() -> None:\n    \"\"\"_normalize_concentration handles scalar and array inputs.\"\"\"\n    species = _make_facade_single()\n\n    values, mode = species._normalize_concentration(1e-6, n_species=1)\n    assert values.shape == (1, 1)\n    assert mode == \"scalar\"\n\n    values, mode = species._normalize_concentration(\n        np.array([1e-6, 2e-6]), n_species=1\n    )\n    assert values.shape == (2, 1)\n    assert mode == \"array\"",
-    "status": "pending assertion-level successor review"
+    "successors": [
+      "particula/gas/tests/native_gas_construction_test.py::test_native_gas_preserves_species_facade_storage_cases"
+    ],
+    "disposition": "Retain explicit native storage fields and ordered species; scalar/vector facade return modes and wrappers are removed."
   },
   {
     "file": "particula/gas/tests/species_private_test.py",
     "test": "test_normalize_concentration_multi_box_raises",
     "original": "def test_normalize_concentration_multi_box_raises() -> None:\n    \"\"\"_normalize_concentration raises for multi-box multi-species input.\"\"\"\n    species = _make_facade_multi()\n    with pytest.raises(ValueError, match=\"single box\"):\n        species._normalize_concentration(\n            np.array([[1e-6, 2e-6], [3e-6, 4e-6]]), n_species=2\n        )",
-    "status": "pending assertion-level successor review"
+    "successors": [
+      "particula/gas/tests/gas_data_test.py::test_valid_multi_box"
+    ],
+    "disposition": "Facade single-box storage restriction is obsolete: native storage supports explicit multiple boxes. CPU process admission remains separately validated."
   },
   {
     "file": "particula/gas/tests/species_private_test.py",
     "test": "test_normalize_partitioning_returns_boolean_array",
     "original": "def test_normalize_partitioning_returns_boolean_array() -> None:\n    \"\"\"_normalize_partitioning returns a boolean array mask.\"\"\"\n    species = _make_facade_single()\n\n    values = species._normalize_partitioning(False, n_species=3)\n\n    npt.assert_array_equal(values, np.array([False, False, False]))",
-    "status": "pending assertion-level successor review"
+    "successors": [
+      "particula/gas/tests/gas_data_test.py::test_partitioning_casts_to_bool"
+    ],
+    "disposition": "Native storage retains boolean mask normalization; facade scalar broadcast/mode behavior is removed."
   },
   {
     "file": "particula/gas/tests/species_private_test.py",
     "test": "test_set_concentration_rebuilds_data",
     "original": "def test_set_concentration_rebuilds_data() -> None:\n    \"\"\"_set_concentration rebuilds GasData and updates modes.\"\"\"\n    species = _make_facade_single()\n\n    species._set_concentration(np.array([2e-6, 4e-6]))\n\n    assert species.data.concentration.shape == (2, 1)\n    assert species._single_species_concentration_mode == \"array\"\n    npt.assert_allclose(\n        species.data.concentration[:, 0], np.array([2e-6, 4e-6])\n    )",
-    "status": "pending assertion-level successor review"
+    "successors": [
+      "particula/gas/tests/native_gas_construction_test.py::test_native_gas_preserves_species_facade_storage_cases",
+      "particula/tests/aerosol_replacement_test.py::test_individual_layout_change_rejects_then_coordinated_succeeds"
+    ],
+    "disposition": "Retain original explicit multibox concentration values. Implicit facade resizing/mode caches are removed; native layout publication requires coordinated replacement."
   },
   {
     "file": "particula/gas/tests/species_private_test.py",
     "test": "test_species_arrays_for_strategy_single_and_multi",
     "original": "def test_species_arrays_for_strategy_single_and_multi() -> None:\n    \"\"\"_species_arrays_for_strategy returns correct arrays.\"\"\"\n    single = _make_facade_single()\n    conc, molar = single._species_arrays_for_strategy()\n    npt.assert_allclose(conc, np.array([1e-6]))\n    npt.assert_allclose(molar, np.array([0.018]))\n\n    multi = _make_facade_multi()\n    conc, molar = multi._species_arrays_for_strategy()\n    npt.assert_allclose(conc, np.array([1e-6, 2e-6]))\n    npt.assert_allclose(molar, np.array([0.018, 0.017]))",
-    "status": "pending assertion-level successor review"
+    "successors": [
+      "particula/gas/tests/native_gas_construction_test.py::test_native_gas_preserves_species_facade_storage_cases"
+    ],
+    "disposition": "Retain explicit native storage fields and ordered species; scalar/vector facade return modes and wrappers are removed."
   },
   {
     "file": "particula/gas/tests/species_private_test.py",
     "test": "test_check_if_negative_concentration_clamps_and_warns",
     "original": "def test_check_if_negative_concentration_clamps_and_warns(\n    caplog,\n) -> None:\n    \"\"\"_check_if_negative_concentration clamps to zero and logs warning.\"\"\"\n    particula_logger = logging.getLogger(\"particula\")\n    old_propagate = particula_logger.propagate\n    particula_logger.propagate = True\n    caplog.set_level(logging.WARNING, logger=\"particula\")\n\n    species = _make_facade_single()\n    caplog.clear()\n    values = species._check_if_negative_concentration(np.array([-1.0, 2.0]))\n\n    npt.assert_allclose(values, np.array([0.0, 2.0]))\n    assert \"Negative concentration\" in caplog.text\n    particula_logger.propagate = old_propagate",
-    "status": "pending assertion-level successor review"
+    "successors": [
+      "particula/gas/tests/native_gas_construction_test.py::test_native_gas_builder_rejects_invalid_fields",
+      "particula/gas/tests/native_gas_construction_test.py::test_native_gas_rejects_invalid_species_lane_without_clamping"
+    ],
+    "disposition": "Physical builder validation rejects invalid species lanes without input mutation. Facade negative-concentration clamping/logging is intentionally removed; raw GasData remains shape-validating storage."
   },
   {
     "file": "particula/gas/tests/species_private_test.py",
     "test": "test_check_non_positive_value_raises",
     "original": "def test_check_non_positive_value_raises() -> None:\n    \"\"\"_check_non_positive_value raises for non-positive values.\"\"\"\n    species = _make_facade_single()\n\n    with pytest.raises(ValueError, match=\"Non-positive\"):\n        species._check_non_positive_value(0.0, name=\"molar_mass\")",
-    "status": "pending assertion-level successor review"
+    "successors": [
+      "particula/gas/tests/native_gas_construction_test.py::test_native_gas_builder_rejects_invalid_fields",
+      "particula/gas/tests/native_gas_construction_test.py::test_native_gas_rejects_invalid_species_lane_without_clamping"
+    ],
+    "disposition": "Physical builder validation rejects invalid species lanes without input mutation. Facade negative-concentration clamping/logging is intentionally removed; raw GasData remains shape-validating storage."
   }
 ]
