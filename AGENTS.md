@@ -90,10 +90,12 @@ Shipped by maintainer decision on 2026-09-27; measured evidence remains
 `UNSHIPPED/BLOCKED` until its designated-device final-revision gate passes. The
 [canonical data-oriented GPU roadmap](docs/Features/Roadmap/data-oriented-gpu.md)
 records Epic H's Shipped plan status and outstanding measurement gaps.
-Release 0.2.13 is planned after this closeout merges and retains both facades
-and containers. Version 0.3.0 is the planned breaking migration that removes
-`ParticleRepresentation` and `GasSpecies` and updates dependent workflows,
-documentation, examples, and tests; Epic I follows that migration. The
+The historical 0.2.13 plan retained both facades and containers. The current
+E9-M6 development tree removes `ParticleRepresentation`, `GasSpecies`,
+`Atmosphere`, obsolete construction and facade bridges for the planned 0.3.0
+migration. GPU population execution/transfers and resident lifecycle require
+explicit supported metadata. Validation and release approval remain separate;
+Epic I follows the migration. The
 [GPU graph-capture profiling record](docs/Features/gpu_graph_capture_performance.md)
 freezes small `(1, 16, 2)` and medium `(1000, 16, 2)` workloads, 100% activity,
 gas communication, replay counts 1/10/100/1000, and native-CUDA-only evidence

@@ -169,6 +169,8 @@ canonical checkpoint bytes; CPU inspection is not continuation authority.
 There is no implicit transfer, fallback, migration or recovery. Batched storage
 does not broaden CPU execution beyond supported single-box process contracts.
 
-Legacy facade and bridge removal belongs to M6 after the examples/documentation
-gate. These temporary implementations are not a supported construction path for
-native examples, and this guide does not authorize a release.
+Legacy facades and conversion bridges have been removed from this development
+tree. CPU-Warp population transfers and resident construction require explicit
+supported distribution metadata; untagged checkpoint records reject before
+restart setup. M6 final validation and review remain separate from release
+publication.
