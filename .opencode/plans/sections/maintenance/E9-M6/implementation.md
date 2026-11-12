@@ -1695,3 +1695,73 @@ The remaining production audit also identifies ambiguous fallback gas width,
 resident diagnostics and construction compatibility, and stale condensation/
 coagulation docstrings. Shared-mask conversion is independent retained science.
 Final published documentation/notebook/readiness gates remain open.
+
+## Explicit transfer, resident and checkpoint metadata (in progress)
+
+Communication closure committed as `6412a19d9`. CPU-Warp upload and restore
+now reject missing/untagged provenance before backend setup or readback;
+explicit PMF and resolved tags retain raw values, PDF remains unsupported.
+Removed the unused `require_legacy_particle_metadata` guard. Zero remains only
+an invalid/unset low-level tag sentinel so each owning consumer can report its
+own unsupported-population admission error; it is no longer interpreted as a
+transferable population.
+
+Resident dimensions require explicit independent gas width; resident metadata
+rejects omitted/unknown population kind. CPU resident preflight checks tag
+admission before payload inspection, preserves the existing field-specific
+schema rejection order, then validates physical interpretation before upload.
+Schema v5 is unchanged: untagged or missing semantics now reject before restart
+setup/upload, and tagged native snapshots retain their canonical byte authority.
+Removed the diagnostics native/legacy mode flag and unmapped mass reducer;
+all total-mass diagnostics require explicit complete material-to-gas maps.
+
+The boundary assertion ledger currently retains 357 original test bodies.
+Shared resident fixtures now declare tags and gas width. Legacy unequal-volume
+diagnostics density fixtures are converted to counts using their original
+volumes, preserving the original independent number, mass and residual oracles.
+A PMF tagging attempt was corrected because non-unit-volume PMF is unsupported.
+No tolerance or scientific oracle was loosened. Raw conversion characterization
+retains PMF unit-volume and resolved V=0.25/1/4 transfer checks; old PDF and
+non-unit-volume PMF cases now assert the required unsupported admission.
+
+Initial collection exposed one generated fixture syntax error, fixed before
+execution (`/tmp/m6-boundary1.log`). First focused run: **445 passed, 26 skipped,
+36 failed in 42.76s** (`/tmp/m6-boundary2.log`); failures identified old
+untagged fixture/protocol expectations. After explicit fixture metadata and
+preserved schema ordering: **487 passed, 25 skipped in 42.18s**
+(`/tmp/m6-boundary3.log`). Subsequent transfer/diagnostics/checkpoint selector:
+**221 passed, 25 skipped, 2 failed** (unsupported non-unit PMF cases), then
+**223 passed, 25 skipped in 1.07s**, `/tmp/m6-boundary5.log`.
+
+Full GPU/execution run is active in `/tmp/m6-boundary-broad1.log` (session
+57174); second mypy is active/completion unpolled in
+`/tmp/m6-boundary-mypy2.log` (session 71473). Changes are uncommitted pending
+full consumer migration, rejection tests and final validation.
+
+### Explicit boundary validation closure
+
+Recovered terminal results for this revision: full GPU/execution run passed
+**4182 passed, 679 skipped in 100.15s**, `/tmp/m6-boundary-broad2.log`;
+source examples passed **225 passed, 2 skipped in 45.38s**,
+`/tmp/m6-boundary-examples1.log`. The preceding broad run exposed untagged
+dilution and precision-study fixtures; those now declare their population
+meaning. Independent-gas-width dilution fixtures resize all gas fields
+consistently. Focused consumers passed **246 passed, 17 skipped in 0.67s**,
+`/tmp/m6-boundary-consumers2.log`. No numerical tolerance was loosened.
+
+The boundary ledger contains 429 original test bodies, each with an existing
+native successor. It includes explicit unsupported-transfer dispositions and
+raw-value precision derivatives; the latter do not claim process equivalence
+to former density interpretations. Mypy passed 535 files
+(`/tmp/m6-boundary-mypy3.log`); package-wide Ruff and format checks and
+`git diff --check` passed. Standard strict docs passed in 1.63s
+(`/tmp/m6-boundary-docs1.log`). Final publication and readiness gates remain
+pending.
+
+Opt-in benchmark collection passed (31 tests in 0.39s,
+`/tmp/m6-benchmark-collection1.log`), but this is collection evidence only.
+Two benchmark fixture constructors still omit explicit population metadata;
+the coagulation workload also uses unsupported unequal active weights.
+Migrate these consumers as a separate integration prerequisite, preserving
+historical fixture provenance and identifying any changed workload. Do not
+interpret collection or optional CUDA skips as measured benchmark evidence.

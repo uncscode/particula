@@ -75,7 +75,7 @@ def _binding(
     wp = pytest.importorskip("warp")
     from particula.execution.tests.gpu_resources_test import _session
 
-    session = _session(boxes=3, particle_count=1, species=1, resolved=True)
+    session = _session(boxes=3, particle_count=1, species=1)
     particles = cast(Any, session.particles)
     gas = cast(Any, session.gas)
     particles.volume.assign(np.array([1.0, 2.0, 4.0], dtype=np.float64))

@@ -404,7 +404,8 @@ def _prepare_dilution_step_gpu(
     Only the two concentration arrays are mutated; masses and all other
     caller-owned fields are preserved.
 
-    Validation order is coefficient form, time step, particle-mass schema,
+    After explicit population admission, validation order is coefficient form,
+    time step, particle-mass schema,
     per-box coefficient schema and values, particle concentration schema and
     values, then gas concentration schema and values. Array values are scanned
     on their active device, with only a scalar validation result observed by the
@@ -433,7 +434,7 @@ def _prepare_dilution_step_gpu(
             real scalar.
         ValueError: If a schema, shape, device, or physical domain is invalid.
     """
-    native_kind = particle_distribution_type(particles)
+    particle_distribution_type(particles)
     is_per_box_coefficient = _is_warp_array_like(coefficient)
     if is_per_box_coefficient:
         validated_coefficient = _validate_warp_coefficient_form(coefficient)
@@ -481,44 +482,43 @@ def _prepare_dilution_step_gpu(
             (particle_concentration, gas_concentration),
         )
 
-    if native_kind is not None:
-        from particula.gpu.kernels._population_validation import (
-            array_field,
-            reject_writer_aliases,
-            validate_population,
-        )
+    from particula.gpu.kernels._population_validation import (
+        array_field,
+        reject_writer_aliases,
+        validate_population,
+    )
 
-        primary = validate_population(particles)
-        gas_width = gas_concentration.shape[1]
-        protected: tuple[Any, ...] = (
-            primary[0],
-            primary[2],
-            primary[3],
-            primary[4],
-            array_field(gas, "molar_mass", (gas_width,), wp.float64, device),
-            array_field(
-                gas, "vapor_pressure", (n_boxes, gas_width), wp.float64, device
-            ),
-            array_field(
-                gas, "partitioning", (n_boxes, gas_width), wp.int32, device
-            ),
-        )
-        if is_per_box_coefficient:
-            protected += (normalized_coefficient,)
-        writers: tuple[Any, ...] = (particle_concentration, gas_concentration)
-        if factors is not None:
-            # Caller-owned resident work storage is also a writer.
-            from types import SimpleNamespace
+    primary = validate_population(particles)
+    gas_width = gas_concentration.shape[1]
+    protected: tuple[Any, ...] = (
+        primary[0],
+        primary[2],
+        primary[3],
+        primary[4],
+        array_field(gas, "molar_mass", (gas_width,), wp.float64, device),
+        array_field(
+            gas, "vapor_pressure", (n_boxes, gas_width), wp.float64, device
+        ),
+        array_field(
+            gas, "partitioning", (n_boxes, gas_width), wp.int32, device
+        ),
+    )
+    if is_per_box_coefficient:
+        protected += (normalized_coefficient,)
+    writers: tuple[Any, ...] = (particle_concentration, gas_concentration)
+    if factors is not None:
+        # Caller-owned resident work storage is also a writer.
+        from types import SimpleNamespace
 
-            array_field(
-                SimpleNamespace(factors=factors),
-                "factors",
-                (n_boxes,),
-                wp.float64,
-                device,
-            )
-            writers += (factors,)
-        reject_writer_aliases(writers, protected)
+        array_field(
+            SimpleNamespace(factors=factors),
+            "factors",
+            (n_boxes,),
+            wp.float64,
+            device,
+        )
+        writers += (factors,)
+    reject_writer_aliases(writers, protected)
 
     if (
         n_boxes == 0

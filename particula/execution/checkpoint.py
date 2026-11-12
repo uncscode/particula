@@ -131,8 +131,9 @@ class ResidentCheckpoint:
             for acquired RNG resources. This preserves the wall-loss
             acquisition boundary, whose sole ``rng_states`` sidecar is
             intentionally excluded from ordinary payloads.
-        distribution_type: Explicit "discrete", "particle_resolved", or
-            "legacy_untagged" semantics for canonical population bytes.
+        distribution_type: Explicit "discrete" or "particle_resolved"
+            semantics for canonical population bytes. Missing or untagged
+            records reject before restart setup or upload.
     """
 
     schema_version: int
@@ -150,7 +151,7 @@ class ResidentCheckpoint:
     communication: "CommunicationCheckpointMetadata | None" = None
     rng_continuation: "RNGContinuationCheckpoint | None" = None
     rng_resource_processes: tuple[str, ...] = ()
-    distribution_type: str = "legacy_untagged"
+    distribution_type: str = ""
 
 
 @dataclass(frozen=True)
@@ -520,7 +521,7 @@ class ResidentCheckpointController:
                 communication,
                 _capture_rng_continuation(rng_streams, rng_manifest),
                 tuple(process_id for process_id, _, _ in rng_streams),
-                self._session.metadata.distribution_type or "legacy_untagged",
+                self._session.metadata.distribution_type,
             )
         except BaseException:
             raise
@@ -639,11 +640,7 @@ def restart_resident_session(  # noqa: C901
         unpack("particles", "charge"),
         unpack("particles", "density"),
         unpack("particles", "volume"),
-        distribution_type=(
-            None
-            if checkpoint.distribution_type == "legacy_untagged"
-            else checkpoint.distribution_type
-        ),
+        distribution_type=checkpoint.distribution_type,
     )
     gas = GasData(
         list(checkpoint.gas_names),
@@ -802,7 +799,6 @@ def _validate_population_metadata(checkpoint: ResidentCheckpoint) -> None:
     """Require declared population meaning and gas width before any upload."""
     kind = checkpoint.distribution_type
     if type(kind) is not str or kind not in (
-        "legacy_untagged",
         "discrete",
         "particle_resolved",
     ):
@@ -810,12 +806,8 @@ def _validate_population_metadata(checkpoint: ResidentCheckpoint) -> None:
     width = checkpoint.dimensions.n_gas_species
     if width is not None and (type(width) is not int or width < 0):
         raise ValueError("checkpoint gas dimensions are invalid.")
-    if kind != "legacy_untagged" and width is None:
+    if width is None:
         raise ValueError("native checkpoint requires explicit gas dimensions.")
-    if kind == "legacy_untagged" and (
-        checkpoint.dimensions.gas_species != checkpoint.dimensions.n_species
-    ):
-        raise ValueError("legacy checkpoint requires equal species widths.")
     metadata = checkpoint.communication
     if (
         kind == "discrete"

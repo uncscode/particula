@@ -42,6 +42,7 @@ def _session() -> ResidentSession:
     )
 
     particles = WarpParticleData()
+    particles.distribution_kind = wp.int32(3)
     particles.masses = wp.array(
         np.array([[[2.0, 3.0], [0.0, 0.0]], [[5.0, 7.0], [11.0, 13.0]]]),
         dtype=wp.float64,
@@ -68,14 +69,31 @@ def _session() -> ResidentSession:
     environment.saturation_ratio = wp.array(
         np.array([[2.0, 3.0], [4.0, 5.0]]), dtype=wp.float64, device="cpu"
     )
+    # Convert the original density fixture to counts at its physical volume.
+    particles.concentration.assign(
+        particles.concentration.numpy() * particles.volume.numpy()[:, None]
+    )
     return ResidentSession(
         particles,
         gas,
         environment,
-        ResidentDimensions(2, 2, 2),
-        ResidentMetadata(Device(Backend.WARP, "cpu"), ("a", "b")),
+        ResidentDimensions(2, 2, 2, 2),
+        ResidentMetadata(
+            Device(Backend.WARP, "cpu"),
+            ("a", "b"),
+            distribution_type="particle_resolved",
+        ),
         ResidentLifecycle.ACTIVE,
     )
+
+
+def _identity_mass_map():
+    """Declare the fixture's two material lanes in full gas order."""
+    from particula.dynamics.condensation.species_mapping import (
+        CondensationSpeciesMap,
+    )
+
+    return CondensationSpeciesMap(("a", "b"), ((0, 0), (1, 1)))
 
 
 def _plan(
@@ -162,7 +180,9 @@ def test_diagnostics_reducers_match_independent_numpy_oracle() -> None:
             ResidentDiagnosticOperation.SATURATION_RATIO_SNAPSHOT, saturation
         ),
         ResidentDiagnosticRegistration(
-            ResidentDiagnosticOperation.TOTAL_SPECIES_MASS, total
+            ResidentDiagnosticOperation.TOTAL_SPECIES_MASS,
+            total,
+            species_map=_identity_mass_map(),
         ),
         ResidentDiagnosticRegistration(
             ResidentDiagnosticOperation.PARTICLE_NUMBER_CONCENTRATION, number
@@ -283,6 +303,7 @@ def test_parallel_reductions_match_large_non_power_of_two_oracle() -> None:
     volume = np.array([1.5, 2.5], dtype=np.float64)
     gas_concentration = np.array([[3.0, 5.0], [7.0, 11.0]]) * 1e-18
     particles = WarpParticleData()
+    particles.distribution_kind = wp.int32(3)
     particles.masses = wp.array(masses, dtype=wp.float64, device="cpu")
     particles.concentration = wp.array(
         concentration, dtype=wp.float64, device="cpu"
@@ -309,12 +330,17 @@ def test_parallel_reductions_match_large_non_power_of_two_oracle() -> None:
     environment.saturation_ratio = wp.ones(
         (n_boxes, n_species), dtype=wp.float64, device="cpu"
     )
+    particles.concentration.assign(concentration * volume[:, None])
     session = ResidentSession(
         particles,
         gas,
         environment,
-        ResidentDimensions(n_boxes, n_particles, n_species),
-        ResidentMetadata(Device(Backend.WARP, "cpu"), ("a", "b")),
+        ResidentDimensions(n_boxes, n_particles, n_species, n_species),
+        ResidentMetadata(
+            Device(Backend.WARP, "cpu"),
+            ("a", "b"),
+            distribution_type="particle_resolved",
+        ),
         ResidentLifecycle.ACTIVE,
     )
     total = wp.zeros((n_boxes, n_species), dtype=wp.float64, device="cpu")
@@ -334,7 +360,9 @@ def test_parallel_reductions_match_large_non_power_of_two_oracle() -> None:
             zero_matrix(),
         ),
         ResidentDiagnosticRegistration(
-            ResidentDiagnosticOperation.TOTAL_SPECIES_MASS, total
+            ResidentDiagnosticOperation.TOTAL_SPECIES_MASS,
+            total,
+            species_map=_identity_mass_map(),
         ),
         ResidentDiagnosticRegistration(
             ResidentDiagnosticOperation.PARTICLE_NUMBER_CONCENTRATION, number
@@ -381,6 +409,7 @@ def test_diagnostic_registration_requires_exact_accounting_bindings() -> None:
             ResidentDiagnosticOperation.TOTAL_SPECIES_MASS,
             output,
             energy_transfer=object(),
+            species_map=_identity_mass_map(),
         )
 
 
@@ -430,7 +459,9 @@ def test_diagnostic_registration_retains_valid_bindings_by_identity() -> None:
             ResidentDiagnosticOperation.SATURATION_RATIO_SNAPSHOT, output
         ),
         ResidentDiagnosticRegistration(
-            ResidentDiagnosticOperation.TOTAL_SPECIES_MASS, output
+            ResidentDiagnosticOperation.TOTAL_SPECIES_MASS,
+            output,
+            species_map=_identity_mass_map(),
         ),
         ResidentDiagnosticRegistration(
             ResidentDiagnosticOperation.PARTICLE_NUMBER_CONCENTRATION, output
@@ -484,7 +515,9 @@ def test_diagnostics_launches_parallel_stages(
             ResidentDiagnosticOperation.SATURATION_RATIO_SNAPSHOT, _matrix()
         ),
         ResidentDiagnosticRegistration(
-            ResidentDiagnosticOperation.TOTAL_SPECIES_MASS, _matrix()
+            ResidentDiagnosticOperation.TOTAL_SPECIES_MASS,
+            _matrix(),
+            species_map=_identity_mass_map(),
         ),
         ResidentDiagnosticRegistration(
             ResidentDiagnosticOperation.PARTICLE_NUMBER_CONCENTRATION,
@@ -528,9 +561,10 @@ def test_diagnostics_launches_parallel_stages(
         "_copy_snapshot",
         "_copy_snapshot",
         "_initialize_total_species_mass",
-        "_accumulate_particle_species_mass",
+        "_accumulate_mapped_particle_mass",
+        "_accumulate_mapped_particle_mass",
         "_clear_particle_number",
-        "_accumulate_particle_number",
+        "_accumulate_resolved_number",
         "_copy_snapshot",
         "_conservation_residual",
     ]
@@ -555,7 +589,9 @@ def test_valid_diagnostics_dispatch_avoids_executor_host_boundaries(
             ResidentDiagnosticOperation.SATURATION_RATIO_SNAPSHOT, matrices[1]
         ),
         ResidentDiagnosticRegistration(
-            ResidentDiagnosticOperation.TOTAL_SPECIES_MASS, matrices[2]
+            ResidentDiagnosticOperation.TOTAL_SPECIES_MASS,
+            matrices[2],
+            species_map=_identity_mass_map(),
         ),
         ResidentDiagnosticRegistration(
             ResidentDiagnosticOperation.PARTICLE_NUMBER_CONCENTRATION,

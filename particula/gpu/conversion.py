@@ -131,7 +131,7 @@ def to_warp_particle_data(
 
     Explicit discrete and resolved distributions retain their kind. Tagged
     PDFs reject before Warp availability checks or uploads because no GPU
-    radius-grid algorithm is supported. Untagged legacy data stays untagged.
+    radius-grid algorithm is supported. Untagged storage is not transferable.
 
     Args:
         data: CPU-side ParticleData container.
@@ -153,10 +153,11 @@ def to_warp_particle_data(
         >>> len(gpu_data.masses.shape)
         3
     """
-    if data.distribution_type is not None:
-        data.validate_representation()
-        if data.distribution_type == "continuous_pdf":
-            raise ValueError("GPU continuous_pdf populations are unsupported")
+    if data.distribution_type is None:
+        raise ValueError("GPU transfer requires explicit population metadata")
+    if data.distribution_type == "continuous_pdf":
+        raise ValueError("GPU continuous_pdf populations are unsupported")
+    data.validate_representation()
     wp = _ensure_warp_available()
     _validate_device(wp, device)
 
@@ -164,7 +165,7 @@ def to_warp_particle_data(
 
     gpu_data = WarpParticleData()
     gpu_data.distribution_kind = wp.int32(
-        {None: 0, "discrete": 1, "particle_resolved": 3}[data.distribution_type]
+        {"discrete": 1, "particle_resolved": 3}[data.distribution_type]
     )
 
     if copy:
@@ -440,8 +441,8 @@ def from_warp_particle_data(
     Use this to transfer GPU-resident particle data back to CPU after
     GPU simulation steps. The returned ParticleData can be used for
     analysis or continuing with CPU-based operations. Discrete and resolved
-    tags survive restoration; legacy untagged input stays untagged. No density
-    conversion occurs. Unknown tags and unsupported PDF metadata reject before
+    tags survive restoration without density conversion. Missing, untagged,
+    unknown tags and unsupported PDF metadata reject before
     synchronization or readback.
 
     Args:

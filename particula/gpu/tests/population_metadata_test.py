@@ -93,9 +93,9 @@ def test_resolved_raw_round_trip_and_independent_inventory(
     )
 
 
-@pytest.mark.parametrize("kind,code", [(None, 0), ("discrete", 1)])
-def test_pmf_and_legacy_round_trip_preserve_meaning(device, kind, code):
-    """Transfer does not assign resolved meaning to old untagged carriers."""
+@pytest.mark.parametrize("kind,code", [("discrete", 1)])
+def test_pmf_round_trip_preserves_meaning(device, kind, code):
+    """Transfer preserves the explicit PMF density interpretation."""
     source = _particles(kind, 1.0)
     gpu = conversion.to_warp_particle_data(source, device=device)
     assert particle_distribution_code(gpu) == code
@@ -104,7 +104,7 @@ def test_pmf_and_legacy_round_trip_preserve_meaning(device, kind, code):
     np.testing.assert_array_equal(restored.concentration, source.concentration)
 
 
-@pytest.mark.parametrize("code", [-1, 2, 4, 3.5, True, None, "3"])
+@pytest.mark.parametrize("code", [-1, 0, 2, 4, 3.5, True, None, "3"])
 def test_restore_rejects_bad_or_unsupported_tag_before_probe(monkeypatch, code):
     """No synchronization/readback occurs when provenance cannot be restored."""
 
@@ -118,11 +118,12 @@ def test_restore_rejects_bad_or_unsupported_tag_before_probe(monkeypatch, code):
         )
 
 
-def test_default_warp_tag_is_explicit_legacy(device):
-    """A fresh struct's wrapped zero is recognized without equality coercion."""
+def test_default_warp_tag_cannot_be_interpreted(device):
+    """A fresh struct has an unset tag and cannot imply a population."""
     from particula.gpu.warp_types import WarpParticleData
 
-    assert particle_distribution_type(WarpParticleData()) is None
+    with pytest.raises(ValueError, match="explicit population metadata"):
+        particle_distribution_type(WarpParticleData())
 
 
 @pytest.mark.parametrize(
@@ -269,3 +270,30 @@ def test_binding_validation_has_no_device_work(device, monkeypatch):
     monkeypatch.setattr(wp, "launch", forbidden)
     monkeypatch.setattr(wp, "synchronize", forbidden)
     binding.validate(particles, gas)
+
+
+@pytest.mark.parametrize("copy", [True, False])
+def test_untagged_upload_rejects_before_backend_probe(monkeypatch, copy):
+    """Raw CPU scratch is not a transferable population without a tag."""
+    source = _particles(None)
+    before = source.masses.copy(), source.concentration.copy()
+
+    def forbidden():
+        pytest.fail("untagged upload reached backend setup")
+
+    monkeypatch.setattr(conversion, "_ensure_warp_available", forbidden)
+    with pytest.raises(ValueError, match="explicit population metadata"):
+        conversion.to_warp_particle_data(source, device="cpu", copy=copy)
+    np.testing.assert_array_equal(source.masses, before[0])
+    np.testing.assert_array_equal(source.concentration, before[1])
+
+
+def test_missing_restore_tag_rejects_before_backend_probe(monkeypatch):
+    """A missing tag cannot trigger synchronization or payload access."""
+
+    def forbidden():
+        pytest.fail("untagged restore reached backend setup")
+
+    monkeypatch.setattr(conversion, "_ensure_warp_available", forbidden)
+    with pytest.raises(ValueError, match="explicit population metadata"):
+        conversion.from_warp_particle_data(SimpleNamespace())

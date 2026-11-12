@@ -49,8 +49,8 @@ class WarpParticleData:
             Shared across all boxes - not batched.
         volume: Simulation volume per box in m^3.
             Shape: (n_boxes,)
-        distribution_kind: Stable host-visible population tag: 0 legacy
-            untagged, 1 discrete density, 2 unsupported PDF, 3 resolved counts.
+        distribution_kind: Stable host-visible population tag: 0 invalid/unset,
+            1 discrete density, 2 unsupported PDF, 3 resolved counts.
             Numerical arrays are never normalized by assigning this tag.
 
     Example:

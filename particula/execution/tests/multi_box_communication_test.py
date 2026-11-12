@@ -49,7 +49,7 @@ def _request(
     from particula.execution import process_graph
     from particula.execution.tests.gpu_resources_test import _session
 
-    session = _session(boxes=3, particle_count=4, species=2, resolved=True)
+    session = _session(boxes=3, particle_count=4, species=2)
     particles = cast(Any, session.particles)
     gas = cast(Any, session.gas)
     particles.volume = wp.array([2.0, 1.0, 4.0], dtype=wp.float64, device="cpu")

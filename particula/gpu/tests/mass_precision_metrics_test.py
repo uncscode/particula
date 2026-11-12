@@ -843,14 +843,15 @@ def test_study_helpers_leave_warp_defaults_at_float64() -> None:
     """The study stays isolated from production Warp dtype defaults."""
     wp = pytest.importorskip("warp")
     case = _MASS_PRECISION_CASES[2]
-    # Warp has no durable tagged metadata carrier yet: exercise the existing
-    # raw-array precision study on its untagged direct-data path.
+    # The raw-array precision study preserves its values with explicit count
+    # metadata; this boundary test does not assert process-level semantics.
     data = ParticleData(
         masses=case.masses,
         density=case.density_kg_m3,
         concentration=case.concentration,
         charge=case.charge,
         volume=case.volume,
+        distribution_type="particle_resolved",
     )
 
     gpu_data = to_warp_particle_data(data, device="cpu")

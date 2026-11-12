@@ -79,8 +79,8 @@ writable particle arrays; new population helpers call it on each read and
 reject invalid interpretation without repairing input. The caller owns
 representation-consistent changes. Native Warp transfers preserve the explicit
 `discrete` or `particle_resolved` kind and its volume interpretation. Continuous
-PDF upload is unsupported; do not clear a tag to bypass admission. Legacy
-untagged transfers remain compatibility storage, not native process admission.
+PDF upload is unsupported. Missing or untagged population metadata rejects
+before transfer setup or readback; clearing a tag cannot bypass admission.
 The former `from_representation()` and `to_representation()` bridges have
 been removed. Construct native data with an explicit distribution kind;
 use `copy()` to retain that provenance in detached storage.
@@ -107,9 +107,9 @@ from particula.particles import ParticleData
 
 Native `Aerosol` holds `ParticleData`, `GasData` and `EnvironmentData` by
 identity. Scientific processes own their physics and validate their supported
-single-box inputs. Legacy untagged carriers remain available, but their raw
-arrays do not establish a distribution interpretation. This guide describes
-the selected checkout; it does not announce a release or M6 facade removal.
+single-box inputs. Incomplete CPU material scratch storage may omit a tag,
+but it is not an executable or transferable population. This guide describes
+the selected checkout; release publication remains a separate decision.
 
 ### Stored units and physical inventories
 
@@ -964,7 +964,7 @@ leading `n_boxes` axis.
 | `charge` | `(n_boxes, n_particles)` | Per-box particle charge state as dimensionless elementary-charge counts. |
 | `density` | `(n_species,)` | Shared-across-box species density. |
 | `volume` | `(n_boxes,)` | Authoritative per-box simulation volume in m³. |
-| `distribution_type` | Scalar string or `None` | Explicit CPU interpretation; `None` is legacy untagged storage. |
+| `distribution_type` | Scalar string or `None` | Explicit CPU interpretation; `None` is incomplete material scratch storage, rejected by native execution and Warp transfer. |
 | `radius_grid` | `(n_particles,)` or `None` | CPU-only PDF radius nodes in metres; required only for `continuous_pdf`. |
 
 Derived properties such as `radii`, `total_mass`, and `effective_density` are

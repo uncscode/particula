@@ -220,7 +220,7 @@ def _request(
     from particula.execution import process_graph
     from particula.execution.tests.gpu_resources_test import _session
 
-    session = _session(boxes=3, particle_count=2, species=1, resolved=True)
+    session = _session(boxes=3, particle_count=2, species=1)
     registry = GPUResourceRegistry(session)
     resources = registry.acquire_communication(
         _configuration(mode, final_volumes=final_volumes)
