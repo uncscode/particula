@@ -8,7 +8,7 @@ The direct coagulation call is part of the illustrative [explicit-transfer seque
 
 ## Overview
 
-The coagulation strategy system lets you model particle collisions using the same object-oriented patterns as condensation and wall loss. Instead of calling standalone kernel functions, you work with strategy objects that operate on `ParticleRepresentation`, support multiple distribution types, and expose a consistent `kernel` / `rate` / `step` interface. Strategies cover Brownian motion, electrostatic enhancement, turbulence (shear and DNS), gravitational sedimentation, and user-defined combinations.
+The coagulation strategy system lets you model particle collisions using the same object-oriented patterns as condensation and wall loss. Instead of calling standalone kernel functions, you work with strategy objects that operate on native `ParticleData`, support multiple distribution types, and expose a consistent `kernel` / `rate` / `step` interface. Strategies cover Brownian motion, electrostatic enhancement, turbulence (shear and DNS), gravitational sedimentation, and user-defined combinations.
 
 This feature is built around user-facing APIs exposed via `particula.dynamics`:
 
@@ -53,10 +53,8 @@ rates remain zero. Supplied pair kernels must be real, finite, nonnegative
 square matrices matching the population width.
 
 Gain/loss/net-rate APIs remain discrete/PDF operations. Native resolved kernel
-support does not introduce deterministic resolved rate APIs. Existing
-untagged/facade examples below
-retain their temporary compatibility behavior; M4 owns runnable and adapter
-migration. Independent native fixtures are in
+support does not introduce deterministic resolved rate APIs. The examples below use native state. Legacy untagged/facade
+execution remains available for compatibility until the separate M6 removal. Independent native fixtures are in
 `particula/dynamics/coagulation/coagulation_strategy/tests/native_rates_test.py`.
 
 ### Native CPU stepping and conservation
@@ -131,7 +129,7 @@ pytest particula/dynamics/coagulation/coagulation_strategy/tests/native_coagulat
 - **Builder/factory parity with validation**: Fluent builders enforce distribution type, turbulent parameters, fluid density, and charged kernel strategy selection with optional unit conversion.
 - **Coverage of major coagulation regimes**: Brownian, charged/electrostatic, turbulent shear, turbulent DNS, and sedimentation kernels plus additive combinations.
 - **Distribution-type flexibility**: Works with "discrete", "continuous_pdf", and "particle_resolved" modes so you can reuse existing particle builders.
-- **Pipeline ready**: `Coagulation` runnable uses `sub_steps`, clamps through strategy logic, and chains with other runnables via `|` for end-to-end simulations.
+- **Pipeline ready**: `Coagulation` runnable uses `sub_steps`, rejects negative native density proposals, and chains with other runnables via `|` for end-to-end simulations.
 
 ## Who It's For
 
@@ -178,9 +176,23 @@ All strategies share a common shape:
 `Coagulation` is a `RunnableABC` exported as `par.dynamics.Coagulation`. It operates on an `Aerosol`, delegates `step` to the provided coagulation strategy, splits `time_step` across any `sub_steps`, and composes with other runnables using `|`:
 
 ```python
+import numpy as np
 import particula as par
 
-aerosol = ...  # your Aerosol instance
+particles = par.particles.create_lognormal_binned_particle_data(
+    distribution_type="discrete",
+    radius_bins=np.geomspace(50e-9, 500e-9, 64),
+    mode=[100e-9], geometric_standard_deviation=[1.5],
+    number_concentration=[1e8],
+)
+gas = par.gas.GasData(
+    name=["organic"], molar_mass=np.array([0.180]),
+    concentration=np.array([[1e-6]]), partitioning=np.array([True]),
+)
+environment = par.gas.EnvironmentData(
+    temperature=[298.15], pressure=[101325.0], saturation_ratio=[[1.0]],
+)
+aerosol = par.Aerosol(particles=particles, gas=gas, environment=environment)
 coagulation = par.dynamics.Coagulation(
     coagulation_strategy=par.dynamics.BrownianCoagulationStrategy(
         distribution_type="discrete",
@@ -191,7 +203,7 @@ coagulation = par.dynamics.Coagulation(
 updated = coagulation.execute(
     aerosol,
     time_step=60.0,
-    sub_steps=4,
+    sub_steps=240,
 )
 
 # Chain with wall loss or condensation in one pipeline
@@ -203,7 +215,7 @@ wall_loss = par.dynamics.WallLoss(
     ),
 )
 pipeline = coagulation | wall_loss
-updated = pipeline.execute(aerosol, time_step=60.0)
+updated = pipeline.execute(aerosol, time_step=60.0, sub_steps=240)
 ```
 
 ### Brownian coagulation strategy
@@ -287,10 +299,13 @@ turb_dns = factory.get_strategy(
     strategy_type="turbulent_dns",
     parameters={
         "distribution_type": "discrete",
-        "turbulent_dissipation": 1e-2,      # m^2/s^3
-        "fluid_density": 1.225,             # kg/m^3
+        "turbulent_dissipation": 1e-2,
+        "turbulent_dissipation_units": "m^2/s^3",
+        "fluid_density": 1.225,
+        "fluid_density_units": "kg/m^3",
         "reynolds_lambda": 150.0,           # dimensionless
-        "relative_velocity": 0.6,           # m/s
+        "relative_velocity": 0.6,
+        "relative_velocity_units": "m/s",
     },
 )
 ```
@@ -321,21 +336,25 @@ combined = par.dynamics.CombineCoagulationStrategy(
 The strategy system operates on the same distribution types used elsewhere in particula:
 
 - "discrete" – radius-binned distributions.
-- "continuous_pdf" – continuous probability-density representations.
+- "continuous_pdf" – radius number-density PDFs (`dn/dr` in m⁻⁴).
 - "particle_resolved" – ensembles of individual particles with stochastic pair selection.
 
-Select the appropriate mode at initialization (or via builders/factory). Particle-resolved paths use kernel-radius binning and `collide_pairs` updates; discrete/continuous paths apply gain/loss rate updates.
+Select the appropriate mode at initialization (or via builders/factory). Particle-resolved paths use kernel-radius binning and count-weighted merges; discrete/continuous paths apply gain/loss rate updates.
 
 ### Particle-resolved coagulation
 
 `CoagulationStrategyABC.step` handles particle-resolved updates by mapping to a kernel radius grid, drawing collision pairs, and updating via `collide_pairs`:
 
 ```python
+resolved_particles = par.particles.create_resolved_particle_data(
+    masses=[1e-18, 2e-18], density=1000.0,
+    concentration=[1.0, 1.0], volume=1e-6,
+)
 particle_resolved = par.dynamics.BrownianCoagulationStrategy(
     distribution_type="particle_resolved",
 )
-aerosol.particles = particle_resolved.step(
-    particle=aerosol.particles,
+resolved_particles = particle_resolved.step(
+    particle=resolved_particles,
     temperature=298.15,
     pressure=101325.0,
     time_step=1.0,
@@ -352,7 +371,7 @@ import particula as par
 # Brownian via builder
 brownian = (
     par.dynamics.BrownianCoagulationBuilder()
-    .set_distribution_type("discrete")
+    .set_distribution_type("continuous_pdf")
     .build()
 )
 
@@ -370,10 +389,18 @@ combined = factory.get_strategy(
     strategy_type="combine",
     parameters={
         "strategies": [brownian, charged],
-        "distribution_type": "continuous_pdf",
     },
 )
 ```
+
+The snippets on this page use the selected E9 checkout. CPU snippets share
+imports and the native aerosol constructed in the runnable section above;
+optional GPU snippets only declare their separate low-level interfaces.
+That runnable fixture uses an explicitly truncated 50–500 nm, 64-bin PMF
+with a 100 nm mode, GSD 1.5 and 1e8 m⁻³ number density. Its finite interval is
+an illustration, not a converged distribution or atmospheric calibration.
+The 60/120-second runs use 0.25-second substeps to keep this fixture's native
+proposals admissible. This does not establish a general timestep bound.
 
 ## Getting Started
 
@@ -383,7 +410,9 @@ combined = factory.get_strategy(
 import particula as par
 
 # 1. Build a radius-binned particle distribution
-particle = par.particles.PresetParticleRadiusBuilder().build()
+particle = par.particles.create_lognormal_binned_particle_data(
+    distribution_type="discrete",
+)
 
 # 2. Configure Brownian coagulation
 brownian = par.dynamics.BrownianCoagulationStrategy(
@@ -407,22 +436,24 @@ particle = brownian.step(
 
 ### Prerequisites
 
-- `particula` version 0.2.6 or later installed.
-- A `ParticleRepresentation` instance (e.g., from preset particle builders).
+- The selected E9 checkout installed with `pip install -e .`; no older-wheel compatibility is implied.
+- A native `ParticleData` instance (with an explicit population kind).
 - Basic familiarity with particula dynamics and the runnable pipeline (`|`).
 
 ## Typical Workflows
 
-### 1. Build a ParticleRepresentation
+### 1. Build native ParticleData
 
 Use preset builders or custom particle-resolved constructors:
 
 ```python
-particle = (
-    par.particles.PresetParticleRadiusBuilder()
-    .set_volume(1.0, "m^3")
-    .build()
+particle = par.particles.create_lognormal_binned_particle_data(
+    distribution_type="discrete", volume=1.0,
+    radius_bins=np.geomspace(50e-9, 500e-9, 64),
+    mode=[100e-9], geometric_standard_deviation=[1.5],
+    number_concentration=[1e8],
 )
+aerosol.particles = particle
 ```
 
 ### 2. Configure a coagulation strategy
@@ -444,7 +475,7 @@ coagulation = par.dynamics.Coagulation(coagulation_strategy=coag_strategy)
 updated = coagulation.execute(
     aerosol,
     time_step=120.0,
-    sub_steps=3,
+    sub_steps=480,
 )
 ```
 
@@ -453,12 +484,18 @@ updated = coagulation.execute(
 Order processes explicitly using the `|` operator:
 
 ```python
+from particula.dynamics.condensation.species_mapping import CondensationSpeciesMap
+
 condensation = par.dynamics.MassCondensation(
-    condensation_strategy=par.dynamics.CondensationIsothermal(
-        molar_mass=0.18,
+    par.dynamics.CondensationIsothermal(
+        molar_mass=gas.molar_mass.copy(),
         diffusion_coefficient=2e-5,
         accommodation_coefficient=1.0,
-    ),
+        activity_strategy=par.particles.ActivityIdealMass(),
+        surface_strategy=par.particles.SurfaceStrategyVolume(density=1000.0),
+        vapor_pressure_strategy=par.gas.ConstantVaporPressureStrategy(1e-3),
+        species_map=CondensationSpeciesMap(("organic",), ((0, 0),)),
+    )
 )
 wall_loss = par.dynamics.WallLoss(
     wall_loss_strategy=par.dynamics.SphericalWallLossStrategy(
@@ -468,7 +505,7 @@ wall_loss = par.dynamics.WallLoss(
     ),
 )
 pipeline = condensation | coagulation | wall_loss
-updated = pipeline.execute(aerosol, time_step=60.0, sub_steps=2)
+updated = pipeline.execute(aerosol, time_step=60.0, sub_steps=240)
 ```
 
 ### 5. Builder/factory workflow for reproducibility
@@ -485,11 +522,15 @@ coagulation = par.dynamics.Coagulation(coagulation_strategy=coag_strategy)
 ### 6. Particle-resolved collision loop
 
 ```python
+resolved_particles = par.particles.create_resolved_particle_data(
+    masses=[1e-18, 2e-18], density=1000.0,
+    concentration=[1.0, 1.0], volume=1e-6,
+)
 particle_resolved = par.dynamics.BrownianCoagulationStrategy(
     distribution_type="particle_resolved",
 )
-aerosol.particles = particle_resolved.step(
-    particle=aerosol.particles,
+resolved_particles = particle_resolved.step(
+    particle=resolved_particles,
     temperature=300.0,
     pressure=101325.0,
     time_step=0.5,
@@ -533,7 +574,7 @@ aerosol.particles = particle_resolved.step(
 
 ## Best Practices
 
-1. **Match distribution type to particle builder:** Keep `distribution_type` consistent with how `ParticleRepresentation` was constructed to avoid unintended kernel application.
+1. **Match distribution type to particle builder:** Keep `distribution_type` consistent with how native `ParticleData` was constructed to avoid unintended kernel application.
 2. **Use builders/factory for validation:** Let builders enforce turbulence units, fluid density, and charged-kernel selection; avoid manual instantiation when sharing configurations.
 3. **Start with smaller `time_step` and use `sub_steps`:** Especially for particle-resolved or highly turbulent cases to reduce overshoot in collisions.
 4. **Combine kernels deliberately:** Use `CombineCoagulationStrategy` when you need additive physics (e.g., Brownian + turbulent shear); ensure all strategies share the same distribution type.
@@ -599,7 +640,9 @@ references. Enqueue uses current counts from the pinned device arrays and
 performs no allocation, readback, synchronization, reset or host configuration
 resolution. Callers keep arrays alive and state compatible between enqueues;
 new bindings or semantics require preparation again. This is direct/prepared
-science evidence; native resident/checkpoint integration remains M4-owned.
+science evidence. Native resident continuation is illustrated in the
+[resident walkthrough](../Examples/gpu_resident_multi_timestep.py); it requires
+fresh exact-device containers and bindings after explicit restart.
 
 Native regression coverage uses resolved volumes 0.25/1/4 m³, common counts
 0.25/1/4, independent species/charge inventories and independent one-pair

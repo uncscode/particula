@@ -8,7 +8,7 @@ The direct wall-loss call appears in the illustrative [explicit-transfer sequenc
 
 ## Overview
 
-The wall loss strategy system lets you model particle deposition onto chamber walls using the same object-oriented patterns as condensation and coagulation. Instead of calling standalone rate functions, you work with strategy objects that operate on `ParticleRepresentation`, support multiple distribution types, and expose a consistent `rate` / `step` interface.
+The wall loss strategy system lets you model particle deposition onto chamber walls using the same object-oriented patterns as condensation and coagulation. Instead of calling standalone rate functions, you work with strategy objects that operate on native `ParticleData`, support multiple distribution types, and expose a consistent `rate` / `step` interface.
 
 This feature is built around user-facing APIs exposed via `particula.dynamics`:
 
@@ -22,7 +22,7 @@ This feature is built around user-facing APIs exposed via `particula.dynamics`:
 - `WallLossFactory` – factory for selecting a wall loss geometry by name with
   builder defaults.
 - `WallLoss` runnable – delegates to a wall loss strategy on `Aerosol`, splits
-  `time_step` across `sub_steps`, and clamps concentrations non-negative.
+  `time_step` across `sub_steps`, and delegates native positivity validation to the strategy.
 
 ## Native CPU strategy contract (E9-M3)
 
@@ -31,8 +31,8 @@ accept explicitly tagged, single-box `ParticleData` directly. Configuration
 remains on the strategy. Each coefficient, rate and step call revalidates the
 current representation, physical state, environment, geometry and field values.
 Native strategy and particle distribution types must agree. Legacy facade
-execution remains available for unmigrated consumers; runnable/adapter migration
-belongs to M4.
+execution remains available for compatibility. Native runnables retain the
+held containers; see the composed examples below.
 
 | Representation | Stored population | Rate measure | Native step |
 |---|---|---|---|
@@ -59,7 +59,7 @@ Removed occupied slots have their counts and species masses cleared. CPU charge
 storage is retained, including in removed slots, as in the existing CPU
 strategy. Surviving and previously unoccupied material remains unchanged.
 This is a CPU process contract, not a claim that removed charged slots satisfy
-the separate fixed-slot activation contract; M4 composition must respect that
+the separate fixed-slot activation contract; composition must respect that
 boundary. GPU removal has its own slot-clearing and RNG contract.
 
 Steps preserve the container and primary array identities. Preflight rejects
@@ -84,7 +84,7 @@ the full package runner cannot substitute for its explicit check.
 
 - **Consistent dynamics workflow**: Use the same strategy-based API (`rate`, `step`, `distribution_type`) as for condensation and coagulation.
 - **Builder/factory parity with validation**: Configure wall loss using the same unit-aware builder and factory patterns as other dynamics modules, with built-in checks for geometry and distribution types.
-- **Direct integration with ParticleRepresentation**: Apply wall loss directly to particle distributions without writing glue code.
+- **Direct integration with ParticleData**: Apply wall loss directly to particle distributions without writing glue code.
 - **Extensible wall loss models**: Add new chamber geometries or wall loss models as additional `WallLossStrategy` implementations.
 
 ## Who It's For
@@ -148,12 +148,28 @@ charged_wall_loss = par.dynamics.ChargedWallLossStrategy(
 `WallLoss` is a `RunnableABC` implementation exported as `par.dynamics.WallLoss`.
 It operates on an `Aerosol` in the runnable pipeline, delegates `rate` and
 `step` to the provided wall loss strategy, splits `time_step` across any
-`sub_steps`, clamps concentrations to be non-negative after each sub-step, and
+`sub_steps`, rejects negative native Euler proposals, and
 works with spherical or rectangular strategies across all supported
 distribution types.
 
 ```python
+import numpy as np
 import particula as par
+
+particles = par.particles.create_lognormal_binned_particle_data(
+    distribution_type="discrete",
+    radius_bins=np.geomspace(50e-9, 500e-9, 64),
+    mode=[100e-9], geometric_standard_deviation=[1.5],
+    number_concentration=[1e8],
+)
+gas = par.gas.GasData(
+    name=["organic"], molar_mass=np.array([0.180]),
+    concentration=np.array([[1e-6]]), partitioning=np.array([True]),
+)
+environment = par.gas.EnvironmentData(
+    temperature=[298.15], pressure=[101325.0], saturation_ratio=[[1.0]],
+)
+aerosol = par.Aerosol(particles=particles, gas=gas, environment=environment)
 
 wall_loss_strategy = par.dynamics.SphericalWallLossStrategy(
     wall_eddy_diffusivity=1e-3,
@@ -164,11 +180,11 @@ wall_loss = par.dynamics.WallLoss(
     wall_loss_strategy=wall_loss_strategy,
 )
 
-# Sub-steps split time_step and clamp concentrations after each sub-step
+# Sub-steps split time_step; native negative proposals reject.
 aerosol = wall_loss.execute(
     aerosol,
     time_step=60.0,
-    sub_steps=4,
+    sub_steps=240,
 )
 
 # Chain with another runnable in a single pipeline
@@ -178,7 +194,7 @@ coagulation = par.dynamics.Coagulation(
     ),
 )
 combined = coagulation | wall_loss
-aerosol = combined.execute(aerosol, time_step=60.0)
+aerosol = combined.execute(aerosol, time_step=60.0, sub_steps=240)
 ```
 
 ## Direct GPU charged wall loss
@@ -243,8 +259,10 @@ Its enqueue performs no host setup or transfer, but the frozen kernel's
 `initialize_rng=True` flag still requests a reset on each eligible launch.
 For persistent replay, supply initialized caller-owned RNG state and prepare
 with `initialize_rng=False`. Zero-time and wholly inactive calls do not advance
-or reset supplied words. Native selected-box/resident dispatch remains an M4
-integration task and rejects tagged inputs at its separate boundary.
+or reset supplied words. Native resident dispatch uses explicit resolved
+metadata and session-owned continuation streams; see the
+[resident walkthrough](../Examples/gpu_resident_multi_timestep.py). Direct
+caller-owned RNG and resident lifecycle ownership are distinct boundaries.
 
 Warp CPU is the baseline when Warp is installed. CUDA is optional and the
 focused suites skip cleanly when it is unavailable:
@@ -265,7 +283,7 @@ replay, mandatory CUDA support, and performance claims remain deferred.
 `SphericalWallLossStrategy` models deposition in a well-mixed spherical chamber. It:
 
 - Reuses existing wall loss coefficient utilities for the underlying physics.
-- Works with any `ParticleRepresentation` compatible with particula dynamics.
+- Works with single-box native `ParticleData` whose declared kind matches the strategy.
 - Computes size-dependent loss rates and updates particle concentration over time.
 
 Typical initialization:
@@ -320,11 +338,20 @@ rectangular = factory.get_strategy(
 The strategy system operates on the same distribution types used elsewhere in particula:
 
 - "discrete" – radius-binned distributions.
-- "continuous_pdf" – continuous probability-density representations.
+- "continuous_pdf" – radius number-density PDFs (`dn/dr` in m⁻⁴).
 - "particle_resolved" – ensembles of individual particles.
 
 You select the appropriate mode at initialization (or via builder/factory parameters) with `distribution_type`, and the strategy adjusts its `step` behavior to match the representation.
 
+
+The snippets on this page use the selected E9 checkout. CPU snippets share
+imports and the native aerosol constructed in the runnable section above;
+optional GPU snippets only declare their separate low-level interfaces.
+That runnable fixture uses an explicitly truncated 50–500 nm, 64-bin PMF
+with a 100 nm mode, GSD 1.5 and 1e8 m⁻³ number density. Its finite interval is
+an illustration, not a converged distribution or atmospheric calibration.
+The 60/120-second runs use 0.25-second substeps to keep this fixture's native
+proposals admissible. This does not establish a general timestep bound.
 
 ## Getting Started
 
@@ -334,7 +361,9 @@ You select the appropriate mode at initialization (or via builder/factory parame
 import particula as par
 
 # 1. Build a radius-binned particle distribution
-particle = par.particles.PresetParticleRadiusBuilder().build()
+particle = par.particles.create_lognormal_binned_particle_data(
+    distribution_type="discrete",
+)
 
 # 2. Configure spherical wall loss
 wall_loss = par.dynamics.SphericalWallLossStrategy(
@@ -348,36 +377,39 @@ T = 298.15  # K
 P = 101325.0  # Pa
 rate = wall_loss.rate(particle, temperature=T, pressure=P)
 
-# 4. Advance the system by one time step
-particle = wall_loss.step(
-    particle=particle,
-    temperature=T,
-    pressure=P,
-    time_step=10.0,  # s
-)
+# 4. Advance 10 seconds with 40 equal steps (0.25 s each).
+# Native binned wall loss rejects a step that would make a bin negative.
+for _ in range(40):
+    particle = wall_loss.step(
+        particle=particle, temperature=T, pressure=P, time_step=0.25,
+    )
 ```
 
 ### Prerequisites
 
-- `particula` version 0.2.6 or later installed.
-- A `ParticleRepresentation` instance (e.g., from one of the preset builders).
+- The selected E9 checkout installed with `pip install -e .`; no older-wheel compatibility is implied.
+- A native `ParticleData` instance (with an explicit population kind).
 - Basic familiarity with particula's dynamics and particle-phase examples.
 
 ## Typical Workflows
 
-### 1. Build a ParticleRepresentation
+### 1. Build native ParticleData
 
 Start by constructing a particle distribution using existing builders:
 
 ```python
-particle = (
-    par.particles.PresetParticleRadiusBuilder()
-    .set_volume(1.0, "m^3")
-    .build()
+particle = par.particles.create_lognormal_binned_particle_data(
+    distribution_type="discrete", volume=1.0,
+    radius_bins=np.geomspace(50e-9, 500e-9, 64),
+    mode=[100e-9], geometric_standard_deviation=[1.5],
+    number_concentration=[1e8],
 )
+aerosol.particles = particle
 ```
 
-You can also use particle-resolved or continuous-PDF builders from the particle phase examples when you need finer control.
+Use the native resolved initializer for counts at a physical volume, or
+`distribution_type="continuous_pdf"` with a radius grid for a radius PDF.
+The strategy kind must match the stored kind; CPU execution is single-box.
 
 ### 2. Configure a SphericalWallLossStrategy
 
@@ -401,29 +433,23 @@ At this point you can:
 Wall loss strategies are designed to compose with other dynamics, such as condensation and coagulation, in a single time-stepping loop:
 
 ```python
-condensation = par.dynamics.CondensationIsothermal(
-    molar_mass=180e-3,
-    diffusion_coefficient=2e-5,
-    accommodation_coefficient=1.0,
+from particula.dynamics.condensation.species_mapping import CondensationSpeciesMap
+
+condensation = par.dynamics.MassCondensation(
+    par.dynamics.CondensationIsothermal(
+        molar_mass=gas.molar_mass.copy(),
+        diffusion_coefficient=2e-5,
+        accommodation_coefficient=1.0,
+        activity_strategy=par.particles.ActivityIdealMass(),
+        surface_strategy=par.particles.SurfaceStrategyVolume(density=1000.0),
+        vapor_pressure_strategy=par.gas.ConstantVaporPressureStrategy(1e-3),
+        species_map=CondensationSpeciesMap(("organic",), ((0, 0),)),
+    )
 )
-
-# Time loop (pseudo-code)
-for _ in range(n_steps):
-    # Update particle size/composition
-    particle = condensation.step(
-        particle=particle,
-        temperature=T,
-        pressure=P,
-        time_step=dt,
-    )
-
-    # Apply wall loss to the updated distribution
-    particle = wall_loss.step(
-        particle=particle,
-        temperature=T,
-        pressure=P,
-        time_step=dt,
-    )
+wall = par.dynamics.WallLoss(wall_loss_strategy=wall_loss)
+workflow = condensation | wall
+for _ in range(10):
+    aerosol = workflow.execute(aerosol, time_step=1.0, sub_steps=2)
 ```
 
 This pattern matches how other dynamics strategies are combined in chamber simulations.
@@ -434,7 +460,7 @@ This pattern matches how other dynamics strategies are combined in chamber simul
 
 **Scenario:** You want to understand how quickly particles are lost to the walls of a well-mixed spherical chamber.
 
-**Solution:** Build a radius-binned `ParticleRepresentation`, configure `SphericalWallLossStrategy`, and integrate `step` over the experiment duration to track normalized concentration decay.
+**Solution:** Build a radius-binned native `ParticleData`, configure `SphericalWallLossStrategy`, and integrate `step` over the experiment duration to track normalized concentration decay.
 
 ### Use case 2: Full chamber dynamics with wall loss
 
@@ -453,7 +479,7 @@ This pattern matches how other dynamics strategies are combined in chamber simul
 
 ## Best Practices
 
-1. **Match distribution type to your builder**: Ensure `distribution_type` matches how your `ParticleRepresentation` was constructed to avoid unintended behavior.
+1. **Match distribution type to your builder**: Ensure `distribution_type` matches how your native `ParticleData` was constructed to avoid unintended behavior.
 2. **Use builder/factory validation**: Set parameters through the builders or factory to enforce positivity, 3D chamber dimensions, and allowed distribution types with automatic unit conversion.
 3. **Use physically reasonable parameters**: Choose `wall_eddy_diffusivity`, `chamber_radius`, or `chamber_dimensions` consistent with your experimental setup.
 4. **Compose processes explicitly**: When combining wall loss with other dynamics, keep a clear, ordered time loop so you can reason about which processes act first in each step.
@@ -475,7 +501,7 @@ This pattern matches how other dynamics strategies are combined in chamber simul
 
 ### Should I use the function-based or strategy-based wall loss API?
 
-Use `SphericalWallLossStrategy` whenever you are already working with `ParticleRepresentation` and other dynamics strategies. The function-based API remains available for lower-level or legacy workflows.
+Use `SphericalWallLossStrategy` whenever you are already working with native `ParticleData` and other dynamics strategies. The function-based API remains available for lower-level or legacy workflows.
 
 ### How do I add a new wall loss model or geometry?
 
