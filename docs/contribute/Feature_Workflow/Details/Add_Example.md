@@ -1,26 +1,65 @@
 # Add Examples
 
-## Goal
+Provide a runnable demonstration with a clear physical purpose, units and
+observable outcomes. Keep small tutorials quick; preserve the published
+workload of scientific simulations and record their longer runtime explicitly.
 
-Provide a runnable demonstration in a Jupyter notebook.
+## Native construction and process ownership
 
-## Rules
+Use the selected E9 checkout (`python -m pip install -e ".[extra]"`), not an
+older released wheel. Construct native `Aerosol` from `ParticleData`, `GasData`
+and `EnvironmentData`; use process-owned physics and explicit species maps.
+Start with [native state access and replacement](../../../Features/particle-data-migration/index.md)
+and [scientific process contracts](../../../Features/native_scientific_processes.md).
 
-- Runtime <30 s on a typical laptop (in most cases).
-- Use only the public API – no private helpers.
-  - `import particula as par`
-- End with at least one plot or printed result.
-- Contextualize the example with a short description of what it does and why it's useful.
+Declare the distribution type and representative volume. Resolved concentration
+stores counts; discrete concentration stores number density; continuous PDFs
+are radius densities dN/dr. Label plotted units and compute inventory using the
+appropriate count/volume or quadrature conversion. Preserve ordered gas names,
+unmapped inert gases and particle-material versus full-gas widths.
 
-## Steps
+Use approved package exports. Required direct-GPU configuration and sidecars
+may come from documented concrete modules; keep those ownership boundaries
+explicit. Callers own transfers, synchronization and device selection. Optional
+CUDA skips do not establish capture, performance or cross-device equivalence.
 
-1. Create a new issue on GitHub and assign it to yourself.
-1. Create a branch on your forked repo for this issue.
-2. Create `docs/examples/**/<feature_name>.ipynb`.
-   1. Add a new folder if needed, but please keep it organized.
-   2. These can also be under `docs/Theory/**/<feature_name>.ipynb` to validate the implementation of the theory.
-3. Interleave Markdown explanations with code cells.
-4. Verify it runs top‑to‑bottom.
-5. Commit the .ipynb file in your PR branch.
-  1. The website builder will automatically convert it to markdown and HTML during PR.
-6. Create your pull‑request description.
+## Source and notebook workflow
+
+Create source files under `docs/Examples/` in the owning topic. Standalone
+scripts are supported; notebook examples use paired `.py` percent-format and
+`.ipynb` files. Edit the Python source first:
+
+```bash
+ruff check docs/Examples/path/example.py --fix
+ruff format docs/Examples/path/example.py
+python .opencode/tools/validate_notebook.py docs/Examples/path/example.ipynb --sync
+python .opencode/tools/run_notebook.py docs/Examples/path/example.ipynb
+```
+
+Execute the standalone source too, inspect plots and retained notebook outputs,
+and commit both files. Pure prose/formatting synchronization may retain prior
+outputs only after verifying every code cell has the same AST. A changed
+calculation requires execution of the complete published workload. Bounded test
+fixtures supplement that execution; they do not replace it.
+
+Add a topic-index link. Relative notebook links render in the full publication
+build. Python files are excluded from the site, so link their repository source
+when a reader needs the standalone entrypoint. `mkdocs-full.yml` renders saved
+notebook outputs and generates API pages; the faster base build does neither.
+
+## Validation and evidence
+
+Put example assertions in `examples_tests/*_test.py`. Check independent
+scientific outcomes, per-species inventory where valid, units, held-state
+identity and rejection behavior. Keep deterministic tolerances separate from
+stochastic aggregate bounds. Describe open reservoirs, sink processes and
+retained numerical defects honestly; execution alone is not scientific
+qualification. Never relax tolerances to hide a migration discrepancy.
+
+Run the explicit example and infrastructure suites as well as package tests;
+default pytest collection covers only `particula`. Follow the repository's
+coverage and lint gates. For a migration, record every source, notebook,
+public snippet and historical exception with literal dated execution evidence.
+Historical API sketches must be labeled before a nonexecutable text fence.
+Do not remove compatibility facades as part of an example migration; that
+requires the separately reviewed M6 removal milestone.

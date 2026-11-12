@@ -287,6 +287,26 @@ def function(arg1: float, arg2: str) -> bool:
     pass
 ```
 
+### Native example maintenance (E9-M5)
+
+- New supported examples construct native `Aerosol` from `ParticleData`,
+  `GasData` and `EnvironmentData`. Distribution type and representative volume
+  are explicit: resolved concentration is count, discrete is number density,
+  and continuous PDF is dN/dr. Physics and species maps belong to processes.
+- Use held properties and validated individual/coordinated replacement; raw
+  array edits do not provide transactional validation. Rebuild process maps
+  and GPU bindings after layout replacement; never imply automatic rebinding.
+- Particle-material width and full-gas width are independent. Preserve ordered
+  names and inert lanes; compute conservation with count/volume normalization.
+- Public quick starts and migration snippets are checked by
+  `examples_tests/native_*_test.py` and the package quick-start test. Execute
+  all changed notebook workloads, inspect outputs, and maintain both files.
+  An AST-identical prose/format sync may retain previously executed outputs.
+- Use the selected E9 checkout for these examples. Compatibility facade removal
+  belongs to M6; M5 does not remove production APIs or qualify existing numerical
+  defects. See `docs/contribute/Feature_Workflow/Details/Add_Example.md` and
+  `.opencode/plans/sections/maintenance/E9-M5/example_inventory.json`.
+
 ### Wall loss strategies
 
 ```python
@@ -996,8 +1016,9 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
   `from particula.gpu.kernels import nucleation_step_gpu`. It composes private
   P1--P4 seams before its fused P5 particle/gas commit; its configuration,
   records, sidecars, and helpers remain concrete-only. CPU fallback, hidden
-  transfer, resizing, compaction, runnable/backend integration, and E6-F9
-  integration remain deferred.
+  transfer, resizing and compaction remain unsupported. E6-F9 supplies an
+  explicit direct-call illustration; resident scheduling has its own bounded
+  contract and does not make the direct step a CPU runnable.
 - Check concentration-weighted particle-plus-gas conservation at
   `rtol=1e-12, atol=1e-30`. Run `python docs/Examples/Nucleation/cpu_nucleation.py`,
   `pytest examples_tests/nucleation_example_test.py -q -Werror`, and

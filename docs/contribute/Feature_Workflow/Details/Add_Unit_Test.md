@@ -6,11 +6,15 @@ Every new public function or class must have at least one test for accuracy and 
 
 ## Location
 
-particula/<area>/tests/test_<symbol>.py  (mirror the package directory)
+particula/<area>/tests/<symbol>_test.py  (mirror the package directory)
+
+The following text templates contain placeholders and are not executable.
+Use native held state and independent physical expectations for process tests;
+see [example maintenance](Add_Example.md).
 
 ## Template for Functions
 
-```python
+```text
 """Docstring for the test module."""
 import numpy as np  # if needed
 import pytest
@@ -31,7 +35,7 @@ def test_<symbol>_bad_inputs(bad_input):
 
 ## Template for Classes
 
-```python
+```text
 """Docstring for the test module."""
 import numpy as np  # if needed
 import pytest
@@ -53,4 +57,7 @@ def test_<ClassName>_bad_inputs(bad_input):
 
 ## Run locally
 
-Execute `pytest -q` before opening the pull request; all tests must be green.
+Run the package suite plus `pytest examples_tests -q -Werror` and
+`pytest scripts/tests -q -Werror` when maintaining examples or infrastructure.
+Focused assertions use `--no-cov`; obtain repository coverage only from the
+untargeted `.opencode/tools/run_pytest.py` gate.

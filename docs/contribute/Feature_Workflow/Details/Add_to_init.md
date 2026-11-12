@@ -15,8 +15,11 @@ Make new public APIs available for easy imports.
 ## Steps
 
 1. Open `particula/<area>/__init__.py`.
-2. Add under the right section:
+2. Add under the right section (nonexecutable placeholder template):
 
-```python
+```text
 from particula.<area> import ClassName, function_name
 ```
+
+Documented concrete configuration and sidecar imports do not authorize package
+re-exports. Preserve the approved public surface and test its exports.

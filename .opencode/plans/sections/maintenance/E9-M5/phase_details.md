@@ -89,8 +89,8 @@ Notebook sync/execution occurs in the owning phase, not deferred to P7.
   - Gate: Advanced examples execute, API targets resolve, strict docs build
     passes; no native capabilities invented to make documentation convenient.
 
-- [ ] **E9-M5-P7: Update development documentation**
-  - Issue: TBD | Size: XS | Status: In Progress
+- [x] **E9-M5-P7: Update development documentation**
+  - Issue: TBD | Size: XS | Status: Implemented and validated; PR review pending
   - Work: Publish contributor example/pair maintenance guidance, close the
     inventory and legacy-history allowlist, and prepare the M6 handoff record.
   - Tests: Final integration audit of all supported entrypoints, snippets and
