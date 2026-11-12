@@ -40,10 +40,16 @@ def _device_parameters() -> list[object]:
     ]
 
 
+class _ResolvedParticleState(SimpleNamespace):
+    """Explicit counts with array-only instance fields for snapshot checks."""
+
+    distribution_kind = 3
+
+
 def _containers(device: str) -> tuple[SimpleNamespace, SimpleNamespace]:
     """Build sparse three-box particle and gas storage."""
     wp = _warp()
-    particles = SimpleNamespace(
+    particles = _ResolvedParticleState(
         masses=wp.array(
             [
                 [[2.0, 3.0], [0.0, 0.0], [5.0, 7.0], [0.0, 0.0]],
@@ -169,7 +175,7 @@ def _gas_oracle(
     )
 
 
-def _particle_oracle(  # noqa: C901
+def _particle_density_oracle(  # noqa: C901
     masses: np.ndarray,
     concentration: np.ndarray,
     charge: np.ndarray,
@@ -284,6 +290,28 @@ def _particle_oracle(  # noqa: C901
     )
 
 
+def _particle_oracle(
+    masses, counts, charge, volume, source, destination, rates, time_step
+):
+    """Normalize counts around the retained independent density oracle."""
+    result = list(
+        _particle_density_oracle(
+            masses,
+            counts / volume[:, None],
+            charge,
+            volume,
+            source,
+            destination,
+            rates,
+            time_step,
+        )
+    )
+    for index in (1, 3, 4):
+        result[index] = result[index] * volume[:, None]
+    result[6] = result[6] * volume[source, None]
+    return tuple(result)
+
+
 @pytest.mark.parametrize("device", _device_parameters())
 @pytest.mark.parametrize(
     ("source", "destination", "rates", "final_volumes"),
@@ -364,17 +392,13 @@ def test_gas_and_volume_match_independent_multibox_oracle(
     )
     npt.assert_allclose(
         particles.concentration.numpy(),
-        initial_particle_concentration
-        * old_volumes[:, None]
-        / final_volumes[:, None],
+        initial_particle_concentration,
         rtol=RTOL,
         atol=0.0,
     )
     npt.assert_allclose(
-        (
-            particles.concentration.numpy() * particles.volume.numpy()[:, None]
-        ).sum(),
-        (initial_particle_concentration * old_volumes[:, None]).sum(),
+        particles.concentration.numpy().sum(),
+        initial_particle_concentration.sum(),
         rtol=RTOL,
         atol=INVENTORY_ATOL,
     )
@@ -626,26 +650,20 @@ def test_particle_transport_conserves_sparse_multibox_inventories(
         buffers.request_concentrations.numpy(), expected[6], rtol=RTOL, atol=0.0
     )
     npt.assert_allclose(
-        (final_concentration * volumes[:, None]).sum(),
-        (initial_concentration * volumes[:, None]).sum(),
+        final_concentration.sum(),
+        initial_concentration.sum(),
         rtol=RTOL,
         atol=INVENTORY_ATOL,
     )
     npt.assert_allclose(
-        (
-            final_mass * final_concentration[..., None] * volumes[:, None, None]
-        ).sum(axis=(0, 1)),
-        (
-            initial_mass
-            * initial_concentration[..., None]
-            * volumes[:, None, None]
-        ).sum(axis=(0, 1)),
+        (final_mass * final_concentration[..., None]).sum(axis=(0, 1)),
+        (initial_mass * initial_concentration[..., None]).sum(axis=(0, 1)),
         rtol=RTOL,
         atol=INVENTORY_ATOL,
     )
     npt.assert_allclose(
-        (final_charge * final_concentration * volumes[:, None]).sum(),
-        (initial_charge * initial_concentration * volumes[:, None]).sum(),
+        (final_charge * final_concentration).sum(),
+        (initial_charge * initial_concentration).sum(),
         rtol=RTOL,
         atol=INVENTORY_ATOL,
     )

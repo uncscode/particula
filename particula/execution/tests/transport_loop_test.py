@@ -75,7 +75,7 @@ def _binding(
     wp = pytest.importorskip("warp")
     from particula.execution.tests.gpu_resources_test import _session
 
-    session = _session(boxes=3, particle_count=1, species=1)
+    session = _session(boxes=3, particle_count=1, species=1, resolved=True)
     particles = cast(Any, session.particles)
     gas = cast(Any, session.gas)
     particles.volume.assign(np.array([1.0, 2.0, 4.0], dtype=np.float64))
@@ -155,7 +155,7 @@ def _transport_oracle(
     if final_volumes is None:
         return gas, particles, volume
     ratio = volume / final_volumes
-    return gas * ratio[:, None], particles * ratio[:, None], final_volumes
+    return gas * ratio[:, None], particles, final_volumes
 
 
 @pytest.mark.warp

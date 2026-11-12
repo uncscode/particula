@@ -36,6 +36,8 @@ if TYPE_CHECKING:
 
 def _resident_binding(
     n_boxes: int = 1,
+    *,
+    resolved: bool = False,
 ) -> tuple[
     ResidentSession,
     "GPUResourceRegistry",
@@ -51,6 +53,7 @@ def _resident_binding(
     )
 
     particles = WarpParticleData()
+    particles.distribution_kind = wp.int32(3 if resolved else 0)
     particles.masses = wp.array(
         np.ones((n_boxes, 1, 1)), dtype=wp.float64, device="cpu"
     )
@@ -87,8 +90,12 @@ def _resident_binding(
         particles,
         gas,
         environment,
-        ResidentDimensions(n_boxes, 1, 1),
-        ResidentMetadata(Device(Backend.WARP, "cpu"), ("water",)),
+        ResidentDimensions(n_boxes, 1, 1, 1 if resolved else None),
+        ResidentMetadata(
+            Device(Backend.WARP, "cpu"),
+            ("water",),
+            distribution_type="particle_resolved" if resolved else None,
+        ),
         ResidentLifecycle.ACTIVE,
     )
     registry = GPUResourceRegistry(session)

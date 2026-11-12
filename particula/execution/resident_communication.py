@@ -5,7 +5,7 @@ already-acquired closed-map communication and optional volume evolution. Its
 prepared enqueue dispatches only those retained device barriers, without
 repeated host/setup metadata validation, acquisition, host conversion,
 synchronization, fallback, or recovery. The shared validator remains a
-read-only metadata seam for legacy execution. Prepared enqueue is
+read-only metadata seam for resident execution. Prepared enqueue is
 retained-reference dispatch only: it does no host payload readback, allocation,
 transfer, synchronization, lookup, resource replacement, fallback, or
 rebinding. Retained native barriers still perform device-side status and
@@ -39,6 +39,7 @@ from particula.gpu.kernels.communication import (
     _enqueue_prepared_resident_gas_communication,
     _enqueue_prepared_resident_particle_communication,
     _enqueue_prepared_resident_volume_evolution,
+    _resolved_communication,
 )
 
 
@@ -251,6 +252,12 @@ def setup_prepared_resident_communication(  # noqa: C901
     ):
         raise ValueError("prepared communication nodes do not match schedule.")
     particles = cast(Any, typed.session.particles)
+    if (
+        typed.resources.configuration.communication_map.transport_mode
+        is CommunicationTransportMode.PARTICLES
+        or typed.resources.final_volumes is not None
+    ):
+        _resolved_communication(particles)
     gas = cast(Any, typed.session.gas)
     primaries = (
         particles.masses,
@@ -354,7 +361,6 @@ def setup_prepared_resident_communication(  # noqa: C901
             state.initial_masses,
             state.initial_concentration,
             state.initial_charge,
-            typed.session.metadata.distribution_type == "particle_resolved",
         )
     if resources.final_volumes is None:
         volume_enqueue: Callable[..., object] = _enqueue_prepared_noop
@@ -370,7 +376,6 @@ def setup_prepared_resident_communication(  # noqa: C901
             state.volume_invalid,
             state.volume_changed,
             particles.masses.device,
-            typed.session.metadata.distribution_type == "particle_resolved",
         )
     return PreparedResidentCommunicationBinding(
         prepared,

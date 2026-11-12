@@ -19,18 +19,24 @@ def _warp():
     return pytest.importorskip("warp")
 
 
+class _ResolvedParticleState(SimpleNamespace):
+    """Explicit counts with array-only instance fields for snapshot checks."""
+
+    distribution_kind = 3
+
+
 def _containers(
     volumes: np.ndarray,
     particle_concentration: np.ndarray,
     gas_concentration: np.ndarray,
     device: str = "cpu",
 ) -> tuple[SimpleNamespace, SimpleNamespace]:
-    """Build complete, nonaliasing fixed-shape Warp test containers."""
+    """Build explicit count and gas-density fixtures with nonaliasing storage."""
     wp = _warp()
     boxes, particles_count = particle_concentration.shape
     species = 2
     gas_species = gas_concentration.shape[1]
-    particles = SimpleNamespace(
+    particles = _ResolvedParticleState(
         masses=wp.array(
             np.full((boxes, particles_count, species), 2.0, dtype=np.float64),
             dtype=wp.float64,
@@ -74,7 +80,7 @@ def _containers(
 def test_volume_evolution_matches_independent_oracle(
     old_volumes: np.ndarray, final_volumes: np.ndarray
 ) -> None:
-    """Scale both concentration ledgers by the NumPy volume ratio oracle."""
+    """Preserve counts and scale gas density by the NumPy volume ratio."""
     wp = _warp()
     from particula.gpu.kernels.communication import volume_evolution_step_gpu
 
@@ -112,7 +118,7 @@ def test_volume_evolution_matches_independent_oracle(
     assert particles.concentration is not None and gas.concentration is not None
     npt.assert_allclose(
         particles.concentration.numpy(),
-        initial_particle * factor[:, None],
+        initial_particle,
         rtol=1e-12,
         atol=0.0,
     )
@@ -126,8 +132,8 @@ def test_volume_evolution_matches_independent_oracle(
         particles.volume.numpy(), final_volumes, rtol=0.0, atol=0.0
     )
     npt.assert_allclose(
-        particles.concentration.numpy() * particles.volume.numpy()[:, None],
-        initial_particle * old_volumes[:, None],
+        particles.concentration.numpy(),
+        initial_particle,
         rtol=1e-12,
         atol=1e-30,
     )
@@ -138,22 +144,14 @@ def test_volume_evolution_matches_independent_oracle(
         atol=1e-30,
     )
     npt.assert_allclose(
-        (
-            particles.concentration.numpy()[..., None]
-            * initial_masses
-            * particles.volume.numpy()[:, None, None]
-        ),
-        initial_particle[..., None]
-        * initial_masses
-        * old_volumes[:, None, None],
+        (particles.concentration.numpy()[..., None] * initial_masses),
+        initial_particle[..., None] * initial_masses,
         rtol=1e-12,
         atol=1e-30,
     )
     npt.assert_allclose(
-        particles.concentration.numpy()
-        * initial_charge
-        * particles.volume.numpy()[:, None],
-        initial_particle * initial_charge * old_volumes[:, None],
+        particles.concentration.numpy() * initial_charge,
+        initial_particle * initial_charge,
         rtol=1e-12,
         atol=1e-30,
     )
@@ -248,7 +246,7 @@ def test_prepared_resident_equal_volumes_preserve_fields_and_statuses() -> None:
 
 
 def test_prepared_resident_changed_volumes_preserve_inventory() -> None:
-    """The private resident volume seam scales changed rows by old/new volume."""
+    """The resident volume seam preserves counts and scales gas density."""
     wp = _warp()
     from particula.gpu.kernels.communication import (
         _enqueue_prepared_resident_volume_evolution,
@@ -276,7 +274,7 @@ def test_prepared_resident_changed_volumes_preserve_inventory() -> None:
 
     npt.assert_allclose(particles.volume.numpy(), [4.0], rtol=0.0, atol=0.0)
     npt.assert_allclose(
-        particles.concentration.numpy(), [[1.5, 2.5]], rtol=1e-12, atol=0.0
+        particles.concentration.numpy(), [[3.0, 5.0]], rtol=1e-12, atol=0.0
     )
     npt.assert_allclose(
         gas.concentration.numpy(), [[3.5, 5.5]], rtol=1e-12, atol=0.0
@@ -376,7 +374,7 @@ def test_invalid_preflight_preserves_all_mutable_state(
     particles, gas = _containers(
         np.array([old_volume]),
         np.array([[concentration, 3.0]]),
-        np.array([[4.0]]),
+        np.array([[concentration]]),
     )
     final = wp.array([final_volume], dtype=wp.float64, device="cpu")
     before = (
@@ -463,7 +461,7 @@ def test_schema_and_missing_field_fail_before_mutation() -> None:
         )
     with pytest.raises(ValueError, match="particles.masses"):
         volume_evolution_step_gpu(
-            SimpleNamespace(),
+            SimpleNamespace(distribution_kind=3),
             gas,
             wp.array([1.0], dtype=wp.float64, device="cpu"),
         )
@@ -1607,7 +1605,7 @@ def test_particle_communication_rejects_gas_mode_before_container_access() -> (
     )
     with pytest.raises(ValueError, match="must be PARTICLES"):
         communication.particle_communication_step_gpu(
-            SimpleNamespace(), configuration, 1.0, object()
+            SimpleNamespace(distribution_kind=3), configuration, 1.0, object()
         )
 
 
@@ -1868,7 +1866,6 @@ def test_private_particle_planner_and_commit_follow_immutable_fields(
         requests,
         invalid,
         demand,
-        0,
     )
     assert invalid[0] == 0 and demand[0] == 1
     npt.assert_array_equal(assignments, [[0, -1]])
@@ -1977,7 +1974,6 @@ def test_particle_communication_conserves_weighted_inventories() -> None:
     old_concentration = particles.concentration.numpy().copy()
     old_masses = particles.masses.numpy().copy()
     old_charge = particles.charge.numpy().copy()
-    volumes = particles.volume.numpy().copy()
 
     particle_communication_step_gpu(
         particles,
@@ -1988,7 +1984,7 @@ def test_particle_communication_conserves_weighted_inventories() -> None:
     wp.synchronize()
 
     concentration = particles.concentration.numpy()
-    npt.assert_allclose(concentration, [[2.0], [0.8]], rtol=1e-12, atol=0.0)
+    npt.assert_allclose(concentration, [[2.0], [2.0]], rtol=1e-12, atol=0.0)
     for values, expected in (
         (concentration, old_concentration),
         (
@@ -1997,21 +1993,15 @@ def test_particle_communication_conserves_weighted_inventories() -> None:
         ),
     ):
         npt.assert_allclose(
-            np.sum(values * volumes[:, None]),
-            np.sum(expected * volumes[:, None]),
+            np.sum(values),
+            np.sum(expected),
             rtol=1e-12,
             atol=0.0,
         )
     for lane in range(2):
         npt.assert_allclose(
-            np.sum(
-                concentration
-                * particles.masses.numpy()[:, :, lane]
-                * volumes[:, None]
-            ),
-            np.sum(
-                old_concentration * old_masses[:, :, lane] * volumes[:, None]
-            ),
+            np.sum(concentration * particles.masses.numpy()[:, :, lane]),
+            np.sum(old_concentration * old_masses[:, :, lane]),
             rtol=1e-12,
             atol=0.0,
         )

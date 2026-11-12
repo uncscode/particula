@@ -111,7 +111,6 @@ def test_physical_volume_keeps_counts_and_extensive_inventories(
                     invalid,
                     changed,
                     particles.volume.device,
-                    True,
                 )
     else:
         assert module.volume_evolution_step_gpu(particles, gas, final) == (
@@ -186,7 +185,6 @@ def test_transport_moves_counts_without_volume_ratio(
                     invalid,
                     demand,
                     *snapshots,
-                    True,
                 )
         expected = [[2.0, 0.0], [6.0, 0.0]]
     else:
@@ -225,7 +223,7 @@ def test_invalid_physical_volume_gates_all_writers(device, final):
         np.testing.assert_array_equal(array.numpy(), expected)
 
 
-@pytest.mark.parametrize("code", [1, 2])
+@pytest.mark.parametrize("code", [None, 0, 1, 2])
 def test_unsupported_population_rejects_before_payload(code):
     """Binned population transport is not silently inferred."""
     from particula.gpu.kernels.communication import (
@@ -233,7 +231,9 @@ def test_unsupported_population_rejects_before_payload(code):
         volume_evolution_step_gpu,
     )
 
-    particles = SimpleNamespace(distribution_kind=code)
+    particles = SimpleNamespace()
+    if code is not None:
+        particles.distribution_kind = code
     with pytest.raises(ValueError, match="particle_resolved"):
         particle_communication_step_gpu(particles, None, 0.0, None)
     with pytest.raises(ValueError, match="particle_resolved"):
@@ -282,3 +282,23 @@ def test_native_transport_rejects_invalid_state_without_primary_writes(
     wp.synchronize()
     for array, expected in zip(fields, before, strict=True):
         np.testing.assert_array_equal(array.numpy(), expected)
+
+
+@pytest.mark.parametrize("code", [None, 0, 1, 2])
+@pytest.mark.parametrize("operation", ["particle", "volume"])
+def test_resident_wrappers_reject_metadata_before_payload(code, operation):
+    """Resident wrappers cannot admit ambiguous counts before array access."""
+    from particula.gpu.kernels import communication as module
+
+    particles = SimpleNamespace()
+    if code is not None:
+        particles.distribution_kind = code
+    with pytest.raises(ValueError, match="particle_resolved"):
+        if operation == "particle":
+            module.resident_particle_communication_step_gpu(
+                particles, None, 0.0, None, None, None, None, None, None
+            )
+        else:
+            module.resident_volume_evolution_step_gpu(
+                particles, None, None, None, None
+            )

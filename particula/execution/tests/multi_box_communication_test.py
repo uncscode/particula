@@ -49,7 +49,7 @@ def _request(
     from particula.execution import process_graph
     from particula.execution.tests.gpu_resources_test import _session
 
-    session = _session(boxes=3, particle_count=4, species=2)
+    session = _session(boxes=3, particle_count=4, species=2, resolved=True)
     particles = cast(Any, session.particles)
     gas = cast(Any, session.gas)
     particles.volume = wp.array([2.0, 1.0, 4.0], dtype=wp.float64, device="cpu")
@@ -157,7 +157,7 @@ def _gas_oracle(
     return (amounts + deltas) / volume[:, None]
 
 
-def _particle_oracle(  # noqa: C901
+def _particle_density_oracle(  # noqa: C901
     masses: np.ndarray,
     concentration: np.ndarray,
     charge: np.ndarray,
@@ -228,6 +228,22 @@ def _particle_oracle(  # noqa: C901
     return final_masses, final_concentration, final_charge
 
 
+def _particle_oracle(
+    masses, counts, charge, volume, source, destination, rates
+):
+    """Normalize counts around the independent retained density oracle."""
+    mass, concentration, charge = _particle_density_oracle(
+        masses,
+        counts / volume[:, None],
+        charge,
+        volume,
+        source,
+        destination,
+        rates,
+    )
+    return mass, concentration * volume[:, None], charge
+
+
 @pytest.mark.warp
 @pytest.mark.gpu_parity
 @pytest.mark.parametrize(
@@ -288,19 +304,13 @@ def test_resident_gas_barriers_match_repeated_numpy_oracle(
     )
     npt.assert_allclose(
         particles.concentration.numpy(),
-        initial_particle_concentration
-        * np.array([2.0, 1.0, 4.0])[:, None]
-        / final_volumes[:, None],
+        initial_particle_concentration,
         rtol=RTOL,
         atol=0.0,
     )
     npt.assert_allclose(
-        (
-            particles.concentration.numpy() * particles.volume.numpy()[:, None]
-        ).sum(),
-        (
-            initial_particle_concentration * np.array([2.0, 1.0, 4.0])[:, None]
-        ).sum(),
+        particles.concentration.numpy().sum(),
+        initial_particle_concentration.sum(),
         rtol=RTOL,
         atol=INVENTORY_ATOL,
     )
@@ -360,8 +370,8 @@ def test_resident_particle_barrier_conserves_multibox_weighted_state() -> None:
     )
 
     npt.assert_allclose(
-        (particles.concentration.numpy() * volume[:, None]).sum(),
-        (concentration * volume[:, None]).sum(),
+        particles.concentration.numpy().sum(),
+        concentration.sum(),
         rtol=RTOL,
         atol=INVENTORY_ATOL,
     )
@@ -369,21 +379,14 @@ def test_resident_particle_barrier_conserves_multibox_weighted_state() -> None:
         (
             particles.masses.numpy()
             * particles.concentration.numpy()[..., None]
-            * volume[:, None, None]
         ).sum(axis=(0, 1)),
-        (mass * concentration[..., None] * volume[:, None, None]).sum(
-            axis=(0, 1)
-        ),
+        (mass * concentration[..., None]).sum(axis=(0, 1)),
         rtol=RTOL,
         atol=INVENTORY_ATOL,
     )
     npt.assert_allclose(
-        (
-            particles.charge.numpy()
-            * particles.concentration.numpy()
-            * volume[:, None]
-        ).sum(),
-        (charge * concentration * volume[:, None]).sum(),
+        (particles.charge.numpy() * particles.concentration.numpy()).sum(),
+        (charge * concentration).sum(),
         rtol=RTOL,
         atol=INVENTORY_ATOL,
     )
