@@ -18,92 +18,75 @@ from particula.dynamics.coagulation.charged_kernel_strategy import (
 from particula.dynamics.coagulation.coagulation_strategy.charged_coagulation_strategy import (  # noqa: E501
     ChargedCoagulationStrategy,
 )
-from particula.particles import (
-    PresetParticleRadiusBuilder,
-    PresetResolvedParticleMassBuilder,
-    ResolvedParticleMassRepresentationBuilder,
+from particula.dynamics.coagulation.particle_resolved_step import (
+    particle_resolved_method,
 )
-from particula.particles.activity_strategies import ActivityIdealMass
-from particula.particles.distribution_strategies import (
-    ParticleResolvedSpeciatedMass,
+from particula.particles import (
+    create_lognormal_binned_particle_data,
+    create_lognormal_resolved_particle_data,
+    create_resolved_particle_data,
 )
 from particula.particles.particle_data import ParticleData
-from particula.particles.representation import ParticleRepresentation
-from particula.particles.surface_strategies import SurfaceStrategyVolume
 
 TEMPERATURE = 298.15
 PRESSURE = 101325.0
 
 
-def _build_particle_resolved_with_charges() -> ParticleRepresentation:
-    radii = np.array(
-        [50e-9, 55e-9, 5e-9, 6e-9],
-        dtype=np.float64,
+def _build_particle_resolved_with_charges() -> ParticleData:
+    """Retain four physical radii with explicit single-material density."""
+    radii = np.array([50e-9, 55e-9, 5e-9, 6e-9])
+    return create_resolved_particle_data(
+        masses=4 / 3 * np.pi * radii**3 * 2000.0,
+        density=2000.0,
+        charge=np.array([-6.0, -6.0, 6.0, 6.0]),
+        volume=1e-15,
     )
-    density = 2000.0
-    mass = 4.0 / 3.0 * np.pi * radii**3 * density
-    charges = np.array([-6.0, -6.0, 6.0, 6.0], dtype=np.float64)
-    builder = ResolvedParticleMassRepresentationBuilder()
-    builder.set_distribution_strategy(ParticleResolvedSpeciatedMass())
-    builder.set_activity_strategy(ActivityIdealMass())
-    builder.set_surface_strategy(SurfaceStrategyVolume())
-    builder.set_mass(mass, "kg")
-    builder.set_density(np.array([density], dtype=np.float64), "kg/m^3")
-    builder.set_charge(charges)
-    builder.set_volume(1e-15, "m^3")
-    return builder.build()
 
 
-def _build_two_particle_opposite_sign() -> ParticleRepresentation:
-    density = np.array([2000.0, 2000.0], dtype=np.float64)
-    radii = np.array([5e-9, 50e-9], dtype=np.float64)
-    mass = 4.0 / 3.0 * np.pi * radii**3 * density
-    builder = ResolvedParticleMassRepresentationBuilder()
-    builder.set_distribution_strategy(ParticleResolvedSpeciatedMass())
-    builder.set_activity_strategy(ActivityIdealMass())
-    builder.set_surface_strategy(SurfaceStrategyVolume())
-    builder.set_mass(mass, "kg")
-    builder.set_density(density, "kg/m^3")
-    builder.set_charge(np.array([6.0, -6.0], dtype=np.float64))
-    builder.set_volume(1e-15, "m^3")
-    return builder.build()
+def _build_two_particle_opposite_sign() -> ParticleData:
+    """Retain two physical radii and opposite charges without facade inference."""
+    radii = np.array([5e-9, 50e-9])
+    return create_resolved_particle_data(
+        masses=4 / 3 * np.pi * radii**3 * 2000.0,
+        density=2000.0,
+        charge=np.array([6.0, -6.0]),
+        volume=1e-15,
+    )
 
 
 def _capture_collision_indices(
-    particle: ParticleRepresentation,
+    particle: ParticleData,
     strategy: ChargedCoagulationStrategy,
     time_step: float,
     seed: int,
     volume: float | None,
     monkeypatch: pytest.MonkeyPatch,
 ) -> tuple[np.ndarray, np.ndarray | None]:
-    """Run a particle-resolved step while capturing collision indices."""
+    """Observe native selector pairs and pre-merge charges without replacing it."""
     collisions: dict[str, np.ndarray] = {}
-    original_collide_pairs = particle.collide_pairs
-    original_volume = particle.volume
+    original = particle_resolved_method.get_particle_resolved_coagulation_step
+    original_volume = particle.volume.copy()
 
-    def _wrapped(indices: np.ndarray) -> None:
+    def capture(**kwargs):
+        indices = original(**kwargs)
         collisions["indices"] = indices.copy()
-        captured_charge = particle.get_charge()
-        if captured_charge is not None:
-            collisions["charges"] = captured_charge.copy()
-        original_collide_pairs(indices)
+        collisions["charges"] = particle.charge[0].copy()
+        return indices
 
-    monkeypatch.setattr(particle, "collide_pairs", _wrapped)
     if volume is not None:
-        particle.volume = volume
-    strategy.random_generator = np.random.default_rng(seed=seed)
-    strategy.step(
-        particle=particle,
-        temperature=TEMPERATURE,
-        pressure=PRESSURE,
-        time_step=time_step,
-    )
-    particle.volume = original_volume
-    return (
-        collisions.get("indices", np.empty((0, 2), dtype=np.int64)),
-        collisions.get("charges"),
-    )
+        particle.volume[:] = volume
+    strategy.random_generator = np.random.default_rng(seed)
+    with monkeypatch.context() as context:
+        context.setattr(
+            particle_resolved_method,
+            "get_particle_resolved_coagulation_step",
+            capture,
+        )
+        strategy.step(particle, TEMPERATURE, PRESSURE, time_step)
+    particle.volume[:] = original_volume
+    return collisions.get(
+        "indices", np.empty((0, 2), dtype=np.int64)
+    ), collisions.get("charges")
 
 
 class TestChargedCoagulationStrategy(unittest.TestCase):
@@ -117,7 +100,12 @@ class TestChargedCoagulationStrategy(unittest.TestCase):
         particle_resolved distribution types.
         """
         # Setup a particle representation for testing
-        self.particle = PresetParticleRadiusBuilder().build()
+        self.particle = create_lognormal_binned_particle_data(
+            distribution_type="discrete"
+        )
+        self.particle_pdf = create_lognormal_binned_particle_data(
+            distribution_type="continuous_pdf"
+        )
         self.temperature = TEMPERATURE
         self.pressure = PRESSURE
 
@@ -133,8 +121,9 @@ class TestChargedCoagulationStrategy(unittest.TestCase):
             distribution_type="continuous_pdf",
             kernel_strategy=self.kernel_strategy,
         )
-        builder = PresetResolvedParticleMassBuilder()
-        self.particle_resolved = builder.set_volume(1e-6, "m^3").build()
+        self.particle_resolved = create_lognormal_resolved_particle_data(
+            volume=1e-6
+        )
         self.strategy_particle_resolved = ChargedCoagulationStrategy(
             distribution_type="particle_resolved",
             kernel_strategy=self.kernel_strategy,
@@ -154,6 +143,7 @@ class TestChargedCoagulationStrategy(unittest.TestCase):
             charge=np.array([[0.0, 1.0, -1.0, 0.0]]),
             density=np.array([1000.0, 1200.0]),
             volume=np.array([1.0]),
+            distribution_type="discrete",
         )
 
     def test_kernel_discrete(self):
@@ -177,14 +167,14 @@ class TestChargedCoagulationStrategy(unittest.TestCase):
         the discrete distribution type.
         """
         # Test the step method for discrete distribution
-        initial_concentration = self.particle.get_concentration().copy()
+        initial_concentration = self.particle.concentration[0].copy()
         self.strategy_discrete.step(
             particle=self.particle,
             temperature=self.temperature,
             pressure=self.pressure,
             time_step=1.0,
         )
-        updated_concentration = self.particle.get_concentration()
+        updated_concentration = self.particle.concentration[0]
         self.assertFalse(
             np.array_equal(initial_concentration, updated_concentration)
         )
@@ -192,14 +182,20 @@ class TestChargedCoagulationStrategy(unittest.TestCase):
     def test_step_particle_resolved(self):
         """Test the kernel calculation for particle_resolved distribution."""
         # Test the kernel calculation for particle_resolved distribution
-        old_concentration = self.particle_resolved.get_total_concentration()
+        old_concentration = (
+            self.particle_resolved.concentration.sum()
+            / self.particle_resolved.volume[0]
+        )
         self.strategy_particle_resolved.step(
             particle=self.particle_resolved,
             temperature=self.temperature,
             pressure=self.pressure,
             time_step=1000,
         )
-        new_concentration = self.particle_resolved.get_total_concentration()
+        new_concentration = (
+            self.particle_resolved.concentration.sum()
+            / self.particle_resolved.volume[0]
+        )
         self.assertNotEqual(old_concentration, new_concentration)
 
     def test_kernel_continuous_pdf(self):
@@ -210,7 +206,7 @@ class TestChargedCoagulationStrategy(unittest.TestCase):
         """
         # Test the kernel calculation for continuous_pdf distribution
         kernel = self.strategy_continuous_pdf.kernel(
-            particle=self.particle,
+            particle=self.particle_pdf,
             temperature=self.temperature,
             pressure=self.pressure,
         )
@@ -234,14 +230,14 @@ class TestChargedCoagulationStrategy(unittest.TestCase):
         the continuous_pdf distribution type.
         """
         # Test the step method for continuous_pdf distribution
-        initial_concentration = self.particle.get_concentration().copy()
+        initial_concentration = self.particle_pdf.concentration[0].copy()
         self.strategy_continuous_pdf.step(
-            particle=self.particle,
+            particle=self.particle_pdf,
             temperature=self.temperature,
             pressure=self.pressure,
             time_step=1.0,
         )
-        updated_concentration = self.particle.get_concentration()
+        updated_concentration = self.particle_pdf.concentration[0]
         self.assertFalse(
             np.array_equal(initial_concentration, updated_concentration)
         )
@@ -259,7 +255,7 @@ def test_direct_kernel_flag_default_false():
 def test_direct_kernel_same_sign_no_spurious_mergers(monkeypatch):
     """Direct kernel should prevent same-sign coagulation artifacts."""
     particle = _build_particle_resolved_with_charges()
-    charges = particle.get_charge()
+    charges = particle.charge[0]
     assert charges is not None
 
     def _selective_kernel(
@@ -309,7 +305,7 @@ def test_direct_kernel_same_sign_no_spurious_mergers(monkeypatch):
 def test_direct_kernel_opposite_sign_attracts(monkeypatch):
     """Direct kernel should still allow opposite-sign coagulation."""
     particle = _build_two_particle_opposite_sign()
-    charges = particle.get_charge()
+    charges = particle.charge[0]
     assert charges is not None
     strategy = ChargedCoagulationStrategy(
         distribution_type="particle_resolved",
@@ -339,10 +335,8 @@ def test_direct_kernel_opposite_sign_attracts(monkeypatch):
 
 
 def test_direct_kernel_neutral_charge_defaults_to_zero(monkeypatch):
-    """Direct kernel should handle particle-resolved cases without charge."""
-    builder = PresetResolvedParticleMassBuilder()
-    particle = builder.set_volume(1e-6, "m^3").build()
-    monkeypatch.setattr(particle, "get_charge", lambda clone=False: None)
+    """Direct kernel accepts explicit native zero-charge state."""
+    particle = create_lognormal_resolved_particle_data(volume=1e-6)
 
     from particula.dynamics.coagulation.coagulation_strategy import (
         coagulation_strategy_abc,
@@ -377,4 +371,4 @@ def test_direct_kernel_neutral_charge_defaults_to_zero(monkeypatch):
         time_step=1.0,
     )
 
-    assert particle.get_charge() is None
+    np.testing.assert_array_equal(particle.charge, 0.0)

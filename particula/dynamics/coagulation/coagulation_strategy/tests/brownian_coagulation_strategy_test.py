@@ -9,8 +9,8 @@ from particula.dynamics.coagulation.coagulation_strategy.brownian_coagulation_st
     BrownianCoagulationStrategy,
 )
 from particula.particles import (
-    PresetParticleRadiusBuilder,
-    PresetResolvedParticleMassBuilder,
+    create_lognormal_binned_particle_data,
+    create_lognormal_resolved_particle_data,
 )
 from particula.particles.particle_data import ParticleData
 
@@ -19,9 +19,14 @@ class TestBrownianCoagulationStrategy(unittest.TestCase):
     """Test suite for the BrownianCoagulationStrategy class."""
 
     def setUp(self):
-        """Set up particle representations and strategies for testing."""
-        # Setup a particle representation for testing
-        self.particle = PresetParticleRadiusBuilder().build()
+        """Set up native particle populations and strategies for testing."""
+        # Setup native particle data for testing
+        self.particle = create_lognormal_binned_particle_data(
+            distribution_type="discrete"
+        )
+        self.particle_pdf = create_lognormal_binned_particle_data(
+            distribution_type="continuous_pdf"
+        )
         # Create strategies for both distribution types
         self.strategy_discrete = BrownianCoagulationStrategy(
             distribution_type="discrete"
@@ -29,8 +34,8 @@ class TestBrownianCoagulationStrategy(unittest.TestCase):
         self.strategy_continuous_pdf = BrownianCoagulationStrategy(
             distribution_type="continuous_pdf"
         )
-        self.particle_resolved = (
-            PresetResolvedParticleMassBuilder().set_volume(1e-6, "m^3").build()
+        self.particle_resolved = create_lognormal_resolved_particle_data(
+            volume=1e-6
         )
         self.strategy_particle_resolved = BrownianCoagulationStrategy(
             distribution_type="particle_resolved"
@@ -50,6 +55,7 @@ class TestBrownianCoagulationStrategy(unittest.TestCase):
             charge=np.array([[0.0, 1.0, -1.0, 0.0]]),
             density=np.array([1000.0, 1200.0]),
             volume=np.array([1.0]),
+            distribution_type="discrete",
         )
         self.temperature = 298.15  # Kelvin
         self.pressure = 101325  # Pascal
@@ -67,14 +73,14 @@ class TestBrownianCoagulationStrategy(unittest.TestCase):
     def test_step_discrete(self):
         """Test the step method for discrete distribution."""
         # Test the step method for discrete distribution
-        initial_concentration = self.particle.get_concentration().copy()
+        initial_concentration = self.particle.concentration[0].copy()
         self.strategy_discrete.step(
             particle=self.particle,
             temperature=self.temperature,
             pressure=self.pressure,
             time_step=1.0,
         )
-        updated_concentration = self.particle.get_concentration()
+        updated_concentration = self.particle.concentration[0]
         self.assertFalse(
             np.array_equal(initial_concentration, updated_concentration)
         )
@@ -82,21 +88,27 @@ class TestBrownianCoagulationStrategy(unittest.TestCase):
     def test_step_particle_resolved(self):
         """Test the kernel calculation for particle_resolved distribution."""
         # Test the kernel calculation for particle_resolved distribution
-        old_concentration = self.particle_resolved.get_total_concentration()
+        old_concentration = (
+            self.particle_resolved.concentration.sum()
+            / self.particle_resolved.volume[0]
+        )
         self.strategy_particle_resolved.step(
             particle=self.particle_resolved,
             temperature=self.temperature,
             pressure=self.pressure,
             time_step=1000,
         )
-        new_concentration = self.particle_resolved.get_total_concentration()
+        new_concentration = (
+            self.particle_resolved.concentration.sum()
+            / self.particle_resolved.volume[0]
+        )
         self.assertNotEqual(old_concentration, new_concentration)
 
     def test_kernel_continuous_pdf(self):
         """Test the kernel calculation for continuous_pdf distribution."""
         # Test the kernel calculation for continuous_pdf distribution
         kernel = self.strategy_continuous_pdf.kernel(
-            particle=self.particle,
+            particle=self.particle_pdf,
             temperature=self.temperature,
             pressure=self.pressure,
         )
@@ -105,14 +117,14 @@ class TestBrownianCoagulationStrategy(unittest.TestCase):
     def test_step_continuous_pdf(self):
         """Test the step method for continuous_pdf distribution."""
         # Test the step method for continuous_pdf distribution
-        initial_concentration = self.particle.get_concentration().copy()
+        initial_concentration = self.particle_pdf.concentration[0].copy()
         self.strategy_continuous_pdf.step(
-            particle=self.particle,
+            particle=self.particle_pdf,
             temperature=self.temperature,
             pressure=self.pressure,
             time_step=1.0,
         )
-        updated_concentration = self.particle.get_concentration()
+        updated_concentration = self.particle_pdf.concentration[0]
         self.assertFalse(
             np.array_equal(initial_concentration, updated_concentration)
         )
