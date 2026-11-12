@@ -10,7 +10,6 @@ from particula.dynamics.coagulation.particle_resolved_step import (
     particle_resolved_method,
 )
 from particula.particles import (
-    PresetParticleRadiusBuilder,
     create_lognormal_binned_particle_data,
 )
 from particula.particles.particle_data import ParticleData
@@ -29,7 +28,7 @@ class DummyCoagulationStrategy(coagulation_strategy_abc.CoagulationStrategyABC):
 
     def kernel(
         self,
-        particle: coagulation_strategy_abc.ParticleLike,
+        particle: ParticleData,
         temperature: float,
         pressure: float,
     ) -> NDArray[np.float64]:
@@ -43,11 +42,12 @@ class DummyCoagulationStrategy(coagulation_strategy_abc.CoagulationStrategyABC):
 def _build_multi_box_particle_data() -> ParticleData:
     """Create unsupported multi-box particle data for rejection tests."""
     return ParticleData(
+        distribution_type="discrete",
         masses=np.array([[[1e-18], [2e-18]], [[9e-18], [8e-18]]]),
         concentration=np.array([[1.0, 2.0], [10.0, 20.0]]),
         charge=np.array([[0.0, 1.0], [4.0, 5.0]]),
         density=np.array([1000.0]),
-        volume=np.array([1.0, 9.0]),
+        volume=np.array([1.0, 1.0]),
     )
 
 
@@ -151,8 +151,14 @@ def test_get_mean_effective_density_particle_data_all_zero_returns_zero() -> (
     assert coagulation_strategy_abc._get_mean_effective_density(data) == 0.0
 
 
-def test_is_particle_data_type_guard() -> None:
-    """Type guard should discriminate ParticleData from representations."""
+def test_material_getters_reject_non_native_input() -> None:
+    """The removed type-dispatch helper is replaced by explicit admission."""
+    with pytest.raises(TypeError, match="requires ParticleData"):
+        coagulation_strategy_abc._get_radius(object())  # type: ignore[arg-type]
+
+
+def test_material_admission_retains_same_instance() -> None:
+    """Native material admission retains the original particle instance."""
     data = ParticleData(
         masses=np.array([[[1e-18]]]),
         concentration=np.array([[1.0]]),
@@ -160,27 +166,8 @@ def test_is_particle_data_type_guard() -> None:
         density=np.array([1000.0]),
         volume=np.array([1.0]),
     )
-    representation = PresetParticleRadiusBuilder().build()
-
-    assert coagulation_strategy_abc._is_particle_data(data) is True
-    assert coagulation_strategy_abc._is_particle_data(representation) is False
-
-
-def test_unwrap_particle_returns_same_instance() -> None:
-    """Unwrap helper should return the original particle instance."""
-    data = ParticleData(
-        masses=np.array([[[1e-18]]]),
-        concentration=np.array([[1.0]]),
-        charge=np.array([[0.0]]),
-        density=np.array([1000.0]),
-        volume=np.array([1.0]),
-    )
-    representation = PresetParticleRadiusBuilder().build()
-
-    assert coagulation_strategy_abc._unwrap_particle(data) is data
     assert (
-        coagulation_strategy_abc._unwrap_particle(representation)
-        is representation
+        coagulation_strategy_abc._require_single_box_particle_data(data) is data
     )
 
 
@@ -216,6 +203,7 @@ def test_require_single_box_particle_data_rejects_multi_box() -> None:
 def test_getters_particle_data_match_arrays() -> None:
     """Adapter helpers should mirror ParticleData arrays."""
     data = ParticleData(
+        distribution_type="discrete",
         masses=np.array([[[1e-18, 2e-18], [2e-18, 3e-18]]]),
         concentration=np.array([[1.0, 2.0]]),
         charge=np.array([[0.0, 1.0]]),
@@ -278,46 +266,45 @@ def test_getters_particle_data_reject_multi_box_inputs() -> None:
             getter(data)
 
 
-def test_getters_particle_representation_match_methods() -> None:
-    """Adapter helpers should mirror ParticleRepresentation accessors."""
-    representation = PresetParticleRadiusBuilder().build()
+def test_getters_native_initializer_match_arrays() -> None:
+    """Native lognormal initializer exposes the same material quantities."""
+    representation = create_lognormal_binned_particle_data(
+        distribution_type="discrete"
+    )
 
     np.testing.assert_allclose(
         coagulation_strategy_abc._get_radius(representation),
-        representation.get_radius(),
+        representation.radii[0],
     )
     np.testing.assert_allclose(
         coagulation_strategy_abc._get_mass(representation),
-        representation.get_mass(),
+        representation.total_mass[0],
     )
     np.testing.assert_allclose(
         coagulation_strategy_abc._get_concentration(representation),
-        representation.concentration,
+        representation.concentration[0],
     )
     np.testing.assert_allclose(
         coagulation_strategy_abc._get_effective_density(representation),
-        representation.get_effective_density(),
+        representation.effective_density[0],
     )
     assert coagulation_strategy_abc._get_volume(
         representation
-    ) == pytest.approx(representation.get_volume())
+    ) == pytest.approx(representation.volume[0])
 
 
-def test_get_charge_representation_none_when_unset() -> None:
-    """Charge helper should mirror representation-provided charge values."""
-    representation = PresetParticleRadiusBuilder().build()
-
-    charge = representation.get_charge()
-    result = coagulation_strategy_abc._get_charge(representation)
-    if charge is None:
-        assert result is None
-    else:
-        np.testing.assert_array_equal(result, charge)
+def test_get_charge_native_initializer_defaults_to_zero() -> None:
+    """Native initialization supplies explicit zero charge lanes."""
+    data = create_lognormal_binned_particle_data(distribution_type="discrete")
+    result = coagulation_strategy_abc._get_charge(data)
+    np.testing.assert_array_equal(result, data.charge[0])
+    np.testing.assert_array_equal(result, 0.0)
 
 
 def test_get_particle_resolved_kernel_radius_data_uses_bin_radius() -> None:
     """Helper should return provided bin radius unchanged."""
     data = ParticleData(
+        distribution_type="particle_resolved",
         masses=np.array([[[1e-18], [2e-18]]]),
         concentration=np.array([[1.0, 1.0]]),
         charge=np.zeros((1, 2)),
@@ -335,13 +322,14 @@ def test_get_particle_resolved_kernel_radius_data_uses_bin_radius() -> None:
 def test_get_particle_resolved_kernel_radius_data_raises_on_all_zero() -> None:
     """All-zero radii should raise a ValueError."""
     data = ParticleData(
+        distribution_type="particle_resolved",
         masses=np.zeros((1, 2, 1)),
         concentration=np.zeros((1, 2)),
         charge=np.zeros((1, 2)),
         density=np.array([1000.0]),
         volume=np.array([1.0]),
     )
-    with pytest.raises(ValueError, match="Particle radius must be finite"):
+    with pytest.raises(ValueError, match="requires an active particle"):
         coagulation_strategy_abc._get_particle_resolved_kernel_radius_data(
             data=data,
         )
@@ -350,13 +338,14 @@ def test_get_particle_resolved_kernel_radius_data_raises_on_all_zero() -> None:
 def test_get_particle_resolved_kernel_radius_data_raises_on_nonfinite() -> None:
     """Non-finite radii should raise a ValueError."""
     data = ParticleData(
+        distribution_type="particle_resolved",
         masses=np.array([[[np.inf]]]),
         concentration=np.array([[1.0]]),
         charge=np.array([[0.0]]),
         density=np.array([1000.0]),
         volume=np.array([1.0]),
     )
-    with pytest.raises(ValueError, match="Particle radius must be finite"):
+    with pytest.raises(ValueError, match="finite"):
         coagulation_strategy_abc._get_particle_resolved_kernel_radius_data(
             data=data,
         )
@@ -367,6 +356,7 @@ def test_get_particle_resolved_kernel_radius_data_generates_requested_bins() -> 
 ):
     """Radius helper should generate explicit or inferred logarithmic bins."""
     data = ParticleData(
+        distribution_type="particle_resolved",
         masses=np.array([[[1e-18], [8e-18], [27e-18]]]),
         concentration=np.array([[1.0, 1.0, 1.0]]),
         charge=np.array([[0.0, 0.0, 0.0]]),
@@ -399,6 +389,7 @@ def test_get_particle_resolved_kernel_radius_data_rejects_multi_box_inputs() -> 
 ):
     """Radius helper should reject unsupported multi-box ParticleData."""
     data = ParticleData(
+        distribution_type="particle_resolved",
         masses=np.array([[[1e-18]], [[2e-18]]]),
         concentration=np.array([[1.0], [2.0]]),
         charge=np.array([[0.0], [1.0]]),
@@ -415,6 +406,7 @@ def test_get_particle_resolved_kernel_radius_data_rejects_multi_box_inputs() -> 
 def test_get_binned_kernel_data_from_particle_data_aggregates_bins() -> None:
     """Binning helper should aggregate mass and concentration by bins."""
     data = ParticleData(
+        distribution_type="particle_resolved",
         masses=np.array([[[1e-18], [2e-18], [3e-18]]]),
         concentration=np.array([[1.0, 2.0, 3.0]]),
         charge=np.array([[0.0, 1.0, 2.0]]),
@@ -438,12 +430,14 @@ def test_get_binned_kernel_data_from_particle_data_aggregates_bins() -> None:
     masses = data.masses[0][valid_mask]
     concentration = data.concentration[0][valid_mask]
     charge = data.charge[0][valid_mask]
-    counts = np.bincount(bin_indexes, minlength=num_bins)
+    counts = np.bincount(bin_indexes, weights=concentration, minlength=num_bins)
     concentration_sum = np.bincount(
         bin_indexes, weights=concentration, minlength=num_bins
     )
     new_masses = np.zeros((num_bins, data.n_species), dtype=np.float64)
-    summed = np.bincount(bin_indexes, weights=masses[:, 0], minlength=num_bins)
+    summed = np.bincount(
+        bin_indexes, weights=masses[:, 0] * concentration, minlength=num_bins
+    )
     with np.errstate(divide="ignore", invalid="ignore"):
         mean_mass = summed / counts
     mean_mass[counts == 0] = np.nan
@@ -474,6 +468,7 @@ def test_get_binned_kernel_data_from_particle_data_rejects_multi_box_inputs() ->
 ):
     """Binning helper should reject unsupported multi-box ParticleData."""
     data = ParticleData(
+        distribution_type="particle_resolved",
         masses=np.array([[[1e-18]], [[2e-18]]]),
         concentration=np.array([[1.0], [2.0]]),
         charge=np.array([[0.0], [1.0]]),
@@ -488,30 +483,27 @@ def test_get_binned_kernel_data_from_particle_data_rejects_multi_box_inputs() ->
         )
 
 
-def test_get_binned_kernel_data_from_particle_data_returns_empty_when_all_outside() -> (
-    None
-):
-    """Binning helper should return an empty single-box container if needed."""
+def test_get_binned_kernel_data_rejects_uncovered_active_radii() -> None:
+    """Uncovered active radii reject instead of silently discarding inventory."""
     data = ParticleData(
+        distribution_type="particle_resolved",
         masses=np.array([[[1e-18], [2e-18]]]),
         concentration=np.array([[1.0, 2.0]]),
         charge=np.array([[0.0, 1.0]]),
         density=np.array([1000.0]),
         volume=np.array([1.0]),
     )
-    kernel_radius = np.array([1e-12], dtype=np.float64)
+    kernel_radius = np.array([1e-12, 2e-12], dtype=np.float64)
 
-    binned = (
+    before = [x.copy() for x in (data.masses, data.concentration, data.charge)]
+    with pytest.raises(ValueError, match="cover every active particle"):
         coagulation_strategy_abc._get_binned_kernel_data_from_particle_data(
-            data=data,
-            kernel_radius=kernel_radius,
+            data=data, kernel_radius=kernel_radius
         )
-    )
-
-    assert binned.masses.shape == (1, 0, 1)
-    assert binned.concentration.shape == (1, 0)
-    assert binned.charge.shape == (1, 0)
-    np.testing.assert_allclose(binned.volume, np.array([1.0]))
+    for actual, expected in zip(
+        (data.masses, data.concentration, data.charge), before, strict=True
+    ):
+        np.testing.assert_array_equal(actual, expected)
 
 
 def test_strategy_init_rejects_invalid_distribution_type() -> None:
@@ -525,44 +517,62 @@ def test_loss_gain_and_net_rate_particle_data_paths(
 ) -> None:
     """Discrete and continuous ParticleData paths should use shared helpers."""
     data = ParticleData(
-        masses=np.array([[[1e-18], [2e-18]]]),
-        concentration=np.array([[3.0, 4.0]]),
-        charge=np.array([[0.0, 1.0]]),
+        distribution_type="discrete",
+        masses=np.array([[[1e-18], [2e-18], [3e-18], [4e-18]]]),
+        concentration=np.array([[3.0, 4.0, 5.0, 6.0]]),
+        charge=np.array([[0.0, 1.0, 0.0, 1.0]]),
         density=np.array([1000.0]),
         volume=np.array([1.0]),
     )
-    kernel = np.array([[1.0, 0.5], [0.5, 2.0]], dtype=np.float64)
+    kernel = np.ones((4, 4), dtype=np.float64)
+    pdf_data = data.copy()
+    pdf_data.distribution_type = "continuous_pdf"
+    pdf_data.radius_grid = data.radii[0].copy()
 
     discrete = DummyCoagulationStrategy(distribution_type="discrete")
     continuous = DummyCoagulationStrategy(distribution_type="continuous_pdf")
     monkeypatch.setattr(
         coagulation_strategy_abc.coagulation_rate,
         "get_coagulation_loss_rate_discrete",
-        lambda concentration, kernel: np.array([10.0, 11.0]),
+        lambda concentration, kernel: np.array([10.0, 11.0, 10.0, 11.0]),
     )
     monkeypatch.setattr(
         coagulation_strategy_abc.coagulation_rate,
         "get_coagulation_gain_rate_discrete",
-        lambda radius, concentration, kernel: np.array([12.0, 13.0]),
+        lambda radius, concentration, kernel: np.array(
+            [12.0, 13.0, 12.0, 13.0]
+        ),
     )
     monkeypatch.setattr(
         coagulation_strategy_abc.coagulation_rate,
         "get_coagulation_loss_rate_continuous",
-        lambda radius, concentration, kernel: np.array([14.0, 15.0]),
+        lambda radius, concentration, kernel: np.array(
+            [14.0, 15.0, 14.0, 15.0]
+        ),
     )
     monkeypatch.setattr(
         coagulation_strategy_abc.coagulation_rate,
         "get_coagulation_gain_rate_continuous",
-        lambda radius, concentration, kernel: np.array([16.0, 17.0]),
+        lambda radius, concentration, kernel: np.array(
+            [16.0, 17.0, 16.0, 17.0]
+        ),
     )
 
-    np.testing.assert_allclose(discrete.loss_rate(data, kernel), [10.0, 11.0])
-    np.testing.assert_allclose(discrete.gain_rate(data, kernel), [12.0, 13.0])
-    np.testing.assert_allclose(continuous.loss_rate(data, kernel), [14.0, 15.0])
-    np.testing.assert_allclose(continuous.gain_rate(data, kernel), [16.0, 17.0])
+    np.testing.assert_allclose(
+        discrete.loss_rate(data, kernel), [10.0, 11.0, 10.0, 11.0]
+    )
+    np.testing.assert_allclose(
+        discrete.gain_rate(data, kernel), [12.0, 13.0, 12.0, 13.0]
+    )
+    np.testing.assert_allclose(
+        continuous.loss_rate(pdf_data, kernel), [14.0, 15.0, 14.0, 15.0]
+    )
+    np.testing.assert_allclose(
+        continuous.gain_rate(pdf_data, kernel), [16.0, 17.0, 16.0, 17.0]
+    )
 
     net_strategy = DummyCoagulationStrategy(distribution_type="discrete")
-    expected_net = np.array([2.0, 2.0])
+    expected_net = np.array([2.0, 2.0, 2.0, 2.0])
     np.testing.assert_allclose(
         net_strategy.net_rate(data, temperature=298.15, pressure=101325.0),
         expected_net,
@@ -618,6 +628,7 @@ def test_public_particle_data_api_rejects_multi_box_inputs(
 def test_loss_gain_rate_reject_invalid_distribution_type() -> None:
     """Invalid distribution types should still fail in loss/gain helpers."""
     data = ParticleData(
+        distribution_type="discrete",
         masses=np.array([[[1e-18]]]),
         concentration=np.array([[1.0]]),
         charge=np.array([[0.0]]),
@@ -628,9 +639,9 @@ def test_loss_gain_rate_reject_invalid_distribution_type() -> None:
     strategy = DummyCoagulationStrategy(distribution_type="discrete")
     strategy.distribution_type = "invalid"
 
-    with pytest.raises(ValueError, match="Invalid distribution type"):
+    with pytest.raises(ValueError, match="distribution_type must match"):
         strategy.loss_rate(data, kernel)
-    with pytest.raises(ValueError, match="Invalid distribution type"):
+    with pytest.raises(ValueError, match="distribution_type must match"):
         strategy.gain_rate(data, kernel)
 
 
@@ -856,12 +867,13 @@ def test_diffusive_knudsen_and_friction_factor_particle_data(
     )
 
 
-def test_coulomb_potential_ratio_uses_zero_charge_when_unset(
+def test_coulomb_potential_ratio_uses_native_zero_charge(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Legacy representations with no charge should use zeros."""
-    representation = PresetParticleRadiusBuilder().build()
-    monkeypatch.setattr(representation, "get_charge", lambda: None)
+    """Native zero-charge material reaches the neutral Coulomb law unchanged."""
+    representation = create_lognormal_binned_particle_data(
+        distribution_type="discrete"
+    )
     strategy = DummyCoagulationStrategy(distribution_type="discrete")
 
     def _fake_coulomb(
@@ -881,7 +893,7 @@ def test_coulomb_potential_ratio_uses_zero_charge_when_unset(
 
     np.testing.assert_allclose(
         strategy.coulomb_potential_ratio(representation, temperature=298.15),
-        np.full_like(representation.get_radius(), 7.0),
+        np.full_like(representation.radii[0], 7.0),
     )
 
 
@@ -1110,3 +1122,24 @@ def test_step_discrete_negative_proposal_preserves_state(monkeypatch):
         (data.masses, data.concentration, data.charge), before, strict=True
     ):
         np.testing.assert_array_equal(actual, expected)
+
+
+def test_binned_empty_native_population_retains_layout_and_volume():
+    """An empty population is distinct from discarding uncovered active slots."""
+    data = ParticleData(
+        masses=np.zeros((1, 0, 2)),
+        concentration=np.zeros((1, 0)),
+        charge=np.zeros((1, 0)),
+        density=np.array([1000.0, 1200.0]),
+        volume=np.array([0.25]),
+        distribution_type="particle_resolved",
+    )
+    binned = (
+        coagulation_strategy_abc._get_binned_kernel_data_from_particle_data(
+            data, np.array([1e-9, 2e-9])
+        )
+    )
+    assert binned.masses.shape == (1, 0, 2)
+    assert binned.concentration.shape == (1, 0)
+    assert binned.charge.shape == (1, 0)
+    np.testing.assert_array_equal(binned.volume, [0.25])

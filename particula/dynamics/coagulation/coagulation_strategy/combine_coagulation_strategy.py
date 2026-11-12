@@ -15,8 +15,10 @@ from typing import List, Union
 import numpy as np
 from numpy.typing import NDArray
 
-from ._native_validation import native_kernel
-from .coagulation_strategy_abc import CoagulationStrategyABC, ParticleLike
+from particula.particles.particle_data import ParticleData
+
+from ._native_validation import _evaluate_material_kernel, native_kernel
+from .coagulation_strategy_abc import CoagulationStrategyABC
 
 logger = logging.getLogger("particula")
 
@@ -53,7 +55,7 @@ class CombineCoagulationStrategy(CoagulationStrategyABC):
             [strategy1, strategy2]
         )
         k_value = combined_strategy.kernel(
-            particle=aerosol, temperature=300, pressure=101325
+            particle=aerosol.particles, temperature=300, pressure=101325
         ) # combined kernel value
         ```
 
@@ -119,7 +121,7 @@ class CombineCoagulationStrategy(CoagulationStrategyABC):
     @native_kernel
     def kernel(
         self,
-        particle: ParticleLike,
+        particle: ParticleData,
         temperature: float,
         pressure: float,
     ) -> Union[float, NDArray[np.float64]]:
@@ -150,7 +152,7 @@ class CombineCoagulationStrategy(CoagulationStrategyABC):
         # Type narrowing: initialize as Union type to match return signature
         combined_kernel: Union[float, NDArray[np.float64]] = 0.0
         for strategy in self.strategies:
-            combined_kernel += strategy.kernel(
-                particle=particle, temperature=temperature, pressure=pressure
+            combined_kernel += _evaluate_material_kernel(
+                strategy, particle, temperature, pressure
             )
         return combined_kernel

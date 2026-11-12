@@ -9,12 +9,12 @@ from numpy.typing import NDArray
 from particula.dynamics.coagulation.charged_kernel_strategy import (
     ChargedKernelStrategyABC,
 )
+from particula.particles.particle_data import ParticleData
 from particula.util.reduced_quantity import get_reduced_self_broadcast
 
 from ._native_validation import native_kernel
 from .coagulation_strategy_abc import (
     CoagulationStrategyABC,
-    ParticleLike,
     _get_mass,
     _get_radius,
 )
@@ -55,8 +55,10 @@ class ChargedCoagulationStrategy(CoagulationStrategyABC):
         charged_coag = par.dynamics.ChargedCoagulationStrategy(
             distribution_type="discrete", kernel_strategy=kernel_strategy
         )
-        # Now the charged_coag object can compute dimensionless and
-        # dimensioned kernels given a ParticleRepresentation object.
+        particle_data = par.particles.create_lognormal_binned_particle_data(
+            distribution_type="discrete"
+        )
+        kernel_values = charged_coag.kernel(particle_data, 298.15, 101325)
         ```
 
     References:
@@ -127,7 +129,7 @@ class ChargedCoagulationStrategy(CoagulationStrategyABC):
     @native_kernel
     def kernel(
         self,
-        particle: ParticleLike,
+        particle: ParticleData,
         temperature: float,
         pressure: float,
     ) -> Union[float, NDArray[np.float64]]:

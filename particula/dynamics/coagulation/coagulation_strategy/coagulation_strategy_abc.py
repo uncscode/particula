@@ -6,7 +6,7 @@ coagulation processes in aerosol simulations.
 
 import logging
 from abc import ABC, abstractmethod
-from typing import Callable, Optional, TypeGuard, Union, cast
+from typing import Callable, Optional, Union, cast
 
 import numpy as np
 from numpy.typing import NDArray
@@ -16,11 +16,9 @@ from particula.dynamics.coagulation import (
     coagulation_rate,
 )
 from particula.particles.particle_data import ParticleData
-from particula.particles.representation import ParticleRepresentation
 
 from ._native_step import binned_kernel_data, kernel_edges, step_native
 from ._native_validation import (
-    is_native,
     positive_scalar,
     rate_radius,
     validate_particle,
@@ -28,25 +26,6 @@ from ._native_validation import (
 )
 
 logger = logging.getLogger("particula")
-
-ParticleLike = Union[ParticleRepresentation, ParticleData]
-
-
-def _is_particle_data(particle: ParticleLike) -> TypeGuard[ParticleData]:
-    """Check whether the particle input is ParticleData."""
-    return isinstance(particle, ParticleData)
-
-
-def _unwrap_particle(particle: ParticleLike) -> ParticleLike:
-    """Normalize particle inputs that may be wrapped or proxied.
-
-    Args:
-        particle: Particle input to normalize.
-
-    Returns:
-        The underlying particle input, unchanged if no wrapper exists.
-    """
-    return particle
 
 
 def _require_single_box_particle_data(particle: ParticleData) -> ParticleData:
@@ -61,7 +40,9 @@ def _require_single_box_particle_data(particle: ParticleData) -> ParticleData:
     Raises:
         ValueError: If ``particle.n_boxes`` is not 1.
     """
-    if is_native(particle):
+    if not isinstance(particle, ParticleData):
+        raise TypeError("coagulation material requires ParticleData")
+    if particle.distribution_type is not None:
         validate_particle(particle, cast(str, particle.distribution_type))
     if particle.n_boxes != 1:
         raise ValueError(
@@ -72,73 +53,45 @@ def _require_single_box_particle_data(particle: ParticleData) -> ParticleData:
     return particle
 
 
-def _get_radius(particle: ParticleLike) -> NDArray[np.float64]:
-    """Return particle radii for either legacy or new data containers."""
-    particle = _unwrap_particle(particle)
-    if isinstance(particle, ParticleData):
-        particle = _require_single_box_particle_data(particle)
-        return particle.radii[0]
-    return cast(ParticleRepresentation, particle).get_radius()
+def _get_radius(particle: ParticleData) -> NDArray[np.float64]:
+    """Return material radii from single-box native storage."""
+    return _require_single_box_particle_data(particle).radii[0]
 
 
-def _get_mass(particle: ParticleLike) -> NDArray[np.float64]:
-    """Return particle total mass for either legacy or new data containers."""
-    particle = _unwrap_particle(particle)
-    if isinstance(particle, ParticleData):
-        particle = _require_single_box_particle_data(particle)
-        return particle.total_mass[0]
-    return cast(ParticleRepresentation, particle).get_mass()
+def _get_mass(particle: ParticleData) -> NDArray[np.float64]:
+    """Return total per-particle material mass."""
+    return _require_single_box_particle_data(particle).total_mass[0]
 
 
-def _get_concentration(particle: ParticleLike) -> NDArray[np.float64]:
-    """Return particle concentration for either legacy or new containers."""
-    particle = _unwrap_particle(particle)
-    if isinstance(particle, ParticleData):
-        particle = _require_single_box_particle_data(particle)
-        if is_native(particle):
-            return particle.slot_concentration_density[0]
-        return particle.concentration[0]
-    return cast(ParticleRepresentation, particle).concentration
+def _get_concentration(particle: ParticleData) -> NDArray[np.float64]:
+    """Interpret explicitly tagged population state as slot number density."""
+    particle = _require_single_box_particle_data(particle)
+    validate_particle(particle, cast(str, particle.distribution_type))
+    return particle.slot_concentration_density[0]
 
 
-def _get_charge(particle: ParticleLike) -> Optional[NDArray[np.float64]]:
-    """Return particle charge for either legacy or new containers."""
-    particle = _unwrap_particle(particle)
-    if isinstance(particle, ParticleData):
-        particle = _require_single_box_particle_data(particle)
-        return particle.charge[0]
-    return cast(ParticleRepresentation, particle).get_charge()
+def _get_charge(particle: ParticleData) -> NDArray[np.float64]:
+    """Return explicit material charge lanes."""
+    return _require_single_box_particle_data(particle).charge[0]
 
 
-def _get_volume(particle: ParticleLike) -> float:
-    """Return particle simulation volume for either legacy or new containers."""
-    particle = _unwrap_particle(particle)
-    if isinstance(particle, ParticleData):
-        particle = _require_single_box_particle_data(particle)
-        return float(particle.volume[0])
-    return cast(ParticleRepresentation, particle).get_volume()
+def _get_volume(particle: ParticleData) -> float:
+    """Return the explicit single-box volume."""
+    return float(_require_single_box_particle_data(particle).volume[0])
 
 
-def _get_effective_density(particle: ParticleLike) -> NDArray[np.float64]:
-    """Return particle effective density for either legacy or new containers."""
-    particle = _unwrap_particle(particle)
-    if isinstance(particle, ParticleData):
-        particle = _require_single_box_particle_data(particle)
-        return particle.effective_density[0]
-    return cast(ParticleRepresentation, particle).get_effective_density()
+def _get_effective_density(particle: ParticleData) -> NDArray[np.float64]:
+    """Return per-particle effective material density."""
+    return _require_single_box_particle_data(particle).effective_density[0]
 
 
-def _get_mean_effective_density(particle: ParticleLike) -> float:
-    """Return the mean effective density for either legacy or new containers."""
-    particle = _unwrap_particle(particle)
-    if isinstance(particle, ParticleData):
-        particle = _require_single_box_particle_data(particle)
-        effective_density = particle.effective_density[0]
-        effective_density = effective_density[effective_density != 0]
-        if effective_density.size == 0:
-            return 0.0
-        return float(np.mean(effective_density))
-    return cast(ParticleRepresentation, particle).get_mean_effective_density()
+def _get_mean_effective_density(particle: ParticleData) -> float:
+    """Return arithmetic mean effective density excluding zero-mass slots."""
+    effective_density = _get_effective_density(particle)
+    effective_density = effective_density[effective_density != 0]
+    if effective_density.size == 0:
+        return 0.0
+    return float(np.mean(effective_density))
 
 
 def _get_particle_resolved_kernel_radius_data(
@@ -161,52 +114,7 @@ def _get_particle_resolved_kernel_radius_data(
     Raises:
         ValueError: If finite radii cannot be determined for binning.
     """
-    data = _require_single_box_particle_data(data)
-    if is_native(data):
-        return kernel_edges(
-            data, bin_radius, total_bins, bins_per_radius_decade
-        )
-    if bin_radius is not None:
-        return bin_radius
-    particle_radius = data.radii[0]
-    if not np.all(np.isfinite(particle_radius)):
-        raise ValueError(
-            "Particle radius must be finite. Check for non-finite or zero "
-            "values before computing the kernel."
-        )
-    positive_mask = particle_radius > 0
-    if not np.any(positive_mask):
-        raise ValueError(
-            "Particle radius must be finite. Check for non-finite or zero "
-            "values before computing the kernel."
-        )
-    min_radius = np.min(particle_radius[positive_mask]) * 0.5
-    max_radius = np.max(particle_radius[positive_mask]) * 2
-    if not np.isfinite(min_radius) or not np.isfinite(max_radius):
-        raise ValueError(
-            "Particle radius must be finite. Check for non-finite or zero "
-            "values before computing the kernel."
-        )
-    if min_radius == 0:
-        min_radius = np.float64(1e-10)
-    if total_bins is not None:
-        return np.logspace(
-            np.log10(min_radius),
-            np.log10(max_radius),
-            num=total_bins,
-            base=10,
-            dtype=np.float64,
-        )
-    num = np.ceil(
-        bins_per_radius_decade * np.log10(max_radius / min_radius),
-    )
-    return np.logspace(
-        np.log10(min_radius),
-        np.log10(max_radius),
-        num=int(num),
-        base=10,
-        dtype=np.float64,
-    )
+    return kernel_edges(data, bin_radius, total_bins, bins_per_radius_decade)
 
 
 def _get_binned_kernel_data_from_particle_data(
@@ -222,64 +130,7 @@ def _get_binned_kernel_data_from_particle_data(
     Returns:
         ParticleData with binned masses, concentration, and charge.
     """
-    data = _require_single_box_particle_data(data)
-    if is_native(data):
-        return binned_kernel_data(data, kernel_radius)
-    radii = data.radii[0]
-    masses = data.masses[0]
-    concentration = data.concentration[0]
-    charge = data.charge[0]
-    bin_indexes = np.digitize(radii, kernel_radius)
-    num_bins = kernel_radius.size
-    valid_mask = bin_indexes < num_bins
-    if not np.any(valid_mask):
-        empty_shape = (1, 0, data.n_species)
-        return ParticleData(
-            masses=np.zeros(empty_shape, dtype=np.float64),
-            concentration=np.zeros((1, 0), dtype=np.float64),
-            charge=np.zeros((1, 0), dtype=np.float64),
-            density=np.copy(data.density),
-            volume=np.array([float(data.volume[0])], dtype=np.float64),
-        )
-    bin_indexes = bin_indexes[valid_mask]
-    masses = masses[valid_mask]
-    concentration = concentration[valid_mask]
-    charge = charge[valid_mask]
-    counts = np.bincount(bin_indexes, minlength=num_bins)
-    concentration_sum = np.bincount(
-        bin_indexes, weights=concentration, minlength=num_bins
-    )
-    new_masses = np.zeros((num_bins, data.n_species), dtype=np.float64)
-    for species_index in range(data.n_species):
-        summed = np.bincount(
-            bin_indexes,
-            weights=masses[:, species_index],
-            minlength=num_bins,
-        )
-        with np.errstate(divide="ignore", invalid="ignore"):
-            mean_mass = summed / counts
-        mean_mass[counts == 0] = np.nan
-        new_masses[:, species_index] = mean_mass
-    new_charge = np.full(num_bins, np.nan, dtype=np.float64)
-    for bin_index in np.flatnonzero(counts):
-        mask = bin_indexes == bin_index
-        new_charge[bin_index] = np.median(charge[mask])
-    new_charge = np.where(np.isnan(new_charge), 0, new_charge)
-    new_concentration = np.where(
-        np.isnan(concentration_sum), 0, concentration_sum
-    )
-    mask_nan_zeros = np.isnan(new_masses) | (new_masses == 0)
-    mask_nan_zeros = ~np.any(mask_nan_zeros, axis=1)
-    filtered_masses = new_masses[mask_nan_zeros]
-    filtered_charge = new_charge[mask_nan_zeros]
-    filtered_concentration = new_concentration[mask_nan_zeros]
-    return ParticleData(
-        masses=filtered_masses[np.newaxis, ...],
-        concentration=filtered_concentration[np.newaxis, ...],
-        charge=filtered_charge[np.newaxis, ...],
-        density=np.copy(data.density),
-        volume=np.array([float(data.volume[0])], dtype=np.float64),
-    )
+    return binned_kernel_data(data, kernel_radius)
 
 
 def _resolve_radius_indices(
@@ -479,7 +330,7 @@ class CoagulationStrategyABC(ABC):
     @abstractmethod
     def kernel(
         self,
-        particle: ParticleLike,
+        particle: ParticleData,
         temperature: float,
         pressure: float,
     ) -> Union[float, NDArray[np.float64]]:
@@ -490,7 +341,7 @@ class CoagulationStrategyABC(ABC):
         ``ParticleData`` inputs are supported only for ``n_boxes == 1``.
 
         Args:
-            particle: ParticleRepresentation or ParticleData providing radius
+            particle: Explicitly tagged ParticleData providing radius
                 and concentration.
             temperature: The temperature in Kelvin [K].
             pressure: The pressure in Pascals [Pa].
@@ -510,7 +361,7 @@ class CoagulationStrategyABC(ABC):
 
     def loss_rate(
         self,
-        particle: ParticleLike,
+        particle: ParticleData,
         kernel: NDArray[np.float64],
     ) -> Union[float, NDArray[np.float64]]:
         """Calculate the coagulation loss rate.
@@ -536,11 +387,9 @@ class CoagulationStrategyABC(ABC):
             loss = strategy.loss_rate(particle, k_val)
             ```
         """
-        particle = _unwrap_particle(particle)
-        if is_native(particle):
-            native_particle = cast(ParticleData, particle)
-            validate_particle(native_particle, self.distribution_type)
-            kernel = validate_rate_kernel(native_particle, kernel)
+        native_particle = particle
+        validate_particle(native_particle, self.distribution_type)
+        kernel = validate_rate_kernel(native_particle, kernel)
         if self.distribution_type == "discrete":
             return coagulation_rate.get_coagulation_loss_rate_discrete(
                 concentration=_get_concentration(particle),
@@ -548,11 +397,7 @@ class CoagulationStrategyABC(ABC):
             )
         if self.distribution_type == "continuous_pdf":
             return coagulation_rate.get_coagulation_loss_rate_continuous(
-                radius=(
-                    rate_radius(cast(ParticleData, particle))
-                    if is_native(particle)
-                    else _get_radius(particle)
-                ),
+                radius=rate_radius(particle),
                 concentration=_get_concentration(particle),
                 kernel=kernel,
             )
@@ -563,7 +408,7 @@ class CoagulationStrategyABC(ABC):
 
     def gain_rate(
         self,
-        particle: ParticleLike,
+        particle: ParticleData,
         kernel: NDArray[np.float64],
     ) -> Union[float, NDArray[np.float64]]:
         """Calculate the coagulation gain rate.
@@ -589,43 +434,31 @@ class CoagulationStrategyABC(ABC):
             gain = strategy.gain_rate(particle, k_val)
             ```
         """
-        particle = _unwrap_particle(particle)
-        if is_native(particle):
-            native_particle = cast(ParticleData, particle)
-            validate_particle(native_particle, self.distribution_type)
-            kernel = validate_rate_kernel(native_particle, kernel)
-            if self.distribution_type in ("discrete", "continuous_pdf"):
-                if not np.any(native_particle.concentration):
-                    return np.zeros(
-                        native_particle.n_particles, dtype=np.float64
-                    )
-                radius = rate_radius(native_particle)
-                if (
-                    radius.size < 4
-                    or np.any(radius <= 0)
-                    or np.any(np.diff(radius) <= 0)
-                ):
-                    raise ValueError(
-                        "coagulation gain requires at least four increasing "
-                        "positive radius nodes"
-                    )
+        native_particle = particle
+        validate_particle(native_particle, self.distribution_type)
+        kernel = validate_rate_kernel(native_particle, kernel)
+        if self.distribution_type in ("discrete", "continuous_pdf"):
+            if not np.any(native_particle.concentration):
+                return np.zeros(native_particle.n_particles, dtype=np.float64)
+            radius = rate_radius(native_particle)
+            if (
+                radius.size < 4
+                or np.any(radius <= 0)
+                or np.any(np.diff(radius) <= 0)
+            ):
+                raise ValueError(
+                    "coagulation gain requires at least four increasing "
+                    "positive radius nodes"
+                )
         if self.distribution_type == "discrete":
             return coagulation_rate.get_coagulation_gain_rate_discrete(
-                radius=(
-                    rate_radius(cast(ParticleData, particle))
-                    if is_native(particle)
-                    else _get_radius(particle)
-                ),
+                radius=rate_radius(particle),
                 concentration=_get_concentration(particle),
                 kernel=kernel,
             )
         if self.distribution_type == "continuous_pdf":
             return coagulation_rate.get_coagulation_gain_rate_continuous(
-                radius=(
-                    rate_radius(cast(ParticleData, particle))
-                    if is_native(particle)
-                    else _get_radius(particle)
-                ),
+                radius=rate_radius(particle),
                 concentration=_get_concentration(particle),
                 kernel=kernel,
             )
@@ -636,7 +469,7 @@ class CoagulationStrategyABC(ABC):
 
     def net_rate(
         self,
-        particle: ParticleLike,
+        particle: ParticleData,
         temperature: float,
         pressure: float,
     ) -> Union[float, NDArray[np.float64]]:
@@ -664,7 +497,7 @@ class CoagulationStrategyABC(ABC):
             net = strategy.net_rate(particle, 298.15, 101325)
             ```
         """
-        particle = _unwrap_particle(particle)
+        validate_particle(particle, self.distribution_type)
         kernel = self.kernel(
             particle=particle, temperature=temperature, pressure=pressure
         )
@@ -716,7 +549,7 @@ class CoagulationStrategyABC(ABC):
 
     def diffusive_knudsen(
         self,
-        particle: ParticleLike,
+        particle: ParticleData,
         temperature: float,
         pressure: float,
     ) -> NDArray[np.float64]:
@@ -742,8 +575,8 @@ class CoagulationStrategyABC(ABC):
             knudsen_nums = strategy.diffusive_knudsen(particle, 298.15, 101325)
             ```
         """
-        particle = _unwrap_particle(particle)
-        if is_native(particle):
+        particle = _require_single_box_particle_data(particle)
+        if particle.distribution_type is not None:
             validate_particle(
                 cast(ParticleData, particle), self.distribution_type
             )
@@ -766,7 +599,7 @@ class CoagulationStrategyABC(ABC):
         )  # type: ignore
 
     def coulomb_potential_ratio(
-        self, particle: ParticleLike, temperature: float
+        self, particle: ParticleData, temperature: float
     ) -> NDArray[np.float64]:
         """Calculate the Coulomb potential ratio for each particle.
 
@@ -789,15 +622,13 @@ class CoagulationStrategyABC(ABC):
             phi = strategy.coulomb_potential_ratio(particle, 298.15)
             ```
         """
-        particle = _unwrap_particle(particle)
-        if is_native(particle):
+        particle = _require_single_box_particle_data(particle)
+        if particle.distribution_type is not None:
             validate_particle(
                 cast(ParticleData, particle), self.distribution_type
             )
             positive_scalar(temperature, "temperature")
         charge = _get_charge(particle)
-        if charge is None:
-            charge = np.zeros_like(_get_radius(particle), dtype=np.float64)
         return particles.get_coulomb_enhancement_ratio(
             particle_radius=_get_radius(particle),
             charge=charge,
@@ -806,7 +637,7 @@ class CoagulationStrategyABC(ABC):
 
     def friction_factor(
         self,
-        particle: ParticleLike,
+        particle: ParticleData,
         temperature: float,
         pressure: float,
     ) -> NDArray[np.float64]:
@@ -833,8 +664,8 @@ class CoagulationStrategyABC(ABC):
             fr = strategy.friction_factor(particle, 298.15, 101325)
             ```
         """
-        particle = _unwrap_particle(particle)
-        if is_native(particle):
+        particle = _require_single_box_particle_data(particle)
+        if particle.distribution_type is not None:
             validate_particle(
                 cast(ParticleData, particle), self.distribution_type
             )

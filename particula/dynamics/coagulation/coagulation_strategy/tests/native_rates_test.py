@@ -572,3 +572,83 @@ def test_native_charged_model_requires_compatible_strategy(name):
     strategy.kernel_strategy = None
     with pytest.raises(ValueError, match="charged kernel strategy"):
         strategy.kernel(_particle(), 298.15, 101325.0)
+
+
+@pytest.mark.parametrize("name", MECHANISMS)
+@pytest.mark.parametrize(
+    "method", ["kernel", "gain_rate", "loss_rate", "net_rate"]
+)
+@pytest.mark.parametrize("candidate_kind", ["untagged", "non_native"])
+def test_removed_population_admission_rejects(name, method, candidate_kind):
+    """Every concrete population entry requires explicit native metadata."""
+    data = _particle()
+    arrays = [data.masses, data.concentration, data.charge, data.volume]
+    before = [a.copy() for a in arrays]
+    if candidate_kind == "untagged":
+        data.distribution_type = None
+        candidate = data
+        error, message = ValueError, "explicit distribution_type"
+    else:
+        candidate = object()
+        error, message = TypeError, "requires ParticleData"
+    strategy = _strategy(name, "discrete")
+    with pytest.raises(error, match=message):
+        if method in ("kernel", "net_rate"):
+            getattr(strategy, method)(candidate, 298.15, 101325.0)
+        else:
+            getattr(strategy, method)(candidate, np.ones((4, 4)))
+    for actual, saved in zip(arrays, before, strict=True):
+        npt.assert_array_equal(actual, saved)
+
+
+@pytest.mark.parametrize(
+    "kind", ["discrete", "continuous_pdf", "particle_resolved"]
+)
+def test_nested_combination_retains_material_laws_and_empty_slots(kind):
+    """Nested children evaluate admitted material without inferred PDF tags."""
+    data = _particle(kind)
+    data.masses[0, 1] = 0
+    data.concentration[0, 1] = 0
+    data.charge[0, 1] = 0
+    first, second, third = (
+        _strategy(name, kind) for name in ("brownian", "shear", "hard")
+    )
+    nested = CombineCoagulationStrategy(
+        [CombineCoagulationStrategy([first, second]), third]
+    )
+    expected = sum(
+        child.kernel(data, 298.15, 101325.0) for child in (first, second, third)
+    )
+    actual = nested.kernel(data, 298.15, 101325.0)
+    npt.assert_allclose(actual, expected, rtol=2e-15, atol=0)
+    npt.assert_array_equal(actual[1], 0)
+    npt.assert_array_equal(actual[:, 1], 0)
+
+
+def test_combination_custom_keyword_kernel_receives_material_only():
+    """Custom material laws retain their keyword-call and active-slot contract."""
+    from types import SimpleNamespace
+
+    data = _particle("continuous_pdf")
+    data.masses[0, 1] = 0
+    data.concentration[0, 1] = 0
+    data.charge[0, 1] = 0
+    calls = []
+
+    def custom(*, particle, temperature, pressure):
+        calls.append(particle)
+        assert particle.distribution_type is None
+        assert particle.n_particles == 3
+        assert temperature == 298.15 and pressure == 101325.0
+        return np.full((3, 3), 1e-15)
+
+    child = SimpleNamespace(distribution_type="continuous_pdf", kernel=custom)
+    combined = CombineCoagulationStrategy([child])
+    expected = np.zeros((4, 4))
+    expected[np.ix_([0, 2, 3], [0, 2, 3])] = 1e-15
+    npt.assert_array_equal(combined.kernel(data, 298.15, 101325), expected)
+    assert len(calls) == 1
+    data.distribution_type = None
+    with pytest.raises(ValueError, match="explicit distribution_type"):
+        combined.kernel(data, 298.15, 101325)
+    assert len(calls) == 1

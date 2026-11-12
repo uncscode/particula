@@ -9,11 +9,11 @@ from numpy.typing import NDArray
 from particula.dynamics.coagulation.brownian_kernel import (
     get_brownian_kernel_via_system_state,
 )
+from particula.particles.particle_data import ParticleData
 
 from ._native_validation import native_kernel
 from .coagulation_strategy_abc import (
     CoagulationStrategyABC,
-    ParticleLike,
     _get_mass,
     _get_radius,
 )
@@ -50,11 +50,12 @@ class BrownianCoagulationStrategy(CoagulationStrategyABC):
         brownian_strat = par.dynamics.BrownianCoagulationStrategy(
             distribution_type="discrete"
         )
-        # Suppose we have a ParticleRepresentation object called 'particle_rep'
-        # kernel_values = brownian_strat.kernel(
-        #   particle_rep, temperature=298, pressure=101325
-        # )
-        # ...
+        particle_data = par.particles.create_lognormal_binned_particle_data(
+            distribution_type="discrete"
+        )
+        kernel_values = brownian_strat.kernel(
+            particle_data, temperature=298, pressure=101325
+        )
         ```
 
     References:
@@ -100,7 +101,7 @@ class BrownianCoagulationStrategy(CoagulationStrategyABC):
     @native_kernel
     def kernel(
         self,
-        particle: ParticleLike,
+        particle: ParticleData,
         temperature: float,
         pressure: float,
     ) -> Union[float, NDArray[np.float64]]:
