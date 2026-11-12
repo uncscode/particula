@@ -507,15 +507,21 @@
       "source": "docs/Examples/Dynamics/Customization/Adding_Particles_During_Simulation.py",
       "notebook": "docs/Examples/Dynamics/Customization/Adding_Particles_During_Simulation.ipynb",
       "phase": "P4",
-      "disposition": "pending audit",
+      "disposition": "native migration executed; scientific limitations explicitly documented",
       "legacy_patterns": [
         "LegacyAerosol",
         "AtmosphereBuilder"
       ],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
-      "evidence": []
+      "regression": "examples_tests/native_simulation_examples_test.py; embedded species inventory checks; native_coagulation_limitations_test.py",
+      "scientific_expectation": "Volume-aware species closure for condensation/resolved processes at rtol=1e-12 atol=1e-30; prescribed source/sink accounting; fixed capacity and held storage; PMF composition defect retained under explicit M3 decision, not claimed conservative.",
+      "execution": "full standalone workload and final notebook execution passed; outputs retained and source pair checked",
+      "evidence": [
+        "10 bounded simulation/injection regressions passed",
+        "26 preserved-method coagulation tests passed unchanged",
+        "All 14 P4 notebook pairs verified with 40 visually inspected plot outputs",
+        "Strict MkDocs passed",
+        "implementation.md P4 checkpoint and limitations record"
+      ]
     },
     {
       "source": "docs/Examples/Equilibria/Notebooks/activity_part1.py",
@@ -731,92 +737,128 @@
       "source": "docs/Examples/Simulations/Notebooks/Biomass_Burning_Cloud_Interactions.py",
       "notebook": "docs/Examples/Simulations/Notebooks/Biomass_Burning_Cloud_Interactions.ipynb",
       "phase": "P4",
-      "disposition": "pending audit",
+      "disposition": "native migration executed; scientific limitations explicitly documented",
       "legacy_patterns": [
         "LegacyAerosol",
         "GasSpecies",
         "AtmosphereBuilder"
       ],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
-      "evidence": []
+      "regression": "examples_tests/native_simulation_examples_test.py; embedded species inventory checks; native_coagulation_limitations_test.py",
+      "scientific_expectation": "Volume-aware species closure for condensation/resolved processes at rtol=1e-12 atol=1e-30; prescribed source/sink accounting; fixed capacity and held storage; PMF composition defect retained under explicit M3 decision, not claimed conservative.",
+      "execution": "full standalone workload and final notebook execution passed; outputs retained and source pair checked",
+      "evidence": [
+        "10 bounded simulation/injection regressions passed",
+        "26 preserved-method coagulation tests passed unchanged",
+        "All 14 P4 notebook pairs verified with 40 visually inspected plot outputs",
+        "Strict MkDocs passed",
+        "implementation.md P4 checkpoint and limitations record"
+      ]
     },
     {
       "source": "docs/Examples/Simulations/Notebooks/Cloud_Chamber_Multi_Cycle.py",
       "notebook": "docs/Examples/Simulations/Notebooks/Cloud_Chamber_Multi_Cycle.ipynb",
       "phase": "P4",
-      "disposition": "pending audit",
+      "disposition": "native migration executed; scientific limitations explicitly documented",
       "legacy_patterns": [
         "LegacyAerosol",
         "GasSpecies",
         "AtmosphereBuilder"
       ],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
-      "evidence": []
+      "regression": "examples_tests/native_simulation_examples_test.py; embedded species inventory checks; native_coagulation_limitations_test.py",
+      "scientific_expectation": "Volume-aware species closure for condensation/resolved processes at rtol=1e-12 atol=1e-30; prescribed source/sink accounting; fixed capacity and held storage; PMF composition defect retained under explicit M3 decision, not claimed conservative.",
+      "execution": "full standalone workload and final notebook execution passed; outputs retained and source pair checked",
+      "evidence": [
+        "10 bounded simulation/injection regressions passed",
+        "26 preserved-method coagulation tests passed unchanged",
+        "All 14 P4 notebook pairs verified with 40 visually inspected plot outputs",
+        "Strict MkDocs passed",
+        "implementation.md P4 checkpoint and limitations record"
+      ]
     },
     {
       "source": "docs/Examples/Simulations/Notebooks/Cloud_Chamber_Single_Cycle.py",
       "notebook": "docs/Examples/Simulations/Notebooks/Cloud_Chamber_Single_Cycle.ipynb",
       "phase": "P4",
-      "disposition": "pending audit",
+      "disposition": "native migration executed; scientific limitations explicitly documented",
       "legacy_patterns": [
         "LegacyAerosol",
         "GasSpecies",
         "AtmosphereBuilder"
       ],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
-      "evidence": []
+      "regression": "examples_tests/native_simulation_examples_test.py; embedded species inventory checks; native_coagulation_limitations_test.py",
+      "scientific_expectation": "Volume-aware species closure for condensation/resolved processes at rtol=1e-12 atol=1e-30; prescribed source/sink accounting; fixed capacity and held storage; PMF composition defect retained under explicit M3 decision, not claimed conservative.",
+      "execution": "full standalone workload and final notebook execution passed; outputs retained and source pair checked",
+      "evidence": [
+        "10 bounded simulation/injection regressions passed",
+        "26 preserved-method coagulation tests passed unchanged",
+        "All 14 P4 notebook pairs verified with 40 visually inspected plot outputs",
+        "Strict MkDocs passed",
+        "implementation.md P4 checkpoint and limitations record"
+      ]
     },
     {
       "source": "docs/Examples/Simulations/Notebooks/Cough_Droplets_Partitioning.py",
       "notebook": "docs/Examples/Simulations/Notebooks/Cough_Droplets_Partitioning.ipynb",
       "phase": "P4",
-      "disposition": "pending audit",
+      "disposition": "native migration executed; scientific limitations explicitly documented",
       "legacy_patterns": [
         "LegacyAerosol",
         "GasSpecies",
         "AtmosphereBuilder"
       ],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
-      "evidence": []
+      "regression": "examples_tests/native_simulation_examples_test.py; embedded species inventory checks; native_coagulation_limitations_test.py",
+      "scientific_expectation": "Volume-aware species closure for condensation/resolved processes at rtol=1e-12 atol=1e-30; prescribed source/sink accounting; fixed capacity and held storage; PMF composition defect retained under explicit M3 decision, not claimed conservative.",
+      "execution": "full standalone workload and final notebook execution passed; outputs retained and source pair checked",
+      "evidence": [
+        "10 bounded simulation/injection regressions passed",
+        "26 preserved-method coagulation tests passed unchanged",
+        "All 14 P4 notebook pairs verified with 40 visually inspected plot outputs",
+        "Strict MkDocs passed",
+        "implementation.md P4 checkpoint and limitations record"
+      ]
     },
     {
       "source": "docs/Examples/Simulations/Notebooks/Organic_Partitioning_and_Coagulation.py",
       "notebook": "docs/Examples/Simulations/Notebooks/Organic_Partitioning_and_Coagulation.ipynb",
       "phase": "P4",
-      "disposition": "pending audit",
+      "disposition": "native migration executed; scientific limitations explicitly documented",
       "legacy_patterns": [
         "LegacyAerosol",
         "GasSpecies",
         "AtmosphereBuilder",
         "ParticleRepresentation"
       ],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
-      "evidence": []
+      "regression": "examples_tests/native_simulation_examples_test.py; embedded species inventory checks; native_coagulation_limitations_test.py",
+      "scientific_expectation": "Volume-aware species closure for condensation/resolved processes at rtol=1e-12 atol=1e-30; prescribed source/sink accounting; fixed capacity and held storage; PMF composition defect retained under explicit M3 decision, not claimed conservative.",
+      "execution": "full standalone workload and final notebook execution passed; outputs retained and source pair checked",
+      "evidence": [
+        "10 bounded simulation/injection regressions passed",
+        "26 preserved-method coagulation tests passed unchanged",
+        "All 14 P4 notebook pairs verified with 40 visually inspected plot outputs",
+        "Strict MkDocs passed",
+        "implementation.md P4 checkpoint and limitations record"
+      ]
     },
     {
       "source": "docs/Examples/Simulations/Notebooks/Soot_Formation_in_Flames.py",
       "notebook": "docs/Examples/Simulations/Notebooks/Soot_Formation_in_Flames.ipynb",
       "phase": "P4",
-      "disposition": "pending audit",
+      "disposition": "native migration executed; scientific limitations explicitly documented",
       "legacy_patterns": [
         "LegacyAerosol",
         "GasSpecies",
         "AtmosphereBuilder"
       ],
-      "regression": null,
-      "scientific_expectation": null,
-      "execution": "pending",
-      "evidence": []
+      "regression": "examples_tests/native_simulation_examples_test.py; embedded species inventory checks; native_coagulation_limitations_test.py",
+      "scientific_expectation": "Volume-aware species closure for condensation/resolved processes at rtol=1e-12 atol=1e-30; prescribed source/sink accounting; fixed capacity and held storage; PMF composition defect retained under explicit M3 decision, not claimed conservative.",
+      "execution": "full standalone workload and final notebook execution passed; outputs retained and source pair checked",
+      "evidence": [
+        "10 bounded simulation/injection regressions passed",
+        "26 preserved-method coagulation tests passed unchanged",
+        "All 14 P4 notebook pairs verified with 40 visually inspected plot outputs",
+        "Strict MkDocs passed",
+        "implementation.md P4 checkpoint and limitations record"
+      ]
     },
     {
       "source": "docs/Examples/cpu_dilution.py",

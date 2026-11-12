@@ -53,7 +53,9 @@ import copy  # to safely duplicate Python objects
 import matplotlib.pyplot as plt  # for plotting
 import numpy as np  # numerical tools
 import particula as par  # the main Particula package
-from particula._legacy_aerosol import Aerosol as LegacyAerosol
+from particula.dynamics.condensation.species_mapping import (
+    CondensationSpeciesMap,
+)
 from tqdm import tqdm  # optional: for progress bars during simulation
 
 # 🎨 Set default plot styling using Tailwind-inspired colors from Particula
@@ -269,11 +271,13 @@ surface_tension_array = np.array(
 #
 # ### 🧪 Building Gas-Phase Species
 #
-# We use `GasSpeciesBuilder()` to define:
+# We use native `GasData` to define:
 #
 # * Species names and molar masses
 # * Their ability to partition
-# * Vapor pressure strategies
+# * Gas mass concentrations in kg/m³
+#
+# Vapor-pressure strategies are supplied explicitly to the process below.
 # * Initial gas-phase concentrations
 #
 # ### 🌡 Creating the Atmosphere
@@ -293,23 +297,16 @@ isat_water = vapor_pressure_strategy_list[0].saturation_concentration(
 concentration_gas[0] = isat_water * 0.3  # 30% RH
 
 # 🧪 Build gas-phase species with vapor strategies and concentrations
-gas_species = (
-    par.gas.GasSpeciesBuilder()
-    .set_name(np.array(list_of_chemicals))
-    .set_molar_mass(molar_mass_array, "kg/mol")
-    .set_partitioning(True)
-    .set_vapor_pressure_strategy(vapor_pressure_strategy_list)
-    .set_concentration(concentration_gas, "kg/m^3")
-    .build()
+gas_species = par.gas.GasData(
+    name=list_of_chemicals,
+    molar_mass=molar_mass_array.copy(),
+    partitioning=np.ones(len(list_of_chemicals), dtype=bool),
+    concentration=concentration_gas[None, :].copy(),
 )
-
-# 🌡 Create atmosphere: includes temperature, pressure, and gas species
-atmosphere = (
-    par.gas.AtmosphereBuilder()
-    .set_more_partitioning_species(gas_species)
-    .set_temperature(temperature, "K")
-    .set_pressure(1, "atm")
-    .build()
+environment = par.gas.EnvironmentData(
+    temperature=np.array([temperature]),
+    pressure=np.array([101325.0]),
+    saturation_ratio=np.zeros((1, len(list_of_chemicals))),
 )
 
 # %% [markdown]
@@ -341,10 +338,10 @@ atmosphere = (
 #
 # ### 🧱 Create the Resolved Particle and Aerosol System
 #
-# We wrap everything into a `ResolvedParticleMassRepresentation` and then build the full **Aerosol** object by combining:
+# We construct native resolved `ParticleData` and an **Aerosol** from:
 #
 # * Particle-phase definition (`resolved_masses`)
-# * Gas-phase environment (`atmosphere`)
+# * Ordered `GasData` and separate `EnvironmentData`
 #
 # This sets up the full simulation-ready aerosol system.
 
@@ -402,20 +399,24 @@ surface_strategy = (
 )
 
 # 🧱 3d. Build resolved particle object
-resolved_masses = (
-    par.particles.ResolvedParticleMassRepresentationBuilder()
-    .set_distribution_strategy(par.particles.ParticleResolvedSpeciatedMass())
-    .set_activity_strategy(activity_strategy)
-    .set_surface_strategy(surface_strategy)
-    .set_mass(mass_speciation, "kg")
-    .set_density(density_array, "kg/m^3")
-    .set_charge(0)
-    .set_volume(simulation_volume, "m^3")
-    .build()
+resolved_masses = par.particles.create_resolved_particle_data(
+    masses=mass_speciation,
+    density=density_array,
+    volume=simulation_volume,
+)
+aerosol = par.Aerosol(
+    particles=resolved_masses, gas=gas_species, environment=environment
 )
 
-# Combine gas and particle phases into full aerosol system
-aerosol = LegacyAerosol(atmosphere=atmosphere, particles=resolved_masses)
+
+def species_inventory(aero):
+    """Independent species inventory in kg, including represented volume."""
+    return np.sum(
+        aero.particles.masses * aero.particles.concentration[..., None], axis=1
+    ) + (aero.gas.concentration * aero.particles.volume[:, None])
+
+
+initial_inventory = species_inventory(aerosol)
 
 # Optional: print summary of aerosol system
 print(aerosol)
@@ -446,7 +447,7 @@ print(aerosol)
 #
 # To visualize the initial aerosol size distribution:
 #
-# * We extract particle **radii** using `aerosol.particles.get_radius()`
+# * We extract particle **radii** using `aerosol.particles.radii[0]`
 # * Convert to **log10 scale** (standard for aerosol data)
 # * Plot a histogram to show how particle sizes are distributed
 #
@@ -457,7 +458,7 @@ fig, ax = plt.subplots()
 
 # Log-scale histogram of particle radii
 ax.hist(
-    np.log10(aerosol.particles.get_radius()),  # convert to log10
+    np.log10(aerosol.particles.radii[0]),  # convert to log10
     bins=50,
     density=False,
     alpha=0.5,
@@ -500,6 +501,13 @@ plt.show()
 # 💧 Isothermal Condensation
 condensation_strategy = par.dynamics.CondensationIsothermal(
     molar_mass=np.array(molar_mass_array),
+    activity_strategy=activity_strategy,
+    surface_strategy=surface_strategy,
+    vapor_pressure_strategy=vapor_pressure_strategy_list,
+    species_map=CondensationSpeciesMap(
+        tuple(gas_species.name),
+        tuple((i, i) for i in range(len(list_of_chemicals))),
+    ),
     diffusion_coefficient=2e-5,  # typical air value [m²/s]
     accommodation_coefficient=1,  # full sticking efficiency
     # skip_partitioning_indices=[]      # optional: exclude species
@@ -523,14 +531,14 @@ coagulation_process = par.dynamics.Coagulation(coagulation_strategy)
 #
 # ### ⚙️ Simulation Settings
 #
-# * **Duration:** 120 seconds
-# * **Steps:** 120
+# * **Duration:** 19.9 seconds
+# * **Stored states:** 200 (199 updates at 0.1 s)
 # * **Condensation sub-steps:** 10 (to improve resolution for fast vapor interactions)
 # * **Coagulation sub-steps:** 1 (low priority here due to low concentration)
 #
 # ```python
-# time_array = np.linspace(0, total_time, total_steps)
 # time_step = total_time / total_steps
+# time_array = np.arange(total_steps) * time_step  # recorded 0..19.9 s
 # ```
 #
 # ---
@@ -572,7 +580,7 @@ condensation_sub_step = 10
 coagulation_sub_step = 1
 
 time_step = total_time / total_steps
-time_array = np.linspace(0, total_time, total_steps)
+time_array = np.arange(total_steps) * time_step  # recorded 0..19.9 s
 time_len = len(time_array)
 
 # 📊 Initialize arrays for tracking outputs
@@ -587,8 +595,8 @@ for step, _t in enumerate(
 ):
     if step > 0:
         # Optional: fix water vapor concentration (e.g. controlled RH)
-        # aerosol_process.atmosphere.partitioning_species.concentration[0] = (
-        #     aerosol.atmosphere.partitioning_species.concentration[0]
+        # aerosol_process.gas.concentration[0, 0] = (
+        #     aerosol.gas.concentration[0, 0]
         # )
 
         # 💧 Execute condensation
@@ -607,20 +615,33 @@ for step, _t in enumerate(
 
     # Record size distribution
     distribution_counts[step, :], edges = np.histogram(
-        aerosol_process.particles.get_radius(clone=True),
+        aerosol_process.particles.radii[0].copy(),
         bins=bins_lognormal,
         density=False,
     )
 
     # Record species mass in particles
-    species_temp = aerosol_process.particles.get_species_mass(clone=True)
-    species_mass[step, :] = np.sum(species_temp, axis=0)
+    species_temp = aerosol_process.particles.masses[0].copy()
+    species_mass[step, :] = np.sum(
+        species_temp * aerosol_process.particles.concentration[0, :, None],
+        axis=0,
+    )
+    np.testing.assert_allclose(
+        species_inventory(aerosol_process),
+        initial_inventory,
+        rtol=1e-12,
+        atol=1e-30,
+    )
 
     # Record vapor saturation ratios
-    vapor_saturation[step, :] = (
-        aerosol_process.atmosphere.partitioning_species.get_saturation_ratio(
-            temperature=temperature
-        )
+    vapor_saturation[step, :] = np.array(
+        [
+            aerosol_process.gas.concentration[0, i]
+            / strategy.saturation_concentration(
+                molar_mass_array[i], aerosol_process.environment.temperature[0]
+            )
+            for i, strategy in enumerate(vapor_pressure_strategy_list)
+        ]
     )
 
 # Normalize counts to number concentration (#/m³)
@@ -637,7 +658,7 @@ print(aerosol_process)
 # ### 📌 What It Shows:
 #
 # * **Dashed line**: Initial size distribution before simulation
-# * **Solid line**: Final distribution after 120 seconds
+# * **Solid line**: Final distribution after 19.9 seconds
 # * **X-axis (log scale)**: Particle radius in meters
 # * **Y-axis**: Particle number concentration (#/m³)
 #
@@ -653,8 +674,8 @@ print(aerosol_process)
 fig, ax = plt.subplots(figsize=(7, 5))
 
 # Get radii before and after simulation
-initial_distribution = aerosol.particles.get_radius(clone=True)
-final_distribution = aerosol_process.particles.get_radius(clone=True)
+initial_distribution = aerosol.particles.radii[0].copy()
+final_distribution = aerosol_process.particles.radii[0].copy()
 
 # Compute binned counts
 counts_initial, _ = np.histogram(
@@ -693,7 +714,7 @@ plt.show()
 # %% [markdown]
 # ## 💧 Step 8: Track Water Vapor Saturation Over Time
 #
-# To understand how the gas phase responds during the simulation, we track the **vapor saturation ratio for water** (RH) throughout the 120 seconds.
+# To understand how the gas phase responds during the simulation, we track the **vapor saturation ratio for water** (RH) throughout the 19.9 seconds.
 #
 # ### 🔍 What Is the Saturation Ratio?
 #
@@ -803,7 +824,7 @@ plt.show()
 # ### 🔍 What to Look For:
 #
 # * The **Y-axis (log scale)** shows particle radius from $10^{-7}$ to $10^{-4}$ meters
-# * The **X-axis** tracks simulation time from 0 to 120 seconds
+# * The **X-axis** tracks simulation time from 0 to 19.9 seconds
 # * The **color map** shows $\log_{10}$ of number concentration (#/m³)
 #
 # ### 💧 Interpretation:

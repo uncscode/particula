@@ -21,10 +21,12 @@
 # 2. **Scenario B**: Sucrose only (kappa=0.10, lower hygroscopicity)
 # 3. **Scenario C**: Mixed AS + sucrose population (competition for water vapor)
 #
-# Key physics demonstrated:
-# - Higher kappa materials activate at lower supersaturation
-# - Larger dry particles activate before smaller ones
-# - In mixed populations, higher-kappa particles activate first and compete for available water vapor
+# This is a fixed-step workflow illustration, not a timestep-convergence
+# study or a quantitative activation-order validation. The saved dry-phase
+# trajectories oscillate at the retained one-second step. Tight material
+# conservation does not establish trajectory accuracy. Refine timesteps and
+# evaluate convergence before interpreting activation fractions quantitatively.
+# The three scenarios retain different kappa values and sampled populations.
 
 # %% [markdown]
 # ## Imports, style, and reproducibility
@@ -35,7 +37,9 @@ import copy
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
-from particula._legacy_aerosol import AerosolBuilder as LegacyAerosolBuilder
+from particula.dynamics.condensation.species_mapping import (
+    CondensationSpeciesMap,
+)
 
 # Optional: uncomment if many steps and you want a progress bar
 # from tqdm import tqdm
@@ -64,7 +68,7 @@ np.random.seed(100)  # reproducibility for sampling and wall-loss RNG
 # %% [markdown]
 # ## 9. Multi-Cycle Simulation Framework
 #
-# We define helper functions for running multiple activation-deactivation cycles with dilution during dry phases.
+# We define helper functions for running multiple activation-deactivation cycles with prescribed humidity resets; dilution disabled.
 
 # %%
 # Common setup for all scenarios
@@ -106,28 +110,19 @@ wall_loss = par.dynamics.WallLoss(wall_loss_strategy=wall_loss_strategy)
 
 
 # %%
-def apply_particle_dilution(
-    particle_mass: np.ndarray,
+def apply_count_dilution(
+    particle_counts: np.ndarray,
     dilution_coefficient: float,
     dt: float,
 ) -> np.ndarray:
-    """Apply dilution to particle masses for particle-resolved simulations.
+    """Illustrate exponential dilution of represented counts, not size.
 
-    For particle-resolved distributions, dilution reduces total particle
-    number/mass proportionally. This is implemented as a mass reduction
-    factor applied uniformly to all particles.
-
-    Args:
-        particle_mass: Array of particle masses (n_particles, n_species).
-        dilution_coefficient: Dilution rate coefficient in s^-1.
-        dt: Time step in seconds.
-
-    Returns:
-        Updated particle masses after dilution.
+    This arithmetic reference is not applied to the cycle histories below.
+    The published cycles contain condensation and wall loss only. For a
+    complete all-gas/particle dilution runnable see cpu_dilution.py.
     """
-    # Exponential decay: m(t+dt) = m(t) * exp(-alpha * dt)
     dilution_factor = np.exp(-dilution_coefficient * dt)
-    return particle_mass * dilution_factor
+    return particle_counts * dilution_factor
 
 
 def run_cycle(
@@ -151,7 +146,7 @@ def run_cycle(
         wall_loss: WallLoss runnable.
         humid_duration: Duration of humid phase in seconds.
         dry_duration: Duration of dry phase in seconds.
-        dilution_coefficient: Dilution rate coefficient (1/s).
+        dilution_coefficient: Unused reference coefficient; dilution is disabled in this scenario.
         c_water_humid: Water vapor concentration during humid phase (kg/m^3).
         c_water_dry: Water vapor concentration during dry phase (kg/m^3).
         water_index: Index of water species in partitioning_species array.
@@ -164,50 +159,78 @@ def run_cycle(
     history = []
 
     # Set initial humid phase water concentration
-    water_conc = aerosol.atmosphere.partitioning_species.get_concentration()
-    water_conc[water_index] = c_water_humid
-    aerosol.atmosphere.partitioning_species.concentration = water_conc
+    aerosol.gas.concentration[0, water_index] = c_water_humid
 
     # Record initial state
     history.append(
         {
             "time": time_offset,
             "phase": "humid",
-            "masses": aerosol.particles.get_species_mass().copy(),
+            "masses": aerosol.particles.masses[0].copy(),
         }
     )
 
     # Phase 1: Humid (activation)
     for t_step in range(1, humid_duration + 1):
         # Condensation handles mass transfer and updates gas concentration internally
+        before = np.sum(
+            aerosol.particles.masses
+            * aerosol.particles.concentration[..., None],
+            axis=1,
+        ) + (
+            aerosol.gas.concentration[:, :-1]
+            * aerosol.particles.volume[:, None]
+        )
         aerosol = condensation.execute(aerosol, time_step=dt)
+        after = np.sum(
+            aerosol.particles.masses
+            * aerosol.particles.concentration[..., None],
+            axis=1,
+        ) + (
+            aerosol.gas.concentration[:, :-1]
+            * aerosol.particles.volume[:, None]
+        )
+        np.testing.assert_allclose(after, before, rtol=1e-12, atol=1e-30)
         aerosol = wall_loss.execute(aerosol, time_step=dt)
         history.append(
             {
                 "time": time_offset + t_step,
                 "phase": "humid",
-                "masses": aerosol.particles.get_species_mass().copy(),
+                "masses": aerosol.particles.masses[0].copy(),
             }
         )
 
-    # Phase 2: Dry (deactivation + dilution)
+    # Phase 2: Dry (deactivation + wall loss)
     # Set dry phase water concentration at phase transition
-    water_conc = aerosol.atmosphere.partitioning_species.get_concentration()
-    water_conc[water_index] = c_water_dry
-    aerosol.atmosphere.partitioning_species.concentration = water_conc
+    aerosol.gas.concentration[0, water_index] = c_water_dry
 
     for t_step in range(1, dry_duration + 1):
-        # Apply dilution to particle masses
-        # Note: dilution effect is minimal and condensation dominates,
-        # so we skip applying diluted mass back to aerosol.
-        # The apply_particle_dilution() function is validated in Section 18.1.
+        # Retain the published condensation + wall-loss scenario. Dilution
+        # is disabled; the separate count-decay exercise is not applied here.
+        before = np.sum(
+            aerosol.particles.masses
+            * aerosol.particles.concentration[..., None],
+            axis=1,
+        ) + (
+            aerosol.gas.concentration[:, :-1]
+            * aerosol.particles.volume[:, None]
+        )
         aerosol = condensation.execute(aerosol, time_step=dt)
+        after = np.sum(
+            aerosol.particles.masses
+            * aerosol.particles.concentration[..., None],
+            axis=1,
+        ) + (
+            aerosol.gas.concentration[:, :-1]
+            * aerosol.particles.volume[:, None]
+        )
+        np.testing.assert_allclose(after, before, rtol=1e-12, atol=1e-30)
         aerosol = wall_loss.execute(aerosol, time_step=dt)
         history.append(
             {
                 "time": time_offset + humid_duration + t_step,
                 "phase": "dry",
-                "masses": aerosol.particles.get_species_mass().copy(),
+                "masses": aerosol.particles.masses[0].copy(),
             }
         )
 
@@ -236,7 +259,7 @@ def run_multi_cycle(
         n_cycles: Number of cycles to run.
         humid_duration: Duration of humid phase per cycle (seconds).
         dry_duration: Duration of dry phase per cycle (seconds).
-        dilution_coefficient: Dilution rate coefficient (1/s).
+        dilution_coefficient: Unused reference coefficient; dilution is disabled in this scenario.
         c_water_humid: Water vapor concentration during humid phase (kg/m^3).
         c_water_dry: Water vapor concentration during dry phase (kg/m^3).
         water_index: Index of water species.
@@ -282,7 +305,58 @@ print("Multi-cycle framework functions defined.")
 #
 # Pure ammonium sulfate seeds with kappa=0.61 (high hygroscopicity). These should activate at lower supersaturation than sucrose.
 
+
 # %%
+def build_native_scenario(
+    names, masses, density, molar_mass, activity, surface
+):
+    """Configure native ordered gas, environment, particles and condensation."""
+    width = len(names)
+    gas = par.gas.GasData(
+        name=[*names, "air"],
+        molar_mass=np.append(molar_mass, 0.029),
+        partitioning=np.array([True] * width + [False]),
+        concentration=np.array(
+            [[*([1e-30] * (width - 1)), c_water_humid, 1.2]]
+        ),
+    )
+    environment = par.gas.EnvironmentData(
+        temperature=np.array([temperature]),
+        pressure=np.array([total_pressure]),
+        saturation_ratio=np.zeros((1, width + 1)),
+    )
+    particles = par.particles.create_resolved_particle_data(
+        masses=masses,
+        density=density,
+        volume=chamber_volume,
+    )
+    vapor = [par.gas.ConstantVaporPressureStrategy(1e-30) for _ in names[:-1]]
+    vapor += [
+        par.gas.WaterBuckVaporPressureBuilder().build(),
+        par.gas.ConstantVaporPressureStrategy(101325.0),
+    ]
+    strategy = par.dynamics.CondensationIsothermalStaggered(
+        molar_mass=gas.molar_mass.copy(),
+        diffusion_coefficient=2.4e-5,
+        accommodation_coefficient=1.0,
+        theta_mode="random",
+        random_state=42,
+        update_gases=True,
+        activity_strategy=activity,
+        surface_strategy=surface,
+        vapor_pressure_strategy=vapor,
+        species_map=CondensationSpeciesMap(
+            tuple(gas.name), tuple((i, i) for i in range(width))
+        ),
+    )
+    return par.Aerosol(
+        particles=particles, gas=gas, environment=environment
+    ), strategy
+
+
+np.random.seed(42)
+wall_loss_strategy.random_generator = np.random.default_rng(42)
+
 # Scenario A: Ammonium Sulfate only (2 species: AS, water)
 kappa_as = np.array([0.61, 0.0])
 density_as = np.array([1770.0, 997.0])
@@ -320,70 +394,13 @@ water_mass_as = np.zeros_like(dry_radius_as)
 seed_mass_as = np.stack([ammonium_sulfate_mass_as, water_mass_as], axis=1)
 
 # Create 2-species gas (AS and water) to match particle species
-partitioning_gases_as = (
-    par.gas.GasSpeciesBuilder()
-    .set_name(np.array(["ammonium_sulfate", "water"]))
-    .set_molar_mass(molar_mass_as, "kg/mol")
-    .set_vapor_pressure_strategy(
-        [
-            par.gas.ConstantVaporPressureStrategy(vapor_pressure=1e-30),
-            par.gas.WaterBuckVaporPressureBuilder().build(),
-        ]
-    )
-    .set_partitioning(True)
-    .set_concentration(np.array([1e-30, c_water_humid]), "kg/m^3")
-    .build()
-)
-
-air_as = (
-    par.gas.GasSpeciesBuilder()
-    .set_name("air")
-    .set_molar_mass(0.029, "kg/mol")
-    .set_vapor_pressure_strategy(
-        par.gas.ConstantVaporPressureStrategy(vapor_pressure=101325)
-    )
-    .set_partitioning(False)
-    .set_concentration(1.2, "kg/m^3")
-    .build()
-)
-
-atmosphere_as = (
-    par.gas.AtmosphereBuilder()
-    .set_temperature(temperature, "K")
-    .set_pressure(total_pressure, "Pa")
-    .set_more_partitioning_species(partitioning_gases_as)
-    .set_more_gas_only_species(air_as)
-    .build()
-)
-
-particles_as = (
-    par.particles.ResolvedParticleMassRepresentationBuilder()
-    .set_distribution_strategy(par.particles.ParticleResolvedSpeciatedMass())
-    .set_activity_strategy(activity_strategy_as)
-    .set_surface_strategy(surface_strategy_as)
-    .set_mass(seed_mass_as, "kg")
-    .set_density(density_as, "kg/m^3")
-    .set_charge(0)
-    .set_volume(chamber_volume, "m^3")
-    .build()
-)
-
-aerosol_as = (
-    LegacyAerosolBuilder()
-    .set_atmosphere(atmosphere_as)
-    .set_particles(particles_as)
-    .build()
-)
-
-# Create condensation strategy for AS (2-species molar mass)
-condensation_strategy_as = (
-    par.dynamics.CondensationIsothermalStaggeredBuilder()
-    .set_molar_mass(molar_mass_as, "kg/mol")
-    .set_diffusion_coefficient(2.4e-5, "m^2/s")
-    .set_accommodation_coefficient(1.0)
-    .set_theta_mode("random")
-    .set_update_gases(True)
-    .build()
+aerosol_as, condensation_strategy_as = build_native_scenario(
+    ["ammonium_sulfate", "water"],
+    seed_mass_as,
+    density_as,
+    molar_mass_as,
+    activity_strategy_as,
+    surface_strategy_as,
 )
 condensation_as = par.dynamics.MassCondensation(
     condensation_strategy=condensation_strategy_as
@@ -438,70 +455,13 @@ water_mass_sucrose = np.zeros_like(dry_radius_sucrose)
 seed_mass_sucrose = np.stack([sucrose_mass_sucrose, water_mass_sucrose], axis=1)
 
 # Create 2-species gas (sucrose and water) to match particle species
-partitioning_gases_sucrose = (
-    par.gas.GasSpeciesBuilder()
-    .set_name(np.array(["sucrose", "water"]))
-    .set_molar_mass(molar_mass_sucrose, "kg/mol")
-    .set_vapor_pressure_strategy(
-        [
-            par.gas.ConstantVaporPressureStrategy(vapor_pressure=1e-30),
-            par.gas.WaterBuckVaporPressureBuilder().build(),
-        ]
-    )
-    .set_partitioning(True)
-    .set_concentration(np.array([1e-30, c_water_humid]), "kg/m^3")
-    .build()
-)
-
-air_sucrose = (
-    par.gas.GasSpeciesBuilder()
-    .set_name("air")
-    .set_molar_mass(0.029, "kg/mol")
-    .set_vapor_pressure_strategy(
-        par.gas.ConstantVaporPressureStrategy(vapor_pressure=101325)
-    )
-    .set_partitioning(False)
-    .set_concentration(1.2, "kg/m^3")
-    .build()
-)
-
-atmosphere_sucrose = (
-    par.gas.AtmosphereBuilder()
-    .set_temperature(temperature, "K")
-    .set_pressure(total_pressure, "Pa")
-    .set_more_partitioning_species(partitioning_gases_sucrose)
-    .set_more_gas_only_species(air_sucrose)
-    .build()
-)
-
-particles_sucrose = (
-    par.particles.ResolvedParticleMassRepresentationBuilder()
-    .set_distribution_strategy(par.particles.ParticleResolvedSpeciatedMass())
-    .set_activity_strategy(activity_strategy_sucrose)
-    .set_surface_strategy(surface_strategy_sucrose)
-    .set_mass(seed_mass_sucrose, "kg")
-    .set_density(density_sucrose, "kg/m^3")
-    .set_charge(0)
-    .set_volume(chamber_volume, "m^3")
-    .build()
-)
-
-aerosol_sucrose = (
-    LegacyAerosolBuilder()
-    .set_atmosphere(atmosphere_sucrose)
-    .set_particles(particles_sucrose)
-    .build()
-)
-
-# Create condensation strategy for sucrose (2-species molar mass)
-condensation_strategy_sucrose = (
-    par.dynamics.CondensationIsothermalStaggeredBuilder()
-    .set_molar_mass(molar_mass_sucrose, "kg/mol")
-    .set_diffusion_coefficient(2.4e-5, "m^2/s")
-    .set_accommodation_coefficient(1.0)
-    .set_theta_mode("random")
-    .set_update_gases(True)
-    .build()
+aerosol_sucrose, condensation_strategy_sucrose = build_native_scenario(
+    ["sucrose", "water"],
+    seed_mass_sucrose,
+    density_sucrose,
+    molar_mass_sucrose,
+    activity_strategy_sucrose,
+    surface_strategy_sucrose,
 )
 condensation_sucrose = par.dynamics.MassCondensation(
     condensation_strategy=condensation_strategy_sucrose
@@ -557,71 +517,13 @@ seed_mass_mixed = np.stack(
 )
 
 # Create 3-species gas to match particle species
-partitioning_gases_mixed = (
-    par.gas.GasSpeciesBuilder()
-    .set_name(np.array(["ammonium_sulfate", "sucrose", "water"]))
-    .set_molar_mass(molar_mass_mixed, "kg/mol")
-    .set_vapor_pressure_strategy(
-        [
-            par.gas.ConstantVaporPressureStrategy(vapor_pressure=1e-30),
-            par.gas.ConstantVaporPressureStrategy(vapor_pressure=1e-30),
-            par.gas.WaterBuckVaporPressureBuilder().build(),
-        ]
-    )
-    .set_partitioning(True)
-    .set_concentration(np.array([1e-30, 1e-30, c_water_humid]), "kg/m^3")
-    .build()
-)
-
-air_mixed = (
-    par.gas.GasSpeciesBuilder()
-    .set_name("air")
-    .set_molar_mass(0.029, "kg/mol")
-    .set_vapor_pressure_strategy(
-        par.gas.ConstantVaporPressureStrategy(vapor_pressure=101325)
-    )
-    .set_partitioning(False)
-    .set_concentration(1.2, "kg/m^3")
-    .build()
-)
-
-atmosphere_mixed = (
-    par.gas.AtmosphereBuilder()
-    .set_temperature(temperature, "K")
-    .set_pressure(total_pressure, "Pa")
-    .set_more_partitioning_species(partitioning_gases_mixed)
-    .set_more_gas_only_species(air_mixed)
-    .build()
-)
-
-particles_mixed = (
-    par.particles.ResolvedParticleMassRepresentationBuilder()
-    .set_distribution_strategy(par.particles.ParticleResolvedSpeciatedMass())
-    .set_activity_strategy(activity_strategy_mixed)
-    .set_surface_strategy(surface_strategy_mixed)
-    .set_mass(seed_mass_mixed, "kg")
-    .set_density(density_mixed, "kg/m^3")
-    .set_charge(0)
-    .set_volume(chamber_volume, "m^3")
-    .build()
-)
-
-aerosol_mixed = (
-    LegacyAerosolBuilder()
-    .set_atmosphere(atmosphere_mixed)
-    .set_particles(particles_mixed)
-    .build()
-)
-
-# Create condensation strategy for mixed (3-species molar mass)
-condensation_strategy_mixed = (
-    par.dynamics.CondensationIsothermalStaggeredBuilder()
-    .set_molar_mass(molar_mass_mixed, "kg/mol")
-    .set_diffusion_coefficient(2.4e-5, "m^2/s")
-    .set_accommodation_coefficient(1.0)
-    .set_theta_mode("random")
-    .set_update_gases(True)
-    .build()
+aerosol_mixed, condensation_strategy_mixed = build_native_scenario(
+    ["ammonium_sulfate", "sucrose", "water"],
+    seed_mass_mixed,
+    density_mixed,
+    molar_mass_mixed,
+    activity_strategy_mixed,
+    surface_strategy_mixed,
 )
 condensation_mixed = par.dynamics.MassCondensation(
     condensation_strategy=condensation_strategy_mixed
@@ -882,7 +784,7 @@ ax.scatter(
 
 ax.set_xlabel("Initial dry diameter (nm)")
 ax.set_ylabel("Activated fraction")
-ax.set_title("Activated Fraction vs Dry Diameter (threshold: 1 um)")
+ax.set_title("Activated Fraction vs Dry Diameter (threshold: 2 um)")
 ax.set_ylim(-0.05, 1.05)
 ax.set_xscale("log")
 ax.legend(loc="lower right")
@@ -992,7 +894,7 @@ print("  - Periodic pattern reflects activation-deactivation cycles")
 # %% [markdown]
 # ## 17. Mass Accumulation Over Successive Cycles
 #
-# Track relative dry mass (non-water) retention for each size bin across cycles. Due to dilution and wall loss, overall mass decreases, but we examine relative retention.
+# Track relative dry mass (non-water) retention for each size bin across cycles. Due to wall loss, dry mass decreases, but we examine relative retention.
 
 
 # %%
@@ -1085,7 +987,9 @@ plt.show()
 
 print("Key observations:")
 print("  - Mass decreases over cycles due to wall loss")
-print("  - Dilution coefficient affects mass retention rate")
+print(
+    "  - Dilution is disabled; humidity resets exchange water with the reservoir"
+)
 
 
 # %% [markdown]
@@ -1197,16 +1101,16 @@ plt.show()
 # Comprehensive validation checks to verify the multi-cycle simulation results.
 
 # %%
-# 18.1 Validate apply_particle_dilution() produces expected decay
-test_mass = np.array([[1.0, 2.0], [3.0, 4.0]])  # 2 particles, 2 species
-diluted = apply_particle_dilution(test_mass, dilution_coefficient=0.01, dt=1.0)
+# 18.1 Validate apply_count_dilution() produces expected decay
+test_counts = np.array([1.0, 2.0, 3.0, 4.0])  # represented counts
+diluted = apply_count_dilution(test_counts, dilution_coefficient=0.01, dt=1.0)
 expected_factor = np.exp(-0.01 * 1.0)  # ~0.99005
-assert np.allclose(diluted, test_mass * expected_factor), (
+assert np.allclose(diluted, test_counts * expected_factor), (
     "Dilution decay incorrect"
 )
-assert np.all(diluted > 0), "Dilution should preserve positive masses"
-assert np.all(diluted < test_mass), "Dilution should reduce mass"
-print("1. apply_particle_dilution() validated")
+assert np.all(diluted > 0), "Dilution should preserve positive counts"
+assert np.all(diluted < test_counts), "Dilution should reduce counts"
+print("1. apply_count_dilution() validated")
 
 
 # 18.2 Validate history structure
@@ -1351,7 +1255,7 @@ print("   Validated: larger particles activate earlier or at same time")
 
 
 # %%
-# 18.6 Validate mass accounting (positive masses, finite values)
+# 18.6 Validate mass accounting (positive counts, finite values)
 def calculate_total_mass(masses):
     """Calculate total mass across all particles and species."""
     return np.sum(masses)
@@ -1428,14 +1332,12 @@ def get_water_fraction_at_phase_peaks(
     history, water_index, humid_duration=30, dry_duration=60
 ):
     """Get mean water mass fraction at end of each humid phase."""
-    humid_records = [r for r in history if r["phase"] == "humid"]
     fractions = []
-    # Sample at end of each humid phase; stride over one full cycle (humid + dry)
-    for i in range(
-        humid_duration - 1, len(humid_records), humid_duration + dry_duration
-    ):
-        if i < len(humid_records):
-            masses = humid_records[i]["masses"]
+    # Select the last humid record before each dry phase. This also handles
+    # the initial record and repeated boundary times between cycles.
+    for record, next_record in zip(history, history[1:]):
+        if record["phase"] == "humid" and next_record["phase"] == "dry":
+            masses = record["masses"]
             water_mass = masses[:, water_index].sum()
             total_mass = masses.sum()
             fractions.append(water_mass / total_mass if total_mass > 0 else 0)
@@ -1449,6 +1351,7 @@ sucrose_water_fracs = get_water_fraction_at_phase_peaks(
     history_sucrose, water_index=1, humid_duration=30, dry_duration=60
 )
 
+assert len(as_water_fracs) == len(sucrose_water_fracs) == n_cycles
 print("9. Water mass fraction at humid phase peaks:")
 if len(as_water_fracs) > 0 and len(sucrose_water_fracs) > 0:
     as_mean_water = np.mean(as_water_fracs)
@@ -1469,7 +1372,9 @@ print(
     "- kappa-dependent activation: AS activates at same time or before sucrose"
 )
 print("- Size-dependent activation: Larger particles activate earlier")
-print("- Mass conservation: Positive, decreasing (losses expected)")
+print(
+    "- Closed condensation conserves mapped inventory; wall deposition removes particles"
+)
 print("- Value validity: All finite and non-negative")
 print("- Cycle count: 4 cycles completed for each scenario")
 print("=" * 60)
@@ -1493,14 +1398,14 @@ def cumulative_loss_by_bin(history, density_array, bins):
     initial_masses = history[0]["masses"]
     final_masses = history[-1]["masses"]
     initial_diam = masses_to_diameter_generic(initial_masses, density_array)
-    final_diam = masses_to_diameter_generic(final_masses, density_array)
-    initial_mass = initial_masses.sum(axis=1)
-    final_mass = final_masses.sum(axis=1)
-
-    init_bin, _ = np.histogram(initial_diam, bins=bins, weights=initial_mass)
-    final_bin, _ = np.histogram(final_diam, bins=bins, weights=final_mass)
-
-    loss_bin = np.clip(init_bin - final_bin, 0.0, None)
+    # Track removed original particle identities. Water uptake changes wet
+    # sizes, so subtracting wet size-bin totals would not measure deposition.
+    dry_mass = initial_masses[:, :-1].sum(axis=1)
+    lost = final_masses.sum(axis=1) == 0
+    init_bin, _ = np.histogram(initial_diam, bins=bins, weights=dry_mass)
+    loss_bin, _ = np.histogram(
+        initial_diam[lost], bins=bins, weights=dry_mass[lost]
+    )
     loss_fraction = np.zeros_like(loss_bin)
     mask = init_bin > 0
     loss_fraction[mask] = loss_bin[mask] / init_bin[mask]
@@ -1599,8 +1504,8 @@ final_means = [md[-1] * 1e6 for md in panel_means]
 def total_mass(history):
     masses0 = history[0]["masses"]
     massesf = history[-1]["masses"]
-    init = masses0.sum()
-    final = massesf.sum()
+    init = masses0[:, :-1].sum()
+    final = massesf[:, :-1].sum()
     return init, final, max(init - final, 0)
 
 
@@ -1679,13 +1584,13 @@ axes[1, 0].bar(
     xpos + width,
     mass_loss,
     width,
-    label="Wall loss + dilution",
+    label="Dry wall deposition",
     color=TAILWIND["rose"]["400"],
 )
 axes[1, 0].set_xticks(xpos)
 axes[1, 0].set_xticklabels(panel_labels)
-axes[1, 0].set_ylabel("Mass (kg)")
-axes[1, 0].set_title("Mass balance after 4 cycles")
+axes[1, 0].set_ylabel("Dry material mass (kg)")
+axes[1, 0].set_title("Dry inventory after 4 cycles")
 axes[1, 0].legend()
 
 # D
@@ -1770,7 +1675,7 @@ plt.show()
 # - Ran one activation-deactivation cycle showing droplet growth beyond 5 um
 #
 # ### Multi-Cycle Scenarios (Part 2)
-# - **Framework**: Created reusable `run_cycle()` and `run_multi_cycle()` functions with dilution during dry phases
+# - **Framework**: Created reusable `run_cycle()` and `run_multi_cycle()` functions with prescribed humidity resets; dilution disabled
 # - **Scenario A (AS)**: High hygroscopicity (kappa=0.61) leads to faster activation
 # - **Scenario B (Sucrose)**: Lower hygroscopicity (kappa=0.10) leads to slower activation
 # - **Scenario C (Mixed)**: Competition for water vapor with AS activating first
@@ -1779,7 +1684,7 @@ plt.show()
 # 1. **kappa-dependent activation**: Higher kappa materials activate at lower supersaturation
 # 2. **Size-dependent activation**: Larger dry particles activate before smaller ones
 # 3. **Water uptake**: Higher kappa leads to higher water mass fraction during humid phases
-# 4. **Mass evolution**: Dilution and wall loss cause overall mass decrease over cycles
+# 4. **Mass evolution**: Wall loss removes dry material; water mass also responds to humidity resets
 # 5. **Wall loss insight**: Size-binned losses highlight faster removal for larger droplets
 # 6. **Gallery recap**: Four-panel summary compares activation, size, mass balance, and hydration
 #

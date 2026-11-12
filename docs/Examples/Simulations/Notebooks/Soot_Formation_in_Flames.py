@@ -56,7 +56,9 @@ import numpy as np  # numerical tools
 import particula as par  # the main Particula package
 from matplotlib.colors import LogNorm
 from numpy.typing import NDArray
-from particula._legacy_aerosol import Aerosol as LegacyAerosol
+from particula.dynamics.condensation.species_mapping import (
+    CondensationSpeciesMap,
+)
 from tqdm import tqdm  # optional: for progress bars during simulation
 
 # 🎨 Set default plot styling using Tailwind-inspired colors from Particula
@@ -290,7 +292,8 @@ for chem, props in chemical_dict.items():
 # Finally, we plot how vapor pressure and surface tension change with temperature for all species — a key step in diagnosing volatility trends and ensuring proper simulation input.
 
 # %%
-# For reproducibility
+# Reproducible initial sampling. Coagulation owns a separate random generator;
+# trajectories are stochastic and are not asserted equal across runs.
 np.random.seed(100)
 
 # Simulation parameters
@@ -394,7 +397,7 @@ plt.show()
 #
 # **🧱 Build Gas Species**
 #
-# We define the gas phase using `GasSpeciesBuilder()`:
+# We define the gas phase using native `GasData`:
 #
 # * Each species is initialized with:
 #
@@ -406,7 +409,7 @@ plt.show()
 #
 # **🌍 Set Atmospheric Properties**
 #
-# Using `AtmosphereBuilder()`, we define:
+# Using separate `EnvironmentData`, we define:
 #
 # * **Temperature**: initial gas temperature (e.g. 1200 K)
 # * **Pressure**: atmospheric (1 atm)
@@ -419,23 +422,16 @@ plt.show()
 concentration_gas = initial_mass_fractions * total_mass_gas_phase
 
 # Initialize gas-phase species with vapor pressure strategy
-gas_species = (
-    par.gas.GasSpeciesBuilder()
-    .set_name(np.array(list_of_chemicals))
-    .set_molar_mass(molar_mass_array, "kg/mol")
-    .set_partitioning(True)
-    .set_vapor_pressure_strategy(vapor_pressure_strategy_list)
-    .set_concentration(concentration_gas, "kg/m^3")
-    .build()
+gas_species = par.gas.GasData(
+    name=list_of_chemicals,
+    molar_mass=molar_mass_array.copy(),
+    partitioning=np.ones(len(list_of_chemicals), dtype=bool),
+    concentration=concentration_gas[None, :].copy(),
 )
-
-# Define atmospheric conditions for the parcel
-atmosphere = (
-    par.gas.AtmosphereBuilder()
-    .set_more_partitioning_species(gas_species)
-    .set_temperature(temperature, "K")
-    .set_pressure(1, "atm")
-    .build()
+environment = par.gas.EnvironmentData(
+    temperature=np.array([float(temperature)]),
+    pressure=np.array([101325.0]),
+    saturation_ratio=np.zeros((1, len(list_of_chemicals))),
 )
 
 # %% [markdown]
@@ -475,7 +471,7 @@ atmosphere = (
 #
 # **🧱 Building the Particle Object**
 #
-# We combine mass, density, thermodynamic strategies, and charge state (neutral) into a `ResolvedParticleMassRepresentation`, then wrap it in an `Aerosol` object alongside the atmosphere.
+# We store masses, density, unit represented counts, and neutral charge in native `ParticleData`. The `Aerosol` also holds ordered `GasData` and `EnvironmentData`; thermodynamic strategies belong to the condensation process.
 #
 #
 #
@@ -526,25 +522,29 @@ surface_strategy = (
 )
 
 # Build the particle representation
-resolved_masses = (
-    par.particles.ResolvedParticleMassRepresentationBuilder()
-    .set_distribution_strategy(par.particles.ParticleResolvedSpeciatedMass())
-    .set_activity_strategy(activity_strategy)
-    .set_surface_strategy(surface_strategy)
-    .set_mass(mass_speciation, "kg")
-    .set_density(density_array, "kg/m^3")
-    .set_charge(0)  # neutral
-    .set_volume(simulation_volume, "m^3")
-    .build()
+resolved_masses = par.particles.create_resolved_particle_data(
+    masses=mass_speciation,
+    density=density_array,
+    volume=simulation_volume,
+)
+aerosol = par.Aerosol(
+    particles=resolved_masses, gas=gas_species, environment=environment
 )
 
-# Wrap into full aerosol system with gas phase
-aerosol = LegacyAerosol(atmosphere=atmosphere, particles=resolved_masses)
+
+def species_inventory(aero):
+    """Independent extensive species accounting including gas, kg."""
+    return np.sum(
+        aero.particles.masses * aero.particles.concentration[..., None], axis=1
+    ) + (aero.gas.concentration * aero.particles.volume[:, None])
+
+
+initial_inventory = species_inventory(aerosol)
 print(aerosol)
 
 # 📊 Plot the initial size distribution
 fig, ax = plt.subplots()
-ax.hist(np.log10(resolved_masses.get_radius()), bins=50, alpha=0.5)
+ax.hist(np.log10(resolved_masses.radii[0]), bins=50, alpha=0.5)
 ax.set_xlabel("log10(Radius [m])")
 ax.set_ylabel("Bin counts")
 ax.set_title("Initial Particle Size Distribution")
@@ -583,6 +583,13 @@ plt.show()
 # 🌀 Condensation strategy setup (isothermal)
 condensation_strategy = par.dynamics.CondensationIsothermal(
     molar_mass=np.array(molar_mass_array),
+    activity_strategy=activity_strategy,
+    surface_strategy=surface_strategy,
+    vapor_pressure_strategy=vapor_pressure_strategy_list,
+    species_map=CondensationSpeciesMap(
+        tuple(gas_species.name),
+        tuple((i, i) for i in range(len(list_of_chemicals))),
+    ),
     diffusion_coefficient=2e-5,  # m²/s
     accommodation_coefficient=1.0,  # perfect uptake
     skip_partitioning_indices=[23],  # skip "Fullerene"
@@ -605,7 +612,7 @@ coagulation_process = par.dynamics.Coagulation(coagulation_strategy)
 # %% [markdown]
 # ## 🔥 Modeling the Temperature Profile After Combustion
 #
-# Below is a **practical, two-stage temperature profile** that is widely used in aerosol post-combustion models. It captures both:
+# Below is an **illustrative two-exponential temperature forcing**, retained from the original example. It imposes two cooling timescales; it is not a calibrated combustion model:
 #
 # * A **fast entrainment/mixing stage** (sub-second), and
 # * A **slow ambient dilution stage** (multi-second)
@@ -622,14 +629,19 @@ coagulation_process = par.dynamics.Coagulation(coagulation_strategy)
 #
 # Where:
 #
-# * **T₀** = initial flame or stack temperature
+# * **T₀** = fast-component reference temperature (not the initial value)
 # * **T∞** = ambient background temperature (≈ 298 K)
-# * **Tₘᵢₓ** = temperature after rapid entrainment (\~500–700 K)
+# * **Tₘᵢₓ** = slow-component reference temperature
 # * **τ₁** = fast cooling timescale (e.g. 0.05–0.3 s)
 # * **τ₂** = slow dilution or mixing timescale (e.g. 2–10 s)
 #
 #
-# **📊 Example Parameter Values**
+# The components add: at zero time, `T(0) = T₀ + Tₘᵢₓ - T∞`.
+# With the parameters below the simulation starts at **1600 K**, not 1200 K.
+# The vapor-pressure tables end at 1500 K; the configured table strategy
+# clamps to its endpoint outside that range. These choices are illustrative.
+#
+# **📊 Illustrative Parameter Values (not validated scenario fits)**
 #
 # | Scenario                     | T₀ (K) | Tₘᵢₓ (K) | τ₁ (s) | τ₂ (s) |
 # | ---------------------------- | ------ | -------- | ------ | ------ |
@@ -663,8 +675,8 @@ def temperature_profile(
 
     Arguments:
         time: Time after emission [s].
-        initial_temperature: Initial temperature at t = 0 [K].
-        intermediate_temperature: Intermediate temperature level [K].
+        initial_temperature: Fast-component reference temperature [K].
+        intermediate_temperature: Slow-component reference temperature [K].
         ambient_temperature: Ambient (final) temperature [K].
         fast_e_folding_time: Fast cooling e-folding time constant [s].
         slow_e_folding_time: Slow cooling e-folding time constant [s].
@@ -693,21 +705,21 @@ def temperature_profile(
 #
 # **⏱️ Simulation Time Setup**
 #
-# * **Total simulation time**: 20 seconds
+# * **Stored time range**: 0–19.96 seconds (499 updates)
 # * **Steps**: 500 (⇒ 0.04 s per step)
 # * **Substeps**:
 #
-#   * **Condensation**: 50 per main step
+#   * **Condensation**: 100 per main step
 #   * **Coagulation**: 1 per main step
 #
 # > You can optionally use a `logspace` time grid if high temporal resolution is needed near `t = 0`.
 #
 # **🌡️ Compute the Temperature Profile**
 #
-# We call the `temperature_profile()` function with typical combustion parameters:
+# We call the `temperature_profile()` function with illustrative component parameters:
 #
-# * `T₀ = 1200 K` (flame)
-# * `Tₘᵢₓ = 700 K` (fast entrainment)
+# * `T₀ = 1200 K` (fast-component reference)
+# * `Tₘᵢₓ = 700 K` (slow-component reference)
 # * `T∞ = 300 K` (ambient)
 # * `τ₁ = 0.05 s`, `τ₂ = 6.0 s` (cooling timescales)
 #
@@ -732,7 +744,7 @@ condensation_sub_step = 100
 coagulation_sub_step = 1
 
 time_step = total_time / total_steps
-time_array = np.linspace(0, total_time, total_steps)
+time_array = np.arange(total_steps) * time_step  # recorded 0..19.96 s
 # Alternative: use logspace for finer early-time resolution
 # time_array = np.logspace(-6, np.log10(total_time), total_steps)
 
@@ -749,7 +761,7 @@ temperature_array = temperature_profile(
 )
 
 # Set initial temperature in atmosphere
-aerosol_process.atmosphere.temperature = temperature_array[0]
+aerosol_process.environment.temperature[0] = temperature_array[0]
 
 # Plot the cooling profile
 fig, ax = plt.subplots(figsize=(7, 5))
@@ -808,7 +820,7 @@ for step, _t in enumerate(
 ):
     if step > 0:
         # Update temperature
-        aerosol_process.atmosphere.temperature = temperature_array[step]
+        aerosol_process.environment.temperature[0] = temperature_array[step]
 
         # --- Condensation process (optional toggle for speed) ---
         aerosol_process = condensation_process.execute(
@@ -826,24 +838,33 @@ for step, _t in enumerate(
 
     # Record radius distribution
     distribution_counts[step, :], edges = np.histogram(
-        aerosol_process.particles.get_radius(clone=True),
+        aerosol_process.particles.radii[0].copy(),
         bins=bins_lognormal,
         density=False,
     )
 
     # Total particle-phase mass [kg/m³]
-    mass_concentration[step] = aerosol_process.particles.get_mass_concentration(
-        clone=True
+    mass_concentration[step] = np.sum(
+        aerosol_process.particles.species_mass_density[0]
     )
 
     # Mean particle radius [m]
-    radius_temp = aerosol_process.particles.get_radius(clone=True)
+    radius_temp = aerosol_process.particles.radii[0].copy()
     mask_valid = radius_temp > 0
     mode_diameter[step] = np.mean(radius_temp[mask_valid])
 
     # Species-specific particle mass [kg]
-    species_temp = aerosol_process.particles.get_species_mass(clone=True)
-    species_mass[step, :] = np.sum(species_temp, axis=0)
+    species_temp = aerosol_process.particles.masses[0].copy()
+    species_mass[step, :] = np.sum(
+        species_temp * aerosol_process.particles.concentration[0, :, None],
+        axis=0,
+    )
+    np.testing.assert_allclose(
+        species_inventory(aerosol_process),
+        initial_inventory,
+        rtol=1e-12,
+        atol=1e-30,
+    )
 
 # Convert counts and masses to concentrations [#/m³] and [kg/m³]
 concentrations = distribution_counts / simulation_volume
@@ -1122,14 +1143,14 @@ plt.show()
 #
 # The simulation tracked the evolution of particle **mass concentration**, **mean diameter**, **size distribution**, and **species-level mass partitioning** over time.
 #
-# By using a realistic cooling profile, we reproduced the **supersaturation window** where low-volatility species (e.g. PAHs) rapidly condense — a critical moment in soot inception. The growth of particles in both number and mass was clearly visible, along with shifts in chemical speciation as the temperature dropped.
+# With this illustrative cooling forcing, low-volatility material can condense on existing seeds. Condensation increases particle mass while coagulation can reduce particle number. There is no new-particle nucleation or combustion chemistry in this sequence, and no calibrated soot-inception claim.
 #
 # ---
 #
 # ## 🧠 Take-Home Points
 #
 # 1. **Post-flame condensation drives rapid aerosol mass growth**
-#    The temperature drop from 1200 K to ambient creates sharp vapor pressure gradients, allowing semi-volatile PAHs to condense onto seed particles almost immediately.
+#    The imposed temperature drop from 1600 K toward ambient creates sharp vapor pressure gradients, allowing semi-volatile PAHs to condense onto seed particles almost immediately.
 #
 # 2. **Soot-forming chemistry is driven by low-volatility species**
 #    Larger PAHs (e.g., benzo\[a]pyrene, coronene) dominate particle-phase mass over time, particularly once smaller aromatics remain in the vapor phase.

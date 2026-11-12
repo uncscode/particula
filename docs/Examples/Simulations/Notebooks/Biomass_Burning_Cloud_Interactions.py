@@ -30,7 +30,7 @@
 #      - **Condensation Only**
 #      - **Condensation + Brownian Coagulation**
 #      - **Condensation + Brownian + Sedimentation Coagulation**
-#      - **Condensation + Brownian + Turbulent DNS Coagulation**
+#      - **Condensation + Turbulent DNS Coagulation**
 #    - Visualizing size distributions, number concentrations, and mass fractions
 #    - Comparing saturation ratios across processes
 #
@@ -45,7 +45,9 @@ import copy
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
-from particula._legacy_aerosol import Aerosol as LegacyAerosol
+from particula.dynamics.condensation.species_mapping import (
+    CondensationSpeciesMap,
+)
 from tqdm import tqdm
 
 # plot settings
@@ -80,7 +82,7 @@ plt.rcParams.update(
 #
 # 3. **Simulation Parameters**
 #    – `number_of_samples` (particles)
-#    – Simulation volume (`1e‑6 m⁻³`)
+#    – Simulation volume (`1e‑6 m³`)
 #    – Initial water activity (`1.02`) and temperature (`298.15 K`)
 #
 # 4. **Vapor‑Pressure Strategies**
@@ -88,22 +90,22 @@ plt.rcParams.update(
 #    – Buck equation for water vapor
 #
 # 5. **Gas‑Phase Composition**
-#    – Build a `GasSpecies` object with condensable vapors and set concentrations
-#    – Assemble into an `Atmosphere` with temperature and pressure
+#    – Build a `GasData` object with condensable vapors and set concentrations
+#    – Store temperature and pressure separately in `EnvironmentData`
 #
 # 6. **Particle Size Distributions**
 #    – Draw lognormal samples for organics and soot modes
-#    – Initialize water mass as the sum of organics and soot volumes (so water mass = 0 at start)
+#    – Initialize water mass as the sum of organic and soot masses
 #
 # 7. **Mass Speciation & Parameterization**
 #    – Stack species masses into an (N×3) array
 #    – Define a κ‑Köhler activity strategy and a surface‑volume strategy
 #
 # 8. **Particle‑Resolved Representation**
-#    – Use `ResolvedParticleMassRepresentationBuilder` to combine mass, density, charge (0), and volume
+#    – Use `create_resolved_particle_data` to combine mass, density, charge (0), and volume
 #
 # 9. **Aerosol Object & Initial Visualization**
-#    – Instantiate `LegacyAerosol(atmosphere, particles)`
+#    – Instantiate `Aerosol(particles, gas, environment)`
 #    – Plot a histogram of log₁₀ particle radii to verify the initial distribution
 #
 # > **Pro tip:** For fast prototyping, begin with `5 000 – 10 000` particles. Once your setup is validated, increase `number_of_samples`, simulation length, or time resolution.
@@ -127,7 +129,7 @@ kappa_soot = 0.01
 kappa_water = 0.01
 
 number_of_samples = 10_000  # number of particles to sample
-simulation_volume = 1e-6  # 1/m^3
+simulation_volume = 1e-6  # m^3
 water_activity = 1.02  # initial water activity
 temperature = 298.15
 
@@ -148,25 +150,18 @@ vapor_water = par.gas.WaterBuckVaporPressureBuilder().build()
 water_sat = vapor_water.saturation_concentration(molar_mass_water, temperature)
 water_conc = water_sat * water_activity
 
-gas_species = (
-    par.gas.GasSpeciesBuilder()
-    .set_name(np.array(["organics", "soot", "water"]))
-    .set_molar_mass(
-        np.array([molar_mass_organics, molar_mass_soot, molar_mass_water]),
-        "kg/mol",
-    )
-    .set_partitioning(True)
-    .set_vapor_pressure_strategy([vapor_organics, vapor_soot, vapor_water])
-    .set_concentration(np.array([1e-12, 1e-12, water_conc]), "kg/m^3")
-    .build()
+gas_species = par.gas.GasData(
+    name=["organics", "soot", "water"],
+    molar_mass=np.array(
+        [molar_mass_organics, molar_mass_soot, molar_mass_water]
+    ),
+    partitioning=np.array([True, True, True]),
+    concentration=np.array([[1e-12, 1e-12, water_conc]]),
 )
-
-atmosphere = (
-    par.gas.AtmosphereBuilder()
-    .set_more_partitioning_species(gas_species)
-    .set_temperature(temperature, "K")
-    .set_pressure(1, "atm")
-    .build()
+environment = par.gas.EnvironmentData(
+    temperature=np.array([temperature]),
+    pressure=np.array([101325.0]),
+    saturation_ratio=np.zeros((1, 3)),
 )
 
 # Particle distributions
@@ -204,31 +199,42 @@ activity_strategy = (
 surface_strategy = par.particles.SurfaceStrategyVolume()
 
 # Create Particula particle object
-resolved_masses = (
-    par.particles.ResolvedParticleMassRepresentationBuilder()
-    .set_distribution_strategy(par.particles.ParticleResolvedSpeciatedMass())
-    .set_activity_strategy(activity_strategy)
-    .set_surface_strategy(surface_strategy)
-    .set_mass(mass_speciation, "kg")
-    .set_density(
-        np.array([density_organics, density_soot, density_water]), "kg/m^3"
-    )
-    .set_charge(0)  # no charge on particles
-    .set_volume(simulation_volume, "m^3")
-    .build()
+resolved_masses = par.particles.create_resolved_particle_data(
+    masses=mass_speciation,
+    density=np.array([density_organics, density_soot, density_water]),
+    volume=simulation_volume,
+)
+aerosol = par.Aerosol(
+    particles=resolved_masses, gas=gas_species, environment=environment
 )
 
-# Create Aerosol object
-aerosol = LegacyAerosol(atmosphere=atmosphere, particles=resolved_masses)
+
+def species_inventory(aero):
+    """Independent extensive material inventory, kg per species."""
+    return (
+        np.sum(
+            aero.particles.masses * aero.particles.concentration[..., None],
+            axis=1,
+        )
+        + aero.gas.concentration * aero.particles.volume[:, None]
+    )
+
+
+def water_saturation(aero):
+    """Current water saturation from explicit process thermodynamics."""
+    return aero.gas.concentration[0, 2] / vapor_water.saturation_concentration(
+        molar_mass_water, aero.environment.temperature[0]
+    )
+
+
+initial_inventory = species_inventory(aerosol)
 print(aerosol)
 
 
 # Plot initial size distribution
 fig, ax = plt.subplots()
-ax.hist(
-    np.log10(resolved_masses.get_radius()), bins=50, density=False, alpha=0.5
-)
-ax.set_xlabel("log10(Diameter [m])")
+ax.hist(np.log10(resolved_masses.radii[0]), bins=50, density=False, alpha=0.5)
+ax.set_xlabel("log10(Radius [m])")
 ax.set_ylabel("Bin counts")
 ax.set_title("Initial Particle Size Distribution")
 
@@ -261,6 +267,12 @@ condensation_strategy = par.dynamics.CondensationIsothermal(
     ),
     diffusion_coefficient=2e-5,
     accommodation_coefficient=1,
+    activity_strategy=activity_strategy,
+    surface_strategy=surface_strategy,
+    vapor_pressure_strategy=[vapor_organics, vapor_soot, vapor_water],
+    species_map=CondensationSpeciesMap(
+        tuple(gas_species.name), ((0, 0), (1, 1), (2, 2))
+    ),
 )
 condensation_process = par.dynamics.MassCondensation(condensation_strategy)
 
@@ -268,7 +280,7 @@ condensation_process = par.dynamics.MassCondensation(condensation_strategy)
 aerosol_activated = copy.deepcopy(aerosol)
 time_step = 600  # total simulation time in seconds
 total_steps = 5_000  # total sub‑steps for finer resolution
-time = np.linspace(0, time_step, time_step)  # 1‑second resolution
+time = np.arange(time_step)  # recorded 0..599 s at one-second intervals
 bins_lognormal = np.logspace(-8, -2, 200)  # radius bins from 10⁻⁸ to 10⁻² m
 distribution_counts = np.zeros((len(time), len(bins_lognormal) - 1))
 
@@ -286,16 +298,21 @@ for i, _t in enumerate(tqdm(time, desc="Condensing")):
         )
     # Record the size distribution at this time
     distribution_counts[i, :], edges = np.histogram(
-        aerosol_activated.particles.get_radius(clone=True), bins=bins_lognormal
+        aerosol_activated.particles.radii[0].copy(), bins=bins_lognormal
     )
 
 # Print final state and water saturation
 print(aerosol_activated)
 print(
     "Final water saturation ratio:",
-    aerosol_activated.atmosphere.partitioning_species.get_saturation_ratio(
-        298.15
-    )[-1],
+    water_saturation(aerosol_activated),
+)
+
+np.testing.assert_allclose(
+    species_inventory(aerosol_activated),
+    initial_inventory,
+    rtol=1e-12,
+    atol=1e-30,
 )
 
 # Convert counts → number concentration (#/m³)
@@ -333,8 +350,8 @@ plt.show()
 # 3. **Brownian + Sedimentation Coagulation**
 #    Combines Brownian motion and gravitational settling before condensation.
 #
-# 4. **Brownian + Turbulent DNS Coagulation**
-#    Includes Brownian collisions, DNS‐derived turbulent relative velocities, and fluid properties prior to condensation.
+# 4. **Turbulent DNS Coagulation**
+#    Uses the DNS turbulent collision kernel before condensation. This branch does not add the separate Brownian strategy.
 #
 
 # %%
@@ -389,16 +406,21 @@ for name, seq in [
     ("CondensationOnly", seq_condensation),
     ("Brownian", seq_brown),
     ("Brownian+Sed", seq_comb),
-    ("Brownian+TurbulentDNS", seq_turb),
+    ("TurbulentDNS", seq_turb),
 ]:
     print("Started simulation:", name)
     obj = copy.deepcopy(aerosol_activated)
     obj = seq.execute(aerosol=obj, time_step=3600, sub_steps=10_000)
+    np.testing.assert_allclose(
+        species_inventory(obj), initial_inventory, rtol=1e-12, atol=1e-30
+    )
+    assert np.all(np.isfinite(obj.particles.masses))
+    assert np.all(obj.particles.masses >= 0)
     results[name] = obj
     print(obj)
     print(
         f"{name} water saturation ratio:",
-        obj.atmosphere.partitioning_species.get_saturation_ratio(298.15)[-1],
+        water_saturation(obj),
     )
     print("\n")
 
@@ -429,7 +451,7 @@ BIN_EDGES = np.logspace(np.log10(0.01), np.log10(100), num_bins + 1)
 
 def get_wet_diameters(aero_obj):
     """Return an array of nonzero wet diameters (µm)."""
-    radii_m = aero_obj.particles.get_radius(clone=True)
+    radii_m = aero_obj.particles.radii[0].copy()
     radii_um = radii_m * par.util.get_unit_conversion("m", "um")
     diameters_um = radii_um[radii_um > 0] * 2
     return diameters_um
@@ -456,7 +478,7 @@ cases = [("Initial", aerosol), ("Start", aerosol_activated)] + list(
 
 for label, aero_obj in cases:
     diameters = get_wet_diameters(aero_obj)
-    volume = aero_obj.particles.get_volume()
+    volume = aero_obj.particles.volume[0]
     centers, dnd = compute_dndlogdp(diameters, volume)
     distributions[label] = (centers, dnd)
 
@@ -466,7 +488,7 @@ for label, aero_obj in cases:
 # In this section we plot the wet‑diameter distributions for each scenario on a single log–log axis:
 #
 # 1. **Extract and clean each distribution**
-#    - Retrieve `(centers, dN/dlogDp)` for “Initial”, “Start”, “CondensationOnly”, “Brownian”, “Brownian+Sed”, and “Brownian+TurbulentDNS”.
+#    - Retrieve `(centers, dN/dlogDp)` for “Initial”, “Start”, “CondensationOnly”, “Brownian”, “Brownian+Sed”, and “TurbulentDNS”.
 #    - Replace zeros with `NaN` so they don’t appear as flat lines on the log scale.
 #
 # 2. **Plot each case**
@@ -497,7 +519,7 @@ dnd_brown = np.where(dnd_brown == 0, np.nan, dnd_brown)
 centers_sed, dnd_sed = distributions["Brownian+Sed"]
 dnd_sed = np.where(dnd_sed == 0, np.nan, dnd_sed)
 
-centers_turb, dnd_turb = distributions["Brownian+TurbulentDNS"]
+centers_turb, dnd_turb = distributions["TurbulentDNS"]
 dnd_turb = np.where(dnd_turb == 0, np.nan, dnd_turb)
 
 # 3. Plot each line explicitly
@@ -580,23 +602,14 @@ plt.show()
 # %% [markdown]
 # #### Interpretation of Final Size Distributions
 #
-# - **Initial (gray)**
-#   The dry aerosol starts as a sub‑micron population, peaking around 0.1–0.2 µm—reflecting the log‑normal organic and soot modes before any growth.
-#
-# - **Activated Start (blue band)**
-#   Once exposed to supersaturation, particles grow rapidly into two droplet modes: a smaller mode near 1.8 µm and a larger mode near 5 µm.
-#
-# - **Condensation Only (dark blue)**
-#   Pure vapor condensation leads to little change in the size distribution. The first mode remains nearly unchanged, indicating that it was well equilibrated with the water vapor. The second mode, however, grows slightly larger and broader.
-#
-# - **Brownian Coagulation (dashed pale line)**
-#   Adding only Brownian collisions barely alters the overall shape—slight smoothing of the peaks indicates a few particle pairs merging, but number concentration remains nearly unchanged.
-#
-# - **Brownian + Sedimentation (pink dots)**
-#   Including gravitational settling removes the largest droplets most efficiently, lowering the second‐mode concentration more than the first and slightly skewing the distribution toward larger diameters.
-#
-# - **Brownian + Turbulent DNS (brown)**
-#   Turbulence‑enhanced collisions also broadens the distribution and reduce peak concentrations, especially for the larger droplets, illustrating how combined Brownian, and turbulent (with sedimentation) effects accelerate coagulation and deplete droplet counts at the largest sizes.
+# The initial particles already contain water. The activated state follows
+# the shared condensation spin-up; all four scenarios begin from its copy.
+# Condensation redistributes water between vapor and particles. Coagulation
+# merges particles and reduces their number while conserving material.
+# Sedimentation here is a collision mechanism, not removal to chamber walls.
+# The DNS branch uses its turbulent kernel alone; it does not compose a
+# separate Brownian or sedimentation kernel. Compare the saved curves for
+# this sampled case rather than treating their peak positions as universal.
 #
 
 # %% [markdown]
@@ -605,7 +618,7 @@ plt.show()
 # Here we compare each particle’s organic mass fraction before and after the turbulent DNS coagulation:
 #
 # 1. **Extract species masses**
-#    - Get the final species‐mass array from the “Brownian+TurbulentDNS” result and the initial aerosol.
+#    - Get the final species‐mass array from the “TurbulentDNS” result and the initial aerosol.
 #    - Zero out the water column so fractions are computed from organics + soot only.
 #
 # 2. **Compute per‑particle organic fraction**
@@ -622,12 +635,10 @@ plt.show()
 
 # %%
 #  1. Retrieve and prepare mass arrays
-combined_dns_mass = results["Brownian+TurbulentDNS"].particles.get_species_mass(
-    clone=True
-)
-initial_mass = aerosol.particles.get_species_mass(clone=True)
+combined_dns_mass = results["TurbulentDNS"].particles.masses[0].copy()
+initial_mass = aerosol.particles.masses[0].copy()
 
-mask = results["Brownian+TurbulentDNS"].particles.get_radius() > 0
+mask = results["TurbulentDNS"].particles.radii[0] > 0
 combined_dns_mass[:, -1] = 0.0  # drop water
 initial_mass[:, -1] = 0.0
 
@@ -637,7 +648,7 @@ dns_mass_fraction = combined_dns_mass[mask, 0] / combined_dns_mass[mask].sum(
 initial_mass_fraction = initial_mass[:, 0] / initial_mass.sum(axis=1)
 
 # 2. Compute wet diameters
-dns_dp = get_wet_diameters(results["Brownian+TurbulentDNS"])
+dns_dp = get_wet_diameters(results["TurbulentDNS"])
 initial_dp = get_wet_diameters(aerosol)
 
 # 3. Plot scatter
