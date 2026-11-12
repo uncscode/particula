@@ -40,6 +40,20 @@ def test_removed_particle_bridge(module_name, name):
     assert caught.value.name == module_name
 
 
+@pytest.mark.parametrize(
+    "module_name",
+    ["particula", "particula.gas", "particula.gas.gas_data"],
+)
+@pytest.mark.parametrize("name", ["from_species", "to_species"])
+def test_removed_gas_bridge(module_name, name):
+    """Gas storage modules import successfully without obsolete species bridges."""
+    module = importlib.import_module(module_name)
+    assert not hasattr(module, name)
+    with pytest.raises(ImportError) as caught:
+        exec(f"from {module_name} import {name}", {})  # noqa: S102
+    assert caught.value.name == module_name
+
+
 def test_native_aggregate_survives_legacy_removal():
     """Public construction and builder retain the three native identities."""
     particles, gas, environment = native_triple()
