@@ -1684,6 +1684,11 @@ def test_condensation_scaling_records_cpu_and_gpu_paths(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Condensation benchmark records both comparison and GPU-only metadata."""
+    monkeypatch.setattr(
+        benchmark_module,
+        "_prepare_benchmark_species_binding",
+        lambda *args: None,
+    )
     monkeypatch.setattr(benchmark_module, "_skip_if_no_cuda", lambda: None)
     monkeypatch.setattr(
         benchmark_module,
@@ -1723,7 +1728,7 @@ def test_condensation_scaling_records_cpu_and_gpu_paths(
     )
     monkeypatch.setattr(
         benchmark_module,
-        "_cpu_condensation_step",
+        "_cpu_native_condensation_step",
         lambda *args, **kwargs: cpu_calls.append("cpu"),
     )
 
@@ -1825,7 +1830,7 @@ def test_coagulation_scaling_records_cpu_and_gpu_paths(
     )
     monkeypatch.setattr(
         benchmark_module,
-        "_cpu_coagulation_step",
+        "_cpu_native_coagulation_step",
         lambda *args, **kwargs: cpu_calls.append("cpu"),
     )
 
@@ -1936,6 +1941,11 @@ def test_coagulation_scaling_uses_coagulation_only_helper(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Coagulation uses its helper while condensation keeps generic setup."""
+    monkeypatch.setattr(
+        benchmark_module,
+        "_prepare_benchmark_species_binding",
+        lambda *args: None,
+    )
     monkeypatch.setattr(benchmark_module, "_skip_if_no_cuda", lambda: None)
     monkeypatch.setattr(
         benchmark_module,
@@ -2198,3 +2208,148 @@ def test_wp_func_benchmarks_records_summary_without_cuda(
     assert result["n_evals"] == 100_000
     assert result["diffusion_coefficient"]["cpu_us"] > 0.0
     assert result["brownian_kernel_pair"]["gpu_us"] > 0.0
+
+
+@pytest.mark.warp
+def test_native_coagulation_benchmark_workload_executes_on_warp_cpu(
+    benchmark_module,
+) -> None:
+    """Native workload conserves material inventory; old unequal counts reject."""
+    wp = pytest.importorskip("warp")
+    from particula.gpu import to_warp_particle_data
+    from particula.gpu.kernels import coagulation_step_gpu
+
+    historical = benchmark_module._make_coagulation_particle_data(2, 4, 2)
+    native = benchmark_module._make_native_coagulation_particle_data(2, 4, 2)
+    npt.assert_array_equal(native.masses, historical.masses)
+    npt.assert_array_equal(native.volume, historical.volume)
+    npt.assert_array_equal(native.concentration, np.ones((2, 4)))
+    assert native.distribution_type == "particle_resolved"
+    rejected = to_warp_particle_data(historical, device="cpu")
+    before = rejected.masses.numpy().copy()
+    with pytest.raises(ValueError, match="equal"):
+        coagulation_step_gpu(rejected, 298.15, 101325.0, time_step=0.5)
+    npt.assert_array_equal(rejected.masses.numpy(), before)
+
+    particles = to_warp_particle_data(native, device="cpu")
+    initial = np.sum(native.masses * native.concentration[..., None], axis=1)
+    coagulation_step_gpu(
+        particles, 298.15, 101325.0, time_step=0.5, rng_seed=42
+    )
+    wp.synchronize()
+    final = np.sum(
+        particles.masses.numpy() * particles.concentration.numpy()[..., None],
+        axis=1,
+    )
+    npt.assert_allclose(final, initial, rtol=1e-12, atol=1e-30)
+
+
+@pytest.mark.warp
+@pytest.mark.parametrize("vapor_pressure_value", [1e-8, 800.0])
+@pytest.mark.parametrize("time_step", [1e-6, 0.5])
+def test_native_condensation_benchmark_matches_numpy_and_conserves(
+    benchmark_module, vapor_pressure_value, time_step
+) -> None:
+    """Real dispatch matches the bounded four-step benchmark comparator."""
+    wp = pytest.importorskip("warp")
+    from particula.gpu import to_warp_gas_data, to_warp_particle_data
+    from particula.gpu.kernels import condensation_step_gpu
+    from particula.gpu.kernels.thermodynamics import ThermodynamicsConfig
+
+    particles = benchmark_module._make_particle_data(2, 4, 2)
+    gas = benchmark_module._make_gas_data(2, 2)
+    initial = (
+        np.sum(particles.masses * particles.concentration[..., None], axis=1)
+        + gas.concentration * particles.volume[:, None]
+    )
+    gp = to_warp_particle_data(particles, device="cpu")
+    gg = to_warp_gas_data(gas, device="cpu")
+    binding = benchmark_module._prepare_benchmark_species_binding(gp, gg, 2)
+    vapor = np.full((2, 2), vapor_pressure_value)
+    surface = np.full(2, 0.072)
+    accommodation = np.ones(2)
+    diffusion = np.full(2, 2e-5)
+    config = ThermodynamicsConfig(
+        modes=wp.zeros(2, dtype=wp.int32, device="cpu"),
+        parameters=wp.array(
+            np.column_stack((vapor[0], np.zeros((2, 3)))),
+            dtype=wp.float64,
+            device="cpu",
+        ),
+        molar_mass_reference=wp.array(
+            gas.molar_mass, dtype=wp.float64, device="cpu"
+        ),
+    )
+    condensation_step_gpu(
+        gp,
+        gg,
+        298.15,
+        101325.0,
+        time_step,
+        thermodynamics=config,
+        species_binding=binding,
+        surface_tension=wp.array(surface, dtype=wp.float64, device="cpu"),
+        mass_accommodation=wp.array(
+            accommodation, dtype=wp.float64, device="cpu"
+        ),
+        diffusion_coefficient_vapor=wp.array(
+            diffusion, dtype=wp.float64, device="cpu"
+        ),
+    )
+    benchmark_module._cpu_native_condensation_step(
+        particles,
+        gas,
+        vapor,
+        surface,
+        accommodation,
+        diffusion,
+        298.15,
+        101325.0,
+        time_step,
+        np.zeros_like(particles.masses),
+    )
+    wp.synchronize()
+    npt.assert_allclose(
+        gp.masses.numpy(), particles.masses, rtol=1e-12, atol=1e-30
+    )
+    npt.assert_allclose(
+        gg.concentration.numpy(), gas.concentration, rtol=1e-12, atol=1e-30
+    )
+    npt.assert_array_equal(gp.concentration.numpy(), particles.concentration)
+    final = (
+        np.sum(gp.masses.numpy() * gp.concentration.numpy()[..., None], axis=1)
+        + gg.concentration.numpy() * particles.volume[:, None]
+    )
+    npt.assert_allclose(final, initial, rtol=1e-12, atol=1e-30)
+
+
+@pytest.mark.parametrize("pairs", [[], [[0, 3]], [[0, 3], [1, 3]]])
+def test_native_cpu_benchmark_coagulation_preserves_each_material(
+    benchmark_module, monkeypatch, pairs
+) -> None:
+    """Forced collisions preserve species and charge across repeated targets."""
+    particles = benchmark_module._make_native_coagulation_particle_data(1, 4, 2)
+    particles.charge[:] = [[1.0, -2.0, 3.0, 4.0]]
+    initial_mass = particles.masses.sum(axis=1)
+    initial_charge = particles.charge.sum(axis=1)
+    monkeypatch.setattr(
+        benchmark_module,
+        "get_particle_resolved_coagulation_step",
+        lambda *args: np.array(pairs, dtype=np.int64).reshape(-1, 2),
+    )
+    benchmark_module._cpu_native_coagulation_step(
+        particles,
+        298.15,
+        101325.0,
+        0.5,
+        np.random.default_rng(42),
+        benchmark_module._build_kernel_radius(particles.radii),
+    )
+    npt.assert_allclose(
+        particles.masses.sum(axis=1), initial_mass, rtol=1e-12, atol=1e-30
+    )
+    npt.assert_array_equal(particles.charge.sum(axis=1), initial_charge)
+    assert particles.concentration.sum() == 4 - len(pairs)
+    for source, _ in pairs:
+        npt.assert_array_equal(particles.masses[0, source], 0.0)
+        assert particles.charge[0, source] == 0.0

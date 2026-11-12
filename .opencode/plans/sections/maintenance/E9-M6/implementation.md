@@ -1765,3 +1765,89 @@ the coagulation workload also uses unsupported unequal active weights.
 Migrate these consumers as a separate integration prerequisite, preserving
 historical fixture provenance and identifying any changed workload. Do not
 interpret collection or optional CUDA skips as measured benchmark evidence.
+
+### Next integration audit findings
+
+Boundary unit committed as `72f179eeb`. Inspection of the opt-in scaling
+benchmarks found additional migration requirements beyond constructor tags:
+`test_condensation_scaling` lacks an explicit species binding; its CPU helper
+performs one uncoupled mass update while the supported direct GPU path uses
+four inventory-finalized gas-coupled substeps. Its constant thermodynamics
+parameters are zero despite a separately supplied nonzero vapor-pressure
+fixture. These timings must not be presented as equivalent-method speedups
+without an explicitly matched comparator and regression evidence.
+`test_coagulation_scaling` consumes mixed-scale unequal weights, while native
+coagulation requires equal active counts. Retain the original mixed-scale
+assertions as unsupported-input evidence and introduce a separately identified
+native workload; do not silently relabel historical timings or overwrite their
+meaning. Check the CPU collision helper's physical weighting when choosing
+the matched native workload.
+
+Full publication audit started at this commit using
+`.venv/bin/mkdocs build --config-file mkdocs-full.yml --strict`, output
+`/tmp/m6-full-publication-audit1.log`, live session 18918. Repeated unclosed
+Div rendering warnings are already observed; terminal result remains pending.
+This is an audit run, not a passing readiness gate. Poll the existing handle
+before starting another publication build.
+
+### Native benchmark migration (uncommitted)
+
+Added explicit resolved tags to raw benchmark fixtures, retaining their values.
+The historical unequal-weight mixed-radius fixture remains and has a real Warp
+CPU rejection check. Timed coagulation now selects a separately identified
+unit-count derivative preserving masses, volumes and material layout; its
+artifact metadata explicitly excludes historical timing comparability. Real
+Warp CPU execution preserves per-material inventory at rtol=1e-12, atol=1e-30.
+The CPU coagulation comparator still needs review: its arithmetic effective
+material density reconstruction must not be treated as validated conservation
+or equivalent-method timing evidence.
+
+Condensation now prepares an explicit identity species binding, uses a constant
+800 Pa thermodynamics fixture consistently across boxes and CPU/GPU paths, and
+identifies the new workload separately. A new NumPy comparator performs four
+inventory-limited gas-coupled substeps with resolved count/volume normalization
+and final slot retirement. The original single-proposal helper and its tests
+remain as independent raw-proposal characterization. Real Warp CPU tests cover
+uptake/evaporation at 1e-6 and 0.5 seconds, compare particle and gas outputs, and
+check extensive species conservation at unchanged tight tolerances. Initial
+zero-vapor-pressure test cases were invalid under the existing positive-constant
+contract; replaced with positive 1e-8 Pa uptake inputs, without changing the
+validator. Final helper run: **92 passed in 0.89s**,
+`/tmp/m6-benchmark-native5.log`. Scoped Ruff/format, mypy and whitespace checks
+pass. The benchmark assertion ledger preserves 79 original test functions.
+This is correctness/helper evidence, not CUDA timing or final benchmark
+qualification. No production numerical kernel changed.
+
+Full publication audit session 18918 is terminal: exit 0, build completed in
+**214.36 seconds**. Its log contains **711 warning/error lines**, including
+unclosed Div warnings from notebook conversion. Therefore process success is
+not warning-free publication evidence. Repair the emitted warnings before
+claiming the full publication gate. Log: `/tmp/m6-full-publication-audit1.log`.
+
+### Benchmark correctness closure
+
+Added a distinct native CPU coagulation comparator using the existing grid
+sampler and direct per-material/charge accumulation for unit-count collisions.
+The historical density-reconstruction helper and every original test remain
+for characterization; timed calls use the conservative native comparator.
+Forced empty, single and repeated-destination collision tests preserve material
+inventory and charge and verify exact source retirement. Metadata names the
+CPU interpolated-grid and GPU direct-pair algorithms and explicitly disclaims
+algorithm parity. Their measured timing ratio alone cannot qualify statistical
+or trajectory equivalence. Historical workload timings remain noncomparable.
+
+The complete helper suite passed **95 tests in 0.92s**,
+`/tmp/m6-benchmark-native6.log`; package mypy passed **535 files**,
+`/tmp/m6-benchmark-mypy1.log`; scoped Ruff and formatting passed. This closes
+native benchmark consumer correctness for the covered workloads; CUDA timing
+is unmeasured, not a required performance claim. Original assertion ledger
+successors all resolve. No numerical kernel or tolerance changed.
+
+Publication warning diagnosis: all 711 lines are Pandoc unclosed-Div warnings.
+mkdocs-jupyter calls Jupytext on every Markdown page before checking include
+patterns, and generated `::: particula...` API directives trigger the parser.
+A publication hook now keeps ordinary Markdown in MkDocs/mkdocstrings and
+leaves Python/ipynb notebook eligibility unchanged. No Markdown notebooks were
+found in the supported docs. The routing regression passed (1 test, 0.02s).
+Full strict publication rerun is active in session 84473, log
+`/tmp/m6-full-publication-routing1.log`; poll this handle before retrying.
