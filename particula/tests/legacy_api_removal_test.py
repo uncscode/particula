@@ -14,6 +14,8 @@ from particula.tests.aerosol_test import native_triple
         "particula._legacy_aerosol",
         "particula.gas.atmosphere",
         "particula.gas.atmosphere_builders",
+        "particula.gas.species_builders",
+        "particula.gas.species_factories",
         "particula.particles.change_particle_representation",
         "particula.particles.representation_factories",
         "particula.particles.representation_builders",
@@ -120,6 +122,20 @@ def test_removed_particle_facade(module_name):
 @pytest.mark.parametrize("name", ["Atmosphere", "AtmosphereBuilder"])
 def test_removed_atmosphere(module_name, name):
     """Gas and environment are native containers without an atmosphere facade."""
+    module = importlib.import_module(module_name)
+    assert not hasattr(module, name)
+    with pytest.raises(ImportError) as caught:
+        exec(f"from {module_name} import {name}", {})  # noqa: S102
+    assert caught.value.name == module_name
+
+
+@pytest.mark.parametrize("module_name", ["particula", "particula.gas"])
+@pytest.mark.parametrize(
+    "name",
+    ["GasSpeciesBuilder", "PresetGasSpeciesBuilder", "GasSpeciesFactory"],
+)
+def test_removed_gas_constructor(module_name, name):
+    """Native gas construction exposes no obsolete facade constructors."""
     module = importlib.import_module(module_name)
     assert not hasattr(module, name)
     with pytest.raises(ImportError) as caught:

@@ -5260,7 +5260,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Removed obsolete gas constructors; fourteen original assertions mapped in gas_constructor_assertions.json to native builder and removed-import successors.",
       "test_nodes": []
     },
     {
@@ -5387,7 +5387,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Removed obsolete gas constructors; fourteen original assertions mapped in gas_constructor_assertions.json to native builder and removed-import successors.",
       "test_nodes": []
     },
     {
@@ -6033,7 +6033,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Removed obsolete gas constructors; fourteen original assertions mapped in gas_constructor_assertions.json to native builder and removed-import successors.",
       "test_nodes": [
         {
           "name": "test_set_name",
@@ -6344,7 +6344,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Removed obsolete gas constructors; fourteen original assertions mapped in gas_constructor_assertions.json to native builder and removed-import successors.",
       "test_nodes": [
         {
           "name": "test_get_builders",
