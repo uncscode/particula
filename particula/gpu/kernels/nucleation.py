@@ -2879,7 +2879,8 @@ def _validate_p5_handoff(  # noqa: C901
         or events < 0.0
         or events != wp.floor(events)
         or events > wp.float64(2147483647)
-        or count != wp.int32(events)
+        # Warp compiles this scalar cast; its Python stub omits Warp scalars.
+        or count != wp.int32(events)  # type: ignore[arg-type]
     )
     if final_demand[box] != wp.float64(count) / volume[box]:
         invalid = True
