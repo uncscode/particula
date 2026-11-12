@@ -540,3 +540,17 @@ Validation:
 - Scoped Ruff/format and whitespace checks passed after formatting.
 Shared condensation strategy legacy dispatch and its main test suite remain
 pending; these focused passes are not final M6 coverage or readiness evidence.
+
+## Preserve staggered controls independently of legacy fixtures
+
+Moved 32 existing constructor, theta/RNG, batch/shuffle and clipping-log tests,
+plus their logging helper, into `staggered_controls_test.py`. Their executable
+method ASTs are identical to the original methods. The new class has no legacy
+fixture setup and uses the shared removal-safe facade guard. Updated each old
+node's native successor in `condensation_assertions.json`. This prevents the
+pending main condensation fixture removal from discarding control/RNG coverage.
+
+Validation: original condensation strategy suite plus extracted controls:
+**144 passed in 0.16s**, `/tmp/m6-staggered-controls.log`; scoped Ruff/format and
+whitespace checks passed. No production behavior changed. Main shared
+condensation legacy execution removal remains pending.
