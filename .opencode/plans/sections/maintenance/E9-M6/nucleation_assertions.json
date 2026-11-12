@@ -1,0 +1,191 @@
+[
+  {
+    "file": "particula/dynamics/tests/nucleation_runnable_test.py",
+    "test": "test_public_surface_exports_only_supported_p5_types",
+    "original": "def test_public_surface_exports_only_supported_p5_types():\n    \"\"\"Dynamics exports P5 types without exposing P2/P3 transaction records.\"\"\"\n    assert particula.dynamics.Nucleation is particle_process.Nucleation\n    assert particula.dynamics.NucleationCommitConfig is NucleationCommitConfig\n    assert not hasattr(particula.dynamics, \"ParticleSourceCommitConfig\")\n    assert not hasattr(particula.dynamics.nucleation, \"commit_particle_source\")\n    assert not hasattr(particle_process, \"ParticleSourceCommitConfig\")\n    assert not hasattr(particle_process, \"PotentialEventData\")\n    assert not hasattr(particle_process, \"commit_particle_source\")\n    assert not hasattr(particle_process, \"finalize_particle_source\")",
+    "successor": "test_public_surface_exports_only_supported_p5_types",
+    "disposition": "migrated to native aggregate, explicit species map and held environment; original behavioral assertions retained"
+  },
+  {
+    "file": "particula/dynamics/tests/nucleation_runnable_test.py",
+    "test": "test_commit_config_owns_immutable_float64_sidecars",
+    "original": "def test_commit_config_owns_immutable_float64_sidecars():\n    \"\"\"Public controls copy caller sidecars and preserve P3 scalar rules.\"\"\"\n    requested = np.array([1.0], dtype=np.float32)\n    config = NucleationCommitConfig(\n        maximum_slot_weight=2.0,\n        source_charge=np.float64(0.0),\n        exhaustion_controls=ExhaustionControls(),\n        requested_scale=requested,\n        minimum_scale=np.array([1.0]),\n        minimum_volume=np.array([1.0]),\n    )\n\n    assert config.requested_scale.dtype == np.float64\n    assert not config.requested_scale.flags.writeable\n    assert not np.shares_memory(config.requested_scale, requested)\n    with pytest.raises(ValueError):\n        config.requested_scale[0] = 2.0\n    with pytest.raises(TypeError, match=\"exact Python float\"):\n        NucleationCommitConfig(\n            1.0, 0.0, ExhaustionControls(), [1.0], [1.0], [1.0], np.float64(1)\n        )",
+    "successor": "test_commit_config_owns_immutable_float64_sidecars",
+    "disposition": "migrated to native aggregate, explicit species map and held environment; original behavioral assertions retained"
+  },
+  {
+    "file": "particula/dynamics/tests/nucleation_runnable_test.py",
+    "test": "test_rate_uses_backing_gas_and_omits_saturation_outside_domain",
+    "original": "def test_rate_uses_backing_gas_and_omits_saturation_outside_domain():\n    \"\"\"The P1 adapter supplies gas lane zero and None saturation as required.\"\"\"\n    aerosol, _, gas, _ = _aerosol()\n    runnable = _runnable()\n    expected = runnable.source_config.strategy.potential_rate(\n        float(gas.concentration[0, 0]),\n        float(gas.molar_mass[0]),\n        298.15,\n        None,\n    )\n\n    assert runnable.rate(aerosol) == expected",
+    "successor": "test_rate_uses_backing_gas_and_omits_saturation_outside_domain",
+    "disposition": "migrated to native aggregate, explicit species map and held environment; original behavioral assertions retained"
+  },
+  {
+    "file": "particula/dynamics/tests/nucleation_runnable_test.py",
+    "test": "test_rate_uses_environment_saturation_for_saturation_domain",
+    "original": "def test_rate_uses_environment_saturation_for_saturation_domain():\n    \"\"\"The P1 adapter supplies the selected environment saturation lane.\"\"\"\n    aerosol, _, gas, _ = _aerosol()\n    strategy = ActivationNucleationStrategy(\n        coefficient=1.0e-2,\n        validity_domain=NucleationValidityDomain(\n            ClosedInterval(1.0, 1.0e30),\n            ClosedInterval(200.0, 400.0),\n            ClosedInterval(1.4, 1.6),\n        ),\n        injection_composition=InjectionComposition((1,)),\n        formation_metadata=FormationMetadata(1.0e-9),\n    )\n    runnable = Nucleation(\n        NucleationSourceConfig(strategy=strategy, precursor_index=0),\n        _commit_config(),\n        EnvironmentData(\n            temperature=np.array([298.15], dtype=np.float64),\n            pressure=np.array([101325.0], dtype=np.float64),\n            saturation_ratio=np.array([[1.5]], dtype=np.float64),\n        ),\n    )\n    expected = strategy.potential_rate(\n        float(gas.concentration[0, 0]),\n        float(gas.molar_mass[0]),\n        298.15,\n        1.5,\n    )\n\n    assert runnable.rate(aerosol) == expected",
+    "successor": "test_rate_uses_environment_saturation_for_saturation_domain",
+    "disposition": "migrated to native aggregate, explicit species map and held environment; original behavioral assertions retained"
+  },
+  {
+    "file": "particula/dynamics/tests/nucleation_runnable_test.py",
+    "test": "test_constructor_rejects_wrong_top_level_configuration_types",
+    "original": "def test_constructor_rejects_wrong_top_level_configuration_types(\n    source_config, commit_config, environment, message\n):\n    \"\"\"Construction reports the invalid public configuration boundary.\"\"\"\n    source = source_config() if callable(source_config) else source_config\n    commit = commit_config() if callable(commit_config) else commit_config\n    environment = (\n        environment(\n            temperature=np.array([298.15]),\n            pressure=np.array([101325.0]),\n            saturation_ratio=np.array([[1.0]]),\n        )\n        if callable(environment)\n        else environment\n    )\n    with pytest.raises(TypeError, match=message):\n        Nucleation(source, commit, environment)",
+    "successor": "test_constructor_rejects_wrong_top_level_configuration_types",
+    "disposition": "Native constructor owns source and commit configs only; both rejection cases retained. Environment type validation belongs to Aerosol and is covered by particula/tests/aerosol_test.py::test_wrong_container[environment]."
+  },
+  {
+    "file": "particula/dynamics/tests/nucleation_runnable_test.py",
+    "test": "test_rate_rejects_invalid_topology_before_p1_and_preserves_state",
+    "original": "def test_rate_rejects_invalid_topology_before_p1_and_preserves_state():\n    \"\"\"Topology mismatch raises before P1 and leaves facade storage untouched.\"\"\"\n    aerosol, particles, gas, gas_only = _aerosol()\n    particles.masses = np.zeros((1, 3, 2), dtype=np.float64)\n    gas_before = gas.concentration.copy()\n    gas_only_before = gas_only.concentration.copy()\n\n    with pytest.raises(ValueError, match=\"species widths\"):\n        _runnable().rate(aerosol)\n    npt.assert_array_equal(gas.concentration, gas_before)\n    npt.assert_array_equal(gas_only.concentration, gas_only_before)",
+    "successor": "test_rate_rejects_invalid_topology_before_p1_and_preserves_state",
+    "disposition": "migrated to native aggregate, explicit species map and held environment; original behavioral assertions retained"
+  },
+  {
+    "file": "particula/dynamics/tests/nucleation_runnable_test.py",
+    "test": "test_execute_commits_each_positive_substep_and_preserves_identities",
+    "original": "def test_execute_commits_each_positive_substep_and_preserves_identities(\n    monkeypatch: pytest.MonkeyPatch,\n):\n    \"\"\"Positive substeps finalize and commit with the original backing objects.\"\"\"\n    aerosol, particles, gas, gas_only = _aerosol()\n    runnable = _runnable()\n    calls: list[tuple[float, ParticleData, GasData]] = []\n\n    def finalize(events, composition, source_gas):\n        assert source_gas is gas\n        return object(), object()\n\n    def commit(demand, diagnostics, source_particles, source_gas, config):\n        calls.append((config.maximum_slot_weight, source_particles, source_gas))\n\n    monkeypatch.setattr(particle_process, \"_finalize_particle_source\", finalize)\n    monkeypatch.setattr(particle_process, \"_commit_particle_source\", commit)\n    assert runnable.execute(aerosol, 2.0, sub_steps=2) is aerosol\n    assert len(calls) == 2\n    assert all(entry[1] is particles and entry[2] is gas for entry in calls)\n    assert aerosol.particles.data is particles\n    assert aerosol.atmosphere.partitioning_species.data is gas\n    npt.assert_array_equal(gas_only.concentration, [[2.0e-6]])",
+    "successor": "test_execute_commits_each_positive_substep_and_preserves_identities",
+    "disposition": "migrated to native aggregate, explicit species map and held environment; original behavioral assertions retained"
+  },
+  {
+    "file": "particula/dynamics/tests/nucleation_runnable_test.py",
+    "test": "test_real_execution_depletes_gas_and_never_touches_gas_only",
+    "original": "def test_real_execution_depletes_gas_and_never_touches_gas_only():\n    \"\"\"P3 transfer changes only the supported particle and partitioning state.\"\"\"\n    aerosol, particles, gas, gas_only = _aerosol()\n    initial_gas = gas.concentration.copy()\n    initial_gas_only = gas_only.concentration.copy()\n\n    assert _runnable().execute(aerosol, 1.0, sub_steps=2) is aerosol\n    assert gas.concentration[0, 0] < initial_gas[0, 0]\n    assert np.any(particles.concentration > 0.0)\n    npt.assert_array_equal(gas_only.concentration, initial_gas_only)",
+    "successor": "test_real_execution_depletes_gas_and_never_touches_gas_only",
+    "disposition": "migrated to native aggregate, explicit species map and held environment; original behavioral assertions retained"
+  },
+  {
+    "file": "particula/dynamics/tests/nucleation_runnable_test.py",
+    "test": "test_real_execution_synchronizes_supported_particle_facade_caches",
+    "original": "def test_real_execution_synchronizes_supported_particle_facade_caches() -> None:\n    \"\"\"A successful P3 commit leaves MassBasedMovingBin facade caches current.\"\"\"\n    aerosol, particles, _, _ = _aerosol()\n    aerosol.particles._charge_is_none = False\n    aerosol.particles._charge_array = particles.charge[0].copy()\n    aerosol.particles._charge_value = aerosol.particles._charge_array\n\n    _runnable().execute(aerosol, 1.0)\n\n    npt.assert_array_equal(\n        aerosol.particles.distribution, particles.masses[0, :, 0]\n    )\n    npt.assert_array_equal(aerosol.particles.charge, particles.charge[0])\n    aerosol.particles.concentration = aerosol.particles.concentration\n    npt.assert_array_equal(\n        aerosol.particles.data.concentration, particles.concentration\n    )",
+    "successor": "test_real_execution_preserves_native_arrays_and_derived_properties",
+    "disposition": "Facade cache synchronization removed. Successor asserts held primary-array identity and updated native total_mass/radii after real source execution; native containers have no obsolete distribution/charge caches."
+  },
+  {
+    "file": "particula/dynamics/tests/nucleation_runnable_test.py",
+    "test": "test_invalid_substeps_fail_before_facade_access",
+    "original": "def test_invalid_substeps_fail_before_facade_access(sub_steps):\n    \"\"\"Invalid substep counts reject before inspecting the aerosol facade.\"\"\"\n    with pytest.raises(\n        ValueError, match=\"sub_steps must be a positive integer\"\n    ):\n        _runnable().execute(object(), 1.0, sub_steps=sub_steps)",
+    "successor": "test_invalid_substeps_fail_before_state_access",
+    "disposition": "migrated to native aggregate, explicit species map and held environment; original behavioral assertions retained"
+  },
+  {
+    "file": "particula/dynamics/tests/nucleation_runnable_test.py",
+    "test": "test_excessive_substeps_fail_before_facade_access_or_source_work",
+    "original": "def test_excessive_substeps_fail_before_facade_access_or_source_work():\n    \"\"\"The bounded substep count rejects before topology or P1 evaluation.\"\"\"\n    with pytest.raises(ValueError, match=\"must not exceed\"):\n        _runnable().execute(\n            object(),\n            1.0,\n            sub_steps=particle_process._MAX_NUCLEATION_SUB_STEPS + 1,\n        )",
+    "successor": "test_excessive_substeps_fail_before_state_access_or_source_work",
+    "disposition": "migrated to native aggregate, explicit species map and held environment; original behavioral assertions retained"
+  },
+  {
+    "file": "particula/dynamics/tests/nucleation_runnable_test.py",
+    "test": "test_maximum_substeps_are_accepted",
+    "original": "def test_maximum_substeps_are_accepted(monkeypatch: pytest.MonkeyPatch):\n    \"\"\"The documented maximum executes valid zero-rate substeps.\"\"\"\n    aerosol, _, _, _ = _aerosol()\n    runnable = _runnable()\n    calls = 0\n\n    def zero_rate(_: GasData) -> float:\n        nonlocal calls\n        calls += 1\n        return 0.0\n\n    monkeypatch.setattr(runnable, \"_rate_from_gas\", zero_rate)\n\n    assert (\n        runnable.execute(\n            aerosol, 1.0, particle_process._MAX_NUCLEATION_SUB_STEPS\n        )\n        is aerosol\n    )\n    assert calls == particle_process._MAX_NUCLEATION_SUB_STEPS",
+    "successor": "test_maximum_substeps_are_accepted",
+    "disposition": "migrated to native aggregate, explicit species map and held environment; original behavioral assertions retained"
+  },
+  {
+    "file": "particula/dynamics/tests/nucleation_runnable_test.py",
+    "test": "test_malformed_facade_fails_before_source_work",
+    "original": "def test_malformed_facade_fails_before_source_work(monkeypatch):\n    \"\"\"Missing legacy facades reject before any P1 source evaluation.\"\"\"\n    runnable = _runnable()\n    monkeypatch.setattr(\n        runnable,\n        \"_rate_from_gas\",\n        lambda _: pytest.fail(\"P1 must not run for malformed facades\"),\n    )\n\n    with pytest.raises(TypeError, match=\"facades\"):\n        runnable.execute(object(), 1.0)",
+    "successor": "test_non_native_aggregate_fails_before_source_work",
+    "disposition": "migrated to native aggregate, explicit species map and held environment; original behavioral assertions retained"
+  },
+  {
+    "file": "particula/dynamics/tests/nucleation_runnable_test.py",
+    "test": "test_invalid_topology_is_write_free_and_skips_source_work",
+    "original": "def test_invalid_topology_is_write_free_and_skips_source_work(\n    monkeypatch: pytest.MonkeyPatch,\n    mutate,\n):\n    \"\"\"Unsupported facade topology is rejected before P1, P2, or P3 work.\"\"\"\n    aerosol, particles, gas, gas_only = _aerosol()\n    runnable = _runnable()\n    mutate(particles, gas, runnable)\n    arrays = (\n        particles.masses,\n        particles.concentration,\n        particles.charge,\n        particles.density,\n        particles.volume,\n        gas.molar_mass,\n        gas.concentration,\n        gas.partitioning,\n        gas_only.molar_mass,\n        gas_only.concentration,\n        gas_only.partitioning,\n    )\n    snapshots = tuple(\n        (\n            array.copy(),\n            id(array),\n            array.shape,\n            array.dtype,\n            array.flags.c_contiguous,\n            array.flags.writeable,\n        )\n        for array in arrays\n    )\n    facade_identities = (\n        id(aerosol),\n        id(aerosol.particles),\n        id(aerosol.particles.data),\n        id(aerosol.atmosphere.partitioning_species),\n        id(aerosol.atmosphere.partitioning_species.data),\n    )\n    monkeypatch.setattr(\n        runnable,\n        \"_rate_from_gas\",\n        lambda _: pytest.fail(\"P1 must not run for invalid topology\"),\n    )\n    monkeypatch.setattr(\n        particle_process,\n        \"_finalize_particle_source\",\n        lambda *args: pytest.fail(\"P2 must not run for invalid topology\"),\n    )\n    monkeypatch.setattr(\n        particle_process,\n        \"_commit_particle_source\",\n        lambda *args: pytest.fail(\"P3 must not run for invalid topology\"),\n    )\n\n    with pytest.raises((TypeError, ValueError)):\n        runnable.execute(aerosol, 1.0)\n    for array, snapshot in zip(arrays, snapshots, strict=True):\n        values, identity, shape, dtype, contiguous, writable = snapshot\n        npt.assert_array_equal(array, values)\n        assert (\n            id(array),\n            array.shape,\n            array.dtype,\n            array.flags.c_contiguous,\n            array.flags.writeable,\n        ) == (identity, shape, dtype, contiguous, writable)\n    assert facade_identities == (\n        id(aerosol),\n        id(aerosol.particles),\n        id(aerosol.particles.data),\n        id(aerosol.atmosphere.partitioning_species),\n        id(aerosol.atmosphere.partitioning_species.data),\n    )",
+    "successor": "test_invalid_topology_is_write_free_and_skips_source_work",
+    "disposition": "All seven topology categories migrated to native arrays and held environment. Out-of-range precursor is index 2 with unified gas width 2. Preserves snapshots, array identity/shape/dtype/flags, container identities and no P1/P2/P3 calls; additionally snapshots environment fields."
+  },
+  {
+    "file": "particula/dynamics/tests/nucleation_runnable_test.py",
+    "test": "test_zero_duration_validates_topology_without_source_work",
+    "original": "def test_zero_duration_validates_topology_without_source_work(monkeypatch):\n    \"\"\"A valid zero duration is a structural, exact write-free no-op.\"\"\"\n    aerosol, particles, gas, gas_only = _aerosol()\n    particle_before = particles.masses.copy()\n    gas_before = gas.concentration.copy()\n    gas_only_before = gas_only.concentration.copy()\n    monkeypatch.setattr(\n        particle_process,\n        \"_finalize_particle_source\",\n        lambda *args: pytest.fail(\"P2 must not run for zero duration\"),\n    )\n\n    assert _runnable().execute(aerosol, 0.0) is aerosol\n    npt.assert_array_equal(particles.masses, particle_before)\n    npt.assert_array_equal(gas.concentration, gas_before)\n    npt.assert_array_equal(gas_only.concentration, gas_only_before)\n    assert isinstance(_runnable(), RunnableABC)",
+    "successor": "test_zero_duration_validates_topology_without_source_work",
+    "disposition": "migrated to native aggregate, explicit species map and held environment; original behavioral assertions retained"
+  },
+  {
+    "file": "particula/dynamics/tests/nucleation_runnable_test.py",
+    "test": "test_commit_config_rejects_invalid_controls",
+    "original": "def test_commit_config_rejects_invalid_controls(field, value, exception):\n    \"\"\"Commit controls enforce P3-compatible scalar and sidecar validation.\"\"\"\n    controls = {\n        \"maximum_slot_weight\": 1.0,\n        \"source_charge\": 0.0,\n        \"exhaustion_controls\": ExhaustionControls(),\n        \"requested_scale\": [1.0],\n        \"minimum_scale\": [1.0],\n        \"minimum_volume\": [1.0],\n        \"radius_cubed_relative_error\": 1.0,\n    }\n    controls[field] = value\n\n    with pytest.raises(exception):\n        NucleationCommitConfig(**controls)",
+    "successor": "test_commit_config_rejects_invalid_controls",
+    "disposition": "migrated to native aggregate, explicit species map and held environment; original behavioral assertions retained"
+  },
+  {
+    "file": "particula/dynamics/tests/nucleation_runnable_test.py",
+    "test": "test_invalid_duration_fails_before_topology_or_source_work",
+    "original": "def test_invalid_duration_fails_before_topology_or_source_work(\n    duration, exception\n):\n    \"\"\"Invalid durations reject before facade lookup and source transactions.\"\"\"\n    with pytest.raises(exception):\n        _runnable().execute(object(), duration)",
+    "successor": "test_invalid_duration_fails_before_topology_or_source_work",
+    "disposition": "migrated to native aggregate, explicit species map and held environment; original behavioral assertions retained"
+  },
+  {
+    "file": "particula/dynamics/tests/nucleation_runnable_test.py",
+    "test": "test_execute_skips_transactions_for_zero_rate",
+    "original": "def test_execute_skips_transactions_for_zero_rate(monkeypatch):\n    \"\"\"An exact zero P1 rate is a write-free skip for every substep.\"\"\"\n    aerosol, particles, gas, gas_only = _aerosol()\n    snapshots = [\n        particles.masses.copy(),\n        particles.concentration.copy(),\n        gas.concentration.copy(),\n        gas_only.concentration.copy(),\n    ]\n    runnable = _runnable()\n    monkeypatch.setattr(runnable, \"_rate_from_gas\", lambda _: 0.0)\n    monkeypatch.setattr(\n        particle_process,\n        \"_finalize_particle_source\",\n        lambda *args: pytest.fail(\"P2 must not run for a zero rate\"),\n    )\n    monkeypatch.setattr(\n        particle_process,\n        \"_commit_particle_source\",\n        lambda *args: pytest.fail(\"P3 must not run for a zero rate\"),\n    )\n\n    assert runnable.execute(aerosol, 1.0, sub_steps=2) is aerosol\n    for actual, expected in zip(\n        (\n            particles.masses,\n            particles.concentration,\n            gas.concentration,\n            gas_only.concentration,\n        ),\n        snapshots,\n        strict=True,\n    ):\n        npt.assert_array_equal(actual, expected)",
+    "successor": "test_execute_skips_transactions_for_zero_rate",
+    "disposition": "migrated to native aggregate, explicit species map and held environment; original behavioral assertions retained"
+  },
+  {
+    "file": "particula/dynamics/tests/nucleation_runnable_test.py",
+    "test": "test_execute_stops_after_deterministic_zero_admission",
+    "original": "def test_execute_stops_after_deterministic_zero_admission(\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"A zero P2 admission avoids repeated no-op substep transactions.\"\"\"\n    aerosol, _, _, _ = _aerosol()\n    runnable = _runnable()\n    finalizations = 0\n\n    def finalize(*_):\n        nonlocal finalizations\n        finalizations += 1\n        return object(), particle_process._SourceDiagnostics(\n            np.array([1.0]),\n            np.array([0.0]),\n            np.array([1.0]),\n            np.array([-1], dtype=np.int32),\n        )\n\n    monkeypatch.setattr(runnable, \"_rate_from_gas\", lambda _: 1.0)\n    monkeypatch.setattr(particle_process, \"_finalize_particle_source\", finalize)\n    monkeypatch.setattr(\n        particle_process,\n        \"_commit_particle_source\",\n        lambda *args: pytest.fail(\"P3 must not run for zero admission\"),\n    )\n\n    assert runnable.execute(aerosol, 1.0, sub_steps=10) is aerosol\n    assert finalizations == 1",
+    "successor": "test_execute_stops_after_deterministic_zero_admission",
+    "disposition": "migrated to native aggregate, explicit species map and held environment; original behavioral assertions retained"
+  },
+  {
+    "file": "particula/dynamics/tests/nucleation_runnable_test.py",
+    "test": "test_execute_uses_equal_duration_and_fresh_config_per_positive_substep",
+    "original": "def test_execute_uses_equal_duration_and_fresh_config_per_positive_substep(\n    monkeypatch: pytest.MonkeyPatch,\n):\n    \"\"\"Positive rates build one P2 record and private P3 config per substep.\"\"\"\n    aerosol, _, gas, _ = _aerosol()\n    runnable = _runnable()\n    rates = iter((2.0, 3.0))\n    durations: list[float] = []\n    configs = []\n    monkeypatch.setattr(runnable, \"_rate_from_gas\", lambda _: next(rates))\n\n    def finalize(events, composition, source_gas):\n        assert source_gas is gas\n        assert (\n            composition is runnable.source_config.strategy.injection_composition\n        )\n        durations.append(events.duration)\n        return object(), object()\n\n    def commit(demand, diagnostics, particles, source_gas, config):\n        assert source_gas is gas\n        configs.append(config)\n\n    monkeypatch.setattr(particle_process, \"_finalize_particle_source\", finalize)\n    monkeypatch.setattr(particle_process, \"_commit_particle_source\", commit)\n\n    assert runnable.execute(aerosol, 4.0, sub_steps=2) is aerosol\n    assert durations == [2.0, 2.0]\n    assert len(configs) == 2\n    assert configs[0] is not configs[1]",
+    "successor": "test_execute_uses_equal_duration_and_immutable_config_per_positive_substep",
+    "disposition": "Equal P2 duration and full-gas identity retained. Native immutable private commit configuration is shared across substeps; assert same config and explicit species-map identity rather than legacy per-substep reconstruction."
+  },
+  {
+    "file": "particula/dynamics/tests/nucleation_runnable_test.py",
+    "test": "test_later_substep_rate_uses_gas_depleted_by_prior_commit",
+    "original": "def test_later_substep_rate_uses_gas_depleted_by_prior_commit(\n    monkeypatch: pytest.MonkeyPatch,\n):\n    \"\"\"Each P1 rate observes the live precursor gas after the preceding P3.\"\"\"\n    aerosol, _, gas, _ = _aerosol()\n    runnable = _runnable()\n    observed_rates: list[float] = []\n    rate_from_gas = runnable._rate_from_gas\n\n    def record_rate(source_gas: GasData) -> float:\n        rate = rate_from_gas(source_gas)\n        observed_rates.append(rate)\n        return rate\n\n    def commit(*args) -> None:\n        if len(observed_rates) == 1:\n            gas.concentration[0, 0] *= 0.5\n\n    monkeypatch.setattr(runnable, \"_rate_from_gas\", record_rate)\n    monkeypatch.setattr(\n        particle_process,\n        \"_finalize_particle_source\",\n        lambda *args: (object(), object()),\n    )\n    monkeypatch.setattr(particle_process, \"_commit_particle_source\", commit)\n\n    assert runnable.execute(aerosol, 2.0, sub_steps=2) is aerosol\n    assert len(observed_rates) == 2\n    assert observed_rates[1] == observed_rates[0] * 0.5\n    npt.assert_array_equal(gas.concentration, [[0.5e-12]])",
+    "successor": "test_later_substep_rate_uses_gas_depleted_by_prior_commit",
+    "disposition": "migrated to native aggregate, explicit species map and held environment; original behavioral assertions retained"
+  },
+  {
+    "file": "particula/dynamics/tests/nucleation_runnable_test.py",
+    "test": "test_real_substeps_read_current_gas_and_match_independent_transfer_math",
+    "original": "def test_real_substeps_read_current_gas_and_match_independent_transfer_math(\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"The single-box P5 path recomputes deterministic source demand per step.\"\"\"\n    aerosol, particles, gas, _ = _aerosol()\n    runnable = _runnable()\n    observed_gas: list[float] = []\n    real_rate = runnable._rate_from_gas\n\n    def spy_rate(source_gas: GasData) -> float:\n        observed_gas.append(float(source_gas.concentration[0, 0]))\n        return real_rate(source_gas)\n\n    monkeypatch.setattr(runnable, \"_rate_from_gas\", spy_rate)\n    initial_gas = float(gas.concentration[0, 0])\n    molar_mass = float(gas.molar_mass[0])\n    coefficient = 1.0e-2\n    duration = 0.5\n    per_event_mass = molar_mass / AVOGADRO_NUMBER\n    expected_gas = initial_gas\n    for _ in range(2):\n        rate = coefficient * expected_gas * AVOGADRO_NUMBER / molar_mass\n        potential = rate * duration\n        admitted = min(potential, expected_gas / per_event_mass)\n        expected_gas -= admitted * per_event_mass\n\n    assert runnable.execute(aerosol, 1.0, sub_steps=2) is aerosol\n    npt.assert_allclose(\n        observed_gas[0],\n        initial_gas,\n        rtol=CONSERVATION_RTOL,\n        atol=CONSERVATION_ATOL,\n    )\n    assert observed_gas[1] < observed_gas[0]\n    npt.assert_allclose(\n        gas.concentration,\n        [[expected_gas]],\n        rtol=CONSERVATION_RTOL,\n        atol=CONSERVATION_ATOL,\n    )\n    npt.assert_allclose(\n        np.einsum(\"bn,bns->bs\", particles.concentration, particles.masses),\n        [[initial_gas - expected_gas]],\n        rtol=CONSERVATION_RTOL,\n        atol=CONSERVATION_ATOL,\n    )\n    assert aerosol.particles.data is particles\n    assert aerosol.atmosphere.partitioning_species.data is gas",
+    "successor": "test_real_substeps_read_current_gas_and_match_independent_transfer_math",
+    "disposition": "Independent two-substep source math, current-gas observations and particle inventory retained at V=1 with original tolerances. Gas expected result includes unchanged inert lane; separate native_nucleation_test covers V=0.25/1/4 and unequal species maps."
+  },
+  {
+    "file": "particula/dynamics/tests/nucleation_runnable_test.py",
+    "test": "test_source_errors_propagate_and_stop_later_stages",
+    "original": "def test_source_errors_propagate_and_stop_later_stages(monkeypatch):\n    \"\"\"P1 and P2 errors retain identity and do not invoke later boundaries.\"\"\"\n    aerosol, _, gas, _ = _aerosol()\n    runnable = _runnable()\n    p1_error = RuntimeError(\"p1\")\n    monkeypatch.setattr(\n        runnable,\n        \"_rate_from_gas\",\n        lambda _: (_ for _ in ()).throw(p1_error),\n    )\n    with pytest.raises(RuntimeError, match=\"p1\"):\n        runnable.execute(aerosol, 1.0)\n\n    monkeypatch.setattr(runnable, \"_rate_from_gas\", lambda _: 1.0)\n    p2_error = RuntimeError(\"p2\")\n    monkeypatch.setattr(\n        particle_process,\n        \"_finalize_particle_source\",\n        lambda *args: (_ for _ in ()).throw(p2_error),\n    )\n    monkeypatch.setattr(\n        particle_process,\n        \"_commit_particle_source\",\n        lambda *args: pytest.fail(\"P3 must not follow a P2 error\"),\n    )\n    gas_before = gas.concentration.copy()\n    with pytest.raises(RuntimeError, match=\"p2\"):\n        runnable.execute(aerosol, 1.0)\n    npt.assert_array_equal(gas.concentration, gas_before)",
+    "successor": "test_source_errors_propagate_and_stop_later_stages",
+    "disposition": "migrated to native aggregate, explicit species map and held environment; original behavioral assertions retained"
+  },
+  {
+    "file": "particula/dynamics/tests/nucleation_runnable_test.py",
+    "test": "test_execute_preflights_topology_once",
+    "original": "def test_execute_preflights_topology_once(monkeypatch: pytest.MonkeyPatch):\n    \"\"\"Execution validates facade topology once before its sequential steps.\"\"\"\n    aerosol, _, _, _ = _aerosol()\n    runnable = _runnable()\n    topology = runnable._topology\n    calls = 0\n\n    def counted_topology(source_aerosol):\n        nonlocal calls\n        calls += 1\n        return topology(source_aerosol)\n\n    monkeypatch.setattr(runnable, \"_topology\", counted_topology)\n    monkeypatch.setattr(runnable, \"_rate_from_gas\", lambda _: 0.0)\n\n    assert runnable.execute(aerosol, 1.0, sub_steps=3) is aerosol\n    assert calls == 1",
+    "successor": "test_execute_preflights_current_state_each_substep",
+    "disposition": "Legacy one-time topology validation removed; native validates initial state and currently held state for each substep. Three substeps assert four state validations."
+  },
+  {
+    "file": "particula/dynamics/tests/nucleation_runnable_test.py",
+    "test": "test_later_commit_failure_preserves_prior_substep",
+    "original": "def test_later_commit_failure_preserves_prior_substep(\n    monkeypatch: pytest.MonkeyPatch,\n):\n    \"\"\"A failing later P3 transaction does not roll back an earlier commit.\"\"\"\n    aerosol, _, gas, _ = _aerosol()\n    runnable = _runnable()\n    commits = 0\n\n    monkeypatch.setattr(runnable, \"_rate_from_gas\", lambda _: 1.0)\n    monkeypatch.setattr(\n        particle_process,\n        \"_finalize_particle_source\",\n        lambda *args: (object(), object()),\n    )\n\n    def commit(*args):\n        nonlocal commits\n        commits += 1\n        if commits == 1:\n            gas.concentration[0, 0] = 0.5e-12\n            return\n        raise RuntimeError(\"second P3 transaction\")\n\n    monkeypatch.setattr(particle_process, \"_commit_particle_source\", commit)\n\n    with pytest.raises(RuntimeError, match=\"second P3 transaction\"):\n        runnable.execute(aerosol, 2.0, sub_steps=2)\n    assert commits == 2\n    npt.assert_array_equal(gas.concentration, [[0.5e-12]])",
+    "successor": "test_later_commit_failure_preserves_prior_substep",
+    "disposition": "migrated to native aggregate, explicit species map and held environment; original behavioral assertions retained"
+  },
+  {
+    "file": "particula/dynamics/tests/nucleation_runnable_test.py",
+    "test": "test_real_later_commit_failure_preserves_prior_substep",
+    "original": "def test_real_later_commit_failure_preserves_prior_substep() -> None:\n    \"\"\"A real failed P3 commit preserves the prior runnable substep state.\"\"\"\n    expected_aerosol, expected_particles, expected_gas, _ = _aerosol(capacity=1)\n    runnable = _runnable()\n    assert runnable.execute(expected_aerosol, 0.5) is expected_aerosol\n    expected_masses = expected_particles.masses.copy()\n    expected_concentration = expected_particles.concentration.copy()\n    expected_charge = expected_particles.charge.copy()\n    expected_volume = expected_particles.volume.copy()\n    expected_gas_concentration = expected_gas.concentration.copy()\n\n    aerosol, particles, gas, _ = _aerosol(capacity=1)\n    with pytest.raises(\n        ValueError,\n        match=\"exhaustion policy cannot represent requested capacity\",\n    ):\n        runnable.execute(aerosol, 1.0, sub_steps=2)\n\n    npt.assert_allclose(\n        particles.masses,\n        expected_masses,\n        rtol=CONSERVATION_RTOL,\n        atol=CONSERVATION_ATOL,\n    )\n    npt.assert_allclose(\n        particles.concentration,\n        expected_concentration,\n        rtol=CONSERVATION_RTOL,\n        atol=CONSERVATION_ATOL,\n    )\n    npt.assert_allclose(\n        particles.charge,\n        expected_charge,\n        rtol=CONSERVATION_RTOL,\n        atol=CONSERVATION_ATOL,\n    )\n    npt.assert_allclose(\n        particles.volume,\n        expected_volume,\n        rtol=CONSERVATION_RTOL,\n        atol=CONSERVATION_ATOL,\n    )\n    npt.assert_allclose(\n        gas.concentration,\n        expected_gas_concentration,\n        rtol=CONSERVATION_RTOL,\n        atol=CONSERVATION_ATOL,\n    )",
+    "successor": "test_real_later_commit_failure_preserves_prior_substep",
+    "disposition": "migrated to native aggregate, explicit species map and held environment; original behavioral assertions retained"
+  },
+  {
+    "file": "particula/dynamics/tests/nucleation_runnable_test.py",
+    "test": "test_runnable_sequence_preserves_process_order",
+    "original": "def test_runnable_sequence_preserves_process_order(\n    monkeypatch: pytest.MonkeyPatch,\n):\n    \"\"\"Nucleation composes through ``|`` with one inner substep per cycle.\"\"\"\n    from particula.dynamics.tests.native_nucleation_test import fixture\n\n    aerosol, _ = fixture()\n    runnable = _runnable()\n    calls: list[tuple[str, int]] = []\n\n    def execute_nucleation(source_aerosol, time_step, sub_steps=1):\n        calls.append((\"nucleation\", sub_steps))\n        return source_aerosol\n\n    class Marker(RunnableABC):\n        \"\"\"Record execution after nucleation.\"\"\"\n\n        def rate(self, aerosol):\n            \"\"\"Return a marker rate.\"\"\"\n            return 0.0\n\n        def execute(self, source_aerosol, time_step, sub_steps=1):\n            \"\"\"Record the delegated substep count.\"\"\"\n            calls.append((\"marker\", sub_steps))\n            return source_aerosol\n\n    monkeypatch.setattr(runnable, \"execute\", execute_nucleation)\n    sequence = runnable | Marker()\n\n    assert sequence.execute(aerosol, 2.0, sub_steps=2) is aerosol\n    assert calls == [\n        (\"nucleation\", 1),\n        (\"marker\", 1),\n        (\"nucleation\", 1),\n        (\"marker\", 1),\n    ]",
+    "successor": "test_runnable_sequence_preserves_process_order",
+    "disposition": "migrated to native aggregate, explicit species map and held environment; original behavioral assertions retained"
+  }
+]

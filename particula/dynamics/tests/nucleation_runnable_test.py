@@ -2,12 +2,14 @@
 
 # ruff: noqa: D100, D101, D102, D103
 
+from types import SimpleNamespace
+
 import numpy as np
 import numpy.testing as npt
 import particula.dynamics
 import particula.dynamics.particle_process as particle_process
 import pytest
-from particula._legacy_aerosol import Aerosol
+from particula.aerosol import Aerosol
 from particula.dynamics.nucleation import (
     ActivationNucleationStrategy,
     ClosedInterval,
@@ -16,25 +18,16 @@ from particula.dynamics.nucleation import (
     NucleationSourceConfig,
     NucleationValidityDomain,
 )
+from particula.dynamics.nucleation.particle_source import SourceDiagnostics
+from particula.dynamics.nucleation.species_mapping import NucleationSpeciesMap
 from particula.dynamics.particle_process import (
-    LegacyNucleation as Nucleation,
-)
-from particula.dynamics.particle_process import (
+    Nucleation,
     NucleationCommitConfig,
 )
-from particula.gas.atmosphere import Atmosphere
 from particula.gas.environment_data import EnvironmentData
 from particula.gas.gas_data import GasData
-from particula.gas.species import GasSpecies
-from particula.gas.vapor_pressure_strategies import (
-    ConstantVaporPressureStrategy,
-)
-from particula.particles.activity_strategies import ActivityIdealMass
-from particula.particles.distribution_strategies import MassBasedMovingBin
 from particula.particles.exhaustion import ExhaustionControls
 from particula.particles.particle_data import ParticleData
-from particula.particles.representation import ParticleRepresentation
-from particula.particles.surface_strategies import SurfaceStrategyVolume
 from particula.runnable import RunnableABC
 from particula.util.constants import AVOGADRO_NUMBER
 
@@ -51,10 +44,11 @@ def _source_config(coefficient: float = 1.0e-2) -> NucleationSourceConfig:
                 ClosedInterval(1.0, 1.0e30),
                 ClosedInterval(200.0, 400.0),
             ),
-            injection_composition=InjectionComposition((1,)),
+            injection_composition=InjectionComposition((1, 0)),
             formation_metadata=FormationMetadata(1.0e-9),
         ),
         precursor_index=0,
+        species_map=NucleationSpeciesMap(("precursor", "inert"), ((0, 0),)),
     )
 
 
@@ -70,62 +64,42 @@ def _commit_config() -> NucleationCommitConfig:
     )
 
 
-def _aerosol(
-    capacity: int = 3,
-) -> tuple[Aerosol, ParticleData, GasData, GasData]:
-    """Build facades over deterministic writable backing containers."""
+def _aerosol(capacity=3):
+    """Build a tagged population and full gas with a retained inert view."""
     particles = ParticleData(
-        masses=np.zeros((1, capacity, 1), dtype=np.float64),
-        concentration=np.zeros((1, capacity), dtype=np.float64),
-        charge=np.zeros((1, capacity), dtype=np.float64),
-        density=np.array([1000.0], dtype=np.float64),
-        volume=np.array([1.0], dtype=np.float64),
+        masses=np.zeros((1, capacity, 1)),
+        concentration=np.zeros((1, capacity)),
+        charge=np.zeros((1, capacity)),
+        density=np.array([1000.0]),
+        volume=np.array([1.0]),
+        distribution_type="particle_resolved",
     )
     gas = GasData(
-        name=["precursor"],
-        molar_mass=np.array([0.1], dtype=np.float64),
-        concentration=np.array([[1.0e-12]], dtype=np.float64),
-        partitioning=np.array([True]),
+        name=["precursor", "inert"],
+        molar_mass=np.array([0.1, 0.04]),
+        concentration=np.array([[1e-12, 2e-6]]),
+        partitioning=np.array([True, False]),
     )
-    gas_only = GasData(
-        name=["inert"],
-        molar_mass=np.array([0.04], dtype=np.float64),
-        concentration=np.array([[2.0e-6]], dtype=np.float64),
-        partitioning=np.array([False]),
-    )
-    particle_facade = ParticleRepresentation.from_data(
-        particles,
-        strategy=MassBasedMovingBin(),
-        activity=ActivityIdealMass(),
-        surface=SurfaceStrategyVolume(),
-        distribution=np.zeros(capacity, dtype=np.float64),
-    )
-    atmosphere = Atmosphere(
-        temperature=298.15,
-        total_pressure=101325.0,
-        partitioning_species=GasSpecies.from_data(
-            gas,
-            ConstantVaporPressureStrategy(0.0),
-        ),
-        gas_only_species=GasSpecies.from_data(
-            gas_only,
-            ConstantVaporPressureStrategy(0.0),
+    aerosol = Aerosol(
+        particles=particles,
+        gas=gas,
+        environment=EnvironmentData(
+            temperature=np.array([298.15]),
+            pressure=np.array([101325.0]),
+            saturation_ratio=np.ones((1, 2)),
         ),
     )
-    return Aerosol(atmosphere, particle_facade), particles, gas, gas_only
+    return aerosol, particles, gas, gas.concentration[:, 1:]
 
 
-def _runnable(coefficient: float = 1.0e-2) -> Nucleation:
-    """Build a runnable with a single-box environment."""
-    return Nucleation(
-        _source_config(coefficient),
-        _commit_config(),
-        EnvironmentData(
-            temperature=np.array([298.15], dtype=np.float64),
-            pressure=np.array([101325.0], dtype=np.float64),
-            saturation_ratio=np.array([[1.0]], dtype=np.float64),
-        ),
-    )
+def _runnable(coefficient=1e-2):
+    """Bind source physics and explicit map; environment belongs to Aerosol."""
+    return Nucleation(_source_config(coefficient), _commit_config())
+
+
+def _admitted_diagnostics():
+    """Positive admission sentinel for orchestration-only tests."""
+    return SimpleNamespace(gas_admitted_event_count=np.ones(1))
 
 
 def test_public_surface_exports_only_supported_p5_types():
@@ -138,6 +112,7 @@ def test_public_surface_exports_only_supported_p5_types():
     assert not hasattr(particle_process, "PotentialEventData")
     assert not hasattr(particle_process, "commit_particle_source")
     assert not hasattr(particle_process, "finalize_particle_source")
+    assert not hasattr(particle_process, "LegacyNucleation")
 
 
 def test_commit_config_owns_immutable_float64_sidecars():
@@ -178,26 +153,26 @@ def test_rate_uses_backing_gas_and_omits_saturation_outside_domain():
 
 
 def test_rate_uses_environment_saturation_for_saturation_domain():
-    """The P1 adapter supplies the selected environment saturation lane."""
+    """The precursor selects its saturation lane from the held environment."""
     aerosol, _, gas, _ = _aerosol()
+    aerosol.environment.saturation_ratio[0, 0] = 1.5
     strategy = ActivationNucleationStrategy(
-        coefficient=1.0e-2,
+        coefficient=1e-2,
         validity_domain=NucleationValidityDomain(
-            ClosedInterval(1.0, 1.0e30),
+            ClosedInterval(1.0, 1e30),
             ClosedInterval(200.0, 400.0),
             ClosedInterval(1.4, 1.6),
         ),
-        injection_composition=InjectionComposition((1,)),
-        formation_metadata=FormationMetadata(1.0e-9),
+        injection_composition=InjectionComposition((1, 0)),
+        formation_metadata=FormationMetadata(1e-9),
     )
     runnable = Nucleation(
-        NucleationSourceConfig(strategy=strategy, precursor_index=0),
-        _commit_config(),
-        EnvironmentData(
-            temperature=np.array([298.15], dtype=np.float64),
-            pressure=np.array([101325.0], dtype=np.float64),
-            saturation_ratio=np.array([[1.5]], dtype=np.float64),
+        NucleationSourceConfig(
+            strategy=strategy,
+            precursor_index=0,
+            species_map=NucleationSpeciesMap(tuple(gas.name), ((0, 0),)),
         ),
+        _commit_config(),
     )
     expected = strategy.potential_rate(
         float(gas.concentration[0, 0]),
@@ -205,48 +180,37 @@ def test_rate_uses_environment_saturation_for_saturation_domain():
         298.15,
         1.5,
     )
-
     assert runnable.rate(aerosol) == expected
 
 
 @pytest.mark.parametrize(
-    ("source_config", "commit_config", "environment", "message"),
+    "source_config, commit_config, message",
     [
-        (None, _commit_config, EnvironmentData, "source_config"),
-        (_source_config, None, EnvironmentData, "commit_config"),
-        (_source_config, _commit_config, None, "environment"),
+        (None, _commit_config, "source_config"),
+        (_source_config, None, "commit_config"),
     ],
 )
 def test_constructor_rejects_wrong_top_level_configuration_types(
-    source_config, commit_config, environment, message
+    source_config, commit_config, message
 ):
-    """Construction reports the invalid public configuration boundary."""
+    """Construction validates both supported process-owned configurations."""
     source = source_config() if callable(source_config) else source_config
     commit = commit_config() if callable(commit_config) else commit_config
-    environment = (
-        environment(
-            temperature=np.array([298.15]),
-            pressure=np.array([101325.0]),
-            saturation_ratio=np.array([[1.0]]),
-        )
-        if callable(environment)
-        else environment
-    )
     with pytest.raises(TypeError, match=message):
-        Nucleation(source, commit, environment)
+        Nucleation(source, commit)
 
 
 def test_rate_rejects_invalid_topology_before_p1_and_preserves_state():
-    """Topology mismatch raises before P1 and leaves facade storage untouched."""
+    """Topology mismatch raises before P1 and leaves native storage untouched."""
     aerosol, particles, gas, gas_only = _aerosol()
     particles.masses = np.zeros((1, 3, 2), dtype=np.float64)
     gas_before = gas.concentration.copy()
-    gas_only_before = gas_only.concentration.copy()
+    gas_only_before = gas_only.copy()
 
-    with pytest.raises(ValueError, match="species widths"):
+    with pytest.raises(ValueError, match="particles.density shape must be"):
         _runnable().rate(aerosol)
     npt.assert_array_equal(gas.concentration, gas_before)
-    npt.assert_array_equal(gas_only.concentration, gas_only_before)
+    npt.assert_array_equal(gas_only, gas_only_before)
 
 
 def test_execute_commits_each_positive_substep_and_preserves_identities(
@@ -259,7 +223,7 @@ def test_execute_commits_each_positive_substep_and_preserves_identities(
 
     def finalize(events, composition, source_gas):
         assert source_gas is gas
-        return object(), object()
+        return object(), _admitted_diagnostics()
 
     def commit(demand, diagnostics, source_particles, source_gas, config):
         calls.append((config.maximum_slot_weight, source_particles, source_gas))
@@ -269,52 +233,52 @@ def test_execute_commits_each_positive_substep_and_preserves_identities(
     assert runnable.execute(aerosol, 2.0, sub_steps=2) is aerosol
     assert len(calls) == 2
     assert all(entry[1] is particles and entry[2] is gas for entry in calls)
-    assert aerosol.particles.data is particles
-    assert aerosol.atmosphere.partitioning_species.data is gas
-    npt.assert_array_equal(gas_only.concentration, [[2.0e-6]])
+    assert aerosol.particles is particles
+    assert aerosol.gas is gas
+    npt.assert_array_equal(gas_only, [[2.0e-6]])
 
 
 def test_real_execution_depletes_gas_and_never_touches_gas_only():
     """P3 transfer changes only the supported particle and partitioning state."""
     aerosol, particles, gas, gas_only = _aerosol()
     initial_gas = gas.concentration.copy()
-    initial_gas_only = gas_only.concentration.copy()
+    initial_gas_only = gas_only.copy()
 
     assert _runnable().execute(aerosol, 1.0, sub_steps=2) is aerosol
     assert gas.concentration[0, 0] < initial_gas[0, 0]
     assert np.any(particles.concentration > 0.0)
-    npt.assert_array_equal(gas_only.concentration, initial_gas_only)
+    npt.assert_array_equal(gas_only, initial_gas_only)
 
 
-def test_real_execution_synchronizes_supported_particle_facade_caches() -> None:
-    """A successful P3 commit leaves MassBasedMovingBin facade caches current."""
+def test_real_execution_preserves_native_arrays_and_derived_properties():
+    """Native derived properties see committed arrays without facade caches."""
     aerosol, particles, _, _ = _aerosol()
-    aerosol.particles._charge_is_none = False
-    aerosol.particles._charge_array = particles.charge[0].copy()
-    aerosol.particles._charge_value = aerosol.particles._charge_array
-
+    arrays = (particles.masses, particles.concentration, particles.charge)
     _runnable().execute(aerosol, 1.0)
-
-    npt.assert_array_equal(
-        aerosol.particles.distribution, particles.masses[0, :, 0]
+    assert aerosol.particles is particles
+    assert all(
+        before is after
+        for before, after in zip(
+            arrays,
+            (particles.masses, particles.concentration, particles.charge),
+            strict=True,
+        )
     )
-    npt.assert_array_equal(aerosol.particles.charge, particles.charge[0])
-    aerosol.particles.concentration = aerosol.particles.concentration
-    npt.assert_array_equal(
-        aerosol.particles.data.concentration, particles.concentration
-    )
+    npt.assert_array_equal(particles.total_mass, particles.masses.sum(axis=2))
+    assert np.any(particles.concentration > 0)
+    assert np.any(particles.radii > 0)
 
 
 @pytest.mark.parametrize("sub_steps", [0, -1, True, 1.0, "1", None])
-def test_invalid_substeps_fail_before_facade_access(sub_steps):
-    """Invalid substep counts reject before inspecting the aerosol facade."""
+def test_invalid_substeps_fail_before_state_access(sub_steps):
+    """Invalid substep counts reject before inspecting aerosol state."""
     with pytest.raises(
         ValueError, match="sub_steps must be a positive integer"
     ):
         _runnable().execute(object(), 1.0, sub_steps=sub_steps)
 
 
-def test_excessive_substeps_fail_before_facade_access_or_source_work():
+def test_excessive_substeps_fail_before_state_access_or_source_work():
     """The bounded substep count rejects before topology or P1 evaluation."""
     with pytest.raises(ValueError, match="must not exceed"):
         _runnable().execute(
@@ -330,12 +294,12 @@ def test_maximum_substeps_are_accepted(monkeypatch: pytest.MonkeyPatch):
     runnable = _runnable()
     calls = 0
 
-    def zero_rate(_: GasData) -> float:
+    def zero_rate(*_) -> float:
         nonlocal calls
         calls += 1
         return 0.0
 
-    monkeypatch.setattr(runnable, "_rate_from_gas", zero_rate)
+    monkeypatch.setattr(runnable, "_rate", zero_rate)
 
     assert (
         runnable.execute(
@@ -346,62 +310,55 @@ def test_maximum_substeps_are_accepted(monkeypatch: pytest.MonkeyPatch):
     assert calls == particle_process._MAX_NUCLEATION_SUB_STEPS
 
 
-def test_malformed_facade_fails_before_source_work(monkeypatch):
-    """Missing legacy facades reject before any P1 source evaluation."""
+def test_non_native_aggregate_fails_before_source_work(monkeypatch):
+    """Non-native aggregate objects reject before any P1 source evaluation."""
     runnable = _runnable()
     monkeypatch.setattr(
         runnable,
-        "_rate_from_gas",
-        lambda _: pytest.fail("P1 must not run for malformed facades"),
+        "_rate",
+        lambda *_: pytest.fail("P1 must not run for non-native objects"),
     )
 
-    with pytest.raises(TypeError, match="facades"):
+    with pytest.raises(TypeError, match="native Aerosol"):
         runnable.execute(object(), 1.0)
 
 
 @pytest.mark.parametrize(
-    "mutate",
+    "mutation",
     [
-        lambda particles, gas, runnable: setattr(
-            particles, "masses", np.zeros((2, 3, 1), dtype=np.float64)
-        ),
-        lambda particles, gas, runnable: setattr(
-            gas, "concentration", np.zeros((2, 1), dtype=np.float64)
-        ),
-        lambda particles, gas, runnable: setattr(
-            gas, "molar_mass", np.ones((1, 1), dtype=np.float64)
-        ),
-        lambda particles, gas, runnable: setattr(
-            particles, "masses", np.zeros((1, 3, 2), dtype=np.float64)
-        ),
-        lambda particles, gas, runnable: setattr(
-            runnable.environment,
-            "temperature",
-            np.array([298.15, 298.15], dtype=np.float64),
-        ),
-        lambda particles, gas, runnable: setattr(
-            runnable.environment,
-            "saturation_ratio",
-            np.ones((1, 2), dtype=np.float64),
-        ),
-        lambda particles, gas, runnable: setattr(
-            runnable,
-            "source_config",
-            NucleationSourceConfig(
-                strategy=runnable.source_config.strategy,
-                precursor_index=1,
-            ),
-        ),
+        "particle_boxes",
+        "gas_boxes",
+        "molar_rank",
+        "particle_species",
+        "temperature_boxes",
+        "saturation_width",
+        "precursor_index",
     ],
 )
 def test_invalid_topology_is_write_free_and_skips_source_work(
-    monkeypatch: pytest.MonkeyPatch,
-    mutate,
+    monkeypatch, mutation
 ):
-    """Unsupported facade topology is rejected before P1, P2, or P3 work."""
-    aerosol, particles, gas, gas_only = _aerosol()
+    """Malformed current state rejects before source work without any writes."""
+    aerosol, particles, gas, inert = _aerosol()
     runnable = _runnable()
-    mutate(particles, gas, runnable)
+    if mutation == "particle_boxes":
+        particles.masses = np.zeros((2, 3, 1))
+    elif mutation == "gas_boxes":
+        gas.concentration = np.zeros((2, 2))
+    elif mutation == "molar_rank":
+        gas.molar_mass = np.ones((1, 2))
+    elif mutation == "particle_species":
+        particles.masses = np.zeros((1, 3, 2))
+    elif mutation == "temperature_boxes":
+        aerosol.environment.temperature = np.array([298.15, 298.15])
+    elif mutation == "saturation_width":
+        aerosol.environment.saturation_ratio = np.ones((1, 3))
+    else:
+        runnable.source_config = NucleationSourceConfig(
+            strategy=runnable.source_config.strategy,
+            precursor_index=2,
+            species_map=runnable.source_config.species_map,
+        )
     arrays = (
         particles.masses,
         particles.concentration,
@@ -411,44 +368,41 @@ def test_invalid_topology_is_write_free_and_skips_source_work(
         gas.molar_mass,
         gas.concentration,
         gas.partitioning,
-        gas_only.molar_mass,
-        gas_only.concentration,
-        gas_only.partitioning,
+        inert,
+        aerosol.environment.temperature,
+        aerosol.environment.pressure,
+        aerosol.environment.saturation_ratio,
     )
-    snapshots = tuple(
+    snapshots = [
         (
-            array.copy(),
-            id(array),
-            array.shape,
-            array.dtype,
-            array.flags.c_contiguous,
-            array.flags.writeable,
+            x.copy(),
+            id(x),
+            x.shape,
+            x.dtype,
+            x.flags.c_contiguous,
+            x.flags.writeable,
         )
-        for array in arrays
-    )
-    facade_identities = (
+        for x in arrays
+    ]
+    identities = (
         id(aerosol),
         id(aerosol.particles),
-        id(aerosol.particles.data),
-        id(aerosol.atmosphere.partitioning_species),
-        id(aerosol.atmosphere.partitioning_species.data),
+        id(aerosol.gas),
+        id(aerosol.environment),
     )
     monkeypatch.setattr(
-        runnable,
-        "_rate_from_gas",
-        lambda _: pytest.fail("P1 must not run for invalid topology"),
+        runnable, "_rate", lambda *_: pytest.fail("P1 must not run")
     )
     monkeypatch.setattr(
         particle_process,
         "_finalize_particle_source",
-        lambda *args: pytest.fail("P2 must not run for invalid topology"),
+        lambda *_: pytest.fail("P2 must not run"),
     )
     monkeypatch.setattr(
         particle_process,
         "_commit_particle_source",
-        lambda *args: pytest.fail("P3 must not run for invalid topology"),
+        lambda *_: pytest.fail("P3 must not run"),
     )
-
     with pytest.raises((TypeError, ValueError)):
         runnable.execute(aerosol, 1.0)
     for array, snapshot in zip(arrays, snapshots, strict=True):
@@ -461,12 +415,11 @@ def test_invalid_topology_is_write_free_and_skips_source_work(
             array.flags.c_contiguous,
             array.flags.writeable,
         ) == (identity, shape, dtype, contiguous, writable)
-    assert facade_identities == (
+    assert identities == (
         id(aerosol),
         id(aerosol.particles),
-        id(aerosol.particles.data),
-        id(aerosol.atmosphere.partitioning_species),
-        id(aerosol.atmosphere.partitioning_species.data),
+        id(aerosol.gas),
+        id(aerosol.environment),
     )
 
 
@@ -475,7 +428,7 @@ def test_zero_duration_validates_topology_without_source_work(monkeypatch):
     aerosol, particles, gas, gas_only = _aerosol()
     particle_before = particles.masses.copy()
     gas_before = gas.concentration.copy()
-    gas_only_before = gas_only.concentration.copy()
+    gas_only_before = gas_only.copy()
     monkeypatch.setattr(
         particle_process,
         "_finalize_particle_source",
@@ -485,7 +438,7 @@ def test_zero_duration_validates_topology_without_source_work(monkeypatch):
     assert _runnable().execute(aerosol, 0.0) is aerosol
     npt.assert_array_equal(particles.masses, particle_before)
     npt.assert_array_equal(gas.concentration, gas_before)
-    npt.assert_array_equal(gas_only.concentration, gas_only_before)
+    npt.assert_array_equal(gas_only, gas_only_before)
     assert isinstance(_runnable(), RunnableABC)
 
 
@@ -534,7 +487,7 @@ def test_commit_config_rejects_invalid_controls(field, value, exception):
 def test_invalid_duration_fails_before_topology_or_source_work(
     duration, exception
 ):
-    """Invalid durations reject before facade lookup and source transactions."""
+    """Invalid durations reject before native state lookup and source transactions."""
     with pytest.raises(exception):
         _runnable().execute(object(), duration)
 
@@ -546,10 +499,10 @@ def test_execute_skips_transactions_for_zero_rate(monkeypatch):
         particles.masses.copy(),
         particles.concentration.copy(),
         gas.concentration.copy(),
-        gas_only.concentration.copy(),
+        gas_only.copy(),
     ]
     runnable = _runnable()
-    monkeypatch.setattr(runnable, "_rate_from_gas", lambda _: 0.0)
+    monkeypatch.setattr(runnable, "_rate", lambda *_: 0.0)
     monkeypatch.setattr(
         particle_process,
         "_finalize_particle_source",
@@ -567,7 +520,7 @@ def test_execute_skips_transactions_for_zero_rate(monkeypatch):
             particles.masses,
             particles.concentration,
             gas.concentration,
-            gas_only.concentration,
+            gas_only,
         ),
         snapshots,
         strict=True,
@@ -586,14 +539,14 @@ def test_execute_stops_after_deterministic_zero_admission(
     def finalize(*_):
         nonlocal finalizations
         finalizations += 1
-        return object(), particle_process._SourceDiagnostics(
+        return object(), SourceDiagnostics(
             np.array([1.0]),
             np.array([0.0]),
             np.array([1.0]),
             np.array([-1], dtype=np.int32),
         )
 
-    monkeypatch.setattr(runnable, "_rate_from_gas", lambda _: 1.0)
+    monkeypatch.setattr(runnable, "_rate", lambda *_: 1.0)
     monkeypatch.setattr(particle_process, "_finalize_particle_source", finalize)
     monkeypatch.setattr(
         particle_process,
@@ -605,16 +558,16 @@ def test_execute_stops_after_deterministic_zero_admission(
     assert finalizations == 1
 
 
-def test_execute_uses_equal_duration_and_fresh_config_per_positive_substep(
+def test_execute_uses_equal_duration_and_immutable_config_per_positive_substep(
     monkeypatch: pytest.MonkeyPatch,
 ):
-    """Positive rates build one P2 record and private P3 config per substep."""
+    """Positive rates build equal-duration P2 records using immutable controls."""
     aerosol, _, gas, _ = _aerosol()
     runnable = _runnable()
     rates = iter((2.0, 3.0))
     durations: list[float] = []
     configs = []
-    monkeypatch.setattr(runnable, "_rate_from_gas", lambda _: next(rates))
+    monkeypatch.setattr(runnable, "_rate", lambda *_: next(rates))
 
     def finalize(events, composition, source_gas):
         assert source_gas is gas
@@ -622,7 +575,7 @@ def test_execute_uses_equal_duration_and_fresh_config_per_positive_substep(
             composition is runnable.source_config.strategy.injection_composition
         )
         durations.append(events.duration)
-        return object(), object()
+        return object(), _admitted_diagnostics()
 
     def commit(demand, diagnostics, particles, source_gas, config):
         assert source_gas is gas
@@ -634,7 +587,8 @@ def test_execute_uses_equal_duration_and_fresh_config_per_positive_substep(
     assert runnable.execute(aerosol, 4.0, sub_steps=2) is aerosol
     assert durations == [2.0, 2.0]
     assert len(configs) == 2
-    assert configs[0] is not configs[1]
+    assert configs[0] is configs[1]
+    assert configs[0].species_map is runnable.source_config.species_map
 
 
 def test_later_substep_rate_uses_gas_depleted_by_prior_commit(
@@ -644,10 +598,10 @@ def test_later_substep_rate_uses_gas_depleted_by_prior_commit(
     aerosol, _, gas, _ = _aerosol()
     runnable = _runnable()
     observed_rates: list[float] = []
-    rate_from_gas = runnable._rate_from_gas
+    rate_from_gas = runnable._rate
 
-    def record_rate(source_gas: GasData) -> float:
-        rate = rate_from_gas(source_gas)
+    def record_rate(source_gas: GasData, environment: EnvironmentData) -> float:
+        rate = rate_from_gas(source_gas, environment)
         observed_rates.append(rate)
         return rate
 
@@ -655,18 +609,18 @@ def test_later_substep_rate_uses_gas_depleted_by_prior_commit(
         if len(observed_rates) == 1:
             gas.concentration[0, 0] *= 0.5
 
-    monkeypatch.setattr(runnable, "_rate_from_gas", record_rate)
+    monkeypatch.setattr(runnable, "_rate", record_rate)
     monkeypatch.setattr(
         particle_process,
         "_finalize_particle_source",
-        lambda *args: (object(), object()),
+        lambda *args: (object(), _admitted_diagnostics()),
     )
     monkeypatch.setattr(particle_process, "_commit_particle_source", commit)
 
     assert runnable.execute(aerosol, 2.0, sub_steps=2) is aerosol
     assert len(observed_rates) == 2
     assert observed_rates[1] == observed_rates[0] * 0.5
-    npt.assert_array_equal(gas.concentration, [[0.5e-12]])
+    npt.assert_array_equal(gas.concentration, [[0.5e-12, 2e-6]])
 
 
 def test_real_substeps_read_current_gas_and_match_independent_transfer_math(
@@ -676,13 +630,13 @@ def test_real_substeps_read_current_gas_and_match_independent_transfer_math(
     aerosol, particles, gas, _ = _aerosol()
     runnable = _runnable()
     observed_gas: list[float] = []
-    real_rate = runnable._rate_from_gas
+    real_rate = runnable._rate
 
-    def spy_rate(source_gas: GasData) -> float:
+    def spy_rate(source_gas: GasData, environment: EnvironmentData) -> float:
         observed_gas.append(float(source_gas.concentration[0, 0]))
-        return real_rate(source_gas)
+        return real_rate(source_gas, environment)
 
-    monkeypatch.setattr(runnable, "_rate_from_gas", spy_rate)
+    monkeypatch.setattr(runnable, "_rate", spy_rate)
     initial_gas = float(gas.concentration[0, 0])
     molar_mass = float(gas.molar_mass[0])
     coefficient = 1.0e-2
@@ -705,7 +659,7 @@ def test_real_substeps_read_current_gas_and_match_independent_transfer_math(
     assert observed_gas[1] < observed_gas[0]
     npt.assert_allclose(
         gas.concentration,
-        [[expected_gas]],
+        [[expected_gas, 2e-6]],
         rtol=CONSERVATION_RTOL,
         atol=CONSERVATION_ATOL,
     )
@@ -715,8 +669,8 @@ def test_real_substeps_read_current_gas_and_match_independent_transfer_math(
         rtol=CONSERVATION_RTOL,
         atol=CONSERVATION_ATOL,
     )
-    assert aerosol.particles.data is particles
-    assert aerosol.atmosphere.partitioning_species.data is gas
+    assert aerosol.particles is particles
+    assert aerosol.gas is gas
 
 
 def test_source_errors_propagate_and_stop_later_stages(monkeypatch):
@@ -726,13 +680,13 @@ def test_source_errors_propagate_and_stop_later_stages(monkeypatch):
     p1_error = RuntimeError("p1")
     monkeypatch.setattr(
         runnable,
-        "_rate_from_gas",
-        lambda _: (_ for _ in ()).throw(p1_error),
+        "_rate",
+        lambda *_: (_ for _ in ()).throw(p1_error),
     )
     with pytest.raises(RuntimeError, match="p1"):
         runnable.execute(aerosol, 1.0)
 
-    monkeypatch.setattr(runnable, "_rate_from_gas", lambda _: 1.0)
+    monkeypatch.setattr(runnable, "_rate", lambda *_: 1.0)
     p2_error = RuntimeError("p2")
     monkeypatch.setattr(
         particle_process,
@@ -750,11 +704,13 @@ def test_source_errors_propagate_and_stop_later_stages(monkeypatch):
     npt.assert_array_equal(gas.concentration, gas_before)
 
 
-def test_execute_preflights_topology_once(monkeypatch: pytest.MonkeyPatch):
-    """Execution validates facade topology once before its sequential steps."""
+def test_execute_preflights_current_state_each_substep(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    """Execution validates current native topology before each sequential step."""
     aerosol, _, _, _ = _aerosol()
     runnable = _runnable()
-    topology = runnable._topology
+    topology = runnable._state
     calls = 0
 
     def counted_topology(source_aerosol):
@@ -762,11 +718,11 @@ def test_execute_preflights_topology_once(monkeypatch: pytest.MonkeyPatch):
         calls += 1
         return topology(source_aerosol)
 
-    monkeypatch.setattr(runnable, "_topology", counted_topology)
-    monkeypatch.setattr(runnable, "_rate_from_gas", lambda _: 0.0)
+    monkeypatch.setattr(runnable, "_state", counted_topology)
+    monkeypatch.setattr(runnable, "_rate", lambda *_: 0.0)
 
     assert runnable.execute(aerosol, 1.0, sub_steps=3) is aerosol
-    assert calls == 1
+    assert calls == 4
 
 
 def test_later_commit_failure_preserves_prior_substep(
@@ -777,11 +733,11 @@ def test_later_commit_failure_preserves_prior_substep(
     runnable = _runnable()
     commits = 0
 
-    monkeypatch.setattr(runnable, "_rate_from_gas", lambda _: 1.0)
+    monkeypatch.setattr(runnable, "_rate", lambda *_: 1.0)
     monkeypatch.setattr(
         particle_process,
         "_finalize_particle_source",
-        lambda *args: (object(), object()),
+        lambda *args: (object(), _admitted_diagnostics()),
     )
 
     def commit(*args):
@@ -797,7 +753,7 @@ def test_later_commit_failure_preserves_prior_substep(
     with pytest.raises(RuntimeError, match="second P3 transaction"):
         runnable.execute(aerosol, 2.0, sub_steps=2)
     assert commits == 2
-    npt.assert_array_equal(gas.concentration, [[0.5e-12]])
+    npt.assert_array_equal(gas.concentration, [[0.5e-12, 2e-6]])
 
 
 def test_real_later_commit_failure_preserves_prior_substep() -> None:

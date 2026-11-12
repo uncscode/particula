@@ -160,10 +160,11 @@ Each source attempt stages before writing, retains array identities, and
 restores attempted particle/gas writes if a CPU writer fails. Earlier committed
 substeps remain applied when a later attempt fails. The small
 `docs/Examples/Nucleation/cpu_nucleation.py` example exercises this native API
-at non-unit volume with inert gas in the unified container. Transitional
-`LegacyNucleation`, available only in `particula.dynamics.particle_process`,
-retains the old constructor environment and facade behavior for compatibility
-tests until M6; it is not exported from `particula.dynamics`.
+at non-unit volume with inert gas in the unified container. The former
+`LegacyNucleation` compatibility runnable has been removed. Construct
+`Nucleation(source_config, commit_config)` and keep environmental state on
+the native aerosol; no constructor-time environment copy or facade cache
+synchronization is required.
 
 The direct GPU `nucleation_step_gpu` requires a separately prepared
 `NucleationSpeciesBinding` for tagged resolved storage. Create it with

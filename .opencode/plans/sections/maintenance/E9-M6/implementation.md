@@ -224,3 +224,37 @@ Validation (repository .venv, writable Warp cache where applicable):
 
 Remaining facade consumers, definition deletion, GPU untagged removal,
 publication warning cleanup and final frozen-revision gates remain pending.
+
+## Legacy nucleation runnable removal
+
+Deleted `LegacyNucleation` (constructor-owned environment, facade topology and
+cache synchronization, legacy source dispatch) from `particle_process.py`.
+Native Nucleation's scientific implementation is unchanged. Updated commit
+control units and the native scientific-process guide. Native source test guards
+now use the common facade-free fixture and survive subsequent module deletion.
+
+`nucleation_assertions.json` preserves and maps all **27 original runnable test
+functions**. Migrated the fixture to explicitly tagged particles and unified
+precursor/inert gas with a species map. Existing independent sequential transfer
+math, live-gas depletion, held identities, inert preservation, capacity failure,
+earlier-substep retention, zero admission/rate and invalid-input checks remain.
+Native ownership replaces only obsolete compatibility assertions: held
+environment validation instead of a constructor environment, per-substep state
+validation instead of one facade lookup, shared immutable commit controls instead
+of fresh legacy configs, and direct arrays/derived properties instead of caches.
+Environment type rejection is also covered by `aerosol_test::test_wrong_container`.
+
+Validation:
+- Dynamics runnable and nucleation suites plus native scientific/sequence
+  integrations: **1024 passed in 3.33s**, `/tmp/m6-nucleation-broad.log`.
+- Nucleation and custom-source examples plus native aggregate tests with
+  `-Werror --no-cov`: **16 passed in 2.73s**,
+  `/tmp/m6-nucleation-examples.log`.
+- Full package mypy: clean, 552 files, `/tmp/m6-nucleation-mypy.log`.
+- Scoped Ruff passed; formatted one test after its expected-message adjustment.
+- Initial focused diagnostic: 71 passed, one outdated native schema-message
+  expectation; corrected in the passing broader run. No numerical changes,
+  tolerance changes or lost scientific assertion were used to pass.
+
+The common aggregate still has legacy condensation/coagulation/wall-loss paths;
+those consumers and their strategies must migrate before facade deletion.

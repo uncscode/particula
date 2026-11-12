@@ -3256,7 +3256,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Migrated every original test function to native source execution; detailed map in nucleation_assertions.json. Facade caches and legacy constructor/environment/config reconstruction replaced with native ownership assertions.",
       "test_nodes": [
         {
           "name": "test_public_surface_exports_only_supported_p5_types",

@@ -29,23 +29,8 @@ from particula.util.constants import AVOGADRO_NUMBER
 
 
 @pytest.fixture(autouse=True)
-def forbid_legacy_construction(monkeypatch):
-    """Native transactions never construct legacy facades."""
-    from particula._legacy_aerosol import Aerosol as LegacyAerosol
-    from particula.gas.atmosphere import Atmosphere
-    from particula.gas.species import GasSpecies
-    from particula.particles.representation import ParticleRepresentation
-
-    def forbidden(*args, **kwargs):
-        raise AssertionError("native source constructed a legacy facade")
-
-    for carrier in (
-        LegacyAerosol,
-        Atmosphere,
-        GasSpecies,
-        ParticleRepresentation,
-    ):
-        monkeypatch.setattr(carrier, "__init__", forbidden)
+def forbid_legacy_construction(forbid_legacy_facades):
+    """Native transactions never construct or import removed facades."""
 
 
 def fixture(volume=0.25, capacity=4):
