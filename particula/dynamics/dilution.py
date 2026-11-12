@@ -25,7 +25,6 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
-from particula._legacy_aerosol import Aerosol as LegacyAerosol
 from particula.aerosol import Aerosol
 from particula.aerosol_validation import validate_aerosol_structure
 from particula.util.validate_inputs import validate_inputs
@@ -44,6 +43,8 @@ def _preflight_native_dilution(
     storage receive the same decay; volume normalization is only for rates.
     Protected-field aliases reject even for zero-work calls.
     """
+    if not isinstance(aerosol, Aerosol):
+        raise TypeError("dilution requires a native Aerosol")
     particles, gas, environment = (
         aerosol.particles,
         aerosol.gas,
@@ -394,223 +395,18 @@ def _preflight_concentration(
     return candidate_array
 
 
-def _preflight_dilution_aerosol(
-    aerosol: Aerosol | LegacyAerosol,
-    coefficient: np.float64,
-    time_step: np.float64,
-) -> dict[str, Any]:
-    """Select explicit native or retained legacy concentration admission."""
-    if isinstance(aerosol, Aerosol):
-        return _preflight_native_dilution(aerosol, coefficient, time_step)
-    return _preflight_legacy_dilution_aerosol(aerosol, coefficient, time_step)
-
-
-def _preflight_legacy_dilution_aerosol(
-    aerosol: LegacyAerosol,
-    coefficient: np.float64,
-    time_step: np.float64,
-) -> dict[str, Any]:
-    """Validate supported dilution state and candidates before any write.
-
-    This concrete-path preflight validates physical particle and gas sources,
-    particle storage, and particle volume; it also computes shape-compatible
-    finite candidates and captures rollback state. Therefore a malformed
-    supported aerosol fails without changing a concentration, including for a
-    zero elapsed time or dilution coefficient.
-
-    Args:
-        aerosol: Aerosol whose supported concentration state is inspected.
-        coefficient: Validated nonnegative dilution coefficient [s⁻¹].
-        time_step: Validated nonnegative elapsed time [s].
-
-    Returns:
-        Sources, candidates, and rollback snapshots for a subsequent atomic
-        commit.
-
-    Raises:
-        TypeError: If the aerosol does not provide the supported concentration
-            protocol or a required concentration or storage value is not
-            numeric.
-        ValueError: If a source, particle volume, stored concentration, or
-            candidate is invalid or has an incompatible shape.
-    """
-    try:
-        particle = aerosol.particles
-        gas_containers = (
-            aerosol.atmosphere.partitioning_species,
-            aerosol.atmosphere.gas_only_species,
-        )
-        particle_storage = particle.concentration
-        particle_volume = particle.get_volume()
-    except AttributeError as error:
-        raise TypeError(
-            "Aerosol dilution requires supported concentration state."
-        ) from error
-    if particle.data.n_boxes != 1:
-        raise ValueError("Aerosol dilution supports exactly one particle box.")
-    try:
-        particle_source = particle.get_concentration()
-    except (AttributeError, TypeError, ValueError) as error:
-        raise TypeError("particle concentration must be numeric.") from error
-    gas_sources: list[object] = []
-    for gas, name in zip(
-        gas_containers,
-        ("partitioning gas concentration", "gas-only concentration"),
-        strict=True,
-    ):
-        try:
-            gas_sources.append(gas.get_concentration())
-        except (AttributeError, TypeError, ValueError) as error:
-            raise TypeError(f"{name} must be numeric.") from error
-
-    particle_source_array = _preflight_concentration(
-        particle_source, particle_source, "particle concentration"
-    )
-    partitioning_source = _preflight_concentration(
-        gas_sources[0], gas_sources[0], "partitioning gas concentration"
-    )
-    gas_only_source = _preflight_concentration(
-        gas_sources[1], gas_sources[1], "gas-only concentration"
-    )
-    particle_storage_array = _preflight_concentration(
-        particle_storage,
-        particle_storage,
-        "particle concentration storage",
-    )
-    if particle_storage_array.shape != particle_source_array.shape:
-        raise ValueError(
-            "stored particle concentration must match the particle "
-            "concentration shape."
-        )
-    try:
-        volume = np.asarray(particle_volume, dtype=np.float64)
-    except (TypeError, ValueError, OverflowError) as error:
-        raise TypeError("particle volume must be numeric.") from error
-    if volume.ndim != 0 or not np.isfinite(volume) or volume <= 0.0:
-        raise ValueError("particle volume must be a finite positive scalar.")
-
-    partitioning_candidate = _preflight_concentration(
-        get_dilution_step(coefficient, partitioning_source, time_step),
-        partitioning_source,
-        "partitioning gas concentration",
-    )
-    gas_only_candidate = _preflight_concentration(
-        get_dilution_step(coefficient, gas_only_source, time_step),
-        gas_only_source,
-        "gas-only concentration",
-    )
-    decay = get_dilution_step(coefficient, 1.0, time_step)
-    with np.errstate(over="ignore", invalid="ignore"):
-        stored_particle_candidate = particle_storage_array * decay
-    stored_particle_candidate = _preflight_concentration(
-        stored_particle_candidate,
-        particle_storage_array,
-        "stored particle concentration",
-    )
-
-    try:
-        gas_snapshots = tuple(
-            _snapshot_gas_backing_state(gas) for gas in gas_containers
-        )
-    except (AttributeError, TypeError, ValueError) as error:
-        raise TypeError(
-            "Aerosol dilution requires supported gas concentration storage."
-        ) from error
-    return {
-        "particle": particle,
-        "gas_containers": gas_containers,
-        "particle_candidate": stored_particle_candidate,
-        "gas_candidates": (partitioning_candidate, gas_only_candidate),
-        "particle_snapshot": _snapshot_particle_backing_state(particle),
-        "gas_snapshots": gas_snapshots,
-    }
-
-
-def _snapshot_gas_backing_state(
-    gas: Any,
-) -> tuple[Any, NDArray[np.float64], Any | None]:
-    """Capture direct gas backing state for setter-independent rollback.
-
-    Args:
-        gas: Gas container providing a ``data.concentration`` backing array.
-
-    Returns:
-        Backing data object, copied concentration, and concentration-mode state.
-    """
-    data = gas.data
-    return (
-        data,
-        np.copy(np.asarray(data.concentration)),
-        getattr(gas, "_single_species_concentration_mode", None),
-    )
-
-
-def _snapshot_particle_backing_state(
-    particle: Any,
-) -> tuple[Any, NDArray[np.float64], Any | None]:
-    """Capture direct particle backing state for setter-independent rollback.
-
-    Args:
-        particle: Particle container providing a ``data.concentration`` backing
-            array.
-
-    Returns:
-        Backing data object, copied concentration, and private data state.
-    """
-    data = particle.data
-    return (
-        data,
-        np.copy(np.asarray(data.concentration)),
-        getattr(particle, "_data", None),
-    )
-
-
-def _restore_particle_backing_state(
-    particle: Any,
-    snapshot: tuple[Any, NDArray[np.float64], Any | None],
-) -> None:
-    """Restore particle backing state without invoking its public setter.
-
-    Args:
-        particle: Particle container whose state should be restored.
-        snapshot: Backing state captured before commit.
-    """
-    data, concentration, private_data = snapshot
-    data.concentration[...] = concentration
-    if hasattr(particle, "_data"):
-        particle._data = private_data if private_data is not None else data
-
-
-def _restore_gas_backing_state(
-    gas: Any,
-    snapshot: tuple[Any, NDArray[np.float64], Any | None],
-) -> None:
-    """Restore gas backing state without invoking its public setter.
-
-    Args:
-        gas: Gas container whose state should be restored.
-        snapshot: Backing state captured before commit.
-    """
-    data, concentration, concentration_mode = snapshot
-    data.concentration[...] = concentration
-    if hasattr(gas, "_data"):
-        gas._data = data
-    if hasattr(gas, "_single_species_concentration_mode"):
-        gas._single_species_concentration_mode = concentration_mode
-
-
 def dilute_aerosol(
-    aerosol: "Aerosol | LegacyAerosol",
+    aerosol: "Aerosol",
     coefficient: float | np.number,
     time_step: float | np.number,
-) -> "Aerosol | LegacyAerosol":
+) -> "Aerosol":
     """Dilute an aerosol's particle and gas concentrations in place.
 
     Applies ``c_new = c * exp(-coefficient * time_step)`` to physical
-    particle-number concentration and, in order, the atmosphere's partitioning
-    and gas-only concentrations. Before writing, it validates every supported
+    particle concentration storage and every gas lane, including inert species.
+    Before writing, it validates every supported
     source, particle-storage representation, volume, and candidate. Thus,
-    preflight failures are atomic; an unexpected later setter failure restores
+    preflight failures are atomic; an unexpected later write failure restores
     concentrations already written from snapshots before reraising the
     original exception. This low-level helper is deliberately concrete-module
     only; construct :class:`DilutionStrategy` for the public API.
@@ -637,52 +433,14 @@ def dilute_aerosol(
     )
     time_step_scalar = _validate_nonnegative_scalar(time_step, "time_step")
 
-    preflight = _preflight_dilution_aerosol(
+    preflight = _preflight_native_dilution(
         aerosol,
         coefficient_scalar,
         time_step_scalar,
     )
     if coefficient_scalar == 0.0 or time_step_scalar == 0.0:
         return aerosol
-    if isinstance(aerosol, Aerosol):
-        _commit_native_dilution(preflight)
-        return aerosol
-    particle = preflight["particle"]
-    gas_containers = preflight["gas_containers"]
-    stored_particle_candidate = preflight["particle_candidate"]
-    gas_candidates = preflight["gas_candidates"]
-    particle_snapshot = preflight["particle_snapshot"]
-    gas_snapshots = preflight["gas_snapshots"]
-    written: list[Any] = []
-    try:
-        written.append(particle)
-        particle.concentration = stored_particle_candidate
-        for gas, candidate in zip(
-            gas_containers,
-            gas_candidates,
-            strict=True,
-        ):
-            written.append(gas)
-            gas.set_concentration(candidate)
-    except Exception as original_error:
-        rollback_error: Exception | None = None
-        for container in reversed(written):
-            try:
-                if container is particle:
-                    _restore_particle_backing_state(
-                        container, particle_snapshot
-                    )
-                else:
-                    gas_index = gas_containers.index(container)
-                    _restore_gas_backing_state(
-                        container,
-                        gas_snapshots[gas_index],
-                    )
-            except Exception as error:  # pragma: no cover - diagnostic path
-                rollback_error = error
-        if rollback_error is not None:
-            raise original_error from rollback_error
-        raise
+    _commit_native_dilution(preflight)
     return aerosol
 
 
@@ -711,9 +469,7 @@ class DilutionStrategy:
             coefficient, "coefficient"
         )
 
-    def rate(
-        self, aerosol: "Aerosol | LegacyAerosol"
-    ) -> float | NDArray[np.float64]:
+    def rate(self, aerosol: "Aerosol") -> float | NDArray[np.float64]:
         """Calculate the particle-number dilution rate.
 
         Args:
@@ -723,21 +479,16 @@ class DilutionStrategy:
             Particle-number concentration rate [1/(m³ s)] with the scalar or
             array shape of the physical particle-number concentration.
         """
-        if isinstance(aerosol, Aerosol):
-            _preflight_native_dilution(
-                aerosol, self.coefficient, np.float64(0), writable=False
-            )
-            concentration = aerosol.particles.concentration[0]
-            if aerosol.particles.distribution_type == "particle_resolved":
-                with np.errstate(over="ignore", invalid="ignore"):
-                    concentration = concentration / aerosol.particles.volume[0]
-            return get_dilution_rate(self.coefficient, concentration)
-        concentration = aerosol.particles.get_concentration()
+        _preflight_native_dilution(
+            aerosol, self.coefficient, np.float64(0), writable=False
+        )
+        concentration = aerosol.particles.concentration[0]
+        if aerosol.particles.distribution_type == "particle_resolved":
+            with np.errstate(over="ignore", invalid="ignore"):
+                concentration = concentration / aerosol.particles.volume[0]
         return get_dilution_rate(self.coefficient, concentration)
 
-    def _preflight(
-        self, aerosol: "Aerosol | LegacyAerosol", time_step: np.float64
-    ) -> None:
+    def _preflight(self, aerosol: "Aerosol", time_step: np.float64) -> None:
         """Validate supported aerosol state before runnable substeps.
 
         Args:
@@ -749,18 +500,18 @@ class DilutionStrategy:
                 numeric.
             ValueError: If supported aerosol state cannot be safely diluted.
         """
-        _preflight_dilution_aerosol(aerosol, self.coefficient, time_step)
+        _preflight_native_dilution(aerosol, self.coefficient, time_step)
 
     def step(
         self,
-        aerosol: "Aerosol | LegacyAerosol",
+        aerosol: "Aerosol",
         time_step: float | np.number,
-    ) -> "Aerosol | LegacyAerosol":
+    ) -> "Aerosol":
         """Apply one validated, atomic in-place aerosol dilution step.
 
         Validates the concrete aerosol state and every candidate before its
         first write. A preflight failure leaves the aerosol unchanged; a later
-        setter failure restores previously written concentration backing state.
+        write failure restores previously written concentration backing state.
 
         Args:
             aerosol: Aerosol whose particle and gas concentrations are diluted.

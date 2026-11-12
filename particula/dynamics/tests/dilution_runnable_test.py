@@ -5,65 +5,15 @@
 import numpy as np
 import numpy.testing as npt
 import pytest
-from particula._legacy_aerosol import Aerosol
+from particula.aerosol import Aerosol
 from particula.dynamics.dilution import DilutionStrategy, get_dilution_rate
 from particula.dynamics.particle_process import Dilution
-from particula.gas.atmosphere import Atmosphere
-from particula.gas.species import GasSpecies
-from particula.particles.activity_strategies import ActivityIdealMass
-from particula.particles.distribution_strategies import MassBasedMovingBin
-from particula.particles.representation import ParticleRepresentation
-from particula.particles.surface_strategies import SurfaceStrategyVolume
+from particula.dynamics.tests.dilution_test import (
+    _concentrations,
+    _make_aerosol,
+)
 from particula.runnable import Aerosol as AerosolLike
 from particula.runnable import RunnableABC, RunnableSequence
-
-
-def _make_aerosol() -> Aerosol:
-    """Build a deterministic aerosol with particle and gas concentrations."""
-    particles = ParticleRepresentation(
-        strategy=MassBasedMovingBin(),
-        activity=ActivityIdealMass(),
-        surface=SurfaceStrategyVolume(),
-        distribution=np.array([1e-18, 2e-18], dtype=np.float64),
-        density=np.array([1000.0], dtype=np.float64),
-        concentration=np.array([4.0, 8.0], dtype=np.float64),
-        charge=np.array([1.0, -1.0], dtype=np.float64),
-        volume=2.0,
-    )
-    partitioning = GasSpecies(
-        name="partitioning",
-        molar_mass=0.1,
-        concentration=3.0,
-        partitioning=True,
-    )
-    gas_only = GasSpecies(
-        name=np.array(["gas_a", "gas_b"]),
-        molar_mass=np.array([0.02, 0.03], dtype=np.float64),
-        concentration=np.array([5.0, 7.0], dtype=np.float64),
-        partitioning=False,
-    )
-    atmosphere = Atmosphere(
-        temperature=298.15,
-        total_pressure=101325.0,
-        partitioning_species=partitioning,
-        gas_only_species=gas_only,
-    )
-    return Aerosol(atmosphere=atmosphere, particles=particles)
-
-
-def _concentrations(
-    aerosol: Aerosol,
-) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """Copy all concentration domains from an aerosol."""
-    return (
-        aerosol.particles.get_concentration().copy(),
-        np.asarray(
-            aerosol.atmosphere.partitioning_species.get_concentration()
-        ).copy(),
-        np.asarray(
-            aerosol.atmosphere.gas_only_species.get_concentration()
-        ).copy(),
-    )
 
 
 @pytest.mark.parametrize(
@@ -171,8 +121,8 @@ def test_dilution_execute_substeps_matches_exact_decay(sub_steps):
         npt.assert_allclose(result, source * decay, rtol=1e-12, atol=0.0)
 
 
-def test_concrete_dilution_executes_one_total_duration_step(monkeypatch):
-    """Concrete exact dilution avoids partial mutations across substeps."""
+def test_concrete_dilution_executes_equal_native_substeps(monkeypatch):
+    """Concrete native dilution retains equal substep delegation."""
     aerosol = _make_aerosol()
     strategy = DilutionStrategy(0.25)
     calls: list[float] = []
@@ -186,7 +136,7 @@ def test_concrete_dilution_executes_one_total_duration_step(monkeypatch):
 
     assert Dilution(strategy).execute(aerosol, 4.0, sub_steps=4) is aerosol
 
-    npt.assert_allclose(calls, [4.0])
+    npt.assert_allclose(calls, [1.0] * 4)
 
 
 @pytest.mark.parametrize("coefficient, time_step", [(0.0, 2.0), (0.5, 0.0)])
@@ -207,7 +157,7 @@ def test_concrete_dilution_preflights_before_first_substep(
 ):
     """Malformed concrete state raises before runnable strategy delegation."""
     aerosol = _make_aerosol()
-    aerosol.particles.data.concentration[0, 0] = np.nan
+    aerosol.particles.concentration[0, 0] = np.nan
     strategy = DilutionStrategy(0.25)
     calls: list[float] = []
     original_step = strategy.step
@@ -218,7 +168,9 @@ def test_concrete_dilution_preflights_before_first_substep(
 
     monkeypatch.setattr(strategy, "step", record_step)
 
-    with pytest.raises(ValueError, match="particle concentration"):
+    with pytest.raises(
+        ValueError, match="particle data must have finite physical values"
+    ):
         Dilution(strategy).execute(aerosol, time_step, sub_steps=2)
 
     assert calls == []

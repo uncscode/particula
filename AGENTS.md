@@ -361,7 +361,7 @@ aerosol = dilution.execute(aerosol, time_step=10.0, sub_steps=2)
   `particula.dynamics`.
 - The concrete strategy validates particle and gas concentration/storage state
   before mutation. Preflight failures leave the aerosol unchanged; unexpected
-  setter failures restore already-written concentration state.
+  array-write failures restore already-written concentration state.
 - `Dilution.execute()` performs concrete-strategy preflight before its first
   equal substep. Custom compatible strategies retain generic equal-substep
   delegation and own validation and atomicity.
