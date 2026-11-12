@@ -3,6 +3,8 @@
 import numpy as np
 import pytest
 from particula import Aerosol, AerosolBuilder
+from particula.gas import EnvironmentData, GasData
+from particula.particles import ParticleData
 from particula.tests.aerosol_replacement_test import assert_unchanged, snapshot
 from particula.tests.aerosol_test import native_triple
 
@@ -77,3 +79,50 @@ def test_set_parameters_and_revalidation():
     g.name[0] = ""
     with pytest.raises(ValueError, match="nonblank"):
         builder.build()
+
+
+@pytest.mark.parametrize(
+    ("particle_width", "gas_width", "partitioning"),
+    [
+        (1, 1, False),
+        (1, 1, True),
+        (2, 1, True),
+        (3, 3, True),
+        (2, 3, True),
+        (2, 2, True),
+    ],
+)
+def test_independent_species_widths(particle_width, gas_width, partitioning):
+    """Construction owns storage; processes own material-to-gas mapping."""
+    particles = ParticleData(
+        masses=np.full((1, 2, particle_width), 1e-18),
+        concentration=np.array([[4.0, 8.0]]),
+        charge=np.zeros((1, 2)),
+        density=np.full(particle_width, 1000.0),
+        volume=np.array([2.0]),
+        distribution_type="particle_resolved",
+    )
+    gas = GasData(
+        name=[f"species_{i}" for i in range(gas_width)],
+        molar_mass=np.full(gas_width, 0.1),
+        concentration=np.zeros((1, gas_width)),
+        partitioning=np.full(gas_width, partitioning),
+    )
+    environment = EnvironmentData(
+        temperature=np.array([298.15]),
+        pressure=np.array([101325.0]),
+        saturation_ratio=np.zeros((1, gas_width)),
+    )
+    saved = snapshot((particles, gas, environment))
+    aerosol = (
+        AerosolBuilder()
+        .set_particles(particles)
+        .set_gas(gas)
+        .set_environment(environment)
+        .build()
+    )
+    assert isinstance(aerosol, Aerosol)
+    assert aerosol.particles is particles
+    assert aerosol.gas is gas
+    assert aerosol.environment is environment
+    assert_unchanged(saved)

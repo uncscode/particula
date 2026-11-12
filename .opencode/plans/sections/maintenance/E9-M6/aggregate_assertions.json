@@ -1,0 +1,65 @@
+[
+  {
+    "file": "particula/tests/legacy_aerosol_test.py",
+    "test": "test_str",
+    "original": "def test_str(self):\n        \"\"\"Test the __str__ method of the Aerosol class.\"\"\"\n        result = str(self.aerosol)\n        self.assertIn(\"Gas mixture\", result)\n        self.assertIn(\"Particle Representation\", result)",
+    "successor": "particula/tests/aerosol_test.py::test_native_identity_current_values",
+    "disposition": "Native rendering includes all three current containers; facade-specific display labels removed."
+  },
+  {
+    "file": "particula/tests/legacy_aerosol_test.py",
+    "test": "test_replace_atmosphere",
+    "original": "def test_replace_atmosphere(self):\n        \"\"\"Test the replace_atmosphere method of the Aerosol class.\"\"\"\n        new_atmosphere = self.atmosphere\n        self.aerosol.replace_atmosphere(new_atmosphere)\n        self.assertEqual(self.aerosol.atmosphere, new_atmosphere)",
+    "successor": "particula/tests/aerosol_replacement_test.py::test_individual_identity_and_peers",
+    "disposition": "Same-object and new-object native replacements preserve identities and peers; atmosphere ownership is split into gas and environment."
+  },
+  {
+    "file": "particula/tests/legacy_aerosol_test.py",
+    "test": "test_replace_particles",
+    "original": "def test_replace_particles(self):\n        \"\"\"Test the add_particle method of the Aerosol class.\"\"\"\n        new_particle = self.particle\n        self.aerosol.replace_particles(new_particle)\n        self.assertEqual(self.aerosol.particles, new_particle)",
+    "successor": "particula/tests/aerosol_replacement_test.py::test_individual_identity_and_peers",
+    "disposition": "Same-object and new-object native replacements preserve identities and peers; atmosphere ownership is split into gas and environment."
+  },
+  {
+    "file": "particula/tests/legacy_aerosol_builder_test.py",
+    "test": "test_no_species_passes",
+    "original": "def test_no_species_passes(self):\n        \"\"\"Validation passes when no gas species are present.\"\"\"\n        atm = _build_atmosphere(0)\n        pr = _speciated_clone(self.base_particle, 1)\n        AerosolBuilder().set_atmosphere(atm).set_particles(\n            pr\n        )._validate_species_length()",
+    "successor": "particula/tests/aerosol_builder_test.py::test_independent_species_widths",
+    "disposition": "No partitioning species is retained as explicit all-false GasData. Native GasData requires at least one named lane; an absent Atmosphere species object is obsolete."
+  },
+  {
+    "file": "particula/tests/legacy_aerosol_builder_test.py",
+    "test": "test_single_species_match_passes",
+    "original": "def test_single_species_match_passes(self):\n        \"\"\"Validation passes when one gas species matches one particle\n        species.\n        \"\"\"\n        atm = _build_atmosphere(1)\n        pr = _speciated_clone(self.base_particle, 1)\n        AerosolBuilder().set_atmosphere(atm).set_particles(\n            pr\n        )._validate_species_length()",
+    "successor": "particula/tests/aerosol_builder_test.py::test_independent_species_widths",
+    "disposition": "Native aggregate build preserves identities for independent particle/gas widths; former equal-width restriction is obsolete because process maps own correspondence."
+  },
+  {
+    "file": "particula/tests/legacy_aerosol_builder_test.py",
+    "test": "test_single_species_mismatch_raises",
+    "original": "def test_single_species_mismatch_raises(self):\n        \"\"\"Validation fails when one gas species does NOT match two particle\n        species.\n        \"\"\"\n        atm = _build_atmosphere(1)\n        pr = _speciated_clone(self.base_particle, 2)\n        with self.assertRaises(ValueError):\n            AerosolBuilder().set_atmosphere(atm).set_particles(\n                pr\n            )._validate_species_length()",
+    "successor": "particula/tests/aerosol_builder_test.py::test_independent_species_widths",
+    "disposition": "Native aggregate build preserves identities for independent particle/gas widths; former equal-width restriction is obsolete because process maps own correspondence."
+  },
+  {
+    "file": "particula/tests/legacy_aerosol_builder_test.py",
+    "test": "test_three_species_match_passes",
+    "original": "def test_three_species_match_passes(self):\n        \"\"\"Validation passes when three gas species match three particle\n        species.\n        \"\"\"\n        atm = _build_atmosphere(3)\n        pr = _speciated_clone(self.base_particle, 3)\n        AerosolBuilder().set_atmosphere(atm).set_particles(\n            pr\n        )._validate_species_length()",
+    "successor": "particula/tests/aerosol_builder_test.py::test_independent_species_widths",
+    "disposition": "Native aggregate build preserves identities for independent particle/gas widths; former equal-width restriction is obsolete because process maps own correspondence."
+  },
+  {
+    "file": "particula/tests/legacy_aerosol_builder_test.py",
+    "test": "test_three_species_mismatch_raises",
+    "original": "def test_three_species_mismatch_raises(self):\n        \"\"\"Validation fails when three gas species do NOT match two particle\n        species.\n        \"\"\"\n        atm = _build_atmosphere(3)\n        pr = _speciated_clone(self.base_particle, 2)\n        with self.assertRaises(ValueError):\n            AerosolBuilder().set_atmosphere(atm).set_particles(\n                pr\n            )._validate_species_length()",
+    "successor": "particula/tests/aerosol_builder_test.py::test_independent_species_widths",
+    "disposition": "Native aggregate build preserves identities for independent particle/gas widths; former equal-width restriction is obsolete because process maps own correspondence."
+  },
+  {
+    "file": "particula/tests/legacy_aerosol_builder_test.py",
+    "test": "test_full_build_returns_aerosol",
+    "original": "def test_full_build_returns_aerosol(self):\n        \"\"\"Ensure a fully-configured builder returns an Aerosol instance.\"\"\"\n        atm = _build_atmosphere(2)  # 2 partitioning species\n        pr = _speciated_clone(self.base_particle, 2)  # 2 particle species\n        aerosol = AerosolBuilder().set_atmosphere(atm).set_particles(pr).build()\n        self.assertIsInstance(aerosol, Aerosol)",
+    "successor": "particula/tests/aerosol_builder_test.py::test_independent_species_widths",
+    "disposition": "Native aggregate build preserves identities for independent particle/gas widths; former equal-width restriction is obsolete because process maps own correspondence."
+  }
+]

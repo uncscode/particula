@@ -714,3 +714,37 @@ Validation:
   condensation strategy module or condensation test tree.
 Final untargeted coverage, supported notebook execution, full publication and
 installed-wheel checks remain pending; no overall readiness claim is made.
+
+## Remove the legacy aggregate and its remaining execution fixture
+
+Deleted `_legacy_aerosol.py` after migrating the remaining real CPU-adapter
+fixture to native particle/gas/environment storage. Particle count divided by
+its explicit 2 m^3 volume retains the previous number-density observation;
+partitioning and inert gas lanes retain their concentrations. The original
+exponential dilution oracle (`rtol=1e-12`, `atol=0`) and adapter lifecycle
+assertions are unchanged.
+
+Reviewed all nine legacy aggregate tests in `aggregate_assertions.json`.
+Rendering and same-object replacement have existing native successors. Added
+six native builder cases for independent material/gas widths, including an
+all-nonpartitioning gas case. The former equal-width restriction is obsolete:
+process maps own species correspondence. An absent legacy partitioning species
+is represented by explicit all-false gas metadata, not an empty native gas
+container (GasData requires at least one named lane).
+
+Added `legacy_api_removal_test.py` to check that the concrete legacy aggregate
+module is absent for the intended reason and native public construction/building
+still preserve all held identities. Remaining `_legacy_aerosol` references in
+package sources are only the removal-safe guard and negative tests.
+
+Validation:
+- Focused aggregate, replacement, builder, adapter and guard suites:
+  **239 passed in 5.63s**, `/tmp/m6-aggregate-focused.log`.
+- Root package tests, integration and execution suites, including the new
+  removed-module test: **1759 passed, 53 skipped in 90.67s**,
+  `/tmp/m6-aggregate-broad.log`.
+- Full-package mypy: **553 files passed**, `/tmp/m6-aggregate-mypy.log`.
+- All nine assertion successor symbols resolve to existing native tests;
+  scoped Ruff/format and whitespace checks passed.
+Final full coverage, remaining facade/GPU removal, notebook publication and
+installed-wheel gates remain pending.
