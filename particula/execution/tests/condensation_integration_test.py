@@ -7,7 +7,6 @@ without using the CPU runnable as an oracle.
 
 from __future__ import annotations
 
-from contextlib import nullcontext
 from dataclasses import dataclass
 from typing import Any, cast
 
@@ -15,12 +14,15 @@ import numpy as np
 import numpy.testing as npt
 import pytest
 
-from particula._legacy_aerosol import Aerosol
+from particula.aerosol import Aerosol
 from particula.dynamics import CondensationIsothermal, MassCondensation
 from particula.dynamics.condensation.mass_transfer import (
     get_first_order_mass_transport_k,
     get_mass_transfer_rate,
     get_mass_transfer_rate_latent_heat,
+)
+from particula.dynamics.condensation.species_mapping import (
+    CondensationSpeciesMap,
 )
 from particula.execution import (
     CondensationActivityMode,
@@ -38,8 +40,7 @@ from particula.execution.adapters.condensation import (
     WarpCondensationExecutionState,
     WarpCondensationState,
 )
-from particula.gas import AtmosphereBuilder, EnvironmentData, GasSpecies
-from particula.gas.gas_data import GasData
+from particula.gas import EnvironmentData, GasData
 from particula.gas.properties.dynamic_viscosity import get_dynamic_viscosity
 from particula.gas.properties.mean_free_path import get_molecule_mean_free_path
 from particula.gas.properties.pressure_function import get_partial_pressure
@@ -51,11 +52,9 @@ from particula.gas.vapor_pressure_strategies import (
 )
 from particula.particles import (
     ActivityIdealMass,
-    ParticleResolvedSpeciatedMass,
-    ResolvedParticleMassRepresentationBuilder,
+    ParticleData,
     SurfaceStrategyVolume,
 )
-from particula.particles.particle_data import ParticleData
 from particula.particles.properties.kelvin_effect_module import (
     get_kelvin_radius,
     get_kelvin_term,
@@ -106,52 +105,46 @@ def _configuration(*, latent_heat: bool = False) -> CondensationExecutionConfig:
     )
 
 
-def _build_legacy_cpu_state(
+def _build_native_cpu_state(
     case: str, time_step: float = 0.1
 ) -> CPUCondensationExecutionState:
-    """Build a real one-box legacy aerosol state for a named CPU case."""
+    """Build a real one-box native aerosol state for a named CPU case."""
     vapor_pressure = 1.0e5 if case == "evaporation" else 1.0e-10
     gas_concentration = 0.0 if case == "zero_gas" else 1.0e-6
     particle_concentration = 0.0 if case == "inactive" else 1.0e6
-    gas = GasSpecies(
-        name="vapor",
-        molar_mass=0.018,
-        vapor_pressure_strategy=ConstantVaporPressureStrategy(vapor_pressure),
-        concentration=gas_concentration,
+    gas = GasData(
+        name=["vapor", "inert"],
+        molar_mass=np.array([0.018, 0.029]),
+        concentration=np.array([[gas_concentration, 0.0]]),
+        partitioning=np.array([True, False]),
     )
-    inert = GasSpecies(
-        name="inert",
-        molar_mass=0.029,
-        vapor_pressure_strategy=ConstantVaporPressureStrategy(0.0),
-        partitioning=False,
-        concentration=0.0,
+    particles = ParticleData(
+        masses=np.array([[[0.0 if case == "inactive" else 1.0e-18]]]),
+        concentration=np.array([[particle_concentration]]),
+        density=np.array([1000.0]),
+        charge=np.zeros((1, 1)),
+        volume=np.ones(1),
+        distribution_type="particle_resolved",
     )
-    atmosphere = (
-        AtmosphereBuilder()
-        .set_temperature(298.15, "K")
-        .set_pressure(101325.0, "Pa")
-        .set_more_partitioning_species(gas)
-        .set_more_gas_only_species(inert)
-        .build()
+    aerosol = Aerosol(
+        particles=particles,
+        gas=gas,
+        environment=EnvironmentData(
+            temperature=np.array([298.15]),
+            pressure=np.array([101325.0]),
+            saturation_ratio=np.ones((1, 2)),
+        ),
     )
-    particles = (
-        ResolvedParticleMassRepresentationBuilder()
-        .set_distribution_strategy(ParticleResolvedSpeciatedMass())
-        .set_activity_strategy(ActivityIdealMass())
-        .set_surface_strategy(SurfaceStrategyVolume())
-        .set_mass(np.array([[1.0e-18]], dtype=np.float64), "kg")
-        .set_density(np.array([1000.0]), "kg/m^3")
-        .set_charge(0)
-        .set_volume(1.0, "m^3")
-        .build()
-    )
-    particles.concentration = np.array(
-        [particle_concentration], dtype=np.float64
-    )
-    aerosol = Aerosol(atmosphere=atmosphere, particles=particles)
     runnable = MassCondensation(
         CondensationIsothermal(
-            molar_mass=np.array([0.018]),
+            molar_mass=gas.molar_mass,
+            activity_strategy=ActivityIdealMass(),
+            surface_strategy=SurfaceStrategyVolume(),
+            vapor_pressure_strategy=[
+                ConstantVaporPressureStrategy(vapor_pressure),
+                ConstantVaporPressureStrategy(0.0),
+            ],
+            species_map=CondensationSpeciesMap(tuple(gas.name), ((0, 0),)),
             diffusion_coefficient=2.0e-5,
             accommodation_coefficient=1.0,
             update_gases=True,
@@ -673,27 +666,20 @@ def test_cpu_adapter_executes_native_cases_and_conserves_inventory(
     case: str,
 ) -> None:
     """Native CPU adapter preserves identity and concentration-weighted mass."""
-    # Keep evaporation within the legacy model's nonzero-radius regime.
-    state = _build_legacy_cpu_state(
+    # Keep evaporation within the nonzero-radius regime.
+    state = _build_native_cpu_state(
         case,
         time_step=1.0e-12 if case == "evaporation" else 0.1,
     )
     aerosol = state.state.aerosol
     assert isinstance(aerosol, Aerosol)
-    initial_mass = aerosol.particles.get_species_mass(clone=True)
-    concentration = aerosol.particles.get_concentration(clone=True)
-    initial_gas = np.array(
-        aerosol.atmosphere.partitioning_species.get_concentration(), copy=True
-    )
-    warning_context = (
-        pytest.warns(RuntimeWarning, match="All radius values are zero")
-        if case == "inactive"
-        else nullcontext()
-    )
-    with warning_context:
-        result = CPUCondensationExecutionAdapter().execute(state)
-    final_mass = aerosol.particles.get_species_mass(clone=True)
-    final_gas = aerosol.atmosphere.partitioning_species.get_concentration()
+    initial_mass = aerosol.particles.masses[0].copy()
+    concentration = aerosol.particles.concentration[0].copy()
+    initial_gas = np.array(aerosol.gas.concentration[0, :1], copy=True)
+    result = CPUCondensationExecutionAdapter().execute(state)
+    assert aerosol.gas.concentration[0, 1] == 0.0
+    final_mass = aerosol.particles.masses[0].copy()
+    final_gas = aerosol.gas.concentration[0, :1]
     assert isinstance(result, ExecutionResult)
     assert result.backend_result is not None
     assert result.state is state and result.backend_result.value is aerosol
@@ -705,14 +691,13 @@ def test_cpu_adapter_executes_native_cases_and_conserves_inventory(
         atol=1.0e-30,
     )
     if case == "zero_gas":
-        # A gas-free legacy fixture may evaporate, but cannot create uptake.
+        # A gas-free fixture may evaporate, but cannot create uptake.
         assert np.all(final_mass <= initial_mass)
         assert np.all(final_gas >= initial_gas)
     if case == "inactive":
-        # Legacy mass transfer can clear this unweighted slot; it must not
-        # change its zero number concentration or partitioning gas inventory.
+        # Inactive native slots preserve count and gas inventory.
         npt.assert_array_equal(
-            aerosol.particles.get_concentration(clone=True),
+            aerosol.particles.concentration[0].copy(),
             concentration,
         )
         npt.assert_array_equal(final_gas, initial_gas)

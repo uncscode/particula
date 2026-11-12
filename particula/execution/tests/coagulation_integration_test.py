@@ -16,7 +16,7 @@ import numpy.testing as npt
 import pytest
 
 import particula as par
-from particula._legacy_aerosol import Aerosol as LegacyAerosol
+from particula.aerosol import Aerosol
 from particula.execution import ExecutionResult
 from particula.execution.adapters.coagulation import (
     BrownianCoagulationConfig,
@@ -91,26 +91,28 @@ def _inventory(fixture: _Fixture) -> tuple[np.ndarray, np.ndarray]:
 def _make_cpu_aerosol() -> tuple[Any, Any]:
     """Build a real particle-resolved CPU aerosol and Brownian runnable."""
     mass = np.array([1.0e-18, 2.0e-18, 3.0e-18], dtype=np.float64)
-    particles = (
-        par.particles.ResolvedParticleMassRepresentationBuilder()
-        .set_distribution_strategy(
-            par.particles.ParticleResolvedSpeciatedMass()
-        )
-        .set_activity_strategy(par.particles.ActivityIdealMass())
-        .set_surface_strategy(par.particles.SurfaceStrategyVolume())
-        .set_mass(mass, "kg")
-        .set_density(np.array([1000.0]), "kg/m^3")
-        .set_charge(np.array([0.0, 1.0, -1.0]))
-        .set_volume(1.0e-6, "m^3")
-        .build()
+    particles = par.particles.ParticleData(
+        masses=mass.reshape(1, 3, 1),
+        concentration=np.ones((1, 3)),
+        charge=np.array([[0.0, 1.0, -1.0]]),
+        density=np.array([1000.0]),
+        volume=np.array([1.0e-6]),
+        distribution_type="particle_resolved",
     )
-    atmosphere = (
-        par.gas.AtmosphereBuilder()
-        .set_temperature(298.15, temperature_units="K")
-        .set_pressure(101325.0, pressure_units="Pa")
-        .build()
+    aerosol = Aerosol(
+        particles=particles,
+        gas=par.gas.GasData(
+            name=["inert"],
+            molar_mass=np.array([0.029]),
+            concentration=np.zeros((1, 1)),
+            partitioning=np.array([False]),
+        ),
+        environment=par.gas.EnvironmentData(
+            temperature=np.array([298.15]),
+            pressure=np.array([101325.0]),
+            saturation_ratio=np.ones((1, 1)),
+        ),
     )
-    aerosol = LegacyAerosol(atmosphere=atmosphere, particles=particles)
     runnable = par.dynamics.Coagulation(
         par.dynamics.BrownianCoagulationStrategy("particle_resolved")
     )
@@ -289,8 +291,8 @@ def test_cpu_adapter_matches_local_brownian_kernel_reference_and_preserves_ident
     """The real CPU strategy rate matches a local reference before dispatch."""
     aerosol, runnable = _make_cpu_aerosol()
     strategy = runnable.coagulation_strategy
-    radii = aerosol.particles.get_radius()
-    masses = aerosol.particles.get_mass()
+    radii = aerosol.particles.radii[0]
+    masses = aerosol.particles.total_mass[0]
     observed = strategy.kernel(aerosol.particles, 298.15, 101325.0)
     expected = _local_brownian_reference(radii, masses, 298.15, 101325.0)
     npt.assert_allclose(observed, expected, rtol=1e-7, atol=0.0)
@@ -310,10 +312,12 @@ def test_cpu_adapter_matches_local_brownian_kernel_reference_and_preserves_ident
 def test_cpu_adapter_nonzero_step_mutates_and_conserves_particle_mass() -> None:
     """A real nonzero selected CPU call mutates while conserving particle mass."""
     aerosol, runnable = _make_cpu_aerosol()
-    runnable.coagulation_strategy.random_generator = np.random.default_rng(41)
-    before_mass = aerosol.particles.get_mass().copy()
-    before_concentration = aerosol.particles.get_concentration().copy()
-    before_charge = aerosol.particles.get_charge().copy()
+    # Pin a native-path draw with a realized collision; legacy and native
+    # binning need not consume identical random trajectories.
+    runnable.coagulation_strategy.random_generator = np.random.default_rng(0)
+    before_mass = aerosol.particles.total_mass[0].copy()
+    before_concentration = aerosol.particles.concentration[0].copy()
+    before_charge = aerosol.particles.charge[0].copy()
     request = CPUCoagulationExecutionState(
         CPUCoagulationState(BrownianCoagulationConfig(), aerosol),
         1.0e14,
@@ -323,9 +327,9 @@ def test_cpu_adapter_nonzero_step_mutates_and_conserves_particle_mass() -> None:
 
     result = CPUCoagulationExecutionAdapter().execute(request)
 
-    after_mass = aerosol.particles.get_mass()
-    after_concentration = aerosol.particles.get_concentration()
-    after_charge = aerosol.particles.get_charge()
+    after_mass = aerosol.particles.total_mass[0]
+    after_concentration = aerosol.particles.concentration[0]
+    after_charge = aerosol.particles.charge[0]
     assert result.backend_result is not None
     cpu_result = cast(CPUCoagulationResult, result.backend_result.value)
     assert cpu_result.aerosol is aerosol

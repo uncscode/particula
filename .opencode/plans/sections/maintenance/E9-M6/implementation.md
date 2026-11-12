@@ -155,3 +155,36 @@ an adapter replacement sentinel cast to its declared native contract.
   group: **279 passed in 6.55s**; `/tmp/m6-runnable-native.log`.
 - Scoped Ruff check/format passed.
 - Full test session 67715 and full publication session 57066 remain pending.
+
+## CPU adapter removal and completed diagnostic gates
+
+Removed legacy aggregate unions from both CPU execution adapters. Migrated
+ownership-only fixtures and subprocess imports to native Aerosol. Real CPU
+integration fixtures now use tagged ParticleData, GasData and EnvironmentData;
+condensation owns its physics and explicit species map on the process. Existing
+kernel-oracle, dispatch, identity, uptake/evaporation/skip/inactive and
+conservation assertions remain. Inactive native slots use canonical zero mass;
+the obsolete all-zero-radius warning expectation is removed. An inert gas lane
+is explicitly checked unchanged.
+
+The coagulation mutation fixture now uses native RNG seed 0 instead of legacy
+seed 41: the latter realizes no collision on this native path. The independent
+Brownian kernel oracle, nonzero mutation, mass and charge conservation checks
+are retained; no production numerics or tolerances changed. A temporary kernel
+bin-count experiment was reverted.
+
+- Adapter/integration group: **161 passed, 5 skipped**, log
+  `/tmp/m6-adapter-removal3.log`; both earlier one-failure diagnostic runs are
+  preserved in `/tmp/m6-adapter-removal.log` and `...removal2.log`.
+- Full package mypy: **clean, 552 source files**,
+  `/tmp/m6-adapter-mypy.log`. Scoped Ruff check/format passed.
+- Prior writable-cache untargeted runner session 67715 completed exit 0:
+  **8062 passed, 678 skipped, 92% coverage (unchanged 80% threshold)**,
+  315.83 seconds, `/tmp/m6-baseline-writable-cache.log`. Source edits overlapped
+  this diagnostic run, so final frozen-revision validation remains mandatory.
+- Prior full strict publication session 57066 completed exit 0 in 237.45 seconds,
+  `/tmp/m6-publication-pass2.log`. Pandoc unclosed-Div warnings remain in stderr;
+  clean rendering is not claimed merely because MkDocs exited successfully.
+
+Facade definitions and most CPU/GPU legacy branches still remain. Inventories
+are pending disposition, final validation is pending, and no PR exists yet.

@@ -26,8 +26,7 @@ from math import prod
 from numbers import Integral, Real
 from typing import TYPE_CHECKING, Any, cast
 
-from particula._legacy_aerosol import Aerosol as LegacyAerosol
-from particula.aerosol import Aerosol as NativeAerosol
+from particula.aerosol import Aerosol
 from particula.dynamics import Coagulation
 from particula.dynamics.coagulation.coagulation_strategy import (
     brownian_coagulation_strategy,
@@ -40,9 +39,6 @@ from particula.execution import (
     MutationScope,
     _isfinite_real,
 )
-
-# Legacy ownership-only callers remain supported until M6.
-Aerosol = NativeAerosol | LegacyAerosol
 
 BrownianCoagulationStrategy = (
     brownian_coagulation_strategy.BrownianCoagulationStrategy
