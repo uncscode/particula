@@ -976,3 +976,20 @@ Validation:
 - All fourteen successor symbols resolve. Scoped Ruff check passed; package
   import whitespace was formatted after the test run, without behavior changes.
 GasSpecies itself, GPU admission and final readiness remain pending.
+
+## GasSpecies assertion audit preparation
+
+Preserved all 37 remaining GasSpecies test bodies in gas_facade_assertions.json;
+their individual successor dispositions remain pending review. The facade and
+all three original test suites remain present until that review is complete.
+Added native builder cases with the original single/multispecies storage values,
+zero concentrations, explicit multibox shapes and mixed partitioning. Retained
+the original scalar/vector constant-vapor-pressure assertions by calling the
+owning scientific strategy directly. Invalid species-lane checks reject without
+clamping or mutating input. GasData itself remains a shape-validating storage
+container; physical input validation here belongs to GasDataBuilder.
+
+- Focused native construction suite: **26 passed in 0.03s**.
+- Scoped Ruff check and formatting passed.
+- This is prerequisite assertion evidence, not completion of facade removal,
+  final integration, or publication gates.
