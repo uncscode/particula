@@ -13,7 +13,9 @@
       "evidence": [
         "Seven functional example regression cases pass",
         "Eleven plot outputs inspected; nonideal axis refreshed to show activities above one"
-      ]
+      ],
+      "command": "python docs/Examples/Activity/activity_tutorial.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Activity/activity_tutorial.ipynb"
     },
     {
       "source": "docs/Examples/Activity/bat_activity_example.py",
@@ -27,7 +29,9 @@
       "evidence": [
         "Seven functional example regression cases pass",
         "Eleven plot outputs inspected; nonideal axis refreshed to show activities above one"
-      ]
+      ],
+      "command": "python docs/Examples/Activity/bat_activity_example.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Activity/bat_activity_example.ipynb"
     },
     {
       "source": "docs/Examples/Activity/equilibria_example.py",
@@ -41,7 +45,9 @@
       "evidence": [
         "Seven functional example regression cases pass",
         "Eleven plot outputs inspected; nonideal axis refreshed to show activities above one"
-      ]
+      ],
+      "command": "python docs/Examples/Activity/equilibria_example.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Activity/equilibria_example.ipynb"
     },
     {
       "source": "docs/Examples/Activity/ideal_activity_example.py",
@@ -55,7 +61,9 @@
       "evidence": [
         "Seven functional example regression cases pass",
         "Eleven plot outputs inspected; nonideal axis refreshed to show activities above one"
-      ]
+      ],
+      "command": "python docs/Examples/Activity/ideal_activity_example.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Activity/ideal_activity_example.ipynb"
     },
     {
       "source": "docs/Examples/Activity/kappa_activity_example.py",
@@ -69,13 +77,15 @@
       "evidence": [
         "Seven functional example regression cases pass",
         "Eleven plot outputs inspected; nonideal axis refreshed to show activities above one"
-      ]
+      ],
+      "command": "python docs/Examples/Activity/kappa_activity_example.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Activity/kappa_activity_example.ipynb"
     },
     {
       "source": "docs/Examples/Aerosol/Aerosol_Tutorial.py",
       "notebook": "docs/Examples/Aerosol/Aerosol_Tutorial.ipynb",
       "phase": "P1",
-      "disposition": "native migration implemented; P1 review pending",
+      "disposition": "native migration implemented and validated in P1",
       "legacy_patterns": [
         "LegacyAerosol",
         "GasSpecies",
@@ -84,12 +94,14 @@
         "PresetParticle"
       ],
       "regression": "examples_tests/native_foundations_example_test.py",
-      "scientific_expectation": null,
+      "scientific_expectation": "Retain foundational physical inputs, SI units and independent functional relations; see native_foundations_example_test.py and foundation-checkpoint-validation in implementation.md.",
       "execution": "standalone and full notebook (where paired) passed; outputs retained 2026-11-11",
       "evidence": [
         "implementation.md#foundation-checkpoint-validation"
       ],
-      "published_link": "Examples/Aerosol/Aerosol_Tutorial.ipynb"
+      "published_link": "Examples/Aerosol/Aerosol_Tutorial.ipynb",
+      "command": "python docs/Examples/Aerosol/Aerosol_Tutorial.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Aerosol/Aerosol_Tutorial.ipynb"
     },
     {
       "source": "docs/Examples/Chamber_Wall_Loss/Notebooks/Chamber_Forward_Simulation.py",
@@ -105,7 +117,9 @@
         "Six notebooks executed without errors",
         "12 plot outputs visually inspected",
         "Input/grid and source-accounting corrections documented in implementation record"
-      ]
+      ],
+      "command": "python docs/Examples/Chamber_Wall_Loss/Notebooks/Chamber_Forward_Simulation.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Chamber_Wall_Loss/Notebooks/Chamber_Forward_Simulation.ipynb"
     },
     {
       "source": "docs/Examples/Chamber_Wall_Loss/Notebooks/Rectangular_Wall_Loss_Strategy.py",
@@ -123,7 +137,9 @@
         "Six notebooks executed without errors",
         "12 plot outputs visually inspected",
         "Input/grid and source-accounting corrections documented in implementation record"
-      ]
+      ],
+      "command": "python docs/Examples/Chamber_Wall_Loss/Notebooks/Rectangular_Wall_Loss_Strategy.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Chamber_Wall_Loss/Notebooks/Rectangular_Wall_Loss_Strategy.ipynb"
     },
     {
       "source": "docs/Examples/Chamber_Wall_Loss/Notebooks/Spherical_Wall_Loss_Strategy.py",
@@ -143,7 +159,9 @@
         "Six notebooks executed without errors",
         "12 plot outputs visually inspected",
         "Input/grid and source-accounting corrections documented in implementation record"
-      ]
+      ],
+      "command": "python docs/Examples/Chamber_Wall_Loss/Notebooks/Spherical_Wall_Loss_Strategy.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Chamber_Wall_Loss/Notebooks/Spherical_Wall_Loss_Strategy.ipynb"
     },
     {
       "source": "docs/Examples/Chamber_Wall_Loss/Notebooks/Wall_Loss_Tutorial.py",
@@ -163,7 +181,9 @@
         "Six notebooks executed without errors",
         "12 plot outputs visually inspected",
         "Input/grid and source-accounting corrections documented in implementation record"
-      ]
+      ],
+      "command": "python docs/Examples/Chamber_Wall_Loss/Notebooks/Wall_Loss_Tutorial.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Chamber_Wall_Loss/Notebooks/Wall_Loss_Tutorial.ipynb"
     },
     {
       "source": "docs/Examples/Chamber_Wall_Loss/Notebooks/wall_loss_builders_factory.py",
@@ -181,7 +201,9 @@
         "Six notebooks executed without errors",
         "12 plot outputs visually inspected",
         "Input/grid and source-accounting corrections documented in implementation record"
-      ]
+      ],
+      "command": "python docs/Examples/Chamber_Wall_Loss/Notebooks/wall_loss_builders_factory.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Chamber_Wall_Loss/Notebooks/wall_loss_builders_factory.ipynb"
     },
     {
       "source": "docs/Examples/Data_Containers/data_containers_and_gpu_foundations.py",
@@ -195,7 +217,8 @@
       "evidence": [
         "implementation.md#foundation-checkpoint-validation"
       ],
-      "published_link": "Examples/Data_Containers/data_containers_and_gpu_foundations.py"
+      "published_link": "Examples/Data_Containers/data_containers_and_gpu_foundations.py",
+      "command": "python docs/Examples/Data_Containers/data_containers_and_gpu_foundations.py"
     },
     {
       "source": "docs/Examples/Dynamics/Coagulation/Charge/Coagulation_with_Charge_functional.py",
@@ -211,7 +234,9 @@
         "16 plot outputs visually inspected",
         "Preset regeneration corrected to retain declared modal inputs",
         "Main 50k-particle 12x600s comparison retained"
-      ]
+      ],
+      "command": "python docs/Examples/Dynamics/Coagulation/Charge/Coagulation_with_Charge_functional.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Dynamics/Coagulation/Charge/Coagulation_with_Charge_functional.ipynb"
     },
     {
       "source": "docs/Examples/Dynamics/Coagulation/Charge/Coagulation_with_Charge_objects.py",
@@ -227,7 +252,9 @@
         "16 plot outputs visually inspected",
         "Preset regeneration corrected to retain declared modal inputs",
         "Main 50k-particle 12x600s comparison retained"
-      ]
+      ],
+      "command": "python docs/Examples/Dynamics/Coagulation/Charge/Coagulation_with_Charge_objects.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Dynamics/Coagulation/Charge/Coagulation_with_Charge_objects.ipynb"
     },
     {
       "source": "docs/Examples/Dynamics/Coagulation/Coagulation_1_PMF_Pattern.py",
@@ -247,7 +274,9 @@
         "16 plot outputs visually inspected",
         "Preset regeneration corrected to retain declared modal inputs",
         "Main 50k-particle 12x600s comparison retained"
-      ]
+      ],
+      "command": "python docs/Examples/Dynamics/Coagulation/Coagulation_1_PMF_Pattern.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Dynamics/Coagulation/Coagulation_1_PMF_Pattern.ipynb"
     },
     {
       "source": "docs/Examples/Dynamics/Coagulation/Coagulation_2_PDF_Pattern.py",
@@ -267,7 +296,9 @@
         "16 plot outputs visually inspected",
         "Preset regeneration corrected to retain declared modal inputs",
         "Main 50k-particle 12x600s comparison retained"
-      ]
+      ],
+      "command": "python docs/Examples/Dynamics/Coagulation/Coagulation_2_PDF_Pattern.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Dynamics/Coagulation/Coagulation_2_PDF_Pattern.ipynb"
     },
     {
       "source": "docs/Examples/Dynamics/Coagulation/Coagulation_3_Particle_Resolved_Pattern.py",
@@ -286,7 +317,9 @@
         "16 plot outputs visually inspected",
         "Preset regeneration corrected to retain declared modal inputs",
         "Main 50k-particle 12x600s comparison retained"
-      ]
+      ],
+      "command": "python docs/Examples/Dynamics/Coagulation/Coagulation_3_Particle_Resolved_Pattern.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Dynamics/Coagulation/Coagulation_3_Particle_Resolved_Pattern.ipynb"
     },
     {
       "source": "docs/Examples/Dynamics/Coagulation/Coagulation_4_Compared.py",
@@ -306,7 +339,9 @@
         "16 plot outputs visually inspected",
         "Preset regeneration corrected to retain declared modal inputs",
         "Main 50k-particle 12x600s comparison retained"
-      ]
+      ],
+      "command": "python docs/Examples/Dynamics/Coagulation/Coagulation_4_Compared.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Dynamics/Coagulation/Coagulation_4_Compared.ipynb"
     },
     {
       "source": "docs/Examples/Dynamics/Coagulation/Coagulation_5_Time_Evolution.py",
@@ -326,7 +361,9 @@
         "16 plot outputs visually inspected",
         "Preset regeneration corrected to retain declared modal inputs",
         "Main 50k-particle 12x600s comparison retained"
-      ]
+      ],
+      "command": "python docs/Examples/Dynamics/Coagulation/Coagulation_5_Time_Evolution.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Dynamics/Coagulation/Coagulation_5_Time_Evolution.ipynb"
     },
     {
       "source": "docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_1_PMF.py",
@@ -346,7 +383,9 @@
         "16 plot outputs visually inspected",
         "Preset regeneration corrected to retain declared modal inputs",
         "Main 50k-particle 12x600s comparison retained"
-      ]
+      ],
+      "command": "python docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_1_PMF.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_1_PMF.ipynb"
     },
     {
       "source": "docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_2_PDF.py",
@@ -366,7 +405,9 @@
         "16 plot outputs visually inspected",
         "Preset regeneration corrected to retain declared modal inputs",
         "Main 50k-particle 12x600s comparison retained"
-      ]
+      ],
+      "command": "python docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_2_PDF.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_2_PDF.ipynb"
     },
     {
       "source": "docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_3_compared.py",
@@ -386,7 +427,9 @@
         "16 plot outputs visually inspected",
         "Preset regeneration corrected to retain declared modal inputs",
         "Main 50k-particle 12x600s comparison retained"
-      ]
+      ],
+      "command": "python docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_3_compared.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_3_compared.ipynb"
     },
     {
       "source": "docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_4_ParticleResolved.py",
@@ -405,7 +448,9 @@
         "16 plot outputs visually inspected",
         "Preset regeneration corrected to retain declared modal inputs",
         "Main 50k-particle 12x600s comparison retained"
-      ]
+      ],
+      "command": "python docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_4_ParticleResolved.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_4_ParticleResolved.ipynb"
     },
     {
       "source": "docs/Examples/Dynamics/Condensation/Condensation_1_Bin.py",
@@ -425,7 +470,9 @@
         "11 focused tests passed",
         "Saved notebook code cells executed without errors",
         "Rendered plots visually inspected; bounded stability claims and units reconciled"
-      ]
+      ],
+      "command": "python docs/Examples/Dynamics/Condensation/Condensation_1_Bin.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Dynamics/Condensation/Condensation_1_Bin.ipynb"
     },
     {
       "source": "docs/Examples/Dynamics/Condensation/Condensation_2_MassBin.py",
@@ -444,7 +491,9 @@
         "11 focused tests passed",
         "Saved notebook code cells executed without errors",
         "Rendered plots visually inspected; bounded stability claims and units reconciled"
-      ]
+      ],
+      "command": "python docs/Examples/Dynamics/Condensation/Condensation_2_MassBin.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Dynamics/Condensation/Condensation_2_MassBin.ipynb"
     },
     {
       "source": "docs/Examples/Dynamics/Condensation/Condensation_3_MassResolved.py",
@@ -463,7 +512,9 @@
         "11 focused tests passed",
         "Saved notebook code cells executed without errors",
         "Rendered plots visually inspected; bounded stability claims and units reconciled"
-      ]
+      ],
+      "command": "python docs/Examples/Dynamics/Condensation/Condensation_3_MassResolved.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Dynamics/Condensation/Condensation_3_MassResolved.ipynb"
     },
     {
       "source": "docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.py",
@@ -482,7 +533,9 @@
         "11 focused tests passed",
         "Saved notebook code cells executed without errors",
         "Rendered plots visually inspected; bounded stability claims and units reconciled"
-      ]
+      ],
+      "command": "python docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.ipynb"
     },
     {
       "source": "docs/Examples/Dynamics/Condensation/Staggered_Condensation_Example.py",
@@ -501,7 +554,9 @@
         "11 focused tests passed",
         "Saved notebook code cells executed without errors",
         "Rendered plots visually inspected; bounded stability claims and units reconciled"
-      ]
+      ],
+      "command": "python docs/Examples/Dynamics/Condensation/Staggered_Condensation_Example.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Dynamics/Condensation/Staggered_Condensation_Example.ipynb"
     },
     {
       "source": "docs/Examples/Dynamics/Customization/Adding_Particles_During_Simulation.py",
@@ -521,7 +576,9 @@
         "All 14 P4 notebook pairs verified with 40 visually inspected plot outputs",
         "Strict MkDocs passed",
         "implementation.md P4 checkpoint and limitations record"
-      ]
+      ],
+      "command": "python docs/Examples/Dynamics/Customization/Adding_Particles_During_Simulation.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Dynamics/Customization/Adding_Particles_During_Simulation.ipynb"
     },
     {
       "source": "docs/Examples/Equilibria/Notebooks/activity_part1.py",
@@ -535,7 +592,9 @@
       "evidence": [
         "Seven functional example regression cases pass",
         "Eleven plot outputs inspected; nonideal axis refreshed to show activities above one"
-      ]
+      ],
+      "command": "python docs/Examples/Equilibria/Notebooks/activity_part1.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Equilibria/Notebooks/activity_part1.ipynb"
     },
     {
       "source": "docs/Examples/Equilibria/Notebooks/equilibria_part1.py",
@@ -549,30 +608,34 @@
       "evidence": [
         "Seven functional example regression cases pass",
         "Eleven plot outputs inspected; nonideal axis refreshed to show activities above one"
-      ]
+      ],
+      "command": "python docs/Examples/Equilibria/Notebooks/equilibria_part1.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Equilibria/Notebooks/equilibria_part1.ipynb"
     },
     {
       "source": "docs/Examples/Gas_Phase/Notebooks/AtmosphereTutorial.py",
       "notebook": "docs/Examples/Gas_Phase/Notebooks/AtmosphereTutorial.ipynb",
       "phase": "P1",
-      "disposition": "native migration implemented; P1 review pending",
+      "disposition": "native migration implemented and validated in P1",
       "legacy_patterns": [
         "GasSpecies",
         "AtmosphereBuilder"
       ],
       "regression": "examples_tests/native_foundations_example_test.py",
-      "scientific_expectation": null,
+      "scientific_expectation": "Retain foundational physical inputs, SI units and independent functional relations; see native_foundations_example_test.py and foundation-checkpoint-validation in implementation.md.",
       "execution": "standalone and full notebook (where paired) passed; outputs retained 2026-11-11",
       "evidence": [
         "implementation.md#foundation-checkpoint-validation"
       ],
-      "published_link": "Examples/Gas_Phase/Notebooks/AtmosphereTutorial.ipynb"
+      "published_link": "Examples/Gas_Phase/Notebooks/AtmosphereTutorial.ipynb",
+      "command": "python docs/Examples/Gas_Phase/Notebooks/AtmosphereTutorial.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Gas_Phase/Notebooks/AtmosphereTutorial.ipynb"
     },
     {
       "source": "docs/Examples/Gas_Phase/Notebooks/Gas_Species.py",
       "notebook": "docs/Examples/Gas_Phase/Notebooks/Gas_Species.ipynb",
       "phase": "P1",
-      "disposition": "native migration implemented; P1 review pending",
+      "disposition": "native migration implemented and validated in P1",
       "legacy_patterns": [
         "GasSpecies"
       ],
@@ -582,7 +645,9 @@
       "evidence": [
         "implementation.md#foundation-checkpoint-validation"
       ],
-      "published_link": "Examples/Gas_Phase/Notebooks/Gas_Species.ipynb"
+      "published_link": "Examples/Gas_Phase/Notebooks/Gas_Species.ipynb",
+      "command": "python docs/Examples/Gas_Phase/Notebooks/Gas_Species.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Gas_Phase/Notebooks/Gas_Species.ipynb"
     },
     {
       "source": "docs/Examples/Gas_Phase/Notebooks/Vapor_Pressure.py",
@@ -591,12 +656,14 @@
       "disposition": "functional scientific example retained; no facade construction",
       "legacy_patterns": [],
       "regression": null,
-      "scientific_expectation": null,
+      "scientific_expectation": "Retain foundational physical inputs, SI units and independent functional relations; see native_foundations_example_test.py and foundation-checkpoint-validation in implementation.md.",
       "execution": "standalone and full notebook (where paired) passed; outputs retained 2026-11-11",
       "evidence": [
         "implementation.md#foundation-checkpoint-validation"
       ],
-      "published_link": "Examples/Gas_Phase/Notebooks/Vapor_Pressure.ipynb"
+      "published_link": "Examples/Gas_Phase/Notebooks/Vapor_Pressure.ipynb",
+      "command": "python docs/Examples/Gas_Phase/Notebooks/Vapor_Pressure.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Gas_Phase/Notebooks/Vapor_Pressure.ipynb"
     },
     {
       "source": "docs/Examples/Nucleation/Notebooks/Custom_Nucleation_Single_Species.py",
@@ -617,7 +684,9 @@
         "Six notebooks executed without errors",
         "12 plot outputs visually inspected",
         "Input/grid and source-accounting corrections documented in implementation record"
-      ]
+      ],
+      "command": "python docs/Examples/Nucleation/Notebooks/Custom_Nucleation_Single_Species.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Nucleation/Notebooks/Custom_Nucleation_Single_Species.ipynb"
     },
     {
       "source": "docs/Examples/Nucleation/cpu_nucleation.py",
@@ -633,7 +702,8 @@
         "Six notebooks executed without errors",
         "12 plot outputs visually inspected",
         "Input/grid and source-accounting corrections documented in implementation record"
-      ]
+      ],
+      "command": "python docs/Examples/Nucleation/cpu_nucleation.py"
     },
     {
       "source": "docs/Examples/Nucleation/gpu_direct_nucleation.py",
@@ -648,7 +718,8 @@
         "P5 combined example/conversion/export gate: 265 passed, 2 optional CUDA skips in 29.46s, 2026-11-11.",
         "Scoped Ruff check/format, git diff --check and strict MkDocs passed.",
         "Warp 1.11.1 CPU; native CUDA unavailable; no fallback or performance claim."
-      ]
+      ],
+      "command": "python docs/Examples/Nucleation/gpu_direct_nucleation.py"
     },
     {
       "source": "docs/Examples/Particle_Phase/Notebooks/Activity_Tutorial.py",
@@ -657,12 +728,14 @@
       "disposition": "functional scientific example retained; no facade construction",
       "legacy_patterns": [],
       "regression": null,
-      "scientific_expectation": null,
+      "scientific_expectation": "Retain foundational physical inputs, SI units and independent functional relations; see native_foundations_example_test.py and foundation-checkpoint-validation in implementation.md.",
       "execution": "standalone and full notebook (where paired) passed; outputs retained 2026-11-11",
       "evidence": [
         "implementation.md#foundation-checkpoint-validation"
       ],
-      "published_link": "Examples/Particle_Phase/Notebooks/Activity_Tutorial.ipynb"
+      "published_link": "Examples/Particle_Phase/Notebooks/Activity_Tutorial.ipynb",
+      "command": "python docs/Examples/Particle_Phase/Notebooks/Activity_Tutorial.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Particle_Phase/Notebooks/Activity_Tutorial.ipynb"
     },
     {
       "source": "docs/Examples/Particle_Phase/Notebooks/Aerosol_Distributions.py",
@@ -671,12 +744,14 @@
       "disposition": "functional scientific example retained; no facade construction",
       "legacy_patterns": [],
       "regression": null,
-      "scientific_expectation": null,
+      "scientific_expectation": "Retain foundational physical inputs, SI units and independent functional relations; see native_foundations_example_test.py and foundation-checkpoint-validation in implementation.md.",
       "execution": "standalone and full notebook (where paired) passed; outputs retained 2026-11-11",
       "evidence": [
         "implementation.md#foundation-checkpoint-validation"
       ],
-      "published_link": "Examples/Particle_Phase/Notebooks/Aerosol_Distributions.ipynb"
+      "published_link": "Examples/Particle_Phase/Notebooks/Aerosol_Distributions.ipynb",
+      "command": "python docs/Examples/Particle_Phase/Notebooks/Aerosol_Distributions.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Particle_Phase/Notebooks/Aerosol_Distributions.ipynb"
     },
     {
       "source": "docs/Examples/Particle_Phase/Notebooks/Distribution_Tutorial.py",
@@ -685,12 +760,14 @@
       "disposition": "functional scientific example retained; no facade construction",
       "legacy_patterns": [],
       "regression": null,
-      "scientific_expectation": null,
+      "scientific_expectation": "Retain foundational physical inputs, SI units and independent functional relations; see native_foundations_example_test.py and foundation-checkpoint-validation in implementation.md.",
       "execution": "standalone and full notebook (where paired) passed; outputs retained 2026-11-11",
       "evidence": [
         "implementation.md#foundation-checkpoint-validation"
       ],
-      "published_link": "Examples/Particle_Phase/Notebooks/Distribution_Tutorial.ipynb"
+      "published_link": "Examples/Particle_Phase/Notebooks/Distribution_Tutorial.ipynb",
+      "command": "python docs/Examples/Particle_Phase/Notebooks/Distribution_Tutorial.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Particle_Phase/Notebooks/Distribution_Tutorial.ipynb"
     },
     {
       "source": "docs/Examples/Particle_Phase/Notebooks/Functional/Activity_Functions.py",
@@ -699,12 +776,14 @@
       "disposition": "functional scientific example retained; no facade construction",
       "legacy_patterns": [],
       "regression": null,
-      "scientific_expectation": null,
+      "scientific_expectation": "Retain foundational physical inputs, SI units and independent functional relations; see native_foundations_example_test.py and foundation-checkpoint-validation in implementation.md.",
       "execution": "standalone and full notebook (where paired) passed; outputs retained 2026-11-11",
       "evidence": [
         "implementation.md#foundation-checkpoint-validation"
       ],
-      "published_link": "Examples/Particle_Phase/Notebooks/Functional/Activity_Functions.ipynb"
+      "published_link": "Examples/Particle_Phase/Notebooks/Functional/Activity_Functions.ipynb",
+      "command": "python docs/Examples/Particle_Phase/Notebooks/Functional/Activity_Functions.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Particle_Phase/Notebooks/Functional/Activity_Functions.ipynb"
     },
     {
       "source": "docs/Examples/Particle_Phase/Notebooks/Particle_Representation_Tutorial.py",
@@ -721,7 +800,9 @@
       "evidence": [
         "implementation.md#foundation-checkpoint-validation"
       ],
-      "published_link": "Examples/Particle_Phase/Notebooks/Particle_Representation_Tutorial.ipynb"
+      "published_link": "Examples/Particle_Phase/Notebooks/Particle_Representation_Tutorial.ipynb",
+      "command": "python docs/Examples/Particle_Phase/Notebooks/Particle_Representation_Tutorial.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Particle_Phase/Notebooks/Particle_Representation_Tutorial.ipynb"
     },
     {
       "source": "docs/Examples/Particle_Phase/Notebooks/Particle_Surface_Tutorial.py",
@@ -730,12 +811,14 @@
       "disposition": "functional scientific example retained; no facade construction",
       "legacy_patterns": [],
       "regression": null,
-      "scientific_expectation": null,
+      "scientific_expectation": "Retain foundational physical inputs, SI units and independent functional relations; see native_foundations_example_test.py and foundation-checkpoint-validation in implementation.md.",
       "execution": "standalone and full notebook (where paired) passed; outputs retained 2026-11-11",
       "evidence": [
         "implementation.md#foundation-checkpoint-validation"
       ],
-      "published_link": "Examples/Particle_Phase/Notebooks/Particle_Surface_Tutorial.ipynb"
+      "published_link": "Examples/Particle_Phase/Notebooks/Particle_Surface_Tutorial.ipynb",
+      "command": "python docs/Examples/Particle_Phase/Notebooks/Particle_Surface_Tutorial.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Particle_Phase/Notebooks/Particle_Surface_Tutorial.ipynb"
     },
     {
       "source": "docs/Examples/Simulations/Notebooks/Biomass_Burning_Cloud_Interactions.py",
@@ -756,7 +839,9 @@
         "All 14 P4 notebook pairs verified with 40 visually inspected plot outputs",
         "Strict MkDocs passed",
         "implementation.md P4 checkpoint and limitations record"
-      ]
+      ],
+      "command": "python docs/Examples/Simulations/Notebooks/Biomass_Burning_Cloud_Interactions.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Simulations/Notebooks/Biomass_Burning_Cloud_Interactions.ipynb"
     },
     {
       "source": "docs/Examples/Simulations/Notebooks/Cloud_Chamber_Multi_Cycle.py",
@@ -777,7 +862,9 @@
         "All 14 P4 notebook pairs verified with 40 visually inspected plot outputs",
         "Strict MkDocs passed",
         "implementation.md P4 checkpoint and limitations record"
-      ]
+      ],
+      "command": "python docs/Examples/Simulations/Notebooks/Cloud_Chamber_Multi_Cycle.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Simulations/Notebooks/Cloud_Chamber_Multi_Cycle.ipynb"
     },
     {
       "source": "docs/Examples/Simulations/Notebooks/Cloud_Chamber_Single_Cycle.py",
@@ -798,7 +885,9 @@
         "All 14 P4 notebook pairs verified with 40 visually inspected plot outputs",
         "Strict MkDocs passed",
         "implementation.md P4 checkpoint and limitations record"
-      ]
+      ],
+      "command": "python docs/Examples/Simulations/Notebooks/Cloud_Chamber_Single_Cycle.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Simulations/Notebooks/Cloud_Chamber_Single_Cycle.ipynb"
     },
     {
       "source": "docs/Examples/Simulations/Notebooks/Cough_Droplets_Partitioning.py",
@@ -819,7 +908,9 @@
         "All 14 P4 notebook pairs verified with 40 visually inspected plot outputs",
         "Strict MkDocs passed",
         "implementation.md P4 checkpoint and limitations record"
-      ]
+      ],
+      "command": "python docs/Examples/Simulations/Notebooks/Cough_Droplets_Partitioning.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Simulations/Notebooks/Cough_Droplets_Partitioning.ipynb"
     },
     {
       "source": "docs/Examples/Simulations/Notebooks/Organic_Partitioning_and_Coagulation.py",
@@ -841,7 +932,9 @@
         "All 14 P4 notebook pairs verified with 40 visually inspected plot outputs",
         "Strict MkDocs passed",
         "implementation.md P4 checkpoint and limitations record"
-      ]
+      ],
+      "command": "python docs/Examples/Simulations/Notebooks/Organic_Partitioning_and_Coagulation.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Simulations/Notebooks/Organic_Partitioning_and_Coagulation.ipynb"
     },
     {
       "source": "docs/Examples/Simulations/Notebooks/Soot_Formation_in_Flames.py",
@@ -862,7 +955,9 @@
         "All 14 P4 notebook pairs verified with 40 visually inspected plot outputs",
         "Strict MkDocs passed",
         "implementation.md P4 checkpoint and limitations record"
-      ]
+      ],
+      "command": "python docs/Examples/Simulations/Notebooks/Soot_Formation_in_Flames.py",
+      "notebook_command": "python .opencode/tools/run_notebook.py docs/Examples/Simulations/Notebooks/Soot_Formation_in_Flames.ipynb"
     },
     {
       "source": "docs/Examples/cpu_dilution.py",
@@ -882,7 +977,8 @@
         "Six notebooks executed without errors",
         "12 plot outputs visually inspected",
         "Input/grid and source-accounting corrections documented in implementation record"
-      ]
+      ],
+      "command": "python docs/Examples/cpu_dilution.py"
     },
     {
       "source": "docs/Examples/data_containers_and_gpu_foundations.py",
@@ -896,7 +992,8 @@
       "evidence": [
         "implementation.md#foundation-checkpoint-validation"
       ],
-      "published_link": "Examples/data_containers_and_gpu_foundations.py"
+      "published_link": "Examples/data_containers_and_gpu_foundations.py",
+      "command": "python docs/Examples/data_containers_and_gpu_foundations.py"
     },
     {
       "source": "docs/Examples/gpu_coagulation_direct.py",
@@ -911,7 +1008,8 @@
         "P5 combined example/conversion/export gate: 265 passed, 2 optional CUDA skips in 29.46s, 2026-11-11.",
         "Scoped Ruff check/format, git diff --check and strict MkDocs passed.",
         "Warp 1.11.1 CPU; native CUDA unavailable; no fallback or performance claim."
-      ]
+      ],
+      "command": "python docs/Examples/gpu_coagulation_direct.py"
     },
     {
       "source": "docs/Examples/gpu_complete_process_sequence.py",
@@ -926,7 +1024,8 @@
         "P5 combined example/conversion/export gate: 265 passed, 2 optional CUDA skips in 29.46s, 2026-11-11.",
         "Scoped Ruff check/format, git diff --check and strict MkDocs passed.",
         "Warp 1.11.1 CPU; native CUDA unavailable; no fallback or performance claim."
-      ]
+      ],
+      "command": "python docs/Examples/gpu_complete_process_sequence.py"
     },
     {
       "source": "docs/Examples/gpu_condensation_parity_walkthrough.py",
@@ -941,7 +1040,8 @@
         "P5 combined example/conversion/export gate: 265 passed, 2 optional CUDA skips in 29.46s, 2026-11-11.",
         "Scoped Ruff check/format, git diff --check and strict MkDocs passed.",
         "Warp 1.11.1 CPU; native CUDA unavailable; no fallback or performance claim."
-      ]
+      ],
+      "command": "python docs/Examples/gpu_condensation_parity_walkthrough.py"
     },
     {
       "source": "docs/Examples/gpu_direct_kernels_quick_start.py",
@@ -956,7 +1056,8 @@
         "P5 combined example/conversion/export gate: 265 passed, 2 optional CUDA skips in 29.46s, 2026-11-11.",
         "Scoped Ruff check/format, git diff --check and strict MkDocs passed.",
         "Warp 1.11.1 CPU; native CUDA unavailable; no fallback or performance claim."
-      ]
+      ],
+      "command": "python docs/Examples/gpu_direct_kernels_quick_start.py"
     },
     {
       "source": "docs/Examples/gpu_resident_graph_capture.py",
@@ -971,7 +1072,8 @@
         "P5 combined example/conversion/export gate: 265 passed, 2 optional CUDA skips in 29.46s, 2026-11-11.",
         "Scoped Ruff check/format, git diff --check and strict MkDocs passed.",
         "Warp 1.11.1 CPU; native CUDA unavailable; no fallback or performance claim."
-      ]
+      ],
+      "command": "python docs/Examples/gpu_resident_graph_capture.py"
     },
     {
       "source": "docs/Examples/gpu_resident_multi_timestep.py",
@@ -986,7 +1088,8 @@
         "P5 combined example/conversion/export gate: 265 passed, 2 optional CUDA skips in 29.46s, 2026-11-11.",
         "Scoped Ruff check/format, git diff --check and strict MkDocs passed.",
         "Warp 1.11.1 CPU; native CUDA unavailable; no fallback or performance claim."
-      ]
+      ],
+      "command": "python docs/Examples/gpu_resident_multi_timestep.py"
     },
     {
       "source": "docs/Examples/gpu_resident_session.py",
@@ -1001,10 +1104,27 @@
         "P5 combined example/conversion/export gate: 265 passed, 2 optional CUDA skips in 29.46s, 2026-11-11.",
         "Scoped Ruff check/format, git diff --check and strict MkDocs passed.",
         "Warp 1.11.1 CPU; native CUDA unavailable; no fallback or performance claim."
-      ]
+      ],
+      "command": "python docs/Examples/gpu_resident_session.py"
     }
   ],
-  "historical_exceptions": [],
+  "historical_exceptions": [
+    {
+      "path": "docs/Features/particle-data-migration/containers.md",
+      "scope": "Historical spelling comparison table only; explicitly labeled nonexecutable migration history",
+      "executable": false
+    },
+    {
+      "path": "docs/Features/Roadmap/index.md",
+      "scope": "Legacy facade names in retained release/M6 planning prose only",
+      "executable": false
+    },
+    {
+      "path": "docs/Features/Roadmap/data-oriented-gpu.md",
+      "scope": "Compatibility and historical milestones in prose; no legacy construction snippet",
+      "executable": false
+    }
+  ],
   "published_snippet_pages": [
     {
       "path": "readme.md",
@@ -1017,8 +1137,8 @@
     {
       "path": "AGENTS.md",
       "python_fences": 9,
-      "disposition": "pending audit",
-      "execution": "pending",
+      "disposition": "Agent reference recipes, not standalone tutorials; native ownership and maintenance guidance added; current runtime examples linked",
+      "execution": "Owning example/process suites passed; partial recipe setup remains caller-owned",
       "phase": "P7"
     },
     {
@@ -1383,14 +1503,14 @@
     },
     {
       "path": "docs/Features/Roadmap/data-oriented-gpu.md",
-      "python_fences": 1,
+      "python_fences": 4,
       "disposition": "Native construction/nucleation ownership reconciled; historical milestones and measurement boundaries retained; partial wall-loss sketch explicitly text",
       "execution": "Package import fences checked; supported executable workflows covered by P5",
       "phase": "P6"
     },
     {
       "path": "docs/Features/Roadmap/warp-autodiff-limitations.md",
-      "python_fences": 7,
+      "python_fences": 6,
       "disposition": "Standalone Warp teaching patterns; no legacy carrier dependency or production-gradient claim; undefined gradcheck recipe explicitly text",
       "execution": "File-backed quadratic Tape snippet gradient [5,7,9] checked on Warp CPU; other teaching definitions retained, not claimed as aerosol runtime evidence",
       "phase": "P6"
@@ -1596,23 +1716,23 @@
     },
     {
       "path": "docs/contribute/Code_Specifications/Details/Function_docstring_format.md",
-      "python_fences": 2,
-      "disposition": "pending audit",
-      "execution": "pending",
+      "python_fences": 0,
+      "disposition": "Nonexecutable contributor writing templates labeled as text; native example maintenance linked",
+      "execution": "Not runtime examples; strict rendering gate",
       "phase": "P7"
     },
     {
       "path": "docs/contribute/Feature_Workflow/Details/Add_Unit_Test.md",
-      "python_fences": 2,
-      "disposition": "pending audit",
-      "execution": "pending",
+      "python_fences": 0,
+      "disposition": "Nonexecutable contributor writing templates labeled as text; native example maintenance linked",
+      "execution": "Not runtime examples; strict rendering gate",
       "phase": "P7"
     },
     {
       "path": "docs/contribute/Feature_Workflow/Details/Add_to_init.md",
-      "python_fences": 1,
-      "disposition": "pending audit",
-      "execution": "pending",
+      "python_fences": 0,
+      "disposition": "Nonexecutable contributor writing templates labeled as text; native example maintenance linked",
+      "execution": "Not runtime examples; strict rendering gate",
       "phase": "P7"
     },
     {
@@ -1646,7 +1766,7 @@
     }
   ],
   "navigation_audit": {
-    "path": "mkdocs.yml",
-    "status": "P1 topic indexes checked; MkDocs uses discovered docs navigation; final tree audit pending P7"
+    "path": "mkdocs.yml and mkdocs-full.yml",
+    "status": "All 59 source entrypoints classified (58 original + native_state_access); 46 notebook pairs retain outputs without error cells. Topic indexes reviewed, excluded .py links changed to repository sources, stale anchors corrected. Full publication generates native API targets from current package; base build intentionally excludes API/notebook rendering."
   }
 }

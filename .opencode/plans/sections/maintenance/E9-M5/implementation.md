@@ -700,3 +700,44 @@ MkDocs excludes Python example files; repaired two stale anchors. API generator
 inputs still discover native modules directly from the package; no symbol
 rename or generator change is needed. Full publication build is being checked
 separately from the required fast strict build; final outcomes belong to P7.
+
+### P7 contributor and inventory reconciliation (2026-11-11)
+
+Updated contributor example maintenance and AGENTS native ownership guidance;
+corrected test filename convention and marked placeholder writing templates as
+nonexecutable. Reconciled all inventory rows and added the M6 handoff record.
+The final source AST audit found **59 classified example sources, 46 notebooks,
+zero forbidden legacy constructor calls, and zero retained notebook errors**.
+All supported original examples remain; no inventory shrink was used to pass.
+Historical facade mentions are explicitly allowlisted prose/table references.
+
+The additional `mkdocs build --config-file mkdocs-full.yml --strict` exited 1
+with **1751 Griffe warnings**. All warnings reference **110 unchanged production
+source files** (checked against M4 base); none are non-Griffe MkDocs warnings.
+Native Aerosol, AerosolBuilder, ParticleData, GasData and EnvironmentData API
+HTML pages were generated and their Python targets import successfully. This
+is an existing full-publication strictness limitation, not a passing gate or a
+reason to modify production docstrings in M5. The required base strict build
+runs separately. Saved notebook rendering does not execute notebooks.
+
+Required final checks so far: example suite **223 passed, 2 skipped in 50.17s**;
+infrastructure **130 passed in 29.81s**; both wall-loss suites **59 passed in
+0.07s**; repository linter runner all passed; explicit mypy **no issues in 551
+source files**; generated helper payload check passed. Commands used the local
+Python 3.12.12 environment, NumPy 2.3.4, pytest 8.4.2 and Warp 1.11.1. CUDA is
+unavailable. The full untargeted coverage run remains in progress; no final M6
+gate is claimed before its terminal result.
+
+
+### Final required gate and M6 handoff (2026-11-11)
+
+The full untargeted runner completed successfully: **8060 passed, 678 skipped,
+287.63s, 92% coverage, unchanged 80.0% threshold**. Assertions and coverage both
+report PASSED. Required `mkdocs build --strict` (separate `/tmp/m5-final-site`
+output to avoid overlap with publication rendering) passed in **1.45s**, with
+no link notices. All executable changes were present for these gates; only
+plan/evidence Markdown and JSON reconciliation followed. Exact commands and
+additional outcomes are in `final_validation.md`. P1–P7 implementation and
+required checks are complete. PR review remains pending and M6 removal has not
+started. The source baseline still equals upstream main `3393e47fa7` at the
+final pre-publication check. No production module changed in this PR.

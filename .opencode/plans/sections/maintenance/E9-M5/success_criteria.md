@@ -1,22 +1,25 @@
 # Success Criteria
 
-All implementation checks remain pending.
+Implementation and required validation are complete on 2026-11-11.
+PR review and acceptance of the M6 handoff remain maintainer decisions; no M6
+removal is performed here. See `final_validation.md` for literal outcomes and
+the inherited full-publication strict warning limitation.
 
-- [ ] M4 completed-and-validated handoff accepted with M1–M3 contract references.
-- [ ] Every supported example and published snippet has a reviewed disposition,
+- [x] M4 completed-and-validated handoff accepted with M1–M3 contract references.
+- [x] Every supported example and published snippet has a reviewed disposition,
   native execution command, expected outcome and phase/evidence mapping.
-- [ ] Foundational, process, simulation and advanced-access examples run natively
+- [x] Foundational, process, simulation and advanced-access examples run natively
   with no supported legacy imports or bridge calls; not merely a new quick start.
-- [ ] Changed notebook pairs are synchronized, executed and retained together;
+- [x] Changed notebook pairs are synchronized, executed and retained together;
   plots, units, species and scientific outputs remain meaningful.
-- [ ] Access/replacement fixtures verify identity, non-unit volume, species
+- [x] Access/replacement fixtures verify identity, non-unit volume, species
   alignment, rejection atomicity and no implicit GPU/resident rebind.
-- [ ] Existing explicit transfer, direct-kernel and resident boundaries remain
+- [x] Existing explicit transfer, direct-kernel and resident boundaries remain
   clear; CPU stays single-box and unsupported history is unmistakable.
-- [ ] Focused assertions, full applicable untargeted suite with configured
+- [x] Focused assertions, full applicable untargeted suite with configured
   full-package coverage, required lint/type checks and `mkdocs build --strict`
   pass on the final revision. Required unavailable checks block completion.
-- [ ] M6 receives the accepted inventory, history allowlist and literal evidence;
+- [x] M6 handoff includes the inventory, history allowlist and literal evidence for review;
   deletion does not begin earlier. M5 is not release approval.
 
 | Metric | Draft baseline | Target | Source |

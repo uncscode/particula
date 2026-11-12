@@ -12,7 +12,9 @@ fix failure. Comprehensive coverage comes only from the full applicable suite
 using `.opencode/tools/run_pytest.py` without a target, with repository-configured
 full-package scope and normal threshold. Do not override coverage source or
 threshold. The generic template's numeric/pyproject coverage statement is not
-authority over active repository testing policy. Do not add local `-Werror`.
+authority over active repository testing policy. Do not add local `-Werror` to focused scientific checks. The explicit
+examples_tests and scripts/tests final runs retain the current AGENTS.md
+required `-Werror` policy.
 
 ## Per-phase assertions and scientific outcomes
 
@@ -82,5 +84,5 @@ Also run Ruff on changed example Python sources and review Markdown links/API
 directives and historical-code exclusions. Record revision, date, dependencies,
 device availability, literal output and pass/fail/skip/unavailable per command.
 Required unavailable evidence blocks M6 handoff; accepted optional device skips
-do not prove performance or relax scientific gates. No tests are run as part
-of this plan-only drafting task.
+do not prove performance or relax scientific gates. The original drafting checkpoint ran no tests; completed implementation
+results are recorded in `final_validation.md`.

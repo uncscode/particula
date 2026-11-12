@@ -4,6 +4,11 @@
 
 ---  
 
+These are nonexecutable writing templates, not supported API snippets. Replace
+placeholders with verified imports, units and calculated outputs before
+publishing an executable example. Follow the repository Google-style `Args:`
+convention and 80-character line limit.
+
 ## High-Level Objective  
 
 - **Improve Documentation Clarity:**  
@@ -28,7 +33,7 @@
 - **Standardized Docstring Format:**  
   Use the following format:  
 
-  ```python
+  ```text
   def function_name(param1: type, param2: type) -> return_type:
       """
       Brief description of what the function does.
@@ -105,7 +110,7 @@ Review each function's existing docstring to identify issues, including:
 - ADD **References** for scientific accuracy.  
 
 **Example Before:**  
-```python
+```text
 def calculate_concentration(partial_pressure, molar_mass, temperature):
     """Calculate the concentration of a gas from its partial pressure, molar mass, and temperature using the ideal gas law.
 
@@ -123,7 +128,7 @@ def calculate_concentration(partial_pressure, molar_mass, temperature):
 ```
 
 **Example After (With Reference):**  
-```python
+```text
 def get_calculate_concentration(
     partial_pressure: Union[float, NDArray[np.float64]],
     molar_mass: Union[float, NDArray[np.float64]],
