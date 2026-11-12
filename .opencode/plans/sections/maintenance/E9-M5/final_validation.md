@@ -54,3 +54,35 @@ Detailed session logs: `/tmp/m5-final-pytest.log`, `m5-final-examples.log`,
 `m5-final-mypy.log`, `m5-final-plugin.log`, `m5-final-mkdocs.log` and
 `m5-full-publication.log` under `/tmp`. This tracked ledger is the durable
 summary; temporary logs are not required to interpret the result.
+
+## CI environment correction — 2026-11-11
+
+PR #1634 exposed two gaps in the original local environment evidence:
+source example CI installed only base runtime dependencies, and isolated conda
+package tests intentionally staged neither README nor docs. Source CI now
+installs the existing `extra` dependency group. Package quick-start integration
+tests construct their native workflows directly; exact README/home-page snippet
+execution and identical inventory checks remain in
+`examples_tests/native_quick_start_docs_test.py`. No test or scientific assertion
+was skipped to fix either failure.
+
+A clean Python 3.13.12 environment with current dependencies (Warp 1.19.0,
+pandas 3.1.1, chemicals 1.5.2, thermo 0.6.1) additionally exposed the upstream
+CSV `float_precision` deprecation. The existing warning bootstrap now filters
+only its exact message, DeprecationWarning category and chemicals.data_reader
+module. A regression confirms the same warning elsewhere and other warnings
+from chemicals still fail; broad warning suppression is not used.
+
+- Fresh installed-wheel package runner: **4381 passed, 25 skipped, 815
+  deselected in 40.07s**, no docs staged and installed provenance verified.
+- Clean source examples with `-Werror -m "not slow and not performance"`:
+  **225 passed, 2 skipped in 45.15s**.
+- Clean infrastructure suite: **130 passed in 26.61s**; the added narrow warning
+  policy regression separately passed (one test).
+- Both integration and exact-document quick starts: **4 passed** locally.
+- Scoped Ruff check/format, mypy and diff whitespace checks passed.
+
+Logs are `/tmp/m5-ci-release.log`, `/tmp/m5-ci-examples-final.log` and
+`/tmp/m5-ci-infra.log`. Hosted rerun outcomes are separate from this local
+validation; the earlier failing CI did not invalidate the recorded local runs,
+but demonstrated why a clean environment is necessary.

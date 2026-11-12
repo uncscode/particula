@@ -29,6 +29,18 @@ def _filter_expected_warnings() -> None:
         category=DeprecationWarning,
         append=False,
     )
+    # chemicals 1.5.2 still requests this pandas CSV parser option. Pandas
+    # 3.1 deprecates it for removal in 4.0; property-table values are unchanged.
+    warnings.filterwarnings(
+        "ignore",
+        message=(
+            "^The 'float_precision' argument is deprecated\\. "
+            "Use the default float precision instead\\.$"
+        ),
+        category=DeprecationWarning,
+        module=r"^chemicals\.data_reader$",
+        append=False,
+    )
 
 
 _filter_expected_warnings()
