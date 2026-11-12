@@ -323,7 +323,7 @@ strategy = par.dynamics.ChargedWallLossStrategy(
 
 wall_loss = par.dynamics.WallLoss(wall_loss_strategy=strategy)
 
-# Split time_step across sub_steps; concentrations clamp at zero each step
+# Split time_step across sub_steps; oversized native steps reject
 aerosol = wall_loss.execute(aerosol, time_step=1.0, sub_steps=2)
 ```
 
@@ -333,8 +333,8 @@ aerosol = wall_loss.execute(aerosol, time_step=1.0, sub_steps=2)
   `particula.dynamics`.
 - `WallLossStrategy` is the abstract base class for wall loss models.
 - `WallLoss` runnable wraps a strategy, splits `time_step` across `sub_steps`,
-  clamps concentrations to non-negative, and composes with other runnables
-  via `|`.
+  clamps successful strategy output to non-negative, and composes with other
+  runnables via `|`. Native strategies reject oversized steps before writing.
 - `ChargedWallLossStrategy` adds image-charge enhancement (active even when
   `wall_potential` is 0), optional `wall_electric_field` drift, and falls back
   to the neutral coefficient when particle charge and field are zero.

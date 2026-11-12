@@ -1,0 +1,79 @@
+[
+  {
+    "file": "particula/dynamics/tests/wall_loss_runnable_test.py",
+    "test": "test_init_with_spherical_strategy",
+    "original": "def test_init_with_spherical_strategy(spherical_strategy):\n    wall_loss = WallLoss(wall_loss_strategy=spherical_strategy)\n    assert wall_loss.wall_loss_strategy is spherical_strategy",
+    "successor": "test_init_with_spherical_strategy",
+    "disposition": "same runnable assertions with native tagged containers; getter assertions translated to native fields; deterministic explicit size-lane fixture replaces obsolete lognormal facade preset (these tests assert runnable behavior, not preset distribution values)"
+  },
+  {
+    "file": "particula/dynamics/tests/wall_loss_runnable_test.py",
+    "test": "test_init_with_rectangular_strategy",
+    "original": "def test_init_with_rectangular_strategy(rectangular_strategy):\n    wall_loss = WallLoss(wall_loss_strategy=rectangular_strategy)\n    assert wall_loss.wall_loss_strategy is rectangular_strategy",
+    "successor": "test_init_with_rectangular_strategy",
+    "disposition": "same runnable assertions with native tagged containers; getter assertions translated to native fields; deterministic explicit size-lane fixture replaces obsolete lognormal facade preset (these tests assert runnable behavior, not preset distribution values)"
+  },
+  {
+    "file": "particula/dynamics/tests/wall_loss_runnable_test.py",
+    "test": "test_execute_reduces_concentration",
+    "original": "def test_execute_reduces_concentration(aerosol, spherical_strategy):\n    wall_loss = WallLoss(wall_loss_strategy=spherical_strategy)\n    initial = aerosol.particles.get_concentration(clone=True)\n    updated = wall_loss.execute(aerosol, time_step=1.0)\n    assert np.all(updated.particles.get_concentration() <= initial)",
+    "successor": "test_execute_reduces_concentration",
+    "disposition": "same runnable assertions with native tagged containers; getter assertions translated to native fields; deterministic explicit size-lane fixture replaces obsolete lognormal facade preset (these tests assert runnable behavior, not preset distribution values)"
+  },
+  {
+    "file": "particula/dynamics/tests/wall_loss_runnable_test.py",
+    "test": "test_execute_zero_time_step_no_change",
+    "original": "def test_execute_zero_time_step_no_change(aerosol, spherical_strategy):\n    wall_loss = WallLoss(wall_loss_strategy=spherical_strategy)\n    initial = aerosol.particles.get_concentration(clone=True)\n    updated = wall_loss.execute(aerosol, time_step=0.0)\n    np.testing.assert_array_equal(\n        updated.particles.get_concentration(), initial\n    )",
+    "successor": "test_execute_zero_time_step_no_change",
+    "disposition": "same runnable assertions with native tagged containers; getter assertions translated to native fields; deterministic explicit size-lane fixture replaces obsolete lognormal facade preset (these tests assert runnable behavior, not preset distribution values)"
+  },
+  {
+    "file": "particula/dynamics/tests/wall_loss_runnable_test.py",
+    "test": "test_execute_clamps_non_negative",
+    "original": "def test_execute_clamps_non_negative(aerosol, spherical_strategy):\n    wall_loss = WallLoss(wall_loss_strategy=spherical_strategy)\n    updated = wall_loss.execute(aerosol, time_step=1e8)\n    concentrations = updated.particles.get_concentration()\n    assert np.all(concentrations >= 0.0)\n    assert np.any(concentrations == 0.0)",
+    "successor": "test_execute_clamps_non_negative",
+    "disposition": "Native strategies reject oversized negative proposals before writes, checked separately by test_oversized_native_step_rejects_before_mutation. Original runnable clamp assertions (nonnegative and at least one zero) retained using successful custom strategy output, with added array-identity check. No native numerical behavior changed."
+  },
+  {
+    "file": "particula/dynamics/tests/wall_loss_runnable_test.py",
+    "test": "test_execute_honors_sub_steps",
+    "original": "def test_execute_honors_sub_steps(aerosol, atmosphere):\n    spy_strategy = SpyWallLossStrategy()\n    wall_loss = WallLoss(wall_loss_strategy=spy_strategy)\n    wall_loss.execute(aerosol, time_step=3.0, sub_steps=3)\n    assert spy_strategy.time_steps == [1.0, 1.0, 1.0]",
+    "successor": "test_execute_honors_sub_steps",
+    "disposition": "same runnable assertions with native tagged containers; getter assertions translated to native fields; deterministic explicit size-lane fixture replaces obsolete lognormal facade preset (these tests assert runnable behavior, not preset distribution values)"
+  },
+  {
+    "file": "particula/dynamics/tests/wall_loss_runnable_test.py",
+    "test": "test_rate_negative_and_shape",
+    "original": "def test_rate_negative_and_shape(aerosol, spherical_strategy):\n    wall_loss = WallLoss(wall_loss_strategy=spherical_strategy)\n    rates = wall_loss.rate(aerosol)\n    assert rates.shape == aerosol.particles.get_concentration().shape\n    assert np.all(rates <= 0.0)",
+    "successor": "test_rate_negative_and_shape",
+    "disposition": "same runnable assertions with native tagged containers; getter assertions translated to native fields; deterministic explicit size-lane fixture replaces obsolete lognormal facade preset (these tests assert runnable behavior, not preset distribution values)"
+  },
+  {
+    "file": "particula/dynamics/tests/wall_loss_runnable_test.py",
+    "test": "test_rectangular_strategy_smoke",
+    "original": "def test_rectangular_strategy_smoke(aerosol, rectangular_strategy):\n    wall_loss = WallLoss(wall_loss_strategy=rectangular_strategy)\n    updated = wall_loss.execute(aerosol, time_step=1.0)\n    rates = wall_loss.rate(updated)\n    assert np.all(rates <= 0.0)\n    assert updated.particles.get_total_concentration() >= 0.0",
+    "successor": "test_rectangular_strategy_smoke",
+    "disposition": "same runnable assertions with native tagged containers; getter assertions translated to native fields; deterministic explicit size-lane fixture replaces obsolete lognormal facade preset (these tests assert runnable behavior, not preset distribution values)"
+  },
+  {
+    "file": "particula/dynamics/tests/wall_loss_runnable_test.py",
+    "test": "test_particle_resolved_distribution_smoke",
+    "original": "def test_particle_resolved_distribution_smoke(aerosol_resolved, atmosphere):\n    strategy = SphericalWallLossStrategy(\n        wall_eddy_diffusivity=1e-3,\n        chamber_radius=0.5,\n        distribution_type=\"particle_resolved\",\n    )\n    wall_loss = WallLoss(wall_loss_strategy=strategy)\n    updated = wall_loss.execute(aerosol_resolved, time_step=0.5)\n    rates = wall_loss.rate(updated)\n    assert np.all(rates <= 0.0)\n    assert updated.particles.get_total_concentration() >= 0.0",
+    "successor": "test_particle_resolved_distribution_smoke",
+    "disposition": "same runnable assertions with native tagged containers; getter assertions translated to native fields; deterministic explicit size-lane fixture replaces obsolete lognormal facade preset (these tests assert runnable behavior, not preset distribution values)"
+  },
+  {
+    "file": "particula/dynamics/tests/wall_loss_runnable_test.py",
+    "test": "test_process_chaining_with_coagulation",
+    "original": "def test_process_chaining_with_coagulation(aerosol, spherical_strategy):\n    coagulation = Coagulation(coagulation_strategy=DummyCoagulationStrategy())\n    wall_loss = WallLoss(wall_loss_strategy=spherical_strategy)\n    combined = coagulation | wall_loss\n    updated = combined.execute(aerosol, time_step=1.0)\n    assert isinstance(updated, Aerosol)\n    assert np.all(updated.particles.get_concentration() >= 0.0)",
+    "successor": "test_process_chaining_with_coagulation",
+    "disposition": "same runnable assertions with native tagged containers; getter assertions translated to native fields; deterministic explicit size-lane fixture replaces obsolete lognormal facade preset (these tests assert runnable behavior, not preset distribution values)"
+  },
+  {
+    "file": "particula/dynamics/tests/wall_loss_runnable_test.py",
+    "test": "test_process_chaining_with_condensation",
+    "original": "def test_process_chaining_with_condensation(aerosol, spherical_strategy):\n    condensation = MassCondensation(\n        condensation_strategy=DummyCondensationStrategy()\n    )\n    wall_loss = WallLoss(wall_loss_strategy=spherical_strategy)\n    combined = condensation | wall_loss\n    updated = combined.execute(aerosol, time_step=1.0)\n    assert isinstance(updated, Aerosol)\n    assert np.all(updated.particles.get_concentration() >= 0.0)",
+    "successor": "test_process_chaining_with_condensation",
+    "disposition": "same runnable assertions with native tagged containers; getter assertions translated to native fields; deterministic explicit size-lane fixture replaces obsolete lognormal facade preset (these tests assert runnable behavior, not preset distribution values)"
+  }
+]
