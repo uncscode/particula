@@ -1,6 +1,6 @@
 # E9-M6 native API migration closeout
 
-**Status: validation in progress; not approved for release.** This record
+**Status: implementation validated; maintainer review and release approval pending.** This record
 tracks the development-tree removal for [E9-M6](https://github.com/uncscode/particula/issues/1607).
 It does not announce a released wheel, change the package version, or qualify
 GPU performance. The maintainer owns final scientific and release approval.
@@ -53,18 +53,18 @@ untargeted repository runner supplies full-package coverage evidence.
 | --- | --- |
 | GPU/execution boundary suite | 4,182 passed, 679 skipped at `72f179eeb` boundary content; no CUDA timing claim |
 | Native benchmark consumers | 95 helper tests passed; real Warp CPU uptake/evaporation and material conservation checks; committed in `48771293c` |
-| Untargeted normal-coverage runner | Initial run: 8,331 passed, 2 failed, 684 skipped; 92% coverage against normal 80% threshold. Two untagged thermodynamics fixtures corrected; full rerun pending |
+| Untargeted normal-coverage runner | Final production cleanup run: 8,333 passed, 684 skipped; 92% coverage against unchanged normal 80% threshold. Earlier two untagged thermodynamics fixtures corrected with original assertions retained |
 | Corrected thermodynamics integration | 2 passed, 1 optional CUDA skip; original test bodies and tolerances retained |
-| Installed-wheel package suite | 4,559 passed, 25 skipped, 820 deselected; imported distribution provenance checked outside checkout, including removed-module and native aggregate tests |
+| Installed-wheel package suite | Final production cleanup: 4,559 passed, 25 skipped, 820 deselected in 41.74s; isolated Warp cache and installed distribution provenance checked outside checkout, including removed-module and native aggregate tests |
 | Separate installed-wheel examples | 20 passed; native dilution, nucleation and latent-heat examples |
 | Both wall-loss suites | Public suite 16 passed; separately collected adjacent suite 43 passed |
 | Infrastructure | 132 passed, including publication-routing regression |
 | Plugin distribution consistency | Six skills and host packages validated |
-| Ruff and mypy | Scoped Ruff/format passed; package mypy passed 535 files at benchmark revision; final changed-file checks pending |
-| Standard and full strict documentation | Passed at `2f90d6c17` routing content: 1.56s and 49.06s, zero warning/error lines; rerun required after final documentation/output edits |
-| Source example suite | Earlier 225 passed, 2 skipped; final rerun pending |
-| Full supported source and notebook workloads | 59 source entrypoints and 46 notebook pairs being reexecuted; final ledger and plot/output review pending |
-| Final compatibility inventory and PR | Pending |
+| Ruff and mypy | Final production lint runner passed, including Ruff and mypy over 535 files |
+| Standard and full strict documentation | Both passed with final notebook outputs: standard 1.46s and full publication 47.69s, zero warning/error lines. Supported API pages remain included; no warning suppression. |
+| Source example suite | 225 passed, 2 skipped after final dilution import guard and simulation prose cleanup |
+| Full supported source and notebook workloads | 58 source executions and all 46 notebooks passed; 98 PNG plots reviewed, code pairs matched and image counts preserved. One native-CUDA-only source skipped cleanly without fallback. Full workload and output hashes recorded in the execution/review ledgers |
+| Final compatibility inventory | Reconciled after regenerated outputs. Only intentional removal-safe test guards retain removed production symbol names; 1,606 native successor references resolve. |
 
 The native benchmark workload identifiers distinguish them from historical
 untagged cases. CPU interpolated-grid and GPU direct-pair coagulation samplers

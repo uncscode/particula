@@ -28,6 +28,8 @@ the requested delivery. No GitHub issue or PR was modified during scoping.
 - Escalate scope expansion or new physics/API requests instead of silently
   growing M6. Log tooling gaps reactively; preserve accurate partial status.
 
-Draft report: six phases, twelve canonical sections, no implementation tests
-run and all execution gates pending. Completion of drafting is not completion
-of T6 or evidence that E9-M5 has passed its entry gate.
+Implementation report: six acceptance phases delivered through one PR with
+serial review commits. Required implementation validation, full supported
+example execution and both strict publication builds pass; the closeout and
+adjacent ledgers preserve results and limitations. Maintainer scientific and
+release acceptance is requested through PR review and remains separate.
