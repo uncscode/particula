@@ -1159,7 +1159,10 @@ plt.show()
 #    Our choice of fixed-step Euler integration creates slight numerical noise in mass fraction plots — highlighting the tradeoff between speed and precision. Higher number of steps or adaptive stepping may improve accuracy.
 #
 # 4. **Particula’s modular design supports combustion plume modeling**
-#    With `Gas`, `Particle`, and `Atmosphere` objects plus tunable process builders, you can recreate real-world conditions for combustion emissions, indoor air pollution, and exposure assessments.
+#    Native `GasData`, `ParticleData`, and `EnvironmentData` containers plus
+#    process-owned physics support bounded plume illustrations. The soot
+#    property assumptions and numerical limitations documented above remain;
+#    this example does not qualify real-world exposure predictions.
 #
 # ---
 #

@@ -280,7 +280,7 @@ surface_tension_array = np.array(
 # Vapor-pressure strategies are supplied explicitly to the process below.
 # * Initial gas-phase concentrations
 #
-# ### 🌡 Creating the Atmosphere
+# ### 🌡 Creating gas and environment state
 #
 # Finally, we construct the atmosphere with temperature, pressure, and link the gas-phase species. This environment will be used to govern **evaporation/condensation dynamics** during the simulation.
 #
