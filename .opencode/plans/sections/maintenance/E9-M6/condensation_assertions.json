@@ -1038,32 +1038,32 @@
       "assertions": [
         "np.testing.assert_allclose(final_mass, initial_mass, rtol=1e-12)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged binned fixture with explicit process physics/full gas molar masses/species map. Original numerical tolerances retained; PDF conservation integrates mass times dN/dr over explicit radius grid rather than summing untagged PDF values. Added independent per-species conservation at rtol=1e-12/atol=1e-30 where total conservation was checked. Rejection cases use native validation messages and additionally verify unchanged particle/gas arrays. Discrete energy oracle remains proposal-based and converts density transfer to extensive mass using volume.",
+      "native_successor": "particula/dynamics/condensation/tests/native_binned_condensation_test.py::TestNativeBinnedCondensation::test_step_discrete_10_bins_mass_conservation"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_discrete_50_bins_mass_conservation",
       "assertions": [
         "np.testing.assert_allclose(final_mass, initial_mass, rtol=1e-12)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged binned fixture with explicit process physics/full gas molar masses/species map. Original numerical tolerances retained; PDF conservation integrates mass times dN/dr over explicit radius grid rather than summing untagged PDF values. Added independent per-species conservation at rtol=1e-12/atol=1e-30 where total conservation was checked. Rejection cases use native validation messages and additionally verify unchanged particle/gas arrays. Discrete energy oracle remains proposal-based and converts density transfer to extensive mass using volume.",
+      "native_successor": "particula/dynamics/condensation/tests/native_binned_condensation_test.py::TestNativeBinnedCondensation::test_step_discrete_50_bins_mass_conservation"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_discrete_100_bins_mass_conservation",
       "assertions": [
         "np.testing.assert_allclose(final_mass, initial_mass, rtol=1e-12)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged binned fixture with explicit process physics/full gas molar masses/species map. Original numerical tolerances retained; PDF conservation integrates mass times dN/dr over explicit radius grid rather than summing untagged PDF values. Added independent per-species conservation at rtol=1e-12/atol=1e-30 where total conservation was checked. Rejection cases use native validation messages and additionally verify unchanged particle/gas arrays. Discrete energy oracle remains proposal-based and converts density transfer to extensive mass using volume.",
+      "native_successor": "particula/dynamics/condensation/tests/native_binned_condensation_test.py::TestNativeBinnedCondensation::test_step_discrete_100_bins_mass_conservation"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_continuous_distribution_mass_conservation",
       "assertions": [
         "np.testing.assert_allclose(final_mass, initial_mass, rtol=1e-12)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged binned fixture with explicit process physics/full gas molar masses/species map. Original numerical tolerances retained; PDF conservation integrates mass times dN/dr over explicit radius grid rather than summing untagged PDF values. Added independent per-species conservation at rtol=1e-12/atol=1e-30 where total conservation was checked. Rejection cases use native validation messages and additionally verify unchanged particle/gas arrays. Discrete energy oracle remains proposal-based and converts density transfer to extensive mass using volume.",
+      "native_successor": "particula/dynamics/condensation/tests/native_binned_condensation_test.py::TestNativeBinnedCondensation::test_step_continuous_distribution_mass_conservation"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_discrete_isothermal_parity",
@@ -1071,8 +1071,8 @@
         "np.testing.assert_allclose(\n            latent_particle.masses[0], iso_particle.masses[0], rtol=1e-15\n        )",
         "np.testing.assert_allclose(\n            latent_gas.concentration[0], iso_gas.concentration[0], rtol=1e-15\n        )"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged binned fixture with explicit process physics/full gas molar masses/species map. Original numerical tolerances retained; PDF conservation integrates mass times dN/dr over explicit radius grid rather than summing untagged PDF values. Added independent per-species conservation at rtol=1e-12/atol=1e-30 where total conservation was checked. Rejection cases use native validation messages and additionally verify unchanged particle/gas arrays. Discrete energy oracle remains proposal-based and converts density transfer to extensive mass using volume.",
+      "native_successor": "particula/dynamics/condensation/tests/native_binned_condensation_test.py::TestNativeBinnedCondensation::test_step_discrete_isothermal_parity"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_continuous_isothermal_parity",
@@ -1080,56 +1080,56 @@
         "np.testing.assert_allclose(\n            latent_particle.masses[0],\n            iso_particle.masses[0],\n            rtol=1e-15,\n            atol=1e-17,\n        )",
         "np.testing.assert_allclose(\n            latent_gas.concentration[0],\n            iso_gas.concentration[0],\n            rtol=1e-15,\n            atol=1e-17,\n        )"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged binned fixture with explicit process physics/full gas molar masses/species map. Original numerical tolerances retained; PDF conservation integrates mass times dN/dr over explicit radius grid rather than summing untagged PDF values. Added independent per-species conservation at rtol=1e-12/atol=1e-30 where total conservation was checked. Rejection cases use native validation messages and additionally verify unchanged particle/gas arrays. Discrete energy oracle remains proposal-based and converts density transfer to extensive mass using volume.",
+      "native_successor": "particula/dynamics/condensation/tests/native_binned_condensation_test.py::TestNativeBinnedCondensation::test_step_continuous_isothermal_parity"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_discrete_energy_tracking",
       "assertions": [
         "np.testing.assert_allclose(\n            cond.last_latent_heat_energy, expected_energy, rtol=1e-14\n        )"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged binned fixture with explicit process physics/full gas molar masses/species map. Original numerical tolerances retained; PDF conservation integrates mass times dN/dr over explicit radius grid rather than summing untagged PDF values. Added independent per-species conservation at rtol=1e-12/atol=1e-30 where total conservation was checked. Rejection cases use native validation messages and additionally verify unchanged particle/gas arrays. Discrete energy oracle remains proposal-based and converts density transfer to extensive mass using volume.",
+      "native_successor": "particula/dynamics/condensation/tests/native_binned_condensation_test.py::TestNativeBinnedCondensation::test_step_discrete_energy_tracking"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_discrete_2d_mass_shapes",
       "assertions": [
         "self.assertEqual(\n            particle_new.masses[0].shape,\n            (\n                particle_data.masses[0].shape[0],\n                particle_data.masses[0].shape[1],\n            ),\n        )"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged binned fixture with explicit process physics/full gas molar masses/species map. Original numerical tolerances retained; PDF conservation integrates mass times dN/dr over explicit radius grid rather than summing untagged PDF values. Added independent per-species conservation at rtol=1e-12/atol=1e-30 where total conservation was checked. Rejection cases use native validation messages and additionally verify unchanged particle/gas arrays. Discrete energy oracle remains proposal-based and converts density transfer to extensive mass using volume.",
+      "native_successor": "particula/dynamics/condensation/tests/native_binned_condensation_test.py::TestNativeBinnedCondensation::test_step_discrete_2d_mass_shapes"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_rate_discrete_shape",
       "assertions": [
         "self.assertEqual(rate.shape, particle_data.masses[0].shape)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged binned fixture with explicit process physics/full gas molar masses/species map. Original numerical tolerances retained; PDF conservation integrates mass times dN/dr over explicit radius grid rather than summing untagged PDF values. Added independent per-species conservation at rtol=1e-12/atol=1e-30 where total conservation was checked. Rejection cases use native validation messages and additionally verify unchanged particle/gas arrays. Discrete energy oracle remains proposal-based and converts density transfer to extensive mass using volume.",
+      "native_successor": "particula/dynamics/condensation/tests/native_binned_condensation_test.py::TestNativeBinnedCondensation::test_rate_discrete_shape"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_mass_transfer_rate_discrete_shape",
       "assertions": [
         "self.assertEqual(mass_rate.shape, particle_data.masses[0].shape)"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged binned fixture with explicit process physics/full gas molar masses/species map. Original numerical tolerances retained; PDF conservation integrates mass times dN/dr over explicit radius grid rather than summing untagged PDF values. Added independent per-species conservation at rtol=1e-12/atol=1e-30 where total conservation was checked. Rejection cases use native validation messages and additionally verify unchanged particle/gas arrays. Discrete energy oracle remains proposal-based and converts density transfer to extensive mass using volume.",
+      "native_successor": "particula/dynamics/condensation/tests/native_binned_condensation_test.py::TestNativeBinnedCondensation::test_mass_transfer_rate_discrete_shape"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_mass_transfer_rate_rejects_nonfinite_latent_heat",
       "assertions": [
         "self.assertRaisesRegex(ValueError, \"latent_heat\")"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged binned fixture with explicit process physics/full gas molar masses/species map. Original numerical tolerances retained; PDF conservation integrates mass times dN/dr over explicit radius grid rather than summing untagged PDF values. Added independent per-species conservation at rtol=1e-12/atol=1e-30 where total conservation was checked. Rejection cases use native validation messages and additionally verify unchanged particle/gas arrays. Discrete energy oracle remains proposal-based and converts density transfer to extensive mass using volume.",
+      "native_successor": "particula/dynamics/condensation/tests/native_binned_condensation_test.py::TestNativeBinnedCondensation::test_mass_transfer_rate_rejects_nonfinite_latent_heat"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_rejects_negative_concentration",
       "assertions": [
         "self.assertRaisesRegex(ValueError, \"concentration must be finite\")"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Native tagged binned fixture with explicit process physics/full gas molar masses/species map. Original numerical tolerances retained; PDF conservation integrates mass times dN/dr over explicit radius grid rather than summing untagged PDF values. Added independent per-species conservation at rtol=1e-12/atol=1e-30 where total conservation was checked. Rejection cases use native validation messages and additionally verify unchanged particle/gas arrays. Discrete energy oracle remains proposal-based and converts density transfer to extensive mass using volume.",
+      "native_successor": "particula/dynamics/condensation/tests/native_binned_condensation_test.py::TestNativeBinnedCondensation::test_step_rejects_negative_concentration"
     },
     {
       "old_node": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_rejects_nonpositive_volume",
