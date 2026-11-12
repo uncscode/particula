@@ -4,12 +4,12 @@ title: Data Containers and GPU Foundations
 
 # Data Containers and GPU Foundations
 
-This page is the canonical reference for Particula's shipped data-container
+This page is the canonical reference for the selected E9 checkout's data-container
 schemas, leading-axis shape conventions, explicit CPU↔GPU transfer helpers,
 the direct-kernel troubleshooting contract, and current CPU/GPU support
 boundaries.
 
-For a runnable walkthrough of the shipped single-box container construction and
+For a runnable walkthrough of native single-box container construction and
 optional Warp CPU-backend round trips, see the
 [Data Containers example](../Examples/Data_Containers/index.md) and run:
 
@@ -52,7 +52,7 @@ allowed. Caller-managed full gas and ratio lane order remains unchanged.
 This structural check cannot certify a same-width permutation of ratio lanes.
 Expected ordered names and ratio-producer provenance, particle/gas mapping,
 mask eligibility, physical validity, and distribution/process admission belong
-to later M3/M4 process bindings, not to this P4 helper.
+to process bindings, not to this structural helper.
 
 ### CPU particle population interpretation
 
@@ -73,13 +73,12 @@ zero PDF and zero population mass.
 Call `validate_representation()` after directly constructing or mutating
 writable particle arrays; new population helpers call it on each read and
 reject invalid interpretation without repairing input. The caller owns
-representation-consistent changes. Tagged particle data is rejected before
-`to_warp_particle_data()` uploads it: the current Warp carrier cannot preserve
-its kind/grid metadata. `to_representation()` likewise rejects tagged data
-because the legacy facade cannot retain that provenance. Existing untagged
-explicit Warp transfers continue
-to support the older raw-array boundary; they do not provide PDF execution
-or tagged round trips.
+representation-consistent changes. Native Warp transfers preserve the explicit
+`discrete` or `particle_resolved` kind and its volume interpretation. Continuous
+PDF upload is unsupported; do not clear a tag to bypass admission. Legacy
+untagged transfers remain compatibility storage, not native process admission.
+`to_representation()` rejects tagged data because the legacy facade cannot
+retain that provenance.
 
 Prefer the currently exported package-level imports. The low-level
 `particula.gpu` container, conversion-helper, explicit-transfer, and
@@ -99,12 +98,13 @@ from particula.gpu import (
 from particula.particles import ParticleData
 ```
 
-## E9-M1 developer contract and M2 handoff
+## Native data contract
 
-M1 delivers CPU interpretation helpers and read-only structural validation.
-It does not migrate scientific consumers or implement the data-native
-`Aerosol` aggregate. Legacy untagged carriers remain available, but their raw
-arrays do not establish a distribution interpretation.
+Native `Aerosol` holds `ParticleData`, `GasData` and `EnvironmentData` by
+identity. Scientific processes own their physics and validate their supported
+single-box inputs. Legacy untagged carriers remain available, but their raw
+arrays do not establish a distribution interpretation. This guide describes
+the selected checkout; it does not announce a release or M6 facade removal.
 
 ### Stored units and physical inventories
 
@@ -124,7 +124,7 @@ node per slot. Integrate the product of varying species mass and PDF on that
 interval, without extrapolation; summing PDF nodes or multiplying separate
 integrals is incorrect. Zero PDF and mass on a valid grid are allowed.
 Density-to-storage conversion would multiply by V only for resolved counts;
-M1 supplies no inverse-conversion helper or automatic rescaling.
+Reading these properties performs no inverse conversion or automatic rescaling.
 
 `species_mass_inventory` is species mass density times V, in kg per box.
 `total_mass` is instead mass per particle, summed over species. Gas
@@ -172,11 +172,11 @@ order, including nonpartitioning species; a mask never compresses storage.
 The structural checker requires nonblank unique names and matching dimensions,
 but matching widths cannot prove the ratio producer used the right chemistry.
 
-A future process binding must compare expected full ordered gas names and
+A process binding must compare expected full ordered gas names and
 ratio-producer provenance and supply explicit unique, in-range, one-to-one
 `(gas_index, particle_index)` pairs. It must check mapped mask eligibility,
 classify unmatched species, and admit physical values and distribution
-capabilities before mutation. These process gates remain M3/M4 work.
+capabilities before mutation. See the [native scientific process contract](native_scientific_processes.md).
 An all-false mask preserves all gas/ratio lanes and admits no partitioning
 transfer; it is not an empty gas container.
 
@@ -202,8 +202,9 @@ Callers own device placement and synchronization.
 Downloads are `from_warp_particle_data(gpu_data, sync=True)`,
 `from_warp_gas_data(gpu_data, name=None, sync=True)`, and
 `from_warp_environment_data(gpu_data, sync=True)`; `sync=False` requires
-caller synchronization before host access. Particle restore is untagged and
-must not be assumed detached from Warp CPU storage; explicitly copy when
+caller synchronization before host access. Native particle restore preserves
+its population kind and volume but must not be assumed detached from Warp CPU
+storage; explicitly copy when
 independent CPU ownership is needed. Preserve gas names externally and pass
 `name=` to restore their meaning; otherwise names are placeholders. GPU vapor
 pressure is omitted on CPU restore. Restored gas numeric storage can also
@@ -211,30 +212,32 @@ share Warp CPU arrays; use `copy()` when isolation is required. Environment
 construction detaches its
 restored arrays. The detailed raw transfer tables below remain authoritative.
 
-Tagged particles are rejected by both Warp upload and legacy facade restore
-because neither carrier preserves kind/grid provenance. Do not clear the tag
-to bypass this check. M1 does not deliver tagged Warp round trips, GPU PDF
-execution, resident metadata migration, or performance evidence.
+Native direct condensation and nucleation require explicit species bindings
+prepared against the transferred containers. Resident restart needs fresh
+bindings for the fresh containers; CPU object replacement does not rebind GPU
+state. See the [migration dynamics guide](particle-data-migration/dynamics.md)
+and the runnable direct and resident examples. GPU PDF execution and
+cross-device continuation are unsupported; no performance evidence follows
+from successful transfers.
 
-### M2-only aggregate replacement specification
+### Aggregate access and validated replacement
 
-The approved future interface is keyword-only
+The native interface is keyword-only
 `Aerosol(particles=..., gas=..., environment=...)`, identity-returning properties
 with validated setters, and keyword-only
 `replace_data(particles=..., gas=..., environment=...)` requiring all three.
-These are **specified for M2, not shipped M1 APIs**.
 
-Validate the complete proposed triple before publishing any reference.
-Same-object assignment preserves identity; a compatible distinct candidate is
-retained by identity. An incompatible single setter rejects without changing
-held or candidate state. A compatible all-three layout change publishes the
-three supplied identities together; one invalid candidate rejects the entire
-operation. Do not implement this by chaining setters or by reconstructing
-containers for validation. Representation validation and structural alignment
-are separate checks; process mapping and physics admission remain later gates.
-Acceptance implies no hidden copy, transfer, GPU/resident rebinding or automatic
-interception of subsequent raw edits. M1's final validation and maintainer
-handoff approval are required before M2 starts.
+The aggregate validates the complete proposed triple before publishing any
+reference. Same-object assignment preserves identity; a compatible distinct
+candidate is retained by identity. An incompatible single setter rejects
+without changing held or candidate state. A compatible all-three layout change
+publishes the three supplied identities together; one invalid candidate rejects
+the entire operation. Representation validation and structural alignment are
+separate checks; process mapping and physics admission remain process gates.
+Acceptance implies no hidden copy, transfer, GPU/resident rebinding, inventory
+conservation or automatic interception of subsequent raw edits. See
+[access and replacement](particle-data-migration/containers.md) for executable
+examples and rejection checks.
 
 ## Execution selection
 
@@ -996,6 +999,7 @@ particle_data = ParticleData(
     charge=np.array([[0.0]]),
     density=np.array([1000.0, 1200.0]),
     volume=np.array([1e-6]),
+    distribution_type="particle_resolved",  # raw concentration stores counts
 )
 
 gas_data = GasData(
@@ -1550,7 +1554,8 @@ Optional keyword-only `energy_transfer` is a caller-owned active-device
 `wp.float64`, `(n_boxes, n_species)`, write-only output. It requires valid
 `latent_heat`, is overwritten only after successful preflight, and is not a
 third return value. Its signed whole-call diagnostic, shipped in issue #1272,
-is `Q[box, species] = sum_particles(Delta m_applied) * L[species]`: `Delta m`
+is `Q[box, species] = sum_particles(count * Delta m_applied) * L[species]`
+for native resolved storage: `Delta m`
 is applied transfer in kg, `L` is latent heat in J/kg, and `Q` is J. Thus
 condensation is positive and evaporation is negative. The strict #1272
 energy-regression tolerance is `rtol=1e-12, atol=1e-18`.
@@ -1596,7 +1601,7 @@ than storage support.
 | Low-level GPU slot activation | Shipped fixed-capacity direct-kernel contract | `activate_slots_gpu` maps selected request prefixes to ascending free slots with caller-owned same-device sidecars; no hidden transfer, resizing, or high-level runnable is provided. |
 | Low-level GPU condensation direct-kernel path | Shipped bounded direct-kernel contract | Executes four fixed coupled substeps with active-device P2 inventory and gas coupling. This is direct-kernel evidence, not broad GPU-condensation support. |
 | Low-level GPU coagulation direct-kernel path | Direct, particle-resolved direct-kernel contract | Exact mask and rejection boundaries follow below. This path establishes no Runnable support, CPU parity, or performance claim. |
-| Fixed-shape GPU/runtime roadmap work | Not current runtime behavior | Graph-capture-oriented and fixed-shape runtime constraints remain roadmap handoff material, not shipped behavior. |
+| Resident execution and native CUDA capture | Explicit bounded lifecycle | See [resident example](../Examples/gpu_resident_multi_timestep.py) and [capture limitations](gpu_graph_capture.md); no implicit CPU fallback or measured performance claim. |
 
 Additional shipped boundaries:
 

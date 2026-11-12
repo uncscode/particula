@@ -1,68 +1,65 @@
-"""Integration test for quick start example in particula."""
+"""Execute the published native quick start with independent inventory checks."""
+
+import re
+from pathlib import Path
 
 import numpy as np
 import particula as par
-from particula._legacy_aerosol import Aerosol as LegacyAerosol
-from particula._legacy_aerosol import AerosolBuilder as LegacyAerosolBuilder
 
 
 def test_quick_start_runs():
-    """Test the quick start example runs without errors."""
-    # 1. Build the GasSpecies for an organic vapor:
-    organic = (
-        par.gas.GasSpeciesBuilder()
-        .set_name("organic")
-        .set_molar_mass(180e-3, "kg/mol")
-        .set_vapor_pressure_strategy(
-            par.gas.ConstantVaporPressureStrategy(1e2)  # Pa
+    """README construction and composed dynamics retain native conservation."""
+    readme = Path(__file__).resolve().parents[2] / "readme.md"
+    snippets = re.findall(
+        r"```python\n(.*?)\n```", readme.read_text(), re.DOTALL
+    )
+    assert len(snippets) == 1
+    namespace = {}
+    exec(compile(snippets[0], str(readme), "exec"), namespace)  # noqa: S102
+    aerosol = namespace["aerosol"]
+    assert isinstance(aerosol, par.Aerosol)
+    assert aerosol.particles is namespace["particles"]
+    assert aerosol.gas is namespace["gas"]
+    assert aerosol.environment is namespace["environment"]
+    assert aerosol.particles.distribution_type == "particle_resolved"
+    assert aerosol.gas.name == ["organic"]
+    assert 0 <= aerosol.gas.concentration[0, 0] < 1e-6
+    inventory = (
+        np.sum(
+            aerosol.particles.masses
+            * aerosol.particles.concentration[..., None]
         )
-        .set_partitioning(True)
-        .set_concentration(np.array([1e2]), "kg/m^3")
-        .build()
+        + aerosol.gas.concentration[0, 0] * 1e-6
     )
+    np.testing.assert_allclose(inventory, 1e-12 + 3e-18, rtol=1e-12, atol=1e-30)
+    assert np.all(np.isfinite(aerosol.particles.masses))
+    assert np.all(aerosol.particles.masses >= 0)
 
-    # 2. Use AtmosphereBuilder to configure temperature, pressure, and species:
-    atmosphere = (
-        par.gas.AtmosphereBuilder()
-        .set_temperature(298.15, "K")
-        .set_pressure(101325, "Pa")
-        .set_more_partitioning_species(organic)
-        .build()
+
+def test_documentation_quick_start_runs():
+    """The published PMF example preserves number and material inventory."""
+    page = Path(__file__).resolve().parents[2] / "docs" / "index.md"
+    snippets = re.findall(r"```python\n(.*?)\n```", page.read_text(), re.DOTALL)
+    assert len(snippets) == 1
+    namespace = {}
+    exec(compile(snippets[0], str(page), "exec"), namespace)  # noqa: S102
+    aerosol = namespace["result"]
+    assert aerosol is namespace["aerosol"]
+    particles = aerosol.particles
+    assert particles.distribution_type == "discrete"
+    np.testing.assert_allclose(particles.number_density, [1e8], rtol=1e-12)
+    np.testing.assert_array_equal(particles.volume, [1.0])
+    assert 0 <= aerosol.gas.concentration[0, 0] < 100.0
+    final_particle_mass = np.sum(
+        particles.masses * particles.concentration[..., None]
     )
-
-    # 3. Build the particle distribution:
-    #    Using PresetParticleRadiusBuilder, we set mode radius, GSD, etc.
-    particle = (
-        par.particles.PresetParticleRadiusBuilder()
-        .set_mode(np.array([100e-9]), "m")
-        .set_geometric_standard_deviation(np.array([1.2]))
-        .set_number_concentration(np.array([1e8]), "1/m^3")
-        .set_density(1e3, "kg/m^3")
-        .build()
+    initial_particle_mass = namespace["initial_particle_mass"].item()
+    assert final_particle_mass > initial_particle_mass
+    np.testing.assert_allclose(
+        final_particle_mass + aerosol.gas.concentration[0, 0],
+        initial_particle_mass + 100.0,
+        rtol=1e-12,
+        atol=1e-30,
     )
-
-    # 4. Create the Aerosol combining the atmosphere and particle distribution:
-    aerosol = (
-        LegacyAerosolBuilder()
-        .set_atmosphere(atmosphere)
-        .set_particles(particle)
-        .build()
-    )
-
-    # 5. Define the isothermal condensation strategy:
-    condensation_strategy = par.dynamics.CondensationIsothermal(
-        molar_mass=180e-3,  # kg/mol
-        diffusion_coefficient=2e-5,  # m^2/s
-        accommodation_coefficient=1.0,
-    )
-
-    # 6. Build the MassCondensation process:
-    process = par.dynamics.MassCondensation(condensation_strategy)
-
-    # 7. Execute the condensation process over 10 seconds:
-    result = process.execute(aerosol, time_step=10.0)
-
-    #   The result is an Aerosol instance with updated particle properties.
-    # print(result)
-    # 8. Confirm the result is an Aerosol instance:
-    assert isinstance(result, LegacyAerosol)
+    assert np.all(np.isfinite(particles.masses))
+    assert np.all(particles.masses >= 0)

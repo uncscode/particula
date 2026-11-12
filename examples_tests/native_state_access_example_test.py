@@ -167,3 +167,28 @@ def test_native_migration_page_python_snippets_execute(page):
     assert (
         namespace["aerosol"].particles.distribution_type == "particle_resolved"
     )
+
+
+def test_foundations_native_construction_snippet():
+    """The canonical schema example declares counts and extensive inventory."""
+    path = (
+        SOURCE.parents[2]
+        / "docs/Features/data-containers-and-gpu-foundations.md"
+    )
+    section = path.read_text().split(
+        "Example single-box container construction:", 1
+    )[1]
+    snippet = re.search(r"```python\n(.*?)\n```", section, re.DOTALL)[1]
+    namespace = {}
+    exec(compile(snippet, str(path), "exec"), namespace)  # noqa: S102
+    particles = namespace["particle_data"]
+    assert particles.distribution_type == "particle_resolved"
+    np.testing.assert_allclose(particles.number_density, [1e6], rtol=1e-12)
+    np.testing.assert_allclose(
+        particles.species_mass_inventory, [[1e-18, 2e-18]], rtol=1e-12
+    )
+    np.testing.assert_allclose(
+        namespace["gas_data"].concentration * particles.volume[:, None],
+        [[1e-12, 2e-16]],
+        rtol=1e-12,
+    )

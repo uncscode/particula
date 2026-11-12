@@ -26,22 +26,51 @@ OpenCode. See the guide for native install commands and environment requirements
 
 ## Quick Start
 
+The following native example requires the selected E9 checkout (install it with
+`pip install -e .`). It does not imply that an older published wheel contains
+these migration APIs.
+
 ```python
+import numpy as np
 import particula as par
-from particula._legacy_aerosol import AerosolBuilder as LegacyAerosolBuilder
+from particula.dynamics.condensation.species_mapping import CondensationSpeciesMap
 
-# Build an aerosol system
-aerosol = (
-    LegacyAerosolBuilder()
-    .set_atmosphere(atmosphere)
-    .set_particles(particles)
-    .build()
+particles = par.particles.create_resolved_particle_data(
+    masses=[1e-18, 2e-18], density=1000.0,
+    concentration=[1.0, 1.0], volume=1e-6,  # counts and m³
 )
+gas = par.gas.GasData(
+    name=["organic"], molar_mass=np.array([0.180]),
+    concentration=np.array([[1e-6]]),  # kg/m³
+    partitioning=np.array([True]),
+)
+environment = par.gas.EnvironmentData(
+    temperature=[298.15], pressure=[101325.0], saturation_ratio=[[1.0]],
+)
+aerosol = par.Aerosol(particles=particles, gas=gas, environment=environment)
 
-# Run dynamics (chainable with | operator)
-process = par.dynamics.Condensation(strategy) | par.dynamics.Coagulation(strategy)
-aerosol = process.execute(aerosol, time_step=10, sub_steps=1000)
+strategy = par.dynamics.CondensationIsothermal(
+    molar_mass=gas.molar_mass.copy(),
+    diffusion_coefficient=2e-5, accommodation_coefficient=1.0,
+    activity_strategy=par.particles.ActivityIdealMass(),
+    surface_strategy=par.particles.SurfaceStrategyVolume(density=1000.0),
+    vapor_pressure_strategy=par.gas.ConstantVaporPressureStrategy(1e-3),
+    species_map=CondensationSpeciesMap(("organic",), ((0, 0),)),
+)
+condensation = par.dynamics.MassCondensation(strategy)
+coagulation = par.dynamics.Coagulation(
+    par.dynamics.BrownianCoagulationStrategy("particle_resolved")
+)
+aerosol = (condensation | coagulation).execute(
+    aerosol, time_step=10.0, sub_steps=10
+)
+print(aerosol.particles.number_density)  # m⁻³, not raw counts
 ```
+
+This single-box illustration retains explicit population and species meaning.
+See [native access and replacement](docs/Features/particle-data-migration/containers.md)
+for ownership, validation and non-unit-volume inventory checks.
+
 
 ## Migration / What's New
 
@@ -83,7 +112,7 @@ particula/
 
 ### Featured Examples
 
-- [**Aerosol Tutorial**](./docs/Examples/Aerosol/Aerosol_Tutorial.ipynb) — Learn how to build gas species, atmospheres, particle distributions, and combine them into an `Aerosol` object.
+- [**Aerosol Tutorial**](./docs/Examples/Aerosol/Aerosol_Tutorial.ipynb) — Build native particle, full gas and environment containers and combine them into an `Aerosol` object.
 
 - [**CPU Latent-Heat Condensation Bookkeeping**](./docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.ipynb)
   — CPU-only walkthrough showing diagnostic latent-heat bookkeeping from real
@@ -94,12 +123,12 @@ particula/
   exported `nucleation_step_gpu`. It requires Warp and is separate from the
   CPU-only `Nucleation` runnable; it provides no CPU fallback.
 
-- [**Organic Partitioning & Coagulation**](./docs/Examples/Simulations/Notebooks/Organic_Partitioning_and_Coagulation.ipynb) — Full simulation of secondary organic aerosol (SOA) formation from 10 organic vapors, followed by Brownian coagulation over 10 minutes.
+- [**Organic Partitioning & Coagulation**](./docs/Examples/Simulations/Notebooks/Organic_Partitioning_and_Coagulation.ipynb) — Illustrative organic partitioning followed by Brownian coagulation, including the retained binned method’s composition limitation; not a quantitative species forecast.
 
 - [**Cloud Chamber Cycles**](./docs/Examples/Simulations/Notebooks/Cloud_Chamber_Multi_Cycle.ipynb)
   — Multi-cycle cloud droplet activation demonstrating κ-Köhler theory across
-  3 seed compositions (Ammonium Sulfate, Sucrose, Mixed), showing how
-  hygroscopicity affects activation at different supersaturations.
+  3 seed compositions (Ammonium Sulfate, Sucrose, Mixed), comparing illustrative humidity responses. Dry-phase timestep oscillations
+  remain unqualified for quantitative activation predictions.
 
 ## Features
 
