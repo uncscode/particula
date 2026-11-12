@@ -497,9 +497,9 @@ class MassCondensation(RunnableABC):
 class Coagulation(RunnableABC):
     """Implements a coagulation process for aerosol particles.
 
-    This class applies a specified coagulation strategy to each particle
-    in an Aerosol, merging or aggregating particles as needed, based on
-    the chosen physical model.
+    Apply a strategy to the held single-box native particle population.
+    Each equal substep reads the current environment and retains the particle
+    container. Non-native aggregates reject before strategy dispatch.
 
     Attributes:
         coagulation_strategy: The coagulation strategy used for particle
@@ -536,10 +536,10 @@ class Coagulation(RunnableABC):
 
     def execute(
         self,
-        aerosol: _AerosolT,
+        aerosol: Aerosol,
         time_step: float,
         sub_steps: int = 1,
-    ) -> _AerosolT:
+    ) -> Aerosol:
         """Perform the coagulation process over a given time step.
 
         Args:
@@ -559,35 +559,24 @@ class Coagulation(RunnableABC):
             # The aerosol now reflects changes from particle collisions
             ```
         """
-        if isinstance(aerosol, Aerosol):
-            duration = _native_duration(time_step, sub_steps)
-            for _ in range(sub_steps):
-                particles, _, temperature, pressure = _native_process_state(
-                    aerosol
-                )
-                result = self.coagulation_strategy.step(
-                    particle=particles,
-                    temperature=temperature,
-                    pressure=pressure,
-                    time_step=duration,
-                )
-                if result is not particles:
-                    raise ValueError(
-                        "Native coagulation must retain its container."
-                    )
-            return aerosol
-        # Loop over particles
+        if not isinstance(aerosol, Aerosol):
+            raise TypeError("Coagulation requires a native Aerosol")
+        duration = _native_duration(time_step, sub_steps)
         for _ in range(sub_steps):
-            # Calculate the coagulation step for the particle
-            aerosol.particles = self.coagulation_strategy.step(
-                particle=aerosol.particles,
-                temperature=aerosol.atmosphere.temperature,
-                pressure=aerosol.atmosphere.total_pressure,
-                time_step=time_step / sub_steps,
-            )  # type: ignore[assignment]
+            particles, _, temperature, pressure = _native_process_state(aerosol)
+            result = self.coagulation_strategy.step(
+                particle=particles,
+                temperature=temperature,
+                pressure=pressure,
+                time_step=duration,
+            )
+            if result is not particles:
+                raise ValueError(
+                    "Native coagulation must retain its container."
+                )
         return aerosol
 
-    def rate(self, aerosol: Aerosol | LegacyAerosol) -> Any:
+    def rate(self, aerosol: Aerosol) -> Any:
         """Compute the coagulation rate for each particle in the aerosol.
 
         Args:
@@ -603,22 +592,14 @@ class Coagulation(RunnableABC):
             # rates might look like array([0.1, 0.05, ...])
             ```
         """
-        if isinstance(aerosol, Aerosol):
-            particles, _, temperature, pressure = _native_process_state(aerosol)
-            return self.coagulation_strategy.net_rate(
-                particle=particles,
-                temperature=temperature,
-                pressure=pressure,
-            )
-        rates = np.array([], dtype=np.float64)
-        # Calculate the net coagulation rate for the particle
-        net_rate = self.coagulation_strategy.net_rate(
-            particle=aerosol.particles,
-            temperature=aerosol.atmosphere.temperature,
-            pressure=aerosol.atmosphere.total_pressure,
+        if not isinstance(aerosol, Aerosol):
+            raise TypeError("Coagulation requires a native Aerosol")
+        particles, _, temperature, pressure = _native_process_state(aerosol)
+        return self.coagulation_strategy.net_rate(
+            particle=particles,
+            temperature=temperature,
+            pressure=pressure,
         )
-        rates = np.append(rates, net_rate)
-        return rates
 
 
 class WallLoss(RunnableABC):

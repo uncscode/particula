@@ -3164,7 +3164,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Removal-safe shared facade guard; native execution assertions retained and non-native coagulation boundary tests added.",
       "test_nodes": [
         {
           "name": "test_real_condensation_substeps_close_each_species_and_retain_objects",
@@ -6891,7 +6891,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Native fixtures complete; all seven original test functions retained; scientific successor map in coagulation_integration_assertions.json.",
       "test_nodes": [
         {
           "name": "test_pmf_initial_distribution",

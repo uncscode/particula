@@ -359,3 +359,31 @@ whitespace checks passed. The initial collection attempt used an incorrect
 EnvironmentData import; the corrected supported package import passed all
 checks above. Shared coagulation dispatch and the remaining integration
 fixtures still require migration/removal before facade definitions can go.
+
+## Native-only coagulation runnable and general integration
+
+Removed legacy aggregate dispatch from `Coagulation.execute` and `rate`.
+Both require native Aerosol before strategy access; the established native
+substep, current-environment, measure and held-container behavior is retained.
+MassCondensation and the shared strategy compatibility paths remain pending.
+
+Migrated all seven general coagulation integration tests to native initializers
+and explicit environment/inert gas. `coagulation_integration_assertions.json`
+records every original test body and its successor. Mass concentration is now
+computed independently from native state: discrete sum, radius-PDF trapezoidal
+quadrature, or resolved count-weighted sum divided by physical volume. Original
+steps, sample counts, distribution parameters and tolerance assertions remain.
+
+Replaced the native runnable suite's constructor-import guard with the shared
+removal-safe fixture. Added six non-native admission cases and a replacement-
+result rejection/held-identity regression. Updated the runnable docstring and
+coagulation guide to state its native-only ownership contract accurately.
+
+Validation at this implementation revision:
+- General migrated integration suite: **7 passed in 0.78s**.
+- All dynamics runnable tests, integration tests and coagulation tests:
+  **1626 passed, 1 skipped in 6.24s**, `/tmp/m6-coag-runnable-final.log`.
+- Full mypy: **552 source files passed**, `/tmp/m6-coag-runnable-mypy.log`.
+- Scoped Ruff/format and whitespace checks passed.
+- Base strict docs: passed in 1.86 seconds, `/tmp/m6-coag-runnable-docs.log`.
+The full publication and final-revision readiness gates remain separate.

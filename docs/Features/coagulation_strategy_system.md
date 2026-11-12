@@ -19,6 +19,13 @@ This feature is built around user-facing APIs exposed via `particula.dynamics`:
 - `CoagulationFactory` – factory for selecting a coagulation strategy by name with builder defaults.
 - `Coagulation` runnable – delegates to a coagulation strategy, splits `time_step` across `sub_steps`, and composes with other runnables using the `|` operator.
 
+The `Coagulation` runnable requires a native `Aerosol` holding `ParticleData`,
+`GasData` and `EnvironmentData`. Each equal substep reads the current held
+population and environment. Strategies must return the same particle container;
+the runnable rejects replacement results. Gas state remains held independently.
+The runnable's `rate` forwards the strategy's native rate without changing its
+population measure. Non-native aggregates reject before strategy dispatch.
+
 ## Native kernel and rate contract (E9-M3)
 
 The six concrete CPU strategy families accept explicitly tagged `ParticleData`
