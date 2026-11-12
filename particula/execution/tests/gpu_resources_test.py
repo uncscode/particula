@@ -58,7 +58,11 @@ from particula.execution.scheduler import (
 
 
 def _session(
-    boxes: int = 1, particle_count: int = 2, species: int = 1
+    boxes: int = 1,
+    particle_count: int = 2,
+    species: int = 1,
+    *,
+    resolved: bool = False,
 ) -> ResidentSession:
     """Build a small valid active Warp CPU resident session lazily."""
     wp = pytest.importorskip("warp")
@@ -69,6 +73,7 @@ def _session(
     )
 
     particles = WarpParticleData()
+    particles.distribution_kind = wp.int32(3 if resolved else 0)
     particles.masses = wp.ones(
         (boxes, particle_count, species), dtype=wp.float64, device="cpu"
     )
@@ -99,10 +104,13 @@ def _session(
         particles,
         gas,
         environment,
-        ResidentDimensions(boxes, particle_count, species),
+        ResidentDimensions(
+            boxes, particle_count, species, species if resolved else None
+        ),
         ResidentMetadata(
             Device(Backend.WARP, "cpu"),
             tuple(str(index) for index in range(species)),
+            distribution_type="particle_resolved" if resolved else None,
         ),
         ResidentLifecycle.ACTIVE,
     )

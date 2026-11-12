@@ -1629,3 +1629,69 @@ Final supporting checks: examples **225 passed, 2 skipped in 42.23s**
 (`/tmp/m6-source-docs2.log`); scoped Ruff, format and whitespace checks passed.
 Communication, transfers/resident/checkpoint admission and final publication
 readiness remain pending. These results do not close the full M6 gate.
+
+## GPU communication native-only migration
+
+Source/exhaustion closure was committed as `2b6a6df24`. Communication now
+requires explicit resolved metadata at direct volume/particle entry points,
+resident wrappers (before payload access), and prepared binding setup for
+particle transport or prescribed volume changes. Removed the planner's native
+mode flag and both prepared-helper mode flags, particle-density transport
+credits, and particle-density volume writers. Gas transport and its independent
+width/accounting remain unchanged. Prepared enqueue still uses pinned arrays.
+
+The new communication ledger retains 62 original tests. Fixtures now explicitly
+label raw particle weights as counts; count-weighted number, species mass and
+charge conservation replace legacy density-times-volume expectations. These
+fixtures are native count derivatives, not claims that unchanged raw weights
+represent the old density inventory. The independent NumPy particle-density
+oracle is retained unchanged (renamed `_particle_density_oracle`); a test-only
+normalization wrapper converts counts to density and converts final weights,
+debits, credits and source requests back to counts. No tolerance changed.
+The old scaled-particle underflow/overflow cases now also put that value in
+gas density, preserving protection of the retained scaled-density writer.
+
+Initial focused run: **84 passed, 12 skipped, 13 failed**
+(`/tmp/m6-communication1.log`), identifying legacy expectations and the removed
+raw-kernel mode argument. After native expectation migration: **97 passed,
+12 skipped in 0.42s** (`/tmp/m6-communication2.log`). Added resident-wrapper
+missing/zero/PMF/PDF metadata rejection coverage; native boundary suite:
+**23 passed, 11 skipped in 0.39s** (`/tmp/m6-communication-boundary.log`).
+Mypy passed all **535 files** (`/tmp/m6-communication-mypy1.log`); scoped
+Ruff/format and standard strict docs passed (`/tmp/m6-communication-docs1.log`).
+The full execution/communication/example dependent run remains active in
+`/tmp/m6-communication-dependent1.log` (session 28020); do not commit until its
+terminal result and assertion reconciliation are recorded.
+
+The first dependent run completed with **1484 passed, 64 skipped, 8 failed in
+82.03s**. All failures were untagged resident fixture admission, not numerical
+mismatches. Added explicit resolved fixture construction (tag, resident
+metadata, independent gas dimension) for communication/restart cases; shared
+helpers retain their other callers' existing default until the resident
+lifecycle migration. Updated native count inventory expectations and removed
+physical-volume scaling only from the particle branch of the transport-loop
+oracle. Both independent particle-density oracles are AST-identical to their
+original bodies after renaming; explicit normalization wrappers preserve them.
+The ledger now contains **83 original tests** including resident communication,
+transport-loop and restart-loop assertions. Their focused run passed **28 tests
+in 0.94s**, `/tmp/m6-communication-dependent2.log`. Full dependent rerun is
+active in `/tmp/m6-communication-dependent3.log` (session 7752).
+
+### Communication commit closure
+
+Full dependent rerun passed: **1500 passed, 64 skipped in 84.25s**,
+`/tmp/m6-communication-dependent3.log`. All source examples passed:
+**225 passed, 2 skipped in 46.24s**, `/tmp/m6-communication-examples1.log`.
+Mypy again passed **535 files**, `/tmp/m6-communication-mypy2.log`.
+All 83 original assertion records have validated native successors. Scoped
+Ruff, format and whitespace checks passed. No tests or numerical tolerances
+were removed. Standard strict documentation passed earlier at the same
+production/doc revision. No validation processes remain live for this unit.
+
+Next unit: explicit population metadata at CPU-Warp transfers and resident
+construction; remove the unused `require_legacy_particle_metadata` guard;
+reject untagged schema-v5 restart before setup/upload, preserving tagged v5.
+The remaining production audit also identifies ambiguous fallback gas width,
+resident diagnostics and construction compatibility, and stale condensation/
+coagulation docstrings. Shared-mask conversion is independent retained science.
+Final published documentation/notebook/readiness gates remain open.

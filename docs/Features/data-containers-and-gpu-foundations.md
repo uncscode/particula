@@ -592,8 +592,9 @@ saturation-refresh consumer window.
 E7-F7 ships fixed-shape, single-device prescribed-map boundaries, not CFD or a
 user-facing transport API. Direct gas communication accepts a GAS map with
 closed in-domain edges and declared `-1` source/sink endpoints. Direct particle
-transport accepts only closed in-domain, particle-resolved, fixed-slot
-PARTICLES maps. In contrast, a resident session pins exactly one complete
+transport accepts only closed in-domain, explicitly particle-resolved,
+fixed-slot PARTICLES maps. Particle transport and physical volume evolution
+reject missing/untagged, PMF and PDF population metadata before payload access. In contrast, a resident session pins exactly one complete
 closed-map GAS or PARTICLES family and rejects combined or open forms.
 
 Direct callers own the same-device fixed-shape primaries, maps, and work
@@ -611,13 +612,15 @@ this standalone boundary, `new_volume` is the current unchanged volume, so its
 sole normalization is equivalently `(amounts + amount_deltas) / volume`; it has
 no fused direct-gas `new_volume` argument. In a resident schedule,
 communication first stages with old volumes, then optional volume evolution
-rescales particle and gas concentrations by `old_volume / final_volume`. This
-is not a second direct-gas normalization.
+rescales gas concentrations by `old_volume / final_volume` and leaves particle
+counts unchanged. Particle transport debits and credits the same count across
+unequal-volume boxes; number density is count divided by the current volume.
+This is not a second direct-gas normalization.
 
 Closed gas maps conserve extensive species amounts within floating-point
 tolerance. Open gas inventory changes are intentional and auditable through
-the source/sink ledgers. Closed particle maps conserve concentration-weighted
-particle number, every mass lane, and signed charge. Particle planning reads
+the source/sink ledgers. Closed particle maps conserve total particle count,
+every count-weighted mass lane, and count-weighted signed charge. Particle planning reads
 immutable pre-step state, prefers an exact population match, then uses the next
 ascending pre-step free slot. Capacity is deterministically gated: there is no
 resize, compaction, implicit activation, or clipping.

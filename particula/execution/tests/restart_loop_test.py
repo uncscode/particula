@@ -70,7 +70,7 @@ def test_restart_restores_closed_transport_and_published_stream_words(
     )
     from particula.execution.tests.checkpoint_test import _resident_binding
 
-    session, registry, guard = _resident_binding(n_boxes=2)
+    session, registry, guard = _resident_binding(n_boxes=2, resolved=True)
     configuration = CommunicationConfiguration(
         CommunicationMap(
             CommunicationMapForm.ONE_DIMENSIONAL,

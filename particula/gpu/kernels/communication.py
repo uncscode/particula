@@ -10,7 +10,7 @@ package. The module performs no hidden host transfer, synchronization,
 resizing, conversion, or CPU fallback. Callers synchronize explicitly before
 inspecting asynchronous device results.
 
-Private prepared calls preserve legacy validation and fallback allocation in
+Private prepared calls preserve setup validation and fallback allocation in
 setup, then enqueue retained device work without validation, allocation,
 readback, transfer, synchronization, lookup, rebinding, or recovery. Empty or
 no-work calls are write-free. Rejection is pre-writer; rollback is not promised
@@ -537,12 +537,11 @@ def _scan_2d(
         )
 
 
-def _resolved_communication(particles: Any) -> bool:
-    """Admit explicit resolved counts or the transitional untagged contract."""
+def _resolved_communication(particles: Any) -> None:
+    """Require explicit resolved-count population metadata."""
     code = particle_distribution_code(particles)
-    if code not in (0, 3):
+    if code != 3:
         raise ValueError("communication requires particle_resolved populations")
-    return code == 3
 
 
 @wp.kernel
@@ -575,15 +574,13 @@ def volume_evolution_step_gpu(
     at its explicit synchronization boundary. Successful calls update only
     ``particles.volume`` and scale gas concentrations by the ratio
     ``old_volume / final_volume``.
-    Native particle counts remain unchanged; untagged particle densities scale
-    with gas. Equal final volumes are write-free no-ops.
+    Particle counts remain unchanged. Equal final volumes are write-free no-ops.
     This direct kernel performs no hidden transfer, synchronization, or CPU
     fallback; callers synchronize before inspection.
 
     Native resolved populations carry counts. Physical volume evolution keeps
     those counts unchanged; transport moves equal counts between boxes. Native
-    PMF and PDF populations are unsupported. Untagged legacy number-density
-    behavior remains available during migration.
+    PMF, PDF and untagged populations are unsupported.
 
     Args:
         particles: Warp particle container with fixed-shape primary fields.
@@ -605,7 +602,7 @@ def volume_evolution_step_gpu(
         Rollback is not promised if an asynchronous apply writer fails after it
         launches.
     """
-    native = _resolved_communication(particles)
+    _resolved_communication(particles)
     # Final-volume form precedes payload access after population admission.
     final_volumes_array, final_range = _validate_array(
         final_volumes, "final_volumes", wp.float64, 1
@@ -743,36 +740,26 @@ def volume_evolution_step_gpu(
         inputs=[volume, final_volumes, invalid, changed],
         device=device,
     )
-    if native:
-        wp.launch(
-            _scan_population,
-            dim=n_boxes,
-            inputs=[
-                masses,
-                particle_concentration,
-                charge,
-                density,
-                volume,
-                3,
-                invalid,
-            ],
-            device=device,
-        )
-        if n_particles:
-            wp.launch(
-                _validate_count_density,
-                dim=particle_concentration.shape,
-                inputs=[particle_concentration, final_volumes, invalid],
-                device=device,
-            )
-    else:
-        _scan_2d(
+    wp.launch(
+        _scan_population,
+        dim=n_boxes,
+        inputs=[
+            masses,
             particle_concentration,
+            charge,
+            density,
             volume,
-            final_volumes,
+            3,
             invalid,
-            changed,
-            True,
+        ],
+        device=device,
+    )
+    if n_particles:
+        wp.launch(
+            _validate_count_density,
+            dim=particle_concentration.shape,
+            inputs=[particle_concentration, final_volumes, invalid],
+            device=device,
         )
     _scan_2d(
         gas_concentration,
@@ -782,19 +769,6 @@ def volume_evolution_step_gpu(
         changed,
         True,
     )
-    if n_particles and not native:
-        wp.launch(
-            _apply_scaled_concentration,
-            dim=(n_boxes, n_particles),
-            inputs=[
-                particle_concentration,
-                volume,
-                final_volumes,
-                invalid,
-                changed,
-            ],
-            device=device,
-        )
     if n_gas:
         wp.launch(
             _apply_scaled_concentration,
@@ -959,7 +933,6 @@ def _particle_communication_plan(  # noqa: C901
     requests: wp.array2d(dtype=wp.float64),
     invalid: wp.array(dtype=wp.int32),
     demand: wp.array(dtype=wp.int32),
-    native: int,
 ) -> None:
     """Plan deterministically, writing public buffers only after demand."""
     if wp.tid() != 0:
@@ -998,9 +971,7 @@ def _particle_communication_plan(  # noqa: C901
             )
             if not active and not all_zero:
                 invalid[0] = 1
-            if native != 0 and not wp.isfinite(
-                concentration[box, slot] / volume[box]
-            ):
+            if not wp.isfinite(concentration[box, slot] / volume[box]):
                 invalid[0] = 1
     for edge in range(edges):
         if enabled[edge] != 0 and enabled[edge] != 1:
@@ -1138,14 +1109,7 @@ def _particle_communication_plan(  # noqa: C901
                         invalid[0] = 1
                     else:
                         assignments[edge, source_slot] = assigned
-                        credit = request
-                        if native == 0:
-                            credit = (
-                                request
-                                * volume[source_box]
-                                / volume[destination_box]
-                            )
-                        credits[destination_box, assigned] += credit
+                        credits[destination_box, assigned] += request
     for box in range(boxes):
         for slot in range(slots):
             final = (
@@ -1159,7 +1123,7 @@ def _particle_communication_plan(  # noqa: C901
                 or debits[box, slot] > concentration[box, slot]
                 or not wp.isfinite(final)
                 or final < 0.0
-                or (native != 0 and not wp.isfinite(final / volume[box]))
+                or not wp.isfinite(final / volume[box])
             ):
                 invalid[0] = 1
 
@@ -1612,8 +1576,8 @@ def particle_communication_step_gpu(
     positive total mass, and finite charge) or exactly free (all-zero fields).
     ``buffers`` owns float64 debit/credit ``(B, N)`` arrays, int32 assignments
     ``(E, N)``, and float64 requests ``(E, N)``. Here ``E`` is map edge
-    capacity. Each source debit is converted to destination concentration using
-    the source/destination volume ratio, preserving weighted inventories.
+    capacity. Each source count debit is credited unchanged at the destination,
+    preserving extensive inventories across unequal box volumes.
 
     Valid zero-size, zero-time, disabled-map, and zero-demand calls are
     write-free, including all supplied buffers. A nonzero plan overwrites the
@@ -1628,8 +1592,7 @@ def particle_communication_step_gpu(
 
     Native resolved populations carry counts. Physical volume evolution keeps
     those counts unchanged; transport moves equal counts between boxes. Native
-    PMF and PDF populations are unsupported. Untagged legacy number-density
-    behavior remains available during migration.
+    PMF, PDF and untagged populations are unsupported.
 
     Args:
         particles: Complete caller-owned fixed-shape Warp particle container.
@@ -1645,7 +1608,7 @@ def particle_communication_step_gpu(
         ValueError: If observable schemas, devices, aliases, or declaration
             metadata are invalid.
     """
-    native = _resolved_communication(particles)
+    _resolved_communication(particles)
     step = _validate_time_step(time_step)
     typed = _validate_particle_communication_configuration(configuration)
     if type(buffers) is not ParticleCommunicationBuffers:
@@ -1820,7 +1783,6 @@ def particle_communication_step_gpu(
             requests,
             invalid,
             demand,
-            int(native),
         ],
         device=device,
     )
@@ -2068,7 +2030,6 @@ def _enqueue_prepared_resident_particle_communication(
     initial_masses: Any,
     initial_concentration: Any,
     initial_charge: Any,
-    native: bool = False,
 ) -> None:
     """Launch bound PARTICLES communication without setup or allocation.
 
@@ -2139,7 +2100,6 @@ def _enqueue_prepared_resident_particle_communication(
             buffers.request_concentrations,
             invalid,
             demand,
-            int(native),
         ],
         device=device,
     )
@@ -2190,7 +2150,6 @@ def _enqueue_prepared_resident_volume_evolution(
     invalid: Any,
     changed: Any,
     device: Any,
-    native: bool = False,
 ) -> None:
     """Launch a bound volume barrier with an equal-volume write-free path.
 
@@ -2224,36 +2183,24 @@ def _enqueue_prepared_resident_volume_evolution(
         inputs=[volume, final_volumes, invalid, changed, boxes],
         device=device,
     )
-    if native:
-        _scan_1d(volume, _scan_positive_finite, invalid)
-        _scan_1d(final_volumes, _scan_positive_finite, invalid)
-        wp.launch(
-            _validate_factors,
-            dim=boxes,
-            inputs=[volume, final_volumes, invalid, changed],
-            device=device,
-        )
-        if particle_concentration.shape[1]:
-            for volumes in (volume, final_volumes):
-                wp.launch(
-                    _validate_count_density,
-                    dim=particle_concentration.shape,
-                    inputs=[particle_concentration, volumes, invalid],
-                    device=device,
-                )
-        _scan_2d(
-            gas_concentration, volume, final_volumes, invalid, changed, False
-        )
-        _scan_2d(
-            gas_concentration, volume, final_volumes, invalid, changed, True
-        )
-    if particle_concentration.shape[1] and not native:
-        wp.launch(
-            _apply_resident_scaled_concentration,
-            dim=particle_concentration.shape,
-            inputs=[particle_concentration, volume, final_volumes, invalid],
-            device=device,
-        )
+    _scan_1d(volume, _scan_positive_finite, invalid)
+    _scan_1d(final_volumes, _scan_positive_finite, invalid)
+    wp.launch(
+        _validate_factors,
+        dim=boxes,
+        inputs=[volume, final_volumes, invalid, changed],
+        device=device,
+    )
+    if particle_concentration.shape[1]:
+        for volumes in (volume, final_volumes):
+            wp.launch(
+                _validate_count_density,
+                dim=particle_concentration.shape,
+                inputs=[particle_concentration, volumes, invalid],
+                device=device,
+            )
+    _scan_2d(gas_concentration, volume, final_volumes, invalid, changed, False)
+    _scan_2d(gas_concentration, volume, final_volumes, invalid, changed, True)
     if gas_concentration.shape[1]:
         wp.launch(
             _apply_resident_scaled_concentration,
@@ -2347,6 +2294,7 @@ def resident_particle_communication_step_gpu(
     Returns:
         The exact ``particles`` input container.
     """
+    _resolved_communication(particles)
     map_data = configuration.communication_map
     _enqueue_prepared_resident_particle_communication(
         particles.masses,
@@ -2371,7 +2319,6 @@ def resident_particle_communication_step_gpu(
         initial_masses,
         initial_concentration,
         initial_charge,
-        _resolved_communication(particles),
     )
     return particles
 
@@ -2395,6 +2342,7 @@ def resident_volume_evolution_step_gpu(
     Returns:
         The exact ``(particles, gas)`` input containers.
     """
+    _resolved_communication(particles)
     _enqueue_prepared_resident_volume_evolution(
         particles.volume,
         particles.concentration,
@@ -2404,6 +2352,5 @@ def resident_volume_evolution_step_gpu(
         invalid,
         changed,
         particles.volume.device,
-        _resolved_communication(particles),
     )
     return particles, gas
