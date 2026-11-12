@@ -99,17 +99,8 @@ def device(request):
 
 
 @pytest.fixture(autouse=True)
-def forbid_facades(monkeypatch):
-    """Native prepared setup and continuation never construct a legacy facade."""
-    from particula._legacy_aerosol import Aerosol as LegacyAerosol
-    from particula.gas.species import GasSpecies
-    from particula.particles.representation import ParticleRepresentation
-
-    def forbidden(*args, **kwargs):
-        pytest.fail("native loop constructed a legacy facade")
-
-    for carrier in (LegacyAerosol, GasSpecies, ParticleRepresentation):
-        monkeypatch.setattr(carrier, "__init__", forbidden)
+def forbid_facades(forbid_legacy_facades):
+    """Apply the removal-safe native execution boundary guard."""
 
 
 def build_loop(device, source=False, restored=None):
