@@ -884,7 +884,7 @@ class TestCondensationLatentHeat(unittest.TestCase):
             mass_rate_array = np.array([mass_rate])
         else:
             mass_rate_array = mass_rate
-        mass_rate_array = cond._apply_skip_partitioning(mass_rate_array)
+        # Native mass rates already exclude skipped full-gas map lanes.
         norm_conc = particle_data.concentration[0] / particle_data.volume[0]
         mass_transfer = get_mass_transfer(
             mass_rate=mass_rate_array,
@@ -936,7 +936,7 @@ class TestCondensationLatentHeat(unittest.TestCase):
             mass_rate_array = np.array([mass_rate])
         else:
             mass_rate_array = mass_rate
-        mass_rate_array = cond._apply_skip_partitioning(mass_rate_array)
+        # Native mass rates already exclude skipped full-gas map lanes.
         norm_conc = particle_data.concentration[0] / particle_data.volume[0]
         mass_transfer = get_mass_transfer(
             mass_rate=mass_rate_array,
@@ -999,7 +999,7 @@ class TestCondensationLatentHeat(unittest.TestCase):
             mass_rate_array = np.array([mass_rate])
         else:
             mass_rate_array = mass_rate
-        mass_rate_array = cond._apply_skip_partitioning(mass_rate_array)
+        # Native mass rates already exclude skipped full-gas map lanes.
         norm_conc = particle_data.concentration[0] / particle_data.volume[0]
         mass_transfer = get_mass_transfer(
             mass_rate=mass_rate_array,
@@ -1062,7 +1062,7 @@ class TestCondensationLatentHeat(unittest.TestCase):
             mass_rate_array = np.array([mass_rate])
         else:
             mass_rate_array = mass_rate
-        mass_rate_array = cond._apply_skip_partitioning(mass_rate_array)
+        # Native mass rates already exclude skipped full-gas map lanes.
         norm_conc = particle_data.concentration[0] / particle_data.volume[0]
         mass_transfer = get_mass_transfer(
             mass_rate=mass_rate_array,
@@ -1268,7 +1268,7 @@ class TestCondensationLatentHeat(unittest.TestCase):
             if isinstance(mass_rate, (int, float))
             else mass_rate
         )
-        mass_rate_array = cond._apply_skip_partitioning(mass_rate_array)
+        # Native mass rates already exclude skipped full-gas map lanes.
         norm_conc = particle_data.concentration[0] / particle_data.volume[0]
         expected_mass_transfer = get_mass_transfer(
             mass_rate=mass_rate_array,
@@ -1348,7 +1348,9 @@ class TestCondensationLatentHeat(unittest.TestCase):
     def test_step_rejects_invalid_time_step(self):
         """step() rejects non-finite or negative timesteps."""
         particle_data, gas_data = self._make_data_inputs()
-        with self.assertRaisesRegex(ValueError, "time_step must be finite"):
+        with self.assertRaisesRegex(
+            ValueError, "time_step must be a finite nonnegative scalar"
+        ):
             self.data_strategy.step(
                 particle=particle_data,
                 gas_species=gas_data,

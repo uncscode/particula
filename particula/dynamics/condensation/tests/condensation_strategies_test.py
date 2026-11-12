@@ -10,14 +10,14 @@ import warnings
 import numpy as np
 import particula as par
 import pytest
+from particula.dynamics.condensation._native_step import (
+    validate_native_time_step,
+)
 from particula.dynamics.condensation.condensation_strategies import (
     CondensationIsothermal,
     CondensationIsothermalStaggered,
-    _normalize_first_order_mass_transport,
     _partial_pressure_from_strategy,
     _pure_vapor_pressure_from_strategy,
-    _require_single_box,
-    _validate_time_step,
 )
 from particula.dynamics.condensation.species_mapping import (
     CondensationSpeciesMap,
@@ -140,9 +140,11 @@ class TestCondensationIsothermal(unittest.TestCase):
 
     def test_validate_time_step_allows_zero_and_rejects_invalid(self):
         """_validate_time_step accepts zero and rejects invalid values."""
-        _validate_time_step(0.0)
-        with self.assertRaisesRegex(ValueError, "time_step must be finite"):
-            _validate_time_step(-0.5)
+        validate_native_time_step(0.0)
+        with self.assertRaisesRegex(
+            ValueError, "time_step must be a finite nonnegative scalar"
+        ):
+            validate_native_time_step(-0.5)
 
     def test_mean_free_path(self):
         """Test the mean free path call."""
@@ -183,10 +185,15 @@ class TestCondensationIsothermal(unittest.TestCase):
             )
         np.testing.assert_array_equal(self.particle.masses, before)
 
-    def test_require_single_box_raises_for_multi_box(self):
-        """require_single_box rejects multi-box inputs."""
-        with self.assertRaises(ValueError):
-            _require_single_box(2, "ParticleData")
+    def test_native_pressure_rejects_multi_box(self):
+        """Pressure evaluation enforces the public single-box contract."""
+        with self.assertRaisesRegex(ValueError, "n_boxes=1"):
+            self.strategy.calculate_pressure_delta(
+                _repeat_particle(self.particle, 2),
+                _repeat_gas(self.gas_species, 2),
+                self.temperature,
+                self.particle.radii[0],
+            )
 
     def test_vapor_pressure_helpers_handle_sequence_and_single(self):
         """Vapor-pressure helpers accept sequences and single strategies."""
@@ -314,20 +321,25 @@ class TestCondensationIsothermal(unittest.TestCase):
         )
         self.assertIsNotNone(result)
 
-    def test_normalize_first_order_mass_transport_2d(self):
-        """Normalize transport shape when pressure delta is 2D."""
-        pressure_delta = np.ones((3, 2))
-        mass_transport = np.array([1.0, 2.0, 3.0])
-
-        normalized = _normalize_first_order_mass_transport(
-            mass_transport, pressure_delta
+    def test_native_transport_preserves_particle_species_axes(self):
+        """Three particle radii and two species cannot broadcast ambiguously."""
+        particle = par.particles.create_resolved_particle_data(
+            masses=self.particle.masses[0] * np.array([[1.0], [2.0], [3.0]]),
+            density=self.particle.density,
+            volume=self.particle.volume[0],
         )
-
-        self.assertEqual(normalized.shape, (3, 1))
+        rates = self.strategy.mass_transfer_rate(
+            particle, self.gas_species, self.temperature, self.pressure
+        )
+        self.assertEqual(rates.shape, (3, 2))
+        self.assertTrue(np.all(np.isfinite(rates)))
+        self.assertTrue(np.all(rates[:, 0] != 0))
 
     def test_step_rejects_invalid_time_step(self):
         """step() rejects non-finite or negative timesteps."""
-        with self.assertRaisesRegex(ValueError, "time_step must be finite"):
+        with self.assertRaisesRegex(
+            ValueError, "time_step must be a finite nonnegative scalar"
+        ):
             self.strategy.step(
                 particle=self.particle,
                 gas_species=self.gas_species,
@@ -455,32 +467,24 @@ class TestCondensationIsothermal(unittest.TestCase):
             final_gas_conc[skip_idx], initial_gas_conc[skip_idx]
         )
 
-    def test_apply_skip_partitioning_direct(self):
-        """_apply_skip_partitioning zeroes selected indices on arrays."""
-        strategy = CondensationIsothermal(
-            activity_strategy=self.activity_strategy,
-            surface_strategy=self.surface_strategy,
-            vapor_pressure_strategy=self.vapor_pressure_strategy,
-            species_map=self.species_map,
-            molar_mass=self.molar_mass,
-            diffusion_coefficient=self.diffusion_coefficient,
-            accommodation_coefficient=self.accommodation_coefficient,
-            skip_partitioning_indices=[0, 2],
+    def test_skip_partitioning_masks_native_rates_without_mutating_inputs(self):
+        """Skipped gas lanes zero their mapped rate while other lanes retain it."""
+        baseline = self.strategy.rate(
+            self.particle, self.gas_species, self.temperature, self.pressure
         )
+        masses = self.particle.masses.copy()
+        gas = self.gas_species.concentration.copy()
+        self.strategy.skip_partitioning_indices = [0]
+        masked = self.strategy.rate(
+            self.particle, self.gas_species, self.temperature, self.pressure
+        )
+        np.testing.assert_array_equal(masked[:, 0], 0)
+        np.testing.assert_array_equal(masked[:, 1], baseline[:, 1])
+        np.testing.assert_array_equal(self.particle.masses, masses)
+        np.testing.assert_array_equal(self.gas_species.concentration, gas)
 
-        array_1d = np.arange(4.0)
-        returned_1d = strategy._apply_skip_partitioning(array_1d)
-        self.assertIs(returned_1d, array_1d)
-        np.testing.assert_array_equal(array_1d, np.array([0.0, 1.0, 0.0, 3.0]))
-
-        array_2d = np.tile(np.arange(4.0), (2, 1))
-        returned_2d = strategy._apply_skip_partitioning(array_2d)
-        self.assertIs(returned_2d, array_2d)
-        expected_2d = np.tile(np.array([0.0, 1.0, 0.0, 3.0]), (2, 1))
-        np.testing.assert_array_equal(array_2d, expected_2d)
-
-    def test_apply_skip_partitioning_rejects_non_integer_indices(self):
-        """_apply_skip_partitioning rejects non-integer indices."""
+    def test_native_skip_rejects_non_integer_indices(self):
+        """Native map admission rejects non-integer skip indices."""
         strategy = CondensationIsothermal(
             activity_strategy=self.activity_strategy,
             surface_strategy=self.surface_strategy,
@@ -492,11 +496,13 @@ class TestCondensationIsothermal(unittest.TestCase):
             skip_partitioning_indices=[0.5],
         )
 
-        with self.assertRaises(TypeError):
-            strategy._apply_skip_partitioning(np.arange(3.0))
+        with self.assertRaisesRegex(ValueError, "skip indices"):
+            strategy.rate(
+                self.particle, self.gas_species, self.temperature, self.pressure
+            )
 
-    def test_apply_skip_partitioning_out_of_bounds_raises(self):
-        """_apply_skip_partitioning rejects out-of-range indices."""
+    def test_native_skip_out_of_bounds_raises(self):
+        """Native map admission rejects out-of-range skip indices."""
         strategy = CondensationIsothermal(
             activity_strategy=self.activity_strategy,
             surface_strategy=self.surface_strategy,
@@ -508,8 +514,10 @@ class TestCondensationIsothermal(unittest.TestCase):
             skip_partitioning_indices=[3],
         )
 
-        with self.assertRaises(IndexError):
-            strategy._apply_skip_partitioning(np.arange(3.0))
+        with self.assertRaisesRegex(ValueError, "skip indices"):
+            strategy.rate(
+                self.particle, self.gas_species, self.temperature, self.pressure
+            )
 
     def test_isothermal_step_with_particle_data_gas_data(self):
         """step() supports ParticleData and GasData inputs."""
@@ -1377,3 +1385,61 @@ def test_empty_multispecies_native_configuration(
     with pytest.raises(ValueError, match="vapor pressure must be finite"):
         strategy.step(particle, gas, fixture.temperature, fixture.pressure, 1.0)
     np.testing.assert_array_equal(gas.concentration, before)
+
+
+@pytest.mark.parametrize(
+    "strategy_type",
+    [
+        CondensationIsothermal,
+        CondensationIsothermalStaggered,
+        par.dynamics.CondensationLatentHeat,
+    ],
+)
+@pytest.mark.parametrize(
+    "method", ["calculate_pressure_delta", "mass_transfer_rate", "rate", "step"]
+)
+@pytest.mark.parametrize("fault", ["untagged", "particle_type", "gas_type"])
+def test_native_only_entry_points_reject_without_mutation(
+    strategy_type, method, fault, forbid_legacy_facades
+):
+    """Every public entry rejects unsupported carriers before state changes."""
+    fixture = TestCondensationIsothermal()
+    fixture.setUp()
+    particle, gas = fixture._make_data_inputs()
+    strategy = strategy_type(
+        molar_mass=gas.molar_mass,
+        activity_strategy=fixture.activity_strategy,
+        surface_strategy=fixture.surface_strategy,
+        vapor_pressure_strategy=fixture.vapor_pressure_strategy,
+        species_map=fixture.species_map,
+    )
+    original_particle, original_gas = particle, gas
+    masses = particle.masses.copy()
+    concentration = particle.concentration.copy()
+    gas_concentration = gas.concentration.copy()
+    if fault == "untagged":
+        particle.distribution_type = None
+    elif fault == "particle_type":
+        particle = object()
+    else:
+        gas = object()
+    args = [particle, gas, fixture.temperature]
+    if method == "calculate_pressure_delta":
+        args.append(fixture.particle.radii[0])
+    else:
+        args.append(fixture.pressure)
+        if method == "step":
+            args.append(1.0)
+    expected = ValueError if fault == "untagged" else TypeError
+    match = (
+        "distribution_type"
+        if fault == "untagged"
+        else "ParticleData and GasData"
+    )
+    with pytest.raises(expected, match=match):
+        getattr(strategy, method)(*args)
+    np.testing.assert_array_equal(original_particle.masses, masses)
+    np.testing.assert_array_equal(
+        original_particle.concentration, concentration
+    )
+    np.testing.assert_array_equal(original_gas.concentration, gas_concentration)

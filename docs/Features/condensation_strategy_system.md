@@ -92,8 +92,12 @@ Fully evaporated resolved particles leave subsequent staggered batches/sweeps.
 
 CPU native calls require one box and revalidate mutable state at each entry.
 They preserve carrier and destination-array identities and reject protected
-storage overlap before writes. The examples below use native state and process-owned physics. Legacy facade
-execution remains available for compatibility until the separate M6 removal.
+storage overlap before writes. CPU condensation accepts tagged `ParticleData`
+and `GasData` only; activity, surface and vapor-pressure laws and the species
+map belong to the process. Facade dispatch, untagged CPU execution, implicit
+physics lookup and legacy normalization helpers have been removed. Empty
+populations retain their native shapes and gas state while still validating
+configuration. The examples below use native state and process-owned physics.
 
 ## Key Benefits
 
