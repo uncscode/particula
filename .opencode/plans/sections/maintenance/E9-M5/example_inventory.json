@@ -1405,10 +1405,11 @@
     },
     {
       "path": "docs/Features/backend_selection.md",
-      "python_fences": 2,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "python_fences": 1,
+      "disposition": "current stable value exports verified; selection-only example retained; resident sketch explicitly nonexecutable text",
+      "execution": "exact selection snippet verifies zero adapter calls; selected adapter/integration gate 96 passed, 3 skipped",
+      "phase": "P6",
+      "evidence": "examples_tests/native_process_guides_test.py and particula/execution/tests/condensation_{adapter,integration}_test.py"
     },
     {
       "path": "docs/Features/coagulation_strategy_system.md",
@@ -1421,8 +1422,8 @@
     {
       "path": "docs/Features/condensation_strategy_system.md",
       "python_fences": 19,
-      "disposition": "native CPU snippets migrated; selected-backend prose reconciliation remains pending",
-      "execution": "all 19 Python fences execute; 18 process-guide tests passed including 10 condensation inventory cases",
+      "disposition": "native CPU recipes and selected-backend ownership/profile prose reconciled",
+      "execution": "all Python fences execute; selected adapter/integration and process guides 96 passed, 3 skipped",
       "phase": "P6",
       "evidence": "examples_tests/native_process_guides_test.py"
     },

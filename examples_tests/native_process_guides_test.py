@@ -227,3 +227,16 @@ def test_native_scientific_direct_calls():
     lost = particles.concentration == 0
     assert np.all(particles.masses[lost] == 0)
     assert np.all(particles.charge[lost] == 0)
+
+
+def test_backend_selection_guide_does_not_execute():
+    """Published registration selects by identity without invoking the adapter."""
+    page = FEATURES / "backend_selection.md"
+    blocks = re.findall(r"```python\n(.*?)\n```", page.read_text(), re.DOTALL)
+    namespace = {}
+    for block in blocks:
+        exec(compile(block, str(page), "exec"), namespace)  # noqa: S102
+    adapter = namespace["adapter"]
+    assert adapter.calls == 0
+    assert namespace["context"].resolve(namespace["request"]) is adapter
+    assert adapter.calls == 0

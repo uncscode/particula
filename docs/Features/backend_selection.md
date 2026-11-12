@@ -109,7 +109,7 @@ CPU-authority declaration before a distinct CPU request. Resident restart is
 an exact-device GPU lifecycle operation, not CPU restoration or fallback. No
 component restores, transfers, synchronizes, migrates, or retries silently.
 
-```python
+```text
 WARP_AVAILABLE = False
 
 if WARP_AVAILABLE:

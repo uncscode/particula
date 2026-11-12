@@ -356,12 +356,14 @@ selected-condensation import, backend-registration recipe, or selected-step
 workflow. Availability and fallback mechanics, adapters, resident seams,
 registries, and GPU sidecars remain concrete-only.
 
-Selected CPU execution retains a caller-owned legacy `Aerosol` and calls a
+Selected CPU execution retains a caller-owned native `Aerosol` and calls a
 caller-owned `MassCondensation`. Selected Warp execution retains supplied
 caller-owned resident `WarpParticleData`, `WarpGasData`, and
-`WarpEnvironmentData`, plus same-device fixed-shape sidecars. Profile selection
-is catalogue/capability metadata: it does not bind or validate a supplied CPU
-runnable or Warp sidecars against that profile. The result retains selected
+`WarpEnvironmentData`, plus same-device fixed-shape sidecars. The CPU profile is catalogue metadata and does not bind the supplied runnable
+to its declared semantics. The selected Warp adapter checks required latent-heat
+sidecars and activity/surface mode selectors against its profile before kernel
+resolution. Native tagged state additionally requires a species binding pinned
+to the exact particle/gas arrays; gas and particle species widths may differ. The result retains selected
 state and native payload identity; it does not convert or restore either state
 form.
 
@@ -1166,11 +1168,11 @@ Warp CPU is the baseline when Warp is installed; CUDA is optional and skips
 cleanly when unavailable. The evidence is not CPU-strategy parity or per-seed
 trajectory replay.
 
-GPU process orchestration, backend selection and scheduling, GPU-resident
-timestep integration, resizing, graph capture, autodiff, performance claims,
-and GPU nucleation remain deferred. The separate CPU-only, one-box
-`Nucleation` runnable is documented in the
-[CPU Nucleation Strategy System](nucleation_strategy_system.md).
+These direct wall-loss checks do not by themselves establish orchestration,
+capture, autodiff or performance evidence. Native resident integration has its
+own [walkthrough](../Examples/gpu_resident_multi_timestep.py), and direct GPU
+nucleation has its own [source contract](nucleation_strategy_system.md#direct-warp-low-level-step).
+The CPU-only, one-box `Nucleation` runnable remains a separate high-level path.
 
 ### Particle transfer boundary
 

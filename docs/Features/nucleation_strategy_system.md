@@ -177,7 +177,7 @@ Callers explicitly convert `ParticleData`, `GasData`, and `EnvironmentData`,
 place arrays on one Warp device, and call `wp.synchronize()` before host
 inspection. Fixed schemas use `B` boxes, `N` particle slots, and `S` species:
 particle masses are `(B, N, S)`, particle concentration/charge are `(B, N)`,
-gas concentration is `(B, Sg)`, partitioning is `(Sg,)`, and temperature
+gas concentration is `(B, Sg)`, partitioning is `(B, Sg)`, and temperature
 is `(B,)`. Native particle width `Sp` may differ from full gas width `Sg`.
 Tagged resolved inputs require a `NucleationSpeciesBinding` prepared with
 `prepare_nucleation_species_map` from
