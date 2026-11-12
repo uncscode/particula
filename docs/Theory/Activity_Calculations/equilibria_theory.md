@@ -121,7 +121,9 @@ The equilibrium solver minimizes the difference between guessed and calculated p
 
 $$\text{Error} = \sum_j (\varepsilon_j^{guess} - \varepsilon_j^{calc})^2 + (C_{liq}^{guess} - C_{liq}^{calc})^2$$
 
-Convergence is achieved when this error falls below a threshold (typically $10^{-16}$).
+Inspect the returned optimizer success flag and residual for each solve.
+Optimizer termination does not imply a universal $10^{-16}$ residual or a
+validated thermodynamic accuracy bound.
 
 ### Mass Balance
 
@@ -129,7 +131,9 @@ At equilibrium, mass must be conserved:
 
 $$C_j^{total} = C_j^{gas} + C_j^{\alpha} + C_j^{\beta}$$
 
-where the particle-phase concentrations include both organic mass and associated water.
+Here each species balance counts organic mass only. Associated water supplied
+by the prescribed humidity reservoir is reported separately; adding it to the
+organic species inventory would create a false mass imbalance.
 
 ## Implementation in Particula
 
@@ -176,7 +180,7 @@ alpha, beta, system, result = liquid_vapor_partitioning(
     q_ab=q_ab,
 )
 
-print(f"Total liquid concentration: {system[0]:.3f} ug/m3")
+print(f"Total liquid organic concentration: {system[0]:.3f} ug/m3")
 print(f"Partition coefficients: {system[2]}")
 ```
 

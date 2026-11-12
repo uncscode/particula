@@ -1398,9 +1398,10 @@
     {
       "path": "docs/Features/activity_system.md",
       "python_fences": 11,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "functional activity/equilibrium reference audited; no native aggregate construction required",
+      "execution": "exact Python fences execute; coefficient identities and organic inventory checks pass in 6-test theory suite",
+      "phase": "P6",
+      "evidence": "examples_tests/native_theory_guides_test.py"
     },
     {
       "path": "docs/Features/backend_selection.md",
@@ -1521,16 +1522,18 @@
     {
       "path": "docs/Theory/Activity_Calculations/activity_theory.md",
       "python_fences": 2,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "functional activity/equilibrium reference audited; no native aggregate construction required",
+      "execution": "exact Python fences execute; coefficient identities and organic inventory checks pass in 6-test theory suite",
+      "phase": "P6",
+      "evidence": "examples_tests/native_theory_guides_test.py"
     },
     {
       "path": "docs/Theory/Activity_Calculations/equilibria_theory.md",
       "python_fences": 1,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "functional activity/equilibrium reference audited; no native aggregate construction required",
+      "execution": "exact Python fences execute; coefficient identities and organic inventory checks pass in 6-test theory suite",
+      "phase": "P6",
+      "evidence": "examples_tests/native_theory_guides_test.py"
     },
     {
       "path": "docs/Theory/Code_Concepts/Details/Design_Patterns.md",
