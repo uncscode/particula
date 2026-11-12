@@ -1,5 +1,13 @@
 # Kernels and Function Inlining for Particle Simulation
 
+These are standalone Warp teaching patterns, not Particula native container or
+process APIs. Snippets share surrounding definitions and may require a CUDA
+device where explicitly selected. They do not validate coupled aerosol physics,
+conservation, performance or public-step autodiff. For the supported native path,
+use [GPU foundations](../../Features/data-containers-and-gpu-foundations.md)
+and its executed direct/resident examples.
+
+
 ## Introduction
 
 Kernels are the fundamental building blocks of parallel computation in Warp. For particula, kernels enable massively parallel computation of aerosol dynamics where each particle can be processed independently.

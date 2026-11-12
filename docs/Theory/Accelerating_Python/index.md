@@ -26,7 +26,7 @@ This pattern is nothing new: classic Fortran and C programs have long relied on 
    - Cons: Niche use cases, less mature ecosystem than CUDA or Taichi.
    - Example: [GPU Benchmarks](../nvidia-warp/examples/gpu_benchmarks.ipynb) -- condensation & coagulation scaling results.
 
-### **Cython (PyPy)**  
+### **Cython**
    - A superset of Python that compiles to C, enabling static type declarations and direct C-API calls.  
    - Pros: Incremental adoption via `*.pyx` files, excellent control over types and memory layout.  
    - Cons: Requires writing Cython annotations, manual build configuration.
@@ -39,11 +39,15 @@ This pattern is nothing new: classic Fortran and C programs have long relied on 
    - Example: This was explored (no example notebook) and found not to be a simple drop-in solution; due to incomplete `numpy` coverage. So if we needed to re-write the code anyway, we might as well use one of the other options.
 ---
 
-## How We Envision This Working
+## Historical one-line proposal
 
-Our vision is to have a simple enable statement for `particula` that allows users to choose the acceleration method. For example, a user could run the following command in their notebook:
+**This is an unimplemented historical proposal, not a supported API.**
+Current workflows use [explicit backend selection](../../Features/backend_selection.md)
+and explicit data transfers; silent fallback is not promised.
 
-```python
+The earlier vision was to have a simple enable statement for `particula` that allows users to choose the acceleration method. For example, a user could run the following command in their notebook:
+
+```text
 import particula as par
 
 par.use_backend("taichi")  # or "warp", "cpp", etc.
@@ -57,7 +61,7 @@ See one option for how this could be done in the [One-Line Vision](Details/One-L
 
 ## Why This Matters
 
-- **Performance**: Offloading compute-intensive work can yield **10×–10,000×** speedups.  
+- **Performance**: Measure each workload on its target device; this exploration establishes no speedup bound.
 - **Maintainability**: Choosing the right tool lets you keep most of your code in Python, while isolating optimized kernels.  
 - **Portability**: Leveraging standard libraries ensures compatibility across platforms (Linux, Windows, macOS).  
 

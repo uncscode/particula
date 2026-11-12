@@ -1,5 +1,13 @@
 # Data Structures for Aerosol Simulation
 
+These are standalone Warp teaching patterns, not Particula native container or
+process APIs. Snippets share surrounding definitions and may require a CUDA
+device where explicitly selected. They do not validate coupled aerosol physics,
+conservation, performance or public-step autodiff. For the supported native path,
+use [GPU foundations](../../Features/data-containers-and-gpu-foundations.md)
+and its executed direct/resident examples.
+
+
 ## Overview
 
 NVIDIA Warp provides a rich set of data structures optimized for parallel computation on both CPU and GPU. For particula, these structures efficiently represent particle populations, aerosol properties, and simulation state.

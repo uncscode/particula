@@ -128,3 +128,48 @@ def test_equilibrium_theory_species_balance():
     np.testing.assert_allclose(
         alpha[2] + beta[2] - alpha[3] - beta[3], system[0], rtol=1e-12
     )
+
+
+def test_warp_theory_quick_start(tmp_path):
+    """The exact file-backed Warp primer runs explicitly on its CPU backend."""
+    import runpy
+
+    import pytest
+
+    wp = pytest.importorskip("warp")
+    page = ROOT / "docs/Theory/nvidia-warp/index.md"
+    blocks = re.findall(r"```python\n(.*?)\n```", page.read_text(), re.DOTALL)
+    source = tmp_path / "warp_primer.py"
+    source.write_text("\n\n".join(blocks))
+    namespace = runpy.run_path(str(source))
+    assert namespace["positions"].device.is_cpu
+    assert namespace["result"].shape == (10000, 3)
+    assert np.all(np.isfinite(namespace["result"]))
+    positions = wp.array(np.zeros((2, 3)), dtype=wp.vec3, device="cpu")
+    velocities = wp.array(np.full((2, 3), 2.0), dtype=wp.vec3, device="cpu")
+    wp.launch(
+        namespace["update_particle_positions"],
+        dim=2,
+        inputs=[positions, velocities, 0.25],
+        device="cpu",
+    )
+    wp.synchronize()
+    np.testing.assert_allclose(positions.numpy(), np.full((2, 3), 0.5))
+
+
+def test_warp_theory_native_environment_round_trip():
+    """The actual native helper example preserves all thermodynamic lanes."""
+    import pytest
+
+    pytest.importorskip("warp")
+    page = ROOT / "docs/Theory/nvidia-warp/datastructures.md"
+    blocks = re.findall(r"```python\n(.*?)\n```", page.read_text(), re.DOTALL)
+    block = next(b for b in blocks if "from_warp_environment_data" in b)
+    namespace = {}
+    exec(compile(block, str(page), "exec"), namespace)  # noqa: S102
+    result = namespace["restored"]
+    np.testing.assert_array_equal(result.temperature, [298.15, 305.0])
+    np.testing.assert_array_equal(result.pressure, [101325.0, 90000.0])
+    np.testing.assert_array_equal(
+        result.saturation_ratio, [[0.95, 1.05, 0.75], [0.8, 0.9, 1.1]]
+    )

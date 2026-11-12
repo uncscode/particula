@@ -1,5 +1,13 @@
 # Aerosol Dynamics with NVIDIA Warp
 
+These are standalone Warp teaching patterns, not Particula native container or
+process APIs. Snippets share surrounding definitions and may require a CUDA
+device where explicitly selected. They do not validate coupled aerosol physics,
+conservation, performance or public-step autodiff. For the supported native path,
+use [GPU foundations](../../../Features/data-containers-and-gpu-foundations.md)
+and its executed direct/resident examples.
+
+
 ## Overview
 
 This guide demonstrates how to implement aerosol dynamics simulations using NVIDIA Warp. We cover the core processes: coagulation (particle collisions), condensation/evaporation (mass transfer), and Brownian diffusion.

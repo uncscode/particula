@@ -64,6 +64,11 @@ pip install warp-lang
 
 ### Basic Usage
 
+Save the kernel/function definitions above and this block in one Python file.
+Warp needs file-backed source for compilation. This standalone Warp example
+is not a Particula `Aerosol` workflow. For native state and explicit transfers,
+see [GPU foundations](../../Features/data-containers-and-gpu-foundations.md).
+
 ```python
 import warp as wp
 import numpy as np
@@ -71,10 +76,12 @@ import numpy as np
 # Initialize Warp
 wp.init()
 
-# Create particle arrays on GPU
+# Choose Warp CPU explicitly; use "cuda" only on a supported CUDA device.
+device = "cpu"
+# Create particle arrays on that device
 n_particles = 10000
-positions = wp.array(np.random.randn(n_particles, 3) * 1e-6, dtype=wp.vec3, device="cuda")
-velocities = wp.zeros(n_particles, dtype=wp.vec3, device="cuda")
+positions = wp.array(np.random.randn(n_particles, 3) * 1e-6, dtype=wp.vec3, device=device)
+velocities = wp.zeros(n_particles, dtype=wp.vec3, device=device)
 
 # Launch kernel
 dt = 0.001  # 1 ms timestep
@@ -95,7 +102,7 @@ result = positions.numpy()
 
 - [Kernels and Function Inlining](./kernels.md) - Writing parallel particle computations
 - [Data Structures](./datastructures.md) - Particle and aerosol data types
-- [Examples](./examples/)
+- Examples
   - [Aerosol Dynamics](./examples/fluids.md) - Coagulation, condensation, diffusion
   - [Particle Interactions](./examples/geometry.md) - Collisions, wall losses
   - [GPU Benchmarks](./examples/gpu_benchmarks.ipynb) - Condensation & coagulation scaling results

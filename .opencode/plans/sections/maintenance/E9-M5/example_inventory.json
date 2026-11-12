@@ -1507,17 +1507,19 @@
     },
     {
       "path": "docs/Theory/Accelerating_Python/Details/One-Line_Vision.md",
-      "python_fences": 8,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "python_fences": 0,
+      "disposition": "historical unimplemented dispatch proposal; all API sketches explicitly nonexecutable text",
+      "execution": "not applicable to unimplemented design; named package APIs verified absent",
+      "phase": "P6",
+      "evidence": "historical notice and current package export check"
     },
     {
       "path": "docs/Theory/Accelerating_Python/index.md",
-      "python_fences": 1,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "python_fences": 0,
+      "disposition": "historical unimplemented dispatch proposal; all API sketches explicitly nonexecutable text",
+      "execution": "not applicable to unimplemented design; named package APIs verified absent",
+      "phase": "P6",
+      "evidence": "historical notice and current package export check"
     },
     {
       "path": "docs/Theory/Activity_Calculations/activity_theory.md",
@@ -1554,37 +1556,42 @@
     {
       "path": "docs/Theory/nvidia-warp/datastructures.md",
       "python_fences": 16,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "standalone Warp patterns; native EnvironmentData helper snippet retained and verified",
+      "execution": "exact native environment round trip passes on Warp CPU; surrounding generic/CUDA teaching patterns are not native entrypoints",
+      "phase": "P6",
+      "evidence": "examples_tests/native_theory_guides_test.py"
     },
     {
       "path": "docs/Theory/nvidia-warp/examples/fluids.md",
       "python_fences": 9,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "standalone Warp teaching definitions and shared-context sketches; no native container construction to migrate",
+      "execution": "not executed as complete Particula simulations; explicitly selected CUDA teaching loops unavailable on this host",
+      "phase": "P6",
+      "evidence": "page scope notice and native-workflow cross-reference; no validation/performance claim"
     },
     {
       "path": "docs/Theory/nvidia-warp/examples/geometry.md",
       "python_fences": 11,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "standalone Warp teaching definitions and shared-context sketches; no native container construction to migrate",
+      "execution": "not executed as complete Particula simulations; explicitly selected CUDA teaching loops unavailable on this host",
+      "phase": "P6",
+      "evidence": "page scope notice and native-workflow cross-reference; no validation/performance claim"
     },
     {
       "path": "docs/Theory/nvidia-warp/index.md",
       "python_fences": 3,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "standalone Warp primer; native workflow boundary stated",
+      "execution": "exact file-backed quick start runs on explicitly selected Warp CPU; nonzero advection checked",
+      "phase": "P6",
+      "evidence": "examples_tests/native_theory_guides_test.py"
     },
     {
       "path": "docs/Theory/nvidia-warp/kernels.md",
       "python_fences": 12,
-      "disposition": "pending audit",
-      "execution": "pending",
-      "phase": "P6"
+      "disposition": "standalone Warp teaching definitions and shared-context sketches; no native container construction to migrate",
+      "execution": "not executed as complete Particula simulations; explicitly selected CUDA teaching loops unavailable on this host",
+      "phase": "P6",
+      "evidence": "page scope notice and native-workflow cross-reference; no validation/performance claim"
     },
     {
       "path": "docs/contribute/Code_Specifications/Details/Function_docstring_format.md",
