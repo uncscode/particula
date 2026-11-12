@@ -1316,3 +1316,135 @@ Python edit was the fixture's explicit `wp.int32(3)` annotation, covered by the
 final focused run and full mypy above. Wall-loss removal is ready to commit.
 GPU coagulation admission/selector cleanup is next; remaining source,
 communication, transfer/checkpoint cleanup and final publication gates remain.
+
+## GPU coagulation admission removal in progress
+
+Direct/prepared coagulation now rejects untagged/discrete/PDF populations before
+particle-array access. Native schema, equal-count physics, volume consistency,
+and ownership checks apply unconditionally. Removed the prepared carrier's
+`native_counts` compatibility flag; enqueue always launches the native
+count-normalized selector. Added eight pre-array rejection cases. The retained
+low-level legacy selector wrapper still needs its raw-test caller audit before
+any deletion; this does not preserve untagged direct/prepared admission.
+
+Saved 243 original coagulation test bodies in `gpu_coagulation_assertions.json`.
+Migrated shared particle fixtures to explicit resolved metadata, and direct-step
+launch spies to the native selector. Invalid-physics tests now upload valid
+native storage before deliberately corrupting device fields where CPU transfer
+would otherwise reject first. The additive-rate statistical fixture now stores
+the same explicit physical volume it passes to the step. Numerical tolerances,
+rate oracles, and RNG assertions are unchanged.
+
+Validation checkpoint:
+- Native suite: **172 passed, 164 skipped in 0.83s**,
+  `/tmp/m6-coag-native2.log`. The first run's 33 failures all referenced the
+  removed prepared compatibility flag; replacement asserts flag absence while
+  retaining the full real prepared execution/conservation checks.
+- Older direct/validation/stochastic diagnostic, latest bounded run:
+  **6 failed, 80 passed in 1.71s**, `/tmp/m6-coag-consumers5.log`.
+  Remaining next cases: combined multibox native physical-state fixture,
+  charged/combined statistical fixtures with mismatching stored/passed volume,
+  and charged invalid-physics cases rejected by CPU transfer before GPU entry.
+  Earlier bounded migration logs 1–4 preserve intermediate failures.
+- Scoped Ruff/format and whitespace passed before the final one-line fixture
+  volume assignment; full mypy result is recorded in `/tmp/m6-coag-mypy1.log`.
+
+The unit remains uncommitted. Continue the retained fixture migration, audit raw
+selector callers, run complete coagulation and dependent execution suites, and
+update relevant public documentation before committing. Remaining GPU source,
+communication, transfer/checkpoint removal and final M6 gates remain pending.
+
+
+## GPU coagulation retained-fixture migration follow-up
+
+Completed the older direct/validation/stochastic fixture migration. Invalid
+physics is uploaded as valid native state and then deliberately corrupted on
+the device, so these tests still exercise GPU preflight rather than failing at
+CPU transfer. Raw snapshots preserve invalid-state no-mutation assertions
+without constructing a validated CPU carrier. Underflow and zero-mass active
+slots now explicitly reject; valid inactive derivatives retain the charged cap
+assertions. Explicit-volume fixtures store the same representative volume used
+by their rate oracle and execution call.
+
+The original mixed NPF/droplet unequal-count fixture remains, with a new
+no-mutation rejection test. Its executable successor retains the particle radii,
+masses and charges with one represented particle per slot, matching the existing
+independent K/V pair-rate oracle. This is a distinct population, not an
+inventory-preserving conversion. Existing sigma bounds, conservation checks,
+raw diagnostic/production comparisons and RNG assertions remain unchanged.
+Public coagulation guidance now states explicit-tag admission for direct and
+prepared entry points.
+
+Validation:
+- Original full diagnostic: **56 failed, 505 passed, 19 skipped in 10.91s**,
+  `/tmp/m6-coag-consumers-full1.log`.
+- Invalid-physics/cap targeted checks: **19 passed, 416 deselected in 0.69s**,
+  `/tmp/m6-coag-fixtures7.log`.
+- Intermediate full diagnostic: **13 failed, 548 passed, 19 skipped in 7.78s**,
+  `/tmp/m6-coag-consumers-full2.log`; all remaining failures were mixed-size
+  population/volume fixtures.
+- Final direct/validation/stochastic suites: **562 passed, 19 skipped in
+  6.01s**, `/tmp/m6-coag-consumers-full3.log`.
+- Full mypy: **534 files passed**, `/tmp/m6-coag-mypy3.log`, after widening the
+  test-only unchanged-state helper annotation to accept raw snapshots.
+- Scoped Ruff check/format passed all five changed Python files.
+
+The dependent native/execution/process-sequence/population run is pending in
+`/tmp/m6-coag-dependent1.log`. Raw selector compatibility remains to audit:
+`brownian_coagulation_kernel` still passes zero to the shared `native_counts`
+switch, whereas supported direct/prepared dispatch always uses the native
+kernel. Resolve its raw diagnostic callers and assertion dispositions before
+committing this unit. Final M6 publication and readiness gates remain pending.
+
+
+Dependent run completed: **10 failed, 1607 passed, 217 skipped in 80.71s**,
+`/tmp/m6-coag-dependent1.log`. All ten failures came from the same untagged
+`coagulation_integration_test.py::_warp_bundle` construction. Added its explicit
+resolved tag, retaining original equal counts, physical volume, inactive
+sentinels, conservation oracles and RNG tests. The complete affected module then
+passed: **12 passed, 2 skipped in 0.47s**,
+`/tmp/m6-coag-integration2.log`. Ruff and whitespace checks passed. Standard
+strict documentation built in **1.71s**, `/tmp/m6-coag-docs1.log`.
+No validation process remains live at this checkpoint. The full dependent suite
+has not yet been rerun after that final fixture tag. Raw-selector audit,
+assertion-ledger reconciliation, and committing the coagulation unit are next.
+
+
+## GPU coagulation selector closure
+
+Audited all references to `brownian_coagulation_kernel`: its only executable
+consumers were four raw-test launch sites. Migrated these to the retained
+`_native_coagulation_kernel`, preserving charged multispecies property checks,
+private sampler diagnostics, inactive-slot assertions, and bounded schedules.
+Removed the obsolete wrapper and the shared selector's `native_counts` switch;
+all mechanism schedules now use the admitted common raw count. No legacy
+scheduling branch remains. Concrete-module export coverage now asserts removal
+of the wrapper alongside positive native/internal imports. The similarly named
+local teaching function in `docs/Theory/nvidia-warp/examples/fluids.md` is an
+independent Brownian equation illustration, not an import of the removed API.
+
+Reconciled **267 original test records** in `gpu_coagulation_assertions.json`,
+including the execution integration and export suites. Each resolves to its
+current successor; changed flag/selector assertions and changed invalid-state
+admission have explicit dispositions. Original bodies remain preserved.
+
+Validation after raw-selector removal:
+- Direct/native/validation/stochastic/export suites: **757 passed, 183 skipped
+  in 17.26s**, `/tmp/m6-coag-selector1.log`.
+- Full-package mypy: **534 files passed**, `/tmp/m6-coag-mypy4.log`.
+- Ruff check and format passed all seven changed Python files.
+- Full execution/process-sequence/population rerun is pending in
+  `/tmp/m6-coag-dependent2.log`; record its terminal result before committing.
+
+
+Final dependent rerun passed: **1445 passed, 53 skipped in 88.56s**,
+`/tmp/m6-coag-dependent2.log`. This covers the full execution suite plus
+process-sequence and population-boundary contracts after raw-selector removal
+and the final integration fixture tag. Source-example validation is running in
+`/tmp/m6-coag-examples1.log` before the coagulation commit.
+
+Source examples also passed: **225 passed, 2 skipped in 48.40s**, with
+`-Werror --no-cov`, `/tmp/m6-coag-examples1.log`. Coagulation removal is ready
+to commit. No validation processes remain live. Remaining M6 units begin with
+GPU nucleation/exhaustion/communication compatibility, followed by transfer and
+checkpoint admission, full installed integration, publication and closeout.

@@ -221,7 +221,7 @@ def test_concrete_kernel_modules_still_expose_supported_and_internal_symbols() -
 
     import particula.gpu.kernels as kernels
     from particula.gpu.kernels.coagulation import (
-        brownian_coagulation_kernel,
+        _native_coagulation_kernel,
         coagulation_step_gpu,
         initialize_coagulation_rng_states,
     )
@@ -232,7 +232,10 @@ def test_concrete_kernel_modules_still_expose_supported_and_internal_symbols() -
 
     assert kernels.coagulation_step_gpu is coagulation_step_gpu
     assert kernels.condensation_step_gpu is condensation_step_gpu
-    assert brownian_coagulation_kernel is not None
+    assert _native_coagulation_kernel is not None
+    import particula.gpu.kernels.coagulation as coagulation
+
+    assert not hasattr(coagulation, "brownian_coagulation_kernel")
     assert initialize_coagulation_rng_states is not None
     assert apply_mass_transfer_kernel is not None
 

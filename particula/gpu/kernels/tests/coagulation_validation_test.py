@@ -848,6 +848,7 @@ def test_selected_public_preflight_failures_are_atomic(failure: str) -> None:
 
     fixture = FIXTURES["normal"]
     cpu_particles = _materialize_public_particles(fixture, n_species=1)
+    particles = to_warp_particle_data(cpu_particles, device="cpu")
     if failure == "charge":
         cpu_particles.charge[0, 0] = np.nan
         mechanisms = ("charged_hard_sphere",)
@@ -877,7 +878,8 @@ def test_selected_public_preflight_failures_are_atomic(failure: str) -> None:
             "fluid_density": 1.2,
         }
         message = "turbulent_dissipation"
-    particles = to_warp_particle_data(cpu_particles, device="cpu")
+    for field in ("masses", "concentration", "density", "charge"):
+        getattr(particles, field).assign(getattr(cpu_particles, field))
     pairs = wp.full((1, 1, 2), -7, dtype=wp.int32, device="cpu")
     counts = wp.full((1,), -7, dtype=wp.int32, device="cpu")
     states = wp.full((1,), 17, dtype=wp.uint32, device="cpu")

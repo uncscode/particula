@@ -614,7 +614,10 @@ from particula.gpu.kernels import coagulation_step_gpu
 from particula.gpu.kernels.coagulation import CoagulationMechanismConfig
 ```
 
-It accepts only `distribution_type="particle_resolved"`. The identifiers are
+It accepts only explicitly tagged `distribution_type="particle_resolved"`
+populations. Direct and prepared entry points reject untagged, discrete, and
+continuous-PDF populations before particle-array access; no population meaning
+is inferred. The identifiers are
 `brownian`, `charged_hard_sphere`, `sedimentation_sp2016`, and
 `turbulent_shear_st1956`; requested tuples normalize to Brownian, charged,
 sedimentation, then turbulent order. Executable masks are singleton masks `1`,
@@ -634,8 +637,8 @@ only with `initialize_rng=True`, and omitted outputs/state are call-local. The
 exact return tuple is `(particles, collision_pairs, n_collisions)`; RNG state is
 not returned.
 
-For explicitly tagged native `ParticleData` transferred to Warp, every
-supported mechanism requires **equal positive active counts within each box**.
+For native `ParticleData` transferred to Warp, every supported mechanism
+requires **equal positive active counts within each box**.
 Counts may be fractional and may differ between boxes; zero-count slots are
 inactive. Every native schedule includes the common count: its trial budget
 scales as `K_majorant * pair_count * count * dt / volume`. The original

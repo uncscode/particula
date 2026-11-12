@@ -138,7 +138,7 @@ def test_native_merges_conserve_all_species_and_charge(  # noqa: C901
     prepared = None
     if mode == "prepared":
         prepared = _prepare_coagulation_step_gpu(state.p, **state.kwargs)
-        assert prepared.native_counts
+        assert not hasattr(prepared, "native_counts")
     for replay, expected_collisions in enumerate((2, 1, 0)):
         before = _snapshot(state)
         if mode == "direct":
@@ -667,3 +667,29 @@ def test_native_admission_preserves_mechanism_specific_active_limits(
         npt.assert_array_equal(collisions.numpy(), 0)
     npt.assert_array_equal(particles.masses.numpy(), cpu.masses)
     npt.assert_array_equal(particles.concentration.numpy(), cpu.concentration)
+
+
+@pytest.mark.parametrize("metadata", [None, 0, 1, 2])
+@pytest.mark.parametrize("prepared", [False, True])
+def test_coagulation_requires_resolved_metadata_before_array_access(
+    metadata, prepared
+):
+    """Missing or unsupported population meaning rejects before setup."""
+    pytest.importorskip("warp")
+    from particula.gpu.kernels.coagulation import (
+        _prepare_coagulation_step_gpu,
+        coagulation_step_gpu,
+    )
+
+    class MetadataOnly:
+        def __getattr__(self, name):
+            if name == "distribution_kind" and metadata is None:
+                raise AttributeError(name)
+            raise AssertionError(f"unexpected state access: {name}")
+
+    particles = MetadataOnly()
+    if metadata is not None:
+        particles.distribution_kind = metadata
+    call = _prepare_coagulation_step_gpu if prepared else coagulation_step_gpu
+    with pytest.raises(ValueError, match="only particle_resolved"):
+        call(particles, None, None, 0.0)
