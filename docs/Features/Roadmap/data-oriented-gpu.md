@@ -140,10 +140,12 @@ Use
 as the implementation walkthrough companion.
 
 The E9 v0.3.0 migration removes the compatibility facades. In the current
-development tree, `ParticleRepresentation`, its builders/factory, and its
-conversion bridges have been removed. Use explicit native initialization;
-remaining gas compatibility removal and final readiness validation belong to
-E9-M6. The historical 0.2.x compatibility policy is not the current API contract.
+development tree, `ParticleRepresentation`, `GasSpecies`, `Atmosphere`, their
+obsolete builders/factories, and facade conversion bridges have been removed.
+Use explicit native initialization and coordinated replacement when layouts
+change. Remaining GPU compatibility removal and final readiness validation
+belong to E9-M6. The historical 0.2.x compatibility policy is not the current
+API contract.
 
 Data-model support and remaining boundaries:
 

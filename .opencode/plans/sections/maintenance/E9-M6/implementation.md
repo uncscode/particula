@@ -993,3 +993,33 @@ container; physical input validation here belongs to GasDataBuilder.
 - Scoped Ruff check and formatting passed.
 - This is prerequisite assertion evidence, not completion of facade removal,
   final integration, or publication gates.
+
+## Remove GasSpecies after native assertion review
+
+Deleted species.py and its export after assigning all 37 preserved tests native
+successors or explicit facade-only dispositions in gas_facade_assertions.json.
+Original storage, constant-pressure, valid concentration arithmetic and combined
+species ownership checks remain. Native explicit species combination preserves
+source containers; aggregate layout changes use validated coordinated replacement.
+Mixed masks and multibox storage are supported instead of retaining obsolete
+facade restrictions. Implicit scalar/array mode caches, name duplication,
+negative clamping, deprecation messages and operator overloads are retired.
+GasData and vapor-pressure science are unchanged. Native builder validation
+rejects invalid physical inputs; raw array writes remain caller-owned.
+
+Removed-module and root/package absence tests cover GasSpecies. Production
+sources contain no remaining consumers; only the removal-safe test guard and
+negative boundary checks mention the old module/class. Updated migration and
+roadmap guidance plus P3 status to reflect implemented removal, with final
+readiness still pending.
+
+Validation:
+- Gas tree, package tests and integration: **760 passed, 1 skipped in 11.91s**,
+  `/tmp/m6-gas-facade-tests.log`.
+- Complete source-example suite with warnings as errors:
+  **225 passed, 2 skipped in 41.96s**, `/tmp/m6-gas-facade-examples.log`.
+- Full-package mypy: **534 files passed**, `/tmp/m6-gas-facade-mypy.log`.
+- Base strict documentation build: **1.57s**, `/tmp/m6-gas-facade-docs.log`.
+- All 37 successor mappings resolve; scoped Ruff/format and whitespace passed.
+GPU untagged admission, final installed-wheel/full-suite/notebook/publication
+validation and the single PR remain outstanding.

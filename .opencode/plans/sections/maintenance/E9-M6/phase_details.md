@@ -80,7 +80,7 @@ full published notebook workloads are mandatory, not optional follow-ups.
     deleted scientific-looking assertion has a reviewed retained disposition.
 
 - [ ] **E9-M6-P3: Remove gas and atmosphere facades with boundary tests**
-  - Issue: TBD | Size: S | Status: Not Started
+  - Issue: #1607 | Size: S | Status: Implemented; final integration/readiness pending
   - Goal: Remove GasSpecies and Atmosphere without splitting gas authority.
   - Work: Delete obsolete species/atmosphere modules, builders/factories and
     bridges plus package/root exports and obsolete aggregate branches. Keep

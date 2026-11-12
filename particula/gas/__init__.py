@@ -1,8 +1,8 @@
 """Expose the public gas-phase API for particula.
 
 This module provides classes and functions for gas-phase modeling,
-including thermodynamic environment containers, gas species,
-atmosphere builders, and vapor-pressure and latent-heat strategies.
+including native gas and environment containers, gas data construction,
+and vapor-pressure and latent-heat strategies.
 
 Example:
     >>> from particula.gas import EnvironmentData, GasDataBuilder
@@ -61,14 +61,12 @@ from particula.gas.latent_heat_factories import LatentHeatFactory
 from particula.gas.environment_data import EnvironmentData
 from particula.gas.gas_data import GasData
 from particula.gas.gas_data_builder import GasDataBuilder
-from particula.gas.species import GasSpecies
 
 
 __all__ = [
     "GasData",
     "EnvironmentData",
     "GasDataBuilder",
-    "GasSpecies",
     "ConstantVaporPressureStrategy",
     "AntoineVaporPressureStrategy",
     "ClausiusClapeyronStrategy",

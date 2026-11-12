@@ -10,8 +10,8 @@ Its original per-phase issue-generation workflow is superseded for this
 delivery by one implementation PR. No child issues are needed for this scope.
 
 Implementation is in progress on `codex/e9-m6-legacy-removal`. CPU consumer,
-legacy aggregate and particle facade removals have revision-specific evidence
-in `implementation.md` and the assertion ledgers. Gas/GPU compatibility removal
+legacy aggregate, particle and gas facade removals have revision-specific evidence
+in `implementation.md` and the assertion ledgers. GPU compatibility removal
 and final readiness gates remain pending. The serial review units are recorded
 in `phase_details.md`; P1–P6 remain acceptance milestones, not separate PRs.
 

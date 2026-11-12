@@ -5067,7 +5067,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Removed after assertion-level review; see gas_facade_assertions.json for all 37 preserved test bodies and native successors.",
       "test_nodes": []
     },
     {
@@ -6199,7 +6199,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Removed after assertion-level review; see gas_facade_assertions.json for all 37 preserved test bodies and native successors.",
       "test_nodes": [
         {
           "name": "test_init_deprecation_log",
@@ -6408,7 +6408,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Removed after assertion-level review; see gas_facade_assertions.json for all 37 preserved test bodies and native successors.",
       "test_nodes": [
         {
           "name": "test_infer_species_count_prefers_max_dimension",
@@ -6610,7 +6610,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Removed after assertion-level review; see gas_facade_assertions.json for all 37 preserved test bodies and native successors.",
       "test_nodes": [
         {
           "name": "test_gas_species_builder_single_species",
