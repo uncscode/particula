@@ -1,5 +1,51 @@
 # Scope
 
+## Post-M5 single-PR scope — 2026-11-11
+
+The maintainer reports M5 completed and requests M6 scoping as one PR with
+multiple commits. GitHub confirms M5 PR #1634 merged at
+`fb25078b6c0e8136ed06feeda59f0928b85c1b34`; the clean local `main` inspected
+for this scope is that revision. Issue #1607 remains the tracking issue.
+Its original per-phase issue-generation workflow is superseded for this
+delivery by one implementation PR. No child issues are needed for this scope.
+
+Implementation is authorized. P1 audit and baseline validation are in progress;
+no deletion or readiness gate is claimed complete.
+Use branch `codex/e9-m6-legacy-removal` when implementation starts, checking
+the upstream base again then. The proposed serial commit sequence is recorded
+in `phase_details.md`; P1–P6 remain acceptance milestones, not separate PRs.
+
+The current source confirms additional explicit removal targets:
+
+- `particula/_legacy_aerosol.py`, including its aggregate and builder.
+- `LegacyNucleation`, legacy dilution preflight and aggregate dispatch in
+  `dynamics/particle_process.py` and `dynamics/dilution.py`.
+- Native/legacy type unions in `runnable.py`, `equilibria/equilibria.py` and
+  CPU condensation/coagulation adapters; facade-unwrapping, strategy fallback
+  and cached-state synchronization in scientific consumers.
+- `from_representation` / `to_representation` in `particles/particle_data.py`
+  and `from_species` / `to_species` in `gas/gas_data.py`, plus their exports.
+- Native test guards that currently import and monkeypatch deleted classes:
+  replace their mechanism while preserving real native execution assertions.
+
+The accepted implementation removes untagged direct/prepared GPU admission
+and schema-v5 `legacy_untagged` checkpoint admission, as explicitly assigned
+by the M4 handoff. Keep tagged v5 payloads and reject untagged records before
+setup/upload; do not infer tags or change schema version. Explicit CPU-Warp
+transfer APIs remain, but require supported explicit population metadata.
+Incomplete CPU material scratch storage is not executable population state.
+Independent shared-mask conversion and numerical utilities remain supported.
+
+The maintainer additionally requires the full publication build to pass.
+Repair the production-docstring backlog and rendering warnings without
+suppressing warnings, excluding supported APIs, or changing scientific code.
+
+Native resolved kernel binning already exists in
+`dynamics/coagulation/coagulation_strategy/_native_step.py` (`kernel_edges`
+and `binned_kernel_data`). Trace the old `change_particle_representation.py`
+assertions to these native capabilities before removing obsolete wrappers;
+do not discard scientific binning or introduce a replacement facade.
+
 ## Modules and directories
 
 - Audit `particula/`, `docs/`, `readme.md`, `AGENTS.md`, `mkdocs.yml` and active
@@ -46,5 +92,6 @@ permanent substitute facade, new public GPU API, hidden transfer/synchronization
 or fallback, automatic prepared-state rebind, resident/graph redesign, new
 performance claims, arbitrary coverage targets, Epic I or release publication.
 Do not remove unrelated warnings, functional science, useful native builders
-or CPU-Warp conversion helpers based on name matching alone. This drafting
-task edits only E9-M6 metadata and its twelve section files.
+or CPU-Warp conversion helpers based on name matching alone. This scoping
+update edits only E9-M6 metadata and its existing section files. A version
+bump, release tag and publication are separate from this implementation scope.

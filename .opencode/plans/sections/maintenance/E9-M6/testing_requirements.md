@@ -1,5 +1,33 @@
 # Testing Requirements
 
+## Post-M5 additions and evidence boundaries — 2026-11-11
+
+- Preserve source-example and infrastructure gates separately from package
+  coverage: `pytest examples_tests -q -Werror --no-cov` and
+  `pytest scripts/tests -q -Werror --no-cov`. These follow current repository
+  source-CI policy; do not add warnings-as-errors indiscriminately elsewhere.
+- Check `python scripts/build_particula_plugins.py --check`; regenerate a
+  helper payload only when its canonical source changes.
+- Run `python scripts/run_release_tests.py` for clean installed-wheel evidence.
+  Verify removed module/import boundaries from an installed wheel outside the
+  checkout, alongside successful native quick starts. Source-only negative
+  imports cannot prove obsolete files are absent from the distribution.
+- Replace native tests' facade-constructor monkeypatch guards when the target
+  classes disappear. Keep their numerical, ownership, mutation and lifecycle
+  assertions; add deliberate removed-boundary checks rather than deleting the
+  native integration tests that import those guards.
+- Both `mkdocs build --strict` and
+  `mkdocs build --config-file mkdocs-full.yml --strict` are required gates.
+  Repair the historical production-docstring and rendering warning backlog;
+  do not suppress warnings or omit supported APIs to pass publication.
+  Notebook execution remains a separate required evidence row.
+- Preserve M5's scientific limitations: fixed-composition binned species
+  transport, unqualified cloud dry-phase oscillations and soot property
+  assumptions. M6 removal does not qualify these models or broaden tolerances.
+
+No tests were run during the 2026-11-11 scoping update. Historical M5 results
+are entry evidence, not post-removal validation.
+
 ## Policy and provenance
 
 1. Test coverage thresholds must NEVER be lowered. Every modified function
