@@ -7308,7 +7308,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Removed both facade bridges and facade/strategy imports; native storage/property algorithms unchanged. See particle_bridge_assertions.json.",
       "test_nodes": []
     },
     {
@@ -7714,7 +7714,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Native storage/property tests retained; obsolete bridge tests audited in particle_bridge_assertions.json with native scientific or removed-import successors.",
       "test_nodes": [
         {
           "name": "test_proposed_nonuniform_radius_pdf_integral_is_not_slot_sum",
@@ -7944,7 +7944,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Native storage/property tests retained; obsolete bridge tests audited in particle_bridge_assertions.json with native scientific or removed-import successors.",
       "test_nodes": [
         {
           "name": "test_resolved_number_and_species_mass_density",
@@ -8209,7 +8209,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Bridge round-trip test audited/removed in particle_bridge_assertions.json; remaining facade tests pending review.",
       "test_nodes": [
         {
           "name": "test_init_deprecation_log",

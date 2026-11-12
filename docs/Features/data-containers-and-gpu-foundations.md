@@ -81,8 +81,9 @@ representation-consistent changes. Native Warp transfers preserve the explicit
 `discrete` or `particle_resolved` kind and its volume interpretation. Continuous
 PDF upload is unsupported; do not clear a tag to bypass admission. Legacy
 untagged transfers remain compatibility storage, not native process admission.
-`to_representation()` rejects tagged data because the legacy facade cannot
-retain that provenance.
+The former `from_representation()` and `to_representation()` bridges have
+been removed. Construct native data with an explicit distribution kind;
+use `copy()` to retain that provenance in detached storage.
 
 Prefer the currently exported package-level imports. The low-level
 `particula.gpu` container, conversion-helper, explicit-transfer, and

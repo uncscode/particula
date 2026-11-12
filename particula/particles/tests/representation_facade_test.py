@@ -11,7 +11,7 @@ from particula.particles.distribution_strategies import (
     RadiiBasedMovingBin,
     SpeciatedMassMovingBin,
 )
-from particula.particles.particle_data import ParticleData, to_representation
+from particula.particles.particle_data import ParticleData
 from particula.particles.representation import (
     _DEPRECATION_MESSAGE,
     ParticleRepresentation,
@@ -305,25 +305,3 @@ def test_charge_none_preserved():
         added_distribution=np.array([[1.0, 2.0]]),
     )
     assert rep.get_charge() is None
-
-
-def test_from_data_round_trip_with_converter(
-    _enable_particula_log_capture,
-):
-    """to_representation returns facade matching source data."""
-    caplog = _enable_particula_log_capture
-    data = ParticleData(
-        masses=np.array([[[1.0, 2.0]]]),
-        concentration=np.array([[1.0]]),
-        charge=np.array([[0.0]]),
-        density=np.array([1000.0, 1200.0]),
-        volume=np.array([1.0]),
-    )
-    rep = to_representation(
-        data,
-        strategy=SpeciatedMassMovingBin(),
-        activity=ActivityIdealMass(),
-        surface=SurfaceStrategyVolume(),
-    )
-    assert _DEPRECATION_MESSAGE in caplog.text
-    np.testing.assert_allclose(rep.data.masses, data.masses)

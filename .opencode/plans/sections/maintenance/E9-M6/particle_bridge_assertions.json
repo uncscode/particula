@@ -1,0 +1,114 @@
+[
+  {
+    "file": "particula/particles/tests/particle_data_test.py",
+    "test": "TestConversionFromRepresentation::test_volume_weight_round_trip_by_strategy",
+    "original": "def test_volume_weight_round_trip_by_strategy(\n        self, volume: float, strategy_type: type\n    ) -> None:\n        \"\"\"Both facade strategies pass through raw storage, not density.\"\"\"\n        strategy = strategy_type()\n        raw = np.array([8.0, 0.5, 0.0], dtype=np.float64)\n        rep = self._make_representation(\n            strategy,\n            np.array([[0.5e-18, 1.5e-18], [2e-18, 3e-18], [0.0, 0.0]]),\n            np.array([1000.0, 1200.0]),\n            raw,\n            np.array([1.0, -1.0, 0.0]),\n            volume,\n        )\n        data = from_representation(rep)\n        npt.assert_array_equal(data.concentration[0], raw)\n        npt.assert_array_equal(data.volume, [volume])\n        npt.assert_allclose(rep.get_concentration(), raw / volume, rtol=1e-12)\n        rebuilt = to_representation(\n            data, strategy, ActivityIdealMass(), SurfaceStrategyMass()\n        )\n        npt.assert_array_equal(rebuilt.concentration, raw)\n        assert rebuilt.volume == volume",
+    "successor": "particula/particles/tests/native_particle_storage_test.py::test_explicit_resolved_storage_and_copy",
+    "disposition": "Retain masses, raw concentration, charge, density, volume, selected-box values and independent copies through owned native construction. Facade strategy labels and inferred shape/meaning are removed; explicit species axes replace ambiguous mass-strategy tiling. Native resolved counts are divided by physical volume once; binned densities already use per-volume units and do not inherit the facade double-meaning."
+  },
+  {
+    "file": "particula/particles/tests/particle_data_test.py",
+    "test": "TestConversionFromRepresentation::test_legacy_radius_backed_pdf_storage_not_integration",
+    "original": "def test_legacy_radius_backed_pdf_storage_not_integration(\n        self, volume: float\n    ) -> None:\n        \"\"\"A radius-backed facade preserves raw PDF-like lanes, then sums them.\n\n        No distribution-kind metadata exists; this documents legacy behavior,\n        not an assertion that radius-backed strategy performs PDF integration.\n        \"\"\"\n        raw = np.array([1e9, 2e9, 1e9], dtype=np.float64)\n        rep = self._make_representation(\n            RadiiBasedMovingBin(),\n            np.array([1e-9, 2e-9, 4e-9]),\n            np.array([1000.0]),\n            raw,\n            np.zeros(3),\n            volume,\n        )\n        data = from_representation(rep)\n        npt.assert_array_equal(data.concentration[0], raw)\n        npt.assert_allclose(rep.get_concentration(), raw / volume)\n        assert rep.get_total_concentration() == pytest.approx(\n            raw.sum() / volume\n        )",
+    "successor": "particula/particles/tests/particle_population_test.py::test_pdf_nonuniform_radius_integrates_mass_times_pdf",
+    "disposition": "Legacy sum of PDF-like lanes divided by volume intentionally retired. Native explicit radius PDF integrates over its grid; existing independent quadrature oracle retained."
+  },
+  {
+    "file": "particula/particles/tests/particle_data_test.py",
+    "test": "TestConversionFromRepresentation::test_mass_based",
+    "original": "def test_mass_based(self) -> None:\n        \"\"\"MassBasedMovingBin maps species mass and preserves raw fields.\"\"\"\n        strategy = MassBasedMovingBin()\n        distribution = np.array([1.0, 2.0])\n        density = np.array([1000.0, 1200.0])\n        concentration = np.array([3.0, 4.0])\n        charge = np.array([0.0, 1.0])\n        rep = self._make_representation(\n            strategy=strategy,\n            distribution=distribution,\n            density=density,\n            concentration=concentration,\n            charge=charge,\n            volume=2.0,\n        )\n\n        data = from_representation(rep)\n\n        assert data.masses.shape == (1, 2, 2)\n        npt.assert_allclose(data.masses[0], rep.get_species_mass())\n        npt.assert_allclose(data.concentration[0], concentration)\n        npt.assert_allclose(data.charge[0], charge)\n        assert data.volume.shape == (1,)\n        assert data.volume[0] == pytest.approx(2.0)",
+    "successor": "particula/particles/tests/native_particle_storage_test.py::test_explicit_resolved_storage_and_copy",
+    "disposition": "Retain masses, raw concentration, charge, density, volume, selected-box values and independent copies through owned native construction. Facade strategy labels and inferred shape/meaning are removed; explicit species axes replace ambiguous mass-strategy tiling."
+  },
+  {
+    "file": "particula/particles/tests/particle_data_test.py",
+    "test": "TestConversionFromRepresentation::test_radii_based",
+    "original": "def test_radii_based(self) -> None:\n        \"\"\"RadiiBasedMovingBin uses per-particle radii derived from masses.\"\"\"\n        strategy = RadiiBasedMovingBin()\n        distribution = np.array([1e-18, 2e-18, 3e-18])\n        density = np.array([1000.0])\n        concentration = np.array([1.0, 2.0, 3.0])\n        charge = np.array([0.0, -1.0, 2.0])\n        rep = self._make_representation(\n            strategy=strategy,\n            distribution=distribution,\n            density=density,\n            concentration=concentration,\n            charge=charge,\n            volume=1.5,\n        )\n\n        data = from_representation(rep)\n\n        assert data.masses.shape == (1, 3, 1)\n        species_mass = rep.get_species_mass()\n        if species_mass.ndim == 1:\n            species_mass = species_mass[:, np.newaxis]\n        npt.assert_allclose(data.masses[0], species_mass)\n        npt.assert_allclose(data.concentration[0], concentration)\n        npt.assert_allclose(data.charge[0], charge)\n        npt.assert_allclose(data.density, density)\n        npt.assert_allclose(data.volume, np.array([1.5]))",
+    "successor": "particula/particles/tests/native_particle_storage_test.py::test_explicit_radius_storage",
+    "disposition": "Retain sphere mass/radius and raw concentration/charge checks through explicit discrete/PDF initialization. Native binned reference volume is 1 m^3; legacy arbitrary-volume radius facade is obsolete."
+  },
+  {
+    "file": "particula/particles/tests/particle_data_test.py",
+    "test": "TestConversionFromRepresentation::test_speciated_mass",
+    "original": "def test_speciated_mass(self) -> None:\n        \"\"\"SpeciatedMassMovingBin preserves per-species masses and tiling.\"\"\"\n        strategy = SpeciatedMassMovingBin()\n        distribution = np.array([[1.0, 0.5], [0.1, 0.9]])\n        density = np.array([900.0, 1100.0])\n        concentration = np.array([2.0, 3.0])\n        charge = np.array([0.5, -0.5])\n        rep = self._make_representation(\n            strategy=strategy,\n            distribution=distribution,\n            density=density,\n            concentration=concentration,\n            charge=charge,\n            volume=0.75,\n        )\n\n        data = from_representation(rep, n_boxes=2)\n\n        assert data.masses.shape == (2, 2, 2)\n        npt.assert_allclose(data.masses[0], distribution)\n        npt.assert_allclose(data.masses[1], distribution)\n        npt.assert_allclose(data.concentration[0], concentration)\n        npt.assert_allclose(data.concentration[1], concentration)\n        npt.assert_allclose(data.charge[0], charge)\n        npt.assert_allclose(data.charge[1], charge)\n        npt.assert_allclose(data.density, density)\n        npt.assert_allclose(data.volume, np.array([0.75, 0.75]))",
+    "successor": "particula/particles/tests/native_particle_storage_test.py::test_explicit_resolved_storage_and_copy",
+    "disposition": "Retain masses, raw concentration, charge, density, volume, selected-box values and independent copies through owned native construction. Facade strategy labels and inferred shape/meaning are removed; explicit species axes replace ambiguous mass-strategy tiling."
+  },
+  {
+    "file": "particula/particles/tests/particle_data_test.py",
+    "test": "TestConversionFromRepresentation::test_particle_resolved",
+    "original": "def test_particle_resolved(self) -> None:\n        \"\"\"ParticleResolvedSpeciatedMass preserves per-particle masses.\"\"\"\n        strategy = ParticleResolvedSpeciatedMass()\n        distribution = np.array([[1.0, 0.2], [0.3, 0.7]])\n        density = np.array([1000.0, 800.0])\n        concentration = np.array([1.0, 1.0])\n        charge = np.array([0.0, 0.0])\n        rep = self._make_representation(\n            strategy=strategy,\n            distribution=distribution,\n            density=density,\n            concentration=concentration,\n            charge=charge,\n            volume=0.5,\n        )\n\n        data = from_representation(rep)\n\n        assert data.masses.shape == (1, 2, 2)\n        npt.assert_allclose(data.masses[0], distribution)\n        npt.assert_allclose(data.concentration[0], concentration)\n        npt.assert_allclose(data.charge[0], charge)\n        npt.assert_allclose(data.density, density)\n        npt.assert_allclose(data.volume, np.array([0.5]))",
+    "successor": "particula/particles/tests/native_particle_storage_test.py::test_explicit_resolved_storage_and_copy",
+    "disposition": "Retain masses, raw concentration, charge, density, volume, selected-box values and independent copies through owned native construction. Facade strategy labels and inferred shape/meaning are removed; explicit species axes replace ambiguous mass-strategy tiling."
+  },
+  {
+    "file": "particula/particles/tests/particle_data_test.py",
+    "test": "TestConversionFromRepresentation::test_multi_box_replication",
+    "original": "def test_multi_box_replication(self) -> None:\n        \"\"\"n_boxes>1 replicates masses/concentration/charge across boxes.\"\"\"\n        strategy = SpeciatedMassMovingBin()\n        distribution = np.array([[1.0, 0.5], [0.3, 0.7]])\n        density = np.array([900.0, 1100.0])\n        concentration = np.array([2.0, 3.0])\n        charge = np.array([0.5, -0.5])\n        rep = self._make_representation(\n            strategy=strategy,\n            distribution=distribution,\n            density=density,\n            concentration=concentration,\n            charge=charge,\n            volume=1.2,\n        )\n\n        data = from_representation(rep, n_boxes=3)\n\n        assert data.masses.shape == (3, 2, 2)\n        for idx in range(3):\n            npt.assert_allclose(data.masses[idx], distribution)\n            npt.assert_allclose(data.concentration[idx], concentration)\n            npt.assert_allclose(data.charge[idx], charge)\n        npt.assert_allclose(data.volume, np.array([1.2, 1.2, 1.2]))",
+    "successor": "particula/particles/tests/native_particle_storage_test.py::test_explicit_resolved_storage_and_copy",
+    "disposition": "Retain masses, raw concentration, charge, density, volume, selected-box values and independent copies through owned native construction. Facade strategy labels and inferred shape/meaning are removed; explicit species axes replace ambiguous mass-strategy tiling."
+  },
+  {
+    "file": "particula/particles/tests/particle_data_test.py",
+    "test": "TestConversionToRepresentation::test_speciated_mass_basic",
+    "original": "def test_speciated_mass_basic(self) -> None:\n        \"\"\"SpeciatedMassMovingBin preserves masses/concentration/charge.\"\"\"\n        data = self._make_data()\n        strategy = SpeciatedMassMovingBin()\n        rep = to_representation(\n            data=data,\n            strategy=strategy,\n            activity=ActivityIdealMass(),\n            surface=SurfaceStrategyMass(),\n            box_index=0,\n        )\n\n        assert rep.get_strategy_name() == strategy.get_name()\n        npt.assert_allclose(rep.distribution, data.masses[0])\n        npt.assert_allclose(rep.concentration, data.concentration[0])\n        charge = rep.charge\n        assert charge is not None\n        npt.assert_allclose(charge, data.charge[0])\n        assert rep.volume == pytest.approx(1.0)",
+    "successor": "particula/particles/tests/native_particle_storage_test.py::test_explicit_resolved_storage_and_copy",
+    "disposition": "Retain masses, raw concentration, charge, density, volume, selected-box values and independent copies through owned native construction. Facade strategy labels and inferred shape/meaning are removed; explicit species axes replace ambiguous mass-strategy tiling."
+  },
+  {
+    "file": "particula/particles/tests/particle_data_test.py",
+    "test": "TestConversionToRepresentation::test_box_index_selection",
+    "original": "def test_box_index_selection(self) -> None:\n        \"\"\"Selects non-zero box index and preserves values.\"\"\"\n        data = self._make_data()\n        strategy = SpeciatedMassMovingBin()\n        rep = to_representation(\n            data=data,\n            strategy=strategy,\n            activity=ActivityIdealMass(),\n            surface=SurfaceStrategyMass(),\n            box_index=1,\n        )\n\n        npt.assert_allclose(rep.distribution, data.masses[1])\n        npt.assert_allclose(rep.concentration, data.concentration[1])\n        charge = rep.charge\n        assert charge is not None\n        npt.assert_allclose(charge, data.charge[1])\n        assert rep.volume == pytest.approx(2.0)",
+    "successor": "particula/particles/tests/native_particle_storage_test.py::test_explicit_resolved_storage_and_copy",
+    "disposition": "Retain masses, raw concentration, charge, density, volume, selected-box values and independent copies through owned native construction. Facade strategy labels and inferred shape/meaning are removed; explicit species axes replace ambiguous mass-strategy tiling."
+  },
+  {
+    "file": "particula/particles/tests/particle_data_test.py",
+    "test": "TestConversionToRepresentation::test_box_index_out_of_range",
+    "original": "def test_box_index_out_of_range(self) -> None:\n        \"\"\"Raises ValueError when box_index is invalid.\"\"\"\n        data = self._make_data()\n        strategy = SpeciatedMassMovingBin()\n        with pytest.raises(ValueError, match=\"box_index 2 out of range\"):\n            to_representation(\n                data=data,\n                strategy=strategy,\n                activity=ActivityIdealMass(),\n                surface=SurfaceStrategyMass(),\n                box_index=2,\n            )",
+    "successor": "particula/tests/legacy_api_removal_test.py::test_removed_particle_bridge",
+    "disposition": "Facade conversion is removed entirely, including box-selection admission and tagged-to-untagged restore. Negative concrete/package import checks supersede calling the obsolete converter."
+  },
+  {
+    "file": "particula/particles/tests/particle_data_test.py",
+    "test": "TestConversionToRepresentation::test_mass_based_distribution",
+    "original": "def test_mass_based_distribution(self) -> None:\n        \"\"\"MassBasedMovingBin uses total mass per particle as distribution.\"\"\"\n        data = self._make_data()\n        strategy = MassBasedMovingBin()\n        rep = to_representation(\n            data=data,\n            strategy=strategy,\n            activity=ActivityIdealMass(),\n            surface=SurfaceStrategyMass(),\n            box_index=0,\n        )\n\n        expected_distribution = data.masses[0].sum(axis=1)\n        npt.assert_allclose(rep.distribution, expected_distribution)\n        npt.assert_allclose(rep.concentration, data.concentration[0])\n        charge = rep.charge\n        assert charge is not None\n        npt.assert_allclose(charge, data.charge[0])",
+    "successor": "particula/particles/tests/native_particle_storage_test.py::test_explicit_resolved_storage_and_copy",
+    "disposition": "Retain masses, raw concentration, charge, density, volume, selected-box values and independent copies through owned native construction. Facade strategy labels and inferred shape/meaning are removed; explicit species axes replace ambiguous mass-strategy tiling."
+  },
+  {
+    "file": "particula/particles/tests/particle_data_test.py",
+    "test": "TestConversionToRepresentation::test_radii_based_distribution",
+    "original": "def test_radii_based_distribution(self) -> None:\n        \"\"\"RadiiBasedMovingBin uses radii for distribution.\"\"\"\n        data = self._make_data()\n        strategy = RadiiBasedMovingBin()\n        rep = to_representation(\n            data=data,\n            strategy=strategy,\n            activity=ActivityIdealMass(),\n            surface=SurfaceStrategyMass(),\n            box_index=0,\n        )\n\n        expected_distribution = data.radii[0]\n        npt.assert_allclose(rep.distribution, expected_distribution)\n        npt.assert_allclose(rep.concentration, data.concentration[0])\n        charge = rep.charge\n        assert charge is not None\n        npt.assert_allclose(charge, data.charge[0])",
+    "successor": "particula/particles/tests/native_particle_storage_test.py::test_explicit_radius_storage",
+    "disposition": "Retain sphere mass/radius and raw concentration/charge checks through explicit discrete/PDF initialization. Native binned reference volume is 1 m^3; legacy arbitrary-volume radius facade is obsolete."
+  },
+  {
+    "file": "particula/particles/tests/particle_data_test.py",
+    "test": "TestConversionToRepresentation::test_particle_resolved_distribution",
+    "original": "def test_particle_resolved_distribution(self) -> None:\n        \"\"\"ParticleResolvedSpeciatedMass preserves per-particle per-species.\"\"\"\n        data = self._make_data()\n        strategy = ParticleResolvedSpeciatedMass()\n        rep = to_representation(\n            data=data,\n            strategy=strategy,\n            activity=ActivityIdealMass(),\n            surface=SurfaceStrategyMass(),\n            box_index=1,\n        )\n\n        npt.assert_allclose(rep.distribution, data.masses[1])\n        npt.assert_allclose(rep.concentration, data.concentration[1])\n        charge = rep.charge\n        assert charge is not None\n        npt.assert_allclose(charge, data.charge[1])\n        assert rep.volume == pytest.approx(2.0)",
+    "successor": "particula/particles/tests/native_particle_storage_test.py::test_explicit_resolved_storage_and_copy",
+    "disposition": "Retain masses, raw concentration, charge, density, volume, selected-box values and independent copies through owned native construction. Facade strategy labels and inferred shape/meaning are removed; explicit species axes replace ambiguous mass-strategy tiling."
+  },
+  {
+    "file": "particula/particles/tests/particle_data_test.py",
+    "test": "TestConversionToRepresentation::test_round_trip",
+    "original": "def test_round_trip(self) -> None:\n        \"\"\"Round trip rep -> data -> rep preserves masses and charge.\"\"\"\n        strategy = SpeciatedMassMovingBin()\n        density = np.array([1000.0, 1200.0])\n        distribution = np.array([[1.0, 0.2], [0.3, 0.7]])\n        concentration = np.array([1.0, 2.0])\n        charge = np.array([0.0, 1.0])\n        rep = ParticleRepresentation(\n            strategy=strategy,\n            activity=ActivityIdealMass(),\n            surface=SurfaceStrategyMass(),\n            distribution=distribution,\n            density=density,\n            concentration=concentration,\n            charge=charge,\n            volume=1.0,\n        )\n\n        data = from_representation(rep, n_boxes=1)\n        rebuilt = to_representation(\n            data=data,\n            strategy=strategy,\n            activity=ActivityIdealMass(),\n            surface=SurfaceStrategyMass(),\n            box_index=0,\n        )\n\n        npt.assert_allclose(rebuilt.distribution, distribution)\n        npt.assert_allclose(rebuilt.concentration, concentration)\n        rebuilt_charge = rebuilt.charge\n        assert rebuilt_charge is not None\n        npt.assert_allclose(rebuilt_charge, charge)\n        assert rebuilt.volume == pytest.approx(1.0)",
+    "successor": "particula/particles/tests/native_particle_storage_test.py::test_explicit_resolved_storage_and_copy",
+    "disposition": "Retain masses, raw concentration, charge, density, volume, selected-box values and independent copies through owned native construction. Facade strategy labels and inferred shape/meaning are removed; explicit species axes replace ambiguous mass-strategy tiling."
+  },
+  {
+    "file": "particula/particles/tests/particle_population_test.py",
+    "test": "test_tagged_facade_restore_rejects_lost_provenance",
+    "original": "def test_tagged_facade_restore_rejects_lost_provenance() -> None:\n    \"\"\"A legacy facade cannot retain an explicit PMF/PDF kind or radius grid.\"\"\"\n    with pytest.raises(ValueError, match=\"untagged facade\"):\n        to_representation(\n            _particles(\"discrete\"),\n            MassBasedMovingBin(),\n            ActivityIdealMass(),\n            SurfaceStrategyMass(),\n        )",
+    "successor": "particula/tests/legacy_api_removal_test.py::test_removed_particle_bridge",
+    "disposition": "Facade conversion is removed entirely, including box-selection admission and tagged-to-untagged restore. Negative concrete/package import checks supersede calling the obsolete converter."
+  },
+  {
+    "file": "particula/particles/tests/representation_facade_test.py",
+    "test": "test_from_data_round_trip_with_converter",
+    "original": "def test_from_data_round_trip_with_converter(\n    _enable_particula_log_capture,\n):\n    \"\"\"to_representation returns facade matching source data.\"\"\"\n    caplog = _enable_particula_log_capture\n    data = ParticleData(\n        masses=np.array([[[1.0, 2.0]]]),\n        concentration=np.array([[1.0]]),\n        charge=np.array([[0.0]]),\n        density=np.array([1000.0, 1200.0]),\n        volume=np.array([1.0]),\n    )\n    rep = to_representation(\n        data,\n        strategy=SpeciatedMassMovingBin(),\n        activity=ActivityIdealMass(),\n        surface=SurfaceStrategyVolume(),\n    )\n    assert _DEPRECATION_MESSAGE in caplog.text\n    np.testing.assert_allclose(rep.data.masses, data.masses)",
+    "successor": "particula/particles/tests/native_particle_storage_test.py::test_explicit_resolved_storage_and_copy",
+    "disposition": "Retain masses, raw concentration, charge, density, volume, selected-box values and independent copies through owned native construction. Facade strategy labels and inferred shape/meaning are removed; explicit species axes replace ambiguous mass-strategy tiling. Obsolete constructor deprecation-log assertion retired; no facade constructor remains on this path."
+  }
+]

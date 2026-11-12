@@ -41,8 +41,6 @@ from particula.particles.representation import (
 )
 from particula.particles.particle_data import (
     ParticleData,
-    from_representation,
-    to_representation,
 )
 from particula.particles.slot_management import (
     get_slot_diagnostics,

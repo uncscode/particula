@@ -1,0 +1,97 @@
+"""Explicit native storage retains the science formerly tested via bridges."""
+
+import numpy as np
+import numpy.testing as npt
+import pytest
+from particula.particles import (
+    create_particle_data_from_radii,
+    create_resolved_particle_data,
+)
+
+
+@pytest.mark.parametrize("volume", [0.25, 1.0, 4.0])
+@pytest.mark.parametrize("boxes", [1, 2, 3])
+def test_explicit_resolved_storage_and_copy(volume, boxes):
+    """Own every input lane; retain physical volume and each selected box."""
+    masses = np.array([[0.5e-18, 1.5e-18], [2e-18, 3e-18], [0, 0]])
+    masses = np.stack([masses * (i + 1) for i in range(boxes)])
+    counts = np.array([8.0, 0.5, 0.0])
+    charge = np.array([1.0, -1.0, 0.0])
+    density = np.array([1000.0, 1200.0])
+    data = create_resolved_particle_data(
+        masses=masses,
+        concentration=counts,
+        charge=charge,
+        density=density,
+        volume=volume,
+    )
+    copied = data.copy()
+    assert data.masses.shape == (boxes, 3, 2)
+    for candidate in (data, copied):
+        assert candidate.distribution_type == "particle_resolved"
+        npt.assert_array_equal(candidate.density, density)
+        npt.assert_array_equal(candidate.volume, np.full(boxes, volume))
+        for box in range(boxes):
+            npt.assert_array_equal(candidate.masses[box], masses[box])
+            npt.assert_array_equal(candidate.concentration[box], counts)
+            npt.assert_array_equal(candidate.charge[box], charge)
+            npt.assert_allclose(
+                candidate.slot_concentration_density[box],
+                counts / volume,
+                rtol=1e-12,
+                atol=0,
+            )
+            npt.assert_allclose(
+                candidate.species_mass_inventory[box],
+                np.sum(masses[box] * counts[:, None], axis=0),
+                rtol=1e-12,
+                atol=1e-30,
+            )
+            npt.assert_array_equal(
+                candidate.total_mass[box], masses[box].sum(axis=1)
+            )
+    for name in ("masses", "concentration", "charge", "density", "volume"):
+        assert not np.shares_memory(getattr(copied, name), getattr(data, name))
+    for name, source in (
+        ("masses", masses),
+        ("concentration", counts),
+        ("charge", charge),
+        ("density", density),
+    ):
+        assert not np.shares_memory(getattr(data, name), source)
+    copied.masses[:] = 0
+    npt.assert_array_equal(data.masses, masses)
+
+
+@pytest.mark.parametrize("kind", ["discrete", "continuous_pdf"])
+def test_explicit_radius_storage(kind):
+    """Radius construction retains raw fields and the independent sphere law."""
+    radii = np.array([1e-9, 2e-9, 4e-9])
+    raw = np.array([1e9, 2e9, 1e9])
+    charge = np.array([0.0, -1.0, 2.0])
+    data = create_particle_data_from_radii(
+        radii=radii,
+        concentration=raw,
+        charge=charge,
+        density=1000.0,
+        distribution_type=kind,
+    )
+    assert data.masses.shape == (1, 3, 1)
+    npt.assert_allclose(
+        data.masses[0, :, 0],
+        4 * np.pi / 3 * radii**3 * 1000,
+        rtol=1e-12,
+        atol=0,
+    )
+    npt.assert_allclose(data.radii[0], radii, rtol=1e-12, atol=0)
+    npt.assert_array_equal(data.concentration[0], raw)
+    npt.assert_array_equal(data.charge[0], charge)
+    npt.assert_array_equal(data.density, [1000.0])
+    npt.assert_array_equal(data.volume, [1.0])
+    if kind == "continuous_pdf":
+        npt.assert_array_equal(data.radius_grid, radii)
+        expected = np.trapezoid(raw, radii)
+    else:
+        assert data.radius_grid is None
+        expected = raw.sum()
+    npt.assert_allclose(data.number_density, [expected], rtol=1e-12, atol=0)

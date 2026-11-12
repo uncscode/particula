@@ -774,3 +774,33 @@ Validation:
 - Scoped Ruff/format and whitespace checks passed.
 Particle representation definitions/builders/factories and facade bridges are
 still pending their assertion-level audits; this is not final M6 readiness.
+
+## Remove particle facade conversion bridges
+
+Removed `from_representation` and `to_representation` from particle_data.py and
+package exports. ParticleData's complete class AST is unchanged. The bridge
+was the container module's remaining dependency on facade and process strategy
+classes. All 16 old bridge test bodies are preserved and mapped in
+`particle_bridge_assertions.json`; native properties and population tests remain.
+
+Added owned native storage/copy cases at V=0.25/1/4 and one/two/three boxes,
+with unequal counts, distinct material masses, charge, densities, extensive
+species inventory and derived total mass. Radius construction retains raw
+fields and an independent sphere-law check for discrete/PDF data; explicit PDF
+number density integrates over radius. Old implicit mass-shape inference,
+arbitrary binned volume, PDF slot summation and facade deprecation logging are
+intentionally retired. Existing native PDF quadrature evidence remains intact.
+Negative import checks cover both bridge names at root, package and concrete
+module boundaries, distinguishing missing symbols from a broken module import.
+Updated the foundations guide to describe removed bridges and native copying.
+
+Validation:
+- Particle, removed-API and native-construction integration suites:
+  **494 passed in 0.27s**, `/tmp/m6-particle-bridge-tests.log`.
+- GPU conversion and complete source-example suites with warnings as errors:
+  **336 passed, 2 skipped in 40.88s**, `/tmp/m6-particle-bridge-examples.log`.
+- Full-package mypy: **552 files passed**, `/tmp/m6-particle-bridge-mypy.log`.
+- Base strict docs passed in **1.55s**, `/tmp/m6-particle-bridge-docs.log`.
+- All 16 successor symbols resolved; scoped Ruff/format and whitespace passed.
+Remaining particle facade definitions/builders/factory and gas/GPU compatibility
+are still pending. This does not replace final full coverage or publication.
