@@ -1754,8 +1754,8 @@
     {
       "source": "particula/integration_tests/quick_start_test.py",
       "phase": "P6",
-      "disposition": "Exact README and home-page native quick starts migrated",
-      "execution": "Both quick starts passed in final 51-test snippet gate"
+      "disposition": "Self-contained native integration workflows for installed packages; exact published snippets independently exercised in examples_tests/native_quick_start_docs_test.py",
+      "execution": "Both workflows passed in isolated wheel release suite; exact snippet regressions retained in source example suite"
     },
     {
       "source": "docs/Examples/native_state_access.py",

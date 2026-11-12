@@ -1,11 +1,17 @@
 # Example test suites
 
-All 13 source example test modules live here with their original basenames.
+Source example test modules live here, including the original 13 modules
+with their original basenames and the native migration regressions.
 They exercise runnable examples under `docs/Examples/`, including CPU, direct
 GPU, and resident GPU workflows. Package tests remain under `particula/`;
 release infrastructure and marker-policy tests live under `scripts/tests/`.
 
 ## Source-checkout validation
+
+Install `particula[extra]` from the checkout plus `pytest PyYAML` for the
+source test environment (or use both development and extra dependency groups).
+Native examples exercise plotting, unit conversion, chemistry and progress
+reporting, so the base runtime dependencies alone are insufficient.
 
 Run these suites separately from the repository root:
 
@@ -25,6 +31,11 @@ use the release-only CPU allowlist: source GPU example coverage is retained.
 Warp CPU is the baseline when Warp is installed; optional CUDA validation
 skips cleanly when unavailable. Existing per-example capability requirements
 still apply; CPU execution is not a fallback for native-CUDA-only examples.
+
+`native_quick_start_docs_test.py` executes the exact README and documentation
+home-page snippets against independent inventory assertions. These checks need
+the source documentation tree. The package integration quick-start tests retain
+self-contained native workflows so installed-package checks need no docs files.
 
 These tests retain runtime, numerical, and API-boundary checks. Documentation
 prose/link, notebook publication-state, and planning-reference assertions are
