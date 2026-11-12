@@ -322,3 +322,60 @@ WARP_CACHE_PATH=/tmp/particula-m5-warp. Scoped Ruff and format checks passed.
 Host CUDA discovery reports no CUDA-capable device; no CUDA evidence claimed.
 The parity walkthrough and resident multi-timestep/capture examples remain
 pending, as do the complete P5 gate, P6/P7 and final repository-wide gates.
+
+
+### P5 completed native example gate (2026-11-11)
+
+All eight P5 standalone sources now carry explicit native population semantics.
+The remaining parity walkthrough retains its independently ordered four NumPy
+substeps and density-space mass-transfer physics. Builders store resolved counts
+as density times volume; limiting and gas updates divide counts by volume.
+Oracle and device energy are extensive count-weighted joules. The added volume
+scaling case verifies unchanged mass/gas trajectories and proportional energy;
+existing physics and conservation tolerances remain unchanged. Its standalone
+command reports physics, conservation and energy passed.
+
+The resident multi-step fixture preserves total box number densities 1.5/3/4.5
+m^-3 while equalizing within-box counts to satisfy native coagulation. This
+intentionally changes the illustrative per-slot weighting; it does not promise
+legacy trajectory parity. Wall loss now explicitly uses resolved stochastic
+survival matching the tag, replacing the former untagged density-decay config.
+All twelve nodes and source/restart dispatch counts are retained. Source setup
+and explicit restart each prepare new exact-carrier species bindings, with
+tests asserting ownership and independent identities. Native total-mass
+diagnostics carry an explicit species map. Initial and restart inventories use
+particle mass times counts plus gas density times volume. Prescribed gas and
+wall loss make this an open system: zero-ledger residuals are independently
+checked as net inventory change, not falsely asserted to be zero.
+
+The capture example shares that native request and fixes its extensive baseline.
+Its standalone unavailable-CUDA path exited 0 without fixture/upload/capture or
+CPU fallback; native capture remains unexecuted and performance unmeasured.
+The subprocess stderr check now narrowly accepts both known Warp no-driver and
+no-device diagnostics, retaining rejection of unrelated stderr and -Werror.
+
+Final P5 focused command (Warp 1.11.1 CPU):
+
+```bash
+WARP_CACHE_PATH=/tmp/particula-m5-warp .venv/bin/pytest \
+  examples_tests/gpu_direct_kernels_example_test.py \
+  examples_tests/gpu_coagulation_direct_example_test.py \
+  examples_tests/gpu_complete_process_sequence_example_test.py \
+  examples_tests/gpu_condensation_parity_walkthrough_test.py \
+  examples_tests/gpu_direct_nucleation_example_test.py \
+  examples_tests/gpu_resident_session_example_test.py \
+  examples_tests/gpu_resident_multi_timestep_docs_test.py \
+  examples_tests/gpu_resident_graph_capture_docs_test.py \
+  examples_tests/data_containers_example_test.py \
+  particula/gpu/tests/conversion_test.py \
+  particula/gpu/tests/kernel_exports_test.py -q --no-cov
+```
+
+Outcome: **265 passed, 2 skipped in 29.46s**. Skips are optional native CUDA
+parity/capture. An initial invocation used the pre-move data-container test path
+and collected no tests; the command above uses its actual examples_tests owner.
+All eight standalone sources were executed at their migrated revision (capture
+reported unavailable as above). Scoped Ruff checks/format and git diff --check
+passed. `.venv/bin/mkdocs build --strict` exited 0, built in 1.58s; informational
+link messages remain for P6/P7 reconciliation (`/tmp/m5-p5-mkdocs.log`).
+P5 is complete. P6, P7, full final-revision gates and the PR remain outstanding.

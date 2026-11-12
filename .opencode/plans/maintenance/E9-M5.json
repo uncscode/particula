@@ -89,11 +89,11 @@
     {
       "id": "E9-M5-P5",
       "title": "Reconcile explicit-transfer and resident examples with boundary tests",
-      "status": "In Progress",
+      "status": "Completed",
       "size": "S",
       "issue_number": null,
       "start_date": "2026-11-11",
-      "completion_date": null,
+      "completion_date": "2026-11-11",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,

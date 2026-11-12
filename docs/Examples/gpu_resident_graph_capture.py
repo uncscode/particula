@@ -390,9 +390,9 @@ def run_example() -> ExampleRun:  # noqa: C901
     graph_capture = runtime.graph_capture
     device = execution.Device(execution.Backend.WARP, native)
     particles, gas, environment = _build_cpu_state()
-    initial_total_mass = particles.volume[:, None] * (
+    initial_total_mass = (
         np.sum(particles.masses * particles.concentration[:, :, None], axis=1)
-        + gas.concentration
+        + gas.concentration * particles.volume[:, None]
     )
     session = None
     binding = None

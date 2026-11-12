@@ -63,6 +63,14 @@ def test_fixture_and_builders_are_fp64_readonly_and_non_aliasing(
         oracle.particles.masses, source.particles.masses
     )
     assert oracle.gas.name is not source.gas.name
+    for particles in (oracle.particles, source.particles):
+        assert particles.distribution_type == "particle_resolved"
+        npt.assert_allclose(
+            particles.concentration / particles.volume[:, None],
+            fixture.concentration,
+            rtol=1e-15,
+            atol=0,
+        )
 
 
 def test_oracle_has_four_substep_uptake_evaporation_coupling_and_energy(
@@ -79,7 +87,12 @@ def test_oracle_has_four_substep_uptake_evaporation_coupling_and_energy(
     assert np.any(result.energy_transfer != 0.0)
     npt.assert_allclose(
         result.energy_transfer,
-        np.sum(result.total_mass_transfer, axis=1)
+        np.sum(
+            result.total_mass_transfer
+            * fixture.concentration[:, :, None]
+            * fixture.volume[:, None, None],
+            axis=1,
+        )
         * fixture.latent_heat[None, :],
         rtol=1e-12,
         atol=1e-30,
@@ -99,6 +112,33 @@ def test_oracle_has_four_substep_uptake_evaporation_coupling_and_energy(
     assert not np.array_equal(
         result.substeps[0].raw_proposal,
         result.substeps[1].raw_proposal,
+    )
+
+
+def test_oracle_volume_scaling_preserves_densities_and_scales_energy(
+    example_module: types.ModuleType,
+) -> None:
+    """Count/volume normalization preserves physics at fixed number density."""
+    fixture = example_module.build_fixture()
+    scaled_fixture = replace(fixture, volume=fixture.volume * 3.0)
+    baseline = example_module.run_oracle(
+        example_module.build_oracle_input(fixture)
+    )
+    scaled = example_module.run_oracle(
+        example_module.build_oracle_input(scaled_fixture)
+    )
+    for field in ("masses", "gas_concentration", "total_mass_transfer"):
+        npt.assert_allclose(
+            getattr(scaled, field),
+            getattr(baseline, field),
+            rtol=1e-12,
+            atol=1e-30,
+        )
+    npt.assert_allclose(
+        scaled.energy_transfer,
+        3.0 * baseline.energy_transfer,
+        rtol=1e-12,
+        atol=1e-30,
     )
 
 
@@ -262,6 +302,10 @@ def test_fake_enabled_route_has_explicit_sidecars_and_synchronized_readback(
     example_module: types.ModuleType,
 ) -> None:
     """Enabled route uses direct arrays, caller-owned sidecars, and syncs."""
+    binding = object()
+    monkeypatch.setattr(
+        example_module, "_prepare_species_binding", lambda *args: binding
+    )
     calls: list[dict[str, Any]] = []
     _FakeWP.events = []
 
@@ -294,6 +338,7 @@ def test_fake_enabled_route_has_explicit_sidecars_and_synchronized_readback(
     result = example_module.run_example()
     assert len(calls) == 1
     call = calls[0]
+    assert call["species_binding"] is binding
     assert result.scratch_buffers is call["scratch_buffers"]
     assert call["temperature"].shape == call["pressure"].shape == (2,)
     assert call["temperature"].dtype is _FakeWP.float64
@@ -328,6 +373,9 @@ def test_oracle_completes_before_runtime_and_ignores_warp_source_mutation(
     example_module: types.ModuleType,
 ) -> None:
     """Detached Warp-source mutation cannot alter the completed oracle result."""
+    monkeypatch.setattr(
+        example_module, "_prepare_species_binding", lambda *args: object()
+    )
     events: list[str] = []
     original_oracle = example_module.run_oracle
     original_source = example_module.build_warp_source
@@ -397,6 +445,9 @@ def test_enabled_failures_propagate_after_completed_oracle_without_restore(
     stage: str,
 ) -> None:
     """Enabled errors preserve type/message and never report fallback success."""
+    monkeypatch.setattr(
+        example_module, "_prepare_species_binding", lambda *args: object()
+    )
     monkeypatch.setattr(example_module, "WARP_AVAILABLE", True)
     monkeypatch.delenv("PARTICULA_EXAMPLE_FORCE_NO_WARP", raising=False)
     message = f"{stage} failure"
@@ -603,14 +654,20 @@ def test_acceptance_reports_all_categories_after_multiple_failures(
 @pytest.mark.warp
 @pytest.mark.gpu_parity
 @pytest.mark.skipif(not WARP_AVAILABLE, reason="Warp is not available")
+@pytest.mark.parametrize("volume_scale", [1.0, 3.0])
 def test_warp_cpu_matches_independent_oracle(
     monkeypatch: pytest.MonkeyPatch,
     example_module: types.ModuleType,
+    volume_scale: float,
 ) -> None:
     """Warp CPU satisfies separate physics, conservation, and energy checks."""
     monkeypatch.delenv("PARTICULA_EXAMPLE_FORCE_NO_WARP", raising=False)
+    template = example_module.build_fixture()
+    scaled = replace(template, volume=template.volume * volume_scale)
+    monkeypatch.setattr(example_module, "build_fixture", lambda: scaled)
     result = example_module.run_example(device="cpu")
     assert result.particle_data is not None and result.gas_data is not None
+    assert result.particle_data.distribution_type == "particle_resolved"
     assert (
         result.total_mass_transfer is not None
         and result.raw_proposal is not None
@@ -670,7 +727,12 @@ def test_warp_cpu_matches_independent_oracle(
     )
     npt.assert_allclose(
         result.energy_transfer,
-        np.sum(result.total_mass_transfer, axis=1)
+        np.sum(
+            result.total_mass_transfer
+            * fixture.concentration[:, :, None]
+            * fixture.volume[:, None, None],
+            axis=1,
+        )
         * fixture.latent_heat[None, :],
         rtol=1e-12,
         atol=1e-18,
@@ -757,7 +819,12 @@ def test_cuda_matches_independent_oracle_when_available(
     )
     npt.assert_allclose(
         result.energy_transfer,
-        np.sum(result.total_mass_transfer, axis=1)
+        np.sum(
+            result.total_mass_transfer
+            * fixture.concentration[:, :, None]
+            * fixture.volume[:, None, None],
+            axis=1,
+        )
         * fixture.latent_heat[None, :],
         rtol=1e-12,
         atol=1e-18,

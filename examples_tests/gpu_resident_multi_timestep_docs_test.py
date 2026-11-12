@@ -5,6 +5,7 @@ from __future__ import annotations
 import builtins
 import importlib
 import os
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -163,7 +164,11 @@ def test_enabled_script_runs_warning_free_without_cuda_requirement() -> None:
         },
         timeout=30,
     )
-    assert result.stderr in ("", _NO_CUDA_STDERR)
+    assert result.stderr in ("", _NO_CUDA_STDERR) or re.fullmatch(
+        r"Warp CUDA error 100: no CUDA-capable device is detected "
+        r"\(in function init_cuda_driver, [^\n]+/cuda_util\.cpp:\d+\)\n",
+        result.stderr,
+    )
     assert result.returncode == 0
 
 
@@ -378,7 +383,9 @@ def test_writer_dispatch_failure_propagates_after_guard_close(
 
 
 @pytest.mark.warp
-def test_real_warp_cpu_example_has_resident_lifecycle_observations() -> None:
+def test_real_warp_cpu_example_has_resident_lifecycle_observations(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """The enabled example performs its documented multi-step lifecycle."""
     pytest.importorskip("warp")
     spec = importlib.util.spec_from_file_location(
@@ -389,11 +396,31 @@ def test_real_warp_cpu_example_has_resident_lifecycle_observations() -> None:
     sys.modules[spec.name] = module
     try:
         spec.loader.exec_module(module)
+        bindings = []
+        original_prepare = module._prepare_species_bindings
+
+        def prepare(session):
+            result = original_prepare(session)
+            bindings.append((session, result))
+            return result
+
+        monkeypatch.setattr(module, "_prepare_species_bindings", prepare)
         result = module.run_example()
     finally:
         sys.modules.pop(spec.name, None)
 
     restarted_session, restarted_registry, restarted_guard = result.restarted
+    assert len(bindings) == 2
+    assert bindings[0][0] is result.session
+    assert bindings[1][0] is restarted_session
+    for session, maps in bindings:
+        assert session.metadata.distribution_type == "particle_resolved"
+        for binding in maps:
+            assert binding.particles is session.particles
+            assert binding.gas is session.gas
+            assert binding.gas_names == ("water",)
+    assert bindings[0][1][0] is not bindings[1][1][0]
+    assert bindings[0][1][1] is not bindings[1][1][1]
     assert result.source_steps == 2
     assert result.restarted_steps == 1
     assert result.gas_snapshot.shape == (3, 1)
@@ -401,6 +428,28 @@ def test_real_warp_cpu_example_has_resident_lifecycle_observations() -> None:
     assert result.initial_total_mass.shape == (3, 1)
     assert np.any(result.initial_total_mass > 0.0)
     assert result.conservation_residual.shape == (3, 1)
+    assert result.checkpoint.particles.distribution_type == "particle_resolved"
+    initial_p, initial_g, _ = module._build_cpu_state()
+    initial_inventory = (
+        np.sum(initial_p.masses * initial_p.concentration[..., None], axis=1)
+        + initial_g.concentration * initial_p.volume[:, None]
+    )
+    npt.assert_array_equal(result.initial_total_mass, initial_inventory)
+    checkpoint_p = result.checkpoint.particles
+    final_inventory = (
+        np.sum(
+            checkpoint_p.masses * checkpoint_p.concentration[..., None], axis=1
+        )
+        + result.checkpoint.gas.concentration * checkpoint_p.volume[:, None]
+    )
+    # Prescribed gas and stochastic wall removal make this an open system;
+    # zero source/sink ledgers report net change, not zero closed-system drift.
+    npt.assert_allclose(
+        result.conservation_residual,
+        final_inventory - initial_inventory,
+        rtol=1e-12,
+        atol=1e-30,
+    )
     assert result.checkpoint.lifecycle.value == "active"
     assert result.session.lifecycle.value == "finalized"
     assert result.terminal_checkpoint is result.session.finalize(
