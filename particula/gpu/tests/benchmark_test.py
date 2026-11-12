@@ -766,13 +766,13 @@ def _make_particle_data(
     n_species: int,
     concentration_scale: float = 1.0,
 ) -> ParticleData:
-    """Create deterministic particle data for benchmarks.
+    """Create deterministic resolved-count particle data for benchmarks.
 
     Args:
         n_boxes: Number of spatial boxes to populate.
         n_particles: Number of particles per box.
         n_species: Number of condensible species per particle.
-        concentration_scale: Scale factor applied to concentrations.
+        concentration_scale: Count represented by each active slot.
 
     Returns:
         ParticleData with masses, concentration, charge, density, and volume.
@@ -794,6 +794,7 @@ def _make_particle_data(
         charge=charge,
         density=density,
         volume=volume,
+        distribution_type="particle_resolved",
     )
 
 
@@ -804,9 +805,10 @@ def _make_coagulation_particle_data(
 ) -> ParticleData:
     """Create deterministic mixed-scale particle data for coagulation.
 
-    The fixture intentionally combines nanometer-scale and droplet-scale
-    particles so opt-in coagulation timings exercise the same broad mass
-    spread covered by the mixed-scale regression tests.
+    This historical unequal-weight fixture preserves the original mixed-scale
+    regression inputs. Its explicitly tagged unequal counts are unsupported
+    by native coagulation. Timed calls use the distinct unit-count workload
+    from ``_make_native_coagulation_particle_data`` instead.
 
     Args:
         n_boxes: Number of spatial boxes to populate.
@@ -854,7 +856,26 @@ def _make_coagulation_particle_data(
         charge=charge,
         density=density,
         volume=volume,
+        distribution_type="particle_resolved",
     )
+
+
+def _make_native_coagulation_particle_data(
+    n_boxes: int,
+    n_particles: int,
+    n_species: int,
+) -> ParticleData:
+    """Build the native unit-count mixed-radius benchmark workload.
+
+    This is a distinct workload from the historical unequal-weight fixture.
+    Each active slot represents exactly one particle, matching the native
+    direct coagulation admission and the CPU collision sampler's count basis.
+    Radii, material composition, box volumes and storage precision are retained.
+    Historical unequal-weight timings are not comparable to this workload.
+    """
+    particles = _make_coagulation_particle_data(n_boxes, n_particles, n_species)
+    particles.concentration.fill(1.0)
+    return particles
 
 
 def _make_gas_data(n_boxes: int, n_species: int) -> GasData:
@@ -1063,6 +1084,85 @@ def _cpu_condensation_step(
     particles.masses = np.maximum(0.0, particles.masses + mass_transfer)
 
 
+def _cpu_native_condensation_step(
+    particles: ParticleData,
+    gas: GasData,
+    vapor_pressure: np.ndarray,
+    surface_tension: np.ndarray,
+    mass_accommodation: np.ndarray,
+    diffusion_coefficient_vapor: np.ndarray,
+    temperature: float,
+    pressure: float,
+    time_step: float,
+    mass_transfer_buffer: np.ndarray,
+) -> None:
+    """Advance the identity-mapped, activity-disabled benchmark in four steps.
+
+    This NumPy comparator uses resolved counts, bounds evaporation by particle
+    inventory and uptake by current gas plus same-substep release. It couples
+    gas after every substep and retires fully evaporated slots after the call.
+    The historical single-proposal helper remains separately characterized.
+    """
+    weights = particles.concentration / particles.volume[:, None]
+    for _ in range(4):
+        proposal = _cpu_mass_transfer(
+            particles,
+            gas,
+            vapor_pressure,
+            surface_tension,
+            mass_accommodation,
+            diffusion_coefficient_vapor,
+            temperature,
+            pressure,
+            time_step / 4.0,
+            out=mass_transfer_buffer,
+        )
+        proposal = np.where(gas.partitioning, proposal, 0.0)
+        candidate = np.maximum(proposal, -particles.masses)
+        uptake = np.maximum(candidate, 0.0)
+        release = np.minimum(candidate, 0.0)
+        demand = np.sum(uptake * weights[..., None], axis=1)
+        available = gas.concentration - np.sum(
+            release * weights[..., None], axis=1
+        )
+        scale = np.minimum(
+            1.0,
+            np.divide(
+                available, demand, out=np.ones_like(demand), where=demand > 0.0
+            ),
+        )
+        updated = np.maximum(
+            particles.masses + release + uptake * scale[:, None, :], 0.0
+        )
+        applied = updated - particles.masses
+        gas.concentration[:] = np.maximum(
+            gas.concentration - np.sum(applied * weights[..., None], axis=1),
+            0.0,
+        )
+        particles.masses[:] = updated
+    empty = np.sum(particles.masses, axis=2) == 0.0
+    particles.concentration[empty] = 0.0
+    particles.charge[empty] = 0.0
+
+
+def _prepare_benchmark_species_binding(particles, gas, n_species):
+    """Prepare the benchmark's declared identity map outside timed dispatch."""
+    from particula.dynamics.condensation.species_mapping import (
+        CondensationSpeciesMap,
+    )
+    from particula.gpu.species_mapping import prepare_condensation_species_map
+
+    names = tuple(f"species_{index}" for index in range(n_species))
+    return prepare_condensation_species_map(
+        particles,
+        gas,
+        gas_names=names,
+        species_map=CondensationSpeciesMap(
+            names, tuple((index, index) for index in range(n_species))
+        ),
+    )
+
+
 def _build_kernel_radius(radii: np.ndarray) -> np.ndarray:
     """Build interpolation radii for particle-resolved coagulation.
 
@@ -1154,6 +1254,83 @@ def _cpu_coagulation_step(
         new_volume = 4.0 / 3.0 * np.pi * np.power(radii, 3)
         new_total_mass = new_volume * effective_density
         masses_box[:] = mass_fractions * new_total_mass[:, np.newaxis]
+
+
+def _cpu_native_coagulation_step(
+    particles: ParticleData,
+    temperature: float,
+    pressure: float,
+    time_step: float,
+    rng: np.random.Generator,
+    kernel_radius: np.ndarray,
+) -> None:
+    """Time the CPU grid sampler with conservative unit-count material updates.
+
+    The CPU interpolated-kernel sampler and GPU direct pair sampler are
+    distinct algorithms. Their timing ratio does not establish trajectory,
+    statistical, or algorithmic parity. Only unit-count active slots are used.
+
+    Args:
+        particles: Particle state to update in-place.
+        temperature: Gas temperature in kelvin.
+        pressure: Gas pressure in pascals.
+        time_step: Time step duration in seconds.
+        rng: Random number generator for collision sampling.
+        kernel_radius: Interpolation radii grid for kernel evaluation.
+    """
+    particles.validate_representation()
+    active = particles.concentration > 0.0
+    if particles.distribution_type != "particle_resolved" or np.any(
+        particles.concentration[active] != 1.0
+    ):
+        raise ValueError("benchmark CPU coagulation requires unit counts")
+    n_boxes = particles.masses.shape[0]
+    # Build a (len(kernel_radius), len(kernel_radius)) kernel matrix
+    # evaluated on the interpolation grid, not on per-particle radii.
+    avg_density = float(np.mean(particles.density))
+    grid_volume = (4.0 / 3.0) * np.pi * np.power(kernel_radius, 3)
+    grid_mass = grid_volume * avg_density
+    kernel = cast(
+        NDArray[np.float64],
+        np.atleast_2d(
+            np.asarray(
+                get_brownian_kernel_via_system_state(
+                    particle_radius=kernel_radius,
+                    particle_mass=grid_mass,
+                    temperature=temperature,
+                    pressure=pressure,
+                ),
+                dtype=np.float64,
+            )
+        ),
+    )
+    for box_idx in range(n_boxes):
+        masses_box = particles.masses[box_idx]
+        concentration_box = particles.concentration[box_idx]
+        total_volume = np.sum(masses_box / particles.density, axis=-1)
+        radii = np.cbrt(3.0 * total_volume / (4.0 * np.pi))
+        collision_pairs = get_particle_resolved_coagulation_step(
+            radii,
+            kernel,
+            kernel_radius,
+            float(particles.volume[box_idx]),
+            time_step,
+            rng,
+        )  # type: ignore[arg-type]
+        if collision_pairs.size == 0:
+            continue
+        # Sequential pair updates preserve each material even when destinations
+        # repeat; never reconstruct mixture mass from an averaged density.
+        for small, large in collision_pairs:
+            if small == large or concentration_box[small] == 0.0:
+                continue
+            if concentration_box[large] == 0.0:
+                raise ValueError("collision target must be an active slot")
+            masses_box[large] += masses_box[small]
+            particles.charge[box_idx, large] += particles.charge[box_idx, small]
+            masses_box[small] = 0.0
+            particles.charge[box_idx, small] = 0.0
+            concentration_box[small] = 0.0
 
 
 def _print_timing(label: str, gpu_time: float, cpu_time: float) -> None:
@@ -1486,7 +1663,7 @@ def test_condensation_scaling(
     )
     particles = _make_particle_data(n_boxes, n_particles, n_species)
     gas = _make_gas_data(n_boxes, n_species)
-    vapor_pressure = _make_vapor_pressure(n_boxes, n_species)
+    vapor_pressure = np.full((n_boxes, n_species), 800.0, dtype=np.float64)
     surface_tension = np.full(
         n_species, DEFAULT_SURFACE_TENSION, dtype=np.float64
     )
@@ -1500,6 +1677,9 @@ def test_condensation_scaling(
     gpu_particles = to_warp_particle_data(particles, device="cuda")
     gpu_gas = to_warp_gas_data(
         gas, device="cuda", vapor_pressure=vapor_pressure
+    )
+    species_binding = _prepare_benchmark_species_binding(
+        gpu_particles, gpu_gas, n_species
     )
     mass_transfer_buffer = _wp_zeros_with_guard(
         (n_boxes, n_particles, n_species),
@@ -1523,11 +1703,10 @@ def test_condensation_scaling(
             device="cuda",
             label=f"{tag} thermodynamics modes",
         ),
-        parameters=_wp_zeros_with_guard(
-            (n_species, 4),
+        parameters=wp.array(
+            np.column_stack((vapor_pressure[0], np.zeros((n_species, 3)))),
             dtype=wp.float64,
             device="cuda",
-            label=f"{tag} thermodynamics parameters",
         ),
         molar_mass_reference=wp.array(
             gas.molar_mass, dtype=wp.float64, device="cuda"
@@ -1547,6 +1726,7 @@ def test_condensation_scaling(
             diffusion_coefficient_vapor=diffusion_vapor_wp,
             mass_transfer=mass_transfer_buffer,
             thermodynamics=thermodynamics,
+            species_binding=species_binding,
         )
 
     print(
@@ -1565,6 +1745,8 @@ def test_condensation_scaling(
             "n_particles": n_particles,
             "n_species": n_species,
             "steps": DEFAULT_STEPS,
+            "workload": "native_resolved_fixed_four_constant_vp_v1",
+            "historical_timings_comparable": False,
         },
     )
     entry["gpu_time_s"] = gpu_time
@@ -1572,13 +1754,14 @@ def test_condensation_scaling(
 
     if run_cpu:
         cpu_particles = particles.copy()
+        cpu_gas = gas.copy()
         cpu_mass_transfer = np.zeros_like(cpu_particles.masses)
 
         def cpu_step() -> None:
             """Execute one CPU condensation step for the timed loop."""
-            _cpu_condensation_step(
+            _cpu_native_condensation_step(
                 cpu_particles,
-                gas,
+                cpu_gas,
                 vapor_pressure,
                 surface_tension,
                 mass_accommodation,
@@ -1639,7 +1822,9 @@ def test_coagulation_scaling(
             label, n_boxes, n_particles, n_species, run_cpu
         )
     )
-    particles = _make_coagulation_particle_data(n_boxes, n_particles, n_species)
+    particles = _make_native_coagulation_particle_data(
+        n_boxes, n_particles, n_species
+    )
 
     gpu_particles = to_warp_particle_data(particles, device="cuda")
     collision_pairs_buf = _wp_zeros_with_guard(
@@ -1703,6 +1888,12 @@ def test_coagulation_scaling(
             "n_particles": n_particles,
             "n_species": n_species,
             "steps": DEFAULT_STEPS,
+            "workload": "native_unit_count_mixed_radius_v1",
+            "cpu_algorithm": "interpolated_kernel_unit_count_sampler",
+            "gpu_algorithm": "direct_pair_unit_count_sampler",
+            "algorithm_parity_claimed": False,
+            "distribution_type": "particle_resolved",
+            "historical_timings_comparable": False,
         },
     )
     entry["gpu_time_s"] = gpu_time
@@ -1715,7 +1906,7 @@ def test_coagulation_scaling(
 
         def cpu_step() -> None:
             """Execute one CPU coagulation step for the timed loop."""
-            _cpu_coagulation_step(
+            _cpu_native_coagulation_step(
                 cpu_particles,
                 DEFAULT_TEMPERATURE,
                 DEFAULT_PRESSURE,

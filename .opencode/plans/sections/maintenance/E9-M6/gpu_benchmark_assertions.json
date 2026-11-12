@@ -1,0 +1,634 @@
+[
+  {
+    "file": "particula/gpu/tests/benchmark_test.py",
+    "test": "test_condensation_scaling",
+    "original": "def test_condensation_scaling(\n    label: str,\n    n_boxes: int,\n    n_particles: int,\n    n_species: int,\n    run_cpu: bool,\n) -> None:\n    \"\"\"Parametrized condensation benchmark across particle counts.\"\"\"\n    _skip_if_no_cuda()\n    tag = f\"cond-{label}\"\n    print(\n        f\"\\n  [{tag}] Setup: {n_boxes} box(es) x \"\n        f\"{n_particles:,} particles x {n_species} species\"\n    )\n    _preflight_condensation_case_allocations(\n        label,\n        n_boxes,\n        n_particles,\n        n_species,\n    )\n    _validate_benchmark_budget(\n        _estimate_condensation_budget(\n            label, n_boxes, n_particles, n_species, run_cpu\n        )\n    )\n    particles = _make_particle_data(n_boxes, n_particles, n_species)\n    gas = _make_gas_data(n_boxes, n_species)\n    vapor_pressure = _make_vapor_pressure(n_boxes, n_species)\n    surface_tension = np.full(\n        n_species, DEFAULT_SURFACE_TENSION, dtype=np.float64\n    )\n    mass_accommodation = np.full(\n        n_species, DEFAULT_MASS_ACCOMMODATION, dtype=np.float64\n    )\n    diffusion_vapor = np.full(\n        n_species, DEFAULT_DIFFUSION_COEFFICIENT, dtype=np.float64\n    )\n\n    gpu_particles = to_warp_particle_data(particles, device=\"cuda\")\n    gpu_gas = to_warp_gas_data(\n        gas, device=\"cuda\", vapor_pressure=vapor_pressure\n    )\n    mass_transfer_buffer = _wp_zeros_with_guard(\n        (n_boxes, n_particles, n_species),\n        dtype=wp.float64,\n        device=\"cuda\",\n        label=f\"{tag} gpu mass transfer buffer\",\n    )\n    surface_tension_wp: Any = wp.array(\n        surface_tension, dtype=wp.float64, device=\"cuda\"\n    )\n    mass_accommodation_wp: Any = wp.array(\n        mass_accommodation, dtype=wp.float64, device=\"cuda\"\n    )\n    diffusion_vapor_wp: Any = wp.array(\n        diffusion_vapor, dtype=wp.float64, device=\"cuda\"\n    )\n    thermodynamics = ThermodynamicsConfig(\n        modes=_wp_zeros_with_guard(\n            (n_species,),\n            dtype=wp.int32,\n            device=\"cuda\",\n            label=f\"{tag} thermodynamics modes\",\n        ),\n        parameters=_wp_zeros_with_guard(\n            (n_species, 4),\n            dtype=wp.float64,\n            device=\"cuda\",\n            label=f\"{tag} thermodynamics parameters\",\n        ),\n        molar_mass_reference=wp.array(\n            gas.molar_mass, dtype=wp.float64, device=\"cuda\"\n        ),\n    )\n\n    def gpu_step() -> None:\n        \"\"\"Execute one GPU condensation step for the timed loop.\"\"\"\n        condensation_step_gpu(\n            gpu_particles,\n            gpu_gas,\n            temperature=DEFAULT_TEMPERATURE,\n            pressure=DEFAULT_PRESSURE,\n            time_step=DEFAULT_TIME_STEP,\n            surface_tension=surface_tension_wp,\n            mass_accommodation=mass_accommodation_wp,\n            diffusion_coefficient_vapor=diffusion_vapor_wp,\n            mass_transfer=mass_transfer_buffer,\n            thermodynamics=thermodynamics,\n        )\n\n    print(\n        f\"  [{tag}] Running GPU: {DEFAULT_WARMUP} warmup + \"\n        f\"{DEFAULT_STEPS} timed steps ...\"\n    )\n    with _warp_profiled(f\"condensation_{label}\"):\n        gpu_time = _time_gpu_loop(gpu_step, DEFAULT_STEPS, DEFAULT_WARMUP)\n    print(f\"  [{tag}] GPU done: {gpu_time:.4f}s\")\n\n    entry_key = f\"condensation_{label}\"\n    entry = _benchmark_results[\"benchmarks\"].setdefault(\n        entry_key,\n        {\n            \"n_boxes\": n_boxes,\n            \"n_particles\": n_particles,\n            \"n_species\": n_species,\n            \"steps\": DEFAULT_STEPS,\n        },\n    )\n    entry[\"gpu_time_s\"] = gpu_time\n    _save_results()\n\n    if run_cpu:\n        cpu_particles = particles.copy()\n        cpu_mass_transfer = np.zeros_like(cpu_particles.masses)\n\n        def cpu_step() -> None:\n            \"\"\"Execute one CPU condensation step for the timed loop.\"\"\"\n            _cpu_condensation_step(\n                cpu_particles,\n                gas,\n                vapor_pressure,\n                surface_tension,\n                mass_accommodation,\n                diffusion_vapor,\n                DEFAULT_TEMPERATURE,\n                DEFAULT_PRESSURE,\n                DEFAULT_TIME_STEP,\n                cpu_mass_transfer,\n            )\n\n        print(\n            f\"  [{tag}] Running CPU: {DEFAULT_WARMUP} warmup + \"\n            f\"{DEFAULT_STEPS} timed steps ...\"\n        )\n        cpu_time = _time_cpu_loop(cpu_step, DEFAULT_STEPS, DEFAULT_WARMUP)\n        print(f\"  [{tag}] CPU done: {cpu_time:.4f}s\")\n        _print_timing(f\"Condensation {label}\", gpu_time, cpu_time)\n        speedup = _compute_speedup(cpu_time, gpu_time)\n        entry[\"cpu_time_s\"] = cpu_time\n        entry[\"speedup\"] = speedup\n    else:\n        total_particles = n_boxes * n_particles\n        per_step = gpu_time / DEFAULT_STEPS\n        print(\n            f\"  [{tag}] GPU-only | {total_particles:,} total particles | \"\n            f\"{per_step:.4f}s/step\"\n        )\n    _save_results()",
+    "successor": "particula/gpu/tests/benchmark_test.py::test_condensation_scaling",
+    "body_changed": true,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_test.py",
+    "test": "test_coagulation_scaling",
+    "original": "def test_coagulation_scaling(\n    label: str,\n    n_boxes: int,\n    n_particles: int,\n    n_species: int,\n    run_cpu: bool,\n) -> None:\n    \"\"\"Benchmark coagulation scaling with the mixed-scale fixture path.\"\"\"\n    _skip_if_no_cuda()\n    tag = f\"coag-{label}\"\n    print(\n        f\"\\n  [{tag}] Setup: {n_boxes} box(es) x \"\n        f\"{n_particles:,} particles x {n_species} species\"\n    )\n    _preflight_coagulation_case_allocations(\n        label,\n        n_boxes,\n        n_particles,\n        n_species,\n    )\n    _validate_benchmark_budget(\n        _estimate_coagulation_budget(\n            label, n_boxes, n_particles, n_species, run_cpu\n        )\n    )\n    particles = _make_coagulation_particle_data(n_boxes, n_particles, n_species)\n\n    gpu_particles = to_warp_particle_data(particles, device=\"cuda\")\n    collision_pairs_buf = _wp_zeros_with_guard(\n        (n_boxes, MAX_COLLISIONS, 2),\n        dtype=wp.int32,\n        device=\"cuda\",\n        label=f\"{tag} collision pairs\",\n        itemsize=4,\n    )\n    n_collisions_buf = _wp_zeros_with_guard(\n        (n_boxes,),\n        dtype=wp.int32,\n        device=\"cuda\",\n        label=f\"{tag} collision counts\",\n        itemsize=4,\n    )\n    rng_states_buf = _wp_zeros_with_guard(\n        (n_boxes,),\n        dtype=wp.uint32,\n        device=\"cuda\",\n        label=f\"{tag} RNG state\",\n        itemsize=4,\n    )\n    _seed_coagulation_rng_states_once(\n        rng_seed=42,\n        rng_states=rng_states_buf,\n        n_boxes=n_boxes,\n        device=\"cuda\",\n    )\n\n    def gpu_step() -> None:\n        \"\"\"Execute one GPU coagulation step for the timed loop.\"\"\"\n        coagulation_step_gpu(\n            gpu_particles,\n            temperature=DEFAULT_TEMPERATURE,\n            pressure=DEFAULT_PRESSURE,\n            time_step=DEFAULT_TIME_STEP,\n            # Keep the seed fixed when reusing caller-owned RNG state so the\n            # benchmark matches persisted-state runtime semantics.\n            rng_seed=42,\n            max_collisions=MAX_COLLISIONS,\n            collision_pairs=collision_pairs_buf,\n            n_collisions=n_collisions_buf,\n            rng_states=rng_states_buf,\n            initialize_rng=False,\n        )\n\n    print(\n        f\"  [{tag}] Running GPU: {DEFAULT_WARMUP} warmup + \"\n        f\"{DEFAULT_STEPS} timed steps ...\"\n    )\n    with _warp_profiled(f\"coagulation_{label}\"):\n        gpu_time = _time_gpu_loop(gpu_step, DEFAULT_STEPS, DEFAULT_WARMUP)\n    print(f\"  [{tag}] GPU done: {gpu_time:.4f}s\")\n\n    entry_key = f\"coagulation_{label}\"\n    entry = _benchmark_results[\"benchmarks\"].setdefault(\n        entry_key,\n        {\n            \"n_boxes\": n_boxes,\n            \"n_particles\": n_particles,\n            \"n_species\": n_species,\n            \"steps\": DEFAULT_STEPS,\n        },\n    )\n    entry[\"gpu_time_s\"] = gpu_time\n    _save_results()\n\n    if run_cpu:\n        cpu_particles = particles.copy()\n        rng = np.random.default_rng(42)\n        kernel_radius = _build_kernel_radius(cpu_particles.radii)\n\n        def cpu_step() -> None:\n            \"\"\"Execute one CPU coagulation step for the timed loop.\"\"\"\n            _cpu_coagulation_step(\n                cpu_particles,\n                DEFAULT_TEMPERATURE,\n                DEFAULT_PRESSURE,\n                DEFAULT_TIME_STEP,\n                rng,\n                kernel_radius,\n            )\n\n        print(\n            f\"  [{tag}] Running CPU: {DEFAULT_WARMUP} warmup + \"\n            f\"{DEFAULT_STEPS} timed steps ...\"\n        )\n        cpu_time = _time_cpu_loop(cpu_step, DEFAULT_STEPS, DEFAULT_WARMUP)\n        print(f\"  [{tag}] CPU done: {cpu_time:.4f}s\")\n        _print_timing(f\"Coagulation {label}\", gpu_time, cpu_time)\n        speedup = _compute_speedup(cpu_time, gpu_time)\n        entry[\"cpu_time_s\"] = cpu_time\n        entry[\"speedup\"] = speedup\n    else:\n        total_particles = n_boxes * n_particles\n        per_step = gpu_time / DEFAULT_STEPS\n        print(\n            f\"  [{tag}] GPU-only | {total_particles:,} total particles | \"\n            f\"{per_step:.4f}s/step\"\n        )\n    _save_results()",
+    "successor": "particula/gpu/tests/benchmark_test.py::test_coagulation_scaling",
+    "body_changed": true,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_test.py",
+    "test": "test_wp_func_benchmarks",
+    "original": "def test_wp_func_benchmarks() -> None:\n    \"\"\"Benchmark key Warp @wp.func utilities against NumPy equivalents.\"\"\"\n    _skip_if_no_cuda()\n    n_evals = 100_000\n    kernel_sample = 256\n    inputs = _build_wp_func_benchmark_inputs(n_evals)\n    cpu_timings = _benchmark_cpu_wp_funcs(inputs, kernel_sample=kernel_sample)\n    gpu_timings = _benchmark_gpu_wp_funcs(inputs)\n\n    kernel_calls = kernel_sample * kernel_sample\n    timing_lines = [\n        \"@wp.func timings (per call, microseconds):\",\n        (\n            \"  diffusion_coefficient_wp: \"\n            f\"CPU {cpu_timings['diffusion_coefficient'] / n_evals * 1e6:.4f} | \"\n            f\"GPU {gpu_timings['diffusion_coefficient'] / n_evals * 1e6:.4f}\"\n        ),\n        (\n            \"  mass_transfer_rate_wp: \"\n            f\"CPU {cpu_timings['mass_transfer_rate'] / n_evals * 1e6:.4f} | \"\n            f\"GPU {gpu_timings['mass_transfer_rate'] / n_evals * 1e6:.4f}\"\n        ),\n        (\n            \"  particle_radius_from_volume_wp: \"\n            f\"CPU {cpu_timings['particle_radius_from_volume'] / n_evals * 1e6:.4f} | \"\n            f\"GPU {gpu_timings['particle_radius_from_volume'] / n_evals * 1e6:.4f}\"\n        ),\n        (\n            \"  brownian_diffusivity_wp: \"\n            f\"CPU {cpu_timings['brownian_diffusivity'] / n_evals * 1e6:.4f} | \"\n            f\"GPU {gpu_timings['brownian_diffusivity'] / n_evals * 1e6:.4f}\"\n        ),\n        (\n            \"  brownian_kernel_pair_wp: \"\n            f\"CPU {cpu_timings['brownian_kernel_pair'] / kernel_calls * 1e6:.4f} | \"\n            f\"GPU {gpu_timings['brownian_kernel_pair'] / n_evals * 1e6:.4f}\"\n        ),\n    ]\n    print(\"\\n\".join(timing_lines))\n\n    _benchmark_results[\"benchmarks\"][\"wp_func\"] = {\n        \"n_evals\": n_evals,\n        \"diffusion_coefficient\": {\n            \"cpu_us\": cpu_timings[\"diffusion_coefficient\"] / n_evals * 1e6,\n            \"gpu_us\": gpu_timings[\"diffusion_coefficient\"] / n_evals * 1e6,\n        },\n        \"mass_transfer_rate\": {\n            \"cpu_us\": cpu_timings[\"mass_transfer_rate\"] / n_evals * 1e6,\n            \"gpu_us\": gpu_timings[\"mass_transfer_rate\"] / n_evals * 1e6,\n        },\n        \"particle_radius_from_volume\": {\n            \"cpu_us\": cpu_timings[\"particle_radius_from_volume\"]\n            / n_evals\n            * 1e6,\n            \"gpu_us\": gpu_timings[\"particle_radius_from_volume\"]\n            / n_evals\n            * 1e6,\n        },\n        \"brownian_diffusivity\": {\n            \"cpu_us\": cpu_timings[\"brownian_diffusivity\"] / n_evals * 1e6,\n            \"gpu_us\": gpu_timings[\"brownian_diffusivity\"] / n_evals * 1e6,\n        },\n        \"brownian_kernel_pair\": {\n            \"cpu_us\": cpu_timings[\"brownian_kernel_pair\"] / kernel_calls * 1e6,\n            \"gpu_us\": gpu_timings[\"brownian_kernel_pair\"] / n_evals * 1e6,\n        },\n    }\n    _save_results()",
+    "successor": "particula/gpu/tests/benchmark_test.py::test_wp_func_benchmarks",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_test.py",
+    "test": "test_mass_precision_projection_benchmark",
+    "original": "def test_mass_precision_projection_benchmark(\n    label: str,\n    case_index: int,\n    candidate_id: str,\n) -> None:\n    \"\"\"Record optional bounded projection timings for P3 study candidates.\"\"\"\n    case = _build_mass_precision_cases()[case_index]\n    start = time.perf_counter()\n    reconstructed = case.masses\n    repeats = 5_000\n    for _ in range(repeats):\n        reconstructed = _project_candidate(\n            case,\n            candidate_id,\n        )[\"reconstructed_masses\"]\n    elapsed = time.perf_counter() - start\n\n    assert reconstructed.shape == case.masses.shape\n    entry_key = f\"mass_precision_candidate_payload_{label}_{candidate_id}\"\n    _benchmark_results[\"benchmarks\"][entry_key] = {\n        \"case_name\": case.case_name,\n        \"candidate_id\": candidate_id,\n        \"repeats\": repeats,\n        \"elapsed_s\": elapsed,\n        \"mean_us\": elapsed / repeats * 1e6,\n        \"n_boxes\": case.masses.shape[0],\n        \"n_particles\": case.masses.shape[1],\n        \"n_species\": case.masses.shape[2],\n    }\n    _save_results()",
+    "successor": "particula/gpu/tests/benchmark_test.py::test_mass_precision_projection_benchmark",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_test.py",
+    "test": "test_resident_launch_profile_evidence",
+    "original": "def test_resident_launch_profile_evidence() -> None:\n    \"\"\"Publish separate native-CUDA launch and completion evidence artifacts.\"\"\"\n    artifacts = _collect_resident_launch_profile_artifacts()\n    assert set(artifacts) == set(PROFILING_ARTIFACT_NAMES)",
+    "successor": "particula/gpu/tests/benchmark_test.py::test_resident_launch_profile_evidence",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_test.py",
+    "test": "test_resident_scaling_memory_captured_replay_comparison",
+    "original": "def test_resident_scaling_memory_captured_replay_comparison() -> None:\n    \"\"\"Publish one aggregate opt-in matrix artifact after every row completes.\"\"\"\n    artifact = _collect_resident_capture_matrix()\n    root = Path(\".artifacts\")\n    root.mkdir(exist_ok=True)\n    destination = write_resident_capture_comparison_artifact(root, artifact)\n    print(f\"resident capture comparison: {destination}\")\n    for result in artifact.results:\n        print(f\"{result.timing_mode}: {result.summary}\")",
+    "successor": "particula/gpu/tests/benchmark_test.py::test_resident_scaling_memory_captured_replay_comparison",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_benchmark_module_requires_explicit_opt_in",
+    "original": "def test_benchmark_module_requires_explicit_opt_in(\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"Benchmark module keeps the explicit --benchmark import gate.\"\"\"\n    with pytest.raises(\n        pytest.skip.Exception,\n        match=r\"GPU benchmarks skipped \\(pass --benchmark to enable\\)\",\n    ):\n        _load_benchmark_module(monkeypatch, benchmark_enabled=False)",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_benchmark_module_requires_explicit_opt_in",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_benchmark_module_skips_before_warp_import_without_opt_in",
+    "original": "def test_benchmark_module_skips_before_warp_import_without_opt_in(\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"No-opt-in import skips before attempting to import Warp.\"\"\"\n\n    def _guarded_import(name, *args, **kwargs):\n        if name == \"warp\":\n            raise AssertionError(\n                \"warp import should not run before opt-in skip\"\n            )\n        return builtins_import(name, *args, **kwargs)\n\n    monkeypatch.setattr(\"builtins.__import__\", _guarded_import)\n\n    with pytest.raises(\n        pytest.skip.Exception,\n        match=r\"GPU benchmarks skipped \\(pass --benchmark to enable\\)\",\n    ):\n        _load_benchmark_module(monkeypatch, benchmark_enabled=False)",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_benchmark_module_skips_before_warp_import_without_opt_in",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_benchmark_enabled_detects_opt_in_flag",
+    "original": "def test_benchmark_enabled_detects_opt_in_flag(\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"Benchmark helper reports the resolved pytest benchmark option state.\"\"\"\n    module = _load_benchmark_module(monkeypatch)\n\n    assert module._benchmark_enabled() is True",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_benchmark_enabled_detects_opt_in_flag",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_benchmark_enabled_reads_shared_resolved_option_state",
+    "original": "def test_benchmark_enabled_reads_shared_resolved_option_state(\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"Benchmark helper uses shared resolved-option state instead of raw argv.\"\"\"\n    monkeypatch.setattr(sys, \"argv\", [\"pytest\"])\n    module = _load_benchmark_module(monkeypatch, benchmark_enabled=True)\n\n    assert module._benchmark_enabled() is True",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_benchmark_enabled_reads_shared_resolved_option_state",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_benchmark_loader_preserves_canonical_module_entry",
+    "original": "def test_benchmark_loader_preserves_canonical_module_entry(\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"Isolated benchmark loading leaves the canonical module untouched.\"\"\"\n    module_name = \"particula.gpu.tests.benchmark_test\"\n    sentinel = object()\n    monkeypatch.setitem(sys.modules, module_name, sentinel)\n\n    _load_benchmark_module(monkeypatch, benchmark_enabled=True)\n\n    assert sys.modules[module_name] is sentinel",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_benchmark_loader_preserves_canonical_module_entry",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_parse_positive_int_env_uses_default_without_override",
+    "original": "def test_parse_positive_int_env_uses_default_without_override(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"Positive-int env helper falls back to the provided default.\"\"\"\n    monkeypatch.delenv(\"BENCHMARK_MAX_BYTES\", raising=False)\n\n    assert (\n        benchmark_module._parse_positive_int_env(\"BENCHMARK_MAX_BYTES\", 9) == 9\n    )",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_parse_positive_int_env_uses_default_without_override",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_parse_positive_int_env_rejects_invalid_overrides",
+    "original": "def test_parse_positive_int_env_rejects_invalid_overrides(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n    raw_value: str,\n) -> None:\n    \"\"\"Positive-int env helper rejects invalid overrides clearly.\"\"\"\n    monkeypatch.setenv(\"BENCHMARK_MAX_BYTES\", raw_value)\n\n    with pytest.raises(ValueError, match=\"BENCHMARK_MAX_BYTES\"):\n        benchmark_module._parse_positive_int_env(\"BENCHMARK_MAX_BYTES\", 9)",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_parse_positive_int_env_rejects_invalid_overrides",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_sanitize_benchmark_output_name_keeps_filename_only",
+    "original": "def test_sanitize_benchmark_output_name_keeps_filename_only(\n    benchmark_module,\n) -> None:\n    \"\"\"Benchmark output names are normalized to artifact-safe filenames.\"\"\"\n    assert (\n        benchmark_module._sanitize_benchmark_output_name(\n            \" nested/results.json \"\n        )\n        == \"results.json\"\n    )",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_sanitize_benchmark_output_name_keeps_filename_only",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_sanitize_benchmark_output_name_rejects_empty_candidates",
+    "original": "def test_sanitize_benchmark_output_name_rejects_empty_candidates(\n    benchmark_module,\n    raw_value: str,\n) -> None:\n    \"\"\"Benchmark output names must resolve to non-empty filenames.\"\"\"\n    with pytest.raises(ValueError, match=\"non-empty filename\"):\n        benchmark_module._sanitize_benchmark_output_name(raw_value)",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_sanitize_benchmark_output_name_rejects_empty_candidates",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_get_benchmark_output_path_stays_within_artifact_directory",
+    "original": "def test_get_benchmark_output_path_stays_within_artifact_directory(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"Output path resolution keeps overrides rooted in the artifact folder.\"\"\"\n    monkeypatch.setenv(\"BENCHMARK_OUTPUT\", \"../custom.json\")\n\n    output_path = benchmark_module._get_benchmark_output_path()\n\n    assert (\n        output_path == benchmark_module.BENCHMARK_ARTIFACT_DIR / \"custom.json\"\n    )",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_get_benchmark_output_path_stays_within_artifact_directory",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_summarize_warp_device_keeps_bounded_json_safe_fields",
+    "original": "def test_summarize_warp_device_keeps_bounded_json_safe_fields(\n    benchmark_module,\n) -> None:\n    \"\"\"Device metadata stays limited to traceable scalar fields.\"\"\"\n\n    class _Device:\n        alias = \"cuda:0\"\n        name = \"Test GPU\"\n        ordinal = 0\n        arch = \"sm_test\"\n        is_cuda = True\n        is_cpu = False\n        is_uva = True\n        total_memory = 1024\n        ignored = object()\n\n    summary = benchmark_module._summarize_warp_device(_Device())\n\n    assert summary == {\n        \"alias\": \"cuda:0\",\n        \"name\": \"Test GPU\",\n        \"ordinal\": 0,\n        \"arch\": \"sm_test\",\n        \"is_cuda\": True,\n        \"is_cpu\": False,\n        \"is_uva\": True,\n        \"total_memory_bytes\": 1024,\n    }",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_summarize_warp_device_keeps_bounded_json_safe_fields",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_build_benchmark_metadata_records_command_and_device_context",
+    "original": "def test_build_benchmark_metadata_records_command_and_device_context(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"Benchmark metadata captures command, artifact path, and device info.\"\"\"\n    monkeypatch.setattr(sys, \"argv\", [\"pytest\", \"bench.py\", \"--benchmark\"])\n    monkeypatch.setattr(benchmark_module, \"BENCHMARK_OUTPUT\", Path(\"out.json\"))\n    monkeypatch.setattr(benchmark_module, \"cuda_available\", lambda _wp: True)\n    monkeypatch.setattr(\n        benchmark_module,\n        \"wp\",\n        types.SimpleNamespace(\n            __version__=\"1.2.3\",\n            get_device=lambda name: types.SimpleNamespace(\n                alias=\"cuda:0\",\n                name=\"Trace GPU\",\n                ordinal=0,\n                total_memory=2048,\n            ),\n        ),\n    )\n\n    metadata = benchmark_module._build_benchmark_metadata()\n\n    assert metadata[\"command\"] == \"pytest bench.py --benchmark\"\n    assert metadata[\"artifact_path\"] == \"out.json\"\n    assert metadata[\"warp_version\"] == \"1.2.3\"\n    assert metadata[\"warp_available\"] is True\n    assert metadata[\"cuda_available\"] is True\n    assert metadata[\"device\"] == {\n        \"alias\": \"cuda:0\",\n        \"name\": \"Trace GPU\",\n        \"ordinal\": 0,\n        \"total_memory_bytes\": 2048,\n    }",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_build_benchmark_metadata_records_command_and_device_context",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_build_benchmark_metadata_reports_warp_unavailable",
+    "original": "def test_build_benchmark_metadata_reports_warp_unavailable(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"Benchmark metadata reports the no-Warp path without CUDA probing.\"\"\"\n    monkeypatch.setattr(sys, \"argv\", [\"pytest\", \"bench.py\", \"--benchmark\"])\n    monkeypatch.setattr(benchmark_module, \"BENCHMARK_OUTPUT\", Path(\"out.json\"))\n    monkeypatch.setattr(benchmark_module, \"wp\", None)\n\n    metadata = benchmark_module._build_benchmark_metadata()\n\n    assert metadata == {\n        \"command\": \"pytest bench.py --benchmark\",\n        \"artifact_path\": \"out.json\",\n        \"warp_available\": False,\n    }",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_build_benchmark_metadata_reports_warp_unavailable",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_build_benchmark_metadata_records_cuda_probe_error",
+    "original": "def test_build_benchmark_metadata_records_cuda_probe_error(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"Unexpected CUDA probe errors surface instead of being downgraded.\"\"\"\n    monkeypatch.setattr(sys, \"argv\", [\"pytest\", \"bench.py\", \"--benchmark\"])\n    monkeypatch.setattr(benchmark_module, \"BENCHMARK_OUTPUT\", Path(\"out.json\"))\n    monkeypatch.setattr(\n        benchmark_module,\n        \"wp\",\n        types.SimpleNamespace(__version__=\"1.2.3\"),\n    )\n    monkeypatch.setattr(\n        benchmark_module,\n        \"cuda_available\",\n        lambda _wp: (_ for _ in ()).throw(RuntimeError(\"probe failed\")),\n    )\n\n    with pytest.raises(RuntimeError, match=\"probe failed\"):\n        benchmark_module._build_benchmark_metadata()",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_build_benchmark_metadata_records_cuda_probe_error",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_save_results_writes_json_snapshot",
+    "original": "def test_save_results_writes_json_snapshot(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n    tmp_path: Path,\n) -> None:\n    \"\"\"Benchmark snapshots are flushed to the configured output path.\"\"\"\n    output_path = tmp_path / \"gpu_benchmark_results.json\"\n    monkeypatch.setattr(benchmark_module, \"BENCHMARK_OUTPUT\", output_path)\n    monkeypatch.setattr(\n        benchmark_module,\n        \"_benchmark_results\",\n        {\n            \"started_at\": \"2026-01-01T00:00:00+00:00\",\n            \"benchmark_metadata\": {\"command\": \"pytest --benchmark\"},\n            \"benchmarks\": {},\n        },\n    )\n\n    benchmark_module._save_results()\n\n    written = output_path.read_text()\n    assert '\"started_at\": \"2026-01-01T00:00:00+00:00\"' in written\n    assert '\"command\": \"pytest --benchmark\"' in written\n    assert '\"updated_at\":' in written",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_save_results_writes_json_snapshot",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_save_results_creates_parent_directories",
+    "original": "def test_save_results_creates_parent_directories(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n    tmp_path: Path,\n) -> None:\n    \"\"\"Benchmark snapshots create missing parent directories first.\"\"\"\n    output_path = tmp_path / \"nested\" / \"gpu_benchmark_results.json\"\n    monkeypatch.setattr(benchmark_module, \"BENCHMARK_OUTPUT\", output_path)\n    monkeypatch.setattr(\n        benchmark_module,\n        \"_benchmark_results\",\n        {\n            \"started_at\": \"2026-01-01T00:00:00+00:00\",\n            \"benchmark_metadata\": {\"command\": \"pytest --benchmark\"},\n            \"benchmarks\": {},\n        },\n    )\n\n    benchmark_module._save_results()\n\n    assert output_path.exists()",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_save_results_creates_parent_directories",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_save_results_surfaces_write_failures",
+    "original": "def test_save_results_surfaces_write_failures(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n    tmp_path: Path,\n) -> None:\n    \"\"\"Benchmark snapshot failures raise a clear RuntimeError.\"\"\"\n    output_path = tmp_path / \"gpu_benchmark_results.json\"\n    monkeypatch.setattr(benchmark_module, \"BENCHMARK_OUTPUT\", output_path)\n\n    def _raise_write_error(*args, **kwargs):\n        raise OSError(\"disk full\")\n\n    monkeypatch.setattr(Path, \"write_text\", _raise_write_error)\n\n    with pytest.raises(RuntimeError, match=\"Failed to write benchmark results\"):\n        benchmark_module._save_results()",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_save_results_surfaces_write_failures",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_skip_if_no_cuda_skips_when_cuda_unavailable",
+    "original": "def test_skip_if_no_cuda_skips_when_cuda_unavailable(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"Benchmark helpers skip cleanly when CUDA is unavailable.\"\"\"\n    monkeypatch.setattr(benchmark_module, \"cuda_available\", lambda _wp: False)\n\n    with pytest.raises(pytest.skip.Exception, match=CUDA_SKIP_REASON):\n        benchmark_module._skip_if_no_cuda()",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_skip_if_no_cuda_skips_when_cuda_unavailable",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_skip_if_no_cuda_skips_when_warp_is_missing",
+    "original": "def test_skip_if_no_cuda_skips_when_warp_is_missing(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"CPU-only helper coverage remains importable without Warp.\"\"\"\n    monkeypatch.setattr(benchmark_module, \"wp\", None)\n\n    with pytest.raises(pytest.skip.Exception, match=CUDA_SKIP_REASON):\n        benchmark_module._skip_if_no_cuda()",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_skip_if_no_cuda_skips_when_warp_is_missing",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_skip_if_no_cuda_returns_when_cuda_is_available",
+    "original": "def test_skip_if_no_cuda_returns_when_cuda_is_available(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"Benchmark helper continues when Warp reports CUDA availability.\"\"\"\n    fake_wp = object()\n    monkeypatch.setattr(benchmark_module, \"wp\", fake_wp)\n    monkeypatch.setattr(benchmark_module, \"cuda_available\", lambda _wp: True)\n\n    benchmark_module._skip_if_no_cuda()",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_skip_if_no_cuda_returns_when_cuda_is_available",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_skip_if_no_cuda_surfaces_unexpected_probe_errors",
+    "original": "def test_skip_if_no_cuda_surfaces_unexpected_probe_errors(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"Unexpected CUDA probe errors fail fast instead of silently skipping.\"\"\"\n    fake_wp = object()\n    monkeypatch.setattr(benchmark_module, \"wp\", fake_wp)\n    monkeypatch.setattr(\n        benchmark_module,\n        \"cuda_available\",\n        lambda _wp: (_ for _ in ()).throw(RuntimeError(\"probe failed\")),\n    )\n\n    with pytest.raises(RuntimeError, match=\"probe failed\"):\n        benchmark_module._skip_if_no_cuda()",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_skip_if_no_cuda_surfaces_unexpected_probe_errors",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_skip_if_no_cuda_uses_shared_reason_when_warp_is_missing",
+    "original": "def test_skip_if_no_cuda_uses_shared_reason_when_warp_is_missing(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"Missing-Warp branch reuses the exported CUDA skip reason.\"\"\"\n    monkeypatch.setattr(benchmark_module, \"wp\", None)\n\n    with pytest.raises(pytest.skip.Exception) as exc_info:\n        benchmark_module._skip_if_no_cuda()\n\n    assert exc_info.value.args[0] == CUDA_SKIP_REASON",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_skip_if_no_cuda_uses_shared_reason_when_warp_is_missing",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_skip_if_no_cuda_uses_shared_reason_when_cuda_is_unavailable",
+    "original": "def test_skip_if_no_cuda_uses_shared_reason_when_cuda_is_unavailable(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"CUDA-unavailable branch reuses the exported CUDA skip reason.\"\"\"\n    fake_wp = object()\n    monkeypatch.setattr(benchmark_module, \"wp\", fake_wp)\n    monkeypatch.setattr(benchmark_module, \"cuda_available\", lambda _wp: False)\n\n    with pytest.raises(pytest.skip.Exception) as exc_info:\n        benchmark_module._skip_if_no_cuda()\n\n    assert exc_info.value.args[0] == CUDA_SKIP_REASON",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_skip_if_no_cuda_uses_shared_reason_when_cuda_is_unavailable",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_warp_profiled_without_profile_env_is_passthrough",
+    "original": "def test_warp_profiled_without_profile_env_is_passthrough(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"Profile wrapper yields directly when profiling is disabled.\"\"\"\n    monkeypatch.setenv(\"WARP_PROFILE\", \"0\")\n    calls: list[str] = []\n\n    with benchmark_module._warp_profiled(\"tag\"):\n        calls.append(\"body\")\n\n    assert calls == [\"body\"]",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_warp_profiled_without_profile_env_is_passthrough",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_warp_profiled_uses_capture_hooks_when_available",
+    "original": "def test_warp_profiled_uses_capture_hooks_when_available(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"Profile wrapper prefers Warp capture hooks when present.\"\"\"\n    monkeypatch.setenv(\"WARP_PROFILE\", \"1\")\n    events: list[str] = []\n    fake_wp = types.SimpleNamespace(\n        capture_begin=lambda tag: events.append(f\"begin:{tag}\"),\n        capture_end=lambda: events.append(\"end\"),\n    )\n    monkeypatch.setattr(benchmark_module, \"wp\", fake_wp)\n\n    with benchmark_module._warp_profiled(\"captured\"):\n        events.append(\"body\")\n\n    assert events == [\"begin:captured\", \"body\", \"end\"]",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_warp_profiled_uses_capture_hooks_when_available",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_warp_profiled_falls_back_to_profiler_object",
+    "original": "def test_warp_profiled_falls_back_to_profiler_object(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"Profile wrapper uses the profiler fallback when capture hooks are absent.\"\"\"\n    monkeypatch.setenv(\"WARP_PROFILE\", \"1\")\n    events: list[str] = []\n\n    class _FakeProfiler:\n        def begin(self) -> None:\n            events.append(\"begin\")\n\n        def end(self) -> None:\n            events.append(\"end\")\n\n    monkeypatch.setattr(\n        benchmark_module,\n        \"wp\",\n        types.SimpleNamespace(profiler=_FakeProfiler()),\n    )\n\n    with benchmark_module._warp_profiled(\"profiled\"):\n        events.append(\"body\")\n\n    assert events == [\"begin\", \"body\", \"end\"]",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_warp_profiled_falls_back_to_profiler_object",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_timing_helpers_run_expected_iterations",
+    "original": "def test_timing_helpers_run_expected_iterations(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"CPU and GPU timing helpers execute warmup and timed steps.\"\"\"\n    gpu_calls: list[str] = []\n    cpu_calls: list[str] = []\n    sync_calls: list[str] = []\n    monkeypatch.setattr(\n        benchmark_module,\n        \"wp\",\n        types.SimpleNamespace(synchronize=lambda: sync_calls.append(\"sync\")),\n    )\n\n    def gpu_step() -> None:\n        gpu_calls.append(\"step\")\n\n    def cpu_step() -> None:\n        cpu_calls.append(\"step\")\n\n    gpu_elapsed = benchmark_module._time_gpu_loop(gpu_step, steps=3, warmup=2)\n    cpu_elapsed = benchmark_module._time_cpu_loop(cpu_step, steps=4, warmup=1)\n\n    assert gpu_elapsed >= 0.0\n    assert cpu_elapsed >= 0.0\n    assert gpu_calls == [\"step\"] * 5\n    assert cpu_calls == [\"step\"] * 5\n    assert sync_calls == [\"sync\", \"sync\"]",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_timing_helpers_run_expected_iterations",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_compute_speedup_returns_ratio_and_skips_invalid_data",
+    "original": "def test_compute_speedup_returns_ratio_and_skips_invalid_data(\n    benchmark_module,\n) -> None:\n    \"\"\"Speedup helper returns a ratio and rejects non-positive timings.\"\"\"\n    assert benchmark_module._compute_speedup(6.0, 2.0) == 3.0\n\n    with pytest.raises(pytest.skip.Exception, match=\"Invalid timing data\"):\n        benchmark_module._compute_speedup(0.0, 2.0)",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_compute_speedup_returns_ratio_and_skips_invalid_data",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_benchmark_budget_helpers_estimate_and_gate_large_cases",
+    "original": "def test_benchmark_budget_helpers_estimate_and_gate_large_cases(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"Budget helpers estimate bytes and skip only when limits are exceeded.\"\"\"\n    condensation_budget = benchmark_module._estimate_condensation_budget(\n        \"cond\", 2, 3, 4, True\n    )\n    coagulation_budget = benchmark_module._estimate_coagulation_budget(\n        \"coag\", 2, 3, 4, False\n    )\n\n    assert condensation_budget.label == \"cond\"\n    assert coagulation_budget.label == \"coag\"\n    assert condensation_budget.total_bytes > condensation_budget.gpu_bytes > 0\n    assert coagulation_budget.total_bytes > coagulation_budget.cpu_bytes > 0\n\n    monkeypatch.setenv(\n        \"BENCHMARK_MAX_BYTES\", str(condensation_budget.total_bytes - 1)\n    )\n    with pytest.raises(\n        pytest.skip.Exception, match=\"exceeding BENCHMARK_MAX_BYTES\"\n    ):\n        benchmark_module._validate_benchmark_budget(condensation_budget)\n\n    monkeypatch.setenv(\n        \"BENCHMARK_MAX_BYTES\", str(condensation_budget.total_bytes)\n    )\n    benchmark_module._validate_benchmark_budget(condensation_budget)",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_benchmark_budget_helpers_estimate_and_gate_large_cases",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_benchmark_data_builders_return_expected_shapes",
+    "original": "def test_benchmark_data_builders_return_expected_shapes(\n    benchmark_module,\n) -> None:\n    \"\"\"Study benchmark builders return deterministic array shapes and dtypes.\"\"\"\n    particles = benchmark_module._make_particle_data(\n        2, 3, 2, concentration_scale=7.0\n    )\n    gas = benchmark_module._make_gas_data(2, 2)\n    vapor_pressure = benchmark_module._make_vapor_pressure(2, 2)\n\n    assert particles.masses.shape == (2, 3, 2)\n    assert particles.concentration.shape == (2, 3)\n    assert np.all(particles.concentration == 7.0)\n    assert particles.charge.shape == (2, 3)\n    assert particles.density.shape == (2,)\n    assert particles.volume.shape == (2,)\n    assert gas.concentration.shape == (2, 2)\n    assert gas.partitioning.dtype == bool\n    assert gas.name == [\"species_0\", \"species_1\"]\n    assert vapor_pressure.shape == (2, 2)\n    npt.assert_allclose(vapor_pressure[1], np.array([850.0, 850.0]))",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_benchmark_data_builders_return_expected_shapes",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_cpu_mass_transfer_handles_zero_concentration_and_zero_volume",
+    "original": "def test_cpu_mass_transfer_handles_zero_concentration_and_zero_volume(\n    benchmark_module,\n) -> None:\n    \"\"\"CPU mass-transfer helper stays deterministic on skipped particle paths.\"\"\"\n    particles = benchmark_module._make_particle_data(1, 2, 1)\n    particles.concentration[0, 0] = 0.0\n    particles.masses[0, 1, 0] = 0.0\n    gas = benchmark_module._make_gas_data(1, 1)\n    vapor_pressure = benchmark_module._make_vapor_pressure(1, 1)\n\n    with warnings.catch_warnings(record=True) as caught:\n        warnings.simplefilter(\"error\")\n        result = benchmark_module._cpu_mass_transfer(\n            particles,\n            gas,\n            vapor_pressure,\n            np.array(\n                [benchmark_module.DEFAULT_SURFACE_TENSION], dtype=np.float64\n            ),\n            np.array(\n                [benchmark_module.DEFAULT_MASS_ACCOMMODATION],\n                dtype=np.float64,\n            ),\n            np.array(\n                [benchmark_module.DEFAULT_DIFFUSION_COEFFICIENT],\n                dtype=np.float64,\n            ),\n            benchmark_module.DEFAULT_TEMPERATURE,\n            benchmark_module.DEFAULT_PRESSURE,\n            benchmark_module.DEFAULT_TIME_STEP,\n        )\n\n    assert not caught\n    assert result.shape == particles.masses.shape\n    npt.assert_array_equal(result, np.zeros_like(result))",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_cpu_mass_transfer_handles_zero_concentration_and_zero_volume",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_cpu_condensation_step_clamps_negative_updated_mass",
+    "original": "def test_cpu_condensation_step_clamps_negative_updated_mass(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"CPU condensation helper clamps negative updated masses to zero.\"\"\"\n    particles = benchmark_module._make_particle_data(1, 2, 1)\n    initial = particles.masses.copy()\n    gas = benchmark_module._make_gas_data(1, 1)\n    transfer = np.array([[[-2.0e-18], [1.0e-19]]], dtype=np.float64)\n    monkeypatch.setattr(\n        benchmark_module,\n        \"_cpu_mass_transfer\",\n        lambda *args, **kwargs: transfer,\n    )\n\n    benchmark_module._cpu_condensation_step(\n        particles,\n        gas,\n        benchmark_module._make_vapor_pressure(1, 1),\n        np.array([benchmark_module.DEFAULT_SURFACE_TENSION], dtype=np.float64),\n        np.array(\n            [benchmark_module.DEFAULT_MASS_ACCOMMODATION], dtype=np.float64\n        ),\n        np.array(\n            [benchmark_module.DEFAULT_DIFFUSION_COEFFICIENT], dtype=np.float64\n        ),\n        benchmark_module.DEFAULT_TEMPERATURE,\n        benchmark_module.DEFAULT_PRESSURE,\n        benchmark_module.DEFAULT_TIME_STEP,\n        np.zeros_like(initial),\n    )\n\n    expected = np.maximum(0.0, initial + transfer)\n    npt.assert_allclose(particles.masses, expected)",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_cpu_condensation_step_clamps_negative_updated_mass",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_build_kernel_radius_handles_empty_and_nonempty_inputs",
+    "original": "def test_build_kernel_radius_handles_empty_and_nonempty_inputs(\n    benchmark_module,\n) -> None:\n    \"\"\"Kernel-radius helper returns bounded interpolation grids.\"\"\"\n    empty_grid = benchmark_module._build_kernel_radius(\n        np.zeros(3, dtype=np.float64)\n    )\n    populated_grid = benchmark_module._build_kernel_radius(\n        np.array([0.0, 2.0e-9, 5.0e-9], dtype=np.float64)\n    )\n\n    assert empty_grid.shape == (32,)\n    assert populated_grid.shape == (64,)\n    assert populated_grid[0] >= 1.0e-9\n    assert populated_grid[-1] > populated_grid[0]",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_build_kernel_radius_handles_empty_and_nonempty_inputs",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_cpu_coagulation_step_updates_colliding_particles",
+    "original": "def test_cpu_coagulation_step_updates_colliding_particles(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"CPU coagulation helper zeroes collided concentration and updates masses.\"\"\"\n    particles = benchmark_module._make_particle_data(1, 3, 2)\n    original_masses = particles.masses.copy()\n    original_density = particles.density.copy()\n    monkeypatch.setattr(\n        benchmark_module,\n        \"get_brownian_kernel_via_system_state\",\n        lambda **kwargs: np.ones((4, 4), dtype=np.float64),\n    )\n    monkeypatch.setattr(\n        benchmark_module,\n        \"get_particle_resolved_coagulation_step\",\n        lambda *args, **kwargs: np.array([[0, 1]], dtype=np.int64),\n    )\n    monkeypatch.setattr(\n        benchmark_module,\n        \"get_particle_resolved_update_step\",\n        lambda radii, *_args: (\n            np.array([0.0, radii[1] * 1.5, radii[2]], dtype=np.float64),\n            None,\n            None,\n        ),\n    )\n\n    benchmark_module._cpu_coagulation_step(\n        particles,\n        benchmark_module.DEFAULT_TEMPERATURE,\n        benchmark_module.DEFAULT_PRESSURE,\n        benchmark_module.DEFAULT_TIME_STEP,\n        np.random.default_rng(42),\n        np.linspace(1.0e-9, 1.0e-8, 4),\n    )\n\n    assert particles.concentration[0, 0] == 0.0\n    assert np.all(particles.masses[0, 0] == 0.0)\n    total_mass_before = np.sum(original_masses[0, 1])\n    mass_fractions_before = original_masses[0, 1] / total_mass_before\n    npt.assert_allclose(\n        particles.masses[0, 1] / np.sum(particles.masses[0, 1]),\n        mass_fractions_before,\n    )\n    assert np.sum(particles.masses[0, 1]) > total_mass_before\n    npt.assert_allclose(\n        particles.density,\n        original_density,\n    )",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_cpu_coagulation_step_updates_colliding_particles",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_print_timing_emits_speedup_summary",
+    "original": "def test_print_timing_emits_speedup_summary(\n    benchmark_module,\n    capsys: pytest.CaptureFixture[str],\n) -> None:\n    \"\"\"Timing printer reports GPU, CPU, and speedup values.\"\"\"\n    benchmark_module._print_timing(\"Case A\", gpu_time=2.0, cpu_time=10.0)\n\n    captured = capsys.readouterr()\n    assert \"Case A: GPU 2.0000s | CPU 10.0000s | speedup 5.00x\" in captured.out",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_print_timing_emits_speedup_summary",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_project_mass_precision_candidate_reconstructs_expected_shapes",
+    "original": "def test_project_mass_precision_candidate_reconstructs_expected_shapes() -> (\n    None\n):\n    \"\"\"Supported study candidates reconstruct arrays with stable shapes.\"\"\"\n    case = _build_mass_precision_cases()[2]\n\n    for candidate_id in (\n        \"fp32_absolute_mass\",\n        \"mixed_precision_mass_plus_density\",\n        \"fp32_total_mass_fp32_mass_fraction\",\n    ):\n        reconstructed = _project_candidate(case, candidate_id)[\n            \"reconstructed_masses\"\n        ]\n        assert reconstructed.shape == case.masses.shape\n        assert reconstructed.dtype == np.float64",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_project_mass_precision_candidate_reconstructs_expected_shapes",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_project_mass_precision_candidate_handles_zero_total_mass",
+    "original": "def test_project_mass_precision_candidate_handles_zero_total_mass() -> None:\n    \"\"\"Zero-total-mass inputs reconstruct zeros without instability.\"\"\"\n    case = _build_mass_precision_cases()[2]\n    zero_mass_case = type(case)(\n        case_name=case.case_name,\n        size_band=case.size_band,\n        radius_unit=case.radius_unit,\n        density_unit=case.density_unit,\n        volume_fraction_unit=case.volume_fraction_unit,\n        target_radius_m=case.target_radius_m,\n        density_kg_m3=case.density_kg_m3.copy(),\n        volume_fractions=case.volume_fractions.copy(),\n        masses=np.zeros((2, 3, 2), dtype=np.float64),\n        concentration=case.concentration.copy(),\n        charge=case.charge.copy(),\n        volume=case.volume.copy(),\n    )\n\n    reconstructed = _project_candidate(\n        zero_mass_case,\n        \"fp32_total_mass_fp32_mass_fraction\",\n    )[\"reconstructed_masses\"]\n\n    npt.assert_array_equal(reconstructed, zero_mass_case.masses)",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_project_mass_precision_candidate_handles_zero_total_mass",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_project_mass_precision_candidate_rejects_unsupported_candidate",
+    "original": "def test_project_mass_precision_candidate_rejects_unsupported_candidate() -> (\n    None\n):\n    \"\"\"Unsupported candidate ids fail with a stable error message.\"\"\"\n    case = _build_mass_precision_cases()[0]\n\n    with pytest.raises(ValueError, match=\"Unsupported candidate id\"):\n        _project_candidate(case, \"unsupported\")",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_project_mass_precision_candidate_rejects_unsupported_candidate",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_mass_precision_projection_benchmark_records_bounded_result",
+    "original": "def test_mass_precision_projection_benchmark_records_bounded_result(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"Benchmark entry point records bounded study metadata without CUDA.\"\"\"\n    monkeypatch.setattr(benchmark_module, \"_save_results\", lambda: None)\n\n    label, case_index, candidate_id = (\n        benchmark_module._MASS_PRECISION_BENCHMARK_CONFIGS[0]\n    )\n    benchmark_module.test_mass_precision_projection_benchmark(\n        label,\n        case_index,\n        candidate_id,\n    )\n\n    result = benchmark_module._benchmark_results[\"benchmarks\"][\n        f\"mass_precision_candidate_payload_{label}_{candidate_id}\"\n    ]\n    assert result[\"case_name\"] == label\n    assert result[\"candidate_id\"] == candidate_id\n    assert result[\"repeats\"] == 5_000\n    assert result[\"elapsed_s\"] >= 0.0\n    assert result[\"mean_us\"] >= 0.0",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_mass_precision_projection_benchmark_records_bounded_result",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_preflight_condensation_case_allocations_checks_largest_buffers",
+    "original": "def test_preflight_condensation_case_allocations_checks_largest_buffers(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"Condensation preflight covers the largest arrays before allocation.\"\"\"\n    seen: list[str] = []\n    monkeypatch.setattr(\n        benchmark_module,\n        \"_preflight_benchmark_array\",\n        lambda shape, *, label, dtype=np.float64, itemsize=None: seen.append(\n            label\n        ),\n    )\n\n    benchmark_module._preflight_condensation_case_allocations(\"1x1k\", 2, 3, 4)\n\n    assert seen == [\n        \"cond-1x1k particle masses\",\n        \"cond-1x1k particle concentration\",\n        \"cond-1x1k gas concentration\",\n        \"cond-1x1k vapor pressure\",\n        \"cond-1x1k gpu mass transfer buffer\",\n    ]",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_preflight_condensation_case_allocations_checks_largest_buffers",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_preflight_coagulation_case_allocations_checks_largest_buffers",
+    "original": "def test_preflight_coagulation_case_allocations_checks_largest_buffers(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"Coagulation preflight covers particle and collision buffers.\"\"\"\n    seen: list[str] = []\n    monkeypatch.setattr(\n        benchmark_module,\n        \"_preflight_benchmark_array\",\n        lambda shape, *, label, dtype=np.float64, itemsize=None: seen.append(\n            label\n        ),\n    )\n\n    benchmark_module._preflight_coagulation_case_allocations(\"1x500\", 2, 3, 4)\n\n    assert seen == [\n        \"coag-1x500 particle masses\",\n        \"coag-1x500 particle concentration\",\n        \"coag-1x500 collision pairs\",\n        \"coag-1x500 collision counts\",\n        \"coag-1x500 RNG state\",\n    ]",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_preflight_coagulation_case_allocations_checks_largest_buffers",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_wp_func_benchmark_input_builder_returns_expected_shapes",
+    "original": "def test_wp_func_benchmark_input_builder_returns_expected_shapes(\n    benchmark_module,\n) -> None:\n    \"\"\"wp.func benchmark inputs are deterministic and shape-stable.\"\"\"\n    result = benchmark_module._build_wp_func_benchmark_inputs(8, seed=7)\n\n    assert set(result) == {\n        \"temperatures\",\n        \"mobilities\",\n        \"pressure_deltas\",\n        \"mass_transport\",\n        \"molar_masses\",\n        \"total_volumes\",\n        \"radii_i\",\n        \"radii_j\",\n        \"diff_i\",\n        \"diff_j\",\n        \"g_i\",\n        \"g_j\",\n        \"speed_i\",\n        \"speed_j\",\n    }\n    for values in result.values():\n        assert values.shape == (8,)\n        assert values.dtype == np.float64",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_wp_func_benchmark_input_builder_returns_expected_shapes",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_preflight_large_allocation_skips_when_limit_is_exceeded",
+    "original": "def test_preflight_large_allocation_skips_when_limit_is_exceeded(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"Oversized opt-in allocations skip before touching device memory.\"\"\"\n    monkeypatch.setenv(\"BENCHMARK_MAX_ALLOC_BYTES\", \"16\")\n\n    with pytest.raises(pytest.skip.Exception, match=\"requires\"):\n        benchmark_module._preflight_large_allocation(\n            (3, 3),\n            label=\"test array\",\n            itemsize=8,\n        )",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_preflight_large_allocation_skips_when_limit_is_exceeded",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_wp_zeros_with_guard_skips_allocation_failures",
+    "original": "def test_wp_zeros_with_guard_skips_allocation_failures(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"Allocation helper turns device allocation failures into skips.\"\"\"\n    fake_wp = types.SimpleNamespace(\n        zeros=lambda *args, **kwargs: (_ for _ in ()).throw(RuntimeError(\"oom\"))\n    )\n    monkeypatch.setattr(benchmark_module, \"wp\", fake_wp)\n\n    with pytest.raises(pytest.skip.Exception, match=\"allocation\"):\n        benchmark_module._wp_zeros_with_guard(\n            (2, 2),\n            dtype=np.float64,\n            device=\"cuda\",\n            label=\"test allocation\",\n            itemsize=8,\n        )",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_wp_zeros_with_guard_skips_allocation_failures",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_seed_coagulation_rng_states_once_launches_and_synchronizes",
+    "original": "def test_seed_coagulation_rng_states_once_launches_and_synchronizes(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"RNG seeding helper launches exactly once and synchronizes afterward.\"\"\"\n    calls: list[tuple[int, object, str]] = []\n    fake_buffer = object()\n\n    def fake_initialize_coagulation_rng_states(**kwargs: Any) -> object:\n        calls.append(\n            (kwargs[\"rng_seed\"], kwargs[\"rng_states\"], kwargs[\"device\"])\n        )\n        return types.SimpleNamespace(shape=(3,))\n\n    monkeypatch.setattr(\n        benchmark_module,\n        \"initialize_coagulation_rng_states\",\n        fake_initialize_coagulation_rng_states,\n    )\n\n    benchmark_module._seed_coagulation_rng_states_once(\n        rng_seed=42,\n        rng_states=fake_buffer,\n        n_boxes=3,\n        device=\"cuda\",\n    )\n\n    assert calls == [(42, fake_buffer, \"cuda\")]",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_seed_coagulation_rng_states_once_launches_and_synchronizes",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_benchmark_module_imports_without_warp_when_opted_in",
+    "original": "def test_benchmark_module_imports_without_warp_when_opted_in(\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"Opted-in import tolerates Warp being unavailable.\"\"\"\n\n    def _guarded_import(name, *args, **kwargs):\n        if name == \"warp\":\n            raise ImportError(\"warp missing\")\n        return builtins_import(name, *args, **kwargs)\n\n    monkeypatch.setattr(\"builtins.__import__\", _guarded_import)\n    module = _load_benchmark_module(monkeypatch, benchmark_enabled=True)\n\n    assert module.wp is None",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_benchmark_module_imports_without_warp_when_opted_in",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_allocation_helpers_compute_sizes_and_delegate_preflight",
+    "original": "def test_allocation_helpers_compute_sizes_and_delegate_preflight(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"Allocation helpers compute bytes and forward item sizes.\"\"\"\n    assert benchmark_module._allocation_itemsize(16, np.float64) == 16\n    assert benchmark_module._allocation_itemsize(None, np.float32) == 4\n    assert benchmark_module._estimate_allocation_nbytes((2, 3, 4), 8) == 192\n\n    seen: list[tuple[tuple[int, ...], str, int]] = []\n    monkeypatch.setattr(\n        benchmark_module,\n        \"_preflight_large_allocation\",\n        lambda shape, *, label, itemsize: seen.append((shape, label, itemsize)),\n    )\n\n    benchmark_module._preflight_benchmark_array(\n        (5, 6),\n        label=\"buffer\",\n        dtype=np.float32,\n    )\n\n    assert seen == [((5, 6), \"buffer\", 4)]",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_allocation_helpers_compute_sizes_and_delegate_preflight",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_byte_sizing_helpers_cover_numpy_and_warp_paths",
+    "original": "def test_byte_sizing_helpers_cover_numpy_and_warp_paths(\n    benchmark_module,\n) -> None:\n    \"\"\"Byte-size helpers report stable dense-array allocation sizes.\"\"\"\n    assert (\n        benchmark_module._warp_dtype_nbytes(benchmark_module.WARP_FLOAT64) == 8\n    )\n    assert benchmark_module._warp_dtype_nbytes(benchmark_module.WARP_INT32) == 4\n    assert benchmark_module._array_nbytes((2, 3, 4), 8) == 192\n    assert benchmark_module._numpy_nbytes((2, 3), np.float32) == 24\n    assert (\n        benchmark_module._warp_nbytes((2, 3), benchmark_module.WARP_UINT32)\n        == 24\n    )",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_byte_sizing_helpers_cover_numpy_and_warp_paths",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_warp_dtype_nbytes_rejects_unsupported_dtype",
+    "original": "def test_warp_dtype_nbytes_rejects_unsupported_dtype(benchmark_module) -> None:\n    \"\"\"Unsupported Warp dtypes fail with a clear sizing error.\"\"\"\n    with pytest.raises(ValueError, match=\"Unsupported Warp dtype\"):\n        benchmark_module._warp_dtype_nbytes(object())",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_warp_dtype_nbytes_rejects_unsupported_dtype",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_warp_profiled_yields_when_no_capture_or_profiler_available",
+    "original": "def test_warp_profiled_yields_when_no_capture_or_profiler_available(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"Profile wrapper still executes the body without Warp hooks.\"\"\"\n    monkeypatch.setenv(\"WARP_PROFILE\", \"1\")\n    monkeypatch.setattr(benchmark_module, \"wp\", types.SimpleNamespace())\n    calls: list[str] = []\n\n    with benchmark_module._warp_profiled(\"plain\"):\n        calls.append(\"body\")\n\n    assert calls == [\"body\"]",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_warp_profiled_yields_when_no_capture_or_profiler_available",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_cpu_mass_transfer_reuses_output_buffer_for_active_particles",
+    "original": "def test_cpu_mass_transfer_reuses_output_buffer_for_active_particles(\n    benchmark_module,\n) -> None:\n    \"\"\"CPU mass transfer fills a caller-provided output buffer in place.\"\"\"\n    particles = benchmark_module._make_particle_data(1, 1, 1)\n    gas = benchmark_module._make_gas_data(1, 1)\n    vapor_pressure = benchmark_module._make_vapor_pressure(1, 1)\n    out = np.full_like(particles.masses, -1.0)\n\n    result = benchmark_module._cpu_mass_transfer(\n        particles,\n        gas,\n        vapor_pressure,\n        np.array([benchmark_module.DEFAULT_SURFACE_TENSION], dtype=np.float64),\n        np.array(\n            [benchmark_module.DEFAULT_MASS_ACCOMMODATION],\n            dtype=np.float64,\n        ),\n        np.array(\n            [benchmark_module.DEFAULT_DIFFUSION_COEFFICIENT],\n            dtype=np.float64,\n        ),\n        benchmark_module.DEFAULT_TEMPERATURE,\n        benchmark_module.DEFAULT_PRESSURE,\n        benchmark_module.DEFAULT_TIME_STEP,\n        out=out,\n    )\n\n    assert result is out\n    assert result.shape == particles.masses.shape\n    assert np.all(np.isfinite(result))\n    assert not np.all(result == 0.0)",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_cpu_mass_transfer_reuses_output_buffer_for_active_particles",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_cpu_coagulation_step_handles_empty_collision_pairs",
+    "original": "def test_cpu_coagulation_step_handles_empty_collision_pairs(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"CPU coagulation leaves state unchanged when no collisions occur.\"\"\"\n    particles = benchmark_module._make_particle_data(1, 3, 2)\n    original_masses = particles.masses.copy()\n    original_concentration = particles.concentration.copy()\n    monkeypatch.setattr(\n        benchmark_module,\n        \"get_brownian_kernel_via_system_state\",\n        lambda **kwargs: np.ones((4, 4), dtype=np.float64),\n    )\n    monkeypatch.setattr(\n        benchmark_module,\n        \"get_particle_resolved_coagulation_step\",\n        lambda *args, **kwargs: np.empty((0, 2), dtype=np.int64),\n    )\n\n    benchmark_module._cpu_coagulation_step(\n        particles,\n        benchmark_module.DEFAULT_TEMPERATURE,\n        benchmark_module.DEFAULT_PRESSURE,\n        benchmark_module.DEFAULT_TIME_STEP,\n        np.random.default_rng(42),\n        np.linspace(1.0e-9, 1.0e-8, 4),\n    )\n\n    npt.assert_allclose(particles.masses, original_masses)\n    npt.assert_allclose(particles.concentration, original_concentration)",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_cpu_coagulation_step_handles_empty_collision_pairs",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_benchmark_cpu_wp_funcs_returns_timing_keys",
+    "original": "def test_benchmark_cpu_wp_funcs_returns_timing_keys(benchmark_module) -> None:\n    \"\"\"CPU wp.func benchmark helper reports each timing bucket.\"\"\"\n    result = benchmark_module._benchmark_cpu_wp_funcs(\n        benchmark_module._build_wp_func_benchmark_inputs(16, seed=5),\n        kernel_sample=8,\n    )\n\n    assert set(result) == {\n        \"diffusion_coefficient\",\n        \"mass_transfer_rate\",\n        \"particle_radius_from_volume\",\n        \"brownian_diffusivity\",\n        \"brownian_kernel_pair\",\n    }\n    assert all(value >= 0.0 for value in result.values())",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_benchmark_cpu_wp_funcs_returns_timing_keys",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_benchmark_gpu_wp_funcs_uses_fake_warp_backend",
+    "original": "def test_benchmark_gpu_wp_funcs_uses_fake_warp_backend(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"GPU wp.func benchmark helper can run against a fake Warp facade.\"\"\"\n    launch_calls: list[tuple[object, int, str]] = []\n\n    class _FakeWarp:\n        float64 = np.float64\n\n        @staticmethod\n        def array(values, dtype=None, device=None):\n            return np.asarray(values, dtype=np.float64)\n\n        @staticmethod\n        def zeros(shape, dtype=None, device=None):\n            return np.zeros(shape, dtype=np.float64)\n\n        @staticmethod\n        def launch(kernel, dim, inputs=None, outputs=None, device=None):\n            launch_calls.append((kernel, dim, device))\n\n        @staticmethod\n        def synchronize():\n            return None\n\n    monkeypatch.setattr(benchmark_module, \"wp\", _FakeWarp())\n    monkeypatch.setattr(\n        benchmark_module,\n        \"_diffusion_coefficient_kernel\",\n        object(),\n        raising=False,\n    )\n    monkeypatch.setattr(\n        benchmark_module,\n        \"_mass_transfer_rate_kernel\",\n        object(),\n        raising=False,\n    )\n    monkeypatch.setattr(\n        benchmark_module,\n        \"_particle_radius_kernel\",\n        object(),\n        raising=False,\n    )\n    monkeypatch.setattr(\n        benchmark_module,\n        \"_brownian_diffusivity_kernel\",\n        object(),\n        raising=False,\n    )\n    monkeypatch.setattr(\n        benchmark_module,\n        \"_brownian_kernel_pair_kernel\",\n        object(),\n        raising=False,\n    )\n\n    result = benchmark_module._benchmark_gpu_wp_funcs(\n        benchmark_module._build_wp_func_benchmark_inputs(4, seed=11)\n    )\n\n    assert len(launch_calls) == 10\n    assert set(result) == {\n        \"diffusion_coefficient\",\n        \"mass_transfer_rate\",\n        \"particle_radius_from_volume\",\n        \"brownian_diffusivity\",\n        \"brownian_kernel_pair\",\n    }\n    assert all(value >= 0.0 for value in result.values())",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_benchmark_gpu_wp_funcs_uses_fake_warp_backend",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_profile_row_keeps_host_launch_synchronization_outside_clocks",
+    "original": "def test_profile_row_keeps_host_launch_synchronization_outside_clocks(\n    benchmark_module,\n) -> None:\n    \"\"\"Host-launch samples have only clocks and operations in their interval.\"\"\"\n    workload = benchmark_module.build_default_profiling_workload_matrix()[0]\n    events: list[str] = []\n    ticks = iter(range(1, 10_000))\n\n    def clock() -> int:\n        events.append(\"clock\")\n        return next(ticks)\n\n    binding = types.SimpleNamespace(\n        enqueue=lambda: events.append(\"operation\"),\n        replay=lambda: events.append(\"replay\"),\n        reset=lambda: events.append(\"reset\"),\n        synchronize=lambda: events.append(\"synchronize\"),\n        validate_identities=lambda: events.append(\"validate\"),\n    )\n\n    samples = benchmark_module._collect_profile_row(\n        binding,\n        workload,\n        mode=\"prepared_uncaptured\",\n        source=\"host_launch\",\n        clock=clock,\n    )\n\n    assert [sample.replay_count for sample in samples] == [\n        count\n        for count in workload.replay_counts\n        for _ in range(workload.sample_count)\n    ]\n    for index, event in enumerate(events):\n        if event == \"clock\":\n            assert (\n                events[index + 1] == \"operation\"\n                or events[index - 1] == \"operation\"\n            )",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_profile_row_keeps_host_launch_synchronization_outside_clocks",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_profile_row_synchronizes_once_inside_elapsed_interval",
+    "original": "def test_profile_row_synchronizes_once_inside_elapsed_interval(\n    benchmark_module,\n) -> None:\n    \"\"\"Completion samples place their single synchronizer before the end clock.\"\"\"\n    workload = benchmark_module.build_default_profiling_workload_matrix()[0]\n    events: list[str] = []\n    ticks = iter(range(1, 10_000))\n\n    def clock() -> int:\n        events.append(\"clock\")\n        return next(ticks)\n\n    binding = types.SimpleNamespace(\n        enqueue=lambda: events.append(\"operation\"),\n        replay=lambda: events.append(\"replay\"),\n        reset=lambda: events.append(\"reset\"),\n        synchronize=lambda: events.append(\"synchronize\"),\n        validate_identities=lambda: events.append(\"validate\"),\n    )\n\n    benchmark_module._collect_profile_row(\n        binding,\n        workload,\n        mode=\"captured_replay\",\n        source=\"synchronized_elapsed\",\n        clock=clock,\n    )\n\n    assert any(\n        events[index : index + 3] == [\"replay\", \"synchronize\", \"clock\"]\n        for index in range(len(events) - 2)\n    )",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_profile_row_synchronizes_once_inside_elapsed_interval",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_profile_row_retains_replay_major_order_and_normalized_durations",
+    "original": "def test_profile_row_retains_replay_major_order_and_normalized_durations(\n    benchmark_module,\n) -> None:\n    \"\"\"Retain exact positive clock deltas in replay-count-major sample order.\"\"\"\n    workload = benchmark_module.build_default_profiling_workload_matrix()[0]\n    ticks = iter(range(100, 200))\n    binding = types.SimpleNamespace(\n        enqueue=lambda: None,\n        replay=lambda: None,\n        reset=lambda: None,\n        synchronize=lambda: None,\n        validate_identities=lambda: None,\n    )\n\n    samples = benchmark_module._collect_profile_row(\n        binding,\n        workload,\n        mode=\"prepared_uncaptured\",\n        source=\"host_launch\",\n        clock=lambda: next(ticks),\n    )\n\n    expected_counts = tuple(\n        count\n        for count in workload.replay_counts\n        for _ in range(workload.sample_count)\n    )\n    assert tuple(sample.replay_count for sample in samples) == expected_counts\n    assert tuple(sample.duration_ns for sample in samples) == (1,) * len(\n        samples\n    )\n    assert sum(\n        sample.duration_ns / sample.replay_count for sample in samples\n    ) / len(samples) == pytest.approx(0.27775)",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_profile_row_retains_replay_major_order_and_normalized_durations",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_profile_row_rejects_nonincreasing_clock_without_samples",
+    "original": "def test_profile_row_rejects_nonincreasing_clock_without_samples(\n    benchmark_module,\n    ticks: tuple[int, int],\n) -> None:\n    \"\"\"Reject invalid timing intervals before an evidence row can be built.\"\"\"\n    workload = benchmark_module.build_default_profiling_workload_matrix()[0]\n    tick_values = iter(ticks)\n    binding = types.SimpleNamespace(\n        enqueue=lambda: None,\n        replay=lambda: None,\n        reset=lambda: None,\n        synchronize=lambda: None,\n        validate_identities=lambda: None,\n    )\n\n    with pytest.raises(ValueError, match=\"increasing integer ns\"):\n        benchmark_module._collect_profile_row(\n            binding,\n            workload,\n            mode=\"prepared_uncaptured\",\n            source=\"host_launch\",\n            clock=lambda: next(tick_values),\n        )",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_profile_row_rejects_nonincreasing_clock_without_samples",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_profile_artifact_publication_restores_complete_previous_set",
+    "original": "def test_profile_artifact_publication_restores_complete_previous_set(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n    tmp_path: Path,\n) -> None:\n    \"\"\"Failed replacement leaves each previously published artifact unchanged.\"\"\"\n    workloads = benchmark_module.build_default_profiling_workload_matrix()\n    artifacts = {\n        pair: benchmark_module.ProfilingArtifact(\n            tuple(\n                benchmark_module.UnavailableEvidence(\n                    \"unavailable\", workload, \"CUDA absent\"\n                )\n                for workload in workloads\n            )\n        )\n        for pair in benchmark_module.PROFILING_ARTIFACT_NAMES\n    }\n    profiling_root = tmp_path / \"benchmarks\" / \"profiling\"\n    profiling_root.mkdir(parents=True)\n    manifest = profiling_root / \"manifest.json\"\n    previous = \"previous-complete-generation\\n\"\n    manifest.write_text(previous, encoding=\"utf-8\")\n\n    replace = benchmark_module.os.replace\n\n    def fail_pointer_publish(source: Path, destination: Path) -> None:\n        if destination == manifest:\n            raise OSError(\"replacement failed\")\n        replace(source, destination)\n\n    monkeypatch.setattr(benchmark_module.os, \"replace\", fail_pointer_publish)\n\n    with pytest.raises(OSError, match=\"replacement failed\"):\n        benchmark_module._write_profile_artifacts(tmp_path, artifacts)\n\n    assert manifest.read_text(encoding=\"utf-8\") == previous\n    assert not list(profiling_root.glob(\"**/*.tmp\"))\n    generations = profiling_root / \"generations\"\n    assert not list(generations.iterdir())",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_profile_artifact_publication_restores_complete_previous_set",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_profile_artifact_publication_points_to_one_complete_generation",
+    "original": "def test_profile_artifact_publication_points_to_one_complete_generation(\n    benchmark_module,\n    tmp_path: Path,\n) -> None:\n    \"\"\"Publish all four artifacts before atomically exposing their generation.\"\"\"\n    workloads = benchmark_module.build_default_profiling_workload_matrix()\n    artifacts = {\n        pair: benchmark_module.ProfilingArtifact(\n            tuple(\n                benchmark_module.UnavailableEvidence(\n                    \"unavailable\", workload, \"CUDA absent\"\n                )\n                for workload in workloads\n            )\n        )\n        for pair in benchmark_module.PROFILING_ARTIFACT_NAMES\n    }\n\n    benchmark_module._write_profile_artifacts(tmp_path, artifacts)\n\n    profiling_root = tmp_path / \"benchmarks\" / \"profiling\"\n    manifest = json.loads(\n        (profiling_root / \"manifest.json\").read_text(encoding=\"utf-8\")\n    )\n    assert set(manifest) == {\n        f\"{mode}/{method}\"\n        for mode, method in benchmark_module.PROFILING_ARTIFACT_NAMES\n    }\n    assert len({Path(value).parts[1] for value in manifest.values()}) == 1\n    assert all(\n        (profiling_root / value).is_file() for value in manifest.values()\n    )",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_profile_artifact_publication_points_to_one_complete_generation",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_source_revision_records_git_revision_and_dirty_state",
+    "original": "def test_source_revision_records_git_revision_and_dirty_state(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n    revision: str,\n    status: str,\n    expected: str,\n) -> None:\n    \"\"\"Retain reproducible Git metadata in bounded source provenance.\"\"\"\n    monkeypatch.setattr(benchmark_module.shutil, \"which\", lambda _: \"/mock/git\")\n    responses = iter((revision, status))\n    monkeypatch.setattr(\n        benchmark_module.subprocess,\n        \"run\",\n        lambda *args, **kwargs: types.SimpleNamespace(stdout=next(responses)),\n    )\n\n    assert benchmark_module._source_revision() == expected",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_source_revision_records_git_revision_and_dirty_state",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_source_revision_uses_labeled_fallback_when_git_is_unavailable",
+    "original": "def test_source_revision_uses_labeled_fallback_when_git_is_unavailable(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"Do not invent a revision when VCS metadata cannot be queried.\"\"\"\n    monkeypatch.setattr(benchmark_module.shutil, \"which\", lambda _: None)\n    monkeypatch.setattr(\n        benchmark_module.subprocess,\n        \"run\",\n        lambda *args, **kwargs: pytest.fail(\"Git must not run when absent\"),\n    )\n\n    assert benchmark_module._source_revision() == \"vcs-unavailable\"",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_source_revision_uses_labeled_fallback_when_git_is_unavailable",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_source_revision_uses_fallback_when_git_command_fails",
+    "original": "def test_source_revision_uses_fallback_when_git_command_fails(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n    command_index: int,\n    failure: str,\n) -> None:\n    \"\"\"Either Git command may fail even when executable discovery succeeds.\"\"\"\n    monkeypatch.setattr(benchmark_module.shutil, \"which\", lambda _: \"/mock/git\")\n    errors = {\n        \"os\": OSError(\"no git\"),\n        \"exit\": benchmark_module.subprocess.CalledProcessError(1, \"git\"),\n        \"timeout\": benchmark_module.subprocess.TimeoutExpired(\"git\", 5),\n    }\n    calls = 0\n\n    def run(*args, **kwargs):\n        nonlocal calls\n        current = calls\n        calls += 1\n        if current == command_index:\n            raise errors[failure]\n        return types.SimpleNamespace(stdout=\"abc123\\n\")\n\n    monkeypatch.setattr(benchmark_module.subprocess, \"run\", run)\n    assert benchmark_module._source_revision() == \"vcs-unavailable\"\n    assert calls == command_index + 1",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_source_revision_uses_fallback_when_git_command_fails",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_source_revision_uses_fallback_for_empty_revision",
+    "original": "def test_source_revision_uses_fallback_for_empty_revision(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"Successful commands with an empty revision cannot establish provenance.\"\"\"\n    monkeypatch.setattr(benchmark_module.shutil, \"which\", lambda _: \"/mock/git\")\n    monkeypatch.setattr(\n        benchmark_module.subprocess,\n        \"run\",\n        lambda *args, **kwargs: types.SimpleNamespace(stdout=\" \\n\"),\n    )\n\n    assert benchmark_module._source_revision() == \"vcs-unavailable\"",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_source_revision_uses_fallback_for_empty_revision",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_profiling_method_sanitizes_command_provenance",
+    "original": "def test_profiling_method_sanitizes_command_provenance(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n    source: str,\n) -> None:\n    \"\"\"Keep arbitrary pytest arguments out of profiling method provenance.\"\"\"\n    monkeypatch.setattr(\n        sys,\n        \"argv\",\n        [\"pytest\", \"benchmark_test.py\", \"--benchmark\", \"-k\", \"resident\"],\n    )\n\n    method = benchmark_module._profiling_method(source)\n\n    assert method.method_id == source\n    assert method.source == source\n    assert method.command == \"pytest\"\n    assert method.version == \"perf_counter_ns\"\n    assert method.duration_unit == \"ns\"",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_profiling_method_sanitizes_command_provenance",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_unavailable_profile_collection_never_invokes_fixture_or_clock",
+    "original": "def test_unavailable_profile_collection_never_invokes_fixture_or_clock(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n    tmp_path: Path,\n) -> None:\n    \"\"\"Publish complete unavailable artifacts before any fixture timing work.\"\"\"\n    artifact_root = tmp_path / \".artifacts\"\n    artifact_root.mkdir()\n    calls: list[str] = []\n    monkeypatch.setattr(\n        benchmark_module,\n        \"cuda_capture_availability\",\n        lambda: types.SimpleNamespace(available=False, reason=\"CUDA absent\"),\n    )\n    monkeypatch.setattr(\n        benchmark_module,\n        \"qualified_cuda_resident_benchmark\",\n        lambda **_: calls.append(\"fixture\"),\n    )\n\n    def clock() -> int:\n        calls.append(\"clock\")\n        return 1\n\n    artifacts = benchmark_module._collect_resident_launch_profile_artifacts(\n        artifact_root,\n        clock=clock,\n    )\n\n    assert calls == []\n    assert all(\n        row.status == \"unavailable\"\n        for artifact in artifacts.values()\n        for row in artifact.evidence\n    )\n    manifest = artifact_root / \"benchmarks\" / \"profiling\" / \"manifest.json\"\n    assert manifest.is_file()",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_unavailable_profile_collection_never_invokes_fixture_or_clock",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_profile_collector_publishes_complete_fake_cuda_generation",
+    "original": "def test_profile_collector_publishes_complete_fake_cuda_generation(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n    tmp_path: Path,\n) -> None:\n    \"\"\"Exercise all mode/method rows without invoking a CPU timing path.\"\"\"\n    events: list[str] = []\n    workloads = benchmark_module.build_default_profiling_workload_matrix()\n    monkeypatch.setattr(\n        benchmark_module,\n        \"cuda_capture_availability\",\n        lambda: types.SimpleNamespace(available=True, reason=\"available\"),\n    )\n\n    @contextmanager\n    def fake_binding(**kwargs: Any):\n        workload = next(\n            item for item in workloads if item.workload_id == kwargs[\"case_id\"]\n        )\n        binding = types.SimpleNamespace(\n            loop=types.SimpleNamespace(\n                prepared=types.SimpleNamespace(\n                    signature=types.SimpleNamespace(\n                        dimensions=types.SimpleNamespace(\n                            n_boxes=workload.shape[0],\n                            n_particles=workload.shape[1],\n                            n_species=workload.shape[2],\n                        )\n                    )\n                )\n            ),\n            duration=workload.duration_seconds,\n            reset=lambda: events.append(\"reset\"),\n            validate_identities=lambda: events.append(\"validate\"),\n            synchronize=lambda: events.append(\"synchronize\"),\n            enqueue=lambda: events.append(\"enqueue\"),\n            replay=lambda: events.append(\"replay\"),\n            capture_elapsed_seconds=0.1,\n            setup_elapsed_seconds=0.2,\n        )\n        yield binding\n\n    monkeypatch.setattr(\n        benchmark_module, \"qualified_cuda_resident_benchmark\", fake_binding\n    )\n    monkeypatch.setattr(\n        benchmark_module,\n        \"_profiling_machine\",\n        lambda _: benchmark_module.MachineProvenance(\n            \"machine\",\n            \"linux\",\n            \"3.12\",\n            \"warp\",\n            \"qualified\",\n            \"cuda:0\",\n            \"git:abc-dirty-false\",\n        ),\n    )\n    ticks = iter(range(1, 100_000))\n\n    artifact_root = tmp_path / \".artifacts\"\n    artifact_root.mkdir()\n    artifacts = benchmark_module._collect_resident_launch_profile_artifacts(\n        artifact_root, clock=lambda: next(ticks)\n    )\n\n    assert set(artifacts) == set(benchmark_module.PROFILING_ARTIFACT_NAMES)\n    assert all(\n        [row.workload.workload_id for row in artifact.evidence]\n        == [workload.workload_id for workload in workloads]\n        for artifact in artifacts.values()\n    )\n    assert events.count(\"enqueue\") > 0\n    assert events.count(\"replay\") > 0\n    raw_root = artifact_root / \"benchmarks\" / \"profiling\" / \"raw\"\n    assert len(list(raw_root.glob(\"*.json\"))) == len(workloads) * 4\n    manifest = json.loads(\n        (\n            artifact_root / \"benchmarks\" / \"profiling\" / \"manifest.json\"\n        ).read_text(encoding=\"utf-8\")\n    )\n    assert len(manifest) == 4\n    assert all(\n        (artifact_root / \"benchmarks\" / \"profiling\" / path).is_file()\n        for path in manifest.values()\n    )",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_profile_collector_publishes_complete_fake_cuda_generation",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_condensation_scaling_records_cpu_and_gpu_paths",
+    "original": "def test_condensation_scaling_records_cpu_and_gpu_paths(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"Condensation benchmark records both comparison and GPU-only metadata.\"\"\"\n    monkeypatch.setattr(benchmark_module, \"_skip_if_no_cuda\", lambda: None)\n    monkeypatch.setattr(\n        benchmark_module,\n        \"_preflight_condensation_case_allocations\",\n        lambda *args, **kwargs: None,\n    )\n    monkeypatch.setattr(\n        benchmark_module,\n        \"to_warp_particle_data\",\n        lambda particles, device: particles,\n    )\n    monkeypatch.setattr(\n        benchmark_module,\n        \"to_warp_gas_data\",\n        lambda gas, device, vapor_pressure: gas,\n    )\n    monkeypatch.setattr(\n        benchmark_module,\n        \"_wp_zeros_with_guard\",\n        lambda *args, **kwargs: np.zeros((1, 1, 1), dtype=np.float64),\n    )\n    monkeypatch.setattr(\n        benchmark_module,\n        \"wp\",\n        types.SimpleNamespace(\n            float64=np.float64,\n            int32=np.int32,\n            array=lambda values, **kwargs: np.asarray(values, dtype=np.float64),\n        ),\n    )\n    gpu_calls: list[str] = []\n    cpu_calls: list[str] = []\n    monkeypatch.setattr(\n        benchmark_module,\n        \"condensation_step_gpu\",\n        lambda *args, **kwargs: gpu_calls.append(\"gpu\"),\n    )\n    monkeypatch.setattr(\n        benchmark_module,\n        \"_cpu_condensation_step\",\n        lambda *args, **kwargs: cpu_calls.append(\"cpu\"),\n    )\n\n    @contextmanager\n    def _profile(_tag: str):\n        yield\n\n    monkeypatch.setattr(benchmark_module, \"_warp_profiled\", _profile)\n\n    def _run_gpu(step_fn, steps, warmup):\n        step_fn()\n        return 0.5\n\n    def _run_cpu(step_fn, steps, warmup):\n        step_fn()\n        return 1.5\n\n    monkeypatch.setattr(benchmark_module, \"_time_gpu_loop\", _run_gpu)\n    monkeypatch.setattr(benchmark_module, \"_time_cpu_loop\", _run_cpu)\n    monkeypatch.setattr(benchmark_module, \"_print_timing\", lambda *args: None)\n    monkeypatch.setattr(\n        benchmark_module,\n        \"_compute_speedup\",\n        lambda cpu_time, gpu_time: cpu_time / gpu_time,\n    )\n    monkeypatch.setattr(benchmark_module, \"_save_results\", lambda: None)\n    monkeypatch.setattr(\n        benchmark_module,\n        \"_benchmark_results\",\n        {\"started_at\": \"2026-01-01T00:00:00+00:00\", \"benchmarks\": {}},\n    )\n\n    benchmark_module.test_condensation_scaling(\"case-a\", 1, 1, 1, True)\n    benchmark_module.test_condensation_scaling(\"case-b\", 1, 1, 1, False)\n\n    assert gpu_calls == [\"gpu\", \"gpu\"]\n    assert cpu_calls == [\"cpu\"]\n    cpu_entry = benchmark_module._benchmark_results[\"benchmarks\"][\n        \"condensation_case-a\"\n    ]\n    gpu_only_entry = benchmark_module._benchmark_results[\"benchmarks\"][\n        \"condensation_case-b\"\n    ]\n    assert cpu_entry[\"gpu_time_s\"] == 0.5\n    assert cpu_entry[\"cpu_time_s\"] == 1.5\n    assert cpu_entry[\"speedup\"] == 3.0\n    assert gpu_only_entry[\"gpu_time_s\"] == 0.5\n    assert \"cpu_time_s\" not in gpu_only_entry",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_condensation_scaling_records_cpu_and_gpu_paths",
+    "body_changed": true,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_coagulation_scaling_records_cpu_and_gpu_paths",
+    "original": "def test_coagulation_scaling_records_cpu_and_gpu_paths(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"Coagulation benchmark records both comparison and GPU-only metadata.\"\"\"\n    monkeypatch.setattr(benchmark_module, \"_skip_if_no_cuda\", lambda: None)\n    monkeypatch.setattr(\n        benchmark_module,\n        \"_preflight_coagulation_case_allocations\",\n        lambda *args, **kwargs: None,\n    )\n    monkeypatch.setattr(\n        benchmark_module,\n        \"to_warp_particle_data\",\n        lambda particles, device: particles,\n    )\n    monkeypatch.setattr(\n        benchmark_module,\n        \"_wp_zeros_with_guard\",\n        lambda shape, **kwargs: np.zeros(shape, dtype=np.int32),\n    )\n    monkeypatch.setattr(\n        benchmark_module,\n        \"wp\",\n        types.SimpleNamespace(\n            int32=np.int32,\n            uint32=np.uint32,\n        ),\n    )\n    gpu_seeds: list[int] = []\n    seed_calls: list[tuple[int, object, int, str]] = []\n    cpu_calls: list[str] = []\n    monkeypatch.setattr(\n        benchmark_module,\n        \"_seed_coagulation_rng_states_once\",\n        lambda **kwargs: seed_calls.append(\n            (\n                kwargs[\"rng_seed\"],\n                kwargs[\"rng_states\"],\n                kwargs[\"n_boxes\"],\n                kwargs[\"device\"],\n            )\n        ),\n    )\n    monkeypatch.setattr(\n        benchmark_module,\n        \"coagulation_step_gpu\",\n        lambda *args, **kwargs: gpu_seeds.append(kwargs[\"rng_seed\"]),\n    )\n    monkeypatch.setattr(\n        benchmark_module,\n        \"_cpu_coagulation_step\",\n        lambda *args, **kwargs: cpu_calls.append(\"cpu\"),\n    )\n\n    @contextmanager\n    def _profile(_tag: str):\n        yield\n\n    monkeypatch.setattr(benchmark_module, \"_warp_profiled\", _profile)\n\n    def _run_gpu(step_fn, steps, warmup):\n        step_fn()\n        return 0.25\n\n    def _run_cpu(step_fn, steps, warmup):\n        step_fn()\n        return 1.0\n\n    monkeypatch.setattr(benchmark_module, \"_time_gpu_loop\", _run_gpu)\n    monkeypatch.setattr(benchmark_module, \"_time_cpu_loop\", _run_cpu)\n    monkeypatch.setattr(benchmark_module, \"_print_timing\", lambda *args: None)\n    monkeypatch.setattr(\n        benchmark_module,\n        \"_compute_speedup\",\n        lambda cpu_time, gpu_time: cpu_time / gpu_time,\n    )\n    monkeypatch.setattr(benchmark_module, \"_save_results\", lambda: None)\n    monkeypatch.setattr(\n        benchmark_module,\n        \"_benchmark_results\",\n        {\"started_at\": \"2026-01-01T00:00:00+00:00\", \"benchmarks\": {}},\n    )\n\n    benchmark_module.test_coagulation_scaling(\"case-a\", 1, 2, 1, True)\n    benchmark_module.test_coagulation_scaling(\"case-b\", 1, 2, 1, False)\n\n    assert gpu_seeds == [42, 42]\n    assert len(seed_calls) == 2\n    assert [call[0] for call in seed_calls] == [42, 42]\n    assert [call[2] for call in seed_calls] == [1, 1]\n    assert [call[3] for call in seed_calls] == [\"cuda\", \"cuda\"]\n    assert cpu_calls == [\"cpu\"]\n    cpu_entry = benchmark_module._benchmark_results[\"benchmarks\"][\n        \"coagulation_case-a\"\n    ]\n    gpu_only_entry = benchmark_module._benchmark_results[\"benchmarks\"][\n        \"coagulation_case-b\"\n    ]\n    assert cpu_entry[\"gpu_time_s\"] == 0.25\n    assert cpu_entry[\"cpu_time_s\"] == 1.0\n    assert cpu_entry[\"speedup\"] == 4.0\n    assert gpu_only_entry[\"gpu_time_s\"] == 0.25\n    assert \"cpu_time_s\" not in gpu_only_entry",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_coagulation_scaling_records_cpu_and_gpu_paths",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_make_coagulation_particle_data_builds_deterministic_mixed_scale_fixture",
+    "original": "def test_make_coagulation_particle_data_builds_deterministic_mixed_scale_fixture(\n    benchmark_module,\n    n_boxes: int,\n    n_particles: int,\n    n_species: int,\n) -> None:\n    \"\"\"Coagulation helper builds deterministic mixed-scale benchmark data.\"\"\"\n    first = benchmark_module._make_coagulation_particle_data(\n        n_boxes,\n        n_particles,\n        n_species,\n    )\n    second = benchmark_module._make_coagulation_particle_data(\n        n_boxes,\n        n_particles,\n        n_species,\n    )\n\n    assert first.masses.shape == (n_boxes, n_particles, n_species)\n    assert first.concentration.shape == (n_boxes, n_particles)\n    assert first.charge.shape == (n_boxes, n_particles)\n    assert first.density.shape == (n_species,)\n    assert first.volume.shape == (n_boxes,)\n    assert np.all(first.concentration > 0.0)\n\n    radii = first.radii\n    assert radii.shape == (n_boxes, n_particles)\n    assert np.all(np.diff(radii[0]) > 0.0)\n    assert np.min(radii) < 1.0e-8\n    assert np.max(radii) > 1.0e-6\n    assert np.max(radii) / np.min(radii) > 1.0e3\n    assert np.any(radii < 5.0e-8)\n    assert np.any(radii > 1.0e-6)\n\n    small_concentration = np.max(\n        first.concentration[:, : max(1, n_particles // 2)]\n    )\n    large_concentration = np.min(\n        first.concentration[:, max(1, n_particles // 2) :]\n    )\n    assert small_concentration > large_concentration\n\n    npt.assert_allclose(first.masses, second.masses)\n    npt.assert_allclose(first.concentration, second.concentration)\n    npt.assert_allclose(first.radii, second.radii)",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_make_coagulation_particle_data_builds_deterministic_mixed_scale_fixture",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_coagulation_scaling_uses_coagulation_only_helper",
+    "original": "def test_coagulation_scaling_uses_coagulation_only_helper(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"Coagulation uses its helper while condensation keeps generic setup.\"\"\"\n    monkeypatch.setattr(benchmark_module, \"_skip_if_no_cuda\", lambda: None)\n    monkeypatch.setattr(\n        benchmark_module,\n        \"_preflight_condensation_case_allocations\",\n        lambda *args, **kwargs: None,\n    )\n    monkeypatch.setattr(\n        benchmark_module,\n        \"_preflight_coagulation_case_allocations\",\n        lambda *args, **kwargs: None,\n    )\n    monkeypatch.setattr(\n        benchmark_module,\n        \"_validate_benchmark_budget\",\n        lambda *args, **kwargs: None,\n    )\n\n    generic_calls: list[tuple[int, int, int]] = []\n    coag_calls: list[tuple[int, int, int]] = []\n\n    generic_particles = benchmark_module._make_particle_data(1, 2, 1)\n    coag_particles = benchmark_module._make_coagulation_particle_data(1, 2, 1)\n\n    def _record_generic_call(\n        n_boxes: int, n_particles: int, n_species: int\n    ) -> object:\n        generic_calls.append((n_boxes, n_particles, n_species))\n        return generic_particles\n\n    def _record_coag_call(\n        n_boxes: int, n_particles: int, n_species: int\n    ) -> object:\n        coag_calls.append((n_boxes, n_particles, n_species))\n        return coag_particles\n\n    monkeypatch.setattr(\n        benchmark_module,\n        \"_make_particle_data\",\n        _record_generic_call,\n    )\n    monkeypatch.setattr(\n        benchmark_module,\n        \"_make_coagulation_particle_data\",\n        _record_coag_call,\n    )\n    monkeypatch.setattr(\n        benchmark_module,\n        \"_make_gas_data\",\n        lambda n_boxes, n_species: types.SimpleNamespace(\n            molar_mass=np.ones(n_species, dtype=np.float64)\n        ),\n    )\n    monkeypatch.setattr(\n        benchmark_module,\n        \"_make_vapor_pressure\",\n        lambda n_boxes, n_species: np.ones(\n            (n_boxes, n_species), dtype=np.float64\n        ),\n    )\n    monkeypatch.setattr(\n        benchmark_module,\n        \"to_warp_particle_data\",\n        lambda particles, device: particles,\n    )\n    monkeypatch.setattr(\n        benchmark_module,\n        \"to_warp_gas_data\",\n        lambda gas, device, vapor_pressure: gas,\n    )\n    monkeypatch.setattr(\n        benchmark_module,\n        \"_wp_zeros_with_guard\",\n        lambda shape, **kwargs: np.zeros(shape, dtype=np.float64),\n    )\n    monkeypatch.setattr(\n        benchmark_module,\n        \"wp\",\n        types.SimpleNamespace(\n            float64=np.float64,\n            int32=np.int32,\n            uint32=np.uint32,\n            array=lambda values, **kwargs: values,\n        ),\n    )\n    monkeypatch.setattr(\n        benchmark_module,\n        \"condensation_step_gpu\",\n        lambda *args, **kwargs: None,\n    )\n    monkeypatch.setattr(\n        benchmark_module,\n        \"coagulation_step_gpu\",\n        lambda *args, **kwargs: None,\n    )\n    monkeypatch.setattr(\n        benchmark_module,\n        \"_seed_coagulation_rng_states_once\",\n        lambda **kwargs: None,\n    )\n\n    @contextmanager\n    def _profile(_tag: str):\n        yield\n\n    monkeypatch.setattr(benchmark_module, \"_warp_profiled\", _profile)\n    monkeypatch.setattr(\n        benchmark_module,\n        \"_time_gpu_loop\",\n        lambda step_fn, steps, warmup: (step_fn() or 0.25),\n    )\n    monkeypatch.setattr(benchmark_module, \"_save_results\", lambda: None)\n    monkeypatch.setattr(benchmark_module, \"_print_timing\", lambda *args: None)\n    monkeypatch.setattr(\n        benchmark_module,\n        \"_benchmark_results\",\n        {\"started_at\": \"2026-01-01T00:00:00+00:00\", \"benchmarks\": {}},\n    )\n\n    benchmark_module.test_condensation_scaling(\"cond\", 1, 2, 1, False)\n\n    assert generic_calls == [(1, 2, 1)]\n    assert coag_calls == []\n\n    benchmark_module.test_coagulation_scaling(\"coag\", 1, 2, 1, False)\n\n    assert generic_calls == [(1, 2, 1)]\n    assert coag_calls == [(1, 2, 1)]",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_coagulation_scaling_uses_coagulation_only_helper",
+    "body_changed": true,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_coagulation_scaling_reuses_persistent_rng_states_without_seed_drift",
+    "original": "def test_coagulation_scaling_reuses_persistent_rng_states_without_seed_drift(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"Coagulation benchmark keeps a constant seed across repeated GPU steps.\"\"\"\n    monkeypatch.setattr(benchmark_module, \"_skip_if_no_cuda\", lambda: None)\n    monkeypatch.setattr(\n        benchmark_module,\n        \"_preflight_coagulation_case_allocations\",\n        lambda *args, **kwargs: None,\n    )\n    monkeypatch.setattr(\n        benchmark_module,\n        \"to_warp_particle_data\",\n        lambda particles, device: particles,\n    )\n\n    rng_state_buffer = object()\n\n    def _zeros_with_guard(shape, **kwargs):\n        if kwargs.get(\"dtype\") is benchmark_module.wp.uint32:\n            return rng_state_buffer\n        return np.zeros(shape, dtype=np.int32)\n\n    monkeypatch.setattr(\n        benchmark_module,\n        \"_wp_zeros_with_guard\",\n        _zeros_with_guard,\n    )\n    monkeypatch.setattr(\n        benchmark_module,\n        \"wp\",\n        types.SimpleNamespace(\n            int32=np.int32,\n            uint32=np.uint32,\n        ),\n    )\n    gpu_kwargs: list[dict[str, object]] = []\n    seed_calls: list[tuple[int, object, int, str]] = []\n    monkeypatch.setattr(\n        benchmark_module,\n        \"_seed_coagulation_rng_states_once\",\n        lambda **kwargs: seed_calls.append(\n            (\n                kwargs[\"rng_seed\"],\n                kwargs[\"rng_states\"],\n                kwargs[\"n_boxes\"],\n                kwargs[\"device\"],\n            )\n        ),\n    )\n    monkeypatch.setattr(\n        benchmark_module,\n        \"coagulation_step_gpu\",\n        lambda *args, **kwargs: gpu_kwargs.append(kwargs),\n    )\n\n    @contextmanager\n    def _profile(_tag: str):\n        yield\n\n    monkeypatch.setattr(benchmark_module, \"_warp_profiled\", _profile)\n\n    def _run_gpu(step_fn, steps, warmup):\n        for _ in range(3):\n            step_fn()\n        return 0.25\n\n    monkeypatch.setattr(benchmark_module, \"_time_gpu_loop\", _run_gpu)\n    monkeypatch.setattr(benchmark_module, \"_save_results\", lambda: None)\n    monkeypatch.setattr(\n        benchmark_module,\n        \"_benchmark_results\",\n        {\"started_at\": \"2026-01-01T00:00:00+00:00\", \"benchmarks\": {}},\n    )\n\n    benchmark_module.test_coagulation_scaling(\"case-a\", 1, 2, 1, False)\n\n    assert len(gpu_kwargs) == 3\n    assert [kwargs[\"rng_seed\"] for kwargs in gpu_kwargs] == [42, 42, 42]\n    assert seed_calls == [(42, rng_state_buffer, 1, \"cuda\")]\n    assert all(\n        kwargs[\"rng_states\"] is rng_state_buffer for kwargs in gpu_kwargs\n    )\n    assert all(kwargs.get(\"initialize_rng\") is False for kwargs in gpu_kwargs)",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_coagulation_scaling_reuses_persistent_rng_states_without_seed_drift",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  },
+  {
+    "file": "particula/gpu/tests/benchmark_helpers_test.py",
+    "test": "test_wp_func_benchmarks_records_summary_without_cuda",
+    "original": "def test_wp_func_benchmarks_records_summary_without_cuda(\n    benchmark_module,\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"wp.func benchmark summary records timing metadata via fast stubs.\"\"\"\n    monkeypatch.setattr(benchmark_module, \"_skip_if_no_cuda\", lambda: None)\n    monkeypatch.setattr(\n        benchmark_module,\n        \"_build_wp_func_benchmark_inputs\",\n        lambda n_evals: {\"dummy\": np.arange(n_evals, dtype=np.float64)},\n    )\n    monkeypatch.setattr(\n        benchmark_module,\n        \"_benchmark_cpu_wp_funcs\",\n        lambda inputs, *, kernel_sample: {\n            \"diffusion_coefficient\": 1.0,\n            \"mass_transfer_rate\": 2.0,\n            \"particle_radius_from_volume\": 3.0,\n            \"brownian_diffusivity\": 4.0,\n            \"brownian_kernel_pair\": 5.0,\n        },\n    )\n    monkeypatch.setattr(\n        benchmark_module,\n        \"_benchmark_gpu_wp_funcs\",\n        lambda inputs: {\n            \"diffusion_coefficient\": 0.5,\n            \"mass_transfer_rate\": 1.0,\n            \"particle_radius_from_volume\": 1.5,\n            \"brownian_diffusivity\": 2.0,\n            \"brownian_kernel_pair\": 2.5,\n        },\n    )\n    monkeypatch.setattr(benchmark_module, \"_save_results\", lambda: None)\n    monkeypatch.setattr(\n        benchmark_module,\n        \"_benchmark_results\",\n        {\"started_at\": \"2026-01-01T00:00:00+00:00\", \"benchmarks\": {}},\n    )\n\n    benchmark_module.test_wp_func_benchmarks()\n\n    result = benchmark_module._benchmark_results[\"benchmarks\"][\"wp_func\"]\n    assert result[\"n_evals\"] == 100_000\n    assert result[\"diffusion_coefficient\"][\"cpu_us\"] > 0.0\n    assert result[\"brownian_kernel_pair\"][\"gpu_us\"] > 0.0",
+    "successor": "particula/gpu/tests/benchmark_helpers_test.py::test_wp_func_benchmarks_records_summary_without_cuda",
+    "body_changed": false,
+    "status": "original test retained; helper suite validated, CUDA timings unmeasured"
+  }
+]
