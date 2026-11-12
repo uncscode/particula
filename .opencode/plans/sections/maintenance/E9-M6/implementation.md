@@ -77,3 +77,56 @@ revision result; final validation will run on a frozen executable revision.
 - Documentation preparation was pulled forward while the original full-suite
   process runs. Keep it separate from API removal commits. Original baseline
   session 12235 remains live; do not restart until terminal state is observed.
+
+## Publication parser audit
+
+A direct Griffe traversal parsed **2710 production docstrings** without
+rendering notebooks (test modules and aliases excluded). First repair audit:
+147 warnings; second repair audit: **99 warnings**. Logs:
+`/tmp/m6-griffe-audit.log`, `/tmp/m6-griffe-audit2.log`.
+This is not equivalent to full publication success. Remaining issues include
+stale parameters, missing types in unannotated APIs, and section indentation.
+
+All **107** uncommitted package files were compared against HEAD after stripping
+docstring AST nodes: executable ASTs are identical. Ruff check and format check
+pass (552 files). Publication session 12505 and baseline session 12235 were
+still live at last observation; preserve their handles. Current source changes
+mean an in-flight publication run is diagnostic rather than final evidence.
+
+Resume parser cleanup from `/tmp/m6-griffe-audit2.log`, retain scientific prose,
+and then return to serial removal. Do not claim inventory P1 complete merely
+because initial lexical and assertion snapshots exist. No facade production
+API has been removed yet; this remains a required major outstanding deliverable.
+
+## Parser cleanup completion (publication still pending)
+
+Direct Griffe audit now parses **2710 docstrings with zero warnings**:
+`/tmp/m6-griffe-audit4.log`. Fixed stale argument names/units against signatures,
+missing documented types, continuation indentation and empty/incorrect sections.
+This does not prove full publication rendering or visual correctness. Final AST
+comparison and strict rendering remain required before documentation closeout.
+
+Original untargeted run terminated exit 1: **7559 passed, 501 failed, 678 skipped**;
+coverage gate passed. Cache configuration was defective as demonstrated by the
+focused native-loop failures. Full rerun with `WARP_CACHE_PATH=/tmp/particula-m6-warp`
+is active in session **67715**, log `/tmp/m6-baseline-writable-cache.log`.
+Do not classify all original failures as cache-only without the corrected run.
+Publication diagnostic session **12505** remains to be polled.
+
+## First production consumer removal
+
+- Committed docstring-only repair as `54a7d3257`: 113 files; final AST check
+  against its parent confirmed executable AST identity. Direct Griffe parser
+  was clean; this is not a final rendered-publication acceptance claim.
+- First full publication diagnostic terminated exit 1 with 138 warnings. It
+  began before later repairs; fresh build session **57066** uses repaired
+  sources, log `/tmp/m6-publication-pass2.log` and site
+  `/tmp/particula-m6-full-site-clean`.
+- Removed Equilibria's legacy aggregate import/type union. Native result
+  recognition remains; generic solver mappings/phase-result behavior unchanged.
+- Strengthened adjacent return-identity test: separate real native input and
+  output aggregates replace the old same-stub assertion, which could pass via
+  the unknown-result fallback. No existing scientific assertion was deleted.
+- Equilibria suites plus native CPU adapter suite: **69 passed in 0.10s**;
+  log `/tmp/m6-equilibria-removal2.log`. Scoped mypy log:
+  `/tmp/m6-equilibria-mypy.log`. Ruff and whitespace checks passed.

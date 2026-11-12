@@ -34,13 +34,9 @@ from __future__ import annotations
 import inspect
 from typing import TYPE_CHECKING, Any, Mapping
 
-from particula._legacy_aerosol import Aerosol as LegacyAerosol
-from particula.aerosol import Aerosol as NativeAerosol
+from particula.aerosol import Aerosol
 from particula.equilibria.equilibria_strategies import EquilibriaStrategy
 from particula.runnable import RunnableABC
-
-# Legacy ownership-only callers remain supported until M6.
-Aerosol = NativeAerosol | LegacyAerosol
 
 if TYPE_CHECKING:
     from particula.equilibria.equilibria_strategies import (
@@ -188,7 +184,7 @@ class Equilibria(RunnableABC):
     def _attach_equilibrium_result_dataclass(
         aerosol: Aerosol, result: EquilibriumResult
     ) -> Aerosol:
-        aerosol.equilibria_result = result  # type: ignore[union-attr]
+        aerosol.equilibria_result = result  # type: ignore[attr-defined]
         return aerosol
 
     @staticmethod
@@ -196,25 +192,25 @@ class Equilibria(RunnableABC):
         aerosol: Aerosol, result: Mapping[str, Any]
     ) -> Aerosol:
         if "phase_concentrations" in result:
-            aerosol.phase_concentrations = result["phase_concentrations"]  # type: ignore[union-attr]
+            aerosol.phase_concentrations = result["phase_concentrations"]  # type: ignore[attr-defined]
         if "mass_concentrations" in result:
-            aerosol.mass_concentrations = result["mass_concentrations"]  # type: ignore[union-attr]
-        aerosol.equilibria_result = result  # type: ignore[union-attr]
+            aerosol.mass_concentrations = result["mass_concentrations"]  # type: ignore[attr-defined]
+        aerosol.equilibria_result = result  # type: ignore[attr-defined]
         return aerosol
 
     @staticmethod
     def _apply_attribute_result(aerosol: Aerosol, result: Any) -> Aerosol:
-        aerosol.equilibria_result = result  # type: ignore[union-attr]
+        aerosol.equilibria_result = result  # type: ignore[attr-defined]
         if hasattr(result, "phase_concentrations"):
-            aerosol.phase_concentrations = result.phase_concentrations  # type: ignore[union-attr]
+            aerosol.phase_concentrations = result.phase_concentrations  # type: ignore[attr-defined]
         if hasattr(result, "mass_concentrations"):
-            aerosol.mass_concentrations = result.mass_concentrations  # type: ignore[union-attr]
+            aerosol.mass_concentrations = result.mass_concentrations  # type: ignore[attr-defined]
         return aerosol
 
     @staticmethod
     def _attach_phase_concentrations(
         aerosol: Aerosol, result: PhaseConcentrations
     ) -> Aerosol:
-        aerosol.phase_concentrations = result  # type: ignore[union-attr]
-        aerosol.equilibria_result = result  # type: ignore[union-attr]
+        aerosol.phase_concentrations = result  # type: ignore[attr-defined]
+        aerosol.equilibria_result = result  # type: ignore[attr-defined]
         return aerosol
