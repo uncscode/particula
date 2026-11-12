@@ -10,7 +10,25 @@ import unittest
 
 import numpy as np
 import particula as par
-from particula._legacy_aerosol import Aerosol as LegacyAerosol
+import pytest
+from particula.gas import EnvironmentData, GasDataBuilder
+
+
+@pytest.fixture(autouse=True)
+def forbid_facades(forbid_legacy_facades):
+    """Guard actual native integration against obsolete construction."""
+
+
+def _mass_density(particle):
+    """Independent population-aware mass concentration in kg/m^3."""
+    product = particle.masses[0].sum(axis=1) * particle.concentration[0]
+    if particle.distribution_type == "continuous_pdf":
+        return np.sum(
+            (product[1:] + product[:-1]) * np.diff(particle.radius_grid) / 2
+        )
+    if particle.distribution_type == "particle_resolved":
+        return product.sum() / particle.volume[0]
+    return product.sum()
 
 
 class TestCoagulationIntegration(unittest.TestCase):
@@ -23,7 +41,7 @@ class TestCoagulationIntegration(unittest.TestCase):
           - mode and geometric_standard_deviation for lognormal sampling
           - number_of_particles and total number_of_samples
           - density, volume, and radius_bins
-          - a default atmosphere with preset gas species
+          - explicit environment and independent inert gas data
         """
         self.mode = np.array([100e-9, 300e-9])  # m
         self.geometric_standard_deviation = np.array([1.3, 1.3])
@@ -32,10 +50,13 @@ class TestCoagulationIntegration(unittest.TestCase):
         self.volume = 1 * 1e-6  # m^3
         self.number_of_samples = 100_000
         self.radius_bins = np.logspace(-8, -6, 250)
-        self.atmosphere = (
-            par.gas.AtmosphereBuilder()
-            .set_temperature(273, temperature_units="K")
-            .set_pressure(101325, pressure_units="Pa")
+        self.environment = EnvironmentData([273.0], [101325.0], [[0.0]])
+        self.gas = (
+            GasDataBuilder()
+            .set_names(["inert"])
+            .set_molar_mass([0.028])
+            .set_concentration([0.0])
+            .set_partitioning([False])
             .build()
         )
 
@@ -50,22 +71,20 @@ class TestCoagulationIntegration(unittest.TestCase):
         number_concentration = self.number_of_particles * np.array(
             [self.number_of_samples / self.volume]
         )
-        particle_pmf = (
-            par.particles.PresetParticleRadiusBuilder()
-            .set_mode(self.mode, mode_units="m")
-            .set_geometric_standard_deviation(self.geometric_standard_deviation)
-            .set_number_concentration(number_concentration, "1/m^3")
-            .set_distribution_type("pmf")
-            .set_radius_bins(self.radius_bins, radius_bins_units="m")
-            .set_density(self.density, "kg/m^3")
-            .build()
+        particle_pmf = par.particles.create_lognormal_binned_particle_data(
+            distribution_type="discrete",
+            mode=self.mode,
+            geometric_standard_deviation=self.geometric_standard_deviation,
+            number_concentration=number_concentration,
+            radius_bins=self.radius_bins,
+            density=self.density,
         )
-        aerosol_pmf = LegacyAerosol(
-            atmosphere=self.atmosphere, particles=particle_pmf
+        aerosol_pmf = par.Aerosol(
+            gas=self.gas, environment=self.environment, particles=particle_pmf
         )
         self.assertIsNotNone(aerosol_pmf)
         self.assertEqual(
-            aerosol_pmf.particles.get_concentration().shape,
+            aerosol_pmf.particles.concentration[0].shape,
             self.radius_bins.shape,
         )
 
@@ -80,23 +99,20 @@ class TestCoagulationIntegration(unittest.TestCase):
         number_concentration = self.number_of_particles * np.array(
             [self.number_of_samples / self.volume]
         )
-        particle_pdf = (
-            par.particles.PresetParticleRadiusBuilder()
-            .set_mode(self.mode, mode_units="m")
-            .set_geometric_standard_deviation(self.geometric_standard_deviation)
-            .set_number_concentration(number_concentration, "1/m^3")
-            .set_distribution_type("pdf")
-            .set_radius_bins(self.radius_bins, radius_bins_units="m")
-            .set_density(self.density, "kg/m^3")
-            .set_charge(np.zeros_like(self.radius_bins))
-            .build()
+        particle_pdf = par.particles.create_lognormal_binned_particle_data(
+            distribution_type="continuous_pdf",
+            mode=self.mode,
+            geometric_standard_deviation=self.geometric_standard_deviation,
+            number_concentration=number_concentration,
+            radius_bins=self.radius_bins,
+            density=self.density,
         )
-        aerosol_pdf = LegacyAerosol(
-            atmosphere=self.atmosphere, particles=particle_pdf
+        aerosol_pdf = par.Aerosol(
+            gas=self.gas, environment=self.environment, particles=particle_pdf
         )
         self.assertIsNotNone(aerosol_pdf)
         self.assertEqual(
-            aerosol_pdf.particles.get_concentration().shape,
+            aerosol_pdf.particles.concentration[0].shape,
             self.radius_bins.shape,
         )
 
@@ -105,7 +121,7 @@ class TestCoagulationIntegration(unittest.TestCase):
 
         Uses lognormal-sampled radii to create resolved particle masses:
           - verifies total mass matches expected sum
-          - checks that ParticleResolvedSpeciatedMass is assigned properly
+          - retains resolved count and volume semantics
         """
         radii_sample = par.particles.get_lognormal_sample_distribution(
             mode=self.mode,
@@ -114,26 +130,20 @@ class TestCoagulationIntegration(unittest.TestCase):
             number_of_samples=self.number_of_samples,
         )
         particle_mass_sample = 4 / 3 * np.pi * radii_sample**3 * self.density
-        resolved_masses = (
-            par.particles.ResolvedParticleMassRepresentationBuilder()
-            .set_distribution_strategy(
-                par.particles.ParticleResolvedSpeciatedMass()
-            )
-            .set_activity_strategy(par.particles.ActivityIdealMass())
-            .set_surface_strategy(par.particles.SurfaceStrategyVolume())
-            .set_mass(particle_mass_sample, "kg")
-            .set_density(self.density, "kg/m^3")
-            .set_charge(0)
-            .set_volume(self.volume, "m^3")
-            .build()
+        resolved_masses = par.particles.create_resolved_particle_data(
+            masses=particle_mass_sample,
+            density=self.density,
+            volume=self.volume,
         )
-        aerosol_resolved = LegacyAerosol(
-            atmosphere=self.atmosphere, particles=resolved_masses
+        aerosol_resolved = par.Aerosol(
+            gas=self.gas,
+            environment=self.environment,
+            particles=resolved_masses,
         )
         self.assertIsNotNone(aerosol_resolved)
         self.assertAlmostEqual(
             np.sum(particle_mass_sample) / self.volume,
-            aerosol_resolved.particles.get_mass_concentration(),
+            _mass_density(aerosol_resolved.particles),
             delta=1e-6,
         )
 
@@ -147,27 +157,23 @@ class TestCoagulationIntegration(unittest.TestCase):
         number_concentration = self.number_of_particles * np.array(
             [self.number_of_samples / self.volume]
         )
-        particle_pmf = (
-            par.particles.PresetParticleRadiusBuilder()
-            .set_mode(self.mode, mode_units="m")
-            .set_geometric_standard_deviation(self.geometric_standard_deviation)
-            .set_number_concentration(number_concentration, "1/m^3")
-            .set_distribution_type("pmf")
-            .set_radius_bins(self.radius_bins, radius_bins_units="m")
-            .set_density(self.density, "kg/m^3")
-            .build()
+        particle_pmf = par.particles.create_lognormal_binned_particle_data(
+            distribution_type="discrete",
+            mode=self.mode,
+            geometric_standard_deviation=self.geometric_standard_deviation,
+            number_concentration=number_concentration,
+            radius_bins=self.radius_bins,
+            density=self.density,
         )
-        aerosol_pmf = LegacyAerosol(
-            atmosphere=self.atmosphere, particles=particle_pmf
+        aerosol_pmf = par.Aerosol(
+            gas=self.gas, environment=self.environment, particles=particle_pmf
         )
-        initial_mass_pmf = aerosol_pmf.particles.get_mass_concentration(
-            clone=True
-        )
+        initial_mass_pmf = _mass_density(aerosol_pmf.particles)
         for _ in range(3):
             aerosol_pmf = coagulation_process_pmf.execute(aerosol_pmf, 100, 1)
         self.assertAlmostEqual(
             initial_mass_pmf,
-            aerosol_pmf.particles.get_mass_concentration(),
+            _mass_density(aerosol_pmf.particles),
             delta=1e-4,
         )
 
@@ -181,28 +187,23 @@ class TestCoagulationIntegration(unittest.TestCase):
         number_concentration = self.number_of_particles * np.array(
             [self.number_of_samples / self.volume]
         )
-        particle_pdf = (
-            par.particles.PresetParticleRadiusBuilder()
-            .set_mode(self.mode, mode_units="m")
-            .set_geometric_standard_deviation(self.geometric_standard_deviation)
-            .set_number_concentration(number_concentration, "1/m^3")
-            .set_distribution_type("pdf")
-            .set_radius_bins(self.radius_bins, radius_bins_units="m")
-            .set_density(self.density, "kg/m^3")
-            .set_charge(np.zeros_like(self.radius_bins))
-            .build()
+        particle_pdf = par.particles.create_lognormal_binned_particle_data(
+            distribution_type="continuous_pdf",
+            mode=self.mode,
+            geometric_standard_deviation=self.geometric_standard_deviation,
+            number_concentration=number_concentration,
+            radius_bins=self.radius_bins,
+            density=self.density,
         )
-        aerosol_pdf = LegacyAerosol(
-            atmosphere=self.atmosphere, particles=particle_pdf
+        aerosol_pdf = par.Aerosol(
+            gas=self.gas, environment=self.environment, particles=particle_pdf
         )
-        initial_mass_pdf = aerosol_pdf.particles.get_mass_concentration(
-            clone=True
-        )
+        initial_mass_pdf = _mass_density(aerosol_pdf.particles)
         for _ in range(3):
             aerosol_pdf = coagulation_process_pdf.execute(aerosol_pdf, 100, 2)
         self.assertAlmostEqual(
             initial_mass_pdf,
-            aerosol_pdf.particles.get_mass_concentration(),
+            _mass_density(aerosol_pdf.particles),
             delta=5,
         )
 
@@ -220,25 +221,17 @@ class TestCoagulationIntegration(unittest.TestCase):
             number_of_samples=self.number_of_samples,
         )
         particle_mass_sample = 4 / 3 * np.pi * radii_sample**3 * self.density
-        resolved_masses = (
-            par.particles.ResolvedParticleMassRepresentationBuilder()
-            .set_distribution_strategy(
-                par.particles.ParticleResolvedSpeciatedMass()
-            )
-            .set_activity_strategy(par.particles.ActivityIdealMass())
-            .set_surface_strategy(par.particles.SurfaceStrategyVolume())
-            .set_mass(particle_mass_sample, "kg")
-            .set_density(self.density, "kg/m^3")
-            .set_charge(0)
-            .set_volume(self.volume, "m^3")
-            .build()
+        resolved_masses = par.particles.create_resolved_particle_data(
+            masses=particle_mass_sample,
+            density=self.density,
+            volume=self.volume,
         )
-        aerosol_resolved = LegacyAerosol(
-            atmosphere=self.atmosphere, particles=resolved_masses
+        aerosol_resolved = par.Aerosol(
+            gas=self.gas,
+            environment=self.environment,
+            particles=resolved_masses,
         )
-        initial_mass_resolved = (
-            aerosol_resolved.particles.get_mass_concentration()
-        )
+        initial_mass_resolved = _mass_density(aerosol_resolved.particles)
         for _ in range(3):
             aerosol_resolved = coagulation_process_resolved.execute(
                 aerosol_resolved, 100, 1
@@ -248,7 +241,7 @@ class TestCoagulationIntegration(unittest.TestCase):
         )
         self.assertAlmostEqual(
             initial_mass_resolved,
-            aerosol_resolved.particles.get_mass_concentration(),
+            _mass_density(aerosol_resolved.particles),
             delta=1e-6,
         )
 
@@ -270,23 +263,21 @@ class TestCoagulationIntegration(unittest.TestCase):
         number_concentration = self.number_of_particles * np.array(
             [self.number_of_samples / self.volume]
         )
-        particle_pmf = (
-            par.particles.PresetParticleRadiusBuilder()
-            .set_mode(self.mode, mode_units="m")
-            .set_geometric_standard_deviation(self.geometric_standard_deviation)
-            .set_number_concentration(number_concentration, "1/m^3")
-            .set_distribution_type("pmf")
-            .set_radius_bins(self.radius_bins, radius_bins_units="m")
-            .set_density(self.density, "kg/m^3")
-            .build()
+        particle_pmf = par.particles.create_lognormal_binned_particle_data(
+            distribution_type="discrete",
+            mode=self.mode,
+            geometric_standard_deviation=self.geometric_standard_deviation,
+            number_concentration=number_concentration,
+            radius_bins=self.radius_bins,
+            density=self.density,
         )
-        aerosol_pmf = LegacyAerosol(
-            atmosphere=self.atmosphere, particles=particle_pmf
+        aerosol_pmf = par.Aerosol(
+            gas=self.gas, environment=self.environment, particles=particle_pmf
         )
-        initial_mass_pmf = aerosol_pmf.particles.get_mass_concentration()
+        initial_mass_pmf = _mass_density(aerosol_pmf.particles)
         for _ in range(3):
             aerosol_pmf = coagulation_process_pmf.execute(aerosol_pmf, 100, 1)
-        final_mass_pmf = aerosol_pmf.particles.get_mass_concentration()
+        final_mass_pmf = _mass_density(aerosol_pmf.particles)
 
         # -------------------------
         # PDF-based final mass check
@@ -295,24 +286,21 @@ class TestCoagulationIntegration(unittest.TestCase):
                 distribution_type="continuous_pdf"
             )
         )
-        particle_pdf = (
-            par.particles.PresetParticleRadiusBuilder()
-            .set_mode(self.mode, mode_units="m")
-            .set_geometric_standard_deviation(self.geometric_standard_deviation)
-            .set_number_concentration(number_concentration, "1/m^3")
-            .set_distribution_type("pdf")
-            .set_radius_bins(self.radius_bins, radius_bins_units="m")
-            .set_density(self.density, "kg/m^3")
-            .set_charge(np.zeros_like(self.radius_bins))
-            .build()
+        particle_pdf = par.particles.create_lognormal_binned_particle_data(
+            distribution_type="continuous_pdf",
+            mode=self.mode,
+            geometric_standard_deviation=self.geometric_standard_deviation,
+            number_concentration=number_concentration,
+            radius_bins=self.radius_bins,
+            density=self.density,
         )
-        aerosol_pdf = LegacyAerosol(
-            atmosphere=self.atmosphere, particles=particle_pdf
+        aerosol_pdf = par.Aerosol(
+            gas=self.gas, environment=self.environment, particles=particle_pdf
         )
-        initial_mass_pdf = aerosol_pdf.particles.get_mass_concentration()
+        initial_mass_pdf = _mass_density(aerosol_pdf.particles)
         for _ in range(3):
             aerosol_pdf = coagulation_process_pdf.execute(aerosol_pdf, 100, 1)
-        final_mass_pdf = aerosol_pdf.particles.get_mass_concentration()
+        final_mass_pdf = _mass_density(aerosol_pdf.particles)
 
         # -------------------------
         # Resolved-based final mass check
@@ -328,32 +316,22 @@ class TestCoagulationIntegration(unittest.TestCase):
             number_of_samples=self.number_of_samples,
         )
         particle_mass_sample = 4 / 3 * np.pi * radii_sample**3 * self.density
-        resolved_masses = (
-            par.particles.ResolvedParticleMassRepresentationBuilder()
-            .set_distribution_strategy(
-                par.particles.ParticleResolvedSpeciatedMass()
-            )
-            .set_activity_strategy(par.particles.ActivityIdealMass())
-            .set_surface_strategy(par.particles.SurfaceStrategyVolume())
-            .set_mass(particle_mass_sample, "kg")
-            .set_density(self.density, "kg/m^3")
-            .set_charge(0)
-            .set_volume(self.volume, "m^3")
-            .build()
+        resolved_masses = par.particles.create_resolved_particle_data(
+            masses=particle_mass_sample,
+            density=self.density,
+            volume=self.volume,
         )
-        aerosol_resolved = LegacyAerosol(
-            atmosphere=self.atmosphere, particles=resolved_masses
+        aerosol_resolved = par.Aerosol(
+            gas=self.gas,
+            environment=self.environment,
+            particles=resolved_masses,
         )
-        initial_mass_resolved = (
-            aerosol_resolved.particles.get_mass_concentration()
-        )
+        initial_mass_resolved = _mass_density(aerosol_resolved.particles)
         for _ in range(3):
             aerosol_resolved = coagulation_process_resolved.execute(
                 aerosol_resolved, 100, 1
             )
-        final_mass_resolved = (
-            aerosol_resolved.particles.get_mass_concentration()
-        )
+        final_mass_resolved = _mass_density(aerosol_resolved.particles)
 
         # Compare final masses
         # They won't be identical but should remain within a reasonable

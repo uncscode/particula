@@ -63,17 +63,8 @@ def condensation(gas):
 
 
 @pytest.fixture(autouse=True)
-def forbid_facades(monkeypatch):
-    """Native runnables cannot hide a transition through a legacy facade."""
-    from particula._legacy_aerosol import Aerosol as LegacyAerosol
-    from particula.gas.species import GasSpecies
-    from particula.particles.representation import ParticleRepresentation
-
-    def forbidden(*args, **kwargs):
-        pytest.fail("native runnable constructed a legacy facade")
-
-    for cls in (LegacyAerosol, GasSpecies, ParticleRepresentation):
-        monkeypatch.setattr(cls, "__init__", forbidden)
+def forbid_facades(forbid_legacy_facades):
+    """Keep the native execution guard valid after facade modules disappear."""
 
 
 @pytest.mark.parametrize("volume", [0.25, 1.0, 4.0])
@@ -205,3 +196,33 @@ def test_current_invalid_environment_rejects_before_dispatch(family):
 
     with pytest.raises(ValueError):
         family(SimpleNamespace(step=forbidden)).execute(aerosol, 0.0)
+
+
+@pytest.mark.parametrize("operation", ["rate", "execute"])
+@pytest.mark.parametrize("candidate", [None, object(), SimpleNamespace()])
+def test_coagulation_rejects_non_native_aggregate(operation, candidate):
+    """Reject obsolete/duck-typed aggregates before strategy access."""
+
+    def forbidden(**kwargs):
+        pytest.fail("non-native aggregate reached strategy")
+
+    process = Coagulation(SimpleNamespace(step=forbidden, net_rate=forbidden))
+    with pytest.raises(
+        TypeError, match="Coagulation requires a native Aerosol"
+    ):
+        if operation == "rate":
+            process.rate(candidate)
+        else:
+            process.execute(candidate, 1.0)
+
+
+def test_coagulation_rejects_replacement_particle_result():
+    """A strategy cannot replace the held population through its return value."""
+    aerosol = state()
+    held = aerosol.particles
+    before = held.masses.copy()
+    process = Coagulation(SimpleNamespace(step=lambda **kwargs: held.copy()))
+    with pytest.raises(ValueError, match="retain its container"):
+        process.execute(aerosol, 0.1)
+    assert aerosol.particles is held
+    np.testing.assert_array_equal(held.masses, before)
