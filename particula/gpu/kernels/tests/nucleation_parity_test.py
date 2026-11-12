@@ -9,6 +9,7 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
+from particula.gpu.kernels.tests._nucleation_test_support import _binding
 from particula.util.constants import AVOGADRO_NUMBER
 
 pytestmark = [pytest.mark.warp, pytest.mark.gpu_parity]
@@ -87,8 +88,10 @@ def _state(device, boxes=1, particles=3, species=2, *, active=False):
         masses[:, 0, :] = 2e-18 + 1e-18 * np.arange(species)
         concentration[:, 0] = 2.0
     box_scale = 0.5 ** np.arange(boxes, dtype=np.float64)
+    concentration /= box_scale[:, None]
     species_scale = 1.0 + 0.1 * np.arange(species, dtype=np.float64)
     particle_data = SimpleNamespace(
+        distribution_kind=3,
         masses=wp.array(masses, dtype=wp.float64, device=device),
         concentration=wp.array(concentration, dtype=wp.float64, device=device),
         charge=wp.zeros((boxes, particles), dtype=wp.float64, device=device),
@@ -100,6 +103,9 @@ def _state(device, boxes=1, particles=3, species=2, *, active=False):
         volume=wp.array(1.0 / box_scale, dtype=wp.float64, device=device),
     )
     gas_data = SimpleNamespace(
+        vapor_pressure=wp.zeros(
+            (boxes, species), dtype=wp.float64, device=device
+        ),
         molar_mass=wp.array(
             0.1 + 0.1 * np.arange(species), dtype=wp.float64, device=device
         ),
@@ -209,10 +215,14 @@ def _numpy_p2(gas, molar_mass, config, time_step):
     return demand, demand[:, None] * event_mass, event_mass
 
 
-def _particle_inventory(masses, concentration):
-    """Return independent per-box, per-species particle mass inventory."""
+def _particle_inventory(masses, concentration, volume):
+    """Return independent per-box, per-species particle mass density."""
     return np.einsum(
-        "bn,bns->bs", concentration, masses, dtype=np.float64, optimize=True
+        "bn,bns->bs",
+        concentration / volume[:, None],
+        masses,
+        dtype=np.float64,
+        optimize=True,
     )
 
 
@@ -301,6 +311,7 @@ def test_public_nucleation_step_matches_independent_p2_p3_p5_oracle(
         exhaustion_controls=api.NucleationExhaustionControls(False, False),
         exhaustion_buffers=exhaustion,
         temperature=300.0,
+        species_binding=_binding(particles, gas),
     )
     wp.synchronize_device(device)
     assert result[0] is particles
@@ -308,7 +319,7 @@ def test_public_nucleation_step_matches_independent_p2_p3_p5_oracle(
     expected_masses = np.zeros((boxes, 3, species), dtype=np.float64)
     expected_concentration = np.zeros((boxes, 3), dtype=np.float64)
     expected_masses[:, 0, :] = event_mass
-    expected_concentration[:, 0] = demand
+    expected_concentration[:, 0] = demand * particles.volume.numpy()
     np.testing.assert_allclose(
         particles.masses.numpy(), expected_masses, rtol=1e-12, atol=1e-30
     )
@@ -374,6 +385,7 @@ def test_public_nucleation_step_gates_are_exact_write_free(
             if "saturation" in kwargs
             else {}
         ),
+        species_binding=_binding(particles, gas),
     )
     wp.synchronize_device(device)
     _assert_unchanged(before)
@@ -388,7 +400,9 @@ def test_public_nucleation_step_conserves_tiny_matrix_transfer(device) -> None:
         api, device, 2, 3, 2
     )
     initial = _particle_inventory(
-        particles.masses.numpy(), particles.concentration.numpy()
+        particles.masses.numpy(),
+        particles.concentration.numpy(),
+        particles.volume.numpy(),
     )
     initial += gas.concentration.numpy()
     api.nucleation_step_gpu(
@@ -402,10 +416,13 @@ def test_public_nucleation_step_conserves_tiny_matrix_transfer(device) -> None:
         exhaustion_controls=api.NucleationExhaustionControls(False, False),
         exhaustion_buffers=exhaustion,
         temperature=300.0,
+        species_binding=_binding(particles, gas),
     )
     wp.synchronize_device(device)
     final = _particle_inventory(
-        particles.masses.numpy(), particles.concentration.numpy()
+        particles.masses.numpy(),
+        particles.concentration.numpy(),
+        particles.volume.numpy(),
     )
     final += gas.concentration.numpy()
     np.testing.assert_allclose(final - initial, 0.0, rtol=0.0, atol=1e-30)
@@ -416,7 +433,7 @@ def test_public_nucleation_step_conserves_tiny_matrix_transfer(device) -> None:
 def test_public_nucleation_step_scaling_fallback_has_separate_inventory(
     device,
 ) -> None:
-    """Scaling halves pre-existing particle and gas inventory before P5."""
+    """Scaling halves extensive inventory while preserving pre-source density."""
     wp = _warp()
     api = _api()
     particles, gas = _state(device, particles=4, active=True)
@@ -439,7 +456,9 @@ def test_public_nucleation_step_scaling_fallback_has_separate_inventory(
         wp.full(1, 0.5, dtype=wp.float64, device=device),
     )
     initial_particle = _particle_inventory(
-        particles.masses.numpy(), particles.concentration.numpy()
+        particles.masses.numpy(),
+        particles.concentration.numpy(),
+        particles.volume.numpy(),
     )
     initial_gas = gas.concentration.numpy().copy()
     config = _config(api, coefficient=0.4 / AVOGADRO_NUMBER)
@@ -458,13 +477,16 @@ def test_public_nucleation_step_scaling_fallback_has_separate_inventory(
         exhaustion_controls=api.NucleationExhaustionControls(False, True),
         exhaustion_buffers=exhaustion,
         temperature=300.0,
+        species_binding=_binding(particles, gas),
     )
     wp.synchronize_device(device)
 
-    # P4 scales demand from 4 to 2 #/m^3 before P5 removes source mass.
-    source_removal = 2.0 * event_mass
+    # P4 scales four events to two in half the volume: density stays 4 / m3.
+    source_removal = 4.0 * event_mass
     final_particle = _particle_inventory(
-        particles.masses.numpy(), particles.concentration.numpy()
+        particles.masses.numpy(),
+        particles.concentration.numpy(),
+        particles.volume.numpy(),
     )
     np.testing.assert_array_equal(exhaustion.scaling_required.numpy(), [1])
     np.testing.assert_allclose(
@@ -475,17 +497,26 @@ def test_public_nucleation_step_scaling_fallback_has_separate_inventory(
     )
     np.testing.assert_allclose(
         gas.concentration.numpy(),
-        0.5 * initial_gas - source_removal,
+        initial_gas - source_removal,
         rtol=1e-12,
         atol=1e-30,
     )
     np.testing.assert_allclose(
         final_particle,
-        0.5 * initial_particle + source_removal,
+        initial_particle + source_removal,
         rtol=1e-12,
         atol=1e-30,
     )
     np.testing.assert_allclose(removal[0], 4.0 * event_mass, rtol=0.0, atol=0.0)
+
+    # Check the extensive scaling ledger separately from source transfer.
+    final_volume = particles.volume.numpy()[:, None]
+    np.testing.assert_allclose(
+        (final_particle + gas.concentration.numpy()) * final_volume,
+        0.5 * (initial_particle + initial_gas),
+        rtol=1e-12,
+        atol=1e-30,
+    )
 
 
 def test_public_nucleation_step_resampling_precedes_scaling(device) -> None:
@@ -510,7 +541,9 @@ def test_public_nucleation_step_resampling_precedes_scaling(device) -> None:
         wp.ones(1, dtype=wp.int32, device=device),
     )
     initial_particle = _particle_inventory(
-        particles.masses.numpy(), particles.concentration.numpy()
+        particles.masses.numpy(),
+        particles.concentration.numpy(),
+        particles.volume.numpy(),
     )
     initial_gas = gas.concentration.numpy().copy()
     config = _config(api, coefficient=0.2 / AVOGADRO_NUMBER)
@@ -526,10 +559,13 @@ def test_public_nucleation_step_resampling_precedes_scaling(device) -> None:
         exhaustion_controls=api.NucleationExhaustionControls(True, True),
         exhaustion_buffers=exhaustion,
         temperature=300.0,
+        species_binding=_binding(particles, gas),
     )
     wp.synchronize_device(device)
     final_particle = _particle_inventory(
-        particles.masses.numpy(), particles.concentration.numpy()
+        particles.masses.numpy(),
+        particles.concentration.numpy(),
+        particles.volume.numpy(),
     )
     np.testing.assert_array_equal(exhaustion.scaling_required.numpy(), [0])
     np.testing.assert_allclose(
@@ -565,6 +601,7 @@ def test_public_nucleation_step_repeated_calls_use_current_gas(device) -> None:
         exhaustion_controls=api.NucleationExhaustionControls(False, False),
         exhaustion_buffers=first_sidecars[3],
         temperature=300.0,
+        species_binding=_binding(particles, gas),
     )
     wp.synchronize_device(device)
     before_particles = particles.masses.numpy().copy()
@@ -585,6 +622,7 @@ def test_public_nucleation_step_repeated_calls_use_current_gas(device) -> None:
         exhaustion_controls=api.NucleationExhaustionControls(False, False),
         exhaustion_buffers=second_sidecars[3],
         temperature=300.0,
+        species_binding=_binding(particles, gas),
     )
     wp.synchronize_device(device)
     expected_masses = before_particles.copy()
@@ -637,6 +675,7 @@ def test_public_nucleation_step_rejections_preserve_callers(
             exhaustion_controls=api.NucleationExhaustionControls(False, False),
             exhaustion_buffers=exhaustion,
             temperature=temperature,
+            species_binding=_binding(particles, gas),
         )
     _assert_unchanged(before)
 
@@ -679,6 +718,7 @@ def test_public_nucleation_step_malformed_sidecar_preserves_callers(
             exhaustion_controls=api.NucleationExhaustionControls(False, False),
             exhaustion_buffers=exhaustion,
             temperature=300.0,
+            species_binding=_binding(particles, gas),
         )
     _assert_unchanged(before)
 
@@ -708,6 +748,7 @@ def test_public_nucleation_step_zero_box_is_write_free(
         exhaustion_controls=api.NucleationExhaustionControls(False, False),
         exhaustion_buffers=exhaustion,
         temperature=300.0,
+        species_binding=_binding(particle_data, gas),
     )
     wp.synchronize_device(device)
     assert result[0] is particle_data
@@ -737,6 +778,7 @@ def test_public_nucleation_step_zero_capacity_zero_gate_is_write_free(
         exhaustion_controls=api.NucleationExhaustionControls(False, False),
         exhaustion_buffers=exhaustion,
         temperature=300.0,
+        species_binding=_binding(particles, gas),
     )
     wp.synchronize_device(device)
     assert result[0] is particles
@@ -769,6 +811,7 @@ def test_public_nucleation_step_full_capacity_rejects_without_mutation(
             exhaustion_controls=api.NucleationExhaustionControls(False, False),
             exhaustion_buffers=exhaustion,
             temperature=300.0,
+            species_binding=_binding(particles, gas),
         )
 
     _assert_unchanged(before)

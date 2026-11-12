@@ -1448,3 +1448,184 @@ Source examples also passed: **225 passed, 2 skipped in 48.40s**, with
 to commit. No validation processes remain live. Remaining M6 units begin with
 GPU nucleation/exhaustion/communication compatibility, followed by transfer and
 checkpoint admission, full installed integration, publication and closeout.
+
+
+## GPU exhaustion removal in progress
+
+Coagulation cleanup committed as `9708297bf`. Began the next logical unit with
+exhaustion: removed the unreferenced legacy `_execute_resampling_step_gpu` and
+`_execute_representative_volume_scaling_step_gpu` implementations plus their
+orphaned `_any_nonzero_demand` kernel. Production resampling/scaling already
+used the prepared path; it now requires explicit resolved metadata before any
+payload access, always performs native population validation, and has no
+prepared `native` compatibility flag.
+
+Preserved original exhaustion test bodies in `gpu_exhaustion_assertions.json`.
+The existing fixtures now expose resolved metadata separately from enumerated
+device fields, retaining all numerical and raw snapshot assertions. Prepared
+no-host-work tests assert the removed implementations are absent while keeping
+allocation/readback guards and real enqueue outcomes. Added 16 pre-payload
+rejection cases across direct/prepared resampling/scaling for missing, zero,
+discrete, and PDF metadata. Module guidance now describes native admission.
+
+Focused exhaustion/native/population suites: **68 passed, 8 skipped in 0.52s**,
+`/tmp/m6-exhaustion2.log`. An initial 23 failures were snapshot helpers treating
+the new metadata integer as a device array; placing metadata on the fixture
+class preserves exact original payload enumeration. Full mypy: **534 files
+passed**, `/tmp/m6-exhaustion-mypy1.log`.
+
+Dependent nucleation/execution/process-sequence diagnostics are running in
+`/tmp/m6-exhaustion-consumers1.log` (session 82502). Early failures identify
+remaining untagged nucleation callers; do not commit exhaustion until dependent
+paths are migrated and validated. Preserved **92 original nucleation test
+bodies** in `gpu_nucleation_assertions.json` before changing nucleation.
+Nucleation still has legacy standalone staged helpers and a prepared native
+flag; its required species binding, count workspace, gas mapping and source
+conservation must remain explicit during removal. No nucleation source has
+been edited at this checkpoint.
+
+
+Exhaustion dependent diagnostic finished: **45 failed, 1565 passed, 93 skipped
+in 84.65s**, `/tmp/m6-exhaustion-consumers1.log`. Every failure is in the older
+nucleation direct/staged or parity fixtures; execution and native nucleation
+consumers passed in this combined run. The old fixtures reach native exhaustion
+with untagged particles. Keep the rejection and migrate their construction,
+species bindings and source/count oracles; do not restore untagged admission.
+The two direct P4 staged cases also expose the old `_preflight_nucleation` /
+`_orchestrate_nucleation_exhaustion` route, whose density workspace differs from
+the native prepared count workspace. Preserve their scientific assertions when
+removing or migrating that route. No validation processes remain live. Scoped
+Ruff and whitespace checks pass; exhaustion is uncommitted pending this work.
+
+
+## Native public nucleation admission and parity migration
+
+The public/prepared nucleation path now requires explicit resolved metadata and
+an explicit species binding before any payload access. Removed the prepared
+`native` flag and both legacy enqueue branches: P4 always stages admitted raw
+counts and P5 always uses the mapped native writer. Private staged legacy
+helpers remain pending; this is not yet complete nucleation removal.
+
+Migrated the independent parity fixture to explicit resolved counts, preserving
+the original active density by multiplying by each representative volume. Added
+complete GPU gas storage and explicit named identity bindings at each call,
+after deliberate array replacements. The independent NumPy P2 demand/removal
+oracle remains unchanged. Slot-count expectations now use demand times volume;
+particle inventory comparisons normalize raw counts by current volume.
+
+The scaling case now checks native density and extensive inventories separately:
+halving representative volume and existing counts preserves particle/gas
+density, halves extensive pre-existing inventory, and scales four admitted
+source events to two. Source density remains four events per cubic metre after
+scaling. The previous gas-density-halving expectation belonged to the retired
+legacy path; the native assertions retain original tolerances and add an
+explicit extensive combined-inventory check.
+
+Extended metadata-only rejection coverage to both direct and prepared calls,
+including missing/zero/discrete/PDF metadata and resolved metadata without a
+binding. Updated the public nucleation guide to describe mandatory native
+metadata and binding.
+
+Validation:
+- Native/parity suite after schema migration: **42 passed, 40 skipped, 1 failed**
+  (legacy scaling-density expectation), `/tmp/m6-nucleation-native2.log`.
+- Native/parity after independent oracle migration: **43 passed, 40 skipped in
+  0.69s**, `/tmp/m6-nucleation-native3.log`.
+- Combined native/parity/exhaustion suites with expanded rejection coverage:
+  **94 passed, 48 skipped in 0.77s**, `/tmp/m6-source-native4.log`.
+- Full mypy: **534 files passed**, `/tmp/m6-nucleation-mypy1.log`.
+
+Next migrate `nucleation_test.py` and its private staged `_preflight_nucleation`,
+`_plan_nucleation_demand`, `_orchestrate_nucleation_exhaustion` and
+`_commit_nucleation_p5` callers. The standalone staged P4 workspace is still
+legacy demand-density while native prepared P4 holds raw counts; preserve the
+original staged scientific/rejection assertions through explicit native mapping
+and count normalization. The unreferenced `_execute_nucleation_step_gpu` wrapper
+and old P5 writer then become removal candidates. No source algorithms or test
+tolerances have been changed by this public-path cleanup.
+
+
+Post-public-removal dependent validation passed: **1431 passed, 53 skipped in
+79.15s**, `/tmp/m6-nucleation-execution1.log`, covering the complete execution
+suite and direct five-process sequence. Standard strict docs built in **1.59s**,
+`/tmp/m6-nucleation-docs1.log`. Scoped Ruff/format and whitespace checks passed.
+No validation processes remain live. Exhaustion/nucleation changes remain
+uncommitted until standalone-phase migration and its retained tests pass.
+
+Static ownership audit for the remaining source work: `_preflight_nucleation`
+is called by standalone P2, the obsolete `_execute_nucleation_step_gpu` wrapper,
+and native preparation. Standalone `_orchestrate_nucleation_exhaustion` and
+`_commit_nucleation_p5` are called only by the obsolete wrapper in production;
+the old `_commit_nucleation_p5_kernel` is called only by standalone P5.
+`_plan_nucleation_demand` and the obsolete wrapper have no production callers.
+Their test assertions are preserved in the 92-record nucleation ledger. There
+are eight `_NucleationPreflight` constructor sites to update if its explicit
+native binding is retained through staged handoffs. Do not infer identity maps
+or restore untagged admission while migrating those tests.
+
+
+## Standalone native source phases and obsolete-route removal
+
+Migrated standalone P1/P2/P3/P4/P5 to explicit resolved metadata and species
+bindings. `_NucleationPreflight` retains the binding across all eight return
+paths. P2 uses full gas width; staged P4 now copies raw admitted counts into its
+workspace; P5 uses the same mapped unit-count writer as prepared execution.
+Removed the unreferenced `_execute_nucleation_step_gpu`, old density-slot P5
+writer, orphaned workspace-copy kernel, and four kernel compatibility flags.
+No untagged admission, native-mode flag, or legacy scheduling branch remains
+in nucleation/exhaustion production code.
+
+Migrated the existing phase tests with an explicit shared identity-map fixture
+helper. Original validation, sidecar, ownership and invalid-handoff assertions
+remain. Four legacy expected values changed with explicit native interpretation:
+slots hold unit counts (their density is count/volume); a half-volume scaling
+of four events produces two events at unchanged demand density; gas density
+remains unchanged before source transfer. The renamed staged P5 gas test is
+`test_p5_preserves_gas_density_after_volume_scaling` (formerly
+`test_p5_scales_gas_before_finalized_source_removal`).
+
+Added staged end-to-end native checks at V=0.25/1/4 with independent particle
+and gas widths, nonidentity species mapping, preserved inert gas, explicit
+per-event masses, and tight independent per-species density conservation.
+Added rejected full-gas storage rebinding and finite-count/overflowed-density
+checks without mutation. Updated native source/exhaustion guidance.
+
+Validation:
+- First phase migration: **182 passed, 40 skipped, 4 failed**, with the four
+  legacy expectation mismatches above, `/tmp/m6-nucleation-stages2.log`.
+- Phase/native/parity/boundary after expectation migration: **210 passed,
+  40 skipped in 1.21s**, `/tmp/m6-nucleation-stages3.log`.
+- Combined source/exhaustion/boundary after removing kernel mode switches:
+  **254 passed, 48 skipped in 3.28s**, `/tmp/m6-source-stages5.log`.
+- All nucleation suites including five new staged native cases: **191 passed,
+  45 skipped in 1.13s**, `/tmp/m6-nucleation-stages6.log`.
+- Full mypy: **535 files passed**, `/tmp/m6-source-mypy2.log`.
+
+The broad GPU-kernel/execution/process/population run is active in
+`/tmp/m6-source-dependent2.log` (session 47003). Final source review identified
+that six early-gated standalone P1 returns still rely on the old fallback
+protected-field list, which omits new mapping and vapor-pressure fields. Extend
+those retained protection lists and add zero-rate alias coverage before commit;
+public preparation already retains the complete protection list.
+
+### Source/exhaustion commit closure
+
+The broad run completed: **3495 passed, 648 skipped in 110.90s**,
+`/tmp/m6-source-dependent2.log`. Extended all six early-return protected-field
+lists to include species maps and gas vapor-pressure storage, with zero-rate
+and active-rate alias rejection coverage. The final focused source/exhaustion
+and population-boundary run passed **262 tests, 55 skipped in 1.33s**,
+`/tmp/m6-source-final-focused.log`. The broad run precedes this final narrow
+ownership extension; the final M6 integration gate remains required.
+
+The 46 exhaustion and 92 nucleation original test records now identify their
+validated native successors. Four numerical expectation groups changed only
+for the explicit count/density and representative-volume semantics described
+above; no tolerances were relaxed. Removed-wrapper assertions verify absence.
+
+Final supporting checks: examples **225 passed, 2 skipped in 42.23s**
+(`/tmp/m6-source-examples2.log`); mypy **535 files passed**
+(`/tmp/m6-source-mypy3.log`); standard strict docs **1.44s**
+(`/tmp/m6-source-docs2.log`); scoped Ruff, format and whitespace checks passed.
+Communication, transfers/resident/checkpoint admission and final publication
+readiness remain pending. These results do not close the full M6 gate.

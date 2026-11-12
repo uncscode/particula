@@ -179,7 +179,9 @@ inspection. Fixed schemas use `B` boxes, `N` particle slots, and `S` species:
 particle masses are `(B, N, S)`, particle concentration/charge are `(B, N)`,
 gas concentration is `(B, Sg)`, partitioning is `(B, Sg)`, and temperature
 is `(B,)`. Native particle width `Sp` may differ from full gas width `Sg`.
-Tagged resolved inputs require a `NucleationSpeciesBinding` prepared with
+Direct and prepared calls require explicitly tagged resolved inputs and reject
+untagged, discrete, and continuous-PDF metadata before particle-array access.
+Each call requires a `NucleationSpeciesBinding` prepared with
 `prepare_nucleation_species_map` from
 `particula.gpu.nucleation_species_mapping`, using preserved full gas names and
 the explicit source map. Preparation binds the exact transferred arrays;

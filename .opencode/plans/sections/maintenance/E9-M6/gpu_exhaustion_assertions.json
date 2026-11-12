@@ -1,0 +1,416 @@
+[
+  {
+    "file": "particula/gpu/kernels/tests/exhaustion_test.py",
+    "test": "test_resampling_prepared_enqueue_is_setup_free_and_pinned",
+    "original": "def test_resampling_prepared_enqueue_is_setup_free_and_pinned(\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"Prepared resampling uses pinned arrays without host setup work.\"\"\"\n    from particula.gpu.kernels import exhaustion as exhaustion_module\n\n    warm_particles, warm_counts, warm_buffers = _state()\n    warm_prepared = exhaustion_module._prepare_resampling_step_gpu(\n        warm_particles, warm_counts, warm_buffers\n    )\n    exhaustion_module._enqueue_prepared_resampling_call(warm_prepared)\n\n    particles, counts, buffers = _state()\n    prepared = exhaustion_module._prepare_resampling_step_gpu(\n        particles, counts, buffers\n    )\n    pinned_concentration = prepared.concentration\n    replacement = _warp().zeros((1, 4), dtype=_warp().float64, device=\"cpu\")\n    particles.concentration = replacement\n\n    def forbidden(*_args: object, **_kwargs: object) -> None:\n        pytest.fail(\"prepared enqueue performed forbidden host setup\")\n\n    with monkeypatch.context() as context:\n        for name in (\"zeros\", \"empty\", \"array\", \"full\", \"synchronize\"):\n            context.setattr(exhaustion_module.wp, name, forbidden)\n        context.setattr(\n            exhaustion_module, \"_execute_resampling_step_gpu\", forbidden\n        )\n        context.setattr(prepared.invalid, \"numpy\", forbidden)\n        context.setattr(prepared.planning_failed, \"numpy\", forbidden)\n        assert (\n            exhaustion_module._enqueue_prepared_resampling_call(prepared)\n            is particles\n        )\n\n    assert (\n        exhaustion_module._observe_prepared_resampling_call(prepared)\n        is particles\n    )\n    np.testing.assert_array_equal(replacement.numpy(), np.zeros((1, 4)))\n    assert np.count_nonzero(pinned_concentration.numpy()) == 2",
+    "successor": "particula/gpu/kernels/tests/exhaustion_test.py::test_resampling_prepared_enqueue_is_setup_free_and_pinned",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/exhaustion_test.py",
+    "test": "test_resampling_prepared_enqueue_gates_live_invalid_counts",
+    "original": "def test_resampling_prepared_enqueue_gates_live_invalid_counts() -> None:\n    \"\"\"A post-prepare invalid release count cannot launch the commit writer.\"\"\"\n    from particula.gpu.kernels import exhaustion as exhaustion_module\n\n    particles, counts, buffers = _state()\n    prepared = exhaustion_module._prepare_resampling_step_gpu(\n        particles, counts, buffers\n    )\n    before = tuple(\n        values.numpy().copy()\n        for values in (\n            prepared.masses,\n            prepared.concentration,\n            prepared.charge,\n        )\n    )\n    _warp().copy(\n        counts,\n        _warp().array([3], dtype=_warp().int32, device=\"cpu\"),\n    )\n\n    exhaustion_module._enqueue_prepared_resampling_call(prepared)\n\n    with pytest.raises(ValueError, match=\"required_release_counts\"):\n        exhaustion_module._observe_prepared_resampling_call(prepared)\n    for expected, values in zip(\n        before,\n        (prepared.masses, prepared.concentration, prepared.charge),\n        strict=True,\n    ):\n        np.testing.assert_array_equal(values.numpy(), expected)",
+    "successor": "particula/gpu/kernels/tests/exhaustion_test.py::test_resampling_prepared_enqueue_gates_live_invalid_counts",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/exhaustion_test.py",
+    "test": "test_scaling_prepared_enqueue_is_setup_free_and_pinned",
+    "original": "def test_scaling_prepared_enqueue_is_setup_free_and_pinned(\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"Prepared scaling uses pinned arrays without host setup work.\"\"\"\n    from particula.gpu.kernels import exhaustion as exhaustion_module\n\n    warm_particles, _, _ = _state()\n    wp = _warp()\n    warm_prepared = (\n        exhaustion_module._prepare_representative_volume_scaling_step_gpu(\n            warm_particles,\n            wp.array([2.0], dtype=wp.float64, device=\"cpu\"),\n            wp.array([1], dtype=wp.int32, device=\"cpu\"),\n            wp.array([0.5], dtype=wp.float64, device=\"cpu\"),\n            wp.array([0.1], dtype=wp.float64, device=\"cpu\"),\n            wp.array([0.1], dtype=wp.float64, device=\"cpu\"),\n            wp.zeros(1, dtype=wp.float64, device=\"cpu\"),\n        )\n    )\n    exhaustion_module._enqueue_prepared_representative_volume_scaling_call(\n        warm_prepared\n    )\n\n    particles, _, _ = _state()\n    demand = wp.array([2.0], dtype=wp.float64, device=\"cpu\")\n    required = wp.array([1], dtype=wp.int32, device=\"cpu\")\n    requested = wp.array([0.5], dtype=wp.float64, device=\"cpu\")\n    minimum = wp.array([0.1], dtype=wp.float64, device=\"cpu\")\n    minimum_volume = wp.array([0.1], dtype=wp.float64, device=\"cpu\")\n    resolved = wp.zeros(1, dtype=wp.float64, device=\"cpu\")\n    prepared = (\n        exhaustion_module._prepare_representative_volume_scaling_step_gpu(\n            particles,\n            demand,\n            required,\n            requested,\n            minimum,\n            minimum_volume,\n            resolved,\n        )\n    )\n    pinned_concentration = prepared.concentration\n    replacement = wp.zeros((1, 4), dtype=wp.float64, device=\"cpu\")\n    particles.concentration = replacement\n\n    def forbidden(*_args: object, **_kwargs: object) -> None:\n        pytest.fail(\"prepared enqueue performed forbidden host setup\")\n\n    with monkeypatch.context() as context:\n        for name in (\"zeros\", \"empty\", \"array\", \"full\", \"synchronize\"):\n            context.setattr(exhaustion_module.wp, name, forbidden)\n        context.setattr(\n            exhaustion_module,\n            \"_execute_representative_volume_scaling_step_gpu\",\n            forbidden,\n        )\n        context.setattr(prepared.status, \"numpy\", forbidden)\n        result = exhaustion_module._enqueue_prepared_representative_volume_scaling_call(\n            prepared\n        )\n\n    assert result == (particles, demand, resolved)\n    assert (\n        exhaustion_module._observe_prepared_representative_volume_scaling_call(\n            prepared\n        )\n        == result\n    )\n    np.testing.assert_array_equal(replacement.numpy(), np.zeros((1, 4)))\n    np.testing.assert_allclose(\n        pinned_concentration.numpy(), [[1.0, 1.5, 2.5, 0.0]]\n    )",
+    "successor": "particula/gpu/kernels/tests/exhaustion_test.py::test_scaling_prepared_enqueue_is_setup_free_and_pinned",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/exhaustion_test.py",
+    "test": "test_scaling_prepared_enqueue_gates_live_invalid_sidecar",
+    "original": "def test_scaling_prepared_enqueue_gates_live_invalid_sidecar() -> None:\n    \"\"\"A post-prepare invalid scale prevents every scaling writer.\"\"\"\n    from particula.gpu.kernels import exhaustion as exhaustion_module\n\n    wp = _warp()\n    particles, _, _ = _state()\n    demand = wp.array([2.0], dtype=wp.float64, device=\"cpu\")\n    required = wp.array([1], dtype=wp.int32, device=\"cpu\")\n    requested = wp.array([0.5], dtype=wp.float64, device=\"cpu\")\n    minimum = wp.array([0.1], dtype=wp.float64, device=\"cpu\")\n    minimum_volume = wp.array([0.1], dtype=wp.float64, device=\"cpu\")\n    resolved = wp.zeros(1, dtype=wp.float64, device=\"cpu\")\n    prepared = (\n        exhaustion_module._prepare_representative_volume_scaling_step_gpu(\n            particles,\n            demand,\n            required,\n            requested,\n            minimum,\n            minimum_volume,\n            resolved,\n        )\n    )\n    before = tuple(\n        values.numpy().copy()\n        for values in (\n            prepared.masses,\n            prepared.concentration,\n            prepared.charge,\n            prepared.volume,\n            prepared.provisional_source_demand,\n            prepared.resolved_scale,\n        )\n    )\n    wp.copy(\n        prepared.requested_scale,\n        wp.array([np.nan], dtype=wp.float64, device=\"cpu\"),\n    )\n\n    exhaustion_module._enqueue_prepared_representative_volume_scaling_call(\n        prepared\n    )\n\n    with pytest.raises(ValueError, match=\"representative scaling sidecars\"):\n        exhaustion_module._observe_prepared_representative_volume_scaling_call(\n            prepared\n        )\n    for expected, values in zip(\n        before,\n        (\n            prepared.masses,\n            prepared.concentration,\n            prepared.charge,\n            prepared.volume,\n            prepared.provisional_source_demand,\n            prepared.resolved_scale,\n        ),\n        strict=True,\n    ):\n        np.testing.assert_array_equal(values.numpy(), expected)",
+    "successor": "particula/gpu/kernels/tests/exhaustion_test.py::test_scaling_prepared_enqueue_gates_live_invalid_sidecar",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/exhaustion_test.py",
+    "test": "test_resampling_remaps_retained_original_slots_and_conserves_inventory",
+    "original": "def test_resampling_remaps_retained_original_slots_and_conserves_inventory() -> (\n    None\n):\n    \"\"\"A valid P2 call commits equal rows and clears released original slots.\"\"\"\n    from particula.gpu.kernels.exhaustion import resampling_step_gpu\n\n    particles, counts, buffers = _state()\n    before_mass = np.sum(\n        particles.masses.numpy() * particles.concentration.numpy()[..., None],\n        axis=1,\n    )\n    before_charge = np.sum(\n        particles.charge.numpy() * particles.concentration.numpy(), axis=1\n    )\n    assert resampling_step_gpu(particles, counts, buffers) is particles\n    assert buffers.retained_indices.numpy()[0, :2].tolist() == [0, 1]\n    assert buffers.released_indices.numpy()[0, :1].tolist() == [2]\n    assert buffers.retained_indices.numpy()[0, 2:].tolist() == [-1, -1]\n    assert particles.concentration.numpy()[0, 2] == 0.0\n    assert np.all(particles.masses.numpy()[0, 2] == 0.0)\n    after_mass = np.sum(\n        particles.masses.numpy() * particles.concentration.numpy()[..., None],\n        axis=1,\n    )\n    after_charge = np.sum(\n        particles.charge.numpy() * particles.concentration.numpy(), axis=1\n    )\n    npt.assert_allclose(after_mass, before_mass, rtol=1e-12, atol=1e-30)\n    npt.assert_allclose(after_charge, before_charge, rtol=1e-12, atol=1e-30)",
+    "successor": "particula/gpu/kernels/tests/exhaustion_test.py::test_resampling_remaps_retained_original_slots_and_conserves_inventory",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/exhaustion_test.py",
+    "test": "test_resampling_zero_demand_is_write_free",
+    "original": "def test_resampling_zero_demand_is_write_free() -> None:\n    \"\"\"All-zero demand preserves particles and every caller-owned buffer.\"\"\"\n    from particula.gpu.kernels.exhaustion import resampling_step_gpu\n\n    particles, counts, buffers = _state()\n    counts = _warp().zeros(1, dtype=_warp().int32, device=\"cpu\")\n    count_container = SimpleNamespace(counts=counts)\n    snapshots = _snapshot(particles, count_container, buffers)\n    assert resampling_step_gpu(particles, counts, buffers) is particles\n    _assert_snapshot(snapshots, particles, count_container, buffers)",
+    "successor": "particula/gpu/kernels/tests/exhaustion_test.py::test_resampling_zero_demand_is_write_free",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/exhaustion_test.py",
+    "test": "test_resampling_empty_box_with_zero_demand_is_write_free",
+    "original": "def test_resampling_empty_box_with_zero_demand_is_write_free() -> None:\n    \"\"\"An empty valid box and zero demand leave all caller storage untouched.\"\"\"\n    from particula.gpu.kernels.exhaustion import resampling_step_gpu\n\n    particles, buffers = _single_active_state()\n    wp = _warp()\n    particles.masses = wp.zeros((1, 4, 2), dtype=wp.float64, device=\"cpu\")\n    particles.concentration = wp.zeros((1, 4), dtype=wp.float64, device=\"cpu\")\n    counts = wp.zeros(1, dtype=wp.int32, device=\"cpu\")\n    count_container = SimpleNamespace(counts=counts)\n    snapshots = _snapshot(particles, count_container, buffers)\n\n    assert resampling_step_gpu(particles, counts, buffers) is particles\n\n    _assert_snapshot(snapshots, particles, count_container, buffers)",
+    "successor": "particula/gpu/kernels/tests/exhaustion_test.py::test_resampling_empty_box_with_zero_demand_is_write_free",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/exhaustion_test.py",
+    "test": "test_resampling_empty_batch_validates_density_before_write_free_return",
+    "original": "def test_resampling_empty_batch_validates_density_before_write_free_return() -> (\n    None\n):\n    \"\"\"An empty batch validates global density and preserves valid caller data.\"\"\"\n    from particula.gpu.kernels.exhaustion import resampling_step_gpu\n\n    masses = np.empty((0, 1, 1), dtype=np.float64)\n    concentration = np.empty((0, 1), dtype=np.float64)\n    charge = np.empty((0, 1), dtype=np.float64)\n    particles, counts, buffers = _custom_state(\n        masses,\n        concentration,\n        charge,\n        np.array([1.0], dtype=np.float64),\n        np.empty(0, dtype=np.int32),\n    )\n    snapshots = _snapshot(particles, SimpleNamespace(counts=counts), buffers)\n    assert resampling_step_gpu(particles, counts, buffers) is particles\n    _assert_snapshot(\n        snapshots, particles, SimpleNamespace(counts=counts), buffers\n    )\n\n    particles, counts, buffers = _custom_state(\n        masses,\n        concentration,\n        charge,\n        np.array([np.nan], dtype=np.float64),\n        np.empty(0, dtype=np.int32),\n    )\n    snapshots = _snapshot(particles, SimpleNamespace(counts=counts), buffers)\n    with pytest.raises(ValueError, match=\"invalid values\"):\n        resampling_step_gpu(particles, counts, buffers)\n    _assert_snapshot(\n        snapshots, particles, SimpleNamespace(counts=counts), buffers\n    )",
+    "successor": "particula/gpu/kernels/tests/exhaustion_test.py::test_resampling_empty_batch_validates_density_before_write_free_return",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/exhaustion_test.py",
+    "test": "test_resampling_accepts_maximum_valid_release_count",
+    "original": "def test_resampling_accepts_maximum_valid_release_count() -> None:\n    \"\"\"Releasing active-count minus one leaves exactly one retained slot.\"\"\"\n    from particula.gpu.kernels.exhaustion import resampling_step_gpu\n\n    particles, _, buffers = _state()\n    wp = _warp()\n    counts = wp.array([2], dtype=wp.int32, device=\"cpu\")\n\n    assert resampling_step_gpu(particles, counts, buffers) is particles\n    assert buffers.retained_counts.numpy().tolist() == [1]\n    assert buffers.released_counts.numpy().tolist() == [2]\n    assert np.count_nonzero(particles.concentration.numpy()) == 1",
+    "successor": "particula/gpu/kernels/tests/exhaustion_test.py::test_resampling_accepts_maximum_valid_release_count",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/exhaustion_test.py",
+    "test": "test_resampling_rejects_release_from_single_active_slot_without_mutation",
+    "original": "def test_resampling_rejects_release_from_single_active_slot_without_mutation() -> (\n    None\n):\n    \"\"\"A nonzero demand cannot release the only active slot.\"\"\"\n    from particula.gpu.kernels.exhaustion import resampling_step_gpu\n\n    particles, buffers = _single_active_state()\n    wp = _warp()\n    counts = wp.array([1], dtype=wp.int32, device=\"cpu\")\n    count_container = SimpleNamespace(counts=counts)\n    snapshots = _snapshot(particles, count_container, buffers)\n\n    with pytest.raises(\n        ValueError,\n        match=\"particles or required_release_counts have invalid values\",\n    ):\n        resampling_step_gpu(particles, counts, buffers)\n\n    _assert_snapshot(snapshots, particles, count_container, buffers)",
+    "successor": "particula/gpu/kernels/tests/exhaustion_test.py::test_resampling_rejects_release_from_single_active_slot_without_mutation",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/exhaustion_test.py",
+    "test": "test_resampling_failed_diagnostics_do_not_commit_particles",
+    "original": "def test_resampling_failed_diagnostics_do_not_commit_particles() -> None:\n    \"\"\"A planning diagnostic failure leaves the caller particle state intact.\"\"\"\n    from particula.gpu.kernels.exhaustion import resampling_step_gpu\n\n    particles, counts, buffers = _state()\n    snapshots = [value.numpy().copy() for value in vars(particles).values()]\n\n    with pytest.raises(ValueError, match=\"resampling diagnostic exceeds bound\"):\n        resampling_step_gpu(\n            particles,\n            counts,\n            buffers,\n            radius_cubed_relative_error=0.0,\n            mean_radius_relative_error=0.0,\n            surface_relative_error=0.0,\n            diversity_absolute_error=0.0,\n        )\n\n    for value, expected in zip(\n        vars(particles).values(), snapshots, strict=True\n    ):\n        npt.assert_array_equal(value.numpy(), expected)",
+    "successor": "particula/gpu/kernels/tests/exhaustion_test.py::test_resampling_failed_diagnostics_do_not_commit_particles",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/exhaustion_test.py",
+    "test": "test_resampling_orders_sources_by_cpu_key_stably",
+    "original": "def test_resampling_orders_sources_by_cpu_key_stably() -> None:\n    \"\"\"The direct planner sorts active sources by the documented CPU key.\"\"\"\n    from particula.gpu.kernels.exhaustion import resampling_step_gpu\n\n    masses = np.array([[[5.0], [1.0], [3.0], [2.0], [4.0]]], dtype=np.float64)\n    concentration = np.ones((1, 5), dtype=np.float64)\n    charge = np.zeros((1, 5), dtype=np.float64)\n    density = np.array([1.0], dtype=np.float64)\n    counts = np.array([2], dtype=np.int32)\n    particles, counts, buffers = _custom_state(\n        masses, concentration, charge, density, counts\n    )\n\n    assert resampling_step_gpu(particles, counts, buffers) is particles\n    assert buffers.sorted_indices.numpy()[0].tolist() == [1, 3, 2, 4, 0]\n    assert buffers.retained_indices.numpy()[0, :3].tolist() == [0, 1, 2]\n    assert buffers.released_indices.numpy()[0, :2].tolist() == [3, 4]",
+    "successor": "particula/gpu/kernels/tests/exhaustion_test.py::test_resampling_orders_sources_by_cpu_key_stably",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/exhaustion_test.py",
+    "test": "test_resampling_rejects_invalid_density_without_mutation",
+    "original": "def test_resampling_rejects_invalid_density_without_mutation() -> None:\n    \"\"\"Density validation rejects nonpositive species values before planning.\"\"\"\n    from particula.gpu.kernels.exhaustion import resampling_step_gpu\n\n    particles, counts, buffers = _state()\n    wp = _warp()\n    particles.density = wp.array([1.0, 0.0], dtype=wp.float64, device=\"cpu\")\n    count_container = SimpleNamespace(counts=counts)\n    snapshots = _snapshot(particles, count_container, buffers)\n\n    with pytest.raises(\n        ValueError,\n        match=\"particles or required_release_counts have invalid values\",\n    ):\n        resampling_step_gpu(particles, counts, buffers)\n\n    _assert_snapshot(snapshots, particles, count_container, buffers)",
+    "successor": "particula/gpu/kernels/tests/exhaustion_test.py::test_resampling_rejects_invalid_density_without_mutation",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/exhaustion_test.py",
+    "test": "test_resampling_rejects_diversity_bound_failure_without_commit",
+    "original": "def test_resampling_rejects_diversity_bound_failure_without_commit() -> None:\n    \"\"\"The planning pass surfaces diversity violations before commit.\"\"\"\n    from particula.gpu.kernels.exhaustion import resampling_step_gpu\n\n    particles, counts, buffers = _custom_state(\n        masses=np.array([[[1.0, 0.0], [0.0, 1.0]]], dtype=np.float64),\n        concentration=np.array([[1.0, 1.0]], dtype=np.float64),\n        charge=np.zeros((1, 2), dtype=np.float64),\n        density=np.array([1.0, 1.0], dtype=np.float64),\n        counts=np.array([1], dtype=np.int32),\n    )\n    count_container = SimpleNamespace(counts=counts)\n    snapshots = _snapshot(particles, count_container)\n\n    with pytest.raises(ValueError, match=\"resampling diagnostic exceeds bound\"):\n        resampling_step_gpu(\n            particles,\n            counts,\n            buffers,\n            diversity_absolute_error=0.0,\n        )\n\n    _assert_snapshot(snapshots, particles, count_container)\n    assert buffers.planning_status.numpy().tolist() == [5]",
+    "successor": "particula/gpu/kernels/tests/exhaustion_test.py::test_resampling_rejects_diversity_bound_failure_without_commit",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/exhaustion_test.py",
+    "test": "test_resampling_pure_species_zero_diversity_bound_preserves_inventory",
+    "original": "def test_resampling_pure_species_zero_diversity_bound_preserves_inventory() -> (\n    None\n):\n    \"\"\"A one-species source has exact diversity despite nonzero remapping error.\"\"\"\n    from particula.gpu.kernels.exhaustion import resampling_step_gpu\n\n    particles, counts, buffers = _custom_state(\n        masses=np.array([[[1.0, 0.0], [3.0, 0.0], [9.0, 0.0]]]),\n        concentration=np.array([[1.0, 2.0, 4.0]]),\n        charge=np.array([[1.0, -2.0, 3.0]]),\n        density=np.array([1.0, 1.0]),\n        counts=np.array([1], dtype=np.int32),\n    )\n    before_mass = np.sum(\n        particles.masses.numpy() * particles.concentration.numpy()[..., None],\n        axis=1,\n    )\n    before_charge = np.sum(\n        particles.charge.numpy() * particles.concentration.numpy(), axis=1\n    )\n\n    assert (\n        resampling_step_gpu(\n            particles, counts, buffers, diversity_absolute_error=0.0\n        )\n        is particles\n    )\n\n    assert buffers.planning_status.numpy().tolist() == [0]\n    assert buffers.diversity_absolute_error.numpy().tolist() == [0.0]\n    npt.assert_allclose(\n        np.sum(\n            particles.masses.numpy()\n            * particles.concentration.numpy()[..., None],\n            axis=1,\n        ),\n        before_mass,\n        rtol=1e-12,\n        atol=1e-30,\n    )\n    npt.assert_allclose(\n        np.sum(\n            particles.charge.numpy() * particles.concentration.numpy(), axis=1\n        ),\n        before_charge,\n        rtol=1e-12,\n        atol=1e-30,\n    )",
+    "successor": "particula/gpu/kernels/tests/exhaustion_test.py::test_resampling_pure_species_zero_diversity_bound_preserves_inventory",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/exhaustion_test.py",
+    "test": "test_resampling_nonfinite_planning_rejects_all_box_commits",
+    "original": "def test_resampling_nonfinite_planning_rejects_all_box_commits() -> None:\n    \"\"\"An overflowing box prevents a valid sibling box from committing.\"\"\"\n    from particula.gpu.kernels.exhaustion import (\n        PLANNING_NONFINITE_FAILURE,\n        resampling_step_gpu,\n    )\n\n    particles, counts, buffers = _custom_state(\n        masses=np.array(\n            [\n                [[1.0, 0.0], [2.0, 0.0], [0.0, 0.0]],\n                [[1.0, 0.0], [3.0, 1.0], [8.0, 0.0]],\n            ]\n        ),\n        concentration=np.array([[1e308, 1e308, 0.0], [1.0, 2.0, 3.0]]),\n        charge=np.zeros((2, 3)),\n        density=np.array([1.0, 1.0]),\n        counts=np.array([1, 1], dtype=np.int32),\n    )\n    count_container = SimpleNamespace(counts=counts)\n    particle_snapshot = _snapshot(particles, count_container)\n\n    with pytest.raises(ValueError, match=\"resampling diagnostic exceeds bound\"):\n        resampling_step_gpu(particles, counts, buffers)\n\n    _assert_snapshot(particle_snapshot, particles, count_container)\n    assert buffers.planning_status.numpy().tolist() == [\n        PLANNING_NONFINITE_FAILURE,\n        0,\n    ]",
+    "successor": "particula/gpu/kernels/tests/exhaustion_test.py::test_resampling_nonfinite_planning_rejects_all_box_commits",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/exhaustion_test.py",
+    "test": "test_resampling_rejects_duplicate_and_protected_alias_without_mutation",
+    "original": "def test_resampling_rejects_duplicate_and_protected_alias_without_mutation() -> (\n    None\n):\n    \"\"\"Duplicate buffers and count-buffer aliasing fail before any caller write.\"\"\"\n    from particula.gpu.kernels.exhaustion import resampling_step_gpu\n\n    particles, counts, buffers = _state()\n    for invalid_buffers in (\n        replace(buffers, released_counts=buffers.retained_counts),\n        replace(buffers, planning_status=counts),\n    ):\n        count_container = SimpleNamespace(counts=counts)\n        snapshots = _snapshot(particles, count_container, buffers)\n        with pytest.raises(\n            ValueError, match=\"resampling arrays must not overlap\"\n        ):\n            resampling_step_gpu(particles, counts, invalid_buffers)\n        _assert_snapshot(snapshots, particles, count_container, buffers)",
+    "successor": "particula/gpu/kernels/tests/exhaustion_test.py::test_resampling_rejects_duplicate_and_protected_alias_without_mutation",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/exhaustion_test.py",
+    "test": "test_resampling_rejects_strided_masses_without_mutation",
+    "original": "def test_resampling_rejects_strided_masses_without_mutation() -> None:\n    \"\"\"A strided Warp mass view is rejected before values or buffers are read.\"\"\"\n    wp = _warp()\n    from particula.gpu.kernels.exhaustion import resampling_step_gpu\n\n    particles, counts, buffers = _custom_state(\n        masses=np.array([[[1.0, 0.0], [3.0, 1.0]]]),\n        concentration=np.array([[1.0, 2.0]]),\n        charge=np.zeros((1, 2)),\n        density=np.array([1.0, 1.0]),\n        counts=np.array([1], dtype=np.int32),\n    )\n    backing = wp.zeros((1, 4, 2), dtype=wp.float64, device=\"cpu\")\n    particles.masses = wp.array(\n        ptr=backing.ptr,\n        capacity=backing.capacity,\n        dtype=wp.float64,\n        shape=(1, 2, 2),\n        strides=(64, 32, 8),\n        device=\"cpu\",\n        copy=False,\n    )\n    count_container = SimpleNamespace(counts=counts)\n    snapshots = _snapshot(particles, count_container, buffers)\n\n    with pytest.raises(ValueError, match=\"masses must be a contiguous\"):\n        resampling_step_gpu(particles, counts, buffers)\n\n    _assert_snapshot(snapshots, particles, count_container, buffers)",
+    "successor": "particula/gpu/kernels/tests/exhaustion_test.py::test_resampling_rejects_strided_masses_without_mutation",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/exhaustion_test.py",
+    "test": "test_resampling_rejects_invalid_release_counts_without_mutation",
+    "original": "def test_resampling_rejects_invalid_release_counts_without_mutation(\n    count: int,\n) -> None:\n    \"\"\"Release counts outside the active-capacity range are preflight errors.\"\"\"\n    from particula.gpu.kernels.exhaustion import resampling_step_gpu\n\n    particles, _, buffers = _state()\n    wp = _warp()\n    counts = wp.array([count], dtype=wp.int32, device=\"cpu\")\n    snapshots = [value.numpy().copy() for value in vars(particles).values()]\n    snapshots.extend(value.numpy().copy() for value in vars(buffers).values())\n\n    with pytest.raises(\n        ValueError,\n        match=\"particles or required_release_counts have invalid values\",\n    ):\n        resampling_step_gpu(particles, counts, buffers)\n\n    values = list(vars(particles).values()) + list(vars(buffers).values())\n    for value, expected in zip(values, snapshots, strict=True):\n        npt.assert_array_equal(value.numpy(), expected)",
+    "successor": "particula/gpu/kernels/tests/exhaustion_test.py::test_resampling_rejects_invalid_release_counts_without_mutation",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/exhaustion_test.py",
+    "test": "test_resampling_rejects_non_exact_or_invalid_bounds",
+    "original": "def test_resampling_rejects_non_exact_or_invalid_bounds(bound: Any) -> None:\n    \"\"\"Diagnostic bounds accept only finite nonnegative exact Python floats.\"\"\"\n    from particula.gpu.kernels.exhaustion import resampling_step_gpu\n\n    particles, counts, buffers = _state()\n    count_container = SimpleNamespace(counts=counts)\n    snapshots = _snapshot(particles, count_container, buffers)\n    with pytest.raises(\n        (TypeError, ValueError), match=\"radius_cubed_relative_error\"\n    ):\n        resampling_step_gpu(  # type: ignore[arg-type]\n            particles, counts, buffers, radius_cubed_relative_error=bound\n        )\n    _assert_snapshot(snapshots, particles, count_container, buffers)",
+    "successor": "particula/gpu/kernels/tests/exhaustion_test.py::test_resampling_rejects_non_exact_or_invalid_bounds",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/exhaustion_test.py",
+    "test": "test_resampling_multi_box_multi_species_matches_independent_numpy_oracle",
+    "original": "def test_resampling_multi_box_multi_species_matches_independent_numpy_oracle() -> (\n    None\n):\n    \"\"\"Warp CPU P2 outputs and diagnostics match the independent oracle.\"\"\"\n    _assert_multi_box_oracle_parity(device=\"cpu\")",
+    "successor": "particula/gpu/kernels/tests/exhaustion_test.py::test_resampling_multi_box_multi_species_matches_independent_numpy_oracle",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/exhaustion_test.py",
+    "test": "test_resampling_cuda_multi_box_multi_species_matches_numpy_oracle",
+    "original": "def test_resampling_cuda_multi_box_multi_species_matches_numpy_oracle() -> None:\n    \"\"\"CUDA P2 parity is optional and cleanly skipped on hosts without CUDA.\"\"\"\n    wp = _warp()\n    if not wp.is_cuda_available():\n        pytest.skip(\"CUDA is unavailable\")\n    _assert_multi_box_oracle_parity(device=\"cuda:0\")",
+    "successor": "particula/gpu/kernels/tests/exhaustion_test.py::test_resampling_cuda_multi_box_multi_species_matches_numpy_oracle",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/exhaustion_test.py",
+    "test": "test_resampling_benchmark_smoke_uses_opt_in_marker",
+    "original": "def test_resampling_benchmark_smoke_uses_opt_in_marker() -> None:\n    \"\"\"Keep allocation-sensitive timing evidence behind the benchmark opt-in.\"\"\"\n    from particula.gpu.kernels.exhaustion import resampling_step_gpu\n\n    particles, counts, buffers = _state()\n    assert resampling_step_gpu(particles, counts, buffers) is particles",
+    "successor": "particula/gpu/kernels/tests/exhaustion_test.py::test_resampling_benchmark_smoke_uses_opt_in_marker",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/exhaustion_test.py",
+    "test": "test_gpu_representative_volume_scaling_matches_numpy_oracle",
+    "original": "def test_gpu_representative_volume_scaling_matches_numpy_oracle() -> None:\n    \"\"\"Concrete P4 scales only selected Warp rows and emits diagnostics.\"\"\"\n    wp = _warp()\n    from particula.gpu.kernels.exhaustion import (\n        representative_volume_scaling_step_gpu,\n    )\n\n    masses = np.array(\n        [[[1.0, 0.0], [2.0, 1.0]], [[3.0, 0.0], [4.0, 2.0]]],\n        dtype=np.float64,\n    )\n    concentration = np.array([[2.0, 3.0], [5.0, 7.0]], dtype=np.float64)\n    particles = SimpleNamespace(\n        masses=wp.array(masses, dtype=wp.float64, device=\"cpu\"),\n        concentration=wp.array(concentration, dtype=wp.float64, device=\"cpu\"),\n        charge=wp.array(\n            [[1.0, 2.0], [3.0, 4.0]], dtype=wp.float64, device=\"cpu\"\n        ),\n        density=wp.array([1.0, 1.0], dtype=wp.float64, device=\"cpu\"),\n        volume=wp.array([4.0, 6.0], dtype=wp.float64, device=\"cpu\"),\n    )\n    demand = wp.array([3.0, 2.0], dtype=wp.float64, device=\"cpu\")\n    flags = wp.array([1, 0], dtype=wp.int32, device=\"cpu\")\n    requested = wp.array([0.5, 0.75], dtype=wp.float64, device=\"cpu\")\n    minimum = wp.array([0.25, 0.5], dtype=wp.float64, device=\"cpu\")\n    minimum_volume = wp.array([1.0, 1.0], dtype=wp.float64, device=\"cpu\")\n    resolved = wp.zeros(2, dtype=wp.float64, device=\"cpu\")\n    original_mass = particles.masses.numpy().copy()\n    original_charge = particles.charge.numpy().copy()\n\n    returned = representative_volume_scaling_step_gpu(\n        particles, demand, flags, requested, minimum, minimum_volume, resolved\n    )\n\n    assert returned[0] is particles\n    assert returned[1] is demand\n    assert returned[2] is resolved\n    wp.synchronize_device(\"cpu\")\n    npt.assert_allclose(particles.volume.numpy(), [2.0, 6.0])\n    npt.assert_allclose(\n        particles.concentration.numpy(), [[1.0, 1.5], [5.0, 7.0]]\n    )\n    npt.assert_allclose(demand.numpy(), [1.5, 2.0])\n    npt.assert_allclose(resolved.numpy(), [0.5, 1.0])\n    npt.assert_array_equal(particles.masses.numpy(), original_mass)\n    npt.assert_array_equal(particles.charge.numpy(), original_charge)",
+    "successor": "particula/gpu/kernels/tests/exhaustion_test.py::test_gpu_representative_volume_scaling_matches_numpy_oracle",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/exhaustion_test.py",
+    "test": "test_gpu_representative_volume_scaling_rejects_late_invalid_row",
+    "original": "def test_gpu_representative_volume_scaling_rejects_late_invalid_row() -> None:\n    \"\"\"A later P4 bound failure leaves particles and every sidecar unchanged.\"\"\"\n    wp = _warp()\n    from particula.gpu.kernels.exhaustion import (\n        representative_volume_scaling_step_gpu,\n    )\n\n    particles, _, _ = _custom_state(\n        np.array([[[1.0]], [[2.0]]]),\n        np.array([[1.0], [2.0]]),\n        np.zeros((2, 1)),\n        np.array([1.0]),\n        np.zeros(2, dtype=np.int32),\n    )\n    particles.volume = wp.array([2.0, 1.0], dtype=wp.float64, device=\"cpu\")\n    demand = wp.array([1.0, 1.0], dtype=wp.float64, device=\"cpu\")\n    flags = wp.array([1, 1], dtype=wp.int32, device=\"cpu\")\n    requested = wp.array([0.5, 0.5], dtype=wp.float64, device=\"cpu\")\n    minimum = wp.array([0.25, 0.25], dtype=wp.float64, device=\"cpu\")\n    minimum_volume = wp.array([0.5, 1.0], dtype=wp.float64, device=\"cpu\")\n    resolved = wp.array([9.0, 9.0], dtype=wp.float64, device=\"cpu\")\n    sidecars = SimpleNamespace(\n        demand=demand,\n        flags=flags,\n        requested=requested,\n        minimum=minimum,\n        minimum_volume=minimum_volume,\n        resolved=resolved,\n    )\n    snapshot = _snapshot(particles, sidecars)\n    with pytest.raises(ValueError, match=\"representative scaling sidecars\"):\n        representative_volume_scaling_step_gpu(\n            particles,\n            demand,\n            flags,\n            requested,\n            minimum,\n            minimum_volume,\n            resolved,\n        )\n    _assert_snapshot(snapshot, particles, sidecars)",
+    "successor": "particula/gpu/kernels/tests/exhaustion_test.py::test_gpu_representative_volume_scaling_rejects_late_invalid_row",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/exhaustion_test.py",
+    "test": "test_gpu_representative_volume_scaling_rejects_zeroing_active_slot",
+    "original": "def test_gpu_representative_volume_scaling_rejects_zeroing_active_slot() -> (\n    None\n):\n    \"\"\"P4 rejects an active concentration that would underflow to zero.\"\"\"\n    wp = _warp()\n    from particula.gpu.kernels.exhaustion import (\n        representative_volume_scaling_step_gpu,\n    )\n\n    particles, _, _ = _custom_state(\n        np.array([[[1.0]]]),\n        np.array([[np.nextafter(0.0, 1.0)]]),\n        np.zeros((1, 1)),\n        np.array([1.0]),\n        np.zeros(1, dtype=np.int32),\n    )\n    demand = wp.array([1.0], dtype=wp.float64, device=\"cpu\")\n    flags = wp.array([1], dtype=wp.int32, device=\"cpu\")\n    requested = wp.array([0.5], dtype=wp.float64, device=\"cpu\")\n    minimum = wp.array([0.25], dtype=wp.float64, device=\"cpu\")\n    minimum_volume = wp.array([0.1], dtype=wp.float64, device=\"cpu\")\n    resolved = wp.array([9.0], dtype=wp.float64, device=\"cpu\")\n    sidecars = SimpleNamespace(\n        demand=demand,\n        flags=flags,\n        requested=requested,\n        minimum=minimum,\n        minimum_volume=minimum_volume,\n        resolved=resolved,\n    )\n    snapshot = _snapshot(particles, sidecars)\n\n    with pytest.raises(ValueError, match=\"representative scaling sidecars\"):\n        representative_volume_scaling_step_gpu(\n            particles,\n            demand,\n            flags,\n            requested,\n            minimum,\n            minimum_volume,\n            resolved,\n        )\n\n    _assert_snapshot(snapshot, particles, sidecars)",
+    "successor": "particula/gpu/kernels/tests/exhaustion_test.py::test_gpu_representative_volume_scaling_rejects_zeroing_active_slot",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/exhaustion_test.py",
+    "test": "test_gpu_representative_volume_scaling_preflights_every_active_slot",
+    "original": "def test_gpu_representative_volume_scaling_preflights_every_active_slot() -> (\n    None\n):\n    \"\"\"P4 rejects a later active lane that would underflow on scaling.\"\"\"\n    wp = _warp()\n    from particula.gpu.kernels.exhaustion import (\n        representative_volume_scaling_step_gpu,\n    )\n\n    particles, _, _ = _custom_state(\n        np.array([[[1.0], [1.0]]]),\n        np.array([[1.0, np.nextafter(0.0, 1.0)]]),\n        np.zeros((1, 2)),\n        np.array([1.0]),\n        np.zeros(1, dtype=np.int32),\n    )\n    demand = wp.array([1.0], dtype=wp.float64, device=\"cpu\")\n    flags = wp.array([1], dtype=wp.int32, device=\"cpu\")\n    requested = wp.array([0.5], dtype=wp.float64, device=\"cpu\")\n    minimum = wp.array([0.25], dtype=wp.float64, device=\"cpu\")\n    minimum_volume = wp.array([0.1], dtype=wp.float64, device=\"cpu\")\n    resolved = wp.array([9.0], dtype=wp.float64, device=\"cpu\")\n    sidecars = SimpleNamespace(\n        demand=demand,\n        flags=flags,\n        requested=requested,\n        minimum=minimum,\n        minimum_volume=minimum_volume,\n        resolved=resolved,\n    )\n    snapshot = _snapshot(particles, sidecars)\n\n    with pytest.raises(ValueError, match=\"representative scaling sidecars\"):\n        representative_volume_scaling_step_gpu(\n            particles,\n            demand,\n            flags,\n            requested,\n            minimum,\n            minimum_volume,\n            resolved,\n        )\n\n    _assert_snapshot(snapshot, particles, sidecars)",
+    "successor": "particula/gpu/kernels/tests/exhaustion_test.py::test_gpu_representative_volume_scaling_preflights_every_active_slot",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/exhaustion_test.py",
+    "test": "test_gpu_representative_volume_scaling_zero_demand_writes_diagnostic_only",
+    "original": "def test_gpu_representative_volume_scaling_zero_demand_writes_diagnostic_only() -> (\n    None\n):\n    \"\"\"P4 leaves non-diagnostic Warp storage untouched for zero demand.\"\"\"\n    wp = _warp()\n    from particula.gpu.kernels.exhaustion import (\n        representative_volume_scaling_step_gpu,\n    )\n\n    particles, _, _ = _custom_state(\n        np.array([[[1.0]], [[2.0]]]),\n        np.array([[1.0], [2.0]]),\n        np.zeros((2, 1)),\n        np.array([1.0]),\n        np.zeros(2, dtype=np.int32),\n    )\n    demand = wp.zeros(2, dtype=wp.float64, device=\"cpu\")\n    flags = wp.array([1, 1], dtype=wp.int32, device=\"cpu\")\n    requested = wp.array([0.5, 0.5], dtype=wp.float64, device=\"cpu\")\n    minimum = wp.array([0.25, 0.25], dtype=wp.float64, device=\"cpu\")\n    minimum_volume = wp.array([0.1, 0.1], dtype=wp.float64, device=\"cpu\")\n    resolved = wp.zeros(2, dtype=wp.float64, device=\"cpu\")\n    sidecars = SimpleNamespace(\n        demand=demand,\n        flags=flags,\n        requested=requested,\n        minimum=minimum,\n        minimum_volume=minimum_volume,\n    )\n    snapshot = _snapshot(particles, sidecars)\n\n    returned = representative_volume_scaling_step_gpu(\n        particles, demand, flags, requested, minimum, minimum_volume, resolved\n    )\n\n    assert returned == (particles, demand, resolved)\n    wp.synchronize_device(\"cpu\")\n    _assert_snapshot(snapshot, particles, sidecars)\n    npt.assert_array_equal(resolved.numpy(), np.ones(2))",
+    "successor": "particula/gpu/kernels/tests/exhaustion_test.py::test_gpu_representative_volume_scaling_zero_demand_writes_diagnostic_only",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/exhaustion_test.py",
+    "test": "test_gpu_representative_volume_scaling_false_flags_write_diagnostic_only",
+    "original": "def test_gpu_representative_volume_scaling_false_flags_write_diagnostic_only() -> (\n    None\n):\n    \"\"\"False P4 flags leave positive-demand Warp rows unchanged and report one.\"\"\"\n    wp = _warp()\n    from particula.gpu.kernels.exhaustion import (\n        representative_volume_scaling_step_gpu,\n    )\n\n    particles, _, _ = _custom_state(\n        np.array([[[1.0]], [[2.0]]]),\n        np.array([[1.0], [2.0]]),\n        np.zeros((2, 1)),\n        np.array([1.0]),\n        np.zeros(2, dtype=np.int32),\n    )\n    demand = wp.array([1.0, 2.0], dtype=wp.float64, device=\"cpu\")\n    flags = wp.zeros(2, dtype=wp.int32, device=\"cpu\")\n    requested = wp.array([0.5, 0.5], dtype=wp.float64, device=\"cpu\")\n    minimum = wp.array([0.25, 0.25], dtype=wp.float64, device=\"cpu\")\n    minimum_volume = wp.array([0.1, 0.1], dtype=wp.float64, device=\"cpu\")\n    resolved = wp.zeros(2, dtype=wp.float64, device=\"cpu\")\n    sidecars = SimpleNamespace(\n        demand=demand,\n        flags=flags,\n        requested=requested,\n        minimum=minimum,\n        minimum_volume=minimum_volume,\n    )\n    snapshot = _snapshot(particles, sidecars)\n\n    returned = representative_volume_scaling_step_gpu(\n        particles, demand, flags, requested, minimum, minimum_volume, resolved\n    )\n\n    assert returned[0] is particles\n    assert returned[1] is demand\n    assert returned[2] is resolved\n    wp.synchronize_device(\"cpu\")\n    _assert_snapshot(snapshot, particles, sidecars)\n    npt.assert_array_equal(resolved.numpy(), np.ones(2))",
+    "successor": "particula/gpu/kernels/tests/exhaustion_test.py::test_gpu_representative_volume_scaling_false_flags_write_diagnostic_only",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/exhaustion_test.py",
+    "test": "test_gpu_representative_volume_scaling_subnormal_demand_is_atomic",
+    "original": "def test_gpu_representative_volume_scaling_subnormal_demand_is_atomic() -> None:\n    \"\"\"Warp CPU P4 selection remains immutable when demand underflows on write.\"\"\"\n    _assert_p4_subnormal_demand_scaling(device=\"cpu\")",
+    "successor": "particula/gpu/kernels/tests/exhaustion_test.py::test_gpu_representative_volume_scaling_subnormal_demand_is_atomic",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/exhaustion_test.py",
+    "test": "test_gpu_representative_volume_scaling_cuda_matches_subnormal_oracle",
+    "original": "def test_gpu_representative_volume_scaling_cuda_matches_subnormal_oracle() -> (\n    None\n):\n    \"\"\"CUDA P4 subnormal-demand parity is optional and cleanly guarded.\"\"\"\n    wp = _warp()\n    if not wp.is_cuda_available():\n        pytest.skip(\"CUDA is unavailable\")\n    _assert_p4_subnormal_demand_scaling(device=\"cuda:0\")",
+    "successor": "particula/gpu/kernels/tests/exhaustion_test.py::test_gpu_representative_volume_scaling_cuda_matches_subnormal_oracle",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/exhaustion_test.py",
+    "test": "test_gpu_representative_volume_scaling_empty_invalid_density_rejects",
+    "original": "def test_gpu_representative_volume_scaling_empty_invalid_density_rejects() -> (\n    None\n):\n    \"\"\"Empty P4 inputs still reject invalid global density before output writes.\"\"\"\n    wp = _warp()\n    from particula.gpu.kernels.exhaustion import (\n        representative_volume_scaling_step_gpu,\n    )\n\n    particles = SimpleNamespace(\n        masses=wp.zeros((0, 1, 1), dtype=wp.float64, device=\"cpu\"),\n        concentration=wp.zeros((0, 1), dtype=wp.float64, device=\"cpu\"),\n        charge=wp.zeros((0, 1), dtype=wp.float64, device=\"cpu\"),\n        density=wp.array([-1.0], dtype=wp.float64, device=\"cpu\"),\n        volume=wp.zeros(0, dtype=wp.float64, device=\"cpu\"),\n    )\n    demand = wp.zeros(0, dtype=wp.float64, device=\"cpu\")\n    flags = wp.zeros(0, dtype=wp.int32, device=\"cpu\")\n    requested = wp.zeros(0, dtype=wp.float64, device=\"cpu\")\n    minimum = wp.zeros(0, dtype=wp.float64, device=\"cpu\")\n    minimum_volume = wp.zeros(0, dtype=wp.float64, device=\"cpu\")\n    resolved = wp.zeros(0, dtype=wp.float64, device=\"cpu\")\n\n    with pytest.raises(ValueError, match=\"representative scaling sidecars\"):\n        representative_volume_scaling_step_gpu(\n            particles,\n            demand,\n            flags,\n            requested,\n            minimum,\n            minimum_volume,\n            resolved,\n        )\n    npt.assert_array_equal(resolved.numpy(), np.empty(0, dtype=np.float64))",
+    "successor": "particula/gpu/kernels/tests/exhaustion_test.py::test_gpu_representative_volume_scaling_empty_invalid_density_rejects",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/exhaustion_test.py",
+    "test": "test_resampling_source_fixture_conserves_each_box_and_species",
+    "original": "def test_resampling_source_fixture_conserves_each_box_and_species() -> None:\n    \"\"\"Warp CPU P2 ledger includes only already-admitted external source state.\"\"\"\n    _assert_source_and_resampling_matrix(\"cpu\")",
+    "successor": "particula/gpu/kernels/tests/exhaustion_test.py::test_resampling_source_fixture_conserves_each_box_and_species",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/exhaustion_test.py",
+    "test": "test_resampling_cuda_source_fixture_conserves_each_box_and_species",
+    "original": "def test_resampling_cuda_source_fixture_conserves_each_box_and_species() -> (\n    None\n):\n    \"\"\"CUDA source-plus-particle P2 evidence remains optional.\"\"\"\n    if not _warp().is_cuda_available():\n        pytest.skip(\"CUDA is unavailable\")\n    _assert_source_and_resampling_matrix(\"cuda:0\")",
+    "successor": "particula/gpu/kernels/tests/exhaustion_test.py::test_resampling_cuda_source_fixture_conserves_each_box_and_species",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/exhaustion_test.py",
+    "test": "test_resampling_active_count_rejection_preserves_count_and_buffers",
+    "original": "def test_resampling_active_count_rejection_preserves_count_and_buffers() -> (\n    None\n):\n    \"\"\"Count equal to active capacity is a write-free preflight failure.\"\"\"\n    from particula.gpu.kernels.exhaustion import resampling_step_gpu\n\n    particles, _, buffers = _state()\n    wp = _warp()\n    counts = wp.array([3], dtype=wp.int32, device=\"cpu\")\n    count_container = SimpleNamespace(counts=counts)\n    snapshot = _snapshot(particles, count_container, buffers)\n    with pytest.raises(ValueError, match=\"invalid values\"):\n        resampling_step_gpu(particles, counts, buffers)\n    _assert_snapshot(snapshot, particles, count_container, buffers)",
+    "successor": "particula/gpu/kernels/tests/exhaustion_test.py::test_resampling_active_count_rejection_preserves_count_and_buffers",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/exhaustion_test.py",
+    "test": "test_resampling_full_capacity_fixture_conserves_particle_ledger",
+    "original": "def test_resampling_full_capacity_fixture_conserves_particle_ledger() -> None:\n    \"\"\"A five-slot, two-species full row preserves each particle ledger lane.\"\"\"\n    from particula.gpu.kernels.exhaustion import resampling_step_gpu\n\n    masses = np.array(\n        [\n            [\n                [1.0e-21, 2.0e-18],\n                [3.0e-15, 4.0e-12],\n                [5.0e-9, 6.0e-6],\n                [7.0e-3, 8.0],\n                [9.0, 1.0e-12],\n            ]\n        ],\n        dtype=np.float64,\n    )\n    concentration = np.array([[1.0, 2.0, 3.0, 4.0, 5.0]])\n    charge = np.array([[1.0, -2.0, 3.0, -4.0, 5.0]])\n    particles, counts, buffers = _custom_state(\n        masses,\n        concentration,\n        charge,\n        np.array([1000.0, 2000.0]),\n        np.array([2], dtype=np.int32),\n    )\n    before = _direct_particle_ledger(\n        masses,\n        concentration,\n        charge,\n        np.ones(1, dtype=np.float64),\n        include_volume=False,\n    )\n    assert resampling_step_gpu(particles, counts, buffers) is particles\n    _assert_direct_ledger(\n        _direct_particle_ledger(\n            particles.masses.numpy(),\n            particles.concentration.numpy(),\n            particles.charge.numpy(),\n            particles.volume.numpy(),\n            include_volume=False,\n        ),\n        before,\n    )\n    npt.assert_array_equal(buffers.released_indices.numpy()[0, :2], [3, 4])",
+    "successor": "particula/gpu/kernels/tests/exhaustion_test.py::test_resampling_full_capacity_fixture_conserves_particle_ledger",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/exhaustion_test.py",
+    "test": "test_gpu_representative_scaling_source_fixture_uses_volume_ledger",
+    "original": "def test_gpu_representative_scaling_source_fixture_uses_volume_ledger() -> None:\n    \"\"\"Warp CPU P4 selected rows preserve explicit volume-ledger accounting.\"\"\"\n    _assert_p4_source_ledger(\"cpu\")",
+    "successor": "particula/gpu/kernels/tests/exhaustion_test.py::test_gpu_representative_scaling_source_fixture_uses_volume_ledger",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/exhaustion_test.py",
+    "test": "test_gpu_representative_scaling_cuda_source_fixture_uses_volume_ledger",
+    "original": "def test_gpu_representative_scaling_cuda_source_fixture_uses_volume_ledger() -> (\n    None\n):\n    \"\"\"CUDA P4 source-ledger evidence is optional and guarded.\"\"\"\n    if not _warp().is_cuda_available():\n        pytest.skip(\"CUDA is unavailable\")\n    _assert_p4_source_ledger(\"cuda:0\")",
+    "successor": "particula/gpu/kernels/tests/exhaustion_test.py::test_gpu_representative_scaling_cuda_source_fixture_uses_volume_ledger",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/exhaustion_native_test.py",
+    "test": "test_native_resampling_preserves_count_moments",
+    "original": "def test_native_resampling_preserves_count_moments(device):\n    \"\"\"Releasing a slot preserves count-weighted mass and charge at V!=1.\"\"\"\n    from particula.gpu.kernels.exhaustion import resampling_step_gpu\n\n    particles, counts, buffers = native_state(device)\n    before = moments(particles)\n    assert resampling_step_gpu(particles, counts, buffers) is particles\n    for actual, expected in zip(moments(particles), before, strict=True):\n        np.testing.assert_allclose(actual, expected, rtol=1e-12, atol=1e-30)\n    np.testing.assert_array_equal(particles.volume.numpy(), [0.25])\n    assert np.count_nonzero(particles.concentration.numpy()) == 2",
+    "successor": "particula/gpu/kernels/tests/exhaustion_native_test.py::test_native_resampling_preserves_count_moments",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/exhaustion_native_test.py",
+    "test": "test_native_scaling_preserves_density_and_repeated_enqueue",
+    "original": "def test_native_scaling_preserves_density_and_repeated_enqueue(\n    device, monkeypatch\n):\n    \"\"\"Prepared count/volume scaling remains setup-free across repeated calls.\"\"\"\n    import warp as wp\n\n    from particula.gpu.kernels import exhaustion as module\n\n    particles, _, _ = native_state(device)\n    before = moments(particles)\n    demand = wp.array([8.0], dtype=wp.float64, device=device)\n    flag = wp.array([1], dtype=wp.int32, device=device)\n    factor = wp.array([0.5], dtype=wp.float64, device=device)\n    minimum = wp.array([0.25], dtype=wp.float64, device=device)\n    minimum_volume = wp.array([0.01], dtype=wp.float64, device=device)\n    resolved = wp.zeros(1, dtype=wp.float64, device=device)\n    prepared = module._prepare_representative_volume_scaling_step_gpu(\n        particles,\n        demand,\n        flag,\n        factor,\n        minimum,\n        minimum_volume,\n        resolved,\n    )\n    module._enqueue_prepared_representative_volume_scaling_call(prepared)\n    module._observe_prepared_representative_volume_scaling_call(prepared)\n\n    def forbidden(*args, **kwargs):\n        pytest.fail(\"prepared native scaling performed host setup\")\n\n    with monkeypatch.context() as patch:\n        for name in (\"zeros\", \"empty\", \"array\", \"full\", \"synchronize\"):\n            patch.setattr(wp, name, forbidden)\n        patch.setattr(prepared.status, \"numpy\", forbidden)\n        module._enqueue_prepared_representative_volume_scaling_call(prepared)\n    module._observe_prepared_representative_volume_scaling_call(prepared)\n    for actual, expected in zip(moments(particles), before, strict=True):\n        np.testing.assert_allclose(\n            actual, expected * 0.25, rtol=1e-12, atol=1e-30\n        )\n    np.testing.assert_array_equal(particles.volume.numpy(), [0.0625])\n    np.testing.assert_array_equal(demand.numpy(), [2.0])",
+    "successor": "particula/gpu/kernels/tests/exhaustion_native_test.py::test_native_scaling_preserves_density_and_repeated_enqueue",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/exhaustion_native_test.py",
+    "test": "test_native_resampling_live_density_overflow_rejects_without_commit",
+    "original": "def test_native_resampling_live_density_overflow_rejects_without_commit(device):\n    \"\"\"Prepared state retains live physical validation of count density.\"\"\"\n    import warp as wp\n\n    from particula.gpu.kernels import exhaustion as module\n\n    particles, counts, buffers = native_state(device)\n    prepared = module._prepare_resampling_step_gpu(particles, counts, buffers)\n    wp.copy(\n        particles.volume, wp.array([1e-309], dtype=wp.float64, device=device)\n    )\n    before = moments(particles)\n    module._enqueue_prepared_resampling_call(prepared)\n    with pytest.raises(ValueError, match=\"invalid values\"):\n        module._observe_prepared_resampling_call(prepared)\n    for actual, expected in zip(moments(particles), before, strict=True):\n        np.testing.assert_array_equal(actual, expected)",
+    "successor": "particula/gpu/kernels/tests/exhaustion_native_test.py::test_native_resampling_live_density_overflow_rejects_without_commit",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/exhaustion_native_test.py",
+    "test": "test_unsupported_native_populations_reject_before_payload",
+    "original": "def test_unsupported_native_populations_reject_before_payload(code, operation):\n    \"\"\"Fixed-slot exhaustion never treats PMF or PDF as resolved counts.\"\"\"\n    from particula.gpu.kernels import exhaustion as module\n\n    class Tagged:\n        distribution_kind = code\n\n        def __getattr__(self, name):\n            pytest.fail(f\"unsupported population accessed {name}\")\n\n    with pytest.raises(ValueError, match=\"only particle_resolved\"):\n        if operation == \"resampling\":\n            module._prepare_resampling_step_gpu(Tagged(), None, None)\n        else:\n            module._prepare_representative_volume_scaling_step_gpu(\n                Tagged(),\n                None,\n                None,\n                None,\n                None,\n                None,\n                None,\n            )",
+    "successor": "particula/gpu/kernels/tests/exhaustion_native_test.py::test_unsupported_native_populations_reject_before_payload",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/tests/population_boundary_test.py",
+    "test": "test_unmigrated_consumers_reject_before_payload_access",
+    "original": "def test_unmigrated_consumers_reject_before_payload_access(module, name, code):\n    \"\"\"Every direct/prepared route protects the newly transferable tag.\"\"\"\n    pytest.importorskip(\"warp\")\n    function = getattr(\n        importlib.import_module(f\"particula.gpu.kernels.{module}\"), name\n    )\n    kwargs = {\n        key: None\n        for key, parameter in inspect.signature(function).parameters.items()\n        if parameter.default is inspect.Parameter.empty\n    }\n    kwargs[\"particles\"] = _TaggedOnly()\n    kwargs[\"particles\"].distribution_kind = code\n    with pytest.raises(ValueError, match=\"require a migrated consumer\"):\n        function(**kwargs)",
+    "successor": "particula/gpu/tests/population_boundary_test.py::test_staged_nucleation_requires_metadata_and_binding",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Obsolete exhaustion implementations removed with absence assertions in their retained prepared tests; staged nucleation now rejects unsupported tags and resolved metadata without a binding, paired with positive native staged mapping tests."
+  },
+  {
+    "file": "particula/gpu/tests/population_boundary_test.py",
+    "test": "test_native_condensation_requires_binding_before_payload_access",
+    "original": "def test_native_condensation_requires_binding_before_payload_access():\n    \"\"\"A tag alone never implies an identity species map.\"\"\"\n    pytest.importorskip(\"warp\")\n    from particula.gpu.kernels.condensation import (\n        _prepare_condensation_step_gpu,\n    )\n\n    with pytest.raises(ValueError, match=\"requires species_binding\"):\n        _prepare_condensation_step_gpu(_TaggedOnly(), None, None, None, 0.1)",
+    "successor": "particula/gpu/tests/population_boundary_test.py::test_native_condensation_requires_binding_before_payload_access",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/tests/population_boundary_test.py",
+    "test": "test_native_coagulation_rejects_unsupported_population_before_payload",
+    "original": "def test_native_coagulation_rejects_unsupported_population_before_payload(code):\n    \"\"\"The resolved migration does not admit PMF or PDF selector algorithms.\"\"\"\n    pytest.importorskip(\"warp\")\n    from particula.gpu.kernels.coagulation import _prepare_coagulation_step_gpu\n\n    particles = _TaggedOnly()\n    particles.distribution_kind = code\n    with pytest.raises(ValueError, match=\"only particle_resolved\"):\n        _prepare_coagulation_step_gpu(particles, None, None, 0.1)",
+    "successor": "particula/gpu/tests/population_boundary_test.py::test_native_coagulation_rejects_unsupported_population_before_payload",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/tests/population_boundary_test.py",
+    "test": "test_native_wall_loss_rejects_unsupported_population_before_payload",
+    "original": "def test_native_wall_loss_rejects_unsupported_population_before_payload(code):\n    \"\"\"A resolved-removal kernel is not a PMF/PDF loss algorithm.\"\"\"\n    pytest.importorskip(\"warp\")\n    from particula.gpu.kernels.wall_loss import _prepare_wall_loss_step_gpu\n\n    particles = _TaggedOnly()\n    particles.distribution_kind = code\n    with pytest.raises(ValueError, match=\"only particle_resolved\"):\n        _prepare_wall_loss_step_gpu(particles, None, None, 0.1, config=None)",
+    "successor": "particula/gpu/tests/population_boundary_test.py::test_native_wall_loss_rejects_unsupported_population_before_payload",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  }
+]

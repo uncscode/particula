@@ -19,8 +19,10 @@ resolved requested factor for selected rows and ``1.0`` otherwise. It has no
 package export, policy, transfer, resizing, or runnable integration; callers
 own device placement and explicitly synchronize before observing results.
 
-Private prepared records preserve legacy validation and workspace allocation in
-setup. Enqueue dispatches retained device work only, without repeated host
+Direct and prepared entry points require explicit particle-resolved metadata.
+Untagged, discrete, and continuous-PDF populations reject before payload access.
+Prepared records pin native validation and workspace allocation in setup.
+Enqueue dispatches retained device work only, without repeated host
 metadata validation, readback, allocation, transfer, synchronization, lookup,
 rebinding, or recovery. Its established device-side dynamic validation runs
 against retained references. Rejection is pre-writer; rollback is not promised
@@ -48,7 +50,6 @@ from particula.gpu.kernels._population_validation import _scan_population
 from particula.gpu.kernels.environment import _is_warp_array_like
 from particula.gpu.population_metadata import (
     particle_distribution_code,
-    require_legacy_particle_metadata,
 )
 
 PLANNING_SUCCESS = 0
@@ -732,17 +733,6 @@ def _commit_resampling(
 
 
 @wp.kernel
-def _any_nonzero_demand(
-    counts: wp.array(dtype=wp.int32),
-    result: wp.array(dtype=wp.int32),
-) -> None:
-    """Record whether at least one box requests a remap."""
-    box = wp.tid()
-    if counts[box] != 0:
-        wp.atomic_add(result, 0, 1)
-
-
-@wp.kernel
 def _aggregate_planning_status(
     counts: wp.array(dtype=wp.int32),
     status: wp.array(dtype=wp.int32),
@@ -1028,412 +1018,6 @@ def _validate_buffers(
                 raise ValueError("resampling arrays must not overlap")
 
 
-def _execute_resampling_step_gpu(  # noqa: C901, PLR0913
-    particles: Any,
-    required_release_counts: Any,
-    buffers: ResamplingBuffers,
-    *,
-    radius_cubed_relative_error: float = 1.0,
-    mean_radius_relative_error: float = 1.0,
-    surface_relative_error: float = 1.0,
-    diversity_absolute_error: float = 1.0,
-) -> Any:
-    """Apply deterministic fixed-capacity P2 equal-weight remapping in place.
-
-    A nonzero per-box count selects remapping and must not exceed active slots
-    minus one; zero-demand boxes are write-free. The caller owns particles,
-    counts, and all buffer arrays. Preflight validates schemas, physical state,
-    and nonaliasing without writing caller storage. Planning may overwrite its
-    documented buffer lanes. A planning failure raises before the single commit
-    launch and therefore preserves particles; rollback is not promised after a
-    commit launch.
-
-    Args:
-        particles: Fixed-capacity Warp particle container with masses,
-            concentration, charge, density, and volume fields.
-        required_release_counts: Same-device ``int32`` release counts shaped
-            ``(B,)``. Counts are explicit inputs and are not modified.
-        buffers: Caller-owned, nonaliasing :class:`ResamplingBuffers` storage.
-        radius_cubed_relative_error: Exact Python ``float`` bound for the
-            finite, nonnegative relative radius-cubed error.
-        mean_radius_relative_error: Exact Python ``float`` bound for the
-            finite, nonnegative relative mean-radius error.
-        surface_relative_error: Exact Python ``float`` bound for the finite,
-            nonnegative relative surface-area error.
-        diversity_absolute_error: Exact Python ``float`` bound for the finite,
-            nonnegative absolute Riemer-diversity error.
-
-    Returns:
-        The identical particle container after a successful in-place commit or
-        a write-free empty/all-zero-demand call.
-
-    Raises:
-        TypeError: If a bound, caller array, or buffer record has an unsupported
-            type.
-        ValueError: If schemas, physical values, ownership, release counts, or
-            planning diagnostics are invalid.
-    """
-    require_legacy_particle_metadata(particles)
-    bounds = (
-        _require_exact_bound(
-            "radius_cubed_relative_error", radius_cubed_relative_error
-        ),
-        _require_exact_bound(
-            "mean_radius_relative_error", mean_radius_relative_error
-        ),
-        _require_exact_bound("surface_relative_error", surface_relative_error),
-        _require_exact_bound(
-            "diversity_absolute_error", diversity_absolute_error
-        ),
-    )
-    masses = _field(particles, "masses")
-    if not _is_warp_array_like(masses):
-        raise TypeError("masses must be a Warp array")
-    if masses.ndim != 3:
-        raise ValueError("masses must have rank 3")
-    if masses.dtype != wp.float64:
-        raise ValueError("masses must have dtype float64")
-    _require_contiguous_array(masses, "masses")
-    b, n, s = tuple(masses.shape)
-    if n == 0:
-        raise ValueError("particle capacity must be positive")
-    if s == 0:
-        raise ValueError("species capacity must be positive")
-    device = masses.device
-    concentration = _field(particles, "concentration")
-    charge = _field(particles, "charge")
-    density = _field(particles, "density")
-    volume = _field(particles, "volume")
-    _validate_array(
-        concentration, "concentration", 2, (b, n), wp.float64, device
-    )
-    _validate_array(charge, "charge", 2, (b, n), wp.float64, device)
-    _validate_array(density, "density", 1, (s,), wp.float64, device)
-    _validate_array(volume, "volume", 1, (b,), wp.float64, device)
-    _validate_array(
-        required_release_counts,
-        "required_release_counts",
-        1,
-        (b,),
-        wp.int32,
-        device,
-    )
-    _validate_buffers(
-        buffers,
-        b,
-        n,
-        s,
-        device,
-        [
-            masses,
-            concentration,
-            charge,
-            density,
-            volume,
-            required_release_counts,
-        ],
-    )
-    invalid = wp.zeros(1, dtype=wp.int32, device=device)
-    upstream_invalid = wp.zeros(1, dtype=wp.int32, device=device)
-    if b == 0:
-        wp.launch(
-            _scan_density,
-            dim=s,
-            inputs=[density, invalid],
-            device=device,
-        )
-        if invalid.numpy()[0] != 0:
-            raise ValueError(
-                "particles or required_release_counts have invalid values"
-            )
-        return particles
-    wp.launch(
-        _scan_particle_values,
-        dim=(b, n, s),
-        inputs=[masses, concentration, charge, density, volume, invalid],
-        device=device,
-    )
-    wp.launch(
-        _scan_density,
-        dim=s,
-        inputs=[density, invalid],
-        device=device,
-    )
-    wp.launch(
-        _scan_slot_state,
-        dim=(b, n),
-        inputs=[masses, concentration, density, invalid],
-        device=device,
-    )
-    wp.launch(
-        _validate_counts,
-        dim=b,
-        inputs=[concentration, required_release_counts, invalid],
-        device=device,
-    )
-    if invalid.numpy()[0] != 0:
-        raise ValueError(
-            "particles or required_release_counts have invalid values"
-        )
-    demand = wp.zeros(1, dtype=wp.int32, device=device)
-    wp.launch(
-        _any_nonzero_demand,
-        dim=b,
-        inputs=[required_release_counts, demand],
-        device=device,
-    )
-    if demand.numpy()[0] == 0:
-        return particles
-    wp.launch(
-        _plan_resampling,
-        dim=b,
-        inputs=[
-            masses,
-            concentration,
-            charge,
-            density,
-            required_release_counts,
-            buffers.retained_counts,
-            buffers.released_counts,
-            buffers.retained_indices,
-            buffers.released_indices,
-            buffers.sorted_indices,
-            buffers.replacement_masses,
-            buffers.replacement_concentration,
-            buffers.replacement_charge,
-            buffers.source_radii,
-            buffers.radius_cubed_relative_error,
-            buffers.mean_radius_relative_error,
-            buffers.surface_relative_error,
-            buffers.diversity_absolute_error,
-            buffers.planning_status,
-            invalid,
-            upstream_invalid,
-            *bounds,
-        ],
-        device=device,
-    )
-    planning_failed = wp.zeros(1, dtype=wp.int32, device=device)
-    wp.launch(
-        _aggregate_planning_status,
-        dim=b,
-        inputs=[
-            required_release_counts,
-            buffers.planning_status,
-            planning_failed,
-            invalid,
-            upstream_invalid,
-        ],
-        device=device,
-    )
-    if planning_failed.numpy()[0] != 0:
-        raise ValueError("resampling diagnostic exceeds bound")
-    wp.launch(
-        _commit_resampling,
-        dim=(b, n, s),
-        inputs=[
-            masses,
-            concentration,
-            charge,
-            required_release_counts,
-            buffers.retained_counts,
-            buffers.retained_indices,
-            buffers.released_indices,
-            buffers.replacement_masses,
-            buffers.replacement_concentration,
-            buffers.replacement_charge,
-            invalid,
-            planning_failed,
-            upstream_invalid,
-        ],
-        device=device,
-    )
-    return particles
-
-
-def _execute_representative_volume_scaling_step_gpu(  # noqa: C901, PLR0913
-    particles: Any,
-    provisional_source_demand: Any,
-    scaling_required: Any,
-    requested_scale: Any,
-    minimum_scale: Any,
-    minimum_volume: Any,
-    resolved_scale: Any,
-) -> tuple[Any, Any, Any]:
-    """Apply P4 scaling to selected Warp particle-container rows in place.
-
-    A row is selected exactly when its ``int32`` flag is ``1`` and its
-    provisional demand is positive. Selected rows scale box volume, every
-    particle concentration, and provisional demand by the requested factor;
-    masses, charge, density, configuration sidecars, and unselected rows are
-    unchanged. A read-only all-box preflight runs before the diagnostic or
-    scaling launch, so rejected calls do not write caller-owned state.
-    ``resolved_scale`` receives the requested factor for selected rows and
-    ``1.0`` otherwise. Successful work is asynchronous: callers own all
-    sidecars, device placement, and explicit Warp synchronization before
-    reading results. This concrete-module-only boundary does not resolve
-    policy, transfer data, resize storage, or provide a runnable or package
-    export.
-
-    Args:
-        particles: Fixed-capacity Warp particle container whose masses,
-            concentration, charge, density, and volume fields are same-device
-            contiguous ``float64`` arrays.
-        provisional_source_demand: Caller-owned same-device contiguous
-            ``float64`` demand array shaped ``(B,)``.
-        scaling_required: Caller-owned same-device contiguous ``int32`` flag
-            array shaped ``(B,)`` containing only ``0`` or ``1``.
-        requested_scale: Caller-owned same-device contiguous ``float64``
-            requested factors shaped ``(B,)``.
-        minimum_scale: Caller-owned same-device contiguous ``float64`` lower
-            factor bounds shaped ``(B,)``.
-        minimum_volume: Caller-owned same-device contiguous ``float64``
-            post-scaling box-volume bounds in m³, shaped ``(B,)``.
-        resolved_scale: Caller-owned same-device contiguous ``float64``
-            diagnostic output shaped ``(B,)``.
-
-    Returns:
-        The identical particle container, demand sidecar, and resolved-scale
-        sidecar after successful asynchronous diagnostic and, when selected,
-        scaling launches.
-
-    Raises:
-        TypeError: If a particle field or sidecar is not a supported Warp array
-            or has the required dtype.
-        ValueError: If schemas, devices, contiguity, ownership, physical
-            values, factor bounds, flags, or selected scaled-volume bounds are
-            invalid. Rejection occurs before any diagnostic or scaling write.
-    """
-    require_legacy_particle_metadata(particles)
-    masses = _field(particles, "masses")
-    if not _is_warp_array_like(masses):
-        raise TypeError("masses must be a Warp array")
-    if masses.ndim != 3:
-        raise ValueError("masses must have rank 3")
-    if masses.dtype != wp.float64:
-        raise ValueError("masses must have dtype float64")
-    _require_contiguous_array(masses, "masses")
-    b, n, s = tuple(masses.shape)
-    if n == 0:
-        raise ValueError("particle capacity must be positive")
-    if s == 0:
-        raise ValueError("species capacity must be positive")
-    device = masses.device
-    concentration = _field(particles, "concentration")
-    charge = _field(particles, "charge")
-    density = _field(particles, "density")
-    volume = _field(particles, "volume")
-    _validate_array(
-        concentration, "concentration", 2, (b, n), wp.float64, device
-    )
-    _validate_array(charge, "charge", 2, (b, n), wp.float64, device)
-    _validate_array(density, "density", 1, (s,), wp.float64, device)
-    _validate_array(volume, "volume", 1, (b,), wp.float64, device)
-    schema = (
-        ("provisional_source_demand", provisional_source_demand, wp.float64),
-        ("scaling_required", scaling_required, wp.int32),
-        ("requested_scale", requested_scale, wp.float64),
-        ("minimum_scale", minimum_scale, wp.float64),
-        ("minimum_volume", minimum_volume, wp.float64),
-        ("resolved_scale", resolved_scale, wp.float64),
-    )
-    sidecars: list[Any] = []
-    for name, values, dtype in schema:
-        if not _is_warp_array_like(values):
-            raise TypeError(f"{name} must be a Warp array")
-        if values.dtype != dtype:
-            raise TypeError(f"{name} must have dtype {dtype}")
-        _validate_array(values, name, 1, (b,), dtype, device)
-        sidecars.append(values)
-    protected = [masses, concentration, charge, density, volume]
-    all_arrays = protected + sidecars
-    for index, left in enumerate(all_arrays):
-        for right in all_arrays[index + 1 :]:
-            if _ranges_overlap(left, right):
-                raise ValueError(
-                    "representative scaling arrays must not overlap"
-                )
-    status = wp.zeros(2, dtype=wp.int32, device=device)
-    upstream_invalid = wp.zeros(1, dtype=wp.int32, device=device)
-    wp.launch(
-        _scan_density_p4,
-        dim=s,
-        inputs=[density, status],
-        device=device,
-    )
-    if b == 0:
-        if status.numpy()[0] != 0:
-            raise ValueError(
-                "particles or representative scaling sidecars have "
-                "invalid values"
-            )
-        return particles, provisional_source_demand, resolved_scale
-    wp.launch(
-        _scan_representative_volume_scaling,
-        dim=(b, n, s),
-        inputs=[
-            masses,
-            concentration,
-            charge,
-            density,
-            volume,
-            provisional_source_demand,
-            scaling_required,
-            requested_scale,
-            minimum_scale,
-            minimum_volume,
-            status,
-        ],
-        device=device,
-    )
-    status_values = status.numpy()
-    if status_values[0] != 0:
-        raise ValueError(
-            "particles or representative scaling sidecars have invalid values"
-        )
-    selected = wp.zeros(b, dtype=wp.int32, device=device)
-    wp.launch(
-        _resolve_representative_volume_selection,
-        dim=b,
-        inputs=[
-            provisional_source_demand,
-            scaling_required,
-            selected,
-            status,
-            upstream_invalid,
-        ],
-        device=device,
-    )
-    wp.launch(
-        _write_resolved_representative_scale,
-        dim=b,
-        inputs=[
-            selected,
-            requested_scale,
-            resolved_scale,
-            status,
-            upstream_invalid,
-        ],
-        device=device,
-    )
-    if status_values[1] != 0:
-        wp.launch(
-            _apply_representative_volume_scaling,
-            dim=(b, n),
-            inputs=[
-                concentration,
-                volume,
-                provisional_source_demand,
-                selected,
-                requested_scale,
-                status,
-                upstream_invalid,
-            ],
-            device=device,
-        )
-    return particles, provisional_source_demand, resolved_scale
-
-
 @dataclass(frozen=True)
 class _PreparedResamplingCall:
     """Pin one allocation-complete resampling launch sequence.
@@ -1460,7 +1044,6 @@ class _PreparedResamplingCall:
     invalid: Any
     planning_failed: Any
     upstream_invalid: Any
-    native: bool = False
 
 
 @dataclass(frozen=True)
@@ -1492,7 +1075,6 @@ class _PreparedRepresentativeVolumeScalingCall:
     status: Any
     selected: Any
     upstream_invalid: Any
-    native: bool = False
 
 
 def _validate_prepared_upstream(
@@ -1524,7 +1106,7 @@ def _enqueue_resampling_validation(
         inputs=[prepared.invalid, prepared.planning_failed],
         device=prepared.device,
     )
-    if b and prepared.native:
+    if b:
         wp.launch(
             _scan_population,
             dim=b,
@@ -1600,7 +1182,7 @@ def _prepare_resampling_step_gpu(
     writes; observation is the sole status readback.
     """
     kind = particle_distribution_code(particles)
-    if kind not in (0, 3):
+    if kind != 3:
         raise ValueError("native exhaustion supports only particle_resolved")
     bounds = (
         _require_exact_bound(
@@ -1681,7 +1263,6 @@ def _prepare_resampling_step_gpu(
         )
     )
     prepared = _PreparedResamplingCall(
-        native=kind == 3,
         result=particles,
         masses=masses,
         concentration=concentration,
@@ -1818,7 +1399,7 @@ def _prepare_representative_volume_scaling_step_gpu(  # noqa: C901
     validation to enqueue and bounded status observation to the observer.
     """
     kind = particle_distribution_code(particles)
-    if kind not in (0, 3):
+    if kind != 3:
         raise ValueError("native exhaustion supports only particle_resolved")
     masses = _field(particles, "masses")
     if not _is_warp_array_like(masses):
@@ -1874,7 +1455,6 @@ def _prepare_representative_volume_scaling_step_gpu(  # noqa: C901
                     "representative scaling arrays must not overlap"
                 )
     prepared = _PreparedRepresentativeVolumeScalingCall(
-        native=kind == 3,
         result=(particles, provisional_source_demand, resolved_scale),
         masses=masses,
         concentration=concentration,
@@ -1913,7 +1493,7 @@ def _enqueue_scaling_validation(
         inputs=[prepared.density, prepared.status],
         device=prepared.device,
     )
-    if b and prepared.native:
+    if b:
         wp.launch(
             _scan_population,
             dim=b,

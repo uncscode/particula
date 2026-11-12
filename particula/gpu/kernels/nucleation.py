@@ -22,9 +22,10 @@ or otherwise transfer their caller-owned arrays. Only ``nucleation_step_gpu``
 is lazily exported through ``particula.gpu.kernels``; all records and helpers
 remain concrete-module-only.
 
-Prepared private execution retains legacy validation ordering, normalized
+Prepared private execution retains phase validation ordering, normalized
 controls, and established workspace allocation. Retained-reference enqueue
-performs no validation, readback, allocation, transfer, synchronization,
+performs no host metadata validation, readback, allocation, transfer,
+synchronization,
 lookup, rebinding, or policy resolution; recovery is not promised after a
 writer-capable launch.
 """
@@ -68,7 +69,6 @@ from particula.gpu.kernels.slot_management import (
 from particula.gpu.nucleation_species_mapping import NucleationSpeciesBinding
 from particula.gpu.population_metadata import (
     particle_distribution_code,
-    require_legacy_particle_metadata,
 )
 from particula.util.constants import AVOGADRO_NUMBER
 
@@ -369,8 +369,9 @@ class NucleationExhaustionBuffers:
     """Reference caller-owned P4 policy workspace and finalized diagnostics.
 
     P2 admitted demand and P3 provisional counts are historical immutable
-    handoffs. P4 copies admitted demand into ``demand_workspace`` and derives
-    ``final_counts`` from its post-policy demand and current box volume.
+    handoffs. P4 copies admitted event counts into ``demand_workspace``.
+    Post-policy counts become ``final_counts``; dividing them by current box
+    volume produces ``final_demand``.
     Expected P4 all-box preflight rejections occur before workspace writes or
     either primitive and preserve every supplied sidecar. Once a selected
     primitive begins, its own planning and commit failure contract applies;
@@ -380,8 +381,8 @@ class NucleationExhaustionBuffers:
     Attributes:
         resampling_buffers: Caller-owned E6-F6 resampling scratch and
             diagnostic storage.
-        demand_workspace: Mutable ``wp.float64`` ``(B,)`` copy of P2 admitted
-            demand [#/m³].
+        demand_workspace: Mutable ``wp.float64`` ``(B,)`` admitted event
+            counts, scaled with representative volume before finalization.
         final_demand: ``wp.float64`` ``(B,)`` P4-finalized demand [#/m³].
         requested_scale: ``wp.float64`` ``(B,)`` requested volume scales.
         minimum_scale: ``wp.float64`` ``(B,)`` lower bounds for volume scales.
@@ -428,7 +429,8 @@ class _NucleationPreflight:
         config: Validated nucleation configuration.
         n_boxes: Fixed number of boxes ``B``.
         n_particles: Fixed particle capacity ``N`` per box.
-        n_species: Fixed species count ``S``.
+        n_species: Fixed particle-material species count ``Sp``.
+        species_binding: Explicit native map retaining independent gas width.
         device: Shared Warp device for all retained arrays.
         temperature: Validated scalar or same-device ``(B,)`` temperature [K].
         saturation: Validated same-device ``(B, S)`` saturation, if configured.
@@ -455,6 +457,7 @@ class _NucleationPreflight:
     has_gated_boxes: bool
     gate_reason: str | None
     normalized_time_step: float
+    species_binding: NucleationSpeciesBinding
     potential_rate: float = 0.0
     potential_demand: float = 0.0
     accepted_count: int = 0
@@ -1071,6 +1074,7 @@ def _preflight_nucleation(  # noqa: C901
         temperature: Positive scalar [K] or same-device ``wp.float64 (B,)``.
         saturation: Configured same-device dimensionless ``wp.float64 (B, S)``.
         environment: Optional owner of temperature and configured saturation.
+        _native_binding: Required explicit native species binding.
         scratch: Optional caller-owned planning sidecars.
         finalized_demand: Optional caller-owned finalized-demand sidecars.
         diagnostics: Optional caller-owned diagnostic sidecars.
@@ -1086,8 +1090,11 @@ def _preflight_nucleation(  # noqa: C901
         ValueError: If schemas, ownership, physical values, or species settings
             violate the P1 contract.
     """
-    if _native_binding is None:
-        require_legacy_particle_metadata(particles)
+    if particle_distribution_code(particles) != 3:
+        raise ValueError("native nucleation supports only particle_resolved")
+    if not isinstance(_native_binding, NucleationSpeciesBinding):
+        raise ValueError("native nucleation requires species_binding")
+    _native_binding.validate(particles, gas)
     if not isinstance(config, NucleationConfig):
         raise ValueError("config must be NucleationConfig.")
     try:
@@ -1119,11 +1126,7 @@ def _preflight_nucleation(  # noqa: C901
         _array(particles, "density", wp.float64, (n_species,), device),
         _array(particles, "volume", wp.float64, (n_boxes,), device),
     )
-    gas_species = (
-        len(_native_binding.gas_names)
-        if _native_binding is not None
-        else n_species
-    )
+    gas_species = len(_native_binding.gas_names)
     gas_arrays = (
         _array(gas, "molar_mass", wp.float64, (gas_species,), device),
         _array(
@@ -1202,22 +1205,21 @@ def _preflight_nucleation(  # noqa: C901
             diagnostics.active_slot_counts,
             diagnostics.free_slot_counts,
         )
-    if _native_binding is not None:
-        external.extend(
-            (
-                _native_binding.particle_to_gas,
-                _native_binding.gas_to_particle,
-                gas.vapor_pressure,
-            )
+    external.extend(
+        (
+            _native_binding.particle_to_gas,
+            _native_binding.gas_to_particle,
+            gas.vapor_pressure,
         )
-        mapped = {
-            source for source, _ in _native_binding.species_map.gas_to_particle
-        }
-        if any(
-            count > 0 and index not in mapped
-            for index, count in enumerate(config.molecule_counts)
-        ):
-            raise ValueError("positive injection requires mapped gas species")
+    )
+    mapped = {
+        source for source, _ in _native_binding.species_map.gas_to_particle
+    }
+    if any(
+        count > 0 and index not in mapped
+        for index, count in enumerate(config.molecule_counts)
+    ):
+        raise ValueError("positive injection requires mapped gas species")
     _no_overlap(particle_arrays + gas_arrays + tuple(external) + sidecars)
     normalized_time_step = _real(time_step, "time_step")
     if (
@@ -1251,6 +1253,7 @@ def _preflight_nucleation(  # noqa: C901
             protected_inputs=(
                 particle_arrays + gas_arrays + tuple(external) + sidecars
             ),
+            species_binding=_native_binding,
         )
     for value, name, positive in zip(
         (particle_arrays[0], particle_arrays[1], *particle_arrays[3:]),
@@ -1265,6 +1268,16 @@ def _preflight_nucleation(  # noqa: C901
     ):
         _scan(value, name, positive=positive)
     _scan_finite_2d(particle_arrays[2], "particles.charge")
+    if n_boxes:
+        population_invalid = wp.zeros(1, dtype=wp.int32, device=device)
+        wp.launch(
+            _scan_population,
+            dim=n_boxes,
+            inputs=[*particle_arrays, 3, population_invalid],
+            device=device,
+        )
+        if population_invalid.numpy()[0]:
+            raise ValueError("invalid native population values or volume")
     for value, name, positive in zip(
         gas_arrays[:2],
         ("gas.molar_mass", "gas.concentration"),
@@ -1293,6 +1306,11 @@ def _preflight_nucleation(  # noqa: C901
             diagnostics=diagnostics,
             p3_sidecars=p3_sidecars,
             protected_sidecars=sidecars,
+            species_binding=_native_binding,
+            protected_inputs=particle_arrays
+            + gas_arrays
+            + tuple(external)
+            + sidecars,
         )
     if float(config.survival_factor) == 0.0:
         return _NucleationPreflight(
@@ -1313,6 +1331,11 @@ def _preflight_nucleation(  # noqa: C901
             diagnostics=diagnostics,
             p3_sidecars=p3_sidecars,
             protected_sidecars=sidecars,
+            species_binding=_native_binding,
+            protected_inputs=particle_arrays
+            + gas_arrays
+            + tuple(external)
+            + sidecars,
         )
     if isinstance(temperature_value, float):
         if (
@@ -1360,6 +1383,11 @@ def _preflight_nucleation(  # noqa: C901
             diagnostics=diagnostics,
             p3_sidecars=p3_sidecars,
             protected_sidecars=sidecars,
+            species_binding=_native_binding,
+            protected_inputs=particle_arrays
+            + gas_arrays
+            + tuple(external)
+            + sidecars,
         )
     # P1 has no rate work.  These conservative aggregate gates preserve the
     # required all-box zero diagnostics while later phases own mixed-box work.
@@ -1385,6 +1413,11 @@ def _preflight_nucleation(  # noqa: C901
             diagnostics=diagnostics,
             p3_sidecars=p3_sidecars,
             protected_sidecars=sidecars,
+            species_binding=_native_binding,
+            protected_inputs=particle_arrays
+            + gas_arrays
+            + tuple(external)
+            + sidecars,
         )
     precursor_status = wp.zeros(2, dtype=wp.int32, device=device)
     precursor_gates = wp.zeros(n_boxes, dtype=wp.int32, device=device)
@@ -1446,6 +1479,11 @@ def _preflight_nucleation(  # noqa: C901
             diagnostics=diagnostics,
             p3_sidecars=p3_sidecars,
             protected_sidecars=sidecars,
+            species_binding=_native_binding,
+            protected_inputs=particle_arrays
+            + gas_arrays
+            + tuple(external)
+            + sidecars,
         )
     gate_count = wp.zeros(1, dtype=wp.int32, device=device)
     wp.launch(
@@ -1477,6 +1515,11 @@ def _preflight_nucleation(  # noqa: C901
             diagnostics=diagnostics,
             p3_sidecars=p3_sidecars,
             protected_sidecars=sidecars,
+            species_binding=_native_binding,
+            protected_inputs=particle_arrays
+            + gas_arrays
+            + tuple(external)
+            + sidecars,
         )
     return _NucleationPreflight(
         particles,
@@ -1500,6 +1543,7 @@ def _preflight_nucleation(  # noqa: C901
         + gas_arrays
         + tuple(external)
         + sidecars,
+        species_binding=_native_binding,
     )
 
 
@@ -1758,6 +1802,7 @@ def _plan_nucleation_demand(
     temperature: Any | None = None,
     saturation: Any | None = None,
     environment: Any | None = None,
+    species_binding: NucleationSpeciesBinding | None = None,
 ) -> None:
     """Privately plan inventory-safe nucleation demand without state mutation.
 
@@ -1797,6 +1842,7 @@ def _plan_nucleation_demand(
         saturation: Configured same-device dimensionless ``wp.float64`` array
             shaped ``(B, S)`` for P1 validation and P2 gating.
         environment: Optional owner of temperature and configured saturation.
+        species_binding: Required explicit native species binding.
 
     Raises:
         TypeError: If a direct scalar has an unsupported type.
@@ -1822,6 +1868,7 @@ def _plan_nucleation_demand(
         scratch=scratch,
         finalized_demand=finalized_demand,
         diagnostics=diagnostics,
+        _native_binding=species_binding,
     )
     _plan_nucleation_demand_from_preflight(
         preflight, scratch, finalized_demand, diagnostics
@@ -1842,7 +1889,8 @@ def _plan_nucleation_demand_from_preflight(
     if preflight.n_boxes == 0:
         return
     device = preflight.device
-    boxes, species = preflight.n_boxes, preflight.n_species
+    boxes = preflight.n_boxes
+    species = len(preflight.species_binding.gas_names)
     number_concentration = wp.zeros(boxes, dtype=wp.float64, device=device)
     rate = wp.zeros(boxes, dtype=wp.float64, device=device)
     potential = wp.zeros(boxes, dtype=wp.float64, device=device)
@@ -2262,7 +2310,6 @@ def _select_p4_policy(
     volume: wp.array(dtype=wp.float64),
     resampling_enabled: wp.int32,
     scaling_enabled: wp.int32,
-    native: wp.int32,
     release: wp.array(dtype=wp.int32),
     scaling: wp.array(dtype=wp.int32),
     invalid: wp.array(dtype=wp.int32),
@@ -2283,10 +2330,6 @@ def _select_p4_policy(
         elif scaling_enabled != 0:
             scaling[box] = 1
             scaled_events = wp.float64(counts[box]) * requested[box]
-            if native == 0:
-                scaled_events = (demand[box] * requested[box]) * (
-                    volume[box] * requested[box]
-                )
             if (
                 not wp.isfinite(scaled_events)
                 or scaled_events < 0.0
@@ -2301,33 +2344,18 @@ def _select_p4_policy(
 
 
 @wp.kernel
-def _copy_p4_workspace(
-    source: wp.array(dtype=wp.float64),
-    destination: wp.array(dtype=wp.float64),
-    invalid: wp.array(dtype=wp.int32),
-) -> None:
-    """Copy immutable P2 admitted demand into private mutable P4 workspace."""
-    box = wp.tid()
-    if invalid[0] == 0:
-        destination[box] = source[box]
-
-
-@wp.kernel
 def _validate_p4_final(  # noqa: C901
     demand: wp.array(dtype=wp.float64),
     volume: wp.array(dtype=wp.float64),
     free_counts: wp.array(dtype=wp.int32),
     invalid: wp.array(dtype=wp.int32),
     upstream_invalid: wp.array(dtype=wp.int32),
-    native: wp.int32,
 ) -> None:
     """Validate final P4 counts before finalized diagnostic writes."""
     box = wp.tid()
     if upstream_invalid[0] != 0:
         return
     events = demand[box]
-    if native == 0:
-        events *= volume[box]
     if (
         not wp.isfinite(demand[box])
         or demand[box] < 0.0
@@ -2350,18 +2378,13 @@ def _write_p4_final(
     final_indices: wp.array2d(dtype=wp.int32),
     invalid: wp.array(dtype=wp.int32),
     upstream_invalid: wp.array(dtype=wp.int32),
-    native: wp.int32,
 ) -> None:
     """Commit finalized P4 demand, counts, and ascending free-slot prefixes."""
     box = wp.tid()
     if invalid[0] != 0 or upstream_invalid[0] != 0:
         return
-    count = wp.int32(demand[box] * volume[box])
-    if native != 0:
-        count = wp.int32(demand[box])
-    final_demand[box] = demand[box]
-    if native != 0:
-        final_demand[box] = demand[box] / volume[box]
+    count = wp.int32(demand[box])
+    final_demand[box] = demand[box] / volume[box]
     final_counts[box] = count
     for rank in range(final_indices.shape[1]):
         if rank < count:
@@ -2595,8 +2618,6 @@ def _orchestrate_nucleation_exhaustion(  # noqa: C901
     )
     invalid = wp.zeros(1, dtype=wp.int32, device=preflight.device)
     upstream_invalid = wp.zeros(1, dtype=wp.int32, device=preflight.device)
-    upstream_invalid = wp.zeros(1, dtype=wp.int32, device=preflight.device)
-    upstream_invalid = wp.zeros(1, dtype=wp.int32, device=preflight.device)
     if preflight.n_particles:
         wp.launch(
             _classify_slots,
@@ -2650,7 +2671,6 @@ def _orchestrate_nucleation_exhaustion(  # noqa: C901
             preflight.particles.volume,
             int(controls.resampling),
             int(controls.representative_volume_scaling),
-            0,
             release,
             scaling,
             invalid,
@@ -2682,10 +2702,10 @@ def _orchestrate_nucleation_exhaustion(  # noqa: C901
         device=preflight.device,
     )
     wp.launch(
-        _copy_p4_workspace,
+        _native_source_counts,
         dim=preflight.n_boxes,
         inputs=[
-            finalized_demand.accepted_demand,
+            finalized_demand.accepted_counts,
             buffers.demand_workspace,
             invalid,
         ],
@@ -2759,7 +2779,6 @@ def _orchestrate_nucleation_exhaustion(  # noqa: C901
             current_count,
             final_invalid,
             upstream_invalid,
-            0,
         ],
         device=preflight.device,
     )
@@ -2777,7 +2796,6 @@ def _orchestrate_nucleation_exhaustion(  # noqa: C901
             buffers.final_selected_slot_indices,
             final_invalid,
             upstream_invalid,
-            0,
         ],
         device=preflight.device,
     )
@@ -2845,16 +2863,13 @@ def _validate_p5_handoff(  # noqa: C901
     selected_indices: wp.array2d(dtype=wp.int32),
     status: wp.array(dtype=wp.int32),
     upstream_invalid: wp.array(dtype=wp.int32),
-    native: wp.int32,
 ) -> None:
     """Validate P4's final handoff before the sole P5 writer launches."""
     box = wp.tid()
     if upstream_invalid[0] != 0:
         return
     count = final_counts[box]
-    events = final_demand[box] * volume[box]
-    if native != 0:
-        events = wp.float64(count)
+    events = wp.float64(count)
     invalid = bool(
         not wp.isfinite(final_demand[box])
         or final_demand[box] < 0.0
@@ -2866,7 +2881,7 @@ def _validate_p5_handoff(  # noqa: C901
         or events > wp.float64(2147483647)
         or count != wp.int32(events)
     )
-    if native != 0 and final_demand[box] != wp.float64(count) / volume[box]:
+    if final_demand[box] != wp.float64(count) / volume[box]:
         invalid = True
     previous = wp.int32(-1)
     for rank in range(selected_indices.shape[1]):
@@ -2909,46 +2924,6 @@ def _validate_p5_handoff(  # noqa: C901
         wp.atomic_or(status, 0, 2)
 
 
-@wp.kernel
-def _commit_nucleation_p5_kernel(
-    masses: wp.array3d(dtype=wp.float64),
-    concentration: wp.array2d(dtype=wp.float64),
-    charge: wp.array2d(dtype=wp.float64),
-    volume: wp.array(dtype=wp.float64),
-    gas_concentration: wp.array2d(dtype=wp.float64),
-    molar_mass: wp.array(dtype=wp.float64),
-    molecule_counts: wp.array(dtype=wp.int32),
-    final_demand: wp.array(dtype=wp.float64),
-    final_counts: wp.array(dtype=wp.int32),
-    selected_indices: wp.array2d(dtype=wp.int32),
-    resolved_scale: wp.array(dtype=wp.float64),
-    status: wp.array(dtype=wp.int32),
-    upstream_invalid: wp.array(dtype=wp.int32),
-) -> None:
-    """Fuse finalized free-slot activation and matching gas removal."""
-    box = wp.tid()
-    if upstream_invalid[0] != 0 or status[0] != 2:
-        return
-    for rank in range(final_counts[box]):
-        particle = selected_indices[box, rank]
-        for species in range(masses.shape[2]):
-            masses[box, particle, species] = (
-                wp.float64(molecule_counts[species])
-                * molar_mass[species]
-                / _AVOGADRO_NUMBER
-            )
-        concentration[box, particle] = wp.float64(1.0) / volume[box]
-        charge[box, particle] = wp.float64(0.0)
-    for species in range(molecule_counts.shape[0]):
-        gas_concentration[box, species] *= resolved_scale[box]
-        if molecule_counts[species] > 0:
-            gas_concentration[box, species] -= final_demand[box] * (
-                wp.float64(molecule_counts[species])
-                * molar_mass[species]
-                / _AVOGADRO_NUMBER
-            )
-
-
 def _revalidate_p5_storage(preflight: _NucleationPreflight) -> None:
     """Reject rebound P1 storage before P5's device handoff validation."""
     b, n, s, device = (
@@ -2970,10 +2945,15 @@ def _revalidate_p5_storage(preflight: _NucleationPreflight) -> None:
         _array(preflight.particles, "density", wp.float64, (s,), device),
         _array(preflight.particles, "volume", wp.float64, (b,), device),
     )
+    gas_species = len(preflight.species_binding.gas_names)
     gas = (
-        _array(preflight.gas, "molar_mass", wp.float64, (s,), device),
-        _array(preflight.gas, "concentration", wp.float64, (b, s), device),
-        _array(preflight.gas, "partitioning", wp.int32, (b, s), device),
+        _array(preflight.gas, "molar_mass", wp.float64, (gas_species,), device),
+        _array(
+            preflight.gas, "concentration", wp.float64, (b, gas_species), device
+        ),
+        _array(
+            preflight.gas, "partitioning", wp.int32, (b, gas_species), device
+        ),
     )
     if any(
         expected is not supplied
@@ -2987,6 +2967,8 @@ def _revalidate_p5_storage(preflight: _NucleationPreflight) -> None:
         for expected, supplied in zip(preflight.gas_arrays, gas, strict=True)
     ):
         raise ValueError("P5 fields must be the P1-validated storage.")
+
+    preflight.species_binding.validate(preflight.particles, preflight.gas)
 
 
 def _commit_nucleation_p5(
@@ -3031,7 +3013,6 @@ def _commit_nucleation_p5(
             buffers.final_selected_slot_indices,
             status,
             upstream_invalid,
-            0,
         ],
         device=preflight.device,
     )
@@ -3041,122 +3022,25 @@ def _commit_nucleation_p5(
     if not result & 2:
         return False
     wp.launch(
-        _commit_nucleation_p5_kernel,
+        _commit_native_nucleation,
         dim=preflight.n_boxes,
         inputs=[
             preflight.particles.masses,
             preflight.particles.concentration,
             preflight.particles.charge,
-            preflight.particles.volume,
             preflight.gas.concentration,
             preflight.gas.molar_mass,
             molecule_counts,
+            preflight.species_binding.particle_to_gas,
             buffers.final_demand,
             buffers.final_counts,
             buffers.final_selected_slot_indices,
-            buffers.resolved_scale,
             status,
             upstream_invalid,
         ],
         device=preflight.device,
     )
     return True
-
-
-def _execute_nucleation_step_gpu(
-    particles: Any,
-    gas: Any,
-    config: NucleationConfig,
-    time_step: Any,
-    *,
-    scratch: NucleationScratchBuffers,
-    finalized_demand: NucleationFinalizedDemandBuffers,
-    diagnostics: NucleationDiagnosticBuffers,
-    exhaustion_controls: NucleationExhaustionControls,
-    exhaustion_buffers: NucleationExhaustionBuffers,
-    temperature: Any | None = None,
-    saturation: Any | None = None,
-    environment: Any | None = None,
-) -> tuple[Any, Any]:
-    """Execute one fixed-capacity direct-Warp nucleation step.
-
-    This direct-device boundary sequences P1 preflight, P2 inventory admission,
-    P3 slot staging, and P4 resampling-first/scaling-fallback resolution before
-    one fused P5 writer activates finalized free slots and removes matching gas
-    mass. The caller owns fixed-capacity, fixed-shape, contiguous same-device
-    Warp particle, gas, input, and sidecar storage, and must synchronize the
-    active Warp device before observing successful asynchronous writes.
-
-    Public validation rejections before P4 primitive entry leave particle and
-    gas state unchanged. P2--P4 may write their documented caller-owned
-    sidecars before a later phase rejects. Once a P4 primitive begins, its
-    documented no-rollback boundary applies; P5 likewise has no rollback after
-    its writer launches. Successful calls return the identical ``(particles,
-    gas)`` objects. CPU fallback, host/device transfer helpers, resizing,
-    compaction, a Runnable API, backend selection, E6-F9 integration, graph
-    capture, autodiff, and performance guarantees are deliberately deferred.
-
-    Args:
-        particles: Caller-owned fixed-capacity Warp particle container.
-        gas: Caller-owned Warp gas container on the particle-data device.
-        config: Immutable scalar nucleation controls.
-        time_step: Finite nonnegative step duration [s].
-        scratch: Caller-owned P2 planning sidecars.
-        finalized_demand: Caller-owned P2/P3 finalized-demand sidecars.
-        diagnostics: Caller-owned P2/P3 slot and gate diagnostic sidecars.
-        exhaustion_controls: Concrete P4 resampling and scaling policy controls.
-        exhaustion_buffers: Caller-owned P4 workspace and finalized diagnostics.
-        temperature: Positive scalar [K] or same-device ``wp.float64 (B,)``.
-        saturation: Configured same-device dimensionless ``wp.float64 (B, S)``.
-        environment: Optional same-device owner of temperature and saturation.
-
-    Returns:
-        The identical caller-owned ``(particles, gas)`` containers.
-
-    Raises:
-        TypeError: If a direct scalar input has an unsupported type.
-        ValueError: If P1--P5 validation, storage ownership, physical state, or
-            finalized handoff validation fails.
-    """
-    if not isinstance(scratch, NucleationScratchBuffers):
-        raise ValueError("scratch must be NucleationScratchBuffers.")
-    if not isinstance(finalized_demand, NucleationFinalizedDemandBuffers):
-        raise ValueError(
-            "finalized_demand must be NucleationFinalizedDemandBuffers."
-        )
-    if not isinstance(diagnostics, NucleationDiagnosticBuffers):
-        raise ValueError("diagnostics must be NucleationDiagnosticBuffers.")
-    preflight = _preflight_nucleation(
-        particles,
-        gas,
-        config,
-        time_step,
-        temperature=temperature,
-        saturation=saturation,
-        environment=environment,
-        scratch=scratch,
-        finalized_demand=finalized_demand,
-        diagnostics=diagnostics,
-    )
-    _validate_public_p4_inputs(
-        preflight, exhaustion_controls, exhaustion_buffers
-    )
-    if preflight.n_boxes == 0:
-        return particles, gas
-    _plan_nucleation_demand_from_preflight(
-        preflight, scratch, finalized_demand, diagnostics
-    )
-    _stage_nucleation_slots(preflight, finalized_demand, diagnostics)
-    _validate_public_molecule_eligibility(preflight)
-    p4_storage = _orchestrate_nucleation_exhaustion(
-        preflight,
-        finalized_demand,
-        diagnostics,
-        exhaustion_controls,
-        exhaustion_buffers,
-    )
-    _commit_nucleation_p5(preflight, exhaustion_buffers, p4_storage)
-    return particles, gas
 
 
 @wp.kernel
@@ -3423,7 +3307,6 @@ class _PreparedNucleationCall:
     scaling: _PreparedRepresentativeVolumeScalingCall | None
     dimensions: tuple[int, int, int]
     device: Any
-    native: bool = False
     particle_to_gas: Any = None
     gas_species: int = 0
 
@@ -3475,14 +3358,11 @@ def _prepare_nucleation_step_gpu(  # noqa: C901
             invalid.
     """
     kind = particle_distribution_code(particles)
-    if kind not in (0, 3):
+    if kind != 3:
         raise ValueError("native nucleation supports only particle_resolved")
-    if kind == 3:
-        if not isinstance(species_binding, NucleationSpeciesBinding):
-            raise ValueError("native nucleation requires species_binding")
-        species_binding.validate(particles, gas)
-    elif species_binding is not None:
-        raise ValueError("species_binding requires native resolved metadata")
+    if not isinstance(species_binding, NucleationSpeciesBinding):
+        raise ValueError("native nucleation requires species_binding")
+    species_binding.validate(particles, gas)
     if not isinstance(scratch, NucleationScratchBuffers):
         raise ValueError("scratch must be NucleationScratchBuffers.")
     if not isinstance(finalized_demand, NucleationFinalizedDemandBuffers):
@@ -3592,12 +3472,7 @@ def _prepare_nucleation_step_gpu(  # noqa: C901
             _upstream_invalid=pipeline_invalid,
         )
     return _PreparedNucleationCall(
-        native=kind == 3,
-        particle_to_gas=(
-            species_binding.particle_to_gas
-            if species_binding is not None
-            else None
-        ),
+        particle_to_gas=species_binding.particle_to_gas,
         gas_species=gas_species,
         result=(particles, gas),
         particle_arrays=particle_arrays,
@@ -3774,7 +3649,7 @@ def _enqueue_prepared_nucleation_call(  # noqa: C901
         ],
         device=prepared.device,
     )
-    if b and prepared.native:
+    if b:
         wp.launch(
             _scan_population,
             dim=b,
@@ -3956,7 +3831,6 @@ def _enqueue_prepared_nucleation_call(  # noqa: C901
             p4[4],
             particles[4],
             *prepared.policy_controls,
-            int(prepared.native),
             p4_work[1],
             p4_work[2],
             prepared.p4_status,
@@ -3983,24 +3857,16 @@ def _enqueue_prepared_nucleation_call(  # noqa: C901
         ],
         device=prepared.device,
     )
-    if prepared.native:
-        wp.launch(
-            _native_source_counts,
-            dim=b,
-            inputs=[
-                finalized[0],
-                p4[0],
-                prepared.pipeline_invalid,
-            ],
-            device=prepared.device,
-        )
-    else:
-        wp.launch(
-            _copy_p4_workspace,
-            dim=b,
-            inputs=[finalized[1], p4[0], prepared.pipeline_invalid],
-            device=prepared.device,
-        )
+    wp.launch(
+        _native_source_counts,
+        dim=b,
+        inputs=[
+            finalized[0],
+            p4[0],
+            prepared.pipeline_invalid,
+        ],
+        device=prepared.device,
+    )
     wp.launch(
         _write_unscaled_p4_resolution,
         dim=b,
@@ -4063,7 +3929,6 @@ def _enqueue_prepared_nucleation_call(  # noqa: C901
             p4_work[5],
             prepared.p4_final_status,
             prepared.pipeline_invalid,
-            int(prepared.native),
         ],
         device=prepared.device,
     )
@@ -4085,7 +3950,6 @@ def _enqueue_prepared_nucleation_call(  # noqa: C901
             p4[10],
             prepared.p4_final_status,
             prepared.pipeline_invalid,
-            int(prepared.native),
         ],
         device=prepared.device,
     )
@@ -4106,58 +3970,35 @@ def _enqueue_prepared_nucleation_call(  # noqa: C901
             p4[10],
             prepared.p5_status,
             prepared.pipeline_invalid,
-            int(prepared.native),
         ],
         device=prepared.device,
     )
-    if prepared.native:
-        wp.launch(
-            _commit_native_nucleation,
-            dim=b,
-            inputs=[
-                particles[0],
-                particles[1],
-                particles[2],
-                gas[1],
-                gas[0],
-                prepared.molecule_counts,
-                prepared.particle_to_gas,
-                p4[1],
-                p4[9],
-                p4[10],
-                prepared.p5_status,
-                prepared.pipeline_invalid,
-            ],
-            device=prepared.device,
-        )
-    else:
-        wp.launch(
-            _commit_nucleation_p5_kernel,
-            dim=b,
-            inputs=[
-                particles[0],
-                particles[1],
-                particles[2],
-                particles[4],
-                gas[1],
-                gas[0],
-                prepared.molecule_counts,
-                p4[1],
-                p4[9],
-                p4[10],
-                p4[5],
-                prepared.p5_status,
-                prepared.pipeline_invalid,
-            ],
-            device=prepared.device,
-        )
+    wp.launch(
+        _commit_native_nucleation,
+        dim=b,
+        inputs=[
+            particles[0],
+            particles[1],
+            particles[2],
+            gas[1],
+            gas[0],
+            prepared.molecule_counts,
+            prepared.particle_to_gas,
+            p4[1],
+            p4[9],
+            p4[10],
+            prepared.p5_status,
+            prepared.pipeline_invalid,
+        ],
+        device=prepared.device,
+    )
     return prepared.result
 
 
 def _observe_prepared_nucleation_call(  # noqa: C901
     prepared: _PreparedNucleationCall,
 ) -> tuple[Any, Any]:
-    """Interpret bounded device status in legacy phase-error order.
+    """Interpret bounded device status in the established phase-error order.
 
     This is the sole host readback boundary for a prepared call. It translates
     device status counters without inspecting or replacing caller-owned payload

@@ -286,25 +286,32 @@ def test_native_prepared_invalid_live_payload_preserves_particles_and_gas(
         np.testing.assert_array_equal(array.numpy(), expected)
 
 
-@pytest.mark.parametrize("code", [1, 2, 3])
+@pytest.mark.parametrize("code", [None, 0, 1, 2, 3])
+@pytest.mark.parametrize(
+    "entry", ["nucleation_step_gpu", "_prepare_nucleation_step_gpu"]
+)
 def test_native_source_requires_supported_population_and_binding_before_payload(
     code,
+    entry,
 ):
     """A tag cannot infer species order or broaden the source algorithm."""
-    from particula.gpu.kernels.nucleation import _prepare_nucleation_step_gpu
+    from particula.gpu.kernels import nucleation as module
 
     class Tagged:
-        distribution_kind = code
-
         def __getattr__(self, name):
+            if name == "distribution_kind":
+                raise AttributeError(name)
             pytest.fail(f"invalid source admission accessed {name}")
 
+    particles = Tagged()
+    if code is not None:
+        particles.distribution_kind = code
     message = (
         "requires species_binding" if code == 3 else "only particle_resolved"
     )
     with pytest.raises(ValueError, match=message):
-        _prepare_nucleation_step_gpu(
-            Tagged(),
+        getattr(module, entry)(
+            particles,
             None,
             None,
             None,
@@ -348,3 +355,159 @@ def test_nonbinary_volume_preserves_admitted_count(device):
     np.testing.assert_allclose(
         density_inventory(p, g), before, rtol=1e-12, atol=1e-30
     )
+
+
+def _stage_native_source(particles, gas, config, kwargs):
+    """Exercise the retained standalone phases with an explicit native map."""
+    from particula.gpu.kernels import nucleation as module
+
+    common = {
+        name: kwargs[name]
+        for name in (
+            "scratch",
+            "finalized_demand",
+            "diagnostics",
+            "temperature",
+        )
+    }
+    module._plan_nucleation_demand(
+        particles,
+        gas,
+        config,
+        1.0,
+        species_binding=kwargs["species_binding"],
+        **common,
+    )
+    preflight = module._preflight_nucleation(
+        particles,
+        gas,
+        config,
+        1.0,
+        _native_binding=kwargs["species_binding"],
+        **common,
+    )
+    module._stage_nucleation_slots(
+        preflight, kwargs["finalized_demand"], kwargs["diagnostics"]
+    )
+    storage = module._orchestrate_nucleation_exhaustion(
+        preflight,
+        kwargs["finalized_demand"],
+        kwargs["diagnostics"],
+        kwargs["exhaustion_controls"],
+        kwargs["exhaustion_buffers"],
+    )
+    return preflight, storage
+
+
+@pytest.mark.parametrize("volume", [0.25, 1.0, 4.0])
+def test_standalone_native_phases_preserve_independent_species_inventory(
+    device,
+    volume,
+):
+    """Staged phases retain unequal species widths, inert gas, and raw counts."""
+    from particula.gpu.kernels import nucleation as module
+
+    p, g, config, kwargs = setup(device, volume=volume)
+    before = density_inventory(p, g)
+    inert = g.concentration.numpy()[:, [0, 3]].copy()
+    preflight, storage = _stage_native_source(p, g, config, kwargs)
+    assert preflight.species_binding is kwargs["species_binding"]
+    assert preflight.n_species == 3
+    assert len(preflight.species_binding.gas_names) == 4
+    assert module._commit_nucleation_p5(
+        preflight, kwargs["exhaustion_buffers"], storage
+    )
+    counts = int(4 * volume)
+    np.testing.assert_array_equal(
+        kwargs["exhaustion_buffers"].final_counts.numpy(), [counts]
+    )
+    np.testing.assert_array_equal(
+        p.concentration.numpy()[0, 1 : counts + 1], 1.0
+    )
+    np.testing.assert_array_equal(
+        p.masses.numpy()[0, 1 : counts + 1],
+        np.tile([1.0, 2.0, 0.0], (counts, 1)),
+    )
+    np.testing.assert_array_equal(g.concentration.numpy()[:, [0, 3]], inert)
+    np.testing.assert_allclose(
+        density_inventory(p, g), before, rtol=1e-12, atol=1e-30
+    )
+
+
+def test_standalone_p5_rejects_rebound_binding_storage(device):
+    """Even unused full-gas storage cannot silently drift across staged P5."""
+    from particula.gpu.kernels import nucleation as module
+
+    p, g, config, kwargs = setup(device)
+    preflight, storage = _stage_native_source(p, g, config, kwargs)
+    wp = pytest.importorskip("warp")
+    g.vapor_pressure = wp.zeros_like(g.vapor_pressure)
+    arrays = (p.masses, p.concentration, p.charge, g.concentration)
+    before = [array.numpy().copy() for array in arrays]
+    with pytest.raises(ValueError, match="species binding storage changed"):
+        module._commit_nucleation_p5(
+            preflight, kwargs["exhaustion_buffers"], storage
+        )
+    for array, expected in zip(arrays, before, strict=True):
+        np.testing.assert_array_equal(array.numpy(), expected)
+
+
+def test_standalone_preflight_rejects_nonfinite_count_density(device):
+    """Finite raw counts cannot admit overflowing number density."""
+    from particula.gpu.kernels import nucleation as module
+
+    p, g, config, kwargs = setup(device)
+    p.volume.assign(np.array([1e-320]))
+    arrays = (p.masses, p.concentration, p.charge, g.concentration)
+    before = [array.numpy().copy() for array in arrays]
+    with pytest.raises(ValueError, match="invalid native population"):
+        module._preflight_nucleation(
+            p,
+            g,
+            config,
+            0.0,
+            temperature=300.0,
+            _native_binding=kwargs["species_binding"],
+        )
+    for array, expected in zip(arrays, before, strict=True):
+        np.testing.assert_array_equal(array.numpy(), expected)
+
+
+@pytest.mark.parametrize("coefficient", [0.0, 0.04])
+def test_standalone_gated_preflight_protects_full_gas_storage(
+    device, coefficient
+):
+    """Early rate gates retain the same full-gas alias protection as work."""
+    from particula.gpu.kernels import nucleation as module
+
+    p, g, config, kwargs = setup(device, capacity=4)
+    config = replace(config, coefficient=coefficient)
+    buffers = kwargs["exhaustion_buffers"]
+    buffers = replace(
+        buffers,
+        resampling_buffers=replace(
+            buffers.resampling_buffers, replacement_charge=g.vapor_pressure
+        ),
+    )
+    preflight = module._preflight_nucleation(
+        p,
+        g,
+        config,
+        1.0,
+        temperature=300.0,
+        _native_binding=kwargs["species_binding"],
+    )
+    arrays = (
+        p.masses,
+        p.concentration,
+        p.charge,
+        g.concentration,
+        g.vapor_pressure,
+    )
+    before = [array.numpy().copy() for array in arrays]
+    with pytest.raises(ValueError, match="overlap"):
+        module._validate_public_p4_inputs(
+            preflight, kwargs["exhaustion_controls"], buffers
+        )
+    for array, expected in zip(arrays, before, strict=True):
+        np.testing.assert_array_equal(array.numpy(), expected)
