@@ -413,3 +413,34 @@ process guides. `.venv/bin/mkdocs build --strict` then exited 0, built in 1.58s
 P6 remains in progress: broader foundations/process/API snippets, public
 quick-start integration fixture, navigation and inventory reconciliation are
 still pending. P7 and final full-repository gates remain outstanding.
+
+### P6 public quick starts and foundations checkpoint (2026-11-11)
+
+README now publishes a self-contained native resolved condensation/coagulation
+pipeline with explicit counts, 1e-6 m³ volume, process-owned physics and ordered
+species mapping. The documentation home quick start retains its original
+250-node lognormal PMF, 100 nm mode, GSD 1.2, 1e8 m⁻³ population, density,
+vapor concentration/pressure and single 10-second step. Its exaggerated
+100 kg/m³ vapor concentration is explicitly illustrative, not atmospheric
+calibration or accuracy evidence. Both pages identify the selected E9 checkout
+rather than claiming older wheels contain these APIs. README simulation links
+now expose the recorded organic-composition and cloud oscillation limitations.
+The integration test executes each exact published snippet and independently
+checks native interpretation, number where applicable, uptake and total mass.
+
+The foundations guide now states native discrete/resolved Warp metadata
+preservation, PDF rejection, actual aggregate access/replacement semantics,
+explicit species binding and fresh restart binding ownership. It replaces
+stale M1/M2 handoff language and unweighted resolved latent-energy notation.
+Its concrete construction snippet declares resolved counts; a regression
+executes that exact snippet and checks number density and extensive particle
+and gas inventories at non-unit volume. Broader process snippets and the rest
+of the foundations page still require the P6 audit; this checkpoint does not
+claim that audit complete.
+
+Validation: native access and quick-start suites report **14 passed in 0.06s**;
+scoped Ruff check/format and git diff --check pass. Strict MkDocs builds after
+quick-start edits and foundations edits both exit 0 (logs
+`/tmp/m5-p6-quickstarts-mkdocs.log` and
+`/tmp/m5-p6-foundations-mkdocs.log`). P6 remains In Progress, P7 and final gates
+remain outstanding, and no PR has been opened.

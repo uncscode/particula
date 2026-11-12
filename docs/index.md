@@ -126,70 +126,52 @@ If you are new to Python or plan on going through the Examples, head to [Setup P
 
 ### Quick Start Example
 
-This “Quick Start Example” demonstrates a concise workflow for building an aerosol system in Particula and performing a single condensation step.
+This native single-box example initializes a lognormal PMF and performs one
+10-second condensation step. Use the selected E9 checkout (`pip install -e .`);
+older published wheels need not contain these migration APIs. The retained
+100 kg/m³ vapor concentration is an exaggerated illustration, not a calibrated
+atmospheric case or an accuracy/convergence claim.
 
 ```python
 import numpy as np
 import particula as par
-from particula._legacy_aerosol import AerosolBuilder as LegacyAerosolBuilder
+from particula.dynamics.condensation.species_mapping import CondensationSpeciesMap
 
-# 1. Build the GasSpecies for an organic vapor:
-organic = (
-    par.gas.GasSpeciesBuilder()
-    .set_name("organic")
-    .set_molar_mass(180e-3, "kg/mol")
-    .set_vapor_pressure_strategy(
-        par.gas.ConstantVaporPressureStrategy(1e2)  # Pa
-    )
-    .set_partitioning(True)
-    .set_concentration(np.array([1e2]), "kg/m^3")
-    .build()
+particles = par.particles.create_lognormal_binned_particle_data(
+    distribution_type="discrete",
+    radius_bins=np.logspace(-9, -4, 250),
+    mode=[100e-9], geometric_standard_deviation=[1.2],
+    number_concentration=[1e8], density=1000.0,
 )
-
-# 2. Use AtmosphereBuilder to configure temperature, pressure, and species:
-atmosphere = (
-    par.gas.AtmosphereBuilder()
-    .set_temperature(298.15, "K")
-    .set_pressure(101325, "Pa")
-    .set_more_partitioning_species(organic)
-    .build()
+gas = par.gas.GasData(
+    name=["organic"], molar_mass=np.array([0.180]),
+    concentration=np.array([[100.0]]),  # kg/m³
+    partitioning=np.array([True]),
 )
-
-# 3. Build the particle distribution:
-#    Using PresetParticleRadiusBuilder, we set mode radius, GSD, etc.
-particle = (
-    par.particles.PresetParticleRadiusBuilder()
-    .set_mode(np.array([100e-9]), "m")
-    .set_geometric_standard_deviation(np.array([1.2]))
-    .set_number_concentration(np.array([1e8]), "1/m^3")
-    .set_density(1e3, "kg/m^3")
-    .build()
+environment = par.gas.EnvironmentData(
+    temperature=[298.15], pressure=[101325.0], saturation_ratio=[[1.0]],
 )
+aerosol = par.Aerosol(particles=particles, gas=gas, environment=environment)
+initial_particle_mass = particles.species_mass_inventory.copy()
 
-# 4. Create the Aerosol combining the atmosphere and particle distribution:
-aerosol = (
-    LegacyAerosolBuilder()
-    .set_atmosphere(atmosphere)
-    .set_particles(particle)
-    .build()
+strategy = par.dynamics.CondensationIsothermal(
+    molar_mass=gas.molar_mass.copy(),
+    diffusion_coefficient=2e-5, accommodation_coefficient=1.0,
+    activity_strategy=par.particles.ActivityIdealMass(),
+    surface_strategy=par.particles.SurfaceStrategyVolume(
+        surface_tension=0.072, density=1000.0
+    ),
+    vapor_pressure_strategy=par.gas.ConstantVaporPressureStrategy(100.0),
+    species_map=CondensationSpeciesMap(("organic",), ((0, 0),)),
 )
-
-# 5. Define the isothermal condensation strategy:
-condensation_strategy = par.dynamics.CondensationIsothermal(
-    molar_mass=180e-3,  # kg/mol
-    diffusion_coefficient=2e-5,  # m^2/s
-    accommodation_coefficient=1.0,
-)
-
-# 6. Build the MassCondensation process:
-process = par.dynamics.MassCondensation(condensation_strategy)
-
-# 7. Execute the condensation process over 10 seconds:
+process = par.dynamics.MassCondensation(strategy)
 result = process.execute(aerosol, time_step=10.0)
-
-#   The result is an Aerosol instance with updated particle properties.
-print(result)
+print(result.particles.species_mass_density)  # kg/m³
 ```
+
+The PMF stores bin number densities and uses the canonical 1 m³ reference
+volume. See [native construction](Features/particle-data-migration/construction.md)
+and [access and replacement](Features/particle-data-migration/containers.md).
 
 ---
 
