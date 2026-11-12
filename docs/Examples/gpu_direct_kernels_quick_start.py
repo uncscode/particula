@@ -58,7 +58,8 @@ def _build_particle_data() -> ParticleData:
     """Create one-box, two-particle, one-species CPU particle data.
 
     The sole mass column corresponds to the ``Water`` species in
-    :func:`_build_gas_data`.
+    :func:`_build_gas_data`. Each slot represents a number density of 1 m⁻³,
+    stored as 1e-6 resolved counts in the 1e-6 m³ represented volume.
 
     Returns:
         Particle data with ``float64`` state arrays and masses shaped
@@ -66,10 +67,11 @@ def _build_particle_data() -> ParticleData:
     """
     return ParticleData(
         masses=np.array([[[1.0e-18], [1.2e-18]]], dtype=np.float64),
-        concentration=np.array([[1.0, 1.0]], dtype=np.float64),
+        concentration=np.array([[1.0e-6, 1.0e-6]], dtype=np.float64),
         charge=np.array([[0.0, 0.0]], dtype=np.float64),
         density=np.array([1000.0], dtype=np.float64),
         volume=np.array([1.0e-6], dtype=np.float64),
+        distribution_type="particle_resolved",
     )
 
 
@@ -136,6 +138,26 @@ def _load_gpu_runtime() -> tuple[Any, Any, Any, Any]:
         kernels.condensation_step_gpu,
         condensation.CondensationScratchBuffers,
         thermodynamics.ThermodynamicsConfig,
+    )
+
+
+def _prepare_species_binding(particles: Any, gas: Any, names: list[str]) -> Any:
+    """Explicitly bind the Water lane to the exact transferred carriers.
+
+    Imports and configuration uploads occur only on the enabled Warp route.
+    Names are the complete gas order retained by the caller during transfer.
+    Replacing either carrier requires a new explicit preparation.
+    """
+    from particula.dynamics.condensation.species_mapping import (
+        CondensationSpeciesMap,
+    )
+    from particula.gpu.species_mapping import prepare_condensation_species_map
+
+    return prepare_condensation_species_map(
+        particles,
+        gas,
+        gas_names=names,
+        species_map=CondensationSpeciesMap(tuple(names), ((0, 0),)),
     )
 
 
@@ -214,6 +236,9 @@ def run_example(device: str = "cpu") -> ExampleRun:
         device=device,
         vapor_pressure=_build_vapor_pressure(),
     )
+    species_binding = _prepare_species_binding(
+        gpu_particle_data, gpu_gas_data, saved_names
+    )
 
     transfer_shape = particle_data.masses.shape
     box_shape = (particle_data.n_boxes,)
@@ -274,6 +299,7 @@ def run_example(device: str = "cpu") -> ExampleRun:
         mass_accommodation=mass_accommodation,
         diffusion_coefficient_vapor=diffusion_coefficient_vapor,
         thermodynamics=thermodynamics,
+        species_binding=species_binding,
         scratch_buffers=scratch_buffers,
         latent_heat=latent_heat,
         energy_transfer=energy_transfer,
@@ -288,6 +314,7 @@ def run_example(device: str = "cpu") -> ExampleRun:
         mass_accommodation=mass_accommodation,
         diffusion_coefficient_vapor=diffusion_coefficient_vapor,
         thermodynamics=thermodynamics,
+        species_binding=species_binding,
         scratch_buffers=scratch_buffers,
         latent_heat=latent_heat,
         energy_transfer=energy_transfer,

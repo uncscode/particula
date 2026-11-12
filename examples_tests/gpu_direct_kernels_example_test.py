@@ -71,6 +71,11 @@ def test_cpu_builders_preserve_documented_dtype_and_species_order(
     vapor_pressure = example_module._build_vapor_pressure()
 
     assert particle_data.masses.shape == (1, 2, 1)
+    assert particle_data.distribution_type == "particle_resolved"
+    np.testing.assert_array_equal(
+        particle_data.concentration / particle_data.volume[:, None],
+        [[1.0, 1.0]],
+    )
     assert particle_data.concentration.shape == (1, 2)
     assert particle_data.masses.dtype == np.float64
     assert particle_data.concentration.dtype == np.float64
@@ -303,6 +308,15 @@ def test_enabled_path_reuses_complete_caller_owned_sidecars(
     gas_data = example_module._build_gas_data()
     gpu_particles = object()
     gpu_gas = object()
+    binding = object()
+
+    def prepare(particles, gas, names):
+        assert particles is gpu_particles and gas is gpu_gas
+        assert names == ["Water"]
+        events.append("prepare_binding")
+        return binding
+
+    monkeypatch.setattr(example_module, "_prepare_species_binding", prepare)
 
     def fake_step(*args: Any, **kwargs: Any) -> tuple[Any, Any]:
         events.append("step")
@@ -365,6 +379,7 @@ def test_enabled_path_reuses_complete_caller_owned_sidecars(
     assert events == [
         "to_particles",
         "to_gas",
+        "prepare_binding",
         "step",
         "step",
         "from_particles",
@@ -397,7 +412,9 @@ def test_enabled_path_reuses_complete_caller_owned_sidecars(
     np.testing.assert_allclose(result.total_mass_transfer.numpy(), 2.0)
     np.testing.assert_allclose(result.energy_transfer.numpy(), 20.0)
     for call in calls:
+        assert call["species_binding"] is binding
         assert set(call) == {
+            "species_binding",
             "temperature",
             "pressure",
             "time_step",
@@ -462,6 +479,9 @@ def test_kernel_failure_propagates_without_restore_or_success_output(
 ) -> None:
     """Test failed steps are observable and do not claim a checkpoint."""
     invocation = 0
+    monkeypatch.setattr(
+        example_module, "_prepare_species_binding", lambda *args: object()
+    )
 
     def failing_step(*args: Any, **kwargs: Any) -> tuple[Any, Any]:
         nonlocal invocation
@@ -522,10 +542,13 @@ def test_real_warp_cpu_path_reuses_sidecars_and_couples_gas(
     result = example_module.run_example(device="cpu")
 
     assert result.particle_data is not None
+    assert result.particle_data.distribution_type == "particle_resolved"
     assert result.gas_data is not None
     assert result.particle_data.masses.shape == (1, 2, 1)
     assert result.gas_data.name == ["Water"]
     assert len(calls) == 2
+    assert calls[0]["species_binding"] is calls[1]["species_binding"]
+    assert calls[0]["species_binding"].gas_names == ("Water",)
     assert calls[0]["scratch_buffers"] is calls[1]["scratch_buffers"]
     assert calls[0]["latent_heat"] is calls[1]["latent_heat"]
     assert calls[0]["energy_transfer"] is calls[1]["energy_transfer"]
@@ -545,9 +568,12 @@ def test_real_warp_cpu_path_reuses_sidecars_and_couples_gas(
     assert np.any(energy != 0.0)
     np.testing.assert_allclose(
         energy,
-        np.sum(transfer, axis=1) * latent_heat[None, :],
+        np.sum(
+            transfer * result.particle_data.concentration[:, :, None], axis=1
+        )
+        * latent_heat[None, :],
         rtol=1e-12,
-        atol=1e-18,
+        atol=1e-30,
     )
     initial_particles = example_module._build_particle_data()
     initial_gas = example_module._build_gas_data()
@@ -559,7 +585,7 @@ def test_real_warp_cpu_path_reuses_sidecars_and_couples_gas(
     gas_change = result.gas_data.concentration - initial_gas.concentration
     assert np.any(gas_change != 0.0)
     np.testing.assert_allclose(
-        particle_change + gas_change,
+        particle_change / initial_particles.volume[:, None] + gas_change,
         0.0,
         rtol=1e-12,
         atol=1e-18,

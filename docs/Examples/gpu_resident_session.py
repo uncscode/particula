@@ -101,7 +101,7 @@ def _load_enabled_runtime() -> SimpleNamespace:
 
 
 def _build_cpu_state() -> tuple[ParticleData, GasData, EnvironmentData]:
-    """Build deterministic one-box CPU carriers for the single upload.
+    """Build native carriers holding one particle in a 1e-6 m³ volume.
 
     Returns:
         Particle, gas, and environment carriers in that setup order.
@@ -112,6 +112,7 @@ def _build_cpu_state() -> tuple[ParticleData, GasData, EnvironmentData]:
         charge=np.array([[0.0]], dtype=np.float64),
         density=np.array([1000.0], dtype=np.float64),
         volume=np.array([1.0e-6], dtype=np.float64),
+        distribution_type="particle_resolved",
     )
     gas = GasData(
         name=["water"],
@@ -195,7 +196,7 @@ def run_example(device: str = "cpu") -> ExampleRun:
             "and cached.",
             "Restart is explicit, same-device, and never automatic.",
             "Inspection is lossy; canonical checkpoint bytes are restart authority.",
-            "Checkpoint schema version 1 compatibility is exact and fail-closed.",
+            "Checkpoint schema version 5 compatibility is exact and fail-closed.",
             "Exclusions: no scheduling, transport, fallback, or physics orchestration.",
         ],
         session=session,

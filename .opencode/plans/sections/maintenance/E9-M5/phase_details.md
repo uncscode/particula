@@ -62,7 +62,7 @@ Notebook sync/execution occurs in the owning phase, not deferred to P7.
     not justification to silently remove an example from support.
 
 - [ ] **E9-M5-P5: Reconcile explicit-transfer and resident examples with boundary tests**
-  - Issue: TBD | Size: S | Status: Not Started
+  - Issue: TBD | Size: S | Status: In Progress
   - Work: Audit/migrate all root direct-GPU and resident scripts plus direct
     nucleation. Preserve standalone versus resident workflow distinctions,
     ordered gas-name ownership, explicit transfers and concrete-only setup.

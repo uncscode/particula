@@ -47,7 +47,8 @@ def test_build_cpu_state_has_documented_sparse_float64_schema(
     assert particles.masses.dtype == np.float64
     assert particles.concentration.shape == (1, 4)
     assert particles.charge.shape == (1, 4)
-    assert np.array_equal(particles.concentration, [[2.0, 0.0, 5.0, 0.0]])
+    assert particles.distribution_type == "particle_resolved"
+    assert np.array_equal(particles.concentration, [[2.0, 0.0, 2.0, 0.0]])
     assert np.array_equal(particles.masses[0, [1, 3]], [[0.0, 0.0], [0.0, 0.0]])
     assert gas.concentration.shape == (1, 2)
     assert gas.partitioning.dtype == np.bool_
@@ -389,6 +390,10 @@ def _fake_step_result(
 ) -> Any:
     """Assert one fake direct-step contract and return its documented owners."""
     assert args[0] is particles
+    if name in ("condensation", "nucleation"):
+        binding = kwargs["species_binding"]
+        assert binding.particles is particles and binding.gas is gas
+        assert binding.names == ["water", "organic"]
     if name == "condensation":
         assert args[1] is gas and kwargs["environment"] is environment
         scratch = kwargs["scratch_buffers"]
@@ -415,6 +420,14 @@ def _fake_step_result(
         return particles
     assert args[1] is gas and kwargs["environment"] is environment
     return particles, gas
+
+
+def _fake_species_bindings(particles, gas, names):
+    """Retain carrier provenance in the hardware-free dispatch fixtures."""
+    return tuple(
+        SimpleNamespace(particles=particles, gas=gas, names=names)
+        for _ in range(2)
+    )
 
 
 def _boundary_step_factory(
@@ -530,6 +543,9 @@ def test_enabled_path_converts_once_orders_steps_and_restores_once(
         from_warp_gas_data=gas_restore,
         from_warp_environment_data=environment_restore,
     )
+    monkeypatch.setattr(
+        example_module, "_prepare_species_bindings", _fake_species_bindings
+    )
 
     def step(name: str) -> Any:
         def call(*args: Any, **kwargs: Any) -> Any:
@@ -625,6 +641,9 @@ def test_boundary_failure_propagates_stops_later_calls_and_prevents_early_restor
     gas = SimpleNamespace()
     environment = SimpleNamespace()
     fake_warp = _FakeWarp(events)
+    monkeypatch.setattr(
+        example_module, "_prepare_species_bindings", _fake_species_bindings
+    )
     fake_warp.synchronize = _boundary_synchronize_factory(  # type: ignore[method-assign]
         failure_boundary,
         events,
@@ -782,11 +801,88 @@ def test_real_warp_cpu_path_restores_named_cpu_containers(
         pytest.skip("Warp is not available")
     monkeypatch.delenv("PARTICULA_EXAMPLE_FORCE_NO_WARP", raising=False)
 
+    runtime = example_module._load_enabled_runtime()
+    stages = []
+
+    def snapshot(particles, gas):
+        # Test-only observation; the published sequence has no intermediate
+        # host restore or instrumentation.
+        masses = particles.masses.numpy().copy()
+        counts = particles.concentration.numpy().copy()
+        volume = particles.volume.numpy().copy()
+        gas_density = gas.concentration.numpy().copy()
+        return {
+            "inventory": np.sum(masses * counts[:, :, None], axis=1)
+            + gas_density * volume[:, None],
+            "masses": masses,
+            "counts": counts,
+            "gas": gas_density,
+            "volume": volume,
+        }
+
+    current_gas = None
+
+    def observe(name, function):
+        def call(*args, **kwargs):
+            nonlocal current_gas
+            if name == "condensation":
+                current_gas = args[1]
+            before = snapshot(args[0], current_gas)
+            if name in ("condensation", "nucleation"):
+                binding = kwargs["species_binding"]
+                assert binding.particles is args[0]
+                assert binding.gas is current_gas
+                assert binding.gas_names == ("water", "organic")
+            result = function(*args, **kwargs)
+            stages.append((name, before, snapshot(args[0], current_gas)))
+            return result
+
+        return call
+
+    for name in _BOUNDARY_STEPS[:5]:
+        attribute = f"{name}_step_gpu"
+        setattr(runtime, attribute, observe(name, getattr(runtime, attribute)))
+    monkeypatch.setattr(
+        example_module, "_load_enabled_runtime", lambda: runtime
+    )
     result = example_module.run_example()
 
     assert result.particle_data is not None
     assert result.gas_data is not None
     assert result.environment_data is not None
     assert result.particle_data.masses.shape == (1, 4, 2)
+    assert result.particle_data.distribution_type == "particle_resolved"
     assert result.gas_data.name == ["water", "organic"]
     assert result.environment_data.temperature.shape == (1,)
+    _assert_native_stage_inventories(stages)
+
+
+def _assert_native_stage_inventories(stages):
+    """Check the independent extensive inventory contract of each process."""
+    assert [name for name, _, _ in stages] == list(_BOUNDARY_STEPS[:5])
+    for name, before, after in stages:
+        np.testing.assert_array_equal(after["volume"], before["volume"])
+        assert np.all(np.isfinite(after["inventory"]))
+        if name in ("condensation", "coagulation", "nucleation"):
+            np.testing.assert_allclose(
+                after["inventory"],
+                before["inventory"],
+                rtol=1e-12,
+                atol=1e-30,
+            )
+        if name == "dilution":
+            for field in ("counts", "gas", "inventory"):
+                np.testing.assert_allclose(
+                    after[field],
+                    before[field] * np.exp(-0.2 * 0.1),
+                    rtol=1e-12,
+                    atol=1e-30,
+                )
+            np.testing.assert_array_equal(after["masses"], before["masses"])
+        if name == "wall_loss":
+            assert np.all(after["counts"] <= before["counts"])
+            assert np.all(after["inventory"] <= before["inventory"])
+            np.testing.assert_array_equal(after["gas"], before["gas"])
+        if name == "nucleation":
+            for field in ("masses", "counts", "gas"):
+                np.testing.assert_array_equal(after[field], before[field])

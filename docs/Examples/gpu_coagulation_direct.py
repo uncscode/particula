@@ -43,7 +43,11 @@ class ExampleRun:
 
 
 def _build_particle_data() -> ParticleData:
-    """Create a deterministic one-box particle-resolved CPU fixture.
+    """Create six unit-count particles in 1e-18 m³ and two inactive slots.
+
+    Inactive material/charge is deliberately retained to demonstrate that
+    coagulation ignores zero-count slots. These are not canonical free slots
+    suitable for nucleation or activation.
 
     Returns:
         Eight particle slots with six active particles and two inactive slots.
@@ -74,6 +78,7 @@ def _build_particle_data() -> ParticleData:
         ),
         density=np.array([1000.0], dtype=np.float64),
         volume=np.array([1.0e-18], dtype=np.float64),
+        distribution_type="particle_resolved",
     )
 
 
@@ -197,7 +202,24 @@ def run_example(device: str = "cpu") -> ExampleRun:
         collision_pairs = backend_result.collision_pairs
         n_collisions = backend_result.n_collisions
     wp.synchronize()
-    restored_particle_data = from_warp_particle_data(gpu_particle_data)
+    restored_particle_data = from_warp_particle_data(
+        gpu_particle_data, sync=False
+    )
+    # Resolved concentration is a count, so extensive species mass has no
+    # extra volume factor. Do not count material in zero-count inactive slots.
+    np.testing.assert_allclose(
+        np.sum(
+            restored_particle_data.masses
+            * restored_particle_data.concentration[:, :, None],
+            axis=1,
+        ),
+        np.sum(
+            particle_data.masses * particle_data.concentration[:, :, None],
+            axis=1,
+        ),
+        rtol=1e-12,
+        atol=1e-30,
+    )
     output.extend(
         [
             "Explicit helpers: CPU→Warp conversion -> selected-adapter dispatch -> CPU restoration",

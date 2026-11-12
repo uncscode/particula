@@ -78,6 +78,10 @@ def _build_cpu_state() -> tuple[
 
     The particle storage has two active and two exactly-free fixed slots. Gas
     names are copied before conversion because Warp gas data does not own them.
+    Both active slots carry two resolved counts in 1e-6 m³. Native coagulation
+    requires equal positive counts: the former unequal 2/5 fixture was not
+    supported by that contract. This is an illustrative sequence, not a
+    calibrated population. Condensation couples gas using counts/volume.
 
     Returns:
         CPU particle, gas, and environment containers plus copied gas names.
@@ -87,10 +91,11 @@ def _build_cpu_state() -> tuple[
             [[[1.0e-18, 2.0e-18], [0.0, 0.0], [3.0e-18, 0.0], [0.0, 0.0]]],
             dtype=np.float64,
         ),
-        concentration=np.array([[2.0, 0.0, 5.0, 0.0]], dtype=np.float64),
+        concentration=np.array([[2.0, 0.0, 2.0, 0.0]], dtype=np.float64),
         charge=np.array([[1.0, 0.0, -2.0, 0.0]], dtype=np.float64),
         density=np.array([1000.0, 1500.0], dtype=np.float64),
         volume=np.array([1.0e-6], dtype=np.float64),
+        distribution_type="particle_resolved",
     )
     gas_data = GasData(
         name=["water", "organic"],
@@ -176,6 +181,42 @@ def _load_enabled_runtime() -> SimpleNamespace | None:
         NucleationDiagnosticBuffers=nucleation.NucleationDiagnosticBuffers,
         NucleationExhaustionBuffers=nucleation.NucleationExhaustionBuffers,
         NucleationExhaustionControls=nucleation.NucleationExhaustionControls,
+    )
+
+
+def _prepare_species_bindings(
+    particles: Any, gas: Any, names: list[str]
+) -> tuple[Any, Any]:
+    """Upload explicit process maps for the current transferred carriers.
+
+    Both processes map water and organic gas lanes to their particle material
+    lanes. Maps are configuration, not a second transfer of physical state.
+    They remain bound to these exact carriers and arrays.
+    """
+    from particula.dynamics.condensation.species_mapping import (
+        CondensationSpeciesMap,
+    )
+    from particula.dynamics.nucleation.species_mapping import (
+        NucleationSpeciesMap,
+    )
+    from particula.gpu.nucleation_species_mapping import (
+        prepare_nucleation_species_map,
+    )
+    from particula.gpu.species_mapping import prepare_condensation_species_map
+
+    return (
+        prepare_condensation_species_map(
+            particles,
+            gas,
+            gas_names=names,
+            species_map=CondensationSpeciesMap(tuple(names), ((0, 0), (1, 1))),
+        ),
+        prepare_nucleation_species_map(
+            particles,
+            gas,
+            gas_names=names,
+            species_map=NucleationSpeciesMap(tuple(names), ((0, 0), (1, 1))),
+        ),
     )
 
 
@@ -394,6 +435,9 @@ def run_example(device: str = "cpu") -> ExampleRun:
     gpu_environment = runtime.gpu.to_warp_environment_data(
         environment_data, device=device
     )
+    condensation_binding, nucleation_binding = _prepare_species_bindings(
+        gpu_particles, gpu_gas, gas_names
+    )
     sidecars = _allocate_sidecars(
         runtime, device, particle_data.masses.shape, gas_data.molar_mass
     )
@@ -430,6 +474,7 @@ def run_example(device: str = "cpu") -> ExampleRun:
         0.01,
         environment=gpu_environment,
         thermodynamics=sidecars.thermodynamics,
+        species_binding=condensation_binding,
         scratch_buffers=sidecars.condensation_scratch,
     )
     assert (
@@ -473,6 +518,7 @@ def run_example(device: str = "cpu") -> ExampleRun:
         gpu_gas,
         nucleation_config,
         0.0,
+        species_binding=nucleation_binding,
         scratch=sidecars.nucleation_scratch,
         finalized_demand=sidecars.finalized_demand,
         diagnostics=sidecars.diagnostics,

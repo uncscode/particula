@@ -41,6 +41,7 @@ def test_cpu_fixture_has_documented_active_and_inactive_slots(
     particle_data = example_module._build_particle_data()
 
     assert particle_data.masses.shape == (1, 8, 1)
+    assert particle_data.distribution_type == "particle_resolved"
     assert particle_data.concentration.shape == (1, 8)
     assert all(
         array.dtype == np.float64
@@ -240,9 +241,10 @@ def test_enabled_path_uses_selected_adapter_and_explicit_lifecycle(
         events.append("convert")
         return gpu_particles
 
-    def restore(_: Any) -> Any:
+    def restore(_: Any, *, sync: bool) -> Any:
         """Return the restored CPU checkpoint after recording restoration."""
         events.append("restore")
+        assert sync is False
         return restored
 
     monkeypatch.setattr(
@@ -309,7 +311,7 @@ def test_failures_propagate_without_fallback_or_restore(
                 raise RuntimeError(failure_at)
             return super().execute(execution_state)
 
-    def restore(value: Any) -> Any:
+    def restore(value: Any, *, sync: bool) -> Any:
         nonlocal restored
         restored = True
         if failure_at == "restore":
@@ -369,6 +371,16 @@ def test_real_warp_selected_adapter_reuses_rng_and_preserves_identity(
     result = example_module.run_example(device="cpu")
 
     assert result.particle_data is not None
+    assert result.particle_data.distribution_type == "particle_resolved"
+    np.testing.assert_allclose(
+        np.sum(
+            result.particle_data.masses
+            * result.particle_data.concentration[:, :, None]
+        ),
+        12.5e-21,
+        rtol=1e-12,
+        atol=1e-30,
+    )
     assert result.collision_pairs is not None
     assert result.n_collisions is not None
     assert result.rng_states is not None

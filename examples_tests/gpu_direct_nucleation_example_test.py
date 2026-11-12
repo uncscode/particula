@@ -44,8 +44,10 @@ def _run_documented_command() -> subprocess.CompletedProcess[str]:
 
 
 @pytest.mark.warp
+@pytest.mark.parametrize("volume", [1.0, 2.0])
 def test_direct_example_runs_with_explicit_transfer_and_conservation(
     monkeypatch: pytest.MonkeyPatch,
+    volume: float,
 ) -> None:
     """Run the standalone fixture and check identity-derived final state."""
     _require_warp()
@@ -61,6 +63,10 @@ def test_direct_example_runs_with_explicit_transfer_and_conservation(
                 assert kwargs["sync"] is False
                 assert args[0] is converted[name.replace("from_", "to_")]
             if name == "nucleation_step_gpu":
+                binding = kwargs["species_binding"]
+                assert binding.particles is args[0]
+                assert binding.gas is args[1]
+                assert binding.gas_names == ("precursor",)
                 assert args[0] is converted["to_warp_particle_data"]
                 assert args[1] is converted["to_warp_gas_data"]
                 assert (
@@ -79,6 +85,7 @@ def test_direct_example_runs_with_explicit_transfer_and_conservation(
         "to_warp_particle_data",
         "to_warp_gas_data",
         "to_warp_environment_data",
+        "prepare_nucleation_species_map",
         "nucleation_step_gpu",
         "synchronize",
         "from_warp_particle_data",
@@ -100,15 +107,20 @@ def test_direct_example_runs_with_explicit_transfer_and_conservation(
             synchronize=observe("synchronize", wp.synchronize),
         ),
     )
-    particles, gas, environment = namespace["run_example"]()
+    particles, gas, environment = namespace["run_example"](volume=volume)
     assert events == boundaries
     assert particles.masses.shape == (1, 2, 1)
     assert gas.concentration.shape == (1, 1)
     assert environment.temperature.shape == (1,)
-    assert np.count_nonzero(particles.concentration) == 1
+    assert particles.distribution_type == "particle_resolved"
+    assert np.count_nonzero(particles.concentration) == int(volume)
+    npt.assert_array_equal(particles.volume, [volume])
     inventory = np.sum(particles.masses * particles.concentration[:, :, None])
     npt.assert_allclose(
-        inventory + gas.concentration.sum(), 1.0, rtol=1e-12, atol=1e-30
+        inventory + gas.concentration.sum() * volume,
+        volume,
+        rtol=1e-12,
+        atol=1e-30,
     )
 
 

@@ -213,6 +213,8 @@ def test_main_propagates_an_enabled_loader_error(
 def test_real_warp_cpu_lifecycle_example() -> None:
     """The real Warp CPU route preserves the identity lifecycle."""
     pytest.importorskip("warp")
+    from particula.gpu import from_warp_particle_data
+
     spec = importlib.util.spec_from_file_location(
         "resident_example_real", _EXAMPLE
     )
@@ -239,6 +241,13 @@ def test_real_warp_cpu_lifecycle_example() -> None:
     assert restarted_session.particles is not result.session.particles
     assert restarted_session.gas is not result.session.gas
     assert restarted_session.environment is not result.session.environment
+    # Explicit inspection after restart verifies native metadata and raw counts
+    # survive the checkpoint boundary; lifecycle bookkeeping ran no physics.
+    restored = from_warp_particle_data(restarted_session.particles)
+    assert restored.distribution_type == "particle_resolved"
+    assert restored.concentration[0, 0] == 1.0
+    assert restored.volume[0] == 1.0e-6
+    assert restored.masses[0, 0, 0] == 1.0e-18
     first_view = restarted_registry.acquire_wall_loss()
     second_view = restarted_registry.acquire_wall_loss()
     assert first_view is second_view
