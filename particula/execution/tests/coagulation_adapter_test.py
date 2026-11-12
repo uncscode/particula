@@ -17,7 +17,7 @@ import pytest
 import particula.execution as execution
 import particula.execution.adapters as adapters
 import particula.execution.adapters.coagulation as coagulation_adapter
-from particula._legacy_aerosol import Aerosol
+from particula.aerosol import Aerosol
 from particula.dynamics import Coagulation
 from particula.dynamics.coagulation.coagulation_strategy.brownian_coagulation_strategy import (
     BrownianCoagulationStrategy,
@@ -205,7 +205,7 @@ def guarded_import(name, *args, **kwargs):
     return original_import(name, *args, **kwargs)
 
 builtins.__import__ = guarded_import
-from particula._legacy_aerosol import Aerosol
+from particula.aerosol import Aerosol
 from particula.execution.adapters.coagulation import (
     BrownianCoagulationConfig, CPUCoagulationResult, CPUCoagulationState,
 )
