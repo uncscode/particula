@@ -110,10 +110,6 @@ def validate_population(particles: Any) -> tuple[Any, ...]:
     active-slot geometry. Callers retain those process-specific checks.
     """
     kind = particle_distribution_type(particles)
-    if kind is None:
-        raise ValueError(
-            "native validation requires explicit population metadata"
-        )
     masses: Any = getattr(particles, "masses", None)
     if not _is_warp_array_like(masses) or masses.ndim != 3:
         raise ValueError("native masses must be rank-three Warp storage")
