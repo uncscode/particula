@@ -629,7 +629,9 @@ def _gas_configuration(
     rates: np.ndarray,
     enabled: np.ndarray | None = None,
 ):
-    """Build the exact P1 declaration used by direct gas-transport tests."""
+    """Build the exact map validation declaration used by direct gas-transport
+    tests.
+    """
     wp = _warp()
     from particula.execution.communication import (
         CommunicationConfiguration,
@@ -1131,7 +1133,9 @@ def test_gas_communication_schema_valid_no_ops_preserve_work_storage(
 def test_gas_communication_rejects_mutated_declaration_metadata(
     mutation: tuple[str, object], message: str
 ) -> None:
-    """Fail closed for exact P1 declaration metadata before primary mutation."""
+    """Fail closed for exact map validation declaration metadata before primary
+    mutation.
+    """
     wp = _warp()
     from particula.gpu.kernels.communication import gas_communication_step_gpu
 
@@ -1468,7 +1472,9 @@ def _particle_configuration(
     rates: np.ndarray,
     enabled: np.ndarray | None = None,
 ):
-    """Build an exact P1 particle-only declaration for direct-kernel tests."""
+    """Build an exact map validation particle-only declaration for direct-kernel
+    tests.
+    """
     wp = _warp()
     from particula.execution.communication import (
         CommunicationConfiguration,

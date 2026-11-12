@@ -2,9 +2,9 @@
 
 ## Scope and current evidence status
 
-E8-F7/T7 owns CUDA profiling and machine-bounded optimization
-recommendations for resident graph capture. E8-F8 is restricted to the
-example, limitations, and epic closeout. P1--P4 profiling support is shipped,
+CUDA profiling owns CUDA profiling and machine-bounded optimization
+recommendations for resident graph capture. Graph-capture documentation is restricted to the
+example, limitations, and epic closeout. Profiling support is shipped,
 but no reviewed normalized artifact or manifest is checked in. Consequently,
 results, rankings, and recommendations are unavailable and unshipped.
 

@@ -4,7 +4,7 @@ title: Data Containers and GPU Foundations
 
 # Data Containers and GPU Foundations
 
-This page is the canonical reference for the selected E9 checkout's data-container
+This page is the canonical reference for the v0.3.0 development checkout's data-container
 schemas, leading-axis shape conventions, explicit CPU↔GPU transfer helpers,
 the direct-kernel troubleshooting contract, and current CPU/GPU support
 boundaries.
@@ -42,7 +42,7 @@ is implied. Native transfers and caller-owned scratch remain visible.
 
 ## Public imports
 
-### Concrete CPU structural alignment (P4)
+### Concrete CPU structural alignment (API validation)
 
 Import `validate_aerosol_structure` directly from
 `particula.aerosol_validation`, not from the top-level package. It checks
@@ -393,7 +393,7 @@ validated deferred state.
 
 Invalid adapter state, time, or profile rejection, and aggregate direct-kernel
 preflight, preserve caller primary and output state before a writer launch. A
-raw-proposal failure occurs before P2 commit in its failing substep, but
+raw-proposal failure occurs before numerical validation commit in its failing substep, but
 completed earlier substeps remain committed and documented vapor-pressure/work
 sidecars may already be written. Callers needing retry semantics must use their
 own snapshot/restore.
@@ -482,7 +482,7 @@ launches. See
 ### Resident native graph-capture validation (test-only)
 
 Resident native graph capture remains a concrete-only direct-import boundary,
-not a public workflow. The delivered P5 matrix uses CPU as a test-local NumPy
+not a public workflow. The delivered regression validation matrix uses CPU as a test-local NumPy
 reference, Warp CPU as uncaptured evidence, and CUDA native capture as optional
 pass-or-clean-skip evidence. Capture freezes the first physical timestep, and
 each launch executes one timestep through one-token replay with authentic
@@ -539,12 +539,12 @@ entry and a fresh signature comparison, opens exactly one token only after that
 gate, and dispatches the twelve
 frozen operations in canonical order. Empty or no-work bindings are write-free;
 live pinned payload changes are permitted, while structural identities and frozen
-scalar controls require a new prepared record. E8-F1 owns lifecycle,
+scalar controls require a new prepared record. Capture capability owns lifecycle,
 compatibility, CAPTURED admission, invalidation, and FAULTED classification; the
 registry owns sidecars. A writer-capable failure retains the no-rollback, no-retry,
-and no-fallback recovery boundary. E8-F3 owns resource work; E8-F4 native
-capture/replay and captured parity remain downstream; E8-F5--E8-F7 own later
-parity/performance/memory/profiling evidence; E8-F8 owns the example,
+and no-fallback recovery boundary. Resource preallocation owns resource work; capture and replay native
+capture/replay and captured parity remain downstream; captured-loop validation, benchmark collection, and CUDA profiling own later
+parity/performance/memory/profiling evidence; graph-capture documentation owns the example,
 limitations, and closeout.
 
 `particula.execution.resident_scheduler` and
@@ -589,7 +589,7 @@ saturation-refresh consumer window.
 
 ### Prescribed communication and volume evolution
 
-E7-F7 ships fixed-shape, single-device prescribed-map boundaries, not CFD or a
+Communication and volume evolution ships fixed-shape, single-device prescribed-map boundaries, not CFD or a
 user-facing transport API. Direct gas communication accepts a GAS map with
 closed in-domain edges and declared `-1` source/sink endpoints. Direct particle
 transport accepts only closed in-domain, explicitly particle-resolved,
@@ -639,7 +639,7 @@ canonical order above: it uses old-volume staging, invalidates saturation only,
 and retains fresh vapor pressure. Restart remains explicit and exact-device with
 fresh identities. This scope excludes CFD, adaptive/distributed/multi-GPU
 transport, hidden transfer or synchronization, CPU fallback, resizing or
-compaction, E7-F8 RNG policy, graph capture, performance claims, and autodiff.
+compaction, resident RNG and restart RNG policy, graph capture, performance claims, and autodiff.
 
 The direct scheduler skips virtual refresh-node dispatch. Instead, the
 thermodynamic coordinator refreshes stale state in vapor-pressure-then-
@@ -659,7 +659,7 @@ dispatch begins, a failure may fault the session and has no rollback or retry
 guarantee. Checkpoint/finalize/restart remain the explicit exact-device boundary
 documented in [GPU resident checkpoints](gpu_resident_checkpoints.md).
 
-### E7-F9 resident support validation matrix (2026-08-11)
+### Resident support validation matrix (2026-08-11)
 
 The supported resident example is the repository-relative
 [multi-timestep resident source](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_resident_multi_timestep.py).
@@ -670,7 +670,7 @@ passed, but shipment now requires the corrected five-module coverage command
 below to complete and record its literal result. Epic H and Epic I remain
 deferred.
 
-The P1--P6 changed executable-module coverage target list is:
+The diagnostics--example changed executable-module coverage target list is:
 
 - `particula/execution/diagnostics.py`
 - `particula/execution/gpu_resources.py`
@@ -678,7 +678,7 @@ The P1--P6 changed executable-module coverage target list is:
 - `particula/execution/resident_communication.py`
 - `particula/execution/resident_scheduler.py`
 
-Documentation-only P7 files are not executable coverage targets. The required
+Documentation-only support publication files are not executable coverage targets. The required
 changed-module aggregate gate is **at least 80%**. The historical four-module
 closeout passed at 95%; the updated five-module command below must retain its
 literal aggregate and per-target term-missing rows.
@@ -689,7 +689,7 @@ literal aggregate and per-target term-missing rows.
 | Export boundary | Frozen export assertions | Passed: 15 assertions, 15 passed; coverage disabled. |
 | Resident fast suite | Full resident suite | Passed: 891 tests, 891 passed; coverage disabled. |
 | Full-package coverage | Whole-package coverage | Passed: 6,254 tests, 9 skipped, 93% coverage. |
-| P1--P6 changed-module coverage | Five-target coverage gate, `>=80%` aggregate | Run the command below and retain its literal aggregate and per-target term-missing rows, including `resident_communication.py`. |
+| diagnostics--example changed-module coverage | Five-target coverage gate, `>=80%` aggregate | Run the command below and retain its literal aggregate and per-target term-missing rows, including `resident_communication.py`. |
 | Strict documentation | Strict MkDocs build | Passed: `mkdocs build --strict` validated successfully. |
 | Optional CUDA | CUDA guarded suites | Passed: `multi_box_loop_test.py` row and `condensation_integration_test.py` / `coagulation_integration_test.py` rows passed under `-m "warp and cuda"`. |
 
@@ -732,7 +732,7 @@ pytest particula/execution/tests/condensation_integration_test.py \
 
 Acceptance classes remain separate: deterministic comparisons use their owning
 explicit `rtol`/`atol`; closed concentration-weighted inventory and ledger
-checks use `rtol=1e-12, atol=1e-30`; and stochastic evidence is P4's 100-seed
+checks use `rtol=1e-12, atol=1e-30`; and stochastic evidence is parity validation's 100-seed
 Warp-CPU aggregate/binomial evidence with an optional 12-seed CUDA bounded
 smoke—not exact per-seed or cross-backend replay.
 
@@ -762,9 +762,9 @@ Configuration and scratch sidecars remain concrete-module imports.
 Caller-owned sidecars have stable fixed shapes; persistent coagulation and
 wall-loss RNG is also caller-owned. There is no hidden transfer or CPU fallback,
 high-level `Runnable`, backend selector, scheduler, resident production loop, or
-transport API. See the [private P2 evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py),
-[P3 regression](https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_complete_process_sequence_example_test.py),
-and [E6 inventory](Roadmap/data-oriented-gpu.md#e6-roadmap-inventory).
+transport API. See the [direct-process validation evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py),
+[example regression](https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_complete_process_sequence_example_test.py),
+and [GPU process completeness inventory](Roadmap/data-oriented-gpu.md#gpu-process-completeness-roadmap-inventory).
 
 `WarpParticleData`, `WarpEnvironmentData`, and `WarpGasData` are exported from
 `particula.gpu` only when Warp is available, so import them only behind an
@@ -931,7 +931,7 @@ prefix are ignored. A rejected preflight preserves every accessible
 caller-owned particle, request, count, and output buffer. Once the writer
 launches, a later failure does not promise rollback.
 
-`get_slot_diagnostics_gpu` remains a concrete-module-only P3 helper. Import it
+`get_slot_diagnostics_gpu` remains a concrete-module-only full-loop validation helper. Import it
 only from its implementation module:
 
 ```python
@@ -1098,7 +1098,7 @@ preflight and is a write-free, no-update-kernel no-op; preflight validation
 scans may still allocate or launch. The contract does not promise rollback
 after a launched-kernel failure.
 
-E6-F1 supplies the upstream CPU finite-step oracle; E6-F9 is the planned
+CPU dilution supplies the upstream CPU finite-step oracle; direct-process integration is the planned
 integrated direct-call consumer. Independent NumPy comparisons of particle and
 gas concentrations run on Warp CPU with float64 `rtol=1e-12, atol=0`; CUDA is
 optional and skips cleanly when unavailable. This tolerance-based evidence is
@@ -1190,9 +1190,9 @@ consumes no draw. Exact CPU/Warp or per-seed RNG replay is not promised.
 | Neutral and charged particle-resolved spherical/rectangular direct execution | Supported |
 | Charged nonzero-charge image/electric-field composition; zero-charge neutral fallback | Supported |
 | Charged configuration and rectangular field ownership semantics | Supported |
-| Geometry-specific deterministic coefficient tolerances and P5 eight-stratum exact-binomial survival evidence (4,096 observations per stratum; inclusive bounds with per-stratum alpha 1.25e-7) | Supported bounded evidence |
+| Geometry-specific deterministic coefficient tolerances and validation eight-stratum exact-binomial survival evidence (4,096 observations per stratum; inclusive bounds with per-stratum alpha 1.25e-7) | Supported bounded evidence |
 | CUDA validation | Optional additive evidence; guarded skips are expected when unavailable |
-| CPU fallback or hidden transfer; high-level runnable, scheduler, or backend integration | Deferred (E6-F9 covers integration/closeout) |
+| CPU fallback or hidden transfer; high-level runnable, scheduler, or backend integration | Deferred (direct-process integration covers integration/closeout) |
 | Dynamic slots, compaction/activation, graph capture, differentiability, performance guarantees, or exact RNG replay | Deferred |
 
 Warp CPU is the baseline when Warp is installed; CUDA is optional and skips
@@ -1485,7 +1485,7 @@ environment temperature array into a device-local float64 buffer when needed
 and performs exactly four equal `time_step / 4.0` substeps. Each substep
 overwrites `vapor_pressure`, prepares environment properties, gates disabled
 partitioning entries and inactive particle slots, and creates a raw proposal.
-P2 finalizes that proposal against particle and gas inventory limits, then
+Sequence validation finalizes that proposal against particle and gas inventory limits, then
 derives the matching concentration-weighted opposite gas delta. The step
 validates that delta and all pending commit values before mutating particle
 masses, accumulating the finalized transfer in the returned total-transfer
@@ -1518,7 +1518,7 @@ rebinding, not array mutation; callers must not mutate storage during launch.
 
 Successful direct calls mutate particle masses and gas concentration in place,
 overwrite the derived GPU-only vapor-pressure buffer, and return the accumulated
-**P2-finalized, inventory-limited** transfer. A supplied total-transfer buffer
+**inventory-limited, inventory-limited** transfer. A supplied total-transfer buffer
 holds that finalized accumulated output and is returned by identity; separate
 supplied work storage retains only the final gated raw proposal and is never the
 returned transfer. The two-item return assignment is
@@ -1526,16 +1526,16 @@ returned transfer. The two-item return assignment is
 `energy_transfer` is caller-owned output, not a third return value. Disabled
 `(box, species)` entries in the
 per-box `(n_boxes, n_species)` partitioning mask and inactive particle slots
-are zeroed before P2 finalization or reductions. CPU↔Warp conversion expands
+are zeroed before sequence validation finalization or reductions. CPU↔Warp conversion expands
 the CPU shared species mask to this per-box layout. `to_per_box_partitioning()`
 is the public migration helper for legacy one-dimensional masks. CPU restoration
 rejects masks that differ by box and rejects zero-box mirrors because no box can
 authoritatively supply the shared CPU mask.
-P2 demand, release, scale, and accumulator sidecars are validated and used for
+Sequence validation demand, release, scale, and accumulator sidecars are validated and used for
 finalization; aggregate invalid state, metadata, or ownership fails with
 `ValueError` before mutable physics or caller-state mutation. Preflight may run
 read-only validation kernels. A later failure caused by a fresh raw proposal
-does not roll back completed substeps, although it occurs before P2 mutation in
+does not roll back completed substeps, although it occurs before sequence validation mutation in
 its failing substep. Unsupported activity or surface
 strategies are not silently copied or approximated; passing
 `activity_surface=None` retains legacy unit activity and static tension.
@@ -1548,7 +1548,7 @@ Native buffers use independent particle and gas widths:
 | --- | --- | --- |
 | Particle mass, accumulated transfer, raw/finalized scratch transfer | `(B, N, Sp)` | Particle-material order |
 | Gas concentration, vapor pressure, energy output | `(B, Sg)` | Full gas order |
-| P2 demand, release, scale and gas accumulator | `(B, Sg)` | Full gas order |
+| sequence validation demand, release, scale and gas accumulator | `(B, Sg)` | Full gas order |
 | Latent heat and deferred thermal work | `(Sg,)` | Full gas order |
 | Thermodynamic model codes/reference masses | `(Sg,)` | Full gas order |
 | Activity kappas/reference masses | `(Sp,)` | Particle-material order |
@@ -1637,7 +1637,7 @@ than storage support.
 | CPU↔GPU transfer | Explicit helper calls only | No hidden container movement or hidden environment synchronization. |
 | Warp/CUDA support | Optional | Warp `device="cpu"` is the baseline when Warp is installed; CUDA is additive local evidence and unavailable devices skip cleanly. |
 | Low-level GPU slot activation | Shipped fixed-capacity direct-kernel contract | `activate_slots_gpu` maps selected request prefixes to ascending free slots with caller-owned same-device sidecars; no hidden transfer, resizing, or high-level runnable is provided. |
-| Low-level GPU condensation direct-kernel path | Shipped bounded direct-kernel contract | Executes four fixed coupled substeps with active-device P2 inventory and gas coupling. This is direct-kernel evidence, not broad GPU-condensation support. |
+| Low-level GPU condensation direct-kernel path | Shipped bounded direct-kernel contract | Executes four fixed coupled substeps with active-device sequence validation inventory and gas coupling. This is direct-kernel evidence, not broad GPU-condensation support. |
 | Low-level GPU coagulation direct-kernel path | Direct, particle-resolved direct-kernel contract | Exact mask and rejection boundaries follow below. This path establishes no Runnable support, CPU parity, or performance claim. |
 | Resident execution and native CUDA capture | Explicit bounded lifecycle | See [resident example](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_resident_multi_timestep.py) and [capture limitations](gpu_graph_capture.md); no implicit CPU fallback or measured performance claim. |
 
@@ -1757,10 +1757,10 @@ path.
   - Preserve ordered CPU gas-name metadata when restoring `GasData`, and keep
     thermodynamics-sidecar species order aligned with `gas.molar_mass`.
   - Confirm the configured water-species index addresses a valid species.
-- **P2 transfer and energy diagnostics**
-  - P2 inventory-limited applied transfers are expected bounded behavior, not
+- **sequence validation transfer and energy diagnostics**
+  - sequence validation inventory-limited applied transfers are expected bounded behavior, not
     CPU-strategy or runnable parity evidence.
-  - `energy_transfer` is caller-owned whole-call P2-finalized output. Explicitly
+  - `energy_transfer` is caller-owned whole-call inventory-limited output. Explicitly
     synchronize before observing it on the host.
 - **Gas/environment restore expectations**
   - `from_warp_gas_data()` is intentionally lossy across the helper boundary:

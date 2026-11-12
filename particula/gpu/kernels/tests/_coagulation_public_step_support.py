@@ -1,7 +1,8 @@
 # ruff: noqa: S101
 """Lazy Warp-backed public coagulation-step test support.
 
-This private module owns P2/P3 public-step materialization and invariants.  It
+This private module owns numerical validation/integration validation public-step
+materialization and invariants.  It
 does not import Warp until a selected device observation requests it.
 """
 

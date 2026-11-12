@@ -581,7 +581,9 @@ def test_records_are_frozen_and_abstract_interface_cannot_instantiate(
 
 
 def test_p4_strategy_symbols_are_exported() -> None:
-    """Approved P4 strategy symbols are available from dynamics."""
+    """Approved public construction strategy symbols are available from
+    dynamics.
+    """
     assert (
         particula.dynamics.ActivationNucleationStrategy
         is ActivationNucleationStrategy
@@ -593,7 +595,9 @@ def test_p4_strategy_symbols_are_exported() -> None:
 
 
 def test_only_approved_p4_construction_symbols_are_exported() -> None:
-    """Both public namespaces expose P4 construction, not P2/P3 helpers."""
+    """Both public namespaces expose public construction, not demand
+    planning/source transaction helpers.
+    """
     import particula.dynamics.nucleation as nucleation
 
     approved = (
@@ -635,7 +639,9 @@ def test_strategies_reject_invalid_coefficient_provenance(
     composition: InjectionComposition,
     metadata: FormationMetadata,
 ) -> None:
-    """Direct P1 construction validates optional provenance when supplied."""
+    """Direct potential-rate evaluation construction validates optional
+    provenance when supplied.
+    """
     with pytest.raises(ValueError, match="coefficient_provenance"):
         strategy_type(
             1.0,

@@ -2,14 +2,14 @@
 
 ## Complete direct-process context
 
-The direct nucleation boundary is shown last in the illustrative [explicit-transfer sequence](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py). Its [private P2 evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py) and [P3 regression](https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_complete_process_sequence_example_test.py) do not turn the example into a public coordinator, GPU `Runnable`, backend selector, resident loop, or CPU fallback.
+The direct nucleation boundary is shown last in the illustrative [explicit-transfer sequence](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py). Its [direct-process validation evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py) and [example regression](https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_complete_process_sequence_example_test.py) do not turn the example into a public coordinator, GPU `Runnable`, backend selector, resident loop, or CPU fallback.
 
 > Convert partitioning precursor gas into fixed-capacity particle slots with a
 > public, conservation-accounted CPU runnable.
 
 The shipped CPU-only nucleation boundary is a deliberately bounded, single-box
-process. It combines immutable potential-rate construction (P4) with the public
-`Nucleation` runnable (P5). It is not a GPU process, scheduler, or general
+process. It combines immutable potential-rate construction (public construction) with the public
+`Nucleation` runnable (runnable execution). It is not a GPU process, scheduler, or general
 empirical new-particle-formation model.
 
 ## Public API, equations, and units
@@ -41,7 +41,7 @@ return a potential rate [#/m³/s]; they do not mutate state.
 
 `NucleationSourceConfig`, `NucleationSourceConfigBuilder`, the activation and
 kinetic strategies/builders, `NucleationFactory`, `Nucleation`, and
-`NucleationCommitConfig` are exported by `particula.dynamics`. P2/P3 records
+`NucleationCommitConfig` are exported by `particula.dynamics`. Demand planning/source transaction records
 and `finalize_particle_source`, `commit_particle_source`, and
 `ParticleSourceCommitConfig` are concrete-only implementation details in
 `nucleation.particle_source`, not supported package imports.
@@ -90,7 +90,7 @@ source = NucleationSourceConfig(
 ## Getting started
 
 Use the [supported CPU example](https://github.com/uncscode/particula/blob/main/docs/Examples/Nucleation/cpu_nucleation.py) as
-the runnable starting point in the selected E9 checkout (`pip install -e .`).
+the runnable starting point in the v0.3.0 development checkout (`pip install -e .`).
 It constructs native `Aerosol`, unified `GasData` with precursor and inert lanes,
 fixed resolved particle capacity, aligned `EnvironmentData`, and
 the public `NucleationCommitConfig`. Its commit controls use
@@ -122,19 +122,19 @@ result = nucleation.execute(aerosol, time_step=1.0, sub_steps=2)
 assert result is aerosol
 ```
 
-P2 planning is nonmutating. P3 rejects invalid preflight atomically. P5 makes
+Demand planning is nonmutating. Source transaction rejects invalid preflight atomically. Runnable execution makes
 each attempted substep a transaction, but is not whole-call atomic: earlier
 successful substeps remain if a later substep fails. Zero-duration and
 zero-admitted-demand paths are no-ops after their applicable validation.
-`Nucleation.execute()` returns the mutated `Aerosol`; it does not return P2/P3
-diagnostic records. The concrete-only P2/P3 transaction diagnostics include
+`Nucleation.execute()` returns the mutated `Aerosol`; it does not return demand planning/source transaction
+diagnostic records. The concrete-only demand planning/source transaction transaction diagnostics include
 potential, admitted, gas-limited, represented, and reduced events; limiting
 species; requested, activated, and released slots; policy/scale; gas mass
 removed; and conservation residual. Particle inventory is
 concentration-weighted. Per-box/per-species particle-plus-gas conservation uses
 `rtol=1e-12, atol=1e-30`.
 
-The source relies on E6-F5 slot activation and E6-F6 policy resolution. Demand
+The source relies on fixed-slot activation and slot exhaustion policy resolution. Demand
 is never silently truncated. On exhaustion, enabled resampling is considered
 first and representative-volume scaling is its fallback; if neither can
 represent the requested demand, the attempt raises rather than silently
@@ -158,14 +158,14 @@ the [equations](../Theory/Technical/Dynamics/Nucleation_Equations.md), and the
 
 ## Direct-Warp low-level step
 
-E6-F8 ships a bounded direct-Warp nucleation step. Import only its supported
+Direct GPU nucleation ships a bounded direct-Warp nucleation step. Import only its supported
 low-level entry point:
 
 ```python
 from particula.gpu.kernels import nucleation_step_gpu
 ```
 
-`NucleationConfig`, P2/P3 records, P4 controls,
+`NucleationConfig`, demand planning/capacity staging records, exhaustion resolution controls,
 `NucleationScratchBuffers`, `NucleationFinalizedDemandBuffers`,
 `NucleationDiagnosticBuffers`, `NucleationExhaustionBuffers`, and helpers are
 concrete-only imports from `particula.gpu.kernels.nucleation`. Nested
@@ -191,28 +191,27 @@ implement the CPU weighted-slot packing scheme.
 Sidecars are caller-owned, same-device, contiguous `wp.float64` or `wp.int32`
 arrays with documented `(B,)`, `(B, N)`, `(B, S)`, and `(B, N, S)` schemas.
 Full-gas demand/transfer sidecars use gas width; resampling scratch uses
-particle width. P4 owns nested E6-F6 resampling/scaling sidecars; see
+particle width. Exhaustion resolution owns nested slot exhaustion resampling/scaling sidecars; see
 [fixed-slot exhaustion](slot_exhaustion_policies.md) for their fields.
 Preflight and phase handoffs may perform bounded aggregate device-status
 readbacks for validation; these are not CPU state transfers or a fallback.
 
-P1 performs read-only preflight, P2 plans and admits one inventory-limited
-demand, P3 stages counts/free-slot prefixes, and P4 uses fully viable resampling
-before representative-volume-scaling fallback. P5 fuses selected-slot activation
+Input validation performs read-only preflight, demand planning admits one inventory-limited
+demand, capacity staging stages counts/free-slot prefixes, and exhaustion resolution uses fully viable resampling
+before representative-volume-scaling fallback. Commit fuses selected-slot activation
 and gas transfer. Free-index tails are `-1`; demand is never silently truncated.
 A valid configured gate, no-admission, or zero-work result is a successful
 no-op, not an error or hidden recovery.
 
-Invalid input rejected before P4 primitive entry preserves particle/gas state.
-P2--P4 can write documented sidecars before a later rejection. Once E6-F6 is
-entered, or a P5 writer launches, rollback is not promised. Success returns the
+Invalid input rejected before volume scaling primitive entry preserves particle/gas state.
+Resampling--volume scaling can write documented sidecars before a later rejection. Once slot exhaustion is
+entered, or a policy integration writer launches, rollback is not promised. Success returns the
 identical particle and gas containers.
 
 This boundary excludes hidden CPU↔Warp state transfer, CPU fallback,
-resize/compaction, GPU `Runnable`, scheduler/backend selection, E6-F9
+resize/compaction, GPU `Runnable`, scheduler/backend selection, direct-process integration
 orchestration, expanded physics, graph capture, autodiff, and performance
-guarantees. E6-F5 fixed-slot activation, E6-F6 exhaustion primitives, and E6-F7
-CPU nucleation are dependencies; E6-F9 is only a downstream explicit-transfer
+guarantees. Fixed-slot management fixed-slot activation, slot exhaustion primitives, and CPU nucleation are dependencies; direct-process integration is only a downstream explicit-transfer
 integration consumer. See the [equations](../Theory/Technical/Dynamics/Nucleation_Equations.md),
 [direct example](https://github.com/uncscode/particula/blob/main/docs/Examples/Nucleation/gpu_direct_nucleation.py), and
 [GPU roadmap](Roadmap/data-oriented-gpu.md).

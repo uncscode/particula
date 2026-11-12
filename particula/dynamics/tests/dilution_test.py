@@ -348,7 +348,7 @@ def test_dilution_helpers_do_not_mutate_failed_inputs():
 
 
 def test_dilution_package_surface_remains_limited_to_existing_helpers():
-    """P1 keeps the finite-step helper concrete-module-only."""
+    """Coefficient validation keeps the finite-step helper concrete-module-only."""
     assert (
         dynamics.get_volume_dilution_coefficient
         is get_volume_dilution_coefficient

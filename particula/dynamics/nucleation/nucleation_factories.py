@@ -1,7 +1,9 @@
-"""Create bounded P4 nucleation strategies with fresh strict builders.
+"""Create bounded public construction nucleation strategies with fresh strict
+    builders.
 
 The factory dispatches only activation and kinetic potential-rate strategies.
-It does not construct source-selection metadata or expose concrete P2/P3
+It does not construct source-selection metadata or expose concrete demand
+planning/source transaction
 ``particle_source`` finalization and mutation helpers.
 """
 
@@ -22,7 +24,8 @@ class NucleationFactory(
         ActivationNucleationStrategy | KineticNucleationStrategy,
     ]
 ):
-    """Build activation or kinetic P4 potential-rate strategies by name.
+    """Build activation or kinetic public construction potential-rate strategies
+        by name.
 
     Each request gets a new builder, so failed or successful requests cannot
     retain configuration into subsequent calls. Identifiers are case-insensitive

@@ -4,14 +4,15 @@ This module validates immutable backend, device, process, and capability
 declarations. An ``ExecutionContext`` capability-validates a typed request and
 returns one exact context-local adapter. Selection does not invoke adapters,
 load or probe optional backends, resolve native devices, transfer state, or
-validate P3 state or result contracts.
+validate state ownership state or result contracts.
 
-P3 result validation retains caller-owned state by identity, keeps backend
+state ownership result validation retains caller-owned state by identity, keeps
+backend
 payloads and results opaque, and records explicit in-place mutation permission.
 It does not import a backend, provide fallback behavior, transfer state, or
-execute adapters. P2 selection remains context-local and callable-only.
+execute adapters. Selection remains context-local and callable-only.
 
-The direct-module-only CPU adapter is a narrow P4 dispatch boundary. It
+The direct-module-only CPU adapter is a narrow dispatch dispatch boundary. It
 preflights concrete CPU state and execution controls, delegates exactly once to
 a caller-supplied CPU runnable, and retains the original state and aerosol by
 identity. It does not select adapters, validate process physics, transfer or
@@ -19,7 +20,7 @@ convert data, or load optional backends.
 
 The direct-module-only condensation profile catalogue declares semantic support
 only. It neither selects an adapter nor validates runtime or native-device
-availability, imports optional backends, allocates state, or exposes a
+Availability, imports optional backends, allocates state, or exposes a
 user-facing API.
 
 The public API is a frozen, dependency-neutral 26-name selection, capability
@@ -769,7 +770,8 @@ class ExecutionAdapter(Protocol):
 class MutationScope(str, Enum):
     """Declare the one allowed mutation scope for an execution result.
 
-    ``STATE`` permits in-place mutation of retained state. P3 does not infer or
+    ``STATE`` permits in-place mutation of retained state. State ownership does
+    not infer or
     verify that a declared mutation occurred.
     """
 
@@ -800,7 +802,8 @@ def _validate_mutation_scopes(value: object) -> None:
     """Validate one exact immutable mutation scope declaration.
 
     This helper is also called at the result boundary so declarations fabricated
-    by bypassing frozen dataclass construction cannot bypass the P3 contract.
+    by bypassing frozen dataclass construction cannot bypass the state ownership
+    contract.
 
     Args:
         value: Candidate exact frozenset of mutation scopes.
@@ -856,7 +859,7 @@ class BackendResult:
 
 @dataclass(frozen=True, eq=False)
 class ExecutionResult:
-    """Declare immutable P3 result ownership and mutation metadata.
+    """Declare immutable state ownership result ownership and mutation metadata.
 
     ``validate_execution_result`` verifies this carrier at the execution
     boundary, including that ``state`` is the original caller-owned object.
@@ -921,7 +924,8 @@ def validate_execution_result(
     original_state: object,
     result: object,
 ) -> ExecutionResult:
-    """Validate and return an immutable P3 result without executing an adapter.
+    """Validate and return an immutable state ownership result without executing
+        an adapter.
 
     Args:
         original_state: Caller-owned state supplied before execution.

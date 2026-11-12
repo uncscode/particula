@@ -59,7 +59,7 @@
 #     pass
 # else:
 #     # in Colab → install quietly
-# Use the selected E9 checkout: `python -m pip install -e ".[extra]"`
+# Use the v0.3.0 development checkout: `python -m pip install -e ".[extra]"`
 # </details>
 
 # %%

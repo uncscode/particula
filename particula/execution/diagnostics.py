@@ -14,7 +14,7 @@ use ``V * Σp(m * c)``. Native mass diagnostics reject unmapped particle-only
 lanes instead of dropping their inventory. Matrix lanes follow full gas order.
 Resolved number concentration is ``Σp(N) / V``; density carriers use ``Σp(c)``.
 Latent energy copies signed
-whole-call P2-finalized energy in J. The residual is
+whole-call inventory-limited energy in J. The residual is
 ``total_mass - baseline_total_mass - source_ledger + sink_ledger`` in kg;
 source and sink ledgers are nonnegative accumulated extensive-mass inputs.
 Execution validates caller-owned same-device bindings without host readback,
@@ -24,7 +24,7 @@ write-free only for ``B == 0``. Prepared setup binds the closed plan; its
 observation-free enqueue repeats no host/setup metadata validation and performs
 no allocation, host readback, transfer, synchronization, lookup, or rebinding.
 Retained diagnostic writers still perform device-side status and physical-state
-validation. Setup rejection is pre-writer; rollback is not promised after a
+Validation. Setup rejection is pre-writer; rollback is not promised after a
 diagnostic writer launches.
 """
 
@@ -612,10 +612,12 @@ class ResidentDiagnosticsExecutor:
 def setup_prepared_resident_diagnostics(
     prepared_timestep: object, plan: object
 ) -> PreparedResidentDiagnostics:
-    """Validate a P1 diagnostics attachment and bind enqueue identities.
+    """Validate a declaration diagnostics attachment and bind enqueue
+        identities.
 
     Args:
-        prepared_timestep: Exact P1 timestep retaining ``plan`` by identity.
+        prepared_timestep: Exact declaration timestep retaining ``plan`` by
+            identity.
         plan: Exact resident diagnostics plan to validate and bind.
 
     Returns:
@@ -624,7 +626,8 @@ def setup_prepared_resident_diagnostics(
 
     Raises:
         TypeError: If either carrier has an unsupported exact type.
-        ValueError: If P1 identities, plan metadata, registrations, or primary
+        ValueError: If declaration identities, plan metadata, registrations, or
+            primary
             arrays are invalid.
     """
     if type(prepared_timestep) is not PreparedResidentTimestep:

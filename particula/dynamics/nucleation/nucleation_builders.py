@@ -1,7 +1,8 @@
-"""Build immutable, normalized P4 nucleation configurations.
+"""Build immutable, normalized public construction nucleation configurations.
 
 The builders accept only the documented physical units and make configuration
-from mappings atomic. They construct potential-rate metadata only; P2/P3
+from mappings atomic. They construct potential-rate metadata only; demand
+planning/source transaction
 source-demand finalization and particle or gas mutation remain in the concrete
 ``particle_source`` module.
 """
@@ -529,15 +530,18 @@ class KineticNucleationBuilder(_NucleationStrategyBuilder):
 
 
 class NucleationSourceConfigBuilder(BuilderABC):
-    """Build immutable P4 source-selection metadata.
+    """Build immutable public construction source-selection metadata.
 
     This builder selects a supported potential-rate strategy and precursor
-    index only. It does not expose P2/P3 particle-source finalization or
+    index only. It does not expose demand planning/source transaction
+    particle-source finalization or
     mutation behavior.
     """
 
     def __init__(self) -> None:
-        """Initialize an unconfigured P4 source-selection builder."""
+        """Initialize an unconfigured public construction source-selection
+        builder.
+        """
         super().__init__(required_parameters=["strategy", "precursor_index"])
         self.strategy: NucleationStrategy | None = None
         self.precursor_index: int | None = None
@@ -609,7 +613,8 @@ class NucleationSourceConfigBuilder(BuilderABC):
         return self
 
     def build(self) -> NucleationSourceConfig:
-        """Build validated immutable P4 source-selection metadata.
+        """Build validated immutable public construction source-selection
+            metadata.
 
         Returns:
             Metadata selecting a supported strategy and precursor index.

@@ -13,7 +13,7 @@
 # ---
 
 # %%
-# M3-P3 workflow validation - edit-lint-sync-execute cycle verified
+# Example workflow validation - edit-lint-sync-execute cycle verified
 
 # %% [markdown]
 # # Activity Tutorial
@@ -39,7 +39,7 @@
 
 # %%
 # Install particula if needed (uncomment for Colab)
-# Use the selected E9 checkout: `python -m pip install -e ".[extra]"`
+# Use the v0.3.0 development checkout: `python -m pip install -e ".[extra]"`
 
 import matplotlib.pyplot as plt
 import numpy as np

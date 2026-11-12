@@ -91,7 +91,7 @@ def test_host_only_import_does_not_load_warp() -> None:
 def test_analysis_records_reject_mutable_provenance_and_portable_proposals() -> (
     None
 ):
-    """Test P4 analysis records retain immutable bounded inputs."""
+    """Test evidence analysis analysis records retain immutable bounded inputs."""
     report = support.RawReportProvenance("trace.json", 5, "a" * 64)
     with pytest.raises(TypeError, match="raw_reports must be a tuple"):
         support.ArtifactReference(
@@ -797,7 +797,9 @@ def test_reconciled_decision_rejects_forged_provenance(
 
 
 def test_analysis_rejects_cross_generation_evidence() -> None:
-    """Test P2/P3 evidence from different generations never reconciles."""
+    """Test host measurement/Nsight measurement evidence from different
+    generations never reconciles.
+    """
     kernel = _analysis_kernel_evidence("attributed")
     different_generation = replace(
         kernel,

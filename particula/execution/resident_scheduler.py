@@ -175,12 +175,13 @@ class PreparedResidentSimulation:
     admission. It represents a READY attachment, not a captured graph.
 
     Attributes:
-        timestep: Prepared P1 timestep retained by identity.
+        timestep: Prepared declaration timestep retained by identity.
         request: Complete resident request retained by identity.
         session: Resident session owning the dispatched containers.
         registry: Resource registry pinned to ``session``.
         guard: Closed step guard for the exact session and registry binding.
-        lifecycle: READY lifecycle metadata retained from the P1 timestep.
+        lifecycle: READY lifecycle metadata retained from the declaration
+            timestep.
         signature: Prepared graph-capture signature metadata.
         graph: Resolver-produced graph for the complete loop.
         schedule: Resolver-produced schedule for the complete loop.

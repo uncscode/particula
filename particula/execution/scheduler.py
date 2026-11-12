@@ -1,6 +1,7 @@
 """Resolve direct-import-only, declaration-only scheduling metadata.
 
-This concrete module validates immutable P1 graph declarations before applying
+This concrete module validates immutable declaration graph declarations before
+applying
 enabled-node selection, direction policy, and freshness closure. Resolution is
 prelaunch-only: it neither loads backends nor enters lifecycle state, allocates
 resources, executes refreshes, or mutates caller-owned data. Its names are not
@@ -47,10 +48,11 @@ _RESOLVER_SCHEDULES: list[object] = []
 
 @dataclass(frozen=True)
 class EnabledNodeSelection:
-    """Declare the complete immutable set of enabled P1 node identifiers.
+    """Declare the complete immutable set of enabled declaration node
+        identifiers.
 
     Graph membership is deliberately deferred to schedule resolution, after
-    complete P1 plan validation.
+    complete declaration plan validation.
 
     Args:
         enabled_node_ids: Exact frozenset of syntactically valid node IDs.
@@ -220,14 +222,15 @@ def resolve_timestep_schedule(
 ) -> ResolvedTimestepSchedule:
     """Resolve an immutable effective schedule without running any process.
 
-    After exact carrier-type checks, complete P1 graph validation happens before
+    After exact carrier-type checks, complete declaration graph validation
+    happens before
     selection or profile inspection. This function then applies selected IDs,
     direction policy, required freshness closure, and canonical topology
     ordering. It returns metadata only and performs no lifecycle, resource, or
     GPU work.
 
     Args:
-        plan: Exact P1 plan declaration.
+        plan: Exact declaration plan declaration.
         selection: Exact enabled-node selection.
         profile: Exact immutable direction policy.
 
@@ -282,7 +285,7 @@ def _validate_resolution_inputs(
     selection: object,
     profile: object,
 ) -> None:
-    """Validate exact public scheduler carriers before P1 resolution."""
+    """Validate public scheduler carriers before declaration resolution."""
     if type(plan) is not TimestepPlan:
         raise TypeError("plan must be a TimestepPlan.")
     if type(selection) is not EnabledNodeSelection:
@@ -295,7 +298,9 @@ def _validate_selected_ids(
     selection: EnabledNodeSelection,
     resolved: ResolvedProcessGraph,
 ) -> None:
-    """Reject selected IDs that are absent from an already resolved P1 graph."""
+    """Reject selected IDs that are absent from an already resolved declaration
+    graph.
+    """
     resolved_ids = frozenset(node.node_id for node in resolved.nodes)
     unknown_ids = sorted(selection.enabled_node_ids - resolved_ids)
     if unknown_ids:
@@ -310,7 +315,7 @@ def _validate_profile_direction(
     resolved: ResolvedProcessGraph,
     direction: tuple[str, str],
 ) -> None:
-    """Reject an explicit P1 direction that opposes the profile."""
+    """Reject an explicit declaration direction that opposes the profile."""
     opposite = (direction[1], direction[0])
     if any(
         (edge.before_id, edge.after_id) == opposite
@@ -347,7 +352,9 @@ def _retained_pairs(
     resolved: ResolvedProcessGraph,
     enabled: frozenset[str],
 ) -> set[tuple[str, str]]:
-    """Return selected P1 edges after enforcing explicit dependency closure."""
+    """Return selected declaration edges after enforcing explicit dependency
+    closure.
+    """
     pairs: set[tuple[str, str]] = set()
     for edge in resolved.dependencies:
         if edge.after_id in enabled and edge.before_id not in enabled:

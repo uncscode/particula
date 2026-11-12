@@ -65,7 +65,7 @@ Tip for new users: the builder pattern reads almost like an English sentence; yo
 
 Problem solved: *“I want one function that returns a ready‑to‑use object, but internally different builders/strategies decide what’s best.”*
 
-Executable Particula example (selected E9 checkout):
+Executable Particula example (v0.3.0 development checkout):
 ```python
 import particula as par
 strategy = par.particles.ActivityFactory().get_strategy("mass_ideal")
@@ -150,7 +150,7 @@ assert process.condensation_strategy is not None
 
 • Native `Aerosol` holds `ParticleData`, `GasData`, and `EnvironmentData` by identity.
 • A process owns its physical strategies and mapping; they are not injected into
-  a particle carrier. Run this example from the selected E9 checkout.
+  a particle carrier. Run this example from the v0.3.0 development checkout.
 
 Benefits  
 – no “diamond” problems,  

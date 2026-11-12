@@ -1,4 +1,5 @@
-"""Test P1 fixtures/helpers and private P2 resident GPU process sequences.
+"""Test fixture fixtures/helpers and private direct-process validation resident
+    GPU process sequences.
 
 This private module supplies deterministic fixtures and independent accounting
 helpers for process-sequence tests, plus private resident composition evidence
@@ -147,7 +148,8 @@ def _build_process_fixtures() -> tuple[ProcessFixture, ...]:
 def _resident_sequence_fixture(fixture: ProcessFixture) -> ProcessFixture:
     """Copy a fixture with every gas lane enabled for resident nucleation.
 
-    The original sparse masks remain the P1 fixtures for disabled-condensation
+    The original sparse masks remain the fixture fixtures for
+    disabled-condensation
     coverage. Nucleation requires its selected precursor to participate in every
     box, so resident sequencing deliberately uses this test-local derivative.
     """
@@ -1738,7 +1740,9 @@ def test_resident_sequence_composes_five_direct_boundaries_cuda(
 def test_condensation_preserves_disabled_original_fixture_lanes(
     fixture: ProcessFixture,
 ) -> None:
-    """Original P1 sparse partitioning leaves disabled condensation lanes exact."""
+    """Original fixture sparse partitioning leaves disabled condensation lanes
+    exact.
+    """
     wp = pytest.importorskip("warp")
     from particula.gpu.kernels import condensation_step_gpu
 
@@ -2331,7 +2335,9 @@ def test_nucleation_preflight_rejects_invalid_inputs_without_mutation(
     value: Any,
     message: str,
 ) -> None:
-    """Nucleation rejects bad P1 or public-P4 inputs before any mutation."""
+    """Nucleation rejects bad fixture or public-validation inputs before any
+    mutation.
+    """
     pytest.importorskip("warp")
     from particula.gpu.kernels import nucleation_step_gpu
     from particula.gpu.kernels.nucleation import (

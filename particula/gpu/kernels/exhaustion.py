@@ -13,8 +13,9 @@ compare-exchanges; all other planning and commit work costs ``O(B * N * S)``.
 The caller supplies its entire particle-scale scratch footprint through
 :class:`ResamplingBuffers`.
 
-The concrete-only P4 representative-volume helper validates all caller-owned
-state before writing its diagnostic or scaling selected rows. It writes the
+The concrete-only volume scaling representative-volume helper validates all
+caller-owned
+State before writing its diagnostic or scaling selected rows. It writes the
 resolved requested factor for selected rows and ``1.0`` otherwise. It has no
 package export, policy, transfer, resizing, or runnable integration; callers
 own device placement and explicitly synchronize before observing results.
@@ -147,7 +148,7 @@ def _less_source(
     right: Any,
     species_count: Any,
 ) -> bool:
-    """Compare the CPU P2 key, including original index tie breaking."""
+    """Compare the CPU resampling key, including original index tie breaking."""
     if left < 0:
         return False
     if right < 0:
@@ -765,7 +766,7 @@ def _scan_representative_volume_scaling(  # noqa: C901
     minimum_volume: wp.array(dtype=wp.float64),
     status: wp.array(dtype=wp.int32),
 ) -> None:
-    """Fuse physical and P4 sidecar checks into one read-only scan."""
+    """Check physical and volume scaling sidecars in one read-only scan."""
     box, particle, species = wp.tid()
     if not wp.isfinite(masses[box, particle, species]) or (
         masses[box, particle, species] < 0.0
@@ -862,7 +863,7 @@ def _write_resolved_representative_scale(
     status: wp.array(dtype=wp.int32),
     upstream_invalid: wp.array(dtype=wp.int32),
 ) -> None:
-    """Write the P4 diagnostic after complete read-only preflight."""
+    """Write the volume scaling diagnostic after read-only preflight."""
     box = wp.tid()
     if status[0] != 0 or upstream_invalid[0] != 0:
         return
@@ -1368,7 +1369,9 @@ def resampling_step_gpu(  # noqa: PLR0913
     surface_relative_error: float = 1.0,
     diversity_absolute_error: float = 1.0,
 ) -> Any:
-    """Apply deterministic fixed-capacity P2 equal-weight remapping in place."""
+    """Apply deterministic fixed-capacity resampling equal-weight remapping in
+    place.
+    """
     prepared = _prepare_resampling_step_gpu(
         particles,
         required_release_counts,
@@ -1602,7 +1605,7 @@ def representative_volume_scaling_step_gpu(  # noqa: PLR0913
     minimum_volume: Any,
     resolved_scale: Any,
 ) -> tuple[Any, Any, Any]:
-    """Apply P4 scaling to selected Warp particle-container rows in place."""
+    """Scale selected Warp particle-container volumes in place."""
     prepared = _prepare_representative_volume_scaling_step_gpu(
         particles,
         provisional_source_demand,

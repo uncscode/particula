@@ -111,7 +111,9 @@ def test_kernels_package_keeps_resampling_buffers_concrete_module_only() -> (
 
 @pytest.mark.warp
 def test_kernels_package_keeps_p4_scaling_concrete_module_only() -> None:
-    """P4 scaling is importable only from the concrete exhaustion module."""
+    """API validation scaling is importable only from the concrete exhaustion
+    module.
+    """
     pytest.importorskip("warp")
     import particula.gpu.kernels as kernels
     from particula.gpu.kernels.exhaustion import (

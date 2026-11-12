@@ -1,4 +1,4 @@
-"""Tests for fixed-shape P2 GPU dilution execution."""
+"""Tests for fixed-shape state validation GPU dilution execution."""
 
 from __future__ import annotations
 
@@ -93,7 +93,9 @@ def _containers(
 
 
 def _state_snapshots(particles, gas, coefficient=None) -> dict[str, np.ndarray]:
-    """Copy all mutable P2 state, including protected caller-owned fields."""
+    """Copy all mutable state validation state, including protected caller-owned
+    fields.
+    """
     snapshots = {
         "particle_masses": particles.masses.numpy().copy(),
         "particle_concentration": particles.concentration.numpy().copy(),
@@ -323,7 +325,9 @@ def test_prepared_dilution_retains_supplied_storage_for_no_op() -> None:
 
 @dataclass(frozen=True)
 class P4DilutionCase:
-    """Immutable finite-step fixture for deterministic P4 parity coverage."""
+    """Immutable finite-step fixture for deterministic validation parity
+    coverage.
+    """
 
     name: str
     particle_concentration: np.ndarray
@@ -393,7 +397,9 @@ def _p4_numpy_oracle(
 def _assert_p4_case_matches_reference(
     case: P4DilutionCase, device: str
 ) -> None:
-    """Assert one P4 finite-step case against its independent NumPy oracle."""
+    """Assert one validation finite-step case against its independent NumPy
+    oracle.
+    """
     wp = _warp()
     from particula.gpu.kernels import dilution_step_gpu
 
@@ -521,7 +527,9 @@ def test_per_box_coefficient_rejects_invalid_values(value) -> None:
 
 @pytest.mark.parametrize("coefficient", [0.5, np.float64(1.5)])
 def test_scalar_dilution_matches_independent_oracle(coefficient) -> None:
-    """Scalar P2 dilution mutates only concentrations by the E6-F1 factor."""
+    """Scalar state validation dilution mutates only concentrations by the CPU
+    dilution factor.
+    """
     from particula.gpu.kernels import dilution_step_gpu
 
     particles, gas = _containers()
@@ -612,7 +620,9 @@ def test_per_box_dilution_preserves_zero_slots_and_compounds() -> None:
 def test_p4_warp_cpu_cases_match_independent_reference(
     case: P4DilutionCase,
 ) -> None:
-    """Warp CPU finite-step dilution matches each independent P4 reference."""
+    """Warp CPU finite-step dilution matches each independent validation
+    reference.
+    """
     _assert_p4_case_matches_reference(case, device="cpu")
 
 
@@ -623,7 +633,7 @@ def test_p4_warp_cpu_cases_match_independent_reference(
 def test_p4_cuda_cases_match_independent_reference(
     case: P4DilutionCase,
 ) -> None:
-    """CUDA finite-step dilution matches each independent P4 reference."""
+    """CUDA finite-step dilution matches each independent validation reference."""
     wp = _warp()
     if not wp.is_cuda_available():
         pytest.skip("CUDA is unavailable")
@@ -1067,7 +1077,7 @@ def test_per_box_coefficient_rank_error_precedes_time_and_state_access() -> (
 def test_invalid_scalar_domains_raise_before_time_or_state_access(
     value,
 ) -> None:
-    """Invalid scalar coefficients retain P1 validation ordering."""
+    """Invalid scalar coefficients retain coefficient validation ordering."""
     from particula.gpu.kernels import dilution_step_gpu
 
     with pytest.raises(ValueError, match="coefficient.*finite and nonnegative"):
@@ -1082,7 +1092,9 @@ def test_invalid_scalar_domains_raise_before_time_or_state_access(
 def test_unsupported_scalar_coefficient_raises_before_time_or_state_access(
     value,
 ) -> None:
-    """Unsupported scalar coefficient forms retain P1 validation ordering."""
+    """Unsupported scalar coefficient forms retain coefficient validation
+    ordering.
+    """
     from particula.gpu.kernels import dilution_step_gpu
 
     with pytest.raises(TypeError, match="coefficient.*real scalar"):

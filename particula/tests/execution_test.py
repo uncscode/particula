@@ -814,14 +814,14 @@ assert not any(name.startswith("particula.gpu.") for name in sys.modules)
 
 
 class _FakeAdapter:
-    """Record whether P2 selection incorrectly invokes an adapter."""
+    """Record whether selection incorrectly invokes an adapter."""
 
     def __init__(self) -> None:
         """Create an adapter with no prior execution calls."""
         self.calls = 0
 
     def execute(self, *args: object, **kwargs: object) -> object:
-        """Record an invocation that P2 must never make."""
+        """Record an invocation that selection must never make."""
         del args, kwargs
         self.calls += 1
         return None
@@ -866,7 +866,9 @@ def _request(
 
 
 def test_execution_request_validates_fields_in_order_and_freezes() -> None:
-    """Test typed P2 requests reject fields before backend pairing checks."""
+    """Test typed selection requests reject fields before backend pairing
+    checks.
+    """
     request = _request()
 
     with pytest.raises(FrozenInstanceError):
@@ -1256,7 +1258,7 @@ class _OpaqueState:
 
 
 class _TypedAdapter:
-    """Provide the typed P3 adapter shape without executing it."""
+    """Provide the typed state ownership adapter shape without executing it."""
 
     def __init__(self) -> None:
         self.calls = 0
@@ -1284,7 +1286,7 @@ def _valid_result(
     metadata: tuple[tuple[str, str], ...] = (("phase", "p3"),),
     backend_result: BackendResult | None = None,
 ) -> ExecutionResult:
-    """Create a valid execution result with P3 defaults."""
+    """Create a valid execution result with state ownership defaults."""
     return ExecutionResult(
         state,
         metadata,
@@ -1294,7 +1296,7 @@ def _valid_result(
 
 
 def test_p3_protocols_are_structural_and_do_not_change_p2_selection() -> None:
-    """Test structural protocols permit callable-only P2 registration."""
+    """Test structural protocols permit callable-only selection registration."""
     state = _State(object())
     typed = _TypedAdapter()
     incompatible = _IncompatibleAdapter()
@@ -1317,7 +1319,7 @@ def test_execution_adapter_accepts_narrow_execute_signature_statically() -> (
         """Provide an adapter with its own narrow execution contract."""
 
         def execute(self, state: ExecutionState) -> ExecutionResult:
-            """Declare the P3-specific execution contract."""
+            """Declare the state ownership-specific execution contract."""
             raise RuntimeError(state)
 
     adapter: ExecutionAdapter = cast(ExecutionAdapter, NarrowAdapter())
@@ -1523,7 +1525,9 @@ def test_validator_accepts_empty_metadata_and_default_backend_result() -> None:
 
 
 def test_validator_rejects_execution_result_subclasses() -> None:
-    """Test P3 accepts only the exact immutable ExecutionResult carrier."""
+    """Test state ownership accepts only the exact immutable ExecutionResult
+    carrier.
+    """
 
     class DerivedExecutionResult(ExecutionResult):
         """Represent an otherwise-valid unsupported result subclass."""
@@ -1703,7 +1707,9 @@ def test_validator_rejects_malformed_forms_without_mutation(
     exception: type[Exception],
     message: str,
 ) -> None:
-    """Test invalid boundaries retain inputs and do not invoke P2 adapters."""
+    """Test invalid boundaries retain inputs and do not invoke selection
+    adapters.
+    """
     result = cast(object, result_factory(original_state))  # type: ignore[operator]
     payload = getattr(original_state, "backend_payload", None)
     metadata = getattr(result, "metadata", None)
@@ -1786,7 +1792,9 @@ def _cpu_adapter_concentrations(
 
 
 def test_cpu_adapter_dispatches_once_and_retains_p3_identity() -> None:
-    """Test successful CPU dispatch retains all P3 carrier identities."""
+    """Test successful CPU dispatch retains all state ownership carrier
+    identities.
+    """
     aerosol = object()
     time_step = 2.0
     sub_steps = 3

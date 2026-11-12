@@ -2099,7 +2099,9 @@ def test_mass_precision_projection_benchmark(
     case_index: int,
     candidate_id: str,
 ) -> None:
-    """Record optional bounded projection timings for P3 study candidates."""
+    """Record optional bounded projection timings for candidate study study
+    candidates.
+    """
     case = _build_mass_precision_cases()[case_index]
     start = time.perf_counter()
     reconstructed = case.masses
@@ -2182,7 +2184,7 @@ def _source_revision() -> str:
 
 
 def _profiling_method(source: str) -> MeasurementMethod:
-    """Build one P1 measurement-method record."""
+    """Build one measurement contract measurement-method record."""
     return MeasurementMethod(
         method_id=source,
         source=source,
@@ -2458,7 +2460,9 @@ def test_resident_launch_profile_evidence() -> None:
 
 
 def _collect_resident_capture_matrix() -> ResidentBenchmarkArtifact:  # noqa: C901
-    """Collect the exact P3 matrix, with no downscale, fallback, or partial write."""
+    """Collect the exact candidate study matrix, with no downscale, fallback, or
+    partial write.
+    """
     cases = build_default_resident_benchmark_matrix()
     results: list[ResidentBenchmarkResult] = []
     memory_observations: list[ResidentMemoryObservation] = []

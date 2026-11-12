@@ -23,4 +23,4 @@ replacement for the supported CPU runnable or a CPU fallback.
 
 The [single-species notebook](Notebooks/Custom_Nucleation_Single_Species.ipynb)
 is an illustrative custom workflow. Its direct facade mutation and custom mass
-source are not the supported E6-F7 API.
+source are not the supported CPU nucleation API.

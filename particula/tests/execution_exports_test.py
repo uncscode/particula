@@ -317,7 +317,9 @@ def test_public_registration_uses_static_execute_inspection() -> None:
 
 
 def test_result_and_cpu_types_remain_off_public_export_boundaries() -> None:
-    """Test P3/P4 implementation types remain direct-module-only."""
+    """Test state ownership/dispatch implementation types remain
+    direct-module-only.
+    """
     for name in EXCLUDED_EXPORTS + DIRECT_IMPORT_ONLY_NAMES:
         assert name not in execution.__all__
         assert not hasattr(particula, name)

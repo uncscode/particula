@@ -1,4 +1,6 @@
-"""Deterministic CPU P2/P3 nucleation validation; no replay or performance claim."""
+"""Deterministic CPU demand planning/source transaction nucleation validation;
+no replay or performance claim.
+"""
 
 import numpy as np
 import numpy.testing as npt
@@ -32,7 +34,9 @@ def _oracle(
     molar_mass: np.ndarray,
     concentration: np.ndarray,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    """Calculate independent float64 P2 potential, admission, limiter, demand."""
+    """Calculate independent float64 demand planning potential, admission,
+    limiter, demand.
+    """
     per_event = np.asarray(counts, dtype=np.float64) * molar_mass
     per_event /= AVOGADRO_NUMBER
     potential = rate * duration
@@ -98,7 +102,9 @@ def _assert_unchanged(
 def _mutable_arrays(
     particles: ParticleData, gas: GasData
 ) -> tuple[np.ndarray, ...]:
-    """Return all caller-owned writable arrays at the P3 boundary."""
+    """Return all caller-owned writable arrays at the source transaction
+    boundary.
+    """
     return (
         particles.masses,
         particles.concentration,
@@ -110,7 +116,9 @@ def _mutable_arrays(
 
 
 def _fixture() -> tuple[ParticleData, GasData, ParticleSourceCommitConfig]:
-    """Build a bounded multi-box, multi-species direct P2/P3 fixture."""
+    """Build a bounded multi-box, multi-species direct demand planning/source
+    transaction fixture.
+    """
     particles = ParticleData(
         masses=np.zeros((2, 4, 2), dtype=np.float64),
         concentration=np.zeros((2, 4), dtype=np.float64),
@@ -185,7 +193,9 @@ def test_direct_multibox_cycles_match_oracle_and_current_gas_coupling() -> None:
 
 
 def test_direct_p3_policy_failure_is_write_free() -> None:
-    """A no-policy full-capacity P3 rejection preserves all direct inputs."""
+    """A no-policy full-capacity source transaction rejection preserves all
+    direct inputs.
+    """
     particles, gas, config = _fixture()
     particles.masses[:] = 0.25
     particles.concentration[:] = 1.0
@@ -205,7 +215,9 @@ def test_direct_p3_policy_failure_is_write_free() -> None:
 
 
 def test_direct_scaling_fallback_preserves_per_lane_scaled_balance() -> None:
-    """P3 scales selected rows before adding their finalized source transfer."""
+    """Source transaction scales selected rows before adding their finalized
+    source transfer.
+    """
     particles, gas, _ = _fixture()
     particles.masses[0, :3] = [0.25, 0.5]
     particles.concentration[0, :3] = 2.0
@@ -255,7 +267,9 @@ def test_direct_scaling_fallback_preserves_per_lane_scaled_balance() -> None:
 
 
 def test_direct_invalid_p2_and_p3_preflight_preserve_all_inputs() -> None:
-    """P2/P3 preflight failures preserve arrays, records, and config sidecars."""
+    """Demand planning/source transaction preflight failures preserve arrays,
+    records, and config sidecars.
+    """
     particles, gas, config = _fixture()
     gas.concentration[:] = 1.0
     gas.concentration[1, 1] = np.nan

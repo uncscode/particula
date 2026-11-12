@@ -89,7 +89,7 @@ path is exactly isothermal.
 - The direct Warp GPU condensation step applies an optional latent-heat rate
   correction in each of its four fixed substeps, with CPU-oracle/Warp parity
   coverage. Omitted latent heat or zero per-species entries retain exact
-  isothermal behavior. E4-F4/#1272 ships optional caller-owned active-device
+  isothermal behavior. GPU latent heat/#1272 ships optional caller-owned active-device
   `wp.float64` `latent_heat` with shape `(n_species,)` and optional
   caller-owned active-device `wp.float64` `energy_transfer` with shape
   `(n_boxes, n_species)`. `energy_transfer` requires valid `latent_heat`, is
@@ -101,7 +101,7 @@ path is exactly isothermal.
   deferred and unused. This bookkeeping does not evolve temperature, mutate
   gas concentration, establish gas/full-system conservation, add adaptive
   substeps or a high-level `Runnable`, or guarantee graph capture/replay,
-  autodiff, or complete E4-F6 cross-device certification.
+  autodiff, or complete condensation parity cross-device certification.
 
 
 ## Additional Parameters

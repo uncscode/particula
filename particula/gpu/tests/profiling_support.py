@@ -634,7 +634,8 @@ class ProfilingArtifact:
 
 
 def build_default_profiling_workload_matrix() -> tuple[ProfilingWorkload, ...]:
-    """Build the fixed small and medium E8-F6 profiling workload matrix.
+    """Build the fixed small and medium resident benchmark study profiling
+        workload matrix.
 
     The returned records request only ``(1, 16, 2)`` and ``(1000, 16, 2)``
     workloads. Building them neither probes hardware nor claims execution,
@@ -1792,7 +1793,8 @@ def _artifact_key(reference: ArtifactReference, mode: str, method: str) -> None:
 
 @dataclass(frozen=True, slots=True)
 class HostEvidenceBinding:
-    """Bind one executed P2 host measurement to an explicit mode and artifact.
+    """Bind one executed host measurement host measurement to an explicit mode
+        and artifact.
 
     Attributes:
         evidence: Complete executed host-launch or synchronized-elapsed
@@ -1807,7 +1809,8 @@ class HostEvidenceBinding:
     reference: ArtifactReference
 
     def __post_init__(self) -> None:
-        """Validate the explicit P2 mode, method, and provenance binding.
+        """Validate the explicit host measurement mode, method, and provenance
+            binding.
 
         Raises:
             TypeError: If evidence or its reference has an invalid type.
@@ -1833,7 +1836,8 @@ class HostEvidenceBinding:
 
 @dataclass(frozen=True, slots=True)
 class MachineBoundKernelEvidence:
-    """Bind one P3 Nsight export to explicit mode, machine, and artifact data.
+    """Bind one Nsight measurement Nsight export to explicit mode, machine, and
+        artifact data.
 
     Attributes:
         evidence: Qualified resident-process Nsight evidence for the frozen
@@ -1849,7 +1853,8 @@ class MachineBoundKernelEvidence:
     reference: ArtifactReference
 
     def __post_init__(self) -> None:
-        """Validate the explicit P3 mode, machine, and provenance binding.
+        """Validate the explicit Nsight measurement mode, machine, and
+            provenance binding.
 
         Raises:
             TypeError: If evidence, machine, or reference has an invalid type.
@@ -1895,7 +1900,8 @@ class MachineBoundKernelEvidence:
 
 @dataclass(frozen=True, slots=True)
 class EvidenceUnavailable:
-    """Record unavailable P2 or P3 evidence without fabricating measurement.
+    """Record unavailable host measurement or Nsight measurement evidence
+        without fabricating measurement.
 
     Attributes:
         workload: Requested workload for which evidence is unavailable.
@@ -2029,8 +2035,10 @@ class PerformanceDecision:
         contributions: Deterministically ranked attributed kernel durations.
         reconciliation: Host/profiler duration comparison, when available.
         limitations: Immutable bounded evidence limitations.
-        host_references: Artifact references for retained P2 evidence.
-        kernel_references: Artifact references for retained P3 evidence.
+        host_references: Artifact references for retained host measurement
+            evidence.
+        kernel_references: Artifact references for retained Nsight measurement
+            evidence.
     """
 
     status: str
@@ -2223,9 +2231,11 @@ def analyze_machine_bounded_performance(
     insufficient or unavailable decision rather than estimating missing data.
 
     Args:
-        host_inputs: Immutable P2 host-evidence bindings or unavailable
+        host_inputs: Immutable host measurement host-evidence bindings or
+            unavailable
             outcomes.
-        kernel_inputs: Immutable P3 machine-bound Nsight bindings or
+        kernel_inputs: Immutable Nsight measurement machine-bound Nsight
+            bindings or
             unavailable outcomes.
 
     Returns:

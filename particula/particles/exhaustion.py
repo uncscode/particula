@@ -1,11 +1,13 @@
 """Particle-capacity exhaustion planning and concrete apply helpers.
 
-P1 consumes fixed-shape capacity sidecars and creates an immutable, later
-commit-boundary plan.  It validates every box before resolving any box, writes
+Policy resolution consumes fixed-shape capacity sidecars and creates an
+immutable, later
+Commit-boundary plan.  It validates every box before resolving any box, writes
 no caller state, and can therefore be retried safely with corrected sidecars.
 The exact requested/admitted and required-release counts, policy code, and
 activation-prefix identity are diagnostics.  Release tuples are empty and
-``float("nan")`` is the no-scale sentinel in P1; ``-1`` is the unused-index
+``float("nan")`` is the no-scale sentinel in policy resolution; ``-1`` is the
+unused-index
 sentinel.
 
 Weighted inventory is calculated in float64 as ``sum(weights)``,
@@ -14,16 +16,20 @@ Weighted inventory is calculated in float64 as ``sum(weights)``,
 Intensive values divide these quantities by volume.  A later unscaled commit
 must equal ``pre_state + source`` and a scaling commit must equal
 ``scale * pre_state + source``.  No radius-cubed or other moment is exact in
-P1; any later preservation claim must specify its moment, domain, and
+Policy resolution; any later preservation claim must specify its moment, domain,
+and
 tolerance before a commit can rely on it.
 
-P2 adds a CPU-only deterministic equal-weight resampling reference. It plans
+resampling adds a CPU-only deterministic equal-weight resampling reference. It
+plans
 detached fixed-capacity remaps without mutation, then commits one validated
-all-box plan. P2 neither provides GPU parity nor implements activation,
-resizing, or compaction. P4 is an opt-in, concrete-module-only direct commit:
+all-box plan. Resampling neither provides GPU parity nor implements activation,
+resizing, or compaction. Volume scaling is an opt-in, concrete-module-only
+direct commit:
 after all-box preflight, it scales selected rows' box volume, particle
 concentration, and provisional demand by a resolved factor. It consumes
-caller-owned sidecars, reports the resolved factor, and neither consumes a P1
+caller-owned sidecars, reports the resolved factor, and neither consumes a
+policy resolution
 plan nor resolves capacity policy, transfers data, resizes capacity, or adds a
 runnable.
 """
@@ -102,7 +108,7 @@ class ExhaustionBoxPlan:
     Attributes:
         requested_count: Requested activation count for the box.
         admitted_count: Count admitted by this plan; equals ``requested_count``
-            in P1.
+            in policy resolution.
         required_release_count: Additional slots needed after free capacity is
             exhausted.
         releasable_count: Capacity reported as releasable by resampling.
@@ -110,8 +116,10 @@ class ExhaustionBoxPlan:
             ``POLICY_SCALE_DEFERRED``.
         activation_indices: Exact free-index prefix for activation plans; empty
             for deferred plans.
-        release_indices: Empty in P1 because release selection is deferred.
-        scale_factor: ``float("nan")`` in P1 because scaling is deferred.
+        release_indices: Empty in policy resolution because release selection is
+            deferred.
+        scale_factor: ``float("nan")`` in policy resolution because scaling is
+            deferred.
     """
 
     requested_count: int
@@ -160,7 +168,8 @@ class WeightedInventory:
 class _ResamplingBoxPlan:
     """Hold one detached fixed-capacity equal-weight remap.
 
-    P2 is CPU-only and deliberately fixed-capacity: retained slots receive
+    resampling is CPU-only and deliberately fixed-capacity: retained slots
+    receive
     replacement particles and released slots are cleared during the later,
     all-box commit. It does not provide GPU parity, activation, or scaling.
     """
@@ -177,11 +186,11 @@ class _ResamplingBoxPlan:
 
 @dataclass(frozen=True)
 class _ResamplingPlan:
-    """Hold detached P2 remaps in particle-box order for one commit.
+    """Hold detached resampling remaps in particle-box order for one commit.
 
     Empty per-box remaps preserve boxes that do not resample, including
     zero-release resampling boxes. The tuple-backed records retain no views
-    into the P1 plan or particle storage.
+    into the policy resolution plan or particle storage.
     """
 
     box_plans: tuple[_ResamplingBoxPlan, ...]
@@ -189,7 +198,7 @@ class _ResamplingPlan:
 
 @dataclass(frozen=True)
 class _ResamplingBounds:
-    """Hold finite nonnegative diagnostic tolerances for P2 remapping."""
+    """Hold finite nonnegative diagnostic tolerances for resampling."""
 
     radius_cubed_relative_error: float
     mean_radius_relative_error: float
@@ -503,7 +512,9 @@ def _validate_resampling_bounds(
     surface_relative_error: object,
     diversity_absolute_error: object,
 ) -> _ResamplingBounds:
-    """Validate and detach P2 diagnostic bounds before particle inspection."""
+    """Validate and detach resampling diagnostic bounds before particle
+    inspection.
+    """
     return _ResamplingBounds(
         radius_cubed_relative_error=_validate_exact_float(
             "radius_cubed_relative_error", radius_cubed_relative_error
@@ -523,7 +534,7 @@ def _validate_resampling_bounds(
 def _validate_particle_schema(  # noqa: C901
     particles: object,
 ) -> ParticleData:
-    """Validate P2's exact writable CPU particle storage schema."""
+    """Validate resampling's exact writable CPU particle storage schema."""
     if not isinstance(particles, ParticleData):
         raise TypeError("particles must be a ParticleData")
     if particles.distribution_type is not None:
@@ -630,7 +641,9 @@ def _validate_p1_plan(  # noqa: C901
     box_count: int,
     particle_count: int,
 ) -> ExhaustionPlan:
-    """Validate P1 records without resolving policy or retaining their data."""
+    """Validate policy resolution records without resolving policy or retaining
+    their data.
+    """
     if not isinstance(exhaustion_plan, ExhaustionPlan):
         raise TypeError("exhaustion_plan must be an ExhaustionPlan")
     if len(exhaustion_plan.box_plans) != box_count:
@@ -766,7 +779,7 @@ def _validate_remap_diagnostics(
     replacement_charges: NDArray[np.float64],
     bounds: _ResamplingBounds | None,
 ) -> None:
-    """Check exact inventories and bounded scalar P2 diagnostics."""
+    """Check exact inventories and bounded scalar resampling diagnostics."""
     source_number = np.sum(source.concentrations, dtype=np.float64)
     source_mass = np.sum(
         source.concentrations[:, None] * source.masses, axis=0, dtype=np.float64
@@ -962,7 +975,8 @@ def plan_resampling(
 ) -> _ResamplingPlan:
     """Create an immutable, deterministic CPU fixed-capacity resampling plan.
 
-    The function validates all boxes and only plans; it does not mutate P1
+    The function validates all boxes and only plans; it does not mutate policy
+    resolution
     records or particle state. The detached plan retains existing active
     capacity only, so it neither activates, scales, resizes, nor compacts
     particles, and it provides no GPU-parity path. Pass it to
@@ -970,7 +984,8 @@ def plan_resampling(
 
     Args:
         particles: Writable, fixed-shape CPU particle data.
-        exhaustion_plan: Immutable P1 capacity decisions to consume unchanged.
+        exhaustion_plan: Immutable policy resolution capacity decisions to
+            consume unchanged.
         radius_cubed_relative_error: Exact Python float, finite nonnegative
             bound for the weighted radius-cubed diagnostic.
         mean_radius_relative_error: Exact Python float, finite nonnegative
@@ -984,9 +999,11 @@ def plan_resampling(
         A detached immutable plan, one remap record per particle box.
 
     Raises:
-        TypeError: If particle storage, P1 records, or diagnostic bounds have
+        TypeError: If particle storage, policy resolution records, or diagnostic
+            bounds have
             an unsupported type or dtype.
-        ValueError: If the fixed-capacity state or P1 decisions are invalid,
+        ValueError: If the fixed-capacity state or policy resolution decisions
+            are invalid,
             resampling is infeasible, or a diagnostic exceeds its bound.
     """
     bounds = _validate_resampling_bounds(
@@ -1201,7 +1218,7 @@ def _validate_p4_sidecar(
     dtype: np.dtype[np.generic],
     box_count: int,
 ) -> NDArray[Any]:
-    """Validate one writable contiguous P4 per-box sidecar."""
+    """Validate one writable contiguous volume scaling per-box sidecar."""
     if not isinstance(values, np.ndarray):
         raise TypeError(f"{name} must be a numpy array")
     if values.dtype != dtype:
@@ -1221,7 +1238,9 @@ def _validate_p4_non_aliasing(
     particles: ParticleData,
     sidecars: tuple[NDArray[Any], ...],
 ) -> None:
-    """Reject P4 sidecar and writable particle-storage overlap before writes."""
+    """Reject volume scaling sidecar and writable particle-storage overlap
+    before writes.
+    """
     arrays = (
         particles.masses,
         particles.concentration,
@@ -1244,7 +1263,7 @@ def apply_representative_volume_scaling(  # noqa: C901, PLR0913
     minimum_volume: NDArray[np.float64],
     resolved_scale: NDArray[np.float64],
 ) -> tuple[ParticleData, NDArray[np.float64], NDArray[np.float64]]:
-    """Apply P4 scaling to selected CPU particle-data rows in place.
+    """Apply volume scaling to selected CPU particle-data rows in place.
 
     A row is selected exactly when ``scaling_required`` is true and its
     provisional demand is positive. Each selected row scales its box volume,

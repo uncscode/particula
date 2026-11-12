@@ -19,7 +19,7 @@ This page tracks the status of the data-oriented container migration and the
 Warp-backed GPU work for particle-resolved aerosol simulations.
 
 The roadmap is a single ordered sequence of epics with explicit boundaries.
-Epics are worked in the order below. Following E8, the 0.2.13 release and
+Epics are worked in the order below. Following graph capture, the 0.2.13 release and
 0.3.0 container migration take precedence over activating Epic I. Cross-cutting
 documentation, validation-infrastructure, and API-stability work is folded
 into each epic's feature list rather than running as a separate parallel
@@ -32,17 +32,17 @@ documentation conventions.
 
 ## Epic Sequence and Status
 
-| Order | Epic | Status | ADW plan |
-| --- | --- | --- | --- |
-| 1 | [Epic A: Data-Model and Numerical Foundations](#epic-a-data-model-and-numerical-foundations) | Shipped | E2 |
-| 2 | [Epic B: Non-Isothermal Condensation Public API (CPU)](#epic-b-non-isothermal-condensation-public-api-cpu) | Shipped | E1 |
-| 3 | [Epic C: GPU Kernel Correctness and Low-Level API Hardening](#epic-c-gpu-kernel-correctness-and-low-level-api-hardening) | Shipped | E3 |
-| 4 | [Epic D: GPU Condensation Physics Parity](#epic-d-gpu-condensation-physics-parity) | Shipped | E4 |
-| 5 | [Epic E: GPU Coagulation Physics Coverage](#epic-e-gpu-coagulation-physics-coverage) | Shipped | E5 |
-| 6 | [Epic F: GPU Process Completeness](#epic-f-gpu-process-completeness) | Shipped | E6 |
-| 7 | [Epic G: Backend Selection and GPU-Resident Simulation](#epic-g-backend-selection-and-gpu-resident-simulation) | Shipped | E7 |
-| 8 | [Epic H: Graph Capture and Performance](#epic-h-graph-capture-and-performance) | Shipped | E8 |
-| 9 | [Epic I: Differentiability and Global Optimization](#epic-i-differentiability-and-global-optimization) | Pending | not scheduled |
+| Order | Epic | Status |
+| --- | --- | --- |
+| 1 | [Epic A: Data-Model and Numerical Foundations](#epic-a-data-model-and-numerical-foundations) | Shipped |
+| 2 | [Epic B: Non-Isothermal Condensation Public API (CPU)](#epic-b-non-isothermal-condensation-public-api-cpu) | Shipped |
+| 3 | [Epic C: GPU Kernel Correctness and Low-Level API Hardening](#epic-c-gpu-kernel-correctness-and-low-level-api-hardening) | Shipped |
+| 4 | [Epic D: GPU Condensation Physics Parity](#epic-d-gpu-condensation-physics-parity) | Shipped |
+| 5 | [Epic E: GPU Coagulation Physics Coverage](#epic-e-gpu-coagulation-physics-coverage) | Shipped |
+| 6 | [Epic F: GPU Process Completeness](#epic-f-gpu-process-completeness) | Shipped |
+| 7 | [Epic G: Backend Selection and GPU-Resident Simulation](#epic-g-backend-selection-and-gpu-resident-simulation) | Shipped |
+| 8 | [Epic H: Graph Capture and Performance](#epic-h-graph-capture-and-performance) | Shipped |
+| 9 | [Epic I: Differentiability and Global Optimization](#epic-i-differentiability-and-global-optimization) | Pending |
 
 The former suggested milestones are absorbed into the per-epic exit bars:
 Milestone 1 (documented low-level GPU API) is Epic C, Milestone 2 (backend
@@ -53,7 +53,7 @@ Milestone 2.75 (differentiable condensation) is Epic I, and Milestone 3
 Quick links:
 
 - [Current container schema inventory](#current-container-schema-inventory)
-- [Shipped E2 foundation baseline](#shipped-e2-foundation-baseline)
+- [Shipped foundation baseline](#shipped-foundation-baseline)
 - [Authoritative field ownership decisions](#authoritative-field-ownership-decisions)
 - [Shipped foundation guide](../data-containers-and-gpu-foundations.md)
 - [Runnable Data Containers example](../../Examples/Data_Containers/index.md)
@@ -84,14 +84,14 @@ decisions in
 [Numerical Precision and Mass Resolution](#numerical-precision-and-mass-resolution)
 and the time-integration decisions in
 [Time-Scale Stiffness](#time-scale-stiffness). New particle formation is both
-a target process and a size-range driver. E6-F7 ships a bounded CPU-only,
-single-box nucleation process. E9-M4 adds native held-state execution to its
-public runnable; M6 removes its compatibility adapter. This CPU runnable
-is not a GPU path. E6-F8 ships package-exported direct-Warp
+a target process and a size-range driver. CPU nucleation ships a bounded CPU-only,
+single-box nucleation process. V0.3.0 adds native held-state execution to its
+public runnable; v0.3.0 removes its compatibility adapter. This CPU runnable
+is not a GPU path. Direct GPU nucleation ships package-exported direct-Warp
 `nucleation_step_gpu`; its callers own explicit transfer, sidecars, and
-synchronization. [Epic F](#epic-f-gpu-process-completeness) closed with E6-F9's
+synchronization. [Epic F](#epic-f-gpu-process-completeness) closed with direct-process integration's
 integrated validation, explicit five-call illustration, documentation, and
-closeout. E6-F9 does not own the direct step or a production coordinator.
+closeout. Direct-process integration does not own the direct step or a production coordinator.
 
 ## Non-Goals
 
@@ -138,13 +138,13 @@ Use
 [ParticleData and GasData Migration](../particle-data-migration/index.md)
 as the implementation walkthrough companion.
 
-The E9 v0.3.0 migration removes the compatibility facades. In the current
+The v0.3.0 migration removes the compatibility facades. In the current
 development tree, `ParticleRepresentation`, `GasSpecies`, `Atmosphere`, their
 obsolete builders/factories, and facade conversion bridges have been removed.
 Use explicit native initialization and coordinated replacement when layouts
 change. GPU execution, transfers and resident lifecycle require explicit
 supported population metadata; untagged v5 checkpoints reject before setup.
-Final readiness validation and review belong to E9-M6; see the
+Final readiness validation and review belong to v0.3.0; see the
 [native migration closeout](data-native-v030-closeout.md). The historical 0.2.x
 compatibility policy is not the current API contract.
 
@@ -163,10 +163,10 @@ Data-model support and remaining boundaries:
   downstream work (see [EnvironmentData Container](#environmentdata-container)).
 - `ParticleData.density` is shaped `(n_species,)` and shared across boxes, so
   boxes at different temperatures cannot carry per-box densities.
-- E6-F1 ships the CPU finite-step dilution oracle and E6-F2 ships P1–P4 direct
+- CPU dilution ships the CPU finite-step dilution oracle and GPU dilution ships direct
   GPU dilution. Import the low-level operation with
   `from particula.gpu.kernels import dilution_step_gpu`; this is not a
-  high-level process or runnable reference. E6-F9 shipped downstream validation
+  high-level process or runnable reference. Direct-process integration shipped downstream validation
   and the explicit five-call illustration, not a high-level integration API.
 
 ### Warp GPU Backend
@@ -203,7 +203,7 @@ Known GPU physics gaps remain:
 
 - Bounded direct GPU condensation is a shipped, verified direct-kernel
   contract. It applies an optional Warp-backed latent-heat rate correction,
-  couples P2-finalized transfer to authoritative active-device gas
+  couples inventory-limited transfer to authoritative active-device gas
   concentration, and records a signed energy diagnostic. Temperature feedback
   and high-level `Runnable` integration remain future work outside this
   low-level publication.
@@ -225,7 +225,7 @@ Known GPU physics gaps remain:
   turbulence remain deferred from the near-term GPU scope.
 - Direct GPU dilution is shipped as a fixed-shape, caller-owned kernel. It
   is imported with `from particula.gpu.kernels import dilution_step_gpu`.
-  E6-F1 supplies its upstream CPU finite-step oracle, while E6-F9 shipped
+  CPU dilution supplies its upstream CPU finite-step oracle, while direct-process integration shipped
   downstream validation and the illustrative direct-call sequence. It accepts
   a finite nonnegative scalar coefficient or a same-device
   `wp.float64` `(n_boxes,)` coefficient array, returns the same particle and
@@ -243,7 +243,7 @@ Known GPU physics gaps remain:
   scheduling, GPU-resident timestep integration, high-level/runnable or broader
   wall-loss integration, high-level GPU nucleation, resizing, graph capture,
   autodiff, and performance work remain future scope. The bounded direct neutral
-  wall-loss P1–P6 kernel contract is shipped; it is not that deferred high-level
+  wall-loss kernel contract is shipped; it is not that deferred high-level
   integration.
   Those items are needed before a full simulation can remain GPU-resident for
   every timestep.
@@ -260,11 +260,11 @@ Known GPU physics gaps remain:
   see the [data containers and GPU foundations
   guide](../data-containers-and-gpu-foundations.md) for the supported
   constant/Buck scope and refresh contract.
-- E6-F7 ships a CPU-only, single-box nucleation/particle-source runnable.
-  E6-F8 ships bounded direct `nucleation_step_gpu` with an explicit-transfer
+- CPU nucleation ships a CPU-only, single-box nucleation/particle-source runnable.
+  Direct GPU nucleation ships bounded direct `nucleation_step_gpu` with an explicit-transfer
   Warp CPU example. It is not a GPU `Runnable`, CPU fallback, scheduler/backend
   selector, resize/compaction mechanism, graph-capture/autodiff API, expanded
-  physics claim, or performance guarantee. E6-F9 shipped downstream validation
+  physics claim, or performance guarantee. Direct-process integration shipped downstream validation
   and closeout, not high-level integration.
 
 Known GPU kernel defects and design limits (see
@@ -282,14 +282,14 @@ Known GPU kernel defects and design limits (see
 
 ## Epic A: Data-Model and Numerical Foundations
 
-Status: shipped as plan E2. This foundation work now defines the container
+Status: shipped as container foundations. This foundation work now defines the container
 schemas, per-box thermodynamic state, precision baseline, mass representation
 policy, and time-integration recommendation that downstream GPU roadmap work
 must build on.
 
-### Shipped E2 Foundation Baseline
+### Shipped Foundation Baseline
 
-E2 closed the foundation scope needed by later GPU roadmap epics:
+Container foundations closed the foundation scope needed by later GPU roadmap epics:
 
 - `ParticleData`, `GasData`, `WarpParticleData`, and `WarpGasData` have a
   documented field-ownership and shape contract, including leading `n_boxes`
@@ -314,14 +314,14 @@ E2 closed the foundation scope needed by later GPU roadmap epics:
   dtype or schema migration until stronger evidence exists.
 - The condensation-stiffness study recommends `fixed_count_substeps_4` as the
   fixed-shape foundation for direct GPU condensation, including its current
-  P2-finalized gas-coupling contract.
+  inventory-limited gas-coupling contract.
 - The foundation guide, migration guide, data-container example, and support
   boundary docs now distinguish multi-box-capable storage from still-limited
   CPU process execution.
 
 ### Release and migration milestones
 
-Maintainer decision (2026-09-27): close E8 and all eight feature plans as
+Maintainer decision (2026-09-27): close graph capture and all eight feature plans as
 Shipped, then merge this closeout before releasing **0.2.13**. That release
 retains both legacy facades and the data containers.
 
@@ -334,14 +334,14 @@ this migration. Neither version is released by this documentation update.
 
 ### Native migration follow-through
 
-- Validate the M6 removal against the full native scientific and installed-wheel
+- Validate the v0.3.0 removal against the full native scientific and installed-wheel
   suites, retaining explicit CPU-Warp transfer and ownership contracts.
 - Keep supported examples on native constructors and process-owned physics/maps.
 - Document historical facade names only as migration references or intentional
   removed-boundary tests, never as runnable current API instructions.
 - Keep single-box CPU execution, batched storage, and direct/resident GPU
   capabilities distinct in examples and migration guidance.
-- Complete M6 evidence and maintainer review before release publication.
+- Complete v0.3.0 evidence and maintainer review before release publication.
 
 #### Current container schema inventory
 
@@ -401,7 +401,7 @@ container.
 ### Authoritative field ownership decisions
 
 This section is the canonical ownership and CPU↔GPU round-trip contract shipped
-by E2. The inventory table above remains the current-state evidence record; use
+by container foundations. The inventory table above remains the current-state evidence record; use
 the decision table below for policy when adding fields, conversion behavior, or
 future GPU environment state.
 
@@ -422,7 +422,7 @@ future GPU environment state.
 | EnvironmentData.temperature | Owned by shipped CPU `EnvironmentData`, not by `ParticleData` or `GasData` | `(n_boxes,)` | `(n_boxes,)` via shipped `WarpEnvironmentData` | `float64` on CPU / `wp.float64` on GPU | Mutable per-box thermodynamic state | Round-trips through `to_warp_environment_data()` / `from_warp_environment_data()`; broader GPU-resident runtime ownership remains future work | Parcel/expansion workflows, latent-heat condensation, and other per-box thermodynamic updates | `particula/gas/environment_data.py`; `particula/gpu/warp_types.py`; `particula/gpu/conversion.py`; `particula/gpu/tests/conversion_test.py` |
 | EnvironmentData.pressure | Owned by shipped CPU `EnvironmentData`, not by `ParticleData` or `GasData` | `(n_boxes,)` | `(n_boxes,)` via shipped `WarpEnvironmentData` | `float64` on CPU / `wp.float64` on GPU | Mutable per-box thermodynamic state | Round-trips through `to_warp_environment_data()` / `from_warp_environment_data()`; broader GPU-resident runtime ownership remains future work | Parcel/expansion workflows, kernel inputs, and per-box forcing profiles | `particula/gas/environment_data.py`; `particula/gpu/warp_types.py`; `particula/gpu/conversion.py`; `particula/gpu/tests/conversion_test.py` |
 | EnvironmentData.saturation_ratio | Shipped CPU `EnvironmentData` helper state; not an independent source of truth separate from current environment and gas state | `(n_boxes, n_species)` | `(n_boxes, n_species)` via shipped `WarpEnvironmentData` or equivalent GPU environment state | `float64` on CPU / `wp.float64` on GPU | Mutable derived/cache state that must be refreshed after invalidating updates | Round-trips through `to_warp_environment_data()` / `from_warp_environment_data()` and still must be invalidated/recomputed after upstream state changes; high-level process integration remains future work | Latent-heat condensation, parcel expansion, and humidity-coupled follow-on work | `particula/gas/environment_data.py`; `particula/gpu/warp_types.py`; `particula/gpu/conversion.py`; `particula/gpu/tests/conversion_test.py` |
-| Simulation volume ownership | Not owned by `EnvironmentData`; must remain owned by `ParticleData.volume` | `(n_boxes,)` on `ParticleData` | `(n_boxes,)` on `WarpParticleData` | `float64` / `wp.float64` | Mutable per-box simulation state under particle container ownership | Must continue to round-trip only with particle container conversion helpers | Per-box particle state, dilution-style workflows, and timestep orchestration that needs simulation volume | `particula/particles/particle_data.py:69-70,111-117`; `particula/gpu/conversion.py:120,286`; `particula/particles/tests/particle_data_test.py:194-206`; `.opencode/plans/sections/features/E2-F1/architecture_design.md:31-46` |
+| Simulation volume ownership | Not owned by `EnvironmentData`; must remain owned by `ParticleData.volume` | `(n_boxes,)` on `ParticleData` | `(n_boxes,)` on `WarpParticleData` | `float64` / `wp.float64` | Mutable per-box simulation state under particle container ownership | Must continue to round-trip only with particle container conversion helpers | Per-box particle state, dilution-style workflows, and timestep orchestration that needs simulation volume | `particula/particles/particle_data.py:69-70,111-117`; `particula/gpu/conversion.py:120,286`; `particula/particles/tests/particle_data_test.py:194-206` |
 
 #### Canonical shape conventions for container workflows
 
@@ -572,7 +572,7 @@ Shared-across-box fields:
   mirrors must not own or mutate simulation volume
   (`particula/particles/particle_data.py:69-70,111-117`; tests:
   `particula/particles/tests/particle_data_test.py:194-206`;
-  `.opencode/plans/sections/features/E2-F1/architecture_design.md:31-46`).
+  `particula/particles/particle_data.py`).
 - `vapor_pressure` is process/GPU-helper state rather than owned CPU
   `GasData` or shipped CPU `EnvironmentData` state; CPU-facing workflows must
   recompute it or pass it as ordered sidecar state after any temperature or
@@ -600,23 +600,23 @@ Shared-across-box fields:
   it, so GPU/CPU paths never mix stale helpers with freshly updated particle or
   gas fields
   ([EnvironmentData Container](#environmentdata-container);
-  `.opencode/plans/sections/features/E2-F1/architecture_design.md:31-46`).
+  `particula/particles/particle_data.py`).
 
 #### Final downstream handoff map for sibling features
 
-This phase publishes the finalized P2/P3 ownership and shape contract for
+This phase publishes the finalized field ownership and shape contract for
 downstream implementers; it does not add new schema semantics.
 
-- `E2-F2`: inherit shipped CPU `EnvironmentData.temperature -> (n_boxes,)`,
+- `CPU environment data`: inherit shipped CPU `EnvironmentData.temperature -> (n_boxes,)`,
   `pressure -> (n_boxes,)`, and `saturation_ratio -> (n_boxes, n_species)`;
   keep `ParticleData.volume -> (n_boxes,)` as the authoritative simulation
   volume owner rather than moving volume into `EnvironmentData`.
-- `E2-F3`: inherit the now-shipped exact CPU↔GPU schema mirroring between
+- `environment transfers`: inherit the now-shipped exact CPU↔GPU schema mirroring between
   `EnvironmentData` and `WarpEnvironmentData`, with
   `temperature -> (n_boxes,)`, `pressure -> (n_boxes,)`, and
   `saturation_ratio -> (n_boxes, n_species)`; do not add an extra volume field
   or an implicit transfer path.
-- `E2-F4`: inherit that `GasData.name` remains CPU-only ordered metadata and
+- `gas schema`: inherit that `GasData.name` remains CPU-only ordered metadata and
   `GasData.partitioning` stays `bool` on CPU while `WarpGasData.partitioning`
   is an active-device binary `wp.int32` `(n_boxes, n_species)` mask indexed by
   box and species. `WarpGasData.vapor_pressure -> (n_boxes, n_species)` remains
@@ -624,33 +624,33 @@ downstream implementers; it does not add new schema semantics.
   ordered species names outside `WarpGasData` and pass them back on restore
   because GPU→CPU restore is intentionally lossy for gas metadata and helper
   state.
-- `E2-F5`: inherit the single-box leading-dimension contract for per-box arrays
+- `per-box environments`: inherit the single-box leading-dimension contract for per-box arrays
   such as `ParticleData.masses -> (1, n_particles, n_species)`,
   `ParticleData.concentration -> (1, n_particles)`, and
   `GasData.concentration -> (1, n_species)` without changing the canonical
   storage ranks for multi-box-ready containers.
-- `E2-F6`: inherit the current `float64` / `wp.float64` schema baseline for
+- `mass-precision study`: inherit the current `float64` / `wp.float64` schema baseline for
   stored particle and gas arrays. Treat the
   [Mass Precision Recommendation Report](mass-precision-study.md) as the
   canonical downstream reference before any production dtype-or-schema
   migration proceeds.
-- `E2-F7`: inherit the existing environment and gas ownership boundaries,
+- `condensation stiffness study`: inherit the existing environment and gas ownership boundaries,
   including `ParticleData.volume` ownership and `WarpGasData.vapor_pressure` as
-  lossy helper state, then build later condensation integration work on the P4
+  lossy helper state, then build later condensation integration work on the API validation
   recommendation in
   [`condensation-stiffness-study.md`](condensation-stiffness-study.md):
   `fixed_count_substeps_4` as the preferred fixed-shape foundation, bounded by
-  the E2-F2 environment-shape contract, the E2-F6 `float64` evidence envelope,
+  the CPU environment-shape contract, the mass-precision study `float64` evidence envelope,
    and the shipped bounded direct-kernel gas-coupling hook. That hook applies
-   validated, P2-finalized particle-transfer deltas to active-device gas state
+   validated, inventory-limited particle-transfer deltas to active-device gas state
    and has direct-kernel conservation evidence; broader CPU-strategy parity and
    runnable support remain future work outside the shipped Epic D scope.
-- `E2-F8`: inherit that container schemas are already multi-box capable through
+- `CPU container support`: inherit that container schemas are already multi-box capable through
   leading `n_boxes` dimensions, while current CPU condensation runtime support
   remains single-box and current CPU coagulation paths are still documented as
   single-box or explicitly transitional execution boundaries; do not infer
   broader multi-box CPU execution support from storage shape alone.
-- `E2-F9`: start user-facing docs and examples from the shipped
+- `foundation documentation`: start user-facing docs and examples from the shipped
   [Data Containers and GPU Foundations](../data-containers-and-gpu-foundations.md)
   guide and the
   [Data Containers example](../../Examples/Data_Containers/index.md), then
@@ -713,7 +713,7 @@ That is roughly fifteen orders of magnitude in particle mass, which sits near
 the limit of double precision (~15-16 significant digits). This dynamic range,
 not raw speed, is the main precision driver.
 
-- **Keep fp64 as the reference and production baseline.** The E2 precision study
+- **Keep fp64 as the reference and production baseline.** The container foundations precision study
   found the current absolute per-species `np.float64` / `wp.float64` schema is
   the accepted baseline for shipped particle mass storage. Lower-precision or
   mixed-precision paths remain future proposals until they meet the report's
@@ -740,7 +740,7 @@ not raw speed, is the main precision driver.
 The same NPF-to-droplet range that stresses mass precision also stresses time
 integration: nanometer particles equilibrate with vapor in microseconds while
 cloud droplets evolve over seconds. The shipped direct GPU step uses exactly
-four equal substeps and P2-finalized particle/gas coupling. P2/P3 candidate
+four equal substeps and inventory-limited particle/gas coupling. historical candidate
 comparisons are retained only as historical evidence and do not expand the
 shipped runtime boundary.
 
@@ -751,7 +751,7 @@ shipped runtime boundary.
 - Every successful `condensation_step_gpu(...)` call runs four `time_step / 4.0`
   substeps. Each optionally refreshes composition-weighted surface tension,
   refreshes vapor pressure and environment properties, produces a raw proposal,
-  P2-finalizes and applies it, accumulates finalized transfer, and couples gas
+  finalizes and applies it, accumulates finalized transfer, and couples gas
   concentration. Later proposals read coupled gas; refresh does not read gas.
 - The case-specific stiffness evidence and limitations are in the
   [condensation stiffness study](condensation-stiffness-study.md); its recorded
@@ -761,8 +761,8 @@ shipped runtime boundary.
 - Do not extend this bounded direct-kernel coupling to temperature feedback,
   high-level strategies or `Runnable`s, general CPU parity, graph capture, or
   autodiff support.
-- Downstream implementers must stay inside the E2-F2 environment-shape
-  contract and the E2-F6 `float64` evidence envelope when applying this
+- Downstream implementers must stay inside the CPU environment-shape
+  contract and the mass-precision study `float64` evidence envelope when applying this
   recommendation.
 - Water condensation near cloud activation remains the hardest stress case for
   future follow-up work because of high vapor concentration, tight
@@ -770,15 +770,15 @@ shipped runtime boundary.
 
 ## Epic B: Non-Isothermal Condensation Public API (CPU)
 
-Status: shipped as ADW plan E1. This epic completed the CPU-side public API,
+Status: shipped as CPU non-isothermal condensation. This epic completed the CPU-side public API,
 validation, documentation, and acceleration readiness for non-isothermal
 (latent-heat) condensation, giving the GPU parity work in
 [Epic D](#epic-d-gpu-condensation-physics-parity) a stable,
 builder-accessible CPU reference to match.
 
-Shipped scope (tracked in plan E1):
+Shipped scope:
 
-- Public builder and factory support for latent-heat condensation (E1-F1),
+- Public builder and factory support for latent-heat condensation (latent-heat construction),
   exported through `particula.dynamics` and covered by export regression
   tests.
 - Regression coverage for the latent-heat CPU path at the unit level,
@@ -792,12 +792,12 @@ Shipped scope (tracked in plan E1):
   parity (fixed-shape state, explicit environment inputs, no hidden CPU↔GPU
   movement).
 
-Two follow-ups were deferred out of E1 and subsequently shipped in Epic C/E3:
+Two follow-ups were deferred out of CPU non-isothermal condensation and subsequently shipped in Epic C/GPU kernel hardening:
 the runnable
 [CPU latent-heat example](../../Examples/Dynamics/Condensation/Condensation_Latent_Heat.ipynb)
-(E3-F6) and the integration-level conservation case in
+(latent-heat example) and the integration-level conservation case in
 `particula/integration_tests/condensation_latent_heat_conservation_test.py`
-(E3-F7). Together they provide the executable CPU reference handed to Epic D.
+(CPU latent-heat conservation). Together they provide the executable CPU reference handed to Epic D.
 
 **Exit bar (met):** Latent-heat condensation is a documented, builder/factory
 accessible CPU workflow with validation coverage, and its API decisions are
@@ -805,12 +805,12 @@ recorded as the reference contract for GPU latent-heat parity in Epic D.
 
 ## Epic C: GPU Kernel Correctness and Low-Level API Hardening
 
-Status: shipped as ADW plan E3 on 2026-07-12. All seven child feature tracks
+Status: shipped as GPU kernel hardening on 2026-07-12. All seven child feature tracks
 and their phases are marked shipped. The implementation made the existing
 low-level GPU kernels reproducible and usable from documentation alone before
 new physics is added. This epic absorbed the former "documented low-level GPU
 API" milestone, the cross-cutting validation-infrastructure work, and the two
-documentation/validation follow-ups deferred from Epic B (plan E1).
+documentation/validation follow-ups deferred from Epic B.
 
 For the current shipped baseline on explicit CPU↔GPU transfer helpers,
 `EnvironmentData` ownership, current CPU/GPU support boundaries, and the
@@ -906,17 +906,17 @@ Shipped scope:
       -q -m "warp and cuda"` for optional CUDA-if-available coverage
 8. The paired
    [`CondensationLatentHeat` example](../../Examples/Dynamics/Condensation/Condensation_Latent_Heat.ipynb)
-   now provides a runnable CPU-only bookkeeping workflow (E3-F6), completing
-   the documentation follow-up deferred from E1.
+   now provides a runnable CPU-only bookkeeping workflow (latent-heat example), completing
+   the documentation follow-up deferred from CPU non-isothermal condensation.
 9. `particula/integration_tests/condensation_latent_heat_conservation_test.py`
    now establishes the CPU mass-conservation and latent-heat bookkeeping
-   baseline that Epic D parity tests can reuse (E3-F7).
+   baseline that Epic D parity tests can reuse (CPU latent-heat conservation).
 
 **Exit bar (met):** A new user can run both kernels from the docs on a CUDA
 device and on Warp CPU without reading source, repeated coagulation steps draw
 uncorrelated samples from a caller-initialized persistent RNG buffer, the
 device-aware test policy plus parity tolerances are recorded, and the deferred
-E1 latent-heat example and integration-conservation case have landed.
+CPU non-isothermal condensation latent-heat example and integration-conservation case have landed.
 
 ### Known Kernel Issues
 
@@ -929,7 +929,7 @@ explicitly accepted with evidence and remain bounded follow-up concerns.
   the seed fixed unless an explicit reset is requested, and graph-captured
   loops should initialize or reset the buffer before capture or before the
   repeated-step loop (see [Random Number Strategy](#random-number-strategy)).
-- **Rejection-sampling acceptance collapse.** The shipped `E3-F2-P2` outcome
+- **Rejection-sampling acceptance collapse.** The shipped `coagulation rejection sampling` outcome
   was a bounded selector hardening improvement inside the existing Brownian
   sampler, not a new public API, not a container or transfer-path change, and
   not a full mixed-scale acceptance-rate fix. The remaining limitation is still
@@ -952,7 +952,7 @@ explicitly accepted with evidence and remain bounded follow-up concerns.
   particle pairs to compute `active_pair_count`, expected mean, and the
   Poisson-style sigma `sqrt(expected_mean)`.
 
-  The measured evidence recorded in E3-F2-P3 is 139 accepted collisions across
+  The measured evidence recorded in coagulation rejection sampling is 139 accepted collisions across
   the fixed seeded replay range `range(101, 201)`, compared with the Brownian
   expected mean `143.846`, Poisson-style sigma `11.994`, and documented
   `3-sigma` tolerance `35.981`. That tolerance is based on repeated fresh
@@ -1019,7 +1019,7 @@ explicitly accepted with evidence and remain bounded follow-up concerns.
 
 ## Epic D: GPU Condensation Physics Parity
 
-Status: shipped. E4-F1--E4-F7 recorded evidence is complete for the bounded
+Status: shipped. Recorded GPU condensation evidence is complete for the bounded
 low-level direct-condensation publication; it does not enable new production
 functionality beyond the verified direct kernel. Epic D inherits the supported
 `particula.gpu.kernels` entry point, explicit transfer boundary, and
@@ -1035,9 +1035,9 @@ Supplied buffers preserve identity; omitted fields use fallback allocations.
 
 Each successful call executes exactly four `time_step / 4.0` substeps. Every
 substep refreshes derived vapor pressure and environment properties, produces a
-raw proposal, and applies a P2-finalized, inventory-limited transfer. Particle
+raw proposal, and applies an inventory-limited transfer. Particle
 masses and the matching particle-concentration-weighted gas-concentration delta
-mutate in place. The total-transfer buffer accumulates P2-finalized transfers,
+mutate in place. The total-transfer buffer accumulates inventory-limited transfers,
 while work storage retains the final raw proposal. Explicit simulation-state
 transfers remain caller responsibilities; entry-point validation may still
 perform synchronous device-to-host readbacks.
@@ -1045,7 +1045,7 @@ perform synchronous device-to-host readbacks.
 The current executable CPU integration baseline remains
 `particula/integration_tests/condensation_latent_heat_conservation_test.py`.
 The direct step applies an optional latent-heat rate correction in each of its
-four fixed substeps, with CPU-oracle/Warp parity coverage. E4-F4's #1272 signed diagnostic is shipped: optional keyword-only caller-owned
+four fixed substeps, with CPU-oracle/Warp parity coverage. GPU latent heat's #1272 signed diagnostic is shipped: optional keyword-only caller-owned
 active-device
 `wp.float64` `latent_heat`, `(n_species,)`, and `energy_transfer`,
 `(n_boxes, n_species)`, record finalized transfer times latent heat.
@@ -1061,7 +1061,7 @@ canonical foundations guide.
 Temperature feedback, high-level `Aerosol`/`Runnable` integration, adaptive
 stepping, unsupported physics, graph capture/replay, broad autodiff, and
 general CPU-strategy parity remain future work outside the shipped scope.
-This leaves temperature feedback, gas mutation beyond the P2-finalized direct
+This leaves temperature feedback, gas mutation beyond the inventory-limited direct
 coupling, and all higher-level process integration outside this milestone.
 
 The independent condensation walkthrough
@@ -1085,27 +1085,27 @@ it does not change production capability. The caller-owned, write-only
 
 ## Epic E: GPU Coagulation Physics Coverage
 
-Status: shipped. E5-F9 P3 completed no later than its P4 closeout, and Epic E
+Status: shipped. Coagulation support documentation integration validation completed no later than its API validation closeout, and Epic E
 completed its bounded direct-kernel coagulation scope. Epics F and G subsequently
 shipped, and Epic H is active.
 
-### E5 roadmap inventory
+### GPU coagulation roadmap inventory
 
-| ID | Title | Status text |
-| --- | --- | --- |
-| `E5` | GPU Coagulation Physics Coverage | Shipped |
-| `E5-F1` | Mechanism Configuration and Sampling Contract | Shipped |
-| `E5-F2` | Charged Pair Physics and Charge-Conserving Merges | Shipped |
-| `E5-F3` | Charged and Brownian-Plus-Charged GPU Execution | Shipped |
-| `E5-F4` | SP2016 Sedimentation GPU Execution | Shipped |
-| `E5-F5` | ST1956 Turbulent-Shear GPU Execution | Shipped |
-| `E5-F6` | Single-Pass Additive Multi-Mechanism Coagulation | Shipped |
-| `E5-F7` | Cross-Mechanism GPU Validation Matrix | Shipped |
-| `E5-F8` | Independent CPU-Warp Condensation Walkthrough | Shipped |
-| `E5-F9` | GPU Coagulation Support Documentation and Epic Closeout | Shipped |
+| Feature | Status |
+| --- | --- |
+| GPU Coagulation Physics Coverage | Shipped |
+| Mechanism Configuration and Sampling Contract | Shipped |
+| Charged Pair Physics and Charge-Conserving Merges | Shipped |
+| Charged and Brownian-Plus-Charged GPU Execution | Shipped |
+| SP2016 Sedimentation GPU Execution | Shipped |
+| ST1956 Turbulent-Shear GPU Execution | Shipped |
+| Single-Pass Additive Multi-Mechanism Coagulation | Shipped |
+| Cross-Mechanism GPU Validation Matrix | Shipped |
+| Independent CPU-Warp Condensation Walkthrough | Shipped |
+| GPU Coagulation Support Documentation and Epic Closeout | Shipped |
 
-E5-F7 owns the [GPU coagulation validation record](coagulation-validation.md),
-E5-F8 owns the [condensation parity walkthrough ownership record](condensation-parity-walkthrough.md),
+Coagulation validation owns the [GPU coagulation validation record](coagulation-validation.md),
+independent condensation walkthrough owns the [condensation parity walkthrough ownership record](condensation-parity-walkthrough.md),
 and the [GPU condensation parity walkthrough](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_condensation_parity_walkthrough.py)
 is runnable source.
 
@@ -1229,12 +1229,12 @@ integration, graph-capture claims, mechanism variants, and DNS/general
 turbulence. Non-unit efficiency,
 alternate drag physics, Runnable integration, CPU fallback, hidden
 simulation-state transfers, graph capture, and performance guarantees are
-unsupported. Read-only P2 validation may synchronize and read back device
+unsupported. Read-only numerical validation may synchronize and read back device
 status, including on CUDA, to report invalid values. The direct path does not
-establish CPU-strategy parity. E5-F6 ships the additive contract and
+establish CPU-strategy parity. Additive coagulation mechanisms ships the additive contract and
 documentation; no additional planned work remains for the shipped approved
-additive combinations. E5-F7 is shipped with the cross-mechanism validation
-record. E5-F9 is shipped: its completed P3/P4 publish the consolidated direct
+additive combinations. Coagulation validation is shipped with the cross-mechanism validation
+record. Coagulation support documentation is shipped: its completed validation and documentation publish the consolidated direct
 example and closeout gate. Epics F and G subsequently shipped, and Epic H is
 active.
 
@@ -1260,38 +1260,38 @@ Epic D carry-forward walkthrough and ownership record are published.
 
 ## Epic F: GPU Process Completeness
 
-Status: shipped as ADW plan E6. This epic delivered the remaining processes a
+Status: shipped as GPU process completeness. This epic delivered the remaining processes a
 complete aerosol simulation needs to stay GPU-resident between checkpoints —
 dilution, wall loss, and nucleation — plus the fixed-capacity slot management
 that nucleation and graph capture depend on.
 
-### E6 roadmap inventory
+### GPU process completeness roadmap inventory
 
-| ID | Title | Status text |
-| --- | --- | --- |
-| `E6` | GPU Process Completeness | Shipped |
-| `E6-F1` | CPU Dilution Strategy and Runnable Reference | Shipped |
-| `E6-F2` | Direct GPU Dilution with CPU Parity | Shipped |
-| `E6-F3` | Neutral Spherical and Rectangular GPU Wall Loss | Shipped |
-| `E6-F4` | Charged GPU Wall Loss with Neutral Fallback | Shipped |
-| `E6-F5` | CPU and GPU Fixed-Slot Activation and Diagnostics | Shipped |
-| `E6-F6` | CPU and GPU Slot Exhaustion Policies | Shipped |
-| `E6-F7` | CPU Nucleation and Particle-Source Process | Shipped |
-| `E6-F8` | Direct GPU Nucleation Process | Shipped |
-| `E6-F9` | Integrated Validation Documentation and Epic Closeout | Shipped |
+| Feature | Status |
+| --- | --- |
+| GPU Process Completeness | Shipped |
+| CPU Dilution Strategy and Runnable Reference | Shipped |
+| Direct GPU Dilution with CPU Parity | Shipped |
+| Neutral Spherical and Rectangular GPU Wall Loss | Shipped |
+| Charged GPU Wall Loss with Neutral Fallback | Shipped |
+| CPU and GPU Fixed-Slot Activation and Diagnostics | Shipped |
+| CPU and GPU Slot Exhaustion Policies | Shipped |
+| CPU Nucleation and Particle-Source Process | Shipped |
+| Direct GPU Nucleation Process | Shipped |
+| Integrated Validation Documentation and Epic Closeout | Shipped |
 
 The private
-[P2 sequence evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py)
-and [P3 published source](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py) cover
+[numerical validation sequence evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py)
+and [integration validation published source](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py) cover
 the fixed illustrative order: `condensation_step_gpu`,
 `coagulation_step_gpu`, `dilution_step_gpu`, `wall_loss_step_gpu`, then
 `nucleation_step_gpu`. This is illustrative, not a production coordinator;
-the P3 [regression](https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_complete_process_sequence_example_test.py)
+the integration validation [example regression](https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_complete_process_sequence_example_test.py)
 keeps explicit transfers visible.
 
 Delivered dilution scope:
 
-- E6-F1 provides the CPU finite-step oracle and E6-F2 delivers the P1–P4
+- CPU dilution provides the CPU finite-step oracle and GPU dilution delivers the input validation–API validation
   direct GPU kernel: `from particula.gpu.kernels import dilution_step_gpu`.
   It is a low-level, fixed-shape operation, not a GPU process or runnable.
 - Callers own CPU↔Warp transfer, device placement, and synchronization. The
@@ -1303,12 +1303,12 @@ Delivered dilution scope:
   scans may still allocate or launch.
   Particle and gas parity evidence uses independent Warp CPU float64 checks at
   `rtol=1e-12, atol=0`; CUDA is optional and skips cleanly when unavailable.
-  It is not bitwise parity. E6-F9 P1–P4 shipped private validation, the
+  It is not bitwise parity. Direct-process integration shipped private validation, the
   explicit-transfer example, documentation, and the closeout gate.
 
-Delivered bounded wall-loss P1–P6 scope:
+Delivered bounded wall-loss scope:
 
-- E6-F3 provides `from particula.gpu.kernels import wall_loss_step_gpu` for
+- Neutral GPU wall loss provides `from particula.gpu.kernels import wall_loss_step_gpu` for
   direct particle-resolved spherical or rectangular fixed-capacity slot wall
   loss. `NeutralWallLossConfig` remains concrete-module-only at
   `particula.gpu.kernels.wall_loss`. SI inputs are wall eddy diffusivity in
@@ -1338,7 +1338,7 @@ Delivered bounded wall-loss P1–P6 scope:
 
   This non-executed direct-call example uses caller-owned same-device Warp
   state. Later calls reuse `rng_states` and omit `initialize_rng=True`.
-- E6-F4 ships charged particle-resolved direct-kernel wall loss through the
+- Charged GPU wall loss ships charged particle-resolved direct-kernel wall loss through the
   same concrete-module-only `NeutralWallLossConfig`; it adds no entry point,
   export, runnable, or transfer behavior. `mode` accepts `"neutral"` or
   `"charged"`. Charged mode accepts a finite signed scalar `wall_potential` in
@@ -1377,7 +1377,7 @@ Delivered bounded wall-loss P1–P6 scope:
   eligible finite positive-rate slots; positive infinite-rate removal is
   deterministic and consumes no draw, so exact CPU/Warp or per-seed replay is
   not supported.
-- P5 evidence is geometry-specific deterministic coefficient tolerances plus
+- regression validation evidence is geometry-specific deterministic coefficient tolerances plus
   eight geometry/radius strata of exact-binomial survival validation. Each
   stratum uses 4,096 observations and inclusive exact-binomial bounds with
   per-stratum alpha 1.25e-7. Warp CPU is the installed-Warp baseline; CUDA is
@@ -1386,21 +1386,21 @@ Delivered bounded wall-loss P1–P6 scope:
 - Deferred scope includes CPU fallback or hidden transfers,
   runnable/scheduler/backend integration, dynamic slots, compaction/activation,
   graph capture, differentiability, performance guarantees, and exact RNG
-  replay. E6-F9 P1–P4 shipped the integrated validation, documentation, and
+  replay. Direct-process integration shipped the integrated validation, documentation, and
   closeout evidence.
 
 Delivered bounded slot-exhaustion primitives are documented in
 [Fixed-Capacity Slot Exhaustion
-Primitives](../slot_exhaustion_policies.md): CPU P1 makes immutable
-activation-prefix or deferred-policy records, CPU P2 plans and commits
-equal-weight resampling, CPU P4 scales selected rows, and direct Warp P2/P4
+Primitives](../slot_exhaustion_policies.md): CPU policy resolution creates immutable
+activation-prefix or deferred-policy records, CPU resampling plans and commits
+equal-weight resampling, CPU volume scaling scales selected rows, and direct Warp resampling and volume scaling
 provide the corresponding caller-owned fixed-shape boundaries. They do not
 discover or activate slots, construct a source, deplete gas, or compose runtime
 policy.
 
-### Shipped E6-F5 fixed-slot primitives
+### Shipped fixed-slot primitives
 
-- E6-F5 ships matching CPU and direct-Warp fixed-shape slot diagnostics and
+- Fixed-slot management ships matching CPU and direct-Warp fixed-shape slot diagnostics and
   activation. The authoritative active/free/invalid classification and schema
   table is in [Data Containers and GPU
   Foundations](../data-containers-and-gpu-foundations.md).
@@ -1415,49 +1415,49 @@ policy.
   preflight may launch read-only validation, classification, or workspace
   kernels, but does not mutate caller-owned state before its writer launches;
   it does not promise rollback after a writer has launched.
-- E6-F6 ships exhaustion resolution, resampling, and volume-scaling primitives.
-  E6-F7 owns CPU particle-source physics and E6-F8 ships the direct-Warp step
-  and explicit-transfer example. E6-F9 shipped validation, the illustrative
+- Slot exhaustion ships exhaustion resolution, resampling, and volume-scaling primitives.
+  CPU nucleation owns CPU particle-source physics and direct GPU nucleation ships the direct-Warp step
+  and explicit-transfer example. Direct-process integration shipped validation, the illustrative
   sequence, documentation, and closeout, not an integration API.
   These later features do not alter the shipped fixed-slot storage contract.
 
 Delivered nucleation boundaries and deferred GPU scope:
 
-1. E6-F7 ships bounded CPU-only, one-box nucleation/particle-source physics
+1. CPU nucleation ships bounded CPU-only, one-box nucleation/particle-source physics
    following the
    [nucleation equations](../../Theory/Technical/Dynamics/Nucleation_Equations.md).
    Its public `Nucleation` runnable preserves native `Aerosol` identity and
    uses fixed-capacity slots, partitioning gas, and per-substep transactions.
    See the [CPU Nucleation Strategy System](../nucleation_strategy_system.md).
-2. E6-F8 ships the bounded, package-exported direct-Warp step:
+2. Direct GPU nucleation ships the bounded, package-exported direct-Warp step:
 
    ```python
    from particula.gpu.kernels import nucleation_step_gpu
    ```
 
-   `NucleationConfig`, P2/P3 records, P4 controls, sidecars, and helpers remain
+   `NucleationConfig`, demand planning/capacity staging records, exhaustion resolution controls, sidecars, and helpers remain
    concrete-only in `particula.gpu.kernels.nucleation`; nested resampling
    buffers remain concrete-only in `particula.gpu.kernels.exhaustion`. Callers
    own same-device fixed-shape `wp.float64`/`wp.int32` sidecars, CPU↔Warp
-   conversion, and synchronization. The step performs P1 preflight, P2
-   admission, P3 fixed-slot staging, P4 resampling-first/scaling-fallback, and a
-   fused P5 selected-slot/gas-transfer commit. It preserves fixed capacity, uses
+   conversion, and synchronization. The step performs potential-rate evaluation preflight, demand planning
+   admission, capacity staging fixed-slot staging, exhaustion resolution resampling-first/scaling-fallback, and a
+   fused commit selected-slot/gas-transfer commit. It preserves fixed capacity, uses
    `-1` free-index tails, and never silently truncates demand.
 
-   Invalid public input rejected before P4 primitive entry preserves particle
-   and gas state, although P2–P4 may have written documented sidecars before a
-   later rejection. No rollback is promised after an E6-F6 primitive is entered
-   or a P5 writer launches. A valid configured no-admission/no-work result is a
+   Invalid public input rejected before volume scaling primitive entry preserves particle
+   and gas state, although resampling–volume scaling may have written documented sidecars before a
+   later rejection. No rollback is promised after a slot-exhaustion primitive is entered
+   or a policy integration writer launches. A valid configured no-admission/no-work result is a
    successful no-op; successful work returns the identical particle and gas
-   containers. This direct boundary depends on E6-F5, E6-F6, and E6-F7. It is
+   containers. This direct boundary depends on fixed-slot management, slot exhaustion, and CPU nucleation. It is
    distinct from the CPU-only `Nucleation` runnable and excludes hidden transfer
    or synchronization, CPU fallback, resize/compaction, a GPU `Runnable`,
    scheduler/backend selection, expanded physics, graph capture, autodiff, and
    performance guarantees. See the [Nucleation Strategy
    System](../nucleation_strategy_system.md) and its
    [direct example](https://github.com/uncscode/particula/blob/main/docs/Examples/Nucleation/gpu_direct_nucleation.py).
-3. E6-F9 shipped private sequence evidence, a direct-transfer illustration,
-   documentation, and closeout. It does not own the shipped E6-F8 direct step
+3. Direct-process integration shipped private sequence evidence, a direct-transfer illustration,
+   documentation, and closeout. It does not own the shipped direct GPU nucleation direct step
    or create a production coordinator.
 4. Fixed-shape workflow extensions and the deferred capabilities: dynamic
    allocation/resizing/compaction, hidden transfers/CPU fallback, high-level
@@ -1483,55 +1483,55 @@ Delivered nucleation boundaries and deferred GPU scope:
 
 ### Particle Slot Management
 
-- E6-F5 has shipped CPU and direct-Warp fixed-slot diagnostics and activation;
+- Fixed-slot management has shipped CPU and direct-Warp fixed-slot diagnostics and activation;
   see [Data Containers and GPU
   Foundations](../data-containers-and-gpu-foundations.md).
   Its active/free classification, ascending mapping, and fixed-shape storage
   are complete.
-- E6-F6 ships exhaustion resolution, resampling, and representative-volume
+- Slot exhaustion ships exhaustion resolution, resampling, and representative-volume
   scaling for fixed-capacity operation. It does not add resize or
-  hidden-transfer behavior to E6-F5.
-- E6-F7 owns CPU source physics; E6-F8 owns the shipped direct-Warp consumer and
-  explicit-transfer example. E6-F9 shipped integrated validation, the
+  hidden-transfer behavior to fixed-slot management.
+- CPU nucleation owns CPU source physics; direct GPU nucleation owns the shipped direct-Warp consumer and
+  explicit-transfer example. Direct-process integration shipped integrated validation, the
   illustrative sequence, documentation, and closeout; it did not ship a
   production coordinator. No direct runnable or user example is shipped by
-  E6-F5.
+  fixed-slot management.
 - Graph capture, autodiff, and performance evidence belong to later epic work.
   Fixed slots preserve stable shapes without resizing or allocating caller-owned
   particle storage; primitives may privately allocate temporary categories,
   workspace, count, and status buffers. Compaction is not part of the shipped
   contract.
 
-**Exit bar:** E6-F1--E6-F8 and E6-F9 P1–P4 are shipped with dated completion
-evidence, so E6 is shipped. Epic G subsequently shipped, and Epic H is active.
+**Exit bar:** The CPU and direct GPU process features and direct-process integration are shipped with dated completion
+evidence, so GPU process completeness is shipped. Epic G subsequently shipped, and Epic H is active.
 Warp CPU remains the baseline and CUDA optional. Graph capture, performance
 validation, profiling, and memory-budget work remain Epic H scope.
 
 ## Epic G: Backend Selection and GPU-Resident Simulation
 
-Status: shipped. E7-F9 P7 validation passed on 2026-08-11 after the required
+Status: shipped. Resident diagnostics support publication validation passed on 2026-08-11 after the required
 focused, export, resident-fast, full-package-coverage, changed-module-coverage,
 strict MkDocs, and optional-CUDA gates passed. Epic G is shipped. Epics H and I
 remain deferred.
-Status: shipped as ADW plan E7 on 2026-08-30. All nine child plans E7-F1
-through E7-F9 are shipped, and Epic H is active next.
+Status: shipped as resident execution on 2026-08-30. All nine child plans backend selection
+through resident diagnostics are shipped, and Epic H is active next.
 
-### E7 roadmap inventory
+### Resident execution roadmap inventory
 
-| ID | Title | Status text |
-| --- | --- | --- |
-| `E7` | Backend Selection and GPU-Resident Simulation | Shipped |
-| `E7-F1` | Backend-Selection and Execution-Context API | Shipped |
-| `E7-F2` | Backend-Selected Condensation | Shipped |
-| `E7-F3` | Backend-Selected Brownian Coagulation | Shipped |
-| `E7-F4` | GPU-Resident Session State and Checkpoints | Shipped |
-| `E7-F5` | Deterministic Full-Process Scheduling | Shipped |
-| `E7-F6` | Fallback, Capability Errors, and API Stability | Shipped |
-| `E7-F7` | Multi-Box Communication and Volume Evolution | Shipped |
-| `E7-F8` | Persistent Per-Box RNG Streams and Restart Semantics | Shipped |
-| `E7-F9` | Diagnostics, Full-Loop Regressions, Documentation, and Closeout | Shipped |
+| Feature | Status |
+| --- | --- |
+| Backend Selection and GPU-Resident Simulation | Shipped |
+| Backend-Selection and Execution-Context API | Shipped |
+| Backend-Selected Condensation | Shipped |
+| Backend-Selected Brownian Coagulation | Shipped |
+| GPU-Resident Session State and Checkpoints | Shipped |
+| Deterministic Full-Process Scheduling | Shipped |
+| Fallback, Capability Errors, and API Stability | Shipped |
+| Multi-Box Communication and Volume Evolution | Shipped |
+| Persistent Per-Box RNG Streams and Restart Semantics | Shipped |
+| Diagnostics, Full-Loop Regressions, Documentation, and Closeout | Shipped |
 
-E7-F1 is shipped (P1--P6 complete). It provides a separate public,
+Backend selection is shipped (implementation and documentation complete). It provides a separate public,
 dependency-neutral, explicit-selection context with a limited CPU/reference
 registration use case.
 It is neither a high-level execution API nor a GPU adapter. Callers construct
@@ -1540,22 +1540,22 @@ does not execute that adapter.
 
 The full-policy downstream ordering was:
 
-`E7-F1 -> E7-F6 -> {E7-F2, E7-F3, E7-F4} -> E7-F5`.
+`backend selection -> execution capability policy -> {selected condensation, selected Brownian coagulation, resident sessions} -> resident scheduling`.
 
-E7-F6 now supplies the shipped availability resolver, typed errors, explicit
+Execution capability policy now supplies the shipped availability resolver, typed errors, explicit
 CPU fallback, frozen stable API, and documentation handoff. See [Backend
 Selection and Explicit CPU Fallback](../backend_selection.md). The historical
-ordering remains context: E7-F6/Track T6 is shipped through P7. E7-F6 is the
+ordering remains context: execution capability policy is shipped through final review. Execution capability policy is the
 prerequisite already satisfied by the
-downstream shipped seams. E7-F1 supplies neither transfer nor fallback. E7-F2
-supplies condensation adapters and E7-F3 supplies coagulation adapters. E7-F4
-supplies resident session/container/sidecar lifecycle; P1--P6 are shipped as
-its bounded concrete-only prerequisite, while P7 is blocked and unshipped.
-E7-F5 is their later scheduling
+downstream shipped seams. Backend selection supplies neither transfer nor fallback. Selected condensation
+supplies condensation adapters and selected Brownian coagulation supplies coagulation adapters. Resident sessions
+supplies resident session/container/sidecar lifecycle; setup, checkpoints, and lifecycle handling are shipped as
+its bounded concrete-only prerequisite, while final review is blocked and unshipped.
+Resident scheduling is their later scheduling
 consumer, shipped as a bounded, concrete-only seam. These consumers do not
 alter the shipped direct-kernel path.
 
-E7-F3's shipped concrete-only Brownian seam remains bounded: it has no public
+Selected Brownian coagulation's shipped concrete-only Brownian seam remains bounded: it has no public
 export, availability probing, fallback, or scheduler dependency, preserving the
 direct-kernel contract. Any broader integration still follows the ordering.
 
@@ -1569,44 +1569,44 @@ direct-kernel contract. Any broader integration still follows the ordering.
    and direct-kernel support boundaries.
 - Selection, availability, and fallback never upload, restore, synchronize,
   migrate, retry, or silently switch after a runtime, kernel, or adapter
-  failure. E7-F1 does not introduce GPU adapters, resident loops, scheduling,
+  failure. Backend selection does not introduce GPU adapters, resident loops, scheduling,
   implicit transfer or synchronization, or replacement of direct GPU APIs.
-- E7-F2, E7-F3, and E7-F4 may add bounded consumers after their process-adapter
-  or resident-lifecycle contracts are established. E7-F3's shipped
+- Selected condensation, selected Brownian coagulation, and resident sessions may add bounded consumers after their process-adapter
+  or resident-lifecycle contracts are established. Selected Brownian coagulation's shipped
   concrete-only seam is the documented exception to the full-policy ordering;
-  E7-F5 is a shipped bounded consumer, not a consequence of E7-F1 selection
+  resident scheduling is a shipped bounded consumer, not a consequence of backend selection
   alone.
-- E7-F3 P6 has shipped bounded selected-Brownian adapter documentation and
+- Selected Brownian coagulation documentation has shipped bounded selected-Brownian adapter documentation and
   evidence in the [coagulation strategy guide](../coagulation_strategy_system.md)
   and its [explicit-transfer example](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_coagulation_direct.py).
-   It preserves the direct-kernel contract. E7-F8's shipped resident-stream
+   It preserves the direct-kernel contract. Resident RNG and restart's shipped resident-stream
    policy remains concrete-only and adds no public exports, fallback, or hidden
    transfer.
 
 ### Full GPU-Resident Simulation
 
-E7-F4 P1--P6 ship the bounded concrete-only resident-session lifecycle and
-in-memory checkpoint/restart prerequisite; P7 is blocked and unshipped. See
+Resident session setup, checkpoint, and lifecycle operations ship the bounded concrete-only resident-session lifecycle and
+in-memory checkpoint/restart prerequisite; documentation is blocked and unshipped. See
 [GPU resident checkpoints](../gpu_resident_checkpoints.md) for its direct-import
 seams, closed-guard binding, canonical recovery bytes, and exact-device fresh
 restart contract. It is not a resident loop or a process coordinator.
 
-E7-F5 is shipped as a bounded concrete-only exception: it runs only the complete
+Resident scheduling is shipped as a bounded concrete-only exception: it runs only the complete
 resolver-produced twelve-node schedule, with communication followed by optional
 volume evolution before the existing process nodes. Communication uses
 pre-update volumes; both barriers invalidate saturation ratio only, while the
 coordinator-owned vapor-pressure/saturation refresh windows remain at their
 existing condensation and diagnostics consumers. It retains one exact resident
 identity binding and exposes only closed diagnostics snapshots. It adds no
-hidden transfer, public orchestration, or export surface. E7-F4 remains its
+hidden transfer, public orchestration, or export surface. Resident sessions remains its
 prerequisite and the explicit checkpoint/restart boundary.
 
-E7-F7 P2 ships concrete-only direct-Warp volume evolution, and P3 ships
-concrete-only direct-Warp synchronous gas communication. P5 integrates their
+The volume-evolution helper provides concrete-only direct-Warp volume evolution, and the gas-transport helper provides
+concrete-only direct-Warp synchronous gas communication. The resident binding integrates their
 closed resident-map forms as the scheduler's communication and optional-volume
 barrier; the direct seams remain unexported and add no transfers,
 synchronization, CPU fallback, resizing, or other orchestration.
-Import P3 only from
+Import gas transport only from
 `particula.gpu.kernels.communication.gas_communication_step_gpu`. Callers
 provide complete Warp particle/gas containers and caller-owned `(B, S)`
 `wp.float64` amount, delta, and outbound work ledgers; enabled open-source or
@@ -1617,17 +1617,17 @@ record it in the source ledger, while `source -> -1` sinks use and record the
 source amount in the sink ledger. The operation performs one gas-concentration
 commit after preflight.
 Broader transport and mixing/advection work remain deferred.
-E7-F8 is shipped: it owns the bounded scheduled persistent-stream identity,
-reset, and checkpoint/restart policy. E7-F9 owns final diagnostics products,
-complete examples, and closeout; its P7 validation gate is shipped.
+Resident RNG and restart is shipped: it owns the bounded scheduled persistent-stream identity,
+reset, and checkpoint/restart policy. Resident diagnostics owns final diagnostics products,
+complete examples, and closeout; its documentation validation gate is shipped.
 High-level GPU adapters and user-facing CPU/GPU orchestration remain later
-contracts after E7-F6 establishes policy. They must not imply availability
+contracts after execution capability policy establishes policy. They must not imply availability
 probing, fallback, retry, graph capture, performance claims, distributed or
 multi-GPU work, or replacement of the direct-kernel APIs.
 
 ### Multi-Box Communication
 
-E7-F7/T7 is shipped as a fixed-shape, single-device prescribed-map contract.
+Communication and volume evolution is shipped as a fixed-shape, single-device prescribed-map contract.
 Direct gas communication supports closed edges and declared `-1` source/sink
 endpoints with caller-owned amount/accounting ledgers; direct particle transport
 supports closed, particle-resolved fixed-slot maps only. Optional direct volume
@@ -1646,15 +1646,15 @@ guide for the amount equations, capacity gating, and checkpoint boundary.
 
 CFD, pressure/velocity solvers, adaptive meshes, distributed or multi-GPU
 transport, broad mixing/advection claims, graph capture, performance work, and
-autodiff remain deferred. Independent boxes remain the default; E7-F8 supplies
-the shipped scheduled RNG policy and E7-F9 closes complete-loop publication.
+autodiff remain deferred. Independent boxes remain the default; resident RNG and restart supplies
+the shipped scheduled RNG policy and resident diagnostics closes complete-loop publication.
 
 Fixed-capacity slot management for these loops is defined in
 [Fixed-Capacity Slot Boundary](#fixed-capacity-slot-boundary) under Epic F.
 
 ### Random Number Strategy
 
-E7-F8 is shipped with two deliberately separate ownership models. Direct
+Resident RNG and restart is shipped with two deliberately separate ownership models. Direct
 kernels retain caller-owned supplied `rng_states`; omitted state is call-local
 convenience state, and only `initialize_rng=True` resets supplied state. A
 resident session and its registry instead own distinct, persistent, nonaliasing
@@ -1685,55 +1685,55 @@ See the
 Warp CPU is the baseline when installed. CUDA evidence is optional and skips
 cleanly when unavailable; no CPU/Warp/CUDA replay guarantee is made.
 
-**Exit bar:** E7-F1 remains a bounded selection seam and E7-F5 remains a
-bounded concrete-only resident scheduler. E7-F7 and E7-F8 are shipped; E7-F9
-P7 is shipped as of 2026-08-11. See the
-[support matrix](../data-containers-and-gpu-foundations.md#e7-f9-resident-support-validation-matrix-2026-08-11)
+**Exit bar:** backend selection remains a bounded selection seam and resident scheduling remains a
+bounded concrete-only resident scheduler. Communication and volume evolution and resident RNG and restart are shipped; resident diagnostics
+validation is shipped as of 2026-08-11. See the
+[support matrix](../data-containers-and-gpu-foundations.md#resident-support-validation-matrix-2026-08-11)
 for the dated evidence. Epic G is shipped. At that closeout, Epics H and I were
-deferred; Epic H subsequently became active with E8-F1 shipped. Any public,
+deferred; Epic H subsequently became active with capture capability shipped. Any public,
 availability-policy, fallback/retry, native graph-capture, performance, or
 distributed integration must establish its own contract. The direct GPU path
 remains explicit and unchanged.
-**Exit bar:** Satisfied on 2026-08-30. E7-F1 remains a bounded selection seam,
-E7-F5 remains a bounded concrete-only resident scheduler, and E7-F7--E7-F9
+**Exit bar:** Satisfied on 2026-08-30. Backend selection remains a bounded selection seam,
+resident scheduling remains a bounded concrete-only resident scheduler, and communication, RNG, and diagnostic features
 close the communication, RNG/restart, diagnostics, validation, documentation,
 and epic publication scope. The direct GPU path remains explicit and unchanged.
-Native graph capture/replay beyond E8-F1 host admission, performance profiling
+Native graph capture/replay beyond capture capability host admission, performance profiling
 and targets, memory-budget evidence, distributed execution, and autodiff remain
 deferred to the later Epic H tracks and Epic I.
 
 ## Epic H: Graph Capture and Performance
 
-Status: **Shipped**, together with E8-F1 through E8-F8, by maintainer closeout
+Status: **Shipped**, together with capture capability through graph-capture documentation, by maintainer closeout
 decision on 2026-09-27. The decision reconciles plan completion and separates
 it from the outstanding measured-evidence gate. Reviewed CUDA scaling,
 memory, and profiling artifacts remain unavailable; no passing measurement
 is inferred from plan status.
-E8-F4 keeps opaque native handles in private LIVE/RELEASING/RELEASED
+Capture and replay keeps opaque native handles in private LIVE/RELEASING/RELEASED
 provenance. Per-record launch leases prevent release races, native callbacks
 run outside the global provenance lock, and the shared session lifecycle
 protocol publishes terminal intent before close, discard, or finalize
 callbacks. Post-begin capture failures abort, fault resident and graph state,
 and preserve the initiating exception.
-E8-F4 P5 supplies bounded three-way full-loop NumPy/Warp-CPU/native-CUDA
+Full-loop capture and replay validation supplies bounded three-way full-loop NumPy/Warp-CPU/native-CUDA
 validation. This work remains concrete-only and provides no public workflow.
 
-E8-F7/T7 owns profiling and machine-bounded recommendations. The
+CUDA profiling owns profiling and machine-bounded recommendations. The
 [GPU graph-capture profiling record](../gpu_graph_capture_performance.md)
 freezes small `(1, 16, 2)` and medium `(1000, 16, 2)` workloads, 100% activity,
 gas communication, replay counts 1/10/100/1000, and native-CUDA-only evidence
 with no CPU or Warp-CPU fallback. No reviewed normalized artifact or manifest
 is checked in, so profiling results and recommendations are unavailable and
-unshipped. E8-F8 owns the [native-CUDA example](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_resident_graph_capture.py),
+unshipped. Graph-capture documentation owns the [native-CUDA example](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_resident_graph_capture.py),
 [operator runbook](../gpu_graph_capture.md), limitations, documentation
 reconciliation, and [closeout record](graph-capture-closeout.md). The closeout
-record is the sole P3 evidence authority. Its measured-evidence disposition
+record is the sole evidence authority. Its measured-evidence disposition
 remains `UNSHIPPED/BLOCKED` until the required evidence passes, independently
 of the maintainer's Shipped plan disposition.
 
-### E8-F1 shipped contract
+### Shipped contract
 
-E8-F1 ships host metadata and scheduler admission only. Its concrete-only
+Capture capability ships host metadata and scheduler admission only. Its concrete-only
 direct-import boundary is `particula.execution.graph_capture`; its carriers and
 lifecycle operations remain absent from `particula.execution` and top-level
 `particula` exports. It supplies neither native CUDA graph capture nor replay,
@@ -1741,7 +1741,7 @@ parity, performance evidence, or a user workflow.
 
 Eligibility is fail-closed: non-CPU Warp native devices require caller-provided
 availability/probe qualification. CPU and Warp CPU are neither capture paths nor
-fallback/emulation paths. E8-F1 provides no availability-policy selection or
+fallback/emulation paths. Capture capability provides no availability-policy selection or
 cross-device replay.
 
 Compatibility compares identity in this exact first-drift order: `request`,
@@ -1767,21 +1767,21 @@ available qualified non-CPU Warp capability, `CAPTURED` lifecycle, and a
 compatible signature. A writer-may-have-launched failure records `FAULTED`
 metadata with no retry or rollback guarantee.
 
-Excluded from E8-F1 are native/full-loop capture or replay, no automatic recapture,
+Excluded from capture capability are native/full-loop capture or replay, no automatic recapture,
 retries, rollback, CPU fallback/emulation, hidden allocation/transfer/
 synchronization, checkpointed native graph handles, cross-device replay,
 captured numerical parity, benchmark/profiling/memory claims, root-README
-changes, and user examples. E8-F2 owns the shipped concrete prepared enqueue
-seams; E8-F3 owns resource work, E8-F4 native capture/replay and captured
-parity, E8-F5--E8-F6 parity/performance/memory, E8-F7/T7 profiling and
-machine-bounded recommendations, and E8-F8 only the example, limitations,
+changes, and user examples. Capture-ready enqueue owns the shipped concrete prepared enqueue
+seams; resource preallocation owns resource work, capture and replay native capture/replay and captured
+parity, captured-loop validation and the resident benchmark study parity/performance/memory, CUDA profiling and
+machine-bounded recommendations, and graph-capture documentation only the example, limitations,
 and closeout.
 
-Work on E8-F4 restarted on September 3, 2026.
+Work on capture and replay restarted on September 3, 2026.
 
-### E8-F4-P1 prepared qualification contract
+### Prepared qualification contract
 
-E8-F4-P1 adds a developer-only, concrete-module qualification seam in
+Capture and replay adds a developer-only, concrete-module qualification seam in
 `particula.execution.graph_capture`. It checks one exact READY resident binding,
 prepared simulation, and published capture-resource set, then lazily obtains an
 adapter-provided native callable vocabulary for the exact non-CPU Warp device.
@@ -1790,16 +1790,16 @@ checks; `Device.native` remains opaque.
 
 Successful qualification retains metadata and callables by identity in a fresh,
 immutable record and leaves the lifecycle `READY`. Rejections likewise leave the
-binding and lifecycle unchanged. This P1 seam does not begin or end capture,
+binding and lifecycle unchanged. This qualification seam does not begin or end capture,
 invoke native callables, open a guard token, own graph or executable handles,
 release or clean up native resources, allocate, transfer, synchronize, or
 dispatch prepared work. Native capture, handles, release, cleanup, replay, and
-captured evidence remain deferred to later E8-F4 phases. These direct-import-only
+captured evidence remain deferred to later capture and replay phases. These direct-import-only
 names remain absent from `particula.execution` and top-level `particula` exports.
 
-### E8-F4-P5 full-loop validation contract
+### Full-loop validation contract
 
-The delivered P5 matrix has three distinct forms of test-only evidence. CPU is
+The delivered full-loop validation matrix has three distinct forms of test-only evidence. CPU is
 a test-local NumPy reference; Warp CPU is uncaptured evidence; CUDA native
 capture is optional pass-or-clean-skip evidence. Capture freezes the first
 physical timestep and each launch executes one timestep through one-token replay
@@ -1815,19 +1815,19 @@ request/session/registry/closed-guard/publication binding, qualification, and
 explicit lifecycle teardown are required. Invalidation, retirement, and explicit
 renewal require fresh preparation and capture; there is no automatic recapture.
 
-P5 provides no public exports or runnable graph-capture example. There is no
+Integrated validation provides no public exports or runnable graph-capture example. There is no
 fallback (including Warp-CPU capture), recovery, retry, or rollback; no hidden
 transfer/readback/synchronization; no checkpointed handle; and no cross-device
 replay.
-It makes no performance, profiling, or memory claim; E8-F5--E8-F6 retain
-parity/performance/memory ownership, E8-F7/T7 owns profiling and
-machine-bounded recommendations, and E8-F8 only the example, limitations,
+It makes no performance, profiling, or memory claim; captured-loop validation and the resident benchmark study retain
+parity/performance/memory ownership, CUDA profiling owns profiling and
+machine-bounded recommendations, and graph-capture documentation only the example, limitations,
 and closeout.
 
-### E8-F5-P5 integrated validation closeout
+### Integrated validation closeout
 
-This separately labelled closeout records E8-F5 P1--P4 correctness evidence; it
-does not replace the preceding E8-F4-P5 full-loop validation contract. The
+This separately labelled closeout records independent-oracle, uncaptured/captured parity, and RNG correctness evidence; it
+does not replace the preceding capture and replay full-loop validation contract. The
 test-only matrix uses an independent CPU/NumPy oracle, required installed-Warp
 uncaptured rows, and optional native-CUDA capture/replay rows that pass or cleanly
 skip. It covers closed GAS and PARTICLES maps, active, prescribed-volume, and
@@ -1845,10 +1845,10 @@ example and makes no fallback, automatic recapture, retry, rollback, hidden
 transfer/readback/synchronization, checkpointed-native-handle, or cross-device
 replay claim. CPU and Warp-CPU are uncaptured validation only, never capture
 fallbacks. It also makes no performance, memory, or profiling completion claim.
-Correctness-qualified handoffs are limited to E8-F6 scaling/memory, E8-F7
-profiling, and E8-F8 example/closeout work.
+Correctness-qualified handoffs are limited to resident benchmark study scaling/memory, CUDA profiling
+profiling, and graph-capture documentation example/closeout work.
 
-**Evidence record date (2026-09-05):** This record follows the P4 plan update
+**Evidence record date (2026-09-05):** This record follows the RNG validation plan update
 dated 2026-09-05 and preserves the literal outcomes for the retained commands.
 The retired documentation-assertion command is omitted; documentation rendering
 continues through MkDocs. Python
@@ -1856,9 +1856,8 @@ continues through MkDocs. Python
 No native CUDA device/capture prerequisite qualified, so the optional CUDA
 selector cleanly skipped; this is not CPU or Warp-CPU capture fallback. The
 available wrapper did not report a Warp version or enumerate opaque device
-strings. The authoritative repository record is
-`.opencode/plans/sections/features/E8-F5/testing_strategy.md`; it is an internal
-plan record rather than a published MkDocs page.
+strings. The command ledger below retains the recorded outcomes; the
+[closeout record](graph-capture-closeout.md) tracks the remaining evidence gate.
 
 | Kind | Exact command | Exit status | Literal outcome |
 | --- | --- | --- | --- |
@@ -1868,26 +1867,26 @@ plan record rather than a published MkDocs page.
 | Untargeted coverage | `.opencode/tools/run_pytest.py` | 0 | `6634 passed, 24 skipped, 1 xfailed, 92.92% coverage` |
 | Documentation | `mkdocs build --strict` | 0 | Passed through the approved `docs-validator` `build_mkdocs_validate` worktree wrapper; strict mode is intrinsic and the exact workflow worktree is supplied as `cwd`. |
 
-### E8-F2 prepared enqueue contract
+### Prepared enqueue contract
 
-### E8-F3-P5 capture-resource accounting integration
+### Capture-resource accounting integration
 
 Before final `ResidentSimulationRequest` construction, callers register the
 complete inventory, build exact views and capacities, construct one exact
 `CaptureResourceRequirements`, and publish it once through
 `GPUResourceRegistry.prepare_capture_resources()`. The request retains the
-requirements only. E8-F1 CAPTURED admission and E8-F2 READY preparation resolve
+requirements only. Capture capability CAPTURED admission and capture-ready enqueue READY preparation resolve
 the already-published set and its immutable report through cached,
 metadata-only validation; they perform no resource preparation, acquisition,
 allocation, payload inspection, synchronization, or stream lifecycle work.
 
 The requirements, published set, and report occupy the existing
-`configurations` signature group in that order without changing E8-F1 drift
+`configurations` signature group in that order without changing capture capability drift
 ordering. Accounting reports manifest shape/dtype logical bytes only. They
 exclude allocator-reserved bytes, pointers or payload reads, checkpoint-copy
 costs, and future autodiff-tape totals.
 
-E8-F2 P1--P6/P8 ship a developer-only, concrete-module prepared path. Setup
+Capture-ready enqueue provides a developer-only, concrete-module prepared path. Setup
 validates, normalizes, allocates established private fallback storage, binds
 identities, freezes the operation selection, and may retain established bounded
 direct-wrapper device-status observation and translation. The resulting private
@@ -1910,10 +1909,10 @@ boundary as individual bindings. Empty or no-work bindings are write-free.
 Payload changes in pinned arrays remain live, but structural identities or frozen
 scalar controls require a new prepared record.
 
-E8-F1 remains the owner of capability qualification, lifecycle, compatibility,
+Capture capability remains the owner of capability qualification, lifecycle, compatibility,
 invalidation, FAULTED classification, and CAPTURED admission; the registry owns
 sidecars. Structural, lifecycle, or signature drift rejects before token entry. A
-writer-capable failure preserves the E8-F1 FAULTED, no-rollback, no-retry, and
+writer-capable failure preserves the capture capability FAULTED, no-rollback, no-retry, and
 no-fallback recovery limit. Warp CPU is uncaptured implementation validation
 only; CUDA is optional pass-or-clean-skip evidence only. This documentation does
 not claim native capture/replay, captured parity, performance or memory evidence,
@@ -1978,8 +1977,8 @@ this measured-evidence bar passed; the closeout ledger preserves its gaps.
   a new setup/capture step.
 - Handle changing active particle counts through inactive slots rather than
   resizing arrays.
-- A future graph-captured loop can build on E6-F6's shipped resampling and
-  representative-volume-scaling policies and E6-F8's direct nucleation policy
+- A future graph-captured loop can build on slot exhaustion's shipped resampling and
+  representative-volume-scaling policies and direct GPU nucleation's direct nucleation policy
   composition. No graph-captured process loop ships yet.
 - Keep graph-captured loops focused on repeated timesteps with stable process
   order, stable buffer shapes, and stable communication maps.
@@ -1994,7 +1993,7 @@ captured loop or repeated-step run.
 For a future graph-captured loop, particle count changes should be represented
 as changes in active slots, not changes in array shape. If a future simulation
 would create more particles than fixed-capacity slots allow, it must invoke the
-shipped E6-F6 exhaustion policy through the composition established by E6-F8
+shipped slot exhaustion policy through the composition established by direct GPU nucleation
 before the graph-captured loop proceeds. No graph-captured process loop invokes
 that policy today.
 
@@ -2043,7 +2042,7 @@ that policy today.
 - Artifact output: `.artifacts/benchmarks/gpu_benchmark_results.json`
 - Mixed-scale fixture note: the coagulation benchmark path uses a
   dedicated deterministic mixed NPF/droplet fixture aligned with the
-  shipped E3-F2 baseline, while condensation benchmarks keep the generic
+  shipped coagulation rejection sampling baseline, while condensation benchmarks keep the generic
   helper.
 
 ##### Measured decision record for the current one-thread-per-box path
@@ -2076,7 +2075,7 @@ decision.
   as the current decision record for the shipped one-thread-per-box design,
   not as a final acceptance decision on the long-term scaling strategy.
 
-#### E8-F6-P6 resident benchmark and memory-budget evidence
+#### Resident benchmark and memory-budget evidence
 
 The resident source of record is the machine-generated schema-v3 artifact
 `.artifacts/benchmarks/resident_capture_comparison.json`; see the
@@ -2222,9 +2221,9 @@ coagulation and state-representation decisions are recorded.
 | Risk / Decision | Impact | Direction |
 | --- | --- | --- |
 | fp64 throughput on consumer CUDA | Slower GPU, weaker speedups | Keep fp64 as the shipped reference and production baseline; evaluate mixed precision only through a future evidence-backed migration proposal |
-| NPF-to-droplet dynamic range near fp64 limits | Lost small-mass resolution | Use the shipped mass-precision report as the baseline; keep per-species absolute mass until a future proposal proves an alternative across the E2 cases |
+| NPF-to-droplet dynamic range near fp64 limits | Lost small-mass resolution | Use the shipped mass-precision report as the baseline; keep per-species absolute mass until a future proposal proves an alternative across the container foundations cases |
 | fp64 memory doubling vs large multi-box | Fewer boxes fit in memory | Build a memory-budget model; treat precision and box count together |
-| Time-scale stiffness across NPF-to-droplet range | Unstable or wastefully slow explicit stepping | Use the shipped four-substep direct condensation step with P2-finalized particle/gas coupling; retain case-specific evidence in the stiffness study and keep temperature feedback, independent-device, graph, and autodiff work gated |
+| Time-scale stiffness across NPF-to-droplet range | Unstable or wastefully slow explicit stepping | Use the shipped four-substep direct condensation step with inventory-limited particle/gas coupling; retain case-specific evidence in the stiffness study and keep temperature feedback, independent-device, graph, and autodiff work gated |
 | No fully integrated GPU-ready per-box thermodynamic runtime path | Blocks parcels, expansion, latent-heat feedback from running end to end on GPU | Keep shipped CPU `EnvironmentData` as the authoritative CPU owner, build on the shipped `WarpEnvironmentData` CPU↔GPU round-trip helpers, and add integration work |
 | Rejection-sampling acceptance collapse for wide size ranges | Coagulation trial counts explode in mixed NPF/droplet boxes | Evaluate binned majorant kernels or stratified pair sampling |
 | One-thread-per-box coagulation | Serializes large single-box workloads | Record as the current measured multi-box tradeoff for the shipped path; any parallel-within-box follow-up would require a new evidence-backed proposal |
@@ -2235,4 +2234,4 @@ coagulation and state-representation decisions are recorded.
 | RNG reproducibility across CPU/Warp CPU/CUDA | Non-reproducible stochastic results | Per-box RNG streams; document tolerances and reproducibility limits |
 | Caller drops ordered gas metadata or vapor-pressure sidecar across `WarpGasData` restore | Placeholder names or missing GPU-helper state break name-keyed or condensation follow-up logic | Preserve ordered names externally. The supported direct condensation path automatically refreshes derived vapor pressure on-device, but CPU restore remains intentionally lossy and this does not add latent-heat temperature feedback or broader runtime behavior. |
 | Graph capture fragility (shape/process changes) | Invalid captured graphs | Fixed shapes, inactive slots, documented re-capture triggers |
-| GPU condensation supports only limited activity/kappa physics | Unsupported activity/surface strategies and the lack of a differentiable/high-level path still constrain hygroscopicity targets | Retain E4-F2's direct ideal/kappa and static/weighted sidecars; add broader or differentiable support only through scoped, evidence-backed Epic D work |
+| GPU condensation supports only limited activity/kappa physics | Unsupported activity/surface strategies and the lack of a differentiable/high-level path still constrain hygroscopicity targets | Retain GPU activity and surface properties's direct ideal/kappa and static/weighted sidecars; add broader or differentiable support only through scoped, evidence-backed Epic D work |

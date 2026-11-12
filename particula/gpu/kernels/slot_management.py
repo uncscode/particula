@@ -1,10 +1,12 @@
 """Classify and activate fixed-capacity particle slots on a Warp device.
 
-This module provides concrete-module-only P3 diagnostics and the
-package-exported P4 ``activate_slots_gpu`` boundary. Both APIs read only
+This module provides concrete-module-only GPU diagnostics diagnostics and the
+package-exported GPU activation ``activate_slots_gpu`` boundary. Both APIs read
+only
 particle masses, concentration, and charge; density and volume are
-intentionally unobserved. P4 validates all metadata, ownership, current slot
-state, counts, capacity, and selected request prefixes before launching its
+intentionally unobserved. GPU activation validates all metadata, ownership,
+current slot
+State, counts, capacity, and selected request prefixes before launching its
 writer, then writes caller-owned activation and diagnostic sidecars. Caller-
 owned simulation arrays are never implicitly transferred; validation may
 synchronize and read back private scalar status buffers.

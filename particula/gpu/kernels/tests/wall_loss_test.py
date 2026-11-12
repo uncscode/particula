@@ -22,7 +22,7 @@ def _warp():
 
 
 def _particles(device: str = "cpu"):
-    """Create valid explicit float64 particle storage for P3 preflight."""
+    """Create valid explicit float64 particle storage for field drift preflight."""
     wp = _warp()
     from particula.gpu import WarpParticleData
 
@@ -211,7 +211,9 @@ def _assert_snapshot_unchanged(particles, snapshot, rng_states=None) -> None:
 
 
 def _assert_slots_preserved_or_cleared(particles, snapshot) -> None:
-    """Assert P5 only clears complete active slots and preserves protected data."""
+    """Assert slot removal only clears complete active slots and preserves
+    protected data.
+    """
     original_masses = snapshot["masses"][1]
     original_concentration = snapshot["concentration"][1]
     original_charge = snapshot["charge"][1]
@@ -258,7 +260,9 @@ def test_public_step_is_lazy_and_config_is_concrete_only() -> None:
 
 
 def test_charged_configuration_defaults_and_fields_are_frozen() -> None:
-    """P1 appends immutable charged fields without changing legacy defaults."""
+    """Coefficient evaluation appends immutable charged fields without changing
+    legacy defaults.
+    """
     from particula.gpu.kernels.wall_loss import NeutralWallLossConfig
 
     config = _config()
@@ -348,7 +352,9 @@ def test_charged_scalar_configuration_rejects_before_particles(
 def test_charged_rectangular_field_schema_rejection_is_atomic(
     field_factory, match
 ) -> None:
-    """Invalid P1 rectangular fields reject before particle scans or RNG reset."""
+    """Invalid coefficient evaluation rectangular fields reject before particle
+    scans or RNG reset.
+    """
     wp = _warp()
     from particula.gpu.kernels import wall_loss_step_gpu
     from particula.gpu.kernels.wall_loss import NeutralWallLossConfig
@@ -443,7 +449,9 @@ def test_charged_rectangular_wrong_device_field_rejection_is_atomic() -> None:
 
 
 def test_charged_rectangular_field_value_error_precedes_charge_error() -> None:
-    """P1 scans the charged field before scanning signed particle charge."""
+    """Coefficient evaluation scans the charged field before scanning signed
+    particle charge.
+    """
     wp = _warp()
     from particula.gpu.kernels import wall_loss_step_gpu
 
@@ -558,7 +566,9 @@ def test_charged_rectangular_zero_time_preserves_field_and_rng() -> None:
 def test_charged_rectangular_execution_preserves_field_identity_and_values() -> (
     None
 ):
-    """Charged P1 execution never replaces or mutates the field sidecar."""
+    """Charged coefficient evaluation execution never replaces or mutates the
+    field sidecar.
+    """
     wp = _warp()
     from particula.gpu.kernels import wall_loss_step_gpu
 
@@ -862,7 +872,9 @@ def test_nonnegative_particle_storage_rejects_negative_values(
 def test_signed_finite_charge_metadata_is_accepted_with_complete_slot_updates(
     charges: list[float],
 ) -> None:
-    """Neutral P5 retains signed charge or clears it with a removed slot."""
+    """Neutral slot removal retains signed charge or clears it with a removed
+    slot.
+    """
     wp = _warp()
     from particula.gpu.kernels import wall_loss_step_gpu
 
@@ -889,7 +901,7 @@ def test_signed_finite_charge_metadata_is_accepted_with_complete_slot_updates(
 
 
 def test_rng_metadata_rejection_preserves_sidecar() -> None:
-    """P3 validates but never consumes a supplied RNG sidecar."""
+    """Field drift validates but never consumes a supplied RNG sidecar."""
     wp = _warp()
     from particula.gpu.kernels import wall_loss_step_gpu
 
@@ -2186,7 +2198,9 @@ def test_charged_all_inactive_positive_time_preserves_requested_rng_reset(
 
 @pytest.mark.benchmark
 def test_wall_loss_p5_benchmark_smoke() -> None:
-    """Record an opt-in P5 execution duration without a throughput target."""
+    """Record an opt-in slot removal execution duration without a throughput
+    target.
+    """
     from particula.gpu.kernels import wall_loss_step_gpu
 
     started = time.perf_counter()

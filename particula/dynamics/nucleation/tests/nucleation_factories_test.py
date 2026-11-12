@@ -1,4 +1,4 @@
-"""Tests for fresh P4 nucleation factory dispatch."""
+"""Tests for fresh public construction nucleation factory dispatch."""
 
 import pytest
 from particula.dynamics.nucleation import (

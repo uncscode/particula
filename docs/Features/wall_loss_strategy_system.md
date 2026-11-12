@@ -2,7 +2,7 @@
 
 ## Complete direct-process context
 
-The direct wall-loss call appears in the illustrative [explicit-transfer sequence](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py), with [private P2 evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py) and a [P3 regression](https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_complete_process_sequence_example_test.py). Caller-owned persistent RNG and sidecars remain explicit; this is not a `Runnable`, backend selector, scheduler, or CPU fallback.
+The direct wall-loss call appears in the illustrative [explicit-transfer sequence](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py), with [direct-process validation evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py) and a [example regression](https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_complete_process_sequence_example_test.py). Caller-owned persistent RNG and sidecars remain explicit; this is not a `Runnable`, backend selector, scheduler, or CPU fallback.
 
 > Strategy-based wall loss for chamber simulations that plugs directly into particula's dynamics workflow.
 
@@ -24,7 +24,7 @@ This feature is built around user-facing APIs exposed via `particula.dynamics`:
 - `WallLoss` runnable – delegates to a wall loss strategy on `Aerosol`, splits
   `time_step` across `sub_steps`, and delegates native positivity validation to the strategy.
 
-## Native CPU strategy contract (E9-M3)
+## Native CPU strategy contract (v0.3.0)
 
 The neutral spherical/rectangular and charged spherical/rectangular strategies
 accept explicitly tagged, single-box `ParticleData` directly. Configuration
@@ -63,8 +63,7 @@ validation but draw nothing. Rejections after a draw do not roll back RNG state.
 Removed occupied slots have their counts, species masses and charge cleared,
 so removed slots satisfy the fixed-slot activation contract. Surviving and
 untouched inactive storage is preserved; the operation does not repair
-pre-existing inactive material. This native M4 behavior supersedes the earlier
-M3 charge-retention description without changing the CPU Bernoulli law.
+pre-existing inactive material. The current approach clears removed slots without changing the CPU Bernoulli law.
 GPU removal also clears charge, with its own RNG lifecycle.
 
 Steps preserve the container and primary array identities. Preflight rejects
@@ -350,7 +349,7 @@ The strategy system operates on the same distribution types used elsewhere in pa
 You select the appropriate mode at initialization (or via builder/factory parameters) with `distribution_type`, and the strategy adjusts its `step` behavior to match the representation.
 
 
-The snippets on this page use the selected E9 checkout. CPU snippets share
+The snippets on this page use the v0.3.0 development checkout. CPU snippets share
 imports and the native aerosol constructed in the runnable section above;
 optional GPU snippets only declare their separate low-level interfaces.
 That runnable fixture uses an explicitly truncated 50–500 nm, 64-bin PMF
@@ -393,7 +392,7 @@ for _ in range(40):
 
 ### Prerequisites
 
-- The selected E9 checkout installed with `pip install -e .`; no older-wheel compatibility is implied.
+- The v0.3.0 development checkout installed with `pip install -e .`; no older-wheel compatibility is implied.
 - A native `ParticleData` instance (with an explicit population kind).
 - Basic familiarity with particula's dynamics and particle-phase examples.
 

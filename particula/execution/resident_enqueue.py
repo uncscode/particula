@@ -1,10 +1,11 @@
 """Prepare READY resident graph metadata for later enqueue phases.
 
-This concrete direct-import-only P1 boundary performs validation and freezes
+This concrete direct-import-only declaration boundary performs validation and
+freezes
 READY-state identity metadata only. It resolves the registry's
 already-published capture resource set and cached report by identity, but does
 not construct executors,
-capture, enqueue, dispatch, acquire resources, inspect payloads, transfer,
+Capture, enqueue, dispatch, acquire resources, inspect payloads, transfer,
 synchronize, mutate a lifecycle, or fall back. Preparation retains the exact
 READY binding but does not authorize token entry or dispatch; identity or
 lifecycle drift requires a new prepared record and rejects before token entry.

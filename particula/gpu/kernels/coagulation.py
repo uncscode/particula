@@ -2054,7 +2054,8 @@ def _ensure_turbulent_input_array(
     n_boxes: int,
     device: Any,
 ) -> Any:
-    """Validate and normalize a turbulent-shear P2 per-box input.
+    """Validate and normalize a turbulent-shear numerical validation per-box
+        input.
 
     This private helper validates explicitly supplied state only; it neither
     infers turbulent properties from shared containers nor transfers host data.
@@ -2087,7 +2088,7 @@ def _normalize_turbulent_input_array(
     n_boxes: int,
     device: Any,
 ) -> Any:
-    """Normalize an already-validated turbulent P2 input.
+    """Normalize an already-validated turbulent numerical validation input.
 
     This helper does not repeat validation.
     """
@@ -2102,7 +2103,8 @@ def _validate_turbulent_input(
     n_boxes: int,
     device: Any,
 ) -> None:
-    """Validate a turbulent-shear P2 input without scalar normalization.
+    """Validate a turbulent-shear numerical validation input without scalar
+        normalization.
 
     This validation-only boundary validates turbulent requests before deferred
     three-way-mask capability rejection. Valid scalars do not create
@@ -2258,7 +2260,8 @@ def _prepare_coagulation_step_gpu(  # noqa: C901
     implementation scope, not a throughput or scaling claim. Malformed,
     duplicate, unknown, and unsupported-distribution combinations reject before
     particle state is accessed. A structurally valid turbulent-shear request
-    reaches a later P2 boundary after particle metadata and device checks.
+    reaches a later numerical validation boundary after particle metadata and
+    device checks.
     Turbulent-shear-enabled executable masks normalize their explicit per-box
     inputs and calculate ST1956 rates. After particle metadata and device
     checks, direct temperature and pressure inputs are validated and normalized
@@ -2354,7 +2357,8 @@ def _prepare_coagulation_step_gpu(  # noqa: C901
             Native tagged inputs always validate charge. Every charged mode
             performs this scan before caller output or RNG mutation.
         turbulent_dissipation: Explicit turbulent kinetic-energy dissipation
-            rate [m^2/s^3] for the turbulent-shear P2 boundary. For a
+            rate [m^2/s^3] for the turbulent-shear numerical validation
+            boundary. For a
             structurally valid ST1956 turbulent request, accepts a positive
             finite Python or NumPy floating scalar, or a positive finite,
             active-device ``wp.float64`` Warp array with shape ``(n_boxes,)``.
@@ -2363,7 +2367,8 @@ def _prepare_coagulation_step_gpu(  # noqa: C901
             This input is not inferred from shared containers and is ignored by
             non-turbulent masks.
         fluid_density: Explicit carrier-fluid density [kg/m^3] for the
-            turbulent-shear P2 boundary. It has the same conditional scalar and
+            turbulent-shear numerical validation boundary. It has the same
+            conditional scalar and
             active-device ``wp.float64`` ``(n_boxes,)`` Warp-array contract as
             ``turbulent_dissipation``, is not inferred from shared containers,
             and is ignored by non-turbulent masks.
@@ -2387,7 +2392,7 @@ def _prepare_coagulation_step_gpu(  # noqa: C901
             either explicit turbulent input or supplies an input with an
             unsupported type, shape, device, ``wp.float64`` dtype, or value
             domain. Deferred turbulent three-way combinations reject after this
-            P2 boundary.
+            Numerical validation boundary.
         ValueError: If particle charge does not have shape
             ``(n_boxes, n_particles)``, dtype ``wp.float64``, or the particle
             device. Charged-containing and exact SP2016 sedimentation
@@ -2413,7 +2418,8 @@ def _prepare_coagulation_step_gpu(  # noqa: C901
         callers stay source-compatible. Structural configuration preflight
         occurs before all runtime input access, allocation, normalization, RNG
         work, and launches. Deferred turbulent three-way masks validate their
-        explicit P2 inputs after particle schema/device metadata, but cannot
+        explicit numerical validation inputs after particle schema/device
+        metadata, but cannot
         reach downstream simulation, selector, apply launches, allocation,
         normalization, RNG work, or caller-owned mutation. It does not make
         unrelated later validation failures atomic.
@@ -2427,7 +2433,7 @@ def _prepare_coagulation_step_gpu(  # noqa: C901
         normalize both inputs and use their active-device values for ST1956
         execution. Non-turbulent masks do not inspect or validate either input.
 
-        Validation runs before volume normalization, RNG setup, and Brownian or
+        validation runs before volume normalization, RNG setup, and Brownian or
         apply launches so invalid ``time_step``, shape, dtype, or device
         combinations fail without mutating particle state or allocating
         downstream work. The normalized environment arrays are forwarded

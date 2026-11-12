@@ -120,7 +120,9 @@ def _state(device, boxes=1, particles=3, species=2, *, active=False):
 
 
 def _sidecars(api, device, boxes, particles, species):
-    """Create distinct same-device P2, P3, and P4 caller-owned sidecars."""
+    """Create distinct same-device demand planning, capacity staging, and
+    exhaustion resolution caller-owned sidecars.
+    """
     wp = _warp()
     scratch = api.NucleationScratchBuffers(
         *[wp.zeros(boxes, dtype=wp.float64, device=device) for _ in range(3)]
@@ -195,7 +197,9 @@ def _sidecars(api, device, boxes, particles, species):
 
 
 def _numpy_p2(gas, molar_mass, config, time_step):
-    """Independently calculate float64 P2 demand, removal, and event mass."""
+    """Independently calculate float64 demand planning demand, removal, and
+    event mass.
+    """
     counts = np.asarray(config.molecule_counts, dtype=np.float64)
     event_mass = counts * molar_mass / AVOGADRO_NUMBER
     participating = counts > 0
@@ -227,7 +231,9 @@ def _particle_inventory(masses, concentration, volume):
 
 
 def _snapshot(*owners):
-    """Capture arrays recursively, including nested P4 resampling sidecars."""
+    """Capture arrays recursively, including nested exhaustion resolution
+    resampling sidecars.
+    """
     result = []
     seen = set()
 

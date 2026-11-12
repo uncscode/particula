@@ -1,7 +1,7 @@
-# E9-M6 native API migration closeout
+# Native API migration closeout
 
 **Status: implementation validated; maintainer review and release approval pending.** This record
-tracks the development-tree removal for [E9-M6](https://github.com/uncscode/particula/issues/1607).
+tracks the development-tree removal for [v0.3.0](https://github.com/uncscode/particula/issues/1607).
 It does not announce a released wheel, change the package version, or qualify
 GPU performance. The maintainer owns final scientific and release approval.
 
@@ -40,7 +40,7 @@ compatible device. CPU inspection carriers remain lossy and cannot replace
 canonical continuation state. No inferred population tags, hidden fallback,
 automatic restart or cross-device replay is introduced.
 
-M5's fixed-composition binned transport, cloud dry-phase oscillation and soot
+V0.3.0's fixed-composition binned transport, cloud dry-phase oscillation and soot
 property limitations remain. No numerical oracle, conservation tolerance or
 coverage threshold is relaxed to make the migration pass.
 
@@ -72,6 +72,6 @@ are distinct algorithms; timing ratios do not establish statistical or
 trajectory parity. No new benchmark timings are published by this migration.
 
 The detailed commands, assertion-retention ledgers and intermediate failures
-are recorded in `.opencode/plans/sections/maintenance/E9-M6/implementation.md`
-and adjacent plan files. Required failures or missing evidence leave readiness
+are retained with the [migration pull request](https://github.com/uncscode/particula/pull/1635)
+and its implementation records. Required failures or missing evidence leave readiness
 incomplete. Optional CUDA skips never stand in for native-CUDA capture evidence.

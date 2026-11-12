@@ -288,7 +288,8 @@ def to_warp_gas_data(
         ``(n_boxes, n_species)`` vapor-pressure array for kernels that consume
         it directly. ``condensation_step_gpu()`` instead refreshes this buffer
         from its thermodynamic configuration on every substep. That step also
-        updates this mirror's ``concentration`` from each P2-finalized particle
+        updates this mirror's ``concentration`` from each inventory-limited
+        particle
         transfer. The updated concentration informs the next mass-transfer
         proposal, not vapor-pressure refresh.
 

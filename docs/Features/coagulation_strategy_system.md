@@ -2,7 +2,7 @@
 
 ## Complete direct-process context
 
-The direct coagulation call is part of the illustrative [explicit-transfer sequence](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py), with [private P2 evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py) and a [P3 regression](https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_complete_process_sequence_example_test.py). Persistent RNG remains caller-owned; the example is not a backend selector, scheduler, `Runnable`, resident loop, or CPU fallback.
+The direct coagulation call is part of the illustrative [explicit-transfer sequence](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py), with [direct-process validation evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py) and a [example regression](https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_complete_process_sequence_example_test.py). Persistent RNG remains caller-owned; the example is not a backend selector, scheduler, `Runnable`, resident loop, or CPU fallback.
 
 > Strategy-based coagulation kernels with unified builders, factory selection, runnable integration, and particle-resolved support.
 
@@ -26,7 +26,7 @@ the runnable rejects replacement results. Gas state remains held independently.
 The runnable's `rate` forwards the strategy's native rate without changing its
 population measure. Non-native aggregates reject before strategy dispatch.
 
-## Native kernel and rate contract (E9-M3)
+## Native kernel and rate contract (v0.3.0)
 
 The six concrete CPU strategy families accept explicitly tagged `ParticleData`
 for kernel evaluation: Brownian, charged, sedimentation, turbulent shear,
@@ -108,7 +108,7 @@ composition rather than the combined donor composition. With composition
 varying across particle size, this method does not generally conserve each
 species or weighted charge. Refining the radius grid or reducing the timestep
 does not resolve that composition error, even when total-mass error converges.
-M3 deliberately preserves this method; conservative species/charge transport
+V0.3.0 deliberately preserves this method; conservative species/charge transport
 is deferred and is not part of the supported density-step contract.
 
 For an illustrative two-species, equal-density (1000 kg/m^3), constant-kernel
@@ -409,7 +409,7 @@ combined = factory.get_strategy(
 )
 ```
 
-The snippets on this page use the selected E9 checkout. CPU snippets share
+The snippets on this page use the v0.3.0 development checkout. CPU snippets share
 imports and the native aerosol constructed in the runnable section above;
 optional GPU snippets only declare their separate low-level interfaces.
 That runnable fixture uses an explicitly truncated 50–500 nm, 64-bin PMF
@@ -452,7 +452,7 @@ particle = brownian.step(
 
 ### Prerequisites
 
-- The selected E9 checkout installed with `pip install -e .`; no older-wheel compatibility is implied.
+- The v0.3.0 development checkout installed with `pip install -e .`; no older-wheel compatibility is implied.
 - A native `ParticleData` instance (with an explicit population kind).
 - Basic familiarity with particula dynamics and the runnable pipeline (`|`).
 
@@ -699,9 +699,9 @@ pytest particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py -q 
 This optional/local command is additive and skips cleanly when CUDA is
 unavailable.
 
-### E7-F3 concrete selected-Brownian adapter
+### Concrete selected-Brownian adapter
 
-The concrete E7-F3 adapter is a separate selected route beside the
+The concrete selected Brownian coagulation adapter is a separate selected route beside the
 multi-mechanism direct-kernel contract above. It accepts an exact
 `BrownianCoagulationConfig` marker only. The CPU reference route retains a
 caller-owned `Aerosol` and exact `Coagulation` runnable. The resident-Warp
@@ -750,8 +750,8 @@ with `initialize_rng=False`. Only `initialize_rng=True` resets it, even when
 Callers control conversion, restoration, device placement, and
 `wp.synchronize()` before observing or resolving device state. The adapter
 does not upload, restore, synchronize, select a fallback, reseed per step,
-retry, create a session or scheduler, or roll back state after launch. E7-F4
-resident-session lifecycle, E7-F5 scheduling, and E7-F8 checkpoint/restart
+retry, create a session or scheduler, or roll back state after launch. Resident sessions
+resident-session lifecycle, resident scheduling scheduling, and resident RNG and restart checkpoint/restart
 stream policy remain explicitly deferred.
 
 For a runnable selected-Brownian introduction, see the

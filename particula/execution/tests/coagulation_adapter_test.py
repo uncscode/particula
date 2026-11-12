@@ -133,7 +133,7 @@ def test_cpu_p2_rejects_non_brownian_requests_before_runnable(
     marker: object,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Test CPU P2 rejects unsupported markers before runnable execution."""
+    """Test CPU state rejects unsupported markers before runnable execution."""
     monkeypatch.setattr(
         Coagulation,
         "execute",
@@ -151,7 +151,7 @@ def test_warp_p2_rejects_non_brownian_requests_before_resolver(
     marker: object,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Test Warp P2 rejects unsupported markers before lazy resolution."""
+    """Test Warp state rejects unsupported markers before lazy resolution."""
     monkeypatch.setattr(
         coagulation_adapter,
         "_get_coagulation_step_gpu",
@@ -541,7 +541,9 @@ def _resource_values(*resources: Any) -> list[np.ndarray]:
 def test_warp_state_construction_is_write_free_and_never_dispatches(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Test P2 construction neither changes resources nor enters Warp runtime work."""
+    """Test state construction neither changes resources nor enters Warp runtime
+    work.
+    """
     wp = pytest.importorskip("warp")
     particles = _warp_particles()
     environment = _environment()
@@ -702,7 +704,7 @@ def test_warp_state_defers_native_schema_validation() -> None:
 def test_warp_state_rejects_required_sidecar_aliases(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Test identity and metadata-detectable P2 sidecar aliases reject."""
+    """Test identity and metadata-detectable state sidecar aliases reject."""
     wp = pytest.importorskip("warp")
     particles = _warp_particles()
     environment = _environment()
@@ -844,7 +846,7 @@ def test_warp_state_accepts_boolean_initialize_rng(
 
 @pytest.mark.warp
 def test_warp_state_retains_request_and_rng_intent_by_identity() -> None:
-    """Test P2 preserves all opaque controls without executing Warp work."""
+    """Test state preserves all opaque controls without executing Warp work."""
     wp = pytest.importorskip("warp")
     particles = _warp_particles()
     environment = _environment()
@@ -1001,7 +1003,9 @@ def _cpu_execution_state(
     time_step: object = 2.5,
     sub_steps: object = 3,
 ) -> tuple[CPUCoagulationExecutionState, Aerosol]:
-    """Create an unconfigured exact runnable P3 state for spy-driven tests."""
+    """Create an unconfigured exact runnable execution state for spy-driven
+    tests.
+    """
     aerosol = _aerosol()
     state = CPUCoagulationState(BrownianCoagulationConfig(), aerosol)
     runnable = Coagulation(BrownianCoagulationStrategy("particle_resolved"))
@@ -1011,7 +1015,7 @@ def _cpu_execution_state(
 
 
 def test_cpu_execution_state_retains_identity_and_exact_types() -> None:
-    """Test CPU P3 construction is control-free and rejects subclasses."""
+    """Test CPU execution construction is control-free and rejects subclasses."""
     state, aerosol = _cpu_execution_state(object(), object())
     assert state.backend_payload is aerosol
     assert state != _cpu_execution_state(object(), object())[0]
@@ -1019,7 +1023,7 @@ def test_cpu_execution_state_retains_identity_and_exact_types() -> None:
         state.time_step = 1.0  # type: ignore[misc]
 
     class P2Subclass(CPUCoagulationState):
-        """Exercise the exact P2 boundary."""
+        """Exercise the exact state boundary."""
 
     class RunnableSubclass(Coagulation):
         """Exercise the exact runnable boundary."""
@@ -1040,7 +1044,7 @@ def test_cpu_execution_state_retains_identity_and_exact_types() -> None:
 def test_cpu_execution_state_does_not_invoke_runnable_or_controls(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Test CPU P3 construction leaves its opaque fields uninspected."""
+    """Test CPU execution construction leaves its opaque fields uninspected."""
     aerosol = _aerosol()
     runnable = object.__new__(Coagulation)
     controls = (object(), object())
@@ -1061,7 +1065,7 @@ def test_cpu_execution_state_does_not_invoke_runnable_or_controls(
 
 
 def test_cpu_adapter_rejects_wrong_state_before_delegation() -> None:
-    """Test CPU dispatch rejects a non-P3 state before any delegation."""
+    """Test CPU dispatch rejects a non-execution state before any delegation."""
     with pytest.raises(TypeError, match="CPUCoagulationExecutionState"):
         CPUCoagulationExecutionAdapter().execute(object())  # type: ignore[arg-type]
 
@@ -1184,7 +1188,9 @@ def test_cpu_adapter_propagates_and_rejects_delegate_results(
 def test_warp_execution_state_is_exact_and_resource_free(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Test Warp P3 construction neither resolves a kernel nor inspects state."""
+    """Test Warp execution construction neither resolves a kernel nor inspects
+    state.
+    """
     wp = pytest.importorskip("warp")
     p2_state = WarpBrownianCoagulationState(
         BrownianCoagulationConfig(),
@@ -1206,7 +1212,7 @@ def test_warp_execution_state_is_exact_and_resource_free(
         state.state = p2_state  # type: ignore[misc]
 
     class P2Subclass(WarpBrownianCoagulationState):
-        """Exercise exact P2 state rejection."""
+        """Exercise exact state state rejection."""
 
     subclass = P2Subclass(
         BrownianCoagulationConfig(),
@@ -1227,7 +1233,7 @@ def test_warp_adapter_forwards_p2_resources_once(
     monkeypatch: pytest.MonkeyPatch,
     use_environment: bool,
 ) -> None:
-    """Test Warp dispatch forwards direct and environment P2 forms unchanged."""
+    """Test Warp dispatch forwards direct and environment state forms unchanged."""
     wp = pytest.importorskip("warp")
     particles = _warp_particles()
     temperature = (

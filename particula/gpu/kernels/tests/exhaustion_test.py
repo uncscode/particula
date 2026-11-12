@@ -401,7 +401,7 @@ def _numpy_remapping_oracle(
     density: np.ndarray,
     counts: np.ndarray,
 ) -> dict[str, np.ndarray]:
-    """Independently implement the P2 equal-weight remapping contract."""
+    """Independently implement the resampling equal-weight remapping contract."""
     box_count, particle_count, species_count = masses.shape
     result = {
         "masses": masses.copy(),
@@ -514,7 +514,9 @@ def _numpy_remapping_oracle(
 def test_resampling_remaps_retained_original_slots_and_conserves_inventory() -> (
     None
 ):
-    """A valid P2 call commits equal rows and clears released original slots."""
+    """A valid resampling call commits equal rows and clears released original
+    slots.
+    """
     from particula.gpu.kernels.exhaustion import resampling_step_gpu
 
     particles, counts, buffers = _state()
@@ -906,7 +908,7 @@ def test_resampling_rejects_non_exact_or_invalid_bounds(bound: Any) -> None:
 
 
 def _assert_multi_box_oracle_parity(device: str) -> None:
-    """Compare one multi-box P2 call with the independent NumPy oracle."""
+    """Compare one multi-box resampling call with the independent NumPy oracle."""
     from particula.gpu.kernels.exhaustion import resampling_step_gpu
 
     masses = np.array(
@@ -991,13 +993,15 @@ def _assert_multi_box_oracle_parity(device: str) -> None:
 def test_resampling_multi_box_multi_species_matches_independent_numpy_oracle() -> (
     None
 ):
-    """Warp CPU P2 outputs and diagnostics match the independent oracle."""
+    """Warp CPU resampling outputs and diagnostics match the independent oracle."""
     _assert_multi_box_oracle_parity(device="cpu")
 
 
 @pytest.mark.cuda
 def test_resampling_cuda_multi_box_multi_species_matches_numpy_oracle() -> None:
-    """CUDA P2 parity is optional and cleanly skipped on hosts without CUDA."""
+    """CUDA resampling parity is optional and cleanly skipped on hosts without
+    CUDA.
+    """
     wp = _warp()
     if not wp.is_cuda_available():
         pytest.skip("CUDA is unavailable")
@@ -1016,7 +1020,9 @@ def test_resampling_benchmark_smoke_uses_opt_in_marker() -> None:
 
 
 def test_gpu_representative_volume_scaling_matches_numpy_oracle() -> None:
-    """Concrete P4 scales only selected Warp rows and emits diagnostics."""
+    """Concrete volume scaling scales only selected Warp rows and emits
+    diagnostics.
+    """
     wp = _warp()
     from particula.gpu.kernels.exhaustion import (
         representative_volume_scaling_step_gpu,
@@ -1064,7 +1070,9 @@ def test_gpu_representative_volume_scaling_matches_numpy_oracle() -> None:
 
 
 def test_gpu_representative_volume_scaling_rejects_late_invalid_row() -> None:
-    """A later P4 bound failure leaves particles and every sidecar unchanged."""
+    """A later volume scaling bound failure leaves particles and every sidecar
+    unchanged.
+    """
     wp = _warp()
     from particula.gpu.kernels.exhaustion import (
         representative_volume_scaling_step_gpu,
@@ -1109,7 +1117,9 @@ def test_gpu_representative_volume_scaling_rejects_late_invalid_row() -> None:
 def test_gpu_representative_volume_scaling_rejects_zeroing_active_slot() -> (
     None
 ):
-    """P4 rejects an active concentration that would underflow to zero."""
+    """Volume scaling rejects an active concentration that would underflow to
+    zero.
+    """
     wp = _warp()
     from particula.gpu.kernels.exhaustion import (
         representative_volume_scaling_step_gpu,
@@ -1155,7 +1165,9 @@ def test_gpu_representative_volume_scaling_rejects_zeroing_active_slot() -> (
 def test_gpu_representative_volume_scaling_preflights_every_active_slot() -> (
     None
 ):
-    """P4 rejects a later active lane that would underflow on scaling."""
+    """Volume scaling rejects a later active lane that would underflow on
+    scaling.
+    """
     wp = _warp()
     from particula.gpu.kernels.exhaustion import (
         representative_volume_scaling_step_gpu,
@@ -1201,7 +1213,9 @@ def test_gpu_representative_volume_scaling_preflights_every_active_slot() -> (
 def test_gpu_representative_volume_scaling_zero_demand_writes_diagnostic_only() -> (
     None
 ):
-    """P4 leaves non-diagnostic Warp storage untouched for zero demand."""
+    """Volume scaling leaves non-diagnostic Warp storage untouched for zero
+    demand.
+    """
     wp = _warp()
     from particula.gpu.kernels.exhaustion import (
         representative_volume_scaling_step_gpu,
@@ -1242,7 +1256,9 @@ def test_gpu_representative_volume_scaling_zero_demand_writes_diagnostic_only() 
 def test_gpu_representative_volume_scaling_false_flags_write_diagnostic_only() -> (
     None
 ):
-    """False P4 flags leave positive-demand Warp rows unchanged and report one."""
+    """False volume scaling flags leave positive-demand Warp rows unchanged and
+    report one.
+    """
     wp = _warp()
     from particula.gpu.kernels.exhaustion import (
         representative_volume_scaling_step_gpu,
@@ -1283,7 +1299,9 @@ def test_gpu_representative_volume_scaling_false_flags_write_diagnostic_only() -
 
 
 def _assert_p4_subnormal_demand_scaling(device: str) -> None:
-    """Assert an immutable P4 selection scales every selected row lane."""
+    """Assert an immutable volume scaling selection scales every selected row
+    lane.
+    """
     wp = _warp()
     from particula.gpu.kernels.exhaustion import (
         representative_volume_scaling_step_gpu,
@@ -1320,7 +1338,9 @@ def _assert_p4_subnormal_demand_scaling(device: str) -> None:
 
 
 def test_gpu_representative_volume_scaling_subnormal_demand_is_atomic() -> None:
-    """Warp CPU P4 selection remains immutable when demand underflows on write."""
+    """Warp CPU volume scaling selection remains immutable when demand
+    underflows on write.
+    """
     _assert_p4_subnormal_demand_scaling(device="cpu")
 
 
@@ -1328,7 +1348,9 @@ def test_gpu_representative_volume_scaling_subnormal_demand_is_atomic() -> None:
 def test_gpu_representative_volume_scaling_cuda_matches_subnormal_oracle() -> (
     None
 ):
-    """CUDA P4 subnormal-demand parity is optional and cleanly guarded."""
+    """CUDA volume scaling subnormal-demand parity is optional and cleanly
+    guarded.
+    """
     wp = _warp()
     if not wp.is_cuda_available():
         pytest.skip("CUDA is unavailable")
@@ -1338,7 +1360,9 @@ def test_gpu_representative_volume_scaling_cuda_matches_subnormal_oracle() -> (
 def test_gpu_representative_volume_scaling_empty_invalid_density_rejects() -> (
     None
 ):
-    """Empty P4 inputs still reject invalid global density before output writes."""
+    """Empty volume scaling inputs still reject invalid global density before
+    output writes.
+    """
     wp = _warp()
     from particula.gpu.kernels.exhaustion import (
         representative_volume_scaling_step_gpu,
@@ -1416,7 +1440,9 @@ def _commit_fixed_source(
     source_charge: np.ndarray,
     device: str,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """Commit fixed external fixture values only into available P2/P4 slots."""
+    """Commit fixed external fixture values only into available
+    resampling/volume scaling slots.
+    """
     wp = _warp()
     wp.synchronize_device(device)
     masses = particles.masses.numpy()
@@ -1458,7 +1484,9 @@ def _commit_fixed_source(
 
 
 def _assert_source_and_resampling_matrix(device: str) -> None:
-    """Exercise sparse, zero-demand sibling, and repeated P2 ledger evidence."""
+    """Exercise sparse, zero-demand sibling, and repeated resampling ledger
+    evidence.
+    """
     wp = _warp()
     from particula.gpu.kernels.exhaustion import resampling_step_gpu
 
@@ -1531,7 +1559,9 @@ def _assert_source_and_resampling_matrix(device: str) -> None:
 
 
 def test_resampling_source_fixture_conserves_each_box_and_species() -> None:
-    """Warp CPU P2 ledger includes only already-admitted external source state."""
+    """Warp CPU resampling ledger includes only already-admitted external source
+    state.
+    """
     _assert_source_and_resampling_matrix("cpu")
 
 
@@ -1539,7 +1569,7 @@ def test_resampling_source_fixture_conserves_each_box_and_species() -> None:
 def test_resampling_cuda_source_fixture_conserves_each_box_and_species() -> (
     None
 ):
-    """CUDA source-plus-particle P2 evidence remains optional."""
+    """CUDA source-plus-particle resampling evidence remains optional."""
     if not _warp().is_cuda_available():
         pytest.skip("CUDA is unavailable")
     _assert_source_and_resampling_matrix("cuda:0")
@@ -1608,7 +1638,9 @@ def test_resampling_full_capacity_fixture_conserves_particle_ledger() -> None:
 
 
 def _assert_p4_source_ledger(device: str) -> None:
-    """Check selected P4 volume accounting before fixed source insertion."""
+    """Check selected volume scaling volume accounting before fixed source
+    insertion.
+    """
     wp = _warp()
     from particula.gpu.kernels.exhaustion import (
         representative_volume_scaling_step_gpu,
@@ -1692,7 +1724,9 @@ def _assert_p4_source_ledger(device: str) -> None:
 
 
 def test_gpu_representative_scaling_source_fixture_uses_volume_ledger() -> None:
-    """Warp CPU P4 selected rows preserve explicit volume-ledger accounting."""
+    """Warp CPU volume scaling selected rows preserve explicit volume-ledger
+    accounting.
+    """
     _assert_p4_source_ledger("cpu")
 
 
@@ -1700,7 +1734,7 @@ def test_gpu_representative_scaling_source_fixture_uses_volume_ledger() -> None:
 def test_gpu_representative_scaling_cuda_source_fixture_uses_volume_ledger() -> (
     None
 ):
-    """CUDA P4 source-ledger evidence is optional and guarded."""
+    """CUDA volume scaling source-ledger evidence is optional and guarded."""
     if not _warp().is_cuda_available():
         pytest.skip("CUDA is unavailable")
     _assert_p4_source_ledger("cuda:0")

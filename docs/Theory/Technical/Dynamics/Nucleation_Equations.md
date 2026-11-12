@@ -139,7 +139,7 @@ The activation form assumes existing thermodynamically stable clusters are activ
 ### Scalar Potential-Rate Boundary
 
 The bounded rate evaluator computes only **potential event rates**. It is used
-by the immutable P4 construction boundary; it is not itself a particle-source
+by the immutable public construction boundary; it is not itself a particle-source
 transaction. It first converts precursor mass concentration to number
 concentration:
 
@@ -203,7 +203,7 @@ Formation-size metadata and injection composition may accompany the rate
 configuration so that a later source process can state its intended physical
 representation. They do not alter either equation. In particular, rate
 evaluation neither creates particles nor gas/particle inventories, chooses
-slots, depletes precursor vapor, or applies a timestep. P4 is the bounded,
+slots, depletes precursor vapor, or applies a timestep. Public construction is the bounded,
 CPU-only public construction API for immutable activation and kinetic
 strategies, their builders, factory, and source-selection configuration through
 `particula.dynamics.nucleation` and `particula.dynamics`; it is not a runnable
@@ -233,7 +233,7 @@ J_d = J_d* × exp( γ × (1/d − 1/d*) × CS' / GR )
 
 **Description:**
 
-The exponential expresses the competition between growth (**GR**, escape to safety at larger sizes) and coagulational loss to the existing aerosol surface (**CS'**). High pre-existing surface area suppresses observable NPF even when the nucleation rate itself is large. In a simulation, this relation is a consistency check: if the model injects particles at a size larger than the true cluster size, the injection rate should be the survival-corrected **J_d**, not the raw **J_d***. P4 does not evaluate this relation; its survival factor is an externally selected value whose scientific justification remains the caller's responsibility.
+The exponential expresses the competition between growth (**GR**, escape to safety at larger sizes) and coagulational loss to the existing aerosol surface (**CS'**). High pre-existing surface area suppresses observable NPF even when the nucleation rate itself is large. In a simulation, this relation is a consistency check: if the model injects particles at a size larger than the true cluster size, the injection rate should be the survival-corrected **J_d**, not the raw **J_d***. Public construction does not evaluate this relation; its survival factor is an externally selected value whose scientific justification remains the caller's responsibility.
 
 For supported execution, see the [CPU nucleation example](https://github.com/uncscode/particula/blob/main/docs/Examples/Nucleation/cpu_nucleation.py)
 and [CPU Nucleation Strategy System](../../../Features/nucleation_strategy_system.md).
@@ -283,18 +283,18 @@ identity; it does not provide GPU execution.
 
 **Implementation boundary:**
 
-- The CPU-only P4 activation and kinetic potential-rate strategies, builders,
+- The CPU-only activation and kinetic potential-rate strategies, builders,
   source-selection metadata, and factory are supported public construction APIs.
   They remain immutable configuration and rate-evaluation boundaries only.
-- The concrete CPU P2 particle-source planner and P3 finalization transaction
+- The concrete CPU demand planning particle-source planner and source transaction
    remain in `particula.dynamics.nucleation.particle_source`. They are not
    re-exported through `particula.dynamics.nucleation` or `particula.dynamics`.
-   P2 returns inventory-limited source demand and diagnostics without mutation;
-   P3 owns the bounded particle/gas transaction.
+   Demand planning returns inventory-limited source demand and diagnostics without mutation;
+   source transaction owns the bounded particle/gas transaction.
 - `Nucleation` applies equal sequential substeps and re-reads the current gas
   state before each rate calculation, so completed substeps can change later
-  rates. Atomicity is per attempted P3 substep only: a completed earlier
-  substep is not rolled back if a later substep fails. P2/P3 helpers remain
+  rates. Atomicity is per attempted source transaction substep only: a completed earlier
+  substep is not rolled back if a later substep fails. Demand planning/source transaction helpers remain
    concrete-only, and GPU support remains deferred.
 
 ### Shipped CPU source transaction
@@ -304,17 +304,17 @@ updates:
 
 ```mermaid
 flowchart LR
-    P4[P4: immutable strategy and source selection] --> R[Potential rate J in #/m³/s]
-    R --> P2[P2: nonmutating demand finalization]
-    P2 --> A[Shared inventory-admitted events and limiting-species diagnostics]
-    A --> P3[P3: staged fixed-capacity commit]
-    P3 --> T[Particle/gas transaction and finalized diagnostics]
-    T --> P5[P5: CPU-only one-box runnable]
-    P5 --> G[Re-read current gas for the next equal substep]
+    construction[Immutable strategy and source selection] --> rate[Potential rate J in #/m³/s]
+    rate --> planning[Nonmutating demand finalization]
+    planning --> admission[Shared inventory-admitted events and limiting-species diagnostics]
+    admission --> staging[Staged fixed-capacity commit]
+    staging --> transaction[Particle/gas transaction and finalized diagnostics]
+    transaction --> runnable[CPU-only one-box runnable]
+    runnable --> gas[Re-read current gas for the next equal substep]
 ```
 
-For each P5 substep, the current potential rate is multiplied by the equal
-substep duration to obtain a potential event count [#/m³]. Concrete-only P2
+For each runnable execution substep, the current potential rate is multiplied by the equal
+substep duration to obtain a potential event count [#/m³]. Concrete-only demand planning
 uses the per-event species mass
 
 $$
@@ -322,7 +322,7 @@ m_{\mathrm{event},i}=n_i\frac{M_i}{N_A}\quad[\mathrm{kg/event}]
 $$
 
 and admits one shared count across participating species, limited by the
-tightest gas inventory, before any mutation. Concrete-only P3 stages slot
+tightest gas inventory, before any mutation. Concrete-only source transaction stages slot
 activation, resampling, and representative-volume scaling on private particle
 state, then transfers each represented event's species mass from partitioning
 gas to particle mass in one commit. Its bookkeeping uses concentration-weighted
@@ -341,61 +341,61 @@ released slots and selected exhaustion policy and scale. Resampling is the
 first exhausted-capacity policy; representative-volume scaling is its fallback.
 For scaled rows the reference total is `scale * pre_total`; the supported
 unscaled example uses `requested_scale == minimum_scale == 1.0` and directly
-asserts total-mass conservation. P2 is nonmutating, P3 preflight rejection is
-atomic, and P5 rollback scope is one attempted substep rather than a complete
+asserts total-mass conservation. Demand planning is nonmutating, source transaction preflight rejection is
+atomic, and runnable execution rollback scope is one attempted substep rather than a complete
 call.
 
-P5 is the supported public `Nucleation` runnable. It is CPU-only and accepts
+Runnable execution is the supported public `Nucleation` runnable. It is CPU-only and accepts
 exactly one legacy `Aerosol` box, retaining its backing particle and
 partitioning-gas containers by identity. It performs equal sequential
 substeps, recomputing the rate from the gas left by each successful commit. A
-successful earlier substep therefore remains visible if a later P2/P3 attempt
-fails; P5 deliberately offers no whole-call rollback.
+successful earlier substep therefore remains visible if a later demand planning/source transaction attempt
+fails; runnable execution deliberately offers no whole-call rollback.
 
-### Direct-Warp P1--P5 correspondence
+### Direct-Warp execution sequence
 
 The bounded direct-Warp step is distinct from the CPU runnable. It computes
 `C = c N_A / M` [#/m³], activation `J = S * A * C` with `A` [s⁻¹], or kinetic
 `J = S * K * C²` with `K` [m³/s]. Its potential demand is
-`E_pot = J * dt` [#/m³]. P2 admits one shared inventory-limited event demand
-before the P5 particle/gas transfer. In these rate laws, `S` is the configured,
+`E_pot = J * dt` [#/m³]. Demand planning admits one shared inventory-limited event demand
+before the commit particle/gas transfer. In these rate laws, `S` is the configured,
 dimensionless survival factor (not the saturation ratio); `c` is [kg/m³] and
 `M` is [kg/mol].
 
-Before P3 stages discrete events, `accepted_demand * volume` must be finite,
+Before discrete-event staging, `accepted_demand * volume` must be finite,
 nonnegative, integral, and representable as an `int32` event count. This
-representability rejection can occur after P2 has written its documented
+representability rejection can occur after demand planning has written its documented
 sidecars; particle/gas preservation and the existing rollback limits are
 unchanged.
 
-Direct P1 accepts finite nonnegative duration, coefficient, and survival;
+Direct input validation accepts finite nonnegative duration, coefficient, and survival;
 inclusive configured precursor bounds; positive temperature; optional configured
 saturation bounds; positive formation diameter [m]; and nonnegative integer
 molecule counts with at least one positive entry. Temperature is either a
 positive scalar or same-device `wp.float64` `(B,)`; configured saturation is
 same-device `wp.float64` `(B, S)` or comes from a validated environment.
 
-The bounded public ordering is P1 read-only domain/schema preflight, read-only
-validation of the public P4 controls and buffers, P2 inventory admission, P3
-fixed-slot staging, participating-molecule eligibility validation, P4
-resampling-first/scaling-fallback resolution, and P5 handoff validation followed
+The bounded public ordering is input validation read-only domain/schema preflight, read-only
+validation of the public exhaustion resolution controls and buffers, demand planning inventory admission, capacity staging
+fixed-slot staging, participating-molecule eligibility validation, exhaustion resolution
+resampling-first/scaling-fallback resolution, and commit handoff validation followed
 by the fused commit when final counts are nonzero. An empty box dimension returns
-after the public P4 validation. A configured zero-work or no-admission result
-still has its applicable planning, staging, and P4 diagnostic phases, but P5
+after the public exhaustion resolution validation. A configured zero-work or no-admission result
+still has its applicable planning, staging, and exhaustion resolution diagnostic phases, but commit
 observes zero final counts and launches no particle/gas writer; it is a
 successful no-op, not an error.
 
 Invalid rejection during the read-only public checks preserves particles and gas.
-P2--P4 may have changed documented sidecars before a later rejection, and
-rollback is not promised after an entered exhaustion primitive or a P5 launch.
+Demand planning--exhaustion resolution may have changed documented sidecars before a later rejection, and
+rollback is not promised after an entered exhaustion primitive or a commit launch.
 
-For an unscaled P5 row, concentration-weighted particle plus gas inventory is
+For an unscaled commit row, concentration-weighted particle plus gas inventory is
 conserved per box/species at `rtol=1e-12, atol=1e-30`. A scaled row compares
-against `s * initial_particle + initial_gas`; P5 source transfer still balances
+against `s * initial_particle + initial_gas`; commit source transfer still balances
 the gas removal. This is direct-kernel conservation evidence, not CPU parity.
 
 The direct step excludes hidden transfer/synchronization, CPU fallback,
-resize/compaction, GPU Runnable/scheduling/backend selection, E6-F9
+resize/compaction, GPU Runnable/scheduling/backend selection, direct-process integration
 orchestration, expanded physics, graph capture, autodiff, and performance
 guarantees. See the [direct example](https://github.com/uncscode/particula/blob/main/docs/Examples/Nucleation/gpu_direct_nucleation.py)
 and [feature contract](../../../Features/nucleation_strategy_system.md).
@@ -457,7 +457,7 @@ and [feature contract](../../../Features/nucleation_strategy_system.md).
 
 - **Parameterization Validity Ranges:** Empirical forms (Equations 7-8) and fitted parameterizations (for example Vehkamäki et al., 2002) are only valid within the temperature, humidity, and concentration ranges of the underlying data; extrapolation can produce unphysical rates.
 
-- **Bounded Scalar Evaluation:** The P4 rate strategies accept scalar precursor
+- **Bounded Scalar Evaluation:** The potential-rate strategies accept scalar precursor
   state only and enforce configured, inclusive concentration and temperature
   intervals. Optional saturation below the lower interval is treated as no
   event; saturation above its upper interval is not extrapolated. A zero
@@ -465,7 +465,7 @@ and [feature contract](../../../Features/nucleation_strategy_system.md).
   a parameterization's domain.
 
 - **Bounded conservation step:** Without representative-volume scaling, the
-  shipped P5 source transaction conserves supported partitioning-gas and
+  shipped source transaction conserves supported partitioning-gas and
   particle inventory directly. For a row selected for representative-volume
   scaling, accounting instead compares the post-step inventory to the selected
   scale times its pre-step inventory, with the finalized source-mass transfer
@@ -488,7 +488,7 @@ and [feature contract](../../../Features/nucleation_strategy_system.md).
 
 Nucleation converts supersaturated vapor into new particles through a
 barrier-crossing process whose rate is exponentially sensitive to saturation
-ratio and surface tension. The bounded P4/P5 CPU implementation is narrower:
+ratio and surface tension. The bounded CPU implementation is narrower:
 it evaluates configured empirical potential rates and commits a one-box,
 fixed-capacity, gas-conserving source transaction. Its configured survival
 factor provides no independently calculated growth or scavenging physics.

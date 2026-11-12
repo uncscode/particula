@@ -502,7 +502,8 @@ def _p2_oracle(case: _WarpCase) -> tuple[np.ndarray, np.ndarray]:
     This deliberately evaluates the scalar physical-rate equations locally,
     rather than invoking an adapter, kernel, or GPU test helper.  The fixture
     is intentionally one-species, so ideal activity is one and the local
-    calculation stays small while retaining P2 inventory limiting and coupling.
+    calculation stays small while retaining inventory finalization inventory
+    limiting and coupling.
     """
     masses = case.masses.copy()
     gas = case.gas.copy()
@@ -611,7 +612,9 @@ def _p2_oracle(case: _WarpCase) -> tuple[np.ndarray, np.ndarray]:
 def _assert_inventory(
     resources: dict[str, Any], masses: np.ndarray, gas: np.ndarray
 ) -> None:
-    """Assert the P2 particle-plus-gas inventory is separately conserved."""
+    """Assert the inventory finalization particle-plus-gas inventory is
+    separately conserved.
+    """
     concentration = resources["initial_concentration"]
     initial = _inventory(
         resources["initial_mass"], concentration, resources["initial_gas"]
@@ -732,7 +735,9 @@ def test_cpu_adapter_executes_native_cases_and_conserves_inventory(
 def test_warp_adapter_matches_independent_p2_oracle_and_conserves_inventory(
     case: _WarpCase,
 ) -> None:
-    """Resident Warp result retains P2 accounting and protected-lane contract."""
+    """Resident Warp result retains inventory finalization accounting and
+    protected-lane contract.
+    """
     resources = _build_warp_state(case, "cpu")
     wp = pytest.importorskip("warp")
     expected_mass, expected_gas = _p2_oracle(case)

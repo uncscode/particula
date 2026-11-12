@@ -460,13 +460,13 @@ def test_plan_records_require_exact_immutable_containers(
 
 @pytest.mark.parametrize("owner", [TimestepPlan, ResolvedProcessGraph])
 def test_plan_records_reject_process_graph_record_subclasses(owner) -> None:
-    """Test every P1 carrier rejects node and edge subclasses."""
+    """Test every declaration carrier rejects node and edge subclasses."""
 
     class NodeSubclass(ProcessNode):
-        """Exercise the exact P1 node-record boundary."""
+        """Exercise the exact declaration node-record boundary."""
 
     class EdgeSubclass(DependencyEdge):
-        """Exercise the exact P1 edge-record boundary."""
+        """Exercise the exact declaration edge-record boundary."""
 
     node = _node("dilution")
     node_subclass = NodeSubclass(

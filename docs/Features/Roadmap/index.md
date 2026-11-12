@@ -6,10 +6,10 @@ schedule.
 
 ## Release and migration sequence
 
-Maintainer decision, 2026-09-27: E8 and E8-F1 through E8-F8 are Shipped.
+Maintainer decision, 2026-09-27: graph capture and capture capability through graph-capture documentation are Shipped.
 The historical release sequence was:
 
-1. Merge the E8 closeout and roadmap update.
+1. Merge the graph capture closeout and roadmap update.
 2. Release **0.2.13**, retaining both the legacy `ParticleRepresentation` /
    `GasSpecies` facades and the `ParticleData` / `GasData` / `EnvironmentData`
    container workflow.
@@ -19,7 +19,7 @@ The historical release sequence was:
 4. Continue Epic I, differentiability and initial-state optimization, after
    the migration milestone.
 
-The current E9-M6 development tree has removed the facades and temporary
+The current v0.3.0 development tree has removed the facades and temporary
 untagged execution paths. Final validation and review are tracked in the
 [native migration closeout](data-native-v030-closeout.md). This roadmap does
 not publish a release. The [closeout record](graph-capture-closeout.md) records the maintainer's
@@ -45,9 +45,9 @@ plan closure separately from unavailable CUDA measurement evidence.
   capture/replay and documentation tracks. Use the [native-CUDA
   example](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_resident_graph_capture.py), [operator
   runbook](../gpu_graph_capture.md), and [closeout
-  record](graph-capture-closeout.md). E8-F7/T7 owns profiling and
-  machine-bounded recommendations; E8-F8 owns the example, runbook,
-  limitations, and closeout. The closeout remains the sole P3 evidence authority;
+  record](graph-capture-closeout.md). CUDA profiling owns profiling and
+  machine-bounded recommendations; graph-capture documentation owns the example, runbook,
+  limitations, and closeout. The closeout remains the sole evidence authority;
   measured performance results remain unavailable and unshipped until reviewed.
   No CPU or Warp-CPU fallback is provided.
 - **Documentation and examples**: Expand practical examples that connect feature
@@ -69,7 +69,7 @@ plan closure separately from unavailable CUDA measurement evidence.
 - Keep supported construction and execution on explicit native containers.
 - Keep migration documentation and removed-boundary tests aligned with the
   native API; historical facade names are migration references only.
-- Complete the M6 scientific, installed-package and example validation before
+- Complete the v0.3.0 scientific, installed-package and example validation before
   final review and release approval.
 - Track details in the
   [data-oriented design and GPU roadmap](data-oriented-gpu.md).
@@ -104,7 +104,7 @@ meets its exit bar, the next pending epic in the sequence becomes active.
 ### Shipped
 
 - [Epic A: Data-Model and Numerical Foundations](data-oriented-gpu.md#epic-a-data-model-and-numerical-foundations)
-  (ADW plan E2) — container schemas, `EnvironmentData`, CPU↔GPU transfer
+  — container schemas, `EnvironmentData`, CPU↔GPU transfer
   boundary, precision baseline, and stiffness recommendation. Shipped
   artifacts:
     - [Data Containers and GPU Foundations](../data-containers-and-gpu-foundations.md)
@@ -115,13 +115,13 @@ meets its exit bar, the next pending epic in the sequence becomes active.
     - [Mass Precision Recommendation Report](mass-precision-study.md) —
       canonical reference for downstream dtype/schema decisions
     - [Condensation stiffness study baseline](condensation-stiffness-study.md)
-      — recorded timestep grid, fixed-four P2-finalized direct GPU contract,
+      — recorded timestep grid, fixed-four inventory-limited direct GPU contract,
       inclusive threshold semantics, and accepted `(n_boxes,)` environment inputs
 - [Epic B: Non-Isothermal Condensation Public API (CPU)](data-oriented-gpu.md#epic-b-non-isothermal-condensation-public-api-cpu)
-  (ADW plan E1) — public builder/factory access, validation, and
+  — public builder/factory access, validation, and
   documentation for latent-heat condensation on the CPU reference path.
 - [Epic C: GPU Kernel Correctness and Low-Level API Hardening](data-oriented-gpu.md#epic-c-gpu-kernel-correctness-and-low-level-api-hardening)
-  (ADW plan E3) — persistent coagulation RNG state, bounded mixed-scale
+  — persistent coagulation RNG state, bounded mixed-scale
   selector hardening, measured one-thread-per-box limits, documented direct
   kernel entry points, device-aware test policy, and the completed Epic B
   latent-heat example and integration baseline. Shipped artifacts:
@@ -134,10 +134,10 @@ meets its exit bar, the next pending epic in the sequence becomes active.
     - [Measured coagulation decision record](data-oriented-gpu.md#measured-decision-record-for-the-current-one-thread-per-box-path)
       — accepted many-box baseline and large single-box caution band
 - [Epic D: GPU Condensation Physics Parity](data-oriented-gpu.md#epic-d-gpu-condensation-physics-parity)
-  (ADW plan E4) is the shipped bounded low-level direct-condensation
+  is the shipped bounded low-level direct-condensation
   publication. It includes constant and Buck vapor-pressure refresh, ideal and
   kappa activity, static and composition-weighted surface tension, fixed-four
-  P2 inventory finalization, gas coupling and conservation, latent-heat rate
+  numerical validation inventory finalization, gas coupling and conservation, latent-heat rate
   correction and signed energy diagnostics, reusable caller-owned fp64
    sidecars, device-aware parity evidence, and the published direct-kernel
    support contract and example. It does not provide high-level runnable
@@ -160,113 +160,113 @@ meets its exit bar, the next pending epic in the sequence becomes active.
        `python docs/Examples/gpu_condensation_parity_walkthrough.py` and
        `pytest examples_tests/gpu_condensation_parity_walkthrough_test.py -q -Werror`.
 - [Epic E: GPU Coagulation Physics Coverage](data-oriented-gpu.md#epic-e-gpu-coagulation-physics-coverage)
-  (ADW plan E5) and all nine feature plans E5-F1 through E5-F9 shipped on
+  and all nine feature plans coagulation sampling through coagulation support documentation shipped on
   2026-07-20. The bounded direct-kernel release covers Brownian, charged
   hard-sphere, SP2016 sedimentation, and ST1956 turbulent-shear terms; approved
   additive masks; charge-conserving merges; deterministic and stochastic
   validation; explicit-transfer documentation and examples; and the ordered
   closeout gate. High-level `Runnable` integration remains deferred.
 - [Epic F: GPU Process Completeness](data-oriented-gpu.md#epic-f-gpu-process-completeness)
-  (ADW plan E6) and all nine feature plans E6-F1 through E6-F9 are shipped.
+  and all nine feature plans CPU dilution through direct-process integration are shipped.
   The release supplies the bounded direct dilution, wall-loss, fixed-slot,
   exhaustion, and nucleation contracts plus explicit five-call sequence
   evidence. High-level GPU orchestration remains deferred to Epic G.
 - [Epic G: Backend Selection and GPU-Resident Simulation](data-oriented-gpu.md#epic-g-backend-selection-and-gpu-resident-simulation)
-  (ADW plan E7) and all nine feature plans E7-F1 through E7-F9 shipped on
+  and all nine feature plans backend selection through resident diagnostics shipped on
   2026-08-30. The release closes backend selection, explicit fallback policy,
   bounded process adapters, resident sessions and checkpoints, deterministic
   scheduling, prescribed communication and volume evolution, persistent RNG
   restart semantics, diagnostics, full-loop regressions, and documentation.
 
-### E6 roadmap inventory
+### GPU process completeness roadmap inventory
 
 | ID | Title | Status text |
 | --- | --- | --- |
-| `E6` | GPU Process Completeness | Shipped |
-| `E6-F1` | CPU Dilution Strategy and Runnable Reference | Shipped |
-| `E6-F2` | Direct GPU Dilution with CPU Parity | Shipped |
-| `E6-F3` | Neutral Spherical and Rectangular GPU Wall Loss | Shipped |
-| `E6-F4` | Charged GPU Wall Loss with Neutral Fallback | Shipped |
-| `E6-F5` | CPU and GPU Fixed-Slot Activation and Diagnostics | Shipped |
-| `E6-F6` | CPU and GPU Slot Exhaustion Policies | Shipped |
-| `E6-F7` | CPU Nucleation and Particle-Source Process | Shipped |
-| `E6-F8` | Direct GPU Nucleation Process | Shipped |
-| `E6-F9` | Integrated Validation Documentation and Epic Closeout | Shipped |
+| `GPU process completeness` | GPU Process Completeness | Shipped |
+| `CPU dilution` | CPU Dilution Strategy and Runnable Reference | Shipped |
+| `GPU dilution` | Direct GPU Dilution with CPU Parity | Shipped |
+| `neutral GPU wall loss` | Neutral Spherical and Rectangular GPU Wall Loss | Shipped |
+| `charged GPU wall loss` | Charged GPU Wall Loss with Neutral Fallback | Shipped |
+| `fixed-slot management` | CPU and GPU Fixed-Slot Activation and Diagnostics | Shipped |
+| `slot exhaustion` | CPU and GPU Slot Exhaustion Policies | Shipped |
+| `CPU nucleation` | CPU Nucleation and Particle-Source Process | Shipped |
+| `direct GPU nucleation` | Direct GPU Nucleation Process | Shipped |
+| `direct-process integration` | Integrated Validation Documentation and Epic Closeout | Shipped |
 
-The private [P2 sequence evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py),
-[P3 source](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py),
-and [P3 regression](https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_complete_process_sequence_example_test.py)
+The private [numerical validation sequence evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py),
+[integration validation source](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py),
+and [example regression](https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_complete_process_sequence_example_test.py)
 document an explicit five-call sequence. Its `condensation_step_gpu`,
 `coagulation_step_gpu`, `dilution_step_gpu`, `wall_loss_step_gpu`, and
 `nucleation_step_gpu` order is illustrative, not a production coordinator.
 
-### E5 roadmap inventory
+### GPU coagulation roadmap inventory
 
 | ID | Title | Status text |
 | --- | --- | --- |
-| `E5` | GPU Coagulation Physics Coverage | Shipped |
-| `E5-F1` | Mechanism Configuration and Sampling Contract | Shipped |
-| `E5-F2` | Charged Pair Physics and Charge-Conserving Merges | Shipped |
-| `E5-F3` | Charged and Brownian-Plus-Charged GPU Execution | Shipped |
-| `E5-F4` | SP2016 Sedimentation GPU Execution | Shipped |
-| `E5-F5` | ST1956 Turbulent-Shear GPU Execution | Shipped |
-| `E5-F6` | Single-Pass Additive Multi-Mechanism Coagulation | Shipped |
-| `E5-F7` | Cross-Mechanism GPU Validation Matrix | Shipped |
-| `E5-F8` | Independent CPU-Warp Condensation Walkthrough | Shipped |
-| `E5-F9` | GPU Coagulation Support Documentation and Epic Closeout | Shipped |
+| `GPU coagulation` | GPU Coagulation Physics Coverage | Shipped |
+| `coagulation sampling` | Mechanism Configuration and Sampling Contract | Shipped |
+| `charged pair rates` | Charged Pair Physics and Charge-Conserving Merges | Shipped |
+| `charged coagulation` | Charged and Brownian-Plus-Charged GPU Execution | Shipped |
+| `sedimentation coagulation` | SP2016 Sedimentation GPU Execution | Shipped |
+| `turbulent-shear coagulation` | ST1956 Turbulent-Shear GPU Execution | Shipped |
+| `additive coagulation mechanisms` | Single-Pass Additive Multi-Mechanism Coagulation | Shipped |
+| `coagulation validation` | Cross-Mechanism GPU Validation Matrix | Shipped |
+| `independent condensation walkthrough` | Independent CPU-Warp Condensation Walkthrough | Shipped |
+| `coagulation support documentation` | GPU Coagulation Support Documentation and Epic Closeout | Shipped |
 
-All E5 features are shipped. The public E5 cross-links are:
+All GPU coagulation features are shipped. The public GPU coagulation cross-links are:
 
-- E5-F7's [GPU coagulation validation record](coagulation-validation.md).
-- E5-F8's
+- Coagulation validation's [GPU coagulation validation record](coagulation-validation.md).
+- Independent condensation walkthrough's
   [condensation parity walkthrough ownership record](condensation-parity-walkthrough.md)
   and runnable
   [GPU condensation parity walkthrough](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_condensation_parity_walkthrough.py).
-- E5-F9's
+- Coagulation support documentation's
   [canonical GPU coagulation ownership contract](../data-containers-and-gpu-foundations.md#gpu-coagulation-configuration-and-sidecar-ownership),
   [direct-kernel support guide](../coagulation_strategy_system.md#gpu-direct-kernel-foundations-and-limitations),
   and
   [direct GPU coagulation example](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_coagulation_direct.py).
 
-### E7 roadmap inventory
+### Resident execution roadmap inventory
 
 | ID | Title | Status text |
 | --- | --- | --- |
-| `E7` | Backend Selection and GPU-Resident Simulation | Shipped |
-| `E7-F1` | Backend-Selection and Execution-Context API | Shipped |
-| `E7-F2` | Backend-Selected Condensation | Shipped |
-| `E7-F3` | Backend-Selected Brownian Coagulation | Shipped |
-| `E7-F4` | GPU-Resident Session State and Checkpoints | Shipped |
-| `E7-F5` | Deterministic Full-Process Scheduling | Shipped |
-| `E7-F6` | Fallback, Capability Errors, and API Stability | Shipped |
-| `E7-F7` | Multi-Box Communication and Volume Evolution | Shipped |
-| `E7-F8` | Persistent Per-Box RNG Streams and Restart Semantics | Shipped |
-| `E7-F9` | Diagnostics, Full-Loop Regressions, Documentation, and Closeout | Shipped |
+| `resident execution` | Backend Selection and GPU-Resident Simulation | Shipped |
+| `backend selection` | Backend-Selection and Execution-Context API | Shipped |
+| `selected condensation` | Backend-Selected Condensation | Shipped |
+| `selected Brownian coagulation` | Backend-Selected Brownian Coagulation | Shipped |
+| `resident sessions` | GPU-Resident Session State and Checkpoints | Shipped |
+| `resident scheduling` | Deterministic Full-Process Scheduling | Shipped |
+| `execution capability policy` | Fallback, Capability Errors, and API Stability | Shipped |
+| `communication and volume evolution` | Multi-Box Communication and Volume Evolution | Shipped |
+| `resident RNG and restart` | Persistent Per-Box RNG Streams and Restart Semantics | Shipped |
+| `resident diagnostics` | Diagnostics, Full-Loop Regressions, Documentation, and Closeout | Shipped |
 
-E5, E6, E7, E8, and all of their feature plans are shipped.
+GPU coagulation, GPU process completeness, resident execution, graph capture, and all of their feature plans are shipped.
 
-### E8 roadmap inventory
+### Graph capture roadmap inventory
 
 | ID | Title | Status text |
 | --- | --- | --- |
-| `E8` | Graph Capture and Performance | Shipped |
-| `E8-F1` | Graph-Capture Capability and Lifecycle Contracts | Shipped |
-| `E8-F2` | Capture-Ready Device Enqueue Paths | Shipped |
-| `E8-F3` | Registry Preallocation, Identity Reuse, and Byte Accounting | Shipped |
-| `E8-F4` | Resident Graph Capture and Guarded Replay Lifecycle | Shipped |
-| `E8-F5` | Captured Full-Loop Parity and Lifecycle Validation | Shipped |
-| `E8-F6` | Multi-Box Scaling Benchmarks and Memory-Budget Evidence | Shipped |
-| `E8-F7` | CUDA Profiling and Machine-Bounded Performance Decisions | Shipped |
-| `E8-F8` | Graph-Capture Example, Runbook, Limitations, and Closeout | Shipped |
+| `graph capture` | Graph Capture and Performance | Shipped |
+| `capture capability` | Graph-Capture Capability and Lifecycle Contracts | Shipped |
+| `capture-ready enqueue` | Capture-Ready Device Enqueue Paths | Shipped |
+| `resource preallocation` | Registry Preallocation, Identity Reuse, and Byte Accounting | Shipped |
+| `capture and replay` | Resident Graph Capture and Guarded Replay Lifecycle | Shipped |
+| `captured-loop validation` | Captured Full-Loop Parity and Lifecycle Validation | Shipped |
+| `resident benchmark study` | Multi-Box Scaling Benchmarks and Memory-Budget Evidence | Shipped |
+| `CUDA profiling` | CUDA Profiling and Machine-Bounded Performance Decisions | Shipped |
+| `graph-capture documentation` | Graph-Capture Example, Runbook, Limitations, and Closeout | Shipped |
 
 - [Epic H: Graph Capture and Performance](data-oriented-gpu.md#epic-h-graph-capture-and-performance)
   and its eight features were closed as Shipped by maintainer decision on
   2026-09-27. Reviewed CUDA measurements remain unavailable; plan closure
-  does not establish a measured performance claim. E8-F8 owns the example,
+  does not establish a measured performance claim. Graph-capture documentation owns the example,
   runbook, limitations, and closeout, with no
   CPU or Warp-CPU fallback. The [native-CUDA example](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_resident_graph_capture.py),
-  [operator runbook](../gpu_graph_capture.md), and [P3 closeout record](graph-capture-closeout.md)
-  are the discoverable references; the closeout alone owns P3 status/evidence.
+  [operator runbook](../gpu_graph_capture.md), and [integration validation closeout record](graph-capture-closeout.md)
+  are the discoverable references; the closeout alone owns integration validation status/evidence.
 
 ### Pending
 

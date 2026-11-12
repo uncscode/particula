@@ -1,4 +1,4 @@
-"""Data-only E9-M1 inventories across ordered particle/gas/environment lanes."""
+"""Data-only v0.3.0 inventories across ordered particle/gas/environment lanes."""
 
 import numpy as np
 import numpy.testing as npt

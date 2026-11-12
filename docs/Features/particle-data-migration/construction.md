@@ -4,7 +4,7 @@ This guide describes native construction used by the supported migrated
 examples. Native CPU processes and runnables consume these held containers;
 see [dynamics migration](dynamics.md) for configuration and single-box limits.
 The [access walkthrough](containers.md) demonstrates executable replacement and
-rejection checks. Use the selected E9-native checkout, not an assumed older
+rejection checks. Use the v0.3.0 development checkout, not an assumed older
 published package. See also [container foundations](../data-containers-and-gpu-foundations.md).
 
 ## Assemble three containers
@@ -172,5 +172,5 @@ does not broaden CPU execution beyond supported single-box process contracts.
 Legacy facades and conversion bridges have been removed from this development
 tree. CPU-Warp population transfers and resident construction require explicit
 supported distribution metadata; untagged checkpoint records reject before
-restart setup. M6 final validation and review remain separate from release
+restart setup. V0.3.0 final validation and review remain separate from release
 publication.

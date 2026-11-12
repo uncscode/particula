@@ -2069,7 +2069,7 @@ def _sedimentation_pair_rate_probe_kernel(
     direct: Any,
     dispatched: Any,
 ) -> None:
-    """Probe the P1 rate and fixed-mask pair-rate dispatcher."""
+    """Probe the input validation rate and fixed-mask pair-rate dispatcher."""
     direct[0] = sedimentation_sp2016_pair_rate_wp(
         radii[0], radii[1], settling_velocities[0], settling_velocities[1]
     )
@@ -3286,7 +3286,9 @@ def test_sedimentation_majorant_excludes_equal_and_invalid_velocities(
 def test_sedimentation_pair_rate_contributes_through_fixed_dispatch(
     device: str,
 ) -> None:
-    """The sedimentation-only mask preserves the P1 pair rate in dispatch."""
+    """The sedimentation-only mask preserves the input validation pair rate in
+    dispatch.
+    """
     radii = np.array([2.0e-6, 6.0e-6], dtype=np.float64)
     velocities = np.array([0.5, 3.0], dtype=np.float64)
     direct = wp.zeros((1,), dtype=wp.float64, device=device)
@@ -5034,7 +5036,9 @@ def test_turbulent_p2_preflight_precedes_capability_and_runtime_work(
     fluid_density: object,
     message: str,
 ) -> None:
-    """Invalid P2 input stops before downstream allocation, RNG, or launch."""
+    """Invalid numerical validation input stops before downstream allocation,
+    RNG, or launch.
+    """
     particles = _make_particle_data(n_boxes=2, n_particles=3, n_species=1)
     gpu_particles = to_warp_particle_data(particles, device=device)
     pairs = wp.array(np.full((2, 1, 2), -7), dtype=wp.int32, device=device)
@@ -5096,7 +5100,9 @@ def test_turbulent_p2_preflight_precedes_capability_and_runtime_work(
 
 
 def test_brownian_ignores_turbulent_p2_inputs(device: str) -> None:
-    """Non-turbulent calls do not validate irrelevant turbulent P2 inputs."""
+    """Non-turbulent calls do not validate irrelevant turbulent numerical
+    validation inputs.
+    """
     particles = _make_particle_data(n_boxes=1, n_particles=3, n_species=1)
     gpu_particles = to_warp_particle_data(particles, device=device)
 
@@ -5118,7 +5124,9 @@ def test_turbulent_singleton_executes_and_conserves_mass(
     device: str,
     use_arrays: bool,
 ) -> None:
-    """ST1956 singleton normalizes P2 inputs and preserves species inventory."""
+    """ST1956 singleton normalizes numerical validation inputs and preserves
+    species inventory.
+    """
     particles = _make_particle_data(n_boxes=2, n_particles=2, n_species=2)
     particles.volume[:] = 1.0e-18
     particles.masses[:] = [
@@ -5281,7 +5289,9 @@ def test_turbulent_singleton_rejects_float32_p2_arrays_without_mutation(
     device: str,
     float32_input: str,
 ) -> None:
-    """ST1956 rejects fp32 P2 arrays before caller-owned state changes."""
+    """ST1956 rejects fp32 numerical validation arrays before caller-owned state
+    changes.
+    """
     particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=1)
     gpu_particles = to_warp_particle_data(particles, device=device)
     pairs = wp.array([[[7, 7]]], dtype=wp.int32, device=device)
@@ -7090,7 +7100,8 @@ def test_mixed_scale_brownian_collision_totals_match_expected_mean_within_sigma_
 ) -> None:
     """Mixed-scale bounded-selector totals stay within Brownian sigma.
 
-    This checks the shipped E3-F2-P2 bounded selector path against the CPU
+    This checks the shipped coagulation rejection sampling-numerical validation
+    bounded selector path against the CPU
     Brownian expected mean across repeated fresh seeded runs.
     """
     particles = _make_native_mixed_npf_droplet_particle_data()

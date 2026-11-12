@@ -1,6 +1,6 @@
 """Provide concrete-only CPU and resident-Warp Brownian adapters.
 
-P2 carriers and P3 execution states retain caller-owned resources by identity.
+state carriers and execution states retain caller-owned resources by identity.
 Frozen dataclasses prohibit field rebinding only; retained resources remain
 mutable. The adapters dispatch only their already-selected CPU runnable or
 resident-Warp kernel. They do not select another backend, transfer,
@@ -152,12 +152,13 @@ class CPUCoagulationResult:
 class CPUCoagulationExecutionState:
     """Retain selected CPU coagulation controls and runnable by identity.
 
-    This concrete-only P3 carrier validates only exact P2-state and runnable
+    This concrete-only execution carrier validates only exact state-state and
+    runnable
     types. Execution controls remain opaque until dispatch, and retained
     resources remain caller-owned and mutable.
 
     Args:
-        state: Exact P2 CPU state retained by identity.
+        state: Exact state CPU state retained by identity.
         time_step: Original execution time step in s, validated at dispatch.
         sub_steps: Original number of runnable substeps, validated at dispatch.
         runnable: Exact caller-owned ``Coagulation`` runnable.
@@ -172,7 +173,7 @@ class CPUCoagulationExecutionState:
     runnable: Coagulation
 
     def __post_init__(self) -> None:
-        """Validate exact P2-state and runnable carrier types."""
+        """Validate exact state-state and runnable carrier types."""
         if type(self.state) is not CPUCoagulationState:
             raise TypeError("state must be an exact CPUCoagulationState.")
         if type(self.runnable) is not Coagulation:
@@ -183,7 +184,7 @@ class CPUCoagulationExecutionState:
         """Return the exact caller-owned CPU aerosol payload.
 
         Returns:
-            The aerosol retained by the P2 state.
+            The aerosol retained by the state state.
         """
         return self.state.backend_payload
 
@@ -346,10 +347,10 @@ class CPUCoagulationExecutionAdapter:
     """
 
     def execute(self, state: ExecutionState) -> ExecutionResult:
-        """Execute one exact CPU P3 state without fallback or recovery.
+        """Execute one exact CPU execution state without fallback or recovery.
 
         Args:
-            state: Exact selected CPU P3 execution state.
+            state: Exact selected CPU execution state.
 
         Returns:
             A result retaining ``state`` and the original aerosol by identity.
@@ -698,12 +699,13 @@ class WarpBrownianCoagulationResult:
 class WarpBrownianCoagulationExecutionState:
     """Retain one selected resident-Warp coagulation request by identity.
 
-    This concrete-only P3 carrier validates only the exact P2 state. It neither
+    This concrete-only execution carrier validates only the exact state state.
+    It neither
     imports a kernel nor inspects or synchronizes caller-owned resident
     resources.
 
     Args:
-        state: Exact P2 resident-Warp state retained by identity.
+        state: Exact state resident-Warp state retained by identity.
 
     Raises:
         TypeError: If ``state`` is not an exact
@@ -713,7 +715,7 @@ class WarpBrownianCoagulationExecutionState:
     state: WarpBrownianCoagulationState
 
     def __post_init__(self) -> None:
-        """Validate the exact P2 Warp state carrier type."""
+        """Validate the exact state Warp state carrier type."""
         if type(self.state) is not WarpBrownianCoagulationState:
             raise TypeError(
                 "state must be an exact WarpBrownianCoagulationState."
@@ -724,7 +726,7 @@ class WarpBrownianCoagulationExecutionState:
         """Return the exact caller-owned resident particle payload.
 
         Returns:
-            The particle container retained by the P2 state.
+            The particle container retained by the state state.
         """
         return self.state.backend_payload
 
@@ -733,7 +735,8 @@ class WarpBrownianCoagulationExecutionState:
 class ResidentBrownianCoagulationExecutionState:
     """Bind a Brownian request to one established resident RNG stream.
 
-    The retained registry view owns the exact P1-initialized, coagulation-only
+    The retained registry view owns the exact configuration-initialized,
+    coagulation-only
     ``wp.uint32`` RNG sidecar. Resident dispatch never acquires, allocates,
     resets, inspects, transfers, or synchronizes that sidecar; it always
     forwards it with ``initialize_rng=False``. Wall-loss streams and public
@@ -807,7 +810,7 @@ class ResidentBrownianCoagulationExecutionAdapter:
 
     The adapter preflights exact session, registry, resource, output, and RNG
     identities before lazily importing the kernel. It then supplies the
-    resident-owned P1-derived coagulation sidecar with literal
+    resident-owned configuration-derived coagulation sidecar with literal
     ``initialize_rng=False``. It does not acquire, allocate, seed, reset,
     inspect, transfer, or synchronize the stream.
     """
@@ -939,24 +942,25 @@ class WarpBrownianCoagulationExecutionAdapter:
     """Dispatch one selected resident-Warp Brownian request exactly once.
 
     This concrete-only adapter resolves the selected kernel lazily after local
-    state validation and calls it once. It forwards P2 resources by identity
+    state validation and calls it once. It forwards state resources by identity
     without conversion, synchronization, fallback, retry, or recovery. Kernel
     exceptions and any post-launch mutation remain governed by the kernel.
     """
 
     def execute(self, state: ExecutionState) -> ExecutionResult:
-        """Execute one exact Warp P3 state without fallback or recovery.
+        """Execute one exact Warp execution state without fallback or recovery.
 
         Args:
-            state: Exact selected resident-Warp P3 execution state.
+            state: Exact selected resident-Warp execution state.
 
         Returns:
             A result retaining ``state`` and native result resources by
             identity.
 
         Raises:
-            TypeError: If ``state`` is not the required exact P3 state.
-            ValueError: If the direct kernel returns resources that violate P2
+            TypeError: If ``state`` is not the required exact execution state.
+            ValueError: If the direct kernel returns resources that violate
+                state
                 result identity requirements. Direct kernel errors propagate
                 unchanged.
             ImportError: If optional Warp kernel dependencies are unavailable

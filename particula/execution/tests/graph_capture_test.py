@@ -139,7 +139,9 @@ def test_native_callables_reject_noncallable_fields(field: str) -> None:
 
 
 def test_native_callables_retain_distinct_callable_identities() -> None:
-    """P1 vocabulary retains callables without a native handle or cleanup."""
+    """Qualification vocabulary retains callables without a native handle or
+    cleanup.
+    """
 
     def begin() -> None:
         """Provide one capture-begin callable."""
@@ -1122,7 +1124,9 @@ def _available_lifecycle() -> GraphCaptureLifecycle:
 def test_lifecycle_successful_transitions_retain_p1_carrier_identities() -> (
     None
 ):
-    """Successful lifecycle successors retain immutable P1 metadata identities."""
+    """Successful lifecycle successors retain immutable qualification metadata
+    identities.
+    """
     ready = _available_lifecycle()
     captured = complete_graph_capture(ready)
     invalidated = invalidate_graph_capture(

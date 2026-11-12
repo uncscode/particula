@@ -402,7 +402,7 @@ def _scan(
 def _validate_prepared_binding(
     prepared_timestep: object, request: object, *, environment: bool
 ) -> None:
-    """Validate the exact P1 binding before retaining copy identities."""
+    """Validate the declaration binding before retaining copy identities."""
     if type(prepared_timestep) is not PreparedResidentTimestep:
         raise TypeError(
             "prepared_timestep must be an exact PreparedResidentTimestep."
@@ -456,7 +456,8 @@ def setup_prepared_environment_update(
     """Validate and bind an environment replacement for later enqueue.
 
     Args:
-        prepared_timestep: Exact P1 timestep retaining ``request`` by identity.
+        prepared_timestep: Exact declaration timestep retaining ``request`` by
+            identity.
         request: Exact environment update request to validate and bind.
 
     Returns:
@@ -465,7 +466,8 @@ def setup_prepared_environment_update(
 
     Raises:
         TypeError: If either carrier has an unsupported exact type.
-        ValueError: If P1 identities, source metadata, aliases, or values are
+        ValueError: If declaration identities, source metadata, aliases, or
+            values are
             invalid.
     """
     _validate_prepared_binding(prepared_timestep, request, environment=True)
@@ -517,7 +519,8 @@ def setup_prepared_gas_update(
     """Validate and bind a gas replacement for later enqueue.
 
     Args:
-        prepared_timestep: Exact P1 timestep retaining ``request`` by identity.
+        prepared_timestep: Exact declaration timestep retaining ``request`` by
+            identity.
         request: Exact gas update request to validate and bind.
 
     Returns:
@@ -526,7 +529,8 @@ def setup_prepared_gas_update(
 
     Raises:
         TypeError: If either carrier has an unsupported exact type.
-        ValueError: If P1 identities, source metadata, aliases, or values are
+        ValueError: If declaration identities, source metadata, aliases, or
+            values are
             invalid.
     """
     _validate_prepared_binding(prepared_timestep, request, environment=False)

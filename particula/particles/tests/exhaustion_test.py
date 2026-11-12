@@ -424,7 +424,9 @@ def _resampling_particles(boxes: int = 1) -> ParticleData:
 
 
 def _resampling_p1(boxes: int = 1) -> ExhaustionPlan:
-    """Create P1 deferred-resampling records releasing two active slots."""
+    """Create policy resolution deferred-resampling records releasing two active
+    slots.
+    """
     free_indices = np.full((boxes, 5), -1, dtype=np.int32)
     free_indices[:, 0] = 0
     return resolve_exhaustion(
@@ -439,7 +441,9 @@ def _resampling_p1(boxes: int = 1) -> ExhaustionPlan:
 
 
 def test_resampling_plan_is_deterministic_detached_and_conservative() -> None:
-    """P2 equal strata conserve represented inventory and detach input state."""
+    """Resampling equal strata conserve represented inventory and detach input
+    state.
+    """
     particles = _resampling_particles()
     plan = plan_resampling(particles, _resampling_p1())
     repeat = plan_resampling(particles, _resampling_p1())
@@ -480,7 +484,9 @@ def test_resampling_plan_is_deterministic_detached_and_conservative() -> None:
 
 
 def test_resampling_multibox_and_zero_release_are_fixed_capacity() -> None:
-    """P2 preserves untouched boxes and makes zero-release plans write-free."""
+    """Resampling preserves untouched boxes and makes zero-release plans
+    write-free.
+    """
     particles = _resampling_particles(2)
     p1 = _resampling_p1(2)
     zero = ExhaustionBoxPlan(
@@ -512,7 +518,9 @@ def test_resampling_multibox_and_zero_release_are_fixed_capacity() -> None:
 
 
 def test_resampling_skips_valid_scaling_deferred_p1_rows() -> None:
-    """P2 plans resampling rows while accepting scaling-deferred sentinels."""
+    """Resampling plans resampling rows while accepting scaling-deferred
+    sentinels.
+    """
     particles = _resampling_particles(2)
     resampling = _resampling_p1(2).box_plans[0]
     scaling = ExhaustionBoxPlan(
@@ -535,7 +543,7 @@ def test_resampling_skips_valid_scaling_deferred_p1_rows() -> None:
 def test_resampling_rejects_malformed_scaling_deferred_p1_rows(
     scaling: ExhaustionBoxPlan,
 ) -> None:
-    """P2 continues to reject malformed deferred-scaling sentinels."""
+    """Resampling continues to reject malformed deferred-scaling sentinels."""
     with pytest.raises(ValueError, match="deferred scaling P1 sentinel"):
         plan_resampling(_resampling_particles(), ExhaustionPlan((scaling,)))
 
@@ -544,7 +552,9 @@ def test_resampling_rejects_malformed_scaling_deferred_p1_rows(
 def test_resampling_rejects_aliased_writable_particle_fields(
     field_name: str,
 ) -> None:
-    """P2 rejects writable-field aliases before planning or commit mutation."""
+    """Resampling rejects writable-field aliases before planning or commit
+    mutation.
+    """
     particles = _resampling_particles()
     if field_name == "charge":
         particles.charge = particles.concentration.view()
@@ -658,7 +668,9 @@ def test_resampling_apply_rejects_stale_active_slots_without_mutation() -> None:
 
 
 def test_resampling_apply_rejects_stale_source_and_forged_replacement() -> None:
-    """P2 binds replacements to source values and validates conservation."""
+    """Resampling binds replacements to source values and validates
+    conservation.
+    """
     particles = _resampling_particles()
     plan = plan_resampling(particles, _resampling_p1())
     particles.masses[0, 0, 0] = 1.5
@@ -764,7 +776,7 @@ def test_riemer_diversity_uses_particle_mixing_not_bulk_inventory() -> None:
 
 
 def test_resampling_equal_strata_matches_independent_weighted_oracle() -> None:
-    """P2 assigns crossing source intervals to equal-number strata."""
+    """Resampling assigns crossing source intervals to equal-number strata."""
     particles = _resampling_particles()
     plan = plan_resampling(particles, _resampling_p1())
     box_plan = plan.box_plans[0]
@@ -800,7 +812,9 @@ def test_resampling_equal_strata_matches_independent_weighted_oracle() -> None:
 def test_resampling_rejects_non_exact_or_nonfinite_diagnostic_bounds(
     bound: object,
 ) -> None:
-    """P2 bounds are strict finite Python floats before particle inspection."""
+    """Resampling bounds are strict finite Python floats before particle
+    inspection.
+    """
     particles = _resampling_particles()
     snapshot = tuple(
         field.tobytes()
@@ -831,7 +845,9 @@ def test_resampling_rejects_non_exact_or_nonfinite_diagnostic_bounds(
 
 
 def test_resampling_rejects_malformed_p1_record_without_mutation() -> None:
-    """P2 consumes valid P1 sentinels rather than resolving policy again."""
+    """Resampling consumes valid policy resolution sentinels rather than
+    resolving policy again.
+    """
     particles = _resampling_particles()
     invalid_p1 = ExhaustionPlan(
         (
@@ -854,7 +870,9 @@ def test_resampling_rejects_malformed_p1_record_without_mutation() -> None:
 
 
 def test_resampling_rejects_p1_release_count_above_requested() -> None:
-    """P2 rejects forged P1 release counts before remap planning."""
+    """Resampling rejects forged policy resolution release counts before remap
+    planning.
+    """
     particles = _resampling_particles()
     invalid_p1 = ExhaustionPlan(
         (
@@ -909,7 +927,9 @@ def test_resampling_apply_rejects_overlapping_plan_without_mutation() -> None:
 
 
 def test_representative_volume_scaling_scales_only_selected_rows() -> None:
-    """P4 scales selected extensive state and preserves protected siblings."""
+    """Volume scaling scales selected extensive state and preserves protected
+    siblings.
+    """
     particles = _resampling_particles(2)
     particles.volume[:] = [4.0, 5.0]
     demand = np.array([3.0, 2.0], dtype=np.float64)
@@ -949,7 +969,9 @@ def test_representative_volume_scaling_scales_only_selected_rows() -> None:
 def test_representative_volume_scaling_no_selected_rows_writes_diagnostic_only(
     demand: list[float], flags: list[bool]
 ) -> None:
-    """P4 emits one diagnostics for all-false and zero-demand selections."""
+    """Volume scaling emits one diagnostics for all-false and zero-demand
+    selections.
+    """
     particles = _resampling_particles(2)
     demand_values = np.array(demand, dtype=np.float64)
     flags_values = np.array(flags, dtype=np.bool_)
@@ -1038,7 +1060,9 @@ def test_representative_volume_scaling_selected_unity_scale_is_exact_noop() -> (
 def test_representative_volume_scaling_rejects_invalid_volume_atomically() -> (
     None
 ):
-    """A later infeasible P4 row prevents earlier selected-row mutation."""
+    """A later infeasible volume scaling row prevents earlier selected-row
+    mutation.
+    """
     particles = _resampling_particles(2)
     demand = np.array([2.0, 2.0], dtype=np.float64)
     flags = np.array([True, True], dtype=np.bool_)
@@ -1093,7 +1117,9 @@ def test_representative_volume_scaling_rejects_invalid_volume_atomically() -> (
 def test_representative_volume_scaling_rejects_zeroing_active_slot_atomically() -> (
     None
 ):
-    """P4 rejects underflowing active concentrations before every write."""
+    """Volume scaling rejects underflowing active concentrations before every
+    write.
+    """
     particles = _resampling_particles()
     particles.concentration[0, 0] = np.nextafter(0.0, 1.0)
     demand = np.array([1.0], dtype=np.float64)
@@ -1143,7 +1169,9 @@ def test_representative_volume_scaling_rejects_zeroing_active_slot_atomically() 
 def test_representative_volume_scaling_preserves_intensities_and_surface() -> (
     None
 ):
-    """P4 scales selected extensive inventories while preserving intensities."""
+    """Volume scaling scales selected extensive inventories while preserving
+    intensities.
+    """
     import particula.particles as particles_package
 
     particles = _resampling_particles()
@@ -1185,7 +1213,9 @@ def test_representative_volume_scaling_preserves_intensities_and_surface() -> (
 
 
 def test_representative_volume_scaling_accepts_empty_boxes() -> None:
-    """P4 accepts B=0 while preserving every supplied empty array identity."""
+    """Volume scaling accepts B=0 while preserving every supplied empty array
+    identity.
+    """
     particles = ParticleData(
         masses=np.empty((0, 1, 1), dtype=np.float64),
         concentration=np.empty((0, 1), dtype=np.float64),
@@ -1210,7 +1240,9 @@ def test_representative_volume_scaling_accepts_empty_boxes() -> None:
 def test_representative_volume_scaling_rejects_factor_bounds_atomically() -> (
     None
 ):
-    """P4 validates unselected factor bounds before writing its diagnostic."""
+    """Volume scaling validates unselected factor bounds before writing its
+    diagnostic.
+    """
     particles = _resampling_particles()
     demand = np.array([0.0], dtype=np.float64)
     flags = np.array([False], dtype=np.bool_)
@@ -1279,7 +1311,9 @@ def test_representative_volume_scaling_rejects_sidecar_schema_atomically(
     error: type[Exception],
     message: str,
 ) -> None:
-    """P4 reports stable sidecar schema failures before any caller write."""
+    """Volume scaling reports stable sidecar schema failures before any caller
+    write.
+    """
     particles = _resampling_particles()
     sidecars: dict[str, object] = {
         "provisional_source_demand": np.array([1.0], dtype=np.float64),
@@ -1330,7 +1364,9 @@ def test_representative_volume_scaling_rejects_sidecar_schema_atomically(
 def test_representative_volume_scaling_rejects_aliases_atomically(
     alias_target: str,
 ) -> None:
-    """P4 rejects diagnostic overlap before mutating particle state or sidecars."""
+    """Volume scaling rejects diagnostic overlap before mutating particle state
+    or sidecars.
+    """
     particles = _resampling_particles()
     demand = np.array([1.0], dtype=np.float64)
     resolved = (
@@ -1392,7 +1428,9 @@ def test_representative_volume_scaling_rejects_zero_capacity(
     masses: np.ndarray,
     message: str,
 ) -> None:
-    """P4 distinguishes valid empty boxes from rejected zero capacities."""
+    """Volume scaling distinguishes valid empty boxes from rejected zero
+    capacities.
+    """
     boxes, particles_count, species = masses.shape
     particles = ParticleData(
         masses=masses,
@@ -1492,7 +1530,9 @@ def _assert_ledger_equal(
 def test_resampling_sparse_source_fixture_and_highest_release_conserve() -> (
     None
 ):
-    """P2 preserves each box ledger before fixed downstream source insertion."""
+    """Resampling preserves each box ledger before fixed downstream source
+    insertion.
+    """
     particles = _resampling_particles(2)
     before = _direct_ledger(
         particles.masses,
@@ -1561,7 +1601,9 @@ def test_resampling_sparse_source_fixture_and_highest_release_conserve() -> (
 
 
 def test_resampling_all_inactive_zero_request_is_exact_noop() -> None:
-    """A valid empty P2 row does not alter particles or its immutable plan."""
+    """A valid empty resampling row does not alter particles or its immutable
+    plan.
+    """
     particles = _resampling_particles()
     particles.masses[:] = 0.0
     particles.concentration[:] = 0.0
@@ -1596,7 +1638,9 @@ def test_resampling_all_inactive_zero_request_is_exact_noop() -> None:
 
 
 def test_resampling_full_capacity_and_over_capacity_plan_rejection() -> None:
-    """Full P2 rows conserve directly; active-count releases fail before writes."""
+    """Full resampling rows conserve directly; active-count releases fail before
+    writes.
+    """
     particles = ParticleData(
         masses=np.array(
             [
@@ -1674,7 +1718,9 @@ def test_resampling_full_capacity_and_over_capacity_plan_rejection() -> None:
 
 
 def test_representative_scaling_source_fixture_uses_volume_ledger() -> None:
-    """P4 accounting is scaled particle inventory plus fixed external source."""
+    """Volume scaling accounting is scaled particle inventory plus fixed
+    external source.
+    """
     particles = _resampling_particles(2)
     particles.volume[:] = [4.0, 9.0]
     before = _direct_ledger(

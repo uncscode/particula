@@ -57,7 +57,9 @@ def _oracle_finalize(
     np.ndarray,
     np.ndarray,
 ]:
-    """Independently calculate the documented P2 float64 admission result."""
+    """Independently calculate the documented demand planning float64 admission
+    result.
+    """
     counts = np.asarray(molecule_counts, dtype=np.float64)
     per_event = (
         counts * np.asarray(molar_mass, dtype=np.float64) / AVOGADRO_NUMBER
@@ -128,7 +130,9 @@ def _assert_snapshot(
 def _all_mutable_arrays(
     particles: ParticleData, gas: GasData
 ) -> tuple[np.ndarray, ...]:
-    """Return every caller-owned mutable P3 particle and gas array."""
+    """Return every caller-owned mutable source transaction particle and gas
+    array.
+    """
     return (
         particles.masses,
         particles.concentration,
@@ -476,7 +480,9 @@ def test_finalization_rejects_mutated_gas_schemas_without_writing(
     mutate: object,
     match: str,
 ) -> None:
-    """P2 revalidates mutable gas schemas before any source calculation."""
+    """Demand planning revalidates mutable gas schemas before any source
+    calculation.
+    """
     gas = _gas(np.array([[1.0, 1.0, 1.0]]))
     mutate(gas)  # type: ignore[operator]
     concentration = gas.concentration.copy()
@@ -520,7 +526,9 @@ def test_finalization_rejects_malformed_gas_metadata_without_writing(
 
 
 def test_finalization_rejects_invalid_types_mass_and_derived_count() -> None:
-    """P2 rejects invalid boundary objects and nonphysical derived inputs."""
+    """Demand planning rejects invalid boundary objects and nonphysical derived
+    inputs.
+    """
     gas = _gas(np.array([[1.0, 1.0, 1.0]]))
     composition = InjectionComposition((1, 1, 0))
     events = PotentialEventData(np.array([1.0]), 1.0)
@@ -685,7 +693,7 @@ def test_finalization_avoids_intermediate_per_event_mass_overflow() -> None:
 
 
 def test_finalization_accepts_positive_infinite_inventory_ratio() -> None:
-    """Nonlimiting overflowing inventory ratios do not reject P2 planning."""
+    """Nonlimiting overflowing inventory ratios do not reject demand planning."""
     gas = _gas(np.array([[np.finfo(float).max, 1.0, 1.0]]))
 
     _, diagnostics = finalize_particle_source(
@@ -698,7 +706,7 @@ def test_finalization_accepts_positive_infinite_inventory_ratio() -> None:
 
 
 def test_concrete_p2_names_are_not_package_exports() -> None:
-    """P2 remains an intentionally concrete module-only boundary."""
+    """Demand planning remains an intentionally concrete module-only boundary."""
     for module in (nucleation, particula.dynamics):
         assert not hasattr(module, "PotentialEventData")
         assert not hasattr(module, "finalize_particle_source")
@@ -718,7 +726,9 @@ def _source_particles(boxes: int = 1, capacity: int = 3) -> ParticleData:
 def _commit_config(
     boxes: int = 1, scale: float = 1.0
 ) -> ParticleSourceCommitConfig:
-    """Build permissive immutable P3 controls for deterministic tests."""
+    """Build permissive immutable source transaction controls for deterministic
+    tests.
+    """
     return ParticleSourceCommitConfig(
         maximum_slot_weight=2.0,
         source_charge=1.0,
@@ -732,7 +742,9 @@ def _commit_config(
 def _p2_records(
     events: np.ndarray,
 ) -> tuple[SourceDemandData, SourceDiagnostics]:
-    """Build internally consistent one-species P2 records for P3 tests."""
+    """Build internally consistent one-species demand planning records for
+    source transaction tests.
+    """
     per_event = np.array([0.25])
     return (
         SourceDemandData(per_event, events[:, None] * per_event[None, :]),
@@ -746,7 +758,7 @@ def _p2_records(
 
 
 def _readonly(values: np.ndarray) -> np.ndarray:
-    """Return a detached read-only payload for P2 forgery checks."""
+    """Return a detached read-only payload for demand planning forgery checks."""
     copied = values.copy()
     copied.setflags(write=False)
     return copied
@@ -755,7 +767,9 @@ def _readonly(values: np.ndarray) -> np.ndarray:
 def test_commit_particle_source_activates_ascending_slots_and_conserves() -> (
     None
 ):
-    """P3 packages source demand equally and applies one atomic transfer."""
+    """Source transaction packages source demand equally and applies one atomic
+    transfer.
+    """
     particles = _source_particles(capacity=4)
     particles.masses[0, 1] = 0.5
     particles.concentration[0, 1] = 3.0
@@ -828,7 +842,9 @@ def test_commit_particle_source_uses_ceiling_slot_counts(
     event_count: float,
     expected_slots: int,
 ) -> None:
-    """P3 uses equal-weight prefixes at zero and ceiling-count boundaries."""
+    """Source transaction uses equal-weight prefixes at zero and ceiling-count
+    boundaries.
+    """
     particles = _source_particles(capacity=3)
     gas = GasData(
         name=["a"],
@@ -951,7 +967,7 @@ def test_commit_particle_source_scales_gas_and_particle_inventory() -> None:
 
 
 def test_commit_config_and_finalized_diagnostics_own_payloads() -> None:
-    """P3 immutable records detach caller vectors and arrays."""
+    """Source transaction immutable records detach caller vectors and arrays."""
     requested = np.array([1.0])
     minimum = np.array([1.0])
     minimum_volume = np.array([0.1])
@@ -1018,7 +1034,9 @@ def test_commit_particle_source_rejects_forged_p2_records_atomically(
     mutate: object,
     match: str,
 ) -> None:
-    """Forged immutable P2 payloads fail before staging can reach callers."""
+    """Forged immutable demand planning payloads fail before staging can reach
+    callers.
+    """
     particles = _source_particles()
     gas = GasData(
         name=["a"],
@@ -1050,7 +1068,7 @@ def test_commit_particle_source_rejects_forged_p2_records_atomically(
 
 
 def test_concrete_p3_names_are_not_package_exports() -> None:
-    """P3 remains intentionally concrete to particle_source."""
+    """Source transaction remains intentionally concrete to particle_source."""
     for module in (nucleation, particula.dynamics):
         assert not hasattr(module, "ParticleSourceCommitConfig")
         assert not hasattr(module, "FinalizedSourceDiagnostics")
@@ -1090,7 +1108,9 @@ def test_commit_config_rejects_invalid_controls_and_sidecars(
 
 
 def test_private_commit_helpers_validate_counts_schema_and_inventory() -> None:
-    """P3 helpers reject impossible counts and calculate weighted inventory."""
+    """Source transaction helpers reject impossible counts and calculate
+    weighted inventory.
+    """
     particles = _source_particles(capacity=2)
     particles.masses[0, 0, 0] = 2.0
     particles.concentration[0, 0] = 3.0
@@ -1124,7 +1144,9 @@ def test_private_commit_helpers_validate_counts_schema_and_inventory() -> None:
 def test_commit_rejects_nonwritable_or_noncontiguous_storage_without_writes(
     mutation: object,
 ) -> None:
-    """P3 validates caller-owned writable storage before detached staging."""
+    """Source transaction validates caller-owned writable storage before
+    detached staging.
+    """
     particles = _source_particles()
     gas = GasData(
         name=["a"],
@@ -1153,7 +1175,9 @@ def test_commit_rejects_nonwritable_or_noncontiguous_storage_without_writes(
 def test_commit_rejects_inconsistent_records_and_invalid_scaling_vectors() -> (
     None
 ):
-    """P3 rejects forged P2 relationships and invalid P4 relationships early."""
+    """Source transaction rejects forged demand planning relationships and
+    invalid public construction relationships early.
+    """
     particles = _source_particles()
     gas = GasData(
         name=["a"],
@@ -1354,7 +1378,9 @@ def test_commit_full_capacity_with_policies_off_preserves_all_storage() -> None:
 
 
 def test_commit_multibox_multispecies_conserves_each_box_and_species() -> None:
-    """P3 places independent requests and removes matching multi-species gas."""
+    """Source transaction places independent requests and removes matching
+    multi-species gas.
+    """
     particles = ParticleData(
         masses=np.zeros((2, 3, 2)),
         concentration=np.zeros((2, 3)),
@@ -1392,7 +1418,9 @@ def test_commit_multibox_multispecies_conserves_each_box_and_species() -> None:
 
 
 def test_commit_rejects_tiny_forged_gas_demand_atomically() -> None:
-    """A tolerance-sized forged P2 mass demand cannot activate a source slot."""
+    """A tolerance-sized forged demand planning mass demand cannot activate a
+    source slot.
+    """
     particles = _source_particles()
     gas = GasData(
         name=["a"],
@@ -1483,7 +1511,9 @@ def test_commit_rejects_gas_metadata_aliasing_atomically(metadata: str) -> None:
 def test_finalization_matches_independent_oracle_for_every_limiting_lane(
     limiting_lane: int,
 ) -> None:
-    """P2 admission selects each participating multi-species lane in turn."""
+    """Demand planning admission selects each participating multi-species lane
+    in turn.
+    """
     molecule_counts = (1, 2, 3, 0)
     molar_mass = np.array([0.1, 0.2, 0.3, 0.4], dtype=np.float64)
     per_event = np.asarray(molecule_counts, dtype=np.float64) * molar_mass
@@ -1556,7 +1586,9 @@ def test_finalization_oracle_covers_inert_and_no_participating_rows() -> None:
 
 
 def test_commit_multibox_oracle_proves_per_species_source_transfer() -> None:
-    """P2-to-P3 coupling conserves each box/species source transfer separately."""
+    """Demand planning-to-source transaction coupling conserves each box/species
+    source transfer separately.
+    """
     particles = ParticleData(
         masses=np.zeros((2, 4, 2), dtype=np.float64),
         concentration=np.zeros((2, 4), dtype=np.float64),
@@ -1616,7 +1648,9 @@ def test_commit_multibox_oracle_proves_per_species_source_transfer() -> None:
 
 
 def test_p2_and_p3_rejections_preserve_all_accessible_metadata() -> None:
-    """Invalid P2/P3 input is read-only; P3 has no caller diagnostic buffer."""
+    """Invalid demand planning/source transaction input is read-only; source
+    transaction has no caller diagnostic buffer.
+    """
     gas = _gas(np.array([[1.0, 1.0, 1.0]], dtype=np.float64))
     rate = np.array([1.0])
     rate_snapshot = _snapshot_arrays(rate)

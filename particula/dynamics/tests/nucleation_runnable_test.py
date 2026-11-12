@@ -103,7 +103,9 @@ def _admitted_diagnostics():
 
 
 def test_public_surface_exports_only_supported_p5_types():
-    """Dynamics exports P5 types without exposing P2/P3 transaction records."""
+    """Dynamics exports runnable execution types without exposing demand
+    planning/source transaction transaction records.
+    """
     assert particula.dynamics.Nucleation is particle_process.Nucleation
     assert particula.dynamics.NucleationCommitConfig is NucleationCommitConfig
     assert not hasattr(particula.dynamics, "ParticleSourceCommitConfig")
@@ -116,7 +118,9 @@ def test_public_surface_exports_only_supported_p5_types():
 
 
 def test_commit_config_owns_immutable_float64_sidecars():
-    """Public controls copy caller sidecars and preserve P3 scalar rules."""
+    """Public controls copy caller sidecars and preserve source transaction
+    scalar rules.
+    """
     requested = np.array([1.0], dtype=np.float32)
     config = NucleationCommitConfig(
         maximum_slot_weight=2.0,
@@ -139,7 +143,9 @@ def test_commit_config_owns_immutable_float64_sidecars():
 
 
 def test_rate_uses_backing_gas_and_omits_saturation_outside_domain():
-    """The P1 adapter supplies gas lane zero and None saturation as required."""
+    """The potential-rate evaluation adapter supplies gas lane zero and None
+    saturation as required.
+    """
     aerosol, _, gas, _ = _aerosol()
     runnable = _runnable()
     expected = runnable.source_config.strategy.potential_rate(
@@ -201,7 +207,9 @@ def test_constructor_rejects_wrong_top_level_configuration_types(
 
 
 def test_rate_rejects_invalid_topology_before_p1_and_preserves_state():
-    """Topology mismatch raises before P1 and leaves native storage untouched."""
+    """Topology mismatch raises before potential-rate evaluation and leaves
+    native storage untouched.
+    """
     aerosol, particles, gas, gas_only = _aerosol()
     particles.masses = np.zeros((1, 3, 2), dtype=np.float64)
     gas_before = gas.concentration.copy()
@@ -239,7 +247,9 @@ def test_execute_commits_each_positive_substep_and_preserves_identities(
 
 
 def test_real_execution_depletes_gas_and_never_touches_gas_only():
-    """P3 transfer changes only the supported particle and partitioning state."""
+    """Source transaction transfer changes only the supported particle and
+    partitioning state.
+    """
     aerosol, particles, gas, gas_only = _aerosol()
     initial_gas = gas.concentration.copy()
     initial_gas_only = gas_only.copy()
@@ -279,7 +289,9 @@ def test_invalid_substeps_fail_before_state_access(sub_steps):
 
 
 def test_excessive_substeps_fail_before_state_access_or_source_work():
-    """The bounded substep count rejects before topology or P1 evaluation."""
+    """The bounded substep count rejects before topology or potential-rate
+    evaluation evaluation.
+    """
     with pytest.raises(ValueError, match="must not exceed"):
         _runnable().execute(
             object(),
@@ -311,7 +323,9 @@ def test_maximum_substeps_are_accepted(monkeypatch: pytest.MonkeyPatch):
 
 
 def test_non_native_aggregate_fails_before_source_work(monkeypatch):
-    """Non-native aggregate objects reject before any P1 source evaluation."""
+    """Non-native aggregate objects reject before any potential-rate evaluation
+    source evaluation.
+    """
     runnable = _runnable()
     monkeypatch.setattr(
         runnable,
@@ -456,7 +470,9 @@ def test_zero_duration_validates_topology_without_source_work(monkeypatch):
     ],
 )
 def test_commit_config_rejects_invalid_controls(field, value, exception):
-    """Commit controls enforce P3-compatible scalar and sidecar validation."""
+    """Commit controls enforce source transaction-compatible scalar and sidecar
+    validation.
+    """
     controls = {
         "maximum_slot_weight": 1.0,
         "source_charge": 0.0,
@@ -493,7 +509,9 @@ def test_invalid_duration_fails_before_topology_or_source_work(
 
 
 def test_execute_skips_transactions_for_zero_rate(monkeypatch):
-    """An exact zero P1 rate is a write-free skip for every substep."""
+    """An exact zero potential-rate evaluation rate is a write-free skip for
+    every substep.
+    """
     aerosol, particles, gas, gas_only = _aerosol()
     snapshots = [
         particles.masses.copy(),
@@ -531,7 +549,9 @@ def test_execute_skips_transactions_for_zero_rate(monkeypatch):
 def test_execute_stops_after_deterministic_zero_admission(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """A zero P2 admission avoids repeated no-op substep transactions."""
+    """A zero demand planning admission avoids repeated no-op substep
+    transactions.
+    """
     aerosol, _, _, _ = _aerosol()
     runnable = _runnable()
     finalizations = 0
@@ -561,7 +581,9 @@ def test_execute_stops_after_deterministic_zero_admission(
 def test_execute_uses_equal_duration_and_immutable_config_per_positive_substep(
     monkeypatch: pytest.MonkeyPatch,
 ):
-    """Positive rates build equal-duration P2 records using immutable controls."""
+    """Positive rates build equal-duration demand planning records using
+    immutable controls.
+    """
     aerosol, _, gas, _ = _aerosol()
     runnable = _runnable()
     rates = iter((2.0, 3.0))
@@ -594,7 +616,9 @@ def test_execute_uses_equal_duration_and_immutable_config_per_positive_substep(
 def test_later_substep_rate_uses_gas_depleted_by_prior_commit(
     monkeypatch: pytest.MonkeyPatch,
 ):
-    """Each P1 rate observes the live precursor gas after the preceding P3."""
+    """Each potential-rate evaluation rate observes the live precursor gas after
+    the preceding source transaction.
+    """
     aerosol, _, gas, _ = _aerosol()
     runnable = _runnable()
     observed_rates: list[float] = []
@@ -626,7 +650,9 @@ def test_later_substep_rate_uses_gas_depleted_by_prior_commit(
 def test_real_substeps_read_current_gas_and_match_independent_transfer_math(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """The single-box P5 path recomputes deterministic source demand per step."""
+    """The single-box runnable execution path recomputes deterministic source
+    demand per step.
+    """
     aerosol, particles, gas, _ = _aerosol()
     runnable = _runnable()
     observed_gas: list[float] = []
@@ -674,7 +700,9 @@ def test_real_substeps_read_current_gas_and_match_independent_transfer_math(
 
 
 def test_source_errors_propagate_and_stop_later_stages(monkeypatch):
-    """P1 and P2 errors retain identity and do not invoke later boundaries."""
+    """potential-rate evaluation and demand planning errors retain identity and
+    do not invoke later boundaries.
+    """
     aerosol, _, gas, _ = _aerosol()
     runnable = _runnable()
     p1_error = RuntimeError("p1")
@@ -728,7 +756,9 @@ def test_execute_preflights_current_state_each_substep(
 def test_later_commit_failure_preserves_prior_substep(
     monkeypatch: pytest.MonkeyPatch,
 ):
-    """A failing later P3 transaction does not roll back an earlier commit."""
+    """A failing later source transaction transaction does not roll back an
+    earlier commit.
+    """
     aerosol, _, gas, _ = _aerosol()
     runnable = _runnable()
     commits = 0
@@ -757,7 +787,9 @@ def test_later_commit_failure_preserves_prior_substep(
 
 
 def test_real_later_commit_failure_preserves_prior_substep() -> None:
-    """A real failed P3 commit preserves the prior runnable substep state."""
+    """A real failed source transaction commit preserves the prior runnable
+    substep state.
+    """
     expected_aerosol, expected_particles, expected_gas, _ = _aerosol(capacity=1)
     runnable = _runnable()
     assert runnable.execute(expected_aerosol, 0.5) is expected_aerosol

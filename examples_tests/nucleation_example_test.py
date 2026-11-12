@@ -16,7 +16,9 @@ EXAMPLE_TIMEOUT_SECONDS = 30
 
 
 def test_cpu_nucleation_example_uses_public_imports_without_source_helpers():
-    """The runnable example stays on public APIs rather than P2/P3 helpers."""
+    """The runnable example stays on public APIs rather than demand
+    planning/source transaction helpers.
+    """
     tree = ast.parse(EXAMPLE.read_text(encoding="utf-8"))
     imports = {
         node.module

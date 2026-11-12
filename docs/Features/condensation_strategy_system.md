@@ -5,7 +5,7 @@ see [native scientific process calls](native_scientific_processes.md).
 
 ## Complete direct-process context
 
-The direct condensation call begins the illustrative [explicit-transfer sequence](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py). The [private P2 evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py) and [P3 regression](https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_complete_process_sequence_example_test.py) preserve caller-owned sidecars and do not claim a high-level coordinator, resident loop, hidden transfer, or CPU fallback.
+The direct condensation call begins the illustrative [explicit-transfer sequence](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py). The [direct-process validation evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py) and [example regression](https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_complete_process_sequence_example_test.py) preserve caller-owned sidecars and do not claim a high-level coordinator, resident loop, hidden transfer, or CPU fallback.
 
 > Strategy-based condensation and evaporation with unified dynamics APIs, staggered Gauss-Seidel updates for stability, and runnable integration.
 
@@ -48,7 +48,7 @@ This feature is built around user-facing APIs exposed via
   transport_k`, `get_mass_transfer`, `get_radius_transfer_rate` for reference
   and lower-level workflows.
 
-## Native data contract (E9-M3)
+## Native data contract (v0.3.0)
 
 Direct native calls to `CondensationIsothermal`,
 `CondensationIsothermalStaggered`, and `CondensationLatentHeat` accept tagged
@@ -135,7 +135,7 @@ condensation subpackage:
 Run the following setup once before the other Python snippets on this page.
 Each recipe then creates fresh aligned state with the indicated molar masses;
 no recipe silently reuses a different species layout. These examples require
-the selected E9 checkout (`pip install -e .`). The shared illustrative PMF uses
+the v0.3.0 development checkout (`pip install -e .`). The shared illustrative PMF uses
 64 nodes over 50–500 nm, mode 100 nm, GSD 1.5 and 1e8 m⁻³; resolved examples
 use two unit-count slots in 1e-6 m³. The discrete quick start below retains the
 default two-mode, 250-bin initializer. Vapor pressures are prescribed at
@@ -320,7 +320,7 @@ reference volume. Condensation is positive and evaporation negative. The
 example regression checks this against the actual particle inventory change;
 it is a per-call diagnostic, not a temperature-evolution model.
 
-For the current shipped support boundary, E3-F7 is the executable CPU
+For the current shipped support boundary, CPU latent-heat conservation is the executable CPU
 integration baseline for future Epic D GPU parity work:
 `particula/integration_tests/condensation_latent_heat_conservation_test.py`.
 It verifies only a finite nonzero condensation transfer, particle water
@@ -333,7 +333,7 @@ optional per-species latent-rate correction in each of its four equal
 substeps, with CPU-oracle/Warp parity coverage. Omitting `latent_heat`, or
 using a zero entry for a species, retains that species' isothermal rate path.
 This is diagnostic bookkeeping, not temperature feedback or strategy/runnable
-thermal coupling. The direct path mutates gas concentration and its P2
+thermal coupling. The direct path mutates gas concentration and its inventory finalization
 finalization conserves particle-plus-gas inventory per box and species. It does
 not provide strategy/runnable-level latent-heat support; the separate
 `energy_transfer` diagnostic is described below.
@@ -653,7 +653,7 @@ particle, gas = staggered.step(
 
 ## Prerequisites
 
-- The selected E9 checkout installed with `pip install -e .`.
+- The v0.3.0 development checkout installed with `pip install -e .`.
 - Native `ParticleData` with an explicit population kind.
 - `GasData`, aligned `EnvironmentData`, and process-owned vapor properties and mapping.
 - Familiarity with particula dynamics and examples.
@@ -921,18 +921,18 @@ concentration by the matching particle-concentration-weighted amount. Later
 proposals therefore see gas concentration coupled by earlier substeps.
 Vapor-pressure refresh is temperature-driven and does not read gas
 concentration. The resolved total transfer buffer is cleared once after
-preflight, accumulates P2-finalized transfer, and is returned by identity when
+preflight, accumulates inventory-limited transfer, and is returned by identity when
 supplied. Work storage keeps only the final raw proposal. Production
 calculations make no hidden data CPU↔Warp transfers. CUDA validation reads small
 device status flags with `.numpy()`, which synchronizes execution but does not
 transfer or mutate caller-owned simulation buffers.
 
-Invalid primary P2 state or supplied P2 sidecars fail during aggregate
+Invalid primary inventory finalization state or supplied inventory finalization sidecars fail during aggregate
 preflight, before launches or caller-buffer mutation. A non-finite fresh raw
-proposal fails before P2 finalization for that substep; completed earlier
+proposal fails before inventory finalization finalization for that substep; completed earlier
 substeps remain applied. The failed cycle may already have written raw work,
 `gas.vapor_pressure`, and supplied dynamic-viscosity, mean-free-path, or
-composition-weighted surface-tension workspaces, but not P2 inventories or
+composition-weighted surface-tension workspaces, but not inventory finalization inventories or
 energy output. Retain or restore caller-owned snapshots when a failed call must
 be retried from its original state.
 
@@ -961,9 +961,9 @@ deferred and unused.
 
 This is diagnostic bookkeeping, not temperature feedback, gas mutation or
 gas/full-system conservation. The direct step couples finalized particle and
-gas transfer through its stated P2-finalized direct coupling, but does not add strategy/
+gas transfer through its stated inventory-limited direct coupling, but does not add strategy/
 `Runnable` integration, adaptive stepping, graph capture/replay, autodiff
-guarantees, or complete E4-F6 cross-device certification.
+guarantees, or complete condensation parity cross-device certification.
 
 The [GPU condensation parity walkthrough](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_condensation_parity_walkthrough.py)
 separately reports physics, conservation, and energy evidence for this
@@ -978,17 +978,17 @@ Focused fixed-four-substep direct-kernel evidence commands are:
 `python docs/Examples/gpu_condensation_parity_walkthrough.py` and
 `pytest examples_tests/gpu_condensation_parity_walkthrough_test.py -q -Werror`.
 
-#### P1--P4 direct-condensation evidence
+#### Direct-condensation evidence
 
 | Evidence | Discoverable wrapper | Bounded result and backend |
 | --- | --- | --- |
-| P1 parity | `particula/gpu/kernels/tests/condensation_test.py` | An independent NumPy fixed-four-substep oracle separately compares final particle masses and gas concentrations for one/multi-box and multi-species cases. Warp CPU is the normal backend when Warp is installed; CUDA is optional additive evidence. |
-| P2 conservation and contracts | `particula/gpu/kernels/tests/condensation_test.py` | Separate concentration-weighted particle-plus-gas inventory checks use `rtol=1e-12`, distinct from P1 parity. The wrapper also covers in-place mutation and caller-owned output contracts. |
-| P3 capture limit | `particula/gpu/kernels/tests/condensation_graph_capture_test.py` | Warp CPU capture is capability-skipped because Warp capture requires CUDA. On CUDA, only the public-step host-validation readback inside capture is strict-xfailed; setup and normal calls must still pass. This records an unsupported capability, not replay support. |
-| P4 raw-rate autodiff | `particula/gpu/kernels/tests/condensation_autodiff_test.py` | A one-box fp64 out-of-place `condensation_mass_transfer_kernel` Tape derivative is compared with centered finite differences only in the interior, where P2 positivity and inventory boundaries are inactive. Warp CPU is the normal backend; CUDA is optional. |
+| Independent parity | `particula/gpu/kernels/tests/condensation_test.py` | An independent NumPy fixed-four-substep oracle separately compares final particle masses and gas concentrations for one/multi-box and multi-species cases. Warp CPU is the normal backend when Warp is installed; CUDA is optional additive evidence. |
+| Conservation and contracts | `particula/gpu/kernels/tests/condensation_test.py` | Separate concentration-weighted particle-plus-gas inventory checks use `rtol=1e-12`, distinct from independent parity. The wrapper also covers in-place mutation and caller-owned output contracts. |
+| Capture limit | `particula/gpu/kernels/tests/condensation_graph_capture_test.py` | Warp CPU capture is capability-skipped because Warp capture requires CUDA. On CUDA, only the public-step host-validation readback inside capture is strict-xfailed; setup and normal calls must still pass. This records an unsupported capability, not replay support. |
+| Raw-rate autodiff | `particula/gpu/kernels/tests/condensation_autodiff_test.py` | A one-box fp64 out-of-place `condensation_mass_transfer_kernel` Tape derivative is compared with centered finite differences only in the interior, where inventory finalization positivity and inventory boundaries are inactive. Warp CPU is the normal backend; CUDA is optional. |
 
-This matrix is evidence for `condensation_step_gpu` (P1--P3) or the raw
-`condensation_mass_transfer_kernel` (P4) only. It establishes no CPU strategy
+This matrix is evidence for `condensation_step_gpu` (proposal gating--thermal correction) or the raw
+`condensation_mass_transfer_kernel` (validation) only. It establishes no CPU strategy
 or `Runnable` equivalence, performance target, adaptive stepping, new API,
 general graph replay, or general differentiability claim. For focused,
 warning-clean coverage, run:
@@ -1005,7 +1005,7 @@ pytest particula/gpu/kernels/tests/condensation_autodiff_test.py -q -m "warp and
 ```
 
 Warp-backed tests may skip when Warp is missing. CUDA evidence is optional when
-CUDA is unavailable; a skip is not GPU execution. P3's CPU skip and narrowly
+CUDA is unavailable; a skip is not GPU execution. thermal correction's CPU skip and narrowly
 scoped CUDA strict expected failure document the public-step host-readback
 limitation rather than a successful capture replay.
 
@@ -1028,7 +1028,7 @@ and its [GPU thermodynamics and condensation refresh record](data-containers-and
 
 Warp delegation executes exactly four equal `time_step / 4.0` substeps. Each
 substep overwrites and refreshes temperature-driven vapor pressure, then applies
-P2 inventory-limited particle/gas coupling. It mutates particle masses, gas
+inventory finalization inventory-limited particle/gas coupling. It mutates particle masses, gas
 concentration, and derived GPU vapor pressure in place. The caller owns supplied
 finalized total-transfer output, scratch/work storage, `latent_heat`, write-only
 `energy_transfer`, and validated but deferred `thermal_work` sidecars. Omitted
@@ -1037,7 +1037,7 @@ validation may perform permitted device scans or status readbacks. Adapter
 dispatch itself performs no hidden transfer, restore, retry, or CPU fallback,
 and callers synchronize before host observation.
 
-Bounded integration fixtures use an independent fixed-four-substep P2 oracle
+Bounded integration fixtures use an independent fixed-four-substep inventory finalization oracle
 that separately compares particle mass and gas concentration at
 `rtol=1e-10, atol=1e-30`. Inventory is checked separately. Warp CPU is the
 installed-Warp baseline, and CUDA rows are optional guarded evidence. This does
@@ -1062,7 +1062,7 @@ and resident guides define their separate scheduling and lifecycle scope.
 
 - **Dynamics overview**: [Wall loss strategy system](./wall_loss_strategy_system.md)
 - **Examples**: [docs/Examples/Simulations/index.md](../Examples/Simulations/index.md)
-- **Latent-heat example (E3-F6)**: [CPU latent-heat condensation bookkeeping](../Examples/Dynamics/Condensation/Condensation_Latent_Heat.ipynb)
+- **Latent-heat example (latent-heat example)**: [CPU latent-heat condensation bookkeeping](../Examples/Dynamics/Condensation/Condensation_Latent_Heat.ipynb)
 - **CPU integration baseline**: `particula/integration_tests/condensation_latent_heat_conservation_test.py`
 - **Theory**: [docs/Theory/index.md](../Theory/index.md)
 

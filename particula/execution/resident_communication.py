@@ -1,6 +1,7 @@
 """Compose pinned communication resources into resident barrier calls.
 
-This concrete-only module validates and freezes a READY P1 binding for
+This concrete-only module validates and freezes a READY map validation binding
+for
 already-acquired closed-map communication and optional volume evolution. Its
 prepared enqueue dispatches only those retained device barriers, without
 repeated host/setup metadata validation, acquisition, host conversion,
@@ -100,7 +101,8 @@ class ResidentCommunicationRequest:
 class PreparedResidentCommunicationBinding:
     """Freeze a validated closed communication barrier for device enqueue.
 
-    This concrete-only carrier retains P1, request, primary, map, work, and
+    This concrete-only carrier retains map validation, request, primary, map,
+    work, and
     optional-volume identities after setup-time validation. Enqueue repeats no
     host/setup metadata validation and performs no lookup, allocation, transfer,
     host readback, synchronization, or fallback. Retained native barriers still
@@ -111,7 +113,8 @@ class PreparedResidentCommunicationBinding:
     launches, rollback is not promised.
 
     Attributes:
-        prepared_timestep: Exact READY P1 timestep retained by identity.
+        prepared_timestep: Exact READY map validation timestep retained by
+            identity.
         request: Validated resident communication request retained by identity.
         masses: Resident particle mass array.
         particle_concentration: Resident particle concentration array.
@@ -193,22 +196,26 @@ def _enqueue_prepared_noop() -> None:
 def setup_prepared_resident_communication(  # noqa: C901
     prepared_timestep: object, request: object
 ) -> PreparedResidentCommunicationBinding:
-    """Validate P1/request identities and freeze a closed native barrier.
+    """Validate map validation/request identities and freeze a closed native
+        barrier.
 
     Setup is read-only and may perform registry/request metadata validation. The
     returned concrete-only binding retains all dispatch inputs by identity for a
     later enqueue; it neither opens a guard nor launches a native writer.
 
     Args:
-        prepared_timestep: Exact READY P1 timestep for the complete request.
-        request: Exact resident communication request attached to that P1 input.
+        prepared_timestep: Exact READY map validation timestep for the complete
+            request.
+        request: Exact resident communication request attached to that map
+            validation input.
 
     Returns:
         Frozen identity-semantic prepared communication binding.
 
     Raises:
         TypeError: If either supplied carrier has an invalid exact type.
-        ValueError: If P1, resource, graph, primary, or map bindings drift.
+        ValueError: If map validation, resource, graph, primary, or map bindings
+            drift.
     """
     if type(prepared_timestep) is not PreparedResidentTimestep:
         raise TypeError(
@@ -504,11 +511,13 @@ class ResidentCommunicationExecutor:
         self._request = request
 
     def validate(self) -> None:
-        """Validate identity and metadata without P1 scans or allocation.
+        """Validate identity and metadata without map validation scans or
+            allocation.
 
-        Validation delegates only to the registry's metadata seam and verifies
+        validation delegates only to the registry's metadata seam and verifies
         resolver provenance plus exact barrier-node identities. It performs no
-        configuration acquisition or P1 scan, payload readback, transfer,
+        configuration acquisition or map validation scan, payload readback,
+        transfer,
         synchronization, allocation, primitive dispatch, or mutation.
 
         Raises:

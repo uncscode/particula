@@ -39,7 +39,7 @@ Example:
 
 # %%
 # In Colab uncomment the following command to install particula:
-# Use the selected E9 checkout: `python -m pip install -e ".[extra]"`
+# Use the v0.3.0 development checkout: `python -m pip install -e ".[extra]"`
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
