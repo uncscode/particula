@@ -104,6 +104,9 @@ construction or migration steps. Do not strip a native tag to cross a bridge.
 The particle facade, its builders/factory and both particle conversion bridges
 have been removed from the v0.3.0 development tree. Import native particle
 initializers or `ParticleDataBuilder` directly from `particula.particles`.
+The `from_species()` and `to_species()` gas bridges have also been removed.
+Construct `GasData` or use `GasDataBuilder`, preserving full ordered species
+and mixed partitioning masks; use `copy()` for detached native storage.
 
 | Historical API | Native replacement |
 |---|---|

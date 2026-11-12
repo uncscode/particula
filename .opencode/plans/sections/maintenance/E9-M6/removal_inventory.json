@@ -4862,7 +4862,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Removed species conversion bridges and facade-only tests; native GasData unchanged. Fourteen original test bodies mapped in gas_bridge_assertions.json.",
       "test_nodes": []
     },
     {
@@ -5790,7 +5790,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Removed species conversion bridges and facade-only tests; native GasData unchanged. Fourteen original test bodies mapped in gas_bridge_assertions.json.",
       "test_nodes": [
         {
           "name": "test_valid_single_box",

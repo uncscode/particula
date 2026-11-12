@@ -1,0 +1,100 @@
+[
+  {
+    "file": "particula/gas/tests/gas_data_test.py",
+    "test": "TestFromSpecies::test_single_species_conversion",
+    "original": "def test_single_species_conversion(self) -> None:\n        \"\"\"Convert single-species GasSpecies to GasData.\"\"\"\n        vapor_pressure = ConstantVaporPressureStrategy(2330.0)\n        species = GasSpecies(\n            name=\"Water\",\n            molar_mass=0.018,\n            vapor_pressure_strategy=vapor_pressure,\n            partitioning=True,\n            concentration=1e-6,  # kg/m^3\n        )\n\n        gas_data = from_species(species)\n\n        assert gas_data.n_boxes == 1\n        assert gas_data.n_species == 1\n        assert gas_data.name == [\"Water\"]\n        npt.assert_allclose(gas_data.molar_mass, np.array([0.018]))\n        assert gas_data.concentration.shape == (1, 1)\n        np.testing.assert_array_equal(gas_data.partitioning, np.array([True]))",
+    "successor": "particula/gas/tests/gas_data_test.py::test_native_storage_preserves_bridge_fields",
+    "disposition": "Native single/multispecies construction and detached copy preserve ordered names, molar mass, kg/m^3 concentration, full partitioning mask and each box; no facade or physics object is needed for storage."
+  },
+  {
+    "file": "particula/gas/tests/gas_data_test.py",
+    "test": "TestFromSpecies::test_multi_species_conversion",
+    "original": "def test_multi_species_conversion(self) -> None:\n        \"\"\"Convert multi-species GasSpecies (built with +=) to GasData.\"\"\"\n        vp1 = ConstantVaporPressureStrategy(2330.0)\n        vp2 = ConstantVaporPressureStrategy(1000.0)\n\n        species1 = GasSpecies(\n            name=\"Water\",\n            molar_mass=0.018,\n            vapor_pressure_strategy=vp1,\n            partitioning=True,\n            concentration=1e-6,\n        )\n        species2 = GasSpecies(\n            name=\"Ammonia\",\n            molar_mass=0.017,\n            vapor_pressure_strategy=vp2,\n            partitioning=True,\n            concentration=2e-6,\n        )\n        species1 += species2\n\n        gas_data = from_species(species1)\n\n        assert gas_data.n_boxes == 1\n        assert gas_data.n_species == 2\n        assert gas_data.name == [\"Water\", \"Ammonia\"]\n        npt.assert_allclose(gas_data.molar_mass, np.array([0.018, 0.017]))\n        assert gas_data.concentration.shape == (1, 2)\n        np.testing.assert_array_equal(\n            gas_data.partitioning, np.array([True, True])\n        )",
+    "successor": "particula/gas/tests/gas_data_test.py::test_native_storage_preserves_bridge_fields",
+    "disposition": "Native single/multispecies construction and detached copy preserve ordered names, molar mass, kg/m^3 concentration, full partitioning mask and each box; no facade or physics object is needed for storage."
+  },
+  {
+    "file": "particula/gas/tests/gas_data_test.py",
+    "test": "TestFromSpecies::test_n_boxes_replication",
+    "original": "def test_n_boxes_replication(self) -> None:\n        \"\"\"from_species with n_boxes>1 replicates concentration correctly.\"\"\"\n        vapor_pressure = ConstantVaporPressureStrategy(2330.0)\n        species = GasSpecies(\n            name=\"Water\",\n            molar_mass=0.018,\n            vapor_pressure_strategy=vapor_pressure,\n            partitioning=True,\n            concentration=1e-6,\n        )\n\n        gas_data = from_species(species, n_boxes=5)\n\n        assert gas_data.n_boxes == 5\n        assert gas_data.n_species == 1\n        assert gas_data.concentration.shape == (5, 1)\n        # All boxes should have the same concentration\n        for i in range(5):\n            npt.assert_allclose(\n                gas_data.concentration[i, :], gas_data.concentration[0, :]\n            )",
+    "successor": "particula/gas/tests/gas_data_test.py::test_native_storage_preserves_bridge_fields",
+    "disposition": "Native single/multispecies construction and detached copy preserve ordered names, molar mass, kg/m^3 concentration, full partitioning mask and each box; no facade or physics object is needed for storage."
+  },
+  {
+    "file": "particula/gas/tests/gas_data_test.py",
+    "test": "TestFromSpecies::test_concentration_passthrough",
+    "original": "def test_concentration_passthrough(self) -> None:\n        \"\"\"Verify kg/m^3 concentrations are copied without conversion.\"\"\"\n        molar_mass = 0.018  # kg/mol (water)\n        concentration_kg = 1e-6  # kg/m^3\n\n        vapor_pressure = ConstantVaporPressureStrategy(2330.0)\n        species = GasSpecies(\n            name=\"Water\",\n            molar_mass=molar_mass,\n            vapor_pressure_strategy=vapor_pressure,\n            partitioning=True,\n            concentration=concentration_kg,\n        )\n\n        gas_data = from_species(species)\n\n        npt.assert_allclose(gas_data.concentration[0, 0], concentration_kg)",
+    "successor": "particula/gas/tests/gas_data_test.py::test_native_storage_preserves_bridge_fields",
+    "disposition": "Native single/multispecies construction and detached copy preserve ordered names, molar mass, kg/m^3 concentration, full partitioning mask and each box; no facade or physics object is needed for storage."
+  },
+  {
+    "file": "particula/gas/tests/gas_data_test.py",
+    "test": "TestToSpecies::test_single_species_conversion",
+    "original": "def test_single_species_conversion(self) -> None:\n        \"\"\"Convert GasData to single-species GasSpecies.\"\"\"\n        gas_data = GasData(\n            name=[\"Water\"],\n            molar_mass=np.array([0.018]),\n            concentration=np.array([[1e-6]]),  # kg/m^3\n            partitioning=np.array([True]),\n        )\n        strategy = ConstantVaporPressureStrategy(2330.0)\n\n        species = to_species(gas_data, [strategy])\n\n        assert species.get_name() == \"Water\"\n        npt.assert_allclose(species.get_molar_mass(), 0.018)\n        assert species.get_partitioning() is True\n        npt.assert_allclose(species.get_concentration(), 1e-6, rtol=1e-10)",
+    "successor": "particula/gas/tests/gas_data_test.py::test_native_storage_preserves_bridge_fields",
+    "disposition": "Native single/multispecies construction and detached copy preserve ordered names, molar mass, kg/m^3 concentration, full partitioning mask and each box; no facade or physics object is needed for storage."
+  },
+  {
+    "file": "particula/gas/tests/gas_data_test.py",
+    "test": "TestToSpecies::test_multi_species_conversion",
+    "original": "def test_multi_species_conversion(self) -> None:\n        \"\"\"Convert GasData to multi-species GasSpecies.\"\"\"\n        gas_data = GasData(\n            name=[\"Water\", \"Ammonia\"],\n            molar_mass=np.array([0.018, 0.017]),\n            concentration=np.array([[1e-6, 2e-6]]),  # kg/m^3\n            partitioning=np.array([True, True]),\n        )\n        strategies = [\n            ConstantVaporPressureStrategy(2330.0),\n            ConstantVaporPressureStrategy(1000.0),\n        ]\n\n        species = to_species(gas_data, strategies)\n\n        assert len(species) == 2\n        np.testing.assert_array_equal(\n            species.get_name(), np.array([\"Water\", \"Ammonia\"])\n        )\n        npt.assert_allclose(species.get_molar_mass(), np.array([0.018, 0.017]))\n        assert species.get_partitioning() is True",
+    "successor": "particula/gas/tests/gas_data_test.py::test_native_storage_preserves_bridge_fields",
+    "disposition": "Native single/multispecies construction and detached copy preserve ordered names, molar mass, kg/m^3 concentration, full partitioning mask and each box; no facade or physics object is needed for storage."
+  },
+  {
+    "file": "particula/gas/tests/gas_data_test.py",
+    "test": "TestToSpecies::test_box_index_selection",
+    "original": "def test_box_index_selection(self) -> None:\n        \"\"\"Verify box_index parameter selects correct concentration.\"\"\"\n        gas_data = GasData(\n            name=[\"Water\"],\n            molar_mass=np.array([0.018]),\n            concentration=np.array([[1e-6], [2e-6], [3e-6]]),  # 3 boxes\n            partitioning=np.array([True]),\n        )\n        strategy = ConstantVaporPressureStrategy(2330.0)\n\n        species_box0 = to_species(gas_data, [strategy], box_index=0)\n        species_box1 = to_species(gas_data, [strategy], box_index=1)\n        species_box2 = to_species(gas_data, [strategy], box_index=2)\n\n        npt.assert_allclose(species_box0.get_concentration(), 1e-6, rtol=1e-10)\n        npt.assert_allclose(species_box1.get_concentration(), 2e-6, rtol=1e-10)\n        npt.assert_allclose(species_box2.get_concentration(), 3e-6, rtol=1e-10)",
+    "successor": "particula/gas/tests/gas_data_test.py::test_native_storage_preserves_bridge_fields",
+    "disposition": "Native single/multispecies construction and detached copy preserve ordered names, molar mass, kg/m^3 concentration, full partitioning mask and each box; no facade or physics object is needed for storage."
+  },
+  {
+    "file": "particula/gas/tests/gas_data_test.py",
+    "test": "TestToSpecies::test_strategy_length_mismatch_raises",
+    "original": "def test_strategy_length_mismatch_raises(self) -> None:\n        \"\"\"ValueError when strategies length doesn't match n_species.\"\"\"\n        gas_data = GasData(\n            name=[\"Water\", \"Ammonia\"],\n            molar_mass=np.array([0.018, 0.017]),\n            concentration=np.array([[1e-6, 2e-6]]),\n            partitioning=np.array([True, True]),\n        )\n        strategy = ConstantVaporPressureStrategy(2330.0)\n\n        with pytest.raises(ValueError, match=\"doesn't match n_species\"):\n            to_species(gas_data, [strategy])",
+    "successor": "particula/tests/legacy_api_removal_test.py::test_removed_gas_bridge",
+    "disposition": "Bridge-only strategy list, box selection and deprecation behavior retired with converter. Removed concrete/package/root imports are tested explicitly. Native storage has no thermodynamic strategy field."
+  },
+  {
+    "file": "particula/gas/tests/gas_data_test.py",
+    "test": "TestToSpecies::test_box_index_out_of_range_raises",
+    "original": "def test_box_index_out_of_range_raises(self) -> None:\n        \"\"\"IndexError when box_index >= n_boxes.\"\"\"\n        gas_data = GasData(\n            name=[\"Water\"],\n            molar_mass=np.array([0.018]),\n            concentration=np.array([[1e-6], [2e-6]]),  # 2 boxes\n            partitioning=np.array([True]),\n        )\n        strategy = ConstantVaporPressureStrategy(2330.0)\n\n        with pytest.raises(IndexError, match=\"out of range\"):\n            to_species(gas_data, [strategy], box_index=2)",
+    "successor": "particula/tests/legacy_api_removal_test.py::test_removed_gas_bridge",
+    "disposition": "Bridge-only strategy list, box selection and deprecation behavior retired with converter. Removed concrete/package/root imports are tested explicitly. Native storage has no thermodynamic strategy field."
+  },
+  {
+    "file": "particula/gas/tests/gas_data_test.py",
+    "test": "TestToSpecies::test_to_species_no_deprecation_log",
+    "original": "def test_to_species_no_deprecation_log(self, caplog) -> None:\n        \"\"\"to_species uses from_data and emits no deprecation log.\"\"\"\n        particula_logger = logging.getLogger(\"particula\")\n        old_propagate = particula_logger.propagate\n        particula_logger.propagate = True\n        caplog.set_level(logging.INFO, logger=\"particula\")\n\n        gas_data = GasData(\n            name=[\"Water\"],\n            molar_mass=np.array([0.018]),\n            concentration=np.array([[1e-6]]),\n            partitioning=np.array([True]),\n        )\n        strategy = ConstantVaporPressureStrategy(2330.0)\n\n        caplog.clear()\n        _ = to_species(gas_data, [strategy])\n\n        assert _DEPRECATION_MESSAGE not in caplog.text\n        particula_logger.propagate = old_propagate",
+    "successor": "particula/tests/legacy_api_removal_test.py::test_removed_gas_bridge",
+    "disposition": "Bridge-only strategy list, box selection and deprecation behavior retired with converter. Removed concrete/package/root imports are tested explicitly. Native storage has no thermodynamic strategy field."
+  },
+  {
+    "file": "particula/gas/tests/gas_data_test.py",
+    "test": "TestToSpecies::test_mixed_partitioning_raises",
+    "original": "def test_mixed_partitioning_raises(self) -> None:\n        \"\"\"ValueError when GasData has mixed partitioning values.\"\"\"\n        gas_data = GasData(\n            name=[\"Water\", \"Ammonia\"],\n            molar_mass=np.array([0.018, 0.017]),\n            concentration=np.array([[1e-6, 2e-6]]),\n            partitioning=np.array([True, False]),  # Mixed!\n        )\n        strategies = [\n            ConstantVaporPressureStrategy(2330.0),\n            ConstantVaporPressureStrategy(1000.0),\n        ]\n\n        with pytest.raises(ValueError, match=\"mixed partitioning\"):\n            to_species(gas_data, strategies)",
+    "successor": "particula/gas/tests/gas_data_test.py::test_native_storage_preserves_bridge_fields",
+    "disposition": "Obsolete uniform-partitioning facade limitation removed. Native mixed and all-false masks remain intact rather than rejecting or splitting species."
+  },
+  {
+    "file": "particula/gas/tests/gas_data_test.py",
+    "test": "TestRoundTrip::test_round_trip_single_species",
+    "original": "def test_round_trip_single_species(self) -> None:\n        \"\"\"Round-trip conversion preserves data within precision.\"\"\"\n        vapor_pressure = ConstantVaporPressureStrategy(2330.0)\n        original = GasSpecies(\n            name=\"Water\",\n            molar_mass=0.018,\n            vapor_pressure_strategy=vapor_pressure,\n            partitioning=True,\n            concentration=1e-6,  # kg/m^3\n        )\n\n        # Convert to GasData and back\n        gas_data = from_species(original)\n        recovered = to_species(gas_data, [vapor_pressure])\n\n        assert recovered.get_name() == original.get_name()\n        npt.assert_allclose(\n            recovered.get_molar_mass(), original.get_molar_mass(), rtol=1e-10\n        )\n        npt.assert_allclose(\n            recovered.get_concentration(),\n            original.get_concentration(),\n            rtol=1e-10,\n        )\n        assert recovered.get_partitioning() == original.get_partitioning()",
+    "successor": "particula/gas/tests/gas_data_test.py::test_native_storage_preserves_bridge_fields",
+    "disposition": "Native single/multispecies construction and detached copy preserve ordered names, molar mass, kg/m^3 concentration, full partitioning mask and each box; no facade or physics object is needed for storage."
+  },
+  {
+    "file": "particula/gas/tests/gas_data_test.py",
+    "test": "TestRoundTrip::test_round_trip_multi_species",
+    "original": "def test_round_trip_multi_species(self) -> None:\n        \"\"\"Round-trip preserves data for multi-species.\"\"\"\n        vp1 = ConstantVaporPressureStrategy(2330.0)\n        vp2 = ConstantVaporPressureStrategy(1000.0)\n\n        species1 = GasSpecies(\n            name=\"Water\",\n            molar_mass=0.018,\n            vapor_pressure_strategy=vp1,\n            partitioning=True,\n            concentration=1e-6,\n        )\n        species2 = GasSpecies(\n            name=\"Ammonia\",\n            molar_mass=0.017,\n            vapor_pressure_strategy=vp2,\n            partitioning=True,\n            concentration=2e-6,\n        )\n        original = species1 + species2  # Creates new combined species\n\n        # Convert to GasData and back\n        gas_data = from_species(original)\n        recovered = to_species(gas_data, [vp1, vp2])\n\n        assert len(recovered) == len(original)\n        np.testing.assert_array_equal(recovered.get_name(), original.get_name())\n        npt.assert_allclose(\n            recovered.get_molar_mass(), original.get_molar_mass(), rtol=1e-10\n        )\n        npt.assert_allclose(\n            recovered.get_concentration(),\n            original.get_concentration(),\n            rtol=1e-10,\n        )\n        assert recovered.get_partitioning() == original.get_partitioning()",
+    "successor": "particula/gas/tests/gas_data_test.py::test_native_storage_preserves_bridge_fields",
+    "disposition": "Native single/multispecies construction and detached copy preserve ordered names, molar mass, kg/m^3 concentration, full partitioning mask and each box; no facade or physics object is needed for storage."
+  },
+  {
+    "file": "particula/gas/tests/gas_data_test.py",
+    "test": "TestRoundTrip::test_round_trip_with_different_partitioning",
+    "original": "def test_round_trip_with_different_partitioning(self) -> None:\n        \"\"\"Test round-trip with partitioning=False (uniform).\"\"\"\n        vapor_pressure = ConstantVaporPressureStrategy(2330.0)\n        original = GasSpecies(\n            name=\"Water\",\n            molar_mass=0.018,\n            vapor_pressure_strategy=vapor_pressure,\n            partitioning=False,  # Different from True\n            concentration=1e-6,\n        )\n\n        # Convert to GasData and back\n        gas_data = from_species(original)\n        recovered = to_species(gas_data, [vapor_pressure])\n\n        assert recovered.get_partitioning() is False\n        npt.assert_allclose(\n            recovered.get_concentration(),\n            original.get_concentration(),\n            rtol=1e-10,\n        )",
+    "successor": "particula/gas/tests/gas_data_test.py::test_native_storage_preserves_bridge_fields",
+    "disposition": "Native single/multispecies construction and detached copy preserve ordered names, molar mass, kg/m^3 concentration, full partitioning mask and each box; no facade or physics object is needed for storage."
+  }
+]

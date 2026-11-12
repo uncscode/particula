@@ -901,3 +901,30 @@ Validation:
 - All 43 successor symbols resolve; scoped Ruff/format and whitespace passed.
 Final installed-wheel absence, full coverage and full publication evidence
 remain pending alongside gas/GPU compatibility removal.
+
+## Remove gas species conversion bridges
+
+Removed from_species/to_species and their package exports. The complete GasData
+class AST is unchanged; only obsolete conversion functions and their imports
+were removed. All fourteen bridge test bodies are retained in
+`gas_bridge_assertions.json`. Native storage/copy tests cover one/two ordered
+species, one/three/five boxes, equal/distinct concentrations, uniform true/false
+and mixed partitioning, kg/m^3 passthrough at rtol=1e-10/atol=0, and detached
+names/array ownership. The former mixed-partitioning rejection is obsolete;
+native data preserves the complete mask. Bridge-specific strategy-length,
+box-selection and deprecation behavior are replaced by explicit missing-symbol
+checks at root/package/concrete boundaries. No vapor-pressure algorithms changed.
+Updated migration guidance to name removed gas bridges and native construction.
+
+Validation:
+- Gas tree, removed APIs and integration: **480 passed, 1 skipped in 2.62s**,
+  `/tmp/m6-gas-bridge-tests.log`.
+- Explicit CPU/Warp conversion suite: **111 passed in 0.19s**,
+  `/tmp/m6-gas-bridge-conversion.log`.
+- Full-package mypy: **544 files passed**, `/tmp/m6-gas-bridge-mypy.log`.
+- Base strict docs: **1.52s**, `/tmp/m6-gas-bridge-docs.log`.
+- All fourteen successor symbols resolved; GasData AST unchanged; scoped
+  Ruff/format and whitespace passed. Only negative tests reference the removed
+  bridge symbols in package sources.
+GasSpecies/Atmosphere and their constructors plus GPU admission and final
+readiness remain pending.
