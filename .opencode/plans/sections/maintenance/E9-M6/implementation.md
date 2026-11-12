@@ -928,3 +928,31 @@ Validation:
   bridge symbols in package sources.
 GasSpecies/Atmosphere and their constructors plus GPU admission and final
 readiness remain pending.
+
+## Remove Atmosphere and its obsolete builder
+
+Deleted atmosphere.py and atmosphere_builders.py plus their package exports.
+All six original tests are recorded in atmosphere_assertions.json. Added native
+GasDataBuilder/EnvironmentData/Aerosol construction for the original oxygen +
+hydrogen and oxygen + nitrogen inputs, retaining temperature, pressure, names,
+molar masses, concentrations and full/partitioning species counts. Extending a
+species layout now exercises validated coordinated gas/environment replacement;
+an individual incompatible replacement rejects while original carriers remain
+unchanged. The old test named 'without species' actually omitted pressure;
+its successor checks that native environment construction requires pressure.
+No native aggregate or gas/environment scientific code changed.
+
+Removed concrete-module and root/package symbol checks cover Atmosphere and
+AtmosphereBuilder. Migration guidance documents the separate native owners and
+coordinated replacement requirement. Remaining package references are limited
+to the removal-safe guard and explicit negative checks.
+
+Validation:
+- Gas tree, package tests and integration: **769 passed, 1 skipped in 11.92s**,
+  `/tmp/m6-atmosphere-removal-tests.log`.
+- Complete source-example suite with warnings as errors:
+  **225 passed, 2 skipped in 42.51s**, `/tmp/m6-atmosphere-removal-examples.log`.
+- Full-package mypy: **541 files passed**, `/tmp/m6-atmosphere-removal-mypy.log`.
+- Base strict docs: **1.50s**, `/tmp/m6-atmosphere-removal-docs.log`.
+- All six native successors resolve; scoped Ruff/format and whitespace passed.
+GasSpecies/builders/factory, GPU compatibility and final readiness remain pending.

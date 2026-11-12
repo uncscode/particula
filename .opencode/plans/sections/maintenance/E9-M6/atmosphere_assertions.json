@@ -1,0 +1,44 @@
+[
+  {
+    "file": "particula/gas/tests/atmosphere_test.py",
+    "test": "test_atmosphere_initialization_values",
+    "original": "def test_atmosphere_initialization_values(atmosphere):\n    \"\"\"Check stored temperature and pressure values.\"\"\"\n    assert atmosphere.temperature == 298.15\n    assert atmosphere.total_pressure == 101325",
+    "successor": "particula/gas/tests/native_gas_environment_test.py::test_native_gas_environment_construction_and_extension",
+    "disposition": "Retain temperature/pressure, ordered gas names/molar masses, partitioning and total species counts using full GasData plus EnvironmentData. Adding lanes requires coordinated explicit aggregate replacement, preserving old carriers, not nested facade append."
+  },
+  {
+    "file": "particula/gas/tests/atmosphere_test.py",
+    "test": "test_partitioning_species_initial_length",
+    "original": "def test_partitioning_species_initial_length(atmosphere):\n    \"\"\"Initially one partitioning species is present.\"\"\"\n    assert len(atmosphere) == 2",
+    "successor": "particula/gas/tests/native_gas_environment_test.py::test_native_gas_environment_construction_and_extension",
+    "disposition": "Retain temperature/pressure, ordered gas names/molar masses, partitioning and total species counts using full GasData plus EnvironmentData. Adding lanes requires coordinated explicit aggregate replacement, preserving old carriers, not nested facade append."
+  },
+  {
+    "file": "particula/gas/tests/atmosphere_test.py",
+    "test": "test_add_partitioning_species_updates_length",
+    "original": "def test_add_partitioning_species_updates_length(\n    atmosphere, vapor_pressure_strategy\n):\n    \"\"\"Adding another partitioning species increases the length.\"\"\"\n    nitrogen = GasSpecies(\n        name=\"Nitrogen\",\n        molar_mass=0.028,\n        vapor_pressure_strategy=vapor_pressure_strategy,\n        partitioning=True,\n        concentration=0.0,\n    )\n    atmosphere.add_partitioning_species(nitrogen)\n    assert len(atmosphere.partitioning_species) == 2",
+    "successor": "particula/gas/tests/native_gas_environment_test.py::test_native_gas_environment_construction_and_extension",
+    "disposition": "Retain temperature/pressure, ordered gas names/molar masses, partitioning and total species counts using full GasData plus EnvironmentData. Adding lanes requires coordinated explicit aggregate replacement, preserving old carriers, not nested facade append."
+  },
+  {
+    "file": "particula/gas/tests/atmosphere_test.py",
+    "test": "test_total_species_count",
+    "original": "def test_total_species_count(atmosphere, vapor_pressure_strategy):\n    \"\"\"Total species count equals partitioning + gas-only.\"\"\"\n    nitrogen = GasSpecies(\n        name=\"Nitrogen\",\n        molar_mass=0.028,\n        vapor_pressure_strategy=vapor_pressure_strategy,\n        partitioning=True,\n        concentration=0.0,\n    )\n    atmosphere.add_partitioning_species(nitrogen)\n    # 2 partitioning + 1 gas-only\n    assert len(atmosphere) == 3",
+    "successor": "particula/gas/tests/native_gas_environment_test.py::test_native_gas_environment_construction_and_extension",
+    "disposition": "Retain temperature/pressure, ordered gas names/molar masses, partitioning and total species counts using full GasData plus EnvironmentData. Adding lanes requires coordinated explicit aggregate replacement, preserving old carriers, not nested facade append."
+  },
+  {
+    "file": "particula/gas/tests/atmosphere_builder_test.py",
+    "test": "test_gas_builder_with_species",
+    "original": "def test_gas_builder_with_species():\n    \"\"\"Test building a Gas object with the GasBuilder.\"\"\"\n    vapor_pressure_strategy = ConstantVaporPressureStrategy(101325)\n\n    oxygen = GasSpecies(\n        name=\"Oxygen\",\n        molar_mass=0.032,\n        vapor_pressure_strategy=vapor_pressure_strategy,\n        partitioning=True,\n        concentration=0.21,\n    )\n\n    nitrogen = GasSpecies(\n        name=\"Nitrogen\",\n        molar_mass=0.028,\n        vapor_pressure_strategy=vapor_pressure_strategy,\n        partitioning=False,\n        concentration=0.79,\n    )\n\n    atmo = (\n        AtmosphereBuilder()\n        .set_temperature(298.15, \"K\")\n        .set_pressure(101325, \"Pa\")\n        .set_more_partitioning_species(oxygen)\n        .set_more_gas_only_species(nitrogen)\n        .build()\n    )\n\n    assert atmo.temperature == 298.15\n    assert atmo.total_pressure == 101325\n    assert atmo.partitioning_species.get_name() == \"Oxygen\"\n    assert atmo.partitioning_species.get_molar_mass() == 0.032\n    assert atmo.gas_only_species.get_name() == \"Nitrogen\"\n    assert atmo.gas_only_species.get_molar_mass() == 0.028\n    # total species count (1+1)\n    assert len(atmo) == 2",
+    "successor": "particula/gas/tests/native_gas_environment_test.py::test_native_gas_environment_construction_and_extension",
+    "disposition": "Retain temperature/pressure, ordered gas names/molar masses, partitioning and total species counts using full GasData plus EnvironmentData. Adding lanes requires coordinated explicit aggregate replacement, preserving old carriers, not nested facade append."
+  },
+  {
+    "file": "particula/gas/tests/atmosphere_builder_test.py",
+    "test": "test_gas_builder_without_species_raises_error",
+    "original": "def test_gas_builder_without_species_raises_error():\n    \"\"\"Test that building a Gas object without any species raises an error.\"\"\"\n    builder = AtmosphereBuilder().set_temperature(298.15, \"K\")\n    # No pressure added \u2013 dataclass should fail\n    with pytest.raises(ValueError):\n        builder.build()",
+    "successor": "particula/gas/tests/native_gas_environment_test.py::test_native_environment_requires_pressure",
+    "disposition": "Original test actually omitted pressure (not just species). Native EnvironmentData requires explicit pressure; absent field fails construction without synthesizing state."
+  }
+]

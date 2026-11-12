@@ -4523,7 +4523,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Removed obsolete atmosphere aggregate/builder. Six original assertions mapped in atmosphere_assertions.json to explicit native gas/environment construction and coordinated replacement.",
       "test_nodes": []
     },
     {
@@ -4734,7 +4734,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Removed obsolete atmosphere aggregate/builder. Six original assertions mapped in atmosphere_assertions.json to explicit native gas/environment construction and coordinated replacement.",
       "test_nodes": []
     },
     {
@@ -5436,7 +5436,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Removed obsolete atmosphere aggregate/builder. Six original assertions mapped in atmosphere_assertions.json to explicit native gas/environment construction and coordinated replacement.",
       "test_nodes": [
         {
           "name": "test_gas_builder_with_species",
@@ -5521,7 +5521,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Removed obsolete atmosphere aggregate/builder. Six original assertions mapped in atmosphere_assertions.json to explicit native gas/environment construction and coordinated replacement.",
       "test_nodes": [
         {
           "name": "test_atmosphere_initialization_values",
