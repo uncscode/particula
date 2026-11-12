@@ -291,6 +291,7 @@ def _build_warp_state(
         to_warp_particle_data,
     )
     from particula.gpu.kernels.thermodynamics import ThermodynamicsConfig
+    from particula.gpu.species_mapping import prepare_condensation_species_map
 
     particle_data = ParticleData(
         masses=case.masses.copy(),
@@ -298,6 +299,7 @@ def _build_warp_state(
         charge=np.zeros_like(case.concentration),
         density=np.array([1000.0]),
         volume=np.ones(case.masses.shape[0]),
+        distribution_type="discrete",
     )
     gas_data = GasData(
         name=["vapor"],
@@ -368,6 +370,14 @@ def _build_warp_state(
             latent_heat=latent_heat,
             energy_transfer=energy,
             thermal_work=thermal_work,
+            species_binding=prepare_condensation_species_map(
+                particles,
+                gas,
+                gas_names=gas_data.name,
+                species_map=CondensationSpeciesMap(
+                    tuple(gas_data.name), ((0, 0),)
+                ),
+            ),
         ),
         case.time_step,
     )
@@ -588,8 +598,12 @@ def _p2_oracle(case: _WarpCase) -> tuple[np.ndarray, np.ndarray]:
         proposal = np.where(
             proposal > 0.0, proposal * scale[:, None, :], proposal
         )
-        masses += proposal
-        gas -= np.sum(proposal * concentration[..., None], axis=1)
+        # Couple only the representable particle increment, not the raw
+        # proposal that may round when added to a much larger stored mass.
+        updated = masses + proposal
+        applied = updated - masses
+        masses = updated
+        gas -= np.sum(applied * concentration[..., None], axis=1)
         np.maximum(gas, 0.0, out=gas)
     return masses, gas
 
@@ -807,7 +821,11 @@ def test_warp_adapter_latent_heat_sidecars_have_identity_and_energy_accounting()
     assert latent_heat_values is not None
     npt.assert_allclose(
         energy,
-        np.sum(transfer, axis=1) * latent_heat_values[None, :],
+        np.sum(
+            transfer * resources["initial_concentration"][:, :, None], axis=1
+        )
+        * resources["particles"].volume.numpy()[:, None]
+        * latent_heat_values[None, :],
         rtol=case.energy_rtol,
         atol=case.energy_atol,
     )

@@ -87,7 +87,6 @@ from particula.gpu.population_metadata import (
     DISCRETE,
     PARTICLE_RESOLVED,
     particle_distribution_code,
-    require_legacy_particle_metadata,
 )
 from particula.gpu.properties.gas_properties import (
     dynamic_viscosity_wp,
@@ -279,13 +278,13 @@ class _PreparedCondensationCall:
     gas_partitioning: Any
     thermodynamics_modes: Any
     thermodynamics_parameters: Any
-    species_binding: Any = None
-    particle_to_gas: Any = None
-    gas_to_particle: Any = None
-    particle_volume: Any = None
-    particle_charge: Any = None
-    distribution_kind: int = 0
-    gas_species_count: int = 0
+    species_binding: CondensationSpeciesBinding
+    particle_to_gas: Any
+    gas_to_particle: Any
+    particle_volume: Any
+    particle_charge: Any
+    distribution_kind: int
+    gas_species_count: int
 
 
 def _read_float64_array(array: Any) -> np.ndarray:
@@ -1057,29 +1056,6 @@ def _clear_energy_transfer_kernel(
 
 @wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
 # type: ignore[misc]
-def _accumulate_energy_transfer_kernel(
-    total_mass_transfer: Any,
-    latent_heat: Any,
-    energy_transfer: Any,
-) -> None:
-    """Accumulate signed energy from the finalized whole-call transfer.
-
-    One lane per box and species sums particle transfers in fp64 before adding
-    the substep energy to the whole-call output.
-    """
-    box_idx, species_idx = wp.tid()  # type: ignore[misc]
-    species_transfer = wp.float64(0.0)
-    for particle_idx in range(total_mass_transfer.shape[1]):
-        species_transfer += total_mass_transfer[
-            box_idx, particle_idx, species_idx
-        ]
-    energy_transfer[box_idx, species_idx] = (
-        species_transfer * latent_heat[species_idx]
-    )
-
-
-@wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
-# type: ignore[misc]
 def _accumulate_finalized_mass_transfer_kernel(
     finalized: Any,
     total_mass_transfer: Any,
@@ -1112,24 +1088,6 @@ def _couple_finalized_transfer_to_gas_kernel(
     if updated_concentration < wp.float64(0.0):
         updated_concentration = wp.float64(0.0)
     gas_concentration[box_idx, species_idx] = updated_concentration
-
-
-@wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
-# type: ignore[misc]
-def _reduce_finalized_transfer_to_gas_kernel(
-    finalized: Any,
-    concentration: Any,
-    gas_delta: Any,
-) -> None:
-    """Reduce finalized particle transfer into a gas concentration delta."""
-    box_idx, species_idx = wp.tid()  # type: ignore[misc]
-    delta = wp.float64(0.0)
-    for particle_idx in range(finalized.shape[1]):
-        delta += (
-            finalized[box_idx, particle_idx, species_idx]
-            * concentration[box_idx, particle_idx]
-        )
-    gas_delta[box_idx, species_idx] = delta
 
 
 @wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
@@ -1878,36 +1836,6 @@ def _validate_partitioning_values(
         raise ValueError("gas.partitioning must contain only binary 0/1 values")
 
 
-@wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
-# type: ignore[misc]
-def _gate_mass_transfer_kernel(
-    partitioning: Any,
-    concentration: Any,
-    work_mass_transfer: Any,
-) -> None:
-    """Zero proposals for disabled species and zero-concentration slots.
-
-    A partitioning value of one permits a proposal; zero disables it. This P1
-    gate is performed before the public step applies mass transfer. The P2
-    inventory finalizer accepts the resulting pre-gated proposal and does not
-    inspect this mask.
-
-    Args:
-        partitioning: Binary per-box, per-species mask where one permits
-            partitioning.
-        concentration: Particle number concentrations by box and particle.
-        work_mass_transfer: Raw proposal overwritten with zeros where disabled.
-    """
-    box_idx, particle_idx = wp.tid()  # type: ignore[misc]
-    for species_idx in range(work_mass_transfer.shape[2]):
-        if partitioning[box_idx, species_idx] != wp.int32(1) or concentration[
-            box_idx, particle_idx
-        ] == wp.float64(0.0):
-            work_mass_transfer[box_idx, particle_idx, species_idx] = wp.float64(
-                0.0
-            )
-
-
 def _validate_device_match(name: str, array: Any, expected_device: Any) -> None:
     """Validate that a Warp array is on the expected device.
 
@@ -1959,8 +1887,10 @@ def _finalize_inventory_limited_mass_transfer(
     owned particle mass. It then limits concentration-weighted positive uptake
     for each box and species to gas inventory plus permitted evaporation
     release. It mutates particle masses and any supplied P2 sidecars, but
-    deliberately does not mutate ``gas.concentration``; public orchestration
-    and gas coupling remain deferred.
+    deliberately does not mutate ``gas.concentration``. This primitive accepts
+    explicitly discrete number-density weights and equal particle/gas lanes.
+    The public mapped step owns its separate gas coupling and supports resolved
+    counts with volume normalization; this primitive does not interpret counts.
 
     Args:
         particles: GPU particle data with float64 masses and concentrations.
@@ -1986,7 +1916,10 @@ def _finalize_inventory_limited_mass_transfer(
         failures leave caller-owned state unchanged; this does not promise
         rollback after a post-launch device-runtime failure.
     """
-    require_legacy_particle_metadata(particles)
+    if particle_distribution_code(particles) != DISCRETE:
+        raise ValueError(
+            "inventory finalizer requires explicit discrete metadata"
+        )
     masses = particles.masses
     if not _is_warp_array_like(masses) or len(masses.shape) != 3:
         raise ValueError("particles.masses must be a 3D Warp array")
@@ -2366,16 +2299,14 @@ def _prepare_condensation_step_gpu(  # noqa: C901
         NaN/Inf before a call.
     """
     population_code = particle_distribution_code(particles)
-    if population_code in (DISCRETE, PARTICLE_RESOLVED):
-        if type(species_binding) is not CondensationSpeciesBinding:
-            raise ValueError("native condensation requires species_binding")
-        species_binding.validate(particles, gas)
-    else:
-        require_legacy_particle_metadata(particles)
-        if species_binding is not None:
-            raise ValueError(
-                "legacy condensation does not accept species_binding"
-            )
+    if population_code not in (DISCRETE, PARTICLE_RESOLVED):
+        raise ValueError(
+            "condensation requires explicit discrete or "
+            "particle_resolved metadata"
+        )
+    if type(species_binding) is not CondensationSpeciesBinding:
+        raise ValueError("native condensation requires species_binding")
+    species_binding.validate(particles, gas)
     if (
         isinstance(time_step, bool)
         or not isinstance(time_step, Real)
@@ -2387,7 +2318,7 @@ def _prepare_condensation_step_gpu(  # noqa: C901
         )
 
     n_boxes, n_particles, n_species = particles.masses.shape
-    n_gas = gas.concentration.shape[1] if species_binding else n_species
+    n_gas = gas.concentration.shape[1]
     _validate_gas_arrays(gas, n_boxes, n_gas)
     _validate_particle_arrays(particles, n_boxes, n_particles, n_species)
 
@@ -2869,14 +2800,10 @@ def _prepare_condensation_step_gpu(  # noqa: C901
         thermodynamics.modes,
         thermodynamics.parameters,
         species_binding=species_binding,
-        particle_to_gas=species_binding.particle_to_gas
-        if species_binding
-        else None,
-        gas_to_particle=species_binding.gas_to_particle
-        if species_binding
-        else None,
-        particle_volume=particles.volume if species_binding else None,
-        particle_charge=particles.charge if species_binding else None,
+        particle_to_gas=species_binding.particle_to_gas,
+        gas_to_particle=species_binding.gas_to_particle,
+        particle_volume=particles.volume,
+        particle_charge=particles.charge,
         distribution_kind=population_code,
         gas_species_count=n_gas,
     )
@@ -2907,8 +2834,7 @@ def _enqueue_prepared_condensation_call(
     """
     p = prepared
     n_boxes, n_particles, n_species = p.dimensions
-    native = p.species_binding is not None
-    n_gas = p.gas_species_count if native else n_species
+    n_gas = p.gas_species_count
     wp.launch(
         _clear_mass_transfer_kernel,
         dim=(n_boxes, n_particles),
@@ -2922,7 +2848,7 @@ def _enqueue_prepared_condensation_call(
             inputs=[p.energy_transfer],
             device=p.device,
         )
-    if native and n_gas == 0:
+    if n_gas == 0:
         wp.launch(
             _clear_mass_transfer_kernel,
             dim=(n_boxes, n_particles),
@@ -2968,9 +2894,7 @@ def _enqueue_prepared_condensation_call(
             device=p.device,
         )
         wp.launch(
-            _mapped_condensation_mass_transfer_kernel
-            if native
-            else condensation_mass_transfer_kernel,
+            _mapped_condensation_mass_transfer_kernel,
             dim=(n_boxes, n_particles),
             inputs=[
                 p.particle_masses,
@@ -2999,20 +2923,18 @@ def _enqueue_prepared_condensation_call(
                 p.substep_time_step,
                 p.work_mass_transfer,
             ]
-            + ([p.particle_to_gas] if native else []),
+            + ([p.particle_to_gas]),
             device=p.device,
         )
         wp.launch(
-            native_kernels.gate_transfer
-            if native
-            else _gate_mass_transfer_kernel,
+            native_kernels.gate_transfer,
             dim=(n_boxes, n_particles),
             inputs=[
                 p.gas_partitioning,
                 p.particle_concentration,
                 p.work_mass_transfer,
             ]
-            + ([p.particle_to_gas] if native else []),
+            + ([p.particle_to_gas]),
             device=p.device,
         )
         wp.launch(
@@ -3022,9 +2944,7 @@ def _enqueue_prepared_condensation_call(
             device=p.device,
         )
         wp.launch(
-            native_kernels.reduce_candidates
-            if native
-            else _reduce_inventory_candidates_kernel,
+            native_kernels.reduce_candidates,
             dim=(n_boxes, n_gas),
             inputs=[
                 p.candidate,
@@ -3039,8 +2959,6 @@ def _enqueue_prepared_condensation_call(
                     wp.int32(p.distribution_kind),
                     p.particle_masses,
                 ]
-                if native
-                else []
             ),
             device=p.device,
         )
@@ -3051,18 +2969,14 @@ def _enqueue_prepared_condensation_call(
             device=p.device,
         )
         wp.launch(
-            native_kernels.finalize_transfer
-            if native
-            else _finalize_and_apply_inventory_transfer_kernel,
+            native_kernels.finalize_transfer,
             dim=(n_boxes, n_particles),
             inputs=[p.particle_masses, p.candidate, p.scale, p.finalized]
-            + ([p.particle_to_gas] if native else []),
+            + ([p.particle_to_gas]),
             device=p.device,
         )
         wp.launch(
-            native_kernels.reduce_finalized
-            if native
-            else _reduce_finalized_transfer_to_gas_kernel,
+            native_kernels.reduce_finalized,
             dim=(n_boxes, n_gas),
             inputs=[p.finalized, p.particle_concentration, p.gas_delta]
             + (
@@ -3073,8 +2987,6 @@ def _enqueue_prepared_condensation_call(
                     p.particle_masses,
                     p.gas_concentration,
                 ]
-                if native
-                else []
             ),
             device=p.device,
         )
@@ -3098,9 +3010,7 @@ def _enqueue_prepared_condensation_call(
         )
         if p.energy_transfer is not None:
             wp.launch(
-                native_kernels.energy_transfer
-                if native
-                else _accumulate_energy_transfer_kernel,
+                native_kernels.energy_transfer,
                 dim=(n_boxes, n_gas),
                 inputs=[
                     p.total_mass_transfer,
@@ -3114,12 +3024,10 @@ def _enqueue_prepared_condensation_call(
                         p.particle_volume,
                         wp.int32(p.distribution_kind),
                     ]
-                    if native
-                    else []
                 ),
                 device=p.device,
             )
-    if native and p.distribution_kind == 3:
+    if p.distribution_kind == 3:
         wp.launch(
             native_kernels.retire_evaporated_slots,
             dim=(n_boxes, n_particles),
@@ -3181,7 +3089,7 @@ def condensation_step_gpu(
         latent_heat: Optional per-species latent heat [J/kg].
         energy_transfer: Optional caller-owned energy output [J].
         thermal_work: Optional validated but unused full-gas thermal sidecar.
-        species_binding: Required explicit binding for tagged discrete/resolved
+        species_binding: Required explicit binding for discrete/resolved
             state; prepare with ``prepare_condensation_species_map`` from
             ``particula.gpu.species_mapping``. Material surface/activity arrays
             use particle order. Thermodynamics, accommodation, diffusion, heat

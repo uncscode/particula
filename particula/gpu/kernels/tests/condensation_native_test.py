@@ -1028,3 +1028,52 @@ def test_four_substeps_cannot_spend_sub_ulp_gas_budget(device, prepared_call):
     npt.assert_array_equal(state.g.concentration.numpy(), old_gas)
     npt.assert_array_equal(state.total.numpy(), 0)
     npt.assert_array_equal(state.energy.numpy(), 0)
+
+
+@pytest.mark.parametrize("prepared", [False, True])
+@pytest.mark.parametrize("metadata", [None, 0, 2])
+def test_untagged_condensation_rejects_before_setup(
+    monkeypatch, prepared, metadata
+):
+    """Missing/legacy/PDF metadata cannot enter direct or prepared execution."""
+    pytest.importorskip("warp")
+    from particula.gpu.kernels import condensation as module
+
+    class Population:
+        @property
+        def masses(self):
+            raise AssertionError("population arrays accessed before admission")
+
+    particles = Population()
+    if metadata is not None:
+        particles.distribution_kind = metadata
+
+    def forbidden(*args, **kwargs):
+        raise AssertionError("allocation or launch before admission")
+
+    for name in ("zeros", "full", "array", "launch"):
+        monkeypatch.setattr(module.wp, name, forbidden)
+    step = (
+        module._prepare_condensation_step_gpu
+        if prepared
+        else module.condensation_step_gpu
+    )
+    with pytest.raises(ValueError, match="requires explicit discrete"):
+        step(particles, object(), 298.15, 101325.0, 1.0)
+
+
+@pytest.mark.parametrize("code", [0, 2, 3])
+def test_inventory_finalizer_rejects_non_density_metadata(code, monkeypatch):
+    """The standalone density oracle primitive never interprets resolved counts."""
+    pytest.importorskip("warp")
+    from particula.gpu.kernels import condensation as module
+
+    def forbidden(*args, **kwargs):
+        raise AssertionError("allocation or launch before admission")
+
+    for name in ("zeros", "full", "array", "launch"):
+        monkeypatch.setattr(module.wp, name, forbidden)
+    with pytest.raises(ValueError, match="requires explicit discrete"):
+        module._finalize_inventory_limited_mass_transfer(
+            SimpleNamespace(distribution_kind=code), object(), object()
+        )

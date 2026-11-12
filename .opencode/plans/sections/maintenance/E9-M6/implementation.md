@@ -1023,3 +1023,181 @@ Validation:
 - All 37 successor mappings resolve; scoped Ruff/format and whitespace passed.
 GPU untagged admission, final installed-wheel/full-suite/notebook/publication
 validation and the single PR remain outstanding.
+
+## GPU condensation native-only execution work in progress
+
+Removed untagged admission from direct/prepared condensation setup and removed
+15 legacy selectors from prepared enqueue. Setup now requires explicit discrete
+or resolved metadata and an exact CondensationSpeciesBinding before accessing
+payloads. The private prepared record requires all mapping/population fields
+without legacy defaults. Native numerical kernels, four equal substeps and
+independent scientific tolerances are unchanged. Six new negative cases cover
+missing/zero/PDF metadata on both direct and prepared entry points before array
+access, allocation or launch.
+
+Preserved 174 GPU condensation test bodies in gpu_condensation_assertions.json;
+their migration dispositions remain pending. The legacy standalone finalizer
+and old unmapped kernels still require caller/assertion review before deletion.
+The historical contract suite fixtures still construct untagged populations;
+they must migrate to explicit population semantics and species maps, preserving
+all applicable assertions. This work is not ready to commit as a completed unit.
+
+- Native suite after setup/enqueue cleanup: **137 passed, 131 skipped in 12.64s**,
+  `/tmp/m6-native-gpu-condensation.log`.
+- Scoped mypy passed two files before removing private-record legacy defaults;
+  `/tmp/m6-gpu-condensation-mypy.log`.
+- Historical suite diagnostic stopped after three expected metadata-admission
+  failures (8 skipped), `/tmp/m6-gpu-condensation-migration-diagnostic.log`.
+  It is failing evidence, not accepted validation.
+- Follow-up native/boundary run after requiring prepared-record fields:
+  **151 passed, 131 skipped in 0.94s**,
+  `/tmp/m6-native-gpu-condensation2.log`, exit 0.
+
+## GPU condensation fixture migration checkpoint
+
+Migrated the shared numerical fixtures to explicit discrete number-density
+semantics and unit representative volume, preserving concentrations, masses and
+numerical tolerances. Added explicit synthetic identity species bindings at 98
+direct/prepared call sites; production never infers maps. Updated equivalent
+mapped-kernel launch hooks and native admission-message assertions. Two P2
+energy oracles now weight transfer by number density and representative volume
+before latent heat, matching the upstream native extensive-energy contract.
+The separate nonidentity/mixed-width native oracle suite remains intact.
+
+Retained the standalone private P2 inventory primitive as density-weighted
+scientific functionality: it now requires explicit discrete metadata and rejects
+untagged/PDF/resolved inputs before setup. It does not mutate gas concentration
+or substitute for the mapped public step. Its original independent NumPy
+finalization and atomicity tests pass without relaxed tolerances. This replaces
+the earlier pending decision about this helper; remaining unused raw kernels
+still require a caller audit.
+
+Graph-capture fixtures now pin species bindings during setup, outside capture,
+and use weighted extensive-energy expectations. Real adapter execution fixtures
+use native metadata/maps; malformed deferred work still reaches its intended
+validator. Metadata-only adapter fixtures and production carrier admission still
+have legacy branches and require the next migration before this unit is complete.
+All inventoried tests remain in place with resolvable successor names and
+original bodies preserved in gpu_condensation_assertions.json.
+
+Validation:
+- Contract, native and population boundaries: **390 passed, 178 skipped in
+  1.88s**, `/tmp/m6-condensation-fixture-migration7.log`.
+- Shared stiffness/graph/autodiff fixtures plus condensation adapter tests:
+  **77 passed, 4 skipped in 5.84s**,
+  `/tmp/m6-condensation-shared-fixtures3.log`.
+- Full-package mypy before the last adapter fixture edits passed **534 files**;
+  `/tmp/m6-gpu-condensation-mypy2.log`. Follow-up after those edits also passed
+  **534 files**, `/tmp/m6-gpu-condensation-mypy3.log`, exit 0.
+- Intermediate diagnostic failures are retained in migration2–6 logs; they
+  exposed fixture semantics, message, launch-hook and energy-oracle differences.
+  Passing focused results do not establish final package/execution readiness.
+
+## Condensation carrier admission and dependent execution audit
+
+Removed WarpCondensationState's untagged admission branch. It now requires an
+explicit population kind and pinned CondensationSpeciesBinding, and adapter
+dispatch always forwards that binding by identity. Existing ordered primary
+metadata/output validation remains; construction performs no device work.
+Migrated 16 metadata-carrier test constructions to explicit one-species maps.
+Binding setup precedes operation guards; carrier construction is checked against
+allocation, launch, copy and synchronization. Added explicit untagged/missing-map
+rejection tests retaining all caller resources and a binding-forwarding assertion.
+
+Migrated the direct integration fixture to discrete density semantics and an
+explicit vapor map. The mixed-transfer oracle previously charged gas for raw
+proposals lost to particle-mass rounding; it now couples the independently
+computed representable mass increment, matching the upstream native contract.
+The native extensive-energy oracle weights by number density and unit volume.
+No numerical tolerance changed. Preserved integration test originals in the
+GPU condensation assertion ledger. Corrected the no-energy launch sentinel to
+watch the native energy kernel rather than an unreachable legacy kernel.
+
+Validation:
+- Adapter and integration suites: **76 passed, 3 skipped in 4.48s**,
+  `/tmp/m6-condensation-carrier5.log`.
+- Contract/native kernel suites: **376 passed, 178 skipped in 1.38s**,
+  `/tmp/m6-condensation-carrier-kernels.log`.
+- Full execution diagnostic finished: **72 failed, 1213 passed, 51 skipped,
+  100 errors in 84.69s**, `/tmp/m6-execution-condensation-migration.log`.
+  This diagnostic began before the integration-fixture fixes above. Remaining
+  failures include shared full-loop/captured-loop constructors, graph fixtures,
+  resident enqueue, communication, diagnostics and state-update fixtures.
+  Inspect their shared setup before another full run; the broad gate is failing.
+- Scoped Ruff and whitespace passed. Mypy exposed a Warp metadata annotation
+  mismatch in a test fixture; changed its literal to wp.int32(1). Follow-up
+  full mypy passed **534 files**, `/tmp/m6-condensation-carrier-mypy2.log`.
+
+The condensation unit remains uncommitted pending migration of dependent
+execution fixtures. Next inspect full_loop_test.py's WarpCondensationState
+construction near line 368 and captured_full_loop_test.py's near line 1398;
+graph/diagnostic/resident tests share these setup paths. GPU coagulation,
+wall-loss, source/communication, lifecycle/checkpoint removal and final
+publication/readiness remain required after this dependency cleanup.
+
+## Native full-loop fixture migration
+
+Converted the shared full-loop particle number densities to explicitly tagged
+resolved counts using each original representative volume. Its independent
+inventory now sums count-weighted particle masses plus volume-weighted gas.
+Pinned explicit condensation and total-mass diagnostic species maps. Retained
+all original tests and their assertions in the GPU condensation ledger.
+
+Migrated the captured two-box scenario similarly. Its detached NumPy oracle
+continues to use density: host comparison snapshots explicitly divide native
+counts by current volume. Particle communication work-buffer expectations now
+convert independently calculated density debits/credits/requests to native
+counts using initial source/destination volumes. No tolerance changed.
+
+Validation:
+- Full-loop suite: **17 passed in 0.71s**,
+  `/tmp/m6-full-loop-native3.log`.
+- Graph-capture and diagnostics suites: **206 passed, 1 skipped in 5.41s**,
+  `/tmp/m6-full-loop-dependents1.log`.
+- Captured-loop suite: **3 failed, 53 passed, 12 skipped in 1.17s**,
+  `/tmp/m6-captured-loop-native3.log`. All remaining failures enter the separate
+  `_build_prepared_loop` fixture via `multi_box_loop_test._scheduler_request`,
+  whose carrier still lacks native population metadata and a condensation map.
+  The migrated two-box scenario and both particle-communication volume cases
+  pass. Next migrate the shared multi-box fixture and preserve its independent
+  inventory, stochastic, and snapshot assertions.
+- Scoped Ruff and whitespace checks passed; formatting applied to both files.
+  Final full-suite, type, publication, and installed-wheel gates remain pending.
+
+## GPU condensation removal unit validated
+
+Migrated the remaining shared multi-box fixture to resolved counts while
+preserving its original density-defined inventory. Added explicit process and
+diagnostic mappings, and the captured-loop zero-source nucleation binding.
+The independent scenario oracle remains density-based at its documented host
+comparison boundary. All 284 assertion-ledger entries retain resolvable test
+successors; original bodies and current body-change flags are recorded.
+
+Removed three now-unreferenced private legacy kernels: unweighted energy
+accumulation, unmapped gas-transfer reduction, and unmapped partition gating.
+CodeGraph and repository reference searches found no remaining callers. Retained
+`condensation_mass_transfer_kernel` because the independent autodiff test uses
+it, plus the explicitly discrete standalone inventory-finalization primitive.
+
+Validation:
+- Multi-box plus captured-loop: **62 passed, 13 skipped in 2.61s**,
+  `/tmp/m6-multibox-native2.log`.
+- Full execution suite: **1384 passed, 52 skipped in 83.25s**,
+  `/tmp/m6-execution-condensation-migration2.log`. This run started before
+  deletion of the three unused kernels; directly affected consumers were rerun
+  afterward as recorded below.
+- Condensation kernel/native/autodiff after dead-kernel removal: **381 passed,
+  179 skipped in 3.44s**, `/tmp/m6-condensation-dead-kernels2.log`.
+  The initial command used a nonexistent contract filename and collected no
+  tests; the corrected command used `condensation_test.py`.
+- Adapter, integration, full-loop, multi-box and captured-loop final consumer
+  rerun: **155 passed, 16 skipped in 6.56s**,
+  `/tmp/m6-condensation-consumers-final.log`.
+- Full-package mypy: **534 files passed**, `/tmp/m6-condensation-mypy5.log`.
+- Ruff check and format check passed all ten changed Python files; whitespace
+  check passed. Focused checks are assertion evidence, not package coverage.
+
+The condensation removal unit is ready to commit. Next remove untagged GPU
+coagulation/wall-loss paths, then source/communication and lifecycle/checkpoint
+compatibility. Full-package, installed-wheel, exhaustive example, publication,
+and final PR gates remain pending.

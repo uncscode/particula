@@ -272,6 +272,7 @@ def _warp_state_inputs() -> tuple[Any, Any, Any]:
     )
 
     particles = WarpParticleData()
+    particles.distribution_kind = wp.int32(1)
     particles.masses = wp.ones((1, 2, 1), dtype=wp.float64, device="cpu")
     particles.concentration = wp.ones((1, 2), dtype=wp.float64, device="cpu")
     particles.charge = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
@@ -289,6 +290,21 @@ def _warp_state_inputs() -> tuple[Any, Any, Any]:
         (1, 1), dtype=wp.float64, device="cpu"
     )
     return particles, gas, environment
+
+
+def _one_species_binding(particles: Any, gas: Any) -> Any:
+    """Prepare the explicit one-lane configuration owned by this test fixture."""
+    from particula.dynamics.condensation.species_mapping import (
+        CondensationSpeciesMap,
+    )
+    from particula.gpu.species_mapping import prepare_condensation_species_map
+
+    return prepare_condensation_species_map(
+        particles,
+        gas,
+        gas_names=("species_0",),
+        species_map=CondensationSpeciesMap(("species_0",), ((0, 0),)),
+    )
 
 
 def _snapshot_warp_resources(*resources: Any) -> list[tuple[int, np.ndarray]]:
@@ -353,6 +369,9 @@ def _real_warp_condensation_state(
 ) -> tuple[Any, Any, Any, Any]:
     """Build a production-converted two-particle, two-species Warp state."""
     wp = pytest.importorskip("warp")
+    from particula.dynamics.condensation.species_mapping import (
+        CondensationSpeciesMap,
+    )
     from particula.gas import EnvironmentData
     from particula.gas.gas_data import GasData
     from particula.gpu.conversion import (
@@ -361,6 +380,7 @@ def _real_warp_condensation_state(
         to_warp_particle_data,
     )
     from particula.gpu.kernels.thermodynamics import ThermodynamicsConfig
+    from particula.gpu.species_mapping import prepare_condensation_species_map
     from particula.particles.particle_data import ParticleData
 
     cpu_particles = ParticleData(
@@ -368,7 +388,8 @@ def _real_warp_condensation_state(
         concentration=np.array([[1.0e6, 2.0e6]]),
         charge=np.zeros((1, 2)),
         density=np.array([1000.0, 1200.0]),
-        volume=np.array([1.0e-6]),
+        volume=np.array([1.0]),
+        distribution_type="discrete",
     )
     cpu_gas = GasData(
         name=["species_0", "species_1"],
@@ -415,6 +436,14 @@ def _real_warp_condensation_state(
             latent_heat=latent_heat,
             energy_transfer=energy_transfer,
             thermal_work=thermal_work,
+            species_binding=prepare_condensation_species_map(
+                particles,
+                gas,
+                gas_names=cpu_gas.name,
+                species_map=CondensationSpeciesMap(
+                    tuple(cpu_gas.name), ((0, 0), (1, 1))
+                ),
+            ),
         ),
         0.1,
     )
@@ -444,6 +473,7 @@ def test_warp_state_retains_primary_and_opaque_resources_by_identity() -> None:
         latent_heat,
         None,
         thermal_work,
+        species_binding=_one_species_binding(particles, gas),
     )
 
     payload = state.backend_payload
@@ -467,6 +497,8 @@ def test_warp_state_does_not_launch_transfer_or_synchronize(
 
     particles, gas, environment = _warp_state_inputs()
 
+    binding = _one_species_binding(particles, gas)
+
     def fail(*args: object, **kwargs: object) -> None:
         """Fail if construction attempts a Warp operation."""
         del args, kwargs
@@ -474,6 +506,8 @@ def test_warp_state_does_not_launch_transfer_or_synchronize(
 
     monkeypatch.setattr(wp, "synchronize", fail)
     monkeypatch.setattr(wp, "copy", fail)
+    for name in ("zeros", "full", "launch"):
+        monkeypatch.setattr(wp, name, fail)
 
     state = WarpCondensationState(
         CondensationExecutionConfig(_configuration()),
@@ -481,6 +515,7 @@ def test_warp_state_does_not_launch_transfer_or_synchronize(
         gas,
         environment,
         object(),
+        species_binding=binding,
     )
 
     assert state.backend_payload == (particles, gas, environment)
@@ -609,6 +644,7 @@ def test_warp_state_validates_writable_outputs_and_ownership() -> None:
         object(),
         mass_transfer=mass_transfer,
         energy_transfer=energy_transfer,
+        species_binding=_one_species_binding(particles, gas),
     )
     assert state.mass_transfer is mass_transfer
     assert state.energy_transfer is energy_transfer
@@ -624,6 +660,7 @@ def test_warp_state_validates_writable_outputs_and_ownership() -> None:
             environment,
             object(),
             mass_transfer=wp.zeros((1, 1, 1), dtype=wp.float64, device="cpu"),
+            species_binding=_one_species_binding(particles, gas),
         )
     with pytest.raises(
         ValueError,
@@ -636,6 +673,7 @@ def test_warp_state_validates_writable_outputs_and_ownership() -> None:
             environment,
             object(),
             mass_transfer=particles.masses,
+            species_binding=_one_species_binding(particles, gas),
         )
     with pytest.raises(
         ValueError,
@@ -648,6 +686,7 @@ def test_warp_state_validates_writable_outputs_and_ownership() -> None:
             environment,
             object(),
             energy_transfer=gas.concentration,
+            species_binding=_one_species_binding(particles, gas),
         )
 
 
@@ -685,6 +724,7 @@ def test_warp_state_accepts_output_adjacent_to_int32_partitioning() -> None:
         environment,
         object(),
         mass_transfer=mass_transfer,
+        species_binding=_one_species_binding(particles, gas),
     )
 
     assert cast(Any, state.gas).partitioning is gas.partitioning
@@ -1117,6 +1157,7 @@ def test_warp_execution_adapter_lazily_dispatches_native_tuple_by_identity(
         latent_heat=latent_heat,
         energy_transfer=energy_transfer,
         thermal_work=thermal_work,
+        species_binding=_one_species_binding(particles, gas),
     )
     state = WarpCondensationExecutionState(p2_state, 1.0)
     expected = (particles, transfer)
@@ -1155,6 +1196,7 @@ def test_warp_execution_adapter_lazily_dispatches_native_tuple_by_identity(
     assert calls[0][1]["mass_transfer"] is transfer
     assert calls[0][1]["environment"] is environment
     assert calls[0][1]["thermodynamics"] is p2_state.thermodynamics
+    assert calls[0][1]["species_binding"] is p2_state.species_binding
     assert calls[0][1]["activity_surface"] is p2_state.activity_surface
     assert calls[0][1]["scratch_buffers"] is p2_state.scratch_buffers
     assert calls[0][1]["thermal_work"] is p2_state.thermal_work
@@ -1220,6 +1262,7 @@ def test_warp_execution_dispatches_supported_profile_sidecars(
             environment,
             object(),
             activity_surface=sidecar,
+            species_binding=_one_species_binding(particles, gas),
         ),
         1.0,
     )
@@ -1257,6 +1300,7 @@ def test_warp_execution_rejects_required_profile_sidecar_before_resolution(
             gas,
             environment,
             object(),
+            species_binding=_one_species_binding(particles, gas),
         ),
         1.0,
     )
@@ -1290,6 +1334,7 @@ def test_warp_execution_state_is_frozen_identity_carrier() -> None:
         gas,
         environment,
         object(),
+        species_binding=_one_species_binding(particles, gas),
     )
     state = WarpCondensationExecutionState(p2_state, 1.0)
 
@@ -1361,6 +1406,7 @@ def test_warp_execution_rejects_invalid_latent_heat_before_resolution(
         _thermodynamics_config_for_warp_state(gas, wp),
         latent_heat=latent_heat,
         energy_transfer=energy_transfer,
+        species_binding=_one_species_binding(particles, gas),
     )
     resources = (
         *_primary_warp_resources(particles, gas, environment),
@@ -1392,10 +1438,21 @@ def test_warp_execution_reaches_direct_deferred_work_validation(
 ) -> None:
     """Test malformed deferred work reaches the real direct-kernel validator."""
     import particula.execution.adapters.condensation as condensation
+    from particula.dynamics.condensation.species_mapping import (
+        CondensationSpeciesMap,
+    )
     from particula.gpu.kernels import condensation_step_gpu
+    from particula.gpu.species_mapping import prepare_condensation_species_map
 
     wp = pytest.importorskip("warp")
     particles, gas, environment = _warp_state_inputs()
+    particles.distribution_kind = wp.int32(1)
+    binding = prepare_condensation_species_map(
+        particles,
+        gas,
+        gas_names=("species_0",),
+        species_map=CondensationSpeciesMap(("species_0",), ((0, 0),)),
+    )
     latent_heat = wp.ones(1, dtype=wp.float64, device="cpu")
     energy_transfer = wp.zeros((1, 1), dtype=wp.float64, device="cpu")
     thermal_work = wp.ones(2, dtype=wp.float64, device="cpu")
@@ -1408,6 +1465,7 @@ def test_warp_execution_reaches_direct_deferred_work_validation(
         latent_heat=latent_heat,
         energy_transfer=energy_transfer,
         thermal_work=thermal_work,
+        species_binding=binding,
     )
     resources = (
         *_primary_warp_resources(particles, gas, environment),
@@ -1498,7 +1556,12 @@ def test_warp_execution_records_energy_without_mutating_thermal_work() -> None:
     assert np.any(mass_transfer.numpy() != 0.0)
     np.testing.assert_allclose(
         energy_transfer.numpy(),
-        np.sum(mass_transfer.numpy(), axis=1) * latent_heat.numpy()[None, :],
+        np.sum(
+            mass_transfer.numpy() * particles.concentration.numpy()[:, :, None],
+            axis=1,
+        )
+        * particles.volume.numpy()[:, None]
+        * latent_heat.numpy()[None, :],
         rtol=1.0e-12,
         atol=1.0e-30,
     )
@@ -1518,6 +1581,7 @@ def test_warp_execution_propagates_native_exception_without_recovery(
         gas,
         environment,
         object(),
+        species_binding=_one_species_binding(particles, gas),
     )
     error = RuntimeError("native failure")
     calls = 0
@@ -1559,6 +1623,7 @@ def test_warp_execution_rejects_invalid_controls_before_kernel_resolution(
         gas,
         environment,
         object(),
+        species_binding=_one_species_binding(particles, gas),
     )
     resources = _primary_warp_resources(particles, gas, environment)
     snapshot = _snapshot_warp_resources(*resources)
@@ -1618,6 +1683,7 @@ def test_warp_execution_rejects_unselected_state_and_profile_before_kernel(
             gas,
             environment,
             object(),
+            species_binding=_one_species_binding(particles, gas),
         ),
         1.0,
     )
@@ -1694,6 +1760,7 @@ def test_warp_execution_rejects_unsupported_profiles_before_resolution(
             latent_heat=latent_heat,
             energy_transfer=energy_transfer,
             thermal_work=thermal_work,
+            species_binding=_one_species_binding(particles, gas),
         ),
         1.0,
     )
@@ -1760,3 +1827,35 @@ def test_get_condensation_step_gpu_prepares_then_enqueues_direct_call(
         ("prepare", ("particles",), {"time_step": 1.0}),
         ("enqueue", (prepared,), None),
     ]
+
+
+@pytest.mark.warp
+@pytest.mark.parametrize(
+    "kind, message",
+    [(0, "explicit population metadata"), (1, "requires species_binding")],
+)
+def test_warp_condensation_requires_explicit_population_and_binding(
+    kind, message, monkeypatch
+):
+    """Unsupported admission performs no device work or caller mutation."""
+    wp = pytest.importorskip("warp")
+    particles, gas, environment = _warp_state_inputs()
+    particles.distribution_kind = kind
+    resources = _primary_warp_resources(particles, gas, environment)
+    snapshot = _snapshot_warp_resources(*resources)
+
+    def forbidden(*args, **kwargs):
+        raise AssertionError("device work during rejected carrier construction")
+
+    with monkeypatch.context() as patch:
+        for name in ("zeros", "full", "copy", "launch", "synchronize"):
+            patch.setattr(wp, name, forbidden)
+        with pytest.raises(ValueError, match=message):
+            WarpCondensationState(
+                CondensationExecutionConfig(_configuration()),
+                particles,
+                gas,
+                environment,
+                object(),
+            )
+    _assert_warp_resources_unchanged(snapshot, *resources)

@@ -923,7 +923,9 @@ def test_condensation_step_gpu_invalid_primary_p2_state_is_atomic(
         return original_launch(kernel, *args, **kwargs)
 
     monkeypatch.setattr(condensation_module.wp, "launch", _tracking_launch)
-    with pytest.raises(ValueError, match="finite and non-negative"):
+    with pytest.raises(
+        ValueError, match="invalid native condensation physical state or volume"
+    ):
         _condensation_step_gpu(
             gpu_particles,
             gpu_gas,
@@ -934,6 +936,7 @@ def test_condensation_step_gpu_invalid_primary_p2_state_is_atomic(
             scratch_buffers=scratch,
             latent_heat=latent_heat,
             energy_transfer=energy_transfer,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
     for array, snapshot in zip(state_arrays, snapshots, strict=True):
         npt.assert_array_equal(array.numpy(), snapshot)
@@ -971,6 +974,7 @@ def test_condensation_step_gpu_empty_particle_axis_preserves_gas_and_outputs(
         time_step=0.1,
         thermodynamics=_make_thermodynamics_config(gpu_gas),
         mass_transfer=total,
+        species_binding=_identity_species_binding(gpu_particles, gpu_gas),
     )
 
     assert returned is total
@@ -1067,6 +1071,7 @@ def test_condensation_step_gpu_rejects_p2_vapor_pressure_alias_atomically(
             time_step=0.1,
             thermodynamics=_make_thermodynamics_config(gpu_gas),
             scratch_buffers=scratch,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
     npt.assert_array_equal(gpu_particles.masses.numpy(), initial_mass)
     npt.assert_array_equal(gpu_gas.concentration.numpy(), initial_gas)
@@ -1107,6 +1112,7 @@ def test_condensation_step_gpu_rejects_legacy_output_alias_atomically(
             time_step=0.1,
             thermodynamics=_make_thermodynamics_config(gpu_gas),
             mass_transfer=gpu_particles.masses,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
     npt.assert_array_equal(gpu_particles.masses.numpy(), initial_mass)
     assert (
@@ -1216,6 +1222,7 @@ def test_condensation_scratch_ownership_aliases_are_atomic(
             time_step=0.1,
             thermodynamics=thermodynamics,
             scratch_buffers=scratch,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
     for array, snapshot in zip(state_arrays, snapshots, strict=True):
         npt.assert_array_equal(array.numpy(), snapshot)
@@ -1250,6 +1257,7 @@ def test_condensation_step_gpu_stale_nonfinite_work_buffer_is_overwritten(
         time_step=0.1,
         thermodynamics=_make_thermodynamics_config(gpu_gas),
         scratch_buffers=scratch,
+        species_binding=_identity_species_binding(gpu_particles, gpu_gas),
     )
 
     assert returned is scratch.total_mass_transfer
@@ -1289,7 +1297,7 @@ def test_condensation_step_gpu_nonfinite_fresh_proposal_is_p2_atomic(
     ) -> Any:
         launched_kernels.append(kernel)
         result = original_launch(kernel, *args, **kwargs)
-        if kernel is condensation_module._gate_mass_transfer_kernel:
+        if kernel is condensation_module.native_kernels.gate_transfer:
             work = kwargs["inputs"][2]
             wp.copy(
                 work,
@@ -1309,6 +1317,7 @@ def test_condensation_step_gpu_nonfinite_fresh_proposal_is_p2_atomic(
             time_step=0.1,
             thermodynamics=_make_thermodynamics_config(gpu_gas),
             scratch_buffers=scratch,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
 
     for array, snapshot in zip(state_arrays, snapshots, strict=True):
@@ -1354,7 +1363,7 @@ def test_condensation_energy_retains_committed_substeps_after_proposal_failure(
     def _fail_second_proposal(kernel: Any, *args: Any, **kwargs: Any) -> Any:
         nonlocal gate_launches
         result = original_launch(kernel, *args, **kwargs)
-        if kernel is condensation_module._gate_mass_transfer_kernel:
+        if kernel is condensation_module.native_kernels.gate_transfer:
             gate_launches += 1
             if gate_launches == 2:
                 wp.copy(
@@ -1375,6 +1384,7 @@ def test_condensation_energy_retains_committed_substeps_after_proposal_failure(
             scratch_buffers=scratch,
             latent_heat=latent_heat,
             energy_transfer=energy_transfer,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
     assert gate_launches == 2
     assert scratch.total_mass_transfer is not None
@@ -1417,7 +1427,7 @@ def test_condensation_rejects_nonfinite_extreme_gas_delta_before_coupling(
         kernel: Any, *args: Any, **kwargs: Any
     ) -> Any:
         result = original_launch(kernel, *args, **kwargs)
-        if kernel is condensation_module._gate_mass_transfer_kernel:
+        if kernel is condensation_module.native_kernels.gate_transfer:
             wp.copy(
                 kwargs["inputs"][2],
                 wp.array([[[-1.0e100]]], dtype=wp.float64, device=device),
@@ -1435,6 +1445,7 @@ def test_condensation_rejects_nonfinite_extreme_gas_delta_before_coupling(
             pressure=101325.0,
             time_step=0.1,
             thermodynamics=_make_thermodynamics_config(gpu_gas),
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
     npt.assert_array_equal(gpu_gas.concentration.numpy(), initial_gas)
     assert np.all(np.isfinite(gpu_gas.concentration.numpy()))
@@ -1458,6 +1469,7 @@ def test_prepared_condensation_enqueue_uses_frozen_device_references_only(
         pressure=101325.0,
         time_step=0.1,
         thermodynamics=thermodynamics,
+        species_binding=_identity_species_binding(gpu_particles, gpu_gas),
     )
     frozen_masses = gpu_particles.masses
     frozen_gas_concentration = gpu_gas.concentration
@@ -1545,7 +1557,7 @@ def test_condensation_public_insufficient_inventory_scales_uptake_and_conserves(
         kernel: Any, *args: Any, **kwargs: Any
     ) -> Any:
         result = original_launch(kernel, *args, **kwargs)
-        if kernel is condensation_module._gate_mass_transfer_kernel:
+        if kernel is condensation_module.native_kernels.gate_transfer:
             wp.copy(
                 kwargs["inputs"][2],
                 wp.array([[[1.0e-18]]], dtype=wp.float64, device=device),
@@ -1563,6 +1575,7 @@ def test_condensation_public_insufficient_inventory_scales_uptake_and_conserves(
         time_step=0.1,
         thermodynamics=_make_thermodynamics_config(gpu_gas),
         scratch_buffers=scratch,
+        species_binding=_identity_species_binding(gpu_particles, gpu_gas),
     )
     assert scratch.positive_mass_transfer_scale is not None
     assert np.all(scratch.positive_mass_transfer_scale.numpy() < 1.0)
@@ -1573,6 +1586,30 @@ def test_condensation_public_insufficient_inventory_scales_uptake_and_conserves(
     assert np.all(final_gas >= 0.0)
     npt.assert_allclose(
         final_weighted_total, initial_weighted_total, rtol=1e-12
+    )
+
+
+def _identity_species_binding(particles: Any, gas: Any) -> Any:
+    """Explicit identity map for these equal-width synthetic species fixtures.
+
+    These historical numerical oracles treat concentration as number density,
+    now declared discrete on CPU construction. Their lanes deliberately pair
+    by fixture index. This is test configuration, not production map inference;
+    nonidentity/full-gas provenance is independently covered by native tests.
+    """
+    from particula.dynamics.condensation.species_mapping import (
+        CondensationSpeciesMap,
+    )
+    from particula.gpu.species_mapping import prepare_condensation_species_map
+
+    names = tuple(f"species_{i}" for i in range(gas.molar_mass.shape[0]))
+    return prepare_condensation_species_map(
+        particles,
+        gas,
+        gas_names=names,
+        species_map=CondensationSpeciesMap(
+            names, tuple((i, i) for i in range(len(names)))
+        ),
     )
 
 
@@ -1670,7 +1707,8 @@ def _make_particle_data(
         concentration=concentration,
         charge=charge,
         density=density,
-        volume=volume,
+        volume=np.ones_like(volume),
+        distribution_type="discrete",
     )
 
 
@@ -1736,7 +1774,8 @@ class CondensationParityCase:
                 concentration=self.particles.concentration.copy(),
                 charge=self.particles.charge.copy(),
                 density=self.particles.density.copy(),
-                volume=self.particles.volume.copy(),
+                volume=np.ones_like(self.particles.volume.copy()),
+                distribution_type="discrete",
             ),
             GasData(
                 name=list(self.gas.name),
@@ -1767,7 +1806,8 @@ def _make_condensation_parity_cases() -> tuple[CondensationParityCase, ...]:
         concentration=np.array([[1.0, 2.0], [1.5, 0.0]], dtype=np.float64),
         charge=np.zeros((2, 2), dtype=np.float64),
         density=np.array([1000.0, 1100.0, 1200.0], dtype=np.float64),
-        volume=np.array([1.0e-6, 1.1e-6], dtype=np.float64),
+        volume=np.ones_like(np.array([1.0e-6, 1.1e-6], dtype=np.float64)),
+        distribution_type="discrete",
     )
     multi_box_gas = GasData(
         name=["uptake", "evaporation", "disabled"],
@@ -2593,7 +2633,8 @@ class P4CondensationCase:
             concentration=np.ones((n_boxes, n_particles), dtype=np.float64),
             charge=np.zeros((n_boxes, n_particles), dtype=np.float64),
             density=np.array([1000.0, 1450.0], dtype=np.float64),
-            volume=np.full(n_boxes, 1.0e-6, dtype=np.float64),
+            volume=np.ones_like(np.full(n_boxes, 1.0e-6, dtype=np.float64)),
+            distribution_type="discrete",
         )
 
     def build_gas_data(self) -> GasData:
@@ -2792,6 +2833,7 @@ def _assert_p4_gpu_matches_reference(
         surface_tension=tension,
         thermodynamics=thermodynamics,
         activity_surface=activity_surface,
+        species_binding=_identity_species_binding(gpu_particles, gpu_gas),
     )
     final_mass = runtime.from_warp_particle_data(
         gpu_particles, sync=True
@@ -3217,6 +3259,7 @@ def _run_gpu_step(
         activity_surface=activity_surface,
         scratch_buffers=scratch_buffers,
         latent_heat=latent_heat,
+        species_binding=_identity_species_binding(gpu_particles, gpu_gas),
     )
     cpu_particles = from_warp_particle_data(gpu_particles, sync=True)
     if not return_gas_state:
@@ -3627,6 +3670,7 @@ def _run_p2_contract_case(device: str) -> dict[str, Any]:
         latent_heat=latent_heat,
         energy_transfer=energy_transfer,
         scratch_buffers=scratch,
+        species_binding=_identity_species_binding(gpu_particles, gpu_gas),
     )
     return {
         "particles": particles,
@@ -3673,7 +3717,13 @@ def test_condensation_p2_contract_conserves_per_box_species_and_energy(
         np.sum(transfer * result["concentration"][:, :, None], axis=1),
     )
     energy = result["energy_transfer"].numpy()
-    expected_energy = transfer.sum(axis=1) * result["latent_heat"][None, :]
+    # Native energy is extensive: number-density-weighted transfer times
+    # the explicit unit representative volume and latent heat.
+    expected_energy = (
+        np.sum(transfer * result["concentration"][:, :, None], axis=1)
+        * result["particles"].volume[:, None]
+        * result["latent_heat"][None, :]
+    )
     _assert_contract_allclose(energy, expected_energy)
     npt.assert_array_equal(energy[:, 1:], 0.0)
     inactive = result["concentration"] == 0.0
@@ -3763,7 +3813,7 @@ def test_condensation_p2_contract_inventory_limited_uptake_is_consistent(
         kernel: Any, *args: Any, **kwargs: Any
     ) -> Any:
         result = original_launch(kernel, *args, **kwargs)
-        if kernel is runtime.condensation_module._gate_mass_transfer_kernel:
+        if kernel is runtime.condensation_module.native_kernels.gate_transfer:
             runtime.wp.copy(
                 kwargs["inputs"][2],
                 runtime.wp.array(
@@ -3787,6 +3837,7 @@ def test_condensation_p2_contract_inventory_limited_uptake_is_consistent(
         latent_heat=latent_heat,
         energy_transfer=energy,
         scratch_buffers=scratch,
+        species_binding=_identity_species_binding(gpu_particles, gpu_gas),
     )
     transfer = transfer_buffer.numpy()
     final_masses = gpu_particles.masses.numpy()
@@ -3806,7 +3857,10 @@ def test_condensation_p2_contract_inventory_limited_uptake_is_consistent(
         particle_delta, final_gas - initial_gas
     )
     _assert_contract_allclose(
-        energy.numpy(), transfer.sum(axis=1) * latent_heat.numpy()[None, :]
+        energy.numpy(),
+        np.sum(transfer * particles.concentration[:, :, None], axis=1)
+        * particles.volume[:, None]
+        * latent_heat.numpy()[None, :],
     )
     _assert_warp_arrays_unchanged(snapshots, immutable)
     assert scratch.total_mass_transfer is transfer_buffer
@@ -3956,6 +4010,7 @@ def test_condensation_p2_contract_invalid_buffers_are_atomic(
             else latent_heat,
             energy_transfer=energy,
             scratch_buffers=scratch,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
     _assert_warp_arrays_unchanged(snapshots, arrays)
 
@@ -3992,7 +4047,8 @@ def _make_production_inventory_case() -> tuple[
         ),
         charge=np.zeros((2, 3), dtype=np.float64),
         density=np.array([1000.0, 1200.0, 1400.0], dtype=np.float64),
-        volume=np.full(2, 1.0e-6, dtype=np.float64),
+        volume=np.ones_like(np.full(2, 1.0e-6, dtype=np.float64)),
+        distribution_type="discrete",
     )
     gas = GasData(
         name=["uptake", "disabled", "evaporation"],
@@ -4320,6 +4376,7 @@ def test_condensation_scratch_transfer_overlap_is_atomic(
             mass_transfer=transfer,
             thermodynamics=_make_thermodynamics_config(gpu_gas),
             scratch_buffers=scratch,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
     npt.assert_array_equal(gpu_particles.masses.numpy(), initial_mass)
     npt.assert_array_equal(transfer.numpy(), initial_transfer)
@@ -4370,6 +4427,7 @@ def test_condensation_scratch_buffer_wrong_dtype_is_atomic(
             0.1,
             thermodynamics=_make_thermodynamics_config(gpu_gas),
             scratch_buffers=scratch,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
     npt.assert_array_equal(gpu_particles.masses.numpy(), initial_mass)
 
@@ -4411,6 +4469,7 @@ def test_condensation_scratch_buffer_wrong_shape_is_atomic(
             0.1,
             thermodynamics=_make_thermodynamics_config(gpu_gas),
             scratch_buffers=scratch,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
     npt.assert_array_equal(gpu_particles.masses.numpy(), initial_mass)
 
@@ -4469,6 +4528,7 @@ def test_condensation_p2_scratch_non_warp_value_is_atomic(
             mass_transfer=transfer,
             thermodynamics=_make_thermodynamics_config(gpu_gas),
             scratch_buffers=scratch,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
 
     npt.assert_array_equal(gpu_particles.masses.numpy(), initial_mass)
@@ -4522,6 +4582,7 @@ def test_condensation_p2_scratch_wrong_device_is_atomic(field: str) -> None:
             0.1,
             thermodynamics=_make_thermodynamics_config(gpu_gas),
             scratch_buffers=scratch,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
 
     npt.assert_array_equal(gpu_particles.masses.numpy(), initial_mass)
@@ -4554,6 +4615,7 @@ def test_condensation_partitioning_nonbinary_mask_is_atomic(
             101325.0,
             0.1,
             thermodynamics=_make_thermodynamics_config(gpu_gas),
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
     npt.assert_array_equal(gpu_particles.masses.numpy(), initial_mass)
     npt.assert_array_equal(gpu_gas.concentration.numpy(), initial_gas)
@@ -4616,7 +4678,9 @@ def test_condensation_partitioning_metadata_failure_is_atomic(
         for field in dataclasses.fields(scratch)
     }
 
-    with pytest.raises(ValueError, match=message):
+    with pytest.raises(
+        ValueError, match="species binding has incompatible shapes or dtypes"
+    ):
         condensation_step_gpu(
             gpu_particles,
             gas_for_step,
@@ -4626,6 +4690,9 @@ def test_condensation_partitioning_metadata_failure_is_atomic(
             mass_transfer=transfer,
             thermodynamics=_make_thermodynamics_config(gas_for_step),
             scratch_buffers=scratch,
+            species_binding=_identity_species_binding(
+                gpu_particles, gas_for_step
+            ),
         )
 
     npt.assert_array_equal(gpu_particles.masses.numpy(), initial_mass)
@@ -4667,6 +4734,7 @@ def test_condensation_partitioning_gates_disabled_species_and_inactive_slots(
         0.1,
         thermodynamics=_make_thermodynamics_config(gpu_gas),
         scratch_buffers=scratch,
+        species_binding=_identity_species_binding(gpu_particles, gpu_gas),
     )
     work = scratch.work_mass_transfer.numpy()
     total_values = total.numpy()
@@ -4725,6 +4793,7 @@ def test_condensation_partitioning_enabled_entry_matches_all_enabled_control(
         0.1,
         thermodynamics=_make_thermodynamics_config(gated_gas),
         scratch_buffers=gated_scratch,
+        species_binding=_identity_species_binding(gated_particles, gated_gas),
     )
     condensation_step_gpu(
         control_particles,
@@ -4734,6 +4803,9 @@ def test_condensation_partitioning_enabled_entry_matches_all_enabled_control(
         0.1,
         thermodynamics=_make_thermodynamics_config(control_gas),
         scratch_buffers=control_scratch,
+        species_binding=_identity_species_binding(
+            control_particles, control_gas
+        ),
     )
     npt.assert_allclose(
         gated_scratch.work_mass_transfer.numpy(),
@@ -4836,6 +4908,9 @@ def _record_condensation_stiffness_trials_uncached(
                 time_step=trial_time_step,
                 thermodynamics=thermodynamics,
                 scratch_buffers=scratch,
+                species_binding=_identity_species_binding(
+                    gpu_particles, gpu_gas
+                ),
             )
             return (
                 particles.masses.copy(),
@@ -5183,6 +5258,9 @@ def test_zero_latent_or_thermal_work_sidecars_preserve_isothermal_condensation(
         time_step=0.1,
         thermodynamics=sidecar_thermodynamics,
         **sidecar_kwargs,
+        species_binding=_identity_species_binding(
+            sidecar_particles, sidecar_gas
+        ),
     )
     _, legacy_transfer = _condensation_step_gpu(
         legacy_particles,
@@ -5191,6 +5269,7 @@ def test_zero_latent_or_thermal_work_sidecars_preserve_isothermal_condensation(
         pressure=101325.0,
         time_step=0.1,
         thermodynamics=legacy_thermodynamics,
+        species_binding=_identity_species_binding(legacy_particles, legacy_gas),
     )
     npt.assert_array_equal(sidecar_transfer.numpy(), legacy_transfer.numpy())
     npt.assert_array_equal(
@@ -5265,6 +5344,7 @@ def test_condensation_latent_heat_matches_four_substep_oracle(
         latent_heat=latent_heat,
         thermal_work=thermal_work,
         scratch_buffers=scratch,
+        species_binding=_identity_species_binding(gpu_particles, gpu_gas),
     )
 
     assert transfer is scratch.total_mass_transfer
@@ -5310,6 +5390,9 @@ def test_condensation_latent_heat_matches_four_substep_oracle(
         latent_heat=latent_heat,
         thermal_work=thermal_work,
         scratch_buffers=scratch,
+        species_binding=_identity_species_binding(
+            repeated_particles, repeated_gas
+        ),
     )
     assert repeated_transfer is scratch.total_mass_transfer
     assert scratch.work_mass_transfer is scratch_arrays[0]
@@ -5406,7 +5489,12 @@ def _assert_composed_condensation_route(
     else:
         step_kwargs.update(temperature=temperature, pressure=pressure)
 
-    result = _condensation_step_gpu(gpu_particles, gpu_gas, **step_kwargs)
+    result = _condensation_step_gpu(
+        gpu_particles,
+        gpu_gas,
+        **step_kwargs,
+        species_binding=_identity_species_binding(gpu_particles, gpu_gas),
+    )
 
     assert len(result) == 2
     assert result[0] is gpu_particles
@@ -5482,6 +5570,7 @@ def test_condensation_step_gpu_energy_transfer_reuses_and_overwrites_output(
         thermodynamics=_make_thermodynamics_config(gpu_gas),
         latent_heat=wp.array(latent_values, dtype=wp.float64, device=device),
         energy_transfer=energy_transfer,
+        species_binding=_identity_species_binding(gpu_particles, gpu_gas),
     )
     assert len(result) == 2
     assert result[0] is gpu_particles
@@ -5508,6 +5597,7 @@ def test_condensation_step_gpu_energy_transfer_reuses_and_overwrites_output(
         thermodynamics=_make_thermodynamics_config(gpu_gas),
         latent_heat=wp.array(latent_values, dtype=wp.float64, device=device),
         energy_transfer=energy_transfer,
+        species_binding=_identity_species_binding(gpu_particles, gpu_gas),
     )
     assert np.all(np.isfinite(energy_transfer.numpy()))
     npt.assert_allclose(
@@ -5544,6 +5634,7 @@ def test_condensation_step_gpu_without_energy_transfer_skips_energy_kernels(
         pressure=101325.0,
         time_step=0.1,
         thermodynamics=_make_thermodynamics_config(gpu_gas),
+        species_binding=_identity_species_binding(gpu_particles, gpu_gas),
     )
 
     assert len(result) == 2
@@ -5552,7 +5643,7 @@ def test_condensation_step_gpu_without_energy_transfer_skips_energy_kernels(
         not in launched_kernels
     )
     assert (
-        condensation_module._accumulate_energy_transfer_kernel
+        condensation_module.native_kernels.energy_transfer
         not in launched_kernels
     )
 
@@ -5602,13 +5693,14 @@ def test_condensation_step_gpu_nonzero_execution_launches_four_p2_sequences(
         time_step=0.1,
         thermodynamics=_make_thermodynamics_config(gpu_gas),
         scratch_buffers=scratch,
+        species_binding=_identity_species_binding(gpu_particles, gpu_gas),
     )
 
     p2_kernels = (
         condensation_module._bound_evaporation_candidate_kernel,
-        condensation_module._reduce_inventory_candidates_kernel,
+        condensation_module.native_kernels.reduce_candidates,
         condensation_module._scale_inventory_uptake_kernel,
-        condensation_module._finalize_and_apply_inventory_transfer_kernel,
+        condensation_module.native_kernels.finalize_transfer,
         condensation_module._accumulate_finalized_mass_transfer_kernel,
         condensation_module._couple_finalized_transfer_to_gas_kernel,
     )
@@ -5645,6 +5737,7 @@ def test_condensation_step_gpu_energy_transfer_aggregates_by_box_and_species(
         thermodynamics=_make_thermodynamics_config(gpu_gas),
         latent_heat=wp.array(latent_values, dtype=wp.float64, device=device),
         energy_transfer=energy_transfer,
+        species_binding=_identity_species_binding(gpu_particles, gpu_gas),
     )
     expected = total.numpy().sum(axis=1) * latent_values[None, :]
     npt.assert_allclose(
@@ -5703,6 +5796,7 @@ def test_condensation_energy_transfer_matches_four_substep_oracle(
         thermodynamics=_make_thermodynamics_config(gpu_gas),
         latent_heat=wp.array(latent_values, dtype=wp.float64, device=device),
         energy_transfer=energy_transfer,
+        species_binding=_identity_species_binding(gpu_particles, gpu_gas),
     )
 
     expected_energy = expected_total.sum(axis=1) * latent_values[None, :]
@@ -5789,6 +5883,7 @@ def test_condensation_energy_transfer_preflight_is_atomic(
             else latent_heat,
             energy_transfer=energy_transfer,
             scratch_buffers=scratch,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
     for array, expected in zip(state_arrays, snapshots, strict=True):
         npt.assert_array_equal(array.numpy(), expected)
@@ -5827,7 +5922,9 @@ def test_condensation_energy_transfer_alias_preflight_is_atomic(
     )
     snapshots = tuple(array.numpy().copy() for array in state_arrays)
 
-    with pytest.raises(ValueError, match="must not overlap mutable"):
+    with pytest.raises(
+        ValueError, match="native condensation writers must not overlap state"
+    ):
         _condensation_step_gpu(
             gpu_particles,
             gpu_gas,
@@ -5838,6 +5935,7 @@ def test_condensation_energy_transfer_alias_preflight_is_atomic(
             latent_heat=latent_heat,
             energy_transfer=energy_transfer,
             scratch_buffers=scratch,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
 
     assert energy_transfer is getattr(gpu_gas, alias_name)
@@ -5909,6 +6007,7 @@ def test_condensation_cuda_invalid_species_sidecar_is_atomic(
             energy_transfer=energy_transfer,
             mass_transfer=mass_transfer,
             **sidecars,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
 
     for array, expected in zip(state_arrays, snapshots, strict=True):
@@ -5934,7 +6033,9 @@ def test_condensation_energy_transfer_rejects_thermodynamic_parameters_alias(
     )
     snapshots = tuple(array.numpy().copy() for array in state_arrays)
 
-    with pytest.raises(ValueError, match="must not overlap mutable"):
+    with pytest.raises(
+        ValueError, match="native condensation writers must not overlap state"
+    ):
         _condensation_step_gpu(
             gpu_particles,
             gpu_gas,
@@ -5944,6 +6045,7 @@ def test_condensation_energy_transfer_rejects_thermodynamic_parameters_alias(
             thermodynamics=thermodynamics,
             latent_heat=latent_heat,
             energy_transfer=thermodynamics.parameters,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
     for array, expected in zip(state_arrays, snapshots, strict=True):
         npt.assert_array_equal(array.numpy(), expected)
@@ -6028,6 +6130,7 @@ def test_condensation_energy_transfer_device_mismatch_is_atomic(
             latent_heat=latent_heat,
             energy_transfer=energy_transfer,
             scratch_buffers=scratch,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
 
     _assert_warp_arrays_unchanged(snapshots, state_arrays)
@@ -6134,6 +6237,7 @@ def test_condensation_mixed_latent_heat_with_activity_matches_oracle(
         activity_surface=activity_surface,
         latent_heat=wp.array(latent_values, dtype=wp.float64, device=device),
         scratch_buffers=scratch,
+        species_binding=_identity_species_binding(gpu_particles, gpu_gas),
     )
 
     npt.assert_allclose(
@@ -6181,6 +6285,9 @@ def test_condensation_isolated_zero_latent_species_matches_baseline(
         pressure=101325.0,
         time_step=0.1,
         thermodynamics=_make_thermodynamics_config(baseline_gas),
+        species_binding=_identity_species_binding(
+            baseline_particles, baseline_gas
+        ),
     )
     _, latent_total = _condensation_step_gpu(
         latent_particles,
@@ -6190,6 +6297,7 @@ def test_condensation_isolated_zero_latent_species_matches_baseline(
         time_step=0.1,
         thermodynamics=_make_thermodynamics_config(latent_gas),
         latent_heat=wp.array([0.0, 2.2e6], dtype=wp.float64, device=device),
+        species_binding=_identity_species_binding(latent_particles, latent_gas),
     )
 
     npt.assert_array_equal(
@@ -6309,6 +6417,7 @@ def test_invalid_latent_sidecar_fails_before_allocation_or_mutation(
             thermodynamics=thermodynamics,
             scratch_buffers=scratch,
             **kwargs,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
     for array, expected in zip(
         (
@@ -6354,6 +6463,7 @@ def test_invalid_time_step_fails_before_mutating_caller_outputs(
             time_step=invalid_time_step,
             mass_transfer=transfer,
             thermodynamics=_make_thermodynamics_config(gpu_gas),
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
 
     npt.assert_array_equal(gpu_particles.masses.numpy(), masses_before)
@@ -6396,6 +6506,7 @@ def test_latent_sidecar_device_mismatch_raises_value_error(
             time_step=0.1,
             thermodynamics=_make_thermodynamics_config(gpu_gas),
             **kwargs,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
 
 
@@ -6440,6 +6551,7 @@ def test_condensation_activity_surface_modes_are_finite_and_water_only(
         time_step=0.1,
         surface_tension=tension,
         activity_surface=activity_surface,
+        species_binding=_identity_species_binding(gpu_particles, gpu_gas),
     )
     configured = configured_transfer.numpy()
     final_masses = from_warp_particle_data(gpu_particles, sync=True).masses
@@ -6461,6 +6573,9 @@ def test_condensation_activity_surface_modes_are_finite_and_water_only(
             time_step=0.1,
             surface_tension=wp.array(
                 [0.04, 0.09], dtype=wp.float64, device=device
+            ),
+            species_binding=_identity_species_binding(
+                legacy_particles, legacy_gas
             ),
         )
         npt.assert_allclose(
@@ -6542,6 +6657,7 @@ def test_condensation_activity_surface_matches_independent_reference(
         surface_tension=tension,
         thermodynamics=thermodynamics,
         activity_surface=sidecar,
+        species_binding=_identity_species_binding(gpu_particles, gpu_gas),
     )
     _, expected, _ = _cpu_four_substep_oracle(
         particles,
@@ -6597,6 +6713,7 @@ def test_condensation_activity_surface_multibox_uses_current_composition(
         ),
         thermodynamics=thermodynamics,
         activity_surface=sidecar,
+        species_binding=_identity_species_binding(gpu_particles, gpu_gas),
     )
     _, expected, _ = _cpu_four_substep_oracle(
         particles,
@@ -6676,6 +6793,7 @@ def test_condensation_activity_surface_invalid_sidecar_is_atomic(
             mass_transfer=transfer,
             thermodynamics=_make_thermodynamics_config(gpu_gas),
             activity_surface=sidecar,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
     for values, expected in zip(
         (
@@ -6736,6 +6854,7 @@ def test_condensation_activity_surface_handles_inactive_composition_edges(
             ),
             thermodynamics=_make_thermodynamics_config(gpu_gas),
             activity_surface=sidecar,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
         transfers[activity_mode] = transfer.numpy()
         final_masses[activity_mode] = from_warp_particle_data(
@@ -6783,6 +6902,7 @@ def test_condensation_step_gpu_scalar_positional_call_remains_valid(
         298.15,
         101325.0,
         0.1,
+        species_binding=_identity_species_binding(gpu_particles, gpu_gas),
     )
     wp.synchronize()
 
@@ -6809,6 +6929,7 @@ def test_condensation_step_gpu_requires_thermodynamics_sidecar(
             temperature=298.15,
             pressure=101325.0,
             time_step=0.1,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
 
 
@@ -6851,6 +6972,7 @@ def test_condensation_step_gpu_rejects_mixed_environment_inputs(
             pressure=pressure,
             time_step=0.1,
             environment=environment,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
 
 
@@ -6878,6 +7000,7 @@ def test_condensation_step_gpu_accepts_explicit_environment(
         temperature=298.15,
         pressure=101325.0,
         time_step=0.1,
+        species_binding=_identity_species_binding(gpu_particles, gpu_gas),
     )
     scalar_result = np.asarray(scalar_mass_transfer.numpy()).copy()
 
@@ -6889,6 +7012,7 @@ def test_condensation_step_gpu_accepts_explicit_environment(
         pressure=None,
         time_step=0.1,
         environment=environment,
+        species_binding=_identity_species_binding(gpu_particles, gpu_gas),
     )
 
     npt.assert_allclose(environment_mass_transfer.numpy(), scalar_result)
@@ -7375,6 +7499,7 @@ def test_missing_scalar_inputs_without_environment_are_rejected(
             temperature=temperature,
             pressure=pressure,
             time_step=0.1,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
 
 
@@ -7444,6 +7569,7 @@ def test_condensation_step_gpu_contract_errors_short_circuit_before_helpers(
             pressure=pressure,
             time_step=0.1,
             environment=environment,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
 
     assert calls == ["partitioning_validation"]
@@ -7505,6 +7631,7 @@ def test_missing_scalar_inputs_short_circuit_before_helpers(
             temperature=temperature,
             pressure=pressure,
             time_step=0.1,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
 
     assert calls == []
@@ -7564,6 +7691,7 @@ def test_invalid_scalar_domains_short_circuit_before_launch(
             temperature=temperature,
             pressure=pressure,
             time_step=0.1,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
 
     assert calls == []
@@ -7617,6 +7745,7 @@ def test_invalid_environment_domains_short_circuit_before_launch(
             pressure=None,
             time_step=0.1,
             environment=environment,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
 
     assert set(calls) == {"partitioning_validation"}
@@ -7689,6 +7818,7 @@ def test_missing_environment_field_short_circuits_before_launch(
             time_step=0.1,
             mass_transfer=mass_transfer,
             environment=environment,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
 
     assert set(calls) == {"partitioning_validation"}
@@ -7761,6 +7891,7 @@ def test_invalid_direct_array_domains_short_circuit_before_launch(
                 device=device,
             ),
             time_step=0.1,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
 
     assert set(calls) == {"partitioning_validation"}
@@ -7832,6 +7963,7 @@ def test_condensation_step_gpu_rejects_direct_non_warp_arrays_before_launch(
             pressure=pressure,
             time_step=0.1,
             mass_transfer=mass_transfer,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
 
     assert calls == []
@@ -7906,6 +8038,7 @@ def test_invalid_environment_array_domains_short_circuit_before_launch(
             pressure=None,
             time_step=0.1,
             environment=environment,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
 
     assert set(calls) == {"partitioning_validation"}
@@ -8152,6 +8285,7 @@ def test_condensation_step_gpu_preserves_direct_environment_array_dtypes(
             [101325.0, 100800.0], dtype=wp.float64, device=device
         ),
         time_step=0.1,
+        species_binding=_identity_species_binding(gpu_particles, gpu_gas),
     )
 
     assert launch_dtypes == [(wp.float64, wp.float64)] * 4
@@ -8228,6 +8362,9 @@ def test_condensation_step_gpu_preserves_environment_array_dtypes(
             )
 
     environment = _EnvironmentLike()
+    environment.saturation_ratio = wp.zeros(
+        (2, 1), dtype=wp.float64, device=device
+    )
     gpu_particles = to_warp_particle_data(particles, device=device)
     gpu_gas = to_warp_gas_data(
         gas, device=device, vapor_pressure=vapor_pressure
@@ -8253,6 +8390,7 @@ def test_condensation_step_gpu_preserves_environment_array_dtypes(
         pressure=None,
         time_step=0.1,
         environment=environment,
+        species_binding=_identity_species_binding(gpu_particles, gpu_gas),
     )
 
     assert launch_dtypes == [(wp.float64, wp.float64)] * 4
@@ -8284,6 +8422,7 @@ def test_condensation_step_gpu_environment_shape_mismatch_raises_value_error(
             pressure=None,
             time_step=0.1,
             environment=environment,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
 
 
@@ -8315,6 +8454,7 @@ def test_condensation_step_gpu_environment_device_mismatch_raises_value_error(
             pressure=None,
             time_step=0.1,
             environment=environment,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
 
 
@@ -8338,6 +8478,7 @@ def test_condensation_step_gpu_direct_temperature_shape_mismatch_raises(
             temperature=temperature,
             pressure=101325.0,
             time_step=0.1,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
 
 
@@ -8365,6 +8506,7 @@ def test_condensation_step_gpu_direct_pressure_device_mismatch_raises(
             temperature=298.15,
             pressure=pressure,
             time_step=0.1,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
 
 
@@ -8395,6 +8537,7 @@ def test_condensation_step_gpu_prepares_box_properties_once_per_call(
         temperature=298.15,
         pressure=101325.0,
         time_step=0.1,
+        species_binding=_identity_species_binding(gpu_particles, gpu_gas),
     )
 
     assert launch_names.count("_prepare_environment_properties_kernel") == 4
@@ -8438,7 +8581,7 @@ def test_condensation_step_gpu_zero_timestep_runs_four_ordered_cycles(
     def _tracking_launch(kernel: Any, *args: Any, **kwargs: Any) -> Any:
         name = getattr(kernel, "key", str(kernel))
         launch_names.append(name)
-        if name == "condensation_mass_transfer_kernel":
+        if name == "_mapped_condensation_mass_transfer_kernel":
             latent_enabled_flags.append(int(kwargs["inputs"][17]))
             transfer_time_steps.append(float(kwargs["inputs"][23]))
         return original_launch(kernel, *args, **kwargs)
@@ -8453,6 +8596,7 @@ def test_condensation_step_gpu_zero_timestep_runs_four_ordered_cycles(
         mass_transfer=total,
         latent_heat=wp.array([2.2e6], dtype=wp.float64, device=device),
         scratch_buffers=scratch,
+        species_binding=_identity_species_binding(gpu_particles, gpu_gas),
     )
 
     assert returned is total
@@ -8462,13 +8606,13 @@ def test_condensation_step_gpu_zero_timestep_runs_four_ordered_cycles(
     expected_cycle = [
         "_refresh_vapor_pressure_kernel",
         "_prepare_environment_properties_kernel",
-        "condensation_mass_transfer_kernel",
-        "_gate_mass_transfer_kernel",
+        "_mapped_condensation_mass_transfer_kernel",
+        "gate_transfer",
         "_bound_evaporation_candidate_kernel",
-        "_reduce_inventory_candidates_kernel",
+        "reduce_candidates",
         "_scale_inventory_uptake_kernel",
-        "_finalize_and_apply_inventory_transfer_kernel",
-        "_reduce_finalized_transfer_to_gas_kernel",
+        "finalize_transfer",
+        "reduce_finalized",
         "apply_mass_transfer_kernel",
         "_accumulate_finalized_mass_transfer_kernel",
         "_couple_finalized_transfer_to_gas_kernel",
@@ -8686,6 +8830,7 @@ def test_condensation_forced_evaporation_accumulates_applied_transfer(
         scratch_buffers=scratch,
         latent_heat=wp.array(latent_values, dtype=wp.float64, device=device),
         energy_transfer=energy_transfer,
+        species_binding=_identity_species_binding(gpu_particles, gpu_gas),
     )
 
     expected_total_buffer = (
@@ -8829,6 +8974,7 @@ def test_condensation_step_gpu_refreshes_before_mass_transfer(
         pressure,
         0.1,
         thermodynamics=thermodynamics,
+        species_binding=_identity_species_binding(gpu_particles, gpu_gas),
     )
 
     expected_pressure = _evaluate_vapor_pressure_config(
@@ -8848,7 +8994,7 @@ def test_condensation_step_gpu_refreshes_before_mass_transfer(
     assert (
         launch_names.index("_refresh_vapor_pressure_kernel")
         < (launch_names.index("_prepare_environment_properties_kernel"))
-        < launch_names.index("condensation_mass_transfer_kernel")
+        < launch_names.index("_mapped_condensation_mass_transfer_kernel")
     )
 
 
@@ -8880,6 +9026,7 @@ def test_condensation_step_gpu_refreshes_reused_gas_at_new_temperature(
         pressure,
         0.1,
         thermodynamics=thermodynamics,
+        species_binding=_identity_species_binding(gpu_particles, gpu_gas),
     )
     first_pressure = gpu_gas.vapor_pressure.numpy().copy()
     _, second_transfer = _condensation_step_gpu(
@@ -8889,6 +9036,7 @@ def test_condensation_step_gpu_refreshes_reused_gas_at_new_temperature(
         pressure,
         0.1,
         thermodynamics=thermodynamics,
+        species_binding=_identity_species_binding(gpu_particles, gpu_gas),
     )
     second_pressure = gpu_gas.vapor_pressure.numpy().copy()
 
@@ -8959,6 +9107,7 @@ def test_condensation_step_gpu_refreshes_stale_pressure_for_each_input_kind(
         0.1,
         environment=environment,
         thermodynamics=thermodynamics,
+        species_binding=_identity_species_binding(gpu_particles, gpu_gas),
     )
     expected_pressure = _evaluate_vapor_pressure_config(
         thermodynamics,
@@ -9035,6 +9184,7 @@ def test_condensation_step_gpu_pre_refresh_failures_are_atomic(
             0.1,
             mass_transfer=mass_transfer,
             thermodynamics=thermodynamics,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
     assert "_refresh_vapor_pressure_kernel" not in launch_names
     npt.assert_allclose(gpu_particles.masses.numpy(), initial_mass)
@@ -9075,6 +9225,7 @@ def test_condensation_step_gpu_invalid_optional_buffer_does_not_refresh(
             0.1,
             mass_transfer=invalid_transfer,
             thermodynamics=thermodynamics,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
     assert "_refresh_vapor_pressure_kernel" not in launch_names
     npt.assert_allclose(gpu_particles.masses.numpy(), initial_mass)
@@ -9514,6 +9665,7 @@ def test_condensation_stiffness_invalid_environment_inputs_do_not_mutate_case(
                 device=device,
             ),
             time_step=case.time_step,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
 
     assert calls == []
@@ -9551,6 +9703,7 @@ def test_condensation_step_gpu_reuses_mass_transfer_buffer(
         pressure=pressure,
         time_step=time_step,
         mass_transfer=mass_transfer,
+        species_binding=_identity_species_binding(gpu_particles, gpu_gas),
     )
     assert returned_buffer is mass_transfer
     assert np.any(returned_buffer.numpy() != 0.0)
@@ -9588,6 +9741,7 @@ def test_rejected_inputs_leave_mass_transfer_buffer_unchanged(
             pressure=101325.0,
             time_step=1.0,
             mass_transfer=mass_transfer,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
 
     npt.assert_allclose(mass_transfer.numpy(), original)
@@ -9620,6 +9774,7 @@ def test_condensation_step_gpu_rejects_mismatched_mass_transfer_shape(
             pressure=101325.0,
             time_step=1.0,
             mass_transfer=mass_transfer,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
 
 
@@ -9710,13 +9865,16 @@ def test_condensation_step_gpu_rejects_particle_length_mismatch(
     bad_density = wp.zeros(3, dtype=wp.float64, device=device)
     gpu_particles.density = bad_density
 
-    with pytest.raises(ValueError, match="particle density length"):
+    with pytest.raises(
+        ValueError, match="species binding has incompatible shapes or dtypes"
+    ):
         condensation_step_gpu(
             gpu_particles,
             gpu_gas,
             temperature=298.15,
             pressure=101325.0,
             time_step=1.0,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
 
 
@@ -9750,7 +9908,7 @@ def test_condensation_step_gpu_zero_volume_particle_short_circuits_with_arrays(
 def test_condensation_step_gpu_rejects_particle_concentration_shape(
     device: str,
 ) -> None:
-    """Condensation rejects particle concentration shape mismatches."""
+    """Explicit binding rejects incompatible particle/gas storage shapes."""
     particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=2)
     gas = _make_gas_data(n_boxes=1, n_species=2)
     vapor_pressure = _make_vapor_pressure(n_boxes=1, n_species=2)
@@ -9767,13 +9925,16 @@ def test_condensation_step_gpu_rejects_particle_concentration_shape(
         device=device,
     )
 
-    with pytest.raises(ValueError, match="particle concentration shape"):
+    with pytest.raises(
+        ValueError, match="species binding has incompatible shapes or dtypes"
+    ):
         condensation_step_gpu(
             gpu_particles,
             gpu_gas,
             temperature=298.15,
             pressure=101325.0,
             time_step=1.0,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
 
 
@@ -9793,20 +9954,23 @@ def test_condensation_step_gpu_rejects_gas_molar_mass_length(
 
     gpu_gas.molar_mass = wp.zeros(3, dtype=wp.float64, device=device)
 
-    with pytest.raises(ValueError, match="n_species mismatch"):
+    with pytest.raises(
+        ValueError, match="species binding has incompatible shapes or dtypes"
+    ):
         condensation_step_gpu(
             gpu_particles,
             gpu_gas,
             temperature=298.15,
             pressure=101325.0,
             time_step=1.0,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
 
 
 def test_condensation_step_gpu_rejects_gas_concentration_shape(
     device: str,
 ) -> None:
-    """Condensation rejects gas concentration shape mismatches."""
+    """Explicit binding rejects incompatible particle/gas storage shapes."""
     particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=2)
     gas = _make_gas_data(n_boxes=1, n_species=2)
     vapor_pressure = _make_vapor_pressure(n_boxes=1, n_species=2)
@@ -9823,20 +9987,23 @@ def test_condensation_step_gpu_rejects_gas_concentration_shape(
         device=device,
     )
 
-    with pytest.raises(ValueError, match="gas concentration shape"):
+    with pytest.raises(
+        ValueError, match="species binding has incompatible shapes or dtypes"
+    ):
         condensation_step_gpu(
             gpu_particles,
             gpu_gas,
             temperature=298.15,
             pressure=101325.0,
             time_step=1.0,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
 
 
 def test_condensation_step_gpu_rejects_vapor_pressure_shape(
     device: str,
 ) -> None:
-    """Condensation rejects vapor pressure shape mismatches."""
+    """Explicit binding rejects incompatible particle/gas storage shapes."""
     particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=2)
     gas = _make_gas_data(n_boxes=1, n_species=2)
     vapor_pressure = _make_vapor_pressure(n_boxes=1, n_species=2)
@@ -9853,13 +10020,16 @@ def test_condensation_step_gpu_rejects_vapor_pressure_shape(
         device=device,
     )
 
-    with pytest.raises(ValueError, match="vapor pressure shape"):
+    with pytest.raises(
+        ValueError, match="species binding has incompatible shapes or dtypes"
+    ):
         condensation_step_gpu(
             gpu_particles,
             gpu_gas,
             temperature=298.15,
             pressure=101325.0,
             time_step=1.0,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
 
 
@@ -9890,6 +10060,7 @@ def test_condensation_step_gpu_rejects_gas_device_mismatch(
             temperature=298.15,
             pressure=101325.0,
             time_step=1.0,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
 
 
@@ -9927,6 +10098,7 @@ def test_condensation_step_gpu_rejects_particle_concentration_device_mismatch(
             temperature=298.15,
             pressure=101325.0,
             time_step=1.0,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
 
 
@@ -9957,6 +10129,7 @@ def test_condensation_step_gpu_rejects_particle_density_device_mismatch(
             temperature=298.15,
             pressure=101325.0,
             time_step=1.0,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
 
 
@@ -9991,6 +10164,7 @@ def test_condensation_step_gpu_rejects_gas_concentration_device_mismatch(
             temperature=298.15,
             pressure=101325.0,
             time_step=1.0,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
 
 
@@ -10025,6 +10199,7 @@ def test_condensation_step_gpu_rejects_vapor_pressure_device_mismatch(
             temperature=298.15,
             pressure=101325.0,
             time_step=1.0,
+            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
         )
 
 

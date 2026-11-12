@@ -290,9 +290,9 @@ def _expected_inventory(session: Any) -> np.ndarray:
     particle_mass = particles.masses.numpy()
     particle_concentration = particles.concentration.numpy()
     gas_concentration = gas.concentration.numpy()
-    return volume[:, None] * (
+    return (
         np.sum(particle_mass * particle_concentration[:, :, None], axis=1)
-        + gas_concentration
+        + gas_concentration * volume[:, None]
     )
 
 
@@ -365,6 +365,19 @@ def _build_condensation_state(
         CondensationActivityMode.IDEAL,
         CondensationSurfaceMode.STATIC,
     )
+    from particula.dynamics.condensation.species_mapping import (
+        CondensationSpeciesMap,
+    )
+    from particula.gpu.species_mapping import prepare_condensation_species_map
+
+    binding = prepare_condensation_species_map(
+        session.particles,
+        session.gas,
+        gas_names=session.metadata.gas_names,
+        species_map=CondensationSpeciesMap(
+            session.metadata.gas_names, ((0, 0),)
+        ),
+    )
     state = WarpCondensationState(
         CondensationExecutionConfig(configuration),
         session.particles,
@@ -372,6 +385,7 @@ def _build_condensation_state(
         session.environment,
         thermodynamics,
         scratch_buffers=scratch_buffers,
+        species_binding=binding,
     )
     return WarpCondensationExecutionState(state, 0.0)
 
@@ -407,6 +421,10 @@ def _build_diagnostics_plan(
     wp: Any,
 ) -> tuple[ResidentDiagnosticsPlan, dict[str, Any]]:
     """Build the closed diagnostics plan and its caller-owned output arrays."""
+    from particula.dynamics.condensation.species_mapping import (
+        CondensationSpeciesMap,
+    )
+
     outputs = {
         "gas_snapshot": wp.zeros((3, 1), dtype=wp.float64, device="cpu"),
         "saturation_snapshot": wp.zeros((3, 1), dtype=wp.float64, device="cpu"),
@@ -433,6 +451,9 @@ def _build_diagnostics_plan(
         ResidentDiagnosticRegistration(
             ResidentDiagnosticOperation.TOTAL_SPECIES_MASS,
             outputs["total_mass"],
+            species_map=CondensationSpeciesMap(
+                session.metadata.gas_names, ((0, 0),)
+            ),
         ),
         ResidentDiagnosticRegistration(
             ResidentDiagnosticOperation.PARTICLE_NUMBER_CONCENTRATION,
@@ -486,6 +507,10 @@ def _build_loop_fixture(  # noqa: C901
     particles.charge = np.zeros((3, 2), dtype=np.float64)
     particles.density = np.array([1000.0], dtype=np.float64)
     particles.volume = np.array([1.0, 2.0, 3.0], dtype=np.float64)
+    # Original fixture weights are number densities. Native resolved storage
+    # holds counts, preserving their original extensive particle inventory.
+    particles.concentration *= particles.volume[:, None]
+    particles.distribution_type = "particle_resolved"
     gas.molar_mass = np.array([0.018], dtype=np.float64)
     gas.concentration = np.array([[0.25], [0.5], [0.75]], dtype=np.float64)
     gas.partitioning = np.array([True], dtype=np.bool_)
