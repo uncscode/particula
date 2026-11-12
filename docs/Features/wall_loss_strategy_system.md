@@ -55,17 +55,17 @@ unoccupied material carriers; charged CPU removal draws for occupied
 positive-radius slots. Native zero-time and wholly unoccupied calls perform
 validation but draw nothing. Rejections after a draw do not roll back RNG state.
 
-Removed occupied slots have their counts and species masses cleared. CPU charge
-storage is retained, including in removed slots, as in the existing CPU
-strategy. Surviving and previously unoccupied material remains unchanged.
-This is a CPU process contract, not a claim that removed charged slots satisfy
-the separate fixed-slot activation contract; composition must respect that
-boundary. GPU removal has its own slot-clearing and RNG contract.
+Removed occupied slots have their counts, species masses and charge cleared,
+so removed slots satisfy the fixed-slot activation contract. Surviving and
+untouched inactive storage is preserved; the operation does not repair
+pre-existing inactive material. This native M4 behavior supersedes the earlier
+M3 charge-retention description without changing the CPU Bernoulli law.
+GPU removal also clears charge, with its own RNG lifecycle.
 
 Steps preserve the container and primary array identities. Preflight rejects
 unwritable destinations and aliases with protected state or array-backed
-geometry/field configuration. Density, volume, charge and the PDF radius grid
-remain protected; resolved masses are the additional writer. Independent tests
+geometry/field configuration. Density, volume and the PDF radius grid remain protected. Binned calls also
+protect masses and charge; resolved removal additionally writes both. Independent tests
 account for removed species and weighted charge, rather than requiring a sink
 process to conserve its remaining inventory.
 
