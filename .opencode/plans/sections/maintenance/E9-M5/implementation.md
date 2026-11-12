@@ -212,3 +212,48 @@ were visually inspected, including the refreshed activity axis. All seven
 functional pairs match their sources and retain successful execution counts.
 Full final-revision simulation notebook execution and plot inspection remain
 pending. P4 is not complete at this checkpoint.
+
+
+P4 follow-up: committed the functional activity/equilibrium audit as `f41e7a066`.
+Cloud/cough full notebooks passed and 14 plots were inspected. The retained
+cloud dry-phase trajectories show step-scale oscillations; both tutorials now
+explicitly distinguish material conservation from timestep/trajectory accuracy.
+The multi-cycle activation plot uses a 2 µm threshold, correcting its old 1 µm
+label; the single-cycle dry humidity is 85%, correcting its old 65% description.
+Formatting-only notebook updates retain outputs only after per-cell AST equality
+checks. Any calculation or plot-label change receives fresh execution. Biomass
+and soot full final publication runs remain active. Seeded initial sampling is
+not claimed to seed the separate stochastic coagulation generators.
+
+
+The organic notebook's complete retained coagulation stage reports per-species
+relative inventory defects from -0.5866 to +0.3493. This is the size-dependent
+composition limitation explicitly accepted in M3 (`p4_preserved_method.md`:
+"Preserve method; document limitation"), not a new native capability gap or a
+relaxed conservation tolerance. Its leading warning now labels this stage a
+limitation demonstration, directs composition-sensitive work to the supported
+resolved example, and distinguishes the conserved condensation pulse. No claim
+of quantitative binned species forecasting remains. The original workload is
+retained. The governing fixed-composition regression suite is included below
+with P4 validation; its existing method and bounds remain unchanged.
+
+
+### P4 completed publication gate
+
+All fourteen P4 source/notebook pairs have completed full execution and retain
+outputs; final source/cell identity and nonempty-cell execution counts were
+verified. All forty plot outputs were inspected. The final biomass notebook
+completed in 642 s and the full soot notebook in 1,456 s; no timeout or reduced
+workload substitutes for those runs. Final organic plots include quantity units
+and the source's first section carries the accepted PMF composition limitation.
+Formatting/prose-only updates were checked for per-cell AST identity before
+retaining outputs; changed plot labels received fresh full execution.
+
+Validation: 17 example regressions plus 26 unchanged preserved-coagulation
+method tests passed (43 total). Scoped Ruff checks/format and `git diff --check`
+passed. Strict MkDocs passed; existing informational link messages remain for
+the P6/P7 navigation audit. The fourteen standalone entrypoints also executed
+with the full migrated workloads. Chemical-property assumptions and extrapolated
+high-temperature tables remain illustrative, not independently requalified.
+P4 is complete; P5–P7 and final repository-wide gates remain pending. No PR,
+push, merge, release, M6 deletion or performance qualification is claimed here.

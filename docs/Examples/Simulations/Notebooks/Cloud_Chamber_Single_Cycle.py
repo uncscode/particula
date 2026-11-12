@@ -20,9 +20,13 @@
 # - Configure chamber geometry and wall-loss settings.
 # - Define hygroscopic seed composition with kappa-theory.
 # - Build a particle-resolved aerosol with speciated mass.
-# - Run one supersaturated activation (100.4% RH) and one deactivation (65% RH).
+# - Run one supersaturated activation (100.4% RH) and one deactivation (85% RH).
 # - Visualize droplet growth beyond 5 um and shrinkage during drying.
-# - Check mass conservation (within ~1%) and discuss reproducibility.
+# - Check each closed condensation inventory at rtol=1e-12 and atol=1e-30, separately from wall removal and humidity resets.
+#
+# This fixed-step illustration is not a timestep-convergence or quantitative
+# activation study. Material conservation alone does not establish trajectory
+# accuracy; the retained dry-phase trajectories include step-scale oscillations.
 #
 # > Learning goals: understand Kohler/kappa activation basics, see how wall loss and condensation interact, and reuse this scaffold for multi-cycle studies.
 
@@ -35,7 +39,9 @@ import copy
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
-from particula._legacy_aerosol import AerosolBuilder as LegacyAerosolBuilder
+from particula.dynamics.condensation.species_mapping import (
+    CondensationSpeciesMap,
+)
 
 # Optional: uncomment if many steps and you want a progress bar
 # from tqdm import tqdm
@@ -107,6 +113,7 @@ activity_params = (
 # Sample particle radii from a lognormal distribution
 # This is more realistic than manually spaced diameters
 n_particles = 1000  # keep modest for speed
+np.random.seed(42)
 dry_radius = par.particles.get_lognormal_sample_distribution(
     mode=np.array([100e-9]),  # 100 nm mode radius (typical CCN seed size)
     geometric_standard_deviation=np.array(
@@ -131,47 +138,22 @@ total_pressure = 101325.0  # Pa
 
 # Create partitioning gas species (3 species to match particle species)
 # AS and sucrose have negligible vapor pressure but must be included for validation
-partitioning_gases = (
-    par.gas.GasSpeciesBuilder()
-    .set_name(np.array(["ammonium_sulfate", "sucrose", "water"]))
-    .set_molar_mass(np.array([0.13214, 0.3423, 0.018015]), "kg/mol")
-    .set_vapor_pressure_strategy(
-        [
-            par.gas.ConstantVaporPressureStrategy(
-                vapor_pressure=1e-30
-            ),  # AS (negligible)
-            par.gas.ConstantVaporPressureStrategy(
-                vapor_pressure=1e-30
-            ),  # Sucrose (negligible)
-            par.gas.WaterBuckVaporPressureBuilder().build(),  # Water (actual condensing species)
-        ]
-    )
-    .set_partitioning(True)
-    .set_concentration(np.array([1e-30, 1e-30, 0.01]), "kg/m^3")
-    .build()
+vapor_strategies = [
+    par.gas.ConstantVaporPressureStrategy(1e-30),
+    par.gas.ConstantVaporPressureStrategy(1e-30),
+    par.gas.WaterBuckVaporPressureBuilder().build(),
+    par.gas.ConstantVaporPressureStrategy(101325.0),
+]
+gas = par.gas.GasData(
+    name=["ammonium_sulfate", "sucrose", "water", "air"],
+    molar_mass=np.append(molar_mass, 0.029),
+    partitioning=np.array([True, True, True, False]),
+    concentration=np.array([[1e-30, 1e-30, 0.01, 1.2]]),
 )
-
-# Create air as non-partitioning carrier gas
-air = (
-    par.gas.GasSpeciesBuilder()
-    .set_name("air")
-    .set_molar_mass(0.029, "kg/mol")
-    .set_vapor_pressure_strategy(
-        par.gas.ConstantVaporPressureStrategy(vapor_pressure=101325)
-    )
-    .set_partitioning(False)
-    .set_concentration(1.2, "kg/m^3")
-    .build()
-)
-
-# Build atmosphere
-atmosphere = (
-    par.gas.AtmosphereBuilder()
-    .set_temperature(temperature, "K")
-    .set_pressure(total_pressure, "Pa")
-    .set_more_partitioning_species(partitioning_gases)
-    .set_more_gas_only_species(air)
-    .build()
+environment = par.gas.EnvironmentData(
+    temperature=np.array([temperature]),
+    pressure=np.array([total_pressure]),
+    saturation_ratio=np.zeros((1, 4)),
 )
 
 # Create surface strategy for Kelvin effect
@@ -183,26 +165,24 @@ surface_strategy = (
 )
 
 # Build particle representation with lognormal-sampled particles
-chamber_volume = 0.25  # m^3 (from chamber_dims)
-particles = (
-    par.particles.ResolvedParticleMassRepresentationBuilder()
-    .set_distribution_strategy(par.particles.ParticleResolvedSpeciatedMass())
-    .set_activity_strategy(activity_params)
-    .set_surface_strategy(surface_strategy)
-    .set_mass(seed_mass, "kg")
-    .set_density(density, "kg/m^3")
-    .set_charge(0)
-    .set_volume(chamber_volume, "m^3")
-    .build()
+# Represented sample volume differs from the geometry used for loss coefficients.
+chamber_volume = 0.25  # m³, retained represented volume
+particles = par.particles.create_resolved_particle_data(
+    masses=seed_mass,
+    density=density,
+    volume=chamber_volume,
 )
+aerosol = par.Aerosol(particles=particles, gas=gas, environment=environment)
+wall_loss_strategy.random_generator = np.random.default_rng(42)
 
-# Build aerosol with new API
-aerosol = (
-    LegacyAerosolBuilder()
-    .set_atmosphere(atmosphere)
-    .set_particles(particles)
-    .build()
-)
+
+def species_inventory(aero):
+    """Extensive inventory for the three mapped species, kg."""
+    return np.sum(
+        aero.particles.masses * aero.particles.concentration[..., None], axis=1
+    ) + (aero.gas.concentration[:, :3] * aero.particles.volume[:, None])
+
+
 print(aerosol)
 
 # %% [markdown]
@@ -210,19 +190,22 @@ print(aerosol)
 # We construct a single isothermal condensation strategy for water with `update_gases=True`, which tracks gas-phase mass internally during the simulation. Instead of manually ramping RH each step, we simply set the water vapor concentration at the start of each phase (activation and deactivation) and let the system equilibrate naturally.
 
 # %%
-# Condensation strategy - molar mass array must match the 3 species
-# (ammonium sulfate, sucrose, water) in the particle representation
-condensation_strategy = (
-    par.dynamics.CondensationIsothermalStaggeredBuilder()
-    .set_molar_mass(
-        molar_mass, "kg/mol"
-    )  # use the same molar_mass array as particles
-    .set_diffusion_coefficient(2.4e-5, "m^2/s")
-    .set_accommodation_coefficient(1.0)
-    .set_theta_mode("random")
-    .set_num_batches(4)
-    .set_update_gases(True)  # tracks gas-phase mass internally
-    .build()
+# Full gas molar masses include air; the explicit map selects the three
+# particle species (ammonium sulfate, sucrose, water).
+condensation_strategy = par.dynamics.CondensationIsothermalStaggered(
+    molar_mass=gas.molar_mass.copy(),
+    diffusion_coefficient=2.4e-5,
+    accommodation_coefficient=1.0,
+    theta_mode="random",
+    num_batches=4,
+    random_state=42,
+    update_gases=True,
+    activity_strategy=activity_params,
+    surface_strategy=surface_strategy,
+    vapor_pressure_strategy=vapor_strategies,
+    species_map=CondensationSpeciesMap(
+        tuple(gas.name), ((0, 0), (1, 1), (2, 2))
+    ),
 )
 condensation = par.dynamics.MassCondensation(
     condensation_strategy=condensation_strategy
@@ -268,7 +251,7 @@ print(
 # We preallocate histories for speed. The condensation strategy tracks gas-phase mass internally (`update_gases=True`), so we only need to set the water vapor concentration at the start of each phase and let the system equilibrate. No manual RH ramping is needed.
 
 # %%
-n_particles = aerosol.particles.get_species_mass().shape[0]
+n_particles = aerosol.particles.masses[0].copy().shape[0]
 diam_hist = np.empty((n_steps, n_particles))
 mass_hist = np.empty((n_steps, n_particles, seed_mass.shape[1]))
 gas_conc_hist = np.empty(n_steps)  # track gas-phase water concentration
@@ -303,9 +286,7 @@ def set_water_concentration(
     aer: par.Aerosol, concentration: float
 ) -> par.Aerosol:
     """Set the gas-phase water vapor concentration in the atmosphere."""
-    conc = aer.atmosphere.partitioning_species.get_concentration()
-    conc[2] = concentration  # water is index 2
-    aer.atmosphere.partitioning_species.concentration = conc
+    aer.gas.concentration[0, 2] = concentration
     return aer
 
 
@@ -314,11 +295,9 @@ aerosol_state = copy.deepcopy(aerosol)
 aerosol_state = set_water_concentration(aerosol_state, c_water_activation)
 
 # Record initial state
-mass_hist[0] = aerosol_state.particles.get_species_mass()
+mass_hist[0] = aerosol_state.particles.masses[0].copy()
 diam_hist[0] = masses_to_diameter(mass_hist[0])
-gas_conc_hist[0] = (
-    aerosol_state.atmosphere.partitioning_species.get_concentration()[2]
-)
+gas_conc_hist[0] = aerosol_state.gas.concentration[0, 2]
 
 # Run simulation - condensation strategy tracks gas-phase mass internally
 for i in range(1, n_steps):
@@ -332,14 +311,24 @@ for i in range(1, n_steps):
         )
 
     # Condensation handles mass transfer and updates gas concentration internally
+    before_condensation = species_inventory(aerosol_state)
     aerosol_state = condensation.execute(aerosol_state, time_step=dt)
-    aerosol_state = wall_loss.execute(aerosol_state, time_step=dt)
-
-    mass_hist[i] = aerosol_state.particles.get_species_mass()
-    diam_hist[i] = masses_to_diameter(mass_hist[i])
-    gas_conc_hist[i] = (
-        aerosol_state.atmosphere.partitioning_species.get_concentration()[2]
+    np.testing.assert_allclose(
+        species_inventory(aerosol_state),
+        before_condensation,
+        rtol=1e-12,
+        atol=1e-30,
     )
+    before_wall = aerosol_state.particles.masses.copy()
+    aerosol_state = wall_loss.execute(aerosol_state, time_step=dt)
+    assert np.all(aerosol_state.particles.masses <= before_wall)
+    np.testing.assert_allclose(
+        aerosol_state.gas.concentration[0, 3], 1.2, rtol=0, atol=0
+    )
+
+    mass_hist[i] = aerosol_state.particles.masses[0].copy()
+    diam_hist[i] = masses_to_diameter(mass_hist[i])
+    gas_conc_hist[i] = aerosol_state.gas.concentration[0, 2]
 
 peak_idx = int(np.nanargmax(diam_hist.max(axis=1)))
 peak_diam = diam_hist[peak_idx].max()
@@ -431,11 +420,12 @@ if not (0 <= n_survivors <= n_particles):
 if not np.isfinite(mass_hist).all():
     raise ValueError("Non-finite masses found")
 
-# Mass accounting (wall loss removes mass, so final < initial is expected)
+# Particle mass ratio includes water exchange and prescribed humidity resets;
+# it is not a measure of wall deposition. Closed condensation is checked above.
 initial_total_mass = seed_mass.sum()
 final_total_mass = mass_hist[-1].sum()
 mass_remaining = final_total_mass / initial_total_mass * 100
-print(f"Mass remaining: {mass_remaining:.1f}% (wall loss removes particles)")
+print(f"Mass remaining: {mass_remaining:.1f}% (includes water uptake and loss)")
 
 # Note: With wall loss enabled, mass is NOT conserved by design
 # Wall loss is a stochastic process that removes particles from the system

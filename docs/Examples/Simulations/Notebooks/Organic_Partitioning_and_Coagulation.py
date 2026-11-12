@@ -15,6 +15,19 @@
 # %% [markdown]
 #  # Organic Partitioning & Coagulation Simulation
 #
+# **Important limitation:** condensation conserves each mapped species, but
+# the subsequent fixed-composition binned coagulation does not transport
+# species between bins. Condensation creates size-dependent composition, so
+# this 600 s coagulation stage is a demonstration of the retained method's
+# limitation, **not a quantitatively reliable species-composition forecast**.
+# In the saved run, relative species-inventory changes range from about
+# -59% to +35%. These are observed defects, not acceptable error tolerances.
+# Reducing the timestep does not supply the missing species transport.
+# Use a supported particle-resolved workflow when composition varies by size;
+# see the [coagulation contract](../../../Features/coagulation_strategy_system.md)
+# and [resolved example](../../Dynamics/Coagulation/Coagulation_3_Particle_Resolved_Pattern.ipynb).
+
+#
 #  This notebook demonstrates how to form secondary organic aerosol (SOA)
 #  from a mixture of gas-phase organics and to follow its evolution by
 #  Brownian coagulation.
@@ -56,7 +69,9 @@ import copy
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
-from particula._legacy_aerosol import AerosolBuilder as LegacyAerosolBuilder
+from particula.dynamics.condensation.species_mapping import (
+    CondensationSpeciesMap,
+)
 
 # Organic density estimation for species
 from particula.particles import get_organic_density_array
@@ -185,16 +200,6 @@ for i in range(len(name)):
     )
     vapor_pressure_strategies.append(vapor_pressure_organic)
 
-organics_gases = (
-    par.gas.GasSpeciesBuilder()
-    .set_name(name)
-    .set_molar_mass(M_gmol, "g/mol")
-    .set_vapor_pressure_strategy(vapor_pressure_strategies)
-    .set_concentration(c_total_ug_per_m3, "ug/m^3")
-    .set_partitioning(True)
-    .build()
-)
-
 # %% [markdown]
 #  ## Compose the atmosphere
 #
@@ -202,7 +207,7 @@ organics_gases = (
 #  into a single `Atmosphere` container.
 #
 #
-#  > **Atmosphere object:** central thermodynamic context (temperature &
+#  > **EnvironmentData:** central thermodynamic context (temperature &
 #  > pressure).  All processes query these values rather than carrying
 #  > their own copies.
 #  sulfate vapor pressure
@@ -213,24 +218,17 @@ sulfate_vapor_pressure = (
     .set_vapor_pressure(1e-30, "Pa")
     .build()
 )
-sulfate_gas = (
-    par.gas.GasSpeciesBuilder()
-    .set_name("Sulfate")
-    .set_molar_mass(96.06, "g/mol")
-    .set_vapor_pressure_strategy(sulfate_vapor_pressure)
-    .set_concentration(0, "ug/m^3")
-    .set_partitioning(True)
-    .build()
+# Unified gas order matches particle species: sulfate then ten organics.
+gas = par.gas.GasData(
+    name=["Sulfate", *name.tolist()],
+    molar_mass=np.append(sulfate_molar_mass, M_gmol) * 1e-3,
+    partitioning=np.ones(11, dtype=bool),
+    concentration=np.append(0.0, c_total_ug_per_m3)[None, :] * 1e-9,
 )
-
-# create atmosphere
-atmosphere = (
-    par.gas.AtmosphereBuilder()
-    .set_temperature(temperature_K, "K")
-    .set_pressure(1.0, "atm")
-    .set_more_partitioning_species(sulfate_gas)
-    .set_more_partitioning_species(organics_gases)
-    .build()
+environment = par.gas.EnvironmentData(
+    temperature=np.array([temperature_K]),
+    pressure=np.array([101325.0]),
+    saturation_ratio=np.zeros((1, 11)),
 )
 
 # %% [markdown]
@@ -283,8 +281,8 @@ activity_strategies = (
     .build()
 )
 
-# the surface tension and activity may have a bug in it causing it to be more evaporative
-# than it should be, so we set it to a very low value, and are investigating it.
+# Retained illustrative surface-tension parameters. The low organic values
+# are modeling assumptions, not measured or independently validated inputs.
 surface_tension = np.append(0.09, np.ones(len(M_gmol)) * 0.0003)  # N/m
 surface_strategy = (
     par.particles.SurfaceStrategyVolumeBuilder()
@@ -297,50 +295,54 @@ surface_strategy = (
 # %% [markdown]
 # ## Particle representation
 #
-#  Attach activity, surface and distribution strategies.  Using
-#  `SpeciatedMassMovingBin` lets the bin boundaries adapt when mass is
-#  added.
-#
-# **SpeciatedMassMovingBin:** bin boundaries adapt when mass is added
-# – avoids artificial dilution present in fixed-grid schemes.
+# Native discrete `ParticleData` stores per-bin number density at unit
+# reference volume. Condensation changes species masses and therefore radii.
+# Coagulation subsequently updates number density at fixed per-bin masses;
+# it does not mix donor compositions into destination bins.
 #
 # **Activity & surface strategies:** thermodynamics (ideal,
 # etc.) and surface tension models are swappable components, keeping
 # the main algorithm clean.
 
 # %%
-particle_representation = (
-    par.particles.ParticleMassRepresentationBuilder()
-    .set_distribution_strategy(par.particles.SpeciatedMassMovingBin())
-    .set_activity_strategy(activity_strategies)
-    .set_mass(mass_distribution, "kg")
+particle_data = (
+    par.particles.ParticleDataBuilder()
+    .set_distribution_type("discrete")
+    .set_masses(mass_distribution, "kg")
     .set_concentration(number_concentration, "1/m^3")
-    .set_charge(0)
+    .set_charge(np.zeros(len(number_concentration)))
     .set_density(particle_densities, "kg/m^3")
-    .set_surface_strategy(surface_strategy)
+    .set_volume(np.array([1.0]))
     .build()
 )
-
 
 # %% [markdown]
 # ## Assemble aerosol
 #
-#  Wrap atmosphere + particles into a single high-level object that the
+#  Wrap particles, gas and environment into a single object that the
 #  dynamical processes will modify in place.
 #
-# **Big picture:** `Aerosol` = `Atmosphere` + `ParticleRepresentation`.
+# **Big picture:** `Aerosol` holds native particle, gas, and environment data.
 # Every subsequent *Runnable* process expects a single aerosol object
 # and modifies it in place.
 
 # %%
 # Build aerosol
-aerosol = (
-    LegacyAerosolBuilder()
-    .set_atmosphere(atmosphere)
-    .set_particles(particle_representation)
-    .build()
-)
+aerosol = par.Aerosol(particles=particle_data, gas=gas, environment=environment)
 
+
+def species_inventory(aero):
+    """Independent species mass density for this reference-volume PMF."""
+    return (
+        np.sum(
+            aero.particles.masses * aero.particles.concentration[..., None],
+            axis=1,
+        )
+        + aero.gas.concentration
+    )
+
+
+initial_inventory = species_inventory(aerosol)
 print(aerosol)
 
 # %% [markdown]
@@ -360,7 +362,17 @@ print(aerosol)
 # %%
 # Condensation Coagulation process setup
 condensation_strategy = par.dynamics.CondensationIsothermal(
-    molar_mass=particle_molar_mass,
+    # Process inputs are SI kg/mol; particle_molar_mass above is g/mol.
+    molar_mass=gas.molar_mass.copy(),
+    activity_strategy=activity_strategies,
+    surface_strategy=surface_strategy,
+    vapor_pressure_strategy=[
+        sulfate_vapor_pressure,
+        *vapor_pressure_strategies,
+    ],
+    species_map=CondensationSpeciesMap(
+        tuple(gas.name), tuple((i, i) for i in range(11))
+    ),
     diffusion_coefficient=2e-5,
     accommodation_coefficient=1,
     update_gases=True,
@@ -382,7 +394,7 @@ aerosol_soa = copy.deepcopy(aerosol)
 #  > We pick a very small internal sub-step
 #  > (`Δt_sub = 20 s / 100 000 ≈ 2×10⁻⁴ s`) to capture the rapid initial
 #  > uptake of vapours onto nano-particles.
-#  10 sec simulation
+#  20 s condensation pulse
 
 # %%
 aerosol_soa = sequence_condensation.execute(
@@ -391,21 +403,26 @@ aerosol_soa = sequence_condensation.execute(
     sub_steps=100_000,
 )
 
+np.testing.assert_allclose(
+    species_inventory(aerosol_soa), initial_inventory, rtol=1e-12, atol=1e-30
+)
 print(aerosol_soa)
 
 fig, ax = plt.subplots(figsize=(7, 5))
 ax.plot(
-    aerosol_initial.particles.get_radius(),
-    aerosol_initial.particles.get_concentration(),
+    aerosol_initial.particles.radii[0],
+    aerosol_initial.particles.concentration[0],
     label="Initial Seeds",
 )
 ax.plot(
-    aerosol_soa.particles.get_radius(),
-    aerosol_soa.particles.get_concentration(),
+    aerosol_soa.particles.radii[0],
+    aerosol_soa.particles.concentration[0],
     label="Seeds+SOA",
 )
 ax.legend(loc="upper left")
 ax.set_xscale("log")
+ax.set_xlabel("Particle radius (m)")
+ax.set_ylabel("Number concentration per bin (m$^{-3}$)")
 ax.set_xlim(left=1e-8, right=1e-6)
 ax.grid(alpha=0.25)
 fig.tight_layout()
@@ -430,7 +447,7 @@ coagulation_strategy = (
 coagulation_process = par.dynamics.Coagulation(coagulation_strategy)
 
 # %% [markdown]
-#  ## Combined simulation (10 min)
+#  ## Coagulation after the condensation pulse (10 min)
 #
 #  We alternate long, finely-resolved condensation steps with coarse
 #  coagulation steps.
@@ -460,8 +477,7 @@ condensation_sub_step = 50_000
 time_step = total_time / total_steps
 
 for _ in tqdm(range(total_steps), desc="Running Sim", mininterval=0.5):
-    # execute condensation process, this is the slowest computationally
-    # feel free to comment this out to see the effect of coagulation only
+    # Condensation stays disabled during this retained coagulation-only stage.
     # aerosol_process = condensation_process.execute(
     #     aerosol=aerosol_process,
     #     time_step=time_step,
@@ -485,29 +501,31 @@ for _ in tqdm(range(total_steps), desc="Running Sim", mininterval=0.5):
 #
 #  > Observe how number concentration drops (coagulation) while the
 #  > median radius grows (condensation + coagulation).
-#  > Try commenting out condensation to isolate the effect of pure
-#  > coagulation broadening the distribution without adding mass.
+#  > The 600 s stage already runs coagulation alone. Its binned numerical
+#  > mass drift is reported below; this is not exact inventory conservation.
 
 # %%
 fig, ax = plt.subplots(figsize=(7, 5))
 ax.plot(
-    aerosol_initial.particles.get_radius(),
-    aerosol_initial.particles.get_concentration(),
+    aerosol_initial.particles.radii[0],
+    aerosol_initial.particles.concentration[0],
     label="Initial Seeds",
 )
 ax.plot(
-    aerosol_soa.particles.get_radius(),
-    aerosol_soa.particles.get_concentration(),
+    aerosol_soa.particles.radii[0],
+    aerosol_soa.particles.concentration[0],
     label="20 sec SOA partitioning",
 )
 ax.plot(
-    aerosol_process.particles.get_radius(),
-    aerosol_process.particles.get_concentration(),
+    aerosol_process.particles.radii[0],
+    aerosol_process.particles.concentration[0],
     label="600 sec coagulation",
     # marker=".",
 )
 ax.legend(loc="upper left")
 ax.set_xscale("log")
+ax.set_xlabel("Particle radius (m)")
+ax.set_ylabel("Number concentration per bin (m$^{-3}$)")
 ax.grid(alpha=0.25)
 ax.set_xlim(left=1e-8, right=1e-6)
 fig.tight_layout()
@@ -521,3 +539,20 @@ fig.tight_layout()
 # with vapour-liquid partitioning, allowing us to model the complex
 # interactions between gas-phase species and particle growth.
 #
+
+# %%
+assert (
+    0
+    < aerosol_process.particles.concentration.sum()
+    < aerosol_soa.particles.concentration.sum()
+)
+assert np.all(np.isfinite(aerosol_process.particles.concentration))
+assert np.all(aerosol_process.particles.concentration >= 0)
+np.testing.assert_array_equal(
+    aerosol_process.gas.concentration, aerosol_soa.gas.concentration
+)
+coagulation_inventory_drift = (
+    species_inventory(aerosol_process) - species_inventory(aerosol_soa)
+) / species_inventory(aerosol_soa)
+print("Per-species relative inventory drift during binned coagulation:")
+print(coagulation_inventory_drift)

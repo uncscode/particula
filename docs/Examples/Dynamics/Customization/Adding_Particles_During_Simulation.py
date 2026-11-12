@@ -17,7 +17,7 @@
 #
 # In this tutorial, we demonstrate how add particles to an aerosol object. This is useful when you want to modify a custom aerosol process during a simulation.
 #
-# The example is for a particle resolved simulation, the same approach can be used for the other types of particle representations (*but it has not been tested yet*).
+# This particle-resolved example reserves fixed capacity for two additions. It does not resize storage or describe a binned insertion API.
 #
 # **Imports**
 
@@ -29,7 +29,7 @@ import numpy as np
 
 # particula imports
 import particula as par
-from particula._legacy_aerosol import Aerosol as LegacyAerosol
+from particula.particles.slot_management import activate_slots
 
 # %% [markdown]
 # ## Aerosol Setup
@@ -37,20 +37,24 @@ from particula._legacy_aerosol import Aerosol as LegacyAerosol
 # We need to first make the aerosol object. Details on this can be found in the Aerosol Tutorial.
 
 # %%
-# Preset gas species that does not condense in the atmosphere
-# AtmosphereBuilder constructs the atmosphere with predefined species
-atmosphere = (
-    par.gas.AtmosphereBuilder()
-    .set_temperature(25, temperature_units="degC")  # Set temperature to 25°C
-    .set_pressure(1, pressure_units="atm")  # Set pressure to 1 atmosphere
-    .build()  # Finalize the atmosphere object
+gas = par.gas.GasData(
+    name=["air"],
+    molar_mass=np.array([0.029]),
+    concentration=np.array([[1.2]]),
+    partitioning=np.array([False]),
 )
+environment = par.gas.EnvironmentData(
+    temperature=np.array([298.15]),
+    pressure=np.array([101325.0]),
+    saturation_ratio=np.zeros((1, 1)),
+)
+np.random.seed(42)
 
 # Generate a particle distribution using a lognormal sample distribution
 # This distribution has a mean particle diameter (mode) and geometric standard deviation (GSD)
 particle_sample = par.particles.get_lognormal_sample_distribution(
-    mode=np.array([100e-9]),  # Mean particle diameter of 100 nm
-    geometric_standard_deviation=np.array([1.3]),  # GSD of 1.3
+    mode=np.array([100e-9]),  # Mode radius of 100 nm
+    geometric_standard_deviation=np.array([1.3]),  # GSD
     number_of_particles=np.array([1e4]),  # Total number of particles
     number_of_samples=100_000,  # Number of samples for particle distribution
 )
@@ -60,30 +64,23 @@ particle_mass_sample = (
     4 / 3 * np.pi * particle_sample**3 * 1500
 )  # Particle mass in kg
 
-# Build a resolved mass representation for each particle
-# This defines how particle mass, activity, and surface are represented
-resolved_masses = (
-    par.particles.ResolvedParticleMassRepresentationBuilder()
-    .set_distribution_strategy(
-        par.particles.ParticleResolvedSpeciatedMass()
-    )  # Use speciated mass distribution
-    .set_activity_strategy(
-        par.particles.ActivityIdealMass()
-    )  # Define activity based on ideal mass
-    .set_surface_strategy(
-        par.particles.SurfaceStrategyVolume()
-    )  # Define surface area based on particle volume
-    .set_mass(particle_mass_sample, "kg")  # Assign mass of particles (in kg)
-    .set_density(1500, "kg/m^3")  # Set particle density to 1500 kg/m^3
-    .set_charge(
-        np.zeros_like(particle_sample)
-    )  # Neutral particles with per-particle charge array
-    .set_volume(1, "cm^3")  # Set volume of particle distribution
-    .build()  # Finalize the resolved mass representation
+# Reserve 20,000 free slots for two 10,000-particle additions. Free slots
+# have exactly zero mass, represented count, and charge.
+initial_count = particle_mass_sample.size
+capacity = initial_count + 20_000
+masses = np.zeros((capacity, 1), dtype=np.float64)
+counts = np.zeros(capacity, dtype=np.float64)
+masses[:initial_count, 0] = particle_mass_sample
+counts[:initial_count] = 1.0
+resolved_masses = par.particles.create_resolved_particle_data(
+    masses=masses,
+    concentration=counts,
+    density=np.array([1500.0]),
+    volume=1e-6,  # 1 cm^3 in m^3
 )
-
-# Create an aerosol object with the defined atmosphere and resolved particles
-aerosol = LegacyAerosol(atmosphere=atmosphere, particles=resolved_masses)
+aerosol = par.Aerosol(
+    particles=resolved_masses, gas=gas, environment=environment
+)
 
 # Print the properties of the atmosphere
 print(aerosol)
@@ -91,11 +88,11 @@ print(aerosol)
 # %% [markdown]
 # ## Particles to Add
 #
-# For the particle resolved representation, the particles to add must be the provide an array of new particle masses and the concentrations.
-#
-# Currently the concentrations should all be one, as this is the particle resolved representation.
-#
-# If you have multiple species, then the shape of the `added_distribution` should be `(number of particles, number of species)`. But `added_concentration` is still `(number of particles,)`.
+# Requests carry masses `(boxes, requests, species)`, represented counts and
+# charge `(boxes, requests)`, and a per-box integer prefix count. Each request
+# here represents one particle. Activation fills ascending free slots and
+# rejects insufficient capacity before mutation. This is an external particle
+# source: gas is unchanged, and particle inventory increases by the injected mass.
 
 # %%
 # particles to add
@@ -103,8 +100,8 @@ print(aerosol)
 # Generate a particle distribution using a lognormal sample distribution
 # This distribution has a mean particle diameter (mode) and geometric standard deviation (GSD)
 particles_to_add = par.particles.get_lognormal_sample_distribution(
-    mode=np.array([1e-9]),  # Mean particle diameter of 100 nm
-    geometric_standard_deviation=np.array([1.1]),  # GSD of 1.3
+    mode=np.array([1e-9]),  # Mode radius of 1 nm
+    geometric_standard_deviation=np.array([1.1]),  # GSD
     number_of_particles=np.array([1e4]),  # Total number of particles
     number_of_samples=10_000,  # Number of samples for particle distribution
 )
@@ -120,33 +117,50 @@ concentration_add = np.ones_like(particle_mass_add)
 print(f"Particles to add: {particle_mass_add.shape}")
 
 # %%
-# Get initial particle radii before adding particle
-initial_radii = aerosol.particles.get_radius(clone=True)
-print(f"Initial concentration: {aerosol.particles.get_total_concentration()}")
+# Only active particles enter the radius histograms.
+initial_radii = aerosol.particles.radii[0, :initial_count].copy()
+initial_inventory = np.sum(masses * counts[:, None], axis=0)
+held_masses = aerosol.particles.masses
+held_counts = aerosol.particles.concentration
+held_gas = aerosol.gas.concentration.copy()
+request_masses = particle_mass_add[None, :, None]
+request_counts = concentration_add[None, :]
+request_charge = np.zeros_like(request_counts)
+requested_counts = np.array([particle_mass_add.size], dtype=np.int32)
 
-# Perform the add process
-aerosol.particles.add_concentration(  # select the particle representation and call add_concentration
-    added_concentration=concentration_add,
-    added_distribution=particle_mass_add,
-    added_charge=np.zeros_like(particle_mass_add),
-)
-radii_after_step_1 = aerosol.particles.get_radius(clone=True)
-print(
-    f"Concentration after step 1: {aerosol.particles.get_total_concentration()}"
-)
+radii_after_steps = []
+for step in (1, 2):
+    activated = activate_slots(
+        aerosol.particles,
+        request_masses=request_masses,
+        request_concentration=request_counts,
+        request_charge=request_charge,
+        requested_counts=requested_counts,
+    )
+    np.testing.assert_array_equal(activated, requested_counts)
+    assert aerosol.particles.masses is held_masses
+    assert aerosol.particles.concentration is held_counts
+    np.testing.assert_array_equal(aerosol.gas.concentration, held_gas)
+    actual = np.sum(
+        aerosol.particles.masses[0]
+        * aerosol.particles.concentration[0, :, None],
+        axis=0,
+    )
+    np.testing.assert_allclose(
+        actual,
+        initial_inventory + step * particle_mass_add.sum(),
+        rtol=1e-12,
+        atol=1e-30,
+    )
+    active = aerosol.particles.concentration[0] > 0
+    radii_after_steps.append(aerosol.particles.radii[0, active].copy())
+    number_density = aerosol.particles.concentration.sum() / 1e-6
+    print(f"Number density after step {step}: {number_density:g} m^-3")
 
-# Perform the add process
-aerosol.particles.add_concentration(
-    added_concentration=concentration_add,
-    added_distribution=particle_mass_add,
-    added_charge=np.zeros_like(particle_mass_add),
+radii_after_step_1, radii_after_step_2 = radii_after_steps
+np.testing.assert_array_equal(
+    par.particles.get_slot_diagnostics(aerosol.particles)[2], [0]
 )
-radii_after_step_2 = aerosol.particles.get_radius(clone=True)
-
-print(
-    f"Concentration after step 2: {aerosol.particles.get_total_concentration()}"
-)
-concentration_value = aerosol.particles.concentration
 
 # %% [markdown]
 # ## Graphing
