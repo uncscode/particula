@@ -209,8 +209,13 @@ instantaneous transfer; call `step(...)` to advance.
 ### Runnable entry point: `MassCondensation`
 
 `MassCondensation` is a `RunnableABC` exported as `par.dynamics.MassCondensation`.
-It operates on an `Aerosol`, delegates to the configured strategy, splits
-`time_step` across `sub_steps`, and composes with other runnables.
+It requires a native `Aerosol` holding `ParticleData`, `GasData` and
+`EnvironmentData`, delegates to the configured strategy, splits `time_step`
+across `sub_steps`, and composes with other runnables. Every substep reads the
+currently held particle, gas and environment state. The strategy must return
+the same particle and gas containers; replacement results reject. Physics and
+species mappings belong to the strategy. Non-native aggregates reject before
+strategy dispatch.
 
 ```python
 aerosol, physics = make_example(0.018)

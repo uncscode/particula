@@ -7,7 +7,16 @@ deterministic, supersaturated, single-species water aerosol.
 import numpy as np
 import particula as par
 import pytest
-from particula._legacy_aerosol import Aerosol as LegacyAerosol
+from particula.dynamics.condensation.species_mapping import (
+    CondensationSpeciesMap,
+)
+from particula.gas import EnvironmentData, GasDataBuilder
+
+
+@pytest.fixture(autouse=True)
+def forbid_facades(forbid_legacy_facades):
+    """Require native execution without temporary facade construction."""
+
 
 LATENT_HEAT_WATER = 2.26e6  # J/kg
 CONSERVATION_RTOL = 1e-12
@@ -36,7 +45,7 @@ def _as_float(value: float | np.ndarray) -> float:
     return float(array_value.reshape(()))
 
 
-def _particle_water_inventory(aerosol: LegacyAerosol) -> float:
+def _particle_water_inventory(aerosol: par.Aerosol) -> float:
     """Return the total particle-phase water inventory for the fixture.
 
     Args:
@@ -49,10 +58,10 @@ def _particle_water_inventory(aerosol: LegacyAerosol) -> float:
         AssertionError: If the particle mass layout is not a valid
             single-species shape.
     """
-    species_mass = np.asarray(
-        aerosol.particles.get_species_mass(), dtype=np.float64
+    species_mass = np.asarray(aerosol.particles.masses[0], dtype=np.float64)
+    concentration = (
+        aerosol.particles.concentration[0] / aerosol.particles.volume[0]
     )
-    concentration = aerosol.particles.get_concentration()
 
     if species_mass.ndim == 1:
         water_mass = species_mass
@@ -67,7 +76,7 @@ def _particle_water_inventory(aerosol: LegacyAerosol) -> float:
     return float(np.sum(water_mass * concentration, dtype=np.float64))
 
 
-def _build_test_aerosol() -> tuple[LegacyAerosol, float]:
+def _build_test_aerosol() -> tuple[par.Aerosol, float]:
     """Build a supersaturated single-species water aerosol state.
 
     Returns:
@@ -83,40 +92,25 @@ def _build_test_aerosol() -> tuple[LegacyAerosol, float]:
         molar_mass=molar_mass_water,
         temperature=temperature,
     )
-    gas_species = (
-        par.gas.GasSpeciesBuilder()
-        .set_molar_mass(molar_mass_water, "kg/mol")
-        .set_vapor_pressure_strategy(vapor_pressure_water)
-        .set_concentration(saturation_concentration * 1.03, "kg/m^3")
-        .set_name("H2O")
-        .set_partitioning(True)
+    gas = (
+        GasDataBuilder()
+        .set_names(["H2O"])
+        .set_molar_mass([molar_mass_water])
+        .set_concentration([float(saturation_concentration) * 1.03])
+        .set_partitioning([True])
         .build()
     )
-    atmosphere = (
-        par.gas.AtmosphereBuilder()
-        .set_more_partitioning_species(gas_species)
-        .set_temperature(temperature, "K")
-        .set_pressure(101325.0, "Pa")
-        .build()
-    )
+    environment = EnvironmentData([temperature], [101325.0], [[1.03]])
 
     particle_radii = np.array([30e-9, 45e-9, 60e-9, 90e-9], dtype=np.float64)
     density = 1000.0  # kg/m^3
     particle_mass = (4.0 / 3.0) * np.pi * particle_radii**3 * density
-    particles = (
-        par.particles.ResolvedParticleMassRepresentationBuilder()
-        .set_distribution_strategy(
-            par.particles.ParticleResolvedSpeciatedMass()
-        )
-        .set_activity_strategy(par.particles.ActivityIdealMass())
-        .set_surface_strategy(par.particles.SurfaceStrategyVolume())
-        .set_mass(particle_mass.reshape(-1, 1), "kg")
-        .set_density(np.array([density], dtype=np.float64), "kg/m^3")
-        .set_charge(np.zeros_like(particle_radii, dtype=np.float64))
-        .set_volume(1.0e-6, "m^3")
-        .build()
+    particles = par.particles.create_resolved_particle_data(
+        masses=particle_mass.reshape(-1, 1),
+        density=np.array([density]),
+        volume=1.0e-6,
     )
-    aerosol = LegacyAerosol(atmosphere=atmosphere, particles=particles)
+    aerosol = par.Aerosol(gas=gas, environment=environment, particles=particles)
     return aerosol, float(saturation_concentration)
 
 
@@ -142,6 +136,12 @@ def _build_condensation() -> tuple[
         diffusion_coefficient=2e-5,
         accommodation_coefficient=1.0,
         latent_heat_strategy=latent_heat_strategy,
+        activity_strategy=par.particles.ActivityIdealMass(),
+        surface_strategy=par.particles.SurfaceStrategyVolume(),
+        vapor_pressure_strategy=par.gas.VaporPressureFactory().get_strategy(
+            "water_buck"
+        ),
+        species_map=CondensationSpeciesMap(("H2O",), ((0, 0),)),
         update_gases=True,
     )
     condensation = par.dynamics.MassCondensation(
@@ -158,9 +158,7 @@ def test_condensation_latent_heat_fixture_starts_supersaturated() -> None:
     """
     aerosol, saturation_concentration = _build_test_aerosol()
 
-    gas_concentration = _as_float(
-        aerosol.atmosphere.partitioning_species.get_concentration()
-    )
+    gas_concentration = _as_float(aerosol.gas.concentration)
 
     assert np.isfinite(saturation_concentration)
     assert np.isfinite(gas_concentration)
@@ -186,19 +184,20 @@ def test_particle_water_inventory_accepts_valid_single_species_shapes(
 ) -> None:
     """Regression: helper accepts valid single-species mass layouts."""
     aerosol, _ = _build_test_aerosol()
-    species_mass = np.asarray(
-        aerosol.particles.get_species_mass(), dtype=np.float64
-    )
+    species_mass = np.asarray(aerosol.particles.masses[0], dtype=np.float64)
     reshaped_mass = species_mass.reshape(mass_shape)
-    monkeypatch.setattr(
-        aerosol.particles,
-        "get_species_mass",
-        lambda: reshaped_mass,
+    aerosol.particles = par.particles.create_resolved_particle_data(
+        masses=reshaped_mass,
+        density=[1000.0],
+        volume=aerosol.particles.volume,
     )
 
     expected = float(
         np.sum(
-            species_mass.reshape(-1) * aerosol.particles.get_concentration(),
+            species_mass.reshape(-1)
+            * (
+                aerosol.particles.concentration[0] / aerosol.particles.volume[0]
+            ),
             dtype=np.float64,
         )
     )
@@ -211,15 +210,11 @@ def test_particle_water_inventory_rejects_multi_species_shapes(
 ) -> None:
     """Regression: helper fails loudly for unexpected multi-species mass."""
     aerosol, _ = _build_test_aerosol()
-    species_mass = np.asarray(
-        aerosol.particles.get_species_mass(), dtype=np.float64
-    )
-    monkeypatch.setattr(
-        aerosol.particles,
-        "get_species_mass",
-        lambda: np.column_stack(
-            [species_mass.reshape(-1), species_mass.reshape(-1)]
-        ),
+    species_mass = np.asarray(aerosol.particles.masses[0], dtype=np.float64)
+    aerosol.particles = par.particles.create_resolved_particle_data(
+        masses=np.column_stack([species_mass.reshape(-1)] * 2),
+        density=[1000.0, 1000.0],
+        volume=aerosol.particles.volume,
     )
 
     with pytest.raises(
@@ -242,9 +237,7 @@ def test_condensation_latent_heat_fixture_executes_via_mass_condensation() -> (
     condensation, condensation_strategy = _build_condensation()
 
     initial_particle_water = _particle_water_inventory(aerosol)
-    initial_gas_water = _as_float(
-        aerosol.atmosphere.partitioning_species.get_concentration()
-    )
+    initial_gas_water = _as_float(aerosol.gas.concentration)
     initial_total_water = initial_particle_water + initial_gas_water
 
     current = aerosol
@@ -252,19 +245,19 @@ def test_condensation_latent_heat_fixture_executes_via_mass_condensation() -> (
         current = condensation.execute(current, time_step=0.1, sub_steps=1)
 
     pre_final_particle_water = _particle_water_inventory(current)
-    pre_final_gas_water = _as_float(
-        current.atmosphere.partitioning_species.get_concentration()
-    )
+    pre_final_gas_water = _as_float(current.gas.concentration)
     current = condensation.execute(current, time_step=0.1, sub_steps=1)
 
     final_particle_water = _particle_water_inventory(current)
-    final_gas_water = _as_float(
-        current.atmosphere.partitioning_species.get_concentration()
-    )
+    final_gas_water = _as_float(current.gas.concentration)
     final_total_water = final_particle_water + final_gas_water
     final_step_particle_gain = final_particle_water - pre_final_particle_water
     final_step_gas_loss = pre_final_gas_water - final_gas_water
-    expected_final_step_energy = final_step_particle_gain * LATENT_HEAT_WATER
+    expected_final_step_energy = (
+        final_step_particle_gain
+        * current.particles.volume[0]
+        * LATENT_HEAT_WATER
+    )
 
     assert np.isfinite(initial_particle_water)
     assert np.isfinite(initial_gas_water)

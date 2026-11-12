@@ -17,24 +17,9 @@ from particula.tests.aerosol_replacement_test import assert_unchanged, snapshot
 @pytest.mark.parametrize("volume", [0.25, 1.0, 4.0])
 @pytest.mark.parametrize("mask", [[True, False, True], [False, False, False]])
 def test_native_construction_replacement_and_accounting(
-    volume, mask, monkeypatch
+    volume, mask, monkeypatch, forbid_legacy_facades
 ):
     """Preserve independent per-species quantities and explicit boundaries."""
-    from particula._legacy_aerosol import Aerosol as LegacyAerosol
-    from particula._legacy_aerosol import AerosolBuilder as LegacyBuilder
-    from particula.gas.atmosphere import Atmosphere
-    from particula.particles.representation import ParticleRepresentation
-
-    def no_legacy(*args, **kwargs):
-        raise AssertionError("native construction must not invoke a facade")
-
-    for cls in (
-        LegacyAerosol,
-        LegacyBuilder,
-        Atmosphere,
-        ParticleRepresentation,
-    ):
-        monkeypatch.setattr(cls, "__init__", no_legacy)
     particles = create_resolved_particle_data(
         masses=[[0.5e-18, 1.5e-18], [2e-18, 3e-18], [0.0, 0.0]],
         density=[1000.0, 1200.0],

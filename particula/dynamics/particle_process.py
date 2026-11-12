@@ -6,12 +6,11 @@ the CPU-only single-box nucleation process.
 
 from dataclasses import dataclass, fields
 from numbers import Integral, Real
-from typing import Any, Protocol, TypeVar, cast
+from typing import Any, Protocol, cast
 
 import numpy as np
 from numpy.typing import NDArray
 
-from particula._legacy_aerosol import Aerosol as LegacyAerosol
 from particula.aerosol import Aerosol
 from particula.aerosol_validation import validate_aerosol_structure
 from particula.dynamics.dilution import (
@@ -43,10 +42,8 @@ from particula.dynamics.nucleation.species_mapping import (
 )
 from particula.gas.environment_data import EnvironmentData
 from particula.gas.gas_data import GasData
-from particula.gas.species import GasSpecies
 from particula.particles.exhaustion import ExhaustionControls
 from particula.particles.particle_data import ParticleData
-from particula.particles.representation import ParticleRepresentation
 
 # Particula imports
 from particula.runnable import RunnableABC
@@ -60,7 +57,6 @@ from .condensation.condensation_strategies import (
 from .wall_loss.wall_loss_strategies import WallLossStrategy
 
 _MAX_NUCLEATION_SUB_STEPS = 10_000
-_AerosolT = TypeVar("_AerosolT", bound=Aerosol | LegacyAerosol)
 
 
 def _native_process_state(
@@ -364,10 +360,10 @@ class Nucleation(RunnableABC):
 class MassCondensation(RunnableABC):
     """Handles the mass condensation process for aerosols.
 
-    This class applies a specified condensation strategy to each particle
-    in an Aerosol, updating particle mass and reducing gas concentration
-    accordingly. It is designed to work with any CondensationStrategy
-    subclass.
+    Apply a strategy to the currently held native particle and gas containers.
+    Each equal substep reads the current environment and preserves container
+    identity. Process-owned physics and species maps define the mass transfer;
+    non-native aggregates reject before strategy dispatch.
 
     Attributes:
         condensation_strategy: The condensation strategy used for mass
@@ -380,7 +376,7 @@ class MassCondensation(RunnableABC):
     Examples:
         ```py title="Example Mass Condensation"
         import particula as par
-        condensation = par.dyanmics.MassCondensation(
+        condensation = par.dynamics.MassCondensation(
             condensation_strategy=my_strategy
         )
         updated_aerosol = condensation.execute(aerosol, time_step=1.0)
@@ -407,10 +403,10 @@ class MassCondensation(RunnableABC):
 
     def execute(
         self,
-        aerosol: _AerosolT,
+        aerosol: Aerosol,
         time_step: float,
         sub_steps: int = 1,
-    ) -> _AerosolT:
+    ) -> Aerosol:
         """Perform the mass condensation process over a given time step.
 
         Args:
@@ -429,38 +425,27 @@ class MassCondensation(RunnableABC):
             # The aerosol now has reduced/increased particle/gas mass
             ```
         """
-        if isinstance(aerosol, Aerosol):
-            duration = _native_duration(time_step, sub_steps)
-            for _ in range(sub_steps):
-                particles, gas, temperature, pressure = _native_process_state(
-                    aerosol
-                )
-                result = self.condensation_strategy.step(
-                    particle=particles,
-                    gas_species=gas,
-                    temperature=temperature,
-                    pressure=pressure,
-                    time_step=duration,
-                )
-                if result[0] is not particles or result[1] is not gas:
-                    raise ValueError(
-                        "Native condensation must retain its containers."
-                    )
-            return aerosol
+        if not isinstance(aerosol, Aerosol):
+            raise TypeError("MassCondensation requires a native Aerosol")
+        duration = _native_duration(time_step, sub_steps)
         for _ in range(sub_steps):
-            # calculate the condensation step for strategy
-            particles_out, gas_out = self.condensation_strategy.step(
-                particle=aerosol.particles,
-                gas_species=aerosol.atmosphere.partitioning_species,
-                temperature=aerosol.atmosphere.temperature,
-                pressure=aerosol.atmosphere.total_pressure,
-                time_step=time_step / sub_steps,
+            particles, gas, temperature, pressure = _native_process_state(
+                aerosol
             )
-            aerosol.particles = cast(ParticleRepresentation, particles_out)
-            aerosol.atmosphere.partitioning_species = cast(GasSpecies, gas_out)
+            result = self.condensation_strategy.step(
+                particle=particles,
+                gas_species=gas,
+                temperature=temperature,
+                pressure=pressure,
+                time_step=duration,
+            )
+            if result[0] is not particles or result[1] is not gas:
+                raise ValueError(
+                    "Native condensation must retain its containers."
+                )
         return aerosol
 
-    def rate(self, aerosol: Aerosol | LegacyAerosol) -> Any:
+    def rate(self, aerosol: Aerosol) -> Any:
         """Compute mass condensation rates for each particle.
 
         Args:
@@ -476,21 +461,14 @@ class MassCondensation(RunnableABC):
             # rates may look like array([1.2e-12, 4.5e-12, ...])
             ```
         """
-        if isinstance(aerosol, Aerosol):
-            particles, gas, temperature, pressure = _native_process_state(
-                aerosol
-            )
-            return self.condensation_strategy.rate(
-                particle=particles,
-                gas_species=gas,
-                temperature=temperature,
-                pressure=pressure,
-            )
+        if not isinstance(aerosol, Aerosol):
+            raise TypeError("MassCondensation requires a native Aerosol")
+        particles, gas, temperature, pressure = _native_process_state(aerosol)
         return self.condensation_strategy.rate(
-            particle=aerosol.particles,
-            gas_species=aerosol.atmosphere.partitioning_species,
-            temperature=aerosol.atmosphere.temperature,
-            pressure=aerosol.atmosphere.total_pressure,
+            particle=particles,
+            gas_species=gas,
+            temperature=temperature,
+            pressure=pressure,
         )
 
 

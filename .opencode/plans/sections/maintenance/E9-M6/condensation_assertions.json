@@ -1274,8 +1274,8 @@
         "self.assertIsInstance(aerosol_iso_out.particles, ParticleRepresentation)",
         "self.assertIsInstance(\n            aerosol_iso_out.atmosphere.partitioning_species, GasSpecies\n        )"
       ],
-      "disposition": "retain and migrate fixture unless individually reviewed as facade-only",
-      "native_successor": null
+      "disposition": "Migrated both latent-enabled and disabled runnable cases to native data with explicit full gas physics and mapping; original facade-type assertions replaced by native-type plus exact held-object identity checks.",
+      "native_successor": "particula/dynamics/condensation/tests/condensation_strategies_test.py::TestCondensationLatentHeat::test_step_mass_condensation_runnable_compatibility"
     }
   ]
 }
