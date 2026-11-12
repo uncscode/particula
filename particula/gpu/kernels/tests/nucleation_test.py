@@ -33,6 +33,9 @@ from particula.gpu.kernels.nucleation import (  # noqa: E402
     _stage_nucleation_slots,
     nucleation_step_gpu,
 )
+from particula.gpu.kernels.tests._nucleation_test_support import (  # noqa: E402
+    _binding,
+)
 from particula.util.constants import AVOGADRO_NUMBER  # noqa: E402
 
 _DEVICE_CASES = [pytest.param("cpu", id="cpu")]
@@ -63,6 +66,7 @@ def test_nucleation_prepared_enqueue_is_setup_free_and_pinned(
         exhaustion_controls=NucleationExhaustionControls(False, False),
         exhaustion_buffers=warm_buffers,
         temperature=300.0,
+        species_binding=_binding(warm_particles, warm_gas),
     )
     nucleation_module._enqueue_prepared_nucleation_call(warm_prepared)
 
@@ -81,6 +85,7 @@ def test_nucleation_prepared_enqueue_is_setup_free_and_pinned(
         exhaustion_controls=NucleationExhaustionControls(False, False),
         exhaustion_buffers=buffers,
         temperature=300.0,
+        species_binding=_binding(particles, gas),
     )
     pinned_masses = prepared.particle_arrays[0]
     pinned_gas = prepared.gas_arrays[1]
@@ -101,11 +106,11 @@ def test_nucleation_prepared_enqueue_is_setup_free_and_pinned(
         prepared.p4_final_status,
         prepared.p5_status,
     )
+    assert not hasattr(nucleation_module, "_execute_nucleation_step_gpu")
     with monkeypatch.context() as context:
         for name in ("zeros", "empty", "array", "full", "synchronize"):
             context.setattr(nucleation_module.wp, name, forbidden)
         for name in (
-            "_execute_nucleation_step_gpu",
             "resampling_step_gpu",
             "representative_volume_scaling_step_gpu",
         ):
@@ -146,6 +151,7 @@ def test_nucleation_prepared_enqueue_gates_live_invalid_payload() -> None:
         exhaustion_controls=NucleationExhaustionControls(False, False),
         exhaustion_buffers=buffers,
         temperature=300.0,
+        species_binding=_binding(particles, gas),
     )
     particle_before = tuple(
         values.numpy().copy() for values in prepared.particle_arrays[:3]
@@ -191,7 +197,7 @@ def test_nucleation_prepared_enqueue_gates_live_invalid_payload() -> None:
 def test_public_zero_rate_preserves_late_validation_short_circuit(
     config_changes: dict[str, float],
 ) -> None:
-    """Zero rate retains the legacy no-admission temperature precedence."""
+    """Zero rate retains the established no-admission temperature precedence."""
     particles, gas = _state(particles=2)
     particles.concentration = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
     scratch, finalized, diagnostics = _sidecars(1, 2, 1)
@@ -209,6 +215,7 @@ def test_public_zero_rate_preserves_late_validation_short_circuit(
         exhaustion_controls=NucleationExhaustionControls(False, False),
         exhaustion_buffers=buffers,
         temperature=500.0,
+        species_binding=_binding(particles, gas),
     ) == (particles, gas)
 
     _assert_snapshot_unchanged(before)
@@ -230,6 +237,7 @@ def test_empty_prepared_enqueue_revalidates_live_global_arrays() -> None:
         exhaustion_controls=NucleationExhaustionControls(False, False),
         exhaustion_buffers=buffers,
         temperature=300.0,
+        species_binding=_binding(particles, gas),
     )
     wp.copy(
         prepared.particle_arrays[3],
@@ -250,6 +258,7 @@ def _state(
 ):
     """Build valid caller-owned fixed-capacity state on the requested device."""
     particle_data = SimpleNamespace(
+        distribution_kind=3,
         masses=wp.zeros(
             (boxes, particles, species), dtype=wp.float64, device=device
         ),
@@ -262,6 +271,9 @@ def _state(
         volume=wp.ones(boxes, dtype=wp.float64, device=device),
     )
     gas_data = SimpleNamespace(
+        vapor_pressure=wp.zeros(
+            (boxes, species), dtype=wp.float64, device=device
+        ),
         molar_mass=wp.ones(species, dtype=wp.float64, device=device)
         * wp.float64(0.1),
         concentration=wp.ones(
@@ -395,6 +407,7 @@ def _stage_slots(counts, particle_slots, device="cpu"):
         scratch=scratch,
         finalized_demand=finalized,
         diagnostics=diagnostics,
+        _native_binding=_binding(particle_data, gas_data),
     )
     _stage_nucleation_slots(preflight, finalized, diagnostics)
     return particle_data, gas_data, scratch, finalized, diagnostics
@@ -478,6 +491,7 @@ def test_public_nucleation_step_commits_selected_slots_and_gas() -> None:
         exhaustion_controls=NucleationExhaustionControls(False, False),
         exhaustion_buffers=buffers,
         temperature=300.0,
+        species_binding=_binding(particles, gas),
     )
 
     assert result_particles is particles
@@ -520,6 +534,7 @@ def test_public_nucleation_step_zero_time_is_particle_gas_write_free() -> None:
         exhaustion_controls=NucleationExhaustionControls(False, False),
         exhaustion_buffers=buffers,
         temperature=300.0,
+        species_binding=_binding(particles, gas),
     )
 
     _assert_snapshot_unchanged(before)
@@ -562,6 +577,7 @@ def test_public_step_rejects_missing_required_sidecars(
             exhaustion_controls=NucleationExhaustionControls(False, False),
             exhaustion_buffers=buffers,
             temperature=300.0,
+            species_binding=_binding(particles, gas),
         )
 
     _assert_snapshot_unchanged(before)
@@ -578,7 +594,7 @@ def test_public_step_rejects_missing_required_sidecars(
         ("diagnostics", "diagnostics must be NucleationDiagnosticBuffers"),
     ],
 )
-def test_public_prepared_path_preserves_legacy_sidecar_error_precedence(
+def test_public_prepared_path_preserves_sidecar_error_precedence(
     missing: str,
     message: str,
 ) -> None:
@@ -608,13 +624,14 @@ def test_public_prepared_path_preserves_legacy_sidecar_error_precedence(
             temperature=object(),
             saturation=object(),
             environment=object(),
+            species_binding=_binding(particles, gas),
         )
 
     _assert_snapshot_unchanged(before)
 
 
-def test_p5_scales_gas_before_finalized_source_removal() -> None:
-    """Representative-volume scaling applies equally to pre-existing gas."""
+def test_p5_preserves_gas_density_after_volume_scaling() -> None:
+    """Volume scaling preserves gas density before mapped source removal."""
     particles, gas, scratch, finalized, diagnostics = _stage_slots(
         [4.0], np.array([[True, True, False, False]])
     )
@@ -632,6 +649,7 @@ def test_p5_scales_gas_before_finalized_source_removal() -> None:
         scratch=scratch,
         finalized_demand=finalized,
         diagnostics=diagnostics,
+        _native_binding=_binding(particles, gas),
     )
     p4_storage = _orchestrate_nucleation_exhaustion(
         preflight,
@@ -649,7 +667,7 @@ def test_p5_scales_gas_before_finalized_source_removal() -> None:
     event_mass = 0.1 / AVOGADRO_NUMBER
     np.testing.assert_allclose(
         gas.concentration.numpy(),
-        0.5 * initial_gas - buffers.final_demand.numpy()[:, None] * event_mass,
+        initial_gas - buffers.final_demand.numpy()[:, None] * event_mass,
         rtol=1e-12,
         atol=0.0,
     )
@@ -687,6 +705,7 @@ def test_public_empty_step_validates_p4_inputs_before_noop(
             exhaustion_controls=exhaustion_controls,
             exhaustion_buffers=exhaustion_buffers,
             temperature=300.0,
+            species_binding=_binding(particles, gas),
         )
 
     _assert_snapshot_unchanged(before)
@@ -707,7 +726,7 @@ def test_public_step_rejects_nonparticipating_demand_before_p4(
 
     def _launch(kernel, dim=None, inputs=None, device=None):
         nonlocal p5_launches
-        if kernel is nucleation_module._commit_nucleation_p5_kernel:
+        if kernel is nucleation_module._commit_native_nucleation:
             p5_launches += 1
         return original_launch(kernel, dim=dim, inputs=inputs, device=device)
 
@@ -727,6 +746,7 @@ def test_public_step_rejects_nonparticipating_demand_before_p4(
             exhaustion_controls=NucleationExhaustionControls(True, False),
             exhaustion_buffers=buffers,
             temperature=300.0,
+            species_binding=_binding(particles, gas),
         )
 
     assert p5_launches == 1
@@ -768,6 +788,7 @@ def test_public_nucleation_step_commits_multi_box_multispecies_state(
         exhaustion_controls=NucleationExhaustionControls(False, False),
         exhaustion_buffers=buffers,
         **kwargs,
+        species_binding=_binding(particles, gas),
     )
 
     event_mass = np.array([0.1 / AVOGADRO_NUMBER, 0.0])
@@ -790,7 +811,7 @@ def test_public_nucleation_step_commits_multi_box_multispecies_state(
     )
     np.testing.assert_allclose(
         particles.concentration.numpy(),
-        [[1.0, 0.0], [0.5, 0.5]],
+        [[1.0, 0.0], [1.0, 1.0]],
         rtol=0.0,
         atol=0.0,
     )
@@ -835,6 +856,7 @@ def test_public_nucleation_step_rejects_corrupt_p5_handoff_without_commit(
             exhaustion_controls=NucleationExhaustionControls(False, False),
             exhaustion_buffers=buffers,
             temperature=300.0,
+            species_binding=_binding(particles, gas),
         )
 
     _assert_snapshot_unchanged(before)
@@ -943,6 +965,7 @@ def test_public_nucleation_step_rejects_invalid_p5_handoffs_without_commit(
             exhaustion_controls=NucleationExhaustionControls(False, False),
             exhaustion_buffers=buffers,
             temperature=300.0,
+            species_binding=_binding(particles, gas),
         )
 
     _assert_snapshot_unchanged(handoff_snapshot)
@@ -966,6 +989,7 @@ def test_prepared_nucleation_p4_rebinding_cannot_redirect_dispatch() -> None:
         exhaustion_controls=NucleationExhaustionControls(False, False),
         exhaustion_buffers=buffers,
         temperature=300.0,
+        species_binding=_binding(particles, gas),
     )
     pinned_final_demand = prepared.p4_arrays[1]
     object.__setattr__(buffers, "final_demand", replacement)
@@ -1068,6 +1092,7 @@ def test_p4_finalizes_free_capacity_without_mutating_p2_or_p3_handoffs():
             scratch=scratch,
             finalized_demand=finalized,
             diagnostics=diagnostics,
+            _native_binding=_binding(particles, gas),
         ),
         finalized,
         diagnostics,
@@ -1103,6 +1128,7 @@ def test_p4_rejects_unresolved_capacity_before_writing_any_sidecar():
         scratch=scratch,
         finalized_demand=finalized,
         diagnostics=diagnostics,
+        _native_binding=_binding(particles, gas),
     )
     before = _snapshot_arrays(
         particles,
@@ -1162,6 +1188,7 @@ def test_p4_expected_handoff_rejections_preserve_complete_snapshots(
         scratch=scratch,
         finalized_demand=finalized,
         diagnostics=diagnostics,
+        _native_binding=_binding(particles, gas),
     )
     before = _snapshot_arrays(
         particles,
@@ -1232,6 +1259,7 @@ def test_p4_mutable_input_rejections_precede_all_writes(corrupt, monkeypatch):
         scratch=scratch,
         finalized_demand=finalized,
         diagnostics=diagnostics,
+        _native_binding=_binding(particles, gas),
     )
     corrupt(particles, finalized)
     before = _snapshot_arrays(
@@ -1282,6 +1310,7 @@ def test_p4_protects_retained_p2_scratch_from_output_aliasing():
         scratch=scratch,
         finalized_demand=finalized,
         diagnostics=diagnostics,
+        _native_binding=_binding(particles, gas),
     )
     before = _snapshot_arrays(
         particles, gas, scratch, finalized, diagnostics, buffers
@@ -1332,6 +1361,7 @@ def test_p4_scaling_records_full_deficit_and_finalized_count():
             scratch=scratch,
             finalized_demand=finalized,
             diagnostics=diagnostics,
+            _native_binding=_binding(particles, gas),
         ),
         finalized,
         diagnostics,
@@ -1341,10 +1371,14 @@ def test_p4_scaling_records_full_deficit_and_finalized_count():
 
     np.testing.assert_array_equal(buffers.required_release_counts.numpy(), [2])
     np.testing.assert_array_equal(buffers.scaling_required.numpy(), [1])
-    np.testing.assert_array_equal(buffers.final_demand.numpy(), [2.0])
-    np.testing.assert_array_equal(buffers.final_counts.numpy(), [1])
+    np.testing.assert_array_equal(buffers.final_demand.numpy(), [4.0])
+    np.testing.assert_array_equal(buffers.final_counts.numpy(), [2])
     np.testing.assert_array_equal(
-        buffers.final_selected_slot_indices.numpy(), [[2, -1, -1, -1]]
+        buffers.final_selected_slot_indices.numpy(), [[2, 3, -1, -1]]
+    )
+    np.testing.assert_array_equal(
+        buffers.final_demand.numpy() * particles.volume.numpy(),
+        buffers.final_counts.numpy(),
     )
     _assert_snapshot_unchanged(p2_p3_before)
 
@@ -1372,6 +1406,7 @@ def test_p4_resampling_precedes_scaling_and_refreshes_final_free_slots():
             scratch=scratch,
             finalized_demand=finalized,
             diagnostics=diagnostics,
+            _native_binding=_binding(particles, gas),
         ),
         finalized,
         diagnostics,
@@ -1408,6 +1443,7 @@ def test_stage_nucleation_slots_rejects_replacement_records_without_writes():
         scratch=scratch,
         finalized_demand=finalized,
         diagnostics=diagnostics,
+        _native_binding=_binding(particles, gas),
     )
     replacement_finalized = NucleationFinalizedDemandBuffers(
         wp.ones(1, dtype=wp.int32, device="cpu"),
@@ -1456,6 +1492,7 @@ def test_stage_nucleation_slots_rejects_replaced_record_buffer_without_writes():
         scratch=scratch,
         finalized_demand=finalized,
         diagnostics=diagnostics,
+        _native_binding=_binding(particles, gas),
     )
     replacement = wp.ones(1, dtype=wp.int32, device="cpu")
     before = _snapshot_arrays(particles, gas, scratch, finalized, diagnostics)
@@ -1487,6 +1524,7 @@ def test_stage_nucleation_slots_excludes_scratch_from_identity_validation():
         scratch=scratch,
         finalized_demand=finalized,
         diagnostics=diagnostics,
+        _native_binding=_binding(particles, gas),
     )
     object.__setattr__(
         scratch,
@@ -1520,6 +1558,7 @@ def test_stage_nucleation_slots_preserves_nonzero_particle_gas_and_p2_state():
         scratch=scratch,
         finalized_demand=finalized,
         diagnostics=diagnostics,
+        _native_binding=_binding(particles, gas),
     )
     preserved = _snapshot_arrays(particles, gas, scratch)
     p2_preserved = _snapshot_arrays(
@@ -1569,6 +1608,7 @@ def test_p3_diagnostic_sidecars_require_int32_nonoverlapping_storage(field):
             scratch=scratch,
             finalized_demand=finalized,
             diagnostics=malformed,
+            _native_binding=_binding(particles, gas),
         )
     _assert_snapshot_unchanged(before)
 
@@ -1590,6 +1630,7 @@ def test_p3_diagnostic_sidecars_require_int32_nonoverlapping_storage(field):
             scratch=scratch,
             finalized_demand=finalized,
             diagnostics=aliased,
+            _native_binding=_binding(particles, gas),
         )
     _assert_snapshot_unchanged(before)
 
@@ -1628,6 +1669,7 @@ def test_stage_nucleation_slots_rejects_invalid_event_conversion_without_writes(
         scratch=scratch,
         finalized_demand=finalized,
         diagnostics=diagnostics,
+        _native_binding=_binding(particle_data, gas_data),
     )
     with pytest.raises(ValueError, match="integral int32"):
         _stage_nucleation_slots(preflight, finalized, diagnostics)
@@ -1674,6 +1716,7 @@ def test_stage_nucleation_slots_e6_f5_failure_preserves_p3_sidecars():
         scratch=scratch,
         finalized_demand=finalized,
         diagnostics=diagnostics,
+        _native_binding=_binding(particles, gas),
     )
     with pytest.raises(ValueError, match="Invalid particle slot state"):
         _stage_nucleation_slots(preflight, finalized, diagnostics)
@@ -1694,6 +1737,7 @@ def test_stage_nucleation_slots_zero_boxes_is_write_free():
         scratch=scratch,
         finalized_demand=finalized,
         diagnostics=diagnostics,
+        _native_binding=_binding(particles, gas),
     )
     _stage_nucleation_slots(preflight, finalized, diagnostics)
     _assert_snapshot_unchanged(before)
@@ -1715,6 +1759,7 @@ def test_p2_to_p3_zero_demand_seam_preserves_p2_outputs():
         scratch=scratch,
         finalized_demand=finalized,
         diagnostics=diagnostics,
+        species_binding=_binding(particles, gas),
     )
     p2_before = _snapshot_arrays(scratch)
     accepted_demand_before = finalized.accepted_demand.numpy().copy()
@@ -1734,6 +1779,7 @@ def test_p2_to_p3_zero_demand_seam_preserves_p2_outputs():
         scratch=scratch,
         finalized_demand=finalized,
         diagnostics=diagnostics,
+        _native_binding=_binding(particles, gas),
     )
     _stage_nucleation_slots(preflight, finalized, diagnostics)
 
@@ -1849,6 +1895,7 @@ def test_preflight_is_read_only_for_valid_inputs():
         scratch=scratch,
         finalized_demand=finalized,
         diagnostics=diagnostics,
+        _native_binding=_binding(particles, gas),
     )
     assert result.n_boxes == 1
     assert result.n_particles == 2
@@ -1870,6 +1917,7 @@ def test_preflight_accepts_finite_signed_particle_charge():
         _config(),
         1.0,
         temperature=300.0,
+        _native_binding=_binding(particles, gas),
     )
 
     assert result.has_eligible_boxes
@@ -1889,6 +1937,7 @@ def test_preflight_accepts_environment_temperature_and_saturation():
         _config(saturation_lower=0.5, saturation_upper=1.5),
         1.0,
         environment=environment,
+        _native_binding=_binding(particles, gas),
     )
     assert result.temperature is environment.temperature
     assert result.saturation is environment.saturation_ratio
@@ -1904,6 +1953,7 @@ def test_preflight_empty_capacity_returns_no_eligible_boxes():
         _config(),
         1.0,
         temperature=300.0,
+        _native_binding=_binding(particles, gas),
     )
     assert result.n_particles == 0
     assert not result.has_eligible_boxes
@@ -1952,6 +2002,7 @@ def test_p2_empty_capacity_validates_before_writing_sidecars(
             scratch=scratch,
             finalized_demand=finalized,
             diagnostics=diagnostics,
+            species_binding=_binding(particles, gas),
         )
 
     _assert_snapshot_unchanged(before)
@@ -1973,6 +2024,7 @@ def test_p2_derived_invalid_demand_preserves_all_caller_state():
             scratch=scratch,
             finalized_demand=finalized,
             diagnostics=diagnostics,
+            species_binding=_binding(particles, gas),
         )
 
     _assert_snapshot_unchanged(before)
@@ -1997,6 +2049,7 @@ def test_preflight_rejects_scalar_temperature_outside_bounds(
             _config(),
             1.0,
             **{field: value},
+            _native_binding=_binding(particles, gas),
         )
 
 
@@ -2028,6 +2081,7 @@ def test_preflight_rejects_direct_array_values_outside_bounds(
             1.0,
             temperature=temperature_data,
             saturation=saturation_data,
+            _native_binding=_binding(particles, gas),
         )
     np.testing.assert_array_equal(temperature_data.numpy(), before)
 
@@ -2047,6 +2101,7 @@ def test_preflight_low_saturation_is_a_read_only_gate():
             1, wp.float64(300.0), dtype=wp.float64, device="cpu"
         ),
         saturation=saturation_data,
+        _native_binding=_binding(particles, gas),
     )
     assert result.gate_reason == "low_saturation"
 
@@ -2076,6 +2131,7 @@ def test_zero_gates_leave_stale_sidecars_untouched(time_step, changes, reason):
         scratch=scratch,
         finalized_demand=finalized,
         diagnostics=diagnostics,
+        _native_binding=_binding(particles, gas),
     )
     assert result.gate_reason == reason
     assert result.potential_rate == 0.0
@@ -2100,6 +2156,7 @@ def test_rejection_does_not_write_state():
             scratch=scratch,
             finalized_demand=finalized,
             diagnostics=diagnostics,
+            _native_binding=_binding(particles, gas),
         )
     _assert_snapshot_unchanged(before)
 
@@ -2136,6 +2193,7 @@ def test_preflight_rejects_invalid_precursor_partitioning(configure, message):
             _config(),
             1.0,
             temperature=300.0,
+            _native_binding=_binding(particles, gas),
         )
 
 
@@ -2154,6 +2212,7 @@ def test_preflight_rejects_conflicting_or_unconfigured_environment_inputs():
             1.0,
             temperature=300.0,
             environment=environment,
+            _native_binding=_binding(particles, gas),
         )
     with pytest.raises(ValueError, match="not configured"):
         _preflight_nucleation(
@@ -2163,6 +2222,7 @@ def test_preflight_rejects_conflicting_or_unconfigured_environment_inputs():
             1.0,
             temperature=300.0,
             saturation=wp.ones((1, 1), dtype=wp.float64, device="cpu"),
+            _native_binding=_binding(particles, gas),
         )
 
 
@@ -2183,6 +2243,7 @@ def test_preflight_rejects_sidecar_overlap_without_mutating_state():
             1.0,
             temperature=300.0,
             scratch=scratch,
+            _native_binding=_binding(particles, gas),
         )
     np.testing.assert_array_equal(particles.concentration.numpy(), before)
 
@@ -2200,7 +2261,12 @@ def test_config_and_time_step_reject_oversized_scalars_as_value_errors():
     particles, gas = _state()
     with pytest.raises(ValueError, match="finite and nonnegative"):
         _preflight_nucleation(
-            particles, gas, _config(), 10**1000, temperature=300.0
+            particles,
+            gas,
+            _config(),
+            10**1000,
+            temperature=300.0,
+            _native_binding=_binding(particles, gas),
         )
 
 
@@ -2220,6 +2286,7 @@ def test_preflight_rejects_lookalike_and_mutated_config_without_writes():
             scratch=scratch,
             finalized_demand=finalized,
             diagnostics=diagnostics,
+            _native_binding=_binding(particles, gas),
         )
     config = _config()
     object.__setattr__(config, "precursor_index", -1)
@@ -2233,6 +2300,7 @@ def test_preflight_rejects_lookalike_and_mutated_config_without_writes():
             scratch=scratch,
             finalized_demand=finalized,
             diagnostics=diagnostics,
+            _native_binding=_binding(particles, gas),
         )
     _assert_snapshot_unchanged(before)
 
@@ -2247,7 +2315,12 @@ def test_scalar_zero_config_gates_before_temperature_interval(
     """Valid zero rate inputs short-circuit configured scalar temperature bounds."""
     particles, gas = _state()
     result = _preflight_nucleation(
-        particles, gas, _config(**changes), 1.0, temperature=temperature
+        particles,
+        gas,
+        _config(**changes),
+        1.0,
+        temperature=temperature,
+        _native_binding=_binding(particles, gas),
     )
     assert result.gate_reason in ("zero_coefficient", "zero_survival")
 
@@ -2270,6 +2343,7 @@ def test_device_zero_config_gates_before_temperature_interval(
         _config(**changes),
         1.0,
         temperature=temperature_data,
+        _native_binding=_binding(particles, gas),
     )
     assert result.gate_reason in ("zero_coefficient", "zero_survival")
 
@@ -2296,6 +2370,7 @@ def test_disjoint_precursor_and_saturation_gates_are_all_box_union():
             2, wp.float64(300.0), dtype=wp.float64, device="cpu"
         ),
         saturation=saturation,
+        _native_binding=_binding(particles, gas),
     )
     assert not result.has_eligible_boxes
     assert result.has_gated_boxes
@@ -2319,6 +2394,7 @@ def test_mixed_gate_union_retains_eligible_box():
             2, wp.float64(300.0), dtype=wp.float64, device="cpu"
         ),
         saturation=saturation,
+        _native_binding=_binding(particles, gas),
     )
     assert result.has_eligible_boxes
     assert result.has_gated_boxes
@@ -2350,6 +2426,7 @@ def test_p2_plans_activation_demand_and_preserves_p3_sidecars():
         scratch=scratch,
         finalized_demand=finalized,
         diagnostics=diagnostics,
+        species_binding=_binding(particles, gas),
     )
 
     precursor = gas.concentration.numpy()[:, 0] * 6.02214076e23 / 0.1
@@ -2437,6 +2514,7 @@ def test_p2_matches_numpy_oracle_across_devices_and_scales(
         scratch=scratch,
         finalized_demand=finalized,
         diagnostics=diagnostics,
+        species_binding=_binding(particles, gas),
     )
 
     concentration = gas.concentration.numpy()
@@ -2482,6 +2560,7 @@ def test_p2_zero_time_writes_zero_outputs_and_gate_code():
         scratch=scratch,
         finalized_demand=finalized,
         diagnostics=diagnostics,
+        species_binding=_binding(particles, gas),
     )
 
     np.testing.assert_array_equal(scratch.potential_rate.numpy(), [0.0])
@@ -2546,6 +2625,7 @@ def test_p2_writes_all_non_time_gate_codes(
         scratch=scratch,
         finalized_demand=finalized,
         diagnostics=diagnostics,
+        species_binding=_binding(particles, gas),
     )
 
     np.testing.assert_array_equal(
@@ -2590,6 +2670,7 @@ def test_p2_kinetic_tied_inventory_uses_lowest_limiting_species():
         scratch=scratch,
         finalized_demand=finalized,
         diagnostics=diagnostics,
+        species_binding=_binding(particles, gas),
     )
 
     precursor = gas.concentration.numpy()[0, 0] * 6.02214076e23 / 0.1
@@ -2625,6 +2706,7 @@ def test_p2_gate_precedence_is_scalar_then_precursor_then_saturation():
         scratch=scratch,
         finalized_demand=finalized,
         diagnostics=diagnostics,
+        species_binding=_binding(particles, gas),
     )
 
     np.testing.assert_array_equal(
@@ -2642,6 +2724,7 @@ def test_p2_gate_precedence_is_scalar_then_precursor_then_saturation():
         scratch=scratch,
         finalized_demand=finalized,
         diagnostics=diagnostics,
+        species_binding=_binding(particles, gas),
     )
 
     np.testing.assert_array_equal(
@@ -2683,6 +2766,7 @@ def test_p2_shared_admission_preserves_nonparticipant_zero_removal():
         scratch=scratch,
         finalized_demand=finalized,
         diagnostics=diagnostics,
+        species_binding=_binding(particles, gas),
     )
 
     potential = (
@@ -2720,6 +2804,7 @@ def test_p2_empty_boxes_are_an_exact_write_free_noop():
         scratch=scratch,
         finalized_demand=finalized,
         diagnostics=diagnostics,
+        species_binding=_binding(particles, gas),
     )
 
     _assert_snapshot_unchanged(before)
@@ -2762,6 +2847,7 @@ def test_p2_rejects_missing_or_wrong_sidecar_records(field, value, message):
             1.0,
             temperature=300.0,
             **sidecars,
+            species_binding=_binding(particles, gas),
         )
 
     _assert_snapshot_unchanged(before)
@@ -2810,6 +2896,7 @@ def test_p2_inventory_rounding_uses_bounded_nextafter_correction():
         scratch=scratch,
         finalized_demand=finalized,
         diagnostics=diagnostics,
+        species_binding=_binding(particles, gas),
     )
 
     np.testing.assert_allclose(
@@ -2861,4 +2948,5 @@ def test_p2_inventory_rounding_raises_exact_failure_after_four_corrections(
             scratch=scratch,
             finalized_demand=finalized,
             diagnostics=diagnostics,
+            species_binding=_binding(particles, gas),
         )

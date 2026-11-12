@@ -1,10 +1,4 @@
-"""Fail-closed interim boundaries for population consumers not yet migrated.
-
-The M3 science guards are replaced by positive scientific admission in their
-own phases. Resident/orchestration guards remain for M4. These checks assert
-rejection before payload access rather than treating rejection as evidence of
-completed numerical migration.
-"""
+"""Native population and species-map admission before payload access."""
 
 import importlib
 import inspect
@@ -25,13 +19,11 @@ class _TaggedOnly:
     "module,name",
     [
         ("nucleation", "_preflight_nucleation"),
-        ("exhaustion", "_execute_resampling_step_gpu"),
-        ("exhaustion", "_execute_representative_volume_scaling_step_gpu"),
     ],
 )
-@pytest.mark.parametrize("code", [1, 2, 3])
-def test_unmigrated_consumers_reject_before_payload_access(module, name, code):
-    """Every direct/prepared route protects the newly transferable tag."""
+@pytest.mark.parametrize("code", [0, 1, 2, 3])
+def test_staged_nucleation_requires_metadata_and_binding(module, name, code):
+    """Resolved metadata alone cannot supply the staged species binding."""
     pytest.importorskip("warp")
     function = getattr(
         importlib.import_module(f"particula.gpu.kernels.{module}"), name
@@ -43,7 +35,10 @@ def test_unmigrated_consumers_reject_before_payload_access(module, name, code):
     }
     kwargs["particles"] = _TaggedOnly()
     kwargs["particles"].distribution_kind = code
-    with pytest.raises(ValueError, match="require a migrated consumer"):
+    message = (
+        "requires species_binding" if code == 3 else "only particle_resolved"
+    )
+    with pytest.raises(ValueError, match=message):
         function(**kwargs)
 
 
@@ -80,3 +75,38 @@ def test_native_wall_loss_rejects_unsupported_population_before_payload(code):
     particles.distribution_kind = code
     with pytest.raises(ValueError, match="only particle_resolved"):
         _prepare_wall_loss_step_gpu(particles, None, None, 0.1, config=None)
+
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        "resampling_step_gpu",
+        "_prepare_resampling_step_gpu",
+        "representative_volume_scaling_step_gpu",
+        "_prepare_representative_volume_scaling_step_gpu",
+    ],
+)
+@pytest.mark.parametrize("code", [None, 0, 1, 2])
+def test_exhaustion_requires_native_metadata_before_payload(name, code):
+    """Every active exhaustion entry rejects absent or unsupported semantics."""
+    pytest.importorskip("warp")
+    module = importlib.import_module("particula.gpu.kernels.exhaustion")
+    function = getattr(module, name)
+
+    class MetadataOnly:
+        def __getattr__(self, field):
+            if field == "distribution_kind":
+                raise AttributeError(field)
+            raise AssertionError(f"payload accessed: {field}")
+
+    particles = MetadataOnly()
+    if code is not None:
+        particles.distribution_kind = code
+    kwargs = {
+        key: None
+        for key, parameter in inspect.signature(function).parameters.items()
+        if parameter.default is inspect.Parameter.empty
+    }
+    kwargs["particles"] = particles
+    with pytest.raises(ValueError, match="only particle_resolved"):
+        function(**kwargs)

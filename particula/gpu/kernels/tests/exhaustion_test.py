@@ -39,9 +39,7 @@ def test_resampling_prepared_enqueue_is_setup_free_and_pinned(
     with monkeypatch.context() as context:
         for name in ("zeros", "empty", "array", "full", "synchronize"):
             context.setattr(exhaustion_module.wp, name, forbidden)
-        context.setattr(
-            exhaustion_module, "_execute_resampling_step_gpu", forbidden
-        )
+        assert not hasattr(exhaustion_module, "_execute_resampling_step_gpu")
         context.setattr(prepared.invalid, "numpy", forbidden)
         context.setattr(prepared.planning_failed, "numpy", forbidden)
         assert (
@@ -141,10 +139,8 @@ def test_scaling_prepared_enqueue_is_setup_free_and_pinned(
     with monkeypatch.context() as context:
         for name in ("zeros", "empty", "array", "full", "synchronize"):
             context.setattr(exhaustion_module.wp, name, forbidden)
-        context.setattr(
-            exhaustion_module,
-            "_execute_representative_volume_scaling_step_gpu",
-            forbidden,
+        assert not hasattr(
+            exhaustion_module, "_execute_representative_volume_scaling_step_gpu"
         )
         context.setattr(prepared.status, "numpy", forbidden)
         result = exhaustion_module._enqueue_prepared_representative_volume_scaling_call(
@@ -231,12 +227,18 @@ def _warp():
     return pytest.importorskip("warp")
 
 
+class _ResolvedParticleState(SimpleNamespace):
+    """Keep population metadata separate from enumerated device payloads."""
+
+    distribution_kind = 3
+
+
 def _state(device: str = "cpu"):
     """Create a sparse two-species fixed-capacity particle state and buffers."""
     wp = _warp()
     from particula.gpu.kernels.exhaustion import ResamplingBuffers
 
-    particles = SimpleNamespace(
+    particles = _ResolvedParticleState(
         masses=wp.array(
             np.array([[[1.0, 0.0], [2.0, 1.0], [4.0, 0.0], [0.0, 0.0]]]),
             dtype=wp.float64,
@@ -288,7 +290,7 @@ def _custom_state(
     from particula.gpu.kernels.exhaustion import ResamplingBuffers
 
     box_count, particle_count, species_count = masses.shape
-    particles = SimpleNamespace(
+    particles = _ResolvedParticleState(
         masses=wp.array(masses, dtype=wp.float64, device=device),
         concentration=wp.array(concentration, dtype=wp.float64, device=device),
         charge=wp.array(charge, dtype=wp.float64, device=device),
@@ -1025,7 +1027,7 @@ def test_gpu_representative_volume_scaling_matches_numpy_oracle() -> None:
         dtype=np.float64,
     )
     concentration = np.array([[2.0, 3.0], [5.0, 7.0]], dtype=np.float64)
-    particles = SimpleNamespace(
+    particles = _ResolvedParticleState(
         masses=wp.array(masses, dtype=wp.float64, device="cpu"),
         concentration=wp.array(concentration, dtype=wp.float64, device="cpu"),
         charge=wp.array(
@@ -1342,7 +1344,7 @@ def test_gpu_representative_volume_scaling_empty_invalid_density_rejects() -> (
         representative_volume_scaling_step_gpu,
     )
 
-    particles = SimpleNamespace(
+    particles = _ResolvedParticleState(
         masses=wp.zeros((0, 1, 1), dtype=wp.float64, device="cpu"),
         concentration=wp.zeros((0, 1), dtype=wp.float64, device="cpu"),
         charge=wp.zeros((0, 1), dtype=wp.float64, device="cpu"),

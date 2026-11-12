@@ -1,0 +1,830 @@
+[
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_native_test.py",
+    "test": "test_native_gpu_unit_count_and_independent_species_widths",
+    "original": "def test_native_gpu_unit_count_and_independent_species_widths(device, volume):\n    \"\"\"One slot per event stores count one and consumes density in gas order.\"\"\"\n    from particula.gpu.kernels.nucleation import nucleation_step_gpu\n\n    p, g, config, kwargs = setup(device, volume)\n    before = density_inventory(p, g)\n    assert nucleation_step_gpu(p, g, config, 1.0, **kwargs) == (p, g)\n    number = int(4 * volume)\n    np.testing.assert_array_equal(\n        p.concentration.numpy()[0, 1 : number + 1], 1.0\n    )\n    np.testing.assert_array_equal(\n        p.masses.numpy()[0, 1 : number + 1],\n        np.tile([1.0, 2.0, 0.0], (number, 1)),\n    )\n    np.testing.assert_array_equal(\n        g.concentration.numpy(), [[7.0, 92.0, 96.0, 9.0]]\n    )\n    np.testing.assert_allclose(\n        density_inventory(p, g), before, rtol=1e-12, atol=1e-30\n    )",
+    "successor": "particula/gpu/kernels/tests/nucleation_native_test.py::test_native_gpu_unit_count_and_independent_species_widths",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_native_test.py",
+    "test": "test_native_gpu_scaling_preserves_gas_and_existing_density",
+    "original": "def test_native_gpu_scaling_preserves_gas_and_existing_density(device):\n    \"\"\"Scaling reduces counts once; inert gas never receives a scaling factor.\"\"\"\n    import warp as wp\n\n    from particula.gpu.kernels.nucleation import (\n        NucleationExhaustionControls,\n        nucleation_step_gpu,\n    )\n\n    p, g, config, kwargs = setup(device, volume=1.0, capacity=3)\n    before = density_inventory(p, g)\n    buffers = kwargs[\"exhaustion_buffers\"]\n    wp.copy(\n        buffers.requested_scale,\n        wp.array([0.5], dtype=wp.float64, device=device),\n    )\n    wp.copy(\n        buffers.minimum_scale, wp.array([0.5], dtype=wp.float64, device=device)\n    )\n    wp.copy(\n        buffers.minimum_volume,\n        wp.array([0.01], dtype=wp.float64, device=device),\n    )\n    kwargs[\"exhaustion_controls\"] = NucleationExhaustionControls(False, True)\n    nucleation_step_gpu(p, g, config, 1.0, **kwargs)\n    np.testing.assert_array_equal(p.volume.numpy(), [0.5])\n    np.testing.assert_array_equal(p.concentration.numpy(), [[1.0, 1.0, 1.0]])\n    np.testing.assert_array_equal(\n        g.concentration.numpy(), [[7.0, 92.0, 96.0, 9.0]]\n    )\n    np.testing.assert_allclose(\n        density_inventory(p, g), before, rtol=1e-12, atol=1e-30\n    )",
+    "successor": "particula/gpu/kernels/tests/nucleation_native_test.py::test_native_gpu_scaling_preserves_gas_and_existing_density",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_native_test.py",
+    "test": "test_native_prepared_repeats_without_setup_and_reads_live_gas",
+    "original": "def test_native_prepared_repeats_without_setup_and_reads_live_gas(\n    device, monkeypatch\n):\n    \"\"\"Retained arrays drive repeated enqueue with no host setup or readback.\"\"\"\n    import warp as wp\n\n    from particula.gpu.kernels import nucleation as module\n\n    p, g, config, kwargs = setup(device)\n    prepared = module._prepare_nucleation_step_gpu(p, g, config, 1.0, **kwargs)\n    module._enqueue_prepared_nucleation_call(prepared)\n    module._observe_prepared_nucleation_call(prepared)\n    # Restore precursor density explicitly so the next admitted event is integral.\n    wp.copy(\n        g.concentration,\n        wp.array([[7.0, 92.0, 100.0, 9.0]], dtype=wp.float64, device=device),\n    )\n\n    def forbidden(*args, **kwargs):\n        pytest.fail(\"native prepared source performed host setup\")\n\n    with monkeypatch.context() as patch:\n        for name in (\"zeros\", \"empty\", \"array\", \"full\", \"synchronize\"):\n            patch.setattr(wp, name, forbidden)\n        for name in (\n            \"p1_status\",\n            \"p2_status\",\n            \"p3_status\",\n            \"p4_status\",\n            \"p5_status\",\n        ):\n            patch.setattr(getattr(prepared, name), \"numpy\", forbidden)\n        module._enqueue_prepared_nucleation_call(prepared)\n    module._observe_prepared_nucleation_call(prepared)\n    np.testing.assert_array_equal(\n        p.concentration.numpy()[0, :3], [2.0, 1.0, 1.0]\n    )\n    np.testing.assert_array_equal(\n        g.concentration.numpy(), [[7.0, 84.0, 96.0, 9.0]]\n    )",
+    "successor": "particula/gpu/kernels/tests/nucleation_native_test.py::test_native_prepared_repeats_without_setup_and_reads_live_gas",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_native_test.py",
+    "test": "test_native_binding_rejects_rebound_storage",
+    "original": "def test_native_binding_rejects_rebound_storage(device):\n    \"\"\"A binding cannot silently acquire replacement gas storage.\"\"\"\n    import warp as wp\n\n    from particula.gpu.kernels.nucleation import _prepare_nucleation_step_gpu\n\n    p, g, config, kwargs = setup(device)\n    g.concentration = wp.zeros((1, 4), dtype=wp.float64, device=device)\n    with pytest.raises(ValueError, match=\"storage changed\"):\n        _prepare_nucleation_step_gpu(p, g, config, 1.0, **kwargs)",
+    "successor": "particula/gpu/kernels/tests/nucleation_native_test.py::test_native_binding_rejects_rebound_storage",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_native_test.py",
+    "test": "test_native_gpu_resampling_then_source_preserves_density",
+    "original": "def test_native_gpu_resampling_then_source_preserves_density(device):\n    \"\"\"Resampling and unit-count source activation share the native population.\"\"\"\n    import warp as wp\n\n    from particula.gpu.kernels.nucleation import (\n        NucleationExhaustionControls,\n        nucleation_step_gpu,\n    )\n\n    p, g, config, kwargs = setup(device, volume=0.5, capacity=4)\n    wp.copy(\n        p.masses,\n        wp.array(\n            [[[2.0, 3.0, 4.0]] * 3 + [[0.0, 0.0, 0.0]]],\n            dtype=wp.float64,\n            device=device,\n        ),\n    )\n    wp.copy(\n        p.concentration,\n        wp.array([[2.0, 3.0, 5.0, 0.0]], dtype=wp.float64, device=device),\n    )\n    buffers = kwargs[\"exhaustion_buffers\"]\n    wp.copy(\n        buffers.resampling_releasable_counts,\n        wp.array([2], dtype=wp.int32, device=device),\n    )\n    kwargs[\"exhaustion_controls\"] = NucleationExhaustionControls(True, False)\n    before = density_inventory(p, g)\n    nucleation_step_gpu(p, g, config, 1.0, **kwargs)\n    np.testing.assert_array_equal(buffers.required_release_counts.numpy(), [1])\n    np.testing.assert_array_equal(\n        p.concentration.numpy(), [[5.0, 5.0, 1.0, 1.0]]\n    )\n    np.testing.assert_allclose(\n        density_inventory(p, g), before, rtol=1e-12, atol=1e-30\n    )",
+    "successor": "particula/gpu/kernels/tests/nucleation_native_test.py::test_native_gpu_resampling_then_source_preserves_density",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_native_test.py",
+    "test": "test_native_prepared_invalid_live_payload_preserves_particles_and_gas",
+    "original": "def test_native_prepared_invalid_live_payload_preserves_particles_and_gas(\n    device, failure\n):\n    \"\"\"Invalid live state gates the source before any primary writer.\"\"\"\n    import warp as wp\n\n    from particula.gpu.kernels import nucleation as module\n\n    p, g, config, kwargs = setup(device)\n    prepared = module._prepare_nucleation_step_gpu(p, g, config, 1.0, **kwargs)\n    if failure == \"density\":\n        wp.copy(p.volume, wp.array([1e-309], dtype=wp.float64, device=device))\n    elif failure == \"partitioning\":\n        wp.copy(\n            g.partitioning,\n            wp.array([[0, 0, 1, 0]], dtype=wp.int32, device=device),\n        )\n    elif failure == \"gas\":\n        wp.copy(\n            g.concentration,\n            wp.array(\n                [[7.0, -1.0, 100.0, 9.0]], dtype=wp.float64, device=device\n            ),\n        )\n    else:\n        wp.copy(\n            g.concentration,\n            wp.array(\n                [[7.0, 100.0, 50.0, 9.0]], dtype=wp.float64, device=device\n            ),\n        )\n    arrays = [p.masses, p.concentration, p.charge, p.volume, g.concentration]\n    before = [array.numpy().copy() for array in arrays]\n    module._enqueue_prepared_nucleation_call(prepared)\n    with pytest.raises(ValueError):\n        module._observe_prepared_nucleation_call(prepared)\n    for array, expected in zip(arrays, before, strict=True):\n        np.testing.assert_array_equal(array.numpy(), expected)",
+    "successor": "particula/gpu/kernels/tests/nucleation_native_test.py::test_native_prepared_invalid_live_payload_preserves_particles_and_gas",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_native_test.py",
+    "test": "test_native_source_requires_supported_population_and_binding_before_payload",
+    "original": "def test_native_source_requires_supported_population_and_binding_before_payload(\n    code,\n):\n    \"\"\"A tag cannot infer species order or broaden the source algorithm.\"\"\"\n    from particula.gpu.kernels.nucleation import _prepare_nucleation_step_gpu\n\n    class Tagged:\n        distribution_kind = code\n\n        def __getattr__(self, name):\n            pytest.fail(f\"invalid source admission accessed {name}\")\n\n    message = (\n        \"requires species_binding\" if code == 3 else \"only particle_resolved\"\n    )\n    with pytest.raises(ValueError, match=message):\n        _prepare_nucleation_step_gpu(\n            Tagged(),\n            None,\n            None,\n            None,\n            scratch=None,\n            finalized_demand=None,\n            diagnostics=None,\n            exhaustion_controls=None,\n            exhaustion_buffers=None,\n        )",
+    "successor": "particula/gpu/kernels/tests/nucleation_native_test.py::test_native_source_requires_supported_population_and_binding_before_payload",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_native_test.py",
+    "test": "test_native_source_rejects_p4_alias_with_protected_vapor_pressure",
+    "original": "def test_native_source_rejects_p4_alias_with_protected_vapor_pressure(device):\n    \"\"\"Every phase protects unused full-gas fields as well as active lanes.\"\"\"\n    from particula.gpu.kernels.nucleation import _prepare_nucleation_step_gpu\n\n    p, g, config, kwargs = setup(device, capacity=4)\n    buffers = kwargs[\"exhaustion_buffers\"]\n    kwargs[\"exhaustion_buffers\"] = replace(\n        buffers,\n        resampling_buffers=replace(\n            buffers.resampling_buffers, replacement_charge=g.vapor_pressure\n        ),\n    )\n    with pytest.raises(ValueError, match=\"overlap\"):\n        _prepare_nucleation_step_gpu(p, g, config, 1.0, **kwargs)",
+    "successor": "particula/gpu/kernels/tests/nucleation_native_test.py::test_native_source_rejects_p4_alias_with_protected_vapor_pressure",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_native_test.py",
+    "test": "test_nonbinary_volume_preserves_admitted_count",
+    "original": "def test_nonbinary_volume_preserves_admitted_count(device):\n    \"\"\"P4/P5 retain one admitted event without a density round trip.\"\"\"\n    from dataclasses import replace\n\n    from particula.gpu.kernels import nucleation_step_gpu\n\n    p, g, config, kwargs = setup(device, volume=0.09)\n    g.concentration.assign(np.array([[7.0, 100.0, 11.111111111111112, 9.0]]))\n    before = density_inventory(p, g)\n    nucleation_step_gpu(p, g, replace(config, coefficient=1.0), 1.0, **kwargs)\n    np.testing.assert_array_equal(\n        kwargs[\"exhaustion_buffers\"].final_counts.numpy(), [1]\n    )\n    np.testing.assert_allclose(\n        density_inventory(p, g), before, rtol=1e-12, atol=1e-30\n    )",
+    "successor": "particula/gpu/kernels/tests/nucleation_native_test.py::test_nonbinary_volume_preserves_admitted_count",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_parity_test.py",
+    "test": "test_public_nucleation_step_matches_independent_p2_p3_p5_oracle",
+    "original": "def test_public_nucleation_step_matches_independent_p2_p3_p5_oracle(\n    device, boxes, species, rate_law\n) -> None:\n    \"\"\"Direct steps match independent demand, slot insertion, and gas removal.\"\"\"\n    wp = _warp()\n    api = _api()\n    particles, gas = _state(device, boxes=boxes, species=species)\n    scratch, finalized, diagnostics, exhaustion = _sidecars(\n        api, device, boxes, 3, species\n    )\n    coefficient = 0.1 / AVOGADRO_NUMBER\n    if rate_law == \"kinetic\":\n        counts = np.arange(1, species + 1, dtype=np.float64)\n        event_mass = counts * gas.molar_mass.numpy() / AVOGADRO_NUMBER\n        gas.concentration = wp.array(\n            event_mass[None, :] / particles.volume.numpy()[:, None],\n            dtype=wp.float64,\n            device=device,\n        )\n        coefficient = 2.0\n    config = _config(\n        api,\n        rate_law=rate_law,\n        coefficient=coefficient,\n        molecule_counts=tuple(range(1, species + 1)),\n    )\n    initial_gas = gas.concentration.numpy().copy()\n    demand, removal, event_mass = _numpy_p2(\n        initial_gas, gas.molar_mass.numpy(), config, 1.0\n    )\n    result = api.nucleation_step_gpu(\n        particles,\n        gas,\n        config,\n        1.0,\n        scratch=scratch,\n        finalized_demand=finalized,\n        diagnostics=diagnostics,\n        exhaustion_controls=api.NucleationExhaustionControls(False, False),\n        exhaustion_buffers=exhaustion,\n        temperature=300.0,\n    )\n    wp.synchronize_device(device)\n    assert result[0] is particles\n    assert result[1] is gas\n    expected_masses = np.zeros((boxes, 3, species), dtype=np.float64)\n    expected_concentration = np.zeros((boxes, 3), dtype=np.float64)\n    expected_masses[:, 0, :] = event_mass\n    expected_concentration[:, 0] = demand\n    np.testing.assert_allclose(\n        particles.masses.numpy(), expected_masses, rtol=1e-12, atol=1e-30\n    )\n    np.testing.assert_allclose(\n        particles.concentration.numpy(),\n        expected_concentration,\n        rtol=1e-12,\n        atol=1e-30,\n    )\n    np.testing.assert_allclose(\n        particles.charge.numpy(), 0.0, rtol=0.0, atol=0.0\n    )\n    np.testing.assert_allclose(\n        gas.concentration.numpy(), initial_gas - removal, rtol=1e-12, atol=1e-30\n    )\n    np.testing.assert_array_equal(\n        exhaustion.final_counts.numpy(),\n        (demand * particles.volume.numpy()).astype(np.int32),\n    )\n    np.testing.assert_array_equal(\n        exhaustion.final_selected_slot_indices.numpy(),\n        np.tile([0, -1, -1], (boxes, 1)),\n    )",
+    "successor": "particula/gpu/kernels/tests/nucleation_parity_test.py::test_public_nucleation_step_matches_independent_p2_p3_p5_oracle",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_parity_test.py",
+    "test": "test_public_nucleation_step_gates_are_exact_write_free",
+    "original": "def test_public_nucleation_step_gates_are_exact_write_free(\n    device, kind\n) -> None:\n    \"\"\"Zero-demand public gates preserve particles and gas byte-for-byte.\"\"\"\n    wp = _warp()\n    api = _api()\n    particles, gas = _state(device)\n    scratch, finalized, diagnostics, exhaustion = _sidecars(\n        api, device, 1, 3, 2\n    )\n    kwargs = {\"time_step\": 1.0, \"config\": _config(api)}\n    if kind == \"zero_time\":\n        kwargs[\"time_step\"] = 0.0\n    elif kind == \"zero_coefficient\":\n        kwargs[\"config\"] = _config(api, coefficient=0.0)\n    else:\n        kwargs[\"config\"] = _config(\n            api, saturation_lower=2.0, saturation_upper=3.0\n        )\n        kwargs[\"saturation\"] = wp.ones((1, 2), dtype=wp.float64, device=device)\n    before = _snapshot(particles, gas)\n    api.nucleation_step_gpu(\n        particles,\n        gas,\n        kwargs[\"config\"],\n        kwargs[\"time_step\"],\n        scratch=scratch,\n        finalized_demand=finalized,\n        diagnostics=diagnostics,\n        exhaustion_controls=api.NucleationExhaustionControls(False, False),\n        exhaustion_buffers=exhaustion,\n        temperature=300.0,\n        **(\n            {\"saturation\": kwargs[\"saturation\"]}\n            if \"saturation\" in kwargs\n            else {}\n        ),\n    )\n    wp.synchronize_device(device)\n    _assert_unchanged(before)",
+    "successor": "particula/gpu/kernels/tests/nucleation_parity_test.py::test_public_nucleation_step_gates_are_exact_write_free",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_parity_test.py",
+    "test": "test_public_nucleation_step_conserves_tiny_matrix_transfer",
+    "original": "def test_public_nucleation_step_conserves_tiny_matrix_transfer(device) -> None:\n    \"\"\"Tiny unscaled transfers conserve each box/species by direct residual.\"\"\"\n    wp = _warp()\n    api = _api()\n    particles, gas = _state(device, boxes=2, active=True)\n    scratch, finalized, diagnostics, exhaustion = _sidecars(\n        api, device, 2, 3, 2\n    )\n    initial = _particle_inventory(\n        particles.masses.numpy(), particles.concentration.numpy()\n    )\n    initial += gas.concentration.numpy()\n    api.nucleation_step_gpu(\n        particles,\n        gas,\n        _config(api),\n        1.0,\n        scratch=scratch,\n        finalized_demand=finalized,\n        diagnostics=diagnostics,\n        exhaustion_controls=api.NucleationExhaustionControls(False, False),\n        exhaustion_buffers=exhaustion,\n        temperature=300.0,\n    )\n    wp.synchronize_device(device)\n    final = _particle_inventory(\n        particles.masses.numpy(), particles.concentration.numpy()\n    )\n    final += gas.concentration.numpy()\n    np.testing.assert_allclose(final - initial, 0.0, rtol=0.0, atol=1e-30)\n    assert np.all(np.isfinite(gas.concentration.numpy()))\n    assert np.all(gas.concentration.numpy() >= 0.0)",
+    "successor": "particula/gpu/kernels/tests/nucleation_parity_test.py::test_public_nucleation_step_conserves_tiny_matrix_transfer",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_parity_test.py",
+    "test": "test_public_nucleation_step_scaling_fallback_has_separate_inventory",
+    "original": "def test_public_nucleation_step_scaling_fallback_has_separate_inventory(\n    device,\n) -> None:\n    \"\"\"Scaling halves pre-existing particle and gas inventory before P5.\"\"\"\n    wp = _warp()\n    api = _api()\n    particles, gas = _state(device, particles=4, active=True)\n    scratch, finalized, diagnostics, exhaustion = _sidecars(\n        api, device, 1, 4, 2\n    )\n    object.__setattr__(\n        exhaustion,\n        \"requested_scale\",\n        wp.full(1, 0.5, dtype=wp.float64, device=device),\n    )\n    object.__setattr__(\n        exhaustion,\n        \"minimum_scale\",\n        wp.full(1, 0.5, dtype=wp.float64, device=device),\n    )\n    object.__setattr__(\n        exhaustion,\n        \"minimum_volume\",\n        wp.full(1, 0.5, dtype=wp.float64, device=device),\n    )\n    initial_particle = _particle_inventory(\n        particles.masses.numpy(), particles.concentration.numpy()\n    )\n    initial_gas = gas.concentration.numpy().copy()\n    config = _config(api, coefficient=0.4 / AVOGADRO_NUMBER)\n    _, removal, event_mass = _numpy_p2(\n        initial_gas, gas.molar_mass.numpy(), config, 1.0\n    )\n\n    api.nucleation_step_gpu(\n        particles,\n        gas,\n        config,\n        1.0,\n        scratch=scratch,\n        finalized_demand=finalized,\n        diagnostics=diagnostics,\n        exhaustion_controls=api.NucleationExhaustionControls(False, True),\n        exhaustion_buffers=exhaustion,\n        temperature=300.0,\n    )\n    wp.synchronize_device(device)\n\n    # P4 scales demand from 4 to 2 #/m^3 before P5 removes source mass.\n    source_removal = 2.0 * event_mass\n    final_particle = _particle_inventory(\n        particles.masses.numpy(), particles.concentration.numpy()\n    )\n    np.testing.assert_array_equal(exhaustion.scaling_required.numpy(), [1])\n    np.testing.assert_allclose(\n        exhaustion.resolved_scale.numpy(), [0.5], rtol=0.0, atol=0.0\n    )\n    np.testing.assert_allclose(\n        particles.volume.numpy(), [0.5], rtol=0.0, atol=0.0\n    )\n    np.testing.assert_allclose(\n        gas.concentration.numpy(),\n        0.5 * initial_gas - source_removal,\n        rtol=1e-12,\n        atol=1e-30,\n    )\n    np.testing.assert_allclose(\n        final_particle,\n        0.5 * initial_particle + source_removal,\n        rtol=1e-12,\n        atol=1e-30,\n    )\n    np.testing.assert_allclose(removal[0], 4.0 * event_mass, rtol=0.0, atol=0.0)",
+    "successor": "particula/gpu/kernels/tests/nucleation_parity_test.py::test_public_nucleation_step_scaling_fallback_has_separate_inventory",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Independent density oracle now preserves pre-source gas/particle density under native volume scaling; raw event counts scale with volume. Added separate extensive combined-inventory assertion with unchanged tolerances."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_parity_test.py",
+    "test": "test_public_nucleation_step_resampling_precedes_scaling",
+    "original": "def test_public_nucleation_step_resampling_precedes_scaling(device) -> None:\n    \"\"\"A fully releasable row chooses resampling and preserves inventory.\"\"\"\n    wp = _warp()\n    api = _api()\n    particles, gas = _state(device, particles=3, active=True)\n    particles.masses = wp.array(\n        [[[2e-18, 3e-18], [4e-18, 5e-18], [0.0, 0.0]]],\n        dtype=wp.float64,\n        device=device,\n    )\n    particles.concentration = wp.array(\n        [[2.0, 3.0, 0.0]], dtype=wp.float64, device=device\n    )\n    scratch, finalized, diagnostics, exhaustion = _sidecars(\n        api, device, 1, 3, 2\n    )\n    object.__setattr__(\n        exhaustion,\n        \"resampling_releasable_counts\",\n        wp.ones(1, dtype=wp.int32, device=device),\n    )\n    initial_particle = _particle_inventory(\n        particles.masses.numpy(), particles.concentration.numpy()\n    )\n    initial_gas = gas.concentration.numpy().copy()\n    config = _config(api, coefficient=0.2 / AVOGADRO_NUMBER)\n    _, removal, _ = _numpy_p2(initial_gas, gas.molar_mass.numpy(), config, 1.0)\n    api.nucleation_step_gpu(\n        particles,\n        gas,\n        config,\n        1.0,\n        scratch=scratch,\n        finalized_demand=finalized,\n        diagnostics=diagnostics,\n        exhaustion_controls=api.NucleationExhaustionControls(True, True),\n        exhaustion_buffers=exhaustion,\n        temperature=300.0,\n    )\n    wp.synchronize_device(device)\n    final_particle = _particle_inventory(\n        particles.masses.numpy(), particles.concentration.numpy()\n    )\n    np.testing.assert_array_equal(exhaustion.scaling_required.numpy(), [0])\n    np.testing.assert_allclose(\n        exhaustion.resolved_scale.numpy(), [1.0], rtol=0.0, atol=0.0\n    )\n    np.testing.assert_array_equal(exhaustion.final_counts.numpy(), [2])\n    np.testing.assert_allclose(\n        final_particle,\n        initial_particle + removal,\n        rtol=1e-12,\n        atol=1e-30,\n    )\n    np.testing.assert_allclose(\n        gas.concentration.numpy(), initial_gas - removal, rtol=1e-12, atol=1e-30\n    )",
+    "successor": "particula/gpu/kernels/tests/nucleation_parity_test.py::test_public_nucleation_step_resampling_precedes_scaling",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_parity_test.py",
+    "test": "test_public_nucleation_step_repeated_calls_use_current_gas",
+    "original": "def test_public_nucleation_step_repeated_calls_use_current_gas(device) -> None:\n    \"\"\"A second commit follows the first call's gas-coupled state, not stale gas.\"\"\"\n    wp = _warp()\n    api = _api()\n    particles, gas = _state(device, particles=3)\n    config = _config(api)\n    first_sidecars = _sidecars(api, device, 1, 3, 2)\n    api.nucleation_step_gpu(\n        particles,\n        gas,\n        config,\n        1.0,\n        scratch=first_sidecars[0],\n        finalized_demand=first_sidecars[1],\n        diagnostics=first_sidecars[2],\n        exhaustion_controls=api.NucleationExhaustionControls(False, False),\n        exhaustion_buffers=first_sidecars[3],\n        temperature=300.0,\n    )\n    wp.synchronize_device(device)\n    before_particles = particles.masses.numpy().copy()\n    before_concentration = particles.concentration.numpy().copy()\n    before_gas = gas.concentration.numpy().copy()\n    demand, removal, event_mass = _numpy_p2(\n        before_gas, gas.molar_mass.numpy(), config, 1.0\n    )\n    second_sidecars = _sidecars(api, device, 1, 3, 2)\n    api.nucleation_step_gpu(\n        particles,\n        gas,\n        config,\n        1.0,\n        scratch=second_sidecars[0],\n        finalized_demand=second_sidecars[1],\n        diagnostics=second_sidecars[2],\n        exhaustion_controls=api.NucleationExhaustionControls(False, False),\n        exhaustion_buffers=second_sidecars[3],\n        temperature=300.0,\n    )\n    wp.synchronize_device(device)\n    expected_masses = before_particles.copy()\n    expected_concentration = before_concentration.copy()\n    expected_masses[:, 1, :] = event_mass\n    expected_concentration[:, 1] = demand\n    np.testing.assert_allclose(\n        particles.masses.numpy(), expected_masses, rtol=1e-12, atol=1e-30\n    )\n    np.testing.assert_allclose(\n        particles.concentration.numpy(),\n        expected_concentration,\n        rtol=1e-12,\n        atol=1e-30,\n    )\n    np.testing.assert_allclose(\n        gas.concentration.numpy(), before_gas - removal, rtol=1e-12, atol=1e-30\n    )",
+    "successor": "particula/gpu/kernels/tests/nucleation_parity_test.py::test_public_nucleation_step_repeated_calls_use_current_gas",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_parity_test.py",
+    "test": "test_public_nucleation_step_rejections_preserve_callers",
+    "original": "def test_public_nucleation_step_rejections_preserve_callers(\n    device, time_step, temperature, message\n) -> None:\n    \"\"\"Public preflight rejection preserves all caller-owned storage.\"\"\"\n    api = _api()\n    particles, gas = _state(device)\n    scratch, finalized, diagnostics, exhaustion = _sidecars(\n        api, device, 1, 3, 2\n    )\n    before = _snapshot(\n        particles, gas, scratch, finalized, diagnostics, exhaustion\n    )\n    with pytest.raises(ValueError, match=message):\n        api.nucleation_step_gpu(\n            particles,\n            gas,\n            _config(api),\n            time_step,\n            scratch=scratch,\n            finalized_demand=finalized,\n            diagnostics=diagnostics,\n            exhaustion_controls=api.NucleationExhaustionControls(False, False),\n            exhaustion_buffers=exhaustion,\n            temperature=temperature,\n        )\n    _assert_unchanged(before)",
+    "successor": "particula/gpu/kernels/tests/nucleation_parity_test.py::test_public_nucleation_step_rejections_preserve_callers",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_parity_test.py",
+    "test": "test_public_nucleation_step_malformed_sidecar_preserves_callers",
+    "original": "def test_public_nucleation_step_malformed_sidecar_preserves_callers(\n    device,\n) -> None:\n    \"\"\"A malformed public diagnostic schema rejects before any caller mutation.\"\"\"\n    wp = _warp()\n    api = _api()\n    particles, gas = _state(device)\n    scratch, finalized, diagnostics, exhaustion = _sidecars(\n        api, device, 1, 3, 2\n    )\n    malformed = api.NucleationDiagnosticBuffers(\n        wp.zeros(1, dtype=wp.float64, device=device),\n        diagnostics.selected_slot_indices,\n        diagnostics.free_slot_indices,\n        diagnostics.active_slot_counts,\n        diagnostics.free_slot_counts,\n    )\n    before = _snapshot(\n        particles,\n        gas,\n        scratch,\n        finalized,\n        diagnostics,\n        malformed,\n        exhaustion,\n    )\n    with pytest.raises(ValueError, match=\"required dtype\"):\n        api.nucleation_step_gpu(\n            particles,\n            gas,\n            _config(api),\n            1.0,\n            scratch=scratch,\n            finalized_demand=finalized,\n            diagnostics=malformed,\n            exhaustion_controls=api.NucleationExhaustionControls(False, False),\n            exhaustion_buffers=exhaustion,\n            temperature=300.0,\n        )\n    _assert_unchanged(before)",
+    "successor": "particula/gpu/kernels/tests/nucleation_parity_test.py::test_public_nucleation_step_malformed_sidecar_preserves_callers",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_parity_test.py",
+    "test": "test_public_nucleation_step_zero_box_is_write_free",
+    "original": "def test_public_nucleation_step_zero_box_is_write_free(\n    device, particles\n) -> None:\n    \"\"\"Valid zero-box calls validate sidecars then leave empty state unchanged.\"\"\"\n    wp = _warp()\n    api = _api()\n    particle_data, gas = _state(device, boxes=0, particles=particles)\n    scratch, finalized, diagnostics, exhaustion = _sidecars(\n        api, device, 0, particles, 2\n    )\n    before = _snapshot(\n        particle_data, gas, scratch, finalized, diagnostics, exhaustion\n    )\n    result = api.nucleation_step_gpu(\n        particle_data,\n        gas,\n        _config(api),\n        1.0,\n        scratch=scratch,\n        finalized_demand=finalized,\n        diagnostics=diagnostics,\n        exhaustion_controls=api.NucleationExhaustionControls(False, False),\n        exhaustion_buffers=exhaustion,\n        temperature=300.0,\n    )\n    wp.synchronize_device(device)\n    assert result[0] is particle_data\n    assert result[1] is gas\n    _assert_unchanged(before)",
+    "successor": "particula/gpu/kernels/tests/nucleation_parity_test.py::test_public_nucleation_step_zero_box_is_write_free",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_parity_test.py",
+    "test": "test_public_nucleation_step_zero_capacity_zero_gate_is_write_free",
+    "original": "def test_public_nucleation_step_zero_capacity_zero_gate_is_write_free(\n    device,\n) -> None:\n    \"\"\"A valid zero-capacity zero-demand call preserves empty particle fields.\"\"\"\n    wp = _warp()\n    api = _api()\n    particles, gas = _state(device, particles=0)\n    scratch, finalized, diagnostics, exhaustion = _sidecars(\n        api, device, 1, 0, 2\n    )\n    before = _snapshot(particles, gas)\n    result = api.nucleation_step_gpu(\n        particles,\n        gas,\n        _config(api, coefficient=0.0),\n        1.0,\n        scratch=scratch,\n        finalized_demand=finalized,\n        diagnostics=diagnostics,\n        exhaustion_controls=api.NucleationExhaustionControls(False, False),\n        exhaustion_buffers=exhaustion,\n        temperature=300.0,\n    )\n    wp.synchronize_device(device)\n    assert result[0] is particles\n    assert result[1] is gas\n    _assert_unchanged(before)\n    np.testing.assert_array_equal(exhaustion.final_counts.numpy(), [0])\n    assert exhaustion.final_selected_slot_indices.numpy().shape == (1, 0)",
+    "successor": "particula/gpu/kernels/tests/nucleation_parity_test.py::test_public_nucleation_step_zero_capacity_zero_gate_is_write_free",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_parity_test.py",
+    "test": "test_public_nucleation_step_full_capacity_rejects_without_mutation",
+    "original": "def test_public_nucleation_step_full_capacity_rejects_without_mutation(\n    device,\n) -> None:\n    \"\"\"A full row without policy rejects before particle/gas writes.\"\"\"\n    api = _api()\n    particles, gas = _state(device, particles=1, active=True)\n    scratch, finalized, diagnostics, exhaustion = _sidecars(\n        api, device, 1, 1, 2\n    )\n    before = _snapshot(particles, gas)\n\n    with pytest.raises(ValueError, match=\"capacity\"):\n        api.nucleation_step_gpu(\n            particles,\n            gas,\n            _config(api),\n            1.0,\n            scratch=scratch,\n            finalized_demand=finalized,\n            diagnostics=diagnostics,\n            exhaustion_controls=api.NucleationExhaustionControls(False, False),\n            exhaustion_buffers=exhaustion,\n            temperature=300.0,\n        )\n\n    _assert_unchanged(before)\n    np.testing.assert_array_equal(finalized.accepted_counts.numpy(), [1])\n    np.testing.assert_array_equal(diagnostics.free_slot_counts.numpy(), [0])",
+    "successor": "particula/gpu/kernels/tests/nucleation_parity_test.py::test_public_nucleation_step_full_capacity_rejects_without_mutation",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_nucleation_prepared_enqueue_is_setup_free_and_pinned",
+    "original": "def test_nucleation_prepared_enqueue_is_setup_free_and_pinned(\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"Prepared nucleation uses pinned arrays without host setup work.\"\"\"\n    warm_particles, warm_gas = _state(particles=2)\n    warm_particles.concentration = wp.zeros(\n        (1, 2), dtype=wp.float64, device=\"cpu\"\n    )\n    warm_scratch, warm_finalized, warm_diagnostics = _sidecars(1, 2, 1)\n    warm_buffers = _exhaustion_buffers(1, 2, 1)\n    warm_prepared = nucleation_module._prepare_nucleation_step_gpu(\n        warm_particles,\n        warm_gas,\n        _config(coefficient=0.1 / AVOGADRO_NUMBER),\n        1.0,\n        scratch=warm_scratch,\n        finalized_demand=warm_finalized,\n        diagnostics=warm_diagnostics,\n        exhaustion_controls=NucleationExhaustionControls(False, False),\n        exhaustion_buffers=warm_buffers,\n        temperature=300.0,\n    )\n    nucleation_module._enqueue_prepared_nucleation_call(warm_prepared)\n\n    particles, gas = _state(particles=2)\n    particles.concentration = wp.zeros((1, 2), dtype=wp.float64, device=\"cpu\")\n    scratch, finalized, diagnostics = _sidecars(1, 2, 1)\n    buffers = _exhaustion_buffers(1, 2, 1)\n    prepared = nucleation_module._prepare_nucleation_step_gpu(\n        particles,\n        gas,\n        _config(coefficient=0.1 / AVOGADRO_NUMBER),\n        1.0,\n        scratch=scratch,\n        finalized_demand=finalized,\n        diagnostics=diagnostics,\n        exhaustion_controls=NucleationExhaustionControls(False, False),\n        exhaustion_buffers=buffers,\n        temperature=300.0,\n    )\n    pinned_masses = prepared.particle_arrays[0]\n    pinned_gas = prepared.gas_arrays[1]\n    replacement_masses = wp.zeros((1, 2, 1), dtype=wp.float64, device=\"cpu\")\n    replacement_gas = wp.full((1, 1), 7.0, dtype=wp.float64, device=\"cpu\")\n    particles.masses = replacement_masses\n    gas.concentration = replacement_gas\n\n    def forbidden(*_args: object, **_kwargs: object) -> None:\n        pytest.fail(\"prepared enqueue performed forbidden host setup\")\n\n    status_arrays = (\n        prepared.p1_status,\n        prepared.p2_status,\n        prepared.p3_status,\n        prepared.molecule_status,\n        prepared.p4_status,\n        prepared.p4_final_status,\n        prepared.p5_status,\n    )\n    with monkeypatch.context() as context:\n        for name in (\"zeros\", \"empty\", \"array\", \"full\", \"synchronize\"):\n            context.setattr(nucleation_module.wp, name, forbidden)\n        for name in (\n            \"_execute_nucleation_step_gpu\",\n            \"resampling_step_gpu\",\n            \"representative_volume_scaling_step_gpu\",\n        ):\n            context.setattr(nucleation_module, name, forbidden)\n        for status in status_arrays:\n            context.setattr(status, \"numpy\", forbidden)\n        assert nucleation_module._enqueue_prepared_nucleation_call(\n            prepared\n        ) == (particles, gas)\n\n    assert nucleation_module._observe_prepared_nucleation_call(prepared) == (\n        particles,\n        gas,\n    )\n    np.testing.assert_array_equal(\n        replacement_masses.numpy(), np.zeros((1, 2, 1))\n    )\n    np.testing.assert_array_equal(replacement_gas.numpy(), [[7.0]])\n    assert pinned_masses.numpy()[0, 0, 0] > 0.0\n    np.testing.assert_array_equal(buffers.final_counts.numpy(), [1])\n    assert pinned_gas is not replacement_gas",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_nucleation_prepared_enqueue_is_setup_free_and_pinned",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_nucleation_prepared_enqueue_gates_live_invalid_payload",
+    "original": "def test_nucleation_prepared_enqueue_gates_live_invalid_payload() -> None:\n    \"\"\"A post-prepare invalid gas value prevents every dependent writer.\"\"\"\n    particles, gas = _state(particles=2)\n    particles.concentration = wp.zeros((1, 2), dtype=wp.float64, device=\"cpu\")\n    scratch, finalized, diagnostics = _sidecars(1, 2, 1)\n    buffers = _exhaustion_buffers(1, 2, 1)\n    prepared = nucleation_module._prepare_nucleation_step_gpu(\n        particles,\n        gas,\n        _config(coefficient=0.1 / AVOGADRO_NUMBER),\n        1.0,\n        scratch=scratch,\n        finalized_demand=finalized,\n        diagnostics=diagnostics,\n        exhaustion_controls=NucleationExhaustionControls(False, False),\n        exhaustion_buffers=buffers,\n        temperature=300.0,\n    )\n    particle_before = tuple(\n        values.numpy().copy() for values in prepared.particle_arrays[:3]\n    )\n    final_before = tuple(\n        values.numpy().copy()\n        for values in (\n            buffers.final_demand,\n            buffers.final_counts,\n            buffers.final_selected_slot_indices,\n        )\n    )\n    wp.copy(\n        prepared.gas_arrays[1],\n        wp.array([[np.nan]], dtype=wp.float64, device=\"cpu\"),\n    )\n\n    nucleation_module._enqueue_prepared_nucleation_call(prepared)\n\n    with pytest.raises(ValueError, match=\"gas.concentration\"):\n        nucleation_module._observe_prepared_nucleation_call(prepared)\n    for expected, values in zip(\n        particle_before, prepared.particle_arrays[:3], strict=True\n    ):\n        np.testing.assert_array_equal(values.numpy(), expected)\n    for expected, values in zip(\n        final_before,\n        (\n            buffers.final_demand,\n            buffers.final_counts,\n            buffers.final_selected_slot_indices,\n        ),\n        strict=True,\n    ):\n        np.testing.assert_array_equal(values.numpy(), expected)",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_nucleation_prepared_enqueue_gates_live_invalid_payload",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_public_zero_rate_preserves_late_validation_short_circuit",
+    "original": "def test_public_zero_rate_preserves_late_validation_short_circuit(\n    config_changes: dict[str, float],\n) -> None:\n    \"\"\"Zero rate retains the legacy no-admission temperature precedence.\"\"\"\n    particles, gas = _state(particles=2)\n    particles.concentration = wp.zeros((1, 2), dtype=wp.float64, device=\"cpu\")\n    scratch, finalized, diagnostics = _sidecars(1, 2, 1)\n    buffers = _exhaustion_buffers(1, 2, 1)\n    before = _snapshot_arrays(particles, gas)\n\n    assert nucleation_step_gpu(\n        particles,\n        gas,\n        _config(**config_changes),\n        1.0,\n        scratch=scratch,\n        finalized_demand=finalized,\n        diagnostics=diagnostics,\n        exhaustion_controls=NucleationExhaustionControls(False, False),\n        exhaustion_buffers=buffers,\n        temperature=500.0,\n    ) == (particles, gas)\n\n    _assert_snapshot_unchanged(before)",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_public_zero_rate_preserves_late_validation_short_circuit",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_empty_prepared_enqueue_revalidates_live_global_arrays",
+    "original": "def test_empty_prepared_enqueue_revalidates_live_global_arrays() -> None:\n    \"\"\"Empty-box enqueue still scans mutable density and molar-mass payloads.\"\"\"\n    particles, gas = _state(boxes=0)\n    scratch, finalized, diagnostics = _sidecars(0, 2, 1)\n    buffers = _exhaustion_buffers(0, 2, 1)\n    prepared = nucleation_module._prepare_nucleation_step_gpu(\n        particles,\n        gas,\n        _config(),\n        1.0,\n        scratch=scratch,\n        finalized_demand=finalized,\n        diagnostics=diagnostics,\n        exhaustion_controls=NucleationExhaustionControls(False, False),\n        exhaustion_buffers=buffers,\n        temperature=300.0,\n    )\n    wp.copy(\n        prepared.particle_arrays[3],\n        wp.array([np.nan], dtype=wp.float64, device=\"cpu\"),\n    )\n\n    nucleation_module._enqueue_prepared_nucleation_call(prepared)\n\n    with pytest.raises(ValueError, match=\"particles.density\"):\n        nucleation_module._observe_prepared_nucleation_call(prepared)",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_empty_prepared_enqueue_revalidates_live_global_arrays",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_public_nucleation_step_commits_selected_slots_and_gas",
+    "original": "def test_public_nucleation_step_commits_selected_slots_and_gas() -> None:\n    \"\"\"P5 activates the P4 prefix and removes the matching gas inventory.\"\"\"\n    particles, gas = _state(particles=2)\n    particles.concentration = wp.zeros((1, 2), dtype=wp.float64, device=\"cpu\")\n    scratch, finalized, diagnostics = _sidecars(1, 2, 1)\n    buffers = _exhaustion_buffers(1, 2, 1)\n    config = _config(coefficient=0.1 / AVOGADRO_NUMBER)\n    original_gas = gas.concentration.numpy().copy()\n\n    result_particles, result_gas = nucleation_step_gpu(\n        particles,\n        gas,\n        config,\n        1.0,\n        scratch=scratch,\n        finalized_demand=finalized,\n        diagnostics=diagnostics,\n        exhaustion_controls=NucleationExhaustionControls(False, False),\n        exhaustion_buffers=buffers,\n        temperature=300.0,\n    )\n\n    assert result_particles is particles\n    assert result_gas is gas\n    event_mass = 0.1 / AVOGADRO_NUMBER\n    np.testing.assert_array_equal(buffers.final_counts.numpy(), [1])\n    np.testing.assert_array_equal(\n        buffers.final_selected_slot_indices.numpy(), [[0, -1]]\n    )\n    np.testing.assert_allclose(\n        particles.masses.numpy(), [[[event_mass], [0.0]]], rtol=1e-12, atol=0.0\n    )\n    np.testing.assert_allclose(\n        particles.concentration.numpy(), [[1.0, 0.0]], rtol=0.0, atol=0.0\n    )\n    np.testing.assert_allclose(\n        gas.concentration.numpy(),\n        original_gas - event_mass,\n        rtol=1e-12,\n        atol=0.0,\n    )",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_public_nucleation_step_commits_selected_slots_and_gas",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_public_nucleation_step_zero_time_is_particle_gas_write_free",
+    "original": "def test_public_nucleation_step_zero_time_is_particle_gas_write_free() -> None:\n    \"\"\"A valid all-box zero-time gate preserves particle and gas fields.\"\"\"\n    particles, gas = _state(particles=2)\n    particles.concentration = wp.zeros((1, 2), dtype=wp.float64, device=\"cpu\")\n    scratch, finalized, diagnostics = _sidecars(1, 2, 1)\n    buffers = _exhaustion_buffers(1, 2, 1)\n    before = _snapshot_arrays(particles, gas)\n\n    nucleation_step_gpu(\n        particles,\n        gas,\n        _config(coefficient=0.1 / AVOGADRO_NUMBER),\n        0.0,\n        scratch=scratch,\n        finalized_demand=finalized,\n        diagnostics=diagnostics,\n        exhaustion_controls=NucleationExhaustionControls(False, False),\n        exhaustion_buffers=buffers,\n        temperature=300.0,\n    )\n\n    _assert_snapshot_unchanged(before)",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_public_nucleation_step_zero_time_is_particle_gas_write_free",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_public_step_rejects_missing_required_sidecars",
+    "original": "def test_public_step_rejects_missing_required_sidecars(\n    boxes, field, message\n) -> None:\n    \"\"\"Public calls reject missing required sidecars before any field access.\"\"\"\n    particles, gas = _state(boxes=boxes)\n    scratch, finalized, diagnostics = _sidecars(boxes, 2, 1)\n    buffers = _exhaustion_buffers(boxes, 2, 1)\n    before = _snapshot_arrays(particles, gas, scratch, finalized, diagnostics)\n    sidecars = {\n        \"scratch\": scratch,\n        \"finalized_demand\": finalized,\n        \"diagnostics\": diagnostics,\n    }\n    sidecars[field] = None\n\n    with pytest.raises(ValueError, match=message):\n        nucleation_step_gpu(\n            particles,\n            gas,\n            _config(),\n            1.0,\n            **sidecars,\n            exhaustion_controls=NucleationExhaustionControls(False, False),\n            exhaustion_buffers=buffers,\n            temperature=300.0,\n        )\n\n    _assert_snapshot_unchanged(before)",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_public_step_rejects_missing_required_sidecars",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_public_prepared_path_preserves_legacy_sidecar_error_precedence",
+    "original": "def test_public_prepared_path_preserves_legacy_sidecar_error_precedence(\n    missing: str,\n    message: str,\n) -> None:\n    \"\"\"Required sidecars reject before every later malformed input.\"\"\"\n    particles, gas = _state()\n    scratch, finalized, diagnostics = _sidecars(1, 2, 1)\n    sidecars = {\n        \"scratch\": scratch,\n        \"finalized_demand\": finalized,\n        \"diagnostics\": diagnostics,\n    }\n    ordered_fields = (\"scratch\", \"finalized_demand\", \"diagnostics\")\n    missing_index = ordered_fields.index(missing)\n    for field in ordered_fields[missing_index:]:\n        sidecars[field] = None\n    before = _snapshot_arrays(particles, gas, scratch, finalized, diagnostics)\n\n    with pytest.raises(ValueError, match=message):\n        nucleation_step_gpu(\n            particles,\n            gas,\n            cast(NucleationConfig, object()),\n            object(),\n            **sidecars,\n            exhaustion_controls=cast(NucleationExhaustionControls, object()),\n            exhaustion_buffers=cast(NucleationExhaustionBuffers, object()),\n            temperature=object(),\n            saturation=object(),\n            environment=object(),\n        )\n\n    _assert_snapshot_unchanged(before)",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_public_prepared_path_preserves_sidecar_error_precedence",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_p5_scales_gas_before_finalized_source_removal",
+    "original": "def test_p5_scales_gas_before_finalized_source_removal() -> None:\n    \"\"\"Representative-volume scaling applies equally to pre-existing gas.\"\"\"\n    particles, gas, scratch, finalized, diagnostics = _stage_slots(\n        [4.0], np.array([[True, True, False, False]])\n    )\n    buffers = _exhaustion_buffers(1, 4, 1)\n    for name in (\"requested_scale\", \"minimum_scale\", \"minimum_volume\"):\n        object.__setattr__(\n            buffers, name, wp.full(1, 0.5, dtype=wp.float64, device=\"cpu\")\n        )\n    preflight = _preflight_nucleation(\n        particles,\n        gas,\n        _config(),\n        1.0,\n        temperature=300.0,\n        scratch=scratch,\n        finalized_demand=finalized,\n        diagnostics=diagnostics,\n    )\n    p4_storage = _orchestrate_nucleation_exhaustion(\n        preflight,\n        finalized,\n        diagnostics,\n        NucleationExhaustionControls(False, True),\n        buffers,\n    )\n    initial_gas = gas.concentration.numpy().copy()\n\n    assert nucleation_module._commit_nucleation_p5(\n        preflight, buffers, p4_storage\n    )\n\n    event_mass = 0.1 / AVOGADRO_NUMBER\n    np.testing.assert_allclose(\n        gas.concentration.numpy(),\n        0.5 * initial_gas - buffers.final_demand.numpy()[:, None] * event_mass,\n        rtol=1e-12,\n        atol=0.0,\n    )",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_p5_preserves_gas_density_after_volume_scaling",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Native staged P5 preserves gas density before source subtraction; removed the old extra gas-density scaling expectation. Source-transfer tolerance unchanged."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_public_empty_step_validates_p4_inputs_before_noop",
+    "original": "def test_public_empty_step_validates_p4_inputs_before_noop(\n    exhaustion_controls, exhaustion_buffers, message\n) -> None:\n    \"\"\"Empty public calls still validate P4 controls and buffers.\"\"\"\n    particles, gas = _state(boxes=0)\n    scratch, finalized, diagnostics = _sidecars(0, 2, 1)\n    buffers = _exhaustion_buffers(0, 2, 1)\n    if exhaustion_controls is None:\n        exhaustion_controls = NucleationExhaustionControls(False, False)\n    if exhaustion_buffers is None:\n        exhaustion_buffers = buffers\n    before = _snapshot_arrays(particles, gas, scratch, finalized, diagnostics)\n\n    with pytest.raises(ValueError, match=message):\n        nucleation_step_gpu(\n            particles,\n            gas,\n            _config(),\n            1.0,\n            scratch=scratch,\n            finalized_demand=finalized,\n            diagnostics=diagnostics,\n            exhaustion_controls=exhaustion_controls,\n            exhaustion_buffers=exhaustion_buffers,\n            temperature=300.0,\n        )\n\n    _assert_snapshot_unchanged(before)",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_public_empty_step_validates_p4_inputs_before_noop",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_public_step_rejects_nonparticipating_demand_before_p4",
+    "original": "def test_public_step_rejects_nonparticipating_demand_before_p4(\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"Positive non-participant demand device-gates P4 and P5 mutation.\"\"\"\n    particles, gas = _state(boxes=2, particles=2, species=2)\n    particles.masses = wp.ones((2, 2, 2), dtype=wp.float64, device=\"cpu\")\n    gas.partitioning = wp.array([[1, 0], [1, 0]], dtype=wp.int32, device=\"cpu\")\n    scratch, finalized, diagnostics = _sidecars(2, 2, 2)\n    buffers = _exhaustion_buffers(2, 2, 2)\n    before = _snapshot_arrays(particles, gas)\n    original_launch = nucleation_module.wp.launch\n    p5_launches = 0\n\n    def _launch(kernel, dim=None, inputs=None, device=None):\n        nonlocal p5_launches\n        if kernel is nucleation_module._commit_nucleation_p5_kernel:\n            p5_launches += 1\n        return original_launch(kernel, dim=dim, inputs=inputs, device=device)\n\n    monkeypatch.setattr(nucleation_module.wp, \"launch\", _launch)\n    with pytest.raises(ValueError, match=\"require participating gas species\"):\n        nucleation_step_gpu(\n            particles,\n            gas,\n            _config(\n                coefficient=0.1 / AVOGADRO_NUMBER,\n                molecule_counts=(1, 1),\n            ),\n            1.0,\n            scratch=scratch,\n            finalized_demand=finalized,\n            diagnostics=diagnostics,\n            exhaustion_controls=NucleationExhaustionControls(True, False),\n            exhaustion_buffers=buffers,\n            temperature=300.0,\n        )\n\n    assert p5_launches == 1\n    _assert_snapshot_unchanged(before)",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_public_step_rejects_nonparticipating_demand_before_p4",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_public_nucleation_step_commits_multi_box_multispecies_state",
+    "original": "def test_public_nucleation_step_commits_multi_box_multispecies_state(\n    input_mode: str,\n) -> None:\n    \"\"\"P5 commits each finalized box prefix using direct or environment inputs.\"\"\"\n    particles, gas = _state(boxes=2, particles=2, species=2)\n    particles.concentration = wp.zeros((2, 2), dtype=wp.float64, device=\"cpu\")\n    gas.molar_mass = wp.array([0.1, 0.2], dtype=wp.float64, device=\"cpu\")\n    scratch, finalized, diagnostics = _sidecars(2, 2, 2)\n    buffers = _exhaustion_buffers(2, 2, 2)\n    particles.volume = wp.array([1.0, 2.0], dtype=wp.float64, device=\"cpu\")\n    config = _config(\n        coefficient=0.1 / AVOGADRO_NUMBER,\n        molecule_counts=(1, 0),\n    )\n    kwargs = {\"temperature\": wp.full(2, 300.0, dtype=wp.float64, device=\"cpu\")}\n    if input_mode == \"environment\":\n        kwargs = {\n            \"environment\": SimpleNamespace(\n                temperature=wp.full(2, 300.0, dtype=wp.float64, device=\"cpu\")\n            )\n        }\n    original_gas = gas.concentration.numpy().copy()\n\n    result_particles, result_gas = nucleation_step_gpu(\n        particles,\n        gas,\n        config,\n        1.0,\n        scratch=scratch,\n        finalized_demand=finalized,\n        diagnostics=diagnostics,\n        exhaustion_controls=NucleationExhaustionControls(False, False),\n        exhaustion_buffers=buffers,\n        **kwargs,\n    )\n\n    event_mass = np.array([0.1 / AVOGADRO_NUMBER, 0.0])\n    assert result_particles is particles\n    assert result_gas is gas\n    np.testing.assert_array_equal(buffers.final_counts.numpy(), [1, 2])\n    np.testing.assert_array_equal(\n        buffers.final_selected_slot_indices.numpy(), [[0, -1], [0, 1]]\n    )\n    np.testing.assert_allclose(\n        particles.masses.numpy(),\n        np.array(\n            [\n                [[event_mass[0], 0.0], [0.0, 0.0]],\n                [[event_mass[0], 0.0], [event_mass[0], 0.0]],\n            ]\n        ),\n        rtol=1e-12,\n        atol=0.0,\n    )\n    np.testing.assert_allclose(\n        particles.concentration.numpy(),\n        [[1.0, 0.0], [0.5, 0.5]],\n        rtol=0.0,\n        atol=0.0,\n    )\n    np.testing.assert_allclose(\n        gas.concentration.numpy(),\n        original_gas - event_mass,\n        rtol=1e-12,\n        atol=0.0,\n    )",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_public_nucleation_step_commits_multi_box_multispecies_state",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Native slots hold unit counts at all volumes; preserved event mass, selected-prefix, raw event counts, identity and gas-removal checks. Density remains count divided by volume."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_public_nucleation_step_rejects_corrupt_p5_handoff_without_commit",
+    "original": "def test_public_nucleation_step_rejects_corrupt_p5_handoff_without_commit(\n    monkeypatch: pytest.MonkeyPatch,\n) -> None:\n    \"\"\"A malformed finalized prefix prevents the public P5 particle/gas commit.\"\"\"\n    particles, gas = _state(particles=2)\n    particles.concentration = wp.zeros((1, 2), dtype=wp.float64, device=\"cpu\")\n    scratch, finalized, diagnostics = _sidecars(1, 2, 1)\n    buffers = _exhaustion_buffers(1, 2, 1)\n    before = _snapshot_arrays(particles, gas)\n    original_launch = nucleation_module.wp.launch\n\n    def _launch(kernel, dim=None, inputs=None, device=None):\n        if kernel is nucleation_module._validate_p5_handoff:\n            wp.copy(\n                buffers.final_selected_slot_indices,\n                wp.array([[1, 1]], dtype=wp.int32, device=\"cpu\"),\n            )\n        return original_launch(kernel, dim=dim, inputs=inputs, device=device)\n\n    monkeypatch.setattr(nucleation_module.wp, \"launch\", _launch)\n\n    with pytest.raises(ValueError, match=\"P5 finalized nucleation handoff\"):\n        nucleation_step_gpu(\n            particles,\n            gas,\n            _config(coefficient=0.1 / AVOGADRO_NUMBER),\n            1.0,\n            scratch=scratch,\n            finalized_demand=finalized,\n            diagnostics=diagnostics,\n            exhaustion_controls=NucleationExhaustionControls(False, False),\n            exhaustion_buffers=buffers,\n            temperature=300.0,\n        )\n\n    _assert_snapshot_unchanged(before)",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_public_nucleation_step_rejects_corrupt_p5_handoff_without_commit",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_public_nucleation_step_rejects_invalid_p5_handoffs_without_commit",
+    "original": "def test_public_nucleation_step_rejects_invalid_p5_handoffs_without_commit(\n    corrupt, monkeypatch: pytest.MonkeyPatch\n) -> None:\n    \"\"\"Every malformed P5 handoff preserves particle and gas state.\"\"\"\n    particles, gas = _state(particles=2)\n    particles.concentration = wp.zeros((1, 2), dtype=wp.float64, device=\"cpu\")\n    scratch, finalized, diagnostics = _sidecars(1, 2, 1)\n    buffers = _exhaustion_buffers(1, 2, 1)\n    handoff_snapshot = []\n    original_launch = nucleation_module.wp.launch\n\n    def _launch(kernel, dim=None, inputs=None, device=None):\n        if kernel is nucleation_module._validate_p5_handoff:\n            corrupt(buffers, gas)\n            handoff_snapshot.extend(_snapshot_arrays(particles, gas))\n        return original_launch(kernel, dim=dim, inputs=inputs, device=device)\n\n    monkeypatch.setattr(nucleation_module.wp, \"launch\", _launch)\n\n    with pytest.raises(ValueError, match=\"P5 finalized nucleation handoff\"):\n        nucleation_step_gpu(\n            particles,\n            gas,\n            _config(coefficient=0.1 / AVOGADRO_NUMBER),\n            1.0,\n            scratch=scratch,\n            finalized_demand=finalized,\n            diagnostics=diagnostics,\n            exhaustion_controls=NucleationExhaustionControls(False, False),\n            exhaustion_buffers=buffers,\n            temperature=300.0,\n        )\n\n    _assert_snapshot_unchanged(handoff_snapshot)",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_public_nucleation_step_rejects_invalid_p5_handoffs_without_commit",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_prepared_nucleation_p4_rebinding_cannot_redirect_dispatch",
+    "original": "def test_prepared_nucleation_p4_rebinding_cannot_redirect_dispatch() -> None:\n    \"\"\"Prepared P4 writes and P5 reads retain the originally pinned arrays.\"\"\"\n    particles, gas = _state(particles=2)\n    particles.concentration = wp.zeros((1, 2), dtype=wp.float64, device=\"cpu\")\n    scratch, finalized, diagnostics = _sidecars(1, 2, 1)\n    buffers = _exhaustion_buffers(1, 2, 1)\n    replacement = wp.ones(1, dtype=wp.float64, device=\"cpu\")\n    prepared = nucleation_module._prepare_nucleation_step_gpu(\n        particles,\n        gas,\n        _config(coefficient=0.1 / AVOGADRO_NUMBER),\n        1.0,\n        scratch=scratch,\n        finalized_demand=finalized,\n        diagnostics=diagnostics,\n        exhaustion_controls=NucleationExhaustionControls(False, False),\n        exhaustion_buffers=buffers,\n        temperature=300.0,\n    )\n    pinned_final_demand = prepared.p4_arrays[1]\n    object.__setattr__(buffers, \"final_demand\", replacement)\n\n    assert nucleation_module._enqueue_prepared_nucleation_call(prepared) == (\n        particles,\n        gas,\n    )\n    assert nucleation_module._observe_prepared_nucleation_call(prepared) == (\n        particles,\n        gas,\n    )\n\n    np.testing.assert_array_equal(replacement.numpy(), [1.0])\n    np.testing.assert_allclose(pinned_final_demand.numpy(), [1.0])\n    assert prepared.particle_arrays[0].numpy()[0, 0, 0] > 0.0",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_prepared_nucleation_p4_rebinding_cannot_redirect_dispatch",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_stage_nucleation_slots_writes_expected_layout",
+    "original": "def test_stage_nucleation_slots_writes_expected_layout(\n    counts, slots, expected_selected, device\n):\n    \"\"\"P3 retains full counts and selects the ascending free-slot prefix.\"\"\"\n    particles, gas, scratch, finalized, diagnostics = _stage_slots(\n        counts, slots, device\n    )\n    particle_snapshot = _snapshot_arrays(particles)\n    gas_snapshot = _snapshot_arrays(gas)\n    scratch_snapshot = _snapshot_arrays(scratch)\n    np.testing.assert_array_equal(\n        finalized.accepted_counts.numpy(), np.asarray(counts, dtype=np.int32)\n    )\n    expected_free = np.where(~slots[0])[0].astype(np.int32)\n    expected_free = np.pad(\n        expected_free,\n        (0, slots.shape[1] - len(expected_free)),\n        constant_values=-1,\n    )\n    np.testing.assert_array_equal(\n        diagnostics.free_slot_indices.numpy(), [expected_free]\n    )\n    np.testing.assert_array_equal(\n        diagnostics.selected_slot_indices.numpy(), expected_selected\n    )\n    assert diagnostics.active_slot_counts.numpy()[0] == np.count_nonzero(slots)\n    assert diagnostics.free_slot_counts.numpy()[0] == np.count_nonzero(~slots)\n    np.testing.assert_array_equal(\n        finalized.accepted_demand.numpy(), np.asarray(counts, dtype=np.float64)\n    )\n    np.testing.assert_array_equal(\n        finalized.precursor_mass_change.numpy(), np.ones((1, 1))\n    )\n    np.testing.assert_array_equal(diagnostics.gate_codes.numpy(), [1])\n    _assert_snapshot_unchanged(particle_snapshot)\n    _assert_snapshot_unchanged(gas_snapshot)\n    _assert_snapshot_unchanged(scratch_snapshot)",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_stage_nucleation_slots_writes_expected_layout",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_p4_controls_require_exact_python_booleans",
+    "original": "def test_p4_controls_require_exact_python_booleans(value):\n    \"\"\"Policy controls reject integer and NumPy Boolean substitutes.\"\"\"\n    with pytest.raises(TypeError, match=\"exact Python bool\"):\n        NucleationExhaustionControls(value, False)",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_p4_controls_require_exact_python_booleans",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_p4_finalizes_free_capacity_without_mutating_p2_or_p3_handoffs",
+    "original": "def test_p4_finalizes_free_capacity_without_mutating_p2_or_p3_handoffs():\n    \"\"\"P4 copies immutable demand and writes the current free-slot prefix.\"\"\"\n    particles, gas, scratch, finalized, diagnostics = _stage_slots(\n        [1.0], np.array([[False, False]])\n    )\n    buffers = _exhaustion_buffers(1, 2, 1)\n    object.__setattr__(\n        buffers,\n        \"required_release_counts\",\n        wp.full(1, wp.int32(9), dtype=wp.int32, device=\"cpu\"),\n    )\n    object.__setattr__(\n        buffers,\n        \"scaling_required\",\n        wp.full(1, wp.int32(9), dtype=wp.int32, device=\"cpu\"),\n    )\n    p2_p3_before = _snapshot_arrays(finalized, diagnostics)\n    source_before = _snapshot_arrays(particles, gas, scratch)\n\n    _orchestrate_nucleation_exhaustion(\n        _preflight_nucleation(\n            particles,\n            gas,\n            _config(),\n            1.0,\n            temperature=300.0,\n            scratch=scratch,\n            finalized_demand=finalized,\n            diagnostics=diagnostics,\n        ),\n        finalized,\n        diagnostics,\n        NucleationExhaustionControls(False, False),\n        buffers,\n    )\n\n    np.testing.assert_array_equal(buffers.demand_workspace.numpy(), [1.0])\n    np.testing.assert_array_equal(buffers.final_demand.numpy(), [1.0])\n    np.testing.assert_array_equal(buffers.final_counts.numpy(), [1])\n    np.testing.assert_array_equal(buffers.required_release_counts.numpy(), [0])\n    np.testing.assert_array_equal(buffers.scaling_required.numpy(), [0])\n    np.testing.assert_array_equal(\n        buffers.final_selected_slot_indices.numpy(), [[0, -1]]\n    )\n    np.testing.assert_array_equal(buffers.resolved_scale.numpy(), [1.0])\n    _assert_snapshot_unchanged(p2_p3_before)\n    _assert_snapshot_unchanged(source_before)",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_p4_finalizes_free_capacity_without_mutating_p2_or_p3_handoffs",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_p4_rejects_unresolved_capacity_before_writing_any_sidecar",
+    "original": "def test_p4_rejects_unresolved_capacity_before_writing_any_sidecar():\n    \"\"\"An exhausted row without a viable policy preserves all P4 state.\"\"\"\n    particles, gas, scratch, finalized, diagnostics = _stage_slots(\n        [1.0], np.array([[True, True]])\n    )\n    buffers = _exhaustion_buffers(1, 2, 1)\n    preflight = _preflight_nucleation(\n        particles,\n        gas,\n        _config(),\n        1.0,\n        temperature=300.0,\n        scratch=scratch,\n        finalized_demand=finalized,\n        diagnostics=diagnostics,\n    )\n    before = _snapshot_arrays(\n        particles,\n        gas,\n        scratch,\n        finalized,\n        diagnostics,\n        buffers,\n        buffers.resampling_buffers,\n    )\n\n    with pytest.raises(\n        ValueError, match=\"P4 handoff, policy input, or capacity\"\n    ):\n        _orchestrate_nucleation_exhaustion(\n            preflight,\n            finalized,\n            diagnostics,\n            NucleationExhaustionControls(False, False),\n            buffers,\n        )\n\n    _assert_snapshot_unchanged(before)",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_p4_rejects_unresolved_capacity_before_writing_any_sidecar",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_p4_expected_handoff_rejections_preserve_complete_snapshots",
+    "original": "def test_p4_expected_handoff_rejections_preserve_complete_snapshots(\n    corrupt, monkeypatch\n):\n    \"\"\"Expected P4 rejections precede primitive calls and every sidecar write.\"\"\"\n    particles, gas, scratch, finalized, diagnostics = _stage_slots(\n        [1.0], np.array([[False, False]])\n    )\n    buffers = _exhaustion_buffers(1, 2, 1)\n    corrupt(finalized, buffers)\n    preflight = _preflight_nucleation(\n        particles,\n        gas,\n        _config(),\n        1.0,\n        temperature=300.0,\n        scratch=scratch,\n        finalized_demand=finalized,\n        diagnostics=diagnostics,\n    )\n    before = _snapshot_arrays(\n        particles,\n        gas,\n        scratch,\n        finalized,\n        diagnostics,\n        buffers,\n        buffers.resampling_buffers,\n    )\n\n    def _primitive_must_not_run(*_args, **_kwargs):\n        pytest.fail(\"P4 called an E6-F6 primitive after expected rejection.\")\n\n    monkeypatch.setattr(\n        nucleation_module, \"resampling_step_gpu\", _primitive_must_not_run\n    )\n    monkeypatch.setattr(\n        nucleation_module,\n        \"representative_volume_scaling_step_gpu\",\n        _primitive_must_not_run,\n    )\n\n    with pytest.raises(\n        ValueError, match=\"P4 handoff, policy input, or capacity\"\n    ):\n        _orchestrate_nucleation_exhaustion(\n            preflight,\n            finalized,\n            diagnostics,\n            NucleationExhaustionControls(False, False),\n            buffers,\n        )\n\n    _assert_snapshot_unchanged(before)",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_p4_expected_handoff_rejections_preserve_complete_snapshots",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_p4_mutable_input_rejections_precede_all_writes",
+    "original": "def test_p4_mutable_input_rejections_precede_all_writes(corrupt, monkeypatch):\n    \"\"\"P4 revalidates mutable P1/P2 state before diagnostics or primitives.\"\"\"\n    particles, gas, scratch, finalized, diagnostics = _stage_slots(\n        [1.0], np.array([[False, False]])\n    )\n    buffers = _exhaustion_buffers(1, 2, 1)\n    preflight = _preflight_nucleation(\n        particles,\n        gas,\n        _config(),\n        1.0,\n        temperature=300.0,\n        scratch=scratch,\n        finalized_demand=finalized,\n        diagnostics=diagnostics,\n    )\n    corrupt(particles, finalized)\n    before = _snapshot_arrays(\n        particles,\n        gas,\n        scratch,\n        finalized,\n        diagnostics,\n        buffers,\n        buffers.resampling_buffers,\n    )\n    monkeypatch.setattr(\n        nucleation_module,\n        \"resampling_step_gpu\",\n        lambda *_args, **_kwargs: pytest.fail(\"primitive must not run\"),\n    )\n    monkeypatch.setattr(\n        nucleation_module,\n        \"representative_volume_scaling_step_gpu\",\n        lambda *_args, **_kwargs: pytest.fail(\"primitive must not run\"),\n    )\n\n    with pytest.raises(ValueError):\n        _orchestrate_nucleation_exhaustion(\n            preflight,\n            finalized,\n            diagnostics,\n            NucleationExhaustionControls(False, False),\n            buffers,\n        )\n\n    _assert_snapshot_unchanged(before)",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_p4_mutable_input_rejections_precede_all_writes",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_p4_protects_retained_p2_scratch_from_output_aliasing",
+    "original": "def test_p4_protects_retained_p2_scratch_from_output_aliasing():\n    \"\"\"P4 rejects output aliases to retained P2 scratch before any write.\"\"\"\n    particles, gas, scratch, finalized, diagnostics = _stage_slots(\n        [1.0], np.array([[False, False]])\n    )\n    buffers = _exhaustion_buffers(1, 2, 1)\n    object.__setattr__(buffers, \"demand_workspace\", scratch.potential_demand)\n    preflight = _preflight_nucleation(\n        particles,\n        gas,\n        _config(),\n        1.0,\n        temperature=300.0,\n        scratch=scratch,\n        finalized_demand=finalized,\n        diagnostics=diagnostics,\n    )\n    before = _snapshot_arrays(\n        particles, gas, scratch, finalized, diagnostics, buffers\n    )\n\n    with pytest.raises(ValueError, match=\"must not overlap\"):\n        _orchestrate_nucleation_exhaustion(\n            preflight,\n            finalized,\n            diagnostics,\n            NucleationExhaustionControls(False, False),\n            buffers,\n        )\n\n    _assert_snapshot_unchanged(before)",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_p4_protects_retained_p2_scratch_from_output_aliasing",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_p4_scaling_records_full_deficit_and_finalized_count",
+    "original": "def test_p4_scaling_records_full_deficit_and_finalized_count():\n    \"\"\"Scaling fallback retains the full deficit and derives scaled counts.\"\"\"\n    particles, gas, scratch, finalized, diagnostics = _stage_slots(\n        [4.0], np.array([[True, True, False, False]])\n    )\n    buffers = _exhaustion_buffers(1, 4, 1)\n    object.__setattr__(\n        buffers,\n        \"requested_scale\",\n        wp.full(1, 0.5, dtype=wp.float64, device=\"cpu\"),\n    )\n    object.__setattr__(\n        buffers,\n        \"minimum_scale\",\n        wp.full(1, 0.5, dtype=wp.float64, device=\"cpu\"),\n    )\n    object.__setattr__(\n        buffers,\n        \"minimum_volume\",\n        wp.full(1, 0.5, dtype=wp.float64, device=\"cpu\"),\n    )\n    p2_p3_before = _snapshot_arrays(finalized, diagnostics)\n\n    _orchestrate_nucleation_exhaustion(\n        _preflight_nucleation(\n            particles,\n            gas,\n            _config(),\n            1.0,\n            temperature=300.0,\n            scratch=scratch,\n            finalized_demand=finalized,\n            diagnostics=diagnostics,\n        ),\n        finalized,\n        diagnostics,\n        NucleationExhaustionControls(False, True),\n        buffers,\n    )\n\n    np.testing.assert_array_equal(buffers.required_release_counts.numpy(), [2])\n    np.testing.assert_array_equal(buffers.scaling_required.numpy(), [1])\n    np.testing.assert_array_equal(buffers.final_demand.numpy(), [2.0])\n    np.testing.assert_array_equal(buffers.final_counts.numpy(), [1])\n    np.testing.assert_array_equal(\n        buffers.final_selected_slot_indices.numpy(), [[2, -1, -1, -1]]\n    )\n    _assert_snapshot_unchanged(p2_p3_before)",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_p4_scaling_records_full_deficit_and_finalized_count",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Four admitted events scale to two at half volume with unchanged demand density; retained full-deficit, scaling-selection and upstream immutability assertions and added independent count-density-volume relation."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_p4_resampling_precedes_scaling_and_refreshes_final_free_slots",
+    "original": "def test_p4_resampling_precedes_scaling_and_refreshes_final_free_slots():\n    \"\"\"P4 resampling resolves a viable deficit before considering scaling.\"\"\"\n    particles, gas, scratch, finalized, diagnostics = _stage_slots(\n        [2.0], np.array([[True, True, False]])\n    )\n    buffers = _exhaustion_buffers(1, 3, 1)\n    object.__setattr__(\n        buffers,\n        \"resampling_releasable_counts\",\n        wp.ones(1, dtype=wp.int32, device=\"cpu\"),\n    )\n    p2_p3_before = _snapshot_arrays(finalized, diagnostics)\n\n    _orchestrate_nucleation_exhaustion(\n        _preflight_nucleation(\n            particles,\n            gas,\n            _config(),\n            1.0,\n            temperature=300.0,\n            scratch=scratch,\n            finalized_demand=finalized,\n            diagnostics=diagnostics,\n        ),\n        finalized,\n        diagnostics,\n        NucleationExhaustionControls(True, True),\n        buffers,\n    )\n\n    np.testing.assert_array_equal(buffers.required_release_counts.numpy(), [1])\n    np.testing.assert_array_equal(buffers.scaling_required.numpy(), [0])\n    np.testing.assert_array_equal(buffers.resolved_scale.numpy(), [1.0])\n    np.testing.assert_array_equal(buffers.final_demand.numpy(), [2.0])\n    np.testing.assert_array_equal(buffers.final_counts.numpy(), [2])\n    np.testing.assert_array_equal(\n        buffers.final_selected_slot_indices.numpy(), [[1, 2, -1]]\n    )\n    _assert_snapshot_unchanged(p2_p3_before)",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_p4_resampling_precedes_scaling_and_refreshes_final_free_slots",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_stage_nucleation_slots_rejects_replacement_records_without_writes",
+    "original": "def test_stage_nucleation_slots_rejects_replacement_records_without_writes():\n    \"\"\"P3 accepts only the exact P2/P3 sidecar records validated by P1.\"\"\"\n    particles, gas = _state()\n    scratch, finalized, diagnostics = _sidecars(1, 2, 1)\n    finalized = NucleationFinalizedDemandBuffers(\n        finalized.accepted_counts,\n        wp.array([1.0], dtype=wp.float64, device=\"cpu\"),\n        finalized.precursor_mass_change,\n    )\n    preflight = _preflight_nucleation(\n        particles,\n        gas,\n        _config(),\n        1.0,\n        temperature=300.0,\n        scratch=scratch,\n        finalized_demand=finalized,\n        diagnostics=diagnostics,\n    )\n    replacement_finalized = NucleationFinalizedDemandBuffers(\n        wp.ones(1, dtype=wp.int32, device=\"cpu\"),\n        wp.ones(1, dtype=wp.float64, device=\"cpu\"),\n        wp.ones((1, 1), dtype=wp.float64, device=\"cpu\"),\n    )\n    replacement_diagnostics = NucleationDiagnosticBuffers(\n        *[\n            wp.ones(tuple(value.shape), dtype=wp.int32, device=\"cpu\")\n            for value in diagnostics.__dict__.values()\n        ]\n    )\n    before = _snapshot_arrays(\n        particles,\n        gas,\n        scratch,\n        finalized,\n        diagnostics,\n        replacement_finalized,\n        replacement_diagnostics,\n    )\n\n    with pytest.raises(ValueError, match=\"preflight-validated record\"):\n        _stage_nucleation_slots(preflight, replacement_finalized, diagnostics)\n    with pytest.raises(ValueError, match=\"preflight-validated record\"):\n        _stage_nucleation_slots(preflight, finalized, replacement_diagnostics)\n\n    _assert_snapshot_unchanged(before)",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_stage_nucleation_slots_rejects_replacement_records_without_writes",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_stage_nucleation_slots_rejects_replaced_record_buffer_without_writes",
+    "original": "def test_stage_nucleation_slots_rejects_replaced_record_buffer_without_writes():\n    \"\"\"P3 rejects a record whose validated storage was substituted after P1.\"\"\"\n    particles, gas = _state()\n    scratch, finalized, diagnostics = _sidecars(1, 2, 1)\n    finalized = NucleationFinalizedDemandBuffers(\n        finalized.accepted_counts,\n        wp.array([1.0], dtype=wp.float64, device=\"cpu\"),\n        finalized.precursor_mass_change,\n    )\n    preflight = _preflight_nucleation(\n        particles,\n        gas,\n        _config(),\n        1.0,\n        temperature=300.0,\n        scratch=scratch,\n        finalized_demand=finalized,\n        diagnostics=diagnostics,\n    )\n    replacement = wp.ones(1, dtype=wp.int32, device=\"cpu\")\n    before = _snapshot_arrays(particles, gas, scratch, finalized, diagnostics)\n    object.__setattr__(finalized, \"accepted_counts\", replacement)\n\n    with pytest.raises(ValueError, match=\"preflight-validated storage\"):\n        _stage_nucleation_slots(preflight, finalized, diagnostics)\n\n    _assert_snapshot_unchanged(before)\n    np.testing.assert_array_equal(replacement.numpy(), [1])",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_stage_nucleation_slots_rejects_replaced_record_buffer_without_writes",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_stage_nucleation_slots_excludes_scratch_from_identity_validation",
+    "original": "def test_stage_nucleation_slots_excludes_scratch_from_identity_validation():\n    \"\"\"P3 accepts scratch replacement because it does not receive scratch.\"\"\"\n    particles, gas = _state()\n    particles.concentration = wp.zeros((1, 2), dtype=wp.float64, device=\"cpu\")\n    scratch, finalized, diagnostics = _sidecars(1, 2, 1)\n    finalized = NucleationFinalizedDemandBuffers(\n        finalized.accepted_counts,\n        wp.array([1.0], dtype=wp.float64, device=\"cpu\"),\n        finalized.precursor_mass_change,\n    )\n    preflight = _preflight_nucleation(\n        particles,\n        gas,\n        _config(),\n        1.0,\n        temperature=300.0,\n        scratch=scratch,\n        finalized_demand=finalized,\n        diagnostics=diagnostics,\n    )\n    object.__setattr__(\n        scratch,\n        \"potential_demand\",\n        wp.ones(1, dtype=wp.float64, device=\"cpu\"),\n    )\n\n    _stage_nucleation_slots(preflight, finalized, diagnostics)\n\n    np.testing.assert_array_equal(finalized.accepted_counts.numpy(), [1])",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_stage_nucleation_slots_excludes_scratch_from_identity_validation",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_stage_nucleation_slots_preserves_nonzero_particle_gas_and_p2_state",
+    "original": "def test_stage_nucleation_slots_preserves_nonzero_particle_gas_and_p2_state():\n    \"\"\"Successful P3 modifies only its count and slot-diagnostic outputs.\"\"\"\n    particles, gas = _state()\n    particles.masses = wp.ones((1, 2, 1), dtype=wp.float64, device=\"cpu\")\n    particles.charge = wp.array([[-2.0, 3.0]], dtype=wp.float64, device=\"cpu\")\n    gas.concentration = wp.array([[7.0]], dtype=wp.float64, device=\"cpu\")\n    scratch, finalized, diagnostics = _sidecars(1, 2, 1)\n    finalized = NucleationFinalizedDemandBuffers(\n        finalized.accepted_counts,\n        wp.array([1.0], dtype=wp.float64, device=\"cpu\"),\n        finalized.precursor_mass_change,\n    )\n    preflight = _preflight_nucleation(\n        particles,\n        gas,\n        _config(),\n        1.0,\n        temperature=300.0,\n        scratch=scratch,\n        finalized_demand=finalized,\n        diagnostics=diagnostics,\n    )\n    preserved = _snapshot_arrays(particles, gas, scratch)\n    p2_preserved = _snapshot_arrays(\n        SimpleNamespace(\n            accepted_demand=finalized.accepted_demand,\n            precursor_mass_change=finalized.precursor_mass_change,\n            gate_codes=diagnostics.gate_codes,\n        )\n    )\n\n    _stage_nucleation_slots(preflight, finalized, diagnostics)\n\n    _assert_snapshot_unchanged(preserved)\n    _assert_snapshot_unchanged(p2_preserved)\n    np.testing.assert_array_equal(finalized.accepted_counts.numpy(), [1])\n    np.testing.assert_array_equal(diagnostics.active_slot_counts.numpy(), [2])\n    np.testing.assert_array_equal(diagnostics.free_slot_counts.numpy(), [0])\n    np.testing.assert_array_equal(\n        diagnostics.selected_slot_indices.numpy(), [[-1, -1]]\n    )",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_stage_nucleation_slots_preserves_nonzero_particle_gas_and_p2_state",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_p3_diagnostic_sidecars_require_int32_nonoverlapping_storage",
+    "original": "def test_p3_diagnostic_sidecars_require_int32_nonoverlapping_storage(field):\n    \"\"\"P1 rejects malformed or aliased P3 diagnostic sidecars unchanged.\"\"\"\n    particles, gas = _state()\n    scratch, finalized, diagnostics = _sidecars(1, 2, 1)\n    values = dict(diagnostics.__dict__)\n    values[field] = wp.ones(\n        tuple(getattr(diagnostics, field).shape),\n        dtype=wp.float64,\n        device=\"cpu\",\n    )\n    malformed = NucleationDiagnosticBuffers(**values)\n    before = _snapshot_arrays(particles, gas, scratch, finalized, malformed)\n\n    with pytest.raises(ValueError, match=\"required dtype\"):\n        _preflight_nucleation(\n            particles,\n            gas,\n            _config(),\n            1.0,\n            temperature=300.0,\n            scratch=scratch,\n            finalized_demand=finalized,\n            diagnostics=malformed,\n        )\n    _assert_snapshot_unchanged(before)\n\n    aliased = NucleationDiagnosticBuffers(\n        diagnostics.gate_codes,\n        diagnostics.selected_slot_indices,\n        diagnostics.free_slot_indices,\n        finalized.accepted_counts,\n        diagnostics.free_slot_counts,\n    )\n    before = _snapshot_arrays(particles, gas, scratch, finalized, aliased)\n    with pytest.raises(ValueError, match=\"must not overlap\"):\n        _preflight_nucleation(\n            particles,\n            gas,\n            _config(),\n            1.0,\n            temperature=300.0,\n            scratch=scratch,\n            finalized_demand=finalized,\n            diagnostics=aliased,\n        )\n    _assert_snapshot_unchanged(before)",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_p3_diagnostic_sidecars_require_int32_nonoverlapping_storage",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_stage_nucleation_slots_rejects_invalid_event_conversion_without_writes",
+    "original": "def test_stage_nucleation_slots_rejects_invalid_event_conversion_without_writes(\n    accepted_demand,\n):\n    \"\"\"Invalid P3 conversions preserve every caller-owned P3 output.\"\"\"\n    particle_data, gas_data = _state(1, 2, 1)\n    particle_data.concentration = wp.zeros(\n        (1, 2), dtype=wp.float64, device=\"cpu\"\n    )\n    scratch, finalized, diagnostics = _sidecars(1, 2, 1)\n    finalized = NucleationFinalizedDemandBuffers(\n        finalized.accepted_counts,\n        wp.array([accepted_demand], dtype=wp.float64, device=\"cpu\"),\n        finalized.precursor_mass_change,\n    )\n    before = _snapshot_arrays(finalized, diagnostics)\n    preflight = _preflight_nucleation(\n        particle_data,\n        gas_data,\n        _config(),\n        1.0,\n        temperature=300.0,\n        scratch=scratch,\n        finalized_demand=finalized,\n        diagnostics=diagnostics,\n    )\n    with pytest.raises(ValueError, match=\"integral int32\"):\n        _stage_nucleation_slots(preflight, finalized, diagnostics)\n    _assert_snapshot_unchanged(before)",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_stage_nucleation_slots_rejects_invalid_event_conversion_without_writes",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_stage_nucleation_slots_handles_zero_capacity",
+    "original": "def test_stage_nucleation_slots_handles_zero_capacity():\n    \"\"\"P3 retains a count and produces empty diagnostics at zero capacity.\"\"\"\n    _, _, _, finalized, diagnostics = _stage_slots(\n        [3.0], np.zeros((1, 0), dtype=bool)\n    )\n    np.testing.assert_array_equal(finalized.accepted_counts.numpy(), [3])\n    assert diagnostics.selected_slot_indices.shape == (1, 0)\n    np.testing.assert_array_equal(diagnostics.active_slot_counts.numpy(), [0])\n    np.testing.assert_array_equal(diagnostics.free_slot_counts.numpy(), [0])",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_stage_nucleation_slots_handles_zero_capacity",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_stage_nucleation_slots_accepts_int32_maximum_event_count",
+    "original": "def test_stage_nucleation_slots_accepts_int32_maximum_event_count():\n    \"\"\"The inclusive int32 event-count boundary is accepted independently.\"\"\"\n    _, _, _, finalized, _ = _stage_slots(\n        [float(np.iinfo(np.int32).max)], np.array([[False]])\n    )\n    np.testing.assert_array_equal(\n        finalized.accepted_counts.numpy(), [np.iinfo(np.int32).max]\n    )",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_stage_nucleation_slots_accepts_int32_maximum_event_count",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_stage_nucleation_slots_e6_f5_failure_preserves_p3_sidecars",
+    "original": "def test_stage_nucleation_slots_e6_f5_failure_preserves_p3_sidecars():\n    \"\"\"E6-F5 slot-state rejection occurs before P3 count or selection writes.\"\"\"\n    particles, gas = _state()\n    scratch, finalized, diagnostics = _sidecars(1, 2, 1)\n    finalized = NucleationFinalizedDemandBuffers(\n        finalized.accepted_counts,\n        wp.array([1.0], dtype=wp.float64, device=\"cpu\"),\n        finalized.precursor_mass_change,\n    )\n    before = _snapshot_arrays(finalized, diagnostics)\n    preflight = _preflight_nucleation(\n        particles,\n        gas,\n        _config(),\n        1.0,\n        temperature=300.0,\n        scratch=scratch,\n        finalized_demand=finalized,\n        diagnostics=diagnostics,\n    )\n    with pytest.raises(ValueError, match=\"Invalid particle slot state\"):\n        _stage_nucleation_slots(preflight, finalized, diagnostics)\n    _assert_snapshot_unchanged(before)",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_stage_nucleation_slots_e6_f5_failure_preserves_p3_sidecars",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_stage_nucleation_slots_zero_boxes_is_write_free",
+    "original": "def test_stage_nucleation_slots_zero_boxes_is_write_free():\n    \"\"\"P3 returns without sidecar writes after valid empty-shape preflight.\"\"\"\n    particles, gas = _state(boxes=0)\n    scratch, finalized, diagnostics = _sidecars(0, 2, 1)\n    before = _snapshot_arrays(finalized, diagnostics)\n    preflight = _preflight_nucleation(\n        particles,\n        gas,\n        _config(),\n        1.0,\n        temperature=300.0,\n        scratch=scratch,\n        finalized_demand=finalized,\n        diagnostics=diagnostics,\n    )\n    _stage_nucleation_slots(preflight, finalized, diagnostics)\n    _assert_snapshot_unchanged(before)",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_stage_nucleation_slots_zero_boxes_is_write_free",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_p2_to_p3_zero_demand_seam_preserves_p2_outputs",
+    "original": "def test_p2_to_p3_zero_demand_seam_preserves_p2_outputs():\n    \"\"\"P3 stages zero P2 demand without changing P2-owned sidecars or state.\"\"\"\n    particles, gas = _state()\n    particles.concentration = wp.zeros((1, 2), dtype=wp.float64, device=\"cpu\")\n    scratch, finalized, diagnostics = _sidecars(1, 2, 1)\n    source_before = _snapshot_arrays(particles, gas)\n\n    _plan_nucleation_demand(\n        particles,\n        gas,\n        _config(),\n        0.0,\n        temperature=300.0,\n        scratch=scratch,\n        finalized_demand=finalized,\n        diagnostics=diagnostics,\n    )\n    p2_before = _snapshot_arrays(scratch)\n    accepted_demand_before = finalized.accepted_demand.numpy().copy()\n    removal_before = finalized.precursor_mass_change.numpy().copy()\n    gate_codes_before = diagnostics.gate_codes.numpy().copy()\n    np.testing.assert_array_equal(finalized.accepted_counts.numpy(), [1])\n    np.testing.assert_array_equal(\n        diagnostics.selected_slot_indices.numpy(), [[1, 1]]\n    )\n\n    preflight = _preflight_nucleation(\n        particles,\n        gas,\n        _config(),\n        0.0,\n        temperature=300.0,\n        scratch=scratch,\n        finalized_demand=finalized,\n        diagnostics=diagnostics,\n    )\n    _stage_nucleation_slots(preflight, finalized, diagnostics)\n\n    np.testing.assert_array_equal(finalized.accepted_counts.numpy(), [0])\n    np.testing.assert_array_equal(\n        diagnostics.free_slot_indices.numpy(), [[0, 1]]\n    )\n    np.testing.assert_array_equal(diagnostics.active_slot_counts.numpy(), [0])\n    np.testing.assert_array_equal(diagnostics.free_slot_counts.numpy(), [2])\n    np.testing.assert_array_equal(\n        diagnostics.selected_slot_indices.numpy(), [[-1, -1]]\n    )\n    np.testing.assert_array_equal(\n        finalized.accepted_demand.numpy(), accepted_demand_before\n    )\n    np.testing.assert_array_equal(\n        finalized.precursor_mass_change.numpy(), removal_before\n    )\n    np.testing.assert_array_equal(\n        diagnostics.gate_codes.numpy(), gate_codes_before\n    )\n    _assert_snapshot_unchanged(source_before)\n    _assert_snapshot_unchanged(p2_before)",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_p2_to_p3_zero_demand_seam_preserves_p2_outputs",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_config_is_frozen_but_retains_arrays_by_identity",
+    "original": "def test_config_is_frozen_but_retains_arrays_by_identity():\n    \"\"\"Frozen records reject rebinding without copying caller array sidecars.\"\"\"\n    config = _config()\n    with pytest.raises(FrozenInstanceError):\n        config.coefficient = 2.0\n    array = wp.zeros(1, dtype=wp.float64, device=\"cpu\")\n    buffers = NucleationScratchBuffers(array, array, array)\n    assert buffers.precursor_number_concentration is array",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_config_is_frozen_but_retains_arrays_by_identity",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_config_rejects_invalid_scalar_rules",
+    "original": "def test_config_rejects_invalid_scalar_rules(changes, message):\n    \"\"\"Configuration validation rejects invalid scalar-only contracts.\"\"\"\n    with pytest.raises((TypeError, ValueError), match=message):\n        _config(**changes)",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_config_rejects_invalid_scalar_rules",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_real_rejects_nonphysical_scalar_values",
+    "original": "def test_real_rejects_nonphysical_scalar_values(value, positive, exception):\n    \"\"\"Scalar normalization rejects booleans, non-reals, and bad domains.\"\"\"\n    with pytest.raises(exception):\n        _real(value, \"value\", positive=positive)",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_real_rejects_nonphysical_scalar_values",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_config_accepts_kinetic_saturation_bounds",
+    "original": "def test_config_accepts_kinetic_saturation_bounds():\n    \"\"\"A complete kinetic configuration retains valid paired bounds.\"\"\"\n    config = _config(\n        rate_law=\"kinetic\",\n        saturation_lower=0.1,\n        saturation_upper=1.2,\n    )\n    assert config.rate_law == \"kinetic\"\n    assert config.saturation_upper == 1.2",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_config_accepts_kinetic_saturation_bounds",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_config_rejects_inconsistent_metadata_and_intervals",
+    "original": "def test_config_rejects_inconsistent_metadata_and_intervals(changes):\n    \"\"\"Configuration rejects malformed species metadata and paired intervals.\"\"\"\n    with pytest.raises((TypeError, ValueError)):\n        _config(**changes)",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_config_rejects_inconsistent_metadata_and_intervals",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_preflight_is_read_only_for_valid_inputs",
+    "original": "def test_preflight_is_read_only_for_valid_inputs():\n    \"\"\"Valid P1 preflight retains state and returns normalized metadata.\"\"\"\n    particles, gas = _state()\n    scratch, finalized, diagnostics = _sidecars(1, 2, 1)\n    environment = SimpleNamespace(\n        temperature=wp.full(\n            1, wp.float64(300.0), dtype=wp.float64, device=\"cpu\"\n        ),\n    )\n    before = _snapshot_arrays(\n        particles, gas, environment, scratch, finalized, diagnostics\n    )\n    result = _preflight_nucleation(\n        particles,\n        gas,\n        _config(),\n        1.0,\n        environment=environment,\n        scratch=scratch,\n        finalized_demand=finalized,\n        diagnostics=diagnostics,\n    )\n    assert result.n_boxes == 1\n    assert result.n_particles == 2\n    _assert_snapshot_unchanged(before)",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_preflight_is_read_only_for_valid_inputs",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_preflight_accepts_finite_signed_particle_charge",
+    "original": "def test_preflight_accepts_finite_signed_particle_charge():\n    \"\"\"Finite signed elementary-charge state remains valid P1 input.\"\"\"\n    particles, gas = _state()\n    particles.charge = wp.array(\n        np.array([[-1.0, 1.0]], dtype=np.float64),\n        dtype=wp.float64,\n        device=\"cpu\",\n    )\n\n    result = _preflight_nucleation(\n        particles,\n        gas,\n        _config(),\n        1.0,\n        temperature=300.0,\n    )\n\n    assert result.has_eligible_boxes",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_preflight_accepts_finite_signed_particle_charge",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_preflight_accepts_environment_temperature_and_saturation",
+    "original": "def test_preflight_accepts_environment_temperature_and_saturation():\n    \"\"\"Environment-owned arrays support configured saturation gating metadata.\"\"\"\n    particles, gas = _state()\n    environment = SimpleNamespace(\n        temperature=wp.ones(1, dtype=wp.float64, device=\"cpu\")\n        * wp.float64(300.0),\n        saturation_ratio=wp.ones((1, 1), dtype=wp.float64, device=\"cpu\"),\n    )\n    result = _preflight_nucleation(\n        particles,\n        gas,\n        _config(saturation_lower=0.5, saturation_upper=1.5),\n        1.0,\n        environment=environment,\n    )\n    assert result.temperature is environment.temperature\n    assert result.saturation is environment.saturation_ratio\n    assert result.has_eligible_boxes",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_preflight_accepts_environment_temperature_and_saturation",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_preflight_empty_capacity_returns_no_eligible_boxes",
+    "original": "def test_preflight_empty_capacity_returns_no_eligible_boxes():\n    \"\"\"Empty fixed-capacity storage is valid but has no eligible work.\"\"\"\n    particles, gas = _state(particles=0)\n    result = _preflight_nucleation(\n        particles,\n        gas,\n        _config(),\n        1.0,\n        temperature=300.0,\n    )\n    assert result.n_particles == 0\n    assert not result.has_eligible_boxes\n    assert not result.has_gated_boxes",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_preflight_empty_capacity_returns_no_eligible_boxes",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_p2_empty_capacity_validates_before_writing_sidecars",
+    "original": "def test_p2_empty_capacity_validates_before_writing_sidecars(\n    config, saturation, message\n):\n    \"\"\"Invalid nonempty-box inputs reject before P2 writes any sidecar.\"\"\"\n    particles, gas = _state(particles=0)\n    scratch, finalized, diagnostics = _sidecars(1, 0, 1)\n    saturation_data = None\n    if saturation is not None:\n        saturation_data = wp.full(\n            (1, 1), wp.float64(saturation), dtype=wp.float64, device=\"cpu\"\n        )\n    owners = (particles, gas, scratch, finalized, diagnostics)\n    if saturation_data is not None:\n        owners += (SimpleNamespace(saturation=saturation_data),)\n    before = _snapshot_arrays(*owners)\n\n    with pytest.raises(ValueError, match=message):\n        _plan_nucleation_demand(\n            particles,\n            gas,\n            config,\n            1.0,\n            temperature=300.0,\n            saturation=saturation_data,\n            scratch=scratch,\n            finalized_demand=finalized,\n            diagnostics=diagnostics,\n        )\n\n    _assert_snapshot_unchanged(before)",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_p2_empty_capacity_validates_before_writing_sidecars",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_p2_derived_invalid_demand_preserves_all_caller_state",
+    "original": "def test_p2_derived_invalid_demand_preserves_all_caller_state():\n    \"\"\"A derived overflow rejects before P2 commits its owned sidecars.\"\"\"\n    particles, gas = _state()\n    scratch, finalized, diagnostics = _sidecars(1, 2, 1)\n    before = _snapshot_arrays(particles, gas, scratch, finalized, diagnostics)\n\n    with pytest.raises(ValueError, match=\"Derived nucleation demand\"):\n        _plan_nucleation_demand(\n            particles,\n            gas,\n            _config(coefficient=np.finfo(np.float64).max),\n            1.0,\n            temperature=300.0,\n            scratch=scratch,\n            finalized_demand=finalized,\n            diagnostics=diagnostics,\n        )\n\n    _assert_snapshot_unchanged(before)",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_p2_derived_invalid_demand_preserves_all_caller_state",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_preflight_rejects_scalar_temperature_outside_bounds",
+    "original": "def test_preflight_rejects_scalar_temperature_outside_bounds(\n    field, value, message\n):\n    \"\"\"Scalar environmental values must remain inside configured bounds.\"\"\"\n    particles, gas = _state()\n    with pytest.raises(ValueError, match=message):\n        _preflight_nucleation(\n            particles,\n            gas,\n            _config(),\n            1.0,\n            **{field: value},\n        )",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_preflight_rejects_scalar_temperature_outside_bounds",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_preflight_rejects_direct_array_values_outside_bounds",
+    "original": "def test_preflight_rejects_direct_array_values_outside_bounds(\n    temperature, saturation, message\n):\n    \"\"\"Device-resident temperature and saturation arrays enforce bounds.\"\"\"\n    particles, gas = _state()\n    temperature_data = wp.ones(1, dtype=wp.float64, device=\"cpu\") * wp.float64(\n        temperature\n    )\n    saturation_data = wp.ones(\n        (1, 1), dtype=wp.float64, device=\"cpu\"\n    ) * wp.float64(saturation)\n    before = temperature_data.numpy().copy()\n    with pytest.raises(ValueError, match=message):\n        _preflight_nucleation(\n            particles,\n            gas,\n            _config(saturation_lower=0.5, saturation_upper=1.5),\n            1.0,\n            temperature=temperature_data,\n            saturation=saturation_data,\n        )\n    np.testing.assert_array_equal(temperature_data.numpy(), before)",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_preflight_rejects_direct_array_values_outside_bounds",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_preflight_low_saturation_is_a_read_only_gate",
+    "original": "def test_preflight_low_saturation_is_a_read_only_gate():\n    \"\"\"Saturation below its lower endpoint gates rather than rejects.\"\"\"\n    particles, gas = _state()\n    saturation_data = wp.full(\n        (1, 1), wp.float64(0.4), dtype=wp.float64, device=\"cpu\"\n    )\n    result = _preflight_nucleation(\n        particles,\n        gas,\n        _config(saturation_lower=0.5, saturation_upper=1.5),\n        1.0,\n        temperature=wp.full(\n            1, wp.float64(300.0), dtype=wp.float64, device=\"cpu\"\n        ),\n        saturation=saturation_data,\n    )\n    assert result.gate_reason == \"low_saturation\"",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_preflight_low_saturation_is_a_read_only_gate",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_zero_gates_leave_stale_sidecars_untouched",
+    "original": "def test_zero_gates_leave_stale_sidecars_untouched(time_step, changes, reason):\n    \"\"\"All-box scalar gates return zero metadata without clearing sidecars.\"\"\"\n    particles, gas = _state()\n    scratch, finalized, diagnostics = _sidecars(1, 2, 1)\n    temperature = wp.full(1, wp.float64(300.0), dtype=wp.float64, device=\"cpu\")\n    before = _snapshot_arrays(\n        particles, gas, temperature, scratch, finalized, diagnostics\n    )\n    result = _preflight_nucleation(\n        particles,\n        gas,\n        _config(**changes),\n        time_step,\n        temperature=temperature,\n        scratch=scratch,\n        finalized_demand=finalized,\n        diagnostics=diagnostics,\n    )\n    assert result.gate_reason == reason\n    assert result.potential_rate == 0.0\n    _assert_snapshot_unchanged(before)",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_zero_gates_leave_stale_sidecars_untouched",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_rejection_does_not_write_state",
+    "original": "def test_rejection_does_not_write_state():\n    \"\"\"Schema/science rejection occurs before caller state is modified.\"\"\"\n    particles, gas = _state()\n    scratch, finalized, diagnostics = _sidecars(1, 2, 1)\n    temperature = wp.full(1, wp.float64(100.0), dtype=wp.float64, device=\"cpu\")\n    before = _snapshot_arrays(\n        particles, gas, temperature, scratch, finalized, diagnostics\n    )\n    with pytest.raises(ValueError, match=\"temperature\"):\n        _preflight_nucleation(\n            particles,\n            gas,\n            _config(),\n            1.0,\n            temperature=temperature,\n            scratch=scratch,\n            finalized_demand=finalized,\n            diagnostics=diagnostics,\n        )\n    _assert_snapshot_unchanged(before)",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_rejection_does_not_write_state",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_preflight_rejects_invalid_precursor_partitioning",
+    "original": "def test_preflight_rejects_invalid_precursor_partitioning(configure, message):\n    \"\"\"Precursor partitioning must be enabled and use binary metadata.\"\"\"\n    particles, gas = _state()\n    configure(particles, gas)\n    with pytest.raises(ValueError, match=message):\n        _preflight_nucleation(\n            particles,\n            gas,\n            _config(),\n            1.0,\n            temperature=300.0,\n        )",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_preflight_rejects_invalid_precursor_partitioning",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_preflight_rejects_conflicting_or_unconfigured_environment_inputs",
+    "original": "def test_preflight_rejects_conflicting_or_unconfigured_environment_inputs():\n    \"\"\"Direct and environment forms cannot be mixed or silently ignored.\"\"\"\n    particles, gas = _state()\n    environment = SimpleNamespace(\n        temperature=wp.ones(1, dtype=wp.float64, device=\"cpu\")\n        * wp.float64(300.0),\n    )\n    with pytest.raises(ValueError, match=\"require no environment\"):\n        _preflight_nucleation(\n            particles,\n            gas,\n            _config(),\n            1.0,\n            temperature=300.0,\n            environment=environment,\n        )\n    with pytest.raises(ValueError, match=\"not configured\"):\n        _preflight_nucleation(\n            particles,\n            gas,\n            _config(),\n            1.0,\n            temperature=300.0,\n            saturation=wp.ones((1, 1), dtype=wp.float64, device=\"cpu\"),\n        )",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_preflight_rejects_conflicting_or_unconfigured_environment_inputs",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_preflight_rejects_sidecar_overlap_without_mutating_state",
+    "original": "def test_preflight_rejects_sidecar_overlap_without_mutating_state():\n    \"\"\"Sidecars cannot alias mutable particle fields during a read-only call.\"\"\"\n    particles, gas = _state()\n    before = particles.concentration.numpy().copy()\n    scratch = NucleationScratchBuffers(\n        particles.volume,\n        wp.zeros(1, dtype=wp.float64, device=\"cpu\"),\n        wp.zeros(1, dtype=wp.float64, device=\"cpu\"),\n    )\n    with pytest.raises(ValueError, match=\"must not overlap\"):\n        _preflight_nucleation(\n            particles,\n            gas,\n            _config(),\n            1.0,\n            temperature=300.0,\n            scratch=scratch,\n        )\n    np.testing.assert_array_equal(particles.concentration.numpy(), before)",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_preflight_rejects_sidecar_overlap_without_mutating_state",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_real_rejects_oversized_scalars_as_value_errors",
+    "original": "def test_real_rejects_oversized_scalars_as_value_errors():\n    \"\"\"Scalar conversion overflow follows the finite-domain error contract.\"\"\"\n    with pytest.raises(ValueError, match=\"finite and nonnegative\"):\n        _real(10**1000, \"value\")",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_real_rejects_oversized_scalars_as_value_errors",
+    "status": "retained; native successor validated",
+    "body_changed": false,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_config_and_time_step_reject_oversized_scalars_as_value_errors",
+    "original": "def test_config_and_time_step_reject_oversized_scalars_as_value_errors():\n    \"\"\"Configuration and direct scalar overflow do not leak OverflowError.\"\"\"\n    with pytest.raises(ValueError, match=\"finite and nonnegative\"):\n        _config(coefficient=10**1000)\n    particles, gas = _state()\n    with pytest.raises(ValueError, match=\"finite and nonnegative\"):\n        _preflight_nucleation(\n            particles, gas, _config(), 10**1000, temperature=300.0\n        )",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_config_and_time_step_reject_oversized_scalars_as_value_errors",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_preflight_rejects_lookalike_and_mutated_config_without_writes",
+    "original": "def test_preflight_rejects_lookalike_and_mutated_config_without_writes():\n    \"\"\"Runtime config validation rejects untrusted indices before kernel use.\"\"\"\n    particles, gas = _state()\n    scratch, finalized, diagnostics = _sidecars(1, 2, 1)\n    before = _snapshot_arrays(particles, gas, scratch, finalized, diagnostics)\n    lookalike = SimpleNamespace(**_config().__dict__)\n    with pytest.raises(ValueError, match=\"NucleationConfig\"):\n        _preflight_nucleation(\n            particles,\n            gas,\n            lookalike,\n            1.0,\n            temperature=300.0,\n            scratch=scratch,\n            finalized_demand=finalized,\n            diagnostics=diagnostics,\n        )\n    config = _config()\n    object.__setattr__(config, \"precursor_index\", -1)\n    with pytest.raises(ValueError, match=\"config scalar values\"):\n        _preflight_nucleation(\n            particles,\n            gas,\n            config,\n            1.0,\n            temperature=300.0,\n            scratch=scratch,\n            finalized_demand=finalized,\n            diagnostics=diagnostics,\n        )\n    _assert_snapshot_unchanged(before)",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_preflight_rejects_lookalike_and_mutated_config_without_writes",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_scalar_zero_config_gates_before_temperature_interval",
+    "original": "def test_scalar_zero_config_gates_before_temperature_interval(\n    temperature, changes\n):\n    \"\"\"Valid zero rate inputs short-circuit configured scalar temperature bounds.\"\"\"\n    particles, gas = _state()\n    result = _preflight_nucleation(\n        particles, gas, _config(**changes), 1.0, temperature=temperature\n    )\n    assert result.gate_reason in (\"zero_coefficient\", \"zero_survival\")",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_scalar_zero_config_gates_before_temperature_interval",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_device_zero_config_gates_before_temperature_interval",
+    "original": "def test_device_zero_config_gates_before_temperature_interval(\n    temperature, changes\n):\n    \"\"\"Valid zero rate inputs short-circuit device temperature range checks.\"\"\"\n    particles, gas = _state()\n    temperature_data = wp.full(\n        1, wp.float64(temperature), dtype=wp.float64, device=\"cpu\"\n    )\n    result = _preflight_nucleation(\n        particles,\n        gas,\n        _config(**changes),\n        1.0,\n        temperature=temperature_data,\n    )\n    assert result.gate_reason in (\"zero_coefficient\", \"zero_survival\")",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_device_zero_config_gates_before_temperature_interval",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_disjoint_precursor_and_saturation_gates_are_all_box_union",
+    "original": "def test_disjoint_precursor_and_saturation_gates_are_all_box_union():\n    \"\"\"Disjoint per-box gates do not incorrectly leave an eligible box.\"\"\"\n    particles, gas = _state(boxes=2)\n    gas.concentration = wp.array(\n        np.array([[0.0], [1.0]], dtype=np.float64),\n        dtype=wp.float64,\n        device=\"cpu\",\n    )\n    saturation = wp.array(\n        np.array([[1.0], [0.4]], dtype=np.float64),\n        dtype=wp.float64,\n        device=\"cpu\",\n    )\n    result = _preflight_nucleation(\n        particles,\n        gas,\n        _config(saturation_lower=0.5, saturation_upper=1.5),\n        1.0,\n        temperature=wp.full(\n            2, wp.float64(300.0), dtype=wp.float64, device=\"cpu\"\n        ),\n        saturation=saturation,\n    )\n    assert not result.has_eligible_boxes\n    assert result.has_gated_boxes",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_disjoint_precursor_and_saturation_gates_are_all_box_union",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_mixed_gate_union_retains_eligible_box",
+    "original": "def test_mixed_gate_union_retains_eligible_box():\n    \"\"\"A gate union smaller than box count retains eligible work metadata.\"\"\"\n    particles, gas = _state(boxes=2)\n    gas.concentration = wp.array(\n        np.array([[0.0], [1.0]], dtype=np.float64),\n        dtype=wp.float64,\n        device=\"cpu\",\n    )\n    saturation = wp.ones((2, 1), dtype=wp.float64, device=\"cpu\")\n    result = _preflight_nucleation(\n        particles,\n        gas,\n        _config(saturation_lower=0.5, saturation_upper=1.5),\n        1.0,\n        temperature=wp.full(\n            2, wp.float64(300.0), dtype=wp.float64, device=\"cpu\"\n        ),\n        saturation=saturation,\n    )\n    assert result.has_eligible_boxes\n    assert result.has_gated_boxes",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_mixed_gate_union_retains_eligible_box",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_p2_plans_activation_demand_and_preserves_p3_sidecars",
+    "original": "def test_p2_plans_activation_demand_and_preserves_p3_sidecars():\n    \"\"\"P2 commits only demand diagnostics using shared inventory admission.\"\"\"\n    particles, gas = _state(boxes=2, particles=0, species=2)\n    gas.molar_mass = wp.array(\n        np.array([0.1, 0.2], dtype=np.float64), dtype=wp.float64, device=\"cpu\"\n    )\n    gas.concentration = wp.array(\n        np.array([[1.0, 0.1], [2.0, 2.0]], dtype=np.float64),\n        dtype=wp.float64,\n        device=\"cpu\",\n    )\n    scratch, finalized, diagnostics = _sidecars(2, 0, 2)\n    source_before = _snapshot_arrays(particles, gas)\n    selected_before = diagnostics.selected_slot_indices.numpy().copy()\n    counts_before = finalized.accepted_counts.numpy().copy()\n    config = _config(molecule_counts=(1, 1), coefficient=1.0)\n\n    _plan_nucleation_demand(\n        particles,\n        gas,\n        config,\n        1.0,\n        temperature=300.0,\n        scratch=scratch,\n        finalized_demand=finalized,\n        diagnostics=diagnostics,\n    )\n\n    precursor = gas.concentration.numpy()[:, 0] * 6.02214076e23 / 0.1\n    potential = config.coefficient * precursor\n    event_mass = np.array([0.1, 0.2]) / 6.02214076e23\n    expected = np.minimum(\n        potential,\n        np.min(gas.concentration.numpy() / event_mass, axis=1),\n    )\n    np.testing.assert_allclose(\n        scratch.precursor_number_concentration.numpy(), precursor, rtol=1e-12\n    )\n    np.testing.assert_allclose(\n        scratch.potential_rate.numpy(), potential, rtol=1e-12\n    )\n    np.testing.assert_allclose(\n        scratch.potential_demand.numpy(), potential, rtol=1e-12\n    )\n    np.testing.assert_allclose(\n        finalized.accepted_demand.numpy(), expected, rtol=1e-12\n    )\n    np.testing.assert_allclose(\n        finalized.precursor_mass_change.numpy(),\n        expected[:, None] * event_mass,\n        rtol=1e-12,\n    )\n    np.testing.assert_array_equal(\n        diagnostics.gate_codes.numpy(),\n        [_P2_GATE_GAS_LIMITED_OFFSET + 1] * 2,\n    )\n    np.testing.assert_array_equal(\n        finalized.accepted_counts.numpy(), counts_before\n    )\n    np.testing.assert_array_equal(\n        diagnostics.selected_slot_indices.numpy(), selected_before\n    )\n    _assert_snapshot_unchanged(source_before)",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_p2_plans_activation_demand_and_preserves_p3_sidecars",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_p2_matches_numpy_oracle_across_devices_and_scales",
+    "original": "def test_p2_matches_numpy_oracle_across_devices_and_scales(\n    device, boxes, species, rate_law\n):\n    \"\"\"P2 rate, demand, and removal match a NumPy float64 oracle.\"\"\"\n    if device.startswith(\"cuda\") and not wp.is_cuda_available():\n        pytest.skip(\"CUDA is unavailable\")\n    particles, gas = _state(\n        boxes=boxes, particles=0, species=species, device=device\n    )\n    gas.molar_mass = wp.array(\n        np.linspace(0.1, 0.1 + 0.1 * (species - 1), species, dtype=np.float64),\n        dtype=wp.float64,\n        device=device,\n    )\n    gas.concentration = wp.array(\n        np.arange(1, boxes * species + 1, dtype=np.float64).reshape(\n            boxes, species\n        )\n        * 1.0e-12,\n        dtype=wp.float64,\n        device=device,\n    )\n    config = _config(\n        rate_law=rate_law,\n        coefficient=1.0e-30,\n        survival_factor=0.75,\n        molecule_counts=tuple(range(1, species + 1)),\n        precursor_number_concentration_upper=1.0e40,\n    )\n    scratch, finalized, diagnostics = _sidecars(\n        boxes, 0, species, device=device\n    )\n    before = _snapshot_arrays(particles, gas)\n\n    _plan_nucleation_demand(\n        particles,\n        gas,\n        config,\n        2.0,\n        temperature=300.0,\n        scratch=scratch,\n        finalized_demand=finalized,\n        diagnostics=diagnostics,\n    )\n\n    concentration = gas.concentration.numpy()\n    molar_mass = gas.molar_mass.numpy()\n    precursor, rate, potential, admitted, removal = _oracle_plan(\n        concentration, molar_mass, config, 2.0\n    )\n    np.testing.assert_allclose(\n        scratch.precursor_number_concentration.numpy(), precursor, rtol=1e-12\n    )\n    np.testing.assert_allclose(scratch.potential_rate.numpy(), rate, rtol=1e-12)\n    np.testing.assert_allclose(\n        scratch.potential_demand.numpy(), potential, rtol=1e-12\n    )\n    np.testing.assert_allclose(finalized.accepted_demand.numpy(), admitted)\n    np.testing.assert_allclose(\n        finalized.precursor_mass_change.numpy(), removal, rtol=1e-12\n    )\n    np.testing.assert_array_equal(\n        diagnostics.gate_codes.numpy(), np.zeros(boxes, dtype=np.int32)\n    )\n    np.testing.assert_array_equal(\n        finalized.accepted_counts.numpy(), np.ones(boxes, dtype=np.int32)\n    )\n    np.testing.assert_array_equal(\n        diagnostics.selected_slot_indices.numpy(),\n        np.full((boxes, 0), -1, dtype=np.int32),\n    )\n    _assert_snapshot_unchanged(before)",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_p2_matches_numpy_oracle_across_devices_and_scales",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_p2_zero_time_writes_zero_outputs_and_gate_code",
+    "original": "def test_p2_zero_time_writes_zero_outputs_and_gate_code():\n    \"\"\"P2 scalar gates commit their defined zero diagnostics.\"\"\"\n    particles, gas = _state()\n    scratch, finalized, diagnostics = _sidecars(1, 2, 1)\n\n    _plan_nucleation_demand(\n        particles,\n        gas,\n        _config(),\n        0.0,\n        temperature=300.0,\n        scratch=scratch,\n        finalized_demand=finalized,\n        diagnostics=diagnostics,\n    )\n\n    np.testing.assert_array_equal(scratch.potential_rate.numpy(), [0.0])\n    np.testing.assert_array_equal(scratch.potential_demand.numpy(), [0.0])\n    np.testing.assert_array_equal(finalized.accepted_demand.numpy(), [0.0])\n    np.testing.assert_array_equal(\n        finalized.precursor_mass_change.numpy(), [[0.0]]\n    )\n    np.testing.assert_array_equal(\n        diagnostics.gate_codes.numpy(), [_P2_GATE_ZERO_TIME]\n    )",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_p2_zero_time_writes_zero_outputs_and_gate_code",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_p2_writes_all_non_time_gate_codes",
+    "original": "def test_p2_writes_all_non_time_gate_codes(\n    changes, concentration, saturation_value, expected_code\n):\n    \"\"\"P2 commits zero demand for each valid gate with defined precedence.\"\"\"\n    particles, gas = _state()\n    gas.concentration = wp.full(\n        (1, 1), wp.float64(concentration), dtype=wp.float64, device=\"cpu\"\n    )\n    if expected_code == _P2_GATE_ZERO_INVENTORY:\n        gas.concentration = wp.zeros((1, 1), dtype=wp.float64, device=\"cpu\")\n        changes = {\"molecule_counts\": (0, 1)}\n        particles, gas = _state(species=2)\n        gas.concentration = wp.array(\n            np.array([[1.0, 0.0]], dtype=np.float64),\n            dtype=wp.float64,\n            device=\"cpu\",\n        )\n    boxes, particle_count, species = 1, 2, gas.molar_mass.shape[0]\n    scratch, finalized, diagnostics = _sidecars(boxes, particle_count, species)\n    config = _config(\n        **changes,\n        saturation_lower=0.5,\n        saturation_upper=1.5,\n    )\n    saturation = wp.full(\n        (1, species),\n        wp.float64(saturation_value),\n        dtype=wp.float64,\n        device=\"cpu\",\n    )\n\n    _plan_nucleation_demand(\n        particles,\n        gas,\n        config,\n        1.0,\n        temperature=300.0,\n        saturation=saturation,\n        scratch=scratch,\n        finalized_demand=finalized,\n        diagnostics=diagnostics,\n    )\n\n    np.testing.assert_array_equal(\n        diagnostics.gate_codes.numpy(), [expected_code]\n    )\n    if expected_code == _P2_GATE_ZERO_INVENTORY:\n        assert scratch.potential_rate.numpy()[0] > 0.0\n    else:\n        np.testing.assert_array_equal(scratch.potential_rate.numpy(), [0.0])\n    np.testing.assert_array_equal(finalized.accepted_demand.numpy(), [0.0])\n    np.testing.assert_array_equal(\n        finalized.precursor_mass_change.numpy(), np.zeros((1, species))\n    )",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_p2_writes_all_non_time_gate_codes",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_p2_kinetic_tied_inventory_uses_lowest_limiting_species",
+    "original": "def test_p2_kinetic_tied_inventory_uses_lowest_limiting_species():\n    \"\"\"Kinetic P2 demand uses its squared rate law and stable limiter tie.\"\"\"\n    particles, gas = _state(species=2)\n    gas.molar_mass = wp.array(\n        np.array([0.1, 0.2], dtype=np.float64), dtype=wp.float64, device=\"cpu\"\n    )\n    event_mass = np.array([0.1, 0.2], dtype=np.float64) / 6.02214076e23\n    gas.concentration = wp.array(\n        np.array([event_mass * 5.0], dtype=np.float64),\n        dtype=wp.float64,\n        device=\"cpu\",\n    )\n    scratch, finalized, diagnostics = _sidecars(1, 2, 2)\n    config = _config(\n        rate_law=\"kinetic\",\n        coefficient=1.0,\n        molecule_counts=(1, 1),\n        precursor_number_concentration_upper=1e40,\n    )\n\n    _plan_nucleation_demand(\n        particles,\n        gas,\n        config,\n        1.0,\n        temperature=300.0,\n        scratch=scratch,\n        finalized_demand=finalized,\n        diagnostics=diagnostics,\n    )\n\n    precursor = gas.concentration.numpy()[0, 0] * 6.02214076e23 / 0.1\n    np.testing.assert_allclose(scratch.potential_rate.numpy(), [precursor**2])\n    np.testing.assert_allclose(finalized.accepted_demand.numpy(), [5.0])\n    np.testing.assert_array_equal(\n        diagnostics.gate_codes.numpy(), [_P2_GATE_GAS_LIMITED_OFFSET]\n    )",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_p2_kinetic_tied_inventory_uses_lowest_limiting_species",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_p2_gate_precedence_is_scalar_then_precursor_then_saturation",
+    "original": "def test_p2_gate_precedence_is_scalar_then_precursor_then_saturation():\n    \"\"\"P2 emits the documented deterministic gate precedence per box.\"\"\"\n    particles, gas = _state(boxes=2)\n    gas.concentration = wp.array(\n        np.array([[0.0], [1.0]], dtype=np.float64),\n        dtype=wp.float64,\n        device=\"cpu\",\n    )\n    saturation = wp.array(\n        np.array([[0.4], [0.4]], dtype=np.float64),\n        dtype=wp.float64,\n        device=\"cpu\",\n    )\n    scratch, finalized, diagnostics = _sidecars(2, 2, 1)\n\n    _plan_nucleation_demand(\n        particles,\n        gas,\n        _config(saturation_lower=0.5, saturation_upper=1.5),\n        0.0,\n        temperature=300.0,\n        saturation=saturation,\n        scratch=scratch,\n        finalized_demand=finalized,\n        diagnostics=diagnostics,\n    )\n\n    np.testing.assert_array_equal(\n        diagnostics.gate_codes.numpy(),\n        [_P2_GATE_ZERO_TIME, _P2_GATE_ZERO_TIME],\n    )\n\n    _plan_nucleation_demand(\n        particles,\n        gas,\n        _config(saturation_lower=0.5, saturation_upper=1.5),\n        1.0,\n        temperature=300.0,\n        saturation=saturation,\n        scratch=scratch,\n        finalized_demand=finalized,\n        diagnostics=diagnostics,\n    )\n\n    np.testing.assert_array_equal(\n        diagnostics.gate_codes.numpy(),\n        [_P2_GATE_ZERO_PRECURSOR, _P2_GATE_LOW_SATURATION],\n    )",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_p2_gate_precedence_is_scalar_then_precursor_then_saturation",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_p2_shared_admission_preserves_nonparticipant_zero_removal",
+    "original": "def test_p2_shared_admission_preserves_nonparticipant_zero_removal():\n    \"\"\"P2 limits each box independently and never removes nonparticipants.\"\"\"\n    particles, gas = _state(boxes=2, particles=0, species=3)\n    molar_mass = np.array([0.1, 0.3, 0.2], dtype=np.float64)\n    event_mass = np.array([0.1, 0.0, 0.4], dtype=np.float64) / AVOGADRO_NUMBER\n    gas.molar_mass = wp.array(molar_mass, dtype=wp.float64, device=\"cpu\")\n    gas.concentration = wp.array(\n        np.array(\n            [\n                [1.0, 9.0, event_mass[2] * 2.0],\n                [0.5, 8.0, event_mass[2] * 7.0],\n            ],\n            dtype=np.float64,\n        ),\n        dtype=wp.float64,\n        device=\"cpu\",\n    )\n    scratch, finalized, diagnostics = _sidecars(2, 0, 3)\n    before = _snapshot_arrays(particles, gas)\n\n    _plan_nucleation_demand(\n        particles,\n        gas,\n        _config(\n            coefficient=1.0e-10,\n            molecule_counts=(1, 0, 2),\n            precursor_number_concentration_upper=1.0e30,\n        ),\n        1.0,\n        temperature=300.0,\n        scratch=scratch,\n        finalized_demand=finalized,\n        diagnostics=diagnostics,\n    )\n\n    potential = (\n        1.0e-10 * gas.concentration.numpy()[:, 0] * AVOGADRO_NUMBER / 0.1\n    )\n    expected_demand = np.minimum(potential, [2.0, 7.0])\n    expected_removal = expected_demand[:, None] * event_mass\n    np.testing.assert_allclose(\n        finalized.accepted_demand.numpy(), expected_demand, rtol=1e-12, atol=0.0\n    )\n    np.testing.assert_allclose(\n        finalized.precursor_mass_change.numpy(),\n        expected_removal,\n        rtol=1e-12,\n        atol=0.0,\n    )\n    np.testing.assert_array_equal(\n        finalized.precursor_mass_change.numpy()[:, 1], [0.0, 0.0]\n    )\n    _assert_snapshot_unchanged(before)",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_p2_shared_admission_preserves_nonparticipant_zero_removal",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_p2_empty_boxes_are_an_exact_write_free_noop",
+    "original": "def test_p2_empty_boxes_are_an_exact_write_free_noop():\n    \"\"\"Valid empty-box planning preserves every supplied sidecar byte-for-byte.\"\"\"\n    particles, gas = _state(boxes=0)\n    scratch, finalized, diagnostics = _sidecars(0, 2, 1)\n    before = _snapshot_arrays(particles, gas, scratch, finalized, diagnostics)\n\n    _plan_nucleation_demand(\n        particles,\n        gas,\n        _config(),\n        1.0,\n        temperature=300.0,\n        scratch=scratch,\n        finalized_demand=finalized,\n        diagnostics=diagnostics,\n    )\n\n    _assert_snapshot_unchanged(before)",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_p2_empty_boxes_are_an_exact_write_free_noop",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_p2_rejects_missing_or_wrong_sidecar_records",
+    "original": "def test_p2_rejects_missing_or_wrong_sidecar_records(field, value, message):\n    \"\"\"P2 refuses missing or wrong records before any caller-owned writes.\"\"\"\n    particles, gas = _state()\n    scratch, finalized, diagnostics = _sidecars(1, 2, 1)\n    before = _snapshot_arrays(particles, gas, scratch, finalized, diagnostics)\n    sidecars = {\n        \"scratch\": scratch,\n        \"finalized_demand\": finalized,\n        \"diagnostics\": diagnostics,\n    }\n    sidecars[field] = value\n\n    with pytest.raises(ValueError, match=message):\n        _plan_nucleation_demand(\n            particles,\n            gas,\n            _config(),\n            1.0,\n            temperature=300.0,\n            **sidecars,\n        )\n\n    _assert_snapshot_unchanged(before)",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_p2_rejects_missing_or_wrong_sidecar_records",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_p2_inventory_rounding_uses_bounded_nextafter_correction",
+    "original": "def test_p2_inventory_rounding_uses_bounded_nextafter_correction():\n    \"\"\"P2 corrects an unsafe division-product ULP without a coarse scale loss.\"\"\"\n    event_mass = np.float64(0.1 / AVOGADRO_NUMBER)\n    inventory = None\n    expected_demand = None\n    for events in range(1, 4097):\n        for direction in (np.inf, -np.inf):\n            candidate_inventory = np.nextafter(\n                event_mass * np.float64(events), direction\n            )\n            candidate_demand = candidate_inventory / event_mass\n            if candidate_demand * event_mass > candidate_inventory:\n                inventory = candidate_inventory\n                expected_demand = candidate_demand\n                break\n        if inventory is not None:\n            break\n    assert inventory is not None\n    assert expected_demand is not None\n\n    for _ in range(4):\n        if expected_demand * event_mass <= inventory:\n            break\n        expected_demand = np.nextafter(expected_demand, -np.inf)\n    assert expected_demand * event_mass <= inventory\n\n    particles, gas = _state(particles=0)\n    gas.concentration = wp.array(\n        np.array([[inventory]], dtype=np.float64),\n        dtype=wp.float64,\n        device=\"cpu\",\n    )\n    scratch, finalized, diagnostics = _sidecars(1, 0, 1)\n\n    _plan_nucleation_demand(\n        particles,\n        gas,\n        _config(coefficient=1.0e10),\n        1.0,\n        temperature=300.0,\n        scratch=scratch,\n        finalized_demand=finalized,\n        diagnostics=diagnostics,\n    )\n\n    np.testing.assert_allclose(\n        finalized.accepted_demand.numpy(), [expected_demand], rtol=0.0, atol=0.0\n    )\n    assert finalized.precursor_mass_change.numpy()[0, 0] <= inventory\n    np.testing.assert_array_equal(\n        diagnostics.gate_codes.numpy(), [_P2_GATE_GAS_LIMITED_OFFSET]\n    )",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_p2_inventory_rounding_uses_bounded_nextafter_correction",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  },
+  {
+    "file": "particula/gpu/kernels/tests/nucleation_test.py",
+    "test": "test_p2_inventory_rounding_raises_exact_failure_after_four_corrections",
+    "original": "def test_p2_inventory_rounding_raises_exact_failure_after_four_corrections(\n    monkeypatch,\n):\n    \"\"\"P2 surfaces the exact inventory-safety failure when correction stalls.\"\"\"\n    particles, gas = _state(particles=0)\n    gas.molar_mass = wp.array([0.1], dtype=wp.float64, device=\"cpu\")\n    gas.concentration = wp.array(\n        np.array([[1.0]], dtype=np.float64),\n        dtype=wp.float64,\n        device=\"cpu\",\n    )\n    scratch, finalized, diagnostics = _sidecars(1, 0, 1)\n\n    original_launch = nucleation_module.wp.launch\n\n    def _launch(kernel, dim=None, inputs=None, device=None):\n        if kernel is nucleation_module._plan_demand_work:\n            monkeypatch.setattr(\n                inputs[-2],\n                \"numpy\",\n                lambda: np.array([0, 1], dtype=np.int32),\n                raising=False,\n            )\n            return None\n        return original_launch(kernel, dim=dim, inputs=inputs, device=device)\n\n    monkeypatch.setattr(nucleation_module.wp, \"launch\", _launch)\n\n    with pytest.raises(\n        ValueError, match=\"Nucleation demand cannot be made inventory-safe.\"\n    ):\n        _plan_nucleation_demand(\n            particles,\n            gas,\n            _config(coefficient=1.0),\n            1.0,\n            temperature=300.0,\n            scratch=scratch,\n            finalized_demand=finalized,\n            diagnostics=diagnostics,\n        )",
+    "successor": "particula/gpu/kernels/tests/nucleation_test.py::test_p2_inventory_rounding_raises_exact_failure_after_four_corrections",
+    "status": "retained; native successor validated",
+    "body_changed": true,
+    "disposition": "Retained scientific, identity, ownership and rejection assertions using explicit native metadata and binding; removed-wrapper guards now assert absence."
+  }
+]

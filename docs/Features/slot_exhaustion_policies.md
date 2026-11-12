@@ -27,9 +27,12 @@ pre-existing number/mass density and gas concentration. This is distinct from
 physical volume evolution, which retains particle counts and dilutes gas.
 The native source consumer supplies explicit ordered species mapping; see
 [native source integration](native_scientific_processes.md#native-source-integration-m4).
-Legacy untagged compatibility remains separate and is not a native construction
-recipe. The two import snippets below require the selected E9 checkout, with
-Warp installed for the GPU imports.
+Direct and prepared GPU exhaustion calls reject untagged, discrete, and PDF
+metadata before payload access. Native source staging requires an explicit
+species binding and carries raw event counts through scaling; final demand
+density is computed from those counts and the current volume. The import
+snippets below require the selected E9 checkout, with Warp installed for GPU
+imports.
 
 ## CPU planning contract
 
@@ -165,8 +168,8 @@ N = \sum w, \qquad M_s = \sum w m_s, \qquad Q = \sum w q.
 Here, $w$ is the dimensionless computational particle weight/count, $m_s$ is
 species mass `[kg]`, and $V$ is box volume `[m^3]`. Thus $N$, $M_s$, and $Q$
 are box totals, while the helper-normalized values $N/V$, $M_s/V$, and $Q/V$
-are their corresponding volume densities. Callers using concentration-valued
-storage must not apply a second volume normalization outside this ledger.
+are their corresponding volume densities. Supported resolved storage contains
+counts; apply volume normalization exactly once when comparing with gas density.
 
 P2 has tolerance-bounded conservation diagnostics. Its radius-cubed,
 mean-radius, surface-area, and Riemer-diversity diagnostics are separate,
