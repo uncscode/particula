@@ -475,3 +475,36 @@ Strict MkDocs exits 0 (`/tmp/m5-p6-process-guides-mkdocs.log`). Inventory now
 records completed quick-start and migration-page snippet work, these two guides,
 and the still-partial foundations-page audit. P6 remains in progress; remaining
 process/API/theory/navigation audits, P7 and final gates are not complete.
+
+### P6 condensation guide checkpoint (2026-11-11)
+
+Migrated all 19 Python fences in the condensation guide to aligned native
+state, explicit mapping and process-owned activity/surface/vapor-pressure
+configuration. Each recipe declares fresh state with its own molar-mass layout;
+two-species selective examples no longer accidentally reuse one-species gas.
+Resolved batching now actually constructs resolved counts at 1e-6 m³. The
+single-material discrete quick start retains the original default two-mode,
+250-bin initializer and 10-second step. Previously undefined recipe fixtures
+use the explicitly documented finite PMF or two-slot resolved illustration.
+Prescribed 1e-3 Pa vapor pressure is an illustrative choice, not calibrated
+species physics. Composed elapsed durations are retained with 0.25-second
+substeps. Added missing required builder/factory units and removed unsupported
+isothermal-factory update_gases input while retaining its True default.
+Builders still demonstrate explicit set_update_gases, including False.
+
+Corrected native latent bookkeeping to extensive J and removed the false claim
+that a numerical radius clamp establishes continuum validity. Ten closed-recipe
+regressions independently sum raw count/bin-weighted particle mass plus gas
+concentration times volume, including selective species and latent energy.
+All Python fences execute, including the optional direct-GPU import. The combined
+process-guide suite reports **18 passed in 5.59s**; scoped Ruff check/format,
+git diff --check and strict MkDocs pass. Render log:
+`/tmp/m5-p6-condensation-guide-mkdocs.log`. Remaining selected-backend prose in
+this guide is explicitly still pending reconciliation; snippets passing is not
+proof of every adjacent claim.
+
+Classified 44 docs/.assets/temp snippet rows as generated exclusions after
+verifying every path is untracked and ignored; .gitignore:14 owns the ignore and
+mkdocs.yml excludes .assets/ from publication. No generated or supported files
+were deleted. P6 remains In Progress, with remaining process/API/theory and
+navigation audits outstanding; P7, final gates and PR creation remain pending.

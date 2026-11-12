@@ -38,7 +38,7 @@ def test_cpu_process_guide_snippets(name):
     assert aerosol.environment is namespace["environment"]
 
 
-@pytest.mark.parametrize("name", ["wall_loss", "coagulation"])
+@pytest.mark.parametrize("name", ["wall_loss", "coagulation", "condensation"])
 def test_optional_process_guide_imports(name):
     """Optional GPU declarations remain valid with Warp installed."""
     pytest.importorskip("warp")
@@ -85,3 +85,65 @@ def test_brownian_quick_start_number_loss():
     # This finite-grid PMF method is not an exact mass-conserving merge.
     assert np.all(np.isfinite(final.species_mass_inventory))
     assert np.all(final.species_mass_inventory > 0)
+
+
+def test_condensation_guide_all_snippets():
+    """Run all CPU recipes, including native factories and composed calls."""
+    page, blocks = snippets("condensation")
+    namespace = {}
+    for block in blocks:
+        if "particula.gpu" not in block:
+            exec(compile(block, str(page), "exec"), namespace)  # noqa: S102
+    aerosol = namespace["aerosol"]
+    assert aerosol.particles.distribution_type == "particle_resolved"
+    assert aerosol.gas.concentration[0, 1] == 1e-6
+    assert 0 <= aerosol.gas.concentration[0, 0] < 1e-6
+
+
+@pytest.mark.parametrize("index", [2, 3, 4, 7, 8, 10, 11, 14, 16, 17])
+def test_condensation_recipe_inventories(index):
+    """Each closed recipe conserves mapped extensive particle-plus-gas mass."""
+    page, blocks = snippets("condensation")
+    namespace = {}
+    exec(compile(blocks[0], str(page), "exec"), namespace)  # noqa: S102
+    prefix, body = blocks[index].split(
+        "particle, gas = aerosol.particles, aerosol.gas\n", 1
+    )
+    exec(compile(prefix, str(page), "exec"), namespace)  # noqa: S102
+    aerosol = namespace["aerosol"]
+    if index == 10:
+        # The discrete quick start deliberately selects the original defaults.
+        aerosol.particles = par.particles.create_lognormal_binned_particle_data(
+            distribution_type="discrete"
+        )
+    particle, gas = aerosol.particles, aerosol.gas
+    namespace.update(particle=particle, gas=gas)
+    initial_particle = np.sum(
+        particle.masses * particle.concentration[..., None], axis=1
+    )
+    initial_gas = gas.concentration.copy() * particle.volume[:, None]
+    exec(compile(body, str(page), "exec"), namespace)  # noqa: S102
+    final = namespace["particle"]
+    final_particle = np.sum(
+        final.masses * final.concentration[..., None], axis=1
+    )
+    np.testing.assert_allclose(
+        final_particle + gas.concentration * final.volume[:, None],
+        initial_particle + initial_gas,
+        rtol=1e-12,
+        atol=1e-30,
+    )
+    assert np.all(final.masses >= 0)
+    assert np.all(gas.concentration >= 0)
+    if index in [7, 17]:
+        np.testing.assert_array_equal(
+            gas.concentration[:, 1] * final.volume,
+            initial_gas[:, 1],
+        )
+    if index == 3:
+        np.testing.assert_allclose(
+            namespace["energy_released"],
+            np.sum(final_particle - initial_particle) * 2.4e6,
+            rtol=1e-10,
+            atol=1e-20,
+        )
