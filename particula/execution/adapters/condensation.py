@@ -11,11 +11,11 @@ enqueue. Frozen fields prevent rebinding only; retained resources remain
 mutable and caller-owned. Native calls may mutate particle masses, gas
 concentration or vapor pressure, and writable sidecars. Callers own resource
 lifetime, synchronization, concurrency, and any post-launch recovery limits.
-Setup preserves legacy validation ordering, normalization, and private fallback
-allocation; prepared enqueue uses retained references only and performs no
-validation, readback, allocation, transfer, synchronization, lookup, rebinding,
-or reset. Rejection is pre-writer; no recovery or rollback is promised after a
-writer-capable failure.
+Setup preserves direct-kernel validation ordering, normalization, and private
+fallback allocation; prepared enqueue uses retained references only and performs
+no validation, readback, allocation, transfer, synchronization, lookup,
+rebinding, or reset. Rejection is pre-writer; no recovery or rollback is
+promised after a writer-capable failure.
 """
 
 from dataclasses import dataclass
@@ -414,10 +414,7 @@ class WarpCondensationState:
         from particula.gpu.population_metadata import particle_distribution_type
         from particula.gpu.species_mapping import CondensationSpeciesBinding
 
-        if particle_distribution_type(self.particles) is None:
-            raise ValueError(
-                "condensation requires explicit population metadata"
-            )
+        particle_distribution_type(self.particles)
         if type(self.species_binding) is not CondensationSpeciesBinding:
             raise ValueError("native condensation requires species_binding")
         self.species_binding.validate(self.particles, self.gas)
@@ -1005,6 +1002,6 @@ def _validate_selected_warp_sidecars(
         )
 
 
-# Short direct-module aliases retain compatibility with the P2 carrier naming.
+# Supported concrete-module short names for the execution adapters.
 CPUCondensationAdapter = CPUCondensationExecutionAdapter
 WarpCondensationAdapter = WarpCondensationExecutionAdapter

@@ -11,8 +11,8 @@ Tagged native calls require an explicit ``CondensationSpeciesBinding``.
 Particle-material arrays retain full composition; gas properties, partitioning,
 limiting reductions and energy outputs retain full gas order. Resolved counts
 use N/V for gas density coupling and raw N for extensive energy. Discrete PMF
-uses stored density and requires V=1. GPU PDF is unsupported. Legacy untagged
-calls retain their existing same-width behavior until their later migration.
+uses stored density and requires V=1. GPU PDF and untagged populations are
+unsupported; both reject before scientific execution.
 
 Entry-point validation accepts scalar direct inputs, explicit ``(n_boxes,)``
 Warp arrays, or a ``WarpEnvironmentData`` container. Aggregate preflight,
@@ -169,7 +169,7 @@ class CondensationScratchBuffers:
     ``(n_boxes, n_particles, n_species)``, property fields have shape
     ``(n_boxes,)``, and P2-only limiting sidecars have shape
     ``(n_boxes, n_gas)``. Native ``n_species`` is particle-material width and
-    ``n_gas`` is complete gas width; legacy calls require equal widths.
+    ``n_gas`` is complete gas width and may differ from material width.
     Fields may be omitted independently; omitted fields are
     step-local fallback allocations, while successful calls preserve every
     supplied object's identity. Transfer roles are deliberately separate: work
@@ -312,8 +312,8 @@ def validate_condensation_scratch_buffers(
         dimensions: Expected ``(n_boxes, n_particles, n_species)`` dimensions.
         device: Active Warp device required for supplied fields.
         caller_name: Entry-point name included in validation errors.
-        gas_species_count: Full gas width for native reduction buffers; omitted
-            for legacy callers whose gas and particle widths match.
+        gas_species_count: Full gas width for reduction buffers. Omitting it
+            validates an explicitly equal-width scratch layout.
 
     Returns:
         The original validated ``CondensationScratchBuffers`` object.
@@ -383,7 +383,7 @@ def validate_condensation_activity_surface_config(
 
     Args:
         activity_surface: Candidate frozen sidecar to validate.
-        n_species: Number of particle material species (also gas for legacy).
+        n_species: Number of particle material species.
         device: Active Warp device for all sidecar arrays.
         gas_molar_mass: Ordered caller-owned gas molar-mass array.
         caller_name: Entry-point name used in validation errors.
@@ -1441,7 +1441,7 @@ def _validate_mass_transfer_ownership(
     mass_transfer: Any,
     state_arrays: tuple[Any, ...],
 ) -> None:
-    """Reject a legacy total-transfer output that aliases condensation state."""
+    """Reject a total-transfer output that aliases condensation state."""
     if np.prod(mass_transfer.shape, dtype=np.int64) == 0:
         return
     output_start, output_end = _warp_array_memory_range(mass_transfer)
@@ -2157,7 +2157,7 @@ def _prepare_condensation_step_gpu(  # noqa: C901
             activity only for ``water_species_index``; non-water species retain
             unit activity. Static tension uses the current condensing-species
             index, while weighted tension uses one particle-wide value. ``None``
-            retains legacy unit activity and species-indexed static tension.
+            uses unit activity and material-indexed static tension.
         scratch_buffers: Optional frozen caller-owned buffers. Supplied
             transfer fields have shape ``(n_boxes, n_particles, n_species)``;
             supplied property fields have shape ``(n_boxes,)``. Every supplied
@@ -2192,7 +2192,8 @@ def _prepare_condensation_step_gpu(  # noqa: C901
             carriers. Native transport/thermal arrays and reductions use full
             gas width; activity/surface arrays and transfers use material width.
             Native energy weights applied transfers by counts (density times
-            unit volume for PMF). Legacy untagged calls omit this binding.
+            unit volume for PMF). Untagged calls reject; this binding is
+            required.
 
     Returns:
         Private prepared call retaining validated inputs, resolved device
@@ -2270,12 +2271,12 @@ def _prepare_condensation_step_gpu(  # noqa: C901
         cast device-side to float64 for refresh.
 
         A supplied work and/or total scratch transfer field conflicts with
-        ``mass_transfer`` because they overlap its legacy output role; a
+        ``mass_transfer`` because they overlap its total-transfer output role; a
         property-only sidecar can be used with ``mass_transfer``. The resolved
         total buffer is cleared once and returned by identity when supplied.
         Work is separate from total so it can retain the final gated raw
         proposal.
-        With no scratch transfer fields, legacy ``mass_transfer`` remains the
+        With no scratch transfer fields, ``mass_transfer`` remains the
         returned total by identity.
 
         Thermodynamic metadata and production calculations stay device-resident.
@@ -2664,7 +2665,7 @@ def _prepare_condensation_step_gpu(  # noqa: C901
         work_mass_transfer = scratch_buffers_value.work_mass_transfer
         total_mass_transfer = scratch_buffers_value.total_mass_transfer
     elif mass_transfer is not None:
-        # The legacy output is the accumulated total, so proposals need private
+        # The direct output is the accumulated total, so proposals need private
         # step-local storage rather than overwriting the caller's total buffer.
         work_mass_transfer = None
         total_mass_transfer = mass_transfer

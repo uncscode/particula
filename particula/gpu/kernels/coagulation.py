@@ -2277,8 +2277,8 @@ def _prepare_coagulation_step_gpu(  # noqa: C901
     explicit volume must equal the particle container's positive physical
     volume. All native writers must be disjoint from each other and protected
     inputs. These read-only checks may allocate private flags and synchronize
-    during preparation; frozen enqueue adds no validation or host work. Legacy
-    untagged callers retain their previous mechanism-specific behavior.
+    during preparation; frozen enqueue adds no validation or host work.
+    Untagged populations reject before execution.
 
     Args:
         particles: Caller-owned, Warp-resident particle data. All required Warp
@@ -2437,9 +2437,8 @@ def _prepare_coagulation_step_gpu(  # noqa: C901
         masses and concentrations, finite/positive density, its bounded active
         count, and finite charge before time-step or environment normalization.
         The active bound caps its exact compact-active O(A²) majorant at 32,640
-        pairs per box. Legacy untagged Brownian validates charge only with
-        ``validate_charge_finite=True`` and otherwise avoids this scan,
-        allocation, synchronization, and host readback.
+        pairs per box. Native population admission requires finite charge for
+        every supported mechanism, including Brownian execution.
 
         Exact SP2016 sedimentation read-only-validates finite charge,
         finite/nonnegative masses and concentrations, finite/positive density,

@@ -423,7 +423,7 @@ def _validate_particle_values(particles: Any) -> None:
 
 
 def _validate_particles(particles: Any) -> tuple[int, Any]:
-    """Validate fixed particle metadata and values in legacy P3 order."""
+    """Validate fixed particle metadata and values in the declared order."""
     n_boxes, device = _validate_particle_schema(particles)
     _validate_particle_values(particles)
     return n_boxes, device
