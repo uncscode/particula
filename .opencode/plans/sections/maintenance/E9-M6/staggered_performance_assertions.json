@@ -1,0 +1,65 @@
+[
+  {
+    "file": "particula/dynamics/condensation/tests/staggered_performance_test.py",
+    "test": "test_staggered_condensation_smoke",
+    "original": "def test_staggered_condensation_smoke():\n    \"\"\"Smoke test for staggered condensation basic functionality.\n\n    This fast test verifies that the CondensationIsothermalStaggered strategy:\n    - Can be instantiated with valid parameters\n    - Executes a step without errors\n    - Returns valid particle and gas objects\n\n    Uses minimal particle count (10 particles) for fast execution (<1s).\n    Not marked slow/performance so it runs in CI/CD.\n    \"\"\"\n    n_particles = 10\n    seed = 42\n    molar_mass = 0.018\n    temperature_k = 298.0\n    pressure_pa = 101325.0\n    time_step = 0.0001\n\n    # Create minimal test system\n    rng = np.random.default_rng(seed)\n    masses = rng.lognormal(mean=-20.0, sigma=0.5, size=(n_particles, 1))\n\n    vapor_strategy = VaporPressureFactory().get_strategy(\n        \"constant\",\n        {\"vapor_pressure\": pressure_pa, \"vapor_pressure_units\": \"Pa\"},\n    )\n\n    distribution_strategy = ParticleResolvedSpeciatedMassBuilder().build()\n    particle = (\n        ResolvedParticleMassRepresentationBuilder()\n        .set_distribution_strategy(distribution_strategy)\n        .set_activity_strategy(ActivityIdealMass())\n        .set_surface_strategy(\n            SurfaceStrategyVolume(surface_tension=0.072, density=1000.0)\n        )\n        .set_mass(masses, \"kg\")\n        .set_density(np.full_like(masses, 1000.0), \"kg/m^3\")\n        .set_charge(np.zeros_like(masses))\n        .set_volume(1.0, \"m^3\")\n        .build()\n    )\n\n    gas_species = (\n        GasSpeciesBuilder()\n        .set_name(\"water\")\n        .set_molar_mass(molar_mass, \"kg/mol\")\n        .set_vapor_pressure_strategy(vapor_strategy)\n        .set_partitioning(True)\n        .set_concentration(0.01, \"kg/m^3\")\n        .build()\n    )\n\n    # Create staggered condensation strategy\n    staggered = CondensationIsothermalStaggered(\n        molar_mass=molar_mass,\n        theta_mode=\"random\",\n        num_batches=2,\n        random_state=seed,\n        shuffle_each_step=True,\n    )\n\n    # Execute one step - this should complete without errors\n    updated_particle, updated_gas = staggered.step(\n        particle,\n        gas_species,\n        temperature_k,\n        pressure_pa,\n        time_step=time_step,\n    )\n\n    # Verify outputs are valid\n    assert updated_particle is not None, \"Particle should not be None\"\n    assert updated_gas is not None, \"Gas should not be None\"\n    assert updated_particle.get_mass().shape[0] == n_particles, (\n        \"Particle count should be preserved\"\n    )",
+    "successor": "test_staggered_condensation_smoke",
+    "disposition": "Native tagged resolved fixtures and process-owned physics; original particle sizes, repetitions, timing/scaling thresholds, seeds and assertions retained."
+  },
+  {
+    "file": "particula/dynamics/condensation/tests/staggered_performance_test.py",
+    "test": "test_performance_1k_particles",
+    "original": "def test_performance_1k_particles() -> None:\n    \"\"\"Report timing for 1k particles (informational benchmark).\"\"\"\n    _run_timing_report(1000)",
+    "successor": "test_performance_1k_particles",
+    "disposition": "Native tagged resolved fixtures and process-owned physics; original particle sizes, repetitions, timing/scaling thresholds, seeds and assertions retained."
+  },
+  {
+    "file": "particula/dynamics/condensation/tests/staggered_performance_test.py",
+    "test": "test_performance_10k_particles",
+    "original": "def test_performance_10k_particles() -> None:\n    \"\"\"Report timing for 10k particles (informational benchmark).\"\"\"\n    _run_timing_report(10000)",
+    "successor": "test_performance_10k_particles",
+    "disposition": "Native tagged resolved fixtures and process-owned physics; original particle sizes, repetitions, timing/scaling thresholds, seeds and assertions retained."
+  },
+  {
+    "file": "particula/dynamics/condensation/tests/staggered_performance_test.py",
+    "test": "test_performance_100k_particles",
+    "original": "def test_performance_100k_particles() -> None:\n    \"\"\"Report timing for 100k particles (informational benchmark).\"\"\"\n    _run_timing_report(100000)",
+    "successor": "test_performance_100k_particles",
+    "disposition": "Native tagged resolved fixtures and process-owned physics; original particle sizes, repetitions, timing/scaling thresholds, seeds and assertions retained."
+  },
+  {
+    "file": "particula/dynamics/condensation/tests/staggered_performance_test.py",
+    "test": "test_performance_scaling_is_linear",
+    "original": "def test_performance_scaling_is_linear() -> None:\n    \"\"\"Verify staggered algorithm scales O(n) with particle count.\n\n    The staggered algorithm should scale linearly with particle count.\n    We measure timing at 1k, 10k, and 100k particles and verify that\n    the scaling factor is approximately 10x for each 10x increase.\n    \"\"\"\n    timings = {}\n    for n in N_PARTICLES:\n        timings[n] = _time_staggered_only(n)\n        print(f\"Staggered timing {n} particles: {timings[n]:.3f}s\")\n\n    # Check scaling from 1k to 10k (should be ~10x, allow up to 15x)\n    scaling_1k_to_10k = timings[10000] / timings[1000]\n    print(f\"Scaling 1k->10k: {scaling_1k_to_10k:.1f}x (expected ~10x)\")\n\n    # Check scaling from 10k to 100k (should be ~10x, allow up to 15x)\n    scaling_10k_to_100k = timings[100000] / timings[10000]\n    print(f\"Scaling 10k->100k: {scaling_10k_to_100k:.1f}x (expected ~10x)\")\n\n    # Allow generous tolerance for O(n) scaling\n    # Superlinear scaling (>15x per 10x particles) indicates regression\n    assert scaling_1k_to_10k <= SCALING_TOLERANCE, (\n        f\"Scaling 1k->10k is {scaling_1k_to_10k:.1f}x, \"\n        f\"exceeds {SCALING_TOLERANCE}x (expected ~10x for O(n) scaling)\"\n    )\n    assert scaling_10k_to_100k <= SCALING_TOLERANCE, (\n        f\"Scaling 10k->100k is {scaling_10k_to_100k:.1f}x, \"\n        f\"exceeds {SCALING_TOLERANCE}x (expected ~10x for O(n) scaling)\"\n    )",
+    "successor": "test_performance_scaling_is_linear",
+    "disposition": "Native tagged resolved fixtures and process-owned physics; original particle sizes, repetitions, timing/scaling thresholds, seeds and assertions retained."
+  },
+  {
+    "file": "particula/dynamics/condensation/tests/staggered_performance_test.py",
+    "test": "test_performance_mode_comparison",
+    "original": "def test_performance_mode_comparison() -> None:\n    \"\"\"Compare half/random/batch timings and keep them within a narrow band.\"\"\"\n    n_particles = 10000\n    mode_durations: dict[str, float] = {}\n    for mode in (\"half\", \"random\", \"batch\"):\n        duration = _run_theta_mode(n_particles, mode)\n        mode_durations[mode] = duration\n        print(\n            f\"Theta mode {mode}: {duration:.3f}s over \"\n            f\"{ITERATIONS[n_particles]} iterations\"\n        )\n\n    fastest = min(mode_durations.values())\n    slowest = max(mode_durations.values())\n    # Guard against zero-duration measurements\n    assert fastest >= 0.0\n    if fastest == 0.0:\n        pytest.skip(\n            \"Theta-mode timings are all zero; \"\n            \"timing resolution too low to compare modes.\"\n        )\n    ratio = slowest / fastest\n    print(f\"Theta-mode ratio (slowest/fastest): {ratio:.2f}x\")\n    # Allow 2.6x tolerance to account for:\n    # - batch mode potentially faster due to reduced gas update overhead\n    # - system load variations during benchmarks\n    assert ratio <= 2.6, (\n        f\"Theta-mode timings drifted beyond the 2.6x band ({ratio:.2f}x)\"\n    )",
+    "successor": "test_performance_mode_comparison",
+    "disposition": "Native tagged resolved fixtures and process-owned physics; original particle sizes, repetitions, timing/scaling thresholds, seeds and assertions retained."
+  },
+  {
+    "file": "particula/dynamics/condensation/tests/staggered_performance_test.py",
+    "test": "test_performance_vs_simultaneous",
+    "original": "def test_performance_vs_simultaneous() -> None:\n    \"\"\"Report overhead comparison between staggered and simultaneous.\n\n    This test reports the overhead ratio but does NOT enforce a target.\n    The staggered algorithm uses Gauss-Seidel style per-particle updates\n    which are inherently slower than the vectorized simultaneous approach.\n    High overhead ratios (100x-1000x+) are expected and acceptable.\n    \"\"\"\n    baseline_time, staggered_time, overhead = _run_timing_report(10000)\n\n    # Report only - no assertion on overhead target\n    # The algorithms are fundamentally different\n    print(\n        f\"Note: Overhead {overhead:.1f}x is expected - staggered uses \"\n        \"sequential per-particle updates while simultaneous is vectorized.\"\n    )\n\n    # Basic sanity: both should complete in reasonable time\n    assert baseline_time < 60.0, \"Baseline took too long (>60s)\"\n    assert staggered_time < 300.0, \"Staggered took too long (>300s)\"",
+    "successor": "test_performance_vs_simultaneous",
+    "disposition": "Native tagged resolved fixtures and process-owned physics; original particle sizes, repetitions, timing/scaling thresholds, seeds and assertions retained."
+  },
+  {
+    "file": "particula/dynamics/condensation/tests/staggered_performance_test.py",
+    "test": "test_create_test_system_is_deterministic",
+    "original": "def test_create_test_system_is_deterministic() -> None:\n    \"\"\"Factory recreates identical masses and concentrations for same seed.\"\"\"\n    particle_a, gas_a = create_test_system(1000, seed=SEED)\n    particle_b, gas_b = create_test_system(1000, seed=SEED)\n\n    assert np.array_equal(particle_a.get_mass(), particle_b.get_mass())\n    assert np.array_equal(\n        np.asarray(gas_a.get_concentration()),\n        np.asarray(gas_b.get_concentration()),\n    )",
+    "successor": "test_create_test_system_is_deterministic",
+    "disposition": "Native tagged resolved fixtures and process-owned physics; original particle sizes, repetitions, timing/scaling thresholds, seeds and assertions retained."
+  },
+  {
+    "file": "particula/dynamics/condensation/tests/staggered_performance_test.py",
+    "test": "test_invalid_num_batches_or_n_particles_raises_value_error",
+    "original": "def test_invalid_num_batches_or_n_particles_raises_value_error() -> None:\n    \"\"\"Guardrails enforce positive particle counts and batch sizes.\"\"\"\n    with pytest.raises(ValueError):\n        create_test_system(0)\n    with pytest.raises(ValueError):\n        _validate_num_batches(0)\n    with pytest.raises(ValueError):\n        _validate_num_batches(-4)",
+    "successor": "test_invalid_num_batches_or_n_particles_raises_value_error",
+    "disposition": "Native tagged resolved fixtures and process-owned physics; original particle sizes, repetitions, timing/scaling thresholds, seeds and assertions retained."
+  }
+]

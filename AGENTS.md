@@ -66,10 +66,11 @@ mkdocs build --strict
 .opencode/tools/run_pytest.py      # Run tests with validation
 .opencode/tools/run_linters.py     # Run linters following CI workflow
 ```
-Performance benchmarks verify O(n) scaling at 1k/10k/100k particles, theta-mode
-comparisons (half/random/batch), and deterministic seeds. Note: staggered uses
-Gauss-Seidel per-particle loops (sequential), so high overhead vs simultaneous
-(vectorized) is expected and not enforced as a target.
+Performance benchmarks check scaling ratios at 1k/10k/100k particles, theta-mode
+comparisons (half/random/batch), and deterministic seeds. Native staggered
+stepping evaluates arrays within each batch while successive batches read the
+updated gas inventory. Relative overhead is workload- and machine-specific;
+no overhead target or universal performance claim is enforced.
 
 The resident collection is CUDA/native-capture-only, with no CPU or Warp-CPU
 fallback. Its source of record is

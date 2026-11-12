@@ -2379,7 +2379,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Migrated to native tagged resolved fixtures with explicit process physics and species map; original scientific thresholds and workloads retained. See staggered_*_assertions.json.",
       "test_nodes": [
         {
           "name": "test_mass_conservation_single_step",
@@ -2450,7 +2450,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Migrated to native tagged resolved fixtures with explicit process physics and species map; original scientific thresholds and workloads retained. See staggered_*_assertions.json.",
       "test_nodes": [
         {
           "name": "test_staggered_condensation_smoke",
@@ -2515,7 +2515,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Migrated to native tagged resolved fixtures with explicit process physics and species map; original scientific thresholds and workloads retained. See staggered_*_assertions.json.",
       "test_nodes": [
         {
           "name": "test_stability_large_time_step",
