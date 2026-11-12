@@ -86,3 +86,23 @@ Logs are `/tmp/m5-ci-release.log`, `/tmp/m5-ci-examples-final.log` and
 `/tmp/m5-ci-infra.log`. Hosted rerun outcomes are separate from this local
 validation; the earlier failing CI did not invalidate the recorded local runs,
 but demonstrated why a clean environment is necessary.
+
+## PR review corrections — 2026-11-11
+
+- Two duplicate installed-release findings were already fixed by `b829a9779`;
+  hosted conda-feedstock run 43133704775 is now successful.
+- Added the missing code-cell delimiter before the equilibrium RH-sweep
+  assertions, synchronized the pair and executed the full notebook. All five
+  assertions ran in code cell 6; no error outputs remain, and the refreshed
+  plot was inspected. Notebook runner passed in 3.98s.
+- Both standalone Warp teaching examples now pass the storage device explicitly
+  to their forward launch. Their numerical regressions reject omitted launch
+  devices on CPU-only hosts as well, so default-device selection cannot hide
+  this regression. No CUDA execution is claimed.
+- Focused theory, activity/equilibrium, exact quick-start, package quick-start
+  and chemistry tests: **28 passed, 4 optional skips in 2.48s** under the clean
+  source environment with warnings treated as errors. The chemistry tests also
+  verify the narrow warning correction from the preceding CI fix.
+- Scoped Ruff check/format and `git diff --check` passed. Strict MkDocs passed
+  in 1.41s. Logs: `/tmp/m5-review-notebook.log`, `/tmp/m5-review-tests.log`, and
+  `/tmp/m5-review-mkdocs.log`.

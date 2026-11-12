@@ -130,13 +130,25 @@ def test_equilibrium_theory_species_balance():
     )
 
 
-def test_warp_theory_quick_start(tmp_path):
+def require_explicit_launch_device(monkeypatch, wp):
+    """Reject implicit device selection even when only Warp CPU is available."""
+    launch = wp.launch
+
+    def checked_launch(*args, **kwargs):
+        assert kwargs.get("device") is not None
+        return launch(*args, **kwargs)
+
+    monkeypatch.setattr(wp, "launch", checked_launch)
+
+
+def test_warp_theory_quick_start(tmp_path, monkeypatch):
     """The exact file-backed Warp primer runs explicitly on its CPU backend."""
     import runpy
 
     import pytest
 
     wp = pytest.importorskip("warp")
+    require_explicit_launch_device(monkeypatch, wp)
     page = ROOT / "docs/Theory/nvidia-warp/index.md"
     blocks = re.findall(r"```python\n(.*?)\n```", page.read_text(), re.DOTALL)
     source = tmp_path / "warp_primer.py"
@@ -175,13 +187,14 @@ def test_warp_theory_native_environment_round_trip():
     )
 
 
-def test_warp_roadmap_toy_gradient(tmp_path):
+def test_warp_roadmap_toy_gradient(tmp_path, monkeypatch):
     """The teaching Tape example differentiates its quadratic on Warp CPU."""
     import runpy
 
     import pytest
 
-    pytest.importorskip("warp")
+    wp = pytest.importorskip("warp")
+    require_explicit_launch_device(monkeypatch, wp)
     page = ROOT / "docs/Features/Roadmap/warp-autodiff-limitations.md"
     blocks = re.findall(r"```python\n(.*?)\n```", page.read_text(), re.DOTALL)
     source = tmp_path / "warp_tape_example.py"

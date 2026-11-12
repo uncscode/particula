@@ -71,7 +71,7 @@ y = wp.zeros_like(x)
 
 tape = wp.Tape()
 with tape:                                   # forward pass, recorded
-    wp.launch(kernel_func, x.shape, inputs=[x], outputs=[y])
+    wp.launch(kernel_func, x.shape, inputs=[x], outputs=[y], device=x.device)
 
 tape.backward(grads={y: wp.ones_like(y)})    # reverse pass
 gradient = x.grad.numpy().copy()
