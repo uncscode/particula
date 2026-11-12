@@ -28,13 +28,13 @@ class GasSpeciesFactory(
     Methods:
         - get_builders : Return a dictionary of builder objects.
         - get_strategy : Construct and return a GasSpecies object with the
-          chosen builder.
+            chosen builder.
 
     Returns:
-        - GasSpecies : A gas species instance from the specified builder.
+        result (GasSpecies): A gas species instance from the specified builder.
 
     Raises:
-        - ValueError : If an unknown strategy type is provided.
+        ValueError: If an unknown strategy type is provided.
 
     Examples:
         ```py title="Create a preset gas species using the factory"
@@ -64,8 +64,8 @@ class GasSpeciesFactory(
         """Return a mapping of strategy types to builder instances.
 
         Returns:
-            - dict[str, Union[GasSpeciesBuilder, PresetGasSpeciesBuilder]] :
-              A dictionary where:
+            result (dict): Available builders.
+                A dictionary where:
                 * "gas_species" -> GasSpeciesBuilder
                 * "preset_gas_species" -> PresetGasSpeciesBuilder
 

@@ -73,8 +73,8 @@ class ActivityIdealMassBuilder(BuilderABC):
         """Validate and return an ActivityIdealMass strategy instance.
 
         Returns:
-            - ActivityIdealMass : The validated strategy for
-              ideal mass-based activity calculations.
+            ActivityIdealMass: The validated strategy for
+                ideal mass-based activity calculations.
 
         Examples:
             ```py title="Build Method Example"
@@ -95,7 +95,7 @@ class ActivityIdealMolarBuilder(BuilderABC, BuilderMolarMassMixin):
     of mole fraction.
 
     Attributes:
-        - molar_mass : Molar mass for each species, in kilograms per mole.
+        molar_mass: Molar mass for each species, in kilograms per mole.
 
     Methods:
         - set_molar_mass: Assigns the molar masses (with unit
@@ -136,7 +136,7 @@ class ActivityIdealMolarBuilder(BuilderABC, BuilderMolarMassMixin):
         Ensures molar_mass is properly configured before building.
 
         Returns:
-            - ActivityIdealMolar : An ideal strategy based on mole fractions.
+            ActivityIdealMolar: An ideal strategy based on mole fractions.
 
         Examples:
             ```py title="Build Method Example"
@@ -170,10 +170,10 @@ class ActivityKappaParameterBuilder(
     behavior. The optional water_index identifies which species is water.
 
     Attributes:
-        - kappa : NDArray of kappa parameters for each species.
-        - density : NDArray of densities, in kilograms per cubic meter.
-        - molar_mass : NDArray of molar masses, in kilograms per mole.
-        - water_index : Integer index of the water species.
+        kappa: NDArray of kappa parameters for each species.
+        density: NDArray of densities, in kilograms per cubic meter.
+        molar_mass: NDArray of molar masses, in kilograms per mole.
+        water_index: Integer index of the water species.
 
     Methods:
         - set_kappa: Assigns kappa values (must be nonnegative).
@@ -265,8 +265,8 @@ class ActivityKappaParameterBuilder(
         """Validate parameters and build ActivityKappaParameter strategy.
 
         Returns:
-            - ActivityKappaParameter : The non-ideal activity strategy
-              utilizing the kappa hygroscopic parameter.
+            ActivityKappaParameter: The non-ideal activity strategy
+                utilizing the kappa hygroscopic parameter.
 
         Examples:
             ```py title="Build Method Example"

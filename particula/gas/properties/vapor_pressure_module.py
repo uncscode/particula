@@ -33,14 +33,14 @@ def get_antoine_vapor_pressure(
         - a, b, c is Antoine equation parameters (dimensionless).
         - T is Temperature [K].
 
-    Arguments:
-        - a : Antoine parameter a (dimensionless).
-        - b : Antoine parameter b (dimensionless).
-        - c : Antoine parameter c (dimensionless).
-        - temperature : Temperature in Kelvin [K].
+    Args:
+        a: Antoine parameter a (dimensionless).
+        b: Antoine parameter b (dimensionless).
+        c: Antoine parameter c (dimensionless).
+        temperature: Temperature in Kelvin [K].
 
     Returns:
-        - Vapor pressure in Pascals [Pa].
+        Vapor pressure in Pascals [Pa].
 
     Examples:
         ```py title="Example usage"
@@ -90,15 +90,15 @@ def get_clausius_clapeyron_vapor_pressure(
         - T_initial is Initial temperature [K].
         - T_final is Final temperature [K].
 
-    Arguments:
-        - latent_heat : Latent heat of vaporization [J/mol].
-        - temperature_initial : Initial temperature [K].
-        - pressure_initial : Initial vapor pressure [Pa].
-        - temperature : Final temperature [K].
-        - gas_constant : Gas constant (default 8.314 J/(mol·K)).
+    Args:
+        latent_heat: Latent heat of vaporization [J/mol].
+        temperature_initial: Initial temperature [K].
+        pressure_initial: Initial vapor pressure [Pa].
+        temperature: Final temperature [K].
+        gas_constant: Gas constant (default 8.314 J/(mol·K)).
 
     Returns:
-        - Pure vapor pressure [Pa].
+        Pure vapor pressure [Pa].
 
     Examples:
         ```py title="Example usage"
@@ -138,11 +138,11 @@ def get_buck_vapor_pressure(
         - p is Vapor pressure [Pa].
         - T is Temperature in Celsius [°C] (converted internally from Kelvin).
 
-    Arguments:
-        - temperature : Temperature in Kelvin [K].
+    Args:
+        temperature: Temperature in Kelvin [K].
 
     Returns:
-        - Vapor pressure in Pascals [Pa].
+        Vapor pressure in Pascals [Pa].
 
     Examples:
         ```py title="Example usage"

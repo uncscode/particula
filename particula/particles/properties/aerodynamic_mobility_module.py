@@ -34,13 +34,13 @@ def get_aerodynamic_mobility(
         - μ is the dynamic viscosity of the fluid (Pa·s).
         - r is the radius of the particle (m).
 
-    Arguments:
-        - particle_radius : The radius of the particle in meters.
-        - slip_correction_factor : Slip correction factor (dimensionless).
-        - dynamic_viscosity : Dynamic viscosity of the fluid in Pa·s.
+    Args:
+        particle_radius: The radius of the particle in meters.
+        slip_correction_factor: Slip correction factor (dimensionless).
+        dynamic_viscosity: Dynamic viscosity of the fluid in Pa·s.
 
     Returns:
-        - The particle aerodynamic mobility in m²/s.
+        The particle aerodynamic mobility in m²/s.
 
     Examples:
         ``` py title="Example"

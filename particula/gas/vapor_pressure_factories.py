@@ -49,9 +49,6 @@ class VaporPressureFactory(
     commissioning the appropriate builder. It is useful for scenarios requiring
     a flexible way to switch or extend vapor pressure calculation methods.
 
-    Attributes:
-        - None
-
     Methods:
     - get_builders : Returns the mapping of strategy types to builder
       instances.
@@ -79,7 +76,7 @@ class VaporPressureFactory(
         """Return a dictionary mapping strategy types to builder instances.
 
         Returns:
-            dict:
+            result (dict): Available builders.
                 - "constant": ConstantVaporPressureBuilder
                 - "antoine": AntoineVaporPressureBuilder
                 - "clausius_clapeyron": ClausiusClapeyronVaporPressureBuilder

@@ -275,14 +275,14 @@ class CondensationStrategy(ABC):
     condensation algorithms based on different physical models and equations.
 
     Attributes:
-        - molar_mass : The molar mass of the species [kg/mol].
-        - diffusion_coefficient : The diffusion coefficient [m^2/s].
-        - accommodation_coefficient : The mass accommodation coefficient
-          (unitless).
-        - update_gases : Whether to update gas concentrations after
-          condensation.
-        - skip_partitioning_indices : Optional list of indices for species
-          that should not partition during condensation (default is None).
+        molar_mass: The molar mass of the species [kg/mol].
+        diffusion_coefficient: The diffusion coefficient [m^2/s].
+        accommodation_coefficient: The mass accommodation coefficient
+            (unitless).
+        update_gases: Whether to update gas concentrations after
+            condensation.
+        skip_partitioning_indices: Optional list of indices for species
+            that should not partition during condensation (default is None).
 
     Methods:
     - mean_free_path : Calculate the mean free path of the gas molecules.
@@ -717,10 +717,10 @@ class CondensationStrategy(ABC):
         """Calculate the mean free path of the gas molecules based on the
         temperature, pressure, and dynamic viscosity of the gas.
 
-        Arguments:
-            - temperature : The temperature of the gas [K].
-            - pressure : The pressure of the gas [Pa].
-            - dynamic_viscosity : The dynamic viscosity of the gas [Pa*s]. If
+        Args:
+            temperature: The temperature of the gas [K].
+            pressure: The pressure of the gas [Pa].
+            dynamic_viscosity: The dynamic viscosity of the gas [Pa*s]. If
                 not provided, it will be calculated based on the temperature
 
         Returns:
@@ -756,11 +756,11 @@ class CondensationStrategy(ABC):
         Calculate the Knudsen number based on the mean free path of the gas
         molecules and the radius of the particle.
 
-        Arguments:
-            - radius : The radius of the particle [m].
-            - temperature : The temperature of the gas [K].
-            - pressure : The pressure of the gas [Pa].
-            - dynamic_viscosity : The dynamic viscosity of the gas [Pa*s]. If
+        Args:
+            radius: The radius of the particle [m].
+            temperature: The temperature of the gas [K].
+            pressure: The pressure of the gas [Pa].
+            dynamic_viscosity: The dynamic viscosity of the gas [Pa*s]. If
                 not provided, it will be calculated based on the temperature
 
         Returns:
@@ -800,12 +800,12 @@ class CondensationStrategy(ABC):
         particle based on the diffusion coefficient, radius, and vapor
         transition correction factor.
 
-        Arguments:
-            - radius : The radius of the particle [m].
-            - temperature : The temperature at which the first-order mass
+        Args:
+            particle_radius: The radius of the particle [m].
+            temperature: The temperature at which the first-order mass
                 transport coefficient is to be calculated.
-            - pressure : The pressure of the gas phase.
-            - dynamic_viscosity : The dynamic viscosity of the gas [Pa*s]. If
+            pressure: The pressure of the gas phase.
+            dynamic_viscosity: The dynamic viscosity of the gas [Pa*s]. If
                 not provided, it will be calculated based on the temperature
 
         Returns:
@@ -849,14 +849,14 @@ class CondensationStrategy(ABC):
         value of zero will ensure that the rate of condensation is zero. The
         fill is necessary to avoid division by zero in the array operations.
 
-        Arguments:
-            - radius : The radius of the particles.
+        Args:
+            radius: The radius of the particles.
 
         Returns:
-            - radius : The radius of the particles with zero values filled.
+            radius: The radius of the particles with zero values filled.
 
         Raises:
-            - Warning : If all radius values are zero.
+            Warning: If all radius values are zero.
 
         Examples:
             ```py title="Example – Fill zero radii"
@@ -885,17 +885,17 @@ class CondensationStrategy(ABC):
         """Calculate the difference in partial pressure between the gas and
         particle phases.
 
-        Arguments:
-            - particle : The particle (representation or data container) for
+        Args:
+            particle: The particle (representation or data container) for
                 which the partial pressure difference is to be calculated.
-            - gas_species : The gas species (facade or data container) in
+            gas_species: The gas species (facade or data container) in
                 contact with the particle.
-            - temperature : The temperature at which the partial pressure
+            temperature: The temperature at which the partial pressure
                 difference is to be calculated.
-            - radius : The radius of the particles.
+            radius: The radius of the particles.
 
         Returns:
-            - partial_pressure_delta : The difference in partial pressure
+            partial_pressure_delta: The difference in partial pressure
                 between the gas and particle phases.
 
         Examples:
@@ -1020,12 +1020,12 @@ class CondensationStrategy(ABC):
         """Zero-out entries for species indices that are configured NOT to
         partition/condense.
 
-        Arguments:
-            - array : 1-D or 2-D array whose elements correspond to gas-species
-              order used by this strategy.
+        Args:
+            array: 1-D or 2-D array whose elements correspond to gas-species
+                order used by this strategy.
 
         Returns:
-            - Same array object with the chosen columns / elements set to zero.
+            Same array object with the chosen columns / elements set to zero.
 
         Examples:
             ```py title="Example – Skip selected species"
@@ -1079,16 +1079,16 @@ class CondensationStrategy(ABC):
         - R is the gas constant,
         - T is temperature in Kelvin.
 
-        Arguments:
-            - particle : The particle representation, providing radius,
-              concentration, etc.
-            - gas_species : The gas species condensing onto the particles.
-            - temperature : System temperature [K].
-            - pressure : System pressure [Pa].
-            - dynamic_viscosity : Optional dynamic viscosity [Pa*s].
+        Args:
+            particle: The particle representation, providing radius,
+                concentration, etc.
+            gas_species: The gas species condensing onto the particles.
+            temperature: System temperature [K].
+            pressure: System pressure [Pa].
+            dynamic_viscosity: Optional dynamic viscosity [Pa*s].
 
         Returns:
-            - Mass transfer rate [kg/s] for each particle.
+            Mass transfer rate [kg/s] for each particle.
 
         Examples:
             ```py title="Example Usage of mass_transfer_rate"
@@ -1113,12 +1113,12 @@ class CondensationStrategy(ABC):
         return each node's contribution to the population mass-density rate.
         Temporary legacy inputs retain their historical concentration scaling.
 
-        Arguments:
-            - particle : ParticleRepresentation object with distribution and
-              concentration.
-            - gas_species : GasSpecies object for the condensing gas.
-            - temperature : The absolute temperature in Kelvin.
-            - pressure : The pressure in Pascals.
+        Args:
+            particle: ParticleRepresentation object with distribution and
+                concentration.
+            gas_species: GasSpecies object for the condensing gas.
+            temperature: The absolute temperature in Kelvin.
+            pressure: The pressure in Pascals.
 
         Returns:
             Per-node, per-species contributions in kg/m^3/s for native data.
@@ -1147,16 +1147,16 @@ class CondensationStrategy(ABC):
         both the particle mass and the gas concentration
         (if update_gases=True).
 
-        Arguments:
-            - particle : The particle representation to update.
-            - gas_species : The gas species whose concentration is reduced.
-            - temperature : System temperature [K].
-            - pressure : System pressure [Pa].
-            - time_step : The time interval for condensation [s].
+        Args:
+            particle: The particle representation to update.
+            gas_species: The gas species whose concentration is reduced.
+            temperature: System temperature [K].
+            pressure: System pressure [Pa].
+            time_step: The time interval for condensation [s].
 
         Returns:
-            - Updated ParticleRepresentation.
-            - Updated GasSpecies.
+            Updated ParticleRepresentation.
+            Updated GasSpecies.
 
         Examples:
             ```py
@@ -1177,14 +1177,14 @@ class CondensationIsothermal(CondensationStrategy):
     no latent heat terms.
 
     Attributes:
-        - Inherits attributes from the base CondensationStrategy:
-          molar_mass, diffusion_coefficient, etc.
+        Inherits attributes from the base CondensationStrategy:
+            molar_mass, diffusion_coefficient, etc.
 
     Methods:
         - mass_transfer_rate : Calculate the mass transfer rate under
-          isothermal conditions.
+            isothermal conditions.
         - rate : Get the per-particle condensation rate, accounting for
-          concentration.
+            concentration.
         - step : Advance the condensation state over a given time step.
 
     Examples:

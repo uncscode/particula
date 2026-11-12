@@ -39,13 +39,14 @@ def get_friction_factor(
         - r is the radius of the particle (m),
         - C is the slip correction factor (dimensionless).
 
-    Arguments:
-        - particle_radius : Radius of the particle in meters (m).
-        - dynamic_viscosity : Dynamic viscosity of the fluid in Pa·s.
-        - slip_correction : Slip correction factor (dimensionless).
+    Args:
+        particle_radius: Radius of the particle in meters (m).
+        dynamic_viscosity: Dynamic viscosity of the fluid in Pa·s.
+        slip_correction: Slip correction factor (dimensionless).
 
     Returns:
-        - The friction factor of the particle in N·s/m.
+        result (float | NDArray[np.float64]): The friction factor of the
+            particle in N·s/m.
 
     Examples:
         ``` py title="Example"

@@ -29,13 +29,13 @@ def get_solute_volume_from_kappa(
       where F depends on kappa and water activity (aw), ensuring that
       for aw → 0, V_solute → V_total.
 
-    Arguments:
-        - volume_total : Volume of the total solution (float or NDArray).
-        - kappa : Kappa parameter (float or NDArray).
-        - water_activity : Water activity (float or NDArray, 0 < aw ≤ 1).
+    Args:
+        volume_total: Volume of the total solution (float or NDArray).
+        kappa: Kappa parameter (float or NDArray).
+        water_activity: Water activity (float or NDArray, 0 < aw ≤ 1).
 
     Returns:
-        - Solute volume (float or NDArray).
+        Solute volume (float or NDArray).
 
     Examples:
         ``` py  title="Example Usage"
@@ -72,13 +72,13 @@ def get_water_volume_from_kappa(
     - V_water = V_solute × ( κ / (1/aw - 1) ), ensuring that for aw → 0,
       V_water → 0.
 
-    Arguments:
-        - volume_solute : Volume of solute (float or NDArray).
-        - kappa : Kappa parameter (float or NDArray).
-        - water_activity : Water activity (float or NDArray, 0 < aw ≤ 1).
+    Args:
+        volume_solute: Volume of solute (float or NDArray).
+        kappa: Kappa parameter (float or NDArray).
+        water_activity: Water activity (float or NDArray, 0 < aw ≤ 1).
 
     Returns:
-        - Water volume (float or NDArray).
+        Water volume (float or NDArray).
 
     Examples:
         ``` py title="Example Usage"
@@ -113,13 +113,13 @@ def get_kappa_from_volumes(
     Rearranging κ-Köhler-based relationships, we have:
     - κ = ( (1/aw) - 1 ) × (V_water / V_solute).
 
-    Arguments:
-        - volume_solute : Solute volume (float or NDArray).
-        - volume_water : Water volume (float or NDArray).
-        - water_activity : Water activity (float or NDArray, 0 < aw ≤ 1).
+    Args:
+        volume_solute: Solute volume (float or NDArray).
+        volume_water: Water volume (float or NDArray).
+        water_activity: Water activity (float or NDArray, 0 < aw ≤ 1).
 
     Returns:
-        - The kappa parameter (float or NDArray).
+        The kappa parameter (float or NDArray).
 
     Examples:
         ``` py
@@ -153,13 +153,13 @@ def get_water_volume_in_mixture(
     - V_water = (φ_water × V_solute_dry) / (1 - φ_water)
         - φ_water is the water volume fraction.
 
-    Arguments:
-        - volume_solute_dry : Volume of the solute (float), excluding water.
-        - volume_fraction_water : Fraction of water volume in the total mixture
-          (float, 0 ≤ φ_water < 1).
+    Args:
+        volume_solute_dry: Volume of the solute (float), excluding water.
+        volume_fraction_water: Fraction of water volume in the total mixture
+            (float, 0 ≤ φ_water < 1).
 
     Returns:
-        - The water volume (float), in the same units as volume_solute_dry.
+        The water volume (float), in the same units as volume_solute_dry.
 
     Examples:
         ``` py title="Example Usage"

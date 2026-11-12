@@ -20,15 +20,15 @@ def get_chemical_vapor_pressure(
         - Pₛₐₜ is saturation-vapor pressure in Pascals (Pa),
         - T is temperature in Kelvin.
 
-    Arguments:
-        - chemical_identifier : Identifier accepted by
-          ``thermo.chemical.Chemical`` (name, CAS number, or formula).
-        - temperature : Temperature(s) in Kelvin. May be a scalar or a NumPy
-          array.
+    Args:
+        chemical_identifier: Identifier accepted by
+            ``thermo.chemical.Chemical`` (name, CAS number, or formula).
+        temperature: Temperature(s) in Kelvin. May be a scalar or a NumPy
+            array.
 
     Returns:
-        - Saturation-vapor pressure(s) in Pascals (Pa). For a scalar
-          temperature, a 0-d NumPy array is returned for consistency.
+        Saturation-vapor pressure(s) in Pascals (Pa). For a scalar
+            temperature, a 0-d NumPy array is returned for consistency.
 
     Examples:
         ``` py title="Example Usage – scalar input"

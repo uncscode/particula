@@ -161,7 +161,7 @@ class ChargedWallLossBuilder(
             chamber_geometry: ``"spherical"`` or ``"rectangular"``.
 
         Returns:
-            ChargedWallLossBuilder: Self for method chaining.
+            result (ChargedWallLossBuilder): This instance for method chaining.
 
         Raises:
             ValueError: If ``chamber_geometry`` is not supported.
@@ -184,7 +184,7 @@ class ChargedWallLossBuilder(
                 optional ``*_units`` keys.
 
         Returns:
-            ChargedWallLossBuilder: Self for method chaining.
+            result (ChargedWallLossBuilder): This instance for method chaining.
 
         Raises:
             ValueError: If required keys are missing or unexpected keys are

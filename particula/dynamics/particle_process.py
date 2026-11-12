@@ -646,8 +646,8 @@ class MassCondensation(RunnableABC):
     subclass.
 
     Attributes:
-        - condensation_strategy : The condensation strategy used for mass
-          transfer calculations.
+        condensation_strategy: The condensation strategy used for mass
+            transfer calculations.
 
     Methods:
     - execute : Perform the mass condensation over a specified time step.
@@ -672,12 +672,12 @@ class MassCondensation(RunnableABC):
     def __init__(self, condensation_strategy: CondensationStrategy):
         """Initialize the MassCondensation process.
 
-        Arguments:
-            - condensation_strategy : The condensation strategy to use,
-              responsible for calculating mass transfer.
+        Args:
+            condensation_strategy: The condensation strategy to use,
+                responsible for calculating mass transfer.
 
         Returns:
-            - None
+            result (None): No return value.
         """
         self.condensation_strategy = condensation_strategy
 
@@ -689,13 +689,13 @@ class MassCondensation(RunnableABC):
     ) -> _AerosolT:
         """Perform the mass condensation process over a given time step.
 
-        Arguments:
-            - aerosol : The Aerosol instance to modify.
-            - time_step : The total time interval for condensation.
-            - sub_steps : Number of subdivisions for iterative calculation.
+        Args:
+            aerosol: The Aerosol instance to modify.
+            time_step: The total time interval for condensation.
+            sub_steps: Number of subdivisions for iterative calculation.
 
         Returns:
-            - The updated aerosol object after condensation.
+            The updated aerosol object after condensation.
 
         Examples:
             ```py title="Example Condensation Execution"
@@ -739,12 +739,12 @@ class MassCondensation(RunnableABC):
     def rate(self, aerosol: Aerosol | LegacyAerosol) -> Any:
         """Compute mass condensation rates for each particle.
 
-        Arguments:
-            - aerosol : The Aerosol instance containing particles and gases.
+        Args:
+            aerosol: The Aerosol instance containing particles and gases.
 
         Returns:
-            - An array of condensation rates for each particle,
-              in units of mass per unit time.
+            An array of condensation rates for each particle,
+                in units of mass per unit time.
 
         Examples:
             ```py title="Rate Calculation Example"
@@ -778,8 +778,8 @@ class Coagulation(RunnableABC):
     the chosen physical model.
 
     Attributes:
-        - coagulation_strategy : The coagulation strategy used for particle
-          collision calculations.
+        coagulation_strategy: The coagulation strategy used for particle
+            collision calculations.
 
     Methods:
     - execute : Perform the coagulation step over a given time interval.
@@ -804,9 +804,9 @@ class Coagulation(RunnableABC):
     def __init__(self, coagulation_strategy: CoagulationStrategyABC):
         """Initialize the Coagulation process.
 
-        Arguments:
-            - coagulation_strategy : The coagulation strategy to use,
-              describing how particles collide and combine.
+        Args:
+            coagulation_strategy: The coagulation strategy to use,
+                describing how particles collide and combine.
         """
         self.coagulation_strategy = coagulation_strategy
 
@@ -818,14 +818,14 @@ class Coagulation(RunnableABC):
     ) -> _AerosolT:
         """Perform the coagulation process over a given time step.
 
-        Arguments:
-            - aerosol : The Aerosol instance to modify.
-            - time_step : The total time interval for coagulation.
-            - sub_steps : Number of internal subdivisions for iterative
-              calculation.
+        Args:
+            aerosol: The Aerosol instance to modify.
+            time_step: The total time interval for coagulation.
+            sub_steps: Number of internal subdivisions for iterative
+                calculation.
 
         Returns:
-            - Aerosol : The updated aerosol object after the coagulation step.
+            Aerosol: The updated aerosol object after the coagulation step.
 
         Examples:
             ```py title="Example Coagulation Execution"
@@ -866,12 +866,12 @@ class Coagulation(RunnableABC):
     def rate(self, aerosol: Aerosol | LegacyAerosol) -> Any:
         """Compute the coagulation rate for each particle in the aerosol.
 
-        Arguments:
-            - aerosol : The Aerosol instance containing particles.
+        Args:
+            aerosol: The Aerosol instance containing particles.
 
         Returns:
-            - np.ndarray : An array of coagulation rates for each particle,
-              in units related to particle collisions per unit time.
+            np.ndarray: An array of coagulation rates for each particle,
+                in units related to particle collisions per unit time.
 
         Examples:
             ```py title="Coagulation Rate Calculation Example"

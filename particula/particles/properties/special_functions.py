@@ -27,15 +27,15 @@ def get_debye_function(
         - x is a dimensionless variable.
         - n is the exponent (default is 1).
 
-    Arguments:
-        - variable : Upper limit of integration; can be float or NDArray.
-        - integration_points : Number of points for numerical integration
-          (default 1000).
-        - n : Exponent in the Debye function formula (default 1).
+    Args:
+        variable: Upper limit of integration; can be float or NDArray.
+        integration_points: Number of points for numerical integration
+            (default 1000).
+        n: Exponent in the Debye function formula (default 1).
 
     Returns:
-        - Debye function value(s). If the input is a float, returns a float.
-          If the input is an array, returns an array of the same shape.
+        Debye function value(s). If the input is a float, returns a float.
+            If the input is an array, returns an array of the same shape.
 
     Examples:
         ``` py title="Debye function with n=1 for a single float value"

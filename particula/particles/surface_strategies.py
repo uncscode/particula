@@ -113,17 +113,18 @@ def _weighted_average_by_phase(
     For every unique entry in `phase_index` the weighted-average is
     computed and broadcast back onto all members of that phase.
 
-    Arguments:
-        - values : Array of values, shape (n_bins, n_species) or (n_species,)
-        - weights : Array of weights corresponding to each species, shape
-          (n_species,) **or** (n_bins, n_species).  A 1-D array is broadcast
-          across the n_bins axis.
-        - phase_index : Array indicating the phase index for each species,
-          shape (n_species,).
+    Args:
+        values: Array of values, shape (n_bins, n_species) or (n_species,)
+        weights: Array of weights corresponding to each species, shape
+            (n_species,) **or** (n_bins, n_species).  A 1-D array is broadcast
+            across the n_bins axis.
+        phase_index: Array indicating the phase index for each species,
+            shape (n_species,).
 
     Returns:
-        - averaged : Array of averaged values, same shape as *values* input.
-          If the weight sum for a bin/phase is zero the arithmetic mean is used.
+        averaged: Array of averaged values, same shape as *values* input.
+            If the weight sum for a bin/phase is zero, the arithmetic mean
+            is used.
     """
     # --- normalise shapes -------------------------------------------------
     values, return_1d = _as_2d(np.asarray(values, dtype=np.float64))
@@ -203,12 +204,12 @@ class SurfaceStrategy(ABC):
     ) -> Union[float, NDArray[np.float64]]:
         """Calculate the effective surface tension of the species mixture.
 
-        Arguments:
-            - mass_concentration : Concentration of the species in kg/m^3.
-            - temperature : Optional temperature dependence in K.
+        Args:
+            mass_concentration: Concentration of the species in kg/m^3.
+            temperature: Optional temperature dependence in K.
 
         Returns:
-            - Effective surface tension in N/m.
+            Effective surface tension in N/m.
         """
 
     @abstractmethod
@@ -216,7 +217,7 @@ class SurfaceStrategy(ABC):
         """Get density of the species mixture.
 
         Returns:
-            - density in kg/m^3.
+            density in kg/m^3.
         """
 
     def get_name(self) -> str:
@@ -232,13 +233,13 @@ class SurfaceStrategy(ABC):
         """Calculate the Kelvin radius, which sets the curvature effect on vapor
         pressure.
 
-        Arguments:
-            - molar_mass : Molar mass of the species in kg/mol.
-            - mass_concentration : Concentration of the species in kg/m^3.
-            - temperature : Temperature of the system in K.
+        Args:
+            molar_mass: Molar mass of the species in kg/mol.
+            mass_concentration: Concentration of the species in kg/m^3.
+            temperature: Temperature of the system in K.
 
         Returns:
-            - Kelvin radius in meters.
+            Kelvin radius in meters.
 
         References:
             - r = 2 × surface_tension × molar_mass / (R × T × density)
@@ -260,14 +261,14 @@ class SurfaceStrategy(ABC):
     ) -> Union[float, NDArray[np.float64]]:
         """Calculate the exponential Kelvin term that adjusts vapor pressure.
 
-        Arguments:
-            - radius : Particle radius in meters.
-            - molar_mass : Molar mass of the species in kg/mol.
-            - mass_concentration : Concentration of the species in kg/m^3.
-            - temperature : Temperature of the system in K.
+        Args:
+            radius: Particle radius in meters.
+            molar_mass: Molar mass of the species in kg/mol.
+            mass_concentration: Concentration of the species in kg/m^3.
+            temperature: Temperature of the system in K.
 
         Returns:
-            - Factor by which vapor pressure is increased.
+            Factor by which vapor pressure is increased.
 
         References:
             - P_eff = P_sat × exp(kelvin_radius / particle_radius)
@@ -285,8 +286,8 @@ class SurfaceStrategy(ABC):
         it interpolates the surface tension value for the specified
         temperature.
 
-        Arguments:
-            - temperature : Temperature in K to update the surface tension.
+        Args:
+            temperature: Temperature in K to update the surface tension.
         """
         if self.surface_tension_table is None or self.temperature_table is None:
             return
@@ -306,16 +307,16 @@ class SurfaceStrategyMolar(SurfaceStrategy):
     """Surface tension and density based on mole-fraction weighting.
 
     Attributes:
-        - surface_tension : Surface tension array or scalar in N/m.
-        - density : Density array or scalar in kg/m^3.
-        - molar_mass : Molar mass array or scalar in kg/mol.
-        - phase_index : Optional array indicating phase indices for species.
-          For example, [0, 1, 1] for two phases, where the first species
-          belongs to phase 0 and the next two to phase 1.
-        - surface_tension_table : Optional 2D array for temperature-dependent
-          surface tension values.
-        - temperature_table : Optional 1D array for temperature values
-          corresponding to the surface tension table.
+        surface_tension: Surface tension array or scalar in N/m.
+        density: Density array or scalar in kg/m^3.
+        molar_mass: Molar mass array or scalar in kg/mol.
+        phase_index: Optional array indicating phase indices for species.
+            For example, [0, 1, 1] for two phases, where the first species
+            belongs to phase 0 and the next two to phase 1.
+        surface_tension_table: Optional 2D array for temperature-dependent
+            surface tension values.
+        temperature_table: Optional 1D array for temperature values
+            corresponding to the surface tension table.
 
     References:
         - [Mole Fraction](https://en.wikipedia.org/wiki/Mole_fraction)
@@ -386,11 +387,11 @@ class SurfaceStrategyMass(SurfaceStrategy):
     """Surface tension and density based on mass-fraction weighting.
 
     Attributes:
-        - surface_tension : Surface tension array or scalar in N/m.
-        - density : Density array or scalar in kg/m^3.
-        - phase_index : Optional array indicating phase indices for species.
-          Example: [0, 1, 1] → three species in two phases (first in phase 0,
-          last two in phase 1).
+        surface_tension: Surface tension array or scalar in N/m.
+        density: Density array or scalar in kg/m^3.
+        phase_index: Optional array indicating phase indices for species.
+            Example: [0, 1, 1] → three species in two phases (first in phase 0,
+            last two in phase 1).
 
     References:
     - [Mass Fraction](https://en.wikipedia.org/wiki/Mass_fraction_(chemistry))
@@ -456,11 +457,11 @@ class SurfaceStrategyVolume(SurfaceStrategy):
     """Surface tension and density based on volume-fraction weighting.
 
     Attributes:
-        - surface_tension : Surface tension array or scalar in N/m.
-        - density : Density array or scalar in kg/m^3.
-        - phase_index : Optional array indicating phase indices for species.
-          Example: [0, 1, 1] → three species in two phases (first in phase 0,
-          last two in phase 1).
+        surface_tension: Surface tension array or scalar in N/m.
+        density: Density array or scalar in kg/m^3.
+        phase_index: Optional array indicating phase indices for species.
+            Example: [0, 1, 1] → three species in two phases (first in phase 0,
+            last two in phase 1).
 
     References:
         - [Volume Fraction](https://en.wikipedia.org/wiki/Volume_fraction)

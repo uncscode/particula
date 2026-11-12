@@ -34,14 +34,14 @@ class TurbulentDNSCoagulationStrategy(CoagulationStrategyABC):
     coagulation of particles larger than 1 µm in turbulent flow fields.
 
     Attributes:
-        - distribution_type : The particle distribution type ("discrete",
-          "continuous_pdf", or "particle_resolved").
-        - turbulent_dissipation : Turbulent kinetic energy dissipation
-          [m^2/s^3] used in DNS fits (examples: 0.001, 0.01, 0.04).
-        - fluid_density : The fluid (air) density [kg/m^3].
-        - reynolds_lambda : Reynolds lambda of air (e.g., 23 or 74).
-        - relative_velocity : Relative velocity of the air [m/s] for
-          collisions.
+        distribution_type: The particle distribution type ("discrete",
+            "continuous_pdf", or "particle_resolved").
+        turbulent_dissipation: Turbulent kinetic energy dissipation
+            [m^2/s^3] used in DNS fits (examples: 0.001, 0.01, 0.04).
+        fluid_density: The fluid (air) density [kg/m^3].
+        reynolds_lambda: Reynolds lambda of air (e.g., 23 or 74).
+        relative_velocity: Relative velocity of the air [m/s] for
+            collisions.
 
     Methods:
     - set_turbulent_dissipation : Change turbulent dissipation rate.
@@ -88,18 +88,18 @@ class TurbulentDNSCoagulationStrategy(CoagulationStrategyABC):
         # pylint: disable=too-many-arguments, too-many-positional-arguments
         """Initialize the TurbulentDNSCoagulationStrategy.
 
-        Arguments:
-            - distribution_type : The distribution type ("discrete",
-              "continuous_pdf", or "particle_resolved").
-            - turbulent_dissipation : Turbulent kinetic energy dissipation
-              [m^2/s^3].
-            - fluid_density : The fluid density [kg/m^3].
-            - reynolds_lambda : Reynolds lambda or characteristic Reynolds
-              number.
-            - relative_velocity : Relative velocity of the flow [m/s].
+        Args:
+            distribution_type: The distribution type ("discrete",
+                "continuous_pdf", or "particle_resolved").
+            turbulent_dissipation: Turbulent kinetic energy dissipation
+                [m^2/s^3].
+            fluid_density: The fluid density [kg/m^3].
+            reynolds_lambda: Reynolds lambda or characteristic Reynolds
+                number.
+            relative_velocity: Relative velocity of the flow [m/s].
 
         Returns:
-            - None
+            result (None): No return value.
         """
         super().__init__(distribution_type=distribution_type)
         self.turbulent_dissipation = turbulent_dissipation
@@ -110,11 +110,12 @@ class TurbulentDNSCoagulationStrategy(CoagulationStrategyABC):
     def set_turbulent_dissipation(self, turbulent_dissipation: float):
         """Set the turbulent kinetic energy dissipation rate.
 
-        Arguments:
-            - turbulent_dissipation : Turbulent dissipation [m^2/s^3].
+        Args:
+            turbulent_dissipation: Turbulent dissipation [m^2/s^3].
 
         Returns:
-            - TurbulentDNSCoagulationStrategy : Self, allowing method chaining.
+            result (TurbulentDNSCoagulationStrategy): This instance for method
+                chaining.
 
         Examples:
             ```py
@@ -127,11 +128,12 @@ class TurbulentDNSCoagulationStrategy(CoagulationStrategyABC):
     def set_reynolds_lambda(self, reynolds_lambda: float):
         """Set the Reynolds lambda value.
 
-        Arguments:
-            - reynolds_lambda : Reynolds lambda [dimensionless].
+        Args:
+            reynolds_lambda: Reynolds lambda [dimensionless].
 
         Returns:
-            - TurbulentDNSCoagulationStrategy : Self, for method chaining.
+            result (TurbulentDNSCoagulationStrategy): This instance for method
+                chaining.
 
         Examples:
             ```py
@@ -144,11 +146,12 @@ class TurbulentDNSCoagulationStrategy(CoagulationStrategyABC):
     def set_relative_velocity(self, relative_velocity: float):
         """Set the relative velocity of the flow [m/s].
 
-        Arguments:
-            - relative_velocity : Relative velocity in [m/s].
+        Args:
+            relative_velocity: Relative velocity in [m/s].
 
         Returns:
-            - TurbulentDNSCoagulationStrategy : Self, for method chaining.
+            result (TurbulentDNSCoagulationStrategy): This instance for method
+                chaining.
 
         Examples:
             ```py
@@ -168,18 +171,18 @@ class TurbulentDNSCoagulationStrategy(CoagulationStrategyABC):
         Not implemented for DNS-based approaches, so raises
         NotImplementedError.
 
-        Arguments:
-            - diffusive_knudsen : The diffusive Knudsen number(s)
-              [dimensionless].
-            - coulomb_potential_ratio : The Coulomb potential ratio(s)
-              [dimensionless].
+        Args:
+            diffusive_knudsen: The diffusive Knudsen number(s)
+                [dimensionless].
+            coulomb_potential_ratio: The Coulomb potential ratio(s)
+                [dimensionless].
 
         Returns:
-            - None : Raises NotImplementedError instead.
+            None: Raises NotImplementedError instead.
 
         Raises:
-            - NotImplementedError : This strategy does not support
-            dimensionless kernels.
+            NotImplementedError: This strategy does not support
+                dimensionless kernels.
         """
         message = (
             "The dimensionless kernel is not implemented for "
@@ -202,15 +205,15 @@ class TurbulentDNSCoagulationStrategy(CoagulationStrategyABC):
         accounts for turbulent dissipation, fluid density, Reynolds lambda,
         and relative velocity.
 
-        Arguments:
-            - particle : The particle data whose radii and density
-              are needed.
-            - temperature : The temperature of the system [K].
-            - pressure : The system pressure [Pa] (unused here, but included
-              for interface consistency).
+        Args:
+            particle: The particle data whose radii and density
+                are needed.
+            temperature: The temperature of the system [K].
+            pressure: The system pressure [Pa] (unused here, but included
+                for interface consistency).
 
         Returns:
-            - The DNS-based coagulation kernel(s).
+            The DNS-based coagulation kernel(s).
 
         Examples:
             ```py

@@ -22,11 +22,11 @@ def get_cunningham_slip_correction(
     - C_c = 1 + Kn × (1.257 + 0.4 × exp(-1.1 / Kn))
         - Kn is the dimensionless Knudsen number.
 
-    Arguments:
-        - knudsen_number : Knudsen number (dimensionless).
+    Args:
+        knudsen_number: Knudsen number (dimensionless).
 
     Returns:
-        - Slip correction factor (dimensionless).
+        Slip correction factor (dimensionless).
 
     Examples:
         ``` py title="Example"

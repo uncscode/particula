@@ -29,11 +29,11 @@ def get_collision_radius_mg1988(
 
     - R_c = R_g
 
-    Arguments:
-        - gyration_radius : Radius of gyration of the particle (m).
+    Args:
+        gyration_radius: Radius of gyration of the particle (m).
 
     Returns:
-        - Collision radius of the particle (m).
+        Collision radius of the particle (m).
 
     Examples:
         ``` py title="Example"
@@ -70,13 +70,13 @@ def get_collision_radius_sr1992(
         - d_f is the fractal dimension (dimensionless).
         - R_g is the radius of gyration (m).
 
-    Arguments:
-        - gyration_radius : Radius of gyration of the particle (m).
-        - fractal_dimension : Fractal dimension of the particle
+    Args:
+        gyration_radius: Radius of gyration of the particle (m).
+        fractal_dimension: Fractal dimension of the particle
             (dimensionless).
 
     Returns:
-        - Collision radius of the particle (m).
+        Collision radius of the particle (m).
 
     Examples:
         ``` py title="Example"
@@ -113,12 +113,12 @@ def get_collision_radius_mzg2002(
         - k₀ is the fractal prefactor (dimensionless).
         - R_g is the radius of gyration (m).
 
-    Arguments:
-        - gyration_radius : Radius of gyration of the particle (m).
-        - fractal_prefactor : Fractal prefactor of particle (dimensionless).
+    Args:
+        gyration_radius: Radius of gyration of the particle (m).
+        fractal_prefactor: Fractal prefactor of particle (dimensionless).
 
     Returns:
-        - Collision radius of the particle (m).
+        Collision radius of the particle (m).
 
     Examples:
         ``` py title="Example"
@@ -159,14 +159,14 @@ def get_collision_radius_tt2012(
 
     - R_c = (radius_s_ii) / 2
 
-    Arguments:
-        - fractal_dimension : Fractal dimension of the particle (dimensionless).
-        - number_of_particles : Number of monomers in the aggregate.
-        - gyration_radius : Radius of gyration of the particle (m).
-        - radius_monomer : Radius of the monomer (m).
+    Args:
+        fractal_dimension: Fractal dimension of the particle (dimensionless).
+        number_of_particles: Number of monomers in the aggregate.
+        gyration_radius: Radius of gyration of the particle (m).
+        radius_monomer: Radius of the monomer (m).
 
     Returns:
-        - Collision radius of the particle (m).
+        Collision radius of the particle (m).
 
     Examples:
         ``` py title="Example"
@@ -214,12 +214,12 @@ def get_collision_radius_wq2022_rg(
         - rₘ is the monomer radius (m).
         - A, B are empirical coefficients from Qian et al. (2022).
 
-    Arguments:
-        - gyration_radius : Radius of gyration of the particle (m).
-        - radius_monomer : Monomer radius (m).
+    Args:
+        gyration_radius: Radius of gyration of the particle (m).
+        radius_monomer: Monomer radius (m).
 
     Returns:
-        - Collision radius of the particle (m).
+        Collision radius of the particle (m).
 
     Examples:
         ``` py title="Example"
@@ -264,13 +264,13 @@ def get_collision_radius_wq2022_rg_df(
         - rₘ is the monomer radius (m).
         - A, B, C are empirical coefficients from Qian et al. (2022).
 
-    Arguments:
-        - fractal_dimension : Fractal dimension of particle (dimensionless).
-        - gyration_radius : Radius of gyration of the particle (m).
-        - radius_monomer : Monomer radius (m).
+    Args:
+        fractal_dimension: Fractal dimension of particle (dimensionless).
+        gyration_radius: Radius of gyration of the particle (m).
+        radius_monomer: Monomer radius (m).
 
     Returns:
-        - Collision radius of the particle (m).
+        Collision radius of the particle (m).
 
     Examples:
         ``` py title="Example"
@@ -322,14 +322,14 @@ def get_collision_radius_wq2022_rg_df_k0(
         - rₘ is the monomer radius (m).
         - A, B, C, D, E are empirical coefficients from Qian et al. (2022).
 
-    Arguments:
-        - fractal_dimension : Fractal dimension of particle (dimensionless).
-        - fractal_prefactor : Fractal prefactor of particle (dimensionless).
-        - gyration_radius : Radius of gyration (m).
-        - radius_monomer : Monomer radius (m).
+    Args:
+        fractal_dimension: Fractal dimension of particle (dimensionless).
+        fractal_prefactor: Fractal prefactor of particle (dimensionless).
+        gyration_radius: Radius of gyration (m).
+        radius_monomer: Monomer radius (m).
 
     Returns:
-        - Collision radius of the particle (m).
+        Collision radius of the particle (m).
 
     Examples:
         ``` py title="Example"
@@ -386,15 +386,15 @@ def get_collision_radius_wq2022_rg_df_k0_a13(
         - rₘ is the monomer radius (m).
         - A, B, C, D, E, F are empirical coefficients from Qian et al. (2022).
 
-    Arguments:
-        - fractal_dimension : Fractal dimension of particle (dimensionless).
-        - fractal_prefactor : Fractal prefactor of particle (dimensionless).
-        - shape_anisotropy : Shape anisotropy parameter (dimensionless, A₁₃).
-        - gyration_radius : Radius of gyration (m).
-        - radius_monomer : Monomer radius (m).
+    Args:
+        fractal_dimension: Fractal dimension of particle (dimensionless).
+        fractal_prefactor: Fractal prefactor of particle (dimensionless).
+        shape_anisotropy: Shape anisotropy parameter (dimensionless, A₁₃).
+        gyration_radius: Radius of gyration (m).
+        radius_monomer: Monomer radius (m).
 
     Returns:
-        - Collision radius of the particle (m).
+        Collision radius of the particle (m).
 
     Examples:
         ``` py title="Example"

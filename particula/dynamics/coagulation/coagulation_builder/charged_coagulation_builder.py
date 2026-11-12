@@ -36,10 +36,10 @@ class ChargedCoagulationBuilder(
     parameters for modeling electrostatic interactions in aerosol coagulation.
 
     Attributes:
-        - distribution_type : Distribution representation
-          ("discrete", "continuous_pdf", or "particle_resolved").
-        - charged_kernel_strategy : Instance of `ChargedKernelStrategyABC`
-          for electrostatic kernel calculations.
+        distribution_type: Distribution representation
+            ("discrete", "continuous_pdf", or "particle_resolved").
+        charged_kernel_strategy: Instance of `ChargedKernelStrategyABC`
+            for electrostatic kernel calculations.
 
     Methods:
     - set_distribution_type : Set the distribution type.
@@ -84,15 +84,15 @@ class ChargedCoagulationBuilder(
     ):
         """Set the charged kernel strategy for electrostatic coagulation.
 
-        Arguments:
-            - charged_kernel_strategy : An instance of
-              `ChargedKernelStrategyABC`.
-            - charged_kernel_strategy_units : For interface consistency,
-              unused.
+        Args:
+            charged_kernel_strategy: An instance of
+                `ChargedKernelStrategyABC`.
+            charged_kernel_strategy_units: For interface consistency,
+                unused.
 
         Raises:
-            - ValueError : If the kernel strategy is invalid or units passed
-              are unsupported.
+            ValueError: If the kernel strategy is invalid or units passed
+                are unsupported.
         """
         # check type
         if not isinstance(charged_kernel_strategy, ChargedKernelStrategyABC):
@@ -119,8 +119,8 @@ class ChargedCoagulationBuilder(
         before creating a `ChargedCoagulationStrategy`.
 
         Returns:
-            - CoagulationStrategyABC : The properly configured
-              charged coagulation strategy.
+            CoagulationStrategyABC: The properly configured
+                charged coagulation strategy.
 
         Examples:
             ```py title="Example of using ChargedCoagulationBuilder build"

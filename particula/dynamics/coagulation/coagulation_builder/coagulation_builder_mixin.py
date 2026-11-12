@@ -28,8 +28,8 @@ class BuilderDistributionTypeMixin:
     strategies. Ensures the chosen `distribution_type` is valid.
 
     Attributes:
-        - distribution_type : Stores the selected distribution type
-          (e.g., "discrete", "continuous_pdf", "particle_resolved").
+        distribution_type: Stores the selected distribution type
+            (e.g., "discrete", "continuous_pdf", "particle_resolved").
 
     Methods:
     - set_distribution_type : Set and validate the distribution type.
@@ -57,12 +57,13 @@ class BuilderDistributionTypeMixin:
         """Set the distribution type.
 
         Args:
-            distribution_type : The distribution type to be set.
+            distribution_type: The distribution type to be set.
                 Options are "discrete", "continuous_pdf", "particle_resolved".
-            distribution_type_units : Not used.
+            distribution_type_units: Not used.
 
         Returns:
-            - The instance of the class with the updated
+            result (BuilderDistributionTypeMixin): This instance for method
+                chaining.
                 distribution_type attribute.
 
         Raises:
@@ -101,8 +102,8 @@ class BuilderUseDirectKernelMixin:
     """Mixin class for direct kernel evaluation in coagulation strategies.
 
     Attributes:
-        - use_direct_kernel : Whether to compute particle-resolved kernels
-          directly instead of using interpolation.
+        use_direct_kernel: Whether to compute particle-resolved kernels
+            directly instead of using interpolation.
 
     Methods:
     - set_use_direct_kernel : Set the direct kernel evaluation flag.
@@ -120,7 +121,8 @@ class BuilderUseDirectKernelMixin:
                 particle-resolved coagulation.
 
         Returns:
-            The instance with the updated ``use_direct_kernel`` value.
+            result (BuilderUseDirectKernelMixin): This instance for method
+                chaining.
 
         Raises:
             ValueError: If value is not a boolean.
@@ -140,8 +142,8 @@ class BuilderTurbulentDissipationMixin:
     turbulent dissipation parameters in coagulation strategies.
 
     Attributes:
-        - turbulent_dissipation : Numeric value of the energy dissipation
-          rate in m^2/s^3 (default units).
+        turbulent_dissipation: Numeric value of the energy dissipation
+            rate in m^2/s^3 (default units).
 
     Methods:
     - set_turbulent_dissipation : Set and validate the turbulent
@@ -168,13 +170,14 @@ class BuilderTurbulentDissipationMixin:
     ):
         """Set the turbulent dissipation rate.
 
-        Arguments:
-            turbulent_dissipation : Turbulent dissipation rate.
-            turbulent_dissipation_units : Units of the turbulent dissipation
+        Args:
+            turbulent_dissipation: Turbulent dissipation rate.
+            turbulent_dissipation_units: Units of the turbulent dissipation
                 rate. Default is *m^2/s^3*.
 
         Returns:
-            - The instance of the class with the updated
+            result (BuilderTurbulentDissipationMixin): This instance for method
+                chaining.
                 turbulent_dissipation attribute.
 
         Raises:
@@ -204,8 +207,8 @@ class BuilderFluidDensityMixin:
     density in coagulation strategies.
 
     Attributes:
-        - fluid_density : Numeric value representing fluid density
-          in kg/m^3 (default units).
+        fluid_density: Numeric value representing fluid density
+            in kg/m^3 (default units).
 
     Methods:
     - set_fluid_density : Set and validate the fluid density.
@@ -231,12 +234,13 @@ class BuilderFluidDensityMixin:
     ):
         """Set the density of the particle in kg/m^3.
 
-        Arguments:
-            density : Density of the particle.
-            density_units : Units of the density. Default is *kg/m^3*
+        Args:
+            fluid_density: Density of the fluid.
+            fluid_density_units: Units of the density. Default is *kg/m^3*
 
         Returns:
-            - The instance of the class with the updated
+            result (BuilderFluidDensityMixin): This instance for method
+                chaining.
                 fluid_density attribute.
 
         Raises:

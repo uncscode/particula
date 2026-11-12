@@ -29,13 +29,13 @@ def get_particle_reynolds_number(
         - vₚ is the particle velocity in meters/second (m/s).
         - ν is the kinematic viscosity in square meters/second (m²/s).
 
-    Arguments:
-        - particle_radius : Particle radius (m).
-        - particle_velocity : Particle velocity relative to the fluid (m/s).
-        - kinematic_viscosity : Kinematic viscosity of the fluid (m²/s).
+    Args:
+        particle_radius: Particle radius (m).
+        particle_velocity: Particle velocity relative to the fluid (m/s).
+        kinematic_viscosity: Kinematic viscosity of the fluid (m²/s).
 
     Returns:
-        - Dimensionless Reynolds number (float or NDArray[np.float64]).
+        Dimensionless Reynolds number (float or NDArray[np.float64]).
 
     Examples:
         ```py title="Example"

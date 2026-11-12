@@ -25,14 +25,14 @@ def get_effective_refractive_index(
     Then the resulting refractive index is:
     - n_eff = (2 × r_eff + 1) / (1 - r_eff).
 
-    Arguments:
-        - m_zero : Refractive index of solute 0 (float or complex).
-        - m_one : Refractive index of solute 1 (float or complex).
-        - volume_zero : Volume of solute 0.
-        - volume_one : Volume of solute 1.
+    Args:
+        m_zero: Refractive index of solute 0 (float or complex).
+        m_one: Refractive index of solute 1 (float or complex).
+        volume_zero: Volume of solute 0.
+        volume_one: Volume of solute 1.
 
     Returns:
-        - Effective refractive index of the mixture (float or complex).
+        Effective refractive index of the mixture (float or complex).
 
     Examples:
         ``` py title="Example"

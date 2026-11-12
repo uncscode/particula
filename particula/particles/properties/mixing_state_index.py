@@ -38,13 +38,13 @@ def get_mixing_state_index(
         - Mₙ is total mass of particle n (Σₛ Mₙₛ)
         - Mₛ is total mass of species s (Σₙ Mₙₛ)
 
-    Arguments:
-        - species_masses : Per-particle species masses (NxS matrix).
-          [kg] where N is the number of particles and S the number of species.
+    Args:
+        species_masses: Per-particle species masses (NxS matrix).
+            [kg] where N is the number of particles and S the number of species.
 
     Returns:
-        - mixing_state_index : Mixing-state index χ (float, 0 ≤ χ ≤ 1).
-          Returns NaN when the aerosol has no mass.
+        mixing_state_index: Mixing-state index χ (float, 0 ≤ χ ≤ 1).
+            Returns NaN when the aerosol has no mass.
 
     Examples:
         ``` py title="Mixing State Index Calculation"

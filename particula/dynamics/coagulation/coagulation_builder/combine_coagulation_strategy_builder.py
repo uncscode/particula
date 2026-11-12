@@ -36,7 +36,7 @@ class CombineCoagulationStrategyBuilder(BuilderABC):
     merged to act on the same particle population.
 
     Attributes:
-        - strategies : List of `CoagulationStrategyABC` objects to combine.
+        strategies: List of `CoagulationStrategyABC` objects to combine.
 
     Methods:
     - set_strategies : Set the list of coagulation strategies to combine.
@@ -55,7 +55,7 @@ class CombineCoagulationStrategyBuilder(BuilderABC):
         """Initialize the CombineCoagulationStrategyBuilder.
 
         Returns:
-            - None
+            result (None): No return value.
 
         Note:
             The only required parameter is 'strategies'. Attempting to
@@ -74,8 +74,8 @@ class CombineCoagulationStrategyBuilder(BuilderABC):
         """Sets a list of CoagulationStrategyABC objects to be combined.
 
         Args:
-            strategies : A list of coagulation strategies to be combined.
-            strategies_units : For interface consistency, not used.
+            strategies: A list of coagulation strategies to be combined.
+            strategies_units: For interface consistency, not used.
 
         Examples:
             ```py title="Set Strategies Example"
@@ -84,7 +84,8 @@ class CombineCoagulationStrategyBuilder(BuilderABC):
             ```
 
         Returns:
-            CombineCoagulationStrategyBuilder:
+            result (CombineCoagulationStrategyBuilder): This instance for method
+                chaining.
                 The builder instance, for fluent chaining.
         """
         if strategies_units is not None:

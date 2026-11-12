@@ -25,10 +25,10 @@ def get_concentration_from_pressure(
         - R is the universal gas constant (J/(mol·K)),
         - T is the temperature in Kelvin.
 
-    Arguments:
-        partial_pressure : Partial pressure of the gas in Pascals (Pa).
-        molar_mass : Molar mass of the gas in kg/mol.
-        temperature : Temperature in Kelvin.
+    Args:
+        partial_pressure: Partial pressure of the gas in Pascals (Pa).
+        molar_mass: Molar mass of the gas in kg/mol.
+        temperature: Temperature in Kelvin.
 
     Examples:
         ```py title="Floating-point Example Usage"

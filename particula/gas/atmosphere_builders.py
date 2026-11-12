@@ -30,12 +30,12 @@ class AtmosphereBuilder(
     species composition.
 
     Attributes:
-        - temperature : Temperature of the gas mixture in Kelvin.
-        - total_pressure : Total pressure of the gas mixture in Pascals.
-        - partitioning_species : GasSpecies object(s) representing partitioning
-          species (or None if not set).
-        - gas_only_species : GasSpecies object(s) representing non-partitioning
-          species (or None if not set).
+        temperature: Temperature of the gas mixture in Kelvin.
+        total_pressure: Total pressure of the gas mixture in Pascals.
+        partitioning_species: GasSpecies object(s) representing partitioning
+            species (or None if not set).
+        gas_only_species: GasSpecies object(s) representing non-partitioning
+            species (or None if not set).
 
     Methods:
     - set_temperature : Set the temperature (with optional unit handling).
@@ -88,15 +88,15 @@ class AtmosphereBuilder(
     ) -> "AtmosphereBuilder":
         """Add a partitioning GasSpecies object to the mixture.
 
-        Arguments:
-            - species : The GasSpecies instance to add (must have
-              ``partitioning=True``).
+        Args:
+            species: The GasSpecies instance to add (must have
+                ``partitioning=True``).
 
         Returns:
-            - AtmosphereBuilder : This builder (for chaining).
+            AtmosphereBuilder: This builder (for chaining).
 
         Raises:
-            - ValueError : If ``species.partitioning`` is False.
+            ValueError: If ``species.partitioning`` is False.
         """
         if not species.get_partitioning():
             raise ValueError("Provided species has partitioning=False")
@@ -112,15 +112,15 @@ class AtmosphereBuilder(
     ) -> "AtmosphereBuilder":
         """Add a non-partitioning GasSpecies object to the mixture.
 
-        Arguments:
-            - species : The GasSpecies instance to add (must have
-              ``partitioning=False``).
+        Args:
+            species: The GasSpecies instance to add (must have
+                ``partitioning=False``).
 
         Returns:
-            - AtmosphereBuilder : This builder (for chaining).
+            AtmosphereBuilder: This builder (for chaining).
 
         Raises:
-            - ValueError : If ``species.partitioning`` is False.
+            ValueError: If ``species.partitioning`` is False.
         """
         if species.get_partitioning():
             raise ValueError("Provided species has partitioning=True")
@@ -138,11 +138,11 @@ class AtmosphereBuilder(
         species must be present) and then initializes the Atmosphere.
 
         Returns:
-            - Atmosphere : The newly created Atmosphere object.
+            Atmosphere: The newly created Atmosphere object.
 
         Raises:
-            - ValueError : If no partitioning or gas-only species have been
-              added to the mixture.
+            ValueError: If no partitioning or gas-only species have been
+                added to the mixture.
         """
         self.pre_build_check()
         return Atmosphere(

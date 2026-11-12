@@ -180,12 +180,12 @@ class RadiiBasedMovingBin(DistributionStrategy):
         where particles are represented by fixed radius bins with
         concentrations.
 
-        Arguments:
-            - distribution : The radius distribution array.
-            - concentration : The concentration array.
-            - density : The density array.
-            - indices : Collision pair indices array of shape (K, 2).
-            - charge : Optional charge array (unused in this strategy).
+        Args:
+            distribution: The radius distribution array.
+            concentration: The concentration array.
+            density: The density array.
+            indices: Collision pair indices array of shape (K, 2).
+            charge: Optional charge array (unused in this strategy).
 
         Raises:
             NotImplementedError: Always raised as method is not applicable.

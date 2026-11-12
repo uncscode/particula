@@ -53,16 +53,16 @@ def get_spherical_wall_loss_coefficient(
         - vₛ is the settling velocity [m/s],
         - R is the chamber radius [m].
 
-    Arguments:
-        - wall_eddy_diffusivity : The wall eddy diffusivity (or rate) in s⁻¹.
-        - diffusion_coefficient : The diffusion coefficient of the particle
+    Args:
+        wall_eddy_diffusivity: The wall eddy diffusivity (or rate) in s⁻¹.
+        diffusion_coefficient: The diffusion coefficient of the particle
             in m²/s.
-        - settling_velocity : The particle settling velocity in m/s.
-        - chamber_radius : The spherical chamber radius in m.
+        settling_velocity: The particle settling velocity in m/s.
+        chamber_radius: The spherical chamber radius in m.
 
     Returns:
-        - The wall loss coefficient k, in inverse seconds
-           (float or NDArray[np.float64]).
+        The wall loss coefficient k, in inverse seconds
+            (float or NDArray[np.float64]).
 
     Examples:
     ```py title="Example (float inputs)"
@@ -113,14 +113,14 @@ def get_rectangle_wall_loss_coefficient(
     - β₀ ~ (some function of wall_eddy_diffusivity, diffusion_coefficient,
     settling_velocity, and L×W×H)
 
-    Arguments:
-        - wall_eddy_diffusivity : Wall eddy diffusivity in s⁻¹.
-        - diffusion_coefficient : Particle diffusion coefficient in m²/s.
-        - settling_velocity : Particle settling velocity in m/s.
-        - chamber_dimensions : A tuple (length, width, height) in m.
+    Args:
+        wall_eddy_diffusivity: Wall eddy diffusivity in s⁻¹.
+        diffusion_coefficient: Particle diffusion coefficient in m²/s.
+        settling_velocity: Particle settling velocity in m/s.
+        chamber_dimensions: A tuple (length, width, height) in m.
 
     Returns:
-        - The wall loss coefficient β₀ (float or NDArray[np.float64]), in s⁻¹.
+        The wall loss coefficient β₀ (float or NDArray[np.float64]), in s⁻¹.
 
     Examples:
     ```py title="Example (float inputs)"
@@ -185,16 +185,16 @@ def get_spherical_wall_loss_coefficient_via_system_state(
         chamber_radius
     )
 
-    Arguments:
-        - wall_eddy_diffusivity : Wall eddy diffusivity in s⁻¹.
-        - particle_radius : Particle radius in m.
-        - particle_density : Particle density in kg/m³.
-        - temperature : System temperature in K.
-        - pressure : System pressure in Pa.
-        - chamber_radius : Chamber radius in m.
+    Args:
+        wall_eddy_diffusivity: Wall eddy diffusivity in s⁻¹.
+        particle_radius: Particle radius in m.
+        particle_density: Particle density in kg/m³.
+        temperature: System temperature in K.
+        pressure: System pressure in Pa.
+        chamber_radius: Chamber radius in m.
 
     Returns:
-        - The computed wall loss coefficient k (float or NDArray[np.float64])
+        The computed wall loss coefficient k (float or NDArray[np.float64])
             in s⁻¹.
 
     Examples:
@@ -262,7 +262,7 @@ def get_rectangle_wall_loss_coefficient_via_system_state(
     (temperature, pressure). The chamber dimensions (length, width, height)
     are also considered.
 
-    Arguments:
+    Args:
         wall_eddy_diffusivity: The rate of wall eddy diffusivity in inverse
             seconds (s⁻¹).
         particle_radius: The radius of the particle in meters (m).

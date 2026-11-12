@@ -53,9 +53,9 @@ class AntoineVaporPressureBuilder(BuilderABC):
         log₁₀(P) = a − b / (T − c)
 
     Attributes:
-        - a : Coefficient "a" of the Antoine equation (dimensionless).
-        - b : Coefficient "b" (in Kelvin).
-        - c : Coefficient "c" (in Kelvin).
+        a: Coefficient "a" of the Antoine equation (dimensionless).
+        b: Coefficient "b" (in Kelvin).
+        c: Coefficient "c" (in Kelvin).
 
     Methods:
     - set_a : Set the coefficient "a" of the Antoine equation.
@@ -143,7 +143,7 @@ class AntoineVaporPressureBuilder(BuilderABC):
         coefficients.
 
         Returns:
-            - Configured with coefficients a, b, and c.
+            Configured with coefficients a, b, and c.
         """
         self.pre_build_check()
         return AntoineVaporPressureStrategy(self.a, self.b, self.c)
@@ -254,7 +254,7 @@ class ClausiusClapeyronVaporPressureBuilder(BuilderABC):
         """Validate parameters and return a ClausiusClapeyronStrategy object.
 
         Returns:
-            - Configured with latent heat, initial Temperature, and Pressure.
+            Configured with latent heat, initial Temperature, and Pressure.
         """
         self.pre_build_check()
         return ClausiusClapeyronStrategy(
@@ -269,7 +269,7 @@ class ConstantVaporPressureBuilder(BuilderABC):
     setting the constant vapor pressure and then building the strategy object.
 
     Attributes:
-        - vapor_pressure: The vapor pressure in Pa (scalar/float).
+        vapor_pressure: The vapor pressure in Pa (scalar/float).
 
     Methods:
     - set_vapor_pressure: Set the constant vapor pressure in Pa
@@ -324,7 +324,7 @@ class ConstantVaporPressureBuilder(BuilderABC):
         """Validate parameters and return ConstantVaporPressureStrategy.
 
         Returns:
-            - Configured with vapor_pressure in Pa.
+            Configured with vapor_pressure in Pa.
         """
         self.pre_build_check()
         return ConstantVaporPressureStrategy(self.vapor_pressure)
@@ -394,9 +394,9 @@ class SaturationConcentrationVaporPressureBuilder(
     ) -> "SaturationConcentrationVaporPressureBuilder":
         """Set the saturation concentration (C*, C^sat).
 
-        Arguments:
-            - saturation_concentration : Value of the saturation concentration.
-            - saturation_concentration_units : Any units convertible to
+        Args:
+            saturation_concentration: Value of the saturation concentration.
+            saturation_concentration_units: Any units convertible to
                 ``"kg/m^3"`` via ``get_unit_conversion`` are accepted.
 
         Returns:
@@ -464,7 +464,7 @@ class WaterBuckVaporPressureBuilder(BuilderABC):  # pylint: disable=too-few-publ
         """Build and return a WaterBuckStrategy object.
 
         Returns:
-            - Configured for water-specific Buck vapor pressure.
+            Configured for water-specific Buck vapor pressure.
         """
         return WaterBuckStrategy()
 

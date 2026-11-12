@@ -40,20 +40,20 @@ def get_organic_density_estimate(
         -  n_C is the number of carbon atoms in the molecule
         -  H:C, O:C, N:C are atomic ratios.
 
-    Arguments:
-        - molar_mass : Molar mass of the compound in g mol⁻¹. If
-          ``mass_ratio_convert`` is ``True`` this is interpreted as a mass
-          ratio and is internally converted to molar mass.
-        - oxygen2carbon : Atomic O:C ratio.
-        - hydrogen2carbon : Atomic H:C ratio.  Supply a *negative* value (or
-          ``None``) to assume H:C = 2 − O:C as suggested by Girolami.
-        - nitrogen2carbon : Atomic N:C ratio.  ``None`` defaults to 0.
-        - mass_ratio_convert : If ``True`` convert ``molar_mass`` from a mass
-          ratio to molar mass using
-          ``particula.activity.ratio.from_molar_mass_ratio``.
+    Args:
+        molar_mass: Molar mass of the compound in g mol⁻¹. If
+            ``mass_ratio_convert`` is ``True`` this is interpreted as a mass
+            ratio and is internally converted to molar mass.
+        oxygen2carbon: Atomic O:C ratio.
+        hydrogen2carbon: Atomic H:C ratio.  Supply a *negative* value (or
+            ``None``) to assume H:C = 2 − O:C as suggested by Girolami.
+        nitrogen2carbon: Atomic N:C ratio.  ``None`` defaults to 0.
+        mass_ratio_convert: If ``True`` convert ``molar_mass`` from a mass
+            ratio to molar mass using
+            ``particula.activity.ratio.from_molar_mass_ratio``.
 
     Returns:
-        - Estimated density of the compound in kg m⁻³.
+        Estimated density of the compound in kg m⁻³.
 
     Examples:
         ```py title="Single compound"
@@ -121,18 +121,18 @@ def get_organic_density_array(
     Applies the Girolami density estimate element-wise to one-dimensional NumPy
     arrays or lists of molecular properties.
 
-    Arguments:
-        - molar_mass : Sequence of molar masses (or mass ratios if
-          ``mass_ratio_convert`` is ``True``) in g mol⁻¹.
-        - oxygen2carbon : Sequence of atomic O:C ratios.
-        - hydrogen2carbon : Sequence of atomic H:C ratios (may be ``None`` or
-          negative to trigger estimation inside the helper function).
-        - nitrogen2carbon : Sequence of atomic N:C ratios (optional).
-        - mass_ratio_convert : Propagate conversion flag to the scalar helper.
+    Args:
+        molar_mass: Sequence of molar masses (or mass ratios if
+            ``mass_ratio_convert`` is ``True``) in g mol⁻¹.
+        oxygen2carbon: Sequence of atomic O:C ratios.
+        hydrogen2carbon: Sequence of atomic H:C ratios (may be ``None`` or
+            negative to trigger estimation inside the helper function).
+        nitrogen2carbon: Sequence of atomic N:C ratios (optional).
+        mass_ratio_convert: Propagate conversion flag to the scalar helper.
 
     Returns:
-        - NumPy array of estimated densities in kg m⁻³ having the same shape as
-          the input arrays.
+        NumPy array of estimated densities in kg m⁻³ having the same shape as
+            the input arrays.
 
     Examples:
         ```py title="Batch calculation"

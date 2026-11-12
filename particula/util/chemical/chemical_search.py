@@ -31,13 +31,13 @@ def get_chemical_search(identifier: str) -> str:
     2. Case-insensitive fuzzy matching against the PubChem name index that
        ships with *thermo* (Levenshtein distance via ``difflib``).
 
-    Arguments:
-        - identifier : Arbitrary chemical name, formula, InChI, or CAS
-          registry number.
+    Args:
+        identifier: Arbitrary chemical name, formula, InChI, or CAS
+            registry number.
 
     Returns:
-        - The resolved identifier string when a match is found, otherwise
-          ``None``.
+        The resolved identifier string when a match is found, otherwise
+            ``None``.
 
     Examples:
         ``` py title="Exact CAS lookup"

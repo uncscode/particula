@@ -71,18 +71,18 @@ class StrategyFactoryABC(ABC, Generic[BuilderT, StrategyT]):
     ) -> StrategyT:
         """Create a strategy instance using its corresponding builder.
 
-        Arguments:
-            - strategy_type (str): Name of the strategy to build.
-            - parameters (Dict[str, Any], optional): Dictionary of parameters
-              to configure the chosen builder.
+        Args:
+            strategy_type (str): Name of the strategy to build.
+            parameters (Dict[str, Any], optional): Dictionary of parameters
+                to configure the chosen builder.
 
         Returns:
             StrategyT: The built strategy object corresponding to the
                 specified type.
 
         Raises:
-            - ValueError: If the `strategy_type` is unknown, or if any required
-              parameter is invalid/missing for the chosen builder.
+            ValueError: If the `strategy_type` is unknown, or if any required
+                parameter is invalid/missing for the chosen builder.
 
         Examples:
             ```py title="Strategy Creation Example"

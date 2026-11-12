@@ -38,11 +38,12 @@ class SurfaceFactory(
         ('volume', 'mass', or 'molar').
 
     Returns:
-        - SurfaceStrategy : The instance of the requested surface strategy.
+        result (SurfaceStrategy): The instance of the requested surface
+            strategy.
 
     Raises:
-        - ValueError : If an unknown strategy type is provided or if
-          required parameters are missing during check_keys/pre_build_check.
+        ValueError: If an unknown strategy type is provided or if
+            required parameters are missing during check_keys/pre_build_check.
     """
 
     def get_builders(
@@ -58,8 +59,8 @@ class SurfaceFactory(
         """Return a mapping of strategy types to builder instances.
 
         Returns:
-            - Keys are 'volume', 'mass', or 'molar', each
-              mapped to the corresponding builder class.
+            Keys are 'volume', 'mass', or 'molar', each
+                mapped to the corresponding builder class.
 
         Examples:
             ```py title="SurfaceFactory Example"

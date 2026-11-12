@@ -26,11 +26,11 @@ def get_thermal_conductivity(
         - k(T) is Thermal conductivity [W/(m·K)].
         - T is Temperature [K].
 
-    Arguments:
-        - temperature : The temperature in Kelvin (K).
+    Args:
+        temperature: The temperature in Kelvin (K).
 
     Returns:
-        - The thermal conductivity [W/(m·K)] or [J/(m·s·K)].
+        The thermal conductivity [W/(m·K)] or [J/(m·s·K)].
 
     Examples:
         ``` py title="Example Usage"

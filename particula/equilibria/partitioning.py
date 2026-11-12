@@ -44,13 +44,13 @@ def _calculate_phase(
 
     Returns:
         Tuple containing:
-        - c_j_phase: Organic concentrations per species in the phase [µg/m³].
-        - c_j_aq_phase: Aqueous concentrations per species in the phase
+        c_j_phase: Organic concentrations per species in the phase [µg/m³].
+        c_j_aq_phase: Aqueous concentrations per species in the phase
             [µg/m³].
-        - c_phase_total: Total concentration (organic + water) in the phase
+        c_phase_total: Total concentration (organic + water) in the phase
             [µg/m³].
-        - c_aq_total: Total aqueous concentration in the phase [µg/m³].
-        - denominator: Stabilized denominator ``(1 - mass_fraction_water)``
+        c_aq_total: Total aqueous concentration in the phase [µg/m³].
+        denominator: Stabilized denominator ``(1 - mass_fraction_water)``
             inverse with zero-fill when the mass fraction is one.
     """
     q_phase = np.asarray(q_phase, dtype=float)
@@ -370,7 +370,7 @@ def liquid_vapor_partitioning(
 
     Raises:
         ValueError: If array lengths are inconsistent or guess length mismatches
-        the number of species.
+            the number of species.
     """
     c_star_j_dry = np.asarray(c_star_j_dry, dtype=float)
     concentration_organic_matter = np.asarray(
@@ -481,7 +481,7 @@ def get_properties_for_liquid_vapor_partitioning(
 
     Raises:
         ValueError: If input lengths are inconsistent or water activity cannot
-        be broadcast to the species dimension.
+            be broadcast to the species dimension.
     """
     oxygen2carbon = np.asarray(oxygen2carbon, dtype=float)
     molar_mass = np.asarray(molar_mass, dtype=float)

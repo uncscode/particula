@@ -186,7 +186,7 @@ def _normalize_coefficient(
     Returns:
         A private scalar broadcast or the original valid Warp array.
 
-    Raises:
+    Notes:
         This helper assumes the public entry point has completed all input
         validation. It performs allocation only for valid scalar inputs.
     """

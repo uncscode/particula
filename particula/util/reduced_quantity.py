@@ -23,15 +23,15 @@ def get_reduced_value(
         - r is the reduced quantity,
         - α, β are the input parameters.
 
-    Arguments:
-        - alpha : The first parameter (scalar or array).
-        - beta : The second parameter (scalar or array).
+    Args:
+        alpha: The first parameter (scalar or array).
+        beta: The second parameter (scalar or array).
 
     Returns:
-        - The element-wise reduced quantity, zero if (α+β)=0.
+        The element-wise reduced quantity, zero if (α+β)=0.
 
     Raises:
-        - ValueError : If arrays have incompatible shapes.
+        ValueError: If arrays have incompatible shapes.
 
     Examples:
         ``` py title="Example"
@@ -76,11 +76,11 @@ def get_reduced_self_broadcast(
     - r_ij = (α_i × α_j) / (α_i + α_j),
         - r_ij is the reduced quantity between α_i and α_j.
 
-    Arguments:
-        - alpha_array : A 1D array for pairwise reduced value calculations.
+    Args:
+        alpha_array: A 1D array for pairwise reduced value calculations.
 
     Returns:
-        - A 2D square matrix of pairwise reduced values.
+        A 2D square matrix of pairwise reduced values.
 
     Examples:
         ``` py title="Example"

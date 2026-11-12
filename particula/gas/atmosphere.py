@@ -14,15 +14,15 @@ class Atmosphere:
     present.
 
     Attributes:
-        - temperature : Temperature of the gas mixture in Kelvin.
-        - total_pressure : Total atmospheric pressure of the mixture in
-          Pascals.
-        - partitioning_species : List of GasSpecies objects representing the
-          various species within the gas mixture, that can be
-          partitioned to the particle phase.
-        - gas_only_species : List of GasSpecies objects representing the
-          various species within the gas mixture, that cannot be
-          partitioned to the particle phase.
+        temperature: Temperature of the gas mixture in Kelvin.
+        total_pressure: Total atmospheric pressure of the mixture in
+            Pascals.
+        partitioning_species: List of GasSpecies objects representing the
+            various species within the gas mixture, that can be
+            partitioned to the particle phase.
+        gas_only_species: List of GasSpecies objects representing the
+            various species within the gas mixture, that cannot be
+            partitioned to the particle phase.
 
     Methods:
     - add_partitioning_species : Adds a GasSpecies object to the mixture.
@@ -37,16 +37,16 @@ class Atmosphere:
     def add_partitioning_species(self, gas_species: GasSpecies) -> None:
         """Add a GasSpecies object to the partitioning species list.
 
-        Arguments:
-            - gas_species : The gas species to be added.
+        Args:
+            gas_species: The gas species to be added.
         """
         self.partitioning_species.append(gas_species)
 
     def add_gas_only_species(self, gas_species: GasSpecies) -> None:
         """Add a GasSpecies to gas only (nonpartitioning) species list.
 
-        Arguments:
-            - gas_species : The gas species to be added.
+        Args:
+            gas_species: The gas species to be added.
         """
         self.gas_only_species.append(gas_species)
 
@@ -54,7 +54,7 @@ class Atmosphere:
         """Return the number of species in the gas mixture.
 
         Returns:
-            - The number of gas species in the mixture.
+            The number of gas species in the mixture.
         """
         return len(self.partitioning_species) + len(self.gas_only_species)
 
@@ -62,8 +62,8 @@ class Atmosphere:
         """Provide a string representation of the Atmosphere object.
 
         Returns:
-            - Includes the temperature, pressure, and lists of partitioning and
-              gas only species.
+            Includes the temperature, pressure, and lists of partitioning and
+                gas only species.
         """
         return (
             f"Gas mixture at {self.temperature} K, {self.total_pressure} Pa, "

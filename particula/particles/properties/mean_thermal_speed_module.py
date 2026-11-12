@@ -31,12 +31,12 @@ def get_mean_thermal_speed(
         - T is the temperature in Kelvin (K),
         - m is the particle mass in kilograms (kg).
 
-    Arguments:
-        - particle_mass : The mass of the particle(s) in kg.
-        - temperature : The temperature of the system in Kelvin (K).
+    Args:
+        particle_mass: The mass of the particle(s) in kg.
+        temperature: The temperature of the system in Kelvin (K).
 
     Returns:
-        - The mean thermal speed in m/s, as either a float or an
+        The mean thermal speed in m/s, as either a float or an
             NDArray[np.float64].
 
     Examples:

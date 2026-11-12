@@ -35,10 +35,10 @@ def get_lagrangian_taylor_microscale_time(
         - a_o (accel_variance) is Normalized acceleration variance in isotropic
             turbulence [-]
 
-    Arguments:
-        - kolmogorov_time : Kolmogorov time scale [s]
-        - re_lambda : Taylor-microscale Reynolds number [-]
-        - accel_variance : Normalized acceleration variance in isotropic
+    Args:
+        kolmogorov_time: Kolmogorov time scale [s]
+        re_lambda: Taylor-microscale Reynolds number [-]
+        accel_variance: Normalized acceleration variance in isotropic
             turbulence [-]
 
     Examples:
@@ -48,7 +48,7 @@ def get_lagrangian_taylor_microscale_time(
         # Output: 0.3872983346207417
         ```
     Returns:
-        - Lagrangian Taylor microscale time [s]
+        Lagrangian Taylor microscale time [s]
     """
     return kolmogorov_time * np.sqrt(
         (2 * re_lambda) / (15**0.5 * accel_variance)
@@ -81,14 +81,14 @@ def get_taylor_microscale(
         - ε (turbulent_dissipation) is Turbulent kinetic energy dissipation
             rate [m²/s³]
 
-    Arguments:
-        - fluid_rms_velocity : Fluid RMS fluctuation velocity [m/s]
-        - kinematic_viscosity : Kinematic viscosity of the fluid [m²/s]
-        - turbulent_dissipation : Turbulent kinetic energy dissipation rate
+    Args:
+        fluid_rms_velocity: Fluid RMS fluctuation velocity [m/s]
+        kinematic_viscosity: Kinematic viscosity of the fluid [m²/s]
+        turbulent_dissipation: Turbulent kinetic energy dissipation rate
             [m²/s³]
 
     Returns:
-        - Taylor microscale [m]
+        Taylor microscale [m]
 
     Examples:
         ``` py title="Example Usage"
@@ -128,13 +128,13 @@ def get_taylor_microscale_reynolds_number(
         - λ (taylor_microscale) is Taylor microscale [m].
         - ν (kinematic_viscosity) is Kinematic viscosity of the fluid [m²/s].
 
-    Arguments:
-        - fluid_rms_velocity : Fluid RMS velocity fluctuation [m/s].
-        - taylor_microscale : Taylor microscale [m].
-        - kinematic_viscosity : Kinematic viscosity of the fluid [m²/s].
+    Args:
+        fluid_rms_velocity: Fluid RMS velocity fluctuation [m/s].
+        taylor_microscale: Taylor microscale [m].
+        kinematic_viscosity: Kinematic viscosity of the fluid [m²/s].
 
     Returns:
-        - Taylor-microscale Reynolds number [dimensionless].
+        Taylor-microscale Reynolds number [dimensionless].
 
     Examples:
         ``` py title="Example Usage"

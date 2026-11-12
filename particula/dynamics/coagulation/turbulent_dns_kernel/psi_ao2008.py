@@ -34,14 +34,14 @@ def get_psi_ao2008(
         - φ is a characteristic velocity/timescale parameter (m/s),
         - vₚₖ is the droplet velocity (m/s).
 
-    Arguments:
-        - alpha : Parameter related to turbulence (dimensionless).
-        - phi : Characteristic velocity or timescale parameter (m/s).
-        - particle_inertia_time : Inertia timescale of the droplet τₚₖ (s).
-        - particle_velocity : Velocity of the droplet vₚₖ (m/s).
+    Args:
+        alpha: Parameter related to turbulence (dimensionless).
+        phi: Characteristic velocity or timescale parameter (m/s).
+        particle_inertia_time: Inertia timescale of the droplet τₚₖ (s).
+        particle_velocity: Velocity of the droplet vₚₖ (m/s).
 
     Returns:
-        - The value of Ψ(α, φ) (dimensionless).
+        The value of Ψ(α, φ) (dimensionless).
 
     Examples:
         ``` py

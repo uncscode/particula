@@ -34,12 +34,12 @@ def calculate_collision_efficiency_function(
     of radii radius1 and radius2, which can depend on additional factors
     (e.g., fluid flow or electrostatic forces). Currently not implemented.
 
-    Arguments:
-        - radius1 : The radius of the first particle [m].
-        - radius2 : The radius of the second particle [m].
+    Args:
+        radius1: The radius of the first particle [m].
+        radius2: The radius of the second particle [m].
 
     Returns:
-        - Collision efficiency [dimensionless].
+        Collision efficiency [dimensionless].
 
     Examples:
         ```py
@@ -76,14 +76,14 @@ def get_sedimentation_kernel_sp2016(
         - vᵢ, vⱼ : settling velocities [m/s],
         - Eᵢⱼ : collision efficiency (dimensionless).
 
-    Arguments:
-        - particle_radius : Array of particle radii [m].
-        - settling_velocities : Array of particle settling velocities [m/s].
-        - calculate_collision_efficiency : Whether to calculate collision
-          efficiency or use 1. Defaults to True.
+    Args:
+        particle_radius: Array of particle radii [m].
+        settling_velocities: Array of particle settling velocities [m/s].
+        calculate_collision_efficiency: Whether to calculate collision
+            efficiency or use 1. Defaults to True.
 
     Returns:
-        - Sedimentation kernel matrix [m³/s], shape (n, n).
+        Sedimentation kernel matrix [m³/s], shape (n, n).
 
     Examples:
         ```py title="Example"
@@ -136,16 +136,16 @@ def get_sedimentation_kernel_sp2016_via_system_state(
     (particle radius, density, temperature, pressure), then calls
     get_sedimentation_kernel_sp2016.
 
-    Arguments:
-        - particle_radius : Array of particle radii [m].
-        - particle_density : Array of particle densities [kg/m³].
-        - temperature : Temperature [K].
-        - pressure : Pressure [Pa].
-        - calculate_collision_efficiency : Whether to calculate collision
-          efficiency or use 1. Defaults to True.
+    Args:
+        particle_radius: Array of particle radii [m].
+        particle_density: Array of particle densities [kg/m³].
+        temperature: Temperature [K].
+        pressure: Pressure [Pa].
+        calculate_collision_efficiency: Whether to calculate collision
+            efficiency or use 1. Defaults to True.
 
     Returns:
-        - Sedimentation kernel matrix [m³/s], shape (n, n).
+        Sedimentation kernel matrix [m³/s], shape (n, n).
 
     Examples:
         ```py title="Example"

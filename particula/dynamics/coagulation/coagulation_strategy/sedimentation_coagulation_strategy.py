@@ -33,8 +33,8 @@ class SedimentationCoagulationStrategy(CoagulationStrategyABC):
     gravitational settling.
 
     Attributes:
-        distribution_type : The particle distribution type ("discrete",
-        "continuous_pdf", or "particle_resolved").
+        distribution_type: The particle distribution type ("discrete",
+            "continuous_pdf", or "particle_resolved").
 
     Methods:
     - dimensionless_kernel : Raises NotImplementedError for this strategy.
@@ -65,7 +65,7 @@ class SedimentationCoagulationStrategy(CoagulationStrategyABC):
     def __init__(self, distribution_type: str):
         """Initialize the sedimentation coagulation strategy.
 
-        Arguments:
+        Args:
             distribution_type: Type of particle distribution ("discrete",
                 "continuous_pdf", or "particle_resolved").
         """
@@ -81,13 +81,13 @@ class SedimentationCoagulationStrategy(CoagulationStrategyABC):
 
         This method is not applicable to sedimentation-based collisions.
 
-        Arguments:
-            - diffusive_knudsen : The diffusive Knudsen number [dimensionless].
-            - coulomb_potential_ratio : The Coulomb potential ratio
-              [dimensionless].
+        Args:
+            diffusive_knudsen: The diffusive Knudsen number [dimensionless].
+            coulomb_potential_ratio: The Coulomb potential ratio
+                [dimensionless].
 
         Raises:
-            - NotImplementedError : Always raised for this strategy.
+            NotImplementedError: Always raised for this strategy.
         """
         message = (
             "Dimensionless kernel not implemented in sedimentation "
@@ -108,14 +108,14 @@ class SedimentationCoagulationStrategy(CoagulationStrategyABC):
         Uses the Seinfeld & Pandis (2016) sedimentation kernel via
         `get_sedimentation_kernel_sp2016_via_system_state`.
 
-        Arguments:
-            - particle : Particle data providing particle radius
-              and density.
-            - temperature : The system temperature [K].
-            - pressure : The system pressure [Pa].
+        Args:
+            particle: Particle data providing particle radius
+                and density.
+            temperature: The system temperature [K].
+            pressure: The system pressure [Pa].
 
         Returns:
-            - The sedimentation coagulation kernel.
+            The sedimentation coagulation kernel.
 
         Examples:
             ```py

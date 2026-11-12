@@ -45,12 +45,12 @@ class DistributionFactory(
         - get_strategy : Return a strategy instance for a given strategy type.
 
     Returns:
-        - DistributionStrategy : An instance configured for the chosen
-          distribution representation.
+        result (DistributionStrategy): An instance configured for the chosen
+            distribution representation.
 
     Raises:
-        - ValueError : If an unknown strategy type is provided or if
-          required parameters are missing or invalid.
+        ValueError: If an unknown strategy type is provided or if
+            required parameters are missing or invalid.
 
     Examples:
         ```py title="DistributionFactory Example"
@@ -65,7 +65,8 @@ class DistributionFactory(
         """Return a mapping of strategy types to builder instances.
 
         Returns:
-            - A dictionary where each key is a string identifying the strategy
+            result (dict): A dictionary where each key is a string identifying
+                the strategy
                 type, and each value is the corresponding builder object.
 
         Examples:

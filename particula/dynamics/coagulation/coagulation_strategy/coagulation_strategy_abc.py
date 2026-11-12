@@ -380,10 +380,10 @@ class CoagulationStrategyABC(ABC):
     particle-resolved distributions).
 
     Attributes:
-        - distribution_type : The type of distribution to be used, one of
-          ("discrete", "continuous_pdf", or "particle_resolved").
-        - use_direct_kernel : Whether to compute pairwise kernels directly
-          for particle-resolved coagulation.
+        distribution_type: The type of distribution to be used, one of
+            ("discrete", "continuous_pdf", or "particle_resolved").
+        use_direct_kernel: Whether to compute pairwise kernels directly
+            for particle-resolved coagulation.
 
     Methods:
     - dimensionless_kernel : Calculate the dimensionless coagulation kernel.
@@ -421,7 +421,7 @@ class CoagulationStrategyABC(ABC):
     ):
         """Initialize the coagulation strategy.
 
-        Arguments:
+        Args:
             distribution_type: Type of distribution ("discrete",
                 "continuous_pdf", or "particle_resolved").
             particle_resolved_kernel_radius: Kernel radius for
@@ -465,15 +465,15 @@ class CoagulationStrategyABC(ABC):
     ) -> NDArray[np.float64]:
         """Calculate the dimensionless coagulation kernel.
 
-        Arguments:
-            - diffusive_knudsen : The diffusive Knudsen number
-              [dimensionless].
-            - coulomb_potential_ratio : The Coulomb potential ratio
-              [dimensionless].
+        Args:
+            diffusive_knudsen: The diffusive Knudsen number
+                [dimensionless].
+            coulomb_potential_ratio: The Coulomb potential ratio
+                [dimensionless].
 
         Returns:
-            - NDArray[np.float64] : Dimensionless kernel for particle
-              coagulation.
+            NDArray[np.float64]: Dimensionless kernel for particle
+                coagulation.
 
         Examples:
             ```py
@@ -495,17 +495,17 @@ class CoagulationStrategyABC(ABC):
         and pressure to return a dimensional kernel for coagulation. CPU
         ``ParticleData`` inputs are supported only for ``n_boxes == 1``.
 
-        Arguments:
-            particle : ParticleRepresentation or ParticleData providing radius
-            and concentration.
-            - temperature : The temperature in Kelvin [K].
-            - pressure : The pressure in Pascals [Pa].
+        Args:
+            particle: ParticleRepresentation or ParticleData providing radius
+                and concentration.
+            temperature: The temperature in Kelvin [K].
+            pressure: The pressure in Pascals [Pa].
 
         Returns:
-            - float or NDArray[np.float64] : The coagulation kernel [m^3/s].
+            float or NDArray[np.float64]: The coagulation kernel [m^3/s].
 
         Raises:
-            - ValueError : If a CPU ``ParticleData`` input has ``n_boxes != 1``.
+            ValueError: If a CPU ``ParticleData`` input has ``n_boxes != 1``.
 
         Examples:
             ```py
@@ -525,17 +525,17 @@ class CoagulationStrategyABC(ABC):
 
         CPU ``ParticleData`` inputs are supported only for ``n_boxes == 1``.
 
-        Arguments:
-            particle : The particle data for which the loss rate
-            is calculated.
-            - kernel : The coagulation kernel [m^3/s].
+        Args:
+            particle: The particle data for which the loss rate
+                is calculated.
+            kernel: The coagulation kernel [m^3/s].
 
         Returns:
             The loss rate in 1/m^3/s for PMF or 1/m^4/s for radius PDF.
 
         Raises:
-            - ValueError : If the distribution type is invalid.
-            - ValueError : If a CPU ``ParticleData`` input has ``n_boxes != 1``.
+            ValueError: If the distribution type is invalid.
+            ValueError: If a CPU ``ParticleData`` input has ``n_boxes != 1``.
 
         Examples:
             ```py
@@ -578,17 +578,17 @@ class CoagulationStrategyABC(ABC):
 
         CPU ``ParticleData`` inputs are supported only for ``n_boxes == 1``.
 
-        Arguments:
-            particle : The particle data used in the
-            calculation.
-            - kernel : The coagulation kernel [m^3/s].
+        Args:
+            particle: The particle data used in the
+                calculation.
+            kernel: The coagulation kernel [m^3/s].
 
         Returns:
             The gain rate in 1/m^3/s for PMF or 1/m^4/s for radius PDF.
 
         Raises:
-            - ValueError : If the distribution type is invalid.
-            - ValueError : If a CPU ``ParticleData`` input has ``n_boxes != 1``.
+            ValueError: If the distribution type is invalid.
+            ValueError: If a CPU ``ParticleData`` input has ``n_boxes != 1``.
 
         Examples:
             ```py
@@ -652,10 +652,10 @@ class CoagulationStrategyABC(ABC):
 
         CPU ``ParticleData`` inputs are supported only for ``n_boxes == 1``.
 
-        Arguments:
-            - particle : The particle data.
-            - temperature : The gas-phase temperature [K].
-            - pressure : The gas-phase pressure [Pa].
+        Args:
+            particle: The particle data.
+            temperature: The gas-phase temperature [K].
+            pressure: The gas-phase pressure [Pa].
 
         Returns:
             float or NDArray[np.float64] : The net coagulation rate
@@ -663,7 +663,7 @@ class CoagulationStrategyABC(ABC):
             Positive values mean net gain; negative values mean net loss.
 
         Raises:
-            - ValueError : If a CPU ``ParticleData`` input has ``n_boxes != 1``.
+            ValueError: If a CPU ``ParticleData`` input has ``n_boxes != 1``.
 
         Examples:
             ```py
@@ -693,19 +693,19 @@ class CoagulationStrategyABC(ABC):
         net_rate calculated for the given time_step. CPU ``ParticleData``
         inputs are supported only for ``n_boxes == 1``.
 
-        Arguments:
-            - particle : The particle data to update.
-            - temperature : The gas-phase temperature [K].
-            - pressure : The gas-phase pressure [Pa].
-            - time_step : The timestep over which to integrate [s].
+        Args:
+            particle: The particle data to update.
+            temperature: The gas-phase temperature [K].
+            pressure: The gas-phase pressure [Pa].
+            time_step: The timestep over which to integrate [s].
 
         Returns:
             ParticleRepresentation or ParticleData : Updated after
             this step.
 
         Raises:
-            - ValueError : If the distribution type is invalid or unsupported,
-              or if a CPU ParticleData input has ``n_boxes != 1``.
+            ValueError: If the distribution type is invalid or unsupported,
+                or if a CPU ParticleData input has ``n_boxes != 1``.
 
         Examples:
             ```py
@@ -991,16 +991,16 @@ class CoagulationStrategyABC(ABC):
         diffusion-controlled processes. CPU ``ParticleData`` inputs are
         supported only for ``n_boxes == 1``.
 
-        Arguments:
-            - particle : The particle data.
-            - temperature : The gas-phase temperature [K].
-            - pressure : The gas-phase pressure [Pa].
+        Args:
+            particle: The particle data.
+            temperature: The gas-phase temperature [K].
+            pressure: The gas-phase pressure [Pa].
 
         Returns:
-            - NDArray[np.float64] : Diffusive Knudsen number(s) [dimensionless].
+            NDArray[np.float64]: Diffusive Knudsen number(s) [dimensionless].
 
         Raises:
-            - ValueError : If a CPU ``ParticleData`` input has ``n_boxes != 1``.
+            ValueError: If a CPU ``ParticleData`` input has ``n_boxes != 1``.
 
         Examples:
             ```py
@@ -1039,15 +1039,15 @@ class CoagulationStrategyABC(ABC):
         coagulation processes. CPU ``ParticleData`` inputs are supported only
         for ``n_boxes == 1``.
 
-        Arguments:
-            - particle : The particle data.
-            - temperature : The gas-phase temperature [K].
+        Args:
+            particle: The particle data.
+            temperature: The gas-phase temperature [K].
 
         Returns:
-            - NDArray[np.float64] : Coulomb potential ratio(s) [dimensionless].
+            NDArray[np.float64]: Coulomb potential ratio(s) [dimensionless].
 
         Raises:
-            - ValueError : If a CPU ``ParticleData`` input has ``n_boxes != 1``.
+            ValueError: If a CPU ``ParticleData`` input has ``n_boxes != 1``.
 
         Examples:
             ```py
@@ -1081,17 +1081,17 @@ class CoagulationStrategyABC(ABC):
         determine the friction factor [kg/s]. CPU ``ParticleData``
         inputs are supported only for ``n_boxes == 1``.
 
-        Arguments:
-            particle : The particle data for which to compute
-            friction factor.
-            - temperature : Gas temperature [K].
-            - pressure : Gas pressure [Pa].
+        Args:
+            particle: The particle data for which to compute
+                friction factor.
+            temperature: Gas temperature [K].
+            pressure: Gas pressure [Pa].
 
         Returns:
-            - NDArray[np.float64] : Friction factor(s) [kg/s].
+            NDArray[np.float64]: Friction factor(s) [kg/s].
 
         Raises:
-            - ValueError : If a CPU ``ParticleData`` input has ``n_boxes != 1``.
+            ValueError: If a CPU ``ParticleData`` input has ``n_boxes != 1``.
 
         Examples:
             ```py

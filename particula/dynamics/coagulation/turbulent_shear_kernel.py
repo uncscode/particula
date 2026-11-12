@@ -45,13 +45,13 @@ def get_turbulent_shear_kernel_st1956(
         - ν : Kinematic viscosity [m²/s],
         - D₁, D₂ : diameters of particles [m].
 
-    Arguments:
-        - particle_radius : Array of particle radii [m].
-        - turbulent_dissipation : Turbulent energy dissipation rate [m²/s³].
-        - kinematic_viscosity : Kinematic viscosity [m²/s].
+    Args:
+        particle_radius: Array of particle radii [m].
+        turbulent_dissipation: Turbulent energy dissipation rate [m²/s³].
+        kinematic_viscosity: Kinematic viscosity [m²/s].
 
     Returns:
-        - Turbulent shear kernel matrix [m³/s], shape (n, n).
+        Turbulent shear kernel matrix [m³/s], shape (n, n).
 
     Examples:
         ```py title="Example"
@@ -99,14 +99,14 @@ def get_turbulent_shear_kernel_st1956_via_system_state(
           - ν : Kinematic viscosity [m²/s],
           - D₁, D₂ : particle diameters [m].
 
-    Arguments:
-        - particle_radius : Array of particle radii [m].
-        - turbulent_dissipation : Turbulent dissipation rate [m²/s³].
-        - temperature : Temperature [K].
-        - fluid_density : Fluid density [kg/m³].
+    Args:
+        particle_radius: Array of particle radii [m].
+        turbulent_dissipation: Turbulent dissipation rate [m²/s³].
+        temperature: Temperature [K].
+        fluid_density: Fluid density [kg/m³].
 
     Returns:
-        - Turbulent shear kernel matrix [m³/s], shape (n, n).
+        Turbulent shear kernel matrix [m³/s], shape (n, n).
 
     Examples:
         ```py title="Example"

@@ -6,7 +6,7 @@ turbulent shear coagulation rate in aerosol systems.
 
 Classes:
     - TurbulentShearCoagulationStrategy : Implements the abstract base
-      class for coagulation using a turbulent shear kernel.
+        class for coagulation using a turbulent shear kernel.
 """
 
 import logging
@@ -37,11 +37,11 @@ class TurbulentShearCoagulationStrategy(CoagulationStrategyABC):
     consistent model of coagulation in turbulent flow.
 
     Attributes:
-        - distribution_type : The type of particle distribution for coagulation
-          ("discrete", "continuous_pdf", or "particle_resolved").
-        - turbulent_dissipation : Turbulent kinetic energy dissipation
-          rate [m^2/s^3].
-        - fluid_density : Fluid density [kg/m^3].
+        distribution_type: The type of particle distribution for coagulation
+            ("discrete", "continuous_pdf", or "particle_resolved").
+        turbulent_dissipation: Turbulent kinetic energy dissipation
+            rate [m^2/s^3].
+        fluid_density: Fluid density [kg/m^3].
 
     Methods:
     - set_turbulent_dissipation : Set the turbulent kinetic energy dissipation
@@ -82,15 +82,15 @@ class TurbulentShearCoagulationStrategy(CoagulationStrategyABC):
     ):
         """Initialize the turbulent shear coagulation strategy.
 
-        Arguments:
-            - distribution_type : The distribution type ("discrete",
-              "continuous_pdf", or "particle_resolved").
-            - turbulent_dissipation : Turbulent kinetic energy dissipation
-              rate [m^2/s^3].
-            - fluid_density : The fluid density [kg/m^3].
+        Args:
+            distribution_type: The distribution type ("discrete",
+                "continuous_pdf", or "particle_resolved").
+            turbulent_dissipation: Turbulent kinetic energy dissipation
+                rate [m^2/s^3].
+            fluid_density: The fluid density [kg/m^3].
 
         Returns:
-            - None
+            result (None): No return value.
         """
         super().__init__(distribution_type=distribution_type)
         self.turbulent_dissipation = turbulent_dissipation
@@ -99,12 +99,13 @@ class TurbulentShearCoagulationStrategy(CoagulationStrategyABC):
     def set_turbulent_dissipation(self, turbulent_dissipation: float):
         """Set the turbulent kinetic energy dissipation rate.
 
-        Arguments:
-            - turbulent_dissipation : Turbulent kinetic energy dissipation
-              rate [m^2/s^3].
+        Args:
+            turbulent_dissipation: Turbulent kinetic energy dissipation
+                rate [m^2/s^3].
 
         Returns:
-            - Self (TurbulentShearCoagulationStrategy)
+            result (TurbulentShearCoagulationStrategy): This instance for method
+                chaining.
 
         Examples:
             ```py
@@ -123,13 +124,13 @@ class TurbulentShearCoagulationStrategy(CoagulationStrategyABC):
 
         Not implemented for turbulent shear; raises NotImplementedError.
 
-        Arguments:
-            - diffusive_knudsen : The diffusive Knudsen number [dimensionless].
-            - coulomb_potential_ratio : The Coulomb potential ratio
-              [dimensionless].
+        Args:
+            diffusive_knudsen: The diffusive Knudsen number [dimensionless].
+            coulomb_potential_ratio: The Coulomb potential ratio
+                [dimensionless].
 
         Returns:
-            - NDArray[np.float64] : Not returned; raises error instead.
+            NDArray[np.float64]: Not returned; raises error instead.
 
         Examples:
             ```py
@@ -164,14 +165,14 @@ class TurbulentShearCoagulationStrategy(CoagulationStrategyABC):
         which depends on the dissipation rate of turbulent kinetic energy,
         fluid density, and particle radius.
 
-        Arguments:
-            - particle : The particle data instance to retrieve
-              particle radii.
-            - temperature : The system temperature [K].
-            - pressure : The system pressure [Pa].
+        Args:
+            particle: The particle data instance to retrieve
+                particle radii.
+            temperature: The system temperature [K].
+            pressure: The system pressure [Pa].
 
         Returns:
-            - float or NDArray[np.float64] : The coagulation kernel(s) [m^3/s].
+            float or NDArray[np.float64]: The coagulation kernel(s) [m^3/s].
 
         Examples:
             ```py title="Example usage of kernel method"

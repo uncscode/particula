@@ -20,14 +20,14 @@ def get_chemical_surface_tension(
         - σ is the surface tension in newtons per metre (N/m),
         - T is the absolute temperature in kelvin (K).
 
-    Arguments:
-        - chemical_identifier : Identifier accepted by
-          ``thermo.chemical.Chemical`` (name, CAS number, or formula).
-        - temperature : Scalar or array of temperatures in kelvin (K).
+    Args:
+        chemical_identifier: Identifier accepted by
+            ``thermo.chemical.Chemical`` (name, CAS number, or formula).
+        temperature: Scalar or array of temperatures in kelvin (K).
 
     Returns:
-        - Surface tension(s) in N/m with the same shape as ``temperature``.
-          A scalar input returns a 0-d ``numpy.ndarray`` for consistency.
+        Surface tension(s) in N/m with the same shape as ``temperature``.
+            A scalar input returns a 0-d ``numpy.ndarray`` for consistency.
 
     Examples:
         ``` py title="Scalar temperature"

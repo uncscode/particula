@@ -42,13 +42,13 @@ def get_diffusion_coefficient(
         - T is the temperature in Kelvin,
         - B is the aerodynamic mobility in m²/s.
 
-    Arguments:
-        - temperature : Temperature in Kelvin (K).
-        - aerodynamic_mobility : Aerodynamic mobility in m²/s.
-        - boltzmann_constant : Boltzmann constant in J/K.
+    Args:
+        temperature: Temperature in Kelvin (K).
+        aerodynamic_mobility: Aerodynamic mobility in m²/s.
+        boltzmann_constant: Boltzmann constant in J/K.
 
     Returns:
-        - The diffusion coefficient of the particle in m²/s.
+        The diffusion coefficient of the particle in m²/s.
 
     Examples:
         ``` py title="Example"
@@ -81,13 +81,13 @@ def get_diffusion_coefficient_via_system_state(
     2. Determining particle slip correction and aerodynamic mobility,
     3. Calling get_diffusion_coefficient() to get D.
 
-    Arguments:
-        - particle_radius : Particle radius in meters (m).
-        - temperature : System temperature in Kelvin (K).
-        - pressure : System pressure in Pascals (Pa).
+    Args:
+        particle_radius: Particle radius in meters (m).
+        temperature: System temperature in Kelvin (K).
+        pressure: System pressure in Pascals (Pa).
 
     Returns:
-        - The diffusion coefficient of the particle in m²/s.
+        The diffusion coefficient of the particle in m²/s.
 
     Examples:
         ``` py title="Example"

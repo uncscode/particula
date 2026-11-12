@@ -60,14 +60,14 @@ def get_first_order_mass_transport_k(
         - D : Diffusion coefficient of the vapor [m²/s].
         - X : Vapor transition correction factor [unitless].
 
-    Arguments:
-        - particle_radius : The radius of the particle [m].
-        - vapor_transition : The vapor transition correction factor [unitless].
-        - diffusion_coefficient : The diffusion coefficient of the vapor [m²/s].
-          Defaults to 2e-5 (approx. air).
+    Args:
+        particle_radius: The radius of the particle [m].
+        vapor_transition: The vapor transition correction factor [unitless].
+        diffusion_coefficient: The diffusion coefficient of the vapor [m²/s].
+            Defaults to 2e-5 (approx. air).
 
     Returns:
-        - The first-order mass transport coefficient per particle [m³/s].
+        The first-order mass transport coefficient per particle [m³/s].
 
     Examples:
         ```py title="Float input"
@@ -134,14 +134,14 @@ def get_mass_transfer_rate(
         - R : Universal gas constant [J/(mol·K)].
         - T : Temperature [K].
 
-    Arguments:
-        - pressure_delta : The difference in partial pressure [Pa].
-        - first_order_mass_transport : The mass transport coefficient [m³/s].
-        - temperature : The temperature [K].
-        - molar_mass : The molar mass [kg/mol].
+    Args:
+        pressure_delta: The difference in partial pressure [Pa].
+        first_order_mass_transport: The mass transport coefficient [m³/s].
+        temperature: The temperature [K].
+        molar_mass: The molar mass [kg/mol].
 
     Returns:
-        - The mass transfer rate [kg/s].
+        The mass transfer rate [kg/s].
 
     Examples:
         ```py title="Single value input"
@@ -284,24 +284,24 @@ def get_mass_transfer_rate_latent_heat(
     rate. When latent heat is zero, the correction equals unity and the
     result matches get_mass_transfer_rate.
 
-    Arguments:
-        - pressure_delta : Difference in partial pressure [Pa].
-        - first_order_mass_transport : Mass transport coefficient K [m³/s].
-        - temperature : Temperature T [K].
-        - molar_mass : Molar mass M [kg/mol].
-        - latent_heat : Latent heat of vaporization L [J/kg].
-        - thermal_conductivity : Gas thermal conductivity kappa [W/(m·K)].
-        - vapor_pressure_surface : Equilibrium vapor pressure at the
+    Args:
+        pressure_delta: Difference in partial pressure [Pa].
+        first_order_mass_transport: Mass transport coefficient K [m³/s].
+        temperature: Temperature T [K].
+        molar_mass: Molar mass M [kg/mol].
+        latent_heat: Latent heat of vaporization L [J/kg].
+        thermal_conductivity: Gas thermal conductivity kappa [W/(m·K)].
+        vapor_pressure_surface: Equilibrium vapor pressure at the
             surface [Pa].
-        - diffusion_coefficient : Vapor diffusion coefficient D [m²/s].
+        diffusion_coefficient: Vapor diffusion coefficient D [m²/s].
 
     Returns:
-        - Non-isothermal mass transfer rate [kg/s], matching the broadcasted
-          input shape.
+        Non-isothermal mass transfer rate [kg/s], matching the broadcasted
+            input shape.
 
     Raises:
-        - ValueError : If any validated inputs violate positive/nonnegative
-          constraints.
+        ValueError: If any validated inputs violate positive/nonnegative
+            constraints.
     """
     pressure_delta = np.asarray(pressure_delta)
     first_order_mass_transport = np.asarray(first_order_mass_transport)
@@ -420,13 +420,13 @@ def get_radius_transfer_rate(
         - ρ : Particle density [kg/m³].
         - dm/dt : Mass change rate [kg/s].
 
-    Arguments:
-        - mass_rate : The mass transfer rate [kg/s].
-        - particle_radius : The radius of the particle [m].
-        - density : The density of the particle [kg/m³].
+    Args:
+        mass_rate: The mass transfer rate [kg/s].
+        particle_radius: The radius of the particle [m].
+        density: The density of the particle [kg/m³].
 
     Returns:
-        - The radius growth (or evaporation) rate [m/s].
+        The radius growth (or evaporation) rate [m/s].
 
     Examples:
         ```py title="Single value input"
@@ -482,15 +482,15 @@ def get_mass_transfer(
 
     - mass_to_change = mass_rate × time_step × particle_concentration
 
-    Arguments:
-        - mass_rate : The rate of mass transfer per particle [kg/s].
-        - time_step : The time step for the mass transfer calculation [s].
-        - gas_mass : The available mass of gas species [kg].
-        - particle_mass : The mass of each particle [kg].
-        - particle_concentration : The concentration of particles [#/m³].
+    Args:
+        mass_rate: The rate of mass transfer per particle [kg/s].
+        time_step: The time step for the mass transfer calculation [s].
+        gas_mass: The available mass of gas species [kg].
+        particle_mass: The mass of each particle [kg].
+        particle_concentration: The concentration of particles [#/m³].
 
     Returns:
-        - The mass transferred (array with the same shape as particle_mass).
+        The mass transferred (array with the same shape as particle_mass).
 
     Examples:
         ```py title="Single species input"
@@ -559,16 +559,16 @@ def get_mass_transfer_of_single_species(
     Then it scales or limits that mass based on available gas mass and
     particle mass.
 
-    Arguments:
-        - mass_rate : Mass transfer rate per particle [kg/s].
-        - time_step : The time step [s].
-        - gas_mass : Total available mass of the gas species [kg].
-        - particle_mass : The mass of each particle [kg].
-        - particle_concentration : Particle concentration [#/m³].
+    Args:
+        mass_rate: Mass transfer rate per particle [kg/s].
+        time_step: The time step [s].
+        gas_mass: Total available mass of the gas species [kg].
+        particle_mass: The mass of each particle [kg].
+        particle_concentration: Particle concentration [#/m³].
 
     Returns:
-        - The amount of mass transferred for the single gas species, shaped
-          like particle_mass.
+        The amount of mass transferred for the single gas species, shaped
+            like particle_mass.
 
     Examples:
         ```py title="Single species input"
@@ -634,17 +634,17 @@ def get_mass_transfer_of_multiple_species(
        inventory of that species.
     4. Clips the result so no individual bin evaporates more mass than it owns.
 
-    Arguments:
-        - mass_rate : The mass transfer rate per particle for each gas
+    Args:
+        mass_rate: The mass transfer rate per particle for each gas
             species [kg/s].
-        - time_step : The time step [s].
-        - gas_mass : The available mass of each gas species [kg].
-        - particle_mass : The mass of each particle for each gas species [kg].
-        - particle_concentration : The concentration of particles [#/m³].
+        time_step: The time step [s].
+        gas_mass: The available mass of each gas species [kg].
+        particle_mass: The mass of each particle for each gas species [kg].
+        particle_concentration: The concentration of particles [#/m³].
 
     Returns:
-        - The mass transferred for multiple gas species, matching the shape
-          of (particle_mass).
+        The mass transferred for multiple gas species, matching the shape
+            of (particle_mass).
 
     Examples:
         ```py title="Multiple species input"

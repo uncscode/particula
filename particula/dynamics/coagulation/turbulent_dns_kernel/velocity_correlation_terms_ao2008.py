@@ -34,13 +34,13 @@ def compute_z(
         - T_L (lagrangian_integral_scale) is the Lagrangian integral
             timescale [s].
 
-    Arguments:
-        - lagrangian_taylor_microscale_time : Lagrangian Taylor microscale
+    Args:
+        lagrangian_taylor_microscale_time: Lagrangian Taylor microscale
             time [s].
-        - lagrangian_integral_scale : Lagrangian integral timescale [s].
+        lagrangian_integral_scale: Lagrangian integral timescale [s].
 
     Returns:
-        - z value [dimensionless].
+        z value [dimensionless].
 
     Examples:
         ```py
@@ -73,12 +73,12 @@ def compute_beta(
         - λ is Taylor microscale [m].
         - L_e is Eulerian integral length scale [m].
 
-    Arguments:
-        - taylor_microscale : Taylor microscale [m].
-        - eulerian_integral_length : Eulerian integral length scale [m].
+    Args:
+        taylor_microscale: Taylor microscale [m].
+        eulerian_integral_length: Eulerian integral length scale [m].
 
     Returns:
-        - β value [dimensionless].
+        β value [dimensionless].
 
     Examples:
         ```py
@@ -104,11 +104,11 @@ def compute_b1(
     - b₁ = (1 + √(1 - 2z²)) / (2 √(1 - 2z²))
         - z is τ_T / T_L.
 
-    Arguments:
-        - z : A dimensionless parameter related to turbulence [-].
+    Args:
+        z: A dimensionless parameter related to turbulence [-].
 
     Returns:
-        - b₁ value [dimensionless].
+        b₁ value [dimensionless].
 
     Examples:
         ```py
@@ -135,11 +135,11 @@ def compute_b2(
     - b₂ = (1 - √(1 - 2z²)) / (2 √(1 - 2z²))
         - z is τ_T / T_L.
 
-    Arguments:
-        - z : A dimensionless parameter related to turbulence [-].
+    Args:
+        z: A dimensionless parameter related to turbulence [-].
 
     Returns:
-        - b₂ value [dimensionless].
+        b₂ value [dimensionless].
 
     Examples:
         ```py
@@ -168,12 +168,12 @@ def compute_c1(
         - z is τ_T / T_L.
         - T_L is the Lagrangian integral timescale [s].
 
-    Arguments:
-        - z : A dimensionless parameter related to turbulence [-].
-        - lagrangian_integral_scale : Lagrangian integral timescale [s].
+    Args:
+        z: A dimensionless parameter related to turbulence [-].
+        lagrangian_integral_scale: Lagrangian integral timescale [s].
 
     Returns:
-        - c₁ value [dimensionless].
+        c₁ value [dimensionless].
 
     Examples:
         ```py
@@ -201,12 +201,12 @@ def compute_c2(
         - z is τ_T / T_L.
         - T_L is the Lagrangian integral timescale [s].
 
-    Arguments:
-        - z : A dimensionless parameter related to turbulence [-].
-        - lagrangian_integral_scale : Lagrangian integral timescale [s].
+    Args:
+        z: A dimensionless parameter related to turbulence [-].
+        lagrangian_integral_scale: Lagrangian integral timescale [s].
 
     Returns:
-        - c₂ value [dimensionless].
+        c₂ value [dimensionless].
 
     Examples:
         ```py
@@ -232,11 +232,11 @@ def compute_d1(
     - d₁ = (1 + √(1 - 2β²)) / (2 √(1 - 2β²))
         - β is defined as β = (√2 × λ) / L_e.
 
-    Arguments:
-        - beta : A dimensionless parameter related to turbulence [-].
+    Args:
+        beta: A dimensionless parameter related to turbulence [-].
 
     Returns:
-        - d₁ value [dimensionless].
+        d₁ value [dimensionless].
 
     Examples:
         ```py
@@ -263,11 +263,11 @@ def compute_d2(
     - d₂ = (1 - √(1 - 2β²)) / (2 √(1 - 2β²))
         - β is defined as β = (√2 × λ) / L_e.
 
-    Arguments:
-        - beta : A dimensionless parameter related to turbulence [-].
+    Args:
+        beta: A dimensionless parameter related to turbulence [-].
 
     Returns:
-        - d₂ value [dimensionless].
+        d₂ value [dimensionless].
 
     Examples:
         ```py
@@ -296,12 +296,12 @@ def compute_e1(
         - β is defined as β = (√2 × λ) / L_e.
         - L_e is the Eulerian integral length scale [m].
 
-    Arguments:
-        - beta : A dimensionless parameter related to turbulence [-].
-        - eulerian_integral_length : Eulerian integral length scale [m].
+    Args:
+        beta: A dimensionless parameter related to turbulence [-].
+        eulerian_integral_length: Eulerian integral length scale [m].
 
     Returns:
-        - e₁ value [dimensionless].
+        e₁ value [dimensionless].
 
     Examples:
         ```py
@@ -329,12 +329,12 @@ def compute_e2(
         - β is defined as β = (√2 × λ) / L_e.
         - L_e is the Eulerian integral length scale [m].
 
-    Arguments:
-        - beta : A dimensionless parameter related to turbulence [-].
-        - eulerian_integral_length : Eulerian integral length scale [m].
+    Args:
+        beta: A dimensionless parameter related to turbulence [-].
+        eulerian_integral_length: Eulerian integral length scale [m].
 
     Returns:
-        - e₂ value [dimensionless].
+        e₂ value [dimensionless].
 
     Examples:
         ```py

@@ -47,7 +47,7 @@ class BuilderDensityMixin:
                 accepts any unit supported by the converter.
 
         Returns:
-            BuilderDensityMixin: Self for method chaining.
+            self (BuilderDensityMixin): Self for method chaining.
         """
         if density_units == "kg/m^3":
             self.density = density
@@ -84,7 +84,7 @@ class BuilderSurfaceTensionMixin:
                 ``"N/m"`` and accepts any supported conversion.
 
         Returns:
-            BuilderSurfaceTensionMixin: Self for method chaining.
+            self (BuilderSurfaceTensionMixin): Self for method chaining.
         """
         if surface_tension_units == "N/m":
             self.surface_tension = surface_tension
@@ -123,7 +123,7 @@ class BuilderSurfaceTensionTableMixin:
                 ``"N/m"``.
 
         Returns:
-            BuilderSurfaceTensionTableMixin: Self for method chaining.
+            self (BuilderSurfaceTensionTableMixin): Self for method chaining.
         """
         table = np.asarray(surface_tension_table, dtype=np.float64)
         if surface_tension_table_units != "N/m":
@@ -162,7 +162,7 @@ class BuilderMolarMassMixin:
                 ``"kg/mol"``.
 
         Returns:
-            BuilderMolarMassMixin: Self for method chaining.
+            self (BuilderMolarMassMixin): Self for method chaining.
         """
         if molar_mass_units == "kg/mol":
             self.molar_mass = molar_mass
@@ -203,7 +203,7 @@ class BuilderConcentrationMixin:
                 ``self.default_units`` before storage.
 
         Returns:
-            BuilderConcentrationMixin: Self for method chaining.
+            self (BuilderConcentrationMixin): Self for method chaining.
         """
         if concentration_units == self.default_units:
             self.concentration = concentration
@@ -237,7 +237,7 @@ class BuilderChargeMixin:
             charge_units: Optional units that are logged and ignored.
 
         Returns:
-            BuilderChargeMixin: Self for method chaining.
+            self (BuilderChargeMixin): Self for method chaining.
         """
         if charge_units is not None:
             logger.warning("Ignoring units for charge parameter.")
@@ -268,7 +268,7 @@ class BuilderPhaseIndexMixin:
             phase_index_units: Optional units that are logged and ignored.
 
         Returns:
-            BuilderPhaseIndexMixin: Self for method chaining.
+            self (BuilderPhaseIndexMixin): Self for method chaining.
         """
         if phase_index_units is not None:
             logger.warning("Ignoring units for phase index parameter.")
@@ -300,7 +300,7 @@ class BuilderMassMixin:
             mass_units: Units for ``mass``. Defaults to ``"kg"``.
 
         Returns:
-            BuilderMassMixin: Self for method chaining.
+            self (BuilderMassMixin): Self for method chaining.
         """
         if mass_units == "kg":
             self.mass = mass
@@ -333,7 +333,7 @@ class BuilderVolumeMixin:
             volume_units: Units for ``volume``. Defaults to ``"m^3"``.
 
         Returns:
-            BuilderVolumeMixin: Self for method chaining.
+            self (BuilderVolumeMixin): Self for method chaining.
         """
         if volume_units == "m^3":
             self.volume = volume
@@ -366,7 +366,7 @@ class BuilderRadiusMixin:
             radius_units: Units for ``radius``. Defaults to ``"m"``.
 
         Returns:
-            BuilderRadiusMixin: Self for method chaining.
+            self (BuilderRadiusMixin): Self for method chaining.
         """
         if radius_units == "m":
             self.radius = radius
@@ -400,7 +400,7 @@ class BuilderTemperatureMixin:
                 Accepts ``"degC"``, ``"degF"``, ``"degR"``, or ``"K"``.
 
         Returns:
-            BuilderTemperatureMixin: Self for method chaining.
+            self (BuilderTemperatureMixin): Self for method chaining.
 
         Raises:
             ValueError: If the converted temperature is below absolute zero.
@@ -438,7 +438,7 @@ class BuilderTemperatureTableMixin:
             temperature_table_units: Units for the values. Defaults to ``"K"``.
 
         Returns:
-            BuilderTemperatureTableMixin: Self for method chaining.
+            self (BuilderTemperatureTableMixin): Self for method chaining.
         """
         temps = np.asarray(temperature_table, dtype=np.float64)
         if temperature_table_units != "K":
@@ -477,7 +477,7 @@ class BuilderPressureMixin:
             pressure_units: Units for ``pressure``. Defaults to ``"Pa"``.
 
         Returns:
-            BuilderPressureMixin: Self for method chaining.
+            self (BuilderPressureMixin): Self for method chaining.
         """
         if pressure_units == "Pa":
             self.pressure = pressure
@@ -514,7 +514,7 @@ class BuilderLognormalMixin:
             mode_units: Units for ``mode``. Defaults to ``"m"``.
 
         Returns:
-            BuilderLognormalMixin: Self for method chaining.
+            self (BuilderLognormalMixin): Self for method chaining.
         """
         if mode_units == "m":
             self.mode = mode
@@ -536,7 +536,7 @@ class BuilderLognormalMixin:
                 and ignored for interface consistency.
 
         Returns:
-            BuilderLognormalMixin: Self for method chaining.
+            self (BuilderLognormalMixin): Self for method chaining.
         """
         if geometric_standard_deviation_units is not None:
             logger.warning("Ignoring units for surface strategy parameter.")
@@ -557,7 +557,7 @@ class BuilderLognormalMixin:
                 be ``"1/m^3"`` or ``"m^-3"`` for direct storage.
 
         Returns:
-            BuilderLognormalMixin: Self for method chaining.
+            self (BuilderLognormalMixin): Self for method chaining.
         """
         if number_concentration_units in {"1/m^3", "m^-3"}:
             self.number_concentration = number_concentration
@@ -593,7 +593,7 @@ class BuilderParticleResolvedCountMixin:
                 ignored.
 
         Returns:
-            BuilderParticleResolvedCountMixin: Self for method chaining.
+            self (BuilderParticleResolvedCountMixin): Self for method chaining.
         """
         if particle_resolved_count_units is not None:
             logger.warning("Ignoring units for particle resolved count.")
@@ -629,7 +629,7 @@ class BuilderWallEddyDiffusivityMixin:
                 "1/s".
 
         Returns:
-            BuilderWallEddyDiffusivityMixin: Self for method chaining.
+            self (BuilderWallEddyDiffusivityMixin): Self for method chaining.
 
         Raises:
             ValueError: If ``wall_eddy_diffusivity`` is not positive.
@@ -675,7 +675,7 @@ class BuilderChamberRadiusMixin:
             chamber_radius_units: Units for the value. Defaults to "m".
 
         Returns:
-            BuilderChamberRadiusMixin: Self for method chaining.
+            self (BuilderChamberRadiusMixin): Self for method chaining.
 
         Raises:
             ValueError: If ``chamber_radius`` is not positive.
@@ -724,7 +724,7 @@ class BuilderChamberDimensionsMixin:
             chamber_dimensions_units: Units for the values. Defaults to "m".
 
         Returns:
-            BuilderChamberDimensionsMixin: Self for method chaining.
+            self (BuilderChamberDimensionsMixin): Self for method chaining.
 
         Raises:
             ValueError: If ``chamber_dimensions`` is not length three or any
@@ -808,7 +808,7 @@ class BuilderWallPotentialMixin:
                 "V".
 
         Returns:
-            BuilderWallPotentialMixin: Self for method chaining.
+            self (BuilderWallPotentialMixin): Self for method chaining.
         """
         if wall_potential_units in {"V", "volt", "volts"}:
             self.wall_potential = wall_potential
@@ -878,7 +878,7 @@ class BuilderWallElectricFieldMixin:
                 Defaults to "V/m".
 
         Returns:
-            BuilderWallElectricFieldMixin: Self for method chaining.
+            self (BuilderWallElectricFieldMixin): Self for method chaining.
 
         Raises:
             ValueError: If the tuple is not length three or any entry is not
@@ -951,7 +951,7 @@ class BuilderDistributionTypeMixin:
                 "particle_resolved".
 
         Returns:
-            BuilderDistributionTypeMixin: Self for method chaining.
+            self (BuilderDistributionTypeMixin): Self for method chaining.
 
         Raises:
             ValueError: If ``distribution_type`` is not supported.

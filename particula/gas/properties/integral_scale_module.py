@@ -26,13 +26,13 @@ def get_lagrangian_integral_time(
         - turbulent_dissipation (ε) is Turbulent energy dissipation rate
             [m²/s³].
 
-    Arguments:
-        - fluid_rms_velocity : Fluid RMS fluctuation velocity [m/s].
-        - turbulent_dissipation : Turbulent kinetic energy dissipation rate
+    Args:
+        fluid_rms_velocity: Fluid RMS fluctuation velocity [m/s].
+        turbulent_dissipation: Turbulent kinetic energy dissipation rate
             [m²/s³].
 
     Returns:
-        - Lagrangian integral timescale [s].
+        Lagrangian integral timescale [s].
 
     Examples:
         ``` py title="Example Usage"
@@ -67,13 +67,13 @@ def get_eulerian_integral_length(
         - turbulent_dissipation (ε) is Turbulent energy dissipation rate
             [m²/s³].
 
-    Arguments:
-        - fluid_rms_velocity : Fluid RMS fluctuation velocity [m/s].
-        - turbulent_dissipation : Turbulent kinetic energy dissipation rate
+    Args:
+        fluid_rms_velocity: Fluid RMS fluctuation velocity [m/s].
+        turbulent_dissipation: Turbulent kinetic energy dissipation rate
             [m²/s³].
 
     Returns:
-        - Eulerian integral length scale [m].
+        Eulerian integral length scale [m].
 
     Examples:
         ``` py title="Example"

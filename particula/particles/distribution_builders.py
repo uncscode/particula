@@ -47,7 +47,7 @@ class MassBasedMovingBinBuilder(BuilderABC):
         """Build and return a MassBasedMovingBin instance.
 
         Returns:
-            - MassBasedMovingBin : A strategy for mass-based particle
+            MassBasedMovingBin: A strategy for mass-based particle
                 distributions.
 
         Examples:
@@ -93,7 +93,7 @@ class RadiiBasedMovingBinBuilder(BuilderABC):
         """Build and return a RadiiBasedMovingBin instance.
 
         Returns:
-            - RadiiBasedMovingBin : A strategy for radius-based particle
+            RadiiBasedMovingBin: A strategy for radius-based particle
                 distributions.
 
         Examples:
@@ -139,7 +139,7 @@ class SpeciatedMassMovingBinBuilder(BuilderABC):
         """Build and return a SpeciatedMassMovingBin instance.
 
         Returns:
-            - SpeciatedMassMovingBin : A strategy for speciated mass
+            SpeciatedMassMovingBin: A strategy for speciated mass
                 distributions.
 
         Examples:
@@ -184,8 +184,8 @@ class ParticleResolvedSpeciatedMassBuilder(BuilderABC):
         """Build and return a ParticleResolvedSpeciatedMass instance.
 
         Returns:
-            - ParticleResolvedSpeciatedMass : A strategy that resolves
-              each particle's species composition independently.
+            ParticleResolvedSpeciatedMass: A strategy that resolves
+                each particle's species composition independently.
 
         Examples:
             ```py title="Build Example"

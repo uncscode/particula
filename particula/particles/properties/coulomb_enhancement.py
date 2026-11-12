@@ -44,15 +44,15 @@ def get_coulomb_enhancement_ratio(
         - k_B is the Boltzmann constant (J·K⁻¹).
         - T is the temperature (K).
 
-    Arguments:
-        - radius : Radius of the particles (m).
-        - charge : Number of integer charges on the particles (dimensionless).
-        - temperature : System temperature (K).
-        - ratio_lower_limit : Lower limit to clip the potential ratio for very
-          large negative (repulsive) values.
+    Args:
+        particle_radius: Radius of the particles (m).
+        charge: Number of integer charges on the particles (dimensionless).
+        temperature: System temperature (K).
+        ratio_lower_limit: Lower limit to clip the potential ratio for very
+            large negative (repulsive) values.
 
     Returns:
-        - The Coulomb potential ratio (dimensionless).
+        The Coulomb potential ratio (dimensionless).
 
     Examples:
         ``` py title="Example"
@@ -113,11 +113,11 @@ def get_coulomb_kinetic_limit(
 
     where ϕ_E is the Coulomb potential ratio (dimensionless).
 
-    Arguments:
-        - coulomb_potential : The Coulomb potential ratio ϕ_E (dimensionless).
+    Args:
+        coulomb_potential: The Coulomb potential ratio ϕ_E (dimensionless).
 
     Returns:
-        - The Coulomb enhancement factor in the kinetic limit (dimensionless).
+        The Coulomb enhancement factor in the kinetic limit (dimensionless).
 
     Examples:
         ``` py title="Example"
@@ -156,11 +156,11 @@ def get_coulomb_continuum_limit(
 
     where ϕ_E is the Coulomb potential ratio (dimensionless).
 
-    Arguments:
-        - coulomb_potential : The Coulomb potential ratio ϕ_E (dimensionless).
+    Args:
+        coulomb_potential: The Coulomb potential ratio ϕ_E (dimensionless).
 
     Returns:
-        - The Coulomb enhancement factor in the continuum limit (dimensionless).
+        The Coulomb enhancement factor in the continuum limit (dimensionless).
 
     Examples:
         ``` py title="Example"

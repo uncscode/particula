@@ -22,18 +22,18 @@ def get_dimensional_kernel(
     dimensionless coagulation kernel and the reduced quantities. All inputs
     are square matrices, representing all particle-particle interactions.
 
-    Arguments:
-        - dimensionless_kernel : The dimensionless coagulation kernel (H)
-          [dimensionless].
-        - coulomb_potential_ratio : The Coulomb potential ratio [dimensionless].
-        - sum_of_radii : The sum of the radii of the particles [m].
-        - reduced_mass : The reduced mass of the particles [kg].
-        - reduced_friction_factor : The reduced friction factor of the
-          particles [dimensionless].
+    Args:
+        dimensionless_kernel: The dimensionless coagulation kernel (H)
+            [dimensionless].
+        coulomb_potential_ratio: The Coulomb potential ratio [dimensionless].
+        sum_of_radii: The sum of the radii of the particles [m].
+        reduced_mass: The reduced mass of the particles [kg].
+        reduced_friction_factor: The reduced friction factor of the
+            particles [dimensionless].
 
     Returns:
-        - The dimensioned coagulation kernel, as a square matrix, of all
-          particle-particle interactions [m³/s].
+        The dimensioned coagulation kernel, as a square matrix, of all
+            particle-particle interactions [m³/s].
 
     References:
         - Chahl, H. S., & Gopalakrishnan, R. (2019). High potential, near free
@@ -64,16 +64,16 @@ def get_hard_sphere_kernel(
     This function provides a hard sphere approximation for the dimensionless
     coagulation kernel based on the diffusive Knudsen number.
 
-    Arguments:
-        - diffusive_knudsen : The diffusive Knudsen number (K_nD)
-          [dimensionless].
+    Args:
+        diffusive_knudsen: The diffusive Knudsen number (K_nD)
+            [dimensionless].
 
     Returns:
-        - The dimensionless coagulation kernel (H) [dimensionless].
+        The dimensionless coagulation kernel (H) [dimensionless].
 
     Raises:
-        - ValueError : If diffusive_knudsen contains negative values, NaN, or
-          infinity.
+        ValueError: If diffusive_knudsen contains negative values, NaN, or
+            infinity.
 
     References:
     - Dyachkov, S. A., Kustova, E. V., & Kustov, A. V. (2007). Coagulation of
@@ -115,14 +115,14 @@ def get_coulomb_kernel_dyachkov2007(
     This function accounts for the Coulomb potential between particles using
     the Dyachkov et al. (2007) approximation.
 
-    Arguments:
-        - diffusive_knudsen : The diffusive Knudsen number (K_nD)
+    Args:
+        diffusive_knudsen: The diffusive Knudsen number (K_nD)
             [dimensionless].
-        - coulomb_potential_ratio : The Coulomb potential ratio (phi_E)
-          [dimensionless].
+        coulomb_potential_ratio: The Coulomb potential ratio (phi_E)
+            [dimensionless].
 
     Returns:
-        - The dimensionless coagulation kernel (H) [dimensionless].
+        The dimensionless coagulation kernel (H) [dimensionless].
 
     References:
     - Dyachkov, S. A., Kustova, E. V., & Kustov, A. V. (2007). Coagulation of
@@ -171,14 +171,14 @@ def get_coulomb_kernel_gatti2008(
     This function accounts for the Coulomb potential between particles using
     the Gatti et al. (2008) approximation.
 
-    Arguments:
-        - diffusive_knudsen : The diffusive Knudsen number (K_nD)
+    Args:
+        diffusive_knudsen: The diffusive Knudsen number (K_nD)
             [dimensionless].
-        - coulomb_potential_ratio : The Coulomb potential ratio (phi_E)
-          [dimensionless].
+        coulomb_potential_ratio: The Coulomb potential ratio (phi_E)
+            [dimensionless].
 
     Returns:
-        - The dimensionless coagulation kernel (H) [dimensionless].
+        The dimensionless coagulation kernel (H) [dimensionless].
 
     References:
     - Gatti, M., & Kortshagen, U. (2008). Analytical model of particle
@@ -239,14 +239,14 @@ def get_coulomb_kernel_gopalakrishnan2012(
     This function accounts for the Coulomb potential between particles using
     the Gopalakrishnan and Hogan (2012) approximation.
 
-    Arguments:
-        - diffusive_knudsen : The diffusive Knudsen number (K_nD)
+    Args:
+        diffusive_knudsen: The diffusive Knudsen number (K_nD)
             [dimensionless].
-        - coulomb_potential_ratio : The Coulomb potential ratio (phi_E)
-          [dimensionless].
+        coulomb_potential_ratio: The Coulomb potential ratio (phi_E)
+            [dimensionless].
 
     Returns:
-        - The dimensionless coagulation kernel (H) [dimensionless].
+        The dimensionless coagulation kernel (H) [dimensionless].
 
     References:
     - Gopalakrishnan, R., & Hogan, C. J. (2012). Coulomb-influenced collisions
@@ -285,14 +285,14 @@ def get_coulomb_kernel_chahl2019(
     This function accounts for the Coulomb potential between particles using
     the Chahl and Gopalakrishnan (2019) approximation.
 
-    Arguments:
-        - diffusive_knudsen : The diffusive Knudsen number (K_nD)
+    Args:
+        diffusive_knudsen: The diffusive Knudsen number (K_nD)
             [dimensionless].
-        - coulomb_potential_ratio : The Coulomb potential ratio (phi_E)
-          [dimensionless].
+        coulomb_potential_ratio: The Coulomb potential ratio (phi_E)
+            [dimensionless].
 
     Returns:
-        - The dimensionless coagulation kernel (H) [dimensionless].
+        The dimensionless coagulation kernel (H) [dimensionless].
 
     References:
         - Chahl, H. S., & Gopalakrishnan, R. (2019). High potential, near free

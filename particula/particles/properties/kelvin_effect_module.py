@@ -42,14 +42,14 @@ def get_kelvin_radius(
         - T is the temperature in Kelvin (K).
         - ρ is the effective density in kg/m³.
 
-    Arguments:
-        - effective_surface_tension : Surface tension of the mixture (N/m).
-        - effective_density : Effective density of the mixture (kg/m³).
-        - molar_mass : Molar mass (kg/mol).
-        - temperature : Temperature of the system (K).
+    Args:
+        effective_surface_tension: Surface tension of the mixture (N/m).
+        effective_density: Effective density of the mixture (kg/m³).
+        molar_mass: Molar mass (kg/mol).
+        temperature: Temperature of the system (K).
 
     Returns:
-        - Kelvin radius in meters (float or NDArray[np.float64]).
+        Kelvin radius in meters (float or NDArray[np.float64]).
 
     Examples:
         ``` py title="Example"
@@ -99,13 +99,13 @@ def get_kelvin_term(
     stability. Below ~0.1 nm, continuum mechanics breaks down anyway, so
     the condensation equations become questionable.
 
-    Arguments:
-        - particle_radius : Radius of the particle (m).
-        - kelvin_radius_value : Precomputed Kelvin radius (m).
+    Args:
+        particle_radius: Radius of the particle (m).
+        kelvin_radius_value: Precomputed Kelvin radius (m).
 
     Returns:
-        - Dimensionless exponential factor adjusting vapor pressure.
-          For extreme cases, the value is clipped to prevent overflow.
+        Dimensionless exponential factor adjusting vapor pressure.
+            For extreme cases, the value is clipped to prevent overflow.
 
     Examples:
         ``` py title="Example"

@@ -198,14 +198,14 @@ class ParticleResolvedSpeciatedMass(DistributionStrategy):
         charge array is provided as a numpy array AND at least one of the
         colliding particles has a non-zero charge.
 
-        Arguments:
-            - distribution : The mass distribution array. Shape is (N,) for
+        Args:
+            distribution: The mass distribution array. Shape is (N,) for
                 single species or (N, M) for M species per particle.
-            - concentration : The concentration array of shape (N,).
-            - density : The density array of shape (M,) for species densities.
-            - indices : Collision pair indices array of shape (K, 2) where
+            concentration: The concentration array of shape (N,).
+            density: The density array of shape (M,) for species densities.
+            indices: Collision pair indices array of shape (K, 2) where
                 each row is [small_index, large_index].
-            - charge : Optional charge array of shape (N,). If provided and
+            charge: Optional charge array of shape (N,). If provided and
                 contains non-zero values in colliding pairs, charges will be
                 summed during collisions. If None, charge handling is skipped.
 

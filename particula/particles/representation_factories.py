@@ -53,9 +53,9 @@ class ParticleRepresentationFactory(
         """Return a mapping of strategy types to builder instances.
 
         Returns:
-            - A dictionary where each key is a strategy type
-              ("mass", "radius", etc.) and each value is the
-              corresponding builder instance.
+            result (dict): A dictionary where each key is a strategy type
+                ("mass", "radius", etc.) and each value is the
+                corresponding builder instance.
 
         Examples:
             ```py title="get_builders usage"
