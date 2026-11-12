@@ -933,16 +933,16 @@ def _remove_resolver_schedule_registrations() -> Any:
 
 
 def _inventory_oracle(fixture: Any) -> np.ndarray:
-    """Compute concentration-weighted inventory independently."""
+    """Compute resolved-count particle plus extensive gas inventory."""
     particles = fixture.session.particles
     gas = fixture.session.gas
-    return particles.volume.numpy()[:, None] * (
+    return (
         np.sum(
             particles.masses.numpy()
             * particles.concentration.numpy()[:, :, None],
             axis=1,
         )
-        + gas.concentration.numpy()
+        + gas.concentration.numpy() * particles.volume.numpy()[:, None]
     )
 
 
@@ -1103,6 +1103,13 @@ def _zero_nucleation_request(
     duration: float,
 ) -> ResidentNucleationRequest:
     """Build a valid, deterministic no-admission nucleation request."""
+    from particula.dynamics.nucleation.species_mapping import (
+        NucleationSpeciesMap,
+    )
+    from particula.gpu.nucleation_species_mapping import (
+        prepare_nucleation_species_map,
+    )
+
     config = NucleationConfig(
         rate_law="activation",
         coefficient=0.0,
@@ -1122,6 +1129,18 @@ def _zero_nucleation_request(
         config,
         duration,
         NucleationExhaustionControls(True, False),
+        species_binding=prepare_nucleation_species_map(
+            session.particles,
+            session.gas,
+            gas_names=session.metadata.gas_names,
+            species_map=NucleationSpeciesMap(
+                session.metadata.gas_names,
+                tuple(
+                    (index, index)
+                    for index in range(session.dimensions.n_species)
+                ),
+            ),
+        ),
     )
 
 
@@ -1313,18 +1332,25 @@ def _build_scenario_prepared_loop_impl(
 ) -> _ScenarioPreparedLoop:
     """Build the P1 two-box scenario without shared fixture update sources."""
     import particula.execution.resident_scheduler as resident_scheduler
+    from particula.dynamics.condensation.species_mapping import (
+        CondensationSpeciesMap,
+    )
     from particula.execution.resident_scheduler import _CANONICAL_IDS
     from particula.gpu.kernels.wall_loss import NeutralWallLossConfig
+    from particula.gpu.species_mapping import prepare_condensation_species_map
 
     wp = pytest.importorskip("warp")
     if scenario is None:
         scenario = _captured_full_loop_scenario()
     particles = ParticleData(
         masses=scenario.particle_masses.copy(),
-        concentration=scenario.particle_concentration.copy(),
+        concentration=(
+            scenario.particle_concentration * scenario.volume[:, None]
+        ),
         charge=scenario.particle_charge.copy(),
         density=np.array([1000.0, 1200.0], dtype=np.float64),
         volume=scenario.volume.copy(),
+        distribution_type="particle_resolved",
     )
     gas = GasData(
         name=["species-a", "species-b"],
@@ -1409,6 +1435,14 @@ def _build_scenario_prepared_loop_impl(
             session.environment,
             thermodynamics,
             scratch_buffers=condensation_resources.scratch_buffers,
+            species_binding=prepare_condensation_species_map(
+                session.particles,
+                session.gas,
+                gas_names=session.metadata.gas_names,
+                species_map=CondensationSpeciesMap(
+                    session.metadata.gas_names, ((0, 0), (1, 1))
+                ),
+            ),
         ),
         duration,
     )
@@ -1460,7 +1494,11 @@ def _build_scenario_prepared_loop_impl(
                 ResidentDiagnosticOperation.SATURATION_RATIO_SNAPSHOT, matrix()
             ),
             ResidentDiagnosticRegistration(
-                ResidentDiagnosticOperation.TOTAL_SPECIES_MASS, matrix()
+                ResidentDiagnosticOperation.TOTAL_SPECIES_MASS,
+                matrix(),
+                species_map=CondensationSpeciesMap(
+                    session.metadata.gas_names, ((0, 0), (1, 1))
+                ),
             ),
             ResidentDiagnosticRegistration(
                 ResidentDiagnosticOperation.PARTICLE_NUMBER_CONCENTRATION,
@@ -1688,14 +1726,20 @@ def _build_scenario_prepared_loop(
 
 
 def _prepared_snapshot(loop: _PreparedLoop) -> dict[str, np.ndarray]:
-    """Synchronize once and copy all meaningful resident-loop outputs."""
+    """Synchronize and snapshot outputs with resolved counts as densities.
+
+    The independent scenario oracle uses number density. This explicit host
+    comparison boundary divides native counts by current representative volume.
+    """
     loop.wp.synchronize_device(loop.session.particles.masses.device)
     particles = loop.session.particles
     gas = loop.session.gas
     environment = loop.session.environment
     snapshot = {
         "particle_masses": particles.masses.numpy().copy(),
-        "particle_concentration": particles.concentration.numpy().copy(),
+        "particle_concentration": (
+            particles.concentration.numpy() / particles.volume.numpy()[:, None]
+        ),
         "particle_charge": particles.charge.numpy().copy(),
         "particle_density": particles.density.numpy().copy(),
         "particle_volume": particles.volume.numpy().copy(),
@@ -1764,13 +1808,15 @@ def _scenario_snapshot(loop: _ScenarioPreparedLoop) -> dict[str, np.ndarray]:
 def _prepared_snapshot_without_sync(
     loop: _PreparedLoop,
 ) -> dict[str, np.ndarray]:
-    """Copy prepared-loop arrays after the caller has synchronized once."""
+    """Copy arrays after synchronization, normalizing counts to oracle density."""
     particles = loop.session.particles
     gas = loop.session.gas
     environment = loop.session.environment
     snapshot = {
         "particle_masses": particles.masses.numpy().copy(),
-        "particle_concentration": particles.concentration.numpy().copy(),
+        "particle_concentration": (
+            particles.concentration.numpy() / particles.volume.numpy()[:, None]
+        ),
         "particle_charge": particles.charge.numpy().copy(),
         "particle_density": particles.density.numpy().copy(),
         "particle_volume": particles.volume.numpy().copy(),
@@ -2045,7 +2091,7 @@ def _independent_particle_work_oracle(
     snapshot: dict[str, np.ndarray],
     scenario: _CapturedLoopScenario,
 ) -> dict[str, np.ndarray]:
-    """Calculate detached PARTICLES state and planning buffers for one step."""
+    """Calculate density state and native count planning buffers independently."""
     concentration = snapshot["particle_concentration"].copy()
     masses = snapshot["particle_masses"].copy()
     charge = snapshot["particle_charge"].copy()
@@ -2117,10 +2163,16 @@ def _independent_particle_work_oracle(
         "particle_concentration": concentration,
         "particle_masses": masses,
         "particle_charge": charge,
-        "communication_source_debits": debits,
-        "communication_destination_credits": credits,
+        "communication_source_debits": (
+            debits * snapshot["particle_volume"][:, None]
+        ),
+        "communication_destination_credits": (
+            credits * snapshot["particle_volume"][:, None]
+        ),
         "communication_assignments": assignments,
-        "communication_requests": requests,
+        "communication_requests": (
+            requests * snapshot["particle_volume"][scenario.edge_sources, None]
+        ),
     }
 
 

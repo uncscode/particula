@@ -16,6 +16,9 @@ import numpy as np
 import numpy.testing as npt
 import pytest
 
+from particula.dynamics.condensation.species_mapping import (
+    CondensationSpeciesMap,
+)
 from particula.execution import (
     CONDENSATION_CAPABILITY_MATRIX,
     CONDENSATION_PROCESS,
@@ -192,10 +195,11 @@ def _cpu_carriers(
         volume[lane] = 1.0e-8 * value
     particles = ParticleData(
         masses=masses,
-        concentration=concentration,
+        concentration=concentration * volume[:, None],
         charge=charge,
         density=np.linspace(1000.0, 1200.0, n_species, dtype=np.float64),
         volume=volume,
+        distribution_type="particle_resolved",
     )
     gas = GasData(
         name=[f"species-{index}" for index in range(n_species)],
@@ -383,8 +387,9 @@ def _inventory(session: Any) -> np.ndarray:
     masses, concentration, _, gas, *_ = state
     # ``_snapshot`` is the explicit readback boundary for all resident data.
     volume = session.particles.volume.numpy()
-    return volume[:, None] * (
-        np.sum(masses * concentration[:, :, None], axis=1) + gas
+    return (
+        np.sum(masses * concentration[:, :, None], axis=1)
+        + gas * volume[:, None]
     )
 
 
@@ -497,7 +502,12 @@ def _diagnostics_plan(
             ResidentDiagnosticOperation.SATURATION_RATIO_SNAPSHOT, matrix()
         ),
         ResidentDiagnosticRegistration(
-            ResidentDiagnosticOperation.TOTAL_SPECIES_MASS, total_mass
+            ResidentDiagnosticOperation.TOTAL_SPECIES_MASS,
+            total_mass,
+            species_map=CondensationSpeciesMap(
+                session.metadata.gas_names,
+                tuple((index, index) for index in range(species)),
+            ),
         ),
         ResidentDiagnosticRegistration(
             ResidentDiagnosticOperation.PARTICLE_NUMBER_CONCENTRATION,
@@ -538,6 +548,7 @@ def _scheduler_request(
     """Build one complete scheduler request with isolated wall-loss physics."""
     wp = pytest.importorskip("warp")
     from particula.gpu.kernels.wall_loss import NeutralWallLossConfig
+    from particula.gpu.species_mapping import prepare_condensation_species_map
 
     graph, schedule, by_id = _resident_graph()
     device = session.particles.masses.device
@@ -583,6 +594,17 @@ def _scheduler_request(
             session.environment,
             thermodynamics,
             scratch_buffers=condensation_resources.scratch_buffers,
+            species_binding=prepare_condensation_species_map(
+                session.particles,
+                session.gas,
+                gas_names=session.metadata.gas_names,
+                species_map=CondensationSpeciesMap(
+                    session.metadata.gas_names,
+                    tuple(
+                        (index, index) for index in range(dimensions.n_species)
+                    ),
+                ),
+            ),
         ),
         duration,
     )

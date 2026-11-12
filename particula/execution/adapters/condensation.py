@@ -331,8 +331,8 @@ class WarpCondensationState:
         latent_heat: Optional opaque latent-heat reference.
         energy_transfer: Optional writable energy-transfer output sidecar.
         thermal_work: Optional opaque thermal-work reference.
-        species_binding: Required explicit pinned species map for native
-            particles; omitted for legacy carriers.
+        species_binding: Required explicit pinned species map for discrete or
+            resolved particles; untagged carriers are rejected.
 
     Raises:
         TypeError: If the configuration or a primary container has an invalid
@@ -414,14 +414,13 @@ class WarpCondensationState:
         from particula.gpu.population_metadata import particle_distribution_type
         from particula.gpu.species_mapping import CondensationSpeciesBinding
 
-        if particle_distribution_type(self.particles) is not None:
-            if type(self.species_binding) is not CondensationSpeciesBinding:
-                raise ValueError("native condensation requires species_binding")
-            self.species_binding.validate(self.particles, self.gas)
-        elif self.species_binding is not None:
+        if particle_distribution_type(self.particles) is None:
             raise ValueError(
-                "legacy condensation does not accept species_binding"
+                "condensation requires explicit population metadata"
             )
+        if type(self.species_binding) is not CondensationSpeciesBinding:
+            raise ValueError("native condensation requires species_binding")
+        self.species_binding.validate(self.particles, self.gas)
 
     def _validate_primary_arrays(self, wp: Any) -> Any:
         """Validate all primary Warp arrays and return the mass storage.
@@ -897,9 +896,8 @@ class WarpCondensationExecutionAdapter:
             latent_heat=p2_state.latent_heat,
             energy_transfer=p2_state.energy_transfer,
             thermal_work=p2_state.thermal_work,
+            species_binding=p2_state.species_binding,
         )
-        if p2_state.species_binding is not None:
-            call_kwargs["species_binding"] = p2_state.species_binding
         if prepare is None or enqueue is None:
             return _PreparedWarpCondensationBinding(
                 state,

@@ -120,6 +120,9 @@ def _make_graph_capture_state(
         for name, value in sidecars.items()
     }
     return {
+        "species_binding": support._identity_species_binding(
+            gpu_particles, gpu_gas
+        ),
         "particles": gpu_particles,
         "gas": gpu_gas,
         "temperature": wp.array(temperature, dtype=wp.float64, device=device),
@@ -353,6 +356,7 @@ def _call_condensation(
         scratch_buffers=state["scratch"],
         latent_heat=state["latent_heat"],
         energy_transfer=state["energy"],
+        species_binding=state["species_binding"],
     )
 
 
@@ -407,7 +411,11 @@ def _assert_graph_replay(device: str) -> None:
         )
         support._assert_contract_allclose(
             replay["energy"],
-            replay["scratch_total_mass_transfer"].sum(axis=1)
+            np.sum(
+                replay["scratch_total_mass_transfer"]
+                * captured["particle_concentration"][:, :, None],
+                axis=1,
+            )
             * captured["latent_heat_values"][None, :],
         )
     support._assert_particle_gas_inventory_conserved(
@@ -419,7 +427,11 @@ def _assert_graph_replay(device: str) -> None:
     )
     support._assert_contract_allclose(
         normal_result["energy"],
-        normal_result["scratch_total_mass_transfer"].sum(axis=1)
+        np.sum(
+            normal_result["scratch_total_mass_transfer"]
+            * normal["particle_concentration"][:, :, None],
+            axis=1,
+        )
         * normal["latent_heat_values"][None, :],
     )
 
