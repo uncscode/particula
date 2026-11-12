@@ -554,3 +554,35 @@ Validation: original condensation strategy suite plus extracted controls:
 **144 passed in 0.16s**, `/tmp/m6-staggered-controls.log`; scoped Ruff/format and
 whitespace checks passed. No production behavior changed. Main shared
 condensation legacy execution removal remains pending.
+
+
+## Native binned latent/isothermal condensation regressions
+
+Migrated twelve binned regression methods and their fixture from the shared
+legacy suite into `native_binned_condensation_test.py`, under the removal-safe
+facade guard. Removed their old representation/species construction and
+conversion calls. The native fixture retains radius nodes, lognormal inputs,
+material densities/fractions, activity/surface/vapor-pressure laws, transport
+parameters, gas loading, bin counts and tolerances. Strategies now use full gas
+molar masses with an explicit ordered three-species map.
+
+The PDF fixture now declares `continuous_pdf` and its radius grid, making
+conservation an independent trapezoidal integral of mass times dN/dr; the old
+untagged fixture incorrectly summed raw PDF nodes. Discrete cases sum number-
+density-weighted mass. Retained total-mass assertions and added tight individual
+species inventory comparisons (rtol=1e-12, atol=1e-30). Zero-latent-heat parity,
+shape checks and the proposal-based discrete latent-energy oracle remain;
+energy explicitly uses extensive applied mass. Rejection checks now match
+native validation messages and prove both containers' arrays remain unchanged.
+Every old node has its successor in `condensation_assertions.json`.
+
+Validation:
+- First focused run: ten passed; two failed solely on legacy error-message
+  expectations, corrected to the existing native messages.
+- Full condensation tree and integration suites after strengthened assertions:
+  **729 passed, 1 skipped in 9.56s**, `/tmp/m6-native-binned-broad.log`.
+- Full-package mypy: **554 source files passed**,
+  `/tmp/m6-native-binned-mypy.log`.
+- Scoped Ruff/format and whitespace checks passed.
+No production stepping changed. Remaining shared condensation compatibility
+and all final release/publication gates remain pending.
