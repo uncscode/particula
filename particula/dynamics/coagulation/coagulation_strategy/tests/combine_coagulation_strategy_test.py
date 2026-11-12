@@ -21,7 +21,9 @@ from particula.dynamics.coagulation.coagulation_strategy.turbulent_shear_coagula
 )
 
 # pylint: disable=line-too-long
-from particula.particles import PresetParticleRadiusBuilder
+from particula.particles import (
+    create_lognormal_binned_particle_data,
+)
 from particula.particles.particle_data import ParticleData
 
 
@@ -32,11 +34,16 @@ class TestCombineCoagulationStrategy(unittest.TestCase):
     def setUp(self):
         """Set up the test environment.
 
-        Initializes a particle representation and creates instances of
+        Initializes native particle data and creates instances of
         CombineCoagulationStrategy for both discrete and continuous_pdf
         distribution types.
         """
-        self.particle = PresetParticleRadiusBuilder().build()
+        self.particle = create_lognormal_binned_particle_data(
+            distribution_type="discrete"
+        )
+        self.particle_pdf = create_lognormal_binned_particle_data(
+            distribution_type="continuous_pdf"
+        )
         self.temperature = 298.15  # Kelvin
         self.pressure = 101325  # Pascal
         self.turbulent_dissipation = 0.1  # m^2/s^2
@@ -70,6 +77,7 @@ class TestCombineCoagulationStrategy(unittest.TestCase):
             charge=np.array([[0.0, 1.0, -1.0]]),
             density=np.array([1000.0, 1200.0]),
             volume=np.array([1.0]),
+            distribution_type="discrete",
         )
 
     def test_kernel_combination(self):
@@ -102,14 +110,14 @@ class TestCombineCoagulationStrategy(unittest.TestCase):
 
         Ensures that the step method updates the particle concentration.
         """
-        initial_concentration = self.particle.get_concentration().copy()
+        initial_concentration = self.particle.concentration[0].copy()
         self.combined_strategy.step(
             particle=self.particle,
             temperature=self.temperature,
             pressure=self.pressure,
-            time_step=1.0,
+            time_step=1.0e-3,
         )
-        updated_concentration = self.particle.get_concentration()
+        updated_concentration = self.particle.concentration[0]
         self.assertFalse(
             np.array_equal(initial_concentration, updated_concentration)
         )
@@ -134,3 +142,25 @@ class TestCombineCoagulationStrategy(unittest.TestCase):
         np.testing.assert_array_almost_equal(
             kernel_combined, kernel_turbulent_shear + kernel_brownian
         )
+
+    def test_native_oversized_steps_reject_without_mutation(self):
+        """Native admission rejects the old one-second negative proposal."""
+        for particle, strategy in [(self.particle, self.combined_strategy)]:
+            with self.subTest(kind=particle.distribution_type):
+                before = particle.copy()
+                with self.assertRaisesRegex(
+                    ValueError, "smaller finite time_step"
+                ):
+                    strategy.step(
+                        particle, self.temperature, self.pressure, 1.0
+                    )
+                for field in (
+                    "masses",
+                    "concentration",
+                    "charge",
+                    "density",
+                    "volume",
+                ):
+                    np.testing.assert_array_equal(
+                        getattr(particle, field), getattr(before, field)
+                    )

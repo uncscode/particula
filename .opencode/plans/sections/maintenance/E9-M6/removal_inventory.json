@@ -665,7 +665,7 @@
           ]
         }
       ],
-      "disposition": "pending review",
+      "disposition": "Migrated mechanism tests to native lognormal initialization and explicit PMF/PDF/resolved metadata; every original test is mapped in coagulation_mechanism_assertions.json. Oversized legacy updates now have separate rejection assertions. Shared strategy dispatch removal remains pending.",
       "test_nodes": [
         {
           "name": "test_direct_kernel_flag_default_false",

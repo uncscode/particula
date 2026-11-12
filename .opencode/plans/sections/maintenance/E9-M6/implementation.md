@@ -322,3 +322,21 @@ Validation:
 
 CPU condensation/coagulation, facade definitions, untagged GPU/lifecycle
 admission, complete inventories and final publication/readiness remain pending.
+
+## Native coagulation mechanism fixtures
+
+Migrated all six mechanism suites to explicit native discrete, radius-PDF,
+and resolved initializers. Recorded all 43 original test functions and their
+successors in `coagulation_mechanism_assertions.json`. Charged collision tests
+now observe the real collision selector, retaining pre-merge charges and all
+collision assertions without facade interception.
+
+Seven former one-second update cases violate the existing native positivity
+boundary. Their positive-update successors use 0.001 seconds; four additional
+cases retain the original one-second inputs and verify rejection with exact
+state preservation. No production algorithm or numerical tolerance changed.
+
+Validation: six mechanism suites **47 passed**; full coagulation tree
+**757 passed in 3.06s** (`/tmp/m6-coag-fixtures-broad.log`). Full-package mypy
+passed for 552 files (`/tmp/m6-coag-fixtures-mypy.log`). These are fixture
+migration checks, not evidence that shared legacy dispatch is removed.

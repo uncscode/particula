@@ -1,0 +1,303 @@
+[
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/brownian_coagulation_strategy_test.py",
+    "test": "TestBrownianCoagulationStrategy::test_kernel_discrete",
+    "original": "def test_kernel_discrete(self):\n        \"\"\"Test the kernel calculation for discrete distribution.\"\"\"\n        # Test the kernel calculation for discrete distribution\n        kernel = self.strategy_discrete.kernel(\n            particle=self.particle,\n            temperature=self.temperature,\n            pressure=self.pressure,\n        )\n        self.assertIsInstance(kernel, np.ndarray)",
+    "successor": "TestBrownianCoagulationStrategy::test_kernel_discrete",
+    "disposition": "Same numerical/assertion body using explicitly tagged native fixtures; native initializer preserves default lognormal parameters, PDF tests use distinct radius-PDF state."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/brownian_coagulation_strategy_test.py",
+    "test": "TestBrownianCoagulationStrategy::test_step_discrete",
+    "original": "def test_step_discrete(self):\n        \"\"\"Test the step method for discrete distribution.\"\"\"\n        # Test the step method for discrete distribution\n        initial_concentration = self.particle.get_concentration().copy()\n        self.strategy_discrete.step(\n            particle=self.particle,\n            temperature=self.temperature,\n            pressure=self.pressure,\n            time_step=1.0,\n        )\n        updated_concentration = self.particle.get_concentration()\n        self.assertFalse(\n            np.array_equal(initial_concentration, updated_concentration)\n        )",
+    "successor": "TestBrownianCoagulationStrategy::test_step_discrete",
+    "disposition": "Same numerical/assertion body using explicitly tagged native fixtures; native initializer preserves default lognormal parameters, PDF tests use distinct radius-PDF state."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/brownian_coagulation_strategy_test.py",
+    "test": "TestBrownianCoagulationStrategy::test_step_particle_resolved",
+    "original": "def test_step_particle_resolved(self):\n        \"\"\"Test the kernel calculation for particle_resolved distribution.\"\"\"\n        # Test the kernel calculation for particle_resolved distribution\n        old_concentration = self.particle_resolved.get_total_concentration()\n        self.strategy_particle_resolved.step(\n            particle=self.particle_resolved,\n            temperature=self.temperature,\n            pressure=self.pressure,\n            time_step=1000,\n        )\n        new_concentration = self.particle_resolved.get_total_concentration()\n        self.assertNotEqual(old_concentration, new_concentration)",
+    "successor": "TestBrownianCoagulationStrategy::test_step_particle_resolved",
+    "disposition": "Same numerical/assertion body using explicitly tagged native fixtures; native initializer preserves default lognormal parameters, PDF tests use distinct radius-PDF state."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/brownian_coagulation_strategy_test.py",
+    "test": "TestBrownianCoagulationStrategy::test_kernel_continuous_pdf",
+    "original": "def test_kernel_continuous_pdf(self):\n        \"\"\"Test the kernel calculation for continuous_pdf distribution.\"\"\"\n        # Test the kernel calculation for continuous_pdf distribution\n        kernel = self.strategy_continuous_pdf.kernel(\n            particle=self.particle,\n            temperature=self.temperature,\n            pressure=self.pressure,\n        )\n        self.assertIsInstance(kernel, np.ndarray)",
+    "successor": "TestBrownianCoagulationStrategy::test_kernel_continuous_pdf",
+    "disposition": "Same numerical/assertion body using explicitly tagged native fixtures; native initializer preserves default lognormal parameters, PDF tests use distinct radius-PDF state."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/brownian_coagulation_strategy_test.py",
+    "test": "TestBrownianCoagulationStrategy::test_step_continuous_pdf",
+    "original": "def test_step_continuous_pdf(self):\n        \"\"\"Test the step method for continuous_pdf distribution.\"\"\"\n        # Test the step method for continuous_pdf distribution\n        initial_concentration = self.particle.get_concentration().copy()\n        self.strategy_continuous_pdf.step(\n            particle=self.particle,\n            temperature=self.temperature,\n            pressure=self.pressure,\n            time_step=1.0,\n        )\n        updated_concentration = self.particle.get_concentration()\n        self.assertFalse(\n            np.array_equal(initial_concentration, updated_concentration)\n        )",
+    "successor": "TestBrownianCoagulationStrategy::test_step_continuous_pdf",
+    "disposition": "Same numerical/assertion body using explicitly tagged native fixtures; native initializer preserves default lognormal parameters, PDF tests use distinct radius-PDF state."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/brownian_coagulation_strategy_test.py",
+    "test": "TestBrownianCoagulationStrategy::test_brownian_kernel_with_particle_data",
+    "original": "def test_brownian_kernel_with_particle_data(self):\n        \"\"\"Test kernel calculation with ParticleData inputs.\"\"\"\n        kernel = self.strategy_discrete.kernel(\n            particle=self.particle_data,\n            temperature=self.temperature,\n            pressure=self.pressure,\n        )\n        kernel = np.asarray(kernel)\n        self.assertIsInstance(kernel, np.ndarray)\n        particle_count = self.particle_data.radii[0].size\n        self.assertEqual(np.shape(kernel), (particle_count, particle_count))",
+    "successor": "TestBrownianCoagulationStrategy::test_brownian_kernel_with_particle_data",
+    "disposition": "Same numerical/assertion body using explicitly tagged native fixtures; native initializer preserves default lognormal parameters, PDF tests use distinct radius-PDF state."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/brownian_coagulation_strategy_test.py",
+    "test": "TestBrownianCoagulationStrategy::test_brownian_step_with_particle_data",
+    "original": "def test_brownian_step_with_particle_data(self):\n        \"\"\"Test coagulation step with ParticleData inputs.\"\"\"\n        particle_data = self.particle_data.copy()\n        initial_concentration = particle_data.concentration.copy()\n        self.strategy_discrete.step(\n            particle=particle_data,\n            temperature=self.temperature,\n            pressure=self.pressure,\n            time_step=1.0,\n        )\n        self.assertFalse(\n            np.array_equal(initial_concentration, particle_data.concentration)\n        )",
+    "successor": "TestBrownianCoagulationStrategy::test_brownian_step_with_particle_data",
+    "disposition": "Same numerical/assertion body using explicitly tagged native fixtures; native initializer preserves default lognormal parameters, PDF tests use distinct radius-PDF state."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/brownian_coagulation_strategy_test.py",
+    "test": "TestBrownianCoagulationStrategy::test_brownian_step_returns_matching_types",
+    "original": "def test_brownian_step_returns_matching_types(self):\n        \"\"\"Test step returns ParticleData when given ParticleData.\"\"\"\n        particle_data = self.particle_data.copy()\n        result = self.strategy_discrete.step(\n            particle=particle_data,\n            temperature=self.temperature,\n            pressure=self.pressure,\n            time_step=1.0,\n        )\n        self.assertIsInstance(result, ParticleData)",
+    "successor": "TestBrownianCoagulationStrategy::test_brownian_step_returns_matching_types",
+    "disposition": "Same numerical/assertion body using explicitly tagged native fixtures; native initializer preserves default lognormal parameters, PDF tests use distinct radius-PDF state."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/brownian_coagulation_strategy_test.py",
+    "test": "TestBrownianCoagulationStrategy::test_loss_rate_with_particle_data",
+    "original": "def test_loss_rate_with_particle_data(self):\n        \"\"\"Test loss rate calculation with ParticleData inputs.\"\"\"\n        kernel = self.strategy_discrete.kernel(\n            particle=self.particle_data,\n            temperature=self.temperature,\n            pressure=self.pressure,\n        )\n        loss_rate = self.strategy_discrete.loss_rate(\n            particle=self.particle_data,\n            kernel=np.atleast_1d(kernel),\n        )\n        self.assertEqual(\n            np.shape(loss_rate), (self.particle_data.radii[0].size,)\n        )",
+    "successor": "TestBrownianCoagulationStrategy::test_loss_rate_with_particle_data",
+    "disposition": "Same numerical/assertion body using explicitly tagged native fixtures; native initializer preserves default lognormal parameters, PDF tests use distinct radius-PDF state."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/brownian_coagulation_strategy_test.py",
+    "test": "TestBrownianCoagulationStrategy::test_gain_rate_with_particle_data",
+    "original": "def test_gain_rate_with_particle_data(self):\n        \"\"\"Test gain rate calculation with ParticleData inputs.\"\"\"\n        kernel = self.strategy_discrete.kernel(\n            particle=self.particle_data,\n            temperature=self.temperature,\n            pressure=self.pressure,\n        )\n        gain_rate = self.strategy_discrete.gain_rate(\n            particle=self.particle_data,\n            kernel=np.atleast_1d(kernel),\n        )\n        self.assertEqual(\n            np.shape(gain_rate), (self.particle_data.radii[0].size,)\n        )",
+    "successor": "TestBrownianCoagulationStrategy::test_gain_rate_with_particle_data",
+    "disposition": "Same numerical/assertion body using explicitly tagged native fixtures; native initializer preserves default lognormal parameters, PDF tests use distinct radius-PDF state."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/brownian_coagulation_strategy_test.py",
+    "test": "TestBrownianCoagulationStrategy::test_net_rate_with_particle_data",
+    "original": "def test_net_rate_with_particle_data(self):\n        \"\"\"Test net rate equals gain minus loss for ParticleData inputs.\"\"\"\n        kernel = self.strategy_discrete.kernel(\n            particle=self.particle_data,\n            temperature=self.temperature,\n            pressure=self.pressure,\n        )\n        kernel_arr = np.atleast_1d(kernel)\n        loss_rate = self.strategy_discrete.loss_rate(\n            particle=self.particle_data,\n            kernel=kernel_arr,\n        )\n        gain_rate = self.strategy_discrete.gain_rate(\n            particle=self.particle_data,\n            kernel=kernel_arr,\n        )\n        net_rate = self.strategy_discrete.net_rate(\n            particle=self.particle_data,\n            temperature=self.temperature,\n            pressure=self.pressure,\n        )\n        self.assertTrue(np.allclose(net_rate, gain_rate - loss_rate))",
+    "successor": "TestBrownianCoagulationStrategy::test_net_rate_with_particle_data",
+    "disposition": "Same numerical/assertion body using explicitly tagged native fixtures; native initializer preserves default lognormal parameters, PDF tests use distinct radius-PDF state."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/brownian_coagulation_strategy_test.py",
+    "test": "TestBrownianCoagulationStrategy::test_diffusive_knudsen_with_particle_data",
+    "original": "def test_diffusive_knudsen_with_particle_data(self):\n        \"\"\"Test diffusive Knudsen number calculation with ParticleData.\"\"\"\n        knudsen_number = self.strategy_discrete.diffusive_knudsen(\n            particle=self.particle_data,\n            temperature=self.temperature,\n            pressure=self.pressure,\n        )\n        particle_count = self.particle_data.radii[0].size\n        knudsen_shape = np.shape(knudsen_number)\n        if len(knudsen_shape) == 2:\n            self.assertEqual(knudsen_shape, (particle_count, particle_count))\n        else:\n            self.assertEqual(knudsen_shape, (particle_count,))",
+    "successor": "TestBrownianCoagulationStrategy::test_diffusive_knudsen_with_particle_data",
+    "disposition": "Same numerical/assertion body using explicitly tagged native fixtures; native initializer preserves default lognormal parameters, PDF tests use distinct radius-PDF state."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/sedimentation_coagulation_strategy_test.py",
+    "test": "TestSedimentationCoagulationStrategy::test_kernel_discrete",
+    "original": "def test_kernel_discrete(self):\n        \"\"\"Test the kernel calculation for discrete distribution.\n\n        Verifies that the kernel method returns an ndarray for the discrete\n        distribution type.\n        \"\"\"\n        kernel = self.strategy_discrete.kernel(\n            particle=self.particle,\n            temperature=self.temperature,\n            pressure=self.pressure,\n        )\n        self.assertIsInstance(kernel, np.ndarray)",
+    "successor": "TestSedimentationCoagulationStrategy::test_kernel_discrete",
+    "disposition": "Same numerical/assertion body using explicitly tagged native fixtures; native initializer preserves default lognormal parameters, PDF tests use distinct radius-PDF state."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/sedimentation_coagulation_strategy_test.py",
+    "test": "TestSedimentationCoagulationStrategy::test_step_discrete",
+    "original": "def test_step_discrete(self):\n        \"\"\"Test the step method for discrete distribution.\n\n        Ensures that the step method updates the particle concentration for\n        the discrete distribution type.\n        \"\"\"\n        initial_concentration = self.particle.get_concentration().copy()\n        self.strategy_discrete.step(\n            particle=self.particle,\n            temperature=self.temperature,\n            pressure=self.pressure,\n            time_step=1.0,\n        )\n        updated_concentration = self.particle.get_concentration()\n        self.assertFalse(\n            np.array_equal(initial_concentration, updated_concentration)\n        )",
+    "successor": "TestSedimentationCoagulationStrategy::test_step_discrete",
+    "disposition": "Same numerical/assertion body using explicitly tagged native fixtures; native initializer preserves default lognormal parameters, PDF tests use distinct radius-PDF state. Original 1s step exceeds native Euler positivity bounds. Existing mutation assertion retained at 0.001s; test_native_oversized_steps_reject_without_mutation checks the original 1s request rejects and preserves all fields. No change to production stepping or tolerances."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/sedimentation_coagulation_strategy_test.py",
+    "test": "TestSedimentationCoagulationStrategy::test_kernel_continuous_pdf",
+    "original": "def test_kernel_continuous_pdf(self):\n        \"\"\"Test the kernel calculation for continuous_pdf distribution.\n\n        Verifies that the kernel method returns an ndarray for the\n        continuous_pdf distribution type.\n        \"\"\"\n        kernel = self.strategy_continuous_pdf.kernel(\n            particle=self.particle,\n            temperature=self.temperature,\n            pressure=self.pressure,\n        )\n        self.assertIsInstance(kernel, np.ndarray)",
+    "successor": "TestSedimentationCoagulationStrategy::test_kernel_continuous_pdf",
+    "disposition": "Same numerical/assertion body using explicitly tagged native fixtures; native initializer preserves default lognormal parameters, PDF tests use distinct radius-PDF state."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/sedimentation_coagulation_strategy_test.py",
+    "test": "TestSedimentationCoagulationStrategy::test_kernel_with_particle_data",
+    "original": "def test_kernel_with_particle_data(self):\n        \"\"\"Test kernel calculation with ParticleData inputs.\"\"\"\n        kernel = self.strategy_discrete.kernel(\n            particle=self.particle_data,\n            temperature=self.temperature,\n            pressure=self.pressure,\n        )\n        kernel = np.asarray(kernel)\n        particle_count = self.particle_data.radii[0].size\n        self.assertEqual(kernel.shape, (particle_count, particle_count))",
+    "successor": "TestSedimentationCoagulationStrategy::test_kernel_with_particle_data",
+    "disposition": "Same numerical/assertion body using explicitly tagged native fixtures; native initializer preserves default lognormal parameters, PDF tests use distinct radius-PDF state."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/sedimentation_coagulation_strategy_test.py",
+    "test": "TestSedimentationCoagulationStrategy::test_step_continuous_pdf",
+    "original": "def test_step_continuous_pdf(self):\n        \"\"\"Test the step method for continuous_pdf distribution.\n\n        Ensures that the step method updates the particle concentration for\n        the continuous_pdf distribution type.\n        \"\"\"\n        initial_concentration = self.particle.get_concentration().copy()\n        self.strategy_continuous_pdf.step(\n            particle=self.particle,\n            temperature=self.temperature,\n            pressure=self.pressure,\n            time_step=1.0,\n        )\n        updated_concentration = self.particle.get_concentration()\n        self.assertFalse(\n            np.array_equal(initial_concentration, updated_concentration)\n        )",
+    "successor": "TestSedimentationCoagulationStrategy::test_step_continuous_pdf",
+    "disposition": "Same numerical/assertion body using explicitly tagged native fixtures; native initializer preserves default lognormal parameters, PDF tests use distinct radius-PDF state. Original 1s step exceeds native Euler positivity bounds. Existing mutation assertion retained at 0.001s; test_native_oversized_steps_reject_without_mutation checks the original 1s request rejects and preserves all fields. No change to production stepping or tolerances."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/sedimentation_coagulation_strategy_test.py",
+    "test": "TestSedimentationCoagulationStrategy::test_step_particle_resolved",
+    "original": "def test_step_particle_resolved(self):\n        \"\"\"Test the step calculation for particle_resolved distribution.\"\"\"\n        old_concentration = self.particle_resolved.get_total_concentration()\n        self.strategy_particle_resolved.step(\n            particle=self.particle_resolved,\n            temperature=self.temperature,\n            pressure=self.pressure,\n            time_step=1000,\n        )\n        new_concentration = self.particle_resolved.get_total_concentration()\n        self.assertNotEqual(old_concentration, new_concentration)",
+    "successor": "TestSedimentationCoagulationStrategy::test_step_particle_resolved",
+    "disposition": "Same numerical/assertion body using explicitly tagged native fixtures; native initializer preserves default lognormal parameters, PDF tests use distinct radius-PDF state."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/turbulent_shear_coagulation_strategy_test.py",
+    "test": "TestTurbulentShearCoagulationStrategy::test_kernel_discrete",
+    "original": "def test_kernel_discrete(self):\n        \"\"\"Test the kernel calculation for discrete distribution.\n\n        Verifies that the kernel method returns an ndarray for the discrete\n        distribution type.\n        \"\"\"\n        kernel = self.strategy_discrete.kernel(\n            particle=self.particle,\n            temperature=self.temperature,\n            pressure=self.pressure,\n        )\n        self.assertIsInstance(kernel, np.ndarray)",
+    "successor": "TestTurbulentShearCoagulationStrategy::test_kernel_discrete",
+    "disposition": "Same numerical/assertion body using explicitly tagged native fixtures; native initializer preserves default lognormal parameters, PDF tests use distinct radius-PDF state."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/turbulent_shear_coagulation_strategy_test.py",
+    "test": "TestTurbulentShearCoagulationStrategy::test_step_discrete",
+    "original": "def test_step_discrete(self):\n        \"\"\"Test the step method for discrete distribution.\n\n        Ensures that the step method updates the particle concentration for\n        the discrete distribution type.\n        \"\"\"\n        initial_concentration = self.particle.get_concentration().copy()\n        self.strategy_discrete.step(\n            particle=self.particle,\n            temperature=self.temperature,\n            pressure=self.pressure,\n            time_step=1.0,\n        )\n        updated_concentration = self.particle.get_concentration()\n        self.assertFalse(\n            np.array_equal(initial_concentration, updated_concentration)\n        )",
+    "successor": "TestTurbulentShearCoagulationStrategy::test_step_discrete",
+    "disposition": "Same numerical/assertion body using explicitly tagged native fixtures; native initializer preserves default lognormal parameters, PDF tests use distinct radius-PDF state. Original 1s step exceeds native Euler positivity bounds. Existing mutation assertion retained at 0.001s; test_native_oversized_steps_reject_without_mutation checks the original 1s request rejects and preserves all fields. No change to production stepping or tolerances."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/turbulent_shear_coagulation_strategy_test.py",
+    "test": "TestTurbulentShearCoagulationStrategy::test_kernel_continuous_pdf",
+    "original": "def test_kernel_continuous_pdf(self):\n        \"\"\"Test the kernel calculation for continuous_pdf distribution.\n\n        Verifies that the kernel method returns an ndarray for the\n        continuous_pdf distribution type.\n        \"\"\"\n        kernel = self.strategy_continuous_pdf.kernel(\n            particle=self.particle,\n            temperature=self.temperature,\n            pressure=self.pressure,\n        )\n        self.assertIsInstance(kernel, np.ndarray)",
+    "successor": "TestTurbulentShearCoagulationStrategy::test_kernel_continuous_pdf",
+    "disposition": "Same numerical/assertion body using explicitly tagged native fixtures; native initializer preserves default lognormal parameters, PDF tests use distinct radius-PDF state."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/turbulent_shear_coagulation_strategy_test.py",
+    "test": "TestTurbulentShearCoagulationStrategy::test_kernel_with_particle_data",
+    "original": "def test_kernel_with_particle_data(self):\n        \"\"\"Test kernel calculation with ParticleData inputs.\"\"\"\n        kernel = self.strategy_discrete.kernel(\n            particle=self.particle_data,\n            temperature=self.temperature,\n            pressure=self.pressure,\n        )\n        kernel = np.asarray(kernel)\n        particle_count = self.particle_data.radii[0].size\n        self.assertEqual(kernel.shape, (particle_count, particle_count))",
+    "successor": "TestTurbulentShearCoagulationStrategy::test_kernel_with_particle_data",
+    "disposition": "Same numerical/assertion body using explicitly tagged native fixtures; native initializer preserves default lognormal parameters, PDF tests use distinct radius-PDF state."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/turbulent_shear_coagulation_strategy_test.py",
+    "test": "TestTurbulentShearCoagulationStrategy::test_step_continuous_pdf",
+    "original": "def test_step_continuous_pdf(self):\n        \"\"\"Test the step method for continuous_pdf distribution.\n\n        Ensures that the step method updates the particle concentration for\n        the continuous_pdf distribution type.\n        \"\"\"\n        initial_concentration = self.particle.get_concentration().copy()\n        self.strategy_continuous_pdf.step(\n            particle=self.particle,\n            temperature=self.temperature,\n            pressure=self.pressure,\n            time_step=1.0,\n        )\n        updated_concentration = self.particle.get_concentration()\n        self.assertFalse(\n            np.array_equal(initial_concentration, updated_concentration)\n        )",
+    "successor": "TestTurbulentShearCoagulationStrategy::test_step_continuous_pdf",
+    "disposition": "Same numerical/assertion body using explicitly tagged native fixtures; native initializer preserves default lognormal parameters, PDF tests use distinct radius-PDF state. Original 1s step exceeds native Euler positivity bounds. Existing mutation assertion retained at 0.001s; test_native_oversized_steps_reject_without_mutation checks the original 1s request rejects and preserves all fields. No change to production stepping or tolerances."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/turbulent_shear_coagulation_strategy_test.py",
+    "test": "TestTurbulentShearCoagulationStrategy::test_step_particle_resolved",
+    "original": "def test_step_particle_resolved(self):\n        \"\"\"Test the step method for particle_resolved distribution.\"\"\"\n        old_concentration = self.particle_resolved.get_total_concentration()\n        self.strategy_particle_resolved.step(\n            particle=self.particle_resolved,\n            temperature=self.temperature,\n            pressure=self.pressure,\n            time_step=1000,\n        )\n        new_concentration = self.particle_resolved.get_total_concentration()\n        self.assertNotEqual(old_concentration, new_concentration)",
+    "successor": "TestTurbulentShearCoagulationStrategy::test_step_particle_resolved",
+    "disposition": "Same numerical/assertion body using explicitly tagged native fixtures; native initializer preserves default lognormal parameters, PDF tests use distinct radius-PDF state."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/turbulent_dns_coagulation_strategy_test.py",
+    "test": "TestTurbulentDNSCoagulationStrategy::test_kernel_discrete",
+    "original": "def test_kernel_discrete(self):\n        \"\"\"Test the kernel calculation for discrete distribution.\n\n        Verifies that the kernel method returns an ndarray for the discrete\n        distribution type.\n        \"\"\"\n        kernel = self.strategy_discrete.kernel(\n            particle=self.particle,\n            temperature=self.temperature,\n            pressure=self.pressure,\n        )\n        self.assertIsInstance(kernel, np.ndarray)",
+    "successor": "TestTurbulentDNSCoagulationStrategy::test_kernel_discrete",
+    "disposition": "Same numerical/assertion body using explicitly tagged native fixtures; native initializer preserves default lognormal parameters, PDF tests use distinct radius-PDF state."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/turbulent_dns_coagulation_strategy_test.py",
+    "test": "TestTurbulentDNSCoagulationStrategy::test_step_discrete",
+    "original": "def test_step_discrete(self):\n        \"\"\"Test the step method for discrete distribution.\n\n        Ensures that the step method updates the particle concentration for\n        the discrete distribution type.\n        \"\"\"\n        initial_concentration = self.particle.get_concentration().copy()\n        self.strategy_discrete.step(\n            particle=self.particle,\n            temperature=self.temperature,\n            pressure=self.pressure,\n            time_step=1.0,\n        )\n        updated_concentration = self.particle.get_concentration()\n        self.assertFalse(\n            np.array_equal(initial_concentration, updated_concentration)\n        )",
+    "successor": "TestTurbulentDNSCoagulationStrategy::test_step_discrete",
+    "disposition": "Same numerical/assertion body using explicitly tagged native fixtures; native initializer preserves default lognormal parameters, PDF tests use distinct radius-PDF state. Original 1s step exceeds native Euler positivity bounds. Existing mutation assertion retained at 0.001s; test_native_oversized_steps_reject_without_mutation checks the original 1s request rejects and preserves all fields. No change to production stepping or tolerances."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/turbulent_dns_coagulation_strategy_test.py",
+    "test": "TestTurbulentDNSCoagulationStrategy::test_kernel_continuous_pdf",
+    "original": "def test_kernel_continuous_pdf(self):\n        \"\"\"Test the kernel calculation for continuous_pdf distribution.\n\n        Verifies that the kernel method returns an ndarray for the\n        continuous_pdf distribution type.\n        \"\"\"\n        kernel = self.strategy_continuous_pdf.kernel(\n            particle=self.particle,\n            temperature=self.temperature,\n            pressure=self.pressure,\n        )\n        self.assertIsInstance(kernel, np.ndarray)",
+    "successor": "TestTurbulentDNSCoagulationStrategy::test_kernel_continuous_pdf",
+    "disposition": "Same numerical/assertion body using explicitly tagged native fixtures; native initializer preserves default lognormal parameters, PDF tests use distinct radius-PDF state."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/turbulent_dns_coagulation_strategy_test.py",
+    "test": "TestTurbulentDNSCoagulationStrategy::test_kernel_with_particle_data",
+    "original": "def test_kernel_with_particle_data(self):\n        \"\"\"Test kernel calculation with ParticleData inputs.\"\"\"\n        kernel = self.strategy_discrete.kernel(\n            particle=self.particle_data,\n            temperature=self.temperature,\n            pressure=self.pressure,\n        )\n        kernel = np.asarray(kernel)\n        particle_count = self.particle_data.radii[0].size\n        self.assertEqual(kernel.shape, (particle_count, particle_count))",
+    "successor": "TestTurbulentDNSCoagulationStrategy::test_kernel_with_particle_data",
+    "disposition": "Same numerical/assertion body using explicitly tagged native fixtures; native initializer preserves default lognormal parameters, PDF tests use distinct radius-PDF state."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/turbulent_dns_coagulation_strategy_test.py",
+    "test": "TestTurbulentDNSCoagulationStrategy::test_step_continuous_pdf",
+    "original": "def test_step_continuous_pdf(self):\n        \"\"\"Test the step method for continuous_pdf distribution.\n\n        Ensures that the step method updates the particle concentration for\n        the continuous_pdf distribution type.\n        \"\"\"\n        initial_concentration = self.particle.get_concentration().copy()\n        self.strategy_continuous_pdf.step(\n            particle=self.particle,\n            temperature=self.temperature,\n            pressure=self.pressure,\n            time_step=1.0,\n        )\n        updated_concentration = self.particle.get_concentration()\n        self.assertFalse(\n            np.array_equal(initial_concentration, updated_concentration)\n        )",
+    "successor": "TestTurbulentDNSCoagulationStrategy::test_step_continuous_pdf",
+    "disposition": "Same numerical/assertion body using explicitly tagged native fixtures; native initializer preserves default lognormal parameters, PDF tests use distinct radius-PDF state. Original 1s step exceeds native Euler positivity bounds. Existing mutation assertion retained at 0.001s; test_native_oversized_steps_reject_without_mutation checks the original 1s request rejects and preserves all fields. No change to production stepping or tolerances."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/turbulent_dns_coagulation_strategy_test.py",
+    "test": "TestTurbulentDNSCoagulationStrategy::test_step_particle_resolved",
+    "original": "def test_step_particle_resolved(self):\n        \"\"\"Test the step method for particle_resolved distribution.\"\"\"\n        old_concentration = self.particle_resolved.get_total_concentration()\n        self.strategy_particle_resolved.step(\n            particle=self.particle_resolved,\n            temperature=self.temperature,\n            pressure=self.pressure,\n            time_step=1000,\n        )\n        new_concentration = self.particle_resolved.get_total_concentration()\n        self.assertNotEqual(old_concentration, new_concentration)",
+    "successor": "TestTurbulentDNSCoagulationStrategy::test_step_particle_resolved",
+    "disposition": "Same numerical/assertion body using explicitly tagged native fixtures; native initializer preserves default lognormal parameters, PDF tests use distinct radius-PDF state."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/combine_coagulation_strategy_test.py",
+    "test": "TestCombineCoagulationStrategy::test_kernel_combination",
+    "original": "def test_kernel_combination(self):\n        \"\"\"Test the kernel combination.\n\n        Verifies that the combined kernel is the sum of the individual kernels.\n        \"\"\"\n        kernel_combined = self.combined_strategy.kernel(\n            particle=self.particle,\n            temperature=self.temperature,\n            pressure=self.pressure,\n        )\n        kernel_turbulent_shear = self.turbulent_shear_strategy.kernel(\n            particle=self.particle,\n            temperature=self.temperature,\n            pressure=self.pressure,\n        )\n        kernel_brownian = self.brownian_strategy.kernel(\n            particle=self.particle,\n            temperature=self.temperature,\n            pressure=self.pressure,\n        )\n\n        np.testing.assert_array_almost_equal(\n            kernel_combined, kernel_turbulent_shear + kernel_brownian\n        )",
+    "successor": "TestCombineCoagulationStrategy::test_kernel_combination",
+    "disposition": "Same numerical/assertion body using explicitly tagged native fixtures; native initializer preserves default lognormal parameters, PDF tests use distinct radius-PDF state."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/combine_coagulation_strategy_test.py",
+    "test": "TestCombineCoagulationStrategy::test_step_combination",
+    "original": "def test_step_combination(self):\n        \"\"\"Test the step method for combined strategy.\n\n        Ensures that the step method updates the particle concentration.\n        \"\"\"\n        initial_concentration = self.particle.get_concentration().copy()\n        self.combined_strategy.step(\n            particle=self.particle,\n            temperature=self.temperature,\n            pressure=self.pressure,\n            time_step=1.0,\n        )\n        updated_concentration = self.particle.get_concentration()\n        self.assertFalse(\n            np.array_equal(initial_concentration, updated_concentration)\n        )",
+    "successor": "TestCombineCoagulationStrategy::test_step_combination",
+    "disposition": "Same numerical/assertion body using explicitly tagged native fixtures; native initializer preserves default lognormal parameters, PDF tests use distinct radius-PDF state. Original 1s step exceeds native Euler positivity bounds. Existing mutation assertion retained at 0.001s; test_native_oversized_steps_reject_without_mutation checks the original 1s request rejects and preserves all fields. No change to production stepping or tolerances."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/combine_coagulation_strategy_test.py",
+    "test": "TestCombineCoagulationStrategy::test_kernel_combination_with_particle_data",
+    "original": "def test_kernel_combination_with_particle_data(self):\n        \"\"\"Test combined kernel calculation with ParticleData inputs.\"\"\"\n        kernel_combined = self.combined_strategy.kernel(\n            particle=self.particle_data,\n            temperature=self.temperature,\n            pressure=self.pressure,\n        )\n        kernel_turbulent_shear = self.turbulent_shear_strategy.kernel(\n            particle=self.particle_data,\n            temperature=self.temperature,\n            pressure=self.pressure,\n        )\n        kernel_brownian = self.brownian_strategy.kernel(\n            particle=self.particle_data,\n            temperature=self.temperature,\n            pressure=self.pressure,\n        )\n        np.testing.assert_array_almost_equal(\n            kernel_combined, kernel_turbulent_shear + kernel_brownian\n        )",
+    "successor": "TestCombineCoagulationStrategy::test_kernel_combination_with_particle_data",
+    "disposition": "Same numerical/assertion body using explicitly tagged native fixtures; native initializer preserves default lognormal parameters, PDF tests use distinct radius-PDF state."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/charged_coagulation_strategy_test.py",
+    "test": "TestChargedCoagulationStrategy::test_kernel_discrete",
+    "original": "def test_kernel_discrete(self):\n        \"\"\"Test the kernel calculation for discrete distribution.\n\n        Verifies that the kernel method returns an ndarray for the discrete\n        distribution type.\n        \"\"\"\n        # Test the kernel calculation for discrete distribution\n        kernel = self.strategy_discrete.kernel(\n            particle=self.particle,\n            temperature=self.temperature,\n            pressure=self.pressure,\n        )\n        self.assertIsInstance(kernel, np.ndarray)",
+    "successor": "TestChargedCoagulationStrategy::test_kernel_discrete",
+    "disposition": "Migrated to tagged native fixtures and direct array assertions; collision indices captured at the existing selector boundary instead of removed facade collide_pairs."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/charged_coagulation_strategy_test.py",
+    "test": "TestChargedCoagulationStrategy::test_step_discrete",
+    "original": "def test_step_discrete(self):\n        \"\"\"Test the step method for discrete distribution.\n\n        Ensures that the step method updates the particle concentration for\n        the discrete distribution type.\n        \"\"\"\n        # Test the step method for discrete distribution\n        initial_concentration = self.particle.get_concentration().copy()\n        self.strategy_discrete.step(\n            particle=self.particle,\n            temperature=self.temperature,\n            pressure=self.pressure,\n            time_step=1.0,\n        )\n        updated_concentration = self.particle.get_concentration()\n        self.assertFalse(\n            np.array_equal(initial_concentration, updated_concentration)\n        )",
+    "successor": "TestChargedCoagulationStrategy::test_step_discrete",
+    "disposition": "Migrated to tagged native fixtures and direct array assertions; collision indices captured at the existing selector boundary instead of removed facade collide_pairs."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/charged_coagulation_strategy_test.py",
+    "test": "TestChargedCoagulationStrategy::test_step_particle_resolved",
+    "original": "def test_step_particle_resolved(self):\n        \"\"\"Test the kernel calculation for particle_resolved distribution.\"\"\"\n        # Test the kernel calculation for particle_resolved distribution\n        old_concentration = self.particle_resolved.get_total_concentration()\n        self.strategy_particle_resolved.step(\n            particle=self.particle_resolved,\n            temperature=self.temperature,\n            pressure=self.pressure,\n            time_step=1000,\n        )\n        new_concentration = self.particle_resolved.get_total_concentration()\n        self.assertNotEqual(old_concentration, new_concentration)",
+    "successor": "TestChargedCoagulationStrategy::test_step_particle_resolved",
+    "disposition": "Migrated to tagged native fixtures and direct array assertions; collision indices captured at the existing selector boundary instead of removed facade collide_pairs."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/charged_coagulation_strategy_test.py",
+    "test": "TestChargedCoagulationStrategy::test_kernel_continuous_pdf",
+    "original": "def test_kernel_continuous_pdf(self):\n        \"\"\"Test the kernel calculation for continuous_pdf distribution.\n\n        Verifies that the kernel method returns an ndarray for the\n        continuous_pdf distribution type.\n        \"\"\"\n        # Test the kernel calculation for continuous_pdf distribution\n        kernel = self.strategy_continuous_pdf.kernel(\n            particle=self.particle,\n            temperature=self.temperature,\n            pressure=self.pressure,\n        )\n        self.assertIsInstance(kernel, np.ndarray)",
+    "successor": "TestChargedCoagulationStrategy::test_kernel_continuous_pdf",
+    "disposition": "Migrated to tagged native fixtures and direct array assertions; collision indices captured at the existing selector boundary instead of removed facade collide_pairs."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/charged_coagulation_strategy_test.py",
+    "test": "TestChargedCoagulationStrategy::test_kernel_with_particle_data",
+    "original": "def test_kernel_with_particle_data(self):\n        \"\"\"Test kernel calculation with ParticleData inputs.\"\"\"\n        kernel = self.strategy_discrete.kernel(\n            particle=self.particle_data,\n            temperature=self.temperature,\n            pressure=self.pressure,\n        )\n        kernel = np.asarray(kernel)\n        particle_count = self.particle_data.radii[0].size\n        self.assertEqual(kernel.shape, (particle_count, particle_count))",
+    "successor": "TestChargedCoagulationStrategy::test_kernel_with_particle_data",
+    "disposition": "Migrated to tagged native fixtures and direct array assertions; collision indices captured at the existing selector boundary instead of removed facade collide_pairs."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/charged_coagulation_strategy_test.py",
+    "test": "TestChargedCoagulationStrategy::test_step_continuous_pdf",
+    "original": "def test_step_continuous_pdf(self):\n        \"\"\"Test the step method for continuous_pdf distribution.\n\n        Ensures that the step method updates the particle concentration for\n        the continuous_pdf distribution type.\n        \"\"\"\n        # Test the step method for continuous_pdf distribution\n        initial_concentration = self.particle.get_concentration().copy()\n        self.strategy_continuous_pdf.step(\n            particle=self.particle,\n            temperature=self.temperature,\n            pressure=self.pressure,\n            time_step=1.0,\n        )\n        updated_concentration = self.particle.get_concentration()\n        self.assertFalse(\n            np.array_equal(initial_concentration, updated_concentration)\n        )",
+    "successor": "TestChargedCoagulationStrategy::test_step_continuous_pdf",
+    "disposition": "Migrated to tagged native fixtures and direct array assertions; collision indices captured at the existing selector boundary instead of removed facade collide_pairs."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/charged_coagulation_strategy_test.py",
+    "test": "test_direct_kernel_flag_default_false",
+    "original": "def test_direct_kernel_flag_default_false():\n    \"\"\"Default direct kernel flag should be disabled.\"\"\"\n    strategy = ChargedCoagulationStrategy(\n        distribution_type=\"discrete\",\n        kernel_strategy=HardSphereKernelStrategy(),\n    )\n    assert strategy.use_direct_kernel is False",
+    "successor": "test_direct_kernel_flag_default_false",
+    "disposition": "Migrated to tagged native fixtures and direct array assertions; collision indices captured at the existing selector boundary instead of removed facade collide_pairs."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/charged_coagulation_strategy_test.py",
+    "test": "test_direct_kernel_same_sign_no_spurious_mergers",
+    "original": "def test_direct_kernel_same_sign_no_spurious_mergers(monkeypatch):\n    \"\"\"Direct kernel should prevent same-sign coagulation artifacts.\"\"\"\n    particle = _build_particle_resolved_with_charges()\n    charges = particle.get_charge()\n    assert charges is not None\n\n    def _selective_kernel(\n        particle_radius: np.ndarray,\n        particle_mass: np.ndarray,\n        particle_charge: np.ndarray,\n        temperature: float,\n        pressure: float,\n    ) -> np.ndarray:\n        _ = particle_radius, particle_mass, temperature, pressure\n        sign_product = np.sign(particle_charge[0]) * np.sign(particle_charge[1])\n        # Zero for same-sign, large value for opposite-sign interactions\n        kernel_value = 0.0 if sign_product >= 0 else 1e-6\n        return np.array([[0.0, kernel_value], [kernel_value, 0.0]])\n\n    monkeypatch.setattr(\n        charged_dimensional_kernel,\n        \"get_hard_sphere_kernel_via_system_state\",\n        _selective_kernel,\n    )\n\n    strategy = ChargedCoagulationStrategy(\n        distribution_type=\"particle_resolved\",\n        kernel_strategy=HardSphereKernelStrategy(),\n        use_direct_kernel=True,\n    )\n    loss_gain_index, captured_charge = _capture_collision_indices(\n        particle=particle,\n        strategy=strategy,\n        time_step=1.0,\n        seed=10,\n        volume=1e-12,\n        monkeypatch=monkeypatch,\n    )\n\n    assert loss_gain_index.size > 0\n    charge_snapshot = (\n        captured_charge if captured_charge is not None else charges\n    )\n    pair_product = (\n        charge_snapshot[loss_gain_index[:, 0]]\n        * charge_snapshot[loss_gain_index[:, 1]]\n    )\n    assert np.all(pair_product <= 0)",
+    "successor": "test_direct_kernel_same_sign_no_spurious_mergers",
+    "disposition": "Migrated to tagged native fixtures and direct array assertions; collision indices captured at the existing selector boundary instead of removed facade collide_pairs."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/charged_coagulation_strategy_test.py",
+    "test": "test_direct_kernel_opposite_sign_attracts",
+    "original": "def test_direct_kernel_opposite_sign_attracts(monkeypatch):\n    \"\"\"Direct kernel should still allow opposite-sign coagulation.\"\"\"\n    particle = _build_two_particle_opposite_sign()\n    charges = particle.get_charge()\n    assert charges is not None\n    strategy = ChargedCoagulationStrategy(\n        distribution_type=\"particle_resolved\",\n        kernel_strategy=HardSphereKernelStrategy(),\n        use_direct_kernel=True,\n    )\n    loss_gain_index, captured_charge = _capture_collision_indices(\n        particle=particle,\n        strategy=strategy,\n        time_step=10.0,\n        seed=12,\n        volume=None,\n        monkeypatch=monkeypatch,\n    )\n    assert loss_gain_index.size > 0\n    charge_snapshot = (\n        captured_charge if captured_charge is not None else charges\n    )\n    small_index = loss_gain_index[:, 0]\n    large_index = loss_gain_index[:, 1]\n    opposite_sign = (\n        (charge_snapshot[small_index] < 0) & (charge_snapshot[large_index] > 0)\n    ) | (\n        (charge_snapshot[small_index] > 0) & (charge_snapshot[large_index] < 0)\n    )\n    assert np.any(opposite_sign)",
+    "successor": "test_direct_kernel_opposite_sign_attracts",
+    "disposition": "Migrated to tagged native fixtures and direct array assertions; collision indices captured at the existing selector boundary instead of removed facade collide_pairs."
+  },
+  {
+    "file": "particula/dynamics/coagulation/coagulation_strategy/tests/charged_coagulation_strategy_test.py",
+    "test": "test_direct_kernel_neutral_charge_defaults_to_zero",
+    "original": "def test_direct_kernel_neutral_charge_defaults_to_zero(monkeypatch):\n    \"\"\"Direct kernel should handle particle-resolved cases without charge.\"\"\"\n    builder = PresetResolvedParticleMassBuilder()\n    particle = builder.set_volume(1e-6, \"m^3\").build()\n    monkeypatch.setattr(particle, \"get_charge\", lambda clone=False: None)\n\n    from particula.dynamics.coagulation.coagulation_strategy import (\n        coagulation_strategy_abc,\n    )\n\n    def _neutral_coulomb(\n        particle_radius: np.ndarray,\n        charge: np.ndarray | int | None = None,\n        temperature: float = 298.15,\n        ratio_lower_limit: float = -200,\n    ) -> np.ndarray:\n        _ = charge, temperature, ratio_lower_limit\n        count = len(particle_radius)\n        return np.zeros((count, count), dtype=np.float64)\n\n    monkeypatch.setattr(\n        coagulation_strategy_abc.particles,\n        \"get_coulomb_enhancement_ratio\",\n        _neutral_coulomb,\n    )\n\n    strategy = ChargedCoagulationStrategy(\n        distribution_type=\"particle_resolved\",\n        kernel_strategy=HardSphereKernelStrategy(),\n        use_direct_kernel=True,\n    )\n    strategy.random_generator = np.random.default_rng(seed=21)\n    strategy.step(\n        particle=particle,\n        temperature=TEMPERATURE,\n        pressure=PRESSURE,\n        time_step=1.0,\n    )\n\n    assert particle.get_charge() is None",
+    "successor": "test_direct_kernel_neutral_charge_defaults_to_zero",
+    "disposition": "Native initializers represent omitted charge as explicit zero arrays; retains neutral direct-kernel execution and checks zero charge rather than facade None accessor."
+  }
+]
