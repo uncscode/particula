@@ -35,12 +35,17 @@
 <code dir="auto">7b064295037c3c9a137f5dd13c03f4a40da3f11b</code>. Its timings are historical observations, not measurements
 of the v0.3.0 tree. The mutable local artifact path may now contain a different
 run; inspect its metadata before comparison. It is not resident/capture evidence.</p>
+<p>The repository does not retain generated files under <code dir="auto">.artifacts/benchmarks/</code>.
+Optional benchmark runs may recreate that ignored output directory. The
+documentation viewer uses the declared snapshot in
+<code dir="auto">docs/data/gpu_benchmark_results.json</code>; its recorded provenance is unchanged
+and does not imply that it contains the July capture described below.</p>
 <ul>
 <li>Command evidence: run
 <code dir="auto">pytest particula/gpu/tests/benchmark_test.py --benchmark -v -s</code>.
 This remains opt-in benchmark evidence for local CUDA-capable environments,
 not part of the standard Warp CPU release-validation command set.
-The recorded source-of-record artifact at
+The historical source-of-record artifact at
 <code dir="auto">.artifacts/benchmarks/gpu_benchmark_results.json</code> preserves the exact
 executed local command in <code dir="auto">benchmark_metadata.command</code>; the 2026-07-10 UTC
 capture came from a local coverage-wrapped invocation of that same benchmark

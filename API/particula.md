@@ -18,7 +18,7 @@ path.
 *attribute* · *module attribute*
 
 ```python
-__version__ = '0.2.15'
+__version__ = '0.3.0'
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/__init__.py#L57-L57)
