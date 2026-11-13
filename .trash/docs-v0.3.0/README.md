@@ -45,3 +45,18 @@ notebook omitted the source's artifact validation. The synchronized replacement
 is `docs/contribute/validation/gpu/legacy-benchmarks/gpu_benchmarks.py` / `.ipynb`.
 Dated coagulation observations remain in the separate validation record; no
 current performance qualification is inferred.
+
+## Retired vector-store tooling
+
+Source revision: `c4a38dd2d1e64bdda217c550f29c65262a7c624a`. These scripts
+are preserved without edits for posterity and are no longer supported tooling.
+
+| Original source | Reason | Replacement |
+| --- | --- | --- |
+| `docs/.assets/vector_file_generator.py` | Vector-store document generation retired | None |
+| `docs/.assets/vector_store_upload.py` | Vector-store upload retired | None |
+
+The associated `.github/workflows/AIdocs.yml` action was already removed in
+`8dc8bc51f564f6391a409f47e7865ed25c14c697`. The unused OpenAI and GitPython
+development dependencies are removed with this retirement. MkDocs remains the
+documentation publication build.
