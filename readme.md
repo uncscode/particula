@@ -20,7 +20,7 @@ conda install -c conda-forge particula
 
 ## AI Assistants
 
-[Particula Helper](docs/contribute/ai-assistants/index.md) provides setup, simulation,
+[Particula Helper](docs/guide/ai-assistants/index.md) provides setup, simulation,
 analysis, and debugging workflows for Codex/ChatGPT, Claude Code/Cowork, and
 OpenCode. See the guide for native install commands and environment requirements.
 
