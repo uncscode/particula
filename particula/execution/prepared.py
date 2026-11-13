@@ -38,6 +38,8 @@ class PreparedSimulation:
     _registry: Any
     _guard: Any
     _stream: Any
+    _observers: list[Callable[[], Any]]
+    _plans: tuple[Any, ...]
 
     def __init__(self) -> None:
         """Reject direct construction without a validated process plan."""
@@ -85,6 +87,8 @@ class PreparedSimulation:
         result._session = None
         result._registry = None
         result._guard = None
+        result._observers = []
+        result._plans = ()
         result._stream = wp.Stream(target) if target.is_cuda else None
         try:
             with result._scope():
@@ -208,6 +212,9 @@ class PreparedSimulation:
             self._require_active()
             try:
                 self._wait()
+                with self._scope():
+                    for observe in self._observers:
+                        observe()
             except BaseException:
                 self._fault()
                 raise
@@ -259,6 +266,8 @@ class PreparedSimulation:
                     self._last_time = float(self._guard.simulated_time)
                     self._closed = True
                     self._operations = None
+                    self._plans = ()
+                    self._observers = []
                     self._guard = self._registry = self._session = None
                     self._stream = None
 
@@ -270,3 +279,56 @@ class PreparedSimulation:
     def __exit__(self, *_exc: object) -> None:
         """Release resources on normal exit and exceptions."""
         self.close()
+
+
+def prepare_simulation(
+    processes: tuple[Any, ...],
+    aerosol: Aerosol,
+    *,
+    backend: Backend = Backend.WARP,
+    device: str = "cuda:0",
+    time_step: float,
+    root_seed: int = 0,
+    logical_box_ids: tuple[str, ...] | None = None,
+) -> PreparedSimulation:
+    """Validate the ordered process plan before uploading native state."""
+    from particula._cpu_batch import duration
+    from particula.execution.gpu_session import _preflight_cpu_session
+    from particula.execution.prepared_processes import (
+        _compile_process,
+        _plan_process,
+    )
+
+    if backend is not Backend.WARP:
+        raise ValueError("prepared execution requires Backend.WARP")
+    target = Device(backend, device)
+    dt = duration(time_step, 1)
+    if type(aerosol) is not Aerosol:
+        raise TypeError("prepared execution requires a native Aerosol")
+    _preflight_cpu_session(
+        aerosol.particles, aerosol.gas, aerosol.environment, target
+    )
+    if not processes:
+        raise ValueError("prepared execution requires at least one process")
+    plans = tuple(_plan_process(process, aerosol) for process in processes)
+    if len({plan.family for plan in plans}) != len(plans):
+        raise ValueError(
+            "prepared execution supports one occurrence per family"
+        )
+    owner = PreparedSimulation._upload(
+        aerosol,
+        device=target,
+        time_step=dt,
+        root_seed=root_seed,
+        logical_box_ids=logical_box_ids,
+    )
+    try:
+        with owner._scope():
+            owner._operations = tuple(
+                _compile_process(plan, owner) for plan in plans
+            )
+            owner._plans = plans
+    except BaseException:
+        owner.close()
+        raise
+    return owner

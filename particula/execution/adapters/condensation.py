@@ -342,6 +342,9 @@ class WarpCondensationState:
         thermal_work: Optional opaque thermal-work reference.
         species_binding: Required explicit pinned species map for discrete or
             resolved particles; untagged carriers are rejected.
+        surface_tension: Optional material-order float64 vector [N/m].
+        mass_accommodation: Optional full-gas float64 dimensionless vector.
+        diffusion_coefficient_vapor: Optional full-gas float64 vector [m²/s].
 
     Raises:
         TypeError: If the configuration or a primary container has an invalid
@@ -364,6 +367,9 @@ class WarpCondensationState:
     energy_transfer: object | None = None
     thermal_work: object | None = None
     species_binding: object | None = None
+    surface_tension: object | None = None
+    mass_accommodation: object | None = None
+    diffusion_coefficient_vapor: object | None = None
 
     def __post_init__(self) -> None:
         """Perform ordered metadata and writable-output ownership validation.
@@ -902,6 +908,9 @@ class WarpCondensationExecutionAdapter:
             state.time_step,
         )
         call_kwargs = dict(
+            surface_tension=p2_state.surface_tension,
+            mass_accommodation=p2_state.mass_accommodation,
+            diffusion_coefficient_vapor=p2_state.diffusion_coefficient_vapor,
             mass_transfer=p2_state.mass_transfer,
             environment=p2_state.environment,
             thermodynamics=p2_state.thermodynamics,
