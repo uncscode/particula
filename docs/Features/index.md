@@ -1,152 +1,33 @@
-# Features
+# Process and execution guides
 
-Welcome to the Particula Features documentation! This section provides comprehensive guides for the major capabilities and systems within Particula. Each feature guide explains the design patterns, available APIs, and best practices for working with that component.
+Use the [Guide](../guide/index.md) for installation and a first simulation.
+Choose a process below, then follow its example and scientific reference links.
 
-## Feature Guides
+## Scientific processes
 
-<div class="grid cards" markdown>
+- [Native process calls and representation semantics](native_scientific_processes.md)
+- [Activity](activity_system.md)
+- [Condensation](condensation_strategy_system.md)
+- [Coagulation](coagulation_strategy_system.md)
+- [Wall loss](wall_loss_strategy_system.md)
+- [Dilution](dilution_strategy_system.md)
+- [Nucleation](nucleation_strategy_system.md)
 
--   __[Activity System](activity_system.md)__
+## Data and execution
 
-    ---
+- [Container schemas, ownership, and explicit transfers](data-containers-and-gpu-foundations.md)
+- [Backend selection](backend_selection.md)
+- [Fixed-capacity slot exhaustion](slot_exhaustion_policies.md)
+- [Resident checkpoints](gpu_resident_checkpoints.md)
+- [Graph-capture runbook](gpu_graph_capture.md)
+- [Migration](particle-data-migration/index.md)
 
-    Strategy-based activity calculations for aerosol thermodynamics,
-    including ideal, kappa-Kohler, and BAT (non-ideal) models.
+## Validation and development
 
-    [:octicons-arrow-right-24: Learn more](activity_system.md)
+- [Graph-capture profiling](gpu_graph_capture_performance.md)
+- [Resident benchmark and memory evidence](resident_benchmark_memory_budget.md)
+- [Numerical precision](Roadmap/mass-precision-study.md)
+- [Development roadmap](Roadmap/index.md)
 
--   __[Coagulation Strategy System](coagulation_strategy_system.md)__
-
-    ---
-
-    Strategy-based particle coagulation for chamber simulations with
-    Brownian, charged, and turbulent coagulation models.
-
-    [:octicons-arrow-right-24: Learn more](coagulation_strategy_system.md)
-
--   __[Condensation Strategy System](condensation_strategy_system.md)__
-
-    ---
-
-    Strategy-based condensation for particle growth simulations with
-    isothermal and coupled dynamics models.
-
-    [:octicons-arrow-right-24: Learn more](condensation_strategy_system.md)
-
--   __[Wall Loss Strategy System](wall_loss_strategy_system.md)__
-
-    ---
-
-    Strategy-based wall loss for chamber simulations with spherical,
-    rectangular, and charged particle deposition models.
-
-    [:octicons-arrow-right-24: Learn more](wall_loss_strategy_system.md)
-
--   __[Dilution Strategy System](dilution_strategy_system.md)__
-
-    ---
-
-    CPU scalar chamber dilution through the public strategy and runnable API,
-    with exact exponential concentration decay and recovery boundaries.
-
-    [:octicons-arrow-right-24: Learn more](dilution_strategy_system.md)
-
--   __[Nucleation Strategy System](nucleation_strategy_system.md)__
-
-    ---
-
-    Bounded single-box CPU nucleation through a public runnable, plus a separate
-    direct-Warp fixed-capacity step with explicit transfer and synchronization.
-
-    [:octicons-arrow-right-24: Learn more](nucleation_strategy_system.md)
-
--   __[Data Containers and GPU Foundations](data-containers-and-gpu-foundations.md)__
-
-    ---
-
-    Canonical reference for container schemas, shape conventions, explicit
-    CPU↔GPU transfer helpers, fixed-slot activation, current support boundaries,
-    and the runnable [Data Containers example](../Examples/Data_Containers/index.md).
-
-    [:octicons-arrow-right-24: Learn more](data-containers-and-gpu-foundations.md)
-
--   __[Backend Selection and Explicit CPU Fallback](backend_selection.md)__
-
-    ---
-
-    Stable execution-value selection and the explicit, caller-visible CPU
-    fallback boundary; concrete mechanics remain direct-module-only.
-
-    [:octicons-arrow-right-24: Learn more](backend_selection.md)
-
--   __[GPU Resident Checkpoints](gpu_resident_checkpoints.md)__
-
-    ---
-
-    Concrete-only resident-session lifecycle and in-memory checkpoint/restart
-    boundaries, including canonical recovery state and explicit same-device
-    restart. This is not a scheduler, transport layer, or public high-level API.
-
-    [:octicons-arrow-right-24: Learn more](gpu_resident_checkpoints.md)
-
--   __[Fixed-Capacity Slot Exhaustion Primitives](slot_exhaustion_policies.md)__
-
-    ---
-
-    Developer contract for CPU planning and direct Warp resampling and
-    representative-volume scaling primitives, with explicit integration limits.
-
-    [:octicons-arrow-right-24: Learn more](slot_exhaustion_policies.md)
-
--   __[Particle & Gas Data Migration](particle-data-migration/index.md)__
-
-    ---
-
-    Migration guide from legacy APIs to the new data containers; use the
-    foundation guide for the canonical container and transfer contract.
-
-    [:octicons-arrow-right-24: Learn more](particle-data-migration/index.md)
-
--   __[Roadmap](Roadmap/index.md)__
-
-    ---
-
-    Current direction for Particula feature development, including active
-    systems, planned improvements, contribution opportunities, and canonical
-    report artifacts such as the Mass Precision Recommendation Report.
-
-    [:octicons-arrow-right-24: View roadmap](Roadmap/index.md)
-
-</div>
-
-## Design Patterns
-
-All feature systems in Particula follow the **Strategy-Builder-Factory** pattern:
-
-- **Strategy**: Abstract base classes defining the interface for each physics domain
-- **Builder**: Unit-aware configuration with validation for constructing strategies
-- **Factory**: Dynamic strategy selection by name for runtime flexibility
-
-This pattern provides:
-
-- Consistent APIs across different physics modules
-- Easy extensibility for new models
-- Validated configuration with automatic unit conversion
-- Interchangeable implementations for comparison studies
-
-## Getting Started
-
-1. Choose the feature guide for your use case
-2. Review the available strategies and their parameters
-3. Use builders for validated configuration or factories for dynamic selection
-4. Integrate with Particula's dynamics workflow using Runnable objects
-
-## Related Documentation
-
-- **Examples**: See [Examples Gallery](../Examples/index.md) for working code
-- **Theory**: See [Theory Documentation](../Theory/index.md) for scientific background
-- **Tutorials**: See [Tutorials](../Examples/index.md#tutorials) for step-by-step learning
-- **Roadmap**: See [Feature Roadmap](Roadmap/index.md) for planned feature direction
-- **Mass precision policy**: See the
-  [Mass Precision Recommendation Report](Roadmap/mass-precision-study.md)
-  for the current downstream GPU dtype/schema recommendation baseline
+See [Examples](../Examples/index.md) for executable workflows and
+[Theory](../Theory/index.md) for equations and assumptions.

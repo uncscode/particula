@@ -1,6 +1,19 @@
 # Setup Particula
 
-Welcome!  Choose the route that matches your comfort level:
+These docs use the **v0.3.0 native development API**. For these examples,
+clone the repository and install the matching checkout:
+
+```bash
+git clone https://github.com/uncscode/particula.git
+cd particula
+python -m pip install -e ".[extra]"
+```
+
+Then [run your first CPU simulation](../../guide/getting-started/first-simulation.md).
+The package-manager commands below install the published distribution, which may
+predate the native API. Documentation does not announce a new release.
+
+Choose the route that matches your comfort level:
 
 * I already use Python every day → **_Quick‑start for Experienced Users_**
 * I’m new to Python → [**_Guide for New Users_**](Details/New_to_Python.md)

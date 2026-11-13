@@ -1,11 +1,16 @@
 # Theory
 
-Particula's Theory section contains a collection of theoretical topics and concepts that are relevant to the Particula package. This includes mathematical equations, physical principles, and other scientific concepts that are used in the development and application of the Particula package.
+Scientific equations, assumptions, and validation comparisons for aerosol work.
+Use the [Guide](../guide/index.md) for APIs and [Examples](../Examples/index.md)
+for runnable workflows.
 
-In addition, we have discussions on implementation details, such as the use of OpenAI models and the integration of various tools and libraries. This section is designed to provide a deeper understanding of the underlying principles and methodologies that drive the functionality of Particula.
+- [Activity and equilibria](Activity_Calculations/index.md)
+- [Condensation](Technical/Dynamics/Condensation_Equations.md)
+- [Nucleation](Technical/Dynamics/Nucleation_Equations.md)
+- [Cloud-droplet coagulation](Technical/Dynamics/Cloud_Droplet_Coagulation/index.md)
+- [Ion–particle coagulation](Technical/Dynamics/ionparticle_coagulation.ipynb)
+- [Dynamic viscosity](Technical/Properties/dynamic_viscosity.ipynb)
+- [Mean free path](Technical/Properties/mean_free_path.ipynb)
 
-See the sidebar on the left for a list of topic categories and their contents.
-
-## Activity Calculations
-
-For the theoretical foundations of activity calculations including the Binary Activity Thermodynamics (BAT) model and liquid-vapor partitioning, see the [Activity Calculations](Activity_Calculations/index.md) section.
+Software architecture and acceleration teaching material are grouped under
+Contribute in the navigation, separately from the physical theory.
