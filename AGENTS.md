@@ -1,1531 +1,241 @@
-# AGENTS.md - particula Quick Reference
+# AGENTS.md — Particula development
 
-**For ADW (AI Developer Workflow) agents working on the particula repository.**
+Particula is a Python aerosol particle simulator. This checkout targets
+**0.3.0**, requires **Python 3.12+**, and uses NumPy, SciPy, and NVIDIA Warp.
+The upstream repository is https://github.com/uncscode/particula; local forks
+may use a different `origin`. `particula/__init__.py` owns the package version,
+which Flit reads dynamically. A version bump does not publish a release.
 
-## Repository Overview
+## Working in this repository
 
-**Name:** particula  
-**Description:** A simple, fast, and powerful particle simulator  
-**Language:** Python 3.12+  
-**Repository:** https://github.com/Gorkowski/particula.git  
-**Version:** 0.2.6
+- Use the repository's existing environment when available (`.venv/bin/python`,
+  `.venv/bin/pytest`, `.venv/bin/ruff`). Development installation is
+  `python -m pip install -e '.[dev,extra]'`.
+- Preserve unrelated work. Keep changes scoped to the requested behavior and
+  inspect the final diff before handing work back.
+- Use the direct test, lint, and documentation commands below. Legacy agent
+  workflow files are historical context, not the current development process.
+- Read the relevant maintained guide and implementation before changing a
+  scientific or lifecycle contract. Historical plans and recorded results are
+  not evidence of current behavior.
 
-## Quick Start
+### CodeGraph
 
-### Build & Test Commands
+In an indexed repository (`.codegraph/` exists), use CodeGraph before text
+search or file reads to locate or understand code. Load the `codegraph` skill
+at `~/.codex/skills/codegraph/SKILL.md` for setup and navigation. Prefer
+`codegraph_explore` with this repository's path and a concrete file or symbol;
+`codegraph explore` is the CLI fallback. Reuse existing indexes. Initialize an
+unindexed repository when needed and keep `.codegraph/` ignored by Git.
+Use ordinary search for documentation, configuration, or unavailable coverage.
+
+## Layout and source of truth
+
+| Path | Purpose |
+| --- | --- |
+| `particula/particles/` | Native particle data, distributions, slots and properties |
+| `particula/gas/` | Gas/environment data and thermodynamic strategies |
+| `particula/dynamics/` | Coagulation, condensation, dilution, nucleation and wall loss |
+| `particula/activity/`, `particula/equilibria/` | Activity and partitioning |
+| `particula/execution/` | Execution metadata and concrete resident lifecycle |
+| `particula/gpu/` | Warp containers, explicit transfers and direct kernels |
+| `particula/util/` | Constants, units and input validation |
+| `examples_tests/` | Tests that execute documentation examples |
+| `scripts/`, `scripts/tests/` | Documentation and release tools and their tests |
+| `docs/` | Maintained guides, scientific examples and validation records |
+| `website/` | Astro/Starlight site, example registry and saved results |
+| `conda/` | Recipe mirror and release-validation instructions |
+| `pyproject.toml` | Dependencies, packaging, pytest, Ruff and mypy configuration |
+
+Start with [contributing](docs/contribute/CONTRIBUTING.md),
+[code specifications](docs/contribute/Code_Specifications/index.md), and
+[architecture](docs/contribute/architecture/index.md). The
+[roadmap](docs/contribute/roadmap.md) tracks pending work. Archived material in
+`.trash/` is reference-only and excluded from source distributions.
+
+## Validation
+
+Run focused checks while editing, then the relevant source suites. The CI
+commands are:
 
 ```bash
-# Run the default package suite (testpaths = particula)
-pytest
-
-# Run source example and infrastructure suites separately
-pytest examples_tests -q -Werror
-pytest scripts/tests -q -Werror
-
-# Run tests with coverage
-pytest --cov=particula --cov-report=term-missing
-
-# Run linters (auto-fix)
-ruff check particula/ --fix
-ruff format particula/
-ruff check particula/
-
-# Run type checker
+pytest -Werror -m "not slow and not performance"
+pytest examples_tests -Werror -m "not slow and not performance"
+pytest scripts/tests -Werror
+ruff check particula/ examples_tests/ scripts/
+ruff format particula/ examples_tests/ scripts/ --check
 mypy particula/ --ignore-missing-imports
+```
 
-# Slow + performance benchmarks (excluded from CI)
-pytest particula/dynamics/condensation/tests/staggered_performance_test.py -v -m "slow and performance"
+Plain `pytest` uses `testpaths = particula`; it does not collect the example or
+infrastructure suites. Tests use the `*_test.py` suffix. The adjacent
+`particula/dynamics/wall_loss/tests/` directory is excluded from normal recursive
+collection; run it explicitly when changing that implementation.
 
-# Focused deterministic GPU mass-precision baseline tests
-pytest particula/gpu/tests/mass_precision_cases_test.py -q
+- Test behavior, independent numerical oracles, conservation and failure
+  atomicity. Avoid assertions that merely freeze prose or source layout.
+- Keep deterministic tolerances explicit, with `np.float64` fixtures for
+  precision work. Never weaken conservation or coverage thresholds to pass.
+- Use aggregate statistics or sigma bounds for stochastic checks; do not
+  promise exact CPU/Warp/CUDA per-seed trajectories.
+- Warp CPU is the baseline when Warp is installed. CUDA tests are optional
+  locally and must skip cleanly when unavailable. A skip is not CUDA evidence.
+- Registered markers are `slow`, `performance`, `benchmark`, `warp`, `cuda`,
+  `gpu_parity`, and `stochastic`. Only `--benchmark` changes collection.
+- Full-package coverage can be measured with
+  `pytest --cov=particula --cov-report=term-missing --cov-fail-under=80`.
+  Focused tests alone do not establish full-package coverage.
 
-# Isolated CPU-focused 0.2.x release checks (fresh wheel per suite)
+### Release checks
+
+```bash
 python scripts/run_release_tests.py
 python scripts/run_release_tests.py --suite examples
-
-# Real conda-feedstock build/test (requires conda-build)
 python scripts/conda_feedstock.py
-
-# Host-only resident profiling-evidence schema tests (no profiler or GPU)
-pytest particula/gpu/tests/profiling_support_test.py -q --no-cov
-
-# Hardware-free resident profiling collector/publication tests
-pytest particula/gpu/tests/benchmark_helpers_test.py -q --no-cov
-
-# Opt-in native-CUDA resident benchmark collection (not standard CI)
-pytest particula/gpu/tests/benchmark_test.py --benchmark -k resident -v -s --no-cov
-
-# Opt-in native-CUDA resident profiling smoke test
-pytest particula/gpu/tests/profiling_smoke_test.py --benchmark -q --no-cov
-
-# Repository-wide coverage and strict documentation rendering
-.opencode/tools/run_pytest.py
-npm --prefix website run build
-
-# ADW tools
-.opencode/tools/run_pytest.py      # Run tests with validation
-.opencode/tools/run_linters.py     # Run linters following CI workflow
-```
-Performance benchmarks check scaling ratios at 1k/10k/100k particles, theta-mode
-comparisons (half/random/batch), and deterministic seeds. Native staggered
-stepping evaluates arrays within each batch while successive batches read the
-updated gas inventory. Relative overhead is workload- and machine-specific;
-no overhead target or universal performance claim is enforced.
-
-The resident collection is CUDA/native-capture-only, with no CPU or Warp-CPU
-fallback. Its source of record is
-`.artifacts/benchmarks/resident_capture_comparison.json`; the legacy
-`gpu_benchmark_results.json` is coagulation-only. No reviewed schema-v3 resident
-artifact is checked in, so the current resident timing and allocator evidence is
-unavailable and unmeasured; see
-[resident benchmark and memory-budget record](docs/contribute/validation/gpu/resident-benchmarks.md).
-
-Use the [native-CUDA example](docs/examples/gpu/resident/gpu_resident_graph_capture.py),
-[operator runbook](docs/guide/gpu/resident/graph-capture.md), and
-[qualification gates](docs/contribute/validation/gpu/graph-capture-qualification.md).
-The qualification record is the evidence authority; measured evidence remains
-`UNSHIPPED/BLOCKED` until its designated-device final-revision gate passes.
-The [current roadmap](docs/contribute/roadmap.md) contains pending work only.
-The historical 0.2.13 plan retained both facades and containers. The current
-E9-M6 development tree removes `ParticleRepresentation`, `GasSpecies`,
-`Atmosphere`, obsolete construction and facade bridges for the planned 0.3.0
-migration. GPU population execution/transfers and resident lifecycle require
-explicit supported metadata. Validation and release approval remain separate;
-Epic I follows the migration. The
-[GPU graph-capture profiling record](docs/contribute/validation/gpu/graph-capture-profiling.md)
-freezes small `(1, 16, 2)` and medium `(1000, 16, 2)` workloads, 100% activity,
-gas communication, replay counts 1/10/100/1000, and native-CUDA-only evidence
-without CPU or Warp-CPU fallback. No reviewed normalized artifact or manifest is
-checked in, so results and recommendations are unavailable and unshipped. Future
-reviewed rows need provenance, a manifest pointer, and contained relative raw
-filenames with byte-size and lowercase SHA-256 references. Host launch has no
-in-interval synchronization, synchronized elapsed has one post-dispatch
-completion boundary, and Nsight overhead is not unprofiled throughput.
-
-### Installation
-
-```bash
-# Development installation
-pip install -e .[dev]
-
-# Or with uv
-uv pip install -e .[dev]
 ```
 
-## Code Style Essentials
+The first two commands build fresh wheels and test isolated installations;
+`conda_feedstock.py` additionally requires conda-build. See
+[conda release validation](conda/README.md) for the exact staging contract and
+external feedstock handoff. The release runner retains its CPU-focused
+allowlists; a version bump does not broaden coverage or approve those exclusions
+for a new release. Source CI still exercises GPU examples and `warp-lang`
+remains a runtime dependency.
 
-### Naming Conventions
-- **Functions/Variables**: `snake_case` (e.g., `calculate_density`, `molar_mass_ratio`)
-- **Classes**: `PascalCase` (e.g., `Aerosol`, `AerosolBuilder`)
-- **Constants**: `UPPER_CASE` (e.g., `BOLTZMANN_CONSTANT`, `GAS_CONSTANT`)
-- **Modules**: `snake_case` (e.g., `activity_coefficients.py`)
-- **Test files**: `*_test.py` suffix (e.g., `activity_coefficients_test.py`)
+An advisory feedstock comparison is not strict parity or external build
+success. External release readiness requires a passing strict contract check
+and an actual external feedstock build. Record unavailable checks honestly.
+The [0.3.0 validation record](docs/contribute/validation/releases/v0.3.0.md)
+separates implementation evidence from maintainer review and release approval.
 
-### Code Formatting
-- **Line length**: 80 characters
-- **Indentation**: 4 spaces (never tabs)
-- **Docstrings**: Google-style
-- **String quotes**: Double quotes `"`
-- **Import order**: stdlib → third-party → local
+## Code style
 
-### Type Hints
-```python
-from typing import Union
-from numpy.typing import NDArray
-import numpy as np
+- Four spaces, double quotes, 80-character lines; Ruff handles formatting.
+- `snake_case` functions/variables, `PascalCase` classes, `UPPER_CASE` constants.
+- Imports: standard library, third-party, then local.
+- Type hints for public APIs; Google-style docstrings with units, shapes,
+  return values and relevant errors. Cite sources for scientific expressions.
+- Prefer NumPy operations where appropriate. Use existing validation helpers
+  such as `validate_inputs` for positive, nonnegative and finite inputs.
+- Do not widen public exports casually. Concrete-module-only helpers and
+  configuration records are intentional API boundaries.
 
-def function(
-    mass: Union[float, NDArray[np.float64]],
-    volume: Union[float, NDArray[np.float64]],
-) -> Union[float, NDArray[np.float64]]:
-    """Short description."""
-    return mass / volume
-```
+## Native data and scientific contracts
 
-## Testing
+Use the [data model](docs/guide/data-model/index.md),
+[ownership guide](docs/guide/data-model/ownership.md), and
+[0.3.0 migration guide](docs/guide/migration/v0.3.0/index.md) as the maintained
+references for field shapes, units and supported construction.
 
-**Framework:** pytest  
-**Coverage:** pytest-cov  
-**Minimum tests:** 500 (current: 713)  
-**Test pattern:** `*_test.py`
-
-**Registered markers:** `slow`, `performance`, `benchmark`, `warp`, `cuda`,
-`gpu_parity`, `stochastic`  
-**Collection policy:** plain `pytest` preserves normal collection;
-`--benchmark` is the only collection-affecting option.
-
-Default `testpaths` is `particula`: it does not collect `examples_tests/` or
-`scripts/tests/`. All 13 source example modules live in `examples_tests/`
-with unchanged basenames; run `pytest examples_tests -q -Werror` explicitly.
-Run `pytest scripts/tests -q -Werror` for release infrastructure and the moved
-`pytest_marker_policy_test.py`. Source CI runs all three suites separately and
-retains GPU example coverage; the release-only CPU allowlist is not a source-CI
-filter. See [example test suites](examples_tests/README.md).
-
-**GPU policy:** Warp CPU is the default parity backend when Warp is installed.
-CUDA coverage is optional local/manual validation and must skip cleanly when
-unavailable. Deterministic parity uses explicit `rtol`/`atol`, conservation
-checks stay tight, and stochastic checks use aggregate statistics or
-sigma-based bounds rather than exact per-seed equality.
-
-**Test structure:**
-```
-particula/
-├── activity/
-│   ├── tests/
-│   │   ├── activity_coefficients_test.py
-│   │   └── ...
-│   └── activity_coefficients.py
-└── ...
-```
-
-For deterministic GPU precision-baseline work, use explicit `np.float64`
-fixtures and keep reproduction commands focused on the affected module.
-
-## Linting
-
-**Linters:** ruff (check + format), mypy
-
-**CI Workflow:**
-1. `ruff check particula/ --fix` (apply fixes)
-2. `ruff format particula/` (format code)
-3. `ruff check particula/` (final check - must pass)
-
-**Configuration:** See `pyproject.toml` → `[tool.ruff]`
-
-**Test files:** Assertions allowed (`S101` ignored in `*_test.py`)
-
-## Project Structure
-
-```
-particula/
-├── activity/          # Activity coefficients, phase separation
-├── dynamics/          # Coagulation, condensation, wall loss
-│   ├── coagulation/
-│   ├── condensation/
-│   └── properties/
-├── equilibria/        # Partitioning calculations
-├── gas/               # Gas phase, species, vapor pressure
-│   └── properties/
-├── particles/         # Particle distributions, representations
-│   ├── distribution_strategies/
-│   └── properties/
-├── util/              # Utilities, constants, validation
-│   ├── chemical/
-│   └── lf2013_coagulation/
-├── integration_tests/ # Integration tests
-└── __init__.py
-```
-
-## Documentation
-
-**Location:** `.opencode/guides/`
-
-**Key guides:**
-- `.opencode/guides/testing_guide.md` - Test framework and conventions
-- `.opencode/guides/linting_guide.md` - Linting tools and configuration
-- `.opencode/guides/code_style.md` - Naming, formatting, type hints
-- `.opencode/guides/docstring_guide.md` - Google-style docstring format
-- `.opencode/guides/commit_conventions.md` - Commit message format
-- `.opencode/guides/pr_conventions.md` - Pull request conventions
-- `docs/contribute/validation/numerics/mass-precision.md` - Final GPU
-  mass-precision recommendation report, unchanged production baseline,
-  candidate study scope, and focused reproduction commands
-- `docs/contribute/Feature_Workflow/index.md` - Contributor workflow overview
-
-## Common Patterns
-
-### Input Validation
-
-```python
-from particula.util.validate_inputs import validate_inputs
-
-@validate_inputs({
-    "mass": "positive",
-    "volume": "positive",
-})
-def calculate_density(mass: float, volume: float) -> float:
-    """Calculate density."""
-    return mass / volume
-```
-
-**Available validators:** `"positive"`, `"nonnegative"`, `"finite"`
-
-### Module Docstrings
-
-```python
-"""Short description of module purpose.
-
-Optional longer description or citation:
-
-Author, A. B., & Author, C. D. (2019).
-Paper title.
-Journal Name
-https://doi.org/...
-"""
-```
-
-### Function Docstrings
-
-```python
-def function(arg1: float, arg2: str) -> bool:
-    """Short one-line summary.
-    
-    Optional longer description.
-    
-    Args:
-        arg1: Description of arg1.
-        arg2: Description of arg2.
-        
-    Returns:
-        Description of return value.
-        
-    Raises:
-        ValueError: When arg1 is negative.
-    """
-    pass
-```
-
-### Native example maintenance (E9-M5)
-
-- New supported examples construct native `Aerosol` from `ParticleData`,
-  `GasData` and `EnvironmentData`. Distribution type and representative volume
-  are explicit: resolved concentration is count, discrete is number density,
-  and continuous PDF is dN/dr. Physics and species maps belong to processes.
-- Use held properties and validated individual/coordinated replacement; raw
-  array edits do not provide transactional validation. Rebuild process maps
-  and GPU bindings after layout replacement; never imply automatic rebinding.
+- Construct native `Aerosol` from `ParticleData`, full ordered `GasData`, and
+  `EnvironmentData`. Legacy `ParticleRepresentation`, `GasSpecies`,
+  `Atmosphere`, and their obsolete builders/bridges have been removed.
+- Population semantics must be explicit: resolved concentration is represented
+  count, discrete concentration is number density, continuous PDF is dN/dr.
+  Use representative volume when comparing density or extensive inventory.
 - Particle-material width and full-gas width are independent. Preserve ordered
-  names and inert lanes; compute conservation with count/volume normalization.
-- Public quick starts and migration snippets are checked by
-  `examples_tests/native_*_test.py` and the package quick-start test. Execute
-  all changed example workloads, inspect outputs, and commit Python sources
-  with their saved result bundles. Prose-only changes may retain current results.
-- Use the selected E9 checkout for these examples. Compatibility facade removal
-  belongs to M6; M5 does not remove production APIs or qualify existing numerical
-  defects. See `docs/contribute/Feature_Workflow/Details/Add_Example.md` and
-  `.opencode/plans/sections/maintenance/E9-M5/example_inventory.json`.
+  species names, inert/nonpartitioning lanes and explicit process species maps.
+  Physics configuration belongs to processes.
+- CPU runnables remain single-box. Batched container storage does not establish
+  general multi-box CPU process support.
+- `Aerosol` holds its containers by identity. Use validated individual or
+  coordinated replacement. Raw array edits do not provide transactional
+  validation. Rebuild process maps and GPU bindings after layout replacement;
+  never imply automatic rebinding.
+- Preserve fixed-capacity slot semantics: active slots have finite positive
+  concentration, finite nonnegative masses with positive total mass and finite
+  charge; free slots have exactly zero concentration, all masses and charge.
+  Other states reject. Do not silently resize, compact or truncate demand.
+- Preserve the fixed-composition interpretation of binned coagulation. Do not
+  present it as a general radius-varying, multispecies composition model.
+- Preserve documented process-specific preflight and mutation boundaries.
+  Sequential substeps may retain earlier successful updates if a later step
+  fails; do not claim whole-call rollback without an explicit implementation.
 
-### Wall loss strategies
+See the [process guides](docs/guide/processes/index.md) for condensation,
+coagulation, dilution, nucleation and wall loss. In particular, direct GPU
+condensation uses four equal substeps with device vapor-pressure refresh and
+inventory-limited gas-coupled transfer; this does not establish CPU-strategy
+parity or adaptive stepping. Charged wall-loss image enhancement remains
+active at zero wall potential.
 
-```python
-import particula as par
+## GPU and resident lifecycle
 
-strategy = par.dynamics.ChargedWallLossStrategy(
-    wall_eddy_diffusivity=0.001,
-    chamber_geometry="spherical",
-    chamber_radius=0.5,
-    wall_potential=0.05,  # V; image-charge still applies when set to 0
-    wall_electric_field=0.0,  # V/m (tuple for rectangular geometry)
-    distribution_type="discrete",
-)
+Read [supported GPU paths](docs/guide/gpu/support.md),
+[transfers](docs/guide/gpu/transfers.md),
+[slot exhaustion](docs/guide/gpu/slot-exhaustion.md),
+[checkpoints](docs/guide/gpu/resident/checkpoints.md), and
+[graph capture](docs/guide/gpu/resident/graph-capture.md) before changing these
+boundaries.
 
-wall_loss = par.dynamics.WallLoss(wall_loss_strategy=strategy)
+- Direct step entry points import from `particula.gpu.kernels`; conversion
+  helpers import from `particula.gpu`. Sidecars and lifecycle APIs documented
+  as concrete-only stay out of package and top-level exports.
+- Callers own device placement, stable-shape buffers, CPU/Warp transfers and
+  synchronization. Do not introduce hidden transfers or CPU fallback.
+- Gas names remain CPU-owned ordered metadata. Preserve them externally for
+  semantic restores. Device vapor pressure is derived state and is dropped by
+  CPU gas inspection/restore helpers.
+- Direct coagulation/wall-loss RNG sidecars persist when supplied; repeating a
+  seed does not reset them. Only explicit initialization/reset reseeds.
+- Resident setup pins exact session, registry, guard and resource identities.
+  Normal stepping does not checkpoint, restart, reseed or rebuild bindings.
+- Schema-v5 checkpoints use immutable canonical device bytes and RNG
+  continuation metadata. CPU inspection carriers are lossy. Restart is
+  explicit, creates fresh identities, and requires an exactly compatible
+  device; there is no inferred migration or cross-device continuation.
+- Preserve read-only preflight rejection guarantees. Once an asynchronous
+  writer launches, do not promise rollback. Faulted lifecycle state requires
+  its documented explicit handling.
+- Native graph capture is CUDA-only. Preserve qualification, admission,
+  invalidation, retirement and teardown boundaries; no Warp-CPU emulation,
+  automatic recapture, or automatic recovery is implied.
 
-# Split time_step across sub_steps; oversized native steps reject
-aerosol = wall_loss.execute(aerosol, time_step=1.0, sub_steps=2)
-```
+### Benchmark and profiling evidence
 
-**Key points:**
+Benchmarks are opt-in (`pytest particula/gpu/tests/benchmark_test.py
+--benchmark -v -s`). Historical coagulation artifacts are not current-version
+or resident-capture evidence. The controlled coagulation output is
+`.artifacts/benchmarks/gpu_benchmark_results.json`; the documentation viewer
+uses the declared input `docs/data/gpu_benchmark_results.json`.
 
-- Strategies live in `particula.dynamics.wall_loss` and are exported through
-  `particula.dynamics`.
-- `WallLossStrategy` is the abstract base class for wall loss models.
-- `WallLoss` runnable wraps a strategy, splits `time_step` across `sub_steps`,
-  clamps successful strategy output to non-negative, and composes with other
-  runnables via `|`. Native strategies reject oversized steps before writing.
-- `ChargedWallLossStrategy` adds image-charge enhancement (active even when
-  `wall_potential` is 0), optional `wall_electric_field` drift, and falls back
-  to the neutral coefficient when particle charge and field are zero.
-- Use `ChargedWallLossBuilder` with `set_chamber_geometry` plus
-  `set_chamber_radius` or `set_chamber_dimensions`, and
-  `set_wall_potential`/`set_wall_electric_field`; `WallLossFactory` supports
-  `strategy_type="charged"`.
-- Supported `distribution_type` values are `"discrete"`, `"continuous_pdf"`,
-  and `"particle_resolved"`.
+Resident benchmark evidence belongs at
+`.artifacts/benchmarks/resident_capture_comparison.json`. The
+[qualification record](docs/contribute/validation/gpu/graph-capture-qualification.md)
+is the evidence authority: measured evidence remains `UNSHIPPED/BLOCKED`
+until its final-revision, designated-device gates pass. Consult the
+[resident benchmark record](docs/contribute/validation/gpu/resident-benchmarks.md),
+[profiling record](docs/contribute/validation/gpu/graph-capture-profiling.md), and
+[mass-precision study](docs/contribute/validation/numerics/mass-precision.md).
+Never turn missing measurements, timing ratios or profiler overhead into
+performance/parity claims.
 
-### CPU dilution
+## Documentation and examples
 
-```python
-import particula as par
+Astro and Starlight are the documentation build. See
+[website development](website/README.md), [authoring](website/AUTHORING.md), and
+[example contribution](docs/contribute/Feature_Workflow/Details/Add_Example.md).
 
-strategy = par.dynamics.DilutionStrategy(coefficient=1.0e-4)  # 1/s
-dilution = par.dynamics.Dilution(strategy)
-aerosol = dilution.execute(aerosol, time_step=10.0, sub_steps=2)
-```
-
-**Key points:**
-
-- `DilutionStrategy` and `Dilution` are the supported public APIs under
-  `particula.dynamics`.
-- The concrete strategy validates particle and gas concentration/storage state
-  before mutation. Preflight failures leave the aerosol unchanged; unexpected
-  array-write failures restore already-written concentration state.
-- `Dilution.execute()` performs concrete-strategy preflight before its first
-  equal substep. Custom compatible strategies retain generic equal-substep
-  delegation and own validation and atomicity.
-- `dilute_aerosol` and `get_dilution_step` remain concrete-module-only helpers;
-  do not import them from `particula.dynamics`.
-
-### GPU environment round trips
-
-### Resident GPU checkpoint lifecycle
-
-- The resident checkpoint boundary is concrete-only. Import checkpoint records,
-  `ResidentCheckpointController`, and `restart_resident_session` directly from
-  `particula.execution.checkpoint`; they are intentionally absent from
-  `particula.execution` and top-level package exports.
-- Bind a controller to one exact active `ResidentSession`, its pinned
-  `GPUResourceRegistry`, and its closed `ResidentStepGuard`, or call the
-  session's `checkpoint(registry, guard)` and `finalize(registry, guard)`
-  methods. `checkpoint()` returns a fresh immutable host snapshot and leaves
-  the session active. The first successful `finalize()` caches that snapshot
-  and transitions the session to `FINALIZED`; later calls return that exact
-  cached object.
-- A checkpoint owns immutable canonical primary-array bytes, acquired
-  registry-owned continuation sidecars, ledgers, diagnostics, and at most one
-  complete closed-map communication family, plus detached CPU inspection
-  carriers. It excludes arbitrary caller outputs and ordinary `rng_states`.
-  Current schema-v5 checkpoints always carry RNG continuation metadata. Their
-  canonical process-family inventory preserves the acquired-stream boundary.
-  Published coagulation/wall-loss current-word payloads may be empty, but when
-  present they are the sole continuation authority. Inspection `GasData` has
-  no GPU vapor-pressure field and is intentionally lossy; restart restores
-  device bytes rather than treating inspection data as authoritative.
-  Snapshotting needs roughly one additional host copy of resident payload bytes
-  as well as the detached inspection copies.
-- Restart is explicit and same-device only:
-  `restart_resident_session(checkpoint, device)` requires an exactly compatible
-  target `Device` and creates fresh session, registry, guard, containers,
-  primary arrays, and sidecars. It never selects or migrates a device, reuses
-  source identities, performs CPU fallback, or runs automatically during normal
-  session use. There is no disk, remote, delta, or rollback facility; after an
-  asynchronous device writer launches, rollback is not guaranteed. See
-  [GPU resident checkpoints](docs/guide/gpu/resident/checkpoints.md).
-- Restart compatibility is fail-closed: an ACTIVE `ResidentCheckpoint` with
-  carrier type `"ResidentSession"`, complete valid descriptors and bytes, and
-  an exactly equal target `Device` is required. Only schema-v5 is accepted;
-  earlier schemas reject before setup or upload without inferred migration.
-  Controllers retain explicit population semantics and independent species
-  widths plus required RNG continuation, even with zero published payloads.
-  A published stream payload must pair with its matching acquired resource
-  family, and either unmatched or incompatible form rejects before setup.
-  Fresh exact-device restore uses present published words without reseeding;
-  normal dispatch and reacquisition preserve them, and only an explicit stream
-  reset rederives root-seed words for restored published streams. Normal first
-  acquisition still initializes a stream absent from the checkpoint. Restart
-  reconstructs fresh communication arrays and bindings; it never reuses source
-  identities. Normal scheduler calls never checkpoint, finalize, or restart.
-
-### Resident RNG stream lifecycle
-
-- Resident streams are concrete-only lifecycle state. The exact active
-  session/registry/closed-guard binding owns separate nonaliasing `(n_boxes,)`
-  `wp.uint32` sidecars for `coagulation` and `wall_loss`; these names are not
-  package or top-level APIs.
-- Schema-versioned stable logical box IDs, the root seed, and namespace define
-  stream identity, not physical lane or registry order. Covered enabled boxes
-  retain state only for a frozen configuration on the same supported device;
-  unrelated added, disabled/no-work, removed, or reordered boxes do not define
-  identity.
-- In contrast, direct kernels use omitted RNG state as call-local convenience
-  state and use supplied state owned by their caller; there,
-  `initialize_rng=True` is the only reset. Resident first acquisition
-  initializes a newly published stream once, scheduled dispatch always uses
-  `initialize_rng=False`, and repeating a root seed does not reset resident
-  state.
-- `inspect_streams`, `initialize_streams`, and `reset_streams` are concrete-only
-  explicit lifecycle operations requiring that exact ACTIVE binding. Inspection
-  is metadata-only: it exposes no current arrays or words and does no readback
-  or synchronization. Selected or all-stream initialization/reset is
-  deliberate; normal scheduling does not inspect, transfer, synchronize,
-  reseed, checkpoint, restart, fall back, or promise rollback.
-- Schema-v5 checkpoints always contain continuation metadata; schema-v5
-  is the current format. Immutable current words for any published streams are
-  the continuation authority, separate from lossy CPU inspection carriers; zero
-  stream payloads are valid. Continuation is manual through a fresh session on
-  an exactly equal supported `Device`; it excludes cross-backend or cross-device
-  replay, migration, durable serialization, automatic restart, and implicit
-  reseeding. See
-  [GPU resident checkpoints](docs/guide/gpu/resident/checkpoints.md).
-- Warp CPU is the installed-Warp baseline. CUDA validation is optional and
-  skips cleanly when unavailable.
-- Validate with:
-
-  ```bash
-  pytest particula/execution/tests/rng_test.py \
-    particula/execution/tests/rng_invariance_test.py \
-    particula/execution/tests/checkpoint_test.py -q
-  pytest examples_tests/gpu_resident_session_example_test.py -q
-  npm --prefix website run build
-  ```
-
-### Complete direct GPU process illustration
-
-- `docs/examples/gpu/direct/gpu_complete_process_sequence.py` is an illustrative,
-  explicit-transfer five-call sequence: condensation, coagulation, dilution,
-  wall loss, then nucleation. It uses one conversion of each CPU container and
-  one final synchronization/restore.
-- Import steps from `particula.gpu.kernels`; keep conversion helpers under
-  `particula.gpu` and configuration/scratch sidecars concrete-only. Device
-  placement, stable-shape sidecars, and persistent coagulation/wall-loss RNG
-  remain caller-owned. No hidden transfer, CPU fallback, scheduler, backend
-  selector, high-level runnable, resident loop, or transport is provided.
-- Validate publication with
-  `pytest examples_tests/gpu_complete_process_sequence_example_test.py -q -Werror`.
-
-```python
-from particula.gpu import (
-    from_warp_environment_data,
-    to_warp_environment_data,
-)
-
-gpu_environment = to_warp_environment_data(environment, device="cpu")
-restored = from_warp_environment_data(gpu_environment)
-```
-
-**Key points:**
-
-- `particula.gpu` now exports `WarpEnvironmentData`,
-  `to_warp_environment_data`, and `from_warp_environment_data`.
-- Import direct GPU step entry points from `particula.gpu.kernels`, not from
-  top-level `particula.gpu`.
-- The canonical runnable example for the supported low-level path is
-  `docs/examples/gpu/direct/gpu_direct_kernels_quick_start.py`; it keeps CPU↔Warp
-  transfers explicit, defaults to Warp `device="cpu"`, and defers
-  `particula.gpu.kernels` imports until the Warp-enabled execution branch.
-- Environment transfers are explicit helper calls; kernels and runnables do
-  not perform hidden CPU↔GPU synchronization for environment state.
-- `condensation_step_gpu(..., environment=...)` and
-  `coagulation_step_gpu(..., environment=...)` accept scalar
-  `temperature`/`pressure`, direct per-box Warp arrays shaped `(n_boxes,)`,
-  hybrid scalar-plus-Warp-array direct inputs when `environment` is omitted,
-  or explicit `WarpEnvironmentData` on the active device.
-- Mixing scalar or Warp-array `temperature`/`pressure` with `environment=`
-  still raises an early `ValueError`.
-- Explicit environment and direct Warp-array inputs must use `(n_boxes,)`
-  temperature and pressure arrays on the same device as the particle/gas data.
-- Accepted direct/environment `temperature` and `pressure` inputs, plus direct
-  coagulation `volume` inputs, are validated as positive finite physical
-  values before launch.
-- Import the low-level step with
-  `from particula.gpu.kernels import condensation_step_gpu`. The optional
-  `CondensationScratchBuffers` sidecar is concrete-module-only at
-  `particula.gpu.kernels.condensation`; it is not a second step entry point.
-- `condensation_step_gpu(...)` requires keyword-only
-  `thermodynamics=ThermodynamicsConfig`. Each successful call executes exactly
-  four equal `time_step / 4.0` substeps. In each substep, it optionally refreshes
-  composition-weighted surface tension, overwrites caller-owned
-   `WarpGasData.vapor_pressure` from normalized current per-box temperature,
-   refreshes environment properties, produces a raw proposal, then applies its
-   P2-finalized, inventory-limited transfer. Vapor pressure is derived step
-   state, not a caller-supplied physics source.
-- The total-transfer buffer is cleared once after preflight, accumulates applied
-  P2-finalized transfers, and is returned by identity when supplied. Work
-  storage retains only the final raw proposal. Particle masses mutate in place,
-  and each finalized transfer applies the matching particle-concentration-
-  weighted delta to `gas.concentration`.
-- Supplied `CondensationScratchBuffers` fields must be active-device,
-  stable-shape `wp.float64`: transfer fields use
-  `(n_boxes, n_particles, n_species)` and property fields use `(n_boxes,)`.
-  Fields may be omitted independently, which uses fallback allocations.
-- An optional active-device `wp.float64` `latent_heat` sidecar shaped
-  `(n_species,)` applies a per-substep rate correction. Omitting it, or using
-  a zero entry for a species, preserves that species' isothermal rate path. An
-   optional caller-owned active-device `wp.float64` `energy_transfer` output
-   shaped `(n_boxes, n_species)` requires `latent_heat`; after successful
-   preflight it records signed whole-call P2-finalized transfer times latent
-   heat and is not returned as a third tuple item. `thermal_work` has
-   validated per-species shape `(n_species,)` but remains deferred, unused
-   state.
-- This direct kernel step does not establish CPU-strategy parity, a `Runnable`
-  API, adaptive stepping, graph capture/replay, autodiff, or general accuracy
-  claims. It executes exactly four equal substeps; vapor-pressure refresh does
-  not read gas concentration, while each later mass-transfer proposal reads
-  gas concentration coupled by its predecessors. See
-  `docs/guide/processes/condensation.md` and
-  `docs/contribute/validation/numerics/condensation-stiffness.md` for its bounded
-  contract and case-specific evidence.
-- The deterministic fp64 direct-kernel parity matrix runs one-box and
-  multi-box/multi-species fixtures against an independent NumPy fixed-four-
-  substep, P2 inventory-finalized, gas-coupled oracle. It separately compares
-  particle masses and gas concentrations, and covers uptake, evaporation,
-  disabled partitioning, latent heat, zero gas, and inactive particle slots.
-  Warp CPU is required when Warp is installed; CUDA is optional and skips
-  cleanly when unavailable. Separate per-box/per-species particle-plus-gas
-  inventory coverage uses `rtol=1e-12, atol=1e-30`. This is direct-kernel
-  evidence only.
-- Scalar temperatures, direct Warp temperature arrays, and
-  `WarpEnvironmentData` all drive this refresh. Non-`wp.float64` temperature
-  arrays are cast into a device-local float64 buffer; no host vapor-pressure
-  evaluation or host-to-device vapor-pressure transfer occurs in the step.
-- `EnvironmentData.temperature` and `pressure` use `(n_boxes,)`;
-  `saturation_ratio` uses `(n_boxes, n_species)` on both CPU and Warp mirrors.
-- Round trips preserve `temperature`, `pressure`, and `saturation_ratio` for
-  CPU-backed tests and parity coverage now also runs on `cuda` when available.
-- `from_warp_environment_data(..., sync=False)` assumes manual Warp
-  synchronization before `.numpy()` access.
-
-### GPU gas round trips
-
-```python
-import numpy as np
-
-from particula.gpu import from_warp_gas_data, to_warp_gas_data
-
-vapor_pressure = np.array([[2330.0, 120.0]])  # (1, n_species)
-gpu_gas = to_warp_gas_data(
-    gas_data,
-    device="cpu",
-    vapor_pressure=vapor_pressure,
-)
-restored = from_warp_gas_data(gpu_gas, name=gas_data.name)
-```
-
-**Key points:**
-
-- `GasData.name` is CPU-owned ordered metadata. `WarpGasData` does not store
-  names, so callers must preserve ordered names externally for semantic
-  restores.
-- Omitting `name` or passing `name=None` to `from_warp_gas_data()` restores
-  placeholders such as `species_0`.
-- `GasData.concentration` and GPU `vapor_pressure` use
-  `(n_boxes, n_species)`, including `(1, n_species)` for single-box examples.
-- `GasData.partitioning` is `bool` on CPU and `int32` on GPU, with explicit
-  `bool → int32 → bool` conversion across the helper boundary.
-- `WarpGasData.vapor_pressure` is GPU-only helper state. Pass it explicitly
-  when needed, otherwise `to_warp_gas_data()` allocates zeros with the same
-  shape, and `from_warp_gas_data()` always drops it on CPU restore.
-- See `docs/guide/data-model/index.md` for the canonical
-  user-facing field authority and transfer-boundary contract,
-  `docs/Features/particle-data-migration/` for migration walkthroughs, and
-  `particula/gpu/tests/conversion_test.py` for the regression-backed contract.
-
-### GPU vapor-pressure refresh
-
-- `refresh_vapor_pressure_gpu` is a concrete-module API: import it from
-  `particula.gpu.kernels.thermodynamics`, not `particula.gpu.kernels`.
-- It explicitly overwrites device-resident `WarpGasData.vapor_pressure` with
-  shape `(n_boxes, n_species)` from a validated `ThermodynamicsConfig` and a
-  device-local `wp.float64` temperature array in K with shape `(n_boxes,)`.
-- Constant mode reads `parameters[:, 0]` as vapor pressure in Pa. Canonical
-  Buck mode uses fixed water/ice equations; its four parameter slots are
-  reserved and ignored.
-- `condensation_step_gpu(..., thermodynamics=config)` invokes this primitive
-  after successful entry-point validation and before condensation mass
-  transfer. Call it directly only when vapor pressure must be refreshed outside
-  a condensation step.
-
-### CPU and direct-Warp fixed-slot contract
-
-- The authoritative table is in
-  `docs/guide/data-model/index.md`. Import CPU diagnostics
-  with `from particula.particles import get_slot_diagnostics`, CPU activation
-  from `particula.particles.slot_management`, and GPU activation with
-  `from particula.gpu.kernels import activate_slots_gpu`.
-- A slot is active only with finite positive concentration, finite nonnegative
-  mass lanes with finite positive total mass, and finite charge. It is free
-  only when concentration, every mass lane, and charge are exactly zero; every
-  other state raises `ValueError("Invalid particle slot state.")`.
-- Selected request rank maps to the matching ascending free slot; free-index
-  rows have `-1` tails. Storage is fixed capacity: no resize or compaction.
-  Both activation APIs mutate only `masses`, `concentration`, and `charge`.
-  CPU preflight also reads `density` and `volume` to reject protected-field
-  storage aliasing; direct-Warp activation does not observe those fields.
-- CPU diagnostics and activation-count results are fresh `np.int32` arrays.
-  GPU count/diagnostic sidecars are caller-owned same-device `wp.int32` and
-  return by identity as `(activated_counts, free_indices, active_counts,
-  free_counts)`; request and particle fields are same-device `wp.float64`.
-- Callers own CPU↔Warp transfer and synchronization. There is no CPU fallback
-  or hidden transfer. CPU performs global read-only preflight; GPU preflight
-  validates metadata/schema/device, aliasing, state, counts, capacity, and the
-  selected request prefix. Rejections preserve accessible state; rollback is
-  not promised after a GPU writer launches.
-- `get_slot_diagnostics_gpu` is concrete-only at
-  `particula.gpu.kernels.slot_management`, not package-exported.
-- E6-F6 owns exhaustion primitives. The unexported E6-F8 P4 seam privately
-  selects fully viable resampling first and representative-volume scaling as a
-  fallback; E6-F9 owns integrated direct-step execution.
-
-Focused contract runs use Warp CPU as the installed-Warp baseline; CUDA is
-optional and skips cleanly when unavailable:
+- Maintain percent-cell Python sources in `docs/examples/` and `docs/theory/`.
+  Do not maintain paired `.ipynb` sources. Jupytext remains a parser/execution
+  dependency; removing notebook-pairing configuration does not remove that use.
+- Declare source, entry point, CPU/CUDA device, timeout and helper/data inputs
+  in `website/examples.json`.
+- Execute changed scientific workloads in full, inspect figures/tables/text,
+  and commit the sources with their saved `website/results/` bundles.
+  Prose-only changes may retain current results.
+- Failed refreshes preserve old results and block acceptance. Do not substitute
+  CPU for required CUDA or weaken scientific parameters/assertions to pass.
+- Builds render saved results without running simulations. Their provenance is
+  revision-specific; a matching example fingerprint does not establish that it
+  was rerun against every later library change.
 
 ```bash
-pytest particula/particles/tests/slot_management_test.py -q -Werror
-pytest particula/gpu/kernels/tests/slot_management_test.py -q -Werror
-```
-
-### GPU dilution P1–P4 contract
-
-- Import the supported direct low-level entry point with
-  `from particula.gpu.kernels import dilution_step_gpu`.
-- Callers own CPU↔Warp transfer, device placement, synchronization, and the
-  mutable `WarpParticleData` and `WarpGasData` containers. There is no hidden
-  transfer or fallback.
-- P3 applies `c_new = c * exp(-alpha * time_step)` in place to fixed-shape
-  particle and gas concentrations, where `alpha = Q / V` has units `s^-1`, and
-  returns the identical containers. Masses and all other caller-owned fields
-  remain unchanged.
-- Entry-point preflight is deterministic and read-only. It validates coefficient
-  form, `time_step`, mass storage, per-box coefficients, particle
-  concentration, then gas concentration. Validation scans may allocate or
-  launch, but rejected calls perform no update-kernel launch or caller mutation.
-  Coefficients and concentrations must be finite and nonnegative.
-- Coefficients may be finite nonnegative scalars or caller-owned same-device
-  `wp.float64` arrays shaped `(n_boxes,)`. Particle masses must be same-device
-  `wp.float64` rank-3 storage. Particle and gas concentrations must be
-  same-device `wp.float64` rank-2 storage. Particle concentration width must
-  match particle capacity; gas width is independent but shares box count.
-- Zero scalar coefficients and zero time steps complete full preflight, then
-  return as write-free, no-update-kernel no-ops; validation scans may still
-  allocate or launch.
-- Rejected calls preserve caller-owned objects without an update launch.
-  Rollback after a successfully launched update kernel failure is not promised.
-- E6-F1 supplies the upstream CPU finite-step oracle; E6-F9 is the future
-  integrated direct-call consumer. Independent Warp CPU float64 particle and
-  gas comparisons use `rtol=1e-12, atol=0`; CUDA is optional and skips cleanly
-  when unavailable. This is tolerance-based evidence, not bitwise parity.
-- Hidden transfers/fallbacks, a GPU runnable, resizing, graph capture,
-  autodiff, performance claims, and broad integrated orchestration remain
-  deferred.
-
-Focused P1–P4 contract run:
-
-```bash
-pytest particula/gpu/kernels/tests/dilution_test.py -q -Werror
-```
-
-### GPU resampling direct-kernel contract
-
-- Import the direct low-level entry point with
-  `from particula.gpu.kernels import resampling_step_gpu`.
-- It performs fixed-capacity, deterministic P2 equal-weight remapping from
-  already-resolved same-device per-box release counts. It does not resolve an
-  exhaustion policy and has no CPU fallback or transfer, resizing, or
-  `Runnable` wrapper.
-- `ResamplingBuffers` is intentionally concrete-module-only at
-  `particula.gpu.kernels.exhaustion`. Its caller-owned same-device Warp arrays
-  provide planning, diagnostic, and sorting storage; it is neither re-exported
-  by `particula.gpu.kernels` nor a reusable CPU plan.
-- Read-only preflight validates particle/count/buffer schemas, physical state,
-  and nonaliasing. For nonzero demand, planning may overwrite documented buffer
-  lanes and diagnostics; any planning failure raises before the single commit
-  and leaves particles unchanged. Rollback is not promised after commit launch.
-- Zero-demand boxes are write-free. A nonzero count must be between `0` and
-  `active_count - 1`, where active means positive concentration. Successful
-  remapping retains and releases original active slots in ascending slot order.
-- The planner uses caller-owned scratch and a deterministic bitonic sort with
-  `O(B * N * log2(N)^2)` compare-exchange work; other planning and commit work
-  is `O(B * N * S)`. This is a bounded-work contract, not a broad performance
-  claim.
-- Parity tests use an independent NumPy oracle, Warp CPU as the baseline, and
-  optional CUDA rows that skip cleanly when unavailable. Benchmark coverage is
-  opt-in behind `--benchmark`.
-
-Focused contract runs:
-
-```bash
-pytest particula/gpu/kernels/tests/exhaustion_test.py -q -Werror
-pytest particula/gpu/kernels/tests/exhaustion_test.py -q \
-  --cov=particula.gpu.kernels.exhaustion --cov-report=term-missing \
-  --cov-fail-under=80 -Werror
-pytest particula/gpu/tests/kernel_exports_test.py -q -Werror
-```
-
-### GPU representative-volume scaling P4 contract
-
-- Import the concrete-only direct helper with
-  `from particula.gpu.kernels.exhaustion import representative_volume_scaling_step_gpu`.
-  It is not re-exported by `particula.gpu.kernels` or `particula.gpu`.
-- Callers own same-device, contiguous sidecars: float64 `(B,)` provisional
-  demand, requested/minimum scales, minimum volumes, and resolved-scale output;
-  plus an int32 `(B,)` scaling-required flag. Sidecars must not overlap each
-  other or particle fields.
-- Read-only preflight validates all physical state and sidecars before writing.
-  It performs one bounded status readback; rejected calls leave every
-  caller-owned field and sidecar unchanged. Even empty box inputs validate
-  global density state before their write-free return.
-- Selection is captured before mutation. Selected rows alone scale volume,
-  every concentration lane, and provisional demand; `resolved_scale` records
-  the selected factor or `1.0`. Successful calls are asynchronous, so callers
-  synchronize explicitly before reading state.
-- Policy resolution, exports, host/device transfers, resizing, a runnable,
-  CPU fallback, and broader orchestration remain deferred.
-
-### Slot exhaustion policy boundaries
-
-- CPU `resolve_exhaustion()` is planning only: `ExhaustionControls()` defaults
-  to resampling enabled and representative-volume scaling disabled. For
-  exhausted capacity, sufficiently releasable enabled resampling takes
-  precedence; enabled scaling is its fallback. Neither viable policy raises
-  before returning a plan, and source demand is never silently truncated.
-- E6-F5 ships authoritative slot discovery, free-index classification, and
-  activation on the CPU and direct-Warp boundaries. E6-F6 ships read-only
-  exhaustion resolution plus CPU/Warp resampling and representative-volume
-  scaling primitives. The concrete CPU-only P3 transaction at
-  `particula.dynamics.nucleation.particle_source` consumes immutable P2 source
-  demand, stages these primitives on a private `ParticleData` copy, and commits
-  particle and gas arrays only after all-box validation. It applies selected
-  representative-volume scales to pre-existing particle and gas state before
-  finalized source-mass removal. Import P3 names only from that concrete module:
-  they are intentionally absent from `particula.dynamics`,
-  `particula.dynamics.nucleation`, and the top-level package. It is not a
-  high-level nucleation loop or a public user API.
-- The supported CPU-only, single-box process boundary is
-  `particula.dynamics.Nucleation`, constructed with
-  `NucleationSourceConfig`, `NucleationCommitConfig`, and `EnvironmentData`.
-  It operates on legacy `Aerosol` backing `ParticleData` and partitioning
-  `GasData` by identity, using equal sequential substeps that re-read gas after
-  each commit. Atomicity is per attempted P3 substep only; successful earlier
-  substeps remain applied if a later one fails. P2/P3 records, helpers, and
-  `ParticleSourceCommitConfig` remain concrete-only.
-- Direct Warp P2 and P4 primitives consume caller-owned same-device state;
-  callers synchronize successful asynchronous P4 work before reading results.
-  See [Fixed-Capacity Slot Exhaustion Primitives](docs/guide/gpu/slot-exhaustion.md)
-  for imports, schemas, diagnostics, and mutation boundaries.
-- Dynamic allocation, resizing, compaction, hidden transfers or CPU fallback,
-  runnable/scheduler/backend integration, graph capture, autodiff, performance
-  guarantees, and exact CPU/Warp/CUDA RNG replay remain outside this contract.
-
-Focused contract runs:
-
-```bash
-pytest particula/particles/tests/exhaustion_test.py \
-  particula/gpu/kernels/tests/exhaustion_test.py -q -Werror
-pytest particula/dynamics/nucleation/tests/particle_source_test.py -q -Werror
+python scripts/docs_examples.py refresh EXAMPLE_KEY
+python scripts/docs_examples.py check
+python scripts/check_docs_structure.py
+npm --prefix website test
 npm --prefix website run build
 ```
 
-### GPU wall-loss direct-kernel contract
-
-- Import the direct low-level boundary with
-  `from particula.gpu.kernels import wall_loss_step_gpu`.
-- Construct `NeutralWallLossConfig` only from
-  `particula.gpu.kernels.wall_loss`; it is deliberately not re-exported by
-  `particula.gpu.kernels` or `particula.gpu`.
-- The direct boundary supports `particle_resolved` neutral and charged
-  configurations. Wall eddy diffusivity is in m²/s; radius and dimensions are
-  in m; temperature is in K; pressure is in Pa; and time is in s.
-  A spherical configuration needs a positive radius and no dimensions. A
-  rectangular configuration needs no radius and exactly three positive dimensions.
-- Charged mode accepts a finite signed wall potential [V] and a finite signed
-  electric field [V/m]: a scalar for spherical geometry or a caller-owned,
-  same-device `wp.float64` Warp array shaped `(3,)` for rectangular geometry.
-  Spherical execution preserves the signed scalar field and adds the signed
-  potential-derived field. Rectangular execution reduces the three field lanes
-  to their Euclidean magnitude, then adds the signed potential-derived field;
-  individual component signs do not select drift direction. Nonzero charged
-  slots use private image-charge and electric-field-drift composition, and
-  image-charge enhancement remains active when `wall_potential=0`. Neutral
-  mode and zero-charge charged slots retain the exact neutral coefficient and
-  RNG path. The rectangular vector remains caller-owned and is read only by
-  charged rectangular execution.
-- P3-frozen preflight validates fixed-shape, same-device `wp.float64` particle
-  fields, finite domain values, a finite nonnegative `time_step` [s],
-  temperature [K], pressure [Pa], and optional `wp.uint32` per-box RNG
-  metadata. In charged mode, finite nonzero particle charge selects the private
-  charged-coefficient path after successful preflight.
-- After successful preflight, eligible finite-rate fixed slots survive with
-  `exp(-k * time_step)`. Selected slots have every mass lane, concentration,
-  and charge cleared; density, volume, dtype, device, capacity, and unselected
-  storage are preserved. Inactive or unusable slots are neither sampled nor
-  reactivated. The asynchronous call mutates caller-owned same-device state in
-  place; callers own explicit CPU↔Warp transfer, device placement, and
-  synchronization. Omitted RNG state is private for each successful nonzero
-  call. Supplied same-device `(n_boxes,)` `wp.uint32` state mutates in place;
-  `initialize_rng=True` is the only reset, and repeating `rng_seed` does not
-  reset persistent state. RNG consumption is sequential per box over eligible
-  slots and does not promise exact CPU/Warp replay. Zero time remains write-free
-  and preserves supplied state. The call returns the identical particle
-  container.
-- Rejected pre-launch calls preserve caller-owned particle and RNG-sidecar state.
-  Rollback is not promised after a mutation kernel launches.
-- Deterministic geometry-specific coefficient tolerances and eight charged
-  geometry-radius strata of 4,096 exact-binomial survival observations provide
-  bounded P5 evidence. Warp CPU is the baseline when available; CUDA is
-  optional and skips cleanly when absent. This is not CPU-strategy parity or
-  per-seed trajectory replay. A high-level runnable, scheduler, or backend
-  integration; hidden transfer or CPU fallback; resizing, compaction,
-  activation, graph capture, differentiability, and performance claims remain
-  deferred. Device validation scans and scalar status synchronization/readback
-  are permitted; they do not transfer or replace caller-owned buffers.
-
-Focused P1–P6 contract runs:
-
-```bash
-pytest particula/gpu/dynamics/tests/wall_loss_funcs_test.py -q -Werror
-pytest particula/gpu/kernels/tests/wall_loss_test.py particula/gpu/kernels/tests/wall_loss_parity_test.py -q -Werror
-```
-
-### GPU coagulation RNG state ownership
-
-```python
-import warp as wp
-
-rng_states = wp.zeros((n_boxes,), dtype=wp.uint32, device=device)
-
-# Seed once before a repeated-step loop.
-coagulation_step_gpu(..., rng_seed=41, rng_states=rng_states,
-                     initialize_rng=True)
-
-for _ in range(n_steps):
-    coagulation_step_gpu(..., rng_seed=41, rng_states=rng_states)
-```
-
-**Key points:**
-
-- `coagulation_step_gpu(..., mechanism_config=...)` accepts a keyword-only
-  `CoagulationMechanismConfig` imported from
-  `particula.gpu.kernels.coagulation`; configuration APIs are deliberately not
-  re-exported through `particula.gpu.kernels`.
-- Omitting `mechanism_config` preserves Brownian, particle-resolved execution.
-  Exact unit-efficiency SP2016 sedimentation-only
-  `("sedimentation_sp2016",)`, charged-only `("charged_hard_sphere",)`, and
-  canonical combined Brownian-plus-charged
-  `("brownian", "charged_hard_sphere")` configurations are executable with
-  `distribution_type="particle_resolved"`. Sedimentation is direct-kernel-only;
-  it uses caller-owned same-device state and preserves the existing output/RNG
-  contracts without hidden transfer or fallback. It read-only validates finite,
-  nonnegative mass and concentration and finite, positive density before output
-  allocation/writes, RNG setup, or particle mutation. P1 recognizes the four
-  singleton mechanisms, all six unordered two-term combinations, and the
-  four-term combination. Executable particle-resolved masks are the singletons
-  `1`, `2`, `4`, and `8`; the two-term masks `3`, `5`, `6`, `9`, `10`, and `12`;
-  and the four-term mask `15`. The deferred three-term masks have deliberate
-  validation ordering: mask `7` rejects at capability preflight before particle
-  metadata or enabled-term validation, while masks `11`, `13`, and `14` validate
-  particle metadata and their enabled terms before raising exactly
-  `ValueError("Additive coagulation execution is deferred.")`. Deferred errors
-  occur before time, environment, or volume normalization; collision-output/RNG
-  allocation or initialization; kernel launch; or mutation. Either supported
-  Brownian-plus-charged order normalizes to the canonical mask and uses one
-  shared stochastic selection path. Malformed configurations, unsupported
-  distributions, duplicate, and unknown mechanisms reject through resolver
-  preflight.
-- The exact ST1956 turbulent-shear singleton
-  `CoagulationMechanismConfig(("turbulent_shear_st1956",))` is executable with
-  `distribution_type="particle_resolved"`. It requires keyword-only, explicit
-  `turbulent_dissipation` (m²/s³) and `fluid_density` (kg/m³). Each accepts a
-  positive finite Python/NumPy floating scalar or an active-device `wp.float64`
-  Warp array shaped `(n_boxes,)`; supplied valid arrays retain identity, while
-  scalar broadcasts use private device storage. These are not container fields.
-  Turbulent masks `11`, `13`, and `14` validate these inputs before their
-  deferred-execution error; non-turbulent masks ignore both parameters.
-  The direct singleton uses an O(A) two-largest-active-radii majorant. It adds
-  no runnable/API re-export, CPU fallback, or performance claim.
-- `WarpParticleData.charge` is caller-owned, device-resident state containing
-  dimensionless elementary-charge counts with shape `(n_boxes, n_particles)`.
-  It is not a sidecar or a hidden transfer result. It must be a same-device
-  `wp.float64` Warp array with that matching shape on the particle-data device.
-  Every execution mode containing charged hard-sphere physics scans it for
-  finite values before environment or volume normalization, caller-output
-  validation or allocation, RNG setup, and selector/apply work. Brownian
-  finite-charge validation remains opt-in.
-  Accepted merge application adds donor charge to the recipient and clears the
-   donor. This bookkeeping conserves charge; charge affects charged-hard-sphere
-   rates and selection but not Brownian rates or selection.
-- Combined execution independently sanitizes and sums Brownian and charged
-  pair rates, then uses one active set, exhaustive additive majorant,
-  candidate/acceptance pass, collision-buffer set, RNG stream, and apply pass.
-  For A active particles, pair work is O(A²), preparation is O(N), and
-  selector/collision storage is O(N), where N is total particle capacity. This
-  is bounded implementation scope, not performance evidence. The return tuple is exactly
-  `(particles, collision_pairs, n_collisions)`; supplied collision buffers are
-  returned by identity, while `rng_states` mutates in place and is not returned.
-- Shipped baseline: caller-owned persistent `rng_states` are seeded once and
-  then reused across repeated calls.
-- Omitting `rng_states` keeps the convenience allocate-and-seed-per-call path.
-- Reusing a fixed `rng_seed` with a persistent `rng_states` buffer does not
-  trigger hidden reseeding; call with `initialize_rng=True` only when you
-  intentionally want to reset the stream.
-- For repeated-step loops, initialize or reset persistent `rng_states` before
-  entering the loop.
-- Coagulation `rng_states` are Warp-resident sidecar state, not fields on
-  `ParticleData`, `GasData`, `EnvironmentData`, or their Warp mirrors.
-- Mixed NPF/droplet coagulation acceptance diagnostics live only in
-  `particula/gpu/kernels/tests/coagulation_test.py`; keep attempted-count
-  instrumentation test-local and leave the public `coagulation_step_gpu(...)`
-  API unchanged for debug-only coverage.
-- The bounded coagulation selector is regression-covered only through
-  test-local diagnostics: accepted pairs must remain sorted, in bounds, and
-  drawn from originally active slots; zero/one-active inputs must early-return;
-  exactly-two-active inputs must collapse to the sole valid pair; and accepted
-  collisions must conserve total mass.
-- Warp CPU is the baseline when installed; CUDA evidence is optional and must
-  skip cleanly when unavailable. Brownian, charged-only, canonical
-  Brownian-plus-charged, exact sedimentation-only, and exact ST1956
-  turbulent-shear-only modes are supported; sedimentation or turbulent
-  combinations, alternate charged models, broader distributions, and
-  performance claims remain deferred.
-- See `docs/guide/data-model/index.md` and
-  `docs/contribute/roadmap.md` for user-facing ownership
-  guidance.
-
-Focused diagnostic runs:
-
-```bash
-pytest particula/gpu/dynamics/tests/coagulation_funcs_test.py -q -Werror
-pytest particula/gpu/kernels/tests/coagulation_test.py -q -Werror
-pytest particula/gpu/kernels/tests/coagulation_test.py -q -k mixed_scale
-pytest particula/gpu/kernels/tests/coagulation_test.py -q -k "mixed_scale or sparse or degenerate or conservation" -Werror
-pytest particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py -q -Werror
-```
-
-### GPU mass-precision baseline study
-
-```bash
-pytest particula/gpu/tests/mass_precision_cases_test.py -q
-pytest particula/gpu/tests/mass_precision_metrics_test.py -q
-pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
-```
-
-**Key points:**
-
-- The deterministic baseline lives in
-  `particula/gpu/tests/mass_precision_cases_test.py`.
-- Baseline cases cover NPF, 5-10 nm, accumulation-mode, and droplet-scale
-  masses without changing the production CPU/GPU storage schema.
-- The focused comparison module lives in
-  `particula/gpu/tests/mass_precision_metrics_test.py` and evaluates exactly
-  three study-only reconstruction candidates against the fp64 baseline,
-  including cached reconstruction, conservation, mixed-scale small-particle,
-  and clamp-accounting checks.
-- Mixed-scale review thresholds are now exercised explicitly so nanometer
-  particles cannot be masked by droplet-scale aggregates in the same array.
-- Optional throughput evidence lives on
-  `particula/gpu/tests/benchmark_test.py` behind the existing `--benchmark`
-  opt-in and still skips cleanly when Warp/CUDA is unavailable.
-- Use `docs/contribute/validation/numerics/mass-precision.md` as the reference for
-  case names, supported-vs-unsupported candidate scope, thresholds,
-  memory-footprint examples, and focused reproduction.
-
-### CPU nucleation
-
-- The public CPU-only, single-box runnable imports from `particula.dynamics`:
-  `Nucleation`, `NucleationCommitConfig`, strategies/builders, and
-  `NucleationSourceConfig`; import `EnvironmentData` from `particula.gas` and
-  `ExhaustionControls` from `particula.particles.exhaustion`.
-- Activation and kinetic rates use SI `J=A*C` and `J=K*C^2`; survival is an
-  explicit dimensionless caller factor. P2/P3 source records and transaction
-  helpers remain concrete-only in `nucleation.particle_source`.
-- P5 preserves `Aerosol` and backing-data identity, uses equal current-gas
-  substeps, and is atomic per attempted substep only. E6-F5 activation and
-  E6-F6 exhaustion primitives are dependencies. The direct, same-device Warp
-  boundary imports with
-  `from particula.gpu.kernels import nucleation_step_gpu`. It composes private
-  P1--P4 seams before its fused P5 particle/gas commit; its configuration,
-  records, sidecars, and helpers remain concrete-only. CPU fallback, hidden
-  transfer, resizing and compaction remain unsupported. E6-F9 supplies an
-  explicit direct-call illustration; resident scheduling has its own bounded
-  contract and does not make the direct step a CPU runnable.
-- Check concentration-weighted particle-plus-gas conservation at
-  `rtol=1e-12, atol=1e-30`. Run `python docs/examples/processes/nucleation/cpu_nucleation.py`,
-  `pytest examples_tests/nucleation_example_test.py -q -Werror`, and
-  `npm --prefix website run build`. Refresh changed registered examples with `scripts/docs_examples.py refresh`.
-
-### Direct GPU nucleation
-
-- The only supported package import is
-  `from particula.gpu.kernels import nucleation_step_gpu`. Import
-  `NucleationConfig`, P2/P3 records, P4 controls, and scratch/finalized/
-  diagnostic/exhaustion sidecars only from `particula.gpu.kernels.nucleation`;
-  nested `ResamplingBuffers` is concrete-only in `kernels.exhaustion`.
-- CPU `particula.dynamics.Nucleation` is a separate CPU-only runnable, never a
-  GPU fallback. Callers explicitly convert particle, gas, and environment data,
-  allocate same-device contiguous `wp.float64`/`wp.int32` sidecars using `(B,)`,
-  `(B, N)`, `(B, S)`, and `(B, N, S)` schemas, and call `wp.synchronize()` before
-  host inspection.
-- P1 preflights, P2 admits shared inventory-limited demand, P3 stages slots,
-  P4 chooses resampling before scaling fallback, and P5 commits selected slots
-  plus gas transfer. Invalid public rejection before P4 preserves particles/gas;
-  documented sidecars may change in P2--P4, and no rollback is promised after
-  an E6-F6 primitive entry or P5 launch. Valid no-admission is a successful no-op.
-- E6-F5 fixed-slot activation, E6-F6 exhaustion primitives, and E6-F7 CPU
-  nucleation are dependencies. Warp CPU is the baseline; CUDA is optional and
-  must cleanly skip when unavailable. Run
-  `python -Werror docs/examples/gpu/direct/gpu_direct_nucleation.py` and
-  `pytest examples_tests/gpu_direct_nucleation_example_test.py -q -Werror`.
-
-### Resident graph-capture admission lifecycle
-
-- Native graph handles are private provenance, not fields on captured records.
-  LIVE records admit replay through per-record leases; teardown transitions to
-  RELEASING, performs the one release outside the global provenance lock, and
-  retains a RELEASED tombstone so an opaque identity cannot be reissued.
-- Capture/replay and close/discard/finalize share a per-session lifecycle
-  protocol. Terminal intent is visible before caller-controlled callbacks, so
-  callback reentry cannot race admission. A post-begin capture failure invokes
-  native abort, faults resident and graph state, and preserves the initiating
-  exception with cleanup failures chained.
-
-#### Resident graph-capture P5 validation boundary
-
-- The delivered three-way P5 matrix uses CPU as a test-local NumPy reference,
-  Warp CPU as uncaptured evidence, and CUDA native capture as optional
-  pass-or-clean-skip evidence. Capture freezes the first physical timestep, and
-  each launch executes one timestep through one-token replay with authentic
-  opaque-handle provenance. Genuine nonzero native-CUDA rows use exact READY
-  bindings for single- and multi-box full loops and compare meaningful state
-  against both references.
-- This is concrete-only: exact READY
-  session/registry/closed-guard/request/publication binding, qualification,
-  explicit invalidation, retirement, renewal, and teardown are required. There
-  are no public exports, no automatic recapture, no fallback (including
-  Warp-CPU capture), no recovery/retry/rollback, no hidden
-  transfer/readback/synchronization, no checkpointed handle, and no
-  cross-device replay.
-- The bounded P5 evidence distinguishes deterministic parity, independent
-  conservation, persistent RNG continuation, and aggregate stochastic criteria;
-  it does not compare cross-device RNG words or per-seed trajectories. It makes
-  no performance, profiling, or memory claim. The separate native-CUDA-only
-  source `docs/examples/gpu/resident/gpu_resident_graph_capture.py` demonstrates the bounded
-  capture, two-replay, invalidation, retirement, and renewal lifecycle without
-  adding a public API or a CPU/Warp-CPU fallback.
-
-  Validate the P5 evidence boundary with focused assertions before the
-  untargeted coverage runner; CUDA selection is optional pass-or-clean-skip
-  evidence only:
-
-  ```bash
-  pytest particula/execution/tests/captured_full_loop_test.py -q --no-cov
-  pytest particula/execution/tests/graph_capture_test.py \
-    particula/execution/tests/rng_invariance_test.py \
-    particula/execution/tests/checkpoint_test.py -q --no-cov
-  pytest particula/execution/tests/captured_full_loop_test.py -q \
-    -m "warp and cuda" --no-cov
-  .opencode/tools/run_pytest.py
-  pytest particula/tests/execution_exports_test.py -q --no-cov
-  npm --prefix website run build
-  ```
-
-- E8-F1 supplies host metadata and scheduler admission only through the
-  concrete-only `particula.execution.graph_capture` import boundary. Its
-  carriers and lifecycle operations are absent from `particula.execution` and
-  top-level `particula`; it supplies no native CUDA graph capture, replay,
-  parity, performance evidence, or user workflow.
-- E8-F4-P1 adds a concrete-only prepared qualification seam in that module. It
-  validates one exact READY binding, prepared simulation, and published capture
-  resource set, then lazily resolves an adapter's native callable vocabulary by
-  identity for an exact non-CPU Warp device. The adapter alone probes runtime,
-  device, and capture-API availability; `Device.native` remains opaque.
-  Qualification returns a fresh immutable metadata record and preserves READY
-  on success or rejection. E8-F4-P2 consumes that exact qualification only to
-  perform native begin, frozen twelve-operation dispatch, and native end. It
-  revalidates before begin and after end, retains the opaque end handle by
-  identity only, and transitions READY to CAPTURED only after successful end.
-  A post-end rejection privately releases that exact handle. E8-F4-P3 adds
-  `replay_captured_resident_graph(captured, duration)`, a concrete
-  direct-import boundary that accepts only an authentic P2-issued capture
-  record. After exact provenance, binding, lifecycle, and duration preflight,
-  it forwards the opaque handle by identity through exactly one guard token,
-  native launch, and completion. It performs no host dispatch, allocation,
-  probing, transfer, readback, synchronization, reseed/reset, fallback, retry,
-  automatic recapture, or native-handle lifecycle work; pinned payload values
-  and resident RNG words may advance without invalidating the record. Launch
-   or completion failures are writer-capable and retain resident no-rollback
-   fault semantics. P3 is intentionally absent from package and top-level
-   exports and is not a public user API; later E8-F4 phases own broader
-   captured evidence.
-- E8-F4-P4 keeps issued native-handle lifecycle internal to
-  `graph_capture`. A P2-issued handle becomes stale before one release when
-  structural identity drifts, a writer may have launched, the exact resident
-  binding finalizes, closes, or discards, or capture is explicitly retired.
-  Release failures do not restore provenance or trigger retry, rollback, or
-  recovery. Exact session/registry/closed-guard notification is lazy and
-  private; it adds no exports, checkpoint payload fields, or user API.
-- Eligibility is fail-closed: non-CPU Warp native devices require
-  caller-provided availability/probe qualification. CPU and Warp CPU are neither
-  capture nor fallback/emulation paths; E8-F1 supplies no availability-policy
-  selection or cross-device replay.
-- Compatibility checks identity in this exact first-drift order: `request`,
-  `session`, `device`, `dimensions`, `primary_containers`, `primary_arrays`,
-  `resource_views`, `graph`, `schedule`, `schedule_order`, `diagnostics`,
-  `communication`, `configurations`, and `rng_resources`. This is payload-only
-  compatibility: unchanged-shape
-  field-value updates, active/free-slot changes, and advancing RNG words remain
-  compatible; replacing an array/resource identity does not.
-- Lifecycle states are `READY`, `CAPTURED`, `INVALIDATED`, `FAULTED`,
-  `RETIRED`, and terminal `CLOSED`. `READY` requires explicit
-  `complete_resident_graph_capture()` for `CAPTURED`; drift invalidates captured
-  metadata; explicit retirement then renewal creates a fresh `READY` lifecycle
-  requiring explicit completion again. Renewal is not native recapture or
-  replay. Writer-may-have-launched failure records `FAULTED` metadata with no
-  retry or rollback guarantee.
-- Admission before scheduler token entry requires the attached exact
-  request/session/registry/closed-guard binding, an `ACTIVE` pinned session,
-  available qualified non-CPU Warp capability, `CAPTURED` lifecycle, and a
-  compatible signature. Before constructing the final request, callers must
-  register the complete inventory, build exact views and capacities, construct
-  `CaptureResourceRequirements`, and publish that exact set once with
-  `GPUResourceRegistry.prepare_capture_resources()`. E8-F1 CAPTURED admission
-  and E8-F2 READY preparation use cached metadata-only validation and freeze
-  the exact requirements, set, and immutable logical-byte report identities;
-  they perform no resource preparation, acquisition, allocation, payload
-  inspection, synchronization, or stream lifecycle work. The identity triple
-  extends `configurations` without changing first-drift ordering. Logical-byte
-  reports cover manifest shape/dtype bytes only, excluding allocator-reserved
-  bytes, pointers or payload reads, checkpoint-copy costs, and future
-  autodiff-tape totals.
-  E8-F2 P1--P6/P8 ship the concrete-only prepared enqueue boundary: setup
-  validates,
-  normalizes, binds identities, and may allocate established private fallback
-  storage; individual retained bindings dispatch frozen device/no-op callables
-  without validation/readback, allocation, transfer, synchronization, resource
-  acquisition/replacement, device selection/fallback, dynamic schedule/policy
-  resolution, mutable-carrier lookup/rebinding, or RNG initialization/reset.
-  `prepare_resident_timestep()` retains READY identities but authorizes neither
-  token entry nor dispatch. `enqueue_prepared_resident_simulation()` separately
-  applies its retained structural/lifecycle identity gate before token entry and
-  a fresh signature comparison, then
-  opens exactly one token and dispatches twelve frozen operations in canonical
-  order. Its post-gate dispatch has the same prohibited-work boundary as an
-  individual binding. Empty or no-work bindings are write-free; identity or
-  frozen-control drift requires new preparation and rejects before token entry.
-  Writer-capable failure retains
-  E8-F1 FAULTED/no-rollback/no-retry/no-fallback recovery limits. E8-F3 owns
-  resource work; E8-F4 native capture/replay and captured parity; E8-F5--F6
-  parity/performance/memory; E8-F7/T7 profiling and machine-bounded
-  recommendations; and E8-F8 only the example, limitations, and closeout.
-  No automatic recapture, native/full-loop capture or replay, hidden
-  allocation/transfer/synchronization, or user example is claimed by this
-  prepared-path contract.
-  Warp CPU is uncaptured implementation validation; CUDA is optional
-  pass-or-clean-skip evidence. Validate this contract with:
-
-  ```bash
-  pytest particula/tests/execution_exports_test.py -q --no-cov
-  npm --prefix website run build
-  ```
-
-### GPU-resident session lifecycle
-
-- `particula.execution.availability` is a concrete direct-import-only P2
-  pre-execution resolver, not a package or top-level API. It accepts already
-  validated P1 `ExecutionRequest`/`CapabilityMatrix` metadata and returns an
-  immutable request-only decision after recognition, structural capability,
-  lazy runtime, device, and request-associated state checks. It does not select
-  adapters, invoke execution, transfer, synchronize, or mutate state.
-- The default CPU provider recognizes only `Device(Backend.CPU, "cpu")` without
-  probing. Default Warp recognition preserves each validated native string as
-  opaque; lazy runtime/device checks decide availability without parsing or
-  normalizing it. Provider registries must contain exactly usable CPU and Warp
-  providers before any optional runtime work.
-- Import concrete resident seams directly: setup/session/guard from
-  `particula.execution.gpu_session`, the registry from
-  `particula.execution.gpu_resources`, communication composition from
-  `particula.execution.resident_communication`, and records/controller/restart
-  from `particula.execution.checkpoint`. They are not `particula.execution` or
-  top-level exports.
-- Setup converts CPU particle, gas, then environment data once. The session
-  retains fixed dimensions and resident identities; ordered gas names remain
-  CPU metadata. The registry pins fixed-shape, same-device, nonaliasing sidecars
-  and does not execute, transfer, synchronize, or initialize RNG streams.
-- The registry's concrete-only capture registration can pin exactly one
-  metadata-only selection: absent communication or one already-published closed
-  GAS/PARTICLES communication view, plus an ordered diagnostic-registration
-  tuple. It retains identities and resolved schemas/logical bytes only; it does
-  not inspect payloads, allocate, dispatch, transfer, synchronize, or become
-  checkpoint authority. First-registration failures leave no selection, and
-  only an exact identity repeat returns the retained inventory. This is not a
-  `particula.execution` or top-level API and provides no user workflow.
-- `GPUResourceRegistry.logical_resource_report(capacities)` is a
-  direct-module-only planning seam. Its immutable report resolves all seven
-  manifest families, including both communication families regardless of later
-  acquisition, from pinned dimensions and explicit collision, gas-edge, and
-  particle-edge capacities. It reports logical schema bytes only, not
-  allocator-reserved bytes, and does not inspect payloads, allocate, acquire,
-  bind, or mutate resources. Its carriers remain absent from
-  `particula.execution` and top-level exports.
-- `prepare_capture_resources(requirements)` is the concrete-only publication
-  boundary used before final resident request construction. It retains one exact
-  complete resource set and cached immutable logical-byte report. Admission and
-  READY preparation only retrieve that published association by identity; they
-  do not rebuild inventory or reports, inspect payloads, allocate, acquire,
-  synchronize, or change stream state. The report excludes pointers, payload
-  reads, checkpoint-copy costs, and future autodiff-tape totals.
-- Checkpoint, finalize, close, and discard require an exact session/registry/
-  closed-guard binding. Normal guard bookkeeping has no bulk synchronization.
-  Read-only failures can remain ACTIVE after token release; writer failures can
-  fault without rollback; close/discard do not checkpoint, restore, synchronize,
-  or mutate payloads.
-- Inspection `GasData` is lossy. Canonical checkpoint bytes preserve GPU vapor
-  pressure and per-box partitioning and are restart authority. Restart is
-  explicit, exact-device, and creates fresh identities; no implicit restore,
-  fallback, migration, or normal-step bulk synchronization exists.
-- Resident diagnostics and complete-loop execution are concrete-only direct
-  imports: use `particula.execution.diagnostics` for the closed
-  `GAS_CONCENTRATION_SNAPSHOT` and `SATURATION_RATIO_SNAPSHOT` protocol, and
-  `particula.execution.resident_scheduler` for the resolved resident loop.
-  Diagnostics copy current resident `(B, S)` gas concentration or saturation
-  ratio into separate caller-owned contiguous same-device `wp.float64` outputs;
-  outputs must not alias primaries, published sidecars, or each other. Canonical
-  empty `(0, S)`, `(B, 0)`, and `(0, 0)` outputs are successful write-free
-  no-ops. Neither module provides callbacks or package/top-level exports.
-- P1-prepared resident state replacements, thermodynamic refreshes, and
-  diagnostics use an internal two-phase boundary: setup validates and freezes
-  the exact READY binding, then enqueue issues only pre-bound device copies or
-  kernels. Enqueue performs no lookup, validation, allocation, readback, or
-  synchronization; valid empty schemas remain write-free. This does not change
-  public protocols or exports, and legacy standalone executors remain
-  compatible.
-- Resident communication is acquired once through the concrete registry as one
-  exact closed-map GAS or PARTICLES configuration, its same-device native work
-  record, and optional final `(B,)` `wp.float64` volumes. Normal-step metadata
-  validation preserves that binding by identity; it does not repeat P1 payload
-  validation, allocate, transfer, inspect payloads, or synchronize. Combined
-  maps and open `-1` endpoints are not resident communication forms.
-- `ResidentSimulationScheduler` accepts only the resolver-produced complete
-  twelve-node schedule. Communication runs first, then optional prescribed
-  volume evolution, followed by environment update, gas update, vapor-pressure
-  refresh, saturation refresh, condensation, Brownian coagulation, dilution,
-  wall loss, nucleation, and diagnostics. The barriers use pre-update volumes
-  and invalidate saturation ratio only; vapor pressure remains fresh. The
-  virtual refresh nodes run vapor-pressure then saturation immediately before
-  condensation and diagnostics. Alongside legacy CAPTURED execution admission,
-  the concrete scheduler composes a READY-only, uncaptured prepared path:
-  setup freezes validated operations, then enqueue rechecks structural,
-  lifecycle, and signature drift before opening one token and dispatching the
-  retained order.
-  It neither captures nor replays graphs, and does not create a public API.
-  Both paths retain one exact active session, pinned registry, and closed guard
-  by identity; they perform no transfer, restore, synchronization,
-  checkpoint/finalize, resource acquisition or replacement, fallback, retry,
-  resize, or compaction. A failure after a writer-capable call closes the token,
-  faults the session, and has no rollback or retry guarantee.
-- Compatibility is fail-closed: only schema-v5 checkpoints with explicit
-  population semantics and species widths, complete canonical
-  payloads, and an exactly equal `Device` restart. Schema-v5
-  continuation metadata is required even when it has zero published-stream
-  payloads. Stream/resource mismatches reject before setup.
-  `ParticleData.volume` is fixed resident state except for the optional
-  prescribed volume-evolution barrier. The standalone E7-F7-P2 direct import is
-  `particula.gpu.kernels.communication.volume_evolution_step_gpu`: callers pass
-  active-device final `(B,)` `wp.float64` volumes in m^3. Native resolved counts
-  stay unchanged while gas density scales by old/new volume; legacy density
-  scales in both carriers. PMF/PDF reject physical volume evolution. It has no
-  scheduler integration, transport/mixing/advection, hidden transfer,
-  synchronization, CPU fallback, resizing, or package/top-level export.
-  E7-F7-P3 provides the separate concrete-only direct import
-  `particula.gpu.kernels.communication.gas_communication_step_gpu` for
-  synchronous explicit-Euler gas communication. It requires an exact P1 GAS
-  `CommunicationConfiguration`, complete Warp particle/gas containers, a
-  finite nonnegative time step, and caller-owned `(B, S)` `wp.float64` amount,
-  delta, and outbound work ledgers. `-1` endpoints are explicit open
-  source/sink boundaries and require their matching accounting ledgers. The
-  step stages `concentration * volume`, rejects aggregate overdraw, and commits
-  gas concentration once; it never changes particle fields or volume. It has
-   no scheduler integration, hidden transfer, synchronization, fallback,
-   resizing, or package/top-level export. `GasCommunicationBuffers` is also
-   concrete-only and only packages those caller-owned ledgers.
-   E7-F7-P4 provides the separate concrete-only direct import
-   `particula.gpu.kernels.communication.particle_communication_step_gpu` and
-   its `ParticleCommunicationBuffers` carrier. It accepts an exact P1
-   PARTICLES `CommunicationConfiguration`, a finite nonnegative time step,
-   and same-device buffers: float64 `(B, N)` source-debit and
-   destination-credit ledgers, int32 `(E, N)` assignments, and float64
-   `(E, N)` requests. It transports prescribed closed in-domain maps only: no
-   gas, volume mutation, `-1` endpoints, slot activation, resizing, compaction,
-   transfer, or synchronization. Immutable pre-step planning preserves complete
-   species-mass vectors and signed charge, reuses exact destination population
-   matches or ascending pre-step free slots, then performs one gated commit.
-   Valid no-op calls leave particles and buffers untouched; invalid plans gate
-   particle writes, while planning buffers may change after device planning
-   starts and rollback is not promised after commit launch. Closed-map calls
-   conserve concentration-weighted particle number, each mass lane, and signed
-   charge. Callers own buffer allocation and synchronization; both names remain
-   absent from package and top-level exports.
-   E7-F8 owns detailed scheduled RNG/restart policy, and E7-F9 owns final
-   diagnostics, complete examples, and closeout.
-
-Focused commands:
-
-```bash
-pytest particula/execution/tests/diagnostics_test.py \
-  particula/execution/tests/gpu_resources_test.py \
-  particula/execution/tests/checkpoint_test.py \
-  particula/execution/tests/rng_invariance_test.py \
-  particula/execution/tests/full_loop_test.py \
-  particula/execution/tests/multi_box_loop_test.py \
-  particula/execution/tests/transport_loop_test.py \
-  particula/execution/tests/restart_loop_test.py \
-  particula/execution/tests/condensation_integration_test.py \
-  particula/execution/tests/coagulation_integration_test.py \
-  particula/execution/tests/errors_test.py \
-  particula/execution/tests/fallback_test.py \
-  particula/execution/tests/fallback_integration_test.py \
-  examples_tests/gpu_resident_multi_timestep_docs_test.py -q
-pytest particula/execution/tests/exports_test.py \
-  particula/tests/execution_exports_test.py -q
-pytest particula/execution/tests/ -q
-pytest --cov=particula --cov-report=term-missing
-pytest particula/execution/tests/ -q \
-  --cov=particula.execution.diagnostics,particula.execution.gpu_resources,particula.execution.checkpoint,particula.execution.resident_scheduler \
-  --cov-report=term-missing --cov-fail-under=80
-npm --prefix website run build
-pytest particula/execution/tests/multi_box_loop_test.py -q -m "warp and cuda"
-pytest particula/execution/tests/condensation_integration_test.py \
-  particula/execution/tests/coagulation_integration_test.py -q \
-  -m "warp and cuda"
-```
-
-Before this sequence, record the date, Warp availability, qualified devices, and
-the exact target list derived from the P1--P6 implementation records and their
-executable-module diff. For this closeout, the list is `diagnostics.py`,
-`gpu_resources.py`, `checkpoint.py`, and `resident_scheduler.py`: P1 changed
-the first two modules, P2 changed `checkpoint.py`, P3 changed
-`resident_scheduler.py`, and P4--P6 changed only tests, an example, or
-documentation. Retain the per-target term-missing rows and the >=80% aggregate
-gate; documentation-only changes are never coverage targets. Run each command
-group sequentially and record literal command output. If a required command
-cannot run, record it as unavailable and keep the closeout unshipped rather than
-inferring a passing result. The optional CUDA groups are pass-or-clean-skip
-evidence only, never CPU fallback.
-The canonical runnable resident example is
-`docs/examples/gpu/resident/gpu_resident_multi_timestep.py`. Warp CPU is the baseline;
-CUDA is optional pass-or-clean-skip evidence, never CPU fallback.
-
-## Conda release gate
-
-The separate `.github/workflows/conda-feedstock.yml` workflow runs a clean
-Python 3.12 conda build/test for PRs that change the literal package version
-or release infrastructure, and supports manual dispatch. Its independent
-`feedstock-contract` job compares the external feedstock's test inputs and
-commands with the local mirror. Automatic source-PR comparisons use external
-`main` with `--allow-drift`: supported differences emit a warning and retain
-`passed=false` in the report without blocking the source release. Missing or
-unsupported test contracts still fail. Manual dispatch accepts a
-`feedstock_ref` and enforces strict parity. The real `conda-build` remains a
-source-PR gate; external release readiness additionally requires strict
-contract parity and an actual external feedstock build.
-See [conda release validation](conda/README.md) for local reproduction,
-explicit test inputs, and feedstock handoff. The recipe runs
-`python scripts/run_release_tests.py --installed` followed by
-`python scripts/run_release_tests.py --installed --suite examples`.
-The default `--suite package` stages tests, fixtures, conftests, and config
-with zero documentation inputs. The examples suite stages only the three CPU
-tests in the authoritative `CPU_EXAMPLE_TESTS` allowlist in
-`scripts/run_release_tests.py` and their matching scripts, plus root
-conftest/config. Neither suite requires a complete documentation checkout or
-`.opencode` records. Documentation prose/link and planning-reference assertions
-are removed; runtime/example coverage remains.
-
-These are explicit **0.2.x** GPU/Warp/CUDA and benchmark release exclusions,
-subject to **v0.3 review**, not source-CI exclusions. Ordinary source CI retains
-full GPU example coverage, and `warp-lang` remains a runtime dependency.
-The immediate external fix for the unpatched **v0.2.14** archive uses its old
-seven-input, one-command recipe. The new two-suite contract requires a new
-source archive or reviewed recipe patch; do not copy new paths or suite flags
-into an unpatched v0.2.14 recipe. Local changes do not establish an external
-recipe update or successful conda build.
-
-## ADW Workflows
-
-**Available workflows:**
-```bash
-adw workflow list          # List all workflows
-adw workflow complete 123  # Full workflow for issue #123
-adw workflow patch 456     # Quick patch for issue #456
-adw workflow test          # Run tests only
-adw workflow document      # Update documentation
-```
-
-**Workflow phases:**
-1. **plan** - Create implementation plan
-2. **build** - Implement changes
-3. **lint** - Run linters (auto-fix)
-4. **test** - Run tests (min 500 required)
-5. **review** - Code review
-6. **document** - Update docs
-7. **ship** - Create PR
-
-## Important Files
-
-**Configuration:**
-- `pyproject.toml` - Package config, ruff, pytest
-- `.github/workflows/test.yml` - Test CI
-- `.github/workflows/lint.yml` - Lint CI
-- `.pre-commit-config.yaml` - Pre-commit hooks
-
-**ADW Tools:**
-- `.opencode/tools/run_pytest.py` - Test runner with validation
-- `.opencode/tools/run_linters.py` - Linter runner following CI workflow
-
-## Dependencies
-
-**Core:**
-- numpy >= 2.0.0
-- scipy >= 1.12
-
-**Development:**
-- pytest (testing)
-- ruff (linting + formatting)
-- mypy (type checking - optional)
-- Astro and Starlight (documentation; website/package.json)
-
-## Key Principles
-
-1. **Scientific Computing**: Use NumPy for vectorized operations
-2. **Validation**: Use `@validate_inputs` decorator for public functions
-3. **Testing**: Maintain >500 tests, use `*_test.py` pattern
-4. **Documentation**: Google-style docstrings with citations
-5. **Code Quality**: Ruff (check + format) + mypy
-6. **Line Length**: 80 characters max
-7. **Type Hints**: Required for public APIs
-
-## Quick Checks
-
-Before committing:
-```bash
-# Run linters
-ruff check particula/ --fix && ruff format particula/ && ruff check particula/
-
-# Run tests
-pytest --cov=particula
-
-# Or use ADW tools
-.opencode/tools/run_linters.py && .opencode/tools/run_pytest.py
-```
-
-## Example Editing
-
-`docs/examples/` and `docs/theory/` contain maintained Python sources with
-percent-cell Markdown and code. Do not maintain paired `.ipynb` sources.
-
-```bash
-ruff check docs/examples/path/to/file.py --fix
-ruff format docs/examples/path/to/file.py
-.venv/bin/python scripts/docs_examples.py refresh EXAMPLE_KEY
-.venv/bin/python scripts/docs_examples.py check
-npm --prefix website run build
-```
-
-Declare the source, entry point, CPU/CUDA device, timeout, helper and data inputs
-in `website/examples.json`. Execute complete published workloads, inspect saved
-figures/tables/text, and commit sources plus `website/results/` bundles. Failed
-refreshes preserve old results and block acceptance. Never substitute CPU for
-required CUDA or weaken scientific parameters/assertions to pass migration.
-Builds render saved results without running simulations. Notebook objects are
-only temporary execution machinery; archived originals are reference material.
-
-**Full documentation:** `.opencode/guides/documentation_guide.md` and
-`docs/contribute/Feature_Workflow/Details/Add_Example.md`.
-
-## Getting Help
-
-**Documentation:**
-- Full guides: `.opencode/guides/`
-- Examples: `docs/examples/`
-- Theory: `docs/Theory/`
-
-**ADW Commands:**
-```bash
-adw health                # Check ADW system health
-adw status                # Show active workflows
-adw workflow list         # List available workflows
-```
-
----
-
-**Last Updated:** 2026-08-09  
-**For questions about ADW:** See `.opencode/guides/README.md`  
-**For questions about particula:** See main `readme.md`
+**Last updated:** 2026-11-13
