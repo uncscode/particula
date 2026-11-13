@@ -48,5 +48,52 @@ volume. See [native construction](../data-model/construction.md)
 and [access and replacement](../data-model/ownership.md).
 
 
+## Combine condensation and coagulation
+
+This particle-resolved illustration constructs native containers with a 1e-6 m³
+representative volume and combines two processes. Use a checkout or installed
+release with the 0.3.0 native APIs; see the [installation guide](installation/index.md).
+
+```python
+import numpy as np
+import particula as par
+from particula.dynamics.condensation.species_mapping import CondensationSpeciesMap
+
+particles = par.particles.create_resolved_particle_data(
+    masses=[1e-18, 2e-18], density=1000.0,
+    concentration=[1.0, 1.0], volume=1e-6,  # counts and m³
+)
+gas = par.gas.GasData(
+    name=["organic"], molar_mass=np.array([0.180]),
+    concentration=np.array([[1e-6]]),  # kg/m³
+    partitioning=np.array([True]),
+)
+environment = par.gas.EnvironmentData(
+    temperature=[298.15], pressure=[101325.0], saturation_ratio=[[1.0]],
+)
+aerosol = par.Aerosol(particles=particles, gas=gas, environment=environment)
+
+strategy = par.dynamics.CondensationIsothermal(
+    molar_mass=gas.molar_mass.copy(),
+    diffusion_coefficient=2e-5, accommodation_coefficient=1.0,
+    activity_strategy=par.particles.ActivityIdealMass(),
+    surface_strategy=par.particles.SurfaceStrategyVolume(density=1000.0),
+    vapor_pressure_strategy=par.gas.ConstantVaporPressureStrategy(1e-3),
+    species_map=CondensationSpeciesMap(("organic",), ((0, 0),)),
+)
+condensation = par.dynamics.MassCondensation(strategy)
+coagulation = par.dynamics.Coagulation(
+    par.dynamics.BrownianCoagulationStrategy("particle_resolved")
+)
+aerosol = (condensation | coagulation).execute(
+    aerosol, time_step=10.0, sub_steps=10
+)
+print(aerosol.particles.number_density)  # m⁻³, not raw counts
+```
+
+The resolved concentration stores counts, while `number_density` reports m⁻³.
+See [native access and replacement](../data-model/ownership.md) for ownership,
+validation, and non-unit-volume inventory checks.
+
 Next: [process guides](../processes/index.md) or
 [examples](../../examples/index.md).

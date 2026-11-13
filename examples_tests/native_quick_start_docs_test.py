@@ -8,14 +8,15 @@ import particula as par
 
 
 def test_quick_start_runs():
-    """README construction and composed dynamics retain native conservation."""
-    readme = Path(__file__).resolve().parents[1] / "readme.md"
-    snippets = re.findall(
-        r"```python\n(.*?)\n```", readme.read_text(), re.DOTALL
+    """The resolved guide example retains native conservation."""
+    page = (
+        Path(__file__).resolve().parents[1]
+        / "docs/guide/getting-started/first-simulation.md"
     )
-    assert len(snippets) == 1
+    snippets = re.findall(r"```python\n(.*?)\n```", page.read_text(), re.DOTALL)
+    assert len(snippets) == 2
     namespace = {}
-    exec(compile(snippets[0], str(readme), "exec"), namespace)  # noqa: S102
+    exec(compile(snippets[1], str(page), "exec"), namespace)  # noqa: S102
     aerosol = namespace["aerosol"]
     assert isinstance(aerosol, par.Aerosol)
     assert aerosol.particles is namespace["particles"]
@@ -43,7 +44,7 @@ def test_documentation_quick_start_runs():
         / "docs/guide/getting-started/first-simulation.md"
     )
     snippets = re.findall(r"```python\n(.*?)\n```", page.read_text(), re.DOTALL)
-    assert len(snippets) == 1
+    assert len(snippets) == 2
     namespace = {}
     exec(compile(snippets[0], str(page), "exec"), namespace)  # noqa: S102
     aerosol = namespace["result"]
