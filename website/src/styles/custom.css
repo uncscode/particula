@@ -19,7 +19,9 @@
 .hero { padding-block: 3rem 2rem; }
 .hero h1 { letter-spacing: -.045em; line-height: 1.05; max-width: 12ch; }
 .hero .tagline { max-width: 36rem; }
-.hero img { filter: drop-shadow(0 15px 35px #5cb49d22); }
+/* Keep the cloud's wisps visible down the page, without horizontal overflow. */
+:root[data-has-hero] .main-frame { overflow-x: clip; }
+:root[data-has-hero] .sl-markdown-content { position: relative; z-index: 1; }
 .site-title img { width: 2rem; height: 2rem; }
 .sl-markdown-content details { border: 1px solid var(--sl-color-gray-5); border-radius: .55rem; padding: .8rem 1rem; margin-block: 1.4rem; }
 .sl-markdown-content details summary { cursor: pointer; font-weight: 600; }

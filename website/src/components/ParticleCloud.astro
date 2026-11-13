@@ -1,0 +1,142 @@
+---
+// A deterministic illustration, rendered with the page; no simulation or image fetch.
+let seed = 314159;
+const random = () => ((seed = (1664525 * seed + 1013904223) >>> 0) / 4294967296);
+const lobes = [[220, 270, 115, 70], [320, 220, 120, 100], [420, 285, 95, 70], [310, 320, 140, 62]];
+const particles = Array.from({ length: 112 }, (_, i) => {
+  const [cx, cy, rx, ry] = lobes[i % lobes.length];
+  const angle = random() * Math.PI * 2;
+  const radius = Math.sqrt(random());
+  return {
+    x: cx + Math.cos(angle) * radius * rx,
+    y: cy + Math.sin(angle) * radius * ry,
+    r: i % 17 === 0 ? 10 + random() * 10 : 1.1 + random() * 3.4,
+    gold: i % 13 === 0,
+    opacity: .28 + random() * .65,
+    dx: 6 + random() * 16,
+    dy: -8 - random() * 12,
+    duration: 18 + random() * 18,
+    phase: -random() * 30,
+  };
+});
+const wisps = Array.from({ length: 32 }, (_, i) => {
+  const y = 350 + i * 17;
+  return { x: 495 + Math.sin(i * .27) * 65 + random() * 65, y, r: 1.2 + random() * 2.8, opacity: .36 * (1 - i / 36), phase: -random() * 30 };
+});
+const style = (p: typeof particles[number]) => `--dx:${p.dx.toFixed(1)}px;--dy:${p.dy.toFixed(1)}px;--duration:${p.duration.toFixed(1)}s;--phase:${p.phase.toFixed(1)}s`;
+---
+
+<particle-cloud data-motion="paused">
+  <svg class="cloud-art" viewBox="0 0 600 600" role="img" aria-labelledby="particle-cloud-title">
+    <title id="particle-cloud-title">A loose cloud of aerosol particles, with small teal particles and larger droplets</title>
+    <defs>
+      <radialGradient id="cloud-haze">
+        <stop stop-color="var(--cloud-haze)" stop-opacity=".19" />
+        <stop offset="1" stop-color="var(--cloud-haze)" stop-opacity="0" />
+      </radialGradient>
+      <radialGradient id="cloud-teal" cx="32%" cy="24%" r="78%">
+        <stop stop-color="var(--cloud-highlight)" />
+        <stop offset=".5" stop-color="var(--cloud-teal)" />
+        <stop offset="1" stop-color="var(--cloud-shadow)" stop-opacity=".8" />
+      </radialGradient>
+      <radialGradient id="cloud-gold" cx="30%" cy="25%" r="80%">
+        <stop stop-color="#fff0bd" /><stop offset=".5" stop-color="#d7bb75" /><stop offset="1" stop-color="#8d7040" stop-opacity=".8" />
+      </radialGradient>
+    </defs>
+    <ellipse cx="330" cy="275" rx="240" ry="185" fill="url(#cloud-haze)" />
+    <ellipse cx="380" cy="320" rx="170" ry="125" fill="url(#cloud-haze)" opacity=".6" />
+    {particles.map((p) => <g transform={`translate(${p.x.toFixed(1)} ${p.y.toFixed(1)})`} opacity={p.opacity.toFixed(2)}>
+      <circle class="cloud-particle" style={style(p)} r={p.r.toFixed(1)} fill={p.gold ? 'url(#cloud-gold)' : p.r > 7 ? 'url(#cloud-teal)' : 'var(--cloud-teal)'} />
+    </g>)}
+    <g class="cloud-wisps" aria-hidden="true">
+      {wisps.map((p) => <g transform={`translate(${p.x.toFixed(1)} ${p.y.toFixed(1)})`} opacity={p.opacity.toFixed(2)}>
+        <circle class="cloud-particle" style={`--dx:14px;--dy:-12px;--duration:32s;--phase:${p.phase.toFixed(1)}s`} r={p.r.toFixed(1)} fill="var(--cloud-teal)" />
+      </g>)}
+    </g>
+  </svg>
+  <button class="cloud-motion-toggle" hidden aria-label="Pause particle motion" title="Pause particle motion" aria-pressed="false">
+    <span class="motion-symbol" aria-hidden="true">Ⅱ</span>
+  </button>
+</particle-cloud>
+
+<script>
+  class ParticleCloud extends HTMLElement {
+    connectedCallback() {
+      const button = this.querySelector<HTMLButtonElement>('button')!;
+      const symbol = button.querySelector('.motion-symbol')!;
+      const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+      let enabled = !reducedMotion.matches;
+      let inView = false;
+      let ready = false;
+      const update = () => {
+        this.dataset.motion = enabled && ready && inView && !document.hidden ? 'running' : 'paused';
+        button.setAttribute('aria-pressed', String(!enabled));
+        button.setAttribute('aria-label', enabled ? 'Pause particle motion' : 'Play particle motion');
+        button.title = enabled ? 'Pause particle motion' : 'Play particle motion';
+        symbol.textContent = enabled ? 'Ⅱ' : '▷';
+      };
+      button.hidden = false;
+      const toggle = () => { enabled = !enabled; update(); };
+      button.addEventListener('click', toggle);
+      const preferenceChanged = () => { enabled = !reducedMotion.matches; update(); };
+      reducedMotion.addEventListener('change', preferenceChanged);
+      document.addEventListener('visibilitychange', update);
+      const observer = new IntersectionObserver(([entry]) => { inView = entry.isIntersecting; update(); });
+      observer.observe(this);
+      const timer = setTimeout(() => { ready = true; update(); }, 500);
+      update();
+      this.cleanup = () => {
+        clearTimeout(timer);
+        observer.disconnect();
+        button.removeEventListener('click', toggle);
+        reducedMotion.removeEventListener('change', preferenceChanged);
+        document.removeEventListener('visibilitychange', update);
+      };
+    }
+    cleanup?: () => void;
+    disconnectedCallback() { this.cleanup?.(); }
+  }
+  customElements.define('particle-cloud', ParticleCloud);
+</script>
+
+<style>
+  particle-cloud {
+    --cloud-teal: #70cbbd;
+    --cloud-highlight: #d5fff0;
+    --cloud-shadow: #23796f;
+    --cloud-haze: #57b9a6;
+    display: block;
+    position: relative;
+    aspect-ratio: 1;
+    width: 100%;
+    min-width: 0;
+    pointer-events: none;
+  }
+  :global([data-theme='light']) particle-cloud {
+    --cloud-teal: #2f9f90;
+    --cloud-highlight: #cbf4e6;
+    --cloud-shadow: #18574d;
+    --cloud-haze: #4caa94;
+  }
+  .cloud-art { position: absolute; top: -15%; left: -20%; width: 145%; height: 145%; max-width: none; overflow: visible; }
+  .cloud-particle { animation: cloud-drift var(--duration) ease-in-out var(--phase) infinite; animation-play-state: paused; }
+  [data-motion='running'] .cloud-particle { animation-play-state: running; }
+  @keyframes cloud-drift {
+    0%, 100% { transform: translate(0, 0); }
+    35% { transform: translate(var(--dx), var(--dy)); }
+    70% { transform: translate(calc(var(--dx) * -.5), calc(var(--dy) * .6)); }
+  }
+  .cloud-motion-toggle { position: absolute; right: 0; bottom: -.5rem; display: grid; place-items: center; width: 2.75rem; height: 2.75rem; padding: 0; border: 1px solid var(--sl-color-gray-5); border-radius: 50%; color: var(--sl-color-gray-2); background: color-mix(in srgb, var(--sl-color-bg) 85%, transparent); font: inherit; font-size: 1rem; pointer-events: auto; cursor: pointer; z-index: 2; }
+  .cloud-motion-toggle[hidden] { display: none; }
+  .cloud-motion-toggle:hover { color: var(--sl-color-white); border-color: var(--sl-color-gray-3); }
+  @media (min-width: 64rem) {
+    .cloud-art { top: -45%; left: -85%; width: 220%; height: 220%; }
+  }
+  @media (max-width: 49.999rem) {
+    particle-cloud { width: min(100%, 23rem); height: 16rem; aspect-ratio: auto; margin-inline: auto; }
+    .cloud-art { width: 120%; height: auto; top: -25%; left: -10%; }
+    .cloud-wisps { display: none; }
+    .cloud-motion-toggle { bottom: -.5rem; }
+  }
+  @media print { .cloud-particle { animation: none; } .cloud-motion-toggle { display: none; } }
+</style>

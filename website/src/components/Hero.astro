@@ -1,0 +1,31 @@
+---
+import { LinkButton } from '@astrojs/starlight/components';
+import ParticleCloud from './ParticleCloud.astro';
+const { data } = Astro.locals.starlightRoute.entry;
+const { title = data.title, tagline, actions = [] } = data.hero ?? {};
+---
+
+<div class="hero particle-hero">
+  <ParticleCloud />
+  <div class="hero-copy">
+    <h1 id="_top" data-page-title set:html={title} />
+    {tagline && <div class="tagline" set:html={tagline} />}
+    <div class="hero-actions">
+      {actions.map(({ text, link, variant, icon, attrs }) => <LinkButton href={link} variant={variant} icon={icon?.name} {...attrs}>{text}</LinkButton>)}
+    </div>
+  </div>
+</div>
+
+<style>
+  .particle-hero { position: relative; display: grid; grid-template-columns: 1fr; gap: 2rem; align-items: center; padding-block: 2rem 3rem; }
+  .hero-copy { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 1.5rem; }
+  h1 { color: var(--sl-color-white); font-size: clamp(2.4rem, 5vw, 4rem); font-weight: 600; white-space: pre-line; }
+  .tagline { color: var(--sl-color-gray-2); font-size: clamp(1rem, 1.6vw, 1.2rem); }
+  .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+  @media (min-width: 50rem) {
+    .particle-hero { grid-template-columns: 1.15fr 1fr; gap: 1.5rem; min-height: 29rem; padding-block: 3rem 4rem; }
+    .particle-hero > :global(particle-cloud) { order: 2; }
+    .hero-copy { align-items: flex-start; text-align: left; }
+    .hero-actions { justify-content: flex-start; }
+  }
+</style>
