@@ -75,3 +75,35 @@ conda install -c conda-forge particula matplotlib pandas tqdm pint
 
 ---
 
+## Local documentation
+
+Wheels built from this 0.3.0 source include version-matched documentation. After
+installing such a release with `pip install particula`, no checkout or network
+connection is needed to read or search it:
+
+```bash
+particula-docs
+python -m particula_docs --json
+rg "ParticleData" "$(python -m particula_docs)/guide"
+```
+
+Use the Python interpreter from your Particula environment. The locator uses
+only the standard library and does not import simulation code, NumPy, or Warp.
+The JSON output records the package version, documentation path, file count,
+uncompressed source size, and manifest path. `bundle-manifest.json` records
+SHA-256 hashes and byte sizes for every bundled source file.
+
+The bundle contains `docs/index.md` and the `guide/`, `theory/`, `contribute/`,
+`examples/`, `data/`, and `images/` trees, preserving source bytes, directory
+structure, and relative links between included files. Python examples remain
+readable source; running them may require optional dependencies and hardware.
+Generated API pages, caches, website builds/saved website results, and `.trash/`
+are excluded. Links to repository tooling or rendered website resources still
+require those resources; this is a searchable source bundle, not a built site.
+
+For editable installations, the locator points directly to the repository's
+maintained `docs/` directory, so edits appear immediately. `docs/` is the only
+maintained documentation source; `particula/docs/` is generated in temporary
+build staging and must not be edited. Older releases without the locator can
+use their matching source documentation or the online documentation after
+checking version compatibility.

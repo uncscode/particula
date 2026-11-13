@@ -47,6 +47,12 @@ For using Particula in a scientific study, the plugin separately provides
   [validation reference](plugins/particula-helper/references/repository-validation.md).
   The retired ADW/OpenCode development system is not required. Its archive is
   historical reference only; do not load it as active agent instructions.
+- Edit the root `readme.md` only when the user explicitly requests README
+  changes. A general feature, documentation, packaging, or release task does
+  not authorize README additions. Keep the README focused on the project
+  overview, installation, a quick start, and links. Put detailed usage,
+  implementation, release, and troubleshooting guidance in the owning `docs/`
+  page or skill reference instead.
 - Keep shared conventions and detailed contracts in the linked skills/references
   and owning documentation rather than copying them back into this file.
 
