@@ -14,7 +14,7 @@
       "skipped": 687
     },
     "infrastructure": 163,
-    "documentation_tool_tests": 47,
+    "documentation_tool_tests": 48,
     "current_bundles": 67,
     "validation_only_cpu_executions": 53,
     "honest_cuda_long_execution_skips": 14,
@@ -24,7 +24,11 @@
     "site_errors": [],
     "archive_hashes": "verified",
     "package_archive_exclusion": "verified",
-    "legacy_api_anchors": 1860
+    "legacy_api_anchors": 1860,
+    "review_graph_nucleation": {
+      "passed": 202,
+      "skipped": 1
+    }
   },
   "remaining": [
     "Hosted PR checks and downloadable preview artifact",

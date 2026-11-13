@@ -1,6 +1,7 @@
 import { realpath, stat } from "node:fs/promises";
 import path from "node:path";
 import { tool } from "@opencode-ai/plugin";
+import { validateCwdWithinRepo } from "./lib/path_validation";
 
 export default tool({
   description: "Build and verify the Starlight documentation, or check source structure without running simulations.",
@@ -13,6 +14,8 @@ export default tool({
     try {
       if (cwd !== undefined && !cwd.trim()) throw new Error("cwd must not be empty");
       root = await realpath(cwd ?? process.cwd());
+      const confinementError = validateCwdWithinRepo(root);
+      if (confinementError) throw new Error(confinementError);
       for (const file of ["website/astro.config.mjs", "scripts/check_docs_structure.py"]) {
         if (!(await stat(path.join(root, file))).isFile()) throw new Error("not a documentation worktree");
       }

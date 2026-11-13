@@ -127,18 +127,20 @@ def _buffers(
 
 def run_example(
     volume: float = 1.0,
+    *,
+    device: str = "cpu",
 ) -> tuple[ParticleData, GasData, EnvironmentData]:
-    """Run one deterministic direct-Warp nucleation event on Warp CPU.
+    """Run one deterministic nucleation event on the selected Warp device.
 
     Args:
         volume: Represented volume in m³. Particle concentration stores counts;
             gas concentration stores kg/m³. The two slots accommodate the
             default one-event demonstration and its two-m³ regression case.
+        device: Explicit Warp device; defaults to CPU. CUDA never falls back.
 
     Returns:
         Restored CPU particle, gas, and environment data after synchronization.
     """
-    device = "cpu"
     particles = ParticleData(
         masses=np.zeros((1, 2, 1), dtype=np.float64),
         concentration=np.zeros((1, 2), dtype=np.float64),

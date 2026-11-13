@@ -44,7 +44,7 @@ release or production deployment was performed.
   CPU baseline. GPU execution was separately verified for all eight examples.
 - Infrastructure: **163 passed**, including rejection of reintroduced notebook
   publication sources.
-- Documentation wrapper/schema tests: 47 passed. JavaScript hero and Markdown
+- Documentation wrapper/schema tests: 48 passed. JavaScript hero and Markdown
   extension test files pass. Focused graph lifecycle/example tests: 211 passed,
   2 skipped. Resident stream/resource/checkpoint tests: 262 passed.
 - Wheel and source distribution built successfully from the committed checkout;
@@ -94,3 +94,19 @@ that complete published tree without force-pushing, and reverting the complete
 migration PR for a source rollback. Archived files alone are not a runnable
 backup. After a future merge, verify production home/search assets, redirects,
 and representative example/API pages before accepting the cutover.
+
+## PR review follow-up
+
+- Nucleation now accepts an explicit Warp device and its registry invocation
+  selects CUDA. The refreshed bundle records native CUDA kernel loads; the
+  superseded CPU bundle has a corrected device label and correction note.
+- Drift-triggered replay cleanup releases native handles outside the global
+  provenance lock. Admission reauthenticates after validation and rejects
+  intervening revocation. Regressions cover a release callback acquiring the
+  lock from another thread and revocation before launch admission.
+- The build wrapper rejects external directories and symlink escapes even when
+  they contain documentation marker files. External worktrees must be the
+  agent's active workspace.
+- Focused graph and nucleation suite: **202 passed, 1 skipped**, including both
+  CPU and CUDA nucleation conservation checks. The affected native CUDA graph
+  example was refreshed successfully. Mypy passes all 535 source files.

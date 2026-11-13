@@ -2988,12 +2988,26 @@ def test_replay_drift_revokes_without_waiting_for_its_own_launch(
     releases: list[object] = []
     launches: list[object] = []
     handle = object()
+    acquired = Event()
+
+    def acquire_elsewhere() -> None:
+        with graph_capture._ISSUED_CAPTURED_GRAPHS_CONDITION:
+            acquired.set()
+
+    def release(value: object) -> None:
+        thread = Thread(target=acquire_elsewhere)
+        thread.start()
+        assert acquired.wait(2.0), "native release held the provenance lock"
+        thread.join(2.0)
+        assert not thread.is_alive()
+        releases.append(value)
+
     captured, binding = _issued_capture_for_lifecycle_test(
         request,
         monkeypatch,
         handle=handle,
         launch=launches.append,
-        release=releases.append,
+        release=release,
     )
 
     def invalidate(candidate: ResidentGraphCaptureBinding) -> None:
@@ -3022,6 +3036,46 @@ def test_replay_drift_revokes_without_waiting_for_its_own_launch(
     assert request.guard.completed_steps == 0
     close_resident_graph_capture(binding)
     assert releases == [handle]
+
+
+@pytest.mark.warp
+def test_replay_reauthenticates_after_validation(
+    resident_request: object,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Revocation between validation and lease admission prevents launch."""
+    request = cast("ResidentSimulationRequest", resident_request)
+    launches: list[object] = []
+    releases: list[object] = []
+    handle = object()
+    captured, binding = _issued_capture_for_lifecycle_test(
+        request,
+        monkeypatch,
+        handle=handle,
+        launch=launches.append,
+        release=releases.append,
+    )
+    original = graph_capture._validate_replay_captured_graph
+    monkeypatch.setattr(
+        graph_capture, "gate_resident_graph_capture", lambda _binding: None
+    )
+
+    def validate_then_close(
+        candidate: object,
+        duration: object,
+    ) -> PreparedGraphCaptureQualification:
+        qualification = original(candidate, duration)
+        close_resident_graph_capture(binding)
+        return qualification
+
+    monkeypatch.setattr(
+        graph_capture, "_validate_replay_captured_graph", validate_then_close
+    )
+    with pytest.raises(ValueError, match="not P2-issued"):
+        replay_captured_resident_graph(captured, 0.0)
+    assert launches == []
+    assert releases == [handle]
+    assert request.guard.completed_steps == 0
 
 
 @pytest.mark.warp

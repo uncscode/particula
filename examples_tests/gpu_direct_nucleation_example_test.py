@@ -45,12 +45,16 @@ def _run_documented_command() -> subprocess.CompletedProcess[str]:
 
 @pytest.mark.warp
 @pytest.mark.parametrize("volume", [1.0, 2.0])
+@pytest.mark.parametrize("device", ["cpu", "cuda"])
 def test_direct_example_runs_with_explicit_transfer_and_conservation(
     monkeypatch: pytest.MonkeyPatch,
     volume: float,
+    device: str,
 ) -> None:
     """Run the standalone fixture and check identity-derived final state."""
     _require_warp()
+    if device == "cuda" and not pytest.importorskip("warp").is_cuda_available():
+        pytest.skip("CUDA is unavailable")
     namespace = runpy.run_path(str(EXAMPLE_PATH))
     globals_ = namespace["run_example"].__globals__
     events: list[str] = []
@@ -75,7 +79,7 @@ def test_direct_example_runs_with_explicit_transfer_and_conservation(
                 )
             result = function(*args, **kwargs)
             if name.startswith("to_warp_"):
-                assert kwargs["device"] == "cpu"
+                assert kwargs["device"] == device
                 converted[name] = result
             return result
 
@@ -107,7 +111,9 @@ def test_direct_example_runs_with_explicit_transfer_and_conservation(
             synchronize=observe("synchronize", wp.synchronize),
         ),
     )
-    particles, gas, environment = namespace["run_example"](volume=volume)
+    particles, gas, environment = namespace["run_example"](
+        volume=volume, device=device
+    )
     assert events == boundaries
     assert particles.masses.shape == (1, 2, 1)
     assert gas.concentration.shape == (1, 1)

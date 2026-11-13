@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 3.51387921202695,
+  "package_source_sha256": "f76479ea8648dab66ef40274babb3b93440994c42c03b8130d507eec80969bcc",
+  "input_sha256": {},
+  "example": "examples-gpu-direct-gpu-direct-nucleation",
+  "fingerprint": "658c5a3879fbed3ab84bd7beb8d700d78bd4ef0f32106f423bc206bf20859bb7",
+  "source": "docs/examples/gpu/direct/gpu_direct_nucleation.py",
+  "revision": "d5471b3da6706f30e73578687f865a49106c0be2",
+  "package_dirty": true,
+  "executed_at": "2026-11-13T16:04:13.521374+00:00",
+  "device": "cuda:0: NVIDIA GeForce RTX 5060",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [],
+    [
+      {
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\nModule particula.gpu.kernels.nucleation 9f6b4f4 load on device 'cuda:0' took 2.02 ms  (cached)\nModule particula.gpu.kernels._population_validation 65eaa49 load on device 'cuda:0' took 0.36 ms  (cached)\nModule particula.gpu.kernels.slot_management 0375e2c load on device 'cuda:0' took 0.44 ms  (cached)\nModule particula.gpu.kernels.exhaustion ccbadfa load on device 'cuda:0' took 1.25 ms  (cached)\nCUDA example completed successfully\n"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "a19ef315f7903de327745e8a54603620eb8f21c02a96be8ab2fbe80e5eee47ba"
+  }
+}
