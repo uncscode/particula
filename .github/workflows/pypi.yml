@@ -10,6 +10,7 @@ on:
 
 jobs:
   pyping:
+    if: github.event_name != 'release' || !startsWith(github.event.release.tag_name, 'particula-helper-v')
 
     runs-on: ubuntu-latest
 

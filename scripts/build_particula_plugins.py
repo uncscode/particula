@@ -73,19 +73,7 @@ def validate():
     version = manifest["version"]
     if not re.fullmatch(r"\d+\.\d+\.\d+", version):
         raise ValueError("Plugin version must be stable SemVer")
-    for name in (
-        ".claude-plugin/plugin.json",
-        ".codex-plugin/plugin.json",
-        "opencode/package.json",
-    ):
-        host = json.loads((PLUGIN / name).read_text())
-        expected = (
-            "particula-helper-opencode"
-            if name.startswith("opencode")
-            else "particula-helper"
-        )
-        if host["name"] != expected or host["version"] != version:
-            raise ValueError(f"Host identity/version drift: {name}")
+    validate_host_versions(version)
     for name in (".claude-plugin", ".agents/plugins"):
         market = json.loads((ROOT / name / "marketplace.json").read_text())
         entry = market["plugins"][0]
@@ -106,6 +94,27 @@ def validate():
         if not target.is_relative_to(PLUGIN) or not target.is_file():
             raise ValueError(f"Invalid icon: {key}")
     return manifest, catalog
+
+
+def validate_host_versions(version):
+    """Keep all host manifests and the OpenCode lockfile in step."""
+    for name in (
+        ".claude-plugin/plugin.json",
+        ".codex-plugin/plugin.json",
+        "opencode/package.json",
+        "opencode/npm-shrinkwrap.json",
+    ):
+        host = json.loads((PLUGIN / name).read_text())
+        expected = (
+            "particula-helper-opencode"
+            if name.startswith("opencode")
+            else "particula-helper"
+        )
+        if host["name"] != expected or host["version"] != version:
+            raise ValueError(f"Host identity/version drift: {name}")
+        if name == "opencode/npm-shrinkwrap.json":
+            if host["packages"][""]["version"] != version:
+                raise ValueError("OpenCode lockfile root version drift")
 
 
 def validate_skills():
@@ -181,6 +190,126 @@ def write_zip(path, files):
             archive.writestr(info, content)
 
 
+def check_public_archive(path):
+    """Inspect the skills-only upload without claiming portal approval."""
+    with zipfile.ZipFile(path) as archive:
+        names = archive.namelist()
+        if len(names) != len(set(names)) or archive.testzip() is not None:
+            raise ValueError("Duplicate or corrupt public archive entries")
+        for name in names:
+            parts = Path(name).parts
+            if (
+                Path(name).is_absolute()
+                or ".." in parts
+                or "\\" in name
+                or any(part.startswith(".") for part in parts)
+                or "hooks" in parts
+                or name in ("mcp.json", "mcp_servers.json")
+            ):
+                raise ValueError(f"Unsupported public archive entry: {name}")
+        manifest = json.loads(archive.read("plugin.json"))
+        extension = manifest["extensions"]["com.openai"]
+        validate_public_components(manifest)
+        if extension.get("requires_local_executor") is not True:
+            raise ValueError("Particula public upload requires local execution")
+        skills = {
+            name.split("/")[1]
+            for name in names
+            if re.fullmatch(r"skills/[^/]+/SKILL.md", name)
+        }
+        if skills != SKILLS:
+            raise ValueError("Public archive is missing expected skills")
+        for key in ("logo", "composerIcon", "logoDark", "composerIconDark"):
+            icon = extension["interface"].get(key)
+            if icon is not None:
+                if not icon.startswith("./") or icon[2:] not in names:
+                    raise ValueError(f"Missing public icon: {key}")
+        return manifest
+
+
+def validate_public_components(manifest):
+    """Reject integrations that do not belong in this skills-only upload."""
+    extension = manifest["extensions"]["com.openai"]
+    for key in ("apps", "hooks", "mcpServers"):
+        if manifest.get(key) is not None or extension.get(key) is not None:
+            raise ValueError(f"Public upload cannot declare {key}")
+
+
+def write_public_submission(output, files, provenance):
+    """Build a portable upload candidate and an explicit publisher handoff."""
+    manifest = json.loads(files["plugin.json"])
+    version = manifest["version"]
+    archive = output / f"particula-helper-openai-{version}.zip"
+    write_zip(archive, {**files, "BUILD.json": provenance})
+    check_public_archive(archive)
+    extension = manifest["extensions"]["com.openai"]
+    source = json.loads(provenance)
+    notes = extension.get("publication", {}).get("release_notes", "")
+    (output / "OPENAI-SUBMISSION.md").write_text(
+        f"# Particula Helper {version}\n\n"
+        f"Upload candidate: `{archive.name}`\n\n"
+        f"Source commit: `{source['source_revision']}`\n\n"
+        f"Package sources modified locally: {source['working_tree_dirty']}\n\n"
+        f"{notes}\n\n"
+        "## Publication handoff\n\n"
+        "This is a locally validated package candidate, not an approved or "
+        "published OpenAI release. GitHub Actions does not submit it.\n\n"
+        "- Verify the requested Particula Developers identity in the intended "
+        "OpenAI organization; the portal controls the displayed publisher.\n"
+        "- Confirm all supported countries and no required payments or "
+        "purchases in the imported metadata.\n"
+        "- Finish and verify product, support, privacy and terms pages for "
+        "the listing; no policy URLs or legal commitments are invented here.\n"
+        "- Test a clean desktop installation and the main workflows. "
+        "Archive smoke tests do not prove live host discovery.\n"
+        "- Upload to the existing public plugin when one exists. Keep the "
+        "same identity; do not create a duplicate on each release.\n"
+        "- Inspect metadata and skill scan results, complete applicable "
+        "attestations, submit for review, then publish after approval.\n\n"
+        "Skills-only packages do not need MCP review cases, reviewer "
+        "credentials or an MCP demo recording.\n\n"
+        "[OpenAI submission process]"
+        "(https://developers.openai.com/plugins/deploy/submission)\n"
+    )
+
+
+def write_github_release_notes(output, manifest, provenance):
+    """Describe the tested GitHub packages independently of store submission."""
+    source = json.loads(provenance)
+    version = manifest["version"]
+    notes = (
+        manifest["extensions"]["com.openai"]
+        .get("publication", {})
+        .get("release_notes", "")
+    )
+    (output / "GITHUB-RELEASE.md").write_text(
+        f"# Particula Helper {version}\n\n"
+        f"{notes}\n\n"
+        f"Source commit: `{source['source_revision']}`\n\n"
+        f"Package sources modified locally: {source['working_tree_dirty']}\n\n"
+        "Packages: `particula-helper-codex.zip`, "
+        "`particula-helper-claude.zip`, `particula-helper-opencode.zip`.\n\n"
+        "Download all ZIPs listed in `SHA256SUMS` and run "
+        "`sha256sum -c SHA256SUMS` to verify them.\n\n"
+        "## Install or refresh\n\n"
+        "Use the [assistant installation guides]"
+        "(https://uncscode.github.io/particula/guide/ai-assistants/) "
+        "for Codex, Claude and OpenCode. Repository marketplace installs "
+        "track their configured branch or tag. Refresh/reinstall the plugin "
+        "and start a new session to load updates. Publishing an archive "
+        "does not update an existing installation automatically.\n\n"
+        "Every successful main build has a version-and-commit-named "
+        "download under [Assistant plugins workflow runs]"
+        "(https://github.com/uncscode/particula/actions/workflows/"
+        "assistant-plugins.yml?query=branch%3Amain+event%3Apush). "
+        "Workflow downloads expire after 30 days. Version bumps create "
+        "draft GitHub releases for longer-term distribution.\n\n"
+        "This distribution does not require OpenAI store verification. "
+        "The optional OpenAI ZIP and OPENAI-SUBMISSION.md are retained "
+        "for a possible future submission, not a published store listing.\n"
+    )
+
+
 def build(output, manifest):
     """Create host archives and checksums in a fresh output directory."""
     if output.resolve().is_relative_to(PLUGIN):
@@ -230,6 +359,8 @@ def build(output, manifest):
         ).read_bytes()
         selected["BUILD.json"] = provenance
         write_zip(output / f"particula-helper-{host}.zip", selected)
+    write_public_submission(output, files, provenance)
+    write_github_release_notes(output, manifest, provenance)
     # Native package plus a manual skills alternative in one OpenCode ZIP.
     native = {
         k: (PLUGIN / "opencode" / k).read_bytes()
