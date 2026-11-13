@@ -1,11 +1,12 @@
 ---
 import SiteTitle from '@astrojs/starlight/components/SiteTitle.astro';
-import Search from '@astrojs/starlight/components/Search.astro';
+import Search from './Search.astro';
 import ThemeSelect from '@astrojs/starlight/components/ThemeSelect.astro';
 import SocialIcons from '@astrojs/starlight/components/SocialIcons.astro';
 ---
 
 <div class="particula-header">
+  <div class="header-brand">
   <button class="navigation-toggle" popovertarget="starlight__sidebar" aria-controls="starlight__sidebar" aria-expanded="false" aria-label="Open navigation menu">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
       <rect x="3" y="4" width="18" height="16" rx="2" />
@@ -14,6 +15,7 @@ import SocialIcons from '@astrojs/starlight/components/SocialIcons.astro';
     <span>Menu</span>
   </button>
   <SiteTitle />
+  </div>
   <div class="header-search"><Search /></div>
   <div class="header-tools"><SocialIcons /><ThemeSelect /></div>
 </div>

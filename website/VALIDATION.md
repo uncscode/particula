@@ -1,5 +1,25 @@
 # Local demo validation
 
+## Centered and scoped search — 2026-11-13
+
+The desktop search bar is centered independently of the logo/menu and theme
+controls. On phones it occupies a full-width second header row. The search
+dialog immediately offers Guide, Examples, Theory, API, Contribute and Home
+checkboxes. No selections searches everything; multiple selections use OR,
+and Clear filters restores the full-site search. Results retain section links,
+highlighted excerpts and pagination. Escape and the close button dismiss the
+dialog; Ctrl/Cmd+K opens it.
+
+Every indexed page has a directory-derived Section filter: 238 API pages,
+five Examples, four Guide, two Theory, two Contribute, and one Home. Browser
+checks for “condensation” returned 41 API pages, two Examples, 43 combined and
+49 without filters. The implementation uses Pagefind's explicit `any` operator
+because its default array filtering is AND; see the
+[Pagefind filtering API](https://pagefind.app/docs/js-api-filtering/).
+Desktop and mobile controls, result links, reset, pagination and no-result
+states were checked. Screenshots are under `qa/search-examples-filter.jpg`
+and `qa/search-filter-mobile.jpg`.
+
 ## Drawer spacing and branch defaults — 2026-11-13
 
 Desktop reading layouts reserve an extra gutter beside an open drawer while
