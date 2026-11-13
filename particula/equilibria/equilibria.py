@@ -65,7 +65,12 @@ class Equilibria(RunnableABC):
         return self.strategy.get_name()
 
     def execute(
-        self, aerosol: Aerosol, time_step: float, sub_steps: int = 1
+        self,
+        aerosol: Aerosol,
+        time_step: float,
+        sub_steps: int = 1,
+        *,
+        context=None,
     ) -> Aerosol:
         """Run equilibria over the provided time step.
 
@@ -82,6 +87,8 @@ class Equilibria(RunnableABC):
             AttributeError: When required partitioning inputs are missing.
             TypeError: If the strategy returns ``None``.
         """
+        if context is not None:
+            raise TypeError("Equilibria does not support CPU box contexts")
         if sub_steps <= 0:
             raise ValueError("sub_steps must be positive")
 

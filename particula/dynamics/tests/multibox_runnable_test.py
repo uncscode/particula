@@ -9,6 +9,8 @@ from particula import _cpu_batch
 from particula.dynamics import (
     BrownianCoagulationStrategy,
     Coagulation,
+    CondensationIsothermalStaggered,
+    CondensationLatentHeat,
     Dilution,
     DilutionStrategy,
     MassCondensation,
@@ -18,6 +20,103 @@ from particula.dynamics import (
 from particula.dynamics.tests.native_nucleation_test import fixture, runnable
 from particula.dynamics.tests.native_runnable_test import condensation, state
 from particula.execution import CPUExecutionContext
+
+
+@pytest.mark.parametrize("kind", ["discrete", "continuous_pdf"])
+@pytest.mark.parametrize(
+    "family", ["condensation", "coagulation", "wall", "dilution"]
+)
+def test_binned_boxes_match_direct_single_box_physics(kind, family):
+    """PMF and PDF retain their measures through the runnable boundary."""
+    single = state(1.0, kind)
+    p = single.particles
+    p.masses = np.concatenate([p.masses, p.masses * 4], axis=1)
+    p.concentration = np.ones((1, 4))
+    p.charge = np.zeros((1, 4))
+    if kind == "continuous_pdf":
+        p.radius_grid = np.array([1e-8, 2e-8, 4e-8, 8e-8])
+    aerosol = batch(single)
+    aerosol.particles.volume[:] = 1.0
+    strategy, runner = {
+        "condensation": (condensation(single.gas), MassCondensation),
+        "coagulation": (BrownianCoagulationStrategy(kind), Coagulation),
+        "wall": (SphericalWallLossStrategy(0.001, 0.5, kind), WallLoss),
+        "dilution": (DilutionStrategy(0.1), Dilution),
+    }[family]
+    process = runner(strategy)
+    reference = _cpu_batch.detached(aerosol)
+    for i in range(2):
+        box = _cpu_batch.box_view(reference, i)
+        if family == "dilution":
+            strategy.step(box, 1e-4)
+        else:
+            kwargs = dict(
+                particle=box.particles,
+                temperature=float(box.environment.temperature[0]),
+                pressure=float(box.environment.pressure[0]),
+                time_step=1e-4,
+            )
+            if family == "condensation":
+                kwargs["gas_species"] = box.gas
+            strategy.step(**kwargs)
+    assert process.rate(aerosol).shape[0] == 2
+    process.execute(aerosol, 1e-4)
+    for name in process._writer_fields(aerosol):
+        np.testing.assert_allclose(
+            _cpu_batch.arrays(aerosol)[name],
+            _cpu_batch.arrays(reference)[name],
+            rtol=1e-12,
+            atol=0,
+        )
+
+
+@pytest.mark.parametrize(
+    "strategy_type", [CondensationIsothermalStaggered, CondensationLatentHeat]
+)
+def test_condensation_variants_conserve_each_box(strategy_type):
+    """Randomized and latent variants conserve mapped inventories per box."""
+    aerosol = batch(state())
+    base = condensation(aerosol.gas)
+    strategy = strategy_type(
+        molar_mass=aerosol.gas.molar_mass.copy(),
+        activity_strategy=base.activity_strategy,
+        surface_strategy=base.surface_strategy,
+        vapor_pressure_strategy=base.vapor_pressure_strategy,
+        species_map=base.species_map,
+        **(
+            {"theta_mode": "random", "num_batches": 2}
+            if strategy_type is CondensationIsothermalStaggered
+            else {"latent_heat": 2e6}
+        ),
+    )
+    process = MassCondensation(strategy)
+    masses_before = aerosol.particles.masses.copy()
+    particle_before = aerosol.particles.species_mass_inventory.copy()
+    before = (
+        particle_before
+        + aerosol.gas.concentration[:, [2, 1]]
+        * aerosol.particles.volume[:, None]
+    )
+    process.execute(aerosol, 0.01, context=CPUExecutionContext(7, ("a", "b")))
+    after = (
+        aerosol.particles.species_mass_inventory
+        + aerosol.gas.concentration[:, [2, 1]]
+        * aerosol.particles.volume[:, None]
+    )
+    np.testing.assert_allclose(after, before, rtol=1e-12, atol=1e-30)
+    if strategy_type is CondensationLatentHeat:
+        assert strategy.last_latent_heat_energy is None
+        np.testing.assert_allclose(
+            process.last_latent_heat_energy,
+            np.einsum(
+                "bns,bn->b",
+                aerosol.particles.masses - masses_before,
+                aerosol.particles.concentration,
+            )
+            * 2e6,
+            rtol=1e-10,
+            atol=1e-30,
+        )
 
 
 def batch(single):

@@ -1745,6 +1745,8 @@ class _RecordingRunnable(RunnableABC):
         aerosol: AerosolLike,
         time_step: float,
         sub_steps: int = 1,
+        *,
+        context=None,
     ) -> AerosolLike:
         """Record controls and return the original aerosol."""
         self.calls.append((aerosol, time_step, sub_steps))
@@ -1945,7 +1947,12 @@ def test_cpu_adapter_propagates_exception_after_one_dispatch() -> None:
         """Raise the preconstructed sentinel error during dispatch."""
 
         def execute(
-            self, aerosol: AerosolLike, time_step: float, sub_steps: int = 1
+            self,
+            aerosol: AerosolLike,
+            time_step: float,
+            sub_steps: int = 1,
+            *,
+            context=None,
         ) -> AerosolLike:
             """Record one call and raise the sentinel error."""
             self.calls.append((aerosol, time_step, sub_steps))
@@ -1968,7 +1975,12 @@ def test_cpu_adapter_rejects_replacement_aerosol_after_one_dispatch() -> None:
         """Return a distinct aerosol sentinel after recording the call."""
 
         def execute(
-            self, aerosol: AerosolLike, time_step: float, sub_steps: int = 1
+            self,
+            aerosol: AerosolLike,
+            time_step: float,
+            sub_steps: int = 1,
+            *,
+            context=None,
         ) -> AerosolLike:
             """Record the call and deliberately return another object."""
             self.calls.append((aerosol, time_step, sub_steps))
