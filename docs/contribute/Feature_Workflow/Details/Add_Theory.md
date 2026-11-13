@@ -17,8 +17,11 @@ Include enough information that a new reader would be able to understand and imp
 
 1. Create a new issue on GitHub and assign it to yourself.
 2. Create a branch on your forked repo for this issue.
-3. Add a new markdown file at `docs/Theory/**/<feature_name>.md`. This can be a new folder if needed, but please keep it organized.
+3. Identify the owning scientific topic under `docs/theory/`. Extend its existing page when the purpose matches; add a descriptive lowercase filename only for a distinct explanation. Put software architecture in `docs/contribute/architecture/` and durable numerical evidence in `docs/contribute/validation/`.
 4. Link the file in the index.md file in the same folder.
 5. Write using Markdown; no specific imports needed.
 6. Commit this file in a branch.
 7. Create your pull request.
+
+Follow the [documentation placement rules](../../documentation.md). Implementation
+plans and completed task narratives belong in `.opencode/plans/`.

@@ -203,8 +203,8 @@ with targeted reads.
 Categorize files:
 - `.opencode/guides/*.md` - Agent guides
 - `docs/examples/*.md` - Examples
-- `docs/Theory/*.md` - Theory docs
-- `docs/Features/*.md` - Feature docs
+- `docs/theory/*.md` - Theory docs
+- `docs/guide/*.md` - Feature docs
 - `README.md`, `AGENTS.md` - Root docs
 
 ## Step 4: Check Internal Links
@@ -305,8 +305,8 @@ DOCS_VALIDATION_COMPLETE
 Files validated: {count}
 - .opencode/guides/: {count} files
 - docs/examples/: {count} files
-- docs/Theory/: {count} files
-- docs/Features/: {count} files
+- docs/theory/: {count} files
+- docs/guide/: {count} files
 - Root: {count} files
 
 Links checked: {total_count}
@@ -448,8 +448,8 @@ DOCS_VALIDATION_COMPLETE
 Files validated: 45
 - .opencode/guides/: 22 files
 - docs/examples/: 10 files
-- docs/Theory/: 5 files
-- docs/Features/: 3 files
+- docs/theory/: 5 files
+- docs/guide/: 3 files
 - Root: 5 files
 
 Links checked: 127

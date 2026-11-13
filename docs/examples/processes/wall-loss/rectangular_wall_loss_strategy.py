@@ -54,7 +54,7 @@ print(
 )
 
 # %% [markdown]
-# ## 2) Configure `RectangularWallLossStrategy`
+# ## 2) Configure RectangularWallLossStrategy
 # Dimensions are given as `(x, y, z)` in meters.
 
 # %%

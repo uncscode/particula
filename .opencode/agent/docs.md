@@ -94,8 +94,8 @@ task({
 - ❌ `.opencode/guides/architecture/` - architecture subagent
 - ❌ `.opencode/plans/` - plan-update-full subagent (structured plan content)
 - ❌ `docs/examples/` - examples subagent
-- ❌ `docs/Theory/` - theory subagent
-- ❌ `docs/Features/` - features subagent
+- ❌ `docs/theory/` - theory subagent
+- ❌ `docs/guide/` - features subagent
 
 # Process
 

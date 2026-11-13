@@ -36,8 +36,14 @@ jobs:
         - name: Install particula package
           run: pip install -e .
 
+        - name: Check documentation structure
+          run: python scripts/check_docs_structure.py
+
         - name: Build full MkDocs site
-          run: mkdocs build --config-file mkdocs-full.yml
+          run: mkdocs build --config-file mkdocs-full.yml --strict
+
+        - name: Check rendered routes and anchors
+          run: python scripts/check_docs_structure.py --site-dir site
 
         - name: Deploy to GitHub Pages (on push or merge_group)
           if: ${{

@@ -339,7 +339,14 @@
     "docs/Features/Roadmap/graph-capture-closeout.md#closeout-metadata": "docs/contribute/validation/gpu/graph-capture-qualification.md#qualification-metadata",
     "docs/Features/Roadmap/graph-capture-closeout.md#target-derivation-ledger": "docs/contribute/validation/gpu/graph-capture-qualification.md#production-targets",
     "docs/Features/Roadmap/graph-capture-closeout.md#command-ledger": "docs/contribute/validation/gpu/graph-capture-qualification.md#collection-commands",
-    "docs/Features/Roadmap/graph-capture-closeout.md#blockers-and-promotion-rule": "docs/contribute/validation/gpu/graph-capture-qualification.md#promotion-rule"
+    "docs/Features/Roadmap/graph-capture-closeout.md#blockers-and-promotion-rule": "docs/contribute/validation/gpu/graph-capture-qualification.md#promotion-rule",
+    "docs/Examples/Dynamics/Condensation/Staggered_Condensation_Example.ipynb#choosing-theta_mode": "docs/examples/processes/condensation/staggered_condensation_example.ipynb#choosing-the-theta-mode",
+    "docs/Examples/Dynamics/Condensation/Staggered_Condensation_Example.ipynb#choosing-num_batches": "docs/examples/processes/condensation/staggered_condensation_example.ipynb#choosing-the-number-of-batches",
+    "docs/Examples/Chamber_Wall_Loss/Notebooks/Rectangular_Wall_Loss_Strategy.ipynb#2-configure-rectangularwalllossstrategy": "docs/examples/processes/wall-loss/rectangular_wall_loss_strategy.ipynb#2-configure-rectangularwalllossstrategy",
+    "docs/Examples/Simulations/Notebooks/Cough_Droplets_Partitioning.ipynb#what-to-look-for": "docs/examples/simulations/cough_droplets_partitioning.ipynb#initial-and-final-sizes-what-to-look-for",
+    "docs/Examples/Simulations/Notebooks/Cough_Droplets_Partitioning.ipynb#what-to-look-for_1": "docs/examples/simulations/cough_droplets_partitioning.ipynb#time-evolution-what-to-look-for",
+    "docs/Theory/Technical/Dynamics/Cloud_Droplet_Coagulation/DNS_Fluid_and_Particle_Properties_Comparison.ipynb#analysis": "docs/theory/dynamics/cloud-droplet-coagulation/dns-fluid-and-particle-properties-comparison.ipynb#property-comparison-analysis",
+    "docs/Theory/Technical/Dynamics/Cloud_Droplet_Coagulation/DNS_Fluid_and_Particle_Properties_Comparison.ipynb#analysis_1": "docs/theory/dynamics/cloud-droplet-coagulation/dns-fluid-and-particle-properties-comparison.ipynb#stokes-number-comparison-analysis"
   },
   "source_revision": "9e024234f2f6401313981e8e3c85a772d675f795",
   "retired": {
@@ -355,6 +362,8 @@
     "docs/Features/Roadmap/data-oriented-gpu.md": ".trash/docs-v0.3.0/docs/Features/Roadmap/data-oriented-gpu.md",
     "docs/Features/Roadmap/graph-capture-closeout.md": ".trash/docs-v0.3.0/docs/Features/Roadmap/graph-capture-closeout.md",
     "docs/Features/Roadmap/index.md": ".trash/docs-v0.3.0/docs/Features/Roadmap/index.md",
-    "docs/guide/processes/catalog.md": ".trash/docs-v0.3.0/docs/guide/processes/catalog.md"
+    "docs/guide/processes/catalog.md": ".trash/docs-v0.3.0/docs/guide/processes/catalog.md",
+    "docs/Theory/nvidia-warp/examples/gpu_benchmarks.py": ".trash/docs-v0.3.0/docs/Theory/nvidia-warp/examples/gpu_benchmarks.py",
+    "docs/Theory/nvidia-warp/examples/gpu_benchmarks.ipynb": ".trash/docs-v0.3.0/docs/Theory/nvidia-warp/examples/gpu_benchmarks.ipynb"
   }
 }

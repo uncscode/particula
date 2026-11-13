@@ -9,7 +9,8 @@ Start with [contributing](CONTRIBUTING.md) and
 | Follow coding conventions | [Code specifications](Code_Specifications/index.md) |
 | Understand the architecture | [Code concepts](architecture/index.md) |
 | Work on Warp internals | [Warp teaching material](architecture/warp/index.md) |
-| Inspect numerical evidence | [Precision](validation/numerics/mass-precision.md), [stiffness](validation/numerics/condensation-stiffness.md), [GPU validation](validation/gpu/coagulation.md) |
+| Organize or add documentation | [Documentation rules](documentation.md) |
+| Inspect numerical evidence | [Validation records](validation/index.md) |
 | Inspect current development direction | [Roadmap](roadmap.md) |
 | Set up coding assistants | [Assistant setup](ai-assistants/index.md) |
 

@@ -285,4 +285,4 @@ ADW_ENABLE_PR_SCANNING=true
 ## See Also
 
 - [Backend Configuration Guide](../backend_configuration.md) - Complete routing documentation
-- [Platform Router Feature](https://github.com/Gorkowski/Agent/blob/main/docs/Features/platform-router.md) - Routing behavior and API
+- [Platform Router Feature](https://github.com/Gorkowski/Agent/blob/main/docs/guide/platform-router.md) - Routing behavior and API

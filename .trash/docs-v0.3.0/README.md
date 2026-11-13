@@ -35,3 +35,13 @@ Graph-capture qualification remains blocked and v0.3.0 release gates remain open
 Provider catalogs contain no unique current Particula setup steps; current assistant
 instructions already own that workflow. Taichi/vision material describes exploratory
 proposals, not the supported Warp execution path. No supporting local assets were referenced.
+
+## Superseded benchmark viewer prose
+
+Source revision: `a16861c91`. The original `docs/Theory/nvidia-warp/examples/`
+`gpu_benchmarks.py` / `.ipynb` pair is preserved here. Its blanket condensation
+speedup recommendations were unsupported by the current recorded rows, and the
+notebook omitted the source's artifact validation. The synchronized replacement
+is `docs/contribute/validation/gpu/legacy-benchmarks/gpu_benchmarks.py` / `.ipynb`.
+Dated coagulation observations remain in the separate validation record; no
+current performance qualification is inferred.

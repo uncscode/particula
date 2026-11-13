@@ -9,7 +9,7 @@ workload of scientific simulations and record their longer runtime explicitly.
 Use the v0.3.0 development checkout (`python -m pip install -e ".[extra]"`), not an
 older released wheel. Construct native `Aerosol` from `ParticleData`, `GasData`
 and `EnvironmentData`; use process-owned physics and explicit species maps.
-Start with [native state access and replacement](../../../guide/migration/v0.3.0/index.md)
+Start with [native state access and replacement](../../../guide/data-model/ownership.md)
 and [scientific process contracts](../../../guide/processes/index.md).
 
 Declare the distribution type and representative volume. Resolved concentration
@@ -61,5 +61,8 @@ default pytest collection covers only `particula`. Follow the repository's
 coverage and lint gates. For a migration, record every source, notebook,
 public snippet and historical exception with literal dated execution evidence.
 Historical API sketches must be labeled before a nonexecutable text fence.
-Do not remove compatibility facades as part of an example migration; that
-requires the separately reviewed v0.3.0 removal milestone.
+Do not introduce historical facade APIs into supported examples.
+
+Before creating a file, follow the [documentation placement rules](../../documentation.md):
+extend an existing example when the learning objective is the same, otherwise
+choose its owning topic and index. Keep Python/notebook stems in snake_case.

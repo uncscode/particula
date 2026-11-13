@@ -7,7 +7,12 @@ Route Markdown to MkDocs/mkdocstrings without changing its contents or hiding
 warnings. Python and ipynb eligibility still belongs to the notebook plugin.
 """
 
+import posixpath
+import re
 from pathlib import Path
+from urllib.parse import unquote, urlsplit, urlunsplit
+
+from mkdocs.utils import get_relative_url
 
 
 def on_config(config):
@@ -24,3 +29,27 @@ def on_config(config):
 
     plugin.should_include = should_include
     return config
+
+
+def on_page_content(html, page, config, files):
+    """Resolve notebook prose links using the same routes as Markdown pages."""
+    if not page.file.src_uri.endswith(".ipynb"):
+        return html
+
+    def replace(match):
+        url = urlsplit(match[2])
+        if url.scheme or url.netloc or not url.path:
+            return match[0]
+        source = posixpath.normpath(
+            posixpath.join(
+                posixpath.dirname(page.file.src_uri), unquote(url.path)
+            )
+        )
+        target = files.get_file_from_path(source)
+        if target is None or target is page.file:
+            return match[0]  # preserve downloadable notebook source links
+        destination = get_relative_url(target.url, page.url)
+        rewritten = urlunsplit(("", "", destination, url.query, url.fragment))
+        return f"href={match[1]}{rewritten}{match[1]}"
+
+    return re.sub(r"href=([\"'])(.*?)\1", replace, html)

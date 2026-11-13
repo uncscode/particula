@@ -407,7 +407,7 @@ The router:
 - Provides backward-compatible facades for deprecated `operations.py` functions
 
 For complete documentation, see:
-- [Platform Router Feature](https://github.com/Gorkowski/Agent/blob/main/docs/Features/platform-router.md) - Full API reference
+- [Platform Router Feature](https://github.com/Gorkowski/Agent/blob/main/docs/guide/platform-router.md) - Full API reference
 - [Platform Router Examples](https://github.com/Gorkowski/Agent/blob/main/docs/examples/advanced/platform-router-usage.md) - Usage examples
 
 ### Configuration Examples
@@ -813,7 +813,7 @@ unset GITHUB_PAT GITHUB_REPO_URL GITHUB_UPSTREAM_URL \
 ### Mixed-Platform Workflows (Future)
 
 Mixed-platform operations within the same workflow are not supported today. See
-[Platform Router](https://github.com/Gorkowski/Agent/blob/main/docs/Features/platform-router.md) for current routing behavior
+[Platform Router](https://github.com/Gorkowski/Agent/blob/main/docs/guide/platform-router.md) for current routing behavior
 and future considerations.
 
 ## Additional Resources
@@ -822,13 +822,13 @@ and future considerations.
   onboarding instructions.
 - [Backend Configuration Example](https://github.com/Gorkowski/Agent/blob/main/docs/examples/backends/configuration.md) —
   Step-by-step walkthrough for a forked contributor environment.
-- [Platform Comparison](https://github.com/Gorkowski/Agent/blob/main/docs/Features/platform-comparison.md) — Differences across
+- [Platform Comparison](https://github.com/Gorkowski/Agent/blob/main/docs/guide/platform-comparison.md) — Differences across
   GitHub vs GitLab (Phase F4).
-- [Platform Router Feature](https://github.com/Gorkowski/Agent/blob/main/docs/Features/platform-router.md) — Routing behavior
+- [Platform Router Feature](https://github.com/Gorkowski/Agent/blob/main/docs/guide/platform-router.md) — Routing behavior
   and API reference.
 - [GitLab Configuration Tutorial](https://github.com/Gorkowski/Agent/blob/main/docs/examples/backends/gitlab-configuration.md) —
   Complete GitLab setup guide.
-- [GitLab Support Feature](https://github.com/Gorkowski/Agent/blob/main/docs/Features/gitlab-support.md) — GitLab platform
+- [GitLab Support Feature](https://github.com/Gorkowski/Agent/blob/main/docs/guide/gitlab-support.md) — GitLab platform
   capabilities and limitations.
 - [Epic E1: Multi-platform Support](https://github.com/Gorkowski/Agent/blob/main/adw-docs/dev-plans/epics/completed/E1-multi-platform-support.md)
   — Track and phase details.

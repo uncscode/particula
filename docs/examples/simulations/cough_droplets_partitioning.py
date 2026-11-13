@@ -662,7 +662,7 @@ print(aerosol_process)
 # * **X-axis (log scale)**: Particle radius in meters
 # * **Y-axis**: Particle number concentration (#/m³)
 #
-# ### 🧪 What to Look For:
+# ### 🧪 Initial and final sizes: what to look for
 #
 # * If the **final peak shifts left**, particles are **shrinking** due to **evaporation**
 # * If the peak moves right or broadens, it may indicate **condensation or growth**
@@ -821,7 +821,7 @@ plt.show()
 #
 # This **contour plot** shows how the **number concentration** of aerosol particles changes **across time and particle size**. It's an excellent way to visualize both **evaporation dynamics** and **distribution narrowing**.
 #
-# ### 🔍 What to Look For:
+# ### 🔍 Time evolution: what to look for
 #
 # * The **Y-axis (log scale)** shows particle radius from $10^{-7}$ to $10^{-4}$ meters
 # * The **X-axis** tracks simulation time from 0 to 19.9 seconds

@@ -368,7 +368,7 @@ plt.show()
 # %% [markdown]
 # ## Parameter Selection Guide
 #
-# ### Choosing `theta_mode`
+# ### Choosing the theta mode
 #
 # | Use Case | Recommended Mode |
 # |----------|------------------|
@@ -377,7 +377,7 @@ plt.show()
 # | Maximum staggering effect | `"batch"` |
 # | Reproducible results needed | `"half"` or `"random"` with fixed seed |
 #
-# ### Choosing `num_batches`
+# ### Choosing the number of batches
 #
 # More batches change how frequently gas feedback is applied. Accuracy and
 # cost depend on the workload and require separate convergence/timing studies.
@@ -457,4 +457,4 @@ plt.show()
 # ### Related Resources
 #
 # - [Condensation 3: Masses Resolved](condensation_3_massresolved.ipynb) - Basic particle-resolved condensation
-# - [CondensationIsothermalStaggered API](../../../Examples/api/dynamics/condensation) - Full API documentation
+# - [CondensationIsothermalStaggered API](https://uncscode.github.io/particula/API/particula/dynamics/condensation/condensation_strategies/) - Full API documentation
