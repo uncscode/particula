@@ -257,11 +257,16 @@ def test_registry_inspection_is_frozen_host_metadata() -> None:
 
 
 @pytest.mark.warp
-def test_initialize_selected_updates_only_requested_lanes() -> None:
+@pytest.mark.parametrize(
+    "device", ["cpu", pytest.param("cuda:0", marks=pytest.mark.cuda)]
+)
+def test_initialize_selected_updates_only_requested_lanes(device: str) -> None:
     """Test selected initialization does not copy or restore other lanes."""
     wp = pytest.importorskip("warp")
-    coagulation = wp.full(3, 17, dtype=wp.uint32, device="cpu")
-    wall_loss = wp.full(3, 19, dtype=wp.uint32, device="cpu")
+    if device != "cpu" and not wp.is_cuda_available():
+        pytest.skip("CUDA unavailable")
+    coagulation = wp.full(3, 17, dtype=wp.uint32, device=device)
+    wall_loss = wp.full(3, 19, dtype=wp.uint32, device=device)
     registry = StreamRegistry(
         5,
         3,
