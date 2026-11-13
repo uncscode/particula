@@ -1188,6 +1188,7 @@ def _build_prepared_loop_impl(
     selected_wall_loss_boxes: tuple[int, ...] = (),
     single_active_particle: bool = False,
     full_activity: bool = False,
+    coagulation_number_density: float | None = None,
 ) -> _PreparedLoop:
     """Build one real all-operation resident loop on the requested device."""
     manifest = tuple((f"box-{2 * index}", index) for index in range(n_boxes))
@@ -1201,6 +1202,20 @@ def _build_prepared_loop_impl(
     )
     cleanup_binding.append((session, registry, guard))
     wp = pytest.importorskip("warp")
+    if coagulation_number_density is not None:
+        # The default manifest intentionally has only one active slot in even
+        # boxes. A stochastic coagulation qualification instead needs many
+        # partners and an aerosol density with measurable collision activity.
+        masses = session.particles.masses.numpy().copy()
+        masses[:] = masses[:, :1, :]
+        counts = np.broadcast_to(
+            coagulation_number_density
+            * session.particles.volume.numpy()[:, None]
+            / n_particles,
+            (n_boxes, n_particles),
+        ).copy()
+        session.particles.masses.assign(masses)
+        session.particles.concentration.assign(counts)
     if single_active_particle:
         warp_device = session.particles.masses.device
         masses = session.particles.masses.numpy()
@@ -1283,6 +1298,7 @@ def _build_prepared_loop(
     selected_wall_loss_boxes: tuple[int, ...] = (),
     single_active_particle: bool = False,
     full_activity: bool = False,
+    coagulation_number_density: float | None = None,
 ) -> _PreparedLoop:
     """Build a prepared loop and close its exact binding after setup failure."""
     cleanup_binding: list[tuple[Any, Any, Any]] = []
@@ -1298,6 +1314,7 @@ def _build_prepared_loop(
             selected_wall_loss_boxes=selected_wall_loss_boxes,
             single_active_particle=single_active_particle,
             full_activity=full_activity,
+            coagulation_number_density=coagulation_number_density,
         )
     except BaseException as setup_error:
         if cleanup_binding:
@@ -3246,8 +3263,8 @@ def test_native_cuda_wall_loss_rng_and_stochastic_aggregate() -> None:
                 raise
             captured = capture_prepared_resident_graph(qualification)
             assert (
-                cuda_loop.registry.coagulation_resources.rng_states
-                is not cuda_loop.registry.wall_loss_resources.rng_states
+                cuda_loop.coagulation_resources.rng_states
+                is not cuda_loop.wall_loss_resources.rng_states
             )
             cuda_rng_initial = cuda_initial["wall_loss_rng"]
 
@@ -3323,7 +3340,14 @@ def test_native_cuda_coagulation_rng_and_nonvacuous_activity() -> None:
     continued_words = 0
 
     for seed in seeds:
-        cpu_loop = _build_prepared_loop("cpu", 3, duration, seed)
+        cpu_loop = _build_prepared_loop(
+            "cpu",
+            3,
+            duration,
+            seed,
+            n_particles=64,
+            coagulation_number_density=1.0e15,
+        )
         cuda_loop = None
         try:
             cuda_loop = _build_prepared_loop(
@@ -3331,6 +3355,8 @@ def test_native_cuda_coagulation_rng_and_nonvacuous_activity() -> None:
                 3,
                 duration,
                 seed,
+                n_particles=64,
+                coagulation_number_density=1.0e15,
             )
             cpu_initial = _prepared_snapshot(cpu_loop)
             cuda_initial = _prepared_snapshot(cuda_loop)

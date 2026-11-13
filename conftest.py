@@ -6,7 +6,10 @@ noisy warnings that are expected during the test suite.
 
 from __future__ import annotations
 
+import re
 import warnings
+
+import pytest
 
 
 def _filter_expected_warnings() -> None:
@@ -54,3 +57,22 @@ def pytest_configure() -> None:
 def pytest_runtest_setup(item) -> None:
     """Ensure deprecation warnings are filtered even under -Werror."""
     _filter_expected_warnings()
+
+
+@pytest.hookimpl(tryfirst=True)
+def pytest_collection_modifyitems(items) -> None:
+    """Mark explicit CUDA device parameters before marker deselection.
+
+    Fixture parameters such as ``device='cuda:0'`` select actual execution
+    targets, whereas the ``warp`` marker alone also covers Warp CPU tests.
+    Do not infer a device from test names or arbitrary configuration strings.
+    """
+    for item in items:
+        parameters = getattr(getattr(item, "callspec", None), "params", {})
+        if any(
+            "device" in name
+            and isinstance(value, str)
+            and re.fullmatch(r"cuda(?::\d+)?", value)
+            for name, value in parameters.items()
+        ):
+            item.add_marker(pytest.mark.cuda)

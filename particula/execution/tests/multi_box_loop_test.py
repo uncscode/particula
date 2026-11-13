@@ -141,8 +141,14 @@ def _isolate_wall_loss_dispatch(monkeypatch: pytest.MonkeyPatch) -> None:
 def _require_device(device: str) -> Any:
     """Lazily require Warp and skip an unavailable optional CUDA device."""
     wp = pytest.importorskip("warp")
-    if device not in warp_devices(wp):
+    if device == "cpu":
+        return wp
+    if "cuda" not in warp_devices(wp):
         pytest.skip(CUDA_SKIP_REASON)
+    # Canonical device identifiers (cuda:0) and the default-device alias
+    # (cuda) identify the same available CUDA device. String membership in
+    # warp_devices() incorrectly skipped the canonical spelling.
+    wp.get_device(device)
     return wp
 
 
