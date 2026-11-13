@@ -9,8 +9,8 @@ workload of scientific simulations and record their longer runtime explicitly.
 Use the v0.3.0 development checkout (`python -m pip install -e ".[extra]"`), not an
 older released wheel. Construct native `Aerosol` from `ParticleData`, `GasData`
 and `EnvironmentData`; use process-owned physics and explicit species maps.
-Start with [native state access and replacement](../../../Features/particle-data-migration/index.md)
-and [scientific process contracts](../../../Features/native_scientific_processes.md).
+Start with [native state access and replacement](../../../guide/migration/v0.3.0/index.md)
+and [scientific process contracts](../../../guide/processes/index.md).
 
 Declare the distribution type and representative volume. Resolved concentration
 stores counts; discrete concentration stores number density; continuous PDFs

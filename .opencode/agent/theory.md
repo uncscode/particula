@@ -7,7 +7,7 @@ description: 'Subagent that manages theoretical and conceptual documentation in 
 
   This subagent: - Loads workflow context from adw_spec_read tool - Creates/updates docs/Theory/*.md
   conceptual documentation - Uses Mermaid diagrams for visualizations - Links to Examples
-  for practical application - Maintains docs/Theory/index.md - Focuses on "why" and
+  for practical application - Maintains docs/theory/index.md - Focuses on "why" and
   "how" at conceptual level - Validates markdown links
 
   Write permissions: - docs/Theory/*.md: ALLOW - docs/Theory/**/*.md: ALLOW'
@@ -73,7 +73,7 @@ task({
 
 # Required Reading
 
-- @docs/Theory/index.md - Theory docs index
+- @docs/theory/index.md - Theory docs index
 - @docs/Theory/isolated-execution.md - Example theory doc
 - @docs/Theory/state-driven-architecture.md - Example theory doc
 - @.opencode/guides/documentation_guide.md - Documentation standards
@@ -83,7 +83,7 @@ task({
 **ALLOWED:**
 - ✅ `docs/Theory/*.md` - Root-level theory docs
 - ✅ `docs/Theory/**/*.md` - Theory docs in subdirectories
-- ✅ `docs/Theory/index.md` - Theory index
+- ✅ `docs/theory/index.md` - Theory index
 
 **DENIED:**
 - ❌ All other directories
@@ -154,7 +154,7 @@ todowrite({
     },
     {
       "id": "4",
-      "content": "Update docs/Theory/index.md",
+      "content": "Update docs/theory/index.md",
       "status": "pending",
       "priority": "medium"
     },
@@ -327,13 +327,13 @@ stateDiagram-v2
 
 Read current index:
 ```python
-read({"filePath": "{worktree_path}/docs/Theory/index.md"})
+read({"filePath": "{worktree_path}/docs/theory/index.md"})
 ```
 
 Add new theory doc:
 ```python
 edit({
-  "filePath": "{worktree_path}/docs/Theory/index.md",
+  "filePath": "{worktree_path}/docs/theory/index.md",
   "oldString": "{existing_entries}",
   "newString": "{existing_entries}\n- [{Concept Name}]({concept-name}.md) - {Brief description}"
 })
@@ -376,7 +376,7 @@ Content:
 - Examples linked: {count}
 - Related concepts: {count}
 
-Index updated: docs/Theory/index.md
+Index updated: docs/theory/index.md
 Links validated: {count} links, all valid
 ```
 
@@ -457,7 +457,7 @@ Content:
 - Examples linked: 3 (basic-workflow.md, json-workflows.md, custom-workflows.md)
 - Related concepts: state-driven-architecture.md, isolated-execution.md
 
-Index updated: docs/Theory/index.md
+Index updated: docs/theory/index.md
 Links validated: 8 links, all valid
 ```
 
@@ -475,4 +475,4 @@ Links validated: 8 links, all valid
 
 **Characteristics:** Language-agnostic, visual, well-linked
 
-**References:** `docs/Theory/index.md`, existing theory docs as templates
+**References:** `docs/theory/index.md`, existing theory docs as templates

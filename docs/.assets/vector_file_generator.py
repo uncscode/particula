@@ -70,7 +70,7 @@ convert_notebooks_to_markdown(filtered_examples, output_examples)
 # Process Theory Notebooks
 # -------------------------
 filtered_theory = [
-    p for p in source_paths_list if "particula/docs/Theory/" in p.as_posix()
+    p for p in source_paths_list if "particula/docs/theory/" in p.as_posix()
 ]
 output_theory = repo_path / "docs/.assets/temp/"
 os.makedirs(output_theory, exist_ok=True)

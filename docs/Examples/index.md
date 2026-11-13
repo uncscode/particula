@@ -1,7 +1,7 @@
 # Examples
 
 Start small, then build toward full scientific workloads. These examples target
-native v0.3.0 development APIs; use the [installation guide](Setup_Particula/index.md).
+native v0.3.0 development APIs; use the [installation guide](../guide/getting-started/installation/index.md).
 Notebook pages display saved results in the full documentation build. Standalone
 sources remain runnable from the repository checkout.
 
@@ -20,7 +20,7 @@ sources remain runnable from the repository checkout.
 - [Nucleation](Nucleation/index.md)
 - [Activity](Activity/index.md)
 - [Equilibria](Equilibria/index.md)
-- [CPU dilution](../Features/dilution_strategy_system.md#boundaries-and-example)
+- [CPU dilution](../guide/processes/dilution.md#boundaries-and-example)
 
 ## GPU examples
 
@@ -46,5 +46,5 @@ with a process tutorial before adapting a full chamber or atmospheric case.
 ## Tutorials
 
 The fundamentals and process indexes above are the tutorial entry points. For
-underlying equations, use [Theory](../Theory/index.md); for support boundaries,
+underlying equations, use [Theory](../theory/index.md); for support boundaries,
 use the [Guide](../guide/index.md).

@@ -18,11 +18,11 @@ Documentation availability does not announce release approval.
 
 | I want to… | Start with |
 | --- | --- |
-| Run my first simulation | [Installation](Examples/Setup_Particula/index.md), then [a CPU simulation](guide/getting-started/first-simulation.md) |
+| Run my first simulation | [Installation](guide/getting-started/installation/index.md), then [a CPU simulation](guide/getting-started/first-simulation.md) |
 | Understand the data and processes | [Guide](guide/index.md) |
 | Adapt an existing workflow | [Examples](Examples/index.md) |
-| Understand the science | [Theory](Theory/index.md) |
-| Upgrade an older script | [Native migration](Features/particle-data-migration/index.md) |
+| Understand the science | [Theory](theory/index.md) |
+| Upgrade an older script | [Native migration](guide/migration/v0.3.0/index.md) |
 | Extend the library | [Contribute](contribute/index.md) |
 
 ## Community and citation

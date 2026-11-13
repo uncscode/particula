@@ -112,6 +112,7 @@ copyright: |
 
 hooks:
   - docs/.assets/navigation.py
+  - docs/.assets/redirects.py
 
 nav:
 - Guide:
@@ -119,32 +120,45 @@ nav:
   - Start here:
     - First CPU simulation: guide/getting-started/first-simulation.md
   - Installation:
-    - New to Python?: Examples/Setup_Particula/Details/New_to_Python.md
-    - Setup via conda: Examples/Setup_Particula/Details/Setup_Conda.md
-    - Setup via pip: Examples/Setup_Particula/Details/Setup_PIP.md
-    - Setup via **uv**: Examples/Setup_Particula/Details/Setup_UV.md
-    - Setup Particula: Examples/Setup_Particula/index.md
+    - New to Python?: guide/getting-started/installation/new-to-python.md
+    - Setup via conda: guide/getting-started/installation/conda.md
+    - Setup via pip: guide/getting-started/installation/pip.md
+    - Setup via **uv**: guide/getting-started/installation/uv.md
+    - Setup Particula: guide/getting-started/installation/index.md
   - Data and processes:
-    - Activity System: Features/activity_system.md
-    - Coagulation Strategy System: Features/coagulation_strategy_system.md
-    - Condensation Strategy System: Features/condensation_strategy_system.md
-    - Data Containers and GPU Foundations: Features/data-containers-and-gpu-foundations.md
-    - Dilution Strategy System: Features/dilution_strategy_system.md
-    - Process and execution guides: Features/index.md
-    - Native scientific process calls: Features/native_scientific_processes.md
-    - Nucleation Strategy System: Features/nucleation_strategy_system.md
-    - Wall Loss Strategy System: Features/wall_loss_strategy_system.md
+    - Activity System: guide/processes/activity.md
+    - Coagulation Strategy System: guide/processes/coagulation.md
+    - Condensation Strategy System: guide/processes/condensation.md
+    - Data Containers and GPU Foundations: guide/data-model/index.md
+    - Dilution Strategy System: guide/processes/dilution.md
+    - Process and execution guides: guide/processes/catalog.md
+    - Native scientific process calls: guide/processes/index.md
+    - Nucleation Strategy System: guide/processes/nucleation.md
+    - Wall Loss Strategy System: guide/processes/wall-loss.md
   - GPU execution:
-    - Backend Selection and Explicit CPU Fallback: Features/backend_selection.md
-    - GPU resident graph capture: Features/gpu_graph_capture.md
-    - GPU resident checkpoints: Features/gpu_resident_checkpoints.md
-    - Fixed-Capacity Slot Exhaustion Primitives: Features/slot_exhaustion_policies.md
+    - Backend Selection and Explicit CPU Fallback: guide/gpu/backend-selection.md
+    - GPU resident graph capture: guide/gpu/resident/graph-capture.md
+    - GPU resident checkpoints: guide/gpu/resident/checkpoints.md
+    - Fixed-Capacity Slot Exhaustion Primitives: guide/gpu/slot-exhaustion.md
   - Migration:
-    - Native aerosol construction and replacement: Features/particle-data-migration/construction.md
-    - Native container access and ownership: Features/particle-data-migration/containers.md
-    - Native dynamics migration: Features/particle-data-migration/dynamics.md
-    - Native aerosol migration: Features/particle-data-migration/index.md
-    - Native migration troubleshooting: Features/particle-data-migration/troubleshooting.md
+    - Native aerosol construction and replacement: guide/data-model/construction.md
+    - Native container access and ownership: guide/data-model/ownership.md
+    - Native dynamics migration: guide/migration/v0.3.0/dynamics.md
+    - Native aerosol migration: guide/migration/v0.3.0/index.md
+    - Native migration troubleshooting: guide/migration/v0.3.0/troubleshooting.md
+  - Detailed reference:
+    - Coagulation Configuration: guide/gpu/direct/coagulation-configuration.md
+    - Coagulation: guide/gpu/direct/coagulation.md
+    - Condensation Configuration: guide/gpu/direct/condensation-configuration.md
+    - Condensation: guide/gpu/direct/condensation.md
+    - Dilution And Wall Loss: guide/gpu/direct/dilution-and-wall-loss.md
+    - Execution: guide/gpu/execution.md
+    - Slots: guide/gpu/slots.md
+    - Support: guide/gpu/support.md
+    - Transfers: guide/gpu/transfers.md
+    - Troubleshooting: guide/gpu/troubleshooting.md
+    - Construction: guide/migration/v0.3.0/construction.md
+    - Containers: guide/migration/v0.3.0/containers.md
 - Examples:
   - Examples: Examples/index.md
   - Activity:
@@ -214,21 +228,21 @@ nav:
     - Soot Formation in Flames: Examples/Simulations/Notebooks/Soot_Formation_in_Flames.ipynb
     - Simulations: Examples/Simulations/index.md
 - Theory:
-  - Theory: Theory/index.md
+  - Theory: theory/index.md
   - Activity Calculations:
-    - Activity Theory: Theory/Activity_Calculations/activity_theory.md
-    - Equilibria Theory: Theory/Activity_Calculations/equilibria_theory.md
-    - Activity Calculations: Theory/Activity_Calculations/index.md
+    - Activity Theory: theory/thermodynamics/activity-theory.md
+    - Equilibria Theory: theory/thermodynamics/equilibria-theory.md
+    - Activity Calculations: theory/thermodynamics/index.md
   - Technical:
     - DNS Fluid and Particle Properties Comparison: Theory/Technical/Dynamics/Cloud_Droplet_Coagulation/DNS_Fluid_and_Particle_Properties_Comparison.ipynb
     - DNS Horizontal Velocity Comparison: Theory/Technical/Dynamics/Cloud_Droplet_Coagulation/DNS_Horizontal_Velocity_Comparison.ipynb
     - DNS Kernel Comparison: Theory/Technical/Dynamics/Cloud_Droplet_Coagulation/DNS_Kernel_Comparison.ipynb
     - DNS Radial Distribution Comparison: Theory/Technical/Dynamics/Cloud_Droplet_Coagulation/DNS_Radial_Distribution_Comparison.ipynb
     - DNS Radial Relative Velocity Comparison: Theory/Technical/Dynamics/Cloud_Droplet_Coagulation/DNS_Radial_Relative_Velocity_Comparison.ipynb
-    - Droplet Coagulation Kernel Ayala 2008: Theory/Technical/Dynamics/Cloud_Droplet_Coagulation/Droplet_Coagulation_Kernel_Ayala2008.md
-    - Cloud Droplet Coagulation: Theory/Technical/Dynamics/Cloud_Droplet_Coagulation/index.md
-    - Condensation Discussion: Theory/Technical/Dynamics/Condensation_Equations.md
-    - Nucleation Discussion: Theory/Technical/Dynamics/Nucleation_Equations.md
+    - Droplet Coagulation Kernel Ayala 2008: theory/dynamics/cloud-droplet-coagulation/droplet-coagulation-kernel-ayala2008.md
+    - Cloud Droplet Coagulation: theory/dynamics/cloud-droplet-coagulation/index.md
+    - Condensation Discussion: theory/dynamics/condensation-equations.md
+    - Nucleation Discussion: theory/dynamics/nucleation-equations.md
     - ionparticle coagulation: Theory/Technical/Dynamics/ionparticle_coagulation.ipynb
     - dynamic viscosity: Theory/Technical/Properties/dynamic_viscosity.ipynb
     - mean free path: Theory/Technical/Properties/mean_free_path.ipynb
@@ -237,45 +251,45 @@ nav:
 - Contribute:
   - Contribute: contribute/index.md
   - AI assistants:
-    - Claude Code, Desktop, and Cowork: AI_Assistants/claude.md
-    - Codex and ChatGPT: AI_Assistants/codex.md
-    - AI Assistants: AI_Assistants/index.md
-    - OpenCode: AI_Assistants/opencode.md
+    - Claude Code, Desktop, and Cowork: contribute/ai-assistants/claude.md
+    - Codex and ChatGPT: contribute/ai-assistants/codex.md
+    - AI Assistants: contribute/ai-assistants/index.md
+    - OpenCode: contribute/ai-assistants/opencode.md
   - Development setup:
-    - Contributor Setup: Examples/Setup_Particula/Details/Contributor_Setup.md
+    - Contributor Setup: contribute/setup.md
   - Validation and roadmap:
-    - GPU Coagulation Validation Record: Features/Roadmap/coagulation-validation.md
-    - Condensation Parity Walkthrough Ownership Record: Features/Roadmap/condensation-parity-walkthrough.md
-    - Condensation Stiffness Study and Recommendation Record: Features/Roadmap/condensation-stiffness-study.md
-    - Native API migration closeout: Features/Roadmap/data-native-v030-closeout.md
+    - GPU Coagulation Validation Record: contribute/validation/gpu/coagulation.md
+    - Condensation Parity Walkthrough Ownership Record: contribute/validation/gpu/condensation-parity.md
+    - Condensation Stiffness Study and Recommendation Record: contribute/validation/numerics/condensation-stiffness.md
+    - Native API migration closeout: contribute/validation/releases/v0.3.0.md
     - Data-Oriented Design and GPU Roadmap: Features/Roadmap/data-oriented-gpu.md
     - Epic H graph-capture closeout record: Features/Roadmap/graph-capture-closeout.md
     - Feature Roadmap: Features/Roadmap/index.md
-    - Mass Precision Recommendation Report: Features/Roadmap/mass-precision-study.md
-    - 'Warp Autodiff: Limitations and Stochastic Process Handling': Features/Roadmap/warp-autodiff-limitations.md
-    - GPU graph-capture profiling record: Features/gpu_graph_capture_performance.md
-    - Resident benchmark and memory-budget record: Features/resident_benchmark_memory_budget.md
+    - Mass Precision Recommendation Report: contribute/validation/numerics/mass-precision.md
+    - 'Warp Autodiff: Limitations and Stochastic Process Handling': contribute/architecture/warp/autodiff-limitations.md
+    - GPU graph-capture profiling record: contribute/validation/gpu/graph-capture-profiling.md
+    - Resident benchmark and memory-budget record: contribute/validation/gpu/resident-benchmarks.md
   - Accelerating Python:
     - One-line Vision — historical proposal: Theory/Accelerating_Python/Details/One-Line_Vision.md
     - Taichi Exploration: Theory/Accelerating_Python/Details/Taichi_Exploration.ipynb
     - Accelerating Python: Theory/Accelerating_Python/index.md
   - Code Concepts:
-    - Particula Design: Theory/Code_Concepts/Details/Design_Patterns.md
-    - Object‑Oriented Patterns: Theory/Code_Concepts/Details/Object_Oriented_Patterns.md
-    - WARMED Code: Theory/Code_Concepts/Details/WARMED_principle.md
-    - Code Concepts: Theory/Code_Concepts/index.md
+    - Particula Design: contribute/architecture/design-patterns.md
+    - Object‑Oriented Patterns: contribute/architecture/object-oriented-patterns.md
+    - WARMED Code: contribute/architecture/warmed-principle.md
+    - Code Concepts: contribute/architecture/index.md
   - OpenAI Models:
     - Agents: Theory/OpenAI_Models/Models/Agents.md
     - Chat: Theory/OpenAI_Models/Models/Chat.md
     - Reasoning: Theory/OpenAI_Models/Models/Reasoning.md
     - OpenAI Models: Theory/OpenAI_Models/index.md
   - nvidia-warp:
-    - Data Structures for Aerosol Simulation: Theory/nvidia-warp/datastructures.md
-    - Aerosol Dynamics with NVIDIA Warp: Theory/nvidia-warp/examples/fluids.md
-    - Particle Interactions and Wall Loss with NVIDIA Warp: Theory/nvidia-warp/examples/geometry.md
+    - Data Structures for Aerosol Simulation: contribute/architecture/warp/datastructures.md
+    - Aerosol Dynamics with NVIDIA Warp: contribute/architecture/warp/teaching/fluids.md
+    - Particle Interactions and Wall Loss with NVIDIA Warp: contribute/architecture/warp/teaching/geometry.md
     - gpu benchmarks: Theory/nvidia-warp/examples/gpu_benchmarks.ipynb
-    - NVIDIA Warp for Particle Simulation: Theory/nvidia-warp/index.md
-    - Kernels and Function Inlining for Particle Simulation: Theory/nvidia-warp/kernels.md
+    - NVIDIA Warp for Particle Simulation: contribute/architecture/warp/index.md
+    - Kernels and Function Inlining for Particle Simulation: contribute/architecture/warp/kernels.md
   - Contribution workflow:
     - Code of Conduct: contribute/CODE_OF_CONDUCT.md
     - CONTRIBUTING: contribute/CONTRIBUTING.md

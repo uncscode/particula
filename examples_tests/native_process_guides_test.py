@@ -7,15 +7,22 @@ import numpy as np
 import particula as par
 import pytest
 
-FEATURES = Path(__file__).resolve().parents[1] / "docs/Features"
+FEATURES = Path(__file__).resolve().parents[1] / "docs/guide/processes"
 
 
 def snippets(name):
     """Read exact Python fences in publication order."""
-    page = FEATURES / f"{name}_strategy_system.md"
-    return page, re.findall(
-        r"```python\n(.*?)\n```", page.read_text(), re.DOTALL
-    )
+    page = FEATURES / f"{name.replace('_', '-')}.md"
+    pages = [page]
+    if name in {"condensation", "coagulation"}:
+        pages.append(FEATURES.parent / "gpu/direct" / f"{name}.md")
+    return page, [
+        block
+        for source in pages
+        for block in re.findall(
+            r"```python\n(.*?)\n```", source.read_text(), re.DOTALL
+        )
+    ]
 
 
 @pytest.mark.parametrize("name", ["wall_loss", "coagulation"])
@@ -204,7 +211,7 @@ def test_nucleation_guide_mapped_inventory():
 
 def test_native_scientific_direct_calls():
     """Direct native composition preserves inert gas and accounts for sinks."""
-    page = FEATURES / "native_scientific_processes.md"
+    page = FEATURES / "index.md"
     blocks = re.findall(r"```python\n(.*?)\n```", page.read_text(), re.DOTALL)
     namespace = {}
     for block in blocks:
@@ -231,7 +238,7 @@ def test_native_scientific_direct_calls():
 
 def test_backend_selection_guide_does_not_execute():
     """Published registration selects by identity without invoking the adapter."""
-    page = FEATURES / "backend_selection.md"
+    page = FEATURES.parent / "gpu/backend-selection.md"
     blocks = re.findall(r"```python\n(.*?)\n```", page.read_text(), re.DOTALL)
     namespace = {}
     for block in blocks:
@@ -245,8 +252,25 @@ def test_backend_selection_guide_does_not_execute():
 def test_foundations_complete_snippet_sequence():
     """Explicit fixed-slot activation and round trips retain native values."""
     wp = pytest.importorskip("warp")
-    page = FEATURES / "data-containers-and-gpu-foundations.md"
-    blocks = re.findall(r"```python\n(.*?)\n```", page.read_text(), re.DOTALL)
+    page = FEATURES.parent / "data-model/index.md"
+    pages = [
+        FEATURES.parent / name
+        for name in [
+            "gpu/slots.md",
+            "data-model/index.md",
+            "gpu/execution.md",
+            "gpu/direct/coagulation-configuration.md",
+            "gpu/direct/condensation-configuration.md",
+            "gpu/transfers.md",
+        ]
+    ]
+    blocks = [
+        block
+        for source in pages
+        for block in re.findall(
+            r"```python\n(.*?)\n```", source.read_text(), re.DOTALL
+        )
+    ]
     namespace = {}
     for block in blocks:
         exec(compile(block, str(page), "exec"), namespace)  # noqa: S102

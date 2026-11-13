@@ -151,14 +151,17 @@ def test_published_example_runs_real_mapped_condensation(example):
     )
 
 
-@pytest.mark.parametrize("page", ["construction", "containers", "dynamics"])
+@pytest.mark.parametrize(
+    "page",
+    [
+        "data-model/construction",
+        "data-model/ownership",
+        "migration/v0.3.0/dynamics",
+    ],
+)
 def test_native_migration_page_python_snippets_execute(page):
     """Execute the exact supported snippets in each page's documented order."""
-    path = (
-        SOURCE.parents[2]
-        / "docs/Features/particle-data-migration"
-        / f"{page}.md"
-    )
+    path = SOURCE.parents[2] / "docs/guide" / f"{page}.md"
     snippets = re.findall(r"```python\n(.*?)\n```", path.read_text(), re.DOTALL)
     assert snippets
     namespace = {}
@@ -171,10 +174,7 @@ def test_native_migration_page_python_snippets_execute(page):
 
 def test_foundations_native_construction_snippet():
     """The canonical schema example declares counts and extensive inventory."""
-    path = (
-        SOURCE.parents[2]
-        / "docs/Features/data-containers-and-gpu-foundations.md"
-    )
+    path = SOURCE.parents[2] / "docs/guide/data-model/index.md"
     section = path.read_text().split(
         "Example single-box container construction:", 1
     )[1]

@@ -20,7 +20,7 @@ conda install -c conda-forge particula
 
 ## AI Assistants
 
-[Particula Helper](docs/AI_Assistants/index.md) provides setup, simulation,
+[Particula Helper](docs/contribute/ai-assistants/index.md) provides setup, simulation,
 analysis, and debugging workflows for Codex/ChatGPT, Claude Code/Cowork, and
 OpenCode. See the guide for native install commands and environment requirements.
 
@@ -68,7 +68,7 @@ print(aerosol.particles.number_density)  # m⁻³, not raw counts
 ```
 
 This single-box illustration retains explicit population and species meaning.
-See [native access and replacement](docs/Features/particle-data-migration/containers.md)
+See [native access and replacement](docs/guide/data-model/ownership.md)
 for ownership, validation and non-unit-volume inventory checks.
 
 
