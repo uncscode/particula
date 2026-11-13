@@ -64,7 +64,6 @@ jobs:
           cp website/legacy-api-anchors.json website/.cache/reports/
           cp website/.cache/execution-inventory.json website/.cache/reports/
           cp website/API_DIAGNOSTICS.md website/.cache/reports/
-          cp website/MIGRATION_VALIDATION.md website/.cache/reports/
           cp .trash/mkdocs-starlight-2026-11-13/inventory.json website/.cache/reports/archive-inventory.json
           cp .trash/mkdocs-starlight-2026-11-13/README.md website/.cache/reports/rollback.md
       - uses: actions/upload-artifact@v7
