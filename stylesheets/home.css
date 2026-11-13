@@ -1,0 +1,73 @@
+/* Scoped to the landing page; documentation pages retain Material's layout. */
+.particula-home {
+  --home-ink: #143e3b;
+  --home-muted: #526965;
+  --home-accent: #087b71;
+  --home-panel: #edf5f1;
+  --home-border: #cfdfd9;
+  padding: .5rem 0 2rem;
+}
+[data-md-color-scheme="slate"] .particula-home {
+  --home-ink: #e4f3ed;
+  --home-muted: #b0c8c2;
+  --home-accent: #7edccc;
+  --home-panel: #233c3b;
+  --home-border: #405957;
+}
+.particula-home .headerlink { display: none; }
+.particula-home a { color: var(--home-accent); }
+.particula-home a:focus-visible { outline: 3px solid var(--home-accent); outline-offset: 5px; }
+.home-hero { display: grid; grid-template-columns: 1.15fr 1fr; gap: 3rem; align-items: center; padding: 2.8rem 0 3.2rem; }
+.particula-home .home-eyebrow { color: var(--home-accent); font-size: .61rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin: 0 0 1rem; }
+.particula-home h1 { color: var(--home-ink); font-size: clamp(2.5rem, 5vw, 3.8rem); font-weight: 750; letter-spacing: -.055em; line-height: 1.06; margin: 0 0 1.2rem; }
+.particula-home .home-lead { font-size: .95rem; line-height: 1.7; color: var(--home-muted); max-width: 27rem; margin-bottom: 1.5rem; }
+.particula-home .home-button { display: inline-block; padding: .65rem 1.1rem; font-size: .75rem; font-weight: 650; border: 1px solid var(--home-accent); border-radius: .25rem; margin: 0 .45rem .5rem 0; transition: background-color .15s, box-shadow .15s; }
+.particula-home .home-button-primary { color: #fff; background: #087b71; border-color: #087b71; }
+.particula-home .home-button:hover { box-shadow: 0 3px 0 var(--home-border); }
+.particula-home .home-note { font-size: .63rem; color: var(--home-muted); margin: .5rem 0 0; }
+.home-visual { background: #103e3a; border-radius: .6rem; overflow: hidden; box-shadow: 0 12px 35px #082e2914; }
+.home-visual > p { margin: 0; line-height: 0; }
+.home-visual img { display: block; width: 100%; }
+.home-visual-caption { display: flex; justify-content: space-between; gap: 1rem; padding: .8rem 1.2rem; border-top: 1px solid #ffffff25; color: #c2e5db; font-size: .57rem; letter-spacing: .03em; }
+.home-start { display: grid; grid-template-columns: 1.4fr 1fr; gap: 2.5rem; align-items: center; background: var(--home-panel); border: 1px solid var(--home-border); border-radius: .4rem; padding: 1.8rem 2rem; }
+.particula-home h2 { color: var(--home-ink); font-size: 1.4rem; font-weight: 650; line-height: 1.3; letter-spacing: -.025em; margin: 0 0 .7rem; }
+.home-start p { color: var(--home-muted); font-size: .75rem; max-width: 25rem; }
+.home-start p:last-child { margin-bottom: 0; }
+.home-start a { font-weight: 600; }
+.particula-home .home-start .home-eyebrow { margin-bottom: .6rem; }
+.particula-home .home-steps ol { list-style: none; margin: 0; }
+.particula-home .home-steps li { display: flex; gap: 1rem; align-items: center; padding: .8rem 0; margin: 0; border-bottom: 1px solid var(--home-border); font-size: .75rem; }
+.particula-home .home-steps li:last-child { border: 0; }
+.home-steps span { color: var(--home-muted); font: .65rem monospace; }
+.home-section-heading { padding-top: 3rem; }
+.home-section-heading p { color: var(--home-muted); margin-top: 0; font-size: .8rem; }
+.home-paths { display: grid; grid-template-columns: repeat(6, 1fr); gap: 1rem; margin: 1.5rem 0; }
+.home-path { grid-column: span 2; padding: 1.3rem; border: 1px solid var(--home-border); border-radius: .35rem; transition: border-color .15s; }
+.home-path:nth-last-child(-n+2) { grid-column: span 3; }
+.home-path:hover { border-color: var(--home-accent); }
+.home-path-number { font-size: .55rem; font-weight: 650; letter-spacing: .08em; color: var(--home-muted); }
+.particula-home .home-path h3 { margin: .65rem 0 .5rem; font-size: 1.05rem; font-weight: 650; }
+.home-path p { color: var(--home-muted); font-size: .73rem; line-height: 1.65; margin: 0; }
+.home-shortcuts { padding: 1.1rem 0 1.8rem; border-bottom: 1px solid var(--home-border); }
+.home-shortcuts p { display: flex; flex-wrap: wrap; gap: .65rem 1.5rem; font-size: .72rem; }
+.home-shortcuts strong { color: var(--home-ink); }
+.home-community { padding: 2rem 0 0; }
+.particula-home .home-community h2 { font-size: 1rem; }
+.home-community p { font-size: .7rem; }
+@media (max-width: 900px) {
+  .home-hero { gap: 1.5rem; }
+  .home-start { gap: 1.5rem; padding: 1.5rem; }
+}
+@media (max-width: 650px) {
+  .home-hero { grid-template-columns: 1fr; padding: 1.5rem 0 2rem; gap: 1.7rem; }
+  .particula-home h1 { font-size: 2.7rem; }
+  .home-visual { max-width: 27rem; width: 100%; }
+  .home-start { grid-template-columns: 1fr; gap: 1rem; padding: 1.3rem; }
+  .home-paths { grid-template-columns: 1fr; }
+  .home-path, .home-path:nth-last-child(-n+2) { grid-column: auto; }
+  .home-section-heading { padding-top: 2rem; }
+  .home-shortcuts p { flex-direction: column; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .particula-home .home-button, .home-path { transition: none; }
+}
