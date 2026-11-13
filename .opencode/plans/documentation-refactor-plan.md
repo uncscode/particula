@@ -691,3 +691,23 @@ Those explicit scientific/maintainer gates remain open in their validation recor
   references and dedicated dependencies are absent; documentation structure
   reports zero errors, the strict base build passes, and the diff passes
   whitespace checks.
+
+## Follow-up — CI, review, and landing-page refinements
+
+- Correct the Material theme icon configuration that failed the hosted strict
+  build, and check percent-format Python Markdown links independently of their
+  notebooks. Fix four stale source links and resolve all three inline review
+  threads. Infrastructure checks now report 151 passing tests.
+- Simplify the landing-page labels and use “Dig deeper into the science” for
+  the five entry points. Place AI assistant setup beside the first-simulation
+  button; retain assistant documentation under Guide.
+- Full notebook CI exposed a pre-existing Reynolds-number overwrite in the
+  DNS kernel comparison. Preserve the supplied Taylor-scale Reynolds number,
+  assert agreement between the manual and system-state calculation paths,
+  execute the notebook, and refresh its plot/table. All 40,000 kernel entries
+  are finite and nonnegative; both paths agree at rtol=1e-12, atol=0.
+- This notebook is an explicit exception to the earlier unchanged-output
+  audit: 53 of the 54 other moved notebooks retain their original code and
+  outputs. Production package code and existing scientific tolerances remain
+  unchanged. Remove the comparison's unsupported claim of matching the
+  paper's reported accuracy; the displayed differences are case-specific.
