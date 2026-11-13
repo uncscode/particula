@@ -319,6 +319,7 @@ def test_execution_exports_stay_narrow_and_concrete_carriers_stay_private() -> (
         "FallbackPolicy",
         "FallbackBoundary",
         "CPUStateAuthority",
+        "CPUExecutionContext",
     ]
     for name in (
         "BrownianCoagulationConfig",

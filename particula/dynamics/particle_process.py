@@ -233,7 +233,7 @@ class NucleationCommitConfig:
 class _NativeBatchRunnable(RunnableABC):
     """Bind native single-box strategies to the shared batch transaction."""
 
-    _strategy_attribute = None
+    _strategy_attribute: str | None = None
     _namespace = ""
 
     def _writer_fields(self, aerosol):

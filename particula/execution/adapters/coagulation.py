@@ -172,6 +172,8 @@ class CPUCoagulationExecutionState:
     sub_steps: object
     runnable: Coagulation
 
+    context: object = None
+
     def __post_init__(self) -> None:
         """Validate exact state-state and runnable carrier types."""
         if type(self.state) is not CPUCoagulationState:
@@ -374,6 +376,7 @@ class CPUCoagulationExecutionAdapter:
             state.state.aerosol,
             cast(float, state.time_step),
             cast(int, state.sub_steps),
+            **({"context": state.context} if state.context is not None else {}),
         )
         cpu_result = CPUCoagulationResult(state.state, aerosol)
         return ExecutionResult(

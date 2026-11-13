@@ -1007,6 +1007,7 @@ class CPUExecutionState:
     aerosol: object
     time_step: object
     sub_steps: object
+    context: object = None
 
     @property
     def backend_payload(self) -> object:
@@ -1079,6 +1080,7 @@ class CPUExecutionAdapter:
             cast("Aerosol", state.aerosol),
             cast(float, state.time_step),
             cast(int, state.sub_steps),
+            **({"context": state.context} if state.context is not None else {}),
         )
         if returned_aerosol is not state.aerosol:
             raise ValueError("CPU runnable must return the original aerosol.")

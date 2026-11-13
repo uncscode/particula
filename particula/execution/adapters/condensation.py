@@ -634,6 +634,8 @@ class CPUCondensationExecutionState:
     sub_steps: object
     runnable: MassCondensation
 
+    context: object = None
+
     def __post_init__(self) -> None:
         """Validate exact inventory finalization-state and runnable carrier
             types.
@@ -834,6 +836,7 @@ class CPUCondensationExecutionAdapter:
             state.state.aerosol,
             cast(float, state.time_step),
             cast(int, state.sub_steps),
+            **({"context": state.context} if state.context is not None else {}),
         )
         if aerosol is not state.state.aerosol:
             raise ValueError("CPU runnable must return the original aerosol.")
