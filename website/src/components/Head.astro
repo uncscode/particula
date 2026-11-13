@@ -2,6 +2,16 @@
 import DefaultHead from '@astrojs/starlight/components/Head.astro';
 ---
 <DefaultHead><slot /></DefaultHead>
+<script is:inline>
+  // Apply the saved reading layout before the page paints. Storage may be
+  // unavailable in private/restricted contexts; the default remains expanded.
+  try {
+    document.documentElement.toggleAttribute(
+      'data-sidebar-collapsed',
+      localStorage.getItem('particula:sidebar-collapsed') === 'true'
+    );
+  } catch {}
+</script>
 <script>
   // Only diagram pages load Mermaid. Static documentation has no simulation runtime.
   if (document.querySelector('pre.mermaid')) {

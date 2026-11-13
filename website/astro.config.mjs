@@ -26,7 +26,10 @@ export default defineConfig({
     favicon: '/images/icon_dark.svg',
     social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/uncscode/particula' }],
     customCss: ['./src/styles/custom.css'],
-    components: { Head: './src/components/Head.astro' },
+    components: {
+      Head: './src/components/Head.astro',
+      Header: './src/components/Header.astro',
+    },
     expressiveCode: { plugins: [pluginCollapsibleSections()], shiki: { langs: ['python', 'bash', 'json', 'text'] } },
     plugins: [starlightPydocs({
       packages: [{
