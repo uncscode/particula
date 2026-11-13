@@ -17,8 +17,10 @@ Examples:
     ```
 """
 
-from abc import ABC, abstractmethod
+from copy import copy
 from typing import Any
+
+import numpy as np
 
 # Check if tqdm is available for progress bars
 try:
@@ -33,7 +35,7 @@ else:
 from particula.aerosol import Aerosol
 
 
-class RunnableABC(ABC):
+class RunnableABC:
     """Abstract base class for processes modifying an Aerosol instance.
 
     This class enforces the implementation of a process rate calculation
@@ -62,48 +64,96 @@ class RunnableABC(ABC):
         - No references available yet.
     """
 
-    @abstractmethod
     def rate(self, aerosol: Aerosol) -> Any:
-        """Calculate and return the rate of this process for the given Aerosol.
+        """Evaluate detached box hooks and retain a leading box axis."""
+        from particula import _cpu_batch
 
-        Args:
-            aerosol: The Aerosol instance on which to calculate the rate.
+        _cpu_batch.validate(aerosol)
+        self._validate_batch(aerosol)
+        candidate = _cpu_batch.detached(aerosol)
+        results = []
+        for box in range(aerosol.particles.n_boxes):
+            worker = self._box_worker(box, aerosol.particles.n_boxes, None)
+            results.append(
+                worker._rate_box(_cpu_batch.box_view(candidate, box))
+            )
+        return np.stack(results, axis=0)
 
-        Returns:
-            - Any : The computed rate of this process.
-
-        Examples:
-            ```py title="Using the rate method"
-            process = CustomProcess()
-            process_rate = process.rate(my_aerosol)
-            print(process_rate)
-            ```
-        """
-
-    @abstractmethod
     def execute(
         self,
         aerosol: Aerosol,
         time_step: float,
         sub_steps: int = 1,
+        *,
+        context=None,
     ) -> Aerosol:
-        """Execute the process, modifying the Aerosol in-place over a time step.
+        """Advance every box, committing atomically after each process substep.
 
-        Args:
-            aerosol: The Aerosol instance to be updated.
-            time_step: The time step size in seconds.
-            sub_steps: Number of sub-steps to subdivide the time step,
-                default 1.
-
-        Returns:
-            - The updated Aerosol after this process runs.
-
-        Examples:
-            ```py title="Executing the process"
-            process = CustomProcess()
-            updated_aerosol = process.execute(my_aerosol, time_step=1.0)
-            ```
+        Contexts own independent logical-box random streams. Completed substeps
+        remain committed if a later one fails. Custom subclasses overriding
+        this method retain responsibility for their own execution semantics.
         """
+        from particula import _cpu_batch
+        from particula.execution import CPUExecutionContext
+
+        step = _cpu_batch.duration(time_step, sub_steps)
+        writers = self._writer_fields(aerosol)
+        _cpu_batch.validate(aerosol, writers)
+        self._validate_batch(aerosol)
+        boxes = aerosol.particles.n_boxes
+        if context is not None:
+            if not isinstance(context, CPUExecutionContext):
+                raise TypeError("context must be CPUExecutionContext")
+            context._begin(boxes)
+        if boxes > 1 and self._is_stochastic(aerosol) and context is None:
+            raise ValueError("stochastic multi-box execution requires context")
+        for _ in range(sub_steps):
+            _cpu_batch.validate(aerosol, writers)
+            transaction = None if context is None else context._begin(boxes)
+            candidate = _cpu_batch.detached(aerosol)
+            workers = []
+            for box in range(boxes):
+                worker = self._box_worker(box, boxes, transaction)
+                view = _cpu_batch.box_view(candidate, box)
+                result = worker._execute_box(view, step, sub_steps=1)
+                if result is not view:
+                    raise ValueError(
+                        "CPU box hooks must retain aerosol identity"
+                    )
+                workers.append(worker)
+            if step == 0:
+                continue
+            _cpu_batch.publish(aerosol, candidate, writers)
+            if transaction is not None:
+                transaction.commit()
+            self._commit_workers(workers, context is not None)
+        return aerosol
+
+    def _validate_batch(self, aerosol):
+        """Validate process-wide controls before staging boxes."""
+
+    def _writer_fields(self, aerosol):
+        """Declare numeric destinations for transactional publication."""
+        raise NotImplementedError
+
+    def _is_stochastic(self, aerosol):
+        """Report whether this process requires independent box streams."""
+        return False
+
+    def _box_worker(self, box, boxes, transaction):
+        """Create isolated hook state for a single box."""
+        return copy(self)
+
+    def _commit_workers(self, workers, uses_context):
+        """Publish staged process diagnostics after numeric success."""
+
+    def _rate_box(self, aerosol):
+        """Evaluate the single-box numerical building block."""
+        raise NotImplementedError
+
+    def _execute_box(self, aerosol, time_step, sub_steps=1):
+        """Execute the single-box numerical building block."""
+        raise NotImplementedError
 
     def __or__(self, other: "RunnableABC") -> "RunnableSequence":
         """Chain this Runnable with another using the '|' operator.
@@ -175,7 +225,12 @@ class RunnableSequence:
         self.processes.append(process)
 
     def execute(
-        self, aerosol: Aerosol, time_step: float, sub_steps: int = 1
+        self,
+        aerosol: Aerosol,
+        time_step: float,
+        sub_steps: int = 1,
+        *,
+        context=None,
     ) -> Aerosol:
         """Execute all processes in the sequence on the given Aerosol.
 
@@ -200,7 +255,9 @@ class RunnableSequence:
             )
             ```
         """
-        sub_step_time_step = time_step / sub_steps
+        from particula._cpu_batch import duration
+
+        sub_step_time_step = duration(time_step, sub_steps)
         # If tqdm is available, wrap the process loop in a progress bar
         loop_iterator = range(sub_steps)
         if AVAILABLE_TQDM and tqdm is not None:
@@ -213,7 +270,10 @@ class RunnableSequence:
             # loop over each process in the sequence
             for process in self.processes:
                 aerosol = process.execute(
-                    aerosol, sub_step_time_step, sub_steps=1
+                    aerosol,
+                    sub_step_time_step,
+                    sub_steps=1,
+                    **({"context": context} if context is not None else {}),
                 )
         return aerosol
 
