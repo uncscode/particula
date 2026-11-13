@@ -1,7 +1,7 @@
 {
   "name": "particula-helper",
-  "version": "0.2.0",
-  "description": "Learn Particula, build and debug aerosol simulations, and run reproducible local Python studies with plots and scientific checks.",
+  "version": "0.3.0",
+  "description": "Build, run and analyze aerosol simulations; plan, develop, test, document and review the Particula library.",
   "author": {
     "email": "kkgorkow@gmail.com",
     "name": "Kyle Gorkowski"

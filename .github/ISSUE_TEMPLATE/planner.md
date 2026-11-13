@@ -1,8 +1,8 @@
 ---
 name: Planner Rough Scope Request
-about: Structured planner intake template for deterministic scope analysis
+about: Scope a Particula feature, maintenance change, or research task
 title: "[Planner]: "
-labels: ["agent", "blocked", "model:default", "type:planner"]
+labels: []
 assignees: ""
 ---
 
@@ -30,7 +30,7 @@ assignees: ""
 | Validation | - [ ] | - [ ] |
 
 ## Codebase Research References
-Use this section for concrete findings from `codebase-researcher` or manual repo review.
+Use this section for concrete findings from source inspection and relevant tests.
 
 | Reference | What It Shows | Planning Impact |
 |-----------|---------------|-----------------|
@@ -50,8 +50,7 @@ Use this section for concrete findings from `codebase-researcher` or manual repo
 
 ## Child Tracks
 Track Type must be one of `Feature`, `Maintenance`, or `Research`.
-All child tracks in a planner request must use the same Track Type; do not mix
-Feature, Maintenance, and Research child plans in one request.
+Use child tracks only when the work has independently reviewable parts.
 
 | Track ID | Track Type | Goal | Size (S/M/L) | Dependencies |
 |----------|------------|------|--------------|--------------|
@@ -76,10 +75,9 @@ maintenance, or research phases instead of generic placeholders.
   - [ ] Listed below
 
 ## Related Plan
-- Related Plan ID (optional):
-- Allowed formats: E{n}, F{n}, E{n}-F{m}, M{n}, E{n}-M{m}, R{n}, E{n}-R{m}
-<!-- ADW Agent: Use `adw_plans({ command: "list", json: true })` for discovery.
-Use `adw_plans({ command: "show", plan_id: "<id>", json: true })` for verification. -->
+- Related issue or plan path (optional):
+
+Repository planning guidance: `plugins/particula-helper/skills/particula-plan/SKILL.md`.
 
 ## Constraints
 - Timeline constraints:

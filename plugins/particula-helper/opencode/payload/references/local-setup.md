@@ -1,7 +1,7 @@
 # Local execution
 The plugin contains skills and supporting Python scripts, not an MCP server. A compatible host must expose local Python execution and file tools. Uploading a ZIP does not connect web/mobile chat to your computer. No API key or hosted server is needed for these scripts.
 
-Use an existing suitable environment where possible. These native starters require a Particula checkout containing the E9 native
+Use an existing suitable environment where possible. These native starters require a Particula checkout containing the 0.3.0 native
 data APIs. They do not run against the older 0.2.x facade-only API. For a new
 project, use Python 3.12 or newer and install the selected native checkout:
 

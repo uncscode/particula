@@ -26,6 +26,11 @@ SKILLS = {
     "particula-run",
     "particula-analyze",
     "particula-debug",
+    "particula-plan",
+    "particula-develop",
+    "particula-test",
+    "particula-docs",
+    "particula-review",
 }
 
 
@@ -104,7 +109,7 @@ def validate():
 
 
 def validate_skills():
-    """Validate the six skill definitions and their resource references."""
+    """Validate the skill catalog and its contained resource references."""
     catalog = []
     for skill in sorted((PLUGIN / "skills").glob("*/SKILL.md")):
         text = skill.read_text()
@@ -128,7 +133,9 @@ def validate_skills():
             {"name": meta["name"], "description": meta["description"]}
         )
     if {item["name"] for item in catalog} != SKILLS:
-        raise ValueError("Expected exactly six Particula skills")
+        raise ValueError(
+            "Particula skill catalog does not match expected names"
+        )
     return catalog
 
 
@@ -275,7 +282,9 @@ def main():
     sync_or_check(catalog, sync=args.sync)
     if args.output:
         build(args.output, manifest)
-    print("Particula Helper: six skills and host packages validated")
+    print(
+        f"Particula Helper: {len(catalog)} skills and host packages validated"
+    )
 
 
 if __name__ == "__main__":

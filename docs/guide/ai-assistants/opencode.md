@@ -3,7 +3,7 @@
 ## Native OpenCode 2 package
 
 The adapter targets OpenCode 2.1.3 and pins `@opencode/plugin` 2.1.3.
-It registers six skills from its own installed resources. Loading it reads
+It registers eleven skills from its own installed resources. Loading it reads
 package files only: it does not run Python, install dependencies into your
 project, or start simulations.
 
@@ -54,12 +54,12 @@ installation is triggered by this command.
 ## Standalone skills alternative
 
 For OpenCode versions without the OpenCode 2 plugin API, extract the ZIP into a
-temporary folder. Copy its six directories from `.opencode/skills/` into your
+temporary folder. Copy its eleven directories from `.opencode/skills/` into your
 project's `.opencode/skills/`, preserving existing directories. If any name
 already exists, stop and compare it; do not overwrite it blindly.
 
 Every copied skill contains its own scripts and references. Start a new session
-and ask it to load `particula-setup`. Remove only those six directories to undo
+and ask it to load `particula-setup`. Remove only those eleven directories to undo
 this manual installation. Do not install both the manual and native copies
 unless you intentionally want the project skills to take precedence.
 

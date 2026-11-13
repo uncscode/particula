@@ -3,6 +3,7 @@
 import importlib.util
 import json
 import os
+import re
 import subprocess
 import sys
 import zipfile
@@ -94,6 +95,53 @@ def test_generated_drift_rejected(tmp_path, monkeypatch):
     )
     with pytest.raises(ValueError, match="drift"):
         builder.sync_or_check(catalog)
+
+
+def test_repository_skills_relocate_with_their_references(tmp_path):
+    """Every host carries repository guidance without the retired tree."""
+    manifest, _ = builder.validate()
+    output = tmp_path / "archives"
+    builder.build(output, manifest)
+    repository_skills = {
+        "particula-plan",
+        "particula-develop",
+        "particula-test",
+        "particula-docs",
+        "particula-review",
+    }
+    for archive_path in output.glob("*.zip"):
+        destination = tmp_path / archive_path.stem
+        with zipfile.ZipFile(archive_path) as archive:
+            archive.extractall(destination)
+        roots = (
+            [
+                destination / "particula-helper/payload/skills",
+                destination / ".opencode/skills",
+            ]
+            if "opencode" in archive_path.name
+            else [destination / "skills"]
+        )
+        for root in roots:
+            pending = [root / name / "SKILL.md" for name in repository_skills]
+            visited = set()
+            while pending:
+                source = pending.pop().resolve()
+                if source in visited:
+                    continue
+                visited.add(source)
+                assert source.is_relative_to(destination)
+                assert source.is_file()
+                content = source.read_text()
+                relatives = re.findall(r"`((?:\.\./|\./)[^`\s]+)", content)
+                relatives += re.findall(r"\]\(([^)#]+)(?:#[^)]*)?\)", content)
+                for relative in relatives:
+                    if "://" in relative:
+                        continue
+                    target = (source.parent / relative).resolve()
+                    assert target.is_relative_to(destination)
+                    assert target.exists(), (source, relative)
+                    if target.suffix == ".md":
+                        pending.append(target)
 
 
 @pytest.mark.skipif(

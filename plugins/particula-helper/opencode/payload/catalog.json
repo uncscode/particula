@@ -12,8 +12,24 @@
     "name": "particula-debug"
   },
   {
+    "description": "Implement or refactor the Particula Python library, native data model, CPU processes, direct Warp kernels, or resident execution. Use for repository source changes, not for authoring a user simulation script.",
+    "name": "particula-develop"
+  },
+  {
+    "description": "Maintain Particula repository docstrings, scientific guides, theory, and published Python examples in Astro/Starlight, including saved outputs and links. Not for unrelated document drafting or private simulation notebooks.",
+    "name": "particula-docs"
+  },
+  {
     "description": "Explain aerosol science and Particula APIs with authoritative sources; use for tutorials, feature questions, equations, units, or choosing a modeling approach.",
     "name": "particula-guide"
+  },
+  {
+    "description": "Plan Particula repository features, maintenance, or research when a development plan or issue scope is requested; define code boundaries, scientific acceptance criteria, dependencies, and evidence. Not for designing an aerosol simulation study.",
+    "name": "particula-plan"
+  },
+  {
+    "description": "Review Particula repository changes or prepare requested commits and PR descriptions, prioritizing scientific correctness, native API contracts, validation, and evidence. Use for review/publication preparation rather than routine simulation analysis.",
+    "name": "particula-review"
   },
   {
     "description": "Execute local Particula simulations and parameter sweeps reproducibly; use when the user asks to run, simulate, compare scenarios, or save results.",
@@ -22,5 +38,9 @@
   {
     "description": "Set up and inspect a local Particula Python environment; use for installation, dependency problems, environment selection, or first-run verification.",
     "name": "particula-setup"
+  },
+  {
+    "description": "Write or run Particula repository tests, numerical parity and conservation checks, lint/type checks, or release validation; use to choose the correct package, example, infrastructure, or GPU suite.",
+    "name": "particula-test"
   }
 ]

@@ -24,7 +24,7 @@ five sections; extend an existing topic before adding another page.
 5. Add purpose, prerequisites, units, device requirements, and version context.
    Keep CPU tutorials separate from optional Warp and native-CUDA-only examples.
 
-Implementation plans and task closeouts belong in `.opencode/plans/`, not in
+Implementation plans and task closeouts belong in `plans/`, not in
 public feature pages. Durable scientific evidence belongs under
 `contribute/validation/` with revision/device provenance, limits, and open gates.
 The public roadmap contains active or pending work only.
