@@ -30,6 +30,8 @@ DEFAULT_PATHS = (
     "particula/gpu/kernels/tests/coagulation_native_test.py",
     "particula/gpu/kernels/tests/brownian_parallel_test.py",
     "particula/gpu/kernels/tests/condensation_native_test.py",
+    "particula/gpu/kernels/tests/condensation_parallel_test.py",
+    "scripts/tests/gpu_studies_test.py",
 )
 
 

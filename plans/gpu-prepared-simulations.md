@@ -95,6 +95,9 @@ profiler traces outside Git; commit compact measurements, provenance and
 publication figures. Use Nsight Systems on representative cases and attempt
 Nsight Compute without changing system security settings.
 
+Approved exception: the old Brownian comparison may use up to 40 minutes per
+case, still within the same eight-hour total. Other cases retain ten minutes.
+
 ## Documentation and acceptance
 
 All eight existing GPU scripts currently have no percent cells or graphics.
@@ -228,3 +231,20 @@ capture passed **13 tests**. Controller provenance/recovery/budget checks passed
 **7 tests**. The first uninstrumented million-slot condensation pilot was stopped
 after roughly eight minutes to investigate its bottleneck; it produced no
 qualified result. Larger scientific and performance acceptance remains pending.
+Nsight Systems then identified serial candidate/finalized inventory reductions
+as approximately 94% of kernel time for one million-slot condensation step
+(about 10.9 seconds total stepping). A follow-up performance commit will use
+deterministic chunk reductions for large slot arrays while retaining the same
+rounded-transfer corrections and bounded fallback. This changes reduction
+grouping, not physical models; conservation and numerical parity are required
+before final measurements. The original small-array route remains available.
+The chunked path passed 38 focused CPU/CUDA tests. The broader condensation and
+prepared suite passed 720 tests with five pre-existing device-error expectation
+failures; corrected binding setup and exact current error checks subsequently
+passed all 12 selected device-mismatch tests. Large-array captured/ordinary and
+checkpoint-resumed trajectories are byte-exact. A preliminary million-slot
+captured pilot passed three warmups/seven restored-state samples, seven fresh
+runs and independent inventories (three-step median 0.0677 s). The full
+1,572,864-active-particle lifecycle passed its per-process source/sink ledger,
+snapshot isolation and exact capture/restart checks. Final committed-source
+campaign evidence remains pending.

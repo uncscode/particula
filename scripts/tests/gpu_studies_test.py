@@ -131,3 +131,41 @@ def test_campaign_retains_the_full_required_matrix():
             assert case.boxes * int(case.slots * case.occupancy) > 1_000_000
         if mode == "numpy":
             assert case.family in ("condensation", "dilution")
+
+
+@pytest.mark.cuda
+def test_large_reductions_capture_and_restart_are_exact():
+    """Private reduction scratch can be reconstructed without changing physics."""
+    wp = pytest.importorskip("warp")
+    if not wp.is_cuda_available():
+        pytest.skip("CUDA unavailable")
+    from scripts.gpu_studies.validation import state_hash
+
+    case = StudyCase(
+        "parallel-continuation",
+        "condensation",
+        3,
+        4097,
+        occupancy=0.75,
+        steps=8,
+        heterogeneous=True,
+    )
+    initial, process, _ = build_case(case)
+    with process.prepare(
+        initial, device="cuda:0", time_step=case.time_step
+    ) as owner:
+        owner.capture()
+        owner.run(steps=4)
+        saved = owner.checkpoint()
+        owner.run(steps=4)
+        captured = owner.snapshot()
+    with process.resume(saved) as owner:
+        owner.capture()
+        owner.run(steps=4)
+        assert state_hash(owner.snapshot()) == state_hash(captured)
+    with process.prepare(
+        initial, device="cuda:0", time_step=case.time_step
+    ) as owner:
+        owner.run(steps=8)
+        assert state_hash(owner.snapshot()) == state_hash(captured)
+    validate_evolution(case, initial, captured)

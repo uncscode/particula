@@ -75,6 +75,7 @@ from particula.gpu.dynamics.condensation_funcs import (
     water_activity_kappa_wp,
 )
 from particula.gpu.kernels import _condensation_native as native_kernels
+from particula.gpu.kernels import _condensation_parallel as parallel_kernels
 from particula.gpu.kernels.environment import (
     _ensure_environment_arrays,
     _is_warp_array_like,
@@ -296,6 +297,7 @@ class _PreparedCondensationCall:
     distribution_kind: int
     gas_species_count: int
     failure: Any = None
+    parallel_reductions: Any = None
 
 
 def _read_float64_array(array: Any) -> np.ndarray:
@@ -2902,6 +2904,11 @@ def _prepare_condensation_step_gpu(  # noqa: C901
         particle_charge=particles.charge,
         distribution_kind=population_code,
         gas_species_count=n_gas,
+        parallel_reductions=(
+            parallel_kernels.prepare(n_boxes, n_particles, n_gas, device)
+            if n_particles >= parallel_kernels.MIN_SLOTS and n_gas > 0
+            else None
+        ),
     )
 
 
@@ -3045,25 +3052,28 @@ def _enqueue_prepared_condensation_call(
             inputs=[p.particle_masses, p.work_mass_transfer, p.candidate],
             device=p.device,
         )
-        wp.launch(
-            native_kernels.reduce_candidates,
-            dim=(n_boxes, n_gas),
-            inputs=[
-                p.candidate,
-                p.particle_concentration,
-                p.demand,
-                p.release,
-            ]
-            + (
-                [
-                    p.gas_to_particle,
-                    p.particle_volume,
-                    wp.int32(p.distribution_kind),
-                    p.particle_masses,
+        if p.parallel_reductions is not None:
+            parallel_kernels.candidates(p)
+        else:
+            wp.launch(
+                native_kernels.reduce_candidates,
+                dim=(n_boxes, n_gas),
+                inputs=[
+                    p.candidate,
+                    p.particle_concentration,
+                    p.demand,
+                    p.release,
                 ]
-            ),
-            device=p.device,
-        )
+                + (
+                    [
+                        p.gas_to_particle,
+                        p.particle_volume,
+                        wp.int32(p.distribution_kind),
+                        p.particle_masses,
+                    ]
+                ),
+                device=p.device,
+            )
         wp.launch(
             _scale_inventory_uptake_kernel,
             dim=(n_boxes, n_gas),
@@ -3077,21 +3087,24 @@ def _enqueue_prepared_condensation_call(
             + ([p.particle_to_gas]),
             device=p.device,
         )
-        wp.launch(
-            native_kernels.reduce_finalized,
-            dim=(n_boxes, n_gas),
-            inputs=[p.finalized, p.particle_concentration, p.gas_delta]
-            + (
-                [
-                    p.gas_to_particle,
-                    p.particle_volume,
-                    wp.int32(p.distribution_kind),
-                    p.particle_masses,
-                    p.gas_concentration,
-                ]
-            ),
-            device=p.device,
-        )
+        if p.parallel_reductions is not None:
+            parallel_kernels.finalized(p)
+        else:
+            wp.launch(
+                native_kernels.reduce_finalized,
+                dim=(n_boxes, n_gas),
+                inputs=[p.finalized, p.particle_concentration, p.gas_delta]
+                + (
+                    [
+                        p.gas_to_particle,
+                        p.particle_volume,
+                        wp.int32(p.distribution_kind),
+                        p.particle_masses,
+                        p.gas_concentration,
+                    ]
+                ),
+                device=p.device,
+            )
         wp.launch(
             apply_mass_transfer_kernel
             if p.failure is None
@@ -3117,24 +3130,27 @@ def _enqueue_prepared_condensation_call(
             device=p.device,
         )
         if p.energy_transfer is not None:
-            wp.launch(
-                native_kernels.energy_transfer,
-                dim=(n_boxes, n_gas),
-                inputs=[
-                    p.total_mass_transfer,
-                    p.latent_heat,
-                    p.energy_transfer,
-                ]
-                + (
-                    [
-                        p.gas_to_particle,
-                        p.particle_concentration,
-                        p.particle_volume,
-                        wp.int32(p.distribution_kind),
+            if p.parallel_reductions is not None:
+                parallel_kernels.energy(p)
+            else:
+                wp.launch(
+                    native_kernels.energy_transfer,
+                    dim=(n_boxes, n_gas),
+                    inputs=[
+                        p.total_mass_transfer,
+                        p.latent_heat,
+                        p.energy_transfer,
                     ]
-                ),
-                device=p.device,
-            )
+                    + (
+                        [
+                            p.gas_to_particle,
+                            p.particle_concentration,
+                            p.particle_volume,
+                            wp.int32(p.distribution_kind),
+                        ]
+                    ),
+                    device=p.device,
+                )
     if p.distribution_kind == 3:
         wp.launch(
             native_kernels.retire_evaporated_slots

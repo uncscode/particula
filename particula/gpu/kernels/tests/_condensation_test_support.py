@@ -10099,21 +10099,28 @@ def test_condensation_step_gpu_rejects_gas_device_mismatch(
         vapor_pressure=vapor_pressure,
     )
 
+    binding = _identity_species_binding(gpu_particles, gpu_gas)
+
     wrong_device = "cpu" if device == "cuda" else "cuda"
     if wrong_device == "cuda" and not cuda_available(wp):
         pytest.skip("CUDA not available for mismatch test")
 
     gpu_gas.molar_mass = wp.zeros(2, dtype=wp.float64, device=wrong_device)
 
-    with pytest.raises(ValueError, match="gas molar mass device mismatch"):
+    before_mass = gpu_particles.masses.numpy().copy()
+    with pytest.raises(
+        ValueError, match="species binding arrays must share one device"
+    ):
         condensation_step_gpu(
             gpu_particles,
             gpu_gas,
             temperature=298.15,
             pressure=101325.0,
             time_step=1.0,
-            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
+            species_binding=binding,
         )
+
+    npt.assert_array_equal(gpu_particles.masses.numpy(), before_mass)
 
 
 def test_condensation_step_gpu_rejects_particle_concentration_device_mismatch(
@@ -10130,6 +10137,8 @@ def test_condensation_step_gpu_rejects_particle_concentration_device_mismatch(
         vapor_pressure=vapor_pressure,
     )
 
+    binding = _identity_species_binding(gpu_particles, gpu_gas)
+
     wrong_device = "cpu" if device == "cuda" else "cuda"
     if wrong_device == "cuda" and not cuda_available(wp):
         pytest.skip("CUDA not available for mismatch test")
@@ -10140,9 +10149,10 @@ def test_condensation_step_gpu_rejects_particle_concentration_device_mismatch(
         device=wrong_device,
     )
 
+    before_mass = gpu_particles.masses.numpy().copy()
     with pytest.raises(
         ValueError,
-        match="particle concentration device mismatch",
+        match="species binding arrays must share one device",
     ):
         condensation_step_gpu(
             gpu_particles,
@@ -10150,8 +10160,10 @@ def test_condensation_step_gpu_rejects_particle_concentration_device_mismatch(
             temperature=298.15,
             pressure=101325.0,
             time_step=1.0,
-            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
+            species_binding=binding,
         )
+
+    npt.assert_array_equal(gpu_particles.masses.numpy(), before_mass)
 
 
 def test_condensation_step_gpu_rejects_particle_density_device_mismatch(
@@ -10168,21 +10180,28 @@ def test_condensation_step_gpu_rejects_particle_density_device_mismatch(
         vapor_pressure=vapor_pressure,
     )
 
+    binding = _identity_species_binding(gpu_particles, gpu_gas)
+
     wrong_device = "cpu" if device == "cuda" else "cuda"
     if wrong_device == "cuda" and not cuda_available(wp):
         pytest.skip("CUDA not available for mismatch test")
 
     gpu_particles.density = wp.zeros(2, dtype=wp.float64, device=wrong_device)
 
-    with pytest.raises(ValueError, match="particle density device mismatch"):
+    before_mass = gpu_particles.masses.numpy().copy()
+    with pytest.raises(
+        ValueError, match="species binding arrays must share one device"
+    ):
         condensation_step_gpu(
             gpu_particles,
             gpu_gas,
             temperature=298.15,
             pressure=101325.0,
             time_step=1.0,
-            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
+            species_binding=binding,
         )
+
+    npt.assert_array_equal(gpu_particles.masses.numpy(), before_mass)
 
 
 def test_condensation_step_gpu_rejects_gas_concentration_device_mismatch(
@@ -10199,6 +10218,8 @@ def test_condensation_step_gpu_rejects_gas_concentration_device_mismatch(
         vapor_pressure=vapor_pressure,
     )
 
+    binding = _identity_species_binding(gpu_particles, gpu_gas)
+
     wrong_device = "cpu" if device == "cuda" else "cuda"
     if wrong_device == "cuda" and not cuda_available(wp):
         pytest.skip("CUDA not available for mismatch test")
@@ -10209,15 +10230,20 @@ def test_condensation_step_gpu_rejects_gas_concentration_device_mismatch(
         device=wrong_device,
     )
 
-    with pytest.raises(ValueError, match="gas concentration device mismatch"):
+    before_mass = gpu_particles.masses.numpy().copy()
+    with pytest.raises(
+        ValueError, match="species binding arrays must share one device"
+    ):
         condensation_step_gpu(
             gpu_particles,
             gpu_gas,
             temperature=298.15,
             pressure=101325.0,
             time_step=1.0,
-            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
+            species_binding=binding,
         )
+
+    npt.assert_array_equal(gpu_particles.masses.numpy(), before_mass)
 
 
 def test_condensation_step_gpu_rejects_vapor_pressure_device_mismatch(
@@ -10234,6 +10260,8 @@ def test_condensation_step_gpu_rejects_vapor_pressure_device_mismatch(
         vapor_pressure=vapor_pressure,
     )
 
+    binding = _identity_species_binding(gpu_particles, gpu_gas)
+
     wrong_device = "cpu" if device == "cuda" else "cuda"
     if wrong_device == "cuda" and not cuda_available(wp):
         pytest.skip("CUDA not available for mismatch test")
@@ -10244,15 +10272,20 @@ def test_condensation_step_gpu_rejects_vapor_pressure_device_mismatch(
         device=wrong_device,
     )
 
-    with pytest.raises(ValueError, match="gas vapor pressure device mismatch"):
+    before_mass = gpu_particles.masses.numpy().copy()
+    with pytest.raises(
+        ValueError, match="species binding arrays must share one device"
+    ):
         condensation_step_gpu(
             gpu_particles,
             gpu_gas,
             temperature=298.15,
             pressure=101325.0,
             time_step=1.0,
-            species_binding=_identity_species_binding(gpu_particles, gpu_gas),
+            species_binding=binding,
         )
+
+    npt.assert_array_equal(gpu_particles.masses.numpy(), before_mass)
 
 
 @pytest.mark.gpu_parity
