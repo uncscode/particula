@@ -456,6 +456,6 @@ plt.show()
 #
 # ### Next Steps
 #
-# - [Activity Theory](../../../Theory/Activity_Calculations/activity_theory.md) - Mathematical foundations
-# - [Equilibria Theory](../../../Theory/Activity_Calculations/equilibria_theory.md) - Partitioning equations
-# - [Activity System Feature Guide](../../../Features/activity_system.md) - Full API documentation
+# - [Activity Theory](../../../theory/thermodynamics/activity-theory.md) - Mathematical foundations
+# - [Equilibria Theory](../../../theory/thermodynamics/equilibria-theory.md) - Partitioning equations
+# - [Activity System Feature Guide](../../../guide/processes/activity.md) - Full API documentation

@@ -24,7 +24,7 @@
 # -59% to +35%. These are observed defects, not acceptable error tolerances.
 # Reducing the timestep does not supply the missing species transport.
 # Use a supported particle-resolved workflow when composition varies by size;
-# see the [coagulation contract](../../Features/coagulation_strategy_system.md)
+# see the [coagulation contract](../../guide/processes/coagulation.md)
 # and [resolved example](../processes/coagulation/coagulation_3_particle_resolved_pattern.ipynb).
 
 #
