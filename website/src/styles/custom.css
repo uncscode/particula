@@ -76,6 +76,13 @@ pre.mermaid svg { display: block; margin: auto; max-width: 100%; }
   .page-menu .sl-container { width: auto; max-width: 100%; }
   .page-menu h2 { font-size: .85rem; }
   .page-menu a { font-size: .75rem; }
+  /* Leave breathing room beside the open drawer without moving the article's center. */
+  body:has(.navigation-drawer:popover-open) .reading-layout.has-page-menu {
+    grid-template-columns: minmax(21.5rem, 1fr) minmax(0, 56rem) minmax(21.5rem, 1fr);
+  }
+  body:has(.navigation-drawer:popover-open) .reading-layout:not(.has-page-menu) .main-pane {
+    max-width: min(56rem, calc(100% - 43rem));
+  }
 }
 @media print {
   .page-header, .navigation-drawer, .page-menu { display: none !important; }

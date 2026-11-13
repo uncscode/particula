@@ -1,0 +1,16 @@
+---
+import SidebarSublist from '@astrojs/starlight/components/SidebarSublist.astro';
+import MobileMenuFooter from '@astrojs/starlight/components/MobileMenuFooter.astro';
+
+const { sidebar } = Astro.locals.starlightRoute;
+// Starlight opens groups containing the current page automatically. Start every
+// other group collapsed, without restoring unrelated branches from prior visits.
+function collapseGroups(entries: typeof sidebar): typeof sidebar {
+  return entries.map((entry) => entry.type === 'group'
+    ? { ...entry, collapsed: true, entries: collapseGroups(entry.entries) }
+    : entry);
+}
+---
+
+<SidebarSublist sublist={collapseGroups(sidebar)} />
+<div class="md:sl-hidden"><MobileMenuFooter /></div>
