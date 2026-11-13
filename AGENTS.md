@@ -59,7 +59,7 @@ For using Particula in a scientific study, the plugin separately provides
   Do not accumulate a changelog or add routine fixes, test results, internal
   implementation notes, or planned work. Keep the markers and line cap intact.
 - Keep the rest of the README focused on the project overview, installation,
-  a quick start, and links. Put detailed usage, implementation, release, and
+  and links to guides. Put detailed usage, implementation, release, and
   troubleshooting guidance in the owning `docs/` page or skill reference.
 - Keep shared conventions and detailed contracts in the linked skills/references
   and owning documentation rather than copying them back into this file.
