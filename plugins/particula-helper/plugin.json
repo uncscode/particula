@@ -24,19 +24,8 @@
         "shortDescription": "Learn, run, analyze aerosols"
       },
       "requires_local_executor": true,
-      "review": {
-        "prompts": [
-          "Help me install Particula and check my local Python environment.",
-          "Build and run a small condensation simulation, then plot and explain the results.",
-          "Debug my Particula script and check its units, conservation, and time-step sensitivity.",
-          "Review a proposed Particula library change for API correctness, scientific assumptions, and suitable tests."
-        ],
-        "commerce": false,
-        "commerce_description": "No payments or purchases are required to use this plugin."
-      },
       "publication": {
-        "countries": [],
-        "release_notes": "Includes six scientific workflows and five repository development skills, local documentation discovery, and desktop execution metadata. Adds reproducible public submission packages and merge-triggered build artifacts."
+        "release_notes": "Includes six scientific workflows and five repository development skills, local documentation discovery, and desktop execution metadata. Adds reproducible GitHub distribution packages and build artifacts after every main merge."
       }
     }
   },

@@ -190,89 +190,6 @@ def write_zip(path, files):
             archive.writestr(info, content)
 
 
-def check_public_archive(path):
-    """Inspect the skills-only upload without claiming portal approval."""
-    with zipfile.ZipFile(path) as archive:
-        names = archive.namelist()
-        if len(names) != len(set(names)) or archive.testzip() is not None:
-            raise ValueError("Duplicate or corrupt public archive entries")
-        for name in names:
-            parts = Path(name).parts
-            if (
-                Path(name).is_absolute()
-                or ".." in parts
-                or "\\" in name
-                or any(part.startswith(".") for part in parts)
-                or "hooks" in parts
-                or name in ("mcp.json", "mcp_servers.json")
-            ):
-                raise ValueError(f"Unsupported public archive entry: {name}")
-        manifest = json.loads(archive.read("plugin.json"))
-        extension = manifest["extensions"]["com.openai"]
-        validate_public_components(manifest)
-        if extension.get("requires_local_executor") is not True:
-            raise ValueError("Particula public upload requires local execution")
-        skills = {
-            name.split("/")[1]
-            for name in names
-            if re.fullmatch(r"skills/[^/]+/SKILL.md", name)
-        }
-        if skills != SKILLS:
-            raise ValueError("Public archive is missing expected skills")
-        for key in ("logo", "composerIcon", "logoDark", "composerIconDark"):
-            icon = extension["interface"].get(key)
-            if icon is not None:
-                if not icon.startswith("./") or icon[2:] not in names:
-                    raise ValueError(f"Missing public icon: {key}")
-        return manifest
-
-
-def validate_public_components(manifest):
-    """Reject integrations that do not belong in this skills-only upload."""
-    extension = manifest["extensions"]["com.openai"]
-    for key in ("apps", "hooks", "mcpServers"):
-        if manifest.get(key) is not None or extension.get(key) is not None:
-            raise ValueError(f"Public upload cannot declare {key}")
-
-
-def write_public_submission(output, files, provenance):
-    """Build a portable upload candidate and an explicit publisher handoff."""
-    manifest = json.loads(files["plugin.json"])
-    version = manifest["version"]
-    archive = output / f"particula-helper-openai-{version}.zip"
-    write_zip(archive, {**files, "BUILD.json": provenance})
-    check_public_archive(archive)
-    extension = manifest["extensions"]["com.openai"]
-    source = json.loads(provenance)
-    notes = extension.get("publication", {}).get("release_notes", "")
-    (output / "OPENAI-SUBMISSION.md").write_text(
-        f"# Particula Helper {version}\n\n"
-        f"Upload candidate: `{archive.name}`\n\n"
-        f"Source commit: `{source['source_revision']}`\n\n"
-        f"Package sources modified locally: {source['working_tree_dirty']}\n\n"
-        f"{notes}\n\n"
-        "## Publication handoff\n\n"
-        "This is a locally validated package candidate, not an approved or "
-        "published OpenAI release. GitHub Actions does not submit it.\n\n"
-        "- Verify the requested Particula Developers identity in the intended "
-        "OpenAI organization; the portal controls the displayed publisher.\n"
-        "- Confirm all supported countries and no required payments or "
-        "purchases in the imported metadata.\n"
-        "- Finish and verify product, support, privacy and terms pages for "
-        "the listing; no policy URLs or legal commitments are invented here.\n"
-        "- Test a clean desktop installation and the main workflows. "
-        "Archive smoke tests do not prove live host discovery.\n"
-        "- Upload to the existing public plugin when one exists. Keep the "
-        "same identity; do not create a duplicate on each release.\n"
-        "- Inspect metadata and skill scan results, complete applicable "
-        "attestations, submit for review, then publish after approval.\n\n"
-        "Skills-only packages do not need MCP review cases, reviewer "
-        "credentials or an MCP demo recording.\n\n"
-        "[OpenAI submission process]"
-        "(https://developers.openai.com/plugins/deploy/submission)\n"
-    )
-
-
 def write_github_release_notes(output, manifest, provenance):
     """Describe the tested GitHub packages independently of store submission."""
     source = json.loads(provenance)
@@ -304,9 +221,7 @@ def write_github_release_notes(output, manifest, provenance):
         "assistant-plugins.yml?query=branch%3Amain+event%3Apush). "
         "Workflow downloads expire after 30 days. Version bumps create "
         "draft GitHub releases for longer-term distribution.\n\n"
-        "This distribution does not require OpenAI store verification. "
-        "The optional OpenAI ZIP and OPENAI-SUBMISSION.md are retained "
-        "for a possible future submission, not a published store listing.\n"
+        "This distribution does not require OpenAI store verification.\n"
     )
 
 
@@ -359,7 +274,6 @@ def build(output, manifest):
         ).read_bytes()
         selected["BUILD.json"] = provenance
         write_zip(output / f"particula-helper-{host}.zip", selected)
-    write_public_submission(output, files, provenance)
     write_github_release_notes(output, manifest, provenance)
     # Native package plus a manual skills alternative in one OpenCode ZIP.
     native = {
