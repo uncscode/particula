@@ -32,24 +32,22 @@ final_aerosol = chained.execute(aerosol, time_step=1.0)
 AVAILABLE_TQDM = True
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L30-L30)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L32-L32)
 
 ## particula.runnable.RunnableABC
 
 *class*
 
 ```python
-class RunnableABC(ABC)
+class RunnableABC
 ```
-
-Bases: `ABC`
 
 Abstract base class for processes modifying an Aerosol instance.
 
-This class enforces the implementation of a process rate calculation
-and an execution method that modifies the Aerosol in-place. Subclasses
-must implement both 'rate' and 'execute', which define how the process
-affects the Aerosol over a time step.
+The default drivers stage and execute single-box hooks across a batch.
+Implement ``_rate_box``, ``_execute_box``, and ``_writer_fields`` to use
+this transaction boundary. Existing subclasses overriding public methods
+retain their own execution and validation responsibilities.
 
 **Functions**
 
@@ -74,7 +72,7 @@ class CustomProcess(Runnable):
 >
 > - No references available yet.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L36-L129)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L38-L188)
 
 ### particula.runnable.RunnableABC.__or__
 
@@ -104,64 +102,119 @@ combined_process = process1 | process2
 final_aerosol = combined_process.execute(aerosol, time_step=1.0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L108-L129)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L167-L188)
+
+### particula.runnable.RunnableABC._box_worker
+
+*method*
+
+```python
+def _box_worker(box, boxes, transaction)
+```
+
+Create isolated hook state for a single box.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L151-L153)
+
+### particula.runnable.RunnableABC._execute_box
+
+*method*
+
+```python
+def _execute_box(aerosol, time_step, sub_steps=1)
+```
+
+Execute the single-box numerical building block.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L163-L165)
+
+### particula.runnable.RunnableABC._is_stochastic
+
+*method*
+
+```python
+def _is_stochastic(aerosol)
+```
+
+Report whether this process requires independent box streams.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L147-L149)
+
+### particula.runnable.RunnableABC._prepare_commit
+
+*method*
+
+```python
+def _prepare_commit(workers, uses_context)
+```
+
+Prepare a non-failing diagnostics publisher before numeric writes.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L155-L157)
+
+### particula.runnable.RunnableABC._rate_box
+
+*method*
+
+```python
+def _rate_box(aerosol)
+```
+
+Evaluate the single-box numerical building block.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L159-L161)
+
+### particula.runnable.RunnableABC._validate_batch
+
+*method*
+
+```python
+def _validate_batch(aerosol)
+```
+
+Validate process-wide controls before staging boxes.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L140-L141)
+
+### particula.runnable.RunnableABC._writer_fields
+
+*method*
+
+```python
+def _writer_fields(aerosol)
+```
+
+Declare numeric destinations for transactional publication.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L143-L145)
 
 ### particula.runnable.RunnableABC.execute
 
-*method* · *abstract*
+*method*
 
 ```python
-def execute(aerosol: Aerosol, time_step: float, sub_steps: int = 1) -> Aerosol
+def execute(aerosol: Aerosol, time_step: float, sub_steps: int = 1, *, context=None) -> Aerosol
 ```
 
-Execute the process, modifying the Aerosol in-place over a time step.
+Advance every box, committing atomically after each process substep.
 
-**Parameters**
+Contexts own independent logical-box random streams. Completed substeps
+remain committed if a later one fails. Custom subclasses overriding
+this method retain responsibility for their own execution semantics.
 
-- `aerosol` (`Aerosol`) — The Aerosol instance to be updated.
-- `time_step` (`float`) — The time step size in seconds.
-- `sub_steps` (`int`) (default: `1`) — Number of sub-steps to subdivide the time step, default 1.
-
-**Returns**
-
-- (`Aerosol`) — - The updated Aerosol after this process runs.
-
-**Examples**
-
-```py title="Executing the process"
-process = CustomProcess()
-updated_aerosol = process.execute(my_aerosol, time_step=1.0)
-```
-
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L83-L106)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L84-L138)
 
 ### particula.runnable.RunnableABC.rate
 
-*method* · *abstract*
+*method*
 
 ```python
 def rate(aerosol: Aerosol) -> Any
 ```
 
-Calculate and return the rate of this process for the given Aerosol.
+Evaluate detached box hooks and retain a leading box axis.
 
-**Parameters**
-
-- `aerosol` (`Aerosol`) — The Aerosol instance on which to calculate the rate.
-
-**Returns**
-
-- (`Any`) — - Any : The computed rate of this process.
-
-**Examples**
-
-```py title="Using the rate method"
-process = CustomProcess()
-process_rate = process.rate(my_aerosol)
-print(process_rate)
-```
-
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L65-L81)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L67-L82)
 
 ## particula.runnable.RunnableSequence
 
@@ -196,7 +249,7 @@ sequence.add_process(AnotherProcess())
 final_aerosol = sequence.execute(aerosol, time_step=2.0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L132-L238)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L191-L307)
 
 ### particula.runnable.RunnableSequence.processes
 
@@ -206,7 +259,7 @@ final_aerosol = sequence.execute(aerosol, time_step=2.0)
 processes: list[RunnableABC] = []
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L161-L161)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L220-L220)
 
 ### particula.runnable.RunnableSequence.__init__
 
@@ -220,7 +273,7 @@ Initialize the RunnableSequence.
 
 Sets up an empty list to hold the sequence of Runnable processes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L156-L161)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L215-L220)
 
 ### particula.runnable.RunnableSequence.__or__
 
@@ -249,7 +302,7 @@ sequence |= CustomProcess()
 sequence = sequence | AnotherProcess()
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L220-L238)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L289-L307)
 
 ### particula.runnable.RunnableSequence.add_process
 
@@ -272,14 +325,14 @@ sequence = RunnableSequence()
 sequence.add_process(CustomProcess())
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L163-L175)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L222-L234)
 
 ### particula.runnable.RunnableSequence.execute
 
 *method*
 
 ```python
-def execute(aerosol: Aerosol, time_step: float, sub_steps: int = 1) -> Aerosol
+def execute(aerosol: Aerosol, time_step: float, sub_steps: int = 1, *, context=None) -> Aerosol
 ```
 
 Execute all processes in the sequence on the given Aerosol.
@@ -307,4 +360,4 @@ final_aerosol = sequence.execute(
 )
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L177-L218)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L236-L287)

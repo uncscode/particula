@@ -26,7 +26,7 @@ path.
 __version__ = '0.3.0'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/__init__.py#L57-L57)
+[View source](https://github.com/uncscode/particula/blob/main/particula/__init__.py#L58-L58)
 
 ## particula.logger
 
@@ -36,10 +36,11 @@ __version__ = '0.3.0'
 logger = setup()
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/__init__.py#L60-L60)
+[View source](https://github.com/uncscode/particula/blob/main/particula/__init__.py#L61-L61)
 
 **Modules**
 
+- `particula._cpu_batch`
 - `particula.abc_builder`
 - `particula.abc_factory`
 - `particula.activity`
@@ -56,6 +57,88 @@ logger = setup()
 - `particula.particles`
 - `particula.runnable`
 - `particula.util`
+
+---
+
+# particula._cpu_batch
+
+*module*
+
+Private CPU batch staging shared by native runnable implementations.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/_cpu_batch.py#L1-L1)
+
+## particula._cpu_batch.arrays
+
+*function*
+
+```python
+def arrays(aerosol)
+```
+
+List stored numeric arrays in a stable ownership order.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/_cpu_batch.py#L34-L52)
+
+## particula._cpu_batch.box_view
+
+*function*
+
+```python
+def box_view(aerosol, box)
+```
+
+Expose one staged box through existing native container types.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/_cpu_batch.py#L111-L138)
+
+## particula._cpu_batch.detached
+
+*function*
+
+```python
+def detached(aerosol)
+```
+
+Stage independent containers preserving population metadata.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/_cpu_batch.py#L102-L108)
+
+## particula._cpu_batch.duration
+
+*function*
+
+```python
+def duration(time_step, sub_steps)
+```
+
+Validate scalar controls before allocating or evaluating state.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/_cpu_batch.py#L14-L31)
+
+## particula._cpu_batch.publish
+
+*function*
+
+```python
+def publish(aerosol, candidate, writers)
+```
+
+Publish selected fields by identity with rollback on write failure.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/_cpu_batch.py#L141-L153)
+
+## particula._cpu_batch.validate
+
+*function*
+
+```python
+def validate(aerosol, writers=())
+```
+
+Validate original storage before detached copies can hide defects.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/_cpu_batch.py#L55-L99)
 
 ---
 
@@ -32384,7 +32467,7 @@ Validate alignment and return particle-lane source mass.
 Runnable particle-centric aerosol processes.
 
 Includes condensation and evaporation, coagulation, wall loss, dilution, and
-the CPU-only single-box nucleation process.
+the CPU-only nucleation process.
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L1-L1)
 
@@ -32396,17 +32479,17 @@ the CPU-only single-box nucleation process.
 _MAX_NUCLEATION_SUB_STEPS = 10000
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L59-L59)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L60-L60)
 
 ## particula.dynamics.particle_process.Coagulation
 
 *class*
 
 ```python
-class Coagulation(RunnableABC)
+class Coagulation(_NativeBatchRunnable)
 ```
 
-Bases: `particula.runnable.RunnableABC`
+Bases: `particula.dynamics.particle_process._NativeBatchRunnable`
 
 Implements a coagulation process for aerosol particles.
 
@@ -32439,7 +32522,27 @@ updated_aerosol = coagulation.execute(aerosol, time_step=0.5)
 > - Seinfeld, J. H. and Pandis, S. N., "Atmospheric Chemistry and
 >   Physics: From Air Pollution to Climate Change," Wiley, 2016.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L478-L583)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L638-L746)
+
+### particula.dynamics.particle_process.Coagulation._namespace
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+_namespace = 'coagulation'
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L670-L670)
+
+### particula.dynamics.particle_process.Coagulation._strategy_attribute
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+_strategy_attribute = 'coagulation_strategy'
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L669-L669)
 
 ### particula.dynamics.particle_process.Coagulation.coagulation_strategy
 
@@ -32449,7 +32552,7 @@ updated_aerosol = coagulation.execute(aerosol, time_step=0.5)
 coagulation_strategy = coagulation_strategy
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L516-L516)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L679-L679)
 
 ### particula.dynamics.particle_process.Coagulation.__init__
 
@@ -32465,14 +32568,14 @@ Initialize the Coagulation process.
 
 - `coagulation_strategy` (`CoagulationStrategyABC`) — The coagulation strategy to use, describing how particles collide and combine.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L509-L516)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L672-L679)
 
-### particula.dynamics.particle_process.Coagulation.execute
+### particula.dynamics.particle_process.Coagulation._execute_box
 
 *method*
 
 ```python
-def execute(aerosol: Aerosol, time_step: float, sub_steps: int = 1) -> Aerosol
+def _execute_box(aerosol: Aerosol, time_step: float, sub_steps: int = 1) -> Aerosol
 ```
 
 Perform the coagulation process over a given time step.
@@ -32496,14 +32599,14 @@ updated_aerosol = coagulation.execute(
 # The aerosol now reflects changes from particle collisions
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L518-L558)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L681-L721)
 
-### particula.dynamics.particle_process.Coagulation.rate
+### particula.dynamics.particle_process.Coagulation._rate_box
 
 *method*
 
 ```python
-def rate(aerosol: Aerosol) -> Any
+def _rate_box(aerosol: Aerosol) -> Any
 ```
 
 Compute the coagulation rate for each particle in the aerosol.
@@ -32523,7 +32626,85 @@ rates = coagulation.rate(aerosol)
 # rates might look like array([0.1, 0.05, ...])
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L560-L583)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L723-L746)
+
+### particula.dynamics.particle_process.Coagulation._box_worker
+
+*method*
+
+```python
+def _box_worker(box, boxes, transaction)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L309-L337)
+
+### particula.dynamics.particle_process.Coagulation._is_stochastic
+
+*method*
+
+```python
+def _is_stochastic(aerosol)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L299-L307)
+
+### particula.dynamics.particle_process.Coagulation._prepare_commit
+
+*method*
+
+```python
+def _prepare_commit(workers, uses_context)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L339-L382)
+
+### particula.dynamics.particle_process.Coagulation._validate_batch
+
+*method*
+
+```python
+def _validate_batch(aerosol)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L259-L278)
+
+### particula.dynamics.particle_process.Coagulation._validate_gas_schema
+
+*method*
+
+```python
+def _validate_gas_schema(gas)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+Reject raw replacements before GasData copying can normalize them.
+
+Only gas-coupled processes require these schemas. Condensation uses
+float64 throughout; nucleation allows real numeric molar-mass metadata
+but its writable gas inventory must remain float64.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L280-L297)
+
+### particula.dynamics.particle_process.Coagulation._writer_fields
+
+*method*
+
+```python
+def _writer_fields(aerosol)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L239-L257)
 
 ### particula.dynamics.particle_process.Coagulation.__or__
 
@@ -32555,17 +32736,49 @@ combined_process = process1 | process2
 final_aerosol = combined_process.execute(aerosol, time_step=1.0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L108-L129)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L167-L188)
+
+### particula.dynamics.particle_process.Coagulation.execute
+
+*method*
+
+```python
+def execute(aerosol: Aerosol, time_step: float, sub_steps: int = 1, *, context=None) -> Aerosol
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Advance every box, committing atomically after each process substep.
+
+Contexts own independent logical-box random streams. Completed substeps
+remain committed if a later one fails. Custom subclasses overriding
+this method retain responsibility for their own execution semantics.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L84-L138)
+
+### particula.dynamics.particle_process.Coagulation.rate
+
+*method*
+
+```python
+def rate(aerosol: Aerosol) -> Any
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Evaluate detached box hooks and retain a leading box axis.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L67-L82)
 
 ## particula.dynamics.particle_process.Dilution
 
 *class*
 
 ```python
-class Dilution(RunnableABC)
+class Dilution(_NativeBatchRunnable)
 ```
 
-Bases: `particula.runnable.RunnableABC`
+Bases: `particula.dynamics.particle_process._NativeBatchRunnable`
 
 Apply a dilution strategy over one or more equal substeps.
 
@@ -32581,7 +32794,27 @@ validation and atomicity.
 
 - `dilution_strategy` (`DilutionStrategyProtocol`) — Public ``DilutionStrategy`` or a compatible custom strategy that reports particle-number rates and applies aerosol dilution steps.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L679-L763)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L845-L948)
+
+### particula.dynamics.particle_process.Dilution._namespace
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+_namespace = 'dilution'
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L863-L863)
+
+### particula.dynamics.particle_process.Dilution._strategy_attribute
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+_strategy_attribute = 'dilution_strategy'
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L862-L862)
 
 ### particula.dynamics.particle_process.Dilution.dilution_strategy
 
@@ -32591,7 +32824,7 @@ validation and atomicity.
 dilution_strategy = dilution_strategy
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L703-L703)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L888-L888)
 
 ### particula.dynamics.particle_process.Dilution.__init__
 
@@ -32606,14 +32839,14 @@ Initialize the dilution runnable.
 dilution_strategy: Public ``DilutionStrategy`` or compatible custom
     strategy that applies dilution to an aerosol.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L696-L703)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L881-L888)
 
-### particula.dynamics.particle_process.Dilution.execute
+### particula.dynamics.particle_process.Dilution._execute_box
 
 *method*
 
 ```python
-def execute(aerosol: Aerosol, time_step: float | np.number, sub_steps: int | np.integer = 1) -> Aerosol
+def _execute_box(aerosol: Aerosol, time_step: float | np.number, sub_steps: int | np.integer = 1) -> Aerosol
 ```
 
 Apply dilution as equal, sequential substeps over a total duration.
@@ -32643,14 +32876,14 @@ supported concrete aerosol state is invalid.
 - `TypeError` — If ``time_step`` is not numeric or a required supported
 concrete aerosol value is not numeric.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L717-L763)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L902-L948)
 
-### particula.dynamics.particle_process.Dilution.rate
+### particula.dynamics.particle_process.Dilution._rate_box
 
 *method*
 
 ```python
-def rate(aerosol: Aerosol) -> float | NDArray[np.float64]
+def _rate_box(aerosol: Aerosol) -> float | NDArray[np.float64]
 ```
 
 Delegate particle-number dilution-rate evaluation to the strategy.
@@ -32664,7 +32897,109 @@ Delegate particle-number dilution-rate evaluation to the strategy.
 - (`float | NDArray[np.float64]`) — Particle-number concentration rate [1/(m³ s)] with the scalar or
 - (`float | NDArray[np.float64]`) — array shape returned by the strategy.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L705-L715)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L890-L900)
+
+### particula.dynamics.particle_process.Dilution.execute
+
+*method*
+
+```python
+def execute(aerosol, time_step, sub_steps=1, *, context=None)
+```
+
+Batch native dilution; retain legacy custom strategy delegation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L865-L873)
+
+### particula.dynamics.particle_process.Dilution.rate
+
+*method*
+
+```python
+def rate(aerosol)
+```
+
+Return native batched rates or the custom strategy's own result.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L875-L879)
+
+### particula.dynamics.particle_process.Dilution._box_worker
+
+*method*
+
+```python
+def _box_worker(box, boxes, transaction)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L309-L337)
+
+### particula.dynamics.particle_process.Dilution._is_stochastic
+
+*method*
+
+```python
+def _is_stochastic(aerosol)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L299-L307)
+
+### particula.dynamics.particle_process.Dilution._prepare_commit
+
+*method*
+
+```python
+def _prepare_commit(workers, uses_context)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L339-L382)
+
+### particula.dynamics.particle_process.Dilution._validate_batch
+
+*method*
+
+```python
+def _validate_batch(aerosol)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L259-L278)
+
+### particula.dynamics.particle_process.Dilution._validate_gas_schema
+
+*method*
+
+```python
+def _validate_gas_schema(gas)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+Reject raw replacements before GasData copying can normalize them.
+
+Only gas-coupled processes require these schemas. Condensation uses
+float64 throughout; nucleation allows real numeric molar-mass metadata
+but its writable gas inventory must remain float64.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L280-L297)
+
+### particula.dynamics.particle_process.Dilution._writer_fields
+
+*method*
+
+```python
+def _writer_fields(aerosol)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L239-L257)
 
 ### particula.dynamics.particle_process.Dilution.__or__
 
@@ -32696,7 +33031,7 @@ combined_process = process1 | process2
 final_aerosol = combined_process.execute(aerosol, time_step=1.0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L108-L129)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L167-L188)
 
 ## particula.dynamics.particle_process.DilutionStrategyProtocol
 
@@ -32710,7 +33045,7 @@ Bases: `Protocol`
 
 Structural contract for strategies compatible with ``Dilution``.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L101-L108)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L102-L109)
 
 ### particula.dynamics.particle_process.DilutionStrategyProtocol.rate
 
@@ -32722,7 +33057,7 @@ def rate(aerosol: Aerosol) -> float | NDArray[np.float64]
 
 Return the particle-number concentration rate.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L104-L105)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L105-L106)
 
 ### particula.dynamics.particle_process.DilutionStrategyProtocol.step
 
@@ -32734,17 +33069,17 @@ def step(aerosol: Aerosol, time_step: float) -> Aerosol
 
 Apply one dilution step to an aerosol.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L107-L108)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L108-L109)
 
 ## particula.dynamics.particle_process.MassCondensation
 
 *class*
 
 ```python
-class MassCondensation(RunnableABC)
+class MassCondensation(_NativeBatchRunnable)
 ```
 
-Bases: `particula.runnable.RunnableABC`
+Bases: `particula.dynamics.particle_process._NativeBatchRunnable`
 
 Handles the mass condensation process for aerosols.
 
@@ -32777,7 +33112,27 @@ References:
 - Seinfeld, J. H. and Pandis, S. N., "Atmospheric Chemistry and Physics:
   From Air Pollution to Climate Change," Wiley, 2016.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L363-L475)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L520-L635)
+
+### particula.dynamics.particle_process.MassCondensation._namespace
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+_namespace = 'condensation'
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L553-L553)
+
+### particula.dynamics.particle_process.MassCondensation._strategy_attribute
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+_strategy_attribute = 'condensation_strategy'
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L552-L552)
 
 ### particula.dynamics.particle_process.MassCondensation.condensation_strategy
 
@@ -32787,7 +33142,7 @@ References:
 condensation_strategy = condensation_strategy
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L405-L405)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L565-L565)
 
 ### particula.dynamics.particle_process.MassCondensation.__init__
 
@@ -32807,14 +33162,14 @@ Initialize the MassCondensation process.
 
 - `result` (`None`) — No return value.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L395-L405)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L555-L565)
 
-### particula.dynamics.particle_process.MassCondensation.execute
+### particula.dynamics.particle_process.MassCondensation._execute_box
 
 *method*
 
 ```python
-def execute(aerosol: Aerosol, time_step: float, sub_steps: int = 1) -> Aerosol
+def _execute_box(aerosol: Aerosol, time_step: float, sub_steps: int = 1) -> Aerosol
 ```
 
 Perform the mass condensation process over a given time step.
@@ -32838,14 +33193,14 @@ updated_aerosol = condensation.execute(
 # The aerosol now has reduced/increased particle/gas mass
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L407-L449)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L567-L609)
 
-### particula.dynamics.particle_process.MassCondensation.rate
+### particula.dynamics.particle_process.MassCondensation._rate_box
 
 *method*
 
 ```python
-def rate(aerosol: Aerosol) -> Any
+def _rate_box(aerosol: Aerosol) -> Any
 ```
 
 Compute mass condensation rates for each particle.
@@ -32865,7 +33220,85 @@ rates = condensation.rate(aerosol)
 # rates may look like array([1.2e-12, 4.5e-12, ...])
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L451-L475)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L611-L635)
+
+### particula.dynamics.particle_process.MassCondensation._box_worker
+
+*method*
+
+```python
+def _box_worker(box, boxes, transaction)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L309-L337)
+
+### particula.dynamics.particle_process.MassCondensation._is_stochastic
+
+*method*
+
+```python
+def _is_stochastic(aerosol)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L299-L307)
+
+### particula.dynamics.particle_process.MassCondensation._prepare_commit
+
+*method*
+
+```python
+def _prepare_commit(workers, uses_context)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L339-L382)
+
+### particula.dynamics.particle_process.MassCondensation._validate_batch
+
+*method*
+
+```python
+def _validate_batch(aerosol)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L259-L278)
+
+### particula.dynamics.particle_process.MassCondensation._validate_gas_schema
+
+*method*
+
+```python
+def _validate_gas_schema(gas)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+Reject raw replacements before GasData copying can normalize them.
+
+Only gas-coupled processes require these schemas. Condensation uses
+float64 throughout; nucleation allows real numeric molar-mass metadata
+but its writable gas inventory must remain float64.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L280-L297)
+
+### particula.dynamics.particle_process.MassCondensation._writer_fields
+
+*method*
+
+```python
+def _writer_fields(aerosol)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L239-L257)
 
 ### particula.dynamics.particle_process.MassCondensation.__or__
 
@@ -32897,19 +33330,51 @@ combined_process = process1 | process2
 final_aerosol = combined_process.execute(aerosol, time_step=1.0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L108-L129)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L167-L188)
+
+### particula.dynamics.particle_process.MassCondensation.execute
+
+*method*
+
+```python
+def execute(aerosol: Aerosol, time_step: float, sub_steps: int = 1, *, context=None) -> Aerosol
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Advance every box, committing atomically after each process substep.
+
+Contexts own independent logical-box random streams. Completed substeps
+remain committed if a later one fails. Custom subclasses overriding
+this method retain responsibility for their own execution semantics.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L84-L138)
+
+### particula.dynamics.particle_process.MassCondensation.rate
+
+*method*
+
+```python
+def rate(aerosol: Aerosol) -> Any
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Evaluate detached box hooks and retain a leading box axis.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L67-L82)
 
 ## particula.dynamics.particle_process.Nucleation
 
 *class*
 
 ```python
-class Nucleation(RunnableABC)
+class Nucleation(_NativeBatchRunnable)
 ```
 
-Bases: `particula.runnable.RunnableABC`
+Bases: `particula.dynamics.particle_process._NativeBatchRunnable`
 
-Apply mapped single-box nucleation to a native resolved population.
+Apply mapped nucleation independently to native resolved boxes.
 
 Source rates and demand planning finalization use densities. The commit
 converts event
@@ -32917,7 +33382,37 @@ density to represented counts using the current physical volume. Each
 attempted substep is atomic; earlier successful substeps remain applied.
 Gas and environment are read from the currently held aerosol every time.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L232-L360)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L385-L517)
+
+### particula.dynamics.particle_process.Nucleation._maximum_sub_steps
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+_maximum_sub_steps = _MAX_NUCLEATION_SUB_STEPS
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L397-L397)
+
+### particula.dynamics.particle_process.Nucleation._namespace
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+_namespace = 'nucleation'
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L396-L396)
+
+### particula.dynamics.particle_process.Nucleation._strategy_attribute
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+_strategy_attribute = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L395-L395)
 
 ### particula.dynamics.particle_process.Nucleation.commit_config
 
@@ -32927,7 +33422,7 @@ Gas and environment are read from the currently held aerosol every time.
 commit_config = commit_config
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L255-L255)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L412-L412)
 
 ### particula.dynamics.particle_process.Nucleation.source_config
 
@@ -32937,7 +33432,7 @@ commit_config = commit_config
 source_config = source_config
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L254-L254)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L411-L411)
 
 ### particula.dynamics.particle_process.Nucleation.__init__
 
@@ -32949,7 +33444,19 @@ def __init__(source_config: NucleationSourceConfig, commit_config: NucleationCom
 
 Bind immutable source selection and count-based commit controls.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L242-L255)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L399-L412)
+
+### particula.dynamics.particle_process.Nucleation._execute_box
+
+*method*
+
+```python
+def _execute_box(aerosol: Aerosol, time_step: float | np.number, sub_steps: int | np.integer = 1) -> Aerosol
+```
+
+Commit equal sequential source substeps and retain all identities.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L477-L517)
 
 ### particula.dynamics.particle_process.Nucleation._rate
 
@@ -32961,7 +33468,19 @@ def _rate(gas: GasData, environment: EnvironmentData) -> float
 
 Evaluate the current precursor and optional saturation gate.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L298-L313)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L455-L470)
+
+### particula.dynamics.particle_process.Nucleation._rate_box
+
+*method*
+
+```python
+def _rate_box(aerosol: Aerosol) -> float
+```
+
+Return the current potential event density rate [m^-3 s^-1].
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L472-L475)
 
 ### particula.dynamics.particle_process.Nucleation._state
 
@@ -32973,31 +33492,85 @@ def _state(aerosol: Aerosol) -> tuple[ParticleData, GasData, EnvironmentData]
 
 Validate current topology and configured injection alignment.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L257-L296)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L414-L453)
 
-### particula.dynamics.particle_process.Nucleation.execute
-
-*method*
-
-```python
-def execute(aerosol: Aerosol, time_step: float | np.number, sub_steps: int | np.integer = 1) -> Aerosol
-```
-
-Commit equal sequential source substeps and retain all identities.
-
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L320-L360)
-
-### particula.dynamics.particle_process.Nucleation.rate
+### particula.dynamics.particle_process.Nucleation._box_worker
 
 *method*
 
 ```python
-def rate(aerosol: Aerosol) -> float
+def _box_worker(box, boxes, transaction)
 ```
 
-Return the current potential event density rate [m^-3 s^-1].
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L315-L318)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L309-L337)
+
+### particula.dynamics.particle_process.Nucleation._is_stochastic
+
+*method*
+
+```python
+def _is_stochastic(aerosol)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L299-L307)
+
+### particula.dynamics.particle_process.Nucleation._prepare_commit
+
+*method*
+
+```python
+def _prepare_commit(workers, uses_context)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L339-L382)
+
+### particula.dynamics.particle_process.Nucleation._validate_batch
+
+*method*
+
+```python
+def _validate_batch(aerosol)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L259-L278)
+
+### particula.dynamics.particle_process.Nucleation._validate_gas_schema
+
+*method*
+
+```python
+def _validate_gas_schema(gas)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+Reject raw replacements before GasData copying can normalize them.
+
+Only gas-coupled processes require these schemas. Condensation uses
+float64 throughout; nucleation allows real numeric molar-mass metadata
+but its writable gas inventory must remain float64.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L280-L297)
+
+### particula.dynamics.particle_process.Nucleation._writer_fields
+
+*method*
+
+```python
+def _writer_fields(aerosol)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L239-L257)
 
 ### particula.dynamics.particle_process.Nucleation.__or__
 
@@ -33029,7 +33602,39 @@ combined_process = process1 | process2
 final_aerosol = combined_process.execute(aerosol, time_step=1.0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L108-L129)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L167-L188)
+
+### particula.dynamics.particle_process.Nucleation.execute
+
+*method*
+
+```python
+def execute(aerosol: Aerosol, time_step: float, sub_steps: int = 1, *, context=None) -> Aerosol
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Advance every box, committing atomically after each process substep.
+
+Contexts own independent logical-box random streams. Completed substeps
+remain committed if a later one fails. Custom subclasses overriding
+this method retain responsibility for their own execution semantics.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L84-L138)
+
+### particula.dynamics.particle_process.Nucleation.rate
+
+*method*
+
+```python
+def rate(aerosol: Aerosol) -> Any
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Evaluate detached box hooks and retain a leading box axis.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L67-L82)
 
 ## particula.dynamics.particle_process.NucleationCommitConfig
 
@@ -33039,12 +33644,12 @@ final_aerosol = combined_process.execute(aerosol, time_step=1.0)
 class NucleationCommitConfig
 ```
 
-Immutable one-box controls for CPU nucleation source commits.
+Immutable per-box controls for CPU nucleation source commits.
 
 The record mirrors the source transaction transaction controls while
 retaining public runnable execution
 ownership. Its rank-one sidecars are copied into read-only float64 arrays;
-their required one-box length is checked immediately before every nonzero
+their required batch length is checked immediately before every nonzero
 substep commit. The configuration is not a source transaction configuration
 and does not
 create a transaction spanning a complete ``Nucleation.execute`` call.
@@ -33069,7 +33674,7 @@ sidecar type is invalid.
 - `ValueError` — If a scalar or tolerance is outside its allowed domain, or
 a sidecar is not rank one.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L153-L229)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L154-L230)
 
 ### particula.dynamics.particle_process.NucleationCommitConfig.diversity_absolute_error
 
@@ -33079,7 +33684,7 @@ a sidecar is not rank one.
 diversity_absolute_error: float = 1.0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L195-L195)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L196-L196)
 
 ### particula.dynamics.particle_process.NucleationCommitConfig.exhaustion_controls
 
@@ -33089,7 +33694,7 @@ diversity_absolute_error: float = 1.0
 exhaustion_controls: ExhaustionControls
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L188-L188)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L189-L189)
 
 ### particula.dynamics.particle_process.NucleationCommitConfig.maximum_slot_weight
 
@@ -33099,7 +33704,7 @@ exhaustion_controls: ExhaustionControls
 maximum_slot_weight: float
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L186-L186)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L187-L187)
 
 ### particula.dynamics.particle_process.NucleationCommitConfig.mean_radius_relative_error
 
@@ -33109,7 +33714,7 @@ maximum_slot_weight: float
 mean_radius_relative_error: float = 1.0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L193-L193)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L194-L194)
 
 ### particula.dynamics.particle_process.NucleationCommitConfig.minimum_scale
 
@@ -33119,7 +33724,7 @@ mean_radius_relative_error: float = 1.0
 minimum_scale: NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L190-L190)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L191-L191)
 
 ### particula.dynamics.particle_process.NucleationCommitConfig.minimum_volume
 
@@ -33129,7 +33734,7 @@ minimum_scale: NDArray[np.float64]
 minimum_volume: NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L191-L191)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L192-L192)
 
 ### particula.dynamics.particle_process.NucleationCommitConfig.radius_cubed_relative_error
 
@@ -33139,7 +33744,7 @@ minimum_volume: NDArray[np.float64]
 radius_cubed_relative_error: float = 1.0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L192-L192)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L193-L193)
 
 ### particula.dynamics.particle_process.NucleationCommitConfig.requested_scale
 
@@ -33149,7 +33754,7 @@ radius_cubed_relative_error: float = 1.0
 requested_scale: NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L189-L189)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L190-L190)
 
 ### particula.dynamics.particle_process.NucleationCommitConfig.source_charge
 
@@ -33159,7 +33764,7 @@ requested_scale: NDArray[np.float64]
 source_charge: float
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L187-L187)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L188-L188)
 
 ### particula.dynamics.particle_process.NucleationCommitConfig.surface_relative_error
 
@@ -33169,7 +33774,7 @@ source_charge: float
 surface_relative_error: float = 1.0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L194-L194)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L195-L195)
 
 ### particula.dynamics.particle_process.NucleationCommitConfig.__init__
 
@@ -33191,17 +33796,17 @@ def __post_init__() -> None
 
 Validate scalar controls and defensively own sidecars.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L197-L229)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L198-L230)
 
 ## particula.dynamics.particle_process.WallLoss
 
 *class*
 
 ```python
-class WallLoss(RunnableABC)
+class WallLoss(_NativeBatchRunnable)
 ```
 
-Bases: `particula.runnable.RunnableABC`
+Bases: `particula.dynamics.particle_process._NativeBatchRunnable`
 
 Apply wall loss strategy to aerosol particles.
 
@@ -33223,7 +33828,27 @@ the runnable clamps concentrations after successful strategy delegation.
 > ... )
 > >>> _ = wall_loss.execute(aerosol, time_step=1.0, sub_steps=2)
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L586-L676)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L749-L842)
+
+### particula.dynamics.particle_process.WallLoss._namespace
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+_namespace = 'wall_loss'
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L771-L771)
+
+### particula.dynamics.particle_process.WallLoss._strategy_attribute
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+_strategy_attribute = 'wall_loss_strategy'
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L770-L770)
 
 ### particula.dynamics.particle_process.WallLoss.wall_loss_strategy
 
@@ -33233,7 +33858,7 @@ the runnable clamps concentrations after successful strategy delegation.
 wall_loss_strategy = wall_loss_strategy
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L615-L615)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L781-L781)
 
 ### particula.dynamics.particle_process.WallLoss.__init__
 
@@ -33249,7 +33874,7 @@ Create a wall loss runnable.
 
 - `wall_loss_strategy` (`WallLossStrategy`) — Strategy that provides wall loss rates and updates particle concentrations for the configured distribution type.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L607-L615)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L773-L781)
 
 ### particula.dynamics.particle_process.WallLoss._clamp_non_negative
 
@@ -33265,14 +33890,14 @@ Clamp particle concentrations to non-negative values.
 
 - `particle` (`ParticleData`) — Particle object whose concentration is clipped in place.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L617-L623)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L783-L789)
 
-### particula.dynamics.particle_process.WallLoss.execute
+### particula.dynamics.particle_process.WallLoss._execute_box
 
 *method*
 
 ```python
-def execute(aerosol: Aerosol, time_step: float, sub_steps: int = 1) -> Aerosol
+def _execute_box(aerosol: Aerosol, time_step: float, sub_steps: int = 1) -> Aerosol
 ```
 
 Apply wall loss over the provided time step.
@@ -33290,14 +33915,14 @@ sub-step.
 
 - (`Aerosol`) — Aerosol with updated particle concentrations.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L625-L658)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L791-L824)
 
-### particula.dynamics.particle_process.WallLoss.rate
+### particula.dynamics.particle_process.WallLoss._rate_box
 
 *method*
 
 ```python
-def rate(aerosol: Aerosol) -> Any
+def _rate_box(aerosol: Aerosol) -> Any
 ```
 
 Return the wall loss rate for the aerosol particles.
@@ -33310,7 +33935,85 @@ Return the wall loss rate for the aerosol particles.
 
 - (`Any`) — Array of wall loss rates matching the particle representation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L660-L676)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L826-L842)
+
+### particula.dynamics.particle_process.WallLoss._box_worker
+
+*method*
+
+```python
+def _box_worker(box, boxes, transaction)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L309-L337)
+
+### particula.dynamics.particle_process.WallLoss._is_stochastic
+
+*method*
+
+```python
+def _is_stochastic(aerosol)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L299-L307)
+
+### particula.dynamics.particle_process.WallLoss._prepare_commit
+
+*method*
+
+```python
+def _prepare_commit(workers, uses_context)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L339-L382)
+
+### particula.dynamics.particle_process.WallLoss._validate_batch
+
+*method*
+
+```python
+def _validate_batch(aerosol)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L259-L278)
+
+### particula.dynamics.particle_process.WallLoss._validate_gas_schema
+
+*method*
+
+```python
+def _validate_gas_schema(gas)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+Reject raw replacements before GasData copying can normalize them.
+
+Only gas-coupled processes require these schemas. Condensation uses
+float64 throughout; nucleation allows real numeric molar-mass metadata
+but its writable gas inventory must remain float64.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L280-L297)
+
+### particula.dynamics.particle_process.WallLoss._writer_fields
+
+*method*
+
+```python
+def _writer_fields(aerosol)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L239-L257)
 
 ### particula.dynamics.particle_process.WallLoss.__or__
 
@@ -33342,7 +34045,231 @@ combined_process = process1 | process2
 final_aerosol = combined_process.execute(aerosol, time_step=1.0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L108-L129)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L167-L188)
+
+### particula.dynamics.particle_process.WallLoss.execute
+
+*method*
+
+```python
+def execute(aerosol: Aerosol, time_step: float, sub_steps: int = 1, *, context=None) -> Aerosol
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Advance every box, committing atomically after each process substep.
+
+Contexts own independent logical-box random streams. Completed substeps
+remain committed if a later one fails. Custom subclasses overriding
+this method retain responsibility for their own execution semantics.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L84-L138)
+
+### particula.dynamics.particle_process.WallLoss.rate
+
+*method*
+
+```python
+def rate(aerosol: Aerosol) -> Any
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Evaluate detached box hooks and retain a leading box axis.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L67-L82)
+
+## particula.dynamics.particle_process._NativeBatchRunnable
+
+*class*
+
+```python
+class _NativeBatchRunnable(RunnableABC)
+```
+
+Bases: `particula.runnable.RunnableABC`
+
+Bind native single-box strategies to the shared batch transaction.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L233-L382)
+
+### particula.dynamics.particle_process._NativeBatchRunnable._namespace
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+_namespace = ''
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L237-L237)
+
+### particula.dynamics.particle_process._NativeBatchRunnable._strategy_attribute
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+_strategy_attribute: str | None = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L236-L236)
+
+### particula.dynamics.particle_process._NativeBatchRunnable._box_worker
+
+*method*
+
+```python
+def _box_worker(box, boxes, transaction)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L309-L337)
+
+### particula.dynamics.particle_process._NativeBatchRunnable._is_stochastic
+
+*method*
+
+```python
+def _is_stochastic(aerosol)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L299-L307)
+
+### particula.dynamics.particle_process._NativeBatchRunnable._prepare_commit
+
+*method*
+
+```python
+def _prepare_commit(workers, uses_context)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L339-L382)
+
+### particula.dynamics.particle_process._NativeBatchRunnable._validate_batch
+
+*method*
+
+```python
+def _validate_batch(aerosol)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L259-L278)
+
+### particula.dynamics.particle_process._NativeBatchRunnable._validate_gas_schema
+
+*method*
+
+```python
+def _validate_gas_schema(gas)
+```
+
+Reject raw replacements before GasData copying can normalize them.
+
+Only gas-coupled processes require these schemas. Condensation uses
+float64 throughout; nucleation allows real numeric molar-mass metadata
+but its writable gas inventory must remain float64.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L280-L297)
+
+### particula.dynamics.particle_process._NativeBatchRunnable._writer_fields
+
+*method*
+
+```python
+def _writer_fields(aerosol)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L239-L257)
+
+### particula.dynamics.particle_process._NativeBatchRunnable.__or__
+
+*method*
+
+```python
+def __or__(other: RunnableABC) -> RunnableSequence
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Chain this Runnable with another using the '|' operator.
+
+This method enables an easy way to sequence processes, so they
+can be executed in a defined order.
+
+**Parameters**
+
+- `other` (`RunnableABC`) — Another Runnable to append after this one.
+
+**Returns**
+
+- (`RunnableSequence`) — A sequence containing both processes.
+
+**Examples**
+
+```py title="Chaining two processes"
+combined_process = process1 | process2
+final_aerosol = combined_process.execute(aerosol, time_step=1.0)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L167-L188)
+
+### particula.dynamics.particle_process._NativeBatchRunnable._execute_box
+
+*method*
+
+```python
+def _execute_box(aerosol, time_step, sub_steps=1)
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Execute the single-box numerical building block.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L163-L165)
+
+### particula.dynamics.particle_process._NativeBatchRunnable._rate_box
+
+*method*
+
+```python
+def _rate_box(aerosol)
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Evaluate the single-box numerical building block.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L159-L161)
+
+### particula.dynamics.particle_process._NativeBatchRunnable.execute
+
+*method*
+
+```python
+def execute(aerosol: Aerosol, time_step: float, sub_steps: int = 1, *, context=None) -> Aerosol
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Advance every box, committing atomically after each process substep.
+
+Contexts own independent logical-box random streams. Completed substeps
+remain committed if a later one fails. Custom subclasses overriding
+this method retain responsibility for their own execution semantics.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L84-L138)
+
+### particula.dynamics.particle_process._NativeBatchRunnable.rate
+
+*method*
+
+```python
+def rate(aerosol: Aerosol) -> Any
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Evaluate detached box hooks and retain a leading box axis.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L67-L82)
 
 ## particula.dynamics.particle_process._is_real_scalar
 
@@ -33354,7 +34281,7 @@ def _is_real_scalar(value: object) -> bool
 
 Return whether ``value`` is a non-Boolean real scalar.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L144-L150)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L145-L151)
 
 ## particula.dynamics.particle_process._native_duration
 
@@ -33366,7 +34293,7 @@ def _native_duration(time_step: object, sub_steps: object) -> float
 
 Validate equal-substep controls before any native process mutation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L90-L98)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L91-L99)
 
 ## particula.dynamics.particle_process._native_process_state
 
@@ -33381,7 +34308,7 @@ Read and validate the currently held single-box native process state.
 This boundary never creates a facade or caches aggregate references.
 Scientific strategies additionally validate their own physical inputs.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L62-L87)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L63-L88)
 
 ## particula.dynamics.particle_process._readonly_float64_vector
 
@@ -33407,7 +34334,7 @@ Return an owned, read-only, rank-one float64 array.
 - `TypeError` — If the values cannot be converted to float64.
 - `ValueError` — If the converted values are not rank one.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L111-L141)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L112-L142)
 
 ---
 
@@ -38771,7 +39698,7 @@ Execute an equilibria strategy within the runnable interface.
 
 - `strategy` (`EquilibriaStrategy`) — Concrete ``EquilibriaStrategy`` used to solve equilibrium.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L48-L216)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L48-L223)
 
 ### particula.equilibria.Equilibria.strategy
 
@@ -38807,7 +39734,7 @@ Initialize with the provided equilibria strategy.
 def _apply_attribute_result(aerosol: Aerosol, result: Any) -> Aerosol
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L201-L208)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L208-L215)
 
 ### particula.equilibria.Equilibria._apply_equilibrium_result
 
@@ -38822,7 +39749,7 @@ Apply strategy results to the aerosol or attach for downstream use.
 Accepts either an updated ``Aerosol`` instance, a mapping/struct with
 recognizable concentration fields, or raises when ``None`` is returned.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L147-L181)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L154-L188)
 
 ### particula.equilibria.Equilibria._apply_mapping_result
 
@@ -38832,7 +39759,7 @@ recognizable concentration fields, or raises when ``None`` is returned.
 def _apply_mapping_result(aerosol: Aerosol, result: Mapping[str, Any]) -> Aerosol
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L190-L199)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L197-L206)
 
 ### particula.equilibria.Equilibria._attach_equilibrium_result_dataclass
 
@@ -38842,7 +39769,7 @@ def _apply_mapping_result(aerosol: Aerosol, result: Mapping[str, Any]) -> Aeroso
 def _attach_equilibrium_result_dataclass(aerosol: Aerosol, result: EquilibriumResult) -> Aerosol
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L183-L188)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L190-L195)
 
 ### particula.equilibria.Equilibria._attach_phase_concentrations
 
@@ -38852,7 +39779,7 @@ def _attach_equilibrium_result_dataclass(aerosol: Aerosol, result: EquilibriumRe
 def _attach_phase_concentrations(aerosol: Aerosol, result: PhaseConcentrations) -> Aerosol
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L210-L216)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L217-L223)
 
 ### particula.equilibria.Equilibria._extract_partitioning_inputs
 
@@ -38869,14 +39796,14 @@ absent, falls back to attributes of the aerosol itself. Raises with a
 clear message when a required field is unavailable to keep failures
 explicit during testing.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L104-L145)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L111-L152)
 
 ### particula.equilibria.Equilibria.execute
 
 *method*
 
 ```python
-def execute(aerosol: Aerosol, time_step: float, sub_steps: int = 1) -> Aerosol
+def execute(aerosol: Aerosol, time_step: float, sub_steps: int = 1, *, context=None) -> Aerosol
 ```
 
 Run equilibria over the provided time step.
@@ -38897,7 +39824,7 @@ Run equilibria over the provided time step.
 - `AttributeError` — When required partitioning inputs are missing.
 - `TypeError` — If the strategy returns ``None``.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L67-L102)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L67-L109)
 
 ### particula.equilibria.Equilibria.rate
 
@@ -38941,7 +39868,105 @@ combined_process = process1 | process2
 final_aerosol = combined_process.execute(aerosol, time_step=1.0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L108-L129)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L167-L188)
+
+### particula.equilibria.Equilibria._box_worker
+
+*method*
+
+```python
+def _box_worker(box, boxes, transaction)
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Create isolated hook state for a single box.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L151-L153)
+
+### particula.equilibria.Equilibria._execute_box
+
+*method*
+
+```python
+def _execute_box(aerosol, time_step, sub_steps=1)
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Execute the single-box numerical building block.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L163-L165)
+
+### particula.equilibria.Equilibria._is_stochastic
+
+*method*
+
+```python
+def _is_stochastic(aerosol)
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Report whether this process requires independent box streams.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L147-L149)
+
+### particula.equilibria.Equilibria._prepare_commit
+
+*method*
+
+```python
+def _prepare_commit(workers, uses_context)
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Prepare a non-failing diagnostics publisher before numeric writes.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L155-L157)
+
+### particula.equilibria.Equilibria._rate_box
+
+*method*
+
+```python
+def _rate_box(aerosol)
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Evaluate the single-box numerical building block.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L159-L161)
+
+### particula.equilibria.Equilibria._validate_batch
+
+*method*
+
+```python
+def _validate_batch(aerosol)
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Validate process-wide controls before staging boxes.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L140-L141)
+
+### particula.equilibria.Equilibria._writer_fields
+
+*method*
+
+```python
+def _writer_fields(aerosol)
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Declare numeric destinations for transactional publication.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L143-L145)
 
 ## particula.equilibria.EquilibriaFactory
 
@@ -39661,7 +40686,7 @@ Execute an equilibria strategy within the runnable interface.
 
 - `strategy` (`EquilibriaStrategy`) — Concrete ``EquilibriaStrategy`` used to solve equilibrium.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L48-L216)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L48-L223)
 
 ### particula.equilibria.equilibria.Equilibria.strategy
 
@@ -39697,7 +40722,7 @@ Initialize with the provided equilibria strategy.
 def _apply_attribute_result(aerosol: Aerosol, result: Any) -> Aerosol
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L201-L208)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L208-L215)
 
 ### particula.equilibria.equilibria.Equilibria._apply_equilibrium_result
 
@@ -39712,7 +40737,7 @@ Apply strategy results to the aerosol or attach for downstream use.
 Accepts either an updated ``Aerosol`` instance, a mapping/struct with
 recognizable concentration fields, or raises when ``None`` is returned.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L147-L181)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L154-L188)
 
 ### particula.equilibria.equilibria.Equilibria._apply_mapping_result
 
@@ -39722,7 +40747,7 @@ recognizable concentration fields, or raises when ``None`` is returned.
 def _apply_mapping_result(aerosol: Aerosol, result: Mapping[str, Any]) -> Aerosol
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L190-L199)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L197-L206)
 
 ### particula.equilibria.equilibria.Equilibria._attach_equilibrium_result_dataclass
 
@@ -39732,7 +40757,7 @@ def _apply_mapping_result(aerosol: Aerosol, result: Mapping[str, Any]) -> Aeroso
 def _attach_equilibrium_result_dataclass(aerosol: Aerosol, result: EquilibriumResult) -> Aerosol
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L183-L188)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L190-L195)
 
 ### particula.equilibria.equilibria.Equilibria._attach_phase_concentrations
 
@@ -39742,7 +40767,7 @@ def _attach_equilibrium_result_dataclass(aerosol: Aerosol, result: EquilibriumRe
 def _attach_phase_concentrations(aerosol: Aerosol, result: PhaseConcentrations) -> Aerosol
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L210-L216)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L217-L223)
 
 ### particula.equilibria.equilibria.Equilibria._extract_partitioning_inputs
 
@@ -39759,14 +40784,14 @@ absent, falls back to attributes of the aerosol itself. Raises with a
 clear message when a required field is unavailable to keep failures
 explicit during testing.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L104-L145)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L111-L152)
 
 ### particula.equilibria.equilibria.Equilibria.execute
 
 *method*
 
 ```python
-def execute(aerosol: Aerosol, time_step: float, sub_steps: int = 1) -> Aerosol
+def execute(aerosol: Aerosol, time_step: float, sub_steps: int = 1, *, context=None) -> Aerosol
 ```
 
 Run equilibria over the provided time step.
@@ -39787,7 +40812,7 @@ Run equilibria over the provided time step.
 - `AttributeError` — When required partitioning inputs are missing.
 - `TypeError` — If the strategy returns ``None``.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L67-L102)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L67-L109)
 
 ### particula.equilibria.equilibria.Equilibria.rate
 
@@ -39831,7 +40856,105 @@ combined_process = process1 | process2
 final_aerosol = combined_process.execute(aerosol, time_step=1.0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L108-L129)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L167-L188)
+
+### particula.equilibria.equilibria.Equilibria._box_worker
+
+*method*
+
+```python
+def _box_worker(box, boxes, transaction)
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Create isolated hook state for a single box.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L151-L153)
+
+### particula.equilibria.equilibria.Equilibria._execute_box
+
+*method*
+
+```python
+def _execute_box(aerosol, time_step, sub_steps=1)
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Execute the single-box numerical building block.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L163-L165)
+
+### particula.equilibria.equilibria.Equilibria._is_stochastic
+
+*method*
+
+```python
+def _is_stochastic(aerosol)
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Report whether this process requires independent box streams.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L147-L149)
+
+### particula.equilibria.equilibria.Equilibria._prepare_commit
+
+*method*
+
+```python
+def _prepare_commit(workers, uses_context)
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Prepare a non-failing diagnostics publisher before numeric writes.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L155-L157)
+
+### particula.equilibria.equilibria.Equilibria._rate_box
+
+*method*
+
+```python
+def _rate_box(aerosol)
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Evaluate the single-box numerical building block.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L159-L161)
+
+### particula.equilibria.equilibria.Equilibria._validate_batch
+
+*method*
+
+```python
+def _validate_batch(aerosol)
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Validate process-wide controls before staging boxes.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L140-L141)
+
+### particula.equilibria.equilibria.Equilibria._writer_fields
+
+*method*
+
+```python
+def _writer_fields(aerosol)
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Declare numeric destinations for transactional publication.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L143-L145)
 
 ---
 
@@ -40792,8 +41915,9 @@ only. It neither selects an adapter nor validates runtime or native-device
 Availability, imports optional backends, allocates state, or exposes a
 user-facing API.
 
-The public API is a frozen, dependency-neutral 26-name selection, capability
-error, and fallback-policy surface. Its three public fallback policy enums are
+The public API includes selection, capability errors, fallback policies, and
+the caller-owned ``CPUExecutionContext`` for CPU box random streams.
+Its three public fallback policy enums are
 ``FallbackPolicy``, ``FallbackBoundary``, and ``CPUStateAuthority``. Concrete
 fallback mechanics and their carriers remain direct-module-only. Importing this
 package does not import optional backends, Warp, or ``particula.gpu``.
@@ -40817,7 +41941,7 @@ Identify a declared execution backend without loading it.
 - `CPU` — The declared CPU backend.
 - `WARP` — The declared Warp backend.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L78-L87)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L82-L91)
 
 ### particula.execution.Backend.CPU
 
@@ -40827,7 +41951,7 @@ Identify a declared execution backend without loading it.
 CPU = 'cpu'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L86-L86)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L90-L90)
 
 ### particula.execution.Backend.WARP
 
@@ -40837,7 +41961,7 @@ CPU = 'cpu'
 WARP = 'warp'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L87-L87)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L91-L91)
 
 ## particula.execution.BackendResult
 
@@ -40854,7 +41978,7 @@ Retain opaque backend result values by identity without inspection.
 - `value` (`object`) — Opaque backend-owned result value.
 - `diagnostics` (`object | None`) (default: `None`) — Optional opaque backend-owned diagnostic value.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L847-L857)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L851-L861)
 
 ### particula.execution.BackendResult.diagnostics
 
@@ -40864,7 +41988,7 @@ Retain opaque backend result values by identity without inspection.
 diagnostics: object | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L857-L857)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L861-L861)
 
 ### particula.execution.BackendResult.value
 
@@ -40874,7 +41998,7 @@ diagnostics: object | None = None
 value: object
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L856-L856)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L860-L860)
 
 ### particula.execution.BackendResult.__init__
 
@@ -40908,7 +42032,7 @@ aerosol and process-physics validation.
 
 - `runnable` (`_CPURunnable | RunnableABC`) — Runnable invoked once for every valid execution state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1013-L1086)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1018-L1092)
 
 ### particula.execution.CPUExecutionAdapter._runnable
 
@@ -40918,7 +42042,7 @@ aerosol and process-physics validation.
 _runnable = runnable
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1035-L1035)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1040-L1040)
 
 ### particula.execution.CPUExecutionAdapter.__init__
 
@@ -40934,7 +42058,7 @@ Retain the runnable by identity without inspecting it.
 
 - `runnable` (`_CPURunnable | RunnableABC`) — CPU runnable invoked once by :meth:`execute` for each valid state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1028-L1035)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1033-L1040)
 
 ### particula.execution.CPUExecutionAdapter.execute
 
@@ -40967,7 +42091,136 @@ non-boolean real scalar.
 - `ValueError` — If controls are invalid or the runnable returns a
 different aerosol object.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1037-L1086)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1042-L1092)
+
+## particula.execution.CPUExecutionContext
+
+*class*
+
+```python
+class CPUExecutionContext
+```
+
+Re-exported from: `particula.execution.cpu_context`
+
+Retain persistent process-specific streams keyed by logical box ID.
+
+**Parameters**
+
+- `root_seed` (`int`) — Nonnegative integer seed; booleans are not accepted.
+- `box_ids` (`tuple[str, ...]`) — Unique nonempty strings in current numeric-array box order.
+
+Reordering numeric storage requires a matching ``with_box_ids`` view.
+Reusing a context and process namespace deliberately continues its streams.
+Create a new context to reset them. Contexts are not thread-safe and must
+not be used concurrently. No CPU/GPU bitwise equivalence is implied.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L29-L90)
+
+### particula.execution.CPUExecutionContext._box_ids
+
+*attribute* · *instance attribute*
+
+```python
+_box_ids: tuple[str, ...] = _box_ids(box_ids)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L51-L51)
+
+### particula.execution.CPUExecutionContext._root_seed
+
+*attribute* · *instance attribute*
+
+```python
+_root_seed: int = int(root_seed)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L50-L50)
+
+### particula.execution.CPUExecutionContext._streams
+
+*attribute* · *instance attribute*
+
+```python
+_streams: dict[tuple[str, str], np.random.Generator] = {}
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L52-L52)
+
+### particula.execution.CPUExecutionContext.box_ids
+
+*property*
+
+```python
+box_ids: tuple[str, ...]
+```
+
+Return logical IDs in this view's numeric-array order.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L60-L62)
+
+### particula.execution.CPUExecutionContext.root_seed
+
+*property*
+
+```python
+root_seed: int
+```
+
+Return the immutable root seed.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L55-L57)
+
+### particula.execution.CPUExecutionContext.__init__
+
+*method*
+
+```python
+def __init__(root_seed: int, box_ids: tuple[str, ...]) -> None
+```
+
+Validate metadata without creating or advancing random streams.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L42-L52)
+
+### particula.execution.CPUExecutionContext._begin
+
+*method*
+
+```python
+def _begin(n_boxes: int) -> _CPUStreamTransaction
+```
+
+Validate layout and begin a private substep transaction.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L74-L78)
+
+### particula.execution.CPUExecutionContext._new_generator
+
+*method*
+
+```python
+def _new_generator(namespace: str, box_id: str) -> np.random.Generator
+```
+
+Derive a versioned PCG64 stream independently of lane/order.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L80-L90)
+
+### particula.execution.CPUExecutionContext.with_box_ids
+
+*method*
+
+```python
+def with_box_ids(box_ids: tuple[str, ...]) -> CPUExecutionContext
+```
+
+Create a reordered, reduced, or extended continuation-sharing view.
+
+New IDs acquire streams lazily; existing IDs retain continuation even
+when absent from a view. The caller must reorder arrays consistently.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L64-L72)
 
 ## particula.execution.CPUExecutionState
 
@@ -40989,7 +42242,7 @@ boundary. The carrier neither copies nor validates the aerosol or controls.
 - `time_step` (`object`) — Caller-supplied total execution duration.
 - `sub_steps` (`object`) — Caller-supplied number of runnable substeps.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L989-L1010)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L993-L1015)
 
 ### particula.execution.CPUExecutionState.aerosol
 
@@ -40999,7 +42252,17 @@ boundary. The carrier neither copies nor validates the aerosol or controls.
 aerosol: object
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1003-L1003)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1007-L1007)
+
+### particula.execution.CPUExecutionState.context
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+context: object = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1010-L1010)
 
 ### particula.execution.CPUExecutionState.sub_steps
 
@@ -41009,7 +42272,7 @@ aerosol: object
 sub_steps: object
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1005-L1005)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1009-L1009)
 
 ### particula.execution.CPUExecutionState.time_step
 
@@ -41019,7 +42282,7 @@ sub_steps: object
 time_step: object
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1004-L1004)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1008-L1008)
 
 ### particula.execution.CPUExecutionState.backend_payload
 
@@ -41031,14 +42294,14 @@ backend_payload: object
 
 Return the caller-owned aerosol as the opaque CPU payload.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1008-L1010)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1013-L1015)
 
 ### particula.execution.CPUExecutionState.__init__
 
 *method*
 
 ```python
-def __init__(aerosol: object, time_step: object, sub_steps: object) -> None
+def __init__(aerosol: object, time_step: object, sub_steps: object, context: object = None) -> None
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L0-L0)
@@ -41118,7 +42381,7 @@ Declare an immutable, validated capability name.
 - `TypeError` — If ``name`` is not a str.
 - `ValueError` — If ``name`` is not a lowercase identifier-style name.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L151-L172)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L155-L176)
 
 ### particula.execution.Capability.name
 
@@ -41128,7 +42391,7 @@ Declare an immutable, validated capability name.
 name: str
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L163-L163)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L167-L167)
 
 ### particula.execution.Capability.__init__
 
@@ -41155,7 +42418,7 @@ Validate the capability name.
 - `TypeError` — If the name is not a str.
 - `ValueError` — If the name is not a lowercase identifier-style name.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L165-L172)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L169-L176)
 
 ## particula.execution.CapabilityDeclaration
 
@@ -41177,7 +42440,7 @@ Declare immutable capability support for one device and process.
 
 - `TypeError` — If any field is not its declared metadata type.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L240-L271)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L244-L275)
 
 ### particula.execution.CapabilityDeclaration.device
 
@@ -41187,7 +42450,7 @@ Declare immutable capability support for one device and process.
 device: Device
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L253-L253)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L257-L257)
 
 ### particula.execution.CapabilityDeclaration.process
 
@@ -41197,7 +42460,7 @@ device: Device
 process: Process
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L254-L254)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L258-L258)
 
 ### particula.execution.CapabilityDeclaration.requirements
 
@@ -41207,7 +42470,7 @@ process: Process
 requirements: CapabilityRequirements
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L255-L255)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L259-L259)
 
 ### particula.execution.CapabilityDeclaration.__init__
 
@@ -41233,7 +42496,7 @@ Validate the declaration's typed value objects.
 
 - `TypeError` — If any declaration field has the wrong type.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L257-L271)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L261-L275)
 
 ## particula.execution.CapabilityMatrix
 
@@ -41258,7 +42521,7 @@ an execution adapter.
 
 - `TypeError` — If ``declarations`` is not a frozenset of declarations.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L274-L364)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L278-L368)
 
 ### particula.execution.CapabilityMatrix.declarations
 
@@ -41268,7 +42531,7 @@ an execution adapter.
 declarations: frozenset[CapabilityDeclaration]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L290-L290)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L294-L294)
 
 ### particula.execution.CapabilityMatrix.__init__
 
@@ -41294,7 +42557,7 @@ Validate the exact immutable declaration collection type.
 
 - `TypeError` — If the collection or one of its members is invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L292-L309)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L296-L313)
 
 ### particula.execution.CapabilityMatrix.require
 
@@ -41317,7 +42580,7 @@ Require a declared capability request without executing it.
 - `TypeError` — If an argument is not its declared metadata type.
 - `ValueError` — If the valid request is not declared by this matrix.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L341-L364)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L345-L368)
 
 ### particula.execution.CapabilityMatrix.supports
 
@@ -41343,7 +42606,7 @@ Return whether the matrix exactly declares a capability request.
 
 - `TypeError` — If an argument is not its declared metadata type.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L311-L339)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L315-L343)
 
 ## particula.execution.CapabilityRequirements
 
@@ -41366,7 +42629,7 @@ features inferred by the matrix.
 
 - `TypeError` — If ``values`` is not a frozenset of Capability instances.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L207-L237)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L211-L241)
 
 ### particula.execution.CapabilityRequirements.values
 
@@ -41376,7 +42639,7 @@ features inferred by the matrix.
 values: frozenset[Capability]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L221-L221)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L225-L225)
 
 ### particula.execution.CapabilityRequirements.__init__
 
@@ -41402,7 +42665,7 @@ Validate the exact immutable capability collection type.
 
 - `TypeError` — If the collection or one of its members is invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L223-L237)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L227-L241)
 
 ## particula.execution.CondensationActivityMode
 
@@ -41425,7 +42688,7 @@ support. It does not inspect or detect concrete activity implementations.
 - `KAPPA` — Kappa activity-coefficient semantics.
 - `NONREPRESENTABLE` — Semantics not representable by a profile.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L382-L396)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L386-L400)
 
 ### particula.execution.CondensationActivityMode.IDEAL
 
@@ -41435,7 +42698,7 @@ support. It does not inspect or detect concrete activity implementations.
 IDEAL = 'ideal'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L394-L394)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L398-L398)
 
 ### particula.execution.CondensationActivityMode.KAPPA
 
@@ -41445,7 +42708,7 @@ IDEAL = 'ideal'
 KAPPA = 'kappa'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L395-L395)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L399-L399)
 
 ### particula.execution.CondensationActivityMode.NONREPRESENTABLE
 
@@ -41455,7 +42718,7 @@ KAPPA = 'kappa'
 NONREPRESENTABLE = 'nonrepresentable'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L396-L396)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L400-L400)
 
 ## particula.execution.CondensationConfiguration
 
@@ -41482,7 +42745,7 @@ It also does not select an adapter or determine runtime availability.
 
 - `TypeError` — If a field is not its exact declared metadata type.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L416-L459)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L420-L463)
 
 ### particula.execution.CondensationConfiguration.activity_mode
 
@@ -41492,7 +42755,7 @@ It also does not select an adapter or determine runtime availability.
 activity_mode: CondensationActivityMode
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L436-L436)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L440-L440)
 
 ### particula.execution.CondensationConfiguration.execution_mode
 
@@ -41502,7 +42765,7 @@ activity_mode: CondensationActivityMode
 execution_mode: CondensationExecutionMode
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L434-L434)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L438-L438)
 
 ### particula.execution.CondensationConfiguration.latent_heat
 
@@ -41512,7 +42775,7 @@ execution_mode: CondensationExecutionMode
 latent_heat: bool
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L435-L435)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L439-L439)
 
 ### particula.execution.CondensationConfiguration.surface_mode
 
@@ -41522,7 +42785,7 @@ latent_heat: bool
 surface_mode: CondensationSurfaceMode
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L437-L437)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L441-L441)
 
 ### particula.execution.CondensationConfiguration.__init__
 
@@ -41544,7 +42807,7 @@ def __post_init__() -> None
 
 Validate the exact semantic configuration field types.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L439-L459)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L443-L463)
 
 ## particula.execution.CondensationExecutionMode
 
@@ -41566,7 +42829,7 @@ an execution implementation.
 - `EQUAL_STEP` — Equal-step condensation semantics.
 - `STAGGERED` — Staggered condensation semantics.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L367-L379)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L371-L383)
 
 ### particula.execution.CondensationExecutionMode.EQUAL_STEP
 
@@ -41576,7 +42839,7 @@ an execution implementation.
 EQUAL_STEP = 'equal_step'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L378-L378)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L382-L382)
 
 ### particula.execution.CondensationExecutionMode.STAGGERED
 
@@ -41586,7 +42849,7 @@ EQUAL_STEP = 'equal_step'
 STAGGERED = 'staggered'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L379-L379)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L383-L383)
 
 ## particula.execution.CondensationSurfaceMode
 
@@ -41609,7 +42872,7 @@ support. It does not inspect or detect concrete surface implementations.
 - `COMPOSITION_WEIGHTED` — Composition-weighted surface-tension semantics.
 - `NONREPRESENTABLE` — Semantics not representable by a profile.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L399-L413)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L403-L417)
 
 ### particula.execution.CondensationSurfaceMode.COMPOSITION_WEIGHTED
 
@@ -41619,7 +42882,7 @@ support. It does not inspect or detect concrete surface implementations.
 COMPOSITION_WEIGHTED = 'composition_weighted'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L412-L412)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L416-L416)
 
 ### particula.execution.CondensationSurfaceMode.NONREPRESENTABLE
 
@@ -41629,7 +42892,7 @@ COMPOSITION_WEIGHTED = 'composition_weighted'
 NONREPRESENTABLE = 'nonrepresentable'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L413-L413)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L417-L417)
 
 ### particula.execution.CondensationSurfaceMode.STATIC
 
@@ -41639,7 +42902,7 @@ NONREPRESENTABLE = 'nonrepresentable'
 STATIC = 'static'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L411-L411)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L415-L415)
 
 ## particula.execution.Device
 
@@ -41664,7 +42927,7 @@ or checked against backend availability.
 - `TypeError` — If ``backend`` is not a Backend or ``native`` is not a str.
 - `ValueError` — If ``native`` is empty or has surrounding whitespace.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L90-L124)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L94-L128)
 
 ### particula.execution.Device.backend
 
@@ -41674,7 +42937,7 @@ or checked against backend availability.
 backend: Backend
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L106-L106)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L110-L110)
 
 ### particula.execution.Device.native
 
@@ -41684,7 +42947,7 @@ backend: Backend
 native: str
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L107-L107)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L111-L111)
 
 ### particula.execution.Device.__init__
 
@@ -41711,7 +42974,7 @@ Validate the declared backend and opaque native identifier.
 - `TypeError` — If the backend or native identifier has the wrong type.
 - `ValueError` — If the native identifier is empty or padded.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L109-L124)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L113-L128)
 
 ## particula.execution.ExecutionAdapter
 
@@ -41730,7 +42993,7 @@ attribute without invoking or probing it. Selection returns the registered
 adapter by identity and does not establish an execution, state, or result
 contract.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L755-L767)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L759-L771)
 
 ### particula.execution.ExecutionAdapter.execute
 
@@ -41742,7 +43005,7 @@ execute: Callable[..., object]
 
 Return the callable execution seam without fixing its signature.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L766-L767)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L770-L771)
 
 ## particula.execution.ExecutionCapabilityError
 
@@ -41997,7 +43260,7 @@ registration state. Registration and selection are context-local only:
 neither invokes an adapter, probes availability, loads a backend, nor
 transfers data.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1161-L1229)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1167-L1235)
 
 ### particula.execution.ExecutionContext._matrix
 
@@ -42007,7 +43270,7 @@ transfers data.
 _matrix = matrix
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1181-L1181)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1187-L1187)
 
 ### particula.execution.ExecutionContext._registry
 
@@ -42017,7 +43280,7 @@ _matrix = matrix
 _registry = _AdapterRegistry()
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1182-L1182)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1188-L1188)
 
 ### particula.execution.ExecutionContext.__init__
 
@@ -42037,7 +43300,7 @@ Store a matrix and create an empty private adapter registry.
 
 - `TypeError` — If ``matrix`` is not a CapabilityMatrix.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1170-L1182)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1176-L1188)
 
 ### particula.execution.ExecutionContext.register_adapter
 
@@ -42065,7 +43328,7 @@ context and is selected later by its exact process/backend pair.
 order.
 - `ValueError` — If the process/backend pair is already registered.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1184-L1206)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1190-L1212)
 
 ### particula.execution.ExecutionContext.resolve
 
@@ -42094,7 +43357,7 @@ method does not catch adapter errors because it never executes adapters.
 - `ValueError` — If CPU device spelling is invalid or support is absent.
 - `LookupError` — If supported request has no exact registered adapter.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1208-L1229)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1214-L1235)
 
 ## particula.execution.ExecutionRequest
 
@@ -42121,7 +43384,7 @@ state, nor establishes execution state or result contracts.
 - `TypeError` — If a field is not its declared metadata type.
 - `ValueError` — If the backend does not match the device backend.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L695-L739)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L699-L743)
 
 ### particula.execution.ExecutionRequest.backend
 
@@ -42131,7 +43394,7 @@ state, nor establishes execution state or result contracts.
 backend: Backend
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L713-L713)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L717-L717)
 
 ### particula.execution.ExecutionRequest.device
 
@@ -42141,7 +43404,7 @@ backend: Backend
 device: Device
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L714-L714)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L718-L718)
 
 ### particula.execution.ExecutionRequest.process
 
@@ -42151,7 +43414,7 @@ device: Device
 process: Process
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L715-L715)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L719-L719)
 
 ### particula.execution.ExecutionRequest.requirements
 
@@ -42161,7 +43424,7 @@ process: Process
 requirements: CapabilityRequirements
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L716-L716)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L720-L720)
 
 ### particula.execution.ExecutionRequest.__init__
 
@@ -42188,7 +43451,7 @@ Validate request metadata without resolving or executing it.
 - `TypeError` — If a field is not its declared metadata type.
 - `ValueError` — If backend and device backend differ.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L718-L739)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L722-L743)
 
 ## particula.execution.ExecutionResult
 
@@ -42210,7 +43473,7 @@ boundary, including that ``state`` is the original caller-owned object.
 - `mutation` (`MutationDeclaration`) — Explicit permission for in-place state mutation.
 - `backend_result` (`BackendResult | None`) (default: `None`) — Optional opaque backend result retained by identity.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L860-L877)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L864-L881)
 
 ### particula.execution.ExecutionResult.backend_result
 
@@ -42220,7 +43483,7 @@ boundary, including that ``state`` is the original caller-owned object.
 backend_result: BackendResult | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L877-L877)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L881-L881)
 
 ### particula.execution.ExecutionResult.metadata
 
@@ -42230,7 +43493,7 @@ backend_result: BackendResult | None = None
 metadata: tuple[tuple[str, str], ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L875-L875)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L879-L879)
 
 ### particula.execution.ExecutionResult.mutation
 
@@ -42240,7 +43503,7 @@ metadata: tuple[tuple[str, str], ...]
 mutation: MutationDeclaration
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L876-L876)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L880-L880)
 
 ### particula.execution.ExecutionResult.state
 
@@ -42250,7 +43513,7 @@ mutation: MutationDeclaration
 state: ExecutionState
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L874-L874)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L878-L878)
 
 ### particula.execution.ExecutionResult.__init__
 
@@ -42277,7 +43540,7 @@ Describe retained caller-owned state with an opaque backend payload.
 The payload is not inspected by this module. Boundary validation requires
 the same state object supplied by the caller and retains it by identity.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L742-L752)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L746-L756)
 
 ### particula.execution.ExecutionState.backend_payload
 
@@ -42289,7 +43552,7 @@ backend_payload: object
 
 Return opaque backend-owned payload state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L751-L752)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L755-L756)
 
 ## particula.execution.FallbackBoundary
 
@@ -42661,7 +43924,7 @@ Declare exactly one explicit state-mutation permission.
 - `TypeError` — If scopes is not an exact frozenset of MutationScope values.
 - `ValueError` — If scopes is empty or combines mutation scopes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L782-L798)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L786-L802)
 
 ### particula.execution.MutationDeclaration.scopes
 
@@ -42671,7 +43934,7 @@ Declare exactly one explicit state-mutation permission.
 scopes: frozenset[MutationScope]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L794-L794)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L798-L798)
 
 ### particula.execution.MutationDeclaration.__init__
 
@@ -42693,7 +43956,7 @@ def __post_init__() -> None
 
 Validate the closed, immutable mutation declaration.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L796-L798)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L800-L802)
 
 ## particula.execution.MutationScope
 
@@ -42711,7 +43974,7 @@ Declare the one allowed mutation scope for an execution result.
 not infer or
 verify that a declared mutation occurred.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L770-L779)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L774-L783)
 
 ### particula.execution.MutationScope.NONE
 
@@ -42721,7 +43984,7 @@ verify that a declared mutation occurred.
 NONE = 'none'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L778-L778)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L782-L782)
 
 ### particula.execution.MutationScope.STATE
 
@@ -42731,7 +43994,7 @@ NONE = 'none'
 STATE = 'state'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L779-L779)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L783-L783)
 
 ## particula.execution.Process
 
@@ -42752,7 +44015,7 @@ Declare an immutable, validated process name.
 - `TypeError` — If ``name`` is not a str.
 - `ValueError` — If ``name`` is not a lowercase identifier-style name.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L127-L148)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L131-L152)
 
 ### particula.execution.Process.name
 
@@ -42762,7 +44025,7 @@ Declare an immutable, validated process name.
 name: str
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L139-L139)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L143-L143)
 
 ### particula.execution.Process.__init__
 
@@ -42789,7 +44052,7 @@ Validate the process name.
 - `TypeError` — If the name is not a str.
 - `ValueError` — If the name is not a lowercase identifier-style name.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L141-L148)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L145-L152)
 
 ## particula.execution.UnavailableDeviceError
 
@@ -44062,7 +45325,7 @@ an adapter, import an optional backend, or determine runtime availability.
 
 - (`bool`) — True when the exact configuration is declared by the backend profile.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L620-L642)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L624-L646)
 
 ## particula.execution.get_condensation_requirements
 
@@ -44089,7 +45352,7 @@ inspect runtime, device, or optional-backend state.
 
 - `TypeError` — If ``configuration`` is not a CondensationConfiguration.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L519-L553)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L523-L557)
 
 ## particula.execution.require_condensation_profile
 
@@ -44115,7 +45378,7 @@ import an optional backend, or determine runtime availability.
 - `TypeError` — If either argument is not its declared metadata type.
 - `ValueError` — If the configuration is not declared by the profile.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L645-L669)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L649-L673)
 
 ## particula.execution.validate_execution_result
 
@@ -44143,7 +45406,7 @@ Validate and return an immutable state ownership result without executing
 invalid.
 - `ValueError` — If state was replaced or metadata is otherwise invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L923-L959)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L927-L963)
 
 **Modules**
 
@@ -44151,6 +45414,7 @@ invalid.
 - `particula.execution.availability`
 - `particula.execution.checkpoint`
 - `particula.execution.communication`
+- `particula.execution.cpu_context`
 - `particula.execution.diagnostics`
 - `particula.execution.errors`
 - `particula.execution.fallback`
@@ -44267,7 +45531,7 @@ caller-owned runnable once without splitting, converting, retrying, or
 recovering. Successful results retain the original aerosol and declare
 state mutation. Delegate exceptions propagate unchanged.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L340-L384)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L342-L387)
 
 ### particula.execution.adapters.coagulation.CPUCoagulationExecutionAdapter.execute
 
@@ -44293,7 +45557,7 @@ Execute one exact CPU execution state without fallback or recovery.
 - `ValueError` — If controls are invalid or the runnable returns another
 aerosol.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L349-L384)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L351-L387)
 
 ## particula.execution.adapters.coagulation.CPUCoagulationExecutionState
 
@@ -44321,7 +45585,17 @@ resources remain caller-owned and mutable.
 
 - `TypeError` — If ``state`` or ``runnable`` is not the required exact type.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L151-L189)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L151-L191)
+
+### particula.execution.adapters.coagulation.CPUCoagulationExecutionState.context
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+context: object = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L175-L175)
 
 ### particula.execution.adapters.coagulation.CPUCoagulationExecutionState.runnable
 
@@ -44377,14 +45651,14 @@ Return the exact caller-owned CPU aerosol payload.
 
 - (`Aerosol`) — The aerosol retained by the state state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L183-L189)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L185-L191)
 
 ### particula.execution.adapters.coagulation.CPUCoagulationExecutionState.__init__
 
 *method*
 
 ```python
-def __init__(state: CPUCoagulationState, time_step: object, sub_steps: object, runnable: Coagulation) -> None
+def __init__(state: CPUCoagulationState, time_step: object, sub_steps: object, runnable: Coagulation, context: object = None) -> None
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L0-L0)
@@ -44399,7 +45673,7 @@ def __post_init__() -> None
 
 Validate exact state-state and runnable carrier types.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L175-L180)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L177-L182)
 
 ## particula.execution.adapters.coagulation.CPUCoagulationResult
 
@@ -44596,7 +45870,7 @@ resident-owned configuration-derived coagulation sidecar with literal
 ``initialize_rng=False``. It does not acquire, allocate, seed, reset,
 inspect, transfer, or synchronize the stream.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L808-L924)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L811-L927)
 
 ### particula.execution.adapters.coagulation.ResidentBrownianCoagulationExecutionAdapter.execute
 
@@ -44625,7 +45899,7 @@ or inconsistent.
 - `ImportError` — If the optional direct Warp kernel is unavailable after
 preflight.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L894-L924)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L897-L927)
 
 ### particula.execution.adapters.coagulation.ResidentBrownianCoagulationExecutionAdapter.prepare
 
@@ -44652,7 +45926,7 @@ Preflight and freeze one resident Brownian kernel call.
 or inconsistent.
 - `ImportError` — If the optional direct Warp kernel is unavailable.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L818-L892)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L821-L895)
 
 ## particula.execution.adapters.coagulation.ResidentBrownianCoagulationExecutionState
 
@@ -44678,7 +45952,7 @@ reset or inspection APIs are outside this concrete-only boundary.
 - `registry` (`GPUResourceRegistry`) — Exact registry that published ``resources`` for ``session``.
 - `resources` (`CoagulationResources`) — Published collision outputs and persistent RNG sidecar.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L734-L780)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L737-L783)
 
 ### particula.execution.adapters.coagulation.ResidentBrownianCoagulationExecutionState.registry
 
@@ -44688,7 +45962,7 @@ reset or inspection APIs are outside this concrete-only boundary.
 registry: GPUResourceRegistry
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L754-L754)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L757-L757)
 
 ### particula.execution.adapters.coagulation.ResidentBrownianCoagulationExecutionState.request
 
@@ -44698,7 +45972,7 @@ registry: GPUResourceRegistry
 request: WarpBrownianCoagulationExecutionState
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L752-L752)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L755-L755)
 
 ### particula.execution.adapters.coagulation.ResidentBrownianCoagulationExecutionState.resources
 
@@ -44708,7 +45982,7 @@ request: WarpBrownianCoagulationExecutionState
 resources: CoagulationResources
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L755-L755)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L758-L758)
 
 ### particula.execution.adapters.coagulation.ResidentBrownianCoagulationExecutionState.session
 
@@ -44718,7 +45992,7 @@ resources: CoagulationResources
 session: ResidentSession
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L753-L753)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L756-L756)
 
 ### particula.execution.adapters.coagulation.ResidentBrownianCoagulationExecutionState.backend_payload
 
@@ -44730,7 +46004,7 @@ backend_payload: object
 
 Return the exact caller-owned resident particle payload.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L778-L780)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L781-L783)
 
 ### particula.execution.adapters.coagulation.ResidentBrownianCoagulationExecutionState.__init__
 
@@ -44752,7 +46026,7 @@ def __post_init__() -> None
 
 Validate concrete carrier types without acquiring resources.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L757-L775)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L760-L778)
 
 ## particula.execution.adapters.coagulation.WarpBrownianCoagulationExecutionAdapter
 
@@ -44769,7 +46043,7 @@ state validation and calls it once. It forwards state resources by identity
 without conversion, synchronization, fallback, retry, or recovery. Kernel
 exceptions and any post-launch mutation remain governed by the kernel.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L941-L999)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L944-L1002)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationExecutionAdapter.execute
 
@@ -44800,7 +46074,7 @@ unchanged.
 - `ImportError` — If optional Warp kernel dependencies are unavailable
 after local preflight.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L950-L999)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L953-L1002)
 
 ## particula.execution.adapters.coagulation.WarpBrownianCoagulationExecutionState
 
@@ -44826,7 +46100,7 @@ resources.
 - `TypeError` — If ``state`` is not an exact
 ``WarpBrownianCoagulationState``.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L698-L731)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L701-L734)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationExecutionState.state
 
@@ -44836,7 +46110,7 @@ resources.
 state: WarpBrownianCoagulationState
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L715-L715)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L718-L718)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationExecutionState.backend_payload
 
@@ -44852,7 +46126,7 @@ Return the exact caller-owned resident particle payload.
 
 - (`object`) — The particle container retained by the state state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L725-L731)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L728-L734)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationExecutionState.__init__
 
@@ -44874,7 +46148,7 @@ def __post_init__() -> None
 
 Validate the exact state Warp state carrier type.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L717-L722)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L720-L725)
 
 ## particula.execution.adapters.coagulation.WarpBrownianCoagulationResult
 
@@ -44904,7 +46178,7 @@ direct-kernel contract.
 - `ValueError` — If particles or a state-supplied diagnostic lacks the
 required identity.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L640-L695)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L643-L698)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationResult.collision_pairs
 
@@ -44914,7 +46188,7 @@ required identity.
 collision_pairs: object | None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L663-L663)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L666-L666)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationResult.n_collisions
 
@@ -44924,7 +46198,7 @@ collision_pairs: object | None
 n_collisions: object | None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L664-L664)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L667-L667)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationResult.particles
 
@@ -44934,7 +46208,7 @@ n_collisions: object | None
 particles: object
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L662-L662)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L665-L665)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationResult.state
 
@@ -44944,7 +46218,7 @@ particles: object
 state: WarpBrownianCoagulationState
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L661-L661)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L664-L664)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationResult.backend_payload
 
@@ -44960,7 +46234,7 @@ Return the caller-owned particle container by identity.
 
 - (`object`) — The exact particle container retained by this result.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L689-L695)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L692-L698)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationResult.__init__
 
@@ -44987,7 +46261,7 @@ Validate state and state-supplied result-sidecar identities.
 - `TypeError` — If the state is not the exact required carrier type.
 - `ValueError` — If a required particle or diagnostic identity differs.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L666-L686)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L669-L689)
 
 ## particula.execution.adapters.coagulation.WarpBrownianCoagulationState
 
@@ -45035,7 +46309,7 @@ configuration preflight.
 is supplied, or metadata establishes forbidden caller-resource
 aliasing.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L538-L637)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L541-L640)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationState.collision_pairs
 
@@ -45045,7 +46319,7 @@ aliasing.
 collision_pairs: object | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L586-L586)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L589-L589)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationState.config
 
@@ -45055,7 +46329,7 @@ collision_pairs: object | None = None
 config: BrownianCoagulationConfig
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L580-L580)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L583-L583)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationState.environment
 
@@ -45065,7 +46339,7 @@ config: BrownianCoagulationConfig
 environment: object | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L591-L591)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L594-L594)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationState.initialize_rng
 
@@ -45075,7 +46349,7 @@ environment: object | None = None
 initialize_rng: object = False
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L590-L590)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L593-L593)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationState.n_collisions
 
@@ -45085,7 +46359,7 @@ initialize_rng: object = False
 n_collisions: object | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L587-L587)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L590-L590)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationState.particles
 
@@ -45095,7 +46369,7 @@ n_collisions: object | None = None
 particles: object
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L581-L581)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L584-L584)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationState.pressure
 
@@ -45105,7 +46379,7 @@ particles: object
 pressure: object | None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L583-L583)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L586-L586)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationState.rng_seed
 
@@ -45115,7 +46389,7 @@ pressure: object | None
 rng_seed: object = 0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L589-L589)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L592-L592)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationState.rng_states
 
@@ -45125,7 +46399,7 @@ rng_seed: object = 0
 rng_states: object | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L588-L588)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L591-L591)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationState.temperature
 
@@ -45135,7 +46409,7 @@ rng_states: object | None = None
 temperature: object | None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L582-L582)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L585-L585)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationState.time_step
 
@@ -45145,7 +46419,7 @@ temperature: object | None
 time_step: object
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L584-L584)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L587-L587)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationState.volume
 
@@ -45155,7 +46429,7 @@ time_step: object
 volume: object | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L585-L585)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L588-L588)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationState.backend_payload
 
@@ -45171,7 +46445,7 @@ Return the caller-owned particle container by identity.
 
 - (`object`) — The exact particle container retained by this state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L631-L637)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L634-L640)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationState.__init__
 
@@ -45203,7 +46477,7 @@ CPU-only construction and deterministic error ordering.
 - `ValueError` — If resource form, selected time, RNG presence, or
 ownership is invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L593-L628)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L596-L631)
 
 ## particula.execution.adapters.coagulation._PreparedResidentBrownianCoagulationBinding
 
@@ -45227,7 +46501,7 @@ boundary.
 - `prepared` (`Any`) — Frozen direct-kernel preparation record.
 - `enqueue` (`Any`) — Callable that issues the already prepared native operation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L783-L805)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L786-L808)
 
 ### particula.execution.adapters.coagulation._PreparedResidentBrownianCoagulationBinding.enqueue
 
@@ -45237,7 +46511,7 @@ boundary.
 enqueue: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L801-L801)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L804-L804)
 
 ### particula.execution.adapters.coagulation._PreparedResidentBrownianCoagulationBinding.prepared
 
@@ -45247,7 +46521,7 @@ enqueue: Any
 prepared: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L800-L800)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L803-L803)
 
 ### particula.execution.adapters.coagulation._PreparedResidentBrownianCoagulationBinding.state
 
@@ -45257,7 +46531,7 @@ prepared: Any
 state: ResidentBrownianCoagulationExecutionState
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L799-L799)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L802-L802)
 
 ### particula.execution.adapters.coagulation._PreparedResidentBrownianCoagulationBinding.__init__
 
@@ -45279,7 +46553,7 @@ def execute() -> tuple[Any, Any, Any]
 
 Enqueue the frozen native call without repeating setup.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L803-L805)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L806-L808)
 
 ## particula.execution.adapters.coagulation._available_fields
 
@@ -45300,7 +46574,7 @@ Return protected fields without validating their native schema.
 
 - (`tuple[object, ...]`) — Available attribute values in ``names`` order.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L475-L489)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L478-L492)
 
 ## particula.execution.adapters.coagulation._dtype_itemsize
 
@@ -45321,7 +46595,7 @@ Return a supported Warp scalar size, deferring unknown metadata.
 
 - (`int | None`) — The scalar size in bytes, or ``None`` when metadata is unsupported.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L387-L401)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L390-L404)
 
 ## particula.execution.adapters.coagulation._get_coagulation_step_gpu
 
@@ -45341,7 +46615,7 @@ Lazily resolve the optional direct Warp coagulation kernel.
 
 - `ImportError` — If optional Warp kernel dependencies are unavailable.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L927-L938)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L930-L941)
 
 ## particula.execution.adapters.coagulation._memory_range
 
@@ -45366,7 +46640,7 @@ native-kernel validation concerns.  It never reads device data.
 - (`tuple[int, int] | None`) — A half-open byte range for usable contiguous storage, or ``None`` when
 - (`tuple[int, int] | None`) — metadata cannot establish a range.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L404-L452)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L407-L455)
 
 ## particula.execution.adapters.coagulation._overlaps
 
@@ -45387,7 +46661,7 @@ Return whether two usable, nonempty storage ranges overlap.
 
 - (`bool`) — True when both ranges are present and share at least one byte.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L455-L472)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L458-L475)
 
 ## particula.execution.adapters.coagulation._validate_cpu_brownian_runnable
 
@@ -45408,7 +46682,7 @@ Validate the selected CPU Brownian particle-resolved capability.
 - `ValueError` — If the runnable is not the supported Brownian,
 particle-resolved configuration.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L221-L238)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L223-L240)
 
 ## particula.execution.adapters.coagulation._validate_initialize_rng
 
@@ -45428,7 +46702,7 @@ Validate the explicit persistent-RNG reset control.
 
 - `TypeError` — If ``initialize_rng`` is not an exact boolean.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L208-L218)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L210-L220)
 
 ## particula.execution.adapters.coagulation._validate_ownership
 
@@ -45457,7 +46731,7 @@ reads metadata only and does not mutate or synchronize device resources.
 - `ValueError` — If writable sidecars alias a protected resource or each
 other.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L492-L535)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L495-L538)
 
 ## particula.execution.adapters.coagulation._validate_time_step
 
@@ -45478,7 +46752,7 @@ Validate a non-boolean, finite, nonnegative real time step.
 - `TypeError` — If ``time_step`` is not a non-boolean real scalar.
 - `ValueError` — If ``time_step`` is non-finite or negative.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L192-L205)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L194-L207)
 
 ## particula.execution.adapters.coagulation._validate_warp_brownian_state_controls
 
@@ -45501,7 +46775,7 @@ type.
 - `ValueError` — If the selected time step is non-finite, negative, or the
 persistent RNG sidecar is missing.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L278-L295)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L280-L297)
 
 ## particula.execution.adapters.coagulation._validate_warp_brownian_state_form
 
@@ -45528,7 +46802,7 @@ Validate resident-Warp payload form and return environment usage.
 - `TypeError` — If particles or the optional environment has an invalid type.
 - `ValueError` — If the selected temperature/pressure form is invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L241-L275)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L243-L277)
 
 ## particula.execution.adapters.coagulation._validate_warp_brownian_state_ownership
 
@@ -45551,7 +46825,7 @@ Validate writable sidecar ownership for resident-Warp dispatch.
 - `ValueError` — If writable sidecars alias a protected resource or each
 other.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L298-L337)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L300-L339)
 
 ---
 
@@ -45590,7 +46864,7 @@ promised after a writer-capable failure.
 CPUCondensationAdapter = CPUCondensationExecutionAdapter
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L1022-L1022)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L1025-L1025)
 
 ## particula.execution.adapters.condensation.WarpCondensationAdapter
 
@@ -45600,7 +46874,7 @@ CPUCondensationAdapter = CPUCondensationExecutionAdapter
 WarpCondensationAdapter = WarpCondensationExecutionAdapter
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L1023-L1023)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L1026-L1026)
 
 ## particula.execution.adapters.condensation.CPUCondensationExecutionAdapter
 
@@ -45620,7 +46894,7 @@ return the original aerosol, and successful results declare state mutation.
 Backend exceptions propagate unchanged. This adapter is concrete-only and
 must be imported from ``particula.execution.adapters.condensation``.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L794-L845)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L796-L848)
 
 ### particula.execution.adapters.condensation.CPUCondensationExecutionAdapter.execute
 
@@ -45647,7 +46921,7 @@ Execute one exact CPU thermal correction state without fallback or
 - `ValueError` — If controls or the selected profile are invalid, latent
 heat is enabled, or the runnable returns another aerosol.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L806-L845)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L808-L848)
 
 ## particula.execution.adapters.condensation.CPUCondensationExecutionState
 
@@ -45677,7 +46951,17 @@ frozen fields prevent rebinding only.
 
 - `TypeError` — If ``state`` or ``runnable`` is not the required exact type.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L611-L657)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L611-L659)
+
+### particula.execution.adapters.condensation.CPUCondensationExecutionState.context
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+context: object = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L637-L637)
 
 ### particula.execution.adapters.condensation.CPUCondensationExecutionState.runnable
 
@@ -45733,14 +47017,14 @@ Return the exact caller-owned CPU aerosol payload.
 
 - (`Aerosol`) — The aerosol retained by the inventory finalization state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L651-L657)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L653-L659)
 
 ### particula.execution.adapters.condensation.CPUCondensationExecutionState.__init__
 
 *method*
 
 ```python
-def __init__(state: CPUCondensationState, time_step: object, sub_steps: object, runnable: MassCondensation) -> None
+def __init__(state: CPUCondensationState, time_step: object, sub_steps: object, runnable: MassCondensation, context: object = None) -> None
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L0-L0)
@@ -45761,7 +47045,7 @@ Validate exact inventory finalization-state and runnable carrier
 - `TypeError` — If ``state`` or ``runnable`` is not the required exact
 type.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L637-L648)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L639-L650)
 
 ## particula.execution.adapters.condensation.CPUCondensationState
 
@@ -45946,7 +47230,7 @@ This concrete-only adapter is imported from
 ``particula.execution.adapters.condensation``. It forwards the exact
 native kernel tuple without reconstructing it.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L848-L952)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L851-L955)
 
 ### particula.execution.adapters.condensation.WarpCondensationExecutionAdapter.execute
 
@@ -45982,7 +47266,7 @@ Direct errors propagate unchanged.
 - `ImportError` — If the optional Warp kernel cannot be imported after
 successful preflight.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L921-L952)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L924-L955)
 
 ### particula.execution.adapters.condensation.WarpCondensationExecutionAdapter.prepare
 
@@ -46009,7 +47293,7 @@ Validate and bind one resident state for repeated device enqueues.
 - `ValueError` — If controls, profile, or selected sidecars are invalid.
 - `ImportError` — If the optional Warp kernel cannot be imported.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L867-L919)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L870-L922)
 
 ## particula.execution.adapters.condensation.WarpCondensationExecutionState
 
@@ -46034,7 +47318,7 @@ Construction neither imports a kernel nor inspects retained resources.
 
 - `TypeError` — If ``state`` is not an exact ``WarpCondensationState``.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L660-L696)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L662-L698)
 
 ### particula.execution.adapters.condensation.WarpCondensationExecutionState.state
 
@@ -46044,7 +47328,7 @@ Construction neither imports a kernel nor inspects retained resources.
 state: WarpCondensationState
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L676-L676)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L678-L678)
 
 ### particula.execution.adapters.condensation.WarpCondensationExecutionState.time_step
 
@@ -46054,7 +47338,7 @@ state: WarpCondensationState
 time_step: object
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L677-L677)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L679-L679)
 
 ### particula.execution.adapters.condensation.WarpCondensationExecutionState.backend_payload
 
@@ -46071,7 +47355,7 @@ Return the exact caller-owned resident primary payload.
 - (`object`) — The ``(particles, gas, environment)`` tuple from the inventory
 - (`object`) — finalization state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L689-L696)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L691-L698)
 
 ### particula.execution.adapters.condensation.WarpCondensationExecutionState.__init__
 
@@ -46097,7 +47381,7 @@ Validate the exact inventory finalization Warp state carrier type.
 
 - `TypeError` — If ``state`` is not an exact ``WarpCondensationState``.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L679-L686)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L681-L688)
 
 ## particula.execution.adapters.condensation.WarpCondensationState
 
@@ -46401,7 +47685,7 @@ not provided.
 - `prepared` (`Any`) — Private kernel record produced during preparation.
 - `enqueue` (`Any`) — Private device-only enqueue callable.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L699-L734)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L701-L736)
 
 ### particula.execution.adapters.condensation._PreparedWarpCondensationBinding.enqueue
 
@@ -46411,7 +47695,7 @@ not provided.
 enqueue: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L720-L720)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L722-L722)
 
 ### particula.execution.adapters.condensation._PreparedWarpCondensationBinding.prepared
 
@@ -46421,7 +47705,7 @@ enqueue: Any
 prepared: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L719-L719)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L721-L721)
 
 ### particula.execution.adapters.condensation._PreparedWarpCondensationBinding.state
 
@@ -46431,7 +47715,7 @@ prepared: Any
 state: WarpCondensationExecutionState
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L718-L718)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L720-L720)
 
 ### particula.execution.adapters.condensation._PreparedWarpCondensationBinding.__init__
 
@@ -46464,7 +47748,7 @@ Enqueue the retained kernel call without repeating setup.
 existing runtime validation failure. Post-launch rollback is
 not provided.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L722-L734)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L724-L736)
 
 ## particula.execution.adapters.condensation._dtype_itemsize
 
@@ -46505,7 +47789,7 @@ Lazily resolve the prepared direct Warp kernel path after preflight.
 
 - `ImportError` — If the optional Warp kernel dependencies are unavailable.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L768-L791)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L770-L793)
 
 ## particula.execution.adapters.condensation._memory_range
 
@@ -46575,7 +47859,7 @@ Reject semantic latent heat at the selected isothermal boundary.
 
 - `ValueError` — If the configuration enables latent heat.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L753-L765)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L755-L767)
 
 ## particula.execution.adapters.condensation._validate_array
 
@@ -46648,7 +47932,7 @@ Validate semantic-profile sidecars before native kernel resolution.
 - `ValueError` — If a required sidecar is missing or incompatible with the
 selected latent-heat, activity, or surface-tension semantics.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L955-L1018)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L958-L1021)
 
 ## particula.execution.adapters.condensation._validate_time_step
 
@@ -46669,7 +47953,7 @@ Validate a non-boolean, finite, nonnegative real time step.
 - `TypeError` — If ``time_step`` is not a non-boolean real scalar.
 - `ValueError` — If ``time_step`` is non-finite or negative.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L737-L750)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L739-L752)
 
 ---
 
@@ -48948,6 +50232,225 @@ value domains, or enabled topology is invalid.
 > before writers run.
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/execution/communication.py#L758-L805)
+
+---
+
+# particula.execution.cpu_context
+
+*module*
+
+Caller-owned, transactional random streams for CPU box execution.
+
+This module does not import Warp or share the resident GPU stream format.
+Context views share continuation state, while transactions stage independent
+generators until a successful runnable substep publishes them.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L1-L1)
+
+## particula.execution.cpu_context.CPUExecutionContext
+
+*class*
+
+```python
+class CPUExecutionContext
+```
+
+Retain persistent process-specific streams keyed by logical box ID.
+
+**Parameters**
+
+- `root_seed` (`int`) — Nonnegative integer seed; booleans are not accepted.
+- `box_ids` (`tuple[str, ...]`) — Unique nonempty strings in current numeric-array box order.
+
+Reordering numeric storage requires a matching ``with_box_ids`` view.
+Reusing a context and process namespace deliberately continues its streams.
+Create a new context to reset them. Contexts are not thread-safe and must
+not be used concurrently. No CPU/GPU bitwise equivalence is implied.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L29-L90)
+
+### particula.execution.cpu_context.CPUExecutionContext._box_ids
+
+*attribute* · *instance attribute*
+
+```python
+_box_ids: tuple[str, ...] = _box_ids(box_ids)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L51-L51)
+
+### particula.execution.cpu_context.CPUExecutionContext._root_seed
+
+*attribute* · *instance attribute*
+
+```python
+_root_seed: int = int(root_seed)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L50-L50)
+
+### particula.execution.cpu_context.CPUExecutionContext._streams
+
+*attribute* · *instance attribute*
+
+```python
+_streams: dict[tuple[str, str], np.random.Generator] = {}
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L52-L52)
+
+### particula.execution.cpu_context.CPUExecutionContext.box_ids
+
+*property*
+
+```python
+box_ids: tuple[str, ...]
+```
+
+Return logical IDs in this view's numeric-array order.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L60-L62)
+
+### particula.execution.cpu_context.CPUExecutionContext.root_seed
+
+*property*
+
+```python
+root_seed: int
+```
+
+Return the immutable root seed.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L55-L57)
+
+### particula.execution.cpu_context.CPUExecutionContext.__init__
+
+*method*
+
+```python
+def __init__(root_seed: int, box_ids: tuple[str, ...]) -> None
+```
+
+Validate metadata without creating or advancing random streams.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L42-L52)
+
+### particula.execution.cpu_context.CPUExecutionContext._begin
+
+*method*
+
+```python
+def _begin(n_boxes: int) -> _CPUStreamTransaction
+```
+
+Validate layout and begin a private substep transaction.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L74-L78)
+
+### particula.execution.cpu_context.CPUExecutionContext._new_generator
+
+*method*
+
+```python
+def _new_generator(namespace: str, box_id: str) -> np.random.Generator
+```
+
+Derive a versioned PCG64 stream independently of lane/order.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L80-L90)
+
+### particula.execution.cpu_context.CPUExecutionContext.with_box_ids
+
+*method*
+
+```python
+def with_box_ids(box_ids: tuple[str, ...]) -> CPUExecutionContext
+```
+
+Create a reordered, reduced, or extended continuation-sharing view.
+
+New IDs acquire streams lazily; existing IDs retain continuation even
+when absent from a view. The caller must reorder arrays consistently.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L64-L72)
+
+## particula.execution.cpu_context._CPUStreamTransaction
+
+*class*
+
+```python
+class _CPUStreamTransaction
+```
+
+Stage stream continuation without touching caller-owned state.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L93-L116)
+
+### particula.execution.cpu_context._CPUStreamTransaction._context
+
+*attribute* · *instance attribute*
+
+```python
+_context = context
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L97-L97)
+
+### particula.execution.cpu_context._CPUStreamTransaction._staged
+
+*attribute* · *instance attribute*
+
+```python
+_staged: dict[tuple[str, str], np.random.Generator] = {}
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L98-L98)
+
+### particula.execution.cpu_context._CPUStreamTransaction.__init__
+
+*method*
+
+```python
+def __init__(context: CPUExecutionContext) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L96-L98)
+
+### particula.execution.cpu_context._CPUStreamTransaction.commit
+
+*method*
+
+```python
+def commit() -> None
+```
+
+Publish staged streams after successful numeric publication.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L114-L116)
+
+### particula.execution.cpu_context._CPUStreamTransaction.generator
+
+*method*
+
+```python
+def generator(namespace: str, box: int) -> np.random.Generator
+```
+
+Return a staged generator for one process and logical box.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L100-L112)
+
+## particula.execution.cpu_context._box_ids
+
+*function*
+
+```python
+def _box_ids(values: tuple[str, ...]) -> tuple[str, ...]
+```
+
+Validate stable, unique logical identities without normalization.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L18-L26)
 
 ---
 
@@ -69914,7 +71417,7 @@ Each setter performs unit conversion and ensures correct dtypes.
 Batch dimensions are inserted automatically when 1D concentration is
 provided.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gas/gas_data_builder.py#L45-L206)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gas/gas_data_builder.py#L45-L217)
 
 ### particula.gas.GasDataBuilder._concentration
 
@@ -69996,7 +71499,7 @@ Build and return validated GasData.
 
 - `ValueError` — If required fields are missing or invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gas/gas_data_builder.py#L176-L206)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gas/gas_data_builder.py#L182-L217)
 
 ### particula.gas.GasDataBuilder.set_concentration
 
@@ -70066,7 +71569,7 @@ Set number of boxes for broadcasting 1D concentration.
 
 - (`'GasDataBuilder'`) — Self for fluent chaining.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gas/gas_data_builder.py#L164-L174)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gas/gas_data_builder.py#L164-L180)
 
 ### particula.gas.GasDataBuilder.set_names
 
@@ -73870,7 +75373,7 @@ Each setter performs unit conversion and ensures correct dtypes.
 Batch dimensions are inserted automatically when 1D concentration is
 provided.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gas/gas_data_builder.py#L45-L206)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gas/gas_data_builder.py#L45-L217)
 
 ### particula.gas.gas_data_builder.GasDataBuilder._concentration
 
@@ -73952,7 +75455,7 @@ Build and return validated GasData.
 
 - `ValueError` — If required fields are missing or invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gas/gas_data_builder.py#L176-L206)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gas/gas_data_builder.py#L182-L217)
 
 ### particula.gas.gas_data_builder.GasDataBuilder.set_concentration
 
@@ -74022,7 +75525,7 @@ Set number of boxes for broadcasting 1D concentration.
 
 - (`'GasDataBuilder'`) — Self for fluent chaining.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gas/gas_data_builder.py#L164-L174)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gas/gas_data_builder.py#L164-L180)
 
 ### particula.gas.gas_data_builder.GasDataBuilder.set_names
 
@@ -102146,7 +103649,7 @@ available when dimensions are supplied instead of masses. Building
 requires an explicit storage kind; PDF storage also requires a radius
 grid and matching PDF concentration units.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L47-L407)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L47-L413)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder._charge
 
@@ -102280,7 +103783,7 @@ def _broadcast_if_needed(array: NDArray[np.float64], target_shape: tuple[int, ..
 
 Broadcast array to target shape when compatible.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L267-L289)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L273-L295)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder._ensure_counts
 
@@ -102292,7 +103795,7 @@ def _ensure_counts() -> None
 
 Ensure counts are available for zero-init path.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L291-L300)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L297-L306)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder._get_counts
 
@@ -102304,7 +103807,7 @@ def _get_counts() -> tuple[int, int, int]
 
 Return the integer counts currently tracked.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L302-L310)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L308-L316)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder._infer_counts_from_masses
 
@@ -102316,7 +103819,7 @@ def _infer_counts_from_masses() -> tuple[int, int, int]
 
 Derive counts from masses when present.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L257-L265)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L263-L271)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder.build
 
@@ -102341,7 +103844,7 @@ Validate the kind-specific volume and PDF radius grid before return.
 - `ValueError` — When required fields, units, shapes, or physical
 values do not match the declared representation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L312-L407)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L318-L413)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder.set_charge
 
@@ -102476,7 +103979,7 @@ def set_n_boxes(n_boxes: int) -> 'ParticleDataBuilder'
 
 Set number of boxes for zero-init or shape validation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L242-L245)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L242-L251)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder.set_n_particles
 
@@ -102488,7 +103991,7 @@ def set_n_particles(n_particles: int) -> 'ParticleDataBuilder'
 
 Set number of particles for zero-init or shape validation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L247-L250)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L253-L256)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder.set_n_species
 
@@ -102500,7 +104003,7 @@ def set_n_species(n_species: int) -> 'ParticleDataBuilder'
 
 Set number of species for zero-init or shape validation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L252-L255)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L258-L261)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder.set_radius_grid
 
@@ -108595,24 +110098,22 @@ final_aerosol = chained.execute(aerosol, time_step=1.0)
 AVAILABLE_TQDM = True
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L30-L30)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L32-L32)
 
 ## particula.runnable.RunnableABC
 
 *class*
 
 ```python
-class RunnableABC(ABC)
+class RunnableABC
 ```
-
-Bases: `ABC`
 
 Abstract base class for processes modifying an Aerosol instance.
 
-This class enforces the implementation of a process rate calculation
-and an execution method that modifies the Aerosol in-place. Subclasses
-must implement both 'rate' and 'execute', which define how the process
-affects the Aerosol over a time step.
+The default drivers stage and execute single-box hooks across a batch.
+Implement ``_rate_box``, ``_execute_box``, and ``_writer_fields`` to use
+this transaction boundary. Existing subclasses overriding public methods
+retain their own execution and validation responsibilities.
 
 **Functions**
 
@@ -108637,7 +110138,7 @@ class CustomProcess(Runnable):
 >
 > - No references available yet.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L36-L129)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L38-L188)
 
 ### particula.runnable.RunnableABC.__or__
 
@@ -108667,64 +110168,119 @@ combined_process = process1 | process2
 final_aerosol = combined_process.execute(aerosol, time_step=1.0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L108-L129)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L167-L188)
+
+### particula.runnable.RunnableABC._box_worker
+
+*method*
+
+```python
+def _box_worker(box, boxes, transaction)
+```
+
+Create isolated hook state for a single box.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L151-L153)
+
+### particula.runnable.RunnableABC._execute_box
+
+*method*
+
+```python
+def _execute_box(aerosol, time_step, sub_steps=1)
+```
+
+Execute the single-box numerical building block.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L163-L165)
+
+### particula.runnable.RunnableABC._is_stochastic
+
+*method*
+
+```python
+def _is_stochastic(aerosol)
+```
+
+Report whether this process requires independent box streams.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L147-L149)
+
+### particula.runnable.RunnableABC._prepare_commit
+
+*method*
+
+```python
+def _prepare_commit(workers, uses_context)
+```
+
+Prepare a non-failing diagnostics publisher before numeric writes.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L155-L157)
+
+### particula.runnable.RunnableABC._rate_box
+
+*method*
+
+```python
+def _rate_box(aerosol)
+```
+
+Evaluate the single-box numerical building block.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L159-L161)
+
+### particula.runnable.RunnableABC._validate_batch
+
+*method*
+
+```python
+def _validate_batch(aerosol)
+```
+
+Validate process-wide controls before staging boxes.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L140-L141)
+
+### particula.runnable.RunnableABC._writer_fields
+
+*method*
+
+```python
+def _writer_fields(aerosol)
+```
+
+Declare numeric destinations for transactional publication.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L143-L145)
 
 ### particula.runnable.RunnableABC.execute
 
-*method* · *abstract*
+*method*
 
 ```python
-def execute(aerosol: Aerosol, time_step: float, sub_steps: int = 1) -> Aerosol
+def execute(aerosol: Aerosol, time_step: float, sub_steps: int = 1, *, context=None) -> Aerosol
 ```
 
-Execute the process, modifying the Aerosol in-place over a time step.
+Advance every box, committing atomically after each process substep.
 
-**Parameters**
+Contexts own independent logical-box random streams. Completed substeps
+remain committed if a later one fails. Custom subclasses overriding
+this method retain responsibility for their own execution semantics.
 
-- `aerosol` (`Aerosol`) — The Aerosol instance to be updated.
-- `time_step` (`float`) — The time step size in seconds.
-- `sub_steps` (`int`) (default: `1`) — Number of sub-steps to subdivide the time step, default 1.
-
-**Returns**
-
-- (`Aerosol`) — - The updated Aerosol after this process runs.
-
-**Examples**
-
-```py title="Executing the process"
-process = CustomProcess()
-updated_aerosol = process.execute(my_aerosol, time_step=1.0)
-```
-
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L83-L106)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L84-L138)
 
 ### particula.runnable.RunnableABC.rate
 
-*method* · *abstract*
+*method*
 
 ```python
 def rate(aerosol: Aerosol) -> Any
 ```
 
-Calculate and return the rate of this process for the given Aerosol.
+Evaluate detached box hooks and retain a leading box axis.
 
-**Parameters**
-
-- `aerosol` (`Aerosol`) — The Aerosol instance on which to calculate the rate.
-
-**Returns**
-
-- (`Any`) — - Any : The computed rate of this process.
-
-**Examples**
-
-```py title="Using the rate method"
-process = CustomProcess()
-process_rate = process.rate(my_aerosol)
-print(process_rate)
-```
-
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L65-L81)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L67-L82)
 
 ## particula.runnable.RunnableSequence
 
@@ -108759,7 +110315,7 @@ sequence.add_process(AnotherProcess())
 final_aerosol = sequence.execute(aerosol, time_step=2.0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L132-L238)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L191-L307)
 
 ### particula.runnable.RunnableSequence.processes
 
@@ -108769,7 +110325,7 @@ final_aerosol = sequence.execute(aerosol, time_step=2.0)
 processes: list[RunnableABC] = []
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L161-L161)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L220-L220)
 
 ### particula.runnable.RunnableSequence.__init__
 
@@ -108783,7 +110339,7 @@ Initialize the RunnableSequence.
 
 Sets up an empty list to hold the sequence of Runnable processes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L156-L161)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L215-L220)
 
 ### particula.runnable.RunnableSequence.__or__
 
@@ -108812,7 +110368,7 @@ sequence |= CustomProcess()
 sequence = sequence | AnotherProcess()
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L220-L238)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L289-L307)
 
 ### particula.runnable.RunnableSequence.add_process
 
@@ -108835,14 +110391,14 @@ sequence = RunnableSequence()
 sequence.add_process(CustomProcess())
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L163-L175)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L222-L234)
 
 ### particula.runnable.RunnableSequence.execute
 
 *method*
 
 ```python
-def execute(aerosol: Aerosol, time_step: float, sub_steps: int = 1) -> Aerosol
+def execute(aerosol: Aerosol, time_step: float, sub_steps: int = 1, *, context=None) -> Aerosol
 ```
 
 Execute all processes in the sequence on the given Aerosol.
@@ -108870,7 +110426,7 @@ final_aerosol = sequence.execute(
 )
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L177-L218)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L236-L287)
 
 ---
 

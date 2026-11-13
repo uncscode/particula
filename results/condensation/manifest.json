@@ -1,15 +1,15 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 3.4024487679707818,
-  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "elapsed_seconds": 3.4198568610008806,
+  "package_source_sha256": "4f670fa90711c3e04809890aa397fedf0654a56ec8d6ae25e182c95a890a36d1",
   "input_sha256": {},
   "example": "condensation",
-  "fingerprint": "10f2fa7bd88b1334f83c52d6adc494f5efc3f89cd400699605b2d95c84e67f88",
+  "fingerprint": "7075cd3175ea91eacf588275358912a3905dbdc653c8a74a1ebe4d19c24281d6",
   "source": "docs/examples/processes/condensation/condensation_1_bin.py",
-  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
-  "package_dirty": false,
-  "executed_at": "2026-11-13T14:59:24.323487+00:00",
+  "revision": "366d7ee5ca6fb37a5418ba96aa8c13a41b4d7a39",
+  "package_dirty": true,
+  "executed_at": "2026-11-13T20:31:40.903418+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
@@ -30,12 +30,12 @@
     ],
     [
       {
-        "text": "Strategy: <particula.dynamics.condensation.condensation_strategies.CondensationIsothermal object at 0x7ff5fddbf320>\nRunnable: <particula.dynamics.particle_process.MassCondensation object at 0x7ff5fd644710>\n"
+        "text": "Strategy: <particula.dynamics.condensation.condensation_strategies.CondensationIsothermal object at 0x7f365d6a2ff0>\nRunnable: <particula.dynamics.particle_process.MassCondensation object at 0x7f365dde0200>\n"
       }
     ],
     [
       {
-        "text": "Condensation rate shape: (500, 1)\nMean rate: -2.52e-07 kg/s per particle\n"
+        "text": "Condensation rate shape: (1, 500, 1)\nMean rate: -2.52e-07 kg/m^3/s per slot\n"
       }
     ],
     [
@@ -45,7 +45,7 @@
     ]
   ],
   "files": {
-    "source.py": "4750dc7eefae0b2a861e63449691fb289143bee3fb900a6d9fb3f6d6561312aa",
+    "source.py": "f57031146ff3dc23a5324056d77c092cef8e5e761228648309d5b13f1e57456d",
     "figure-5-1.png": "05b7e62d1b091b848a2d32f453549dccf8fa2a5a9efc6257946feb15dde7cccd"
   }
 }

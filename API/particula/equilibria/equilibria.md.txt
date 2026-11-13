@@ -52,7 +52,7 @@ Execute an equilibria strategy within the runnable interface.
 
 - `strategy` (`EquilibriaStrategy`) — Concrete ``EquilibriaStrategy`` used to solve equilibrium.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L48-L216)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L48-L223)
 
 ### particula.equilibria.equilibria.Equilibria.strategy
 
@@ -88,7 +88,7 @@ Initialize with the provided equilibria strategy.
 def _apply_attribute_result(aerosol: Aerosol, result: Any) -> Aerosol
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L201-L208)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L208-L215)
 
 ### particula.equilibria.equilibria.Equilibria._apply_equilibrium_result
 
@@ -103,7 +103,7 @@ Apply strategy results to the aerosol or attach for downstream use.
 Accepts either an updated ``Aerosol`` instance, a mapping/struct with
 recognizable concentration fields, or raises when ``None`` is returned.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L147-L181)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L154-L188)
 
 ### particula.equilibria.equilibria.Equilibria._apply_mapping_result
 
@@ -113,7 +113,7 @@ recognizable concentration fields, or raises when ``None`` is returned.
 def _apply_mapping_result(aerosol: Aerosol, result: Mapping[str, Any]) -> Aerosol
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L190-L199)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L197-L206)
 
 ### particula.equilibria.equilibria.Equilibria._attach_equilibrium_result_dataclass
 
@@ -123,7 +123,7 @@ def _apply_mapping_result(aerosol: Aerosol, result: Mapping[str, Any]) -> Aeroso
 def _attach_equilibrium_result_dataclass(aerosol: Aerosol, result: EquilibriumResult) -> Aerosol
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L183-L188)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L190-L195)
 
 ### particula.equilibria.equilibria.Equilibria._attach_phase_concentrations
 
@@ -133,7 +133,7 @@ def _attach_equilibrium_result_dataclass(aerosol: Aerosol, result: EquilibriumRe
 def _attach_phase_concentrations(aerosol: Aerosol, result: PhaseConcentrations) -> Aerosol
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L210-L216)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L217-L223)
 
 ### particula.equilibria.equilibria.Equilibria._extract_partitioning_inputs
 
@@ -150,14 +150,14 @@ absent, falls back to attributes of the aerosol itself. Raises with a
 clear message when a required field is unavailable to keep failures
 explicit during testing.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L104-L145)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L111-L152)
 
 ### particula.equilibria.equilibria.Equilibria.execute
 
 *method*
 
 ```python
-def execute(aerosol: Aerosol, time_step: float, sub_steps: int = 1) -> Aerosol
+def execute(aerosol: Aerosol, time_step: float, sub_steps: int = 1, *, context=None) -> Aerosol
 ```
 
 Run equilibria over the provided time step.
@@ -178,7 +178,7 @@ Run equilibria over the provided time step.
 - `AttributeError` — When required partitioning inputs are missing.
 - `TypeError` — If the strategy returns ``None``.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L67-L102)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L67-L109)
 
 ### particula.equilibria.equilibria.Equilibria.rate
 
@@ -222,4 +222,102 @@ combined_process = process1 | process2
 final_aerosol = combined_process.execute(aerosol, time_step=1.0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L108-L129)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L167-L188)
+
+### particula.equilibria.equilibria.Equilibria._box_worker
+
+*method*
+
+```python
+def _box_worker(box, boxes, transaction)
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Create isolated hook state for a single box.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L151-L153)
+
+### particula.equilibria.equilibria.Equilibria._execute_box
+
+*method*
+
+```python
+def _execute_box(aerosol, time_step, sub_steps=1)
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Execute the single-box numerical building block.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L163-L165)
+
+### particula.equilibria.equilibria.Equilibria._is_stochastic
+
+*method*
+
+```python
+def _is_stochastic(aerosol)
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Report whether this process requires independent box streams.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L147-L149)
+
+### particula.equilibria.equilibria.Equilibria._prepare_commit
+
+*method*
+
+```python
+def _prepare_commit(workers, uses_context)
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Prepare a non-failing diagnostics publisher before numeric writes.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L155-L157)
+
+### particula.equilibria.equilibria.Equilibria._rate_box
+
+*method*
+
+```python
+def _rate_box(aerosol)
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Evaluate the single-box numerical building block.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L159-L161)
+
+### particula.equilibria.equilibria.Equilibria._validate_batch
+
+*method*
+
+```python
+def _validate_batch(aerosol)
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Validate process-wide controls before staging boxes.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L140-L141)
+
+### particula.equilibria.equilibria.Equilibria._writer_fields
+
+*method*
+
+```python
+def _writer_fields(aerosol)
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Declare numeric destinations for transactional publication.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L143-L145)

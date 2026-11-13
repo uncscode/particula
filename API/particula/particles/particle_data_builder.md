@@ -56,7 +56,7 @@ available when dimensions are supplied instead of masses. Building
 requires an explicit storage kind; PDF storage also requires a radius
 grid and matching PDF concentration units.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L47-L407)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L47-L413)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder._charge
 
@@ -190,7 +190,7 @@ def _broadcast_if_needed(array: NDArray[np.float64], target_shape: tuple[int, ..
 
 Broadcast array to target shape when compatible.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L267-L289)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L273-L295)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder._ensure_counts
 
@@ -202,7 +202,7 @@ def _ensure_counts() -> None
 
 Ensure counts are available for zero-init path.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L291-L300)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L297-L306)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder._get_counts
 
@@ -214,7 +214,7 @@ def _get_counts() -> tuple[int, int, int]
 
 Return the integer counts currently tracked.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L302-L310)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L308-L316)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder._infer_counts_from_masses
 
@@ -226,7 +226,7 @@ def _infer_counts_from_masses() -> tuple[int, int, int]
 
 Derive counts from masses when present.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L257-L265)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L263-L271)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder.build
 
@@ -251,7 +251,7 @@ Validate the kind-specific volume and PDF radius grid before return.
 - `ValueError` — When required fields, units, shapes, or physical
 values do not match the declared representation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L312-L407)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L318-L413)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder.set_charge
 
@@ -386,7 +386,7 @@ def set_n_boxes(n_boxes: int) -> 'ParticleDataBuilder'
 
 Set number of boxes for zero-init or shape validation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L242-L245)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L242-L251)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder.set_n_particles
 
@@ -398,7 +398,7 @@ def set_n_particles(n_particles: int) -> 'ParticleDataBuilder'
 
 Set number of particles for zero-init or shape validation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L247-L250)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L253-L256)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder.set_n_species
 
@@ -410,7 +410,7 @@ def set_n_species(n_species: int) -> 'ParticleDataBuilder'
 
 Set number of species for zero-init or shape validation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L252-L255)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L258-L261)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder.set_radius_grid
 

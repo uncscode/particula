@@ -76,7 +76,7 @@ caller-owned runnable once without splitting, converting, retrying, or
 recovering. Successful results retain the original aerosol and declare
 state mutation. Delegate exceptions propagate unchanged.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L340-L384)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L342-L387)
 
 ### particula.execution.adapters.coagulation.CPUCoagulationExecutionAdapter.execute
 
@@ -102,7 +102,7 @@ Execute one exact CPU execution state without fallback or recovery.
 - `ValueError` — If controls are invalid or the runnable returns another
 aerosol.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L349-L384)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L351-L387)
 
 ## particula.execution.adapters.coagulation.CPUCoagulationExecutionState
 
@@ -130,7 +130,17 @@ resources remain caller-owned and mutable.
 
 - `TypeError` — If ``state`` or ``runnable`` is not the required exact type.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L151-L189)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L151-L191)
+
+### particula.execution.adapters.coagulation.CPUCoagulationExecutionState.context
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+context: object = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L175-L175)
 
 ### particula.execution.adapters.coagulation.CPUCoagulationExecutionState.runnable
 
@@ -186,14 +196,14 @@ Return the exact caller-owned CPU aerosol payload.
 
 - (`Aerosol`) — The aerosol retained by the state state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L183-L189)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L185-L191)
 
 ### particula.execution.adapters.coagulation.CPUCoagulationExecutionState.__init__
 
 *method*
 
 ```python
-def __init__(state: CPUCoagulationState, time_step: object, sub_steps: object, runnable: Coagulation) -> None
+def __init__(state: CPUCoagulationState, time_step: object, sub_steps: object, runnable: Coagulation, context: object = None) -> None
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L0-L0)
@@ -208,7 +218,7 @@ def __post_init__() -> None
 
 Validate exact state-state and runnable carrier types.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L175-L180)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L177-L182)
 
 ## particula.execution.adapters.coagulation.CPUCoagulationResult
 
@@ -405,7 +415,7 @@ resident-owned configuration-derived coagulation sidecar with literal
 ``initialize_rng=False``. It does not acquire, allocate, seed, reset,
 inspect, transfer, or synchronize the stream.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L808-L924)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L811-L927)
 
 ### particula.execution.adapters.coagulation.ResidentBrownianCoagulationExecutionAdapter.execute
 
@@ -434,7 +444,7 @@ or inconsistent.
 - `ImportError` — If the optional direct Warp kernel is unavailable after
 preflight.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L894-L924)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L897-L927)
 
 ### particula.execution.adapters.coagulation.ResidentBrownianCoagulationExecutionAdapter.prepare
 
@@ -461,7 +471,7 @@ Preflight and freeze one resident Brownian kernel call.
 or inconsistent.
 - `ImportError` — If the optional direct Warp kernel is unavailable.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L818-L892)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L821-L895)
 
 ## particula.execution.adapters.coagulation.ResidentBrownianCoagulationExecutionState
 
@@ -487,7 +497,7 @@ reset or inspection APIs are outside this concrete-only boundary.
 - `registry` (`GPUResourceRegistry`) — Exact registry that published ``resources`` for ``session``.
 - `resources` (`CoagulationResources`) — Published collision outputs and persistent RNG sidecar.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L734-L780)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L737-L783)
 
 ### particula.execution.adapters.coagulation.ResidentBrownianCoagulationExecutionState.registry
 
@@ -497,7 +507,7 @@ reset or inspection APIs are outside this concrete-only boundary.
 registry: GPUResourceRegistry
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L754-L754)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L757-L757)
 
 ### particula.execution.adapters.coagulation.ResidentBrownianCoagulationExecutionState.request
 
@@ -507,7 +517,7 @@ registry: GPUResourceRegistry
 request: WarpBrownianCoagulationExecutionState
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L752-L752)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L755-L755)
 
 ### particula.execution.adapters.coagulation.ResidentBrownianCoagulationExecutionState.resources
 
@@ -517,7 +527,7 @@ request: WarpBrownianCoagulationExecutionState
 resources: CoagulationResources
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L755-L755)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L758-L758)
 
 ### particula.execution.adapters.coagulation.ResidentBrownianCoagulationExecutionState.session
 
@@ -527,7 +537,7 @@ resources: CoagulationResources
 session: ResidentSession
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L753-L753)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L756-L756)
 
 ### particula.execution.adapters.coagulation.ResidentBrownianCoagulationExecutionState.backend_payload
 
@@ -539,7 +549,7 @@ backend_payload: object
 
 Return the exact caller-owned resident particle payload.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L778-L780)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L781-L783)
 
 ### particula.execution.adapters.coagulation.ResidentBrownianCoagulationExecutionState.__init__
 
@@ -561,7 +571,7 @@ def __post_init__() -> None
 
 Validate concrete carrier types without acquiring resources.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L757-L775)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L760-L778)
 
 ## particula.execution.adapters.coagulation.WarpBrownianCoagulationExecutionAdapter
 
@@ -578,7 +588,7 @@ state validation and calls it once. It forwards state resources by identity
 without conversion, synchronization, fallback, retry, or recovery. Kernel
 exceptions and any post-launch mutation remain governed by the kernel.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L941-L999)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L944-L1002)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationExecutionAdapter.execute
 
@@ -609,7 +619,7 @@ unchanged.
 - `ImportError` — If optional Warp kernel dependencies are unavailable
 after local preflight.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L950-L999)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L953-L1002)
 
 ## particula.execution.adapters.coagulation.WarpBrownianCoagulationExecutionState
 
@@ -635,7 +645,7 @@ resources.
 - `TypeError` — If ``state`` is not an exact
 ``WarpBrownianCoagulationState``.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L698-L731)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L701-L734)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationExecutionState.state
 
@@ -645,7 +655,7 @@ resources.
 state: WarpBrownianCoagulationState
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L715-L715)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L718-L718)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationExecutionState.backend_payload
 
@@ -661,7 +671,7 @@ Return the exact caller-owned resident particle payload.
 
 - (`object`) — The particle container retained by the state state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L725-L731)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L728-L734)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationExecutionState.__init__
 
@@ -683,7 +693,7 @@ def __post_init__() -> None
 
 Validate the exact state Warp state carrier type.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L717-L722)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L720-L725)
 
 ## particula.execution.adapters.coagulation.WarpBrownianCoagulationResult
 
@@ -713,7 +723,7 @@ direct-kernel contract.
 - `ValueError` — If particles or a state-supplied diagnostic lacks the
 required identity.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L640-L695)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L643-L698)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationResult.collision_pairs
 
@@ -723,7 +733,7 @@ required identity.
 collision_pairs: object | None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L663-L663)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L666-L666)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationResult.n_collisions
 
@@ -733,7 +743,7 @@ collision_pairs: object | None
 n_collisions: object | None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L664-L664)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L667-L667)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationResult.particles
 
@@ -743,7 +753,7 @@ n_collisions: object | None
 particles: object
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L662-L662)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L665-L665)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationResult.state
 
@@ -753,7 +763,7 @@ particles: object
 state: WarpBrownianCoagulationState
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L661-L661)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L664-L664)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationResult.backend_payload
 
@@ -769,7 +779,7 @@ Return the caller-owned particle container by identity.
 
 - (`object`) — The exact particle container retained by this result.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L689-L695)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L692-L698)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationResult.__init__
 
@@ -796,7 +806,7 @@ Validate state and state-supplied result-sidecar identities.
 - `TypeError` — If the state is not the exact required carrier type.
 - `ValueError` — If a required particle or diagnostic identity differs.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L666-L686)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L669-L689)
 
 ## particula.execution.adapters.coagulation.WarpBrownianCoagulationState
 
@@ -844,7 +854,7 @@ configuration preflight.
 is supplied, or metadata establishes forbidden caller-resource
 aliasing.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L538-L637)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L541-L640)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationState.collision_pairs
 
@@ -854,7 +864,7 @@ aliasing.
 collision_pairs: object | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L586-L586)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L589-L589)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationState.config
 
@@ -864,7 +874,7 @@ collision_pairs: object | None = None
 config: BrownianCoagulationConfig
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L580-L580)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L583-L583)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationState.environment
 
@@ -874,7 +884,7 @@ config: BrownianCoagulationConfig
 environment: object | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L591-L591)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L594-L594)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationState.initialize_rng
 
@@ -884,7 +894,7 @@ environment: object | None = None
 initialize_rng: object = False
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L590-L590)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L593-L593)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationState.n_collisions
 
@@ -894,7 +904,7 @@ initialize_rng: object = False
 n_collisions: object | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L587-L587)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L590-L590)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationState.particles
 
@@ -904,7 +914,7 @@ n_collisions: object | None = None
 particles: object
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L581-L581)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L584-L584)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationState.pressure
 
@@ -914,7 +924,7 @@ particles: object
 pressure: object | None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L583-L583)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L586-L586)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationState.rng_seed
 
@@ -924,7 +934,7 @@ pressure: object | None
 rng_seed: object = 0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L589-L589)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L592-L592)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationState.rng_states
 
@@ -934,7 +944,7 @@ rng_seed: object = 0
 rng_states: object | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L588-L588)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L591-L591)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationState.temperature
 
@@ -944,7 +954,7 @@ rng_states: object | None = None
 temperature: object | None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L582-L582)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L585-L585)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationState.time_step
 
@@ -954,7 +964,7 @@ temperature: object | None
 time_step: object
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L584-L584)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L587-L587)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationState.volume
 
@@ -964,7 +974,7 @@ time_step: object
 volume: object | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L585-L585)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L588-L588)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationState.backend_payload
 
@@ -980,7 +990,7 @@ Return the caller-owned particle container by identity.
 
 - (`object`) — The exact particle container retained by this state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L631-L637)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L634-L640)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationState.__init__
 
@@ -1012,7 +1022,7 @@ CPU-only construction and deterministic error ordering.
 - `ValueError` — If resource form, selected time, RNG presence, or
 ownership is invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L593-L628)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L596-L631)
 
 ## particula.execution.adapters.coagulation._PreparedResidentBrownianCoagulationBinding
 
@@ -1036,7 +1046,7 @@ boundary.
 - `prepared` (`Any`) — Frozen direct-kernel preparation record.
 - `enqueue` (`Any`) — Callable that issues the already prepared native operation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L783-L805)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L786-L808)
 
 ### particula.execution.adapters.coagulation._PreparedResidentBrownianCoagulationBinding.enqueue
 
@@ -1046,7 +1056,7 @@ boundary.
 enqueue: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L801-L801)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L804-L804)
 
 ### particula.execution.adapters.coagulation._PreparedResidentBrownianCoagulationBinding.prepared
 
@@ -1056,7 +1066,7 @@ enqueue: Any
 prepared: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L800-L800)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L803-L803)
 
 ### particula.execution.adapters.coagulation._PreparedResidentBrownianCoagulationBinding.state
 
@@ -1066,7 +1076,7 @@ prepared: Any
 state: ResidentBrownianCoagulationExecutionState
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L799-L799)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L802-L802)
 
 ### particula.execution.adapters.coagulation._PreparedResidentBrownianCoagulationBinding.__init__
 
@@ -1088,7 +1098,7 @@ def execute() -> tuple[Any, Any, Any]
 
 Enqueue the frozen native call without repeating setup.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L803-L805)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L806-L808)
 
 ## particula.execution.adapters.coagulation._available_fields
 
@@ -1109,7 +1119,7 @@ Return protected fields without validating their native schema.
 
 - (`tuple[object, ...]`) — Available attribute values in ``names`` order.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L475-L489)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L478-L492)
 
 ## particula.execution.adapters.coagulation._dtype_itemsize
 
@@ -1130,7 +1140,7 @@ Return a supported Warp scalar size, deferring unknown metadata.
 
 - (`int | None`) — The scalar size in bytes, or ``None`` when metadata is unsupported.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L387-L401)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L390-L404)
 
 ## particula.execution.adapters.coagulation._get_coagulation_step_gpu
 
@@ -1150,7 +1160,7 @@ Lazily resolve the optional direct Warp coagulation kernel.
 
 - `ImportError` — If optional Warp kernel dependencies are unavailable.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L927-L938)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L930-L941)
 
 ## particula.execution.adapters.coagulation._memory_range
 
@@ -1175,7 +1185,7 @@ native-kernel validation concerns.  It never reads device data.
 - (`tuple[int, int] | None`) — A half-open byte range for usable contiguous storage, or ``None`` when
 - (`tuple[int, int] | None`) — metadata cannot establish a range.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L404-L452)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L407-L455)
 
 ## particula.execution.adapters.coagulation._overlaps
 
@@ -1196,7 +1206,7 @@ Return whether two usable, nonempty storage ranges overlap.
 
 - (`bool`) — True when both ranges are present and share at least one byte.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L455-L472)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L458-L475)
 
 ## particula.execution.adapters.coagulation._validate_cpu_brownian_runnable
 
@@ -1217,7 +1227,7 @@ Validate the selected CPU Brownian particle-resolved capability.
 - `ValueError` — If the runnable is not the supported Brownian,
 particle-resolved configuration.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L221-L238)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L223-L240)
 
 ## particula.execution.adapters.coagulation._validate_initialize_rng
 
@@ -1237,7 +1247,7 @@ Validate the explicit persistent-RNG reset control.
 
 - `TypeError` — If ``initialize_rng`` is not an exact boolean.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L208-L218)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L210-L220)
 
 ## particula.execution.adapters.coagulation._validate_ownership
 
@@ -1266,7 +1276,7 @@ reads metadata only and does not mutate or synchronize device resources.
 - `ValueError` — If writable sidecars alias a protected resource or each
 other.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L492-L535)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L495-L538)
 
 ## particula.execution.adapters.coagulation._validate_time_step
 
@@ -1287,7 +1297,7 @@ Validate a non-boolean, finite, nonnegative real time step.
 - `TypeError` — If ``time_step`` is not a non-boolean real scalar.
 - `ValueError` — If ``time_step`` is non-finite or negative.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L192-L205)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L194-L207)
 
 ## particula.execution.adapters.coagulation._validate_warp_brownian_state_controls
 
@@ -1310,7 +1320,7 @@ type.
 - `ValueError` — If the selected time step is non-finite, negative, or the
 persistent RNG sidecar is missing.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L278-L295)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L280-L297)
 
 ## particula.execution.adapters.coagulation._validate_warp_brownian_state_form
 
@@ -1337,7 +1347,7 @@ Validate resident-Warp payload form and return environment usage.
 - `TypeError` — If particles or the optional environment has an invalid type.
 - `ValueError` — If the selected temperature/pressure form is invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L241-L275)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L243-L277)
 
 ## particula.execution.adapters.coagulation._validate_warp_brownian_state_ownership
 
@@ -1360,4 +1370,4 @@ Validate writable sidecar ownership for resident-Warp dispatch.
 - `ValueError` — If writable sidecars alias a protected resource or each
 other.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L298-L337)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L300-L339)

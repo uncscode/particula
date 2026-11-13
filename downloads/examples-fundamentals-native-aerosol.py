@@ -104,3 +104,72 @@ print(
 # The aggregate exposes its held containers through properties. Mutating their
 # arrays changes the held state; use `copy()` for detached inspection. Processes
 # validate their own scientific requirements before using this state.
+
+# %% [markdown]
+# ## Two boxes through the same CPU runnable
+#
+# Boxes share one population type and material layout. Each resolved box has
+# its own physical volume, environment, gas inventory, and particle counts.
+# Runnables iterate boxes; direct strategy methods still operate on one box.
+
+# %%
+box_particles = par.particles.create_resolved_particle_data(
+    masses=np.array([[[1e-18], [2e-18]], [[1e-18], [2e-18]]]),
+    density=1000.0,
+    concentration=np.array([[10.0, 20.0], [30.0, 40.0]]),
+    volume=np.array([0.25, 4.0]),
+)
+box_gas = (
+    par.gas.GasDataBuilder()
+    .set_names(["inert"])
+    .set_molar_mass([0.028])
+    .set_concentration([[1e-6], [2e-6]])
+    .set_partitioning([False])
+    .build()
+)
+box_aerosol = par.Aerosol(
+    particles=box_particles,
+    gas=box_gas,
+    environment=par.gas.EnvironmentData(
+        [280.0, 310.0], [101325.0, 90000.0], [[0.0], [0.0]]
+    ),
+)
+dilution = par.dynamics.Dilution(par.dynamics.DilutionStrategy(0.1))
+initial_counts = box_particles.concentration.copy()
+initial_gas = box_gas.concentration.copy()
+box_rates = dilution.rate(box_aerosol)
+assert box_rates.shape == (2, 2)
+np.testing.assert_allclose(
+    box_rates, -0.1 * initial_counts / box_particles.volume[:, None]
+)
+assert dilution.execute(box_aerosol, time_step=2.0, sub_steps=2) is box_aerosol
+np.testing.assert_allclose(
+    box_particles.concentration, initial_counts * np.exp(-0.2)
+)
+np.testing.assert_allclose(box_gas.concentration, initial_gas * np.exp(-0.2))
+print(
+    "Two-box number densities after dilution [m^-3]:",
+    box_particles.number_density,
+)
+print("Runnable rate shape (boxes, slots):", box_rates.shape)
+
+# %% [markdown]
+# Stochastic multi-box execution requires stable logical box IDs. Reuse this
+# context to continue streams; if arrays are reordered, use a matching
+# `context.with_box_ids(...)` view. Reusing a seed does not reset a context.
+# A failed process substep commits neither box state nor random streams.
+
+# %%
+context = par.CPUExecutionContext(
+    root_seed=42, box_ids=("chamber-a", "chamber-b")
+)
+wall_loss = par.dynamics.WallLoss(
+    par.dynamics.SphericalWallLossStrategy(
+        wall_eddy_diffusivity=0.001,
+        chamber_radius=0.5,
+        distribution_type="particle_resolved",
+    )
+)
+wall_loss.execute(box_aerosol, time_step=0.1, context=context)
+print("Per-box volumes [m^3]:", box_particles.volume)
+print("Number densities after wall loss [m^-3]:", box_particles.number_density)

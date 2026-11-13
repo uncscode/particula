@@ -21,7 +21,7 @@ path.
 __version__ = '0.3.0'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/__init__.py#L57-L57)
+[View source](https://github.com/uncscode/particula/blob/main/particula/__init__.py#L58-L58)
 
 ## particula.logger
 
@@ -31,10 +31,11 @@ __version__ = '0.3.0'
 logger = setup()
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/__init__.py#L60-L60)
+[View source](https://github.com/uncscode/particula/blob/main/particula/__init__.py#L61-L61)
 
 **Modules**
 
+- `particula._cpu_batch`
 - `particula.abc_builder`
 - `particula.abc_factory`
 - `particula.activity`

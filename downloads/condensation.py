@@ -139,8 +139,9 @@ initial_concentration = aerosol.particles.slot_concentration_density[0].copy()
 
 # Calculate the condensation rate (mass change per particle per second)
 rate = condensation_process.rate(aerosol)
+# Runnable results retain (boxes, slots, particle species), even for B=1.
 print(f"Condensation rate shape: {rate.shape}")
-print(f"Mean rate: {np.mean(rate):.2e} kg/s per particle")
+print(f"Mean rate: {np.mean(rate):.2e} kg/m^3/s per slot")
 
 # %%
 # Plot the initial particle distribution

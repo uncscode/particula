@@ -5,7 +5,7 @@
 Runnable particle-centric aerosol processes.
 
 Includes condensation and evaporation, coagulation, wall loss, dilution, and
-the CPU-only single-box nucleation process.
+the CPU-only nucleation process.
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L1-L1)
 
@@ -17,17 +17,17 @@ the CPU-only single-box nucleation process.
 _MAX_NUCLEATION_SUB_STEPS = 10000
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L59-L59)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L60-L60)
 
 ## particula.dynamics.particle_process.Coagulation
 
 *class*
 
 ```python
-class Coagulation(RunnableABC)
+class Coagulation(_NativeBatchRunnable)
 ```
 
-Bases: `particula.runnable.RunnableABC`
+Bases: `particula.dynamics.particle_process._NativeBatchRunnable`
 
 Implements a coagulation process for aerosol particles.
 
@@ -60,7 +60,27 @@ updated_aerosol = coagulation.execute(aerosol, time_step=0.5)
 > - Seinfeld, J. H. and Pandis, S. N., "Atmospheric Chemistry and
 >   Physics: From Air Pollution to Climate Change," Wiley, 2016.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L478-L583)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L638-L746)
+
+### particula.dynamics.particle_process.Coagulation._namespace
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+_namespace = 'coagulation'
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L670-L670)
+
+### particula.dynamics.particle_process.Coagulation._strategy_attribute
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+_strategy_attribute = 'coagulation_strategy'
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L669-L669)
 
 ### particula.dynamics.particle_process.Coagulation.coagulation_strategy
 
@@ -70,7 +90,7 @@ updated_aerosol = coagulation.execute(aerosol, time_step=0.5)
 coagulation_strategy = coagulation_strategy
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L516-L516)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L679-L679)
 
 ### particula.dynamics.particle_process.Coagulation.__init__
 
@@ -86,14 +106,14 @@ Initialize the Coagulation process.
 
 - `coagulation_strategy` (`CoagulationStrategyABC`) — The coagulation strategy to use, describing how particles collide and combine.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L509-L516)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L672-L679)
 
-### particula.dynamics.particle_process.Coagulation.execute
+### particula.dynamics.particle_process.Coagulation._execute_box
 
 *method*
 
 ```python
-def execute(aerosol: Aerosol, time_step: float, sub_steps: int = 1) -> Aerosol
+def _execute_box(aerosol: Aerosol, time_step: float, sub_steps: int = 1) -> Aerosol
 ```
 
 Perform the coagulation process over a given time step.
@@ -117,14 +137,14 @@ updated_aerosol = coagulation.execute(
 # The aerosol now reflects changes from particle collisions
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L518-L558)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L681-L721)
 
-### particula.dynamics.particle_process.Coagulation.rate
+### particula.dynamics.particle_process.Coagulation._rate_box
 
 *method*
 
 ```python
-def rate(aerosol: Aerosol) -> Any
+def _rate_box(aerosol: Aerosol) -> Any
 ```
 
 Compute the coagulation rate for each particle in the aerosol.
@@ -144,7 +164,85 @@ rates = coagulation.rate(aerosol)
 # rates might look like array([0.1, 0.05, ...])
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L560-L583)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L723-L746)
+
+### particula.dynamics.particle_process.Coagulation._box_worker
+
+*method*
+
+```python
+def _box_worker(box, boxes, transaction)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L309-L337)
+
+### particula.dynamics.particle_process.Coagulation._is_stochastic
+
+*method*
+
+```python
+def _is_stochastic(aerosol)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L299-L307)
+
+### particula.dynamics.particle_process.Coagulation._prepare_commit
+
+*method*
+
+```python
+def _prepare_commit(workers, uses_context)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L339-L382)
+
+### particula.dynamics.particle_process.Coagulation._validate_batch
+
+*method*
+
+```python
+def _validate_batch(aerosol)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L259-L278)
+
+### particula.dynamics.particle_process.Coagulation._validate_gas_schema
+
+*method*
+
+```python
+def _validate_gas_schema(gas)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+Reject raw replacements before GasData copying can normalize them.
+
+Only gas-coupled processes require these schemas. Condensation uses
+float64 throughout; nucleation allows real numeric molar-mass metadata
+but its writable gas inventory must remain float64.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L280-L297)
+
+### particula.dynamics.particle_process.Coagulation._writer_fields
+
+*method*
+
+```python
+def _writer_fields(aerosol)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L239-L257)
 
 ### particula.dynamics.particle_process.Coagulation.__or__
 
@@ -176,17 +274,49 @@ combined_process = process1 | process2
 final_aerosol = combined_process.execute(aerosol, time_step=1.0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L108-L129)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L167-L188)
+
+### particula.dynamics.particle_process.Coagulation.execute
+
+*method*
+
+```python
+def execute(aerosol: Aerosol, time_step: float, sub_steps: int = 1, *, context=None) -> Aerosol
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Advance every box, committing atomically after each process substep.
+
+Contexts own independent logical-box random streams. Completed substeps
+remain committed if a later one fails. Custom subclasses overriding
+this method retain responsibility for their own execution semantics.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L84-L138)
+
+### particula.dynamics.particle_process.Coagulation.rate
+
+*method*
+
+```python
+def rate(aerosol: Aerosol) -> Any
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Evaluate detached box hooks and retain a leading box axis.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L67-L82)
 
 ## particula.dynamics.particle_process.Dilution
 
 *class*
 
 ```python
-class Dilution(RunnableABC)
+class Dilution(_NativeBatchRunnable)
 ```
 
-Bases: `particula.runnable.RunnableABC`
+Bases: `particula.dynamics.particle_process._NativeBatchRunnable`
 
 Apply a dilution strategy over one or more equal substeps.
 
@@ -202,7 +332,27 @@ validation and atomicity.
 
 - `dilution_strategy` (`DilutionStrategyProtocol`) — Public ``DilutionStrategy`` or a compatible custom strategy that reports particle-number rates and applies aerosol dilution steps.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L679-L763)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L845-L948)
+
+### particula.dynamics.particle_process.Dilution._namespace
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+_namespace = 'dilution'
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L863-L863)
+
+### particula.dynamics.particle_process.Dilution._strategy_attribute
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+_strategy_attribute = 'dilution_strategy'
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L862-L862)
 
 ### particula.dynamics.particle_process.Dilution.dilution_strategy
 
@@ -212,7 +362,7 @@ validation and atomicity.
 dilution_strategy = dilution_strategy
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L703-L703)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L888-L888)
 
 ### particula.dynamics.particle_process.Dilution.__init__
 
@@ -227,14 +377,14 @@ Initialize the dilution runnable.
 dilution_strategy: Public ``DilutionStrategy`` or compatible custom
     strategy that applies dilution to an aerosol.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L696-L703)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L881-L888)
 
-### particula.dynamics.particle_process.Dilution.execute
+### particula.dynamics.particle_process.Dilution._execute_box
 
 *method*
 
 ```python
-def execute(aerosol: Aerosol, time_step: float | np.number, sub_steps: int | np.integer = 1) -> Aerosol
+def _execute_box(aerosol: Aerosol, time_step: float | np.number, sub_steps: int | np.integer = 1) -> Aerosol
 ```
 
 Apply dilution as equal, sequential substeps over a total duration.
@@ -264,14 +414,14 @@ supported concrete aerosol state is invalid.
 - `TypeError` — If ``time_step`` is not numeric or a required supported
 concrete aerosol value is not numeric.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L717-L763)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L902-L948)
 
-### particula.dynamics.particle_process.Dilution.rate
+### particula.dynamics.particle_process.Dilution._rate_box
 
 *method*
 
 ```python
-def rate(aerosol: Aerosol) -> float | NDArray[np.float64]
+def _rate_box(aerosol: Aerosol) -> float | NDArray[np.float64]
 ```
 
 Delegate particle-number dilution-rate evaluation to the strategy.
@@ -285,7 +435,109 @@ Delegate particle-number dilution-rate evaluation to the strategy.
 - (`float | NDArray[np.float64]`) — Particle-number concentration rate [1/(m³ s)] with the scalar or
 - (`float | NDArray[np.float64]`) — array shape returned by the strategy.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L705-L715)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L890-L900)
+
+### particula.dynamics.particle_process.Dilution.execute
+
+*method*
+
+```python
+def execute(aerosol, time_step, sub_steps=1, *, context=None)
+```
+
+Batch native dilution; retain legacy custom strategy delegation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L865-L873)
+
+### particula.dynamics.particle_process.Dilution.rate
+
+*method*
+
+```python
+def rate(aerosol)
+```
+
+Return native batched rates or the custom strategy's own result.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L875-L879)
+
+### particula.dynamics.particle_process.Dilution._box_worker
+
+*method*
+
+```python
+def _box_worker(box, boxes, transaction)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L309-L337)
+
+### particula.dynamics.particle_process.Dilution._is_stochastic
+
+*method*
+
+```python
+def _is_stochastic(aerosol)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L299-L307)
+
+### particula.dynamics.particle_process.Dilution._prepare_commit
+
+*method*
+
+```python
+def _prepare_commit(workers, uses_context)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L339-L382)
+
+### particula.dynamics.particle_process.Dilution._validate_batch
+
+*method*
+
+```python
+def _validate_batch(aerosol)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L259-L278)
+
+### particula.dynamics.particle_process.Dilution._validate_gas_schema
+
+*method*
+
+```python
+def _validate_gas_schema(gas)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+Reject raw replacements before GasData copying can normalize them.
+
+Only gas-coupled processes require these schemas. Condensation uses
+float64 throughout; nucleation allows real numeric molar-mass metadata
+but its writable gas inventory must remain float64.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L280-L297)
+
+### particula.dynamics.particle_process.Dilution._writer_fields
+
+*method*
+
+```python
+def _writer_fields(aerosol)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L239-L257)
 
 ### particula.dynamics.particle_process.Dilution.__or__
 
@@ -317,7 +569,7 @@ combined_process = process1 | process2
 final_aerosol = combined_process.execute(aerosol, time_step=1.0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L108-L129)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L167-L188)
 
 ## particula.dynamics.particle_process.DilutionStrategyProtocol
 
@@ -331,7 +583,7 @@ Bases: `Protocol`
 
 Structural contract for strategies compatible with ``Dilution``.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L101-L108)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L102-L109)
 
 ### particula.dynamics.particle_process.DilutionStrategyProtocol.rate
 
@@ -343,7 +595,7 @@ def rate(aerosol: Aerosol) -> float | NDArray[np.float64]
 
 Return the particle-number concentration rate.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L104-L105)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L105-L106)
 
 ### particula.dynamics.particle_process.DilutionStrategyProtocol.step
 
@@ -355,17 +607,17 @@ def step(aerosol: Aerosol, time_step: float) -> Aerosol
 
 Apply one dilution step to an aerosol.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L107-L108)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L108-L109)
 
 ## particula.dynamics.particle_process.MassCondensation
 
 *class*
 
 ```python
-class MassCondensation(RunnableABC)
+class MassCondensation(_NativeBatchRunnable)
 ```
 
-Bases: `particula.runnable.RunnableABC`
+Bases: `particula.dynamics.particle_process._NativeBatchRunnable`
 
 Handles the mass condensation process for aerosols.
 
@@ -398,7 +650,27 @@ References:
 - Seinfeld, J. H. and Pandis, S. N., "Atmospheric Chemistry and Physics:
   From Air Pollution to Climate Change," Wiley, 2016.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L363-L475)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L520-L635)
+
+### particula.dynamics.particle_process.MassCondensation._namespace
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+_namespace = 'condensation'
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L553-L553)
+
+### particula.dynamics.particle_process.MassCondensation._strategy_attribute
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+_strategy_attribute = 'condensation_strategy'
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L552-L552)
 
 ### particula.dynamics.particle_process.MassCondensation.condensation_strategy
 
@@ -408,7 +680,7 @@ References:
 condensation_strategy = condensation_strategy
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L405-L405)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L565-L565)
 
 ### particula.dynamics.particle_process.MassCondensation.__init__
 
@@ -428,14 +700,14 @@ Initialize the MassCondensation process.
 
 - `result` (`None`) — No return value.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L395-L405)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L555-L565)
 
-### particula.dynamics.particle_process.MassCondensation.execute
+### particula.dynamics.particle_process.MassCondensation._execute_box
 
 *method*
 
 ```python
-def execute(aerosol: Aerosol, time_step: float, sub_steps: int = 1) -> Aerosol
+def _execute_box(aerosol: Aerosol, time_step: float, sub_steps: int = 1) -> Aerosol
 ```
 
 Perform the mass condensation process over a given time step.
@@ -459,14 +731,14 @@ updated_aerosol = condensation.execute(
 # The aerosol now has reduced/increased particle/gas mass
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L407-L449)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L567-L609)
 
-### particula.dynamics.particle_process.MassCondensation.rate
+### particula.dynamics.particle_process.MassCondensation._rate_box
 
 *method*
 
 ```python
-def rate(aerosol: Aerosol) -> Any
+def _rate_box(aerosol: Aerosol) -> Any
 ```
 
 Compute mass condensation rates for each particle.
@@ -486,7 +758,85 @@ rates = condensation.rate(aerosol)
 # rates may look like array([1.2e-12, 4.5e-12, ...])
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L451-L475)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L611-L635)
+
+### particula.dynamics.particle_process.MassCondensation._box_worker
+
+*method*
+
+```python
+def _box_worker(box, boxes, transaction)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L309-L337)
+
+### particula.dynamics.particle_process.MassCondensation._is_stochastic
+
+*method*
+
+```python
+def _is_stochastic(aerosol)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L299-L307)
+
+### particula.dynamics.particle_process.MassCondensation._prepare_commit
+
+*method*
+
+```python
+def _prepare_commit(workers, uses_context)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L339-L382)
+
+### particula.dynamics.particle_process.MassCondensation._validate_batch
+
+*method*
+
+```python
+def _validate_batch(aerosol)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L259-L278)
+
+### particula.dynamics.particle_process.MassCondensation._validate_gas_schema
+
+*method*
+
+```python
+def _validate_gas_schema(gas)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+Reject raw replacements before GasData copying can normalize them.
+
+Only gas-coupled processes require these schemas. Condensation uses
+float64 throughout; nucleation allows real numeric molar-mass metadata
+but its writable gas inventory must remain float64.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L280-L297)
+
+### particula.dynamics.particle_process.MassCondensation._writer_fields
+
+*method*
+
+```python
+def _writer_fields(aerosol)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L239-L257)
 
 ### particula.dynamics.particle_process.MassCondensation.__or__
 
@@ -518,19 +868,51 @@ combined_process = process1 | process2
 final_aerosol = combined_process.execute(aerosol, time_step=1.0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L108-L129)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L167-L188)
+
+### particula.dynamics.particle_process.MassCondensation.execute
+
+*method*
+
+```python
+def execute(aerosol: Aerosol, time_step: float, sub_steps: int = 1, *, context=None) -> Aerosol
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Advance every box, committing atomically after each process substep.
+
+Contexts own independent logical-box random streams. Completed substeps
+remain committed if a later one fails. Custom subclasses overriding
+this method retain responsibility for their own execution semantics.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L84-L138)
+
+### particula.dynamics.particle_process.MassCondensation.rate
+
+*method*
+
+```python
+def rate(aerosol: Aerosol) -> Any
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Evaluate detached box hooks and retain a leading box axis.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L67-L82)
 
 ## particula.dynamics.particle_process.Nucleation
 
 *class*
 
 ```python
-class Nucleation(RunnableABC)
+class Nucleation(_NativeBatchRunnable)
 ```
 
-Bases: `particula.runnable.RunnableABC`
+Bases: `particula.dynamics.particle_process._NativeBatchRunnable`
 
-Apply mapped single-box nucleation to a native resolved population.
+Apply mapped nucleation independently to native resolved boxes.
 
 Source rates and demand planning finalization use densities. The commit
 converts event
@@ -538,7 +920,37 @@ density to represented counts using the current physical volume. Each
 attempted substep is atomic; earlier successful substeps remain applied.
 Gas and environment are read from the currently held aerosol every time.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L232-L360)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L385-L517)
+
+### particula.dynamics.particle_process.Nucleation._maximum_sub_steps
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+_maximum_sub_steps = _MAX_NUCLEATION_SUB_STEPS
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L397-L397)
+
+### particula.dynamics.particle_process.Nucleation._namespace
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+_namespace = 'nucleation'
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L396-L396)
+
+### particula.dynamics.particle_process.Nucleation._strategy_attribute
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+_strategy_attribute = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L395-L395)
 
 ### particula.dynamics.particle_process.Nucleation.commit_config
 
@@ -548,7 +960,7 @@ Gas and environment are read from the currently held aerosol every time.
 commit_config = commit_config
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L255-L255)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L412-L412)
 
 ### particula.dynamics.particle_process.Nucleation.source_config
 
@@ -558,7 +970,7 @@ commit_config = commit_config
 source_config = source_config
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L254-L254)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L411-L411)
 
 ### particula.dynamics.particle_process.Nucleation.__init__
 
@@ -570,7 +982,19 @@ def __init__(source_config: NucleationSourceConfig, commit_config: NucleationCom
 
 Bind immutable source selection and count-based commit controls.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L242-L255)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L399-L412)
+
+### particula.dynamics.particle_process.Nucleation._execute_box
+
+*method*
+
+```python
+def _execute_box(aerosol: Aerosol, time_step: float | np.number, sub_steps: int | np.integer = 1) -> Aerosol
+```
+
+Commit equal sequential source substeps and retain all identities.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L477-L517)
 
 ### particula.dynamics.particle_process.Nucleation._rate
 
@@ -582,7 +1006,19 @@ def _rate(gas: GasData, environment: EnvironmentData) -> float
 
 Evaluate the current precursor and optional saturation gate.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L298-L313)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L455-L470)
+
+### particula.dynamics.particle_process.Nucleation._rate_box
+
+*method*
+
+```python
+def _rate_box(aerosol: Aerosol) -> float
+```
+
+Return the current potential event density rate [m^-3 s^-1].
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L472-L475)
 
 ### particula.dynamics.particle_process.Nucleation._state
 
@@ -594,31 +1030,85 @@ def _state(aerosol: Aerosol) -> tuple[ParticleData, GasData, EnvironmentData]
 
 Validate current topology and configured injection alignment.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L257-L296)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L414-L453)
 
-### particula.dynamics.particle_process.Nucleation.execute
-
-*method*
-
-```python
-def execute(aerosol: Aerosol, time_step: float | np.number, sub_steps: int | np.integer = 1) -> Aerosol
-```
-
-Commit equal sequential source substeps and retain all identities.
-
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L320-L360)
-
-### particula.dynamics.particle_process.Nucleation.rate
+### particula.dynamics.particle_process.Nucleation._box_worker
 
 *method*
 
 ```python
-def rate(aerosol: Aerosol) -> float
+def _box_worker(box, boxes, transaction)
 ```
 
-Return the current potential event density rate [m^-3 s^-1].
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L315-L318)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L309-L337)
+
+### particula.dynamics.particle_process.Nucleation._is_stochastic
+
+*method*
+
+```python
+def _is_stochastic(aerosol)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L299-L307)
+
+### particula.dynamics.particle_process.Nucleation._prepare_commit
+
+*method*
+
+```python
+def _prepare_commit(workers, uses_context)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L339-L382)
+
+### particula.dynamics.particle_process.Nucleation._validate_batch
+
+*method*
+
+```python
+def _validate_batch(aerosol)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L259-L278)
+
+### particula.dynamics.particle_process.Nucleation._validate_gas_schema
+
+*method*
+
+```python
+def _validate_gas_schema(gas)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+Reject raw replacements before GasData copying can normalize them.
+
+Only gas-coupled processes require these schemas. Condensation uses
+float64 throughout; nucleation allows real numeric molar-mass metadata
+but its writable gas inventory must remain float64.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L280-L297)
+
+### particula.dynamics.particle_process.Nucleation._writer_fields
+
+*method*
+
+```python
+def _writer_fields(aerosol)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L239-L257)
 
 ### particula.dynamics.particle_process.Nucleation.__or__
 
@@ -650,7 +1140,39 @@ combined_process = process1 | process2
 final_aerosol = combined_process.execute(aerosol, time_step=1.0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L108-L129)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L167-L188)
+
+### particula.dynamics.particle_process.Nucleation.execute
+
+*method*
+
+```python
+def execute(aerosol: Aerosol, time_step: float, sub_steps: int = 1, *, context=None) -> Aerosol
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Advance every box, committing atomically after each process substep.
+
+Contexts own independent logical-box random streams. Completed substeps
+remain committed if a later one fails. Custom subclasses overriding
+this method retain responsibility for their own execution semantics.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L84-L138)
+
+### particula.dynamics.particle_process.Nucleation.rate
+
+*method*
+
+```python
+def rate(aerosol: Aerosol) -> Any
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Evaluate detached box hooks and retain a leading box axis.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L67-L82)
 
 ## particula.dynamics.particle_process.NucleationCommitConfig
 
@@ -660,12 +1182,12 @@ final_aerosol = combined_process.execute(aerosol, time_step=1.0)
 class NucleationCommitConfig
 ```
 
-Immutable one-box controls for CPU nucleation source commits.
+Immutable per-box controls for CPU nucleation source commits.
 
 The record mirrors the source transaction transaction controls while
 retaining public runnable execution
 ownership. Its rank-one sidecars are copied into read-only float64 arrays;
-their required one-box length is checked immediately before every nonzero
+their required batch length is checked immediately before every nonzero
 substep commit. The configuration is not a source transaction configuration
 and does not
 create a transaction spanning a complete ``Nucleation.execute`` call.
@@ -690,7 +1212,7 @@ sidecar type is invalid.
 - `ValueError` — If a scalar or tolerance is outside its allowed domain, or
 a sidecar is not rank one.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L153-L229)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L154-L230)
 
 ### particula.dynamics.particle_process.NucleationCommitConfig.diversity_absolute_error
 
@@ -700,7 +1222,7 @@ a sidecar is not rank one.
 diversity_absolute_error: float = 1.0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L195-L195)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L196-L196)
 
 ### particula.dynamics.particle_process.NucleationCommitConfig.exhaustion_controls
 
@@ -710,7 +1232,7 @@ diversity_absolute_error: float = 1.0
 exhaustion_controls: ExhaustionControls
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L188-L188)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L189-L189)
 
 ### particula.dynamics.particle_process.NucleationCommitConfig.maximum_slot_weight
 
@@ -720,7 +1242,7 @@ exhaustion_controls: ExhaustionControls
 maximum_slot_weight: float
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L186-L186)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L187-L187)
 
 ### particula.dynamics.particle_process.NucleationCommitConfig.mean_radius_relative_error
 
@@ -730,7 +1252,7 @@ maximum_slot_weight: float
 mean_radius_relative_error: float = 1.0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L193-L193)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L194-L194)
 
 ### particula.dynamics.particle_process.NucleationCommitConfig.minimum_scale
 
@@ -740,7 +1262,7 @@ mean_radius_relative_error: float = 1.0
 minimum_scale: NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L190-L190)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L191-L191)
 
 ### particula.dynamics.particle_process.NucleationCommitConfig.minimum_volume
 
@@ -750,7 +1272,7 @@ minimum_scale: NDArray[np.float64]
 minimum_volume: NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L191-L191)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L192-L192)
 
 ### particula.dynamics.particle_process.NucleationCommitConfig.radius_cubed_relative_error
 
@@ -760,7 +1282,7 @@ minimum_volume: NDArray[np.float64]
 radius_cubed_relative_error: float = 1.0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L192-L192)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L193-L193)
 
 ### particula.dynamics.particle_process.NucleationCommitConfig.requested_scale
 
@@ -770,7 +1292,7 @@ radius_cubed_relative_error: float = 1.0
 requested_scale: NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L189-L189)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L190-L190)
 
 ### particula.dynamics.particle_process.NucleationCommitConfig.source_charge
 
@@ -780,7 +1302,7 @@ requested_scale: NDArray[np.float64]
 source_charge: float
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L187-L187)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L188-L188)
 
 ### particula.dynamics.particle_process.NucleationCommitConfig.surface_relative_error
 
@@ -790,7 +1312,7 @@ source_charge: float
 surface_relative_error: float = 1.0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L194-L194)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L195-L195)
 
 ### particula.dynamics.particle_process.NucleationCommitConfig.__init__
 
@@ -812,17 +1334,17 @@ def __post_init__() -> None
 
 Validate scalar controls and defensively own sidecars.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L197-L229)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L198-L230)
 
 ## particula.dynamics.particle_process.WallLoss
 
 *class*
 
 ```python
-class WallLoss(RunnableABC)
+class WallLoss(_NativeBatchRunnable)
 ```
 
-Bases: `particula.runnable.RunnableABC`
+Bases: `particula.dynamics.particle_process._NativeBatchRunnable`
 
 Apply wall loss strategy to aerosol particles.
 
@@ -844,7 +1366,27 @@ the runnable clamps concentrations after successful strategy delegation.
 > ... )
 > >>> _ = wall_loss.execute(aerosol, time_step=1.0, sub_steps=2)
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L586-L676)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L749-L842)
+
+### particula.dynamics.particle_process.WallLoss._namespace
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+_namespace = 'wall_loss'
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L771-L771)
+
+### particula.dynamics.particle_process.WallLoss._strategy_attribute
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+_strategy_attribute = 'wall_loss_strategy'
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L770-L770)
 
 ### particula.dynamics.particle_process.WallLoss.wall_loss_strategy
 
@@ -854,7 +1396,7 @@ the runnable clamps concentrations after successful strategy delegation.
 wall_loss_strategy = wall_loss_strategy
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L615-L615)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L781-L781)
 
 ### particula.dynamics.particle_process.WallLoss.__init__
 
@@ -870,7 +1412,7 @@ Create a wall loss runnable.
 
 - `wall_loss_strategy` (`WallLossStrategy`) — Strategy that provides wall loss rates and updates particle concentrations for the configured distribution type.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L607-L615)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L773-L781)
 
 ### particula.dynamics.particle_process.WallLoss._clamp_non_negative
 
@@ -886,14 +1428,14 @@ Clamp particle concentrations to non-negative values.
 
 - `particle` (`ParticleData`) — Particle object whose concentration is clipped in place.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L617-L623)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L783-L789)
 
-### particula.dynamics.particle_process.WallLoss.execute
+### particula.dynamics.particle_process.WallLoss._execute_box
 
 *method*
 
 ```python
-def execute(aerosol: Aerosol, time_step: float, sub_steps: int = 1) -> Aerosol
+def _execute_box(aerosol: Aerosol, time_step: float, sub_steps: int = 1) -> Aerosol
 ```
 
 Apply wall loss over the provided time step.
@@ -911,14 +1453,14 @@ sub-step.
 
 - (`Aerosol`) — Aerosol with updated particle concentrations.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L625-L658)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L791-L824)
 
-### particula.dynamics.particle_process.WallLoss.rate
+### particula.dynamics.particle_process.WallLoss._rate_box
 
 *method*
 
 ```python
-def rate(aerosol: Aerosol) -> Any
+def _rate_box(aerosol: Aerosol) -> Any
 ```
 
 Return the wall loss rate for the aerosol particles.
@@ -931,7 +1473,85 @@ Return the wall loss rate for the aerosol particles.
 
 - (`Any`) — Array of wall loss rates matching the particle representation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L660-L676)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L826-L842)
+
+### particula.dynamics.particle_process.WallLoss._box_worker
+
+*method*
+
+```python
+def _box_worker(box, boxes, transaction)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L309-L337)
+
+### particula.dynamics.particle_process.WallLoss._is_stochastic
+
+*method*
+
+```python
+def _is_stochastic(aerosol)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L299-L307)
+
+### particula.dynamics.particle_process.WallLoss._prepare_commit
+
+*method*
+
+```python
+def _prepare_commit(workers, uses_context)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L339-L382)
+
+### particula.dynamics.particle_process.WallLoss._validate_batch
+
+*method*
+
+```python
+def _validate_batch(aerosol)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L259-L278)
+
+### particula.dynamics.particle_process.WallLoss._validate_gas_schema
+
+*method*
+
+```python
+def _validate_gas_schema(gas)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+Reject raw replacements before GasData copying can normalize them.
+
+Only gas-coupled processes require these schemas. Condensation uses
+float64 throughout; nucleation allows real numeric molar-mass metadata
+but its writable gas inventory must remain float64.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L280-L297)
+
+### particula.dynamics.particle_process.WallLoss._writer_fields
+
+*method*
+
+```python
+def _writer_fields(aerosol)
+```
+
+Inherited from: `particula.dynamics.particle_process._NativeBatchRunnable`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L239-L257)
 
 ### particula.dynamics.particle_process.WallLoss.__or__
 
@@ -963,7 +1583,231 @@ combined_process = process1 | process2
 final_aerosol = combined_process.execute(aerosol, time_step=1.0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L108-L129)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L167-L188)
+
+### particula.dynamics.particle_process.WallLoss.execute
+
+*method*
+
+```python
+def execute(aerosol: Aerosol, time_step: float, sub_steps: int = 1, *, context=None) -> Aerosol
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Advance every box, committing atomically after each process substep.
+
+Contexts own independent logical-box random streams. Completed substeps
+remain committed if a later one fails. Custom subclasses overriding
+this method retain responsibility for their own execution semantics.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L84-L138)
+
+### particula.dynamics.particle_process.WallLoss.rate
+
+*method*
+
+```python
+def rate(aerosol: Aerosol) -> Any
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Evaluate detached box hooks and retain a leading box axis.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L67-L82)
+
+## particula.dynamics.particle_process._NativeBatchRunnable
+
+*class*
+
+```python
+class _NativeBatchRunnable(RunnableABC)
+```
+
+Bases: `particula.runnable.RunnableABC`
+
+Bind native single-box strategies to the shared batch transaction.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L233-L382)
+
+### particula.dynamics.particle_process._NativeBatchRunnable._namespace
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+_namespace = ''
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L237-L237)
+
+### particula.dynamics.particle_process._NativeBatchRunnable._strategy_attribute
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+_strategy_attribute: str | None = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L236-L236)
+
+### particula.dynamics.particle_process._NativeBatchRunnable._box_worker
+
+*method*
+
+```python
+def _box_worker(box, boxes, transaction)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L309-L337)
+
+### particula.dynamics.particle_process._NativeBatchRunnable._is_stochastic
+
+*method*
+
+```python
+def _is_stochastic(aerosol)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L299-L307)
+
+### particula.dynamics.particle_process._NativeBatchRunnable._prepare_commit
+
+*method*
+
+```python
+def _prepare_commit(workers, uses_context)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L339-L382)
+
+### particula.dynamics.particle_process._NativeBatchRunnable._validate_batch
+
+*method*
+
+```python
+def _validate_batch(aerosol)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L259-L278)
+
+### particula.dynamics.particle_process._NativeBatchRunnable._validate_gas_schema
+
+*method*
+
+```python
+def _validate_gas_schema(gas)
+```
+
+Reject raw replacements before GasData copying can normalize them.
+
+Only gas-coupled processes require these schemas. Condensation uses
+float64 throughout; nucleation allows real numeric molar-mass metadata
+but its writable gas inventory must remain float64.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L280-L297)
+
+### particula.dynamics.particle_process._NativeBatchRunnable._writer_fields
+
+*method*
+
+```python
+def _writer_fields(aerosol)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L239-L257)
+
+### particula.dynamics.particle_process._NativeBatchRunnable.__or__
+
+*method*
+
+```python
+def __or__(other: RunnableABC) -> RunnableSequence
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Chain this Runnable with another using the '|' operator.
+
+This method enables an easy way to sequence processes, so they
+can be executed in a defined order.
+
+**Parameters**
+
+- `other` (`RunnableABC`) — Another Runnable to append after this one.
+
+**Returns**
+
+- (`RunnableSequence`) — A sequence containing both processes.
+
+**Examples**
+
+```py title="Chaining two processes"
+combined_process = process1 | process2
+final_aerosol = combined_process.execute(aerosol, time_step=1.0)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L167-L188)
+
+### particula.dynamics.particle_process._NativeBatchRunnable._execute_box
+
+*method*
+
+```python
+def _execute_box(aerosol, time_step, sub_steps=1)
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Execute the single-box numerical building block.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L163-L165)
+
+### particula.dynamics.particle_process._NativeBatchRunnable._rate_box
+
+*method*
+
+```python
+def _rate_box(aerosol)
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Evaluate the single-box numerical building block.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L159-L161)
+
+### particula.dynamics.particle_process._NativeBatchRunnable.execute
+
+*method*
+
+```python
+def execute(aerosol: Aerosol, time_step: float, sub_steps: int = 1, *, context=None) -> Aerosol
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Advance every box, committing atomically after each process substep.
+
+Contexts own independent logical-box random streams. Completed substeps
+remain committed if a later one fails. Custom subclasses overriding
+this method retain responsibility for their own execution semantics.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L84-L138)
+
+### particula.dynamics.particle_process._NativeBatchRunnable.rate
+
+*method*
+
+```python
+def rate(aerosol: Aerosol) -> Any
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Evaluate detached box hooks and retain a leading box axis.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L67-L82)
 
 ## particula.dynamics.particle_process._is_real_scalar
 
@@ -975,7 +1819,7 @@ def _is_real_scalar(value: object) -> bool
 
 Return whether ``value`` is a non-Boolean real scalar.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L144-L150)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L145-L151)
 
 ## particula.dynamics.particle_process._native_duration
 
@@ -987,7 +1831,7 @@ def _native_duration(time_step: object, sub_steps: object) -> float
 
 Validate equal-substep controls before any native process mutation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L90-L98)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L91-L99)
 
 ## particula.dynamics.particle_process._native_process_state
 
@@ -1002,7 +1846,7 @@ Read and validate the currently held single-box native process state.
 This boundary never creates a facade or caches aggregate references.
 Scientific strategies additionally validate their own physical inputs.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L62-L87)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L63-L88)
 
 ## particula.dynamics.particle_process._readonly_float64_vector
 
@@ -1028,4 +1872,4 @@ Return an owned, read-only, rank-one float64 array.
 - `TypeError` — If the values cannot be converted to float64.
 - `ValueError` — If the converted values are not rank one.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L111-L141)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L112-L142)

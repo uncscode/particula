@@ -51,7 +51,7 @@ Each setter performs unit conversion and ensures correct dtypes.
 Batch dimensions are inserted automatically when 1D concentration is
 provided.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gas/gas_data_builder.py#L45-L206)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gas/gas_data_builder.py#L45-L217)
 
 ### particula.gas.gas_data_builder.GasDataBuilder._concentration
 
@@ -133,7 +133,7 @@ Build and return validated GasData.
 
 - `ValueError` — If required fields are missing or invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gas/gas_data_builder.py#L176-L206)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gas/gas_data_builder.py#L182-L217)
 
 ### particula.gas.gas_data_builder.GasDataBuilder.set_concentration
 
@@ -203,7 +203,7 @@ Set number of boxes for broadcasting 1D concentration.
 
 - (`'GasDataBuilder'`) — Self for fluent chaining.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gas/gas_data_builder.py#L164-L174)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gas/gas_data_builder.py#L164-L180)
 
 ### particula.gas.gas_data_builder.GasDataBuilder.set_names
 
