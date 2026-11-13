@@ -13,6 +13,7 @@ description: "Design and write Particula aerosol simulations; use for scripts, n
 Deliver executable code, assumptions, exact run command, expected artifacts, and validation criteria. If requested, continue with particula-run rather than stopping at code generation.
 
 ## Shared operating rules
+Use the selected interpreter’s `python -m particula_docs --json` to locate and search version-matched installed docs before relying on the live site; see `../../references/sources.md` for commands and older-version fallback.
 Read `../../references/compatibility.md` for tested versions and known numerical limitations.
 Read `../../references/scientific-practice.md` before technical work and use `../../references/sources.md` to find authoritative documentation. Resolve these paths relative to this skill file, not the user's working directory.
 Use the user's chosen local project and Python environment. Treat bundled files as read-only templates; write studies and results to the user's project. A host with local execution and file access is required to run on the user's computer. If unavailable, explain the limitation and provide runnable files; never describe proposed code as executed.

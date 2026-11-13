@@ -66,3 +66,46 @@ and `pytest scripts/tests -q -Werror` when infrastructure changes. Changing
 release-example paths also requires `python scripts/run_release_tests.py --suite examples`.
 Retain scientific assertions and tolerances. Keep missing CUDA measurements and
 pending release approvals explicit.
+
+## Installed documentation bundles
+
+`docs/` remains the only maintained source. Ordinary PEP 517 wheel builds use
+`_particula_build.py` to stage the selected documentation under `particula/docs/`
+in a temporary source tree, then delegate packaging to Flit. Builds do not
+create a second maintained copy in the checkout. Editable installs resolve the
+locator to this source tree instead of copying docs.
+
+The bundle includes `index.md`, guides, theory, contributor guidance, Python
+examples, and supporting data/images with their original relative paths and
+bytes. Generated API pages, hidden directories, caches, build output, temporary
+files, website output and `.trash/` are excluded. The generated manifest records
+the package version and each source file's size and SHA-256 hash. Locate it with
+`python -m particula_docs --json`; `particula-docs` prints only the directory.
+Relative links within the selected trees are preserved. Repository tooling and
+rendered-site links are not made into standalone offline pages.
+
+Build and verify release artifacts using the selected development interpreter:
+
+```bash
+python -m build
+python scripts/check_doc_bundle.py \
+  --wheel dist/particula-0.3.0-py3-none-any.whl \
+  --sdist dist/particula-0.3.0.tar.gz \
+  --report .artifacts/docs-bundle.json
+pytest scripts/tests/doc_bundle_test.py -q -Werror
+```
+
+Use the filenames for the version being released. The checker verifies source
+hashes and wheel RECORD entries, rebuilds from the source archive with no Git or
+network access, and installs both wheels in separate clean environments. It
+checks searchable guides, examples, assets, relative links and the import-free
+locator. The report records version, documentation size, artifact sizes and
+hashes. PyPI publication requires these checks on the exact upload artifacts.
+The regression suite additionally exercises ordinary `pip wheel`, editable
+installs, excluded-content sentinels and rejection of corrupted bundles.
+
+The source archive contains the build adapter, locator and selected docs;
+rebuilding offline needs only Python and the declared Flit build dependency
+already installed. The verification tools additionally require `build` (and
+`pytest`/PyYAML for the regression suite), included in the development extra.
+The local conda recipe stages these same documentation sources and build files.

@@ -28,7 +28,7 @@ jobs:
         
     - name: Install dependencies
       run: |
-        python -m pip install pytest PyYAML Markdown pymdown-extensions jupytext
+        python -m pip install pytest PyYAML Markdown pymdown-extensions jupytext build 'flit_core>=3.12,<4'
         # Native examples exercise plotting, unit conversion, and chemistry.
         python -m pip install ".[extra]"
 

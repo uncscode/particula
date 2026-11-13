@@ -7,8 +7,8 @@ differ from the installed distribution metadata; inspect both.
 ## Numerical evidence
 
 The current starters use native Aerosol, ParticleData, GasData and
-EnvironmentData. Install the checkout with the 0.3.0 native APIs as described in
-local-setup.md; the older release evidence below is historical, not a claim
+EnvironmentData. Use an installation with the 0.3.0 native APIs as described
+in local-setup.md (a selected checkout when these APIs are not yet released); the older release evidence below is historical, not a claim
 that this script still supports that facade API. Native default 1 s/100-step
 smokes passed: condensation total-mass error 7.9e-16, coagulation particle-mass
 error 2.5e-9, with the existing 1e-6 helper tolerance unchanged.
@@ -52,3 +52,11 @@ skills use the selected source checkout and its current instructions, not a
 bundled copy of the library. The historical live-host checks above cover the
 original six; package checks can verify the expanded catalog and resource paths
 but do not establish live discovery or model-driven behavior in every host.
+
+## Local documentation
+
+Plugin 0.3.1 uses the selected interpreter's `particula_docs` locator to find
+release-matched documentation, with explicit fallback for older installations.
+Documentation packaging and locator checks do not expand the numerical or
+live-host qualification above. Repository development still uses the selected
+checkout, while reading a wheel's bundled documentation needs no checkout.

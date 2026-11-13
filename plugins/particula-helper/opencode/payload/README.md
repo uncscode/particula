@@ -25,11 +25,17 @@ See the [installation and compatibility guide](https://uncscode.github.io/partic
 
 ## Environment and science
 
-Reuse the user's selected environment. The native starters require a checkout with the 0.3.0 native APIs; `requirements.txt` is an opt-in pinned
+Reuse the user's selected environment. The native starters require an installation with the 0.3.0 native APIs; `requirements.txt` is an opt-in pinned
 starter for a fresh environment, not an instruction to replace an existing one.
 Condensation is the introductory CPU example. Scientific checks are numerical
 checks, not experimental validation. See `references/compatibility.md` for
 the known coagulation limitation and host verification boundaries.
+
+Locate matching installed documentation with the selected interpreter's
+`python -m particula_docs --json`, then search the returned directory. Wheel
+installs include local guides, theory, contributor guidance, Python examples,
+and data/images; editable installs point to the maintained repository docs.
+See `references/sources.md` for search commands and older-version fallback.
 
 ## Repository development skills
 
