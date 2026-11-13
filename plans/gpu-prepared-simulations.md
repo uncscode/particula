@@ -36,7 +36,7 @@ not promise rollback. No state readbacks or allocations inside prepared steps.
   unexpected skips. Record hardware/runtime provenance.
 - [x] 2. `feat(execution): add prepared simulation ownership`: upload,
   detached complete snapshots, synchronization and lifecycle/cleanup.
-- [ ] 3. `feat(execution): prepare supported runnable processes`: faithful
+- [x] 3. `feat(execution): prepare supported runnable processes`: faithful
   configuration translation, persistent resources, nondefault coefficients,
   explicit capabilities and independent per-process validation.
 - [ ] 4. `feat(execution): compose resident process sequences`: ordered
@@ -144,3 +144,16 @@ Prepared/native-resident/conversion suites: **167 passed** on the host with
 CUDA and Warp CPU. Ruff and targeted mypy passed. No transfer, synchronization
 or allocation is allowed by the enqueue regression; all snapshot fields are
 checked for isolation. Closing performs no download.
+
+Phase 3: all five selected families now have internal immutable translation
+plans and retained device resources. Condensation forwards nondefault transport
+coefficients and explicitly limits activity, Kelvin density and vapor models to
+representable configurations. Nucleation retains maps, scaling and resampling
+bounds, rejects charged/weighted injection, and observes direct-kernel status.
+Its existing integral unit-event restriction remains explicit. Public runnable
+integration and persistent cross-step failure gating are phase 4 work; the
+internal compiler is not yet a complete public simulation API.
+Prepared/condensation/process-adapter tests: **165 passed** on the host, including
+actual CUDA and separately parameterized Warp CPU. Independent checks cover
+mass/count/charge preservation, active condensation, two-event nucleation,
+capacity resampling, configuration freezing and pre-upload capability rejection.
