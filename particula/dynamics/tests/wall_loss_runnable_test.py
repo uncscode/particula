@@ -212,7 +212,7 @@ def test_execute_honors_sub_steps(aerosol):
 def test_rate_negative_and_shape(aerosol, spherical_strategy):
     wall_loss = WallLoss(wall_loss_strategy=spherical_strategy)
     rates = wall_loss.rate(aerosol)
-    assert rates.shape == aerosol.particles.concentration[0].shape
+    assert rates.shape == aerosol.particles.concentration.shape
     assert np.all(rates <= 0.0)
 
 

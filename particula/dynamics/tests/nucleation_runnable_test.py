@@ -230,7 +230,8 @@ def test_execute_commits_each_positive_substep_and_preserves_identities(
     calls: list[tuple[float, ParticleData, GasData]] = []
 
     def finalize(events, composition, source_gas):
-        assert source_gas is gas
+        assert source_gas is not gas
+        assert not np.shares_memory(source_gas.concentration, gas.concentration)
         return object(), _admitted_diagnostics()
 
     def commit(demand, diagnostics, source_particles, source_gas, config):
@@ -240,7 +241,13 @@ def test_execute_commits_each_positive_substep_and_preserves_identities(
     monkeypatch.setattr(particle_process, "_commit_particle_source", commit)
     assert runnable.execute(aerosol, 2.0, sub_steps=2) is aerosol
     assert len(calls) == 2
-    assert all(entry[1] is particles and entry[2] is gas for entry in calls)
+    assert all(
+        entry[1] is not particles and entry[2] is not gas for entry in calls
+    )
+    assert all(
+        not np.shares_memory(entry[2].concentration, gas.concentration)
+        for entry in calls
+    )
     assert aerosol.particles is particles
     assert aerosol.gas is gas
     npt.assert_array_equal(gas_only, [[2.0e-6]])
@@ -546,12 +553,10 @@ def test_execute_skips_transactions_for_zero_rate(monkeypatch):
         npt.assert_array_equal(actual, expected)
 
 
-def test_execute_stops_after_deterministic_zero_admission(
+def test_execute_rechecks_deterministic_zero_admission(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """A zero demand planning admission avoids repeated no-op substep
-    transactions.
-    """
+    """Zero admission skips commits; subsequent substeps recheck state."""
     aerosol, _, _, _ = _aerosol()
     runnable = _runnable()
     finalizations = 0
@@ -575,7 +580,7 @@ def test_execute_stops_after_deterministic_zero_admission(
     )
 
     assert runnable.execute(aerosol, 1.0, sub_steps=10) is aerosol
-    assert finalizations == 1
+    assert finalizations == 10
 
 
 def test_execute_uses_equal_duration_and_immutable_config_per_positive_substep(
@@ -592,7 +597,8 @@ def test_execute_uses_equal_duration_and_immutable_config_per_positive_substep(
     monkeypatch.setattr(runnable, "_rate", lambda *_: next(rates))
 
     def finalize(events, composition, source_gas):
-        assert source_gas is gas
+        assert source_gas is not gas
+        assert not np.shares_memory(source_gas.concentration, gas.concentration)
         assert (
             composition is runnable.source_config.strategy.injection_composition
         )
@@ -600,7 +606,8 @@ def test_execute_uses_equal_duration_and_immutable_config_per_positive_substep(
         return object(), _admitted_diagnostics()
 
     def commit(demand, diagnostics, particles, source_gas, config):
-        assert source_gas is gas
+        assert source_gas is not gas
+        assert not np.shares_memory(source_gas.concentration, gas.concentration)
         configs.append(config)
 
     monkeypatch.setattr(particle_process, "_finalize_particle_source", finalize)
@@ -609,7 +616,10 @@ def test_execute_uses_equal_duration_and_immutable_config_per_positive_substep(
     assert runnable.execute(aerosol, 4.0, sub_steps=2) is aerosol
     assert durations == [2.0, 2.0]
     assert len(configs) == 2
-    assert configs[0] is configs[1]
+    assert configs[0] is not configs[1]
+    npt.assert_array_equal(
+        configs[0].requested_scale, configs[1].requested_scale
+    )
     assert configs[0].species_map is runnable.source_config.species_map
 
 
@@ -631,7 +641,7 @@ def test_later_substep_rate_uses_gas_depleted_by_prior_commit(
 
     def commit(*args) -> None:
         if len(observed_rates) == 1:
-            gas.concentration[0, 0] *= 0.5
+            args[3].concentration[0, 0] *= 0.5
 
     monkeypatch.setattr(runnable, "_rate", record_rate)
     monkeypatch.setattr(
@@ -750,7 +760,7 @@ def test_execute_preflights_current_state_each_substep(
     monkeypatch.setattr(runnable, "_rate", lambda *_: 0.0)
 
     assert runnable.execute(aerosol, 1.0, sub_steps=3) is aerosol
-    assert calls == 4
+    assert calls == 6
 
 
 def test_later_commit_failure_preserves_prior_substep(
@@ -774,7 +784,7 @@ def test_later_commit_failure_preserves_prior_substep(
         nonlocal commits
         commits += 1
         if commits == 1:
-            gas.concentration[0, 0] = 0.5e-12
+            args[3].concentration[0, 0] = 0.5e-12
             return
         raise RuntimeError("second P3 transaction")
 

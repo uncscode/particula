@@ -837,7 +837,9 @@ def test_dilution_rejects_non_native_aggregate_before_access(operation):
     old_shape = SimpleNamespace(particles=native.particles, atmosphere=object())
     snapshots = [x.copy() for x in _storage(native)]
     strategy = DilutionStrategy(0.5)
-    with pytest.raises(TypeError, match="dilution requires a native Aerosol"):
+    with pytest.raises(
+        TypeError, match="[Dd]ilution requires a native Aerosol"
+    ):
         if operation == "primitive":
             dilute_aerosol(old_shape, 0.5, 1.0)
         elif operation == "rate":
