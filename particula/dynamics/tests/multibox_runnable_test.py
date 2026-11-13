@@ -267,3 +267,163 @@ def test_batch_matches_single_boxes_and_preserves_identity(family):
                 [_cpu_batch.arrays(ref)[name] for ref in references]
             )
             np.testing.assert_allclose(values, expected, rtol=1e-12, atol=0)
+
+
+@pytest.mark.parametrize(
+    "kind", ["discrete", "continuous_pdf", "particle_resolved"]
+)
+@pytest.mark.parametrize(
+    "mechanism",
+    [
+        "brownian",
+        "sedimentation",
+        "shear",
+        "dns",
+        "hard",
+        "dyachkov",
+        "gatti",
+        "gopal",
+        "chahl",
+        "combined",
+    ],
+)
+def test_all_coagulation_mechanisms_match_independent_boxes(kind, mechanism):
+    """Every existing material kernel keeps per-box state and environment."""
+    from particula.dynamics.coagulation.coagulation_strategy.tests.native_rates_test import (
+        _particle,
+        _strategy,
+    )
+
+    single = state(1.0, kind)
+    single.particles = _particle(kind)
+    if kind == "particle_resolved":
+        single.particles.concentration[:] = 2.0
+    aerosol = batch(single)
+    if kind != "particle_resolved":
+        aerosol.particles.volume[:] = 1
+    aerosol.environment.pressure[1] = 90000
+    reference = _cpu_batch.detached(aerosol)
+    context = CPUExecutionContext(123, ("a", "b"))
+    for i in range(2):
+        box = _cpu_batch.box_view(reference, i)
+        strategy = _strategy(mechanism, kind)
+        strategy.random_generator = context._begin(2).generator(
+            "coagulation", i
+        )
+        strategy.step(
+            box.particles,
+            float(box.environment.temperature[0]),
+            float(box.environment.pressure[0]),
+            1e-4,
+        )
+    process = Coagulation(_strategy(mechanism, kind))
+    process.execute(aerosol, 1e-4, context=context)
+    for name in process._writer_fields(aerosol):
+        np.testing.assert_allclose(
+            _cpu_batch.arrays(aerosol)[name],
+            _cpu_batch.arrays(reference)[name],
+            rtol=1e-12,
+            atol=0,
+        )
+
+
+@pytest.mark.parametrize(
+    "kind", ["discrete", "continuous_pdf", "particle_resolved"]
+)
+@pytest.mark.parametrize(
+    "geometry", ["rectangular", "charged_spherical", "charged_rectangular"]
+)
+def test_wall_geometries_match_independent_boxes(kind, geometry):
+    """Charged and rectangular variants use each box's own environment."""
+    from particula.dynamics import (
+        ChargedWallLossStrategy,
+        RectangularWallLossStrategy,
+    )
+
+    aerosol = batch(state(1.0, kind))
+    if kind != "particle_resolved":
+        aerosol.particles.volume[:] = 1
+    aerosol.environment.pressure[1] = 90000
+    if geometry == "rectangular":
+        strategy = RectangularWallLossStrategy(0.001, (1.0, 1.0, 1.0), kind)
+    else:
+        strategy = ChargedWallLossStrategy(
+            0.001,
+            chamber_geometry=geometry.removeprefix("charged_"),
+            chamber_radius=0.5,
+            chamber_dimensions=(1.0, 1.0, 1.0),
+            wall_potential=0.05,
+            distribution_type=kind,
+        )
+    process = WallLoss(strategy)
+    reference = _cpu_batch.detached(aerosol)
+    context = CPUExecutionContext(42, ("a", "b"))
+    for i in range(2):
+        box = _cpu_batch.box_view(reference, i)
+        strategy = deepcopy(process.wall_loss_strategy)
+        strategy.random_generator = context._begin(2).generator("wall_loss", i)
+        strategy.step(
+            box.particles,
+            float(box.environment.temperature[0]),
+            float(box.environment.pressure[0]),
+            0.01,
+        )
+    process.execute(aerosol, 0.01, context=context)
+    for name in process._writer_fields(aerosol):
+        np.testing.assert_array_equal(
+            _cpu_batch.arrays(aerosol)[name],
+            _cpu_batch.arrays(reference)[name],
+        )
+
+
+@pytest.mark.parametrize("family", ["coagulation", "wall"])
+@pytest.mark.parametrize("zero_duration", [True, False])
+def test_zero_work_preserves_random_continuation(family, zero_duration):
+    """Empty populations and zero-duration calls do not consume randomness."""
+    aerosol = batch(state())
+    process = (
+        Coagulation(BrownianCoagulationStrategy("particle_resolved"))
+        if family == "coagulation"
+        else WallLoss(
+            SphericalWallLossStrategy(0.001, 0.5, "particle_resolved")
+        )
+    )
+    context = CPUExecutionContext(17, ("a", "b"))
+    reference = CPUExecutionContext(17, ("a", "b"))
+    if not zero_duration:
+        aerosol.particles.masses[:] = 0
+        aerosol.particles.concentration[:] = 0
+        aerosol.particles.charge[:] = 0
+    process.execute(aerosol, 0 if zero_duration else 1, context=context)
+    namespace = "coagulation" if family == "coagulation" else "wall_loss"
+    for i in range(2):
+        np.testing.assert_array_equal(
+            context._begin(2).generator(namespace, i).random(10),
+            reference._begin(2).generator(namespace, i).random(10),
+        )
+
+
+def test_late_nucleation_capacity_failure_preserves_every_box():
+    """A full later box cannot commit earlier source injection or gas loss."""
+    from particula.particles.exhaustion import ExhaustionControls
+
+    single, config = fixture()
+    process = runnable(single, config)
+    process.commit_config = replace(
+        process.commit_config,
+        exhaustion_controls=ExhaustionControls(False, False),
+        **{
+            name: np.repeat(getattr(process.commit_config, name), 2)
+            for name in ("requested_scale", "minimum_scale", "minimum_volume")
+        },
+    )
+    aerosol = batch(single)
+    aerosol.particles.masses[1, :] = aerosol.particles.masses[1, 0]
+    aerosol.particles.concentration[1, :] = 2
+    before = {
+        name: value.copy() for name, value in _cpu_batch.arrays(aerosol).items()
+    }
+    with pytest.raises(ValueError):
+        process.execute(aerosol, 1)
+    for name, value in _cpu_batch.arrays(aerosol).items():
+        np.testing.assert_array_equal(value, before[name])

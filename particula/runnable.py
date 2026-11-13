@@ -38,10 +38,10 @@ from particula.aerosol import Aerosol
 class RunnableABC:
     """Abstract base class for processes modifying an Aerosol instance.
 
-    This class enforces the implementation of a process rate calculation
-    and an execution method that modifies the Aerosol in-place. Subclasses
-    must implement both 'rate' and 'execute', which define how the process
-    affects the Aerosol over a time step.
+    The default drivers stage and execute single-box hooks across a batch.
+    Implement ``_rate_box``, ``_execute_box``, and ``_writer_fields`` to use
+    this transaction boundary. Existing subclasses overriding public methods
+    retain their own execution and validation responsibilities.
 
     Methods:
         - rate: Calculate and return the rate of the process.
@@ -130,10 +130,11 @@ class RunnableABC:
                 workers.append(worker)
             if step == 0:
                 continue
+            commit_workers = self._prepare_commit(workers, context is not None)
             _cpu_batch.publish(aerosol, candidate, writers)
             if transaction is not None:
                 transaction.commit()
-            self._commit_workers(workers, context is not None)
+            commit_workers()
         return aerosol
 
     def _validate_batch(self, aerosol):
@@ -151,8 +152,9 @@ class RunnableABC:
         """Create isolated hook state for a single box."""
         return copy(self)
 
-    def _commit_workers(self, workers, uses_context):
-        """Publish staged process diagnostics after numeric success."""
+    def _prepare_commit(self, workers, uses_context):
+        """Prepare a non-failing diagnostics publisher before numeric writes."""
+        return lambda: None
 
     def _rate_box(self, aerosol):
         """Evaluate the single-box numerical building block."""
