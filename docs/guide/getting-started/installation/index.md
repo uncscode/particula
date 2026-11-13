@@ -1,7 +1,6 @@
 # Setup Particula
 
-These docs use the **v0.3.0 native development API**. For these examples,
-clone the repository and install the matching checkout:
+To run the examples from source, clone the repository and install Particula:
 
 ```bash
 git clone https://github.com/uncscode/particula.git
@@ -10,8 +9,6 @@ python -m pip install -e ".[extra]"
 ```
 
 Then [run your first CPU simulation](../first-simulation.md).
-The package-manager commands below install the published distribution, which may
-predate the native API. Documentation does not announce a new release.
 
 Choose the route that matches your comfort level:
 

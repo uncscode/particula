@@ -7,7 +7,7 @@ constructors, `.data` wrapping, `from_data`, `from_representation`,
 `to_representation`, `from_species` and `to_species` are not supported native
 construction or migration steps. Do not strip a native tag to cross a bridge.
 The particle facade, its builders/factory and both particle conversion bridges
-have been removed from the v0.3.0 development tree. Import native particle
+have been removed in v0.3.0. Import native particle
 initializers or `ParticleDataBuilder` directly from `particula.particles`.
 The `from_species()` and `to_species()` gas bridges have also been removed.
 Construct `GasData` or use `GasDataBuilder`, preserving full ordered species

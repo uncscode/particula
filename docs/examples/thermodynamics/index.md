@@ -1,6 +1,6 @@
 # Thermodynamics examples
 
-These CPU examples use the v0.3.0 development checkout. Start with the
+Start with the
 [activity strategy examples](activity/index.md), then choose a specific question.
 All notebook/source pairs are retained because their APIs, inputs, or scientific
 outputs differ; they are not independent copies of the same calculation.

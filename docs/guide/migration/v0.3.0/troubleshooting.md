@@ -85,7 +85,7 @@ continuation from inspection data or silently migrate an old schema.
 ## Reproduce the supported path
 
 Run the published scripts and their owning `examples_tests` suites from the
-v0.3.0 development checkout. Warp CPU is the installed-Warp baseline for
+repository checkout. Warp CPU is the installed-Warp baseline for
 uncaptured examples. Optional CUDA tests skip when unavailable; native capture
 has no CPU fallback. A no-Warp result must report that no kernel ran, not claim
 physics parity. See [focused reproduction commands](../../gpu/troubleshooting.md#focused-reproduction-commands).

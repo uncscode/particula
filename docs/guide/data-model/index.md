@@ -4,7 +4,7 @@ title: Data model
 
 # Data model
 
-This page is the canonical reference for the v0.3.0 development checkout's data-container
+This page is the canonical reference for data-container
 schemas, leading-axis shape conventions, explicit CPU↔GPU transfer helpers,
 the direct-kernel troubleshooting contract, and current CPU/GPU support
 boundaries.

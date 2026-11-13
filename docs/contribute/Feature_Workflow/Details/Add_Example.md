@@ -6,8 +6,8 @@ workload of scientific simulations and record their longer runtime explicitly.
 
 ## Native construction and process ownership
 
-Use the v0.3.0 development checkout (`python -m pip install -e ".[extra]"`), not an
-older released wheel. Construct native `Aerosol` from `ParticleData`, `GasData`
+Install the repository checkout (`python -m pip install -e ".[extra]"`).
+Construct native `Aerosol` from `ParticleData`, `GasData`
 and `EnvironmentData`; use process-owned physics and explicit species maps.
 Start with [native state access and replacement](../../../guide/data-model/ownership.md)
 and [scientific process contracts](../../../guide/processes/index.md).

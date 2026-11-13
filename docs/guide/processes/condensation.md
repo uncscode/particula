@@ -134,8 +134,7 @@ condensation subpackage:
 
 Run the following setup once before the other Python snippets on this page.
 Each recipe then creates fresh aligned state with the indicated molar masses;
-no recipe silently reuses a different species layout. These examples require
-the v0.3.0 development checkout (`pip install -e .`). The shared illustrative PMF uses
+no recipe silently reuses a different species layout. The shared illustrative PMF uses
 64 nodes over 50–500 nm, mode 100 nm, GSD 1.5 and 1e8 m⁻³; resolved examples
 use two unit-count slots in 1e-6 m³. The discrete quick start below retains the
 default two-mode, 250-bin initializer. Vapor pressures are prescribed at
@@ -653,7 +652,6 @@ particle, gas = staggered.step(
 
 ## Prerequisites
 
-- The v0.3.0 development checkout installed with `pip install -e .`.
 - Native `ParticleData` with an explicit population kind.
 - `GasData`, aligned `EnvironmentData`, and process-owned vapor properties and mapping.
 - Familiarity with particula dynamics and examples.

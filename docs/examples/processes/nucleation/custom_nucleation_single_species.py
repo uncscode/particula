@@ -39,7 +39,7 @@ runnables. Its native fixed-slot custom source is illustrative only; use
 
 # %%
 # In Colab uncomment the following command to install particula:
-# Use the v0.3.0 development checkout: `python -m pip install -e ".[extra]"`
+# Install from the repository root: `python -m pip install -e ".[extra]"`
 import matplotlib.pyplot as plt
 import numpy as np
 

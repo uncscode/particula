@@ -90,7 +90,7 @@ source = NucleationSourceConfig(
 ## Getting started
 
 Use the [supported CPU example](https://github.com/uncscode/particula/blob/main/docs/examples/processes/nucleation/cpu_nucleation.py) as
-the runnable starting point in the v0.3.0 development checkout (`pip install -e .`).
+the runnable starting point.
 It constructs native `Aerosol`, unified `GasData` with precursor and inert lanes,
 fixed resolved particle capacity, aligned `EnvironmentData`, and
 the public `NucleationCommitConfig`. Its commit controls use

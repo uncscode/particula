@@ -1,7 +1,7 @@
 # Examples
 
-Start small, then build toward full scientific workloads. These examples target
-native v0.3.0 development APIs; use the [installation guide](../guide/getting-started/installation/index.md).
+Start small, then build toward full scientific workloads. Begin with the
+[installation guide](../guide/getting-started/installation/index.md).
 Notebook pages display saved results in the full documentation build. Standalone
 sources remain runnable from the repository checkout.
 

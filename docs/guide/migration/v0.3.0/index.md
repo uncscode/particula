@@ -5,9 +5,8 @@ title: Native aerosol migration
 # Native aerosol migration
 
 Migrate supported workflows to the flat native `Aerosol`, holding `ParticleData`,
-full ordered `GasData`, and `EnvironmentData`. Use the v0.3.0 development checkout
-for these examples; their presence here does not announce a published wheel or
-release. V0.3.0 removes the legacy APIs and validates the resulting native-only
+full ordered `GasData`, and `EnvironmentData`. V0.3.0 removes the legacy APIs
+and validates the resulting native-only
 execution boundaries after the v0.3.0 handoff.
 
 See the [v0.3.0 closeout record](../../../contribute/validation/releases/v0.3.0.md) for
@@ -49,9 +48,8 @@ bytes, not those inspection carriers, govern explicit compatible restart.
 
 ## Historical release context
 
-The graph capture closeout planned coexistence in 0.2.13 and a breaking native migration in
-0.3.0. These are release plans, not publication claims. This guide documents the
-native development API: particle, gas species, and atmosphere facades and their
+The 0.2.13 plan retained both facades and native containers. In v0.3.0,
+particle, gas species, and atmosphere facades and their
 obsolete constructors have been removed. Native gas storage uses explicit
 box/species axes and retains mixed partitioning masks; vapor-pressure strategies
 belong to processes. Construct validated gas input with `GasDataBuilder`;

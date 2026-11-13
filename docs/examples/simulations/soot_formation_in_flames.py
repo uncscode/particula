@@ -45,7 +45,7 @@
 # %%
 # 🚧 Install Particula if you're running this in Google Colab
 # Remove the comment below to enable installation
-# Use the v0.3.0 development checkout: `python -m pip install -e ".[extra]"`
+# Install from the repository root: `python -m pip install -e ".[extra]"`
 
 # 📦 Import necessary libraries
 import copy  # to safely duplicate Python objects

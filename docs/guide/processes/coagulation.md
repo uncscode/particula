@@ -409,7 +409,7 @@ combined = factory.get_strategy(
 )
 ```
 
-The snippets on this page use the v0.3.0 development checkout. CPU snippets share
+CPU snippets share
 imports and the native aerosol constructed in the runnable section above;
 optional GPU snippets only declare their separate low-level interfaces.
 That runnable fixture uses an explicitly truncated 50–500 nm, 64-bin PMF
@@ -452,7 +452,6 @@ particle = brownian.step(
 
 ### Prerequisites
 
-- The v0.3.0 development checkout installed with `pip install -e .`; no older-wheel compatibility is implied.
 - A native `ParticleData` instance (with an explicit population kind).
 - Basic familiarity with particula dynamics and the runnable pipeline (`|`).
 

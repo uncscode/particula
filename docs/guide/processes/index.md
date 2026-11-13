@@ -40,7 +40,7 @@ Pass `aerosol.particles`, `aerosol.gas`, and scalar values from
 import particula as par
 from docs.examples.fundamentals.native_state_access import build_aerosol, build_condensation
 
-# Run from the v0.3.0 development checkout; the fixture includes ordered inert gas.
+# Run from the repository root; the fixture includes ordered inert gas.
 aerosol = build_aerosol()
 condensation = build_condensation(aerosol.gas).condensation_strategy
 coagulation = par.dynamics.BrownianCoagulationStrategy("particle_resolved")

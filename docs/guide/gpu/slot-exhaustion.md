@@ -30,9 +30,8 @@ The native source consumer supplies explicit ordered species mapping; see
 Direct and prepared GPU exhaustion calls reject untagged, discrete, and PDF
 metadata before payload access. Native source staging requires an explicit
 species binding and carries raw event counts through scaling; final demand
-density is computed from those counts and the current volume. The import
-snippets below require the v0.3.0 development checkout, with Warp installed for GPU
-imports.
+density is computed from those counts and the current volume. The GPU import
+snippets below require Warp.
 
 ## CPU planning contract
 

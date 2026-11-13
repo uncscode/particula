@@ -349,7 +349,7 @@ The strategy system operates on the same distribution types used elsewhere in pa
 You select the appropriate mode at initialization (or via builder/factory parameters) with `distribution_type`, and the strategy adjusts its `step` behavior to match the representation.
 
 
-The snippets on this page use the v0.3.0 development checkout. CPU snippets share
+CPU snippets share
 imports and the native aerosol constructed in the runnable section above;
 optional GPU snippets only declare their separate low-level interfaces.
 That runnable fixture uses an explicitly truncated 50–500 nm, 64-bin PMF
@@ -392,7 +392,6 @@ for _ in range(40):
 
 ### Prerequisites
 
-- The v0.3.0 development checkout installed with `pip install -e .`; no older-wheel compatibility is implied.
 - A native `ParticleData` instance (with an explicit population kind).
 - Basic familiarity with particula's dynamics and particle-phase examples.
 

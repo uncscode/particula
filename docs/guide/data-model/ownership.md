@@ -4,8 +4,8 @@ title: Native container access and ownership
 
 # Native container access and ownership
 
-Use the native `Aerosol(particles=..., gas=..., environment=...)` aggregate
-from the v0.3.0 development checkout. It retains three supplied containers by identity.
+The native `Aerosol(particles=..., gas=..., environment=...)` aggregate
+retains three supplied containers by identity.
 The [construction guide](construction.md) covers initializers and builders;
 [the executable access example](https://github.com/uncscode/particula/blob/main/docs/examples/fundamentals/native_state_access.py)
 covers access, replacement and a subsequent mapped process.
