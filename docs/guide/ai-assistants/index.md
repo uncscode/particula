@@ -121,10 +121,74 @@ The OpenCode ZIP includes both a native package and manual-install skills.
 Plugin versions are independent of Python library versions. Archives include
 `BUILD.json` with the source commit, dirty-tree indicator, resource hashes,
 and a pointer to compatibility evidence. Verify downloads with
-`sha256sum -c SHA256SUMS` after downloading all three ZIPs.
+`sha256sum -c SHA256SUMS` after downloading all ZIPs listed in that file.
 Branch-based installs can change when refreshed. Use a published release tag
 or full commit for a fixed revision; examples in the host guides use
 `RELEASE_TAG` as a placeholder for an actual release containing these files.
+
+### Packages after every main merge
+
+GitHub is the primary distribution route. The **Assistant plugins** workflow
+validates every pull request targeting `main`, merge-queue build, and push to
+`main`, with no changed-path filter. This also checks plugin compatibility when
+only the Python library changes. A failed check prevents package upload and
+draft-release creation. Maintainers can require the workflow's `validate` check
+in branch protection; this source change does not modify repository rules.
+
+After each successful merge build, open the latest successful `main` push in
+[Assistant plugins](https://github.com/uncscode/particula/actions/workflows/assistant-plugins.yml?query=branch%3Amain+event%3Apush)
+and follow **Download tested plugin packages** in the run summary. The artifact
+contains the Codex, Claude and OpenCode ZIPs, checksums, and `GITHUB-RELEASE.md`
+with installation instructions. Artifacts are named by version and source
+commit and retained for 30 days. GitHub requires sign-in to download workflow
+artifacts. Manual workflow runs also build packages.
+
+After a successful upstream `main` push that increases the plugin version, the
+workflow creates a draft GitHub release named `particula-helper-vVERSION`,
+targeting the exact tested commit. Reruns preserve existing release assets;
+same-version merges still produce fresh workflow artifacts. Forks do not create
+these drafts. Publish a draft when a durable public download is wanted. Plugin
+release tags do not trigger Python package publication. No OpenAI credentials
+or public-directory access are required for GitHub distribution.
+
+Existing installations need a marketplace refresh/reinstall and a new session;
+merging a change does not update installed plugin caches automatically. See the
+[Codex update commands](codex.md#codex-cli) or the matching host guide above.
+
+To prepare an update, increase the root, Codex, Claude and OpenCode package
+versions together, including both version entries in `npm-shrinkwrap.json`.
+Update the portable manifest's release notes, then run:
+
+```bash
+.venv/bin/python scripts/build_particula_plugins.py --sync
+.venv/bin/python scripts/build_particula_plugins.py --check \
+  --output /tmp/particula-plugin-candidate
+```
+
+Use a fresh output directory. Inspect `GITHUB-RELEASE.md` and verify the ZIP
+checksums before sharing a local build.
+
+### OpenAI directory preparation
+
+Plugin version 0.3.2 adds a separate portable upload candidate,
+`particula-helper-openai-0.3.2.zip` (the filename follows the plugin version),
+and `OPENAI-SUBMISSION.md` with source provenance and publication handoff steps.
+This skills-only package is marked for desktop execution. The requested
+publisher is **Particula Developers**, with all supported countries and no
+required payments or purchases. The publisher identity still needs verification
+in the intended OpenAI organization. Public directory approval and a clean
+installation in the target desktop app have not been established by packaging.
+
+Use a fresh output directory. The builder verifies the final public ZIP's
+skills, resource references and absence of private app bindings or lifecycle
+hooks. This is a local package check, not OpenAI's submission validator.
+Complete the listing and policy pages, verify the publisher identity, and test
+a clean desktop installation before following the
+[OpenAI submission process](https://developers.openai.com/plugins/deploy/submission).
+Upload updates to the existing public plugin, inspect the portal's scans,
+complete applicable attestations, submit for review and publish after approval.
+The workflow does not upload to OpenAI or publish the store listing, and needs
+no OpenAI secret. GitHub draft creation uses the repository's built-in token.
 
 ## Troubleshooting
 

@@ -10,6 +10,7 @@ import zipfile
 from pathlib import Path
 
 import pytest
+import yaml
 
 SCRIPT = Path(__file__).resolve().parents[1] / "build_particula_plugins.py"
 SPEC = importlib.util.spec_from_file_location("plugin_builder", SCRIPT)
@@ -95,6 +96,156 @@ def test_generated_drift_rejected(tmp_path, monkeypatch):
     )
     with pytest.raises(ValueError, match="drift"):
         builder.sync_or_check(catalog)
+
+
+def test_public_submission_contains_portable_listing_and_provenance(tmp_path):
+    """The public ZIP carries all skills, metadata and verifiable resources."""
+    import hashlib
+
+    manifest, _ = builder.validate()
+    output = tmp_path / "public"
+    builder.build(output, manifest)
+    path = output / f"particula-helper-openai-{manifest['version']}.zip"
+    with zipfile.ZipFile(path) as archive:
+        portable = json.loads(archive.read("plugin.json"))
+        extension = portable["extensions"]["com.openai"]
+        assert extension["requires_local_executor"] is True
+        assert extension["interface"]["developerName"] == "Particula Developers"
+        assert extension["publication"]["countries"] == []
+        assert extension["review"]["commerce"] is False
+        assert len(extension["review"]["prompts"]) >= 3
+        assert not any(name.startswith(".") for name in archive.namelist())
+        provenance = json.loads(archive.read("BUILD.json"))
+        assert provenance["plugin_version"] == portable["version"]
+        for name, digest in provenance["sha256"].items():
+            assert hashlib.sha256(archive.read(name)).hexdigest() == digest
+    for line in (output / "SHA256SUMS").read_text().splitlines():
+        digest, name = line.split()
+        assert (
+            hashlib.sha256((output / name).read_bytes()).hexdigest() == digest
+        )
+    assert "not an approved" in (output / "OPENAI-SUBMISSION.md").read_text()
+    github_notes = (output / "GITHUB-RELEASE.md").read_text()
+    assert provenance["source_revision"] in github_notes
+    assert manifest["version"] in github_notes
+    assert "does not require OpenAI store verification" in github_notes
+
+
+@pytest.mark.parametrize(
+    "extra", [".app.json", "hooks/hooks.json", "mcp.json", "../escape"]
+)
+def test_public_upload_rejects_unsupported_components(tmp_path, extra):
+    """Local bindings, hooks, servers and escaping paths cannot reach upload."""
+    path = tmp_path / "bad.zip"
+    builder.write_zip(path, {**builder.canonical(), extra: b"{}"})
+    with pytest.raises(ValueError, match="Unsupported public archive entry"):
+        builder.check_public_archive(path)
+
+
+def test_public_upload_rejects_missing_skills_and_local_execution(tmp_path):
+    """A valid-looking ZIP must still preserve execution and skill contracts."""
+    files = builder.canonical()
+    path = tmp_path / "bad.zip"
+    manifest = json.loads(files["plugin.json"])
+    manifest["extensions"]["com.openai"]["requires_local_executor"] = False
+    builder.write_zip(
+        path, {**files, "plugin.json": builder.json_bytes(manifest)}
+    )
+    with pytest.raises(ValueError, match="requires local execution"):
+        builder.check_public_archive(path)
+    del files["skills/particula-run/SKILL.md"]
+    builder.write_zip(path, files)
+    with pytest.raises(ValueError, match="missing expected skills"):
+        builder.check_public_archive(path)
+
+
+@pytest.mark.parametrize("key", ["apps", "hooks", "mcpServers"])
+def test_public_upload_rejects_manifest_integrations(tmp_path, key):
+    """Bindings in the manifest cannot bypass the archive file checks."""
+    files = builder.canonical()
+    manifest = json.loads(files["plugin.json"])
+    manifest["extensions"]["com.openai"][key] = "./integration.json"
+    files["plugin.json"] = builder.json_bytes(manifest)
+    path = tmp_path / "bad.zip"
+    builder.write_zip(path, files)
+    with pytest.raises(ValueError, match=f"cannot declare {key}"):
+        builder.check_public_archive(path)
+
+
+@pytest.mark.parametrize(
+    "event_name, previous, current, expected",
+    [
+        ("push", "0.3.1", "0.3.2", "true"),
+        ("push", "0.3.2", "0.3.2", "false"),
+        ("push", "0.3.9", "0.3.10", "true"),
+        ("push", "0.3.2", "0.3.1", None),
+        ("pull_request", "0.3.1", "0.3.2", "false"),
+        ("workflow_dispatch", "0.3.1", "0.3.2", "false"),
+        ("release", "0.3.1", "0.3.2", "false"),
+        ("merge_group", "0.3.1", "0.3.2", "false"),
+    ],
+)
+def test_workflow_release_version_gate(
+    tmp_path, monkeypatch, event_name, previous, current, expected
+):
+    """Run CI's actual gate against version bumps, reruns and non-push events."""
+    workflow = yaml.safe_load(
+        (builder.ROOT / ".github/workflows/assistant-plugins.yml").read_text()
+    )
+    step = next(
+        step
+        for step in workflow["jobs"]["validate"]["steps"]
+        if step.get("id") == "package"
+    )
+    code = step["run"].split("\n", 1)[1].rsplit("\nPY", 1)[0]
+    manifest = tmp_path / "plugins/particula-helper/plugin.json"
+    manifest.parent.mkdir(parents=True)
+    manifest.write_text(json.dumps({"version": current}))
+    event = tmp_path / "event.json"
+    event.write_text(json.dumps({"before": "a" * 40}))
+    output = tmp_path / "output"
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("GITHUB_EVENT_PATH", str(event))
+    monkeypatch.setenv("GITHUB_EVENT_NAME", event_name)
+    monkeypatch.setenv("GITHUB_OUTPUT", str(output))
+    monkeypatch.setenv("GITHUB_SHA", "b" * 40)
+
+    def previous_manifest(command, **kwargs):
+        assert event_name == "push"
+        assert command == [
+            "git",
+            "show",
+            f"{'a' * 40}:plugins/particula-helper/plugin.json",
+        ]
+        return json.dumps({"version": previous})
+
+    monkeypatch.setattr(subprocess, "check_output", previous_manifest)
+    if expected is None:
+        with pytest.raises(SystemExit, match="must not decrease"):
+            exec(compile(code, "workflow-version-gate", "exec"), {})  # noqa: S102 - trusted repository workflow
+        assert not output.exists()
+    else:
+        exec(compile(code, "workflow-version-gate", "exec"), {})  # noqa: S102 - trusted repository workflow
+        values = dict(
+            line.split("=", 1) for line in output.read_text().splitlines()
+        )
+        assert values["version-increased"] == expected
+        assert values["version"] == current
+        assert values["artifact"] == f"particula-helper-{current}-{'b' * 40}"
+
+
+def test_workflow_builds_every_main_merge_without_path_filters():
+    """Library-only merges and merge queues must also check plugin packages."""
+    workflow = yaml.safe_load(
+        (builder.ROOT / ".github/workflows/assistant-plugins.yml").read_text(),
+    )
+    # PyYAML's YAML 1.1 parser treats the unquoted GitHub key `on` as True.
+    triggers = workflow.get("on", workflow.get(True))
+    for event in ("push", "pull_request", "merge_group"):
+        trigger = triggers[event]
+        assert trigger["branches"] == ["main"]
+        assert "paths" not in trigger
+        assert "paths-ignore" not in trigger
 
 
 def test_repository_skills_relocate_with_their_references(tmp_path):
