@@ -5,7 +5,7 @@ from the bounded direct-condensation walkthrough.
 
 ## Supported evidence boundary
 
-The [walkthrough source](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_condensation_parity_walkthrough.py)
+The [walkthrough source](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/direct/gpu_condensation_parity_walkthrough.py)
 compares an independent fp64, fixed-four-substep NumPy oracle with the low-level
 direct GPU kernel. Its [walkthrough regression test](https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_condensation_parity_walkthrough_test.py)
 keeps that bounded comparison executable.
@@ -39,7 +39,7 @@ states the related production-hook evidence limit.
 ## Focused reproduction commands
 
 ```bash
-python docs/Examples/gpu_condensation_parity_walkthrough.py
+python docs/examples/gpu/direct/gpu_condensation_parity_walkthrough.py
 pytest examples_tests/gpu_condensation_parity_walkthrough_test.py -q -Werror
 pytest particula/gpu/kernels/tests/condensation_test.py -q -Werror
 pytest particula/gpu/kernels/tests/condensation_stiffness_test.py -q -Werror

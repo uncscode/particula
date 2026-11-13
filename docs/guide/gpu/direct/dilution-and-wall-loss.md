@@ -130,7 +130,7 @@ trajectory replay.
 
 These direct wall-loss checks do not by themselves establish orchestration,
 capture, autodiff or performance evidence. Native resident integration has its
-own [walkthrough](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_resident_multi_timestep.py), and direct GPU
+own [walkthrough](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/resident/gpu_resident_multi_timestep.py), and direct GPU
 nucleation has its own [source contract](../../processes/nucleation.md#direct-warp-low-level-step).
 The CPU-only, one-box `Nucleation` runnable remains a separate high-level path.
 

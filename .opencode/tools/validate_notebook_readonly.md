@@ -44,13 +44,13 @@ Error contract:
 ## Examples
 
 - Validation:
-  - `validate_notebook_readonly({ notebookPath: 'docs/Examples/setup-template-init-tutorial.ipynb' })`
+  - `validate_notebook_readonly({ notebookPath: 'docs/examples/setup-template-init-tutorial.ipynb' })`
 - Recursive validation:
-  - `validate_notebook_readonly({ notebookPath: 'docs/Examples/', recursive: true, options: 'output=json' })`
+  - `validate_notebook_readonly({ notebookPath: 'docs/examples/', recursive: true, options: 'output=json' })`
 - Fast validation:
-  - `validate_notebook_readonly({ notebookPath: 'docs/Examples/', options: 'fast' })`
+  - `validate_notebook_readonly({ notebookPath: 'docs/examples/', options: 'fast' })`
 - Check-sync (read-only):
-  - `validate_notebook_readonly({ notebookPath: 'docs/Examples/', recursive: true, checkSync: true })`
+  - `validate_notebook_readonly({ notebookPath: 'docs/examples/', recursive: true, checkSync: true })`
 
 ## Mutating workflows
 

@@ -109,9 +109,9 @@ The following subagents are invoked during the documentation workflow (`adw work
 | Subagent | Purpose | Tools |
 |----------|---------|-------|
 | `adw-docs-notebook` | Create, edit, validate, execute Jupyter notebooks | `validate_notebook`, `run_notebook` |
-| `examples` | Create tutorials, examples, and notebooks in `docs/Examples/` | Standard file tools |
+| `examples` | Create tutorials, examples, and notebooks in `docs/examples/` | Standard file tools |
 
-**Note:** If your implementation includes Jupyter notebooks in `docs/Examples/`, the `adw-docs-notebook` subagent (invoked via the documentation workflow) provides specialized tools for safe notebook editing using Jupytext workflows.
+**Note:** If your implementation includes Jupyter notebooks in `docs/examples/`, the `adw-docs-notebook` subagent (invoked via the documentation workflow) provides specialized tools for safe notebook editing using Jupytext workflows.
 
 # Execution Flow
 

@@ -87,7 +87,7 @@ contract for normal-step limits.
 
 For a lazy lifecycle-only walkthrough that does not schedule or launch physics,
 see the
-[GPU-resident session lifecycle source](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_resident_session.py).
+[GPU-resident session lifecycle source](https://github.com/Gorkowski/particula/blob/main/docs/examples/gpu/resident/gpu_resident_session.py).
 
 Validate documentation with:
 

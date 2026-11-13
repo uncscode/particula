@@ -29,5 +29,5 @@ Choose a process below, then follow its example and scientific reference links.
 - [Numerical precision](../../contribute/validation/numerics/mass-precision.md)
 - [Development roadmap](../../Features/Roadmap/index.md)
 
-See [Examples](../../Examples/index.md) for executable workflows and
+See [Examples](../../examples/index.md) for executable workflows and
 [Theory](../../theory/index.md) for equations and assumptions.

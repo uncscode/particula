@@ -25,15 +25,15 @@ CUDA skips do not establish capture, performance or cross-device equivalence.
 
 ## Source and notebook workflow
 
-Create source files under `docs/Examples/` in the owning topic. Standalone
+Create source files under `docs/examples/` in the owning topic. Standalone
 scripts are supported; notebook examples use paired `.py` percent-format and
 `.ipynb` files. Edit the Python source first:
 
 ```bash
-ruff check docs/Examples/path/example.py --fix
-ruff format docs/Examples/path/example.py
-python .opencode/tools/validate_notebook.py docs/Examples/path/example.ipynb --sync
-python .opencode/tools/run_notebook.py docs/Examples/path/example.ipynb
+ruff check docs/examples/path/example.py --fix
+ruff format docs/examples/path/example.py
+python .opencode/tools/validate_notebook.py docs/examples/path/example.ipynb --sync
+python .opencode/tools/run_notebook.py docs/examples/path/example.ipynb
 ```
 
 Execute the standalone source too, inspect plots and retained notebook outputs,

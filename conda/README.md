@@ -156,11 +156,11 @@ release example-test allowlist; `CPU_EXAMPLES` declares the matching scripts.
 The examples workspace contains only these three pairs plus root
 `conftest.py` and `pyproject.toml`:
 
-| Test under `examples_tests/` | Script under `docs/Examples/` |
+| Test under `examples_tests/` | Script under `docs/examples/` |
 | --- | --- |
 | `dilution_example_test.py` | `cpu_dilution.py` |
-| `nucleation_example_test.py` | `Nucleation/cpu_nucleation.py` |
-| `condensation_latent_heat_example_test.py` | `Dynamics/Condensation/Condensation_Latent_Heat.py` |
+| `nucleation_example_test.py` | `processes/nucleation/cpu_nucleation.py` |
+| `condensation_latent_heat_example_test.py` | `processes/condensation/condensation_latent_heat.py` |
 
 Each declared example test module must contribute selected tests. The conda
 recipe lists inputs for both suites, but the runner stages them separately;
@@ -201,9 +201,9 @@ test:
     - pyproject.toml
     - conftest.py
     - scripts/run_release_tests.py
-    - docs/Examples/cpu_dilution.py
-    - docs/Examples/Nucleation/cpu_nucleation.py
-    - docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.py
+    - docs/examples/processes/dilution/cpu_dilution.py
+    - docs/examples/processes/nucleation/cpu_nucleation.py
+    - docs/examples/processes/condensation/condensation_latent_heat.py
   commands:
     - python scripts/run_release_tests.py --installed
 ```

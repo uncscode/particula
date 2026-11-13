@@ -56,8 +56,8 @@ Quick links:
 - [Shipped foundation baseline](#shipped-foundation-baseline)
 - [Authoritative field ownership decisions](#authoritative-field-ownership-decisions)
 - [Shipped foundation guide](../../guide/data-model/index.md)
-- [Runnable Data Containers example](../../Examples/Data_Containers/index.md)
-- [Native-CUDA resident graph-capture example](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_resident_graph_capture.py)
+- [Runnable Data Containers example](../../examples/fundamentals/data-containers.md)
+- [Native-CUDA resident graph-capture example](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/resident/gpu_resident_graph_capture.py)
 - [Resident graph-capture operator runbook](../../guide/gpu/resident/graph-capture.md)
 - [Graph-capture closeout record](graph-capture-closeout.md)
 - [Final downstream handoff map for sibling features](#final-downstream-handoff-map-for-sibling-features)
@@ -653,7 +653,7 @@ downstream implementers; it does not add new schema semantics.
 - `foundation documentation`: start user-facing docs and examples from the shipped
   [Data Containers and GPU Foundations](../../guide/data-model/index.md)
   guide and the
-  [Data Containers example](../../Examples/Data_Containers/index.md), then
+  [Data Containers example](../../examples/fundamentals/data-containers.md), then
   link back to this roadmap page only for implementation-planning detail such
   as field ownership, shape tables, CPU↔GPU transfer caveats, validation
   evidence, and downstream handoff anchors.
@@ -794,7 +794,7 @@ Shipped scope:
 
 Two follow-ups were deferred out of CPU non-isothermal condensation and subsequently shipped in Epic C/GPU kernel hardening:
 the runnable
-[CPU latent-heat example](../../Examples/Dynamics/Condensation/Condensation_Latent_Heat.ipynb)
+[CPU latent-heat example](../../examples/processes/condensation/condensation_latent_heat.ipynb)
 (latent-heat example) and the integration-level conservation case in
 `particula/integration_tests/condensation_latent_heat_conservation_test.py`
 (CPU latent-heat conservation). Together they provide the executable CPU reference handed to Epic D.
@@ -817,7 +817,7 @@ For the current shipped baseline on explicit CPU↔GPU transfer helpers,
 canonical runnable entrypoint, start from the
 [Data Containers and GPU Foundations](../../guide/data-model/index.md)
 guide and the
-[Data Containers example](../../Examples/Data_Containers/index.md); this
+[Data Containers example](../../examples/fundamentals/data-containers.md); this
 epic and every later epic extend those contracts rather than redefining
 them.
 
@@ -863,7 +863,7 @@ Shipped scope:
    stochastic validation uses bounded aggregate expectations such as tolerance
    bands or `3-sigma` behavior rather than exact per-seed equality.
 7. The shipped canonical direct-kernel quick-start is
-   [`docs/Examples/gpu_direct_kernels_quick_start.py`](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_direct_kernels_quick_start.py).
+   [`docs/examples/gpu/direct/gpu_direct_kernels_quick_start.py`](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/direct/gpu_direct_kernels_quick_start.py).
    It demonstrates the supported `ParticleData`/`GasData` path, explicit
    `to_warp_*` and `from_warp_*` transfer helpers, the `WARP_AVAILABLE`
    guard, and deferred `particula.gpu.kernels` imports so the CPU↔Warp
@@ -905,7 +905,7 @@ Shipped scope:
       skip contract and `pytest particula/gpu/kernels/tests/environment_test.py
       -q -m "warp and cuda"` for optional CUDA-if-available coverage
 8. The paired
-   [`CondensationLatentHeat` example](../../Examples/Dynamics/Condensation/Condensation_Latent_Heat.ipynb)
+   [`CondensationLatentHeat` example](../../examples/processes/condensation/condensation_latent_heat.ipynb)
    now provides a runnable CPU-only bookkeeping workflow (latent-heat example), completing
    the documentation follow-up deferred from CPU non-isothermal condensation.
 9. `particula/integration_tests/condensation_latent_heat_conservation_test.py`
@@ -1065,12 +1065,12 @@ This leaves temperature feedback, gas mutation beyond the inventory-limited dire
 coupling, and all higher-level process integration outside this milestone.
 
 The independent condensation walkthrough
-(`docs/Examples/gpu_condensation_parity_walkthrough.py`)
+(`docs/examples/gpu/direct/gpu_condensation_parity_walkthrough.py`)
 provides fixed-four-substep low-level direct-kernel physics, conservation, and
 energy evidence. Run:
 
 ```bash
-python docs/Examples/gpu_condensation_parity_walkthrough.py
+python docs/examples/gpu/direct/gpu_condensation_parity_walkthrough.py
 pytest examples_tests/gpu_condensation_parity_walkthrough_test.py -q -Werror
 ```
 
@@ -1106,7 +1106,7 @@ shipped, and Epic H is active.
 
 Coagulation validation owns the [GPU coagulation validation record](../../contribute/validation/gpu/coagulation.md),
 independent condensation walkthrough owns the [condensation parity walkthrough ownership record](../../contribute/validation/gpu/condensation-parity.md),
-and the [GPU condensation parity walkthrough](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_condensation_parity_walkthrough.py)
+and the [GPU condensation parity walkthrough](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/direct/gpu_condensation_parity_walkthrough.py)
 is runnable source.
 
 Extend GPU coagulation beyond the Brownian kernel to the collision
@@ -1282,7 +1282,7 @@ that nucleation and graph capture depend on.
 
 The private
 [numerical validation sequence evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py)
-and [integration validation published source](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py) cover
+and [integration validation published source](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/direct/gpu_complete_process_sequence.py) cover
 the fixed illustrative order: `condensation_step_gpu`,
 `coagulation_step_gpu`, `dilution_step_gpu`, `wall_loss_step_gpu`, then
 `nucleation_step_gpu`. This is illustrative, not a production coordinator;
@@ -1455,7 +1455,7 @@ Delivered nucleation boundaries and deferred GPU scope:
    scheduler/backend selection, expanded physics, graph capture, autodiff, and
    performance guarantees. See the [Nucleation Strategy
    System](../../guide/processes/nucleation.md) and its
-   [direct example](https://github.com/uncscode/particula/blob/main/docs/Examples/Nucleation/gpu_direct_nucleation.py).
+   [direct example](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/direct/gpu_direct_nucleation.py).
 3. Direct-process integration shipped private sequence evidence, a direct-transfer illustration,
    documentation, and closeout. It does not own the shipped direct GPU nucleation direct step
    or create a production coordinator.
@@ -1564,7 +1564,7 @@ direct-kernel contract. Any broader integration still follows the ordering.
 - Use the shipped
   [Data Containers and GPU Foundations](../../guide/data-model/index.md)
   guide and
-  [Data Containers example](../../Examples/Data_Containers/index.md) as the
+  [Data Containers example](../../examples/fundamentals/data-containers.md) as the
    current baseline for explicit transfer helpers, `EnvironmentData` ownership,
    and direct-kernel support boundaries.
 - Selection, availability, and fallback never upload, restore, synchronize,
@@ -1578,7 +1578,7 @@ direct-kernel contract. Any broader integration still follows the ordering.
   alone.
 - Selected Brownian coagulation documentation has shipped bounded selected-Brownian adapter documentation and
   evidence in the [coagulation strategy guide](../../guide/processes/coagulation.md)
-  and its [explicit-transfer example](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_coagulation_direct.py).
+  and its [explicit-transfer example](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/direct/gpu_coagulation_direct.py).
    It preserves the direct-kernel contract. Resident RNG and restart's shipped resident-stream
    policy remains concrete-only and adds no public exports, fallback, or hidden
    transfer.
@@ -1724,7 +1724,7 @@ freezes small `(1, 16, 2)` and medium `(1000, 16, 2)` workloads, 100% activity,
 gas communication, replay counts 1/10/100/1000, and native-CUDA-only evidence
 with no CPU or Warp-CPU fallback. No reviewed normalized artifact or manifest
 is checked in, so profiling results and recommendations are unavailable and
-unshipped. Graph-capture documentation owns the [native-CUDA example](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_resident_graph_capture.py),
+unshipped. Graph-capture documentation owns the [native-CUDA example](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/resident/gpu_resident_graph_capture.py),
 [operator runbook](../../guide/gpu/resident/graph-capture.md), limitations, documentation
 reconciliation, and [closeout record](graph-capture-closeout.md). The closeout
 record is the sole evidence authority. Its measured-evidence disposition
@@ -1957,7 +1957,7 @@ this measured-evidence bar passed; the closeout ledger preserves its gaps.
   guide while designing graph-captured GPU loops; performance work should not
   reintroduce implicit synchronization or move the canonical example entrypoint
   away from the
-  [Data Containers example](../../Examples/Data_Containers/index.md).
+  [Data Containers example](../../examples/fundamentals/data-containers.md).
 
 - Investigate Warp graph capture for repeated timestep execution with a fixed
   process order and stable array shapes.
@@ -2116,7 +2116,7 @@ container, transfer, and runnable-example baseline that this differentiability
 work builds on, start from the
 [Data Containers and GPU Foundations](../../guide/data-model/index.md)
 guide and the
-[Data Containers example](../../Examples/Data_Containers/index.md).
+[Data Containers example](../../examples/fundamentals/data-containers.md).
 
 See [Warp Autodiff: Limitations and Stochastic Process Handling](../../contribute/architecture/warp/autodiff-limitations.md)
 for the detailed implementation-planning companion on autodiff mechanics,

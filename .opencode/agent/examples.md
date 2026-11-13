@@ -1,17 +1,17 @@
 ---
 
-description: 'Subagent that manages practical examples and tutorials in docs/Examples/.
+description: 'Subagent that manages practical examples and tutorials in docs/examples/.
   Invoked by the documentation primary agent to create and maintain working examples,
   tutorials, and Jupyter notebooks for ADW features.
 
   This subagent: - Loads workflow context from adw_spec_read tool - Creates and updates
-  docs/Examples/*.md files - Creates .py and .ipynb files in docs/Examples/ - Runs
+  docs/examples/*.md files - Creates .py and .ipynb files in docs/examples/ - Runs
   examples to validate they work - Adds examples for new features - Maintains folder
-  structure and organization - Updates docs/Examples/index.md - Validates markdown
+  structure and organization - Updates docs/examples/index.md - Validates markdown
   links
 
-  Write permissions: - docs/Examples/*.md: ALLOW - docs/Examples/**/*.py: ALLOW -
-  docs/Examples/**/*.ipynb: ALLOW (preferred for interactive examples)'
+  Write permissions: - docs/examples/*.md: ALLOW - docs/examples/**/*.py: ALLOW -
+  docs/examples/**/*.ipynb: ALLOW (preferred for interactive examples)'
 mode: subagent
 permission:
   "*": deny
@@ -42,7 +42,7 @@ permission:
 
 # Examples Subagent
 
-Create and maintain practical examples, tutorials, and Jupyter notebooks in docs/Examples/.
+Create and maintain practical examples, tutorials, and Jupyter notebooks in docs/examples/.
 
 # Core Mission
 
@@ -63,7 +63,7 @@ Feature: <feature_name>
 Usage: <how users interact>
 
 Create:
-- Markdown guide in docs/Examples/
+- Markdown guide in docs/examples/
 - Jupyter notebook (.ipynb) with working code examples
 - Run examples to validate they work
 ```
@@ -79,18 +79,18 @@ task({
 
 # Required Reading
 
-- @docs/Examples/index.md - Examples index and structure
+- @docs/examples/index.md - Examples index and structure
 - @.opencode/guides/documentation_guide.md - Documentation standards
-- @docs/Examples/workflows/basic-workflow.md - Example of good tutorial
+- @docs/examples/workflows/basic-workflow.md - Example of good tutorial
 
 # Write Permissions
 
 **ALLOWED:**
-- ✅ `docs/Examples/*.md` - Markdown tutorials
-- ✅ `docs/Examples/**/*.md` - Tutorials in subdirectories
-- ✅ `docs/Examples/**/*.py` - Python example scripts
-- ✅ `docs/Examples/**/*.ipynb` - Jupyter notebooks (preferred)
-- ✅ `docs/Examples/index.md` - Examples index
+- ✅ `docs/examples/*.md` - Markdown tutorials
+- ✅ `docs/examples/**/*.md` - Tutorials in subdirectories
+- ✅ `docs/examples/**/*.py` - Python example scripts
+- ✅ `docs/examples/**/*.ipynb` - Jupyter notebooks (preferred)
+- ✅ `docs/examples/index.md` - Examples index
 
 **DENIED:**
 - ❌ All other directories
@@ -129,8 +129,8 @@ From context, identify:
 ### 2.2: Check Existing Examples
 
 ```bash
-ls -la docs/Examples/
-ls -la docs/Examples/*/
+ls -la docs/examples/
+ls -la docs/examples/*/
 ```
 
 Determine:
@@ -164,7 +164,7 @@ todowrite({
     },
     {
       "id": "4",
-      "content": "Update docs/Examples/index.md",
+      "content": "Update docs/examples/index.md",
       "status": "pending",
       "priority": "medium"
     },
@@ -184,7 +184,7 @@ Create comprehensive markdown guide:
 
 ```python
 write({
-  "filePath": "{worktree_path}/docs/Examples/{feature-name}.md",
+  "filePath": "{worktree_path}/docs/examples/{feature-name}.md",
   "content": """# {Feature Name} Tutorial
 
 Learn how to use {feature} in ADW with practical examples.
@@ -284,8 +284,8 @@ if __name__ == "__main__":
 
 ## Next Steps
 
-- Learn about [Structured Plans](../../docs/Examples/setup/cli-reference.md#structured-plans)
-- Read the [Workflow Reference](../../docs/Examples/setup/workflow-reference.md)
+- Learn about [Structured Plans](../../docs/examples/setup/cli-reference.md#structured-plans)
+- Read the [Workflow Reference](../../docs/examples/setup/workflow-reference.md)
 - See the [Architecture Reference](../guides/architecture_reference.md)
 
 ## See Also
@@ -304,7 +304,7 @@ Create interactive notebook for exploration.
 
 ```python
 write({
-  "filePath": "{worktree_path}/docs/Examples/**/{feature-name}-tutorial.ipynb",
+  "filePath": "{worktree_path}/docs/examples/**/{feature-name}-tutorial.ipynb",
   "content": """{
  "cells": [
   {
@@ -389,7 +389,7 @@ write({
     "- {learning_3}\\n",
     "\\n",
     "## Next Steps\\n",
-    "- Explore more examples in [docs/Examples/](.)\\n",
+    "- Explore more examples in [docs/examples/](.)\\n",
     "- Read the full documentation"
    ]
   }
@@ -417,7 +417,7 @@ If Jupyter notebook not appropriate, create standalone Python script:
 
 ```python
 write({
-  "filePath": "{worktree_path}/docs/Examples/**/{example_name}.py",
+  "filePath": "{worktree_path}/docs/examples/**/{example_name}.py",
   "content": """#!/usr/bin/env python3
 \"""
 {Feature Name} Example Script
@@ -490,13 +490,13 @@ Check notebook JSON structure is valid by reading and verifying:
 
 Read current index:
 ```python
-read({"filePath": "{worktree_path}/docs/Examples/index.md"})
+read({"filePath": "{worktree_path}/docs/examples/index.md"})
 ```
 
 Add new examples to appropriate section:
 ```python
 edit({
-  "filePath": "{worktree_path}/docs/Examples/index.md",
+  "filePath": "{worktree_path}/docs/examples/index.md",
   "oldString": "{existing_section_entries}",
   "newString": "{existing_section_entries}\n- [{Feature Tutorial}]({feature-name}.md) - {description}\n- [{Feature Notebook}]({feature-name}-tutorial.ipynb) - Interactive tutorial"
 })
@@ -506,7 +506,7 @@ edit({
 
 Check all links in created files:
 ```text
-ripgrep({"contentPattern": "\\[([^\\]]+)\\]\\(([^)]+)\\)", "pattern": "docs/Examples/{feature}*.md"})
+ripgrep({"contentPattern": "\\[([^\\]]+)\\]\\(([^)]+)\\)", "pattern": "docs/examples/{feature}*.md"})
 ```
 
 Verify internal and external links are valid.
@@ -521,9 +521,9 @@ EXAMPLES_UPDATE_COMPLETE
 Created examples for: {feature_name}
 
 Files created:
-- docs/Examples/{feature-name}.md (markdown tutorial)
-- docs/Examples/**/{feature-name}-tutorial.ipynb (Jupyter notebook)
-- docs/Examples/{feature}_example.py (Python script)
+- docs/examples/{feature-name}.md (markdown tutorial)
+- docs/examples/**/{feature-name}-tutorial.ipynb (Jupyter notebook)
+- docs/examples/{feature}_example.py (Python script)
 
 Validation:
 ✅ Python syntax valid
@@ -531,7 +531,7 @@ Validation:
 ✅ Examples run successfully (if tested)
 ✅ Markdown links valid
 
-Index updated: docs/Examples/index.md
+Index updated: docs/examples/index.md
 ```
 
 ### No Changes Needed:
@@ -571,7 +571,7 @@ Recommendation: {what_to_fix}
 # Folder Structure
 
 ```
-docs/Examples/
+docs/examples/
 ├── index.md                    # Main index
 ├── basic-workflow.md           # Basic workflow tutorial
 ├── custom-slash-command.md     # Custom command tutorial
@@ -617,22 +617,22 @@ EXAMPLES_UPDATE_COMPLETE
 Created examples for: Workflow Builder
 
 Files created:
-- docs/Examples/workflow-builder.md (markdown tutorial)
-- docs/Examples/workflow-builder-tutorial.ipynb (Jupyter notebook)
+- docs/examples/workflow-builder.md (markdown tutorial)
+- docs/examples/workflow-builder-tutorial.ipynb (Jupyter notebook)
 
 Validation:
 ✅ Python syntax valid
 ✅ Notebook JSON valid
 ✅ Markdown links valid
 
-Index updated: docs/Examples/index.md (+2 entries)
+Index updated: docs/examples/index.md (+2 entries)
 ```
 
 # Quick Reference
 
 **Output Signal:** `EXAMPLES_UPDATE_COMPLETE` or `EXAMPLES_UPDATE_FAILED`
 
-**Scope:** `docs/Examples/` only
+**Scope:** `docs/examples/` only
 
 **File Types:**
 - `.md` - Markdown tutorials
@@ -645,7 +645,7 @@ Index updated: docs/Examples/index.md (+2 entries)
 - Check markdown links
 - Include prerequisites and expected output
 
-**References:** `docs/Examples/index.md`, `.opencode/guides/documentation_guide.md`
+**References:** `docs/examples/index.md`, `.opencode/guides/documentation_guide.md`
 
 # Related Subagents
 

@@ -7,7 +7,7 @@ For the shipped container, transfer, and runnable-example baseline that this
 follow-on differentiability work builds on, start with the
 [Data Containers and GPU Foundations](../../../guide/data-model/index.md)
 guide and the
-[Data Containers example](../../../Examples/Data_Containers/index.md).
+[Data Containers example](../../../examples/fundamentals/data-containers.md).
 
 This page records how NVIDIA Warp automatic differentiation works, the
 constraints it imposes on kernel authoring, and the options for making

@@ -228,7 +228,7 @@ def filter_changed_files(changed_files):
     for file in changed_files:
         if (
             "particula/" in file
-            or "docs/Examples" in file
+            or "docs/examples" in file
             or "docs/theory" in file
         ):
             filtered_files.append(file)
@@ -248,7 +248,7 @@ def collect_files_to_update(client, changed_files):
     Examples:
         ```py
         update_dict = collect_files_to_update(client,
-            ["particula/foo.py", "docs/Examples/bar.md"])
+            ["particula/foo.py", "docs/examples/bar.md"])
         ```
     """
     remote_files = client.files.list(

@@ -50,4 +50,4 @@ and [access and replacement](../data-model/ownership.md).
 
 
 Next: [process guides](../processes/index.md) or
-[examples](../../Examples/index.md).
+[examples](../../examples/index.md).

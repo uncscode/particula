@@ -245,7 +245,7 @@ set `ADW_GITLAB_USE_CLI=true` (explicit opt-in) in your environment.
 The CLI adapter captures JSON output from `glab` and enforces a parsing size cap; if you
 expect unusually large payloads, keep output sizes in mind when troubleshooting.
 
-See [GitLab Configuration Tutorial](https://github.com/Gorkowski/Agent/blob/main/docs/Examples/backends/gitlab-configuration.md)
+See [GitLab Configuration Tutorial](https://github.com/Gorkowski/Agent/blob/main/docs/examples/backends/gitlab-configuration.md)
 for step-by-step setup instructions.
 
 ### Operation Permissions
@@ -408,7 +408,7 @@ The router:
 
 For complete documentation, see:
 - [Platform Router Feature](https://github.com/Gorkowski/Agent/blob/main/docs/Features/platform-router.md) - Full API reference
-- [Platform Router Examples](https://github.com/Gorkowski/Agent/blob/main/docs/Examples/advanced/platform-router-usage.md) - Usage examples
+- [Platform Router Examples](https://github.com/Gorkowski/Agent/blob/main/docs/examples/advanced/platform-router-usage.md) - Usage examples
 
 ### Configuration Examples
 
@@ -820,13 +820,13 @@ and future considerations.
 
 - [Root README](https://github.com/Gorkowski/Agent/blob/main/README.md#backend-configuration) — Quick reference and
   onboarding instructions.
-- [Backend Configuration Example](https://github.com/Gorkowski/Agent/blob/main/docs/Examples/backends/configuration.md) —
+- [Backend Configuration Example](https://github.com/Gorkowski/Agent/blob/main/docs/examples/backends/configuration.md) —
   Step-by-step walkthrough for a forked contributor environment.
 - [Platform Comparison](https://github.com/Gorkowski/Agent/blob/main/docs/Features/platform-comparison.md) — Differences across
   GitHub vs GitLab (Phase F4).
 - [Platform Router Feature](https://github.com/Gorkowski/Agent/blob/main/docs/Features/platform-router.md) — Routing behavior
   and API reference.
-- [GitLab Configuration Tutorial](https://github.com/Gorkowski/Agent/blob/main/docs/Examples/backends/gitlab-configuration.md) —
+- [GitLab Configuration Tutorial](https://github.com/Gorkowski/Agent/blob/main/docs/examples/backends/gitlab-configuration.md) —
   Complete GitLab setup guide.
 - [GitLab Support Feature](https://github.com/Gorkowski/Agent/blob/main/docs/Features/gitlab-support.md) — GitLab platform
   capabilities and limitations.

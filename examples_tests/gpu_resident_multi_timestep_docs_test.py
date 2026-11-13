@@ -19,7 +19,7 @@ import pytest
 pytestmark = pytest.mark.warp
 
 _ROOT = Path(__file__).resolve().parents[1]
-_EXAMPLE = _ROOT / "docs" / "Examples" / "gpu_resident_multi_timestep.py"
+_EXAMPLE = _ROOT / "docs/examples/gpu/resident/gpu_resident_multi_timestep.py"
 _NO_CUDA_STDERR = (
     "Warp CUDA warning: Could not find or load the NVIDIA CUDA driver. "
     "GPU execution will not be available.\n"

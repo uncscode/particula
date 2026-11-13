@@ -50,7 +50,7 @@ particula/
 
 Integration tests live in `particula/integration_tests/`.
 
-Tests that execute `docs/Examples/` scripts live in `examples_tests/`, outside
+Tests that execute `docs/examples/` scripts live in `examples_tests/`, outside
 the default `testpaths = ["particula"]` collection. Release infrastructure and
 marker-configuration tests live in `scripts/tests/`. Invoke both explicitly;
 the package coverage runner alone does not collect these source-only suites:
@@ -283,19 +283,19 @@ Use the maintained examples and their regression tests as the source of truth
 for concrete workflows and expected output. Update an example and its test
 together instead of copying its detailed contract into this guide:
 
-- Data containers: `docs/Examples/data_containers_and_gpu_foundations.py` and
+- Data containers: `docs/examples/fundamentals/data_containers.py` and
   `examples_tests/data_containers_example_test.py`.
-- Direct kernels: `docs/Examples/gpu_direct_kernels_quick_start.py` and
+- Direct kernels: `docs/examples/gpu/direct/gpu_direct_kernels_quick_start.py` and
   `examples_tests/gpu_direct_kernels_example_test.py`.
-- Direct coagulation: `docs/Examples/gpu_coagulation_direct.py` and
+- Direct coagulation: `docs/examples/gpu/direct/gpu_coagulation_direct.py` and
   `examples_tests/gpu_coagulation_direct_example_test.py`.
-- Direct nucleation: `docs/Examples/Nucleation/gpu_direct_nucleation.py` and
+- Direct nucleation: `docs/examples/gpu/direct/gpu_direct_nucleation.py` and
   `examples_tests/gpu_direct_nucleation_example_test.py`.
-- Complete direct sequence: `docs/Examples/gpu_complete_process_sequence.py`
+- Complete direct sequence: `docs/examples/gpu/direct/gpu_complete_process_sequence.py`
   and `examples_tests/gpu_complete_process_sequence_example_test.py`.
-- Resident session: `docs/Examples/gpu_resident_session.py` and
+- Resident session: `docs/examples/gpu/resident/gpu_resident_session.py` and
   `examples_tests/gpu_resident_session_example_test.py`.
-- Resident loop: `docs/Examples/gpu_resident_multi_timestep.py` and
+- Resident loop: `docs/examples/gpu/resident/gpu_resident_multi_timestep.py` and
   `examples_tests/gpu_resident_multi_timestep_docs_test.py`.
 
 `particula/gpu/tests/process_sequence_test.py` is the maintained reference for

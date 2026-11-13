@@ -2,7 +2,7 @@
 
 Source example test modules live here, including the original 13 modules
 with their original basenames and the native migration regressions.
-They exercise runnable examples under `docs/Examples/`, including CPU, direct
+They exercise runnable examples under `docs/examples/`, including CPU, direct
 GPU, and resident GPU workflows. Package tests remain under `particula/`;
 release infrastructure and marker-policy tests live under `scripts/tests/`.
 
@@ -57,11 +57,11 @@ python scripts/run_release_tests.py --suite examples
 and pytest configuration, but neither this directory nor documentation inputs.
 `--suite examples` stages root conftest/config and only these test/script pairs:
 
-| Test in this directory | Script under `docs/Examples/` |
+| Test in this directory | Script under `docs/examples/` |
 | --- | --- |
 | `dilution_example_test.py` | `cpu_dilution.py` |
-| `nucleation_example_test.py` | `Nucleation/cpu_nucleation.py` |
-| `condensation_latent_heat_example_test.py` | `Dynamics/Condensation/Condensation_Latent_Heat.py` |
+| `nucleation_example_test.py` | `processes/nucleation/cpu_nucleation.py` |
+| `condensation_latent_heat_example_test.py` | `processes/condensation/condensation_latent_heat.py` |
 
 `CPU_EXAMPLE_TESTS` in
 [`scripts/run_release_tests.py`](../scripts/run_release_tests.py) is the

@@ -62,7 +62,7 @@ The Documentation Agent System is a comprehensive suite of agents that automate 
 | **docs** | `subagent` | `adw-docs/*.md`, `README.md`, `docs/*.md` | General documentation |
 | **plan-update-full** | `subagent` | `plans/sections/**/*.md` | Plan section content updates |
 | **plan-update-short** | `subagent` | Plan metadata via `adw_plans` | Phase status and plan lifecycle |
-| **examples** | `subagent` | `docs/Examples/*.md`, `.py`, `.ipynb` | Practical examples and tutorials |
+| **examples** | `subagent` | `docs/examples/*.md`, `.py`, `.ipynb` | Practical examples and tutorials |
 | **architecture** | `subagent` | `adw-docs/architecture/*.md` | ADRs, architecture outline |
 | **theory** | `subagent` | `docs/Theory/*.md` | Conceptual documentation |
 | **features** | `subagent` | `docs/Features/*.md` | High-level feature docs |
@@ -91,9 +91,9 @@ plans/sections/**/*.md                    plan-update-full
 Plan phase status (via adw_plans)         plan-update-short
 adw-docs/architecture/*.md            architecture
 adw-docs/architecture/decisions/*.md  architecture
-docs/Examples/*.md                      examples
-docs/Examples/**/*.py                   examples
-docs/Examples/**/*.ipynb                examples
+docs/examples/*.md                      examples
+docs/examples/**/*.py                   examples
+docs/examples/**/*.ipynb                examples
 docs/Theory/*.md                        theory
 docs/Features/*.md                      features
 All markdown links                      docs-validator (validates)
@@ -206,7 +206,7 @@ ALWAYS (after all documentation updates):
 1. **docstring** → Update docstrings in `adw/auth/operations.py`
 2. **docs** → Update README.md with auth CLI commands
 3. **plan-update-full** → Update plan sections for authentication feature
-4. **examples** → Create `docs/Examples/authentication-tutorial.ipynb`
+4. **examples** → Create `docs/examples/authentication-tutorial.ipynb`
 5. **architecture** → Update outline with auth module, potentially create ADR
 6. **docs-validator** → Validate all links
 7. **git-commit** → Commit "docs: add authentication documentation"

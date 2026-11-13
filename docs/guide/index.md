@@ -11,7 +11,7 @@ instructions when your installed release predates it.
 3. Learn [container construction](data-model/construction.md)
    and [state access and ownership](data-model/ownership.md).
 4. Choose a [scientific process](processes/index.md)
-   and a related [example](../Examples/index.md).
+   and a related [example](../examples/index.md).
 
 ## Choose a path
 

@@ -19,7 +19,7 @@ def test_radius_bin_example_evaporation_and_species_inventory():
         values = runpy.run_path(
             str(
                 ROOT
-                / "docs/Examples/Dynamics/Condensation/Condensation_1_Bin.py"
+                / "docs/examples/processes/condensation/condensation_1_bin.py"
             )
         )
     plt.close("all")

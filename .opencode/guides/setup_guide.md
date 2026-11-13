@@ -215,7 +215,7 @@ OPENCODE_MODEL_HEAVY=opencode/claude-opus-4-5
 ### GitLab (cloud or self-hosted)
 - Scopes: `api`, `read_repository`, `write_repository`; auto-detects hosts with
 `gitlab`, otherwise set `ADW_PLATFORM_HINT=gitlab`. See
-[GitLab Configuration Tutorial](https://github.com/Gorkowski/Agent/blob/main/docs/Examples/backends/gitlab-configuration.md).
+[GitLab Configuration Tutorial](https://github.com/Gorkowski/Agent/blob/main/docs/examples/backends/gitlab-configuration.md).
 ```env
 GITLAB_REPO_URL=https://gitlab.com/<group>/<project>
 GITLAB_TOKEN=glpat-***
@@ -330,6 +330,6 @@ See the [E7-F1 Docs Scaffold Command plan](https://github.com/Gorkowski/Agent/bl
 ## Next Steps
 - Run: `adw workflow complete <issue-number>` (use `--target` or `ADW_TARGET_REPO`).
 - Explore advanced options in [Backend Configuration](backend_configuration.md).
-- More GitLab examples: [GitLab Configuration Tutorial](https://github.com/Gorkowski/Agent/blob/main/docs/Examples/backends/gitlab-configuration.md).
+- More GitLab examples: [GitLab Configuration Tutorial](https://github.com/Gorkowski/Agent/blob/main/docs/examples/backends/gitlab-configuration.md).
 - Troubleshoot setup failures in [troubleshooting_setup.md](troubleshooting_setup.md);
   start with `adw health` when errors appear.

@@ -47,6 +47,6 @@ types, zero concentration handling, and helper-function parity.
 
 ## Notebook Changes
 
-For `docs/Examples/` notebooks, review the paired `.py` source and `.ipynb`.
+For `docs/examples/` notebooks, review the paired `.py` source and `.ipynb`.
 The `.py` should be linted, synced to the notebook, and the notebook executed
 when feasible.

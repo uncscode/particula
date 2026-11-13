@@ -202,7 +202,7 @@ with targeted reads.
 
 Categorize files:
 - `.opencode/guides/*.md` - Agent guides
-- `docs/Examples/*.md` - Examples
+- `docs/examples/*.md` - Examples
 - `docs/Theory/*.md` - Theory docs
 - `docs/Features/*.md` - Feature docs
 - `README.md`, `AGENTS.md` - Root docs
@@ -304,7 +304,7 @@ DOCS_VALIDATION_COMPLETE
 
 Files validated: {count}
 - .opencode/guides/: {count} files
-- docs/Examples/: {count} files
+- docs/examples/: {count} files
 - docs/Theory/: {count} files
 - docs/Features/: {count} files
 - Root: {count} files
@@ -447,7 +447,7 @@ DOCS_VALIDATION_COMPLETE
 
 Files validated: 45
 - .opencode/guides/: 22 files
-- docs/Examples/: 10 files
+- docs/examples/: 10 files
 - docs/Theory/: 5 files
 - docs/Features/: 3 files
 - Root: 5 files
@@ -464,7 +464,7 @@ Links checked: 127
 | Source File | Link Text | Target | Issue |
 |-------------|-----------|--------|-------|
 | `.opencode/guides/testing_guide.md` | [old guide] | `../old/testing.md` | File not found |
-| `docs/Examples/basic.md` | [api docs] | `../../API/core.md` | Wrong path |
+| `docs/examples/basic.md` | [api docs] | `../../API/core.md` | Wrong path |
 
 ## Broken Anchor Links (1)
 

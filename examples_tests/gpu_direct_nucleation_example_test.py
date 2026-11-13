@@ -14,7 +14,7 @@ import numpy.testing as npt
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
-EXAMPLE_PATH = ROOT / "docs/Examples/Nucleation/gpu_direct_nucleation.py"
+EXAMPLE_PATH = ROOT / "docs/examples/gpu/direct/gpu_direct_nucleation.py"
 
 
 def _require_warp() -> None:

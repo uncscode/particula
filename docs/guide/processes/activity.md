@@ -381,8 +381,8 @@ result = partitioning.solve(
 
 - **Theory**: [Activity Theory](../../theory/thermodynamics/activity-theory.md) - Mathematical foundations
 - **Theory**: [Equilibria Theory](../../theory/thermodynamics/equilibria-theory.md) - Partitioning equations
-- **Examples**: [Activity Examples](../../Examples/Activity/index.md) - Working code examples
-- **Tutorial**: [Activity Tutorial](../../Examples/Particle_Phase/Notebooks/Activity_Tutorial.ipynb) - Interactive notebook
+- **Examples**: [Activity Examples](../../examples/thermodynamics/activity/index.md) - Working code examples
+- **Tutorial**: [Activity Tutorial](../../examples/thermodynamics/particle-properties/activity_tutorial.ipynb) - Interactive notebook
 
 ## FAQ
 
@@ -406,6 +406,6 @@ Activity determines the effective concentration that drives phase equilibrium. T
 
 ## See Also
 
-- [Equilibria Examples](../../Examples/Equilibria/index.md)
-- [Particle Phase Tutorial](../../Examples/Particle_Phase/index.md)
+- [Equilibria Examples](../../examples/thermodynamics/equilibria/index.md)
+- [Particle Phase Tutorial](../../examples/fundamentals/particles/index.md)
 - [Wall Loss Strategy System](wall-loss.md)

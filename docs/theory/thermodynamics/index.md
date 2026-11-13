@@ -37,5 +37,5 @@ Activity calculations determine how chemical species behave in mixtures, account
 
 ## Related Resources
 
-- **Examples**: See the [Equilibria How-To Guide](../../Examples/Equilibria/index.md) for practical tutorials
+- **Examples**: See the [Equilibria How-To Guide](../../examples/thermodynamics/equilibria/index.md) for practical tutorials
 - **API Reference**: The `particula.activity` and `particula.equilibria` modules implement these concepts

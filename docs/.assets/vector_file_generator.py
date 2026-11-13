@@ -60,7 +60,7 @@ source_paths_list = list(source_paths)
 # Process Examples Notebooks
 # -------------------------
 filtered_examples = [
-    p for p in source_paths_list if "particula/docs/Examples/" in p.as_posix()
+    p for p in source_paths_list if "particula/docs/examples/" in p.as_posix()
 ]
 output_examples = repo_path / "docs/.assets/temp/"
 os.makedirs(output_examples, exist_ok=True)

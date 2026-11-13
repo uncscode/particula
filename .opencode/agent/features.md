@@ -260,7 +260,7 @@ The fastest way to use {feature}:
 ## Related Documentation
 
 - **Detailed Guide**: [.opencode/guides/{related-guide}.md](../guides/{guide}.md)
-- **Examples**: [docs/Examples/{feature}.md](../Examples/{feature}.md)
+- **Examples**: [docs/examples/{feature}.md](../Examples/{feature}.md)
 - **Architecture**: [docs/Theory/{concept}.md](../Theory/{concept}.md)
 
 ## FAQ
@@ -294,7 +294,7 @@ Use `edit` to update capabilities, use cases, etc.
 
 Ensure feature doc links to:
 - Detailed guides in `.opencode/guides/`
-- Practical examples in `docs/Examples/`
+- Practical examples in `docs/examples/`
 - Conceptual documentation in `docs/Theory/`
 - Architecture in `.opencode/guides/architecture/`
 

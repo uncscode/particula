@@ -11,7 +11,7 @@ pytestmark = pytest.mark.warp
 
 EXAMPLE_PATH = (
     Path(__file__).resolve().parents[1]
-    / "docs/Examples/gpu_coagulation_direct.py"
+    / "docs/examples/gpu/direct/gpu_coagulation_direct.py"
 )
 
 

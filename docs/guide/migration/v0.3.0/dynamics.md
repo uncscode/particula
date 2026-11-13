@@ -12,10 +12,10 @@ execution. Their schema may store several boxes, but the supported CPU runnable
 path is single-box; it does not silently process box zero of a multi-box input.
 
 Run this excerpt from the selected native checkout. Its maintained constructors
-are in `docs/Examples/native_state_access.py`:
+are in `docs/examples/fundamentals/native_state_access.py`:
 
 ```python
-from docs.Examples.native_state_access import build_aerosol, build_condensation
+from docs.examples.fundamentals.native_state_access import build_aerosol, build_condensation
 
 aerosol = build_aerosol()
 condensation = build_condensation(aerosol.gas)
@@ -58,8 +58,8 @@ there is no blanket whole-sequence rollback guarantee.
 Import steps from `particula.gpu.kernels`. Conversion helpers remain under
 `particula.gpu`; maps, scratch and resident configuration remain at their concrete
 modules. See the maintained
-[direct quick start](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_direct_kernels_quick_start.py)
-and [five-process sequence](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py).
+[direct quick start](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/direct/gpu_direct_kernels_quick_start.py)
+and [five-process sequence](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/direct/gpu_complete_process_sequence.py).
 
 Explicitly convert native discrete/resolved data; radius PDFs cannot be
 uploaded. Raw resolved concentration stays counts. Condensation couples gas
@@ -84,7 +84,7 @@ may synchronize flags internally; simulation-state transfers remain explicit.
 
 ## Resident and capture paths
 
-The [resident multi-timestep example](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_resident_multi_timestep.py)
+The [resident multi-timestep example](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/resident/gpu_resident_multi_timestep.py)
 prepares exact session/registry/guard ownership and process mappings, then runs
 the maintained twelve-node composition. After explicit same-device restart it
 prepares new mappings against fresh carriers. Its prescribed gas and wall loss
@@ -92,7 +92,7 @@ make it an open system: zero-ledger residuals report net inventory change,
 not zero closed-system drift.
 
 Uncaptured examples use Warp CPU when installed. The
-[native capture example](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_resident_graph_capture.py)
+[native capture example](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/resident/gpu_resident_graph_capture.py)
 requires CUDA and never substitutes CPU or Warp CPU. Optional CUDA absence is
 not performance evidence. See [container foundations](../../data-model/index.md)
 for transfers and [resident checkpoints](../../gpu/resident/checkpoints.md) for

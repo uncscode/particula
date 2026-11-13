@@ -44,7 +44,7 @@ def test_object_oriented_native_builder_units():
 
 def test_activity_index_molar_fractions():
     """The functional activity entrypoint remains independent of native state."""
-    namespace = execute_page("docs/Examples/Activity/index.md")
+    namespace = execute_page("docs/examples/thermodynamics/activity/index.md")
     amounts = np.array([0.5e-9 / 18.015e-3, 0.5e-9 / 200e-3])
     np.testing.assert_allclose(
         namespace["activity"], amounts / amounts.sum(), rtol=1e-12
@@ -53,9 +53,7 @@ def test_activity_index_molar_fractions():
 
 def test_design_pattern_function_and_strategy_examples():
     """The functional example keeps symmetric cubic-radius kernel scaling."""
-    namespace = execute_page(
-        "docs/contribute/architecture/design-patterns.md"
-    )
+    namespace = execute_page("docs/contribute/architecture/design-patterns.md")
     kernel = namespace["kernel"]
     assert kernel.shape == (2, 2)
     assert np.all(np.isfinite(kernel)) and np.all(kernel > 0)
@@ -93,9 +91,7 @@ def test_activity_feature_equilibrium_organic_balance():
 
 def test_activity_theory_coefficient_identity():
     """BAT activity equals its coefficient times the appropriate mole fraction."""
-    namespace = execute_page(
-        "docs/theory/thermodynamics/activity-theory.md"
-    )
+    namespace = execute_page("docs/theory/thermodynamics/activity-theory.md")
     np.testing.assert_allclose(
         namespace["activity_water"],
         namespace["gamma_water"] * 0.7,
@@ -110,9 +106,7 @@ def test_activity_theory_coefficient_identity():
 
 def test_equilibrium_theory_species_balance():
     """The functional solver preserves each organic species with water separate."""
-    namespace = execute_page(
-        "docs/theory/thermodynamics/equilibria-theory.md"
-    )
+    namespace = execute_page("docs/theory/thermodynamics/equilibria-theory.md")
     assert namespace["result"].success
     alpha, beta, system = (
         namespace["alpha"],

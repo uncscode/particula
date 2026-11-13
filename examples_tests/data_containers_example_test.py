@@ -15,16 +15,7 @@ from particula.gpu import WARP_AVAILABLE
 
 EXAMPLE_PATH = (
     Path(__file__).resolve().parents[1]
-    / "docs"
-    / "Examples"
-    / "data_containers_and_gpu_foundations.py"
-)
-GUIDE_PATH = (
-    Path(__file__).resolve().parents[1]
-    / "docs"
-    / "Examples"
-    / "Data_Containers"
-    / "data_containers_and_gpu_foundations.py"
+    / "docs/examples/fundamentals/data_containers.py"
 )
 EXAMPLES_ROOT = EXAMPLE_PATH.parent
 
@@ -46,21 +37,10 @@ def _load_module(module_name: str, module_path: Path) -> types.ModuleType:
 def example_module(monkeypatch: pytest.MonkeyPatch) -> types.ModuleType:
     """Load the published top-level example module."""
     monkeypatch.syspath_prepend(str(EXAMPLES_ROOT))
-    sys.modules.pop("data_containers_and_gpu_foundations", None)
+    sys.modules.pop("data_containers", None)
     return _load_module(
         "data_containers_and_gpu_foundations_test",
         EXAMPLE_PATH,
-    )
-
-
-@pytest.fixture
-def guide_module(monkeypatch: pytest.MonkeyPatch) -> types.ModuleType:
-    """Load the guide-local forwarding module."""
-    monkeypatch.syspath_prepend(str(EXAMPLES_ROOT))
-    sys.modules.pop("data_containers_and_gpu_foundations", None)
-    return _load_module(
-        "data_containers_and_gpu_foundations_guide_test",
-        GUIDE_PATH,
     )
 
 
@@ -212,23 +192,6 @@ def test_example_main_prints_example_output(
     assert captured.out.splitlines() == lines
 
 
-def test_guide_main_prints_example_output(
-    monkeypatch: pytest.MonkeyPatch,
-    capsys: pytest.CaptureFixture[str],
-    guide_module: types.ModuleType,
-) -> None:
-    """Test the guide-local module delegates to the canonical example."""
-    lines = ["guide-sentinel", "canonical-sentinel"]
-    monkeypatch.setattr(
-        guide_module._CANONICAL_MODULE, "run_example", lambda: lines
-    )
-
-    guide_module.main()
-
-    captured = capsys.readouterr()
-    assert captured.out.splitlines() == lines
-
-
 def test_example_runs_as_main_entrypoint(
     monkeypatch: pytest.MonkeyPatch,
     capsys: pytest.CaptureFixture[str],
@@ -242,54 +205,11 @@ def test_example_runs_as_main_entrypoint(
     assert captured.err == ""
 
 
-def test_guide_runs_as_main_entrypoint(
-    monkeypatch: pytest.MonkeyPatch,
-    capsys: pytest.CaptureFixture[str],
-) -> None:
-    """Test the guide-local forwarding module executes successfully."""
-    monkeypatch.setenv("PARTICULA_EXAMPLE_FORCE_NO_WARP", "1")
-
-    runpy.run_path(str(GUIDE_PATH), run_name="__main__")
-
-    captured = capsys.readouterr()
-    assert captured.err == ""
-
-
 def test_example_non_warp_path_reports_cpu_success() -> None:
     """Test the published example path completes without Warp transfers."""
     result = _run_example(force_no_warp=True)
 
     assert result.returncode == 0
-
-
-def test_guide_module_re_exports_canonical_run_example(
-    monkeypatch: pytest.MonkeyPatch,
-    guide_module: types.ModuleType,
-) -> None:
-    """Test the guide module re-exports the canonical run_example helper."""
-    assert (
-        guide_module.run_example is guide_module._CANONICAL_MODULE.run_example
-    )
-    assert guide_module.main is guide_module._CANONICAL_MODULE.main
-
-
-def test_guide_module_raises_import_error_when_canonical_example_cannot_load(
-    monkeypatch: pytest.MonkeyPatch,
-    guide_module: types.ModuleType,
-) -> None:
-    """Test guide import fails clearly when the canonical example cannot load."""
-
-    def _missing_spec(*args: object, **kwargs: object) -> None:
-        return None
-
-    monkeypatch.setattr(
-        guide_module.importlib.util,
-        "spec_from_file_location",
-        _missing_spec,
-    )
-
-    with pytest.raises(ImportError, match="Unable to load canonical example"):
-        guide_module._load_canonical_module()
 
 
 @pytest.mark.skipif(not WARP_AVAILABLE, reason="Warp is not available")
