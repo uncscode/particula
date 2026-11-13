@@ -101,7 +101,7 @@ monolithic tool names with the specific split wrappers the agent needs:
 | `move` | `move_safe`, `move_overwrite`, `move_trash` |
 | `clear_build` | `clear_build_preview`, `clear_build_delete` |
 | `ripgrep` | `find_files`, `search_content`, `ripgrep_advanced` |
-| `build_mkdocs` | `build_mkdocs_validate`, `build_mkdocs_build` |
+| Retired MkDocs tools | `build_docs` with `action=build` or `action=check` |
 
 Only grant the specific split wrappers the agent actually calls. For example,
 an agent that only reads spec state and writes messages needs:

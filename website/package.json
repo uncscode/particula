@@ -1,5 +1,5 @@
 {
-  "name": "particula-documentation-demo",
+  "name": "particula-documentation",
   "private": true,
   "type": "module",
   "scripts": {
@@ -7,7 +7,7 @@
     "dev": "npm run prepare:content && ASTRO_TELEMETRY_DISABLED=1 astro dev --host 127.0.0.1",
     "build": "npm run prepare:content && ASTRO_TELEMETRY_DISABLED=1 astro build && node scripts/python.mjs ../scripts/docs_site.py verify",
     "preview": "ASTRO_TELEMETRY_DISABLED=1 astro preview --host 127.0.0.1",
-    "test": "node scripts/python.mjs -m pytest ../scripts/tests/docs_examples_test.py ../scripts/tests/docs_site_test.py -q --no-cov && node --test scripts/hero-scenes.test.mjs"
+    "test": "node scripts/python.mjs -m pytest ../scripts/tests/docs_*_test.py -q --no-cov && node --test scripts/*.test.mjs"
   },
   "dependencies": {
     "@astrojs/markdown-remark": "^7.3.0",
@@ -18,5 +18,8 @@
     "rehype-mathjax": "^7.0.0",
     "remark-math": "^6.0.0",
     "starlight-pydocs": "0.3.0"
+  },
+  "engines": {
+    "node": "26.13.0"
   }
 }

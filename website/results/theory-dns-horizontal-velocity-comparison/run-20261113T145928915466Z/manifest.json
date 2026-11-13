@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 3.1611044800374657,
+  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "input_sha256": {},
+  "example": "theory-dns-horizontal-velocity-comparison",
+  "fingerprint": "346036fc5c8eb9a74236c97d3a14006c3bc64144520b6a19754890db68734a35",
+  "source": "docs/theory/dynamics/cloud-droplet-coagulation/dns-horizontal-velocity-comparison.py",
+  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "package_dirty": false,
+  "executed_at": "2026-11-13T14:59:29.042294+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [
+      {
+        "image": "figure-7-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "dc908bb207ed15dc6d4c2b7e62f633dc7821f34ad2e6aa57409dbfd60f188057",
+    "figure-7-1.png": "90b29784c8d70acf8dcc02d255853b769591a7f40b832c5ad99e772977192320"
+  }
+}

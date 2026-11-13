@@ -30,7 +30,7 @@ permission:
   workflow_builder: deny
   git_diff: allow
   platform_operations: deny
-  build_mkdocs: deny
+  build_docs: deny
   feedback_log: allow
   get_datetime: allow
   get_version: allow
@@ -39,6 +39,17 @@ permission:
   codesearch: deny
   bash: deny
 ---
+
+## Publication source policy
+
+The Starlight site publishes Markdown and percent-cell Python under `docs/`.
+Do not create or maintain `.ipynb` files there. Use the `examples` agent and
+`website/AUTHORING.md` for publication work. The notebook recipes below are
+retained only for explicitly requested temporary or unpublished exploration
+outside `docs/`; they do not override this publication policy. Generated
+notebooks are disposable execution intermediates. Use the saved-result runner
+for publication refreshes and Starlight for builds.
+
 
 
 # Documentation Primary Agent
@@ -67,9 +78,9 @@ You are running as an **orchestrator** that:
 
 ## Documentation Build Validation
 
-Do not call MkDocs wrappers directly from this orchestrator. Delegate documentation
+Do not call the documentation build wrapper directly from this orchestrator. Delegate documentation
 build validation to the `docs-validator` subagent, which is the only agent permitted
-to use `build_mkdocs_validate` (validation-only path).
+to use `build_docs` (build and verification path).
 
 # Required Reading
 

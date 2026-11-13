@@ -316,7 +316,7 @@ pytest particula/gpu/ particula/execution/tests/ -q \
 ```
 
 After focused checks pass, run `.opencode/tools/run_pytest.py` without a target
-for repository-wide assertions and coverage. Run `mkdocs build --strict` when
+for repository-wide assertions and coverage. Run `npm --prefix website run build` when
 GPU examples or user-facing documentation change.
 
 For resident graph-capture validation, use the maintained

@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 2.8149950570077635,
+  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "input_sha256": {},
+  "example": "examples-fundamentals-particles-distribution-tutorial",
+  "fingerprint": "0e779d58ba333ade0dfa374ef4bcf08e49deac1417bcb24b97a36b95a32a1d08",
+  "source": "docs/examples/fundamentals/particles/distribution_tutorial.py",
+  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "package_dirty": false,
+  "executed_at": "2026-11-13T14:59:57.720909+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [
+      {
+        "text": "'Distribution strategy tutorial for particle property calculations.\\n\\nThis tutorial covers the distribution strategies implemented in particula\\nfor calculating particle properties. Strategies define how to compute\\nderived properties like particle mass, radius, and total mass based on\\nthe distribution type (mass-based, radius-based, or speciated-mass).\\n\\nStrategies covered:\\n    - MassBasedMovingBin: Calculate radius from known particle mass\\n    - RadiiBasedMovingBin: Calculate mass from known particle radius\\n    - SpeciatedMassMovingBin: Multi-species mass-based calculations\\n\\nExample:\\n    Calculate particle radius from mass::\\n\\n        import numpy as np\\n        import particula as par\\n        mass = np.linspace(0, 10, 5)  # kg\\n        density = np.array([1000.0])  # kg/m^3\\n        radius = par.particles.MassBasedMovingBin().get_radius(mass, density)\\n'"
+      }
+    ],
+    [],
+    [
+      {
+        "text": "Radii [m]: [[0.         0.08419452 0.10607844 0.1214295  0.13365046]]\nMaterial mass density [kg/m^3]: [[25.]]\nMaterial inventory [kg]: [[25.]]\n"
+      }
+    ],
+    [
+      {
+        "text": "Per-particle masses [kg]: [[0.         0.06544985 0.52359878 1.76714587 4.1887902 ]]\nMaterial inventory [kg]: [[6.54498469]]\n"
+      }
+    ],
+    [
+      {
+        "text": "Radii [m]: [[0.         0.09637866 0.1214295  0.13900208 0.15299159]]\nMaterial inventory [kg]: [[25. 25.]]\n"
+      }
+    ],
+    [
+      {
+        "text": "Number density [m^-3]: [32.]\nMaterial inventory [kg]: [[50. 50.]]\n"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "1c55f6f3dbcf03955005224f4a5658dffe2ba1eabcc4e79e171391df2130ed73"
+  }
+}

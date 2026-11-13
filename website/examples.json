@@ -23,5 +23,529 @@
     "timeout": 300,
     "inputs": [],
     "invoke": "result = run_example(device='cuda')\nprint('\\n'.join(result.output))"
+  },
+  "theory-dns-fluid-and-particle-properties-comparison": {
+    "title": "Dns Fluid And Particle Properties Comparison",
+    "source": "docs/theory/dynamics/cloud-droplet-coagulation/dns-fluid-and-particle-properties-comparison.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "theory-dns-horizontal-velocity-comparison": {
+    "title": "Dns Horizontal Velocity Comparison",
+    "source": "docs/theory/dynamics/cloud-droplet-coagulation/dns-horizontal-velocity-comparison.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "theory-dns-kernel-comparison": {
+    "title": "Dns Kernel Comparison",
+    "source": "docs/theory/dynamics/cloud-droplet-coagulation/dns-kernel-comparison.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "theory-dns-radial-distribution-comparison": {
+    "title": "Dns Radial Distribution Comparison",
+    "source": "docs/theory/dynamics/cloud-droplet-coagulation/dns-radial-distribution-comparison.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "theory-dns-radial-relative-velocity-comparison": {
+    "title": "Dns Radial Relative Velocity Comparison",
+    "source": "docs/theory/dynamics/cloud-droplet-coagulation/dns-radial-relative-velocity-comparison.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "theory-ionparticle-coagulation": {
+    "title": "Ionparticle Coagulation",
+    "source": "docs/theory/dynamics/ionparticle-coagulation.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "theory-dynamic-viscosity": {
+    "title": "Dynamic Viscosity",
+    "source": "docs/theory/properties/dynamic-viscosity.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "theory-mean-free-path": {
+    "title": "Mean Free Path",
+    "source": "docs/theory/properties/mean-free-path.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "examples-fundamentals-data-containers": {
+    "title": "Data Containers",
+    "source": "docs/examples/fundamentals/data_containers.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "examples-fundamentals-gas-environment-data": {
+    "title": "Gas Mixture and Environment Tutorial",
+    "source": "docs/examples/fundamentals/gas/environment_data.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "examples-fundamentals-gas-gas-data": {
+    "title": "Native Gas Species Tutorial",
+    "source": "docs/examples/fundamentals/gas/gas_data.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "examples-fundamentals-gas-vapor-pressure": {
+    "title": "Vapor Pressure Tutorial",
+    "source": "docs/examples/fundamentals/gas/vapor_pressure.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "examples-fundamentals-native-aerosol": {
+    "title": "Aerosol Tutorial",
+    "source": "docs/examples/fundamentals/native_aerosol.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "examples-fundamentals-native-state-access": {
+    "title": "Native State Access",
+    "source": "docs/examples/fundamentals/native_state_access.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "examples-fundamentals-particles-distribution-tutorial": {
+    "title": "Native Distribution Storage",
+    "source": "docs/examples/fundamentals/particles/distribution_tutorial.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "examples-fundamentals-particles-particle-data": {
+    "title": "Native Particle Construction",
+    "source": "docs/examples/fundamentals/particles/particle_data.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "examples-gpu-direct-gpu-complete-process-sequence": {
+    "title": "Gpu Complete Process Sequence",
+    "source": "docs/examples/gpu/direct/gpu_complete_process_sequence.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 1800,
+    "inputs": [],
+    "invoke": "result = run_example(device='cuda')\nprint('\\n'.join(result.output) if hasattr(result, 'output') else 'CUDA example completed successfully')"
+  },
+  "examples-gpu-direct-gpu-condensation-parity-walkthrough": {
+    "title": "Gpu Condensation Parity Walkthrough",
+    "source": "docs/examples/gpu/direct/gpu_condensation_parity_walkthrough.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 1800,
+    "inputs": [],
+    "invoke": "result = run_example(device='cuda')\nprint('\\n'.join(result.output) if hasattr(result, 'output') else 'CUDA example completed successfully')"
+  },
+  "examples-gpu-direct-gpu-direct-kernels-quick-start": {
+    "title": "Gpu Direct Kernels Quick Start",
+    "source": "docs/examples/gpu/direct/gpu_direct_kernels_quick_start.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 1800,
+    "inputs": [],
+    "invoke": "result = run_example(device='cuda')\nprint('\\n'.join(result.output) if hasattr(result, 'output') else 'CUDA example completed successfully')"
+  },
+  "examples-gpu-direct-gpu-direct-nucleation": {
+    "title": "Gpu Direct Nucleation",
+    "source": "docs/examples/gpu/direct/gpu_direct_nucleation.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 1800,
+    "inputs": [],
+    "invoke": "result = run_example()\nprint('\\n'.join(result.output) if hasattr(result, 'output') else 'CUDA example completed successfully')"
+  },
+  "examples-gpu-resident-gpu-resident-graph-capture": {
+    "title": "Gpu Resident Graph Capture",
+    "source": "docs/examples/gpu/resident/gpu_resident_graph_capture.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 1800,
+    "inputs": [],
+    "invoke": "result = run_example()\nprint('\\n'.join(result.output) if hasattr(result, 'output') else 'CUDA example completed successfully')"
+  },
+  "examples-gpu-resident-gpu-resident-multi-timestep": {
+    "title": "Gpu Resident Multi Timestep",
+    "source": "docs/examples/gpu/resident/gpu_resident_multi_timestep.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 1800,
+    "inputs": [],
+    "invoke": "result = run_example(device='cuda:0')\nprint('\\n'.join(result.output) if hasattr(result, 'output') else 'CUDA example completed successfully')"
+  },
+  "examples-gpu-resident-gpu-resident-session": {
+    "title": "Gpu Resident Session",
+    "source": "docs/examples/gpu/resident/gpu_resident_session.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 1800,
+    "inputs": [],
+    "invoke": "result = run_example(device='cuda:0')\nprint('\\n'.join(result.output) if hasattr(result, 'output') else 'CUDA example completed successfully')"
+  },
+  "examples-processes-coagulation-charge-coagulation-with-charge-functional": {
+    "title": "Coagulation with Charge (Functional + Factory)",
+    "source": "docs/examples/processes/coagulation/charge/coagulation_with_charge_functional.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "examples-processes-coagulation-charge-coagulation-with-charge-objects": {
+    "title": "Coagulation with Charge (Builder pattern)",
+    "source": "docs/examples/processes/coagulation/charge/coagulation_with_charge_objects.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "examples-processes-coagulation-coagulation-1-pmf-pattern": {
+    "title": "Coagulation Pattern 1: PMF",
+    "source": "docs/examples/processes/coagulation/coagulation_1_pmf_pattern.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "examples-processes-coagulation-coagulation-2-pdf-pattern": {
+    "title": "Coagulation Pattern 2: PDF",
+    "source": "docs/examples/processes/coagulation/coagulation_2_pdf_pattern.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "examples-processes-coagulation-coagulation-3-particle-resolved-pattern": {
+    "title": "Coagulation Pattern 3: Particle Resolved",
+    "source": "docs/examples/processes/coagulation/coagulation_3_particle_resolved_pattern.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "examples-processes-coagulation-coagulation-4-compared": {
+    "title": "Coagulation Pattern 4: PMF vs PDF",
+    "source": "docs/examples/processes/coagulation/coagulation_4_compared.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "examples-processes-coagulation-coagulation-5-time-evolution": {
+    "title": "Coagulation Pattern 5: Time Evolution Comparison",
+    "source": "docs/examples/processes/coagulation/coagulation_5_time_evolution.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "examples-processes-coagulation-functional-coagulation-basic-1-pmf": {
+    "title": "Coagulation Basic 1: PMF (Builder + Coagulation)",
+    "source": "docs/examples/processes/coagulation/functional/coagulation_basic_1_pmf.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "examples-processes-coagulation-functional-coagulation-basic-2-pdf": {
+    "title": "Coagulation Basic 2: PDF (Builder + Coagulation)",
+    "source": "docs/examples/processes/coagulation/functional/coagulation_basic_2_pdf.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "examples-processes-coagulation-functional-coagulation-basic-3-compared": {
+    "title": "Coagulation Basic 3: PMF vs PDF (Builder + Coagulation)",
+    "source": "docs/examples/processes/coagulation/functional/coagulation_basic_3_compared.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "examples-processes-coagulation-functional-coagulation-basic-4-particleresolved": {
+    "title": "Coagulation Basic 4: Particle Resolved (Builder + Coagulation)",
+    "source": "docs/examples/processes/coagulation/functional/coagulation_basic_4_particleresolved.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "examples-processes-condensation-condensation-2-massbin": {
+    "title": "Condensation Tutorial: Mass Binned",
+    "source": "docs/examples/processes/condensation/condensation_2_massbin.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "examples-processes-condensation-condensation-3-massresolved": {
+    "title": "Condensation Tutorial: Particle Resolved",
+    "source": "docs/examples/processes/condensation/condensation_3_massresolved.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "examples-processes-condensation-condensation-latent-heat": {
+    "title": "CPU latent-heat condensation bookkeeping",
+    "source": "docs/examples/processes/condensation/condensation_latent_heat.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "examples-processes-condensation-staggered-condensation-example": {
+    "title": "Staggered Condensation Stepping",
+    "source": "docs/examples/processes/condensation/staggered_condensation_example.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "examples-processes-customization-adding-particles-during-simulation": {
+    "title": "Adding Particles During Simulation",
+    "source": "docs/examples/processes/customization/adding_particles_during_simulation.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "examples-processes-dilution-cpu-dilution": {
+    "title": "Cpu Dilution",
+    "source": "docs/examples/processes/dilution/cpu_dilution.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "examples-processes-nucleation-cpu-nucleation": {
+    "title": "Cpu Nucleation",
+    "source": "docs/examples/processes/nucleation/cpu_nucleation.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "examples-processes-nucleation-custom-nucleation-single-species": {
+    "title": "Custom Nucleation: Single Species",
+    "source": "docs/examples/processes/nucleation/custom_nucleation_single_species.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "examples-processes-wall-loss-chamber-forward-simulation": {
+    "title": "Chamber Forward Simulation",
+    "source": "docs/examples/processes/wall-loss/chamber_forward_simulation.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "examples-processes-wall-loss-rectangular-wall-loss-strategy": {
+    "title": "Rectangular Wall Loss Strategy (interactive quick start)",
+    "source": "docs/examples/processes/wall-loss/rectangular_wall_loss_strategy.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "examples-processes-wall-loss-spherical-wall-loss-strategy": {
+    "title": "Spherical Wall Loss Strategy Tutorial",
+    "source": "docs/examples/processes/wall-loss/spherical_wall_loss_strategy.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "examples-processes-wall-loss-wall-loss-builders-factory": {
+    "title": "Wall Loss Builders and Factory (interactive)",
+    "source": "docs/examples/processes/wall-loss/wall_loss_builders_factory.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "examples-processes-wall-loss-wall-loss-tutorial": {
+    "title": "Wall Loss Tutorial: Spherical vs Rectangular Chambers",
+    "source": "docs/examples/processes/wall-loss/wall_loss_tutorial.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "examples-simulations-biomass-burning-cloud-interactions": {
+    "title": "Biomass Burning Cloud Interactions",
+    "source": "docs/examples/simulations/biomass_burning_cloud_interactions.py",
+    "policy": "long",
+    "device": "cpu",
+    "timeout": 7200,
+    "inputs": []
+  },
+  "examples-simulations-cloud-chamber-multi-cycle": {
+    "title": "Cloud Chamber Multi-Cycle Simulation",
+    "source": "docs/examples/simulations/cloud_chamber_multi_cycle.py",
+    "policy": "long",
+    "device": "cpu",
+    "timeout": 7200,
+    "inputs": []
+  },
+  "examples-simulations-cloud-chamber-single-cycle": {
+    "title": "Cloud Chamber Activation-Deactivation Cycle (Single Run)",
+    "source": "docs/examples/simulations/cloud_chamber_single_cycle.py",
+    "policy": "long",
+    "device": "cpu",
+    "timeout": 7200,
+    "inputs": []
+  },
+  "examples-simulations-cough-droplets-partitioning": {
+    "title": "Cough Droplets Partitioning",
+    "source": "docs/examples/simulations/cough_droplets_partitioning.py",
+    "policy": "long",
+    "device": "cpu",
+    "timeout": 7200,
+    "inputs": []
+  },
+  "examples-simulations-organic-partitioning-and-coagulation": {
+    "title": "Organic Partitioning And Coagulation",
+    "source": "docs/examples/simulations/organic_partitioning_and_coagulation.py",
+    "policy": "long",
+    "device": "cpu",
+    "timeout": 7200,
+    "inputs": []
+  },
+  "examples-simulations-soot-formation-in-flames": {
+    "title": "Soot Formation in Flames",
+    "source": "docs/examples/simulations/soot_formation_in_flames.py",
+    "policy": "long",
+    "device": "cpu",
+    "timeout": 7200,
+    "inputs": []
+  },
+  "examples-thermodynamics-activity-activity-tutorial": {
+    "title": "Activity Tutorial",
+    "source": "docs/examples/thermodynamics/activity/activity_tutorial.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "examples-thermodynamics-activity-bat-activity-example": {
+    "title": "BAT Model Activity Example",
+    "source": "docs/examples/thermodynamics/activity/bat_activity_example.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "examples-thermodynamics-activity-equilibria-example": {
+    "title": "Equilibria Partitioning Example",
+    "source": "docs/examples/thermodynamics/activity/equilibria_example.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "examples-thermodynamics-activity-ideal-activity-example": {
+    "title": "Ideal Activity Example",
+    "source": "docs/examples/thermodynamics/activity/ideal_activity_example.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "examples-thermodynamics-activity-kappa-activity-example": {
+    "title": "Kappa Parameter Activity Example",
+    "source": "docs/examples/thermodynamics/activity/kappa_activity_example.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "examples-thermodynamics-equilibria-activity-part1": {
+    "title": "Activity Example",
+    "source": "docs/examples/thermodynamics/equilibria/activity_part1.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "examples-thermodynamics-equilibria-equilibria-part1": {
+    "title": "Liquid Vapor Equilibrium",
+    "source": "docs/examples/thermodynamics/equilibria/equilibria_part1.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "examples-thermodynamics-particle-properties-activity-functions": {
+    "title": "Activity Tutorial",
+    "source": "docs/examples/thermodynamics/particle-properties/activity_functions.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "examples-thermodynamics-particle-properties-activity-tutorial": {
+    "title": "Activity Tutorial",
+    "source": "docs/examples/thermodynamics/particle-properties/activity_tutorial.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "examples-thermodynamics-particle-properties-particle-surface-tutorial": {
+    "title": "Particle Surface Tutorial",
+    "source": "docs/examples/thermodynamics/particle-properties/particle_surface_tutorial.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": []
+  },
+  "contribute-validation-gpu-legacy-benchmarks-gpu-benchmarks": {
+    "title": "Recorded GPU benchmark viewer",
+    "source": "docs/contribute/validation/gpu/legacy-benchmarks/gpu_benchmarks.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": [
+      "docs/data/gpu_benchmark_results.json"
+    ],
+    "input_destinations": {
+      "docs/data/gpu_benchmark_results.json": "gpu_benchmark_results.json"
+    }
   }
 }

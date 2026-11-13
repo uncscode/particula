@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 3.2490041099954396,
+  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "input_sha256": {},
+  "example": "theory-dns-radial-relative-velocity-comparison",
+  "fingerprint": "559bc6c6feb92438e4336e8580245672f1384dd2f2e8163489020da5bed7daeb",
+  "source": "docs/theory/dynamics/cloud-droplet-coagulation/dns-radial-relative-velocity-comparison.py",
+  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "package_dirty": false,
+  "executed_at": "2026-11-13T14:59:33.897019+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [],
+    [
+      {
+        "image": "figure-5-1.png"
+      }
+    ],
+    [],
+    [],
+    [
+      {
+        "image": "figure-8-1.png"
+      },
+      {
+        "image": "figure-8-2.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "3a2c76673d63957241f42cdfc575aa49b2fe022c9f528bfcf2e1779e7ac3d7ea",
+    "figure-5-1.png": "253b10b4b9d10cc65d1e6abb4fba1c616323574011b485fefdb1e615f68f9676",
+    "figure-8-1.png": "7f74bf40013a22c51f33244074007111717a69253c53d590ab5ee0f6d66f1d6e",
+    "figure-8-2.png": "b32d65a8caba8cd053bfbeb791a9998ae9eb5f834b4572d78ee47a01e607013a"
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 2.7370773219736293,
+  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "input_sha256": {},
+  "example": "examples-thermodynamics-particle-properties-activity-tutorial",
+  "fingerprint": "ae23cde78283ace04d56bb84a15a71f96b47ea911ac7c072ac1a270073b99869",
+  "source": "docs/examples/thermodynamics/particle-properties/activity_tutorial.py",
+  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "package_dirty": false,
+  "executed_at": "2026-11-13T15:13:38.452575+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [
+      {
+        "text": "'Activity tutorial for mixing rules and water activity predictions.\\n\\nThis tutorial demonstrates mixing behavior in aerosol solutions, including\\nideal and non-ideal mixing rules. Topics covered include mass-based and\\nmolar-based activity calculations, and kappa value parameterization for\\npredicting water activity in non-ideal solutions.\\n\\nExample:\\n    Run this tutorial to learn about different activity strategies::\\n\\n        import particula as par\\n        activity_mass = par.particles.ActivityIdealMass()\\n        activities = activity_mass.activity(mass_concentration=[0.2, 0.8])\\n'"
+      }
+    ],
+    [],
+    [
+      {
+        "text": "Activities: [0.2 0.8]\nPartial pressures: [20.  8.]\n"
+      }
+    ],
+    [
+      {
+        "text": "Activities: [0.82608954 0.17391046]\nPartial pressures: [82.6089542   1.73910458]\n"
+      }
+    ],
+    [
+      {
+        "text": "Activities: [0.55555556 0.17391046]\nPartial pressures: [55.55555556  1.73910458]\n"
+      }
+    ],
+    [
+      {
+        "image": "figure-6-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "b307ef19df877f6a7c98b83cca7b16de1cce1674305c3449ecf979a40ad21e41",
+    "figure-6-1.png": "8f1e86789c1ce96fc182b13cc1ef8b3802f0810e90da7d30e4cfa71f90434d0b"
+  }
+}

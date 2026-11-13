@@ -56,6 +56,17 @@ permission:
   sync_notebook_pair: allow
 ---
 
+## Publication source policy
+
+The Starlight site publishes Markdown and percent-cell Python under `docs/`.
+Do not create or maintain `.ipynb` files there. Use the `examples` agent and
+`website/AUTHORING.md` for publication work. The notebook recipes below are
+retained only for explicitly requested temporary or unpublished exploration
+outside `docs/`; they do not override this publication policy. Generated
+notebooks are disposable execution intermediates. Use the saved-result runner
+for publication refreshes and Starlight for builds.
+
+
 # ADW Docs Notebook Subagent
 
 Specialized agent for creating, editing, validating, executing, and converting Jupyter notebooks safely.

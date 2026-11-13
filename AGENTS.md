@@ -60,7 +60,7 @@ pytest particula/gpu/tests/profiling_smoke_test.py --benchmark -q --no-cov
 
 # Repository-wide coverage and strict documentation rendering
 .opencode/tools/run_pytest.py
-mkdocs build --strict
+npm --prefix website run build
 
 # ADW tools
 .opencode/tools/run_pytest.py      # Run tests with validation
@@ -299,8 +299,8 @@ def function(arg1: float, arg2: str) -> bool:
   names and inert lanes; compute conservation with count/volume normalization.
 - Public quick starts and migration snippets are checked by
   `examples_tests/native_*_test.py` and the package quick-start test. Execute
-  all changed notebook workloads, inspect outputs, and maintain both files.
-  An AST-identical prose/format sync may retain previously executed outputs.
+  all changed example workloads, inspect outputs, and commit Python sources
+  with their saved result bundles. Prose-only changes may retain current results.
 - Use the selected E9 checkout for these examples. Compatibility facade removal
   belongs to M6; M5 does not remove production APIs or qualify existing numerical
   defects. See `docs/contribute/Feature_Workflow/Details/Add_Example.md` and
@@ -457,7 +457,7 @@ aerosol = dilution.execute(aerosol, time_step=10.0, sub_steps=2)
     particula/execution/tests/rng_invariance_test.py \
     particula/execution/tests/checkpoint_test.py -q
   pytest examples_tests/gpu_resident_session_example_test.py -q
-  mkdocs build --strict
+  npm --prefix website run build
   ```
 
 ### Complete direct GPU process illustration
@@ -793,7 +793,7 @@ Focused contract runs:
 pytest particula/particles/tests/exhaustion_test.py \
   particula/gpu/kernels/tests/exhaustion_test.py -q -Werror
 pytest particula/dynamics/nucleation/tests/particle_source_test.py -q -Werror
-mkdocs build --strict
+npm --prefix website run build
 ```
 
 ### GPU wall-loss direct-kernel contract
@@ -1021,8 +1021,7 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
 - Check concentration-weighted particle-plus-gas conservation at
   `rtol=1e-12, atol=1e-30`. Run `python docs/examples/processes/nucleation/cpu_nucleation.py`,
   `pytest examples_tests/nucleation_example_test.py -q -Werror`, and
-  `mkdocs build --strict`. If changing the paired custom notebook source, sync
-  and execute it with the prescribed Jupytext tools.
+  `npm --prefix website run build`. Refresh changed registered examples with `scripts/docs_examples.py refresh`.
 
 ### Direct GPU nucleation
 
@@ -1096,7 +1095,7 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
     -m "warp and cuda" --no-cov
   .opencode/tools/run_pytest.py
   pytest particula/tests/execution_exports_test.py -q --no-cov
-  mkdocs build --strict
+  npm --prefix website run build
   ```
 
 - E8-F1 supplies host metadata and scheduler admission only through the
@@ -1195,7 +1194,7 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
 
   ```bash
   pytest particula/tests/execution_exports_test.py -q --no-cov
-  mkdocs build --strict
+  npm --prefix website run build
   ```
 
 ### GPU-resident session lifecycle
@@ -1362,7 +1361,7 @@ pytest --cov=particula --cov-report=term-missing
 pytest particula/execution/tests/ -q \
   --cov=particula.execution.diagnostics,particula.execution.gpu_resources,particula.execution.checkpoint,particula.execution.resident_scheduler \
   --cov-report=term-missing --cov-fail-under=80
-mkdocs build --strict
+npm --prefix website run build
 pytest particula/execution/tests/multi_box_loop_test.py -q -m "warp and cuda"
 pytest particula/execution/tests/condensation_integration_test.py \
   particula/execution/tests/coagulation_integration_test.py -q \
@@ -1461,7 +1460,7 @@ adw workflow document      # Update documentation
 - pytest (testing)
 - ruff (linting + formatting)
 - mypy (type checking - optional)
-- mkdocs, mkdocs-material (documentation)
+- Astro and Starlight (documentation; website/package.json)
 
 ## Key Principles
 
@@ -1489,33 +1488,27 @@ pytest --cov=particula
 
 ## Example Editing
 
-`docs/examples/` may contain runnable `.py` entrypoints, paired notebooks, or
-both. For notebook-backed examples, use Jupytext paired sync and edit `.py`
-files, not `.ipynb`:
+`docs/examples/` and `docs/theory/` contain maintained Python sources with
+percent-cell Markdown and code. Do not maintain paired `.ipynb` sources.
 
 ```bash
-# 1. Edit the .py file (percent format with # %% cell markers)
-# 2. Lint the .py file
 ruff check docs/examples/path/to/file.py --fix
 ruff format docs/examples/path/to/file.py
-
-# 3. Sync to update .ipynb
-python3 .opencode/tools/validate_notebook.py docs/examples/path/to/file.ipynb --sync
-
-# 4. Execute to validate and generate outputs
-python3 .opencode/tools/run_notebook.py docs/examples/path/to/file.ipynb
-
-# 5. Commit both files (.py and .ipynb)
+.venv/bin/python scripts/docs_examples.py refresh EXAMPLE_KEY
+.venv/bin/python scripts/docs_examples.py check
+npm --prefix website run build
 ```
 
-**Key points:**
-- Runnable script examples may be standalone `.py` files without notebooks
-- Always edit `.py` files, not `.ipynb` directly, when a notebook pair exists
-- Lint before sync to catch syntax errors
-- Execute after sync to validate code and generate website outputs
-- Commit both files to keep them paired when the example includes a notebook
+Declare the source, entry point, CPU/CUDA device, timeout, helper and data inputs
+in `website/examples.json`. Execute complete published workloads, inspect saved
+figures/tables/text, and commit sources plus `website/results/` bundles. Failed
+refreshes preserve old results and block acceptance. Never substitute CPU for
+required CUDA or weaken scientific parameters/assertions to pass migration.
+Builds render saved results without running simulations. Notebook objects are
+only temporary execution machinery; archived originals are reference material.
 
-**Full documentation:** `.opencode/guides/documentation_guide.md` (Example Source Workflow section)
+**Full documentation:** `.opencode/guides/documentation_guide.md` and
+`docs/contribute/Feature_Workflow/Details/Add_Example.md`.
 
 ## Getting Help
 

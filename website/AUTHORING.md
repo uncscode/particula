@@ -47,7 +47,11 @@ expandable; figures remain visible. Older results are labeled and grouped
 separately from the updated code. Missing results show an awaiting-results note.
 Generated Markdown, API dumps, and the built website are disposable outputs.
 
-The current demo coexists with MkDocs. Existing notebook pairs remain available
-to MkDocs until the complete migration is accepted; the Starlight build never
-reads them. Internal execution uses temporary notebook objects to capture rich
-outputs, without introducing a second maintained source file.
+Starlight is the sole documentation build. Retired MkDocs assets and original
+notebooks are preserved under `.trash/mkdocs-starlight-2026-11-13/` and excluded
+from publication. Internal execution uses temporary notebook objects to capture
+rich outputs, without introducing a second maintained source file.
+
+Figures are exported at 300 DPI. Captured diagnostics retain repository-relative
+filenames and line numbers; local account and checkout paths are redacted before
+saving publication bundles. Terminal progress bars render in closed disclosures.

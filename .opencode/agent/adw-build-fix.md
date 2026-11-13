@@ -69,7 +69,7 @@ reinterpret it during this fix pass.
 | Subagent | Purpose | When Called |
 |----------|---------|-------------|
 | `adw-build-tests` | Validate/write tests and coverage only; never lint or type-check | After all fix implementation completes |
-| `docs-validator` | Validate changed documentation with links, formatting, and strict MkDocs | After test validation when documentation or MkDocs configuration changed |
+| `docs-validator` | Validate changed documentation with links, formatting, and Starlight | After test validation when documentation or Starlight configuration changed |
 
 ## Execution Steps
 
@@ -225,9 +225,9 @@ Parse the result explicitly:
 
 ### Step 9: Validate and Promote Completion
 
-If the fix changed Markdown documentation, `mkdocs.yml`, or other MkDocs input,
+If the fix changed Markdown documentation, `website/astro.config.mjs`, or other Starlight input,
 delegate documentation validation to `docs-validator`. Do not ask
-`adw-build-tests` to run MkDocs and do not call an MkDocs wrapper directly from
+`adw-build-tests` to run the documentation build and do not call the documentation wrapper directly from
 this agent:
 
 ```python
@@ -239,9 +239,8 @@ task({
     f"Resolved worktree_path: {worktree_path}\n\n"
     f"Changed documentation files: {','.join(changed_documentation_files)}\n\n"
     "Use the supplied workflow-state-derived worktree_path; do not reread "
-    "workflow state for this delegation. Run strict MkDocs validation with "
-    "build_mkdocs_validate using that path as cwd. Strict "
-    "mode is intrinsic; do not pass a strict option. Also check links, "
+    "workflow state for this delegation. Run Starlight validation with "
+    "build_docs with action=build using that path as cwd. Also check links, "
     "formatting, and cross-references. Do not use raw shell commands or "
     "delegate this validation to a test subagent."
   ),
@@ -249,12 +248,12 @@ task({
 })
 ```
 
-Require `DOCS_VALIDATION_COMPLETE` with an explicit successful strict MkDocs
+Require `DOCS_VALIDATION_COMPLETE` with an explicit successful Starlight
 result. Treat `DOCS_VALIDATION_FAILED`, a blocked/unavailable wrapper, a missing
-strict MkDocs result, or stale output as a failed required subagent: leave
+Starlight result, or stale output as a failed required subagent: leave
 `fix_completed=false` and emit `ADW_BUILD_FIX_BLOCKED` for unavailable
 infrastructure or `ADW_BUILD_FIX_FAILED` for documentation validation failures.
-When no documentation or MkDocs input changed, record that this conditional
+When no documentation or Starlight input changed, record that this conditional
 validation was not required.
 
 The delegated `worktree_path` must be the exact non-empty value loaded and
@@ -296,5 +295,5 @@ Success output should include:
 
 - files changed
 - targeted tests run
-- strict MkDocs documentation validation result, or why it was not required
+- Starlight documentation validation result, or why it was not required
 - whether review findings were fully addressed according to `fix_spec_content`

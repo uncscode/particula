@@ -478,7 +478,7 @@ pytest particula/execution/tests/ -q \
   --cov=particula.execution.resident_communication \
   --cov=particula.execution.resident_scheduler \
   --cov-report=term-missing --cov-fail-under=80
-mkdocs build --strict
+npm --prefix website run build
 pytest particula/execution/tests/multi_box_loop_test.py -q \
   -m "warp and cuda"
 pytest particula/execution/tests/condensation_integration_test.py \

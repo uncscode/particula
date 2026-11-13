@@ -210,5 +210,5 @@ For the delivered-versus-deferred GPU roadmap, see
 ```bash
 pytest particula/particles/tests/exhaustion_test.py \
   particula/gpu/kernels/tests/exhaustion_test.py -q -Werror
-mkdocs build --strict
+npm --prefix website run build
 ```

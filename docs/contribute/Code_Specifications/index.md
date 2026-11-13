@@ -79,7 +79,7 @@ _Focus: **R** — rich docstrings turn code into readable, searchable documentat
     - Keep line length ≤ 79 characters.
 
 These templates are more than bureaucracy—they power the
-auto‑documentation pipeline (code → Mkdocs website) and give language
+auto‑documentation pipeline (code → Starlight website) and give language
 models deterministic anchors when summarizing or refactoring code.
 
 The templates are also used by LLMs in a AI-developer-workflow to generate/revise the docstrings.

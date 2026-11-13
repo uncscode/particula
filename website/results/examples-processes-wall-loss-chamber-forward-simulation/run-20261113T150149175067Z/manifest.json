@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 17.852505821967497,
+  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "input_sha256": {},
+  "example": "examples-processes-wall-loss-chamber-forward-simulation",
+  "fingerprint": "fedb36b3eec4a23cf7cd3d7e3c5c0f478e637dcff266977c25a07d3f2302fb6b",
+  "source": "docs/examples/processes/wall-loss/chamber_forward_simulation.py",
+  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "package_dirty": false,
+  "executed_at": "2026-11-13T15:01:49.304939+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [],
+    [
+      {
+        "image": "figure-2-1.png"
+      }
+    ],
+    [
+      {
+        "image": "figure-3-1.png"
+      }
+    ],
+    [
+      {
+        "text": "Done\n"
+      }
+    ],
+    [
+      {
+        "image": "figure-5-1.png"
+      }
+    ],
+    [
+      {
+        "image": "figure-6-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "fef6210f4fd326ad8524517f0799993b76dc9a86c3322701320f31d3e136905c",
+    "figure-2-1.png": "e32f30426a53c45fd8eccd8db7704f2265e9203061cf56b6ca58fdd03d04ca74",
+    "figure-3-1.png": "9d7b81cb2699ecf213402f5b66f69469a59c26ac4f7bcca6c9f94059cf4d8ade",
+    "figure-5-1.png": "b5f50a1038a82dff99ace51ce7f25972b2538766b6b36d17e17ebd5ec2388a2b",
+    "figure-6-1.png": "26b24040e10800934d78661f57fcf99ecfa3472a15991eff2efdfabe33b1d54f"
+  }
+}

@@ -18,10 +18,9 @@ five sections; extend an existing topic before adding another page.
 2. Keep the canonical contract in one place. Link to it from examples, migration
    comparisons, and validation records. Keep short local warnings where misuse
    could change a scientific interpretation.
-3. Use topic folders and descriptive lowercase filenames. Python/notebook pairs
-   use the same snake_case stem so the source remains importable.
-4. Add the page to `mkdocs.yml` or link it from its owning index. The shared
-   navigation adapts to the base and full builds. Never add a sixth top-level tab.
+3. Use topic folders and descriptive lowercase filenames. Python sources
+   use snake_case stems so the source remains importable.
+4. Add the page to `website/navigation.json` and link it from its owning index. Never add a sixth top-level tab.
 5. Add purpose, prerequisites, units, device requirements, and version context.
    Keep CPU tutorials separate from optional Warp and native-CUDA-only examples.
 
@@ -32,9 +31,8 @@ The public roadmap contains active or pending work only.
 
 ## Move, merge, or retire
 
-Update links, notebook Markdown, source imports/loaders, tests, CI selectors,
-release allowlists, and assistant instructions together. Move notebook/source
-pairs and required data together. Follow [Add Examples](Feature_Workflow/Details/Add_Example.md)
+Update links, percent-cell Markdown, source imports/loaders, tests, CI selectors,
+release allowlists, and assistant instructions together. Move Python sources and declared data together. Follow [Add Examples](Feature_Workflow/Details/Add_Example.md)
 for full-workload execution and retained outputs.
 
 Record meaningful old routes and split-section anchors in
@@ -53,15 +51,14 @@ with measured qualification.
 
 ```bash
 python scripts/check_docs_structure.py
-mkdocs build --strict
-mkdocs build --config-file mkdocs-full.yml --strict
-python scripts/check_docs_structure.py --site-dir site
+npm --prefix website run build
+python scripts/check_docs_structure.py --site-dir website/dist
 ```
 
 The structural check covers navigation targets, authored-page reachability,
-local links, moved-path references, and paired code. The rendered check also
+local links, moved-path references, and registered Python sources. The rendered check also
 validates redirect destinations/fragments, generated API entry, and retirement
-from search. Review desktop/mobile navigation and saved notebook plots for
+from search. Review desktop/mobile navigation and saved example plots for
 layout problems a structural check cannot identify.
 
 Run `pytest examples_tests -q -Werror` when examples or public snippets change,

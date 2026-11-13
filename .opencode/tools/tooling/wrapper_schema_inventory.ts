@@ -99,7 +99,6 @@ const COMPATIBILITY_WRAPPER_NAMES = new Set<string>([
   "adw_notes",
   "adw_plans",
   "adw_spec",
-  "build_mkdocs",
   "clear_build",
   "move",
   "platform_operations",
@@ -125,8 +124,6 @@ const SPLIT_WRAPPER_NAMES = new Set<string>([
   "adw_spec_read",
   "adw_spec_write",
   "adw_status_health",
-  "build_mkdocs_build",
-  "build_mkdocs_validate",
   "clear_build_delete",
   "clear_build_preview",
   "convert_notebook_to_py",
@@ -184,9 +181,6 @@ const BOUNDED_OPTIONS_WRAPPERS = new Set<string>([
   "adw_spec_read",
   "adw_spec_write",
   "auto_mode_manifest",
-  "build_mkdocs",
-  "build_mkdocs_build",
-  "build_mkdocs_validate",
   "find_files",
   "ripgrep_advanced",
   "run_cmake",
@@ -203,7 +197,6 @@ const SPLIT_NEEDED_WRAPPERS = new Set<string>([
   "adw_issues_spec",
   "adw_notes",
   "adw_spec",
-  "build_mkdocs",
   "clear_build",
   "move",
   "platform_operations",
@@ -222,8 +215,6 @@ const WRAPPER_TEST_FALLBACK_CANDIDATES = new Map<string, string[]>([
   ["run_cmake_build", ["run_cmake"]],
   ["run_cmake_configure", ["run_cmake"]],
   ["validate_notebook", ["validate_notebook_readonly"]],
-  ["build_mkdocs_build", ["build_mkdocs"]],
-  ["build_mkdocs_validate", ["build_mkdocs"]],
   ["clear_build_delete", ["clear_build"]],
   ["clear_build_preview", ["clear_build"]],
 ]);
@@ -231,16 +222,12 @@ const WRAPPER_TEST_FALLBACK_PREFIXES = new Map<string, string[]>([
   ["adw_notes", ["adw_notes_"]],
   ["adw_plans", ["adw_plans_"]],
   ["adw_spec", ["adw_spec_"]],
-  ["build_mkdocs", ["build_mkdocs_"]],
   ["clear_build", ["clear_build_"]],
   ["move", ["move_"]],
   ["validate_notebook", ["validate_notebook"]],
   ["workflow_builder", ["workflow_builder_"]],
 ]);
 const AUDIT_ONLY_TEST_COVERED_WRAPPERS = new Set<string>([
-  "build_mkdocs",
-  "build_mkdocs_validate",
-  "build_mkdocs_build",
   "clear_build",
   "clear_build_preview",
   "clear_build_delete",
@@ -255,6 +242,7 @@ const AUDIT_ONLY_TEST_COVERED_WRAPPERS = new Set<string>([
   "run_pytest_advanced",
 ]);
 const WRAPPER_AUDIT_BASELINES = new Map<string, WrapperAuditBaseline>([
+  ["build_docs", { fieldRoleAudit: [{ field: "cwd", role: "safety-field" }, { field: "action", role: "command-selector" }] }],
   [
     "feedback_log",
     {
@@ -639,7 +627,7 @@ const WRAPPER_AUDIT_BASELINES = new Map<string, WrapperAuditBaseline>([
         { field: "options", role: "explicit-exception", notes: "Bounded token carrier for output/ninja/jobs compatibility toggles." },
       ],
       auditNotes: [
-        "P3 follow-up covers run_ctest, run_cmake*, run_linters, run_validate_agent_references, build_mkdocs*, and clear_build* schema-budget migration work; E27-M9 records the baseline only.",
+        "P3 follow-up covers run_ctest, run_cmake*, run_linters, run_validate_agent_references, and clear_build* schema-budget migration work; E27-M9 records the baseline only.",
       ],
     },
   ],
@@ -696,49 +684,6 @@ const WRAPPER_AUDIT_BASELINES = new Map<string, WrapperAuditBaseline>([
       fieldRoleAudit: [
         { field: "cwd", role: "safety-field", notes: "Exact-root validation target; wrapper fails closed unless cwd resolves to the current repository/worktree root exactly." },
         { field: "baselinePath", role: "safety-field", notes: "Repo-relative committed baseline path confined to .opencode/guides/ for auditable suppressions." },
-      ],
-    },
-  ],
-  [
-    "build_mkdocs",
-    {
-      fieldRoleAudit: [
-        { field: "outputMode", role: "bounded-option-candidate" },
-        { field: "timeout", role: "explicit-exception", notes: "Validation guard retained direct for mkdocs wrapper execution." },
-        { field: "cwd", role: "safety-field", notes: "Repository-root-confined docs build root." },
-        { field: "strict", role: "bounded-option-candidate" },
-        { field: "clean", role: "bounded-option-candidate" },
-        { field: "configFile", role: "safety-field", notes: "Repository-root-confined mkdocs config path." },
-        { field: "validateOnly", role: "explicit-exception", notes: "Compatibility-only mode selector bridging validate-only and artifact-producing split wrappers." },
-        { field: "options", role: "explicit-exception", notes: "Bounded token carrier for output/strict/clean toggles." },
-      ],
-    },
-  ],
-  [
-    "build_mkdocs_validate",
-    {
-      fieldRoleAudit: [
-        { field: "outputMode", role: "bounded-option-candidate" },
-        { field: "timeout", role: "explicit-exception", notes: "Validation guard retained direct for mkdocs wrapper execution." },
-        { field: "cwd", role: "safety-field", notes: "Repository-root-confined docs validation root." },
-        { field: "strict", role: "bounded-option-candidate" },
-        { field: "clean", role: "bounded-option-candidate" },
-        { field: "configFile", role: "safety-field", notes: "Repository-root-confined mkdocs config path." },
-        { field: "options", role: "explicit-exception", notes: "Bounded token carrier for output/strict/clean toggles." },
-      ],
-    },
-  ],
-  [
-    "build_mkdocs_build",
-    {
-      fieldRoleAudit: [
-        { field: "outputMode", role: "bounded-option-candidate" },
-        { field: "timeout", role: "explicit-exception", notes: "Validation guard retained direct for mkdocs wrapper execution." },
-        { field: "cwd", role: "safety-field", notes: "Repository-root-confined docs build root." },
-        { field: "strict", role: "bounded-option-candidate" },
-        { field: "clean", role: "bounded-option-candidate" },
-        { field: "configFile", role: "safety-field", notes: "Repository-root-confined mkdocs config path." },
-        { field: "options", role: "explicit-exception", notes: "Bounded token carrier for output/strict/clean toggles." },
       ],
     },
   ],
@@ -1096,13 +1041,12 @@ const WRAPPER_FAMILY_SPECS: WrapperFamilySpec[] = [
       basename === "run_bun_test" ||
       basename === "run_linters" ||
       basename === "run_validate_agent_references" ||
-      basename.startsWith("build_mkdocs") ||
       basename.startsWith("clear_build") ||
       basename.startsWith("run_cmake") ||
       basename === "run_ctest",
     oversizedClassification: "split-needed",
     testCandidateBasenames: ["run_pytest_basic", "run_linters", "run_bun_test", "run_validate_agent_references"],
-    testBasenamePrefixes: ["run_pytest_basic", "run_pytest_advanced", "build_mkdocs", "clear_build", "run_cmake"],
+    testBasenamePrefixes: ["run_pytest_basic", "run_pytest_advanced", "clear_build", "run_cmake"],
   },
   {
     ownerPlan: "E27-M10",

@@ -166,27 +166,6 @@
           "classification": "historical_deprecated"
         }
       ]
-    },
-    {
-      "name": "build_mkdocs",
-      "status": "exception_approved",
-      "contexts": [
-        {
-          "path_glob": ".opencode/agent/*.md",
-          "classification": "exception_approved",
-          "owner": "E20-F11",
-          "compatibility_window": "until-retirement-gates-met",
-          "replacement_guidance": "Prefer build_mkdocs_validate and build_mkdocs_build split wrappers"
-        },
-        {
-          "path_glob": ".opencode/tools/*.md",
-          "classification": "historical_deprecated"
-        },
-        {
-          "path_glob": "AGENTS.md",
-          "classification": "historical_deprecated"
-        }
-      ]
     }
   ]
 }

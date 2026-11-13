@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 2.751260599005036,
+  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "input_sha256": {},
+  "example": "examples-thermodynamics-activity-equilibria-example",
+  "fingerprint": "e685b59f71c23b97ea7a852bff70a2e8551258ba550bd1f9e6d0a7610a427bed",
+  "source": "docs/examples/thermodynamics/activity/equilibria_example.py",
+  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "package_dirty": false,
+  "executed_at": "2026-11-13T15:13:11.270828+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [],
+    [
+      {
+        "text": "=== Organic Species Properties ===\nC* (dry): [1.e-06 1.e-04 1.e-02]\nTotal concentration: [ 1.  5. 10.] ug/m^3\nO:C ratios: [0.2 0.3 0.5]\n"
+      }
+    ],
+    [
+      {
+        "text": "Strategy: LiquidVaporPartitioningStrategy\nWater activity (RH): 75%\n"
+      }
+    ],
+    [
+      {
+        "text": "Equilibrium solved successfully!\n"
+      }
+    ],
+    [
+      {
+        "text": "=== Liquid-Vapor Partitioning ===\nWater activity (RH): 75%\n\nInput organic species:\n  C* (dry): [1.e-06 1.e-04 1.e-02]\n  Total concentration: [ 1.  5. 10.] ug/m^3\n  O:C ratios: [0.2 0.3 0.5]\n\n=== Equilibrium Results ===\nPartition coefficients: [0.99999998 0.99999838 0.9998916 ]\n  (fraction in condensed phase)\n\nAlpha phase (water-rich):\n  Species-associated organic + water: [ 1.10751471  5.94511189 13.45712289]\n  Water concentration: 4.51 ug/m^3\n  Total concentration: 20.51 ug/m^3\n\nBeta phase (organic-rich):\n  Species-associated organic + water: [0. 0. 0.]\n  Water concentration: 0.00 ug/m^3\n\nWater content: alpha=4.51, beta=0.00 ug/m^3\nOptimization error: 5.57e-14\n"
+      }
+    ],
+    [
+      {
+        "text": "=== Effect of RH on Partitioning ===\n\nRH=30%: mean partition coeff = 0.9999, water = 0.66 ug/m^3\nRH=50%: mean partition coeff = 0.9999, water = 1.52 ug/m^3\nRH=75%: mean partition coeff = 1.0000, water = 4.51 ug/m^3\nRH=90%: mean partition coeff = 1.0000, water = 13.42 ug/m^3\n"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "fb5c415cc44036982947ff74c89928277a6506f89cc7e11d6524a427ee0ed8db"
+  }
+}

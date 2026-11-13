@@ -18,7 +18,7 @@ coding style, tests, linting, review, documentation, and architecture.
 | **[Linting Guide](linting_guide.md)** | Code quality tools | ruff check + format, mypy |
 | **[Code Style Guide](code_style.md)** | Naming and formatting conventions | Python 3.12+, 80-char lines |
 | **[Docstring Guide](docstring_guide.md)** | Docstring format standards | Google-style docstrings |
-| **[Documentation Guide](documentation_guide.md)** | Documentation workflows | MkDocs, examples, Jupytext notebooks |
+| **[Documentation Guide](documentation_guide.md)** | Documentation workflows | Starlight, Python examples, saved results |
 
 ### Workflow Guides
 
@@ -50,7 +50,7 @@ coding style, tests, linting, review, documentation, and architecture.
 
 - **Testing:** pytest with pytest-cov
 - **Linting:** ruff check, ruff format, mypy
-- **Documentation:** MkDocs with Material theme
+- **Documentation:** Astro + Starlight
 - **Build System:** flit
 - **Package Managers:** pip, uv, or conda
 
@@ -100,10 +100,10 @@ mypy particula/ --ignore-missing-imports
 
 ```bash
 # Build documentation
-mkdocs build
+npm --prefix website run build
 
 # Serve locally
-mkdocs serve
+npm --prefix website run dev
 ```
 
 ## Example Source Workflow

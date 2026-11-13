@@ -1,0 +1,101 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 3.7432308030547574,
+  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "input_sha256": {},
+  "example": "examples-thermodynamics-activity-activity-tutorial",
+  "fingerprint": "2bba77383dee3ec9c53f40540513e1a9fc284d2c62306254aaeedb53d1cf0e87",
+  "source": "docs/examples/thermodynamics/activity/activity_tutorial.py",
+  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "package_dirty": false,
+  "executed_at": "2026-11-13T15:13:02.925604+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [],
+    [],
+    [
+      {
+        "text": "Strategy: ActivityIdealMolar\nMolar masses: [ 18.015 200.   ] g/mol\n"
+      }
+    ],
+    [
+      {
+        "text": "Mass concentrations: [0.5 0.5] ug/m^3\nActivity values: water=0.9174, organic=0.0826\nMole fractions: water=0.9174, organic=0.0826\n"
+      }
+    ],
+    [
+      {
+        "image": "figure-5-1.png"
+      }
+    ],
+    [
+      {
+        "text": "Strategy: ActivityNonIdealBinary\nOrganic O:C ratio: 0.4\n"
+      }
+    ],
+    [
+      {
+        "text": "At 50% water by mass:\n  Ideal activity:     water=0.9174, organic=0.0826\n  Non-ideal (BAT):    organic=0.1340\n\n  Organic activity coefficient: gamma=1.6214\n"
+      }
+    ],
+    [
+      {
+        "image": "figure-8-1.png"
+      }
+    ],
+    [
+      {
+        "image": "figure-9-1.png"
+      }
+    ],
+    [
+      {
+        "text": "Strategy: ActivityKappaParameter\nKappa values: [0.   0.61]\n"
+      }
+    ],
+    [
+      {
+        "text": "Water Activity for Water + Ammonium Sulfate:\nWater Fraction | Water Activity\n-----------------------------------\n    0.3        |     0.5543\n    0.5        |     0.7437\n    0.7        |     0.8713\n    0.9        |     0.9631\n"
+      }
+    ],
+    [
+      {
+        "image": "figure-12-1.png"
+      }
+    ],
+    [
+      {
+        "text": "Strategy: LiquidVaporPartitioningStrategy\nTarget water activity: 0.75\n"
+      }
+    ],
+    [
+      {
+        "text": "=== Equilibrium Results ===\nPartition coefficients: [0.99999998 0.99999838 0.9998916 ]\nAlpha phase water: 4.51 ug/m^3\nOptimization error: 5.57e-14\n"
+      }
+    ],
+    [
+      {
+        "image": "figure-15-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "800998d2f279857341db6591d72bf3112fca1873061f01a3e0c8b7b3a028d212",
+    "figure-5-1.png": "eaa8e5e9a47e636d578d841d6a1916fd45b58aa75d12d446a8df615724d557ba",
+    "figure-8-1.png": "85e88f279a3bdee590454cfd4b6c6e94235c4f9bdf3d450c53e28695f0e3f3d7",
+    "figure-9-1.png": "0199666bee64d1adba32addb8f41e5344808ea092f8cb577dbe98321ae196c33",
+    "figure-12-1.png": "045753c4ef601359e84c18236e6412ff54d3b1e091640101800bdb180cb0dd72",
+    "figure-15-1.png": "d8317fb3a1e81e08657abd0e058b016a1d3ee4441aa038c2c608277c7d5f3e2f"
+  }
+}

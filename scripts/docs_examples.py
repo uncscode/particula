@@ -14,10 +14,12 @@ import hashlib
 import importlib.metadata
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
 import tempfile
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -25,6 +27,7 @@ GIT = shutil.which("git") or "git"
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG = ROOT / "website/examples.json"
 RESULTS = ROOT / "website/results"
+FIGURE_DPI = 300
 
 
 def registry():
@@ -51,9 +54,11 @@ def executable_signature(source):
 def fingerprint(config, root=ROOT):
     """Hash executable semantics, settings, and declared input bytes."""
     payload = {
+        "figure_dpi": FIGURE_DPI,
         "sections": executable_signature((root / config["source"]).read_text()),
         "invoke": config.get("invoke", ""),
         "device": config["device"],
+        "input_destinations": config.get("input_destinations", {}),
         "inputs": {
             name: hashlib.sha256((root / name).read_bytes()).hexdigest()
             for name in config.get("inputs", [])
@@ -125,6 +130,10 @@ def execute(config, root=ROOT):
         "sys.modules['particula_docs_example'] = sys.modules['__main__']\n"
         f"__name__ = {module_name!r}\n"
         "%matplotlib inline\n"
+        "from matplotlib_inline.backend_inline import InlineBackend\n"
+        "InlineBackend.instance().figure_formats = {'png'}\n"
+        "InlineBackend.instance().print_figure_kwargs = "
+        f"{{'bbox_inches': 'tight', 'dpi': {FIGURE_DPI}}}\n"
     )
     notebook = nbformat.v4.new_notebook(
         cells=[nbformat.v4.new_code_cell(bootstrap), *cells]
@@ -141,7 +150,9 @@ def execute(config, root=ROOT):
     ]
     with tempfile.TemporaryDirectory(prefix="particula-example-") as temporary:
         for name in config.get("inputs", []):
-            destination = Path(temporary) / name
+            destination = Path(temporary) / config.get(
+                "input_destinations", {}
+            ).get(name, name)
             destination.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(root / name, destination)
         try:
@@ -156,6 +167,30 @@ def execute(config, root=ROOT):
             if km.has_kernel:
                 km.shutdown_kernel(now=True)
     return notebook.cells[1:], device_name
+
+
+def sanitize_execution_output(value, root=ROOT):
+    """Remove local account and checkout paths without hiding diagnostics."""
+    if isinstance(value, dict):
+        return {
+            key: sanitize_execution_output(item, root)
+            for key, item in value.items()
+        }
+    if isinstance(value, list):
+        return [sanitize_execution_output(item, root) for item in value]
+    if not isinstance(value, str):
+        return value
+    # Preserve useful repository-relative paths in warnings and tracebacks.
+    value = value.replace(str(root) + "/", "")
+    value = value.replace(str(root), "<checkout>")
+    value = re.sub(r"/(?:home|Users)/[^/\s\"'<>]+", "~", value)
+    value = re.sub(r"[A-Za-z]:\\Users\\[^\\\s\"'<>]+", "~", value)
+    value = re.sub(
+        r"/tmp/(?:particula-example-|ipykernel_)[^/\s\"'<>]+",  # noqa: S108 -- redaction pattern, not file access
+        "<execution-temp>",
+        value,
+    )
+    return value
 
 
 def package_versions():
@@ -181,7 +216,9 @@ def refresh(example_id, config, root=ROOT, results=RESULTS):
     """Publish a complete result generation only after successful execution."""
     source = (root / config["source"]).read_bytes()
     initial_fingerprint = fingerprint(config, root)
+    started = time.monotonic()
     cells, device = execute(config, root)
+    elapsed = time.monotonic() - started
     if (root / config["source"]).read_bytes() != source or fingerprint(
         config, root
     ) != initial_fingerprint:
@@ -231,6 +268,18 @@ def refresh(example_id, config, root=ROOT, results=RESULTS):
         )
         manifest = {
             "schema": 1,
+            "figure_dpi": FIGURE_DPI,
+            "elapsed_seconds": elapsed,
+            "package_source_sha256": hashlib.sha256(
+                b"".join(
+                    str(p.relative_to(root)).encode() + p.read_bytes()
+                    for p in sorted((root / "particula").rglob("*.py"))
+                )
+            ).hexdigest(),
+            "input_sha256": {
+                name: hashlib.sha256((root / name).read_bytes()).hexdigest()
+                for name in config.get("inputs", [])
+            },
             "example": example_id,
             "fingerprint": initial_fingerprint,
             "source": config["source"],
@@ -240,7 +289,7 @@ def refresh(example_id, config, root=ROOT, results=RESULTS):
             "device": device,
             "python": sys.version.split()[0],
             "versions": package_versions(),
-            "outputs": outputs,
+            "outputs": sanitize_execution_output(outputs, root),
             "files": {
                 p.name: hashlib.sha256(p.read_bytes()).hexdigest()
                 for p in pending.iterdir()
@@ -327,7 +376,12 @@ def main():
     for key, config in configs.items():
         fingerprint(config)
         _, manifest = bundle(key)
-        print(f"RESULTS {key}: {result_state(config, manifest)}")
+        state = result_state(config, manifest)
+        print(f"RESULTS {key}: {state}")
+        if state != "current":
+            raise RuntimeError(
+                f"{key}: {state} results; explicit refresh required"
+            )
     for key in selected:
         config = configs[key]
         if config["policy"] != "cpu":

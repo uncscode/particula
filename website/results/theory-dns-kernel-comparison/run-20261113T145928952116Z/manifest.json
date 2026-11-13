@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 3.1639757840312086,
+  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "input_sha256": {},
+  "example": "theory-dns-kernel-comparison",
+  "fingerprint": "dfa502d955d7b28e09ccb4a7e4acb39c180da9744decd0485d012e170df74ecb",
+  "source": "docs/theory/dynamics/cloud-droplet-coagulation/dns-kernel-comparison.py",
+  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "package_dirty": false,
+  "executed_at": "2026-11-13T14:59:29.088384+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [],
+    [
+      {
+        "image": "figure-5-1.png"
+      }
+    ],
+    [],
+    [
+      {
+        "html": "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>Radius (\u00b5m)</th>\n      <th>DNS Kernel (cm\u00b3/s)</th>\n      <th>Model Kernel (cm\u00b3/s)</th>\n      <th>Percent Error (%)</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>10.060680</td>\n      <td>0.000582</td>\n      <td>0.000568</td>\n      <td>-2.393023</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>14.975728</td>\n      <td>0.000655</td>\n      <td>0.000615</td>\n      <td>-5.972799</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>19.890777</td>\n      <td>0.000642</td>\n      <td>0.000585</td>\n      <td>-8.902835</td>\n    </tr>\n    <tr>\n      <th>3</th>\n      <td>25.109223</td>\n      <td>0.000582</td>\n      <td>0.000425</td>\n      <td>-27.027138</td>\n    </tr>\n    <tr>\n      <th>4</th>\n      <td>27.536408</td>\n      <td>0.000485</td>\n      <td>0.000287</td>\n      <td>-40.777352</td>\n    </tr>\n    <tr>\n      <th>5</th>\n      <td>29.963592</td>\n      <td>0.000315</td>\n      <td>0.000105</td>\n      <td>-66.672752</td>\n    </tr>\n    <tr>\n      <th>6</th>\n      <td>32.512136</td>\n      <td>0.000667</td>\n      <td>0.000353</td>\n      <td>-46.976581</td>\n    </tr>\n    <tr>\n      <th>7</th>\n      <td>40.036408</td>\n      <td>0.001964</td>\n      <td>0.001530</td>\n      <td>-22.077130</td>\n    </tr>\n    <tr>\n      <th>8</th>\n      <td>50.048544</td>\n      <td>0.004618</td>\n      <td>0.004313</td>\n      <td>-6.617935</td>\n    </tr>\n    <tr>\n      <th>9</th>\n      <td>60.000000</td>\n      <td>0.009127</td>\n      <td>0.008997</td>\n      <td>-1.426415</td>\n    </tr>\n  </tbody>\n</table>\n</div>"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "de4d6505fd9e8354503ca62d07508b711c5b3a014c2093c2396ca957e6e5b872",
+    "figure-5-1.png": "39115e11e517b4f4064fb229726a8cfad8c4f4935af6d8c5abae09900cf7cf53"
+  }
+}

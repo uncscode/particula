@@ -1,8 +1,9 @@
-"""Prepare and verify the local Starlight demo without running examples."""
+"""Prepare and verify the Starlight documentation without running examples."""
 
 from __future__ import annotations
 
 import argparse
+import gzip
 import hashlib
 import html
 import json
@@ -28,16 +29,11 @@ SITE = ROOT / "website"
 CONTENT = SITE / "src/content/docs"
 BASE = "/particula/"
 PUBLISHED = "https://uncscode.github.io/particula/"
-PAGES = [
-    "guide/index.md",
-    "guide/getting-started/first-simulation.md",
-    "guide/data-model/construction.md",
-    "guide/gpu/support.md",
-    "examples/index.md",
-    "theory/index.md",
-    "theory/thermodynamics/activity-theory.md",
-    "contribute/index.md",
-]
+PAGES = sorted(
+    str(p.relative_to(ROOT / "docs"))
+    for section in ("guide", "examples", "theory", "contribute")
+    for p in (ROOT / "docs" / section).rglob("*.md")
+)
 
 
 def route(path):
@@ -48,7 +44,7 @@ def route(path):
 
 
 def local_routes():
-    """Return routes present in the representative demo."""
+    """Return routes present in the complete documentation site."""
     return (
         {route(p) for p in PAGES}
         | {route(c["source"]) for c in registry().values()}
@@ -84,9 +80,7 @@ def rewrite_links(text, source):
             if page in local_routes() or page.startswith("API/particula"):
                 destination = BASE + (page + "/" if page else "")
             else:
-                destination = PUBLISHED + page + "/"
-                if not image:
-                    label += " ↗"
+                destination = BASE + page + "/"
         else:
             destination = (
                 "https://github.com/uncscode/particula/blob/main/" + target
@@ -104,6 +98,8 @@ def write_page(path, title, body, source=None, extra=None):
     destination = CONTENT / path
     destination.parent.mkdir(parents=True, exist_ok=True)
     metadata = {"title": title}
+    if str(path) != "index.mdx":
+        metadata["slug"] = route(path)
     if source:
         metadata["editUrl"] = (
             "https://github.com/uncscode/particula/edit/main/" + source
@@ -122,6 +118,8 @@ def write_page(path, title, body, source=None, extra=None):
 def output_markdown(outputs, url, title):
     """Render captured scientific output, keeping plots outside code folds."""
     result = []
+    progress = []
+    progress_bar = re.compile(r"\d+(?:\.\d+)?%\|.*?\|\s*[\d,.]+/[\d,.]+")
     for output in outputs:
         if "image" in output:
             result.append(
@@ -137,12 +135,28 @@ def output_markdown(outputs, url, title):
                 '<div class="result-table">\n\n' + output["html"] + "\n\n</div>"
             )
         elif output.get("text", "").strip():
-            # Escaping prevents output from becoming Markdown/HTML instructions.
-            result.append(
-                '<pre class="result-output" data-pagefind-ignore><code>'
-                + html.escape(output["text"])
-                + "</code></pre>"
-            )
+            # Keep scientific text visible; collect terminal progress updates.
+            visible = []
+            for line in output["text"].splitlines():
+                clean = re.sub(r"\x1b\[[0-?]*[ -/]*[@-~]", "", line)
+                if progress_bar.search(clean):
+                    progress.append(clean.strip())
+                elif clean.strip():
+                    visible.append(clean)
+            if visible:
+                result.append(
+                    '<pre class="result-output" data-pagefind-ignore><code>'
+                    + html.escape("\n".join(visible))
+                    + "</code></pre>"
+                )
+    if progress:
+        result.append(
+            '<details class="execution-progress" data-pagefind-ignore>'
+            "<summary>Execution progress</summary>"
+            '<pre class="result-output"><code>'
+            + html.escape("\n".join(progress))
+            + "</code></pre></details>"
+        )
     return "\n\n".join(result)
 
 
@@ -288,7 +302,7 @@ def generate_api():
 
 
 def prepare():
-    """Prepare demo pages from source files and saved outputs."""
+    """Prepare documentation pages from source files and saved outputs."""
     if CONTENT.exists():
         shutil.rmtree(CONTENT)
     CONTENT.mkdir(parents=True)
@@ -303,17 +317,18 @@ def prepare():
         heading = re.search(r"^# (.+)$", text, re.M)
         title = heading[1] if heading else source.stem.replace("-", " ").title()
         if heading:
-            text = text[: heading.start()] + text[heading.end() :]
+            anchor = re.sub(r"[^\w -]", "", title.lower()).replace(" ", "-")
+            text = (
+                text[: heading.start()]
+                + f'<a id="{anchor}"></a>\n'
+                + text[heading.end() :]
+            )
         text = rewrite_links(text, "docs/" + page)
-        banner = (
-            '<p class="demo-banner">Local preview · Links marked ↗ '
-            "open the published documentation.</p>\n\n"
-        )
-        write_page(page, title, banner + text.strip(), "docs/" + page)
+        write_page(page, title, text.strip(), "docs/" + page)
     for key, config in registry().items():
         render_example(key, config)
     # Replace the Material-specific home template with native Starlight.
-    home = (SITE / "templates/home.mdx").read_text()
+    home = rewrite_links((ROOT / "docs/index.md").read_text(), "docs/index.md")
     write_page(
         "index.mdx",
         "Particula",
@@ -348,12 +363,6 @@ def prepare():
         "API reference",
         (SITE / "templates/api.md").read_text(),
     )
-    # Presentation fixtures do not alter scientific source or provenance.
-    write_page(
-        "examples/result-states.md",
-        "Saved-result states",
-        (SITE / "templates/result-states.md").read_text(),
-    )
     write_page(
         "contribute/script-examples.md",
         "Author a Python example",
@@ -371,11 +380,14 @@ class Links(HTMLParser):
         super().__init__()
         self.links = []
         self.ids = set()
+        self.is_redirect = False
         self.feed(text)
 
     def handle_starttag(self, tag, attrs):
         """Collect only attributes relevant to link validation."""
         attrs = dict(attrs)
+        if "data-particula-redirect" in attrs:
+            self.is_redirect = True
         if "id" in attrs:
             self.ids.add(attrs["id"])
         if tag in {"a", "img", "script", "link"}:
@@ -385,9 +397,9 @@ class Links(HTMLParser):
 
 
 def redirects(dist):
-    """Reuse relocation records only for destinations included in this demo."""
+    """Reuse applicable relocation records for retained destinations."""
     records = json.loads((ROOT / "docs/.assets/relocations.json").read_text())
-    # Keep the original MkDocs API landing URL alongside the demo overview.
+    # Keep the original MkDocs API landing URL alongside the new overview.
     api_landing = dist / "API/index.html"
     api_landing.parent.mkdir(exist_ok=True)
     api_landing.write_text(
@@ -444,7 +456,10 @@ def check_rendered_links(dist, pages):
     for page, parsed in pages.items():
         for href in parsed.links:
             url = urlsplit(href)
-            if url.scheme or url.netloc:
+            if (url.scheme or url.netloc) and not (
+                url.netloc == urlsplit(PUBLISHED).netloc
+                and url.path.startswith(BASE)
+            ):
                 continue
             if url.path.startswith("/"):
                 if not url.path.startswith(BASE):
@@ -476,12 +491,104 @@ def check_rendered_links(dist, pages):
     return errors
 
 
+def check_inventory(dist, pages):
+    """Validate complete page, fragment, and source-download coverage."""
+    errors = []
+    for page_route in local_routes():
+        if not (dist / page_route / "index.html").exists():
+            errors.append(f"Missing inventoried page {page_route}")
+    records = json.loads((ROOT / "docs/.assets/relocations.json").read_text())
+    for old, destination in records["fragments"].items():
+        source, anchor = destination.split("#", 1)
+        target = dist / route(source) / "index.html"
+        if target not in pages or anchor not in pages[target].ids:
+            errors.append(f"Missing relocated anchor {old} -> {destination}")
+    for key in registry():
+        if not (dist / "downloads" / f"{key}.py").is_file():
+            errors.append(f"Missing source download {key}")
+    if any(".trash" in p.relative_to(dist).parts for p in dist.rglob("*")):
+        errors.append("Archived files leaked into the published site")
+    return errors
+
+
+def check_discovery(dist, pages):
+    """Inspect actual search fragments and sitemap URLs for retired content."""
+    errors = []
+    fragments = list((dist / "pagefind").rglob("*.pf_fragment"))
+    if not fragments:
+        errors.append("Missing Pagefind search fragments")
+    urls = []
+    for fragment in fragments:
+        data = gzip.decompress(fragment.read_bytes())
+        prefix = b"pagefind_dcd"
+        if not data.startswith(prefix):
+            errors.append(f"Unknown search fragment format: {fragment.name}")
+            continue
+        urls.append(json.loads(data[len(prefix) :])["url"])
+    for sitemap in dist.glob("sitemap-*.xml"):
+        urls.extend(re.findall(r"<loc>(.*?)</loc>", sitemap.read_text()))
+    for url in urls:
+        path = unquote(urlsplit(url).path).removeprefix(BASE).lstrip("/")
+        if path.endswith(".xml"):
+            continue
+        target = dist / path / "index.html"
+        if ".trash" in Path(path).parts:
+            errors.append(f"Archive indexed in search/sitemap: {url}")
+        elif target not in pages:
+            errors.append(f"Unknown page indexed in search/sitemap: {url}")
+        elif pages[target].is_redirect:
+            errors.append(f"Redirect indexed in search/sitemap: {url}")
+    return sorted(set(errors))
+
+
+def preserve_fragment_aliases(dist):
+    """Keep unambiguous MkDocs heading IDs alongside Starlight heading IDs."""
+    records = json.loads((ROOT / "docs/.assets/relocations.json").read_text())
+    for destination in set(records["fragments"].values()):
+        source, anchor = destination.split("#", 1)
+        target = dist / route(source) / "index.html"
+        if not target.exists():
+            continue
+        text = target.read_text()
+        ids = Links(text).ids
+        if anchor in ids:
+            continue
+        matches = [
+            value
+            for value in ids
+            if re.sub("-+", "-", value).strip("-") == anchor
+        ]
+        if len(matches) == 1:
+            pattern = (
+                r'(<h[1-6]\b[^>]*\bid="' + re.escape(matches[0]) + r'"[^>]*>)'
+            )
+            text = re.sub(
+                pattern,
+                lambda m,
+                anchor=anchor: f'<span id="{html.escape(anchor)}"></span>'
+                + m[0],
+                text,
+                count=1,
+            )
+            target.write_text(text)
+
+
 def verify():
     """Verify routes, links, API coverage, and generated assets."""
     dist = SITE / "dist"
+    not_found = dist / "404.html"
+    if not_found.exists():
+        not_found.write_text(
+            not_found.read_text().replace(
+                PUBLISHED + "404/", PUBLISHED + "404.html"
+            )
+        )
+    preserve_fragment_aliases(dist)
     redirected = redirects(dist)
     pages = {p: Links(p.read_text()) for p in dist.rglob("*.html")}
     errors = check_rendered_links(dist, pages)
+    errors.extend(check_inventory(dist, pages))
+    errors.extend(check_discovery(dist, pages))
     data = json.loads((SITE / ".cache/griffe.json").read_text())
     modules = []
 

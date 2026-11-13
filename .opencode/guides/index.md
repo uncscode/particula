@@ -6,7 +6,7 @@
 
 This directory contains agent-facing guides for contributors working on the
 particula particle-simulation codebase. User-facing project documentation lives
-under `docs/` and is built by MkDocs.
+under `docs/` and is built by Astro + Starlight.
 
 ## Core Guides
 
@@ -14,7 +14,7 @@ under `docs/` and is built by MkDocs.
 - **[Testing Guide](testing_guide.md)**: pytest commands, file naming, warnings-as-errors, and performance benchmark guidance.
 - **[Linting Guide](linting_guide.md)**: ruff and mypy configuration, commands, and CI expectations.
 - **[Docstring Guide](docstring_guide.md)**: Google-style docstrings and module documentation.
-- **[Documentation Guide](documentation_guide.md)**: MkDocs and notebook documentation workflow.
+- **[Documentation Guide](documentation_guide.md)**: Starlight and saved Python-result documentation workflow.
 - **[Review Guide](review_guide.md)**: Review criteria for correctness, tests, scientific validity, and maintainability.
 
 ## Architecture
@@ -50,7 +50,7 @@ ruff check particula/
 mypy particula/ --ignore-missing-imports
 
 # Documentation
-mkdocs build
+npm --prefix website run build
 ```
 
 ## Project Structure

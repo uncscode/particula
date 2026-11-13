@@ -96,7 +96,7 @@ pytest particula/execution/tests/rng_test.py \
   particula/execution/tests/rng_invariance_test.py \
   particula/execution/tests/checkpoint_test.py -q
 pytest examples_tests/gpu_resident_session_example_test.py -q
-mkdocs build --strict
+npm --prefix website run build
 ```
 
 Warp CPU is the installed-Warp baseline. CUDA evidence is optional and skips

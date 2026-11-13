@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 2.9596766470349394,
+  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "input_sha256": {},
+  "example": "examples-processes-wall-loss-wall-loss-builders-factory",
+  "fingerprint": "fd31eb57dd34c1f027d36f5cfe2152ace2133924432645db9d79830493b7dd6e",
+  "source": "docs/examples/processes/wall-loss/wall_loss_builders_factory.py",
+  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "package_dirty": false,
+  "executed_at": "2026-11-13T15:01:53.803503+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [],
+    [
+      {
+        "text": "eddy diffusivity [1/s] 1.000e-03\nchamber radius [m] 0.60\ndistribution type discrete\nrate[0] -1.897e-88 m^-3 s^-1\n"
+      }
+    ],
+    [
+      {
+        "text": "rectangular dims [m] (1.8, 1.5, 1.2)\ndistribution type particle_resolved\ndiffusivity [1/s] 3.333e-04\n"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "f63fc65db0a1453d95e3889afcdbbd6240d4539447938fc9779ee4d26c59a427"
+  }
+}

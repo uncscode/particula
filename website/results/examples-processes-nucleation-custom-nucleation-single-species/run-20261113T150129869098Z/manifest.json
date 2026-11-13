@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 3.4936895609716885,
+  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "input_sha256": {},
+  "example": "examples-processes-nucleation-custom-nucleation-single-species",
+  "fingerprint": "5d40bfb0bdec2badf4576ffed292c892c585202c2cdefaf4141c51916d7b689d",
+  "source": "docs/examples/processes/nucleation/custom_nucleation_single_species.py",
+  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "package_dirty": false,
+  "executed_at": "2026-11-13T15:01:29.907189+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [
+      {
+        "text": "'Demonstrate an illustrative custom single-species nucleation workflow.\\n\\nThe notebook builds an ammonium-sulfate aerosol, applies a hand-built\\nsaturation-based mass source, and couples condensation and coagulation\\nrunnables. Its native fixed-slot custom source is illustrative only; use\\n``../cpu_nucleation.py`` for the supported bounded CPU-only nucleation API.\\n'"
+      }
+    ],
+    [],
+    [
+      {
+        "text": "ParticleData(masses=array([[[7.83417809e-16],\n        [4.12694782e-16],\n        [9.12385156e-16],\n        ...,\n        [0.00000000e+00],\n        [0.00000000e+00],\n        [0.00000000e+00]]], shape=(1, 100000, 1)), concentration=array([[1., 1., 1., ..., 0., 0., 0.]], shape=(1, 100000)), charge=array([[0., 0., 0., ..., 0., 0., 0.]], shape=(1, 100000)), density=array([1770.]), volume=array([1.e-07]), distribution_type='particle_resolved', radius_grid=None)\nGasData(name=['sulfate'], molar_mass=array([0.13214]), concentration=array([[1.08021925e-11]]), partitioning=array([ True]))\nEnvironmentData(temperature=array([298.15]), pressure=array([101325.]), saturation_ratio=array([[0.]]))\n"
+      }
+    ],
+    [],
+    [
+      {
+        "text": "Step 1\nCurrent sulfate concentration:  1.0802192486690696e-11\nNew sulfate concentration:  1.5123069481366975e-11\nSaturation ratio: 0.7\nNucleation rate [mass concentration per sec, kg/m^3/s]: 0.0\nNumber of new particles nucleated: 0.0\n"
+      }
+    ],
+    [
+      {
+        "text": "ParticleData(masses=array([[[7.83417809e-16],\n        [4.12694782e-16],\n        [9.12385156e-16],\n        ...,\n        [0.00000000e+00],\n        [0.00000000e+00],\n        [0.00000000e+00]]], shape=(1, 100000, 1)), concentration=array([[1., 1., 1., ..., 0., 0., 0.]], shape=(1, 100000)), charge=array([[0., 0., 0., ..., 0., 0., 0.]], shape=(1, 100000)), density=array([1770.]), volume=array([1.e-07]), distribution_type='particle_resolved', radius_grid=None)\nGasData(name=['sulfate'], molar_mass=array([0.13214]), concentration=array([[1.08021925e-11]]), partitioning=array([ True]))\nEnvironmentData(temperature=array([298.15]), pressure=array([101325.]), saturation_ratio=array([[0.]]))\nTotal iterations to do: 10\n"
+      }
+    ],
+    [
+      {
+        "text": "Index 0: Total resolved particles in simulation: 100.0\nActivating 2281 unit-count nuclei\n"
+      },
+      {
+        "text": "Activating 10481 unit-count nuclei\n"
+      }
+    ],
+    [
+      {
+        "image": "figure-8-1.png"
+      }
+    ],
+    [
+      {
+        "image": "figure-9-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "ac1b62ba90918cba09774ed30f0068300b6f76987f48221dc09debeab63f80df",
+    "figure-8-1.png": "f225e056021088b2abfc37fa4e9f1589b6c894b65996624548dcf12b8d2557d2",
+    "figure-9-1.png": "64ff78387ed7117726aa23a090a83dfd2ae33933d1357a1a06d4e576a03361b2"
+  }
+}

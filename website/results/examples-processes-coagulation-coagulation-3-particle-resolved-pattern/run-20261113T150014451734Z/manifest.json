@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 4.627391750051174,
+  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "input_sha256": {},
+  "example": "examples-processes-coagulation-coagulation-3-particle-resolved-pattern",
+  "fingerprint": "c1b315cac42a975c5396e1c5c00f7f05359ef2d8a367e69594fb1a98c605eb6b",
+  "source": "docs/examples/processes/coagulation/coagulation_3_particle_resolved_pattern.py",
+  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "package_dirty": false,
+  "executed_at": "2026-11-13T15:00:14.585239+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [
+      {
+        "text": "'Demonstrate particle-resolved Brownian coagulation.\\n\\nGenerates a modest bimodal particle-resolved sample, configures Brownian\\ncoagulation with ``distribution_type=\"particle_resolved\"``, runs a short\\nstep, and plots histograms of radii before/after execution to show how the\\nsample redistributes. Uses a small sample size to keep runtime fast.\\n\\nExample:\\n    Run the script to visualize how Brownian coagulation redistributes a\\n    set of sampled radii in a particle-resolved representation via the\\n    public ``par.dynamics`` API.\\n'"
+      }
+    ],
+    [],
+    [],
+    [
+      {
+        "text": "<particula.dynamics.particle_process.Coagulation object at 0x7f4ee7084260>\n"
+      }
+    ],
+    [],
+    [
+      {
+        "image": "figure-6-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "58399e0c5a2ad7fc3c16c6a769b8067d647da608472a75d9df6c532b2ddd9658",
+    "figure-6-1.png": "41be60b9c4dc06a2cb464d1f5a65c729da852ca72b3b77bde8fc28899c3474c8"
+  }
+}

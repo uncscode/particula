@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 3.473205934977159,
+  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "input_sha256": {},
+  "example": "examples-thermodynamics-particle-properties-activity-functions",
+  "fingerprint": "a1fa0d169b444707e36be90fc1bf665c2cb9c6236b5bd1b9089de39e40a07b69",
+  "source": "docs/examples/thermodynamics/particle-properties/activity_functions.py",
+  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "package_dirty": false,
+  "executed_at": "2026-11-13T15:13:34.361620+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [
+      {
+        "text": "'Explore mixing rules and activity coefficient calculations.\\n\\nThis notebook walks through mass-based, molar-based, and volume-based\\nmixing rules, compares ideal activity coefficients, and demonstrates the\\nkappa value parameterization to model non-ideal solution behavior. Each\\nsection builds the required data arrays, computes activities with the\\npublic ``par.particles`` helpers, and plots the results.\\n\\nExample:\\n    Run this notebook to generate activity coefficient plots for two- and\\nthree-component systems under different mixing assumptions.\\n'"
+      }
+    ],
+    [],
+    [],
+    [
+      {
+        "image": "figure-4-1.png"
+      }
+    ],
+    [
+      {
+        "image": "figure-5-1.png"
+      }
+    ],
+    [
+      {
+        "image": "figure-6-1.png"
+      }
+    ],
+    [
+      {
+        "image": "figure-7-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "be46dd2f70186e012198b9d0cb2852795ed850d02871bc05e569af927f7d8765",
+    "figure-4-1.png": "279160110039fbeea65d5fea1209404b8d93ca8c4d5120b37abf2b6cae5e79ce",
+    "figure-5-1.png": "969729ae3bb740bf5483e8c60ea073f5dbe996f0071910ec04c69217c4ac6baf",
+    "figure-6-1.png": "2f70ff0c6c2ce994e6df81bc338fa5468eecab97d0fdd6b1dea2bdf767edc6e3",
+    "figure-7-1.png": "9ecbe35e56877cf4a884b19422202be45255528033c6e079d91de5c9c5fc0e81"
+  }
+}

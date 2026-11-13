@@ -289,7 +289,7 @@ Optional throughput evidence remains opt-in only:
 - `pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s`
 
 Check every Markdown link and anchor referenced by this report update directly
-and run `mkdocs build --strict` when the docs toolchain is available.
+and run `npm --prefix website run build` when the docs toolchain is available.
 
 ## Reproduction commands
 

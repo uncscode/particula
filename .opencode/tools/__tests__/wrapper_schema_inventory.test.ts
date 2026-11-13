@@ -561,8 +561,8 @@ describe("wrapper schema inventory", () => {
     expect(rowsByBasename.get("run_pytest_advanced")?.nearest_test_path).toBe(
       ".opencode/tools/__tests__/run_pytest_advanced.test.ts",
     );
-    expect(rowsByBasename.get("build_mkdocs")?.nearest_test_path).toBe(
-      ".opencode/tools/__tests__/build_mkdocs.test.ts",
+    expect(rowsByBasename.get("build_docs")?.nearest_test_path).toBe(
+      ".opencode/tools/__tests__/build_docs.test.ts",
     );
     expect(rowsByBasename.get("clear_build")?.nearest_test_path).toBe(
       ".opencode/tools/__tests__/clear_build.test.ts",
@@ -821,9 +821,7 @@ describe("wrapper schema inventory", () => {
       "run_cmake_build",
       "run_linters",
       "run_validate_agent_references",
-      "build_mkdocs",
-      "build_mkdocs_validate",
-      "build_mkdocs_build",
+      "build_docs",
       "clear_build",
       "clear_build_preview",
       "clear_build_delete",
@@ -998,38 +996,10 @@ describe("wrapper schema inventory", () => {
       ]),
     );
 
-    const buildMkdocsCompatibilityRow = rowsByBasename.get("build_mkdocs");
-    expect(buildMkdocsCompatibilityRow?.owner_plan).toBeNull();
-    expect(buildMkdocsCompatibilityRow?.nearest_test_path).toBe(
-      ".opencode/tools/__tests__/build_mkdocs.test.ts",
-    );
-    expect(buildMkdocsCompatibilityRow?.counted_fields).toEqual(["timeout", "cwd", "configFile", "validateOnly"]);
-    expect(buildMkdocsCompatibilityRow?.exempt_fields).toEqual(["options"]);
-    expect(buildMkdocsCompatibilityRow?.field_role_audit).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ field: "cwd", role: "safety-field" }),
-        expect.objectContaining({ field: "configFile", role: "safety-field" }),
-        expect.objectContaining({ field: "options", role: "explicit-exception" }),
-        expect.objectContaining({ field: "timeout", role: "explicit-exception" }),
-        expect.objectContaining({ field: "validateOnly", role: "explicit-exception" }),
-      ]),
-    );
-
-    for (const wrapperName of ["build_mkdocs_validate", "build_mkdocs_build"]) {
-      expect(rowsByBasename.get(wrapperName)?.nearest_test_path).toBe(
-        ".opencode/tools/__tests__/build_mkdocs.test.ts",
-      );
-      expect(rowsByBasename.get(wrapperName)?.counted_fields).toEqual(["timeout", "cwd", "configFile"]);
-      expect(rowsByBasename.get(wrapperName)?.exempt_fields).toEqual(["options"]);
-      expect(rowsByBasename.get(wrapperName)?.field_role_audit).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({ field: "cwd", role: "safety-field" }),
-          expect.objectContaining({ field: "configFile", role: "safety-field" }),
-          expect.objectContaining({ field: "options", role: "explicit-exception" }),
-          expect.objectContaining({ field: "timeout", role: "explicit-exception" }),
-        ]),
-      );
-    }
+    const docsRow = rowsByBasename.get("build_docs");
+    expect(docsRow?.counted_fields).toEqual(["cwd", "action"]);
+    expect(docsRow?.classification).toBe("already-compliant");
+    expect(rowsByBasename.has("build_mkdocs")).toBe(false);
 
     const clearBuildCompatibilityRow = rowsByBasename.get("clear_build");
     expect(clearBuildCompatibilityRow?.owner_plan).toBeNull();
@@ -1781,9 +1751,7 @@ describe("wrapper schema inventory", () => {
     expect(resolveNearestTestPath("platform_operations", testsByBasename)).toBe(
       ".opencode/tools/__tests__/platform_operations_compat_comment_pr_review.test.ts",
     );
-    expect(resolveNearestTestPath("build_mkdocs", testsByBasename)).toBe(
-      ".opencode/tools/__tests__/wrapper_schema_inventory.test.ts",
-    );
+    expect(resolveNearestTestPath("build_docs", testsByBasename)).toBeNull();
     expect(resolveNearestTestPath("clear_build", testsByBasename)).toBe(
       ".opencode/tools/__tests__/wrapper_schema_inventory.test.ts",
     );

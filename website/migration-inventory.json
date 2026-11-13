@@ -1,0 +1,1408 @@
+{
+  "baseline": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "converted_theory_sources": [
+    "docs/theory/dynamics/cloud-droplet-coagulation/dns-fluid-and-particle-properties-comparison.py",
+    "docs/theory/dynamics/cloud-droplet-coagulation/dns-horizontal-velocity-comparison.py",
+    "docs/theory/dynamics/cloud-droplet-coagulation/dns-kernel-comparison.py",
+    "docs/theory/dynamics/cloud-droplet-coagulation/dns-radial-distribution-comparison.py",
+    "docs/theory/dynamics/cloud-droplet-coagulation/dns-radial-relative-velocity-comparison.py",
+    "docs/theory/dynamics/ionparticle-coagulation.py",
+    "docs/theory/properties/dynamic-viscosity.py",
+    "docs/theory/properties/mean-free-path.py"
+  ],
+  "sources": [
+    {
+      "source": "docs/contribute/CODE_OF_CONDUCT.md",
+      "route": "/particula/contribute/CODE_OF_CONDUCT/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/contribute/CONTRIBUTING.md",
+      "route": "/particula/contribute/CONTRIBUTING/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/contribute/Code_Specifications/Details/Class_docstring_format.md",
+      "route": "/particula/contribute/Code_Specifications/Details/Class_docstring_format/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/contribute/Code_Specifications/Details/Function_docstring_format.md",
+      "route": "/particula/contribute/Code_Specifications/Details/Function_docstring_format/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/contribute/Code_Specifications/Details/Linear_Git_Repository.md",
+      "route": "/particula/contribute/Code_Specifications/Details/Linear_Git_Repository/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/contribute/Code_Specifications/index.md",
+      "route": "/particula/contribute/Code_Specifications/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/contribute/Feature_Workflow/Details/Add_Class.md",
+      "route": "/particula/contribute/Feature_Workflow/Details/Add_Class/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/contribute/Feature_Workflow/Details/Add_Example.md",
+      "route": "/particula/contribute/Feature_Workflow/Details/Add_Example/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/contribute/Feature_Workflow/Details/Add_Function.md",
+      "route": "/particula/contribute/Feature_Workflow/Details/Add_Function/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/contribute/Feature_Workflow/Details/Add_Theory.md",
+      "route": "/particula/contribute/Feature_Workflow/Details/Add_Theory/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/contribute/Feature_Workflow/Details/Add_Unit_Test.md",
+      "route": "/particula/contribute/Feature_Workflow/Details/Add_Unit_Test/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/contribute/Feature_Workflow/Details/Add_to_init.md",
+      "route": "/particula/contribute/Feature_Workflow/Details/Add_to_init/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/contribute/Feature_Workflow/index.md",
+      "route": "/particula/contribute/Feature_Workflow/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/contribute/architecture/design-patterns.md",
+      "route": "/particula/contribute/architecture/design-patterns/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/contribute/architecture/index.md",
+      "route": "/particula/contribute/architecture/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/contribute/architecture/object-oriented-patterns.md",
+      "route": "/particula/contribute/architecture/object-oriented-patterns/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/contribute/architecture/warmed-principle.md",
+      "route": "/particula/contribute/architecture/warmed-principle/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/contribute/architecture/warp/autodiff-limitations.md",
+      "route": "/particula/contribute/architecture/warp/autodiff-limitations/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/contribute/architecture/warp/datastructures.md",
+      "route": "/particula/contribute/architecture/warp/datastructures/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/contribute/architecture/warp/index.md",
+      "route": "/particula/contribute/architecture/warp/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/contribute/architecture/warp/kernels.md",
+      "route": "/particula/contribute/architecture/warp/kernels/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/contribute/architecture/warp/teaching/fluids.md",
+      "route": "/particula/contribute/architecture/warp/teaching/fluids/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/contribute/architecture/warp/teaching/geometry.md",
+      "route": "/particula/contribute/architecture/warp/teaching/geometry/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/contribute/documentation.md",
+      "route": "/particula/contribute/documentation/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/contribute/index.md",
+      "route": "/particula/contribute/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/contribute/roadmap.md",
+      "route": "/particula/contribute/roadmap/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/contribute/setup.md",
+      "route": "/particula/contribute/setup/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/contribute/validation/gpu/coagulation-benchmarks.md",
+      "route": "/particula/contribute/validation/gpu/coagulation-benchmarks/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/contribute/validation/gpu/coagulation.md",
+      "route": "/particula/contribute/validation/gpu/coagulation/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/contribute/validation/gpu/condensation-parity.md",
+      "route": "/particula/contribute/validation/gpu/condensation-parity/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/contribute/validation/gpu/graph-capture-profiling.md",
+      "route": "/particula/contribute/validation/gpu/graph-capture-profiling/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/contribute/validation/gpu/graph-capture-qualification.md",
+      "route": "/particula/contribute/validation/gpu/graph-capture-qualification/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/contribute/validation/gpu/legacy-benchmarks/gpu_benchmarks.ipynb",
+      "route": "/particula/contribute/validation/gpu/legacy-benchmarks/gpu_benchmarks/",
+      "kind": "notebook-original",
+      "replacement": "docs/contribute/validation/gpu/legacy-benchmarks/gpu_benchmarks.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/contribute/validation/gpu/legacy-benchmarks/gpu_benchmarks.ipynb"
+    },
+    {
+      "source": "docs/contribute/validation/gpu/legacy-benchmarks/gpu_benchmarks.py",
+      "route": "/particula/contribute/validation/gpu/legacy-benchmarks/gpu_benchmarks/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/contribute/validation/gpu/resident-benchmarks.md",
+      "route": "/particula/contribute/validation/gpu/resident-benchmarks/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/contribute/validation/index.md",
+      "route": "/particula/contribute/validation/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/contribute/validation/numerics/condensation-stiffness.md",
+      "route": "/particula/contribute/validation/numerics/condensation-stiffness/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/contribute/validation/numerics/mass-precision.md",
+      "route": "/particula/contribute/validation/numerics/mass-precision/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/contribute/validation/releases/v0.3.0.md",
+      "route": "/particula/contribute/validation/releases/v0.3.0/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/fundamentals/data-containers.md",
+      "route": "/particula/examples/fundamentals/data-containers/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/fundamentals/data_containers.py",
+      "route": "/particula/examples/fundamentals/data_containers/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/fundamentals/gas/environment_data.ipynb",
+      "route": "/particula/examples/fundamentals/gas/environment_data/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/fundamentals/gas/environment_data.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/fundamentals/gas/environment_data.ipynb"
+    },
+    {
+      "source": "docs/examples/fundamentals/gas/environment_data.py",
+      "route": "/particula/examples/fundamentals/gas/environment_data/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/fundamentals/gas/gas_data.ipynb",
+      "route": "/particula/examples/fundamentals/gas/gas_data/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/fundamentals/gas/gas_data.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/fundamentals/gas/gas_data.ipynb"
+    },
+    {
+      "source": "docs/examples/fundamentals/gas/gas_data.py",
+      "route": "/particula/examples/fundamentals/gas/gas_data/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/fundamentals/gas/index.md",
+      "route": "/particula/examples/fundamentals/gas/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/fundamentals/gas/vapor_pressure.ipynb",
+      "route": "/particula/examples/fundamentals/gas/vapor_pressure/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/fundamentals/gas/vapor_pressure.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/fundamentals/gas/vapor_pressure.ipynb"
+    },
+    {
+      "source": "docs/examples/fundamentals/gas/vapor_pressure.py",
+      "route": "/particula/examples/fundamentals/gas/vapor_pressure/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/fundamentals/index.md",
+      "route": "/particula/examples/fundamentals/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/fundamentals/native_aerosol.ipynb",
+      "route": "/particula/examples/fundamentals/native_aerosol/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/fundamentals/native_aerosol.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/fundamentals/native_aerosol.ipynb"
+    },
+    {
+      "source": "docs/examples/fundamentals/native_aerosol.py",
+      "route": "/particula/examples/fundamentals/native_aerosol/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/fundamentals/native_state_access.py",
+      "route": "/particula/examples/fundamentals/native_state_access/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/fundamentals/particles/aerosol_distributions.ipynb",
+      "route": "/particula/examples/fundamentals/particles/aerosol_distributions/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/fundamentals/particles/aerosol_distributions.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/fundamentals/particles/aerosol_distributions.ipynb"
+    },
+    {
+      "source": "docs/examples/fundamentals/particles/aerosol_distributions.py",
+      "route": "/particula/examples/fundamentals/particles/aerosol_distributions/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/fundamentals/particles/distribution_tutorial.ipynb",
+      "route": "/particula/examples/fundamentals/particles/distribution_tutorial/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/fundamentals/particles/distribution_tutorial.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/fundamentals/particles/distribution_tutorial.ipynb"
+    },
+    {
+      "source": "docs/examples/fundamentals/particles/distribution_tutorial.py",
+      "route": "/particula/examples/fundamentals/particles/distribution_tutorial/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/fundamentals/particles/index.md",
+      "route": "/particula/examples/fundamentals/particles/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/fundamentals/particles/particle_data.ipynb",
+      "route": "/particula/examples/fundamentals/particles/particle_data/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/fundamentals/particles/particle_data.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/fundamentals/particles/particle_data.ipynb"
+    },
+    {
+      "source": "docs/examples/fundamentals/particles/particle_data.py",
+      "route": "/particula/examples/fundamentals/particles/particle_data/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/gpu/direct/gpu_coagulation_direct.py",
+      "route": "/particula/examples/gpu/direct/gpu_coagulation_direct/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/gpu/direct/gpu_complete_process_sequence.py",
+      "route": "/particula/examples/gpu/direct/gpu_complete_process_sequence/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/gpu/direct/gpu_condensation_parity_walkthrough.py",
+      "route": "/particula/examples/gpu/direct/gpu_condensation_parity_walkthrough/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/gpu/direct/gpu_direct_kernels_quick_start.py",
+      "route": "/particula/examples/gpu/direct/gpu_direct_kernels_quick_start/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/gpu/direct/gpu_direct_nucleation.py",
+      "route": "/particula/examples/gpu/direct/gpu_direct_nucleation/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/gpu/index.md",
+      "route": "/particula/examples/gpu/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/gpu/resident/gpu_resident_graph_capture.py",
+      "route": "/particula/examples/gpu/resident/gpu_resident_graph_capture/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/gpu/resident/gpu_resident_multi_timestep.py",
+      "route": "/particula/examples/gpu/resident/gpu_resident_multi_timestep/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/gpu/resident/gpu_resident_session.py",
+      "route": "/particula/examples/gpu/resident/gpu_resident_session/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/index.md",
+      "route": "/particula/examples/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/processes/coagulation/charge/coagulation_with_charge_functional.ipynb",
+      "route": "/particula/examples/processes/coagulation/charge/coagulation_with_charge_functional/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/processes/coagulation/charge/coagulation_with_charge_functional.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/processes/coagulation/charge/coagulation_with_charge_functional.ipynb"
+    },
+    {
+      "source": "docs/examples/processes/coagulation/charge/coagulation_with_charge_functional.py",
+      "route": "/particula/examples/processes/coagulation/charge/coagulation_with_charge_functional/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/processes/coagulation/charge/coagulation_with_charge_objects.ipynb",
+      "route": "/particula/examples/processes/coagulation/charge/coagulation_with_charge_objects/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/processes/coagulation/charge/coagulation_with_charge_objects.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/processes/coagulation/charge/coagulation_with_charge_objects.ipynb"
+    },
+    {
+      "source": "docs/examples/processes/coagulation/charge/coagulation_with_charge_objects.py",
+      "route": "/particula/examples/processes/coagulation/charge/coagulation_with_charge_objects/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/processes/coagulation/coagulation_1_pmf_pattern.ipynb",
+      "route": "/particula/examples/processes/coagulation/coagulation_1_pmf_pattern/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/processes/coagulation/coagulation_1_pmf_pattern.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/processes/coagulation/coagulation_1_pmf_pattern.ipynb"
+    },
+    {
+      "source": "docs/examples/processes/coagulation/coagulation_1_pmf_pattern.py",
+      "route": "/particula/examples/processes/coagulation/coagulation_1_pmf_pattern/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/processes/coagulation/coagulation_2_pdf_pattern.ipynb",
+      "route": "/particula/examples/processes/coagulation/coagulation_2_pdf_pattern/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/processes/coagulation/coagulation_2_pdf_pattern.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/processes/coagulation/coagulation_2_pdf_pattern.ipynb"
+    },
+    {
+      "source": "docs/examples/processes/coagulation/coagulation_2_pdf_pattern.py",
+      "route": "/particula/examples/processes/coagulation/coagulation_2_pdf_pattern/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/processes/coagulation/coagulation_3_particle_resolved_pattern.ipynb",
+      "route": "/particula/examples/processes/coagulation/coagulation_3_particle_resolved_pattern/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/processes/coagulation/coagulation_3_particle_resolved_pattern.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/processes/coagulation/coagulation_3_particle_resolved_pattern.ipynb"
+    },
+    {
+      "source": "docs/examples/processes/coagulation/coagulation_3_particle_resolved_pattern.py",
+      "route": "/particula/examples/processes/coagulation/coagulation_3_particle_resolved_pattern/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/processes/coagulation/coagulation_4_compared.ipynb",
+      "route": "/particula/examples/processes/coagulation/coagulation_4_compared/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/processes/coagulation/coagulation_4_compared.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/processes/coagulation/coagulation_4_compared.ipynb"
+    },
+    {
+      "source": "docs/examples/processes/coagulation/coagulation_4_compared.py",
+      "route": "/particula/examples/processes/coagulation/coagulation_4_compared/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/processes/coagulation/coagulation_5_time_evolution.ipynb",
+      "route": "/particula/examples/processes/coagulation/coagulation_5_time_evolution/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/processes/coagulation/coagulation_5_time_evolution.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/processes/coagulation/coagulation_5_time_evolution.ipynb"
+    },
+    {
+      "source": "docs/examples/processes/coagulation/coagulation_5_time_evolution.py",
+      "route": "/particula/examples/processes/coagulation/coagulation_5_time_evolution/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/processes/coagulation/functional/coagulation_basic_1_pmf.ipynb",
+      "route": "/particula/examples/processes/coagulation/functional/coagulation_basic_1_pmf/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/processes/coagulation/functional/coagulation_basic_1_pmf.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/processes/coagulation/functional/coagulation_basic_1_pmf.ipynb"
+    },
+    {
+      "source": "docs/examples/processes/coagulation/functional/coagulation_basic_1_pmf.py",
+      "route": "/particula/examples/processes/coagulation/functional/coagulation_basic_1_pmf/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/processes/coagulation/functional/coagulation_basic_2_pdf.ipynb",
+      "route": "/particula/examples/processes/coagulation/functional/coagulation_basic_2_pdf/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/processes/coagulation/functional/coagulation_basic_2_pdf.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/processes/coagulation/functional/coagulation_basic_2_pdf.ipynb"
+    },
+    {
+      "source": "docs/examples/processes/coagulation/functional/coagulation_basic_2_pdf.py",
+      "route": "/particula/examples/processes/coagulation/functional/coagulation_basic_2_pdf/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/processes/coagulation/functional/coagulation_basic_3_compared.ipynb",
+      "route": "/particula/examples/processes/coagulation/functional/coagulation_basic_3_compared/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/processes/coagulation/functional/coagulation_basic_3_compared.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/processes/coagulation/functional/coagulation_basic_3_compared.ipynb"
+    },
+    {
+      "source": "docs/examples/processes/coagulation/functional/coagulation_basic_3_compared.py",
+      "route": "/particula/examples/processes/coagulation/functional/coagulation_basic_3_compared/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/processes/coagulation/functional/coagulation_basic_4_particleresolved.ipynb",
+      "route": "/particula/examples/processes/coagulation/functional/coagulation_basic_4_particleresolved/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/processes/coagulation/functional/coagulation_basic_4_particleresolved.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/processes/coagulation/functional/coagulation_basic_4_particleresolved.ipynb"
+    },
+    {
+      "source": "docs/examples/processes/coagulation/functional/coagulation_basic_4_particleresolved.py",
+      "route": "/particula/examples/processes/coagulation/functional/coagulation_basic_4_particleresolved/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/processes/condensation/condensation_1_bin.ipynb",
+      "route": "/particula/examples/processes/condensation/condensation_1_bin/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/processes/condensation/condensation_1_bin.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/processes/condensation/condensation_1_bin.ipynb"
+    },
+    {
+      "source": "docs/examples/processes/condensation/condensation_1_bin.py",
+      "route": "/particula/examples/processes/condensation/condensation_1_bin/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/processes/condensation/condensation_2_massbin.ipynb",
+      "route": "/particula/examples/processes/condensation/condensation_2_massbin/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/processes/condensation/condensation_2_massbin.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/processes/condensation/condensation_2_massbin.ipynb"
+    },
+    {
+      "source": "docs/examples/processes/condensation/condensation_2_massbin.py",
+      "route": "/particula/examples/processes/condensation/condensation_2_massbin/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/processes/condensation/condensation_3_massresolved.ipynb",
+      "route": "/particula/examples/processes/condensation/condensation_3_massresolved/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/processes/condensation/condensation_3_massresolved.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/processes/condensation/condensation_3_massresolved.ipynb"
+    },
+    {
+      "source": "docs/examples/processes/condensation/condensation_3_massresolved.py",
+      "route": "/particula/examples/processes/condensation/condensation_3_massresolved/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/processes/condensation/condensation_latent_heat.ipynb",
+      "route": "/particula/examples/processes/condensation/condensation_latent_heat/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/processes/condensation/condensation_latent_heat.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/processes/condensation/condensation_latent_heat.ipynb"
+    },
+    {
+      "source": "docs/examples/processes/condensation/condensation_latent_heat.py",
+      "route": "/particula/examples/processes/condensation/condensation_latent_heat/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/processes/condensation/staggered_condensation_example.ipynb",
+      "route": "/particula/examples/processes/condensation/staggered_condensation_example/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/processes/condensation/staggered_condensation_example.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/processes/condensation/staggered_condensation_example.ipynb"
+    },
+    {
+      "source": "docs/examples/processes/condensation/staggered_condensation_example.py",
+      "route": "/particula/examples/processes/condensation/staggered_condensation_example/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/processes/customization/adding_particles_during_simulation.ipynb",
+      "route": "/particula/examples/processes/customization/adding_particles_during_simulation/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/processes/customization/adding_particles_during_simulation.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/processes/customization/adding_particles_during_simulation.ipynb"
+    },
+    {
+      "source": "docs/examples/processes/customization/adding_particles_during_simulation.py",
+      "route": "/particula/examples/processes/customization/adding_particles_during_simulation/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/processes/dilution/cpu_dilution.py",
+      "route": "/particula/examples/processes/dilution/cpu_dilution/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/processes/index.md",
+      "route": "/particula/examples/processes/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/processes/nucleation/cpu_nucleation.py",
+      "route": "/particula/examples/processes/nucleation/cpu_nucleation/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/processes/nucleation/custom_nucleation_single_species.ipynb",
+      "route": "/particula/examples/processes/nucleation/custom_nucleation_single_species/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/processes/nucleation/custom_nucleation_single_species.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/processes/nucleation/custom_nucleation_single_species.ipynb"
+    },
+    {
+      "source": "docs/examples/processes/nucleation/custom_nucleation_single_species.py",
+      "route": "/particula/examples/processes/nucleation/custom_nucleation_single_species/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/processes/nucleation/index.md",
+      "route": "/particula/examples/processes/nucleation/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/processes/wall-loss/chamber_forward_simulation.ipynb",
+      "route": "/particula/examples/processes/wall-loss/chamber_forward_simulation/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/processes/wall-loss/chamber_forward_simulation.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/processes/wall-loss/chamber_forward_simulation.ipynb"
+    },
+    {
+      "source": "docs/examples/processes/wall-loss/chamber_forward_simulation.py",
+      "route": "/particula/examples/processes/wall-loss/chamber_forward_simulation/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/processes/wall-loss/index.md",
+      "route": "/particula/examples/processes/wall-loss/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/processes/wall-loss/rectangular_wall_loss_strategy.ipynb",
+      "route": "/particula/examples/processes/wall-loss/rectangular_wall_loss_strategy/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/processes/wall-loss/rectangular_wall_loss_strategy.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/processes/wall-loss/rectangular_wall_loss_strategy.ipynb"
+    },
+    {
+      "source": "docs/examples/processes/wall-loss/rectangular_wall_loss_strategy.py",
+      "route": "/particula/examples/processes/wall-loss/rectangular_wall_loss_strategy/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/processes/wall-loss/spherical_wall_loss_strategy.ipynb",
+      "route": "/particula/examples/processes/wall-loss/spherical_wall_loss_strategy/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/processes/wall-loss/spherical_wall_loss_strategy.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/processes/wall-loss/spherical_wall_loss_strategy.ipynb"
+    },
+    {
+      "source": "docs/examples/processes/wall-loss/spherical_wall_loss_strategy.py",
+      "route": "/particula/examples/processes/wall-loss/spherical_wall_loss_strategy/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/processes/wall-loss/wall_loss_builders_factory.ipynb",
+      "route": "/particula/examples/processes/wall-loss/wall_loss_builders_factory/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/processes/wall-loss/wall_loss_builders_factory.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/processes/wall-loss/wall_loss_builders_factory.ipynb"
+    },
+    {
+      "source": "docs/examples/processes/wall-loss/wall_loss_builders_factory.py",
+      "route": "/particula/examples/processes/wall-loss/wall_loss_builders_factory/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/processes/wall-loss/wall_loss_tutorial.ipynb",
+      "route": "/particula/examples/processes/wall-loss/wall_loss_tutorial/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/processes/wall-loss/wall_loss_tutorial.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/processes/wall-loss/wall_loss_tutorial.ipynb"
+    },
+    {
+      "source": "docs/examples/processes/wall-loss/wall_loss_tutorial.py",
+      "route": "/particula/examples/processes/wall-loss/wall_loss_tutorial/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/simulations/biomass_burning_cloud_interactions.ipynb",
+      "route": "/particula/examples/simulations/biomass_burning_cloud_interactions/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/simulations/biomass_burning_cloud_interactions.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/simulations/biomass_burning_cloud_interactions.ipynb"
+    },
+    {
+      "source": "docs/examples/simulations/biomass_burning_cloud_interactions.py",
+      "route": "/particula/examples/simulations/biomass_burning_cloud_interactions/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/simulations/cloud_chamber_multi_cycle.ipynb",
+      "route": "/particula/examples/simulations/cloud_chamber_multi_cycle/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/simulations/cloud_chamber_multi_cycle.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/simulations/cloud_chamber_multi_cycle.ipynb"
+    },
+    {
+      "source": "docs/examples/simulations/cloud_chamber_multi_cycle.py",
+      "route": "/particula/examples/simulations/cloud_chamber_multi_cycle/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/simulations/cloud_chamber_single_cycle.ipynb",
+      "route": "/particula/examples/simulations/cloud_chamber_single_cycle/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/simulations/cloud_chamber_single_cycle.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/simulations/cloud_chamber_single_cycle.ipynb"
+    },
+    {
+      "source": "docs/examples/simulations/cloud_chamber_single_cycle.py",
+      "route": "/particula/examples/simulations/cloud_chamber_single_cycle/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/simulations/cough_droplets_partitioning.ipynb",
+      "route": "/particula/examples/simulations/cough_droplets_partitioning/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/simulations/cough_droplets_partitioning.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/simulations/cough_droplets_partitioning.ipynb"
+    },
+    {
+      "source": "docs/examples/simulations/cough_droplets_partitioning.py",
+      "route": "/particula/examples/simulations/cough_droplets_partitioning/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/simulations/index.md",
+      "route": "/particula/examples/simulations/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/simulations/organic_partitioning_and_coagulation.ipynb",
+      "route": "/particula/examples/simulations/organic_partitioning_and_coagulation/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/simulations/organic_partitioning_and_coagulation.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/simulations/organic_partitioning_and_coagulation.ipynb"
+    },
+    {
+      "source": "docs/examples/simulations/organic_partitioning_and_coagulation.py",
+      "route": "/particula/examples/simulations/organic_partitioning_and_coagulation/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/simulations/soot_formation_in_flames.ipynb",
+      "route": "/particula/examples/simulations/soot_formation_in_flames/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/simulations/soot_formation_in_flames.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/simulations/soot_formation_in_flames.ipynb"
+    },
+    {
+      "source": "docs/examples/simulations/soot_formation_in_flames.py",
+      "route": "/particula/examples/simulations/soot_formation_in_flames/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/thermodynamics/activity/activity_tutorial.ipynb",
+      "route": "/particula/examples/thermodynamics/activity/activity_tutorial/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/thermodynamics/activity/activity_tutorial.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/thermodynamics/activity/activity_tutorial.ipynb"
+    },
+    {
+      "source": "docs/examples/thermodynamics/activity/activity_tutorial.py",
+      "route": "/particula/examples/thermodynamics/activity/activity_tutorial/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/thermodynamics/activity/bat_activity_example.ipynb",
+      "route": "/particula/examples/thermodynamics/activity/bat_activity_example/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/thermodynamics/activity/bat_activity_example.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/thermodynamics/activity/bat_activity_example.ipynb"
+    },
+    {
+      "source": "docs/examples/thermodynamics/activity/bat_activity_example.py",
+      "route": "/particula/examples/thermodynamics/activity/bat_activity_example/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/thermodynamics/activity/equilibria_example.ipynb",
+      "route": "/particula/examples/thermodynamics/activity/equilibria_example/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/thermodynamics/activity/equilibria_example.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/thermodynamics/activity/equilibria_example.ipynb"
+    },
+    {
+      "source": "docs/examples/thermodynamics/activity/equilibria_example.py",
+      "route": "/particula/examples/thermodynamics/activity/equilibria_example/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/thermodynamics/activity/ideal_activity_example.ipynb",
+      "route": "/particula/examples/thermodynamics/activity/ideal_activity_example/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/thermodynamics/activity/ideal_activity_example.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/thermodynamics/activity/ideal_activity_example.ipynb"
+    },
+    {
+      "source": "docs/examples/thermodynamics/activity/ideal_activity_example.py",
+      "route": "/particula/examples/thermodynamics/activity/ideal_activity_example/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/thermodynamics/activity/index.md",
+      "route": "/particula/examples/thermodynamics/activity/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/thermodynamics/activity/kappa_activity_example.ipynb",
+      "route": "/particula/examples/thermodynamics/activity/kappa_activity_example/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/thermodynamics/activity/kappa_activity_example.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/thermodynamics/activity/kappa_activity_example.ipynb"
+    },
+    {
+      "source": "docs/examples/thermodynamics/activity/kappa_activity_example.py",
+      "route": "/particula/examples/thermodynamics/activity/kappa_activity_example/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/thermodynamics/equilibria/activity_part1.ipynb",
+      "route": "/particula/examples/thermodynamics/equilibria/activity_part1/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/thermodynamics/equilibria/activity_part1.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/thermodynamics/equilibria/activity_part1.ipynb"
+    },
+    {
+      "source": "docs/examples/thermodynamics/equilibria/activity_part1.py",
+      "route": "/particula/examples/thermodynamics/equilibria/activity_part1/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/thermodynamics/equilibria/equilibria_part1.ipynb",
+      "route": "/particula/examples/thermodynamics/equilibria/equilibria_part1/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/thermodynamics/equilibria/equilibria_part1.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/thermodynamics/equilibria/equilibria_part1.ipynb"
+    },
+    {
+      "source": "docs/examples/thermodynamics/equilibria/equilibria_part1.py",
+      "route": "/particula/examples/thermodynamics/equilibria/equilibria_part1/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/thermodynamics/equilibria/index.md",
+      "route": "/particula/examples/thermodynamics/equilibria/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/thermodynamics/index.md",
+      "route": "/particula/examples/thermodynamics/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/thermodynamics/particle-properties/activity_functions.ipynb",
+      "route": "/particula/examples/thermodynamics/particle-properties/activity_functions/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/thermodynamics/particle-properties/activity_functions.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/thermodynamics/particle-properties/activity_functions.ipynb"
+    },
+    {
+      "source": "docs/examples/thermodynamics/particle-properties/activity_functions.py",
+      "route": "/particula/examples/thermodynamics/particle-properties/activity_functions/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/thermodynamics/particle-properties/activity_tutorial.ipynb",
+      "route": "/particula/examples/thermodynamics/particle-properties/activity_tutorial/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/thermodynamics/particle-properties/activity_tutorial.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/thermodynamics/particle-properties/activity_tutorial.ipynb"
+    },
+    {
+      "source": "docs/examples/thermodynamics/particle-properties/activity_tutorial.py",
+      "route": "/particula/examples/thermodynamics/particle-properties/activity_tutorial/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/examples/thermodynamics/particle-properties/particle_surface_tutorial.ipynb",
+      "route": "/particula/examples/thermodynamics/particle-properties/particle_surface_tutorial/",
+      "kind": "notebook-original",
+      "replacement": "docs/examples/thermodynamics/particle-properties/particle_surface_tutorial.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/examples/thermodynamics/particle-properties/particle_surface_tutorial.ipynb"
+    },
+    {
+      "source": "docs/examples/thermodynamics/particle-properties/particle_surface_tutorial.py",
+      "route": "/particula/examples/thermodynamics/particle-properties/particle_surface_tutorial/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/guide/ai-assistants/claude.md",
+      "route": "/particula/guide/ai-assistants/claude/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/guide/ai-assistants/codex.md",
+      "route": "/particula/guide/ai-assistants/codex/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/guide/ai-assistants/index.md",
+      "route": "/particula/guide/ai-assistants/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/guide/ai-assistants/opencode.md",
+      "route": "/particula/guide/ai-assistants/opencode/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/guide/data-model/construction.md",
+      "route": "/particula/guide/data-model/construction/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/guide/data-model/field-ownership.md",
+      "route": "/particula/guide/data-model/field-ownership/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/guide/data-model/index.md",
+      "route": "/particula/guide/data-model/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/guide/data-model/ownership.md",
+      "route": "/particula/guide/data-model/ownership/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/guide/getting-started/first-simulation.md",
+      "route": "/particula/guide/getting-started/first-simulation/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/guide/getting-started/installation/conda.md",
+      "route": "/particula/guide/getting-started/installation/conda/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/guide/getting-started/installation/index.md",
+      "route": "/particula/guide/getting-started/installation/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/guide/getting-started/installation/new-to-python.md",
+      "route": "/particula/guide/getting-started/installation/new-to-python/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/guide/getting-started/installation/pip.md",
+      "route": "/particula/guide/getting-started/installation/pip/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/guide/getting-started/installation/uv.md",
+      "route": "/particula/guide/getting-started/installation/uv/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/guide/gpu/backend-selection.md",
+      "route": "/particula/guide/gpu/backend-selection/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/guide/gpu/direct/coagulation-configuration.md",
+      "route": "/particula/guide/gpu/direct/coagulation-configuration/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/guide/gpu/direct/coagulation.md",
+      "route": "/particula/guide/gpu/direct/coagulation/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/guide/gpu/direct/condensation-configuration.md",
+      "route": "/particula/guide/gpu/direct/condensation-configuration/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/guide/gpu/direct/condensation.md",
+      "route": "/particula/guide/gpu/direct/condensation/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/guide/gpu/direct/dilution-and-wall-loss.md",
+      "route": "/particula/guide/gpu/direct/dilution-and-wall-loss/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/guide/gpu/execution.md",
+      "route": "/particula/guide/gpu/execution/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/guide/gpu/index.md",
+      "route": "/particula/guide/gpu/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/guide/gpu/resident/checkpoints.md",
+      "route": "/particula/guide/gpu/resident/checkpoints/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/guide/gpu/resident/graph-capture.md",
+      "route": "/particula/guide/gpu/resident/graph-capture/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/guide/gpu/slot-exhaustion.md",
+      "route": "/particula/guide/gpu/slot-exhaustion/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/guide/gpu/slots.md",
+      "route": "/particula/guide/gpu/slots/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/guide/gpu/support.md",
+      "route": "/particula/guide/gpu/support/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/guide/gpu/transfers.md",
+      "route": "/particula/guide/gpu/transfers/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/guide/gpu/troubleshooting.md",
+      "route": "/particula/guide/gpu/troubleshooting/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/guide/index.md",
+      "route": "/particula/guide/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/guide/migration/v0.3.0/construction.md",
+      "route": "/particula/guide/migration/v0.3.0/construction/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/guide/migration/v0.3.0/containers.md",
+      "route": "/particula/guide/migration/v0.3.0/containers/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/guide/migration/v0.3.0/dynamics.md",
+      "route": "/particula/guide/migration/v0.3.0/dynamics/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/guide/migration/v0.3.0/index.md",
+      "route": "/particula/guide/migration/v0.3.0/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/guide/migration/v0.3.0/troubleshooting.md",
+      "route": "/particula/guide/migration/v0.3.0/troubleshooting/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/guide/processes/activity.md",
+      "route": "/particula/guide/processes/activity/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/guide/processes/coagulation.md",
+      "route": "/particula/guide/processes/coagulation/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/guide/processes/condensation.md",
+      "route": "/particula/guide/processes/condensation/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/guide/processes/dilution.md",
+      "route": "/particula/guide/processes/dilution/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/guide/processes/index.md",
+      "route": "/particula/guide/processes/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/guide/processes/nucleation.md",
+      "route": "/particula/guide/processes/nucleation/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/guide/processes/wall-loss.md",
+      "route": "/particula/guide/processes/wall-loss/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/index.md",
+      "route": "/particula/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/theory/dynamics/cloud-droplet-coagulation/dns-fluid-and-particle-properties-comparison.ipynb",
+      "route": "/particula/theory/dynamics/cloud-droplet-coagulation/dns-fluid-and-particle-properties-comparison/",
+      "kind": "notebook-original",
+      "replacement": "docs/theory/dynamics/cloud-droplet-coagulation/dns-fluid-and-particle-properties-comparison.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/theory/dynamics/cloud-droplet-coagulation/dns-fluid-and-particle-properties-comparison.ipynb"
+    },
+    {
+      "source": "docs/theory/dynamics/cloud-droplet-coagulation/dns-fluid-and-particle-properties-comparison.py",
+      "route": "/particula/theory/dynamics/cloud-droplet-coagulation/dns-fluid-and-particle-properties-comparison/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/theory/dynamics/cloud-droplet-coagulation/dns-horizontal-velocity-comparison.ipynb",
+      "route": "/particula/theory/dynamics/cloud-droplet-coagulation/dns-horizontal-velocity-comparison/",
+      "kind": "notebook-original",
+      "replacement": "docs/theory/dynamics/cloud-droplet-coagulation/dns-horizontal-velocity-comparison.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/theory/dynamics/cloud-droplet-coagulation/dns-horizontal-velocity-comparison.ipynb"
+    },
+    {
+      "source": "docs/theory/dynamics/cloud-droplet-coagulation/dns-horizontal-velocity-comparison.py",
+      "route": "/particula/theory/dynamics/cloud-droplet-coagulation/dns-horizontal-velocity-comparison/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/theory/dynamics/cloud-droplet-coagulation/dns-kernel-comparison.ipynb",
+      "route": "/particula/theory/dynamics/cloud-droplet-coagulation/dns-kernel-comparison/",
+      "kind": "notebook-original",
+      "replacement": "docs/theory/dynamics/cloud-droplet-coagulation/dns-kernel-comparison.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/theory/dynamics/cloud-droplet-coagulation/dns-kernel-comparison.ipynb"
+    },
+    {
+      "source": "docs/theory/dynamics/cloud-droplet-coagulation/dns-kernel-comparison.py",
+      "route": "/particula/theory/dynamics/cloud-droplet-coagulation/dns-kernel-comparison/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/theory/dynamics/cloud-droplet-coagulation/dns-radial-distribution-comparison.ipynb",
+      "route": "/particula/theory/dynamics/cloud-droplet-coagulation/dns-radial-distribution-comparison/",
+      "kind": "notebook-original",
+      "replacement": "docs/theory/dynamics/cloud-droplet-coagulation/dns-radial-distribution-comparison.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/theory/dynamics/cloud-droplet-coagulation/dns-radial-distribution-comparison.ipynb"
+    },
+    {
+      "source": "docs/theory/dynamics/cloud-droplet-coagulation/dns-radial-distribution-comparison.py",
+      "route": "/particula/theory/dynamics/cloud-droplet-coagulation/dns-radial-distribution-comparison/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/theory/dynamics/cloud-droplet-coagulation/dns-radial-relative-velocity-comparison.ipynb",
+      "route": "/particula/theory/dynamics/cloud-droplet-coagulation/dns-radial-relative-velocity-comparison/",
+      "kind": "notebook-original",
+      "replacement": "docs/theory/dynamics/cloud-droplet-coagulation/dns-radial-relative-velocity-comparison.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/theory/dynamics/cloud-droplet-coagulation/dns-radial-relative-velocity-comparison.ipynb"
+    },
+    {
+      "source": "docs/theory/dynamics/cloud-droplet-coagulation/dns-radial-relative-velocity-comparison.py",
+      "route": "/particula/theory/dynamics/cloud-droplet-coagulation/dns-radial-relative-velocity-comparison/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/theory/dynamics/cloud-droplet-coagulation/droplet-coagulation-kernel-ayala2008.md",
+      "route": "/particula/theory/dynamics/cloud-droplet-coagulation/droplet-coagulation-kernel-ayala2008/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/theory/dynamics/cloud-droplet-coagulation/index.md",
+      "route": "/particula/theory/dynamics/cloud-droplet-coagulation/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/theory/dynamics/condensation-equations.md",
+      "route": "/particula/theory/dynamics/condensation-equations/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/theory/dynamics/ionparticle-coagulation.ipynb",
+      "route": "/particula/theory/dynamics/ionparticle-coagulation/",
+      "kind": "notebook-original",
+      "replacement": "docs/theory/dynamics/ionparticle-coagulation.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/theory/dynamics/ionparticle-coagulation.ipynb"
+    },
+    {
+      "source": "docs/theory/dynamics/ionparticle-coagulation.py",
+      "route": "/particula/theory/dynamics/ionparticle-coagulation/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/theory/dynamics/nucleation-equations.md",
+      "route": "/particula/theory/dynamics/nucleation-equations/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/theory/index.md",
+      "route": "/particula/theory/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/theory/properties/dynamic-viscosity.ipynb",
+      "route": "/particula/theory/properties/dynamic-viscosity/",
+      "kind": "notebook-original",
+      "replacement": "docs/theory/properties/dynamic-viscosity.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/theory/properties/dynamic-viscosity.ipynb"
+    },
+    {
+      "source": "docs/theory/properties/dynamic-viscosity.py",
+      "route": "/particula/theory/properties/dynamic-viscosity/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/theory/properties/mean-free-path.ipynb",
+      "route": "/particula/theory/properties/mean-free-path/",
+      "kind": "notebook-original",
+      "replacement": "docs/theory/properties/mean-free-path.py",
+      "archive": ".trash/mkdocs-starlight-2026-11-13/docs/theory/properties/mean-free-path.ipynb"
+    },
+    {
+      "source": "docs/theory/properties/mean-free-path.py",
+      "route": "/particula/theory/properties/mean-free-path/",
+      "kind": "python",
+      "replacement": null
+    },
+    {
+      "source": "docs/theory/thermodynamics/activity-theory.md",
+      "route": "/particula/theory/thermodynamics/activity-theory/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/theory/thermodynamics/equilibria-theory.md",
+      "route": "/particula/theory/thermodynamics/equilibria-theory/",
+      "kind": "narrative",
+      "replacement": null
+    },
+    {
+      "source": "docs/theory/thermodynamics/index.md",
+      "route": "/particula/theory/thermodynamics/",
+      "kind": "narrative",
+      "replacement": null
+    }
+  ]
+}
