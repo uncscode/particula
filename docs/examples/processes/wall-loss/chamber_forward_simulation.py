@@ -27,7 +27,7 @@
 
 # %%
 # In Colab uncomment the following command to install particula:
-# Use the v0.3.0 development checkout: `python -m pip install -e ".[extra]"`
+# Install from the repository root: `python -m pip install -e ".[extra]"`
 import numpy as np
 import particula as par
 from matplotlib import pyplot as plt

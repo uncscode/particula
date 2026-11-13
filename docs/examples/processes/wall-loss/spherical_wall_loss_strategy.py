@@ -41,12 +41,12 @@
 # In Google Colab you can install particula with:
 #
 # ```bash
-# Use the v0.3.0 development checkout: `python -m pip install -e ".[extra]"`
+# Install from the repository root: `python -m pip install -e ".[extra]"`
 # ```
 
 # %%
 # If running in Colab, uncomment the next line to install particula:
-# Use the v0.3.0 development checkout: `python -m pip install -e ".[extra]"`
+# Install from the repository root: `python -m pip install -e ".[extra]"`
 
 import numpy as np
 import particula as par

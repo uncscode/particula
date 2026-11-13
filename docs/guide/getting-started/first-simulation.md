@@ -2,8 +2,7 @@
 
 
 This native single-box example initializes a lognormal PMF and performs one
-10-second condensation step. Use the v0.3.0 development checkout (`pip install -e .`);
-older published wheels need not contain these migration APIs. The retained
+10-second condensation step. The retained
 100 kg/m³ vapor concentration is an exaggerated illustration, not a calibrated
 atmospheric case or an accuracy/convergence claim.
 

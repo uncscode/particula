@@ -22,7 +22,7 @@
 # ## Prerequisites
 #
 # - Python 3.12+
-# Use the v0.3.0 development checkout: `python -m pip install -e ".[extra]"`
+# Install from the repository root: `python -m pip install -e ".[extra]"`
 # - NumPy included with `particula` for sample particle presets
 
 # %%

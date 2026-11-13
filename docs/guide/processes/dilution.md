@@ -50,7 +50,7 @@ PMF storage holds bin number density (m⁻³), and PDF storage holds `dn/dr`
 (m⁻⁴). All receive the same multiplicative decay at fixed volume. All lanes of
 the unified `GasData.concentration` (kg/m³) decay, regardless of partitioning.
 The native runnable supports one box; storage shapes do not imply multi-box
-transport support. Use the v0.3.0 development checkout (`pip install -e .`).
+transport support.
 
 ## Execution, validation, and recovery
 

@@ -4,8 +4,7 @@ This guide describes native construction used by the supported migrated
 examples. Native CPU processes and runnables consume these held containers;
 see [dynamics migration](../migration/v0.3.0/dynamics.md) for configuration and single-box limits.
 The [access walkthrough](ownership.md) demonstrates executable replacement and
-rejection checks. Use the v0.3.0 development checkout, not an assumed older
-published package. See also [container foundations](index.md).
+rejection checks. See also [container foundations](index.md).
 
 ## Assemble three containers
 

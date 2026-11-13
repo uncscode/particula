@@ -1,8 +1,6 @@
 # Guide
 
 Start with a small CPU simulation, then choose a process or execution path.
-These guides describe the v0.3.0 native development API; follow the checkout
-instructions when your installed release predates it.
 
 ## Start here
 

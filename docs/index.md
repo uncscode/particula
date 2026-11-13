@@ -9,10 +9,6 @@ hide:
 Particula is a Python library for aerosol simulation: construct particle and gas
 state, configure physical processes, and study how a population evolves.
 
-These docs describe the **v0.3.0 native development API**. Use the matching
-checkout for the examples; an older published wheel may expose a different API.
-Documentation availability does not announce release approval.
-
 [Start here](guide/index.md){ .md-button .md-button--primary }
 [Browse examples](examples/index.md){ .md-button }
 

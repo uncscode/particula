@@ -1,6 +1,6 @@
 # GPU examples
 
-Run these sources from the repository root after installing the v0.3.0 checkout
+Run these sources from the repository root after installing Particula
 and optional Warp support. Read the [GPU guide](../../guide/gpu/index.md) first.
 Warp CPU is the baseline for the direct and uncaptured resident examples;
 graph capture requires native CUDA and does not fall back to CPU.
