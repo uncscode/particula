@@ -71,3 +71,9 @@ pytest particula/gpu/kernels/tests/coagulation_test.py -q -Werror
 
 Missing Warp or unavailable CUDA is valid only when an existing guarded test
 skips. A skip is not CPU/Warp or CUDA parity evidence.
+
+## Historical performance context
+
+[Recorded coagulation benchmark evidence](coagulation-benchmarks.md) describes
+a dated, machine-specific tradeoff. It is separate from the physics validation
+above and from current resident/capture qualification.

@@ -214,7 +214,7 @@ orchestration, expanded physics, graph capture, autodiff, and performance
 guarantees. Fixed-slot management fixed-slot activation, slot exhaustion primitives, and CPU nucleation are dependencies; direct-process integration is only a downstream explicit-transfer
 integration consumer. See the [equations](../../theory/dynamics/nucleation-equations.md),
 [direct example](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/direct/gpu_direct_nucleation.py), and
-[GPU roadmap](../../Features/Roadmap/data-oriented-gpu.md).
+[GPU roadmap](../../contribute/roadmap.md).
 
 Focused validation:
 

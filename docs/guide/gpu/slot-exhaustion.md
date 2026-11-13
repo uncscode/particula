@@ -204,7 +204,7 @@ scalar status readbacks. They do not establish a loop that invokes a policy
 before exhaustion.
 
 For the delivered-versus-deferred GPU roadmap, see
-[Data-Oriented GPU Roadmap](../../Features/Roadmap/data-oriented-gpu.md).
+[Current roadmap](../../contribute/roadmap.md).
 
 ## Focused validation
 

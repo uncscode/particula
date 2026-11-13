@@ -48,3 +48,6 @@ with a process tutorial before adapting a full chamber or atmospheric case.
 The fundamentals and process indexes above are the tutorial entry points. For
 underlying equations, use [Theory](../theory/index.md); for support boundaries,
 use the [Guide](../guide/index.md).
+
+[Choose a thermodynamics learning objective](thermodynamics/index.md) to compare
+activity strategies, mixing functions, and equilibrium calculations.

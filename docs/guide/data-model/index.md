@@ -34,7 +34,7 @@ Use this guide when you need the current contract for:
 For migration walkthroughs and before/after examples, see
 [Particle & Gas Data Migration](../migration/v0.3.0/index.md). For future work
 and planned expansions, see the
-[Data-Oriented Design and GPU Roadmap](../../Features/Roadmap/data-oriented-gpu.md).
+[Pending initial-state optimization](../../contribute/roadmap.md).
 
 The Python snippets in each walkthrough share imports and state in page order.
 Slot examples continue the container construction shown here; follow the
@@ -375,7 +375,7 @@ runtime regression command is
 
 - [Data Containers example](../../examples/fundamentals/data-containers.md)
 - [Particle & Gas Data Migration](../migration/v0.3.0/index.md)
-- [Data-Oriented Design and GPU Roadmap](../../Features/Roadmap/data-oriented-gpu.md)
+- [Pending initial-state optimization](../../contribute/roadmap.md)
 - [Mass Precision Recommendation Report](../../contribute/validation/numerics/mass-precision.md)
 
 ## Related execution guides
@@ -385,3 +385,5 @@ runtime regression command is
 - [Execution and resident scheduling](../gpu/execution.md)
 - [Support boundaries](../gpu/support.md)
 - [Troubleshooting](../gpu/troubleshooting.md)
+
+- [Field ownership and transfer policy](field-ownership.md)

@@ -131,8 +131,7 @@ nav:
     - Condensation Strategy System: guide/processes/condensation.md
     - Data Containers and GPU Foundations: guide/data-model/index.md
     - Dilution Strategy System: guide/processes/dilution.md
-    - Process and execution guides: guide/processes/catalog.md
-    - Native scientific process calls: guide/processes/index.md
+    - Process and execution guides: guide/processes/index.md
     - Nucleation Strategy System: guide/processes/nucleation.md
     - Wall Loss Strategy System: guide/processes/wall-loss.md
   - GPU execution:
@@ -246,7 +245,6 @@ nav:
     - ionparticle coagulation: theory/dynamics/ionparticle-coagulation.ipynb
     - dynamic viscosity: theory/properties/dynamic-viscosity.ipynb
     - mean free path: theory/properties/mean-free-path.ipynb
-    - Technical: Theory/Technical/index.md
 - API: https://uncscode.github.io/particula/API/
 - Contribute:
   - Contribute: contribute/index.md
@@ -261,28 +259,18 @@ nav:
     - GPU Coagulation Validation Record: contribute/validation/gpu/coagulation.md
     - Condensation Parity Walkthrough Ownership Record: contribute/validation/gpu/condensation-parity.md
     - Condensation Stiffness Study and Recommendation Record: contribute/validation/numerics/condensation-stiffness.md
-    - Native API migration closeout: contribute/validation/releases/v0.3.0.md
-    - Data-Oriented Design and GPU Roadmap: Features/Roadmap/data-oriented-gpu.md
-    - Epic H graph-capture closeout record: Features/Roadmap/graph-capture-closeout.md
-    - Feature Roadmap: Features/Roadmap/index.md
+    - v0.3.0 validation: contribute/validation/releases/v0.3.0.md
+    - Pending optimization: contribute/roadmap.md
+    - Graph-capture qualification: contribute/validation/gpu/graph-capture-qualification.md
     - Mass Precision Recommendation Report: contribute/validation/numerics/mass-precision.md
     - 'Warp Autodiff: Limitations and Stochastic Process Handling': contribute/architecture/warp/autodiff-limitations.md
     - GPU graph-capture profiling record: contribute/validation/gpu/graph-capture-profiling.md
     - Resident benchmark and memory-budget record: contribute/validation/gpu/resident-benchmarks.md
-  - Accelerating Python:
-    - One-line Vision — historical proposal: Theory/Accelerating_Python/Details/One-Line_Vision.md
-    - Taichi Exploration: Theory/Accelerating_Python/Details/Taichi_Exploration.ipynb
-    - Accelerating Python: Theory/Accelerating_Python/index.md
   - Code Concepts:
     - Particula Design: contribute/architecture/design-patterns.md
     - Object‑Oriented Patterns: contribute/architecture/object-oriented-patterns.md
     - WARMED Code: contribute/architecture/warmed-principle.md
     - Code Concepts: contribute/architecture/index.md
-  - OpenAI Models:
-    - Agents: Theory/OpenAI_Models/Models/Agents.md
-    - Chat: Theory/OpenAI_Models/Models/Chat.md
-    - Reasoning: Theory/OpenAI_Models/Models/Reasoning.md
-    - OpenAI Models: Theory/OpenAI_Models/index.md
   - nvidia-warp:
     - Data Structures for Aerosol Simulation: contribute/architecture/warp/datastructures.md
     - Aerosol Dynamics with NVIDIA Warp: contribute/architecture/warp/teaching/fluids.md

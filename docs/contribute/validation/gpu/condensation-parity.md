@@ -17,24 +17,19 @@ parity, or general CPU workflow parity. The
 [fixed-four direct-kernel evidence boundary](../numerics/condensation-stiffness.md#production-hook-evidence-boundary)
 states the related production-hook evidence limit.
 
-## Deferred capability ownership
+## Scope boundaries and current owners
 
-| Deferred capability | Downstream owner | Entry gate | independent condensation walkthrough non-claim |
-| --- | --- | --- | --- |
-| thermal_work consumption | Future approved condensation numerical-method work | An approved numerical-method plan and numerical/validation contract are required. | thermal_work consumption is outside the walkthrough/independent condensation walkthrough scope. |
-| temperature feedback | Future approved condensation numerical-method work | An approved numerical-method plan and numerical/validation contract are required. | temperature feedback is outside the walkthrough/independent condensation walkthrough scope. |
-| adaptive stepping | Future approved condensation numerical-method work | An approved numerical-method plan and numerical/validation contract are required. | adaptive stepping is outside the walkthrough/independent condensation walkthrough scope. |
-| backend selection | Epic G | Backend-selection and GPU-resident integration work is required. | backend selection is outside the walkthrough/independent condensation walkthrough scope. |
-| high-level Aerosol/Runnable integration | Epic G | Backend-selection and GPU-resident integration work is required. | high-level Aerosol/Runnable integration is outside the walkthrough/independent condensation walkthrough scope. |
-| GPU-resident/full-workflow coupling | Epic G | Backend-selection and GPU-resident integration work is required. | GPU-resident/full-workflow coupling is outside the walkthrough/independent condensation walkthrough scope. |
-| general CPU workflow/strategy parity | Epic G | Backend-selection and GPU-resident integration work is required. | general CPU workflow/strategy parity is outside the walkthrough/independent condensation walkthrough scope. |
-| graph capture/replay | Epic H | Graph-capturable stable-shape loop validation and capture/performance exit work are required. | graph capture/replay is outside the walkthrough/independent condensation walkthrough scope. |
-| host-validation/capture separation | Epic H | Graph-capturable stable-shape loop validation and capture/performance exit work are required. | host-validation/capture separation is outside the walkthrough/independent condensation walkthrough scope. |
-| performance/benchmarking | Epic H | Benchmark/memory-budget exit work is required. | performance/benchmarking is outside the walkthrough/independent condensation walkthrough scope. |
-| memory-budget work | Epic H | Benchmark/memory-budget exit work is required. | memory-budget work is outside the walkthrough/independent condensation walkthrough scope. |
-| broad state/multi-step autodiff | Epic I | Differentiability and gradient-validation work is required; it is distinct from the shipped raw-rate interior probe. | broad state/multi-step autodiff is outside the walkthrough/independent condensation walkthrough scope. |
-| phase-aware surface tension | Approved condensation-physics expansion | An approved plan and physics-validation contract are required. | phase-aware surface tension is outside the walkthrough/independent condensation walkthrough scope. |
-| BAT activity | Approved condensation-physics expansion | An approved plan and physics-validation contract are required. | BAT activity is outside the walkthrough/independent condensation walkthrough scope. |
+This walkthrough establishes direct fixed-four-substep kernel evidence only.
+It does not qualify the following independent paths:
+
+| Capability | Canonical owner and evidence requirement |
+| --- | --- |
+| `thermal_work` consumption, temperature feedback, adaptive stepping | Future approved numerical-method work with its own numerical/validation contract |
+| Backend selection, native/runnable integration, resident loops | [Execution](../../../guide/gpu/execution.md); use its explicit supported paths and separate tests, without inferring general CPU-strategy parity |
+| Graph capture and host-validation separation | [Graph-capture runbook](../../../guide/gpu/resident/graph-capture.md); capture qualification requires separate evidence |
+| Performance and memory budget | [Resident benchmarks](resident-benchmarks.md) and [qualification gates](graph-capture-qualification.md); no reviewed measurement is supplied by the walkthrough |
+| Broad state/multi-step autodiff | [Pending initial-state optimization](../../roadmap.md); distinct from the bounded raw-rate interior probe |
+| Phase-aware surface tension and BAT activity in the direct kernel | Future approved physics expansion and validation contract |
 
 ## Focused reproduction commands
 
@@ -46,11 +41,3 @@ pytest particula/gpu/kernels/tests/condensation_stiffness_test.py -q -Werror
 pytest particula/gpu/kernels/tests/condensation_graph_capture_test.py -q -Werror
 pytest particula/gpu/kernels/tests/condensation_autodiff_test.py -q -Werror
 ```
-
-## Downstream roadmap owners
-
-Deferred integration and workflow work belongs to [Epic G](../../../Features/Roadmap/data-oriented-gpu.md#epic-g-backend-selection-and-gpu-resident-simulation).
-Capture, validation separation, and performance work belong to
-[Epic H](../../../Features/Roadmap/data-oriented-gpu.md#epic-h-graph-capture-and-performance). Broad
-state autodiff belongs to
-[Epic I](../../../Features/Roadmap/data-oriented-gpu.md#epic-i-differentiability-and-global-optimization).

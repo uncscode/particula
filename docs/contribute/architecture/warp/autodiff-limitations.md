@@ -1,7 +1,7 @@
 # Warp Autodiff: Limitations and Stochastic Process Handling
 
 Reference notes for the differentiable-simulation goal in the
-[Data-Oriented Design and GPU Roadmap](../../../Features/Roadmap/data-oriented-gpu.md#epic-i-differentiability-and-global-optimization).
+[Pending initial-state optimization](../../roadmap.md#differentiability-and-initial-state-optimization-epic-i).
 
 For the shipped container, transfer, and runnable-example baseline that this
 follow-on differentiability work builds on, start with the
@@ -459,7 +459,7 @@ The essential Warp patterns are reproduced inline in
 used without internet access. The external links below are for optional
 follow-up only and are not required to implement the guidance here.
 
-- Roadmap: [Data-Oriented Design and GPU Roadmap](../../../Features/Roadmap/data-oriented-gpu.md)
+- Roadmap: [Pending initial-state optimization](../../roadmap.md)
 - Warp version referenced: 1.14 (`warp-lang`). Verify against the installed
   version with `python -c "import warp; print(warp.__version__)"`, since autodiff
   behavior can change between releases.
