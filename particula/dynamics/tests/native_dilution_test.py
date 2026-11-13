@@ -37,7 +37,7 @@ def test_native_all_gas_decay_and_measure_correct_rate(kind, volume, mask):
     old_gas = aerosol.gas.concentration.copy()
     process = Dilution(DilutionStrategy(0.25))
     np.testing.assert_allclose(
-        process.rate(aerosol), -0.25 * old_counts[0] / volume, rtol=1e-15
+        process.rate(aerosol), -0.25 * old_counts / volume, rtol=1e-15
     )
     assert process.execute(aerosol, 4.0, 4) is aerosol
     np.testing.assert_allclose(
@@ -93,7 +93,11 @@ def test_failed_later_substep_restores_its_entry_and_keeps_prior_commit(
     before_gas = aerosol.gas.concentration.copy()
 
     def write(target, values):
-        calls.append(target)
+        if (
+            target is aerosol.particles.concentration
+            or target is aerosol.gas.concentration
+        ):
+            calls.append(target)
         original(target, values)
         if len(calls) == 4:
             raise error

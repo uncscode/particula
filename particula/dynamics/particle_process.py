@@ -4,7 +4,8 @@ Includes condensation and evaporation, coagulation, wall loss, dilution, and
 the CPU-only single-box nucleation process.
 """
 
-from dataclasses import dataclass, fields
+from copy import copy, deepcopy
+from dataclasses import dataclass, fields, replace
 from numbers import Integral, Real
 from typing import Any, Protocol, cast
 
@@ -229,7 +230,106 @@ class NucleationCommitConfig:
             )
 
 
-class Nucleation(RunnableABC):
+class _NativeBatchRunnable(RunnableABC):
+    """Bind native single-box strategies to the shared batch transaction."""
+
+    _strategy_attribute = None
+    _namespace = ""
+
+    def _writer_fields(self, aerosol):
+        writers = ["particles.concentration"]
+        resolved = aerosol.particles.distribution_type == "particle_resolved"
+        if self._namespace in ("condensation", "nucleation") or (
+            resolved and self._namespace in ("coagulation", "wall_loss")
+        ):
+            writers.extend(["particles.masses", "particles.charge"])
+        if self._namespace in ("condensation", "dilution", "nucleation"):
+            if self._namespace != "condensation" or getattr(
+                self.condensation_strategy, "update_gases", True
+            ):
+                writers.append("gas.concentration")
+        if self._namespace == "nucleation":
+            writers.append("particles.volume")
+        return tuple(writers)
+
+    def _validate_batch(self, aerosol):
+        if self._namespace == "nucleation":
+            for name in ("requested_scale", "minimum_scale", "minimum_volume"):
+                if getattr(self.commit_config, name).shape != (
+                    aerosol.particles.n_boxes,
+                ):
+                    raise ValueError(f"{name} must have one entry per box")
+
+    def _is_stochastic(self, aerosol):
+        if self._namespace in ("coagulation", "wall_loss"):
+            return aerosol.particles.distribution_type == "particle_resolved"
+        if self._namespace == "condensation":
+            strategy = self.condensation_strategy
+            return getattr(strategy, "theta_mode", None) == "random" or getattr(
+                strategy, "shuffle_each_step", False
+            )
+        return False
+
+    def _box_worker(self, box, boxes, transaction):
+        worker = copy(self)
+        if self._strategy_attribute is not None:
+            original = getattr(self, self._strategy_attribute)
+            strategy = copy(original)
+            for name in ("random_generator", "random_state"):
+                if hasattr(original, name):
+                    value = getattr(original, name)
+                    setattr(strategy, name, deepcopy(value))
+                    if transaction is not None:
+                        setattr(
+                            strategy,
+                            name,
+                            transaction.generator(self._namespace, box),
+                        )
+            setattr(worker, self._strategy_attribute, strategy)
+        if self._namespace == "nucleation":
+            worker.commit_config = replace(
+                self.commit_config,
+                **{
+                    name: getattr(self.commit_config, name)[box : box + 1]
+                    for name in (
+                        "requested_scale",
+                        "minimum_scale",
+                        "minimum_volume",
+                    )
+                },
+            )
+        return worker
+
+    def _commit_workers(self, workers, uses_context):
+        if self._strategy_attribute is None:
+            return
+        original = getattr(self, self._strategy_attribute)
+        if len(workers) == 1 and not uses_context:
+            staged = getattr(workers[0], self._strategy_attribute)
+            for name in ("random_generator", "random_state"):
+                value = getattr(original, name, None)
+                updated = getattr(staged, name, None)
+                if isinstance(value, np.random.Generator):
+                    value.bit_generator.state = updated.bit_generator.state
+                elif isinstance(value, np.random.RandomState):
+                    value.set_state(updated.get_state())
+        if hasattr(original, "last_latent_heat_energy"):
+            energies = np.asarray(
+                [
+                    getattr(
+                        worker, self._strategy_attribute
+                    ).last_latent_heat_energy
+                    for worker in workers
+                ],
+                dtype=np.float64,
+            )
+            self.last_latent_heat_energy = energies
+            original.last_latent_heat_energy = (
+                float(energies[0]) if len(workers) == 1 else None
+            )
+
+
+class Nucleation(_NativeBatchRunnable):
     """Apply mapped single-box nucleation to a native resolved population.
 
     Source rates and demand planning finalization use densities. The commit
@@ -238,6 +338,10 @@ class Nucleation(RunnableABC):
     attempted substep is atomic; earlier successful substeps remain applied.
     Gas and environment are read from the currently held aerosol every time.
     """
+
+    _strategy_attribute = None
+    _namespace = "nucleation"
+    _maximum_sub_steps = _MAX_NUCLEATION_SUB_STEPS
 
     def __init__(
         self,
@@ -312,12 +416,12 @@ class Nucleation(RunnableABC):
             saturation=saturation,
         )
 
-    def rate(self, aerosol: Aerosol) -> float:
+    def _rate_box(self, aerosol: Aerosol) -> float:
         """Return the current potential event density rate [m^-3 s^-1]."""
         _, gas, environment = self._state(aerosol)
         return self._rate(gas, environment)
 
-    def execute(
+    def _execute_box(
         self,
         aerosol: Aerosol,
         time_step: float | np.number,
@@ -360,7 +464,7 @@ class Nucleation(RunnableABC):
         return aerosol
 
 
-class MassCondensation(RunnableABC):
+class MassCondensation(_NativeBatchRunnable):
     """Handles the mass condensation process for aerosols.
 
     Apply a strategy to the currently held native particle and gas containers.
@@ -392,6 +496,9 @@ class MassCondensation(RunnableABC):
       From Air Pollution to Climate Change," Wiley, 2016.
     """
 
+    _strategy_attribute = "condensation_strategy"
+    _namespace = "condensation"
+
     def __init__(self, condensation_strategy: CondensationStrategy):
         """Initialize the MassCondensation process.
 
@@ -404,7 +511,7 @@ class MassCondensation(RunnableABC):
         """
         self.condensation_strategy = condensation_strategy
 
-    def execute(
+    def _execute_box(
         self,
         aerosol: Aerosol,
         time_step: float,
@@ -448,7 +555,7 @@ class MassCondensation(RunnableABC):
                 )
         return aerosol
 
-    def rate(self, aerosol: Aerosol) -> Any:
+    def _rate_box(self, aerosol: Aerosol) -> Any:
         """Compute mass condensation rates for each particle.
 
         Args:
@@ -475,7 +582,7 @@ class MassCondensation(RunnableABC):
         )
 
 
-class Coagulation(RunnableABC):
+class Coagulation(_NativeBatchRunnable):
     """Implements a coagulation process for aerosol particles.
 
     Apply a strategy to the held single-box native particle population.
@@ -506,6 +613,9 @@ class Coagulation(RunnableABC):
           Physics: From Air Pollution to Climate Change," Wiley, 2016.
     """
 
+    _strategy_attribute = "coagulation_strategy"
+    _namespace = "coagulation"
+
     def __init__(self, coagulation_strategy: CoagulationStrategyABC):
         """Initialize the Coagulation process.
 
@@ -515,7 +625,7 @@ class Coagulation(RunnableABC):
         """
         self.coagulation_strategy = coagulation_strategy
 
-    def execute(
+    def _execute_box(
         self,
         aerosol: Aerosol,
         time_step: float,
@@ -557,7 +667,7 @@ class Coagulation(RunnableABC):
                 )
         return aerosol
 
-    def rate(self, aerosol: Aerosol) -> Any:
+    def _rate_box(self, aerosol: Aerosol) -> Any:
         """Compute the coagulation rate for each particle in the aerosol.
 
         Args:
@@ -583,7 +693,7 @@ class Coagulation(RunnableABC):
         )
 
 
-class WallLoss(RunnableABC):
+class WallLoss(_NativeBatchRunnable):
     """Apply wall loss strategy to aerosol particles.
 
     Supports discrete, continuous PDF, and particle-resolved distributions via
@@ -604,6 +714,9 @@ class WallLoss(RunnableABC):
         >>> _ = wall_loss.execute(aerosol, time_step=1.0, sub_steps=2)
     """
 
+    _strategy_attribute = "wall_loss_strategy"
+    _namespace = "wall_loss"
+
     def __init__(self, wall_loss_strategy: WallLossStrategy):
         """Create a wall loss runnable.
 
@@ -622,7 +735,7 @@ class WallLoss(RunnableABC):
         """
         np.maximum(particle.concentration, 0.0, out=particle.concentration)
 
-    def execute(
+    def _execute_box(
         self,
         aerosol: Aerosol,
         time_step: float,
@@ -657,7 +770,7 @@ class WallLoss(RunnableABC):
             self._clamp_non_negative(particles)
         return aerosol
 
-    def rate(self, aerosol: Aerosol) -> Any:
+    def _rate_box(self, aerosol: Aerosol) -> Any:
         """Return the wall loss rate for the aerosol particles.
 
         Args:
@@ -676,7 +789,7 @@ class WallLoss(RunnableABC):
         )
 
 
-class Dilution(RunnableABC):
+class Dilution(_NativeBatchRunnable):
     """Apply a dilution strategy over one or more equal substeps.
 
     Each substep delegates aerosol mutation to the configured strategy. The
@@ -693,6 +806,9 @@ class Dilution(RunnableABC):
             dilution steps.
     """
 
+    _strategy_attribute = "dilution_strategy"
+    _namespace = "dilution"
+
     def __init__(self, dilution_strategy: DilutionStrategyProtocol):
         """Initialize the dilution runnable.
 
@@ -702,7 +818,7 @@ class Dilution(RunnableABC):
         """
         self.dilution_strategy = dilution_strategy
 
-    def rate(self, aerosol: Aerosol) -> float | NDArray[np.float64]:
+    def _rate_box(self, aerosol: Aerosol) -> float | NDArray[np.float64]:
         """Delegate particle-number dilution-rate evaluation to the strategy.
 
         Args:
@@ -714,7 +830,7 @@ class Dilution(RunnableABC):
         """
         return self.dilution_strategy.rate(aerosol)
 
-    def execute(
+    def _execute_box(
         self,
         aerosol: Aerosol,
         time_step: float | np.number,

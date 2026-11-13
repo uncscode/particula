@@ -152,7 +152,9 @@ def test_density_coagulation_rate_keeps_measure_and_does_not_mutate(kind):
     strategy = BrownianCoagulationStrategy(kind)
     before = aerosol.particles.concentration.copy()
     expected = strategy.net_rate(aerosol.particles, 298.15, 101325.0)
-    np.testing.assert_array_equal(Coagulation(strategy).rate(aerosol), expected)
+    np.testing.assert_array_equal(
+        Coagulation(strategy).rate(aerosol), expected[None, :]
+    )
     np.testing.assert_array_equal(aerosol.particles.concentration, before)
 
 
