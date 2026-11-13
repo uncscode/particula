@@ -1,5 +1,26 @@
 # Local demo validation
 
+## Centered reading and unified drawer — 2026-11-13
+
+Supersedes the separate homepage navigation and space-consuming desktop sidebar
+described below. Every page now uses one left-hand popover navigation tree.
+The hero starts closed regardless of the saved documentation preference.
+Desktop documentation remembers explicit open/closed choices; mobile use does
+not overwrite that preference. Opening the drawer expands the current page's
+ancestor groups and centers its link within the drawer without scrolling or
+shifting the article. Escape, the menu button, the drawer close button and
+outside clicks dismiss it through native popover behavior.
+
+The article uses equal outer gutters, with a separate sticky contents menu on
+the right. That menu uses smaller text and its intrinsic width, capped at 14rem;
+it does not grow with the viewport. At 1440 and 1920 pixel viewports, measured
+article centers matched the available viewport center within one pixel.
+At 1920 pixels, the guide's short contents menu measured about 122 pixels wide.
+The nested ParticleData API link centered within one pixel of the drawer's
+midpoint, with all ancestor groups open. Mobile hero and documentation menus
+were reviewed at 390 pixels. Screenshots: `qa/centered-article.jpg`,
+`qa/current-page-drawer.jpg`, and `qa/unified-menu-mobile.jpg`.
+
 ## Navigation follow-up — 2026-11-13
 
 Added homepage links for Guide, Examples, Theory, API and Contribute, with a

@@ -1,0 +1,67 @@
+---
+import Sidebar from '@astrojs/starlight/components/Sidebar.astro';
+const { hasSidebar } = Astro.locals.starlightRoute;
+---
+
+<div class="page particula-page">
+  <header class="page-header"><slot name="header" /></header>
+  <nav id="starlight__sidebar" class="navigation-drawer print:hidden" popover="auto" aria-label="Main navigation" data-documentation={hasSidebar ? 'true' : 'false'}>
+    <div class="drawer-heading">
+      <strong>Navigation</strong>
+      <button class="drawer-close" popovertarget="starlight__sidebar" popovertargetaction="hide" aria-label="Close navigation menu">✕</button>
+    </div>
+    <div class="sidebar-content">
+      {hasSidebar ? <slot name="sidebar" /> : <Sidebar />}
+    </div>
+  </nav>
+  <div class="main-frame"><slot /></div>
+</div>
+
+<script>
+  function initializeNavigation() {
+    const drawer = document.querySelector<HTMLElement>('.navigation-drawer');
+    const toggle = document.querySelector<HTMLButtonElement>('.navigation-toggle');
+    if (!drawer || !toggle || drawer.dataset.ready) return;
+    drawer.dataset.ready = 'true';
+    const desktop = matchMedia('(min-width: 50rem)');
+    const isDocumentation = drawer.dataset.documentation === 'true';
+
+    function centerCurrentPage() {
+      const active = drawer!.querySelector<HTMLElement>('a[aria-current="page"]');
+      if (!active) {
+        drawer!.scrollTop = 0;
+        return;
+      }
+      // Reopen every ancestor, even if a previous visit collapsed its group.
+      for (let parent = active.parentElement; parent && parent !== drawer; parent = parent.parentElement) {
+        if (parent instanceof HTMLDetailsElement) parent.open = true;
+      }
+      // Scroll only the drawer: scrollIntoView would also move the article.
+      requestAnimationFrame(() => {
+        const pane = drawer!.getBoundingClientRect();
+        const item = active.getBoundingClientRect();
+        drawer!.scrollTop += item.top + item.height / 2 - pane.top - pane.height / 2;
+      });
+    }
+
+    drawer.addEventListener('toggle', () => {
+      const open = drawer.matches(':popover-open');
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.setAttribute('aria-label', open ? 'Close navigation menu' : 'Open navigation menu');
+      if (open) centerCurrentPage();
+      // The hero always starts closed; mobile use never changes desktop preference.
+      if (isDocumentation && desktop.matches) {
+        try { localStorage.setItem('particula:sidebar-collapsed', String(!open)); } catch {}
+      }
+    });
+
+    // Restore only explicit desktop preference. First visits and the hero are closed.
+    if (isDocumentation && desktop.matches) {
+      try {
+        if (localStorage.getItem('particula:sidebar-collapsed') === 'false') drawer.showPopover();
+      } catch {}
+    }
+  }
+  initializeNavigation();
+  document.addEventListener('astro:page-load', initializeNavigation);
+</script>

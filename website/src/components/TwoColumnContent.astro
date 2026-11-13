@@ -1,0 +1,8 @@
+---
+const { toc } = Astro.locals.starlightRoute;
+---
+
+<div class:list={['reading-layout', { 'has-page-menu': !!toc }]}>
+  {toc && <aside class="page-menu print:hidden"><slot name="right-sidebar" /></aside>}
+  <div class="main-pane"><slot /></div>
+</div>
