@@ -1,5 +1,18 @@
 # Local demo validation
 
+## Drawer spacing and branch defaults — 2026-11-13
+
+Desktop reading layouts reserve an extra gutter beside an open drawer while
+keeping the article centered. At 1440 pixels, the drawer-to-text gap is 48
+pixels; closing it restores the wider article. The right contents menu remains
+compact. Mobile retains its overlay layout.
+
+Navigation groups now start collapsed except for ancestors of the current page.
+This applies recursively to generated API groups as well as the homepage menu.
+Readers can still expand adjacent branches manually. Unrelated branch state is
+no longer restored from earlier visits; the drawer's open/closed preference is
+still remembered separately.
+
 ## Centered reading and unified drawer — 2026-11-13
 
 Supersedes the separate homepage navigation and space-consuming desktop sidebar
