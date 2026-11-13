@@ -9,8 +9,6 @@ hide:
 <div class="home-hero" markdown="1">
 <div class="home-intro" markdown="1">
 
-<p class="home-eyebrow">Particula · Aerosol simulation in Python</p>
-
 # Small particles.<br>Big questions. {#particula}
 
 Model how particles form, grow, collide, and evolve. Build a simulation from
@@ -36,13 +34,12 @@ Open source. Built for scientific exploration.
 <div class="home-start" markdown="1">
 <div markdown="1">
 
-<p class="home-eyebrow">Your first simulation</p>
-
 ## From a population to a process
 
 Set up Particula, construct an aerosol, and run a small CPU condensation example.
 
-[Run your first simulation →](guide/getting-started/first-simulation.md)
+[Run your first simulation →](guide/getting-started/first-simulation.md){ .home-button .home-button-primary }
+[Set up an AI assistant →](guide/ai-assistants/index.md){ .home-button .home-button-secondary }
 
 </div>
 <div class="home-steps" markdown="1">
@@ -56,9 +53,7 @@ Set up Particula, construct an aerosol, and run a small CPU condensation example
 
 <div class="home-section-heading" markdown="1">
 
-## Find your way into the science
-
-A starting point for each stage of your work.
+## Dig deeper into the science
 
 </div>
 
@@ -113,7 +108,6 @@ Add a process, improve an example, or help make the documentation clearer.
 <div class="home-shortcuts" markdown="1">
 
 **Already working with Particula?**
-[Set up an AI assistant →](guide/ai-assistants/index.md)
 [Upgrade an older script →](guide/migration/v0.3.0/index.md)
 
 </div>
