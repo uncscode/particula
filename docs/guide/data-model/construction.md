@@ -2,7 +2,7 @@
 
 This guide describes native construction used by the supported migrated
 examples. Native CPU processes and runnables consume these held containers;
-see [dynamics migration](../migration/v0.3.0/dynamics.md) for configuration and single-box limits.
+see [dynamics migration](../migration/v0.3.0/dynamics.md) for configuration and runnable batching.
 The [access walkthrough](ownership.md) demonstrates executable replacement and
 rejection checks. See also [container foundations](index.md).
 
@@ -165,8 +165,8 @@ resident examples show their concrete preparation APIs and synchronization.
 A CPU aggregate replacement cannot rebind existing device arrays or a prepared
 resident request. Explicit restart uses a fresh same-device binding and schema-v5
 canonical checkpoint bytes; CPU inspection is not continuation authority.
-There is no implicit transfer, fallback, migration or recovery. Batched storage
-does not broaden CPU execution beyond supported single-box process contracts.
+There is no implicit transfer, fallback, migration or recovery. CPU dynamics runnables iterate batched storage; direct strategies retain
+their single-box contracts and existing numerical restrictions.
 
 Legacy facades and conversion bridges have been removed from this development
 tree. CPU-Warp population transfers and resident construction require explicit

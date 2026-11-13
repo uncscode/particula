@@ -47,12 +47,13 @@ are valid storage but that does not imply every process supports arbitrary
 weights. Binned coagulation also retains method-specific composition limits.
 Consult the process documentation instead of changing conservation tolerances.
 
-## Multi-box storage is not general CPU execution
+## Multi-box execution requires the runnable boundary
 
-Native CPU runnables remain single-box. Multi-box arrays must not be passed to a
-single-box process expecting implicit iteration. Application-owned per-box
-execution requires explicit independent state/configuration and result handling;
-there is no undocumented helper that slices/reassembles a complete simulation.
+The five native dynamics runnables iterate boxes transactionally. Direct
+strategy methods remain single-box. Supply `CPUExecutionContext(root_seed,
+box_ids)` for stochastic multi-box calls, with one stable logical ID per box.
+Each batch retains one population label and shared process configuration.
+`Equilibria` remains a separately documented native-data migration gap.
 See [dynamics migration](dynamics.md).
 
 ## A GPU binding rejects state
