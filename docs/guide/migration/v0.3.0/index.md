@@ -18,7 +18,7 @@ revision-specific validation and outstanding readiness gates.
   native initializers, distribution measures, units and ownership.
 - [Container access](../../data-model/ownership.md): raw arrays, detached properties, individual
   and coordinated replacement, and historical API terminology.
-- [Dynamics](dynamics.md): native single-box CPU processes, explicit species
+- [Dynamics](dynamics.md): native batched CPU runnables, explicit species
   maps, and direct/resident GPU boundaries.
 - [Troubleshooting](troubleshooting.md): validation, gas order, normalization,
   storage replacement and explicit transfer errors.

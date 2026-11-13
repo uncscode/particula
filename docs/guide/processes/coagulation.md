@@ -79,8 +79,10 @@ container and its arrays. It validates
 representation, writable/nonoverlapping destinations, environment and current
 process controls before publishing a staged update. Rejected numerical
 proposals leave caller arrays unchanged. Density, volume and the explicit PDF
-radius grid are protected. This is single-box CPU execution; runnable and
-resident integration remain separate migration work.
+radius grid are protected. These direct strategy methods remain single-box.
+The `Coagulation` runnable stages and iterates all boxes, with explicit
+`CPUExecutionContext` required for stochastic multi-box execution; see
+[batched CPU execution](index.md#batched-cpu-runnable-execution).
 
 Discrete/PDF stepping preserves the existing explicit number gain/loss
 update on a fixed composition grid. It writes concentration only; per-bin

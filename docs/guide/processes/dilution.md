@@ -49,26 +49,26 @@ Here `time_step` is in s. Native resolved particle storage holds counts;
 PMF storage holds bin number density (m⁻³), and PDF storage holds `dn/dr`
 (m⁻⁴). All receive the same multiplicative decay at fixed volume. All lanes of
 the unified `GasData.concentration` (kg/m³) decay, regardless of partitioning.
-The native runnable supports one box; storage shapes do not imply multi-box
-transport support.
+The native runnable applies the coefficient independently to every box.
+There is no cross-box transport.
 
 ## Execution, validation, and recovery
 
 `sub_steps` must be a positive, non-boolean Python or NumPy integer. For the
-concrete exact-exponential strategy, the runnable performs one total-duration
-operation, independent of `sub_steps`, so the whole call is retry-safe. Custom
-compatible strategies retain equal `time_step / sub_steps` slice delegation.
+concrete exact-exponential strategy, the shared runnable driver executes equal
+`time_step / sub_steps` slices. Each slice commits only after every box succeeds;
+earlier successful slices remain committed if a later slice fails. Custom
+compatible strategies retain their own validation and execution guarantees.
 The coefficient and duration must be finite, nonnegative real scalars;
 complex values are rejected, and booleans and non-scalars are rejected.
 
 A zero coefficient or zero duration is an exact no-op, but supported state is
-still preflighted even for a no-op. Concrete CPU dilution supports exactly one
-particle box and validates state
-before mutation. If validation fails, state is unchanged; if an unexpected
+still preflighted even for a no-op. The direct concrete strategy operates on one
+box; `Dilution` stages all boxes through the shared runnable driver. If validation fails, state is unchanged; if an unexpected
 CPU write failure occurs, it restores attempted concentration writes from
 snapshots. Held containers and destination-array identities are retained.
-These atomicity and retry-safe failure guarantees let callers correct input and
-retry safely. Extreme finite decay may underflow to zero, but outputs remain
+A failed substep can be retried after correcting its inputs; do not replay
+already completed substeps. Extreme finite decay may underflow to zero, but outputs remain
 finite and nonnegative.
 
 Dilution changes only particle number concentration and gas mass

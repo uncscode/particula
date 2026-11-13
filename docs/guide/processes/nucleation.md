@@ -7,14 +7,14 @@ The direct nucleation boundary is shown last in the illustrative [explicit-trans
 > Convert partitioning precursor gas into fixed-capacity particle slots with a
 > public, conservation-accounted CPU runnable.
 
-The shipped CPU-only nucleation boundary is a deliberately bounded, single-box
-process. It combines immutable potential-rate construction (public construction) with the public
+The CPU-only nucleation runnable executes each resolved box independently
+through the shared transactional driver. It combines immutable potential-rate construction (public construction) with the public
 `Nucleation` runnable (runnable execution). It is not a GPU process, scheduler, or general
 empirical new-particle-formation model.
 
 ## Public API, equations, and units
 
-Use public process imports and the concrete species-map configuration. `EnvironmentData` is the one-box thermodynamic input;
+Use public process imports and the concrete species-map configuration. `EnvironmentData` supplies each box’s thermodynamic input;
 `ExhaustionControls` selects fixed-capacity recovery behavior.
 
 ```python
@@ -94,14 +94,16 @@ the runnable starting point.
 It constructs native `Aerosol`, unified `GasData` with precursor and inert lanes,
 fixed resolved particle capacity, aligned `EnvironmentData`, and
 the public `NucleationCommitConfig`. Its commit controls use
-`ExhaustionControls()` and one-element `float64` `requested_scale`,
-`minimum_scale`, and `minimum_volume` sidecars. Do not replace that setup with
+`ExhaustionControls()` and per-box `float64` `requested_scale`,
+`minimum_scale`, and `minimum_volume` sidecars (one element in this example). Do not replace that setup with
 imports from `nucleation.particle_source`.
 
 ## Execution, fixed capacity, and accounting
 
 The runnable retains the native aggregate and its containers by identity.
-It supports exactly one resolved box and fixed-capacity slots. Full ordered
+It supports resolved batches with fixed-capacity slots in each box. The shared
+driver slices exhaustion controls and stages volume changes per box. A failed
+box rejects the entire current substep. Full ordered
 gas names and explicit gas-to-particle pairs define the source mapping; gas
 and particle widths may differ. Every positive injection lane must be mapped
 and partitioning-enabled; other gas lanes remain unchanged. It does not resize

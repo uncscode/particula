@@ -90,7 +90,11 @@ batches. Physical arrays publish only after successful staging; late model
 failure does not promise rollback of already consumed random draws.
 Fully evaporated resolved particles leave subsequent staggered batches/sweeps.
 
-CPU native calls require one box and revalidate mutable state at each entry.
+Direct CPU strategy calls require one box and revalidate mutable state at each
+entry. `MassCondensation` iterates a batch through the shared transactional
+driver and reports rates with shape `(B, N, Sp)`. Latent-energy diagnostics on
+the runnable have shape `(B,)` for the last successful substep; multi-box runs
+set the strategy scalar diagnostic to `None`.
 They preserve carrier and destination-array identities and reject protected
 storage overlap before writes. CPU condensation accepts tagged `ParticleData`
 and `GasData` only; activity, surface and vapor-pressure laws and the species

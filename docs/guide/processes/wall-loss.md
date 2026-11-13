@@ -413,7 +413,9 @@ aerosol.particles = particle
 
 Use the native resolved initializer for counts at a physical volume, or
 `distribution_type="continuous_pdf"` with a radius grid for a radius PDF.
-The strategy kind must match the stored kind; CPU execution is single-box.
+The strategy kind must match the stored kind. Direct strategy calls are
+single-box; `WallLoss` iterates all boxes through the shared transactional
+driver. Stochastic multi-box execution requires `CPUExecutionContext`.
 
 ### 2. Configure a SphericalWallLossStrategy
 
