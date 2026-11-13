@@ -29,6 +29,8 @@ export default defineConfig({
     components: {
       Head: './src/components/Head.astro',
       Header: './src/components/Header.astro',
+      PageFrame: './src/components/PageFrame.astro',
+      TwoColumnContent: './src/components/TwoColumnContent.astro',
     },
     expressiveCode: { plugins: [pluginCollapsibleSections()], shiki: { langs: ['python', 'bash', 'json', 'text'] } },
     plugins: [starlightPydocs({
