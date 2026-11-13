@@ -311,15 +311,15 @@ ReturnType functionName(Type1 param1, Type2 param2);
 
 ```
 docs/
-├── Agent/
-│   ├── README.md           # Integration guide
-│   ├── code_style.md       # Style conventions
-│   ├── testing_guide.md    # Testing patterns
-│   └── ...
-├── Examples/               # Usage examples
-└── Features/               # Feature documentation
+├── guide/                  # Supported use, installation, migration
+├── examples/               # Runnable scientific workflows
+├── theory/                 # Scientific equations and assumptions
+├── API/                    # Generated API reference
+└── contribute/             # Development, architecture, validation
 
-README.md                   # Quick start, installation
+.opencode/guides/           # Agent guidance
+.opencode/plans/            # Implementation plans and task closeouts
+readme.md                  # Repository entry point
 ```
 
 **Example Finding:**

@@ -13,28 +13,25 @@
 # ---
 
 # %% [markdown]
-# # GPU Benchmark Results: Condensation & Coagulation
+# # Recorded GPU benchmark viewer
 #
-# This notebook loads benchmark results produced by
-# `particula/gpu/tests/benchmark_test.py` and visualizes GPU vs CPU
-# scaling for the two main aerosol-dynamics kernels:
+# This viewer reads a locally recorded artifact and displays any condensation
+# or coagulation rows it contains. Saved outputs are an illustration of that
+# artifact, not qualification of the current release or evidence of general
+# CPU-strategy parity. Missing rows are unavailable, not zero.
 #
-# * **Condensation** -- per-particle mass transfer (embarrassingly
-#   parallel, O(n) work).
-# * **Coagulation** -- stochastic particle-resolved collisions
-#   (sequential pair selection per box, but parallelized across boxes).
-#
-# Run the benchmarks first:
+# Run from the repository root. The opt-in collector is:
 #
 # ```bash
 # pytest particula/gpu/tests/benchmark_test.py --benchmark -v -s
 # ```
 #
-# The benchmark helper records the source-of-record artifact at
-# `.artifacts/benchmarks/gpu_benchmark_results.json`, and this notebook looks
-# for that controlled path first. A local `gpu_benchmark_results.json` export is
-# still accepted as a fallback, but the artifact path remains the traceable
-# record for the original command and runtime metadata.
+# The controlled path is `.artifacts/benchmarks/gpu_benchmark_results.json`.
+# A local export with matching metadata is also accepted. Check its recorded
+# revision, command, Warp version, device, and workload before comparing runs.
+# The file is mutable and may differ from the dated evidence linked below.
+# It does not contain the reviewed resident/capture evidence required by the
+# [qualification gates](../graph-capture-qualification.md).
 
 # %%
 import json
@@ -344,48 +341,19 @@ else:
     plt.show()
 
 # %% [markdown]
-# ## Key observations
+# ## Interpreting results
 #
-# ### Condensation
+# Compare only rows with matching workloads, numerical methods, precision,
+# revision, and hardware context. A kernel timing is not end-to-end throughput;
+# explicit transfers and synchronization can change the relevant cost.
 #
-# * The GPU condensation kernel is **embarrassingly parallel** -- each
-#   particle's mass transfer is independent. This gives near-constant GPU
-#   time up to ~100k particles, with linear scaling beyond that.
-# * Speedups range from **~13x** at 1k particles to **~1,400x** at 100k
-#   particles per box, demonstrating excellent GPU utilization.
-# * At 1M particles the GPU still completes a step in under 1 ms.
+# Condensation sections display data only when the loaded artifact contains
+# those rows. They do not establish a general speedup or recommendation.
+# Coagulation's one-thread-per-box path can benefit from independent-box
+# parallelism while large single-box workloads remain constrained.
 #
-# ### Coagulation
-#
-# * The GPU coagulation kernel uses a **single thread per box** for the
-#   sequential acceptance-rejection pair selection loop. This means
-#   single-box performance is limited by the per-particle work within
-#   that one thread.
-# * **Multi-box configurations** remain the effective region for the current
-#   kernel because the GPU parallelizes across independent boxes. The recorded
-#   many-box cases (`10x500`, `10x1k`, `50x1k`, `10x5k`, `50x5k`, `100x1k`,
-#   `10x10k`) stay near the smaller timings seen at lower box counts on this
-#   benchmark machine.
-# * Single-box speedups are modest (**1.5--3x**) because the GPU thread does
-#   essentially the same sequential work as the CPU, just with faster
-#   per-operation throughput.
-# * Treat the recorded `1x10k` to `1x50k` range as a **single-box caution
-#   band** for the shipped one-thread-per-box path: the measured GPU step time
-#   rises from **0.6809 s** to **3.3984 s**, so large single-box workloads are
-#   no longer a strong GPU recommendation in this benchmark capture.
-# * The `k_max` computation uses an O(n) min/max radius bound (matching
-#   the CPU's bin-pair strategy) rather than the original O(n^2)
-#   all-pairs scan. This reduced single-box GPU time from **29s to
-#   0.28s** at 2k particles.
-# * These conclusions are **machine-bounded** to the 2026-07-10 capture on the
-#   recorded Warp/device context, not universal guarantees for every GPU or
-#   future kernel variant.
-#
-# ### When to use GPU acceleration
-#
-# | Scenario | Recommendation |
-# |---|---|
-# | Condensation, any size | Always use GPU -- massive speedup |
-# | Coagulation, many boxes | Use GPU for the recorded multi-box cases on this machine |
-# | Coagulation, single box, <5k particles | Either -- modest GPU advantage |
-# | Coagulation, single box, 10k--50k particles | Caution band -- not a strong GPU recommendation in this machine-bounded capture |
+# See the [2026-07-10 coagulation decision record](../coagulation-benchmarks.md)
+# for its specific machine-bounded timings and caution band. Those historical
+# observations are not measurements of the current v0.3.0 tree or necessarily
+# the artifact loaded above. Current resident timing and memory qualification
+# remains [unavailable](../resident-benchmarks.md).

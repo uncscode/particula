@@ -64,8 +64,8 @@ The Documentation Agent System is a comprehensive suite of agents that automate 
 | **plan-update-short** | `subagent` | Plan metadata via `adw_plans` | Phase status and plan lifecycle |
 | **examples** | `subagent` | `docs/examples/*.md`, `.py`, `.ipynb` | Practical examples and tutorials |
 | **architecture** | `subagent` | `adw-docs/architecture/*.md` | ADRs, architecture outline |
-| **theory** | `subagent` | `docs/Theory/*.md` | Conceptual documentation |
-| **features** | `subagent` | `docs/Features/*.md` | High-level feature docs |
+| **theory** | `subagent` | `docs/theory/*.md` | Conceptual documentation |
+| **features** | `subagent` | `docs/guide/*.md` | High-level feature docs |
 | **docs-validator** | `subagent` | All docs (read-only) | Validate links, formatting, and agent references via narrow wrappers |
 
 ### Existing Subagents Used
@@ -94,8 +94,8 @@ adw-docs/architecture/decisions/*.md  architecture
 docs/examples/*.md                      examples
 docs/examples/**/*.py                   examples
 docs/examples/**/*.ipynb                examples
-docs/Theory/*.md                        theory
-docs/Features/*.md                      features
+docs/theory/*.md                        theory
+docs/guide/*.md                      features
 All markdown links                      docs-validator (validates)
 ```
 

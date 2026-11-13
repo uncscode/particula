@@ -86,8 +86,8 @@ to use `build_mkdocs_validate` (validation-only path).
 | **plan-update-full** | Update plan section content | `.opencode/plans/sections/**/*.md` via `adw_plans_read` |
 | **examples** | Create/update examples | `docs/examples/*.md`, `.py`, `.ipynb` |
 | **architecture** | ADRs and architecture outline | `.opencode/guides/architecture/*.md` |
-| **theory** | Conceptual documentation | `docs/Theory/*.md` |
-| **features** | High-level feature docs | `docs/Features/*.md` |
+| **theory** | Conceptual documentation | `docs/theory/*.md` |
+| **features** | High-level feature docs | `docs/guide/*.md` |
 | **docs-validator** | Validate links and formatting | All docs (read-only) |
 | **adw-docs-notebook** | Jupyter notebook creation, editing, validation | `docs/examples/**/*.ipynb`, `docs/**/*.ipynb` |
 | **adw-commit** | Commit changes | Git operations |
@@ -165,7 +165,8 @@ From `spec_content`, identify:
 | Issue tracked in a plan | **plan-update-full** (update section content) |
 | New user-facing feature | **examples**, **adw-docs-notebook** (for .ipynb) |
 | New module/component | **architecture** |
-| New design pattern | **theory** |
+| Scientific equations or assumptions | **theory** |
+| New design pattern | Contributor architecture under `docs/contribute/architecture/` |
 | Major feature | **features** |
 | ALWAYS | **docs-validator** |
 | ALWAYS | **adw-commit** |

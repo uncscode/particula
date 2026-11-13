@@ -6,13 +6,19 @@
 particula documentation is split between agent-facing guides in
 `.opencode/guides/` and user-facing MkDocs content in `docs/`.
 
+Follow `docs/contribute/documentation.md` for the canonical five-section
+placement, consolidation, retirement, and validation rules. Extend an owning
+topic before adding a file; implementation phases are not public feature pages.
+
 ## Locations
 
 - `.opencode/guides/`: Agent and contributor guidance.
 - `docs/`: User-facing MkDocs content.
 - `docs/examples/`: Tutorials, examples, runnable scripts, and paired Jupytext
   notebooks.
-- `docs/Theory/`: Conceptual and theoretical explanations.
+- `docs/guide/`: Supported usage, installation, migration, and GPU contracts.
+- `docs/theory/`: Scientific equations, assumptions, and primary references.
+- `docs/contribute/`: Contributor workflows, architecture, and durable validation.
 - `docs/API/`: Generated or API-oriented documentation.
 - `adw-docs/`: Legacy source of migrated guide content, kept for reference.
 

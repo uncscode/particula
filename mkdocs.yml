@@ -7,7 +7,7 @@ edit_uri: edit/main/docs/
 # Exclude helper scripts and assets from being built as pages
 exclude_docs: |
   .assets/
-  examples/**/*.py
+  **/*.py
 
 theme:
   name: material
@@ -117,178 +117,204 @@ hooks:
 nav:
 - Guide:
   - Guide: guide/index.md
-  - Start here:
+  - Getting started:
     - First CPU simulation: guide/getting-started/first-simulation.md
-  - Installation:
-    - New to Python?: guide/getting-started/installation/new-to-python.md
-    - Setup via conda: guide/getting-started/installation/conda.md
-    - Setup via pip: guide/getting-started/installation/pip.md
-    - Setup via **uv**: guide/getting-started/installation/uv.md
-    - Setup Particula: guide/getting-started/installation/index.md
-  - Data and processes:
+    - Installation:
+      - Installation: guide/getting-started/installation/index.md
+      - Setup via conda: guide/getting-started/installation/conda.md
+      - New to Python?: guide/getting-started/installation/new-to-python.md
+      - Setup via pip: guide/getting-started/installation/pip.md
+      - Setup via **uv**: guide/getting-started/installation/uv.md
+  - Data model:
+    - Data model: guide/data-model/index.md
+    - Native aerosol construction and replacement: guide/data-model/construction.md
+    - Field ownership and transfer policy: guide/data-model/field-ownership.md
+    - Native container access and ownership: guide/data-model/ownership.md
+  - Processes:
+    - Processes: guide/processes/index.md
     - Activity System: guide/processes/activity.md
     - Coagulation Strategy System: guide/processes/coagulation.md
     - Condensation Strategy System: guide/processes/condensation.md
-    - Data Containers and GPU Foundations: guide/data-model/index.md
     - Dilution Strategy System: guide/processes/dilution.md
-    - Process and execution guides: guide/processes/index.md
     - Nucleation Strategy System: guide/processes/nucleation.md
     - Wall Loss Strategy System: guide/processes/wall-loss.md
-  - GPU execution:
+  - GPU:
+    - GPU: guide/gpu/index.md
     - Backend Selection and Explicit CPU Fallback: guide/gpu/backend-selection.md
-    - GPU resident graph capture: guide/gpu/resident/graph-capture.md
-    - GPU resident checkpoints: guide/gpu/resident/checkpoints.md
-    - Fixed-Capacity Slot Exhaustion Primitives: guide/gpu/slot-exhaustion.md
-  - Migration:
-    - Native aerosol construction and replacement: guide/data-model/construction.md
-    - Native container access and ownership: guide/data-model/ownership.md
-    - Native dynamics migration: guide/migration/v0.3.0/dynamics.md
-    - Native aerosol migration: guide/migration/v0.3.0/index.md
-    - Native migration troubleshooting: guide/migration/v0.3.0/troubleshooting.md
-  - Detailed reference:
-    - Coagulation Configuration: guide/gpu/direct/coagulation-configuration.md
-    - Coagulation: guide/gpu/direct/coagulation.md
-    - Condensation Configuration: guide/gpu/direct/condensation-configuration.md
-    - Condensation: guide/gpu/direct/condensation.md
-    - Dilution And Wall Loss: guide/gpu/direct/dilution-and-wall-loss.md
     - Execution: guide/gpu/execution.md
+    - Fixed-Capacity Slot Exhaustion Primitives: guide/gpu/slot-exhaustion.md
     - Slots: guide/gpu/slots.md
     - Support: guide/gpu/support.md
     - Transfers: guide/gpu/transfers.md
     - Troubleshooting: guide/gpu/troubleshooting.md
-    - Construction: guide/migration/v0.3.0/construction.md
-    - Containers: guide/migration/v0.3.0/containers.md
+    - Direct kernels:
+      - Coagulation Configuration: guide/gpu/direct/coagulation-configuration.md
+      - Coagulation: guide/gpu/direct/coagulation.md
+      - Condensation Configuration: guide/gpu/direct/condensation-configuration.md
+      - Condensation: guide/gpu/direct/condensation.md
+      - Dilution And Wall Loss: guide/gpu/direct/dilution-and-wall-loss.md
+    - Resident workflows:
+      - GPU resident checkpoints: guide/gpu/resident/checkpoints.md
+      - GPU resident graph capture: guide/gpu/resident/graph-capture.md
+  - Migration:
+    - v0.3.0:
+      - v0.3.0: guide/migration/v0.3.0/index.md
+      - Construction migration: guide/migration/v0.3.0/construction.md
+      - Containers: guide/migration/v0.3.0/containers.md
+      - Native dynamics migration: guide/migration/v0.3.0/dynamics.md
+      - Native migration troubleshooting: guide/migration/v0.3.0/troubleshooting.md
 - Examples:
   - Examples: examples/index.md
-  - Activity:
-    - activity tutorial: examples/thermodynamics/activity/activity_tutorial.ipynb
-    - bat activity example: examples/thermodynamics/activity/bat_activity_example.ipynb
-    - equilibria example: examples/thermodynamics/activity/equilibria_example.ipynb
-    - ideal activity example: examples/thermodynamics/activity/ideal_activity_example.ipynb
-    - Activity Examples: examples/thermodynamics/activity/index.md
-    - kappa activity example: examples/thermodynamics/activity/kappa_activity_example.ipynb
-  - Aerosol:
-    - Aerosol Tutorial: examples/fundamentals/native_aerosol.ipynb
-    - 'Index: Aerosols': examples/fundamentals/index.md
-  - Chamber Wall Loss:
-    - Chamber Forward Simulation: examples/processes/wall-loss/chamber_forward_simulation.ipynb
-    - Rectangular Wall Loss Strategy: examples/processes/wall-loss/rectangular_wall_loss_strategy.ipynb
-    - Spherical Wall Loss Strategy: examples/processes/wall-loss/spherical_wall_loss_strategy.ipynb
-    - Wall Loss Tutorial: examples/processes/wall-loss/wall_loss_tutorial.ipynb
-    - wall loss builders factory: examples/processes/wall-loss/wall_loss_builders_factory.ipynb
-    - 'Index: Chamber Wall Loss': examples/processes/wall-loss/index.md
-  - Data Containers:
+  - Fundamentals:
+    - Fundamentals: examples/fundamentals/index.md
     - Data Containers: examples/fundamentals/data-containers.md
-  - Dynamics:
-    - Coagulation with Charge functional: examples/processes/coagulation/charge/coagulation_with_charge_functional.ipynb
-    - Coagulation with Charge objects: examples/processes/coagulation/charge/coagulation_with_charge_objects.ipynb
-    - Coagulation 1 PMF Pattern: examples/processes/coagulation/coagulation_1_pmf_pattern.ipynb
-    - Coagulation 2 PDF Pattern: examples/processes/coagulation/coagulation_2_pdf_pattern.ipynb
-    - Coagulation 3 Particle Resolved Pattern: examples/processes/coagulation/coagulation_3_particle_resolved_pattern.ipynb
-    - Coagulation 4 Compared: examples/processes/coagulation/coagulation_4_compared.ipynb
-    - Coagulation 5 Time Evolution: examples/processes/coagulation/coagulation_5_time_evolution.ipynb
-    - Coagulation Basic 1 PMF: examples/processes/coagulation/functional/coagulation_basic_1_pmf.ipynb
-    - Coagulation Basic 2 PDF: examples/processes/coagulation/functional/coagulation_basic_2_pdf.ipynb
-    - Coagulation Basic 3 compared: examples/processes/coagulation/functional/coagulation_basic_3_compared.ipynb
-    - Coagulation Basic 4 ParticleResolved: examples/processes/coagulation/functional/coagulation_basic_4_particleresolved.ipynb
-    - Condensation 1 Bin: examples/processes/condensation/condensation_1_bin.ipynb
-    - Condensation 2 MassBin: examples/processes/condensation/condensation_2_massbin.ipynb
-    - Condensation 3 MassResolved: examples/processes/condensation/condensation_3_massresolved.ipynb
-    - Condensation Latent Heat: examples/processes/condensation/condensation_latent_heat.ipynb
-    - Staggered Condensation Example: examples/processes/condensation/staggered_condensation_example.ipynb
-    - Adding Particles During Simulation: examples/processes/customization/adding_particles_during_simulation.ipynb
-    - Dynamics: examples/processes/index.md
-  - Equilibria:
-    - activity part1: examples/thermodynamics/equilibria/activity_part1.ipynb
-    - equilibria part1: examples/thermodynamics/equilibria/equilibria_part1.ipynb
-    - Index Equilibria: examples/thermodynamics/equilibria/index.md
-  - Gas Phase:
-    - AtmosphereTutorial: examples/fundamentals/gas/environment_data.ipynb
-    - Gas Species: examples/fundamentals/gas/gas_data.ipynb
-    - Vapor Pressure: examples/fundamentals/gas/vapor_pressure.ipynb
-    - Gas Phase: examples/fundamentals/gas/index.md
-  - Nucleation:
-    - Custom Nucleation Single Species: examples/processes/nucleation/custom_nucleation_single_species.ipynb
-    - Nucleation: examples/processes/nucleation/index.md
-  - Particle Phase:
-    - Activity Tutorial: examples/thermodynamics/particle-properties/activity_tutorial.ipynb
-    - Aerosol Distributions: examples/fundamentals/particles/aerosol_distributions.ipynb
-    - Distribution Tutorial: examples/fundamentals/particles/distribution_tutorial.ipynb
-    - Activity Functions: examples/thermodynamics/particle-properties/activity_functions.ipynb
-    - Particle Representation Tutorial: examples/fundamentals/particles/particle_data.ipynb
-    - Particle Surface Tutorial: examples/thermodynamics/particle-properties/particle_surface_tutorial.ipynb
-    - 'Index: Particle Phase': examples/fundamentals/particles/index.md
-  - Simulations:
-    - Biomass Burning Cloud Interactions: examples/simulations/biomass_burning_cloud_interactions.ipynb
-    - Cloud Chamber Multi Cycle: examples/simulations/cloud_chamber_multi_cycle.ipynb
-    - Cloud Chamber Single Cycle: examples/simulations/cloud_chamber_single_cycle.ipynb
+    - Aerosol Tutorial: examples/fundamentals/native_aerosol.ipynb
+    - Gas and environment:
+      - Gas and environment: examples/fundamentals/gas/index.md
+      - Gas Mixture and Environment Tutorial: examples/fundamentals/gas/environment_data.ipynb
+      - Native Gas Species Tutorial: examples/fundamentals/gas/gas_data.ipynb
+      - Vapor Pressure Tutorial: examples/fundamentals/gas/vapor_pressure.ipynb
+    - Particles:
+      - Particles: examples/fundamentals/particles/index.md
+      - Size Distributions Tutorial: examples/fundamentals/particles/aerosol_distributions.ipynb
+      - Native Distribution Storage: examples/fundamentals/particles/distribution_tutorial.ipynb
+      - Native Particle Construction: examples/fundamentals/particles/particle_data.ipynb
+  - Processes:
+    - Processes: examples/processes/index.md
+    - Coagulation:
+      - 'Coagulation Pattern 1: PMF': examples/processes/coagulation/coagulation_1_pmf_pattern.ipynb
+      - 'Coagulation Pattern 2: PDF': examples/processes/coagulation/coagulation_2_pdf_pattern.ipynb
+      - 'Coagulation Pattern 3: Particle Resolved': examples/processes/coagulation/coagulation_3_particle_resolved_pattern.ipynb
+      - 'Coagulation Pattern 4: PMF vs PDF': examples/processes/coagulation/coagulation_4_compared.ipynb
+      - 'Coagulation Pattern 5: Time Evolution Comparison': examples/processes/coagulation/coagulation_5_time_evolution.ipynb
+      - Charged coagulation:
+        - Coagulation with Charge (Functional + Factory): examples/processes/coagulation/charge/coagulation_with_charge_functional.ipynb
+        - Coagulation with Charge (Builder pattern): examples/processes/coagulation/charge/coagulation_with_charge_objects.ipynb
+      - Kernel functions:
+        - 'Coagulation Basic 1: PMF (Builder + Coagulation)': examples/processes/coagulation/functional/coagulation_basic_1_pmf.ipynb
+        - 'Coagulation Basic 2: PDF (Builder + Coagulation)': examples/processes/coagulation/functional/coagulation_basic_2_pdf.ipynb
+        - 'Coagulation Basic 3: PMF vs PDF (Builder + Coagulation)': examples/processes/coagulation/functional/coagulation_basic_3_compared.ipynb
+        - 'Coagulation Basic 4: Particle Resolved (Builder + Coagulation)': examples/processes/coagulation/functional/coagulation_basic_4_particleresolved.ipynb
+    - Condensation:
+      - 'Condensation Tutorial: Radius Bin': examples/processes/condensation/condensation_1_bin.ipynb
+      - 'Condensation Tutorial: Mass Binned': examples/processes/condensation/condensation_2_massbin.ipynb
+      - 'Condensation Tutorial: Particle Resolved': examples/processes/condensation/condensation_3_massresolved.ipynb
+      - CPU latent-heat condensation bookkeeping: examples/processes/condensation/condensation_latent_heat.ipynb
+      - Staggered Condensation Stepping: examples/processes/condensation/staggered_condensation_example.ipynb
+    - Customization:
+      - Adding Particles During Simulation: examples/processes/customization/adding_particles_during_simulation.ipynb
+    - Nucleation:
+      - Nucleation: examples/processes/nucleation/index.md
+      - 'Custom Nucleation: Single Species': examples/processes/nucleation/custom_nucleation_single_species.ipynb
+    - Wall loss:
+      - Wall loss: examples/processes/wall-loss/index.md
+      - Chamber Forward Simulation: examples/processes/wall-loss/chamber_forward_simulation.ipynb
+      - Rectangular Wall Loss Strategy (interactive quick start): examples/processes/wall-loss/rectangular_wall_loss_strategy.ipynb
+      - Spherical Wall Loss Strategy Tutorial: examples/processes/wall-loss/spherical_wall_loss_strategy.ipynb
+      - Wall Loss Builders and Factory (interactive): examples/processes/wall-loss/wall_loss_builders_factory.ipynb
+      - 'Wall Loss Tutorial: Spherical vs Rectangular Chambers': examples/processes/wall-loss/wall_loss_tutorial.ipynb
+  - Thermodynamics:
+    - Thermodynamics: examples/thermodynamics/index.md
+    - Activity:
+      - Activity: examples/thermodynamics/activity/index.md
+      - Activity Tutorial: examples/thermodynamics/activity/activity_tutorial.ipynb
+      - BAT Model Activity Example: examples/thermodynamics/activity/bat_activity_example.ipynb
+      - Equilibria Partitioning Example: examples/thermodynamics/activity/equilibria_example.ipynb
+      - Ideal Activity Example: examples/thermodynamics/activity/ideal_activity_example.ipynb
+      - Kappa Parameter Activity Example: examples/thermodynamics/activity/kappa_activity_example.ipynb
+    - Equilibria:
+      - Equilibria: examples/thermodynamics/equilibria/index.md
+      - Activity Example: examples/thermodynamics/equilibria/activity_part1.ipynb
+      - Liquid Vapor Equilibrium: examples/thermodynamics/equilibria/equilibria_part1.ipynb
+    - Mixing and surface properties:
+      - Activity Tutorial: examples/thermodynamics/particle-properties/activity_functions.ipynb
+      - Activity Tutorial: examples/thermodynamics/particle-properties/activity_tutorial.ipynb
+      - Particle Surface Tutorial: examples/thermodynamics/particle-properties/particle_surface_tutorial.ipynb
+  - GPU:
+    - GPU: examples/gpu/index.md
+  - Full simulations:
+    - Full simulations: examples/simulations/index.md
+    - Biomass burning cloud interactions: examples/simulations/biomass_burning_cloud_interactions.ipynb
+    - Cloud Chamber Multi-Cycle Simulation: examples/simulations/cloud_chamber_multi_cycle.ipynb
+    - Cloud Chamber Activation-Deactivation Cycle (Single Run): examples/simulations/cloud_chamber_single_cycle.ipynb
     - Cough Droplets Partitioning: examples/simulations/cough_droplets_partitioning.ipynb
-    - Organic Partitioning and Coagulation: examples/simulations/organic_partitioning_and_coagulation.ipynb
+    - Organic partitioning and coagulation: examples/simulations/organic_partitioning_and_coagulation.ipynb
     - Soot Formation in Flames: examples/simulations/soot_formation_in_flames.ipynb
-    - Simulations: examples/simulations/index.md
 - Theory:
   - Theory: theory/index.md
-  - Activity Calculations:
+  - Thermodynamics:
+    - Thermodynamics: theory/thermodynamics/index.md
     - Activity Theory: theory/thermodynamics/activity-theory.md
     - Equilibria Theory: theory/thermodynamics/equilibria-theory.md
-    - Activity Calculations: theory/thermodynamics/index.md
-  - Technical:
-    - DNS Fluid and Particle Properties Comparison: theory/dynamics/cloud-droplet-coagulation/dns-fluid-and-particle-properties-comparison.ipynb
-    - DNS Horizontal Velocity Comparison: theory/dynamics/cloud-droplet-coagulation/dns-horizontal-velocity-comparison.ipynb
-    - DNS Kernel Comparison: theory/dynamics/cloud-droplet-coagulation/dns-kernel-comparison.ipynb
-    - DNS Radial Distribution Comparison: theory/dynamics/cloud-droplet-coagulation/dns-radial-distribution-comparison.ipynb
-    - DNS Radial Relative Velocity Comparison: theory/dynamics/cloud-droplet-coagulation/dns-radial-relative-velocity-comparison.ipynb
-    - Droplet Coagulation Kernel Ayala 2008: theory/dynamics/cloud-droplet-coagulation/droplet-coagulation-kernel-ayala2008.md
-    - Cloud Droplet Coagulation: theory/dynamics/cloud-droplet-coagulation/index.md
+  - Dynamics:
     - Condensation Discussion: theory/dynamics/condensation-equations.md
+    - Ion–Particle Coagulation: theory/dynamics/ionparticle-coagulation.ipynb
     - Nucleation Discussion: theory/dynamics/nucleation-equations.md
-    - ionparticle coagulation: theory/dynamics/ionparticle-coagulation.ipynb
-    - dynamic viscosity: theory/properties/dynamic-viscosity.ipynb
-    - mean free path: theory/properties/mean-free-path.ipynb
+    - Cloud droplet coagulation:
+      - Cloud droplet coagulation: theory/dynamics/cloud-droplet-coagulation/index.md
+      - Fluid and Particle Properties for Cloud Droplet Coagulation: theory/dynamics/cloud-droplet-coagulation/dns-fluid-and-particle-properties-comparison.ipynb
+      - Horizontal Velocity Comparison: theory/dynamics/cloud-droplet-coagulation/dns-horizontal-velocity-comparison.ipynb
+      - DNS Kernel Comparison: theory/dynamics/cloud-droplet-coagulation/dns-kernel-comparison.ipynb
+      - Radial Distribution Function Comparison: theory/dynamics/cloud-droplet-coagulation/dns-radial-distribution-comparison.ipynb
+      - Radial Relative Velocity Comparison: theory/dynamics/cloud-droplet-coagulation/dns-radial-relative-velocity-comparison.ipynb
+      - Droplet Coagulation Kernel Ayala 2008: theory/dynamics/cloud-droplet-coagulation/droplet-coagulation-kernel-ayala2008.md
+  - Properties:
+    - Dynamic Viscosity: theory/properties/dynamic-viscosity.ipynb
+    - Mean Free Path: theory/properties/mean-free-path.ipynb
 - API: https://uncscode.github.io/particula/API/
 - Contribute:
   - Contribute: contribute/index.md
+  - Code of Conduct: contribute/CODE_OF_CONDUCT.md
+  - Contributing: contribute/CONTRIBUTING.md
+  - Maintaining the documentation: contribute/documentation.md
+  - Current roadmap: contribute/roadmap.md
+  - Contributor Setup: contribute/setup.md
+  - Code specifications:
+    - Code specifications: contribute/Code_Specifications/index.md
+    - Details:
+      - 'Docstring Specification: Python Classes, Attributes, and Methods': contribute/Code_Specifications/Details/Class_docstring_format.md
+      - 'Docstring Specification: Python Functions': contribute/Code_Specifications/Details/Function_docstring_format.md
+      - Linear Git Repository: contribute/Code_Specifications/Details/Linear_Git_Repository.md
+  - Contribution workflow:
+    - Contribution workflow: contribute/Feature_Workflow/index.md
+    - Details:
+      - Add Class: contribute/Feature_Workflow/Details/Add_Class.md
+      - Add Examples: contribute/Feature_Workflow/Details/Add_Example.md
+      - Add Functions: contribute/Feature_Workflow/Details/Add_Function.md
+      - Add Theory: contribute/Feature_Workflow/Details/Add_Theory.md
+      - Add Unit Tests: contribute/Feature_Workflow/Details/Add_Unit_Test.md
+      - Adding to `__init__.py`: contribute/Feature_Workflow/Details/Add_to_init.md
   - AI assistants:
+    - AI assistants: contribute/ai-assistants/index.md
     - Claude Code, Desktop, and Cowork: contribute/ai-assistants/claude.md
     - Codex and ChatGPT: contribute/ai-assistants/codex.md
-    - AI Assistants: contribute/ai-assistants/index.md
     - OpenCode: contribute/ai-assistants/opencode.md
-  - Development setup:
-    - Contributor Setup: contribute/setup.md
-  - Validation and roadmap:
-    - GPU Coagulation Validation Record: contribute/validation/gpu/coagulation.md
-    - Condensation Parity Walkthrough Ownership Record: contribute/validation/gpu/condensation-parity.md
-    - Condensation Stiffness Study and Recommendation Record: contribute/validation/numerics/condensation-stiffness.md
-    - v0.3.0 validation: contribute/validation/releases/v0.3.0.md
-    - Pending optimization: contribute/roadmap.md
-    - Graph-capture qualification: contribute/validation/gpu/graph-capture-qualification.md
-    - Mass Precision Recommendation Report: contribute/validation/numerics/mass-precision.md
-    - 'Warp Autodiff: Limitations and Stochastic Process Handling': contribute/architecture/warp/autodiff-limitations.md
-    - GPU graph-capture profiling record: contribute/validation/gpu/graph-capture-profiling.md
-    - Resident benchmark and memory-budget record: contribute/validation/gpu/resident-benchmarks.md
-  - Code Concepts:
+  - Architecture:
+    - Architecture: contribute/architecture/index.md
     - Particula Design: contribute/architecture/design-patterns.md
     - Object‑Oriented Patterns: contribute/architecture/object-oriented-patterns.md
     - WARMED Code: contribute/architecture/warmed-principle.md
-    - Code Concepts: contribute/architecture/index.md
-  - nvidia-warp:
-    - Data Structures for Aerosol Simulation: contribute/architecture/warp/datastructures.md
-    - Aerosol Dynamics with NVIDIA Warp: contribute/architecture/warp/teaching/fluids.md
-    - Particle Interactions and Wall Loss with NVIDIA Warp: contribute/architecture/warp/teaching/geometry.md
-    - gpu benchmarks: contribute/validation/gpu/legacy-benchmarks/gpu_benchmarks.ipynb
-    - NVIDIA Warp for Particle Simulation: contribute/architecture/warp/index.md
-    - Kernels and Function Inlining for Particle Simulation: contribute/architecture/warp/kernels.md
-  - Contribution workflow:
-    - Code of Conduct: contribute/CODE_OF_CONDUCT.md
-    - CONTRIBUTING: contribute/CONTRIBUTING.md
-    - 'Docstring Specification: Python Classes, Attributes, and Methods': contribute/Code_Specifications/Details/Class_docstring_format.md
-    - 'Docstring Specification: Python Functions': contribute/Code_Specifications/Details/Function_docstring_format.md
-    - Linear Git Repository: contribute/Code_Specifications/Details/Linear_Git_Repository.md
-    - Code Specifications: contribute/Code_Specifications/index.md
-    - Add Class: contribute/Feature_Workflow/Details/Add_Class.md
-    - Add Examples: contribute/Feature_Workflow/Details/Add_Example.md
-    - Add Functions: contribute/Feature_Workflow/Details/Add_Function.md
-    - Add Theory: contribute/Feature_Workflow/Details/Add_Theory.md
-    - Add Unit Tests: contribute/Feature_Workflow/Details/Add_Unit_Test.md
-    - Adding to `__init__.py`: contribute/Feature_Workflow/Details/Add_to_init.md
-    - Feature Workflow: contribute/Feature_Workflow/index.md
+    - Warp internals:
+      - Warp internals: contribute/architecture/warp/index.md
+      - 'Warp Autodiff: Limitations and Stochastic Process Handling': contribute/architecture/warp/autodiff-limitations.md
+      - Data Structures for Aerosol Simulation: contribute/architecture/warp/datastructures.md
+      - Kernels and Function Inlining for Particle Simulation: contribute/architecture/warp/kernels.md
+      - Illustrative Warp examples:
+        - Aerosol Dynamics with NVIDIA Warp: contribute/architecture/warp/teaching/fluids.md
+        - Particle Interactions and Wall Loss with NVIDIA Warp: contribute/architecture/warp/teaching/geometry.md
+  - Validation:
+    - Validation: contribute/validation/index.md
+    - GPU:
+      - Historical coagulation benchmark evidence: contribute/validation/gpu/coagulation-benchmarks.md
+      - GPU Coagulation Validation Record: contribute/validation/gpu/coagulation.md
+      - Condensation Parity Walkthrough Ownership Record: contribute/validation/gpu/condensation-parity.md
+      - GPU graph-capture profiling record: contribute/validation/gpu/graph-capture-profiling.md
+      - Graph-capture qualification gates: contribute/validation/gpu/graph-capture-qualification.md
+      - Resident benchmark and memory-budget record: contribute/validation/gpu/resident-benchmarks.md
+      - Historical benchmark viewer:
+        - 'Recorded GPU benchmark viewer': contribute/validation/gpu/legacy-benchmarks/gpu_benchmarks.ipynb
+    - Numerical methods:
+      - Condensation Stiffness Study and Recommendation Record: contribute/validation/numerics/condensation-stiffness.md
+      - Mass Precision Recommendation Report: contribute/validation/numerics/mass-precision.md
+    - Release gates:
+      - Native API migration validation and release gates: contribute/validation/releases/v0.3.0.md

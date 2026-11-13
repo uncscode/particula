@@ -992,7 +992,7 @@ TIPS:
 
 DOCUMENTATION:
 - Full routing guide: .opencode/guides/backend_configuration.md
-- Platform router: docs/Features/platform-router.md
+- Platform router: docs/guide/platform-router.md
 ```
 
 # Error Handling

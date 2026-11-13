@@ -36,6 +36,7 @@ class ValidationResult:
     execution_error: str | None
     timed_out: bool
     file_missing: bool = False  # True if file was deleted/not found
+    prerequisite_missing: str | None = None
 
 
 def validate_syntax(notebook_path: Path) -> tuple[bool, list[str]]:
@@ -198,6 +199,31 @@ def validate_notebook(notebook_path: str, timeout: int) -> ValidationResult:
     # Phase 1: Syntax validation
     syntax_valid, syntax_errors = validate_syntax(path)
 
+    # This viewer consumes an opt-in, machine-specific local artifact. CI must
+    # not invent timing rows or treat its absence as measured evidence.
+    repo = Path(__file__).resolve().parents[2]
+    viewer = repo / (
+        "docs/contribute/validation/gpu/legacy-benchmarks/"
+        "gpu_benchmarks.ipynb"
+    )
+    artifact = repo / ".artifacts/benchmarks/gpu_benchmark_results.json"
+    exported = repo / "gpu_benchmark_results.json"
+    if (
+        syntax_valid
+        and path.resolve() == viewer
+        and not artifact.is_file()
+        and not exported.is_file()
+    ):
+        return ValidationResult(
+            notebook=notebook_path,
+            syntax_valid=True,
+            syntax_errors=[],
+            execution_valid=None,
+            execution_error=None,
+            timed_out=False,
+            prerequisite_missing=str(artifact.relative_to(repo)),
+        )
+
     # Phase 2: Execution validation (only if syntax is valid)
     if syntax_valid:
         exec_valid, exec_error, timed_out = execute_notebook(path, timeout)
@@ -222,6 +248,11 @@ def print_result(result: ValidationResult) -> None:
 
     if result.file_missing:
         print(f"  SKIP: {notebook_name} (file deleted/not found)")
+    elif result.prerequisite_missing:
+        print(
+            f"  UNAVAILABLE: {notebook_name} "
+            f"(requires recorded artifact: {result.prerequisite_missing})"
+        )
     elif result.syntax_valid and result.execution_valid:
         print(f"  PASS: {notebook_name}")
     elif result.timed_out:
@@ -290,11 +321,15 @@ def main() -> int:
     )
     skipped_timeout = sum(1 for r in results if r.timed_out)
     skipped_missing = sum(1 for r in results if r.file_missing)
+    skipped_prerequisite = sum(
+        1 for r in results if r.prerequisite_missing is not None
+    )
 
     print(f"  Passed:  {passed}")
     print(f"  Failed:  {failed}")
     print(f"  Skipped: {skipped_timeout} (timeout)")
     print(f"  Skipped: {skipped_missing} (deleted)")
+    print(f"  Unavailable: {skipped_prerequisite} (recorded artifact required)")
     print("=" * 60)
 
     # Return failure if any notebooks failed (not for timeouts)

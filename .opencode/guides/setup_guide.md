@@ -228,7 +228,7 @@ GITLAB_TOKEN=glpat-***
 Keep branches/PRs on your fork and route issues upstream when needed. See the
 fork+upstream settings in
 [Backend Configuration](backend_configuration.md#github-single-repository-installs-default)
-for required variables and the [Routing Feature](https://github.com/Gorkowski/Agent/blob/main/docs/Features/fork-upstream-routing.md)
+for required variables and the [Routing Feature](https://github.com/Gorkowski/Agent/blob/main/docs/guide/fork-upstream-routing.md)
 for behavior.
 ```env
 GITHUB_REPO_URL=https://github.com/<you>/Agent
