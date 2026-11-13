@@ -23,6 +23,7 @@ from particula import (
 from particula.aerosol import Aerosol
 from particula.aerosol_builder import AerosolBuilder
 from particula.execution import (
+    CPUExecutionContext,
     Backend,
     Capability,
     CapabilityDeclaration,
