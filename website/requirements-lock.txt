@@ -74,7 +74,7 @@ six==1.17.0
 soupsieve==4.0
 stack-data==0.6.3
 thermo==0.4.2
-tornado==6.6
+tornado==6.6.1
 tqdm==4.67.1
 traitlets==5.14.3
 typing-extensions==4.15.0
