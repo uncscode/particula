@@ -1,0 +1,221 @@
+---
+import { Icon } from '@astrojs/starlight/components';
+const sections = ['Guide', 'Examples', 'Theory', 'API', 'Contribute', 'Home'];
+---
+
+<particula-search>
+  <button class="search-trigger" aria-label="Search" aria-keyshortcuts="Control+K Meta+K" disabled>
+    <Icon name="magnifier" size="1.2rem" />
+    <span>Search documentation</span><kbd>Ctrl K</kbd>
+  </button>
+  <dialog aria-label="Search documentation" class="search-dialog">
+    <div class="search-dialog-heading"><strong>Search documentation</strong><button class="search-close" aria-label="Close search">✕</button></div>
+    <fieldset class="search-sections" disabled>
+      <legend>Search in</legend>
+      <div class="search-section-options">
+        {sections.map((section) => <label><input type="checkbox" value={section} />{section}</label>)}
+      </div>
+      <div class="search-scope-help"><span>Leave unchecked to search all sections.</span><button type="button" class="search-all">Clear filters</button></div>
+    </fieldset>
+    <p class="search-loading" role="status">Loading search…</p>
+    <div id="particula-search-results">
+      <label class="sr-only" for="documentation-query">Search documentation</label>
+      <input id="documentation-query" type="search" placeholder="Search documentation" autocomplete="off" />
+      <p class="search-status" role="status" aria-live="polite"></p>
+      <ol class="search-results"></ol>
+      <button class="search-more" hidden>Show more results</button>
+    </div>
+  </dialog>
+</particula-search>
+
+<script>
+  interface SearchResult {
+    url: string;
+    meta: { title?: string };
+    excerpt: string;
+    sub_results?: { url: string; title: string; excerpt: string }[];
+  }
+  interface ResultReference { data: () => Promise<SearchResult> }
+  interface SearchIndex {
+    init: () => Promise<void>;
+    search: (query: string, options: { filters: object }) => Promise<{ results: ResultReference[] }>;
+  }
+  class ParticulaSearch extends HTMLElement {
+    connectedCallback() {
+      if (this.dataset.ready) return;
+      this.dataset.ready = 'true';
+      const trigger = this.querySelector<HTMLButtonElement>('.search-trigger')!;
+      const dialog = this.querySelector<HTMLDialogElement>('dialog')!;
+      const fieldset = this.querySelector<HTMLFieldSetElement>('fieldset')!;
+      const loading = this.querySelector<HTMLElement>('.search-loading')!;
+      const input = this.querySelector<HTMLInputElement>('#documentation-query')!;
+      const status = this.querySelector<HTMLElement>('.search-status')!;
+      const list = this.querySelector<HTMLOListElement>('.search-results')!;
+      const more = this.querySelector<HTMLButtonElement>('.search-more')!;
+      const boxes = [...fieldset.querySelectorAll<HTMLInputElement>('input')];
+      let index: SearchIndex | undefined;
+      let pending: Promise<void> | undefined;
+      let revision = 0;
+      let results: ResultReference[] = [];
+      let shown = 0;
+      let timer: ReturnType<typeof setTimeout>;
+
+      // Render text and highlight markers only, never insert indexed HTML.
+      const excerpt = (text: string) => {
+        const paragraph = document.createElement('p');
+        const parsed = new DOMParser().parseFromString(text, 'text/html');
+        for (const node of parsed.body.childNodes) {
+          if (node instanceof Element && node.tagName === 'MARK') {
+            const mark = document.createElement('mark');
+            mark.textContent = node.textContent;
+            paragraph.append(mark);
+          } else paragraph.append(document.createTextNode(node.textContent ?? ''));
+        }
+        return paragraph;
+      };
+      const link = (url: string, title: string) => {
+        const element = document.createElement('a');
+        element.href = url;
+        element.textContent = title;
+        return element;
+      };
+      const appendResults = async (version: number) => {
+        more.disabled = true;
+        try {
+          const next = await Promise.all(results.slice(shown, shown + 5).map((result) => result.data()));
+          if (version !== revision) return;
+          for (const data of next) {
+            const item = document.createElement('li');
+            const title = document.createElement('h3');
+            title.append(link(data.url, data.meta.title ?? data.url));
+            item.append(title, excerpt(data.excerpt));
+            for (const sub of (data.sub_results ?? []).filter((sub) => sub.url !== data.url && !sub.url.endsWith('#_top')).slice(0, 3)) {
+              const detail = document.createElement('div');
+              detail.className = 'search-subresult';
+              detail.append(link(sub.url, sub.title), excerpt(sub.excerpt));
+              item.append(detail);
+            }
+            list.append(item);
+          }
+          shown += next.length;
+          more.hidden = shown >= results.length;
+        } catch {
+          if (version === revision) status.textContent = 'Some results could not load. Search again to retry.';
+        } finally { if (version === revision) more.disabled = false; }
+      };
+      const search = async (version: number) => {
+        list.replaceChildren();
+        more.hidden = true;
+        const query = input.value.trim();
+        if (!query) { status.textContent = 'Enter a term to search.'; return; }
+        status.textContent = 'Searching…';
+        try {
+          await pending;
+          if (!index || version !== revision) return;
+          const sections = boxes.filter((box) => box.checked).map((box) => box.value);
+          const response = await index.search(query, {
+            filters: sections.length ? { Section: { any: sections } } : {},
+          });
+          if (version !== revision) return;
+          results = response.results;
+          shown = 0;
+          status.textContent = `${results.length} ${results.length === 1 ? 'result' : 'results'} for “${query}”`;
+          await appendResults(version);
+        } catch {
+          if (version === revision) status.textContent = 'Search could not complete. Please try again.';
+        }
+      };
+      const scheduleSearch = () => {
+        clearTimeout(timer);
+        const version = ++revision;
+        timer = setTimeout(() => search(version), 150);
+      };
+      const initialize = async () => {
+        try {
+          const path = import.meta.env.BASE_URL.replace(/\/$/, '') + '/pagefind/pagefind.js';
+          index = await import(/* @vite-ignore */ path);
+          await index!.init();
+          fieldset.disabled = false;
+          loading.hidden = true;
+        } catch {
+          index = undefined;
+          loading.textContent = 'Search could not load. Close this dialog and reopen it to retry.';
+          pending = undefined;
+        }
+      };
+      const open = async () => {
+        if (dialog.open) return;
+        dialog.showModal();
+        input.focus();
+        if (import.meta.env.DEV) {
+          loading.textContent = 'Search is available in the built preview.';
+          return;
+        }
+        pending ??= initialize();
+        await pending;
+        if (index) scheduleSearch();
+      };
+      trigger.disabled = false;
+      if (/Mac|iPhone|iPad|iPod/.test(navigator.platform)) trigger.querySelector('kbd')!.textContent = '⌘ K';
+      trigger.addEventListener('click', open);
+      input.addEventListener('input', scheduleSearch);
+      fieldset.addEventListener('change', scheduleSearch);
+      more.addEventListener('click', () => appendResults(revision));
+      this.querySelector('.search-close')!.addEventListener('click', () => dialog.close());
+      dialog.addEventListener('click', (event) => {
+        if (event.target === dialog || (event.target instanceof Element && event.target.closest('a'))) dialog.close();
+      });
+      dialog.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') { event.preventDefault(); dialog.close(); }
+      }, { capture: true });
+      dialog.addEventListener('close', () => trigger.focus());
+      this.querySelector('.search-all')!.addEventListener('click', () => {
+        boxes.forEach((box) => { box.checked = false; });
+        scheduleSearch();
+      });
+      window.addEventListener('keydown', (event) => {
+        if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+          event.preventDefault();
+          dialog.open ? dialog.close() : open();
+        }
+      });
+    }
+  }
+  customElements.define('particula-search', ParticulaSearch);
+</script>
+
+<style is:global>
+  particula-search { display: block; }
+  .search-trigger { display: flex; align-items: center; gap: .6rem; width: 100%; min-height: 2.5rem; padding: .5rem .75rem; border: 1px solid var(--sl-color-gray-5); border-radius: .5rem; background: var(--sl-color-bg); color: var(--sl-color-gray-2); font: inherit; font-size: .85rem; cursor: pointer; }
+  .search-trigger kbd { margin-inline-start: auto; font-size: .7rem; white-space: nowrap; }
+  .search-trigger span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .search-trigger:hover { border-color: var(--sl-color-gray-3); }
+  .search-dialog { width: min(44rem, calc(100% - 2rem)); max-height: calc(100dvh - 4rem); margin: 2rem auto; padding: 1.25rem; overflow: auto; border: 1px solid var(--sl-color-gray-5); border-radius: .75rem; background: var(--sl-color-bg); color: var(--sl-color-text); box-shadow: var(--sl-shadow-lg); }
+  .search-dialog::backdrop { background: #0008; backdrop-filter: blur(3px); }
+  body:has(.search-dialog[open]) { overflow: hidden; }
+  .search-dialog-heading { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; color: var(--sl-color-gray-1); }
+  .search-close { background: transparent; border: 1px solid var(--sl-color-gray-5); border-radius: .4rem; color: inherit; min-width: 2.5rem; min-height: 2.5rem; cursor: pointer; }
+  .search-sections { border: 0; padding: 0; margin: 0 0 1rem; min-width: 0; }
+  .search-sections legend { font-size: .8rem; font-weight: 600; margin-bottom: .5rem; }
+  .search-section-options { display: flex; flex-wrap: wrap; gap: .4rem; }
+  .search-section-options label { display: flex; align-items: center; gap: .45rem; padding: .4rem .6rem; border: 1px solid var(--sl-color-gray-5); border-radius: .4rem; font-size: .85rem; cursor: pointer; }
+  .search-section-options label:has(:checked) { background: var(--sl-color-accent-low); border-color: var(--sl-color-accent); color: var(--sl-color-text-accent); }
+  .search-section-options input { appearance: auto; width: 1rem; height: 1rem; accent-color: var(--sl-color-accent); }
+  .search-scope-help { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .5rem; font-size: .75rem; margin-top: .5rem; }
+  .search-all { background: transparent; border: 0; padding: 0; font: inherit; color: var(--sl-color-text-accent); text-decoration: underline; cursor: pointer; }
+  #documentation-query { width: 100%; min-height: 3rem; border: 1px solid var(--sl-color-gray-5); border-radius: .5rem; background: var(--sl-color-bg); padding: .7rem 1rem; color: var(--sl-color-gray-1); font: inherit; }
+  .search-status { font-size: .85rem; margin-block: 1rem; }
+  .search-results { list-style: none; margin: 0; padding: 0; }
+  .search-results > li { border-top: 1px solid var(--sl-color-gray-5); padding-block: 1.1rem; }
+  .search-results h3 { font-size: 1rem; margin: 0 0 .5rem; }
+  .search-results a { color: var(--sl-color-gray-1); text-decoration: none; font-weight: 600; }
+  .search-results a:hover { color: var(--sl-color-text-accent); text-decoration: underline; }
+  .search-results p { font-size: .85rem; margin-block: .35rem; overflow-wrap: anywhere; }
+  .search-subresult { border-inline-start: 1px solid var(--sl-color-gray-5); padding-inline-start: .75rem; margin-top: .75rem; font-size: .9rem; }
+  .search-results mark { color: var(--sl-color-text-accent); background: var(--sl-color-accent-low); }
+  .search-more { width: 100%; padding: .75rem; color: var(--sl-color-text-accent); background: var(--sl-color-bg); border: 1px solid var(--sl-color-gray-5); border-radius: .4rem; cursor: pointer; }
+  @media (max-width: 49.999rem) {
+    .search-trigger kbd { display: none; }
+    .search-dialog { width: calc(100% - 1rem); margin: .5rem auto; max-height: calc(100dvh - 1rem); padding: 1rem; }
+  }
+</style>

@@ -20,7 +20,7 @@
 .hero h1 { letter-spacing: -.045em; line-height: 1.05; max-width: 12ch; }
 .hero .tagline { max-width: 36rem; }
 .hero img { filter: drop-shadow(0 15px 35px #5cb49d22); }
-.site-title img { width: 2rem; }
+.site-title img { width: 2rem; height: 2rem; }
 .sl-markdown-content details { border: 1px solid var(--sl-color-gray-5); border-radius: .55rem; padding: .8rem 1rem; margin-block: 1.4rem; }
 .sl-markdown-content details summary { cursor: pointer; font-weight: 600; }
 .sl-markdown-content figure.scientific-figure { margin-inline: 0; padding: 1rem; background: white; border: 1px solid #dce8e2; border-radius: .7rem; }
@@ -49,10 +49,11 @@ pre.mermaid svg { display: block; margin: auto; max-width: 100%; }
 :root { --sl-content-inline-start: 0rem; }
 .particula-page { min-height: 100vh; }
 .page-header { position: fixed; inset: 0 0 auto; height: var(--sl-nav-height); padding: var(--sl-nav-pad-y) var(--sl-nav-pad-x); z-index: var(--sl-z-index-navbar); background: var(--sl-color-bg-nav); border-bottom: 1px solid var(--sl-color-hairline-shade); }
-.particula-header { display: flex; align-items: center; gap: 1rem; height: 100%; }
+.particula-header { display: grid; grid-template-columns: 1fr clamp(12rem, 28vw, 22rem) 1fr; align-items: center; gap: 1rem; height: 100%; }
+.header-brand { display: flex; align-items: center; gap: .75rem; }
 .particula-header .site-title { flex-shrink: 0; }
-.header-search { margin-inline-start: auto; min-width: 0; }
-.header-tools { display: flex; align-items: center; gap: 1rem; }
+.header-search { width: 100%; min-width: 0; }
+.header-tools { display: flex; align-items: center; gap: 1rem; justify-self: end; }
 .navigation-toggle, .drawer-close { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; border: 1px solid var(--sl-color-gray-5); border-radius: .4rem; padding: .45rem .65rem; background: transparent; color: var(--sl-color-white); font: inherit; font-size: .85rem; cursor: pointer; white-space: nowrap; }
 .navigation-toggle:hover, .drawer-close:hover { background: var(--sl-color-gray-6); }
 .navigation-drawer { position: fixed; inset: var(--sl-nav-height) auto 0 0; margin: 0; padding: 0 1rem 1.5rem; width: min(20rem, calc(100vw - .75rem)); height: auto; max-height: none; overflow-y: auto; overscroll-behavior: contain; color: var(--sl-color-text); background: var(--sl-color-bg-sidebar); border: 0; border-inline-end: 1px solid var(--sl-color-gray-5); box-shadow: var(--sl-shadow-lg); }
@@ -63,7 +64,9 @@ pre.mermaid svg { display: block; margin: auto; max-width: 100%; }
 .reading-layout .main-pane { width: 100%; max-width: 56rem; min-width: 0; margin-inline: auto; }
 .reading-layout .sl-container { margin-inline: auto; }
 @media (max-width: 49.999rem) {
-  .particula-header { gap: .65rem; }
+  :root { --sl-nav-height: 7.25rem; }
+  .particula-header { grid-template-columns: 1fr; grid-template-rows: auto auto; gap: .5rem; }
+  .header-search { grid-row: 2; }
   .navigation-toggle span, .header-tools { display: none; }
   .navigation-toggle { min-height: 2.5rem; min-width: 2.5rem; }
 }
@@ -88,4 +91,8 @@ pre.mermaid svg { display: block; margin: auto; max-width: 100%; }
   .page-header, .navigation-drawer, .page-menu { display: none !important; }
   .main-frame { padding: 0; }
   .reading-layout.has-page-menu { display: block; }
+}
+
+@media (min-width: 50rem) and (max-width: 63.999rem) {
+  .navigation-toggle span { display: none; }
 }
