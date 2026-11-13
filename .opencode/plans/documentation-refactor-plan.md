@@ -678,3 +678,17 @@ catalog does not claim fresh execution or scientific validation.
 
 This refactor does not approve the v0.3.0 release or qualify CUDA performance.
 Those explicit scientific/maintainer gates remain open in their validation records.
+
+## Follow-up — retire vector-store publication
+
+- The vector-store build and upload are no longer part of the documentation
+  workflow. Archive `docs/.assets/vector_file_generator.py` and
+  `docs/.assets/vector_store_upload.py` unchanged under `.trash/docs-v0.3.0/`.
+- Remove the OpenAI and GitPython development dependencies; the retired
+  uploader was their only Python consumer in this repository.
+- The associated `AIdocs.yml` action was already removed in `8dc8bc51f`.
+  Keep the current MkDocs site/API publication workflow.
+- Validation: archived scripts match their source bytes; active build/tooling
+  references and dedicated dependencies are absent; documentation structure
+  reports zero errors, the strict base build passes, and the diff passes
+  whitespace checks.
