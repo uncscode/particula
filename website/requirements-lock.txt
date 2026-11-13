@@ -71,7 +71,7 @@ referencing==0.37.0
 rpds-py==0.27.1
 scipy==1.16.2
 six==1.17.0
-soupsieve==2.8
+soupsieve==4.0
 stack-data==0.6.3
 thermo==0.4.2
 tornado==6.5.2
