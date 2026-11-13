@@ -24,7 +24,11 @@ DEFAULT_PATHS = (
     "particula/execution/tests/native_checkpoint_test.py",
     "particula/execution/tests/native_full_loop_test.py",
     "particula/execution/tests/captured_full_loop_test.py",
+    "particula/execution/tests/graph_capture_test.py",
+    "particula/execution/tests/prepared_test.py",
+    "particula/execution/tests/prepared_restart_capture_test.py",
     "particula/gpu/kernels/tests/coagulation_native_test.py",
+    "particula/gpu/kernels/tests/brownian_parallel_test.py",
     "particula/gpu/kernels/tests/condensation_native_test.py",
 )
 

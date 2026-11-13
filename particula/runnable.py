@@ -37,6 +37,7 @@ from particula.aerosol import Aerosol
 if TYPE_CHECKING:
     from particula.execution import Backend
     from particula.execution.prepared import PreparedSimulation
+    from particula.execution.prepared_types import SimulationCheckpoint
 
 
 class RunnableABC:
@@ -209,6 +210,39 @@ class RunnableABC:
             logical_box_ids=logical_box_ids,
         )
 
+    def resume(
+        self,
+        checkpoint: "SimulationCheckpoint",
+        *,
+        backend: "Backend | None" = None,
+        device: str | None = None,
+    ) -> "PreparedSimulation":
+        """Resume exact saved state using the same process configuration.
+
+        Args:
+            checkpoint: SimulationCheckpoint from a prepared owner.
+            backend: Backend.WARP by default.
+            device: Exact checkpoint device by default; migration rejects.
+
+        Returns:
+            A new owner preserving state, RNG words, timestep and counters.
+            Capture is explicit again; native graph handles are never restored.
+
+        Raises:
+            ValueError: If configuration, order, schema or device differs, or
+                current population cannot be admitted (e.g. unequal Brownian
+                counts after a later process injected new particles).
+        """
+        from particula.execution import Backend
+        from particula.execution.prepared_checkpoint import resume_simulation
+
+        return resume_simulation(
+            (self,),
+            checkpoint,
+            backend=Backend.WARP if backend is None else backend,
+            device=device,
+        )
+
     def __or__(self, other: "RunnableABC") -> "RunnableSequence":
         """Chain this Runnable with another using the '|' operator.
 
@@ -370,6 +404,39 @@ class RunnableSequence:
             time_step=time_step,
             root_seed=root_seed,
             logical_box_ids=logical_box_ids,
+        )
+
+    def resume(
+        self,
+        checkpoint: "SimulationCheckpoint",
+        *,
+        backend: "Backend | None" = None,
+        device: str | None = None,
+    ) -> "PreparedSimulation":
+        """Resume exact saved state using the same process configuration.
+
+        Args:
+            checkpoint: SimulationCheckpoint from a prepared owner.
+            backend: Backend.WARP by default.
+            device: Exact checkpoint device by default; migration rejects.
+
+        Returns:
+            A new owner preserving state, RNG words, timestep and counters.
+            Capture is explicit again; native graph handles are never restored.
+
+        Raises:
+            ValueError: If configuration, order, schema or device differs, or
+                current population cannot be admitted (e.g. unequal Brownian
+                counts after a later process injected new particles).
+        """
+        from particula.execution import Backend
+        from particula.execution.prepared_checkpoint import resume_simulation
+
+        return resume_simulation(
+            tuple(self.processes),
+            checkpoint,
+            backend=Backend.WARP if backend is None else backend,
+            device=device,
         )
 
     def __or__(self, process: RunnableABC) -> "RunnableSequence":

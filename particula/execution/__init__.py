@@ -73,6 +73,7 @@ __all__ = [
     "CPUExecutionContext",
     "PreparedSimulation",
     "SimulationDiagnostics",
+    "SimulationCheckpoint",
 ]
 
 if TYPE_CHECKING:
@@ -1297,4 +1298,8 @@ def __getattr__(name: str):
         from particula.execution.prepared_types import SimulationDiagnostics
 
         return SimulationDiagnostics
+    if name == "SimulationCheckpoint":
+        from particula.execution.prepared_types import SimulationCheckpoint
+
+        return SimulationCheckpoint
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

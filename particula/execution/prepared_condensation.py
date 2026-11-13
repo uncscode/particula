@@ -360,4 +360,6 @@ def compile_condensation(plan: _ProcessPlan, owner: Any):
         prepared=replace(binding.prepared, failure=owner._device_failure),
     )
     owner._bindings[plan.family] = binding
+    if state.energy_transfer is not None:
+        owner._auxiliary["latent_heat_energy"] = state.energy_transfer
     return binding.execute
