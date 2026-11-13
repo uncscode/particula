@@ -34,7 +34,7 @@ not promise rollback. No state readbacks or allocations inside prepared steps.
 - [x] 1. `test(gpu): make CUDA qualification explicit`: normalize aliases,
   correctly mark parameter cases, require nonempty CUDA execution and reject
   unexpected skips. Record hardware/runtime provenance.
-- [ ] 2. `feat(execution): add prepared simulation ownership`: upload,
+- [x] 2. `feat(execution): add prepared simulation ownership`: upload,
   detached complete snapshots, synchronization and lifecycle/cleanup.
 - [ ] 3. `feat(execution): prepare supported runnable processes`: faithful
   configuration translation, persistent resources, nondefault coefficients,
@@ -136,3 +136,11 @@ fixture with one active particle per box (zero collision opportunities).
 The coagulation qualification now explicitly uses 64 partners and total number
 density 1e15 m^-3; existing activity, RNG-continuation and conservation assertions
 all pass. This is baseline qualification, not final feature/performance evidence.
+
+Phase 2: owner, dedicated CUDA stream, detached snapshots, explicit observation,
+faulting and context cleanup implemented in `execution/prepared.py`. This is
+still internally constructed until phase 3 connects validated runnables.
+Prepared/native-resident/conversion suites: **167 passed** on the host with
+CUDA and Warp CPU. Ruff and targeted mypy passed. No transfer, synchronization
+or allocation is allowed by the enqueue regression; all snapshot fields are
+checked for isolation. Closing performs no download.
