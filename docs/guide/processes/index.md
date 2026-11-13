@@ -28,8 +28,9 @@ through the v0.3.0 public initializers/builders and forbids facade construction.
 
 Per-particle species mass is kg. Resolved number density is count/V. Gas
 concentration is kg/m^3 in complete gas order, including inert lanes. CPU
-strategies currently require one box. Container support for more boxes does
-not imply multi-box strategy execution.
+strategies require one box. The five dynamics runnables handle multiple boxes
+through the shared `RunnableABC` driver; strategy methods keep their existing
+single-box inputs and outputs.
 
 ## Explicit calls and configuration
 
@@ -230,3 +231,57 @@ extensive kg in gas order: gas concentration times volume plus mapped particle
 inventory. Unmapped particle-only material is supported by process calls, but
 this bounded gas-order total-mass diagnostic rejects it rather than dropping
 its inventory. Two-snapshot diagnostics do not require a mass map.
+
+## Batched CPU runnable execution
+
+`MassCondensation`, `Coagulation`, `WallLoss`, `Dilution`, and `Nucleation`
+use the shared `RunnableABC` box loop. Each process substep stages independent
+state, invokes its single-box strategy for every box, and publishes into the
+original arrays only after every box succeeds. Earlier completed substeps and
+processes remain committed if a later one fails. Concurrent mutation is not
+supported. A `RunnableSequence` orders work as substep, process, then boxes.
+
+One `ParticleData.distribution_type` applies to the entire batch. Discrete/PMF
+and continuous-PDF boxes retain exactly 1 m³ reference volume; resolved boxes
+can have different positive physical volumes. Strategies with a declared kind
+must match it. Nucleation accepts resolved populations only. No implicit type
+conversion, cross-box transport, or per-box physics configuration is added.
+Material densities, gas names, species maps, and process configuration are
+shared; gas inventories, temperature, pressure, and resolved volumes are per box.
+
+Runnable rates preserve the box axis even when B=1:
+
+| Runnable | Rate shape |
+|---|---|
+| Mass condensation | `(B, N, Sp)` |
+| Coagulation (PMF/PDF), wall loss, dilution | `(B, N)` |
+| Nucleation | `(B,)` |
+
+Direct strategy rates and kernels keep their single-box shapes. Resolved
+coagulation still has no continuous number-rate API. Existing PMF/PDF
+coagulation composition limitations are unchanged. Latent condensation exposes
+`MassCondensation.last_latent_heat_energy` in J as `(B,)` for the most recent
+successful substep. The strategy scalar remains available for single-box use;
+its value is `None` after multi-box runnable execution to avoid reporting only
+the last box.
+
+Stochastic multi-box calls require `CPUExecutionContext(root_seed, box_ids)`
+from `particula.execution`. Pass it with `execute(..., context=context)`;
+sequences and CPU adapter execution-state records also accept the context.
+Each process namespace and logical box ID has a persistent independent NumPy
+stream. Reuse the context to continue; create a new one to reset. Reorder arrays
+and use `context.with_box_ids(new_order)` together. Views share continuation;
+new IDs initialize lazily, and temporarily absent IDs retain their state.
+Failed and zero-duration substeps do not advance caller-owned streams.
+Single-box calls without a context retain existing strategy seed configuration.
+There is no implied equivalence to resident GPU RNG or checkpoint state.
+
+Custom runnables that override `execute` or `rate` retain their own semantics.
+To adopt batching, implement the single-box hooks and declare writer fields;
+custom code owns any additional mutable state and publication behavior.
+Legacy custom dilution strategies retain their original delegation path and
+cannot accept an execution context. `Equilibria` still uses auxiliary inputs
+and result attachments; native inventory mapping is a separate migration gap.
+
+See the [Aerosol Tutorial](../../examples/fundamentals/native-aerosol.md) for
+an executed two-box example with distinct volumes and stable box IDs.

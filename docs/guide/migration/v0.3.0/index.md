@@ -34,8 +34,8 @@ including nonpartitioning species. `EnvironmentData` owns per-box temperature
 and pressure and full gas-order saturation ratios. Activity, surface,
 vapor-pressure and other physical configuration belong to processes.
 
-Batched storage does not imply general multi-box CPU process support. The
-native CPU runnable path remains single-box. Direct Warp and resident execution
+The five native CPU dynamics runnables support batched storage through a
+shared box loop; direct strategy methods remain single-box. Direct Warp and resident execution
 use explicit preparation and transfer, with their documented process-specific
 limits. Warp CPU is the installed-Warp baseline for uncaptured examples;
 native graph capture requires CUDA and has no CPU fallback.

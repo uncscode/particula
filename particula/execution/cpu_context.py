@@ -47,8 +47,8 @@ class CPUExecutionContext:
             or root_seed < 0
         ):
             raise ValueError("root_seed must be a nonnegative integer")
-        self._root_seed = int(root_seed)
-        self._box_ids = _box_ids(box_ids)
+        self._root_seed: int = int(root_seed)
+        self._box_ids: tuple[str, ...] = _box_ids(box_ids)
         self._streams: dict[tuple[str, str], np.random.Generator] = {}
 
     @property

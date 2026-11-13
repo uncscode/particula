@@ -4,12 +4,14 @@ title: Native dynamics migration
 
 # Native dynamics migration
 
-## Single-box CPU processes
+## CPU processes and boxes
 
 Native runnables consume the current `Aerosol.particles`, `.gas` and
 `.environment` objects. They preserve those identities during in-place process
-execution. Their schema may store several boxes, but the supported CPU runnable
-path is single-box; it does not silently process box zero of a multi-box input.
+execution. Condensation, coagulation, wall loss, dilution, and nucleation
+runnables process every box. Direct strategy methods remain single-box.
+Runnable rates retain the box axis, including B=1: use `rates[0]` when
+passing one box to existing plotting or single-box numerical utilities.
 
 Run this excerpt from the selected native checkout. Its maintained constructors
 are in `docs/examples/fundamentals/native_state_access.py`:

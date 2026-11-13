@@ -108,8 +108,9 @@ from particula.particles import ParticleData
 ## Native data contract
 
 Native `Aerosol` holds `ParticleData`, `GasData` and `EnvironmentData` by
-identity. Scientific processes own their physics and validate their supported
-single-box inputs. Incomplete CPU material scratch storage may omit a tag,
+identity. Scientific strategies own their physics and validate single-box inputs.
+CPU runnables stage and iterate every box through these strategies, publishing
+each process substep only after all boxes succeed. Incomplete CPU material scratch storage may omit a tag,
 but it is not an executable or transferable population. This guide describes
 the selected checkout; release publication remains a separate decision.
 
@@ -387,3 +388,13 @@ runtime regression command is
 - [Troubleshooting](../gpu/troubleshooting.md)
 
 - [Field ownership and transfer policy](field-ownership.md)
+
+### Builder box counts and ownership
+
+`set_n_boxes()` accepts positive Python or NumPy integers, excluding booleans
+and fractional values. Gas builders broadcast singleton concentration rows,
+accept exact box-count matches, and reject other mismatches. Particle builders
+materialize writable independent arrays when broadcasting concentration,
+charge, or volume. Already matching arrays retain their existing ownership
+behavior. A successful build does not imply an independent copy of every
+input; use `copy()` when isolation is required.
