@@ -1,0 +1,36 @@
+:root {
+  --sl-color-accent-low: #123c3b;
+  --sl-color-accent: #53c5b6;
+  --sl-color-accent-high: #b5eee6;
+  --sl-font: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --sl-content-width: 52rem;
+}
+:root[data-theme='light'] {
+  --sl-color-accent-low: #e0f5ef;
+  --sl-color-accent: #08786c;
+  --sl-color-accent-high: #154b43;
+  --sl-color-white: #18322d;
+  --sl-color-gray-1: #29463f;
+  --sl-color-gray-2: #3f5c56;
+  --sl-color-gray-3: #5b716b;
+  --sl-color-gray-6: #eaf0ec;
+  --sl-color-bg: #fcfdfb;
+}
+.hero { padding-block: 3rem 2rem; }
+.hero h1 { letter-spacing: -.045em; line-height: 1.05; max-width: 12ch; }
+.hero .tagline { max-width: 36rem; }
+.hero img { filter: drop-shadow(0 15px 35px #5cb49d22); }
+.site-title img { width: 2rem; }
+.sl-markdown-content details { border: 1px solid var(--sl-color-gray-5); border-radius: .55rem; padding: .8rem 1rem; margin-block: 1.4rem; }
+.sl-markdown-content details summary { cursor: pointer; font-weight: 600; }
+.sl-markdown-content figure.scientific-figure { margin-inline: 0; padding: 1rem; background: white; border: 1px solid #dce8e2; border-radius: .7rem; }
+.sl-markdown-content figure.scientific-figure img { width: 100%; height: auto; }
+.sl-markdown-content figure.scientific-figure figcaption { color: #456058; font-size: .85rem; padding-top: .5rem; }
+.sl-markdown-content mjx-container:not([display='true']) > svg { display: inline; }
+.sl-markdown-content mjx-container[display='true'] { display: block; overflow-x: auto; margin-block: 1.5rem; }
+.result-output { max-height: 20rem; overflow: auto; }
+.result-meta { font-size: .85rem; color: var(--sl-color-gray-2); border-left: 3px solid var(--sl-color-accent); padding: .5rem 1rem; }
+.demo-banner { font-size: .85rem; padding: .7rem 1rem; border-radius: .4rem; background: var(--sl-color-accent-low); }
+pre.mermaid { background: #f4f7f4; padding: 1rem; border-radius: .6rem; overflow-x: auto; }
+pre.mermaid svg { display: block; margin: auto; max-width: 100%; }
+.result-table { overflow-x: auto; }
