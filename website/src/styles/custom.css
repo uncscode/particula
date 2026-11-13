@@ -35,6 +35,16 @@ pre.mermaid { background: #f4f7f4; padding: 1rem; border-radius: .6rem; overflow
 pre.mermaid svg { display: block; margin: auto; max-width: 100%; }
 .result-table { overflow-x: auto; }
 
+/* Informational notes are quiet context, not alerts. */
+.starlight-aside--note {
+  --sl-color-asides-text-accent: var(--sl-color-gray-1);
+  --sl-color-asides-border: var(--sl-color-gray-5);
+  color: var(--sl-color-text);
+  background-color: color-mix(in srgb, var(--sl-color-gray-6) 45%, transparent);
+  border: 1px solid var(--sl-color-asides-border);
+  border-radius: .5rem;
+}
+
 /* The same overlay navigation serves the hero and documentation pages. */
 :root { --sl-content-inline-start: 0rem; }
 .particula-page { min-height: 100vh; }
