@@ -8,14 +8,14 @@ on:
       - particula/conftest.py
       - conftest.py
       - pyproject.toml
+      - _particula_build.py
+      - particula_docs.py
       - conda/**
       - scripts/conda_feedstock.py
       - scripts/check_feedstock_contract.py
       - scripts/run_release_tests.py
       - scripts/tests/**
-      - docs/examples/processes/dilution/cpu_dilution.py
-      - docs/examples/processes/nucleation/cpu_nucleation.py
-      - docs/examples/processes/condensation/condensation_latent_heat.py
+      - docs/**
       - examples_tests/dilution_example_test.py
       - examples_tests/nucleation_example_test.py
       - examples_tests/condensation_latent_heat_example_test.py

@@ -23,9 +23,23 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install build
+        pip install build 'flit_core>=3.12,<4' pytest PyYAML
+    - name: Test documentation packaging
+      run: python -m pytest scripts/tests/doc_bundle_test.py -q -Werror
     - name: Build package
       run: python -m build
+    - name: Verify exact release documentation bundles
+      run: >-
+        python scripts/check_doc_bundle.py
+        --wheel dist/particula-*.whl --sdist dist/particula-*.tar.gz
+        --report .artifacts/docs-bundle.json
+    - name: Save documentation bundle evidence
+      uses: actions/upload-artifact@v7
+      with:
+        name: docs-bundle
+        path: .artifacts/docs-bundle.json
+        include-hidden-files: true
+        if-no-files-found: error
     - if: ${{ github.event.action == 'published' }}
       name: Publish package
       uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086

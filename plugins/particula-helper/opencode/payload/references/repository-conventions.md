@@ -24,6 +24,13 @@ The 0.3.0 source tree requires Python 3.12+. `particula/__init__.py` owns
 `__version__`; Flit reads it dynamically. Plugin versions are independent.
 Neither changing a version nor passing tests publishes a release.
 
+For library development, read the selected checkout's maintained `docs/` tree.
+For questions about an installed release, locate its matching bundle with that
+interpreter's `python -m particula_docs --json`, then search the returned path;
+see [source discovery](sources.md) for commands and older-release fallback.
+An editable installation resolves directly to repository docs. Never edit the
+generated installed bundle or use it in place of the checkout's build inputs.
+
 ## Package boundaries
 
 - `particles/`: native particle data, distributions, slots, properties.

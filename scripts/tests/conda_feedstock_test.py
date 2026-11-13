@@ -94,6 +94,9 @@ def test_version_gate_writes_action_output(runner, monkeypatch, tmp_path):
         "scripts/tests/new_test.py",
         ".github/workflows/conda-feedstock.yml",
         "pyproject.toml",
+        "_particula_build.py",
+        "particula_docs.py",
+        "docs/guide/data-model/index.md",
         "conftest.py",
         "particula/conftest.py",
         "docs/examples/processes/dilution/cpu_dilution.py",
@@ -147,6 +150,7 @@ def test_workflow_triggers_cover_release_gate_inputs(runner):
         runner.VERSION_PATH,
         "conda/recipe/meta.yaml",
         "scripts/tests/new_test.py",
+        "docs/guide/data-model/index.md",
     ):
         assert any(fnmatchcase(path, pattern) for pattern in patterns), path
 
@@ -164,6 +168,11 @@ def test_recipe_declared_inputs_exist_in_staged_source(runner, tmp_path):
         "conftest.py",
         "readme.md",
         "license",
+        "_particula_build.py",
+        "particula_docs.py",
+        "docs/guide/index.md",
+        "docs/examples/unlisted.py",
+        "docs/data/reference.csv",
         "scripts/run_release_tests.py",
         *runner.CPU_EXAMPLES,
         *runner.CPU_EXAMPLE_TESTS,
@@ -174,7 +183,7 @@ def test_recipe_declared_inputs_exist_in_staged_source(runner, tmp_path):
         path.write_text("fixture")
     excluded = (
         "docs/Features/planning.md",
-        "docs/examples/unlisted.py",
+        "docs/guide/__pycache__/cache.pyc",
         "examples_tests/unlisted_test.py",
         ".opencode/plan.md",
     )
@@ -188,6 +197,7 @@ def test_recipe_declared_inputs_exist_in_staged_source(runner, tmp_path):
     for relative in contract.test_contract(recipe)["source_files"]:
         assert (staged / relative).exists(), relative
     assert not any((staged / relative).exists() for relative in excluded)
+    assert all((staged / relative).is_file() for relative in required)
 
 
 def test_staging_retains_integration_and_fixtures_without_application_sources(

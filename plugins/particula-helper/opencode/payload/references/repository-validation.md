@@ -100,6 +100,14 @@ and visual inspection when scientific code changes.
 
 ## Release checks
 
+For documentation packaging changes, run `pytest scripts/tests/doc_bundle_test.py
+-q -Werror`. Build artifacts with `python -m build`, then run
+`scripts/check_doc_bundle.py --wheel PATH --sdist PATH --report PATH` using the
+selected interpreter. The check compares all bundled source hashes and versions,
+rebuilds without Git/network, and installs both wheels in isolated environments.
+Record the report's version and byte sizes; it gates PyPI publication.
+
+
 ```bash
 python scripts/run_release_tests.py
 python scripts/run_release_tests.py --suite examples

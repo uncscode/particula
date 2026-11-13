@@ -13,6 +13,7 @@ description: "Execute local Particula simulations and parameter sweeps reproduci
 Report what actually ran, scientific assumptions, numerical checks, output links and limitations. Use particula-analyze for interpretation. Never upload research data or start a hosted job unless requested.
 
 ## Shared operating rules
+Use the selected interpreter’s `python -m particula_docs --json` to locate and search version-matched installed docs before relying on the live site; see `../../references/sources.md` for commands and older-version fallback.
 Read `../../references/compatibility.md` for tested versions and known numerical limitations.
 Read `../../references/scientific-practice.md` before technical work and use `../../references/sources.md` to find authoritative documentation. Resolve these paths relative to this skill file, not the user's working directory.
 Use the user's chosen local project and Python environment. Treat bundled files as read-only templates; write studies and results to the user's project. A host with local execution and file access is required to run on the user's computer. If unavailable, explain the limitation and provide runnable files; never describe proposed code as executed.

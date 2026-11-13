@@ -33,10 +33,13 @@ dynamic = ["version"]
 homepage = "https://github.com/uncscode/particula"
 repository = "https://github.com/uncscode/particula"
 
+[project.scripts]
+particula-docs = "particula_docs:main"
+
 [project.optional-dependencies]
 dev = [
     "pytest", "pytest-cov", "PyYAML", "jupyterlab", "nbclient", "nbconvert",
-    "build", "jupytext", "Markdown", "pymdown-extensions",
+    "build", "flit_core>=3.12,<4", "jupytext", "Markdown", "pymdown-extensions",
     "griffe", "ruff==0.14.1", "mypy==1.19.0",
 ]
 extra = [
@@ -49,15 +52,16 @@ all = [
 ]
 
 [build-system]
-requires = ["flit_core >=3.2,<4"]
-build-backend = "flit_core.buildapi"
+requires = ["flit_core >=3.12,<4"]
+build-backend = "_particula_build"
+backend-path = ["."]
 
 # Configuration for ruff, a fast Python linter and formatter #
 [tool.ruff]
 line-length = 80
 fix = true
 src = ["particula", "docs/examples"]
-include = ["particula/**/*.py", "docs/examples/**/*.py", "scripts/**/*.py", "examples_tests/**/*.py"]
+include = ["particula/**/*.py", "docs/examples/**/*.py", "scripts/**/*.py", "examples_tests/**/*.py", "_particula_build.py", "particula_docs.py"]
 extend-exclude = [
   ".trash/**",
   "**/*.ipynb",    # ignore every .ipynb anywhere in the project
@@ -150,4 +154,17 @@ exclude = [
 ]
 
 [tool.flit.sdist]
-exclude = [".trash/**", "website/node_modules/**", "website/dist/**", "website/.cache/**", "website/qa/**"]
+include = [
+    "_particula_build.py", "particula_docs.py",
+    "docs/index.md", "docs/guide/", "docs/theory/", "docs/contribute/",
+    "docs/examples/", "docs/data/", "docs/images/",
+    "scripts/", "examples_tests/", "conda/", "conftest.py",
+]
+exclude = [
+    ".trash/**", "website/**", "**/__pycache__/**", "**/*.pyc",
+    "**/*.bak", "**/*.pyo", "**/*.tmp", "**/*.log",
+    "**/.ipynb_checkpoints/**", "**/.pytest_cache/**",
+    "docs/API/**", "docs/**/API/**", "docs/**/api/**", "docs/**/build/**",
+    "docs/**/dist/**", "docs/**/node_modules/**", "docs/**/site/**",
+    "docs/**/.*", "docs/**/.*/**",
+]

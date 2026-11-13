@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import ast
+import importlib.util
 import os
 import shutil
 import subprocess
@@ -28,6 +29,8 @@ RELEASE_PATHS = {
     "scripts/check_feedstock_contract.py",
     "scripts/run_release_tests.py",
     "pyproject.toml",
+    "_particula_build.py",
+    "particula_docs.py",
     "conftest.py",
     "particula/conftest.py",
     *CPU_EXAMPLES,
@@ -38,7 +41,8 @@ RELEASE_PATHS = {
 def release_inputs_changed(paths: list[str]) -> bool:
     """Recognize edits that require rebuilding the release test environment."""
     return any(
-        path in RELEASE_PATHS or path.startswith(("conda/", "scripts/tests/"))
+        path in RELEASE_PATHS
+        or path.startswith(("conda/", "scripts/tests/", "docs/"))
         for path in paths
     )
 
@@ -114,7 +118,7 @@ def check_version(
 
 
 def stage_source(source: Path, destination: Path) -> None:
-    """Create the recipe source without Git, documentation prose, or plans."""
+    """Stage build/test inputs and maintained documentation without Git."""
     shutil.copytree(
         source / "particula",
         destination / "particula",
@@ -122,6 +126,8 @@ def stage_source(source: Path, destination: Path) -> None:
     )
     for relative in (
         "pyproject.toml",
+        "_particula_build.py",
+        "particula_docs.py",
         "readme.md",
         "license",
         "conftest.py",
@@ -132,6 +138,15 @@ def stage_source(source: Path, destination: Path) -> None:
         target = destination / relative
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(source / relative, target)
+    spec = importlib.util.spec_from_file_location(
+        "particula_docs", ROOT / "particula_docs.py"
+    )
+    documentation = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(documentation)
+    for path in documentation.source_files(source / "docs"):
+        target = destination / path.relative_to(source)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(path, target)
 
 
 def build() -> int:

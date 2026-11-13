@@ -178,6 +178,12 @@ notebooks, or planning records.
 
 `conda/recipe/meta.yaml` is the local release mirror, derived from the earlier
 conda-forge/particula-feedstock handoff and now using the two-suite contract.
+The staging helper includes the documentation build adapter, lightweight locator,
+and maintained documentation sources used by ordinary wheels. Flit 3.12 or newer
+is required. The installed package therefore includes version-matched local docs;
+`python -m particula_docs --json` reports their path, version and size. This does
+not broaden the CPU-only test allowlist below.
+
 Its source is the explicitly staged current checkout instead of a tagged
 archive. Keep local and external contracts synchronized for the chosen release;
 the current mirror does not establish that the external recipe has changed.
