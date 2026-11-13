@@ -241,6 +241,12 @@ class ParticleDataBuilder:
 
     def set_n_boxes(self, n_boxes: int) -> "ParticleDataBuilder":
         """Set number of boxes for zero-init or shape validation."""
+        if (
+            isinstance(n_boxes, (bool, np.bool_))
+            or not isinstance(n_boxes, (int, np.integer))
+            or n_boxes <= 0
+        ):
+            raise ValueError("n_boxes must be a positive integer")
         self._n_boxes = int(n_boxes)
         return self
 
@@ -277,12 +283,12 @@ class ParticleDataBuilder:
             return np.broadcast_to(
                 array,
                 target_shape,
-            )
+            ).copy()
         if len(target_shape) == 1 and array.shape == (1,):
             return np.broadcast_to(
                 array,
                 target_shape,
-            )
+            ).copy()
         raise ValueError(
             f"{label} shape {array.shape} does not match expected "
             f"{target_shape}"

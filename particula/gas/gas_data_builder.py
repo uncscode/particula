@@ -170,6 +170,12 @@ class GasDataBuilder:
         Returns:
             Self for fluent chaining.
         """
+        if (
+            isinstance(n_boxes, (bool, np.bool_))
+            or not isinstance(n_boxes, (int, np.integer))
+            or n_boxes <= 0
+        ):
+            raise ValueError("n_boxes must be a positive integer")
         self._n_boxes = int(n_boxes)
         return self
 
@@ -192,6 +198,11 @@ class GasDataBuilder:
             raise ValueError("partitioning is required")
 
         # Handle n_boxes broadcasting if set
+        if self._n_boxes is not None and self._concentration.shape[0] not in (
+            1,
+            self._n_boxes,
+        ):
+            raise ValueError("concentration box count must match n_boxes")
         if self._n_boxes is not None and self._concentration.shape[0] == 1:
             self._concentration = np.broadcast_to(
                 self._concentration,
