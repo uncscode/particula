@@ -283,5 +283,5 @@ Legacy custom dilution strategies retain their original delegation path and
 cannot accept an execution context. `Equilibria` still uses auxiliary inputs
 and result attachments; native inventory mapping is a separate migration gap.
 
-See the [Aerosol Tutorial](../../examples/fundamentals/native-aerosol.md) for
+See the [Aerosol Tutorial](../../examples/fundamentals/native_aerosol.ipynb) for
 an executed two-box example with distinct volumes and stable box IDs.

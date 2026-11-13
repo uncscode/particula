@@ -30,7 +30,7 @@ def test_radius_bin_example_evaporation_and_species_inventory():
     inventory = (
         np.sum(masses * particles.concentration[..., None], axis=1) + gas_before
     )
-    assert values["rate"].shape == (500, 1)
+    assert values["rate"].shape == (1, 500, 1)
     assert np.all(values["rate"] < 0)
     values["condensation_process"].execute(aerosol, time_step=1e-9, sub_steps=4)
     assert aerosol.particles is particles and aerosol.gas is gas
