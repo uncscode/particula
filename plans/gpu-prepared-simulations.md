@@ -220,3 +220,11 @@ selects the new suites and the corrected native capture smoke test.
 Strict expanded RTX qualification: **414 passed, zero skipped**; JSON/XML is
 under `.artifacts/qualification/phase6/`. This is phase evidence; final release
 qualification and the complete campaign remain pending.
+
+Phase 7 (in progress): the fixed campaign contains 104 case/mode combinations,
+including four scientific histories and a 1,572,864-active-particle lifecycle.
+Small CUDA controls for all families, forcing, sixteen seeds, exact restart and
+capture passed **13 tests**. Controller provenance/recovery/budget checks passed
+**7 tests**. The first uninstrumented million-slot condensation pilot was stopped
+after roughly eight minutes to investigate its bottleneck; it produced no
+qualified result. Larger scientific and performance acceptance remains pending.
