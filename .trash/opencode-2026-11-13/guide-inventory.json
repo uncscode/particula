@@ -1,0 +1,350 @@
+[
+  {
+    "source": ".opencode/guides/README.md",
+    "destination": "AGENTS.md routing; plugin README"
+  },
+  {
+    "source": ".opencode/guides/agent_fallback_system.md",
+    "destination": "Retired workflow/tool manual; no active skill dependency"
+  },
+  {
+    "source": ".opencode/guides/agents/QUICK_REFERENCE.md",
+    "destination": "Retired workflow/tool manual; no active skill dependency"
+  },
+  {
+    "source": ".opencode/guides/agents/README.md",
+    "destination": "Retired workflow/tool manual; no active skill dependency"
+  },
+  {
+    "source": ".opencode/guides/agents/adw-build-family.md",
+    "destination": "particula-develop (useful decisions only; automation retired)"
+  },
+  {
+    "source": ".opencode/guides/agents/adw-default.md",
+    "destination": "Retired workflow/tool manual; no active skill dependency"
+  },
+  {
+    "source": ".opencode/guides/agents/adw-review-system.md",
+    "destination": "particula-review (useful decisions only; automation retired)"
+  },
+  {
+    "source": ".opencode/guides/agents/adw-setup-maintainer.md",
+    "destination": "Retired workflow/tool manual; no active skill dependency"
+  },
+  {
+    "source": ".opencode/guides/agents/adw-setup.md",
+    "destination": "Retired workflow/tool manual; no active skill dependency"
+  },
+  {
+    "source": ".opencode/guides/agents/agent-creator.md",
+    "destination": "Retired workflow/tool manual; no active skill dependency"
+  },
+  {
+    "source": ".opencode/guides/agents/agent-permissions.md",
+    "destination": "Retired workflow/tool manual; no active skill dependency"
+  },
+  {
+    "source": ".opencode/guides/agents/auto-mode-bootstrap.md",
+    "destination": "Retired workflow/tool manual; no active skill dependency"
+  },
+  {
+    "source": ".opencode/guides/agents/dev-plan-manager.md",
+    "destination": "particula-plan (portable planning decisions only; orchestration retired)"
+  },
+  {
+    "source": ".opencode/guides/agents/documentation-system.md",
+    "destination": "particula-docs (useful decisions only; automation retired)"
+  },
+  {
+    "source": ".opencode/guides/agents/epic-to-issues.md",
+    "destination": "Retired workflow/tool manual; no active skill dependency"
+  },
+  {
+    "source": ".opencode/guides/agents/execute-plan.md",
+    "destination": "particula-develop (useful decisions only; automation retired)"
+  },
+  {
+    "source": ".opencode/guides/agents/git-commit.md",
+    "destination": "particula-review (useful decisions only; automation retired)"
+  },
+  {
+    "source": ".opencode/guides/agents/investigate-adw.md",
+    "destination": "Retired workflow/tool manual; no active skill dependency"
+  },
+  {
+    "source": ".opencode/guides/agents/linter.md",
+    "destination": "particula-test (useful decisions only; automation retired)"
+  },
+  {
+    "source": ".opencode/guides/agents/plan-epic-drafter.md",
+    "destination": "particula-plan (portable planning decisions only; orchestration retired)"
+  },
+  {
+    "source": ".opencode/guides/agents/plan-feature-drafter.md",
+    "destination": "particula-plan (portable planning decisions only; orchestration retired)"
+  },
+  {
+    "source": ".opencode/guides/agents/plan-maintenance-drafter.md",
+    "destination": "particula-plan (portable planning decisions only; orchestration retired)"
+  },
+  {
+    "source": ".opencode/guides/agents/plan-orchestrator.md",
+    "destination": "particula-plan (portable planning decisions only; orchestration retired)"
+  },
+  {
+    "source": ".opencode/guides/agents/plan-phase-splitter.md",
+    "destination": "particula-plan (portable planning decisions only; orchestration retired)"
+  },
+  {
+    "source": ".opencode/guides/agents/plan-research-drafter.md",
+    "destination": "particula-plan (portable planning decisions only; orchestration retired)"
+  },
+  {
+    "source": ".opencode/guides/agents/plan-review-architecture.md",
+    "destination": "particula-plan (portable planning decisions only; orchestration retired)"
+  },
+  {
+    "source": ".opencode/guides/agents/plan-type-designer.md",
+    "destination": "Retired workflow/tool manual; no active skill dependency"
+  },
+  {
+    "source": ".opencode/guides/agents/plan-work.md",
+    "destination": "particula-plan (portable planning decisions only; orchestration retired)"
+  },
+  {
+    "source": ".opencode/guides/agents/planner-intake.md",
+    "destination": "particula-plan (portable planning decisions only; orchestration retired)"
+  },
+  {
+    "source": ".opencode/guides/agents/planning-system.md",
+    "destination": "particula-plan (portable planning decisions only; orchestration retired)"
+  },
+  {
+    "source": ".opencode/guides/agents/pr-comment-analyzer.md",
+    "destination": "particula-review (useful decisions only; automation retired)"
+  },
+  {
+    "source": ".opencode/guides/agents/setup-adw.md",
+    "destination": "Retired workflow/tool manual; no active skill dependency"
+  },
+  {
+    "source": ".opencode/guides/agents/setup-platform-dev.md",
+    "destination": "Retired workflow/tool manual; no active skill dependency"
+  },
+  {
+    "source": ".opencode/guides/agents/setup-update.md",
+    "destination": "Retired workflow/tool manual; no active skill dependency"
+  },
+  {
+    "source": ".opencode/guides/agents/shipper.md",
+    "destination": "particula-review (useful decisions only; automation retired)"
+  },
+  {
+    "source": ".opencode/guides/architecture/architecture_guide.md",
+    "destination": "scientific-boundaries.md; current docs/guide contracts"
+  },
+  {
+    "source": ".opencode/guides/architecture/architecture_outline.md",
+    "destination": "repository-conventions.md; current architecture docs"
+  },
+  {
+    "source": ".opencode/guides/architecture/decisions/ADR-001-neutral-gpu-wall-loss-boundary.md",
+    "destination": "Historical ADR/reference retained; current native/GPU docs own the contract"
+  },
+  {
+    "source": ".opencode/guides/architecture/decisions/ADR-002-gpu-fixed-slot-activation-boundary.md",
+    "destination": "Historical ADR/reference retained; current native/GPU docs own the contract"
+  },
+  {
+    "source": ".opencode/guides/architecture/decisions/ADR-003-dependency-neutral-execution-capabilities.md",
+    "destination": "Historical ADR/reference retained; current native/GPU docs own the contract"
+  },
+  {
+    "source": ".opencode/guides/architecture/decisions/ADR-004-concrete-gpu-resident-session-boundary.md",
+    "destination": "Historical ADR/reference retained; current native/GPU docs own the contract"
+  },
+  {
+    "source": ".opencode/guides/architecture/decisions/ADR-005-one-time-gpu-resident-session-setup.md",
+    "destination": "Historical ADR/reference retained; current native/GPU docs own the contract"
+  },
+  {
+    "source": ".opencode/guides/architecture/decisions/ADR-006-resident-gpu-step-lifecycle-guard.md",
+    "destination": "Historical ADR/reference retained; current native/GPU docs own the contract"
+  },
+  {
+    "source": ".opencode/guides/architecture/decisions/ADR-007-resident-session-checkpoint-finalize-restart.md",
+    "destination": "Historical ADR/reference retained; current native/GPU docs own the contract"
+  },
+  {
+    "source": ".opencode/guides/architecture/decisions/ADR-008-resident-session-failure-close-semantics.md",
+    "destination": "Historical ADR/reference retained; current native/GPU docs own the contract"
+  },
+  {
+    "source": ".opencode/guides/architecture/decisions/ADR-009-resident-process-delegation-adapters.md",
+    "destination": "Historical ADR/reference retained; current native/GPU docs own the contract"
+  },
+  {
+    "source": ".opencode/guides/architecture/decisions/ADR-010-resident-state-update-boundary.md",
+    "destination": "Historical ADR/reference retained; current native/GPU docs own the contract"
+  },
+  {
+    "source": ".opencode/guides/architecture/decisions/ADR-011-resident-thermodynamic-freshness-coordinator.md",
+    "destination": "Historical ADR/reference retained; current native/GPU docs own the contract"
+  },
+  {
+    "source": ".opencode/guides/architecture/decisions/ADR-012-resident-complete-loop-and-diagnostics.md",
+    "destination": "Historical ADR/reference retained; current native/GPU docs own the contract"
+  },
+  {
+    "source": ".opencode/guides/architecture/decisions/ADR-013-pre-execution-availability-resolution.md",
+    "destination": "Historical ADR/reference retained; current native/GPU docs own the contract"
+  },
+  {
+    "source": ".opencode/guides/architecture/decisions/ADR-014-opt-in-cpu-fallback-boundary.md",
+    "destination": "Historical ADR/reference retained; current native/GPU docs own the contract"
+  },
+  {
+    "source": ".opencode/guides/architecture/decisions/ADR-015-execution-public-surface-and-experimental-gpu-policy.md",
+    "destination": "Historical ADR/reference retained; current native/GPU docs own the contract"
+  },
+  {
+    "source": ".opencode/guides/architecture/decisions/ADR-016-direct-gpu-volume-evolution-boundary.md",
+    "destination": "Historical ADR/reference retained; current native/GPU docs own the contract"
+  },
+  {
+    "source": ".opencode/guides/architecture/decisions/ADR-017-direct-gpu-particle-transport-boundary.md",
+    "destination": "Historical ADR/reference retained; current native/GPU docs own the contract"
+  },
+  {
+    "source": ".opencode/guides/architecture/decisions/ADR-018-resident-communication-integration.md",
+    "destination": "Historical ADR/reference retained; current native/GPU docs own the contract"
+  },
+  {
+    "source": ".opencode/guides/architecture/decisions/ADR-019-prepared-resident-graph-capture-qualification.md",
+    "destination": "Historical ADR/reference retained; current native/GPU docs own the contract"
+  },
+  {
+    "source": ".opencode/guides/architecture/decisions/ADR-020-authenticated-native-resident-graph-replay.md",
+    "destination": "Historical ADR/reference retained; current native/GPU docs own the contract"
+  },
+  {
+    "source": ".opencode/guides/architecture/decisions/ADR-021-graph-capture-teardown-ownership.md",
+    "destination": "Historical ADR/reference retained; current native/GPU docs own the contract"
+  },
+  {
+    "source": ".opencode/guides/architecture/decisions/README.md",
+    "destination": "Historical ADR/reference retained; current native/GPU docs own the contract"
+  },
+  {
+    "source": ".opencode/guides/architecture/decisions/template.md",
+    "destination": "Historical ADR/reference retained; current native/GPU docs own the contract"
+  },
+  {
+    "source": ".opencode/guides/architecture_reference.md",
+    "destination": "scientific-boundaries.md; current docs/guide contracts"
+  },
+  {
+    "source": ".opencode/guides/backend_configuration.md",
+    "destination": "Retired workflow/tool manual; no active skill dependency"
+  },
+  {
+    "source": ".opencode/guides/code_culture.md",
+    "destination": "particula-develop; repository-conventions.md"
+  },
+  {
+    "source": ".opencode/guides/code_style.md",
+    "destination": "particula-develop; repository-conventions.md"
+  },
+  {
+    "source": ".opencode/guides/commit_conventions.md",
+    "destination": "particula-review; repository-conventions.md"
+  },
+  {
+    "source": ".opencode/guides/conditional_docs.md",
+    "destination": "AGENTS.md task-to-skill routing"
+  },
+  {
+    "source": ".opencode/guides/docstring_class.md",
+    "destination": "particula-docs; docstrings.md (actual contracts only)"
+  },
+  {
+    "source": ".opencode/guides/docstring_function.md",
+    "destination": "particula-docs; docstrings.md (Google-style sections)"
+  },
+  {
+    "source": ".opencode/guides/docstring_guide.md",
+    "destination": "particula-docs; docstrings.md"
+  },
+  {
+    "source": ".opencode/guides/documentation_guide.md",
+    "destination": "particula-docs; maintained documentation/authoring guides"
+  },
+  {
+    "source": ".opencode/guides/index.md",
+    "destination": "AGENTS.md routing; plugin README"
+  },
+  {
+    "source": ".opencode/guides/linting_guide.md",
+    "destination": "particula-test; repository-validation.md"
+  },
+  {
+    "source": ".opencode/guides/notebook_validation_guide.md",
+    "destination": "particula-docs; source/result workflow"
+  },
+  {
+    "source": ".opencode/guides/opencode-advanced-features.md",
+    "destination": "Retired workflow/tool manual; no active skill dependency"
+  },
+  {
+    "source": ".opencode/guides/phase-sizing-rules.md",
+    "destination": "particula-plan (coherent steps; retired rigid parser/size rules)"
+  },
+  {
+    "source": ".opencode/guides/planner_issue_format.md",
+    "destination": "particula-plan; ordinary planning issue template"
+  },
+  {
+    "source": ".opencode/guides/pr_conventions.md",
+    "destination": "particula-review; repository-conventions.md"
+  },
+  {
+    "source": ".opencode/guides/review_guide.md",
+    "destination": "particula-review"
+  },
+  {
+    "source": ".opencode/guides/security/container-isolation.md",
+    "destination": "Retired workflow/tool manual; no active skill dependency"
+  },
+  {
+    "source": ".opencode/guides/setup_guide.md",
+    "destination": "Retired workflow/tool manual; no active skill dependency"
+  },
+  {
+    "source": ".opencode/guides/testing_guide.md",
+    "destination": "particula-test; repository-validation.md"
+  },
+  {
+    "source": ".opencode/guides/tool-wrapper-exceptions.json",
+    "destination": "Retired workflow/tool manual; no active skill dependency"
+  },
+  {
+    "source": ".opencode/guides/troubleshooting_setup.md",
+    "destination": "Retired workflow/tool manual; no active skill dependency"
+  },
+  {
+    "source": ".opencode/guides/workflow-conditionals.md",
+    "destination": "Retired workflow/tool manual; no active skill dependency"
+  },
+  {
+    "source": ".opencode/guides/workflow-engine.md",
+    "destination": "Retired workflow/tool manual; no active skill dependency"
+  },
+  {
+    "source": ".opencode/guides/workflow-examples.md",
+    "destination": "Retired workflow/tool manual; no active skill dependency"
+  },
+  {
+    "source": ".opencode/guides/workflow-json-schema.md",
+    "destination": "Retired workflow/tool manual; no active skill dependency"
+  }
+]

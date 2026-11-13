@@ -1,0 +1,3 @@
+interface:
+  display_name: "Particula Test"
+  short_description: "Validate Particula repository changes"

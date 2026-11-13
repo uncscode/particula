@@ -121,7 +121,7 @@ dynamic maps, or portable performance claim.
 
 ## Reproduction commands
 
-Run focused assertions before the untargeted coverage runner. The CUDA-selected
+Run focused assertions before the full-package coverage check. The CUDA-selected
 row is optional pass-or-clean-skip evidence only; it is never CPU or Warp-CPU
 substitution.
 
@@ -131,7 +131,7 @@ pytest particula/execution/tests/graph_capture_test.py -q --no-cov
 pytest particula/execution/tests/captured_full_loop_test.py -q --no-cov
 pytest particula/execution/tests/captured_full_loop_test.py -q \
   -m "warp and cuda" --no-cov
-.opencode/tools/run_pytest.py
+pytest --cov=particula --cov-report=term-missing --cov-fail-under=80
 npm --prefix website run build
 ```
 

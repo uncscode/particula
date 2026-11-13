@@ -60,4 +60,4 @@ def test_<ClassName>_bad_inputs(bad_input):
 Run the package suite plus `pytest examples_tests -q -Werror` and
 `pytest scripts/tests -q -Werror` when maintaining examples or infrastructure.
 Focused assertions use `--no-cov`; obtain repository coverage only from the
-untargeted `.opencode/tools/run_pytest.py` gate.
+full-package `pytest --cov=particula --cov-report=term-missing --cov-fail-under=80` gate.

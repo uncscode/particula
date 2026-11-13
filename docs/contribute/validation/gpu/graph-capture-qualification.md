@@ -78,16 +78,20 @@ metadata only.
 | H7 | Small/medium captured-versus-uncaptured launch-overhead provenance | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C8; benchmark artifact unavailable; A1 |
 | H8 | Logical memory model and observed peak-memory comparison | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C8; benchmark artifact unavailable; A1 |
 | H9 | Nsight occupancy/memory-access evidence and bounded follow-up | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C9; profiling artifact unavailable; A2 |
-| H10 | Example/runbook/limitations and strict MkDocs result | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C5; final-revision documentation output unavailable |
+| H10 | Example/runbook/limitations and Starlight build result | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C5; final-revision documentation output unavailable |
 | H11 | Exact qualification command matrix and literal results before promotion | UNAVAILABLE | UNAVAILABLE | UNAVAILABLE | C2–C5, C7–C9; literal results unavailable |
 
 ## Collection commands
 
 These commands remain unexecuted **for this qualification record**. Results from
 other revisions or devices cannot populate its gates. Historical C1/C6 prose
-tests were removed; strict MkDocs C5 now owns documentation validation. C2–C3
+tests were removed; Starlight C5 now owns documentation validation. C2–C3
 are focused checks, C4 owns aggregate coverage, and C7–C9 are opt-in native-CUDA
 collection. A clean skip cannot satisfy measured-evidence gates.
+
+The commands below use the current direct tools after retirement of the old
+workflow wrappers. This command update supplies no new qualification evidence;
+all required outcomes remain unexecuted for this record.
 
 ### C2
 `pytest particula/execution/tests/graph_capture_test.py particula/execution/tests/captured_full_loop_test.py particula/execution/tests/rng_invariance_test.py particula/execution/tests/checkpoint_test.py -q --no-cov`
@@ -97,21 +101,25 @@ NOT RUN — output must be pasted verbatim after execution
 ```
 
 ### C3
-`.opencode/tools/run_linters.py`
+```bash
+ruff check particula/ examples_tests/ scripts/ --no-fix
+ruff format particula/ examples_tests/ scripts/ --check
+mypy particula/ --ignore-missing-imports
+```
 
 ```text
 NOT RUN — output must be pasted verbatim after execution
 ```
 
 ### C4
-`.opencode/tools/run_pytest.py`
+`pytest --cov=particula --cov-report=term-missing --cov-fail-under=80`
 
 ```text
 NOT RUN — output must be pasted verbatim after execution
 ```
 
 ### C5
-`mkdocs build --strict`
+`npm --prefix website run build`
 
 ```text
 NOT RUN — output must be pasted verbatim after execution

@@ -7,7 +7,7 @@ differ from the installed distribution metadata; inspect both.
 ## Numerical evidence
 
 The current starters use native Aerosol, ParticleData, GasData and
-EnvironmentData. Install the selected E9 native checkout as described in
+EnvironmentData. Install the checkout with the 0.3.0 native APIs as described in
 local-setup.md; the older release evidence below is historical, not a claim
 that this script still supports that facade API. Native default 1 s/100-step
 smokes passed: condensation total-mass error 7.9e-16, coagulation particle-mass
@@ -44,3 +44,11 @@ establish successful model-driven execution in every host. Desktop uploads,
 Cowork Python availability, and access to a pre-existing local virtual
 environment require verification in the actual host. A package never grants
 filesystem access on its own.
+
+## Repository skills
+
+Plugin 0.3.0 expands the catalog from six to eleven skills. The five repository
+skills use the selected source checkout and its current instructions, not a
+bundled copy of the library. The historical live-host checks above cover the
+original six; package checks can verify the expanded catalog and resource paths
+but do not establish live discovery or model-driven behavior in every host.

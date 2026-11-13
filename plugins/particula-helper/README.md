@@ -1,7 +1,7 @@
 # Particula Helper
 
-Six skills for environment setup, aerosol science guidance, simulation design,
-local execution, analysis, and debugging. The host supplies filesystem and
+Six scientific skills for environment setup, aerosol science guidance, simulation
+design, execution, analysis and debugging, plus five repository development skills. The host supplies filesystem and
 Python execution tools. Installing this plugin does not install Particula,
 change Python environments, start a server, or run simulations.
 
@@ -21,15 +21,35 @@ opencode plugin add 'github:uncscode/particula#main::path:plugins/particula-help
 
 Choose the commands for your host, then start a new session and ask:
 "Use particula-setup to check my project's existing .venv."
-See the [installation and compatibility guide](https://uncscode.github.io/particula/AI_Assistants/).
+See the [installation and compatibility guide](https://uncscode.github.io/particula/guide/ai-assistants/).
 
 ## Environment and science
 
-Reuse the user's selected environment. The native starters require the selected E9 checkout; `requirements.txt` is an opt-in pinned
+Reuse the user's selected environment. The native starters require a checkout with the 0.3.0 native APIs; `requirements.txt` is an opt-in pinned
 starter for a fresh environment, not an instruction to replace an existing one.
 Condensation is the introductory CPU example. Scientific checks are numerical
 checks, not experimental validation. See `references/compatibility.md` for
 the known coagulation limitation and host verification boundaries.
+
+## Repository development skills
+
+Use these in a selected Particula source checkout. They do not apply to every
+Python project or replace the six study-oriented skills.
+
+| Skill | Use |
+| --- | --- |
+| [particula-plan](https://github.com/uncscode/particula/blob/main/plugins/particula-helper/skills/particula-plan/SKILL.md) | Scope changes with concrete code references and acceptance evidence |
+| [particula-develop](https://github.com/uncscode/particula/blob/main/plugins/particula-helper/skills/particula-develop/SKILL.md) | Implement native library, CPU process and GPU changes |
+| [particula-test](https://github.com/uncscode/particula/blob/main/plugins/particula-helper/skills/particula-test/SKILL.md) | Select suites and preserve independent scientific validation |
+| [particula-docs](https://github.com/uncscode/particula/blob/main/plugins/particula-helper/skills/particula-docs/SKILL.md) | Maintain docstrings, Starlight content and saved example outputs |
+| [particula-review](https://github.com/uncscode/particula/blob/main/plugins/particula-helper/skills/particula-review/SKILL.md) | Review scientific/API correctness and prepare requested commits/PRs |
+
+In the repository, `AGENTS.md` routes to these canonical files. Shared guidance
+lives in `references/repository-conventions.md`, `scientific-boundaries.md`,
+`repository-validation.md`, and `docstrings.md`. This replaces the retired
+root development workflow; the OpenCode host adapter here remains supported.
+No skill requires the historical root workflow directory. Installed copies
+must defer to the selected checkout's current instructions and configuration.
 
 ## Maintaining this package
 

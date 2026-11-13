@@ -1,7 +1,8 @@
 # AI Assistants
 
-Particula Helper provides six reusable workflows: environment setup, scientific
-guidance, simulation design, execution, analysis, and debugging. It packages
+Particula Helper provides six scientific workflows: environment setup, guidance,
+simulation design, execution, analysis and debugging, plus five repository
+development skills for planning, implementation, testing, documentation and review. It packages
 instructions and Python examples; your assistant supplies the tools to read
 files and execute Python. No hosted simulation service or MCP server is included.
 
@@ -40,6 +41,21 @@ Other prompts:
 - “Compare the results after halving the time step.”
 - “Debug this traceback against my installed Particula version.”
 
+## Contribute to the library
+
+Repository contributors can use `particula-plan`, `particula-develop`,
+`particula-test`, `particula-docs`, and `particula-review`. The repository's
+[agent entry point](../../../AGENTS.md) links directly to each skill and its
+shared references; installation is optional when working from that checkout.
+The [plugin source](https://github.com/uncscode/particula/tree/main/plugins/particula-helper)
+packages the same guidance for all supported hosts.
+
+These skills use the selected source checkout and direct Python/pytest/Ruff,
+plugin packaging and Astro/Starlight commands. They replace the retired root
+ADW/OpenCode development workflow. The standalone OpenCode host adapter remains
+available. Archived plans and architecture records retain historical context,
+not authority over current native APIs or qualification evidence.
+
 ## Manual condensation walkthrough
 
 From a checkout or an extracted Codex/Claude plugin, locate its `scripts`
@@ -73,12 +89,16 @@ are illustrative parameters, not measured or calibrated research results.
 | Evidence | Status / boundary |
 | --- | --- |
 | Codex CLI 0.167.0; Claude Code 2.1.319 | Local marketplace/package installation tested in isolated configurations; see the PR for recorded commands |
-| OpenCode 2.1.3 / SDK 2.1.3 | Six skills discovered in a live isolated host from an extracted npm package; installed-package tests cover paths, reload, duplicate preservation, and cleanup |
+| OpenCode 2.1.3 / SDK 2.1.3 | Original six-skill inventory discovered in a live isolated host from an extracted npm package; installed-package tests cover paths, reload, duplicate preservation, and cleanup |
 | Python 3.12 / Particula 0.2.14 | Condensation numerical smoke and time-step comparison passed for the documented bounded case |
 | Current repository Python package | CI tests the installed checkout with explicit numerical dependency versions |
 | Desktop import / Cowork execution | Not verified by CLI/package tests; verify in the target app |
 | Model-driven end-to-end conversations | Separate from installation tests; not claimed by the automated checks |
 | GPU | Not qualified by CPU smoke tests |
+
+The five repository skills are new package content; the historical host checks
+above do not establish live discovery or model-driven execution of the expanded
+catalog. Validate the updated package in the target host after installation.
 
 These CLI versions are tested targets, not inferred minimum supported versions.
 If an install command is absent, consult your host's `--help` and update it or

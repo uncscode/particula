@@ -24,4 +24,4 @@ Include enough information that a new reader would be able to understand and imp
 7. Create your pull request.
 
 Follow the [documentation placement rules](../../documentation.md). Implementation
-plans and completed task narratives belong in `.opencode/plans/`.
+plans and completed task narratives belong in `plans/`.

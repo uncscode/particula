@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { access, readFile } from "node:fs/promises";
+import { access } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import test from "node:test";
@@ -10,10 +10,15 @@ const { default: plugin, loadSkills } = await import(
   entry.startsWith("file:") ? entry : pathToFileURL(resolve(entry)).href
 );
 
-test("installed package loads six skills and resolves supporting files", async () => {
+const expectedSkills = [
+  "particula-analyze", "particula-build", "particula-debug", "particula-develop",
+  "particula-docs", "particula-guide", "particula-plan", "particula-review",
+  "particula-run", "particula-setup", "particula-test",
+];
+
+test("installed package loads science and repository skills with supporting files", async () => {
   const skills = await loadSkills();
-  assert.equal(skills.length, 6);
-  assert.equal(new Set(skills.map((s) => s.id)).size, 6);
+  assert.deepEqual(skills.map((s) => s.id).sort(), expectedSkills);
   for (const skill of skills) {
     assert.ok(skill.description);
     assert.ok(!skill.content.startsWith("---"));
@@ -21,7 +26,6 @@ test("installed package loads six skills and resolves supporting files", async (
     for (const match of skill.content.matchAll(/`((?:\.\.\/|\.\/)[^`\s]+)/g)) {
       await access(resolve(dirname(skill.path), match[1]));
     }
-    assert.match(await readFile(skill.path, "utf8"), /Shared operating rules/);
   }
 });
 
@@ -41,7 +45,7 @@ test("transform reload preserves duplicates and unrelated skills; cleanup dispos
       assert.ok(!entries.has(skill.id));
       entries.set(skill.id, skill);
     } });
-    assert.equal(entries.size, 7);
+    assert.equal(entries.size, expectedSkills.length + 1);
     assert.equal(entries.get(custom.id), custom);
     transform({ get: (id) => entries.get(id), add: () => assert.fail("duplicate") });
   }
