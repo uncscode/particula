@@ -64,6 +64,7 @@ jobs:
           printf '%s\n' 'Run python -m http.server 8000 from this directory.' 'Open http://localhost:8000/particula/.' > website/preview/README.txt
           cp website/.cache/verification.json website/preview/verification.json
           cp website/migration-inventory.json website/preview/source-inventory.json
+          cp website/legacy-api-anchors.json website/preview/
           cp website/.cache/execution-inventory.json website/preview/
           cp website/API_DIAGNOSTICS.md website/preview/
           cp website/MIGRATION_VALIDATION.md website/preview/

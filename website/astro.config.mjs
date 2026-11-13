@@ -42,7 +42,7 @@ export default defineConfig({
       packages: [{
         name: 'particula', base: 'API/particula', source: { file: '.cache/griffe.json' },
         docstringStyle: 'google',
-        filters: { private: true },
+        filters: { private: true, special: true },
         sourceLink: { host: 'github', repo: 'uncscode/particula', ref: 'main', root: '..' },
       }],
     })],

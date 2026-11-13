@@ -1,0 +1,2339 @@
+{
+  "publication_revision": "6597906ba8dd09bdccb9c3e502d8155c6668a1d4",
+  "pages": {
+    "API/particula/abc_builder/index.html": [
+      "particula.abc_builder",
+      "particula.abc_builder.BuilderABC",
+      "particula.abc_builder.BuilderABC.build",
+      "particula.abc_builder.BuilderABC.check_keys",
+      "particula.abc_builder.BuilderABC.pre_build_check",
+      "particula.abc_builder.BuilderABC.set_parameters"
+    ],
+    "API/particula/abc_factory/index.html": [
+      "particula.abc_factory",
+      "particula.abc_factory.StrategyFactoryABC",
+      "particula.abc_factory.StrategyFactoryABC.get_builders",
+      "particula.abc_factory.StrategyFactoryABC.get_strategy"
+    ],
+    "API/particula/activity/activity_coefficients/index.html": [
+      "particula.activity.activity_coefficients",
+      "particula.activity.activity_coefficients.bat_activity_coefficients"
+    ],
+    "API/particula/activity/bat_blending/index.html": [
+      "particula.activity.bat_blending",
+      "particula.activity.bat_blending.bat_blending_weights"
+    ],
+    "API/particula/activity/bat_coefficients/index.html": [
+      "particula.activity.bat_coefficients",
+      "particula.activity.bat_coefficients.FitValues",
+      "particula.activity.bat_coefficients.coefficients_c"
+    ],
+    "API/particula/activity/convert_functional_group/index.html": [
+      "particula.activity.convert_functional_group",
+      "particula.activity.convert_functional_group.convert_to_oh_equivalent"
+    ],
+    "API/particula/activity/gibbs/index.html": [
+      "particula.activity.gibbs",
+      "particula.activity.gibbs.gibbs_free_energy",
+      "particula.activity.gibbs.gibbs_free_engery"
+    ],
+    "API/particula/activity/gibbs_mixing/index.html": [
+      "particula.activity.gibbs_mixing",
+      "particula.activity.gibbs_mixing.gibbs_mix_weight",
+      "particula.activity.gibbs_mixing.gibbs_of_mixing"
+    ],
+    "API/particula/activity/index.html": [
+      "particula.activity",
+      "particula.activity.FitValues",
+      "particula.activity.bat_activity_coefficients",
+      "particula.activity.bat_blending_weights",
+      "particula.activity.coefficients_c",
+      "particula.activity.convert_to_oh_equivalent",
+      "particula.activity.find_phase_sep_index",
+      "particula.activity.find_phase_separation",
+      "particula.activity.from_molar_mass_ratio",
+      "particula.activity.gibbs_free_energy",
+      "particula.activity.gibbs_mix_weight",
+      "particula.activity.gibbs_of_mixing",
+      "particula.activity.organic_water_single_phase",
+      "particula.activity.q_alpha",
+      "particula.activity.to_molar_mass_ratio"
+    ],
+    "API/particula/activity/phase_separation/index.html": [
+      "particula.activity.phase_separation",
+      "particula.activity.phase_separation.find_phase_sep_index",
+      "particula.activity.phase_separation.find_phase_separation",
+      "particula.activity.phase_separation.organic_water_single_phase",
+      "particula.activity.phase_separation.q_alpha"
+    ],
+    "API/particula/activity/ratio/index.html": [
+      "particula.activity.ratio",
+      "particula.activity.ratio.from_molar_mass_ratio",
+      "particula.activity.ratio.to_molar_mass_ratio"
+    ],
+    "API/particula/activity/water_activity/index.html": [
+      "particula.activity.water_activity",
+      "particula.activity.water_activity.biphasic_water_activity_point",
+      "particula.activity.water_activity.fixed_water_activity"
+    ],
+    "API/particula/aerosol/index.html": [
+      "particula.aerosol",
+      "particula.aerosol.Aerosol",
+      "particula.aerosol.Aerosol.__str__",
+      "particula.aerosol.Aerosol.environment",
+      "particula.aerosol.Aerosol.gas",
+      "particula.aerosol.Aerosol.particles",
+      "particula.aerosol.Aerosol.replace_data"
+    ],
+    "API/particula/aerosol_builder/index.html": [
+      "particula.aerosol_builder",
+      "particula.aerosol_builder.AerosolBuilder",
+      "particula.aerosol_builder.AerosolBuilder.build",
+      "particula.aerosol_builder.AerosolBuilder.set_environment",
+      "particula.aerosol_builder.AerosolBuilder.set_gas",
+      "particula.aerosol_builder.AerosolBuilder.set_particles"
+    ],
+    "API/particula/aerosol_validation/index.html": [
+      "particula.aerosol_validation",
+      "particula.aerosol_validation.validate_aerosol_structure"
+    ],
+    "API/particula/builder_mixin/index.html": [
+      "particula.builder_mixin",
+      "particula.builder_mixin.BuilderChamberDimensionsMixin",
+      "particula.builder_mixin.BuilderChamberDimensionsMixin.set_chamber_dimensions",
+      "particula.builder_mixin.BuilderChamberRadiusMixin",
+      "particula.builder_mixin.BuilderChamberRadiusMixin.set_chamber_radius",
+      "particula.builder_mixin.BuilderChargeMixin",
+      "particula.builder_mixin.BuilderChargeMixin.set_charge",
+      "particula.builder_mixin.BuilderConcentrationMixin",
+      "particula.builder_mixin.BuilderConcentrationMixin.set_concentration",
+      "particula.builder_mixin.BuilderDensityMixin",
+      "particula.builder_mixin.BuilderDensityMixin.set_density",
+      "particula.builder_mixin.BuilderDistributionTypeMixin",
+      "particula.builder_mixin.BuilderDistributionTypeMixin.set_distribution_type",
+      "particula.builder_mixin.BuilderLognormalMixin",
+      "particula.builder_mixin.BuilderLognormalMixin.set_geometric_standard_deviation",
+      "particula.builder_mixin.BuilderLognormalMixin.set_mode",
+      "particula.builder_mixin.BuilderLognormalMixin.set_number_concentration",
+      "particula.builder_mixin.BuilderMassMixin",
+      "particula.builder_mixin.BuilderMassMixin.set_mass",
+      "particula.builder_mixin.BuilderMolarMassMixin",
+      "particula.builder_mixin.BuilderMolarMassMixin.set_molar_mass",
+      "particula.builder_mixin.BuilderParticleResolvedCountMixin",
+      "particula.builder_mixin.BuilderParticleResolvedCountMixin.set_particle_resolved_count",
+      "particula.builder_mixin.BuilderPhaseIndexMixin",
+      "particula.builder_mixin.BuilderPhaseIndexMixin.set_phase_index",
+      "particula.builder_mixin.BuilderPressureMixin",
+      "particula.builder_mixin.BuilderPressureMixin.set_pressure",
+      "particula.builder_mixin.BuilderRadiusMixin",
+      "particula.builder_mixin.BuilderRadiusMixin.set_radius",
+      "particula.builder_mixin.BuilderSurfaceTensionMixin",
+      "particula.builder_mixin.BuilderSurfaceTensionMixin.set_surface_tension",
+      "particula.builder_mixin.BuilderSurfaceTensionTableMixin",
+      "particula.builder_mixin.BuilderSurfaceTensionTableMixin.set_surface_tension_table",
+      "particula.builder_mixin.BuilderTemperatureMixin",
+      "particula.builder_mixin.BuilderTemperatureMixin.set_temperature",
+      "particula.builder_mixin.BuilderTemperatureTableMixin",
+      "particula.builder_mixin.BuilderTemperatureTableMixin.set_temperature_table",
+      "particula.builder_mixin.BuilderVolumeMixin",
+      "particula.builder_mixin.BuilderVolumeMixin.set_volume",
+      "particula.builder_mixin.BuilderWallEddyDiffusivityMixin",
+      "particula.builder_mixin.BuilderWallEddyDiffusivityMixin.set_wall_eddy_diffusivity",
+      "particula.builder_mixin.BuilderWallElectricFieldMixin",
+      "particula.builder_mixin.BuilderWallElectricFieldMixin.set_wall_electric_field",
+      "particula.builder_mixin.BuilderWallPotentialMixin",
+      "particula.builder_mixin.BuilderWallPotentialMixin.set_wall_potential"
+    ],
+    "API/particula/dynamics/coagulation/brownian_kernel/index.html": [
+      "particula.dynamics.coagulation.brownian_kernel",
+      "particula.dynamics.coagulation.brownian_kernel.get_brownian_kernel",
+      "particula.dynamics.coagulation.brownian_kernel.get_brownian_kernel_via_system_state"
+    ],
+    "API/particula/dynamics/coagulation/charged_dimensional_kernel/index.html": [
+      "particula.dynamics.coagulation.charged_dimensional_kernel",
+      "particula.dynamics.coagulation.charged_dimensional_kernel.get_coulomb_kernel_chahl2019_via_system_state",
+      "particula.dynamics.coagulation.charged_dimensional_kernel.get_coulomb_kernel_dyachkov2007_via_system_state",
+      "particula.dynamics.coagulation.charged_dimensional_kernel.get_coulomb_kernel_gatti2008_via_system_state",
+      "particula.dynamics.coagulation.charged_dimensional_kernel.get_coulomb_kernel_gopalakrishnan2012_via_system_state",
+      "particula.dynamics.coagulation.charged_dimensional_kernel.get_hard_sphere_kernel_via_system_state"
+    ],
+    "API/particula/dynamics/coagulation/charged_dimensionless_kernel/index.html": [
+      "particula.dynamics.coagulation.charged_dimensionless_kernel",
+      "particula.dynamics.coagulation.charged_dimensionless_kernel.get_coulomb_kernel_chahl2019",
+      "particula.dynamics.coagulation.charged_dimensionless_kernel.get_coulomb_kernel_dyachkov2007",
+      "particula.dynamics.coagulation.charged_dimensionless_kernel.get_coulomb_kernel_gatti2008",
+      "particula.dynamics.coagulation.charged_dimensionless_kernel.get_coulomb_kernel_gopalakrishnan2012",
+      "particula.dynamics.coagulation.charged_dimensionless_kernel.get_dimensional_kernel",
+      "particula.dynamics.coagulation.charged_dimensionless_kernel.get_hard_sphere_kernel"
+    ],
+    "API/particula/dynamics/coagulation/charged_kernel_strategy/index.html": [
+      "particula.dynamics.coagulation.charged_kernel_strategy",
+      "particula.dynamics.coagulation.charged_kernel_strategy.ChargedKernelStrategyABC",
+      "particula.dynamics.coagulation.charged_kernel_strategy.ChargedKernelStrategyABC.dimensionless",
+      "particula.dynamics.coagulation.charged_kernel_strategy.ChargedKernelStrategyABC.kernel",
+      "particula.dynamics.coagulation.charged_kernel_strategy.CoulombDyachkov2007KernelStrategy",
+      "particula.dynamics.coagulation.charged_kernel_strategy.CoulombGatti2008KernelStrategy",
+      "particula.dynamics.coagulation.charged_kernel_strategy.CoulombGopalakrishnan2012KernelStrategy",
+      "particula.dynamics.coagulation.charged_kernel_strategy.CoulumbChahl2019KernelStrategy",
+      "particula.dynamics.coagulation.charged_kernel_strategy.HardSphereKernelStrategy"
+    ],
+    "API/particula/dynamics/coagulation/coagulation_builder/brownian_coagulation_builder/index.html": [
+      "particula.dynamics.coagulation.coagulation_builder.brownian_coagulation_builder",
+      "particula.dynamics.coagulation.coagulation_builder.brownian_coagulation_builder.BrownianCoagulationBuilder",
+      "particula.dynamics.coagulation.coagulation_builder.brownian_coagulation_builder.BrownianCoagulationBuilder.build"
+    ],
+    "API/particula/dynamics/coagulation/coagulation_builder/charged_coagulation_builder/index.html": [
+      "particula.dynamics.coagulation.coagulation_builder.charged_coagulation_builder",
+      "particula.dynamics.coagulation.coagulation_builder.charged_coagulation_builder.ChargedCoagulationBuilder",
+      "particula.dynamics.coagulation.coagulation_builder.charged_coagulation_builder.ChargedCoagulationBuilder.build",
+      "particula.dynamics.coagulation.coagulation_builder.charged_coagulation_builder.ChargedCoagulationBuilder.set_charged_kernel_strategy"
+    ],
+    "API/particula/dynamics/coagulation/coagulation_builder/coagulation_builder_mixin/index.html": [
+      "particula.dynamics.coagulation.coagulation_builder.coagulation_builder_mixin",
+      "particula.dynamics.coagulation.coagulation_builder.coagulation_builder_mixin.BuilderDistributionTypeMixin",
+      "particula.dynamics.coagulation.coagulation_builder.coagulation_builder_mixin.BuilderDistributionTypeMixin.set_distribution_type",
+      "particula.dynamics.coagulation.coagulation_builder.coagulation_builder_mixin.BuilderFluidDensityMixin",
+      "particula.dynamics.coagulation.coagulation_builder.coagulation_builder_mixin.BuilderFluidDensityMixin.set_fluid_density",
+      "particula.dynamics.coagulation.coagulation_builder.coagulation_builder_mixin.BuilderTurbulentDissipationMixin",
+      "particula.dynamics.coagulation.coagulation_builder.coagulation_builder_mixin.BuilderTurbulentDissipationMixin.set_turbulent_dissipation",
+      "particula.dynamics.coagulation.coagulation_builder.coagulation_builder_mixin.BuilderUseDirectKernelMixin",
+      "particula.dynamics.coagulation.coagulation_builder.coagulation_builder_mixin.BuilderUseDirectKernelMixin.set_use_direct_kernel"
+    ],
+    "API/particula/dynamics/coagulation/coagulation_builder/combine_coagulation_strategy_builder/index.html": [
+      "particula.dynamics.coagulation.coagulation_builder.combine_coagulation_strategy_builder",
+      "particula.dynamics.coagulation.coagulation_builder.combine_coagulation_strategy_builder.CombineCoagulationStrategyBuilder",
+      "particula.dynamics.coagulation.coagulation_builder.combine_coagulation_strategy_builder.CombineCoagulationStrategyBuilder.build",
+      "particula.dynamics.coagulation.coagulation_builder.combine_coagulation_strategy_builder.CombineCoagulationStrategyBuilder.set_strategies"
+    ],
+    "API/particula/dynamics/coagulation/coagulation_builder/index.html": [
+      "particula.dynamics.coagulation.coagulation_builder"
+    ],
+    "API/particula/dynamics/coagulation/coagulation_builder/sedimentation_coagulation_builder/index.html": [
+      "particula.dynamics.coagulation.coagulation_builder.sedimentation_coagulation_builder",
+      "particula.dynamics.coagulation.coagulation_builder.sedimentation_coagulation_builder.SedimentationCoagulationBuilder",
+      "particula.dynamics.coagulation.coagulation_builder.sedimentation_coagulation_builder.SedimentationCoagulationBuilder.build"
+    ],
+    "API/particula/dynamics/coagulation/coagulation_builder/turbulent_dns_coagulation_builder/index.html": [
+      "particula.dynamics.coagulation.coagulation_builder.turbulent_dns_coagulation_builder",
+      "particula.dynamics.coagulation.coagulation_builder.turbulent_dns_coagulation_builder.TurbulentDNSCoagulationBuilder",
+      "particula.dynamics.coagulation.coagulation_builder.turbulent_dns_coagulation_builder.TurbulentDNSCoagulationBuilder--now-strategy-can-be-used-to-compute-dns-based-coagulation-rates",
+      "particula.dynamics.coagulation.coagulation_builder.turbulent_dns_coagulation_builder.TurbulentDNSCoagulationBuilder.build",
+      "particula.dynamics.coagulation.coagulation_builder.turbulent_dns_coagulation_builder.TurbulentDNSCoagulationBuilder.set_relative_velocity",
+      "particula.dynamics.coagulation.coagulation_builder.turbulent_dns_coagulation_builder.TurbulentDNSCoagulationBuilder.set_reynolds_lambda"
+    ],
+    "API/particula/dynamics/coagulation/coagulation_builder/turbulent_shear_coagulation_builder/index.html": [
+      "particula.dynamics.coagulation.coagulation_builder.turbulent_shear_coagulation_builder",
+      "particula.dynamics.coagulation.coagulation_builder.turbulent_shear_coagulation_builder.TurbulentShearCoagulationBuilder",
+      "particula.dynamics.coagulation.coagulation_builder.turbulent_shear_coagulation_builder.TurbulentShearCoagulationBuilder.build"
+    ],
+    "API/particula/dynamics/coagulation/coagulation_factories/index.html": [
+      "particula.dynamics.coagulation.coagulation_factories",
+      "particula.dynamics.coagulation.coagulation_factories.CoagulationFactory",
+      "particula.dynamics.coagulation.coagulation_factories.CoagulationFactory.get_builders"
+    ],
+    "API/particula/dynamics/coagulation/coagulation_rate/index.html": [
+      "particula.dynamics.coagulation.coagulation_rate",
+      "particula.dynamics.coagulation.coagulation_rate.get_coagulation_gain_rate_continuous",
+      "particula.dynamics.coagulation.coagulation_rate.get_coagulation_gain_rate_discrete",
+      "particula.dynamics.coagulation.coagulation_rate.get_coagulation_loss_rate_continuous",
+      "particula.dynamics.coagulation.coagulation_rate.get_coagulation_loss_rate_discrete"
+    ],
+    "API/particula/dynamics/coagulation/coagulation_strategy/_native_step/index.html": [
+      "particula.dynamics.coagulation.coagulation_strategy._native_step",
+      "particula.dynamics.coagulation.coagulation_strategy._native_step.binned_kernel_data",
+      "particula.dynamics.coagulation.coagulation_strategy._native_step.kernel_edges",
+      "particula.dynamics.coagulation.coagulation_strategy._native_step.step_native",
+      "particula.dynamics.coagulation.coagulation_strategy._native_step.validate_bin_controls",
+      "particula.dynamics.coagulation.coagulation_strategy._native_step.validate_edges"
+    ],
+    "API/particula/dynamics/coagulation/coagulation_strategy/_native_validation/index.html": [
+      "particula.dynamics.coagulation.coagulation_strategy._native_validation",
+      "particula.dynamics.coagulation.coagulation_strategy._native_validation.native_kernel",
+      "particula.dynamics.coagulation.coagulation_strategy._native_validation.positive_scalar",
+      "particula.dynamics.coagulation.coagulation_strategy._native_validation.rate_radius",
+      "particula.dynamics.coagulation.coagulation_strategy._native_validation.validate_controls",
+      "particula.dynamics.coagulation.coagulation_strategy._native_validation.validate_particle",
+      "particula.dynamics.coagulation.coagulation_strategy._native_validation.validate_rate_kernel"
+    ],
+    "API/particula/dynamics/coagulation/coagulation_strategy/brownian_coagulation_strategy/index.html": [
+      "particula.dynamics.coagulation.coagulation_strategy.brownian_coagulation_strategy",
+      "particula.dynamics.coagulation.coagulation_strategy.brownian_coagulation_strategy.BrownianCoagulationStrategy",
+      "particula.dynamics.coagulation.coagulation_strategy.brownian_coagulation_strategy.BrownianCoagulationStrategy.dimensionless_kernel",
+      "particula.dynamics.coagulation.coagulation_strategy.brownian_coagulation_strategy.BrownianCoagulationStrategy.kernel"
+    ],
+    "API/particula/dynamics/coagulation/coagulation_strategy/charged_coagulation_strategy/index.html": [
+      "particula.dynamics.coagulation.coagulation_strategy.charged_coagulation_strategy",
+      "particula.dynamics.coagulation.coagulation_strategy.charged_coagulation_strategy.ChargedCoagulationStrategy",
+      "particula.dynamics.coagulation.coagulation_strategy.charged_coagulation_strategy.ChargedCoagulationStrategy.dimensionless_kernel",
+      "particula.dynamics.coagulation.coagulation_strategy.charged_coagulation_strategy.ChargedCoagulationStrategy.kernel"
+    ],
+    "API/particula/dynamics/coagulation/coagulation_strategy/coagulation_strategy_abc/index.html": [
+      "particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc",
+      "particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc.CoagulationStrategyABC",
+      "particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc.CoagulationStrategyABC.coulomb_potential_ratio",
+      "particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc.CoagulationStrategyABC.diffusive_knudsen",
+      "particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc.CoagulationStrategyABC.dimensionless_kernel",
+      "particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc.CoagulationStrategyABC.friction_factor",
+      "particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc.CoagulationStrategyABC.gain_rate",
+      "particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc.CoagulationStrategyABC.kernel",
+      "particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc.CoagulationStrategyABC.loss_rate",
+      "particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc.CoagulationStrategyABC.net_rate",
+      "particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc.CoagulationStrategyABC.step"
+    ],
+    "API/particula/dynamics/coagulation/coagulation_strategy/combine_coagulation_strategy/index.html": [
+      "particula.dynamics.coagulation.coagulation_strategy.combine_coagulation_strategy",
+      "particula.dynamics.coagulation.coagulation_strategy.combine_coagulation_strategy.CombineCoagulationStrategy",
+      "particula.dynamics.coagulation.coagulation_strategy.combine_coagulation_strategy.CombineCoagulationStrategy.dimensionless_kernel",
+      "particula.dynamics.coagulation.coagulation_strategy.combine_coagulation_strategy.CombineCoagulationStrategy.kernel"
+    ],
+    "API/particula/dynamics/coagulation/coagulation_strategy/index.html": [
+      "particula.dynamics.coagulation.coagulation_strategy"
+    ],
+    "API/particula/dynamics/coagulation/coagulation_strategy/sedimentation_coagulation_strategy/index.html": [
+      "particula.dynamics.coagulation.coagulation_strategy.sedimentation_coagulation_strategy",
+      "particula.dynamics.coagulation.coagulation_strategy.sedimentation_coagulation_strategy.SedimentationCoagulationStrategy",
+      "particula.dynamics.coagulation.coagulation_strategy.sedimentation_coagulation_strategy.SedimentationCoagulationStrategy.dimensionless_kernel",
+      "particula.dynamics.coagulation.coagulation_strategy.sedimentation_coagulation_strategy.SedimentationCoagulationStrategy.kernel"
+    ],
+    "API/particula/dynamics/coagulation/coagulation_strategy/turbulent_dns_coagulation_strategy/index.html": [
+      "particula.dynamics.coagulation.coagulation_strategy.turbulent_dns_coagulation_strategy",
+      "particula.dynamics.coagulation.coagulation_strategy.turbulent_dns_coagulation_strategy.TurbulentDNSCoagulationStrategy",
+      "particula.dynamics.coagulation.coagulation_strategy.turbulent_dns_coagulation_strategy.TurbulentDNSCoagulationStrategy.dimensionless_kernel",
+      "particula.dynamics.coagulation.coagulation_strategy.turbulent_dns_coagulation_strategy.TurbulentDNSCoagulationStrategy.kernel",
+      "particula.dynamics.coagulation.coagulation_strategy.turbulent_dns_coagulation_strategy.TurbulentDNSCoagulationStrategy.set_relative_velocity",
+      "particula.dynamics.coagulation.coagulation_strategy.turbulent_dns_coagulation_strategy.TurbulentDNSCoagulationStrategy.set_reynolds_lambda",
+      "particula.dynamics.coagulation.coagulation_strategy.turbulent_dns_coagulation_strategy.TurbulentDNSCoagulationStrategy.set_turbulent_dissipation"
+    ],
+    "API/particula/dynamics/coagulation/coagulation_strategy/turbulent_shear_coagulation_strategy/index.html": [
+      "particula.dynamics.coagulation.coagulation_strategy.turbulent_shear_coagulation_strategy",
+      "particula.dynamics.coagulation.coagulation_strategy.turbulent_shear_coagulation_strategy.TurbulentShearCoagulationStrategy",
+      "particula.dynamics.coagulation.coagulation_strategy.turbulent_shear_coagulation_strategy.TurbulentShearCoagulationStrategy.dimensionless_kernel",
+      "particula.dynamics.coagulation.coagulation_strategy.turbulent_shear_coagulation_strategy.TurbulentShearCoagulationStrategy.kernel",
+      "particula.dynamics.coagulation.coagulation_strategy.turbulent_shear_coagulation_strategy.TurbulentShearCoagulationStrategy.set_turbulent_dissipation"
+    ],
+    "API/particula/dynamics/coagulation/index.html": [
+      "particula.dynamics.coagulation"
+    ],
+    "API/particula/dynamics/coagulation/particle_resolved_step/index.html": [
+      "particula.dynamics.coagulation.particle_resolved_step"
+    ],
+    "API/particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method/index.html": [
+      "particula.dynamics.coagulation.particle_resolved_step.particle_resolved_method",
+      "particula.dynamics.coagulation.particle_resolved_step.particle_resolved_method.get_particle_resolved_coagulation_step",
+      "particula.dynamics.coagulation.particle_resolved_step.particle_resolved_method.get_particle_resolved_update_step"
+    ],
+    "API/particula/dynamics/coagulation/particle_resolved_step/super_droplet_method/index.html": [
+      "particula.dynamics.coagulation.particle_resolved_step.super_droplet_method",
+      "particula.dynamics.coagulation.particle_resolved_step.super_droplet_method.get_super_droplet_coagulation_step",
+      "particula.dynamics.coagulation.particle_resolved_step.super_droplet_method.get_super_droplet_coagulation_step--coagulation-step",
+      "particula.dynamics.coagulation.particle_resolved_step.super_droplet_method.get_super_droplet_coagulation_step--r_new-c_new-have-updated-values-after-one-super-droplet",
+      "particula.dynamics.coagulation.particle_resolved_step.super_droplet_method.random_choice_indices"
+    ],
+    "API/particula/dynamics/coagulation/sedimentation_kernel/index.html": [
+      "particula.dynamics.coagulation.sedimentation_kernel",
+      "particula.dynamics.coagulation.sedimentation_kernel.calculate_collision_efficiency_function",
+      "particula.dynamics.coagulation.sedimentation_kernel.get_sedimentation_kernel_sp2016",
+      "particula.dynamics.coagulation.sedimentation_kernel.get_sedimentation_kernel_sp2016_via_system_state"
+    ],
+    "API/particula/dynamics/coagulation/turbulent_dns_kernel/g12_radial_distribution_ao2008/index.html": [
+      "particula.dynamics.coagulation.turbulent_dns_kernel.g12_radial_distribution_ao2008",
+      "particula.dynamics.coagulation.turbulent_dns_kernel.g12_radial_distribution_ao2008.get_g12_radial_distribution_ao2008"
+    ],
+    "API/particula/dynamics/coagulation/turbulent_dns_kernel/index.html": [
+      "particula.dynamics.coagulation.turbulent_dns_kernel"
+    ],
+    "API/particula/dynamics/coagulation/turbulent_dns_kernel/phi_ao2008/index.html": [
+      "particula.dynamics.coagulation.turbulent_dns_kernel.phi_ao2008",
+      "particula.dynamics.coagulation.turbulent_dns_kernel.phi_ao2008.PhiComputeTerms",
+      "particula.dynamics.coagulation.turbulent_dns_kernel.phi_ao2008.get_phi_ao2008"
+    ],
+    "API/particula/dynamics/coagulation/turbulent_dns_kernel/psi_ao2008/index.html": [
+      "particula.dynamics.coagulation.turbulent_dns_kernel.psi_ao2008",
+      "particula.dynamics.coagulation.turbulent_dns_kernel.psi_ao2008.get_psi_ao2008"
+    ],
+    "API/particula/dynamics/coagulation/turbulent_dns_kernel/radial_velocity_module/index.html": [
+      "particula.dynamics.coagulation.turbulent_dns_kernel.radial_velocity_module",
+      "particula.dynamics.coagulation.turbulent_dns_kernel.radial_velocity_module.get_radial_relative_velocity_ao2008",
+      "particula.dynamics.coagulation.turbulent_dns_kernel.radial_velocity_module.get_radial_relative_velocity_dz2002"
+    ],
+    "API/particula/dynamics/coagulation/turbulent_dns_kernel/sigma_relative_velocity_ao2008/index.html": [
+      "particula.dynamics.coagulation.turbulent_dns_kernel.sigma_relative_velocity_ao2008",
+      "particula.dynamics.coagulation.turbulent_dns_kernel.sigma_relative_velocity_ao2008.VelocityCorrelationTerms",
+      "particula.dynamics.coagulation.turbulent_dns_kernel.sigma_relative_velocity_ao2008.get_relative_velocity_variance"
+    ],
+    "API/particula/dynamics/coagulation/turbulent_dns_kernel/turbulent_dns_kernel_ao2008/index.html": [
+      "particula.dynamics.coagulation.turbulent_dns_kernel.turbulent_dns_kernel_ao2008",
+      "particula.dynamics.coagulation.turbulent_dns_kernel.turbulent_dns_kernel_ao2008.get_turbulent_dns_kernel_ao2008",
+      "particula.dynamics.coagulation.turbulent_dns_kernel.turbulent_dns_kernel_ao2008.get_turbulent_dns_kernel_ao2008_via_system_state"
+    ],
+    "API/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_f2_ao2008/index.html": [
+      "particula.dynamics.coagulation.turbulent_dns_kernel.velocity_correlation_f2_ao2008",
+      "particula.dynamics.coagulation.turbulent_dns_kernel.velocity_correlation_f2_ao2008.get_f2_longitudinal_velocity_correlation"
+    ],
+    "API/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_terms_ao2008/index.html": [
+      "particula.dynamics.coagulation.turbulent_dns_kernel.velocity_correlation_terms_ao2008",
+      "particula.dynamics.coagulation.turbulent_dns_kernel.velocity_correlation_terms_ao2008.compute_b1",
+      "particula.dynamics.coagulation.turbulent_dns_kernel.velocity_correlation_terms_ao2008.compute_b2",
+      "particula.dynamics.coagulation.turbulent_dns_kernel.velocity_correlation_terms_ao2008.compute_beta",
+      "particula.dynamics.coagulation.turbulent_dns_kernel.velocity_correlation_terms_ao2008.compute_c1",
+      "particula.dynamics.coagulation.turbulent_dns_kernel.velocity_correlation_terms_ao2008.compute_c2",
+      "particula.dynamics.coagulation.turbulent_dns_kernel.velocity_correlation_terms_ao2008.compute_d1",
+      "particula.dynamics.coagulation.turbulent_dns_kernel.velocity_correlation_terms_ao2008.compute_d2",
+      "particula.dynamics.coagulation.turbulent_dns_kernel.velocity_correlation_terms_ao2008.compute_e1",
+      "particula.dynamics.coagulation.turbulent_dns_kernel.velocity_correlation_terms_ao2008.compute_e2",
+      "particula.dynamics.coagulation.turbulent_dns_kernel.velocity_correlation_terms_ao2008.compute_z"
+    ],
+    "API/particula/dynamics/coagulation/turbulent_shear_kernel/index.html": [
+      "particula.dynamics.coagulation.turbulent_shear_kernel",
+      "particula.dynamics.coagulation.turbulent_shear_kernel.get_turbulent_shear_kernel_st1956",
+      "particula.dynamics.coagulation.turbulent_shear_kernel.get_turbulent_shear_kernel_st1956_via_system_state"
+    ],
+    "API/particula/dynamics/condensation/_native_step/index.html": [
+      "particula.dynamics.condensation._native_step",
+      "particula.dynamics.condensation._native_step.finalize_native_transfer",
+      "particula.dynamics.condensation._native_step.retire_evaporated_slots",
+      "particula.dynamics.condensation._native_step.validate_native_step_storage",
+      "particula.dynamics.condensation._native_step.validate_native_time_step"
+    ],
+    "API/particula/dynamics/condensation/condensation_builder/condensation_builder_mixin/index.html": [
+      "particula.dynamics.condensation.condensation_builder.condensation_builder_mixin",
+      "particula.dynamics.condensation.condensation_builder.condensation_builder_mixin.BuilderAccommodationCoefficientMixin",
+      "particula.dynamics.condensation.condensation_builder.condensation_builder_mixin.BuilderAccommodationCoefficientMixin.set_accommodation_coefficient",
+      "particula.dynamics.condensation.condensation_builder.condensation_builder_mixin.BuilderDiffusionCoefficientMixin",
+      "particula.dynamics.condensation.condensation_builder.condensation_builder_mixin.BuilderDiffusionCoefficientMixin.set_diffusion_coefficient",
+      "particula.dynamics.condensation.condensation_builder.condensation_builder_mixin.BuilderUpdateGasesMixin",
+      "particula.dynamics.condensation.condensation_builder.condensation_builder_mixin.BuilderUpdateGasesMixin.set_update_gases"
+    ],
+    "API/particula/dynamics/condensation/condensation_builder/condensation_isothermal_builder/index.html": [
+      "particula.dynamics.condensation.condensation_builder.condensation_isothermal_builder",
+      "particula.dynamics.condensation.condensation_builder.condensation_isothermal_builder.CondensationIsothermalBuilder",
+      "particula.dynamics.condensation.condensation_builder.condensation_isothermal_builder.CondensationIsothermalBuilder.build",
+      "particula.dynamics.condensation.condensation_builder.condensation_isothermal_builder.CondensationIsothermalBuilder.set_parameters"
+    ],
+    "API/particula/dynamics/condensation/condensation_builder/condensation_isothermal_staggered_builder/index.html": [
+      "particula.dynamics.condensation.condensation_builder.condensation_isothermal_staggered_builder",
+      "particula.dynamics.condensation.condensation_builder.condensation_isothermal_staggered_builder.CondensationIsothermalStaggeredBuilder",
+      "particula.dynamics.condensation.condensation_builder.condensation_isothermal_staggered_builder.CondensationIsothermalStaggeredBuilder.build",
+      "particula.dynamics.condensation.condensation_builder.condensation_isothermal_staggered_builder.CondensationIsothermalStaggeredBuilder.set_num_batches",
+      "particula.dynamics.condensation.condensation_builder.condensation_isothermal_staggered_builder.CondensationIsothermalStaggeredBuilder.set_parameters",
+      "particula.dynamics.condensation.condensation_builder.condensation_isothermal_staggered_builder.CondensationIsothermalStaggeredBuilder.set_random_state",
+      "particula.dynamics.condensation.condensation_builder.condensation_isothermal_staggered_builder.CondensationIsothermalStaggeredBuilder.set_shuffle_each_step",
+      "particula.dynamics.condensation.condensation_builder.condensation_isothermal_staggered_builder.CondensationIsothermalStaggeredBuilder.set_theta_mode"
+    ],
+    "API/particula/dynamics/condensation/condensation_builder/condensation_latent_heat_builder/index.html": [
+      "particula.dynamics.condensation.condensation_builder.condensation_latent_heat_builder",
+      "particula.dynamics.condensation.condensation_builder.condensation_latent_heat_builder.CondensationLatentHeatBuilder",
+      "particula.dynamics.condensation.condensation_builder.condensation_latent_heat_builder.CondensationLatentHeatBuilder.build",
+      "particula.dynamics.condensation.condensation_builder.condensation_latent_heat_builder.CondensationLatentHeatBuilder.set_latent_heat",
+      "particula.dynamics.condensation.condensation_builder.condensation_latent_heat_builder.CondensationLatentHeatBuilder.set_latent_heat_strategy",
+      "particula.dynamics.condensation.condensation_builder.condensation_latent_heat_builder.CondensationLatentHeatBuilder.set_parameters"
+    ],
+    "API/particula/dynamics/condensation/condensation_builder/index.html": [
+      "particula.dynamics.condensation.condensation_builder",
+      "particula.dynamics.condensation.condensation_builder.CondensationIsothermalBuilder",
+      "particula.dynamics.condensation.condensation_builder.CondensationIsothermalBuilder.build",
+      "particula.dynamics.condensation.condensation_builder.CondensationIsothermalBuilder.set_parameters",
+      "particula.dynamics.condensation.condensation_builder.CondensationIsothermalStaggeredBuilder",
+      "particula.dynamics.condensation.condensation_builder.CondensationIsothermalStaggeredBuilder.build",
+      "particula.dynamics.condensation.condensation_builder.CondensationIsothermalStaggeredBuilder.set_num_batches",
+      "particula.dynamics.condensation.condensation_builder.CondensationIsothermalStaggeredBuilder.set_parameters",
+      "particula.dynamics.condensation.condensation_builder.CondensationIsothermalStaggeredBuilder.set_random_state",
+      "particula.dynamics.condensation.condensation_builder.CondensationIsothermalStaggeredBuilder.set_shuffle_each_step",
+      "particula.dynamics.condensation.condensation_builder.CondensationIsothermalStaggeredBuilder.set_theta_mode",
+      "particula.dynamics.condensation.condensation_builder.CondensationLatentHeatBuilder",
+      "particula.dynamics.condensation.condensation_builder.CondensationLatentHeatBuilder.build",
+      "particula.dynamics.condensation.condensation_builder.CondensationLatentHeatBuilder.set_latent_heat",
+      "particula.dynamics.condensation.condensation_builder.CondensationLatentHeatBuilder.set_latent_heat_strategy",
+      "particula.dynamics.condensation.condensation_builder.CondensationLatentHeatBuilder.set_parameters"
+    ],
+    "API/particula/dynamics/condensation/condensation_builder/native_configuration/index.html": [
+      "particula.dynamics.condensation.condensation_builder.native_configuration",
+      "particula.dynamics.condensation.condensation_builder.native_configuration.BuilderNativeCondensationMixin",
+      "particula.dynamics.condensation.condensation_builder.native_configuration.BuilderNativeCondensationMixin.set_activity_strategy",
+      "particula.dynamics.condensation.condensation_builder.native_configuration.BuilderNativeCondensationMixin.set_skip_partitioning_indices",
+      "particula.dynamics.condensation.condensation_builder.native_configuration.BuilderNativeCondensationMixin.set_species_map",
+      "particula.dynamics.condensation.condensation_builder.native_configuration.BuilderNativeCondensationMixin.set_surface_strategy",
+      "particula.dynamics.condensation.condensation_builder.native_configuration.BuilderNativeCondensationMixin.set_vapor_pressure_strategy"
+    ],
+    "API/particula/dynamics/condensation/condensation_factories/index.html": [
+      "particula.dynamics.condensation.condensation_factories",
+      "particula.dynamics.condensation.condensation_factories.CondensationFactory",
+      "particula.dynamics.condensation.condensation_factories.CondensationFactory.get_builders"
+    ],
+    "API/particula/dynamics/condensation/condensation_strategies/index.html": [
+      "particula.dynamics.condensation.condensation_strategies",
+      "particula.dynamics.condensation.condensation_strategies.CondensationIsothermal",
+      "particula.dynamics.condensation.condensation_strategies.CondensationIsothermal.mass_transfer_rate",
+      "particula.dynamics.condensation.condensation_strategies.CondensationIsothermal.rate",
+      "particula.dynamics.condensation.condensation_strategies.CondensationIsothermal.step",
+      "particula.dynamics.condensation.condensation_strategies.CondensationIsothermalStaggered",
+      "particula.dynamics.condensation.condensation_strategies.CondensationIsothermalStaggered.mass_transfer_rate",
+      "particula.dynamics.condensation.condensation_strategies.CondensationIsothermalStaggered.rate",
+      "particula.dynamics.condensation.condensation_strategies.CondensationIsothermalStaggered.step",
+      "particula.dynamics.condensation.condensation_strategies.CondensationLatentHeat",
+      "particula.dynamics.condensation.condensation_strategies.CondensationLatentHeat.mass_transfer_rate",
+      "particula.dynamics.condensation.condensation_strategies.CondensationLatentHeat.rate",
+      "particula.dynamics.condensation.condensation_strategies.CondensationLatentHeat.step",
+      "particula.dynamics.condensation.condensation_strategies.CondensationStrategy",
+      "particula.dynamics.condensation.condensation_strategies.CondensationStrategy.calculate_pressure_delta",
+      "particula.dynamics.condensation.condensation_strategies.CondensationStrategy.first_order_mass_transport",
+      "particula.dynamics.condensation.condensation_strategies.CondensationStrategy.knudsen_number",
+      "particula.dynamics.condensation.condensation_strategies.CondensationStrategy.mass_transfer_rate",
+      "particula.dynamics.condensation.condensation_strategies.CondensationStrategy.mean_free_path",
+      "particula.dynamics.condensation.condensation_strategies.CondensationStrategy.rate",
+      "particula.dynamics.condensation.condensation_strategies.CondensationStrategy.step"
+    ],
+    "API/particula/dynamics/condensation/index.html": [
+      "particula.dynamics.condensation",
+      "particula.dynamics.condensation.CondensationFactory",
+      "particula.dynamics.condensation.CondensationFactory.get_builders",
+      "particula.dynamics.condensation.CondensationIsothermal",
+      "particula.dynamics.condensation.CondensationIsothermal.mass_transfer_rate",
+      "particula.dynamics.condensation.CondensationIsothermal.rate",
+      "particula.dynamics.condensation.CondensationIsothermal.step",
+      "particula.dynamics.condensation.CondensationIsothermalBuilder",
+      "particula.dynamics.condensation.CondensationIsothermalBuilder.build",
+      "particula.dynamics.condensation.CondensationIsothermalBuilder.set_parameters",
+      "particula.dynamics.condensation.CondensationIsothermalStaggered",
+      "particula.dynamics.condensation.CondensationIsothermalStaggered.mass_transfer_rate",
+      "particula.dynamics.condensation.CondensationIsothermalStaggered.rate",
+      "particula.dynamics.condensation.CondensationIsothermalStaggered.step",
+      "particula.dynamics.condensation.CondensationIsothermalStaggeredBuilder",
+      "particula.dynamics.condensation.CondensationIsothermalStaggeredBuilder.build",
+      "particula.dynamics.condensation.CondensationIsothermalStaggeredBuilder.set_num_batches",
+      "particula.dynamics.condensation.CondensationIsothermalStaggeredBuilder.set_parameters",
+      "particula.dynamics.condensation.CondensationIsothermalStaggeredBuilder.set_random_state",
+      "particula.dynamics.condensation.CondensationIsothermalStaggeredBuilder.set_shuffle_each_step",
+      "particula.dynamics.condensation.CondensationIsothermalStaggeredBuilder.set_theta_mode",
+      "particula.dynamics.condensation.CondensationLatentHeat",
+      "particula.dynamics.condensation.CondensationLatentHeat.mass_transfer_rate",
+      "particula.dynamics.condensation.CondensationLatentHeat.rate",
+      "particula.dynamics.condensation.CondensationLatentHeat.step",
+      "particula.dynamics.condensation.CondensationLatentHeatBuilder",
+      "particula.dynamics.condensation.CondensationLatentHeatBuilder.build",
+      "particula.dynamics.condensation.CondensationLatentHeatBuilder.set_latent_heat",
+      "particula.dynamics.condensation.CondensationLatentHeatBuilder.set_latent_heat_strategy",
+      "particula.dynamics.condensation.CondensationLatentHeatBuilder.set_parameters",
+      "particula.dynamics.condensation.CondensationStrategy",
+      "particula.dynamics.condensation.CondensationStrategy.calculate_pressure_delta",
+      "particula.dynamics.condensation.CondensationStrategy.first_order_mass_transport",
+      "particula.dynamics.condensation.CondensationStrategy.knudsen_number",
+      "particula.dynamics.condensation.CondensationStrategy.mass_transfer_rate",
+      "particula.dynamics.condensation.CondensationStrategy.mean_free_path",
+      "particula.dynamics.condensation.CondensationStrategy.rate",
+      "particula.dynamics.condensation.CondensationStrategy.step"
+    ],
+    "API/particula/dynamics/condensation/mass_transfer/index.html": [
+      "particula.dynamics.condensation.mass_transfer",
+      "particula.dynamics.condensation.mass_transfer.get_first_order_mass_transport_k",
+      "particula.dynamics.condensation.mass_transfer.get_latent_heat_energy_released",
+      "particula.dynamics.condensation.mass_transfer.get_mass_transfer",
+      "particula.dynamics.condensation.mass_transfer.get_mass_transfer_of_multiple_species",
+      "particula.dynamics.condensation.mass_transfer.get_mass_transfer_of_single_species",
+      "particula.dynamics.condensation.mass_transfer.get_mass_transfer_rate",
+      "particula.dynamics.condensation.mass_transfer.get_mass_transfer_rate_latent_heat",
+      "particula.dynamics.condensation.mass_transfer.get_radius_transfer_rate",
+      "particula.dynamics.condensation.mass_transfer.get_thermal_resistance_factor"
+    ],
+    "API/particula/dynamics/condensation/mass_transfer_utils/index.html": [
+      "particula.dynamics.condensation.mass_transfer_utils",
+      "particula.dynamics.condensation.mass_transfer_utils.apply_condensation_limit",
+      "particula.dynamics.condensation.mass_transfer_utils.apply_evaporation_limit",
+      "particula.dynamics.condensation.mass_transfer_utils.apply_per_bin_limit",
+      "particula.dynamics.condensation.mass_transfer_utils.calc_mass_to_change"
+    ],
+    "API/particula/dynamics/condensation/species_mapping/index.html": [
+      "particula.dynamics.condensation.species_mapping",
+      "particula.dynamics.condensation.species_mapping.CondensationSpeciesMap",
+      "particula.dynamics.condensation.species_mapping.CondensationSpeciesMap.__post_init__",
+      "particula.dynamics.condensation.species_mapping.condensation_population_weights",
+      "particula.dynamics.condensation.species_mapping.validate_condensation_state"
+    ],
+    "API/particula/dynamics/dilution/index.html": [
+      "particula.dynamics.dilution",
+      "particula.dynamics.dilution.DilutionStrategy",
+      "particula.dynamics.dilution.DilutionStrategy.rate",
+      "particula.dynamics.dilution.DilutionStrategy.step",
+      "particula.dynamics.dilution.dilute_aerosol",
+      "particula.dynamics.dilution.get_dilution_rate",
+      "particula.dynamics.dilution.get_dilution_step",
+      "particula.dynamics.dilution.get_volume_dilution_coefficient"
+    ],
+    "API/particula/dynamics/index.html": [
+      "particula.dynamics"
+    ],
+    "API/particula/dynamics/nucleation/index.html": [
+      "particula.dynamics.nucleation",
+      "particula.dynamics.nucleation.ActivationNucleationBuilder",
+      "particula.dynamics.nucleation.ActivationNucleationBuilder.build",
+      "particula.dynamics.nucleation.ActivationNucleationStrategy",
+      "particula.dynamics.nucleation.ActivationNucleationStrategy.__post_init__",
+      "particula.dynamics.nucleation.ActivationNucleationStrategy.potential_rate",
+      "particula.dynamics.nucleation.ClosedInterval",
+      "particula.dynamics.nucleation.ClosedInterval.__post_init__",
+      "particula.dynamics.nucleation.ClosedInterval.contains",
+      "particula.dynamics.nucleation.FormationMetadata",
+      "particula.dynamics.nucleation.FormationMetadata.__post_init__",
+      "particula.dynamics.nucleation.InjectionComposition",
+      "particula.dynamics.nucleation.InjectionComposition.__post_init__",
+      "particula.dynamics.nucleation.KineticNucleationBuilder",
+      "particula.dynamics.nucleation.KineticNucleationBuilder.build",
+      "particula.dynamics.nucleation.KineticNucleationStrategy",
+      "particula.dynamics.nucleation.KineticNucleationStrategy.__post_init__",
+      "particula.dynamics.nucleation.KineticNucleationStrategy.potential_rate",
+      "particula.dynamics.nucleation.NucleationFactory",
+      "particula.dynamics.nucleation.NucleationFactory.get_builders",
+      "particula.dynamics.nucleation.NucleationFactory.get_strategy",
+      "particula.dynamics.nucleation.NucleationSourceConfig",
+      "particula.dynamics.nucleation.NucleationSourceConfig.__post_init__",
+      "particula.dynamics.nucleation.NucleationSourceConfigBuilder",
+      "particula.dynamics.nucleation.NucleationSourceConfigBuilder.build",
+      "particula.dynamics.nucleation.NucleationSourceConfigBuilder.set_parameters",
+      "particula.dynamics.nucleation.NucleationSourceConfigBuilder.set_precursor_index",
+      "particula.dynamics.nucleation.NucleationSourceConfigBuilder.set_species_map",
+      "particula.dynamics.nucleation.NucleationSourceConfigBuilder.set_strategy",
+      "particula.dynamics.nucleation.NucleationStrategy",
+      "particula.dynamics.nucleation.NucleationStrategy.potential_rate",
+      "particula.dynamics.nucleation.NucleationValidityDomain",
+      "particula.dynamics.nucleation.NucleationValidityDomain.__post_init__"
+    ],
+    "API/particula/dynamics/nucleation/nucleation_builders/index.html": [
+      "particula.dynamics.nucleation.nucleation_builders",
+      "particula.dynamics.nucleation.nucleation_builders.ActivationNucleationBuilder",
+      "particula.dynamics.nucleation.nucleation_builders.ActivationNucleationBuilder.build",
+      "particula.dynamics.nucleation.nucleation_builders.KineticNucleationBuilder",
+      "particula.dynamics.nucleation.nucleation_builders.KineticNucleationBuilder.build",
+      "particula.dynamics.nucleation.nucleation_builders.NucleationSourceConfigBuilder",
+      "particula.dynamics.nucleation.nucleation_builders.NucleationSourceConfigBuilder.build",
+      "particula.dynamics.nucleation.nucleation_builders.NucleationSourceConfigBuilder.set_parameters",
+      "particula.dynamics.nucleation.nucleation_builders.NucleationSourceConfigBuilder.set_precursor_index",
+      "particula.dynamics.nucleation.nucleation_builders.NucleationSourceConfigBuilder.set_species_map",
+      "particula.dynamics.nucleation.nucleation_builders.NucleationSourceConfigBuilder.set_strategy"
+    ],
+    "API/particula/dynamics/nucleation/nucleation_configuration/index.html": [
+      "particula.dynamics.nucleation.nucleation_configuration",
+      "particula.dynamics.nucleation.nucleation_configuration.NucleationSourceConfig",
+      "particula.dynamics.nucleation.nucleation_configuration.NucleationSourceConfig.__post_init__"
+    ],
+    "API/particula/dynamics/nucleation/nucleation_factories/index.html": [
+      "particula.dynamics.nucleation.nucleation_factories",
+      "particula.dynamics.nucleation.nucleation_factories.NucleationFactory",
+      "particula.dynamics.nucleation.nucleation_factories.NucleationFactory.get_builders",
+      "particula.dynamics.nucleation.nucleation_factories.NucleationFactory.get_strategy"
+    ],
+    "API/particula/dynamics/nucleation/nucleation_strategies/index.html": [
+      "particula.dynamics.nucleation.nucleation_strategies",
+      "particula.dynamics.nucleation.nucleation_strategies.ActivationNucleationStrategy",
+      "particula.dynamics.nucleation.nucleation_strategies.ActivationNucleationStrategy.__post_init__",
+      "particula.dynamics.nucleation.nucleation_strategies.ActivationNucleationStrategy.potential_rate",
+      "particula.dynamics.nucleation.nucleation_strategies.ClosedInterval",
+      "particula.dynamics.nucleation.nucleation_strategies.ClosedInterval.__post_init__",
+      "particula.dynamics.nucleation.nucleation_strategies.ClosedInterval.contains",
+      "particula.dynamics.nucleation.nucleation_strategies.FormationMetadata",
+      "particula.dynamics.nucleation.nucleation_strategies.FormationMetadata.__post_init__",
+      "particula.dynamics.nucleation.nucleation_strategies.InjectionComposition",
+      "particula.dynamics.nucleation.nucleation_strategies.InjectionComposition.__post_init__",
+      "particula.dynamics.nucleation.nucleation_strategies.KineticNucleationStrategy",
+      "particula.dynamics.nucleation.nucleation_strategies.KineticNucleationStrategy.__post_init__",
+      "particula.dynamics.nucleation.nucleation_strategies.KineticNucleationStrategy.potential_rate",
+      "particula.dynamics.nucleation.nucleation_strategies.NucleationStrategy",
+      "particula.dynamics.nucleation.nucleation_strategies.NucleationStrategy.potential_rate",
+      "particula.dynamics.nucleation.nucleation_strategies.NucleationValidityDomain",
+      "particula.dynamics.nucleation.nucleation_strategies.NucleationValidityDomain.__post_init__"
+    ],
+    "API/particula/dynamics/nucleation/particle_source/index.html": [
+      "particula.dynamics.nucleation.particle_source",
+      "particula.dynamics.nucleation.particle_source.FinalizedSourceDiagnostics",
+      "particula.dynamics.nucleation.particle_source.FinalizedSourceDiagnostics.__post_init__",
+      "particula.dynamics.nucleation.particle_source.ParticleSourceCommitConfig",
+      "particula.dynamics.nucleation.particle_source.ParticleSourceCommitConfig.__post_init__",
+      "particula.dynamics.nucleation.particle_source.PotentialEventData",
+      "particula.dynamics.nucleation.particle_source.PotentialEventData.__post_init__",
+      "particula.dynamics.nucleation.particle_source.SourceDemandData",
+      "particula.dynamics.nucleation.particle_source.SourceDemandData.__post_init__",
+      "particula.dynamics.nucleation.particle_source.SourceDiagnostics",
+      "particula.dynamics.nucleation.particle_source.SourceDiagnostics.__post_init__",
+      "particula.dynamics.nucleation.particle_source.commit_particle_source",
+      "particula.dynamics.nucleation.particle_source.finalize_particle_source"
+    ],
+    "API/particula/dynamics/nucleation/species_mapping/index.html": [
+      "particula.dynamics.nucleation.species_mapping",
+      "particula.dynamics.nucleation.species_mapping.NucleationSpeciesMap",
+      "particula.dynamics.nucleation.species_mapping.NucleationSpeciesMap.__post_init__",
+      "particula.dynamics.nucleation.species_mapping.validate_nucleation_mapping"
+    ],
+    "API/particula/dynamics/particle_process/index.html": [
+      "particula.dynamics.particle_process",
+      "particula.dynamics.particle_process.Coagulation",
+      "particula.dynamics.particle_process.Coagulation.execute",
+      "particula.dynamics.particle_process.Coagulation.rate",
+      "particula.dynamics.particle_process.Dilution",
+      "particula.dynamics.particle_process.Dilution.execute",
+      "particula.dynamics.particle_process.Dilution.rate",
+      "particula.dynamics.particle_process.DilutionStrategyProtocol",
+      "particula.dynamics.particle_process.DilutionStrategyProtocol.rate",
+      "particula.dynamics.particle_process.DilutionStrategyProtocol.step",
+      "particula.dynamics.particle_process.MassCondensation",
+      "particula.dynamics.particle_process.MassCondensation.execute",
+      "particula.dynamics.particle_process.MassCondensation.rate",
+      "particula.dynamics.particle_process.Nucleation",
+      "particula.dynamics.particle_process.Nucleation.execute",
+      "particula.dynamics.particle_process.Nucleation.rate",
+      "particula.dynamics.particle_process.NucleationCommitConfig",
+      "particula.dynamics.particle_process.NucleationCommitConfig.__post_init__",
+      "particula.dynamics.particle_process.WallLoss",
+      "particula.dynamics.particle_process.WallLoss.execute",
+      "particula.dynamics.particle_process.WallLoss.rate"
+    ],
+    "API/particula/dynamics/properties/index.html": [
+      "particula.dynamics.properties"
+    ],
+    "API/particula/dynamics/properties/wall_loss_coefficient/index.html": [
+      "particula.dynamics.properties.wall_loss_coefficient",
+      "particula.dynamics.properties.wall_loss_coefficient.get_rectangle_wall_loss_coefficient",
+      "particula.dynamics.properties.wall_loss_coefficient.get_rectangle_wall_loss_coefficient_via_system_state",
+      "particula.dynamics.properties.wall_loss_coefficient.get_spherical_wall_loss_coefficient",
+      "particula.dynamics.properties.wall_loss_coefficient.get_spherical_wall_loss_coefficient_via_system_state"
+    ],
+    "API/particula/dynamics/wall_loss/_native/index.html": [
+      "particula.dynamics.wall_loss._native",
+      "particula.dynamics.wall_loss._native.coefficient",
+      "particula.dynamics.wall_loss._native.rate",
+      "particula.dynamics.wall_loss._native.step",
+      "particula.dynamics.wall_loss._native.validate"
+    ],
+    "API/particula/dynamics/wall_loss/index.html": [
+      "particula.dynamics.wall_loss",
+      "particula.dynamics.wall_loss.ChargedWallLossBuilder",
+      "particula.dynamics.wall_loss.ChargedWallLossBuilder.build",
+      "particula.dynamics.wall_loss.ChargedWallLossBuilder.set_chamber_geometry",
+      "particula.dynamics.wall_loss.ChargedWallLossBuilder.set_parameters",
+      "particula.dynamics.wall_loss.ChargedWallLossStrategy",
+      "particula.dynamics.wall_loss.ChargedWallLossStrategy.compute_coefficient_from_arrays",
+      "particula.dynamics.wall_loss.ChargedWallLossStrategy.loss_coefficient",
+      "particula.dynamics.wall_loss.ChargedWallLossStrategy.loss_coefficient_for_particles",
+      "particula.dynamics.wall_loss.ChargedWallLossStrategy.step",
+      "particula.dynamics.wall_loss.RectangularWallLossBuilder",
+      "particula.dynamics.wall_loss.RectangularWallLossBuilder.build",
+      "particula.dynamics.wall_loss.RectangularWallLossStrategy",
+      "particula.dynamics.wall_loss.RectangularWallLossStrategy.loss_coefficient",
+      "particula.dynamics.wall_loss.RectangularWallLossStrategy.loss_coefficient_for_particles",
+      "particula.dynamics.wall_loss.SphericalWallLossBuilder",
+      "particula.dynamics.wall_loss.SphericalWallLossBuilder.build",
+      "particula.dynamics.wall_loss.SphericalWallLossStrategy",
+      "particula.dynamics.wall_loss.SphericalWallLossStrategy.loss_coefficient",
+      "particula.dynamics.wall_loss.SphericalWallLossStrategy.loss_coefficient_for_particles",
+      "particula.dynamics.wall_loss.WallLossFactory",
+      "particula.dynamics.wall_loss.WallLossFactory.get_builders",
+      "particula.dynamics.wall_loss.WallLossFactory.get_strategy",
+      "particula.dynamics.wall_loss.WallLossStrategy",
+      "particula.dynamics.wall_loss.WallLossStrategy.loss_coefficient",
+      "particula.dynamics.wall_loss.WallLossStrategy.loss_coefficient_for_particles",
+      "particula.dynamics.wall_loss.WallLossStrategy.loss_rate",
+      "particula.dynamics.wall_loss.WallLossStrategy.rate",
+      "particula.dynamics.wall_loss.WallLossStrategy.step",
+      "particula.dynamics.wall_loss.get_charged_wall_loss_rate",
+      "particula.dynamics.wall_loss.get_particle_resolved_wall_loss_step",
+      "particula.dynamics.wall_loss.get_rectangle_wall_loss_rate",
+      "particula.dynamics.wall_loss.get_spherical_wall_loss_rate"
+    ],
+    "API/particula/dynamics/wall_loss/rate/index.html": [
+      "particula.dynamics.wall_loss.rate",
+      "particula.dynamics.wall_loss.rate.get_charged_wall_loss_rate",
+      "particula.dynamics.wall_loss.rate.get_rectangle_wall_loss_rate",
+      "particula.dynamics.wall_loss.rate.get_spherical_wall_loss_rate"
+    ],
+    "API/particula/dynamics/wall_loss/wall_loss_builders/index.html": [
+      "particula.dynamics.wall_loss.wall_loss_builders",
+      "particula.dynamics.wall_loss.wall_loss_builders.ChargedWallLossBuilder",
+      "particula.dynamics.wall_loss.wall_loss_builders.ChargedWallLossBuilder.build",
+      "particula.dynamics.wall_loss.wall_loss_builders.ChargedWallLossBuilder.set_chamber_geometry",
+      "particula.dynamics.wall_loss.wall_loss_builders.ChargedWallLossBuilder.set_parameters",
+      "particula.dynamics.wall_loss.wall_loss_builders.RectangularWallLossBuilder",
+      "particula.dynamics.wall_loss.wall_loss_builders.RectangularWallLossBuilder.build",
+      "particula.dynamics.wall_loss.wall_loss_builders.SphericalWallLossBuilder",
+      "particula.dynamics.wall_loss.wall_loss_builders.SphericalWallLossBuilder.build"
+    ],
+    "API/particula/dynamics/wall_loss/wall_loss_factories/index.html": [
+      "particula.dynamics.wall_loss.wall_loss_factories",
+      "particula.dynamics.wall_loss.wall_loss_factories.WallLossFactory",
+      "particula.dynamics.wall_loss.wall_loss_factories.WallLossFactory.get_builders",
+      "particula.dynamics.wall_loss.wall_loss_factories.WallLossFactory.get_strategy"
+    ],
+    "API/particula/dynamics/wall_loss/wall_loss_strategies/index.html": [
+      "particula.dynamics.wall_loss.wall_loss_strategies",
+      "particula.dynamics.wall_loss.wall_loss_strategies.ChargedWallLossStrategy",
+      "particula.dynamics.wall_loss.wall_loss_strategies.ChargedWallLossStrategy.compute_coefficient_from_arrays",
+      "particula.dynamics.wall_loss.wall_loss_strategies.ChargedWallLossStrategy.loss_coefficient",
+      "particula.dynamics.wall_loss.wall_loss_strategies.ChargedWallLossStrategy.loss_coefficient_for_particles",
+      "particula.dynamics.wall_loss.wall_loss_strategies.ChargedWallLossStrategy.step",
+      "particula.dynamics.wall_loss.wall_loss_strategies.RectangularWallLossStrategy",
+      "particula.dynamics.wall_loss.wall_loss_strategies.RectangularWallLossStrategy.loss_coefficient",
+      "particula.dynamics.wall_loss.wall_loss_strategies.RectangularWallLossStrategy.loss_coefficient_for_particles",
+      "particula.dynamics.wall_loss.wall_loss_strategies.SphericalWallLossStrategy",
+      "particula.dynamics.wall_loss.wall_loss_strategies.SphericalWallLossStrategy.loss_coefficient",
+      "particula.dynamics.wall_loss.wall_loss_strategies.SphericalWallLossStrategy.loss_coefficient_for_particles",
+      "particula.dynamics.wall_loss.wall_loss_strategies.WallLossStrategy",
+      "particula.dynamics.wall_loss.wall_loss_strategies.WallLossStrategy.loss_coefficient",
+      "particula.dynamics.wall_loss.wall_loss_strategies.WallLossStrategy.loss_coefficient_for_particles",
+      "particula.dynamics.wall_loss.wall_loss_strategies.WallLossStrategy.loss_rate",
+      "particula.dynamics.wall_loss.wall_loss_strategies.WallLossStrategy.rate",
+      "particula.dynamics.wall_loss.wall_loss_strategies.WallLossStrategy.step",
+      "particula.dynamics.wall_loss.wall_loss_strategies.get_particle_resolved_wall_loss_step"
+    ],
+    "API/particula/equilibria/equilibria/index.html": [
+      "particula.equilibria.equilibria",
+      "particula.equilibria.equilibria.Equilibria",
+      "particula.equilibria.equilibria.Equilibria.execute",
+      "particula.equilibria.equilibria.Equilibria.rate"
+    ],
+    "API/particula/equilibria/equilibria_builders/index.html": [
+      "particula.equilibria.equilibria_builders",
+      "particula.equilibria.equilibria_builders.LiquidVaporPartitioningBuilder",
+      "particula.equilibria.equilibria_builders.LiquidVaporPartitioningBuilder.build",
+      "particula.equilibria.equilibria_builders.LiquidVaporPartitioningBuilder.pre_build_check",
+      "particula.equilibria.equilibria_builders.LiquidVaporPartitioningBuilder.set_parameters",
+      "particula.equilibria.equilibria_builders.LiquidVaporPartitioningBuilder.set_water_activity"
+    ],
+    "API/particula/equilibria/equilibria_factories/index.html": [
+      "particula.equilibria.equilibria_factories",
+      "particula.equilibria.equilibria_factories.EquilibriaFactory",
+      "particula.equilibria.equilibria_factories.EquilibriaFactory.get_builders",
+      "particula.equilibria.equilibria_factories.EquilibriaFactory.get_strategy"
+    ],
+    "API/particula/equilibria/equilibria_strategies/index.html": [
+      "particula.equilibria.equilibria_strategies",
+      "particula.equilibria.equilibria_strategies.EquilibriaStrategy",
+      "particula.equilibria.equilibria_strategies.EquilibriaStrategy.get_name",
+      "particula.equilibria.equilibria_strategies.EquilibriaStrategy.solve",
+      "particula.equilibria.equilibria_strategies.EquilibriumResult",
+      "particula.equilibria.equilibria_strategies.LiquidVaporPartitioningStrategy",
+      "particula.equilibria.equilibria_strategies.LiquidVaporPartitioningStrategy.solve",
+      "particula.equilibria.equilibria_strategies.PhaseConcentrations"
+    ],
+    "API/particula/equilibria/index.html": [
+      "particula.equilibria",
+      "particula.equilibria.Equilibria",
+      "particula.equilibria.Equilibria.execute",
+      "particula.equilibria.Equilibria.rate",
+      "particula.equilibria.EquilibriaFactory",
+      "particula.equilibria.EquilibriaFactory.get_builders",
+      "particula.equilibria.EquilibriaFactory.get_strategy",
+      "particula.equilibria.EquilibriaStrategy",
+      "particula.equilibria.EquilibriaStrategy.get_name",
+      "particula.equilibria.EquilibriaStrategy.solve",
+      "particula.equilibria.EquilibriumResult",
+      "particula.equilibria.LiquidVaporPartitioningBuilder",
+      "particula.equilibria.LiquidVaporPartitioningBuilder.build",
+      "particula.equilibria.LiquidVaporPartitioningBuilder.pre_build_check",
+      "particula.equilibria.LiquidVaporPartitioningBuilder.set_parameters",
+      "particula.equilibria.LiquidVaporPartitioningBuilder.set_water_activity",
+      "particula.equilibria.LiquidVaporPartitioningStrategy",
+      "particula.equilibria.LiquidVaporPartitioningStrategy.solve",
+      "particula.equilibria.PhaseConcentrations",
+      "particula.equilibria.get_properties_for_liquid_vapor_partitioning",
+      "particula.equilibria.liquid_vapor_obj_function",
+      "particula.equilibria.liquid_vapor_partitioning"
+    ],
+    "API/particula/equilibria/partitioning/index.html": [
+      "particula.equilibria.partitioning",
+      "particula.equilibria.partitioning.get_properties_for_liquid_vapor_partitioning",
+      "particula.equilibria.partitioning.liquid_vapor_obj_function",
+      "particula.equilibria.partitioning.liquid_vapor_partitioning"
+    ],
+    "API/particula/execution/adapters/coagulation/index.html": [
+      "particula.execution.adapters.coagulation",
+      "particula.execution.adapters.coagulation.BrownianCoagulationConfig",
+      "particula.execution.adapters.coagulation.CPUCoagulationExecutionAdapter",
+      "particula.execution.adapters.coagulation.CPUCoagulationExecutionAdapter.execute",
+      "particula.execution.adapters.coagulation.CPUCoagulationExecutionState",
+      "particula.execution.adapters.coagulation.CPUCoagulationExecutionState.__post_init__",
+      "particula.execution.adapters.coagulation.CPUCoagulationExecutionState.backend_payload",
+      "particula.execution.adapters.coagulation.CPUCoagulationResult",
+      "particula.execution.adapters.coagulation.CPUCoagulationResult.__post_init__",
+      "particula.execution.adapters.coagulation.CPUCoagulationResult.backend_payload",
+      "particula.execution.adapters.coagulation.CPUCoagulationState",
+      "particula.execution.adapters.coagulation.CPUCoagulationState.__post_init__",
+      "particula.execution.adapters.coagulation.CPUCoagulationState.backend_payload",
+      "particula.execution.adapters.coagulation.ResidentBrownianCoagulationExecutionAdapter",
+      "particula.execution.adapters.coagulation.ResidentBrownianCoagulationExecutionAdapter.execute",
+      "particula.execution.adapters.coagulation.ResidentBrownianCoagulationExecutionAdapter.prepare",
+      "particula.execution.adapters.coagulation.ResidentBrownianCoagulationExecutionState",
+      "particula.execution.adapters.coagulation.ResidentBrownianCoagulationExecutionState.__post_init__",
+      "particula.execution.adapters.coagulation.ResidentBrownianCoagulationExecutionState.backend_payload",
+      "particula.execution.adapters.coagulation.WarpBrownianCoagulationExecutionAdapter",
+      "particula.execution.adapters.coagulation.WarpBrownianCoagulationExecutionAdapter.execute",
+      "particula.execution.adapters.coagulation.WarpBrownianCoagulationExecutionState",
+      "particula.execution.adapters.coagulation.WarpBrownianCoagulationExecutionState.__post_init__",
+      "particula.execution.adapters.coagulation.WarpBrownianCoagulationExecutionState.backend_payload",
+      "particula.execution.adapters.coagulation.WarpBrownianCoagulationResult",
+      "particula.execution.adapters.coagulation.WarpBrownianCoagulationResult.__post_init__",
+      "particula.execution.adapters.coagulation.WarpBrownianCoagulationResult.backend_payload",
+      "particula.execution.adapters.coagulation.WarpBrownianCoagulationState",
+      "particula.execution.adapters.coagulation.WarpBrownianCoagulationState.__post_init__",
+      "particula.execution.adapters.coagulation.WarpBrownianCoagulationState.backend_payload"
+    ],
+    "API/particula/execution/adapters/condensation/index.html": [
+      "particula.execution.adapters.condensation",
+      "particula.execution.adapters.condensation.CPUCondensationExecutionAdapter",
+      "particula.execution.adapters.condensation.CPUCondensationExecutionAdapter.execute",
+      "particula.execution.adapters.condensation.CPUCondensationExecutionState",
+      "particula.execution.adapters.condensation.CPUCondensationExecutionState.__post_init__",
+      "particula.execution.adapters.condensation.CPUCondensationExecutionState.backend_payload",
+      "particula.execution.adapters.condensation.CPUCondensationState",
+      "particula.execution.adapters.condensation.CPUCondensationState.__post_init__",
+      "particula.execution.adapters.condensation.CPUCondensationState.backend_payload",
+      "particula.execution.adapters.condensation.CondensationExecutionConfig",
+      "particula.execution.adapters.condensation.CondensationExecutionConfig.__post_init__",
+      "particula.execution.adapters.condensation.WarpCondensationExecutionAdapter",
+      "particula.execution.adapters.condensation.WarpCondensationExecutionAdapter.execute",
+      "particula.execution.adapters.condensation.WarpCondensationExecutionAdapter.prepare",
+      "particula.execution.adapters.condensation.WarpCondensationExecutionState",
+      "particula.execution.adapters.condensation.WarpCondensationExecutionState.__post_init__",
+      "particula.execution.adapters.condensation.WarpCondensationExecutionState.backend_payload",
+      "particula.execution.adapters.condensation.WarpCondensationState",
+      "particula.execution.adapters.condensation.WarpCondensationState.__post_init__",
+      "particula.execution.adapters.condensation.WarpCondensationState.backend_payload"
+    ],
+    "API/particula/execution/adapters/index.html": [
+      "particula.execution.adapters"
+    ],
+    "API/particula/execution/availability/index.html": [
+      "particula.execution.availability",
+      "particula.execution.availability.AvailabilityDecision",
+      "particula.execution.availability.AvailabilityProvider",
+      "particula.execution.availability.AvailabilityProvider.device_available",
+      "particula.execution.availability.AvailabilityProvider.recognizes",
+      "particula.execution.availability.AvailabilityProvider.runtime_available",
+      "particula.execution.availability.resolve_availability"
+    ],
+    "API/particula/execution/checkpoint/index.html": [
+      "particula.execution.checkpoint",
+      "particula.execution.checkpoint.CheckpointPayload",
+      "particula.execution.checkpoint.CommunicationCheckpointMetadata",
+      "particula.execution.checkpoint.RNGContinuationCheckpoint",
+      "particula.execution.checkpoint.RNGContinuationPayload",
+      "particula.execution.checkpoint.ResidentCheckpoint",
+      "particula.execution.checkpoint.ResidentCheckpointController",
+      "particula.execution.checkpoint.ResidentCheckpointController.checkpoint",
+      "particula.execution.checkpoint.ResidentCheckpointController.finalize",
+      "particula.execution.checkpoint.restart_resident_session"
+    ],
+    "API/particula/execution/communication/index.html": [
+      "particula.execution.communication",
+      "particula.execution.communication.CommunicationConfiguration",
+      "particula.execution.communication.CommunicationConfiguration.__post_init__",
+      "particula.execution.communication.CommunicationMap",
+      "particula.execution.communication.CommunicationMap.__post_init__",
+      "particula.execution.communication.CommunicationMapForm",
+      "particula.execution.communication.CommunicationResourceShape",
+      "particula.execution.communication.CommunicationResourceShape.__post_init__",
+      "particula.execution.communication.CommunicationShapeKind",
+      "particula.execution.communication.CommunicationTransportMode",
+      "particula.execution.communication.PrescribedVolumeUpdate",
+      "particula.execution.communication.validate_communication_configuration"
+    ],
+    "API/particula/execution/diagnostics/index.html": [
+      "particula.execution.diagnostics",
+      "particula.execution.diagnostics.PreparedResidentDiagnostics",
+      "particula.execution.diagnostics.ResidentDiagnosticOperation",
+      "particula.execution.diagnostics.ResidentDiagnosticRegistration",
+      "particula.execution.diagnostics.ResidentDiagnosticRegistration.__post_init__",
+      "particula.execution.diagnostics.ResidentDiagnosticsExecutor",
+      "particula.execution.diagnostics.ResidentDiagnosticsExecutor.execute",
+      "particula.execution.diagnostics.ResidentDiagnosticsExecutor.validate",
+      "particula.execution.diagnostics.ResidentDiagnosticsPlan",
+      "particula.execution.diagnostics.ResidentDiagnosticsPlan.__post_init__",
+      "particula.execution.diagnostics.setup_prepared_resident_diagnostics",
+      "particula.execution.diagnostics.validate_resident_diagnostics_plan"
+    ],
+    "API/particula/execution/errors/index.html": [
+      "particula.execution.errors",
+      "particula.execution.errors.ExecutionCapabilityError",
+      "particula.execution.errors.ExecutionCapabilityError.__str__",
+      "particula.execution.errors.ExecutionCapabilityReason",
+      "particula.execution.errors.FallbackDisallowedError",
+      "particula.execution.errors.InvalidExecutionStateError",
+      "particula.execution.errors.UnavailableDeviceError",
+      "particula.execution.errors.UnavailableExecutionTargetError",
+      "particula.execution.errors.UnavailableRuntimeError",
+      "particula.execution.errors.UnknownBackendError",
+      "particula.execution.errors.UnknownDeviceError",
+      "particula.execution.errors.UnknownExecutionTargetError",
+      "particula.execution.errors.UnsupportedCapabilityError",
+      "particula.execution.errors.UnsupportedExecutionRequestError",
+      "particula.execution.errors.UnsupportedProcessError"
+    ],
+    "API/particula/execution/fallback/index.html": [
+      "particula.execution.fallback",
+      "particula.execution.fallback.FallbackDispatchResult",
+      "particula.execution.fallback.FallbackDispatchResult.__post_init__",
+      "particula.execution.fallback.FallbackRequest",
+      "particula.execution.fallback.FallbackRequest.__post_init__",
+      "particula.execution.fallback.FallbackResolution",
+      "particula.execution.fallback.FallbackResolution.__post_init__",
+      "particula.execution.fallback.dispatch_cpu_fallback",
+      "particula.execution.fallback.resolve_cpu_fallback"
+    ],
+    "API/particula/execution/gpu_resources/index.html": [
+      "particula.execution.gpu_resources",
+      "particula.execution.gpu_resources.CaptureResourceRequirements",
+      "particula.execution.gpu_resources.CaptureResourceRequirements.__post_init__",
+      "particula.execution.gpu_resources.CaptureResourceSet",
+      "particula.execution.gpu_resources.CoagulationResources",
+      "particula.execution.gpu_resources.CommunicationResources",
+      "particula.execution.gpu_resources.CondensationResources",
+      "particula.execution.gpu_resources.DilutionResources",
+      "particula.execution.gpu_resources.GPUResourceRegistry",
+      "particula.execution.gpu_resources.GPUResourceRegistry.acquire_coagulation",
+      "particula.execution.gpu_resources.GPUResourceRegistry.acquire_communication",
+      "particula.execution.gpu_resources.GPUResourceRegistry.acquire_condensation",
+      "particula.execution.gpu_resources.GPUResourceRegistry.acquire_nucleation",
+      "particula.execution.gpu_resources.GPUResourceRegistry.acquire_wall_loss",
+      "particula.execution.gpu_resources.GPUResourceRegistry.assert_step_closed",
+      "particula.execution.gpu_resources.GPUResourceRegistry.get_communication_resources",
+      "particula.execution.gpu_resources.GPUResourceRegistry.initialize_published_streams",
+      "particula.execution.gpu_resources.GPUResourceRegistry.inspect_published_streams",
+      "particula.execution.gpu_resources.GPUResourceRegistry.logical_resource_report",
+      "particula.execution.gpu_resources.GPUResourceRegistry.manifests",
+      "particula.execution.gpu_resources.GPUResourceRegistry.prepare_capture_resources",
+      "particula.execution.gpu_resources.GPUResourceRegistry.register_capture_resources",
+      "particula.execution.gpu_resources.GPUResourceRegistry.release_open_step",
+      "particula.execution.gpu_resources.GPUResourceRegistry.reserve_open_step",
+      "particula.execution.gpu_resources.GPUResourceRegistry.selected_resource_report",
+      "particula.execution.gpu_resources.GPUResourceRegistry.validate_capture_resource_set",
+      "particula.execution.gpu_resources.GPUResourceRegistry.validate_coagulation_resources",
+      "particula.execution.gpu_resources.GPUResourceRegistry.validate_communication_resources",
+      "particula.execution.gpu_resources.GPUResourceRegistry.validate_condensation_resources",
+      "particula.execution.gpu_resources.GPUResourceRegistry.validate_diagnostic_outputs",
+      "particula.execution.gpu_resources.GPUResourceRegistry.validate_diagnostic_registrations",
+      "particula.execution.gpu_resources.GPUResourceRegistry.validate_dilution_resources",
+      "particula.execution.gpu_resources.GPUResourceRegistry.validate_nucleation_resources",
+      "particula.execution.gpu_resources.GPUResourceRegistry.validate_pinned_session",
+      "particula.execution.gpu_resources.GPUResourceRegistry.validate_prepared_resource_views",
+      "particula.execution.gpu_resources.GPUResourceRegistry.validate_wall_loss_resources",
+      "particula.execution.gpu_resources.LogicalResourceFamilyReport",
+      "particula.execution.gpu_resources.LogicalResourceReport",
+      "particula.execution.gpu_resources.LogicalResourceRoleReport",
+      "particula.execution.gpu_resources.ManifestEntry",
+      "particula.execution.gpu_resources.NucleationResources",
+      "particula.execution.gpu_resources.PreparedResourceViews",
+      "particula.execution.gpu_resources.PublishedStreamManifest",
+      "particula.execution.gpu_resources.ResidentCommunicationState",
+      "particula.execution.gpu_resources.ResolvedResourceInventoryEntry",
+      "particula.execution.gpu_resources.ResourceInventoryCapacities",
+      "particula.execution.gpu_resources.ResourceManifest",
+      "particula.execution.gpu_resources.SelectedResourceFamilyReport",
+      "particula.execution.gpu_resources.SelectedResourceInventory",
+      "particula.execution.gpu_resources.SelectedResourceRole",
+      "particula.execution.gpu_resources.WallLossResources"
+    ],
+    "API/particula/execution/gpu_session/index.html": [
+      "particula.execution.gpu_session",
+      "particula.execution.gpu_session.ResidentDimensions",
+      "particula.execution.gpu_session.ResidentDimensions.__post_init__",
+      "particula.execution.gpu_session.ResidentDimensions.gas_species",
+      "particula.execution.gpu_session.ResidentLifecycle",
+      "particula.execution.gpu_session.ResidentMetadata",
+      "particula.execution.gpu_session.ResidentMetadata.__post_init__",
+      "particula.execution.gpu_session.ResidentSession",
+      "particula.execution.gpu_session.ResidentSession.__post_init__",
+      "particula.execution.gpu_session.ResidentSession.checkpoint",
+      "particula.execution.gpu_session.ResidentSession.close",
+      "particula.execution.gpu_session.ResidentSession.discard",
+      "particula.execution.gpu_session.ResidentSession.finalize",
+      "particula.execution.gpu_session.ResidentSession.initialize_streams",
+      "particula.execution.gpu_session.ResidentSession.inspect_streams",
+      "particula.execution.gpu_session.ResidentSession.reset_streams",
+      "particula.execution.gpu_session.ResidentStepGuard",
+      "particula.execution.gpu_session.ResidentStepGuard.assert_step_closed",
+      "particula.execution.gpu_session.ResidentStepGuard.begin_step",
+      "particula.execution.gpu_session.ResidentStepGuard.complete_step",
+      "particula.execution.gpu_session.ResidentStepGuard.completed_steps",
+      "particula.execution.gpu_session.ResidentStepGuard.simulated_time",
+      "particula.execution.gpu_session.ResidentStepToken",
+      "particula.execution.gpu_session.ResidentStreamMetadata",
+      "particula.execution.gpu_session.ResidentStreamMetadata.__post_init__",
+      "particula.execution.gpu_session.setup_resident_session"
+    ],
+    "API/particula/execution/graph_capture/index.html": [
+      "particula.execution.graph_capture",
+      "particula.execution.graph_capture.CapturedResidentGraph",
+      "particula.execution.graph_capture.CapturedResidentGraph.__post_init__",
+      "particula.execution.graph_capture.GraphCaptureAvailability",
+      "particula.execution.graph_capture.GraphCaptureCapability",
+      "particula.execution.graph_capture.GraphCaptureCapability.__post_init__",
+      "particula.execution.graph_capture.GraphCaptureCompatibility",
+      "particula.execution.graph_capture.GraphCaptureCompatibility.__post_init__",
+      "particula.execution.graph_capture.GraphCaptureDriftReason",
+      "particula.execution.graph_capture.GraphCaptureFailureClassification",
+      "particula.execution.graph_capture.GraphCaptureLifecycle",
+      "particula.execution.graph_capture.GraphCaptureLifecycle.__post_init__",
+      "particula.execution.graph_capture.GraphCaptureLifecycleState",
+      "particula.execution.graph_capture.GraphCaptureNativeCallables",
+      "particula.execution.graph_capture.GraphCaptureNativeCallables.__post_init__",
+      "particula.execution.graph_capture.GraphCaptureRuntimeAdapter",
+      "particula.execution.graph_capture.GraphCaptureRuntimeAdapter.capture_callables",
+      "particula.execution.graph_capture.GraphCaptureRuntimeProbe",
+      "particula.execution.graph_capture.GraphCaptureRuntimeProbe.capture_api_available",
+      "particula.execution.graph_capture.GraphCaptureRuntimeProbe.device_available",
+      "particula.execution.graph_capture.GraphCaptureRuntimeProbe.runtime_available",
+      "particula.execution.graph_capture.PreparedGraphCaptureQualification",
+      "particula.execution.graph_capture.ResidentGraphCaptureBinding",
+      "particula.execution.graph_capture.ResidentGraphCaptureBinding.__post_init__",
+      "particula.execution.graph_capture.ResidentGraphCaptureBinding.lifecycle",
+      "particula.execution.graph_capture.ResidentGraphCaptureSignature",
+      "particula.execution.graph_capture.ResidentGraphCaptureSignature.__post_init__",
+      "particula.execution.graph_capture.capture_prepared_resident_graph",
+      "particula.execution.graph_capture.classify_graph_capture_failure",
+      "particula.execution.graph_capture.classify_resident_graph_capture_writer_failure",
+      "particula.execution.graph_capture.close_graph_capture",
+      "particula.execution.graph_capture.close_resident_graph_capture",
+      "particula.execution.graph_capture.compare_resident_graph_capture_signature",
+      "particula.execution.graph_capture.complete_graph_capture",
+      "particula.execution.graph_capture.complete_resident_graph_capture",
+      "particula.execution.graph_capture.create_graph_capture_lifecycle",
+      "particula.execution.graph_capture.create_resident_graph_capture_signature",
+      "particula.execution.graph_capture.gate_resident_graph_capture",
+      "particula.execution.graph_capture.invalidate_graph_capture",
+      "particula.execution.graph_capture.qualify_prepared_resident_graph_capture",
+      "particula.execution.graph_capture.renew_resident_graph_capture",
+      "particula.execution.graph_capture.renew_retired_graph_capture",
+      "particula.execution.graph_capture.replay_captured_resident_graph",
+      "particula.execution.graph_capture.resolve_graph_capture_capability",
+      "particula.execution.graph_capture.retire_graph_capture",
+      "particula.execution.graph_capture.retire_resident_graph_capture",
+      "particula.execution.graph_capture.validate_resident_capture_resources"
+    ],
+    "API/particula/execution/index.html": [
+      "particula.execution",
+      "particula.execution.Backend",
+      "particula.execution.BackendResult",
+      "particula.execution.CPUExecutionAdapter",
+      "particula.execution.CPUExecutionAdapter.execute",
+      "particula.execution.CPUExecutionState",
+      "particula.execution.CPUExecutionState.backend_payload",
+      "particula.execution.CPUStateAuthority",
+      "particula.execution.Capability",
+      "particula.execution.Capability.__post_init__",
+      "particula.execution.CapabilityDeclaration",
+      "particula.execution.CapabilityDeclaration.__post_init__",
+      "particula.execution.CapabilityMatrix",
+      "particula.execution.CapabilityMatrix.__post_init__",
+      "particula.execution.CapabilityMatrix.require",
+      "particula.execution.CapabilityMatrix.supports",
+      "particula.execution.CapabilityRequirements",
+      "particula.execution.CapabilityRequirements.__post_init__",
+      "particula.execution.CondensationActivityMode",
+      "particula.execution.CondensationConfiguration",
+      "particula.execution.CondensationConfiguration.__post_init__",
+      "particula.execution.CondensationExecutionMode",
+      "particula.execution.CondensationSurfaceMode",
+      "particula.execution.Device",
+      "particula.execution.Device.__post_init__",
+      "particula.execution.ExecutionAdapter",
+      "particula.execution.ExecutionAdapter.execute",
+      "particula.execution.ExecutionCapabilityError",
+      "particula.execution.ExecutionCapabilityError.__str__",
+      "particula.execution.ExecutionCapabilityReason",
+      "particula.execution.ExecutionContext",
+      "particula.execution.ExecutionContext.register_adapter",
+      "particula.execution.ExecutionContext.resolve",
+      "particula.execution.ExecutionRequest",
+      "particula.execution.ExecutionRequest.__post_init__",
+      "particula.execution.ExecutionResult",
+      "particula.execution.ExecutionState",
+      "particula.execution.ExecutionState.backend_payload",
+      "particula.execution.FallbackBoundary",
+      "particula.execution.FallbackDisallowedError",
+      "particula.execution.FallbackPolicy",
+      "particula.execution.InvalidExecutionStateError",
+      "particula.execution.MutationDeclaration",
+      "particula.execution.MutationDeclaration.__post_init__",
+      "particula.execution.MutationScope",
+      "particula.execution.Process",
+      "particula.execution.Process.__post_init__",
+      "particula.execution.UnavailableDeviceError",
+      "particula.execution.UnavailableExecutionTargetError",
+      "particula.execution.UnavailableRuntimeError",
+      "particula.execution.UnknownBackendError",
+      "particula.execution.UnknownDeviceError",
+      "particula.execution.UnknownExecutionTargetError",
+      "particula.execution.UnsupportedCapabilityError",
+      "particula.execution.UnsupportedExecutionRequestError",
+      "particula.execution.UnsupportedProcessError",
+      "particula.execution.condensation_profile_supports",
+      "particula.execution.get_condensation_requirements",
+      "particula.execution.require_condensation_profile",
+      "particula.execution.validate_execution_result"
+    ],
+    "API/particula/execution/process_adapters/index.html": [
+      "particula.execution.process_adapters",
+      "particula.execution.process_adapters.ResidentDilutionAdapter",
+      "particula.execution.process_adapters.ResidentDilutionAdapter.execute",
+      "particula.execution.process_adapters.ResidentDilutionAdapter.prepare",
+      "particula.execution.process_adapters.ResidentDilutionRequest",
+      "particula.execution.process_adapters.ResidentDilutionRequest.__post_init__",
+      "particula.execution.process_adapters.ResidentNucleationAdapter",
+      "particula.execution.process_adapters.ResidentNucleationAdapter.execute",
+      "particula.execution.process_adapters.ResidentNucleationAdapter.prepare",
+      "particula.execution.process_adapters.ResidentNucleationRequest",
+      "particula.execution.process_adapters.ResidentNucleationRequest.__post_init__",
+      "particula.execution.process_adapters.ResidentWallLossAdapter",
+      "particula.execution.process_adapters.ResidentWallLossAdapter.execute",
+      "particula.execution.process_adapters.ResidentWallLossAdapter.prepare",
+      "particula.execution.process_adapters.ResidentWallLossRequest",
+      "particula.execution.process_adapters.ResidentWallLossRequest.__post_init__",
+      "particula.execution.process_adapters.ResidentWallLossRequest.validate_enabled_box_indices"
+    ],
+    "API/particula/execution/process_graph/index.html": [
+      "particula.execution.process_graph",
+      "particula.execution.process_graph.DependencyEdge",
+      "particula.execution.process_graph.DependencyEdge.__post_init__",
+      "particula.execution.process_graph.InvalidatedState",
+      "particula.execution.process_graph.NodeKind",
+      "particula.execution.process_graph.ProcessNode",
+      "particula.execution.process_graph.ProcessNode.__post_init__",
+      "particula.execution.process_graph.ResolvedProcessGraph",
+      "particula.execution.process_graph.ResolvedProcessGraph.__post_init__",
+      "particula.execution.process_graph.ResourceRequirement",
+      "particula.execution.process_graph.TimestepPlan",
+      "particula.execution.process_graph.TimestepPlan.__post_init__",
+      "particula.execution.process_graph.resolve_canonical_topological_order",
+      "particula.execution.process_graph.resolve_timestep_plan"
+    ],
+    "API/particula/execution/resident_communication/index.html": [
+      "particula.execution.resident_communication",
+      "particula.execution.resident_communication.PreparedResidentCommunicationBinding",
+      "particula.execution.resident_communication.ResidentCommunicationExecutor",
+      "particula.execution.resident_communication.ResidentCommunicationExecutor.execute_communication",
+      "particula.execution.resident_communication.ResidentCommunicationExecutor.execute_volume_evolution",
+      "particula.execution.resident_communication.ResidentCommunicationExecutor.validate",
+      "particula.execution.resident_communication.ResidentCommunicationRequest",
+      "particula.execution.resident_communication.ResidentCommunicationRequest.__post_init__",
+      "particula.execution.resident_communication.setup_prepared_resident_communication",
+      "particula.execution.resident_communication.validate_resident_communication_request"
+    ],
+    "API/particula/execution/resident_enqueue/index.html": [
+      "particula.execution.resident_enqueue",
+      "particula.execution.resident_enqueue.PreparedResidentTimestep",
+      "particula.execution.resident_enqueue.PreparedResidentTimestep.__post_init__",
+      "particula.execution.resident_enqueue.prepare_resident_timestep"
+    ],
+    "API/particula/execution/resident_scheduler/index.html": [
+      "particula.execution.resident_scheduler",
+      "particula.execution.resident_scheduler.PreparedResidentOperation",
+      "particula.execution.resident_scheduler.PreparedResidentSimulation",
+      "particula.execution.resident_scheduler.ResidentSimulationRequest",
+      "particula.execution.resident_scheduler.ResidentSimulationRequest.__post_init__",
+      "particula.execution.resident_scheduler.ResidentSimulationScheduler",
+      "particula.execution.resident_scheduler.ResidentSimulationScheduler.execute",
+      "particula.execution.resident_scheduler.enqueue_prepared_resident_simulation",
+      "particula.execution.resident_scheduler.prepare_resident_simulation"
+    ],
+    "API/particula/execution/rng/index.html": [
+      "particula.execution.rng",
+      "particula.execution.rng.StreamDescriptor",
+      "particula.execution.rng.StreamDescriptor.__post_init__",
+      "particula.execution.rng.StreamKey",
+      "particula.execution.rng.StreamKey.__post_init__",
+      "particula.execution.rng.StreamManifest",
+      "particula.execution.rng.StreamRegistry",
+      "particula.execution.rng.StreamRegistry.descriptor_for",
+      "particula.execution.rng.StreamRegistry.descriptors",
+      "particula.execution.rng.StreamRegistry.initialize",
+      "particula.execution.rng.StreamRegistry.initialize_process",
+      "particula.execution.rng.StreamRegistry.initialize_selected",
+      "particula.execution.rng.StreamRegistry.inspect",
+      "particula.execution.rng.StreamRegistry.lane_for",
+      "particula.execution.rng.StreamRegistry.lanes",
+      "particula.execution.rng.StreamRegistry.logical_box_ids",
+      "particula.execution.rng.StreamRegistry.n_boxes",
+      "particula.execution.rng.StreamRegistry.preflight_selected",
+      "particula.execution.rng.StreamRegistry.root_seed",
+      "particula.execution.rng.StreamRegistry.state_array_for",
+      "particula.execution.rng.StreamRegistry.state_arrays",
+      "particula.execution.rng.StreamRegistry.word_for",
+      "particula.execution.rng.StreamRegistry.words_by_lane"
+    ],
+    "API/particula/execution/scheduler/index.html": [
+      "particula.execution.scheduler",
+      "particula.execution.scheduler.EnabledNodeSelection",
+      "particula.execution.scheduler.EnabledNodeSelection.__post_init__",
+      "particula.execution.scheduler.NucleationCondensationDirection",
+      "particula.execution.scheduler.ResolvedTimestepSchedule",
+      "particula.execution.scheduler.ResolvedTimestepSchedule.__post_init__",
+      "particula.execution.scheduler.SchedulerProfile",
+      "particula.execution.scheduler.SchedulerProfile.__post_init__",
+      "particula.execution.scheduler.is_resolver_produced_schedule",
+      "particula.execution.scheduler.resolve_timestep_schedule"
+    ],
+    "API/particula/execution/state_updates/index.html": [
+      "particula.execution.state_updates",
+      "particula.execution.state_updates.PreparedResidentEnvironmentUpdate",
+      "particula.execution.state_updates.PreparedResidentGasUpdate",
+      "particula.execution.state_updates.ResidentEnvironmentUpdateRequest",
+      "particula.execution.state_updates.ResidentEnvironmentUpdateRequest.__post_init__",
+      "particula.execution.state_updates.ResidentGasUpdateRequest",
+      "particula.execution.state_updates.ResidentGasUpdateRequest.__post_init__",
+      "particula.execution.state_updates.ResidentStateUpdateExecutor",
+      "particula.execution.state_updates.ResidentStateUpdateExecutor.execute",
+      "particula.execution.state_updates.setup_prepared_environment_update",
+      "particula.execution.state_updates.setup_prepared_gas_update"
+    ],
+    "API/particula/execution/thermodynamic_updates/index.html": [
+      "particula.execution.thermodynamic_updates",
+      "particula.execution.thermodynamic_updates.PreparedResidentThermodynamicBinding",
+      "particula.execution.thermodynamic_updates.PreparedResidentThermodynamicConsumer",
+      "particula.execution.thermodynamic_updates.PreparedResidentThermodynamicSequence",
+      "particula.execution.thermodynamic_updates.ResidentThermodynamicUpdateCoordinator",
+      "particula.execution.thermodynamic_updates.ResidentThermodynamicUpdateCoordinator.cursor",
+      "particula.execution.thermodynamic_updates.ResidentThermodynamicUpdateCoordinator.execute_consumer",
+      "particula.execution.thermodynamic_updates.ResidentThermodynamicUpdateCoordinator.prepare_consumer",
+      "particula.execution.thermodynamic_updates.ResidentThermodynamicUpdateCoordinator.record_completed",
+      "particula.execution.thermodynamic_updates.ResidentThermodynamicUpdateCoordinator.stale_states",
+      "particula.execution.thermodynamic_updates.ResidentThermodynamicUpdateRequest",
+      "particula.execution.thermodynamic_updates.ResidentThermodynamicUpdateRequest.__post_init__",
+      "particula.execution.thermodynamic_updates.record_prepared_thermodynamic_success",
+      "particula.execution.thermodynamic_updates.setup_prepared_thermodynamic_binding",
+      "particula.execution.thermodynamic_updates.setup_prepared_thermodynamic_sequence"
+    ],
+    "API/particula/execution/validation/index.html": [
+      "particula.execution.validation",
+      "particula.execution.validation.validate_capability_matrix",
+      "particula.execution.validation.validate_execution_request"
+    ],
+    "API/particula/execution/values/index.html": [
+      "particula.execution.values",
+      "particula.execution.values.CPUStateAuthority",
+      "particula.execution.values.FallbackBoundary",
+      "particula.execution.values.FallbackPolicy"
+    ],
+    "API/particula/gas/environment_data/index.html": [
+      "particula.gas.environment_data",
+      "particula.gas.environment_data.EnvironmentData",
+      "particula.gas.environment_data.EnvironmentData.__post_init__",
+      "particula.gas.environment_data.EnvironmentData.copy",
+      "particula.gas.environment_data.EnvironmentData.n_boxes"
+    ],
+    "API/particula/gas/gas_data/index.html": [
+      "particula.gas.gas_data",
+      "particula.gas.gas_data.GasData",
+      "particula.gas.gas_data.GasData.__post_init__",
+      "particula.gas.gas_data.GasData.copy",
+      "particula.gas.gas_data.GasData.n_boxes",
+      "particula.gas.gas_data.GasData.n_species"
+    ],
+    "API/particula/gas/gas_data_builder/index.html": [
+      "particula.gas.gas_data_builder",
+      "particula.gas.gas_data_builder.GasDataBuilder",
+      "particula.gas.gas_data_builder.GasDataBuilder.build",
+      "particula.gas.gas_data_builder.GasDataBuilder.set_concentration",
+      "particula.gas.gas_data_builder.GasDataBuilder.set_molar_mass",
+      "particula.gas.gas_data_builder.GasDataBuilder.set_n_boxes",
+      "particula.gas.gas_data_builder.GasDataBuilder.set_names",
+      "particula.gas.gas_data_builder.GasDataBuilder.set_partitioning"
+    ],
+    "API/particula/gas/index.html": [
+      "particula.gas",
+      "particula.gas.AntoineVaporPressureBuilder",
+      "particula.gas.AntoineVaporPressureBuilder.build",
+      "particula.gas.AntoineVaporPressureBuilder.set_a",
+      "particula.gas.AntoineVaporPressureBuilder.set_b",
+      "particula.gas.AntoineVaporPressureBuilder.set_c",
+      "particula.gas.AntoineVaporPressureStrategy",
+      "particula.gas.AntoineVaporPressureStrategy.pure_vapor_pressure",
+      "particula.gas.ArblasterLiquidVaporPressureStrategy",
+      "particula.gas.ArblasterLiquidVaporPressureStrategy.pure_vapor_pressure",
+      "particula.gas.ClausiusClapeyronStrategy",
+      "particula.gas.ClausiusClapeyronStrategy.pure_vapor_pressure",
+      "particula.gas.ClausiusClapeyronVaporPressureBuilder",
+      "particula.gas.ClausiusClapeyronVaporPressureBuilder.build",
+      "particula.gas.ClausiusClapeyronVaporPressureBuilder.set_latent_heat",
+      "particula.gas.ClausiusClapeyronVaporPressureBuilder.set_pressure_initial",
+      "particula.gas.ClausiusClapeyronVaporPressureBuilder.set_temperature_initial",
+      "particula.gas.ConstantLatentHeat",
+      "particula.gas.ConstantLatentHeat.latent_heat",
+      "particula.gas.ConstantLatentHeatBuilder",
+      "particula.gas.ConstantLatentHeatBuilder.build",
+      "particula.gas.ConstantLatentHeatBuilder.set_latent_heat_ref",
+      "particula.gas.ConstantVaporPressureBuilder",
+      "particula.gas.ConstantVaporPressureBuilder.build",
+      "particula.gas.ConstantVaporPressureBuilder.set_vapor_pressure",
+      "particula.gas.ConstantVaporPressureStrategy",
+      "particula.gas.ConstantVaporPressureStrategy.pure_vapor_pressure",
+      "particula.gas.EnvironmentData",
+      "particula.gas.EnvironmentData.__post_init__",
+      "particula.gas.EnvironmentData.copy",
+      "particula.gas.EnvironmentData.n_boxes",
+      "particula.gas.GasData",
+      "particula.gas.GasData.__post_init__",
+      "particula.gas.GasData.copy",
+      "particula.gas.GasData.n_boxes",
+      "particula.gas.GasData.n_species",
+      "particula.gas.GasDataBuilder",
+      "particula.gas.GasDataBuilder.build",
+      "particula.gas.GasDataBuilder.set_concentration",
+      "particula.gas.GasDataBuilder.set_molar_mass",
+      "particula.gas.GasDataBuilder.set_n_boxes",
+      "particula.gas.GasDataBuilder.set_names",
+      "particula.gas.GasDataBuilder.set_partitioning",
+      "particula.gas.LatentHeatFactory",
+      "particula.gas.LatentHeatFactory.get_builders",
+      "particula.gas.LatentHeatStrategy",
+      "particula.gas.LatentHeatStrategy.latent_heat",
+      "particula.gas.LinearLatentHeat",
+      "particula.gas.LinearLatentHeat.latent_heat",
+      "particula.gas.LinearLatentHeatBuilder",
+      "particula.gas.LinearLatentHeatBuilder.build",
+      "particula.gas.LinearLatentHeatBuilder.set_latent_heat_ref",
+      "particula.gas.LinearLatentHeatBuilder.set_slope",
+      "particula.gas.LinearLatentHeatBuilder.set_temperature_ref",
+      "particula.gas.LiquidClausiusHybridStrategy",
+      "particula.gas.LiquidClausiusHybridStrategy.pure_vapor_pressure",
+      "particula.gas.PowerLawLatentHeat",
+      "particula.gas.PowerLawLatentHeat.latent_heat",
+      "particula.gas.PowerLawLatentHeatBuilder",
+      "particula.gas.PowerLawLatentHeatBuilder.build",
+      "particula.gas.PowerLawLatentHeatBuilder.set_beta",
+      "particula.gas.PowerLawLatentHeatBuilder.set_critical_temperature",
+      "particula.gas.PowerLawLatentHeatBuilder.set_latent_heat_ref",
+      "particula.gas.SaturationConcentrationVaporPressureBuilder",
+      "particula.gas.SaturationConcentrationVaporPressureBuilder.build",
+      "particula.gas.SaturationConcentrationVaporPressureBuilder.set_saturation_concentration",
+      "particula.gas.TableVaporPressureBuilder",
+      "particula.gas.TableVaporPressureBuilder.build",
+      "particula.gas.TableVaporPressureBuilder.set_vapor_pressure_table",
+      "particula.gas.TableVaporPressureStrategy",
+      "particula.gas.TableVaporPressureStrategy.pure_vapor_pressure",
+      "particula.gas.VaporPressureFactory",
+      "particula.gas.VaporPressureFactory.get_builders",
+      "particula.gas.WaterBuckStrategy",
+      "particula.gas.WaterBuckStrategy.pure_vapor_pressure",
+      "particula.gas.WaterBuckVaporPressureBuilder",
+      "particula.gas.WaterBuckVaporPressureBuilder.build",
+      "particula.gas.get_antoine_vapor_pressure",
+      "particula.gas.get_buck_vapor_pressure",
+      "particula.gas.get_clausius_clapeyron_vapor_pressure",
+      "particula.gas.get_concentration_from_pressure",
+      "particula.gas.get_dynamic_viscosity",
+      "particula.gas.get_eulerian_integral_length",
+      "particula.gas.get_fluid_rms_velocity",
+      "particula.gas.get_kinematic_viscosity",
+      "particula.gas.get_kinematic_viscosity_via_system_state",
+      "particula.gas.get_kolmogorov_length",
+      "particula.gas.get_kolmogorov_time",
+      "particula.gas.get_kolmogorov_velocity",
+      "particula.gas.get_lagrangian_integral_time",
+      "particula.gas.get_lagrangian_taylor_microscale_time",
+      "particula.gas.get_molecule_mean_free_path",
+      "particula.gas.get_normalized_accel_variance_ao2008",
+      "particula.gas.get_partial_pressure",
+      "particula.gas.get_saturation_ratio_from_pressure",
+      "particula.gas.get_taylor_microscale",
+      "particula.gas.get_taylor_microscale_reynolds_number",
+      "particula.gas.get_thermal_conductivity"
+    ],
+    "API/particula/gas/latent_heat_builders/index.html": [
+      "particula.gas.latent_heat_builders",
+      "particula.gas.latent_heat_builders.ConstantLatentHeatBuilder",
+      "particula.gas.latent_heat_builders.ConstantLatentHeatBuilder.build",
+      "particula.gas.latent_heat_builders.ConstantLatentHeatBuilder.set_latent_heat_ref",
+      "particula.gas.latent_heat_builders.LinearLatentHeatBuilder",
+      "particula.gas.latent_heat_builders.LinearLatentHeatBuilder.build",
+      "particula.gas.latent_heat_builders.LinearLatentHeatBuilder.set_latent_heat_ref",
+      "particula.gas.latent_heat_builders.LinearLatentHeatBuilder.set_slope",
+      "particula.gas.latent_heat_builders.LinearLatentHeatBuilder.set_temperature_ref",
+      "particula.gas.latent_heat_builders.PowerLawLatentHeatBuilder",
+      "particula.gas.latent_heat_builders.PowerLawLatentHeatBuilder.build",
+      "particula.gas.latent_heat_builders.PowerLawLatentHeatBuilder.set_beta",
+      "particula.gas.latent_heat_builders.PowerLawLatentHeatBuilder.set_critical_temperature",
+      "particula.gas.latent_heat_builders.PowerLawLatentHeatBuilder.set_latent_heat_ref"
+    ],
+    "API/particula/gas/latent_heat_factories/index.html": [
+      "particula.gas.latent_heat_factories",
+      "particula.gas.latent_heat_factories.LatentHeatFactory",
+      "particula.gas.latent_heat_factories.LatentHeatFactory.get_builders"
+    ],
+    "API/particula/gas/latent_heat_strategies/index.html": [
+      "particula.gas.latent_heat_strategies",
+      "particula.gas.latent_heat_strategies.ConstantLatentHeat",
+      "particula.gas.latent_heat_strategies.ConstantLatentHeat.latent_heat",
+      "particula.gas.latent_heat_strategies.LatentHeatStrategy",
+      "particula.gas.latent_heat_strategies.LatentHeatStrategy.latent_heat",
+      "particula.gas.latent_heat_strategies.LinearLatentHeat",
+      "particula.gas.latent_heat_strategies.LinearLatentHeat.latent_heat",
+      "particula.gas.latent_heat_strategies.PowerLawLatentHeat",
+      "particula.gas.latent_heat_strategies.PowerLawLatentHeat.latent_heat"
+    ],
+    "API/particula/gas/properties/concentration_function/index.html": [
+      "particula.gas.properties.concentration_function",
+      "particula.gas.properties.concentration_function.get_concentration_from_pressure"
+    ],
+    "API/particula/gas/properties/dynamic_viscosity/index.html": [
+      "particula.gas.properties.dynamic_viscosity",
+      "particula.gas.properties.dynamic_viscosity.get_dynamic_viscosity"
+    ],
+    "API/particula/gas/properties/fluid_rms_velocity/index.html": [
+      "particula.gas.properties.fluid_rms_velocity",
+      "particula.gas.properties.fluid_rms_velocity.get_fluid_rms_velocity"
+    ],
+    "API/particula/gas/properties/index.html": [
+      "particula.gas.properties"
+    ],
+    "API/particula/gas/properties/integral_scale_module/index.html": [
+      "particula.gas.properties.integral_scale_module",
+      "particula.gas.properties.integral_scale_module.get_eulerian_integral_length",
+      "particula.gas.properties.integral_scale_module.get_lagrangian_integral_time"
+    ],
+    "API/particula/gas/properties/kinematic_viscosity/index.html": [
+      "particula.gas.properties.kinematic_viscosity",
+      "particula.gas.properties.kinematic_viscosity.get_kinematic_viscosity",
+      "particula.gas.properties.kinematic_viscosity.get_kinematic_viscosity_via_system_state"
+    ],
+    "API/particula/gas/properties/kolmogorov_module/index.html": [
+      "particula.gas.properties.kolmogorov_module",
+      "particula.gas.properties.kolmogorov_module.get_kolmogorov_length",
+      "particula.gas.properties.kolmogorov_module.get_kolmogorov_time",
+      "particula.gas.properties.kolmogorov_module.get_kolmogorov_velocity"
+    ],
+    "API/particula/gas/properties/mean_free_path/index.html": [
+      "particula.gas.properties.mean_free_path",
+      "particula.gas.properties.mean_free_path.get_molecule_mean_free_path"
+    ],
+    "API/particula/gas/properties/normalize_accel_variance/index.html": [
+      "particula.gas.properties.normalize_accel_variance",
+      "particula.gas.properties.normalize_accel_variance.get_normalized_accel_variance_ao2008"
+    ],
+    "API/particula/gas/properties/pressure_function/index.html": [
+      "particula.gas.properties.pressure_function",
+      "particula.gas.properties.pressure_function.get_partial_pressure",
+      "particula.gas.properties.pressure_function.get_saturation_ratio_from_pressure"
+    ],
+    "API/particula/gas/properties/taylor_microscale_module/index.html": [
+      "particula.gas.properties.taylor_microscale_module",
+      "particula.gas.properties.taylor_microscale_module.get_lagrangian_taylor_microscale_time",
+      "particula.gas.properties.taylor_microscale_module.get_taylor_microscale",
+      "particula.gas.properties.taylor_microscale_module.get_taylor_microscale_reynolds_number"
+    ],
+    "API/particula/gas/properties/thermal_conductivity/index.html": [
+      "particula.gas.properties.thermal_conductivity",
+      "particula.gas.properties.thermal_conductivity.get_thermal_conductivity"
+    ],
+    "API/particula/gas/properties/vapor_pressure_module/index.html": [
+      "particula.gas.properties.vapor_pressure_module",
+      "particula.gas.properties.vapor_pressure_module.get_antoine_vapor_pressure",
+      "particula.gas.properties.vapor_pressure_module.get_buck_vapor_pressure",
+      "particula.gas.properties.vapor_pressure_module.get_clausius_clapeyron_vapor_pressure"
+    ],
+    "API/particula/gas/vapor_pressure_builders/index.html": [
+      "particula.gas.vapor_pressure_builders",
+      "particula.gas.vapor_pressure_builders.AntoineVaporPressureBuilder",
+      "particula.gas.vapor_pressure_builders.AntoineVaporPressureBuilder.build",
+      "particula.gas.vapor_pressure_builders.AntoineVaporPressureBuilder.set_a",
+      "particula.gas.vapor_pressure_builders.AntoineVaporPressureBuilder.set_b",
+      "particula.gas.vapor_pressure_builders.AntoineVaporPressureBuilder.set_c",
+      "particula.gas.vapor_pressure_builders.ClausiusClapeyronVaporPressureBuilder",
+      "particula.gas.vapor_pressure_builders.ClausiusClapeyronVaporPressureBuilder.build",
+      "particula.gas.vapor_pressure_builders.ClausiusClapeyronVaporPressureBuilder.set_latent_heat",
+      "particula.gas.vapor_pressure_builders.ClausiusClapeyronVaporPressureBuilder.set_pressure_initial",
+      "particula.gas.vapor_pressure_builders.ClausiusClapeyronVaporPressureBuilder.set_temperature_initial",
+      "particula.gas.vapor_pressure_builders.ConstantVaporPressureBuilder",
+      "particula.gas.vapor_pressure_builders.ConstantVaporPressureBuilder.build",
+      "particula.gas.vapor_pressure_builders.ConstantVaporPressureBuilder.set_vapor_pressure",
+      "particula.gas.vapor_pressure_builders.SaturationConcentrationVaporPressureBuilder",
+      "particula.gas.vapor_pressure_builders.SaturationConcentrationVaporPressureBuilder.build",
+      "particula.gas.vapor_pressure_builders.SaturationConcentrationVaporPressureBuilder.set_saturation_concentration",
+      "particula.gas.vapor_pressure_builders.TableVaporPressureBuilder",
+      "particula.gas.vapor_pressure_builders.TableVaporPressureBuilder.build",
+      "particula.gas.vapor_pressure_builders.TableVaporPressureBuilder.set_vapor_pressure_table",
+      "particula.gas.vapor_pressure_builders.WaterBuckVaporPressureBuilder",
+      "particula.gas.vapor_pressure_builders.WaterBuckVaporPressureBuilder.build"
+    ],
+    "API/particula/gas/vapor_pressure_factories/index.html": [
+      "particula.gas.vapor_pressure_factories",
+      "particula.gas.vapor_pressure_factories.VaporPressureFactory",
+      "particula.gas.vapor_pressure_factories.VaporPressureFactory.get_builders"
+    ],
+    "API/particula/gas/vapor_pressure_strategies/index.html": [
+      "particula.gas.vapor_pressure_strategies",
+      "particula.gas.vapor_pressure_strategies.AntoineVaporPressureStrategy",
+      "particula.gas.vapor_pressure_strategies.AntoineVaporPressureStrategy.pure_vapor_pressure",
+      "particula.gas.vapor_pressure_strategies.ArblasterLiquidVaporPressureStrategy",
+      "particula.gas.vapor_pressure_strategies.ArblasterLiquidVaporPressureStrategy.pure_vapor_pressure",
+      "particula.gas.vapor_pressure_strategies.ClausiusClapeyronStrategy",
+      "particula.gas.vapor_pressure_strategies.ClausiusClapeyronStrategy.pure_vapor_pressure",
+      "particula.gas.vapor_pressure_strategies.ConstantVaporPressureStrategy",
+      "particula.gas.vapor_pressure_strategies.ConstantVaporPressureStrategy.pure_vapor_pressure",
+      "particula.gas.vapor_pressure_strategies.LiquidClausiusHybridStrategy",
+      "particula.gas.vapor_pressure_strategies.LiquidClausiusHybridStrategy.pure_vapor_pressure",
+      "particula.gas.vapor_pressure_strategies.TableVaporPressureStrategy",
+      "particula.gas.vapor_pressure_strategies.TableVaporPressureStrategy.pure_vapor_pressure",
+      "particula.gas.vapor_pressure_strategies.VaporPressureStrategy",
+      "particula.gas.vapor_pressure_strategies.VaporPressureStrategy.concentration",
+      "particula.gas.vapor_pressure_strategies.VaporPressureStrategy.partial_pressure",
+      "particula.gas.vapor_pressure_strategies.VaporPressureStrategy.pure_vapor_pressure",
+      "particula.gas.vapor_pressure_strategies.VaporPressureStrategy.saturation_concentration",
+      "particula.gas.vapor_pressure_strategies.VaporPressureStrategy.saturation_ratio",
+      "particula.gas.vapor_pressure_strategies.WaterBuckStrategy",
+      "particula.gas.vapor_pressure_strategies.WaterBuckStrategy.pure_vapor_pressure"
+    ],
+    "API/particula/gpu/conversion/index.html": [
+      "particula.gpu.conversion",
+      "particula.gpu.conversion.from_warp_environment_data",
+      "particula.gpu.conversion.from_warp_gas_data",
+      "particula.gpu.conversion.from_warp_gas_data--with-caller-supplied-ordered-names",
+      "particula.gpu.conversion.from_warp_gas_data--with-placeholder-names-because-gpu-data-stores-no-names",
+      "particula.gpu.conversion.from_warp_particle_data",
+      "particula.gpu.conversion.from_warp_particle_data--after-gpu-simulation",
+      "particula.gpu.conversion.from_warp_particle_data--batched-transfers-with-manual-sync-advanced",
+      "particula.gpu.conversion.gpu_context",
+      "particula.gpu.conversion.gpu_context--or-transfer-back-after-context-data-still-valid",
+      "particula.gpu.conversion.gpu_context--transfer-back-inside-context",
+      "particula.gpu.conversion.to_per_box_partitioning",
+      "particula.gpu.conversion.to_warp_environment_data",
+      "particula.gpu.conversion.to_warp_gas_data",
+      "particula.gpu.conversion.to_warp_gas_data--omitted-vapor-pressure-allocates-zeros-for-schema-parity-only",
+      "particula.gpu.conversion.to_warp_gas_data--supply-initial-vapor-pressure-for-kernels-that-do-not-refresh-it",
+      "particula.gpu.conversion.to_warp_particle_data"
+    ],
+    "API/particula/gpu/dynamics/coagulation_funcs/index.html": [
+      "particula.gpu.dynamics.coagulation_funcs",
+      "particula.gpu.dynamics.coagulation_funcs.brownian_diffusivity_wp",
+      "particula.gpu.dynamics.coagulation_funcs.brownian_kernel_pair_wp",
+      "particula.gpu.dynamics.coagulation_funcs.charged_hard_sphere_wp",
+      "particula.gpu.dynamics.coagulation_funcs.coulomb_continuum_limit_wp",
+      "particula.gpu.dynamics.coagulation_funcs.coulomb_kinetic_limit_wp",
+      "particula.gpu.dynamics.coagulation_funcs.coulomb_potential_ratio_wp",
+      "particula.gpu.dynamics.coagulation_funcs.diffusive_knudsen_number_wp",
+      "particula.gpu.dynamics.coagulation_funcs.g_collection_term_wp",
+      "particula.gpu.dynamics.coagulation_funcs.kinematic_viscosity_wp",
+      "particula.gpu.dynamics.coagulation_funcs.particle_mean_free_path_wp",
+      "particula.gpu.dynamics.coagulation_funcs.reduced_value_wp",
+      "particula.gpu.dynamics.coagulation_funcs.sedimentation_sp2016_pair_rate_wp",
+      "particula.gpu.dynamics.coagulation_funcs.turbulent_shear_st1956_pair_rate_wp"
+    ],
+    "API/particula/gpu/dynamics/condensation_funcs/index.html": [
+      "particula.gpu.dynamics.condensation_funcs",
+      "particula.gpu.dynamics.condensation_funcs.effective_surface_tension_wp",
+      "particula.gpu.dynamics.condensation_funcs.first_order_mass_transport_k_wp",
+      "particula.gpu.dynamics.condensation_funcs.mass_transfer_rate_wp",
+      "particula.gpu.dynamics.condensation_funcs.water_activity_ideal_wp",
+      "particula.gpu.dynamics.condensation_funcs.water_activity_kappa_wp"
+    ],
+    "API/particula/gpu/dynamics/index.html": [
+      "particula.gpu.dynamics",
+      "particula.gpu.dynamics.brownian_diffusivity_wp",
+      "particula.gpu.dynamics.brownian_kernel_pair_wp",
+      "particula.gpu.dynamics.diffusion_coefficient_wp",
+      "particula.gpu.dynamics.first_order_mass_transport_k_wp",
+      "particula.gpu.dynamics.g_collection_term_wp",
+      "particula.gpu.dynamics.mass_transfer_rate_wp",
+      "particula.gpu.dynamics.particle_mean_free_path_wp"
+    ],
+    "API/particula/gpu/dynamics/wall_loss_funcs/index.html": [
+      "particula.gpu.dynamics.wall_loss_funcs",
+      "particula.gpu.dynamics.wall_loss_funcs.rectangle_wall_loss_coefficient_from_transport_wp",
+      "particula.gpu.dynamics.wall_loss_funcs.rectangle_wall_loss_coefficient_wp",
+      "particula.gpu.dynamics.wall_loss_funcs.spherical_wall_loss_coefficient_from_transport_wp",
+      "particula.gpu.dynamics.wall_loss_funcs.spherical_wall_loss_coefficient_wp"
+    ],
+    "API/particula/gpu/index.html": [
+      "particula.gpu",
+      "particula.gpu--create-particle-data-for-2-boxes-100-particles-3-species",
+      "particula.gpu.__getattr__"
+    ],
+    "API/particula/gpu/kernels/_coagulation_config/index.html": [
+      "particula.gpu.kernels._coagulation_config",
+      "particula.gpu.kernels._coagulation_config.CoagulationMechanismConfig",
+      "particula.gpu.kernels._coagulation_config.resolve_coagulation_mechanism_config",
+      "particula.gpu.kernels._coagulation_config.validate_coagulation_mechanism_capabilities"
+    ],
+    "API/particula/gpu/kernels/_coagulation_native/index.html": [
+      "particula.gpu.kernels._coagulation_native",
+      "particula.gpu.kernels._coagulation_native.validate_ownership",
+      "particula.gpu.kernels._coagulation_native.validate_physics",
+      "particula.gpu.kernels._coagulation_native.validate_schema"
+    ],
+    "API/particula/gpu/kernels/_condensation_native/index.html": [
+      "particula.gpu.kernels._condensation_native",
+      "particula.gpu.kernels._condensation_native.energy_transfer",
+      "particula.gpu.kernels._condensation_native.finalize_transfer",
+      "particula.gpu.kernels._condensation_native.gate_transfer",
+      "particula.gpu.kernels._condensation_native.reduce_candidates",
+      "particula.gpu.kernels._condensation_native.reduce_finalized",
+      "particula.gpu.kernels._condensation_native.retire_evaporated_slots",
+      "particula.gpu.kernels._condensation_native.validate_primary_state"
+    ],
+    "API/particula/gpu/kernels/_population_validation/index.html": [
+      "particula.gpu.kernels._population_validation",
+      "particula.gpu.kernels._population_validation.array_field",
+      "particula.gpu.kernels._population_validation.memory_range",
+      "particula.gpu.kernels._population_validation.reject_writer_aliases",
+      "particula.gpu.kernels._population_validation.validate_population"
+    ],
+    "API/particula/gpu/kernels/_wall_loss_native/index.html": [
+      "particula.gpu.kernels._wall_loss_native",
+      "particula.gpu.kernels._wall_loss_native.validate_ownership",
+      "particula.gpu.kernels._wall_loss_native.validate_physics"
+    ],
+    "API/particula/gpu/kernels/coagulation/index.html": [
+      "particula.gpu.kernels.coagulation",
+      "particula.gpu.kernels.coagulation.apply_coagulation_kernel",
+      "particula.gpu.kernels.coagulation.coagulation_step_gpu",
+      "particula.gpu.kernels.coagulation.initialize_coagulation_rng_states"
+    ],
+    "API/particula/gpu/kernels/communication/index.html": [
+      "particula.gpu.kernels.communication",
+      "particula.gpu.kernels.communication.GasCommunicationBuffers",
+      "particula.gpu.kernels.communication.ParticleCommunicationBuffers",
+      "particula.gpu.kernels.communication.gas_communication_step_gpu",
+      "particula.gpu.kernels.communication.particle_communication_step_gpu",
+      "particula.gpu.kernels.communication.resident_gas_communication_step_gpu",
+      "particula.gpu.kernels.communication.resident_particle_communication_step_gpu",
+      "particula.gpu.kernels.communication.resident_volume_evolution_step_gpu",
+      "particula.gpu.kernels.communication.volume_evolution_step_gpu"
+    ],
+    "API/particula/gpu/kernels/condensation/index.html": [
+      "particula.gpu.kernels.condensation",
+      "particula.gpu.kernels.condensation.CondensationActivitySurfaceConfig",
+      "particula.gpu.kernels.condensation.CondensationScratchBuffers",
+      "particula.gpu.kernels.condensation.apply_mass_transfer_kernel",
+      "particula.gpu.kernels.condensation.condensation_mass_transfer_kernel",
+      "particula.gpu.kernels.condensation.condensation_step_gpu",
+      "particula.gpu.kernels.condensation.validate_condensation_activity_surface_config",
+      "particula.gpu.kernels.condensation.validate_condensation_scratch_buffers"
+    ],
+    "API/particula/gpu/kernels/dilution/index.html": [
+      "particula.gpu.kernels.dilution",
+      "particula.gpu.kernels.dilution.dilution_step_gpu"
+    ],
+    "API/particula/gpu/kernels/environment/index.html": [
+      "particula.gpu.kernels.environment",
+      "particula.gpu.kernels.environment.validate_environment_inputs"
+    ],
+    "API/particula/gpu/kernels/exhaustion/index.html": [
+      "particula.gpu.kernels.exhaustion",
+      "particula.gpu.kernels.exhaustion.ResamplingBuffers",
+      "particula.gpu.kernels.exhaustion.representative_volume_scaling_step_gpu",
+      "particula.gpu.kernels.exhaustion.resampling_step_gpu"
+    ],
+    "API/particula/gpu/kernels/index.html": [
+      "particula.gpu.kernels",
+      "particula.gpu.kernels.__getattr__"
+    ],
+    "API/particula/gpu/kernels/nucleation/index.html": [
+      "particula.gpu.kernels.nucleation",
+      "particula.gpu.kernels.nucleation.NucleationConfig",
+      "particula.gpu.kernels.nucleation.NucleationConfig.__post_init__",
+      "particula.gpu.kernels.nucleation.NucleationDiagnosticBuffers",
+      "particula.gpu.kernels.nucleation.NucleationExhaustionBuffers",
+      "particula.gpu.kernels.nucleation.NucleationExhaustionControls",
+      "particula.gpu.kernels.nucleation.NucleationExhaustionControls.__post_init__",
+      "particula.gpu.kernels.nucleation.NucleationFinalizedDemandBuffers",
+      "particula.gpu.kernels.nucleation.NucleationScratchBuffers",
+      "particula.gpu.kernels.nucleation.nucleation_step_gpu"
+    ],
+    "API/particula/gpu/kernels/slot_management/index.html": [
+      "particula.gpu.kernels.slot_management",
+      "particula.gpu.kernels.slot_management.activate_slots_gpu",
+      "particula.gpu.kernels.slot_management.get_slot_diagnostics_gpu"
+    ],
+    "API/particula/gpu/kernels/thermodynamics/index.html": [
+      "particula.gpu.kernels.thermodynamics",
+      "particula.gpu.kernels.thermodynamics.THERMODYNAMICS_MODE_BUCK",
+      "particula.gpu.kernels.thermodynamics.THERMODYNAMICS_MODE_CONSTANT",
+      "particula.gpu.kernels.thermodynamics.ThermodynamicsConfig",
+      "particula.gpu.kernels.thermodynamics.refresh_vapor_pressure_gpu",
+      "particula.gpu.kernels.thermodynamics.validate_thermodynamics_config"
+    ],
+    "API/particula/gpu/kernels/wall_loss/index.html": [
+      "particula.gpu.kernels.wall_loss",
+      "particula.gpu.kernels.wall_loss.NeutralWallLossConfig",
+      "particula.gpu.kernels.wall_loss.wall_loss_selected_boxes_step_gpu",
+      "particula.gpu.kernels.wall_loss.wall_loss_step_gpu"
+    ],
+    "API/particula/gpu/nucleation_species_mapping/index.html": [
+      "particula.gpu.nucleation_species_mapping",
+      "particula.gpu.nucleation_species_mapping.NucleationSpeciesBinding",
+      "particula.gpu.nucleation_species_mapping.NucleationSpeciesBinding.validate",
+      "particula.gpu.nucleation_species_mapping.prepare_nucleation_species_map"
+    ],
+    "API/particula/gpu/population_metadata/index.html": [
+      "particula.gpu.population_metadata",
+      "particula.gpu.population_metadata.particle_distribution_code",
+      "particula.gpu.population_metadata.particle_distribution_type"
+    ],
+    "API/particula/gpu/properties/gas_properties/index.html": [
+      "particula.gpu.properties.gas_properties",
+      "particula.gpu.properties.gas_properties.dynamic_viscosity_wp",
+      "particula.gpu.properties.gas_properties.molecule_mean_free_path_wp",
+      "particula.gpu.properties.gas_properties.partial_pressure_wp"
+    ],
+    "API/particula/gpu/properties/index.html": [
+      "particula.gpu.properties",
+      "particula.gpu.properties.aerodynamic_mobility_wp",
+      "particula.gpu.properties.cunningham_slip_correction_wp",
+      "particula.gpu.properties.debye_1_wp",
+      "particula.gpu.properties.diffusion_coefficient_wp",
+      "particula.gpu.properties.dynamic_viscosity_wp",
+      "particula.gpu.properties.effective_density_wp",
+      "particula.gpu.properties.friction_factor_wp",
+      "particula.gpu.properties.kelvin_radius_wp",
+      "particula.gpu.properties.kelvin_term_wp",
+      "particula.gpu.properties.knudsen_number_wp",
+      "particula.gpu.properties.mean_thermal_speed_wp",
+      "particula.gpu.properties.molecule_mean_free_path_wp",
+      "particula.gpu.properties.partial_pressure_delta_wp",
+      "particula.gpu.properties.partial_pressure_wp",
+      "particula.gpu.properties.particle_radius_from_volume_wp",
+      "particula.gpu.properties.settling_velocity_stokes_from_transport_wp",
+      "particula.gpu.properties.settling_velocity_stokes_wp",
+      "particula.gpu.properties.vapor_transition_correction_wp",
+      "particula.gpu.properties.x_coth_x_wp"
+    ],
+    "API/particula/gpu/properties/particle_properties/index.html": [
+      "particula.gpu.properties.particle_properties",
+      "particula.gpu.properties.particle_properties.aerodynamic_mobility_wp",
+      "particula.gpu.properties.particle_properties.cunningham_slip_correction_wp",
+      "particula.gpu.properties.particle_properties.debye_1_wp",
+      "particula.gpu.properties.particle_properties.diffusion_coefficient_wp",
+      "particula.gpu.properties.particle_properties.effective_density_wp",
+      "particula.gpu.properties.particle_properties.friction_factor_wp",
+      "particula.gpu.properties.particle_properties.kelvin_radius_wp",
+      "particula.gpu.properties.particle_properties.kelvin_term_wp",
+      "particula.gpu.properties.particle_properties.knudsen_number_wp",
+      "particula.gpu.properties.particle_properties.mean_thermal_speed_wp",
+      "particula.gpu.properties.particle_properties.partial_pressure_delta_wp",
+      "particula.gpu.properties.particle_properties.particle_radius_from_volume_wp",
+      "particula.gpu.properties.particle_properties.settling_velocity_stokes_from_transport_wp",
+      "particula.gpu.properties.particle_properties.settling_velocity_stokes_wp",
+      "particula.gpu.properties.particle_properties.vapor_transition_correction_wp",
+      "particula.gpu.properties.particle_properties.x_coth_x_wp"
+    ],
+    "API/particula/gpu/species_mapping/index.html": [
+      "particula.gpu.species_mapping",
+      "particula.gpu.species_mapping.CondensationSpeciesBinding",
+      "particula.gpu.species_mapping.CondensationSpeciesBinding.validate",
+      "particula.gpu.species_mapping.prepare_condensation_species_map"
+    ],
+    "API/particula/gpu/warp_types/index.html": [
+      "particula.gpu.warp_types",
+      "particula.gpu.warp_types.WarpEnvironmentData",
+      "particula.gpu.warp_types.WarpGasData",
+      "particula.gpu.warp_types.WarpParticleData"
+    ],
+    "API/particula/index.html": [
+      "particula"
+    ],
+    "API/particula/logger_setup/index.html": [
+      "particula.logger_setup",
+      "particula.logger_setup.setup"
+    ],
+    "API/particula/particles/activity_builders/index.html": [
+      "particula.particles.activity_builders",
+      "particula.particles.activity_builders.ActivityIdealMassBuilder",
+      "particula.particles.activity_builders.ActivityIdealMassBuilder.build",
+      "particula.particles.activity_builders.ActivityIdealMolarBuilder",
+      "particula.particles.activity_builders.ActivityIdealMolarBuilder.build",
+      "particula.particles.activity_builders.ActivityKappaParameterBuilder",
+      "particula.particles.activity_builders.ActivityKappaParameterBuilder.build",
+      "particula.particles.activity_builders.ActivityKappaParameterBuilder.set_kappa",
+      "particula.particles.activity_builders.ActivityKappaParameterBuilder.set_water_index",
+      "particula.particles.activity_builders.ActivityNonIdealBinaryBuilder",
+      "particula.particles.activity_builders.ActivityNonIdealBinaryBuilder.build",
+      "particula.particles.activity_builders.ActivityNonIdealBinaryBuilder.set_functional_group",
+      "particula.particles.activity_builders.ActivityNonIdealBinaryBuilder.set_oxygen2carbon",
+      "particula.particles.activity_builders.ActivityNonIdealBinaryBuilder.set_parameters"
+    ],
+    "API/particula/particles/activity_factories/index.html": [
+      "particula.particles.activity_factories",
+      "particula.particles.activity_factories.ActivityFactory",
+      "particula.particles.activity_factories.ActivityFactory.get_builders"
+    ],
+    "API/particula/particles/activity_strategies/index.html": [
+      "particula.particles.activity_strategies",
+      "particula.particles.activity_strategies.ActivityIdealMass",
+      "particula.particles.activity_strategies.ActivityIdealMass.activity",
+      "particula.particles.activity_strategies.ActivityIdealMolar",
+      "particula.particles.activity_strategies.ActivityIdealMolar.activity",
+      "particula.particles.activity_strategies.ActivityIdealVolume",
+      "particula.particles.activity_strategies.ActivityIdealVolume.activity",
+      "particula.particles.activity_strategies.ActivityKappaParameter",
+      "particula.particles.activity_strategies.ActivityKappaParameter.activity",
+      "particula.particles.activity_strategies.ActivityNonIdealBinary",
+      "particula.particles.activity_strategies.ActivityNonIdealBinary.activity",
+      "particula.particles.activity_strategies.ActivityNonIdealBinary.get_name",
+      "particula.particles.activity_strategies.ActivityStrategy",
+      "particula.particles.activity_strategies.ActivityStrategy.activity",
+      "particula.particles.activity_strategies.ActivityStrategy.get_name",
+      "particula.particles.activity_strategies.ActivityStrategy.partial_pressure"
+    ],
+    "API/particula/particles/distribution_builders/index.html": [
+      "particula.particles.distribution_builders",
+      "particula.particles.distribution_builders.MassBasedMovingBinBuilder",
+      "particula.particles.distribution_builders.MassBasedMovingBinBuilder.build",
+      "particula.particles.distribution_builders.ParticleResolvedSpeciatedMassBuilder",
+      "particula.particles.distribution_builders.ParticleResolvedSpeciatedMassBuilder.build",
+      "particula.particles.distribution_builders.RadiiBasedMovingBinBuilder",
+      "particula.particles.distribution_builders.RadiiBasedMovingBinBuilder.build",
+      "particula.particles.distribution_builders.SpeciatedMassMovingBinBuilder",
+      "particula.particles.distribution_builders.SpeciatedMassMovingBinBuilder.build"
+    ],
+    "API/particula/particles/distribution_factories/index.html": [
+      "particula.particles.distribution_factories",
+      "particula.particles.distribution_factories.DistributionFactory",
+      "particula.particles.distribution_factories.DistributionFactory.get_builders"
+    ],
+    "API/particula/particles/distribution_strategies/base/index.html": [
+      "particula.particles.distribution_strategies.base",
+      "particula.particles.distribution_strategies.base.DistributionStrategy",
+      "particula.particles.distribution_strategies.base.DistributionStrategy.add_concentration",
+      "particula.particles.distribution_strategies.base.DistributionStrategy.add_mass",
+      "particula.particles.distribution_strategies.base.DistributionStrategy.collide_pairs",
+      "particula.particles.distribution_strategies.base.DistributionStrategy.get_mass",
+      "particula.particles.distribution_strategies.base.DistributionStrategy.get_name",
+      "particula.particles.distribution_strategies.base.DistributionStrategy.get_radius",
+      "particula.particles.distribution_strategies.base.DistributionStrategy.get_species_mass",
+      "particula.particles.distribution_strategies.base.DistributionStrategy.get_total_mass"
+    ],
+    "API/particula/particles/distribution_strategies/index.html": [
+      "particula.particles.distribution_strategies",
+      "particula.particles.distribution_strategies.DistributionStrategy",
+      "particula.particles.distribution_strategies.DistributionStrategy.add_concentration",
+      "particula.particles.distribution_strategies.DistributionStrategy.add_mass",
+      "particula.particles.distribution_strategies.DistributionStrategy.collide_pairs",
+      "particula.particles.distribution_strategies.DistributionStrategy.get_mass",
+      "particula.particles.distribution_strategies.DistributionStrategy.get_name",
+      "particula.particles.distribution_strategies.DistributionStrategy.get_radius",
+      "particula.particles.distribution_strategies.DistributionStrategy.get_species_mass",
+      "particula.particles.distribution_strategies.DistributionStrategy.get_total_mass",
+      "particula.particles.distribution_strategies.MassBasedMovingBin",
+      "particula.particles.distribution_strategies.MassBasedMovingBin.add_concentration",
+      "particula.particles.distribution_strategies.MassBasedMovingBin.add_mass",
+      "particula.particles.distribution_strategies.MassBasedMovingBin.collide_pairs",
+      "particula.particles.distribution_strategies.MassBasedMovingBin.get_mass",
+      "particula.particles.distribution_strategies.MassBasedMovingBin.get_radius",
+      "particula.particles.distribution_strategies.MassBasedMovingBin.get_species_mass",
+      "particula.particles.distribution_strategies.ParticleResolvedSpeciatedMass",
+      "particula.particles.distribution_strategies.ParticleResolvedSpeciatedMass.add_concentration",
+      "particula.particles.distribution_strategies.ParticleResolvedSpeciatedMass.add_mass",
+      "particula.particles.distribution_strategies.ParticleResolvedSpeciatedMass.collide_pairs",
+      "particula.particles.distribution_strategies.ParticleResolvedSpeciatedMass.get_radius",
+      "particula.particles.distribution_strategies.ParticleResolvedSpeciatedMass.get_species_mass",
+      "particula.particles.distribution_strategies.RadiiBasedMovingBin",
+      "particula.particles.distribution_strategies.RadiiBasedMovingBin.add_concentration",
+      "particula.particles.distribution_strategies.RadiiBasedMovingBin.add_mass",
+      "particula.particles.distribution_strategies.RadiiBasedMovingBin.collide_pairs",
+      "particula.particles.distribution_strategies.RadiiBasedMovingBin.get_radius",
+      "particula.particles.distribution_strategies.RadiiBasedMovingBin.get_species_mass",
+      "particula.particles.distribution_strategies.SpeciatedMassMovingBin",
+      "particula.particles.distribution_strategies.SpeciatedMassMovingBin.add_concentration",
+      "particula.particles.distribution_strategies.SpeciatedMassMovingBin.add_mass",
+      "particula.particles.distribution_strategies.SpeciatedMassMovingBin.collide_pairs",
+      "particula.particles.distribution_strategies.SpeciatedMassMovingBin.get_radius",
+      "particula.particles.distribution_strategies.SpeciatedMassMovingBin.get_species_mass"
+    ],
+    "API/particula/particles/distribution_strategies/mass_based_moving_bin/index.html": [
+      "particula.particles.distribution_strategies.mass_based_moving_bin",
+      "particula.particles.distribution_strategies.mass_based_moving_bin.MassBasedMovingBin",
+      "particula.particles.distribution_strategies.mass_based_moving_bin.MassBasedMovingBin.add_concentration",
+      "particula.particles.distribution_strategies.mass_based_moving_bin.MassBasedMovingBin.add_mass",
+      "particula.particles.distribution_strategies.mass_based_moving_bin.MassBasedMovingBin.collide_pairs",
+      "particula.particles.distribution_strategies.mass_based_moving_bin.MassBasedMovingBin.get_mass",
+      "particula.particles.distribution_strategies.mass_based_moving_bin.MassBasedMovingBin.get_radius",
+      "particula.particles.distribution_strategies.mass_based_moving_bin.MassBasedMovingBin.get_species_mass"
+    ],
+    "API/particula/particles/distribution_strategies/particle_resolved_speciated_mass/index.html": [
+      "particula.particles.distribution_strategies.particle_resolved_speciated_mass",
+      "particula.particles.distribution_strategies.particle_resolved_speciated_mass.ParticleResolvedSpeciatedMass",
+      "particula.particles.distribution_strategies.particle_resolved_speciated_mass.ParticleResolvedSpeciatedMass.add_concentration",
+      "particula.particles.distribution_strategies.particle_resolved_speciated_mass.ParticleResolvedSpeciatedMass.add_mass",
+      "particula.particles.distribution_strategies.particle_resolved_speciated_mass.ParticleResolvedSpeciatedMass.collide_pairs",
+      "particula.particles.distribution_strategies.particle_resolved_speciated_mass.ParticleResolvedSpeciatedMass.get_radius",
+      "particula.particles.distribution_strategies.particle_resolved_speciated_mass.ParticleResolvedSpeciatedMass.get_species_mass"
+    ],
+    "API/particula/particles/distribution_strategies/radii_based_moving_bin/index.html": [
+      "particula.particles.distribution_strategies.radii_based_moving_bin",
+      "particula.particles.distribution_strategies.radii_based_moving_bin.RadiiBasedMovingBin",
+      "particula.particles.distribution_strategies.radii_based_moving_bin.RadiiBasedMovingBin.add_concentration",
+      "particula.particles.distribution_strategies.radii_based_moving_bin.RadiiBasedMovingBin.add_mass",
+      "particula.particles.distribution_strategies.radii_based_moving_bin.RadiiBasedMovingBin.collide_pairs",
+      "particula.particles.distribution_strategies.radii_based_moving_bin.RadiiBasedMovingBin.get_radius",
+      "particula.particles.distribution_strategies.radii_based_moving_bin.RadiiBasedMovingBin.get_species_mass"
+    ],
+    "API/particula/particles/distribution_strategies/speciated_mass_moving_bin/index.html": [
+      "particula.particles.distribution_strategies.speciated_mass_moving_bin",
+      "particula.particles.distribution_strategies.speciated_mass_moving_bin.SpeciatedMassMovingBin",
+      "particula.particles.distribution_strategies.speciated_mass_moving_bin.SpeciatedMassMovingBin.add_concentration",
+      "particula.particles.distribution_strategies.speciated_mass_moving_bin.SpeciatedMassMovingBin.add_mass",
+      "particula.particles.distribution_strategies.speciated_mass_moving_bin.SpeciatedMassMovingBin.collide_pairs",
+      "particula.particles.distribution_strategies.speciated_mass_moving_bin.SpeciatedMassMovingBin.get_radius",
+      "particula.particles.distribution_strategies.speciated_mass_moving_bin.SpeciatedMassMovingBin.get_species_mass"
+    ],
+    "API/particula/particles/exhaustion/index.html": [
+      "particula.particles.exhaustion",
+      "particula.particles.exhaustion.ExhaustionBoxPlan",
+      "particula.particles.exhaustion.ExhaustionControls",
+      "particula.particles.exhaustion.ExhaustionControls.__post_init__",
+      "particula.particles.exhaustion.ExhaustionInputs",
+      "particula.particles.exhaustion.ExhaustionPlan",
+      "particula.particles.exhaustion.WeightedInventory",
+      "particula.particles.exhaustion.apply_representative_volume_scaling",
+      "particula.particles.exhaustion.apply_resampling",
+      "particula.particles.exhaustion.get_weighted_inventory",
+      "particula.particles.exhaustion.plan_resampling",
+      "particula.particles.exhaustion.resolve_exhaustion"
+    ],
+    "API/particula/particles/index.html": [
+      "particula.particles"
+    ],
+    "API/particula/particles/particle_data/index.html": [
+      "particula.particles.particle_data",
+      "particula.particles.particle_data.ParticleData",
+      "particula.particles.particle_data.ParticleData.__post_init__",
+      "particula.particles.particle_data.ParticleData.copy",
+      "particula.particles.particle_data.ParticleData.effective_density",
+      "particula.particles.particle_data.ParticleData.mass_fractions",
+      "particula.particles.particle_data.ParticleData.n_boxes",
+      "particula.particles.particle_data.ParticleData.n_particles",
+      "particula.particles.particle_data.ParticleData.n_species",
+      "particula.particles.particle_data.ParticleData.number_density",
+      "particula.particles.particle_data.ParticleData.radii",
+      "particula.particles.particle_data.ParticleData.slot_concentration_density",
+      "particula.particles.particle_data.ParticleData.species_mass_density",
+      "particula.particles.particle_data.ParticleData.species_mass_inventory",
+      "particula.particles.particle_data.ParticleData.total_mass",
+      "particula.particles.particle_data.ParticleData.validate_representation"
+    ],
+    "API/particula/particles/particle_data_builder/index.html": [
+      "particula.particles.particle_data_builder",
+      "particula.particles.particle_data_builder.ParticleDataBuilder",
+      "particula.particles.particle_data_builder.ParticleDataBuilder.build",
+      "particula.particles.particle_data_builder.ParticleDataBuilder.set_charge",
+      "particula.particles.particle_data_builder.ParticleDataBuilder.set_concentration",
+      "particula.particles.particle_data_builder.ParticleDataBuilder.set_density",
+      "particula.particles.particle_data_builder.ParticleDataBuilder.set_distribution_type",
+      "particula.particles.particle_data_builder.ParticleDataBuilder.set_masses",
+      "particula.particles.particle_data_builder.ParticleDataBuilder.set_n_boxes",
+      "particula.particles.particle_data_builder.ParticleDataBuilder.set_n_particles",
+      "particula.particles.particle_data_builder.ParticleDataBuilder.set_n_species",
+      "particula.particles.particle_data_builder.ParticleDataBuilder.set_radius_grid",
+      "particula.particles.particle_data_builder.ParticleDataBuilder.set_volume"
+    ],
+    "API/particula/particles/particle_data_initialization/index.html": [
+      "particula.particles.particle_data_initialization",
+      "particula.particles.particle_data_initialization.create_lognormal_binned_particle_data",
+      "particula.particles.particle_data_initialization.create_lognormal_resolved_particle_data",
+      "particula.particles.particle_data_initialization.create_particle_data_from_radii",
+      "particula.particles.particle_data_initialization.create_resolved_particle_data"
+    ],
+    "API/particula/particles/properties/activity_module/index.html": [
+      "particula.particles.properties.activity_module",
+      "particula.particles.properties.activity_module.get_ideal_activity_mass",
+      "particula.particles.properties.activity_module.get_ideal_activity_molar",
+      "particula.particles.properties.activity_module.get_ideal_activity_volume",
+      "particula.particles.properties.activity_module.get_kappa_activity",
+      "particula.particles.properties.activity_module.get_surface_partial_pressure"
+    ],
+    "API/particula/particles/properties/aerodynamic_mobility_module/index.html": [
+      "particula.particles.properties.aerodynamic_mobility_module",
+      "particula.particles.properties.aerodynamic_mobility_module.get_aerodynamic_mobility"
+    ],
+    "API/particula/particles/properties/aerodynamic_size/index.html": [
+      "particula.particles.properties.aerodynamic_size",
+      "particula.particles.properties.aerodynamic_size.get_aerodynamic_length",
+      "particula.particles.properties.aerodynamic_size.get_aerodynamic_shape_factor"
+    ],
+    "API/particula/particles/properties/collision_radius_module/index.html": [
+      "particula.particles.properties.collision_radius_module",
+      "particula.particles.properties.collision_radius_module.get_collision_radius_mg1988",
+      "particula.particles.properties.collision_radius_module.get_collision_radius_mzg2002",
+      "particula.particles.properties.collision_radius_module.get_collision_radius_sr1992",
+      "particula.particles.properties.collision_radius_module.get_collision_radius_tt2012",
+      "particula.particles.properties.collision_radius_module.get_collision_radius_wq2022_rg",
+      "particula.particles.properties.collision_radius_module.get_collision_radius_wq2022_rg_df",
+      "particula.particles.properties.collision_radius_module.get_collision_radius_wq2022_rg_df_k0",
+      "particula.particles.properties.collision_radius_module.get_collision_radius_wq2022_rg_df_k0_a13"
+    ],
+    "API/particula/particles/properties/convert_kappa_volumes/index.html": [
+      "particula.particles.properties.convert_kappa_volumes",
+      "particula.particles.properties.convert_kappa_volumes.get_kappa_from_volumes",
+      "particula.particles.properties.convert_kappa_volumes.get_solute_volume_from_kappa",
+      "particula.particles.properties.convert_kappa_volumes.get_water_volume_from_kappa",
+      "particula.particles.properties.convert_kappa_volumes.get_water_volume_in_mixture"
+    ],
+    "API/particula/particles/properties/convert_mass_concentration/index.html": [
+      "particula.particles.properties.convert_mass_concentration",
+      "particula.particles.properties.convert_mass_concentration.get_mass_fraction_from_mass",
+      "particula.particles.properties.convert_mass_concentration.get_mole_fraction_from_mass",
+      "particula.particles.properties.convert_mass_concentration.get_volume_fraction_from_mass"
+    ],
+    "API/particula/particles/properties/convert_mole_fraction/index.html": [
+      "particula.particles.properties.convert_mole_fraction",
+      "particula.particles.properties.convert_mole_fraction.get_mass_fractions_from_moles"
+    ],
+    "API/particula/particles/properties/convert_size_distribution/index.html": [
+      "particula.particles.properties.convert_size_distribution",
+      "particula.particles.properties.convert_size_distribution.ConversionStrategy",
+      "particula.particles.properties.convert_size_distribution.ConversionStrategy.convert",
+      "particula.particles.properties.convert_size_distribution.DNdlogDPtoPDFConversionStrategy",
+      "particula.particles.properties.convert_size_distribution.DNdlogDPtoPDFConversionStrategy.convert",
+      "particula.particles.properties.convert_size_distribution.DNdlogDPtoPMFConversionStrategy",
+      "particula.particles.properties.convert_size_distribution.DNdlogDPtoPMFConversionStrategy.convert",
+      "particula.particles.properties.convert_size_distribution.PMFtoPDFConversionStrategy",
+      "particula.particles.properties.convert_size_distribution.PMFtoPDFConversionStrategy.convert",
+      "particula.particles.properties.convert_size_distribution.SameScaleConversionStrategy",
+      "particula.particles.properties.convert_size_distribution.SameScaleConversionStrategy.convert",
+      "particula.particles.properties.convert_size_distribution.SizerConverter",
+      "particula.particles.properties.convert_size_distribution.SizerConverter.convert",
+      "particula.particles.properties.convert_size_distribution.get_distribution_conversion_strategy",
+      "particula.particles.properties.convert_size_distribution.get_distribution_in_dn",
+      "particula.particles.properties.convert_size_distribution.get_pdf_distribution_in_pmf"
+    ],
+    "API/particula/particles/properties/coulomb_enhancement/index.html": [
+      "particula.particles.properties.coulomb_enhancement",
+      "particula.particles.properties.coulomb_enhancement.get_coulomb_continuum_limit",
+      "particula.particles.properties.coulomb_enhancement.get_coulomb_enhancement_ratio",
+      "particula.particles.properties.coulomb_enhancement.get_coulomb_kinetic_limit"
+    ],
+    "API/particula/particles/properties/diffusion_coefficient/index.html": [
+      "particula.particles.properties.diffusion_coefficient",
+      "particula.particles.properties.diffusion_coefficient.get_diffusion_coefficient",
+      "particula.particles.properties.diffusion_coefficient.get_diffusion_coefficient_via_system_state"
+    ],
+    "API/particula/particles/properties/diffusive_knudsen_module/index.html": [
+      "particula.particles.properties.diffusive_knudsen_module",
+      "particula.particles.properties.diffusive_knudsen_module.get_diffusive_knudsen_number"
+    ],
+    "API/particula/particles/properties/friction_factor_module/index.html": [
+      "particula.particles.properties.friction_factor_module",
+      "particula.particles.properties.friction_factor_module.get_friction_factor"
+    ],
+    "API/particula/particles/properties/index.html": [
+      "particula.particles.properties"
+    ],
+    "API/particula/particles/properties/inertia_time/index.html": [
+      "particula.particles.properties.inertia_time",
+      "particula.particles.properties.inertia_time.get_particle_inertia_time"
+    ],
+    "API/particula/particles/properties/kelvin_effect_module/index.html": [
+      "particula.particles.properties.kelvin_effect_module",
+      "particula.particles.properties.kelvin_effect_module.get_kelvin_radius",
+      "particula.particles.properties.kelvin_effect_module.get_kelvin_term"
+    ],
+    "API/particula/particles/properties/knudsen_number_module/index.html": [
+      "particula.particles.properties.knudsen_number_module",
+      "particula.particles.properties.knudsen_number_module.get_knudsen_number"
+    ],
+    "API/particula/particles/properties/lognormal_size_distribution/index.html": [
+      "particula.particles.properties.lognormal_size_distribution",
+      "particula.particles.properties.lognormal_size_distribution.get_lognormal_pdf_distribution",
+      "particula.particles.properties.lognormal_size_distribution.get_lognormal_pmf_distribution",
+      "particula.particles.properties.lognormal_size_distribution.get_lognormal_sample_distribution"
+    ],
+    "API/particula/particles/properties/mean_thermal_speed_module/index.html": [
+      "particula.particles.properties.mean_thermal_speed_module",
+      "particula.particles.properties.mean_thermal_speed_module.get_mean_thermal_speed"
+    ],
+    "API/particula/particles/properties/mixing_state_index/index.html": [
+      "particula.particles.properties.mixing_state_index",
+      "particula.particles.properties.mixing_state_index.get_mixing_state_index"
+    ],
+    "API/particula/particles/properties/organic_density_module/index.html": [
+      "particula.particles.properties.organic_density_module",
+      "particula.particles.properties.organic_density_module.get_organic_density_array",
+      "particula.particles.properties.organic_density_module.get_organic_density_estimate"
+    ],
+    "API/particula/particles/properties/partial_pressure_module/index.html": [
+      "particula.particles.properties.partial_pressure_module",
+      "particula.particles.properties.partial_pressure_module.get_partial_pressure_delta"
+    ],
+    "API/particula/particles/properties/reynolds_number/index.html": [
+      "particula.particles.properties.reynolds_number",
+      "particula.particles.properties.reynolds_number.get_particle_reynolds_number"
+    ],
+    "API/particula/particles/properties/settling_velocity/index.html": [
+      "particula.particles.properties.settling_velocity",
+      "particula.particles.properties.settling_velocity.get_particle_settling_velocity",
+      "particula.particles.properties.settling_velocity.get_particle_settling_velocity_via_inertia",
+      "particula.particles.properties.settling_velocity.get_particle_settling_velocity_via_system_state",
+      "particula.particles.properties.settling_velocity.get_particle_settling_velocity_with_drag"
+    ],
+    "API/particula/particles/properties/slip_correction_module/index.html": [
+      "particula.particles.properties.slip_correction_module",
+      "particula.particles.properties.slip_correction_module.get_cunningham_slip_correction"
+    ],
+    "API/particula/particles/properties/sort_bins/index.html": [
+      "particula.particles.properties.sort_bins",
+      "particula.particles.properties.sort_bins.get_sorted_bins_by_radius"
+    ],
+    "API/particula/particles/properties/special_functions/index.html": [
+      "particula.particles.properties.special_functions",
+      "particula.particles.properties.special_functions.get_debye_function"
+    ],
+    "API/particula/particles/properties/stokes_number/index.html": [
+      "particula.particles.properties.stokes_number",
+      "particula.particles.properties.stokes_number.get_stokes_number"
+    ],
+    "API/particula/particles/properties/vapor_correction_module/index.html": [
+      "particula.particles.properties.vapor_correction_module",
+      "particula.particles.properties.vapor_correction_module.get_vapor_transition_correction"
+    ],
+    "API/particula/particles/slot_management/index.html": [
+      "particula.particles.slot_management",
+      "particula.particles.slot_management.activate_slots",
+      "particula.particles.slot_management.get_slot_diagnostics"
+    ],
+    "API/particula/particles/surface_builders/index.html": [
+      "particula.particles.surface_builders",
+      "particula.particles.surface_builders.SurfaceStrategyMassBuilder",
+      "particula.particles.surface_builders.SurfaceStrategyMassBuilder.build",
+      "particula.particles.surface_builders.SurfaceStrategyMolarBuilder",
+      "particula.particles.surface_builders.SurfaceStrategyMolarBuilder.build",
+      "particula.particles.surface_builders.SurfaceStrategyVolumeBuilder",
+      "particula.particles.surface_builders.SurfaceStrategyVolumeBuilder.build"
+    ],
+    "API/particula/particles/surface_factories/index.html": [
+      "particula.particles.surface_factories",
+      "particula.particles.surface_factories.SurfaceFactory",
+      "particula.particles.surface_factories.SurfaceFactory.get_builders"
+    ],
+    "API/particula/particles/surface_strategies/index.html": [
+      "particula.particles.surface_strategies",
+      "particula.particles.surface_strategies.SurfaceStrategy",
+      "particula.particles.surface_strategies.SurfaceStrategy.effective_surface_tension",
+      "particula.particles.surface_strategies.SurfaceStrategy.get_density",
+      "particula.particles.surface_strategies.SurfaceStrategy.get_name",
+      "particula.particles.surface_strategies.SurfaceStrategy.kelvin_radius",
+      "particula.particles.surface_strategies.SurfaceStrategy.kelvin_term",
+      "particula.particles.surface_strategies.SurfaceStrategy.update_surface_tension",
+      "particula.particles.surface_strategies.SurfaceStrategyMass",
+      "particula.particles.surface_strategies.SurfaceStrategyMass.effective_surface_tension",
+      "particula.particles.surface_strategies.SurfaceStrategyMass.get_density",
+      "particula.particles.surface_strategies.SurfaceStrategyMolar",
+      "particula.particles.surface_strategies.SurfaceStrategyMolar.effective_surface_tension",
+      "particula.particles.surface_strategies.SurfaceStrategyMolar.get_density",
+      "particula.particles.surface_strategies.SurfaceStrategyVolume",
+      "particula.particles.surface_strategies.SurfaceStrategyVolume.effective_surface_tension",
+      "particula.particles.surface_strategies.SurfaceStrategyVolume.get_density"
+    ],
+    "API/particula/runnable/index.html": [
+      "particula.runnable",
+      "particula.runnable.RunnableABC",
+      "particula.runnable.RunnableABC.__or__",
+      "particula.runnable.RunnableABC.execute",
+      "particula.runnable.RunnableABC.rate",
+      "particula.runnable.RunnableSequence",
+      "particula.runnable.RunnableSequence.__or__",
+      "particula.runnable.RunnableSequence.add_process",
+      "particula.runnable.RunnableSequence.execute"
+    ],
+    "API/particula/util/arbitrary_round/index.html": [
+      "particula.util.arbitrary_round",
+      "particula.util.arbitrary_round.get_arbitrary_round"
+    ],
+    "API/particula/util/chemical/chemical_properties/index.html": [
+      "particula.util.chemical.chemical_properties",
+      "particula.util.chemical.chemical_properties.get_chemical_stp_properties",
+      "particula.util.chemical.chemical_properties.get_chemical_stp_properties--parameters",
+      "particula.util.chemical.chemical_properties.get_chemical_stp_properties--returns"
+    ],
+    "API/particula/util/chemical/chemical_search/index.html": [
+      "particula.util.chemical.chemical_search",
+      "particula.util.chemical.chemical_search.get_chemical_search"
+    ],
+    "API/particula/util/chemical/chemical_surface_tension/index.html": [
+      "particula.util.chemical.chemical_surface_tension",
+      "particula.util.chemical.chemical_surface_tension.get_chemical_surface_tension"
+    ],
+    "API/particula/util/chemical/chemical_vapor_pressure/index.html": [
+      "particula.util.chemical.chemical_vapor_pressure",
+      "particula.util.chemical.chemical_vapor_pressure.get_chemical_vapor_pressure"
+    ],
+    "API/particula/util/chemical/index.html": [
+      "particula.util.chemical",
+      "particula.util.chemical.get_chemical_search",
+      "particula.util.chemical.get_chemical_stp_properties",
+      "particula.util.chemical.get_chemical_stp_properties--parameters",
+      "particula.util.chemical.get_chemical_stp_properties--returns",
+      "particula.util.chemical.get_chemical_surface_tension",
+      "particula.util.chemical.get_chemical_vapor_pressure"
+    ],
+    "API/particula/util/chemical/thermo_import/index.html": [
+      "particula.util.chemical.thermo_import"
+    ],
+    "API/particula/util/colors/index.html": [
+      "particula.util.colors"
+    ],
+    "API/particula/util/constants/index.html": [
+      "particula.util.constants"
+    ],
+    "API/particula/util/convert_dtypes/index.html": [
+      "particula.util.convert_dtypes",
+      "particula.util.convert_dtypes.get_coerced_type",
+      "particula.util.convert_dtypes.get_dict_from_list",
+      "particula.util.convert_dtypes.get_shape_check",
+      "particula.util.convert_dtypes.get_values_of_dict"
+    ],
+    "API/particula/util/convert_units/index.html": [
+      "particula.util.convert_units",
+      "particula.util.convert_units.get_unit_conversion"
+    ],
+    "API/particula/util/index.html": [
+      "particula.util",
+      "particula.util.get_arbitrary_round",
+      "particula.util.get_chemical_search",
+      "particula.util.get_chemical_stp_properties",
+      "particula.util.get_chemical_stp_properties--parameters",
+      "particula.util.get_chemical_stp_properties--returns",
+      "particula.util.get_chemical_surface_tension",
+      "particula.util.get_chemical_vapor_pressure",
+      "particula.util.get_coerced_type",
+      "particula.util.get_dict_from_list",
+      "particula.util.get_effective_refractive_index",
+      "particula.util.get_reduced_self_broadcast",
+      "particula.util.get_reduced_value",
+      "particula.util.get_safe_exp",
+      "particula.util.get_safe_log",
+      "particula.util.get_safe_log10",
+      "particula.util.get_shape_check",
+      "particula.util.get_unit_conversion",
+      "particula.util.get_values_of_dict"
+    ],
+    "API/particula/util/lf2013_coagulation/index.html": [
+      "particula.util.lf2013_coagulation",
+      "particula.util.lf2013_coagulation.lf2013_coag_full"
+    ],
+    "API/particula/util/lf2013_coagulation/src_lf2013_coagulation/index.html": [
+      "particula.util.lf2013_coagulation.src_lf2013_coagulation",
+      "particula.util.lf2013_coagulation.src_lf2013_coagulation.lf2013_coag_full"
+    ],
+    "API/particula/util/machine_limit/index.html": [
+      "particula.util.machine_limit",
+      "particula.util.machine_limit.get_safe_exp",
+      "particula.util.machine_limit.get_safe_log",
+      "particula.util.machine_limit.get_safe_log10",
+      "particula.util.machine_limit.get_safe_power"
+    ],
+    "API/particula/util/reduced_quantity/index.html": [
+      "particula.util.reduced_quantity",
+      "particula.util.reduced_quantity.get_reduced_self_broadcast",
+      "particula.util.reduced_quantity.get_reduced_value"
+    ],
+    "API/particula/util/refractive_index_mixing/index.html": [
+      "particula.util.refractive_index_mixing",
+      "particula.util.refractive_index_mixing.get_effective_refractive_index"
+    ],
+    "API/particula/util/validate_inputs/index.html": [
+      "particula.util.validate_inputs",
+      "particula.util.validate_inputs.validate_finite",
+      "particula.util.validate_inputs.validate_inputs",
+      "particula.util.validate_inputs.validate_negative",
+      "particula.util.validate_inputs.validate_nonnegative",
+      "particula.util.validate_inputs.validate_nonpositive",
+      "particula.util.validate_inputs.validate_nonzero",
+      "particula.util.validate_inputs.validate_positive"
+    ]
+  }
+}
