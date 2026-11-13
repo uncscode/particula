@@ -23,8 +23,9 @@ only. It neither selects an adapter nor validates runtime or native-device
 Availability, imports optional backends, allocates state, or exposes a
 user-facing API.
 
-The public API is a frozen, dependency-neutral 26-name selection, capability
-error, and fallback-policy surface. Its three public fallback policy enums are
+The public API includes selection, capability errors, fallback policies, and
+the caller-owned ``CPUExecutionContext`` for CPU box random streams.
+Its three public fallback policy enums are
 ``FallbackPolicy``, ``FallbackBoundary``, and ``CPUStateAuthority``. Concrete
 fallback mechanics and their carriers remain direct-module-only. Importing this
 package does not import optional backends, Warp, or ``particula.gpu``.
@@ -39,6 +40,8 @@ from itertools import product
 from math import isfinite
 from numbers import Integral, Rational, Real
 from typing import TYPE_CHECKING, Protocol, cast, runtime_checkable
+
+from particula.execution.cpu_context import CPUExecutionContext
 
 __all__ = [
     "Backend",
@@ -67,6 +70,7 @@ __all__ = [
     "FallbackPolicy",
     "FallbackBoundary",
     "CPUStateAuthority",
+    "CPUExecutionContext",
 ]
 
 if TYPE_CHECKING:
