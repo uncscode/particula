@@ -427,3 +427,89 @@ def test_late_nucleation_capacity_failure_preserves_every_box():
         process.execute(aerosol, 1)
     for name, value in _cpu_batch.arrays(aerosol).items():
         np.testing.assert_array_equal(value, before[name])
+
+
+@pytest.mark.parametrize("family", ["condensation", "nucleation"])
+@pytest.mark.parametrize("operation", ["rate", "execute"])
+@pytest.mark.parametrize(
+    "field,dtype",
+    [
+        ("concentration", np.float32),
+        ("concentration", np.int64),
+        ("partitioning", np.int64),
+        ("molar_mass", object),
+    ],
+)
+def test_invalid_raw_gas_schema_rejects_before_staging(
+    family, operation, field, dtype
+):
+    """Copies must not sanitize invalid replacement arrays or hide precision loss."""
+    if family == "nucleation":
+        single, config = fixture()
+        process = runnable(single, config)
+        process.commit_config = replace(
+            process.commit_config,
+            **{
+                name: np.repeat(getattr(process.commit_config, name), 2)
+                for name in (
+                    "requested_scale",
+                    "minimum_scale",
+                    "minimum_volume",
+                )
+            },
+        )
+    else:
+        single = state()
+        process = MassCondensation(condensation(single.gas))
+    aerosol = batch(single)
+    replacement = getattr(aerosol.gas, field).astype(dtype)
+    if field == "partitioning":
+        replacement[0] = 2
+    setattr(aerosol.gas, field, replacement)
+    before = {
+        name: value.copy() for name, value in _cpu_batch.arrays(aerosol).items()
+    }
+    with pytest.raises(ValueError, match="gas"):
+        if operation == "rate":
+            process.rate(aerosol)
+        else:
+            process.execute(aerosol, 0.01)
+    assert getattr(aerosol.gas, field) is replacement
+    for name, value in _cpu_batch.arrays(aerosol).items():
+        np.testing.assert_array_equal(value, before[name])
+
+
+@pytest.mark.parametrize("kind", ["discrete", "continuous_pdf"])
+@pytest.mark.parametrize("update_gases", [False, True])
+def test_binned_condensation_accepts_readonly_protected_inputs(
+    kind, update_gases
+):
+    """Binned concentration/charge stay protected, with optional fixed gas."""
+    aerosol = batch(state(1.0, kind))
+    aerosol.particles.volume[:] = 1
+    strategy = condensation(aerosol.gas)
+    strategy.update_gases = update_gases
+    process = MassCondensation(strategy)
+    reference = _cpu_batch.detached(aerosol)
+    process.execute(reference, 0.01)
+    protected = [aerosol.particles.concentration, aerosol.particles.charge]
+    if not update_gases:
+        protected.append(aerosol.gas.concentration)
+    for value in protected:
+        value.flags.writeable = False
+    process.execute(aerosol, 0.01)
+    for name, value in _cpu_batch.arrays(aerosol).items():
+        np.testing.assert_array_equal(value, _cpu_batch.arrays(reference)[name])
+    assert all(not value.flags.writeable for value in protected)
+
+
+def test_gas_precision_requirements_remain_process_specific():
+    """Condensation requires float64 metadata; dilution does not use it."""
+    aerosol = batch(state())
+    process = MassCondensation(condensation(aerosol.gas))
+    aerosol.gas.molar_mass = aerosol.gas.molar_mass.astype(np.float32)
+    with pytest.raises(ValueError, match="molar_mass.*float64"):
+        process.rate(aerosol)
+    with pytest.raises(ValueError, match="molar_mass.*float64"):
+        process.execute(aerosol, 0.01)
+    Dilution(DilutionStrategy(0.1)).execute(aerosol, 0.01)

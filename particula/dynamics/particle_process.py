@@ -237,22 +237,27 @@ class _NativeBatchRunnable(RunnableABC):
     _namespace = ""
 
     def _writer_fields(self, aerosol):
+        if self._namespace == "condensation":
+            writers = ["particles.masses"]
+            if aerosol.particles.distribution_type == "particle_resolved":
+                writers.extend(["particles.concentration", "particles.charge"])
+            if getattr(self.condensation_strategy, "update_gases", True):
+                writers.append("gas.concentration")
+            return tuple(writers)
         writers = ["particles.concentration"]
         resolved = aerosol.particles.distribution_type == "particle_resolved"
-        if self._namespace in ("condensation", "nucleation") or (
+        if self._namespace == "nucleation" or (
             resolved and self._namespace in ("coagulation", "wall_loss")
         ):
             writers.extend(["particles.masses", "particles.charge"])
-        if self._namespace in ("condensation", "dilution", "nucleation"):
-            if self._namespace != "condensation" or getattr(
-                self.condensation_strategy, "update_gases", True
-            ):
-                writers.append("gas.concentration")
+        if self._namespace in ("dilution", "nucleation"):
+            writers.append("gas.concentration")
         if self._namespace == "nucleation":
             writers.append("particles.volume")
         return tuple(writers)
 
     def _validate_batch(self, aerosol):
+        self._validate_gas_schema(aerosol.gas)
         if self._strategy_attribute is not None:
             strategy = getattr(self, self._strategy_attribute)
             expected = getattr(strategy, "distribution_type", None)
@@ -271,6 +276,25 @@ class _NativeBatchRunnable(RunnableABC):
                     aerosol.particles.n_boxes,
                 ):
                     raise ValueError(f"{name} must have one entry per box")
+
+    def _validate_gas_schema(self, gas):
+        """Reject raw replacements before GasData copying can normalize them.
+
+        Only gas-coupled processes require these schemas. Condensation uses
+        float64 throughout; nucleation allows real numeric molar-mass metadata
+        but its writable gas inventory must remain float64.
+        """
+        if self._namespace not in ("condensation", "nucleation"):
+            return
+        if gas.partitioning.dtype != np.bool_:
+            raise ValueError("gas partitioning must have boolean dtype")
+        if gas.concentration.dtype != np.float64:
+            raise ValueError("gas concentration must have dtype float64")
+        if self._namespace == "condensation":
+            if gas.molar_mass.dtype != np.float64:
+                raise ValueError("gas molar_mass must have dtype float64")
+        elif gas.molar_mass.dtype.kind in "bOSUc":
+            raise ValueError("gas molar_mass must be real numeric storage")
 
     def _is_stochastic(self, aerosol):
         if self._namespace in ("coagulation", "wall_loss"):
