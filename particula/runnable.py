@@ -68,6 +68,8 @@ class RunnableABC:
         """Evaluate detached box hooks and retain a leading box axis."""
         from particula import _cpu_batch
 
+        if not isinstance(aerosol, Aerosol):
+            raise TypeError(f"{type(self).__name__} requires a native Aerosol")
         _cpu_batch.validate(aerosol)
         self._validate_batch(aerosol)
         candidate = _cpu_batch.detached(aerosol)
@@ -79,7 +81,7 @@ class RunnableABC:
             )
         return np.stack(results, axis=0)
 
-    def execute(
+    def execute(  # noqa: C901
         self,
         aerosol: Aerosol,
         time_step: float,
@@ -97,6 +99,11 @@ class RunnableABC:
         from particula.execution import CPUExecutionContext
 
         step = _cpu_batch.duration(time_step, sub_steps)
+        if not isinstance(aerosol, Aerosol):
+            raise TypeError(f"{type(self).__name__} requires a native Aerosol")
+        maximum = getattr(self, "_maximum_sub_steps", None)
+        if maximum is not None and sub_steps > maximum:
+            raise ValueError(f"sub_steps must not exceed {maximum}")
         writers = self._writer_fields(aerosol)
         _cpu_batch.validate(aerosol, writers)
         self._validate_batch(aerosol)
