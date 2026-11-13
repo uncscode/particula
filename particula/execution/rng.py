@@ -476,7 +476,8 @@ class StreamRegistry:
             ],
             dtype=np.int32,
         )
-        lane_source: Any = wp.array(lanes, dtype=wp.int32, device="cpu")
+        device = self.state_array_for(selected_processes[0]).device
+        lane_source: Any = wp.array(lanes, dtype=wp.int32, device=device)
         for process_id in selected_processes:
             words = np.asarray(
                 [
@@ -485,7 +486,7 @@ class StreamRegistry:
                 ],
                 dtype=np.uint32,
             )
-            word_source: Any = wp.array(words, dtype=wp.uint32, device="cpu")
+            word_source: Any = wp.array(words, dtype=wp.uint32, device=device)
             state = self.state_array_for(process_id)
             try:
                 wp.launch(
