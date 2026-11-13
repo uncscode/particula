@@ -1,0 +1,22 @@
+{
+  "name": "particula-documentation-demo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "prepare:content": "node scripts/python.mjs ../scripts/docs_site.py prepare",
+    "dev": "npm run prepare:content && ASTRO_TELEMETRY_DISABLED=1 astro dev --host 127.0.0.1",
+    "build": "npm run prepare:content && ASTRO_TELEMETRY_DISABLED=1 astro build && node scripts/python.mjs ../scripts/docs_site.py verify",
+    "preview": "ASTRO_TELEMETRY_DISABLED=1 astro preview --host 127.0.0.1",
+    "test": "node scripts/python.mjs -m pytest ../scripts/tests/docs_examples_test.py ../scripts/tests/docs_site_test.py -q --no-cov"
+  },
+  "dependencies": {
+    "@astrojs/markdown-remark": "^7.3.0",
+    "@astrojs/starlight": "0.42.11",
+    "@expressive-code/plugin-collapsible-sections": "^0.41.0",
+    "astro": "7.4.11",
+    "mermaid": "^11.17.2",
+    "rehype-mathjax": "^7.0.0",
+    "remark-math": "^6.0.0",
+    "starlight-pydocs": "0.3.0"
+  }
+}

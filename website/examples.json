@@ -1,0 +1,27 @@
+{
+  "distributions": {
+    "title": "Aerosol size distributions",
+    "source": "docs/examples/fundamentals/particles/aerosol_distributions.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 300,
+    "inputs": []
+  },
+  "condensation": {
+    "title": "Condensation in radius bins",
+    "source": "docs/examples/processes/condensation/condensation_1_bin.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 300,
+    "inputs": []
+  },
+  "gpu-coagulation": {
+    "title": "Direct GPU coagulation",
+    "source": "docs/examples/gpu/direct/gpu_coagulation_direct.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 300,
+    "inputs": [],
+    "invoke": "result = run_example(device='cuda')\nprint('\\n'.join(result.output))"
+  }
+}

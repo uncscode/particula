@@ -1,0 +1,8 @@
+# Site preparation and optional explicit example execution.
+# Install the repository with [extra] for the scientific examples themselves.
+griffe==1.14.0
+jupytext==1.17.3
+nbclient==0.10.2
+nbformat==5.10.4
+ipykernel>=6,<8
+PyYAML>=6,<7

@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "example": "distributions",
+  "fingerprint": "84f699b3353533e7d413b7f2250bc14307bf570b96e176354e9c1699376ef730",
+  "source": "docs/examples/fundamentals/particles/aerosol_distributions.py",
+  "revision": "45f4d53e931e9fc4e57073b15895fe01a10f9cca",
+  "package_dirty": false,
+  "executed_at": "2026-11-13T04:27:59.038026+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [
+      {
+        "image": "figure-8-1.png"
+      }
+    ],
+    [],
+    [
+      {
+        "text": "Total Concentration for Single Mode: 1000.0\nTotal Concentration for Multi Mode: 2000.000000000002\n"
+      }
+    ],
+    [],
+    [
+      {
+        "image": "figure-12-1.png"
+      }
+    ],
+    [],
+    [
+      {
+        "text": "Total Concentration for Single Mode: 1000.0000000000001\nTotal Concentration for Multi Mode: 2000.0\n"
+      }
+    ],
+    [
+      {
+        "text": "Native radius-PDF number density [m^-3]: [2000.]\n"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "31c7d3a44b201a22886203e3c7f84170337f4eb9a58cf6bbd7d66d1c4c5fedd8",
+    "figure-8-1.png": "f0a9e3b2b30bc010c4f54c84d74aff5eeffce22118f02231ac0e4866ba2b2802",
+    "figure-12-1.png": "c03656330481701b7f154dcc451cec175306f0ab164a605033683139fdca6bf4"
+  }
+}

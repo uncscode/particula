@@ -1,0 +1,12 @@
+---
+import DefaultHead from '@astrojs/starlight/components/Head.astro';
+---
+<DefaultHead><slot /></DefaultHead>
+<script>
+  // Only diagram pages load Mermaid. Static documentation has no simulation runtime.
+  if (document.querySelector('pre.mermaid')) {
+    const { default: mermaid } = await import('mermaid');
+    mermaid.initialize({ startOnLoad: false, theme: 'neutral', securityLevel: 'strict' });
+    await mermaid.run({ querySelector: 'pre.mermaid' });
+  }
+</script>

@@ -178,3 +178,14 @@ logs/
 .opencode.backup.*/
 adforge_local/
 .codegraph/
+
+# Local Astro documentation demo
+website/node_modules/
+website/.astro/
+website/.cache/
+website/src/content/docs/
+website/public/generated/
+website/public/images/
+website/public/downloads/
+website/public/results/
+website/qa/
