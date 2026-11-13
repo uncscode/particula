@@ -159,3 +159,40 @@ def test_interleaved_nonoverlapping_storage_is_supported():
     Process().execute(aerosol, 1)
     assert aerosol.particles.concentration is target
     np.testing.assert_allclose(target, np.exp(-1))
+
+
+@pytest.mark.parametrize("fail", [False, True])
+def test_environment_hook_writes_are_transactional(fail):
+    """Declared environment writes publish by identity or roll back together."""
+
+    class Heating(Process):
+        def _writer_fields(self, aerosol):
+            return (
+                "environment.temperature",
+                "environment.pressure",
+                "environment.saturation_ratio",
+            )
+
+        def _execute_box(self, aerosol, time_step, sub_steps=1):
+            aerosol.environment.temperature += time_step
+            aerosol.environment.pressure += time_step
+            aerosol.environment.saturation_ratio += time_step
+            if fail and aerosol.environment.temperature[0] > 300:
+                raise ValueError("late heating failure")
+            return aerosol
+
+    aerosol = state()
+    fields = (
+        aerosol.environment.temperature,
+        aerosol.environment.pressure,
+        aerosol.environment.saturation_ratio,
+    )
+    snapshots = [value.copy() for value in fields]
+    if fail:
+        with pytest.raises(ValueError, match="late heating"):
+            Heating().execute(aerosol, 1)
+    else:
+        Heating().execute(aerosol, 1)
+    for field, before in zip(fields, snapshots, strict=True):
+        np.testing.assert_array_equal(field, before + (0 if fail else 1))
+    assert aerosol.environment.temperature is fields[0]

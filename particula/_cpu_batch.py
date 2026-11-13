@@ -1,12 +1,13 @@
 """Private CPU batch staging shared by native runnable implementations."""
 
+from copy import copy
 from numbers import Integral, Real
 
 import numpy as np
 
 from particula.aerosol import Aerosol
 from particula.aerosol_validation import validate_aerosol_structure
-from particula.gas import EnvironmentData, GasData
+from particula.gas import GasData
 from particula.particles import ParticleData
 
 
@@ -111,6 +112,12 @@ def box_view(aerosol, box):
     """Expose one staged box through existing native container types."""
     p, g, e = aerosol.particles, aerosol.gas, aerosol.environment
     row = slice(box, box + 1)
+    # EnvironmentData's public constructor deliberately copies. A private
+    # carrier must instead write through to this detached candidate only.
+    environment = copy(e)
+    environment.temperature = e.temperature[row]
+    environment.pressure = e.pressure[row]
+    environment.saturation_ratio = e.saturation_ratio[row]
     return Aerosol(
         particles=ParticleData(
             masses=p.masses[row],
@@ -127,11 +134,7 @@ def box_view(aerosol, box):
             concentration=g.concentration[row],
             partitioning=g.partitioning,
         ),
-        environment=EnvironmentData(
-            temperature=e.temperature[row],
-            pressure=e.pressure[row],
-            saturation_ratio=e.saturation_ratio[row],
-        ),
+        environment=environment,
     )
 
 
