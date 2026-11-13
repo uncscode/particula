@@ -1,7 +1,7 @@
 """Runnable particle-centric aerosol processes.
 
 Includes condensation and evaporation, coagulation, wall loss, dilution, and
-the CPU-only single-box nucleation process.
+the CPU-only nucleation process.
 """
 
 from copy import copy, deepcopy
@@ -153,12 +153,12 @@ def _is_real_scalar(value: object) -> bool:
 
 @dataclass(frozen=True)
 class NucleationCommitConfig:
-    """Immutable one-box controls for CPU nucleation source commits.
+    """Immutable per-box controls for CPU nucleation source commits.
 
     The record mirrors the source transaction transaction controls while
     retaining public runnable execution
     ownership. Its rank-one sidecars are copied into read-only float64 arrays;
-    their required one-box length is checked immediately before every nonzero
+    their required batch length is checked immediately before every nonzero
     substep commit. The configuration is not a source transaction configuration
     and does not
     create a transaction spanning a complete ``Nucleation.execute`` call.
@@ -253,7 +253,19 @@ class _NativeBatchRunnable(RunnableABC):
         return tuple(writers)
 
     def _validate_batch(self, aerosol):
+        if self._strategy_attribute is not None:
+            strategy = getattr(self, self._strategy_attribute)
+            expected = getattr(strategy, "distribution_type", None)
+            if expected is not None and (
+                expected != aerosol.particles.distribution_type
+            ):
+                raise ValueError(
+                    "strategy distribution_type must match particle "
+                    "distribution_type"
+                )
         if self._namespace == "nucleation":
+            if aerosol.particles.distribution_type != "particle_resolved":
+                raise ValueError("Nucleation requires particle_resolved data")
             for name in ("requested_scale", "minimum_scale", "minimum_volume"):
                 if getattr(self.commit_config, name).shape != (
                     aerosol.particles.n_boxes,
@@ -300,9 +312,11 @@ class _NativeBatchRunnable(RunnableABC):
             )
         return worker
 
-    def _commit_workers(self, workers, uses_context):
+    def _prepare_commit(self, workers, uses_context):  # noqa: C901
         if self._strategy_attribute is None:
-            return
+            return lambda: None
+        random_updates = []
+        energies = None
         original = getattr(self, self._strategy_attribute)
         if len(workers) == 1 and not uses_context:
             staged = getattr(workers[0], self._strategy_attribute)
@@ -310,9 +324,11 @@ class _NativeBatchRunnable(RunnableABC):
                 value = getattr(original, name, None)
                 updated = getattr(staged, name, None)
                 if isinstance(value, np.random.Generator):
-                    value.bit_generator.state = updated.bit_generator.state
+                    random_updates.append(
+                        (value.bit_generator, updated.bit_generator.state)
+                    )
                 elif isinstance(value, np.random.RandomState):
-                    value.set_state(updated.get_state())
+                    random_updates.append((value, updated.get_state()))
         if hasattr(original, "last_latent_heat_energy"):
             energies = np.asarray(
                 [
@@ -323,14 +339,27 @@ class _NativeBatchRunnable(RunnableABC):
                 ],
                 dtype=np.float64,
             )
-            self.last_latent_heat_energy = energies
-            original.last_latent_heat_energy = (
-                float(energies[0]) if len(workers) == 1 else None
-            )
+        scalar_energy = (
+            float(energies[0])
+            if energies is not None and len(workers) == 1
+            else None
+        )
+
+        def commit():
+            for target, state in random_updates:
+                if isinstance(target, np.random.RandomState):
+                    target.set_state(state)
+                else:
+                    target.state = state
+            if energies is not None:
+                self.last_latent_heat_energy = energies
+                original.last_latent_heat_energy = scalar_energy
+
+        return commit
 
 
 class Nucleation(_NativeBatchRunnable):
-    """Apply mapped single-box nucleation to a native resolved population.
+    """Apply mapped nucleation independently to native resolved boxes.
 
     Source rates and demand planning finalization use densities. The commit
     converts event

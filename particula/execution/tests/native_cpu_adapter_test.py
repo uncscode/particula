@@ -188,3 +188,28 @@ def test_equilibria_recognizes_native_return_and_preserves_input_mapping():
         aerosol.mass_concentrations
         is strategy.solve.return_value["mass_concentrations"]
     )
+
+
+@pytest.mark.parametrize("family", ["condensation", "coagulation"])
+def test_selected_adapter_delegates_multibox_context_once(family, monkeypatch):
+    """Selected adapters forward context without introducing another box loop."""
+    from dataclasses import replace
+
+    from particula.dynamics.tests.multibox_runnable_test import batch
+    from particula.execution import CPUExecutionContext
+
+    aerosol = batch(state())
+    adapter, request = selected(family, aerosol)
+    context = CPUExecutionContext(17, ("a", "b"))
+    request = replace(request, time_step=0.01, context=context)
+    execute = request.runnable.execute
+    calls = []
+
+    def record(*args, **kwargs):
+        calls.append((args, kwargs))
+        return execute(*args, **kwargs)
+
+    monkeypatch.setattr(request.runnable, "execute", record)
+    result = adapter.execute(request)
+    assert result.state is request
+    assert calls == [((aerosol, 0.01, request.sub_steps), {"context": context})]

@@ -71,13 +71,31 @@ def validate(aerosol, writers=()):
             if key != name
         ):
             raise ValueError("CPU writer fields must not alias state")
-        # Reject overlapping lanes, including writable zero-stride views.
-        for box in range(target.shape[0]):
-            if any(
-                np.shares_memory(target[box : box + 1], target[j : j + 1])
-                for j in range(box)
-            ):
-                raise ValueError("CPU writer box rows must not alias")
+        if target.size == 0:
+            continue
+        # A stride-span proof handles contiguous, transposed, reversed and
+        # ordinary sliced arrays without a quadratic scan over box pairs.
+        span = target.itemsize
+        for stride, length in sorted(
+            (abs(stride), length)
+            for stride, length in zip(target.strides, target.shape, strict=True)
+            if length > 1
+        ):
+            if stride < span:
+                # Interleaved views can fail the simple span proof without
+                # overlapping. Resolve only these unusual layouts exactly.
+                offsets = np.array([0], dtype=np.int64)
+                for size, step in zip(
+                    target.shape, target.strides, strict=True
+                ):
+                    offsets = (
+                        offsets[:, None] + np.arange(size) * step
+                    ).ravel()
+                offsets.sort()
+                if np.any(np.diff(offsets) < target.itemsize):
+                    raise ValueError("CPU writer elements must not overlap")
+                break
+            span += stride * (length - 1)
 
 
 def detached(aerosol):

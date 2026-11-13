@@ -584,7 +584,7 @@ assert execution.__all__[:10] == [
     'ExecutionAdapter',
     'ExecutionContext',
 ]
-assert len(execution.__all__) == 26
+assert len(execution.__all__) == 27
 assert 'particula.execution.state_updates' not in sys.modules
 assert 'particula.execution.gpu_resources' not in sys.modules
 assert 'particula.gpu' not in sys.modules

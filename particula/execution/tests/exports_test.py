@@ -38,6 +38,7 @@ EXPECTED_EXPORTS = (
     "FallbackPolicy",
     "FallbackBoundary",
     "CPUStateAuthority",
+    "CPUExecutionContext",
 )
 
 EXPECTED_ERROR_EXPORTS = (
