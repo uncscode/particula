@@ -31,7 +31,7 @@
     }
   },
   "remaining": [
-    "Hosted PR checks and downloadable preview artifact",
+    "Hosted PR checks and validation reports",
     "Production verification after a future merge (conditional; no deployment performed)"
   ]
 }

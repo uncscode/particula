@@ -48,7 +48,7 @@ fingerprint does not claim execution against every later library revision.
 See [authoring instructions](AUTHORING.md) and
 [API diagnostics](API_DIAGNOSTICS.md).
 
-## Validation and PR preview
+## Validation and publishing
 
 ```bash
 npm --prefix website test
@@ -62,11 +62,10 @@ CI validates every saved bundle and executes changed ordinary CPU examples
 without replacing published results. CUDA and long-running examples require an
 explicit local refresh; hosted CPU skips are reported honestly.
 
-PRs, main pushes and merge-queue builds produce a downloadable
-`documentation-preview` artifact containing the full site, preview instructions,
-validation and execution reports, source/archive inventories and rollback notes.
-Unzip it, run `python -m http.server 8000` in its root, then open
-http://localhost:8000/particula/. It is not a hosted preview deployment.
+PRs, main pushes and merge-queue builds upload `documentation-validation`,
+containing validation and execution reports, source/archive inventories and
+rollback notes. PRs and merge-queue builds do not upload a site preview.
+Production builds alone upload the verified site for the deployment job.
 
 Only successful upstream main builds publish to the existing `gh-pages` branch.
 PRs and merge-queue builds never publish production. See the archive README for

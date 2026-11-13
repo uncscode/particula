@@ -83,10 +83,11 @@ Screenshots are retained locally in ignored `website/qa/`.
 ## Publishing and rollback
 
 PR, main-push and merge-queue builds validate saved bundles and publish a
-**downloadable preview artifact**, execution inventory, source/archive
+validation reports, execution inventory, source/archive
 inventories and this report. Only successful upstream `main` builds deploy to
 `gh-pages`; PR and merge-queue builds cannot publish production. Existing Python
-and Ruff check names are unchanged.
+and Ruff check names are unchanged. PR site previews are disabled; only
+production builds upload the site for deployment.
 
 The pre-cutover publication revision is
 `6597906ba8dd09bdccb9c3e502d8155c6668a1d4`. The archive README documents restoring
