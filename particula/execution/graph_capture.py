@@ -2013,6 +2013,11 @@ def _acquire_captured_graph_launch(
     """Authenticate a live record and acquire its per-binding launch lease."""
     with _ISSUED_CAPTURED_GRAPHS_CONDITION:
         typed = _require_issued_captured_graph(captured)
+        if (
+            typed.lifecycle is not typed.binding.lifecycle
+            or typed.lifecycle.state is not GraphCaptureLifecycleState.CAPTURED
+        ):
+            raise ValueError("captured resident graph lifecycle changed.")
         record = _ISSUED_CAPTURED_GRAPHS[typed]
         record.launch_leases += 1
         return typed, record
@@ -2551,7 +2556,8 @@ def _validate_replay_captured_graph(
         ValueError: If provenance, metadata, binding admission, device, or
             duration compatibility fails.
     """
-    captured = _require_issued_captured_graph(captured)
+    with _ISSUED_CAPTURED_GRAPHS_CONDITION:
+        captured = _require_issued_captured_graph(captured)
     qualification = captured.qualification
     if type(qualification) is not PreparedGraphCaptureQualification:
         raise TypeError(
@@ -2704,17 +2710,15 @@ def replay_captured_resident_graph(captured: object, duration: object) -> None:
     launch_lease_active = False
     try:
         operation_lease = session._acquire_native_operation("replay")
-        with _ISSUED_CAPTURED_GRAPHS_CONDITION:
-            # Structural validation can revoke this graph. Do not hold a
-            # launch lease while that revocation waits for admitted launches.
-            # Keep validation and lease acquisition atomic against teardown.
-            qualification = _validate_replay_captured_graph(
-                captured_graph, duration
-            )
-            captured_graph, record = _acquire_captured_graph_launch(
-                captured_graph
-            )
-            launch_lease_active = True
+        # Validation may revoke and release the graph. It must hold neither
+        # a launch lease nor the provenance lock during native cleanup.
+        qualification = _validate_replay_captured_graph(
+            captured_graph, duration
+        )
+        # Reauthenticate and acquire atomically: intervening revocation must
+        # reject, while later revocation waits for this admitted launch.
+        captured_graph, record = _acquire_captured_graph_launch(captured_graph)
+        launch_lease_active = True
         guard = cast("ResidentStepGuard", qualification.guard)
         token = guard.begin_step(duration)
         try:

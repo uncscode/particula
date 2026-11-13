@@ -31,3 +31,27 @@ it("rejects an empty explicit worktree without starting a build", async () => {
   expect(await execute({ cwd: " " })).toContain("FAIL:");
   expect(spawn).not.toHaveBeenCalled();
 });
+
+it("rejects external marker directories and symlink escapes", async () => {
+  const { mkdtemp, mkdir, writeFile, symlink, rm } = await import("node:fs/promises");
+  const { tmpdir } = await import("node:os");
+  const path = await import("node:path");
+  const external = await mkdtemp(path.join(tmpdir(), "docs-external-"));
+  const link = path.join(process.cwd(), `.docs-escape-${Date.now()}`);
+  try {
+    await mkdir(path.join(external, "website"));
+    await mkdir(path.join(external, "scripts"));
+    await writeFile(path.join(external, "website/astro.config.mjs"), "");
+    await writeFile(path.join(external, "scripts/check_docs_structure.py"), "");
+    await symlink(external, link);
+    spawn = spyOn(Bun, "spawn");
+    const execute = await loadToolExecute("../../build_docs.ts");
+    for (const cwd of [external, link]) {
+      expect(await execute({ cwd })).toContain("FAIL:");
+    }
+    expect(spawn).not.toHaveBeenCalled();
+  } finally {
+    await rm(link, { force: true });
+    await rm(external, { recursive: true, force: true });
+  }
+});

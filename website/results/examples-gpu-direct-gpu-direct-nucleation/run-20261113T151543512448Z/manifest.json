@@ -10,7 +10,7 @@
   "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
   "package_dirty": true,
   "executed_at": "2026-11-13T15:15:43.543233+00:00",
-  "device": "cuda:0: NVIDIA GeForce RTX 5060",
+  "device": "cpu (Warp CPU)",
   "python": "3.12.12",
   "versions": {
     "particula": "0.2.14",
@@ -31,5 +31,6 @@
   ],
   "files": {
     "source.py": "9ff37b19df5e56e2fdfc82472eb4c9a59ec80def63c745e45940d02530c75fc3"
-  }
+  },
+  "provenance_correction": "The recorded source hard-coded Warp CPU. The original CUDA label described an available device, not the executed device. This superseded run is CPU evidence only."
 }

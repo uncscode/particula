@@ -186,7 +186,7 @@
     "device": "cuda",
     "timeout": 1800,
     "inputs": [],
-    "invoke": "result = run_example()\nprint('\\n'.join(result.output) if hasattr(result, 'output') else 'CUDA example completed successfully')"
+    "invoke": "result = run_example(device='cuda')\nprint('\\n'.join(result.output) if hasattr(result, 'output') else 'CUDA example completed successfully')"
   },
   "examples-gpu-resident-gpu-resident-graph-capture": {
     "title": "Gpu Resident Graph Capture",
