@@ -47,12 +47,20 @@ For using Particula in a scientific study, the plugin separately provides
   [validation reference](plugins/particula-helper/references/repository-validation.md).
   The retired ADW/OpenCode development system is not required. Its archive is
   historical reference only; do not load it as active agent instructions.
-- Edit the root `readme.md` only when the user explicitly requests README
-  changes. A general feature, documentation, packaging, or release task does
-  not authorize README additions. Keep the README focused on the project
-  overview, installation, a quick start, and links. Put detailed usage,
-  implementation, release, and troubleshooting guidance in the owning `docs/`
-  page or skill reference instead.
+- Outside the bounded Recent news block, edit the root `readme.md` only when
+  the user explicitly requests README changes. General feature, documentation,
+  packaging, or release tasks do not authorize other README additions.
+- Agents may update text between `RECENT_NEWS_START` and `RECENT_NEWS_END`
+  for major implemented, user-facing changes, such as AI assistants or a new
+  data model. Keep this block at most **20 lines**, counting its heading, blank
+  lines, and wrapped bullet lines (excluding the marker comments). Use short
+  bullets with GitHub Pages links; describe development versus released status
+  accurately. Overwrite, replace, or remove older bullets to stay concise.
+  Do not accumulate a changelog or add routine fixes, test results, internal
+  implementation notes, or planned work. Keep the markers and line cap intact.
+- Keep the rest of the README focused on the project overview, installation,
+  a quick start, and links. Put detailed usage, implementation, release, and
+  troubleshooting guidance in the owning `docs/` page or skill reference.
 - Keep shared conventions and detailed contracts in the linked skills/references
   and owning documentation rather than copying them back into this file.
 

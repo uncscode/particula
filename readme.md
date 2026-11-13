@@ -6,6 +6,15 @@ A simple, fast, and powerful particle simulator for aerosol science.
 
 [Documentation](https://uncscode.github.io/particula/) | [Examples](https://uncscode.github.io/particula/examples/) | [PyPI](https://pypi.org/project/particula/)
 
+<!-- RECENT_NEWS_START -->
+## Recent news
+
+- **AI assistants:** added setup, simulation, analysis, and development skills
+  through [Particula Helper](https://uncscode.github.io/particula/guide/ai-assistants/).
+- **Native data storage:** the 0.3.0 development version uses particle, gas, and
+  environment containers. See the [migration guide](https://uncscode.github.io/particula/guide/migration/v0.3.0/).
+<!-- RECENT_NEWS_END -->
+
 ## Installation
 
 ```bash
