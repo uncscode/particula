@@ -98,23 +98,26 @@ def test_generated_drift_rejected(tmp_path, monkeypatch):
         builder.sync_or_check(catalog)
 
 
-def test_public_submission_contains_portable_listing_and_provenance(tmp_path):
-    """The public ZIP carries all skills, metadata and verifiable resources."""
+def test_github_packages_contain_metadata_and_provenance(tmp_path):
+    """GitHub distributions include only the supported host packages."""
     import hashlib
 
     manifest, _ = builder.validate()
-    output = tmp_path / "public"
+    output = tmp_path / "github"
     builder.build(output, manifest)
-    path = output / f"particula-helper-openai-{manifest['version']}.zip"
+    assert {path.name for path in output.iterdir()} == {
+        "particula-helper-codex.zip",
+        "particula-helper-claude.zip",
+        "particula-helper-opencode.zip",
+        "SHA256SUMS",
+        "GITHUB-RELEASE.md",
+    }
+    path = output / "particula-helper-codex.zip"
     with zipfile.ZipFile(path) as archive:
         portable = json.loads(archive.read("plugin.json"))
         extension = portable["extensions"]["com.openai"]
         assert extension["requires_local_executor"] is True
         assert extension["interface"]["developerName"] == "Particula Developers"
-        assert extension["publication"]["countries"] == []
-        assert extension["review"]["commerce"] is False
-        assert len(extension["review"]["prompts"]) >= 3
-        assert not any(name.startswith(".") for name in archive.namelist())
         provenance = json.loads(archive.read("BUILD.json"))
         assert provenance["plugin_version"] == portable["version"]
         for name, digest in provenance["sha256"].items():
@@ -124,52 +127,10 @@ def test_public_submission_contains_portable_listing_and_provenance(tmp_path):
         assert (
             hashlib.sha256((output / name).read_bytes()).hexdigest() == digest
         )
-    assert "not an approved" in (output / "OPENAI-SUBMISSION.md").read_text()
     github_notes = (output / "GITHUB-RELEASE.md").read_text()
     assert provenance["source_revision"] in github_notes
     assert manifest["version"] in github_notes
     assert "does not require OpenAI store verification" in github_notes
-
-
-@pytest.mark.parametrize(
-    "extra", [".app.json", "hooks/hooks.json", "mcp.json", "../escape"]
-)
-def test_public_upload_rejects_unsupported_components(tmp_path, extra):
-    """Local bindings, hooks, servers and escaping paths cannot reach upload."""
-    path = tmp_path / "bad.zip"
-    builder.write_zip(path, {**builder.canonical(), extra: b"{}"})
-    with pytest.raises(ValueError, match="Unsupported public archive entry"):
-        builder.check_public_archive(path)
-
-
-def test_public_upload_rejects_missing_skills_and_local_execution(tmp_path):
-    """A valid-looking ZIP must still preserve execution and skill contracts."""
-    files = builder.canonical()
-    path = tmp_path / "bad.zip"
-    manifest = json.loads(files["plugin.json"])
-    manifest["extensions"]["com.openai"]["requires_local_executor"] = False
-    builder.write_zip(
-        path, {**files, "plugin.json": builder.json_bytes(manifest)}
-    )
-    with pytest.raises(ValueError, match="requires local execution"):
-        builder.check_public_archive(path)
-    del files["skills/particula-run/SKILL.md"]
-    builder.write_zip(path, files)
-    with pytest.raises(ValueError, match="missing expected skills"):
-        builder.check_public_archive(path)
-
-
-@pytest.mark.parametrize("key", ["apps", "hooks", "mcpServers"])
-def test_public_upload_rejects_manifest_integrations(tmp_path, key):
-    """Bindings in the manifest cannot bypass the archive file checks."""
-    files = builder.canonical()
-    manifest = json.loads(files["plugin.json"])
-    manifest["extensions"]["com.openai"][key] = "./integration.json"
-    files["plugin.json"] = builder.json_bytes(manifest)
-    path = tmp_path / "bad.zip"
-    builder.write_zip(path, files)
-    with pytest.raises(ValueError, match=f"cannot declare {key}"):
-        builder.check_public_archive(path)
 
 
 @pytest.mark.parametrize(

@@ -168,28 +168,6 @@ Update the portable manifest's release notes, then run:
 Use a fresh output directory. Inspect `GITHUB-RELEASE.md` and verify the ZIP
 checksums before sharing a local build.
 
-### OpenAI directory preparation
-
-Plugin version 0.3.2 adds a separate portable upload candidate,
-`particula-helper-openai-0.3.2.zip` (the filename follows the plugin version),
-and `OPENAI-SUBMISSION.md` with source provenance and publication handoff steps.
-This skills-only package is marked for desktop execution. The requested
-publisher is **Particula Developers**, with all supported countries and no
-required payments or purchases. The publisher identity still needs verification
-in the intended OpenAI organization. Public directory approval and a clean
-installation in the target desktop app have not been established by packaging.
-
-Use a fresh output directory. The builder verifies the final public ZIP's
-skills, resource references and absence of private app bindings or lifecycle
-hooks. This is a local package check, not OpenAI's submission validator.
-Complete the listing and policy pages, verify the publisher identity, and test
-a clean desktop installation before following the
-[OpenAI submission process](https://developers.openai.com/plugins/deploy/submission).
-Upload updates to the existing public plugin, inspect the portal's scans,
-complete applicable attestations, submit for review and publish after approval.
-The workflow does not upload to OpenAI or publish the store listing, and needs
-no OpenAI secret. GitHub draft creation uses the repository's built-in token.
-
 ## Troubleshooting
 
 - **Import fails:** run the doctor with the same interpreter the simulation uses.
