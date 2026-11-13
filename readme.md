@@ -87,7 +87,7 @@ for ownership, validation and non-unit-volume inventory checks.
 | API reference | [API](https://uncscode.github.io/particula/api/) |
 | Upgrading to 0.3.0 | [Migration guide](https://uncscode.github.io/particula/guide/migration/v0.3.0/) |
 | AI assistants | [Particula Helper](https://uncscode.github.io/particula/guide/ai-assistants/) |
-| Contributing and code structure | [Contributor guide](https://uncscode.github.io/particula/contribute/CONTRIBUTING/), [architecture](https://uncscode.github.io/particula/contribute/architecture/) |
+| Contributing | [Contributor guide](https://uncscode.github.io/particula/contribute/CONTRIBUTING/) |
 
 ## Citation
 
