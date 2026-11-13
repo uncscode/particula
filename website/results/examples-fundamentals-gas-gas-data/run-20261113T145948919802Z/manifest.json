@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 3.3017101729637943,
+  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "input_sha256": {},
+  "example": "examples-fundamentals-gas-gas-data",
+  "fingerprint": "f2a0523edad190857f20dab9c476f59a67cee9fd01992add890fc211093ef334",
+  "source": "docs/examples/fundamentals/gas/gas_data.py",
+  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "package_dirty": false,
+  "executed_at": "2026-11-13T14:59:49.048849+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [],
+    [],
+    [
+      {
+        "text": "GasData(name=['Water'], molar_mass=array([0.01801528]), concentration=array([[1.e-07]]), partitioning=array([ True]))\nGasData(name=['butanol', 'styrene'], molar_mass=array([0.074121, 0.10415 ]), concentration=array([[2.e-06, 1.e-09]]), partitioning=array([ True,  True]))\n"
+      }
+    ],
+    [
+      {
+        "image": "figure-4-1.png"
+      }
+    ],
+    [
+      {
+        "image": "figure-5-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "020ed648d005aa3a11e9063d6894748438733341f47e7ecfe924e55507a53b40",
+    "figure-4-1.png": "f24ed593ceb6b6e3180365acef576b487983b716be3f712778d5affb551e792d",
+    "figure-5-1.png": "195bf4c272c3b708912e1b90acc94582abb9b6c6c57a2638056a42b951bfe990"
+  }
+}

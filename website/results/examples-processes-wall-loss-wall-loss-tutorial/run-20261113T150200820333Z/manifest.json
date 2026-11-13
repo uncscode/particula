@@ -1,0 +1,792 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 5.408200756995939,
+  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "input_sha256": {},
+  "example": "examples-processes-wall-loss-wall-loss-tutorial",
+  "fingerprint": "455e9df3ce537117cf4537b66a708a7de97589adefb9557eda66ce531b7a5e91",
+  "source": "docs/examples/processes/wall-loss/wall_loss_tutorial.py",
+  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "package_dirty": false,
+  "executed_at": "2026-11-13T15:02:00.857738+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [],
+    [
+      {
+        "text": "Initial bins: 150\nInitial total conc (1/m^3): 1.100e+10\n"
+      }
+    ],
+    [
+      {
+        "text": "Final conc (spherical): 1.061e+10 1/m^3\n"
+      }
+    ],
+    [
+      {
+        "image": "figure-4-1.png"
+      }
+    ],
+    [
+      {
+        "text": "Text(0.5, 1.0, 'Geometry comparison')"
+      },
+      {
+        "image": "figure-5-2.png"
+      }
+    ],
+    [
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 92.51it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 119.72it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 122.11it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 156.87it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 141.17it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 132.05it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 166.03it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 164.90it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 138.26it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 150.81it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 123.08it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 129.10it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 142.78it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 105.74it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 108.57it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 137.63it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 147.07it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 127.25it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 106.65it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 109.82it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 106.64it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 108.28it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 110.73it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 99.68it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 97.65it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 106.17it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 106.06it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 132.05it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 142.52it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 115.83it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 114.48it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 158.48it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 146.58it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 146.74it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 153.99it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 145.92it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 151.74it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 98.89it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 103.31it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 135.35it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 141.89it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 159.90it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 107.53it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 98.00it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 117.86it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 99.96it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 99.43it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 110.15it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 110.34it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 128.48it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 132.99it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 148.58it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 153.58it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 157.95it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 169.30it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 104.29it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 137.12it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 139.74it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 154.20it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 158.86it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "image": "figure-6-181.png"
+      }
+    ],
+    [
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 271.13it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 279.23it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 240.69it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 319.44it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 315.01it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 309.25it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 450.52it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 285.06it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 304.86it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 314.65it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 248.83it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 289.60it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 301.94it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 314.58it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 314.32it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 301.23it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 329.46it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 274.37it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 317.37it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 279.43it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "image": "figure-7-61.png"
+      }
+    ],
+    [
+      {
+        "text": "Assertions passed: parameter guards and non-negativity checks.\n"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "a3ea86e76755ecf6f027b3a2cf6e6a6881b64be8c8bd8518acda23969358717f",
+    "figure-4-1.png": "61864549664a9d9f0c197cf18cc67850acbab372ae97e7b1d01739d1114d78c6",
+    "figure-5-2.png": "013e51a6a1a79ba558bcb531e06f63de017a9f7f93d2f51003674ecd78ae57c0",
+    "figure-6-181.png": "e7bca1affd76ea14fc649e8cfcddb1c88f85c7f6f309d6d79924befa1eb3e6f0",
+    "figure-7-61.png": "b011ce220ca0c5eaa856c3674ee92051611fd8967d2483d5f9f03815c1da4473"
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 3.7616244640084915,
+  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "input_sha256": {},
+  "example": "theory-ionparticle-coagulation",
+  "fingerprint": "f5f9be330f436c33409434e30d23352227ede0fdea623c4191c14a6683de81b3",
+  "source": "docs/theory/dynamics/ionparticle-coagulation.py",
+  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "package_dirty": false,
+  "executed_at": "2026-11-13T14:59:39.019123+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [],
+    [],
+    [
+      {
+        "text": "particula/dynamics/coagulation/charged_dimensionless_kernel.py:203: RuntimeWarning: divide by zero encountered in divide\n  factored_term = (pi_sqrt * continuum * coulomb_potential_ratio * 1.22) / (\nparticula/dynamics/coagulation/charged_dimensionless_kernel.py:208: RuntimeWarning: invalid value encountered in multiply\n  term1 = continuum_limit * (1 - (1 + factored_term) * exponential_decay)\nparticula/dynamics/coagulation/charged_dimensionless_kernel.py:214: RuntimeWarning: divide by zero encountered in divide\n  + (\nparticula/dynamics/coagulation/charged_dimensionless_kernel.py:210: RuntimeWarning: invalid value encountered in multiply\n  np.sqrt(8 * np.pi)\nparticula/dynamics/coagulation/charged_dimensionless_kernel.py:313: RuntimeWarning: divide by zero encountered in log\n  diff_knudsen_log = np.log(diffusive_knudsen)\n"
+      },
+      {
+        "image": "figure-3-2.png"
+      }
+    ],
+    [
+      {
+        "image": "figure-4-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "e1495afbb5807de6af786d68061b76291b914b385c963f52f8bd5ca36465caf8",
+    "figure-3-2.png": "85ec9cb577dd579574548a36b61ce786af030a63900fd129c3829a3b646631ee",
+    "figure-4-1.png": "2d02483ec452ffd94dd9c6b1f9df3164e4297fc794f67346a134f9c8ad0adebb"
+  }
+}

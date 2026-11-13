@@ -31,8 +31,7 @@ permission:
   run_bun_test: allow
   run_validate_agent_references: allow
   run_linters: deny
-  build_mkdocs: deny
-  build_mkdocs_validate: allow
+  build_docs: allow
   get_datetime: allow
   get_version: allow
   webfetch: deny
@@ -71,17 +70,17 @@ Tasks:
 ```python
 task({
   "description": "Validate all documentation",
-  "prompt": f"Validate documentation quality and consistency.\n\nArguments: adw_id={adw_id}\n\nResolved worktree_path: {worktree_path}\n\nTasks:\n- Run strict MkDocs validation with build_mkdocs_validate\n- Check all markdown links\n- Validate formatting\n- Verify cross-references",
+  "prompt": f"Validate documentation quality and consistency.\n\nArguments: adw_id={adw_id}\n\nResolved worktree_path: {worktree_path}\n\nTasks:\n- Run Starlight validation with build_docs\n- Check all markdown links\n- Validate formatting\n- Verify cross-references",
   "subagent_type": "docs-validator"
 })
 ```
 
-## MkDocs Build Validation
+## Starlight Build Validation
 
-Use MkDocs validation to catch broken references and configuration errors without modifying
-the documentation. `build_mkdocs_validate` is the only permitted MkDocs path for this agent.
-It always invokes validation-only strict mode, so do not pass a `strict` option and do not call
-`build_mkdocs`, `build_mkdocs_build`, a test subagent, or a raw shell command as a fallback.
+Use Starlight validation to catch broken references and configuration errors without modifying
+the documentation. `build_docs` is the only permitted documentation build path for this agent.
+It builds disposable site outputs and verifies links without executing examples.
+Use `action="build"`; do not substitute a source-only check for full validation.
 
 ```python
 # Prefer the caller-supplied workflow-state-derived worktree_path. Only when it
@@ -91,9 +90,9 @@ worktree_path = adw_spec_read({
   "adw_id": "{adw_id}",
   "field": "worktree_path"
 })
-mkdocs_result = build_mkdocs_validate({
+docs_result = build_docs({
   "cwd": worktree_path,
-  "options": "output=summary"
+  "action": "build"
 })
 ```
 
@@ -101,7 +100,7 @@ Require a successful wrapper result before reporting successful documentation va
 An `ERROR:` response, failure outcome, timeout, unavailable wrapper, missing result, or stale
 result must produce `DOCS_VALIDATION_FAILED` and must not be represented as
 `DOCS_VALIDATION_COMPLETE`. Review successful output for broken cross-references, missing
-pages, or plugin errors and include the strict MkDocs result in the validation summary.
+pages, or plugin errors and include the Starlight result in the validation summary.
 
 ## TypeScript Wrapper Validation
 
@@ -179,10 +178,10 @@ worktree_path = adw_spec_read({
 
 Do not use a fieldless `read`: it returns the default `spec_content` field, not
 the complete workflow state. Scope every permitted tool call (`read`,
-`find_files`, `search_content`, `ripgrep_advanced`, `build_mkdocs_validate`,
+`find_files`, `search_content`, `ripgrep_advanced`, `build_docs`,
 `run_bun_test`, `run_validate_agent_references`) to that worktree context.
 Reject an absent, empty, `null`, error, or non-directory `worktree_path` before
-calling `build_mkdocs_validate`; do not fall back to the ambient working directory.
+calling `build_docs`; do not fall back to the ambient working directory.
 
 ## Step 2: Create Validation Checklist
 
@@ -315,7 +314,7 @@ Links checked: {total_count}
 - External links: {count} (format validated)
 
 Formatting: ✅ All files pass
-MkDocs strict validation: PASSED
+Starlight build validation: PASSED
 
 Validation: PASSED
 All documentation is valid and consistent.
@@ -374,7 +373,7 @@ DOCS_VALIDATION_FAILED: {reason}
 
 Error: {specific_error}
 File: {file_causing_error}
-MkDocs strict validation: FAILED or unavailable
+Starlight build validation: FAILED or unavailable
 
 Validation could not complete.
 ```
@@ -489,7 +488,7 @@ Validation: COMPLETED WITH WARNINGS
 - Anchor links valid
 - External link format correct
 - Markdown formatting proper
-- Strict MkDocs validation passes through `build_mkdocs_validate`
+- Starlight validation passes through `build_docs`
 
 **Does NOT:**
 - Auto-fix issues

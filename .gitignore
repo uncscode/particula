@@ -189,3 +189,6 @@ website/public/images/
 website/public/downloads/
 website/public/results/
 website/qa/
+
+# Downloadable documentation preview artifact
+website/preview/

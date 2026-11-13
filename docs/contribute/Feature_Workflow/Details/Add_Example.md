@@ -23,29 +23,35 @@ may come from documented concrete modules; keep those ownership boundaries
 explicit. Callers own transfers, synchronization and device selection. Optional
 CUDA skips do not establish capture, performance or cross-device equivalence.
 
-## Source and notebook workflow
+## Python source and saved results
 
-Create source files under `docs/examples/` in the owning topic. Standalone
-scripts are supported; notebook examples use paired `.py` percent-format and
-`.ipynb` files. Edit the Python source first:
+Create percent-cell Python under `docs/examples/` in the owning topic. Use
+`# %% [markdown]` cells for prose and equations and `# %%` for executable code.
+Python is the maintained source; do not create a paired notebook.
+
+Register the page in `website/examples.json`, including its entry point,
+CPU/CUDA requirement, timeout, and every helper or data input. Historical result
+viewers must declare their recorded input data rather than rerun benchmarks.
 
 ```bash
 ruff check docs/examples/path/example.py --fix
 ruff format docs/examples/path/example.py
-python .opencode/tools/validate_notebook.py docs/examples/path/example.ipynb --sync
-python .opencode/tools/run_notebook.py docs/examples/path/example.ipynb
+.venv/bin/python scripts/docs_examples.py refresh EXAMPLE_KEY
+npm --prefix website run build
 ```
 
-Execute the standalone source too, inspect plots and retained notebook outputs,
-and commit both files. Pure prose/formatting synchronization may retain prior
-outputs only after verifying every code cell has the same AST. A changed
-calculation requires execution of the complete published workload. Bounded test
-fixtures supplement that execution; they do not replace it.
+Refresh executes the complete workload and saves figures, tables, text,
+executed source and provenance under `website/results/`. Inspect those outputs
+and commit the Python source and successful result bundle together. Failed runs
+preserve prior results and block acceptance. Do not reduce scientific parameters
+or substitute CPU execution for a required CUDA run.
 
-Add a topic-index link. Relative notebook links render in the full publication
-build. Python files are excluded from the site, so link their repository source
-when a reader needs the standalone entrypoint. `mkdocs-full.yml` renders saved
-notebook outputs and generates API pages; the faster base build does neither.
+Add a topic-index link and navigation entry in `website/navigation.json`.
+Generated pages show results with collapsed code and a Python download.
+Documentation builds render saved bundles without executing simulations.
+CI validates all bundles and executes changed ordinary CPU examples without
+rewriting published results. CUDA and long-running changes require an explicit
+local refresh; hosted CPU skips do not establish successful GPU execution.
 
 ## Validation and evidence
 
@@ -58,11 +64,11 @@ qualification. Never relax tolerances to hide a migration discrepancy.
 
 Run the explicit example and infrastructure suites as well as package tests;
 default pytest collection covers only `particula`. Follow the repository's
-coverage and lint gates. For a migration, record every source, notebook,
+coverage and lint gates. For a migration, record every source, result bundle,
 public snippet and historical exception with literal dated execution evidence.
 Historical API sketches must be labeled before a nonexecutable text fence.
 Do not introduce historical facade APIs into supported examples.
 
 Before creating a file, follow the [documentation placement rules](../../documentation.md):
 extend an existing example when the learning objective is the same, otherwise
-choose its owning topic and index. Keep Python/notebook stems in snake_case.
+choose its owning topic and index. Keep Python stems in snake_case.

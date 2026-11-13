@@ -132,7 +132,7 @@ pytest particula/execution/tests/captured_full_loop_test.py -q --no-cov
 pytest particula/execution/tests/captured_full_loop_test.py -q \
   -m "warp and cuda" --no-cov
 .opencode/tools/run_pytest.py
-mkdocs build --strict
+npm --prefix website run build
 ```
 
 Relevant repository sources are

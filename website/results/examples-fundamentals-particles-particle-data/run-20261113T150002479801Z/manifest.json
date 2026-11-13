@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 3.5512105980305932,
+  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "input_sha256": {},
+  "example": "examples-fundamentals-particles-particle-data",
+  "fingerprint": "9528645a4cc7827582d20c7d772471d2d1f9971017d860624dcca5bc817f97a2",
+  "source": "docs/examples/fundamentals/particles/particle_data.py",
+  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "package_dirty": false,
+  "executed_at": "2026-11-13T15:00:02.608510+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [],
+    [
+      {
+        "text": "Per-particle mass [kg]: [[1.04719755e-17 8.37758041e-17 2.82743339e-16]]\nRadius [m]: [[1.e-07 2.e-07 3.e-07]]\nMaterial mass density [kg/m^3]: [[2.91225639e-06]]\n"
+      }
+    ],
+    [
+      {
+        "text": "Material mass density [kg/m^3]: [[0.0001296  0.00012898 0.00013249]]\n"
+      }
+    ],
+    [
+      {
+        "image": "figure-4-1.png"
+      },
+      {
+        "image": "figure-4-2.png"
+      }
+    ],
+    [
+      {
+        "image": "figure-5-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "952054b6075fab5294c626454e8c2db3e394f8059bf699d14c208fac1aaa7489",
+    "figure-4-1.png": "b957022e9e94ea13a7899d975425395acf7d20eddacbe43238a8a5c610f40783",
+    "figure-4-2.png": "12a6a847d1b3e7b9e95c27a13d77594bcd7cd0a85ec67690b08851574d7a576a",
+    "figure-5-1.png": "afd6187a2aea7630c830e6acddcc501ba25b9a0e5b6f2a70be547d2f806696f3"
+  }
+}

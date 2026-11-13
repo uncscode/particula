@@ -129,8 +129,10 @@ def test_policy_skips_cuda_without_invoking_runner(monkeypatch, capsys):
     monkeypatch.setattr(
         examples, "registry", lambda: {"gpu": {"policy": "cuda"}}
     )
-    monkeypatch.setattr(examples, "fingerprint", lambda _: "hash")
-    monkeypatch.setattr(examples, "bundle", lambda _: (None, None))
+    monkeypatch.setattr(examples, "fingerprint", lambda *args: "hash")
+    monkeypatch.setattr(
+        examples, "bundle", lambda _: (None, {"fingerprint": "hash"})
+    )
     monkeypatch.setattr(
         examples,
         "execute",
@@ -139,3 +141,29 @@ def test_policy_skips_cuda_without_invoking_runner(monkeypatch, capsys):
     monkeypatch.setattr(sys, "argv", ["docs_examples", "check"])
     examples.main()
     assert "SKIP gpu" in capsys.readouterr().out
+
+
+def test_output_redaction_preserves_scientific_warning_details(tmp_path):
+    """Checkout/account paths disappear but warnings retain location and text."""
+    value = [
+        {
+            "text": (
+                f"{tmp_path}/particula/kernel.py:203: RuntimeWarning: divide by zero\n"
+                "/home/alice/.cache/warp/module.py\n"
+                "/Users/bob/project/data.csv\n"
+                "C:\\Users\\charlie\\AppData\\cache\n"
+                "/tmp/particula-example-abcd/data.csv\n"  # noqa: S108 -- test text
+                "Mass balance: 1.0"
+            )
+        }
+    ]
+    result = examples.sanitize_execution_output(value, tmp_path)
+    text = result[0]["text"]
+    assert "particula/kernel.py:203: RuntimeWarning: divide by zero" in text
+    assert "~/.cache/warp/module.py" in text
+    assert "~/project/data.csv" in text
+    assert "~\\AppData\\cache" in text
+    assert "<execution-temp>/data.csv" in text
+    assert "Mass balance: 1.0" in text
+    assert all(name not in text for name in ("alice", "bob", "charlie"))
+    assert result != value

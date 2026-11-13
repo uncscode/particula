@@ -57,6 +57,6 @@ Add every new page to navigation or its owning index. For moves, update callers
 and meaningful fragment redirects in `docs/.assets/relocations.json`; retire
 obsolete originals under the documented root `.trash` policy.
 
-Run `python scripts/check_docs_structure.py` and both strict MkDocs builds.
+Run `python scripts/check_docs_structure.py` and the complete Starlight build (`npm --prefix website run build`).
 Do not change scientific assertions, tolerances, or qualification status merely
 to make documentation validation pass.

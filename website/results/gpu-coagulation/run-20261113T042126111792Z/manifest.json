@@ -21,7 +21,7 @@
     [],
     [
       {
-        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     /home/kyle/.cache/warp/1.11.1\nModule particula.gpu.kernels.environment e11375e load on device 'cuda:0' took 1.75 ms  (cached)\n"
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\nModule particula.gpu.kernels.environment e11375e load on device 'cuda:0' took 1.75 ms  (cached)\n"
       },
       {
         "text": "Module particula.gpu.kernels.coagulation 9ee9d75 load on device 'cuda:0' took 433.05 ms  (compiled)\nModule particula.gpu.kernels._coagulation_native f93a244 load on device 'cuda:0' took 2.04 ms  (cached)\n"

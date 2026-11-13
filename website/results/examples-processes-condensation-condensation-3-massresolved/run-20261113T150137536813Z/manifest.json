@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 37.8628029699903,
+  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "input_sha256": {},
+  "example": "examples-processes-condensation-condensation-3-massresolved",
+  "fingerprint": "31845307626ca8adf77655bb217dac65a9bbfa903faeb724c6e05d8ce8d9fbda",
+  "source": "docs/examples/processes/condensation/condensation_3_massresolved.py",
+  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "package_dirty": false,
+  "executed_at": "2026-11-13T15:01:37.672662+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [],
+    [],
+    [
+      {
+        "text": "ParticleData(masses=array([[[0.00000000e+00, 1.09610890e-17],\n        [0.00000000e+00, 1.23441527e-17],\n        [0.00000000e+00, 6.16625122e-18],\n        ...,\n        [0.00000000e+00, 2.51160058e-16],\n        [0.00000000e+00, 3.08530181e-17],\n        [0.00000000e+00, 1.86701325e-16]]], shape=(1, 10000, 2)), concentration=array([[1., 1., 1., ..., 1., 1., 1.]], shape=(1, 10000)), charge=array([[0., 0., 0., ..., 0., 0., 0.]], shape=(1, 10000)), density=array([1000., 1770.]), volume=array([1.e-06]), distribution_type='particle_resolved', radius_grid=None)\nGasData(name=['H2O', 'NH4HSO4'], molar_mass=array([0.018015, 0.13214 ]), concentration=array([[2.360191e-02, 1.000000e-30]]), partitioning=array([ True,  True]))\nEnvironmentData(temperature=array([298.15]), pressure=array([101325.]), saturation_ratio=array([[1.025, 0.   ]]))\n"
+      }
+    ],
+    [
+      {
+        "text": "Total iterations to do: 10000\n"
+      }
+    ],
+    [
+      {
+        "text": "ParticleData(masses=array([[[1.46138086e-15, 1.09610890e-17],\n        [1.69264383e-15, 1.23441527e-17],\n        [7.10570981e-16, 6.16625122e-18],\n        ...,\n        [6.78233789e-14, 2.51160058e-16],\n        [5.14965328e-15, 3.08530181e-17],\n        [4.88385892e-14, 1.86701325e-16]]], shape=(1, 10000, 2)), concentration=array([[1., 1., 1., ..., 1., 1., 1.]], shape=(1, 10000)), charge=array([[0., 0., 0., ..., 0., 0., 0.]], shape=(1, 10000)), density=array([1000., 1770.]), volume=array([1.e-06]), distribution_type='particle_resolved', radius_grid=None)\nGasData(name=['H2O', 'NH4HSO4'], molar_mass=array([0.018015, 0.13214 ]), concentration=array([[2.30009156e-02, 1.00000000e-30]]), partitioning=array([ True,  True]))\nEnvironmentData(temperature=array([298.15]), pressure=array([101325.]), saturation_ratio=array([[1.025, 0.   ]]))\n"
+      }
+    ],
+    [
+      {
+        "image": "figure-6-1.png"
+      }
+    ],
+    [
+      {
+        "image": "figure-7-1.png"
+      }
+    ],
+    [
+      {
+        "image": "figure-8-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "7ef7c136d5aed2fd86f0331d1c524f6de005322bf9e01638e00c1301648191f5",
+    "figure-6-1.png": "9fc5fbc839b35c8e389ee0760435f2c1fe1eb4a5ffb978e182de850555535324",
+    "figure-7-1.png": "f22e6c41d307703fcae8d8906a9d3b1e69546a69d42786d7342d05f810db3e41",
+    "figure-8-1.png": "cdfd69c05339a66ca362ddc04c2d03171ffda5983d8b38a36a2515c0e42e1487"
+  }
+}

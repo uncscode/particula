@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 30.982149382005446,
+  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "input_sha256": {},
+  "example": "examples-processes-wall-loss-spherical-wall-loss-strategy",
+  "fingerprint": "f6bf4bb3328960ea6700b741f59f894dba0ca11c9349fd52ef6927e6b223295e",
+  "source": "docs/examples/processes/wall-loss/spherical_wall_loss_strategy.py",
+  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "package_dirty": false,
+  "executed_at": "2026-11-13T15:02:15.761014+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [],
+    [
+      {
+        "text": "Radius shape: (250,)\nConcentration shape: (250,)\nTotal concentration (initial): 1.100e+10 1/m^3\n"
+      }
+    ],
+    [
+      {
+        "text": "Rate array shape: (250,)\nExample rate[0]: -2.2766844125094575e-88\n"
+      }
+    ],
+    [
+      {
+        "text": "Internal substeps per output interval: 2\n"
+      },
+      {
+        "text": "Total concentration (final): 1.009e+10 1/m^3\n"
+      }
+    ],
+    [
+      {
+        "image": "figure-5-1.png"
+      }
+    ],
+    [
+      {
+        "image": "figure-6-1.png"
+      }
+    ],
+    []
+  ],
+  "files": {
+    "source.py": "60f2a6c5dc99da5203df7f8b884a3cf38a503be56d46ed4f4502e9ebb2a900b0",
+    "figure-5-1.png": "73a780025ffc5d82a2fe5a6bf85075a0517b414554ab0b98362a670d496458e8",
+    "figure-6-1.png": "e24535350fcf493881f93621351612cfe8970b83d16e5d46086cb4aa22fc5db0"
+  }
+}

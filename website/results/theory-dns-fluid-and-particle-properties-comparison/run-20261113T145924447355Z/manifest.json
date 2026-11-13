@@ -1,0 +1,108 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 3.598040557000786,
+  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "input_sha256": {},
+  "example": "theory-dns-fluid-and-particle-properties-comparison",
+  "fingerprint": "81437029c2c06834d054e9e5b92b0306532431094ccd1fbb98ee23408182ad4f",
+  "source": "docs/theory/dynamics/cloud-droplet-coagulation/dns-fluid-and-particle-properties-comparison.py",
+  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "package_dirty": false,
+  "executed_at": "2026-11-13T14:59:24.476901+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [
+      {
+        "image": "figure-9-1.png"
+      }
+    ],
+    [
+      {
+        "text": "Paper Values From Table 2\n"
+      },
+      {
+        "html": "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>Radius (\u00b5m)</th>\n      <th>t_p (s)</th>\n      <th>Settling Velocity (cm/s)</th>\n      <th>Re_p</th>\n      <th>f(Re_p)</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>10.0</td>\n      <td>0.0013</td>\n      <td>1.286443</td>\n      <td>0.015</td>\n      <td>1.008</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>20.0</td>\n      <td>0.0052</td>\n      <td>4.974247</td>\n      <td>0.116</td>\n      <td>1.034</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>30.0</td>\n      <td>0.0118</td>\n      <td>10.806122</td>\n      <td>0.378</td>\n      <td>1.077</td>\n    </tr>\n    <tr>\n      <th>3</th>\n      <td>40.0</td>\n      <td>0.0209</td>\n      <td>18.246052</td>\n      <td>0.851</td>\n      <td>1.134</td>\n    </tr>\n    <tr>\n      <th>4</th>\n      <td>50.0</td>\n      <td>0.0327</td>\n      <td>26.860932</td>\n      <td>1.566</td>\n      <td>1.204</td>\n    </tr>\n    <tr>\n      <th>5</th>\n      <td>60.0</td>\n      <td>0.0471</td>\n      <td>36.263402</td>\n      <td>2.537</td>\n      <td>1.284</td>\n    </tr>\n  </tbody>\n</table>\n</div>"
+      },
+      {
+        "text": "Particula Computed Values\n"
+      },
+      {
+        "html": "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>Radius (\u00b5m)</th>\n      <th>t_p (s)</th>\n      <th>Settling Velocity (cm/s)</th>\n      <th>Re_p</th>\n      <th>f(Re_p)</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>10.0</td>\n      <td>0.001296</td>\n      <td>1.269408</td>\n      <td>0.014910</td>\n      <td>1.008342</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>20.0</td>\n      <td>0.005182</td>\n      <td>4.930276</td>\n      <td>0.118395</td>\n      <td>1.034632</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>30.0</td>\n      <td>0.011660</td>\n      <td>10.615204</td>\n      <td>0.399585</td>\n      <td>1.079872</td>\n    </tr>\n    <tr>\n      <th>3</th>\n      <td>40.0</td>\n      <td>0.020729</td>\n      <td>17.794648</td>\n      <td>0.947163</td>\n      <td>1.144509</td>\n    </tr>\n    <tr>\n      <th>4</th>\n      <td>50.0</td>\n      <td>0.032389</td>\n      <td>26.470099</td>\n      <td>1.539373</td>\n      <td>1.201742</td>\n    </tr>\n    <tr>\n      <th>5</th>\n      <td>60.0</td>\n      <td>0.046640</td>\n      <td>35.746128</td>\n      <td>2.495207</td>\n      <td>1.281128</td>\n    </tr>\n  </tbody>\n</table>\n</div>"
+      },
+      {
+        "text": "Percent Errors for Re_p, t_p, and Settling Velocity\n"
+      },
+      {
+        "html": "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>Radius (\u00b5m)</th>\n      <th>Percent Error in t_p (%)</th>\n      <th>Percent Error in Settling Velocity (%)</th>\n      <th>Percent Error in Re_p (%)</th>\n      <th>Percent Error in f(Re_p) (%)</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>10.0</td>\n      <td>-0.341394</td>\n      <td>-1.324191</td>\n      <td>-0.600546</td>\n      <td>0.033926</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>20.0</td>\n      <td>-0.341394</td>\n      <td>-0.883963</td>\n      <td>2.064960</td>\n      <td>0.061080</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>30.0</td>\n      <td>-1.185958</td>\n      <td>-1.766755</td>\n      <td>5.710198</td>\n      <td>0.266699</td>\n    </tr>\n    <tr>\n      <th>3</th>\n      <td>40.0</td>\n      <td>-0.818229</td>\n      <td>-2.473979</td>\n      <td>11.300040</td>\n      <td>0.926727</td>\n    </tr>\n    <tr>\n      <th>4</th>\n      <td>50.0</td>\n      <td>-0.950927</td>\n      <td>-1.455025</td>\n      <td>-1.700333</td>\n      <td>-0.187536</td>\n    </tr>\n    <tr>\n      <th>5</th>\n      <td>60.0</td>\n      <td>-0.976162</td>\n      <td>-1.426436</td>\n      <td>-1.647344</td>\n      <td>-0.223708</td>\n    </tr>\n  </tbody>\n</table>\n</div>"
+      }
+    ],
+    [],
+    [
+      {
+        "image": "figure-12-1.png"
+      }
+    ],
+    [
+      {
+        "text": "Paper Values From Table 3 (Stokes Numbers)\n"
+      },
+      {
+        "html": "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>Radius (\u00b5m)</th>\n      <th>St (10 cm^2/s^3)</th>\n      <th>St (100 cm^2/s^3)</th>\n      <th>St (400 cm^2/s^3)</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>10.0</td>\n      <td>0.010</td>\n      <td>0.032</td>\n      <td>0.063</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>20.0</td>\n      <td>0.040</td>\n      <td>0.127</td>\n      <td>0.253</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>30.0</td>\n      <td>0.090</td>\n      <td>0.285</td>\n      <td>0.570</td>\n    </tr>\n    <tr>\n      <th>3</th>\n      <td>40.0</td>\n      <td>0.160</td>\n      <td>0.507</td>\n      <td>1.014</td>\n    </tr>\n    <tr>\n      <th>4</th>\n      <td>50.0</td>\n      <td>0.250</td>\n      <td>0.792</td>\n      <td>1.585</td>\n    </tr>\n    <tr>\n      <th>5</th>\n      <td>60.0</td>\n      <td>0.361</td>\n      <td>1.141</td>\n      <td>2.282</td>\n    </tr>\n  </tbody>\n</table>\n</div>"
+      },
+      {
+        "text": "Particula Computed Stokes Numbers\n"
+      },
+      {
+        "html": "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>Radius (\u00b5m)</th>\n      <th>St (10 cm^2/s^3)</th>\n      <th>St (100 cm^2/s^3)</th>\n      <th>St (400 cm^2/s^3)</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>10.0</td>\n      <td>0.009892</td>\n      <td>0.031282</td>\n      <td>0.062564</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>20.0</td>\n      <td>0.039569</td>\n      <td>0.125128</td>\n      <td>0.250255</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>30.0</td>\n      <td>0.089030</td>\n      <td>0.281537</td>\n      <td>0.563075</td>\n    </tr>\n    <tr>\n      <th>3</th>\n      <td>40.0</td>\n      <td>0.158275</td>\n      <td>0.500511</td>\n      <td>1.001022</td>\n    </tr>\n    <tr>\n      <th>4</th>\n      <td>50.0</td>\n      <td>0.247305</td>\n      <td>0.782048</td>\n      <td>1.564096</td>\n    </tr>\n    <tr>\n      <th>5</th>\n      <td>60.0</td>\n      <td>0.356120</td>\n      <td>1.126149</td>\n      <td>2.252299</td>\n    </tr>\n  </tbody>\n</table>\n</div>"
+      },
+      {
+        "text": "Percent Errors for Stokes Numbers\n"
+      },
+      {
+        "html": "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>Radius (\u00b5m)</th>\n      <th>Percent Error in St (10 cm^2/s^3)</th>\n      <th>Percent Error in St (100 cm^2/s^3)</th>\n      <th>Percent Error in St (400 cm^2/s^3)</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>10.0</td>\n      <td>-1.077861</td>\n      <td>-2.243978</td>\n      <td>-0.692295</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>20.0</td>\n      <td>-1.077861</td>\n      <td>-1.474246</td>\n      <td>-1.084816</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>30.0</td>\n      <td>-1.077861</td>\n      <td>-1.214967</td>\n      <td>-1.214967</td>\n    </tr>\n    <tr>\n      <th>3</th>\n      <td>40.0</td>\n      <td>-1.077861</td>\n      <td>-1.279915</td>\n      <td>-1.279915</td>\n    </tr>\n    <tr>\n      <th>4</th>\n      <td>50.0</td>\n      <td>-1.077861</td>\n      <td>-1.256544</td>\n      <td>-1.318842</td>\n    </tr>\n    <tr>\n      <th>5</th>\n      <td>60.0</td>\n      <td>-1.351884</td>\n      <td>-1.301545</td>\n      <td>-1.301545</td>\n    </tr>\n  </tbody>\n</table>\n</div>"
+      },
+      {
+        "text": "Paper Values From Table 3 (Stokes Velocities)\n"
+      },
+      {
+        "html": "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>Radius (\u00b5m)</th>\n      <th>Stokes Velocity (10 cm^2/s^3)</th>\n      <th>Stokes Velocity (100 cm^2/s^3)</th>\n      <th>Stokes Velocity (400 cm^2/s^3)</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>10.0</td>\n      <td>1.113</td>\n      <td>0.626</td>\n      <td>0.442</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>20.0</td>\n      <td>4.343</td>\n      <td>2.442</td>\n      <td>1.727</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>30.0</td>\n      <td>9.385</td>\n      <td>5.278</td>\n      <td>3.732</td>\n    </tr>\n    <tr>\n      <th>3</th>\n      <td>40.0</td>\n      <td>15.841</td>\n      <td>8.908</td>\n      <td>6.299</td>\n    </tr>\n    <tr>\n      <th>4</th>\n      <td>50.0</td>\n      <td>23.316</td>\n      <td>13.111</td>\n      <td>9.271</td>\n    </tr>\n    <tr>\n      <th>5</th>\n      <td>60.0</td>\n      <td>31.478</td>\n      <td>17.701</td>\n      <td>12.516</td>\n    </tr>\n  </tbody>\n</table>\n</div>"
+      },
+      {
+        "text": "Particula Computed Stokes Velocities\n"
+      },
+      {
+        "html": "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>Radius (\u00b5m)</th>\n      <th>Stokes Velocity (10 cm^2/s^3)</th>\n      <th>Stokes Velocity (100 cm^2/s^3)</th>\n      <th>Stokes Velocity (400 cm^2/s^3)</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>10.0</td>\n      <td>1.109223</td>\n      <td>0.623762</td>\n      <td>0.441066</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>20.0</td>\n      <td>4.308131</td>\n      <td>2.422640</td>\n      <td>1.713065</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>30.0</td>\n      <td>9.275686</td>\n      <td>5.216101</td>\n      <td>3.688341</td>\n    </tr>\n    <tr>\n      <th>3</th>\n      <td>40.0</td>\n      <td>15.549165</td>\n      <td>8.743938</td>\n      <td>6.182898</td>\n    </tr>\n    <tr>\n      <th>4</th>\n      <td>50.0</td>\n      <td>23.129872</td>\n      <td>13.006883</td>\n      <td>9.197255</td>\n    </tr>\n    <tr>\n      <th>5</th>\n      <td>60.0</td>\n      <td>31.235372</td>\n      <td>17.564940</td>\n      <td>12.420288</td>\n    </tr>\n  </tbody>\n</table>\n</div>"
+      },
+      {
+        "text": "Percent Errors for Stokes Velocities\n"
+      },
+      {
+        "html": "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>Radius (\u00b5m)</th>\n      <th>Percent Error in Sv (10 cm^2/s^3)</th>\n      <th>Percent Error in Sv (100 cm^2/s^3)</th>\n      <th>Percent Error in Sv (400 cm^2/s^3)</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>10.0</td>\n      <td>-0.339333</td>\n      <td>-0.357498</td>\n      <td>-0.211226</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>20.0</td>\n      <td>-0.802873</td>\n      <td>-0.792784</td>\n      <td>-0.806872</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>30.0</td>\n      <td>-1.164775</td>\n      <td>-1.172765</td>\n      <td>-1.169862</td>\n    </tr>\n    <tr>\n      <th>3</th>\n      <td>40.0</td>\n      <td>-1.842276</td>\n      <td>-1.841737</td>\n      <td>-1.843183</td>\n    </tr>\n    <tr>\n      <th>4</th>\n      <td>50.0</td>\n      <td>-0.798283</td>\n      <td>-0.794119</td>\n      <td>-0.795435</td>\n    </tr>\n    <tr>\n      <th>5</th>\n      <td>60.0</td>\n      <td>-0.770787</td>\n      <td>-0.768656</td>\n      <td>-0.764714</td>\n    </tr>\n  </tbody>\n</table>\n</div>"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "b5893cea61411ed6ac65d6e8a4375079f6f3381581cb273d5f6e42b134f33aa7",
+    "figure-9-1.png": "c01d4dfdf10341589b59e4e2cb0110ec175af61f7b5dabb0ef3c1bf4168be1d8",
+    "figure-12-1.png": "d61e242663f4ee44caf4f6a3253274e25142c05440ff2c0318733ef11f687f03"
+  }
+}

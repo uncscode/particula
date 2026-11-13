@@ -426,176 +426,31 @@
       "nearest_test_path": ".opencode/tools/__tests__/auto_mode_manifest.test.ts"
     },
     {
-      "wrapper_path": ".opencode/tools/build_mkdocs_build.ts",
-      "companion_doc_path": ".opencode/tools/build_mkdocs_build.md",
-      "wrapper_kind": "split",
+      "wrapper_path": ".opencode/tools/build_docs.ts",
+      "companion_doc_path": ".opencode/tools/build_docs.md",
+      "wrapper_kind": "unsplit",
       "status": "ok",
       "current_shape": "direct_args_object",
       "counted_fields": [
-        "timeout",
         "cwd",
-        "configFile"
+        "action"
       ],
-      "exempt_fields": [
-        "options"
-      ],
-      "current_count": 3,
+      "exempt_fields": [],
+      "current_count": 2,
       "diagnostic": null,
       "classification": "already-compliant",
       "target_shape": "direct_args_object",
-      "target_count": 3,
+      "target_count": 2,
       "owner_plan": null,
-      "nearest_test_path": ".opencode/tools/__tests__/build_mkdocs.test.ts",
+      "nearest_test_path": ".opencode/tools/__tests__/build_docs.test.ts",
       "field_role_audit": [
         {
-          "field": "outputMode",
-          "role": "bounded-option-candidate"
-        },
-        {
-          "field": "timeout",
-          "role": "explicit-exception",
-          "notes": "Validation guard retained direct for mkdocs wrapper execution."
-        },
-        {
           "field": "cwd",
-          "role": "safety-field",
-          "notes": "Repository-root-confined docs build root."
+          "role": "safety-field"
         },
         {
-          "field": "strict",
-          "role": "bounded-option-candidate"
-        },
-        {
-          "field": "clean",
-          "role": "bounded-option-candidate"
-        },
-        {
-          "field": "configFile",
-          "role": "safety-field",
-          "notes": "Repository-root-confined mkdocs config path."
-        },
-        {
-          "field": "options",
-          "role": "explicit-exception",
-          "notes": "Bounded token carrier for output/strict/clean toggles."
-        }
-      ]
-    },
-    {
-      "wrapper_path": ".opencode/tools/build_mkdocs_validate.ts",
-      "companion_doc_path": ".opencode/tools/build_mkdocs_validate.md",
-      "wrapper_kind": "split",
-      "status": "ok",
-      "current_shape": "direct_args_object",
-      "counted_fields": [
-        "timeout",
-        "cwd",
-        "configFile"
-      ],
-      "exempt_fields": [
-        "options"
-      ],
-      "current_count": 3,
-      "diagnostic": null,
-      "classification": "already-compliant",
-      "target_shape": "direct_args_object",
-      "target_count": 3,
-      "owner_plan": null,
-      "nearest_test_path": ".opencode/tools/__tests__/build_mkdocs.test.ts",
-      "field_role_audit": [
-        {
-          "field": "outputMode",
-          "role": "bounded-option-candidate"
-        },
-        {
-          "field": "timeout",
-          "role": "explicit-exception",
-          "notes": "Validation guard retained direct for mkdocs wrapper execution."
-        },
-        {
-          "field": "cwd",
-          "role": "safety-field",
-          "notes": "Repository-root-confined docs validation root."
-        },
-        {
-          "field": "strict",
-          "role": "bounded-option-candidate"
-        },
-        {
-          "field": "clean",
-          "role": "bounded-option-candidate"
-        },
-        {
-          "field": "configFile",
-          "role": "safety-field",
-          "notes": "Repository-root-confined mkdocs config path."
-        },
-        {
-          "field": "options",
-          "role": "explicit-exception",
-          "notes": "Bounded token carrier for output/strict/clean toggles."
-        }
-      ]
-    },
-    {
-      "wrapper_path": ".opencode/tools/build_mkdocs.ts",
-      "companion_doc_path": ".opencode/tools/build_mkdocs.md",
-      "wrapper_kind": "compatibility",
-      "status": "ok",
-      "current_shape": "direct_args_object",
-      "counted_fields": [
-        "timeout",
-        "cwd",
-        "configFile",
-        "validateOnly"
-      ],
-      "exempt_fields": [
-        "options"
-      ],
-      "current_count": 4,
-      "diagnostic": null,
-      "classification": "already-compliant",
-      "target_shape": "direct_args_object",
-      "target_count": 4,
-      "owner_plan": null,
-      "nearest_test_path": ".opencode/tools/__tests__/build_mkdocs.test.ts",
-      "field_role_audit": [
-        {
-          "field": "outputMode",
-          "role": "bounded-option-candidate"
-        },
-        {
-          "field": "timeout",
-          "role": "explicit-exception",
-          "notes": "Validation guard retained direct for mkdocs wrapper execution."
-        },
-        {
-          "field": "cwd",
-          "role": "safety-field",
-          "notes": "Repository-root-confined docs build root."
-        },
-        {
-          "field": "strict",
-          "role": "bounded-option-candidate"
-        },
-        {
-          "field": "clean",
-          "role": "bounded-option-candidate"
-        },
-        {
-          "field": "configFile",
-          "role": "safety-field",
-          "notes": "Repository-root-confined mkdocs config path."
-        },
-        {
-          "field": "validateOnly",
-          "role": "explicit-exception",
-          "notes": "Compatibility-only mode selector bridging validate-only and artifact-producing split wrappers."
-        },
-        {
-          "field": "options",
-          "role": "explicit-exception",
-          "notes": "Bounded token carrier for output/strict/clean toggles."
+          "field": "action",
+          "role": "command-selector"
         }
       ]
     },
@@ -1988,7 +1843,7 @@
         }
       ],
       "audit_notes": [
-        "P3 follow-up covers run_ctest, run_cmake*, run_linters, run_validate_agent_references, build_mkdocs*, and clear_build* schema-budget migration work; E27-M9 records the baseline only."
+        "P3 follow-up covers run_ctest, run_cmake*, run_linters, run_validate_agent_references, and clear_build* schema-budget migration work; E27-M9 records the baseline only."
       ]
     },
     {

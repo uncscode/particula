@@ -1,0 +1,393 @@
+{
+  "stage": "final-archive-and-clean-checkout-validation",
+  "complete": false,
+  "verified_conversion": "Combined executable AST and every Markdown cell match each original notebook.",
+  "fresh_runs": [
+    {
+      "example": "theory-dns-fluid-and-particle-properties-comparison",
+      "exit_code": 0,
+      "seconds": 4.08,
+      "log": "theory-dns-fluid-and-particle-properties-comparison.log"
+    },
+    {
+      "example": "theory-dns-horizontal-velocity-comparison",
+      "exit_code": 0,
+      "seconds": 3.9,
+      "log": "theory-dns-horizontal-velocity-comparison.log"
+    },
+    {
+      "example": "theory-dns-kernel-comparison",
+      "exit_code": 0,
+      "seconds": 3.72,
+      "log": "theory-dns-kernel-comparison.log"
+    },
+    {
+      "example": "theory-dns-radial-distribution-comparison",
+      "exit_code": 0,
+      "seconds": 3.82,
+      "log": "theory-dns-radial-distribution-comparison.log"
+    },
+    {
+      "example": "theory-dns-radial-relative-velocity-comparison",
+      "exit_code": 0,
+      "seconds": 3.73,
+      "log": "theory-dns-radial-relative-velocity-comparison.log"
+    },
+    {
+      "example": "theory-ionparticle-coagulation",
+      "exit_code": 0,
+      "seconds": 3.94,
+      "log": "theory-ionparticle-coagulation.log"
+    },
+    {
+      "example": "theory-mean-free-path",
+      "exit_code": 0,
+      "seconds": 3.54,
+      "log": "theory-mean-free-path.log"
+    },
+    {
+      "example": "theory-dynamic-viscosity",
+      "exit_code": 0
+    }
+  ],
+  "remaining": [
+    "Complete example registry and refresh all other runnable sources, including CUDA and long runs",
+    "Complete narrative rendering, navigation and structured Markdown conversion",
+    "Preserve and verify all routes, assets and fragment mappings",
+    "Replace CI, publishing and contributor tooling",
+    "Archive replaced MkDocs/notebook sources after acceptance",
+    "Clean-checkout validation, browser review and migration PR"
+  ],
+  "registered_examples": 67,
+  "latest_completed_runs": [
+    {
+      "example": "condensation",
+      "exit_code": 0,
+      "elapsed_seconds": 4.18
+    },
+    {
+      "example": "contribute-validation-gpu-legacy-benchmarks-gpu-benchmarks",
+      "exit_code": 0,
+      "elapsed_seconds": 2.76
+    },
+    {
+      "example": "distributions",
+      "exit_code": 0,
+      "elapsed_seconds": 4.28
+    },
+    {
+      "example": "examples-fundamentals-data-containers",
+      "exit_code": 0,
+      "elapsed_seconds": 4.87
+    },
+    {
+      "example": "examples-fundamentals-gas-environment-data",
+      "exit_code": 0,
+      "elapsed_seconds": 4.31
+    },
+    {
+      "example": "examples-fundamentals-gas-gas-data",
+      "exit_code": 0,
+      "elapsed_seconds": 4.51
+    },
+    {
+      "example": "examples-fundamentals-gas-vapor-pressure",
+      "exit_code": 0,
+      "elapsed_seconds": 4.78
+    },
+    {
+      "example": "examples-fundamentals-native-aerosol",
+      "exit_code": 0,
+      "elapsed_seconds": 4.25
+    },
+    {
+      "example": "examples-fundamentals-native-state-access",
+      "exit_code": 0,
+      "elapsed_seconds": 4.17
+    },
+    {
+      "example": "examples-fundamentals-particles-distribution-tutorial",
+      "exit_code": 0,
+      "elapsed_seconds": 4.13
+    },
+    {
+      "example": "examples-fundamentals-particles-particle-data",
+      "exit_code": 0,
+      "elapsed_seconds": 4.62
+    },
+    {
+      "example": "examples-processes-coagulation-charge-coagulation-with-charge-functional",
+      "exit_code": 0,
+      "elapsed_seconds": 4.7
+    },
+    {
+      "example": "examples-processes-coagulation-charge-coagulation-with-charge-objects",
+      "exit_code": 0,
+      "elapsed_seconds": 4.69
+    },
+    {
+      "example": "examples-processes-coagulation-coagulation-1-pmf-pattern",
+      "exit_code": 0,
+      "elapsed_seconds": 5.44
+    },
+    {
+      "example": "examples-processes-coagulation-coagulation-2-pdf-pattern",
+      "exit_code": 0,
+      "elapsed_seconds": 5.67
+    },
+    {
+      "example": "examples-processes-coagulation-coagulation-3-particle-resolved-pattern",
+      "exit_code": 0,
+      "elapsed_seconds": 5.31
+    },
+    {
+      "example": "examples-processes-coagulation-coagulation-4-compared",
+      "exit_code": 0,
+      "elapsed_seconds": 5.18
+    },
+    {
+      "example": "examples-processes-coagulation-coagulation-5-time-evolution",
+      "exit_code": 0,
+      "elapsed_seconds": 42.36
+    },
+    {
+      "example": "examples-processes-coagulation-functional-coagulation-basic-1-pmf",
+      "exit_code": 0,
+      "elapsed_seconds": 4.11
+    },
+    {
+      "example": "examples-processes-coagulation-functional-coagulation-basic-2-pdf",
+      "exit_code": 0,
+      "elapsed_seconds": 4.25
+    },
+    {
+      "example": "examples-processes-coagulation-functional-coagulation-basic-3-compared",
+      "exit_code": 0,
+      "elapsed_seconds": 4.58
+    },
+    {
+      "example": "examples-processes-coagulation-functional-coagulation-basic-4-particleresolved",
+      "exit_code": 0,
+      "elapsed_seconds": 5.11
+    },
+    {
+      "example": "examples-processes-condensation-condensation-2-massbin",
+      "exit_code": 0,
+      "elapsed_seconds": 20.53
+    },
+    {
+      "example": "examples-processes-condensation-condensation-3-massresolved",
+      "exit_code": 0,
+      "elapsed_seconds": 37.72
+    },
+    {
+      "example": "examples-processes-condensation-condensation-latent-heat",
+      "exit_code": 0,
+      "elapsed_seconds": 4.05
+    },
+    {
+      "example": "examples-processes-condensation-staggered-condensation-example",
+      "exit_code": 0,
+      "elapsed_seconds": 8.04
+    },
+    {
+      "example": "examples-processes-customization-adding-particles-during-simulation",
+      "exit_code": 0,
+      "elapsed_seconds": 4.94
+    },
+    {
+      "example": "examples-processes-dilution-cpu-dilution",
+      "exit_code": 0,
+      "elapsed_seconds": 3.93
+    },
+    {
+      "example": "examples-processes-nucleation-cpu-nucleation",
+      "exit_code": 0,
+      "elapsed_seconds": 3.93
+    },
+    {
+      "example": "examples-processes-nucleation-custom-nucleation-single-species",
+      "exit_code": 0,
+      "elapsed_seconds": 4.45
+    },
+    {
+      "example": "examples-processes-wall-loss-chamber-forward-simulation",
+      "exit_code": 0,
+      "elapsed_seconds": 17.61
+    },
+    {
+      "example": "examples-processes-wall-loss-rectangular-wall-loss-strategy",
+      "exit_code": 0,
+      "elapsed_seconds": 4.76
+    },
+    {
+      "example": "examples-processes-wall-loss-spherical-wall-loss-strategy",
+      "exit_code": 0,
+      "elapsed_seconds": 27.3
+    },
+    {
+      "example": "examples-processes-wall-loss-wall-loss-builders-factory",
+      "exit_code": 0,
+      "elapsed_seconds": 4.28
+    },
+    {
+      "example": "examples-processes-wall-loss-wall-loss-tutorial",
+      "exit_code": 0,
+      "elapsed_seconds": 5.86
+    },
+    {
+      "example": "examples-simulations-biomass-burning-cloud-interactions",
+      "exit_code": 0,
+      "elapsed_seconds": 631.87
+    },
+    {
+      "example": "examples-simulations-cloud-chamber-multi-cycle",
+      "exit_code": 0,
+      "elapsed_seconds": 12.32
+    },
+    {
+      "example": "examples-simulations-cloud-chamber-single-cycle",
+      "exit_code": 0,
+      "elapsed_seconds": 10.85
+    },
+    {
+      "example": "examples-simulations-cough-droplets-partitioning",
+      "exit_code": 0,
+      "elapsed_seconds": 21.01
+    },
+    {
+      "example": "examples-simulations-organic-partitioning-and-coagulation",
+      "exit_code": 0,
+      "elapsed_seconds": 238.77
+    },
+    {
+      "example": "examples-thermodynamics-activity-activity-tutorial",
+      "exit_code": 0,
+      "elapsed_seconds": 4.66
+    },
+    {
+      "example": "examples-thermodynamics-activity-bat-activity-example",
+      "exit_code": 0,
+      "elapsed_seconds": 4.06
+    },
+    {
+      "example": "examples-thermodynamics-activity-equilibria-example",
+      "exit_code": 0,
+      "elapsed_seconds": 3.94
+    },
+    {
+      "example": "examples-thermodynamics-activity-ideal-activity-example",
+      "exit_code": 0,
+      "elapsed_seconds": 3.92
+    },
+    {
+      "example": "examples-thermodynamics-activity-kappa-activity-example",
+      "exit_code": 0,
+      "elapsed_seconds": 3.98
+    },
+    {
+      "example": "examples-thermodynamics-equilibria-activity-part1",
+      "exit_code": 0,
+      "elapsed_seconds": 4.34
+    },
+    {
+      "example": "examples-thermodynamics-equilibria-equilibria-part1",
+      "exit_code": 0,
+      "elapsed_seconds": 4.42
+    },
+    {
+      "example": "examples-thermodynamics-particle-properties-activity-functions",
+      "exit_code": 0,
+      "elapsed_seconds": 4.39
+    },
+    {
+      "example": "examples-thermodynamics-particle-properties-activity-tutorial",
+      "exit_code": 0,
+      "elapsed_seconds": 4.04
+    },
+    {
+      "example": "examples-thermodynamics-particle-properties-particle-surface-tutorial",
+      "exit_code": 0,
+      "elapsed_seconds": 4.58
+    },
+    {
+      "example": "theory-dns-fluid-and-particle-properties-comparison",
+      "exit_code": 0,
+      "elapsed_seconds": 4.26
+    },
+    {
+      "example": "theory-dns-horizontal-velocity-comparison",
+      "exit_code": 0,
+      "elapsed_seconds": 4.13
+    },
+    {
+      "example": "theory-dns-kernel-comparison",
+      "exit_code": 0,
+      "elapsed_seconds": 4.17
+    },
+    {
+      "example": "theory-dns-radial-distribution-comparison",
+      "exit_code": 0,
+      "elapsed_seconds": 4.23
+    },
+    {
+      "example": "theory-dns-radial-relative-velocity-comparison",
+      "exit_code": 0,
+      "elapsed_seconds": 4.1
+    },
+    {
+      "example": "theory-dynamic-viscosity",
+      "exit_code": 0,
+      "elapsed_seconds": 3.93
+    },
+    {
+      "example": "theory-ionparticle-coagulation",
+      "exit_code": 0,
+      "elapsed_seconds": 4.19
+    },
+    {
+      "example": "theory-mean-free-path",
+      "exit_code": 0,
+      "elapsed_seconds": 3.91
+    }
+  ],
+  "previous_published_revision": "6597906ba8dd09bdccb9c3e502d8155c6668a1d4",
+  "completed_run_count": 67,
+  "latest_validation": {
+    "rendered_site": {
+      "html_pages": 538,
+      "api_modules": 237,
+      "redirects": 130,
+      "errors": []
+    },
+    "documentation_tool_tests": {
+      "passed": 47
+    },
+    "markdown_extension_tests": "passed",
+    "source_structure": "passed",
+    "output_and_report_tests": 13,
+    "infrastructure_tests": 158,
+    "browser_review": "Desktop/mobile navigation, sidebar reload persistence, scoped search, themes, API signatures and hero pause verified; refreshed output/math review pending",
+    "cpu_source_suite": {
+      "passed": 8554,
+      "skipped": 686
+    },
+    "native_cuda_source_suite": {
+      "passed": 6603,
+      "failed": 5,
+      "skipped": 11,
+      "xfailed": 1,
+      "note": "Unchanged communication numerical test and four invalid-device fixture setup failures; not claimed passing."
+    },
+    "search_sitemap_contents": "Verified compressed Pagefind fragments and sitemap URLs; no archives or redirects indexed",
+    "graph_lifecycle_and_example_tests": {
+      "passed": 211,
+      "skipped": 2
+    }
+  },
+  "live_sessions": {},
+  "requested_figure_dpi": 300,
+  "output_privacy": "Checkout and account paths redacted; warning text and relative locations retained",
+  "api_diagnostics": "Three external optional chemical aliases; five warnings in excluded test helpers; see API_DIAGNOSTICS.md",
+  "pending_examples": []
+}

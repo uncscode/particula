@@ -1,0 +1,99 @@
+name: Documentation
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  merge_group:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: documentation-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v7.1.0
+        with:
+          python-version: '3.12'
+          cache: pip
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '26.13.0'
+          cache: npm
+          cache-dependency-path: website/package-lock.json
+      - name: Install documentation dependencies
+        run: |
+          python -m pip install -e '.[extra]' -r website/requirements.txt pytest
+          npm --prefix website ci
+      - name: Test publishing infrastructure
+        run: |
+          npm --prefix website test
+          python -m pytest scripts/tests/check_docs_structure_test.py -q --no-cov
+          python scripts/check_docs_structure.py
+      - name: Check saved results and changed examples
+        env:
+          DOCS_BASE: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha || github.event.before }}
+        run: |
+          base="$DOCS_BASE"
+          if [ -z "$base" ] || ! git cat-file -e "$base^{commit}" 2>/dev/null; then
+            base=HEAD^
+          fi
+          python scripts/docs_examples.py check --changed --base "$base"
+      - name: Build and verify the full site
+        run: npm --prefix website run build
+      - name: Generate execution inventory
+        run: python scripts/docs_report.py
+      - name: Prepare downloadable preview
+        run: |
+          mkdir -p website/preview/particula
+          cp -a website/dist/. website/preview/particula/
+          touch website/preview/particula/.nojekyll
+          printf '%s\n' 'Run python -m http.server 8000 from this directory.' 'Open http://localhost:8000/particula/.' > website/preview/README.txt
+          cp website/.cache/verification.json website/preview/verification.json
+          cp website/migration-inventory.json website/preview/source-inventory.json
+          cp website/.cache/execution-inventory.json website/preview/
+          cp website/API_DIAGNOSTICS.md website/preview/
+          cp website/MIGRATION_VALIDATION.md website/preview/
+          cp .trash/mkdocs-starlight-2026-11-13/inventory.json website/preview/archive-inventory.json
+          cp .trash/mkdocs-starlight-2026-11-13/README.md website/preview/rollback.md
+      - uses: actions/upload-artifact@v7
+        with:
+          name: documentation-preview
+          path: website/preview/
+          retention-days: 30
+
+  deploy:
+    needs: build
+    if: github.repository == 'uncscode/particula' && github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: production-documentation
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v8.0.2
+        with:
+          name: documentation-preview
+          path: documentation-preview
+      - name: Publish verified site
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: documentation-preview/particula

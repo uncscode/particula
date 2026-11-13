@@ -226,5 +226,5 @@ pytest examples_tests/gpu_direct_nucleation_example_test.py -q -Werror
 pytest particula/dynamics/nucleation/tests/ \
   particula/dynamics/tests/nucleation_runnable_test.py \
   particula/integration_tests/nucleation_process_test.py -q -Werror
-mkdocs build --strict
+npm --prefix website run build
 ```

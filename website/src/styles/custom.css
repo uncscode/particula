@@ -98,3 +98,6 @@ pre.mermaid svg { display: block; margin: auto; max-width: 100%; }
 @media (min-width: 50rem) and (max-width: 63.999rem) {
   .navigation-toggle span { display: none; }
 }
+
+/* Terminal progress remains available without overwhelming the results. */
+.execution-progress .result-output { max-height: 16rem; overflow: auto; }

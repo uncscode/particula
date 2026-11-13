@@ -51,5 +51,5 @@ notebook/source pairs together; preserve their numerical scope and outputs.
 Follow Add Theory and Add Example under `docs/contribute/Feature_Workflow/Details/`.
 
 Validate local links and anchors with `python scripts/check_docs_structure.py`,
-both strict MkDocs builds, and the owning scientific tests when calculations
+the complete Starlight build (`npm --prefix website run build`), and the owning scientific tests when calculations
 change. Never infer measured performance or release approval from plan closure.

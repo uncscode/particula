@@ -1,10 +1,10 @@
 # Documentation Guide
 
 **Project:** particula  
-**Last Updated:** 2026-08-09
+**Last Updated:** 2026-11-13
 
 particula documentation is split between agent-facing guides in
-`.opencode/guides/` and user-facing MkDocs content in `docs/`.
+`.opencode/guides/` and user-facing Starlight content in `docs/`.
 
 Follow `docs/contribute/documentation.md` for the canonical five-section
 placement, consolidation, retirement, and validation rules. Extend an owning
@@ -13,27 +13,26 @@ topic before adding a file; implementation phases are not public feature pages.
 ## Locations
 
 - `.opencode/guides/`: Agent and contributor guidance.
-- `docs/`: User-facing MkDocs content.
-- `docs/examples/`: Tutorials, examples, runnable scripts, and paired Jupytext
-  notebooks.
+- `docs/`: User-facing Starlight content.
+- `docs/examples/`: Tutorials, examples, runnable percent-cell Python sources.
 - `docs/guide/`: Supported usage, installation, migration, and GPU contracts.
 - `docs/theory/`: Scientific equations, assumptions, and primary references.
 - `docs/contribute/`: Contributor workflows, architecture, and durable validation.
 - `docs/API/`: Generated or API-oriented documentation.
 - `adw-docs/`: Legacy source of migrated guide content, kept for reference.
 
-## MkDocs
+## Starlight
 
 Validate documentation changes with the repository-local wrapper:
 
 ```bash
-python3 .opencode/tools/build_mkdocs.py --validate-only --strict
+npm --prefix website run build
 ```
 
 For a dated feature closeout, also run and record the exact required command:
 
 ```bash
-mkdocs build --strict
+npm --prefix website run build
 ```
 
 Closeout tables must report actual dated command outcomes, including required
@@ -54,8 +53,8 @@ remediation.
 
 When the current agent cannot run the wrapper directly, delegate validation to
 the `docs-validator` subagent with the changed documentation paths and request
-strict MkDocs validation. The subagent should check links and anchors, run the
-equivalent of `mkdocs build --strict`, and return a concise pass/fail result with
+Starlight validation. The subagent should check links and anchors, run the
+equivalent of `npm --prefix website run build`, and return a concise pass/fail result with
 the command outcome. Treat a reported strict-validation failure as blocking;
 informational notices outside the changed-file scope should be reported but do
 not require unrelated fixes.
@@ -64,39 +63,39 @@ Example task prompt:
 
 ```text
 Validate these changed documentation files: <paths>. Check Markdown links and
-anchors, run the equivalent of `mkdocs build --strict`, and report pass/fail
+anchors, run the equivalent of `npm --prefix website run build`, and report pass/fail
 with the command result. Do not modify files unless a validation fix is needed.
 ```
 
-Build docs directly with MkDocs when you need a full local site build:
+Build docs directly with Starlight when you need a full local site build:
 
 ```bash
-mkdocs build
+npm --prefix website run build
 ```
 
 Serve locally with:
 
 ```bash
-mkdocs serve
+npm --prefix website run dev
 ```
 
 ## Example Source Workflow
 
-Examples in `docs/examples/` may be plain runnable `.py` scripts, paired
-`.py`/`.ipynb` notebooks, or both behind a topic landing page. Keep the
-published runnable entrypoint current when an example intentionally exposes one.
-
-For notebook-backed examples, use Jupytext paired sync: edit the `.py` percent
-file first, then sync and execute the `.ipynb`.
+Examples in `docs/examples/` and `docs/theory/` use Python sources with
+percent cells for Markdown and code. Register entry points, device requirements,
+timeouts and helper/data dependencies in `website/examples.json`.
 
 ```bash
-ruff check docs/examples/path/to/file.py --fix
-ruff format docs/examples/path/to/file.py
-python3 .opencode/tools/validate_notebook.py docs/examples/path/to/file.ipynb --sync
-python3 .opencode/tools/run_notebook.py docs/examples/path/to/file.ipynb
+.venv/bin/python scripts/docs_examples.py refresh EXAMPLE_KEY
+.venv/bin/python scripts/docs_examples.py check
+npm --prefix website run build
 ```
 
-Commit both paired files when a notebook exists.
+Inspect figures, tables and textual output, then commit the source and saved
+bundle in `website/results/`. A failed refresh leaves the previous bundle intact
+and blocks acceptance. Never reduce workloads or use a CPU fallback to qualify
+CUDA execution. Historical viewers consume declared recorded data. Builds do
+not execute examples. See `docs/contribute/Feature_Workflow/Details/Add_Example.md`.
 
 ## Docstrings
 
@@ -124,5 +123,5 @@ package APIs or imply hidden transfer, fallback, or high-level integration.
 ## Link Hygiene
 
 Prefer relative links within the repository. After documentation changes, run
-`python3 .opencode/tools/build_mkdocs.py --validate-only --strict` when
+`npm --prefix website run build` when
 feasible to catch broken documentation structure and invalid links.

@@ -1,11 +1,10 @@
-"""Check documentation ownership, links, source pairs, and published redirects.
+"""Check documentation ownership, links, script coverage, and redirects.
 
-Requires the MkDocs documentation environment (Markdown and PyYAML).
+Requires Markdown and pymdown-extensions for source-prose validation.
 Run from any directory; --site-dir requires a completed full publication build.
 """
 
 import argparse
-import ast
 import json
 import re
 from html.parser import HTMLParser
@@ -13,7 +12,6 @@ from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
 import markdown
-import yaml
 
 SECTIONS = ("Guide", "Examples", "Theory", "API", "Contribute")
 OWNERS = {"guide", "examples", "theory", "contribute", "API"}
@@ -63,7 +61,7 @@ def source_text(path):
 
 
 def nav_targets(items):
-    """Yield the leaves of MkDocs' nested navigation."""
+    """Yield the leaves of the source navigation hierarchy."""
     for item in items:
         for value in item.values():
             if isinstance(value, list):
@@ -90,29 +88,58 @@ def local_target(url, source, root):
             root / "docs" / unquote(parsed.path.lstrip("/"))
         ).resolve(), unquote(parsed.fragment)
     target = (source.parent / unquote(parsed.path)).resolve()
+    if target.suffix == ".ipynb":
+        target = target.with_suffix(".py")
     if target.is_dir():
         target /= "index.md"
     return target, unquote(parsed.fragment)
 
 
 def published_path(source):
-    """Map a repository docs path to its MkDocs directory URL."""
+    """Map a repository docs path to its published directory URL."""
     path = Path(source).relative_to("docs")
     if path.name == "index.md":
         return path.parent / "index.html"
     return path.with_suffix("") / "index.html"
 
 
+def source_navigation(items, docs):
+    """Adapt Starlight navigation for source reachability checks."""
+    return [
+        {
+            item["label"]: source_navigation(item["items"], docs)
+            if "items" in item
+            else "https://uncscode.github.io/particula/api/"
+            if item["label"] == "API"
+            else source_for_slug(item["slug"], docs)
+        }
+        for item in items
+    ]
+
+
+def source_for_slug(slug, docs):
+    """Resolve a configured route to its canonical source."""
+    for suffix in ("/index.md", ".md", ".py"):
+        candidate = slug + suffix
+        if (docs / candidate).exists():
+            return candidate
+    return slug + ".md"
+
+
 def check(root, site=None):
     """Return actionable errors for the complete authored documentation tree."""
     root = root.resolve()
     docs = root / "docs"
-    # BaseLoader constructs strings/lists/maps, never Python objects.
-    config = yaml.load(
-        (root / "mkdocs.yml").read_text(),
-        Loader=yaml.BaseLoader,  # noqa: S506 -- non-object loader
-    )
-    errors = []
+
+    config = {
+        "nav": source_navigation(
+            json.loads((root / "website/navigation.json").read_text()), docs
+        )
+    }
+    errors = [
+        f"retired notebook publication source: {p.relative_to(root)}"
+        for p in sorted(docs.rglob("*.ipynb"))
+    ]
     nav = config["nav"]
     if tuple(next(iter(item)) for item in nav) != SECTIONS:
         errors.append(
@@ -122,7 +149,7 @@ def check(root, site=None):
     pages = {
         p.resolve()
         for p in docs.rglob("*")
-        if p.suffix in {".md", ".ipynb"}
+        if p.suffix in {".md", ".py"}
         and not any(x.startswith(".") for x in p.relative_to(docs).parts)
     }
     errors.extend(
@@ -148,9 +175,7 @@ def check(root, site=None):
     navigation_pages, navigation_errors = check_navigation(nav, docs, pages)
     reachable.update(navigation_pages)
     errors.extend(navigation_errors)
-    graph, linked_sources, link_errors = check_links(
-        root, pages, parsed, manifest
-    )
+    graph, _, link_errors = check_links(root, pages, parsed, manifest)
     errors.extend(link_errors)
     pending = list(reachable)
     while pending:
@@ -159,7 +184,7 @@ def check(root, site=None):
             pending.append(target)
     for path in sorted(pages - reachable):
         errors.append(f"unreachable authored page: {path.relative_to(root)}")
-    errors.extend(check_pairs(root, pages, linked_sources))
+    errors.extend(check_script_coverage(root, pages))
     if site is not None:
         errors.extend(check_published(root, site.resolve(), pages, manifest))
         errors.extend(check_rendered_links(root, site.resolve(), pages))
@@ -186,36 +211,21 @@ def check_navigation(nav, docs, pages):
     return reachable, errors
 
 
-def check_pairs(root, pages, linked_sources):
-    """Require source/notebook parity and discoverable standalone examples."""
-    errors = []
-    docs = root / "docs"
-    for path in sorted(pages):
-        if path.suffix != ".ipynb":
-            continue
-        script = path.with_suffix(".py")
-        if not script.exists():
-            if path.is_relative_to(docs / "examples"):
-                errors.append(
-                    f"missing notebook pair: {script.relative_to(root)}"
-                )
-            continue  # scientific Theory notebooks may be notebook-only
-        linked_sources.add(script)
-        notebook = json.loads(path.read_text())
-        code = "\n".join(
-            "".join(c["source"])
-            for c in notebook["cells"]
-            if c["cell_type"] == "code"
-        )
-        if ast.dump(ast.parse(code)) != ast.dump(ast.parse(script.read_text())):
-            errors.append(
-                f"notebook/source code differs: {path.relative_to(root)}"
-            )
-    for script in sorted((docs / "examples").rglob("*.py")):
-        if script not in linked_sources:
-            errors.append(
-                f"unlinked standalone source: {script.relative_to(root)}"
-            )
+def check_script_coverage(root, pages):
+    """Require an explicit publication policy for every executable source."""
+    configs = json.loads((root / "website/examples.json").read_text())
+    registered = {root / c["source"] for c in configs.values()}
+    scripts = {p for p in pages if p.suffix == ".py"}
+    errors = [
+        f"unregistered source: {p.relative_to(root)}"
+        for p in sorted(scripts - registered)
+    ]
+    errors.extend(
+        f"missing registered source: {p.relative_to(root)}"
+        for p in sorted(registered - scripts)
+    )
+    if len(registered) != len(configs):
+        errors.append("duplicate registered source")
     return errors
 
 
@@ -289,18 +299,16 @@ def check_published(root, site, pages, manifest):
 def check_search(site, manifest):
     """Keep retired routes and trash out of the public search index."""
     errors = []
-    search = json.loads((site / "search/search_index.json").read_text())
-    retired_routes = {
-        str(published_path(p).parent) + "/"
-        for p in manifest.get("retired", {})
-        if p.endswith((".md", ".ipynb"))
-    }
-    for row in search["docs"]:
+    for source in manifest.get("retired", {}):
         if (
-            row["location"].split("#", 1)[0] in retired_routes
-            or ".trash" in row["location"]
+            source.endswith((".md", ".ipynb"))
+            and (site / published_path(source)).exists()
         ):
-            errors.append(f"retired source in search: {row['location']}")
+            errors.append(f"retired source in publication: {source}")
+    if any(".trash" in p.relative_to(site).parts for p in site.rglob("*")):
+        errors.append("archive in publication")
+    if not (site / "pagefind/pagefind.js").exists():
+        errors.append("missing Pagefind search index")
     return errors
 
 
@@ -320,11 +328,7 @@ def check_rendered_links(root, site, pages):
     """Catch plugin-produced broken URLs, including notebook Markdown links."""
     errors = []
     cache = {}
-    config = yaml.load(
-        (root / "mkdocs.yml").read_text(),
-        Loader=yaml.BaseLoader,  # noqa: S506 -- non-object loader
-    )
-    mount = urlsplit(config.get("site_url", "")).path.rstrip("/")
+    mount = "/particula"
     for source in sorted(pages):
         page = site / published_path(source.relative_to(root).as_posix())
         if not page.exists():

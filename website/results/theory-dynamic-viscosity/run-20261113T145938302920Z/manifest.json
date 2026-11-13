@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 2.8883989240275696,
+  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "input_sha256": {},
+  "example": "theory-dynamic-viscosity",
+  "fingerprint": "ea142faa134ff5fc8edb84fd3546262d25d87ec0eed687e5b964507bd013c352",
+  "source": "docs/theory/properties/dynamic-viscosity.py",
+  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "package_dirty": false,
+  "executed_at": "2026-11-13T14:59:38.428732+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [
+      {
+        "text": "Air dynamic viscosity at 298.15 K is 1.84e-05 kg/m/s\n"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "df45c43e0dc6f898ad5074f115145218cda796a838a8b9e179314803d908de27"
+  }
+}

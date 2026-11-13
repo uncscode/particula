@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 4.215818751021288,
+  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "input_sha256": {},
+  "example": "examples-processes-coagulation-coagulation-1-pmf-pattern",
+  "fingerprint": "8d0e5757f3e22d64b0357e8a545bddce11d57ba48397a88e935a68c02b5b69ed",
+  "source": "docs/examples/processes/coagulation/coagulation_1_pmf_pattern.py",
+  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "package_dirty": false,
+  "executed_at": "2026-11-13T15:00:08.483458+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [
+      {
+        "text": "'Showcase a PMF-based Brownian coagulation example.\\n\\nBuilds a lognormal PMF aerosol, configures Brownian coagulation with\\n``distribution_type=\"discrete\"``, runs a short guarded step, and plots PMF\\nconcentration before/after execution to visualize redistribution. Designed\\nfor quick execution with a small grid and modest sub-steps.\\n\\nExample:\\n    Run the script to generate before/after concentration curves for a\\n    discrete PMF aerosol using the public ``par.dynamics`` API.\\n'"
+      }
+    ],
+    [],
+    [],
+    [
+      {
+        "text": "<particula.dynamics.particle_process.Coagulation object at 0x7f17767163f0>\n"
+      }
+    ],
+    [],
+    [
+      {
+        "text": "Relative material mass drift: [ 0.         -0.0011476  -0.00225778]\n"
+      }
+    ],
+    [
+      {
+        "image": "figure-7-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "0e47b5a79447f0b8cc3ea22295c91d2b905eb550b79982aba033443d0b961660",
+    "figure-7-1.png": "4e23c3c22aa1c9dcbd3992381b0727f3c4649a6b035d7df26704d445a994a44a"
+  }
+}

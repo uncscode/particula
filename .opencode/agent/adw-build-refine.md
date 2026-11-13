@@ -41,7 +41,7 @@ permission:
   create_workspace: deny
   workflow_builder: deny
   git_diff: allow
-  build_mkdocs: deny
+  build_docs: deny
   platform_operations: deny
   run_pytest_advanced: allow
   run_linters: allow

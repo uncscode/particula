@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 2.766151279967744,
+  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "input_sha256": {},
+  "example": "examples-thermodynamics-activity-bat-activity-example",
+  "fingerprint": "cfc6e1681b78c94cf3bede9fc8e8cea782e883a1abff43b68b60a1737af7ba54",
+  "source": "docs/examples/thermodynamics/activity/bat_activity_example.py",
+  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "package_dirty": false,
+  "executed_at": "2026-11-13T15:13:07.129934+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [],
+    [
+      {
+        "text": "=== Organic Properties ===\nMolar mass: 200.0 g/mol\nO:C ratio: 0.5\nDensity: 1200.0 kg/m^3\n"
+      }
+    ],
+    [
+      {
+        "text": "Strategy: ActivityNonIdealBinary\n"
+      }
+    ],
+    [
+      {
+        "text": "Ideal strategy: ActivityIdealMolar\n"
+      }
+    ],
+    [
+      {
+        "text": "=== Ideal vs Non-Ideal Activity Comparison ===\nOrganic O:C ratio: 0.5\nOrganic molar mass: 200.0 g/mol\nNote: BAT model returns organic activity only (scalar)\n\nOrganic mass fraction: 0.2\n  Mass conc: water=0.8, org=0.2 ug/m^3\n  Ideal activity:     water=0.9780, org=0.0220\n  Non-ideal (BAT):    org=0.0295\n  Organic activity coeff (gamma): 1.3399\n\nOrganic mass fraction: 0.5\n  Mass conc: water=0.5, org=0.5 ug/m^3\n  Ideal activity:     water=0.9174, org=0.0826\n  Non-ideal (BAT):    org=0.0681\n  Organic activity coeff (gamma): 0.8244\n\nOrganic mass fraction: 0.8\n  Mass conc: water=0.2, org=0.8 ug/m^3\n  Ideal activity:     water=0.7351, org=0.2649\n  Non-ideal (BAT):    org=0.1991\n  Organic activity coeff (gamma): 0.7518\n\n"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "871b2f5857be6031406b8718e1136f762f5732065d4f404002e919978a9974af"
+  }
+}

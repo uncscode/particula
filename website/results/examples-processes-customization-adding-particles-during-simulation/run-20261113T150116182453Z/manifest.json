@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 3.154692679992877,
+  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "input_sha256": {},
+  "example": "examples-processes-customization-adding-particles-during-simulation",
+  "fingerprint": "c3e3369703b6ab33b739379c11550463028d0ca45356ee730237b143ac8cb35a",
+  "source": "docs/examples/processes/customization/adding_particles_during_simulation.py",
+  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "package_dirty": false,
+  "executed_at": "2026-11-13T15:01:16.305874+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [],
+    [
+      {
+        "text": "ParticleData(masses=array([[[9.28905845e-18],\n        [5.63529914e-18],\n        [1.04611464e-17],\n        ...,\n        [0.00000000e+00],\n        [0.00000000e+00],\n        [0.00000000e+00]]], shape=(1, 120000, 1)), concentration=array([[1., 1., 1., ..., 0., 0., 0.]], shape=(1, 120000)), charge=array([[0., 0., 0., ..., 0., 0., 0.]], shape=(1, 120000)), density=array([1500.]), volume=array([1.e-06]), distribution_type='particle_resolved', radius_grid=None)\nGasData(name=['air'], molar_mass=array([0.029]), concentration=array([[1.2]]), partitioning=array([False]))\nEnvironmentData(temperature=array([298.15]), pressure=array([101325.]), saturation_ratio=array([[0.]]))\n"
+      }
+    ],
+    [
+      {
+        "text": "Particles to add: (10000,)\n"
+      }
+    ],
+    [
+      {
+        "text": "Number density after step 1: 1.1e+11 m^-3\nNumber density after step 2: 1.2e+11 m^-3\n"
+      }
+    ],
+    [
+      {
+        "image": "figure-5-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "94cd4f3336db3687491ace072b66a640edc99ebd2df6be07db0055e1a4ece089",
+    "figure-5-1.png": "21c9714ee2698ebb3c2d5da299b4b5e57c81569f764da14f8288ed5cf173bba6"
+  }
+}
