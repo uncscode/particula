@@ -5786,7 +5786,10 @@ def test_coagulation_step_gpu_explicit_brownian_matches_default_and_dispatches_m
     original_launch = coagulation_module.wp.launch
 
     def _tracking_launch(kernel: Any, *args: Any, **kwargs: Any) -> Any:
-        if getattr(kernel, "key", "") == "_native_coagulation_kernel":
+        if getattr(kernel, "key", "") in {
+            "_native_coagulation_kernel",
+            "_select_brownian",
+        }:
             masks.append(
                 kwargs["inputs"][BROWNIAN_COAGULATION_MASK_INPUT_INDEX]
             )
@@ -6367,7 +6370,10 @@ def test_coagulation_step_gpu_preserves_direct_environment_array_dtypes(
 
     def _tracking_launch(kernel: Any, *args: Any, **kwargs: Any) -> Any:
         inputs = kwargs.get("inputs", [])
-        if getattr(kernel, "key", "") == "_native_coagulation_kernel":
+        if getattr(kernel, "key", "") in {
+            "_native_coagulation_kernel",
+            "_select_brownian",
+        }:
             launch_dtypes.append((inputs[4].dtype, inputs[5].dtype))
         return original_launch(kernel, *args, **kwargs)
 
@@ -6414,7 +6420,10 @@ def test_coagulation_step_gpu_preserves_environment_array_dtypes(
 
     def _tracking_launch(kernel: Any, *args: Any, **kwargs: Any) -> Any:
         inputs = kwargs.get("inputs", [])
-        if getattr(kernel, "key", "") == "_native_coagulation_kernel":
+        if getattr(kernel, "key", "") in {
+            "_native_coagulation_kernel",
+            "_select_brownian",
+        }:
             launch_dtypes.append((inputs[4].dtype, inputs[5].dtype))
         return original_launch(kernel, *args, **kwargs)
 
@@ -6532,7 +6541,10 @@ def test_coagulation_step_gpu_reuses_direct_environment_arrays(
 
     def _tracking_launch(kernel: Any, *args: Any, **kwargs: Any) -> Any:
         inputs = kwargs.get("inputs", [])
-        if getattr(kernel, "key", "") == "_native_coagulation_kernel":
+        if getattr(kernel, "key", "") in {
+            "_native_coagulation_kernel",
+            "_select_brownian",
+        }:
             forwarded_inputs.append((inputs[4], inputs[5]))
         return original_launch(kernel, *args, **kwargs)
 
@@ -9383,7 +9395,10 @@ def test_coagulation_step_gpu_forced_collision_transfers_charge_exactly(
     launch = coagulation_module.wp.launch
 
     def _force_brownian(kernel: Any, *args: Any, **kwargs: Any) -> Any:
-        if kernel is coagulation_module._native_coagulation_kernel:
+        if getattr(kernel, "key", "") in {
+            "_native_coagulation_kernel",
+            "_select_brownian",
+        }:
             inputs = kwargs["inputs"]
             return launch(
                 _force_pair,
