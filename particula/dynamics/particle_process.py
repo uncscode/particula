@@ -809,6 +809,22 @@ class Dilution(_NativeBatchRunnable):
     _strategy_attribute = "dilution_strategy"
     _namespace = "dilution"
 
+    def execute(self, aerosol, time_step, sub_steps=1, *, context=None):
+        """Batch native dilution; retain legacy custom strategy delegation."""
+        if isinstance(self.dilution_strategy, DilutionStrategy):
+            return super().execute(
+                aerosol, time_step, sub_steps, context=context
+            )
+        if context is not None:
+            raise TypeError("custom dilution strategies do not support context")
+        return self._execute_box(aerosol, time_step, sub_steps)
+
+    def rate(self, aerosol):
+        """Return native batched rates or the custom strategy's own result."""
+        if isinstance(self.dilution_strategy, DilutionStrategy):
+            return super().rate(aerosol)
+        return self._rate_box(aerosol)
+
     def __init__(self, dilution_strategy: DilutionStrategyProtocol):
         """Initialize the dilution runnable.
 

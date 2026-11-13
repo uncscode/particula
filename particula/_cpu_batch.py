@@ -18,12 +18,14 @@ def duration(time_step, sub_steps):
         or sub_steps <= 0
     ):
         raise ValueError("sub_steps must be a positive integer")
-    if (
-        isinstance(time_step, (bool, np.bool_))
-        or not isinstance(time_step, Real)
-        or not np.isfinite(time_step)
-        or time_step < 0
-    ):
+    value = np.asarray(time_step)
+    if value.ndim != 0:
+        raise ValueError("time_step must be a finite nonnegative scalar")
+    if isinstance(time_step, (bool, np.bool_)) or value.dtype.kind == "b":
+        raise TypeError("time_step must be numeric, not boolean")
+    if not isinstance(time_step, Real) and value.dtype.kind not in "iuf":
+        raise TypeError("time_step must be numeric and real")
+    if not np.isfinite(value) or value < 0:
         raise ValueError("time_step must be finite and nonnegative")
     return float(time_step) / int(sub_steps)
 

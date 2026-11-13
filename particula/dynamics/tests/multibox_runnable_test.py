@@ -37,6 +37,65 @@ def batch(single):
     return result
 
 
+def test_failed_later_wall_box_does_not_advance_data_or_streams():
+    """A late physical failure rolls back staged draws as well as storage."""
+    aerosol = batch(state())
+    reference = _cpu_batch.detached(aerosol)
+    process = WallLoss(
+        SphericalWallLossStrategy(0.001, 0.5, "particle_resolved")
+    )
+    context = CPUExecutionContext(91, ("a", "b"))
+    before = {
+        name: value.copy() for name, value in _cpu_batch.arrays(aerosol).items()
+    }
+    aerosol.particles.masses[1, 0] = 0
+    invalid = aerosol.particles.masses.copy()
+    with pytest.raises(ValueError, match="positive mass"):
+        process.execute(aerosol, 10.0, context=context)
+    np.testing.assert_array_equal(aerosol.particles.masses, invalid)
+    for name in process._writer_fields(aerosol):
+        if name != "particles.masses":
+            np.testing.assert_array_equal(
+                _cpu_batch.arrays(aerosol)[name], before[name]
+            )
+    assert context._streams == {}
+    aerosol.particles.masses[:] = before["particles.masses"]
+    process.execute(aerosol, 10.0, context=context)
+    process.execute(
+        reference, 10.0, context=CPUExecutionContext(91, ("a", "b"))
+    )
+    for name in process._writer_fields(aerosol):
+        np.testing.assert_array_equal(
+            _cpu_batch.arrays(aerosol)[name], _cpu_batch.arrays(reference)[name]
+        )
+
+
+def test_wall_streams_follow_box_identity_across_reordering():
+    """Changing lane order preserves each box's state and RNG continuation."""
+    original = batch(state())
+    reordered = _cpu_batch.detached(original)
+    for name, value in _cpu_batch.arrays(reordered).items():
+        if name not in (
+            "particles.density",
+            "gas.molar_mass",
+            "gas.partitioning",
+        ):
+            value[:] = value[::-1].copy()
+    process = WallLoss(
+        SphericalWallLossStrategy(0.001, 0.5, "particle_resolved")
+    )
+    first = CPUExecutionContext(13, ("a", "b"))
+    second = CPUExecutionContext(13, ("b", "a"))
+    for _ in range(3):
+        process.execute(original, 0.01, context=first)
+        process.execute(reordered, 0.01, context=second)
+    for name in process._writer_fields(original):
+        np.testing.assert_array_equal(
+            _cpu_batch.arrays(original)[name],
+            _cpu_batch.arrays(reordered)[name][::-1],
+        )
+
+
 @pytest.mark.parametrize(
     "family", ["condensation", "coagulation", "wall", "dilution", "nucleation"]
 )
