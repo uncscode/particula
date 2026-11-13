@@ -78,11 +78,11 @@ fallback. Its source of record is
 `gpu_benchmark_results.json` is coagulation-only. No reviewed schema-v3 resident
 artifact is checked in, so the current resident timing and allocator evidence is
 unavailable and unmeasured; see
-[resident benchmark and memory-budget record](docs/Features/resident_benchmark_memory_budget.md).
+[resident benchmark and memory-budget record](docs/contribute/validation/gpu/resident-benchmarks.md).
 
 E8-F7/T7 owns graph-capture profiling and machine-bounded recommendations; E8-F8
 owns the [native-CUDA example](docs/Examples/gpu_resident_graph_capture.py),
-[operator runbook](docs/Features/gpu_graph_capture.md), limitations,
+[operator runbook](docs/guide/gpu/resident/graph-capture.md), limitations,
 documentation reconciliation, and the
 [P3 closeout record](docs/Features/Roadmap/graph-capture-closeout.md). The
 closeout is the sole P3 evidence authority. E8 and all eight feature plans are
@@ -96,7 +96,7 @@ E9-M6 development tree removes `ParticleRepresentation`, `GasSpecies`,
 migration. GPU population execution/transfers and resident lifecycle require
 explicit supported metadata. Validation and release approval remain separate;
 Epic I follows the migration. The
-[GPU graph-capture profiling record](docs/Features/gpu_graph_capture_performance.md)
+[GPU graph-capture profiling record](docs/contribute/validation/gpu/graph-capture-profiling.md)
 freezes small `(1, 16, 2)` and medium `(1000, 16, 2)` workloads, 100% activity,
 gas communication, replay counts 1/10/100/1000, and native-CUDA-only evidence
 without CPU or Warp-CPU fallback. No reviewed normalized artifact or manifest is
@@ -232,7 +232,7 @@ particula/
 - `.opencode/guides/docstring_guide.md` - Google-style docstring format
 - `.opencode/guides/commit_conventions.md` - Commit message format
 - `.opencode/guides/pr_conventions.md` - Pull request conventions
-- `docs/Features/Roadmap/mass-precision-study.md` - Final GPU
+- `docs/contribute/validation/numerics/mass-precision.md` - Final GPU
   mass-precision recommendation report, unchanged production baseline,
   candidate study scope, and focused reproduction commands
 - `docs/contribute/Feature_Workflow/index.md` - Contributor workflow overview
@@ -405,7 +405,7 @@ aerosol = dilution.execute(aerosol, time_step=10.0, sub_steps=2)
   source identities, performs CPU fallback, or runs automatically during normal
   session use. There is no disk, remote, delta, or rollback facility; after an
   asynchronous device writer launches, rollback is not guaranteed. See
-  [GPU resident checkpoints](docs/Features/gpu_resident_checkpoints.md).
+  [GPU resident checkpoints](docs/guide/gpu/resident/checkpoints.md).
 - Restart compatibility is fail-closed: an ACTIVE `ResidentCheckpoint` with
   carrier type `"ResidentSession"`, complete valid descriptors and bytes, and
   an exactly equal target `Device` is required. Only schema-v5 is accepted;
@@ -451,7 +451,7 @@ aerosol = dilution.execute(aerosol, time_step=10.0, sub_steps=2)
   an exactly equal supported `Device`; it excludes cross-backend or cross-device
   replay, migration, durable serialization, automatic restart, and implicit
   reseeding. See
-  [GPU resident checkpoints](docs/Features/gpu_resident_checkpoints.md).
+  [GPU resident checkpoints](docs/guide/gpu/resident/checkpoints.md).
 - Warp CPU is the installed-Warp baseline. CUDA validation is optional and
   skips cleanly when unavailable.
 - Validate with:
@@ -547,8 +547,8 @@ restored = from_warp_environment_data(gpu_environment)
   claims. It executes exactly four equal substeps; vapor-pressure refresh does
   not read gas concentration, while each later mass-transfer proposal reads
   gas concentration coupled by its predecessors. See
-  `docs/Features/condensation_strategy_system.md` and
-  `docs/Features/Roadmap/condensation-stiffness-study.md` for its bounded
+  `docs/guide/processes/condensation.md` and
+  `docs/contribute/validation/numerics/condensation-stiffness.md` for its bounded
   contract and case-specific evidence.
 - The deterministic fp64 direct-kernel parity matrix runs one-box and
   multi-box/multi-species fixtures against an independent NumPy fixed-four-
@@ -600,7 +600,7 @@ restored = from_warp_gas_data(gpu_gas, name=gas_data.name)
 - `WarpGasData.vapor_pressure` is GPU-only helper state. Pass it explicitly
   when needed, otherwise `to_warp_gas_data()` allocates zeros with the same
   shape, and `from_warp_gas_data()` always drops it on CPU restore.
-- See `docs/Features/data-containers-and-gpu-foundations.md` for the canonical
+- See `docs/guide/data-model/index.md` for the canonical
   user-facing field authority and transfer-boundary contract,
   `docs/Features/particle-data-migration/` for migration walkthroughs, and
   `particula/gpu/tests/conversion_test.py` for the regression-backed contract.
@@ -623,7 +623,7 @@ restored = from_warp_gas_data(gpu_gas, name=gas_data.name)
 ### CPU and direct-Warp fixed-slot contract
 
 - The authoritative table is in
-  `docs/Features/data-containers-and-gpu-foundations.md`. Import CPU diagnostics
+  `docs/guide/data-model/index.md`. Import CPU diagnostics
   with `from particula.particles import get_slot_diagnostics`, CPU activation
   from `particula.particles.slot_management`, and GPU activation with
   `from particula.gpu.kernels import activate_slots_gpu`.
@@ -785,7 +785,7 @@ pytest particula/gpu/tests/kernel_exports_test.py -q -Werror
   `ParticleSourceCommitConfig` remain concrete-only.
 - Direct Warp P2 and P4 primitives consume caller-owned same-device state;
   callers synchronize successful asynchronous P4 work before reading results.
-  See [Fixed-Capacity Slot Exhaustion Primitives](docs/Features/slot_exhaustion_policies.md)
+  See [Fixed-Capacity Slot Exhaustion Primitives](docs/guide/gpu/slot-exhaustion.md)
   for imports, schemas, diagnostics, and mutation boundaries.
 - Dynamic allocation, resizing, compaction, hidden transfers or CPU fallback,
   runnable/scheduler/backend integration, graph capture, autodiff, performance
@@ -961,7 +961,7 @@ for _ in range(n_steps):
   turbulent-shear-only modes are supported; sedimentation or turbulent
   combinations, alternate charged models, broader distributions, and
   performance claims remain deferred.
-- See `docs/Features/data-containers-and-gpu-foundations.md` and
+- See `docs/guide/data-model/index.md` and
   `docs/Features/Roadmap/data-oriented-gpu.md` for user-facing ownership
   guidance.
 
@@ -999,7 +999,7 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
 - Optional throughput evidence lives on
   `particula/gpu/tests/benchmark_test.py` behind the existing `--benchmark`
   opt-in and still skips cleanly when Warp/CUDA is unavailable.
-- Use `docs/Features/Roadmap/mass-precision-study.md` as the reference for
+- Use `docs/contribute/validation/numerics/mass-precision.md` as the reference for
   case names, supported-vs-unsupported candidate scope, thresholds,
   memory-footprint examples, and focused reproduction.
 

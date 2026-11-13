@@ -9,7 +9,7 @@ on:
       - 'scripts/build_particula_plugins.py'
       - 'scripts/tests/plugin_distribution_test.py'
       - '.github/workflows/assistant-plugins.yml'
-      - 'docs/AI_Assistants/**'
+      - 'docs/contribute/ai-assistants/**'
   release:
     types: [published]
   workflow_dispatch:

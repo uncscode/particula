@@ -55,10 +55,10 @@ Quick links:
 - [Current container schema inventory](#current-container-schema-inventory)
 - [Shipped foundation baseline](#shipped-foundation-baseline)
 - [Authoritative field ownership decisions](#authoritative-field-ownership-decisions)
-- [Shipped foundation guide](../data-containers-and-gpu-foundations.md)
+- [Shipped foundation guide](../../guide/data-model/index.md)
 - [Runnable Data Containers example](../../Examples/Data_Containers/index.md)
 - [Native-CUDA resident graph-capture example](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_resident_graph_capture.py)
-- [Resident graph-capture operator runbook](../gpu_graph_capture.md)
+- [Resident graph-capture operator runbook](../../guide/gpu/resident/graph-capture.md)
 - [Graph-capture closeout record](graph-capture-closeout.md)
 - [Final downstream handoff map for sibling features](#final-downstream-handoff-map-for-sibling-features)
 
@@ -128,14 +128,14 @@ The core data-oriented model is implemented.
   batched storage does not broaden CPU execution beyond the supported
   single-box process boundary.
 - Migration documentation exists in
-  [ParticleData and GasData Migration](../particle-data-migration/index.md).
+  [ParticleData and GasData Migration](../../guide/migration/v0.3.0/index.md).
 
 For the canonical user-facing CPU support boundary, including the current
 `n_boxes == 1` limitation for audited CPU condensation and CPU coagulation
 container workflows, refer to
-[Data Containers and GPU Foundations](../data-containers-and-gpu-foundations.md).
+[Data Containers and GPU Foundations](../../guide/data-model/index.md).
 Use
-[ParticleData and GasData Migration](../particle-data-migration/index.md)
+[ParticleData and GasData Migration](../../guide/migration/v0.3.0/index.md)
 as the implementation walkthrough companion.
 
 The v0.3.0 migration removes the compatibility facades. In the current
@@ -145,7 +145,7 @@ Use explicit native initialization and coordinated replacement when layouts
 change. GPU execution, transfers and resident lifecycle require explicit
 supported population metadata; untagged v5 checkpoints reject before setup.
 Final readiness validation and review belong to v0.3.0; see the
-[native migration closeout](data-native-v030-closeout.md). The historical 0.2.x
+[native migration closeout](../../contribute/validation/releases/v0.3.0.md). The historical 0.2.x
 compatibility policy is not the current API contract.
 
 Data-model support and remaining boundaries:
@@ -258,7 +258,7 @@ Known GPU physics gaps remain:
   dropped when converting back to `GasData`. Every successful supported direct
   GPU condensation call refreshes it on-device from the current temperature;
   see the [data containers and GPU foundations
-  guide](../data-containers-and-gpu-foundations.md) for the supported
+  guide](../../guide/data-model/index.md) for the supported
   constant/Buck scope and refresh contract.
 - CPU nucleation ships a CPU-only, single-box nucleation/particle-source runnable.
   Direct GPU nucleation ships bounded direct `nucleation_step_gpu` with an explicit-transfer
@@ -554,9 +554,9 @@ Shared-across-box fields:
     workflows. CPU condensation explicitly enforces `n_boxes == 1`, and CPU
     coagulation support for `ParticleData` is also documented and validated as
     `n_boxes == 1` only. For the canonical user-facing support contract, see
-    [Data Containers and GPU Foundations](../data-containers-and-gpu-foundations.md).
+    [Data Containers and GPU Foundations](../../guide/data-model/index.md).
     Use
-    [ParticleData and GasData Migration](../particle-data-migration/index.md)
+    [ParticleData and GasData Migration](../../guide/migration/v0.3.0/index.md)
     as the implementation walkthrough companion.
 
 #### Rationale for issue-critical ownership decisions
@@ -631,14 +631,14 @@ downstream implementers; it does not add new schema semantics.
   storage ranks for multi-box-ready containers.
 - `mass-precision study`: inherit the current `float64` / `wp.float64` schema baseline for
   stored particle and gas arrays. Treat the
-  [Mass Precision Recommendation Report](mass-precision-study.md) as the
+  [Mass Precision Recommendation Report](../../contribute/validation/numerics/mass-precision.md) as the
   canonical downstream reference before any production dtype-or-schema
   migration proceeds.
 - `condensation stiffness study`: inherit the existing environment and gas ownership boundaries,
   including `ParticleData.volume` ownership and `WarpGasData.vapor_pressure` as
   lossy helper state, then build later condensation integration work on the API validation
   recommendation in
-  [`condensation-stiffness-study.md`](condensation-stiffness-study.md):
+  [`condensation-stiffness-study.md`](../../contribute/validation/numerics/condensation-stiffness.md):
   `fixed_count_substeps_4` as the preferred fixed-shape foundation, bounded by
   the CPU environment-shape contract, the mass-precision study `float64` evidence envelope,
    and the shipped bounded direct-kernel gas-coupling hook. That hook applies
@@ -651,7 +651,7 @@ downstream implementers; it does not add new schema semantics.
   single-box or explicitly transitional execution boundaries; do not infer
   broader multi-box CPU execution support from storage shape alone.
 - `foundation documentation`: start user-facing docs and examples from the shipped
-  [Data Containers and GPU Foundations](../data-containers-and-gpu-foundations.md)
+  [Data Containers and GPU Foundations](../../guide/data-model/index.md)
   guide and the
   [Data Containers example](../../Examples/Data_Containers/index.md), then
   link back to this roadmap page only for implementation-planning detail such
@@ -660,7 +660,7 @@ downstream implementers; it does not add new schema semantics.
 
 - Keep the shipped particle mass storage representation unless a future
   production migration proposal satisfies the evidence requirements in the
-  [Mass Precision Recommendation Report](mass-precision-study.md).
+  [Mass Precision Recommendation Report](../../contribute/validation/numerics/mass-precision.md).
 
 ### EnvironmentData Container
 
@@ -732,7 +732,7 @@ not raw speed, is the main precision driver.
   target devices matter, and whether a validated fp32 or mixed-precision path is
   needed for those devices.
 - Use the shipped
-  [Mass Precision Recommendation Report](mass-precision-study.md) as the
+  [Mass Precision Recommendation Report](../../contribute/validation/numerics/mass-precision.md) as the
   acceptance gate before changing precision, dtype, or mass schema.
 
 ### Time-Scale Stiffness
@@ -745,7 +745,7 @@ comparisons are retained only as historical evidence and do not expand the
 shipped runtime boundary.
 
 - Detailed evidence lives in
-  [`condensation-stiffness-study.md`](condensation-stiffness-study.md),
+  [`condensation-stiffness-study.md`](../../contribute/validation/numerics/condensation-stiffness.md),
   including the recorded explicit grid, candidate comparison, and current
   bounded direct-kernel contract.
 - Every successful `condensation_step_gpu(...)` call runs four `time_step / 4.0`
@@ -754,7 +754,7 @@ shipped runtime boundary.
   finalizes and applies it, accumulates finalized transfer, and couples gas
   concentration. Later proposals read coupled gas; refresh does not read gas.
 - The case-specific stiffness evidence and limitations are in the
-  [condensation stiffness study](condensation-stiffness-study.md); its recorded
+  [condensation stiffness study](../../contribute/validation/numerics/condensation-stiffness.md); its recorded
   thresholds are not general accuracy or stable-timestep limits.
 - Adaptive stepping, graph capture/replay, and autodiff readiness are not
   shipped claims.
@@ -785,9 +785,9 @@ Shipped scope:
   including mass-transfer conservation and per-step
   `last_latent_heat_energy` bookkeeping checks.
 - User-facing feature documentation with worked code snippets in the
-  [condensation strategy system guide](../condensation_strategy_system.md)
+  [condensation strategy system guide](../../guide/processes/condensation.md)
   and the latent-heat section of the
-  [condensation equations theory page](../../Theory/Technical/Dynamics/Condensation_Equations.md#condensation-with-latent-heat).
+  [condensation equations theory page](../../theory/dynamics/condensation-equations.md#condensation-with-latent-heat).
 - CPU API decisions recorded as the reference contract for GPU latent-heat
   parity (fixed-shape state, explicit environment inputs, no hidden CPU↔GPU
   movement).
@@ -815,7 +815,7 @@ documentation/validation follow-ups deferred from Epic B.
 For the current shipped baseline on explicit CPU↔GPU transfer helpers,
 `EnvironmentData` ownership, current CPU/GPU support boundaries, and the
 canonical runnable entrypoint, start from the
-[Data Containers and GPU Foundations](../data-containers-and-gpu-foundations.md)
+[Data Containers and GPU Foundations](../../guide/data-model/index.md)
 guide and the
 [Data Containers example](../../Examples/Data_Containers/index.md); this
 epic and every later epic extend those contracts rather than redefining
@@ -1027,7 +1027,7 @@ device-aware validation policy from Epic C.
 
 Import the direct step with `from particula.gpu.kernels import
 condensation_step_gpu`. The canonical [data containers and GPU foundations
-guide](../data-containers-and-gpu-foundations.md) defines the supported schema,
+guide](../../guide/data-model/index.md) defines the supported schema,
 units, ordering, device ownership, and explicit-transfer boundary. The step
 uses caller-owned stable-shape fp64 (`wp.float64`) sidecars: transfer fields use
 `(n_boxes, n_particles, n_species)` and property fields use `(n_boxes,)`.
@@ -1055,7 +1055,7 @@ Warp `cpu` baseline evidence is required whenever Warp is installed.
 Optional/local additive CUDA evidence skips cleanly when unavailable; it is
 additional local evidence rather than a default CI requirement. The focused
 direct-kernel evidence is summarized in the
-[fixed-four decision record](condensation-stiffness-study.md) and the
+[fixed-four decision record](../../contribute/validation/numerics/condensation-stiffness.md) and the
 canonical foundations guide.
 
 Temperature feedback, high-level `Aerosol`/`Runnable` integration, adaptive
@@ -1104,8 +1104,8 @@ shipped, and Epic H is active.
 | Independent CPU-Warp Condensation Walkthrough | Shipped |
 | GPU Coagulation Support Documentation and Epic Closeout | Shipped |
 
-Coagulation validation owns the [GPU coagulation validation record](coagulation-validation.md),
-independent condensation walkthrough owns the [condensation parity walkthrough ownership record](condensation-parity-walkthrough.md),
+Coagulation validation owns the [GPU coagulation validation record](../../contribute/validation/gpu/coagulation.md),
+independent condensation walkthrough owns the [condensation parity walkthrough ownership record](../../contribute/validation/gpu/condensation-parity.md),
 and the [GPU condensation parity walkthrough](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_condensation_parity_walkthrough.py)
 is runnable source.
 
@@ -1391,7 +1391,7 @@ Delivered bounded wall-loss scope:
 
 Delivered bounded slot-exhaustion primitives are documented in
 [Fixed-Capacity Slot Exhaustion
-Primitives](../slot_exhaustion_policies.md): CPU policy resolution creates immutable
+Primitives](../../guide/gpu/slot-exhaustion.md): CPU policy resolution creates immutable
 activation-prefix or deferred-policy records, CPU resampling plans and commits
 equal-weight resampling, CPU volume scaling scales selected rows, and direct Warp resampling and volume scaling
 provide the corresponding caller-owned fixed-shape boundaries. They do not
@@ -1403,7 +1403,7 @@ policy.
 - Fixed-slot management ships matching CPU and direct-Warp fixed-shape slot diagnostics and
   activation. The authoritative active/free/invalid classification and schema
   table is in [Data Containers and GPU
-  Foundations](../data-containers-and-gpu-foundations.md).
+  Foundations](../../guide/data-model/index.md).
 - CPU diagnostics and activation use fresh `np.int32` outputs. Direct-Warp
   activation maps selected request-prefix ranks to ascending free slots and
   returns caller-owned, same-device `wp.int32` sidecars by identity. Free-index
@@ -1425,10 +1425,10 @@ Delivered nucleation boundaries and deferred GPU scope:
 
 1. CPU nucleation ships bounded CPU-only, one-box nucleation/particle-source physics
    following the
-   [nucleation equations](../../Theory/Technical/Dynamics/Nucleation_Equations.md).
+   [nucleation equations](../../theory/dynamics/nucleation-equations.md).
    Its public `Nucleation` runnable preserves native `Aerosol` identity and
    uses fixed-capacity slots, partitioning gas, and per-substep transactions.
-   See the [CPU Nucleation Strategy System](../nucleation_strategy_system.md).
+   See the [CPU Nucleation Strategy System](../../guide/processes/nucleation.md).
 2. Direct GPU nucleation ships the bounded, package-exported direct-Warp step:
 
    ```python
@@ -1454,7 +1454,7 @@ Delivered nucleation boundaries and deferred GPU scope:
    or synchronization, CPU fallback, resize/compaction, a GPU `Runnable`,
    scheduler/backend selection, expanded physics, graph capture, autodiff, and
    performance guarantees. See the [Nucleation Strategy
-   System](../nucleation_strategy_system.md) and its
+   System](../../guide/processes/nucleation.md) and its
    [direct example](https://github.com/uncscode/particula/blob/main/docs/Examples/Nucleation/gpu_direct_nucleation.py).
 3. Direct-process integration shipped private sequence evidence, a direct-transfer illustration,
    documentation, and closeout. It does not own the shipped direct GPU nucleation direct step
@@ -1485,7 +1485,7 @@ Delivered nucleation boundaries and deferred GPU scope:
 
 - Fixed-slot management has shipped CPU and direct-Warp fixed-slot diagnostics and activation;
   see [Data Containers and GPU
-  Foundations](../data-containers-and-gpu-foundations.md).
+  Foundations](../../guide/data-model/index.md).
   Its active/free classification, ascending mapping, and fixed-shape storage
   are complete.
 - Slot exhaustion ships exhaustion resolution, resampling, and representative-volume
@@ -1544,7 +1544,7 @@ The full-policy downstream ordering was:
 
 Execution capability policy now supplies the shipped availability resolver, typed errors, explicit
 CPU fallback, frozen stable API, and documentation handoff. See [Backend
-Selection and Explicit CPU Fallback](../backend_selection.md). The historical
+Selection and Explicit CPU Fallback](../../guide/gpu/backend-selection.md). The historical
 ordering remains context: execution capability policy is shipped through final review. Execution capability policy is the
 prerequisite already satisfied by the
 downstream shipped seams. Backend selection supplies neither transfer nor fallback. Selected condensation
@@ -1562,7 +1562,7 @@ direct-kernel contract. Any broader integration still follows the ordering.
 ### High-Level Integration
 
 - Use the shipped
-  [Data Containers and GPU Foundations](../data-containers-and-gpu-foundations.md)
+  [Data Containers and GPU Foundations](../../guide/data-model/index.md)
   guide and
   [Data Containers example](../../Examples/Data_Containers/index.md) as the
    current baseline for explicit transfer helpers, `EnvironmentData` ownership,
@@ -1577,7 +1577,7 @@ direct-kernel contract. Any broader integration still follows the ordering.
   resident scheduling is a shipped bounded consumer, not a consequence of backend selection
   alone.
 - Selected Brownian coagulation documentation has shipped bounded selected-Brownian adapter documentation and
-  evidence in the [coagulation strategy guide](../coagulation_strategy_system.md)
+  evidence in the [coagulation strategy guide](../../guide/processes/coagulation.md)
   and its [explicit-transfer example](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_coagulation_direct.py).
    It preserves the direct-kernel contract. Resident RNG and restart's shipped resident-stream
    policy remains concrete-only and adds no public exports, fallback, or hidden
@@ -1587,7 +1587,7 @@ direct-kernel contract. Any broader integration still follows the ordering.
 
 Resident session setup, checkpoint, and lifecycle operations ship the bounded concrete-only resident-session lifecycle and
 in-memory checkpoint/restart prerequisite; documentation is blocked and unshipped. See
-[GPU resident checkpoints](../gpu_resident_checkpoints.md) for its direct-import
+[GPU resident checkpoints](../../guide/gpu/resident/checkpoints.md) for its direct-import
 seams, closed-guard binding, canonical recovery bytes, and exact-device fresh
 restart contract. It is not a resident loop or a process coordinator.
 
@@ -1641,7 +1641,7 @@ only identity and metadata, run communication before volume evolution using old
 volumes, and invalidate saturation only. Direct-boundary empty/disabled maps
 and unchanged final volumes are write-free no-ops; resident barriers instead
 follow their own composition and validation rules. See the
-[Data Containers and GPU Foundations](../data-containers-and-gpu-foundations.md)
+[Data Containers and GPU Foundations](../../guide/data-model/index.md)
 guide for the amount equations, capacity gating, and checkpoint boundary.
 
 CFD, pressure/velocity solvers, adaptive meshes, distributed or multi-GPU
@@ -1679,8 +1679,8 @@ provide manual, fresh,
 exact-device continuation; cross-backend replay, migration, automatic restart,
 durable serialization, implicit reseeding, and hidden transfer are excluded.
 See the
-[foundations guide](../data-containers-and-gpu-foundations.md) and
-[GPU resident checkpoints](../gpu_resident_checkpoints.md).
+[foundations guide](../../guide/data-model/index.md) and
+[GPU resident checkpoints](../../guide/gpu/resident/checkpoints.md).
 
 Warp CPU is the baseline when installed. CUDA evidence is optional and skips
 cleanly when unavailable; no CPU/Warp/CUDA replay guarantee is made.
@@ -1688,7 +1688,7 @@ cleanly when unavailable; no CPU/Warp/CUDA replay guarantee is made.
 **Exit bar:** backend selection remains a bounded selection seam and resident scheduling remains a
 bounded concrete-only resident scheduler. Communication and volume evolution and resident RNG and restart are shipped; resident diagnostics
 validation is shipped as of 2026-08-11. See the
-[support matrix](../data-containers-and-gpu-foundations.md#resident-support-validation-matrix-2026-08-11)
+[support matrix](../../guide/gpu/execution.md#resident-support-validation-matrix-2026-08-11)
 for the dated evidence. Epic G is shipped. At that closeout, Epics H and I were
 deferred; Epic H subsequently became active with capture capability shipped. Any public,
 availability-policy, fallback/retry, native graph-capture, performance, or
@@ -1719,13 +1719,13 @@ Full-loop capture and replay validation supplies bounded three-way full-loop Num
 validation. This work remains concrete-only and provides no public workflow.
 
 CUDA profiling owns profiling and machine-bounded recommendations. The
-[GPU graph-capture profiling record](../gpu_graph_capture_performance.md)
+[GPU graph-capture profiling record](../../contribute/validation/gpu/graph-capture-profiling.md)
 freezes small `(1, 16, 2)` and medium `(1000, 16, 2)` workloads, 100% activity,
 gas communication, replay counts 1/10/100/1000, and native-CUDA-only evidence
 with no CPU or Warp-CPU fallback. No reviewed normalized artifact or manifest
 is checked in, so profiling results and recommendations are unavailable and
 unshipped. Graph-capture documentation owns the [native-CUDA example](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_resident_graph_capture.py),
-[operator runbook](../gpu_graph_capture.md), limitations, documentation
+[operator runbook](../../guide/gpu/resident/graph-capture.md), limitations, documentation
 reconciliation, and [closeout record](graph-capture-closeout.md). The closeout
 record is the sole evidence authority. Its measured-evidence disposition
 remains `UNSHIPPED/BLOCKED` until the required evidence passes, independently
@@ -1953,7 +1953,7 @@ this measured-evidence bar passed; the closeout ledger preserves its gaps.
 
 - Preserve the shipped explicit CPU↔GPU helper boundary and documented
   container ownership model from the
-  [Data Containers and GPU Foundations](../data-containers-and-gpu-foundations.md)
+  [Data Containers and GPU Foundations](../../guide/data-model/index.md)
   guide while designing graph-captured GPU loops; performance work should not
   reintroduce implicit synchronization or move the canonical example entrypoint
   away from the
@@ -2079,7 +2079,7 @@ decision.
 
 The resident source of record is the machine-generated schema-v3 artifact
 `.artifacts/benchmarks/resident_capture_comparison.json`; see the
-[resident benchmark and memory-budget record](../resident_benchmark_memory_budget.md).
+[resident benchmark and memory-budget record](../../contribute/validation/gpu/resident-benchmarks.md).
 That artifact is absent in this revision. The adjacent legacy
 `.artifacts/benchmarks/gpu_benchmark_results.json` contains coagulation-only
 rows and is not resident evidence.
@@ -2114,11 +2114,11 @@ while the Epic D and Epic E kernels are authored, not added afterward. For
 the shipped
 container, transfer, and runnable-example baseline that this differentiability
 work builds on, start from the
-[Data Containers and GPU Foundations](../data-containers-and-gpu-foundations.md)
+[Data Containers and GPU Foundations](../../guide/data-model/index.md)
 guide and the
 [Data Containers example](../../Examples/Data_Containers/index.md).
 
-See [Warp Autodiff: Limitations and Stochastic Process Handling](warp-autodiff-limitations.md)
+See [Warp Autodiff: Limitations and Stochastic Process Handling](../../contribute/architecture/warp/autodiff-limitations.md)
 for the detailed implementation-planning companion on autodiff mechanics,
 kernel-authoring constraints, offline code patterns, and the options for
 differentiating stochastic coagulation.

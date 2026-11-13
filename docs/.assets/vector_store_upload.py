@@ -229,7 +229,7 @@ def filter_changed_files(changed_files):
         if (
             "particula/" in file
             or "docs/Examples" in file
-            or "docs/Theory" in file
+            or "docs/theory" in file
         ):
             filtered_files.append(file)
     return filtered_files

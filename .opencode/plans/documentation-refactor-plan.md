@@ -556,3 +556,23 @@ catalog does not claim fresh execution or scientific validation.
   Guide layout, and the readable 390 px mobile layout.
 - Remaining folder moves, content splits, retirement, durable checks, and final
   example validation belong to phases 2–5.
+
+### Phase 2 — narrative relocation and extraction completed
+
+- Moved 54 narrative paths into Guide, Theory, and Contribute; split container,
+  transfer, slot, direct-process, and execution references into 12 additional
+  topic pages. Current construction/access snippets now live in Data model;
+  migration retains historical comparisons and links to those canonical guides.
+- Added a relocation manifest and post-build redirects outside navigation and
+  search. Verified all 54 redirect destinations and all 137 split-page fragment
+  destinations against rendered HTML. Old heading fragments retain useful
+  destinations even when their sections moved to different pages.
+- Updated current docs, notebook Markdown links, assistant workflow selection,
+  extraction-tool paths, and snippet-test references. Three affected notebooks
+  retain exactly unchanged code cells and outputs.
+- Strict base/full builds passed (1.67 s / 50.38 s); no warning/error or broken-link
+  messages. Focused native/theory/process/quick-start tests: 46 passed using a
+  writable temporary Warp cache. No scientific assertions or tolerances changed.
+- Roadmap/history extraction is intentionally completed with retirement in
+  phase 4, so original authorities remain available until their successor
+  evidence pages are ready. Example and theory notebook moves are phase 3.

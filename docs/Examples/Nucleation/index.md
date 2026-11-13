@@ -8,7 +8,7 @@ using fixed-capacity slots and partitioning gas. It preserves the supplied
 
 - [Source/download: CPU nucleation](https://github.com/uncscode/particula/blob/main/docs/Examples/Nucleation/cpu_nucleation.py)
 - Run: `python docs/Examples/Nucleation/cpu_nucleation.py`
-- [Feature contract](../../Features/nucleation_strategy_system.md)
+- [Feature contract](../../guide/processes/nucleation.md)
 
 ## Direct-Warp low-level example
 

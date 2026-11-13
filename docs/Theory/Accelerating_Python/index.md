@@ -42,7 +42,7 @@ This pattern is nothing new: classic Fortran and C programs have long relied on 
 ## Historical one-line proposal
 
 **This is an unimplemented historical proposal, not a supported API.**
-Current workflows use [explicit backend selection](../../Features/backend_selection.md)
+Current workflows use [explicit backend selection](../../guide/gpu/backend-selection.md)
 and explicit data transfers; silent fallback is not promised.
 
 The earlier vision was to have a simple enable statement for `particula` that allows users to choose the acceleration method. For example, a user could run the following command in their notebook:

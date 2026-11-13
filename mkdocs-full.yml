@@ -2,6 +2,7 @@ INHERIT: mkdocs.yml
 
 hooks:
   - docs/.assets/navigation.py
+  - docs/.assets/redirects.py
   - docs/.assets/notebook_routing.py
 
 # Full publication build. Local `mkdocs serve` intentionally uses the faster

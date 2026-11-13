@@ -9,7 +9,7 @@ Thanks for thinking about contributing! Our goal is to make your first pull requ
 | You are… | Start here |
 |----------|-----------|
 | **Experienced with Git + Python** | Jump straight to [Github workflow](#3-github-flow) below. |
-| **New to GitHub or virtual‑envs** | Follow [setup for new contributors](#2-setup-for-new-contributors) and the [Contributor Setup guide](../Examples/Setup_Particula/Details/Contributor_Setup.md). |
+| **New to GitHub or virtual‑envs** | Follow [setup for new contributors](#2-setup-for-new-contributors) and the [Contributor Setup guide](setup.md). |
 | **Planning to contribute major code or new features** | Follow [Feature Workflow](Feature_Workflow/index.md) and [Code Specifications](Code_Specifications/index.md) before you begin. |
 
 ---
@@ -18,7 +18,7 @@ Thanks for thinking about contributing! Our goal is to make your first pull requ
 
 For the complete, click‑through tutorial (fork → clone → virtual‑env →
 editable install) see the
-[Contributor Setup guide](../Examples/Setup_Particula/Details/Contributor_Setup.md).
+[Contributor Setup guide](setup.md).
 
 > _If you already have Python, Git, and a preferred editor, skim this section._
 
@@ -39,9 +39,9 @@ editable install) see the
 
    | Tool | Command | Instructions |
    |------|----------|---------|
-   | **uv (fast, minimal)** | `uv venv .venv`<br>`source .venv/bin/activate`<br>`uv pip install -e ".[dev,extra]"` | [uv setup guide](../Examples/Setup_Particula/Details/Setup_UV.md) |
-   | **pip + venv** | `python -m venv .venv`<br>`source .venv/bin/activate`<br>`pip install -e ".[dev,extra]"` | [pip setup guide](../Examples/Setup_Particula/Details/Setup_PIP.md) |
-   | **conda** | `conda create -n particula-dev`<br>`conda activate particula-dev`<br>`pip install -e ".[dev,extra]"` | [conda setup guide](../Examples/Setup_Particula/Details/Setup_Conda.md) |
+   | **uv (fast, minimal)** | `uv venv .venv`<br>`source .venv/bin/activate`<br>`uv pip install -e ".[dev,extra]"` | [uv setup guide](../guide/getting-started/installation/uv.md) |
+   | **pip + venv** | `python -m venv .venv`<br>`source .venv/bin/activate`<br>`pip install -e ".[dev,extra]"` | [pip setup guide](../guide/getting-started/installation/pip.md) |
+   | **conda** | `conda create -n particula-dev`<br>`conda activate particula-dev`<br>`pip install -e ".[dev,extra]"` | [conda setup guide](../guide/getting-started/installation/conda.md) |
 
 5. **Verify installation**  
    ```bash
@@ -102,7 +102,7 @@ For a full step‑by‑step breakdown see the
 
 **Step 5 – Commit & push**
 
-For an overview of git standards we use, see [Linear Git Repository](../contribute/Code_Specifications/Details/Linear_Git_Repository.md).
+For an overview of git standards we use, see [Linear Git Repository](Code_Specifications/Details/Linear_Git_Repository.md).
 
 ```bash
 git add .
@@ -135,9 +135,9 @@ Your contribution is now part of **Particula**—thank you!
 | Topic | Rule |
 |-------|------|
 | **Style** | Detailed rules: [Code Specifications](Code_Specifications/index.md). |
-| **Docstrings** | Follow the templates in [Function docstring format](../contribute/Code_Specifications/Details/Function_docstring_format.md) and [Class docstring format](../contribute/Code_Specifications/Details/Class_docstring_format.md). One‑line summary + details + sections (`Arguments`, `Returns`, `Raises`, `Examples`, `References`). |
+| **Docstrings** | Follow the templates in [Function docstring format](Code_Specifications/Details/Function_docstring_format.md) and [Class docstring format](Code_Specifications/Details/Class_docstring_format.md). One‑line summary + details + sections (`Arguments`, `Returns`, `Raises`, `Examples`, `References`). |
 | **Typing** | Use `typing` annotations. Omit types in docstrings. |
-| **Tests** | Every public function/class must have at least one `pytest` test. Add regression coverage for fixes and keep change-scope coverage strong. See [Add Unit Tests](../contribute/Feature_Workflow/Details/Add_Unit_Test.md) and the repository testing guide. |
+| **Tests** | Every public function/class must have at least one `pytest` test. Add regression coverage for fixes and keep change-scope coverage strong. See [Add Unit Tests](Feature_Workflow/Details/Add_Unit_Test.md) and the repository testing guide. |
 | **Commit messages** | Imperative mood, ≤ 72 chars summary + context body if needed. |
 | **Large changes** | Open a **discussion** first and discuss design before implementation. |
 

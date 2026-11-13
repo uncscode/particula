@@ -45,9 +45,9 @@ print(result.particles.species_mass_density)  # kg/m³
 ```
 
 The PMF stores bin number densities and uses the canonical 1 m³ reference
-volume. See [native construction](../../Features/particle-data-migration/construction.md)
-and [access and replacement](../../Features/particle-data-migration/containers.md).
+volume. See [native construction](../data-model/construction.md)
+and [access and replacement](../data-model/ownership.md).
 
 
-Next: [process guides](../../Features/native_scientific_processes.md) or
+Next: [process guides](../processes/index.md) or
 [examples](../../Examples/index.md).

@@ -4,8 +4,8 @@
 > `par.get_backend`, `par.dispatchable` and `par.register` names below are not
 > current Particula APIs. All code blocks on this page are nonexecutable proposal
 > text. Silent fallback was a proposed design, not the current execution
-> contract. Use [explicit backend selection](../../../Features/backend_selection.md)
-> and the [native migration guide](../../../Features/particle-data-migration/index.md).
+> contract. Use [explicit backend selection](../../../guide/gpu/backend-selection.md)
+> and the [native migration guide](../../../guide/migration/v0.3.0/index.md).
 
 
 **Objective**

@@ -67,8 +67,8 @@ This tutorial covers:
 ## Related Resources
 
 - **Existing Tutorial**: [Activity Tutorial (Particle Phase)](../Particle_Phase/Notebooks/Activity_Tutorial.ipynb) - Covers Strategy, Builder, and Factory patterns
-- **Feature Guide**: [Activity System](../../Features/activity_system.md) - Comprehensive feature documentation
-- **Theory**: [Activity Theory](../../Theory/Activity_Calculations/activity_theory.md) - Mathematical foundations
+- **Feature Guide**: [Activity System](../../guide/processes/activity.md) - Comprehensive feature documentation
+- **Theory**: [Activity Theory](../../theory/thermodynamics/activity-theory.md) - Mathematical foundations
 
 ## Quick Reference
 

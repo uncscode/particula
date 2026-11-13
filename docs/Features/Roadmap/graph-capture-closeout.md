@@ -41,9 +41,9 @@ Future producers must inspect the capture capability, enqueue, preallocation,
 capture/replay, parity, benchmark, and profiling implementations and their final
 executable diff. Exclude tests, documentation, internal plans, and artifacts;
 then freeze a sorted, deduplicated repository-relative production-module list.
-Use the [operator runbook](../gpu_graph_capture.md),
-[benchmark record](../resident_benchmark_memory_budget.md), and
-[profiling record](../gpu_graph_capture_performance.md) to locate the supported
+Use the [operator runbook](../../guide/gpu/resident/graph-capture.md),
+[benchmark record](../../contribute/validation/gpu/resident-benchmarks.md), and
+[profiling record](../../contribute/validation/gpu/graph-capture-profiling.md) to locate the supported
 boundaries and their evidence requirements. These are static refresh inputs,
 not a live dependency of this record or its test.
 

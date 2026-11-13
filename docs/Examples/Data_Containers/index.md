@@ -54,7 +54,7 @@ unavailable or `PARTICULA_EXAMPLE_FORCE_NO_WARP=1`; this disabled route has no
 CPU coagulation fallback. The example is a direct-kernel path, not a Runnable
 API.
 
-- [Feature guide: Data Containers and GPU Foundations](../../Features/data-containers-and-gpu-foundations.md)
+- [Feature guide: Data Containers and GPU Foundations](../../guide/data-model/index.md)
 - [Runnable entrypoint source on GitHub](https://github.com/Gorkowski/particula/blob/main/docs/Examples/data_containers_and_gpu_foundations.py)
 - [Direct GPU kernels quick-start source on GitHub](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_direct_kernels_quick_start.py)
 - [Direct GPU coagulation source](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_coagulation_direct.py)
