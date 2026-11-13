@@ -74,6 +74,23 @@ verification pass with the new controls.
 Validated 2026-11-12/13 on branch `codex/starlight-local-demo`, based on
 `45f4d53e931e9fc4e57073b15895fe01a10f9cca`.
 
+## Particle-cloud hero — 2026-11-13
+
+Replaced the hero image with a deterministic inline SVG particle cloud. CSS
+drift starts after 500 ms; no simulation runtime, animation dependency or hero
+image download is required. Wide desktop layouts enlarge the cloud into the
+text area and trail particles into the following sections. Narrow layouts keep
+the compact cloud and mobile hides the trailing wisps. Text stays above the art.
+
+The icon-only pause/play control retains an accessible name and tooltip.
+Browser checks confirmed both control states, automatic off-screen pausing,
+light/dark readability, and no horizontal overflow at 1440 and 390 pixels.
+The implementation also observes reduced-motion and document visibility;
+OS preference emulation was not part of the browser check. The full build and
+link verification pass, and all ten documentation infrastructure tests pass.
+Screenshots: `qa/particle-cloud-desktop.jpg`, `qa/particle-cloud-light.jpg`,
+and `qa/particle-cloud-mobile.jpg`.
+
 ## Completed
 
 - Production build: 253 content pages; post-build verification checks 261 HTML

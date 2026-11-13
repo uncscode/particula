@@ -328,7 +328,6 @@ def prepare():
                     "Build a simulation from physical processes, then "
                     "explore the science behind the results."
                 ),
-                "image": {"file": "../../../public/images/aerosol-model.svg"},
                 "actions": [
                     {
                         "text": "Start exploring",
