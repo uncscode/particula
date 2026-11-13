@@ -12,7 +12,6 @@ Start with [contributing](CONTRIBUTING.md) and
 | Organize or add documentation | [Documentation rules](documentation.md) |
 | Inspect numerical evidence | [Validation records](validation/index.md) |
 | Inspect current development direction | [Roadmap](roadmap.md) |
-| Set up coding assistants | [Assistant setup](ai-assistants/index.md) |
 
 Follow the [code of conduct](CODE_OF_CONDUCT.md). Implementation plans belong
 with development records; scientific assumptions belong in Theory and supported

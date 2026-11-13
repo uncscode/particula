@@ -15,6 +15,7 @@ Start with a small CPU simulation, then choose a process or execution path.
 
 | Task | Read next |
 | --- | --- |
+| Set up AI assistants | [Assistant setup](ai-assistants/index.md) |
 | Configure particle, gas, and environment state | [Data model](data-model/index.md) |
 | Simulate growth, collisions, sources, or losses | [Processes](processes/index.md) |
 | Use explicit Warp transfers and device execution | [GPU selection](gpu/backend-selection.md), then [resident checkpoints](gpu/resident/checkpoints.md) |

@@ -19,10 +19,10 @@ Source revision: `7b064295037c3c9a137f5dd13c03f4a40da3f11b`. Original files are 
 | `docs/Theory/Accelerating_Python/index.md` | Outdated proposal/provider catalog | `docs/guide/gpu/execution.md` |
 | `docs/Theory/Accelerating_Python/Details/Taichi_Exploration.ipynb` | Outdated proposal/provider catalog | `docs/guide/gpu/execution.md` |
 | `docs/Theory/Accelerating_Python/Details/One-Line_Vision.md` | Outdated proposal/provider catalog | `docs/guide/gpu/execution.md` |
-| `docs/Theory/OpenAI_Models/index.md` | Outdated proposal/provider catalog | `docs/contribute/ai-assistants/index.md` |
-| `docs/Theory/OpenAI_Models/Models/Agents.md` | Outdated proposal/provider catalog | `docs/contribute/ai-assistants/index.md` |
-| `docs/Theory/OpenAI_Models/Models/Chat.md` | Outdated proposal/provider catalog | `docs/contribute/ai-assistants/index.md` |
-| `docs/Theory/OpenAI_Models/Models/Reasoning.md` | Outdated proposal/provider catalog | `docs/contribute/ai-assistants/index.md` |
+| `docs/Theory/OpenAI_Models/index.md` | Outdated proposal/provider catalog | `docs/guide/ai-assistants/index.md` |
+| `docs/Theory/OpenAI_Models/Models/Agents.md` | Outdated proposal/provider catalog | `docs/guide/ai-assistants/index.md` |
+| `docs/Theory/OpenAI_Models/Models/Chat.md` | Outdated proposal/provider catalog | `docs/guide/ai-assistants/index.md` |
+| `docs/Theory/OpenAI_Models/Models/Reasoning.md` | Outdated proposal/provider catalog | `docs/guide/ai-assistants/index.md` |
 | `docs/Theory/Technical/index.md` | Redundant hierarchy/catalog merged into owning index | `docs/theory/index.md` |
 | `docs/Features/Roadmap/data-oriented-gpu.md` | Completed/mixed roadmap; current contracts and evidence extracted | `docs/contribute/roadmap.md` |
 | `docs/Features/Roadmap/graph-capture-closeout.md` | Completed/mixed roadmap; current contracts and evidence extracted | `docs/contribute/validation/gpu/graph-capture-qualification.md` |

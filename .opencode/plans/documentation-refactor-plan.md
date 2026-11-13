@@ -99,6 +99,7 @@ docs/
     migration/
       index.md                     # version chooser, currently v0.3.0
       v0.3.0/                      # old -> new, troubleshooting, compatibility
+    ai-assistants/                 # supported assistant setup and workflows
     data-model/                    # construction, shapes, units, ownership
     processes/                     # activity, condensation, coagulation, etc.
     gpu/                           # selection, transfers, slots, resident use
@@ -125,13 +126,11 @@ docs/
     validation/                    # numeric studies and GPU evidence records
     roadmap/                       # active and pending work only
     documentation.md               # placement, ownership, and review rules
-    ai-assistants/                 # supported assistant setup and workflows
 ```
 
 Top-level tabs, in order: **Guide, Examples, Theory, API, Contribute**. The
 project overview remains the home link, with Start here pointing into Guide.
-Getting started and Migration are Guide subsections; AI assistants is a
-Contribute subsection. There is no public Archive section. Prefer two
+Getting started, Migration, and AI assistants are Guide subsections. There is no public Archive section. Prefer two
 or three meaningful navigation levels, with topic indexes for deeper material;
 use descriptive group names instead of `Details`, `Notebooks`, or `Technical`.
 
@@ -209,7 +208,7 @@ that an older published wheel contains the development API.
 | Topic-local data-container forwarding script | Move redundant forwarding module to `.trash` after consolidating to one canonical example | Update callers, tests, and published commands; preserve any still-required compatibility until callers are migrated. |
 | Activity/Equilibria tutorials spread across three topics | Co-locate, then review overlap | Similar subject matter is not duplicate content; compare learning objectives and scientific outputs before merging. |
 | One-Line Vision and Taichi exploration | Move to `.trash` as outdated proposals/experiments | Preserve original source and supporting assets; replace active links with current GPU guidance. |
-| OpenAI model catalog | Move to `.trash`; link current assistant instructions | Extract any unique, still-current Particula workflow guidance into Contribute → AI assistants first. |
+| OpenAI model catalog | Move to `.trash`; link current assistant instructions | Extract any unique, still-current Particula workflow guidance into Guide → AI assistants first. |
 | Standalone Warp teaching examples | Move to contributor architecture/learning material | Keep explicit teaching-only status; do not mix them with validated Particula process examples. |
 | Autodiff limitations | Keep as contributor design/reference material | It informs future work and is not proof of shipped differentiability. |
 | Precision, stiffness, and coagulation validation studies | Keep as scientific validation/reference, not roadmap pages | Preserve evidence supporting current numerical claims and decisions. |

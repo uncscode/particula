@@ -125,6 +125,11 @@ nav:
       - New to Python?: guide/getting-started/installation/new-to-python.md
       - Setup via pip: guide/getting-started/installation/pip.md
       - Setup via **uv**: guide/getting-started/installation/uv.md
+  - AI assistants:
+    - AI assistants: guide/ai-assistants/index.md
+    - Claude Code, Desktop, and Cowork: guide/ai-assistants/claude.md
+    - Codex and ChatGPT: guide/ai-assistants/codex.md
+    - OpenCode: guide/ai-assistants/opencode.md
   - Data model:
     - Data model: guide/data-model/index.md
     - Native aerosol construction and replacement: guide/data-model/construction.md
@@ -284,11 +289,6 @@ nav:
       - Add Theory: contribute/Feature_Workflow/Details/Add_Theory.md
       - Add Unit Tests: contribute/Feature_Workflow/Details/Add_Unit_Test.md
       - Adding to `__init__.py`: contribute/Feature_Workflow/Details/Add_to_init.md
-  - AI assistants:
-    - AI assistants: contribute/ai-assistants/index.md
-    - Claude Code, Desktop, and Cowork: contribute/ai-assistants/claude.md
-    - Codex and ChatGPT: contribute/ai-assistants/codex.md
-    - OpenCode: contribute/ai-assistants/opencode.md
   - Architecture:
     - Architecture: contribute/architecture/index.md
     - Particula Design: contribute/architecture/design-patterns.md

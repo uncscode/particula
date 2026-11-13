@@ -50,10 +50,10 @@
     "docs/Features/coagulation_strategy_system.md": "docs/guide/processes/coagulation.md",
     "docs/Features/particle-data-migration/construction.md": "docs/guide/data-model/construction.md",
     "docs/Features/particle-data-migration/containers.md": "docs/guide/data-model/ownership.md",
-    "docs/AI_Assistants/claude.md": "docs/contribute/ai-assistants/claude.md",
-    "docs/AI_Assistants/codex.md": "docs/contribute/ai-assistants/codex.md",
-    "docs/AI_Assistants/index.md": "docs/contribute/ai-assistants/index.md",
-    "docs/AI_Assistants/opencode.md": "docs/contribute/ai-assistants/opencode.md",
+    "docs/AI_Assistants/claude.md": "docs/guide/ai-assistants/claude.md",
+    "docs/AI_Assistants/codex.md": "docs/guide/ai-assistants/codex.md",
+    "docs/AI_Assistants/index.md": "docs/guide/ai-assistants/index.md",
+    "docs/AI_Assistants/opencode.md": "docs/guide/ai-assistants/opencode.md",
     "docs/Examples/Activity/index.md": "docs/examples/thermodynamics/activity/index.md",
     "docs/Examples/Aerosol/index.md": "docs/examples/fundamentals/index.md",
     "docs/Examples/Chamber_Wall_Loss/index.md": "docs/examples/processes/wall-loss/index.md",
@@ -183,7 +183,11 @@
     "docs/Features/Roadmap/data-oriented-gpu.md": "docs/contribute/roadmap.md",
     "docs/Features/Roadmap/graph-capture-closeout.md": "docs/contribute/validation/gpu/graph-capture-qualification.md",
     "docs/Features/Roadmap/index.md": "docs/contribute/roadmap.md",
-    "docs/guide/processes/catalog.md": "docs/guide/processes/index.md"
+    "docs/guide/processes/catalog.md": "docs/guide/processes/index.md",
+    "docs/contribute/ai-assistants/claude.md": "docs/guide/ai-assistants/claude.md",
+    "docs/contribute/ai-assistants/codex.md": "docs/guide/ai-assistants/codex.md",
+    "docs/contribute/ai-assistants/index.md": "docs/guide/ai-assistants/index.md",
+    "docs/contribute/ai-assistants/opencode.md": "docs/guide/ai-assistants/opencode.md"
   },
   "fragments": {
     "docs/Features/data-containers-and-gpu-foundations.md#data-containers-and-gpu-foundations": "docs/guide/data-model/index.md#data-model",
