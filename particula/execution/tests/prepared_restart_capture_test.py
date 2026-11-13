@@ -200,6 +200,19 @@ def test_cpu_capture_rejects_without_advancing():
         assert simulation.completed_steps == 1
 
 
+def test_checkpoint_does_not_delay_owned_storage_release(device):
+    """A saved checkpoint retains CPU bytes, not a cyclic live GPU binding."""
+    import weakref
+
+    initial, process, dt = scenario("dilution")
+    owner = process.prepare(initial, device=device, time_step=dt)
+    primary = weakref.ref(owner._session.particles.masses)
+    checkpoint = owner.checkpoint()
+    owner.close()
+    assert primary() is None
+    assert checkpoint.resident.payloads
+
+
 def test_restart_rechecks_evolved_equal_count_capability(device, monkeypatch):
     """A late source can create a state that the next Brownian step rejects."""
     initial, source = nucleation_case()

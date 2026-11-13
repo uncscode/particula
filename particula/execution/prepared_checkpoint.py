@@ -13,13 +13,21 @@ from particula.execution.prepared_types import SimulationCheckpoint
 
 def checkpoint(owner: Any) -> SimulationCheckpoint:
     """Observe errors before saving canonical bytes and last-step results."""
-    from particula.execution.checkpoint import _payload
+    from particula.execution.checkpoint import (
+        ResidentCheckpointController,
+        _payload,
+    )
 
     owner.synchronize()
     if not owner._plans:
         raise ValueError("checkpoint requires a bound process plan")
     with owner._scope():
-        resident = owner._session.checkpoint(owner._registry, owner._guard)
+        # This owner needs nonterminal checkpoints only. A short-lived
+        # controller avoids attaching a session -> controller -> session cycle
+        # that would otherwise retain large GPU arrays until cyclic GC runs.
+        resident = ResidentCheckpointController(
+            owner._session, owner._registry, owner._guard
+        ).checkpoint()
         auxiliary = tuple(
             _payload("prepared", role, array)
             for role, array in sorted(owner._auxiliary.items())
