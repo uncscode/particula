@@ -1,0 +1,308 @@
+# particula.gpu.warp_types
+
+*module*
+
+GPU-side data containers using NVIDIA Warp.
+
+This module defines Warp struct containers for particle, gas, and
+environment data that mirror CPU-side particula containers. These structs
+store multi-box simulation state in Warp-native array types for GPU-resident
+workflows.
+
+The structs use Warp array types for GPU memory management:
+- wp.array: 1D arrays
+- wp.array2d: 2D arrays
+- wp.array3d: 3D arrays
+
+All arrays support batch dimensions (n_boxes) for multi-box simulations.
+Single-box simulations use n_boxes=1.
+
+> **References**
+>
+> NVIDIA Warp documentation: https://nvidia.github.io/warp/
+> Warp structs: https://nvidia.github.io/warp/modules/structs.html
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/warp_types.py#L1-L1)
+
+## particula.gpu.warp_types.WarpEnvironmentData
+
+*class*
+
+```python
+class WarpEnvironmentData
+```
+
+GPU-side environment data container using Warp arrays.
+
+This struct mirrors the CPU-side ``EnvironmentData`` schema from
+``particula.gas.environment_data``. Temperature and pressure store one
+float64 value per simulation box, and saturation ratio stores one float64
+value per box and species.
+
+**Attributes**
+
+- `temperature` (`wp.array(dtype=wp.float64)`) — Box temperatures in kelvin. Shape: (n_boxes,)
+- `pressure` (`wp.array(dtype=wp.float64)`) — Box pressures in pascals. Shape: (n_boxes,)
+- `saturation_ratio` (`wp.array2d(dtype=wp.float64)`) — Per-box, per-species saturation ratios. Shape: (n_boxes, n_species)
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/warp_types.py#L170-L190)
+
+### particula.gpu.warp_types.WarpEnvironmentData.pressure
+
+*attribute* · *instance attribute*
+
+```python
+pressure: wp.array(dtype=wp.float64)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/warp_types.py#L189-L189)
+
+### particula.gpu.warp_types.WarpEnvironmentData.saturation_ratio
+
+*attribute* · *instance attribute*
+
+```python
+saturation_ratio: wp.array2d(dtype=wp.float64)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/warp_types.py#L190-L190)
+
+### particula.gpu.warp_types.WarpEnvironmentData.temperature
+
+*attribute* · *instance attribute*
+
+```python
+temperature: wp.array(dtype=wp.float64)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/warp_types.py#L188-L188)
+
+## particula.gpu.warp_types.WarpGasData
+
+*class*
+
+```python
+class WarpGasData
+```
+
+GPU-side gas species data container using Warp arrays.
+
+All batched arrays have shape (n_boxes, n_species) for multi-box CFD.
+Mirrors the GasData container from particula.gas, but excludes
+string fields (names) which are not GPU-compatible.
+
+> **Batch Dimension Convention**
+>
+> - First dimension is n_boxes (number of simulation boxes)
+> - Second dimension is n_species (number of gas species)
+> - Single-box simulations use n_boxes=1
+
+> **Note**
+>
+> - The ``name`` field from CPU ``GasData`` is excluded because
+>   strings are not GPU-compatible. Preserve species identity with
+>   caller-owned ordered names or index mapping outside this struct;
+>   placeholder names are generated only by CPU restore helpers when
+>   names are omitted.
+> - The ``partitioning`` field is the version-2 active-device, per-box
+>   ``(n_boxes, n_species)`` int32 mask rather than a CPU bool vector.
+>   Its values must remain binary (1 = True, 0 = False). The public
+>   condensation step gates raw proposals with this mask; its private
+>   inventory finalization
+>   inventory finalizer instead requires an already gated proposal. The
+>   public step applies finalized transfer to particle mass and couples
+>   its concentration-weighted opposite to ``concentration`` after every
+>   substep. CPU restore additionally requires every box to have the same
+>   mask because ``GasData`` owns one shared species mask. Migrate legacy
+>   one-dimensional masks with ``to_per_box_partitioning()`` before
+>   assigning this public field.
+> - ``vapor_pressure`` is GPU-only helper state for condensation-style
+>   kernels and is not part of CPU ``GasData`` ownership.
+>   ``to_warp_gas_data()`` accepts caller-supplied values with shape
+>   ``(n_boxes, n_species)`` or allocates zeros when omitted. Those
+>   zeros keep the Warp schema valid but do not provide physical
+>   vapor-pressure inputs for kernels that consume the field directly.
+>   ``condensation_step_gpu()`` refreshes the field from its thermodynamic
+>   configuration before every transfer proposal; that refresh does not
+>   consume gas concentration. CPU restore helpers drop this field
+>   intentionally from restored ``GasData``, while the
+>   retained GPU container can still expose it until the caller discards
+>   that object.
+
+**Attributes**
+
+- `molar_mass` (`wp.array(dtype=wp.float64)`) — Molar masses in kg/mol. Shape: (n_species,) Shared across all boxes - not batched.
+- `concentration` (`wp.array2d(dtype=wp.float64)`) — Mass concentrations in kg/m^3. Shape: (n_boxes, n_species). The public condensation step updates this field after each inventory-limited substep transfer; it supplies inventory for subsequent transfer proposals.
+- `vapor_pressure` (`wp.array2d(dtype=wp.float64)`) — Vapor pressures in Pa. Shape: (n_boxes, n_species) GPU-only helper state for condensation kernels.
+- `partitioning` (`wp.array2d(dtype=wp.int32)`) — Binary mask used by the public condensation step to allow species proposals to partition to particles in each box. Shape: (n_boxes, n_species) Uses int32 (1=True, 0=False) for GPU compatibility.
+
+> **Example**
+>
+> >>> import warp as wp
+> >>> from particula.gpu import WarpGasData
+> >>> wp.init()
+> >>> n_boxes, n_species = 2, 3
+> >>> gas = WarpGasData()
+> >>> gas.molar_mass = wp.array(
+> ...     [0.018, 0.150, 0.200], dtype=wp.float64
+> ... )
+> >>> gas.concentration = wp.zeros(
+> ...     (n_boxes, n_species), dtype=wp.float64
+> ... )
+> >>> gas.vapor_pressure = wp.ones(
+> ...     (n_boxes, n_species), dtype=wp.float64
+> ... ) * 1000.0
+> >>> gas.partitioning = wp.array([[1, 1, 0], [1, 1, 0]], dtype=wp.int32)
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/warp_types.py#L85-L167)
+
+### particula.gpu.warp_types.WarpGasData.concentration
+
+*attribute* · *instance attribute*
+
+```python
+concentration: wp.array2d(dtype=wp.float64)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/warp_types.py#L165-L165)
+
+### particula.gpu.warp_types.WarpGasData.molar_mass
+
+*attribute* · *instance attribute*
+
+```python
+molar_mass: wp.array(dtype=wp.float64)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/warp_types.py#L164-L164)
+
+### particula.gpu.warp_types.WarpGasData.partitioning
+
+*attribute* · *instance attribute*
+
+```python
+partitioning: wp.array2d(dtype=wp.int32)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/warp_types.py#L167-L167)
+
+### particula.gpu.warp_types.WarpGasData.vapor_pressure
+
+*attribute* · *instance attribute*
+
+```python
+vapor_pressure: wp.array2d(dtype=wp.float64)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/warp_types.py#L166-L166)
+
+## particula.gpu.warp_types.WarpParticleData
+
+*class*
+
+```python
+class WarpParticleData
+```
+
+GPU-side particle data container using Warp arrays.
+
+All arrays have batch dimension for multi-box CFD support.
+Mirrors the shape convention of ParticleData from particula.particles.
+
+> **Batch Dimension Convention**
+>
+> - First dimension is always n_boxes (number of simulation boxes)
+> - Single-box simulations use n_boxes=1
+> - This enables vectorized operations across multiple boxes
+
+**Attributes**
+
+- `masses` (`wp.array3d(dtype=wp.float64)`) — Per-species masses in kg. Shape: (n_boxes, n_particles, n_species) 3D array where each particle has mass per species.
+- `concentration` (`wp.array2d(dtype=wp.float64)`) — Number concentration per particle. Shape: (n_boxes, n_particles) For particle-resolved: actual count (typically 1). For binned: number per m^3.
+- `charge` (`wp.array2d(dtype=wp.float64)`) — Particle charges (dimensionless integer counts). Shape: (n_boxes, n_particles) Stored as float64 for GPU compatibility.
+- `density` (`wp.array(dtype=wp.float64)`) — Material densities in kg/m^3. Shape: (n_species,) Shared across all boxes - not batched.
+- `volume` (`wp.array(dtype=wp.float64)`) — Simulation volume per box in m^3. Shape: (n_boxes,)
+- `distribution_kind` (`wp.int32`) — Stable host-visible population tag: 0 invalid/unset, 1 discrete density, 2 unsupported PDF, 3 resolved counts. Numerical arrays are never normalized by assigning this tag.
+
+> **Example**
+>
+> >>> import warp as wp
+> >>> from particula.gpu import WarpParticleData
+> >>> wp.init()
+> >>> n_boxes, n_particles, n_species = 2, 100, 3
+> >>> data = WarpParticleData()
+> >>> data.masses = wp.zeros(
+> ...     (n_boxes, n_particles, n_species), dtype=wp.float64
+> ... )
+> >>> data.concentration = wp.ones(
+> ...     (n_boxes, n_particles), dtype=wp.float64
+> ... )
+> >>> data.charge = wp.zeros(
+> ...     (n_boxes, n_particles), dtype=wp.float64
+> ... )
+> >>> data.density = wp.array(
+> ...     [1000.0, 1200.0, 1500.0], dtype=wp.float64
+> ... )
+> >>> data.volume = wp.array([1e-3, 1e-3], dtype=wp.float64)
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/warp_types.py#L24-L82)
+
+### particula.gpu.warp_types.WarpParticleData.charge
+
+*attribute* · *instance attribute*
+
+```python
+charge: wp.array2d(dtype=wp.float64)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/warp_types.py#L79-L79)
+
+### particula.gpu.warp_types.WarpParticleData.concentration
+
+*attribute* · *instance attribute*
+
+```python
+concentration: wp.array2d(dtype=wp.float64)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/warp_types.py#L78-L78)
+
+### particula.gpu.warp_types.WarpParticleData.density
+
+*attribute* · *instance attribute*
+
+```python
+density: wp.array(dtype=wp.float64)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/warp_types.py#L80-L80)
+
+### particula.gpu.warp_types.WarpParticleData.distribution_kind
+
+*attribute* · *instance attribute*
+
+```python
+distribution_kind: wp.int32
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/warp_types.py#L82-L82)
+
+### particula.gpu.warp_types.WarpParticleData.masses
+
+*attribute* · *instance attribute*
+
+```python
+masses: wp.array3d(dtype=wp.float64)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/warp_types.py#L77-L77)
+
+### particula.gpu.warp_types.WarpParticleData.volume
+
+*attribute* · *instance attribute*
+
+```python
+volume: wp.array(dtype=wp.float64)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/warp_types.py#L81-L81)

@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 3.1249003760167398,
+  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "input_sha256": {},
+  "example": "examples-processes-coagulation-functional-coagulation-basic-2-pdf",
+  "fingerprint": "fbc7b20e23f05fc53ef7993a293af2b78793a59cf993bb552c21b4948adcf3a3",
+  "source": "docs/examples/processes/coagulation/functional/coagulation_basic_2_pdf.py",
+  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "package_dirty": false,
+  "executed_at": "2026-11-13T15:00:28.472385+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [],
+    [],
+    [
+      {
+        "text": "<particula.dynamics.particle_process.Coagulation object at 0x7f553ff907a0>\n"
+      }
+    ],
+    [],
+    [
+      {
+        "image": "figure-5-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "83abbe63479e159d57d1d532e676cdcf261969b3a8b587359bd4dc32a3993ace",
+    "figure-5-1.png": "7d296b25aa0dd2fd7f2a0fcb73976886fcdff957f951f583485e53022113f936"
+  }
+}

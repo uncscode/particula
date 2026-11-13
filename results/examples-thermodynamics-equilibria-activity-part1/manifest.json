@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 3.498788805969525,
+  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "input_sha256": {},
+  "example": "examples-thermodynamics-equilibria-activity-part1",
+  "fingerprint": "e4a44b95ef51c8b2bbce8758318c69da9a4e255579e0661a704c5bee3ef23910",
+  "source": "docs/examples/thermodynamics/equilibria/activity_part1.py",
+  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "package_dirty": false,
+  "executed_at": "2026-11-13T15:13:24.386216+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [],
+    [],
+    [
+      {
+        "image": "figure-3-1.png"
+      },
+      {
+        "image": "figure-3-2.png"
+      }
+    ],
+    [
+      {
+        "image": "figure-4-1.png"
+      }
+    ],
+    [
+      {
+        "image": "figure-5-1.png"
+      }
+    ],
+    [
+      {
+        "image": "figure-6-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "0fd47e8e0f9fbfd385aad9a18a2727bab0920ae1dd7b21dda00fc482a7fdc243",
+    "figure-3-1.png": "6ecc610e733ace930805607a070f81f2c41c3a797c6628bedf8e654448f2d921",
+    "figure-3-2.png": "06355996b65cf72f546ac8e11d4fe1711b417241399927f5d14f1079468ef940",
+    "figure-4-1.png": "9ac71052097dd949818f91fc2bb5b85e8f135e9e6962d97ac10f44e9d192f5bf",
+    "figure-5-1.png": "a93dade1fed5f38048511d9032691cf2ce3f280936ad2f84f0bfefd802ba66cd",
+    "figure-6-1.png": "2e5cd4213723b87a90ff61c84ca01082a95cca9418f6ae5b59dbc2a7634c0c4a"
+  }
+}

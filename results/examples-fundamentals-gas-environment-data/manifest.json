@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 3.314256037992891,
+  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "input_sha256": {},
+  "example": "examples-fundamentals-gas-environment-data",
+  "fingerprint": "330475365efbc43356d558de7f0d8206f10dd19b5fdf6add46800030738a904a",
+  "source": "docs/examples/fundamentals/gas/environment_data.py",
+  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "package_dirty": false,
+  "executed_at": "2026-11-13T14:59:47.474103+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [],
+    [
+      {
+        "text": "GasData(name=['water', 'butanol', 'styrene'], molar_mass=array([0.01801528, 0.074121  , 0.10415   ]), concentration=array([[1.e-03, 2.e-06, 1.e-09]]), partitioning=array([ True,  True,  True]))\nEnvironmentData(temperature=array([298.15]), pressure=array([101325.]), saturation_ratio=array([[0., 0., 0.]]))\n"
+      }
+    ],
+    [
+      {
+        "image": "figure-3-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "83203e82171b77db501fa0181891a80170244c9792d59c629fd7238bc2a35eba",
+    "figure-3-1.png": "0681d521402af7e0d4cfd27fe0e0e59ea492a617cea0c4b0797f3ea2668aff30"
+  }
+}

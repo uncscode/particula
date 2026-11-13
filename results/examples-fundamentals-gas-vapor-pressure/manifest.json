@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 4.097932522010524,
+  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "input_sha256": {},
+  "example": "examples-fundamentals-gas-vapor-pressure",
+  "fingerprint": "06854c76bdd233e824d1ee78513f786a829243c3be032cb3f9bbd79c0e8b2ca5",
+  "source": "docs/examples/fundamentals/gas/vapor_pressure.py",
+  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "package_dirty": false,
+  "executed_at": "2026-11-13T14:59:53.212005+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [],
+    [
+      {
+        "text": "Butanol Antoine vapor pressure at 300 K: 7.1170940952359955e-06 Pa\nStyrene Antoine vapor pressure at 300 K: 7.239588688753633e-11 Pa\nWater Antoine vapor pressure at 300 K: 2.305360971329159e-13 Pa\n"
+      }
+    ],
+    [
+      {
+        "text": "[ERROR|abc_builder|L150]: Required parameter(s) not set: b, c\n"
+      },
+      {
+        "text": "Required parameter(s) not set: b, c\n"
+      }
+    ],
+    [
+      {
+        "image": "figure-4-1.png"
+      }
+    ],
+    [
+      {
+        "image": "figure-5-1.png"
+      }
+    ],
+    [
+      {
+        "image": "figure-6-1.png"
+      }
+    ],
+    [
+      {
+        "image": "figure-7-1.png"
+      }
+    ],
+    [
+      {
+        "image": "figure-8-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "0bf40312b35f993ccdc0f8dead6082dc3d4aa06ee600bfab58a62609e151e9fb",
+    "figure-4-1.png": "db888521deb1b1576f57a7ad5ee31ac53275a7167c1131d3fe6f362d2f689164",
+    "figure-5-1.png": "1286510daac7010f2a70230eda1b94f6c58480d8572fb9f904eb3a59690ffeba",
+    "figure-6-1.png": "e11843eb655d516af54633e53135e1979630261f45976a6290782ba4942c992d",
+    "figure-7-1.png": "f34b91990c37b0ab0bcc4ef7fbce0a0d7e1565d1f963078d5399aafd807f1f5e",
+    "figure-8-1.png": "42580a56d54e2aaec01824aa35ac9a0321ec9fbec0b0b6774ba50c4d9d2beb09"
+  }
+}

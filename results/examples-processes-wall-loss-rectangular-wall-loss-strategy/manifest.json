@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 3.7176423179917037,
+  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "input_sha256": {},
+  "example": "examples-processes-wall-loss-rectangular-wall-loss-strategy",
+  "fingerprint": "27f933d508832e273b0efa3df7269e33e6811cabb82b5de47abc4309d817388d",
+  "source": "docs/examples/processes/wall-loss/rectangular_wall_loss_strategy.py",
+  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "package_dirty": false,
+  "executed_at": "2026-11-13T15:01:43.149287+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [],
+    [
+      {
+        "text": "Bins: 250\nInitial total concentration: 1.100e+10 1/m^3\n"
+      }
+    ],
+    [],
+    [
+      {
+        "text": "Rate shape: (250,)\nFirst three rates (m^-3 s^-1): [-0. -0. -0.]\n"
+      }
+    ],
+    [
+      {
+        "text": "Internal substeps per output interval: 9\n"
+      },
+      {
+        "text": "Final concentration: 1.065e+10 1/m^3\nRelative decay: 0.968\n"
+      }
+    ],
+    [],
+    []
+  ],
+  "files": {
+    "source.py": "4deed184e6b621462c5b2e5c8bbda1e321fcc34266e1ebf8f2dc73be05bb5e09"
+  }
+}

@@ -1,0 +1,53 @@
+# particula.particles.properties.partial_pressure_module
+
+*module*
+
+Module for calculating the partial pressure of a species in a
+gas over particle phase.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/properties/partial_pressure_module.py#L1-L1)
+
+## particula.particles.properties.partial_pressure_module.get_partial_pressure_delta
+
+*function*
+
+```python
+def get_partial_pressure_delta(partial_pressure_gas: Union[float, NDArray[np.float64]], partial_pressure_particle: Union[float, NDArray[np.float64]], kelvin_term: Union[float, NDArray[np.float64]]) -> Union[float, NDArray[np.float64]]
+```
+
+Calculate the difference in partial pressure between gas and particle
+phase, considering the Kelvin effect.
+
+- Δp = p_gas − (p_particle × K)
+    - p_gas is the partial pressure in the gas phase,
+    - p_particle is the partial pressure in the particle phase,
+    - K is the Kelvin term (dimensionless).
+
+**Parameters**
+
+- `partial_pressure_gas` (`Union[float, NDArray[np.float64]]`) — Partial pressure of the species in the gas phase.
+- `partial_pressure_particle` (`Union[float, NDArray[np.float64]]`) — Partial pressure of the species in the particle phase.
+- `kelvin_term` (`Union[float, NDArray[np.float64]]`) — Dimensionless Kelvin effect factor due to particle curvature.
+
+**Returns**
+
+- (`Union[float, NDArray[np.float64]]`) — The difference in partial pressure, as either a float or NDArray[np.float64].
+
+**Examples**
+
+``` py title="Example"
+import particula as par
+par.particles.get_partial_pressure_delta(
+    partial_pressure_gas=1000.0,
+    partial_pressure_particle=900.0,
+    kelvin_term=1.01
+)
+# Output: 1000.0 - (900.0 * 1.01) = 91.0
+```
+
+> **References**
+>
+> - [Kelvin effect, Wikipedia](https://en.wikipedia.org/wiki/Kelvin_equation)
+> - [Partial pressure, Wikipedia](https://en.wikipedia.org/wiki/Partial_pressure)
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/properties/partial_pressure_module.py#L11-L51)

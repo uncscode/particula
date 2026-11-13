@@ -1,0 +1,72 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 7.356125243997667,
+  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "input_sha256": {},
+  "example": "examples-processes-condensation-staggered-condensation-example",
+  "fingerprint": "367e43a006a13a9b6deec33e5f2f778f2f6558383c488a20e86959ca28df7302",
+  "source": "docs/examples/processes/condensation/staggered_condensation_example.py",
+  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "package_dirty": false,
+  "executed_at": "2026-11-13T15:01:11.669536+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [],
+    [
+      {
+        "text": "Initial water concentration: 2.360191e-02 kg/m^3\nSaturation concentration: 2.302625e-02 kg/m^3\n"
+      }
+    ],
+    [
+      {
+        "text": "Created 1000 particles\nInitial total particle mass: 1.186594e-14 kg\nMean particle radius: 111.3 nm\n"
+      }
+    ],
+    [
+      {
+        "text": "Mode 'half': Final particle mass = 2.738868e-10 kg\n"
+      },
+      {
+        "text": "Mode 'random': Final particle mass = 2.738870e-10 kg\n"
+      },
+      {
+        "text": "Mode 'batch': Final particle mass = 2.739334e-10 kg\n"
+      }
+    ],
+    [
+      {
+        "image": "figure-5-1.png"
+      },
+      {
+        "text": "\nFinal Relative Mass Errors:\n  half: 1.12e-15\n  random: 9.81e-16\n  batch: 1.40e-15\n"
+      }
+    ],
+    [
+      {
+        "image": "figure-6-1.png"
+      }
+    ],
+    [
+      {
+        "image": "figure-7-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "751524541c728762d82cc58cc4431cc625bbb4a8a82cd5e254c8b42b097510e5",
+    "figure-5-1.png": "6a9c3e556551c1312ac72ba1e15da1adb4a0e49f5475c1dbb5689d705794102b",
+    "figure-6-1.png": "cc744c851bdeb3a17aec2dfa38a776a79180e92931592b39826949b5548aef0a",
+    "figure-7-1.png": "9ce6bb68e7b082e0772e86eff8ec689a26e27e133dab93e7488ad6fcc0994bb3"
+  }
+}

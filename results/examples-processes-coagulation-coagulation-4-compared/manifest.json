@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 4.440829814993776,
+  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "input_sha256": {},
+  "example": "examples-processes-coagulation-coagulation-4-compared",
+  "fingerprint": "e23787fe07187a526b13c30a5be0d332afc78c29a058667094dc12703bf8df07",
+  "source": "docs/examples/processes/coagulation/coagulation_4_compared.py",
+  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "package_dirty": false,
+  "executed_at": "2026-11-13T15:00:19.080400+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [
+      {
+        "text": "'Compare PMF and PDF coagulation representations.\\n\\nBuilds PMF and PDF aerosols over a shared radius grid, configures Brownian\\ncoagulation with both ``distribution_type=\"discrete\"`` and\\n``distribution_type=\"continuous_pdf\"``, runs short guarded steps, converts\\nbetween representations via ``get_pdf_distribution_in_pmf``, and plots\\nbefore/after concentrations in PMF and PDF units for side-by-side behavior\\nchecks. Uses modest grids and a single short step to keep runtime quick.\\n\\nExample:\\n    Execute the script to see matching PMF and PDF concentration curves\\n    before and after coagulation, enabling comparison across\\n    representations.\\n'"
+      }
+    ],
+    [],
+    [],
+    [
+      {
+        "text": "<particula.dynamics.particle_process.Coagulation object at 0x7f0cf0820320>\n<particula.dynamics.particle_process.Coagulation object at 0x7f0cf05d1070>\n"
+      }
+    ],
+    [],
+    [
+      {
+        "text": "Total number PMF: 1.00e+10 m^-3\nTotal number PDF: 1.00e+10 m^-3 (integrated)\n"
+      }
+    ],
+    [
+      {
+        "image": "figure-7-1.png"
+      }
+    ],
+    [
+      {
+        "image": "figure-8-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "937e46e5eb5a5d5be27e4dfb31bbf2a7107db88e5309361f912f4a95c9d1e356",
+    "figure-7-1.png": "46c5db30dce5ad6a41093180737ebb0c3e46326d9c8558f246f517040df6e768",
+    "figure-8-1.png": "c86009f7bb4c4b947ae9f2bd8b1c5b5f27b42e2e5b0cb789a66c173ee8a6bf9e"
+  }
+}

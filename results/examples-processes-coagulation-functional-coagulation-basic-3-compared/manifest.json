@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 3.418697737972252,
+  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "input_sha256": {},
+  "example": "examples-processes-coagulation-functional-coagulation-basic-3-compared",
+  "fingerprint": "5e14f5ec55247c787b3289539e326c2e13fe5adfcf629261a8c90ca38406b2dd",
+  "source": "docs/examples/processes/coagulation/functional/coagulation_basic_3_compared.py",
+  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "package_dirty": false,
+  "executed_at": "2026-11-13T15:00:33.354780+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [],
+    [],
+    [
+      {
+        "text": "<particula.dynamics.particle_process.Coagulation object at 0x7f47b6c1fce0>\n<particula.dynamics.particle_process.Coagulation object at 0x7f471da12db0>\n"
+      }
+    ],
+    [],
+    [
+      {
+        "text": "Total number PMF: 8.00e+08 m^-3\nTotal number PDF: 8.00e+08 m^-3 (integrated)\n"
+      }
+    ],
+    [
+      {
+        "image": "figure-6-1.png"
+      }
+    ],
+    [
+      {
+        "image": "figure-7-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "3d0283214e9f827d99b307f1e621b1a307659c1e05d69cfe1d0cf4a366503594",
+    "figure-6-1.png": "c4f8050be70f475e66c6fce098700dde1d7c29372e76418b589ed0a00e7e9b1d",
+    "figure-7-1.png": "545472f3b8054c915c2a438a26bde3b5a82e5b0555c407a357c164156deffc8c"
+  }
+}

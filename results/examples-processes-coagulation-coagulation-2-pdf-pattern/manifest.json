@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 4.156829131010454,
+  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "input_sha256": {},
+  "example": "examples-processes-coagulation-coagulation-2-pdf-pattern",
+  "fingerprint": "0bdbff044cf4a1f1cfbc0123ceee3dd72d3418ecb39703fefc2dd87141ff2ed4",
+  "source": "docs/examples/processes/coagulation/coagulation_2_pdf_pattern.py",
+  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "package_dirty": false,
+  "executed_at": "2026-11-13T15:00:13.166056+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [
+      {
+        "text": "'Showcase a PDF-based Brownian coagulation example.\\n\\nBuilds a lognormal PDF aerosol, configures Brownian coagulation with\\n``distribution_type=\"continuous_pdf\"``, runs multiple steps, and plots PDF\\nconcentration before/after execution to visualize redistribution. Uses a\\ncontinuous probability density function representation where units are\\nnumber per volume per size (m^-3 * m^-1 = m^-4).\\n\\nExample:\\n    Run the script to generate before/after concentration curves for a\\n    continuous PDF aerosol using the public ``par.dynamics`` API.\\n'"
+      }
+    ],
+    [],
+    [],
+    [
+      {
+        "text": "<particula.dynamics.particle_process.Coagulation object at 0x7f8edf6347d0>\n"
+      }
+    ],
+    [],
+    [
+      {
+        "text": "Relative material mass drift: [ 0.00000000e+00 -1.62508063e-05 -3.24505022e-05]\n"
+      }
+    ],
+    [
+      {
+        "image": "figure-7-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "422b93cf4781602ae972c8d92eb81a079203df27b9e96c1d2cca13b65fbef060",
+    "figure-7-1.png": "9637b136ef63361e4f10c90569ff51e871df0a6ceec00aa8e01ec4b40a33a69a"
+  }
+}

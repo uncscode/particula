@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 3.473271686991211,
+  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "input_sha256": {},
+  "example": "examples-thermodynamics-equilibria-equilibria-part1",
+  "fingerprint": "b287bd7a4b9c88a076bb638bf32660abfdf0acfc20f23624fa10b704ac71585d",
+  "source": "docs/examples/thermodynamics/equilibria/equilibria_part1.py",
+  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "package_dirty": false,
+  "executed_at": "2026-11-13T15:13:29.384282+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [],
+    [],
+    [
+      {
+        "text": "mass in organic aerosol [ug/m3]: 24.216782218329037\nmass in water [ug/m3]: 9.407806893154259\n"
+      }
+    ],
+    [
+      {
+        "text": "Calculation complete\n"
+      }
+    ],
+    [
+      {
+        "image": "figure-5-1.png"
+      }
+    ],
+    []
+  ],
+  "files": {
+    "source.py": "9f2fc7148b90ed9160920420cb1930affc2d8ab95e229fc701725f55232d0760",
+    "figure-5-1.png": "46dbfc2c7e0299e05e5f882f222fd99b73270d9558dda0a71eb6c4b8e1221be9"
+  }
+}

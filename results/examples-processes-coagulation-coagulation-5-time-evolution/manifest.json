@@ -1,0 +1,114 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 42.13547291205032,
+  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "input_sha256": {},
+  "example": "examples-processes-coagulation-coagulation-5-time-evolution",
+  "fingerprint": "a17c834e9ef0d6d39ee1ca9ff61b246383cf451be458ad548b5465e9d0a8f64f",
+  "source": "docs/examples/processes/coagulation/coagulation_5_time_evolution.py",
+  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "package_dirty": false,
+  "executed_at": "2026-11-13T15:00:58.315549+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [
+      {
+        "text": "'Compare time evolution of total number concentration across coagulation.\\n\\nBuilds PMF, PDF, and particle-resolved aerosols with equivalent lognormal\\ndistributions, configures Brownian coagulation for each representation,\\nand tracks total number concentration over time. Plots the decay of particle\\nnumber for all three approaches on the same axes to compare how each\\nrepresentation tracks coagulation-driven particle loss.\\n\\nExample:\\n    Run the script to visualize how total number concentration decreases\\n    over time for PMF, PDF, and particle-resolved coagulation representations.\\n'"
+      }
+    ],
+    [],
+    [],
+    [
+      {
+        "text": "PMF initial total: 1.00e+10 m^-3\n"
+      }
+    ],
+    [
+      {
+        "text": "PDF initial total: 1.00e+10 m^-3\n"
+      }
+    ],
+    [
+      {
+        "text": "Particle-resolved initial count: 50000 particles\n  -> concentration: 1.00e+10 m^-3\n"
+      }
+    ],
+    [
+      {
+        "text": "PMF: <particula.dynamics.particle_process.Coagulation object at 0x7f23c6a2df70>\nPDF: <particula.dynamics.particle_process.Coagulation object at 0x7f23868aa810>\nResolved: <particula.dynamics.particle_process.Coagulation object at 0x7f23868aac60>\n"
+      }
+    ],
+    [
+      {
+        "text": "Initial: PMF=1.00e+10, PDF=1.00e+10, Resolved=1.00e+10\nRunning 12 steps of 600s each (50 sub-steps)\nTotal simulation time: 2.0 hours\n"
+      }
+    ],
+    [
+      {
+        "text": "Step 1/12: PMF=9.96e+09, PDF=9.96e+09, Resolved=9.95e+09\n"
+      },
+      {
+        "text": "Step 2/12: PMF=9.91e+09, PDF=9.92e+09, Resolved=9.91e+09\n"
+      },
+      {
+        "text": "Step 3/12: PMF=9.87e+09, PDF=9.88e+09, Resolved=9.87e+09\n"
+      },
+      {
+        "text": "Step 4/12: PMF=9.83e+09, PDF=9.83e+09, Resolved=9.84e+09\n"
+      },
+      {
+        "text": "Step 5/12: PMF=9.79e+09, PDF=9.79e+09, Resolved=9.79e+09\n"
+      },
+      {
+        "text": "Step 6/12: PMF=9.75e+09, PDF=9.75e+09, Resolved=9.75e+09\n"
+      },
+      {
+        "text": "Step 7/12: PMF=9.71e+09, PDF=9.71e+09, Resolved=9.71e+09\n"
+      },
+      {
+        "text": "Step 8/12: PMF=9.67e+09, PDF=9.68e+09, Resolved=9.67e+09\n"
+      },
+      {
+        "text": "Step 9/12: PMF=9.63e+09, PDF=9.64e+09, Resolved=9.63e+09\n"
+      },
+      {
+        "text": "Step 10/12: PMF=9.59e+09, PDF=9.60e+09, Resolved=9.59e+09\n"
+      },
+      {
+        "text": "Step 11/12: PMF=9.55e+09, PDF=9.56e+09, Resolved=9.55e+09\n"
+      },
+      {
+        "text": "Step 12/12: PMF=9.51e+09, PDF=9.52e+09, Resolved=9.52e+09\n"
+      }
+    ],
+    [
+      {
+        "image": "figure-10-1.png"
+      }
+    ],
+    [
+      {
+        "image": "figure-11-1.png"
+      },
+      {
+        "text": "\nFinal concentrations:\n  PMF: 9.51e+09 m^-3 (95.1% remaining)\n  PDF: 9.52e+09 m^-3 (95.2% remaining)\n  Resolved: 9.52e+09 m^-3 (95.2% remaining)\n"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "b7cd9411193ee63ed532bdd01b40daf09d629da32d04fe07bffd9589aa0a2635",
+    "figure-10-1.png": "582e0a8bb04877698a37b83d08b06df438ead48baec49b82df3ceec7f1b020d2",
+    "figure-11-1.png": "ae75b8e19f2e1c8734313520a16328707c1c14f79a7ab7e16d0bedadcc7a9308"
+  }
+}

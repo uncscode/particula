@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 3.610792068007868,
+  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "input_sha256": {},
+  "example": "examples-thermodynamics-particle-properties-particle-surface-tutorial",
+  "fingerprint": "f709da7b535bb05439bf917c0d495aec14838fde5a7984f04c6cf7fa10fccbb0",
+  "source": "docs/examples/thermodynamics/particle-properties/particle_surface_tutorial.py",
+  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "package_dirty": false,
+  "executed_at": "2026-11-13T15:13:43.431914+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [
+      {
+        "text": "'Tutorial on surface strategies and Kelvin effect calculations for particles.'"
+      }
+    ],
+    [],
+    [
+      {
+        "text": "kelvin radius of glycerol 5.392780089118282e-09 m\n"
+      }
+    ],
+    [
+      {
+        "image": "figure-4-1.png"
+      }
+    ],
+    [
+      {
+        "image": "figure-5-1.png"
+      }
+    ],
+    [
+      {
+        "text": "kelvin radius of mixture [3.68915277e-09 2.55254960e-09] m\n"
+      },
+      {
+        "image": "figure-6-2.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "0f352fca4eae6224b6734a1c31677263d3164a10b06b1341fd86d69f2fcc83d8",
+    "figure-4-1.png": "07faaf7223f13d46661a232c6adba419c8f5d199a5aefaf8cd91c073e73b6fd2",
+    "figure-5-1.png": "c4d1a13ad2e7c7fbe7ea867d844f02a9f7aac5c1fecfe45a8e9b3d49d718d3d9",
+    "figure-6-2.png": "f46a6d873eab3632aebcca0683c0d358bd9688e688242b782c223bdcd0861fa3"
+  }
+}
