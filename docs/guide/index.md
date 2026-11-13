@@ -18,7 +18,7 @@ instructions when your installed release predates it.
 | Task | Read next |
 | --- | --- |
 | Configure particle, gas, and environment state | [Data model](data-model/index.md) |
-| Simulate growth, collisions, sources, or losses | [Processes](processes/catalog.md) |
+| Simulate growth, collisions, sources, or losses | [Processes](processes/index.md) |
 | Use explicit Warp transfers and device execution | [GPU selection](gpu/backend-selection.md), then [resident checkpoints](gpu/resident/checkpoints.md) |
 | Capture a resident loop on native CUDA | [Graph-capture runbook](gpu/resident/graph-capture.md) |
 | Upgrade legacy scripts | [v0.3.0 migration](migration/v0.3.0/index.md) |

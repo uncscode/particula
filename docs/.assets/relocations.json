@@ -12,7 +12,7 @@
     "docs/Features/gpu_graph_capture.md": "docs/guide/gpu/resident/graph-capture.md",
     "docs/Features/gpu_graph_capture_performance.md": "docs/contribute/validation/gpu/graph-capture-profiling.md",
     "docs/Features/gpu_resident_checkpoints.md": "docs/guide/gpu/resident/checkpoints.md",
-    "docs/Features/index.md": "docs/guide/processes/catalog.md",
+    "docs/Features/index.md": "docs/guide/processes/index.md",
     "docs/Features/native_scientific_processes.md": "docs/guide/processes/index.md",
     "docs/Features/nucleation_strategy_system.md": "docs/guide/processes/nucleation.md",
     "docs/Features/particle-data-migration/dynamics.md": "docs/guide/migration/v0.3.0/dynamics.md",
@@ -178,7 +178,12 @@
     "docs/Theory/Technical/Properties/dynamic_viscosity.ipynb": "docs/theory/properties/dynamic-viscosity.ipynb",
     "docs/Theory/Technical/Properties/mean_free_path.ipynb": "docs/theory/properties/mean-free-path.ipynb",
     "docs/Theory/nvidia-warp/examples/gpu_benchmarks.py": "docs/contribute/validation/gpu/legacy-benchmarks/gpu_benchmarks.py",
-    "docs/Theory/nvidia-warp/examples/gpu_benchmarks.ipynb": "docs/contribute/validation/gpu/legacy-benchmarks/gpu_benchmarks.ipynb"
+    "docs/Theory/nvidia-warp/examples/gpu_benchmarks.ipynb": "docs/contribute/validation/gpu/legacy-benchmarks/gpu_benchmarks.ipynb",
+    "docs/Theory/Technical/index.md": "docs/theory/index.md",
+    "docs/Features/Roadmap/data-oriented-gpu.md": "docs/contribute/roadmap.md",
+    "docs/Features/Roadmap/graph-capture-closeout.md": "docs/contribute/validation/gpu/graph-capture-qualification.md",
+    "docs/Features/Roadmap/index.md": "docs/contribute/roadmap.md",
+    "docs/guide/processes/catalog.md": "docs/guide/processes/index.md"
   },
   "fragments": {
     "docs/Features/data-containers-and-gpu-foundations.md#data-containers-and-gpu-foundations": "docs/guide/data-model/index.md#data-model",
@@ -317,10 +322,39 @@
     "docs/Features/particle-data-migration/containers.md#executable-access-and-replacement-walkthrough": "docs/guide/data-model/ownership.md#executable-access-and-replacement-walkthrough",
     "docs/Features/particle-data-migration/containers.md#historical-terminology-unsupported-before-state": "docs/guide/migration/v0.3.0/containers.md#historical-terminology-unsupported-before-state",
     "docs/Features/particle-data-migration/containers.md#explicit-warp-boundary": "docs/guide/data-model/ownership.md#explicit-warp-boundary",
-    "docs/Features/coagulation_strategy_system.md#3-run-through-the-coagulation-runnable-with-sub_steps": "docs/guide/processes/coagulation.md#3-run-through-the-coagulation-runnable-with-sub_steps"
+    "docs/Features/coagulation_strategy_system.md#3-run-through-the-coagulation-runnable-with-sub_steps": "docs/guide/processes/coagulation.md#3-run-through-the-coagulation-runnable-with-sub_steps",
+    "docs/Features/Roadmap/data-oriented-gpu.md#authoritative-field-ownership-decisions": "docs/guide/data-model/field-ownership.md#field-ownership-and-transfer-policy",
+    "docs/Features/Roadmap/data-oriented-gpu.md#current-container-schema-inventory": "docs/guide/data-model/index.md#canonical-container-schemas",
+    "docs/Features/Roadmap/data-oriented-gpu.md#canonical-shape-conventions-for-container-workflows": "docs/guide/data-model/index.md#shape-conventions",
+    "docs/Features/Roadmap/data-oriented-gpu.md#final-downstream-handoff-map-for-sibling-features": "docs/guide/data-model/field-ownership.md#field-ownership-and-transfer-policy",
+    "docs/Features/Roadmap/data-oriented-gpu.md#cpugpu-restore-boundary-for-ordered-gas-metadata": "docs/guide/gpu/transfers.md#transfers",
+    "docs/Features/Roadmap/data-oriented-gpu.md#current-cpu-execution-limits-for-multi-box-ready-containers": "docs/guide/processes/index.md#representation-and-inventory",
+    "docs/Features/Roadmap/data-oriented-gpu.md#epic-i-differentiability-and-global-optimization": "docs/contribute/roadmap.md#differentiability-and-initial-state-optimization-epic-i",
+    "docs/Features/Roadmap/data-oriented-gpu.md#epic-g-backend-selection-and-gpu-resident-simulation": "docs/guide/gpu/execution.md#execution",
+    "docs/Features/Roadmap/data-oriented-gpu.md#epic-h-graph-capture-and-performance": "docs/guide/gpu/resident/graph-capture.md#gpu-resident-graph-capture",
+    "docs/Features/Roadmap/data-oriented-gpu.md#epic-f-gpu-process-completeness": "docs/guide/gpu/support.md#support",
+    "docs/Features/Roadmap/data-oriented-gpu.md#gpu-process-completeness-roadmap-inventory": "docs/guide/gpu/support.md#support",
+    "docs/Features/Roadmap/data-oriented-gpu.md#measured-decision-record-for-the-current-one-thread-per-box-path": "docs/contribute/validation/gpu/coagulation-benchmarks.md#recorded-one-thread-per-box-tradeoff",
+    "docs/Features/Roadmap/graph-capture-closeout.md#scope-and-current-disposition": "docs/contribute/validation/gpu/graph-capture-qualification.md#graph-capture-qualification-gates",
+    "docs/Features/Roadmap/graph-capture-closeout.md#closeout-metadata": "docs/contribute/validation/gpu/graph-capture-qualification.md#qualification-metadata",
+    "docs/Features/Roadmap/graph-capture-closeout.md#target-derivation-ledger": "docs/contribute/validation/gpu/graph-capture-qualification.md#production-targets",
+    "docs/Features/Roadmap/graph-capture-closeout.md#command-ledger": "docs/contribute/validation/gpu/graph-capture-qualification.md#collection-commands",
+    "docs/Features/Roadmap/graph-capture-closeout.md#blockers-and-promotion-rule": "docs/contribute/validation/gpu/graph-capture-qualification.md#promotion-rule"
   },
   "source_revision": "9e024234f2f6401313981e8e3c85a772d675f795",
   "retired": {
-    "docs/Examples/Data_Containers/data_containers_and_gpu_foundations.py": ".trash/docs-v0.3.0/docs/Examples/Data_Containers/data_containers_and_gpu_foundations.py"
+    "docs/Examples/Data_Containers/data_containers_and_gpu_foundations.py": ".trash/docs-v0.3.0/docs/Examples/Data_Containers/data_containers_and_gpu_foundations.py",
+    "docs/Theory/Accelerating_Python/index.md": ".trash/docs-v0.3.0/docs/Theory/Accelerating_Python/index.md",
+    "docs/Theory/Accelerating_Python/Details/Taichi_Exploration.ipynb": ".trash/docs-v0.3.0/docs/Theory/Accelerating_Python/Details/Taichi_Exploration.ipynb",
+    "docs/Theory/Accelerating_Python/Details/One-Line_Vision.md": ".trash/docs-v0.3.0/docs/Theory/Accelerating_Python/Details/One-Line_Vision.md",
+    "docs/Theory/OpenAI_Models/index.md": ".trash/docs-v0.3.0/docs/Theory/OpenAI_Models/index.md",
+    "docs/Theory/OpenAI_Models/Models/Agents.md": ".trash/docs-v0.3.0/docs/Theory/OpenAI_Models/Models/Agents.md",
+    "docs/Theory/OpenAI_Models/Models/Chat.md": ".trash/docs-v0.3.0/docs/Theory/OpenAI_Models/Models/Chat.md",
+    "docs/Theory/OpenAI_Models/Models/Reasoning.md": ".trash/docs-v0.3.0/docs/Theory/OpenAI_Models/Models/Reasoning.md",
+    "docs/Theory/Technical/index.md": ".trash/docs-v0.3.0/docs/Theory/Technical/index.md",
+    "docs/Features/Roadmap/data-oriented-gpu.md": ".trash/docs-v0.3.0/docs/Features/Roadmap/data-oriented-gpu.md",
+    "docs/Features/Roadmap/graph-capture-closeout.md": ".trash/docs-v0.3.0/docs/Features/Roadmap/graph-capture-closeout.md",
+    "docs/Features/Roadmap/index.md": ".trash/docs-v0.3.0/docs/Features/Roadmap/index.md",
+    "docs/guide/processes/catalog.md": ".trash/docs-v0.3.0/docs/guide/processes/catalog.md"
   }
 }

@@ -80,16 +80,12 @@ artifact is checked in, so the current resident timing and allocator evidence is
 unavailable and unmeasured; see
 [resident benchmark and memory-budget record](docs/contribute/validation/gpu/resident-benchmarks.md).
 
-E8-F7/T7 owns graph-capture profiling and machine-bounded recommendations; E8-F8
-owns the [native-CUDA example](docs/examples/gpu/resident/gpu_resident_graph_capture.py),
-[operator runbook](docs/guide/gpu/resident/graph-capture.md), limitations,
-documentation reconciliation, and the
-[P3 closeout record](docs/Features/Roadmap/graph-capture-closeout.md). The
-closeout is the sole P3 evidence authority. E8 and all eight feature plans are
-Shipped by maintainer decision on 2026-09-27; measured evidence remains
-`UNSHIPPED/BLOCKED` until its designated-device final-revision gate passes. The
-[canonical data-oriented GPU roadmap](docs/Features/Roadmap/data-oriented-gpu.md)
-records Epic H's Shipped plan status and outstanding measurement gaps.
+Use the [native-CUDA example](docs/examples/gpu/resident/gpu_resident_graph_capture.py),
+[operator runbook](docs/guide/gpu/resident/graph-capture.md), and
+[qualification gates](docs/contribute/validation/gpu/graph-capture-qualification.md).
+The qualification record is the evidence authority; measured evidence remains
+`UNSHIPPED/BLOCKED` until its designated-device final-revision gate passes.
+The [current roadmap](docs/contribute/roadmap.md) contains pending work only.
 The historical 0.2.13 plan retained both facades and containers. The current
 E9-M6 development tree removes `ParticleRepresentation`, `GasSpecies`,
 `Atmosphere`, obsolete construction and facade bridges for the planned 0.3.0
@@ -962,7 +958,7 @@ for _ in range(n_steps):
   combinations, alternate charged models, broader distributions, and
   performance claims remain deferred.
 - See `docs/guide/data-model/index.md` and
-  `docs/Features/Roadmap/data-oriented-gpu.md` for user-facing ownership
+  `docs/contribute/roadmap.md` for user-facing ownership
   guidance.
 
 Focused diagnostic runs:

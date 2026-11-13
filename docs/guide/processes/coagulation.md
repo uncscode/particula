@@ -608,7 +608,7 @@ resolved_particles = particle_resolved.step(
 - **Wall loss strategies**: [wall_loss_strategy_system.md](wall-loss.md)
 - **Condensation strategies**: [condensation_strategy_system.md](condensation.md)
 - **GPU direct example**: [gpu_coagulation_direct.py](https://github.com/Gorkowski/particula/blob/main/docs/examples/gpu/direct/gpu_coagulation_direct.py)
-- **GPU roadmap**: [Data-Oriented Design and GPU Roadmap](../../Features/Roadmap/data-oriented-gpu.md)
+- **GPU roadmap**: [Pending initial-state optimization](../../contribute/roadmap.md)
 
 ## FAQ
 

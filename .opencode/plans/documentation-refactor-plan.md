@@ -597,3 +597,25 @@ catalog does not claim fresh execution or scientific validation.
   files have no diff.
 - Strict base/full builds passed (1.47 s / 57.78 s). Final link/reachability
   checks and browser review will run across the complete phase-5 tree.
+
+### Phase 4 — consolidation and retirement completed
+
+- Retired 12 narrative/proposal files after extraction (13 archived originals
+  including the phase-3 forwarding script). Verified every archived file is
+  byte-identical to its recorded source revision and absent from active docs.
+- Replaced the mixed/completed GPU roadmaps with pending Epic I only. Extracted
+  field ownership, dated machine-bounded coagulation timings, and capture
+  qualification gates into their owning guide/validation pages. Retained
+  UNSHIPPED/BLOCKED measurement status and pending v0.3.0 release approval.
+- Removed obsolete provider catalogs, the Taichi/vision proposals, the empty
+  Technical hierarchy, and the redundant process catalog. Current assistant
+  setup already contains the useful workflow instructions; no local supporting
+  assets were required by the retired proposals.
+- Compared activity/equilibrium tutorial objectives and preserved their distinct
+  strategy, functional, phase-separation, and partitioning calculations. Added a
+  topic learning-objective map. No numerical snippets, outputs, or tolerances
+  changed in this phase.
+- Focused process, foundations, parity, and capture-example regressions:
+  70 passed, 2 optional skips. Strict base/full builds passed (1.37 s / 48.08 s).
+  Compatibility routes point to retained current content; obsolete-only model
+  catalogs and proposals have no published archive or blanket home redirect.

@@ -1,4 +1,15 @@
-# Native scientific process calls
+# Scientific processes
+
+Choose a process guide for practical setup and an executable example:
+
+- [Activity](activity.md)
+- [Condensation](condensation.md)
+- [Coagulation](coagulation.md)
+- [Wall loss](wall-loss.md)
+- [Dilution](dilution.md)
+- [Nucleation](nucleation.md)
+
+## Native scientific process calls
 
 V0.3.0 connects the native `Aerosol` aggregate to explicit CPU scientific
 strategies. The aggregate owns `ParticleData`, full-order `GasData`, and

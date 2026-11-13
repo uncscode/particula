@@ -8,8 +8,7 @@ title: Backend Selection and Explicit CPU Fallback
 declaring and selecting a registered execution adapter. It is separate from
 the supported experimental `particula.gpu` containers, explicit-transfer
 helpers, and direct kernels. See [Data Containers and GPU
-Foundations](../data-model/index.md), the [Epic G
-roadmap](../../Features/Roadmap/data-oriented-gpu.md#epic-g-backend-selection-and-gpu-resident-simulation),
+Foundations](../data-model/index.md), the [execution guide](execution.md#execution),
 and [GPU resident checkpoints](resident/checkpoints.md).
 
 ## Stable public values

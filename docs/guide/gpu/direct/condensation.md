@@ -206,6 +206,6 @@ installed-Warp baseline, and CUDA rows are optional guarded evidence. This does
 not claim general
 CPU-strategy parity, performance, adaptive stepping, graph capture/replay,
 autodiff, multi-GPU, resizing, or full scheduler support. The
-[Epic G record](../../../Features/Roadmap/data-oriented-gpu.md#epic-g-backend-selection-and-gpu-resident-simulation)
+[execution guide](../execution.md#execution)
 and resident guides define their separate scheduling and lifecycle scope.
 

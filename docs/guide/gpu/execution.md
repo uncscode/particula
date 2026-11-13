@@ -520,7 +520,7 @@ wall-loss RNG is also caller-owned. There is no hidden transfer or CPU fallback,
 high-level `Runnable`, backend selector, scheduler, resident production loop, or
 transport API. See the [direct-process validation evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py),
 [example regression](https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_complete_process_sequence_example_test.py),
-and [GPU process completeness inventory](../../Features/Roadmap/data-oriented-gpu.md#gpu-process-completeness-roadmap-inventory).
+and [GPU process completeness inventory](support.md#support).
 
 `WarpParticleData`, `WarpEnvironmentData`, and `WarpGasData` are exported from
 `particula.gpu` only when Warp is available, so import them only behind an
