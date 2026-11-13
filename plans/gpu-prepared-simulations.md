@@ -42,7 +42,7 @@ not promise rollback. No state readbacks or allocations inside prepared steps.
 - [x] 4. `feat(execution): compose resident process sequences`: ordered
   subsets, thermodynamic freshness, forcing, diagnostics, runtime guards and
   RNG continuity; preserve the existing complete canonical scheduler.
-- [ ] 5. `perf(gpu): parallelize Brownian majorant evaluation`: parallel
+- [x] 5. `perf(gpu): parallelize Brownian majorant evaluation`: parallel
   properties and bounded tiled pair maxima, ascending active ranks and original
   sequential selection/RNG semantics. No full N-by-N allocation; other
   mechanisms unchanged. Retain quadratic complexity honestly in documentation.
@@ -176,3 +176,19 @@ mypy passed. CUDA and Warp CPU are distinct parametrizations. Scientific checks
 cover multibox forcing, raw-count versus discrete-density reductions, latent
 energy, preserved gas order, no-write/no-RNG behavior after failure and stable
 logical-box RNG identities across run segmentation and physical permutation.
+
+Phase 5: Brownian-only preparation now computes per-slot transport properties
+in parallel, compacts active indices in ascending order, and evaluates exact
+pair maxima using at most 4096 float64 partials per box. Selection shares the
+original sequential RNG/acceptance function; other mechanism masks retain their
+original path. No dense pair matrix is allocated; pair work remains quadratic.
+Coagulation/native/validation/parallel/prepared regressions: **1377 passed** on
+CUDA and separately parameterized Warp CPU. Byte-exact legacy continuation,
+independent NumPy maxima, species mass/charge conservation and a 65537-slot
+memory-bound check pass. Targeted Ruff and mypy pass.
+A preliminary RTX probe (three boxes, full occupancy, float64, restored primary
+state and RNG, three warmups/seven samples) measured legacy/parallel median
+resident steps of 10.90/0.210 ms at N=128, 158.65/1.476 ms at N=512,
+2556.95/20.641 ms at N=2048, and 40653.86/178.320 ms at N=8192.
+These are old-versus-new GPU execution timings, not CPU comparisons, setup costs,
+or final campaign evidence. The complete required study matrix remains phase 7.

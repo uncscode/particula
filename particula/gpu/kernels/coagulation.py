@@ -59,7 +59,7 @@ before any output, RNG, or particle-state mutation.
 # pyright: reportGeneralTypeIssues=false
 # pyright: reportOperatorIssue=false
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING, Any, cast, no_type_check
 
 import numpy as np
@@ -1209,6 +1209,86 @@ def _coagulation_selector_impl(  # noqa: C901
                 if pair_rate > majorant_total:
                     majorant_total = pair_rate
 
+    _select_coagulation_pairs_impl(
+        masses,
+        concentration,
+        density,
+        volume,
+        temperature,
+        pressure,
+        gas_constant,
+        boltzmann_constant,
+        molecular_weight_air,
+        ref_viscosity,
+        ref_temperature,
+        sutherland_constant,
+        elementary_charge_value,
+        electric_permittivity,
+        time_step,
+        radii,
+        diffusivities,
+        g_terms,
+        speeds,
+        settling_velocities,
+        turbulent_dissipation,
+        fluid_density,
+        total_masses,
+        charge,
+        active_indices,
+        collision_pairs,
+        n_collisions,
+        rng_states,
+        mechanism_mask,
+        collision_capacity,
+        box_idx,
+        majorant_total,
+        active_count,
+        kinematic_viscosity,
+    )
+
+
+@no_type_check
+@wp.func
+def _select_coagulation_pairs_impl(  # noqa: C901
+    masses: Any,
+    concentration: Any,
+    density: Any,
+    volume: Any,
+    temperature: Any,
+    pressure: Any,
+    gas_constant: Any,
+    boltzmann_constant: Any,
+    molecular_weight_air: Any,
+    ref_viscosity: Any,
+    ref_temperature: Any,
+    sutherland_constant: Any,
+    elementary_charge_value: Any,
+    electric_permittivity: Any,
+    time_step: Any,
+    radii: Any,
+    diffusivities: Any,
+    g_terms: Any,
+    speeds: Any,
+    settling_velocities: Any,
+    turbulent_dissipation: Any,
+    fluid_density: Any,
+    total_masses: Any,
+    charge: Any,
+    active_indices: Any,
+    collision_pairs: Any,
+    n_collisions: Any,
+    rng_states: Any,
+    mechanism_mask: Any,
+    collision_capacity: Any,
+    box_idx: int,
+    majorant_total: wp.float64,
+    active_count: wp.int32,
+    kinematic_viscosity: wp.float64,
+) -> None:
+    """Preserve sequential pair selection and the exact persistent RNG path."""
+    n_species = masses.shape[2]
+    temperature_value = temperature[box_idx]
+    pressure_value = pressure[box_idx]
     if not (wp.isfinite(majorant_total) and majorant_total > wp.float64(0.0)):
         n_collisions[box_idx] = wp.int32(0)
         return
@@ -2334,6 +2414,7 @@ class _PreparedCoagulationCall:
     device: Any
     selector_inputs: tuple[Any, ...]
     failure: Any = None
+    brownian_parallel: Any = None
 
 
 def _prepare_coagulation_step_gpu(  # noqa: C901
@@ -2810,7 +2891,7 @@ def _prepare_coagulation_step_gpu(  # noqa: C901
             device=device,
         )
 
-    return _PreparedCoagulationCall(
+    prepared = _PreparedCoagulationCall(
         particles,
         particles.masses,
         particles.concentration,
@@ -2854,6 +2935,19 @@ def _prepare_coagulation_step_gpu(  # noqa: C901
         ),
     )
 
+    if resolved_mechanism_config.mask == BROWNIAN_MECHANISM_FLAG:
+        from particula.gpu.kernels._brownian_parallel import (
+            prepare_brownian_work,
+        )
+
+        return replace(
+            prepared,
+            brownian_parallel=prepare_brownian_work(
+                prepared.selector_inputs, device
+            ),
+        )
+    return prepared
+
 
 def _enqueue_prepared_coagulation_call(
     prepared: _PreparedCoagulationCall,
@@ -2872,15 +2966,18 @@ def _enqueue_prepared_coagulation_call(
         collision-count buffer, in the same order as the public direct-kernel
         API.
     """
-    wp.launch(
-        _native_coagulation_kernel
-        if prepared.failure is None
-        else _native_coagulation_kernel_guarded,
-        dim=(prepared.n_boxes,),
-        inputs=(list(prepared.selector_inputs))
-        + ([] if prepared.failure is None else [prepared.failure]),
-        device=prepared.device,
-    )
+    if prepared.brownian_parallel is not None:
+        prepared.brownian_parallel.enqueue(prepared.failure)
+    else:
+        wp.launch(
+            _native_coagulation_kernel
+            if prepared.failure is None
+            else _native_coagulation_kernel_guarded,
+            dim=(prepared.n_boxes,),
+            inputs=(list(prepared.selector_inputs))
+            + ([] if prepared.failure is None else [prepared.failure]),
+            device=prepared.device,
+        )
 
     wp.launch(
         apply_coagulation_kernel
