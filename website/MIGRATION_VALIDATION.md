@@ -26,6 +26,12 @@ release or production deployment was performed.
   under `.trash/mkdocs-starlight-2026-11-13/`. The 84 archived files have verified
   SHA-256 mappings. There is no automatic deletion date.
 
+- The final compatibility audit records and verifies all 1,860 legacy API
+  anchors across 237 pages. Concrete-only members and special methods retain
+  their documentation and source links; nested docstring anchors resolve to
+  their owning symbol sections. The old Aerosol.__str__ link was checked in
+  the local browser.
+
 ## Build and automated checks
 
 - Exact committed checkout `3c5f08619e02795ced67b607b343105e8e27d930`:
@@ -36,7 +42,7 @@ release or production deployment was performed.
   and sitemap checks exclude redirects and archive routes.
 - Source and example suites: **8,555 passed, 687 skipped**, using the hosted-CI
   CPU baseline. GPU execution was separately verified for all eight examples.
-- Infrastructure: **161 passed**, including rejection of reintroduced notebook
+- Infrastructure: **163 passed**, including rejection of reintroduced notebook
   publication sources.
 - Documentation wrapper/schema tests: 47 passed. JavaScript hero and Markdown
   extension test files pass. Focused graph lifecycle/example tests: 211 passed,

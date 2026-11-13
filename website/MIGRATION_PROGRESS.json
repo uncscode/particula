@@ -13,7 +13,7 @@
       "passed": 8555,
       "skipped": 687
     },
-    "infrastructure": 161,
+    "infrastructure": 163,
     "documentation_tool_tests": 47,
     "current_bundles": 67,
     "validation_only_cpu_executions": 53,
@@ -23,7 +23,8 @@
     "redirects": 130,
     "site_errors": [],
     "archive_hashes": "verified",
-    "package_archive_exclusion": "verified"
+    "package_archive_exclusion": "verified",
+    "legacy_api_anchors": 1860
   },
   "remaining": [
     "Hosted PR checks and downloadable preview artifact",

@@ -241,11 +241,44 @@ def render_example(key, config):
     )
 
 
+def legacy_api_pages():
+    """Load symbol anchors recorded from the pre-migration publication."""
+    return json.loads((SITE / "legacy-api-anchors.json").read_text())["pages"]
+
+
+def preserve_api_members(data, pages):
+    """Retain documented concrete-module members in the docs-only model.
+
+    Starlight uses __all__ as a documentation filter. The previous site also
+    documented concrete-only members, so extend only the extracted model's
+    exports with existing members recorded in the publication inventory.
+    This does not alter package exports or invent removed symbols.
+    """
+    for page, anchors in pages.items():
+        parts = page.removeprefix("API/").removesuffix("/index.html").split("/")
+        node = data.get(parts[0], {})
+        for part in parts[1:]:
+            node = node.get("members", {}).get(part, {})
+        if "exports" not in node or node["exports"] is None:
+            continue
+        prefix = ".".join(parts) + "."
+        names = {
+            anchor[len(prefix) :].split(".")[0].split("--")[0]
+            for anchor in anchors
+            if anchor.startswith(prefix)
+        }
+        node["exports"] = sorted(
+            set(node["exports"]) | (names & node.get("members", {}).keys())
+        )
+
+
 def generate_api():
     """Cache Griffe data using the original generator's exclusions."""
     cache = SITE / ".cache"
     cache.mkdir(exist_ok=True)
     digest = hashlib.sha256()
+    digest.update(Path(__file__).read_bytes())
+    digest.update((SITE / "legacy-api-anchors.json").read_bytes())
     for path in sorted((ROOT / "particula").rglob("*.py")):
         digest.update(str(path.relative_to(ROOT)).encode())
         digest.update(path.read_bytes())
@@ -293,6 +326,7 @@ def generate_api():
                     prune(child)
 
         prune(data["particula"])
+        preserve_api_members(data, legacy_api_pages())
         (cache / "griffe.json").write_text(json.dumps(data))
         stamp.write_text(digest.hexdigest())
     print(
@@ -573,6 +607,50 @@ def preserve_fragment_aliases(dist):
             target.write_text(text)
 
 
+def preserve_api_anchors(dist, inventory):
+    """Place old module and docstring anchors beside their current sections.
+
+    Missing symbols are errors, never silently redirected to a page heading.
+    MkDocs' nested docstring headings resolve to their owning symbol section.
+    """
+    errors = []
+    for page, anchors in inventory.items():
+        target = dist / page
+        if not target.is_file():
+            errors.append(f"Missing legacy API page {page}")
+            continue
+        text = target.read_text()
+        ids = Links(text).ids
+        module = page.removeprefix("API/").removesuffix("/index.html")
+        module = module.replace("/", ".")
+        for anchor in anchors:
+            if anchor in ids:
+                continue
+            owner = anchor.split("--", 1)[0]
+            if owner == module:
+                pattern = r"(<h1\b[^>]*>)"
+            elif "--" in anchor and owner in ids:
+                pattern = r'(<[^>]+\bid="' + re.escape(owner) + r'"[^>]*>)'
+            else:
+                errors.append(f"Missing legacy API symbol {page}#{anchor}")
+                continue
+            text, count = re.subn(
+                pattern,
+                lambda match, anchor=anchor: (
+                    f'<span id="{html.escape(anchor, quote=True)}"></span>'
+                    + match[0]
+                ),
+                text,
+                count=1,
+            )
+            if count:
+                ids.add(anchor)
+            else:
+                errors.append(f"Missing API anchor target {page}#{anchor}")
+        target.write_text(text)
+    return errors
+
+
 def verify():
     """Verify routes, links, API coverage, and generated assets."""
     dist = SITE / "dist"
@@ -584,9 +662,12 @@ def verify():
             )
         )
     preserve_fragment_aliases(dist)
+    api_anchors = legacy_api_pages()
+    api_errors = preserve_api_anchors(dist, api_anchors)
     redirected = redirects(dist)
     pages = {p: Links(p.read_text()) for p in dist.rglob("*.html")}
     errors = check_rendered_links(dist, pages)
+    errors.extend(api_errors)
     errors.extend(check_inventory(dist, pages))
     errors.extend(check_discovery(dist, pages))
     data = json.loads((SITE / ".cache/griffe.json").read_text())
@@ -607,6 +688,7 @@ def verify():
     report = {
         "html_pages": len(pages),
         "api_modules": len(modules),
+        "legacy_api_anchors": sum(map(len, api_anchors.values())),
         "redirects": redirected,
         "errors": sorted(set(errors)),
     }

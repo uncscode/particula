@@ -133,3 +133,49 @@ def test_search_and_sitemaps_reject_redirect_and_archive_pages(tmp_path):
     )
     assert any("Archive indexed" in error for error in errors)
     assert any("Redirect indexed" in error for error in errors)
+
+
+def test_legacy_api_members_extend_only_documented_existing_exports():
+    """Concrete-only docs remain visible without inventing removed APIs."""
+    node = {
+        "exports": ["Public"],
+        "members": {"Public": {}, "Concrete": {}, "Unrelated": {}},
+    }
+    data = {"particula": {"members": {"example": node}}}
+    site.preserve_api_members(
+        data,
+        {
+            "API/particula/example/index.html": [
+                "particula.example.Concrete.method",
+                "particula.example.Removed",
+            ],
+        },
+    )
+    assert node["exports"] == ["Concrete", "Public"]
+
+
+def test_legacy_api_anchors_preserve_sections_and_reject_missing_symbols(
+    tmp_path,
+):
+    """Module/prose aliases work; missing actual API documentation fails."""
+    page = "API/particula/example/index.html"
+    target = tmp_path / page
+    target.parent.mkdir(parents=True)
+    target.write_text(
+        '<h1>Example</h1><h2 id="particula.example.run">run()</h2>'
+    )
+    anchors = [
+        "particula.example",
+        "particula.example.run",
+        "particula.example.run--parameters",
+        "particula.example.Removed",
+    ]
+    errors = site.preserve_api_anchors(tmp_path, {page: anchors})
+    assert len(errors) == 1 and "Removed" in errors[0]
+    text = target.read_text()
+    assert set(anchors[:-1]) <= site.Links(text).ids
+    assert text.index('id="particula.example.run--parameters"') < text.index(
+        '<h2 id="particula.example.run"'
+    )
+    site.preserve_api_anchors(tmp_path, {page: anchors})
+    assert target.read_text() == text
