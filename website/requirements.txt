@@ -19,7 +19,7 @@ pint==0.25
 thermo==0.4.2
 tqdm==4.67.1
 warp-lang==1.11.1
-pytest==8.4.2
+pytest==9.0.3
 pytest-cov==7.0.0
 typing_extensions==4.15.0
 nbconvert==7.16.6
