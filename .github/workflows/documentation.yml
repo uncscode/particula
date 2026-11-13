@@ -73,6 +73,7 @@ jobs:
         with:
           name: documentation-preview
           path: website/preview/
+          include-hidden-files: true
           retention-days: 30
 
   deploy:
