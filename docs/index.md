@@ -1,29 +1,129 @@
 ---
 title: Particula
+template: home.html
 hide:
+  - navigation
   - toc
 ---
 
-# Particula
+<div class="home-hero" markdown="1">
+<div class="home-intro" markdown="1">
 
-Particula is a Python library for aerosol simulation: construct particle and gas
-state, configure physical processes, and study how a population evolves.
+<p class="home-eyebrow">Particula · Aerosol simulation in Python</p>
 
-[Start here](guide/index.md){ .md-button .md-button--primary }
-[Browse examples](examples/index.md){ .md-button }
+# Small particles.<br>Big questions. {#particula}
 
-| I want to… | Start with |
-| --- | --- |
-| Run my first simulation | [Installation](guide/getting-started/installation/index.md), then [a CPU simulation](guide/getting-started/first-simulation.md) |
-| Understand the data and processes | [Guide](guide/index.md) |
-| Adapt an existing workflow | [Examples](examples/index.md) |
-| Understand the science | [Theory](theory/index.md) |
-| Upgrade an older script | [Native migration](guide/migration/v0.3.0/index.md) |
-| Extend the library | [Contribute](contribute/index.md) |
+Model how particles form, grow, collide, and evolve. Build a simulation from
+physical processes, then explore the science behind the results.
+{.home-lead}
 
-## Community and citation
+[Start here →](guide/index.md){ .home-button .home-button-primary }
+[Explore examples](examples/index.md){ .home-button .home-button-secondary }
 
-Ask questions and share studies in [GitHub Discussions](https://github.com/uncscode/particula/discussions).
-Report problems through [GitHub Issues](https://github.com/uncscode/particula/issues).
+Open source. Built for scientific exploration.
+{.home-note}
 
-Cite Particula [Computer software], [DOI: 10.5281/zenodo.6634653](https://doi.org/10.5281/zenodo.6634653).
+</div>
+<div class="home-visual" markdown="1">
+
+![Illustration of aerosol particles of different sizes suspended in a gas.](images/aerosol-model.svg)
+
+<div class="home-visual-caption"><span>Particles + gases</span><span>A system in motion</span></div>
+
+</div>
+</div>
+
+<div class="home-start" markdown="1">
+<div markdown="1">
+
+<p class="home-eyebrow">Your first simulation</p>
+
+## From a population to a process
+
+Set up Particula, construct an aerosol, and run a small CPU condensation example.
+
+[Run your first simulation →](guide/getting-started/first-simulation.md)
+
+</div>
+<div class="home-steps" markdown="1">
+
+1. <span>01</span> [Install Particula](guide/getting-started/installation/index.md)
+2. <span>02</span> [Define your aerosol](guide/data-model/construction.md)
+3. <span>03</span> [Choose a process](guide/processes/index.md)
+
+</div>
+</div>
+
+<div class="home-section-heading" markdown="1">
+
+## Find your way into the science
+
+A starting point for each stage of your work.
+
+</div>
+
+<div class="home-paths" markdown="1">
+<div class="home-path" markdown="1">
+
+<span class="home-path-number">01 / LEARN</span>
+
+### [Guide →](guide/index.md)
+
+Build your model step by step. Understand containers, processes, and CPU or GPU execution.
+
+</div>
+<div class="home-path" markdown="1">
+
+<span class="home-path-number">02 / EXPERIMENT</span>
+
+### [Examples →](examples/index.md)
+
+Start with a working notebook. Explore individual processes or adapt a full simulation.
+
+</div>
+<div class="home-path" markdown="1">
+
+<span class="home-path-number">03 / UNDERSTAND</span>
+
+### [Theory →](theory/index.md)
+
+Connect the implementation to equations, physical assumptions, and scientific references.
+
+</div>
+<div class="home-path" markdown="1">
+
+<span class="home-path-number">04 / LOOK UP</span>
+
+### [API →](https://uncscode.github.io/particula/API/)
+
+Find functions, classes, parameters, and return values in the generated Python reference.
+
+</div>
+<div class="home-path" markdown="1">
+
+<span class="home-path-number">05 / BUILD TOGETHER</span>
+
+### [Contribute →](contribute/index.md)
+
+Add a process, improve an example, or help make the documentation clearer.
+
+</div>
+</div>
+
+<div class="home-shortcuts" markdown="1">
+
+**Already working with Particula?**
+[Set up an AI assistant →](guide/ai-assistants/index.md)
+[Upgrade an older script →](guide/migration/v0.3.0/index.md)
+
+</div>
+
+<div class="home-community" markdown="1">
+
+## Science is a shared effort {#community-and-citation}
+
+[Ask a question](https://github.com/uncscode/particula/discussions) ·
+[Report an issue](https://github.com/uncscode/particula/issues) ·
+[Cite Particula](https://doi.org/10.5281/zenodo.6634653)
+
+</div>
