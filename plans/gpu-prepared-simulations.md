@@ -46,7 +46,7 @@ not promise rollback. No state readbacks or allocations inside prepared steps.
   properties and bounded tiled pair maxima, ascending active ranks and original
   sequential selection/RNG semantics. No full N-by-N allocation; other
   mechanisms unchanged. Retain quadratic complexity honestly in documentation.
-- [ ] 6. `feat(execution): integrate prepared restart and CUDA capture`:
+- [x] 6. `feat(execution): integrate prepared restart and CUDA capture`:
   checkpoint/resume, explicit capture with no duplicate timestep, provenance,
   invalidation, faulting and teardown tests.
 - [ ] 7. `test(gpu): add reproducible scaling and variability studies`:
@@ -192,3 +192,31 @@ resident steps of 10.90/0.210 ms at N=128, 158.65/1.476 ms at N=512,
 2556.95/20.641 ms at N=2048, and 40653.86/178.320 ms at N=8192.
 These are old-versus-new GPU execution timings, not CPU comparisons, setup costs,
 or final campaign evidence. The complete required study matrix remains phase 7.
+
+Phase 6: `SimulationCheckpoint` wraps the unchanged canonical resident schema
+with frozen process plans, timestep and last-step latent energy. `resume` checks
+configuration/order, current-state capability and exact device before upload;
+CPU inspection edits cannot alter continuation. Recompilation restores all
+canonical primary/registry bytes after setup refreshes, preserves RNG words and
+counters, and allocates fresh identities. A checkpoint containing unequal active
+counts after a later source is still inspectable, but Brownian resume rejects
+that incompatible population before upload, just as its next runtime guard does.
+`capture()` records without executing or advancing time; subsequent `step/run`
+replay its private owner-bound graph. Forcing changes values in place. Restart
+requires a new explicit capture. Native-operation leases, pinned descriptors,
+failure revocation, and stream-drained cleanup protect graph use. The canonical
+complete scheduler's public qualification/provenance validators are unchanged.
+Warp 1.11 may lazily instantiate its executable on first replay; benchmarks must
+warm up that replay separately. No library array allocation, transfer, readback
+or Python physics dispatch occurs during captured stepping.
+Adjacent restart/capture/import/runnable run: **478 passed**, with one obsolete
+`Graph.destroy` skip subsequently corrected and executed successfully on CUDA.
+After added resampling/lifecycle checks, prepared restart/capture plus reporter:
+**49 passed, zero skipped**. Tests cover all five families, ordered subsets,
+actual resampling, exact future continuation and canonical bytes, forcing,
+non-advancing capture, queued failure gates, pre-upload rejection, and native
+graph lifetime release. Targeted Ruff/mypy pass. Strict qualification now also
+selects the new suites and the corrected native capture smoke test.
+Strict expanded RTX qualification: **414 passed, zero skipped**; JSON/XML is
+under `.artifacts/qualification/phase6/`. This is phase evidence; final release
+qualification and the complete campaign remain pending.

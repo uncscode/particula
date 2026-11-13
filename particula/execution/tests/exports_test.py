@@ -41,6 +41,7 @@ EXPECTED_EXPORTS = (
     "CPUExecutionContext",
     "PreparedSimulation",
     "SimulationDiagnostics",
+    "SimulationCheckpoint",
 )
 
 EXPECTED_ERROR_EXPORTS = (

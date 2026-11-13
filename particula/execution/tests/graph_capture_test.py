@@ -2789,6 +2789,8 @@ def test_capture_prepared_graph_real_cuda_smoke(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Capture twelve device no-ops with Warp's real CUDA capture API."""
+    import weakref
+
     wp = pytest.importorskip("warp")
     devices = [
         device for device in wp.get_devices() if str(device).startswith("cuda")
@@ -2801,9 +2803,6 @@ def test_capture_prepared_graph_real_cuda_smoke(
         for name in ("capture_begin", "capture_end")
     ):
         pytest.skip("Warp capture API unavailable")
-    graph_type = getattr(wp, "Graph", None)
-    if graph_type is None or not callable(getattr(graph_type, "destroy", None)):
-        pytest.skip("Warp capture release API unavailable")
 
     request = cast("ResidentSimulationRequest", resident_request)
     signature = create_resident_graph_capture_signature(request)
@@ -2837,19 +2836,23 @@ def test_capture_prepared_graph_real_cuda_smoke(
         wp.launch(noop_kernel, dim=1, inputs=[values], device=device)
 
     released: list[object] = []
+    graphs: dict[object, Any] = {}
+    graph_refs: list[Any] = []
 
     def capture_begin() -> None:
         wp.capture_begin(device=device, force_module_load=True)
 
     def capture_end() -> object:
-        return wp.capture_end()
+        graph = wp.capture_end(device=device)
+        handle = object()
+        graphs[handle] = graph
+        graph_refs.append(weakref.ref(graph))
+        return handle
 
     def capture_release(handle: object) -> None:
         released.append(handle)
-        destroy = getattr(handle, "destroy", None)
-        if not callable(destroy):
-            pytest.fail("Warp capture handle has no native release method")
-        destroy()
+        # Warp graphs release native storage through Python lifetime cleanup.
+        del graphs[handle]
 
     qualification = PreparedGraphCaptureQualification(
         binding,
@@ -2900,6 +2903,8 @@ def test_capture_prepared_graph_real_cuda_smoke(
     )
     retire_resident_graph_capture(binding)
     assert len(released) == 1
+    assert not graphs
+    assert graph_refs[0]() is None
 
 
 def _issued_capture_for_lifecycle_test(

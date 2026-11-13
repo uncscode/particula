@@ -1,8 +1,36 @@
 """CPU-only result types for prepared simulation observations."""
 
+from __future__ import annotations
+
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
 import numpy as np
+
+if TYPE_CHECKING:
+    from particula.execution.checkpoint import (
+        CheckpointPayload,
+        ResidentCheckpoint,
+    )
+    from particula.execution.prepared_processes import _ProcessPlan
+
+
+@dataclass(frozen=True)
+class SimulationCheckpoint:
+    """In-memory, exact-device continuation of a prepared simulation.
+
+    Canonical resident bytes preserve primary state, acquired sidecars and
+    random words. The frozen process plans and timestep identify the compatible
+    runnable sequence. Auxiliary bytes preserve last-step latent energy.
+    Resident CPU inspection arrays are detached but are not restart authority.
+    This is not a portable disk format or a device-migration interface.
+    """
+
+    schema_version: int
+    resident: ResidentCheckpoint
+    processes: tuple[_ProcessPlan, ...]
+    time_step: float
+    auxiliary: tuple[CheckpointPayload, ...] = ()
 
 
 @dataclass(frozen=True)

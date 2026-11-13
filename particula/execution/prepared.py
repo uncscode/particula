@@ -14,7 +14,10 @@ from typing import Any, Callable
 
 from particula.aerosol import Aerosol
 from particula.execution import Backend, Device
-from particula.execution.prepared_types import SimulationDiagnostics
+from particula.execution.prepared_types import (
+    SimulationCheckpoint,
+    SimulationDiagnostics,
+)
 
 
 class PreparedSimulation:
@@ -45,6 +48,8 @@ class PreparedSimulation:
     _bindings: dict[str, Any]
     _observers: list[Callable[[], Any]]
     _plans: tuple[Any, ...]
+    _auxiliary: dict[str, Any]
+    _capture: Any
 
     def __init__(self) -> None:
         """Reject direct construction without a validated process plan."""
@@ -77,28 +82,9 @@ class PreparedSimulation:
         _preflight_cpu_session(
             aerosol.particles, aerosol.gas, aerosol.environment, device
         )
-        import warp as wp
-
-        target = wp.get_device(device.native)
-        result = object.__new__(cls)
-        result._wp = wp
-        result._device = Device(Backend.WARP, str(target))
-        result._time_step = dt
-        result._lock = RLock()
-        result._closed = False
-        result._last_steps = 0
-        result._last_time = 0.0
-        result._operations = None
-        result._session = None
-        result._registry = None
-        result._guard = None
-        result._diagnostics = None
-        result._refresh = None
-        result._device_failure = None
-        result._bindings = {}
-        result._observers = []
-        result._plans = ()
-        result._stream = wp.Stream(target) if target.is_cuda else None
+        result = cls._empty(device, dt)
+        wp = result._wp
+        target = result._device.native
         try:
             with result._scope():
                 result._session = setup_resident_session(
@@ -122,6 +108,47 @@ class PreparedSimulation:
             result._wait()
             raise
         return result
+
+    @classmethod
+    def _empty(cls, device: Device, time_step: float) -> PreparedSimulation:
+        """Create an owner and stream before either upload or exact restart."""
+        import warp as wp
+
+        target = wp.get_device(device.native)
+        result = object.__new__(cls)
+        result._wp = wp
+        result._device = Device(Backend.WARP, str(target))
+        result._time_step = time_step
+        result._lock = RLock()
+        result._closed = False
+        result._last_steps = 0
+        result._last_time = 0.0
+        result._operations = None
+        result._session = None
+        result._registry = None
+        result._guard = None
+        result._diagnostics = None
+        result._refresh = None
+        result._device_failure = None
+        result._bindings = {}
+        result._observers = []
+        result._plans = ()
+        result._auxiliary = {}
+        result._capture = None
+        result._stream = wp.Stream(target) if target.is_cuda else None
+        return result
+
+    def _bind(self, plans: tuple[Any, ...]) -> None:
+        """Compile a validated process plan against the owned resident state."""
+        from particula.execution.prepared_diagnostics import setup_diagnostics
+        from particula.execution.prepared_processes import _compile_process
+        from particula.execution.prepared_updates import compose_operations
+
+        with self._scope():
+            operations = tuple(_compile_process(plan, self) for plan in plans)
+            self._operations = compose_operations(self, plans, operations)
+            self._diagnostics = setup_diagnostics(self)
+            self._plans = plans
 
     @contextmanager
     def _scope(self):
@@ -151,6 +178,9 @@ class PreparedSimulation:
             _fault_resident_session_with_context,
         )
 
+        # Revoke first, but retain the graph until outstanding work completes.
+        if self._capture is not None:
+            self._capture.invalidate()
         _fault_resident_session_with_context(
             self._session, self._registry, self._guard
         )
@@ -197,8 +227,13 @@ class PreparedSimulation:
             token = self._guard.begin_step(self._time_step)
             try:
                 with self._scope():
-                    for operation in self._operations:
-                        operation()
+                    if self._capture is None:
+                        for operation in self._operations:
+                            operation()
+                    else:
+                        from particula.execution.prepared_capture import replay
+
+                        replay(self)
                 self._guard.complete_step(token)
             except BaseException:
                 try:
@@ -359,6 +394,44 @@ class PreparedSimulation:
             )
             apply_forcing(self, ((target, values),))
 
+    def checkpoint(self) -> SimulationCheckpoint:
+        """Observe and save exact continuation bytes plus frozen configuration.
+
+        Unlike a CPU snapshot, this in-memory checkpoint preserves random
+        streams, GPU-only fields and step counters. Resume on the same device
+        through the original runnable or an equivalently configured sequence.
+        """
+        from particula.execution.prepared_checkpoint import checkpoint
+
+        with self._lock:
+            return checkpoint(self)
+
+    @property
+    def captured(self) -> bool:
+        """Report whether subsequent steps use this owner's live CUDA graph."""
+        with self._lock:
+            return self._capture is not None and self._capture.valid
+
+    def capture(self) -> None:
+        """Record one CUDA timestep without executing it or advancing time.
+
+        This explicit setup boundary synchronizes prior work. Later step/run
+        calls replay the owned graph. Shape, process order, duration and buffer
+        identities stay fixed; forcing updates may change values in place.
+        Warp CPU rejects. Warp may instantiate its executable on first replay;
+        performance measurements should warm up that replay separately.
+        """
+        from particula.execution.prepared_capture import capture
+
+        with self._lock:
+            capture(self)
+
+    def uncapture(self) -> None:
+        """Wait, release the graph and return to ordinary prepared execution."""
+        with self._lock:
+            self.synchronize()
+            self._capture = None
+
     def close(self) -> None:
         """Wait and release owned storage without downloading a final state."""
         with self._lock:
@@ -374,8 +447,10 @@ class PreparedSimulation:
                     self._last_steps = self._guard.completed_steps
                     self._last_time = float(self._guard.simulated_time)
                     self._closed = True
+                    self._capture = None
                     self._operations = None
                     self._plans = ()
+                    self._auxiliary = {}
                     self._observers = []
                     self._diagnostics = None
                     self._refresh = None
@@ -407,10 +482,7 @@ def prepare_simulation(
     """Validate the ordered process plan before uploading native state."""
     from particula._cpu_batch import duration
     from particula.execution.gpu_session import _preflight_cpu_session
-    from particula.execution.prepared_processes import (
-        _compile_process,
-        _plan_process,
-    )
+    from particula.execution.prepared_processes import _plan_process
 
     if backend is not Backend.WARP:
         raise ValueError("prepared execution requires Backend.WARP")
@@ -436,21 +508,7 @@ def prepare_simulation(
         logical_box_ids=logical_box_ids,
     )
     try:
-        with owner._scope():
-            owner._operations = tuple(
-                _compile_process(plan, owner) for plan in plans
-            )
-            from particula.execution.prepared_updates import compose_operations
-
-            owner._operations = compose_operations(
-                owner, plans, owner._operations
-            )
-            from particula.execution.prepared_diagnostics import (
-                setup_diagnostics,
-            )
-
-            owner._diagnostics = setup_diagnostics(owner)
-            owner._plans = plans
+        owner._bind(plans)
     except BaseException:
         owner.close()
         raise

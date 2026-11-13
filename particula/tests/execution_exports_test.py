@@ -51,6 +51,7 @@ EXPECTED_EXPORTS = (
     "CPUExecutionContext",
     "PreparedSimulation",
     "SimulationDiagnostics",
+    "SimulationCheckpoint",
 )
 
 EXCLUDED_EXPORTS = (
