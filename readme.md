@@ -26,47 +26,8 @@ python -m pip install -e '.[dev,extra]'
 ```
 
 The source version does not indicate that 0.3.0 has been published. See the
-[release validation record](docs/contribute/validation/releases/v0.3.0.md)
+[release validation record](https://uncscode.github.io/particula/contribute/validation/releases/v0.3.0/)
 for revision-specific evidence and outstanding release gates.
-
-## Local documentation
-
-Wheels built from this 0.3.0 source include version-matched documentation. After
-installing such a release with `pip install particula`, no checkout or network
-connection is needed to read or search it:
-
-```bash
-particula-docs
-python -m particula_docs --json
-rg "ParticleData" "$(python -m particula_docs)/guide"
-```
-
-Use the Python interpreter from your Particula environment. The locator uses
-only the standard library and does not import simulation code, NumPy, or Warp.
-The JSON output records the package version, documentation path, file count,
-uncompressed source size, and manifest path. `bundle-manifest.json` records
-SHA-256 hashes and byte sizes for every bundled source file.
-
-The bundle contains `docs/index.md` and the `guide/`, `theory/`, `contribute/`,
-`examples/`, `data/`, and `images/` trees, preserving source bytes, directory
-structure, and relative links between included files. Python examples remain
-readable source; running them may require optional dependencies and hardware.
-Generated API pages, caches, website builds/saved website results, and `.trash/`
-are excluded. Links to repository tooling or rendered website resources still
-require those resources; this is a searchable source bundle, not a built site.
-
-For editable installations, the locator points directly to the repository's
-maintained `docs/` directory, so edits appear immediately. `docs/` is the only
-maintained documentation source; `particula/docs/` is generated in temporary
-build staging and must not be edited. Older releases without the locator can
-use their matching source documentation or the online documentation after
-checking version compatibility.
-
-## AI Assistants
-
-[Particula Helper](docs/guide/ai-assistants/index.md) provides setup, simulation,
-analysis, and debugging workflows for Codex/ChatGPT, Claude Code/Cowork, and
-OpenCode. See the guide for native install commands and environment requirements.
 
 ## Quick Start
 
@@ -112,95 +73,21 @@ print(aerosol.particles.number_density)  # m⁻³, not raw counts
 ```
 
 This single-box illustration retains explicit population and species meaning.
-See [native access and replacement](docs/guide/data-model/ownership.md)
+See [native access and replacement](https://uncscode.github.io/particula/guide/data-model/ownership/)
 for ownership, validation and non-unit-volume inventory checks.
 
+## Documentation
 
-## Migration / What's New
-
-Version 0.3.0 replaces `ParticleRepresentation`, `GasSpecies`, and `Atmosphere`
-with native data containers and explicit process configuration. See the
-[migration guide](docs/guide/migration/v0.3.0/index.md) for replacements,
-ownership rules, and direct-kernel troubleshooting. CPU runnable processes
-remain single-box; GPU transfers and device selection are explicit.
-
-## Code Structure
-
-```
-particula/
-├── gas/           # Gas/environment data and thermodynamic strategies
-├── particles/     # Particle data, distributions and properties
-├── dynamics/      # Time-dependent processes
-│   ├── coagulation/
-│   ├── condensation/
-│   └── wall_loss/
-├── activity/      # Activity coefficients, phase separation
-├── equilibria/    # Gas-particle partitioning
-├── execution/     # Execution metadata and concrete resident lifecycle
-├── gpu/           # Warp data, explicit transfers and direct kernels
-└── util/          # Constants, validation, unit conversion
-```
-
-## Documentation Guide
-
-| Looking for...            | Go to                                      |
-|---------------------------|--------------------------------------------|
-| Tutorials & walkthroughs  | [Examples](https://uncscode.github.io/particula/examples/) |
-| Scientific background     | [Theory](https://uncscode.github.io/particula/theory/) |
-| API reference             | [Full Docs](https://uncscode.github.io/particula) |
-| Contributing              | [contribute/](./docs/contribute/CONTRIBUTING.md) |
-
-Documentation uses Astro and Starlight. Examples are maintained as percent-cell
-Python scripts with saved results; see [website development](website/README.md)
-for building the site and [authoring](website/AUTHORING.md) for updating examples.
-
-### Examples by Topic
-
-- **Aerosol** — Building and inspecting aerosol objects
-- **Dynamics** — Coagulation, condensation, wall loss simulations
-- **Equilibria** — Gas-particle partitioning calculations
-- **Gas Phase** — Vapor pressure, species properties
-- **Particle Phase** — Size distributions, optical properties
-- **Simulations** — Full end-to-end scientific scenarios
-
-### Featured Examples
-
-- [**Aerosol Tutorial**](./docs/examples/fundamentals/native_aerosol.py) — Build native particle, full gas and environment containers and combine them into an `Aerosol` object.
-
-- [**CPU Latent-Heat Condensation Bookkeeping**](./docs/examples/processes/condensation/condensation_latent_heat.py)
-  — CPU-only walkthrough showing diagnostic latent-heat bookkeeping from real
-  condensation mass transfer with no temperature feedback.
-
-- [**Direct-Warp GPU Nucleation**](./docs/examples/gpu/direct/gpu_direct_nucleation.py)
-  — Explicit-transfer, fixed-capacity low-level example using the package-
-  exported `nucleation_step_gpu`. It requires Warp and is separate from the
-  CPU-only `Nucleation` runnable; it provides no CPU fallback.
-
-- [**Organic Partitioning & Coagulation**](./docs/examples/simulations/organic_partitioning_and_coagulation.py) — Illustrative organic partitioning followed by Brownian coagulation, including the retained binned method’s composition limitation; not a quantitative species forecast.
-
-- [**Cloud Chamber Cycles**](./docs/examples/simulations/cloud_chamber_multi_cycle.py)
-  — Multi-cycle cloud droplet activation demonstrating κ-Köhler theory across
-  3 seed compositions (Ammonium Sulfate, Sucrose, Mixed), comparing illustrative humidity responses. Dry-phase timestep oscillations
-  remain unqualified for quantitative activation predictions.
-
-## Features
-
-- **Gas & Particle Phases** — Full thermodynamic modeling with swappable strategies
-- **Dynamics** — Coagulation, condensation, wall loss, dilution
-- **Flexible Representations** — Discrete bins, continuous PDF, particle-resolved
-- **Builder Pattern** — Clean, validated object construction with unit conversion
-- **Composable Processes** — Chain runnables with `|` operator
-- **Condensation Utilities** — Non-isothermal helpers via
-  `particula.dynamics.get_thermal_resistance_factor`,
-  `particula.dynamics.get_mass_transfer_rate_latent_heat`, and
-  `particula.dynamics.get_latent_heat_energy_released`
-- **Condensation Strategies** — `CondensationIsothermal` plus
-  `CondensationLatentHeat` with latent-heat-corrected
-  `mass_transfer_rate()`/`rate()` and `step()` energy tracking via
-  `last_latent_heat_energy`, with optional `dynamic_viscosity` override
-- **Latent Heat Factories** — Build constant, linear, and power-law latent heat
-  strategies via `particula.gas.LatentHeatFactory` with unit-aware builders and
-  gas-phase exports for upcoming non-isothermal workflows
+| Looking for… | Read next |
+| --- | --- |
+| Installation and local documentation | [Installation guide](https://uncscode.github.io/particula/guide/getting-started/installation/) |
+| Tutorials and examples | [Examples](https://uncscode.github.io/particula/examples/) |
+| Scientific processes | [Process guide](https://uncscode.github.io/particula/guide/processes/) |
+| Scientific background | [Theory](https://uncscode.github.io/particula/theory/) |
+| API reference | [API](https://uncscode.github.io/particula/api/) |
+| Upgrading to 0.3.0 | [Migration guide](https://uncscode.github.io/particula/guide/migration/v0.3.0/) |
+| AI assistants | [Particula Helper](https://uncscode.github.io/particula/guide/ai-assistants/) |
+| Contributing and code structure | [Contributor guide](https://uncscode.github.io/particula/contribute/CONTRIBUTING/), [architecture](https://uncscode.github.io/particula/contribute/architecture/) |
 
 ## Citation
 
