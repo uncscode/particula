@@ -943,6 +943,55 @@ def _wall_loss_remove(
 
 
 @no_type_check
+@wp.kernel
+def _wall_loss_remove_guarded(
+    masses: wp.array3d(dtype=wp.float64),
+    concentration: wp.array2d(dtype=wp.float64),
+    charge: wp.array2d(dtype=wp.float64),
+    density: wp.array(dtype=wp.float64),
+    temperature: wp.array(dtype=wp.float64),
+    pressure: wp.array(dtype=wp.float64),
+    time_step: wp.float64,
+    wall_eddy_diffusivity: wp.float64,
+    chamber_radius: wp.float64,
+    chamber_length: wp.float64,
+    chamber_width: wp.float64,
+    chamber_height: wp.float64,
+    geometry_mode: wp.int32,
+    n_particles: wp.int32,
+    n_species: wp.int32,
+    rng_states: wp.array(dtype=wp.uint32),
+    rng_seed: wp.int32,
+    initialize_rng: wp.int32,
+    failure: wp.array(dtype=wp.int32),
+) -> None:
+    """Skip this resident writer after a latched simulation failure."""
+    if failure[0] != 0:
+        return
+    _wall_loss_remove_impl(
+        masses,
+        concentration,
+        charge,
+        density,
+        temperature,
+        pressure,
+        time_step,
+        wall_eddy_diffusivity,
+        chamber_radius,
+        chamber_length,
+        chamber_width,
+        chamber_height,
+        geometry_mode,
+        n_particles,
+        n_species,
+        rng_states,
+        rng_seed,
+        initialize_rng,
+        wp.tid(),
+    )
+
+
+@no_type_check
 @wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
 def _wall_loss_remove_selected(
     masses: wp.array3d(dtype=wp.float64),
@@ -1032,6 +1081,51 @@ def _charged_spherical_wall_loss_remove(
 
 
 @no_type_check
+@wp.kernel
+def _charged_spherical_wall_loss_remove_guarded(
+    masses: wp.array3d(dtype=wp.float64),
+    concentration: wp.array2d(dtype=wp.float64),
+    charge: wp.array2d(dtype=wp.float64),
+    density: wp.array(dtype=wp.float64),
+    temperature: wp.array(dtype=wp.float64),
+    pressure: wp.array(dtype=wp.float64),
+    time_step: wp.float64,
+    wall_eddy_diffusivity: wp.float64,
+    chamber_radius: wp.float64,
+    wall_potential: wp.float64,
+    wall_electric_field: wp.float64,
+    n_particles: wp.int32,
+    n_species: wp.int32,
+    rng_states: wp.array(dtype=wp.uint32),
+    rng_seed: wp.int32,
+    initialize_rng: wp.int32,
+    failure: wp.array(dtype=wp.int32),
+) -> None:
+    """Skip this resident writer after a latched simulation failure."""
+    if failure[0] != 0:
+        return
+    _charged_spherical_wall_loss_remove_impl(
+        masses,
+        concentration,
+        charge,
+        density,
+        temperature,
+        pressure,
+        time_step,
+        wall_eddy_diffusivity,
+        chamber_radius,
+        wall_potential,
+        wall_electric_field,
+        n_particles,
+        n_species,
+        rng_states,
+        rng_seed,
+        initialize_rng,
+        wp.tid(),
+    )
+
+
+@no_type_check
 @wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
 def _charged_spherical_wall_loss_remove_selected(
     masses: wp.array3d(dtype=wp.float64),
@@ -1097,6 +1191,55 @@ def _charged_rectangular_wall_loss_remove(
     initialize_rng: wp.int32,
 ) -> None:
     """Run charged rectangular wall loss for the direct all-box boundary."""
+    _charged_rectangular_wall_loss_remove_impl(
+        masses,
+        concentration,
+        charge,
+        density,
+        temperature,
+        pressure,
+        time_step,
+        wall_eddy_diffusivity,
+        chamber_length,
+        chamber_width,
+        chamber_height,
+        wall_potential,
+        wall_electric_field,
+        n_particles,
+        n_species,
+        rng_states,
+        rng_seed,
+        initialize_rng,
+        wp.tid(),
+    )
+
+
+@no_type_check
+@wp.kernel
+def _charged_rectangular_wall_loss_remove_guarded(
+    masses: wp.array3d(dtype=wp.float64),
+    concentration: wp.array2d(dtype=wp.float64),
+    charge: wp.array2d(dtype=wp.float64),
+    density: wp.array(dtype=wp.float64),
+    temperature: wp.array(dtype=wp.float64),
+    pressure: wp.array(dtype=wp.float64),
+    time_step: wp.float64,
+    wall_eddy_diffusivity: wp.float64,
+    chamber_length: wp.float64,
+    chamber_width: wp.float64,
+    chamber_height: wp.float64,
+    wall_potential: wp.float64,
+    wall_electric_field: wp.array(dtype=wp.float64),
+    n_particles: wp.int32,
+    n_species: wp.int32,
+    rng_states: wp.array(dtype=wp.uint32),
+    rng_seed: wp.int32,
+    initialize_rng: wp.int32,
+    failure: wp.array(dtype=wp.int32),
+) -> None:
+    """Skip this resident writer after a latched simulation failure."""
+    if failure[0] != 0:
+        return
     _charged_rectangular_wall_loss_remove_impl(
         masses,
         concentration,

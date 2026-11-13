@@ -51,7 +51,7 @@ launches.
 
 from dataclasses import dataclass
 from numbers import Real
-from typing import Any
+from typing import Any, no_type_check
 
 import numpy as np
 
@@ -83,6 +83,7 @@ from particula.gpu.kernels.environment import (
 from particula.gpu.kernels.thermodynamics import (
     ThermodynamicsConfig,
     _refresh_vapor_pressure_kernel,
+    _refresh_vapor_pressure_kernel_guarded,
     _validate_array_metadata,
     validate_thermodynamics_config,
 )
@@ -294,6 +295,7 @@ class _PreparedCondensationCall:
     particle_charge: Any
     distribution_kind: int
     gas_species_count: int
+    failure: Any = None
 
 
 def _read_float64_array(array: Any) -> np.ndarray:
@@ -1015,11 +1017,14 @@ def _prepare_environment_properties_kernel(
     )
 
 
-@wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
+@no_type_check
+@wp.func  # pragma: no cover - device kernels execute outside Python coverage
 # type: ignore[misc]
-def apply_mass_transfer_kernel(
+def apply_mass_transfer_kernel_body(
     masses: Any,
     mass_transfer: Any,
+    box_idx: wp.int32,
+    particle_idx: wp.int32,
 ) -> None:
     """Apply condensation mass transfer and clamp masses to non-negative.
 
@@ -1027,7 +1032,6 @@ def apply_mass_transfer_kernel(
         masses: Particle masses array ``(n_boxes, n_particles, n_species)``.
         mass_transfer: Mass transfer array matching ``masses`` shape.
     """
-    box_idx, particle_idx = wp.tid()  # type: ignore[misc]
     n_species = masses.shape[2]
     for species_idx in range(n_species):
         updated_mass = (
@@ -1037,6 +1041,35 @@ def apply_mass_transfer_kernel(
         if updated_mass < wp.float64(0.0):
             updated_mass = wp.float64(0.0)
         masses[box_idx, particle_idx, species_idx] = updated_mass
+
+
+@no_type_check
+@wp.kernel
+def apply_mass_transfer_kernel(
+    masses: Any,
+    mass_transfer: Any,
+) -> None:
+    """Run the shared device operation through the direct kernel API."""
+    box_idx, particle_idx = wp.tid()
+    apply_mass_transfer_kernel_body(
+        masses, mass_transfer, box_idx, particle_idx
+    )
+
+
+@no_type_check
+@wp.kernel
+def apply_mass_transfer_kernel_guarded(
+    masses: Any,
+    mass_transfer: Any,
+    failure: wp.array(dtype=wp.int32),
+) -> None:
+    """Skip this resident writer after a latched simulation failure."""
+    if failure[0] != 0:
+        return
+    box_idx, particle_idx = wp.tid()
+    apply_mass_transfer_kernel_body(
+        masses, mass_transfer, box_idx, particle_idx
+    )
 
 
 @wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
@@ -1077,11 +1110,14 @@ def _accumulate_finalized_mass_transfer_kernel(
         ]
 
 
-@wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
+@no_type_check
+@wp.func  # pragma: no cover - device kernels execute outside Python coverage
 # type: ignore[misc]
-def _couple_finalized_transfer_to_gas_kernel(
+def _couple_finalized_transfer_to_gas_kernel_body(
     gas_delta: Any,
     gas_concentration: Any,
+    box_idx: wp.int32,
+    species_idx: wp.int32,
 ) -> None:
     """Couple a prevalidated finalized-transfer reduction to gas.
 
@@ -1089,7 +1125,6 @@ def _couple_finalized_transfer_to_gas_kernel(
     transfer delta from gas. Negative finalized transfer therefore adds
     evaporated inventory to gas.
     """
-    box_idx, species_idx = wp.tid()  # type: ignore[misc]
     updated_concentration = (
         gas_concentration[box_idx, species_idx]
         - (gas_delta[box_idx, species_idx])
@@ -1097,6 +1132,35 @@ def _couple_finalized_transfer_to_gas_kernel(
     if updated_concentration < wp.float64(0.0):
         updated_concentration = wp.float64(0.0)
     gas_concentration[box_idx, species_idx] = updated_concentration
+
+
+@no_type_check
+@wp.kernel
+def _couple_finalized_transfer_to_gas_kernel(
+    gas_delta: Any,
+    gas_concentration: Any,
+) -> None:
+    """Run the shared device operation through the direct kernel API."""
+    box_idx, species_idx = wp.tid()
+    _couple_finalized_transfer_to_gas_kernel_body(
+        gas_delta, gas_concentration, box_idx, species_idx
+    )
+
+
+@no_type_check
+@wp.kernel
+def _couple_finalized_transfer_to_gas_kernel_guarded(
+    gas_delta: Any,
+    gas_concentration: Any,
+    failure: wp.array(dtype=wp.int32),
+) -> None:
+    """Skip this resident writer after a latched simulation failure."""
+    if failure[0] != 0:
+        return
+    box_idx, species_idx = wp.tid()
+    _couple_finalized_transfer_to_gas_kernel_body(
+        gas_delta, gas_concentration, box_idx, species_idx
+    )
 
 
 @wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
@@ -2905,14 +2969,19 @@ def _enqueue_prepared_condensation_call(
                 device=p.device,
             )
         wp.launch(
-            _refresh_vapor_pressure_kernel,
+            _refresh_vapor_pressure_kernel
+            if p.failure is None
+            else _refresh_vapor_pressure_kernel_guarded,
             dim=(n_boxes, n_gas),
-            inputs=[
-                p.thermodynamics_modes,
-                p.thermodynamics_parameters,
-                p.refresh_temperature,
-                p.gas_vapor_pressure,
-            ],
+            inputs=(
+                [
+                    p.thermodynamics_modes,
+                    p.thermodynamics_parameters,
+                    p.refresh_temperature,
+                    p.gas_vapor_pressure,
+                ]
+            )
+            + ([] if p.failure is None else [p.failure]),
             device=p.device,
         )
         wp.launch(
@@ -3024,9 +3093,12 @@ def _enqueue_prepared_condensation_call(
             device=p.device,
         )
         wp.launch(
-            apply_mass_transfer_kernel,
+            apply_mass_transfer_kernel
+            if p.failure is None
+            else apply_mass_transfer_kernel_guarded,
             dim=(n_boxes, n_particles),
-            inputs=[p.particle_masses, p.finalized],
+            inputs=([p.particle_masses, p.finalized])
+            + ([] if p.failure is None else [p.failure]),
             device=p.device,
         )
         wp.launch(
@@ -3036,9 +3108,12 @@ def _enqueue_prepared_condensation_call(
             device=p.device,
         )
         wp.launch(
-            _couple_finalized_transfer_to_gas_kernel,
+            _couple_finalized_transfer_to_gas_kernel
+            if p.failure is None
+            else _couple_finalized_transfer_to_gas_kernel_guarded,
             dim=(n_boxes, n_gas),
-            inputs=[p.gas_delta, p.gas_concentration],
+            inputs=([p.gas_delta, p.gas_concentration])
+            + ([] if p.failure is None else [p.failure]),
             device=p.device,
         )
         if p.energy_transfer is not None:
@@ -3062,13 +3137,14 @@ def _enqueue_prepared_condensation_call(
             )
     if p.distribution_kind == 3:
         wp.launch(
-            native_kernels.retire_evaporated_slots,
+            native_kernels.retire_evaporated_slots
+            if p.failure is None
+            else native_kernels.retire_evaporated_slots_guarded,
             dim=(n_boxes, n_particles),
-            inputs=[
-                p.particle_masses,
-                p.particle_concentration,
-                p.particle_charge,
-            ],
+            inputs=(
+                [p.particle_masses, p.particle_concentration, p.particle_charge]
+            )
+            + ([] if p.failure is None else [p.failure]),
             device=p.device,
         )
     return p.particles, p.total_mass_transfer

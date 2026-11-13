@@ -18,7 +18,7 @@ Examples:
 """
 
 from copy import copy
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
@@ -33,6 +33,10 @@ else:
 
 
 from particula.aerosol import Aerosol
+
+if TYPE_CHECKING:
+    from particula.execution import Backend
+    from particula.execution.prepared import PreparedSimulation
 
 
 class RunnableABC:
@@ -164,6 +168,47 @@ class RunnableABC:
         """Execute the single-box numerical building block."""
         raise NotImplementedError
 
+    def prepare(
+        self,
+        aerosol: Aerosol,
+        *,
+        time_step: float,
+        backend: "Backend | None" = None,
+        device: str = "cuda:0",
+        root_seed: int = 0,
+        logical_box_ids=None,
+    ) -> "PreparedSimulation":
+        """Upload native state once and prepare supported resident GPU physics.
+
+        Args:
+            aerosol: Initial native particle, gas and environment state.
+            time_step: Fixed duration of each complete process cycle [s].
+            backend: Backend.WARP by default; CPU execution uses execute().
+            device: Explicit Warp device, default CUDA device zero.
+            root_seed: Root seed for persistent independent process/box streams.
+            logical_box_ids: Optional stable identities in physical box order.
+
+        Returns:
+            An owned PreparedSimulation. Use its context manager or close().
+            snapshot() returns detached CPU state for analysis and plotting.
+
+        Raises:
+            ValueError: If process physics or state cannot be represented.
+            RuntimeError: If the requested runtime/device is unavailable.
+        """
+        from particula.execution import Backend
+        from particula.execution.prepared import prepare_simulation
+
+        return prepare_simulation(
+            (self,),
+            aerosol,
+            backend=Backend.WARP if backend is None else backend,
+            device=device,
+            time_step=time_step,
+            root_seed=root_seed,
+            logical_box_ids=logical_box_ids,
+        )
+
     def __or__(self, other: "RunnableABC") -> "RunnableSequence":
         """Chain this Runnable with another using the '|' operator.
 
@@ -285,6 +330,47 @@ class RunnableSequence:
                     **({"context": context} if context is not None else {}),
                 )
         return aerosol
+
+    def prepare(
+        self,
+        aerosol: Aerosol,
+        *,
+        time_step: float,
+        backend: "Backend | None" = None,
+        device: str = "cuda:0",
+        root_seed: int = 0,
+        logical_box_ids=None,
+    ) -> "PreparedSimulation":
+        """Upload native state once and prepare supported resident GPU physics.
+
+        Args:
+            aerosol: Initial native particle, gas and environment state.
+            time_step: Fixed duration of each complete process cycle [s].
+            backend: Backend.WARP by default; CPU execution uses execute().
+            device: Explicit Warp device, default CUDA device zero.
+            root_seed: Root seed for persistent independent process/box streams.
+            logical_box_ids: Optional stable identities in physical box order.
+
+        Returns:
+            An owned PreparedSimulation. Use its context manager or close().
+            snapshot() returns detached CPU state for analysis and plotting.
+
+        Raises:
+            ValueError: If process physics or state cannot be represented.
+            RuntimeError: If the requested runtime/device is unavailable.
+        """
+        from particula.execution import Backend
+        from particula.execution.prepared import prepare_simulation
+
+        return prepare_simulation(
+            tuple(self.processes),
+            aerosol,
+            backend=Backend.WARP if backend is None else backend,
+            device=device,
+            time_step=time_step,
+            root_seed=root_seed,
+            logical_box_ids=logical_box_ids,
+        )
 
     def __or__(self, process: RunnableABC) -> "RunnableSequence":
         """Chain another Runnable into this sequence using the '|' operator.

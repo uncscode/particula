@@ -3166,8 +3166,14 @@ def _reset_prepared_nucleation_status(  # noqa: PLR0913
     p5_status: wp.array(dtype=wp.int32),
     release: wp.array(dtype=wp.int32),
     scaling: wp.array(dtype=wp.int32),
+    upstream_failure: wp.array(dtype=wp.int32),
 ) -> None:
     """Reset preparation-owned status and policy work on device."""
+    if upstream_failure:
+        if upstream_failure[0] != 0:
+            if wp.tid() == 0:
+                pipeline_invalid[0] = 1
+            return
     index = wp.tid()
     if index < p1_status.shape[0]:
         p1_status[index] = 0
@@ -3432,6 +3438,7 @@ class _PreparedNucleationCall:
     device: Any
     particle_to_gas: Any = None
     gas_species: int = 0
+    upstream_failure: Any = None
 
 
 def _prepare_nucleation_step_gpu(  # noqa: C901
@@ -3751,6 +3758,7 @@ def _enqueue_prepared_nucleation_call(  # noqa: C901
             prepared.p5_status,
             p4_work[1],
             p4_work[2],
+            prepared.upstream_failure,
         ],
         device=prepared.device,
     )
@@ -4143,7 +4151,27 @@ def _observe_prepared_nucleation_call(  # noqa: C901
             exhaustion operation
             recorded an error.
     """
-    p1 = prepared.p1_status.numpy()
+    statuses = [
+        prepared.p1_status.numpy(),
+        prepared.p2_status.numpy(),
+        prepared.p3_status.numpy(),
+        prepared.molecule_status.numpy()[:1],
+        prepared.p4_status.numpy()[:1],
+        prepared.resampling.invalid.numpy()[:1] if prepared.resampling else [0],
+        prepared.resampling.planning_failed.numpy()[:1]
+        if prepared.resampling
+        else [0],
+        prepared.scaling.status.numpy()[:1] if prepared.scaling else [0],
+        prepared.p4_final_status.numpy()[:1],
+        prepared.p5_status.numpy()[:1],
+    ]
+    _raise_nucleation_status(np.concatenate(statuses))
+    return prepared.result
+
+
+def _raise_nucleation_status(status: np.ndarray) -> None:  # noqa: C901
+    """Decode the fixed 25-lane nucleation status in scientific phase order."""
+    p1 = status[:14]
     p1_errors = (
         "particles.masses must be finite and nonnegative.",
         "particles.concentration must be finite and nonnegative.",
@@ -4163,14 +4191,14 @@ def _observe_prepared_nucleation_call(  # noqa: C901
     for value, message in zip(p1, p1_errors, strict=True):
         if int(value):
             raise ValueError(message)
-    p2 = prepared.p2_status.numpy()
+    p2 = status[14:16]
     if int(p2[0]):
         raise ValueError(
             "Derived nucleation demand must be finite and nonnegative."
         )
     if int(p2[1]):
         raise ValueError("Nucleation demand cannot be made inventory-safe.")
-    p3 = prepared.p3_status.numpy()
+    p3 = status[16:18]
     if int(p3[0]):
         raise ValueError("Invalid particle slot state.")
     if int(p3[1]):
@@ -4178,28 +4206,26 @@ def _observe_prepared_nucleation_call(  # noqa: C901
             "accepted_demand times particle volume must be a finite, "
             "nonnegative integral int32 count."
         )
-    if int(prepared.molecule_status.numpy()[0]):
+    if int(status[18]):
         raise ValueError(
             "Positive molecule counts require participating gas species."
         )
-    if int(prepared.p4_status.numpy()[0]):
+    if int(status[19]):
         raise ValueError("P4 handoff, policy input, or capacity is invalid.")
-    if prepared.resampling is not None:
-        if int(prepared.resampling.invalid.numpy()[0]):
-            raise ValueError(
-                "particles or required_release_counts have invalid values"
-            )
-        if int(prepared.resampling.planning_failed.numpy()[0]):
-            raise ValueError("resampling diagnostic exceeds bound")
-    if prepared.scaling is not None and int(prepared.scaling.status.numpy()[0]):
+    if int(status[20]):
+        raise ValueError(
+            "particles or required_release_counts have invalid values"
+        )
+    if int(status[21]):
+        raise ValueError("resampling diagnostic exceeds bound")
+    if int(status[22]):
         raise ValueError(
             "particles or representative scaling sidecars have invalid values"
         )
-    if int(prepared.p4_final_status.numpy()[0]):
+    if int(status[23]):
         raise ValueError("P4 final demand does not fit available capacity.")
-    if int(prepared.p5_status.numpy()[0]) & 1:
+    if int(status[24]) & 1:
         raise ValueError("P5 finalized nucleation handoff is invalid.")
-    return prepared.result
 
 
 def nucleation_step_gpu(

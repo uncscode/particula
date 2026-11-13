@@ -1420,13 +1420,88 @@ def _native_coagulation_kernel(
 
 @no_type_check
 @wp.kernel
+def _native_coagulation_kernel_guarded(
+    masses: Any,
+    concentration: Any,
+    density: Any,
+    volume: Any,
+    temperature: Any,
+    pressure: Any,
+    gas_constant: Any,
+    boltzmann_constant: Any,
+    molecular_weight_air: Any,
+    ref_viscosity: Any,
+    ref_temperature: Any,
+    sutherland_constant: Any,
+    elementary_charge_value: Any,
+    electric_permittivity: Any,
+    time_step: Any,
+    radii: Any,
+    diffusivities: Any,
+    g_terms: Any,
+    speeds: Any,
+    settling_velocities: Any,
+    turbulent_dissipation: Any,
+    fluid_density: Any,
+    total_masses: Any,
+    charge: Any,
+    active_indices: Any,
+    collision_pairs: Any,
+    n_collisions: Any,
+    rng_states: Any,
+    mechanism_mask: Any,
+    collision_capacity: Any,
+    failure: wp.array(dtype=wp.int32),
+) -> None:
+    """Skip this resident writer after a latched simulation failure."""
+    if failure[0] != 0:
+        return
+    _coagulation_selector_impl(
+        masses,
+        concentration,
+        density,
+        volume,
+        temperature,
+        pressure,
+        gas_constant,
+        boltzmann_constant,
+        molecular_weight_air,
+        ref_viscosity,
+        ref_temperature,
+        sutherland_constant,
+        elementary_charge_value,
+        electric_permittivity,
+        time_step,
+        radii,
+        diffusivities,
+        g_terms,
+        speeds,
+        settling_velocities,
+        turbulent_dissipation,
+        fluid_density,
+        total_masses,
+        charge,
+        active_indices,
+        collision_pairs,
+        n_collisions,
+        rng_states,
+        mechanism_mask,
+        collision_capacity,
+        wp.tid(),
+    )
+
+
+@no_type_check
+@wp.func
 # type: ignore[misc]
-def apply_coagulation_kernel(
+def apply_coagulation_kernel_body(
     masses: Any,
     concentration: Any,
     charge: Any,
     collision_pairs: Any,
     n_collisions: Any,
+    box_idx: wp.int32,
+    collision_idx: wp.int32,
 ) -> None:
     """Apply representable coagulation merges to caller-owned state in place.
 
@@ -1446,7 +1521,6 @@ def apply_coagulation_kernel(
             ``(n_boxes, max_collisions, 2)``.
         n_collisions: Collision counts ``(n_boxes,)``.
     """  # type: ignore
-    box_idx, collision_idx = wp.tid()  # type: ignore[misc]
     if collision_idx >= n_collisions[box_idx]:
         return
 
@@ -1488,6 +1562,53 @@ def apply_coagulation_kernel(
     charge[box_idx, idx_i] = merged_charge
     charge[box_idx, idx_j] = wp.float64(0.0)
     concentration[box_idx, idx_j] = wp.float64(0.0)
+
+
+@no_type_check
+@wp.kernel
+def apply_coagulation_kernel(
+    masses: Any,
+    concentration: Any,
+    charge: Any,
+    collision_pairs: Any,
+    n_collisions: Any,
+) -> None:
+    """Run the shared device operation through the direct kernel API."""
+    box_idx, collision_idx = wp.tid()
+    apply_coagulation_kernel_body(
+        masses,
+        concentration,
+        charge,
+        collision_pairs,
+        n_collisions,
+        box_idx,
+        collision_idx,
+    )
+
+
+@no_type_check
+@wp.kernel
+def apply_coagulation_kernel_guarded(
+    masses: Any,
+    concentration: Any,
+    charge: Any,
+    collision_pairs: Any,
+    n_collisions: Any,
+    failure: wp.array(dtype=wp.int32),
+) -> None:
+    """Skip this resident writer after a latched simulation failure."""
+    if failure[0] != 0:
+        return
+    box_idx, collision_idx = wp.tid()
+    apply_coagulation_kernel_body(
+        masses,
+        concentration,
+        charge,
+        collision_pairs,
+        n_collisions,
+        box_idx,
+        collision_idx,
+    )
 
 
 @no_type_check
@@ -2212,6 +2333,7 @@ class _PreparedCoagulationCall:
     max_collisions: int
     device: Any
     selector_inputs: tuple[Any, ...]
+    failure: Any = None
 
 
 def _prepare_coagulation_step_gpu(  # noqa: C901
@@ -2751,22 +2873,30 @@ def _enqueue_prepared_coagulation_call(
         API.
     """
     wp.launch(
-        _native_coagulation_kernel,
+        _native_coagulation_kernel
+        if prepared.failure is None
+        else _native_coagulation_kernel_guarded,
         dim=(prepared.n_boxes,),
-        inputs=list(prepared.selector_inputs),
+        inputs=(list(prepared.selector_inputs))
+        + ([] if prepared.failure is None else [prepared.failure]),
         device=prepared.device,
     )
 
     wp.launch(
-        apply_coagulation_kernel,
+        apply_coagulation_kernel
+        if prepared.failure is None
+        else apply_coagulation_kernel_guarded,
         dim=(prepared.n_boxes, prepared.max_collisions),
-        inputs=[
-            prepared.masses,
-            prepared.concentration,
-            prepared.charge,
-            prepared.collision_pairs,
-            prepared.n_collisions,
-        ],
+        inputs=(
+            [
+                prepared.masses,
+                prepared.concentration,
+                prepared.charge,
+                prepared.collision_pairs,
+                prepared.n_collisions,
+            ]
+        )
+        + ([] if prepared.failure is None else [prepared.failure]),
         device=prepared.device,
     )
     wp.launch(

@@ -10,7 +10,7 @@ use the canonical water/ice equations and reserve all four parameter slots.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, no_type_check
 
 import numpy as np
 
@@ -298,6 +298,26 @@ def _evaluate_vapor_pressure(
     return _buck_vapor_pressure(temperature)
 
 
+@no_type_check
+@wp.func
+def _refresh_vapor_pressure_kernel_body(
+    modes: Any,
+    parameters: Any,
+    temperature: Any,
+    vapor_pressure: Any,
+    box_idx: wp.int32,
+    species_idx: wp.int32,
+) -> None:
+    """Refresh all per-box, per-species vapor-pressure values."""
+    vapor_pressure[box_idx, species_idx] = _evaluate_vapor_pressure(
+        modes[species_idx],
+        parameters,
+        species_idx,
+        temperature[box_idx],
+    )
+
+
+@no_type_check
 @wp.kernel
 def _refresh_vapor_pressure_kernel(
     modes: Any,
@@ -305,13 +325,28 @@ def _refresh_vapor_pressure_kernel(
     temperature: Any,
     vapor_pressure: Any,
 ) -> None:
-    """Refresh all per-box, per-species vapor-pressure values."""
-    box_idx, species_idx = wp.tid()  # type: ignore[misc]
-    vapor_pressure[box_idx, species_idx] = _evaluate_vapor_pressure(
-        modes[species_idx],
-        parameters,
-        species_idx,
-        temperature[box_idx],
+    """Run the shared device operation through the direct kernel API."""
+    box_idx, species_idx = wp.tid()
+    _refresh_vapor_pressure_kernel_body(
+        modes, parameters, temperature, vapor_pressure, box_idx, species_idx
+    )
+
+
+@no_type_check
+@wp.kernel
+def _refresh_vapor_pressure_kernel_guarded(
+    modes: Any,
+    parameters: Any,
+    temperature: Any,
+    vapor_pressure: Any,
+    failure: wp.array(dtype=wp.int32),
+) -> None:
+    """Skip this resident writer after a latched simulation failure."""
+    if failure[0] != 0:
+        return
+    box_idx, species_idx = wp.tid()
+    _refresh_vapor_pressure_kernel_body(
+        modes, parameters, temperature, vapor_pressure, box_idx, species_idx
     )
 
 

@@ -577,3 +577,362 @@ def test_unsupported_physics_is_rejected_before_upload(monkeypatch, failure):
     monkeypatch.setattr(conversion, "to_warp_particle_data", forbidden)
     with pytest.raises(ValueError):
         prepare_simulation((process,), initial, time_step=1.0)
+
+
+def test_source_failure_latches_across_steps_and_stops_later_writers(device):
+    """A fractional source cannot be forgotten or followed by gas dilution."""
+    from particula.dynamics import Dilution, DilutionStrategy
+    from particula.execution.prepared import prepare_simulation
+
+    initial, process = nucleation_case()
+    with prepare_simulation(
+        (process, Dilution(DilutionStrategy(1.0))),
+        initial,
+        device=device.native,
+        time_step=0.1,
+    ) as simulation:
+        simulation.run(3)
+        simulation._wait()
+        np.testing.assert_array_equal(
+            simulation._session.gas.concentration.numpy(),
+            initial.gas.concentration,
+        )
+        np.testing.assert_array_equal(
+            simulation._session.particles.masses.numpy(),
+            initial.particles.masses,
+        )
+        with pytest.raises(ValueError, match="integral"):
+            simulation.synchronize()
+
+
+def test_new_unit_particles_guard_unequal_coagulation_before_rng_draw(device):
+    """Nucleation may make a valid initial equal-count cohort incompatible."""
+    from particula.dynamics import (
+        BrownianCoagulationStrategy,
+        Coagulation,
+        Dilution,
+        DilutionStrategy,
+    )
+    from particula.execution.prepared import prepare_simulation
+
+    initial, process = nucleation_case()
+    initial.particles.concentration[0, 0] = 2
+    with prepare_simulation(
+        (
+            process,
+            Coagulation(BrownianCoagulationStrategy("particle_resolved")),
+            Dilution(DilutionStrategy(1.0)),
+        ),
+        initial,
+        device=device.native,
+        time_step=1.0,
+    ) as simulation:
+        resources = simulation._registry.acquire_coagulation(4)
+        before_rng = resources.rng_states.numpy().copy()
+        simulation.run(3)
+        simulation._wait()
+        np.testing.assert_array_equal(
+            simulation._session.particles.concentration.numpy(), [[2, 1, 1, 0]]
+        )
+        np.testing.assert_array_equal(resources.rng_states.numpy(), before_rng)
+        with pytest.raises(ValueError, match="equal active counts"):
+            simulation.synchronize()
+
+
+@pytest.mark.parametrize("kind", ["particle_resolved", "discrete"])
+def test_public_prepare_forcing_and_reduced_diagnostics(device, kind):
+    """Box-varying forcing and density reductions preserve the population basis."""
+    from particula.dynamics import Dilution, DilutionStrategy
+    from particula.dynamics.tests.multibox_runnable_test import batch
+    from particula.execution import PreparedSimulation, SimulationDiagnostics
+
+    initial = batch(state(volume=1.0, kind=kind))
+    if kind == "discrete":
+        initial.particles.volume[:] = 1.0
+    process = Dilution(DilutionStrategy(0.2))
+    with process.prepare(
+        initial, device=device.native, time_step=0.5
+    ) as simulation:
+        assert isinstance(simulation, PreparedSimulation)
+        before = simulation.diagnostics()
+        assert isinstance(before, SimulationDiagnostics)
+        expected_count = initial.particles.concentration.sum(axis=1)
+        expected_mass = np.sum(
+            initial.particles.masses
+            * initial.particles.concentration[..., None],
+            axis=1,
+        )
+        if kind == "particle_resolved":
+            expected_count /= initial.particles.volume
+            expected_mass /= initial.particles.volume[:, None]
+        np.testing.assert_allclose(before.number_concentration, expected_count)
+        np.testing.assert_allclose(
+            before.particle_mass_concentration, expected_mass
+        )
+        np.testing.assert_array_equal(before.active_slots, [2, 2])
+        gas = np.array([0.01, 0.02, 0.03])
+        simulation.update_gas(gas)
+        gas[:] = 0
+        simulation.update_environment(temperature=[290, 310], pressure=90000)
+        simulation.run(2)
+        after = simulation.diagnostics()
+        np.testing.assert_allclose(
+            after.gas_concentration,
+            np.tile([0.01, 0.02, 0.03], (2, 1)) * np.exp(-0.2),
+        )
+        np.testing.assert_array_equal(after.temperature, [290, 310])
+        np.testing.assert_array_equal(after.pressure, [90000, 90000])
+        np.testing.assert_allclose(
+            after.number_concentration, expected_count * np.exp(-0.2)
+        )
+        np.testing.assert_array_equal(
+            before.temperature, initial.environment.temperature
+        )
+        with pytest.raises(ValueError, match="nonphysical"):
+            simulation.update_environment(
+                temperature=[300, 301], pressure=np.nan
+            )
+        np.testing.assert_array_equal(
+            simulation.diagnostics().temperature, [290, 310]
+        )
+        after.number_concentration[:] = -1
+        assert np.all(simulation.diagnostics().number_concentration >= 0)
+
+
+def test_condensation_forcing_refreshes_saturation_and_last_step_energy(device):
+    """Warm forcing changes Buck pressure immediately; latent output is extensive."""
+    from particula.util.constants import GAS_CONSTANT
+
+    initial, process = condensation_case(latent=True)
+    with process.prepare(
+        initial, device=device.native, time_step=1e-4
+    ) as simulation:
+        first = simulation.diagnostics()
+        simulation.update_environment(temperature=310)
+        warm = simulation.diagnostics()
+        assert warm.saturation_ratio[0, 2] < first.saturation_ratio[0, 2]
+        gas = initial.gas.concentration.copy()
+        gas[:, 2] = 0.08
+        simulation.update_gas(gas)
+        before = simulation.diagnostics()
+        simulation.step()
+        after = simulation.diagnostics()
+        vapor = simulation._session.gas.vapor_pressure.numpy()
+        np.testing.assert_allclose(
+            after.saturation_ratio,
+            after.gas_concentration
+            * GAS_CONSTANT
+            * after.temperature[:, None]
+            / (initial.gas.molar_mass[None, :] * vapor),
+            rtol=1e-14,
+        )
+        expected_energy = (
+            (before.gas_concentration - after.gas_concentration)
+            * after.volume[:, None]
+            * 2.4e6
+        )
+        np.testing.assert_allclose(
+            after.latent_heat_energy, expected_energy, rtol=1e-9, atol=1e-24
+        )
+        assert after.latent_heat_energy[0, 2] > 0
+        with pytest.raises(ValueError, match="owns derived"):
+            simulation.update_environment(saturation_ratio=1)
+
+
+def test_real_prepared_sequence_has_no_stepping_allocations_or_readbacks(
+    device, monkeypatch
+):
+    """Compiled condensation/dilution loops only enqueue retained device work."""
+    from particula.dynamics import Dilution, DilutionStrategy
+
+    initial, process = condensation_case()
+    sequence = process | Dilution(DilutionStrategy(0.01))
+    with sequence.prepare(
+        initial, device=device.native, time_step=1e-4
+    ) as simulation:
+        simulation.step()
+        simulation.synchronize()
+
+        def forbidden(*_args, **_kwargs):
+            pytest.fail("resident sequence performed host work or allocation")
+
+        with monkeypatch.context() as patch:
+            for name in (
+                "zeros",
+                "empty",
+                "synchronize",
+                "synchronize_device",
+                "synchronize_stream",
+            ):
+                patch.setattr(wp, name, forbidden)
+            patch.setattr(wp.array, "numpy", forbidden)
+            simulation.run(3)
+        assert simulation.completed_steps == 4
+        assert np.all(np.isfinite(simulation.diagnostics().gas_concentration))
+
+
+@pytest.mark.parametrize(
+    "family", ["condensation", "coagulation", "wall_loss", "dilution"]
+)
+def test_latched_failure_preserves_primary_arrays_and_random_streams(
+    device, family
+):
+    """Every selectable writer respects the same persistent sequence gate."""
+    from particula.dynamics import (
+        BrownianCoagulationStrategy,
+        Coagulation,
+        Dilution,
+        DilutionStrategy,
+        WallLoss,
+    )
+    from particula.dynamics.wall_loss.wall_loss_strategies import (
+        ChargedWallLossStrategy,
+    )
+
+    initial = state()
+    if family == "condensation":
+        initial, process = condensation_case()
+    elif family == "coagulation":
+        process = Coagulation(BrownianCoagulationStrategy("particle_resolved"))
+    elif family == "wall_loss":
+        process = WallLoss(
+            ChargedWallLossStrategy(
+                1e-3,
+                "rectangular",
+                chamber_dimensions=(1.0, 2.0, 3.0),
+                wall_electric_field=np.array([1.0, 2.0, 3.0]),
+                distribution_type="particle_resolved",
+            )
+        )
+    else:
+        process = Dilution(DilutionStrategy(0.2))
+    with process.prepare(
+        initial, device=device.native, time_step=1
+    ) as simulation:
+        simulation.synchronize()
+        resident = simulation._session
+        targets = [
+            getattr(resident.particles, name)
+            for name in (
+                "masses",
+                "concentration",
+                "charge",
+                "density",
+                "volume",
+            )
+        ]
+        targets += [
+            getattr(resident.gas, name)
+            for name in (
+                "concentration",
+                "molar_mass",
+                "partitioning",
+                "vapor_pressure",
+            )
+        ]
+        targets += [
+            resident.environment.temperature,
+            resident.environment.pressure,
+            resident.environment.saturation_ratio,
+        ]
+        if family == "wall_loss":
+            targets.append(simulation._registry.acquire_wall_loss().rng_states)
+        elif family == "coagulation":
+            targets.append(
+                simulation._registry.acquire_coagulation(2).rng_states
+            )
+        before = [array.numpy().copy() for array in targets]
+        with simulation._scope():
+            simulation._device_failure.assign(np.array([1], dtype=np.int32))
+        simulation.run(3)
+        simulation._wait()
+        for array, original in zip(targets, before, strict=True):
+            np.testing.assert_array_equal(array.numpy(), original)
+        with pytest.raises(ValueError, match="dependent work stopped"):
+            simulation.synchronize()
+
+
+def test_nucleation_resampling_tolerance_failure_stops_later_process(device):
+    """User error bounds remain active and a failed remap cannot dilute gas."""
+    from dataclasses import replace
+
+    from particula.dynamics import Dilution, DilutionStrategy
+
+    initial, process = nucleation_case(resampling=True)
+    initial.particles.masses[0, 1] = initial.particles.masses[0, 0] * 1000
+    initial.particles.masses[0, 2] = initial.particles.masses[0, 0] * 1e6
+    initial.particles.concentration[0, :3] = 1
+    process.commit_config = replace(
+        process.commit_config, mean_radius_relative_error=0.0
+    )
+    with (process | Dilution(DilutionStrategy(1.0))).prepare(
+        initial, device=device.native, time_step=1
+    ) as simulation:
+        simulation.run(2)
+        simulation._wait()
+        np.testing.assert_array_equal(
+            simulation._session.gas.concentration.numpy(),
+            initial.gas.concentration,
+        )
+        np.testing.assert_array_equal(
+            simulation._session.particles.masses.numpy(),
+            initial.particles.masses,
+        )
+        with pytest.raises(ValueError, match="diagnostic exceeds bound"):
+            simulation.synchronize()
+
+
+def test_prepared_stochastic_streams_follow_logical_boxes_and_run_segments(
+    device,
+):
+    """Scheduling chunks and physical box order cannot reseed scientific paths."""
+    from particula._cpu_batch import detached
+    from particula.dynamics import BrownianCoagulationStrategy, Coagulation
+    from particula.dynamics.tests.multibox_runnable_test import batch
+    from particula.particles import ParticleData
+
+    initial = batch(state())
+    old = initial.particles
+    initial.particles = ParticleData(
+        masses=np.tile(old.masses, (1, 32, 1)),
+        concentration=np.ones((2, 64)),
+        charge=np.tile(old.charge, (1, 32)),
+        density=old.density.copy(),
+        volume=np.array([1e-13, 2e-13]),
+        distribution_type="particle_resolved",
+    )
+    swapped = detached(initial)
+    for carrier, names in (
+        (swapped.particles, ("masses", "concentration", "charge", "volume")),
+        (swapped.gas, ("concentration",)),
+        (swapped.environment, ("temperature", "pressure", "saturation_ratio")),
+    ):
+        for name in names:
+            values = getattr(carrier, name)
+            values[:] = values[::-1].copy()
+    process = Coagulation(BrownianCoagulationStrategy("particle_resolved"))
+    results = []
+    for aerosol, identities, segments in (
+        (initial, ("cell A", "cell B"), (4,)),
+        (initial, ("cell A", "cell B"), (2, 2)),
+        (swapped, ("cell B", "cell A"), (1, 3)),
+    ):
+        with process.prepare(
+            aerosol,
+            device=device.native,
+            time_step=0.1,
+            root_seed=123,
+            logical_box_ids=identities,
+        ) as simulation:
+            for steps in segments:
+                simulation.run(steps)
+            results.append(simulation.snapshot())
+    assert np.count_nonzero(results[0].particles.concentration) < 128
+    for name in ("masses", "concentration", "charge", "volume"):
+        first = getattr(results[0].particles, name)
+        np.testing.assert_array_equal(
+            first, getattr(results[1].particles, name)
+        )
+        np.testing.assert_array_equal(
+            first, getattr(results[2].particles, name)[::-1]
+        )
