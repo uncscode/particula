@@ -122,6 +122,35 @@ def test_notebook_markdown_and_source_urls_are_checked(tree):
     assert all("missing local link" in error for error in errors)
 
 
+def test_percent_source_prose_links_are_checked_independently(tree):
+    """Valid notebook prose must not hide stale links in its paired source."""
+    write(
+        tree,
+        "docs/examples/run.py",
+        "# %% [markdown]\n"
+        "# [old](../old.md)\n"
+        "# [missing](missing.md)\n"
+        "# [bad anchor](../guide/child.md#missing)\n"
+        "# %%\n"
+        "# [not prose](ignored.md)\n"
+        "result = 1\n",
+    )
+    errors = MODULE.check(tree)
+    assert any("stale moved link" in e for e in errors)
+    assert any("missing local link: missing.md" in e for e in errors)
+    assert any("missing anchor" in e for e in errors)
+    assert all("ignored.md" not in e for e in errors)
+
+    write(
+        tree,
+        "docs/examples/run.py",
+        "# %% [markdown]\n"
+        "# [current](../guide/child.md#after)\n"
+        "# %%\nresult = 1\n",
+    )
+    assert MODULE.check(tree) == []
+
+
 def test_rendered_gates_require_api_redirect_fragments_and_clean_search(tree):
     """Missing generated content or a retired search route fails publication."""
     site = tree / "site"

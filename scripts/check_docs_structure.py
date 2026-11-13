@@ -49,6 +49,16 @@ def source_text(path):
             for cell in json.loads(path.read_text())["cells"]
             if cell["cell_type"] == "markdown"
         )
+    if path.suffix == ".py":
+        prose = []
+        in_markdown = False
+        for line in path.read_text().splitlines():
+            if re.match(r"# %%(?:\s|$)", line):
+                in_markdown = "[markdown]" in line
+                prose.append("")
+            elif in_markdown and line.startswith("#"):
+                prose.append(line.removeprefix("#").removeprefix(" "))
+        return "\n".join(prose)
     return re.sub(r"\A---\n.*?\n---\n", "", path.read_text(), flags=re.S)
 
 
@@ -121,7 +131,12 @@ def check(root, site=None):
         if p != docs / "index.md" and p.relative_to(docs).parts[0] not in OWNERS
     )
     parsed = {}
-    for path in sorted(pages):
+    sources = {
+        p.resolve()
+        for p in docs.rglob("*.py")
+        if not any(x.startswith(".") for x in p.relative_to(docs).parts)
+    }
+    for path in sorted(pages | sources):
         parsed[path] = Links(
             markdown.markdown(
                 source_text(path),
@@ -232,7 +247,7 @@ def check_links(root, pages, parsed, manifest):
                     f"{path.relative_to(root)}: missing local link: {url}"
                 )
             elif target in pages:
-                graph[path].add(target)
+                graph.setdefault(path, set()).add(target)
                 if anchor and anchor not in parsed[target].ids:
                     errors.append(
                         f"{path.relative_to(root)}: missing anchor: {url}"

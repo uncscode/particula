@@ -30,8 +30,6 @@ theme:
     - content.code.annotation
     - content.code.copy
   language: en
-  icon:
-    logo: images/icon_light_clear.svg
   palette:
     # Palette toggle for automatic mode
     - media: "(prefers-color-scheme)"
