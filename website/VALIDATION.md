@@ -1,5 +1,22 @@
 # Local demo validation
 
+## Navigation follow-up — 2026-11-13
+
+Added homepage links for Guide, Examples, Theory, API and Contribute, with a
+native popover menu at smaller widths. Documentation pages now offer a
+keyboard-operable Show/Hide sidebar button. The preference is stored locally
+in the browser and restored before paint; blocked storage falls back to the
+expanded layout. Mobile navigation remains independent of that preference.
+
+Browser checks confirmed both preference states survive reloads, the collapsed
+state survives page navigation, and content gains width when collapsed. At
+390 pixels, the documentation menu still opens with the desktop sidebar hidden;
+homepage menu links navigate and Escape dismisses the popover. Desktop and
+breakpoint checks included 1280 and 1152 pixels. Screenshots are under
+`website/qa/home-navigation-desktop.jpg`, `home-navigation-mobile.jpg`, and
+`sidebar-collapsed-desktop.jpg`. The production build and complete local-link
+verification pass with the new controls.
+
 Validated 2026-11-12/13 on branch `codex/starlight-local-demo`, based on
 `45f4d53e931e9fc4e57073b15895fe01a10f9cca`.
 

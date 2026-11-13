@@ -34,3 +34,36 @@
 pre.mermaid { background: #f4f7f4; padding: 1rem; border-radius: .6rem; overflow-x: auto; }
 pre.mermaid svg { display: block; margin: auto; max-width: 100%; }
 .result-table { overflow-x: auto; }
+
+/* Keep navigation available without giving the landing page a sidebar. */
+.particula-header { display: flex; align-items: center; gap: 1rem; height: 100%; }
+.particula-header .site-title { flex-shrink: 0; }
+.header-search { margin-inline-start: auto; min-width: 0; }
+.header-tools { display: flex; align-items: center; gap: 1rem; }
+.home-navigation { display: flex; gap: 1.2rem; margin-inline: auto; }
+.home-navigation a, .home-mobile-navigation a { color: var(--sl-color-gray-2); text-decoration: none; font-weight: 600; }
+.home-navigation a:hover, .home-mobile-navigation a:hover { color: var(--sl-color-text-accent); }
+.sidebar-toggle, .home-menu-button { align-items: center; gap: .5rem; border: 1px solid var(--sl-color-gray-5); border-radius: .4rem; padding: .45rem .65rem; background: transparent; color: var(--sl-color-white); font: inherit; font-size: .85rem; cursor: pointer; white-space: nowrap; }
+.sidebar-toggle:hover, .home-menu-button:hover { background: var(--sl-color-gray-6); }
+.sidebar-toggle, .home-menu-button { display: none; }
+.home-mobile-navigation { position: fixed; inset: var(--sl-nav-height) 0 auto auto; margin: .5rem 1rem; padding: 1rem; min-width: 14rem; border: 1px solid var(--sl-color-gray-5); border-radius: .5rem; background: var(--sl-color-bg-nav); box-shadow: var(--sl-shadow-md); }
+.home-mobile-navigation:popover-open { display: grid; gap: .3rem; }
+.home-mobile-navigation a { padding: .6rem .5rem; }
+.home-mobile-navigation::backdrop { background: #0003; }
+@media (max-width: 71.999rem) {
+  .home-navigation { display: none; }
+  .home-menu-button { display: inline-flex; order: 4; }
+  .header-tools { display: none; }
+}
+@media (max-width: 49.999rem) {
+  .particula-header { gap: .65rem; }
+}
+@media (min-width: 50rem) {
+  :root[data-has-sidebar] .header-tools { display: flex; }
+  .sidebar-toggle:not([hidden]) { display: inline-flex; }
+  :root[data-has-sidebar][data-sidebar-collapsed] { --sl-content-inline-start: 0rem; --sl-content-width: 64rem; }
+  :root[data-sidebar-collapsed] #starlight__sidebar { display: none; }
+}
+@media print {
+  .sidebar-toggle, .home-menu-button, .home-navigation, .home-mobile-navigation { display: none !important; }
+}
