@@ -54,7 +54,7 @@ from particula.runnable import RunnableSequence
 
 from particula.logger_setup import setup
 
-__version__ = "0.2.15"
+__version__ = "0.3.0"
 
 # setup the logger
 logger = setup()

@@ -2,9 +2,9 @@
 
 A simple, fast, and powerful particle simulator for aerosol science.
 
-**Requires:** Python 3.12+
+**Development version:** 0.3.0 · **Requires:** Python 3.12+
 
-[Documentation](https://uncscode.github.io/particula) | [Examples](https://uncscode.github.io/particula/Examples/) | [PyPI](https://pypi.org/project/particula/)
+[Documentation](https://uncscode.github.io/particula/) | [Examples](https://uncscode.github.io/particula/examples/) | [PyPI](https://pypi.org/project/particula/)
 
 ## Installation
 
@@ -18,6 +18,17 @@ or via conda:
 conda install -c conda-forge particula
 ```
 
+These commands install the published release. To work with the 0.3.0 source
+checkout, including the native APIs below, install from the repository root:
+
+```bash
+python -m pip install -e '.[dev,extra]'
+```
+
+The source version does not indicate that 0.3.0 has been published. See the
+[release validation record](docs/contribute/validation/releases/v0.3.0.md)
+for revision-specific evidence and outstanding release gates.
+
 ## AI Assistants
 
 [Particula Helper](docs/guide/ai-assistants/index.md) provides setup, simulation,
@@ -26,9 +37,9 @@ OpenCode. See the guide for native install commands and environment requirements
 
 ## Quick Start
 
-The following native example requires the selected E9 checkout (install it with
-`pip install -e .`). It does not imply that an older published wheel contains
-these migration APIs.
+This example uses the 0.3.0 native data model: `ParticleData`, `GasData`, and
+`EnvironmentData` held by an `Aerosol`. Install the source checkout as above
+when using a published release that predates these APIs.
 
 ```python
 import numpy as np
@@ -74,21 +85,26 @@ for ownership, validation and non-unit-volume inventory checks.
 
 ## Migration / What's New
 
-See the [migration guide](./docs/Features/particle-data-migration/) for
-current APIs, compatibility notes, and direct-kernel troubleshooting.
+Version 0.3.0 replaces `ParticleRepresentation`, `GasSpecies`, and `Atmosphere`
+with native data containers and explicit process configuration. See the
+[migration guide](docs/guide/migration/v0.3.0/index.md) for replacements,
+ownership rules, and direct-kernel troubleshooting. CPU runnable processes
+remain single-box; GPU transfers and device selection are explicit.
 
 ## Code Structure
 
 ```
 particula/
-├── gas/           # Gas phase: species, vapor pressure, atmosphere
-├── particles/     # Particle representations & distributions
+├── gas/           # Gas/environment data and thermodynamic strategies
+├── particles/     # Particle data, distributions and properties
 ├── dynamics/      # Time-dependent processes
 │   ├── coagulation/
 │   ├── condensation/
 │   └── wall_loss/
 ├── activity/      # Activity coefficients, phase separation
 ├── equilibria/    # Gas-particle partitioning
+├── execution/     # Execution metadata and concrete resident lifecycle
+├── gpu/           # Warp data, explicit transfers and direct kernels
 └── util/          # Constants, validation, unit conversion
 ```
 
@@ -96,10 +112,14 @@ particula/
 
 | Looking for...            | Go to                                      |
 |---------------------------|--------------------------------------------|
-| Tutorials & walkthroughs  | [Examples/](https://uncscode.github.io/particula/Examples/) |
-| Scientific background     | [Theory/](https://uncscode.github.io/particula/Theory/) |
+| Tutorials & walkthroughs  | [Examples](https://uncscode.github.io/particula/examples/) |
+| Scientific background     | [Theory](https://uncscode.github.io/particula/theory/) |
 | API reference             | [Full Docs](https://uncscode.github.io/particula) |
 | Contributing              | [contribute/](./docs/contribute/CONTRIBUTING.md) |
+
+Documentation uses Astro and Starlight. Examples are maintained as percent-cell
+Python scripts with saved results; see [website development](website/README.md)
+for building the site and [authoring](website/AUTHORING.md) for updating examples.
 
 ### Examples by Topic
 
@@ -112,9 +132,9 @@ particula/
 
 ### Featured Examples
 
-- [**Aerosol Tutorial**](./docs/examples/fundamentals/native_aerosol.ipynb) — Build native particle, full gas and environment containers and combine them into an `Aerosol` object.
+- [**Aerosol Tutorial**](./docs/examples/fundamentals/native_aerosol.py) — Build native particle, full gas and environment containers and combine them into an `Aerosol` object.
 
-- [**CPU Latent-Heat Condensation Bookkeeping**](./docs/examples/processes/condensation/condensation_latent_heat.ipynb)
+- [**CPU Latent-Heat Condensation Bookkeeping**](./docs/examples/processes/condensation/condensation_latent_heat.py)
   — CPU-only walkthrough showing diagnostic latent-heat bookkeeping from real
   condensation mass transfer with no temperature feedback.
 
@@ -123,9 +143,9 @@ particula/
   exported `nucleation_step_gpu`. It requires Warp and is separate from the
   CPU-only `Nucleation` runnable; it provides no CPU fallback.
 
-- [**Organic Partitioning & Coagulation**](./docs/examples/simulations/organic_partitioning_and_coagulation.ipynb) — Illustrative organic partitioning followed by Brownian coagulation, including the retained binned method’s composition limitation; not a quantitative species forecast.
+- [**Organic Partitioning & Coagulation**](./docs/examples/simulations/organic_partitioning_and_coagulation.py) — Illustrative organic partitioning followed by Brownian coagulation, including the retained binned method’s composition limitation; not a quantitative species forecast.
 
-- [**Cloud Chamber Cycles**](./docs/examples/simulations/cloud_chamber_multi_cycle.ipynb)
+- [**Cloud Chamber Cycles**](./docs/examples/simulations/cloud_chamber_multi_cycle.py)
   — Multi-cycle cloud droplet activation demonstrating κ-Köhler theory across
   3 seed compositions (Ammonium Sulfate, Sucrose, Mixed), comparing illustrative humidity responses. Dry-phase timestep oscillations
   remain unqualified for quantitative activation predictions.
