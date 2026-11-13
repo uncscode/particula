@@ -42,8 +42,9 @@ rendering, including signatures, symbol anchors and source links.
 2. Validate changed executable examples without overwriting committed results;
    skip explicitly classified expensive/GPU cases with a visible report.
 3. Check result integrity/freshness and rendered links/API coverage on every PR.
-4. Add preview artifacts and a Pages build/deploy workflow with correct base
-   paths and permissions. Test the generated artifact before enabling publish.
+4. Upload validation reports and use a Pages build/deploy workflow with correct
+   base paths and permissions. Upload the site only for production deployment;
+   do not generate downloadable PR previews.
 5. Approve a complete content/URL comparison, then switch publishing. Keep a
    straightforward rollback to the previous workflow for the first release.
 6. Remove MkDocs/notebook pairing only after the replacement is accepted.
