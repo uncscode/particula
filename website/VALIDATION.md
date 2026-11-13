@@ -74,6 +74,33 @@ verification pass with the new controls.
 Validated 2026-11-12/13 on branch `codex/starlight-local-demo`, based on
 `45f4d53e931e9fc4e57073b15895fe01a10f9cca`.
 
+## Rotating process illustrations — 2026-11-13
+
+The hero now rotates through Cloud drift, Rising plume, Fire & smoke, Emissions,
+Charged particles, Condensation, and Scavenging. Each visit randomizes particle
+positions and/or appearance and timing. Session storage holds a shuffled cycle:
+all seven scenes appear before repeating, with no immediate repeat at the cycle
+boundary. Blocked storage falls back to random selection. There is no automatic
+scene change while reading the page.
+
+Condensation droplets have size-dependent downward motion; their surrounding
+vapor shares the settling offset. Scavenging collectors descend through small
+particles whose disappearance is synchronized with the collector crossing.
+These are process-inspired illustrations, not Particula numerical results or
+evidence of combustion/transport model support. Settling speeds are visual
+scales rather than calculated physical terminal velocities.
+
+Validation: the production build and all local-link checks pass. Ten Python
+documentation tests and seven JavaScript scene tests pass. Scene tests cover
+100 seeded refresh cycles, malformed/blocked storage, geometry bounds, vapor
+targets, charge-pair motion, relative settling speeds, and scavenging timing.
+Browser review covers each scene on refresh, desktop and 390-pixel layouts,
+warm colors in light mode, pause/play, and off-screen pausing. Reduced-motion
+and background-tab handling are retained; OS preference emulation was not run.
+Local screenshots include `qa/hero-charge.jpg`, `qa/hero-dust-light.jpg`,
+`qa/hero-fire-mobile.jpg`, `qa/hero-scavenging.jpg`, and
+`qa/hero-condensation-settling.jpg`.
+
 ## Particle-cloud hero — 2026-11-13
 
 Replaced the hero image with a deterministic inline SVG particle cloud. CSS
