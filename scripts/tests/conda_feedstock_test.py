@@ -96,7 +96,7 @@ def test_version_gate_writes_action_output(runner, monkeypatch, tmp_path):
         "pyproject.toml",
         "conftest.py",
         "particula/conftest.py",
-        "docs/Examples/cpu_dilution.py",
+        "docs/examples/processes/dilution/cpu_dilution.py",
         "examples_tests/dilution_example_test.py",
         "examples_tests/nucleation_example_test.py",
         "examples_tests/condensation_latent_heat_example_test.py",
@@ -174,7 +174,7 @@ def test_recipe_declared_inputs_exist_in_staged_source(runner, tmp_path):
         path.write_text("fixture")
     excluded = (
         "docs/Features/planning.md",
-        "docs/Examples/unlisted.py",
+        "docs/examples/unlisted.py",
         "examples_tests/unlisted_test.py",
         ".opencode/plan.md",
     )

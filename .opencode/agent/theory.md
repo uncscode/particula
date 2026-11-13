@@ -342,7 +342,7 @@ edit({
 ## Step 6: Link to Examples
 
 Ensure theory docs link to practical examples:
-- Reference `docs/Examples/` tutorials
+- Reference `docs/examples/` tutorials
 - Link to relevant code in `adw/`
 - Cross-reference with Architecture docs
 

@@ -235,9 +235,9 @@ J_d = J_d* × exp( γ × (1/d − 1/d*) × CS' / GR )
 
 The exponential expresses the competition between growth (**GR**, escape to safety at larger sizes) and coagulational loss to the existing aerosol surface (**CS'**). High pre-existing surface area suppresses observable NPF even when the nucleation rate itself is large. In a simulation, this relation is a consistency check: if the model injects particles at a size larger than the true cluster size, the injection rate should be the survival-corrected **J_d**, not the raw **J_d***. Public construction does not evaluate this relation; its survival factor is an externally selected value whose scientific justification remains the caller's responsibility.
 
-For supported execution, see the [CPU nucleation example](https://github.com/uncscode/particula/blob/main/docs/Examples/Nucleation/cpu_nucleation.py)
+For supported execution, see the [CPU nucleation example](https://github.com/uncscode/particula/blob/main/docs/examples/processes/nucleation/cpu_nucleation.py)
 and [CPU Nucleation Strategy System](../../guide/processes/nucleation.md).
-The hand-built [custom single-species notebook](../../Examples/Nucleation/Notebooks/Custom_Nucleation_Single_Species.ipynb)
+The hand-built [custom single-species notebook](../../examples/processes/nucleation/custom_nucleation_single_species.ipynb)
 is illustrative only and is not the supported API.
 
 ## Nucleation as a Source Term in Aerosol Dynamics
@@ -397,7 +397,7 @@ the gas removal. This is direct-kernel conservation evidence, not CPU parity.
 The direct step excludes hidden transfer/synchronization, CPU fallback,
 resize/compaction, GPU Runnable/scheduling/backend selection, direct-process integration
 orchestration, expanded physics, graph capture, autodiff, and performance
-guarantees. See the [direct example](https://github.com/uncscode/particula/blob/main/docs/Examples/Nucleation/gpu_direct_nucleation.py)
+guarantees. See the [direct example](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/direct/gpu_direct_nucleation.py)
 and [feature contract](../../guide/processes/nucleation.md).
 
 ## Variable Descriptions

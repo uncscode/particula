@@ -11,14 +11,14 @@ boundaries.
 
 For a runnable walkthrough of native single-box container construction and
 optional Warp CPU-backend round trips, see the
-[Data Containers example](../../Examples/Data_Containers/index.md) and run:
+[Data Containers example](../../examples/fundamentals/data-containers.md) and run:
 
 ```bash
-python docs/Examples/data_containers_and_gpu_foundations.py
+python docs/examples/fundamentals/data_containers.py
 ```
 
 For the low-level direct-kernel path, use the canonical quick-start at
-[`docs/Examples/gpu_direct_kernels_quick_start.py`](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_direct_kernels_quick_start.py).
+[`docs/examples/gpu/direct/gpu_direct_kernels_quick_start.py`](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/direct/gpu_direct_kernels_quick_start.py).
 That example keeps direct step imports explicit through `particula.gpu.kernels`
 while top-level `particula.gpu` stays focused on `WARP_AVAILABLE` and the
 `to_warp_*` / `from_warp_*` transfer helpers.
@@ -369,11 +369,11 @@ environment = EnvironmentData(
 ## Related references
 
 The fixed-four-substep low-level direct-kernel walkthrough can be run with
-`python docs/Examples/gpu_condensation_parity_walkthrough.py`. Its focused
+`python docs/examples/gpu/direct/gpu_condensation_parity_walkthrough.py`. Its focused
 runtime regression command is
 `pytest examples_tests/gpu_condensation_parity_walkthrough_test.py -q -Werror`.
 
-- [Data Containers example](../../Examples/Data_Containers/index.md)
+- [Data Containers example](../../examples/fundamentals/data-containers.md)
 - [Particle & Gas Data Migration](../migration/v0.3.0/index.md)
 - [Data-Oriented Design and GPU Roadmap](../../Features/Roadmap/data-oriented-gpu.md)
 - [Mass Precision Recommendation Report](../../contribute/validation/numerics/mass-precision.md)

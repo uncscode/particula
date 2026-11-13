@@ -21,9 +21,7 @@ from particula.gpu.tests.cuda_availability import (
 
 EXAMPLE_PATH = (
     Path(__file__).resolve().parents[1]
-    / "docs"
-    / "Examples"
-    / "gpu_condensation_parity_walkthrough.py"
+    / "docs/examples/gpu/direct/gpu_condensation_parity_walkthrough.py"
 )
 
 

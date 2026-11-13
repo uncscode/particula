@@ -13,16 +13,16 @@ Exit codes:
 
 Examples:
   # Validation
-  python3 .opencode/tools/validate_notebook.py docs/Examples --recursive --output json
+  python3 .opencode/tools/validate_notebook.py docs/examples --recursive --output json
   # Conversion
   python3 .opencode/tools/validate_notebook.py notebook.ipynb --convert-to-py
-   python3 .opencode/tools/validate_notebook.py docs/Examples \\
+   python3 .opencode/tools/validate_notebook.py docs/examples \\
        --recursive --convert-to-py --output-dir scripts
   python3 .opencode/tools/validate_notebook.py script.py --convert-to-ipynb
   # Sync
   python3 .opencode/tools/validate_notebook.py notebook.ipynb --sync
   # Check-sync (read-only)
-  python3 .opencode/tools/validate_notebook.py docs/Examples --recursive --check-sync
+  python3 .opencode/tools/validate_notebook.py docs/examples --recursive --check-sync
 """
 
 from __future__ import annotations
@@ -518,20 +518,20 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             "  # Validation\n"
             "  python3 .opencode/tools/validate_notebook.py notebook.ipynb\n"
             "  python3 .opencode/tools/validate_notebook.py"
-            " docs/Examples --recursive --output json\n"
+            " docs/examples --recursive --output json\n"
             "\n"
             "  # Conversion\n"
             "  python3 .opencode/tools/validate_notebook.py"
             " notebook.ipynb --convert-to-py\n"
             "  python3 .opencode/tools/validate_notebook.py"
-            " docs/Examples --recursive"
+            " docs/examples --recursive"
             " --convert-to-py --output-dir scripts\n"
             "  python3 .opencode/tools/validate_notebook.py script.py --convert-to-ipynb\n"
             "\n"
             "  # Sync\n"
             "  python3 .opencode/tools/validate_notebook.py notebook.ipynb --sync\n"
             "  python3 .opencode/tools/validate_notebook.py"
-            " docs/Examples --recursive --check-sync\n"
+            " docs/examples --recursive --check-sync\n"
         ),
     )
 

@@ -33,16 +33,16 @@ def history(tmp_path, monkeypatch):
     git("init", "-q")
     git("config", "user.name", "Test")
     git("config", "user.email", "test@example.com")
-    Path("docs/Examples").mkdir(parents=True)
+    Path("docs/examples").mkdir(parents=True)
     for name in ("changed", "deleted", "unchanged"):
-        Path(f"docs/Examples/{name}.ipynb").write_text("{}")
+        Path(f"docs/examples/{name}.ipynb").write_text("{}")
     git("add", ".")
     git("commit", "-qm", "base")
     base = git("rev-parse", "HEAD")
-    Path("docs/Examples/changed.ipynb").write_text('{"cells": []}')
-    Path("docs/Examples/deleted.ipynb").unlink()
-    Path("docs/Examples/space name.ipynb").write_text("{}")
-    Path("docs/Examples/code.py").write_text("pass")
+    Path("docs/examples/changed.ipynb").write_text('{"cells": []}')
+    Path("docs/examples/deleted.ipynb").unlink()
+    Path("docs/examples/space name.ipynb").write_text("{}")
+    Path("docs/examples/code.py").write_text("pass")
     git("add", ".")
     git("commit", "-qm", "changes")
     return base, git("rev-parse", "HEAD")
@@ -58,8 +58,8 @@ def test_changed_paths_preserve_spaces_and_exclude_deleted(history, kind):
         "pull_request": {"base": {"sha": base}, "head": {"sha": head}},
     }
     assert MODULE.changed_notebooks(event, kind) == [
-        "docs/Examples/changed.ipynb",
-        "docs/Examples/space name.ipynb",
+        "docs/examples/changed.ipynb",
+        "docs/examples/space name.ipynb",
     ]
 
 

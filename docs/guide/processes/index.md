@@ -27,7 +27,7 @@ Pass `aerosol.particles`, `aerosol.gas`, and scalar values from
 
 ```python
 import particula as par
-from docs.Examples.native_state_access import build_aerosol, build_condensation
+from docs.examples.fundamentals.native_state_access import build_aerosol, build_condensation
 
 # Run from the v0.3.0 development checkout; the fixture includes ordered inert gas.
 aerosol = build_aerosol()
@@ -131,7 +131,7 @@ Native runnable composition, execution adapters, dilution/nucleation and
 resident/checkpoint integration are available under their bounded contracts.
 See the source, communication and resident sections below, the
 [migration guide](../migration/v0.3.0/index.md), and the
-[complete direct sequence](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py).
+[complete direct sequence](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/direct/gpu_complete_process_sequence.py).
 Temporary facades and untagged compatibility dispatch remain until v0.3.0; these
 examples do not authorize deletion, a release, or GPU performance claims.
 
@@ -159,7 +159,7 @@ species mass and charge under its existing bounded moment checks.
 Each source attempt stages before writing, retains array identities, and
 restores attempted particle/gas writes if a CPU writer fails. Earlier committed
 substeps remain applied when a later attempt fails. The small
-`docs/Examples/Nucleation/cpu_nucleation.py` example exercises this native API
+`docs/examples/processes/nucleation/cpu_nucleation.py` example exercises this native API
 at non-unit volume with inert gas in the unified container. The former
 `LegacyNucleation` compatibility runnable has been removed. Construct
 `Nucleation(source_config, commit_config)` and keep environmental state on

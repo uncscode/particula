@@ -84,12 +84,12 @@ to use `build_mkdocs_validate` (validation-only path).
 | **docstring** | Update Python docstrings | `*.py` files |
 | **docs** | Update general documentation | `.opencode/guides/*.md`, `README.md`, `docs/*.md` |
 | **plan-update-full** | Update plan section content | `.opencode/plans/sections/**/*.md` via `adw_plans_read` |
-| **examples** | Create/update examples | `docs/Examples/*.md`, `.py`, `.ipynb` |
+| **examples** | Create/update examples | `docs/examples/*.md`, `.py`, `.ipynb` |
 | **architecture** | ADRs and architecture outline | `.opencode/guides/architecture/*.md` |
 | **theory** | Conceptual documentation | `docs/Theory/*.md` |
 | **features** | High-level feature docs | `docs/Features/*.md` |
 | **docs-validator** | Validate links and formatting | All docs (read-only) |
-| **adw-docs-notebook** | Jupyter notebook creation, editing, validation | `docs/Examples/**/*.ipynb`, `docs/**/*.ipynb` |
+| **adw-docs-notebook** | Jupyter notebook creation, editing, validation | `docs/examples/**/*.ipynb`, `docs/**/*.ipynb` |
 | **adw-commit** | Commit changes | Git operations |
 | **linter** | Code quality validation | Python files |
 
@@ -319,7 +319,7 @@ task({
 Arguments: adw_id={adw_id} changed_targets={changed_targets} worktree_path={worktree_path}
 
 Task: create
-Notebook: docs/Examples/feature-tutorial.ipynb
+Notebook: docs/examples/feature-tutorial.ipynb
 Details: Create interactive tutorial with setup, examples, and summary cells
 """,
   "subagent_type": "adw-docs-notebook"
@@ -333,7 +333,7 @@ task({
 Arguments: adw_id={adw_id} changed_targets={changed_targets} worktree_path={worktree_path}
 
 Task: edit
-Notebook: docs/Examples/setup.ipynb
+Notebook: docs/examples/setup.ipynb
 Details: Add a new code cell showing environment configuration
 """,
   "subagent_type": "adw-docs-notebook"
@@ -347,7 +347,7 @@ task({
 Arguments: adw_id={adw_id} changed_targets={changed_targets} worktree_path={worktree_path}
 
 Task: batch-validate
-Notebook: docs/Examples/
+Notebook: docs/examples/
 Details: Validate all .ipynb files, report issues
 """,
   "subagent_type": "adw-docs-notebook"
@@ -361,7 +361,7 @@ task({
 Arguments: adw_id={adw_id} changed_targets={changed_targets} worktree_path={worktree_path}
 
 Task: execute
-Notebook: docs/Examples/tutorial.ipynb
+Notebook: docs/examples/tutorial.ipynb
 Details: Execute and verify outputs include "Success" and "DataFrame"
 """,
   "subagent_type": "adw-docs-notebook"
@@ -375,7 +375,7 @@ task({
 Arguments: adw_id={adw_id} changed_targets={changed_targets} worktree_path={worktree_path}
 
 Task: fix
-Notebook: docs/Examples/broken.ipynb
+Notebook: docs/examples/broken.ipynb
 Details: Notebook fails to open, diagnose and repair
 """,
   "subagent_type": "adw-docs-notebook"

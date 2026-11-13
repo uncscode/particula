@@ -2,7 +2,7 @@
 
 ## Complete direct-process context
 
-The direct wall-loss call appears in the illustrative [explicit-transfer sequence](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py), with [direct-process validation evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py) and a [example regression](https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_complete_process_sequence_example_test.py). Caller-owned persistent RNG and sidecars remain explicit; this is not a `Runnable`, backend selector, scheduler, or CPU fallback.
+The direct wall-loss call appears in the illustrative [explicit-transfer sequence](https://github.com/Gorkowski/particula/blob/main/docs/examples/gpu/direct/gpu_complete_process_sequence.py), with [direct-process validation evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py) and a [example regression](https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_complete_process_sequence_example_test.py). Caller-owned persistent RNG and sidecars remain explicit; this is not a `Runnable`, backend selector, scheduler, or CPU fallback.
 
 > Strategy-based wall loss for chamber simulations that plugs directly into particula's dynamics workflow.
 
@@ -266,7 +266,7 @@ For persistent replay, supply initialized caller-owned RNG state and prepare
 with `initialize_rng=False`. Zero-time and wholly inactive calls do not advance
 or reset supplied words. Native resident dispatch uses explicit resolved
 metadata and session-owned continuation streams; see the
-[resident walkthrough](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_resident_multi_timestep.py). Direct
+[resident walkthrough](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/resident/gpu_resident_multi_timestep.py). Direct
 caller-owned RNG and resident lifecycle ownership are distinct boundaries.
 
 Warp CPU is the baseline when Warp is installed. CUDA is optional and the
@@ -497,8 +497,8 @@ This pattern matches how other dynamics strategies are combined in chamber simul
 
 ## Related Documentation
 
-- **Hands-on guide**: [Wall loss tutorial](../../Examples/Chamber_Wall_Loss/Notebooks/Wall_Loss_Tutorial.ipynb)
-- **Notebooks**: [Spherical wall loss strategy](../../Examples/Chamber_Wall_Loss/Notebooks/Spherical_Wall_Loss_Strategy.ipynb)
+- **Hands-on guide**: [Wall loss tutorial](../../examples/processes/wall-loss/wall_loss_tutorial.ipynb)
+- **Notebooks**: [Spherical wall loss strategy](../../examples/processes/wall-loss/spherical_wall_loss_strategy.ipynb)
 - **Dynamics overview**:
   [Wall loss strategies](catalog.md#scientific-processes)
 
@@ -514,5 +514,5 @@ Subclass `WallLossStrategy` in your own code or contribute a new strategy to par
 
 ## See Also
 
-- [Condensation strategies](../../Examples/Simulations/index.md)
-- [Particle phase examples](../../Examples/Particle_Phase/index.md)
+- [Condensation strategies](../../examples/simulations/index.md)
+- [Particle phase examples](../../examples/fundamentals/particles/index.md)

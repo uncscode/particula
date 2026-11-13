@@ -11,7 +11,8 @@ import numpy.testing as npt
 import pytest
 
 EXAMPLE_PATH = (
-    Path(__file__).resolve().parents[1] / "docs/Examples/cpu_dilution.py"
+    Path(__file__).resolve().parents[1]
+    / "docs/examples/processes/dilution/cpu_dilution.py"
 )
 
 

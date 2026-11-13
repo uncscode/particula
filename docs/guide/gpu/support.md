@@ -15,7 +15,7 @@ than storage support.
 | Low-level GPU slot activation | Shipped fixed-capacity direct-kernel contract | `activate_slots_gpu` maps selected request prefixes to ascending free slots with caller-owned same-device sidecars; no hidden transfer, resizing, or high-level runnable is provided. |
 | Low-level GPU condensation direct-kernel path | Shipped bounded direct-kernel contract | Executes four fixed coupled substeps with active-device sequence validation inventory and gas coupling. This is direct-kernel evidence, not broad GPU-condensation support. |
 | Low-level GPU coagulation direct-kernel path | Direct, particle-resolved direct-kernel contract | Exact mask and rejection boundaries follow below. This path establishes no Runnable support, CPU parity, or performance claim. |
-| Resident execution and native CUDA capture | Explicit bounded lifecycle | See [resident example](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_resident_multi_timestep.py) and [capture limitations](resident/graph-capture.md); no implicit CPU fallback or measured performance claim. |
+| Resident execution and native CUDA capture | Explicit bounded lifecycle | See [resident example](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/resident/gpu_resident_multi_timestep.py) and [capture limitations](resident/graph-capture.md); no implicit CPU fallback or measured performance claim. |
 
 Additional shipped boundaries:
 

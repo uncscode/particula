@@ -576,3 +576,24 @@ catalog does not claim fresh execution or scientific validation.
 - Roadmap/history extraction is intentionally completed with retirement in
   phase 4, so original authorities remain available until their successor
   evidence pages are ready. Example and theory notebook moves are phase 3.
+
+### Phase 3 — example and theory source relocation completed
+
+- Relocated 125 example/theory sources, including all 46 Examples notebook/script
+  pairs, into topic folders. Python stems use snake_case for ordinary imports;
+  prose-only theory notebook stems use hyphens. Updated release allowlists,
+  source tests, CI selectors, helper instructions, and repository-source links.
+- Retired the redundant data-container forwarding module after migrating its
+  callers; retained all canonical scientific assertions and tolerances.
+- All 46 example pairs have equivalent executable ASTs. All 55 moved notebooks
+  initially retained identical code ASTs, execution counts, and outputs. The
+  historical benchmark pair had a pre-existing mismatch: its notebook lacked
+  the Python source's controlled-artifact validation. Synchronized it to that
+  source and executed the complete viewer against the existing local recorded
+  artifact. This is viewer validation, not new measured GPU qualification.
+- Source example suite: 221 passed, 2 optional skips. Infrastructure: 132 passed.
+  Fresh-wheel release example suite: 20 passed. Ruff passed for example sources,
+  example tests, release runner, and infrastructure tests. Production package
+  files have no diff.
+- Strict base/full builds passed (1.47 s / 57.78 s). Final link/reachability
+  checks and browser review will run across the complete phase-5 tree.

@@ -20,9 +20,9 @@ import venv
 from pathlib import Path
 
 CPU_EXAMPLES = (
-    "docs/Examples/cpu_dilution.py",
-    "docs/Examples/Nucleation/cpu_nucleation.py",
-    "docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.py",
+    "docs/examples/processes/dilution/cpu_dilution.py",
+    "docs/examples/processes/nucleation/cpu_nucleation.py",
+    "docs/examples/processes/condensation/condensation_latent_heat.py",
 )
 CPU_EXAMPLE_TESTS = (
     "examples_tests/dilution_example_test.py",

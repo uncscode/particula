@@ -15,7 +15,7 @@ description: 'Subagent that handles Jupyter notebook creation, editing, validati
   Invoked by: examples subagent, documentation primary agent, or directly for notebook
   maintenance tasks
 
-  Write permissions: - docs/Examples/**/*.ipynb: ALLOW - docs/**/*.ipynb: ALLOW -
+  Write permissions: - docs/examples/**/*.ipynb: ALLOW - docs/**/*.ipynb: ALLOW -
   *.ipynb files in explicitly allowed directories: ALLOW
 
   Examples:
@@ -86,7 +86,7 @@ Jupyter notebooks are JSON files that are easy to corrupt with direct editing. T
 Arguments: adw_id=<workflow-id>
 
 Task: <create|edit|validate|convert|execute|batch-validate|fix>
-Notebook: <docs/Examples/{notebook_name}.ipynb or directory for batch operations>
+Notebook: <docs/examples/{notebook_name}.ipynb or directory for batch operations>
 Details: <specific instructions>
 ```
 
@@ -103,7 +103,7 @@ Details: <specific instructions>
 ```python
 task({
   "description": "Create tutorial notebook for feature",
-  "prompt": f"Create tutorial notebook.\n\nArguments: adw_id={adw_id}\n\nTask: create\nNotebook: docs/Examples/feature-tutorial.ipynb\nDetails: Create interactive tutorial with setup, examples, and summary cells",
+  "prompt": f"Create tutorial notebook.\n\nArguments: adw_id={adw_id}\n\nTask: create\nNotebook: docs/examples/feature-tutorial.ipynb\nDetails: Create interactive tutorial with setup, examples, and summary cells",
   "subagent_type": "adw-docs-notebook"
 })
 ```
@@ -112,7 +112,7 @@ task({
 ```python
 task({
   "description": "Validate all example notebooks",
-  "prompt": f"Validate notebooks.\n\nArguments: adw_id={adw_id}\n\nTask: batch-validate\nNotebook: docs/Examples/\nDetails: Validate all .ipynb files, report issues",
+  "prompt": f"Validate notebooks.\n\nArguments: adw_id={adw_id}\n\nTask: batch-validate\nNotebook: docs/examples/\nDetails: Validate all .ipynb files, report issues",
   "subagent_type": "adw-docs-notebook"
 })
 ```
@@ -129,7 +129,7 @@ selects an ambient working directory for notebook reads, writes, or execution.
 # Write Permissions
 
 **ALLOWED:**
-- ✅ `docs/Examples/**/*.ipynb` - Example notebooks
+- ✅ `docs/examples/**/*.ipynb` - Example notebooks
 - ✅ `docs/**/*.ipynb` - Documentation notebooks
 - ✅ `*.ipynb` files in explicitly allowed directories (specified in task)
 - ✅ Temporary `.py` files during Jupytext conversion (same directory as notebook)
@@ -153,11 +153,11 @@ repo-relative; this wrapper has no `cwd` field.
 
 ```python
 validate_notebook_readonly({
-  "notebookPath": "docs/Examples/tutorial.ipynb",
+  "notebookPath": "docs/examples/tutorial.ipynb",
   "options": "output=full"
 })
 validate_notebook_readonly({
-  "notebookPath": "docs/Examples/",
+  "notebookPath": "docs/examples/",
   "recursive": true,
   "checkSync": true
 })
@@ -170,13 +170,13 @@ Validate notebook structure, convert to Python, or sync with Jupytext.
 ```python
 # Convert notebook to Python script
 validate_notebook({
-  "notebookPath": "docs/Examples/tutorial.ipynb",
+  "notebookPath": "docs/examples/tutorial.ipynb",
   "convertToPy": true
 })
 
 # Convert with custom output directory
 validate_notebook({
-  "notebookPath": "docs/Examples/",
+  "notebookPath": "docs/examples/",
   "recursive": true,
   "convertToPy": true,
   "outputDir": "scripts/"
@@ -184,13 +184,13 @@ validate_notebook({
 
 # Sync notebook with paired Python script
 validate_notebook({
-  "notebookPath": "docs/Examples/tutorial.ipynb",
+  "notebookPath": "docs/examples/tutorial.ipynb",
   "sync": true
 })
 
 # Skip syntax validation (for debugging invalid notebooks)
 validate_notebook({
-  "notebookPath": "docs/Examples/broken.ipynb",
+  "notebookPath": "docs/examples/broken.ipynb",
   "skipSyntax": true
 })
 ```
@@ -219,60 +219,60 @@ Execute notebooks with validation and structured outputs.
 ```python
 # Execute single notebook (overwrites source, creates .ipynb.bak backup)
 run_notebook({
-  "notebookPath": "docs/Examples/tutorial.ipynb"
+  "notebookPath": "docs/examples/tutorial.ipynb"
 })
 
 # Execute all notebooks in directory
 run_notebook({
-  "notebookPath": "docs/Examples/",
+  "notebookPath": "docs/examples/",
   "recursive": true
 })
 
 # Execute with timeout
 run_notebook({
-  "notebookPath": "docs/Examples/tutorial.ipynb",
+  "notebookPath": "docs/examples/tutorial.ipynb",
   "timeout": 300
 })
 
 # Keep source unchanged (no overwrite)
 run_notebook({
-  "notebookPath": "docs/Examples/tutorial.ipynb",
+  "notebookPath": "docs/examples/tutorial.ipynb",
   "noOverwrite": true
 })
 
 # Skip backup creation
 run_notebook({
-  "notebookPath": "docs/Examples/tutorial.ipynb",
+  "notebookPath": "docs/examples/tutorial.ipynb",
   "noBackup": true
 })
 
 # Write executed notebook to different path
 run_notebook({
-  "notebookPath": "docs/Examples/tutorial.ipynb",
-  "writeExecuted": "docs/Examples/tutorial-executed.ipynb"
+  "notebookPath": "docs/examples/tutorial.ipynb",
+  "writeExecuted": "docs/examples/tutorial-executed.ipynb"
 })
 
 # Validate expected output patterns
 run_notebook({
-  "notebookPath": "docs/Examples/tutorial.ipynb",
+  "notebookPath": "docs/examples/tutorial.ipynb",
   "expectOutput": ["DataFrame", "plot", "Success"]
 })
 
 # Execute in specific working directory
 run_notebook({
-  "notebookPath": "docs/Examples/tutorial.ipynb",
+  "notebookPath": "docs/examples/tutorial.ipynb",
   "cwd": worktree_path
 })
 
 # Skip pre-execution validation (for debugging)
 run_notebook({
-  "notebookPath": "docs/Examples/broken.ipynb",
+  "notebookPath": "docs/examples/broken.ipynb",
   "skipValidation": true
 })
 
 # JSON output for programmatic parsing
 run_notebook({
-  "notebookPath": "docs/Examples/tutorial.ipynb",
+  "notebookPath": "docs/examples/tutorial.ipynb",
   "options": "output=json"
 })
 ```
@@ -335,7 +335,7 @@ write({
 Find notebooks by pattern:
 
 ```python
-find_files({"pattern": "docs/Examples/**/*.ipynb"})
+find_files({"pattern": "docs/examples/**/*.ipynb"})
 ```
 
 Search notebook contents:
@@ -343,7 +343,7 @@ Search notebook contents:
 ```python
 ripgrep_advanced({
   "contentPattern": "import pandas",
-  "path": "docs/Examples/"
+  "path": "docs/examples/"
 })
 ```
 
@@ -352,7 +352,7 @@ ripgrep_advanced({
 List directory contents with ripgrep:
 
 ```python
-find_files({"pattern": "**/*", "path": "docs/Examples/"})
+find_files({"pattern": "**/*", "path": "docs/examples/"})
 ```
 
 ### move
@@ -361,8 +361,8 @@ Move or rename notebooks:
 
 ```python
 move({
-  "source": "docs/Examples/old-name.ipynb",
-  "destination": "docs/Examples/new-name.ipynb"
+  "source": "docs/examples/old-name.ipynb",
+  "destination": "docs/examples/new-name.ipynb"
 })
 ```
 
@@ -463,7 +463,7 @@ directory. Keep wrapper notebook paths repo-relative in `notebook_path`, and use
 Before proceeding, verify the notebook path is in an allowed directory:
 
 ```python
-allowed_prefixes = ["docs/Examples/", "docs/"]
+allowed_prefixes = ["docs/examples/", "docs/"]
 if not any(notebook_path.startswith(p) for p in allowed_prefixes):
     # Output failure - path not allowed
     return "NOTEBOOK_UPDATE_FAILED: Path not in allowed directories"
@@ -717,7 +717,7 @@ run_notebook({
 run_notebook({
   "notebookPath": "{notebook_path}",
   "noOverwrite": true,
-  "writeExecuted": "docs/Examples/{notebook_name}-executed.ipynb"
+  "writeExecuted": "docs/examples/{notebook_name}-executed.ipynb"
 })
 
 # Execute with output validation
@@ -965,10 +965,10 @@ Results:
 - Skipped: {count}
 
 Details:
-✅ docs/Examples/tutorial.ipynb - Valid
-✅ docs/Examples/quickstart.ipynb - Valid
-❌ docs/Examples/broken.ipynb - Invalid JSON at line 45
-⚠️ docs/Examples/outdated.ipynb - Python syntax error in cell 3
+✅ docs/examples/tutorial.ipynb - Valid
+✅ docs/examples/quickstart.ipynb - Valid
+❌ docs/examples/broken.ipynb - Invalid JSON at line 45
+⚠️ docs/examples/outdated.ipynb - Python syntax error in cell 3
 
 Failed notebooks require manual attention.
 ```
@@ -1211,7 +1211,7 @@ edit({
 
 # Option 2: Use Jupytext to regenerate from .py
 validate_notebook({
-  "notebookPath": "docs/Examples/{notebook_name}.ipynb",
+  "notebookPath": "docs/examples/{notebook_name}.ipynb",
   "sync": true  # Regenerate from paired .py file
 })
 ```
@@ -1223,13 +1223,13 @@ For complex edits, always use the Jupytext workflow:
 ```
 ┌─────────────────────────────────────────────────────────┐
 │ 1. VALIDATE → Check notebook is currently valid          │
-│    validate_notebook({notebookPath: "docs/Examples/{notebook_name}.ipynb"}) │
+│    validate_notebook({notebookPath: "docs/examples/{notebook_name}.ipynb"}) │
 └─────────────────────────────────────────────────────────┘
                           ↓
 ┌─────────────────────────────────────────────────────────┐
 │ 2. CONVERT → Convert to .py script via Jupytext         │
 │    validate_notebook({                                   │
-│      notebookPath: "docs/Examples/{notebook_name}.ipynb", │
+│      notebookPath: "docs/examples/{notebook_name}.ipynb", │
 │      convertToPy: true                                   │
 │    })                                                    │
 └─────────────────────────────────────────────────────────┘
@@ -1246,20 +1246,20 @@ For complex edits, always use the Jupytext workflow:
 ┌─────────────────────────────────────────────────────────┐
 │ 4. SYNC → Convert back to .ipynb                         │
 │    validate_notebook({                                   │
-│      notebookPath: "docs/Examples/{notebook_name}.ipynb", │
+│      notebookPath: "docs/examples/{notebook_name}.ipynb", │
 │      sync: true                                          │
 │    })                                                    │
 └─────────────────────────────────────────────────────────┘
                           ↓
 ┌─────────────────────────────────────────────────────────┐
 │ 5. VALIDATE → Confirm notebook is still valid            │
-│    validate_notebook({notebookPath: "docs/Examples/{notebook_name}.ipynb"}) │
+│    validate_notebook({notebookPath: "docs/examples/{notebook_name}.ipynb"}) │
 └─────────────────────────────────────────────────────────┘
                           ↓
 ┌─────────────────────────────────────────────────────────┐
 │ 6. RUN (Optional) → Execute to verify code works         │
 │    run_notebook({                                        │
-│      notebookPath: "docs/Examples/{notebook_name}.ipynb", │
+│      notebookPath: "docs/examples/{notebook_name}.ipynb", │
 │      noOverwrite: true                                   │
 │    })                                                    │
 └─────────────────────────────────────────────────────────┘
@@ -1441,7 +1441,7 @@ Make these decisions without asking:
 Arguments: adw_id=abc12345
 
 Task: create
-Notebook: docs/Examples/feature-demo.ipynb
+Notebook: docs/examples/feature-demo.ipynb
 Details: Create a notebook demonstrating the new validation feature with:
 - Overview section explaining the feature
 - Code examples showing basic usage
@@ -1455,7 +1455,7 @@ Details: Create a notebook demonstrating the new validation feature with:
 Arguments: adw_id=abc12345
 
 Task: edit
-Notebook: docs/Examples/setup.ipynb
+Notebook: docs/examples/setup.ipynb
 Details: Add a new code cell after the imports section that shows
 how to configure the environment variables for development.
 ```
@@ -1466,7 +1466,7 @@ how to configure the environment variables for development.
 Arguments: adw_id=abc12345
 
 Task: fix
-Notebook: docs/Examples/broken.ipynb
+Notebook: docs/examples/broken.ipynb
 Details: The notebook fails to open in JupyterLab. Diagnose the issue
 and repair if possible.
 ```
@@ -1477,7 +1477,7 @@ and repair if possible.
 Arguments: adw_id=abc12345
 
 Task: convert
-Notebook: docs/Examples/
+Notebook: docs/examples/
 Details: Convert all notebooks in the Examples directory to .py scripts
 so we can run mypy on them. Keep the notebooks in sync.
 ```
@@ -1488,7 +1488,7 @@ so we can run mypy on them. Keep the notebooks in sync.
 Arguments: adw_id=abc12345
 
 Task: batch-validate
-Notebook: docs/Examples/
+Notebook: docs/examples/
 Details: Validate all .ipynb files recursively, report any issues found.
 ```
 
@@ -1498,7 +1498,7 @@ Details: Validate all .ipynb files recursively, report any issues found.
 Arguments: adw_id=abc12345
 
 Task: execute
-Notebook: docs/Examples/tutorial.ipynb
+Notebook: docs/examples/tutorial.ipynb
 Details: Execute the notebook and verify it runs without errors.
 Check that outputs include "Success" and "DataFrame".
 ```
@@ -1572,4 +1572,4 @@ Before reporting completion, verify:
 - `validate_notebook` tool documentation
 - `run_notebook` tool documentation  
 - `.opencode/guides/documentation_guide.md`
-- `docs/Examples/index.md`
+- `docs/examples/index.md`

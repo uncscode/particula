@@ -20,9 +20,7 @@ from particula.particles import ParticleData
 
 EXAMPLE_PATH = (
     Path(__file__).resolve().parents[1]
-    / "docs"
-    / "Examples"
-    / "gpu_direct_kernels_quick_start.py"
+    / "docs/examples/gpu/direct/gpu_direct_kernels_quick_start.py"
 )
 EXAMPLES_ROOT = EXAMPLE_PATH.parent
 EXAMPLE_TIMEOUT_SECONDS = 10

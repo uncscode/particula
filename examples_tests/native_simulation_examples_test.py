@@ -16,8 +16,8 @@ import particula as par
 import pytest
 from particula.particles.slot_management import activate_slots
 
-EXAMPLES = Path(__file__).resolve().parents[1] / "docs/Examples"
-SIMULATIONS = EXAMPLES / "Simulations/Notebooks"
+EXAMPLES = Path(__file__).resolve().parents[1] / "docs/examples"
+SIMULATIONS = EXAMPLES / "simulations"
 
 
 def _setup_through(path, target):
@@ -56,21 +56,21 @@ def _inventory(aerosol):
     "filename,process_name,aerosol_name,width",
     [
         (
-            "Biomass_Burning_Cloud_Interactions",
+            "biomass_burning_cloud_interactions",
             "condensation_process",
             "aerosol",
             3,
         ),
-        ("Cough_Droplets_Partitioning", "condensation_process", "aerosol", 12),
+        ("cough_droplets_partitioning", "condensation_process", "aerosol", 12),
         (
-            "Organic_Partitioning_and_Coagulation",
+            "organic_partitioning_and_coagulation",
             "condensation_process",
             "aerosol",
             11,
         ),
-        ("Soot_Formation_in_Flames", "condensation_process", "aerosol", 24),
-        ("Cloud_Chamber_Single_Cycle", "condensation", "aerosol", 3),
-        ("Cloud_Chamber_Multi_Cycle", "condensation_as", "aerosol_as", 2),
+        ("soot_formation_in_flames", "condensation_process", "aerosol", 24),
+        ("cloud_chamber_single_cycle", "condensation", "aerosol", 3),
+        ("cloud_chamber_multi_cycle", "condensation_as", "aerosol_as", 2),
     ],
 )
 def test_simulation_species_inventory_and_storage(
@@ -92,7 +92,7 @@ def test_simulation_species_inventory_and_storage(
             gas=aerosol.gas,
             environment=aerosol.environment,
         )
-    if filename == "Soot_Formation_in_Flames":
+    if filename == "soot_formation_in_flames":
         # The hot precursor has no uptake; exercise the cooled parcel.
         aerosol.environment.temperature[0] = 300.0
     assert aerosol.particles.n_species == width
@@ -121,7 +121,7 @@ def test_particle_injection_counts_inventory_and_exhaustion(monkeypatch):
     values = runpy.run_path(
         str(
             EXAMPLES
-            / "Dynamics/Customization/Adding_Particles_During_Simulation.py"
+            / "processes/customization/adding_particles_during_simulation.py"
         )
     )
     aerosol = values["aerosol"]
@@ -154,7 +154,7 @@ def test_particle_injection_counts_inventory_and_exhaustion(monkeypatch):
 
 def test_cloud_cycle_diagnostics_track_dry_identity_and_each_peak():
     """Changing wet size cannot masquerade as deposited dry material."""
-    path = SIMULATIONS / "Cloud_Chamber_Multi_Cycle.py"
+    path = SIMULATIONS / "cloud_chamber_multi_cycle.py"
     wanted = {
         "masses_to_diameter_generic",
         "cumulative_loss_by_bin",
@@ -195,7 +195,7 @@ def test_cooled_soot_condensation_then_coagulation_inventory(monkeypatch):
     """The retained process order conserves material along a cooling path."""
     monkeypatch.setattr(plt, "show", lambda *args, **kwargs: None)
     values = _setup_through(
-        SIMULATIONS / "Soot_Formation_in_Flames.py", "coagulation_process"
+        SIMULATIONS / "soot_formation_in_flames.py", "coagulation_process"
     )
     source = values["aerosol"]
     aerosol = par.Aerosol(
@@ -229,7 +229,7 @@ def test_three_cloud_compositions_humidity_reset_and_dry_mass(monkeypatch):
     """Short cycles retain all three material mappings and prescribed forcing."""
     monkeypatch.setattr(plt, "show", lambda *args, **kwargs: None)
     values = _setup_through(
-        SIMULATIONS / "Cloud_Chamber_Multi_Cycle.py", "condensation_mixed"
+        SIMULATIONS / "cloud_chamber_multi_cycle.py", "condensation_mixed"
     )
     for suffix, water_index in (("as", 1), ("sucrose", 1), ("mixed", 2)):
         source = values[f"aerosol_{suffix}"]

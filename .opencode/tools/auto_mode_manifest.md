@@ -127,7 +127,7 @@ Keep these fields direct:
     retained states such as `awaiting_final_pr`, `awaiting_merge`, `ready`,
     `running`, `failed_retryable`, and `blocked_operator_action` remain visible
     until cleanup progresses or an operator intervenes.
-  - See `docs/Examples/operations/auto-mode-runbook.md` for full cadence,
+  - See `docs/examples/operations/auto-mode-runbook.md` for full cadence,
     prerequisites, visible failure states, and recovery guidance.
 - `complete` defaults `branch_merged` to true and completes running or fixing
   issues by default; use `force` for other states.

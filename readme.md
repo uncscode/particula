@@ -112,20 +112,20 @@ particula/
 
 ### Featured Examples
 
-- [**Aerosol Tutorial**](./docs/Examples/Aerosol/Aerosol_Tutorial.ipynb) — Build native particle, full gas and environment containers and combine them into an `Aerosol` object.
+- [**Aerosol Tutorial**](./docs/examples/fundamentals/native_aerosol.ipynb) — Build native particle, full gas and environment containers and combine them into an `Aerosol` object.
 
-- [**CPU Latent-Heat Condensation Bookkeeping**](./docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.ipynb)
+- [**CPU Latent-Heat Condensation Bookkeeping**](./docs/examples/processes/condensation/condensation_latent_heat.ipynb)
   — CPU-only walkthrough showing diagnostic latent-heat bookkeeping from real
   condensation mass transfer with no temperature feedback.
 
-- [**Direct-Warp GPU Nucleation**](./docs/Examples/Nucleation/gpu_direct_nucleation.py)
+- [**Direct-Warp GPU Nucleation**](./docs/examples/gpu/direct/gpu_direct_nucleation.py)
   — Explicit-transfer, fixed-capacity low-level example using the package-
   exported `nucleation_step_gpu`. It requires Warp and is separate from the
   CPU-only `Nucleation` runnable; it provides no CPU fallback.
 
-- [**Organic Partitioning & Coagulation**](./docs/Examples/Simulations/Notebooks/Organic_Partitioning_and_Coagulation.ipynb) — Illustrative organic partitioning followed by Brownian coagulation, including the retained binned method’s composition limitation; not a quantitative species forecast.
+- [**Organic Partitioning & Coagulation**](./docs/examples/simulations/organic_partitioning_and_coagulation.ipynb) — Illustrative organic partitioning followed by Brownian coagulation, including the retained binned method’s composition limitation; not a quantitative species forecast.
 
-- [**Cloud Chamber Cycles**](./docs/Examples/Simulations/Notebooks/Cloud_Chamber_Multi_Cycle.ipynb)
+- [**Cloud Chamber Cycles**](./docs/examples/simulations/cloud_chamber_multi_cycle.ipynb)
   — Multi-cycle cloud droplet activation demonstrating κ-Köhler theory across
   3 seed compositions (Ammonium Sulfate, Sucrose, Mixed), comparing illustrative humidity responses. Dry-phase timestep oscillations
   remain unqualified for quantitative activation predictions.

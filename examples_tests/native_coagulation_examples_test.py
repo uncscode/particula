@@ -8,7 +8,7 @@ import numpy as np
 import pytest
 
 EXAMPLES = (
-    Path(__file__).resolve().parents[1] / "docs/Examples/Dynamics/Coagulation"
+    Path(__file__).resolve().parents[1] / "docs/examples/processes/coagulation"
 )
 
 
@@ -19,7 +19,7 @@ def test_binned_coagulation_number_loss_and_accounting(
     """Independent radius integrals distinguish PDF density from bin counts."""
     monkeypatch.setattr(plt, "show", lambda: None)
     result = runpy.run_path(
-        str(EXAMPLES / f"Coagulation_{index}_{kind.upper()}_Pattern.py")
+        str(EXAMPLES / f"coagulation_{index}_{kind}_pattern.py")
     )
     particles = result[f"{kind}_aerosol"].particles
     radius = result["radius_bins"]

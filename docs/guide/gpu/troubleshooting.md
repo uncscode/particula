@@ -3,7 +3,7 @@
 ## Direct-kernel troubleshooting
 
 Use
-[`docs/Examples/gpu_direct_kernels_quick_start.py`](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_direct_kernels_quick_start.py)
+[`docs/examples/gpu/direct/gpu_direct_kernels_quick_start.py`](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/direct/gpu_direct_kernels_quick_start.py)
 as the canonical runnable reference when troubleshooting the low-level GPU
 path.
 
@@ -71,7 +71,7 @@ the other evidence classes.
 
 | Command | Evidence |
 | --- | --- |
-| `python docs/Examples/gpu_direct_kernels_quick_start.py` | Canonical explicit-transfer walkthrough. |
+| `python docs/examples/gpu/direct/gpu_direct_kernels_quick_start.py` | Canonical explicit-transfer walkthrough. |
 | `pytest examples_tests/gpu_direct_kernels_example_test.py -q` | Quick-start regression. |
 | `pytest particula/gpu/kernels/tests/condensation_test.py -q -Werror` | Primary direct CPU-oracle particle-mass/gas-concentration parity matrix. |
 | `pytest particula/gpu/kernels/tests/condensation_stiffness_test.py -q -Werror` | Bounded direct-step stiffness coverage. |
@@ -98,7 +98,7 @@ pytest particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py -q 
 This is additive to the required Warp `device="cpu"` baseline and skips
 cleanly when CUDA is unavailable.
 
-The [GPU condensation parity walkthrough](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_condensation_parity_walkthrough.py)
+The [GPU condensation parity walkthrough](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/direct/gpu_condensation_parity_walkthrough.py)
 and its [condensation parity walkthrough ownership record](../../contribute/validation/gpu/condensation-parity.md)
 document bounded physics, conservation, and energy evidence only. They retain
 the fixed-four-substep low-level direct-kernel boundary: Warp CPU is the

@@ -81,7 +81,7 @@ unavailable and unmeasured; see
 [resident benchmark and memory-budget record](docs/contribute/validation/gpu/resident-benchmarks.md).
 
 E8-F7/T7 owns graph-capture profiling and machine-bounded recommendations; E8-F8
-owns the [native-CUDA example](docs/Examples/gpu_resident_graph_capture.py),
+owns the [native-CUDA example](docs/examples/gpu/resident/gpu_resident_graph_capture.py),
 [operator runbook](docs/guide/gpu/resident/graph-capture.md), limitations,
 documentation reconciliation, and the
 [P3 closeout record](docs/Features/Roadmap/graph-capture-closeout.md). The
@@ -466,7 +466,7 @@ aerosol = dilution.execute(aerosol, time_step=10.0, sub_steps=2)
 
 ### Complete direct GPU process illustration
 
-- `docs/Examples/gpu_complete_process_sequence.py` is an illustrative,
+- `docs/examples/gpu/direct/gpu_complete_process_sequence.py` is an illustrative,
   explicit-transfer five-call sequence: condensation, coagulation, dilution,
   wall loss, then nucleation. It uses one conversion of each CPU container and
   one final synchronization/restore.
@@ -495,7 +495,7 @@ restored = from_warp_environment_data(gpu_environment)
 - Import direct GPU step entry points from `particula.gpu.kernels`, not from
   top-level `particula.gpu`.
 - The canonical runnable example for the supported low-level path is
-  `docs/Examples/gpu_direct_kernels_quick_start.py`; it keeps CPU↔Warp
+  `docs/examples/gpu/direct/gpu_direct_kernels_quick_start.py`; it keeps CPU↔Warp
   transfers explicit, defaults to Warp `device="cpu"`, and defers
   `particula.gpu.kernels` imports until the Warp-enabled execution branch.
 - Environment transfers are explicit helper calls; kernels and runnables do
@@ -1023,7 +1023,7 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
   explicit direct-call illustration; resident scheduling has its own bounded
   contract and does not make the direct step a CPU runnable.
 - Check concentration-weighted particle-plus-gas conservation at
-  `rtol=1e-12, atol=1e-30`. Run `python docs/Examples/Nucleation/cpu_nucleation.py`,
+  `rtol=1e-12, atol=1e-30`. Run `python docs/examples/processes/nucleation/cpu_nucleation.py`,
   `pytest examples_tests/nucleation_example_test.py -q -Werror`, and
   `mkdocs build --strict`. If changing the paired custom notebook source, sync
   and execute it with the prescribed Jupytext tools.
@@ -1048,7 +1048,7 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
 - E6-F5 fixed-slot activation, E6-F6 exhaustion primitives, and E6-F7 CPU
   nucleation are dependencies. Warp CPU is the baseline; CUDA is optional and
   must cleanly skip when unavailable. Run
-  `python -Werror docs/Examples/Nucleation/gpu_direct_nucleation.py` and
+  `python -Werror docs/examples/gpu/direct/gpu_direct_nucleation.py` and
   `pytest examples_tests/gpu_direct_nucleation_example_test.py -q -Werror`.
 
 ### Resident graph-capture admission lifecycle
@@ -1083,7 +1083,7 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
   conservation, persistent RNG continuation, and aggregate stochastic criteria;
   it does not compare cross-device RNG words or per-seed trajectories. It makes
   no performance, profiling, or memory claim. The separate native-CUDA-only
-  source `docs/Examples/gpu_resident_graph_capture.py` demonstrates the bounded
+  source `docs/examples/gpu/resident/gpu_resident_graph_capture.py` demonstrates the bounded
   capture, two-replay, invalidation, retirement, and renewal lifecycle without
   adding a public API or a CPU/Warp-CPU fallback.
 
@@ -1386,7 +1386,7 @@ cannot run, record it as unavailable and keep the closeout unshipped rather than
 inferring a passing result. The optional CUDA groups are pass-or-clean-skip
 evidence only, never CPU fallback.
 The canonical runnable resident example is
-`docs/Examples/gpu_resident_multi_timestep.py`. Warp CPU is the baseline;
+`docs/examples/gpu/resident/gpu_resident_multi_timestep.py`. Warp CPU is the baseline;
 CUDA is optional pass-or-clean-skip evidence, never CPU fallback.
 
 ## Conda release gate
@@ -1493,21 +1493,21 @@ pytest --cov=particula
 
 ## Example Editing
 
-`docs/Examples/` may contain runnable `.py` entrypoints, paired notebooks, or
+`docs/examples/` may contain runnable `.py` entrypoints, paired notebooks, or
 both. For notebook-backed examples, use Jupytext paired sync and edit `.py`
 files, not `.ipynb`:
 
 ```bash
 # 1. Edit the .py file (percent format with # %% cell markers)
 # 2. Lint the .py file
-ruff check docs/Examples/path/to/file.py --fix
-ruff format docs/Examples/path/to/file.py
+ruff check docs/examples/path/to/file.py --fix
+ruff format docs/examples/path/to/file.py
 
 # 3. Sync to update .ipynb
-python3 .opencode/tools/validate_notebook.py docs/Examples/path/to/file.ipynb --sync
+python3 .opencode/tools/validate_notebook.py docs/examples/path/to/file.ipynb --sync
 
 # 4. Execute to validate and generate outputs
-python3 .opencode/tools/run_notebook.py docs/Examples/path/to/file.ipynb
+python3 .opencode/tools/run_notebook.py docs/examples/path/to/file.ipynb
 
 # 5. Commit both files (.py and .ipynb)
 ```
@@ -1525,7 +1525,7 @@ python3 .opencode/tools/run_notebook.py docs/Examples/path/to/file.ipynb
 
 **Documentation:**
 - Full guides: `.opencode/guides/`
-- Examples: `docs/Examples/`
+- Examples: `docs/examples/`
 - Theory: `docs/Theory/`
 
 **ADW Commands:**

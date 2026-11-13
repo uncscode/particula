@@ -101,4 +101,4 @@ It fails when:
 - `.opencode/agent/issue-generator.md`
 - `.opencode/agent/adw-auto-mode-manifest.md`
 - `.opencode/workflow/generate-auto.json`
-- `docs/Examples/operations/auto-mode-runbook.md`
+- `docs/examples/operations/auto-mode-runbook.md`

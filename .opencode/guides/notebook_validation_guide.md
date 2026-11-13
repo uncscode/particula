@@ -22,22 +22,22 @@ Skip rules and safety:
 
 ### Validate a single notebook
 ```bash
-validate_notebook docs/Examples/setup/template-init-tutorial.ipynb
+validate_notebook docs/examples/setup/template-init-tutorial.ipynb
 ```
 
 ### Validate recursively in a directory
 ```bash
-validate_notebook docs/Examples/ --recursive
+validate_notebook docs/examples/ --recursive
 ```
 
 ### JSON output for CI or tooling
 ```bash
-validate_notebook docs/Examples/ --recursive --output-mode json
+validate_notebook docs/examples/ --recursive --output-mode json
 ```
 
 ### Full verification (validation + docs build)
 ```bash
-validate_notebook docs/Examples/ --recursive --full --output-mode json
+validate_notebook docs/examples/ --recursive --full --output-mode json
 python3 -m mkdocs build --strict
 ```
 
@@ -50,13 +50,13 @@ Treat notebooks and scripts as untrusted code.
 
 ```bash
 # Execute with validation (default), overwrite source, create backup
-run_notebook docs/Examples/setup/template-init-tutorial.ipynb
+run_notebook docs/examples/setup/template-init-tutorial.ipynb
 
 # Execute without validation (not recommended except for debugging)
-run_notebook docs/Examples/setup/template-init-tutorial.ipynb --skip-validation
+run_notebook docs/examples/setup/template-init-tutorial.ipynb --skip-validation
 
 # Preserve the original file and/or skip backup
-run_notebook docs/Examples/setup/template-init-tutorial.ipynb --no-overwrite --no-backup
+run_notebook docs/examples/setup/template-init-tutorial.ipynb --no-overwrite --no-backup
 ```
 
 Defaults during execution:
@@ -70,18 +70,18 @@ Use Jupytext to enable type checking and linting on notebook code.
 
 - Convert notebook → script for mypy/ruff:
   ```bash
-  validate_notebook docs/Examples/setup/template-init-tutorial.ipynb --convert-to-py
-  mypy docs/Examples/setup/template-init-tutorial.py  # or ruff, pytest on the script
+  validate_notebook docs/examples/setup/template-init-tutorial.ipynb --convert-to-py
+  mypy docs/examples/setup/template-init-tutorial.py  # or ruff, pytest on the script
   ```
 
 - Sync notebook and script (newer wins by mtime):
   ```bash
-  validate_notebook docs/Examples/ --sync
+  validate_notebook docs/examples/ --sync
   ```
 
 - Check sync in CI (fails if out of sync, no writes):
   ```bash
-  validate_notebook docs/Examples/ --check-sync --recursive
+  validate_notebook docs/examples/ --check-sync --recursive
   ```
 
 ## Validation Errors
@@ -98,7 +98,7 @@ Use Jupytext to enable type checking and linting on notebook code.
 Example (`--output-mode json`):
 ```json
 {
-  "path": "docs/Examples/setup/template-init-tutorial.ipynb",
+  "path": "docs/examples/setup/template-init-tutorial.ipynb",
   "valid": false,
   "errors": [
     {
@@ -122,10 +122,10 @@ Minimal CI job to validate and enforce sync:
 
 ```yaml
 - name: Validate notebooks
-  run: validate_notebook docs/Examples/ --recursive --output-mode json
+  run: validate_notebook docs/examples/ --recursive --output-mode json
 
 - name: Enforce Jupytext sync
-  run: validate_notebook docs/Examples/ --check-sync --recursive
+  run: validate_notebook docs/examples/ --check-sync --recursive
 ```
 
 ## Troubleshooting
@@ -150,13 +150,13 @@ Pass a `.py` file path and `run_notebook` auto-detects script mode:
 
 ```bash
 # Single script (auto-detected by .py extension)
-run_notebook docs/Examples/panel-methods/regime-selection.py
+run_notebook docs/examples/panel-methods/regime-selection.py
 
 # With output validation
-run_notebook docs/Examples/panel-methods/regime-selection.py --expect-output "DataFrame" "plot"
+run_notebook docs/examples/panel-methods/regime-selection.py --expect-output "DataFrame" "plot"
 
 # JSON output
-run_notebook docs/Examples/panel-methods/regime-selection.py --output json
+run_notebook docs/examples/panel-methods/regime-selection.py --output json
 ```
 
 ### Directory Collection with `--script`
@@ -166,13 +166,13 @@ instead of `.ipynb` notebooks:
 
 ```bash
 # All scripts in a directory
-run_notebook docs/Examples/panel-methods/ --script
+run_notebook docs/examples/panel-methods/ --script
 
 # Recursive collection
-run_notebook docs/Examples/panel-methods/ --script --recursive
+run_notebook docs/examples/panel-methods/ --script --recursive
 
 # With timeout per script
-run_notebook docs/Examples/panel-methods/ --script --recursive --timeout 300
+run_notebook docs/examples/panel-methods/ --script --recursive --timeout 300
 ```
 
 ### Script-Mode Behavior
@@ -221,7 +221,7 @@ Example JSON output:
   "total_execution_time": 0.42,
   "results": [
     {
-      "script": "docs/Examples/panel-methods/regime-selection.py",
+      "script": "docs/examples/panel-methods/regime-selection.py",
       "success": true,
       "execution_time": 0.42,
       "exit_code": 0,

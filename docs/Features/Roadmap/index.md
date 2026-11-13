@@ -43,7 +43,7 @@ plan closure separately from unavailable CUDA measurement evidence.
 - **Graph capture and performance**: Maintain shipped
   [Epic H](data-oriented-gpu.md#epic-h-graph-capture-and-performance)'s bounded
   capture/replay and documentation tracks. Use the [native-CUDA
-  example](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_resident_graph_capture.py), [operator
+  example](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/resident/gpu_resident_graph_capture.py), [operator
   runbook](../../guide/gpu/resident/graph-capture.md), and [closeout
   record](graph-capture-closeout.md). CUDA profiling owns profiling and
   machine-bounded recommendations; graph-capture documentation owns the example, runbook,
@@ -110,7 +110,7 @@ meets its exit bar, the next pending epic in the sequence becomes active.
     - [Data Containers and GPU Foundations](../../guide/data-model/index.md)
       — shipped guide for the current container, transfer-helper, and support
       boundary baseline
-    - [Data Containers example](../../Examples/Data_Containers/index.md) —
+    - [Data Containers example](../../examples/fundamentals/data-containers.md) —
       canonical runnable entrypoint linked from the roadmap handoff notes
     - [Mass Precision Recommendation Report](../../contribute/validation/numerics/mass-precision.md) —
       canonical reference for downstream dtype/schema decisions
@@ -125,11 +125,11 @@ meets its exit bar, the next pending epic in the sequence becomes active.
   selector hardening, measured one-thread-per-box limits, documented direct
   kernel entry points, device-aware test policy, and the completed Epic B
   latent-heat example and integration baseline. Shipped artifacts:
-    - [Direct GPU kernels quick-start](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_direct_kernels_quick_start.py)
+    - [Direct GPU kernels quick-start](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/direct/gpu_direct_kernels_quick_start.py)
       — explicit-transfer, two-call low-level condensation path with reused
       caller-owned fp64 sidecars; it does not invoke coagulation or configure
       RNG state
-    - [CPU latent-heat condensation example](../../Examples/Dynamics/Condensation/Condensation_Latent_Heat.ipynb)
+    - [CPU latent-heat condensation example](../../examples/processes/condensation/condensation_latent_heat.ipynb)
       — runnable bookkeeping reference for future GPU parity
     - [Measured coagulation decision record](data-oriented-gpu.md#measured-decision-record-for-the-current-one-thread-per-box-path)
       — accepted many-box baseline and large single-box caution band
@@ -143,7 +143,7 @@ meets its exit bar, the next pending epic in the sequence becomes active.
    support contract and example. It does not provide high-level runnable
    integration or general CPU-strategy parity.
      - Independent condensation walkthrough
-       (`docs/Examples/gpu_condensation_parity_walkthrough.py`)
+       (`docs/examples/gpu/direct/gpu_condensation_parity_walkthrough.py`)
        — fixed-four-substep low-level direct-kernel physics, conservation, and
          energy evidence, with Warp CPU as the installed-Warp baseline; CUDA is
          optional additive evidence
@@ -157,7 +157,7 @@ meets its exit bar, the next pending epic in the sequence becomes active.
        parity, adaptive stepping, graph capture/replay, broad autodiff, or
        performance claim.
      - Focused evidence commands:
-       `python docs/Examples/gpu_condensation_parity_walkthrough.py` and
+       `python docs/examples/gpu/direct/gpu_condensation_parity_walkthrough.py` and
        `pytest examples_tests/gpu_condensation_parity_walkthrough_test.py -q -Werror`.
 - [Epic E: GPU Coagulation Physics Coverage](data-oriented-gpu.md#epic-e-gpu-coagulation-physics-coverage)
   and all nine feature plans coagulation sampling through coagulation support documentation shipped on
@@ -194,7 +194,7 @@ meets its exit bar, the next pending epic in the sequence becomes active.
 | `direct-process integration` | Integrated Validation Documentation and Epic Closeout | Shipped |
 
 The private [numerical validation sequence evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py),
-[integration validation source](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py),
+[integration validation source](https://github.com/Gorkowski/particula/blob/main/docs/examples/gpu/direct/gpu_complete_process_sequence.py),
 and [example regression](https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_complete_process_sequence_example_test.py)
 document an explicit five-call sequence. Its `condensation_step_gpu`,
 `coagulation_step_gpu`, `dilution_step_gpu`, `wall_loss_step_gpu`, and
@@ -221,12 +221,12 @@ All GPU coagulation features are shipped. The public GPU coagulation cross-links
 - Independent condensation walkthrough's
   [condensation parity walkthrough ownership record](../../contribute/validation/gpu/condensation-parity.md)
   and runnable
-  [GPU condensation parity walkthrough](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_condensation_parity_walkthrough.py).
+  [GPU condensation parity walkthrough](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/direct/gpu_condensation_parity_walkthrough.py).
 - Coagulation support documentation's
   [canonical GPU coagulation ownership contract](../../guide/gpu/direct/coagulation-configuration.md#gpu-coagulation-configuration-and-sidecar-ownership),
   [direct-kernel support guide](../../guide/gpu/direct/coagulation.md#gpu-direct-kernel-foundations-and-limitations),
   and
-  [direct GPU coagulation example](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_coagulation_direct.py).
+  [direct GPU coagulation example](https://github.com/Gorkowski/particula/blob/main/docs/examples/gpu/direct/gpu_coagulation_direct.py).
 
 ### Resident execution roadmap inventory
 
@@ -264,7 +264,7 @@ GPU coagulation, GPU process completeness, resident execution, graph capture, an
   2026-09-27. Reviewed CUDA measurements remain unavailable; plan closure
   does not establish a measured performance claim. Graph-capture documentation owns the example,
   runbook, limitations, and closeout, with no
-  CPU or Warp-CPU fallback. The [native-CUDA example](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_resident_graph_capture.py),
+  CPU or Warp-CPU fallback. The [native-CUDA example](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/resident/gpu_resident_graph_capture.py),
   [operator runbook](../../guide/gpu/resident/graph-capture.md), and [integration validation closeout record](graph-capture-closeout.md)
   are the discoverable references; the closeout alone owns integration validation status/evidence.
 

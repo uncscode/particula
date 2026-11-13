@@ -148,4 +148,4 @@ Source-of-truth definition:
 
 Related operator coverage:
 
-- `docs/Examples/operations/planner-workflow-runbook.md`
+- `docs/examples/operations/planner-workflow-runbook.md`

@@ -58,7 +58,7 @@ def test_corrected_external_handoff_passes_despite_release_metadata(
     [
         "pyproject.toml",
         "conftest.py",
-        "docs/Examples/cpu_dilution.py",
+        "docs/examples/processes/dilution/cpu_dilution.py",
         "examples_tests/dilution_example_test.py",
         "examples_tests/nucleation_example_test.py",
         "examples_tests/condensation_latent_heat_example_test.py",

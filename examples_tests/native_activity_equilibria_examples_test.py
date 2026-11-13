@@ -7,19 +7,19 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
-ROOT = Path(__file__).resolve().parents[1] / "docs/Examples"
+ROOT = Path(__file__).resolve().parents[1] / "docs/examples"
 
 
 @pytest.mark.parametrize(
     "relative_path",
     [
-        "Activity/activity_tutorial.py",
-        "Activity/bat_activity_example.py",
-        "Activity/equilibria_example.py",
-        "Activity/ideal_activity_example.py",
-        "Activity/kappa_activity_example.py",
-        "Equilibria/Notebooks/activity_part1.py",
-        "Equilibria/Notebooks/equilibria_part1.py",
+        "thermodynamics/activity/activity_tutorial.py",
+        "thermodynamics/activity/bat_activity_example.py",
+        "thermodynamics/activity/equilibria_example.py",
+        "thermodynamics/activity/ideal_activity_example.py",
+        "thermodynamics/activity/kappa_activity_example.py",
+        "thermodynamics/equilibria/activity_part1.py",
+        "thermodynamics/equilibria/equilibria_part1.py",
     ],
 )
 def test_functional_activity_and_equilibrium_examples(

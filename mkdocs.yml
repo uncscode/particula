@@ -7,7 +7,7 @@ edit_uri: edit/main/docs/
 # Exclude helper scripts and assets from being built as pages
 exclude_docs: |
   .assets/
-  Examples/**/*.py
+  examples/**/*.py
 
 theme:
   name: material
@@ -160,73 +160,73 @@ nav:
     - Construction: guide/migration/v0.3.0/construction.md
     - Containers: guide/migration/v0.3.0/containers.md
 - Examples:
-  - Examples: Examples/index.md
+  - Examples: examples/index.md
   - Activity:
-    - activity tutorial: Examples/Activity/activity_tutorial.ipynb
-    - bat activity example: Examples/Activity/bat_activity_example.ipynb
-    - equilibria example: Examples/Activity/equilibria_example.ipynb
-    - ideal activity example: Examples/Activity/ideal_activity_example.ipynb
-    - Activity Examples: Examples/Activity/index.md
-    - kappa activity example: Examples/Activity/kappa_activity_example.ipynb
+    - activity tutorial: examples/thermodynamics/activity/activity_tutorial.ipynb
+    - bat activity example: examples/thermodynamics/activity/bat_activity_example.ipynb
+    - equilibria example: examples/thermodynamics/activity/equilibria_example.ipynb
+    - ideal activity example: examples/thermodynamics/activity/ideal_activity_example.ipynb
+    - Activity Examples: examples/thermodynamics/activity/index.md
+    - kappa activity example: examples/thermodynamics/activity/kappa_activity_example.ipynb
   - Aerosol:
-    - Aerosol Tutorial: Examples/Aerosol/Aerosol_Tutorial.ipynb
-    - 'Index: Aerosols': Examples/Aerosol/index.md
+    - Aerosol Tutorial: examples/fundamentals/native_aerosol.ipynb
+    - 'Index: Aerosols': examples/fundamentals/index.md
   - Chamber Wall Loss:
-    - Chamber Forward Simulation: Examples/Chamber_Wall_Loss/Notebooks/Chamber_Forward_Simulation.ipynb
-    - Rectangular Wall Loss Strategy: Examples/Chamber_Wall_Loss/Notebooks/Rectangular_Wall_Loss_Strategy.ipynb
-    - Spherical Wall Loss Strategy: Examples/Chamber_Wall_Loss/Notebooks/Spherical_Wall_Loss_Strategy.ipynb
-    - Wall Loss Tutorial: Examples/Chamber_Wall_Loss/Notebooks/Wall_Loss_Tutorial.ipynb
-    - wall loss builders factory: Examples/Chamber_Wall_Loss/Notebooks/wall_loss_builders_factory.ipynb
-    - 'Index: Chamber Wall Loss': Examples/Chamber_Wall_Loss/index.md
+    - Chamber Forward Simulation: examples/processes/wall-loss/chamber_forward_simulation.ipynb
+    - Rectangular Wall Loss Strategy: examples/processes/wall-loss/rectangular_wall_loss_strategy.ipynb
+    - Spherical Wall Loss Strategy: examples/processes/wall-loss/spherical_wall_loss_strategy.ipynb
+    - Wall Loss Tutorial: examples/processes/wall-loss/wall_loss_tutorial.ipynb
+    - wall loss builders factory: examples/processes/wall-loss/wall_loss_builders_factory.ipynb
+    - 'Index: Chamber Wall Loss': examples/processes/wall-loss/index.md
   - Data Containers:
-    - Data Containers: Examples/Data_Containers/index.md
+    - Data Containers: examples/fundamentals/data-containers.md
   - Dynamics:
-    - Coagulation with Charge functional: Examples/Dynamics/Coagulation/Charge/Coagulation_with_Charge_functional.ipynb
-    - Coagulation with Charge objects: Examples/Dynamics/Coagulation/Charge/Coagulation_with_Charge_objects.ipynb
-    - Coagulation 1 PMF Pattern: Examples/Dynamics/Coagulation/Coagulation_1_PMF_Pattern.ipynb
-    - Coagulation 2 PDF Pattern: Examples/Dynamics/Coagulation/Coagulation_2_PDF_Pattern.ipynb
-    - Coagulation 3 Particle Resolved Pattern: Examples/Dynamics/Coagulation/Coagulation_3_Particle_Resolved_Pattern.ipynb
-    - Coagulation 4 Compared: Examples/Dynamics/Coagulation/Coagulation_4_Compared.ipynb
-    - Coagulation 5 Time Evolution: Examples/Dynamics/Coagulation/Coagulation_5_Time_Evolution.ipynb
-    - Coagulation Basic 1 PMF: Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_1_PMF.ipynb
-    - Coagulation Basic 2 PDF: Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_2_PDF.ipynb
-    - Coagulation Basic 3 compared: Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_3_compared.ipynb
-    - Coagulation Basic 4 ParticleResolved: Examples/Dynamics/Coagulation/Functional/Coagulation_Basic_4_ParticleResolved.ipynb
-    - Condensation 1 Bin: Examples/Dynamics/Condensation/Condensation_1_Bin.ipynb
-    - Condensation 2 MassBin: Examples/Dynamics/Condensation/Condensation_2_MassBin.ipynb
-    - Condensation 3 MassResolved: Examples/Dynamics/Condensation/Condensation_3_MassResolved.ipynb
-    - Condensation Latent Heat: Examples/Dynamics/Condensation/Condensation_Latent_Heat.ipynb
-    - Staggered Condensation Example: Examples/Dynamics/Condensation/Staggered_Condensation_Example.ipynb
-    - Adding Particles During Simulation: Examples/Dynamics/Customization/Adding_Particles_During_Simulation.ipynb
-    - Dynamics: Examples/Dynamics/index.md
+    - Coagulation with Charge functional: examples/processes/coagulation/charge/coagulation_with_charge_functional.ipynb
+    - Coagulation with Charge objects: examples/processes/coagulation/charge/coagulation_with_charge_objects.ipynb
+    - Coagulation 1 PMF Pattern: examples/processes/coagulation/coagulation_1_pmf_pattern.ipynb
+    - Coagulation 2 PDF Pattern: examples/processes/coagulation/coagulation_2_pdf_pattern.ipynb
+    - Coagulation 3 Particle Resolved Pattern: examples/processes/coagulation/coagulation_3_particle_resolved_pattern.ipynb
+    - Coagulation 4 Compared: examples/processes/coagulation/coagulation_4_compared.ipynb
+    - Coagulation 5 Time Evolution: examples/processes/coagulation/coagulation_5_time_evolution.ipynb
+    - Coagulation Basic 1 PMF: examples/processes/coagulation/functional/coagulation_basic_1_pmf.ipynb
+    - Coagulation Basic 2 PDF: examples/processes/coagulation/functional/coagulation_basic_2_pdf.ipynb
+    - Coagulation Basic 3 compared: examples/processes/coagulation/functional/coagulation_basic_3_compared.ipynb
+    - Coagulation Basic 4 ParticleResolved: examples/processes/coagulation/functional/coagulation_basic_4_particleresolved.ipynb
+    - Condensation 1 Bin: examples/processes/condensation/condensation_1_bin.ipynb
+    - Condensation 2 MassBin: examples/processes/condensation/condensation_2_massbin.ipynb
+    - Condensation 3 MassResolved: examples/processes/condensation/condensation_3_massresolved.ipynb
+    - Condensation Latent Heat: examples/processes/condensation/condensation_latent_heat.ipynb
+    - Staggered Condensation Example: examples/processes/condensation/staggered_condensation_example.ipynb
+    - Adding Particles During Simulation: examples/processes/customization/adding_particles_during_simulation.ipynb
+    - Dynamics: examples/processes/index.md
   - Equilibria:
-    - activity part1: Examples/Equilibria/Notebooks/activity_part1.ipynb
-    - equilibria part1: Examples/Equilibria/Notebooks/equilibria_part1.ipynb
-    - Index Equilibria: Examples/Equilibria/index.md
+    - activity part1: examples/thermodynamics/equilibria/activity_part1.ipynb
+    - equilibria part1: examples/thermodynamics/equilibria/equilibria_part1.ipynb
+    - Index Equilibria: examples/thermodynamics/equilibria/index.md
   - Gas Phase:
-    - AtmosphereTutorial: Examples/Gas_Phase/Notebooks/AtmosphereTutorial.ipynb
-    - Gas Species: Examples/Gas_Phase/Notebooks/Gas_Species.ipynb
-    - Vapor Pressure: Examples/Gas_Phase/Notebooks/Vapor_Pressure.ipynb
-    - Gas Phase: Examples/Gas_Phase/index.md
+    - AtmosphereTutorial: examples/fundamentals/gas/environment_data.ipynb
+    - Gas Species: examples/fundamentals/gas/gas_data.ipynb
+    - Vapor Pressure: examples/fundamentals/gas/vapor_pressure.ipynb
+    - Gas Phase: examples/fundamentals/gas/index.md
   - Nucleation:
-    - Custom Nucleation Single Species: Examples/Nucleation/Notebooks/Custom_Nucleation_Single_Species.ipynb
-    - Nucleation: Examples/Nucleation/index.md
+    - Custom Nucleation Single Species: examples/processes/nucleation/custom_nucleation_single_species.ipynb
+    - Nucleation: examples/processes/nucleation/index.md
   - Particle Phase:
-    - Activity Tutorial: Examples/Particle_Phase/Notebooks/Activity_Tutorial.ipynb
-    - Aerosol Distributions: Examples/Particle_Phase/Notebooks/Aerosol_Distributions.ipynb
-    - Distribution Tutorial: Examples/Particle_Phase/Notebooks/Distribution_Tutorial.ipynb
-    - Activity Functions: Examples/Particle_Phase/Notebooks/Functional/Activity_Functions.ipynb
-    - Particle Representation Tutorial: Examples/Particle_Phase/Notebooks/Particle_Representation_Tutorial.ipynb
-    - Particle Surface Tutorial: Examples/Particle_Phase/Notebooks/Particle_Surface_Tutorial.ipynb
-    - 'Index: Particle Phase': Examples/Particle_Phase/index.md
+    - Activity Tutorial: examples/thermodynamics/particle-properties/activity_tutorial.ipynb
+    - Aerosol Distributions: examples/fundamentals/particles/aerosol_distributions.ipynb
+    - Distribution Tutorial: examples/fundamentals/particles/distribution_tutorial.ipynb
+    - Activity Functions: examples/thermodynamics/particle-properties/activity_functions.ipynb
+    - Particle Representation Tutorial: examples/fundamentals/particles/particle_data.ipynb
+    - Particle Surface Tutorial: examples/thermodynamics/particle-properties/particle_surface_tutorial.ipynb
+    - 'Index: Particle Phase': examples/fundamentals/particles/index.md
   - Simulations:
-    - Biomass Burning Cloud Interactions: Examples/Simulations/Notebooks/Biomass_Burning_Cloud_Interactions.ipynb
-    - Cloud Chamber Multi Cycle: Examples/Simulations/Notebooks/Cloud_Chamber_Multi_Cycle.ipynb
-    - Cloud Chamber Single Cycle: Examples/Simulations/Notebooks/Cloud_Chamber_Single_Cycle.ipynb
-    - Cough Droplets Partitioning: Examples/Simulations/Notebooks/Cough_Droplets_Partitioning.ipynb
-    - Organic Partitioning and Coagulation: Examples/Simulations/Notebooks/Organic_Partitioning_and_Coagulation.ipynb
-    - Soot Formation in Flames: Examples/Simulations/Notebooks/Soot_Formation_in_Flames.ipynb
-    - Simulations: Examples/Simulations/index.md
+    - Biomass Burning Cloud Interactions: examples/simulations/biomass_burning_cloud_interactions.ipynb
+    - Cloud Chamber Multi Cycle: examples/simulations/cloud_chamber_multi_cycle.ipynb
+    - Cloud Chamber Single Cycle: examples/simulations/cloud_chamber_single_cycle.ipynb
+    - Cough Droplets Partitioning: examples/simulations/cough_droplets_partitioning.ipynb
+    - Organic Partitioning and Coagulation: examples/simulations/organic_partitioning_and_coagulation.ipynb
+    - Soot Formation in Flames: examples/simulations/soot_formation_in_flames.ipynb
+    - Simulations: examples/simulations/index.md
 - Theory:
   - Theory: theory/index.md
   - Activity Calculations:
@@ -234,18 +234,18 @@ nav:
     - Equilibria Theory: theory/thermodynamics/equilibria-theory.md
     - Activity Calculations: theory/thermodynamics/index.md
   - Technical:
-    - DNS Fluid and Particle Properties Comparison: Theory/Technical/Dynamics/Cloud_Droplet_Coagulation/DNS_Fluid_and_Particle_Properties_Comparison.ipynb
-    - DNS Horizontal Velocity Comparison: Theory/Technical/Dynamics/Cloud_Droplet_Coagulation/DNS_Horizontal_Velocity_Comparison.ipynb
-    - DNS Kernel Comparison: Theory/Technical/Dynamics/Cloud_Droplet_Coagulation/DNS_Kernel_Comparison.ipynb
-    - DNS Radial Distribution Comparison: Theory/Technical/Dynamics/Cloud_Droplet_Coagulation/DNS_Radial_Distribution_Comparison.ipynb
-    - DNS Radial Relative Velocity Comparison: Theory/Technical/Dynamics/Cloud_Droplet_Coagulation/DNS_Radial_Relative_Velocity_Comparison.ipynb
+    - DNS Fluid and Particle Properties Comparison: theory/dynamics/cloud-droplet-coagulation/dns-fluid-and-particle-properties-comparison.ipynb
+    - DNS Horizontal Velocity Comparison: theory/dynamics/cloud-droplet-coagulation/dns-horizontal-velocity-comparison.ipynb
+    - DNS Kernel Comparison: theory/dynamics/cloud-droplet-coagulation/dns-kernel-comparison.ipynb
+    - DNS Radial Distribution Comparison: theory/dynamics/cloud-droplet-coagulation/dns-radial-distribution-comparison.ipynb
+    - DNS Radial Relative Velocity Comparison: theory/dynamics/cloud-droplet-coagulation/dns-radial-relative-velocity-comparison.ipynb
     - Droplet Coagulation Kernel Ayala 2008: theory/dynamics/cloud-droplet-coagulation/droplet-coagulation-kernel-ayala2008.md
     - Cloud Droplet Coagulation: theory/dynamics/cloud-droplet-coagulation/index.md
     - Condensation Discussion: theory/dynamics/condensation-equations.md
     - Nucleation Discussion: theory/dynamics/nucleation-equations.md
-    - ionparticle coagulation: Theory/Technical/Dynamics/ionparticle_coagulation.ipynb
-    - dynamic viscosity: Theory/Technical/Properties/dynamic_viscosity.ipynb
-    - mean free path: Theory/Technical/Properties/mean_free_path.ipynb
+    - ionparticle coagulation: theory/dynamics/ionparticle-coagulation.ipynb
+    - dynamic viscosity: theory/properties/dynamic-viscosity.ipynb
+    - mean free path: theory/properties/mean-free-path.ipynb
     - Technical: Theory/Technical/index.md
 - API: https://uncscode.github.io/particula/API/
 - Contribute:
@@ -287,7 +287,7 @@ nav:
     - Data Structures for Aerosol Simulation: contribute/architecture/warp/datastructures.md
     - Aerosol Dynamics with NVIDIA Warp: contribute/architecture/warp/teaching/fluids.md
     - Particle Interactions and Wall Loss with NVIDIA Warp: contribute/architecture/warp/teaching/geometry.md
-    - gpu benchmarks: Theory/nvidia-warp/examples/gpu_benchmarks.ipynb
+    - gpu benchmarks: contribute/validation/gpu/legacy-benchmarks/gpu_benchmarks.ipynb
     - NVIDIA Warp for Particle Simulation: contribute/architecture/warp/index.md
     - Kernels and Function Inlining for Particle Simulation: contribute/architecture/warp/kernels.md
   - Contribution workflow:

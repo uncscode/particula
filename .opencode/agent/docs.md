@@ -93,7 +93,7 @@ task({
 **EXCLUDED (handled by other subagents):**
 - ❌ `.opencode/guides/architecture/` - architecture subagent
 - ❌ `.opencode/plans/` - plan-update-full subagent (structured plan content)
-- ❌ `docs/Examples/` - examples subagent
+- ❌ `docs/examples/` - examples subagent
 - ❌ `docs/Theory/` - theory subagent
 - ❌ `docs/Features/` - features subagent
 

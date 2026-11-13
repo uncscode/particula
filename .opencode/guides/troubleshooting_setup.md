@@ -712,6 +712,6 @@ adw health
   - `curl -I https://api.github.com` and `curl -I https://api.anthropic.com`
 - Check related guides: [ADW Setup Guide](setup_guide.md),
   [Backend Configuration](backend_configuration.md), and
-  [Authorization Troubleshooting](../docs/Examples/setup/authorization-troubleshooting.md).
+  [Authorization Troubleshooting](../docs/examples/setup/authorization-troubleshooting.md).
 - If unresolved, open a GitHub issue with the above details (omit secrets) and recent log
   snippets from `adw setup validate`.

@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 def test_aerosol_tutorial_population_and_held_state():
     """Retain the prescribed lognormal number, mass and saturation state."""
     values = runpy.run_path(
-        str(ROOT / "docs/Examples/Aerosol/Aerosol_Tutorial.py")
+        str(ROOT / "docs/examples/fundamentals/native_aerosol.py")
     )
     aerosol = values["aerosol"]
     particles = values["particles"]
@@ -52,9 +52,7 @@ def test_atmosphere_tutorial_prescribed_history():
 
     with patch.object(plt, "show"):
         values = runpy.run_path(
-            str(
-                ROOT / "docs/Examples/Gas_Phase/Notebooks/AtmosphereTutorial.py"
-            )
+            str(ROOT / "docs/examples/fundamentals/gas/environment_data.py")
         )
     plt.close("all")
     gas = values["gas_mixture"]
@@ -86,7 +84,7 @@ def test_gas_species_tutorial_units_and_pressure_ratios():
 
     with patch.object(plt, "show"):
         values = runpy.run_path(
-            str(ROOT / "docs/Examples/Gas_Phase/Notebooks/Gas_Species.py")
+            str(ROOT / "docs/examples/fundamentals/gas/gas_data.py")
         )
     plt.close("all")
     water = values["water_species"]
@@ -129,10 +127,7 @@ def test_particle_construction_units_and_material_inventory():
 
     with patch.object(plt, "show"):
         values = runpy.run_path(
-            str(
-                ROOT
-                / "docs/Examples/Particle_Phase/Notebooks/Particle_Representation_Tutorial.py"
-            )
+            str(ROOT / "docs/examples/fundamentals/particles/particle_data.py")
         )
     plt.close("all")
     particles = values["particle_data"]
@@ -168,7 +163,7 @@ def test_distribution_tutorial_material_and_volume_accounting():
     values = runpy.run_path(
         str(
             ROOT
-            / "docs/Examples/Particle_Phase/Notebooks/Distribution_Tutorial.py"
+            / "docs/examples/fundamentals/particles/distribution_tutorial.py"
         )
     )
     np.testing.assert_allclose(
@@ -204,7 +199,7 @@ def test_diameter_to_native_radius_pdf_preserves_population():
         values = runpy.run_path(
             str(
                 ROOT
-                / "docs/Examples/Particle_Phase/Notebooks/Aerosol_Distributions.py"
+                / "docs/examples/fundamentals/particles/aerosol_distributions.py"
             )
         )
     plt.close("all")

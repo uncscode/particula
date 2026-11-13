@@ -176,13 +176,13 @@ From each feature plan, extract:
 Parse phase entries from the Phase Checklist (Section 3 or Section 6):
 
 ```markdown
-- [ ] **E13-F2-P1:** Create docs/Examples/setup/ with installation and backend config
+- [ ] **E13-F2-P1:** Create docs/examples/setup/ with installation and backend config
   - Issue: TBD | Size: M | Status: Not Started
 ```
 
 Extract:
 - Phase ID: `E13-F2-P1`
-- Description: `Create docs/Examples/setup/ with installation and backend config`
+- Description: `Create docs/examples/setup/ with installation and backend config`
 - Size: `M` (from the Issue/Size/Status line, if present)
 
 ## Step 4: Build Dependency Graph

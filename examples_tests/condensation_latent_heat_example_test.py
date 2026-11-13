@@ -13,7 +13,7 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 EXAMPLE_PATH = (
-    ROOT / "docs/Examples/Dynamics/Condensation/Condensation_Latent_Heat.py"
+    ROOT / "docs/examples/processes/condensation/condensation_latent_heat.py"
 )
 EFFECTIVE_ZERO_LATENT_HEAT_ENERGY_TOLERANCE = 1.0e-18
 

@@ -8,7 +8,8 @@ import numpy as np
 import pytest
 
 SOURCE = (
-    Path(__file__).resolve().parents[1] / "docs/Examples/native_state_access.py"
+    Path(__file__).resolve().parents[1]
+    / "docs/examples/fundamentals/native_state_access.py"
 )
 
 
@@ -161,7 +162,7 @@ def test_published_example_runs_real_mapped_condensation(example):
 )
 def test_native_migration_page_python_snippets_execute(page):
     """Execute the exact supported snippets in each page's documented order."""
-    path = SOURCE.parents[2] / "docs/guide" / f"{page}.md"
+    path = Path(__file__).resolve().parents[1] / "docs/guide" / f"{page}.md"
     snippets = re.findall(r"```python\n(.*?)\n```", path.read_text(), re.DOTALL)
     assert snippets
     namespace = {}
@@ -174,7 +175,9 @@ def test_native_migration_page_python_snippets_execute(page):
 
 def test_foundations_native_construction_snippet():
     """The canonical schema example declares counts and extensive inventory."""
-    path = SOURCE.parents[2] / "docs/guide/data-model/index.md"
+    path = (
+        Path(__file__).resolve().parents[1] / "docs/guide/data-model/index.md"
+    )
     section = path.read_text().split(
         "Example single-box container construction:", 1
     )[1]

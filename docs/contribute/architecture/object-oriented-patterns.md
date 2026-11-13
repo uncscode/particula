@@ -141,7 +141,7 @@ BaseParticle
 Particula builds objects out of **smaller collaborating parts**:
 
 ```python
-from docs.Examples.native_state_access import build_aerosol, build_condensation
+from docs.examples.fundamentals.native_state_access import build_aerosol, build_condensation
 
 aerosol = build_aerosol()  # native particle, full gas and environment containers
 process = build_condensation(aerosol.gas)  # explicit physics and species mapping
