@@ -2996,7 +2996,7 @@ def test_replay_drift_revokes_without_waiting_for_its_own_launch(
         release=releases.append,
     )
 
-    def invalidate(candidate: object) -> None:
+    def invalidate(candidate: ResidentGraphCaptureBinding) -> None:
         graph_capture._teardown_resident_graph_capture(
             candidate,
             "structural_drift",
