@@ -2697,15 +2697,24 @@ def replay_captured_resident_graph(captured: object, duration: object) -> None:
         BaseException: Propagates native-launch or completion failure after
             writer-capable cleanup and capture-failure classification.
     """
-    captured_graph, record = _acquire_captured_graph_launch(captured)
+    with _ISSUED_CAPTURED_GRAPHS_CONDITION:
+        captured_graph = _require_issued_captured_graph(captured)
     session = cast("ResidentSession", captured_graph.session)
     operation_lease: object | None = None
-    launch_lease_active = True
+    launch_lease_active = False
     try:
         operation_lease = session._acquire_native_operation("replay")
-        qualification = _validate_replay_captured_graph(
-            captured_graph, duration
-        )
+        with _ISSUED_CAPTURED_GRAPHS_CONDITION:
+            # Structural validation can revoke this graph. Do not hold a
+            # launch lease while that revocation waits for admitted launches.
+            # Keep validation and lease acquisition atomic against teardown.
+            qualification = _validate_replay_captured_graph(
+                captured_graph, duration
+            )
+            captured_graph, record = _acquire_captured_graph_launch(
+                captured_graph
+            )
+            launch_lease_active = True
         guard = cast("ResidentStepGuard", qualification.guard)
         token = guard.begin_step(duration)
         try:

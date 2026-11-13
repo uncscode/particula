@@ -14,11 +14,13 @@ import importlib
 import os
 from dataclasses import dataclass
 from types import SimpleNamespace
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from particula.gas import EnvironmentData, GasData
-from particula.particles import ParticleData
+
+if TYPE_CHECKING:
+    from particula.gas import EnvironmentData, GasData
+    from particula.particles import ParticleData
 
 _FORCE_NO_NATIVE_CAPTURE_ENV = "PARTICULA_EXAMPLE_FORCE_NO_NATIVE_CAPTURE"
 _UNAVAILABLE_OUTPUT = (
@@ -219,24 +221,41 @@ class _WarpNativeCaptureAdapter:
                 force_module_load=True,
             )
 
+        graphs: dict[object, Any] = {}
+
+        def end() -> object:
+            """Own the Warp graph behind an opaque lifecycle token."""
+            graph = self._warp.capture_end()
+            if graph is None:
+                raise ValueError("Warp capture did not return a graph.")
+            handle = object()
+            graphs[handle] = graph
+            return handle
+
+        def launch(handle: object) -> None:
+            """Launch the graph owned by this adapter's live token."""
+            self._warp.capture_launch(graphs[handle])
+
         def release(handle: object) -> None:
-            """Release an opaque native handle or reject unsupported cleanup."""
-            destroy = getattr(handle, "destroy", None)
-            if not callable(destroy):
-                raise TypeError(
-                    "native capture handle must provide callable destroy()."
-                )
-            destroy()
+            """Drop ownership so Warp's graph finalizer frees native storage.
+
+            Warp 1.11 graphs use Python lifetime cleanup, not ``destroy()``.
+            Keeping only the opaque token in lifecycle provenance avoids
+            retaining the graph after explicit release.
+            """
+            if handle not in graphs:
+                raise ValueError("native capture handle is not owned or live.")
+            del graphs[handle]
 
         def abort() -> object:
             """End incomplete capture and return its cleanup handle."""
-            return self._warp.capture_end()
+            return end()
 
         return self._graph_capture.GraphCaptureNativeCallables(
             begin,
-            self._warp.capture_end,
+            end,
             lambda: None,
-            self._warp.capture_launch,
+            launch,
             release,
             abort,
         )

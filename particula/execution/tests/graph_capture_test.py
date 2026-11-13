@@ -2979,6 +2979,52 @@ def _issued_capture_for_lifecycle_test(
 
 
 @pytest.mark.warp
+def test_replay_drift_revokes_without_waiting_for_its_own_launch(
+    resident_request: object,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Prelaunch invalidation releases once without a self-owned wait."""
+    request = cast("ResidentSimulationRequest", resident_request)
+    releases: list[object] = []
+    launches: list[object] = []
+    handle = object()
+    captured, binding = _issued_capture_for_lifecycle_test(
+        request,
+        monkeypatch,
+        handle=handle,
+        launch=launches.append,
+        release=releases.append,
+    )
+
+    def invalidate(candidate: object) -> None:
+        graph_capture._teardown_resident_graph_capture(
+            candidate,
+            "structural_drift",
+            GraphCaptureCompatibility(
+                False, GraphCaptureDriftReason.CONFIGURATIONS
+            ),
+        )
+        raise ValueError("resident graph-capture signature is incompatible.")
+
+    monkeypatch.setattr(
+        graph_capture, "gate_resident_graph_capture", invalidate
+    )
+    monkeypatch.setattr(
+        graph_capture._ISSUED_CAPTURED_GRAPHS_CONDITION,
+        "wait",
+        lambda: pytest.fail("prelaunch rejection must not wait on itself"),
+    )
+    with pytest.raises(ValueError, match="signature is incompatible"):
+        replay_captured_resident_graph(captured, 0.0)
+    assert binding.lifecycle.state is GraphCaptureLifecycleState.INVALIDATED
+    assert launches == []
+    assert releases == [handle]
+    assert request.guard.completed_steps == 0
+    close_resident_graph_capture(binding)
+    assert releases == [handle]
+
+
+@pytest.mark.warp
 @pytest.mark.parametrize(
     ("duration", "exception", "match"),
     [

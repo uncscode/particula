@@ -436,11 +436,14 @@ def test_native_adapter_aborts_and_releases_post_begin_failure() -> None:
     """End and release an incomplete native capture through the adapter."""
     example = _fresh_example()
     events: list[str] = []
-    handle = SimpleNamespace(destroy=lambda: events.append("release"))
 
-    def capture_end() -> SimpleNamespace:
+    class NativeGraph:
+        def __del__(self) -> None:
+            events.append("release")
+
+    def capture_end() -> NativeGraph:
         events.append("end")
-        return handle
+        return NativeGraph()
 
     warp = SimpleNamespace(
         capture_begin=lambda **_kwargs: events.append("begin"),
@@ -486,7 +489,7 @@ def test_native_adapter_rejects_unsupported_handle_release() -> None:
         device,
         graph_capture,
     )
-    with pytest.raises(TypeError, match="callable destroy"):
+    with pytest.raises(ValueError, match="not owned or live"):
         adapter.capture_callables(device).capture_release(object())
 
 
