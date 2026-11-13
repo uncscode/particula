@@ -1,209 +1,50 @@
 # Examples
 
-Welcome to the Particula Examples Gallery! Here you’ll find a curated collection of notebooks and step‑by‑step tutorials designed to help you explore, learn, and extend the core functionality of Particula. Whether you’re looking for a full end‑to‑end simulation, a focused how‑to guide, or a deep dive into individual components, each card below links to a ready‑to‑run example with contextual explanations and code snippets.
+Start small, then build toward full scientific workloads. These examples target
+native v0.3.0 development APIs; use the [installation guide](Setup_Particula/index.md).
+Notebook pages display saved results in the full documentation build. Standalone
+sources remain runnable from the repository checkout.
 
-Use the **End‑to‑End Simulations** to see complete workflows in action, then explore the **How‑To Guides** for targeted recipes that tackle specific processes (e.g., chamber wall losses, thermodynamic equilibria, or nucleation events). Finally, the **Tutorials** section breaks down the building blocks of Particula’s architecture—Aerosol objects, Dynamics modules, Gas Phase definitions, and Particle Phase representations—so you can customize and combine them in your own research.
+## Fundamentals
 
-Jump in by selecting any card below and follow along in your browser or local environment. Happy modeling!
+1. [First CPU simulation](../guide/getting-started/first-simulation.md)
+2. [Native aerosol](Aerosol/index.md)
+3. [Data containers and explicit transfers](Data_Containers/index.md)
+4. [Gas and environment](Gas_Phase/index.md)
+5. [Particle distributions and properties](Particle_Phase/index.md)
 
+## Processes and thermodynamics
 
-## End-to-End Simulations
+- [Condensation and coagulation](Dynamics/index.md)
+- [Wall loss](Chamber_Wall_Loss/index.md)
+- [Nucleation](Nucleation/index.md)
+- [Activity](Activity/index.md)
+- [Equilibria](Equilibria/index.md)
+- [CPU dilution](../Features/dilution_strategy_system.md#boundaries-and-example)
 
-<div class="grid cards" markdown>
+## GPU examples
 
--  __[Aerosol-Cloud Interactions](Simulations/Notebooks/Biomass_Burning_Cloud_Interactions.ipynb)__
+These standalone examples use explicit caller-owned transfers and device state.
+Warp CPU is the baseline when installed; CUDA capture is a separate path.
 
-    ---
+| Purpose | Source | Requirement |
+| --- | --- | --- |
+| Direct condensation | [Quick start](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_direct_kernels_quick_start.py) | Optional Warp; CPU device by default |
+| Direct coagulation | [Brownian coagulation](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_coagulation_direct.py) | Optional Warp; CPU device by default |
+| Combine direct processes | [Five-process sequence](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py) | Optional Warp; illustrative explicit calls |
+| Inspect numerical agreement | [Condensation parity](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_condensation_parity_walkthrough.py) | Validation demonstration, not general strategy parity |
+| Manage session state | [Resident lifecycle](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_resident_session.py) | Optional Warp; explicit restart/finalization |
+| Run several resident steps | [Resident loop](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_resident_multi_timestep.py) | Optional Warp; explicit scheduling |
+| Capture and replay | [Graph capture](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_resident_graph_capture.py) | Native CUDA only; no CPU fallback |
 
-    Biomass burning aerosols that activate into cloud droplets, simulating the interactions between aerosols and clouds.
+## Full simulations
 
-    [:octicons-arrow-right-24: Simulation](Simulations/Notebooks/Biomass_Burning_Cloud_Interactions.ipynb)
-
-- __[Organic Partitioning and Coagulation](Simulations/Notebooks/Organic_Partitioning_and_Coagulation.ipynb)__
-
-    ---
-
-    Simulation of organic partitioning on to seed particles and coagulation.
-
-    [:octicons-arrow-right-24: Simulation](Simulations/Notebooks/Organic_Partitioning_and_Coagulation.ipynb)
-
-- __[Cough Droplets Partitioning](Simulations/Notebooks/Cough_Droplets_Partitioning.ipynb)__
-
-    ---
-
-    Simulates the evaporation of cough droplets, tracking size distribution and composition changes over time.
-
-    [:octicons-arrow-right-24: Simulation](Simulations/Notebooks/Cough_Droplets_Partitioning.ipynb)
-
-- __[Soot Formation in Flames](Simulations/Notebooks/Soot_Formation_in_Flames.ipynb)__
- 
-    ---
-
-    Simulates soot formation in a cooling combustion plume, tracking particle growth and chemical speciation.
-
-    [:octicons-arrow-right-24: Simulation](Simulations/Notebooks/Soot_Formation_in_Flames.ipynb)
-
-- __[Cloud Chamber Single Cycle](Simulations/Notebooks/Cloud_Chamber_Single_Cycle.ipynb)__
-
-    ---
-
-    Single activation-deactivation cycle with κ-theory hygroscopicity and wall loss in a rectangular chamber.
-
-    [:octicons-arrow-right-24: Simulation](Simulations/Notebooks/Cloud_Chamber_Single_Cycle.ipynb)
-
-- __[Cloud Chamber Multi Cycle](Simulations/Notebooks/Cloud_Chamber_Multi_Cycle.ipynb)__
-
-    ---
-
-    Four-cycle simulation comparing κ-dependent activation across ammonium sulfate, sucrose, and mixed seed scenarios.
-
-    [:octicons-arrow-right-24: Simulation](Simulations/Notebooks/Cloud_Chamber_Multi_Cycle.ipynb)
-
-</div>
-
-
-## How-To Guides
-
-<div class="grid cards" markdown>
-
--   __[Setup Particula](Setup_Particula/index.md)__
-
-    ---
-
-    How to setup python and install `Particula` via pip.
-
-    [:octicons-arrow-right-24: Tutorial](Setup_Particula/index.md)
-
--   __[Chamber Wall Loss](Chamber_Wall_Loss/index.md)__
-
-    ---
-
-    How to simulate experiments for the loss of particles to the chamber walls,
-    including the strategy-based wall loss API
-    (`WallLossStrategy`, `SphericalWallLossStrategy`, and `RectangularWallLossStrategy`).
-    - [Wall Loss Tutorial](Chamber_Wall_Loss/Notebooks/Wall_Loss_Tutorial.ipynb) — Geometry comparison plus coagulation/condensation chaining
-
-    [:octicons-arrow-right-24: Tutorial](Chamber_Wall_Loss/index.md)
-
--   __[Equilibria](Equilibria/index.md)__
-
-    ---
-
-    How to simulate aerosol thermodynamic equilibria using the Binary Activity Thermodynamic `BAT` Model. Useful for water uptake and cloud droplet activation.
-
-    [:octicons-arrow-right-24: Tutorial](Equilibria/index.md)
-
--   __[Nucleation](Nucleation/index.md)__
-
-    ---
-
-    Run the supported CPU single-box nucleation runnable, or review an
-    illustrative custom workflow.
-
-    [:octicons-arrow-right-24: Tutorial](Nucleation/index.md)
-
--   __[Activity Calculations](Activity/index.md)__
-
-    ---
-
-    Learn how to compute chemical activity in organic-water mixtures
-    using ideal, kappa, and BAT (non-ideal) models. Includes examples
-    for equilibria calculations.
-
-    [:octicons-arrow-right-24: Tutorial](Activity/activity_tutorial.ipynb)
-
-</div>
-
+[Scientific simulations](Simulations/index.md) retain their complete workloads
+and limitations. They are longer studies, not installation smoke tests. Start
+with a process tutorial before adapting a full chamber or atmospheric case.
 
 ## Tutorials
 
-<div class="grid cards" markdown>
-
--   __[Aerosol](Aerosol/index.md)__
-
-    ---
-
-    Learn what goes into the [Aerosol](Aerosol/index.md) object and why it is used.
-
-    [:octicons-arrow-right-24: Tutorial](Aerosol/index.md)
-
--   __[Dynamics](Dynamics/index.md)__
-
-    ---
-
-    [Dynamics](Dynamics/index.md) is a collection of classes that processes
-    `Aerosol` objects, to perform coagulation, condensation, and other
-    processes.
-
-    Key examples:
-    - [Wall Loss Builders and Factory](Chamber_Wall_Loss/Notebooks/wall_loss_builders_factory.ipynb)
-    - [Dilution Strategy System](../Features/dilution_strategy_system.md) —
-      public CPU-only scalar dilution API, contract, and boundaries
-    - [CPU dilution source](https://github.com/Gorkowski/particula/blob/main/docs/Examples/cpu_dilution.py)
-      — deterministic standalone example; run
-        `python docs/Examples/cpu_dilution.py`
-
-    [:octicons-arrow-right-24: Tutorial](Dynamics/index.md)
-
--   __[Gas Phase](Gas_Phase/index.md)__
-
-    ---
-
-    Learn how to represent the [Gas Phase](Gas_Phase/index.md), including vapor pressures and atmospheric properties.
-
-    [:octicons-arrow-right-24: Tutorial](Gas_Phase/index.md)
-
--   __[Data Containers](Data_Containers/index.md)__
-
-    ---
-
-    Learn the shipped `ParticleData` and `GasData` shapes, then run the
-    canonical local example command `python
-    docs/Examples/data_containers_and_gpu_foundations.py` for the documented
-    CPU-only and optional Warp CPU-backend flow.
-
-    Key examples:
-    - [Data containers and GPU foundations](Data_Containers/index.md) —
-      `ParticleData` / `GasData` shapes plus explicit transfer helpers
-    - [Direct GPU kernels quick-start source](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_direct_kernels_quick_start.py)
-      — a low-level explicit-transfer direct-condensation path with a Warp CPU
-      default when installed, lazy direct and concrete imports, caller-owned
-      fixed-shape fp64 scratch/latent/energy sidecars reused across explicit
-      calls, gas coupling, and explicit final checkpoint restoration
-    - [Direct GPU coagulation source](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_coagulation_direct.py) — a standalone explicit-transfer, Warp CPU-default, low-level particle-resolved Brownian path: two supported direct calls reuse caller-owned collision and persistent RNG sidecars before an explicit CPU checkpoint restore. When Warp is unavailable or disabled, it does no conversion or kernel work and has no CPU fallback.
-    - [GPU-resident session lifecycle source](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_resident_session.py) — a lazy, concrete-only lifecycle and in-memory checkpoint walkthrough. It demonstrates resident ownership, explicit same-device restart, and terminal finalization without scheduling, transport, fallback, or physics orchestration. Run `python docs/Examples/gpu_resident_session.py`; set `PARTICULA_EXAMPLE_FORCE_NO_WARP=1` to verify its no-Warp path.
-    - [GPU-resident multi-timestep source](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_resident_multi_timestep.py) — a lazy resident-loop walkthrough with resolver-produced scheduling, two completed source steps, caller-owned diagnostics, manual same-device restart, and cached source finalization. Run `python docs/Examples/gpu_resident_multi_timestep.py`; set `PARTICULA_EXAMPLE_FORCE_NO_WARP=1` to verify its no-Warp path.
-    - [GPU-resident graph-capture source](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_resident_graph_capture.py)
-      — a lazy native-CUDA-only walkthrough that explicitly captures, replays
-      twice, invalidates, retires, and renews one fixed resident binding. Run
-      `python docs/Examples/gpu_resident_graph_capture.py`; set
-      `PARTICULA_EXAMPLE_FORCE_NO_NATIVE_CAPTURE=1` to verify that no CPU or
-      Warp-CPU fallback runs.
-    - [GPU coagulation strategy guide](../Features/coagulation_strategy_system.md) — supported direct-kernel mechanisms, validation boundaries, and release evidence.
-    - [Canonical low-level direct-condensation contract](../Features/data-containers-and-gpu-foundations.md)
-      — supported low-level scope and boundaries
-    - [GPU condensation parity walkthrough](https://github.com/uncscode/particula/blob/main/docs/Examples/gpu_condensation_parity_walkthrough.py)
-      — explicit-transfer, fixed-four-substep low-level direct-kernel evidence
-        with separately reported physics, conservation, and energy results
-    - [condensation parity walkthrough ownership record](../Features/Roadmap/condensation-parity-walkthrough.md)
-      — deferred-capability ownership without expanding production support
-
-    Run `python docs/Examples/gpu_condensation_parity_walkthrough.py`, then
-    `pytest examples_tests/gpu_condensation_parity_walkthrough_test.py -q -Werror`.
-     Warp CPU is the installed-Warp baseline; CUDA is optional additive evidence.
-     Its caller-owned, write-only `energy_transfer` output is a diagnostic, not
-     a return value or temperature feedback (`kg * J/kg = J`). This direct-kernel
-     example does not add high-level integration, adaptive execution, graph
-     replay, broad autodiff, or performance claims.
-
-    [:octicons-arrow-right-24: Guide](Data_Containers/index.md)
-
--   __[Particle Phase](Particle_Phase/index.md)__
-
-    ---
-
-    Learn about how to represent the [Particle Phase](Particle_Phase/index.md), including different particle representations; radius bins, speciated mass bins, and particle resolved.
-
-    [:octicons-arrow-right-24: Tutorial](Particle_Phase/index.md)
-
-</div>
+The fundamentals and process indexes above are the tutorial entry points. For
+underlying equations, use [Theory](../Theory/index.md); for support boundaries,
+use the [Guide](../guide/index.md).

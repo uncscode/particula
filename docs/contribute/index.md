@@ -1,10 +1,18 @@
 # Contribute
 
-Welcome — we’re thrilled that you’d like to help make Particula better!
+Start with [contributing](CONTRIBUTING.md) and
+[development setup](../Examples/Setup_Particula/Details/Contributor_Setup.md).
 
-All detailed guides, workflow diagrams, and coding standards can be found
-in the navigation menu on the left.  Use those links whenever you need
-more information about a specific step or requirement.
+| Task | Entry point |
+| --- | --- |
+| Add or review a change | [Feature workflow](Feature_Workflow/index.md) |
+| Follow coding conventions | [Code specifications](Code_Specifications/index.md) |
+| Understand the architecture | [Code concepts](../Theory/Code_Concepts/index.md) |
+| Work on Warp internals | [Warp teaching material](../Theory/nvidia-warp/index.md) |
+| Inspect numerical evidence | [Precision](../Features/Roadmap/mass-precision-study.md), [stiffness](../Features/Roadmap/condensation-stiffness-study.md), [GPU validation](../Features/Roadmap/coagulation-validation.md) |
+| Inspect current development direction | [Roadmap](../Features/Roadmap/index.md) |
+| Set up coding assistants | [Assistant setup](../AI_Assistants/index.md) |
 
-Start with [Contributing](CONTRIBUTING.md) for a high-level overview of the process.
-Then, branch out to the specific sections for more details on each step.
+Follow the [code of conduct](CODE_OF_CONDUCT.md). Implementation plans belong
+with development records; scientific assumptions belong in Theory and supported
+usage belongs in Guide.

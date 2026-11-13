@@ -38,7 +38,10 @@ def test_quick_start_runs():
 
 def test_documentation_quick_start_runs():
     """The published PMF example preserves number and material inventory."""
-    page = Path(__file__).resolve().parents[1] / "docs" / "index.md"
+    page = (
+        Path(__file__).resolve().parents[1]
+        / "docs/guide/getting-started/first-simulation.md"
+    )
     snippets = re.findall(r"```python\n(.*?)\n```", page.read_text(), re.DOTALL)
     assert len(snippets) == 1
     namespace = {}
