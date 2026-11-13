@@ -100,8 +100,6 @@ def plan_nucleation(process, aerosol) -> _ProcessPlan:
 
 def compile_nucleation(plan: _ProcessPlan, owner: Any):
     """Retain all source/exhaustion buffers and explicit status observation."""
-    from functools import partial
-
     from particula.dynamics.nucleation.species_mapping import (
         NucleationSpeciesMap,
     )
@@ -112,8 +110,8 @@ def compile_nucleation(plan: _ProcessPlan, owner: Any):
         NucleationConfig,
         NucleationExhaustionControls,
         _enqueue_prepared_nucleation_call,
-        _observe_prepared_nucleation_call,
         _prepare_nucleation_step_gpu,
+        _raise_nucleation_status,
     )
     from particula.gpu.nucleation_species_mapping import (
         prepare_nucleation_species_map,
@@ -152,9 +150,16 @@ def compile_nucleation(plan: _ProcessPlan, owner: Any):
             prepared,
             resampling=replace(prepared.resampling, bounds=values["bounds"]),
         )
-    owner._observers.append(
-        partial(_observe_prepared_nucleation_call, prepared)
-    )
+    from particula.execution.prepared_guards import latch_nucleation_failure
+
+    prepared = replace(prepared, upstream_failure=owner._device_failure)
+    owner._bindings[plan.family] = prepared
+    saved_status = wp.zeros(25, dtype=wp.int32, device=owner.device.native)
+
+    def observe():
+        _raise_nucleation_status(saved_status.numpy())
+
+    owner._observers.append(observe)
     counts = session.particles.concentration
     budget = resources.exhaustion.resampling_releasable_counts
 
@@ -166,5 +171,27 @@ def compile_nucleation(plan: _ProcessPlan, owner: Any):
             device=owner.device.native,
         )
         _enqueue_prepared_nucleation_call(prepared)
+        wp.launch(
+            latch_nucleation_failure,
+            dim=1,
+            inputs=[
+                prepared.pipeline_invalid,
+                prepared.p1_status,
+                prepared.p2_status,
+                prepared.p3_status,
+                prepared.molecule_status,
+                prepared.p4_status,
+                prepared.resampling.invalid if prepared.resampling else None,
+                prepared.resampling.planning_failed
+                if prepared.resampling
+                else None,
+                prepared.scaling.status if prepared.scaling else None,
+                prepared.p4_final_status,
+                prepared.p5_status,
+                saved_status,
+                owner._device_failure,
+            ],
+            device=prepared.device,
+        )
 
     return enqueue

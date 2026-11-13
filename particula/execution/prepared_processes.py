@@ -7,8 +7,7 @@ delegates. User-defined strategies never receive an inferred GPU equivalent.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from functools import partial
+from dataclasses import dataclass, replace
 from typing import Any
 
 import numpy as np
@@ -185,18 +184,20 @@ def _compile_process(plan: _ProcessPlan, owner: Any):
             ResidentDilutionRequest,
         )
 
-        return (
-            ResidentDilutionAdapter()
-            .prepare(
-                ResidentDilutionRequest(
-                    session,
-                    registry,
-                    plan.values["coefficient"],
-                    owner.time_step,
-                )
+        binding = ResidentDilutionAdapter().prepare(
+            ResidentDilutionRequest(
+                session,
+                registry,
+                plan.values["coefficient"],
+                owner.time_step,
             )
-            .execute
         )
+        binding = replace(
+            binding,
+            prepared=replace(binding.prepared, failure=owner._device_failure),
+        )
+        owner._bindings[plan.family] = binding
+        return binding.execute
     if plan.family == "wall_loss":
         from particula.execution.process_adapters import (
             ResidentWallLossAdapter,
@@ -211,19 +212,29 @@ def _compile_process(plan: _ProcessPlan, owner: Any):
                 dtype=owner._wp.float64,
                 device=owner.device.native,
             )
-        return (
-            ResidentWallLossAdapter()
-            .prepare(
-                ResidentWallLossRequest(
-                    session,
-                    registry,
-                    registry.acquire_wall_loss(),
-                    NeutralWallLossConfig(**values),
-                    owner.time_step,
-                )
+        binding = ResidentWallLossAdapter().prepare(
+            ResidentWallLossRequest(
+                session,
+                registry,
+                registry.acquire_wall_loss(),
+                NeutralWallLossConfig(**values),
+                owner.time_step,
             )
-            .execute
         )
+        from particula.gpu.kernels import wall_loss as kernels
+
+        prepared = binding.prepared
+        if prepared.launch_kernel is not None:
+            prepared = replace(
+                prepared,
+                launch_kernel=getattr(
+                    kernels, prepared.launch_kernel.key + "_guarded"
+                ),
+                launch_inputs=(*prepared.launch_inputs, owner._device_failure),
+            )
+        binding = replace(binding, prepared=prepared)
+        owner._bindings[plan.family] = binding
+        return binding.execute
     if plan.family == "coagulation":
         from particula.gpu.kernels.coagulation import (
             _enqueue_prepared_coagulation_call,
@@ -242,5 +253,21 @@ def _compile_process(plan: _ProcessPlan, owner: Any):
             initialize_rng=False,
             environment=session.environment,
         )
-        return partial(_enqueue_prepared_coagulation_call, prepared)
+        from particula.execution.prepared_guards import equal_active_counts
+
+        prepared = replace(prepared, failure=owner._device_failure)
+        owner._bindings[plan.family] = prepared
+        counts, failure = session.particles.concentration, owner._device_failure
+        wp = owner._wp
+
+        def enqueue():
+            wp.launch(
+                equal_active_counts,
+                dim=counts.shape[0],
+                inputs=[counts, failure],
+                device=prepared.device,
+            )
+            _enqueue_prepared_coagulation_call(prepared)
+
+        return enqueue
     raise ValueError(f"unsupported prepared process family: {plan.family}")

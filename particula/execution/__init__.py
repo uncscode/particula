@@ -71,6 +71,8 @@ __all__ = [
     "FallbackBoundary",
     "CPUStateAuthority",
     "CPUExecutionContext",
+    "PreparedSimulation",
+    "SimulationDiagnostics",
 ]
 
 if TYPE_CHECKING:
@@ -1283,3 +1285,16 @@ from particula.execution.values import (  # noqa: E402
     FallbackBoundary,
     FallbackPolicy,
 )
+
+
+def __getattr__(name: str):
+    """Load prepared ownership/result types without importing Warp eagerly."""
+    if name == "PreparedSimulation":
+        from particula.execution.prepared import PreparedSimulation
+
+        return PreparedSimulation
+    if name == "SimulationDiagnostics":
+        from particula.execution.prepared_types import SimulationDiagnostics
+
+        return SimulationDiagnostics
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

@@ -8,6 +8,7 @@ represented by those controls; do not discard unsupported strategy choices.
 from __future__ import annotations
 
 from collections.abc import Sequence
+from dataclasses import replace
 from typing import Any
 
 import numpy as np
@@ -310,7 +311,7 @@ def compile_condensation(plan: _ProcessPlan, owner: Any):
         array(config["references"]),
     )
     resources = owner._registry.acquire_condensation()
-    binding = prepare_condensation_species_map(
+    species_binding = prepare_condensation_species_map(
         session.particles,
         session.gas,
         gas_names=session.metadata.gas_names,
@@ -336,16 +337,27 @@ def compile_condensation(plan: _ProcessPlan, owner: Any):
         thermodynamics,
         activity_surface=activity,
         scratch_buffers=resources.scratch_buffers,
-        species_binding=binding,
+        species_binding=species_binding,
         surface_tension=array(config["tensions"]),
         mass_accommodation=array(config["accommodation"]),
         diffusion_coefficient_vapor=array(config["diffusion"]),
+        energy_transfer=wp.zeros(
+            session.gas.concentration.shape,
+            dtype=wp.float64,
+            device=owner.device.native,
+        )
+        if config["latent"] is not None
+        else None,
         latent_heat=array(config["latent"])
         if config["latent"] is not None
         else None,
     )
-    return (
-        WarpCondensationExecutionAdapter()
-        .prepare(WarpCondensationExecutionState(state, owner.time_step))
-        .execute
+    binding = WarpCondensationExecutionAdapter().prepare(
+        WarpCondensationExecutionState(state, owner.time_step)
     )
+    binding = replace(
+        binding,
+        prepared=replace(binding.prepared, failure=owner._device_failure),
+    )
+    owner._bindings[plan.family] = binding
+    return binding.execute

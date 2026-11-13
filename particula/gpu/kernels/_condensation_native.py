@@ -5,7 +5,7 @@ Gas reductions use kg/m^3 in complete gas order. Explicit device maps contain
 -1 for unmapped/skipped lanes; no species identity is inferred from widths.
 """
 
-from typing import Any
+from typing import Any, no_type_check
 
 import warp as wp
 
@@ -247,12 +247,16 @@ def energy_transfer(
     energy[box, g] = delta * latent_heat[g]
 
 
-@wp.kernel
-def retire_evaporated_slots(
-    masses: Any, concentration: Any, charge: Any
+@no_type_check
+@wp.func
+def retire_evaporated_slots_body(
+    masses: Any,
+    concentration: Any,
+    charge: Any,
+    box: wp.int32,
+    slot: wp.int32,
 ) -> None:
     """Clear fully evaporated resolved slots after gas/energy accounting."""
-    box, slot = wp.tid()  # type: ignore[misc]
     empty = bool(True)
     for species in range(masses.shape[2]):
         if masses[box, slot, species] != wp.float64(0.0):
@@ -260,3 +264,28 @@ def retire_evaporated_slots(
     if empty and concentration[box, slot] > wp.float64(0.0):
         concentration[box, slot] = wp.float64(0.0)
         charge[box, slot] = wp.float64(0.0)
+
+
+@no_type_check
+@wp.kernel
+def retire_evaporated_slots(
+    masses: Any, concentration: Any, charge: Any
+) -> None:
+    """Run the shared device operation through the direct kernel API."""
+    box, slot = wp.tid()
+    retire_evaporated_slots_body(masses, concentration, charge, box, slot)
+
+
+@no_type_check
+@wp.kernel
+def retire_evaporated_slots_guarded(
+    masses: Any,
+    concentration: Any,
+    charge: Any,
+    failure: wp.array(dtype=wp.int32),
+) -> None:
+    """Skip this resident writer after a latched simulation failure."""
+    if failure[0] != 0:
+        return
+    box, slot = wp.tid()
+    retire_evaporated_slots_body(masses, concentration, charge, box, slot)

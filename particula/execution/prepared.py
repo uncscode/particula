@@ -14,6 +14,7 @@ from typing import Any, Callable
 
 from particula.aerosol import Aerosol
 from particula.execution import Backend, Device
+from particula.execution.prepared_types import SimulationDiagnostics
 
 
 class PreparedSimulation:
@@ -38,6 +39,10 @@ class PreparedSimulation:
     _registry: Any
     _guard: Any
     _stream: Any
+    _diagnostics: Callable[[], Any] | None
+    _refresh: Callable[[], None] | None
+    _device_failure: Any
+    _bindings: dict[str, Any]
     _observers: list[Callable[[], Any]]
     _plans: tuple[Any, ...]
 
@@ -87,6 +92,10 @@ class PreparedSimulation:
         result._session = None
         result._registry = None
         result._guard = None
+        result._diagnostics = None
+        result._refresh = None
+        result._device_failure = None
+        result._bindings = {}
         result._observers = []
         result._plans = ()
         result._stream = wp.Stream(target) if target.is_cuda else None
@@ -99,6 +108,9 @@ class PreparedSimulation:
                     result._device,
                     root_seed=root_seed,
                     logical_box_ids=logical_box_ids,
+                )
+                result._device_failure = wp.zeros(
+                    1, dtype=wp.int32, device=target
                 )
                 result._registry = GPUResourceRegistry(result._session)
                 result._guard = ResidentStepGuard(
@@ -213,8 +225,18 @@ class PreparedSimulation:
             try:
                 self._wait()
                 with self._scope():
+                    failure = int(self._device_failure.numpy()[0])
+                    if failure == 2:
+                        raise ValueError(
+                            "Brownian GPU coagulation requires "
+                            "equal active counts"
+                        )
                     for observe in self._observers:
                         observe()
+                    if failure:
+                        raise ValueError(
+                            "prepared nucleation failed; dependent work stopped"
+                        )
             except BaseException:
                 self._fault()
                 raise
@@ -250,6 +272,93 @@ class PreparedSimulation:
                     ).copy(),
                 )
 
+    def diagnostics(self) -> SimulationDiagnostics:
+        """Observe detached box/species reductions without downloading slots.
+
+        Returns:
+            SimulationDiagnostics with number, charge and mass concentrations,
+            active-slot counts, forcing, and optional last-step latent energy.
+        """
+        with self._lock:
+            self.synchronize()
+            if self._diagnostics is None:
+                raise RuntimeError("diagnostics are not prepared")
+            try:
+                with self._scope():
+                    return self._diagnostics()
+            except BaseException:
+                self._fault()
+                raise
+
+    @property
+    def gas_names(self) -> tuple[str, ...]:
+        """Return the fixed full-gas order for updates and analysis."""
+        with self._lock:
+            self._require_active()
+            return self._session.metadata.gas_names
+
+    def update_environment(
+        self, *, temperature=None, pressure=None, saturation_ratio=None
+    ) -> None:
+        """Replace specified environment fields between run segments.
+
+        Temperature [K] and pressure [Pa] accept scalars or per-box vectors.
+        Saturation accepts a scalar, full-gas vector or box-by-gas matrix; it
+        is externally prescribed when no condensation model is present. With
+        condensation, saturation is derived and cannot be prescribed here.
+        This explicit forcing boundary waits for prior work and its uploads.
+        Invalid values reject before any resident field is changed.
+        """
+        from particula.execution.prepared_updates import (
+            apply_forcing,
+            forcing_array,
+        )
+
+        with self._lock:
+            self._require_active()
+            if saturation_ratio is not None and self._refresh is not None:
+                raise ValueError("condensation owns derived saturation_ratio")
+            if all(
+                value is None
+                for value in (temperature, pressure, saturation_ratio)
+            ):
+                raise ValueError("supply at least one environment field")
+            environment = self._session.environment
+            updates = []
+            for name, value, positive in (
+                ("temperature", temperature, True),
+                ("pressure", pressure, True),
+                ("saturation_ratio", saturation_ratio, False),
+            ):
+                if value is not None:
+                    target = getattr(environment, name)
+                    values = forcing_array(
+                        value, target.shape, name, positive=positive
+                    )
+                    updates.append((target, values))
+            apply_forcing(self, tuple(updates))
+
+    def update_gas(self, concentration) -> None:
+        """Replace full-gas concentration [kg/m³] between run segments.
+
+        Accept a full-gas vector or box-by-gas matrix in ``gas_names`` order.
+        This explicit boundary waits for pending work, uploads owned values,
+        and refreshes derived saturation when condensation supplies its law.
+        It leaves particle state and process configuration unchanged.
+        """
+        from particula.execution.prepared_updates import (
+            apply_forcing,
+            forcing_array,
+        )
+
+        with self._lock:
+            self._require_active()
+            target = self._session.gas.concentration
+            values = forcing_array(
+                concentration, target.shape, "concentration", positive=False
+            )
+            apply_forcing(self, ((target, values),))
+
     def close(self) -> None:
         """Wait and release owned storage without downloading a final state."""
         with self._lock:
@@ -268,6 +377,10 @@ class PreparedSimulation:
                     self._operations = None
                     self._plans = ()
                     self._observers = []
+                    self._diagnostics = None
+                    self._refresh = None
+                    self._device_failure = None
+                    self._bindings = {}
                     self._guard = self._registry = self._session = None
                     self._stream = None
 
@@ -327,6 +440,16 @@ def prepare_simulation(
             owner._operations = tuple(
                 _compile_process(plan, owner) for plan in plans
             )
+            from particula.execution.prepared_updates import compose_operations
+
+            owner._operations = compose_operations(
+                owner, plans, owner._operations
+            )
+            from particula.execution.prepared_diagnostics import (
+                setup_diagnostics,
+            )
+
+            owner._diagnostics = setup_diagnostics(owner)
             owner._plans = plans
     except BaseException:
         owner.close()

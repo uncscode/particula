@@ -28,7 +28,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from numbers import Real
-from typing import Any, cast
+from typing import Any, cast, no_type_check
 
 import numpy as np
 
@@ -61,11 +61,14 @@ def _dilution_factors(
     factors[box] = wp.exp(-coefficient[box] * time_step)
 
 
-@wp.kernel
-def _apply_particle_dilution(
+@no_type_check
+@wp.func
+def _apply_particle_dilution_body(
     concentration: wp.array2d(dtype=wp.float64),
     coefficient: wp.array(dtype=wp.float64),
     factors: wp.array(dtype=wp.float64),
+    box: wp.int32,
+    particle: wp.int32,
 ) -> None:
     """Apply precomputed factors to particle concentration in place.
 
@@ -74,18 +77,51 @@ def _apply_particle_dilution(
         coefficient: Per-box coefficients used to skip zero-coefficient boxes.
         factors: Precomputed per-box exponential dilution factors.
     """
-    box, particle = wp.tid()
     if coefficient[box] != 0.0:
         concentration[box, particle] = (
             concentration[box, particle] * factors[box]
         )
 
 
+@no_type_check
 @wp.kernel
-def _apply_gas_dilution(
+def _apply_particle_dilution(
     concentration: wp.array2d(dtype=wp.float64),
     coefficient: wp.array(dtype=wp.float64),
     factors: wp.array(dtype=wp.float64),
+) -> None:
+    """Run the shared device operation through the direct kernel API."""
+    box, particle = wp.tid()
+    _apply_particle_dilution_body(
+        concentration, coefficient, factors, box, particle
+    )
+
+
+@no_type_check
+@wp.kernel
+def _apply_particle_dilution_guarded(
+    concentration: wp.array2d(dtype=wp.float64),
+    coefficient: wp.array(dtype=wp.float64),
+    factors: wp.array(dtype=wp.float64),
+    failure: wp.array(dtype=wp.int32),
+) -> None:
+    """Skip this resident writer after a latched simulation failure."""
+    if failure[0] != 0:
+        return
+    box, particle = wp.tid()
+    _apply_particle_dilution_body(
+        concentration, coefficient, factors, box, particle
+    )
+
+
+@no_type_check
+@wp.func
+def _apply_gas_dilution_body(
+    concentration: wp.array2d(dtype=wp.float64),
+    coefficient: wp.array(dtype=wp.float64),
+    factors: wp.array(dtype=wp.float64),
+    box: wp.int32,
+    species: wp.int32,
 ) -> None:
     """Apply precomputed factors to gas concentration in place.
 
@@ -94,9 +130,35 @@ def _apply_gas_dilution(
         coefficient: Per-box coefficients used to skip zero-coefficient boxes.
         factors: Precomputed per-box exponential dilution factors.
     """
-    box, species = wp.tid()
     if coefficient[box] != 0.0:
         concentration[box, species] = concentration[box, species] * factors[box]
+
+
+@no_type_check
+@wp.kernel
+def _apply_gas_dilution(
+    concentration: wp.array2d(dtype=wp.float64),
+    coefficient: wp.array(dtype=wp.float64),
+    factors: wp.array(dtype=wp.float64),
+) -> None:
+    """Run the shared device operation through the direct kernel API."""
+    box, species = wp.tid()
+    _apply_gas_dilution_body(concentration, coefficient, factors, box, species)
+
+
+@no_type_check
+@wp.kernel
+def _apply_gas_dilution_guarded(
+    concentration: wp.array2d(dtype=wp.float64),
+    coefficient: wp.array(dtype=wp.float64),
+    factors: wp.array(dtype=wp.float64),
+    failure: wp.array(dtype=wp.int32),
+) -> None:
+    """Skip this resident writer after a latched simulation failure."""
+    if failure[0] != 0:
+        return
+    box, species = wp.tid()
+    _apply_gas_dilution_body(concentration, coefficient, factors, box, species)
 
 
 @wp.kernel
@@ -375,6 +437,7 @@ class _PreparedDilutionCall:
     n_gas_species: int
     device: Any
     no_op: bool
+    failure: Any = None
 
 
 def _prepare_dilution_step_gpu(
@@ -593,24 +656,34 @@ def _enqueue_prepared_dilution_call(
     )
     if prepared.n_particles > 0:
         wp.launch(
-            _apply_particle_dilution,
+            _apply_particle_dilution
+            if prepared.failure is None
+            else _apply_particle_dilution_guarded,
             dim=(prepared.n_boxes, prepared.n_particles),
-            inputs=[
-                prepared.particle_concentration,
-                prepared.coefficient,
-                prepared.factors,
-            ],
+            inputs=(
+                [
+                    prepared.particle_concentration,
+                    prepared.coefficient,
+                    prepared.factors,
+                ]
+            )
+            + ([] if prepared.failure is None else [prepared.failure]),
             device=prepared.device,
         )
     if prepared.n_gas_species > 0:
         wp.launch(
-            _apply_gas_dilution,
+            _apply_gas_dilution
+            if prepared.failure is None
+            else _apply_gas_dilution_guarded,
             dim=(prepared.n_boxes, prepared.n_gas_species),
-            inputs=[
-                prepared.gas_concentration,
-                prepared.coefficient,
-                prepared.factors,
-            ],
+            inputs=(
+                [
+                    prepared.gas_concentration,
+                    prepared.coefficient,
+                    prepared.factors,
+                ]
+            )
+            + ([] if prepared.failure is None else [prepared.failure]),
             device=prepared.device,
         )
     return prepared.particles, prepared.gas

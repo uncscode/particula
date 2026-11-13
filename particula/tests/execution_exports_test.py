@@ -49,6 +49,8 @@ EXPECTED_EXPORTS = (
     "FallbackBoundary",
     "CPUStateAuthority",
     "CPUExecutionContext",
+    "PreparedSimulation",
+    "SimulationDiagnostics",
 )
 
 EXCLUDED_EXPORTS = (

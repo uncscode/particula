@@ -1,8 +1,11 @@
 """Device preparation for live fixed-capacity nucleation admission."""
 
+from typing import no_type_check
+
 import warp as wp
 
 
+@no_type_check
 @wp.kernel
 def _releasable_slots(
     counts: wp.array2d(dtype=wp.float64),

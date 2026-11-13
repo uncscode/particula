@@ -61,3 +61,12 @@ __version__ = "0.3.0"
 logger = setup()
 # log the version of particula upon loading
 logger.info("particula version %s loaded.", __version__)
+
+
+def __getattr__(name: str):
+    """Expose prepared simulation types without loading optional runtimes."""
+    if name in ("PreparedSimulation", "SimulationDiagnostics"):
+        from particula import execution
+
+        return getattr(execution, name)
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

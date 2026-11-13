@@ -39,7 +39,7 @@ not promise rollback. No state readbacks or allocations inside prepared steps.
 - [x] 3. `feat(execution): prepare supported runnable processes`: faithful
   configuration translation, persistent resources, nondefault coefficients,
   explicit capabilities and independent per-process validation.
-- [ ] 4. `feat(execution): compose resident process sequences`: ordered
+- [x] 4. `feat(execution): compose resident process sequences`: ordered
   subsets, thermodynamic freshness, forcing, diagnostics, runtime guards and
   RNG continuity; preserve the existing complete canonical scheduler.
 - [ ] 5. `perf(gpu): parallelize Brownian majorant evaluation`: parallel
@@ -157,3 +157,22 @@ Prepared/condensation/process-adapter tests: **165 passed** on the host, includi
 actual CUDA and separately parameterized Warp CPU. Independent checks cover
 mass/count/charge preservation, active condensation, two-event nucleation,
 capacity resampling, configuration freezing and pre-upload capability rejection.
+
+Phase 4: public runnable/sequence `prepare`, ordered subsets, explicit owned
+forcing uploads, derived saturation refresh, detached reduced diagnostics,
+last-step latent energy, and persistent device failure admission are connected.
+Guarded writers reuse the same device physics as direct APIs. Runtime unequal
+counts stop Brownian selection before RNG consumption. First nucleation error
+status survives later queued steps, including resampling failures. Observation
+faults the session; prior successful work is not rolled back. Forcing is an
+explicit synchronization boundary; ordinary stepping performs no device
+allocation, transfer or status readback. Without a condensation law, saturation
+remains an externally prescribed environment input.
+Direct/prepared process regression set: **827 passed**. Following the final
+status-retention correction, prepared/nucleation regressions: **124 passed**.
+Public export and runnable regressions: **19 passed**, including fresh-process
+checks that public result/owner imports do not import Warp. Targeted Ruff and
+mypy passed. CUDA and Warp CPU are distinct parametrizations. Scientific checks
+cover multibox forcing, raw-count versus discrete-density reductions, latent
+energy, preserved gas order, no-write/no-RNG behavior after failure and stable
+logical-box RNG identities across run segmentation and physical permutation.
