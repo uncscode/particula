@@ -933,6 +933,7 @@ def _cpu_mass_transfer(
     pressure: float,
     time_step: float,
     out: np.ndarray | None = None,
+    native_transport: bool = False,
 ) -> np.ndarray:
     """Compute CPU mass transfer matching GPU kernel physics.
 
@@ -1000,8 +1001,19 @@ def _cpu_mass_transfer(
             )
 
             for species_idx in range(n_species):
+                vapor_knudsen = knudsen_number
+                if native_transport:
+                    vapor_knudsen = (
+                        get_molecule_mean_free_path(
+                            molar_mass=gas.molar_mass[species_idx],
+                            temperature=temperature,
+                            pressure=pressure,
+                            dynamic_viscosity=dynamic_viscosity,
+                        )
+                        / radius
+                    )
                 transition = get_vapor_transition_correction(
-                    knudsen_number=knudsen_number,
+                    knudsen_number=vapor_knudsen,
                     mass_accommodation=mass_accommodation[species_idx],
                 )
                 diffusion_value = diffusion_coefficient_vapor[species_idx]
@@ -1116,6 +1128,7 @@ def _cpu_native_condensation_step(
             pressure,
             time_step / 4.0,
             out=mass_transfer_buffer,
+            native_transport=True,
         )
         proposal = np.where(gas.partitioning, proposal, 0.0)
         candidate = np.maximum(proposal, -particles.masses)

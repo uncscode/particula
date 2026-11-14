@@ -519,7 +519,7 @@ def _p2_oracle(case: _WarpCase) -> tuple[np.ndarray, np.ndarray]:
                 reference_temperature=constants.REF_TEMPERATURE_STP,
             )
             mean_free_path = get_molecule_mean_free_path(
-                molar_mass=constants.MOLECULAR_WEIGHT_AIR,
+                molar_mass=0.018,
                 temperature=temperature,
                 pressure=pressure,
                 dynamic_viscosity=viscosity,

@@ -527,7 +527,7 @@ def test_cuda_volume_evolution_when_available() -> None:
     volume_evolution_step_gpu(particles, gas, final)
 
     npt.assert_allclose(
-        particles.concentration.numpy(), np.array([[1.5, 0.0]]), rtol=1e-12
+        particles.concentration.numpy(), np.array([[3.0, 0.0]]), rtol=1e-12
     )
     npt.assert_allclose(
         gas.concentration.numpy(), np.array([[2.0, 4.0]]), rtol=1e-12

@@ -442,3 +442,47 @@ def test_interp_surface_tension_helper():
     with pytest.raises(ValueError):
         bad_table = st_2d[:, :, np.newaxis]  # 3-D input
         _ = _interp_surface_tension(285.0, bad_table, t_tab)
+
+
+@pytest.mark.parametrize("kind", ["mass", "volume", "molar"])
+def test_surface_mixing_preserves_independent_particle_composition(kind):
+    """Different particles must not share an averaged mixture surface law."""
+    mass = np.array([[9.0, 1.0, 2.0], [1.0, 3.0, 5.0], [7.0, 2.0, 4.0]])
+    tension = np.array([0.06, 0.08, 0.04])
+    density = np.array([1000.0, 1200.0, 1500.0])
+    molar_mass = np.array([0.018, 0.046, 0.1])
+    kwargs = dict(
+        surface_tension=tension, density=density, phase_index=[0, 0, 1]
+    )
+    if kind == "molar":
+        strategy = SurfaceStrategyMolar(molar_mass=molar_mass, **kwargs)
+        weights = mass / molar_mass
+    elif kind == "volume":
+        strategy = SurfaceStrategyVolume(**kwargs)
+        weights = mass / density
+    else:
+        strategy = SurfaceStrategyMass(**kwargs)
+        weights = mass
+    mixed = (weights[:, :2] * tension[:2]).sum(axis=1) / weights[:, :2].sum(
+        axis=1
+    )
+    expected = np.column_stack((mixed, mixed, np.full(3, tension[2])))
+    actual = strategy.effective_surface_tension(mass)
+    assert actual.shape == mass.shape
+    np.testing.assert_allclose(actual, expected, rtol=1e-15, atol=0)
+    order = [2, 0, 1]
+    np.testing.assert_allclose(
+        strategy.effective_surface_tension(mass[order]),
+        expected[order],
+        rtol=1e-15,
+        atol=0,
+    )
+
+
+def test_square_weight_matrix_keeps_particle_and_species_axes():
+    """An already matching square matrix must not be treated as transposed."""
+    values = np.array([[0.06, 0.08], [0.06, 0.08]])
+    weights = np.array([[9.0, 1.0], [2.0, 8.0]])
+    expected = np.array([[0.062, 0.062], [0.076, 0.076]])
+    actual = _weighted_average_by_phase(values, weights, np.array([0, 0]))
+    np.testing.assert_allclose(actual, expected, rtol=1e-15, atol=0)
