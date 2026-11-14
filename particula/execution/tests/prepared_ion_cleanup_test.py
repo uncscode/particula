@@ -121,6 +121,8 @@ def test_cleanup_rejects_evolving_fractional_counts():
             exported_mass,
             exported_particles,
             failure,
+            wp.int64(1),
+            wp.zeros(1, dtype=wp.int64, device="cpu"),
         ],
         device="cpu",
     )
@@ -129,3 +131,80 @@ def test_cleanup_rejects_evolving_fractional_counts():
     np.testing.assert_array_equal(counts_gpu.numpy(), counts)
     assert not exported_mass.numpy().any()
     assert not exported_particles.numpy().any()
+
+
+@pytest.mark.parametrize(
+    "device", ["cpu", pytest.param("cuda:0", marks=pytest.mark.cuda)]
+)
+def test_periodic_cleanup_preserves_phase_across_capture_restart(device):
+    """Products remain until the third call, including after a midperiod restart."""
+    if device != "cpu" and not wp.is_cuda_available():
+        pytest.skip("CUDA unavailable")
+    initial = cleanup_case()
+    process = IonNeutralCleanup(0, 1, interval_steps=3)
+    with process.prepare(initial, device=device, time_step=0.5) as simulation:
+        simulation.step()
+        checkpoint = simulation.checkpoint()
+        if device != "cpu":
+            simulation.capture()
+        simulation.step()
+        np.testing.assert_array_equal(
+            simulation.snapshot().particles.masses, initial.particles.masses
+        )
+        np.testing.assert_array_equal(
+            simulation.ion_cleanup_diagnostics()["exported_particles"], [0]
+        )
+        simulation.step()
+        result = simulation.snapshot()
+        ledger = simulation.ion_cleanup_diagnostics()
+        np.testing.assert_array_equal(ledger["exported_particles"], [1])
+        assert not result.particles.masses[:, 0].any()
+        simulation.run(3)
+        np.testing.assert_array_equal(
+            simulation.ion_cleanup_diagnostics()["exported_mass"],
+            ledger["exported_mass"],
+        )
+    with process.resume(checkpoint) as simulation:
+        simulation.step()
+        np.testing.assert_array_equal(
+            simulation.snapshot().particles.masses, initial.particles.masses
+        )
+        simulation.step()
+        np.testing.assert_array_equal(
+            simulation.snapshot().particles.masses, result.particles.masses
+        )
+        np.testing.assert_array_equal(
+            simulation.ion_cleanup_diagnostics()["exported_mass"],
+            ledger["exported_mass"],
+        )
+    with pytest.raises(ValueError, match="configuration/order"):
+        IonNeutralCleanup(0, 1, interval_steps=2).resume(checkpoint)
+
+
+@pytest.mark.parametrize("interval", [0, -1, True, 1.5, 2**63])
+def test_cleanup_interval_rejects_invalid_values(interval):
+    """The periodic clock requires a positive exactly representable integer."""
+    with pytest.raises(ValueError, match="interval_steps"):
+        IonNeutralCleanup(0, 1, interval).prepare(
+            cleanup_case(), device="cpu", time_step=1
+        )
+
+
+@pytest.mark.parametrize("phase", [-1, 3])
+def test_cleanup_checkpoint_rejects_out_of_range_phase(phase):
+    """Restart cannot admit a negative or overdue cleanup phase."""
+    from dataclasses import replace
+
+    process = IonNeutralCleanup(0, 1, interval_steps=3)
+    with process.prepare(
+        cleanup_case(), device="cpu", time_step=1
+    ) as simulation:
+        checkpoint = simulation.checkpoint()
+    auxiliary = tuple(
+        replace(item, data=np.array([phase], dtype="<i8").tobytes())
+        if item.role == "ion_cleanup_phase"
+        else item
+        for item in checkpoint.auxiliary
+    )
+    with pytest.raises(ValueError, match="cleanup phase"):
+        process.resume(replace(checkpoint, auxiliary=auxiliary))

@@ -97,6 +97,7 @@ def plan_ion_cleanup(process, aerosol):
         (
             ("positive_species", process.positive_species),
             ("negative_species", process.negative_species),
+            ("interval_steps", process.interval_steps),
         ),
     )
 
@@ -115,6 +116,10 @@ def compile_ion_cleanup(plan, owner):
     particles = wp.zeros(
         dimensions.n_boxes, dtype=wp.int64, device=owner.device.native
     )
+    phase = wp.zeros(
+        dimensions.n_boxes, dtype=wp.int64, device=owner.device.native
+    )
+    owner._auxiliary["ion_cleanup_phase"] = phase
     owner._auxiliary["ion_export_mass"] = mass
     owner._auxiliary["ion_export_particles"] = particles
     p = session.particles
@@ -127,6 +132,8 @@ def compile_ion_cleanup(plan, owner):
         mass,
         particles,
         owner._device_failure,
+        wp.int64(plan.values["interval_steps"]),
+        phase,
     ]
 
     def enqueue():
@@ -142,10 +149,15 @@ def compile_ion_cleanup(plan, owner):
 
 def plan_ion_exclusion(process, aerosol):
     """Freeze the reserved material lanes used to gate vapor proposals."""
-    from dataclasses import replace
+    from particula.execution.prepared_processes import _ProcessPlan
 
-    return replace(
-        plan_ion_cleanup(process, aerosol), family="ion_condensation"
+    process._validate_batch(aerosol)
+    return _ProcessPlan(
+        "ion_condensation",
+        (
+            ("positive_species", process.positive_species),
+            ("negative_species", process.negative_species),
+        ),
     )
 
 
@@ -180,3 +192,14 @@ def validate_ion_plans(plans):
                 plan.values["negative_species"],
             ) != indices:
                 raise ValueError("ion processes require matching material maps")
+
+
+def validate_cleanup_phase(saved, plans):
+    """Reject a restart clock outside the configured cleanup period."""
+    plan = next((p for p in plans if p.family == "ion_cleanup"), None)
+    if plan is None:
+        return
+    item = next(p for p in saved.auxiliary if p.role == "ion_cleanup_phase")
+    values = np.frombuffer(item.data, dtype=item.dtype)
+    if np.any(values < 0) or np.any(values >= plan.values["interval_steps"]):
+        raise ValueError("checkpoint ion cleanup phase is outside its interval")
