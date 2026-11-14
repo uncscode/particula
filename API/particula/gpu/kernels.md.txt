@@ -47,9 +47,11 @@ Lazily resolve a supported public direct-kernel entry point.
 
 **Modules**
 
+- `particula.gpu.kernels._brownian_parallel`
 - `particula.gpu.kernels._coagulation_config`
 - `particula.gpu.kernels._coagulation_native`
 - `particula.gpu.kernels._condensation_native`
+- `particula.gpu.kernels._condensation_parallel`
 - `particula.gpu.kernels._population_validation`
 - `particula.gpu.kernels._wall_loss_native`
 - `particula.gpu.kernels.coagulation`

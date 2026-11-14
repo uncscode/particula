@@ -135,7 +135,7 @@ equations.
 - `ValueError` — If an input violates the device-array contract or the
 configuration is invalid. ``gas.vapor_pressure`` is unchanged.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/thermodynamics.py#L348-L407)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/thermodynamics.py#L383-L442)
 
 ## particula.gpu.kernels.thermodynamics.validate_thermodynamics_config
 

@@ -222,7 +222,7 @@ combined_process = process1 | process2
 final_aerosol = combined_process.execute(aerosol, time_step=1.0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L167-L188)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L246-L267)
 
 ### particula.equilibria.Equilibria._box_worker
 
@@ -236,7 +236,7 @@ Inherited from: `particula.runnable.RunnableABC`
 
 Create isolated hook state for a single box.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L151-L153)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L156-L158)
 
 ### particula.equilibria.Equilibria._execute_box
 
@@ -250,7 +250,7 @@ Inherited from: `particula.runnable.RunnableABC`
 
 Execute the single-box numerical building block.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L163-L165)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L168-L170)
 
 ### particula.equilibria.Equilibria._is_stochastic
 
@@ -264,7 +264,7 @@ Inherited from: `particula.runnable.RunnableABC`
 
 Report whether this process requires independent box streams.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L147-L149)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L152-L154)
 
 ### particula.equilibria.Equilibria._prepare_commit
 
@@ -278,7 +278,7 @@ Inherited from: `particula.runnable.RunnableABC`
 
 Prepare a non-failing diagnostics publisher before numeric writes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L155-L157)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L160-L162)
 
 ### particula.equilibria.Equilibria._rate_box
 
@@ -292,7 +292,7 @@ Inherited from: `particula.runnable.RunnableABC`
 
 Evaluate the single-box numerical building block.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L159-L161)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L164-L166)
 
 ### particula.equilibria.Equilibria._validate_batch
 
@@ -306,7 +306,7 @@ Inherited from: `particula.runnable.RunnableABC`
 
 Validate process-wide controls before staging boxes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L140-L141)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L145-L146)
 
 ### particula.equilibria.Equilibria._writer_fields
 
@@ -320,7 +320,71 @@ Inherited from: `particula.runnable.RunnableABC`
 
 Declare numeric destinations for transactional publication.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L143-L145)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L148-L150)
+
+### particula.equilibria.Equilibria.prepare
+
+*method*
+
+```python
+def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None) -> PreparedSimulation
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Upload native state once and prepare supported resident GPU physics.
+
+**Parameters**
+
+- `aerosol` (`Aerosol`) — Initial native particle, gas and environment state.
+- `time_step` (`float`) — Fixed duration of each complete process cycle [s].
+- `backend` (`Backend | None`) (default: `None`) — Backend.WARP by default; CPU execution uses execute().
+- `device` (`str`) (default: `'cuda:0'`) — Explicit Warp device, default CUDA device zero.
+- `root_seed` (`int`) (default: `0`) — Root seed for persistent independent process/box streams.
+- `logical_box_ids` (default: `None`) — Optional stable identities in physical box order.
+
+**Returns**
+
+- (`PreparedSimulation`) — An owned PreparedSimulation. Use its context manager or close().
+- (`PreparedSimulation`) — snapshot() returns detached CPU state for analysis and plotting.
+
+**Raises**
+
+- `ValueError` — If process physics or state cannot be represented.
+- `RuntimeError` — If the requested runtime/device is unavailable.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L172-L211)
+
+### particula.equilibria.Equilibria.resume
+
+*method*
+
+```python
+def resume(checkpoint: SimulationCheckpoint, *, backend: Backend | None = None, device: str | None = None) -> PreparedSimulation
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Resume exact saved state using the same process configuration.
+
+**Parameters**
+
+- `checkpoint` (`SimulationCheckpoint`) — SimulationCheckpoint from a prepared owner.
+- `backend` (`Backend | None`) (default: `None`) — Backend.WARP by default.
+- `device` (`str | None`) (default: `None`) — Exact checkpoint device by default; migration rejects.
+
+**Returns**
+
+- (`PreparedSimulation`) — A new owner preserving state, RNG words, timestep and counters.
+- (`PreparedSimulation`) — Capture is explicit again; native graph handles are never restored.
+
+**Raises**
+
+- `ValueError` — If configuration, order, schema or device differs, or
+current population cannot be admitted (e.g. unequal Brownian
+counts after a later process injected new particles).
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L213-L244)
 
 ## particula.equilibria.EquilibriaFactory
 

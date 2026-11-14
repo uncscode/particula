@@ -1,15 +1,15 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 3.51387921202695,
-  "package_source_sha256": "f76479ea8648dab66ef40274babb3b93440994c42c03b8130d507eec80969bcc",
+  "elapsed_seconds": 4.006569300952833,
+  "package_source_sha256": "1d2bf0708c00d6e34107e200c143eb76cae07571fd4e691f1ce7cb88cd95a134",
   "input_sha256": {},
   "example": "examples-gpu-direct-gpu-direct-nucleation",
-  "fingerprint": "658c5a3879fbed3ab84bd7beb8d700d78bd4ef0f32106f423bc206bf20859bb7",
+  "fingerprint": "1b20cb6fe64f3043b9d62c76e51d12c55387e4b0f7d8eebece2fd4197d8d23e5",
   "source": "docs/examples/gpu/direct/gpu_direct_nucleation.py",
-  "revision": "d5471b3da6706f30e73578687f865a49106c0be2",
+  "revision": "b4e98034b2150dad71d6e8f53085640a64561e64",
   "package_dirty": true,
-  "executed_at": "2026-11-13T16:04:13.521374+00:00",
+  "executed_at": "2026-11-14T00:42:53.455377+00:00",
   "device": "cuda:0: NVIDIA GeForce RTX 5060",
   "python": "3.12.12",
   "versions": {
@@ -23,13 +23,18 @@
   },
   "outputs": [
     [],
+    [],
     [
       {
-        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\nModule particula.gpu.kernels.nucleation 9f6b4f4 load on device 'cuda:0' took 2.02 ms  (cached)\nModule particula.gpu.kernels._population_validation 65eaa49 load on device 'cuda:0' took 0.36 ms  (cached)\nModule particula.gpu.kernels.slot_management 0375e2c load on device 'cuda:0' took 0.44 ms  (cached)\nModule particula.gpu.kernels.exhaustion ccbadfa load on device 'cuda:0' took 1.25 ms  (cached)\nCUDA example completed successfully\n"
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\nModule particula.gpu.kernels.nucleation 1124f09 load on device 'cuda:0' took 2.53 ms  (cached)\nModule particula.gpu.kernels._population_validation 65eaa49 load on device 'cuda:0' took 0.49 ms  (cached)\nModule particula.gpu.kernels.slot_management 0375e2c load on device 'cuda:0' took 0.57 ms  (cached)\nModule particula.gpu.kernels.exhaustion ccbadfa load on device 'cuda:0' took 1.77 ms  (cached)\nCounts: [1. 2.] Number densities (m^-3): [1. 1.]\nPer-species particle + gas inventory checks passed.\n"
+      },
+      {
+        "image": "figure-3-2.png"
       }
     ]
   ],
   "files": {
-    "source.py": "a19ef315f7903de327745e8a54603620eb8f21c02a96be8ab2fbe80e5eee47ba"
+    "source.py": "aeda08546e51831940b91f24984c2e3181631d14dd476068b6eb659f019677d7",
+    "figure-3-2.png": "fc80581e8eab2d4d0cf76e6b6f1b43b1371e298d6cd16d6b5ade2d095c8e8507"
   }
 }

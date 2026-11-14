@@ -1,3 +1,14 @@
+# %% [markdown]
+# # Direct Brownian coagulation on CUDA
+#
+# Six active particles and two inactive slots make the bookkeeping visible:
+# collisions reduce particle number while preserving represented mass and
+# charge. The same random stream and collision storage survive both calls.
+# Run with `--cuda` to reproduce the published figures. The unflagged command
+# retains the small Warp CPU regression; large stochastic ensembles are shown
+# in the prepared simulation studies.
+
+# %%
 """Run selected-adapter GPU coagulation with explicit CPU-to-Warp transfers.
 
 This standalone example demonstrates the bounded, low-level,
@@ -6,6 +17,7 @@ and reuses caller-owned collision and RNG sidecars for two concrete
 selected-adapter dispatches before explicitly restoring CPU particle data. It
 has no hidden CPU fallback, Runnable API, CUDA requirement, restart/checkpoint
 support, or performance claim.
+
 """
 
 from __future__ import annotations
@@ -245,6 +257,62 @@ def run_example(device: str = "cpu") -> ExampleRun:
     )
 
 
+# %% [markdown]
+# ## Inspect the changed size distribution
+#
+# Histogram weights are represented counts divided by physical box volume.
+# Inactive slots contribute nothing, even if they retain old mass values.
+# A single six-particle realization illustrates merging; it is not an estimate
+# of ensemble variability or a throughput benchmark.
+
+
+# %%
+def run_publication():
+    """Require CUDA and show particle-number change alongside conserved mass."""
+    import matplotlib.pyplot as plt
+    import warp as wp
+
+    if not _warp_enabled() or not wp.is_cuda_available():
+        raise RuntimeError("This publication run requires CUDA")
+    initial = _build_particle_data()
+    result = run_example(device="cuda:0")
+    final = result.particle_data
+    if final is None:
+        raise RuntimeError("CUDA produced no particle snapshot")
+    fig, axes = plt.subplots(1, 2, figsize=(9, 3.6), constrained_layout=True)
+    edges = np.geomspace(1, 30, 16)
+    for data, label in ((initial, "Initial"), (final, "After two calls")):
+        volume = np.sum(data.masses / data.density, axis=2)[0]
+        radius = np.cbrt(3 * volume / (4 * np.pi)) * 1e9
+        histogram, _ = np.histogram(
+            radius, bins=edges, weights=data.concentration[0] / data.volume[0]
+        )
+        axes[0].stairs(histogram, edges, label=label, linewidth=2)
+    axes[0].set(
+        xscale="log",
+        xlabel="Radius (nm)",
+        ylabel="Number density per bin (m$^{-3}$)",
+    )
+    axes[0].legend()
+    initial_mass = np.sum(initial.masses * initial.concentration[..., None])
+    final_mass = np.sum(final.masses * final.concentration[..., None])
+    fraction = [
+        final.concentration.sum() / initial.concentration.sum(),
+        final_mass / initial_mass,
+    ]
+    axes[1].bar(
+        ["Represented number", "Represented mass"],
+        fraction,
+        color=["#be6c39", "#287a90"],
+    )
+    axes[1].axhline(1, color="0.5", linestyle="--")
+    axes[1].set(ylabel="Final / initial", ylim=(0, 1.1))
+    fig.suptitle("Brownian collisions · " + wp.get_device("cuda:0").name)
+    print("\n".join(result.output))
+    plt.show()
+    return result
+
+
 def main() -> None:
     """Run the example and print metadata only after successful execution."""
     for line in run_example().output:
@@ -252,4 +320,9 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+
+    if "--cuda" in sys.argv[1:]:
+        run_publication()
+    else:
+        main()

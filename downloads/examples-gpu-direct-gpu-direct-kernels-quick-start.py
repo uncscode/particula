@@ -1,3 +1,16 @@
+# %% [markdown]
+# # Direct CUDA condensation: upload, calculate, download
+#
+# Build particles and gas on the CPU, upload each once, reuse the same device
+# scratch for two condensation calls, and download the result for plotting.
+# The figures below come from actual CUDA execution. Run this file with
+# `--cuda` to reproduce them; the unflagged entry point retains the small
+# Warp CPU regression demonstration. Neither route silently changes devices.
+#
+# These two particles illustrate ownership and units. For large populations
+# and time-dependent environments, use the prepared simulation tutorials.
+
+# %%
 """Run direct condensation with explicit CPU↔Warp transfers.
 
 This example demonstrates only the supported low-level, gas-coupled
@@ -354,6 +367,49 @@ def run_example(device: str = "cpu") -> ExampleRun:
     )
 
 
+# %% [markdown]
+# ## Inspect particle growth on the CPU
+#
+# Particle masses are kilograms per particle. The transfer accumulator and
+# signed latent energy describe the last call, while the final radii include
+# both calls. Plotting happens only after the explicit device-to-host transfer.
+
+
+# %%
+def run_publication():
+    """Require CUDA, execute the complete example and plot physical outputs."""
+    import matplotlib.pyplot as plt
+    import warp as wp
+
+    if not _warp_enabled() or not wp.is_cuda_available():
+        raise RuntimeError("This publication run requires CUDA")
+    initial = _build_particle_data()
+    result = run_example(device="cuda:0")
+    if result.particle_data is None:
+        raise RuntimeError("CUDA produced no particle snapshot")
+    fig, axes = plt.subplots(1, 2, figsize=(9, 3.6), constrained_layout=True)
+    slots = np.arange(initial.n_particles) + 1
+    for particles, label, marker in (
+        (initial, "Initial", "o"),
+        (result.particle_data, "After 0.2 s", "s"),
+    ):
+        volume = np.sum(particles.masses / particles.density, axis=2)[0]
+        radius_nm = np.cbrt(3 * volume / (4 * np.pi)) * 1e9
+        axes[0].plot(slots, radius_nm, marker=marker, label=label)
+    axes[0].set(xlabel="Particle slot", ylabel="Radius (nm)", xticks=slots)
+    axes[0].legend()
+    transfer = result.total_mass_transfer.numpy()[0, :, 0]
+    axes[1].bar(slots, transfer * 1e21, color="#287a90")
+    axes[1].set(
+        xlabel="Particle slot", ylabel="Last-call mass gain (ag)", xticks=slots
+    )
+    fig.suptitle("Direct condensation · " + wp.get_device("cuda:0").name)
+    print("\n".join(result.output))
+    print("Last-call signed latent energy (J):", result.energy_transfer.numpy())
+    plt.show()
+    return result
+
+
 def main() -> None:
     """Run the example and print its deterministic execution metadata.
 
@@ -365,4 +421,9 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+
+    if "--cuda" in sys.argv[1:]:
+        run_publication()
+    else:
+        main()

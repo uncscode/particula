@@ -254,7 +254,7 @@ launches.
 - `launch_inputs` (`tuple[Any, ...]`) — Frozen kernel arguments, including caller-owned fields.
 - `device` (`Any`) — Frozen Warp device used for the selected launch.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/wall_loss.py#L1170-L1194)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/wall_loss.py#L1313-L1337)
 
 ### particula.gpu.kernels.wall_loss._PreparedWallLossCall.device
 
@@ -264,7 +264,7 @@ launches.
 device: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/wall_loss.py#L1194-L1194)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/wall_loss.py#L1337-L1337)
 
 ### particula.gpu.kernels.wall_loss._PreparedWallLossCall.launch_dim
 
@@ -274,7 +274,7 @@ device: Any
 launch_dim: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/wall_loss.py#L1192-L1192)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/wall_loss.py#L1335-L1335)
 
 ### particula.gpu.kernels.wall_loss._PreparedWallLossCall.launch_inputs
 
@@ -284,7 +284,7 @@ launch_dim: Any
 launch_inputs: tuple[Any, ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/wall_loss.py#L1193-L1193)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/wall_loss.py#L1336-L1336)
 
 ### particula.gpu.kernels.wall_loss._PreparedWallLossCall.launch_kernel
 
@@ -294,7 +294,7 @@ launch_inputs: tuple[Any, ...]
 launch_kernel: Any | None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/wall_loss.py#L1191-L1191)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/wall_loss.py#L1334-L1334)
 
 ### particula.gpu.kernels.wall_loss._PreparedWallLossCall.particles
 
@@ -304,7 +304,7 @@ launch_kernel: Any | None
 particles: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/wall_loss.py#L1190-L1190)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/wall_loss.py#L1333-L1333)
 
 ### particula.gpu.kernels.wall_loss._PreparedWallLossCall.__init__
 
@@ -338,7 +338,19 @@ def _charged_rectangular_wall_loss_remove(masses: wp.array3d(dtype=wp.float64), 
 
 Run charged rectangular wall loss for the direct all-box boundary.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/wall_loss.py#L1077-L1120)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/wall_loss.py#L1171-L1214)
+
+## particula.gpu.kernels.wall_loss._charged_rectangular_wall_loss_remove_guarded
+
+*function*
+
+```python
+def _charged_rectangular_wall_loss_remove_guarded(masses: wp.array3d(dtype=wp.float64), concentration: wp.array2d(dtype=wp.float64), charge: wp.array2d(dtype=wp.float64), density: wp.array(dtype=wp.float64), temperature: wp.array(dtype=wp.float64), pressure: wp.array(dtype=wp.float64), time_step: wp.float64, wall_eddy_diffusivity: wp.float64, chamber_length: wp.float64, chamber_width: wp.float64, chamber_height: wp.float64, wall_potential: wp.float64, wall_electric_field: wp.array(dtype=wp.float64), n_particles: wp.int32, n_species: wp.int32, rng_states: wp.array(dtype=wp.uint32), rng_seed: wp.int32, initialize_rng: wp.int32, failure: wp.array(dtype=wp.int32)) -> None
+```
+
+Skip this resident writer after a latched simulation failure.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/wall_loss.py#L1217-L1263)
 
 ## particula.gpu.kernels.wall_loss._charged_rectangular_wall_loss_remove_impl
 
@@ -362,7 +374,7 @@ def _charged_rectangular_wall_loss_remove_selected(masses: wp.array3d(dtype=wp.f
 
 Run charged rectangular wall loss for selected logical-box lanes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/wall_loss.py#L1123-L1167)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/wall_loss.py#L1266-L1310)
 
 ## particula.gpu.kernels.wall_loss._charged_spherical_wall_loss_remove
 
@@ -374,7 +386,19 @@ def _charged_spherical_wall_loss_remove(masses: wp.array3d(dtype=wp.float64), co
 
 Run charged spherical wall loss for the direct all-box boundary.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/wall_loss.py#L992-L1031)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/wall_loss.py#L1041-L1080)
+
+## particula.gpu.kernels.wall_loss._charged_spherical_wall_loss_remove_guarded
+
+*function*
+
+```python
+def _charged_spherical_wall_loss_remove_guarded(masses: wp.array3d(dtype=wp.float64), concentration: wp.array2d(dtype=wp.float64), charge: wp.array2d(dtype=wp.float64), density: wp.array(dtype=wp.float64), temperature: wp.array(dtype=wp.float64), pressure: wp.array(dtype=wp.float64), time_step: wp.float64, wall_eddy_diffusivity: wp.float64, chamber_radius: wp.float64, wall_potential: wp.float64, wall_electric_field: wp.float64, n_particles: wp.int32, n_species: wp.int32, rng_states: wp.array(dtype=wp.uint32), rng_seed: wp.int32, initialize_rng: wp.int32, failure: wp.array(dtype=wp.int32)) -> None
+```
+
+Skip this resident writer after a latched simulation failure.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/wall_loss.py#L1083-L1125)
 
 ## particula.gpu.kernels.wall_loss._charged_spherical_wall_loss_remove_impl
 
@@ -398,7 +422,7 @@ def _charged_spherical_wall_loss_remove_selected(masses: wp.array3d(dtype=wp.flo
 
 Run charged spherical wall loss for selected logical-box lanes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/wall_loss.py#L1034-L1074)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/wall_loss.py#L1128-L1168)
 
 ## particula.gpu.kernels.wall_loss._enqueue_prepared_wall_loss_call
 
@@ -425,7 +449,7 @@ write-free; rollback is not promised after a writer launches.
 
 - (`Any`) — The pinned particle container.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/wall_loss.py#L1408-L1432)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/wall_loss.py#L1551-L1575)
 
 ## particula.gpu.kernels.wall_loss._get_required_field
 
@@ -496,7 +520,7 @@ type.
 - `ValueError` — If selected lanes, particle, environment, configuration,
 or RNG inputs violate the direct-kernel contract.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/wall_loss.py#L1485-L1641)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/wall_loss.py#L1628-L1784)
 
 ## particula.gpu.kernels.wall_loss._prepare_wall_loss_step_gpu
 
@@ -567,7 +591,7 @@ values, shapes, dtypes, or devices violate the direct contract,
 including an invalid charged field or combining ``environment``
 with direct environment inputs.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/wall_loss.py#L1197-L1405)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/wall_loss.py#L1340-L1548)
 
 ## particula.gpu.kernels.wall_loss._require_finite_real
 
@@ -821,6 +845,18 @@ Run neutral wall loss for the direct all-box boundary.
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/wall_loss.py#L899-L942)
 
+## particula.gpu.kernels.wall_loss._wall_loss_remove_guarded
+
+*function*
+
+```python
+def _wall_loss_remove_guarded(masses: wp.array3d(dtype=wp.float64), concentration: wp.array2d(dtype=wp.float64), charge: wp.array2d(dtype=wp.float64), density: wp.array(dtype=wp.float64), temperature: wp.array(dtype=wp.float64), pressure: wp.array(dtype=wp.float64), time_step: wp.float64, wall_eddy_diffusivity: wp.float64, chamber_radius: wp.float64, chamber_length: wp.float64, chamber_width: wp.float64, chamber_height: wp.float64, geometry_mode: wp.int32, n_particles: wp.int32, n_species: wp.int32, rng_states: wp.array(dtype=wp.uint32), rng_seed: wp.int32, initialize_rng: wp.int32, failure: wp.array(dtype=wp.int32)) -> None
+```
+
+Skip this resident writer after a latched simulation failure.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/wall_loss.py#L945-L991)
+
 ## particula.gpu.kernels.wall_loss._wall_loss_remove_impl
 
 *function*
@@ -843,7 +879,7 @@ def _wall_loss_remove_selected(masses: wp.array3d(dtype=wp.float64), concentrati
 
 Run neutral wall loss once for the selected logical-box lanes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/wall_loss.py#L945-L989)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/wall_loss.py#L994-L1038)
 
 ## particula.gpu.kernels.wall_loss.wall_loss_selected_boxes_step_gpu
 
@@ -882,7 +918,7 @@ type.
 - `ValueError` — If selected lanes, particle, environment, configuration,
 or RNG inputs violate the direct-kernel contract.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/wall_loss.py#L1644-L1826)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/wall_loss.py#L1787-L1969)
 
 ## particula.gpu.kernels.wall_loss.wall_loss_step_gpu
 
@@ -918,4 +954,4 @@ type.
 - `ValueError` — If particle, environment, configuration, or RNG inputs do
 not satisfy the direct-kernel contract.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/wall_loss.py#L1435-L1482)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/wall_loss.py#L1578-L1625)

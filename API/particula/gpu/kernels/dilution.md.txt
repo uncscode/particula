@@ -59,7 +59,7 @@ writer launches.
 - `device` (`Any`) — Active Warp device for the launches.
 - `no_op` (`bool`) — Whether validation completed for a write-free call.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L340-L377)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L402-L440)
 
 ### particula.gpu.kernels.dilution._PreparedDilutionCall.coefficient
 
@@ -69,7 +69,7 @@ writer launches.
 coefficient: Any | None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L368-L368)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L430-L430)
 
 ### particula.gpu.kernels.dilution._PreparedDilutionCall.device
 
@@ -79,7 +79,7 @@ coefficient: Any | None
 device: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L376-L376)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L438-L438)
 
 ### particula.gpu.kernels.dilution._PreparedDilutionCall.factors
 
@@ -89,7 +89,17 @@ device: Any
 factors: Any | None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L372-L372)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L434-L434)
+
+### particula.gpu.kernels.dilution._PreparedDilutionCall.failure
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+failure: Any = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L440-L440)
 
 ### particula.gpu.kernels.dilution._PreparedDilutionCall.gas
 
@@ -99,7 +109,7 @@ factors: Any | None
 gas: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L367-L367)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L429-L429)
 
 ### particula.gpu.kernels.dilution._PreparedDilutionCall.gas_concentration
 
@@ -109,7 +119,7 @@ gas: Any
 gas_concentration: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L371-L371)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L433-L433)
 
 ### particula.gpu.kernels.dilution._PreparedDilutionCall.n_boxes
 
@@ -119,7 +129,7 @@ gas_concentration: Any
 n_boxes: int
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L373-L373)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L435-L435)
 
 ### particula.gpu.kernels.dilution._PreparedDilutionCall.n_gas_species
 
@@ -129,7 +139,7 @@ n_boxes: int
 n_gas_species: int
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L375-L375)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L437-L437)
 
 ### particula.gpu.kernels.dilution._PreparedDilutionCall.n_particles
 
@@ -139,7 +149,7 @@ n_gas_species: int
 n_particles: int
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L374-L374)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L436-L436)
 
 ### particula.gpu.kernels.dilution._PreparedDilutionCall.no_op
 
@@ -149,7 +159,7 @@ n_particles: int
 no_op: bool
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L377-L377)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L439-L439)
 
 ### particula.gpu.kernels.dilution._PreparedDilutionCall.particle_concentration
 
@@ -159,7 +169,7 @@ no_op: bool
 particle_concentration: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L370-L370)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L432-L432)
 
 ### particula.gpu.kernels.dilution._PreparedDilutionCall.particles
 
@@ -169,7 +179,7 @@ particle_concentration: Any
 particles: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L366-L366)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L428-L428)
 
 ### particula.gpu.kernels.dilution._PreparedDilutionCall.time_step
 
@@ -179,14 +189,14 @@ particles: Any
 time_step: float
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L369-L369)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L431-L431)
 
 ### particula.gpu.kernels.dilution._PreparedDilutionCall.__init__
 
 *method*
 
 ```python
-def __init__(particles: Any, gas: Any, coefficient: Any | None, time_step: float, particle_concentration: Any, gas_concentration: Any, factors: Any | None, n_boxes: int, n_particles: int, n_gas_species: int, device: Any, no_op: bool) -> None
+def __init__(particles: Any, gas: Any, coefficient: Any | None, time_step: float, particle_concentration: Any, gas_concentration: Any, factors: Any | None, n_boxes: int, n_particles: int, n_gas_species: int, device: Any, no_op: bool, failure: Any = None) -> None
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L0-L0)
@@ -199,6 +209,18 @@ def __init__(particles: Any, gas: Any, coefficient: Any | None, time_step: float
 def _apply_gas_dilution(concentration: wp.array2d(dtype=wp.float64), coefficient: wp.array(dtype=wp.float64), factors: wp.array(dtype=wp.float64)) -> None
 ```
 
+Run the shared device operation through the direct kernel API.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L137-L146)
+
+## particula.gpu.kernels.dilution._apply_gas_dilution_body
+
+*function*
+
+```python
+def _apply_gas_dilution_body(concentration: wp.array2d(dtype=wp.float64), coefficient: wp.array(dtype=wp.float64), factors: wp.array(dtype=wp.float64), box: wp.int32, species: wp.int32) -> None
+```
+
 Apply precomputed factors to gas concentration in place.
 
 **Parameters**
@@ -207,7 +229,19 @@ Apply precomputed factors to gas concentration in place.
 - `coefficient` (`wp.array(dtype=wp.float64)`) — Per-box coefficients used to skip zero-coefficient boxes.
 - `factors` (`wp.array(dtype=wp.float64)`) — Precomputed per-box exponential dilution factors.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L84-L99)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L117-L134)
+
+## particula.gpu.kernels.dilution._apply_gas_dilution_guarded
+
+*function*
+
+```python
+def _apply_gas_dilution_guarded(concentration: wp.array2d(dtype=wp.float64), coefficient: wp.array(dtype=wp.float64), factors: wp.array(dtype=wp.float64), failure: wp.array(dtype=wp.int32)) -> None
+```
+
+Skip this resident writer after a latched simulation failure.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L149-L161)
 
 ## particula.gpu.kernels.dilution._apply_particle_dilution
 
@@ -215,6 +249,18 @@ Apply precomputed factors to gas concentration in place.
 
 ```python
 def _apply_particle_dilution(concentration: wp.array2d(dtype=wp.float64), coefficient: wp.array(dtype=wp.float64), factors: wp.array(dtype=wp.float64)) -> None
+```
+
+Run the shared device operation through the direct kernel API.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L86-L97)
+
+## particula.gpu.kernels.dilution._apply_particle_dilution_body
+
+*function*
+
+```python
+def _apply_particle_dilution_body(concentration: wp.array2d(dtype=wp.float64), coefficient: wp.array(dtype=wp.float64), factors: wp.array(dtype=wp.float64), box: wp.int32, particle: wp.int32) -> None
 ```
 
 Apply precomputed factors to particle concentration in place.
@@ -225,7 +271,19 @@ Apply precomputed factors to particle concentration in place.
 - `coefficient` (`wp.array(dtype=wp.float64)`) — Per-box coefficients used to skip zero-coefficient boxes.
 - `factors` (`wp.array(dtype=wp.float64)`) — Precomputed per-box exponential dilution factors.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L64-L81)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L64-L83)
+
+## particula.gpu.kernels.dilution._apply_particle_dilution_guarded
+
+*function*
+
+```python
+def _apply_particle_dilution_guarded(concentration: wp.array2d(dtype=wp.float64), coefficient: wp.array(dtype=wp.float64), factors: wp.array(dtype=wp.float64), failure: wp.array(dtype=wp.int32)) -> None
+```
+
+Skip this resident writer after a latched simulation failure.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L100-L114)
 
 ## particula.gpu.kernels.dilution._coerce_nonnegative_real
 
@@ -251,7 +309,7 @@ Return one supported finite, nonnegative real scalar.
 - `TypeError` — If ``value`` is not a supported real scalar form.
 - `ValueError` — If ``value`` is non-finite or negative.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L124-L152)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L186-L214)
 
 ## particula.gpu.kernels.dilution._dilution_factors
 
@@ -294,7 +352,7 @@ writer launches.
 
 - (`tuple[Any, Any]`) — The pinned particle and gas containers, unchanged in identity.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L569-L616)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L632-L689)
 
 ## particula.gpu.kernels.dilution._get_required_field
 
@@ -306,7 +364,7 @@ def _get_required_field(container: Any, field: str, name: str) -> Any
 
 Return a required container field with a stable schema failure.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L221-L226)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L283-L288)
 
 ## particula.gpu.kernels.dilution._normalize_coefficient
 
@@ -336,7 +394,7 @@ private ``wp.float64`` storage of shape ``(n_boxes,)`` without caching.
 > This helper assumes the public entry point has completed all input
 > validation. It performs allocation only for valid scalar inputs.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L171-L202)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L233-L264)
 
 ## particula.gpu.kernels.dilution._normalize_time_step
 
@@ -361,7 +419,7 @@ Validate and return a finite, nonnegative time step in seconds.
 - `TypeError` — If ``time_step`` is not a supported real scalar.
 - `ValueError` — If ``time_step`` is non-finite or negative.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L205-L218)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L267-L280)
 
 ## particula.gpu.kernels.dilution._prepare_dilution_step_gpu
 
@@ -422,7 +480,7 @@ promised.
 real scalar.
 - `ValueError` — If a schema, shape, device, or physical domain is invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L380-L566)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L443-L629)
 
 ## particula.gpu.kernels.dilution._scan_nonnegative_finite_1d
 
@@ -434,7 +492,7 @@ def _scan_nonnegative_finite_1d(values: wp.array(dtype=wp.float64), invalid: wp.
 
 Record whether a one-dimensional array has an invalid value.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L102-L110)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L164-L172)
 
 ## particula.gpu.kernels.dilution._scan_nonnegative_finite_2d
 
@@ -446,7 +504,7 @@ def _scan_nonnegative_finite_2d(values: wp.array2d(dtype=wp.float64), invalid: w
 
 Record whether a two-dimensional array has an invalid value.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L113-L121)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L175-L183)
 
 ## particula.gpu.kernels.dilution._validate_concentration_schema
 
@@ -458,7 +516,7 @@ def _validate_concentration_schema(values: Any, name: str, n_boxes: int, device:
 
 Validate concentration schema and physical values read-only.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L278-L298)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L340-L360)
 
 ## particula.gpu.kernels.dilution._validate_mass_schema
 
@@ -470,7 +528,7 @@ def _validate_mass_schema(particles: Any) -> tuple[Any, int, int, int, Any]
 
 Validate masses before deriving authoritative dimensions and device.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L229-L239)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L291-L301)
 
 ## particula.gpu.kernels.dilution._validate_no_overlap
 
@@ -482,7 +540,7 @@ def _validate_no_overlap(read_side_arrays: tuple[Any, ...], mutable_arrays: tupl
 
 Reject caller storage that aliases a concentration update target.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L322-L337)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L384-L399)
 
 ## particula.gpu.kernels.dilution._validate_nonnegative_finite_values
 
@@ -497,7 +555,7 @@ Reject non-finite or negative values with a device-resident scan.
 The single integer result is the only validation state copied to the host;
 caller-owned arrays are never materialized on the host during preflight.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L242-L261)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L304-L323)
 
 ## particula.gpu.kernels.dilution._validate_per_box_coefficient
 
@@ -509,7 +567,7 @@ def _validate_per_box_coefficient(coefficient: Any, n_boxes: int, device: Any) -
 
 Validate exact same-device coefficient schema and physical values.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L264-L275)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L326-L337)
 
 ## particula.gpu.kernels.dilution._validate_warp_coefficient_form
 
@@ -526,7 +584,7 @@ Shape and device compatibility require particle metadata and are checked by
 checked first so malformed coefficient inputs fail before time or container
 access.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L155-L168)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L217-L230)
 
 ## particula.gpu.kernels.dilution._warp_array_memory_range
 
@@ -538,7 +596,7 @@ def _warp_array_memory_range(array: Any) -> tuple[int, int]
 
 Return a contiguous Warp array's byte range for ownership checks.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L301-L319)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L363-L381)
 
 ## particula.gpu.kernels.dilution.dilution_step_gpu
 
@@ -569,4 +627,4 @@ isolates validation and allocation from device enqueue.
 - `TypeError` — If a scalar input has an unsupported type.
 - `ValueError` — If schemas, devices, values, or storage overlap are invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L619-L647)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/dilution.py#L692-L720)

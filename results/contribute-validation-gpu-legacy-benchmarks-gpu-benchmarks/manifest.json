@@ -1,17 +1,17 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 1.4957555829896592,
-  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "elapsed_seconds": 1.5243487870320678,
+  "package_source_sha256": "3dac41bba262547612a4d2db087d86999d8856d8f95ca109acd1a7c44940026d",
   "input_sha256": {
     "docs/data/gpu_benchmark_results.json": "8352b7bae01663a01d9cf451a5ed48be2095750b9807105d94392c675f5df44e"
   },
   "example": "contribute-validation-gpu-legacy-benchmarks-gpu-benchmarks",
   "fingerprint": "9b83752aa1b15d8f5589ea2d331ef303fb66a706e99ab501a895c624a3c8dd0d",
   "source": "docs/contribute/validation/gpu/legacy-benchmarks/gpu_benchmarks.py",
-  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
-  "package_dirty": false,
-  "executed_at": "2026-11-13T15:13:46.366244+00:00",
+  "revision": "b4e98034b2150dad71d6e8f53085640a64561e64",
+  "package_dirty": true,
+  "executed_at": "2026-11-14T00:30:39.407669+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {

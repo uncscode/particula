@@ -42,7 +42,7 @@ def energy_transfer(total: Any, latent_heat: Any, energy: Any, gas_to_particle: 
 
 Write signed extensive energy in J in full gas order.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_native.py#L227-L247)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_native.py#L245-L265)
 
 ## particula.gpu.kernels._condensation_native.finalize_transfer
 
@@ -54,7 +54,7 @@ def finalize_transfer(masses: Any, candidate: Any, scale: Any, finalized: Any, p
 
 Retain the representable particle change after mapped limiting.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_native.py#L150-L169)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_native.py#L158-L177)
 
 ## particula.gpu.kernels._condensation_native.gate_transfer
 
@@ -78,7 +78,7 @@ def reduce_candidates(candidate: Any, concentration: Any, demand: Any, release: 
 
 Reduce bounded particle proposals into full-gas density inventory.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_native.py#L117-L147)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_native.py#L117-L155)
 
 ## particula.gpu.kernels._condensation_native.reduce_finalized
 
@@ -96,7 +96,7 @@ gaining masses by at least one representable value (Warp has no nextafter).
 If four corrections cannot fit the budget, suppress uptake for that species.
 Nonfinite reductions suppress all transfers for that species.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_native.py#L172-L224)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_native.py#L180-L242)
 
 ## particula.gpu.kernels._condensation_native.retire_evaporated_slots
 
@@ -106,9 +106,33 @@ Nonfinite reductions suppress all transfers for that species.
 def retire_evaporated_slots(masses: Any, concentration: Any, charge: Any) -> None
 ```
 
+Run the shared device operation through the direct kernel API.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_native.py#L287-L294)
+
+## particula.gpu.kernels._condensation_native.retire_evaporated_slots_body
+
+*function*
+
+```python
+def retire_evaporated_slots_body(masses: Any, concentration: Any, charge: Any, box: wp.int32, slot: wp.int32) -> None
+```
+
 Clear fully evaporated resolved slots after gas/energy accounting.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_native.py#L250-L262)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_native.py#L268-L284)
+
+## particula.gpu.kernels._condensation_native.retire_evaporated_slots_guarded
+
+*function*
+
+```python
+def retire_evaporated_slots_guarded(masses: Any, concentration: Any, charge: Any, failure: wp.array(dtype=wp.int32)) -> None
+```
+
+Skip this resident writer after a latched simulation failure.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_native.py#L297-L309)
 
 ## particula.gpu.kernels._condensation_native.validate_primary_state
 

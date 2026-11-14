@@ -1,3 +1,12 @@
+# %% [markdown]
+# # Direct CUDA nucleation with explicit species mapping
+#
+# Map precursor gas to particle material and inject unit-count neutral
+# particles into free slots. Counts and gas density use different units.
+# Run this script with `--cuda` to reproduce the published figures.
+# The unflagged command retains its portable Warp CPU regression.
+
+# %%
 """Run the bounded direct-Warp nucleation step with explicit transfers.
 
 The package-exported ``nucleation_step_gpu`` is used for execution, while
@@ -225,6 +234,52 @@ def run_example(
     return restored_particles, restored_gas, restored_environment
 
 
+# %% [markdown]
+# ## Separate represented counts from number density
+#
+# Doubling represented volume doubles the number of unit events at the same
+# formation rate per cubic metre. Each injected particle consumes one precursor
+# molecule. Two free slots suffice for this deliberately small demonstration;
+# the prepared lifecycle tutorial uses thousands of boxes and an active pulse.
+
+
+# %%
+def run_publication():
+    """Require CUDA and compare one- and two-cubic-metre source events."""
+    import matplotlib.pyplot as plt
+
+    if not wp.is_cuda_available():
+        raise RuntimeError("This publication run requires CUDA")
+    results = [run_example(volume=v, device="cuda:0") for v in (1.0, 2.0)]
+    count = np.array([p.concentration.sum() for p, _, _ in results])
+    volumes = np.array([1.0, 2.0])
+    npt.assert_array_equal(count, volumes)
+    fig, axes = plt.subplots(1, 2, figsize=(8, 3.5), constrained_layout=True)
+    axes[0].bar(volumes, count, color="#287a90", width=0.6)
+    axes[0].set(
+        xlabel="Represented volume (m³)",
+        ylabel="Injected count",
+        xticks=volumes,
+        yticks=[0, 1, 2],
+    )
+    axes[1].bar(volumes, count / volumes, color="#be6c39", width=0.6)
+    axes[1].set(
+        xlabel="Represented volume (m³)",
+        ylabel="Injected number density (m$^{-3}$)",
+        xticks=volumes,
+    )
+    fig.suptitle("Unit-event nucleation · " + wp.get_device("cuda:0").name)
+    print("Counts:", count, "Number densities (m^-3):", count / volumes)
+    print("Per-species particle + gas inventory checks passed.")
+    plt.show()
+    return results
+
+
 if __name__ == "__main__":
-    run_example()
-    print("Direct Warp nucleation example completed on device=cpu.")
+    import sys
+
+    if "--cuda" in sys.argv[1:]:
+        run_publication()
+    else:
+        run_example()
+        print("Direct Warp nucleation example completed on device=cpu.")

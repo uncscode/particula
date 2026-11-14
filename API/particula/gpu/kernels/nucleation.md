@@ -1162,7 +1162,7 @@ concrete-module-only implementation state, not a public enqueue protocol.
 - `dimensions` (`tuple[int, int, int]`) — Fixed ``(B, N, S)`` dimensions.
 - `device` (`Any`) — Shared active Warp device.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3356-L3434)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3362-L3441)
 
 ### particula.gpu.kernels.nucleation._PreparedNucleationCall.device
 
@@ -1172,7 +1172,7 @@ concrete-module-only implementation state, not a public enqueue protocol.
 device: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3432-L3432)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3438-L3438)
 
 ### particula.gpu.kernels.nucleation._PreparedNucleationCall.diagnostic_arrays
 
@@ -1182,7 +1182,7 @@ device: Any
 diagnostic_arrays: tuple[Any, ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3416-L3416)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3422-L3422)
 
 ### particula.gpu.kernels.nucleation._PreparedNucleationCall.dimensions
 
@@ -1192,7 +1192,7 @@ diagnostic_arrays: tuple[Any, ...]
 dimensions: tuple[int, int, int]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3431-L3431)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3437-L3437)
 
 ### particula.gpu.kernels.nucleation._PreparedNucleationCall.finalized_arrays
 
@@ -1202,7 +1202,7 @@ dimensions: tuple[int, int, int]
 finalized_arrays: tuple[Any, ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3415-L3415)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3421-L3421)
 
 ### particula.gpu.kernels.nucleation._PreparedNucleationCall.gas_arrays
 
@@ -1212,7 +1212,7 @@ finalized_arrays: tuple[Any, ...]
 gas_arrays: tuple[Any, ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3408-L3408)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3414-L3414)
 
 ### particula.gpu.kernels.nucleation._PreparedNucleationCall.gas_species
 
@@ -1222,7 +1222,7 @@ gas_arrays: tuple[Any, ...]
 gas_species: int = 0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3434-L3434)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3440-L3440)
 
 ### particula.gpu.kernels.nucleation._PreparedNucleationCall.molecule_counts
 
@@ -1232,7 +1232,7 @@ gas_species: int = 0
 molecule_counts: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3413-L3413)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3419-L3419)
 
 ### particula.gpu.kernels.nucleation._PreparedNucleationCall.molecule_status
 
@@ -1242,7 +1242,7 @@ molecule_counts: Any
 molecule_status: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3425-L3425)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3431-L3431)
 
 ### particula.gpu.kernels.nucleation._PreparedNucleationCall.p1_status
 
@@ -1252,7 +1252,7 @@ molecule_status: Any
 p1_status: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3421-L3421)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3427-L3427)
 
 ### particula.gpu.kernels.nucleation._PreparedNucleationCall.p2_status
 
@@ -1262,7 +1262,7 @@ p1_status: Any
 p2_status: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3423-L3423)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3429-L3429)
 
 ### particula.gpu.kernels.nucleation._PreparedNucleationCall.p2_work
 
@@ -1272,7 +1272,7 @@ p2_status: Any
 p2_work: tuple[Any, ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3418-L3418)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3424-L3424)
 
 ### particula.gpu.kernels.nucleation._PreparedNucleationCall.p3_status
 
@@ -1282,7 +1282,7 @@ p2_work: tuple[Any, ...]
 p3_status: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3424-L3424)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3430-L3430)
 
 ### particula.gpu.kernels.nucleation._PreparedNucleationCall.p3_work
 
@@ -1292,7 +1292,7 @@ p3_status: Any
 p3_work: tuple[Any, ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3419-L3419)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3425-L3425)
 
 ### particula.gpu.kernels.nucleation._PreparedNucleationCall.p4_arrays
 
@@ -1302,7 +1302,7 @@ p3_work: tuple[Any, ...]
 p4_arrays: tuple[Any, ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3417-L3417)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3423-L3423)
 
 ### particula.gpu.kernels.nucleation._PreparedNucleationCall.p4_final_status
 
@@ -1312,7 +1312,7 @@ p4_arrays: tuple[Any, ...]
 p4_final_status: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3427-L3427)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3433-L3433)
 
 ### particula.gpu.kernels.nucleation._PreparedNucleationCall.p4_status
 
@@ -1322,7 +1322,7 @@ p4_final_status: Any
 p4_status: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3426-L3426)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3432-L3432)
 
 ### particula.gpu.kernels.nucleation._PreparedNucleationCall.p4_work
 
@@ -1332,7 +1332,7 @@ p4_status: Any
 p4_work: tuple[Any, ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3420-L3420)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3426-L3426)
 
 ### particula.gpu.kernels.nucleation._PreparedNucleationCall.p5_status
 
@@ -1342,7 +1342,7 @@ p4_work: tuple[Any, ...]
 p5_status: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3428-L3428)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3434-L3434)
 
 ### particula.gpu.kernels.nucleation._PreparedNucleationCall.particle_arrays
 
@@ -1352,7 +1352,7 @@ p5_status: Any
 particle_arrays: tuple[Any, ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3407-L3407)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3413-L3413)
 
 ### particula.gpu.kernels.nucleation._PreparedNucleationCall.particle_to_gas
 
@@ -1362,7 +1362,7 @@ particle_arrays: tuple[Any, ...]
 particle_to_gas: Any = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3433-L3433)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3439-L3439)
 
 ### particula.gpu.kernels.nucleation._PreparedNucleationCall.pipeline_invalid
 
@@ -1372,7 +1372,7 @@ particle_to_gas: Any = None
 pipeline_invalid: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3422-L3422)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3428-L3428)
 
 ### particula.gpu.kernels.nucleation._PreparedNucleationCall.policy_controls
 
@@ -1382,7 +1382,7 @@ pipeline_invalid: Any
 policy_controls: tuple[int, int]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3412-L3412)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3418-L3418)
 
 ### particula.gpu.kernels.nucleation._PreparedNucleationCall.resampling
 
@@ -1392,7 +1392,7 @@ policy_controls: tuple[int, int]
 resampling: _PreparedResamplingCall | None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3429-L3429)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3435-L3435)
 
 ### particula.gpu.kernels.nucleation._PreparedNucleationCall.result
 
@@ -1402,7 +1402,7 @@ resampling: _PreparedResamplingCall | None
 result: tuple[Any, Any]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3406-L3406)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3412-L3412)
 
 ### particula.gpu.kernels.nucleation._PreparedNucleationCall.saturation
 
@@ -1412,7 +1412,7 @@ result: tuple[Any, Any]
 saturation: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3410-L3410)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3416-L3416)
 
 ### particula.gpu.kernels.nucleation._PreparedNucleationCall.scalar_controls
 
@@ -1422,7 +1422,7 @@ saturation: Any
 scalar_controls: tuple[Any, ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3411-L3411)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3417-L3417)
 
 ### particula.gpu.kernels.nucleation._PreparedNucleationCall.scaling
 
@@ -1432,7 +1432,7 @@ scalar_controls: tuple[Any, ...]
 scaling: _PreparedRepresentativeVolumeScalingCall | None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3430-L3430)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3436-L3436)
 
 ### particula.gpu.kernels.nucleation._PreparedNucleationCall.scratch_arrays
 
@@ -1442,7 +1442,7 @@ scaling: _PreparedRepresentativeVolumeScalingCall | None
 scratch_arrays: tuple[Any, ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3414-L3414)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3420-L3420)
 
 ### particula.gpu.kernels.nucleation._PreparedNucleationCall.temperature
 
@@ -1452,14 +1452,24 @@ scratch_arrays: tuple[Any, ...]
 temperature: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3409-L3409)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3415-L3415)
+
+### particula.gpu.kernels.nucleation._PreparedNucleationCall.upstream_failure
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+upstream_failure: Any = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3441-L3441)
 
 ### particula.gpu.kernels.nucleation._PreparedNucleationCall.__init__
 
 *method*
 
 ```python
-def __init__(result: tuple[Any, Any], particle_arrays: tuple[Any, ...], gas_arrays: tuple[Any, ...], temperature: Any, saturation: Any, scalar_controls: tuple[Any, ...], policy_controls: tuple[int, int], molecule_counts: Any, scratch_arrays: tuple[Any, ...], finalized_arrays: tuple[Any, ...], diagnostic_arrays: tuple[Any, ...], p4_arrays: tuple[Any, ...], p2_work: tuple[Any, ...], p3_work: tuple[Any, ...], p4_work: tuple[Any, ...], p1_status: Any, pipeline_invalid: Any, p2_status: Any, p3_status: Any, molecule_status: Any, p4_status: Any, p4_final_status: Any, p5_status: Any, resampling: _PreparedResamplingCall | None, scaling: _PreparedRepresentativeVolumeScalingCall | None, dimensions: tuple[int, int, int], device: Any, particle_to_gas: Any = None, gas_species: int = 0) -> None
+def __init__(result: tuple[Any, Any], particle_arrays: tuple[Any, ...], gas_arrays: tuple[Any, ...], temperature: Any, saturation: Any, scalar_controls: tuple[Any, ...], policy_controls: tuple[int, int], molecule_counts: Any, scratch_arrays: tuple[Any, ...], finalized_arrays: tuple[Any, ...], diagnostic_arrays: tuple[Any, ...], p4_arrays: tuple[Any, ...], p2_work: tuple[Any, ...], p3_work: tuple[Any, ...], p4_work: tuple[Any, ...], p1_status: Any, pipeline_invalid: Any, p2_status: Any, p3_status: Any, molecule_status: Any, p4_status: Any, p4_final_status: Any, p5_status: Any, resampling: _PreparedResamplingCall | None, scaling: _PreparedRepresentativeVolumeScalingCall | None, dimensions: tuple[int, int, int], device: Any, particle_to_gas: Any = None, gas_species: int = 0, upstream_failure: Any = None) -> None
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L0-L0)
@@ -1487,7 +1497,7 @@ def _aggregate_prepared_status(status: wp.array(dtype=wp.int32), pipeline_invali
 
 Promote any phase-local status lane into the pipeline gate.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3305-L3313)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3311-L3319)
 
 ## particula.gpu.kernels.nucleation._array
 
@@ -1555,7 +1565,7 @@ def _commit_native_nucleation(masses: wp.array3d(dtype=wp.float64), counts: wp.a
 
 Activate unit-count resolved slots and consume full-order gas density.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3670-L3709)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3677-L3716)
 
 ## particula.gpu.kernels.nucleation._commit_nucleation_p5
 
@@ -1581,7 +1591,7 @@ def _commit_prepared_p3_diagnostics(categories: wp.array2d(dtype=wp.int32), free
 Commit fixed-slot management diagnostics only after complete capacity
 staging validation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3327-L3353)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3333-L3359)
 
 ## particula.gpu.kernels.nucleation._commit_staged_nucleation_slots
 
@@ -1690,7 +1700,7 @@ launch.
 - (`Any`) — The original ``(particles, gas)`` containers. Device errors remain in
 - (`Any`) — preparation-owned status arrays until observation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3712-L4123)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3719-L4131)
 
 ## particula.gpu.kernels.nucleation._field
 
@@ -1940,7 +1950,7 @@ def _native_source_counts(accepted_counts: wp.array(dtype=wp.int32), counts: wp.
 
 Stage admitted integer counts before native exhaustion scaling.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3658-L3667)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3665-L3674)
 
 ## particula.gpu.kernels.nucleation._no_overlap
 
@@ -1990,7 +2000,7 @@ storage. Writer failures preserve the established no-rollback contract.
 exhaustion operation
 recorded an error.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L4126-L4202)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L4134-L4169)
 
 ## particula.gpu.kernels.nucleation._orchestrate_nucleation_exhaustion
 
@@ -2259,7 +2269,7 @@ pre-writer; rollback is not promised after a writer-capable launch.
 - `ValueError` — If fixed schemas, identities, controls, or sidecars are
 invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3437-L3655)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3444-L3662)
 
 ## particula.gpu.kernels.nucleation._promote_prepared_invalid_lane
 
@@ -2271,7 +2281,19 @@ def _promote_prepared_invalid_lane(status: wp.array(dtype=wp.int32), lane: wp.in
 
 Promote one invalid-only status lane into the pipeline gate.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3316-L3324)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3322-L3330)
+
+## particula.gpu.kernels.nucleation._raise_nucleation_status
+
+*function*
+
+```python
+def _raise_nucleation_status(status: np.ndarray) -> None
+```
+
+Decode the fixed 25-lane nucleation status in scientific phase order.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L4172-L4228)
 
 ## particula.gpu.kernels.nucleation._real
 
@@ -2305,12 +2327,12 @@ Normalize a finite, non-Boolean real scalar.
 *function*
 
 ```python
-def _reset_prepared_nucleation_status(p1_status: wp.array(dtype=wp.int32), pipeline_invalid: wp.array(dtype=wp.int32), p2_status: wp.array(dtype=wp.int32), p3_status: wp.array(dtype=wp.int32), molecule_status: wp.array(dtype=wp.int32), p4_status: wp.array(dtype=wp.int32), p4_final_status: wp.array(dtype=wp.int32), p5_status: wp.array(dtype=wp.int32), release: wp.array(dtype=wp.int32), scaling: wp.array(dtype=wp.int32)) -> None
+def _reset_prepared_nucleation_status(p1_status: wp.array(dtype=wp.int32), pipeline_invalid: wp.array(dtype=wp.int32), p2_status: wp.array(dtype=wp.int32), p3_status: wp.array(dtype=wp.int32), molecule_status: wp.array(dtype=wp.int32), p4_status: wp.array(dtype=wp.int32), p4_final_status: wp.array(dtype=wp.int32), p5_status: wp.array(dtype=wp.int32), release: wp.array(dtype=wp.int32), scaling: wp.array(dtype=wp.int32), upstream_failure: wp.array(dtype=wp.int32)) -> None
 ```
 
 Reset preparation-owned status and policy work on device.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3157-L3186)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3157-L3192)
 
 ## particula.gpu.kernels.nucleation._revalidate_p4_particle_state
 
@@ -2573,7 +2595,7 @@ def _validate_prepared_nucleation_p1(masses: wp.array3d(dtype=wp.float64), conce
 Validate all live input validation payloads and retain ordered error
 lanes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3189-L3302)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L3195-L3308)
 
 ## particula.gpu.kernels.nucleation._validate_public_molecule_eligibility
 
@@ -2750,4 +2772,4 @@ type.
 state, or a
 finalized handoff is invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L4205-L4272)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/nucleation.py#L4231-L4298)

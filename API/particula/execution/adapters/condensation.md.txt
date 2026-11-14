@@ -33,7 +33,7 @@ promised after a writer-capable failure.
 CPUCondensationAdapter = CPUCondensationExecutionAdapter
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L1025-L1025)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L1034-L1034)
 
 ## particula.execution.adapters.condensation.WarpCondensationAdapter
 
@@ -43,7 +43,7 @@ CPUCondensationAdapter = CPUCondensationExecutionAdapter
 WarpCondensationAdapter = WarpCondensationExecutionAdapter
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L1026-L1026)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L1035-L1035)
 
 ## particula.execution.adapters.condensation.CPUCondensationExecutionAdapter
 
@@ -63,7 +63,7 @@ return the original aerosol, and successful results declare state mutation.
 Backend exceptions propagate unchanged. This adapter is concrete-only and
 must be imported from ``particula.execution.adapters.condensation``.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L796-L848)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L802-L854)
 
 ### particula.execution.adapters.condensation.CPUCondensationExecutionAdapter.execute
 
@@ -90,7 +90,7 @@ Execute one exact CPU thermal correction state without fallback or
 - `ValueError` — If controls or the selected profile are invalid, latent
 heat is enabled, or the runnable returns another aerosol.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L808-L848)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L814-L854)
 
 ## particula.execution.adapters.condensation.CPUCondensationExecutionState
 
@@ -120,7 +120,7 @@ frozen fields prevent rebinding only.
 
 - `TypeError` — If ``state`` or ``runnable`` is not the required exact type.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L611-L659)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L617-L665)
 
 ### particula.execution.adapters.condensation.CPUCondensationExecutionState.context
 
@@ -130,7 +130,7 @@ frozen fields prevent rebinding only.
 context: object = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L637-L637)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L643-L643)
 
 ### particula.execution.adapters.condensation.CPUCondensationExecutionState.runnable
 
@@ -140,7 +140,7 @@ context: object = None
 runnable: MassCondensation
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L635-L635)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L641-L641)
 
 ### particula.execution.adapters.condensation.CPUCondensationExecutionState.state
 
@@ -150,7 +150,7 @@ runnable: MassCondensation
 state: CPUCondensationState
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L632-L632)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L638-L638)
 
 ### particula.execution.adapters.condensation.CPUCondensationExecutionState.sub_steps
 
@@ -160,7 +160,7 @@ state: CPUCondensationState
 sub_steps: object
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L634-L634)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L640-L640)
 
 ### particula.execution.adapters.condensation.CPUCondensationExecutionState.time_step
 
@@ -170,7 +170,7 @@ sub_steps: object
 time_step: object
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L633-L633)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L639-L639)
 
 ### particula.execution.adapters.condensation.CPUCondensationExecutionState.backend_payload
 
@@ -186,7 +186,7 @@ Return the exact caller-owned CPU aerosol payload.
 
 - (`Aerosol`) — The aerosol retained by the inventory finalization state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L653-L659)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L659-L665)
 
 ### particula.execution.adapters.condensation.CPUCondensationExecutionState.__init__
 
@@ -214,7 +214,7 @@ Validate exact inventory finalization-state and runnable carrier
 - `TypeError` — If ``state`` or ``runnable`` is not the required exact
 type.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L639-L650)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L645-L656)
 
 ## particula.execution.adapters.condensation.CPUCondensationState
 
@@ -399,7 +399,7 @@ This concrete-only adapter is imported from
 ``particula.execution.adapters.condensation``. It forwards the exact
 native kernel tuple without reconstructing it.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L851-L955)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L857-L964)
 
 ### particula.execution.adapters.condensation.WarpCondensationExecutionAdapter.execute
 
@@ -435,7 +435,7 @@ Direct errors propagate unchanged.
 - `ImportError` — If the optional Warp kernel cannot be imported after
 successful preflight.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L924-L955)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L933-L964)
 
 ### particula.execution.adapters.condensation.WarpCondensationExecutionAdapter.prepare
 
@@ -462,7 +462,7 @@ Validate and bind one resident state for repeated device enqueues.
 - `ValueError` — If controls, profile, or selected sidecars are invalid.
 - `ImportError` — If the optional Warp kernel cannot be imported.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L870-L922)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L876-L931)
 
 ## particula.execution.adapters.condensation.WarpCondensationExecutionState
 
@@ -487,7 +487,7 @@ Construction neither imports a kernel nor inspects retained resources.
 
 - `TypeError` — If ``state`` is not an exact ``WarpCondensationState``.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L662-L698)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L668-L704)
 
 ### particula.execution.adapters.condensation.WarpCondensationExecutionState.state
 
@@ -497,7 +497,7 @@ Construction neither imports a kernel nor inspects retained resources.
 state: WarpCondensationState
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L678-L678)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L684-L684)
 
 ### particula.execution.adapters.condensation.WarpCondensationExecutionState.time_step
 
@@ -507,7 +507,7 @@ state: WarpCondensationState
 time_step: object
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L679-L679)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L685-L685)
 
 ### particula.execution.adapters.condensation.WarpCondensationExecutionState.backend_payload
 
@@ -524,7 +524,7 @@ Return the exact caller-owned resident primary payload.
 - (`object`) — The ``(particles, gas, environment)`` tuple from the inventory
 - (`object`) — finalization state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L691-L698)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L697-L704)
 
 ### particula.execution.adapters.condensation.WarpCondensationExecutionState.__init__
 
@@ -550,7 +550,7 @@ Validate the exact inventory finalization Warp state carrier type.
 
 - `TypeError` — If ``state`` is not an exact ``WarpCondensationState``.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L681-L688)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L687-L694)
 
 ## particula.execution.adapters.condensation.WarpCondensationState
 
@@ -592,6 +592,9 @@ containers and sidecars remain caller-owned and mutable.
 - `energy_transfer` (`object | None`) (default: `None`) — Optional writable energy-transfer output sidecar.
 - `thermal_work` (`object | None`) (default: `None`) — Optional opaque thermal-work reference.
 - `species_binding` (`object | None`) (default: `None`) — Required explicit pinned species map for discrete or resolved particles; untagged carriers are rejected.
+- `surface_tension` (`object | None`) (default: `None`) — Optional material-order float64 vector [N/m].
+- `mass_accommodation` (`object | None`) (default: `None`) — Optional full-gas float64 dimensionless vector.
+- `diffusion_coefficient_vapor` (`object | None`) (default: `None`) — Optional full-gas float64 vector [m²/s].
 
 **Raises**
 
@@ -602,7 +605,7 @@ validation requires it.
 - `ValueError` — If primary metadata, required thermodynamics, writable
 output metadata, or writable-output ownership is invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L310-L608)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L310-L614)
 
 ### particula.execution.adapters.condensation.WarpCondensationState.activity_surface
 
@@ -612,7 +615,7 @@ output metadata, or writable-output ownership is invalid.
 activity_surface: object | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L360-L360)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L363-L363)
 
 ### particula.execution.adapters.condensation.WarpCondensationState.config
 
@@ -622,7 +625,17 @@ activity_surface: object | None = None
 config: CondensationExecutionConfig
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L355-L355)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L358-L358)
+
+### particula.execution.adapters.condensation.WarpCondensationState.diffusion_coefficient_vapor
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+diffusion_coefficient_vapor: object | None = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L372-L372)
 
 ### particula.execution.adapters.condensation.WarpCondensationState.energy_transfer
 
@@ -632,7 +645,7 @@ config: CondensationExecutionConfig
 energy_transfer: object | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L364-L364)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L367-L367)
 
 ### particula.execution.adapters.condensation.WarpCondensationState.environment
 
@@ -642,7 +655,7 @@ energy_transfer: object | None = None
 environment: object
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L358-L358)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L361-L361)
 
 ### particula.execution.adapters.condensation.WarpCondensationState.gas
 
@@ -652,7 +665,7 @@ environment: object
 gas: object
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L357-L357)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L360-L360)
 
 ### particula.execution.adapters.condensation.WarpCondensationState.latent_heat
 
@@ -662,7 +675,17 @@ gas: object
 latent_heat: object | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L363-L363)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L366-L366)
+
+### particula.execution.adapters.condensation.WarpCondensationState.mass_accommodation
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+mass_accommodation: object | None = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L371-L371)
 
 ### particula.execution.adapters.condensation.WarpCondensationState.mass_transfer
 
@@ -672,7 +695,7 @@ latent_heat: object | None = None
 mass_transfer: object | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L362-L362)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L365-L365)
 
 ### particula.execution.adapters.condensation.WarpCondensationState.particles
 
@@ -682,7 +705,7 @@ mass_transfer: object | None = None
 particles: object
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L356-L356)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L359-L359)
 
 ### particula.execution.adapters.condensation.WarpCondensationState.scratch_buffers
 
@@ -692,7 +715,7 @@ particles: object
 scratch_buffers: object | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L361-L361)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L364-L364)
 
 ### particula.execution.adapters.condensation.WarpCondensationState.species_binding
 
@@ -702,7 +725,17 @@ scratch_buffers: object | None = None
 species_binding: object | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L366-L366)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L369-L369)
+
+### particula.execution.adapters.condensation.WarpCondensationState.surface_tension
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+surface_tension: object | None = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L370-L370)
 
 ### particula.execution.adapters.condensation.WarpCondensationState.thermal_work
 
@@ -712,7 +745,7 @@ species_binding: object | None = None
 thermal_work: object | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L365-L365)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L368-L368)
 
 ### particula.execution.adapters.condensation.WarpCondensationState.thermodynamics
 
@@ -722,7 +755,7 @@ thermal_work: object | None = None
 thermodynamics: object
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L359-L359)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L362-L362)
 
 ### particula.execution.adapters.condensation.WarpCondensationState.backend_payload
 
@@ -738,14 +771,14 @@ Return the three caller-owned primary containers by identity.
 
 - (`tuple[object, object, object]`) — The ``(particles, gas, environment)`` primary-container tuple.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L602-L608)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L608-L614)
 
 ### particula.execution.adapters.condensation.WarpCondensationState.__init__
 
 *method*
 
 ```python
-def __init__(config: CondensationExecutionConfig, particles: object, gas: object, environment: object, thermodynamics: object, activity_surface: object | None = None, scratch_buffers: object | None = None, mass_transfer: object | None = None, latent_heat: object | None = None, energy_transfer: object | None = None, thermal_work: object | None = None, species_binding: object | None = None) -> None
+def __init__(config: CondensationExecutionConfig, particles: object, gas: object, environment: object, thermodynamics: object, activity_surface: object | None = None, scratch_buffers: object | None = None, mass_transfer: object | None = None, latent_heat: object | None = None, energy_transfer: object | None = None, thermal_work: object | None = None, species_binding: object | None = None, surface_tension: object | None = None, mass_accommodation: object | None = None, diffusion_coefficient_vapor: object | None = None) -> None
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L0-L0)
@@ -771,7 +804,7 @@ invalid.
 - `ValueError` — If required metadata, thermodynamics, or writable
 output ownership is invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L368-L419)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L374-L425)
 
 ### particula.execution.adapters.condensation.WarpCondensationState._validate_optional_outputs
 
@@ -791,7 +824,7 @@ Validate optional outputs and ownership against primary state.
 - `species` (`int`) — Number of validated species in the primary state.
 - `device` (`Any`) — Device metadata from the validated mass storage.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L545-L599)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L551-L605)
 
 ### particula.execution.adapters.condensation.WarpCondensationState._validate_population_binding
 
@@ -803,7 +836,7 @@ def _validate_population_binding() -> None
 
 Require a matching native mapping without reading payloads.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L421-L429)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L427-L435)
 
 ### particula.execution.adapters.condensation.WarpCondensationState._validate_primary_arrays
 
@@ -827,7 +860,7 @@ Validate all primary Warp arrays and return the mass storage.
 
 - `ValueError` — If a required primary array is missing or malformed.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L431-L543)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L437-L549)
 
 ## particula.execution.adapters.condensation._PreparedWarpCondensationBinding
 
@@ -854,7 +887,7 @@ not provided.
 - `prepared` (`Any`) — Private kernel record produced during preparation.
 - `enqueue` (`Any`) — Private device-only enqueue callable.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L701-L736)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L707-L742)
 
 ### particula.execution.adapters.condensation._PreparedWarpCondensationBinding.enqueue
 
@@ -864,7 +897,7 @@ not provided.
 enqueue: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L722-L722)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L728-L728)
 
 ### particula.execution.adapters.condensation._PreparedWarpCondensationBinding.prepared
 
@@ -874,7 +907,7 @@ enqueue: Any
 prepared: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L721-L721)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L727-L727)
 
 ### particula.execution.adapters.condensation._PreparedWarpCondensationBinding.state
 
@@ -884,7 +917,7 @@ prepared: Any
 state: WarpCondensationExecutionState
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L720-L720)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L726-L726)
 
 ### particula.execution.adapters.condensation._PreparedWarpCondensationBinding.__init__
 
@@ -917,7 +950,7 @@ Enqueue the retained kernel call without repeating setup.
 existing runtime validation failure. Post-launch rollback is
 not provided.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L724-L736)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L730-L742)
 
 ## particula.execution.adapters.condensation._dtype_itemsize
 
@@ -958,7 +991,7 @@ Lazily resolve the prepared direct Warp kernel path after preflight.
 
 - `ImportError` — If the optional Warp kernel dependencies are unavailable.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L770-L793)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L776-L799)
 
 ## particula.execution.adapters.condensation._memory_range
 
@@ -1028,7 +1061,7 @@ Reject semantic latent heat at the selected isothermal boundary.
 
 - `ValueError` — If the configuration enables latent heat.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L755-L767)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L761-L773)
 
 ## particula.execution.adapters.condensation._validate_array
 
@@ -1101,7 +1134,7 @@ Validate semantic-profile sidecars before native kernel resolution.
 - `ValueError` — If a required sidecar is missing or incompatible with the
 selected latent-heat, activity, or surface-tension semantics.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L958-L1021)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L967-L1030)
 
 ## particula.execution.adapters.condensation._validate_time_step
 
@@ -1122,4 +1155,4 @@ Validate a non-boolean, finite, nonnegative real time step.
 - `TypeError` — If ``time_step`` is not a non-boolean real scalar.
 - `ValueError` — If ``time_step`` is non-finite or negative.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L739-L752)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L745-L758)

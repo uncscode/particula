@@ -1,3 +1,12 @@
+# %% [markdown]
+# # CUDA resident ownership and checkpoint restart
+#
+# Keep native particles, gas and environment on one device and restart
+# from a canonical checkpoint with new storage identities.
+# Run with `--cuda` to reproduce the saved figures. CUDA is required
+# for publication; unavailable hardware never becomes a successful GPU run.
+
+# %%
 """Demonstrate the bounded GPU-resident session lifecycle and checkpoints.
 
 The optional Warp runtime and every concrete resident seam are imported only on
@@ -208,6 +217,70 @@ def run_example(device: str = "cpu") -> ExampleRun:
     )
 
 
+# %% [markdown]
+# ## Verify physical state survives checkpoint and restart
+#
+# This ownership example advances zero physical time. The equal bars are the
+# expected result: checkpoint and restart preserve represented number and
+# particle-plus-gas inventory. Restart creates new device allocations from
+# canonical bytes. Use the prepared lifecycle tutorial for evolving physics.
+
+
+# %%
+def run_publication():
+    """Require CUDA and visualize state preservation across ownership changes."""
+    import matplotlib.pyplot as plt
+    import warp as wp
+
+    if not _warp_enabled() or not wp.is_cuda_available():
+        raise RuntimeError("This publication run requires CUDA")
+    initial_p, initial_g, _ = _build_cpu_state()
+    result = run_example(device="cuda:0")
+    if result.checkpoint is None or result.restarted is None:
+        raise RuntimeError("CUDA produced no checkpoint")
+    restarted, registry, guard = result.restarted
+    try:
+        wp.synchronize_device("cuda:0")
+        masses = restarted.particles.masses.numpy().copy()
+        counts = restarted.particles.concentration.numpy().copy()
+        gas = restarted.gas.concentration.numpy().copy()
+        np.testing.assert_array_equal(masses, initial_p.masses)
+        np.testing.assert_array_equal(counts, initial_p.concentration)
+        np.testing.assert_array_equal(gas, initial_g.concentration)
+        checkpoint = result.checkpoint
+        numbers = [
+            initial_p.concentration.sum(),
+            checkpoint.particles.concentration.sum(),
+            counts.sum(),
+        ]
+        inventories = [
+            np.sum(initial_p.masses * initial_p.concentration[..., None])
+            + np.sum(initial_g.concentration * initial_p.volume[:, None]),
+            np.sum(
+                checkpoint.particles.masses
+                * checkpoint.particles.concentration[..., None]
+            )
+            + np.sum(
+                checkpoint.gas.concentration
+                * checkpoint.particles.volume[:, None]
+            ),
+            np.sum(masses * counts[..., None])
+            + np.sum(gas * restarted.particles.volume.numpy()[:, None]),
+        ]
+    finally:
+        restarted.close(registry, guard)
+    fig, axes = plt.subplots(1, 2, figsize=(9, 3.5), constrained_layout=True)
+    labels = ["CPU initial", "Checkpoint", "CUDA restart"]
+    axes[0].bar(labels, numbers, color="#287a90")
+    axes[0].set(ylabel="Represented particle count")
+    axes[1].bar(labels, np.array(inventories) * 1e18, color="#be6c39")
+    axes[1].set(ylabel="Particle + gas inventory (fg)")
+    fig.suptitle("State preservation · " + wp.get_device("cuda:0").name)
+    print("\n".join(result.output))
+    plt.show()
+    return result
+
+
 def main() -> None:
     """Run the example and print its deterministic status lines.
 
@@ -221,4 +294,9 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+
+    if "--cuda" in sys.argv[1:]:
+        run_publication()
+    else:
+        main()

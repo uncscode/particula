@@ -72,7 +72,7 @@ class CustomProcess(Runnable):
 >
 > - No references available yet.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L38-L188)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L43-L267)
 
 ### particula.runnable.RunnableABC.__or__
 
@@ -102,7 +102,7 @@ combined_process = process1 | process2
 final_aerosol = combined_process.execute(aerosol, time_step=1.0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L167-L188)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L246-L267)
 
 ### particula.runnable.RunnableABC._box_worker
 
@@ -114,7 +114,7 @@ def _box_worker(box, boxes, transaction)
 
 Create isolated hook state for a single box.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L151-L153)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L156-L158)
 
 ### particula.runnable.RunnableABC._execute_box
 
@@ -126,7 +126,7 @@ def _execute_box(aerosol, time_step, sub_steps=1)
 
 Execute the single-box numerical building block.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L163-L165)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L168-L170)
 
 ### particula.runnable.RunnableABC._is_stochastic
 
@@ -138,7 +138,7 @@ def _is_stochastic(aerosol)
 
 Report whether this process requires independent box streams.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L147-L149)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L152-L154)
 
 ### particula.runnable.RunnableABC._prepare_commit
 
@@ -150,7 +150,7 @@ def _prepare_commit(workers, uses_context)
 
 Prepare a non-failing diagnostics publisher before numeric writes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L155-L157)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L160-L162)
 
 ### particula.runnable.RunnableABC._rate_box
 
@@ -162,7 +162,7 @@ def _rate_box(aerosol)
 
 Evaluate the single-box numerical building block.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L159-L161)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L164-L166)
 
 ### particula.runnable.RunnableABC._validate_batch
 
@@ -174,7 +174,7 @@ def _validate_batch(aerosol)
 
 Validate process-wide controls before staging boxes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L140-L141)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L145-L146)
 
 ### particula.runnable.RunnableABC._writer_fields
 
@@ -186,7 +186,7 @@ def _writer_fields(aerosol)
 
 Declare numeric destinations for transactional publication.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L143-L145)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L148-L150)
 
 ### particula.runnable.RunnableABC.execute
 
@@ -202,7 +202,38 @@ Contexts own independent logical-box random streams. Completed substeps
 remain committed if a later one fails. Custom subclasses overriding
 this method retain responsibility for their own execution semantics.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L84-L138)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L89-L143)
+
+### particula.runnable.RunnableABC.prepare
+
+*method*
+
+```python
+def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None) -> PreparedSimulation
+```
+
+Upload native state once and prepare supported resident GPU physics.
+
+**Parameters**
+
+- `aerosol` (`Aerosol`) — Initial native particle, gas and environment state.
+- `time_step` (`float`) — Fixed duration of each complete process cycle [s].
+- `backend` (`Backend | None`) (default: `None`) — Backend.WARP by default; CPU execution uses execute().
+- `device` (`str`) (default: `'cuda:0'`) — Explicit Warp device, default CUDA device zero.
+- `root_seed` (`int`) (default: `0`) — Root seed for persistent independent process/box streams.
+- `logical_box_ids` (default: `None`) — Optional stable identities in physical box order.
+
+**Returns**
+
+- (`PreparedSimulation`) — An owned PreparedSimulation. Use its context manager or close().
+- (`PreparedSimulation`) — snapshot() returns detached CPU state for analysis and plotting.
+
+**Raises**
+
+- `ValueError` — If process physics or state cannot be represented.
+- `RuntimeError` — If the requested runtime/device is unavailable.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L172-L211)
 
 ### particula.runnable.RunnableABC.rate
 
@@ -214,7 +245,36 @@ def rate(aerosol: Aerosol) -> Any
 
 Evaluate detached box hooks and retain a leading box axis.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L67-L82)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L72-L87)
+
+### particula.runnable.RunnableABC.resume
+
+*method*
+
+```python
+def resume(checkpoint: SimulationCheckpoint, *, backend: Backend | None = None, device: str | None = None) -> PreparedSimulation
+```
+
+Resume exact saved state using the same process configuration.
+
+**Parameters**
+
+- `checkpoint` (`SimulationCheckpoint`) — SimulationCheckpoint from a prepared owner.
+- `backend` (`Backend | None`) (default: `None`) — Backend.WARP by default.
+- `device` (`str | None`) (default: `None`) — Exact checkpoint device by default; migration rejects.
+
+**Returns**
+
+- (`PreparedSimulation`) — A new owner preserving state, RNG words, timestep and counters.
+- (`PreparedSimulation`) — Capture is explicit again; native graph handles are never restored.
+
+**Raises**
+
+- `ValueError` — If configuration, order, schema or device differs, or
+current population cannot be admitted (e.g. unequal Brownian
+counts after a later process injected new particles).
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L213-L244)
 
 ## particula.runnable.RunnableSequence
 
@@ -249,7 +309,7 @@ sequence.add_process(AnotherProcess())
 final_aerosol = sequence.execute(aerosol, time_step=2.0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L191-L307)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L270-L460)
 
 ### particula.runnable.RunnableSequence.processes
 
@@ -259,7 +319,7 @@ final_aerosol = sequence.execute(aerosol, time_step=2.0)
 processes: list[RunnableABC] = []
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L220-L220)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L299-L299)
 
 ### particula.runnable.RunnableSequence.__init__
 
@@ -273,7 +333,7 @@ Initialize the RunnableSequence.
 
 Sets up an empty list to hold the sequence of Runnable processes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L215-L220)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L294-L299)
 
 ### particula.runnable.RunnableSequence.__or__
 
@@ -302,7 +362,7 @@ sequence |= CustomProcess()
 sequence = sequence | AnotherProcess()
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L289-L307)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L442-L460)
 
 ### particula.runnable.RunnableSequence.add_process
 
@@ -325,7 +385,7 @@ sequence = RunnableSequence()
 sequence.add_process(CustomProcess())
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L222-L234)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L301-L313)
 
 ### particula.runnable.RunnableSequence.execute
 
@@ -360,4 +420,64 @@ final_aerosol = sequence.execute(
 )
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L236-L287)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L315-L366)
+
+### particula.runnable.RunnableSequence.prepare
+
+*method*
+
+```python
+def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None) -> PreparedSimulation
+```
+
+Upload native state once and prepare supported resident GPU physics.
+
+**Parameters**
+
+- `aerosol` (`Aerosol`) — Initial native particle, gas and environment state.
+- `time_step` (`float`) — Fixed duration of each complete process cycle [s].
+- `backend` (`Backend | None`) (default: `None`) — Backend.WARP by default; CPU execution uses execute().
+- `device` (`str`) (default: `'cuda:0'`) — Explicit Warp device, default CUDA device zero.
+- `root_seed` (`int`) (default: `0`) — Root seed for persistent independent process/box streams.
+- `logical_box_ids` (default: `None`) — Optional stable identities in physical box order.
+
+**Returns**
+
+- (`PreparedSimulation`) — An owned PreparedSimulation. Use its context manager or close().
+- (`PreparedSimulation`) — snapshot() returns detached CPU state for analysis and plotting.
+
+**Raises**
+
+- `ValueError` — If process physics or state cannot be represented.
+- `RuntimeError` — If the requested runtime/device is unavailable.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L368-L407)
+
+### particula.runnable.RunnableSequence.resume
+
+*method*
+
+```python
+def resume(checkpoint: SimulationCheckpoint, *, backend: Backend | None = None, device: str | None = None) -> PreparedSimulation
+```
+
+Resume exact saved state using the same process configuration.
+
+**Parameters**
+
+- `checkpoint` (`SimulationCheckpoint`) — SimulationCheckpoint from a prepared owner.
+- `backend` (`Backend | None`) (default: `None`) — Backend.WARP by default.
+- `device` (`str | None`) (default: `None`) — Exact checkpoint device by default; migration rejects.
+
+**Returns**
+
+- (`PreparedSimulation`) — A new owner preserving state, RNG words, timestep and counters.
+- (`PreparedSimulation`) — Capture is explicit again; native graph handles are never restored.
+
+**Raises**
+
+- `ValueError` — If configuration, order, schema or device differs, or
+current population cannot be admitted (e.g. unequal Brownian
+counts after a later process injected new particles).
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L409-L440)

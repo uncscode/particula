@@ -56,7 +56,7 @@ launches.
 ACTIVITY_MODE_IDEAL = wp.int32(0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L123-L123)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L126-L126)
 
 ## particula.gpu.kernels.condensation.ACTIVITY_MODE_KAPPA
 
@@ -66,7 +66,7 @@ ACTIVITY_MODE_IDEAL = wp.int32(0)
 ACTIVITY_MODE_KAPPA = wp.int32(1)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L124-L124)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L127-L127)
 
 ## particula.gpu.kernels.condensation.SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED
 
@@ -76,7 +76,7 @@ ACTIVITY_MODE_KAPPA = wp.int32(1)
 SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED = wp.int32(1)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L126-L126)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L129-L129)
 
 ## particula.gpu.kernels.condensation.SURFACE_TENSION_MODE_STATIC
 
@@ -86,7 +86,7 @@ SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED = wp.int32(1)
 SURFACE_TENSION_MODE_STATIC = wp.int32(0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L125-L125)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L128-L128)
 
 ## particula.gpu.kernels.condensation._DEFAULT_DIFFUSION_COEFFICIENT
 
@@ -96,7 +96,7 @@ SURFACE_TENSION_MODE_STATIC = wp.int32(0)
 _DEFAULT_DIFFUSION_COEFFICIENT = 2e-05
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L114-L114)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L116-L116)
 
 ## particula.gpu.kernels.condensation._DEFAULT_MASS_ACCOMMODATION
 
@@ -106,7 +106,7 @@ _DEFAULT_DIFFUSION_COEFFICIENT = 2e-05
 _DEFAULT_MASS_ACCOMMODATION = 1.0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L113-L113)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L115-L115)
 
 ## particula.gpu.kernels.condensation._DEFAULT_SURFACE_TENSION
 
@@ -116,7 +116,7 @@ _DEFAULT_MASS_ACCOMMODATION = 1.0
 _DEFAULT_SURFACE_TENSION = 0.072
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L112-L112)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L114-L114)
 
 ## particula.gpu.kernels.condensation._GAS_CONSTANT
 
@@ -126,7 +126,17 @@ _DEFAULT_SURFACE_TENSION = 0.072
 _GAS_CONSTANT = wp.constant(wp.float64(constants.GAS_CONSTANT))
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L115-L115)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L117-L117)
+
+## particula.gpu.kernels.condensation._MIN_NATIVE_RADIUS
+
+*attribute* · *module attribute*
+
+```python
+_MIN_NATIVE_RADIUS = wp.constant(wp.float64(1e-10))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L119-L119)
 
 ## particula.gpu.kernels.condensation._MOLECULAR_WEIGHT_AIR
 
@@ -136,7 +146,7 @@ _GAS_CONSTANT = wp.constant(wp.float64(constants.GAS_CONSTANT))
 _MOLECULAR_WEIGHT_AIR = wp.constant(wp.float64(constants.MOLECULAR_WEIGHT_AIR))
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L116-L116)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L118-L118)
 
 ## particula.gpu.kernels.condensation._REF_TEMPERATURE_STP
 
@@ -146,7 +156,7 @@ _MOLECULAR_WEIGHT_AIR = wp.constant(wp.float64(constants.MOLECULAR_WEIGHT_AIR))
 _REF_TEMPERATURE_STP = wp.constant(wp.float64(constants.REF_TEMPERATURE_STP))
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L120-L120)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L123-L123)
 
 ## particula.gpu.kernels.condensation._REF_VISCOSITY_AIR_STP
 
@@ -156,7 +166,7 @@ _REF_TEMPERATURE_STP = wp.constant(wp.float64(constants.REF_TEMPERATURE_STP))
 _REF_VISCOSITY_AIR_STP = wp.constant(wp.float64(constants.REF_VISCOSITY_AIR_STP))
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L117-L119)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L120-L122)
 
 ## particula.gpu.kernels.condensation._SUTHERLAND_CONSTANT
 
@@ -166,7 +176,7 @@ _REF_VISCOSITY_AIR_STP = wp.constant(wp.float64(constants.REF_VISCOSITY_AIR_STP)
 _SUTHERLAND_CONSTANT = wp.constant(wp.float64(constants.SUTHERLAND_CONSTANT))
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L121-L121)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L124-L124)
 
 ## particula.gpu.kernels.condensation.CondensationActivitySurfaceConfig
 
@@ -196,7 +206,7 @@ particle-wide value for every condensing species.
 - `kappas` (`Any`) — Caller-owned finite, non-negative ``wp.float64`` array of per-species kappa parameters with shape ``(n_species,)``.
 - `molar_mass_reference` (`Any`) — Caller-owned positive ``wp.float64`` array of per-species molar masses [kg/mol], shaped ``(n_species,)`` and equal to mapped full-gas values for native calls. Unmapped material molar masses are independent. Legacy calls require gas order.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L129-L162)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L132-L165)
 
 ### particula.gpu.kernels.condensation.CondensationActivitySurfaceConfig.activity_mode
 
@@ -206,7 +216,7 @@ particle-wide value for every condensing species.
 activity_mode: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L158-L158)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L161-L161)
 
 ### particula.gpu.kernels.condensation.CondensationActivitySurfaceConfig.kappas
 
@@ -216,7 +226,7 @@ activity_mode: Any
 kappas: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L161-L161)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L164-L164)
 
 ### particula.gpu.kernels.condensation.CondensationActivitySurfaceConfig.molar_mass_reference
 
@@ -226,7 +236,7 @@ kappas: Any
 molar_mass_reference: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L162-L162)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L165-L165)
 
 ### particula.gpu.kernels.condensation.CondensationActivitySurfaceConfig.surface_tension_mode
 
@@ -236,7 +246,7 @@ molar_mass_reference: Any
 surface_tension_mode: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L159-L159)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L162-L162)
 
 ### particula.gpu.kernels.condensation.CondensationActivitySurfaceConfig.water_species_index
 
@@ -246,7 +256,7 @@ surface_tension_mode: Any
 water_species_index: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L160-L160)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L163-L163)
 
 ### particula.gpu.kernels.condensation.CondensationActivitySurfaceConfig.__init__
 
@@ -301,7 +311,7 @@ leaves caller-owned state unchanged.
 - `negative_mass_transfer_release` (`Any | None`) — Optional inventory finalization-only per-box, per-species reduction storage. Proposal gating validates but does not read or write it.
 - `positive_mass_transfer_scale` (`Any | None`) — Optional inventory finalization-only per-box, per-species scale storage. Proposal gating validates but does not read or write it.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L165-L221)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L168-L224)
 
 ### particula.gpu.kernels.condensation.CondensationScratchBuffers.dynamic_viscosity
 
@@ -311,7 +321,7 @@ leaves caller-owned state unchanged.
 dynamic_viscosity: Any | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L217-L217)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L220-L220)
 
 ### particula.gpu.kernels.condensation.CondensationScratchBuffers.mean_free_path
 
@@ -321,7 +331,7 @@ dynamic_viscosity: Any | None = None
 mean_free_path: Any | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L218-L218)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L221-L221)
 
 ### particula.gpu.kernels.condensation.CondensationScratchBuffers.negative_mass_transfer_release
 
@@ -331,7 +341,7 @@ mean_free_path: Any | None = None
 negative_mass_transfer_release: Any | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L220-L220)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L223-L223)
 
 ### particula.gpu.kernels.condensation.CondensationScratchBuffers.positive_mass_transfer_demand
 
@@ -341,7 +351,7 @@ negative_mass_transfer_release: Any | None = None
 positive_mass_transfer_demand: Any | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L219-L219)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L222-L222)
 
 ### particula.gpu.kernels.condensation.CondensationScratchBuffers.positive_mass_transfer_scale
 
@@ -351,7 +361,7 @@ positive_mass_transfer_demand: Any | None = None
 positive_mass_transfer_scale: Any | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L221-L221)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L224-L224)
 
 ### particula.gpu.kernels.condensation.CondensationScratchBuffers.total_mass_transfer
 
@@ -361,7 +371,7 @@ positive_mass_transfer_scale: Any | None = None
 total_mass_transfer: Any | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L216-L216)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L219-L219)
 
 ### particula.gpu.kernels.condensation.CondensationScratchBuffers.work_mass_transfer
 
@@ -371,7 +381,7 @@ total_mass_transfer: Any | None = None
 work_mass_transfer: Any | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L215-L215)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L218-L218)
 
 ### particula.gpu.kernels.condensation.CondensationScratchBuffers.__init__
 
@@ -412,7 +422,7 @@ after a writer launches.
 - `device` (`Any`) — Active Warp device for all retained arrays.
 - `substep_time_step` (`Any`) — Equal duration of each of four substeps [s].
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L224-L296)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L227-L301)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.activity_enabled
 
@@ -422,7 +432,7 @@ after a writer launches.
 activity_enabled: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L267-L267)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L270-L270)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.activity_mode
 
@@ -432,7 +442,7 @@ activity_enabled: Any
 activity_mode: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L268-L268)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L271-L271)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.candidate
 
@@ -442,7 +452,7 @@ activity_mode: Any
 candidate: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L260-L260)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L263-L263)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.demand
 
@@ -452,7 +462,7 @@ candidate: Any
 demand: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L257-L257)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L260-L260)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.device
 
@@ -462,7 +472,7 @@ demand: Any
 device: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L279-L279)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L282-L282)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.diffusion_coefficient_vapor
 
@@ -472,7 +482,7 @@ device: Any
 diffusion_coefficient_vapor: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L254-L254)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L257-L257)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.dimensions
 
@@ -482,7 +492,7 @@ diffusion_coefficient_vapor: Any
 dimensions: tuple[int, int, int]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L278-L278)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L281-L281)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.distribution_kind
 
@@ -492,7 +502,7 @@ dimensions: tuple[int, int, int]
 distribution_kind: int
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L295-L295)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L298-L298)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.dynamic_viscosity
 
@@ -502,7 +512,7 @@ distribution_kind: int
 dynamic_viscosity: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L263-L263)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L266-L266)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.effective_surface_tension
 
@@ -512,7 +522,7 @@ dynamic_viscosity: Any
 effective_surface_tension: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L271-L271)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L274-L274)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.energy_transfer
 
@@ -522,7 +532,17 @@ effective_surface_tension: Any
 energy_transfer: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L277-L277)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L280-L280)
+
+### particula.gpu.kernels.condensation._PreparedCondensationCall.failure
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+failure: Any = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L300-L300)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.finalized
 
@@ -532,7 +552,7 @@ energy_transfer: Any
 finalized: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L261-L261)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L264-L264)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.gas
 
@@ -542,7 +562,7 @@ finalized: Any
 gas: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L250-L250)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L253-L253)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.gas_concentration
 
@@ -552,7 +572,7 @@ gas: Any
 gas_concentration: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L284-L284)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L287-L287)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.gas_delta
 
@@ -562,7 +582,7 @@ gas_concentration: Any
 gas_delta: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L262-L262)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L265-L265)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.gas_molar_mass
 
@@ -572,7 +592,7 @@ gas_delta: Any
 gas_molar_mass: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L286-L286)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L289-L289)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.gas_partitioning
 
@@ -582,7 +602,7 @@ gas_molar_mass: Any
 gas_partitioning: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L287-L287)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L290-L290)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.gas_species_count
 
@@ -592,7 +612,7 @@ gas_partitioning: Any
 gas_species_count: int
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L296-L296)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L299-L299)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.gas_to_particle
 
@@ -602,7 +622,7 @@ gas_species_count: int
 gas_to_particle: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L292-L292)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L295-L295)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.gas_vapor_pressure
 
@@ -612,7 +632,7 @@ gas_to_particle: Any
 gas_vapor_pressure: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L285-L285)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L288-L288)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.kappas
 
@@ -622,7 +642,7 @@ gas_vapor_pressure: Any
 kappas: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L265-L265)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L268-L268)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.kernel_pressure
 
@@ -632,7 +652,7 @@ kappas: Any
 kernel_pressure: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L273-L273)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L276-L276)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.latent_heat
 
@@ -642,7 +662,7 @@ kernel_pressure: Any
 latent_heat: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L274-L274)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L277-L277)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.latent_heat_enabled
 
@@ -652,7 +672,7 @@ latent_heat: Any
 latent_heat_enabled: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L276-L276)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L279-L279)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.latent_heat_values
 
@@ -662,7 +682,7 @@ latent_heat_enabled: Any
 latent_heat_values: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L275-L275)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L278-L278)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.mass_accommodation
 
@@ -672,7 +692,7 @@ latent_heat_values: Any
 mass_accommodation: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L253-L253)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L256-L256)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.mean_free_path
 
@@ -682,7 +702,7 @@ mass_accommodation: Any
 mean_free_path: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L264-L264)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L267-L267)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.molar_mass_reference
 
@@ -692,7 +712,17 @@ mean_free_path: Any
 molar_mass_reference: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L266-L266)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L269-L269)
+
+### particula.gpu.kernels.condensation._PreparedCondensationCall.parallel_reductions
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+parallel_reductions: Any = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L301-L301)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.particle_charge
 
@@ -702,7 +732,7 @@ molar_mass_reference: Any
 particle_charge: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L294-L294)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L297-L297)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.particle_concentration
 
@@ -712,7 +742,7 @@ particle_charge: Any
 particle_concentration: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L282-L282)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L285-L285)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.particle_density
 
@@ -722,7 +752,7 @@ particle_concentration: Any
 particle_density: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L283-L283)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L286-L286)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.particle_masses
 
@@ -732,7 +762,7 @@ particle_density: Any
 particle_masses: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L281-L281)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L284-L284)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.particle_to_gas
 
@@ -742,7 +772,7 @@ particle_masses: Any
 particle_to_gas: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L291-L291)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L294-L294)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.particle_volume
 
@@ -752,7 +782,7 @@ particle_to_gas: Any
 particle_volume: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L293-L293)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L296-L296)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.particles
 
@@ -762,7 +792,7 @@ particle_volume: Any
 particles: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L249-L249)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L252-L252)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.refresh_temperature
 
@@ -772,7 +802,7 @@ particles: Any
 refresh_temperature: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L272-L272)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L275-L275)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.release
 
@@ -782,7 +812,7 @@ refresh_temperature: Any
 release: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L258-L258)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L261-L261)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.scale
 
@@ -792,7 +822,7 @@ release: Any
 scale: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L259-L259)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L262-L262)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.species_binding
 
@@ -802,7 +832,7 @@ scale: Any
 species_binding: CondensationSpeciesBinding
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L290-L290)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L293-L293)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.substep_time_step
 
@@ -812,7 +842,7 @@ species_binding: CondensationSpeciesBinding
 substep_time_step: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L280-L280)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L283-L283)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.surface_tension
 
@@ -822,7 +852,7 @@ substep_time_step: Any
 surface_tension: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L252-L252)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L255-L255)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.surface_tension_mode
 
@@ -832,7 +862,7 @@ surface_tension: Any
 surface_tension_mode: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L269-L269)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L272-L272)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.thermodynamics
 
@@ -842,7 +872,7 @@ surface_tension_mode: Any
 thermodynamics: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L251-L251)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L254-L254)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.thermodynamics_modes
 
@@ -852,7 +882,7 @@ thermodynamics: Any
 thermodynamics_modes: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L288-L288)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L291-L291)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.thermodynamics_parameters
 
@@ -862,7 +892,7 @@ thermodynamics_modes: Any
 thermodynamics_parameters: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L289-L289)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L292-L292)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.total_mass_transfer
 
@@ -872,7 +902,7 @@ thermodynamics_parameters: Any
 total_mass_transfer: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L255-L255)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L258-L258)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.water_species_index
 
@@ -882,7 +912,7 @@ total_mass_transfer: Any
 water_species_index: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L270-L270)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L273-L273)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.work_mass_transfer
 
@@ -892,14 +922,14 @@ water_species_index: Any
 work_mass_transfer: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L256-L256)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L259-L259)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.__init__
 
 *method*
 
 ```python
-def __init__(particles: Any, gas: Any, thermodynamics: Any, surface_tension: Any, mass_accommodation: Any, diffusion_coefficient_vapor: Any, total_mass_transfer: Any, work_mass_transfer: Any, demand: Any, release: Any, scale: Any, candidate: Any, finalized: Any, gas_delta: Any, dynamic_viscosity: Any, mean_free_path: Any, kappas: Any, molar_mass_reference: Any, activity_enabled: Any, activity_mode: Any, surface_tension_mode: Any, water_species_index: Any, effective_surface_tension: Any, refresh_temperature: Any, kernel_pressure: Any, latent_heat: Any, latent_heat_values: Any, latent_heat_enabled: Any, energy_transfer: Any, dimensions: tuple[int, int, int], device: Any, substep_time_step: Any, particle_masses: Any, particle_concentration: Any, particle_density: Any, gas_concentration: Any, gas_vapor_pressure: Any, gas_molar_mass: Any, gas_partitioning: Any, thermodynamics_modes: Any, thermodynamics_parameters: Any, species_binding: CondensationSpeciesBinding, particle_to_gas: Any, gas_to_particle: Any, particle_volume: Any, particle_charge: Any, distribution_kind: int, gas_species_count: int) -> None
+def __init__(particles: Any, gas: Any, thermodynamics: Any, surface_tension: Any, mass_accommodation: Any, diffusion_coefficient_vapor: Any, total_mass_transfer: Any, work_mass_transfer: Any, demand: Any, release: Any, scale: Any, candidate: Any, finalized: Any, gas_delta: Any, dynamic_viscosity: Any, mean_free_path: Any, kappas: Any, molar_mass_reference: Any, activity_enabled: Any, activity_mode: Any, surface_tension_mode: Any, water_species_index: Any, effective_surface_tension: Any, refresh_temperature: Any, kernel_pressure: Any, latent_heat: Any, latent_heat_values: Any, latent_heat_enabled: Any, energy_transfer: Any, dimensions: tuple[int, int, int], device: Any, substep_time_step: Any, particle_masses: Any, particle_concentration: Any, particle_density: Any, gas_concentration: Any, gas_vapor_pressure: Any, gas_molar_mass: Any, gas_partitioning: Any, thermodynamics_modes: Any, thermodynamics_parameters: Any, species_binding: CondensationSpeciesBinding, particle_to_gas: Any, gas_to_particle: Any, particle_volume: Any, particle_charge: Any, distribution_kind: int, gas_species_count: int, failure: Any = None, parallel_reductions: Any = None) -> None
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L0-L0)
@@ -914,7 +944,7 @@ def _accumulate_finalized_mass_transfer_kernel(finalized: Any, total_mass_transf
 
 Add one inventory-limited transfer to the whole-call total.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1066-L1077)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1118-L1129)
 
 ## particula.gpu.kernels.condensation._bound_evaporation_candidate_kernel
 
@@ -932,7 +962,7 @@ Copy a gated proposal while bounding evaporation by owned mass.
 - `gated_transfer` (`Any`) — Already partitioning-gated transfer proposal matching ``masses`` [kg].
 - `candidate` (`Any`) — Output bounded proposal matching ``masses`` [kg].
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1102-L1124)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1185-L1207)
 
 ## particula.gpu.kernels.condensation._clear_energy_transfer_kernel
 
@@ -944,7 +974,7 @@ def _clear_energy_transfer_kernel(energy_transfer: Any) -> None
 
 Clear caller-owned whole-call energy diagnostic storage.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1055-L1063)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1107-L1115)
 
 ## particula.gpu.kernels.condensation._clear_mass_transfer_kernel
 
@@ -956,7 +986,7 @@ def _clear_mass_transfer_kernel(total_mass_transfer: Any) -> None
 
 Clear the fixed-shape accumulator before the four-substep update.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1042-L1052)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1094-L1104)
 
 ## particula.gpu.kernels.condensation._condensation_mass_transfer_impl
 
@@ -968,7 +998,7 @@ def _condensation_mass_transfer_impl(masses: Any, concentration: Any, density: A
 
 Shared raw proposal with explicit gas lookup only for native calls.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L488-L762)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L493-L783)
 
 ## particula.gpu.kernels.condensation._copy_pressure_to_float64_kernel
 
@@ -985,7 +1015,7 @@ Copy normalized pressures into a float64 device buffer.
 - `pressure` (`Any`) — Normalized per-box pressure array ``(n_boxes,)`` [Pa].
 - `output` (`Any`) — Float64 per-box output array ``(n_boxes,)`` [Pa].
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L966-L979)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L987-L1000)
 
 ## particula.gpu.kernels.condensation._copy_temperature_to_float64_kernel
 
@@ -1005,7 +1035,7 @@ thermodynamic vapor-pressure refresh without changing the input buffer.
 - `temperature` (`Any`) — Normalized per-box temperature array ``(n_boxes,)`` [K].
 - `output` (`Any`) — Float64 per-box output array ``(n_boxes,)`` [K].
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L947-L963)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L968-L984)
 
 ## particula.gpu.kernels.condensation._couple_finalized_transfer_to_gas_kernel
 
@@ -1015,13 +1045,37 @@ thermodynamic vapor-pressure refresh without changing the input buffer.
 def _couple_finalized_transfer_to_gas_kernel(gas_delta: Any, gas_concentration: Any) -> None
 ```
 
+Run the shared device operation through the direct kernel API.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1156-L1166)
+
+## particula.gpu.kernels.condensation._couple_finalized_transfer_to_gas_kernel_body
+
+*function*
+
+```python
+def _couple_finalized_transfer_to_gas_kernel_body(gas_delta: Any, gas_concentration: Any, box_idx: wp.int32, species_idx: wp.int32) -> None
+```
+
 Couple a prevalidated finalized-transfer reduction to gas.
 
 Each box-species lane subtracts a finite, concentration-weighted particle
 transfer delta from gas. Negative finalized transfer therefore adds
 evaporated inventory to gas.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1080-L1099)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1132-L1153)
+
+## particula.gpu.kernels.condensation._couple_finalized_transfer_to_gas_kernel_guarded
+
+*function*
+
+```python
+def _couple_finalized_transfer_to_gas_kernel_guarded(gas_delta: Any, gas_concentration: Any, failure: wp.array(dtype=wp.int32)) -> None
+```
+
+Skip this resident writer after a latched simulation failure.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1169-L1182)
 
 ## particula.gpu.kernels.condensation._effective_surface_tension_kernel
 
@@ -1037,7 +1091,7 @@ The output is recalculated from the current mass in each substep and reused
 for every condensing species of that particle, avoiding a full composition
 reduction per species.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L928-L944)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L949-L965)
 
 ## particula.gpu.kernels.condensation._enqueue_prepared_condensation_call
 
@@ -1068,7 +1122,7 @@ coupling, and diagnostic sequence four times.
 - (`Any`) — A tuple containing the resident particle container and the accumulated
 - (`Any`) — finalized mass-transfer buffer, both retained by the prepared record.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L2844-L3074)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L2932-L3183)
 
 ## particula.gpu.kernels.condensation._finalize_and_apply_inventory_transfer_kernel
 
@@ -1091,7 +1145,7 @@ therefore does not perform gas coupling.
 - `scale` (`Any`) — Positive-transfer fractions by box and species.
 - `finalized` (`Any`) — Output applied transfer matching ``masses`` [kg].
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1199-L1224)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1282-L1307)
 
 ## particula.gpu.kernels.condensation._finalize_inventory_limited_mass_transfer
 
@@ -1140,7 +1194,7 @@ peer storage.
 > failures leave caller-owned state unchanged; this does not promise
 > rollback after a post-launch device-runtime failure.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1898-L2041)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1981-L2124)
 
 ## particula.gpu.kernels.condensation._mapped_condensation_mass_transfer_kernel
 
@@ -1152,7 +1206,7 @@ def _mapped_condensation_mass_transfer_kernel(masses: Any, concentration: Any, d
 
 Compute particle-ordered proposals from full-gas mapped sources.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L864-L925)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L885-L946)
 
 ## particula.gpu.kernels.condensation._prepare_condensation_step_gpu
 
@@ -1292,7 +1346,7 @@ before launch to prevent non-isothermal arithmetic overflow.
 > only writes it. This write-only contract permits stale finite values and
 > NaN/Inf before a call.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L2135-L2841)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L2218-L2929)
 
 ## particula.gpu.kernels.condensation._prepare_environment_properties_kernel
 
@@ -1311,7 +1365,7 @@ Precompute box-level gas properties for one condensation substep.
 - `dynamic_viscosity` (`Any`) — Output dynamic viscosity array ``(n_boxes,)`` [Pa·s].
 - `mean_free_path` (`Any`) — Output mean free path array ``(n_boxes,)`` [m].
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L982-L1015)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1003-L1036)
 
 ## particula.gpu.kernels.condensation._read_float64_array
 
@@ -1323,7 +1377,7 @@ def _read_float64_array(array: Any) -> np.ndarray
 
 Return a Warp array's values as a float64 NumPy array for validation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L299-L301)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L304-L306)
 
 ## particula.gpu.kernels.condensation._reduce_inventory_candidates_kernel
 
@@ -1346,7 +1400,7 @@ negative candidates contribute their magnitude to release.
 - `demand` (`Any`) — Output positive transfer demand ``(n_boxes, n_species)`` [kg/m^3].
 - `release` (`Any`) — Output evaporation release ``(n_boxes, n_species)`` [kg/m^3].
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1127-L1160)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1210-L1243)
 
 ## particula.gpu.kernels.condensation._scale_inventory_uptake_kernel
 
@@ -1369,7 +1423,7 @@ and otherwise the available-to-demand ratio clamped to ``[0, 1]``.
 - `release` (`Any`) — Evaporation release ``(n_boxes, n_species)`` [kg/m^3].
 - `scale` (`Any`) — Output positive-transfer fractions ``(n_boxes, n_species)``.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1163-L1196)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1246-L1279)
 
 ## particula.gpu.kernels.condensation._validate_device_arrays
 
@@ -1391,7 +1445,7 @@ Validate particle and gas arrays share the same Warp device.
 
 - `ValueError` — If any particle or gas array is on a different device.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1877-L1895)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1960-L1978)
 
 ## particula.gpu.kernels.condensation._validate_device_match
 
@@ -1413,7 +1467,7 @@ Validate that a Warp array is on the expected device.
 
 - `ValueError` — If the array is not on the expected device.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1861-L1874)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1944-L1957)
 
 ## particula.gpu.kernels.condensation._validate_energy_transfer_buffer
 
@@ -1425,7 +1479,7 @@ def _validate_energy_transfer_buffer(energy_transfer: Any, expected_shape: tuple
 
 Validate metadata for caller-owned write-only energy output storage.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1352-L1372)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1435-L1455)
 
 ## particula.gpu.kernels.condensation._validate_energy_transfer_ownership
 
@@ -1437,7 +1491,7 @@ def _validate_energy_transfer_ownership(energy_transfer: Any, mutable_arrays: tu
 
 Reject energy output storage overlapping condensation state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1428-L1447)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1511-L1530)
 
 ## particula.gpu.kernels.condensation._validate_finite_gas_delta
 
@@ -1449,7 +1503,7 @@ def _validate_finite_gas_delta(gas_delta: Any, device: Any) -> None
 
 Reject non-finite finalized-transfer reductions before gas mutation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1622-L1636)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1705-L1719)
 
 ## particula.gpu.kernels.condensation._validate_float64_species_array
 
@@ -1465,7 +1519,7 @@ Numeric-domain validation runs before the step can clear or mutate any
 caller-owned output. CUDA values are checked by a device-side preflight
 kernel; only its one-element validation result is read back.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1256-L1299)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1339-L1382)
 
 ## particula.gpu.kernels.condensation._validate_gas_arrays
 
@@ -1487,7 +1541,7 @@ Validate gas array shapes and lengths.
 
 - `ValueError` — If gas array shapes do not match expectations.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1778-L1804)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1861-L1887)
 
 ## particula.gpu.kernels.condensation._validate_gas_delta_values_kernel
 
@@ -1499,7 +1553,7 @@ def _validate_gas_delta_values_kernel(gas_delta: Any, invalid: Any) -> None
 
 Record a non-finite finalized-transfer gas reduction.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1508-L1514)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1591-L1597)
 
 ## particula.gpu.kernels.condensation._validate_int32_selector
 
@@ -1511,7 +1565,7 @@ def _validate_int32_selector(name: str, value: Any, allowed: tuple[int, ...]) ->
 
 Validate a non-boolean integer selector before Warp int32 conversion.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L364-L379)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L369-L384)
 
 ## particula.gpu.kernels.condensation._validate_mass_transfer_buffer
 
@@ -1533,7 +1587,7 @@ Validate mass transfer buffer shape and device.
 
 - `ValueError` — If the shape or device does not match expectations.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1321-L1349)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1404-L1432)
 
 ## particula.gpu.kernels.condensation._validate_mass_transfer_ownership
 
@@ -1545,7 +1599,7 @@ def _validate_mass_transfer_ownership(mass_transfer: Any, state_arrays: tuple[An
 
 Reject a total-transfer output that aliases condensation state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1450-L1471)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1533-L1554)
 
 ## particula.gpu.kernels.condensation._validate_native_ownership
 
@@ -1560,7 +1614,7 @@ Reject overlaps involving any native writer before normalization.
 Primary arrays, outputs and supplied scratch must not overwrite any peer
 or configuration array. Read-only configuration may share storage.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L2044-L2132)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L2127-L2215)
 
 ## particula.gpu.kernels.condensation._validate_no_overlap
 
@@ -1572,7 +1626,7 @@ def _validate_no_overlap(read_only_arrays: tuple[Any | None, ...], writable_arra
 
 Reject thermal sidecars that alias writable scratch property storage.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1406-L1425)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1489-L1508)
 
 ## particula.gpu.kernels.condensation._validate_p2_commit_values
 
@@ -1585,7 +1639,7 @@ def _validate_p2_commit_values(particles: Any, finalized: Any, total_mass_transf
 Validate every prospective inventory finalization state value before its
 first commit.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1639-L1683)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1722-L1766)
 
 ## particula.gpu.kernels.condensation._validate_p2_commit_values_kernel
 
@@ -1598,7 +1652,7 @@ def _validate_p2_commit_values_kernel(masses: Any, finalized: Any, total_mass_tr
 Record invalid prospective inventory finalization values before mutating
 public state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1517-L1552)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1600-L1635)
 
 ## particula.gpu.kernels.condensation._validate_p2_primary_state
 
@@ -1611,7 +1665,7 @@ def _validate_p2_primary_state(particles: Any, gas: Any, dimensions: tuple[int, 
 Validate finite, non-negative primary inventory finalization state before
 launch.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1555-L1598)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1638-L1681)
 
 ## particula.gpu.kernels.condensation._validate_p2_primary_values_kernel
 
@@ -1624,7 +1678,7 @@ def _validate_p2_primary_values_kernel(masses: Any, concentration: Any, gas_conc
 Record invalid primary inventory finalization state without changing
 caller data.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1474-L1495)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1557-L1578)
 
 ## particula.gpu.kernels.condensation._validate_p2_proposal_finiteness
 
@@ -1637,7 +1691,7 @@ def _validate_p2_proposal_finiteness(proposal: Any, dimensions: tuple[int, int, 
 Validate a freshly written proposal gating proposal immediately before
 inventory finalization mutation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1601-L1619)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1684-L1702)
 
 ## particula.gpu.kernels.condensation._validate_p2_proposal_values_kernel
 
@@ -1649,7 +1703,7 @@ def _validate_p2_proposal_values_kernel(proposal: Any, invalid: Any) -> None
 
 Record a non-finite freshly generated proposal gating proposal.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1498-L1505)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1581-L1588)
 
 ## particula.gpu.kernels.condensation._validate_p2_sidecar_ownership
 
@@ -1662,7 +1716,7 @@ def _validate_p2_sidecar_ownership(demand: Any | None, release: Any | None, scal
 Reject inventory finalization reduction sidecars overlapping protected or
 peer storage.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1686-L1713)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1769-L1796)
 
 ## particula.gpu.kernels.condensation._validate_particle_arrays
 
@@ -1685,7 +1739,7 @@ Validate particle array shapes and lengths.
 
 - `ValueError` — If particle array shapes do not match expectations.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1753-L1775)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1836-L1858)
 
 ## particula.gpu.kernels.condensation._validate_partitioning_metadata
 
@@ -1697,7 +1751,7 @@ def _validate_partitioning_metadata(partitioning: Any, n_boxes: int, n_species: 
 
 Validate an active-device per-box partitioning mask's metadata.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1819-L1835)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1902-L1918)
 
 ## particula.gpu.kernels.condensation._validate_partitioning_values
 
@@ -1713,7 +1767,7 @@ The one-element status buffer is private disposable preflight state. Its
 readback is necessary to make arbitrary device-resident non-binary values
 observable before any caller-owned state is changed.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1838-L1858)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1921-L1941)
 
 ## particula.gpu.kernels.condensation._validate_partitioning_values_kernel
 
@@ -1725,7 +1779,7 @@ def _validate_partitioning_values_kernel(partitioning: Any, invalid: Any) -> Non
 
 Record non-binary entries in a per-box partitioning mask.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1807-L1816)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1890-L1899)
 
 ## particula.gpu.kernels.condensation._validate_scratch_ownership
 
@@ -1737,7 +1791,7 @@ def _validate_scratch_ownership(scratch_buffers: CondensationScratchBuffers, pro
 
 Reject all supplied scratch buffers overlapping peers or public state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1716-L1750)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1799-L1833)
 
 ## particula.gpu.kernels.condensation._validate_species_array
 
@@ -1760,7 +1814,7 @@ Validate per-species array length and device.
 
 - `ValueError` — If the array length or device mismatches expectations.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1227-L1253)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1310-L1336)
 
 ## particula.gpu.kernels.condensation._validate_species_values_kernel
 
@@ -1772,7 +1826,7 @@ def _validate_species_values_kernel(values: Any, require_nonnegative: wp.int32, 
 
 Record whether a species sidecar has an invalid numeric value.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1302-L1318)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1385-L1401)
 
 ## particula.gpu.kernels.condensation._warp_array_memory_range
 
@@ -1787,7 +1841,7 @@ Return a contiguous Warp array's byte range.
 Ownership checks reject strided views because a single address range cannot
 distinguish their gaps from overlapping storage.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1375-L1403)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1458-L1486)
 
 ## particula.gpu.kernels.condensation.apply_mass_transfer_kernel
 
@@ -1797,6 +1851,18 @@ distinguish their gaps from overlapping storage.
 def apply_mass_transfer_kernel(masses: Any, mass_transfer: Any) -> None
 ```
 
+Run the shared device operation through the direct kernel API.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1065-L1075)
+
+## particula.gpu.kernels.condensation.apply_mass_transfer_kernel_body
+
+*function*
+
+```python
+def apply_mass_transfer_kernel_body(masses: Any, mass_transfer: Any, box_idx: wp.int32, particle_idx: wp.int32) -> None
+```
+
 Apply condensation mass transfer and clamp masses to non-negative.
 
 **Parameters**
@@ -1804,7 +1870,19 @@ Apply condensation mass transfer and clamp masses to non-negative.
 - `masses` (`Any`) — Particle masses array ``(n_boxes, n_particles, n_species)``.
 - `mass_transfer` (`Any`) — Mass transfer array matching ``masses`` shape.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1018-L1039)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1039-L1062)
+
+## particula.gpu.kernels.condensation.apply_mass_transfer_kernel_guarded
+
+*function*
+
+```python
+def apply_mass_transfer_kernel_guarded(masses: Any, mass_transfer: Any, failure: wp.array(dtype=wp.int32)) -> None
+```
+
+Skip this resident writer after a latched simulation failure.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1078-L1091)
 
 ## particula.gpu.kernels.condensation.condensation_mass_transfer_kernel
 
@@ -1852,7 +1930,7 @@ the original isothermal rate path.
 - `time_step` (`Any`) — Condensation substep duration [s].
 - `mass_transfer` (`Any`) — Output raw mass-transfer proposal array.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L765-L861)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L786-L882)
 
 ## particula.gpu.kernels.condensation.condensation_step_gpu
 
@@ -1901,7 +1979,7 @@ API.
 - `ValueError` — If preflight rejects the containers, inputs, sidecars, or
 output ownership, or if a post-launch runtime validation fails.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L3077-L3161)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L3186-L3270)
 
 ## particula.gpu.kernels.condensation.validate_condensation_activity_surface_config
 
@@ -1937,7 +2015,7 @@ ordered molar-mass reference violates the contract.
 > sidecar therefore leaves particle, gas, environment, and supplied
 > output buffers unchanged; it never falls back to legacy physics.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L382-L485)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L387-L490)
 
 ## particula.gpu.kernels.condensation.validate_condensation_scratch_buffers
 
@@ -1972,4 +2050,4 @@ synchronizes.
 - `ValueError` — If ``candidate`` is not the exact sidecar type or a
 supplied field has incompatible shape, dtype, or device.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L304-L361)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L309-L366)

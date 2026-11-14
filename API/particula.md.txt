@@ -33,6 +33,18 @@ logger = setup()
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/__init__.py#L61-L61)
 
+## particula.__getattr__
+
+*function*
+
+```python
+def __getattr__(name: str)
+```
+
+Expose prepared simulation types without loading optional runtimes.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/__init__.py#L66-L76)
+
 **Modules**
 
 - `particula._cpu_batch`

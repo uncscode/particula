@@ -96,7 +96,7 @@ the condensation equations become questionable.
 **Parameters**
 
 - `particle_radius` (`Union[float, NDArray[np.float64]]`) — Radius of the particle (m).
-- `kelvin_radius_value` (`Union[float, NDArray[np.float64]]`) — Precomputed Kelvin radius (m).
+- `kelvin_radius_value` (`Union[float, NDArray[np.float64]]`) — Precomputed Kelvin radius (m). A species vector broadcasts over particles; a particle-by-species matrix retains its particle-specific composition.
 
 **Returns**
 
@@ -120,4 +120,4 @@ print(kv_term)
 >   new-particle formation?" Faraday Discussions, 165, 91–104.
 >   https://doi.org/10.1039/C3FD00046J. [check]
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/properties/kelvin_effect_module.py#L76-L153)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/properties/kelvin_effect_module.py#L76-L166)

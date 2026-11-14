@@ -1,15 +1,15 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 3.5917229740298353,
-  "package_source_sha256": "d2d42e4f36b1c94dcf9d453f0cc405e59a8ec0ba96206d0c47d7a94f078e7be1",
+  "elapsed_seconds": 3.8875446440069936,
+  "package_source_sha256": "1d2bf0708c00d6e34107e200c143eb76cae07571fd4e691f1ce7cb88cd95a134",
   "input_sha256": {},
   "example": "examples-gpu-resident-gpu-resident-session",
-  "fingerprint": "40121483db8e53d891fd88ec96e6a5d7d76bbada4bf47cbd62ee965901611a8c",
+  "fingerprint": "2949f5164c519e70fc1310ecfd5fce8fa0f33132b04b909c40974fcb6cae0118",
   "source": "docs/examples/gpu/resident/gpu_resident_session.py",
-  "revision": "0dd628a755428a066c7e79519cfc6bb783f2c16d",
-  "package_dirty": false,
-  "executed_at": "2026-11-13T15:31:17.957056+00:00",
+  "revision": "b4e98034b2150dad71d6e8f53085640a64561e64",
+  "package_dirty": true,
+  "executed_at": "2026-11-14T00:43:10.853235+00:00",
   "device": "cuda:0: NVIDIA GeForce RTX 5060",
   "python": "3.12.12",
   "versions": {
@@ -23,13 +23,18 @@
   },
   "outputs": [
     [],
+    [],
     [
       {
         "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\nCanonical path: docs/examples/gpu/resident/gpu_resident_session.py\nFinalization terminalizes its source; returned checkpoint is ACTIVE and cached.\nRestart is explicit, same-device, and never automatic.\nInspection is lossy; canonical checkpoint bytes are restart authority.\nCheckpoint schema version 5 compatibility is exact and fail-closed.\nExclusions: no scheduling, transport, fallback, or physics orchestration.\n"
+      },
+      {
+        "image": "figure-3-2.png"
       }
     ]
   ],
   "files": {
-    "source.py": "5b11ce96daa168e034f41e8cfa46288565ff4a7407a8a69e7e31241077ab6f8c"
+    "source.py": "bbc24dcef12be3f5b8321ae1c663f00beb7f8d2a96cfae201feebaf187b87df4",
+    "figure-3-2.png": "c93399622ddb819c99b17d1f69aab258009541316e7b6d3614d5dd8b5ffa52be"
   }
 }

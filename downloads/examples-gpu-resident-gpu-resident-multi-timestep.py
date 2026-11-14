@@ -1,3 +1,12 @@
+# %% [markdown]
+# # Multibox resident timesteps and continuation
+#
+# Run the complete low-level resident schedule across three heterogeneous
+# boxes, inspect CPU diagnostics, and explicitly resume a checkpoint.
+# Run with `--cuda` to reproduce the saved figures. CUDA is required
+# for publication; unavailable hardware never becomes a successful GPU run.
+
+# %%
 """Run a complete multi-box GPU-resident scheduler example.
 
 Warp and the concrete resident seams are optional at import time.  When Warp is
@@ -852,6 +861,60 @@ def run_example(device: str = "cpu") -> ExampleRun:
     )
 
 
+# %% [markdown]
+# ## Compare boxes after two resident timesteps
+#
+# The boxes have distinct volume, gas concentration and temperature. Prescribed
+# gas is refreshed during each step and walls may remove particles. The plotted
+# inventory change is therefore an open-system response, not conservation error.
+# The checkpoint is then restarted and advanced once more; its forcing must
+# match exactly before that continuation begins.
+
+
+# %%
+def run_publication():
+    """Require CUDA and plot heterogeneous gas and open-system inventories."""
+    import matplotlib.pyplot as plt
+    import warp as wp
+
+    if not _warp_enabled() or not wp.is_cuda_available():
+        raise RuntimeError("This publication run requires CUDA")
+    _, initial_gas, _ = _build_cpu_state()
+    result = run_example(device="cuda:0")
+    if result.gas_snapshot is None or result.conservation_residual is None:
+        raise RuntimeError("CUDA produced no diagnostic snapshots")
+    boxes = np.arange(3) + 1
+    fig, axes = plt.subplots(1, 2, figsize=(9, 3.6), constrained_layout=True)
+    axes[0].bar(
+        boxes - 0.18,
+        initial_gas.concentration[:, 0],
+        width=0.36,
+        label="Initial",
+    )
+    axes[0].bar(
+        boxes + 0.18,
+        result.gas_snapshot[:, 0],
+        width=0.36,
+        label="After two steps",
+    )
+    axes[0].set(xlabel="Box", ylabel="Water gas (kg m$^{-3}$)", xticks=boxes)
+    axes[0].legend()
+    relative = np.asarray(result.conservation_residual).reshape(3, -1)[:, 0]
+    relative = relative / result.initial_total_mass[:, 0]
+    axes[1].bar(boxes, relative, color="#be6c39")
+    axes[1].set(
+        xlabel="Box", ylabel="Net inventory change / initial", xticks=boxes
+    )
+    axes[1].axhline(0, color="0.5", linewidth=0.8)
+    fig.suptitle(
+        "Resident multibox evolution · " + wp.get_device("cuda:0").name
+    )
+    print("\n".join(result.output))
+    print("Checkpoint forcing matched exactly before continuation.")
+    plt.show()
+    return result
+
+
 def main() -> None:
     """Run the example and print its deterministic status lines."""
     for line in run_example().output:
@@ -859,4 +922,9 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+
+    if "--cuda" in sys.argv[1:]:
+        run_publication()
+    else:
+        main()
