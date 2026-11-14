@@ -1,3 +1,12 @@
+# %% [markdown]
+# # Five direct CUDA process boundaries
+#
+# Upload particles, gas and environment once, retain explicit sidecars, and
+# restore the complete CPU result after the ordered calls.
+# Run this script with `--cuda` to reproduce the published figures.
+# The unflagged command retains its portable Warp CPU regression.
+
+# %%
 """Run five direct Warp steps with explicit container conversions and restore.
 
 The enabled path converts CPU particle, gas, and environment containers once,
@@ -584,6 +593,57 @@ def run_example(device: str = "cpu") -> ExampleRun:
     )
 
 
+# %% [markdown]
+# ## Observe the complete direct-call sequence
+#
+# The CPU snapshots below show the combined result of condensation,
+# coagulation, dilution and wall loss. The nucleation call has zero duration:
+# it demonstrates its boundary without injecting particles. The prepared
+# lifecycle study adds an active source pulse and a per-process inventory
+# ledger. These before/after panels do not attribute changes to individual
+# processes or claim closed-system conservation in the presence of sinks.
+
+
+# %%
+def run_publication():
+    """Run all five direct boundaries on CUDA and plot restored state."""
+    import matplotlib.pyplot as plt
+    import warp as wp
+
+    if not _warp_enabled() or not wp.is_cuda_available():
+        raise RuntimeError("This publication run requires CUDA")
+    particles, gas, _, _ = _build_cpu_state()
+    result = run_example(device="cuda:0")
+    if result.particle_data is None or result.gas_data is None:
+        raise RuntimeError("CUDA produced no complete snapshot")
+    fig, axes = plt.subplots(1, 2, figsize=(9, 3.8), constrained_layout=True)
+    x = np.arange(2)
+    for offset, p, g, label in (
+        (-0.18, particles, gas, "Initial"),
+        (0.18, result.particle_data, result.gas_data, "Final"),
+    ):
+        particle_mass = np.sum(p.masses * p.concentration[..., None], axis=1)[0]
+        particle_density = particle_mass / p.volume[0]
+        axes[0].bar(x + offset, particle_density * 1e9, width=0.36, label=label)
+        axes[1].bar(
+            x + offset, g.concentration[0] * 1e9, width=0.36, label=label
+        )
+    for ax in axes:
+        ax.set(xticks=x, xticklabels=gas.name)
+        ax.legend()
+    axes[0].set(ylabel="Particle mass density (µg m$^{-3}$)")
+    axes[1].set(ylabel="Gas mass density (µg m$^{-3}$)")
+    fig.suptitle("Combined direct sequence · " + wp.get_device("cuda:0").name)
+    print("\n".join(result.output))
+    print(
+        "Represented number, initial/final:",
+        particles.concentration.sum(),
+        result.particle_data.concentration.sum(),
+    )
+    plt.show()
+    return result
+
+
 def main() -> None:
     """Run the example and print only its completed-result output.
 
@@ -595,4 +655,9 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+
+    if "--cuda" in sys.argv[1:]:
+        run_publication()
+    else:
+        main()

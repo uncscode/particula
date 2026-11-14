@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 4.388440231035929,
+  "package_source_sha256": "1d2bf0708c00d6e34107e200c143eb76cae07571fd4e691f1ce7cb88cd95a134",
+  "input_sha256": {},
+  "example": "gpu-coagulation",
+  "fingerprint": "c9ca5138d117179967806750d50fbeaf75126fba70695f4ff44481bdf90379f3",
+  "source": "docs/examples/gpu/direct/gpu_coagulation_direct.py",
+  "revision": "b4e98034b2150dad71d6e8f53085640a64561e64",
+  "package_dirty": true,
+  "executed_at": "2026-11-14T00:42:30.758131+00:00",
+  "device": "cuda:0: NVIDIA GeForce RTX 5060",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [],
+    [],
+    [
+      {
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\nModule particula.gpu.kernels.environment e11375e load on device 'cuda:0' took 0.41 ms  (cached)\nModule particula.gpu.kernels.coagulation 9ee9d75 load on device 'cuda:0' took 0.43 ms  (cached)\nModule particula.gpu.kernels._coagulation_native f93a244 load on device 'cuda:0' took 0.32 ms  (cached)\nModule particula.gpu.kernels.coagulation 198d307 load on device 'cuda:0' took 1.48 ms  (cached)\nModule particula.gpu.kernels._brownian_parallel 17ce68f load on device 'cuda:0' took 0.71 ms  (cached)\nModule particula.gpu.kernels._brownian_parallel 326c699 load on device 'cuda:0' took 1.26 ms  (cached)\nModule particula.gpu.kernels.coagulation 1e59d34 load on device 'cuda:0' took 1.44 ms  (cached)\nModule particula.gpu.kernels.coagulation e46ffbd load on device 'cuda:0' took 0.47 ms  (cached)\nCanonical path: docs/examples/gpu/direct/gpu_coagulation_direct.py\nParticleData constructed: masses=(1, 8, 1), concentration=(1, 8), charge=(1, 8), density=(1,), volume=(1,)\nExplicit helpers: CPU\u2192Warp conversion -> selected-adapter dispatch -> CPU restoration\nSelected Brownian coagulation complete: device=cuda:0, calls=2, collision_pairs=(1, 4, 2), n_collisions=(1,)\nFinal particle data restored: particle_masses=(1, 8, 1)\nAdapter result retains supplied collision and RNG sidecars by identity.\nPersistent RNG state is initialized once and reused by the second call.\n"
+      },
+      {
+        "image": "figure-3-2.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "c61c1256ba06695afcbbaeaf0a9e57e71460f916b8054ad7046d66945271128d",
+    "figure-3-2.png": "658ba5d62324e93facfdb377d2a4bc11e0061a2bf257a795fb9cd45e4e27d006"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 115.60250239598099,
+  "package_source_sha256": "e4661a2e3003b42b1a1e9ff8b438636f922d2afff85115706be9ee79fe9b3741",
+  "input_sha256": {
+    "scripts/docs_gpu_figures.py": "c6e4aca14a964fc2e3f091c92b3384212d40b3211ec34b2fa00df6a0f191a9ae",
+    "scripts/gpu_studies/__init__.py": "530c51f7c7f432a895623c9ba4548b7cf3e053a1a0f328a36ae8ae9e50cec9c4",
+    "scripts/gpu_studies/cases.py": "8728bdc1bb583d849d7228055c5bbc27606c021e1564f2d531b8c9a9e93787ec",
+    "scripts/gpu_studies/validation.py": "816f83d10024feef14daa05112688ea7d26faa3ddde8e05ba12e8dc29f6a4a45",
+    "scripts/gpu_studies/trajectories.py": "41d64b0ef3351bb41c12cd3314b02b7ea7c87d8e225d7b9b6508663f6eca84af"
+  },
+  "example": "gpu-prepared-forcing",
+  "fingerprint": "0fe3250e41cc01489a722401c41a7e35f48a67dcf6c2b10369f2e53d303ceb00",
+  "source": "docs/examples/gpu/prepared/gpu_prepared_forcing.py",
+  "revision": "da142e3dfcf190010d21f1ac07aca1a12e4c9fd0",
+  "package_dirty": true,
+  "executed_at": "2026-11-14T00:53:12.924817+00:00",
+  "device": "cuda:0: NVIDIA GeForce RTX 5060",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [],
+    [],
+    [
+      {
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\nModule particula.gpu.kernels.condensation 14a649a load on device 'cuda:0' took 0.68 ms  (cached)\nModule particula.gpu.kernels.condensation 2c7d291 load on device 'cuda:0' took 0.42 ms  (cached)\nModule particula.gpu.kernels.environment e11375e load on device 'cuda:0' took 0.52 ms  (cached)\nModule particula.gpu.kernels._condensation_native 34375de load on device 'cuda:0' took 0.51 ms  (cached)\n"
+      },
+      {
+        "text": "Module particula.gpu.kernels.dilution 0472484 load on device 'cuda:0' took 0.63 ms  (cached)\nModule particula.gpu.kernels._population_validation 65eaa49 load on device 'cuda:0' took 0.43 ms  (cached)\nModule particula.gpu.kernels.thermodynamics 563d292 load on device 'cuda:0' took 0.36 ms  (cached)\nModule particula.execution.prepared_guards e16d312 load on device 'cuda:0' took 0.36 ms  (cached)\nModule warp.utils f35afd3 load on device 'cuda:0' took 0.36 ms  (cached)\nModule warp.math edde159 load on device 'cuda:0' took 0.16 ms  (cached)\nModule warp.marching_cubes fb6e712 load on device 'cuda:0' took 0.71 ms  (cached)\nModule particula.execution.communication 2909959 load on device 'cuda:0' took 0.70 ms  (cached)\nModule particula.gpu.kernels.communication ac9b2a2 load on device 'cuda:0' took 1.86 ms  (cached)\nModule particula.gpu.properties.gas_properties edde159 load on device 'cuda:0' took 0.28 ms  (cached)\nModule particula.gpu.properties.particle_properties edde159 load on device 'cuda:0' took 0.19 ms  (cached)\nModule particula.gpu.dynamics.coagulation_funcs edde159 load on device 'cuda:0' took 0.16 ms  (cached)\nModule particula.gpu.dynamics.condensation_funcs edde159 load on device 'cuda:0' took 0.24 ms  (cached)\nModule particula.gpu.kernels._condensation_parallel edde159 load on device 'cuda:0' took 0.20 ms  (cached)\nModule particula.gpu.kernels.exhaustion ccbadfa load on device 'cuda:0' took 1.42 ms  (cached)\nModule particula.gpu.kernels.slot_management 0375e2c load on device 'cuda:0' took 0.38 ms  (cached)\nModule particula.gpu.kernels.nucleation 1124f09 load on device 'cuda:0' took 2.39 ms  (cached)\nModule particula.execution.gpu_resources 30f296c load on device 'cuda:0' took 0.36 ms  (cached)\nModule particula.gpu.warp_types edde159 load on device 'cuda:0' took 0.18 ms  (cached)\nModule particula.execution.prepared_diagnostics ca06582 load on device 'cuda:0' took 0.26 ms  (cached)\nModule particula.gpu.kernels.condensation c7ee7df load on device 'cuda:0' took 0.27 ms  (cached)\nModule particula.gpu.kernels.condensation 57dfed0 load on device 'cuda:0' took 0.27 ms  (cached)\n"
+      },
+      {
+        "text": "Module particula.gpu.kernels.condensation c3959d9 load on device 'cuda:0' took 1563.19 ms  (compiled)\nModule particula.gpu.kernels._condensation_native 9623455 load on device 'cuda:0' took 0.48 ms  (cached)\n"
+      },
+      {
+        "text": "Module particula.gpu.kernels.condensation 7f60dd5 load on device 'cuda:0' took 1541.78 ms  (compiled)\nModule particula.gpu.kernels._condensation_parallel e3b5b03 load on device 'cuda:0' took 0.44 ms  (cached)\nModule particula.gpu.kernels._condensation_parallel 27b2aba load on device 'cuda:0' took 0.41 ms  (cached)\n"
+      },
+      {
+        "text": "Module particula.gpu.kernels.condensation 7bff092 load on device 'cuda:0' took 1609.21 ms  (compiled)\nModule particula.gpu.kernels._condensation_native a7ac5d1 load on device 'cuda:0' took 0.43 ms  (cached)\nModule particula.gpu.kernels._condensation_parallel ffc25c8 load on device 'cuda:0' took 0.43 ms  (cached)\nModule particula.gpu.kernels._condensation_parallel 14f65ff load on device 'cuda:0' took 0.47 ms  (cached)\nModule particula.gpu.kernels._condensation_parallel 80fa1cf load on device 'cuda:0' took 0.52 ms  (cached)\n"
+      },
+      {
+        "text": "Module particula.gpu.kernels.condensation 6eb4098 load on device 'cuda:0' took 1729.25 ms  (compiled)\n"
+      },
+      {
+        "text": "Module particula.gpu.kernels.condensation 09ba18c load on device 'cuda:0' took 1902.53 ms  (compiled)\nModule particula.gpu.kernels.condensation 8dbfd8e load on device 'cuda:0' took 0.82 ms  (cached)\nModule particula.gpu.kernels._condensation_native d1db25a load on device 'cuda:0' took 0.47 ms  (cached)\n"
+      },
+      {
+        "text": "Maximum per-box, per-material inventory relative error: 1.8984813721090177e-14\nNet prescribed water addition across boxes (kg): 1.1839368460735165e-11\nShapes: particle materials (16, 4096, 4) gas species (16, 5)\nTimestep refinement: {'coarse_time_step_s': 1e-06, 'fine_time_step_s': 5e-07, 'max_particle_total_mass_relative_change': 0.0008383167321686091, 'max_water_vapor_relative_change': 2.2008040065246703e-05, 'fine_inventory_relative_error': 2.7977620220553945e-14, 'same_physical_duration_and_forcing': True}\n"
+      },
+      {
+        "image": "figure-3-9.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "4ef84f53c09e77f5efda9b0bd4b29cac463f5df2dd573c5135b26ec1b0349648",
+    "figure-3-9.png": "d09c7a78a4645651da458011aaf54f018bada0fe21b98f1bfc535ab7d571bdcf"
+  }
+}

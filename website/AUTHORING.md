@@ -55,3 +55,17 @@ rich outputs, without introducing a second maintained source file.
 Figures are exported at 300 DPI. Captured diagnostics retain repository-relative
 filenames and line numbers; local account and checkout paths are redacted before
 saving publication bundles. Terminal progress bars render in closed disclosures.
+
+## CUDA studies and downloadable helpers
+
+Published GPU examples use `policy: "cuda"` and require a real CUDA device.
+Their deliberate refresh can run longer than the routine ten-minute benchmark
+guide; the registry declares each timeout. CI checks source and saved-result
+integrity without executing these studies. A timeout or missing GPU must never
+produce a replacement CPU result.
+
+Declare every imported local helper and data file in `inputs`. These bytes
+participate in freshness checks and are included in the downloadable ZIP with
+`example.py`, preserving their relative import paths (or `input_destinations`).
+The plain Python download remains available; use the ZIP when helpers or data
+are needed. Test extracted bundles independently before publication.

@@ -1,3 +1,16 @@
+# %% [markdown]
+# # Check CUDA condensation against independent equations
+#
+# Two boxes have different temperatures, particle compositions and gas
+# inventories. Water uptake and organic evaporation occur in the same call.
+# An independent NumPy calculation evaluates four equal substeps before the
+# CUDA calculation begins. Separate checks cover transfer, conservation and
+# signed latent energy; passing one does not imply that the others pass.
+#
+# Reproduce the CUDA figures with `python gpu_condensation_parity_walkthrough.py
+# --cuda`. The unflagged command retains the portable Warp CPU regression.
+
+# %%
 """Compare an independent NumPy oracle with direct Warp condensation.
 
 This direct-kernel-only walkthrough defaults to Warp's CPU device and makes
@@ -432,8 +445,15 @@ def _proposal(state: OracleInput) -> np.ndarray:  # noqa: C901
                 temperature, mobility, constants.BOLTZMANN_CONSTANT
             )
             for species in range(2):
+                vapor_mean_free_path = get_molecule_mean_free_path(
+                    fixture.molar_mass[species],
+                    temperature,
+                    fixture.pressure[box],
+                    viscosity,
+                )
                 transition = get_vapor_transition_correction(
-                    knudsen, fixture.mass_accommodation[species]
+                    vapor_mean_free_path / radius,
+                    fixture.mass_accommodation[species],
                 )
                 vapor_diffusion = fixture.diffusion_coefficient_vapor[species]
                 if vapor_diffusion <= 0.0:
@@ -850,6 +870,81 @@ def run_example(device: str = "cpu") -> ExampleRun:
     )
 
 
+# %% [markdown]
+# ## Compare signed mass transfer and latent energy
+#
+# Positive transfer means condensation; negative transfer means evaporation.
+# Energy is an extensive quantity in joules and includes represented counts.
+# The small fixture tests the calculation, not GPU throughput.
+
+
+# %%
+def run_publication():
+    """Require successful CUDA acceptance before rendering the comparison."""
+    import matplotlib.pyplot as plt
+    import warp as wp
+
+    if not _warp_enabled() or not wp.is_cuda_available():
+        raise RuntimeError("This publication run requires CUDA")
+    result = run_example(device="cuda:0")
+    if any(item.status != "passed" for item in result.acceptance):
+        raise AssertionError("CUDA condensation acceptance failed")
+    fig, axes = plt.subplots(1, 2, figsize=(10, 3.8), constrained_layout=True)
+    labels = [
+        f"B{b + 1} P{p + 1} {s}"
+        for b in range(2)
+        for p in range(2)
+        for s in ("water", "organic")
+    ]
+    x = np.arange(8)
+    axes[0].bar(
+        x - 0.18,
+        result.oracle.total_mass_transfer.ravel() * 1e21,
+        width=0.36,
+        label="Independent NumPy",
+    )
+    axes[0].bar(
+        x + 0.18,
+        result.total_mass_transfer.ravel() * 1e21,
+        width=0.36,
+        label="CUDA",
+    )
+    axes[0].set(
+        ylabel="Signed mass transfer (ag)", xticks=x, xticklabels=labels
+    )
+    axes[0].tick_params(axis="x", rotation=65)
+    axes[0].axhline(0, color="0.5", linewidth=0.8)
+    axes[0].legend()
+    x = np.arange(4)
+    axes[1].plot(
+        x,
+        result.oracle.energy_transfer.ravel() * 1e12,
+        "o",
+        label="Independent NumPy",
+    )
+    axes[1].plot(
+        x,
+        result.energy_transfer.ravel() * 1e12,
+        "x",
+        markersize=9,
+        label="CUDA",
+    )
+    axes[1].set(
+        ylabel="Signed latent energy (pJ)",
+        xticks=x,
+        xticklabels=["B1 water", "B1 organic", "B2 water", "B2 organic"],
+    )
+    axes[1].tick_params(axis="x", rotation=35)
+    axes[1].axhline(0, color="0.5", linewidth=0.8)
+    axes[1].legend()
+    fig.suptitle(
+        "Independent condensation check · " + wp.get_device("cuda:0").name
+    )
+    print("\n".join(result.output))
+    plt.show()
+    return result
+
+
 def main() -> int:
     """Run the walkthrough, print results, and return its process status."""
     result = run_example()
@@ -859,4 +954,9 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    import sys
+
+    if "--cuda" in sys.argv[1:]:
+        run_publication()
+    else:
+        raise SystemExit(main())

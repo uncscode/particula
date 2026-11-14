@@ -130,6 +130,10 @@
             "slug": "guide/gpu"
           },
           {
+            "label": "Prepared simulations",
+            "slug": "guide/gpu/prepared"
+          },
+          {
             "label": "Backend Selection and Explicit CPU Fallback",
             "slug": "guide/gpu/backend-selection"
           },
@@ -538,6 +542,84 @@
           {
             "label": "GPU",
             "slug": "examples/gpu"
+          },
+          {
+            "label": "Prepared workflows",
+            "collapsed": true,
+            "items": [
+              {
+                "label": "Prepared CUDA: CPU state to GPU and back",
+                "slug": "examples/gpu/prepared/gpu_prepared_quick_start"
+              },
+              {
+                "label": "64 heterogeneous CUDA boxes",
+                "slug": "examples/gpu/prepared/gpu_prepared_multibox"
+              },
+              {
+                "label": "CUDA cooling and vapor pulses",
+                "slug": "examples/gpu/prepared/gpu_prepared_forcing"
+              },
+              {
+                "label": "Sixteen-seed CUDA coagulation",
+                "slug": "examples/gpu/prepared/gpu_prepared_stochastic"
+              },
+              {
+                "label": "Million-particle CUDA lifecycle",
+                "slug": "examples/gpu/prepared/gpu_prepared_lifecycle"
+              },
+              {
+                "label": "Cyclic CUDA aerosol with repeated source pulses",
+                "slug": "examples/gpu/prepared/gpu_prepared_cyclic_chamber"
+              },
+              {
+                "label": "Measured RTX 5060 scaling",
+                "slug": "examples/gpu/prepared/gpu_scaling_results"
+              }
+            ]
+          },
+          {
+            "label": "Direct kernels",
+            "collapsed": true,
+            "items": [
+              {
+                "label": "Direct CUDA coagulation",
+                "slug": "examples/gpu/direct/gpu_coagulation_direct"
+              },
+              {
+                "label": "CUDA Complete Process Sequence",
+                "slug": "examples/gpu/direct/gpu_complete_process_sequence"
+              },
+              {
+                "label": "CUDA Condensation Parity Walkthrough",
+                "slug": "examples/gpu/direct/gpu_condensation_parity_walkthrough"
+              },
+              {
+                "label": "CUDA Direct Kernels Quick Start",
+                "slug": "examples/gpu/direct/gpu_direct_kernels_quick_start"
+              },
+              {
+                "label": "CUDA Direct Nucleation",
+                "slug": "examples/gpu/direct/gpu_direct_nucleation"
+              }
+            ]
+          },
+          {
+            "label": "Resident internals",
+            "collapsed": true,
+            "items": [
+              {
+                "label": "CUDA Resident Graph Capture",
+                "slug": "examples/gpu/resident/gpu_resident_graph_capture"
+              },
+              {
+                "label": "CUDA Resident Multi Timestep",
+                "slug": "examples/gpu/resident/gpu_resident_multi_timestep"
+              },
+              {
+                "label": "CUDA Resident Session",
+                "slug": "examples/gpu/resident/gpu_resident_session"
+              }
+            ]
           }
         ]
       },
@@ -840,6 +922,10 @@
             "label": "GPU",
             "collapsed": true,
             "items": [
+              {
+                "label": "Prepared simulations: RTX 5060",
+                "slug": "contribute/validation/gpu/prepared-rtx5060"
+              },
               {
                 "label": "Historical coagulation benchmark evidence",
                 "slug": "contribute/validation/gpu/coagulation-benchmarks"
