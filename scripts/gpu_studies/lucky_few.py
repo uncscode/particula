@@ -62,6 +62,7 @@ class SurvivalConfig:
     ion_pairs_cm3_s: float = 0.0
     omitted: str = "reject"
     root_seed: int = 317
+    coagulation_first: bool = False
 
     def validate(self):
         """Keep whole physical intervals and immutable population geometry."""
@@ -70,6 +71,8 @@ class SurvivalConfig:
             minimum = 0 if name in ("background_particles", "root_seed") else 1
             if type(value) is not int or value < minimum:
                 raise ValueError(f"{name} must be an integer >= {minimum}")
+        if type(self.coagulation_first) is not bool:
+            raise ValueError("coagulation_first must be a boolean")
         if self.capacity < self.background_particles + 1:
             raise ValueError(
                 "capacity must hold the initial background and seed"
@@ -193,6 +196,12 @@ def build_survival_case(config):
             ),
         )
     )
+    coagulation = AtmosphericCoagulation(3, 4, omitted=config.omitted)
+    first, second = (
+        (coagulation, condensation)
+        if config.coagulation_first
+        else (condensation, coagulation)
+    )
     process = (
         IonPairSource(
             config.ion_pairs_cm3_s * 1e6,
@@ -201,8 +210,8 @@ def build_survival_case(config):
             POSITIVE_ION_MASS,
             NEGATIVE_ION_MASS,
         )
-        | condensation
-        | AtmosphericCoagulation(3, 4, omitted=config.omitted)
+        | first
+        | second
         | IonNeutralCleanup(
             3,
             4,

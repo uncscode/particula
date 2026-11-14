@@ -204,3 +204,74 @@ Doubling capacity from 128 to 256 preserved the full neutral cohort time
 series exactly (39 reached, 2009 captured). All three pilot runs had mass
 residuals below 6.3e-15 and maximum observed occupancy 33. This establishes
 neutral capacity invariance for this workload, not the ion-production cases.
+
+
+The third percent-cell manuscript is staged at `plans/gpu_lucky_few_example.py`
+until its numerical settings and omitted-rate policy are qualified. It has
+explicit policy/numerical CLI arguments, unchanged physical defaults, cohort
+curves, final exact intervals, outcome partitions, budget/timing output and
+primary references. Its plotting layout was inspected using the actual neutral
+2048-box pilot, not fabricated ion results. It is not yet a published or fully
+executed example and does not satisfy the unchecked final-example gates.
+
+The manuscript distinguishes lower/upper **attachment coefficient** assumptions
+from survival-probability bounds: nonlinear charge and collision histories mean
+endpoint coefficient runs do not guarantee extrema of the survival outcome.
+
+
+The study helper now exposes `coagulation_first` for the required process-order
+check, retaining the existing order by default and keeping source first and
+cleanup last. Both orders pass the controlled-growth check on Warp CPU and actual CUDA.
+Twenty pure helper checks also pass. The existing 8192-box confirmation retains its original
+loaded helper, revision `d14f0899c` and recorded source hash.
+
+Review of the ion-balance percent source found that its reference solver
+silently assumed a uniform time grid. The source now rejects incompatible
+sampling and invalid chain parameters. Ten independent example-reference tests
+pass, including the analytic two-pair pure-death mean and variance. Its complete
+CUDA refresh is now saved as `run-20261114T070049797164Z`; the numerical figure
+is byte-identical to the prior run and was visually inspected.
+
+
+Neutral order qualification is predeclared separately from the timestep test:
+8192 boxes, root seed 318, dt=1 s, coagulation before condensation, compared
+with the confirmation baseline. All other physical and numerical parameters
+must match exactly; a 95% difference interval must lie inside [-0.01, 0.01].
+This is a separate interval, not a claim of simultaneous 95% coverage across
+all numerical comparisons. Execution is queued conceptually after the active
+GPU workload; no order-study process has been launched yet.
+
+
+Independent composed-system validation will exercise both implemented omission
+configurations at q=2 and 10 with 64 boxes, root seed 319 and the frozen physical
+defaults, then compare q=10 capacity 128 versus 256 for each assumption. These
+are integration checks of supported paths, not production policy selection or
+qualification of rare survival differences. Full-package correctness testing
+began alongside the half-step confirmation at 2026-11-14 06:53 UTC; that
+confirmation's elapsed stepping time will not be used as performance evidence.
+
+
+Full package after periodic cleanup: 10,119 passed, 14 skipped, 1 xfailed;
+91.85% coverage on host CPU/CUDA with warnings treated as errors. Ruff,
+formatting (646 files) and mypy (586 files) pass. All six hosted workflows
+passed on `d14f0899c`. The reference/manuscript/order-control increment passed the complete
+example/tooling suite: 493 passed, 1 skipped, with actual CUDA. The changed
+example check passed; CUDA examples retain explicit-refresh policy. The website
+built 453 pages with no link errors, and the ion-balance download matches and
+compiles. Final hosted follow-through remains required after this increment.
+
+
+Before moving the manuscript into published examples, freeze the qualified
+numerical/policy defaults so the downloadable bundle's `python example.py
+--cuda` invocation runs the complete study. Register its helper as an input
+and test the extracted ZIP independently. The draft deliberately still
+requires explicit settings and is not a replacement for those publication gates.
+
+
+The six composed ion integration runs completed: q=2/10 under each explicit
+omission assumption, plus q=10 at doubled capacity. Each recorded 1 reached,
+63 captured and no unresolved lineages, with maximum mass residual below
+4e-15. Observed occupied slots peaked at 34 for q=2 and 35 for q=10. Both
+capacity comparisons preserved the full cohort time series exactly. These
+small runs validate composed code paths; they neither establish a rare-event
+ion effect nor choose the production omitted-rate policy.

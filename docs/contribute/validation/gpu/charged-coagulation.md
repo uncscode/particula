@@ -292,3 +292,75 @@ invalid confidence levels and controlled condensation with inventory closure.
 Ruff and formatting passed; documentation structure had zero errors and the
 website built 453 pages with no link errors. The full-package result above
 still predates periodic cleanup; a final complete run remains required.
+
+
+## Full-package follow-through after periodic cleanup
+
+At library revision `d14f0899c` (with documentation and study-helper review
+changes in the working tree), host CPU/CUDA validation completed:
+
+| Command | Result |
+| --- | --- |
+| `WARP_CACHE_PATH=/tmp/particula-charged-warp .venv/bin/pytest --cov=particula --cov-report=term-missing --cov-fail-under=80 -Werror` | 10,119 passed, 14 skipped, 1 xfailed; 91.85% coverage |
+| `.venv/bin/ruff check particula examples_tests scripts --no-fix` | Passed |
+| `.venv/bin/ruff format particula examples_tests scripts --check` | 646 files formatted |
+| `.venv/bin/mypy particula --ignore-missing-imports` | Passed, 586 files |
+
+This full-package result includes the periodic-cleanup implementation and
+supersedes the earlier package run that preceded it. The CUDA device was
+available on the host; it was not replaced with a CPU fallback. The test run
+overlapped the 8192-box half-step confirmation from 06:53 UTC on 2026-11-14.
+That confirmation's stepping duration is therefore excluded from performance
+comparisons. Numerical outcomes and conservation assertions remain separate
+from timing claims. All six hosted workflows passed on `d14f0899c`; later
+uncommitted example/helper changes still require their own follow-through.
+
+
+## Example review and composed ion checks
+
+The ion-balance reference now rejects nonuniform/nonzero-origin time grids
+instead of silently evaluating different times, and rejects invalid chain
+parameters. Ten independent tests include analytic two-pair decay: rates
+4 alpha/V then alpha/V yield P2=exp(-4 alpha t/V) and
+P1=(4/3)[exp(-alpha t/V)-P2], from which both moments are checked.
+
+The complete example/tooling command, `WARP_CACHE_PATH=/tmp/particula-charged-warp
+.venv/bin/pytest examples_tests scripts/tests -q -Werror --no-cov`, passed
+493 tests with one skip on the host. This includes controlled growth under
+both aerosol process orders on Warp CPU and actual CUDA. The full ion-balance
+CUDA refresh is `run-20261114T070049797164Z`; its inspected figure is
+byte-identical to the prior numerical figure. The executed source and built
+Python download both match the maintained source and compile. The changed
+example check passed, website tests passed (3), and the 453-page build reported
+zero link errors. CUDA-policy skips in the routine example checker are distinct
+from the deliberately refreshed CUDA workload.
+
+The selected environment retains installed Particula distribution metadata
+0.2.14 while the executed checkout reports source version 0.3.0. The manifest
+records installed distribution versions separately from the actual source
+revision and package-source hash; the environment was preserved.
+
+Composed-system CUDA checks used 64 boxes, root seed 319, dt=1 s, cleanup every
+10 s and all frozen physical defaults for 20,000 s:
+
+| q [pairs cm^-3 s^-1] | Omission assumption | Capacity | Reached / captured / unresolved | Maximum mass residual | Observed peak slots |
+| --- | --- | --- | --- | --- | --- |
+| 2 | lower | 128 | 1 / 63 / 0 | 4.00e-15 | 34 |
+| 2 | upper | 128 | 1 / 63 / 0 | 4.00e-15 | 34 |
+| 10 | lower | 128 | 1 / 63 / 0 | 3.78e-15 | 35 |
+| 10 | upper | 128 | 1 / 63 / 0 | 3.78e-15 | 35 |
+| 10 | lower | 256 | 1 / 63 / 0 | 3.78e-15 | 35 |
+| 10 | upper | 256 | 1 / 63 / 0 | 3.78e-15 | 35 |
+
+Both q=10 capacity comparisons preserved the complete cohort time series
+exactly. These are composed-path and capacity checks under each implemented
+assumption, not production model selection. The ensemble is too small to
+establish an ion effect or insensitivity of rare survival. Coefficient endpoints
+do not necessarily bound survival outcomes in this nonlinear coupled model.
+These runs and the example refresh overlapped the neutral confirmation; their
+timings are not performance qualification.
+
+The reviewed survival manuscript remains under `plans/gpu_lucky_few_example.py`.
+Its plots were inspected using the actual neutral pilot. It still needs frozen
+qualified settings, the production policy decision, full saved CUDA results,
+registration and extracted-download verification before publication.
