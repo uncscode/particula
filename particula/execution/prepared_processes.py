@@ -30,6 +30,7 @@ class _ProcessPlan:
 
 def _plan_process(process: Any, aerosol: Aerosol) -> _ProcessPlan:
     """Reject unknown runnable/strategy semantics before any GPU allocation."""
+    from particula.dynamics.ions.source import IonPairSource
     from particula.dynamics.particle_process import (
         Coagulation,
         Dilution,
@@ -38,9 +39,11 @@ def _plan_process(process: Any, aerosol: Aerosol) -> _ProcessPlan:
         WallLoss,
     )
     from particula.execution.prepared_condensation import plan_condensation
+    from particula.execution.prepared_ions import plan_ion_source
     from particula.execution.prepared_nucleation import plan_nucleation
 
     planners = {
+        IonPairSource: plan_ion_source,
         Dilution: _plan_dilution,
         Coagulation: _plan_coagulation,
         WallLoss: _plan_wall_loss,
@@ -74,11 +77,30 @@ def _plan_dilution(process: Any, _aerosol: Aerosol) -> _ProcessPlan:
 
 def _plan_coagulation(process: Any, aerosol: Aerosol) -> _ProcessPlan:
     """Admit direct Brownian physics and equal active represented counts."""
-    from particula.dynamics import BrownianCoagulationStrategy
+    from particula.dynamics import (
+        BrownianCoagulationStrategy,
+        ChargedCoagulationStrategy,
+    )
+    from particula.dynamics.coagulation import charged_kernel_strategy as models
+
+    supported = {
+        models.HardSphereKernelStrategy: "hard_sphere",
+        models.CoulombDyachkov2007KernelStrategy: "dyachkov2007",
+        models.CoulombGatti2008KernelStrategy: "gatti2008",
+        models.CoulombGopalakrishnan2012KernelStrategy: "gopalakrishnan2012",
+        models.CoulumbChahl2019KernelStrategy: "chahl2019",
+    }
 
     strategy = process.coagulation_strategy
-    if type(strategy) is not BrownianCoagulationStrategy:
-        raise ValueError("prepared coagulation supports Brownian only")
+    charged_model = None
+    if type(strategy) is ChargedCoagulationStrategy:
+        charged_model = supported.get(type(strategy.kernel_strategy))
+        if charged_model is None:
+            raise ValueError("charged kernel has no prepared GPU translation")
+    elif type(strategy) is not BrownianCoagulationStrategy:
+        raise ValueError(
+            "prepared coagulation requires Brownian or charged strategy"
+        )
     if aerosol.particles.distribution_type != "particle_resolved":
         raise ValueError("prepared coagulation requires particle_resolved")
     if (
@@ -95,7 +117,9 @@ def _plan_coagulation(process: Any, aerosol: Aerosol) -> _ProcessPlan:
             raise ValueError(
                 "Brownian GPU coagulation requires equal active counts"
             )
-    return _ProcessPlan("coagulation")
+    if charged_model is None:
+        return _ProcessPlan("coagulation")
+    return _ProcessPlan("coagulation", (("charged_model", charged_model),))
 
 
 def _plan_wall_loss(process: Any, aerosol: Aerosol) -> _ProcessPlan:
@@ -168,6 +192,10 @@ def _plan_wall_loss(process: Any, aerosol: Aerosol) -> _ProcessPlan:
 def _compile_process(plan: _ProcessPlan, owner: Any):
     """Retain one existing prepared direct-kernel call and its resources."""
     session, registry = owner._session, owner._registry
+    if plan.family == "ion_source":
+        from particula.execution.prepared_ions import compile_ion_source
+
+        return compile_ion_source(plan, owner)
     if plan.family == "nucleation":
         from particula.execution.prepared_nucleation import compile_nucleation
 
@@ -237,10 +265,19 @@ def _compile_process(plan: _ProcessPlan, owner: Any):
         return binding.execute
     if plan.family == "coagulation":
         from particula.gpu.kernels.coagulation import (
+            CoagulationMechanismConfig,
             _enqueue_prepared_coagulation_call,
             _prepare_coagulation_step_gpu,
         )
 
+        model = plan.values.get("charged_model")
+        mechanism = (
+            CoagulationMechanismConfig(
+                mechanisms=("charged_hard_sphere",), charged_model=model
+            )
+            if model is not None
+            else CoagulationMechanismConfig()
+        )
         resources = registry.acquire_coagulation(session.dimensions.n_particles)
         prepared = _prepare_coagulation_step_gpu(
             session.particles,
@@ -252,6 +289,7 @@ def _compile_process(plan: _ProcessPlan, owner: Any):
             rng_states=resources.rng_states,
             initialize_rng=False,
             environment=session.environment,
+            mechanism_config=mechanism,
         )
         from particula.execution.prepared_guards import equal_active_counts
 

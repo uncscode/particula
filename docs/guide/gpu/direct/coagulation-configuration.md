@@ -20,6 +20,15 @@ supplied RNG sidecar is reused and changes in place; it resets only with
 `initialize_rng=True`. Configuration and caller-owned sidecars have no implicit
 CPU↔GPU transfer.
 
+The optional `charged_model` selects `hard_sphere` (the default),
+`dyachkov2007`, `gatti2008`, `gopalakrishnan2012`, or `chahl2019`.
+A nondefault selection requires the `charged_hard_sphere` mechanism identifier,
+retained for compatibility. Unknown models reject before particle access.
+These fits describe complete charged Brownian rates. For that physical model,
+select the charged mechanism alone; adding the ordinary Brownian mechanism
+would count both complete rates. Existing explicitly additive calls retain
+their original semantics.
+
 Only `distribution_type="particle_resolved"` is accepted. `"discrete"` and
 `"continuous_pdf"` raise `ValueError`; they do not fall back or convert.
 Malformed configuration and an unsupported distribution fail before particle
@@ -114,9 +123,11 @@ Sedimentation-specific read-only preflight fails before output allocation, RNG
 initialization, or particle mutation, but does not make unrelated later runtime
 failures atomic. Transfers are explicit. Warp CPU is the baseline when Warp is
 installed. CUDA is optional additive evidence and guarded suites skip cleanly
-when unavailable. This direct path provides no high-level `Runnable`
-integration, automatic transfer, CPU fallback, mandatory CUDA requirement, or
-general-turbulence support.
+when unavailable. The direct call itself provides no automatic transfer or
+CPU fallback.
+Brownian and charged models are also available through the separate
+[prepared runnable interface](../prepared.md); sedimentation and turbulence
+remain direct-only.
 
 Future mechanisms must provide a stable identifier; required host and device
 inputs; property preparation; a sanitized additive pair-rate term; a proven-safe

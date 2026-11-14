@@ -138,9 +138,7 @@ def get_coulomb_kernel_dyachkov2007(
     kinetic = coulomb_enhancement.get_coulomb_kinetic_limit(
         coulomb_potential_ratio
     )
-    continuum = coulomb_enhancement.get_coulomb_continuum_limit(
-        coulomb_potential_ratio
-    )
+    continuum = coulomb_potential_ratio / -np.expm1(-coulomb_potential_ratio)
 
     ratio_k_c = kinetic / continuum
     adjustment_factor = 1 + diffusive_knudsen * ratio_k_c
@@ -149,14 +147,16 @@ def get_coulomb_kernel_dyachkov2007(
     exponential_decay = np.exp(-coulomb_potential_ratio / adjustment_factor)
     term1 = np.sqrt(2 * np.pi) * diffusive_knudsen * kinetic * exponential_decay
 
-    term2 = adjustment_factor**2 - (
+    # Algebraically equivalent differences avoid cancellation near neutrality
+    # and when the diffusive Knudsen number is large.
+    term2 = 1 + (
         2 + diffusive_knudsen * ratio_k_c
-    ) * diffusive_knudsen * ratio_k_c * np.exp(
+    ) * diffusive_knudsen * ratio_k_c * -np.expm1(
         -coulomb_potential_ratio
         / (adjustment_factor * (2 + diffusive_knudsen * ratio_k_c))
     )
-    term3 = 1 - exponential_decay
-    term4 = 1 - np.exp(-coulomb_potential_ratio)
+    term3 = -np.expm1(-coulomb_potential_ratio / adjustment_factor)
+    term4 = -np.expm1(-coulomb_potential_ratio)
 
     # Using vectorized operations to combine terms
     return continuum_limit / (term1 / term2 + term3 / term4)

@@ -38,10 +38,14 @@ class CoagulationMechanismConfig:
         mechanisms: Requested identifiers, or ``None`` for Brownian.
         distribution_type: Required representation; only ``"particle_resolved"``
             is structurally supported.
+        charged_model: Alternative charged Brownian fit: hard_sphere,
+            dyachkov2007, gatti2008, gopalakrishnan2012 or chahl2019.
+            Nondefault selection requires the charged mechanism.
     """
 
     mechanisms: tuple[str, ...] | None = None
     distribution_type: str = "particle_resolved"
+    charged_model: str = "hard_sphere"
 
 
 @dataclass(frozen=True)
@@ -51,6 +55,7 @@ class _ResolvedCoagulationMechanismConfig:
     mechanisms: tuple[str, ...]
     distribution_type: str
     mask: int
+    charged_model: int = 0
 
 
 def resolve_coagulation_mechanism_config(
@@ -73,6 +78,15 @@ def resolve_coagulation_mechanism_config(
         raise ValueError(
             "distribution_type must be exactly 'particle_resolved'."
         )
+    models = (
+        "hard_sphere",
+        "dyachkov2007",
+        "gatti2008",
+        "gopalakrishnan2012",
+        "chahl2019",
+    )
+    if config.charged_model not in models:
+        raise ValueError("Unknown charged coagulation model")
     mechanisms = config.mechanisms
     if mechanisms is None:
         mechanisms = (BROWNIAN_MECHANISM,)
@@ -100,7 +114,13 @@ def resolve_coagulation_mechanism_config(
         for mechanism in CANONICAL_COAGULATION_MECHANISMS
         if mechanism in mechanisms
     )
+    if (
+        config.charged_model != "hard_sphere"
+        and CHARGED_HARD_SPHERE_MECHANISM not in mechanisms
+    ):
+        raise ValueError("charged_model requires the charged mechanism")
     return _ResolvedCoagulationMechanismConfig(
+        charged_model=models.index(config.charged_model),
         mechanisms=normalized_mechanisms,
         distribution_type=config.distribution_type,
         mask=sum(

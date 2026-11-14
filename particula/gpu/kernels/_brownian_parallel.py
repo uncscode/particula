@@ -17,6 +17,7 @@ from particula.gpu.kernels.coagulation import (
     aerodynamic_mobility_wp,
     brownian_diffusivity_wp,
     brownian_kernel_pair_wp,
+    charged_kernel_wp,
     cunningham_slip_correction_wp,
     dynamic_viscosity_wp,
     g_collection_term_wp,
@@ -174,6 +175,71 @@ def _pair_maxima(
 
 @no_type_check
 @wp.kernel
+def _charged_pair_maxima(
+    radii: wp.array2d(dtype=wp.float64),
+    masses: wp.array2d(dtype=wp.float64),
+    charges: wp.array2d(dtype=wp.float64),
+    temperature: wp.array(dtype=wp.float64),
+    pressure: wp.array(dtype=wp.float64),
+    gas_constant: wp.float64,
+    boltzmann_constant: wp.float64,
+    molecular_weight_air: wp.float64,
+    ref_viscosity: wp.float64,
+    ref_temperature: wp.float64,
+    sutherland_constant: wp.float64,
+    elementary_charge_value: wp.float64,
+    electric_permittivity: wp.float64,
+    mechanism_mask: wp.int32,
+    indices: wp.array2d(dtype=wp.int32),
+    counts: wp.array(dtype=wp.int32),
+    partials: wp.array2d(dtype=wp.float64),
+    failure: wp.array(dtype=wp.int32),
+):
+    """Tile the upper pair matrix across bounded lanes without storing it."""
+    if failure:
+        if failure[0] != 0:
+            return
+    box, lane = wp.tid()
+    count = wp.int64(counts[box])
+    maximum = wp.float64(0.0)
+    # Grid-stride tiles visit each valid upper-triangle pair exactly once.
+    # int64 arithmetic avoids capacity-squared overflow before loop admission.
+    pair = wp.int64(lane)
+    while pair < count * count:
+        first_rank = wp.int32(pair // count)
+        second_rank = wp.int32(pair % count)
+        if first_rank < second_rank:
+            first = indices[box, first_rank]
+            second = indices[box, second_rank]
+            rate = _sanitize_positive_finite(
+                charged_kernel_wp(
+                    mechanism_mask >> wp.int32(8),
+                    radii[box, first],
+                    radii[box, second],
+                    masses[box, first],
+                    masses[box, second],
+                    charges[box, first],
+                    charges[box, second],
+                    temperature[box],
+                    pressure[box],
+                    boltzmann_constant,
+                    elementary_charge_value,
+                    electric_permittivity,
+                    gas_constant,
+                    molecular_weight_air,
+                    ref_viscosity,
+                    ref_temperature,
+                    sutherland_constant,
+                )
+            )
+            if rate > maximum:
+                maximum = rate
+        pair += wp.int64(partials.shape[1])
+    partials[box, lane] = maximum
+
+
+@no_type_check
+@wp.kernel
 def _finish_maxima(
     partials: wp.array2d(dtype=wp.float64),
     majorants: wp.array(dtype=wp.float64),
@@ -301,18 +367,37 @@ class _PreparedBrownianWork:
             ],
             device=self.device,
         )
-        wp.launch(
-            _pair_maxima,
-            dim=self.partials.shape,
-            inputs=[
-                *self.selector_inputs[15:19],
-                self.selector_inputs[24],
-                self.counts,
-                self.partials,
-                failure,
-            ],
-            device=self.device,
-        )
+        if int(self.selector_inputs[28]) & 255 == 2:
+            args = self.selector_inputs
+            wp.launch(
+                _charged_pair_maxima,
+                dim=self.partials.shape,
+                inputs=[
+                    args[15],
+                    args[22],
+                    args[23],
+                    *args[4:14],
+                    args[28],
+                    args[24],
+                    self.counts,
+                    self.partials,
+                    failure,
+                ],
+                device=self.device,
+            )
+        else:
+            wp.launch(
+                _pair_maxima,
+                dim=self.partials.shape,
+                inputs=[
+                    *self.selector_inputs[15:19],
+                    self.selector_inputs[24],
+                    self.counts,
+                    self.partials,
+                    failure,
+                ],
+                device=self.device,
+            )
         wp.launch(
             _finish_maxima,
             dim=self.active.shape[0],

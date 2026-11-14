@@ -645,5 +645,14 @@
       "docs/data/gpu/rtx5060.json": "rtx5060.json"
     },
     "invoke": "result = run_example()"
+  },
+  "gpu-charged-models": {
+    "title": "Charge-dependent Brownian collisions on CUDA",
+    "source": "docs/examples/gpu/prepared/gpu_charged_models.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 600,
+    "inputs": [],
+    "invoke": "result = run_example()"
   }
 }

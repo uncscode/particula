@@ -117,7 +117,7 @@ def _preflight(processes, saved, backend, device):
     families = {p.family for p in plans}
     actual = {p.family for p in restart.resource_payloads}
     if (
-        actual != families - {"wall_loss", "dilution"}
+        actual != families - {"wall_loss", "dilution", "ion_source"}
         or saved.resident.communication is not None
     ):
         raise ValueError(
@@ -140,27 +140,40 @@ def _validate_auxiliary(saved, plans):
         p.family == "condensation" and p.values["latent"] is not None
         for p in plans
     )
-    if type(saved.auxiliary) is not tuple or len(saved.auxiliary) != int(
-        latent
+    expected = {}
+    boxes = saved.resident.dimensions.n_boxes
+    if latent:
+        expected["latent_heat_energy"] = (
+            "<f8",
+            (boxes, saved.resident.dimensions.gas_species),
+        )
+    if any(p.family == "ion_source" for p in plans):
+        expected["ion_source_rng"] = ("<u4", (boxes,))
+        expected["ion_source_pairs"] = ("<i8", (boxes,))
+    if type(saved.auxiliary) is not tuple or len(saved.auxiliary) != len(
+        expected
     ):
         raise ValueError(
             "checkpoint auxiliary inventory differs from process plan"
         )
+    seen = set()
     for item in saved.auxiliary:
         _validate_payload(item)
-        if (item.family, item.role, item.dtype, item.shape, item.capacity) != (
-            "prepared",
-            "latent_heat_energy",
-            "<f8",
-            (
-                saved.resident.dimensions.n_boxes,
-                saved.resident.dimensions.gas_species,
-            ),
-            None,
+        spec = expected.get(item.role)
+        if (
+            item.family != "prepared"
+            or item.role in seen
+            or spec is None
+            or (item.dtype, item.shape) != spec
+            or item.capacity is not None
         ):
             raise ValueError("invalid prepared checkpoint auxiliary payload")
-        if not np.all(np.isfinite(np.frombuffer(item.data, dtype=item.dtype))):
-            raise ValueError("checkpoint latent energy must be finite")
+        seen.add(item.role)
+        values = np.frombuffer(item.data, dtype=item.dtype)
+        if not np.all(np.isfinite(values)):
+            raise ValueError("checkpoint auxiliary values must be finite")
+        if item.role == "ion_source_pairs" and np.any(values < 0):
+            raise ValueError("checkpoint ion source counts must be nonnegative")
 
 
 def _restore_after_binding(owner, saved):

@@ -13,7 +13,7 @@ hardware/runtime requirement; requesting CUDA never selects Warp CPU silently.
 | --- | --- | --- |
 | Native CPU storage | Multi-box particle, gas and environment containers | Explicit leading box axis and population metadata. |
 | Native CPU dynamics | Five batched runnables through the shared box loop | Direct strategy methods remain single-box. |
-| Prepared runnables | Ordered subsets of condensation, Brownian coagulation, dilution, wall loss and nucleation | One occurrence per family; exact supported configuration, fixed capacity and timestep. |
+| Prepared runnables | Ordered subsets of condensation, Brownian/charged coagulation, dilution, wall loss, nucleation and ion-pair production | One occurrence per family; exact supported configuration, fixed capacity and timestep. |
 | CPU → CUDA | `runnable.prepare(aerosol, device="cuda:0", time_step=...)` | Validates, uploads once, owns private resources; initial CPU state is unchanged. |
 | CUDA → CPU | `simulation.snapshot()` or reduced `diagnostics()` | Explicit synchronized, detached observations; full snapshots preserve native names and measures. |
 | Forcing | Environment and full-gas updates between segments | Explicit uploads; condensation owns derived saturation. |
@@ -22,8 +22,8 @@ hardware/runtime requirement; requesting CUDA never selects Warp CPU silently.
 | Direct kernels | Supported process-specific fixed-shape interfaces | Caller owns transfers, scratch, species bindings and RNG sidecars. |
 | Warp CPU | Separate regression target | CPU evidence is labeled separately from actual CUDA execution and performance. |
 
-Prepared Brownian coagulation is particle-resolved and requires equal active
-counts. Prepared nucleation injects neutral unit-count events with integral
+Prepared Brownian and charged coagulation are particle-resolved and require
+equal active counts. Prepared nucleation injects neutral unit-count events with integral
 demand and explicit capacity policies. Their evolving compatibility matters;
 see [failure boundaries](prepared.md#evolving-compatibility-and-failure).
 Prepared condensation supports a bounded set of thermodynamic configurations and
@@ -33,8 +33,9 @@ four equal fixed substeps; it does not imply general CPU-strategy equivalence.
 
 Direct coagulation supports singleton masks `1`, `2`, `4`, `8`, pairs `3`, `5`,
 `6`, `9`, `10`, `12`, and mask `15`. Three-way masks reject at their documented
-preflight boundaries; turbulent masks require explicit turbulent inputs. These
-additional mechanisms do not extend the prepared Brownian runnable capability.
+preflight boundaries; turbulent masks require explicit turbulent inputs.
+Sedimentation and turbulent mechanisms remain direct-only. Prepared charged
+coagulation selects one of the five existing charged models.
 See [configuration](direct/coagulation-configuration.md).
 
 Direct collision outputs and persistent RNG are caller-owned, same-device
