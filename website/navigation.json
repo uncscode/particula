@@ -564,7 +564,7 @@
                 "slug": "examples/gpu/prepared/gpu_lucky_few"
               },
               {
-                "label": "Two million charged particles",
+                "label": "Humid aerosols and explicit ions",
                 "slug": "examples/gpu/prepared/gpu_environment_sweep"
               },
               {

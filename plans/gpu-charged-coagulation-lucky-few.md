@@ -402,7 +402,7 @@ longer humidity study with active coagulation and explicit ions.
 - [x] Dry 1000 s study: 19 conditions, 2,490,368 initial particles; independent
   64-box timestep comparison at 0.5/0.25 s passed the predeclared individual
   95% interval criterion of +/-2 percentage points of initial number.
-- [ ] Add opt-in `mobility` ion attachment, preserving LF2013 defaults. Use
+- [x] Add opt-in `mobility` ion attachment, preserving LF2013 defaults. Use
   constant collision-cross-section low-field mobility scaling
   Z=Z_ref sqrt(T/298.15) 101325/P, ion friction e/Z, and the existing
   Coulomb-adjusted hard-sphere transition fit. Ion radius is contact geometry,
@@ -410,9 +410,9 @@ longer humidity study with active coagulation and explicit ions.
   This is a transport approximation, not LF2013 extrapolation or a new measured
   atmospheric fit. No image forces, hydration or evolving ion chemistry.
   Opposite-ion recombination remains an explicit user-supplied coefficient.
-- [ ] Validate independent continuum/ballistic limits, polarity, mobility law,
+- [x] Validate independent continuum/ballistic limits, polarity, mobility law,
   CPU/Warp/CUDA parity, invalid-input rejection and prepared continuation.
-- [ ] Humidity: include free ions, source and neutral cleanup; distinguish
+- [x] Humidity: include free ions, source and neutral cleanup; distinguish
   aerosol mergers, attachment and recombination using population/material
   ledgers. Preserve every-box mass and total charge accounting.
 - [ ] Preview figures, qualify humidity timestep, execute final CUDA studies,
@@ -428,3 +428,10 @@ no-spurious-calcite-merger regression. Replace the interpolation diagnostic's
 arbitrary suppression threshold with independently derived charged flux limits;
 retain its interpolation agreement tolerance. Existing tiny-Knudsen tests now
 use zero absolute tolerance and analytic expectations.
+
+Current source implementation: 6bdf3ebce. Complete host CPU/CUDA package suite:
+10093 passed, 13 skipped, 57 deselected, 1 xfailed; coverage 91.60%.
+Dry refinement passed again after normalization correction. The 16-box
+humidity pilot failed its 2% ion population criterion (water/vapor passed);
+retain the failure. Freeze a separate 256-box, seed-413 confirmation with
+unchanged tolerances before publication. No adaptive tolerance relaxation.

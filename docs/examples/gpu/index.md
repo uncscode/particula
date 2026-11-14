@@ -16,7 +16,7 @@ There is no CPU fallback in publication runs.
 | [Charged Brownian models](prepared/gpu_charged_models.py) | How do five charged fits compare on CUDA against their CPU implementations? |
 | [Explicit atmospheric ion balance](prepared/gpu_ion_balance.py) | Do ion production, recombination and neutral-product export reproduce finite-population balance on CUDA? |
 | [Ground to mesopause and high pressure](prepared/gpu_dry_environment_sweep.py) | How do dry charged-aerosol size, charge and collision histories change from 0–86 km and from 1–10 atm? |
-| [Two million charged particles](prepared/gpu_environment_sweep.py) | How do charged aerosols exchange water and coagulate across sixteen temperature, pressure and initial-humidity conditions? |
+| [Humid aerosols and explicit ions](prepared/gpu_environment_sweep.py) | How do 2.6 million aerosols and ions exchange water, charge, attach and coagulate across sixteen environments? |
 | [The lucky few](prepared/gpu_lucky_few.py) | How often does a 3 nm seed reach 50 nm before background capture, under two explicit ion-attachment assumptions? |
 | [Heterogeneous boxes](prepared/gpu_prepared_multibox.py) | How do 64 boxes with different thermodynamic conditions, volume and composition respond? |
 | [Cooling, heating and vapor forcing](prepared/gpu_prepared_forcing.py) | How does a four-material/five-gas population respond to an external schedule? |
