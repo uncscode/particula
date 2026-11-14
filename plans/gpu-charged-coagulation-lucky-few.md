@@ -17,20 +17,24 @@ upstream PR. Merge and release are outside this authorization.
 - [x] Add paired Poisson ion production, source inventory ledgers, fixed
   capacity and independent persistent source RNG with capture/restart.
 - [x] Add neutral-product cleanup and exported inventory ledgers as a prepared
-  process; final ion-collision ordering remains part of study integration.
+  process; the study injects ions first and performs cleanup last.
 - [x] Exclude free ions and neutral products from condensation proposals;
   preserve uptake by aerosol particles with attached ions and exact inventories.
 - [x] Add resident cohort metadata, first-passage tracking and censoring;
-  study-level timestep and process-order qualification is recorded below.
+  study-level timestep and aerosol process-order qualification is recorded below.
 - [x] Validate implemented library formulas, stochastic collisions and lifecycle
   behavior on native CPU references, Warp CPU and actual CUDA.
 - [x] Complete survival-study convergence and uncertainty qualification.
 - [x] Add narrated percent-cell charged model comparison and saved CUDA output.
 - [x] Add atmospheric ion-balance percent source and inspect saved CUDA output.
 - [x] Add the 3–50 nm Lucky Few percent-cell study.
-- [ ] Execute full examples, inspect saved figures, verify downloads/build.
+- [x] Execute full examples, inspect saved figures, verify downloads/build.
 - [x] Open draft upstream PR #1650 and push validated implementation increments.
-- [ ] Finish the survival example, final diff review and final hosted CI.
+- [x] Finish the survival example and final diff review.
+
+Final hosted CI is tracked on the [current PR head](https://github.com/uncscode/particula/pull/1650/checks).
+All required workflows must pass before task closeout; these external results
+are separate from the saved local CUDA evidence.
 
 ## Scientific contract
 
@@ -337,3 +341,26 @@ coefficient assumption. All lineages resolved, maximum mass residual was
 2.998e-15, and all four capacity time series matched their baselines exactly.
 The complete matrix, source hash and limitations are in the validation record.
 The separate root-321 publication run and final saved-output/CI checks remain.
+
+## Published example and local closeout
+
+The complete CUDA generation is `run-20261114T140715836273Z`, from source
+commit `4a550421e7c0f01f4f0e6d2e9a9a75e8648c4b9f`. With root seed 321 and
+8192 boxes per case, the no-ion control reached 163 lineages; q=2 reached 154
+and q=10 reached 163 under either omission assumption. Every lineage resolved.
+The conservative ion-minus-control intervals include zero; this is a GPU
+sensitivity demonstration, not a resolved ion effect or atmospheric validation.
+
+The actual saved figure was inspected. Maintained source, saved executed source,
+built Python download and extracted ZIP source match; declared helper hashes
+match, and the extracted ZIP passed all five small CUDA smoke cases outside the
+checkout. The changed-example check passed, all three website tests passed,
+and the full site build produced 454 pages / 584 HTML files with no link errors.
+The final host example/tooling suite passed 494 tests with one skip; the new
+stopping helper has 25 passing CPU/CUDA tests. Source and references received
+a final review, with no additional actionable findings.
+
+Upstream advanced from the original base to `e5f0af936` only by changing the
+website Mistune lock from 3.1.4 to 3.3.3. Simulator code and the selected local
+research environment are unchanged. Final PR CI checks integration with the
+current upstream base. Merge and release remain outside this task.
