@@ -284,14 +284,14 @@ and <0.1% in each box's water vapor, in addition to the original species
 inventory checks. The coarse cyclic chamber remains explicitly an integration
 and restart stress example, not a timestep-converged chamber prediction.
 
-Final campaign: all **104 jobs passed** on executable revision `0a8307046`
+Pre-review campaign: all **104 jobs passed** on executable revision `0a8307046`
 (digest `41e30ec6c05cbc75fe05639f84149373fd173a4a15c7ad55412a456b5ecf20e5`).
 The 100 timing runs and four scientific histories finished within the original
 eight-hour window; the 16,384-particle old Brownian baseline used 1,619.7 seconds
 of its approved forty-minute limit. All 17 comparable CPU/CUDA cases passed
 full-array parity and common CUDA modes produced exact native physical outputs.
 Raw RNG/canonical continuation is covered separately by regression tests.
-Final source validation: 9,936 library tests passed (91.91% coverage),
+Pre-review source validation: 9,936 library tests passed (91.91% coverage),
 450 example/infrastructure tests passed, and 453 strict CUDA tests passed with
 zero skips. Ruff, mypy and plugin validation passed.
 The refined quickstart also passed: halving its timestep changed final particle
@@ -313,3 +313,20 @@ displayed text; small point/line/bar datasets may accompany scripts. Exclude
 full simulation states, image/heatmap arrays and unused diagnostic records.
 The campaign download is reduced from roughly 912 kB to 34 kB through an
 explicit plotted-field allowlist, without changing scientific validation.
+
+Final PR review addressed missing benchmark timing-stage validation, row-shaped
+surface-tension broadcasting, and concurrent simulation status reads during
+closure. The final executable is `464738b14`, digest
+`c853675d08921a1f7eb2c860ca5650fce0458ec4a31743bc8e64666c29a86ef2`.
+All **104 campaign jobs passed again** within the original eight-hour window,
+including the old 16,384-particle Brownian baseline (1,620.8 seconds).
+All **17 full-array CPU/CUDA parity cases**, **455 strict RTX checks** (zero
+skips), and **114 focused surface/prepared-state regressions** passed.
+Hosted tests passed on Python 3.12, 3.13 and 3.14. Python 3.14's known Warp ctypes
+warnings have narrowly scoped compatibility filters with regression coverage;
+unrelated warnings still fail. All six hosted workflows passed before the final
+measurement-only documentation refresh.
+The final download retains 78 plotted series in about 34 kB, after validating
+all 104 jobs. Million-particle condensation measured 2.197 s NumPy versus
+0.0672 s prepared CUDA resident, and 2.200 s versus 0.777 s including setup and
+download. The final source measurements supersede the pre-review campaign.
