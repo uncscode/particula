@@ -379,8 +379,8 @@ There is no altitude trajectory, ion attachment or humidity replenishment.
 
 - [x] Existing charged feature passed all six hosted workflows at 4fefc50c3.
 - [x] Small CUDA pilot: finite nonnegative state and per-box mass/charge budgets.
-- [ ] Choose duration after full-layout performance and timestep pilots.
-- [ ] Validate water-growth timestep sensitivity and independent equilibrium law.
+- [x] Choose 0.001 s / 1000 steps after full-layout performance and timestep pilots.
+- [x] Validate water-growth timestep sensitivity and independent equilibrium law (nine tests passed on CPU/CUDA).
 - [ ] Run the complete 2,097,152-particle workload and inspect saved figures.
 - [ ] Register narrated percent source, test downloadable helpers and build site.
 - [ ] Push final evidence and follow final-commit CI.

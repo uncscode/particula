@@ -48,7 +48,7 @@ def test_invalid_layout_or_time_is_rejected(changes):
 
 def cuda():
     """Skip unavailable hardware honestly; publication always requires CUDA."""
-    import warp as wp
+    wp = pytest.importorskip("warp")
 
     if not wp.is_cuda_available():
         pytest.skip("CUDA unavailable")
