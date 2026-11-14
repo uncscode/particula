@@ -72,3 +72,14 @@ Do not introduce historical facade APIs into supported examples.
 Before creating a file, follow the [documentation placement rules](../../documentation.md):
 extend an existing example when the learning objective is the same, otherwise
 choose its owning topic and index. Keep Python stems in snake_case.
+
+## Replot saved observations
+
+Plotting-only changes use `scripts/docs_examples.py replot EXAMPLE_KEY`, not a
+new simulation. Separate numerical calculation from rendering and declare the
+renderer/data contract in the registry as described in `website/AUTHORING.md`.
+Keep compact numerical plot summaries under the 10 MiB per-example JSON cap.
+Missing histories need a one-time data-saving refresh. Changed scientific inputs
+still require full execution. Each example has one stable
+`website/results/EXAMPLE_KEY/` folder; Git tracks history. Preserve simulation
+provenance and record re-rendering separately.
