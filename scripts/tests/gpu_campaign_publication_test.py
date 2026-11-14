@@ -35,12 +35,23 @@ def campaign(tmp_path, monkeypatch):
             "input_sha256": "same-input",
             "result_hash": "same-result",
             "timings": {
-                "resident": {
+                stage: {
                     "samples_s": [0.1] * 7,
                     "median_s": 0.1,
                     "minimum_s": 0.1,
                     "maximum_s": 0.1,
                 }
+                for stage in (
+                    ("resident", "download")
+                    if mode == "legacy"
+                    else (
+                        "setup",
+                        "resident",
+                        "download",
+                        "end_to_end",
+                        "capture",
+                    )
+                )
             },
             "memory": {"mempool_peak_bytes": 1024, "method": "pool peak"},
             "gpu_name": "Test CUDA GPU",
@@ -109,7 +120,16 @@ def test_complete_evidence_keeps_only_plotted_values(campaign):
         (
             "brownian-128-captured.json",
             "timings",
-            {"resident": {"samples_s": [0.1] * 6}},
+            {
+                stage: {"samples_s": [0.1] * (6 if stage == "resident" else 7)}
+                for stage in (
+                    "setup",
+                    "resident",
+                    "download",
+                    "end_to_end",
+                    "capture",
+                )
+            },
             "timing samples",
         ),
     ],
@@ -162,3 +182,48 @@ def test_cpu_ratios_require_complete_array_parity(tmp_path, change):
             publication.parity_evidence(tmp_path, rows, "current")
     else:
         assert publication.parity_evidence(tmp_path, rows, "current") == report
+
+
+@pytest.mark.parametrize(
+    "mode", ["numpy", "direct", "prepared", "captured", "legacy"]
+)
+def test_each_required_timing_stage_is_present(mode):
+    """Every expected stage is mandatory even when other samples are complete."""
+    stages = {"resident", "download"}
+    if mode != "legacy":
+        stages.update(("setup", "end_to_end"))
+    if mode not in {"numpy", "legacy"}:
+        stages.add("capture")
+    report = {
+        "mode": mode,
+        "warmups": 3,
+        "samples": 7,
+        "timings": {stage: {"samples_s": [0.1] * 7} for stage in stages},
+    }
+    publication.validate_samples(report, "complete")
+    for omitted in stages:
+        incomplete = dict(
+            report,
+            timings={
+                stage: value
+                for stage, value in report["timings"].items()
+                if stage != omitted
+            },
+        )
+        with pytest.raises(ValueError, match="Missing timing stages"):
+            publication.validate_samples(incomplete, omitted)
+    with pytest.raises(ValueError, match="Missing timing stages"):
+        publication.validate_samples(dict(report, timings={}), "empty")
+
+
+def test_missing_stage_preserves_existing_publication(campaign):
+    """Missing capture timing cannot silently disappear from a published plot."""
+    path = campaign / "brownian-128-captured.json"
+    report = json.loads(path.read_text())
+    del report["timings"]["capture"]
+    path.write_text(json.dumps(report))
+    destination = campaign / "public.json"
+    destination.write_text("previous successful publication")
+    with pytest.raises(ValueError, match="Missing timing stages"):
+        publication.export_campaign(campaign, destination)
+    assert destination.read_text() == "previous successful publication"
