@@ -531,7 +531,7 @@ def test_nucleation_resampling_uses_live_capacity_and_retains_bounds(device):
     "failure",
     [
         "activity",
-        "density",
+        "surface_density",
         "zero_vapor",
         "uncoupled",
         "latent_bound",
@@ -555,8 +555,8 @@ def test_unsupported_physics_is_rejected_before_upload(monkeypatch, failure):
     strategy = process.condensation_strategy
     if failure == "activity":
         strategy.activity_strategy = ActivityIdealMass()
-    elif failure == "density":
-        initial.particles.density[1] = 1200
+    elif failure == "surface_density":
+        strategy.surface_strategy.density = np.array([1000.0, 1200.0])
     elif failure == "zero_vapor":
         strategy.vapor_pressure_strategy = ConstantVaporPressureStrategy(0)
     elif failure == "uncoupled":

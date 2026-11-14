@@ -299,6 +299,8 @@ class _PreparedCondensationCall:
     gas_species_count: int
     failure: Any = None
     parallel_reductions: Any = None
+    ion_material_indices: tuple[int, int] | None = None
+    kelvin_density: float = 0.0
 
 
 def _read_float64_array(array: Any) -> np.ndarray:
@@ -519,6 +521,7 @@ def _condensation_mass_transfer_impl(  # noqa: C901
     mass_transfer: Any,
     particle_to_gas: Any,
     native: wp.int32,
+    kelvin_density: Any,
     box_idx: int,
     particle_idx: int,
 ) -> None:
@@ -557,6 +560,8 @@ def _condensation_mass_transfer_impl(  # noqa: C901
         if native == wp.int32(1):
             radius = wp.max(radius, _MIN_NATIVE_RADIUS)
         effective_density = density[0]
+        if kelvin_density > wp.float64(0.0):
+            effective_density = kelvin_density
         knudsen_number = knudsen_number_wp(mean_free_path_value, radius)
         slip_correction = cunningham_slip_correction_wp(knudsen_number)
         mobility = aerodynamic_mobility_wp(
@@ -670,6 +675,8 @@ def _condensation_mass_transfer_impl(  # noqa: C901
     effective_density = total_mass / total_volume
     if effective_density <= wp.float64(0.0):
         effective_density = density[0]
+    if kelvin_density > wp.float64(0.0):
+        effective_density = kelvin_density
 
     knudsen_number = knudsen_number_wp(mean_free_path_value, radius)
     slip_correction = cunningham_slip_correction_wp(knudsen_number)
@@ -877,6 +884,7 @@ def condensation_mass_transfer_kernel(  # noqa: C901
         mass_transfer,
         density,
         wp.int32(0),
+        wp.float64(0.0),
         box_idx,
         particle_idx,
     )
@@ -910,6 +918,7 @@ def _mapped_condensation_mass_transfer_kernel(  # noqa: C901
     time_step: Any,
     mass_transfer: Any,
     particle_to_gas: Any,
+    kelvin_density: wp.float64,
 ) -> None:
     """Compute particle-ordered proposals from full-gas mapped sources."""
     box_idx, particle_idx = wp.tid()  # type: ignore[misc]
@@ -941,6 +950,7 @@ def _mapped_condensation_mass_transfer_kernel(  # noqa: C901
         mass_transfer,
         particle_to_gas,
         wp.int32(1),
+        kelvin_density,
         box_idx,
         particle_idx,
     )
@@ -2953,6 +2963,8 @@ def _enqueue_prepared_condensation_call(
         finalized mass-transfer buffer, both retained by the prepared record.
 
     """
+    from particula.gpu.kernels.ion_condensation import gate_ion_condensation
+
     p = prepared
     n_boxes, n_particles, n_species = p.dimensions
     n_gas = p.gas_species_count
@@ -3049,7 +3061,7 @@ def _enqueue_prepared_condensation_call(
                 p.substep_time_step,
                 p.work_mass_transfer,
             ]
-            + ([p.particle_to_gas]),
+            + [p.particle_to_gas, wp.float64(p.kelvin_density)],
             device=p.device,
         )
         wp.launch(
@@ -3069,6 +3081,7 @@ def _enqueue_prepared_condensation_call(
             inputs=[p.particle_masses, p.work_mass_transfer, p.candidate],
             device=p.device,
         )
+        gate_ion_condensation(p)
         if p.parallel_reductions is not None:
             parallel_kernels.candidates(p)
         else:

@@ -138,3 +138,40 @@ def compile_ion_cleanup(plan, owner):
         )
 
     return enqueue
+
+
+def plan_ion_exclusion(process, aerosol):
+    """Freeze the reserved material lanes used to gate vapor proposals."""
+    from dataclasses import replace
+
+    return replace(
+        plan_ion_cleanup(process, aerosol), family="ion_condensation"
+    )
+
+
+def compile_ion_exclusion(_plan, _owner):
+    """Condensation compilation consumes this companion configuration."""
+    return lambda: None
+
+
+def validate_ion_plans(plans):
+    """Require condensation and compatible, nonvolatile reserved ion lanes."""
+    exclusion = next((p for p in plans if p.family == "ion_condensation"), None)
+    if exclusion is None:
+        return
+    condensation = next((p for p in plans if p.family == "condensation"), None)
+    if condensation is None:
+        raise ValueError("ion condensation exclusion requires condensation")
+    indices = (
+        exclusion.values["positive_species"],
+        exclusion.values["negative_species"],
+    )
+    if any(material in indices for _, material in condensation.values["pairs"]):
+        raise ValueError("reserved ion materials must be nonvolatile")
+    for plan in plans:
+        if plan.family in ("ion_source", "ion_cleanup"):
+            if (
+                plan.values["positive_species"],
+                plan.values["negative_species"],
+            ) != indices:
+                raise ValueError("ion processes require matching material maps")

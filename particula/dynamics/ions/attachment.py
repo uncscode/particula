@@ -13,6 +13,8 @@ from pathlib import Path
 
 import numpy as np
 
+from particula.dynamics.ions.attachment_table import centered_attachment_tables
+
 ATTACHMENT_CUTOFF = 1e-15
 
 
@@ -70,7 +72,7 @@ def attachment_coefficient(radius, charge, polarity, *, omitted="reject"):
         )
     if not np.all((polarity == -1) | (polarity == 1)):
         raise ValueError("ion polarity must be -1 or +1")
-    negative, positive = _tables()
+    negative, positive = centered_attachment_tables()
     rows = np.where(
         (polarity < 0)[..., None],
         negative[charge.astype(int) + 100],
@@ -82,11 +84,12 @@ def attachment_coefficient(radius, charge, polarity, *, omitted="reject"):
         raise ValueError("LF2013 input outside the published fit domain")
     if omitted == "reject" and np.any(below):
         raise ValueError("LF2013 repulsive rate omitted below published cutoff")
+    # The centered basis removes cancellation without fitting a new model.
     # Evaluate only valid lanes; bounds must never evaluate an extrapolation.
-    safe_radius = np.maximum(radius.astype(np.longdouble), rows[..., -2])
-    x = np.log10(safe_radius)
-    exponent = np.zeros(radius.shape, dtype=np.longdouble)
-    for index in range(rows.shape[-1] - 5, 0, -1):
+    safe_radius = np.maximum(radius, rows[..., -2])
+    x = (np.log10(safe_radius) - rows[..., -4]) / rows[..., -3]
+    exponent = rows[..., 23].copy()
+    for index in range(22, -1, -1):
         exponent = exponent * x + rows[..., index]
     result = np.asarray(10**exponent, dtype=float)
     if not np.all(np.isfinite(result) & (result > 0)):

@@ -107,3 +107,53 @@ real condensation growth, actual CUDA capture, restart before/after merging,
 corrupt checkpoint outcome rejection and conflicting ion material maps.
 Ruff, formatting and mypy passed (575 source files). These tests establish
 bookkeeping and integration; survival-probability convergence is still pending.
+
+## Ion attachment numerics and condensation exclusion
+
+The LF2013 device helper evaluates the published degree-23 polynomials in a
+centered logarithmic-radius basis. Coefficients are transformed once using
+70-digit decimal arithmetic and uploaded as fp64 values. This is an algebraic
+basis change, not a new fit or interpolation. Tests independently evaluate the
+original decimal coefficients at nine radii in each valid interval, covering
+all 201 aerosol charges and both ion polarities. CPU and CUDA agree with those
+references within 1e-10 relative tolerance. Default unsupported rates return a
+fault sentinel; optional lower/upper bounds remain explicit. Device helpers
+classify free ions, inert neutral products, aerosols and unsupported ion-only
+clusters. They are not yet connected to the atmospheric collision scheduler.
+
+`IonCondensationExclusion` gates ion-only proposals before gas-inventory
+limiting in every condensation substep. Tests verify exact ion/product masses,
+continued uptake by an aerosol carrying ion mass, particle/gas conservation,
+isothermal and latent-heat capture/restart, and configuration rejection.
+Mixed physical material densities use the CPU surface model's constant Kelvin
+density rather than replacing physical densities; a native CPU comparison
+passes at 2e-12 relative tolerance. The former mixed-material rejection test
+now exercises the still-unsupported nonuniform surface-density case, while
+the new parity test covers the newly supported material-density case.
+
+Host command (171 passed, actual CPU/CUDA):
+
+```bash
+WARP_CACHE_PATH=/tmp/particula-charged-warp .venv/bin/pytest \
+  particula/execution/tests/prepared_ion_condensation_test.py \
+  particula/execution/tests/prepared_test.py \
+  particula/execution/tests/prepared_cohort_test.py \
+  particula/execution/tests/prepared_restart_capture_test.py \
+  particula/gpu/dynamics/tests/ion_attachment_test.py \
+  particula/dynamics/ions/tests/attachment_test.py \
+  -q --no-cov -Werror
+```
+
+The direct condensation regression, parallel reductions and autodiff were also
+checked after the shared proposal signature changed:
+
+```bash
+WARP_CACHE_PATH=/tmp/particula-charged-warp .venv/bin/pytest \
+  particula/gpu/kernels/tests/condensation_test.py \
+  particula/gpu/kernels/tests/condensation_autodiff_test.py \
+  particula/gpu/kernels/tests/condensation_parallel_test.py \
+  -q --no-cov -Werror
+```
+
+Result: 324 passed, 3 skipped. Ruff, formatting and mypy (581 source files)
+passed; the website built with zero link errors.

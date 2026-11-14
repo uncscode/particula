@@ -52,6 +52,7 @@ the full collection of CPU strategies or direct GPU mechanism masks.
 | Nucleation | `Nucleation` with activation or kinetic strategy | Resolved unit-count, neutral injection with explicit species mapping, integral event demand and fixed capacity; supported exhaustion/resampling policy is retained. |
 | Ion source | `IonPairSource` with constant production | Paired Poisson unit-count injection into fixed capacity; independent source RNG and inventory ledger. |
 | Ion cleanup | `IonNeutralCleanup` | Exports neutral ion-only products from reserved material lanes; retains neutralized aerosol particles and records exported mass. |
+| Ion condensation exclusion | `IonCondensationExclusion` | Companion configuration gating ion-only vapor proposals before inventory limiting in every substep. |
 | Seed cohort | `SeedCohort` | Original unit-count seed lineages; first passage before background capture; observes after every physical process. |
 
 Prepared charged coagulation accepts `HardSphereKernelStrategy`,
@@ -110,8 +111,24 @@ CPU `execute()` is unsupported and rejects explicitly.
 
 This source supplies particles, not atmospheric ion collision physics. Do not
 interpret ordinary charged coagulation of these particles as validated
-ion–aerosol attachment or ion–ion recombination. Free-ion condensation
-exclusion still requires additional integration.
+ion–aerosol attachment or ion–ion recombination.
+
+Compose `IonCondensationExclusion` from `particula.dynamics.ions.condensation`
+with `MassCondensation` to keep free ions and neutral ion-only products out of
+vapor transfer. Specify the reserved positive/negative material indices; they
+must match any ion source/cleanup configuration and must not be condensation
+targets. Particles containing any other material remain eligible, including
+aerosols carrying attached ions. Uptake and evaporation proposals are zeroed
+for ion-only particles before gas inventory limiting in each substep. Physical
+particle counts, masses and charges are never temporarily masked.
+
+This configuration is frozen at preparation and preserved by capture/restart.
+The native minimum-radius setting is a transport floor, not an exclusion rule.
+Prepared condensation supports different physical material densities with a
+constant surface-model density for Kelvin curvature. Physical particle volume
+still sums mass divided by each material's density. Nonuniform surface-model
+densities remain unsupported. This distinction allows equal-diameter ions of
+different molecular masses without changing their physical material densities.
 
 `IonNeutralCleanup` from `particula.dynamics.ions.cleanup` removes neutral
 products containing both reserved ion materials and no other material.

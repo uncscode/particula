@@ -86,6 +86,7 @@ def _preflight(processes, saved, backend, device):
     )
     from particula.execution.gpu_session import _preflight_cpu_session
     from particula.execution.prepared_cohort import validate_cohort_plans
+    from particula.execution.prepared_ions import validate_ion_plans
     from particula.execution.prepared_processes import (
         _plan_process,
         _ProcessPlan,
@@ -114,6 +115,7 @@ def _preflight(processes, saved, backend, device):
     _preflight_cpu_session(host.particles, host.gas, host.environment, target)
     plans = tuple(_plan_process(p, host) for p in processes)
     validate_cohort_plans(plans)
+    validate_ion_plans(plans)
     if plans != saved.processes or len({p.family for p in plans}) != len(plans):
         raise ValueError("runnable configuration/order differs from checkpoint")
     families = {p.family for p in plans}
@@ -121,7 +123,14 @@ def _preflight(processes, saved, backend, device):
     if (
         actual
         != families
-        - {"wall_loss", "dilution", "ion_source", "ion_cleanup", "cohort"}
+        - {
+            "wall_loss",
+            "dilution",
+            "ion_source",
+            "ion_cleanup",
+            "ion_condensation",
+            "cohort",
+        }
         or saved.resident.communication is not None
     ):
         raise ValueError(

@@ -91,15 +91,13 @@ def _surface_plan(surface, particles):
         surface.surface_tension, width, "surface_tension", positive=True
     )
     density = _vector(surface.density, width, "surface density", positive=True)
-    # The direct kernel uses the live mixture density for Kelvin curvature.
-    # A fixed CPU density can match this for arbitrary future composition only
-    # when every material has that same density.
-    if not np.all(density == particles.density[0]) or not np.all(
-        particles.density == particles.density[0]
-    ):
-        raise ValueError(
-            "GPU Kelvin density requires uniform material/surface density"
-        )
+    # A constant CPU surface density is distinct from physical material density.
+    # Retain the legacy mixture path only where the two are always identical.
+    if not np.all(density == density[0]):
+        raise ValueError("GPU Kelvin density requires uniform surface density")
+    kelvin_density = (
+        None if np.all(particles.density == density[0]) else float(density[0])
+    )
     mode = 0
     if surface.phase_index is not None:
         phases = np.asarray(surface.phase_index)
@@ -110,7 +108,7 @@ def _surface_plan(surface, particles):
         ):
             raise ValueError("GPU mixing supports one volume-weighted phase")
         mode = 1
-    return tuple(float(x) for x in tensions), mode
+    return tuple(float(x) for x in tensions), mode, kelvin_density
 
 
 def _activity_plan(activity, particles, gas, pairs, vapor):  # noqa: C901
@@ -222,7 +220,7 @@ def plan_condensation(process, aerosol) -> _ProcessPlan:
         (int(s), int(t)) for s, t in zip(sources, targets, strict=True)
     )
     vapor = _vapor_plan(strategy.vapor_pressure_strategy, len(aerosol.gas.name))
-    tensions, surface_mode = _surface_plan(
+    tensions, surface_mode, kelvin_density = _surface_plan(
         strategy.surface_strategy, aerosol.particles
     )
     activity_mode, water, kappas, references = _activity_plan(
@@ -257,6 +255,11 @@ def plan_condensation(process, aerosol) -> _ProcessPlan:
                 accommodation=tuple(float(x) for x in accommodation),
                 tensions=tensions,
                 surface_mode=surface_mode,
+                **(
+                    {"kelvin_density": kelvin_density}
+                    if kelvin_density is not None
+                    else {}
+                ),
                 activity_mode=activity_mode,
                 water=water,
                 kappas=kappas,
@@ -357,9 +360,25 @@ def compile_condensation(plan: _ProcessPlan, owner: Any):
     binding = WarpCondensationExecutionAdapter().prepare(
         WarpCondensationExecutionState(state, owner.time_step)
     )
+    exclusion = next(
+        (p for p in owner._plans if p.family == "ion_condensation"), None
+    )
+    ion_materials = (
+        (
+            exclusion.values["positive_species"],
+            exclusion.values["negative_species"],
+        )
+        if exclusion is not None
+        else None
+    )
     binding = replace(
         binding,
-        prepared=replace(binding.prepared, failure=owner._device_failure),
+        prepared=replace(
+            binding.prepared,
+            failure=owner._device_failure,
+            ion_material_indices=ion_materials,
+            kelvin_density=config.get("kelvin_density", 0.0),
+        ),
     )
     owner._bindings[plan.family] = binding
     if state.energy_transfer is not None:
