@@ -92,8 +92,8 @@ def test_scientific_history_controls_and_exact_lifecycle(experiment):
         4,
         128,
         occupancy=0.75,
-        time_step=1.0 if family != "condensation" else 0.1,
-        steps=2 if family != "condensation" else 20,
+        time_step=1.0 if family != "condensation" else 1e-7,
+        steps=2 if family != "condensation" else 120,
         experiment=experiment,
     )
     initial, process, processes = build_case(case)
@@ -105,7 +105,7 @@ def test_scientific_history_controls_and_exact_lifecycle(experiment):
     elif experiment == "stochastic":
         assert len(result["result_hashes"]) == 16
     else:
-        assert len(result["frames"]) == 3
+        assert len(result["frames"]) == 13
         assert result["max_box_species_relative_error"] < 2e-12
 
 
@@ -169,3 +169,32 @@ def test_large_reductions_capture_and_restart_are_exact():
         owner.run(steps=8)
         assert state_hash(owner.snapshot()) == state_hash(captured)
     validate_evolution(case, initial, captured)
+
+
+@pytest.mark.cuda
+def test_dense_inventory_limiter_matches_full_cpu_state():
+    """Rounded box sums must not suppress valid uptake in a 1024-slot cohort."""
+    wp = pytest.importorskip("warp")
+    if not wp.is_cuda_available():
+        pytest.skip("CUDA unavailable")
+    case = StudyCase("inventory-roundoff", "condensation", 8, 1024, steps=1)
+    initial, process, processes = build_case(case)
+    reference = native_cpu_steps(case, detached(initial), processes)
+    with process.prepare(
+        initial, device="cuda:0", time_step=case.time_step
+    ) as owner:
+        owner.capture()
+        owner.run(case.steps)
+        result = owner.snapshot()
+    np.testing.assert_allclose(
+        result.particles.masses,
+        reference.particles.masses,
+        rtol=2e-12,
+        atol=1e-30,
+    )
+    np.testing.assert_allclose(
+        result.gas.concentration,
+        reference.gas.concentration,
+        rtol=2e-12,
+        atol=1e-30,
+    )
