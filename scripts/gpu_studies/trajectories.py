@@ -1,5 +1,7 @@
 """Variability, forcing, stochastic and large-particle lifecycle studies."""
 
+from dataclasses import replace
+
 import numpy as np
 from particula.util.constants import GAS_CONSTANT
 from scripts.gpu_studies.cases import (
@@ -35,7 +37,7 @@ def _frame(owner, step):
     }, snapshot
 
 
-def evolution(case, initial, process):
+def _evolution_once(case, initial, process):
     """Follow heterogeneous response or a prescribed cooling/heating pulse."""
     frames = []
     expected = mapped_inventory(initial)
@@ -48,7 +50,10 @@ def evolution(case, initial, process):
         frame, _ = _frame(owner, 0)
         frames.append(frame)
         for step in range(case.steps):
-            if case.experiment == "forcing":
+            if (
+                case.experiment == "forcing"
+                and step % max(1, case.steps // 120) == 0
+            ):
                 phase = step / case.steps
                 temperature = np.interp(
                     phase, [0, 1 / 3, 2 / 3, 1], [298.15, 275, 310, 298.15]
@@ -73,7 +78,9 @@ def evolution(case, initial, process):
                     owner.update_gas(gas)
             owner.step()
             expected *= np.exp(-0.02 * case.time_step)
-            if (step + 1) % 10 == 0 or step + 1 == case.steps:
+            if (step + 1) % max(
+                1, case.steps // 12
+            ) == 0 or step + 1 == case.steps:
                 frame, current = _frame(owner, step + 1)
                 frames.append(frame)
                 actual = mapped_inventory(current)
@@ -95,7 +102,51 @@ def evolution(case, initial, process):
         "result_hash": state_hash(final),
         "external_mass_kg_by_box_material": external.tolist(),
         "max_box_species_relative_error": max_error,
+    }, final
+
+
+def evolution(case, initial, process):
+    """Require timestep refinement in addition to conservation for histories."""
+    if case.experiment == "forcing":
+        require(
+            case.steps % 120 == 0, "forcing needs 120 exact control intervals"
+        )
+    report, coarse = _evolution_once(case, initial, process)
+    fine_case = replace(
+        case, time_step=case.time_step / 2, steps=case.steps * 2
+    )
+    fine_report, fine = _evolution_once(fine_case, initial, process)
+    active = fine.particles.concentration > 0
+    fine_mass = fine.particles.masses.sum(axis=2)[active]
+    coarse_mass = coarse.particles.masses.sum(axis=2)[active]
+    mass_error = float(np.max(np.abs(coarse_mass / fine_mass - 1)))
+    gas_error = float(
+        np.max(
+            np.abs(
+                coarse.gas.concentration[:, 2] / fine.gas.concentration[:, 2]
+                - 1
+            )
+        )
+    )
+    require(
+        mass_error < 0.01,
+        f"particle total masses fail 1% timestep refinement: {mass_error:.6g}",
+    )
+    require(
+        gas_error < 0.001,
+        f"water vapor fails 0.1% timestep refinement: {gas_error:.6g}",
+    )
+    report["refinement"] = {
+        "coarse_time_step_s": case.time_step,
+        "fine_time_step_s": fine_case.time_step,
+        "max_particle_total_mass_relative_change": mass_error,
+        "max_water_vapor_relative_change": gas_error,
+        "fine_inventory_relative_error": fine_report[
+            "max_box_species_relative_error"
+        ],
+        "same_physical_duration_and_forcing": True,
     }
+    return report
 
 
 def stochastic(case, initial, process):
