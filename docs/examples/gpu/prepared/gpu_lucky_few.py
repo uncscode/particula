@@ -12,12 +12,20 @@
 # the example does not calculate cloud activation. Charging is not assumed to
 # help: it can also enhance scavenging by background particles.
 #
-# Development manuscript: the production omission policy and numerical
-# qualification are pending. This source deliberately requires an explicit
-# policy argument. It is not yet registered as a published example.
+# Both omitted-rate assumptions are explicit sensitivity cases. The default
+# workload uses 8192 independent boxes per case; numerical qualification is
+# documented in the [validation record](../../../contribute/validation/gpu/charged-coagulation.md).
+# Each case starts with 270,336 aerosol particles and allocates 1,048,576
+# particle slots, including space for injected ions. The five cases execute
+# sequentially on the GPU.
+#
+# Use the Particula 0.3.0 development checkout with its prepared atmospheric-ion
+# API, plotting dependencies and a CUDA device. Download the helper ZIP and
+# run `python example.py --cuda` from its extracted directory. The plain Python
+# download also needs the helper files listed in the ZIP.
 
 # %%
-"""Run the survival manuscript only with an explicitly selected rate policy."""
+"""Measure rare seed survival on CUDA under two explicit attachment assumptions."""
 
 import argparse
 from dataclasses import replace
@@ -25,12 +33,20 @@ from dataclasses import replace
 import matplotlib.pyplot as plt
 import numpy as np
 import warp as wp
-from scripts.gpu_studies.lucky_few import SurvivalConfig, run_survival
+from scripts.gpu_studies.lucky_few import (
+    SurvivalConfig,
+    difference_interval,
+    run_survival,
+)
 
 # %% [markdown]
 # ## What is represented
 #
-# The observation horizon is 20,000 s (5.56 h).
+# The observation horizon is 20,000 s (5.56 h). Stepping stops earlier if every
+# original lineage has reached the target or been captured: both outcomes are
+# final. The displayed curves end at that diagnostic; later aerosol evolution
+# is not simulated or inferred. Boxes are well mixed; particle positions and
+# electric fields are not evolved.
 # Each physical box occupies 3.2 × 10⁻¹⁰ m³; initial background concentration
 # is 10¹¹ m⁻³. Increasing the number of boxes adds independent realizations
 # without changing particle counts or physical volume within a box. Allocated
@@ -102,13 +118,15 @@ from scripts.gpu_studies.lucky_few import SurvivalConfig, run_survival
 
 
 # %%
-def run_example(config, policies):
-    """Run the selected assumptions without choosing a production policy.
+def run_example(config=None, policies=("lower", "upper")):
+    """Run the control and explicit attachment sensitivity cases.
 
     ``config`` contains the already-qualified numerical settings. ``policies``
     must explicitly select one or both documented omitted-rate assumptions.
     The q=0 control is run once with strict lookup and no initial ions.
     """
+    if config is None:
+        config = SurvivalConfig(boxes=8192, root_seed=321)
     policies = tuple(policies)
     if not policies or len(set(policies)) != len(policies):
         raise ValueError("select distinct explicit omission policies")
@@ -124,7 +142,7 @@ def run_example(config, policies):
     results = []
     for q, policy in cases:
         current = replace(config, ion_pairs_cm3_s=q, omitted=policy)
-        result = run_survival(current)
+        result = run_survival(current, stop_when_resolved=True)
         reached, captured, unresolved = result["outcomes"][-1]
         low, high, zero_upper = result["success_interval95"]
         print(
@@ -134,7 +152,7 @@ def run_example(config, policies):
             f"exact 95% interval=[{low:.5f}, {high:.5f}]; "
             f"maximum mass residual={result['maximum_mass_residual']:.2e}; "
             f"observed peak slots={result['maximum_observed_slots']}/"
-            f"{config.capacity}"
+            f"{config.capacity}; last simulated time={result['time'][-1]:g} s"
         )
         if zero_upper is not None:
             print(f"Zero events: one-sided 95% upper bound={zero_upper:.5f}")
@@ -145,6 +163,20 @@ def run_example(config, policies):
             f"{result['synchronized_compute_seconds']:.3f} s"
         )
         results.append(result)
+    control = int(results[0]["outcomes"][-1, 0])
+    for result in results[1:]:
+        low, high = difference_interval(
+            control,
+            config.boxes,
+            int(result["outcomes"][-1, 0]),
+            config.boxes,
+        )
+        current = result["config"]
+        print(
+            f"q={current['ion_pairs_cm3_s']:g}, {current['omitted']}: "
+            "success probability minus no-ion control, conservative "
+            f"95% interval=[{low:.5f}, {high:.5f}]"
+        )
     plot_results(results)
     return results
 
@@ -156,7 +188,8 @@ def plot_results(results):
     for index, result in enumerate(results):
         config = result["config"]
         q, policy = config["ion_pairs_cm3_s"], config["omitted"]
-        label = "No ions" if q == 0 else f"q={q:g}, {policy}"
+        coefficient = "0" if policy == "lower" else "10⁻¹⁵"
+        label = "No ions" if q == 0 else f"q={q:g}, K={coefficient}"
         labels.append(label)
         fractions = result["outcomes"] / config["boxes"]
         final.append(fractions[-1])
@@ -176,7 +209,7 @@ def plot_results(results):
         axes[2].bar(labels, final[:, index], bottom=bottom, label=name)
         bottom += final[:, index]
     axes[0].set(xlabel="Time [h]", ylabel="Fraction reaching 50 nm")
-    axes[0].legend(fontsize=8)
+    axes[0].legend(title="Omitted K [m³/s]", fontsize=8, title_fontsize=8)
     axes[1].set(
         xticks=np.arange(len(labels)),
         xticklabels=labels,
@@ -196,6 +229,8 @@ def plot_results(results):
 # of surviving particles. The final intervals quantify finite-ensemble sampling
 # uncertainty for each case separately, not parameter uncertainty or a joint
 # confidence band. Overlapping intervals alone do not establish equivalence.
+# The printed differences compare each ion case with the no-ion control;
+# each interval has its own coverage, not simultaneous coverage over all cases.
 # A probability-difference interval and a declared tolerance are used for
 # numerical qualification. A zero-success case gives an upper bound rather
 # than proving survival impossible.
@@ -210,8 +245,9 @@ def plot_results(results):
 # collision work. Report preparation and forcing separately from synchronized
 # stepping. These timings exclude diagnostic transfers, plotting and analysis;
 # a CPU speedup requires a matched CPU workload and is not inferred here.
-# Production conclusions require qualified timestep, cleanup interval, capacity
-# and ensemble size, plus sensitivity to the unresolved attachment assumptions.
+# Numerical checks use a predeclared 0.01 absolute probability tolerance;
+# they do not resolve effects smaller than one percentage point. The two
+# attachment assumptions remain model uncertainty even after those checks.
 #
 # Primary context:
 # - [Gopalakrishnan and Hogan (2012)](https://doi.org/10.1103/PhysRevE.85.026410):
@@ -235,13 +271,13 @@ if __name__ == "__main__":
         help="CUDA execution is required for this study.",
     )
     parser.add_argument(
-        "--omitted", required=True, choices=("lower", "upper", "both")
+        "--omitted", default="both", choices=("lower", "upper", "both")
     )
-    parser.add_argument("--boxes", type=int, required=True)
-    parser.add_argument("--time-step", type=float, required=True)
-    parser.add_argument("--capacity", type=int, required=True)
-    parser.add_argument("--cleanup-seconds", type=float, required=True)
-    parser.add_argument("--root-seed", type=int, required=True)
+    parser.add_argument("--boxes", type=int, default=8192)
+    parser.add_argument("--time-step", type=float, default=1.0)
+    parser.add_argument("--capacity", type=int, default=128)
+    parser.add_argument("--cleanup-seconds", type=float, default=10.0)
+    parser.add_argument("--root-seed", type=int, default=321)
     parser.add_argument("--coagulation-first", action="store_true")
     args = parser.parse_args()
     selected = ("lower", "upper") if args.omitted == "both" else (args.omitted,)

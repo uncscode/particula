@@ -25,10 +25,11 @@ species mass and particle ledgers. Neither establishes ion collision physics or
 the completed Lucky Few survival study.
 
 The LF2013 helper rejects unsupported domains by default. Optional lower/upper
-values for omitted repulsive fluxes are uncertainty bounds, not an extrapolated
-fit or an atmospheric validation result. Same-sign singly charged seed particles
+values for omitted repulsive fluxes are explicit coefficient assumptions, not
+bounds on survival probability or an extrapolated fit. Same-sign charged seeds
 with diameter 3 nm fall below the corresponding fit's lower radius, approximately
-5.308 nm. Production treatment remains a scientific decision for the full study.
+5.308 nm. On 2026-11-14 the user selected both coefficient assumptions for
+the survival sensitivity demonstration; neither is a fitted best estimate.
 
 ## Device and checks
 
@@ -360,10 +361,11 @@ do not necessarily bound survival outcomes in this nonlinear coupled model.
 These runs and the example refresh overlapped the neutral confirmation; their
 timings are not performance qualification.
 
-The reviewed survival manuscript remains under `plans/gpu_lucky_few_example.py`.
-Its plots were inspected using the actual neutral pilot. It still needs frozen
-qualified settings, the production policy decision, full saved CUDA results,
-registration and extracted-download verification before publication.
+At this stage the survival manuscript's plots had been inspected using the
+actual neutral pilot. The manuscript has since moved to
+`docs/examples/gpu/prepared/gpu_lucky_few.py` for the accepted two-assumption
+sensitivity demonstration. Charged qualification and publication evidence
+are recorded below as they become available.
 
 
 ## Fixed neutral timestep confirmation
@@ -420,3 +422,42 @@ no additional image/polarization term. At fixed masses and radii, either zero
 aerosol charge removes that Coulomb correction. LF2013 ion attachment remains
 a separate collision law. These model boundaries limit interpretation of any
 future atmospheric-survival comparison.
+
+## Accepted two-assumption qualification campaign
+
+The accepted study compares the documented omissions replaced by 0 and 1e-15
+m^3/s. Settings were frozen before execution: 8192 boxes, root seed 320,
+20,000 s horizon, dt=1 s, capacity 128, cleanup every 10 s, q=2/10 pairs
+cm^-3 s^-1. For each assumption and q, the baseline is compared with dt=0.5 s,
+reversed aerosol order, cleanup every 5 s and capacity 256. Each conservative
+95% probability-difference interval must lie within [-0.01, 0.01]; each
+baseline exact 95% interval must have width <=0.01. These cover individual
+comparisons, not a simultaneous confidence guarantee across the matrix.
+
+Run the fixed matrix with:
+
+```bash
+WARP_CACHE_PATH=/tmp/particula-charged-warp .venv/bin/python \
+  -m scripts.gpu_studies.qualify_lucky_few --output /tmp/lucky-few-qualification
+```
+
+The output directory must be new. The specification records the source revision
+and helper hash before any run; reduced results and checks are saved after each
+case. The script retains failed or inconclusive comparisons and exits nonzero
+if any acceptance criterion is unresolved.
+
+`stop_when_resolved=True` ends a case only when every original lineage has an
+absorbing reached/captured outcome. It preserves survival at the configured
+horizon but does not predict later aerosol evolution. Stopped runs matched the
+full-run prefix and final outcomes on CPU/CUDA; a censored case still ran to its
+horizon. The focused helper suite passed 25 tests. The complete example/tooling
+suite passed 494 tests with one skip using host CUDA and the writable Warp cache.
+A preceding sandbox run failed only on its read-only default Warp cache.
+
+The registered source is linked from the GPU index, prepared guide and website
+navigation. A preliminary build produced 454 pages and 584 HTML documents with
+zero link errors. The extracted helper ZIP imported its own local helper and
+executed all five small CUDA cases outside the checkout with `PYTHONPATH`
+removed. Its first smoke assertion used exact decimal-time equality; rerunning
+with the established 1e-14 time tolerance passed. This download smoke check is
+separate from the complete publication workload and its numerical qualification.
