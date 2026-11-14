@@ -688,7 +688,15 @@
       "scripts/gpu_studies/population_diagnostics.py",
       "scripts/gpu_studies/population_figures.py"
     ],
-    "invoke": "result = run_example()"
+    "invoke": "result = run_example()",
+    "data_expression": "result",
+    "replot_invoke": "result = plot_results(saved_data)",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": [
+      "scripts/gpu_studies/population_figures.py"
+    ]
   },
   "gpu-dry-environment-sweep": {
     "title": "Dry charged aerosols from ground to mesopause and high pressure",
@@ -702,6 +710,14 @@
       "scripts/gpu_studies/population_diagnostics.py",
       "scripts/gpu_studies/population_figures.py"
     ],
-    "invoke": "result = run_example()"
+    "invoke": "result = run_example()",
+    "data_expression": "result",
+    "replot_invoke": "result = plot_results(saved_data)",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": [
+      "scripts/gpu_studies/population_figures.py"
+    ]
   }
 }

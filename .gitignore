@@ -187,3 +187,7 @@ website/qa/
 
 # Downloadable documentation preview artifact
 website/preview/
+
+# Transactional documentation publication staging (never committed)
+website/results/.pending-*/
+website/results/.backup-*/

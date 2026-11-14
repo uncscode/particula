@@ -23,12 +23,24 @@ and `docs/theory/`, registered in `website/examples.json`. They are not paired
 notebooks. Jupytext still parses the sources; do not remove the dependency on
 the assumption that it only supports notebook pairing.
 
-For executable changes, run `python scripts/docs_examples.py refresh EXAMPLE_KEY`
-for every affected complete workload, inspect figures/tables/text, and retain
-sources plus `website/results/` bundles. Preserve workload sizes, assertions,
-scientific parameters and CUDA requirements. Failed refreshes retain prior
-outputs and do not establish acceptance. Prose-only edits may keep results;
-check fingerprints without inventing a rerun or changing recorded provenance.
+For changes to simulation physics, parameters, numerical methods or scientific
+inputs, run `python scripts/docs_examples.py refresh EXAMPLE_KEY` for each
+affected complete workload. Preserve workload sizes, assertions and CUDA
+requirements. For plotting-only changes, use
+`python scripts/docs_examples.py replot EXAMPLE_KEY` from saved numerical plot
+data; do not rerun the simulation. Inspect the resulting figures/text. Replot
+must verify data integrity and unchanged simulation inputs, preserve original
+execution provenance, and record rendering provenance separately. Missing or
+incomplete data requires a one-time data-saving refresh; never reconstruct
+numerical observations from an image or label a replot as a new simulation.
+
+Store each example's current outputs directly in `website/results/EXAMPLE_KEY/`,
+without timestamp/run subfolders or current-generation pointers. Git retains
+history. Publish only after success; failures preserve the previous bundle.
+Save compact plotted summaries (times, counts, distributions and quantiles),
+not full particle states. Numerical plot data has a hard 10 MiB per-example
+serialized JSON limit; exceeding it fails without truncating values. Prose-only
+edits can retain results when executable fingerprints still match.
 
 Update navigation, links, registry inputs, loader/tests and release allowlists
 when moving sources. Use the existing relocation mechanism for meaningful old

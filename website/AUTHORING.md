@@ -13,16 +13,38 @@ python scripts/docs_examples.py refresh gpu-coagulation
 ```
 
 The CUDA example requires CUDA and never falls back to CPU. A refresh runs in
-a fresh kernel with temporary working storage, captures figures and outputs,
-and saves a complete successful generation. After success, superseded
-generations for that example are removed; retain only the current final bundle
-in the checkout. Git history preserves earlier committed provenance. A failed
-run preserves the previous successful bundle. Review and commit the result bundle together with the script change.
-Save the displayed figures and text, not simulation-state dumps. Small numeric
-series for point, line or bar plots may accompany a downloadable script. Do not
-publish full particle states, checkpoint arrays, heatmap/image matrices, raw
-trajectories or unused validation diagnostics. Regenerate those by running the
-script. GPU campaign export uses an explicit allowlist of plotted summaries.
+a fresh kernel with temporary working storage and captures figures, text and
+explicitly declared compact numerical plot data. Outputs live directly in
+`website/results/EXAMPLE_KEY/`: `manifest.json`, `source.py`, figures, and
+optional `data.json`. There are no timestamped run folders or pointer files.
+Git preserves earlier versions. Failed execution or rendering keeps the previous
+successful bundle. Review and commit the bundle together with source changes.
+
+For a plotting-only change, reuse numerical data instead of rerunning physics:
+
+```bash
+python scripts/docs_examples.py replot gpu-environment-sweep
+python scripts/docs_examples.py migrate-results  # one-time legacy layout migration
+```
+
+Replottable examples separate `simulate()` from `plot_results(report)`.
+The registry declares `data_expression`, `replot_invoke`, `render_functions`
+and `plot_inputs`. Only pure rendering functions/helpers belong in these
+exclusions: they must not change scientific parameters, processes or diagnostics.
+Replot checks saved-file hashes, the simulation fingerprint and library hash;
+changes to simulation code or inputs require a full refresh. It executes the
+renderer on CPU, without requiring CUDA or advancing a simulation. It preserves
+the original execution timestamp, device, revision and versions, and records
+rendering time/revision separately. `executed_source.py` preserves the original
+source when the renderer changes. Missing numerical data requires one data-saving
+refresh; images and printed endpoint tables cannot recover missing histories.
+
+Save compact plotted summaries: observation times, counts, histogram bins,
+quantiles and the settings needed to interpret them. Do not save full particle
+states, checkpoints, trajectories or unused diagnostics. The serialized numeric
+JSON has a **10 MiB hard limit per example**, enforced while writing. This limits
+saved plot data, not simulation RAM or figure size. Oversized data fails clearly
+and preserves the previous successful bundle; it is never silently truncated.
 
 ## Validate changes
 
@@ -37,7 +59,8 @@ Use `--base` with the pull request base revision in CI.
 
 The example registry declares its source, execution policy, device, timeout,
 optional invocation, and input/helper files. Executable changes and declared
-input bytes invalidate saved results; ordinary prose changes do not. Changes
+input bytes invalidate rendered results; plotting-only changes can be replotted
+from compatible saved data. Ordinary prose changes do not invalidate results. Changes
 inside Particula still need the existing scientific tests and a deliberate
 result refresh when appropriate. The recorded library revision remains visible.
 

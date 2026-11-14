@@ -169,22 +169,143 @@ def test_output_redaction_preserves_scientific_warning_details(tmp_path):
     assert result != value
 
 
-def test_successful_publication_prunes_only_its_superseded_bundles(tmp_path):
-    """Keep the selected result and unrelated content while pruning old runs."""
-    for name, example_id in [
-        ("run-old", "demo"),
-        ("run-new", "demo"),
-        ("run-unrelated", "other"),
-    ]:
-        directory = tmp_path / name
-        directory.mkdir()
+def test_migration_preserves_files_metadata_and_removes_run_folders(tmp_path):
+    """Flatten only the verified selected generation; Git owns old history."""
+    parent = tmp_path / "demo"
+    for name in ("run-old", "run-new"):
+        directory = parent / name
+        directory.mkdir(parents=True)
+        (directory / "source.py").write_text(name)
         (directory / "manifest.json").write_text(
-            json.dumps({"example": example_id})
+            json.dumps(
+                {
+                    "example": "demo",
+                    "revision": "original",
+                    "files": {
+                        "source.py": hashlib.sha256(name.encode()).hexdigest()
+                    },
+                }
+            )
         )
-    (tmp_path / "run-notes").mkdir()
-    (tmp_path / "run-notes/note.txt").write_text("Keep this note")
-    examples.prune_superseded_results("demo", tmp_path, "run-new")
-    assert not (tmp_path / "run-old").exists()
-    assert (tmp_path / "run-new/manifest.json").is_file()
-    assert (tmp_path / "run-unrelated/manifest.json").is_file()
-    assert (tmp_path / "run-notes/note.txt").is_file()
+    (parent / "current.json").write_text('{"generation": "run-new"}')
+    examples.migrate_results("demo", tmp_path)
+    directory, manifest = examples.bundle("demo", tmp_path)
+    assert directory == parent
+    assert (parent / "source.py").read_text() == "run-new"
+    assert manifest["revision"] == "original"
+    assert sorted(p.name for p in parent.iterdir()) == [
+        "manifest.json",
+        "source.py",
+    ]
+    examples.migrate_results("demo", tmp_path)  # idempotent
+
+
+def test_publication_failure_restores_previous_folder(tmp_path, monkeypatch):
+    """A failed replacement must not discard the last successful output."""
+    old, new = tmp_path / "demo", tmp_path / ".pending-demo"
+    old.mkdir()
+    new.mkdir()
+    (old / "figure.png").write_bytes(b"old")
+    original = Path.rename
+
+    def fail(source, target):
+        if source == new:
+            raise OSError("publication failure")
+        return original(source, target)
+
+    monkeypatch.setattr(Path, "rename", fail)
+    with pytest.raises(OSError, match="publication failure"):
+        examples.publish_bundle(new, old)
+    assert (old / "figure.png").read_bytes() == b"old"
+    assert not (tmp_path / ".backup-demo").exists()
+
+
+def test_plot_data_size_cap_rejects_without_partial_file(tmp_path, monkeypatch):
+    """Enforce the serialized byte limit, not just a count of data points."""
+    monkeypatch.setattr(examples, "MAX_PLOT_DATA_BYTES", 32)
+    path = tmp_path / "data.json"
+    examples.write_plot_data(path, {"x": [1, 2]})
+    assert json.loads(path.read_text()) == {"x": [1, 2]}
+    with pytest.raises(ValueError, match="10 MiB"):
+        examples.write_plot_data(path, {"x": "a" * 33})
+    assert not path.exists()
+    with pytest.raises(ValueError):
+        examples.write_plot_data(path, {"x": float("nan")})
+    assert not path.exists()
+
+
+def test_simulation_fingerprint_excludes_only_rendering(example):
+    """Plot styling can change; settings, scientific helpers and drivers cannot."""
+    root, config = example
+    source = root / "example.py"
+    source.write_text(
+        "def simulate():\n    return 4\ndef plot_results(x):\n    return x\n"
+    )
+    config.update(render_functions=["plot_results"], plot_inputs=["style.py"])
+    config["inputs"].append("style.py")
+    (root / "style.py").write_text("color = 'blue'")
+    before = examples.simulation_fingerprint(config, root)
+    source.write_text(source.read_text().replace("return x", "return x + 0"))
+    (root / "style.py").write_text("color = 'red'")
+    assert examples.simulation_fingerprint(config, root) == before
+    source.write_text(source.read_text().replace("return 4", "return 5"))
+    assert examples.simulation_fingerprint(config, root) != before
+    source.write_text(source.read_text().replace("return 5", "return 4"))
+    (root / "input.txt").write_text("scientific change")
+    assert examples.simulation_fingerprint(config, root) != before
+
+
+def test_replot_requires_data_and_valid_scientific_provenance(example):
+    """Missing data fails before executing any renderer or simulation."""
+    root, config = example
+    with pytest.raises(ValueError, match="No saved numerical data"):
+        examples.refresh("demo", config, root, root / "results", replot=True)
+
+
+def test_refresh_then_replot_does_not_repeat_simulation(tmp_path):
+    """A real kernel reuses data while preserving original execution provenance."""
+    source = tmp_path / "example.py"
+    counter = tmp_path / "simulation-count"
+    source.write_text(
+        "# %%\nfrom pathlib import Path\n"
+        "def simulate():\n"
+        f"    path = Path({str(counter)!r})\n"
+        "    path.write_text(str(int(path.read_text()) + 1) if path.exists() else '1')\n"
+        "    return {'time': [0, 1], 'count': [0, 3]}\n"
+        "def plot_results(data):\n"
+        "    print('blue', data['count'])\n"
+        "    return data\n"
+        "def run_example():\n"
+        "    return plot_results(simulate())\n"
+    )
+    config = {
+        "source": str(source),
+        "device": "cpu",
+        "policy": "cpu",
+        "timeout": 60,
+        "inputs": [],
+        "invoke": "result = run_example()",
+        "data_expression": "result",
+        "replot_invoke": "result = plot_results(saved_data)",
+        "render_functions": ["plot_results"],
+    }
+    results = tmp_path / "results"
+    examples.refresh("demo", config, results=results)
+    directory, before = examples.bundle("demo", results)
+    original_data = (directory / "data.json").read_bytes()
+    source.write_text(source.read_text().replace("'blue'", "'red'"))
+    examples.refresh("demo", config, results=results, replot=True)
+    directory, after = examples.bundle("demo", results)
+    assert counter.read_text() == "1"
+    assert (directory / "data.json").read_bytes() == original_data
+    assert after["executed_at"] == before["executed_at"]
+    assert after["revision"] == before["revision"]
+    assert after["device"] == before["device"]
+    assert "rendered_at" in after
+    assert "blue" in (directory / "executed_source.py").read_text()
+    assert "red" in (directory / "source.py").read_text()
+    assert examples.result_state(config, after) == "current"
+    source.write_text(source.read_text().replace("[0, 3]", "[0, 4]"))
+    with pytest.raises(ValueError, match="Simulation inputs changed"):
+        examples.refresh("demo", config, results=results, replot=True)
+    assert counter.read_text() == "1"

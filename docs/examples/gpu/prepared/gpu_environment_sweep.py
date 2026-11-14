@@ -78,10 +78,15 @@ from scripts.gpu_studies.population_figures import (
 
 
 # %%
-def run_example():
-    """Require CUDA, check source/export budgets and plot all sixteen conditions."""
+def simulate():
+    """Run the complete CUDA study and return compact numerical summaries."""
     report, final = run_environment_sweep(EnvironmentSweep(ions=True))
     del final
+    return report
+
+
+def plot_results(report):
+    """Render saved observations without advancing the simulation."""
     history = report["history"]
     grid = np.array(report["conditions"])
     time_ms = np.array([row["time"] for row in history]) * 1000
@@ -149,6 +154,11 @@ def run_example():
     describe_population(report, labels)
     ion_figures(report, labels)
     return report
+
+
+def run_example():
+    """Simulate once, then render the resulting numerical summaries."""
+    return plot_results(simulate())
 
 
 # %% [markdown]

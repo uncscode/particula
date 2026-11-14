@@ -48,7 +48,7 @@ def population_figures(report, labels, *, time_scale=1.0, time_unit="s"):
     ax.set(
         xlabel=f"Time [{time_unit}]",
         ylabel="Cumulative accepted mergers",
-        title="Aerosol number loss = aerosol mergers",
+        title="Sampled cumulative mergers · aerosol number loss",
     )
     ax.secondary_yaxis(
         "right",
@@ -150,12 +150,12 @@ def population_figures(report, labels, *, time_scale=1.0, time_unit="s"):
     fig.legend(handles, legend, loc="outside lower center", ncols=5)
 
     fig, axes = _facets(
-        labels, "Cumulative collisions and particle-number loss"
+        labels, "Sampled cumulative mergers · markers are observations"
     )
     for i, ax in enumerate(axes):
         if i >= len(labels):
             break
-        ax.step(shown_time, number[0, i] - number[:, i], where="post")
+        ax.plot(shown_time, number[0, i] - number[:, i], marker=".")
         ax.set(xlabel=f"Time [{time_unit}]", ylabel="Accepted mergers = N₀ − N")
     return number
 

@@ -222,13 +222,30 @@ def render_example(key, config):
             else "Results from an earlier run—refresh needed"
         )
         kind = "note" if state == "current" else "caution"
+        executed_source = (
+            "executed_source.py" if "rendered_at" in manifest else "source.py"
+        )
+        rendering = (
+            f"Plots rendered from saved data on {manifest['rendered_at'][:10]} "
+            f"UTC (revision `{manifest['render_revision'][:9]}`); "
+            "simulation not rerun.\n\n"
+            if "rendered_at" in manifest
+            else ""
+        )
+        data_link = (
+            f"[Numerical plot data]({url}/data.json).\n\n"
+            if "data.json" in manifest.get("files", {})
+            else ""
+        )
         chunks.append(
             f":::{kind}[{status}]\nExecution: **{manifest['device']}** · "
             f"{manifest['executed_at'][:10]} UTC. "
             f"Particula revision `{manifest['revision'][:9]}`. "
-            f"[Executed source]({url}/source.py) · "
+            f"[Executed source]({url}/{executed_source}) · "
             f"[Run metadata]({url}/manifest.json).\n\n"
-            "A matching script fingerprint is not a claim of validation "
+            + rendering
+            + data_link
+            + "A matching script fingerprint is not a claim of validation "
             "against every later library revision.\n:::"
         )
     else:
