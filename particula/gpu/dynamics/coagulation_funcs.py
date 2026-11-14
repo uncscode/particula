@@ -517,8 +517,128 @@ def diffusive_knudsen_number_wp(
     return numerator / denominator
 
 
+_MIN_ATTRACTIVE_POTENTIAL = wp.constant(wp.float64(1e-16))
+_FIT_SERIES_THRESHOLD = wp.constant(wp.float64(1e-5))
+_GATTI_FACTOR = wp.constant(wp.float64(1.22))
+_GATTI_FACTOR_CUBED = wp.constant(wp.float64(1.815848))
+_GOPAL_POTENTIAL_THRESHOLD = wp.constant(wp.float64(0.5))
+_FIT_TRANSITION_SCALE = wp.constant(wp.float64(2.5))
+_GOPAL_COEFFICIENT = wp.constant(wp.float64(1.598))
+_GOPAL_EXPONENT = wp.constant(wp.float64(1.1709))
+_MIN_CHAHL_POTENTIAL = wp.constant(wp.float64(1e-12))
+_CHAHL_EXP_COEFFICIENT = wp.constant(wp.float64(4.528))
+_CHAHL_EXP_DECAY = wp.constant(wp.float64(1.088))
+_CHAHL_LOG_COEFFICIENT = wp.constant(wp.float64(0.7091))
+_CHAHL_LOG_FACTOR = wp.constant(wp.float64(1.527))
+_CHAHL_POWER_COEFFICIENT = wp.constant(wp.float64(11.36))
+_CHAHL_POWER_EXPONENT = wp.constant(wp.float64(0.272))
+_CHAHL_SHAPE_SLOPE = wp.constant(wp.float64(0.003533))
+_CHAHL_OFFSET = wp.constant(wp.float64(10.33))
+_CHAHL_SHAPE_INTERCEPT = wp.constant(wp.float64(0.05971))
+
+
 @wp.func
-def charged_hard_sphere_wp(  # noqa: C901
+def charged_dimensionless_wp(
+    model: wp.int32,
+    kn: wp.float64,
+    phi: wp.float64,
+    hard_sphere: wp.float64,
+) -> wp.float64:
+    """Evaluate dimensionless CPU strategy formulas (model IDs 0 through 4).
+
+    IDs: hard sphere, Dyachkov 2007, Gatti 2008, Gopalakrishnan 2012,
+    Chahl 2019. The dimensional Coulomb enhancement is applied by the caller.
+    References and fitted domains follow charged_dimensionless_kernel.py.
+    """
+    one = wp.float64(1.0)
+    continuum = wp.float64(4.0) * _PI * kn * kn
+    if model == 1:
+        potential = wp.max(phi, _MIN_ATTRACTIVE_POTENTIAL)
+        kinetic = coulomb_kinetic_limit_wp(potential)
+        cont = coulomb_continuum_limit_wp(potential)
+        ratio = kn * kinetic / cont
+        adjustment = one + ratio
+        decay = wp.exp(-potential / adjustment)
+        term1 = wp.sqrt(wp.float64(2.0) * _PI) * kn * kinetic * decay
+        # Stable differences are essential near the neutral limit.
+        x = potential / (adjustment * (wp.float64(2.0) + ratio))
+        diff = one - wp.exp(-x)
+        if x < _FIT_SERIES_THRESHOLD:
+            diff = x * (one - x / wp.float64(2.0) + x * x / wp.float64(6.0))
+        term2 = one + (wp.float64(2.0) + ratio) * ratio * diff
+        numerator = one - decay
+        denominator = one - wp.exp(-potential)
+        if potential < _FIT_SERIES_THRESHOLD:
+            y = potential / adjustment
+            numerator = y * (
+                one - y / wp.float64(2.0) + y * y / wp.float64(6.0)
+            )
+            denominator = potential * (
+                one
+                - potential / wp.float64(2.0)
+                + potential * potential / wp.float64(6.0)
+            )
+        return continuum / (term1 / term2 + numerator / denominator)
+    if model == 2 and phi >= wp.float64(0.0):
+        potential = wp.max(phi, _MIN_ATTRACTIVE_POTENTIAL)
+        kinetic = coulomb_kinetic_limit_wp(potential)
+        cont = coulomb_continuum_limit_wp(potential)
+        x = (
+            wp.sqrt(_PI)
+            * cont
+            * potential
+            * _GATTI_FACTOR
+            / (wp.float64(2.0) * kinetic * kn)
+        )
+        decay = wp.exp(-x)
+        first = continuum * (one - (one + x) * decay)
+        second = (
+            wp.sqrt(wp.float64(8.0) * _PI)
+            * kn
+            * (
+                one
+                + wp.float64(2.0)
+                * wp.sqrt(_PI)
+                * _GATTI_FACTOR_CUBED
+                * cont
+                * potential ** wp.float64(3.0)
+                / (wp.float64(9.0) * kinetic * kinetic * kn)
+            )
+            * decay
+        )
+        return first + second
+    if model == 3 and phi > _GOPAL_POTENTIAL_THRESHOLD:
+        minimum = wp.max(
+            wp.min(kn, wp.float64(3.0) * kn / (wp.float64(2.0) * phi)),
+            _MIN_ATTRACTIVE_POTENTIAL,
+        )
+        if minimum < _FIT_TRANSITION_SCALE:
+            return continuum / (
+                one + _GOPAL_COEFFICIENT * minimum**_GOPAL_EXPONENT
+            )
+    if model == 4 and phi > wp.float64(0.0):
+        potential = wp.max(phi, _MIN_CHAHL_POTENTIAL)
+        c1 = _CHAHL_EXP_COEFFICIENT * wp.exp(
+            -(_CHAHL_EXP_DECAY * potential)
+        ) + _CHAHL_LOG_COEFFICIENT * wp.log(one + _CHAHL_LOG_FACTOR * potential)
+        c2 = (
+            _CHAHL_POWER_COEFFICIENT * potential**_CHAHL_POWER_EXPONENT
+            - _CHAHL_OFFSET
+        )
+        c3 = -(_CHAHL_SHAPE_SLOPE * potential) + _CHAHL_SHAPE_INTERCEPT
+        base = one + c3 * (wp.log(kn) - c1) / _FIT_TRANSITION_SCALE
+        correction = (
+            (c2 / _FIT_TRANSITION_SCALE)
+            * base ** (-one / c3 - one)
+            * wp.exp(-(base ** (-one / c3)))
+        )
+        return wp.exp(correction) * hard_sphere
+    return hard_sphere
+
+
+@wp.func
+def charged_kernel_wp(  # noqa: C901
+    model: wp.int32,
     radius_i: wp.float64,
     radius_j: wp.float64,
     mass_i: wp.float64,
@@ -536,7 +656,7 @@ def charged_hard_sphere_wp(  # noqa: C901
     ref_temperature: wp.float64,
     sutherland_constant: wp.float64,
 ) -> wp.float64:
-    """Calculate an internal charged hard-sphere pair rate in SI units.
+    """Calculate a selected charged Brownian pair rate in SI units.
 
     This device-only, concrete-module-only helper is the pair-rate primitive for
     charged-only and canonical Brownian-plus-charged particle-resolved low-level
@@ -557,6 +677,8 @@ def charged_hard_sphere_wp(  # noqa: C901
     cutoff when its enhancement is below ``1e-80``.
 
     Args:
+        model: Fit identifier, 0=hard sphere, 1=Dyachkov, 2=Gatti,
+            3=Gopalakrishnan, 4=Chahl.
         radius_i: Radius of particle i [m]. Must be finite and positive.
         radius_j: Radius of particle j [m]. Must be finite and positive.
         mass_i: Mass of particle i [kg]. Must be finite and positive.
@@ -756,7 +878,9 @@ def charged_hard_sphere_wp(  # noqa: C901
         or denominator <= zero
     ):
         return zero
-    dimensionless_kernel = numerator / denominator
+    dimensionless_kernel = charged_dimensionless_wp(
+        model, diffusive_knudsen, potential_ratio, numerator / denominator
+    )
     if not wp.isfinite(dimensionless_kernel) or dimensionless_kernel < zero:
         return zero
 
@@ -771,3 +895,44 @@ def charged_hard_sphere_wp(  # noqa: C901
     if not wp.isfinite(result) or result <= zero:
         return zero
     return result
+
+
+@wp.func
+def charged_hard_sphere_wp(  # noqa: C901
+    radius_i: wp.float64,
+    radius_j: wp.float64,
+    mass_i: wp.float64,
+    mass_j: wp.float64,
+    charge_i: wp.float64,
+    charge_j: wp.float64,
+    temperature: wp.float64,
+    pressure: wp.float64,
+    boltzmann_constant: wp.float64,
+    elementary_charge_value: wp.float64,
+    electric_permittivity: wp.float64,
+    gas_constant: wp.float64,
+    molecular_weight_air: wp.float64,
+    ref_viscosity: wp.float64,
+    ref_temperature: wp.float64,
+    sutherland_constant: wp.float64,
+) -> wp.float64:
+    """Evaluate the backwards-compatible charged hard-sphere pair rate."""
+    return charged_kernel_wp(
+        wp.int32(0),
+        radius_i,
+        radius_j,
+        mass_i,
+        mass_j,
+        charge_i,
+        charge_j,
+        temperature,
+        pressure,
+        boltzmann_constant,
+        elementary_charge_value,
+        electric_permittivity,
+        gas_constant,
+        molecular_weight_air,
+        ref_viscosity,
+        ref_temperature,
+        sutherland_constant,
+    )

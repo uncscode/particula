@@ -263,6 +263,12 @@ class PreparedSimulation:
                 self._wait()
                 with self._scope():
                     failure = int(self._device_failure.numpy()[0])
+                    if failure == 3:
+                        raise ValueError("ion source capacity exhausted")
+                    if failure == 4:
+                        raise ValueError(
+                            "ion source Poisson mean exceeds supported range"
+                        )
                     if failure == 2:
                         raise ValueError(
                             "Brownian GPU coagulation requires "
@@ -395,6 +401,29 @@ class PreparedSimulation:
                 concentration, target.shape, "concentration", positive=False
             )
             apply_forcing(self, ((target, values),))
+
+    def ion_source_diagnostics(self):
+        """Return cumulative injected pairs and mass [kg] for each box.
+
+        This explicit observation synchronizes and returns detached arrays.
+        Mass is extensive, in the native particle species order.
+        """
+        import numpy as np
+
+        with self._lock:
+            self.synchronize()
+            source = next(
+                (p for p in self._plans if p.family == "ion_source"), None
+            )
+            if source is None:
+                raise ValueError("simulation has no ion source")
+            pairs = self._auxiliary["ion_source_pairs"].numpy().copy()
+            mass = np.zeros((pairs.size, self._session.dimensions.n_species))
+            for polarity in ("positive", "negative"):
+                mass[:, source.values[polarity + "_species"]] = (
+                    pairs * source.values[polarity + "_mass"]
+                )
+            return {"injected_pairs": pairs, "injected_mass": mass}
 
     def checkpoint(self) -> SimulationCheckpoint:
         """Observe and save exact continuation bytes plus frozen configuration.

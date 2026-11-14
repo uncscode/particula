@@ -46,10 +46,24 @@ the full collection of CPU strategies or direct GPU mechanism masks.
 | Family | Prepared support | Boundaries |
 | --- | --- | --- |
 | Condensation | `MassCondensation` with isothermal or latent-heat strategy | Native discrete or resolved populations; explicit species maps; supported ideal/Kappa activity and constant/Water Buck vapor-pressure models; four fixed equal GPU substeps. |
-| Coagulation | `Coagulation` with Brownian strategy | Particle-resolved, equal positive active counts, default interpolation. Other direct-kernel mechanisms are not prepared runnable capabilities. |
+| Coagulation | `Coagulation` with Brownian or an existing charged strategy | Particle-resolved, equal positive active counts, default interpolation controls. Charged fits replace Brownian rather than add to it. |
 | Dilution | `Dilution` with exact exponential strategy | Counts/densities and gas inventory decrease consistently; no volume change. |
 | Wall loss | `WallLoss` with spherical, rectangular or charged strategy | Particle-resolved; supported neutral/charged configuration is frozen at preparation; retired resolved slots retain the native raw-count semantics. |
 | Nucleation | `Nucleation` with activation or kinetic strategy | Resolved unit-count, neutral injection with explicit species mapping, integral event demand and fixed capacity; supported exhaustion/resampling policy is retained. |
+| Ion source | `IonPairSource` with constant production | Paired Poisson unit-count injection into fixed capacity; independent source RNG and inventory ledger. |
+
+Prepared charged coagulation accepts `HardSphereKernelStrategy`,
+`CoulombDyachkov2007KernelStrategy`, `CoulombGatti2008KernelStrategy`,
+`CoulombGopalakrishnan2012KernelStrategy`, and `CoulumbChahl2019KernelStrategy`
+inside `ChargedCoagulationStrategy`. The selected fit is frozen and included in
+checkpoint compatibility. Each uses the shared stochastic sampler and bounded
+parallel pair maximum reduction. Capture and resume use the same model.
+Custom subclasses and unsupported interpolation controls reject before upload.
+See the [charged model comparison](../../examples/gpu/prepared/gpu_charged_models.py).
+The [charged coagulation validation record](../../contribute/validation/gpu/charged-coagulation.md)
+lists actual CUDA checks and remaining scientific boundaries.
+This support does not itself provide atmospheric ion attachment or
+recombination; those need separate physical models and validation.
 
 Condensation retains configured transport coefficients and uses the mapped vapor
 material's molar mass for transport mean free paths, matching native CPU physics.
@@ -69,6 +83,33 @@ Process configuration, timestep, box layout and buffer capacity are frozen.
 Editing the original Python strategy after preparation does not change a running
 simulation. Changing these requires a new preparation; a checkpoint resume also
 requires matching configuration and the exact supported device.
+
+## Paired ion production
+
+`IonPairSource` from `particula.dynamics.ions.source` is an explicit,
+prepared-only particle source. It composes with runnables using `|`. Supply
+`production_rate` in ion pairs m^-3 s^-1, distinct positive/negative material
+indices, and each ion's mass in kg. It samples a Poisson number of pairs per
+box per step, with mean `production_rate * volume * time_step`. Each event
+inserts both polarities with unit count and charges +1 and -1.
+
+The source owns a separate random stream keyed by the root seed and logical
+box identity. It participates in native CUDA capture and exact checkpoint
+continuation. `simulation.ion_source_diagnostics()` returns detached cumulative
+`injected_pairs` and extensive `injected_mass` [kg, box by particle species].
+Include these external inputs in conservation checks.
+
+Free slots must accommodate both members of every sampled pair. Insufficient
+capacity faults the simulation at observation; no partial pair, resampling or
+volume scaling occurs. The Poisson mean is bounded at one million pairs per
+box per step and uses Warp's float32 Poisson parameter. Ordinary particle
+state and inventories remain fp64. Zero production advances no source RNG.
+CPU `execute()` is unsupported and rejects explicitly.
+
+This source supplies particles, not atmospheric ion collision physics. Do not
+interpret ordinary charged coagulation of these particles as validated
+ion–aerosol attachment or ion–ion recombination. Free-ion condensation,
+neutral-product removal and cohort tracking require additional integration.
 
 ## State, forcing and observations
 

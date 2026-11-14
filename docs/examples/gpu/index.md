@@ -13,6 +13,7 @@ There is no CPU fallback in publication runs.
 | Example | Scientific or workflow question |
 | --- | --- |
 | [CPU → CUDA → CPU quick start](prepared/gpu_prepared_quick_start.py) | How do eight aerosol boxes evolve, change forcing, capture and resume? |
+| [Charged Brownian models](prepared/gpu_charged_models.py) | How do five charged fits compare on CUDA against their CPU implementations? |
 | [Heterogeneous boxes](prepared/gpu_prepared_multibox.py) | How do 64 boxes with different thermodynamic conditions, volume and composition respond? |
 | [Cooling, heating and vapor forcing](prepared/gpu_prepared_forcing.py) | How does a four-material/five-gas population respond to an external schedule? |
 | [Stochastic coagulation ensemble](prepared/gpu_prepared_stochastic.py) | How much does evolution vary across sixteen random seeds? |
