@@ -87,7 +87,9 @@ def _surface_plan(surface, particles):
     ):
         raise ValueError("GPU surface tension tables are unsupported")
     width = particles.n_species
-    tensions = _vector(surface.surface_tension, width, "surface_tension")
+    tensions = _vector(
+        surface.surface_tension, width, "surface_tension", positive=True
+    )
     density = _vector(surface.density, width, "surface density", positive=True)
     # The direct kernel uses the live mixture density for Kelvin curvature.
     # A fixed CPU density can match this for arbitrary future composition only

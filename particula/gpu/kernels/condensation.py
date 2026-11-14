@@ -116,6 +116,7 @@ _DEFAULT_MASS_ACCOMMODATION = 1.0
 _DEFAULT_DIFFUSION_COEFFICIENT = 2.0e-5
 _GAS_CONSTANT = wp.constant(wp.float64(constants.GAS_CONSTANT))
 _MOLECULAR_WEIGHT_AIR = wp.constant(wp.float64(constants.MOLECULAR_WEIGHT_AIR))
+_MIN_NATIVE_RADIUS = wp.constant(wp.float64(1e-10))
 _REF_VISCOSITY_AIR_STP = wp.constant(
     wp.float64(constants.REF_VISCOSITY_AIR_STP)
 )
@@ -553,6 +554,8 @@ def _condensation_mass_transfer_impl(  # noqa: C901
             return
 
         radius = particle_radius_from_volume_wp(total_volume)
+        if native == wp.int32(1):
+            radius = wp.max(radius, _MIN_NATIVE_RADIUS)
         effective_density = density[0]
         knudsen_number = knudsen_number_wp(mean_free_path_value, radius)
         slip_correction = cunningham_slip_correction_wp(knudsen_number)
@@ -662,6 +665,8 @@ def _condensation_mass_transfer_impl(  # noqa: C901
         return
 
     radius = particle_radius_from_volume_wp(total_volume)
+    if native == wp.int32(1):
+        radius = wp.max(radius, _MIN_NATIVE_RADIUS)
     effective_density = total_mass / total_volume
     if effective_density <= wp.float64(0.0):
         effective_density = density[0]

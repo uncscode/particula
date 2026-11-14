@@ -970,3 +970,45 @@ def test_prepared_weighted_surface_matches_each_cpu_particle(
     np.testing.assert_allclose(
         actual.gas.concentration, cpu.gas.concentration, rtol=2e-12, atol=1e-30
     )
+
+
+def test_native_condensation_minimum_radius_matches_cpu(device):
+    """Native transport and Kelvin evaluation share the CPU radius floor."""
+    from particula._cpu_batch import detached
+
+    initial, process = condensation_case()
+    total_mass = 4 * np.pi / 3 * 1000 * (5e-11) ** 3
+    initial.particles.masses[:] = total_mass * np.array([0.5, 0.5])
+    initial.gas.concentration[:, 2] = 0
+    cpu = detached(initial)
+    process.execute(cpu, time_step=1e-16, sub_steps=4)
+    with process.prepare(
+        initial, device=device.native, time_step=1e-16
+    ) as owner:
+        owner.step()
+        result = owner.snapshot()
+    assert np.any(cpu.particles.masses != initial.particles.masses)
+    np.testing.assert_allclose(
+        result.particles.masses, cpu.particles.masses, rtol=2e-12, atol=1e-45
+    )
+    np.testing.assert_allclose(
+        result.gas.concentration[:, 2],
+        cpu.gas.concentration[:, 2],
+        rtol=2e-12,
+        atol=1e-45,
+    )
+
+
+def test_zero_surface_tension_rejects_before_gpu_upload(monkeypatch):
+    """The prepared model honors the native CPU Kelvin positive-tension domain."""
+    from particula.gpu import conversion
+
+    initial, process = condensation_case()
+    process.condensation_strategy.surface_strategy.surface_tension[:] = 0
+
+    def forbidden(*_args, **_kwargs):
+        pytest.fail("invalid surface reached upload")
+
+    monkeypatch.setattr(conversion, "to_warp_particle_data", forbidden)
+    with pytest.raises(ValueError, match="surface_tension"):
+        process.prepare(initial, device="cpu", time_step=1)
