@@ -67,6 +67,37 @@ def test_route_preserves_case_and_underscores():
     assert site.route("docs/guide/searchindex.md") == "guide/searchindex"
 
 
+def test_download_bundle_runs_with_declared_helpers(tmp_path, monkeypatch):
+    """Downloaded helpers remain importable without the repository on sys.path."""
+    import subprocess
+    import zipfile
+
+    helper = tmp_path / "helpers/fixture.py"
+    helper.parent.mkdir()
+    helper.write_text("VALUE = 42\n")
+    monkeypatch.setattr(site, "ROOT", tmp_path)
+    monkeypatch.setattr(site, "SITE", tmp_path / "website")
+    links = site.example_downloads(
+        "demo",
+        {"inputs": ["helpers/fixture.py"], "device": "cpu"},
+        "from helpers.fixture import VALUE\nprint(VALUE)\n",
+    )
+    assert "demo.zip" in links
+    extracted = tmp_path / "extracted"
+    with zipfile.ZipFile(
+        tmp_path / "website/public/downloads/demo.zip"
+    ) as archive:
+        archive.extractall(extracted)  # noqa: S202 -- generated local test archive
+    result = subprocess.run(  # noqa: S603 -- fixed generated test script
+        [sys.executable, "example.py"],
+        cwd=extracted,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    assert result.stdout.strip() == "42"
+
+
 def test_progress_updates_collapse_without_hiding_scientific_results():
     """One closed disclosure collects stream updates but not scientific text."""
     progress = (
@@ -179,3 +210,43 @@ def test_legacy_api_anchors_preserve_sections_and_reject_missing_symbols(
     )
     site.preserve_api_anchors(tmp_path, {page: anchors})
     assert target.read_text() == text
+
+
+def test_example_links_open_illustrated_page(monkeypatch):
+    """A tutorial link should expose figures and its separate download links."""
+    monkeypatch.setattr(
+        site,
+        "registry",
+        lambda: {
+            "example": {"source": "docs/examples/gpu/prepared/example.py"}
+        },
+    )
+    result = site.rewrite_links(
+        "[Tutorial](prepared/example.py)", "docs/examples/gpu/index.md"
+    )
+    assert result == "[Tutorial](/particula/examples/gpu/prepared/example/)"
+    assert "downloads" not in result
+
+
+def test_bundle_preserves_explicit_data_destination(tmp_path, monkeypatch):
+    """Standalone data viewers receive the same paths as refresh kernels."""
+    import zipfile
+
+    source = tmp_path / "docs/data/results.json"
+    source.parent.mkdir(parents=True)
+    source.write_text('{"qualified": true}')
+    monkeypatch.setattr(site, "ROOT", tmp_path)
+    monkeypatch.setattr(site, "SITE", tmp_path / "website")
+    site.example_downloads(
+        "data",
+        {
+            "inputs": ["docs/data/results.json"],
+            "input_destinations": {"docs/data/results.json": "results.json"},
+        },
+        "print('viewer')",
+    )
+    with zipfile.ZipFile(
+        tmp_path / "website/public/downloads/data.zip"
+    ) as archive:
+        assert archive.read("results.json") == source.read_bytes()
+        assert "docs/data/results.json" not in archive.namelist()

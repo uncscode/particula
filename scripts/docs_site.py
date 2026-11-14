@@ -71,7 +71,7 @@ def rewrite_links(text, source):
         elif Path(target).suffix == ".py":
             ids = {c["source"]: key for key, c in registry().items()}
             destination = (
-                BASE + f"downloads/{ids[target]}.py"
+                BASE + route(target) + "/"
                 if target in ids
                 else "https://github.com/uncscode/particula/blob/main/" + target
             )
@@ -160,15 +160,58 @@ def output_markdown(outputs, url, title):
     return "\n\n".join(result)
 
 
+def example_downloads(key, config, source):
+    """Publish source and a runnable bundle when helpers are needed."""
+    import zipfile
+
+    download = SITE / "public/downloads" / f"{key}.py"
+    download.parent.mkdir(parents=True, exist_ok=True)
+    download.write_text(source)
+    links = [f"[Download Python script]({BASE}downloads/{key}.py)"]
+    if config.get("inputs"):
+        archive = download.with_suffix(".zip")
+        flag = " --cuda" if config.get("device") == "cuda" else ""
+        with zipfile.ZipFile(
+            archive, "w", compression=zipfile.ZIP_DEFLATED
+        ) as bundle:
+            bundle.writestr("example.py", source)
+            bundle.writestr(
+                "README.txt",
+                "Extract this entire archive into one directory. Install the "
+                "Particula version documented on the example page and its "
+                "optional dependencies. From the extracted directory run:\n\n"
+                f"python example.py{flag}\n\n"
+                "Helper/data paths are preserved below that directory. CUDA "
+                "examples require an available NVIDIA GPU and Warp.\n",
+            )
+            used_names = {"example.py", "README.txt"}
+            for name in config["inputs"]:
+                destination = Path(
+                    config.get("input_destinations", {}).get(name, name)
+                )
+                if destination.is_absolute() or ".." in destination.parts:
+                    raise ValueError(
+                        "Example bundle input must be a relative contained path"
+                    )
+                if destination.as_posix() in used_names:
+                    raise ValueError(
+                        "Example input collides with a bundle entry"
+                    )
+                used_names.add(destination.as_posix())
+                bundle.write(ROOT / name, destination.as_posix())
+        links.append(
+            f"[Download script with helper and data files (.zip)]"
+            f"({BASE}downloads/{key}.zip)"
+        )
+    return " · ".join(links)
+
+
 def render_example(key, config):
     """Render current source and saved output without execution."""
     directory, manifest = bundle(key)
     state = result_state(config, manifest)
     source = (ROOT / config["source"]).read_text()
-    download = SITE / "public/downloads" / f"{key}.py"
-    download.parent.mkdir(parents=True, exist_ok=True)
-    download.write_text(source)
-    chunks = [f"[Download complete Python script]({BASE}downloads/{key}.py)"]
+    chunks = [example_downloads(key, config, source)]
     url = BASE + f"results/{key}"
     if directory:
         destination = SITE / "public/results" / key
@@ -537,9 +580,14 @@ def check_inventory(dist, pages):
         target = dist / route(source) / "index.html"
         if target not in pages or anchor not in pages[target].ids:
             errors.append(f"Missing relocated anchor {old} -> {destination}")
-    for key in registry():
+    for key, config in registry().items():
         if not (dist / "downloads" / f"{key}.py").is_file():
             errors.append(f"Missing source download {key}")
+        if (
+            config.get("inputs")
+            and not (dist / "downloads" / f"{key}.zip").is_file()
+        ):
+            errors.append(f"Missing helper/data download {key}")
     if any(".trash" in p.relative_to(dist).parts for p in dist.rglob("*")):
         errors.append("Archived files leaked into the published site")
     return errors
