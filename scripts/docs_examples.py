@@ -193,7 +193,7 @@ def execute(config, root=ROOT, *, saved_data=None):
                 timeout=config["timeout"],
                 resources={"metadata": {"path": temporary}},
                 allow_errors=False,
-            ).execute()
+            ).execute(cleanup_kc=True)
             if config.get("data_expression"):
                 data = json.loads(
                     (Path(temporary) / "_plot_data.json").read_text()
@@ -251,6 +251,8 @@ def package_versions():
 
 def write_plot_data(path, data):
     """Stream JSON summaries with a hard byte cap and no silent truncation."""
+    if not isinstance(data, (dict, list)):
+        raise ValueError("Plot data must be a JSON object or array")
     path = Path(path)
     size = 0
     try:
@@ -285,11 +287,10 @@ def load_replot_data(example_id, config, root, results):
         )
     if (directory / "data.json").stat().st_size > MAX_PLOT_DATA_BYTES:
         raise ValueError("Saved plot data exceeds the 10 MiB limit")
-    return (
-        directory,
-        original,
-        json.loads((directory / "data.json").read_text()),
-    )
+    data = json.loads((directory / "data.json").read_text())
+    if not isinstance(data, (dict, list)):
+        raise ValueError("Plot data must be a JSON object or array")
+    return directory, original, data
 
 
 def save_cell_outputs(cells, pending):
@@ -297,12 +298,14 @@ def save_cell_outputs(cells, pending):
     outputs = []
     for index, cell in enumerate(cells):
         rendered = []
+        image_index = 0
         for output in cell.get("outputs", []):
             data = output.get("data", {})
             if "image/png" in data or "image/svg+xml" in data:
                 mime = "image/png" if "image/png" in data else "image/svg+xml"
                 ext = "png" if mime == "image/png" else "svg"
-                filename = f"figure-{index + 1}-{len(rendered) + 1}.{ext}"
+                image_index += 1
+                filename = f"figure-{index + 1}-{image_index}.{ext}"
                 value = (
                     base64.b64decode(data[mime])
                     if ext == "png"
@@ -409,6 +412,8 @@ def refresh(example_id, config, root=ROOT, results=RESULTS, *, replot=False):
                 config, root
             )
         if replot:
+            manifest["render_versions"] = manifest["versions"]
+            manifest["render_device"] = device
             for key in (
                 "elapsed_seconds",
                 "package_source_sha256",
@@ -569,6 +574,24 @@ def selected_changed(configs, base, root=ROOT):
     return selected
 
 
+def validate_example(key, config):
+    """Validate rendering-only updates without repeating their simulation."""
+    if config["policy"] != "cpu":
+        print(
+            f"SKIP {key}: {config['policy']} execution "
+            "requires explicit refresh"
+        )
+        return
+    _, manifest = bundle(key)
+    if manifest.get("rendered_at") and config.get("data_expression"):
+        _, _, data = load_replot_data(key, config, ROOT, RESULTS)
+        execute(config, saved_data=data)
+        print(f"PASS {key}: saved-data rendering; simulation not rerun")
+    else:
+        execute(config)
+        print(f"PASS {key}: validation only; publication results unchanged")
+
+
 def main():
     """Run explicit refreshes or read-only validation of changed examples."""
     parser = argparse.ArgumentParser(description=__doc__)
@@ -607,15 +630,7 @@ def main():
                 f"{key}: {state} results; explicit refresh required"
             )
     for key in selected:
-        config = configs[key]
-        if config["policy"] != "cpu":
-            print(
-                f"SKIP {key}: {config['policy']} execution "
-                "requires explicit refresh"
-            )
-            continue
-        execute(config)
-        print(f"PASS {key}: validation only; publication results unchanged")
+        validate_example(key, configs[key])
     if not selected:
         print("No executable changes selected")
 

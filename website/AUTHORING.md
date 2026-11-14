@@ -17,8 +17,10 @@ a fresh kernel with temporary working storage and captures figures, text and
 explicitly declared compact numerical plot data. Outputs live directly in
 `website/results/EXAMPLE_KEY/`: `manifest.json`, `source.py`, figures, and
 optional `data.json`. There are no timestamped run folders or pointer files.
-Git preserves earlier versions. Failed execution or rendering keeps the previous
-successful bundle. Review and commit the bundle together with source changes.
+Figure filenames use their order within the code section, independent of log
+message counts. Git preserves earlier versions. Failed execution or rendering
+keeps the previous successful bundle. Review and commit the bundle together
+with source changes.
 
 For a plotting-only change, reuse numerical data instead of rerunning physics:
 
@@ -53,8 +55,10 @@ python scripts/docs_examples.py check --changed --base upstream/main
 ```
 
 Changed CPU examples execute for validation without replacing publication
-results. Declared CUDA or long-running examples report an explicit execution
-skip. Syntax, saved-file integrity, and freshness are checked for every example.
+results. After a plotting-only replot, validation reuses saved data and does
+not repeat the simulation. Declared CUDA or long-running examples report an
+explicit execution skip. Syntax, saved-file integrity, and freshness are checked
+for every example.
 Use `--base` with the pull request base revision in CI.
 
 The example registry declares its source, execution policy, device, timeout,

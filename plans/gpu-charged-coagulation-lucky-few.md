@@ -451,3 +451,30 @@ Dry refinement passed again after normalization correction. The 16-box
 humidity pilot failed its 2% ion population criterion (water/vapor passed);
 retain the failure. The separate frozen 256-box, seed-413 confirmation passed
 with unchanged tolerances before publication. No adaptive tolerance relaxation.
+
+## Saved-data plotting and stable output folders
+
+- [x] Replace cumulative-event stairs with dots at recorded observations and
+  connecting lines. Retain interval-average rate plots and explain their meaning.
+- [x] Migrate all 79 example bundles to `website/results/EXAMPLE_KEY/`, preserving
+  selected output bytes and provenance. Git retains earlier versions; remove
+  per-run folders and current-generation pointers.
+- [x] Add explicit saved-data replotting with scientific-input and data-integrity
+  checks. Preserve original execution provenance and record rendering separately.
+- [x] Limit compact numerical plot data to 10 MiB of serialized JSON per example;
+  reject oversized/nonfinite data and preserve the previous successful bundle.
+  Exclude full particle states; this is a saved-data cap, not a simulation RAM cap.
+- [x] Update authoring and assistant rules to reuse numerical data for plot-only
+  edits. Make figure filenames independent of stdout message chunking.
+- [x] Capture the full dry study's previously unsaved numeric histories and
+  verify a CPU-only replot preserves exact data, all six figures and provenance.
+- [x] Complete the humidity data capture and verify its CPU-only replot:
+  157,620 bytes, 11.41 s; data, eight figures and provenance unchanged.
+- [x] Rebuild the website and verify both live pages, numerical downloads and
+  bundled Python/helper bytes. The build renders 459 pages with zero link errors.
+
+Final-commit hosted validation is tracked by the existing
+[draft PR CI gate](https://github.com/uncscode/particula/pull/1650/checks).
+
+Earlier run identifiers in this plan describe historical publications. The
+stable example folders above are the sole current output locations.

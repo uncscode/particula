@@ -2,9 +2,9 @@
 
 The [dry study](../../../examples/gpu/prepared/gpu_dry_environment_sweep.py)
 and [humidity study](../../../examples/gpu/prepared/gpu_environment_sweep.py)
-are separate physical experiments. Each published example retains only its
-current successful output generation; superseded output remains in Git history.
-Failed refreshes preserve the previous successful generation.
+are separate physical experiments. Each published example uses one stable
+`website/results/EXAMPLE_KEY/` folder; superseded output remains in Git history.
+Failed refreshes or replots preserve the previous successful bundle.
 
 ## Physical workloads
 
@@ -103,7 +103,8 @@ interval or proof of asymptotic convergence. Reproduce the fixed checks with:
 ## Completed humidity publication
 
 The full CUDA run completed with seed 411 and 3 ms of physical evolution.
-Generation `run-20261114T205354713341Z` records revision `5011becc0` and
+The original publication `run-20261114T205354713341Z` recorded revision
+`5011becc0` and
 source/input hashes. All eight figures were inspected. Starting with 2,097,152
 aerosols plus 524,288 ions, it recorded 334 aerosol mergers, leaving 2,096,818
 aerosols (0.01593% number loss). The maximum per-box species-mass residual was
@@ -143,7 +144,7 @@ with exact charge conservation and a 2.442e-15 maximum mass residual.
 ## Completed dry publication
 
 The full dry CUDA run completed with seed 512, 2,490,368 initial aerosols and
-1000 s of physical evolution. Its saved generation is
+1000 s of physical evolution. Its original publication was
 `run-20261114T180838997295Z`, with revision `8aa63a3fb` and executable/input
 hashes in the manifest. All six figures were inspected. It recorded 449,485
 mergers, leaving 2,040,883 aerosols: an 18.04894% total number loss. The largest
@@ -191,6 +192,64 @@ The final website build rendered 459 pages and verified 589 HTML pages,
 All three study downloads match their maintained Python sources and declared
 helpers; separately extracted bundles passed the CUDA smoke checks described
 here and in the charged-coagulation validation record.
+
+## Saved numerical data and replotting
+
+The publication pipeline now stores one current bundle per example directly in
+`website/results/gpu-dry-environment-sweep/` and
+`website/results/gpu-environment-sweep/`. All 79 registered example bundles were
+migrated without changing their selected manifest bytes; Git retains historical
+versions. Only the two environmental examples currently opt into numeric-data
+capture and replotting.
+
+Their `data.json` contains compact group summaries, observation times, size
+histograms, charge counts and quantiles, not individual particle states. The
+pipeline caps serialized JSON at 10 MiB per example. Oversized or nonfinite
+data fails publication without replacing the previous successful bundle.
+This cap applies to saved plot data, not simulation RAM or PNG files.
+
+For plotting-only changes, run:
+
+```bash
+CUDA_VISIBLE_DEVICES='' .venv/bin/python scripts/docs_examples.py replot gpu-dry-environment-sweep
+CUDA_VISIBLE_DEVICES='' .venv/bin/python scripts/docs_examples.py replot gpu-environment-sweep
+```
+
+Replotting verifies the data hash, scientific-source fingerprint and library
+hash before rendering on CPU. It preserves the execution timestamp, revision,
+device and dependency versions, saves the original executed source, and records
+rendering provenance separately. Scientific changes require a full refresh.
+Cumulative merger plots use dots at recorded observations connected by straight
+lines; they do not claim to resolve individual event times. Interval-rate plots
+retain steps because each value is an average over its measurement interval.
+
+The old publications had not saved complete numeric histories, so a one-time
+data-saving CUDA refresh was necessary. The dry refresh at revision
+`54edfe13b7c99ec01b3a5f853e3ee45e6454ab61` took 3790.63 s and reproduced the
+449,485 mergers and 1.554e-15 mass residual. Its 11 observations occupy 95,371
+bytes. The subsequent CPU-only replot took 10.09 s and preserved the exact
+data bytes, all six figure hashes and original execution provenance.
+
+The humidity capture at the same revision took 6054.08 s and reproduced 334
+aerosol mergers, 105,243 attachments and 6,861 recombinations, with maximum
+mass residual 8.593e-14. Its 18 observations occupy 157,620 bytes. CPU replotting
+took 11.41 s and preserved exact data bytes, all eight figure hashes and original
+execution provenance. Both cumulative and overview figures were inspected;
+the remaining figures match the original publications byte for byte. These
+capture times include overlapping CUDA work and are not benchmark results.
+
+The saved numerical SHA-256 digests are:
+
+| Example | `data.json` SHA-256 |
+| --- | --- |
+| Dry | `8aab526a58e745252e1baa1ff9c13471219320a3495dabfc89a47c5856961924` |
+| Humidity | `a36f8b3dc9a1d8d5979e050442aa6fb2886ffb43b27b09733645059eefd044b1` |
+
+The final infrastructure/example regression suite passed 527 tests with one
+skip and warnings treated as errors. Its integration checks cover an actual
+kernel refresh followed by replot with no additional simulation invocation,
+size-limit failures preserving the old bundle, data mutation rejection,
+scientific-input invalidation, stable filenames and publication rollback.
 
 ## Diagnostics and interpretation boundaries
 

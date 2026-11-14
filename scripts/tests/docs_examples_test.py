@@ -262,7 +262,10 @@ def test_replot_requires_data_and_valid_scientific_provenance(example):
         examples.refresh("demo", config, root, root / "results", replot=True)
 
 
-def test_refresh_then_replot_does_not_repeat_simulation(tmp_path):
+@pytest.mark.filterwarnings(
+    "ignore:importing 'Const' from 'astroid' is deprecated:DeprecationWarning"
+)
+def test_refresh_then_replot_does_not_repeat_simulation(tmp_path, monkeypatch):
     """A real kernel reuses data while preserving original execution provenance."""
     source = tmp_path / "example.py"
     counter = tmp_path / "simulation-count"
@@ -305,7 +308,112 @@ def test_refresh_then_replot_does_not_repeat_simulation(tmp_path):
     assert "blue" in (directory / "executed_source.py").read_text()
     assert "red" in (directory / "source.py").read_text()
     assert examples.result_state(config, after) == "current"
+    # A replot must not probe CUDA, even for a CUDA-only scientific workload.
+    from types import SimpleNamespace
+
+    monkeypatch.setitem(
+        sys.modules,
+        "warp",
+        SimpleNamespace(
+            is_cuda_available=lambda: pytest.fail("replot must not probe CUDA")
+        ),
+    )
+    examples.execute(
+        {**config, "device": "cuda"}, saved_data=json.loads(original_data)
+    )
+    assert counter.read_text() == "1"
     source.write_text(source.read_text().replace("[0, 3]", "[0, 4]"))
     with pytest.raises(ValueError, match="Simulation inputs changed"):
         examples.refresh("demo", config, results=results, replot=True)
     assert counter.read_text() == "1"
+
+
+def test_oversized_refresh_preserves_existing_bundle(example, monkeypatch):
+    """A size-limit failure during staging leaves published output intact."""
+    root, config = example
+    config["data_expression"] = "result"
+    published = root / "results/demo"
+    published.mkdir(parents=True)
+    (published / "manifest.json").write_text("previous successful output")
+    monkeypatch.setattr(examples, "MAX_PLOT_DATA_BYTES", 32)
+    monkeypatch.setattr(
+        examples,
+        "execute",
+        lambda *args: (
+            [{"metadata": {"plot_data": {"values": list(range(100))}}}],
+            "CPU",
+        ),
+    )
+    with pytest.raises(ValueError, match="10 MiB"):
+        examples.refresh("demo", config, root, root / "results")
+    assert (
+        published / "manifest.json"
+    ).read_text() == "previous successful output"
+    assert not list((root / "results").glob(".pending-*"))
+
+
+def test_renderer_cannot_replace_saved_observations(example):
+    """Rendering may change appearance, never the preserved numerical values."""
+    root, config = example
+    source = (root / config["source"]).read_bytes()
+    cells = [{"metadata": {"plot_data": {"count": [0, 5]}}}]
+    with pytest.raises(ValueError, match="changed saved numerical data"):
+        examples.validate_render(
+            config,
+            root,
+            source,
+            examples.fingerprint(config, root),
+            cells,
+            {"count": [0, 4]},
+        )
+
+
+def test_plot_data_requires_an_object_or_array(tmp_path):
+    """Null cannot accidentally select the simulation execution path on replot."""
+    with pytest.raises(ValueError, match="object or array"):
+        examples.write_plot_data(tmp_path / "data.json", None)
+
+
+def test_validation_reuses_data_after_a_render_only_publication(monkeypatch):
+    """CI validation must not undo the no-rerun contract for CPU examples."""
+    config = {"policy": "cpu", "data_expression": "result"}
+    data = {"time": [0, 1], "count": [0, 4]}
+    calls = []
+    monkeypatch.setattr(
+        examples, "bundle", lambda key: (None, {"rendered_at": "now"})
+    )
+    monkeypatch.setattr(
+        examples, "load_replot_data", lambda *args: (None, {}, data)
+    )
+    monkeypatch.setattr(
+        examples, "execute", lambda c, **kwargs: calls.append(kwargs)
+    )
+    examples.validate_example("demo", config)
+    assert calls == [{"saved_data": data}]
+
+
+def test_figure_names_do_not_depend_on_stdout_chunking(tmp_path):
+    """Additional logs must not rename identical scientific figures."""
+    import base64
+
+    figure = {"data": {"image/png": base64.b64encode(b"figure").decode()}}
+    quiet = tmp_path / "quiet"
+    noisy = tmp_path / "noisy"
+    quiet.mkdir()
+    noisy.mkdir()
+    first = examples.save_cell_outputs([{"outputs": [figure]}], quiet)
+    second = examples.save_cell_outputs(
+        [
+            {
+                "outputs": [
+                    {"output_type": "stream", "text": "Kernel loaded"},
+                    figure,
+                ]
+            }
+        ],
+        noisy,
+    )
+    assert first[0][0]["image"] == second[0][1]["image"] == "figure-1-1.png"
+    assert (quiet / "figure-1-1.png").read_bytes() == (
+        noisy / "figure-1-1.png"
+    ).read_bytes()
