@@ -13,7 +13,7 @@ does not authorize a release.
 - Python 3.12.12; AMD Ryzen AI 9 HX 370 CPU.
 - CUDA target `cuda:0`, float64 scientific state. Warp CPU is separately
   parameterized regression evidence and is never reported as GPU performance.
-- Campaign executable revision `0a8307046`.
+- Campaign executable revision `464738b14`.
   The source digest covers library and study Python files; test and documentation
   edits are outside that digest. Each result retains its own revision, digest,
   input-state hash, hardware/runtime information and dirty-tree indicator.
@@ -79,22 +79,22 @@ preparation. Compilation and context startup are warmed in both measurements.
 
 | Workload | NumPy resident | Prepared CUDA resident | NumPy fresh | Prepared CUDA fresh |
 | --- | ---: | ---: | ---: | ---: |
-| One box, 1,048,576 particles, condensation + dilution | 2.364 s | 0.0672 s | 2.367 s | 0.778 s |
-| 1,024 boxes × 1,024 particles, condensation + dilution | 7.287 s | 0.0701 s | 7.291 s | 0.160 s |
-| One box, 1,048,576 particles, dilution | 0.0682 s | 0.000553 s | 0.0722 s | 0.692 s |
+| One box, 1,048,576 particles, condensation + dilution | 2.197 s | 0.0672 s | 2.200 s | 0.777 s |
+| 1,024 boxes × 1,024 particles, condensation + dilution | 6.982 s | 0.0698 s | 6.986 s | 0.160 s |
+| One box, 1,048,576 particles, dilution | 0.0643 s | 0.000529 s | 0.0674 s | 0.686 s |
 
-The one-box condensation case is about 35 times faster for resident work and
-three times faster for a fresh run. Pure dilution illustrates the opposite
+The one-box condensation case is about 33 times faster for resident work and
+2.8 times faster for a fresh run. Pure dilution illustrates the opposite
 end-to-end tradeoff: its very short device computation does not repay preparation
 and transfer costs in this three-step run. Keeping state resident matters.
 These ratios describe the current implementations and workloads, not universal
 GPU speedups. The downloadable report keeps the plotted median and minimum–maximum spread.
 
 For one Brownian step at 16,384 particles per box, the retained previous CUDA
-implementation measured 161.648 s and prepared CUDA 0.1378 s (about 1,173 times
+implementation measured 161.556 s and prepared CUDA 0.1378 s (about 1,172 times
 faster). All four CUDA modes produced the same final-state hash. This compares
 two GPU implementations, not GPU against CPU, and retains quadratic pair work.
-The complete old-code case took 1,619.7 s, including three warmups and seven
+The complete old-code case took 1,620.8 s, including three warmups and seven
 samples, within its forty-minute allowance.
 
 Timing workloads use fixed coarse steps to stress execution and inventory
@@ -154,16 +154,26 @@ methodology follow the version-matched
 
 ## Final validation ledger
 
-- Library: `pytest -q -Werror -m "not slow and not performance"
+- Full library suite before the final review corrections:
+  `pytest -q -Werror -m "not slow and not performance"
   --cov=particula --cov-report=term-missing --cov-fail-under=80`: 9,936 passed,
   13 skipped, 57 deselected, one expected failure; **91.91% coverage**.
-- Examples and infrastructure: `pytest examples_tests scripts/tests -q -Werror
+- Examples and infrastructure before the final review corrections:
+  `pytest examples_tests scripts/tests -q -Werror
   -m "not slow and not performance"`: **450 passed, one skipped**.
 - Strict RTX gate: `python scripts/qualify_gpu.py --output
-  .artifacts/qualification/final/gpu`: **453 passed, zero skips**.
+  .artifacts/qualification/review/gpu`: **455 passed, zero skips**.
+- Final surface-shape and prepared-state regressions: **114 passed** with
+  warnings treated as errors. Final review preserves row-shaped surface-tension
+  broadcasting and serializes status reads with simulation closure. Publication
+  validation also rejects missing timing stages before accepting their samples.
+- Hosted library/example/infrastructure tests passed on Python 3.12, 3.13 and
+  3.14 after those corrections. Python 3.14 compatibility filters cover only the
+  known Warp ctypes layout deprecations in their owning module; regression tests
+  confirm unrelated deprecations still fail.
 - Full-array CPU/CUDA campaign parity: **17 matching cases passed**,
   `rtol=2e-12`, `atol=1e-30`, against executable digest
-  `41e30ec6c05cbc75fe05639f84149373fd173a4a15c7ad55412a456b5ecf20e5`.
+  `c853675d08921a1f7eb2c860ca5650fce0458ec4a31743bc8e64666c29a86ef2`.
 - Final campaign: **104 of 104 jobs passed**, including 100 timing runs and
   four scientific histories, within the original eight-hour window.
 - The quickstart refinement changed final particle mass by at most 0.0545%,
