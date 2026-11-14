@@ -1,5 +1,10 @@
 # Execution
 
+For public aerosol simulation, start with [prepared GPU simulations](prepared.md).
+This page documents the lower-level selection and resident machinery used by
+advanced integrations; its concrete interfaces remain separate from the public
+`PreparedSimulation` workflow.
+
 ## Execution selection
 
 The package-level selection and policy values are stable and dependency-neutral.
@@ -88,10 +93,14 @@ backend is selected.
 Selection has ended after an adapter is returned and does not catch, retry, or
 fallback from adapter failures.
 
+The package also exports `CPUExecutionContext`, `PreparedSimulation`,
+`SimulationDiagnostics` and `SimulationCheckpoint`. Importing these public
+names does not import Warp.
+
 ### Selected-condensation ownership and API boundary
 
 This is a non-runnable API and ownership reference. `particula.execution`
-provides this frozen ordered 26-name public surface, also re-exported by
+provides the following selection and policy surface, also re-exported by
 top-level `particula` alongside its unrelated APIs:
 
 1. Selection declarations: `Backend`, `Device`, `Process`, `Capability`,
@@ -161,8 +170,8 @@ documents lifecycle ownership rather than process execution.
 
 ### GPU-resident session lifecycle
 
-`particula.execution` is the resident-session boundary, but its frozen 26-name
-public export list excludes resident seams. Import resident seams only from their concrete
+`particula.execution` is the resident-session boundary, but its
+public exports exclude the concrete resident seams. Import resident seams only from their concrete
 modules: `setup_resident_session`, `ResidentSession`, and `ResidentStepGuard`
 from `particula.execution.gpu_session`; `GPUResourceRegistry` and its manifests
 or views from `particula.execution.gpu_resources`; and checkpoint records,
@@ -237,8 +246,9 @@ launches. See
 
 ### Resident native graph-capture validation (test-only)
 
-Resident native graph capture remains a concrete-only direct-import boundary,
-not a public workflow. The delivered regression validation matrix uses CPU as a test-local NumPy
+The low-level resident graph-capture qualification types remain concrete-only
+direct imports. The public workflow is the [prepared owner](prepared.md), which
+manages its private graph internally. The regression matrix uses CPU as a test-local NumPy
 reference, Warp CPU as uncaptured evidence, and CUDA native capture as optional
 pass-or-clean-skip evidence. Capture freezes the first physical timestep, and
 each launch executes one timestep through one-token replay with authentic
@@ -263,8 +273,9 @@ per-seed trajectories are not parity requirements.
 
 Exact READY session/registry/closed-guard/request/publication binding,
 qualification, explicit invalidation, retirement, renewal, and teardown remain
-required. There are no public exports, no runnable example, no automatic
-recapture, no fallback (including Warp-CPU capture), recovery, retry, rollback,
+required. These internal qualification types have no public exports; runnable
+examples use the prepared owner. There is no automatic recapture, fallback
+(including Warp-CPU capture), recovery, retry, rollback,
 no hidden transfer/readback/synchronization, no checkpointed handle, or
 cross-device replay.
 This boundary makes no performance, profiling, or memory claim.
@@ -520,7 +531,7 @@ wall-loss RNG is also caller-owned. There is no hidden transfer or CPU fallback,
 high-level `Runnable`, backend selector, scheduler, resident production loop, or
 transport API. See the [direct-process validation evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py),
 [example regression](https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_complete_process_sequence_example_test.py),
-and [GPU process completeness inventory](support.md#support).
+and [GPU process completeness inventory](support.md).
 
 `WarpParticleData`, `WarpEnvironmentData`, and `WarpGasData` are exported from
 `particula.gpu` only when Warp is available, so import them only behind an

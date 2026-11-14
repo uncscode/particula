@@ -7,6 +7,10 @@ A simple, fast, and powerful particle simulator for aerosol science.
 <!-- RECENT_NEWS_START -->
 ## Recent news
 
+- **Prepared CUDA simulations (development):** upload a native aerosol once,
+  evolve supported processes on the GPU, and download analysis snapshots.
+  Explore [the workflow](https://uncscode.github.io/particula/guide/gpu/prepared/)
+  and [illustrated GPU studies](https://uncscode.github.io/particula/examples/gpu/).
 - **AI assistants:** added setup, simulation, analysis, and development skills
   through [Particula Helper](https://uncscode.github.io/particula/guide/ai-assistants/).
 - **Native data storage:** the 0.3.0 development version uses particle, gas, and

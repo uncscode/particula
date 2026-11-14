@@ -20,8 +20,8 @@ Read `docs/guide/data-model/index.md`, `docs/guide/data-model/ownership.md`, and
 - `Aerosol` holds containers by identity. Validated individual/coordinated
   replacement is distinct from raw array mutation. Layout changes require
   rebuilding process maps and prepared GPU bindings; there is no auto-rebinding.
-- CPU runnables remain single-box. Batched storage does not imply general
-  multi-box CPU execution.
+- The five native dynamics runnables support batched CPU execution through the
+  shared transactional box loop. Direct strategy methods remain single-box.
 - Fixed slots are active only with finite positive concentration, finite
   nonnegative masses with positive total mass, and finite charge. Free slots
   have exactly zero concentration, all masses and charge. Reject other states.
@@ -47,10 +47,20 @@ whole-call rollback merely because preflight is read-only.
 
 ## GPU state and lifecycle
 
-Read `docs/guide/gpu/support.md`, `transfers.md`, `slot-exhaustion.md`, and the
+Read `docs/guide/gpu/prepared.md`, `support.md`, `transfers.md`,
+`slot-exhaustion.md`, and the
 `resident/checkpoints.md` and `resident/graph-capture.md` guides in that folder.
 
-- Step entry points import from `particula.gpu.kernels`; conversion helpers
+- Public runnable `prepare()` owns explicit upload and fixed resident resources;
+  `snapshot()` downloads detached native CPU state. Supported ordered subsets
+  contain at most one occurrence of each of five process families. Check exact
+  configuration support before recommending this path. Condensation remains
+  four fixed substeps; Brownian requires equal active resolved counts, including
+  after any source or sink. No hidden backend fallback is provided.
+- Prepared forcing is explicit, diagnostics reduce without full particle
+  download, and checkpoints preserve exact continuation rather than just
+  analysis state. Capture records without advancing and requires native CUDA.
+- Direct step entry points import from `particula.gpu.kernels`; conversion helpers
   from `particula.gpu`. Keep concrete-only configuration/sidecar/lifecycle names
   out of package exports unless an API change is explicitly in scope.
 - Callers own devices, stable-shape buffers, transfers and synchronization.
@@ -58,7 +68,8 @@ Read `docs/guide/gpu/support.md`, `transfers.md`, `slot-exhaustion.md`, and the
   A separately documented opt-in fallback policy does not imply fallback in
   direct kernels, resident execution, checkpointing or graph capture.
 - Gas names are CPU-owned metadata. Preserve ordered names externally for a
-  semantic restore. GPU vapor pressure is derived state, omitted from CPU
+  semantic direct restore; prepared owners retain these names automatically.
+  GPU vapor pressure is derived state, omitted from CPU
   inspection/restore carriers.
 - Supplied coagulation/wall-loss RNG sidecars persist across calls. Repeating
   a root seed does not reset them; initialization/reset is deliberate.
@@ -77,7 +88,8 @@ Read `docs/guide/gpu/support.md`, `transfers.md`, `slot-exhaustion.md`, and the
 ## Evidence
 
 Use the maintained records in `docs/contribute/validation/`, especially
-`gpu/graph-capture-qualification.md`, `gpu/resident-benchmarks.md`,
+`gpu/prepared-rtx5060.md`, `gpu/graph-capture-qualification.md`,
+`gpu/resident-benchmarks.md`,
 `gpu/graph-capture-profiling.md`, `numerics/mass-precision.md`, and
 `releases/v0.3.0.md`. Implementation validation, release approval and performance
 qualification are separate. Missing measurements remain unavailable.
@@ -90,3 +102,9 @@ Resident measurements use `.artifacts/benchmarks/resident_capture_comparison.jso
 and the designated-device/final-revision qualification gates. Historical
 measurements do not become current by changing package metadata. Profiler
 intervals and host-launch timing are not interchangeable throughput measures.
+
+The prepared campaign is `.artifacts/gpu-campaign/`; its compact publication
+data is `docs/data/gpu/rtx5060.json`. Publish only a complete qualified matrix,
+matching executable digest, exact common GPU continuation and separate full-array
+CPU/CUDA equivalence for CPU timing comparisons. Long CUDA illustrations are
+manually refreshed; CI does not execute them. Do not relabel Warp CPU as GPU.

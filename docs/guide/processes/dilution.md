@@ -1,5 +1,9 @@
 # Dilution Strategy System
 
+For the supported CUDA configuration of this runnable, use
+[prepared GPU simulations](../gpu/prepared.md). The CPU and direct-kernel
+contracts below retain their own, sometimes broader, capabilities.
+
 ## Complete direct-process context
 
 CPU dilution remains the semantic source. The direct GPU step is one call in the

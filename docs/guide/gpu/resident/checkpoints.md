@@ -1,5 +1,7 @@
 # GPU resident checkpoints
 
+For public runnable continuation, use [prepared checkpoints and resume](../prepared.md#state-forcing-and-observations). The detailed concrete resident schema below remains the underlying continuation authority.
+
 Current controllers create schema-v5 checkpoints with explicit population type
 and independent particle-material and gas widths. Schemas v1–v4 reject before
 setup or upload; there is no inferred migration. Supported population semantics

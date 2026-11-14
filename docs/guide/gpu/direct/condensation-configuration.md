@@ -165,8 +165,9 @@ energy-regression tolerance is `rtol=1e-12, atol=1e-18`.
 unused: the step neither reads nor writes it. It does not evolve temperature or
 add a `Runnable`, adaptive substeps, graph capture/replay, or autodiff.
 
-Use `to_warp_*` and `from_warp_*` as the sole data CPU↔Warp boundary. There is
-no high-level `Aerosol` or `Runnable` GPU path. CUDA preflight reads one-element
+Direct callers use `to_warp_*` and `from_warp_*` for explicit CPU↔Warp transfer.
+The separate [prepared runnable path](../prepared.md) validates native `Aerosol`
+configuration and owns upload and resident resources. CUDA preflight reads one-element
 device validation flags with `.numpy()`; those status reads synchronize but do
 not transfer or mutate caller-owned simulation buffers. Callers requiring retry
 or rollback must snapshot and restore particle masses, gas concentration,
@@ -187,3 +188,8 @@ pytest particula/integration_tests/condensation_particle_resolved_test.py -q -We
 Run CUDA-marked kernel cases separately only on CUDA-capable hosts; unavailable
 Warp or CUDA remains an expected guarded skip, not evidence of a fallback path.
 
+
+Native mapped condensation uses each vapor species' molar mass for its
+transport mean free path, matching the native CPU strategy. Particle mobility
+uses air properties. The low-level raw proposal kernel retains its explicitly
+supplied mean-free-path semantics.

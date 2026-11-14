@@ -1,11 +1,14 @@
 # GPU execution
 
-Start with the [native data model](../data-model/index.md) and a working CPU
-example. Warp is optional. Select a supported device explicitly; transferring
-state, synchronizing, and preserving species metadata remain caller-owned.
+Start with the [prepared simulation workflow](prepared.md): construct a native
+CPU aerosol, upload once, evolve supported processes on CUDA, and download a
+detached snapshot for analysis. Warp is a declared Particula dependency;
+CUDA requires an available NVIDIA GPU and compatible driver. Device selection
+is explicit. Direct kernels remain available for manual resource control.
 
 | Task | Guide |
 | --- | --- |
+| Run native aerosol processes on CUDA | [Prepared simulations](prepared.md) |
 | Choose the supported execution path | [Execution](execution.md), [support matrix](support.md), [backend selection](backend-selection.md) |
 | Move state between CPU and Warp | [Transfers](transfers.md) |
 | Manage fixed-capacity particle storage | [Slots](slots.md), [capacity exhaustion](slot-exhaustion.md) |

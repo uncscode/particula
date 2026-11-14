@@ -14,14 +14,16 @@ path.
     steps or pretending kernels ran.
 - **CUDA unavailable**
   - CUDA is optional.
-  - The default supported runnable path is Warp `device="cpu"`; only opt into
-    `device="cuda"` when a CUDA device is actually available.
+  - Published GPU examples and prepared defaults require `device="cuda:0"`.
+    Check the driver and Warp installation if this target is unavailable.
+    Explicit Warp `device="cpu"` is regression execution, not GPU evidence.
 - **Explicit CPU↔GPU transfer boundary**
   - Kernels operate on Warp-backed container mirrors, not CPU `ParticleData`,
     `GasData`, or `EnvironmentData` objects directly.
   - Move simulation state across the boundary explicitly with `to_warp_*` and
     `from_warp_*`; kernels and runnables do not perform hidden simulation-state
-    transfers or top-level fallback imports. Read-only device validation may
+    transfers or top-level fallback imports. The public `prepare()` and
+    `snapshot()` methods own those explicit boundaries for prepared runnables. Read-only device validation may
     synchronize and read back status to surface invalid values, including on
     CUDA.
 - **Device mismatch across particle, gas, environment, and sidecar buffers**

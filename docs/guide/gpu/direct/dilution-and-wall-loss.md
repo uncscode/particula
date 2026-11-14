@@ -121,7 +121,7 @@ consumes no draw. Exact CPU/Warp or per-seed RNG replay is not promised.
 | Charged configuration and rectangular field ownership semantics | Supported |
 | Geometry-specific deterministic coefficient tolerances and validation eight-stratum exact-binomial survival evidence (4,096 observations per stratum; inclusive bounds with per-stratum alpha 1.25e-7) | Supported bounded evidence |
 | CUDA validation | Optional additive evidence; guarded skips are expected when unavailable |
-| CPU fallback or hidden transfer; high-level runnable, scheduler, or backend integration | Deferred (direct-process integration covers integration/closeout) |
+| Prepared runnable integration | Available separately through [prepared simulations](../prepared.md); direct callers still own their resources. |
 | Dynamic slots, compaction/activation, graph capture, differentiability, performance guarantees, or exact RNG replay | Deferred |
 
 Warp CPU is the baseline when Warp is installed; CUDA is optional and skips
@@ -132,5 +132,6 @@ These direct wall-loss checks do not by themselves establish orchestration,
 capture, autodiff or performance evidence. Native resident integration has its
 own [walkthrough](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/resident/gpu_resident_multi_timestep.py), and direct GPU
 nucleation has its own [source contract](../../processes/nucleation.md#direct-warp-low-level-step).
-The CPU-only, one-box `Nucleation` runnable remains a separate high-level path.
+The native `Nucleation` runnable supports batched CPU execution and bounded
+[prepared CUDA execution](../prepared.md), separate from direct calls.
 
