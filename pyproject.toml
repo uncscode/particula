@@ -101,6 +101,7 @@ norecursedirs = [".trash","trees", ".git", "dist", "build", "particula/dynamics/
 filterwarnings = [
     "ignore:The NumPy module was reloaded.*:UserWarning",
     "ignore:Due to '_pack_', the 'APICLaunchParamRecord' Structure.*:DeprecationWarning",
+    "ignore:Due to '_pack_', the 'APIC(CudaCompileRecipe|LaunchPtrLocation)' Structure.*:DeprecationWarning:warp\\._src\\.apic\\.types",
 ]
 markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",

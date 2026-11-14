@@ -32,6 +32,18 @@ def _filter_expected_warnings() -> None:
         category=DeprecationWarning,
         append=False,
     )
+    # Warp 1.19 adds two packed ctypes records in its APIC module. Python
+    # 3.14 warns until upstream declares their explicit Windows layout.
+    warnings.filterwarnings(
+        "ignore",
+        message=(
+            "Due to '_pack_', the 'APIC(?:CudaCompileRecipe|LaunchPtrLocation)'"
+            " Structure.*"
+        ),
+        category=DeprecationWarning,
+        module=r"^warp\._src\.apic\.types$",
+        append=False,
+    )
     # chemicals 1.5.2 still requests this pandas CSV parser option. Pandas
     # 3.1 deprecates it for removal in 4.0; property-table values are unchanged.
     warnings.filterwarnings(
