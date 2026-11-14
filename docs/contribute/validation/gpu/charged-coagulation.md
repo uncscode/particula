@@ -1,19 +1,54 @@
 # Charged coagulation and atmospheric ion validation
 
-The historical results below predate the environmental extension's charged
-Knudsen normalization correction. They are evidence for their recorded
-revisions, not current numerical qualification. A replacement confirmation
-and publication refresh are required before treating the corrected results
-as final. See [environmental validation](environment-sweep.md).
+## Current corrected-model qualification
+
+The corrected CPU/GPU charged Knudsen normalization passed a fresh twenty-case
+CUDA qualification on 2026-11-14. The frozen specification records revision
+`54ad1a812`, 8192 independent boxes per case and root seed 320. Its helper hash
+still matches the maintained source. All sixteen individual conservative 95%
+probability-difference intervals lie inside the predeclared [-0.01, 0.01]
+tolerance; the largest absolute endpoint is 0.00714698. All four baseline
+interval widths satisfy the separate 0.01 sampling-precision target.
+These are individual comparison coverages, not a simultaneous 95% statement.
+
+| Ion source [pairs cm^-3 s^-1] | Omitted coefficient assumption | Reached | Captured | Unresolved | Baseline interval width |
+| --- | --- | ---: | ---: | ---: | ---: |
+| 2 | 0 m³/s | 142 | 8050 | 0 | 0.00577974 |
+| 2 | 1e-15 m³/s | 142 | 8050 | 0 | 0.00577974 |
+| 10 | 0 m³/s | 154 | 8038 | 0 | 0.00600904 |
+| 10 | 1e-15 m³/s | 154 | 8038 | 0 | 0.00600904 |
+
+Every case resolved all original lineages. The largest per-species mass
+residual over the campaign was 3.109e-15, and every box conserved exact net
+charge. Each doubled-capacity case preserved the entire recorded time/outcome
+series exactly, checked independently after execution. Maximum observed
+occupancy was 37 slots; diagnostic samples do not bound occupancy between
+observations. The complete specification, twenty comparisons, case summaries
+and capacity checks are saved in
+`docs/data/gpu/charged-survival-corrected-qualification.json`.
+
+The corrected five-case publication run, with its separate root seed 321,
+is now running. Its previous saved numerical results are not substituted for
+the pending refresh. The independently extracted download already passed all
+five small CUDA smoke cases with eight boxes and a 100 s horizon; source and
+helper bytes match. That smoke test checks execution and inventory/lineage
+bookkeeping, not survival precision. The current package regression and
+environmental qualification are recorded in
+[environmental validation](environment-sweep.md). Concurrent CUDA jobs mean
+campaign timings are not standalone performance measurements.
+
+## Historical development checkpoints
+
+The following results predate the charged Knudsen normalization correction.
+They are evidence for their recorded revisions, not the current results above.
 
 Development evidence, 2026-11-13, branch
 `codex/gpu-charged-coagulation-lucky-few`, based on `19a8fb11d`.
 These results concern the implementation on this branch; no release is claimed.
-Sections retain chronological checkpoints. The latest charged numerical results
-are in [completed qualification](#completed-charged-survival-qualification);
-earlier pending-status notes describe their original checkpoints.
-The [complete publication run](#complete-lucky-few-publication-run) records
-the saved results for the [Lucky Few example](../../../examples/gpu/prepared/gpu_lucky_few.py).
+Sections retain chronological checkpoints. The earlier
+[qualification](#completed-charged-survival-qualification) and
+[publication run](#complete-lucky-few-publication-run) describe their original
+revisions of the [Lucky Few example](../../../examples/gpu/prepared/gpu_lucky_few.py).
 
 ## Implemented boundary
 

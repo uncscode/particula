@@ -421,8 +421,11 @@ longer humidity study with active coagulation and explicit ions.
 - [x] Qualify humidity timestep with the frozen 256-box, seed-413 confirmation:
   all original criteria passed; maximum ion-event difference 1.90430% against
   2%. Retain the failed 16-box pilot alongside the confirmation.
-- [ ] Execute the final humidity CUDA study and corrected
-  Lucky Few qualification/publication; inspect and interpret the final results.
+- [x] Corrected Lucky Few qualification: all twenty predeclared checks passed;
+  all four doubled-capacity time/outcome series match exactly. Retain the
+  frozen specification and complete comparison record.
+- [ ] Execute the final humidity CUDA study and corrected Lucky Few
+  publication; inspect and interpret the final results.
 - [ ] Run relevant regression suites, documentation build, push and check PR CI.
 
 Physical-limit validation uncovered an inherited inversion of Gc/Gk in the
