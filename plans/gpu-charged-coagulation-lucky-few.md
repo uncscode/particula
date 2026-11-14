@@ -428,7 +428,9 @@ longer humidity study with active coagulation and explicit ions.
   152 q=2 and 170 q=10 successes out of 8192 under either coefficient
   assumption; all resolved. Individual differences include zero. Save the
   final figure, interpretation and independently checked download.
-- [ ] Complete the final humidity CUDA study; inspect and interpret its results.
+- [x] Complete the final humidity CUDA study; inspect all eight figures and
+  interpret 334 aerosol mergers and 105,243 ion attachments. Maximum mass
+  residual 8.593e-14; exact total charge; extracted CUDA download verified.
 - [ ] Run relevant regression suites, documentation build, push and check PR CI.
 
 Physical-limit validation uncovered an inherited inversion of Gc/Gk in the

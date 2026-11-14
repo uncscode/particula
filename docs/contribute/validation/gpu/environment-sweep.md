@@ -100,7 +100,45 @@ interval or proof of asymptotic convergence. Reproduce the fixed checks with:
 .venv/bin/python -m scripts.gpu_studies.qualify_environment humidity /tmp/humid.json
 ```
 
-The full humidity publication is running after this confirmation passed.
+## Completed humidity publication
+
+The full CUDA run completed with seed 411 and 3 ms of physical evolution.
+Generation `run-20261114T205354713341Z` records revision `5011becc0` and
+source/input hashes. All eight figures were inspected. Starting with 2,097,152
+aerosols plus 524,288 ions, it recorded 334 aerosol mergers, leaving 2,096,818
+aerosols (0.01593% number loss). The maximum per-box species-mass residual was
+8.593e-14 and total charge was conserved exactly at every observation.
+
+There were 46,354 positive and 58,889 negative attachments, 6,861 recombination
+events and 12,625 injected ion pairs. Attachment therefore changed aerosol
+charge much more often than aerosol mergers changed particle number. The
+attachment balance transfers net -12,535 elementary charges to aerosols,
+compensated by the remaining free ions. Faster negative-ion depletion is
+consistent with the prescribed larger negative mobility; this does not isolate
+mobility from the other coupled model processes.
+
+The pooled median diameter rose from 74.453 to 85.209 nm. Water uptake drives
+this bulk size change: only 0.01593% of aerosols were lost to mergers. Final
+median diameters at initial RH 90% were about 101.84 nm at 278.15 K and
+103.19 nm at 298.15 K, compared with about 74.26 nm at RH 40%. The finite
+vapor reservoir leaves final RH near 89.28% and 89.77%, respectively, in the
+90% cases. Size distributions approach a plateau while attachment and aerosol
+mergers continue. Charge-change panels reveal redistribution that is difficult
+to see in the nearly flat pooled neutral/singly charged fractions.
+
+Each condition recorded only 12–31 aerosol mergers. The bars follow physical
+T/P/RH order; their noisy ranking does not establish significant environmental
+differences or an ion-induced coagulation enhancement. That causal comparison
+would require matched no-ion controls and uncertainty estimates.
+
+The refresh took 7450.46 s, including 7431.77 s synchronized stepping and
+2.05 s preparation. It overlapped other CUDA work, so this is provenance,
+not a standalone performance benchmark. Saved source, declared helper inputs
+and figure hashes match; only the final successful generation is retained.
+The extracted download independently passed a real-CUDA smoke run with
+10,240 particles over 100 microseconds and all eight plotting paths. That
+smoke exercised both attachment polarities, recombination and the ion source,
+with exact charge conservation and a 2.442e-15 maximum mass residual.
 
 ## Completed dry publication
 
@@ -148,8 +186,11 @@ installation test initially failed because the validation wrapper exported the
 checkout through `PYTHONPATH`. Rerunning the seven bundle tests without that
 override passed, including the wheel and offline source-distribution checks.
 Ruff lint/format, mypy (589 files) and documentation structure checks passed.
-The preliminary website build rendered 459 pages; final saved-result validation
-requires a new build after the publication runs finish.
+The final website build rendered 459 pages and verified 589 HTML pages,
+272 API modules, 1860 legacy anchors and 130 redirects with zero errors.
+All three study downloads match their maintained Python sources and declared
+helpers; separately extracted bundles passed the CUDA smoke checks described
+here and in the charged-coagulation validation record.
 
 ## Diagnostics and interpretation boundaries
 
