@@ -1,5 +1,7 @@
 """Prepared ownership, transfers, stream selection and failure boundaries."""
 
+from concurrent.futures import ThreadPoolExecutor, TimeoutError
+from threading import Event
 from typing import no_type_check
 
 import numpy as np
@@ -1012,3 +1014,30 @@ def test_zero_surface_tension_rejects_before_gpu_upload(monkeypatch):
     monkeypatch.setattr(conversion, "to_warp_particle_data", forbidden)
     with pytest.raises(ValueError, match="surface_tension"):
         process.prepare(initial, device="cpu", time_step=1)
+
+
+@pytest.mark.parametrize(
+    "counter, expected", [("completed_steps", 3), ("simulated_time", 0.375)]
+)
+def test_counter_read_serializes_with_close(device, counter, expected):
+    """A blocked status reader sees cached final counters after teardown."""
+    simulation = upload(state(), device)
+    simulation._operations = ()
+    simulation.run(3)
+    started = Event()
+
+    def read_counter():
+        started.set()
+        return getattr(simulation, counter)
+
+    try:
+        with ThreadPoolExecutor(max_workers=1) as executor:
+            with simulation._lock:
+                future = executor.submit(read_counter)
+                assert started.wait(timeout=5)
+                with pytest.raises(TimeoutError):
+                    future.result(timeout=0.1)
+                simulation.close()
+            assert future.result(timeout=5) == expected
+    finally:
+        simulation.close()

@@ -198,16 +198,18 @@ class PreparedSimulation:
     @property
     def completed_steps(self) -> int:
         """Return enqueued steps; synchronization establishes device success."""
-        if self._closed:
-            return self._last_steps
-        return self._guard.completed_steps
+        with self._lock:
+            if self._closed:
+                return self._last_steps
+            return self._guard.completed_steps
 
     @property
     def simulated_time(self) -> float:
         """Return enqueued simulated time in seconds."""
-        if self._closed:
-            return self._last_time
-        return float(self._guard.simulated_time)
+        with self._lock:
+            if self._closed:
+                return self._last_time
+            return float(self._guard.simulated_time)
 
     @property
     def closed(self) -> bool:

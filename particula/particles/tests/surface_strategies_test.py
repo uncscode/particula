@@ -486,3 +486,34 @@ def test_square_weight_matrix_keeps_particle_and_species_axes():
     expected = np.array([[0.062, 0.062], [0.076, 0.076]])
     actual = _weighted_average_by_phase(values, weights, np.array([0, 0]))
     np.testing.assert_allclose(actual, expected, rtol=1e-15, atol=0)
+
+
+@pytest.mark.parametrize(
+    "strategy_type",
+    [SurfaceStrategyMass, SurfaceStrategyMolar, SurfaceStrategyVolume],
+)
+@pytest.mark.parametrize("tension_rows", [1, 2])
+def test_row_tension_broadcasts_with_single_composition(
+    strategy_type, tension_rows
+):
+    """One composition mixes each supplied row without losing its bin axis."""
+    tension = np.array([[0.072, 0.03], [0.06, 0.02]])[:tension_rows]
+    kwargs = {"surface_tension": tension, "phase_index": [0, 0]}
+    if strategy_type is SurfaceStrategyMolar:
+        kwargs["molar_mass"] = np.array([0.02, 0.04])
+        weights = np.array([50.0, 75.0])
+    elif strategy_type is SurfaceStrategyVolume:
+        kwargs["density"] = np.array([1000.0, 500.0])
+        weights = np.array([0.001, 0.006])
+    else:
+        weights = np.array([1.0, 3.0])
+    result = strategy_type(**kwargs).effective_surface_tension(
+        np.array([1.0, 3.0])
+    )
+    expected = (tension[:, 0] * weights[0] + tension[:, 1] * weights[1]) / sum(
+        weights
+    )
+    assert result.shape == (tension_rows, 2)
+    np.testing.assert_allclose(
+        result, np.repeat(expected[:, None], 2, axis=1), rtol=1e-14
+    )
