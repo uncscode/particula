@@ -6,6 +6,11 @@ Particula uses explicit helper calls for CPU↔GPU container movement. Kernels
 and runnables do not perform hidden container transfers. Read-only device
 validation may synchronize and read back status to surface invalid values.
 
+For a complete aerosol and supported runnables, [prepared simulations](prepared.md)
+own these transfers through `prepare()` and `snapshot()`. The examples below
+show direct CUDA transfers. Use `device="cpu"` only when deliberately testing
+the separate Warp CPU path.
+
 Available public helpers:
 
 - `to_warp_particle_data()`
@@ -15,7 +20,8 @@ Available public helpers:
 - `to_warp_environment_data()`
 - `from_warp_environment_data()`
 
-Optional Warp availability can be checked with `WARP_AVAILABLE`.
+Runtime import availability can be checked with `WARP_AVAILABLE`; it does not
+establish that CUDA hardware is available.
 
 For the direct-kernel example path, keep the import split explicit:
 
@@ -34,7 +40,7 @@ containers and Warp-owned storage:
 ```python
 from particula.gpu import from_warp_particle_data, to_warp_particle_data
 
-gpu_particle = to_warp_particle_data(particle_data, device="cpu")
+gpu_particle = to_warp_particle_data(particle_data, device="cuda:0")
 restored_particle = from_warp_particle_data(gpu_particle)
 ```
 
@@ -82,7 +88,7 @@ from particula.gpu import (
     to_warp_environment_data,
 )
 
-gpu_environment = to_warp_environment_data(environment, device="cpu")
+gpu_environment = to_warp_environment_data(environment, device="cuda:0")
 restored_environment = from_warp_environment_data(gpu_environment)
 ```
 
@@ -122,7 +128,7 @@ from particula.gpu import from_warp_gas_data, to_warp_gas_data
 vapor_pressure = np.array([[2330.0, 120.0]])
 gpu_gas = to_warp_gas_data(
     gas_data,
-    device="cpu",
+    device="cuda:0",
     vapor_pressure=vapor_pressure,
 )
 restored_gas = from_warp_gas_data(gpu_gas, name=gas_data.name)

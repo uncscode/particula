@@ -84,6 +84,15 @@ Warp arrays, including scalar/array hybrids. Alternatively supply
 forms. Synchronize explicitly before host observation/restoration. Validation
 may synchronize flags internally; simulation-state transfers remain explicit.
 
+## Prepared runnable execution
+
+Call `process.prepare(aerosol, device="cuda:0", time_step=...)` for supported
+processes or ordered sequences. The owner provides `run`, explicit forcing,
+reduced diagnostics and detached `snapshot()` results. `checkpoint()` and
+`process.resume(checkpoint)` retain exact random continuation; `capture()`
+records without advancing physics. See [capabilities and examples](../../gpu/prepared.md).
+Existing direct calls remain explicit, and CPU execution semantics are unchanged.
+
 ## Resident and capture paths
 
 The [resident multi-timestep example](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/resident/gpu_resident_multi_timestep.py)

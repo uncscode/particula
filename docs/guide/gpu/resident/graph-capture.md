@@ -1,5 +1,9 @@
 # GPU resident graph capture
 
+For the public runnable workflow, use
+[`PreparedSimulation.capture()`](../prepared.md#capture-and-random-streams).
+The contract below describes the separate concrete canonical resident scheduler.
+
 Native resident graph capture is concrete, direct-import-only machinery in
 `particula.execution.graph_capture`; it is not a package or top-level API. The
 only eligible path is a caller-qualified, non-CPU native Warp CUDA device. CPU

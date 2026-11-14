@@ -49,15 +49,15 @@ not promise rollback. No state readbacks or allocations inside prepared steps.
 - [x] 6. `feat(execution): integrate prepared restart and CUDA capture`:
   checkpoint/resume, explicit capture with no duplicate timestep, provenance,
   invalidation, faulting and teardown tests.
-- [ ] 7. `test(gpu): add reproducible scaling and variability studies`:
+- [x] 7. `test(gpu): add reproducible scaling and variability studies`:
   controlled workloads, scientific assertions, process-isolated budgets,
   reproducible measurements and provenance.
-- [ ] 8. `docs(gpu): publish illustrated CUDA tutorials`: convert all eight
+- [x] 8. `docs(gpu): publish illustrated CUDA tutorials`: convert all eight
   existing GPU examples to percent-cell Python, add substantive studies,
   refresh complete CUDA workloads and visually review figures/rendered pages.
-- [ ] 9. `docs(gpu): record RTX qualification and feature guidance`: final
+- [x] 9. `docs(gpu): record RTX qualification and feature guidance`: final
   evidence, capability/migration guides, accurate GPU labeling, bounded Recent
-  news entry, complete validation and a single PR.
+  news entry, complete local validation and prepare the single final PR.
 
 Use follow-up fix commits when necessary; each phase has its own validation.
 Do not infer completion from this checklist: verify executable behavior,
@@ -97,6 +97,10 @@ Nsight Compute without changing system security settings.
 
 Approved exception: the old Brownian comparison may use up to 40 minutes per
 case, still within the same eight-hour total. Other cases retain ten minutes.
+Longer complex scientific examples may also exceed the ten-minute guide, as
+explicitly authorized. Give them deliberate manual CUDA refreshes and realistic
+per-example timeouts; CI checks source and saved-result integrity without
+executing these large studies. Benchmark defaults remain bounded separately.
 
 ## Documentation and acceptance
 
@@ -248,3 +252,58 @@ runs and independent inventories (three-step median 0.0677 s). The full
 1,572,864-active-particle lifecycle passed its per-process source/sink ledger,
 snapshot isolation and exact capture/restart checks. Final committed-source
 campaign evidence remains pending.
+
+Final review found a pre-existing CPU surface-mixing broadcasting error: an
+array of different particle compositions collapsed to one averaged surface
+tension, and matching square weight matrices were transposed. Four independent
+CPU regressions fail on the previous behavior. Correct the per-particle
+broadcasting and add prepared/CPU weighted-surface parity before final
+qualification. Re-run the fixed campaign against the corrected executable
+digest; do not relabel earlier measurements as final-source evidence.
+
+Final scientific review found three additional issues before accepting timing
+publication: CPU phase-weighted surface tension collapsed independent particle
+composition (and square weights transposed); native GPU condensation used air
+rather than mapped-vapor mean free paths; uncompensated serial inventory sums
+could trigger the conservative no-uptake fallback in dense boxes. Regression
+oracles now preserve particle/species axes, use mapped molecule transport, and
+compare complete native CPU/CUDA trajectories. Compensated reductions retain
+strict nonnegative gas budgets. All 17 comparable timing cases pass full-array
+parity at rtol=2e-12, atol=1e-30 after these corrections.
+
+The first complete 104-job campaign at b4e98034b is retained separately under
+`.artifacts/gpu-campaign-b4e98034b`; it is superseded, not final publication.
+Its 16,384-particle legacy case completed in 1,619 s. Executable changes require
+a complete final rerun within the original eight-hour campaign window.
+
+Visual review also exposed coarse-step condensation oscillations. Heterogeneous
+and forcing histories now use 6,000 one-microsecond steps and a second run
+at half that timestep, preserving the physical duration and forcing control
+times. Publication requires <1% change in every active particle's total mass
+and <0.1% in each box's water vapor, in addition to the original species
+inventory checks. The coarse cyclic chamber remains explicitly an integration
+and restart stress example, not a timestep-converged chamber prediction.
+
+Final campaign: all **104 jobs passed** on executable revision `0a8307046`
+(digest `41e30ec6c05cbc75fe05639f84149373fd173a4a15c7ad55412a456b5ecf20e5`).
+The 100 timing runs and four scientific histories finished within the original
+eight-hour window; the 16,384-particle old Brownian baseline used 1,619.7 seconds
+of its approved forty-minute limit. All 17 comparable CPU/CUDA cases passed
+full-array parity and common CUDA modes produced exact native physical outputs.
+Raw RNG/canonical continuation is covered separately by regression tests.
+Final source validation: 9,936 library tests passed (91.91% coverage),
+450 example/infrastructure tests passed, and 453 strict CUDA tests passed with
+zero skips. Ruff, mypy and plugin validation passed.
+The refined quickstart also passed: halving its timestep changed final particle
+mass by at most 0.0545%, below the unchanged 1% acceptance threshold.
+
+Phases 8–9 complete: eight existing CUDA examples converted to percent scripts;
+six new CUDA tutorials and one measured-data report added, all with saved figures.
+All 74 saved examples are current; all 54 CPU-policy examples executed.
+Website tests, 432-page build, 130 redirects and link checks passed after
+preserving existing support anchors. Quickstart/report pages passed desktop
+and mobile visual review; all new scientific figures were inspected.
+The extracted multibox ZIP passed the full 196,608-active-particle refined
+CUDA study using bundled helpers; the extracted report ZIP used its bundled JSON.
+Wheel/sdist documentation, isolated installations and offline rebuild passed.
+The final PR includes all phased commits; no merge or release is authorized.

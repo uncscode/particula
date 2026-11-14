@@ -1,5 +1,9 @@
 # Condensation Strategy System
 
+For the supported CUDA configuration of this runnable, use
+[prepared GPU simulations](../gpu/prepared.md). The CPU and direct-kernel
+contracts below retain their own, sometimes broader, capabilities.
+
 For aggregate construction, population units and explicit cross-process calls,
 see [native scientific process calls](index.md).
 

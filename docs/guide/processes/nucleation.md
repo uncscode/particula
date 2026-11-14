@@ -1,5 +1,9 @@
 # Nucleation Strategy System
 
+For the supported CUDA configuration of this runnable, use
+[prepared GPU simulations](../gpu/prepared.md). The CPU and direct-kernel
+contracts below retain their own, sometimes broader, capabilities.
+
 ## Complete direct-process context
 
 The direct nucleation boundary is shown last in the illustrative [explicit-transfer sequence](https://github.com/Gorkowski/particula/blob/main/docs/examples/gpu/direct/gpu_complete_process_sequence.py). Its [direct-process validation evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py) and [example regression](https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_complete_process_sequence_example_test.py) do not turn the example into a public coordinator, GPU `Runnable`, backend selector, resident loop, or CPU fallback.
@@ -7,9 +11,9 @@ The direct nucleation boundary is shown last in the illustrative [explicit-trans
 > Convert partitioning precursor gas into fixed-capacity particle slots with a
 > public, conservation-accounted CPU runnable.
 
-The CPU-only nucleation runnable executes each resolved box independently
+The CPU execution method of the nucleation runnable executes each resolved box independently
 through the shared transactional driver. It combines immutable potential-rate construction (public construction) with the public
-`Nucleation` runnable (runnable execution). It is not a GPU process, scheduler, or general
+`Nucleation` runnable (runnable execution). Its CPU execution method is not a GPU scheduler or general
 empirical new-particle-formation model.
 
 ## Public API, equations, and units
@@ -172,7 +176,7 @@ from particula.gpu.kernels import nucleation_step_gpu
 `NucleationDiagnosticBuffers`, `NucleationExhaustionBuffers`, and helpers are
 concrete-only imports from `particula.gpu.kernels.nucleation`. Nested
 `ResamplingBuffers` is concrete-only in `particula.gpu.kernels.exhaustion`.
-They are deliberately not package exports. The CPU-only `Nucleation` runnable
+They are deliberately not package exports. The CPU `Nucleation` execution method
 remains the supported high-level CPU process; it is not a GPU fallback.
 
 Callers explicitly convert `ParticleData`, `GasData`, and `EnvironmentData`,

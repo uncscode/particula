@@ -37,8 +37,9 @@ vapor-pressure and other physical configuration belong to processes.
 The five native CPU dynamics runnables support batched storage through a
 shared box loop; direct strategy methods remain single-box. Direct Warp and resident execution
 use explicit preparation and transfer, with their documented process-specific
-limits. Warp CPU is the installed-Warp baseline for uncaptured examples;
-native graph capture requires CUDA and has no CPU fallback.
+limits. The new [prepared runnable workflow](../../gpu/prepared.md) connects
+native aerosols to CUDA and detached CPU snapshots. Published GPU illustrations
+require actual CUDA; Warp CPU is separately labeled regression evidence.
 
 Start with [container foundations](../../data-model/index.md)
 for the schema and [native access](../../data-model/ownership.md) for units. GPU gas restore

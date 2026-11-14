@@ -1,5 +1,9 @@
 # Coagulation Strategy System
 
+For the supported CUDA configuration of this runnable, use
+[prepared GPU simulations](../gpu/prepared.md). The CPU and direct-kernel
+contracts below retain their own, sometimes broader, capabilities.
+
 ## Complete direct-process context
 
 The direct coagulation call is part of the illustrative [explicit-transfer sequence](https://github.com/Gorkowski/particula/blob/main/docs/examples/gpu/direct/gpu_complete_process_sequence.py), with [direct-process validation evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py) and a [example regression](https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_complete_process_sequence_example_test.py). Persistent RNG remains caller-owned; the example is not a backend selector, scheduler, `Runnable`, resident loop, or CPU fallback.
