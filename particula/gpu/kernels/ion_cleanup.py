@@ -6,6 +6,32 @@ import warp as wp
 
 
 @no_type_check
+@wp.func
+def is_neutral_ion_product(
+    masses: wp.array3d(dtype=wp.float64),
+    counts: wp.array2d(dtype=wp.float64),
+    charges: wp.array2d(dtype=wp.float64),
+    positive_species: wp.int32,
+    negative_species: wp.int32,
+    box: wp.int32,
+    slot: wp.int32,
+) -> bool:
+    """Identify neutral ion-only products without selecting neutral aerosols."""
+    if not (
+        counts[box, slot] == wp.float64(1.0)
+        and charges[box, slot] == wp.float64(0.0)
+        and masses[box, slot, positive_species] > wp.float64(0.0)
+        and masses[box, slot, negative_species] > wp.float64(0.0)
+    ):
+        return False
+    for species in range(masses.shape[2]):
+        if species != positive_species and species != negative_species:
+            if masses[box, slot, species] != wp.float64(0.0):
+                return False
+    return True
+
+
+@no_type_check
 @wp.kernel
 def remove_neutral_ion_products(
     masses: wp.array3d(dtype=wp.float64),
@@ -16,6 +42,8 @@ def remove_neutral_ion_products(
     exported_mass: wp.array2d(dtype=wp.float64),
     exported_particles: wp.array(dtype=wp.int64),
     failure: wp.array(dtype=wp.int32),
+    interval_steps: wp.int64,
+    phase: wp.array(dtype=wp.int64),
 ):
     """Export only neutral products containing both reserved ion materials."""
     if failure[0] != 0:
@@ -26,17 +54,21 @@ def remove_neutral_ion_products(
         if count != wp.float64(0.0) and count != wp.float64(1.0):
             wp.atomic_max(failure, 0, 5)
             return
+    next_phase = phase[box] + wp.int64(1)
+    if next_phase < interval_steps:
+        phase[box] = next_phase
+        return
+    phase[box] = wp.int64(0)
     for slot in range(counts.shape[1]):
-        eligible = (
-            counts[box, slot] == wp.float64(1.0)
-            and charges[box, slot] == wp.float64(0.0)
-            and masses[box, slot, positive_species] > wp.float64(0.0)
-            and masses[box, slot, negative_species] > wp.float64(0.0)
+        eligible = is_neutral_ion_product(
+            masses,
+            counts,
+            charges,
+            positive_species,
+            negative_species,
+            box,
+            slot,
         )
-        for species in range(masses.shape[2]):
-            if species != positive_species and species != negative_species:
-                if masses[box, slot, species] != wp.float64(0.0):
-                    eligible = False
         if eligible:
             for species in range(masses.shape[2]):
                 exported_mass[box, species] += masses[box, slot, species]

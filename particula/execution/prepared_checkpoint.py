@@ -166,6 +166,7 @@ def _validate_auxiliary(saved, plans):
         expected["ion_source_pairs"] = ("<i8", (boxes,))
     if any(p.family == "ion_cleanup" for p in plans):
         expected["ion_export_particles"] = ("<i8", (boxes,))
+        expected["ion_cleanup_phase"] = ("<i8", (boxes,))
         expected["ion_export_mass"] = (
             "<f8",
             (boxes, saved.resident.dimensions.n_species),
@@ -203,6 +204,9 @@ def _validate_auxiliary(saved, plans):
             "ion_export_mass",
         ) and np.any(values < 0):
             raise ValueError("checkpoint ion inventories must be nonnegative")
+    from particula.execution.prepared_ions import validate_cleanup_phase
+
+    validate_cleanup_phase(saved, plans)
     validate_cohort_checkpoint(saved)
 
 

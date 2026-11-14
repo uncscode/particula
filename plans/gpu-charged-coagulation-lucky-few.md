@@ -133,3 +133,53 @@ Update owning GPU guides and validation evidence; preserve README boundaries.
   seconds, exact finite-population birth/death reference; maximum mean errors
   1.58/2.67/2.54 standard errors for q=0/2/10. Mass residuals below 1e-14.
   Plot reviewed; source download matches and compiles; website build passed.
+
+- Added configurable neutral-product cleanup intervals with checkpointed phase;
+  104 affected CPU/CUDA lifecycle tests passed. The survival pilot can now vary
+  cleanup frequency independently of its physical timestep.
+- Fixed the hosted documentation reachability failure by linking the ion-balance
+  source from its owning index and guide; committed-file structure and 13
+  structure tests pass. Hosted follow-through remains required on the final head.
+
+## Survival pilot specification and first neutral result
+
+The reusable runner is `scripts/gpu_studies/lucky_few.py`. Physical defaults
+were set before the first neutral pilot and are frozen for subsequent ion
+comparisons: one 3 nm original seed and 32 neutral 100 nm background particles
+per 3.2e-10 m³ box, material density 1400 kg/m³, target diameter 50 nm, fixed
+298.15 K and 101325 Pa. The illustrative vapor has molar mass 0.2 kg/mol,
+diffusivity 5e-6 m²/s, reference vapor pressure 1e-12 Pa and unit accommodation.
+Its concentration is replenished to 2e-10 kg/m³ every 10 s. This is a defined
+pulsed feed, not an assertion of constant vapor concentration between updates.
+Every signed gas-inventory change is included in the external feed budget.
+
+Vapor growth uses continuous deterministic condensation. Collision selection,
+ion production and charge histories are stochastic. This does not implement
+molecule-by-molecule stochastic vapor growth or ion-induced nucleation.
+Background particles coagulate and grow; they are not an immutable sink.
+One initial seed per independent box supports exact binomial intervals for
+reaching the threshold by the finite observation time. Censored lineages remain
+explicit. A zero-event result additionally reports a one-sided 95% upper bound.
+
+First CUDA pilot: q=0, 64 boxes, capacity 128, dt=1 s, cleanup every 10 s,
+duration 20,000 s, root seed 317. Outcomes were 2 reached, 62 captured and
+0 unresolved. Exact two-sided 95% success interval: 0.003807–0.108371.
+Maximum relative mass residual: 4.67e-15; maximum observed occupied slots: 33.
+Synchronized stepping took 36.1 s on RTX 5060, separate from 9.34 s preparation
+and 0.382 s gas forcing; these are one-run observations, not a speedup benchmark.
+The 125-test combined helper/ion/lifecycle suite passed on CPU and CUDA.
+
+Next independent work: neutral timestep and capacity sensitivity, larger
+ensembles, and a no-background growth control through the full 50 nm threshold.
+Then the production ion cases require the outstanding omitted-rate choice.
+Keep the physical defaults fixed; do not tune a desired charging benefit.
+
+Additional primary context for the final percent-cell narrative:
+- Lehtinen et al. (2007), growth versus scavenging and apparent formation rates:
+  https://doi.org/10.1016/j.jaerosci.2007.06.009.
+- Atmospheric Nanoparticle Survivability Reduction Due to Charge-Induced
+  Coagulation Scavenging Enhancement (2021):
+  https://doi.org/10.1029/2021GL092758. Charging need not improve survival.
+- Robust metric for quantifying the importance of stochastic effects on
+  nanoparticle growth (2018): https://doi.org/10.1038/s41598-018-32610-z.
+  Distinguish discrete molecular growth from the continuous condensation used here.

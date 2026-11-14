@@ -184,8 +184,14 @@ must be reserved for ions; material composition is the classification contract.
 Neutral aerosol particles with any mass in another lane are retained. Cleanup
 does not itself model a recombination reaction or remove charged free ions.
 
-Place cleanup at the chosen point in the ordered composition; it executes once
-per prepared step and reclaims slots by zeroing all particle fields.
+Place cleanup at the chosen point in the ordered composition. By default it
+exports every prepared step, reclaiming slots by zeroing all particle fields.
+Set `interval_steps=N` for export on steps N, 2N, and so on; the physical interval
+is `N * time_step`. Its phase survives capture and checkpoint continuation.
+Unit-count validation still runs every step. Neutral products remain inert but
+occupy slots between exports, so capacity must accommodate the entire interval.
+Source-before-cleanup ordering can fault on capacity before an export later in
+that same step.
 `simulation.ion_cleanup_diagnostics()` observes detached cumulative
 `exported_particles` and `exported_mass` [kg, box by species]. Exported charge
 is exactly zero. Check each species' initial mass plus injected mass against

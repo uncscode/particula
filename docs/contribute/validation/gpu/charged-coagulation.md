@@ -197,3 +197,37 @@ This qualifies the source/recombination example, not a survival conclusion.
 The 3–50 nm study and its timestep/cleanup/capacity/ensemble convergence remain
 outstanding. The production treatment of omitted LF2013 repulsive coefficients
 is still awaiting the user's scientific choice; strict rejection is the default.
+
+## Periodic cleanup and documentation reachability follow-up
+
+Hosted documentation CI at `0288c548b` detected that the new ion-balance page
+was not linked from authored navigation. The earlier local check ran before
+that file was tracked and did not inventory it. Commit `fc18f012d` adds the
+owning GPU index and guide links; the committed-file structure check reports
+zero errors and its 13 tests pass. This corrects the earlier local-only
+structure result rather than treating the failed hosted build as successful.
+
+`IonNeutralCleanup.interval_steps` makes refresh frequency independent of the
+physical timestep. A bounded per-box phase counter is checkpointed; cleanup
+runs on multiples of the configured interval. Inert neutral products continue
+to occupy slots between exports. Unit-count checks still run every call and
+invalid checkpoint phases or changed intervals reject. CPU/CUDA cleanup,
+atmospheric, cohort and restart regression passed 104 tests, including
+midperiod capture/restart and default every-step behavior. Ruff and mypy passed.
+The earlier full-package coverage result predates this periodic extension.
+
+
+The subsequent combined study-helper/ion-exclusion/cleanup/atmospheric/cohort/
+restart suite passed 125 tests on host CPU/CUDA. This caught and corrected a
+shared-plan assumption: condensation exclusion must not inherit the cleanup
+interval parameter. The complete ion-balance example was refreshed again and
+its default every-step results retained.
+
+A preliminary neutral survival pilot used the explicit defaults in
+`scripts/gpu_studies/lucky_few.py`: 64 independent boxes, one 3 nm seed each,
+32 initial 100 nm background particles per box, pulsed vapor replenishment,
+and 20,000 s duration. It recorded 2 reached, 62 captured and 0 unresolved
+lineages, with maximum mass residual 4.67e-15. The exact 95% success interval
+is broad (0.003807–0.108371); this is not a converged production estimate.
+The pending timestep/capacity/ensemble work and ion-domain decision remain in
+the plan. No ion-effect conclusion follows from this q=0 pilot.
