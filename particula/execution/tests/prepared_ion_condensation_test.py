@@ -128,3 +128,28 @@ def test_mixed_material_density_matches_native_cpu_kelvin(device):
     np.testing.assert_allclose(
         result.gas.concentration, cpu.gas.concentration, rtol=2e-12, atol=0
     )
+
+
+def test_weighted_mixed_density_surface_rejects_before_upload(monkeypatch):
+    """CPU surface weights must not silently become physical-volume weights."""
+    from particula.gpu import conversion
+
+    initial, process = condensation_case(weighted=True)
+    initial.particles.density[:] = [1000.0, 2000.0]
+    initial.particles.masses[:] = 1e-19
+    surface = process.condensation_strategy.surface_strategy
+    # Equal masses and equal surface densities give the arithmetic mean.
+    np.testing.assert_allclose(
+        surface.effective_surface_tension(initial.particles.masses[0]),
+        0.07,
+        rtol=1e-15,
+    )
+    before = initial.particles.masses.copy()
+
+    def forbidden(*_args, **_kwargs):
+        pytest.fail("unsupported surface weighting reached device upload")
+
+    monkeypatch.setattr(conversion, "to_warp_particle_data", forbidden)
+    with pytest.raises(ValueError, match="surface weighting.*uniform material"):
+        process.prepare(initial, device="cpu", time_step=1e-6)
+    np.testing.assert_array_equal(initial.particles.masses, before)
