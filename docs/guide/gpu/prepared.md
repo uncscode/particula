@@ -79,8 +79,10 @@ material mappings or unsupported thermodynamics reject explicitly. See the
 underlying physics and the executable preparation error for a rejected plan.
 Latent energy is diagnostic bookkeeping, not automatic temperature feedback.
 For the supported single-phase volume-weighted surface model, each particle
-uses its own composition. CPU surface mixing and Kelvin terms preserve that
-particle axis as well; independent rows are never averaged into one mixture.
+uses its own composition and requires uniform physical material densities;
+separate surface-weighting density translation is not implemented. CPU surface
+mixing and Kelvin terms preserve that particle axis as well; independent rows
+are never averaged into one mixture.
 
 Process configuration, timestep, box layout and buffer capacity are frozen.
 Editing the original Python strategy after preparation does not change a running
@@ -173,9 +175,12 @@ particle counts, masses and charges are never temporarily masked.
 
 This configuration is frozen at preparation and preserved by capture/restart.
 The native minimum-radius setting is a transport floor, not an exclusion rule.
-Prepared condensation supports different physical material densities with a
-constant surface-model density for Kelvin curvature. Physical particle volume
-still sums mass divided by each material's density. Nonuniform surface-model
+Prepared condensation with a static surface-tension model supports different
+physical material densities with a constant surface-model density for Kelvin
+curvature. Composition-weighted surfaces reject mixed material densities before
+upload because CPU surface weights and device physical-volume weights differ.
+Physical particle volume still sums mass divided by each material's density.
+Nonuniform surface-model
 densities remain unsupported. This distinction allows equal-diameter ions of
 different molecular masses without changing their physical material densities.
 

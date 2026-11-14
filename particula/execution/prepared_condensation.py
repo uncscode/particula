@@ -107,6 +107,10 @@ def _surface_plan(surface, particles):
             or not np.all(phases == phases[0])
         ):
             raise ValueError("GPU mixing supports one volume-weighted phase")
+        if not np.all(particles.density == particles.density[0]):
+            raise ValueError(
+                "GPU surface weighting requires uniform material densities"
+            )
         mode = 1
     return tuple(float(x) for x in tensions), mode, kelvin_density
 

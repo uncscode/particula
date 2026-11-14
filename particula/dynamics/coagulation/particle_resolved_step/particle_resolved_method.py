@@ -187,7 +187,18 @@ def get_particle_resolved_coagulation_step(  # noqa: C901
         small_index = random_generator.choice(  # type: ignore
             small_indices, size=tests, replace=bool(replace_in_pool)
         )
-        large_index = random_generator.choice(large_indices, tests)
+        if lower_bin == upper_bin:
+            # events_count already excludes self-pairs. Sample uniformly from
+            # the other N-1 particles instead of rejecting self-trials later,
+            # which would suppress the physical rate by (N-1)/N.
+            self_position = np.searchsorted(large_indices, small_index)
+            partner_position = random_generator.integers(
+                len(large_indices) - 1, size=tests
+            )
+            partner_position += partner_position >= self_position
+            large_index = large_indices[partner_position]
+        else:
+            large_index = random_generator.choice(large_indices, tests)
 
         # Step 9: Calculate the kernel value for the selected particle pairs
         if kernel_index_func is not None:
@@ -245,9 +256,6 @@ def get_particle_resolved_coagulation_step(  # noqa: C901
             np.where(swap, large_index, small_index),
             np.where(swap, small_index, large_index),
         )
-        valid_indices = valid_indices[
-            small_index[valid_indices] != large_index[valid_indices]
-        ]
         # Step 12: Ensure each small particle only coagulates with one large.
         _, unique_index = np.unique(
             small_index[valid_indices], return_index=True

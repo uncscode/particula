@@ -3,6 +3,7 @@
 import time
 
 import numpy as np
+import pytest
 
 # fmt: off
 from particula.dynamics.coagulation.particle_resolved_step.particle_resolved_method import (  # noqa: E501  # pylint: disable=line-too-long
@@ -318,3 +319,33 @@ def test_particle_resolved_coagulation_step_mixed_range_particles():
         random_generator,
     )
     assert loss_gain_index.shape[1] == 2
+
+
+@pytest.mark.parametrize("evaluation", ["interpolated", "radius", "index"])
+def test_two_particle_same_bin_collision_rate(evaluation):
+    """The sole physical pair has probability K dt / V, not half that rate."""
+    rng = np.random.default_rng(873)
+    radii = np.array([1.5e-9, 1.6e-9])
+    grid = np.array([1e-9, 3e-9])
+    trials = 4000
+    expected_probability = 0.2  # K=2e-15 m3/s, dt=0.1 s, V=1e-15 m3.
+
+    def pair_kernel(first, second):
+        assert np.all(first != second)
+        return np.full(first.shape, 2e-15)
+
+    kwargs = {}
+    if evaluation == "radius":
+        kwargs["kernel_func"] = pair_kernel
+    elif evaluation == "index":
+        kwargs["kernel_index_func"] = pair_kernel
+    collisions = sum(
+        len(
+            get_particle_resolved_coagulation_step(
+                radii, np.full((2, 2), 2e-15), grid, 1e-15, 0.1, rng, **kwargs
+            )
+        )
+        for _ in range(trials)
+    )
+    sigma = np.sqrt(expected_probability * (1 - expected_probability) / trials)
+    assert abs(collisions / trials - expected_probability) < 5 * sigma
