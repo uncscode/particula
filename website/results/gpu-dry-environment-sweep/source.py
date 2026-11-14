@@ -57,10 +57,15 @@ from scripts.gpu_studies.population_figures import (
 
 
 # %%
-def run_example():
-    """Require CUDA and render ordered environmental and temporal summaries."""
+def simulate():
+    """Run the complete CUDA study and return compact numerical summaries."""
     report, final = run_dry_sweep(DryEnvironmentSweep())
     del final
+    return report
+
+
+def plot_results(report):
+    """Render saved observations without advancing the simulation."""
     labels = report["labels"]
     first, last = report["history"][0], report["history"][-1]
     n0, n1 = np.array(first["number"]), np.array(last["number"])
@@ -115,8 +120,16 @@ def run_example():
     return report
 
 
+def run_example():
+    """Simulate once, then render the resulting numerical summaries."""
+    return plot_results(simulate())
+
+
 # %% [markdown]
 # ## Interpret the results
+#
+# Dots on cumulative-merger curves mark saved observations. Straight connecting
+# lines guide the eye; they do not resolve the timing of individual collisions.
 #
 # Read the atmospheric and chamber comparisons separately. Altitude changes
 # both temperature and pressure and has a nonmonotonic temperature profile.

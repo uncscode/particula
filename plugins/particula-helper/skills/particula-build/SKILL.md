@@ -8,7 +8,7 @@ description: "Design and write Particula aerosol simulations; use for scripts, n
 2. Inspect installed signatures and authoritative examples. Use `../../scripts/run_example.py` as a tested CPU starter, not a universal scientific model. Copy it into the user's study only if editing is needed.
 3. Keep configuration, model construction, stepping, diagnostics and plotting separate. Use explicit units and state shapes. Bound time steps and output sizes; seed stochastic algorithms where supported and record the seed.
 4. Compose only processes supported by the installed version. Account for process ordering and operator splitting. For source/sink models define the inventory budget explicitly.
-5. Save the script, parameters, dependencies and output instructions together. Write outputs into a fresh run directory; preserve earlier results.
+5. Save the script, parameters, dependencies and output instructions together. For registered repository examples, use one stable `website/results/EXAMPLE_KEY/` folder and let Git preserve history; follow `../particula-docs/SKILL.md` for bounded numerical plot data and replotting. For private studies outside that workflow, preserve earlier results using the user's chosen output organization.
 6. Start small, then check finite/nonnegative state, relevant conservation and time-step or resolution sensitivity before increasing scale. Avoid clamping negative values to hide numerical errors.
 Deliver executable code, assumptions, exact run command, expected artifacts, and validation criteria. If requested, continue with particula-run rather than stopping at code generation.
 

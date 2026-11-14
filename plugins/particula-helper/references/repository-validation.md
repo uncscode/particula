@@ -11,7 +11,7 @@ tools. Consult current `pyproject.toml` and `.github/workflows/` for drift.
 | Numerical function or CPU process | Adjacent `tests/*_test.py`; independent physical oracle and edge cases |
 | Direct Warp kernel/transfer | Kernel/property/conversion tests, Warp CPU baseline and optional CUDA |
 | Resident lifecycle | Affected execution tests, identities, failure state, checkpoint/RNG continuity |
-| Published example or README snippet | Matching `examples_tests/` modules; full changed workload and outputs |
+| Published example or README snippet | Matching `examples_tests/` modules; full workload for scientific changes, saved-data replot for plotting-only changes |
 | Release/docs/plugin tooling | Affected `scripts/tests/` plus the relevant build/check command |
 | Concrete wall loss | Both `particula/dynamics/tests/wall_loss_strategies_test.py` and the adjacent wall-loss suite |
 
@@ -96,7 +96,9 @@ pytest scripts/tests/plugin_distribution_test.py -q -Werror
 
 Run the relevant subset; documentation builds render saved outputs without
 executing simulations. Follow `website/AUTHORING.md` for full-workload refresh
-and visual inspection when scientific code changes.
+and visual inspection when scientific code changes. Plotting-only changes use
+`docs_examples.py replot` from verified saved numerical data, with the original
+execution provenance preserved.
 
 ## Release checks
 
