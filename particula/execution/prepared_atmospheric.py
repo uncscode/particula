@@ -18,6 +18,10 @@ def plan_atmospheric(process, _aerosol):
                 "charged_model",
                 "omitted",
                 "recombination",
+                "attachment_model",
+                "positive_mobility",
+                "negative_mobility",
+                "ion_radius",
             )
         ),
     )
@@ -35,6 +39,7 @@ def configure_atmospheric(plan, owner, prepared):
     from particula.gpu.dynamics.ion_pair_data import IonPairData
     from particula.gpu.kernels.ion_coagulation import (
         cache_attachment_rates,
+        cache_mobility_rates,
         classify_ions,
     )
 
@@ -69,6 +74,7 @@ def configure_atmospheric(plan, owner, prepared):
         kinds,
         presence,
         owner._device_failure,
+        int(values.get("attachment_model", "lf2013") == "mobility"),
     )
     rate_args = (
         kinds,
@@ -81,12 +87,32 @@ def configure_atmospheric(plan, owner, prepared):
         owner._device_failure,
     )
 
+    rate_kernel = cache_attachment_rates
+    if values.get("attachment_model", "lf2013") == "mobility":
+        rate_kernel = cache_mobility_rates
+        rate_args = (
+            kinds,
+            presence,
+            args[15],
+            args[23],
+            args[0],
+            args[4],
+            args[5],
+            wp.float64(POSITIVE_ION_MASS),
+            wp.float64(NEGATIVE_ION_MASS),
+            wp.float64(values["positive_mobility"]),
+            wp.float64(values["negative_mobility"]),
+            wp.float64(values["ion_radius"]),
+            rates,
+            owner._device_failure,
+        )
+
     def setup():
         wp.launch(
             classify_ions, dim=shape[0], inputs=classify_args, device=device
         )
         wp.launch(
-            cache_attachment_rates,
+            rate_kernel,
             dim=rates.shape,
             inputs=rate_args,
             device=device,

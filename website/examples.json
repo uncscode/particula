@@ -677,14 +677,30 @@
     "invoke": "result = run_example()"
   },
   "gpu-environment-sweep": {
-    "title": "Two million charged particles across sixteen environments",
+    "title": "Charged aerosols and ions across sixteen humid environments",
     "source": "docs/examples/gpu/prepared/gpu_environment_sweep.py",
     "policy": "cuda",
     "device": "cuda",
-    "timeout": 3600,
+    "timeout": 10800,
     "inputs": [
       "scripts/gpu_studies/__init__.py",
-      "scripts/gpu_studies/environment_sweep.py"
+      "scripts/gpu_studies/environment_sweep.py",
+      "scripts/gpu_studies/population_diagnostics.py",
+      "scripts/gpu_studies/population_figures.py"
+    ],
+    "invoke": "result = run_example()"
+  },
+  "gpu-dry-environment-sweep": {
+    "title": "Dry charged aerosols from ground to mesopause and high pressure",
+    "source": "docs/examples/gpu/prepared/gpu_dry_environment_sweep.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 7200,
+    "inputs": [
+      "scripts/gpu_studies/__init__.py",
+      "scripts/gpu_studies/dry_environment_sweep.py",
+      "scripts/gpu_studies/population_diagnostics.py",
+      "scripts/gpu_studies/population_figures.py"
     ],
     "invoke": "result = run_example()"
   }

@@ -392,3 +392,39 @@ The second fixes crowded chart labels without changing physics or seed.
 Nine strengthened CPU/CUDA tests passed, and the extracted ZIP passed a
 separate CUDA smoke check. Details and provenance are in the
 [environmental validation record](../docs/contribute/validation/gpu/environment-sweep.md).
+
+## Extended environmental dynamics and variable ion transport
+
+User-approved extension: retain only final saved output per example; add size,
+charge, loss and collision histories; dry 0–86 km and 2/5/10 atm chambers;
+longer humidity study with active coagulation and explicit ions.
+
+- [x] Dry 1000 s study: 19 conditions, 2,490,368 initial particles; independent
+  64-box timestep comparison at 0.5/0.25 s passed the predeclared individual
+  95% interval criterion of +/-2 percentage points of initial number.
+- [ ] Add opt-in `mobility` ion attachment, preserving LF2013 defaults. Use
+  constant collision-cross-section low-field mobility scaling
+  Z=Z_ref sqrt(T/298.15) 101325/P, ion friction e/Z, and the existing
+  Coulomb-adjusted hard-sphere transition fit. Ion radius is contact geometry,
+  not a proxy for ion mobility. Defaults are illustrative reference mobilities.
+  This is a transport approximation, not LF2013 extrapolation or a new measured
+  atmospheric fit. No image forces, hydration or evolving ion chemistry.
+  Opposite-ion recombination remains an explicit user-supplied coefficient.
+- [ ] Validate independent continuum/ballistic limits, polarity, mobility law,
+  CPU/Warp/CUDA parity, invalid-input rejection and prepared continuation.
+- [ ] Humidity: include free ions, source and neutral cleanup; distinguish
+  aerosol mergers, attachment and recombination using population/material
+  ledgers. Preserve every-box mass and total charge accounting.
+- [ ] Preview figures, qualify humidity timestep, execute final CUDA studies,
+  interpret observed results, retain final generations, update validation record.
+- [ ] Run relevant regression suites, documentation build, push and check PR CI.
+
+Physical-limit validation uncovered an inherited inversion of Gc/Gk in the
+charged diffusive Knudsen number. Correct both CPU and Warp before final runs;
+requalify dry stepping and refresh affected charged examples. The corrected
+rates also exposed a CPU radius-bin sampler chain: orient sampled donors by
+actual radius and exclude self-pairs before donor uniqueness. Keep the existing
+no-spurious-calcite-merger regression. Replace the interpolation diagnostic's
+arbitrary suppression threshold with independently derived charged flux limits;
+retain its interpolation agreement tolerance. Existing tiny-Knudsen tests now
+use zero absolute tolerance and analytic expectations.

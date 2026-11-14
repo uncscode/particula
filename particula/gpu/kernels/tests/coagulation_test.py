@@ -1831,7 +1831,7 @@ def _charged_hard_sphere_oracle(
         knudsen = (
             np.sqrt(constants.BOLTZMANN_CONSTANT * temperature * reduced_mass)
             / reduced_friction
-        ) / (radius_sum * continuum / kinetic)
+        ) / (radius_sum * kinetic / continuum)
         numerator = (
             4.0 * pi_value * knudsen**2
             + 25.836 * knudsen**3

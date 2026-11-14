@@ -167,3 +167,24 @@ def test_output_redaction_preserves_scientific_warning_details(tmp_path):
     assert "Mass balance: 1.0" in text
     assert all(name not in text for name in ("alice", "bob", "charlie"))
     assert result != value
+
+
+def test_successful_publication_prunes_only_its_superseded_bundles(tmp_path):
+    """Keep the selected result and unrelated content while pruning old runs."""
+    for name, example_id in [
+        ("run-old", "demo"),
+        ("run-new", "demo"),
+        ("run-unrelated", "other"),
+    ]:
+        directory = tmp_path / name
+        directory.mkdir()
+        (directory / "manifest.json").write_text(
+            json.dumps({"example": example_id})
+        )
+    (tmp_path / "run-notes").mkdir()
+    (tmp_path / "run-notes/note.txt").write_text("Keep this note")
+    examples.prune_superseded_results("demo", tmp_path, "run-new")
+    assert not (tmp_path / "run-old").exists()
+    assert (tmp_path / "run-new/manifest.json").is_file()
+    assert (tmp_path / "run-unrelated/manifest.json").is_file()
+    assert (tmp_path / "run-notes/note.txt").is_file()

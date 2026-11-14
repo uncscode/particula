@@ -237,8 +237,18 @@ def get_particle_resolved_coagulation_step(  # noqa: C901
             random_generator.uniform(size=tests) < coagulation_probabilities
         )
 
-        # Step 12: Ensure each small particle only coagulates with one large
-        # particle
+        # Orient actual pairs before enforcing uniqueness. A radius bin can
+        # contain both sizes; letting one ion appear as both donor and receiver
+        # would join two repelling aerosols through an artificial merge chain.
+        swap = particle_radius[small_index] > particle_radius[large_index]
+        small_index, large_index = (
+            np.where(swap, large_index, small_index),
+            np.where(swap, small_index, large_index),
+        )
+        valid_indices = valid_indices[
+            small_index[valid_indices] != large_index[valid_indices]
+        ]
+        # Step 12: Ensure each small particle only coagulates with one large.
         _, unique_index = np.unique(
             small_index[valid_indices], return_index=True
         )

@@ -35,7 +35,7 @@ def get_diffusive_knudsen_number(
     number. It represents the ratio of the mean particle persistence
     distance to the effective Coulombic interaction scale. Mathematically:
 
-    - Kn_d = [ √(k_B × T × μ_red) / f_red ] / [ (rᵢ + rⱼ) × (Γ_c / Γ_k) ]
+    - Kn_d = [ √(k_B × T × μ_red) / f_red ] / [ (rᵢ + rⱼ) × (Γ_k / Γ_c) ]
         - k_B is the Boltzmann constant (J/K).
         - T is the temperature (K).
         - μ_red is the reduced mass of particles (kg).
@@ -128,8 +128,8 @@ def get_diffusive_knudsen_number(
     # Guard for same-sign repulsion; see coulomb_enhancement.py:83-97 and
     # diffusive_knudsen_module.py:113-119 (issue #1087).
     denominator = np.divide(
-        sum_of_radii * continuum_enhance,
-        kinetic_enhance,
+        sum_of_radii * kinetic_enhance,
+        continuum_enhance,
         out=np.full_like(sum_of_radii, np.inf, dtype=np.float64),
         where=kinetic_enhance >= KINETIC_ENHANCE_MIN,
     )

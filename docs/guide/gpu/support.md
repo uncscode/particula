@@ -57,3 +57,9 @@ Direct validation may synchronize status flags or scans. Prepared steps retain
 validated resources and defer observation to explicit boundaries. Neither path
 adds hidden backend fallback, general adaptive stepping, dynamic storage resizing,
 a new PDF algorithm, unequal-multiplicity coagulation or multi-GPU execution.
+
+Explicit ions also support the opt-in `attachment_model="mobility"` transport
+approximation at variable temperature and pressure. LF2013 remains the default
+and retains its reference-condition restrictions. See
+[variable-environment ion attachment](prepared.md#variable-temperaturepressure-ion-attachment)
+for mobility scaling, fixed recombination, and omitted physical processes.

@@ -1,5 +1,11 @@
 # Charged coagulation and atmospheric ion validation
 
+The historical results below predate the environmental extension's charged
+Knudsen normalization correction. They are evidence for their recorded
+revisions, not current numerical qualification. A replacement confirmation
+and publication refresh are required before treating the corrected results
+as final. See [environmental validation](environment-sweep.md).
+
 Development evidence, 2026-11-13, branch
 `codex/gpu-charged-coagulation-lucky-few`, based on `19a8fb11d`.
 These results concern the implementation on this branch; no release is claimed.

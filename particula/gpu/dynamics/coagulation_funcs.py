@@ -513,7 +513,7 @@ def diffusive_knudsen_number_wp(
         wp.sqrt(boltzmann_constant * temperature * reduced_mass)
         / reduced_friction
     )
-    denominator = sum_radius * continuum_limit / kinetic_limit
+    denominator = sum_radius * kinetic_limit / continuum_limit
     return numerator / denominator
 
 
@@ -852,7 +852,7 @@ def charged_kernel_wp(  # noqa: C901
     continuum_limit = coulomb_continuum_limit_wp(potential_ratio)
     if not wp.isfinite(continuum_limit) or continuum_limit <= zero:
         return zero
-    diffusive_denominator = sum_radius * continuum_limit / kinetic_limit
+    diffusive_denominator = sum_radius * kinetic_limit / continuum_limit
     if not wp.isfinite(diffusive_denominator) or diffusive_denominator <= zero:
         return zero
 

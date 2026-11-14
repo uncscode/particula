@@ -14,7 +14,7 @@ class AtmosphericCoagulation(RunnableABC):
     """Combine charged aerosol coagulation, ion attachment and recombination.
 
     Prepared Warp execution only, for unit represented particles. Aerosol pairs
-    use ``charged_model``; ion-aerosol pairs use the conductive-air LF2013
+    use ``charged_model``; default ion-aerosol rates use conductive-air LF2013
     tables at 298.15 K and 101325 Pa, with 150 u positive and 90 u negative
     ions. Opposite free ions recombine; same-sign ions do not cluster. Neutral
     ion-only products are inert until an explicit ``IonNeutralCleanup``.
@@ -27,7 +27,15 @@ class AtmosphericCoagulation(RunnableABC):
         omitted: ``reject`` (default), ``lower`` or ``upper`` for repulsive
             attachment rates omitted below the published 1e-15 m^3/s cutoff.
             Bounds are sensitivity assumptions, not extrapolated fit values.
-        recombination: Opposite-ion recombination coefficient [m^3/s].
+        recombination: Explicit opposite-ion recombination coefficient [m^3/s],
+            held constant with T/P; not predicted by the attachment model.
+        attachment_model: ``lf2013`` or opt-in ``mobility`` Coulomb transport
+            approximation, supporting variable T/P. No image forces or
+            hydration.
+        positive_mobility: Illustrative positive-ion mobility at 298.15 K,
+            101325 Pa [m^2/(V s)]; supply a measured value for a specific ion.
+        negative_mobility: Corresponding negative-ion reference mobility.
+        ion_radius: Ion contact radius [m], independent of mobility transport.
 
     References:
         López-Yglesias and Flagan (2013), Aerosol Science and Technology,
@@ -39,6 +47,10 @@ class AtmosphericCoagulation(RunnableABC):
     charged_model: str = "hard_sphere"
     omitted: str = "reject"
     recombination: float = 1.7e-12
+    attachment_model: str = "lf2013"
+    positive_mobility: float = 1.4e-4
+    negative_mobility: float = 1.9e-4
+    ion_radius: float = 0.25e-9
 
     def _validate_batch(self, aerosol):
         """Reject unsupported model and physical state before GPU upload."""
@@ -66,8 +78,22 @@ class AtmosphericCoagulation(RunnableABC):
             or self.recombination < 0
         ):
             raise ValueError("recombination must be finite and nonnegative")
-        if np.any(aerosol.environment.temperature != 298.15) or np.any(
-            aerosol.environment.pressure != 101325.0
+        if self.attachment_model not in ("lf2013", "mobility"):
+            raise ValueError("attachment_model must be lf2013 or mobility")
+        for name in ("positive_mobility", "negative_mobility", "ion_radius"):
+            value = getattr(self, name)
+            if (
+                isinstance(value, bool)
+                or not np.isscalar(value)
+                or not np.isfinite(value)
+                or value <= 0
+            ):
+                raise ValueError(f"{name} must be finite and positive")
+        if self.attachment_model == "mobility" and self.omitted != "reject":
+            raise ValueError("omitted applies only to LF2013")
+        if self.attachment_model == "lf2013" and (
+            np.any(aerosol.environment.temperature != 298.15)
+            or np.any(aerosol.environment.pressure != 101325.0)
         ):
             raise ValueError("LF2013 requires 298.15 K and 101325 Pa")
 

@@ -331,3 +331,43 @@ combines charged Brownian coagulation with closed water condensation across
 sixteen temperature, pressure and initial-humidity conditions. It keeps all
 2,097,152 initial particles resident together and documents its constant
 vapor-diffusivity approximation.
+
+### Variable-temperature/pressure ion attachment
+
+`AtmosphericCoagulation(..., attachment_model="mobility")` selects an explicit
+Coulomb transport approximation instead of the reference-only LF2013 tables.
+It uses each box's current temperature, pressure, wet aerosol radius, total
+mass and charge; rates refresh before collision sampling, including graph
+replay and restart. `omitted` sensitivity choices apply only to LF2013.
+
+Ion friction is `e / Z`, with
+`Z = Z_ref * sqrt(T / 298.15) * 101325 / P`. This scaling assumes a constant
+momentum-transfer collision cross section in the low-field Mason–Schamp
+relation. The default positive/negative reference mobilities, 1.4/1.9 × 10⁻⁴
+m²/(V s), are illustrative configuration values, not fitted measurements for
+all environments. Ion masses remain 150/90 u. `ion_radius` (default 0.25 nm)
+sets contact geometry independently of mobility. Aerosol friction retains
+Stokes–Cunningham transport.
+
+The transition interpolation uses the hard-sphere dimensionless fit with
+Coulomb continuum/ballistic enhancement. With `a = r_a + r_i`, reduced mass
+`m`, reduced friction `f`, and enhancement factors `Gc`, `Gk`, its normalized
+Knudsen number is `sqrt(kBT*m)/(f*a) * Gc/Gk`. This yields the independent
+limits `4*pi*a*kBT/f * Gc` and `pi*a**2*sqrt(8*kBT/(pi*m)) * Gk`.
+The same normalization correction applies to the charged aerosol CPU/GPU
+kernels; previous CPU/GPU parity alone did not establish these physical limits.
+
+This approximation omits image forces, three-body trapping, ion hydration and
+composition changes. Strong attractive collisions can therefore be
+underestimated. It is not an extrapolation of LF2013 or an empirical model of
+the whole atmosphere. Recombination remains the separately supplied constant
+`recombination` in m³/s; varying attachment with T/P does not predict its T/P
+dependence. Source, neutral cleanup and condensation exclusion remain explicit
+companion processes. Check mass including injected/exported material and total
+aerosol-plus-ion charge, rather than aerosol charge alone.
+
+References: [Gopalakrishnan and Hogan (2012)](https://doi.org/10.1103/PhysRevE.85.026410)
+for the transition scaling and Coulomb limits;
+[Stow et al. (2017)](https://doi.org/10.1021/acs.analchem.7b01729) for the
+low-field mobility relation. Constant cross section and fixed ion composition
+are assumptions of this implementation.

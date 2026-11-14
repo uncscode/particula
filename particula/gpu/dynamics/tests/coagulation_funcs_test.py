@@ -601,7 +601,7 @@ def _diffusive_knudsen_number_oracle(
     continuum_limit = _continuum_limit_oracle(potential)
     numerator = np.sqrt(BOLTZMANN_CONSTANT * temperature * reduced_mass)
     denominator = (
-        reduced_friction * sum_radius * continuum_limit / kinetic_limit
+        reduced_friction * sum_radius * kinetic_limit / continuum_limit
     )
     return float(numerator / denominator)
 
@@ -722,7 +722,7 @@ def _charged_hard_sphere_oracle(  # noqa: C901
         diffusive_knudsen = (
             np.sqrt(boltzmann_constant * temperature * reduced_mass)
             / reduced_friction
-            / (sum_radius * continuum / kinetic)
+            / (sum_radius * kinetic / continuum)
         )
         if not np.isfinite(diffusive_knudsen) or diffusive_knudsen < 0.0:
             return 0.0

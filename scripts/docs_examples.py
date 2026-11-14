@@ -2,7 +2,7 @@
 
 Python percent-format scripts are the source of truth. Notebook objects exist
 only in memory while nbclient captures rich output. Published bundles are
-immutable generations selected by an atomically replaced pointer.
+a single successful generation selected by an atomic pointer replacement.
 """
 
 from __future__ import annotations
@@ -302,6 +302,7 @@ def refresh(example_id, config, root=ROOT, results=RESULTS):
         pointer = parent / ".current.tmp"
         pointer.write_text(json.dumps({"generation": generation}) + "\n")
         os.replace(pointer, parent / "current.json")
+        prune_superseded_results(example_id, parent, generation)
     finally:
         if pending.exists():
             shutil.rmtree(pending)
@@ -309,6 +310,31 @@ def refresh(example_id, config, root=ROOT, results=RESULTS):
         f"REFRESHED {example_id}: {device}; "
         f"{sum(len(x) for x in outputs)} outputs"
     )
+
+
+def prune_superseded_results(example_id, parent, current):
+    """Remove only identified superseded bundles after publishing a successor.
+
+    Failed refreshes leave the previous successful result untouched. Unknown
+    directories and symlinks are never treated as disposable result bundles.
+    Git history retains the provenance of previously committed generations.
+    """
+    for candidate in parent.glob("run-*"):
+        if candidate.name == current or candidate.is_symlink():
+            continue
+        manifest = candidate / "manifest.json"
+        if (
+            not candidate.is_dir()
+            or not manifest.is_file()
+            or manifest.is_symlink()
+        ):
+            continue
+        try:
+            metadata = json.loads(manifest.read_text())
+        except (OSError, json.JSONDecodeError):
+            continue
+        if isinstance(metadata, dict) and metadata.get("example") == example_id:
+            shutil.rmtree(candidate)
 
 
 def selected_changed(configs, base, root=ROOT):

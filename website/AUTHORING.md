@@ -14,8 +14,10 @@ python scripts/docs_examples.py refresh gpu-coagulation
 
 The CUDA example requires CUDA and never falls back to CPU. A refresh runs in
 a fresh kernel with temporary working storage, captures figures and outputs,
-and saves a complete successful generation. A failed run preserves previous
-results. Review and commit the result bundle together with the script change.
+and saves a complete successful generation. After success, superseded
+generations for that example are removed; retain only the current final bundle
+in the checkout. Git history preserves earlier committed provenance. A failed
+run preserves the previous successful bundle. Review and commit the result bundle together with the script change.
 Save the displayed figures and text, not simulation-state dumps. Small numeric
 series for point, line or bar plots may accompany a downloadable script. Do not
 publish full particle states, checkpoint arrays, heatmap/image matrices, raw

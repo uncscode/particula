@@ -269,7 +269,7 @@ def test_coag_same_sign_repulsive():
 
     All charges identical, so the interpolator is consistent
     with direct — no bleed problem.  Kernel values are
-    ~11 orders of magnitude below Brownian baseline. Small
+    strongly suppressed relative to Brownian baseline. Small
     rtol/atol is used because kernels are near machine precision.
     """
     results = _run_coag_scenario(
@@ -290,7 +290,29 @@ def test_coag_same_sign_repulsive():
     k_neutral = results["direct_kernels"]["neutral (0,0) Brownian"]
     k_interp = results["k_interp_50_100"]
 
-    assert k_repulsive < k_neutral * 1e-8
+    from particula.util.constants import (
+        BOLTZMANN_CONSTANT,
+        ELECTRIC_PERMITTIVITY,
+        ELEMENTARY_CHARGE_VALUE,
+    )
+
+    # Independent charged flux limits replace the old arbitrary suppression
+    # threshold, which encoded the inverted Coulomb normalization.
+    phi = (
+        -36
+        * ELEMENTARY_CHARGE_VALUE**2
+        / (
+            4
+            * np.pi
+            * ELECTRIC_PERMITTIVITY
+            * 150e-9
+            * BOLTZMANN_CONSTANT
+            * TEMPERATURE
+        )
+    )
+    kinetic = np.exp(phi)
+    continuum = phi / -np.expm1(-phi)
+    assert kinetic < k_repulsive / k_neutral < continuum
     # Allow a small tolerance because kernels are ~1e-24 to 1e-23 in this case.
     npt.assert_allclose(
         k_interp,

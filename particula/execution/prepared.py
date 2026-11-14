@@ -277,9 +277,9 @@ class PreparedSimulation:
                         6: "seed cohort lineage invariant violated",
                         7: (
                             "atmospheric coagulation requires valid unit ions "
-                            "at 298.15 K and 101325 Pa"
+                            "and a supported model environment"
                         ),
-                        8: "LF2013 attachment rate is unsupported",
+                        8: "ion attachment rate is unsupported",
                     }
                     if failure in messages:
                         raise ValueError(messages[failure])

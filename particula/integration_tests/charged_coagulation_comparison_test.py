@@ -230,7 +230,9 @@ def test_neutral_ions_brownian_baseline():
 
     _assert_conservation(results)
     assert results["ion_calcite_mergers"] > 0
-    assert results["calcite_calcite_mergers"] > 0
+    # Neutral attachments do not neutralize the mutually repelling calcite.
+    # Correct donor orientation removes the old artificial ion-mediated chains.
+    assert results["calcite_calcite_mergers"] == 0
 
 
 def test_opposite_sign_ions_direct_kernel():

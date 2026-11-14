@@ -1,8 +1,8 @@
 # %% [markdown]
-# # Two million charged particles across sixteen environments
+# # Charged aerosols and ions across sixteen environments
 #
-# This CUDA example starts with **2,097,152 active resolved particles**:
-# 16 conditions × 1,024 independent boxes × 128 particles. All boxes remain
+# This CUDA example starts with **2,621,440 active resolved particles**:
+# 16 conditions × 1,024 independent boxes × (128 aerosols + 16 positive + 16 negative ions). All boxes remain
 # resident together. Each particle has its own material masses and integer
 # charge; its initial multiplicity is one. Boxes are well mixed, with no
 # positions, electric fields or exchange between boxes.
@@ -15,8 +15,8 @@
 # dense aerosol. All physical parameters here are demonstration assumptions.
 #
 # Water condensation/evaporation acts first, followed by charge-dependent
-# Brownian coagulation. A captured schedule advances 1,000 steps of 1 µs,
-# totaling 1 ms. This resolves fast water-growth transients while making
+# Brownian coagulation. A captured schedule advances 3,000 steps of 1 µs,
+# totaling 3 ms. This resolves fast water-growth transients while making
 # comparatively rare collisions visible across a large population. It is
 # not a long-term atmospheric evolution or a CPU/GPU speed comparison.
 
@@ -29,9 +29,29 @@ from scripts.gpu_studies.environment_sweep import (
     EnvironmentSweep,
     run_environment_sweep,
 )
+from scripts.gpu_studies.population_figures import (
+    describe_population,
+    ion_figures,
+    population_figures,
+)
 
 # %% [markdown]
 # ## Physical model and limitations
+#
+# Each box starts with 16 ions of each sign (6.25 × 10¹² m⁻³ each). A source
+# supplies 10¹⁴ ion pairs m⁻³ s⁻¹. This dense laboratory-style population is
+# chosen to expose millisecond dynamics, not to represent ambient ion levels.
+# Ion diameter is 0.5 nm; positive/negative masses are 150/90 u. Reference
+# mobilities are illustrative 1.4/1.9 × 10⁻⁴ m² V⁻¹ s⁻¹ at 298.15 K,
+# 1 atm, scaled as sqrt(T/298.15) × 101325/P. Ion friction is e/mobility.
+# The Coulomb transition approximation omits image forces, trapping, hydration
+# and ion chemistry. The explicitly fixed recombination coefficient is
+# 1.7 × 10⁻¹² m³ s⁻¹; its T/P dependence is not modeled. Neutral products
+# are exported every ten steps into a conserved mass ledger. Free ions and
+# neutral products do not take up water; ion material remains nonvolatile.
+#
+# The aerosol spectra and merger plots exclude free ions and neutral products.
+# Separate ion plots distinguish attachment, recombination and source events.
 #
 # Dry radii follow a clipped lognormal distribution: geometric mean 35 nm,
 # geometric standard deviation 1.6, bounds 15–150 nm. Dry density is
@@ -40,7 +60,7 @@ from scripts.gpu_studies.environment_sweep import (
 # The κ-water activity model uses illustrative dry κ = 0.3, with Kelvin
 # curvature and Buck saturation vapor pressure. Every four initial particles
 # carry charges −1, 0, 0, +1 elementary charges. Collisions add charge and
-# both material masses; there is no free-ion charging source in this example.
+# all material masses. Explicit ions attach, transfer charge and recombine.
 #
 # Vapor diffusivity is held at **2 × 10⁻⁵ m² s⁻¹** across conditions. The
 # prepared interface accepts a species constant, not a per-box diffusion
@@ -52,14 +72,14 @@ from scripts.gpu_studies.environment_sweep import (
 #
 # The charged hard-sphere model uses Coulomb-modified Brownian collision
 # rates. No empirical ion-attachment fit is extrapolated to these conditions.
-# The separate [Lucky Few example](gpu_lucky_few.py) includes explicit ions
-# at its attachment model's fixed reference conditions.
+# The [Lucky Few example](gpu_lucky_few.py) retains LF2013 at its fixed
+# reference conditions. This study selects the separate mobility model.
 
 
 # %%
 def run_example():
-    """Require CUDA, check closed budgets and plot all sixteen conditions."""
-    report, final = run_environment_sweep(EnvironmentSweep())
+    """Require CUDA, check source/export budgets and plot all sixteen conditions."""
+    report, final = run_environment_sweep(EnvironmentSweep(ions=True))
     del final
     history = report["history"]
     grid = np.array(report["conditions"])
@@ -97,7 +117,7 @@ def run_example():
     ax.invert_yaxis()
     ax.set_xlim(0, max(mergers.max() * 1.1, 1))
     ax.set(
-        xlabel="Accepted mergers in 1 ms",
+        xlabel="Accepted mergers in 3 ms",
         title="Rare collisions across 131,072 initial particles per condition",
     )
     ax.bar_label(ax.containers[0], fontsize=8)
@@ -121,15 +141,56 @@ def run_example():
     print(
         "Counts are one stochastic realization; differences are not significance tests."
     )
+    labels = [
+        f"{t:.2f} K · {p / 1000:g} kPa · RH {rh:.0%}" for t, p, rh in grid
+    ]
+    population_figures(report, labels, time_scale=1000, time_unit="ms")
+    describe_population(report, labels)
+    ion_figures(report, labels)
     return report
 
 
 # %% [markdown]
-# ## Read the result
+# ## Interpret the dynamics
+#
+# The overview separates bulk size growth from the much rarer mergers.
+# Water uptake changes particle diameter without changing particle number.
+# Coagulation reduces number, moves dry and wet material into larger particles,
+# and combines charges. Thus number lost equals accepted mergers here; it is
+# **not material lost from the box**. There are no deposition or dilution sinks.
+#
+# Each size-spectrum panel follows one environment. The ordinate is
+# dN/(N₀ dlog₁₀D), with volume-equivalent diameter D. Integrating over log₁₀D
+# yields the fraction of initial particles remaining, so normalization does
+# not hide coagulation loss. Early diagnostic times resolve rapid water uptake;
+# later curves show whether it is approaching a plateau.
+#
+# The charge overview gives fractions of the current population; the detailed
+# panels instead show absolute changes in each charge class. The latter make
+# rare neutralization and multiply charged particles visible even when the
+# bulk fractions appear flat. Aerosol charge can change through attachment;
+# total aerosol-plus-ion charge is conserved exactly.
+#
+# Collision-rate values are averages over diagnostic intervals, not instantaneous
+# rates or exact collision times. Small event counts create visible fluctuations.
+# The bars retain ascending temperature, pressure and initial-humidity order,
+# rather than sorting by the noisy outcomes. The printed interpretation reports
+# measured size and count changes and identifies observed extrema without
+# treating their ranking as a significance test.
+#
+# At higher RH, this model supplies a larger water reservoir and equilibrium
+# water content. Read the early rise and later plateau together: extending the
+# duration can add collisions after most water growth has already occurred.
+# Constant diffusivity and surface tension remain approximations. A dry
+# [altitude and high-pressure scan](gpu_dry_environment_sweep.py) separately
+# explores the much wider temperature/pressure domain without extrapolating
+# this liquid-water treatment into the mesopause.
+#
+# ## Numerical evidence and limits
 #
 # The water curves distinguish evaporation, uptake and finite-time response.
 # Each bar counts actual accepted mergers, inferred from the loss of resolved
-# particles in this closed system. Each condition contains 1,024 independent
+# aerosols in this system. Each condition contains 1,024 independent
 # boxes, but the bars are single-realization totals, without confidence
 # intervals. They do not establish a statistically resolved environmental
 # effect or charge enhancement relative to a neutral control.
@@ -141,7 +202,7 @@ def run_example():
 # tolerances), compare CPU/CUDA condensation, and check κ-Köhler equilibrium
 # against an independently written expression. Those tests qualify water
 # integration; they do not establish stochastic convergence of the collision
-# counts. The 1 ms endpoint need not be equilibrium for every particle.
+# counts. The 3 ms endpoint need not be equilibrium for every particle.
 #
 # Preparation and synchronized stepping timings exclude Python construction,
 # diagnostic reductions, state download and plotting. The downloadable ZIP

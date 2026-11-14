@@ -316,7 +316,7 @@ def _charged(
     diffusive_knudsen = (
         np.sqrt(constants.BOLTZMANN_CONSTANT * temperature * reduced_mass)
         / reduced_friction
-    ) / ((radius_i + radius_j) * continuum / kinetic)
+    ) / ((radius_i + radius_j) * kinetic / continuum)
     numerator = (
         4 * np.pi * diffusive_knudsen**2
         + 25.836 * diffusive_knudsen**3

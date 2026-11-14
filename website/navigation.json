@@ -568,6 +568,10 @@
                 "slug": "examples/gpu/prepared/gpu_environment_sweep"
               },
               {
+                "label": "Ground to mesopause and high pressure",
+                "slug": "examples/gpu/prepared/gpu_dry_environment_sweep"
+              },
+              {
                 "label": "64 heterogeneous CUDA boxes",
                 "slug": "examples/gpu/prepared/gpu_prepared_multibox"
               },
