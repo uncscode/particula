@@ -307,3 +307,9 @@ The extracted multibox ZIP passed the full 196,608-active-particle refined
 CUDA study using bundled helpers; the extracted report ZIP used its bundled JSON.
 Wheel/sdist documentation, isolated installations and offline rebuild passed.
 The final PR includes all phased commits; no merge or release is authorized.
+
+Publication storage policy clarified by the user: retain rendered graphs and
+displayed text; small point/line/bar datasets may accompany scripts. Exclude
+full simulation states, image/heatmap arrays and unused diagnostic records.
+The campaign download is reduced from roughly 912 kB to 34 kB through an
+explicit plotted-field allowlist, without changing scientific validation.

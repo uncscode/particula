@@ -16,7 +16,11 @@ The CUDA example requires CUDA and never falls back to CPU. A refresh runs in
 a fresh kernel with temporary working storage, captures figures and outputs,
 and saves a complete successful generation. A failed run preserves previous
 results. Review and commit the result bundle together with the script change.
-Keep large raw data outside these publication bundles.
+Save the displayed figures and text, not simulation-state dumps. Small numeric
+series for point, line or bar plots may accompany a downloadable script. Do not
+publish full particle states, checkpoint arrays, heatmap/image matrices, raw
+trajectories or unused validation diagnostics. Regenerate those by running the
+script. GPU campaign export uses an explicit allowlist of plotted summaries.
 
 ## Validate changes
 

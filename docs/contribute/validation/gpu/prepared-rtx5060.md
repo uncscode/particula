@@ -19,8 +19,11 @@ does not authorize a release.
   input-state hash, hardware/runtime information and dirty-tree indicator.
 
 The [downloadable scaling report](../../../examples/gpu/prepared/gpu_scaling_results.py)
-retains exact samples and compact provenance. Large raw histories, profiler
-traces and subprocess logs remain local artifacts rather than repository files.
+contains only small point/line/bar series and displayed provenance text (about
+34 kB). Full timing repetitions, validation diagnostics, raw histories, profiler
+traces and subprocess logs remain local artifacts. Particle states and image
+arrays are not included in downloadable data; rerun the scripts to regenerate
+them.
 
 ## Reproduce the campaign
 
@@ -85,7 +88,7 @@ three times faster for a fresh run. Pure dilution illustrates the opposite
 end-to-end tradeoff: its very short device computation does not repay preparation
 and transfer costs in this three-step run. Keeping state resident matters.
 These ratios describe the current implementations and workloads, not universal
-GPU speedups. The downloadable report preserves every sample and its spread.
+GPU speedups. The downloadable report keeps the plotted median and minimum–maximum spread.
 
 For one Brownian step at 16,384 particles per box, the retained previous CUDA
 implementation measured 161.648 s and prepared CUDA 0.1378 s (about 1,173 times
@@ -184,3 +187,8 @@ methodology follow the version-matched
   CUDA study outside the checkout, with imports verified to resolve to the
   extracted helper files. An initial externally terminated run was not accepted
   as evidence; the independently completed retry exited successfully.
+
+Publication follow-up: the data exporter now selects only the 78 plotted timing
+series, their displayed cost/memory summaries and the one small distribution
+line. All 104 jobs still pass the same pre-publication gates; raw repetitions
+and detailed scientific records are validated locally and omitted from downloads.

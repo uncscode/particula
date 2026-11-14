@@ -2,7 +2,8 @@
 # # Measured CUDA scaling on an RTX 5060
 #
 # This CPU plotting script reads saved, qualified measurements. It does not
-# rerun the GPU campaign. The underlying experiment uses float64, three
+# rerun the GPU campaign. Its small data file contains only plotted point/line
+# summaries and the provenance text shown below, not model states or image arrays. The underlying experiment uses float64, three
 # warmups, seven identical-state timing repetitions, and seven independent
 # fresh runs including setup and download. Brownian legacy timings cover
 # resident work only. Every GPU mode uses actual CUDA.
@@ -49,7 +50,11 @@ def read_results():
     if path is None:
         raise FileNotFoundError("Download the ZIP containing rtx5060.json")
     report = json.loads(path.read_text())
-    if not report["qualified"] or report["job_count"] != 104:
+    if (
+        report["schema_version"] != 2
+        or not report["qualified"]
+        or report["job_count"] != 104
+    ):
         raise ValueError("The complete 104-job campaign must be qualified")
     return report
 
@@ -99,7 +104,7 @@ def curve(ax, rows, mode, x_field, *, timing="resident", throughput=False):
 #
 # The first row holds the box count at one. The second row holds capacity at
 # 1,024 slots per box. Throughput uses **initial active particles × timesteps**;
-# evolving counts and occupancy are recorded separately in the source data.
+# the small saved series retains only values needed by these graphs.
 # Comparing one huge box with many smaller boxes changes execution geometry,
 # so neither arrangement is a universal predictor for other physics.
 
@@ -274,11 +279,11 @@ def cost_and_science_figures(rows):
 def run_example():
     """Render committed measurements and print their exact provenance."""
     report = read_results()
-    rows = [r for r in report["reports"] if r["mode"] != "evolution"]
+    rows = report["reports"]
     scaling_figures(rows)
     brownian_figures(rows)
     cost_and_science_figures(rows)
-    gpu = next(r for r in rows if r["mode"] == "captured")
+    gpu = report["provenance"]
     print("GPU:", gpu["gpu_name"], "Warp:", gpu["warp"])
     print("CPU:", gpu["cpu_model"])
     print("Campaign start:", report["campaign_started_at"])
@@ -288,9 +293,9 @@ def run_example():
     print("All direct/prepared/captured/legacy CUDA states match exactly.")
     print(
         "Full-array CPU/CUDA parity cases:",
-        len(report["cpu_cuda_parity"]["cases"]),
+        report["cpu_cuda_parity_case_count"],
     )
-    print("Memory method:", gpu["memory"]["method"])
+    print("Memory method:", report["memory_method"])
     plt.show()
     return report
 
