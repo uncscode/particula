@@ -8,7 +8,8 @@ study and does not extrapolate LF2013 attachment rates.
 
 ## Model and fixed workload
 
-The source revision is `4a36139cd01aa18fe10b48abad86d7225026c758`.
+The first full-run source revision is
+`4a36139cd01aa18fe10b48abad86d7225026c758`.
 The default workload contains 2,097,152 initially active resolved particles,
 all resident simultaneously, in 16,384 independent well-mixed boxes. Each
 condition has 1024 boxes of 128 unit-count particles, at initial number
@@ -35,7 +36,7 @@ material properties or an altitude trajectory.
 
 Helper SHA256:
 `bdec86572aa3185c517e17205a176669bedf5a433a5c1b9a51ffa9d1bc8d80a5`.
-Percent-source SHA256:
+First full-run percent-source SHA256:
 `9390b6c8d061ea2678b191ada927856a07300ac683a65d3999eafbdfa8a32f2f`.
 
 ## Numerical qualification
@@ -101,15 +102,50 @@ match the recorded revision above. Installed distribution metadata remains
 
 These are single-realization counts, not significance tests. Actual figure
 inspection found crowded pressure labels in the first collision chart.
-The revised source uses horizontal bars; a second complete refresh is pending
-with identical physics, workload and seed. The first generation is retained.
+The revised source uses horizontal bars. The final complete generation is
+`run-20261114T151140530086Z`, from revision
+`9a145b1e29c6e1fccd59e24ef4426f5c3d6ace5b`. It completed in 842.41 s overall,
+with 836.71 s synchronized stepping and 1.67 s preparation/capture. Every
+printed scientific result matches the first run exactly, and the water-growth
+PNG is byte-identical. This is fixed-seed reproducibility, not an independent
+statistical replicate. Both actual final figures were reviewed (the unchanged
+water figure by byte equality to its inspected predecessor); all sixteen
+collision labels are readable. The first generation is retained.
+
+Final percent-source SHA256:
+`5ed3c6bc71e4b0dfb083a4d005d7d52093fb13b780c844bdf979be7ef9838f6b`.
+The helper hash is unchanged. Both manifests record a clean package and the
+same library source hash; no library code changed for this additional study.
 
 ## Publication checks
 
 The documentation tooling tests (25 Python tests and three Node tests),
-documentation structure check and changed-file Ruff checks passed. The first saved
-bundle passed integrity checks and the site built 456 pages / 586 HTML files
-with zero link errors. Final plot-refresh integrity and extracted ZIP execution
-remain pending. All nine study tests passed again on the final helper source. The library itself is unchanged by this example;
-its broader validation remains in the
-[charged coagulation record](charged-coagulation.md).
+documentation structure check and changed-file Ruff checks passed. All nine
+final CPU/CUDA study tests passed in 12.42 s. The refinement fixture uses
+128 particles per box, matching production geometry; it checks the entire
+plotted water-mass time series as well as individual final particle masses.
+The final site build produced 456 pages / 586 HTML files with zero link errors.
+
+Saved executed source, maintained source, built Python download and ZIP source
+match byte for byte. Both helper files match their ZIP entries. The extracted
+ZIP ran a separate 256-particle CUDA smoke test outside the checkout, asserting
+that imports came from its own bundled helper and checking the final time,
+particle count and conservation. This small portability test is separate from
+the complete two-million-particle publication runs above.
+
+The first sandboxed changed-example validator stalled before launching its
+example kernel and was terminated. The host rerun completed successfully:
+
+```bash
+WARP_CACHE_PATH=/tmp/particula-charged-warp .venv/bin/python -u \
+  scripts/docs_examples.py check --changed \
+  --base 4fefc50c3d979713cb5f926ad613d3fb2d835617
+```
+
+All 54 CPU-policy examples passed, all saved bundles were current, and
+CUDA/long policies were explicitly skipped by this validator. The two full
+CUDA refreshes above supply this example's execution evidence. No sandbox
+execution completion is claimed. The broader unchanged library validation is
+in the [charged coagulation record](charged-coagulation.md). Hosted CI is
+tracked on [PR #1650](https://github.com/uncscode/particula/pull/1650/checks);
+merge and release are not authorized by this record.

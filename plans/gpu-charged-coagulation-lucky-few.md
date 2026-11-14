@@ -381,6 +381,14 @@ There is no altitude trajectory, ion attachment or humidity replenishment.
 - [x] Small CUDA pilot: finite nonnegative state and per-box mass/charge budgets.
 - [x] Choose 0.001 s / 1000 steps after full-layout performance and timestep pilots.
 - [x] Validate water-growth timestep sensitivity and independent equilibrium law (nine tests passed on CPU/CUDA).
-- [ ] Run the complete 2,097,152-particle workload and inspect saved figures.
-- [ ] Register narrated percent source, test downloadable helpers and build site.
-- [ ] Push final evidence and follow final-commit CI.
+- [x] Run the complete 2,097,152-particle workload and inspect saved figures.
+- [x] Register narrated percent source, test downloadable helpers and build site.
+- Final push and hosted validation use the live [PR CI gate](https://github.com/uncscode/particula/pull/1650/checks).
+
+Two complete runs retained identical printed scientific results: 124 mergers,
+2,097,028 final particles, exact charge conservation and a maximum per-box
+species-mass residual of 1.688e-14. Each complete refresh took about 14 minutes.
+The second fixes crowded chart labels without changing physics or seed.
+Nine strengthened CPU/CUDA tests passed, and the extracted ZIP passed a
+separate CUDA smoke check. Details and provenance are in the
+[environmental validation record](../docs/contribute/validation/gpu/environment-sweep.md).
