@@ -654,5 +654,14 @@
     "timeout": 600,
     "inputs": [],
     "invoke": "result = run_example()"
+  },
+  "gpu-ion-balance": {
+    "title": "Explicit atmospheric ion balance on CUDA",
+    "source": "docs/examples/gpu/prepared/gpu_ion_balance.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 1200,
+    "inputs": [],
+    "invoke": "result = run_example()"
   }
 }
