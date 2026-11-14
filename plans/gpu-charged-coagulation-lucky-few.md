@@ -424,8 +424,11 @@ longer humidity study with active coagulation and explicit ions.
 - [x] Corrected Lucky Few qualification: all twenty predeclared checks passed;
   all four doubled-capacity time/outcome series match exactly. Retain the
   frozen specification and complete comparison record.
-- [ ] Execute the final humidity CUDA study and corrected Lucky Few
-  publication; inspect and interpret the final results.
+- [x] Complete and inspect corrected Lucky Few publication: 163 no-ion,
+  152 q=2 and 170 q=10 successes out of 8192 under either coefficient
+  assumption; all resolved. Individual differences include zero. Save the
+  final figure, interpretation and independently checked download.
+- [ ] Complete the final humidity CUDA study; inspect and interpret its results.
 - [ ] Run relevant regression suites, documentation build, push and check PR CI.
 
 Physical-limit validation uncovered an inherited inversion of Gc/Gk in the

@@ -27,15 +27,47 @@ observations. The complete specification, twenty comparisons, case summaries
 and capacity checks are saved in
 `docs/data/gpu/charged-survival-corrected-qualification.json`.
 
-The corrected five-case publication run, with its separate root seed 321,
-is now running. Its previous saved numerical results are not substituted for
-the pending refresh. The independently extracted download already passed all
-five small CUDA smoke cases with eight boxes and a 100 s horizon; source and
-helper bytes match. That smoke test checks execution and inventory/lineage
-bookkeeping, not survival precision. The current package regression and
-environmental qualification are recorded in
+The current package regression and environmental qualification are recorded in
 [environmental validation](environment-sweep.md). Concurrent CUDA jobs mean
 campaign timings are not standalone performance measurements.
+
+## Completed corrected-model publication
+
+The five-case CUDA publication used the separate root seed 321 and 8192 boxes
+per case. Its final generation is `run-20261114T203855083494Z`, with revision
+`799e75d92` and source/helper hashes in the manifest. The previous generation
+was removed after this successful refresh; only the final output remains.
+
+| Ion source [pairs cm^-3 s^-1] | Omitted coefficient assumption | Reached | Captured | Success fraction | Exact 95% interval |
+| --- | --- | ---: | ---: | ---: | --- |
+| 0 | Strict lookup, no ions | 163 | 8029 | 0.01990 | [0.01698, 0.02316] |
+| 2 | 0 m³/s | 152 | 8040 | 0.01855 | [0.01574, 0.02172] |
+| 2 | 1e-15 m³/s | 152 | 8040 | 0.01855 | [0.01574, 0.02172] |
+| 10 | 0 m³/s | 170 | 8022 | 0.02075 | [0.01778, 0.02408] |
+| 10 | 1e-15 m³/s | 170 | 8022 | 0.02075 | [0.01778, 0.02408] |
+
+All lineages resolved by 3730–3750 s. About 98% were captured before reaching
+50 nm; the cumulative-success curves rise only near the growth time of the
+surviving minority. The q=2 point estimate is below the no-ion control and the
+q=10 estimate is above it. However, the individual conservative 95%
+ion-minus-control intervals are [-0.00827, 0.00559] for q=2 and
+[-0.00626, 0.00797] for q=10 under either omission assumption. Each includes
+zero, so this realization does not resolve an ion effect. Matching outcomes
+under both coefficient assumptions do not establish identical probabilities or
+turn those assumptions into guaranteed survival bounds. The one-percentage-point
+numerical criterion does not establish smaller effects.
+
+Every box conserved exact net charge; maximum species-mass residuals were
+about 2.89e-15. Observed peak occupancy was 33, 35 and 37 slots for q=0, 2 and
+10, respectively, against capacity 128. The final three-panel figure was
+visually inspected; source/helper/figure hashes match, with one generation
+retained. The complete refresh took 2030.59 s while the humidity study also ran
+on the GPU; this is execution provenance, not a throughput comparison.
+
+The independently extracted download passed all five small CUDA smoke cases
+with eight boxes and a 100 s horizon; Python source and helper bytes match.
+That smoke test checks execution and inventory/lineage bookkeeping, not
+survival precision.
 
 ## Historical development checkpoints
 
