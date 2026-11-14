@@ -371,14 +371,10 @@ class SurfaceStrategyMolar(SurfaceStrategy):
             mass_concentration,
             self.molar_mass,  # type: ignore
         )
-        return _weighted_average_by_phase(
-            np.broadcast_to(
-                np.asarray(self.surface_tension, dtype=np.float64),
-                mole_frac.shape,
-            ),
-            mole_frac,
-            self.phase_index,
+        tensions, weights = np.broadcast_arrays(
+            np.asarray(self.surface_tension, dtype=np.float64), mole_frac
         )
+        return _weighted_average_by_phase(tensions, weights, self.phase_index)
 
     def get_density(self) -> Union[float, NDArray[np.float64]]:
         """Get density of the species mixture.
@@ -444,14 +440,10 @@ class SurfaceStrategyMass(SurfaceStrategy):
             return np.asarray(self.surface_tension, dtype=np.float64)
 
         mass_fraction = get_mass_fraction_from_mass(mass_concentration)
-        return _weighted_average_by_phase(
-            np.broadcast_to(
-                np.asarray(self.surface_tension, dtype=np.float64),
-                mass_fraction.shape,
-            ),
-            mass_fraction,
-            self.phase_index,
+        tensions, weights = np.broadcast_arrays(
+            np.asarray(self.surface_tension, dtype=np.float64), mass_fraction
         )
+        return _weighted_average_by_phase(tensions, weights, self.phase_index)
 
     def get_density(self) -> Union[float, NDArray[np.float64]]:
         """Get density of the species mixture.
@@ -520,14 +512,10 @@ class SurfaceStrategyVolume(SurfaceStrategy):
             mass_concentration,
             self.density,  # type: ignore
         )
-        return _weighted_average_by_phase(
-            np.broadcast_to(
-                np.asarray(self.surface_tension, dtype=np.float64),
-                vol_frac.shape,
-            ),
-            vol_frac,
-            self.phase_index,
+        tensions, weights = np.broadcast_arrays(
+            np.asarray(self.surface_tension, dtype=np.float64), vol_frac
         )
+        return _weighted_average_by_phase(tensions, weights, self.phase_index)
 
     def get_density(self) -> Union[float, NDArray[np.float64]]:
         """Get density of the species mixture.
