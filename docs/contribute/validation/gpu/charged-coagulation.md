@@ -231,3 +231,64 @@ lineages, with maximum mass residual 4.67e-15. The exact 95% success interval
 is broad (0.003807–0.108371); this is not a converged production estimate.
 The pending timestep/capacity/ensemble work and ion-domain decision remain in
 the plan. No ion-effect conclusion follows from this q=0 pilot.
+
+
+## Neutral growth and survival uncertainty controls
+
+Host CUDA checks at library revision `5aa5b47ff` used the frozen physical
+parameters in the survival helper. With background particles disabled, four
+seeds per run all reached 50 nm at each of dt = 2, 1 and 0.5 s. First passage
+was first observed at 1390 s in all three runs, using 10 s diagnostic spacing.
+This satisfies the predeclared crossing-time spread criterion of the larger
+of 10 s and 1% of the finest-step crossing time. It does not resolve passage
+time within a diagnostic interval. Maximum mass residuals were 2.45e-15,
+2.23e-15 and 3.45e-15, respectively.
+
+Survival timestep qualification uses an absolute probability tolerance of
+0.01, fixed before the 2048-box comparison. Each run has one initial seed per
+independent box. The exact intervals follow [Clopper and Pearson (1934)](https://doi.org/10.1093/biomet/26.4.404).
+Two exact 97.5% binomial intervals give at least 95% joint
+coverage by the union bound; subtracting their opposite endpoints gives a
+conservative interval for the probability difference. This does not assume
+independence between runs sharing random streams. The entire difference
+interval must lie inside [-0.01, 0.01] to establish the declared tolerance.
+An interval that crosses a tolerance boundary is inconclusive, even when
+point estimates agree. Any larger confirmatory ensemble must be declared
+before its outcomes are examined; pilot estimates alone are not a stopping
+rule for nominal confidence coverage.
+
+All six hosted workflows passed on `5aa5b47ff`: test, linting, documentation,
+assistant plugins, PyPI packaging and Conda feedstock checks. These are
+validation results, not a package release or merge.
+
+
+The 2048-box pilot gave 39 reached at dt=1 s and 34 at dt=0.5 s, with no
+unresolved lineages. The conservative difference interval is
+[-0.016076, 0.011208], so the pilot does **not** resolve the declared tolerance.
+A fixed confirmation is declared before execution: 8192 independent boxes
+per timestep, new root seed 318, dt=1 and 0.5 s, all physical defaults and
+20,000 s duration unchanged. Its intervals will be assessed once, separately
+from the pilot; neither pooling nor repeated nominal-95% stopping is used.
+
+
+| Neutral pilot | Reached / 2048 | Maximum mass residual | Synchronized stepping |
+| --- | --- | --- | --- |
+| dt=1 s, capacity 128 | 39 | 6.22e-15 | 205.7 s |
+| dt=0.5 s, capacity 128 | 34 | 5.56e-15 | 407.8 s |
+| dt=1 s, capacity 256 | 39 | 6.22e-15 | 304.0 s |
+
+The capacity comparison preserves the complete cohort outcome time series
+exactly; maximum observed occupancy was 33 in all runs. These single-run
+stepping times exclude preparation, explicit gas forcing and analysis. They
+are workload observations on RTX 5060, not a matched CPU speedup or a repeated
+performance benchmark. Ion-production capacity and cleanup sensitivity are
+still outstanding.
+
+
+The updated interval helper passed all 21 study-helper tests on host CPU/CUDA
+(`.venv/bin/pytest scripts/tests/lucky_few_study_test.py -q -Werror --no-cov`).
+Tests cover exact binomial endpoints, sign reversal of difference intervals,
+invalid confidence levels and controlled condensation with inventory closure.
+Ruff and formatting passed; documentation structure had zero errors and the
+website built 453 pages with no link errors. The full-package result above
+still predates periodic cleanup; a final complete run remains required.

@@ -169,8 +169,14 @@ Synchronized stepping took 36.1 s on RTX 5060, separate from 9.34 s preparation
 and 0.382 s gas forcing; these are one-run observations, not a speedup benchmark.
 The 125-test combined helper/ion/lifecycle suite passed on CPU and CUDA.
 
-Next independent work: neutral timestep and capacity sensitivity, larger
-ensembles, and a no-background growth control through the full 50 nm threshold.
+The no-background growth control reached 50 nm for all four seeds at dt =
+2, 1 and 0.5 s, first observed at 1390 s in each run (10 s observation spacing).
+Maximum mass residual was below 3.45e-15. The predeclared timing criterion passed.
+
+The 2048-box neutral timestep/capacity pilot is complete. Its predeclared
+absolute probability tolerance is 0.01, assessed using a conservative 95%
+difference interval, not only point estimates. A larger confirmatory ensemble
+may be needed if this pilot cannot resolve that tolerance.
 Then the production ion cases require the outstanding omitted-rate choice.
 Keep the physical defaults fixed; do not tune a desired charging benefit.
 
@@ -183,3 +189,18 @@ Additional primary context for the final percent-cell narrative:
 - Robust metric for quantifying the importance of stochastic effects on
   nanoparticle growth (2018): https://doi.org/10.1038/s41598-018-32610-z.
   Distinguish discrete molecular growth from the continuous condensation used here.
+
+
+The 2048-box pilot gave 39 reached at dt=1 s and 34 at dt=0.5 s, with no
+unresolved lineages. The conservative difference interval is
+[-0.016076, 0.011208], so the pilot does **not** resolve the declared tolerance.
+A fixed confirmation is declared before execution: 8192 independent boxes
+per timestep, new root seed 318, dt=1 and 0.5 s, all physical defaults and
+20,000 s duration unchanged. Its intervals will be assessed once, separately
+from the pilot; neither pooling nor repeated nominal-95% stopping is used.
+
+
+Doubling capacity from 128 to 256 preserved the full neutral cohort time
+series exactly (39 reached, 2009 captured). All three pilot runs had mass
+residuals below 6.3e-15 and maximum observed occupancy 33. This establishes
+neutral capacity invariance for this workload, not the ion-production cases.

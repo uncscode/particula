@@ -216,20 +216,61 @@ def build_survival_case(config):
     return aerosol, process
 
 
-def success_interval(reached, total):
-    """Exact binomial 95% interval and a one-sided zero-event upper bound."""
+def _confidence_tail(confidence):
+    """Validate coverage and return the equal-tail probability."""
+    if (
+        isinstance(confidence, (bool, np.bool_))
+        or not np.isscalar(confidence)
+        or not np.isfinite(confidence)
+        or not 0 < confidence < 1
+    ):
+        raise ValueError("confidence must be finite and between zero and one")
+    return (1 - confidence) / 2
+
+
+def success_interval(reached, total, *, confidence=0.95):
+    """Exact binomial interval and a one-sided zero-event upper bound.
+
+    Confidence describes coverage of each interval separately. One initial
+    seed per independent box is required for the binomial interpretation.
+    Uses Clopper and Pearson (1934), doi:10.1093/biomet/26.4.404.
+    """
     if type(reached) is not int or type(total) is not int:
         raise ValueError("event counts must be integers")
     if total < 1 or not 0 <= reached <= total:
         raise ValueError("event counts require 0 <= reached <= total")
-    low = 0.0 if reached == 0 else beta.ppf(0.025, reached, total - reached + 1)
+    tail = _confidence_tail(confidence)
+    low = 0.0 if reached == 0 else beta.ppf(tail, reached, total - reached + 1)
     high = (
         1.0
         if reached == total
-        else beta.ppf(0.975, reached + 1, total - reached)
+        else beta.ppf(1 - tail, reached + 1, total - reached)
     )
-    zero_upper = -np.expm1(np.log(0.05) / total) if reached == 0 else None
+    zero_upper = (
+        -np.expm1(np.log(1 - confidence) / total) if reached == 0 else None
+    )
     return float(low), float(high), zero_upper
+
+
+def difference_interval(
+    first_reached, first_total, second_reached, second_total, *, confidence=0.95
+):
+    """Conservative interval for the second success probability minus first.
+
+    Two exact marginal intervals at (1 + confidence)/2 give at least the
+    requested joint coverage by the union bound. This remains valid when the
+    two runs share random streams; independence between runs is not assumed.
+    A convergence claim requires the entire difference interval, rather than
+    only its point estimate, to lie inside the predeclared tolerance.
+    """
+    joint = 1 - _confidence_tail(confidence)
+    low_a, high_a, _ = success_interval(
+        first_reached, first_total, confidence=joint
+    )
+    low_b, high_b, _ = success_interval(
+        second_reached, second_total, confidence=joint
+    )
+    return low_b - high_a, high_b - low_a
 
 
 def run_survival(config, *, device="cuda:0", capture=True):
