@@ -6,6 +6,8 @@ These results concern the implementation on this branch; no release is claimed.
 Sections retain chronological checkpoints. The latest charged numerical results
 are in [completed qualification](#completed-charged-survival-qualification);
 earlier pending-status notes describe their original checkpoints.
+The [complete publication run](#complete-lucky-few-publication-run) records
+the saved results for the [Lucky Few example](../../../examples/gpu/prepared/gpu_lucky_few.py).
 
 ## Implemented boundary
 
@@ -520,3 +522,45 @@ these timings are not performance comparisons. The publication workload uses
 a separate fixed root seed, 321, with the qualified default settings. Both
 coefficient assumptions remain explicit sensitivity cases, not bounds on
 survival probability or an empirical atmospheric validation.
+
+## Complete Lucky Few publication run
+
+The complete five-case CUDA refresh is
+`run-20261114T140715836273Z`, executed from clean source revision
+`4a550421e7c0f01f4f0e6d2e9a9a75e8648c4b9f` on the RTX 5060.
+It used 8192 boxes per case, root seed 321, and the qualified defaults.
+The saved source matches the maintained percent script byte for byte; both
+helper hashes match the manifest. The 300-DPI three-panel figure was visually
+reviewed with the actual five publication cases.
+
+| q [pairs cm^-3 s^-1] | Omitted coefficient [m^3/s] | Reached | Captured | Unresolved | Exact 95% success interval |
+| --- | --- | --- | --- | --- | --- |
+| 0 | strict; no ions | 163 | 8029 | 0 | [0.016984, 0.023159] |
+| 2 | 0 | 154 | 8038 | 0 | [0.015969, 0.021978] |
+| 2 | 1e-15 | 154 | 8038 | 0 | [0.015969, 0.021978] |
+| 10 | 0 | 163 | 8029 | 0 | [0.016984, 0.023159] |
+| 10 | 1e-15 | 163 | 8029 | 0 | [0.016984, 0.023159] |
+
+The conservative 95% ion-minus-control intervals include zero for every
+comparison. This run does not resolve an ion-production effect. Matching
+coefficient-case outcomes do not establish identical survival probabilities
+or mathematical bounds. These are illustrative finite-box results, not
+field-validated atmospheric predictions.
+
+All reported maximum mass residuals were 2.89e-15, exact charge checks passed,
+and observed peak occupancy was at most 37/128 slots. Final diagnostics were
+at 3710–3740 s, with no unresolved lineages. The complete refresh took
+975.98 s (about 16.3 minutes). Printed stepping times exclude
+diagnostic transfers, plotting and analysis; preparation timing begins after
+CPU initial-state construction. These are execution diagnostics, not a
+matched CPU/GPU speedup measurement.
+
+Final download checks compared the built Python and ZIP sources with the
+maintained source and both declared helpers byte for byte. The extracted ZIP
+passed all five small CUDA smoke cases outside the checkout with `PYTHONPATH`
+removed. The changed-example check passed; its CUDA policy skips are separate
+from the deliberate full CUDA refresh above. Website tests passed (3), and
+the final build produced 454 pages / 584 HTML documents / 270 API modules with
+zero link errors. Final hosted status is recorded on
+[PR #1650](https://github.com/uncscode/particula/pull/1650/checks), separately
+from local CUDA evidence.
