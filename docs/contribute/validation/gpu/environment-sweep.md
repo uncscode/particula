@@ -71,6 +71,7 @@ and dt=0.5/0.25 s. Every individual paired-box approximate 95% interval for
 the number-loss difference must lie within ±2 percentage points of initial
 number. All 19 conditions passed after the normalization correction.
 Intervals are individual, not a simultaneous 95% guarantee.
+The largest absolute interval endpoint was 1.4491 percentage points.
 
 The initial humidity pilot used 16 boxes per condition and seed 412. Halving
 dt from 1 to 0.5 microseconds over 3 ms changed water inventories by at most
@@ -91,6 +92,22 @@ interval or proof of asymptotic convergence. Reproduce the fixed checks with:
 ```
 
 Confirmation and full publication results will be recorded after completion.
+
+## Implementation checks
+
+The implementation at `54ad1a812` passed the host CPU/CUDA package suite:
+10,093 passed, 13 skipped, 57 deselected and one expected failure, with warnings
+treated as errors and 91.60% coverage. The skipped and deselected cases are
+not claimed as executed CUDA evidence. Independent charged continuum and
+ballistic limits supplement CPU/GPU parity; LF2013 default behavior is retained.
+
+The examples/tooling run passed 516 tests with one skip. Its isolated wheel
+installation test initially failed because the validation wrapper exported the
+checkout through `PYTHONPATH`. Rerunning the seven bundle tests without that
+override passed, including the wheel and offline source-distribution checks.
+Ruff lint/format, mypy (589 files) and documentation structure checks passed.
+The preliminary website build rendered 459 pages; final saved-result validation
+requires a new build after the publication runs finish.
 
 ## Diagnostics and interpretation boundaries
 

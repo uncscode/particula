@@ -11,11 +11,12 @@
 # of 70,000 and 101,325 Pa, and initial relative humidities of 40, 60, 80 and
 # 90%. These are controlled environments, **not an altitude trajectory**.
 # Each condition starts with the same sampled particle population. The box
-# volume keeps initial number concentration at 5 × 10¹³ m⁻³, an illustrative
+# volume keeps initial aerosol number concentration at 5 × 10¹³ m⁻³, an illustrative
 # dense aerosol. All physical parameters here are demonstration assumptions.
 #
-# Water condensation/evaporation acts first, followed by charge-dependent
-# Brownian coagulation. A captured schedule advances 3,000 steps of 1 µs,
+# Each step injects ion pairs, then applies water condensation/evaporation,
+# followed by charge-dependent Brownian coagulation and ion collisions.
+# A captured schedule advances 3,000 steps of 1 µs,
 # totaling 3 ms. This resolves fast water-growth transients while making
 # comparatively rare collisions visible across a large population. It is
 # not a long-term atmospheric evolution or a CPU/GPU speed comparison.
@@ -103,7 +104,7 @@ def run_example():
         )
         ax.legend(fontsize=8)
         ax.grid(alpha=0.2)
-    fig.suptitle("Closed water uptake · 2,097,152 initial charged particles")
+    fig.suptitle("Closed water uptake · 2,097,152 initial aerosols")
 
     fig, ax = plt.subplots(figsize=(10, 8), constrained_layout=True)
     mergers = counts[0] - counts[-1]
@@ -118,12 +119,12 @@ def run_example():
     ax.set_xlim(0, max(mergers.max() * 1.1, 1))
     ax.set(
         xlabel="Accepted mergers in 3 ms",
-        title="Rare collisions across 131,072 initial particles per condition",
+        title="Rare collisions across 131,072 initial aerosols per condition",
     )
     ax.bar_label(ax.containers[0], fontsize=8)
     print(f"Device: {report['device']}")
-    print(f"Initial active particles: {report['initial_particles']:,}")
-    print(f"Final active particles: {counts[-1].sum():,}")
+    print(f"Initial active aerosols + ions: {report['initial_particles']:,}")
+    print(f"Final active aerosols: {counts[-1].sum():,}")
     print(f"Total accepted mergers: {mergers.sum():,}")
     print(
         "Maximum per-box species-mass relative residual:",
@@ -171,6 +172,15 @@ def run_example():
 # bulk fractions appear flat. Aerosol charge can change through attachment;
 # total aerosol-plus-ion charge is conserved exactly.
 #
+# Read the ion histories alongside the charge panels. Attachment removes a
+# free ion and transfers its charge to an aerosol; recombination removes one
+# free ion of each sign and makes a neutral product. The source replenishes
+# both signs equally. Different positive and negative attachment totals can
+# therefore change aerosol net charge while the complete box stays neutral.
+# The illustrative negative-ion mobility is larger than the positive value,
+# but evolving aerosol charge and size also affect attachment. The plots
+# report the combined response, not a measurement of either mobility alone.
+#
 # Collision-rate values are averages over diagnostic intervals, not instantaneous
 # rates or exact collision times. Small event counts create visible fluctuations.
 # The bars retain ascending temperature, pressure and initial-humidity order,
@@ -207,7 +217,7 @@ def run_example():
 # Preparation and synchronized stepping timings exclude Python construction,
 # diagnostic reductions, state download and plotting. The downloadable ZIP
 # includes the helper; run `python example.py` in a compatible CUDA environment.
-# The full manual refresh takes minutes and is not executed by routine CI.
+# The full manual refresh can take hours and is not executed by routine CI.
 #
 # ## References
 #
