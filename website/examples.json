@@ -16,13 +16,13 @@
     "inputs": []
   },
   "gpu-coagulation": {
-    "title": "Direct GPU coagulation",
+    "title": "Direct CUDA coagulation",
     "source": "docs/examples/gpu/direct/gpu_coagulation_direct.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 300,
     "inputs": [],
-    "invoke": "result = run_example(device='cuda')\nprint('\\n'.join(result.output))"
+    "invoke": "result = run_publication()"
   },
   "theory-dns-fluid-and-particle-properties-comparison": {
     "title": "Dns Fluid And Particle Properties Comparison",
@@ -153,67 +153,69 @@
     "inputs": []
   },
   "examples-gpu-direct-gpu-complete-process-sequence": {
-    "title": "Gpu Complete Process Sequence",
+    "title": "CUDA Complete Process Sequence",
     "source": "docs/examples/gpu/direct/gpu_complete_process_sequence.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 1800,
     "inputs": [],
-    "invoke": "result = run_example(device='cuda')\nprint('\\n'.join(result.output) if hasattr(result, 'output') else 'CUDA example completed successfully')"
+    "invoke": "result = run_publication()"
   },
   "examples-gpu-direct-gpu-condensation-parity-walkthrough": {
-    "title": "Gpu Condensation Parity Walkthrough",
+    "title": "CUDA Condensation Parity Walkthrough",
     "source": "docs/examples/gpu/direct/gpu_condensation_parity_walkthrough.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 1800,
     "inputs": [],
-    "invoke": "result = run_example(device='cuda')\nprint('\\n'.join(result.output) if hasattr(result, 'output') else 'CUDA example completed successfully')"
+    "invoke": "result = run_publication()"
   },
   "examples-gpu-direct-gpu-direct-kernels-quick-start": {
-    "title": "Gpu Direct Kernels Quick Start",
+    "title": "CUDA Direct Kernels Quick Start",
     "source": "docs/examples/gpu/direct/gpu_direct_kernels_quick_start.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 1800,
     "inputs": [],
-    "invoke": "result = run_example(device='cuda')\nprint('\\n'.join(result.output) if hasattr(result, 'output') else 'CUDA example completed successfully')"
+    "invoke": "result = run_publication()"
   },
   "examples-gpu-direct-gpu-direct-nucleation": {
-    "title": "Gpu Direct Nucleation",
+    "title": "CUDA Direct Nucleation",
     "source": "docs/examples/gpu/direct/gpu_direct_nucleation.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 1800,
     "inputs": [],
-    "invoke": "result = run_example(device='cuda')\nprint('\\n'.join(result.output) if hasattr(result, 'output') else 'CUDA example completed successfully')"
+    "invoke": "result = run_publication()"
   },
   "examples-gpu-resident-gpu-resident-graph-capture": {
-    "title": "Gpu Resident Graph Capture",
+    "title": "CUDA Resident Graph Capture",
     "source": "docs/examples/gpu/resident/gpu_resident_graph_capture.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 1800,
-    "inputs": [],
-    "invoke": "result = run_example()\nprint('\\n'.join(result.output) if hasattr(result, 'output') else 'CUDA example completed successfully')"
+    "inputs": [
+      "docs/examples/gpu/resident/gpu_resident_multi_timestep.py"
+    ],
+    "invoke": "result = run_publication()"
   },
   "examples-gpu-resident-gpu-resident-multi-timestep": {
-    "title": "Gpu Resident Multi Timestep",
+    "title": "CUDA Resident Multi Timestep",
     "source": "docs/examples/gpu/resident/gpu_resident_multi_timestep.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 1800,
     "inputs": [],
-    "invoke": "result = run_example(device='cuda:0')\nprint('\\n'.join(result.output) if hasattr(result, 'output') else 'CUDA example completed successfully')"
+    "invoke": "result = run_publication()"
   },
   "examples-gpu-resident-gpu-resident-session": {
-    "title": "Gpu Resident Session",
+    "title": "CUDA Resident Session",
     "source": "docs/examples/gpu/resident/gpu_resident_session.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 1800,
     "inputs": [],
-    "invoke": "result = run_example(device='cuda:0')\nprint('\\n'.join(result.output) if hasattr(result, 'output') else 'CUDA example completed successfully')"
+    "invoke": "result = run_publication()"
   },
   "examples-processes-coagulation-charge-coagulation-with-charge-functional": {
     "title": "Coagulation with Charge (Functional + Factory)",
@@ -547,5 +549,101 @@
     "input_destinations": {
       "docs/data/gpu_benchmark_results.json": "gpu_benchmark_results.json"
     }
+  },
+  "gpu-prepared-quick-start": {
+    "title": "Prepared CUDA: CPU state to GPU and back",
+    "source": "docs/examples/gpu/prepared/gpu_prepared_quick_start.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 600,
+    "inputs": [],
+    "invoke": "result = run_example()"
+  },
+  "gpu-prepared-multibox": {
+    "title": "64 heterogeneous CUDA boxes",
+    "source": "docs/examples/gpu/prepared/gpu_prepared_multibox.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 7200,
+    "inputs": [
+      "scripts/docs_gpu_figures.py",
+      "scripts/gpu_studies/__init__.py",
+      "scripts/gpu_studies/cases.py",
+      "scripts/gpu_studies/validation.py",
+      "scripts/gpu_studies/trajectories.py"
+    ],
+    "invoke": "result = run_example()"
+  },
+  "gpu-prepared-forcing": {
+    "title": "CUDA cooling and vapor pulses",
+    "source": "docs/examples/gpu/prepared/gpu_prepared_forcing.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 7200,
+    "inputs": [
+      "scripts/docs_gpu_figures.py",
+      "scripts/gpu_studies/__init__.py",
+      "scripts/gpu_studies/cases.py",
+      "scripts/gpu_studies/validation.py",
+      "scripts/gpu_studies/trajectories.py"
+    ],
+    "invoke": "result = run_example()"
+  },
+  "gpu-prepared-stochastic": {
+    "title": "Sixteen-seed CUDA coagulation",
+    "source": "docs/examples/gpu/prepared/gpu_prepared_stochastic.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 7200,
+    "inputs": [
+      "scripts/docs_gpu_figures.py",
+      "scripts/gpu_studies/__init__.py",
+      "scripts/gpu_studies/cases.py",
+      "scripts/gpu_studies/validation.py",
+      "scripts/gpu_studies/trajectories.py"
+    ],
+    "invoke": "result = run_example()"
+  },
+  "gpu-prepared-lifecycle": {
+    "title": "Million-particle CUDA lifecycle",
+    "source": "docs/examples/gpu/prepared/gpu_prepared_lifecycle.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 7200,
+    "inputs": [
+      "scripts/docs_gpu_figures.py",
+      "scripts/gpu_studies/__init__.py",
+      "scripts/gpu_studies/cases.py",
+      "scripts/gpu_studies/validation.py",
+      "scripts/gpu_studies/trajectories.py"
+    ],
+    "invoke": "result = run_example()"
+  },
+  "gpu-prepared-cyclic-chamber": {
+    "title": "Cyclic CUDA aerosol with repeated source pulses",
+    "source": "docs/examples/gpu/prepared/gpu_prepared_cyclic_chamber.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 7200,
+    "inputs": [
+      "scripts/gpu_studies/__init__.py",
+      "scripts/gpu_studies/cases.py",
+      "scripts/gpu_studies/validation.py"
+    ],
+    "invoke": "result = run_example()"
+  },
+  "gpu-scaling-results": {
+    "title": "Measured RTX 5060 scaling",
+    "source": "docs/examples/gpu/prepared/gpu_scaling_results.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 300,
+    "inputs": [
+      "docs/data/gpu/rtx5060.json"
+    ],
+    "input_destinations": {
+      "docs/data/gpu/rtx5060.json": "rtx5060.json"
+    },
+    "invoke": "result = run_example()"
   }
 }

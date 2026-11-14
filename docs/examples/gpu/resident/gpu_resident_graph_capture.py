@@ -1,3 +1,12 @@
+# %% [markdown]
+# # Capture and replay a native CUDA schedule
+#
+# Record an owned resident schedule, replay it twice, and verify
+# invalidation and renewal without serializing an opaque CUDA graph.
+# Run with `--cuda` to reproduce the saved figures. CUDA is required
+# for publication; unavailable hardware never becomes a successful GPU run.
+
+# %%
 """Demonstrate qualified native-CUDA resident graph capture.
 
 Lazy qualification runs before CPU-state construction, resident imports, or
@@ -535,6 +544,47 @@ def run_example() -> ExampleRun:  # noqa: C901
         return result
 
 
+# %% [markdown]
+# ## Observe actual physics after graph replay
+#
+# Recording captures kernel launches; the two replays advance the physical
+# state. Each box retains its own gas and thermodynamic response. Structural
+# drift invalidates the old graph, and renewal creates a fresh binding.
+# This small lifecycle demonstration makes no throughput claim; the prepared
+# scaling studies measure warm replay and end-to-end costs separately.
+
+
+# %%
+def run_publication():
+    """Require native CUDA capture and visualize the replayed box states."""
+    import matplotlib.pyplot as plt
+    import warp as wp
+
+    if _qualified_native_cuda() is None:
+        raise RuntimeError("This publication run requires native CUDA capture")
+    result = run_example()
+    if result.gas_snapshot is None or result.saturation_snapshot is None:
+        raise RuntimeError("CUDA capture produced no diagnostic snapshots")
+    boxes = np.arange(result.gas_snapshot.shape[0]) + 1
+    fig, axes = plt.subplots(1, 2, figsize=(9, 3.5), constrained_layout=True)
+    axes[0].bar(boxes, result.gas_snapshot[:, 0], color="#287a90")
+    axes[0].set(
+        xlabel="Box",
+        ylabel="Water gas after replay (kg m$^{-3}$)",
+        xticks=boxes,
+    )
+    axes[1].bar(boxes, result.saturation_snapshot[:, 0], color="#be6c39")
+    axes[1].axhline(1, color="0.5", linestyle="--", label="Saturation")
+    axes[1].set(
+        xlabel="Box", ylabel="Saturation ratio after replay", xticks=boxes
+    )
+    axes[1].legend()
+    fig.suptitle("Two native graph replays · " + wp.get_device("cuda:0").name)
+    print("\n".join(result.output))
+    plt.show()
+    return result
+
+
 def main() -> None:
     """Run the example and print its deterministic status lines.
 
@@ -546,4 +596,9 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+
+    if "--cuda" in sys.argv[1:]:
+        run_publication()
+    else:
+        main()
