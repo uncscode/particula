@@ -33,6 +33,7 @@ def test_survival_case_has_one_seed_and_explicit_volume_per_box():
     [
         {"capacity": 32},
         {"boxes": 0},
+        {"coagulation_first": "false"},
         {"ion_pairs_cm3_s": -1},
         {"vapor_concentration": np.nan},
         {"time_step": 3},
@@ -67,8 +68,10 @@ def test_binomial_extremes_and_zero_event_upper_bound():
 @pytest.mark.parametrize(
     "device", ["cpu", pytest.param("cuda:0", marks=pytest.mark.cuda)]
 )
+@pytest.mark.parametrize("coagulation_first", [False, True])
 def test_controlled_neutral_growth_reaches_target_and_closes_feed_budget(
     device,
+    coagulation_first,
 ):
     """Without background capture every original seed crosses a nearby target."""
     wp = pytest.importorskip("warp")
@@ -83,6 +86,7 @@ def test_controlled_neutral_growth_reaches_target_and_closes_feed_budget(
         duration=2,
         vapor_refresh_seconds=1,
         cleanup_seconds=0.5,
+        coagulation_first=coagulation_first,
     )
     result = run_survival(config, device=device, capture=device != "cpu")
     np.testing.assert_array_equal(result["outcomes"][0], [0, 0, 4])

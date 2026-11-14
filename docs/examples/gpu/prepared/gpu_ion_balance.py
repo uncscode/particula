@@ -94,7 +94,32 @@ def initial_state(boxes=64, capacity=256, initial_pairs=0):
 
 # %%
 def finite_population_reference(q, initial_pairs, times, maximum_pairs=128):
-    """Return exact mean and variance of pair counts in the truncated chain."""
+    """Return pair-count moments at uniform times starting at zero.
+
+    The sparse exponential API returns an evenly spaced time grid. Reject
+    incompatible inputs rather than labeling its results with different times.
+    """
+    times = np.asarray(times, dtype=float)
+    if (
+        times.ndim != 1
+        or times.size < 2
+        or not np.all(np.isfinite(times))
+        or times[0] != 0
+        or times[-1] <= 0
+        or not np.allclose(
+            np.diff(times), times[-1] / (times.size - 1), rtol=1e-12, atol=0
+        )
+    ):
+        raise ValueError("times must be uniform, increasing and start at zero")
+    if type(maximum_pairs) is not int or maximum_pairs < 1:
+        raise ValueError("maximum_pairs must be a positive integer")
+    if (
+        type(initial_pairs) is not int
+        or not 0 <= initial_pairs <= maximum_pairs
+    ):
+        raise ValueError("initial_pairs must be an integer within the chain")
+    if not np.isfinite(q) or q < 0:
+        raise ValueError("q must be finite and nonnegative")
     states = np.arange(maximum_pairs + 1, dtype=float)
     birth = np.full(maximum_pairs + 1, q * VOLUME)
     birth[-1] = 0
@@ -110,7 +135,7 @@ def finite_population_reference(q, initial_pairs, times, maximum_pairs=128):
         generator, initial, start=0, stop=float(times[-1]), num=len(times)
     )
     assert probabilities[:, -2:].sum(axis=1).max() < 1e-10
-    np.testing.assert_allclose(probabilities.sum(axis=1), 1, atol=1e-10)
+    np.testing.assert_allclose(probabilities.sum(axis=1), 1, rtol=0, atol=1e-10)
     mean = probabilities @ states
     variance = np.maximum(probabilities @ states**2 - mean**2, 0)
     return mean, variance
@@ -192,7 +217,9 @@ def run_case(q_cm3, *, boxes=64, capacity=256, time_step=1.0):
 # slots per box. Cleanup runs after coagulation every second. No slot resizing
 # or resampling occurs. Exhaustion raises an error instead of dropping ions.
 # Timings separate preparation/capture from synchronized stepping and exclude
-# the reference solver and analysis. This small validation workload does not
+# the reference solver and analysis. Device exclusivity is not controlled;
+# elapsed stepping can include contention from other GPU jobs.
+# This small validation workload does not
 # establish a CPU speedup or a maximum GPU particle count.
 
 
