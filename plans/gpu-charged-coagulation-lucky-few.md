@@ -12,7 +12,7 @@ upstream PR. Merge and release are outside this authorization.
   and Chahl 2019 charged kernels using fp64 and the shared sampler.
 - [x] Integrate selection into prepared execution, parallel majorants,
   capture and exact checkpoint continuation without double-counting Brownian.
-- [ ] Add explicit ion pair classification, LF2013 attachment and atmospheric
+- [x] Add explicit ion pair classification, LF2013 attachment and atmospheric
   recombination with validated domains and no implicit extrapolation.
 - [x] Add paired Poisson ion production, source inventory ledgers, fixed
   capacity and independent persistent source RNG with capture/restart.
@@ -22,12 +22,15 @@ upstream PR. Merge and release are outside this authorization.
   preserve uptake by aerosol particles with attached ions and exact inventories.
 - [x] Add resident cohort metadata, first-passage tracking and censoring;
   study-level timestep and process-order convergence remains outstanding.
-- [ ] Validate numerical, scientific, stochastic and lifecycle behavior on
-  CPU, Warp CPU and actual CUDA.
+- [x] Validate implemented library formulas, stochastic collisions and lifecycle
+  behavior on native CPU references, Warp CPU and actual CUDA.
+- [ ] Complete survival-study convergence and uncertainty qualification.
 - [x] Add narrated percent-cell charged model comparison and saved CUDA output.
-- [ ] Add atmospheric ion balance and the 3–50 nm Lucky Few percent-cell study.
+- [x] Add atmospheric ion-balance percent source and inspect saved CUDA output.
+- [ ] Add the 3–50 nm Lucky Few percent-cell study.
 - [ ] Execute full examples, inspect saved figures, verify downloads/build.
-- [ ] Run required checks, review final diff, push and open draft upstream PR.
+- [x] Open draft upstream PR #1650 and push validated implementation increments.
+- [ ] Finish the survival example, final diff review and final hosted CI.
 
 ## Scientific contract
 
@@ -92,12 +95,12 @@ Update owning GPU guides and validation evidence; preserve README boundaries.
 - New charged formulas, dimensional majorants, capture/restart and strict
   attachment checks: 43 passed on host CPU and CUDA.
 - First narrated CUDA model-comparison example executed and visually inspected.
-- Paired source implementation and source ledger added; complete ion collision
-  integration, neutral cleanup and lineage tracking remain outstanding.
+- Initial source increment added the paired source and ledger; subsequent
+  increments below add cleanup, lineages and atmospheric collision integration.
 - Source, capture/restart and charged lifecycle checks: 62 passed on host
   CPU/CUDA; subsequent composition and zero-production tests also passed.
 - Example and tooling suites: 459 passed, 1 skipped with host cache access.
-- Final full package run: 10,047 passed, 14 skipped, 1 xfailed; 92.04% coverage
+- Earlier full package run: 10,047 passed, 14 skipped, 1 xfailed; 92.04% coverage
   with actual CUDA available. Ruff, formatting, mypy and website build pass.
 - Both existing charged examples refreshed on the host and figures inspected.
 - Full documentation example check passed; saved bundles are current, CPU-policy
@@ -111,7 +114,7 @@ Update owning GPU guides and validation evidence; preserve README boundaries.
 - LF2013 device helpers use algebraically centered published polynomials;
   all 201 charge states and both polarities match 70-digit decimal evaluation
   at nine radii per valid interval within 1e-10 relative tolerance. These helpers
-  still need integration into the atmospheric collision scheduler.
+  are now integrated into the atmospheric collision scheduler.
 - Ion exclusion and mixed-density Kelvin support: 171 combined ion-physics and
   prepared tests passed on host CPU/CUDA, including native CPU parity at 2e-12.
 - Discovered scientific gap: LF2013 omits repulsive attachment rates below
@@ -119,3 +122,14 @@ Update owning GPU guides and validation evidence; preserve README boundaries.
   5.30835917 nm, above the planned 1.5 nm seed radius. Production policy is
   awaiting the user's choice between explicit uncertainty bracketing and a
   deeper attachment-theory implementation; default coefficient lookup rejects.
+
+- Atmospheric pair routing and lifecycle tests: 30 tests included in the full
+  package run, with CPU/CUDA recombination, attachment, omission bounds,
+  fault-before-RNG behavior, source/cleanup/cohort composition and restart.
+- Prepared/parallel/formula regression: 1,721 passed on host CPU/CUDA.
+- Full package after atmospheric integration: 10,110 passed, 14 skipped,
+  1 xfailed; 91.85% coverage with actual CUDA and warnings treated as errors.
+- Ion-balance CUDA example: 64 boxes per production condition, 2000 simulated
+  seconds, exact finite-population birth/death reference; maximum mean errors
+  1.58/2.67/2.54 standard errors for q=0/2/10. Mass residuals below 1e-14.
+  Plot reviewed; source download matches and compiles; website build passed.

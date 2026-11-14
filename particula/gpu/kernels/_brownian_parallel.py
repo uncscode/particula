@@ -6,11 +6,15 @@ Selection, acceptance, merge admission and random draws use the original
 sequential device function.
 """
 
-from dataclasses import dataclass
-from typing import Any, no_type_check
+from dataclasses import dataclass, field
+from typing import Any, Callable, no_type_check
 
 import warp as wp
 
+from particula.gpu.dynamics.ion_pair_data import (
+    IonPairData,
+    replace_ion_pair_rate,
+)
 from particula.gpu.kernels.coagulation import (
     _sanitize_positive_finite,
     _select_coagulation_pairs_impl,
@@ -194,6 +198,7 @@ def _charged_pair_maxima(
     counts: wp.array(dtype=wp.int32),
     partials: wp.array2d(dtype=wp.float64),
     failure: wp.array(dtype=wp.int32),
+    ion_data: IonPairData,
 ):
     """Tile the upper pair matrix across bounded lanes without storing it."""
     if failure:
@@ -232,6 +237,7 @@ def _charged_pair_maxima(
                     sutherland_constant,
                 )
             )
+            rate = replace_ion_pair_rate(ion_data, box, first, second, rate)
             if rate > maximum:
                 maximum = rate
         pair += wp.int64(partials.shape[1])
@@ -292,6 +298,7 @@ def _select_brownian(  # noqa: C901
     active_counts: wp.array(dtype=wp.int32),
     majorants: wp.array(dtype=wp.float64),
     failure: wp.array(dtype=wp.int32),
+    ion_data: IonPairData,
 ) -> None:
     """Select from parallel properties and maxima with the original RNG code."""
     if failure:
@@ -333,6 +340,7 @@ def _select_brownian(  # noqa: C901
         majorants[box_idx],
         active_counts[box_idx],
         wp.float64(0.0),
+        ion_data,
     )
 
 
@@ -347,6 +355,8 @@ class _PreparedBrownianWork:
     partials: Any
     majorants: Any
     device: Any
+    ion_data: Any = field(default_factory=IonPairData)
+    ion_setup: Callable | None = None
 
     def enqueue(self, failure):
         """Enqueue retained work without allocation or observation."""
@@ -356,6 +366,8 @@ class _PreparedBrownianWork:
             inputs=(*self.property_inputs, self.active, failure),
             device=self.device,
         )
+        if self.ion_setup is not None:
+            self.ion_setup()
         wp.launch(
             _compact_active,
             dim=self.active.shape[0],
@@ -382,6 +394,7 @@ class _PreparedBrownianWork:
                     self.counts,
                     self.partials,
                     failure,
+                    self.ion_data,
                 ],
                 device=self.device,
             )
@@ -412,6 +425,7 @@ class _PreparedBrownianWork:
                 self.counts,
                 self.majorants,
                 failure,
+                self.ion_data,
             ),
             device=self.device,
         )

@@ -65,8 +65,8 @@ Custom subclasses and unsupported interpolation controls reject before upload.
 See the [charged model comparison](../../examples/gpu/prepared/gpu_charged_models.py).
 The [charged coagulation validation record](../../contribute/validation/gpu/charged-coagulation.md)
 lists actual CUDA checks and remaining scientific boundaries.
-This support does not itself provide atmospheric ion attachment or
-recombination; those need separate physical models and validation.
+For explicit atmospheric ions, use the separate
+[atmospheric collision configuration](#atmospheric-ion-collisions) below.
 
 Condensation retains configured transport coefficients and uses the mapped vapor
 material's molar mass for transport mean free paths, matching native CPU physics.
@@ -86,6 +86,51 @@ Process configuration, timestep, box layout and buffer capacity are frozen.
 Editing the original Python strategy after preparation does not change a running
 simulation. Changing these requires a new preparation; a checkpoint resume also
 requires matching configuration and the exact supported device.
+
+## Atmospheric ion collisions
+
+`AtmosphericCoagulation` from `particula.dynamics.ions.coagulation` selects
+one collision law per pair within the existing prepared sampler:
+
+- aerosol–aerosol: the selected `charged_model`;
+- free ion–aerosol: the conductive-air LF2013 attachment coefficients;
+- opposite free ions: a constant recombination coefficient, default
+  `1.7e-12 m³/s`;
+- same-sign free ions and neutral ion-only products: zero collision rate.
+
+This is one coagulation process, so do not compose a second `Coagulation` with
+it. Supply distinct `positive_species` and `negative_species` material lanes.
+Active particles must have unit represented counts. Positive ions have mass
+150 u and charge +1; negative ions have mass 90 u and charge −1. The module
+exports `POSITIVE_ION_MASS` and `NEGATIVE_ION_MASS` in kg for source setup.
+Choose physical material densities to obtain the intended free-ion diameter;
+these densities continue to determine volume after attachment.
+
+LF2013 is restricted to 298.15 K and 101325 Pa, integer aerosol charge between
+−100 and +100, and the published radius interval for each charge and polarity.
+The global radius domain is 0.2 nm–10 µm. State and needed attachment rates are
+validated on the device before collision sampling; invalid states or unsupported
+fits fault at observation without advancing the collision RNG or applying merges.
+A prior process in the same ordered step may already have completed.
+
+The default `omitted="reject"` rejects repulsive rates below the table's fitted
+radius interval. `omitted="lower"` assigns zero and `omitted="upper"` assigns
+the published omission cutoff, `1e-15 m³/s`, only in those omitted repulsive
+regions. These are explicit sensitivity bounds, not an extrapolation. Report
+both when using this uncertainty treatment. Other unsupported inputs still
+reject. Fits are evaluated only for polarities currently present in a box.
+
+Ion source, cleanup and condensation-exclusion material maps must agree.
+Sources must use the reference ion masses. Condensation requires the explicit
+`IonCondensationExclusion` companion. Recombination products conserve their
+material masses until cleanup exports them; neutralized aerosols remain active.
+The collision law supports CUDA capture and checkpoint continuation. Derived
+classifications and rates are rebuilt from physical state each step.
+
+The [validation record](../../contribute/validation/gpu/charged-coagulation.md)
+distinguishes pair-law, conservation and finite-population decay evidence from
+the remaining atmospheric survival study. The coefficients follow
+[López-Yglesias and Flagan (2013)](https://doi.org/10.1080/02786826.2013.783684).
 
 ## Paired ion production
 

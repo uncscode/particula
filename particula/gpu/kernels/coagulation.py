@@ -88,6 +88,10 @@ from particula.gpu.dynamics.coagulation_funcs import (
     sedimentation_sp2016_pair_rate_wp,
     turbulent_shear_st1956_pair_rate_wp,
 )
+from particula.gpu.dynamics.ion_pair_data import (
+    IonPairData,
+    replace_ion_pair_rate,
+)
 from particula.gpu.kernels._coagulation_config import (
     _COAGULATION_MECHANISM_FLAGS,  # noqa: F401
     BROWNIAN_MECHANISM,  # noqa: F401
@@ -1248,6 +1252,7 @@ def _coagulation_selector_impl(  # noqa: C901
         majorant_total,
         active_count,
         kinematic_viscosity,
+        IonPairData(),
     )
 
 
@@ -1288,6 +1293,7 @@ def _select_coagulation_pairs_impl(  # noqa: C901
     majorant_total: wp.float64,
     active_count: wp.int32,
     kinematic_viscosity: wp.float64,
+    ion_data: IonPairData,
 ) -> None:
     """Preserve sequential pair selection and the exact persistent RNG path."""
     n_species = masses.shape[2]
@@ -1392,6 +1398,9 @@ def _select_coagulation_pairs_impl(  # noqa: C901
             ref_viscosity,
             ref_temperature,
             sutherland_constant,
+        )
+        total_rate = replace_ion_pair_rate(
+            ion_data, box_idx, selected_i, selected_j, total_rate
         )
         acceptance_probability = _safe_acceptance_probability(
             total_rate, majorant_total

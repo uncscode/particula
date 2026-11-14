@@ -9,6 +9,9 @@ BOLTZMANN_CONSTANT = scipy.constants.k
 
 AVOGADRO_NUMBER = scipy.constants.Avogadro
 
+# Unified atomic mass unit [kg].
+ATOMIC_MASS_UNIT = scipy.constants.atomic_mass
+
 # Gas constant in J mol^-1 K^-1 = m^2 kg mol^-1 s^-2 K^-1
 # J = kg m^2 s^-2
 GAS_CONSTANT = BOLTZMANN_CONSTANT * AVOGADRO_NUMBER

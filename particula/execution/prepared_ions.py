@@ -156,6 +156,11 @@ def compile_ion_exclusion(_plan, _owner):
 
 def validate_ion_plans(plans):
     """Require condensation and compatible, nonvolatile reserved ion lanes."""
+    from particula.execution.prepared_atmospheric import (
+        validate_atmospheric_companions,
+    )
+
+    validate_atmospheric_companions(plans)
     exclusion = next((p for p in plans if p.family == "ion_condensation"), None)
     if exclusion is None:
         return
