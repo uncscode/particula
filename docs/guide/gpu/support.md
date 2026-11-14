@@ -13,7 +13,7 @@ hardware/runtime requirement; requesting CUDA never selects Warp CPU silently.
 | --- | --- | --- |
 | Native CPU storage | Multi-box particle, gas and environment containers | Explicit leading box axis and population metadata. |
 | Native CPU dynamics | Five batched runnables through the shared box loop | Direct strategy methods remain single-box. |
-| Prepared runnables | Ordered subsets of condensation, Brownian/charged coagulation, dilution, wall loss, nucleation and ion-pair production | One occurrence per family; exact supported configuration, fixed capacity and timestep. |
+| Prepared runnables | Ordered subsets of condensation, Brownian/charged coagulation, dilution, wall loss, nucleation, ion-pair production and neutral ion-product cleanup | One occurrence per family; exact supported configuration, fixed capacity and timestep. |
 | CPU → CUDA | `runnable.prepare(aerosol, device="cuda:0", time_step=...)` | Validates, uploads once, owns private resources; initial CPU state is unchanged. |
 | CUDA → CPU | `simulation.snapshot()` or reduced `diagnostics()` | Explicit synchronized, detached observations; full snapshots preserve native names and measures. |
 | Forcing | Environment and full-gas updates between segments | Explicit uploads; condensation owns derived saturation. |

@@ -30,6 +30,7 @@ class _ProcessPlan:
 
 def _plan_process(process: Any, aerosol: Aerosol) -> _ProcessPlan:
     """Reject unknown runnable/strategy semantics before any GPU allocation."""
+    from particula.dynamics.ions.cleanup import IonNeutralCleanup
     from particula.dynamics.ions.source import IonPairSource
     from particula.dynamics.particle_process import (
         Coagulation,
@@ -39,10 +40,14 @@ def _plan_process(process: Any, aerosol: Aerosol) -> _ProcessPlan:
         WallLoss,
     )
     from particula.execution.prepared_condensation import plan_condensation
-    from particula.execution.prepared_ions import plan_ion_source
+    from particula.execution.prepared_ions import (
+        plan_ion_cleanup,
+        plan_ion_source,
+    )
     from particula.execution.prepared_nucleation import plan_nucleation
 
     planners = {
+        IonNeutralCleanup: plan_ion_cleanup,
         IonPairSource: plan_ion_source,
         Dilution: _plan_dilution,
         Coagulation: _plan_coagulation,
@@ -192,10 +197,16 @@ def _plan_wall_loss(process: Any, aerosol: Aerosol) -> _ProcessPlan:
 def _compile_process(plan: _ProcessPlan, owner: Any):
     """Retain one existing prepared direct-kernel call and its resources."""
     session, registry = owner._session, owner._registry
-    if plan.family == "ion_source":
-        from particula.execution.prepared_ions import compile_ion_source
+    if plan.family in ("ion_source", "ion_cleanup"):
+        from particula.execution.prepared_ions import (
+            compile_ion_cleanup,
+            compile_ion_source,
+        )
 
-        return compile_ion_source(plan, owner)
+        return {
+            "ion_source": compile_ion_source,
+            "ion_cleanup": compile_ion_cleanup,
+        }[plan.family](plan, owner)
     if plan.family == "nucleation":
         from particula.execution.prepared_nucleation import compile_nucleation
 

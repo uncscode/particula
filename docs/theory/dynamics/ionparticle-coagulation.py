@@ -21,10 +21,10 @@
 # To model ion–particle interactions, we compare several coagulation kernels, each incorporating different physical effects:
 #
 # - **Hard Sphere Kernel:** Assumes Brownian collisions with idealized electrostatic interactions.
-# - **Dyachkov et al. (2007) Kernel** – [J. Chem. Phys., 126, 094501](https://aip.scitation.org/doi/10.1063/1.2713719)
+# - **Dyachkov et al. (2007) Kernel** – [Physics of Plasmas, 14, 042102](https://doi.org/10.1063/1.2713719)
 # - **Gatti & Kortshagen (2008) Kernel** – [Phys. Rev. E, 78, 046402](https://journals.aps.org/pre/abstract/10.1103/PhysRevE.78.046402)
 # - **Gopalakrishnan et al. (2012) Kernel** – [Phys. Rev. E, 85, 026410](https://journals.aps.org/pre/abstract/10.1103/PhysRevE.85.026410)
-# - **Chahl et al. (2019) Kernel** – [Aerosol Sci. Technol., 53(8), 877-892](https://www.tandfonline.com/doi/full/10.1080/02786826.2019.1614522)
+# - **Chahl et al. (2019) Kernel** – [Aerosol Sci. Technol., 53(8), 933-957](https://www.tandfonline.com/doi/full/10.1080/02786826.2019.1614522)
 #
 # Each kernel accounts for charge-dependent coagulation efficiencies. This study aims to compare these models to evaluate how charge influences ion–particle collision rates.
 

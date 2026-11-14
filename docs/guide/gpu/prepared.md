@@ -51,6 +51,7 @@ the full collection of CPU strategies or direct GPU mechanism masks.
 | Wall loss | `WallLoss` with spherical, rectangular or charged strategy | Particle-resolved; supported neutral/charged configuration is frozen at preparation; retired resolved slots retain the native raw-count semantics. |
 | Nucleation | `Nucleation` with activation or kinetic strategy | Resolved unit-count, neutral injection with explicit species mapping, integral event demand and fixed capacity; supported exhaustion/resampling policy is retained. |
 | Ion source | `IonPairSource` with constant production | Paired Poisson unit-count injection into fixed capacity; independent source RNG and inventory ledger. |
+| Ion cleanup | `IonNeutralCleanup` | Exports neutral ion-only products from reserved material lanes; retains neutralized aerosol particles and records exported mass. |
 
 Prepared charged coagulation accepts `HardSphereKernelStrategy`,
 `CoulombDyachkov2007KernelStrategy`, `CoulombGatti2008KernelStrategy`,
@@ -108,8 +109,24 @@ CPU `execute()` is unsupported and rejects explicitly.
 
 This source supplies particles, not atmospheric ion collision physics. Do not
 interpret ordinary charged coagulation of these particles as validated
-ion–aerosol attachment or ion–ion recombination. Free-ion condensation,
-neutral-product removal and cohort tracking require additional integration.
+ion–aerosol attachment or ion–ion recombination. Free-ion condensation
+exclusion and cohort tracking require additional integration.
+
+`IonNeutralCleanup` from `particula.dynamics.ions.cleanup` removes neutral
+products containing both reserved ion materials and no other material.
+Supply the same positive/negative material indices as the source. These lanes
+must be reserved for ions; material composition is the classification contract.
+Neutral aerosol particles with any mass in another lane are retained. Cleanup
+does not itself model a recombination reaction or remove charged free ions.
+
+Place cleanup at the chosen point in the ordered composition; it executes once
+per prepared step and reclaims slots by zeroing all particle fields.
+`simulation.ion_cleanup_diagnostics()` observes detached cumulative
+`exported_particles` and `exported_mass` [kg, box by species]. Exported charge
+is exactly zero. Check each species' initial mass plus injected mass against
+remaining mass plus exported mass. The ledgers participate in CUDA capture and
+exact checkpoint continuation. Unit active counts are required throughout;
+evolving fractional counts fault before a box is modified.
 
 ## State, forcing and observations
 

@@ -16,7 +16,8 @@ upstream PR. Merge and release are outside this authorization.
   recombination with validated domains and no implicit extrapolation.
 - [x] Add paired Poisson ion production, source inventory ledgers, fixed
   capacity and independent persistent source RNG with capture/restart.
-- [ ] Add neutral-product cleanup and exported inventory ledgers.
+- [x] Add neutral-product cleanup and exported inventory ledgers as a prepared
+  process; final ion-collision ordering remains part of study integration.
 - [ ] Add resident cohort metadata, first-passage tracking and censoring.
 - [ ] Validate numerical, scientific, stochastic and lifecycle behavior on
   CPU, Warp CPU and actual CUDA.
@@ -98,6 +99,9 @@ Update owning GPU guides and validation evidence; preserve README boundaries.
 - Both existing charged examples refreshed on the host and figures inspected.
 - Full documentation example check passed; saved bundles are current, CPU-policy
   examples executed, and the new CUDA comparison was explicitly refreshed.
+- Neutral ion-product cleanup, export accounting, capture/restart and source
+  regression: 58 passed on host CPU/CUDA. Reference review corrected existing
+  Dyachkov bibliographic errors and added primary papers to the CUDA example.
 - Discovered scientific gap: LF2013 omits repulsive attachment rates below
   1e-15 m^3/s. For same-sign singly charged seeds, the fit begins at radius
   5.30835917 nm, above the planned 1.5 nm seed radius. Production policy is

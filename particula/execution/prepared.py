@@ -263,6 +263,10 @@ class PreparedSimulation:
                 self._wait()
                 with self._scope():
                     failure = int(self._device_failure.numpy()[0])
+                    if failure == 5:
+                        raise ValueError(
+                            "ion cleanup requires unit active counts"
+                        )
                     if failure == 3:
                         raise ValueError("ion source capacity exhausted")
                     if failure == 4:
@@ -424,6 +428,25 @@ class PreparedSimulation:
                     pairs * source.values[polarity + "_mass"]
                 )
             return {"injected_pairs": pairs, "injected_mass": mass}
+
+    def ion_cleanup_diagnostics(self):
+        """Observe cumulative exported particles and mass [kg, box by species].
+
+        Exported charge is exactly zero by construction. Returned arrays are
+        detached; this explicit observation synchronizes the prepared owner.
+        """
+        with self._lock:
+            self.synchronize()
+            if "ion_export_mass" not in self._auxiliary:
+                raise ValueError("simulation has no ion cleanup")
+            return {
+                "exported_particles": self._auxiliary["ion_export_particles"]
+                .numpy()
+                .copy(),
+                "exported_mass": self._auxiliary["ion_export_mass"]
+                .numpy()
+                .copy(),
+            }
 
     def checkpoint(self) -> SimulationCheckpoint:
         """Observe and save exact continuation bytes plus frozen configuration.

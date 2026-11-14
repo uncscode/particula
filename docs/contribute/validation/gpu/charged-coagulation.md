@@ -19,8 +19,10 @@ constants rather than rounding through float32 literals.
 
 `IonPairSource` injects explicit positive/negative particles with unit counts,
 independent persistent source randomness, a fixed-capacity rejection boundary,
-and cumulative external-mass accounting. This does not establish ion collision,
-neutral-product cleanup, or the completed Lucky Few survival study.
+and cumulative external-mass accounting. `IonNeutralCleanup` exports only
+neutral particles made entirely from both reserved ion materials, with persistent
+species mass and particle ledgers. Neither establishes ion collision physics or
+the completed Lucky Few survival study.
 
 The LF2013 helper rejects unsupported domains by default. Optional lower/upper
 values for omitted repulsive fluxes are uncertainty bounds, not an extrapolated
@@ -52,8 +54,10 @@ Commands below used `WARP_CACHE_PATH=/tmp/particula-charged-warp` where relevant
 | `npm --prefix website test` | 3 passed |
 | `npm --prefix website run build` | Passed; 0 link errors |
 
-The full package run includes the final paired-source integration, composition
-and zero-production tests. The existing functional and object charged examples
+The full package run at `80e271627` includes paired-source integration,
+composition and zero-production tests. Subsequent cleanup changes are covered
+by the focused checks below; that earlier full run does not qualify them.
+The existing functional and object charged examples
 were also refreshed; all four saved figures were visually inspected. Notebook
 execution required host access; restricted notebook processes were stopped
 after stalling during kernel startup. A restricted tooling run also hit
@@ -61,3 +65,18 @@ the read-only Warp cache; the successful host rerun above supersedes it.
 
 Hosted CI is separate from these local results and remains pending on the draft PR.
 No speedup or atmospheric survival probability is established by this record.
+
+## Neutral-product cleanup follow-up
+
+Cleanup tests check that neutral aerosols remain, charged ion-only particles
+remain, each exported species is accounted for, repeated cleanup is a no-op,
+and ledger/state continuation survives checkpoint and native CUDA capture.
+Invalid reserved indices reject at preparation; evolving fractional counts
+fault before modifying the affected box. The source and cleanup retain distinct
+families so the example must explicitly choose their ordering.
+
+Host command: `WARP_CACHE_PATH=/tmp/particula-charged-warp .venv/bin/pytest
+particula/execution/tests/prepared_ion_cleanup_test.py
+particula/execution/tests/prepared_ions_test.py
+particula/execution/tests/prepared_restart_capture_test.py -q --no-cov -Werror`:
+58 passed, including actual CUDA. Ruff and mypy passed (571 source files).

@@ -76,10 +76,10 @@ def get_hard_sphere_kernel(
             infinity.
 
     References:
-    - Dyachkov, S. A., Kustova, E. V., & Kustov, A. V. (2007). Coagulation of
-      particles in the transition regime: The effect of the Coulomb potential.
-      Journal of Chemical Physics, 126(12).
-      https://doi.org/10.1063/1.2713719
+    - Gopalakrishnan, R., & Hogan, C. J. (2012). Coulomb-influenced
+      collisions in aerosols and dusty plasmas. Physical Review E, 85, 026410,
+      equation (5) for the hard-sphere fit and its four coefficients.
+      https://doi.org/10.1103/PhysRevE.85.026410
     """
     if np.any(diffusive_knudsen < 0):
         raise ValueError("Particle sizes must be non-negative")
@@ -125,9 +125,9 @@ def get_coulomb_kernel_dyachkov2007(
         The dimensionless coagulation kernel (H) [dimensionless].
 
     References:
-    - Dyachkov, S. A., Kustova, E. V., & Kustov, A. V. (2007). Coagulation of
-      particles in the transition regime: The effect of the Coulomb potential.
-      Journal of Chemical Physics, 126(12).
+    - D'yachkov, L. G., Khrapak, A. G., Khrapak, S. A., & Morfill, G. E.
+      (2007). Model of grain charging in collisional plasmas accounting for
+      collisionless layer. Physics of Plasmas, 14, 042102.
       https://doi.org/10.1063/1.2713719
     """
     coulomb_potential_ratio = np.maximum(
