@@ -7,6 +7,7 @@ import pytest
 from scripts.gpu_studies.lucky_few import (
     SurvivalConfig,
     build_survival_case,
+    difference_interval,
     run_survival,
     success_interval,
     whole_steps,
@@ -89,3 +90,28 @@ def test_controlled_neutral_growth_reaches_target_and_closes_feed_budget(
     assert result["maximum_mass_residual"] < 2e-12
     assert result["maximum_observed_slots"] == 1
     np.testing.assert_allclose(result["time"], [0, 1, 2], rtol=1e-14, atol=0)
+
+
+@pytest.mark.parametrize("confidence", [0, 1, -0.1, np.nan, np.inf, True])
+def test_success_interval_rejects_invalid_confidence(confidence):
+    """Coverage probabilities must define genuine finite intervals."""
+    with pytest.raises(ValueError, match="confidence"):
+        success_interval(0, 100, confidence=confidence)
+    with pytest.raises(ValueError, match="confidence"):
+        difference_interval(0, 100, 0, 100, confidence=confidence)
+
+
+def test_difference_interval_has_joint_coverage_and_reverses_sign():
+    """Check the Bonferroni endpoints against exact all-zero/all-one formulas."""
+    low, high = difference_interval(0, 100, 100, 100)
+    expected_low = 2 * 0.0125 ** (1 / 100) - 1
+    np.testing.assert_allclose(low, expected_low, rtol=2e-15)
+    assert high == 1
+    np.testing.assert_allclose(
+        difference_interval(100, 100, 0, 100), [-high, -low], rtol=2e-15
+    )
+    zero = difference_interval(0, 100, 0, 100)
+    expected_high = 1 - 0.0125 ** (1 / 100)
+    np.testing.assert_allclose(
+        zero, [-expected_high, expected_high], rtol=2e-15
+    )
