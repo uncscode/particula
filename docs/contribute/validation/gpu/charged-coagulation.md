@@ -1,4 +1,4 @@
-# Charged coagulation and ion-source validation
+# Charged coagulation and atmospheric ion validation
 
 Development evidence, 2026-11-13, branch
 `codex/gpu-charged-coagulation-lucky-few`, based on `19a8fb11d`.
@@ -63,7 +63,8 @@ execution required host access; restricted notebook processes were stopped
 after stalling during kernel startup. A restricted tooling run also hit
 the read-only Warp cache; the successful host rerun above supersedes it.
 
-Hosted CI is separate from these local results and remains pending on the draft PR.
+Hosted CI is separate from these local results. All six workflows passed at
+`8d8f476fd`; newer increments require their own hosted results.
 No speedup or atmospheric survival probability is established by this record.
 
 ## Neutral-product cleanup follow-up
@@ -157,3 +158,42 @@ WARP_CACHE_PATH=/tmp/particula-charged-warp .venv/bin/pytest \
 
 Result: 324 passed, 3 skipped. Ruff, formatting and mypy (581 source files)
 passed; the website built with zero link errors.
+
+## Atmospheric collision integration and ion balance
+
+The follow-up to `8d8f476fd` routes ion pairs through the existing sampler and
+merge application. Both the exact pair maximum and acceptance probability use
+the same derived ion classification and cached LF2013 rates. Validation faults
+before collision RNG or physical merge mutation. Neutral products are inert;
+same-sign ions do not cluster. Source, cleanup, condensation exclusion and cohort
+material contracts are checked together. Derived scratch is recomputed at each
+step and does not introduce a new checkpoint payload.
+
+Host CPU/CUDA evidence, 2026-11-14 UTC:
+
+| Command | Result |
+| --- | --- |
+| `.venv/bin/pytest particula/execution/tests particula/gpu/kernels/tests/brownian_parallel_test.py particula/gpu/dynamics/tests/ion_attachment_test.py -q --no-cov` | 1,721 passed before the final three composition/marker tests |
+| `.venv/bin/pytest --cov=particula --cov-report=term-missing --cov-fail-under=80 -Werror` | 10,110 passed, 14 skipped, 1 xfailed; 91.85% coverage; includes all 30 atmospheric tests and actual CUDA |
+| `.venv/bin/ruff check particula examples_tests scripts --no-fix` | Passed |
+| `.venv/bin/ruff format particula examples_tests scripts --check` | 643 files formatted |
+| `.venv/bin/mypy particula --ignore-missing-imports` | Passed, 586 files |
+| `.venv/bin/python scripts/docs_examples.py refresh gpu-ion-balance` | Complete RTX 5060 run; figure visually inspected |
+| `.venv/bin/python scripts/check_docs_structure.py` | Passed |
+| `npm --prefix website test` | 3 passed |
+| `npm --prefix website run build` | 453 pages; passed |
+
+The ion-balance example simulates 64 independent boxes per q=0/2/10 condition,
+256 slots per box, timestep 1 s and duration 2000 s. A separate sparse master
+equation solution supplies the exact finite-population mean and variance;
+its truncated upper-state probability is checked below 1e-10. Maximum observed
+mean discrepancies were 1.58, 2.67 and 2.54 standard errors, below the fixed six
+standard-error acceptance criterion. Net charge was exactly zero. Per-species
+mass budgets included source input and neutral-product export, with maximum
+relative residual below 1e-14. Observed peak occupied slots were 40, 70 and 128.
+The current Python download matches the maintained source and compiles.
+
+This qualifies the source/recombination example, not a survival conclusion.
+The 3–50 nm study and its timestep/cleanup/capacity/ensemble convergence remain
+outstanding. The production treatment of omitted LF2013 repulsive coefficients
+is still awaiting the user's scientific choice; strict rejection is the default.

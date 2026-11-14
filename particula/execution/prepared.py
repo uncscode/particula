@@ -266,25 +266,23 @@ class PreparedSimulation:
                 self._wait()
                 with self._scope():
                     failure = int(self._device_failure.numpy()[0])
-                    if failure == 6:
-                        raise ValueError(
-                            "seed cohort lineage invariant violated"
-                        )
-                    if failure == 5:
-                        raise ValueError(
-                            "ion cleanup requires unit active counts"
-                        )
-                    if failure == 3:
-                        raise ValueError("ion source capacity exhausted")
-                    if failure == 4:
-                        raise ValueError(
-                            "ion source Poisson mean exceeds supported range"
-                        )
-                    if failure == 2:
-                        raise ValueError(
+                    messages = {
+                        2: (
                             "Brownian GPU coagulation requires "
                             "equal active counts"
-                        )
+                        ),
+                        3: "ion source capacity exhausted",
+                        4: "ion source Poisson mean exceeds supported range",
+                        5: "ion cleanup requires unit active counts",
+                        6: "seed cohort lineage invariant violated",
+                        7: (
+                            "atmospheric coagulation requires valid unit ions "
+                            "at 298.15 K and 101325 Pa"
+                        ),
+                        8: "LF2013 attachment rate is unsupported",
+                    }
+                    if failure in messages:
+                        raise ValueError(messages[failure])
                     for observe in self._observers:
                         observe()
                     if failure:
