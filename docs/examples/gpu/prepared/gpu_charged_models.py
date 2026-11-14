@@ -114,7 +114,23 @@ def run_example():
 # model field selects its charged fit. Existing additive requests retain their
 # original meaning and should not be used to double-count Brownian collisions.
 #
-# See the CPU charged-kernel docstrings for the original papers and fit domains.
+# ## References and scope
+#
+# - [D'yachkov et al. (2007), Physics of Plasmas 14, 042102](https://doi.org/10.1063/1.2713719):
+#   flux matching with a collisionless layer for grain charging.
+# - [Gatti and Kortshagen (2008), Physical Review E 78, 046402](https://doi.org/10.1103/PhysRevE.78.046402):
+#   a charging model across collisionality regimes.
+# - [Gopalakrishnan and Hogan (2012), Physical Review E 85, 026410](https://doi.org/10.1103/PhysRevE.85.026410):
+#   the hard-sphere fit in equation (5), charged dimensionless scaling, and
+#   comparisons with the earlier charging models. Particula's Gatti expression
+#   follows this continuum-consistent formulation rather than independently
+#   reimplementing the original plasma model.
+# - [Chahl and Gopalakrishnan (2019), Aerosol Science and Technology 53, 933–957](https://doi.org/10.1080/02786826.2019.1614522):
+#   high-potential, near-free-molecular Coulombic collision modeling.
+#
+# These sources distinguish model assumptions and regimes. CPU/CUDA parity
+# verifies the port of Particula's formulas, including their existing branch
+# conventions; it does not validate all five fits for atmospheric small ions.
 
 # %%
 if __name__ == "__main__":

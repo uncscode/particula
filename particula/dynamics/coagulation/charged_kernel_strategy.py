@@ -185,10 +185,10 @@ class CoulombDyachkov2007KernelStrategy(ChargedKernelStrategyABC):
         ```
 
     References:
-    - Dyachkov, S. A., Kustova, E. V., & Kustov, A. V. (2007). Coagulation
-      of particles in the transition regime: The effect of the Coulomb
-      potential. J. Chem. Phys., 126(12).
-      [DOI](https://doi.org/10.1063/1.2713719)
+    - D'yachkov, L. G., Khrapak, A. G., Khrapak, S. A., & Morfill, G. E.
+      (2007). Model of grain charging in collisional plasmas accounting for
+      collisionless layer. Physics of Plasmas, 14, 042102.
+      https://doi.org/10.1063/1.2713719
     """
 
     def dimensionless(  # noqa: D102

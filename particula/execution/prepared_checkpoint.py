@@ -117,7 +117,8 @@ def _preflight(processes, saved, backend, device):
     families = {p.family for p in plans}
     actual = {p.family for p in restart.resource_payloads}
     if (
-        actual != families - {"wall_loss", "dilution", "ion_source"}
+        actual
+        != families - {"wall_loss", "dilution", "ion_source", "ion_cleanup"}
         or saved.resident.communication is not None
     ):
         raise ValueError(
@@ -150,6 +151,12 @@ def _validate_auxiliary(saved, plans):
     if any(p.family == "ion_source" for p in plans):
         expected["ion_source_rng"] = ("<u4", (boxes,))
         expected["ion_source_pairs"] = ("<i8", (boxes,))
+    if any(p.family == "ion_cleanup" for p in plans):
+        expected["ion_export_particles"] = ("<i8", (boxes,))
+        expected["ion_export_mass"] = (
+            "<f8",
+            (boxes, saved.resident.dimensions.n_species),
+        )
     if type(saved.auxiliary) is not tuple or len(saved.auxiliary) != len(
         expected
     ):
@@ -172,8 +179,12 @@ def _validate_auxiliary(saved, plans):
         values = np.frombuffer(item.data, dtype=item.dtype)
         if not np.all(np.isfinite(values)):
             raise ValueError("checkpoint auxiliary values must be finite")
-        if item.role == "ion_source_pairs" and np.any(values < 0):
-            raise ValueError("checkpoint ion source counts must be nonnegative")
+        if item.role in (
+            "ion_source_pairs",
+            "ion_export_particles",
+            "ion_export_mass",
+        ) and np.any(values < 0):
+            raise ValueError("checkpoint ion inventories must be nonnegative")
 
 
 def _restore_after_binding(owner, saved):

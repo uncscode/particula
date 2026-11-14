@@ -85,3 +85,56 @@ def compile_ion_source(plan, owner):
         )
 
     return enqueue
+
+
+def plan_ion_cleanup(process, aerosol):
+    """Freeze the explicit reserved material map for neutral export."""
+    from particula.execution.prepared_processes import _ProcessPlan
+
+    process._validate_batch(aerosol)
+    return _ProcessPlan(
+        "ion_cleanup",
+        (
+            ("positive_species", process.positive_species),
+            ("negative_species", process.negative_species),
+        ),
+    )
+
+
+def compile_ion_cleanup(plan, owner):
+    """Allocate checkpointed export ledgers and retain one device launch."""
+    from particula.gpu.kernels.ion_cleanup import remove_neutral_ion_products
+
+    wp, session = owner._wp, owner._session
+    dimensions = session.dimensions
+    mass = wp.zeros(
+        (dimensions.n_boxes, dimensions.n_species),
+        dtype=wp.float64,
+        device=owner.device.native,
+    )
+    particles = wp.zeros(
+        dimensions.n_boxes, dtype=wp.int64, device=owner.device.native
+    )
+    owner._auxiliary["ion_export_mass"] = mass
+    owner._auxiliary["ion_export_particles"] = particles
+    p = session.particles
+    args = [
+        p.masses,
+        p.concentration,
+        p.charge,
+        plan.values["positive_species"],
+        plan.values["negative_species"],
+        mass,
+        particles,
+        owner._device_failure,
+    ]
+
+    def enqueue():
+        wp.launch(
+            remove_neutral_ion_products,
+            dim=dimensions.n_boxes,
+            inputs=args,
+            device=owner.device.native,
+        )
+
+    return enqueue
