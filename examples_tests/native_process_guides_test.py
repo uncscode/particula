@@ -249,8 +249,8 @@ def test_backend_selection_guide_does_not_execute():
     assert adapter.calls == 0
 
 
-def test_foundations_complete_snippet_sequence():
-    """Explicit fixed-slot activation and round trips retain native values."""
+def _foundations_namespace():
+    """Execute portable foundation snippets without changing their devices."""
     wp = pytest.importorskip("warp")
     page = FEATURES.parent / "data-model/index.md"
     pages = [
@@ -261,7 +261,6 @@ def test_foundations_complete_snippet_sequence():
             "gpu/execution.md",
             "gpu/direct/coagulation-configuration.md",
             "gpu/direct/condensation-configuration.md",
-            "gpu/transfers.md",
         ]
     ]
     blocks = [
@@ -292,6 +291,33 @@ def test_foundations_complete_snippet_sequence():
             np.testing.assert_array_equal(
                 namespace["particle_data"].concentration, [[1.0, 0.0]]
             )
+    return namespace
+
+
+def test_foundations_warp_cpu_snippet_sequence():
+    """Portable activation and native construction remain covered without CUDA."""
+    namespace = _foundations_namespace()
+    particle = namespace["particle_data"]
+    assert particle.distribution_type == "particle_resolved"
+    np.testing.assert_allclose(particle.number_density, [1e6])
+    np.testing.assert_allclose(
+        particle.species_mass_inventory, [[1e-18, 2e-18]], rtol=1e-12
+    )
+
+
+@pytest.mark.cuda
+def test_foundations_complete_snippet_sequence():
+    """The published CUDA transfers round-trip on actual CUDA hardware."""
+    wp = pytest.importorskip("warp")
+    if not wp.is_cuda_available():
+        pytest.skip("Published transfer snippets require CUDA")
+    namespace = _foundations_namespace()
+    page = FEATURES.parent / "gpu/transfers.md"
+    for block in re.findall(
+        r"```python\n(.*?)\n```", page.read_text(), re.DOTALL
+    ):
+        exec(compile(block, str(page), "exec"), namespace)  # noqa: S102
+    assert namespace["gpu_particle"].masses.device.is_cuda
     restored = namespace["restored_particle"]
     assert restored.distribution_type == "particle_resolved"
     np.testing.assert_allclose(restored.number_density, [1e6])
