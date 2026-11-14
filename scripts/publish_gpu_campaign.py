@@ -70,6 +70,13 @@ def validate_samples(report, key):
     """Reject partial timing repetitions before publishing a ratio."""
     if report["warmups"] != 3 or report["samples"] != 7:
         raise ValueError(f"Incomplete repetitions: {key}")
+    required = {"resident", "download"}
+    if report["mode"] != "legacy":
+        required.update(("setup", "end_to_end"))
+    if report["mode"] not in {"legacy", "numpy"}:
+        required.add("capture")
+    if missing := required.difference(report["timings"]):
+        raise ValueError(f"Missing timing stages for {key}: {sorted(missing)}")
     for timing in report["timings"].values():
         if len(timing["samples_s"]) != 7:
             raise ValueError(f"Missing timing samples: {key}")
