@@ -81,11 +81,16 @@ from particula.gpu.dynamics.coagulation_funcs import (
     brownian_diffusivity_wp,
     brownian_kernel_pair_wp,
     charged_hard_sphere_wp,
+    charged_kernel_wp,
     g_collection_term_wp,
     kinematic_viscosity_wp,
     particle_mean_free_path_wp,
     sedimentation_sp2016_pair_rate_wp,
     turbulent_shear_st1956_pair_rate_wp,
+)
+from particula.gpu.dynamics.ion_pair_data import (
+    IonPairData,
+    replace_ion_pair_rate,
 )
 from particula.gpu.kernels._coagulation_config import (
     _COAGULATION_MECHANISM_FLAGS,  # noqa: F401
@@ -290,7 +295,8 @@ def _total_pair_rate(  # noqa: PLR0913
         total_rate = accumulated_rate
     if mechanism_mask & wp.int32(CHARGED_HARD_SPHERE_MECHANISM_FLAG):
         component_rate = _sanitize_positive_finite(
-            charged_hard_sphere_wp(
+            charged_kernel_wp(
+                wp.int32(mechanism_mask) >> wp.int32(8),
                 radius_i,
                 radius_j,
                 total_mass_i,
@@ -1033,18 +1039,20 @@ def _coagulation_selector_impl(  # noqa: C901
     """  # type: ignore
     n_particles = masses.shape[1]
 
+    # Low byte retains the mechanism flags; high byte selects the charged fit.
+    base_mask = mechanism_mask & wp.int32(255)
     executable_mask = (
-        mechanism_mask == wp.int32(1)
-        or mechanism_mask == wp.int32(2)
-        or mechanism_mask == wp.int32(3)
-        or mechanism_mask == wp.int32(4)
-        or mechanism_mask == wp.int32(5)
-        or mechanism_mask == wp.int32(6)
-        or mechanism_mask == wp.int32(8)
-        or mechanism_mask == wp.int32(9)
-        or mechanism_mask == wp.int32(10)
-        or mechanism_mask == wp.int32(12)
-        or mechanism_mask == wp.int32(15)
+        base_mask == wp.int32(1)
+        or base_mask == wp.int32(2)
+        or base_mask == wp.int32(3)
+        or base_mask == wp.int32(4)
+        or base_mask == wp.int32(5)
+        or base_mask == wp.int32(6)
+        or base_mask == wp.int32(8)
+        or base_mask == wp.int32(9)
+        or base_mask == wp.int32(10)
+        or base_mask == wp.int32(12)
+        or base_mask == wp.int32(15)
     )
     if not executable_mask:
         return
@@ -1244,6 +1252,7 @@ def _coagulation_selector_impl(  # noqa: C901
         majorant_total,
         active_count,
         kinematic_viscosity,
+        IonPairData(),
     )
 
 
@@ -1284,6 +1293,7 @@ def _select_coagulation_pairs_impl(  # noqa: C901
     majorant_total: wp.float64,
     active_count: wp.int32,
     kinematic_viscosity: wp.float64,
+    ion_data: IonPairData,
 ) -> None:
     """Preserve sequential pair selection and the exact persistent RNG path."""
     n_species = masses.shape[2]
@@ -1388,6 +1398,9 @@ def _select_coagulation_pairs_impl(  # noqa: C901
             ref_viscosity,
             ref_temperature,
             sutherland_constant,
+        )
+        total_rate = replace_ion_pair_rate(
+            ion_data, box_idx, selected_i, selected_j, total_rate
         )
         acceptance_probability = _safe_acceptance_probability(
             total_rate, majorant_total
@@ -2854,7 +2867,10 @@ def _prepare_coagulation_step_gpu(  # noqa: C901
     sedimentation_enabled = bool(
         resolved_mechanism_config.mask & SEDIMENTATION_SP2016_MECHANISM_FLAG
     )
-    if brownian_enabled:
+    if (
+        brownian_enabled
+        or resolved_mechanism_config.mask == CHARGED_HARD_SPHERE_MECHANISM_FLAG
+    ):
         diffusivities = wp.zeros(
             (n_boxes, n_particles), dtype=wp.float64, device=device
         )
@@ -2930,12 +2946,18 @@ def _prepare_coagulation_step_gpu(  # noqa: C901
             collision_pairs,
             n_collisions,
             rng_states,
-            wp.int32(resolved_mechanism_config.mask),
+            wp.int32(
+                resolved_mechanism_config.mask
+                | (resolved_mechanism_config.charged_model << 8)
+            ),
             wp.int32(max_collisions_value),
         ),
     )
 
-    if resolved_mechanism_config.mask == BROWNIAN_MECHANISM_FLAG:
+    if resolved_mechanism_config.mask in (
+        BROWNIAN_MECHANISM_FLAG,
+        CHARGED_HARD_SPHERE_MECHANISM_FLAG,
+    ):
         from particula.gpu.kernels._brownian_parallel import (
             prepare_brownian_work,
         )

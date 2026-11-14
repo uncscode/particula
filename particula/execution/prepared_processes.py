@@ -30,6 +30,10 @@ class _ProcessPlan:
 
 def _plan_process(process: Any, aerosol: Aerosol) -> _ProcessPlan:
     """Reject unknown runnable/strategy semantics before any GPU allocation."""
+    from particula.dynamics.ions.cleanup import IonNeutralCleanup
+    from particula.dynamics.ions.coagulation import AtmosphericCoagulation
+    from particula.dynamics.ions.condensation import IonCondensationExclusion
+    from particula.dynamics.ions.source import IonPairSource
     from particula.dynamics.particle_process import (
         Coagulation,
         Dilution,
@@ -37,10 +41,23 @@ def _plan_process(process: Any, aerosol: Aerosol) -> _ProcessPlan:
         Nucleation,
         WallLoss,
     )
+    from particula.execution.cohort import SeedCohort
+    from particula.execution.prepared_atmospheric import plan_atmospheric
+    from particula.execution.prepared_cohort import plan_cohort
     from particula.execution.prepared_condensation import plan_condensation
+    from particula.execution.prepared_ions import (
+        plan_ion_cleanup,
+        plan_ion_exclusion,
+        plan_ion_source,
+    )
     from particula.execution.prepared_nucleation import plan_nucleation
 
     planners = {
+        AtmosphericCoagulation: plan_atmospheric,
+        IonCondensationExclusion: plan_ion_exclusion,
+        SeedCohort: plan_cohort,
+        IonNeutralCleanup: plan_ion_cleanup,
+        IonPairSource: plan_ion_source,
         Dilution: _plan_dilution,
         Coagulation: _plan_coagulation,
         WallLoss: _plan_wall_loss,
@@ -74,11 +91,30 @@ def _plan_dilution(process: Any, _aerosol: Aerosol) -> _ProcessPlan:
 
 def _plan_coagulation(process: Any, aerosol: Aerosol) -> _ProcessPlan:
     """Admit direct Brownian physics and equal active represented counts."""
-    from particula.dynamics import BrownianCoagulationStrategy
+    from particula.dynamics import (
+        BrownianCoagulationStrategy,
+        ChargedCoagulationStrategy,
+    )
+    from particula.dynamics.coagulation import charged_kernel_strategy as models
+
+    supported = {
+        models.HardSphereKernelStrategy: "hard_sphere",
+        models.CoulombDyachkov2007KernelStrategy: "dyachkov2007",
+        models.CoulombGatti2008KernelStrategy: "gatti2008",
+        models.CoulombGopalakrishnan2012KernelStrategy: "gopalakrishnan2012",
+        models.CoulumbChahl2019KernelStrategy: "chahl2019",
+    }
 
     strategy = process.coagulation_strategy
-    if type(strategy) is not BrownianCoagulationStrategy:
-        raise ValueError("prepared coagulation supports Brownian only")
+    charged_model = None
+    if type(strategy) is ChargedCoagulationStrategy:
+        charged_model = supported.get(type(strategy.kernel_strategy))
+        if charged_model is None:
+            raise ValueError("charged kernel has no prepared GPU translation")
+    elif type(strategy) is not BrownianCoagulationStrategy:
+        raise ValueError(
+            "prepared coagulation requires Brownian or charged strategy"
+        )
     if aerosol.particles.distribution_type != "particle_resolved":
         raise ValueError("prepared coagulation requires particle_resolved")
     if (
@@ -95,7 +131,9 @@ def _plan_coagulation(process: Any, aerosol: Aerosol) -> _ProcessPlan:
             raise ValueError(
                 "Brownian GPU coagulation requires equal active counts"
             )
-    return _ProcessPlan("coagulation")
+    if charged_model is None:
+        return _ProcessPlan("coagulation")
+    return _ProcessPlan("coagulation", (("charged_model", charged_model),))
 
 
 def _plan_wall_loss(process: Any, aerosol: Aerosol) -> _ProcessPlan:
@@ -168,6 +206,25 @@ def _plan_wall_loss(process: Any, aerosol: Aerosol) -> _ProcessPlan:
 def _compile_process(plan: _ProcessPlan, owner: Any):
     """Retain one existing prepared direct-kernel call and its resources."""
     session, registry = owner._session, owner._registry
+    if plan.family in (
+        "ion_source",
+        "ion_cleanup",
+        "ion_condensation",
+        "cohort",
+    ):
+        from particula.execution.prepared_cohort import compile_cohort
+        from particula.execution.prepared_ions import (
+            compile_ion_cleanup,
+            compile_ion_exclusion,
+            compile_ion_source,
+        )
+
+        return {
+            "ion_condensation": compile_ion_exclusion,
+            "cohort": compile_cohort,
+            "ion_source": compile_ion_source,
+            "ion_cleanup": compile_ion_cleanup,
+        }[plan.family](plan, owner)
     if plan.family == "nucleation":
         from particula.execution.prepared_nucleation import compile_nucleation
 
@@ -236,38 +293,60 @@ def _compile_process(plan: _ProcessPlan, owner: Any):
         owner._bindings[plan.family] = binding
         return binding.execute
     if plan.family == "coagulation":
-        from particula.gpu.kernels.coagulation import (
-            _enqueue_prepared_coagulation_call,
-            _prepare_coagulation_step_gpu,
-        )
-
-        resources = registry.acquire_coagulation(session.dimensions.n_particles)
-        prepared = _prepare_coagulation_step_gpu(
-            session.particles,
-            None,
-            None,
-            owner.time_step,
-            collision_pairs=resources.collision_pairs,
-            n_collisions=resources.n_collisions,
-            rng_states=resources.rng_states,
-            initialize_rng=False,
-            environment=session.environment,
-        )
-        from particula.execution.prepared_guards import equal_active_counts
-
-        prepared = replace(prepared, failure=owner._device_failure)
-        owner._bindings[plan.family] = prepared
-        counts, failure = session.particles.concentration, owner._device_failure
-        wp = owner._wp
-
-        def enqueue():
-            wp.launch(
-                equal_active_counts,
-                dim=counts.shape[0],
-                inputs=[counts, failure],
-                device=prepared.device,
-            )
-            _enqueue_prepared_coagulation_call(prepared)
-
-        return enqueue
+        return _compile_coagulation(plan, owner)
     raise ValueError(f"unsupported prepared process family: {plan.family}")
+
+
+def _compile_coagulation(plan, owner):
+    """Retain the common collision sampler with optional ion rate work."""
+    session, registry = owner._session, owner._registry
+    from particula.gpu.kernels.coagulation import (
+        CoagulationMechanismConfig,
+        _enqueue_prepared_coagulation_call,
+        _prepare_coagulation_step_gpu,
+    )
+
+    model = plan.values.get("charged_model")
+    mechanism = (
+        CoagulationMechanismConfig(
+            mechanisms=("charged_hard_sphere",), charged_model=model
+        )
+        if model is not None
+        else CoagulationMechanismConfig()
+    )
+    resources = registry.acquire_coagulation(session.dimensions.n_particles)
+    prepared = _prepare_coagulation_step_gpu(
+        session.particles,
+        None,
+        None,
+        owner.time_step,
+        collision_pairs=resources.collision_pairs,
+        n_collisions=resources.n_collisions,
+        rng_states=resources.rng_states,
+        initialize_rng=False,
+        environment=session.environment,
+        mechanism_config=mechanism,
+    )
+    from particula.execution.prepared_guards import equal_active_counts
+
+    prepared = replace(prepared, failure=owner._device_failure)
+    if plan.values.get("atmospheric"):
+        from particula.execution.prepared_atmospheric import (
+            configure_atmospheric,
+        )
+
+        prepared = configure_atmospheric(plan, owner, prepared)
+    owner._bindings[plan.family] = prepared
+    counts, failure = session.particles.concentration, owner._device_failure
+    wp = owner._wp
+
+    def enqueue():
+        wp.launch(
+            equal_active_counts,
+            dim=counts.shape[0],
+            inputs=[counts, failure],
+            device=prepared.device,
+        )
+        _enqueue_prepared_coagulation_call(prepared)
+
+    return enqueue

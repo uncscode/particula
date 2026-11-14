@@ -85,6 +85,8 @@ def _preflight(processes, saved, backend, device):
         _preflight_restart,
     )
     from particula.execution.gpu_session import _preflight_cpu_session
+    from particula.execution.prepared_cohort import validate_cohort_plans
+    from particula.execution.prepared_ions import validate_ion_plans
     from particula.execution.prepared_processes import (
         _plan_process,
         _ProcessPlan,
@@ -112,12 +114,23 @@ def _preflight(processes, saved, backend, device):
     host = _host_state(saved.resident, restart.primary)
     _preflight_cpu_session(host.particles, host.gas, host.environment, target)
     plans = tuple(_plan_process(p, host) for p in processes)
+    validate_cohort_plans(plans)
+    validate_ion_plans(plans)
     if plans != saved.processes or len({p.family for p in plans}) != len(plans):
         raise ValueError("runnable configuration/order differs from checkpoint")
     families = {p.family for p in plans}
     actual = {p.family for p in restart.resource_payloads}
     if (
-        actual != families - {"wall_loss", "dilution"}
+        actual
+        != families
+        - {
+            "wall_loss",
+            "dilution",
+            "ion_source",
+            "ion_cleanup",
+            "ion_condensation",
+            "cohort",
+        }
         or saved.resident.communication is not None
     ):
         raise ValueError(
@@ -135,32 +148,66 @@ def _preflight(processes, saved, backend, device):
 def _validate_auxiliary(saved, plans):
     """Validate the optional last-step energy before setup or upload."""
     from particula.execution.checkpoint import _validate_payload
+    from particula.execution.prepared_cohort import validate_cohort_checkpoint
 
     latent = any(
         p.family == "condensation" and p.values["latent"] is not None
         for p in plans
     )
-    if type(saved.auxiliary) is not tuple or len(saved.auxiliary) != int(
-        latent
+    expected = {}
+    boxes = saved.resident.dimensions.n_boxes
+    if latent:
+        expected["latent_heat_energy"] = (
+            "<f8",
+            (boxes, saved.resident.dimensions.gas_species),
+        )
+    if any(p.family == "ion_source" for p in plans):
+        expected["ion_source_rng"] = ("<u4", (boxes,))
+        expected["ion_source_pairs"] = ("<i8", (boxes,))
+    if any(p.family == "ion_cleanup" for p in plans):
+        expected["ion_export_particles"] = ("<i8", (boxes,))
+        expected["ion_cleanup_phase"] = ("<i8", (boxes,))
+        expected["ion_export_mass"] = (
+            "<f8",
+            (boxes, saved.resident.dimensions.n_species),
+        )
+    if any(p.family == "cohort" for p in plans):
+        shape = (boxes, saved.resident.dimensions.n_particles)
+        expected["cohort_pending"] = ("<i8", shape)
+        expected["cohort_background"] = ("<i4", shape)
+        expected["cohort_statistics"] = ("<i8", (boxes, 4))
+    if type(saved.auxiliary) is not tuple or len(saved.auxiliary) != len(
+        expected
     ):
         raise ValueError(
             "checkpoint auxiliary inventory differs from process plan"
         )
+    seen = set()
     for item in saved.auxiliary:
         _validate_payload(item)
-        if (item.family, item.role, item.dtype, item.shape, item.capacity) != (
-            "prepared",
-            "latent_heat_energy",
-            "<f8",
-            (
-                saved.resident.dimensions.n_boxes,
-                saved.resident.dimensions.gas_species,
-            ),
-            None,
+        spec = expected.get(item.role)
+        if (
+            item.family != "prepared"
+            or item.role in seen
+            or spec is None
+            or (item.dtype, item.shape) != spec
+            or item.capacity is not None
         ):
             raise ValueError("invalid prepared checkpoint auxiliary payload")
-        if not np.all(np.isfinite(np.frombuffer(item.data, dtype=item.dtype))):
-            raise ValueError("checkpoint latent energy must be finite")
+        seen.add(item.role)
+        values = np.frombuffer(item.data, dtype=item.dtype)
+        if not np.all(np.isfinite(values)):
+            raise ValueError("checkpoint auxiliary values must be finite")
+        if item.role in (
+            "ion_source_pairs",
+            "ion_export_particles",
+            "ion_export_mass",
+        ) and np.any(values < 0):
+            raise ValueError("checkpoint ion inventories must be nonnegative")
+    from particula.execution.prepared_ions import validate_cleanup_phase
+
+    validate_cleanup_phase(saved, plans)
+    validate_cohort_checkpoint(saved)
 
 
 def _restore_after_binding(owner, saved):

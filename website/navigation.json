@@ -552,6 +552,22 @@
                 "slug": "examples/gpu/prepared/gpu_prepared_quick_start"
               },
               {
+                "label": "Charged Brownian models",
+                "slug": "examples/gpu/prepared/gpu_charged_models"
+              },
+              {
+                "label": "Explicit atmospheric ion balance",
+                "slug": "examples/gpu/prepared/gpu_ion_balance"
+              },
+              {
+                "label": "The lucky few",
+                "slug": "examples/gpu/prepared/gpu_lucky_few"
+              },
+              {
+                "label": "Two million charged particles",
+                "slug": "examples/gpu/prepared/gpu_environment_sweep"
+              },
+              {
                 "label": "64 heterogeneous CUDA boxes",
                 "slug": "examples/gpu/prepared/gpu_prepared_multibox"
               },

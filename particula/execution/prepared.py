@@ -140,12 +140,15 @@ class PreparedSimulation:
 
     def _bind(self, plans: tuple[Any, ...]) -> None:
         """Compile a validated process plan against the owned resident state."""
+        from particula.execution.prepared_cohort import wrap_cohort_operations
         from particula.execution.prepared_diagnostics import setup_diagnostics
         from particula.execution.prepared_processes import _compile_process
         from particula.execution.prepared_updates import compose_operations
 
         with self._scope():
+            self._plans = plans
             operations = tuple(_compile_process(plan, self) for plan in plans)
+            operations = wrap_cohort_operations(self, plans, operations)
             self._operations = compose_operations(self, plans, operations)
             self._diagnostics = setup_diagnostics(self)
             self._plans = plans
@@ -263,11 +266,23 @@ class PreparedSimulation:
                 self._wait()
                 with self._scope():
                     failure = int(self._device_failure.numpy()[0])
-                    if failure == 2:
-                        raise ValueError(
+                    messages = {
+                        2: (
                             "Brownian GPU coagulation requires "
                             "equal active counts"
-                        )
+                        ),
+                        3: "ion source capacity exhausted",
+                        4: "ion source Poisson mean exceeds supported range",
+                        5: "ion cleanup requires unit active counts",
+                        6: "seed cohort lineage invariant violated",
+                        7: (
+                            "atmospheric coagulation requires valid unit ions "
+                            "at 298.15 K and 101325 Pa"
+                        ),
+                        8: "LF2013 attachment rate is unsupported",
+                    }
+                    if failure in messages:
+                        raise ValueError(messages[failure])
                     for observe in self._observers:
                         observe()
                     if failure:
@@ -396,6 +411,67 @@ class PreparedSimulation:
             )
             apply_forcing(self, ((target, values),))
 
+    def ion_source_diagnostics(self):
+        """Return cumulative injected pairs and mass [kg] for each box.
+
+        This explicit observation synchronizes and returns detached arrays.
+        Mass is extensive, in the native particle species order.
+        """
+        import numpy as np
+
+        with self._lock:
+            self.synchronize()
+            source = next(
+                (p for p in self._plans if p.family == "ion_source"), None
+            )
+            if source is None:
+                raise ValueError("simulation has no ion source")
+            pairs = self._auxiliary["ion_source_pairs"].numpy().copy()
+            mass = np.zeros((pairs.size, self._session.dimensions.n_species))
+            for polarity in ("positive", "negative"):
+                mass[:, source.values[polarity + "_species"]] = (
+                    pairs * source.values[polarity + "_mass"]
+                )
+            return {"injected_pairs": pairs, "injected_mass": mass}
+
+    def ion_cleanup_diagnostics(self):
+        """Observe cumulative exported particles and mass [kg, box by species].
+
+        Exported charge is exactly zero by construction. Returned arrays are
+        detached; this explicit observation synchronizes the prepared owner.
+        """
+        with self._lock:
+            self.synchronize()
+            if "ion_export_mass" not in self._auxiliary:
+                raise ValueError("simulation has no ion cleanup")
+            return {
+                "exported_particles": self._auxiliary["ion_export_particles"]
+                .numpy()
+                .copy(),
+                "exported_mass": self._auxiliary["ion_export_mass"]
+                .numpy()
+                .copy(),
+            }
+
+    def cohort_diagnostics(self):
+        """Observe detached per-box original-lineage outcome counts.
+
+        Counts partition initial seeds into reached, captured and unresolved.
+        Unresolved lineages are censored at the chosen observation end time.
+        These are lineage counts, not the number of surviving particles.
+        """
+        with self._lock:
+            self.synchronize()
+            if "cohort_statistics" not in self._auxiliary:
+                raise ValueError("simulation has no seed cohort")
+            values = self._auxiliary["cohort_statistics"].numpy()
+            return {
+                name: values[:, column].copy()
+                for column, name in enumerate(
+                    ("initial", "reached", "captured", "unresolved")
+                )
+            }
+
     def checkpoint(self) -> SimulationCheckpoint:
         """Observe and save exact continuation bytes plus frozen configuration.
 
@@ -484,6 +560,8 @@ def prepare_simulation(
     """Validate the ordered process plan before uploading native state."""
     from particula._cpu_batch import duration
     from particula.execution.gpu_session import _preflight_cpu_session
+    from particula.execution.prepared_cohort import validate_cohort_plans
+    from particula.execution.prepared_ions import validate_ion_plans
     from particula.execution.prepared_processes import _plan_process
 
     if backend is not Backend.WARP:
@@ -498,6 +576,8 @@ def prepare_simulation(
     if not processes:
         raise ValueError("prepared execution requires at least one process")
     plans = tuple(_plan_process(process, aerosol) for process in processes)
+    validate_cohort_plans(plans)
+    validate_ion_plans(plans)
     if len({plan.family for plan in plans}) != len(plans):
         raise ValueError(
             "prepared execution supports one occurrence per family"
