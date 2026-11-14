@@ -78,12 +78,18 @@ def test_condensation_refinement_and_kappa_equilibrium():
     cuda()
     c = EnvironmentSweep(
         boxes_per_condition=2,
-        particles_per_box=16,
+        particles_per_box=128,
         duration=0.001,
         coagulation=False,
     )
-    _, coarse = run_environment_sweep(c)
-    _, fine = run_environment_sweep(replace(c, time_step=5e-7))
+    coarse_report, coarse = run_environment_sweep(c)
+    fine_report, fine = run_environment_sweep(replace(c, time_step=5e-7))
+    np.testing.assert_allclose(
+        [row["water_mass"] for row in coarse_report["history"]],
+        [row["water_mass"] for row in fine_report["history"]],
+        rtol=0.01,
+        atol=0,
+    )
     np.testing.assert_allclose(
         coarse.particles.masses, fine.particles.masses, rtol=0.01, atol=0
     )
