@@ -275,3 +275,30 @@ omission assumption, plus q=10 at doubled capacity. Each recorded 1 reached,
 capacity comparisons preserved the full cohort time series exactly. These
 small runs validate composed code paths; they neither establish a rare-event
 ion effect nor choose the production omitted-rate policy.
+
+
+The fixed 8192-box neutral timestep confirmation completed at the predeclared
+root seed 318. The default step reached 153 seeds (8039 captured); the half
+step reached 159 (8033 captured); neither left unresolved lineages. The 95%
+difference interval, half-step minus default, is [-0.006166, 0.007630], wholly
+inside the fixed [-0.01, 0.01] tolerance. This qualifies the neutral timestep
+comparison to that absolute resolution, not arbitrary smaller effects or
+ion-production cases. Mass residuals were below 5.8e-15. The separate order
+run is active on actual CUDA; the production omission-policy choice remains
+pending.
+
+
+The 8192-box neutral process-order check also completed. Coagulation first
+produced 152 reached, 8040 captured and no unresolved lineages; its 95%
+difference interval versus the default order is [-0.006945, 0.006701], inside
+the predeclared [-0.01, 0.01] tolerance. Maximum mass residual was 6.67e-15.
+The neutral timestep and order requirements are qualified at one-percentage-
+point absolute resolution. Charged production timestep/order/cleanup and
+ensemble qualification remain open; the 64-box ion checks do not replace them.
+
+Source review corrected the remaining erroneous D'yachkov bibliography entry
+in the GPU pair primitive, added the other model references, and documented
+its Coulomb-only aerosol interaction. The manuscript now explicitly excludes
+an additional aerosol image/polarization force and cites the hard-sphere fit.
+The executable GPU AST is unchanged after removing docstrings; these edits
+change documentation, not the numerical implementation.

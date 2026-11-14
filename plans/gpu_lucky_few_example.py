@@ -65,6 +65,13 @@ from scripts.gpu_studies.lucky_few import SurvivalConfig, run_survival
 # %% [markdown]
 # ## Attachment uncertainty and the outcome definition
 #
+# Aerosol–aerosol rates use the hard-sphere charged fit with Coulomb
+# interactions. There is no additional image/polarization force between
+# aerosols: at fixed masses and sizes, either zero aerosol charge removes the
+# Coulomb correction. Ion–aerosol attachment uses LF2013 separately. The
+# references motivate the question; reproducing their physical models would
+# require matching their interaction laws.
+#
 # LF2013 supplies ion–aerosol attachment within its tabulated charge, size and
 # reference-condition domains. Some repulsive coefficients below 10⁻¹⁵ m³/s
 # were omitted. A singly charged 3 nm seed falls outside the same-sign fit's
@@ -207,6 +214,8 @@ def plot_results(results):
 # and ensemble size, plus sensitivity to the unresolved attachment assumptions.
 #
 # Primary context:
+# - [Gopalakrishnan and Hogan (2012)](https://doi.org/10.1103/PhysRevE.85.026410):
+#   Coulombic collision scaling and the hard-sphere fit.
 # - [Lehtinen et al. (2007), growth versus scavenging](https://doi.org/10.1016/j.jaerosci.2007.06.009).
 # - [Mahfouz and Donahue (2021), charge-enhanced scavenging can reduce survival](https://doi.org/10.1029/2021GL092758).
 # - [Olenius et al. (2018), stochastic effects on nanoparticle growth](https://doi.org/10.1038/s41598-018-32610-z);

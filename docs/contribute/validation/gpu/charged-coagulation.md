@@ -364,3 +364,59 @@ The reviewed survival manuscript remains under `plans/gpu_lucky_few_example.py`.
 Its plots were inspected using the actual neutral pilot. It still needs frozen
 qualified settings, the production policy decision, full saved CUDA results,
 registration and extracted-download verification before publication.
+
+
+## Fixed neutral timestep confirmation
+
+The predeclared confirmation used 8192 independent boxes, root seed 318 and
+20,000 s at the frozen physical defaults. Both cases used the helper loaded
+at `d14f0899c`, before the order-control option was added. Their specification
+recorded helper SHA256
+`14f936ca87a115653c73b3dc8d36af14793473b264cd7a142ee50eb77918361e`.
+
+| Timestep | Reached | Captured | Unresolved | Exact 95% success interval | Maximum mass residual |
+| --- | --- | --- | --- | --- | --- |
+| 1 s | 153 | 8039 | 0 | [0.0158563, 0.0218466] | 5.78e-15 |
+| 0.5 s | 159 | 8033 | 0 | [0.0165326, 0.0226344] | 5.33e-15 |
+
+The conservative 95% difference interval (half-step minus default) is
+[-0.00616579, 0.00762977]. It lies inside the predeclared absolute tolerance
+[-0.01, 0.01], so the neutral timestep check passes at that resolution. This
+is not proof that numerical differences smaller than one percentage point
+are negligible, nor does it qualify charged ion-production conditions. Pilot
+and confirmation samples were not pooled, and the fresh-seed confirmation
+was assessed once. The half-step timing overlapped other CUDA validation
+and is excluded from performance comparisons.
+
+
+## Neutral process-order confirmation and reference review
+
+The separately predeclared order check used `ee8384eec`, 8192 boxes, root
+seed 318, dt=1 s and 20,000 s. The script asserted that every configuration
+field except aerosol process order matched the saved confirmation baseline.
+With coagulation before condensation, it recorded 152 reached, 8040 captured
+and zero unresolved lineages. Its exact 95% success interval was
+[0.0157437, 0.0217152], and maximum mass residual was 6.67e-15.
+
+The conservative 95% difference interval versus the default order is
+[-0.00694530, 0.00670130], inside the fixed [-0.01, 0.01] tolerance. This
+qualifies the neutral ordering comparison at that absolute resolution.
+Timestep and ordering intervals are separate, not simultaneous 95% bounds
+across every numerical comparison. Charged-production and cleanup-frequency
+qualification remain outstanding. Overlapping runs exclude timing claims.
+
+Source review found and corrected one remaining incorrect D'yachkov citation
+in `charged_kernel_wp`. The [publisher record](https://doi.org/10.1063/1.2713719)
+identifies D'yachkov, the two Khrapaks and Morfill in *Physics of Plasmas* 14,
+042102 (2007). The common pair scaling and hard-sphere fit are separately
+attributed to [Gopalakrishnan and Hogan (2012)](https://doi.org/10.1103/PhysRevE.85.026410),
+with Gatti/Kortshagen and Chahl/Gopalakrishnan references included for the other
+selected fits. After removing docstrings, the changed GPU module has an
+identical executable AST to `ee8384eec`.
+
+The manuscript now states the implemented interaction boundary explicitly:
+aerosol–aerosol electrostatics enter through the product of the charges, with
+no additional image/polarization term. At fixed masses and radii, either zero
+aerosol charge removes that Coulomb correction. LF2013 ion attachment remains
+a separate collision law. These model boundaries limit interpretation of any
+future atmospheric-survival comparison.

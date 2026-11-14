@@ -668,6 +668,10 @@ def charged_kernel_wp(  # noqa: C901
     ``particula.dynamics.coagulation.charged_dimensionless_kernel``. It does
     not change public exports.
 
+    Aerosol-pair electrostatics enter through the charge product. No separate
+    image or polarization interaction is included. At fixed masses and radii,
+    setting either charge to zero removes the Coulomb correction.
+
     Non-finite or non-positive radii, masses, thermodynamic state, or physical
     constants return exact safe zero. Charges must be finite but may be signed
     or zero. Invalid intermediates, finite-input intermediate overflow,
@@ -705,15 +709,29 @@ def charged_kernel_wp(  # noqa: C901
             finite and positive.
 
     Returns:
-        Finite, non-negative charged hard-sphere pair rate [m³/s], or exact
+        Finite, non-negative selected charged pair rate [m³/s], or exact
         ``0.0`` for invalid inputs, invalid or overflowed intermediates,
         finite extreme-repulsion clipping, or the kinetic cutoff.
 
     References:
-        Dyachkov, S. A., Kustova, E. V., & Kustov, A. V. (2007).
-        Coagulation of particles in the transition regime: The effect of the
-        Coulomb potential. *Journal of Chemical Physics*, 126(12).
+        Gopalakrishnan, R., & Hogan, C. J., Jr. (2012). Coulomb-influenced
+        collisions in aerosols and dusty plasmas. *Physical Review E*, 85,
+        026410. https://doi.org/10.1103/PhysRevE.85.026410
+
+        D'yachkov, L. G., Khrapak, A. G., Khrapak, S. A., & Morfill, G. E.
+        (2007). Model of grain charging in collisional plasmas accounting for
+        collisionless layer. *Physics of Plasmas*, 14, 042102.
         https://doi.org/10.1063/1.2713719
+
+        Gatti, M., & Kortshagen, U. (2008). Analytical model of particle
+        charging in plasmas over a wide range of collisionality.
+        *Physical Review E*, 78, 046402.
+        https://doi.org/10.1103/PhysRevE.78.046402
+
+        Chahl, H. S., & Gopalakrishnan, R. (2019). High potential, near free
+        molecular regime Coulombic collisions in aerosols and dusty plasmas.
+        *Aerosol Science and Technology*, 53, 933-957.
+        https://doi.org/10.1080/02786826.2019.1614522
     """
     zero = wp.float64(0.0)
     if (
