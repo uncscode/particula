@@ -26,7 +26,8 @@ physical predictions still require appropriate model choice and convergence.
 
 The [RTX 5060 scaling report](prepared/gpu_scaling_results.py) separates
 resident throughput, complete-workflow costs, old/new Brownian GPU execution
-and memory. Its downloadable data includes all timing samples and provenance.
+and memory. Its small downloadable data contains plotted summaries and displayed provenance,
+not model states or image arrays.
 
 ## Direct kernels and concrete resident interfaces
 

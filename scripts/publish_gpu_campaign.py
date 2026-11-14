@@ -1,4 +1,4 @@
-"""Validate a complete CUDA campaign and export compact publication evidence."""
+"""Validate a complete CUDA campaign; export only displayed plotting values."""
 
 import argparse
 import json
@@ -8,20 +8,62 @@ from scripts.gpu_studies.campaign import all_jobs, valid_result
 from scripts.gpu_studies.worker import executable_hash
 
 
-def compact(value):
-    """Retain samples and validation, omitting large trajectory arrays."""
-    omitted = {
-        "frames",
-        "number_m3_by_seed_time_box",
-        "final_histogram_by_seed_box",
-        "final_histogram_number_m3",
-        "external_mass_kg_by_box_material",
+def plot_row(report):
+    """Select only the small numeric series used by published line/bar plots.
+
+    Use an allowlist so future simulation arrays or validation diagnostics
+    cannot accidentally become downloadable data. Heatmaps and particle states
+    belong to transient execution, not this plotting payload.
+    """
+    case, mode = report["case"], report["mode"]
+    name = case["name"]
+    scaling = name.startswith(("particles-", "boxes-", "brownian-"))
+    occupancy = name.startswith("species-") and mode == "captured"
+    if not (scaling or occupancy) or mode == "evolution":
+        return None
+    case_fields = ["name", "steps"]
+    case_fields.append("boxes" if name.startswith("boxes-") else "slots")
+    if occupancy:
+        case_fields = ["name", "steps", "occupancy"]
+    timing_fields = ("median_s", "minimum_s", "maximum_s")
+    if occupancy:
+        timing_fields = ("median_s",)
+    result = {
+        "case": {key: case[key] for key in case_fields},
+        "mode": mode,
+        "timings": {
+            "resident": {
+                key: report["timings"]["resident"][key] for key in timing_fields
+            }
+        },
     }
-    if isinstance(value, dict):
-        return {k: compact(v) for k, v in value.items() if k not in omitted}
-    if isinstance(value, list):
-        return [compact(v) for v in value]
-    return value
+    if name.startswith("boxes-"):
+        result["science"] = {
+            "initial_active_slots": report["science"]["initial_active_slots"]
+        }
+    million = name == "particles-condensation-1048576"
+    if million:
+        result["timings"].update(
+            {
+                key: {"median_s": report["timings"][key]["median_s"]}
+                for key in ("setup", "capture", "download", "end_to_end")
+                if key in report["timings"]
+            }
+        )
+    if (million and mode != "numpy") or (
+        name.startswith("brownian-") and mode != "direct"
+    ):
+        result["memory"] = {
+            "mempool_peak_bytes": report["memory"]["mempool_peak_bytes"]
+        }
+    if million and mode == "captured":
+        for key in (
+            "radius_edges_m",
+            "initial_mean_histogram_number_m3",
+            "final_mean_histogram_number_m3",
+        ):
+            result[key] = report[key]
+    return result
 
 
 def validate_samples(report, key):
@@ -54,7 +96,7 @@ def parity_evidence(directory, reports, source_hash):
 
 
 def export_campaign(directory, destination):
-    """Require all declared jobs and exact cross-mode CUDA continuation."""
+    """Validate all jobs before selecting displayed point/line data."""
     manifest = json.loads((directory / "manifest.json").read_text())
     source_hash = executable_hash()
     if not manifest.get("qualified"):
@@ -71,33 +113,29 @@ def export_campaign(directory, destination):
         if mode != "evolution":
             validate_samples(report, key)
             groups.setdefault(case.name, []).append(report)
-        reports.append(compact(report))
+        reports.append(report)
     for name, rows in groups.items():
         if len({r["input_sha256"] for r in rows}) != 1:
             raise ValueError(f"Modes used different initial states: {name}")
         gpu = [r for r in rows if r["mode"] != "numpy"]
         if len({r["result_hash"] for r in gpu}) != 1:
             raise ValueError(f"CUDA modes changed continuation: {name}")
+    parity = parity_evidence(directory, reports, source_hash)
+    gpu = next(row for row in reports if row["mode"] == "captured")
     output = {
-        "schema_version": 1,
+        "schema_version": 2,
         "qualified": True,
         "campaign_started_at": manifest["started_at"],
         "executable_sha256": source_hash,
         "job_count": len(reports),
         "cross_mode_cuda_exact": True,
-        "cpu_cuda_parity": parity_evidence(directory, reports, source_hash),
-        "notes": [
-            "Actual CUDA; Warp CPU is not a performance comparison.",
-            "Three warmups and seven restored-state timing samples.",
-            "Seven independent fresh setup/work/download runs except legacy.",
-            "Direct means retained low-level kernels, not wrapper preflight.",
-            "Legacy retains the original serial Brownian majorant/selector.",
-            "Condensation workloads include exact exponential dilution.",
-            "Memory is Warp mempool peak, excluding context/driver allocation.",
-            "Dirty metadata includes docs edits; executable hash is pinned.",
-            "Full histories are regenerated by their separate CUDA tutorials.",
-        ],
-        "reports": reports,
+        "cpu_cuda_parity_case_count": len(parity["cases"]) if parity else 0,
+        "provenance": {
+            key: gpu[key]
+            for key in ("gpu_name", "warp", "cpu_model", "source_revision")
+        },
+        "memory_method": gpu["memory"]["method"],
+        "reports": [row for report in reports if (row := plot_row(report))],
     }
     destination.parent.mkdir(parents=True, exist_ok=True)
     destination.write_text(json.dumps(output, indent=2, allow_nan=False) + "\n")
@@ -111,7 +149,10 @@ def main():
     parser.add_argument("destination", type=Path)
     args = parser.parse_args()
     report = export_campaign(args.directory, args.destination)
-    print(f"Exported {report['job_count']} qualified reports")
+    print(
+        f"Validated {report['job_count']} jobs; "
+        f"exported {len(report['reports'])} plotted series"
+    )
 
 
 if __name__ == "__main__":

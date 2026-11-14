@@ -11,7 +11,7 @@ from scripts.gpu_studies.cases import StudyCase
 @pytest.fixture
 def campaign(tmp_path, monkeypatch):
     """Build a tiny complete campaign with exact comparable continuations."""
-    case = StudyCase("test", "brownian", 1, 128)
+    case = StudyCase("brownian-128", "brownian", 1, 128)
     modes = ("direct", "prepared", "captured", "legacy")
     monkeypatch.setattr(
         publication, "all_jobs", lambda: tuple((case, m) for m in modes)
@@ -23,7 +23,7 @@ def campaign(tmp_path, monkeypatch):
         "jobs": {},
     }
     for mode in modes:
-        key = f"test-{mode}"
+        key = f"brownian-128-{mode}"
         manifest["jobs"][key] = {"status": "passed"}
         report = {
             "qualified": True,
@@ -34,7 +34,21 @@ def campaign(tmp_path, monkeypatch):
             "samples": 7,
             "input_sha256": "same-input",
             "result_hash": "same-result",
-            "timings": {"resident": {"samples_s": [0.1] * 7}},
+            "timings": {
+                "resident": {
+                    "samples_s": [0.1] * 7,
+                    "median_s": 0.1,
+                    "minimum_s": 0.1,
+                    "maximum_s": 0.1,
+                }
+            },
+            "memory": {"mempool_peak_bytes": 1024, "method": "pool peak"},
+            "gpu_name": "Test CUDA GPU",
+            "warp": "1.11.1",
+            "cpu_model": "Test CPU",
+            "source_revision": "current",
+            "science": {"large_unused_array": [1] * 1000},
+            "new_future_state_field": [2] * 1000,
         }
         (tmp_path / f"{key}.json").write_text(json.dumps(report))
     (tmp_path / "manifest.json").write_text(json.dumps(manifest))
@@ -49,13 +63,28 @@ def mutate(directory, name, field, value):
     path.write_text(json.dumps(report))
 
 
-def test_complete_evidence_keeps_samples_and_exactness(campaign):
-    """Publication retains repetitions and exposes cross-mode validation."""
+def test_complete_evidence_keeps_only_plotted_values(campaign):
+    """Validate repetitions locally but publish only displayed numeric summaries."""
     destination = campaign / "public.json"
     result = publication.export_campaign(campaign, destination)
     assert result["job_count"] == 4
     assert result["cross_mode_cuda_exact"] is True
-    assert result["reports"][0]["timings"]["resident"]["samples_s"] == [0.1] * 7
+    assert result["schema_version"] == 2
+    assert result["reports"][0] == {
+        "case": {"name": "brownian-128", "steps": 3, "slots": 128},
+        "mode": "direct",
+        "timings": {
+            "resident": {"median_s": 0.1, "minimum_s": 0.1, "maximum_s": 0.1}
+        },
+    }
+    encoded = destination.read_text()
+    for omitted in (
+        "samples_s",
+        "science",
+        "new_future_state_field",
+        "result_hash",
+    ):
+        assert omitted not in encoded
     assert json.loads(destination.read_text()) == result
 
 
@@ -63,12 +92,22 @@ def test_complete_evidence_keeps_samples_and_exactness(campaign):
     ("file", "field", "value", "message"),
     [
         ("manifest.json", "qualified", False, "incomplete"),
-        ("test-captured.json", "executable_sha256", "old", "stale"),
-        ("test-captured.json", "result_hash", "different", "continuation"),
-        ("test-captured.json", "input_sha256", "different", "initial states"),
-        ("test-captured.json", "samples", 6, "repetitions"),
+        ("brownian-128-captured.json", "executable_sha256", "old", "stale"),
         (
-            "test-captured.json",
+            "brownian-128-captured.json",
+            "result_hash",
+            "different",
+            "continuation",
+        ),
+        (
+            "brownian-128-captured.json",
+            "input_sha256",
+            "different",
+            "initial states",
+        ),
+        ("brownian-128-captured.json", "samples", 6, "repetitions"),
+        (
+            "brownian-128-captured.json",
             "timings",
             {"resident": {"samples_s": [0.1] * 6}},
             "timing samples",
@@ -87,18 +126,16 @@ def test_bad_evidence_never_replaces_publication(
     assert destination.read_text() == "original publication"
 
 
-def test_compact_preserves_measurements_and_scientific_gates():
-    """Only large raw histories are excluded from downloadable evidence."""
-    result = publication.compact(
-        {
-            "timings": {"samples_s": [1, 2, 3]},
-            "experiment": {"frames": ["large"], "restart_exact": True},
-        }
-    )
-    assert result == {
-        "timings": {"samples_s": [1, 2, 3]},
-        "experiment": {"restart_exact": True},
-    }
+def test_unplotted_workloads_are_not_exported():
+    """Scientific histories and unused timing cases remain local artifacts."""
+    for name, mode in (
+        ("heterogeneous-evolution", "evolution"),
+        ("full-million", "prepared"),
+        ("species-condensation-25", "direct"),
+    ):
+        assert (
+            publication.plot_row({"case": {"name": name}, "mode": mode}) is None
+        )
 
 
 @pytest.mark.parametrize(

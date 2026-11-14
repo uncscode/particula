@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 2.883971343981102,
+  "package_source_sha256": "e4661a2e3003b42b1a1e9ff8b438636f922d2afff85115706be9ee79fe9b3741",
+  "input_sha256": {
+    "docs/data/gpu/rtx5060.json": "a9e6a4f61c0103cdd24e1c97675dc9d2252388cfb6bf87509e749904cb7d7b4d"
+  },
+  "example": "gpu-scaling-results",
+  "fingerprint": "b41dafc423ee941f18dcfd9b016fc37063b327738f3c206808485a2bfc91821b",
+  "source": "docs/examples/gpu/prepared/gpu_scaling_results.py",
+  "revision": "f6b4dd8336100d2ed356df5966af7f7925624b30",
+  "package_dirty": false,
+  "executed_at": "2026-11-14T02:20:01.694487+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [],
+    [
+      {
+        "text": "GPU: NVIDIA GeForce RTX 5060 Warp: 1.11.1\nCPU: AMD Ryzen AI 9 HX 370 w/ Radeon 890M\nCampaign start: 2026-11-13T23:40:44.667614+00:00\nExecutable SHA256: 41e30ec6c05cbc75fe05639f84149373fd173a4a15c7ad55412a456b5ecf20e5\nSource revision: 0a8307046d064e101d13327190cec5fa4813078f\nQualified jobs: 104\nAll direct/prepared/captured/legacy CUDA states match exactly.\nFull-array CPU/CUDA parity cases: 17\nMemory method: Warp CUDA mempool high-water mark; excludes CUDA context/driver allocations\n"
+      },
+      {
+        "image": "figure-5-2.png"
+      },
+      {
+        "image": "figure-5-3.png"
+      },
+      {
+        "image": "figure-5-4.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "ef48200f7df99aeb5511a4453edda278d5e6bd58b99bfda09484ca03921d8cc8",
+    "figure-5-2.png": "922430e5b571635cdc1b8fcdb7e6bc5ffb9a314f7a1e2177651776c37119135b",
+    "figure-5-3.png": "ea1abed8bcd310367aa9f81de4e84fac3b214d852a1b95abc5c6f544c29829b4",
+    "figure-5-4.png": "dae096b2ebc6ef259c5b35c400f63ac67fb7f322fa474c2d471ac5a9be1f56bc"
+  }
+}
