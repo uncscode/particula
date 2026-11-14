@@ -1,15 +1,15 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 3.7616244640084915,
-  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "elapsed_seconds": 3.019109045038931,
+  "package_source_sha256": "98021107918d76caafbd800e6f8ab4c66bb0905e1950a2fc7075c622655abf5a",
   "input_sha256": {},
   "example": "theory-ionparticle-coagulation",
   "fingerprint": "f5f9be330f436c33409434e30d23352227ede0fdea623c4191c14a6683de81b3",
   "source": "docs/theory/dynamics/ionparticle-coagulation.py",
-  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "revision": "54ad1a812054da5361bdad2f2d397dd05615269e",
   "package_dirty": false,
-  "executed_at": "2026-11-13T14:59:39.019123+00:00",
+  "executed_at": "2026-11-14T17:18:02.120093+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
@@ -39,8 +39,8 @@
     ]
   ],
   "files": {
-    "source.py": "e1495afbb5807de6af786d68061b76291b914b385c963f52f8bd5ca36465caf8",
-    "figure-3-2.png": "85ec9cb577dd579574548a36b61ce786af030a63900fd129c3829a3b646631ee",
-    "figure-4-1.png": "2d02483ec452ffd94dd9c6b1f9df3164e4297fc794f67346a134f9c8ad0adebb"
+    "source.py": "04829c25ef807617b621cfc9995a42c3f6cc341ef6bdb5e4e6b4b76350f182e6",
+    "figure-3-2.png": "0cc909db762f0f3b23e0b6ec2cc3e2c8af3a4fbb8ec19b25912d7a00971c1089",
+    "figure-4-1.png": "386dc066e758c12324c064ce34aeb695385c0d08d9b7e7558a4997144a5f89f7"
   }
 }
