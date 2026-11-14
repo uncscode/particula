@@ -321,7 +321,7 @@ def save_cell_outputs(cells, pending):
 
 
 def validate_render(config, root, source, initial_fingerprint, cells, data):
-    """Reject source drift or renderer mutation before touching published output."""
+    """Reject source drift or data mutation before publication."""
     if data is not None and cells[0]["metadata"]["plot_data"] != data:
         raise ValueError(
             "Renderer changed saved numerical data; refusing publication"
