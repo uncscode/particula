@@ -121,8 +121,9 @@ from scripts.gpu_studies.lucky_few import (
 def run_example(config=None, policies=("lower", "upper")):
     """Run the control and explicit attachment sensitivity cases.
 
-    ``config`` contains the already-qualified numerical settings. ``policies``
-    must explicitly select one or both documented omitted-rate assumptions.
+    Defaults use the qualified study settings. Custom physical or numerical
+    settings need their own checks. ``policies`` selects one or both documented
+    omitted-rate assumptions.
     The q=0 control is run once with strict lookup and no initial ions.
     """
     if config is None:
@@ -226,7 +227,10 @@ def plot_results(results):
 # ## Reading the result
 #
 # The curves show cumulative first passages; they are not instantaneous counts
-# of surviving particles. The final intervals quantify finite-ensemble sampling
+# of surviving particles. Identical curves can overlap.
+# Matching recorded outcomes under both rate
+# assumptions does not establish identical survival probabilities.
+# The final intervals quantify finite-ensemble sampling
 # uncertainty for each case separately, not parameter uncertainty or a joint
 # confidence band. Overlapping intervals alone do not establish equivalence.
 # The printed differences compare each ion case with the no-ion control;

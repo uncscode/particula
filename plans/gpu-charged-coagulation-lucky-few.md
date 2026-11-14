@@ -21,13 +21,13 @@ upstream PR. Merge and release are outside this authorization.
 - [x] Exclude free ions and neutral products from condensation proposals;
   preserve uptake by aerosol particles with attached ions and exact inventories.
 - [x] Add resident cohort metadata, first-passage tracking and censoring;
-  study-level timestep and process-order convergence remains outstanding.
+  study-level timestep and process-order qualification is recorded below.
 - [x] Validate implemented library formulas, stochastic collisions and lifecycle
   behavior on native CPU references, Warp CPU and actual CUDA.
-- [ ] Complete survival-study convergence and uncertainty qualification.
+- [x] Complete survival-study convergence and uncertainty qualification.
 - [x] Add narrated percent-cell charged model comparison and saved CUDA output.
 - [x] Add atmospheric ion-balance percent source and inspect saved CUDA output.
-- [ ] Add the 3–50 nm Lucky Few percent-cell study.
+- [x] Add the 3–50 nm Lucky Few percent-cell study.
 - [ ] Execute full examples, inspect saved figures, verify downloads/build.
 - [x] Open draft upstream PR #1650 and push validated implementation increments.
 - [ ] Finish the survival example, final diff review and final hosted CI.
@@ -326,3 +326,14 @@ CPU/CUDA regressions compare the stopped prefix/final outcome with full runs
 and retain unresolved lineages through the horizon: 25 helper tests passed.
 The earlier full-horizon runs resolved all lineages by 3730 s; this observation
 motivates the optimization, not a shorter fixed observation horizon.
+
+## Charged qualification completed
+
+All 20 fixed CUDA runs passed: four baseline sampling-precision checks and
+16 timestep/order/cleanup/capacity comparisons. Every individual conservative
+95% difference interval lies within the predeclared [-0.01, 0.01] tolerance.
+Baseline successes were 140/8192 for q=2 and 151/8192 for q=10 under either
+coefficient assumption. All lineages resolved, maximum mass residual was
+2.998e-15, and all four capacity time series matched their baselines exactly.
+The complete matrix, source hash and limitations are in the validation record.
+The separate root-321 publication run and final saved-output/CI checks remain.

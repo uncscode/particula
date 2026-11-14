@@ -3,6 +3,9 @@
 Development evidence, 2026-11-13, branch
 `codex/gpu-charged-coagulation-lucky-few`, based on `19a8fb11d`.
 These results concern the implementation on this branch; no release is claimed.
+Sections retain chronological checkpoints. The latest charged numerical results
+are in [completed qualification](#completed-charged-survival-qualification);
+earlier pending-status notes describe their original checkpoints.
 
 ## Implemented boundary
 
@@ -66,7 +69,8 @@ the read-only Warp cache; the successful host rerun above supersedes it.
 
 Hosted CI is separate from these local results. All six workflows passed at
 `8d8f476fd`; newer increments require their own hosted results.
-No speedup or atmospheric survival probability is established by this record.
+No CPU speedup or field-validated atmospheric survival prediction is established
+by this record.
 
 ## Neutral-product cleanup follow-up
 
@@ -461,3 +465,58 @@ executed all five small CUDA cases outside the checkout with `PYTHONPATH`
 removed. Its first smoke assertion used exact decimal-time equality; rerunning
 with the established 1e-14 time tolerance passed. This download smoke check is
 separate from the complete publication workload and its numerical qualification.
+
+## Completed charged survival qualification
+
+All 20 CUDA runs completed and all predeclared checks passed. The four baseline
+precision checks and 16 numerical comparisons use individual confidence
+intervals; they do not form a simultaneous 95% guarantee over the matrix.
+The accepted resolution is one percentage point in absolute survival
+probability. Smaller ion effects are not qualified by this criterion.
+
+The campaign used library revision `58ab7e3e870b08932149baca4ae5c62a5ba99664` and the
+study helper now committed in `f861f9fd4`, SHA256
+`5f61eb0415b560e577b8f6d841053c3cf8eda7e9a4a3acb184812663d9ec8ca1`.
+All cases resolved every lineage before the 20,000 s horizon. Their last
+diagnostics ranged from 3710 to 3790 s. Maximum per-species mass residual was
+2.998e-15, exact net charge remained zero, and peak observed occupancy
+was 37 slots. Diagnostic occupancy is not an instantaneous upper bound.
+
+| q [pairs cm^-3 s^-1] | Omitted coefficient [m^3/s] | Baseline reached / 8192 | Exact 95% success interval |
+| --- | --- | --- | --- |
+| 2 | 0 | 140 | [0.014395, 0.020136] |
+| 2 | 1e-15 | 140 | [0.014395, 0.020136] |
+| 10 | 0 | 151 | [0.015631, 0.021584] |
+| 10 | 1e-15 | 151 | [0.015631, 0.021584] |
+
+Differences below are variant minus its matching baseline.
+
+| q | Omitted coefficient [m^3/s] | Numerical change | Reached / 8192 | Conservative 95% difference interval |
+| --- | --- | --- | --- | --- |
+| 2 | 0 | half-step | 135 | [-0.007102, 0.005882] |
+| 2 | 0 | reversed-order | 140 | [-0.006549, 0.006549] |
+| 2 | 0 | half-cleanup | 140 | [-0.006549, 0.006549] |
+| 2 | 0 | double-capacity | 140 | [-0.006549, 0.006549] |
+| 2 | 1e-15 | half-step | 135 | [-0.007102, 0.005882] |
+| 2 | 1e-15 | reversed-order | 140 | [-0.006549, 0.006549] |
+| 2 | 1e-15 | half-cleanup | 140 | [-0.006549, 0.006549] |
+| 2 | 1e-15 | double-capacity | 140 | [-0.006549, 0.006549] |
+| 10 | 0 | half-step | 153 | [-0.006569, 0.007057] |
+| 10 | 0 | reversed-order | 152 | [-0.006680, 0.006924] |
+| 10 | 0 | half-cleanup | 150 | [-0.006902, 0.006658] |
+| 10 | 0 | double-capacity | 151 | [-0.006791, 0.006791] |
+| 10 | 1e-15 | half-step | 153 | [-0.006569, 0.007057] |
+| 10 | 1e-15 | reversed-order | 152 | [-0.006680, 0.006924] |
+| 10 | 1e-15 | half-cleanup | 150 | [-0.006902, 0.006658] |
+| 10 | 1e-15 | double-capacity | 151 | [-0.006791, 0.006791] |
+
+All four doubled-capacity runs preserved the complete recorded outcome time
+series exactly. Nine earlier full-horizon validation histories also retained
+identical outcome counts after every lineage had resolved, supporting the
+absorbing-outcome stopping rule alongside the CPU/CUDA regressions.
+
+Short CUDA regression and download-smoke jobs overlapped early campaign runs;
+these timings are not performance comparisons. The publication workload uses
+a separate fixed root seed, 321, with the qualified default settings. Both
+coefficient assumptions remain explicit sensitivity cases, not bounds on
+survival probability or an empirical atmospheric validation.
