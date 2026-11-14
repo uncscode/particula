@@ -675,5 +675,17 @@
       "scripts/gpu_studies/lucky_few.py"
     ],
     "invoke": "result = run_example()"
+  },
+  "gpu-environment-sweep": {
+    "title": "Two million charged particles across sixteen environments",
+    "source": "docs/examples/gpu/prepared/gpu_environment_sweep.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 3600,
+    "inputs": [
+      "scripts/gpu_studies/__init__.py",
+      "scripts/gpu_studies/environment_sweep.py"
+    ],
+    "invoke": "result = run_example()"
   }
 }
