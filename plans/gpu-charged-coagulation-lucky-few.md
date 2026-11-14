@@ -431,7 +431,9 @@ longer humidity study with active coagulation and explicit ions.
 - [x] Complete the final humidity CUDA study; inspect all eight figures and
   interpret 334 aerosol mergers and 105,243 ion attachments. Maximum mass
   residual 8.593e-14; exact total charge; extracted CUDA download verified.
-- [ ] Run relevant regression suites, documentation build, push and check PR CI.
+- [x] Run relevant regression suites and the final documentation build; push
+  completed studies and validation records to the draft PR. Final-commit hosted
+  validation is tracked by the live [PR CI gate](https://github.com/uncscode/particula/pull/1650/checks).
 
 Physical-limit validation uncovered an inherited inversion of Gc/Gk in the
 charged diffusive Knudsen number. Correct both CPU and Warp before final runs;
