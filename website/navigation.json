@@ -564,6 +564,10 @@
                 "slug": "examples/gpu/prepared/gpu_lucky_few"
               },
               {
+                "label": "Two million charged particles",
+                "slug": "examples/gpu/prepared/gpu_environment_sweep"
+              },
+              {
                 "label": "64 heterogeneous CUDA boxes",
                 "slug": "examples/gpu/prepared/gpu_prepared_multibox"
               },

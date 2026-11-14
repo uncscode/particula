@@ -364,3 +364,23 @@ Upstream advanced from the original base to `e5f0af936` only by changing the
 website Mistune lock from 3.1.4 to 3.3.3. Simulator code and the selected local
 research environment are unchanged. Final PR CI checks integration with the
 current upstream base. Merge and release remain outside this task.
+
+## Additional two-million-particle environmental example
+
+The user selected charged aerosols with temperature, pressure and humidity
+variation, separate from the fixed-reference explicit-ion study. Design:
+16 controlled environments (278.15/298.15 K, 70000/101325 Pa, initial RH
+0.4/0.6/0.8/0.9), 1024 independent boxes per condition and 128 initially
+active particles per box: 2,097,152 simultaneous resolved particles.
+Unit counts, matched polydisperse initial populations, balanced charge,
+closed water vapor plus kappa-water condensation and charged Brownian
+coagulation. Vapor diffusivity is an explicit fixed 2e-5 m2/s approximation.
+There is no altitude trajectory, ion attachment or humidity replenishment.
+
+- [x] Existing charged feature passed all six hosted workflows at 4fefc50c3.
+- [x] Small CUDA pilot: finite nonnegative state and per-box mass/charge budgets.
+- [ ] Choose duration after full-layout performance and timestep pilots.
+- [ ] Validate water-growth timestep sensitivity and independent equilibrium law.
+- [ ] Run the complete 2,097,152-particle workload and inspect saved figures.
+- [ ] Register narrated percent source, test downloadable helpers and build site.
+- [ ] Push final evidence and follow final-commit CI.

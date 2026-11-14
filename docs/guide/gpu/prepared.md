@@ -325,3 +325,9 @@ work. The campaign waits for the measured work before stopping its timer and
 reports separate preparation and transfer costs. Nsight Systems supplies
 kernel-level attribution; profiling runs are separate from timing repetitions.
 See [Warp profiling guidance](https://nvidia.github.io/warp/v1.11/deep_dive/profiling.html).
+
+The [two-million-particle environmental sweep](../../examples/gpu/prepared/gpu_environment_sweep.py)
+combines charged Brownian coagulation with closed water condensation across
+sixteen temperature, pressure and initial-humidity conditions. It keeps all
+2,097,152 initial particles resident together and documents its constant
+vapor-diffusivity approximation.
