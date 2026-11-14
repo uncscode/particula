@@ -140,12 +140,14 @@ class PreparedSimulation:
 
     def _bind(self, plans: tuple[Any, ...]) -> None:
         """Compile a validated process plan against the owned resident state."""
+        from particula.execution.prepared_cohort import wrap_cohort_operations
         from particula.execution.prepared_diagnostics import setup_diagnostics
         from particula.execution.prepared_processes import _compile_process
         from particula.execution.prepared_updates import compose_operations
 
         with self._scope():
             operations = tuple(_compile_process(plan, self) for plan in plans)
+            operations = wrap_cohort_operations(self, plans, operations)
             self._operations = compose_operations(self, plans, operations)
             self._diagnostics = setup_diagnostics(self)
             self._plans = plans
@@ -263,6 +265,10 @@ class PreparedSimulation:
                 self._wait()
                 with self._scope():
                     failure = int(self._device_failure.numpy()[0])
+                    if failure == 6:
+                        raise ValueError(
+                            "seed cohort lineage invariant violated"
+                        )
                     if failure == 5:
                         raise ValueError(
                             "ion cleanup requires unit active counts"
@@ -448,6 +454,25 @@ class PreparedSimulation:
                 .copy(),
             }
 
+    def cohort_diagnostics(self):
+        """Observe detached per-box original-lineage outcome counts.
+
+        Counts partition initial seeds into reached, captured and unresolved.
+        Unresolved lineages are censored at the chosen observation end time.
+        These are lineage counts, not the number of surviving particles.
+        """
+        with self._lock:
+            self.synchronize()
+            if "cohort_statistics" not in self._auxiliary:
+                raise ValueError("simulation has no seed cohort")
+            values = self._auxiliary["cohort_statistics"].numpy()
+            return {
+                name: values[:, column].copy()
+                for column, name in enumerate(
+                    ("initial", "reached", "captured", "unresolved")
+                )
+            }
+
     def checkpoint(self) -> SimulationCheckpoint:
         """Observe and save exact continuation bytes plus frozen configuration.
 
@@ -536,6 +561,7 @@ def prepare_simulation(
     """Validate the ordered process plan before uploading native state."""
     from particula._cpu_batch import duration
     from particula.execution.gpu_session import _preflight_cpu_session
+    from particula.execution.prepared_cohort import validate_cohort_plans
     from particula.execution.prepared_processes import _plan_process
 
     if backend is not Backend.WARP:
@@ -550,6 +576,7 @@ def prepare_simulation(
     if not processes:
         raise ValueError("prepared execution requires at least one process")
     plans = tuple(_plan_process(process, aerosol) for process in processes)
+    validate_cohort_plans(plans)
     if len({plan.family for plan in plans}) != len(plans):
         raise ValueError(
             "prepared execution supports one occurrence per family"

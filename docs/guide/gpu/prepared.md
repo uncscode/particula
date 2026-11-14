@@ -52,6 +52,7 @@ the full collection of CPU strategies or direct GPU mechanism masks.
 | Nucleation | `Nucleation` with activation or kinetic strategy | Resolved unit-count, neutral injection with explicit species mapping, integral event demand and fixed capacity; supported exhaustion/resampling policy is retained. |
 | Ion source | `IonPairSource` with constant production | Paired Poisson unit-count injection into fixed capacity; independent source RNG and inventory ledger. |
 | Ion cleanup | `IonNeutralCleanup` | Exports neutral ion-only products from reserved material lanes; retains neutralized aerosol particles and records exported mass. |
+| Seed cohort | `SeedCohort` | Original unit-count seed lineages; first passage before background capture; observes after every physical process. |
 
 Prepared charged coagulation accepts `HardSphereKernelStrategy`,
 `CoulombDyachkov2007KernelStrategy`, `CoulombGatti2008KernelStrategy`,
@@ -110,7 +111,7 @@ CPU `execute()` is unsupported and rejects explicitly.
 This source supplies particles, not atmospheric ion collision physics. Do not
 interpret ordinary charged coagulation of these particles as validated
 ion–aerosol attachment or ion–ion recombination. Free-ion condensation
-exclusion and cohort tracking require additional integration.
+exclusion still requires additional integration.
 
 `IonNeutralCleanup` from `particula.dynamics.ions.cleanup` removes neutral
 products containing both reserved ion materials and no other material.
@@ -127,6 +128,39 @@ is exactly zero. Check each species' initial mass plus injected mass against
 remaining mass plus exported mass. The ledgers participate in CUDA capture and
 exact checkpoint continuation. Unit active counts are required throughout;
 evolving fractional counts fault before a box is modified.
+
+## Original seed lineages
+
+`SeedCohort` from `particula.execution.cohort` adds an observer to a prepared
+composition. Supply distinct `seed_species` and `background_species` indices
+and `target_diameter` [m, default 50 nm]. At preparation, each active particle
+containing seed material contributes one original lineage; particles containing
+background material receive a persistent background label. Labels describe the
+initial population, not a later test of material composition.
+
+The observer runs after every physical process, regardless of where its
+configuration appears in the composition. It follows successfully applied
+coagulation pairs, adds unresolved lineage counts on seed–seed mergers, and
+clears donor labels before slot reuse. Any background merger captures unresolved
+lineages before the merged particle's diameter is tested. A lineage that already
+reached the threshold remains successful after later mergers. Diameter uses the
+sum of material volumes, consistent with the native spherical-particle model.
+
+`simulation.cohort_diagnostics()` returns detached per-box arrays `initial`,
+`reached`, `captured` and `unresolved`. The invariant is
+`initial = reached + captured + unresolved`. At the chosen end time, unresolved
+lineages are right-censored. These counts differ from surviving particle counts:
+two seeds may become one particle while retaining two unresolved lineages.
+The labels and outcome ledger survive native capture and exact checkpoint
+continuation; they never modify physical mass, charge or the collision RNG.
+
+Supported physical companions are condensation, coagulation, ion sources and
+ion cleanup. Ion material lanes must be distinct from both cohort markers.
+Removal, dilution and resampling processes reject because their lineage-outcome
+semantics are not defined here. All active counts must remain one.
+First passage is resolved at process boundaries, not interpolated within a
+condensation substep or physical time interval. A survival study must test
+timestep and process-order sensitivity before interpreting rare-event results.
 
 ## State, forcing and observations
 
