@@ -18,6 +18,8 @@ upstream PR. Merge and release are outside this authorization.
   capacity and independent persistent source RNG with capture/restart.
 - [x] Add neutral-product cleanup and exported inventory ledgers as a prepared
   process; final ion-collision ordering remains part of study integration.
+- [x] Exclude free ions and neutral products from condensation proposals;
+  preserve uptake by aerosol particles with attached ions and exact inventories.
 - [x] Add resident cohort metadata, first-passage tracking and censoring;
   study-level timestep and process-order convergence remains outstanding.
 - [ ] Validate numerical, scientific, stochastic and lifecycle behavior on
@@ -106,6 +108,12 @@ Update owning GPU guides and validation evidence; preserve README boundaries.
 - Seed-lineage observer and affected prepared regression: 171 passed on host
   CPU/CUDA, including actual condensation growth, merger/capture precedence,
   native capture and exact continuation before/after mergers.
+- LF2013 device helpers use algebraically centered published polynomials;
+  all 201 charge states and both polarities match 70-digit decimal evaluation
+  at nine radii per valid interval within 1e-10 relative tolerance. These helpers
+  still need integration into the atmospheric collision scheduler.
+- Ion exclusion and mixed-density Kelvin support: 171 combined ion-physics and
+  prepared tests passed on host CPU/CUDA, including native CPU parity at 2e-12.
 - Discovered scientific gap: LF2013 omits repulsive attachment rates below
   1e-15 m^3/s. For same-sign singly charged seeds, the fit begins at radius
   5.30835917 nm, above the planned 1.5 nm seed radius. Production policy is

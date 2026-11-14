@@ -146,6 +146,7 @@ class PreparedSimulation:
         from particula.execution.prepared_updates import compose_operations
 
         with self._scope():
+            self._plans = plans
             operations = tuple(_compile_process(plan, self) for plan in plans)
             operations = wrap_cohort_operations(self, plans, operations)
             self._operations = compose_operations(self, plans, operations)
@@ -562,6 +563,7 @@ def prepare_simulation(
     from particula._cpu_batch import duration
     from particula.execution.gpu_session import _preflight_cpu_session
     from particula.execution.prepared_cohort import validate_cohort_plans
+    from particula.execution.prepared_ions import validate_ion_plans
     from particula.execution.prepared_processes import _plan_process
 
     if backend is not Backend.WARP:
@@ -577,6 +579,7 @@ def prepare_simulation(
         raise ValueError("prepared execution requires at least one process")
     plans = tuple(_plan_process(process, aerosol) for process in processes)
     validate_cohort_plans(plans)
+    validate_ion_plans(plans)
     if len({plan.family for plan in plans}) != len(plans):
         raise ValueError(
             "prepared execution supports one occurrence per family"

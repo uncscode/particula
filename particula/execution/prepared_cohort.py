@@ -37,6 +37,7 @@ def validate_cohort_plans(plans):
         "condensation",
         "ion_source",
         "ion_cleanup",
+        "ion_condensation",
     }
     if any(p.family not in supported for p in plans):
         raise ValueError(
@@ -47,7 +48,7 @@ def validate_cohort_plans(plans):
         cohort.values["background_species"],
     }
     for plan in plans:
-        if plan.family in ("ion_source", "ion_cleanup"):
+        if plan.family in ("ion_source", "ion_cleanup", "ion_condensation"):
             if markers & {
                 plan.values["positive_species"],
                 plan.values["negative_species"],
