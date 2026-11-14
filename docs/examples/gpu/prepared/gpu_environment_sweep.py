@@ -85,17 +85,19 @@ def run_example():
         ax.grid(alpha=0.2)
     fig.suptitle("Closed water uptake · 2,097,152 initial charged particles")
 
-    fig, ax = plt.subplots(figsize=(11, 5), constrained_layout=True)
+    fig, ax = plt.subplots(figsize=(10, 8), constrained_layout=True)
     mergers = counts[0] - counts[-1]
     colors = plt.get_cmap("viridis")(np.tile(np.linspace(0.15, 0.9, 4), 4))
-    ax.bar(np.arange(16), mergers, color=colors)
-    ax.set_xticks(
+    ax.barh(np.arange(16), mergers, color=colors)
+    ax.set_yticks(
         np.arange(16),
-        [f"{t:.0f} K\n{p / 1000:g} kPa\n{rh:.0%}" for t, p, rh in grid],
+        [f"{t:.2f} K · {p / 1000:g} kPa · RH {rh:.0%}" for t, p, rh in grid],
     )
-    ax.tick_params(axis="x", labelsize=8)
+    ax.tick_params(axis="y", labelsize=9)
+    ax.invert_yaxis()
+    ax.set_xlim(0, max(mergers.max() * 1.1, 1))
     ax.set(
-        ylabel="Accepted mergers in 1 ms",
+        xlabel="Accepted mergers in 1 ms",
         title="Rare collisions across 131,072 initial particles per condition",
     )
     ax.bar_label(ax.containers[0], fontsize=8)
