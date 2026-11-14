@@ -83,7 +83,15 @@ population criterion therefore failed. This small stochastic pilot is
 inconclusive, not a passing timestep validation.
 
 A separately frozen confirmation uses 256 boxes per condition and seed 413,
-with the same timestep, horizon and tolerances. The population comparison
+with the same timestep, horizon and tolerances. It passed: water differed by
+at most 0.26361%, vapor by 0.0003033%, and aerosol number by 0.01526% of initial
+aerosol count. Positive attachment, negative attachment and recombination
+differed by 0.95215%, 1.90430% and 0.80566% of initial per-sign ion count,
+respectively. The negative-attachment comparison is close to the 2% criterion;
+passing it does not establish precision substantially below that threshold.
+The records are retained in `docs/data/gpu/environment-humidity-pilot.json`
+and `docs/data/gpu/environment-humidity-refinement.json`.
+The population comparison
 includes Monte Carlo variability; it is a sensitivity check, not a confidence
 interval or proof of asymptotic convergence. Reproduce the fixed checks with:
 
@@ -92,7 +100,7 @@ interval or proof of asymptotic convergence. Reproduce the fixed checks with:
 .venv/bin/python -m scripts.gpu_studies.qualify_environment humidity /tmp/humid.json
 ```
 
-Humidity confirmation and publication results remain pending.
+The full humidity publication is running after this confirmation passed.
 
 ## Completed dry publication
 

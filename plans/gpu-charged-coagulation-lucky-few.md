@@ -418,7 +418,10 @@ longer humidity study with active coagulation and explicit ions.
 - [x] Execute the full dry CUDA study, inspect all six figures, interpret
   measured trends and verify the independently extracted CUDA download.
   449,485 mergers; 18.04894% number loss; maximum mass residual 1.554e-15.
-- [ ] Qualify humidity timestep, execute its final CUDA study and corrected
+- [x] Qualify humidity timestep with the frozen 256-box, seed-413 confirmation:
+  all original criteria passed; maximum ion-event difference 1.90430% against
+  2%. Retain the failed 16-box pilot alongside the confirmation.
+- [ ] Execute the final humidity CUDA study and corrected
   Lucky Few qualification/publication; inspect and interpret the final results.
 - [ ] Run relevant regression suites, documentation build, push and check PR CI.
 
@@ -436,5 +439,5 @@ Current source implementation: 6bdf3ebce. Complete host CPU/CUDA package suite:
 10093 passed, 13 skipped, 57 deselected, 1 xfailed; coverage 91.60%.
 Dry refinement passed again after normalization correction. The 16-box
 humidity pilot failed its 2% ion population criterion (water/vapor passed);
-retain the failure. Freeze a separate 256-box, seed-413 confirmation with
-unchanged tolerances before publication. No adaptive tolerance relaxation.
+retain the failure. The separate frozen 256-box, seed-413 confirmation passed
+with unchanged tolerances before publication. No adaptive tolerance relaxation.

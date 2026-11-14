@@ -1,0 +1,18 @@
+{
+  "seed": 412,
+  "boxes_per_condition": 16,
+  "duration": 0.003,
+  "timesteps": [
+    1e-06,
+    5e-07
+  ],
+  "water_relative": 0.0027013534706112896,
+  "vapor_relative": 2.2469119189683084e-06,
+  "population_differences_fraction": {
+    "number": 0.00048828125,
+    "attachment_positive": 0.05859375,
+    "attachment_negative": 0.078125,
+    "recombination": 0.0234375
+  },
+  "passed": false
+}
