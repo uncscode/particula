@@ -1582,7 +1582,13 @@ def _run_resident_sequence_on_device(
     )
 
     gas_for_nucleation = state.gas.concentration.numpy()
-    gas_for_nucleation[1:, 0] = 0.0
+    # Set an exactly specified four-molecule pulse. Computing a reciprocal
+    # coefficient from the evolved reservoir can round the event count off
+    # its required integer value.
+    gas_for_nucleation[:, 0] = 0.0
+    gas_for_nucleation[0, 0] = (
+        (4 / fixture.volume[0]) * fixture.molar_mass[0] / AVOGADRO_NUMBER
+    )
     wp.copy(
         state.gas.concentration,
         wp.array(gas_for_nucleation, dtype=wp.float64, device=device),
@@ -1596,14 +1602,7 @@ def _run_resident_sequence_on_device(
     )
     config = NucleationConfig(
         rate_law="activation",
-        coefficient=(
-            (1.0 / fixture.volume[0])
-            / (
-                state.gas.concentration.numpy()[0, 0]
-                / fixture.molar_mass[0]
-                * AVOGADRO_NUMBER
-            )
-        ),
+        coefficient=0.25,
         survival_factor=1.0,
         precursor_index=0,
         molecule_counts=(1, 0),

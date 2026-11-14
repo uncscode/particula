@@ -190,10 +190,7 @@ def _oracle(state):  # noqa: C901
         / (temp + constants.SUTHERLAND_CONSTANT)
     )
     mean_path = (
-        2
-        * mu
-        / pressure
-        / np.sqrt(8 * constants.MOLECULAR_WEIGHT_AIR / (np.pi * rgas * temp))
+        2 * mu / pressure / np.sqrt(8 * gas.molar_mass / (np.pi * rgas * temp))
     )
     for _ in range(4):
         proposal = np.zeros_like(masses)
@@ -209,13 +206,13 @@ def _oracle(state):  # noqa: C901
                 density = sum(masses[b, i]) / particle_volume
                 config = state.kwargs.get("activity_surface")
                 tension = np.dot(state.surface, vols) / particle_volume
-                kn = mean_path / radius
                 moles = masses[b, i] / state.refs
                 activity = moles[0] / sum(moles) if sum(moles) else 0.0
                 for g, material in state.pairs:
                     if g in state.skips or not state.flags[b, g]:
                         continue
                     alpha = state.accom[g]
+                    kn = mean_path[g] / radius
                     transition = (
                         0.75
                         * alpha

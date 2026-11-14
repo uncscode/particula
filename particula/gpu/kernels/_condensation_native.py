@@ -130,6 +130,8 @@ def reduce_candidates(
     p = gas_to_particle[g]
     uptake = wp.float64(0.0)
     evaporation = wp.float64(0.0)
+    uptake_correction = wp.float64(0.0)
+    evaporation_correction = wp.float64(0.0)
     if p >= 0:
         for slot in range(candidate.shape[1]):
             transfer = candidate[box, slot, p]
@@ -140,9 +142,15 @@ def reduce_candidates(
                 concentration, volume, kind, box, slot
             )
             if transfer > wp.float64(0.0):
-                uptake += weighted
+                corrected = weighted - uptake_correction
+                updated = uptake + corrected
+                uptake_correction = (updated - uptake) - corrected
+                uptake = updated
             else:
-                evaporation -= weighted
+                corrected = -weighted - evaporation_correction
+                updated = evaporation + corrected
+                evaporation_correction = (updated - evaporation) - corrected
+                evaporation = updated
     demand[box, g] = uptake
     release[box, g] = evaporation
 
@@ -194,10 +202,15 @@ def reduce_finalized(
     if p >= 0:
         for attempt in range(5):
             delta = wp.float64(0.0)
+            correction = wp.float64(0.0)
             for slot in range(finalized.shape[1]):
-                delta += finalized[box, slot, p] * _density_weight(
+                weighted = finalized[box, slot, p] * _density_weight(
                     concentration, volume, kind, box, slot
                 )
+                corrected = weighted - correction
+                updated_delta = delta + corrected
+                correction = (updated_delta - delta) - corrected
+                delta = updated_delta
             if wp.isfinite(delta) and delta <= gas_concentration[box, g]:
                 break
             for slot in range(finalized.shape[1]):
@@ -217,10 +230,15 @@ def reduce_finalized(
                     finalized[box, slot, p] = updated - mass
         # Recompute after the last correction, including the bounded fallback.
         delta = wp.float64(0.0)
+        correction = wp.float64(0.0)
         for slot in range(finalized.shape[1]):
-            delta += finalized[box, slot, p] * _density_weight(
+            weighted = finalized[box, slot, p] * _density_weight(
                 concentration, volume, kind, box, slot
             )
+            corrected = weighted - correction
+            updated_delta = delta + corrected
+            correction = (updated_delta - delta) - corrected
+            delta = updated_delta
     gas_delta[box, g] = delta
 
 

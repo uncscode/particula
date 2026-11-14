@@ -1,6 +1,7 @@
 """Test the Kelvin effect module."""
 
 import numpy as np
+import pytest
 from particula.particles.properties.kelvin_effect_module import (
     get_kelvin_radius,
     get_kelvin_term,
@@ -139,3 +140,14 @@ def test_kelvin_radius_combined_limits():
     radii = np.array([1e-9, 1e-12])
     expected_term = np.exp(result / radii)
     np.testing.assert_allclose(get_kelvin_term(radii, result), expected_term)
+
+
+@pytest.mark.parametrize("particles", [1, 2, 3])
+def test_particle_species_kelvin_terms_preserve_both_axes(particles):
+    """Composition-dependent radii already have a particle axis, not an outer grid."""
+    radius = np.linspace(1e-8, 4e-8, particles)
+    kelvin = np.linspace(1e-9, 4e-9, particles * 2).reshape(particles, 2)
+    expected = np.exp(kelvin / radius[:, None])
+    actual = get_kelvin_term(radius, kelvin)
+    assert actual.shape == expected.shape
+    np.testing.assert_allclose(actual, expected, rtol=1e-15, atol=0)

@@ -610,7 +610,7 @@ def test_execution_package_does_not_export_scheduler_symbols() -> None:
     """Test scheduler remains absent from the frozen execution API."""
     import particula.execution as execution
 
-    assert len(execution.__all__) == 27
+    assert len(execution.__all__) == 30
     assert "scheduler" not in execution.__all__
     assert not hasattr(execution, "resolve_timestep_schedule")
 

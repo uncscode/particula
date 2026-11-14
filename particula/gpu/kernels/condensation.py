@@ -564,8 +564,13 @@ def _condensation_mass_transfer_impl(  # noqa: C901
             mobility,
             boltzmann_constant,
         )
+        vapor_knudsen = knudsen_number
+        if native == wp.int32(1):
+            vapor_knudsen *= wp.sqrt(
+                _MOLECULAR_WEIGHT_AIR / molar_mass[gas_idx]
+            )
         transition = vapor_transition_correction_wp(
-            knudsen_number,
+            vapor_knudsen,
             mass_accommodation[gas_idx],
         )
         diffusion_value = diffusion_coefficient_vapor[gas_idx]
@@ -682,8 +687,15 @@ def _condensation_mass_transfer_impl(  # noqa: C901
         if gas_idx < 0:
             mass_transfer[box_idx, particle_idx, species_idx] = wp.float64(0.0)
             continue
+        # Particle mobility uses air; native vapor transport uses the mapped
+        # molecule's mean free path, as in the native CPU condensation law.
+        vapor_knudsen = knudsen_number
+        if native == wp.int32(1):
+            vapor_knudsen *= wp.sqrt(
+                _MOLECULAR_WEIGHT_AIR / molar_mass[gas_idx]
+            )
         transition = vapor_transition_correction_wp(
-            knudsen_number,
+            vapor_knudsen,
             mass_accommodation[gas_idx],
         )
         diffusion_value = diffusion_coefficient_vapor[gas_idx]

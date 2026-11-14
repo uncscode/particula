@@ -1,5 +1,7 @@
 """Prepared ownership, transfers, stream selection and failure boundaries."""
 
+from typing import no_type_check
+
 import numpy as np
 import pytest
 
@@ -31,6 +33,7 @@ def upload(aerosol, device):
     )
 
 
+@no_type_check
 @wp.kernel
 def _consume_gas(values: wp.array2d(dtype=wp.float64)):
     box, species = wp.tid()
@@ -936,3 +939,34 @@ def test_prepared_stochastic_streams_follow_logical_boxes_and_run_segments(
         np.testing.assert_array_equal(
             first, getattr(results[2].particles, name)[::-1]
         )
+
+
+@pytest.mark.parametrize("weighted", [False, True])
+@pytest.mark.parametrize("latent,kappa", [(False, False), (True, True)])
+def test_prepared_weighted_surface_matches_each_cpu_particle(
+    device, weighted, latent, kappa
+):
+    """Mapped vapor transport and composition agree across CPU and CUDA."""
+    from particula.aerosol import Aerosol
+
+    initial, process = condensation_case(
+        weighted=weighted, latent=latent, kappa=kappa
+    )
+    initial.particles.masses[0, :2] = [[9e-19, 1e-19], [1e-19, 9e-19]]
+    cpu = Aerosol(
+        particles=initial.particles.copy(),
+        gas=initial.gas.copy(),
+        environment=initial.environment.copy(),
+    )
+    process.execute(cpu, time_step=1e-4, sub_steps=4)
+    with process.prepare(
+        initial, device=device.native, time_step=1e-4
+    ) as simulation:
+        simulation.step()
+        actual = simulation.snapshot()
+    np.testing.assert_allclose(
+        actual.particles.masses, cpu.particles.masses, rtol=2e-12, atol=1e-30
+    )
+    np.testing.assert_allclose(
+        actual.gas.concentration, cpu.gas.concentration, rtol=2e-12, atol=1e-30
+    )

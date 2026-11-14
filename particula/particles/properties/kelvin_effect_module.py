@@ -101,7 +101,9 @@ def get_kelvin_term(
 
     Args:
         particle_radius: Radius of the particle (m).
-        kelvin_radius_value: Precomputed Kelvin radius (m).
+        kelvin_radius_value: Precomputed Kelvin radius (m). A species vector
+            broadcasts over particles; a particle-by-species matrix retains
+            its particle-specific composition.
 
     Returns:
         Dimensionless exponential factor adjusting vapor pressure.
@@ -123,6 +125,17 @@ def get_kelvin_term(
           new-particle formation?" Faraday Discussions, 165, 91–104.
           https://doi.org/10.1039/C3FD00046J. [check]
     """
+    if (
+        isinstance(kelvin_radius_value, np.ndarray)
+        and kelvin_radius_value.ndim == 2
+    ):
+        radius = np.asarray(particle_radius)
+        if radius.ndim == 1:
+            radius = radius[:, np.newaxis]
+        with np.errstate(divide="ignore", invalid="ignore"):
+            kelvin_ratio = kelvin_radius_value / radius
+        return get_safe_exp(np.clip(kelvin_ratio, None, MAX_KELVIN_RATIO))
+
     kelvin_expand = False
     # Broadcast the arrays if necessary np.isscalar(kelvin_radius_value)
     if isinstance(kelvin_radius_value, np.ndarray) and (

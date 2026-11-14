@@ -81,7 +81,10 @@ def _broadcast_weights(
         return np.tile(weights, (n_bins, 1))
 
     if weights.ndim == 2:
-        if weights.shape == (n_species, n_bins):
+        if weights.shape != target_shape and weights.shape == (
+            n_species,
+            n_bins,
+        ):
             weights = weights.T  # transposed input
         # (a) single-bin weights → broadcast to all bins
         if weights.shape == (1, n_species) and n_bins > 1:
@@ -369,7 +372,10 @@ class SurfaceStrategyMolar(SurfaceStrategy):
             self.molar_mass,  # type: ignore
         )
         return _weighted_average_by_phase(
-            np.asarray(self.surface_tension, dtype=np.float64),
+            np.broadcast_to(
+                np.asarray(self.surface_tension, dtype=np.float64),
+                mole_frac.shape,
+            ),
             mole_frac,
             self.phase_index,
         )
@@ -439,7 +445,10 @@ class SurfaceStrategyMass(SurfaceStrategy):
 
         mass_fraction = get_mass_fraction_from_mass(mass_concentration)
         return _weighted_average_by_phase(
-            np.asarray(self.surface_tension, dtype=np.float64),
+            np.broadcast_to(
+                np.asarray(self.surface_tension, dtype=np.float64),
+                mass_fraction.shape,
+            ),
             mass_fraction,
             self.phase_index,
         )
@@ -512,7 +521,10 @@ class SurfaceStrategyVolume(SurfaceStrategy):
             self.density,  # type: ignore
         )
         return _weighted_average_by_phase(
-            np.asarray(self.surface_tension, dtype=np.float64),
+            np.broadcast_to(
+                np.asarray(self.surface_tension, dtype=np.float64),
+                vol_frac.shape,
+            ),
             vol_frac,
             self.phase_index,
         )

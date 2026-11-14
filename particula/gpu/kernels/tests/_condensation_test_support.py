@@ -2349,6 +2349,7 @@ def _cpu_mass_transfer(  # noqa: C901
     water_species_index: int = 0,
     kappas: np.ndarray | None = None,
     latent_heat: np.ndarray | None = None,
+    native_transport: bool = False,
 ) -> np.ndarray:
     """Compute CPU mass transfer matching refreshed GPU kernel physics."""
     n_boxes, n_particles, n_species = particles.masses.shape
@@ -2412,8 +2413,19 @@ def _cpu_mass_transfer(  # noqa: C901
             )
 
             for species_idx in range(n_species):
+                vapor_knudsen = knudsen_number
+                if native_transport:
+                    vapor_knudsen = (
+                        get_molecule_mean_free_path(
+                            molar_mass=gas.molar_mass[species_idx],
+                            temperature=box_temperature,
+                            pressure=box_pressure,
+                            dynamic_viscosity=dynamic_viscosity,
+                        )
+                        / radius
+                    )
                 transition = get_vapor_transition_correction(
-                    knudsen_number=knudsen_number,
+                    knudsen_number=vapor_knudsen,
                     mass_accommodation=mass_accommodation[species_idx],
                 )
                 diffusion_value = diffusion_coefficient_vapor[species_idx]
@@ -2555,7 +2567,9 @@ def _cpu_four_substep_oracle(
             call_kwargs["time_step"] = time_step / 4.0
         if "gas" in call_kwargs:
             call_kwargs["gas"] = working_gas
-        proposal = _cpu_mass_transfer(*call_args, **call_kwargs)
+        proposal = _cpu_mass_transfer(
+            *call_args, **call_kwargs, native_transport=True
+        )
         if partitioning is not None:
             proposal[:, :, ~np.asarray(partitioning, dtype=bool)] = 0.0
         _, _, _, _, applied = _inventory_reference(
