@@ -415,8 +415,11 @@ longer humidity study with active coagulation and explicit ions.
 - [x] Humidity: include free ions, source and neutral cleanup; distinguish
   aerosol mergers, attachment and recombination using population/material
   ledgers. Preserve every-box mass and total charge accounting.
-- [ ] Preview figures, qualify humidity timestep, execute final CUDA studies,
-  interpret observed results, retain final generations, update validation record.
+- [x] Execute the full dry CUDA study, inspect all six figures, interpret
+  measured trends and verify the independently extracted CUDA download.
+  449,485 mergers; 18.04894% number loss; maximum mass residual 1.554e-15.
+- [ ] Qualify humidity timestep, execute its final CUDA study and corrected
+  Lucky Few qualification/publication; inspect and interpret the final results.
 - [ ] Run relevant regression suites, documentation build, push and check PR CI.
 
 Physical-limit validation uncovered an inherited inversion of Gc/Gk in the

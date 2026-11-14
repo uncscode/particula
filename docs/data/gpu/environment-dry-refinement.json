@@ -1,0 +1,147 @@
+{
+  "criterion": "Each approximate 95% paired-box difference interval within +/- 0.02 initial-number fraction; individual, not simultaneous coverage",
+  "seed": 513,
+  "boxes_per_condition": 64,
+  "duration": 1000,
+  "timesteps": [
+    0.5,
+    0.25
+  ],
+  "rows": [
+    {
+      "label": "0 km",
+      "mean_difference": 0.00341796875,
+      "low": -0.0036728383825231333,
+      "high": 0.010508775882523132,
+      "passed": true
+    },
+    {
+      "label": "5 km",
+      "mean_difference": 0.00537109375,
+      "low": -0.0016339429793730213,
+      "high": 0.012376130479373021,
+      "passed": true
+    },
+    {
+      "label": "10 km",
+      "mean_difference": 0.0001220703125,
+      "low": -0.007687758033727578,
+      "high": 0.00793189865872758,
+      "passed": true
+    },
+    {
+      "label": "15 km",
+      "mean_difference": -0.005859375,
+      "low": -0.012856856799649229,
+      "high": 0.0011381067996492278,
+      "passed": true
+    },
+    {
+      "label": "20 km",
+      "mean_difference": 0.00537109375,
+      "low": -0.0037483642779611043,
+      "high": 0.014490551777961104,
+      "passed": true
+    },
+    {
+      "label": "25 km",
+      "mean_difference": -0.00048828125,
+      "low": -0.011450037713883214,
+      "high": 0.010473475213883214,
+      "passed": true
+    },
+    {
+      "label": "30 km",
+      "mean_difference": -0.0009765625,
+      "low": -0.009000251223013522,
+      "high": 0.007047126223013522,
+      "passed": true
+    },
+    {
+      "label": "35 km",
+      "mean_difference": -0.0010986328125,
+      "low": -0.011854367899304278,
+      "high": 0.009657102274304278,
+      "passed": true
+    },
+    {
+      "label": "40 km",
+      "mean_difference": 0.0020751953125,
+      "low": -0.006436487990151776,
+      "high": 0.010586878615151776,
+      "passed": true
+    },
+    {
+      "label": "45 km",
+      "mean_difference": 0.0040283203125,
+      "low": -0.005436689760520991,
+      "high": 0.013493330385520991,
+      "passed": true
+    },
+    {
+      "label": "50 km",
+      "mean_difference": 0.001220703125,
+      "low": -0.008347380129580986,
+      "high": 0.010788786379580986,
+      "passed": true
+    },
+    {
+      "label": "60 km",
+      "mean_difference": -0.003662109375,
+      "low": -0.013570062048009236,
+      "high": 0.006245843298009236,
+      "passed": true
+    },
+    {
+      "label": "70 km",
+      "mean_difference": 0.0,
+      "low": -0.009503302791396079,
+      "high": 0.009503302791396079,
+      "passed": true
+    },
+    {
+      "label": "75 km",
+      "mean_difference": 0.0003662109375,
+      "low": -0.009234738116980995,
+      "high": 0.009967159991980995,
+      "passed": true
+    },
+    {
+      "label": "80 km",
+      "mean_difference": -0.0001220703125,
+      "low": -0.01145591191007108,
+      "high": 0.01121177128507108,
+      "passed": true
+    },
+    {
+      "label": "86 km",
+      "mean_difference": -0.0029296875,
+      "low": -0.012480578484774059,
+      "high": 0.0066212034847740586,
+      "passed": true
+    },
+    {
+      "label": "2 atm chamber",
+      "mean_difference": 0.0030517578125,
+      "low": -0.0018608628675964058,
+      "high": 0.007964378492596406,
+      "passed": true
+    },
+    {
+      "label": "5 atm chamber",
+      "mean_difference": -0.00048828125,
+      "low": -0.004279331411973328,
+      "high": 0.0033027689119733278,
+      "passed": true
+    },
+    {
+      "label": "10 atm chamber",
+      "mean_difference": 0.000244140625,
+      "low": -0.0036583842130205237,
+      "high": 0.004146665463020524,
+      "passed": true
+    }
+  ],
+  "coarse_compute_seconds": 114.67086425801972,
+  "fine_compute_seconds": 228.639990704949
+}

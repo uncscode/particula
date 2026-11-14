@@ -72,6 +72,7 @@ the number-loss difference must lie within ±2 percentage points of initial
 number. All 19 conditions passed after the normalization correction.
 Intervals are individual, not a simultaneous 95% guarantee.
 The largest absolute interval endpoint was 1.4491 percentage points.
+`docs/data/gpu/environment-dry-refinement.json` retains all nineteen comparisons.
 
 The initial humidity pilot used 16 boxes per condition and seed 412. Halving
 dt from 1 to 0.5 microseconds over 3 ms changed water inventories by at most
@@ -91,7 +92,40 @@ interval or proof of asymptotic convergence. Reproduce the fixed checks with:
 .venv/bin/python -m scripts.gpu_studies.qualify_environment humidity /tmp/humid.json
 ```
 
-Confirmation and full publication results will be recorded after completion.
+Humidity confirmation and publication results remain pending.
+
+## Completed dry publication
+
+The full dry CUDA run completed with seed 512, 2,490,368 initial aerosols and
+1000 s of physical evolution. Its saved generation is
+`run-20261114T180838997295Z`, with revision `8aa63a3fb` and executable/input
+hashes in the manifest. All six figures were inspected. It recorded 449,485
+mergers, leaving 2,040,883 aerosols: an 18.04894% total number loss. The largest
+per-box material residual was 1.554e-15; every box conserved net charge exactly.
+The pooled number-median diameter increased from 70.121 to 75.853 nm.
+
+The altitude response was nonmonotonic. Number loss rose from 9.875% at ground
+level to 24.392% at 50 km, then fell to 21.464% at 86 km. This is consistent
+with the model approaching its low-pressure collision limit while the reference
+temperature decreases above the stratopause. It is not evidence that ambient
+mesospheric aerosol concentrations or lifetimes follow these values: initial
+number density was deliberately held constant and omitted processes remain
+absent. The separate isothermal chamber series decreased monotonically from
+9.875% loss at 1 atm to 6.647%, 4.482% and 3.853% at 2, 5 and 10 atm.
+
+The time histories add information beyond those endpoints. The pooled collision
+rate declines as the particle population is depleted, while the size quantiles
+increase. Absolute neutral and singly charged counts decline; small populations
+with charge magnitude at least two emerge. A nearly unchanged neutral fraction
+therefore does not imply an unchanged neutral population. These are descriptive
+fixed-seed observations, not significance tests or a neutral-control comparison.
+
+The complete refresh took 5357.70 s, including 5345.54 s of synchronized
+stepping and 0.92 s preparation. Other CUDA studies ran concurrently, so these
+times are execution provenance rather than standalone throughput measurements.
+Maintained, saved and downloadable Python sources match; ZIP helper bytes match
+the declared inputs. The extracted ZIP passed a separate CUDA smoke run with
+4864 aerosols over 5 s, exercising all six plotting paths outside the checkout.
 
 ## Implementation checks
 

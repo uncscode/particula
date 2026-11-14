@@ -1,0 +1,72 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 5357.698152590019,
+  "package_source_sha256": "98021107918d76caafbd800e6f8ab4c66bb0905e1950a2fc7075c622655abf5a",
+  "input_sha256": {
+    "scripts/gpu_studies/__init__.py": "530c51f7c7f432a895623c9ba4548b7cf3e053a1a0f328a36ae8ae9e50cec9c4",
+    "scripts/gpu_studies/dry_environment_sweep.py": "a91667ed85ebbf99456ea3f79a6c92df35b6e868767ef6e31dabcca5de673b51",
+    "scripts/gpu_studies/population_diagnostics.py": "8a91762a4321fd10751f580a1ab6a624566eb22ee7b38e65aad70d98f4718e35",
+    "scripts/gpu_studies/population_figures.py": "0cf855d6879321084f49d7774d3c250c8212ac266436c010515f7770fecaec57"
+  },
+  "example": "gpu-dry-environment-sweep",
+  "fingerprint": "28e3438f128cd255c4064186f7be90f1b461e1337aeb6009c3fa79909a061cb0",
+  "source": "docs/examples/gpu/prepared/gpu_dry_environment_sweep.py",
+  "revision": "8aa63a3fbc36bbc27124b74709d5d18b2cd5bfd5",
+  "package_dirty": false,
+  "executed_at": "2026-11-14T18:08:39.032823+00:00",
+  "device": "cuda:0: NVIDIA GeForce RTX 5060",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [
+      {
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     /tmp/particula-charged-warp\n"
+      },
+      {
+        "text": "Module particula.gpu.kernels.coagulation 907b9eb load on device 'cuda:0' took 2.34 ms  (cached)\nModule particula.gpu.kernels.coagulation 583acfc load on device 'cuda:0' took 1.81 ms  (cached)\nModule particula.gpu.kernels.coagulation 33bf240 load on device 'cuda:0' took 1.70 ms  (cached)\nModule particula.gpu.kernels.environment e11375e load on device 'cuda:0' took 1.82 ms  (cached)\nModule particula.gpu.kernels.coagulation 5b8dfcc load on device 'cuda:0' took 1.33 ms  (cached)\nModule particula.gpu.kernels._coagulation_native f93a244 load on device 'cuda:0' took 1.76 ms  (cached)\nModule warp.utils f35afd3 load on device 'cuda:0' took 2.43 ms  (cached)\nModule warp.math edde159 load on device 'cuda:0' took 2.17 ms  (cached)\nModule warp.marching_cubes fb6e712 load on device 'cuda:0' took 1.20 ms  (cached)\nModule particula.execution.communication 2909959 load on device 'cuda:0' took 1.53 ms  (cached)\nModule particula.gpu.kernels._population_validation edde159 load on device 'cuda:0' took 2.19 ms  (cached)\nModule particula.gpu.kernels.communication ac9b2a2 load on device 'cuda:0' took 2.84 ms  (cached)\nModule particula.gpu.properties.gas_properties edde159 load on device 'cuda:0' took 2.18 ms  (cached)\nModule particula.gpu.properties.particle_properties edde159 load on device 'cuda:0' took 2.20 ms  (cached)\nModule particula.gpu.dynamics.coagulation_funcs edde159 load on device 'cuda:0' took 2.21 ms  (cached)\nModule particula.gpu.dynamics.condensation_funcs edde159 load on device 'cuda:0' took 2.19 ms  (cached)\nModule particula.gpu.kernels._condensation_native edde159 load on device 'cuda:0' took 2.16 ms  (cached)\nModule particula.gpu.kernels._condensation_parallel edde159 load on device 'cuda:0' took 2.18 ms  (cached)\nModule particula.gpu.kernels.thermodynamics edde159 load on device 'cuda:0' took 2.19 ms  (cached)\nModule particula.gpu.kernels.condensation edde159 load on device 'cuda:0' took 2.18 ms  (cached)\nModule particula.gpu.kernels.exhaustion ccbadfa load on device 'cuda:0' took 2.10 ms  (cached)\nModule particula.gpu.kernels.slot_management 0375e2c load on device 'cuda:0' took 1.15 ms  (cached)\nModule particula.gpu.kernels.nucleation 1124f09 load on device 'cuda:0' took 3.07 ms  (cached)\nModule particula.execution.gpu_resources 30f296c load on device 'cuda:0' took 2.10 ms  (cached)\nModule particula.gpu.warp_types edde159 load on device 'cuda:0' took 2.19 ms  (cached)\nModule particula.execution.prepared_diagnostics ca06582 load on device 'cuda:0' took 1.86 ms  (cached)\nModule particula.gpu.dynamics.ion_pair_data edde159 load on device 'cuda:0' took 2.19 ms  (cached)\nModule particula.gpu.kernels._brownian_parallel 30c33a2 load on device 'cuda:0' took 2.26 ms  (cached)\nModule particula.execution.prepared_guards e16d312 load on device 'cuda:0' took 1.69 ms  (cached)\nModule particula.gpu.kernels._brownian_parallel 6745116 load on device 'cuda:0' took 2.48 ms  (cached)\nModule particula.gpu.kernels.coagulation 54d7db3 load on device 'cuda:0' took 2.96 ms  (cached)\nModule particula.gpu.kernels.coagulation d9d6c48 load on device 'cuda:0' took 1.17 ms  (cached)\n"
+      },
+      {
+        "text": "Over 1000 s: 449,485 accepted mergers; 2,040,883 particles remain (18.04894% number loss).\nPooled number-median diameter changes from 70.121 to 75.853 nm.\nLargest recorded merger count: 50 km (31,971); smallest: 10 atm chamber (5,050).\nCondition | initial count | final count | mergers | final D50 [nm]\n0 km | 131072 | 118128 | 12944 | 73.693\n5 km | 131072 | 115113 | 15959 | 74.566\n10 km | 131072 | 111647 | 19425 | 75.342\n15 km | 131072 | 107083 | 23989 | 76.600\n20 km | 131072 | 104042 | 27030 | 76.989\n25 km | 131072 | 102438 | 28634 | 77.287\n30 km | 131072 | 101498 | 29574 | 77.548\n35 km | 131072 | 100422 | 30650 | 77.772\n40 km | 131072 | 100003 | 31069 | 77.836\n45 km | 131072 | 99385 | 31687 | 78.014\n50 km | 131072 | 99101 | 31971 | 78.103\n60 km | 131072 | 100166 | 30906 | 77.782\n70 km | 131072 | 101198 | 29874 | 77.524\n75 km | 131072 | 101746 | 29326 | 77.416\n80 km | 131072 | 102394 | 28678 | 77.266\n86 km | 131072 | 102939 | 28133 | 76.965\n2 atm chamber | 131072 | 122360 | 8712 | 72.327\n5 atm chamber | 131072 | 125198 | 5874 | 71.547\n10 atm chamber | 131072 | 126022 | 5050 | 71.310\nMaximum mass residual: 1.554e-15; net charge is exactly conserved in every box.\nOne fixed-seed realization: rankings and interval-rate fluctuations are descriptive, not significance tests.\nDevice: NVIDIA GeForce RTX 5060; preparation 0.92 s; synchronized stepping 5345.54 s\nCondition | temperature [K] | pressure [Pa]\n0 km | 288.150 | 101325\n5 km | 255.676 | 54048.3\n10 km | 223.252 | 26499.9\n15 km | 216.650 | 12111.8\n20 km | 216.650 | 5529.31\n25 km | 221.552 | 2549.22\n30 km | 226.509 | 1197.03\n35 km | 236.513 | 574.595\n40 km | 250.350 | 287.144\n45 km | 264.164 | 149.101\n50 km | 270.650 | 79.7791\n60 km | 247.021 | 21.9587\n70 km | 219.585 | 5.2209\n75 km | 208.399 | 2.38814\n80 km | 198.639 | 1.05247\n86 km | 186.946 | 0.37338\n2 atm chamber | 288.150 | 202650\n5 atm chamber | 288.150 | 506625\n10 atm chamber | 288.150 | 1.01325e+06\nAt fixed 288.15 K, observed number loss is 9.875% at 1 atm and 3.853% at 10 atm.\n"
+      },
+      {
+        "image": "figure-4-4.png"
+      },
+      {
+        "image": "figure-4-5.png"
+      },
+      {
+        "image": "figure-4-6.png"
+      },
+      {
+        "image": "figure-4-7.png"
+      },
+      {
+        "image": "figure-4-8.png"
+      },
+      {
+        "image": "figure-4-9.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "5d9dc3101b330e0759285ff0bdc0985941ceb573a4bd83722d95cddd90b47f63",
+    "figure-4-4.png": "d33c1227ac831bb7dd084d5e52b537d9431feb878dce39da60405f373e5177ea",
+    "figure-4-5.png": "bf186c5a1fc769ebb108edc565f3e9aadacfbef129962687ccda073d5a8770dc",
+    "figure-4-6.png": "1fa62bfd5dcadd7780ba639f30149837b31b44bf8728f8e6d4a2f4275dc5d471",
+    "figure-4-7.png": "f57c543d2629e92820e56332636160761cf39b0efb57e6b0d75d017b53157dc7",
+    "figure-4-8.png": "bf7bf4bffa1059ef22ee06e7f179fc566168a9ae5902f04115829123f6dbc609",
+    "figure-4-9.png": "836471518db319025c4433c572a8d8dbbbe6e8c7e54c9db173771713ee6d37d8"
+  }
+}
