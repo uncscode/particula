@@ -282,13 +282,20 @@ def difference_interval(
     return low_b - high_a, high_b - low_a
 
 
-def run_survival(config, *, device="cuda:0", capture=True):
+def run_survival(
+    config, *, device="cuda:0", capture=True, stop_when_resolved=False
+):
     """Advance physical steps between explicit vapor refreshes and reductions.
 
     Default execution requires CUDA and never falls back. ``device='cpu'``
     with ``capture=False`` is a separately requested regression target.
     Return compact cohort time series and budgets, not particle-state dumps.
+    With ``stop_when_resolved=True``, stop at the first diagnostic at which
+    every original lineage has an absorbing outcome. This preserves survival
+    at the configured horizon, but does not simulate later aerosol evolution.
     """
+    if type(stop_when_resolved) is not bool:
+        raise ValueError("stop_when_resolved must be a boolean")
     initial, process = build_survival_case(config)
     segments = whole_steps(config.duration, config.vapor_refresh_seconds)
     steps = whole_steps(config.vapor_refresh_seconds, config.time_step)
@@ -342,6 +349,8 @@ def run_survival(config, *, device="cuda:0", capture=True):
                 ]
             )
             max_occupancy = max(max_occupancy, int(data.active_slots.max()))
+            if stop_when_resolved and outcomes[-1][2] == 0:
+                break
             if segment < segments:
                 start = perf_counter()
                 change = gas_target - data.gas_concentration
@@ -352,6 +361,7 @@ def run_survival(config, *, device="cuda:0", capture=True):
     return {
         "config": asdict(config),
         "device": device,
+        "stop_when_resolved": stop_when_resolved,
         "time": np.asarray(times),
         "outcomes": counts,
         "success_interval95": success_interval(

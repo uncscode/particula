@@ -131,7 +131,9 @@ The [ion-balance example](../../examples/gpu/prepared/gpu_ion_balance.py)
 checks production, recombination and export against an independent finite-box
 reference. The [validation record](../../contribute/validation/gpu/charged-coagulation.md)
 distinguishes pair-law, conservation and finite-population decay evidence from
-the remaining atmospheric survival study. The coefficients follow
+the [Lucky Few sensitivity study](../../examples/gpu/prepared/gpu_lucky_few.py).
+Its rate assumptions do not guarantee bounds on survival probability.
+The coefficients follow
 [López-Yglesias and Flagan (2013)](https://doi.org/10.1080/02786826.2013.783684).
 
 ## Paired ion production

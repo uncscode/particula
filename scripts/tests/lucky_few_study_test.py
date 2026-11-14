@@ -94,6 +94,32 @@ def test_controlled_neutral_growth_reaches_target_and_closes_feed_budget(
     assert result["maximum_mass_residual"] < 2e-12
     assert result["maximum_observed_slots"] == 1
     np.testing.assert_allclose(result["time"], [0, 1, 2], rtol=1e-14, atol=0)
+    stopped = run_survival(
+        config,
+        device=device,
+        capture=device != "cpu",
+        stop_when_resolved=True,
+    )
+    np.testing.assert_allclose(stopped["time"], [0, 1], rtol=1e-14, atol=0)
+    np.testing.assert_array_equal(stopped["outcomes"], result["outcomes"][:2])
+    np.testing.assert_array_equal(
+        stopped["outcomes"][-1], result["outcomes"][-1]
+    )
+    assert stopped["maximum_mass_residual"] < 2e-12
+
+
+def test_unresolved_lineages_run_to_horizon():
+    """An early stopping request must retain censored lineages at the horizon."""
+    config = SurvivalConfig(
+        boxes=1, capacity=2, background_particles=0, duration=10
+    )
+    result = run_survival(
+        config, device="cpu", capture=False, stop_when_resolved=True
+    )
+    assert result["time"][-1] == 10
+    np.testing.assert_array_equal(result["outcomes"][-1], [0, 0, 1])
+    with pytest.raises(ValueError, match="stop_when_resolved"):
+        run_survival(config, stop_when_resolved="yes")
 
 
 @pytest.mark.parametrize("confidence", [0, 1, -0.1, np.nan, np.inf, True])

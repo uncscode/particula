@@ -663,5 +663,17 @@
     "timeout": 1200,
     "inputs": [],
     "invoke": "result = run_example()"
+  },
+  "gpu-lucky-few": {
+    "title": "The lucky few: growth, charging and background capture",
+    "source": "docs/examples/gpu/prepared/gpu_lucky_few.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 7200,
+    "inputs": [
+      "scripts/gpu_studies/__init__.py",
+      "scripts/gpu_studies/lucky_few.py"
+    ],
+    "invoke": "result = run_example()"
   }
 }

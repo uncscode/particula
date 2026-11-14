@@ -302,3 +302,27 @@ its Coulomb-only aerosol interaction. The manuscript now explicitly excludes
 an additional aerosol image/polarization force and cites the hard-sphere fit.
 The executable GPU AST is unchanged after removing docstrings; these edits
 change documentation, not the numerical implementation.
+
+## Accepted attachment sensitivity and final qualification
+
+On 2026-11-14 the user selected both explicit omitted-rate assumptions, zero
+and 1e-15 m^3/s. This resolves the production-policy decision; the two cases
+remain sensitivity assumptions, not bounds on survival probability.
+
+The final charged matrix is frozen before execution: q=2/10, lower/upper,
+8192 boxes, root seed 320, 20,000 s horizon, dt=1 s, cleanup=10 s and capacity
+128. Each case is compared with dt=0.5 s, reversed aerosol process order,
+cleanup=5 s and capacity 256. Every separate conservative 95% probability
+difference interval must lie inside [-0.01, 0.01]; each baseline exact 95%
+interval must have width <=0.01. These are individual comparison coverages,
+not a joint confidence statement for the complete matrix. No tolerance will
+be adjusted after observing results. The reusable runner is
+`scripts/gpu_studies/qualify_lucky_few.py`.
+
+An explicit helper option stops at the first diagnostic with no unresolved
+lineages. Reached/captured are absorbing outcomes, so this preserves the
+specified horizon's survival outcome without simulating later aerosol state.
+CPU/CUDA regressions compare the stopped prefix/final outcome with full runs
+and retain unresolved lineages through the horizon: 25 helper tests passed.
+The earlier full-horizon runs resolved all lineages by 3730 s; this observation
+motivates the optimization, not a shorter fixed observation horizon.
