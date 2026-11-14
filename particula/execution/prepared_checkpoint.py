@@ -85,6 +85,7 @@ def _preflight(processes, saved, backend, device):
         _preflight_restart,
     )
     from particula.execution.gpu_session import _preflight_cpu_session
+    from particula.execution.prepared_cohort import validate_cohort_plans
     from particula.execution.prepared_processes import (
         _plan_process,
         _ProcessPlan,
@@ -112,13 +113,15 @@ def _preflight(processes, saved, backend, device):
     host = _host_state(saved.resident, restart.primary)
     _preflight_cpu_session(host.particles, host.gas, host.environment, target)
     plans = tuple(_plan_process(p, host) for p in processes)
+    validate_cohort_plans(plans)
     if plans != saved.processes or len({p.family for p in plans}) != len(plans):
         raise ValueError("runnable configuration/order differs from checkpoint")
     families = {p.family for p in plans}
     actual = {p.family for p in restart.resource_payloads}
     if (
         actual
-        != families - {"wall_loss", "dilution", "ion_source", "ion_cleanup"}
+        != families
+        - {"wall_loss", "dilution", "ion_source", "ion_cleanup", "cohort"}
         or saved.resident.communication is not None
     ):
         raise ValueError(
@@ -136,6 +139,7 @@ def _preflight(processes, saved, backend, device):
 def _validate_auxiliary(saved, plans):
     """Validate the optional last-step energy before setup or upload."""
     from particula.execution.checkpoint import _validate_payload
+    from particula.execution.prepared_cohort import validate_cohort_checkpoint
 
     latent = any(
         p.family == "condensation" and p.values["latent"] is not None
@@ -157,6 +161,11 @@ def _validate_auxiliary(saved, plans):
             "<f8",
             (boxes, saved.resident.dimensions.n_species),
         )
+    if any(p.family == "cohort" for p in plans):
+        shape = (boxes, saved.resident.dimensions.n_particles)
+        expected["cohort_pending"] = ("<i8", shape)
+        expected["cohort_background"] = ("<i4", shape)
+        expected["cohort_statistics"] = ("<i8", (boxes, 4))
     if type(saved.auxiliary) is not tuple or len(saved.auxiliary) != len(
         expected
     ):
@@ -185,6 +194,7 @@ def _validate_auxiliary(saved, plans):
             "ion_export_mass",
         ) and np.any(values < 0):
             raise ValueError("checkpoint ion inventories must be nonnegative")
+    validate_cohort_checkpoint(saved)
 
 
 def _restore_after_binding(owner, saved):

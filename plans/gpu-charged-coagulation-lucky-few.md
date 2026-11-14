@@ -18,7 +18,8 @@ upstream PR. Merge and release are outside this authorization.
   capacity and independent persistent source RNG with capture/restart.
 - [x] Add neutral-product cleanup and exported inventory ledgers as a prepared
   process; final ion-collision ordering remains part of study integration.
-- [ ] Add resident cohort metadata, first-passage tracking and censoring.
+- [x] Add resident cohort metadata, first-passage tracking and censoring;
+  study-level timestep and process-order convergence remains outstanding.
 - [ ] Validate numerical, scientific, stochastic and lifecycle behavior on
   CPU, Warp CPU and actual CUDA.
 - [x] Add narrated percent-cell charged model comparison and saved CUDA output.
@@ -102,6 +103,9 @@ Update owning GPU guides and validation evidence; preserve README boundaries.
 - Neutral ion-product cleanup, export accounting, capture/restart and source
   regression: 58 passed on host CPU/CUDA. Reference review corrected existing
   Dyachkov bibliographic errors and added primary papers to the CUDA example.
+- Seed-lineage observer and affected prepared regression: 171 passed on host
+  CPU/CUDA, including actual condensation growth, merger/capture precedence,
+  native capture and exact continuation before/after mergers.
 - Discovered scientific gap: LF2013 omits repulsive attachment rates below
   1e-15 m^3/s. For same-sign singly charged seeds, the fit begins at radius
   5.30835917 nm, above the planned 1.5 nm seed radius. Production policy is

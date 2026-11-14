@@ -17,6 +17,7 @@ hardware/runtime requirement; requesting CUDA never selects Warp CPU silently.
 | CPU → CUDA | `runnable.prepare(aerosol, device="cuda:0", time_step=...)` | Validates, uploads once, owns private resources; initial CPU state is unchanged. |
 | CUDA → CPU | `simulation.snapshot()` or reduced `diagnostics()` | Explicit synchronized, detached observations; full snapshots preserve native names and measures. |
 | Forcing | Environment and full-gas updates between segments | Explicit uploads; condensation owns derived saturation. |
+| Seed cohort observations | Original-lineage threshold, background capture and censoring | Unit-count populations; supported process compositions and explicit initial material markers. |
 | Continuation | `checkpoint()` and matching runnable `resume()` | Exact device/configuration and canonical bytes; no automatic CPU fallback. |
 | Native CUDA capture | `capture()`, then ordinary `step/run` | Non-advancing capture; fixed bindings; fresh capture after resume. |
 | Direct kernels | Supported process-specific fixed-shape interfaces | Caller owns transfers, scratch, species bindings and RNG sidecars. |

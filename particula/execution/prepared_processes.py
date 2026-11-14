@@ -39,6 +39,8 @@ def _plan_process(process: Any, aerosol: Aerosol) -> _ProcessPlan:
         Nucleation,
         WallLoss,
     )
+    from particula.execution.cohort import SeedCohort
+    from particula.execution.prepared_cohort import plan_cohort
     from particula.execution.prepared_condensation import plan_condensation
     from particula.execution.prepared_ions import (
         plan_ion_cleanup,
@@ -47,6 +49,7 @@ def _plan_process(process: Any, aerosol: Aerosol) -> _ProcessPlan:
     from particula.execution.prepared_nucleation import plan_nucleation
 
     planners = {
+        SeedCohort: plan_cohort,
         IonNeutralCleanup: plan_ion_cleanup,
         IonPairSource: plan_ion_source,
         Dilution: _plan_dilution,
@@ -197,13 +200,15 @@ def _plan_wall_loss(process: Any, aerosol: Aerosol) -> _ProcessPlan:
 def _compile_process(plan: _ProcessPlan, owner: Any):
     """Retain one existing prepared direct-kernel call and its resources."""
     session, registry = owner._session, owner._registry
-    if plan.family in ("ion_source", "ion_cleanup"):
+    if plan.family in ("ion_source", "ion_cleanup", "cohort"):
+        from particula.execution.prepared_cohort import compile_cohort
         from particula.execution.prepared_ions import (
             compile_ion_cleanup,
             compile_ion_source,
         )
 
         return {
+            "cohort": compile_cohort,
             "ion_source": compile_ion_source,
             "ion_cleanup": compile_ion_cleanup,
         }[plan.family](plan, owner)

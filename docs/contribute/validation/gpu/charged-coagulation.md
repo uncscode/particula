@@ -80,3 +80,30 @@ particula/execution/tests/prepared_ion_cleanup_test.py
 particula/execution/tests/prepared_ions_test.py
 particula/execution/tests/prepared_restart_capture_test.py -q --no-cov -Werror`:
 58 passed, including actual CUDA. Ruff and mypy passed (571 source files).
+
+## Original-seed lineage follow-up
+
+`SeedCohort` stores unresolved original-lineage counts and persistent background
+labels separately from particle inventories. It consumes only applied compacted
+collision pairs and observes size after each physical process. Outcome counts
+partition the original cohort into reached, captured and unresolved lineages.
+
+The affected prepared suite passed 171 tests on host CPU/CUDA:
+
+```bash
+WARP_CACHE_PATH=/tmp/particula-charged-warp .venv/bin/pytest \
+  particula/execution/tests/prepared_cohort_test.py \
+  particula/execution/tests/prepared_test.py \
+  particula/execution/tests/prepared_charged_test.py \
+  particula/execution/tests/prepared_ions_test.py \
+  particula/execution/tests/prepared_ion_cleanup_test.py \
+  particula/execution/tests/prepared_restart_capture_test.py \
+  -q --no-cov -Werror
+```
+
+Tests cover two seed lineages in one merged particle, merger-induced threshold
+crossing, capture precedence, irrevocable previous success, unresolved censoring,
+real condensation growth, actual CUDA capture, restart before/after merging,
+corrupt checkpoint outcome rejection and conflicting ion material maps.
+Ruff, formatting and mypy passed (575 source files). These tests establish
+bookkeeping and integration; survival-probability convergence is still pending.
