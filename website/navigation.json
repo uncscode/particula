@@ -696,6 +696,10 @@
       {
         "label": "Sphere optics",
         "slug": "examples/optics/sphere_optics"
+      },
+      {
+        "label": "CUDA optics",
+        "slug": "examples/optics/cuda_optics"
       }
     ]
   },
@@ -1031,6 +1035,10 @@
             ]
           }
         ]
+      },
+      {
+        "label": "CUDA optics qualification",
+        "slug": "contribute/validation/optics/cuda"
       }
     ]
   }

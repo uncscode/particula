@@ -120,6 +120,10 @@ it is not total flux transmission through a multiply scattering cloud.
 
 ## Device calculations
 
+Run the [CUDA optics example](../../examples/optics/cuda_optics.py) for explicit
+transfers, timed particle batches and a streamed cloud spectrum. It requires
+native CUDA and verifies results against CPU calculations.
+
 Upload inputs explicitly to the chosen Warp device. `prepare_mie` accepts
 contiguous 1D `wp.vec2d` relative indices (real, imaginary) and `wp.float64`
 size parameters. Optional shared angles are a 1D float64 array. It retains
