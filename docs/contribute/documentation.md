@@ -1,7 +1,8 @@
 # Maintaining the documentation
 
 Choose the reader's task before choosing a filename. Public documentation has
-five sections; extend an existing topic before adding another page.
+five content sections, with a separate persistent Explore topics menu folder;
+extend an existing topic before adding another page.
 
 | Section | Audience and purpose | Owner |
 | --- | --- | --- |
@@ -14,7 +15,9 @@ five sections; extend an existing topic before adding another page.
 ## Topic organization and scientific narratives
 
 The [topic explorer](../guide/topics/index.md) connects the existing sections
-around scientific questions. Its canonical `website/topics.json` classifies
+around scientific questions. Its top-level menu folder contains the explorer
+and four main topic categories, independently of Guide. Existing topic URLs
+remain stable. Its canonical `website/topics.json` classifies
 all authored pages and registered examples; operational pages have explicit
 supporting-page reasons. A mapped page is not automatically an editorially
 reviewed page.
@@ -39,7 +42,9 @@ without duplicating the interactive map or editing generated pages.
    could change a scientific interpretation.
 3. Use topic folders and descriptive lowercase filenames. Python sources
    use snake_case stems so the source remains importable.
-4. Add the page to `website/navigation.json` and link it from its owning index. Never add a sixth top-level tab.
+4. Add the page to its content section in `website/navigation.json` and link it
+   from its owning index. Keep Explore topics as a separate top-level folder
+   for the explorer and main topic categories.
 5. Add purpose, prerequisites, units, device requirements, and version context.
    Keep CPU tutorials separate from optional Warp and native-CUDA-only examples.
 
@@ -59,12 +64,14 @@ Record meaningful old routes and split-section anchors in
 so old routes do not become duplicate navigation/search entries. Test targets in
 the full rendered site. Retired-only routes do not need home-page redirects.
 
-For v0.3.0, preserve outdated originals at
-`.trash/docs-v0.3.0/<original-repository-path>` and document revision, reason, and
-replacement in its README. Extract unique current guidance/evidence first.
-Do not publish `.trash` or include it in example discovery. An old scientific
-result can remain useful; do not confuse age with obsolescence or plan completion
-with measured qualification.
+Before retiring a source, extract unique current guidance and evidence. Record
+its reason, replacement, and the last Git revision containing it;
+use Git history rather than keeping duplicate archives in the checkout.
+The v0.3.0 originals remain in Git history at `4f669de11`.
+Retired entries in `docs/.assets/relocations.json` record that historical
+revision. Do not publish archived sources or include them in example discovery.
+An old scientific result can remain useful; do not confuse age with obsolescence
+or plan completion with measured qualification.
 
 ## Check the change
 

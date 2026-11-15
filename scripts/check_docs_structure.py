@@ -15,6 +15,7 @@ import docs_topics
 import markdown
 
 SECTIONS = ("Guide", "Examples", "Theory", "API", "Contribute")
+NAVIGATION = ("Explore topics", *SECTIONS)
 OWNERS = {"guide", "examples", "theory", "contribute", "API"}
 
 
@@ -124,6 +125,15 @@ def source_for_slug(slug, docs):
         candidate = slug + suffix
         if (docs / candidate).exists():
             return candidate
+    # Generated topic pages share the authored offline explorer as their entry.
+    # Recognize only registered topics so misspelled menu routes still fail.
+    if (
+        slug.startswith("guide/topics/")
+        and (docs.parent / "website/topics.json").exists()
+    ):
+        topics = docs_topics.load(docs.parent)["topics"]
+        if any(slug == docs_topics.topic_route(t["id"]) for t in topics):
+            return "guide/topics/index.md"
     return slug + ".md"
 
 
@@ -142,10 +152,8 @@ def check(root, site=None):
         for p in sorted(docs.rglob("*.ipynb"))
     ]
     nav = config["nav"]
-    if tuple(next(iter(item)) for item in nav) != SECTIONS:
-        errors.append(
-            "navigation must have Guide, Examples, Theory, API, Contribute"
-        )
+    if tuple(next(iter(item)) for item in nav) != NAVIGATION:
+        errors.append("navigation must have " + ", ".join(NAVIGATION))
     manifest = json.loads((docs / ".assets/relocations.json").read_text())
     pages = {
         p.resolve()
@@ -201,7 +209,12 @@ def check_navigation(nav, docs, pages):
     for item in nav:
         title = next(iter(item))
         first = next(nav_targets([item]), None)
-        if title != "API" and first != title.lower() + "/index.md":
+        landing = (
+            "guide/topics/index.md"
+            if title == "Explore topics"
+            else title.lower() + "/index.md"
+        )
+        if title != "API" and first != landing:
             errors.append(f"section landing must be first: {title}")
     for target in nav_targets(nav):
         if urlsplit(target).scheme:

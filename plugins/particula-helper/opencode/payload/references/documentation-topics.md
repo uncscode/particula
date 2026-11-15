@@ -6,6 +6,15 @@ The current `website/topics.json` owns concepts, page associations, and explicit
 supporting-page dispositions. Existing Guide, Examples, Theory, API, and
 Contribute sections describe document roles; the topic graph connects them.
 
+The persistent top-level Explore topics menu folder contains the explorer and
+the root topic's four main categories. Keep it separate from Guide and expanded
+by default, without a duplicate shortcut. `website/navigation.json` owns these
+menu entries; `website/topics.json` owns their labels and scientific grouping.
+Existing `guide/topics/` URLs and the offline `docs/guide/topics/index.md` entry
+remain stable even though the menu folder is independent of Guide. Validate
+generated topic destinations against the registry rather than assuming each
+has an authored Markdown file.
+
 ## Review a collection
 
 Inventory all authored pages and registered Python examples before proposing
@@ -14,6 +23,9 @@ reason. Note its scientific question, reader prerequisites, distinct contributio
 and editorial gaps. Similar titles do not establish duplicate content. Preserve
 unique calculations, evidence, and device boundaries when merging material.
 Use topic associations and better indexes before changing established routes.
+For retired sources, preserve unique evidence and record the last containing
+Git revision instead of retaining duplicate archive trees. The removed legacy
+archives remain in repository history at `4f669de11`; they are not build inputs.
 
 Keep a prioritized backlog in the requested plan location. Separate scientific
 contradictions, missing interpretation, and navigation problems. A page being
