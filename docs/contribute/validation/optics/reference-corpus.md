@@ -95,3 +95,24 @@ print(len(cases), 'cases;', out.stat().st_size, 'bytes;', 'sha256', hashlib.sha2
 
 Population fixtures and independent published/analytic benchmarks are still
 pending. This corpus does not by itself qualify a Particula implementation.
+
+## Large-sphere reference discrepancies
+
+The first independent implementation comparison found nine cases outside the
+1e-6 relative tolerance: m=1.33 and m=1.33+1e-8i at x=100, 1000, 3000, 10000,
+and m=1.5+0.01i at x=100. These exact cases retain their raw fixture values,
+but physical acceptance uses an independent direct spherical-Bessel evaluation
+with SciPy, rather than the production continued-fraction algorithm. Tests
+also assert that the documented raw-reference disagreement remains observable.
+
+For m=1.33, independent/production extinction agrees to about 1e-14:
+
+| x | Independent extinction | Raw PyMieScatt extinction |
+| --- | --- | --- |
+| 100 | 2.1010895537298273 | 2.101037518280405 |
+| 1000 | 2.0165783128478854 | 2.0162568524087 |
+| 3000 | 2.008372431870777 | 2.007587213279409 |
+| 10000 | 2.00411482223858 | 2.0043977121561216 |
+
+The precise upstream failure mechanism has not yet been isolated. No fixture
+values or acceptance tolerances were changed to hide these discrepancies.
