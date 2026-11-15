@@ -36,16 +36,16 @@ Numerical, failure, ownership, capture and restart tests remain separate gates.
 
 ## Correctness and publication checks
 
-Library revision `fb8c254f2`, Python 3.12.12, real NVIDIA GeForce RTX 5060:
+Library revision `dac1251fd`, Python 3.12.12, real NVIDIA GeForce RTX 5060:
 
 | Check | Result |
 | --- | --- |
-| Full package, warnings as errors, no slow/performance exclusion | 10,290 passed, 18 skipped, one expected failure |
+| Full package, warnings as errors, no slow/performance exclusion | 10,304 passed, 20 skipped, one expected failure |
 | Full-package coverage | 91.78%; required minimum 80% |
 | CI example suite | 238 passed, one skipped |
 | Full script suite | 294 passed |
-| Whole-library mypy | Passed, 611 source files |
-| CI Ruff and formatting targets | Passed, 684 files formatted |
+| Whole-library mypy | Passed, 612 source files |
+| CI Ruff and formatting targets | Passed, 685 files formatted |
 | Website tests | 38 Python and 11 JavaScript tests passed |
 | Three new examples | Full CPU/CUDA refresh and saved-data replot passed |
 
@@ -53,11 +53,11 @@ The package run uses a separate coverage database so other local runs cannot
 overwrite its evidence:
 
 ```bash
-COVERAGE_FILE=.artifacts/process-field-extensions/.coverage-final \
+COVERAGE_FILE=.artifacts/process-field-extensions/.coverage-review \
 WARP_CACHE_PATH=/tmp/particula-extension-warp \
 MPLCONFIGDIR=/tmp/particula-mpl \
 .venv/bin/pytest -q -Werror --cov=particula --cov-report=term-missing \
-  --cov-report=json:.artifacts/process-field-extensions/coverage-final.json \
+  --cov-report=json:.artifacts/process-field-extensions/coverage-review.json \
   --cov-fail-under=80
 .venv/bin/pytest examples_tests -q -Werror \
   -m 'not slow and not performance' --no-cov
@@ -67,7 +67,9 @@ MPLCONFIGDIR=/tmp/particula-mpl \
 Focused tests cover CPU later-box rollback and managed RNG; field copy/view
 isolation and source/removal accounting; real CUDA resident and explicit-transfer
 execution; device pointer retention; failure suppression; checkpoint drift
-rejection; and capture recording/replay. Native numerical regression remains
+rejection; and capture recording/replay. Declared saturation consumers also match an independent ideal-gas oracle after
+native updates, including transfer, resident, capture and restart paths.
+Native numerical regression remains
 part of the full package suite. The new downloadable GPU example also executes
 from its extracted ZIP outside the checkout, including its declared Warp helper.
 
@@ -79,7 +81,7 @@ rerun passed. Neither run was counted as a successful final package gate.
 
 ## Timing results
 
-Measured on revision `24c99ad8c` with Warp 1.11.1, NumPy 2.3.4 and Python
+Measured on revision `dac1251fd` with Warp 1.11.1, NumPy 2.3.4 and Python
 3.12.12. This revision has the same library bytes as the full package run.
 The [complete samples and source hashes](https://github.com/uncscode/particula/blob/main/docs/data/gpu/process-field-extensions.json)
 retain seven samples per case and the benchmark script digest. Other GPU tests
@@ -88,13 +90,13 @@ checked for competing GPU processes before starting.
 
 | Execution | Median time per step | Sample range | Native overhead |
 | --- | ---: | ---: | ---: |
-| Pre-feature native | 91.954 µs | 89.572–93.776 µs | Baseline |
-| Current native | 101.203 µs | 99.758–102.545 µs | +10.1% |
-| Pre-feature native, captured | 124.135 µs | 123.555–131.212 µs | Baseline |
-| Current native, captured | 137.293 µs | 135.108–138.645 µs | +10.6% |
-| Custom resident + native | 129.000 µs | 127.049–130.842 µs | Different work |
-| Custom resident + native, captured | 163.099 µs | 155.962–167.565 µs | Different work |
-| Explicit CPU transfer + native | 1,890.613 µs | 1,850.797–1,915.288 µs | Different work |
+| Pre-feature native | 90.599 µs | 89.799–92.546 µs | Baseline |
+| Current native | 98.828 µs | 96.145–101.029 µs | +9.1% |
+| Pre-feature native, captured | 124.654 µs | 123.744–127.069 µs | Baseline |
+| Current native, captured | 136.901 µs | 134.709–137.938 µs | +9.8% |
+| Custom resident + native | 128.609 µs | 127.781–130.357 µs | Different work |
+| Custom resident + native, captured | 161.238 µs | 159.672–170.535 µs | Different work |
+| Explicit CPU transfer + native | 1,869.641 µs | 1,825.235–1,913.798 µs | Different work |
 
 Both extension-free comparisons pass the predeclared 20% bound. Capture is
 slower for this small workload: these are complete host-enqueued step costs,
