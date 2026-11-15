@@ -111,7 +111,7 @@ def write_page(path, title, body, source=None, extra=None):
         )
     if extra:
         metadata.update(extra)
-    if source:
+    if source and str(path) != "index.mdx":
         body += docs_topics.page_links(source, docs_topics.load(), BASE)
     destination.write_text(
         "---\n"

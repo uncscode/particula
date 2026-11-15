@@ -23,17 +23,3 @@ your coding agent.
   <LinkCard title="API reference" description="Signatures and docstrings extracted directly with Griffe." href="/particula/api/" />
   <LinkCard title="Contribute" description="Develop models and maintain reproducible examples." href="/particula/contribute/" />
 </CardGrid>
-
-## Get started
-
-[Install Particula](guide/getting-started/installation/index.md) ·
-[Set up agentic plugins](guide/ai-assistants/index.md) ·
-[Upgrade an older script](guide/migration/v0.3.0/index.md)
-
-<a id="community-and-citation"></a>
-
-## Science is a shared effort
-
-[Ask a question](https://github.com/uncscode/particula/discussions) ·
-[Report an issue](https://github.com/uncscode/particula/issues) ·
-[Cite Particula](https://doi.org/10.5281/zenodo.6634653)
