@@ -1,9 +1,0 @@
-# Change Log
-
-| Date | Change | Author |
-|------|--------|--------|
-| 2026-07-16 | Initial E5-F3 plan drafted with four issue-sized phases for a safe charged majorant, charged-only execution, Brownian-plus-charged one-pass execution, and development documentation; preserved classifier diagnostics (`none`). | plan-feature-drafter |
-| 2026-07-17 | Completed E5-F3-P1 / #1342: added private exhaustive compact-active charged hard-sphere term-majorant dispatch and independent deterministic coverage. No public charged execution, selection, merge, API, or module-boundary change was made. | plan-update-full |
-| 2026-07-17 | Completed E5-F3-P2 / #1343: enabled exact charged-only particle-resolved low-level execution with charged rates, compact O(A²) majorant, private summed-total-mass scratch, forced finite-charge preflight, charge-conserving shared merge, and expanded deterministic/stochastic coverage. Brownian-plus-charged remains deferred. | plan-update-full |
-| 2026-07-17 | Completed E5-F3-P3 / #1344: enabled canonical Brownian-plus-charged particle-resolved direct execution in either requested order. Combined rates and their single-pass exhaustive additive majorant use the existing selector, caller buffers, RNG stream, and charge-conserving apply kernel; preflight and deterministic/stochastic/ownership/conservation coverage were extended. | plan-update-full |
-| 2026-07-17 | Completed E5-F3-P4 / #1345: documented the P1-P3 direct charged contract and corrected charged-coagulation eligibility, rejected-merge reporting, and regression coverage discovered during review. Charged-only uses a bounded compact active O(A²) majorant; combined mode uses one exhaustive active-pair additive O(A²) majorant and shared selection/apply pass. Warp CPU is baseline, CUDA remains optional cleanly skipped evidence, and E5-F9 retains the canonical example/support table. | adw-build |

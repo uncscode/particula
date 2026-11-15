@@ -1,5 +1,0 @@
-| Risk | Likelihood | Impact | Mitigation | Owner | Status |
-|------|------------|--------|------------|-------|--------|
-| Reused builder state may retain omitted optional parameters across successive `set_parameters()` calls | Low | Medium | Mitigated in PR #1162 by resetting `update_gases` to its default before each parameter load and adding a regression test for reused builders | TBD | Mitigated |
-| Factory registration could publish an unstable or unclear public key (`"latent_heat"` vs alias) that later forces docs churn or compatibility shims | Medium | Medium | Resolved by shipping only the final `"latent_heat"` key and documenting that same path in the feature docs | TBD | Mitigated |
-| Namespace exports or docs examples may drift from the final shipped builder path | Medium | Medium | Mitigated by coupling P3 export smoke tests with the completed `docs/Features/condensation_strategy_system.md` sync and updating plan sections after docs-validator drift surfaced | TBD | Mitigated |
