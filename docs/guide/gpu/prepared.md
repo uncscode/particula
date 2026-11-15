@@ -286,6 +286,35 @@ field checks retain integer precision, including int64 values above 2**53.
 `simulated_time` remains elapsed time. Custom kernels read the current interval's
 start from `context.clock[0]`, so captured replay follows evolving time.
 
+## Registered particle fields
+
+Prepared execution uploads `aerosol.fields` once and includes detached field
+values and inventory ledgers in snapshots and checkpoints. Particle fields
+require a resolved population. Their schema and device identities remain fixed
+until a new preparation.
+
+Additive float64 fields follow actual native collision pairs and the exact
+represented-count overlaps used by native resampling. Dilution retains the
+per-particle value while recording removed inventory. Wall loss and condensation
+retirement clear freed slots and record removed inventory; nucleation initializes
+actual newborn slots from `FieldSpec.initial_value` and records source inventory.
+For each field, compare `sum(count * value)` with the initial inventory plus
+`fields.inventory_changes(name)["source"]` minus its `"removal"` ledger. Vector
+fields retain a separate budget for each particle-species component.
+
+Passive fields, including int32/int64 labels, support births and retirement but
+reject coagulation and enabled resampling because their merge rule is undefined.
+Particle fields reject representative-volume scaling and ion source/cleanup
+sequences without a supported field-event contract. Custom processes may change
+values but must preserve slot activity. Active slots obey the declared bounds;
+inactive slots must contain zero even when the active minimum is positive.
+
+Field lifecycle operations retain their buffers during preparation and support
+resident CUDA capture and exact checkpoint continuation. These accounting rules
+preserve represented inventory; resampling can still alter the joint
+particle/tracer distribution. Custom scientific sources and sinks remain the
+custom process author's responsibility.
+
 ## State, forcing and observations
 
 `run(steps)` enqueues fixed-duration steps. `completed_steps` and

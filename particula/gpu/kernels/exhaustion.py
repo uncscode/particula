@@ -402,9 +402,15 @@ def _plan_resampling(  # noqa: C901, PLR0915
     mean_bound: wp.float64,
     surface_bound: wp.float64,
     diversity_bound: wp.float64,
+    transport_counts: wp.array(dtype=wp.int32),
+    transport_targets: wp.array2d(dtype=wp.int32),
+    transport_donors: wp.array2d(dtype=wp.int32),
+    transport_overlaps: wp.array2d(dtype=wp.float64),
 ) -> None:
     """Plan one box sequentially; output rows remain caller-owned storage."""
     box = wp.tid()
+    if transport_counts:
+        transport_counts[box] = 0
     if invalid[0] != 0 or upstream_invalid[0] != 0 or counts[box] == 0:
         return
     n_particles = concentration.shape[1]
@@ -516,6 +522,12 @@ def _plan_resampling(  # noqa: C901, PLR0915
             overlap_end = wp.min(target_end, source_end)
             overlap = overlap_end - cursor
             source_particle = sorted_indices[box, source]
+            if transport_counts:
+                entry = transport_counts[box]
+                transport_targets[box, entry] = target
+                transport_donors[box, entry] = source_particle
+                transport_overlaps[box, entry] = overlap
+                transport_counts[box] = entry + 1
             for species in range(n_species):
                 replacement_masses[box, target, species] += (
                     overlap * masses[box, source_particle, species] / equal
@@ -1045,6 +1057,7 @@ class _PreparedResamplingCall:
     invalid: Any
     planning_failed: Any
     upstream_invalid: Any
+    transport: tuple[Any, ...] | None = None
 
 
 @dataclass(frozen=True)
@@ -1308,6 +1321,7 @@ def _enqueue_prepared_resampling_call(
             prepared.invalid,
             prepared.upstream_invalid,
             *prepared.bounds,
+            *(prepared.transport or (None, None, None, None)),
         ],
         device=prepared.device,
     )

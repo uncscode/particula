@@ -153,6 +153,9 @@ def compile_nucleation(plan: _ProcessPlan, owner: Any):
     from particula.execution.prepared_guards import latch_nucleation_failure
 
     prepared = replace(prepared, upstream_failure=owner._device_failure)
+    from particula.execution.prepared_particle_fields import attach_transport
+
+    prepared = attach_transport(prepared, owner)
     owner._bindings[plan.family] = prepared
     saved_status = wp.zeros(25, dtype=wp.int32, device=owner.device.native)
 

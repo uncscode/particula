@@ -80,6 +80,9 @@ def prepare_validation(configuration, arrays, state, owner):  # noqa: C901
     for name in configuration.writes:
         array = arrays[name]
         spec = descriptors.get(name)
+        if spec is not None and "particle" in spec.axes:
+            # Lifecycle validation applies bounds only to active slots.
+            continue
         if spec is not None and spec.dtype != "float64":
             limits = np.iinfo(spec.dtype)
             lower = (
