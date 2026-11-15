@@ -376,3 +376,11 @@ narrow passing suite. Leave merge, version bump and release outside this goal.
   timing samples are ready for the final evidence push. Local implementation,
   examples, numerical checks, coverage, types, formatting and documentation
   gates are complete; hosted final-commit CI and live reviews remain.
+- Hosted Python 3.12/3.13/3.14 package suites passed, but their example suites
+  exposed a CPU-guide code fence that unconditionally selected CUDA. The CPU
+  guide now links to the separately executed CUDA example. Its regression test
+  rejects any prepared-device launch while preserving all scientific assertions.
+  With CUDA hidden, the focused guide suite passes 23 tests (one CUDA skip),
+  and the complete example suite passes 233 tests (six skips). Library source
+  bytes are unchanged; the qualified numerical, timing and saved-example hashes
+  remain valid. Final hosted checks must rerun on this correction.

@@ -333,21 +333,10 @@ separate capability.
 ### Explicit Python execution in a GPU sequence
 
 Wrap a `BoxProcess` or `FunctionProcess` in `CPUTransfer` to select a host round
-trip inside a prepared GPU sequence:
-
-```python
-from particula import CPUTransfer
-
-with CPUTransfer(warming).prepare(
-    aerosol, device="cuda:0", time_step=10.0, time=120.0
-) as simulation:
-    simulation.run(3)
-    result = simulation.snapshot()
-    saved = simulation.checkpoint()
-
-with CPUTransfer(warming).resume(saved) as continuation:
-    continuation.step()
-```
+trip inside a prepared GPU sequence. The
+[custom CPU/CUDA process example](../../examples/gpu/prepared/custom_process_backends.py)
+demonstrates explicit CUDA preparation, transfer execution and checkpoint/resume
+on a GPU. The ordinary CPU examples on this page require no GPU.
 
 Each transfer waits for preceding GPU work, downloads the full native and
 registered state, runs the CPU process with the current simulation time, and
