@@ -93,6 +93,7 @@ class RunnableABC:
         sub_steps: int = 1,
         *,
         context=None,
+        time: float = 0.0,
     ) -> Aerosol:
         """Advance every box, committing atomically after each process substep.
 
@@ -101,8 +102,10 @@ class RunnableABC:
         this method retain responsibility for their own execution semantics.
         """
         from particula import _cpu_batch
+        from particula.box_process import validate_time
         from particula.execution import CPUExecutionContext
 
+        validate_time(time)
         step = _cpu_batch.duration(time_step, sub_steps)
         maximum = getattr(self, "_maximum_sub_steps", None)
         if maximum is not None and sub_steps > maximum:
@@ -319,6 +322,7 @@ class RunnableSequence:
         sub_steps: int = 1,
         *,
         context=None,
+        time: float = 0.0,
     ) -> Aerosol:
         """Execute all processes in the sequence on the given Aerosol.
 
@@ -344,8 +348,14 @@ class RunnableSequence:
             ```
         """
         from particula._cpu_batch import duration
+        from particula.box_process import BoxProcess, validate_time
 
+        time = validate_time(time)
+        names = [p.name for p in self.processes if isinstance(p, BoxProcess)]
+        if len(names) != len(set(names)):
+            raise ValueError("custom process instance names must be unique")
         sub_step_time_step = duration(time_step, sub_steps)
+        validate_time(time + float(time_step))
         # If tqdm is available, wrap the process loop in a progress bar
         loop_iterator = range(sub_steps)
         if AVAILABLE_TQDM and tqdm is not None:
@@ -354,13 +364,18 @@ class RunnableSequence:
                 desc="Executing Runnable",
                 mininterval=0.5,
             )
-        for _ in loop_iterator:
+        for substep in loop_iterator:
             # loop over each process in the sequence
             for process in self.processes:
                 aerosol = process.execute(
                     aerosol,
                     sub_step_time_step,
                     sub_steps=1,
+                    **(
+                        {"time": time + substep * sub_step_time_step}
+                        if isinstance(process, BoxProcess)
+                        else {}
+                    ),
                     **({"context": context} if context is not None else {}),
                 )
         return aerosol

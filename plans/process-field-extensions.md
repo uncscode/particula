@@ -177,3 +177,15 @@ narrow passing suite. Leave merge, version bump and release outside this goal.
 - Initial restricted regression attempt: 58 passed, 69 skipped, 13 failed due
   to an unwritable Warp compiler cache. Host CUDA rerun uses temporary cache;
   running session 46417 at this checkpoint. Do not treat skips as CUDA evidence.
+- Host regression session 46417 completed: 140 passed, no skips, including
+  CUDA cases and prepared restart/capture. This qualifies the operation-record
+  refactor only, not the remaining extension features.
+- Initial public BoxProcess/FunctionProcess and explicit CPU sequence time are
+  implemented. CPU contract remains under development: broaden multi-box/RNG,
+  metadata/replacement tests, declaration validation and docs before completion.
+
+- CPU contract tests now include later-box numeric/RNG rollback, duplicate
+  instance rejection, metadata/container/undeclared-write rejection, and shared
+  physical substep time. Focused CPU suites: 37 passed. Ruff and mypy for the
+  new CPU module/runnable pass. Public process guide documents actual CPU API.
+  Registered fields and GPU integration remain unimplemented at this point.
