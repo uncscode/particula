@@ -174,3 +174,12 @@ entries, discrete/resolved/PDF reductions and single/multiple layers.
   Full current suite: 230 passed on CPU and RTX 5060; Ruff/format/mypy pass.
   The public API/failure audit, examples, documentation, performance and broad
   repository/packaging qualification remain before the PR.
+- Added named CPU perpendicular/parallel/unpolarized differential cross
+  sections in m²/sr, with batch/angle contracts and explicit overflow handling.
+  Added a direct Warp per-particle cross-section kernel retaining ext/sca/abs/
+  back/pr in m², including upstream and invalid-value status propagation.
+  This preserves individual absorption for later feedback without mutating
+  particle state. Absolute units, medium scaling, buffer reuse and failures
+  are covered. Full optics suite: 240 passed on CPU and native RTX 5060;
+  Ruff/format/mypy pass. Remaining API/failure review, examples, public guides,
+  performance qualification and broad repository/packaging checks remain.
