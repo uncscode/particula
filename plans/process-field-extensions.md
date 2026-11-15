@@ -189,3 +189,6 @@ narrow passing suite. Leave merge, version bump and release outside this goal.
   physical substep time. Focused CPU suites: 37 passed. Ruff and mypy for the
   new CPU module/runnable pass. Public process guide documents actual CPU API.
   Registered fields and GPU integration remain unimplemented at this point.
+- Registered storage is connected to Aerosol, detached copies, box views,
+  alias/publication checks and custom declarations. Storage/CPU/aerosol tests:
+  43 passed. Native population-event integration remains pending.

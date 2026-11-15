@@ -112,7 +112,7 @@ class BoxProcess(RunnableABC):
         validate_time(start + float(time_step))
         _cpu_batch.validate(aerosol)
         fields = _cpu_batch.arrays(aerosol)
-        if not set(self.writes) <= _WRITABLE:
+        if not set(self.writes) <= _WRITABLE | aerosol.fields.specs.keys():
             raise ValueError("unsupported writer field")
         if not set(self.reads) <= fields.keys():
             raise ValueError("unknown reader field")
@@ -176,7 +176,9 @@ class BoxProcess(RunnableABC):
         return aerosol
 
 
-def _check_candidate(candidate, before, retained, writes, containers):
+def _check_candidate(  # noqa: C901
+    candidate, before, retained, writes, containers
+):
     """Reject replacement, undeclared writes and invalid native state."""
     if any(
         new is not old
@@ -187,6 +189,21 @@ def _check_candidate(candidate, before, retained, writes, containers):
         )
     ):
         raise ValueError("process replaced a native container")
+    if candidate.fields.specs != before.fields.specs:
+        raise ValueError("process changed field schema")
+    if any("particle" in spec.axes for spec in before.fields.specs.values()):
+        if not np.array_equal(
+            candidate.particles.concentration > 0,
+            before.particles.concentration > 0,
+        ):
+            raise ValueError("custom processes must preserve particle activity")
+    from particula.extension_fields import field_dimensions
+
+    candidate.fields.validate_layout(
+        field_dimensions(candidate.particles, candidate.gas),
+        candidate.particles.distribution_type,
+        candidate.particles.concentration > 0,
+    )
     actual = _cpu_batch.arrays(candidate)
     original = _cpu_batch.arrays(before)
     if actual.keys() != retained.keys():
