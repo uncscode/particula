@@ -110,13 +110,13 @@ Recording advances neither scientific state, clock nor RNG.
 
 - [x] docs(plan): record process and field extension design
 - [x] refactor(execution): introduce typed process bindings
-- [ ] feat(cpu): expose timed box process extensions
-- [ ] feat(data): add registered extension fields
-- [ ] feat(particles): preserve additive fields through population events
-- [ ] feat(gpu): prepare registered processes and fields
-- [ ] feat(gpu): add explicit CPU transfer processes
-- [ ] feat(execution): checkpoint and capture extension state
-- [ ] docs(examples): demonstrate process and field extensions
+- [x] feat(cpu): expose timed box process extensions
+- [x] feat(data): add registered extension fields
+- [x] feat(particles): preserve additive fields through population events
+- [x] feat(gpu): prepare registered processes and fields
+- [x] feat(gpu): add explicit CPU transfer processes
+- [x] feat(execution): checkpoint and capture extension state
+- [x] docs(examples): demonstrate process and field extensions
 - [ ] test(execution): qualify extension workflows
 
 Feature commits include focused tests, not just the final qualification commit.
@@ -346,3 +346,10 @@ narrow passing suite. Leave merge, version bump and release outside this goal.
   Site build passed: 477 generated pages, with rendered verification reporting
   zero errors across 607 HTML pages and 286 API modules. Final saved-example
   refresh after the compatibility corrections remains required.
+
+- Final-source example suite: 238 passed, one skip; script suite: 294 passed.
+  All three maintained examples were refreshed against fb8c254f2 and then
+  replotted from saved numerical data. Figure bytes are unchanged. Full-library
+  Ruff, format and mypy pass; final package coverage and isolated timings remain
+  in progress. The timing protocol declares its 20% native-overhead bound before
+  measurement and uses an archived pre-feature source tree with the same runtime.
