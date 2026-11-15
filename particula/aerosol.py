@@ -1,6 +1,7 @@
 """Identity-preserving aggregate of native CPU aerosol data."""
 
 from particula.aerosol_validation import validate_aerosol_structure
+from particula.extension_fields import ExtensionFields, field_dimensions
 from particula.gas.environment_data import EnvironmentData
 from particula.gas.gas_data import GasData
 from particula.particles.particle_data import ParticleData
@@ -20,6 +21,7 @@ class Aerosol:
         particles: ParticleData,
         gas: GasData,
         environment: EnvironmentData,
+        fields: ExtensionFields | None = None,
     ) -> None:
         """Validate the complete triple before retaining supplied identities.
 
@@ -32,9 +34,19 @@ class Aerosol:
             TypeError: If a container has the wrong type.
             ValueError: If structure or particle representation is invalid.
         """
+        if fields is not None and type(fields) is not ExtensionFields:
+            raise TypeError("fields must be ExtensionFields")
+        self._fields = fields
         self._replace_data(
             particles=particles, gas=gas, environment=environment
         )
+
+    @property
+    def fields(self) -> ExtensionFields:
+        """Return registered persistent extension storage by identity."""
+        if self._fields is None:
+            raise RuntimeError("aerosol field storage is not initialized")
+        return self._fields
 
     @property
     def particles(self) -> ParticleData:
@@ -109,6 +121,16 @@ class Aerosol:
         """Validate candidates before publishing their references."""
         validate_aerosol_structure(particles, gas, environment)
         particles.validate_representation()
+        dimensions = field_dimensions(particles, gas)
+        fields = self._fields
+        if fields is None or not fields.specs:
+            fields = ExtensionFields(dimensions)
+        fields.validate_layout(
+            dimensions,
+            particles.distribution_type,
+            particles.concentration > 0,
+        )
+        self._fields = fields
         self._particles, self._gas, self._environment = (
             particles,
             gas,

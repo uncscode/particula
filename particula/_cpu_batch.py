@@ -49,6 +49,7 @@ def arrays(aerosol):
     }
     if p.radius_grid is not None:
         result["particles.radius_grid"] = p.radius_grid
+    result.update(aerosol.fields.items())
     return result
 
 
@@ -61,6 +62,13 @@ def validate(aerosol, writers=()):
     )
     aerosol.particles.validate_representation()
     aerosol.environment.__post_init__()
+    from particula.extension_fields import field_dimensions
+
+    aerosol.fields.validate_layout(
+        field_dimensions(aerosol.particles, aerosol.gas),
+        aerosol.particles.distribution_type,
+        aerosol.particles.concentration > 0,
+    )
     fields = arrays(aerosol)
     for name in writers:
         target = fields[name]
@@ -105,6 +113,7 @@ def detached(aerosol):
         particles=aerosol.particles.copy(),
         gas=aerosol.gas.copy(),
         environment=aerosol.environment.copy(),
+        fields=aerosol.fields.copy(),
     )
 
 
@@ -135,6 +144,7 @@ def box_view(aerosol, box):
             partitioning=g.partitioning,
         ),
         environment=environment,
+        fields=aerosol.fields.box_view(box),
     )
 
 

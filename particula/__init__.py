@@ -20,6 +20,7 @@ from particula import (
     activity,
     equilibria,
 )
+from particula.extension_fields import ExtensionFields, FieldSpec
 from particula.aerosol import Aerosol
 from particula.aerosol_builder import AerosolBuilder
 from particula.execution import (
