@@ -76,9 +76,9 @@ entries, discrete/resolved/PDF reductions and single/multiple layers.
 - [x] CPU angular scattering, Mueller matrices and Stokes helpers.
 - [x] Warp equivalents and CPU/Warp-CPU/real-CUDA parity.
 - [x] Population optics, path/column helpers on both backends.
-- [ ] Executed spectral, polarization, cloud-depth and CUDA examples with
+- [x] Executed spectral, polarization, cloud-depth and CUDA examples with
       saved compact numerical data; later-feedback usage sketch only.
-- [ ] Google-style SI/shape/domain docstrings, primary citations, guide/API
+- [x] Google-style SI/shape/domain docstrings, primary citations, guide/API
       navigation and numerical/performance validation record.
 - [x] Rayleigh limits, lossless energy balance, extinction=scattering+absorption,
       bounded g; angular integrals recover Csca/g and normalized phase.
@@ -89,9 +89,9 @@ entries, discrete/resolved/PDF reductions and single/multiple layers.
       rtol=1e-8/atol=1e-12. Document scale-aware angular errors near zeros and
       independent absolute checks of weak absorption. Investigate failures,
       never automatically weaken tolerances.
-- [ ] Real CUDA small/medium/large workloads, compilation/transfer/execution
+- [x] Real CUDA small/medium/large workloads, compilation/transfer/execution
       timing separated; no unmeasured speedup claims.
-- [ ] Relevant numerical suites, full required checks, Ruff/mypy, examples,
+- [x] Relevant numerical suites, full required checks, Ruff/mypy, examples,
       documentation/site build, clean wheel installation and offline fixture
       tests with no external Mie solver installed.
 - [ ] Review final diff and evidence, push final branch, then create upstream
@@ -258,3 +258,39 @@ entries, discrete/resolved/PDF reductions and single/multiple layers.
   not a full-suite pass). A replacement full-suite/80%-coverage run now uses
   the frozen final source. Its result remains pending. CPU/CUDA saved example
   refresh and final site/evidence review follow completion of concurrent tests.
+
+## Local completion audit — 2026-11-15
+
+All implementation and local qualification requirements are satisfied. Final
+numerical source is baf393b18. The later evidence commits do not change it.
+
+- Physics/API: CPU and Warp Mie, cross sections, angular/polarization,
+  distribution weights, population reductions, optical depth/transmission and
+  mass opacity are implemented under particula/optics and exercised by 251
+  focused tests on CPU and native CUDA. Reference corpus and independent
+  Bessel/high-precision/angular-integral checks cover through x=10000.
+- Contracts: SI/medium/Stokes conventions, count/volume/PDF weighting,
+  explicitly supplied geometry, validity masks, bounded convergence, numerical
+  failure propagation, tile independence and retained workspace reuse are
+  documented and tested. No aerosol/environment state-changing process added.
+- Dependencies: no PyMieScatt/miepython/mpmath dependency or test import.
+  Clean installed wheel with current declared dependencies passed 251 tests;
+  reference data ships in the wheel and runs offline.
+- Full validation: 10408 passed, 14 skipped, 1 xfailed; 91.36% coverage against
+  80%. Infrastructure 298 passed; examples 235 passed/1 skipped. Whole-tree
+  Ruff, formatting and mypy pass. Earlier interrupted/stale runs are not used
+  as completion evidence.
+- Examples/docs: both optics workloads refreshed on the final package hash;
+  all saved bundles current and figures visually inspected. Native CUDA
+  timings isolate module load, transfer, preparation and synchronized compute.
+  Final site build and rendered structure/link checks pass with zero errors.
+- Packaging: final docs wheel/sdist build and offline source rebuild passed;
+  both isolated documentation installations passed. Delivery artifacts:
+  wheel 4087740 bytes, sdist 3700492 bytes. The public qualification record
+  distinguishes Python coverage from compiled Warp execution evidence.
+- Final diff reviewed: only the optics implementation/evidence/docs and the
+  tested retired-redirect checker correction; no dependency/version/README or
+  unrelated working-tree changes. Upstream base remains a73fa1974.
+
+Remaining: push final evidence, create upstream PR, observe hosted checks and
+resolve actionable review/check failures. Do not merge or publish a release.
