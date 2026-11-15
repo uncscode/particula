@@ -132,7 +132,8 @@ computed SciPy Bessel coefficients and Legendre-polynomial derivatives at
 rtol=1e-9, atol=1e-10. Mueller sign conventions are independently checked by
 propagating complex Jones electric fields and constructing Stokes vectors.
 Angular integration tests recover total scattering and asymmetry through
-x=100. Angular qualification at larger size parameters remains pending.
+x=100. Larger sizes have independent pointwise and solid-angle
+qualification below.
 
 ## Population reference cases
 
@@ -150,3 +151,114 @@ multiplying by 2e15. Raw bulk optical coefficients are Mm⁻¹ and convert to
 m⁻¹ by multiplying by 1e-6. G is dimensionless; Bratio is retained for provenance
 but is not a Particula output. Tests compare extinction, scattering,
 absorption, backscatter, radiation pressure and G independently.
+
+## Independent large-sphere angular qualification
+
+`large_angular_test.py` compares NumPy, Warp CPU and native CUDA amplitudes
+against independent external spherical Bessel functions and Jacobi-polynomial
+angular functions at x=100, 1000, 3000 and 10000. Materials are
+m=1.33+1e-8i, 1.5+0.1i and 0.2+3i. Nine angles include both endpoints,
+1e-6/1e-4/1e-3 radian forward angles and near-backward scattering. The oracle
+includes ten additional series terms to check truncation independently.
+
+The internal logarithmic derivative is computed from ratios of
+[SciPy's scaled AMOS Bessel functions](https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.jve.html).
+Angular functions use the Legendre derivative identity
+P_n'(mu)=(n+1)P_(n-1)^(1,1)(mu)/2, evaluated by
+[SciPy's Jacobi polynomial function](https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.eval_jacobi.html).
+These avoid the production continued fraction and angular recurrence.
+
+At m=0.2+3i and x=10000, even scaled AMOS functions underflow at large orders.
+For that case, `high_precision_angular.json` stores an independent reference
+using upward internal Riccati-Bessel recurrence at 2000 decimal digits,
+repeated at 2200 digits. Every logarithmic derivative agrees exactly after
+rounding to complex128. External radial and angular functions remain SciPy
+double precision; this is not a claim of 2000-digit final amplitudes.
+The fixture records versions, precision check, term count and generator hash.
+Neither mpmath nor an external Mie solver is a project dependency.
+
+Acceptance is maximum amplitude error divided by the case's peak amplitude
+<=1e-8. A second check constrains every amplitude at angles >=0.01 radians
+with rtol=1e-6 and atol=1e-8, so weak side/back scattering cannot be hidden
+by a large forward peak. All 36 backend/material/size combinations pass on
+NumPy, Warp CPU and the RTX 5060. This establishes the listed sample cases,
+not an exhaustive proof for every refractive index.
+
+To regenerate the exceptional fixture, install mpmath==1.3.0 in a disposable
+external environment alongside the NumPy/SciPy versions recorded in the JSON.
+Save and run this generator with its output JSON path as the first argument:
+
+```python
+"""Generate one independent absorbing-sphere angular reference.
+
+Run with mpmath==1.3.0 in a disposable environment; not a package dependency.
+Internal Riccati-Bessel functions use upward recurrence at 2000/2200 decimal
+places, distinct from the production double continued fraction/downward ratio.
+The second precision run verifies that cancellation has not exhausted precision.
+"""
+import hashlib
+import json
+from pathlib import Path
+import sys
+
+import mpmath as mp
+import numpy as np
+import scipy
+from scipy.special import eval_jacobi, eval_legendre, spherical_jn, spherical_yn
+
+x = 10000.0
+m = 0.2 + 3j
+n = np.arange(1, int(np.ceil(x + 4.05 * np.cbrt(x) + 2)) + 11)
+theta = np.array([0, 1e-6, 1e-4, 1e-3, .01, .5, np.pi/2, np.pi-1e-4, np.pi])
+
+
+def derivatives(precision):
+    with mp.workdps(precision):
+        z = mp.mpc(2000, 30000)
+        previous = mp.sin(z)
+        current = mp.sin(z)/z - mp.cos(z)
+        result = []
+        for order in n:
+            order = int(order)
+            result.append(complex(previous/current - order/z))
+            previous, current = current, (2*order+1)/z*current - previous
+        return np.array(result)
+
+
+d = derivatives(2000)
+verified = derivatives(2200)
+np.testing.assert_allclose(d, verified, rtol=0, atol=0)
+j, jp = spherical_jn(n, x), spherical_jn(n, x, True)
+y, yp = spherical_yn(n, x), spherical_yn(n, x, True)
+psi, psip = x*j, j+x*jp
+xi, xip = x*(j+1j*y), j+1j*y+x*(jp+1j*yp)
+a = (m*psip-d*psi)/(m*xip-d*xi)
+b = (psip-m*d*psi)/(xip-m*d*xi)
+order, mu = n[:, None], np.cos(theta)[None, :]
+pi = (order+1)/2*eval_jacobi(order-1, 1, 1, mu)
+tau = order*(order+1)*eval_legendre(order, mu)-mu*pi
+factor = (2*order+1)/(order*(order+1))
+s1 = np.sum(factor*(a[:, None]*pi+b[:, None]*tau), axis=0)
+s2 = np.sum(factor*(a[:, None]*tau+b[:, None]*pi), axis=0)
+amplitudes = np.stack((s1, s2), axis=-1)
+result = {
+    'description': 'Independent large absorbing sphere angular oracle',
+    'index': [m.real, m.imag], 'size_parameter': x,
+    'angles_radians': theta.tolist(),
+    'amplitudes': np.stack((amplitudes.real, amplitudes.imag), -1).tolist(),
+    'internal_decimal_precision': [2000, 2200],
+    'precision_check': 'Every derivative identical after rounding to complex128',
+    'series_terms': int(n[-1]),
+    'mpmath': mp.__version__, 'numpy': np.__version__, 'scipy': scipy.__version__,
+    'generator_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+}
+Path(sys.argv[1]).write_text(json.dumps(result, indent=2)+'\n')
+print('Saved', sys.argv[1], flush=True)
+```
+
+The high-size solid-angle check uses composite 128-point Gauss integration
+in scattering angle, including the sin(theta) Jacobian, at x=1000 and 10000.
+Two panel densities (ceil(x/40) and ceil(x/20)) independently recover Qsca
+and g at rtol=1e-8. A single large Legendre rule in cos(theta) produced a
+1.6e-6 relative scattering discrepancy at x=10000; composite integration
+resolves that quadrature limitation without relaxing acceptance thresholds.
