@@ -162,3 +162,15 @@ entries, discrete/resolved/PDF reductions and single/multiple layers.
   Complete current optics suite: 190 passed on Warp CPU and native RTX 5060;
   Ruff and mypy pass. Examples, documentation, further API/failure audit,
   independent large-x angular checks and performance qualification remain.
+- Added independent large-sphere angular qualification at x=100,1000,3000,
+  10000 for three complex indices, endpoints and fine forward angles on NumPy,
+  Warp CPU and native CUDA. AMOS Bessel ratios/Jacobi polynomials provide the
+  oracle; one highly absorbing case needs a saved externally generated
+  2000/2200-digit upward-recurrence reference because scaled AMOS underflows.
+  No mpmath dependency was added. Generator/provenance are recorded alongside
+  the reference documentation. Composite angular quadrature at two resolutions
+  recovers Qsca/g through x=10000 with rtol=1e-8. A single high-order quadrature
+  rule was insufficient; the acceptance tolerances were preserved.
+  Full current suite: 230 passed on CPU and RTX 5060; Ruff/format/mypy pass.
+  The public API/failure audit, examples, documentation, performance and broad
+  repository/packaging qualification remain before the PR.
