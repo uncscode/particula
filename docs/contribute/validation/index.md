@@ -15,6 +15,7 @@ Results are specific to their recorded revision, workload, and device.
 | Is resident capture performance qualified? | [Qualification gates](gpu/graph-capture-qualification.md): UNSHIPPED/BLOCKED |
 | How must resident timing and memory be measured? | [Benchmark/memory record](gpu/resident-benchmarks.md) |
 | How must capture profiling be collected? | [Profiling record](gpu/graph-capture-profiling.md) |
+| What qualifies custom processes and registered fields? | [Extension qualification](gpu/process-field-extensions.md) |
 
 Missing reviewed artifacts are unavailable and unmeasured. A passing source
 test or closed implementation plan cannot populate a missing measurement row.

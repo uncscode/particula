@@ -959,6 +959,10 @@
                 "slug": "contribute/validation/gpu/prepared-rtx5060"
               },
               {
+                "label": "Custom processes and fields",
+                "slug": "contribute/validation/gpu/process-field-extensions"
+              },
+              {
                 "label": "Historical coagulation benchmark evidence",
                 "slug": "contribute/validation/gpu/coagulation-benchmarks"
               },

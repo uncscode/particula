@@ -262,7 +262,7 @@ def plot_results(report):
     """Show inventory closure, changed distributions and explicit source tags."""
     coag, source = report["coagulation"], report["source"]
     fig, axes = plt.subplots(1, 3, figsize=(13, 4), constrained_layout=True)
-    axes[0].plot(coag["time"], coag["inventory"], label="Resident inventory")
+    axes[0].plot(coag["time"], coag["inventory"], label="In-box inventory")
     axes[0].plot(coag["time"], coag["removal"], label="Removed inventory")
     axes[0].plot(
         coag["time"],
