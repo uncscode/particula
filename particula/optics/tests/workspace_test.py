@@ -1,0 +1,80 @@
+"""Prepared GPU metadata admission, tile invariance and explicit observation."""
+
+import numpy as np
+import pytest
+from particula.optics import get_mie_efficiencies
+
+wp = pytest.importorskip("warp")
+from particula.optics.gpu import prepare_mie  # noqa: E402
+
+
+@pytest.mark.parametrize("device", ["cpu", "cuda:0"])
+def test_workspace_tiles_and_reuse(device):
+    """Preparation is inert and repeated launches preserve output pointers."""
+    if device.startswith("cuda") and not wp.is_cuda_available():
+        pytest.skip("Native CUDA is unavailable")
+    indices = np.tile([1.5, 0.1], (5, 1))
+    x = np.array([0.0, 0.1, 1.0, 10.0, 100.0])
+    m = wp.array(indices, dtype=wp.vec2d, device=device)
+    sizes = wp.array(x, dtype=wp.float64, device=device)
+    angles = wp.array(
+        np.array([0.0, 0.01, 0.3, np.pi / 2, np.pi]),
+        dtype=wp.float64,
+        device=device,
+    )
+    full = prepare_mie(
+        m,
+        sizes,
+        angles=angles,
+        coefficient_capacity=130,
+        case_tile=5,
+        angle_tile=5,
+    )
+    tiled = prepare_mie(
+        m,
+        sizes,
+        angles=angles,
+        coefficient_capacity=130,
+        case_tile=2,
+        angle_tile=2,
+    )
+    full.efficiencies.fill_(123.0)
+    np.testing.assert_array_equal(full.efficiencies.numpy(), 123.0)
+    pointer = tiled.efficiencies.ptr
+    for _ in range(2):
+        full.enqueue()
+        tiled.enqueue()
+        full.check()
+        tiled.check()
+        assert tiled.efficiencies.ptr == pointer
+        for name in ("efficiencies", "perpendicular", "parallel", "mueller"):
+            np.testing.assert_allclose(
+                getattr(full, name).numpy(),
+                getattr(tiled, name).numpy(),
+                rtol=1e-12,
+                atol=1e-12,
+            )
+    expected = get_mie_efficiencies(x / (2 * np.pi), 1.0, 1.5 + 0.1j)
+    for j, value in enumerate(expected):
+        np.testing.assert_allclose(
+            tiled.efficiencies.numpy()[:, j], value, rtol=1e-8, atol=1e-12
+        )
+    sizes.assign(np.array([0.0, 0.1, -1.0, 10.0, 100.0]))
+    tiled.enqueue()
+    with pytest.raises(RuntimeError, match="coefficients"):
+        tiled.check()
+    np.testing.assert_array_equal(tiled.status.numpy(), [0, 0, 1, 0, 0])
+
+
+def test_workspace_metadata_rejection():
+    """Reject incompatible metadata before compiling scientific commands."""
+    m = wp.zeros(2, dtype=wp.vec2d, device="cpu")
+    x = wp.zeros(2, dtype=wp.float64, device="cpu")
+    with pytest.raises(ValueError):
+        prepare_mie(m, x, case_tile=0)
+    with pytest.raises(ValueError):
+        prepare_mie(m, x, coefficient_capacity=10091)
+    with pytest.raises(ValueError):
+        prepare_mie(m, wp.zeros(2, dtype=wp.float32, device="cpu"))
+    with pytest.raises(ValueError):
+        prepare_mie(m, x, matrix_scale=x)
