@@ -211,6 +211,43 @@ class ExtensionFields:
         for name, values in candidates.items():
             np.copyto(self._arrays[name], values)
 
+    def _resample_particles(self, plan):
+        """Transport tracers using the native remap's exact count overlaps.
+
+        Called on private source-transaction state after native plan validation.
+        Changing representation adds no source or removal inventory.
+        """
+        self.require_additive()
+        for box, remap in enumerate(plan.box_plans):
+            if not remap.retained_indices:
+                continue
+            for name in self.particle_names():
+                values = self._arrays[name]
+                source = values[box].copy()
+                values[box] = 0
+                for target, donor, overlap in remap.transport:
+                    values[box, target] += overlap * source[donor]
+                retained = np.asarray(remap.retained_indices)
+                counts = np.asarray(remap.replacement_concentrations)
+                divisor = counts if values.ndim == 2 else counts[:, None]
+                values[box, retained] /= divisor
+                if not np.all(np.isfinite(values[box])):
+                    raise ValueError("particle tracer resampling overflow")
+
+    def _activate_particles(self, before_counts, after_counts):
+        """Initialize newly active slots and record their additive inventory."""
+        born = (before_counts == 0) & (after_counts > 0)
+        for name in self.particle_names():
+            spec = self._specs[name]
+            values = self._arrays[name]
+            values[born] = spec.initial_value
+            if spec.particle_policy == "additive":
+                counts = np.where(born, after_counts, 0)
+                weights = counts if values.ndim == 2 else counts[..., None]
+                self._ledgers[f"__field_ledger__.source.{name}"] += np.sum(
+                    weights * values, axis=1
+                )
+
     def transaction_arrays(self):
         """Expose internal inventory arrays to transactional publication."""
         return self._ledgers.items()

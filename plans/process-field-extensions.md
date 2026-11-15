@@ -202,3 +202,12 @@ narrow passing suite. Leave merge, version bump and release outside this goal.
   slice with field state and publish atomically. Source population ledger
   integration remains pending. Focused CPU/multi-box suite: 115 passed;
   field suite including independent dilution/removal budgets: 13 passed.
+- CPU particle sources now stage registered fields with native state, preserve
+  additive tracers using the exact resampling count-overlap records, initialize
+  reused slots from field defaults, and record birth inventory. Passive fields
+  reject resampling; particle fields reject representative-volume scaling.
+  Late field-ledger overflow rolls back the entire source transaction. Native
+  nucleation forwards its field store into this transaction.
+- Source/resampling qualification: 227 tests passed across extension fields,
+  source transactions, exhaustion, native runnables and CPU batching; Ruff and
+  targeted mypy passed. GPU population events and public examples remain pending.

@@ -28,6 +28,7 @@ from particula.dynamics.nucleation.species_mapping import (
     NucleationSpeciesMap,
     validate_nucleation_mapping,
 )
+from particula.extension_fields import ExtensionFields, field_dimensions
 from particula.gas.gas_data import GasData
 from particula.particles.exhaustion import (
     POLICY_RESAMPLE_DEFERRED,
@@ -926,6 +927,8 @@ def commit_particle_source(  # noqa: C901, PLR0914, PLR0915
     particles: ParticleData,
     gas: GasData,
     config: ParticleSourceCommitConfig,
+    *,
+    extension_fields: ExtensionFields | None = None,
 ) -> FinalizedSourceDiagnostics:
     """Commit a gas-admitted source into staged fixed-capacity particle storage.
 
@@ -951,6 +954,8 @@ def commit_particle_source(  # noqa: C901, PLR0914, PLR0915
         gas: Writable gas concentration inventory.
         config: Immutable capacity, resampling, and public construction scaling
             controls.
+        extension_fields: Optional registered state staged and committed with
+            the native source; particle births use descriptor defaults.
 
     Returns:
         Immutable final event, slot, policy, gas-transfer, and conservation
@@ -965,6 +970,18 @@ def commit_particle_source(  # noqa: C901, PLR0914, PLR0915
     demand, diagnostics, particles, gas, config = _validate_commit_inputs(
         demand, diagnostics, particles, gas, config
     )
+    staged_fields = None
+    if extension_fields is not None and extension_fields.particle_names():
+        extension_fields.validate_layout(
+            field_dimensions(particles, gas),
+            particles.distribution_type,
+            particles.concentration > 0,
+        )
+        if config.exhaustion_controls.representative_volume_scaling:
+            raise ValueError(
+                "particle fields forbid representative volume scaling"
+            )
+        staged_fields = extension_fields.copy()
     native = particles.distribution_type is not None
     source_mass = demand.per_event_mass
     event_volume = np.ones(particles.n_boxes, dtype=np.float64)
@@ -1025,6 +1042,8 @@ def commit_particle_source(  # noqa: C901, PLR0914, PLR0915
             diversity_absolute_error=config.diversity_absolute_error,
         )
         apply_resampling(staged_particles, resampling_plan)
+        if staged_fields is not None:
+            staged_fields._resample_particles(resampling_plan)
         released_counts = np.asarray(
             [len(plan.released_indices) for plan in resampling_plan.box_plans],
             dtype=np.int32,
@@ -1087,6 +1106,11 @@ def commit_particle_source(  # noqa: C901, PLR0914, PLR0915
                 represented_events[box_index] / prefix
             )
             request_charge[box_index, :prefix] = config.source_charge
+    counts_before_birth = (
+        staged_particles.concentration.copy()
+        if staged_fields is not None
+        else None
+    )
     activated_counts = activate_slots(
         staged_particles,
         request_masses,
@@ -1094,6 +1118,15 @@ def commit_particle_source(  # noqa: C901, PLR0914, PLR0915
         request_charge,
         requested_counts,
     )
+    if staged_fields is not None and counts_before_birth is not None:
+        staged_fields._activate_particles(
+            counts_before_birth, staged_particles.concentration
+        )
+        staged_fields.validate_layout(
+            field_dimensions(staged_particles, gas),
+            staged_particles.distribution_type,
+            staged_particles.concentration > 0,
+        )
     density_events = represented_events
     if native:
         density_events = np.minimum(
@@ -1165,6 +1198,15 @@ def commit_particle_source(  # noqa: C901, PLR0914, PLR0915
         staged_particles.volume,
         staged_gas,
     )
+    if staged_fields is not None and extension_fields is not None:
+        targets += tuple(array for _, array in extension_fields.items())
+        targets += tuple(
+            array for _, array in extension_fields.transaction_arrays()
+        )
+        candidates += tuple(array for _, array in staged_fields.items())
+        candidates += tuple(
+            array for _, array in staged_fields.transaction_arrays()
+        )
     snapshots = tuple(target.copy() for target in targets)
     attempted = 0
     try:
