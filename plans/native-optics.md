@@ -102,3 +102,9 @@ entries, discrete/resolved/PDF reductions and single/multiple layers.
 - Worktree created from upstream main a73fa1974; unrelated development preserved.
 - Earlier NVIDIA-SMI observation could not access the driver. Real CUDA remains
   a completion requirement; investigate actual device access during validation.
+- CPU coefficient/efficiency foundation implemented with bounded continued
+  fraction and independent small-argument Bessel series. Focused suite: 99
+  passed, including all qualified reference cases through x=10000, independent
+  Bessel checks of nine documented upstream discrepancies, Rayleigh limits,
+  zero cases, medium normalization, broadcasting and invalid-input rejection.
+  Cross-section, angular, GPU and remaining full-stack work still pending.
