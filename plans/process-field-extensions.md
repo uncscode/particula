@@ -117,7 +117,7 @@ Recording advances neither scientific state, clock nor RNG.
 - [x] feat(gpu): add explicit CPU transfer processes
 - [x] feat(execution): checkpoint and capture extension state
 - [x] docs(examples): demonstrate process and field extensions
-- [ ] test(execution): qualify extension workflows
+- [x] test(execution): qualify extension workflows
 
 Feature commits include focused tests, not just the final qualification commit.
 
@@ -392,3 +392,17 @@ narrow passing suite. Leave merge, version bump and release outside this goal.
   on Warp CPU, CUDA, capture and checkpoint/resume. Affected regression suite:
   203 passed, three skips; whole-library Ruff/format and mypy (612 files) pass.
   Full-package and saved-example qualification are being refreshed for this fix.
+
+- Review-corrected source dac1251fd passes the full package: 10,304 passed,
+  20 skipped, one expected failure and 91.78% coverage. Full CUDA examples:
+  238 passed, one skip. All three examples refreshed and replotted with
+  unchanged figures; complete saved-example validation passed. Final isolated
+  timings show 9.1% native overhead and 9.8% captured overhead, both below the
+  predeclared 20% bound. An earlier timing rerun overlapped documentation
+  validation and was discarded; only the isolated samples are published.
+  The saturation review thread is resolved against the pushed correction.
+- Final review-source site build passed: 477 generated pages, 607 rendered HTML
+  pages, 286 API modules and zero verification errors. Hosted documentation on
+  the source-only fix correctly rejected the old saved-example package hash;
+  this evidence commit includes the refreshed manifests already validated
+  locally. Final-commit hosted CI remains the last delivery gate.
