@@ -734,5 +734,23 @@
       "plot_results"
     ],
     "plot_inputs": []
+  },
+  "custom-process-backends": {
+    "title": "Custom processes across CPU and CUDA",
+    "source": "docs/examples/gpu/prepared/custom_process_backends.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 300,
+    "inputs": [
+      "scripts/gpu_studies/__init__.py",
+      "scripts/gpu_studies/extension_kernels.py"
+    ],
+    "invoke": "report = run_example()",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\nplot_results(report)",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": []
   }
 }

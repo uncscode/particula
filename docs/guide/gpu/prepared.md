@@ -458,3 +458,7 @@ for the transition scaling and Coulomb limits;
 [Stow et al. (2017)](https://doi.org/10.1021/acs.analchem.7b01729) for the
 low-field mobility relation. Constant cross section and fixed ion composition
 are assumptions of this implementation.
+
+See [custom processes across CPU and CUDA](../../examples/gpu/prepared/custom_process_backends.py)
+for equivalent NumPy/Warp updates, explicit CPU transfers, a registered field,
+absolute-time capture, detached snapshots and exact restart checks.

@@ -598,6 +598,10 @@
               {
                 "label": "Measured RTX 5060 scaling",
                 "slug": "examples/gpu/prepared/gpu_scaling_results"
+              },
+              {
+                "label": "Custom CPU and CUDA processes",
+                "slug": "examples/gpu/prepared/custom_process_backends"
               }
             ]
           },
