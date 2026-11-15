@@ -124,11 +124,13 @@ def prepare_population_mie(
     )
     stream = mie._stream
     angle_count = 0 if angles is None else angles.shape[0]
-    totals = wp.empty((groups, 9), dtype=wp.float64, device=device)
-    matrices = wp.empty(
-        (groups, angle_count, 16), dtype=wp.float64, device=device
-    )
-    status = wp.zeros(groups, dtype=wp.int32, device=device)
+    # Initialization and replay share stream order without a device barrier.
+    with wp.ScopedStream(stream, sync_enter=False):
+        totals = wp.empty((groups, 9), dtype=wp.float64, device=device)
+        matrices = wp.empty(
+            (groups, angle_count, 16), dtype=wp.float64, device=device
+        )
+        status = wp.zeros(groups, dtype=wp.int32, device=device)
     commands = []
 
     def record(kernel, dim, inputs):
