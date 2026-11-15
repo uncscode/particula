@@ -112,3 +112,9 @@ entries, discrete/resolved/PDF reductions and single/multiple layers.
   sphere Mueller/phase matrices, explicit Stokes rotations and matrix action.
   Independent Jones-field and solid-angle integral checks accompany raw angular
   references. Full high-x angular/CUDA qualification remains pending.
+- Added CPU population-weight helpers, bulk scalar/Mueller reductions,
+  column optical depth/transmission and mass-specific opacity. Four additional
+  raw PyMieScatt population cases cover discrete and continuous distributions.
+- Device access verified outside the restricted execution environment:
+  NVIDIA GeForce RTX 5060, 8151 MiB, driver 615.78.08. Actual Warp CUDA
+  numerical/performance validation remains pending kernel implementation.

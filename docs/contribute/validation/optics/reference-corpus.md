@@ -133,3 +133,20 @@ rtol=1e-9, atol=1e-10. Mueller sign conventions are independently checked by
 propagating complex Jones electric fields and constructing Stokes vectors.
 Angular integration tests recover total scattering and asymmetry through
 x=100. Angular qualification at larger size parameters remains pending.
+
+## Population reference cases
+
+`pymiescatt_populations.json` records four raw `Mie_SD` calls from the same
+source and environment as the sphere corpus. Regenerate with the source
+loader above, m in [1.33+0j, 1.77+0.63j], wavelength=500 nm,
+dp=np.array([1.,2.,10.])*500/np.pi nm, ndp=np.array([10.,20.,30.]),
+nMedium=1., and each SMPS flag True/False. The JSON records argument values,
+entrypoint, output order, source hash and revision. No reference code is
+imported by tests.
+
+For SMPS=True the number entries are cm⁻³ bin densities. For SMPS=False they
+are a diameter density per cm³ per nm; convert to the native radius PDF by
+multiplying by 2e15. Raw bulk optical coefficients are Mm⁻¹ and convert to
+m⁻¹ by multiplying by 1e-6. G is dimensionless; Bratio is retained for provenance
+but is not a Particula output. Tests compare extinction, scattering,
+absorption, backscatter, radiation pressure and G independently.

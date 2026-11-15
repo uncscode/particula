@@ -4,6 +4,11 @@ from particula.optics.angular import (
     ScatteringAmplitudes,
     get_scattering_amplitudes,
 )
+from particula.optics.column import (
+    ColumnOptics,
+    get_column_optics,
+    get_mass_specific_opacity,
+)
 from particula.optics.cross_sections import (
     OpticalCrossSections,
     get_cross_sections,
@@ -21,8 +26,21 @@ from particula.optics.polarization import (
     get_mueller_matrix,
     rotate_stokes,
 )
+from particula.optics.population import (
+    PopulationOptics,
+    get_population_mueller_matrix,
+    get_population_optics,
+    get_population_weights,
+)
 
 __all__ = [
+    "ColumnOptics",
+    "get_column_optics",
+    "get_mass_specific_opacity",
+    "PopulationOptics",
+    "get_population_weights",
+    "get_population_optics",
+    "get_population_mueller_matrix",
     "MieCoefficients",
     "MieEfficiencies",
     "get_mie_coefficients",
