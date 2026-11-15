@@ -1,15 +1,15 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 3.3017101729637943,
-  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "elapsed_seconds": 3.6667602990055457,
+  "package_source_sha256": "8340db23fd0f933d97cccca5043297b3b1382b94bbaa2249dcaeb9fe1dc62879",
   "input_sha256": {},
   "example": "examples-fundamentals-gas-gas-data",
-  "fingerprint": "f2a0523edad190857f20dab9c476f59a67cee9fd01992add890fc211093ef334",
+  "fingerprint": "a5ca85b7120554d26f62635124da1f7b4ca42a1b62afa061a23c1c5fd09967ec",
   "source": "docs/examples/fundamentals/gas/gas_data.py",
-  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "revision": "277ccafb82ee7ed32af4ea96bec6ae301ce67df5",
   "package_dirty": false,
-  "executed_at": "2026-11-13T14:59:49.048849+00:00",
+  "executed_at": "2026-11-15T19:32:35.946043+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
@@ -41,8 +41,8 @@
     ]
   ],
   "files": {
-    "source.py": "020ed648d005aa3a11e9063d6894748438733341f47e7ecfe924e55507a53b40",
-    "figure-4-1.png": "f24ed593ceb6b6e3180365acef576b487983b716be3f712778d5affb551e792d",
-    "figure-5-1.png": "195bf4c272c3b708912e1b90acc94582abb9b6c6c57a2638056a42b951bfe990"
+    "source.py": "65dc0eeca4d3f2efba555f3be35298580eb57750b807bcdd536b15a8a9f81ebc",
+    "figure-4-1.png": "4f959b4d7c8c57e03f843801c47dc93c063051463aaddb49efadcaa4d6873728",
+    "figure-5-1.png": "c43e28243e5481979cfa45606486631087531c676e43af904a0e94fc3c9c266a"
   }
 }

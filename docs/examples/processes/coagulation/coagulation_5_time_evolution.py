@@ -28,17 +28,16 @@ Example:
 
 
 # %% [markdown]
-# # Coagulation Pattern 5: Time Evolution Comparison
+# # Does particle-number decay depend on representation?
 #
-# Compare how total particle number decreases over time for three coagulation
-# representations:
+# A size spectrum can look different simply because its vertical axis differs.
+# Total number density provides a shared diagnostic for PMF, PDF, and sampled
+# particle populations. Here all three use the same nominal lognormal population
+# and Brownian mechanism over two hours.
 #
-# - **PMF (discrete)**: Bin-based number concentration
-# - **PDF (continuous)**: Number concentration per unit size
-# - **Particle-resolved**: Individual sampled particles
-#
-# All three start from equivalent lognormal distributions. We track total
-# number concentration at each time step and plot the decay curves together.
+# The aim is to construct a fair comparison and interpret its limits. Read the
+# [PMF/PDF unit comparison](coagulation_4_compared.py) first if sums, integrals,
+# and counts per volume are not yet distinct.
 
 # %%
 # In Colab uncomment the following command to install particula:
@@ -49,12 +48,13 @@ import particula as par
 from scipy.integrate import trapezoid
 
 # %% [markdown]
-# ## Setup: Create Three Equivalent Aerosols
+# ## Match a target population, not every individual radius
 #
-# We use the same lognormal parameters for all three representations:
-# - Mode: 80 nm
-# - Geometric standard deviation: 1.5
-# - Total number concentration: 1e10 m^-3
+# The target lognormal radius scale is 80 nm, geometric standard deviation 1.5,
+# and number density 10¹⁰ m⁻³. PMF and PDF use 150 nodes from 10 nm to 10 µm;
+# the particle population samples the same nominal law. Finite quadrature and
+# sampling mean their initial size distributions are not identical realizations.
+# Density is 1000 kg m⁻³ at fixed 298.15 K and 101325 Pa.
 
 # %%
 # Shared radius bins for PMF and PDF
@@ -81,7 +81,10 @@ gas = par.gas.GasData(
 )
 
 # %% [markdown]
-# ### PMF Aerosol (Discrete)
+# ### Bin totals: sum to obtain abundance
+#
+# The discrete concentration stores m⁻³ per bin. Summing the initialized array
+# gives the PMF number density against which the sampled population is matched.
 
 # %%
 # PMF distribution (number per bin)
@@ -106,7 +109,11 @@ aerosol_pmf = par.Aerosol(
 print(f"PMF initial total: {concentration_pmf.sum():.2e} m^-3")
 
 # %% [markdown]
-# ### PDF Aerosol (Continuous)
+# ### Radius density: integrate to obtain abundance
+#
+# The continuous concentration stores m⁻⁴. Its total is a trapezoidal integral
+# over radius, not the unweighted sum of stored values. Retain this distinction
+# at every time point, including normalization.
 
 # %%
 # PDF distribution (number per unit size)
@@ -132,7 +139,12 @@ pdf_total = trapezoid(concentration_pdf, x=radius_bins)
 print(f"PDF initial total: {pdf_total:.2e} m^-3")
 
 # %% [markdown]
-# ### Particle-Resolved Aerosol
+# ### Sampled particles: set the physical volume
+#
+# The 50,000 sampled particles have unit represented counts. Volume is chosen as
+# sample count divided by the actual initial PMF number density, matching abundance
+# without pretending the samples occupy identical radius nodes. The initial
+# count-weighted material inventory is retained for a conservation check.
 
 # %%
 # Sample radii from the same lognormal distribution
@@ -177,7 +189,11 @@ print(
 )
 
 # %% [markdown]
-# ## Configure Three Coagulation Processes
+# ## Use one mechanism with three numerical representations
+#
+# Each wrapper selects Brownian coagulation and the storage-appropriate distribution
+# type. The zero-concentration carrier is structural, not a source or sink. With
+# no other processes, declining particle number is attributable to coagulation.
 
 # %%
 # PMF coagulation (discrete)
@@ -212,10 +228,13 @@ print("PDF:", coagulation_pdf)
 print("Resolved:", coagulation_resolved)
 
 # %% [markdown]
-# ## Time Evolution Loop
+# ## Follow a common clock and diagnostic
 #
-# Track total number concentration at each time step for all three
-# representations. We run for 2 hours in 10-minute steps.
+# Twelve 600 s advances, each with 50 substeps, give two hours of evolution plus
+# the initial state. PMF and particle-resolved totals use native number density;
+# the PDF is integrated over radius. The resolved assertion checks material
+# inventory at every step, not just the endpoint. No corresponding assertion here
+# establishes exact mass conservation for the finite-grid methods.
 
 # %%
 # Time parameters
@@ -287,7 +306,12 @@ number_pdf = np.array(number_pdf)
 number_resolved = np.array(number_resolved)
 
 # %% [markdown]
-# ## Plot: Number Concentration vs Time
+# ## Compare absolute abundance first
+#
+# The first plot shows number density in m⁻³. Inspect initial alignment as well
+# as subsequent decay; equal normalized slopes could hide unequal physical
+# abundances. Collision frequency depends on the population available to collide,
+# so a concentration mismatch would change the experiment itself.
 
 # %%
 fig, ax = plt.subplots(figsize=(10, 6))
@@ -334,7 +358,13 @@ plt.tight_layout()
 plt.show()
 
 # %% [markdown]
-# ## Normalized Decay Comparison
+# ## Then compare the fraction remaining
+#
+# Dividing by each initial number removes small initialization offsets from the
+# display. The saved run reports about 95.1% remaining for PMF and 95.2% for PDF
+# and resolved particles after two hours. Those rounded values show similar
+# number decay for this workload, not identical spectra or validated accuracy.
+# The resolved curve is one stochastic realization, with no uncertainty band.
 
 # %%
 # Normalize to initial concentration for easier comparison
@@ -391,40 +421,25 @@ print(f"  PDF: {number_pdf[-1]:.2e} m^-3 ({pdf_pct:.1f}% remaining)")
 print(f"  Resolved: {number_resolved[-1]:.2e} m^-3 ({res_pct:.1f}% remaining)")
 
 # %% [markdown]
-# ## Native initialization and numerical limits
+# ## Keep conservation, agreement, and convergence separate
 #
-# Native construction retains the explicitly generated concentration array.
-# Earlier versions used a preset builder that regenerated its default bimodal
-# distribution, replacing the declared inputs. The plots here therefore use
-# the stated mode and total number concentration, not that old preset result.
-# Finite-grid coagulation is not exactly mass conservative. Number loss and
-# distribution changes illustrate this workload; they are not a convergence
-# study or evidence of exact agreement between representations.
+# The input arrays reflect the specified population rather than regenerated
+# preset defaults. Finite-grid mass drift, sample variability, and time-discretization
+# error remain distinct possibilities. The resolved inventory assertion verifies
+# bookkeeping within tolerance; agreement in total number cannot rule out
+# compensating errors or differences in size-dependent composition.
 
 # %% [markdown]
-# ## Summary
+# ## Ask whether a research conclusion survives refinement
 #
-# This notebook compared the time evolution of total number concentration
-# for three coagulation representations:
+# For these initial conditions, representation has a small effect on the displayed
+# number-decay diagnostic at the reported precision. A stronger study would vary
+# grid extent and resolution, sample size, and substep duration independently,
+# repeat stochastic runs, and compare size spectra and mass as well as number.
 #
-# - **PMF (discrete)**: Total number is the sum of bin concentrations
-# - **PDF (continuous)**: Total number requires integration over the
-#   distribution
-# - **Particle-resolved**: Total number is the particle count divided by
-#   the sample volume
-#
-# Key observations:
-#
-# 1. **All three representations agree**: At the same initial concentration
-#    (1e10 m^-3), all three approaches show similar decay rates, validating
-#    the consistency of the coagulation implementations.
-#
-# 2. **Coagulation rate scaling**: Coagulation rate scales with n^2 (number
-#    concentration squared), so high concentrations like 1e10 m^-3 show
-#    significant particle loss over 2 hours.
-#
-# 3. **Use cases**:
-#    - PMF: Efficient bin-based representation, good for most applications
-#    - PDF: Continuous representation, useful for smooth distributions
-#    - Particle-resolved: Best for tracking individual particle properties
-#      (e.g., composition mixing state) but computationally more expensive
+# For example, to estimate whether coagulation substantially changes a chamber's
+# particle lifetime, repeat this design over initial concentration while holding
+# size distribution fixed. Compare the time to a specified number-loss fraction
+# and its uncertainty, then introduce [wall loss](../wall-loss/index.md) as a
+# separate mechanism. That extension is proposed; it is not established by these
+# three curves.

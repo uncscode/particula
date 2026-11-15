@@ -13,25 +13,32 @@
 # ---
 
 # %% [markdown]
-# # Cloud Chamber Activation-Deactivation Cycle (Single Run)
+# # Follow droplets through one wet–dry chamber cycle
 #
-# Welcome! This beginner-friendly notebook shows how to simulate one cloud activation-deactivation cycle in a rectangular cloud chamber using **Particula**. You will:
+# What changes when hygroscopic seeds encounter a supersaturated vapor reservoir
+# and then a drier one? This example couples condensation, evaporation, and
+# rectangular-chamber wall removal, following individual particle sizes and the
+# remaining gas-phase water. It provides a scaffold for reasoning about water
+# exchange and survival in a chamber.
 #
-# - Configure chamber geometry and wall-loss settings.
-# - Define hygroscopic seed composition with kappa-theory.
-# - Build a particle-resolved aerosol with speciated mass.
-# - Run one supersaturated activation (100.4% RH) and one deactivation (85% RH).
-# - Visualize droplet growth beyond 5 um and shrinkage during drying.
-# - Check each closed condensation inventory at rtol=1e-12 and atol=1e-30, separately from wall removal and humidity resets.
+# The two humidity settings initialize phases; they are not held fixed by a
+# continuous controller. Each condensation step conserves its mapped species,
+# whereas wall removal and the imposed humidity reset open that inventory.
+# The retained 0.1 s calculation exhibits dry-phase oscillations. Its checks do
+# not establish timestep convergence or a quantitative activation threshold.
 #
-# This fixed-step illustration is not a timestep-convergence or quantitative
-# activation study. Material conservation alone does not establish trajectory
-# accuracy; the retained dry-phase trajectories include step-scale oscillations.
-#
-# > Learning goals: understand Kohler/kappa activation basics, see how wall loss and condensation interact, and reuse this scaffold for multi-cycle studies.
+# Start with [condensation](../processes/condensation/condensation_1_bin.py) and
+# [rectangular wall loss](../processes/wall-loss/rectangular_wall_loss_strategy.py)
+# if either process is unfamiliar. This example adds their interaction, not a
+# validation against chamber measurements.
 
 # %% [markdown]
-# ## Imports, style, and reproducibility
+# ## Make the sampling choices reproducible
+#
+# Use NumPy for the sampled seed population and an explicit generator for wall
+# removal. Fixed seeds make this particular realization repeatable under the same
+# implementation. Estimating stochastic uncertainty would require an ensemble of
+# independent realizations, which is not run here.
 
 # %%
 import copy
@@ -68,8 +75,13 @@ np.random.seed(100)  # reproducibility for sampling and wall-loss RNG
 
 
 # %% [markdown]
-# ## 1. Chamber geometry and wall-loss setup
-# We model a rectangular cloud chamber. Wall loss is stochastic inside the strategy, so small run-to-run variability is expected even with a fixed seed (reproducibility mainly controls sampling order).
+# ## Define the geometry used by wall loss
+#
+# The wall-loss model uses a 2 m × 1 m × 1 m chamber and an eddy-loss parameter
+# of 0.001 s⁻¹. Particle removal is stochastic in the resolved representation.
+# Keep this geometry distinct from the represented aerosol sample volume set
+# below: one controls the loss coefficients, the other converts particle counts
+# and gas concentration into an extensive inventory.
 
 # %%
 # Geometry (meters)
@@ -89,8 +101,14 @@ wall_loss = par.dynamics.WallLoss(wall_loss_strategy=wall_loss_strategy)
 
 
 # %% [markdown]
-# ## 2. Seed species and kappa-activity parameters
-# We track three species in each particle: ammonium sulfate, sucrose, and water (water index = 2). kappa-theory approximates water activity from composition; higher kappa means more hygroscopic. Kohler theory couples curvature and solute effects; kappa-theory is a convenient approximation.
+# ## Put solute effects and water in aligned species lanes
+#
+# Each particle contains ammonium sulfate, sucrose, and water, in that order.
+# κ=[0.61, 0.10, 0] supplies an illustrative hygroscopicity model; densities
+# are kg/m³ and molar masses kg/mol. Water is lane 2, and its own κ is unused.
+# Solute activity and the later Kelvin surface correction both enter the
+# condensation calculation. These fixed values do not describe every
+# concentration or temperature dependence of the named materials.
 
 # %%
 kappa = np.array([0.61, 0.10, 0.0])
@@ -106,8 +124,18 @@ activity_params = (
 )
 
 # %% [markdown]
-# ## 3. Particle-resolved distribution, atmosphere, and initial aerosol
-# We create a particle-resolved speciated-mass representation using a lognormal sample distribution. Particles are sampled from a lognormal distribution with realistic CCN seed sizes. Water starts at zero; species ordering matches the kappa inputs.
+# ## Build a sampled dry population and its vapor reservoir
+#
+# Sample 1000 dry radii from a lognormal distribution with 100 nm mode radius
+# and geometric standard deviation 1.5. The dry material is 60% ammonium sulfate
+# and 40% sucrose **by volume**, converted to species masses using their densities.
+# Water starts at zero. The gas adds an unmapped air lane as well as the three
+# mapped particle species.
+#
+# The represented sample volume is 0.25 m³, distinct from the 2 m³ chamber
+# geometry above. Constant water-like surface tension is assumed. The inventory
+# helper combines weighted particle mass with gas concentration times sample
+# volume, in kg; this is the quantity compared around each condensation step.
 
 # %%
 # Sample particle radii from a lognormal distribution
@@ -186,8 +214,17 @@ def species_inventory(aero):
 print(aerosol)
 
 # %% [markdown]
-# ## 4. Condensation/evaporation strategy and RH setup
-# We construct a single isothermal condensation strategy for water with `update_gases=True`, which tracks gas-phase mass internally during the simulation. Instead of manually ramping RH each step, we simply set the water vapor concentration at the start of each phase (activation and deactivation) and let the system equilibrate naturally.
+# ## Set phase boundaries without imposing a continuous RH ramp
+#
+# The staggered condensation strategy updates both particle and gas inventories.
+# Its explicit species map excludes air. The two phases span a nominal 30 s each
+# at a fixed 0.1 s step; the reset occurs before the step stored at t=30 s.
+# Water vapor is initialized at 100.4% saturation and reset to 85% at the phase
+# boundary. Between resets it evolves through mass transfer.
+#
+# The conversion from vapor pressure to concentration uses the ideal-gas relation
+# at 298.15 K. Thus the lower plot's effective RH is a diagnostic of the changing
+# gas reservoir, not an independently prescribed trajectory.
 
 # %%
 # Full gas molar masses include air; the explicit map selects the three
@@ -247,8 +284,19 @@ print(
 
 
 # %% [markdown]
-# ## 5. Run activation -> deactivation cycle
-# We preallocate histories for speed. The condensation strategy tracks gas-phase mass internally (`update_gases=True`), so we only need to set the water vapor concentration at the start of each phase and let the system equilibrate. No manual RH ramping is needed.
+# ## Track exchange and removal with different checks
+#
+# At every step, compare the mapped particle-plus-gas inventory immediately
+# before and after condensation at rtol=10⁻¹² and atol=10⁻³⁰ kg. Then apply
+# wall loss and check that it cannot add particle mass. Air must remain unchanged.
+# These local checks deliberately exclude the external water reset from a
+# closed-system conservation claim.
+#
+# Store particle masses, equivalent spherical diameters, and gas water for the
+# same times. Zero-mass removed particles have zero plotted diameter. The saved
+# realization reaches a 24.41 µm peak diameter and ends with 779 of 1000 particle
+# slots retaining mass; those are outcomes of this setup, not general chamber
+# performance estimates.
 
 # %%
 n_particles = aerosol.particles.masses[0].copy().shape[0]
@@ -341,8 +389,16 @@ print("Survivors:", survivors.sum(), "of", n_particles)
 
 
 # %% [markdown]
-# ## 6. Visualize size trajectories
-# Activation and deactivation phases are shaded; lines colored by Tailwind palette for clarity.
+# ## Read size histories beside the vapor history
+#
+# The upper panel shows sampled particle diameters and the lower panel shows
+# effective RH. Shading marks the wet and dry phases. Growth consumes gas water;
+# the imposed reset changes the reservoir, after which evaporation can return
+# water to the gas. Removal is a separate sink.
+#
+# The retained dry-phase oscillations are a numerical limitation of this fixed
+# step. Do not interpret every size reversal as a physical evaporation cycle or
+# use the trajectories to infer a converged activation criterion.
 
 # %%
 colors = [
@@ -400,8 +456,14 @@ plt.show()
 
 
 # %% [markdown]
-# ## 7. Internal checks and assertions
-# We ensure growth >5 um, deactivation shrinkage, finite values, survival sanity, and mass conservation (accounting for wall loss).
+# ## Separate an inventory check from a wet-to-dry mass ratio
+#
+# The final block checks finite masses and a bounded survivor count, and reports
+# peak diameter. It does not assert a 5 µm activation threshold or convergence.
+# The printed “mass remaining” divides final **wet** particle mass by initial
+# **dry** seed mass, so it can greatly exceed 100%. It is neither a wall-deposition
+# fraction nor a measure of mass-conservation error. Conservation of the mapped
+# species was checked separately around each condensation operation.
 
 # %%
 # Peak diameter check - particles should grow during activation
@@ -433,9 +495,17 @@ print("Simulation completed successfully.")
 
 
 # %% [markdown]
-# ## 8. Summary and next steps
-# - We ran one activation-deactivation cycle with kappa-based activity and rectangular wall loss.
-# - Droplets grew beyond 5 um and shrank on drying; mass drift stayed within ~1%.
-# - RNG seeding (np.random.seed(100)) controls sampling; wall-loss survival remains stochastic by design.
+# ## What this cycle supports—and what to investigate next
 #
-# Next steps for future phases: multi-cycle forcing, injections, dilution, and sensitivity to kappa or wall eddy diffusivity.
+# The calculation connects a humidity change to particle water exchange while
+# wall removal reduces the surviving population. A consistent local inventory
+# can coexist with oscillatory size trajectories: mass conservation alone does
+# not establish temporal accuracy.
+#
+# Before using this setup to interpret an experiment, reduce the timestep and
+# compare peak diameter, dry-phase size histories, and gas water. Then repeat
+# across random seeds to quantify survival uncertainty. Keep humidity additions
+# and removals in an explicit external-water budget. The
+# [multiple-cycle example](cloud_chamber_multi_cycle.py) extends the forcing and
+# composition comparisons, but still needs those numerical and experimental
+# checks for a quantitative chamber study.

@@ -12,42 +12,36 @@
 #     name: python3
 # ---
 
-"""Explore mixing rules and activity coefficient calculations.
+"""Explore mixing rules and activity calculations.
 
-This notebook walks through mass-based, molar-based, and volume-based
-mixing rules, compares ideal activity coefficients, and demonstrates the
+This example walks through mass-based, molar-based, and volume-based
+mixing rules, compares ideal activities, and demonstrates the
 kappa value parameterization to model non-ideal solution behavior. Each
 section builds the required data arrays, computes activities with the
 public ``par.particles`` helpers, and plots the results.
 
 Example:
-    Run this notebook to generate activity coefficient plots for two- and
+    Run this example to generate activity plots for two- and
 three-component systems under different mixing assumptions.
 """
 
 
 # %% [markdown]
-# # Activity Tutorial
+# # Compare activity rules along a composition path
 #
-# This Jupyter notebook is designed to deepen your understanding of mixing behaviors in solutions, focusing on both theoretical models and practical applications. We will explore ideal and non-ideal mixing rules, differentiate between mass-based and molar-based approaches, and introduce the kappa value parameterization for predicting water activity.
+# How much can an assumed mixing rule change the activity assigned to the same
+# mixture? We follow binary and ternary composition paths, comparing mole-,
+# volume-, and mass-fraction rules with a κ water-activity parameterization.
+# This helps separate a change of composition coordinates from a change of
+# thermodynamic model before coupling activity to condensation.
 #
-# ## Introduction to Mixing Rules
-#
-# Mixing rules are essential for predicting the properties of solutions, including their thermodynamic behavior and phase equilibria. In this notebook, we will:
-#
-# - **Define and compare different mixing rules:** Understand how various rules apply to different types of solutions.
-# - **Mass-Based vs. Molar-Based Mixing:** Discuss the implications of choosing mass-based or molar-based calculations for different applications.
-# - **Kappa Value based Activity:** Learn about the kappa value parameterization and its role in modeling water activity in non-ideal solutions.
-#
-# ## Structure of the Notebook
-#
-# 1. **Mass-Based vs. Molar-Based vs. Volume-Based**
-#    - Definitions and when to use each method
-#    - Examples and comparative analysis
-#
-# 2. **Kappa Value Parameterization**
-#    - Theory behind kappa values
-#    - Practical exercises on calculating water activity
+# Every vertical axis is **activity**, not activity coefficient. In the molar
+# standard-state convention, $a_i=\gamma_i x_i$; ideal molar mixing has
+# $\gamma_i=1$ but generally $a_i\ne1$. Substituting mass or volume fraction for
+# activity is a different approximation, not another way to plot the same
+# Raoult-law prediction. These generic components are not a calibrated material
+# system. For construction interfaces, continue with the
+# [strategy comparison](activity_tutorial.py).
 
 # %%
 # In Colab uncomment the following command to install particula:
@@ -57,11 +51,17 @@ import numpy as np
 import particula as par
 
 # %% [markdown]
-# ## Mass Arrays
+# ## Define the path before interpreting the curves
 #
-# First we'll need to create some mass concentration arrays to use in our examples. We will use a 2-component and 3-component system for demonstration purposes.
+# Water mass increases from 0 to 100 relative units while component 2 remains
+# at 30. In the ternary path, component 3 decreases from 150 to 10. The common
+# mass scale cancels in these rules; total mass is not held constant. Densities
+# are kg/m³ and molar masses are kg/mol.
 #
-# In each the first component is water and the second component is a solute. The mass fractions of the solute will be varied to demonstrate the different mixing rules.
+# All panels use **water mole fraction** on the horizontal axis, computed once
+# from these same masses. The ternary curves therefore trace one changing
+# composition path, not a full ternary phase diagram. Component 3's relative
+# abundance changes at the same time as water's.
 
 # %%
 masses_1 = np.linspace(0, 100, 1000)
@@ -72,9 +72,9 @@ density_1 = 1000  # kg/m^3
 density_2 = 2000  # kg/m^3
 density_3 = 1500  # kg/m^3
 
-molar_mass_1 = 18.01528e-3  # g/mol
-molar_mass_2 = 200e-3  # g/mol
-molar_mass_3 = 150e-3  # g/mol
+molar_mass_1 = 18.01528e-3  # kg/mol
+molar_mass_2 = 200e-3  # kg/mol
+molar_mass_3 = 150e-3  # kg/mol
 
 mass_2component = np.column_stack((masses_1, masses_2))
 mass_3component = np.column_stack((masses_1, masses_2, masses_3))
@@ -83,19 +83,22 @@ density_2component = np.array([density_1, density_2])
 density_3component = np.array([density_1, density_2, density_3])
 
 # get mole fractions
-mass_fractions_2component = par.particles.get_mole_fraction_from_mass(
+mole_fractions_2component = par.particles.get_mole_fraction_from_mass(
     mass_2component, molar_masses=np.array([molar_mass_1, molar_mass_2])
 )
-mass_fractions_3component = par.particles.get_mole_fraction_from_mass(
+mole_fractions_3component = par.particles.get_mole_fraction_from_mass(
     mass_3component,
     molar_masses=np.array([molar_mass_1, molar_mass_2, molar_mass_3]),
 )
 
 # %% [markdown]
-# ## Molar-Based Mixing
+# ## Use mole fractions as the reference
 #
-# The ideal in this context refers to all the activity coefficients being equal to 1. This is the simplest case and is often used as a reference point for more complex models. In this case, then we are just mixing based on molar fractions.
-#
+# Ideal molar activity equals mole fraction. Water's curve therefore lies on
+# $a_w=x_w$ in both panels. In the binary panel, the solute follows $1-x_w$;
+# in the ternary panel, the two solutes share that remainder according to the
+# chosen path. This is a reference model, not evidence that the generic mixture
+# is ideal.
 
 # %%
 activity_2component_molar = par.particles.get_ideal_activity_molar(
@@ -115,44 +118,44 @@ fig, ax = plt.subplots(2, 1, figsize=(5, 8))
 
 # Plot each component in the 2-component system with separate colors
 ax[0].plot(
-    mass_fractions_2component[:, 0],
+    mole_fractions_2component[:, 0],
     activity_2component_molar[:, 0],
     color="blue",
     label="Water (1)",
 )
 ax[0].plot(
-    mass_fractions_2component[:, 0],
+    mole_fractions_2component[:, 0],
     activity_2component_molar[:, 1],
     color="green",
     label="Component 2",
 )
 ax[0].set_xlabel("Water Mole Fraction")
-ax[0].set_ylabel("Activity coefficient")
-ax[0].set_title("Activity coefficient vs mass fraction for 2 components")
+ax[0].set_ylabel("Activity")
+ax[0].set_title("Binary molar-based activity")
 ax[0].legend()
 
 # Plot the 3-component system without setting specific colors
 ax[1].plot(
-    mass_fractions_3component[:, 0],
+    mole_fractions_3component[:, 0],
     activity_3component_molar[:, 0],
     label="Water (1)",
     color="blue",
 )
 ax[1].plot(
-    mass_fractions_3component[:, 0],
+    mole_fractions_3component[:, 0],
     activity_3component_molar[:, 1],
     label="Component 2",
     color="green",
 )
 ax[1].plot(
-    mass_fractions_3component[:, 0],
+    mole_fractions_3component[:, 0],
     activity_3component_molar[:, 2],
     label="Component 3",
     color="red",
 )
 ax[1].set_xlabel("Water Mole Fraction")
-ax[1].set_ylabel("Activity coefficient")
-ax[1].set_title("Activity coefficient vs mass fraction for 3 components")
+ax[1].set_ylabel("Activity")
+ax[1].set_title("Ternary molar-based activity")
 ax[1].legend()
 
 # Display the plot
@@ -160,12 +163,16 @@ plt.tight_layout()
 plt.show()
 
 # %% [markdown]
-# ## Volume-Based Mixing
+# ## Weight by liquid volume
 #
-# In this next example, we will use volume-based mixing. This is common for use with liquid mixtures, where the volume of the solution is the sum of the volumes of the components. This is a simple way to mix solutions, but it is not always accurate.
+# The volume rule normalizes $m_i/\rho_i$ and returns those fractions as
+# activities. Its curves need not lie on the molar reference, even though the
+# horizontal coordinate is unchanged. The assumed additive component volumes
+# and the choice to equate volume fraction with activity are separate modeling
+# assumptions; density conversion alone does not establish thermodynamic accuracy.
 
 # %%
-# Volume activity coefficient
+# Volume activity
 activity_2component_volume = par.particles.get_ideal_activity_volume(
     mass_concentration=mass_2component,
     density=density_2component,
@@ -181,44 +188,44 @@ fig, ax = plt.subplots(2, 1, figsize=(5, 8))
 
 # Plot each component in the 2-component system with separate colors
 ax[0].plot(
-    mass_fractions_2component[:, 0],
+    mole_fractions_2component[:, 0],
     activity_2component_volume[:, 0],
     color="blue",
     label="Water (1)",
 )
 ax[0].plot(
-    mass_fractions_2component[:, 0],
+    mole_fractions_2component[:, 0],
     activity_2component_volume[:, 1],
     color="green",
     label="Component 2",
 )
 ax[0].set_xlabel("Water Mole Fraction")
-ax[0].set_ylabel("Activity coefficient")
-ax[0].set_title("Activity coefficient vs mass fraction for 2 components")
+ax[0].set_ylabel("Activity")
+ax[0].set_title("Binary volume-based activity")
 ax[0].legend()
 
 # Plot the 3-component system without setting specific colors
 ax[1].plot(
-    mass_fractions_3component[:, 0],
+    mole_fractions_3component[:, 0],
     activity_3component_volume[:, 0],
     label="Water (1)",
     color="blue",
 )
 ax[1].plot(
-    mass_fractions_3component[:, 0],
+    mole_fractions_3component[:, 0],
     activity_3component_volume[:, 1],
     label="Component 2",
     color="green",
 )
 ax[1].plot(
-    mass_fractions_3component[:, 0],
+    mole_fractions_3component[:, 0],
     activity_3component_volume[:, 2],
     label="Component 3",
     color="red",
 )
 ax[1].set_xlabel("Water Mole Fraction")
-ax[1].set_ylabel("Activity coefficient")
-ax[1].set_title("Activity coefficient vs mass fraction for 3 components")
+ax[1].set_ylabel("Activity")
+ax[1].set_title("Ternary volume-based activity")
 ax[1].legend()
 
 # Display the plot
@@ -226,12 +233,15 @@ plt.tight_layout()
 plt.show()
 
 # %% [markdown]
-# ## Mass-Based Mixing
+# ## Weight by mass
 #
-# In this example, we will use mass-based mixing. This is the simplest, as our mass fractions are directly proportional to the mass of the components.
+# The mass rule normalizes the input masses directly. Because water is much
+# lighter per molecule than either solute, its mass fraction is below its mole
+# fraction along these paths. The curved water trace against $x_w$ is therefore
+# expected. It does not indicate a numerically inconsistent mass conversion.
 
 # %%
-# Mass activity coefficient
+# Mass activity
 activity_2component_mass = par.particles.get_ideal_activity_mass(
     mass_concentration=mass_2component,
 )
@@ -244,7 +254,7 @@ fig, ax = plt.subplots(2, 1, figsize=(5, 8))
 
 # Plot each component in the 2-component system with separate colors
 ax[0].plot(
-    mass_fractions_2component[:, 0],
+    mole_fractions_2component[:, 0],
     activity_2component_mass[:, 0],
     color="blue",
     label="Water (1)",
@@ -252,19 +262,19 @@ ax[0].plot(
     linestyle="--",
 )
 ax[0].plot(
-    mass_fractions_2component[:, 0],
+    mole_fractions_2component[:, 0],
     activity_2component_mass[:, 1],
     color="green",
     label="Component 2",
 )
 ax[0].set_xlabel("Water Mole Fraction")
-ax[0].set_ylabel("Activity coefficient")
-ax[0].set_title("Activity coefficient vs mass fraction for 2 components")
+ax[0].set_ylabel("Activity")
+ax[0].set_title("Binary mass-based activity")
 ax[0].legend()
 
 # Plot the 3-component system without setting specific colors
 ax[1].plot(
-    mass_fractions_3component[:, 0],
+    mole_fractions_3component[:, 0],
     activity_3component_mass[:, 0],
     label="Water (1)",
     color="blue",
@@ -272,21 +282,21 @@ ax[1].plot(
     linestyle="--",
 )
 ax[1].plot(
-    mass_fractions_3component[:, 0],
+    mole_fractions_3component[:, 0],
     activity_3component_mass[:, 1],
     label="Component 2",
     color="green",
     linewidth=3,
 )
 ax[1].plot(
-    mass_fractions_3component[:, 0],
+    mole_fractions_3component[:, 0],
     activity_3component_mass[:, 2],
     label="Component 3",
     color="red",
 )
 ax[1].set_xlabel("Water Mole Fraction")
-ax[1].set_ylabel("Activity coefficient")
-ax[1].set_title("Activity coefficient vs mass fraction for 3 components")
+ax[1].set_ylabel("Activity")
+ax[1].set_title("Ternary mass-based activity")
 ax[1].legend()
 
 # Display the plot
@@ -294,12 +304,22 @@ plt.tight_layout()
 plt.show()
 
 # %% [markdown]
-# ## Kappa-Activity
+# ## Change water's rule with κ
 #
-# The kappa value parameterization is a simple way to model non-ideal water interactions in solutions.
+# The illustrative solutes have κ=0.6 and 1.2; the water lane's κ is unused.
+# Water activity follows $a_w=V_w/(V_w+\sum_i\kappa_i V_i)$ for the solute
+# volumes $V_i$. Its dry endpoint is zero here. Along the ternary path, the
+# relative contributions of the two solutes also change, so there is no single
+# constant effective solute κ for the entire curve.
+#
+# The nonwater lanes retain ideal molar activities. Compare them with the first
+# pair of panels to see that this model changes water's rule without computing
+# nonideal activity coefficients for every component. The parameterization follows
+# [Petters and Kreidenweis (2007)](https://acp.copernicus.org/articles/7/1961/2007/);
+# the particular solute parameters here are illustrative.
 
 # %%
-# kappa activity coefficient
+# kappa activity
 
 kappa_1 = 0.0  # kappa of water
 kappa_2 = 0.6  # kappa of component 2
@@ -327,44 +347,44 @@ fig, ax = plt.subplots(2, 1, figsize=(5, 8))
 
 # Plot each component in the 2-component system with separate colors
 ax[0].plot(
-    mass_fractions_2component[:, 0],
+    mole_fractions_2component[:, 0],
     activity_2component_kappa[:, 0],
     color="blue",
     label="Water (1)",
 )
 ax[0].plot(
-    mass_fractions_2component[:, 0],
+    mole_fractions_2component[:, 0],
     activity_2component_kappa[:, 1],
     color="green",
     label="Component 2",
 )
 ax[0].set_xlabel("Water Mole Fraction")
-ax[0].set_ylabel("Activity coefficient")
-ax[0].set_title("Kappa Activity coefficient vs mass fraction for 2 components")
+ax[0].set_ylabel("Activity")
+ax[0].set_title("Binary κ activity")
 ax[0].legend()
 
 # Plot the 3-component system without setting specific colors
 ax[1].plot(
-    mass_fractions_3component[:, 0],
+    mole_fractions_3component[:, 0],
     activity_3component_kappa[:, 0],
     label="Water (1)",
     color="blue",
 )
 ax[1].plot(
-    mass_fractions_3component[:, 0],
+    mole_fractions_3component[:, 0],
     activity_3component_kappa[:, 1],
     label="Component 2",
     color="green",
 )
 ax[1].plot(
-    mass_fractions_3component[:, 0],
+    mole_fractions_3component[:, 0],
     activity_3component_kappa[:, 2],
     label="Component 3",
     color="red",
 )
 ax[1].set_xlabel("Water Mole Fraction")
-ax[1].set_ylabel("Activity coefficient")
-ax[1].set_title("Kappa Activity coefficient vs mass fraction for 3 components")
+ax[1].set_ylabel("Activity")
+ax[1].set_title("Ternary κ activity")
 ax[1].legend()
 
 # Display the plot
@@ -372,8 +392,16 @@ plt.tight_layout()
 plt.show()
 
 # %% [markdown]
-# ## Summary
+# ## What survives a change of mixing rule?
 #
-# By the end of this notebook, you should have a better understanding of mixing rules, mass-based vs. molar-based calculations, and the kappa value parameterization for predicting water activity in non-ideal solutions. You will also have learned how to apply these concepts to practical examples and visualize the results using plots.
+# The composition path and its mole-fraction coordinate stay fixed, while the
+# predicted activities change. Thus interpreting a condensation calculation
+# requires naming its activity approximation as well as its composition.
+# Agreement at an endpoint or the fact that fractions sum to one does not choose
+# the physically appropriate rule.
 #
-# You saw how different mixing rules can be used to predict the properties of solutions and how they can affect the accuracy of the predictions. You also learned about the kappa value parameterization and how it can be used to model water activity in non-ideal solutions. These concepts are essential for condensation and phase equilibrium calculations when aerosol particles are present in the atmosphere.
+# For a research comparison, hold the dry solute ratio fixed, vary only water,
+# and compare predicted $a_w$ with measured water activity at one temperature.
+# Use residuals over the measured range to assess a fitted κ against ideal molar
+# mixing. That controlled path would separate water uptake from the changing
+# dry composition used in the ternary illustration here.

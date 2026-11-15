@@ -1,23 +1,27 @@
-# Simulations
+# Connect processes to a research question
 
-This directory hosts end‑to‑end aerosol simulation notebooks built with Particula. Each notebook walks you through a complete modeling workflow—from setup to visualization or analysis.
+These worked simulations combine population construction, thermodynamic inputs,
+time evolution, and diagnostics. Choose a question, then inspect the example's
+assumptions and validation boundary before adapting its parameters. A successful
+run or an attractive size distribution alone does not establish a reliable
+material model.
 
-## Available Simulations
+| Question | Example | What it helps you distinguish |
+| --- | --- | --- |
+| How do collision assumptions change a water-grown mixed population? | [Biomass-burning-inspired aerosol](biomass_burning_cloud_interactions.py) | A common starting state, continued condensation, and alternative collision kernels |
+| Can a plausible size spectrum hide a species-inventory failure? | [Organic uptake followed by binned coagulation](organic_partitioning_and_coagulation.py) | A valid closed condensation check versus unsupported fixed-composition coagulation |
+| What changes when a vapor reservoir is reset from wet to dry? | [One chamber cycle](cloud_chamber_single_cycle.py) | Water exchange, surviving particles, and the limits of a fixed timestep |
+| How do repeated cycles change water content and dry retention? | [Four chamber cycles](cloud_chamber_multi_cycle.py) | Internally mixed versus single-material seeds, threshold definitions, and diagnostic weighting |
+| Can a property lookup invalidate an otherwise executable model? | [Respiratory-droplet input audit](cough_droplets_partitioning.py) | Requested chemical names versus resolved identities; the retained results are not valid respiratory-fluid predictions |
+| How does imposed cooling affect uptake onto existing seeds? | [Cooling organic aerosol](soot_formation_in_flames.py) | Partitioning and collisions versus soot chemistry, nucleation, and thermal feedback |
 
-- **[Biomass Burning Cloud Interactions](biomass_burning_cloud_interactions.ipynb)**  
-  End‑to‑end biomass burning aerosol‑cloud simulation using Particula.
+For a first coupled calculation, start with the single chamber cycle after the
+[process examples](../processes/index.md). Use the multi-cycle example when
+comparing composition and removal, and the biomass-inspired example when comparing
+collision mechanisms from a common initial state. The organic binned and
+respiratory-droplet examples deliberately expose limitations that must be resolved
+before drawing their originally suggested research conclusions.
 
-- **[Organic Partitioning and Coagulation](organic_partitioning_and_coagulation.ipynb)**
-  End‑to‑end organic aerosol partitioning and coagulation simulation using Particula.
-
-- **[Cough Droplets Partitioning](cough_droplets_partitioning.ipynb)**  
-  Simulates the evaporation of cough droplets in a well-mixed air environment, tracking size distribution and composition changes over time.
-
-- **[Soot Formation in Flames](soot_formation_in_flames.ipynb)**  
-  Simulates soot formation in a cooling combustion plume, tracking particle growth and chemical speciation.
-
-- **[Cloud Chamber Single Cycle](cloud_chamber_single_cycle.ipynb)**  
-  Single activation–deactivation cycle with kappa-based activity, wall loss, growth/shrink visualization, and mass conservation checks.
-
-- **[Cloud Chamber Multi Cycle](cloud_chamber_multi_cycle.ipynb)**  
-  Four-cycle comparison across ammonium sulfate, sucrose, and mixed seeds with kappa-dependent activation, wall-loss analysis, and gallery overlays.
+The scripts preserve complete workloads and saved outputs. Where a study needs
+a material property, convergence result, or experimental comparison that an
+example does not supply, its closing section identifies a concrete next test.

@@ -40,8 +40,8 @@ def check_topic_fields(t, root):
     identifier = t["id"]
     if not re.fullmatch(r"[a-z][a-z0-9-]*", identifier):
         errors.append(f"invalid topic identifier: {identifier}")
-    for key in ("label", "description", "icon"):
-        if not isinstance(t[key], str) or not t[key].strip():
+    for key in ("label", "description", "icon", "context", "investigation"):
+        if not isinstance(t.get(key), str) or not t[key].strip():
             errors.append(f"{identifier}: missing {key}")
     icon = root / "website/public/topic-icons" / (t["icon"] + ".svg")
     if not re.fullmatch(r"[a-z][a-z0-9-]*", t["icon"]) or not icon.is_file():

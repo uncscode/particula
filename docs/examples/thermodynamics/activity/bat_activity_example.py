@@ -13,32 +13,29 @@
 # ---
 
 # %% [markdown]
-# # BAT Model Activity Example
+# # Compare ideal and nonideal organic activity
 #
-# Demonstrates using `ActivityNonIdealBinary` for organic-water mixtures,
-# comparing ideal vs non-ideal activity coefficients.
+# Does a mole fraction alone describe an organic component's tendency to leave
+# a water mixture? This example compares ideal organic activity with the
+# Binary Activity Thermodynamics (BAT) approximation at three compositions.
+# The diagnostic γ = a/x distinguishes the activity coefficient from activity
+# itself; they are not interchangeable.
 #
-# ## What is the BAT Model?
-#
-# The Binary Activity Thermodynamic (BAT) model accounts for non-ideal
-# interactions between water and organic species based on the organic's
-# oxygen-to-carbon ratio.
-#
-# ## What This Example Shows
-#
-# - Creating a non-ideal activity strategy via builder
-# - Comparing ideal vs non-ideal activity at various compositions
-# - Understanding the effect of O:C ratio on non-ideality
+# BAT uses reduced molecular descriptors to represent organic–water interactions.
+# Its scientific basis and limitations are described by
+# [Gorkowski et al. (2019)](https://acp.copernicus.org/articles/19/13383/2019/).
+# This example compares model predictions, not a measured compound.
 
 # %%
 import numpy as np
 import particula as par
 
 # %% [markdown]
-# ## 1. Define Organic Properties
+# ## Fix the organic descriptors
 #
-# Set up properties for an organic species with a moderate oxygen-to-carbon
-# ratio.
+# The illustrative organic has molar mass 200 g mol⁻¹, O:C = 0.5, and density
+# 1200 kg m⁻³. O:C is held fixed in this page; a claim about its effect would
+# require another sweep. The default functional-group assumption is retained.
 
 # %%
 molar_mass_organic = 200.0e-3  # kg/mol
@@ -51,9 +48,12 @@ print(f"O:C ratio: {o2c_ratio}")
 print(f"Density: {density_organic} kg/m^3")
 
 # %% [markdown]
-# ## 2. Create Non-Ideal (BAT) Activity Strategy
+# ## Construct the binary approximation
 #
-# Use the builder pattern to create the BAT activity strategy.
+# The builder records the descriptors with explicit units. `ActivityNonIdealBinary`
+# expects the input order [water, organic] and returns the organic activity only.
+# The underlying BAT helper can provide other quantities, but this strategy's
+# scalar output must not be interpreted as a two-species activity vector.
 
 # %%
 non_ideal = (
@@ -67,9 +67,12 @@ non_ideal = (
 print(f"Strategy: {type(non_ideal).__name__}")
 
 # %% [markdown]
-# ## 3. Create Ideal Activity Strategy for Comparison
+# ## Use a matching ideal reference
 #
-# Create an ideal strategy with the same molar masses to compare results.
+# The ideal strategy uses the same organic molar mass and returns both species'
+# mole fractions. Compare its organic entry with the BAT scalar. The water molar
+# mass used by the BAT implementation has slightly more precision than the rounded
+# 18.015 g mol⁻¹ reference here; the displayed comparison is correspondingly rounded.
 
 # %%
 ideal = par.particles.ActivityIdealMolar(
@@ -79,13 +82,13 @@ ideal = par.particles.ActivityIdealMolar(
 print(f"Ideal strategy: {type(ideal).__name__}")
 
 # %% [markdown]
-# ## 4. Compare Ideal vs Non-Ideal Activity
+# ## Interpret activity and γ at the same composition
 #
-# Test at various organic mass fractions and compare the activity values
-# and activity coefficients.
-#
-# **Note**: The BAT model returns only the organic activity (scalar), not both
-# water and organic activities like the ideal model.
+# The organic mass fractions are 0.2, 0.5, and 0.8 at total mass 1 µg m⁻³.
+# The saved γ values are approximately 1.34, 0.824, and 0.752: departure from the
+# ideal reference changes with composition and need not always increase activity.
+# A value γ > 1 does not by itself imply a > 1, because activity is γ times mole
+# fraction. No phase-equilibrium or mass-transfer calculation is performed here.
 
 # %%
 mass_fractions = np.array([0.2, 0.5, 0.8])
@@ -118,3 +121,17 @@ for org_frac in mass_fractions:
     mole_frac = moles / np.sum(moles)
     gamma_organic = bat_organic_activity / mole_frac[1]
     print(f"  Organic activity coeff (gamma): {gamma_organic:.4f}\n")
+
+# %% [markdown]
+# ## Ask whether nonideality changes your conclusion
+#
+# For these descriptors, ideality changes the organic activity in a
+# composition-dependent way. The comparison identifies a model sensitivity,
+# not which prediction is correct for a specific compound.
+#
+# To extend it, vary O:C while keeping molar mass, functional-group assumptions,
+# and composition fixed, then compare predicted equilibrium partial pressures.
+# Check the chosen descriptor range against the model's domain and independent
+# data. The [activity comparison](activity_tutorial.py) includes such a sweep;
+# [partitioning](equilibria_example.py) connects thermodynamics to an equilibrium
+# inventory rather than just a component activity.

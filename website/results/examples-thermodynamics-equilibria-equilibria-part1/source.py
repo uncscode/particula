@@ -13,9 +13,19 @@
 # ---
 
 # %% [markdown]
-# # Liquid Vapor Equilibrium
+# # How does water uptake change organic aerosol partitioning?
 #
-# This notebook explores the calculation of equilibrium composition in liquid-vapor mixtures, a crucial concept in aerosol science and environmental studies. We utilize an activity coefficient model to understand how different volatile organic compounds distribute between the liquid and vapor phases. This analysis is particularly important for predicting aerosol behavior and understanding atmospheric processes.
+# At fixed total organic loading, changing water activity can change both aerosol
+# water and the amount of organic material in the condensed phase. Here a
+# five-component volatility distribution is solved at equilibrium, first at
+# $a_w=0.8$ and then across a water-activity sweep. The aim is to interpret that
+# equilibrium sensitivity before adding time-dependent transport.
+#
+# Use the [BAT phase-property walkthrough](activity_part1.py) to understand the
+# activity coefficients and phase weights. This functional calculation does not
+# require an aerosol container and does not predict a condensation timescale.
+# It uses the reduced thermodynamic framework of
+# [Gorkowski, Preston, and Zuend (2019)](https://doi.org/10.5194/acp-19-13383-2019).
 
 # %%
 # In Colab uncomment the following command to install particula:
@@ -31,16 +41,17 @@ from particula.particles.properties.organic_density_module import (
 )  # For calculating species density
 
 # %% [markdown]
-# ## Setup the System
+# ## Span volatility while fixing the available organic mass
 #
-# To simulate the liquid-vapor equilibrium, we define several key parameters:
-# - `c_star_j_dry`: Represents the volatility distribution of organic compounds in dry air, calculable from vapor pressure.
-# - `concentration_organic_matter`: The combined concentration of vapor and liquid organic matter in the system.
-# - `oxygen2carbon`: The ratio of oxygen to carbon in the organic compounds, crucial for characterizing their chemical nature.
-# - `molar_mass`: The molar mass of the organic compounds.
+# The dry saturation concentrations $C_i^*$ range from $10^{-6}$ to $10^4$
+# µg/m³. Total gas-plus-particle organic concentrations are [1, 5, 10, 15, 10]
+# µg/m³, summing to 41 µg/m³. These are independent inputs: saturation
+# concentration describes volatility, while total concentration bounds the
+# available material. All five molar masses are 200 g/mol.
 #
-# These parameters help us determine the density of organics in the system, a vital step in understanding their distribution between phases.
-#
+# O:C and estimated density supply the activity calculation. The density helper
+# returns kg/m³ using its default elemental assumptions. The generic components
+# are illustrative, not a measured speciation or fitted emission mixture.
 
 # %%
 # Defining system parameters
@@ -64,10 +75,17 @@ density = get_organic_density_array(
 )
 
 # %% [markdown]
-# ## Calculate the Activity Coefficients
+# ## Connect phase properties to mass partitioning
 #
-# The next step involves calculating the activity coefficients, which are pivotal in determining how the organic compounds distribute between the liquid and vapor phases. We use the `partitioning.get_properties_for_liquid_vapor_partitioning` function, a specialized tool that simplifies the process by returning only the essential properties: activity coefficients, mass fractions, and the two-phase *q* values for the alpha-beta equilibrium.
+# At $a_w=0.8$, first calculate organic activity coefficients, water fractions,
+# and alpha/beta phase weights. The partitioning solver then uses them with
+# volatility and total loading to allocate organic mass. The printed organic
+# and water concentrations describe the combined aerosol phases.
 #
+# The saved calculation gives about 24.22 µg/m³ condensed organic material and
+# 9.41 µg/m³ aerosol water. Organic mass is bounded by the 41 µg/m³ total;
+# water comes from the imposed equilibrium activity rather than that organic
+# inventory. These values depend on the chosen surrogate mixture.
 
 # %%
 # Calculate the properties needed for liquid-vapor partitioning
@@ -97,9 +115,16 @@ print(f"mass in organic aerosol [ug/m3]: {system_opt[0]}")
 print(f"mass in water [ug/m3]: {system_opt[1]}")
 
 # %% [markdown]
-# ## Activity Coefficients as a Function of Relative Humidity (f(RH))
+# ## Repeat equilibria across water activity
 #
-# The binary activity model's key feature is its interaction with water, particularly through relative humidity (RH). Here, we will calculate how the activity coefficients vary as a function of RH. This is done by iterating over a range of RH values and computing the corresponding activity coefficients, providing insights into how atmospheric humidity influences the equilibrium behavior of the system.
+# Each of the 50 points from $a_w=0.01$ to 0.99 is a separate equilibrium
+# calculation with unchanged organic loading. This is not a time trajectory or
+# a closed water budget. Water activity equals RH/100 only under the assumed
+# flat-interface equilibrium at a common temperature; curvature is omitted.
+#
+# The arrays retain **condensed mass concentrations**, not activity coefficients.
+# Changing humidity influences those masses through both phase properties and
+# partitioning. No parameter fitting to observations occurs in this sweep.
 
 # %%
 # Calculating activity coefficients across a range of RH values
@@ -139,13 +164,16 @@ for i, water_activity in enumerate(water_activity_curve):
 print("Calculation complete")
 
 # %% [markdown]
-# ## Plotting the Equilibrium Composition vs. Relative Humidity
+# ## Interpret the two concentration scales
 #
-# This functional example is independent of the native aerosol containers.
-# Its equilibrium solver and phase-transfer model are unchanged by v0.3.0; the
-# plot is illustrative, not a new validation of two-phase thermodynamics.
+# The green curve uses the left axis for organic aerosol and the blue curve uses
+# the right axis for aerosol water, both in µg/m³. Follow each axis separately:
+# a line crossing is not equality of concentrations. The high-activity water
+# response illustrates how strongly water uptake can change while organic mass
+# remains constrained by a fixed inventory.
 #
-# Now that we have calculated the equilibrium composition for a range of RH values, we will visualize these results. The plot will show how the total organic aerosol concentration and the water concentration in the aerosol vary with changing RH. This visualization is crucial for understanding the dynamic behavior of aerosols in different atmospheric humidity conditions.
+# The plotted states are equilibrium predictions for these inputs, not evidence
+# of how quickly an ambient aerosol responds or of validated multiphase kinetics.
 
 # %%
 fig, ax = plt.subplots()
@@ -163,7 +191,7 @@ aw.plot(
     color="blue",
 )
 plt.legend(loc="upper left")
-ax.set_xlabel("water activity (a_w is RH/100)")
+ax.set_xlabel("Water activity")
 
 handles, labels = ax.get_legend_handles_labels()
 aw_handles, aw_labels = aw.get_legend_handles_labels()
@@ -176,10 +204,20 @@ aw.set_ylabel("aerosol water concentration [ug/m3]")
 plt.show()
 
 # %% [markdown]
-# ## Summary
+# ## Use the equilibrium curve as a bounded reference
 #
-# In this notebook, we have journeyed through the process of defining a liquid-vapor equilibrium system and employing the binary activity model to calculate activity coefficients as a function of relative humidity (RH). We then used these coefficients to determine the equilibrium composition of the liquid and vapor phases. Finally, the results were visualized to demonstrate the impact of RH on aerosol behavior, which is essential for understanding atmospheric aerosol dynamics and their environmental implications.
+# Water activity affects more than aerosol water: it also changes the equilibrium
+# organic partitioning problem. The final checks require finite, nonnegative
+# masses and organic concentration no greater than the available inventory.
+# Those bounds are necessary checks, not proof of solver convergence at every
+# point or agreement with measured aerosol composition.
 #
+# For a research extension, vary the total organic loading while preserving its
+# species ratios, then compare the fraction condensed at each water activity.
+# Record solver success and residuals as well as mass bounds; compare the result
+# with a measured humidity-dependent partitioning curve. A time-dependent
+# [condensation example](../../processes/condensation/condensation_1_bin.py)
+# would address the separate question of approaching those equilibria.
 
 # %%
 # Check finite, physically bounded condensed organic mass across the RH sweep.

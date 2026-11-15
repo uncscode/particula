@@ -1,15 +1,15 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 2.8149950570077635,
-  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "elapsed_seconds": 3.603105756104924,
+  "package_source_sha256": "8340db23fd0f933d97cccca5043297b3b1382b94bbaa2249dcaeb9fe1dc62879",
   "input_sha256": {},
   "example": "examples-fundamentals-particles-distribution-tutorial",
-  "fingerprint": "0e779d58ba333ade0dfa374ef4bcf08e49deac1417bcb24b97a36b95a32a1d08",
+  "fingerprint": "a1282819a28bf6ccb82af2849921ff9fb327b5f4fd025168f7d510d34d4a7610",
   "source": "docs/examples/fundamentals/particles/distribution_tutorial.py",
-  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "revision": "277ccafb82ee7ed32af4ea96bec6ae301ce67df5",
   "package_dirty": false,
-  "executed_at": "2026-11-13T14:59:57.720909+00:00",
+  "executed_at": "2026-11-15T19:29:17.201668+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
@@ -22,11 +22,6 @@
     "warp-lang": "1.11.1"
   },
   "outputs": [
-    [
-      {
-        "text": "'Distribution strategy tutorial for particle property calculations.\\n\\nThis tutorial covers the distribution strategies implemented in particula\\nfor calculating particle properties. Strategies define how to compute\\nderived properties like particle mass, radius, and total mass based on\\nthe distribution type (mass-based, radius-based, or speciated-mass).\\n\\nStrategies covered:\\n    - MassBasedMovingBin: Calculate radius from known particle mass\\n    - RadiiBasedMovingBin: Calculate mass from known particle radius\\n    - SpeciatedMassMovingBin: Multi-species mass-based calculations\\n\\nExample:\\n    Calculate particle radius from mass::\\n\\n        import numpy as np\\n        import particula as par\\n        mass = np.linspace(0, 10, 5)  # kg\\n        density = np.array([1000.0])  # kg/m^3\\n        radius = par.particles.MassBasedMovingBin().get_radius(mass, density)\\n'"
-      }
-    ],
     [],
     [
       {
@@ -50,6 +45,6 @@
     ]
   ],
   "files": {
-    "source.py": "1c55f6f3dbcf03955005224f4a5658dffe2ba1eabcc4e79e171391df2130ed73"
+    "source.py": "ad3670f48a206533f0f18f7818e0d91d397c609f0907b64bd9e9912659f06636"
   }
 }

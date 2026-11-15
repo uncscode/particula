@@ -1,6 +1,12 @@
 # %% [markdown]
 # # Charge-dependent Brownian collisions on CUDA
 #
+# If two collision formulas agree on a GPU, does that make them the same physical
+# model? Here you will separate implementation agreement from model disagreement
+# by holding the dimensionless inputs fixed. The
+# [charged coagulation examples](../../processes/coagulation/charge/coagulation_with_charge_functional.py)
+# connect these inputs to particle size and charge.
+#
 # A charged Brownian kernel is a complete collision model, not a correction
 # to add to the ordinary Brownian rate. This example compares the five
 # existing Particula models using the same diffusive Knudsen number and
@@ -135,3 +141,17 @@ def run_example():
 # %%
 if __name__ == "__main__":
     run_example()
+
+# %% [markdown]
+# ## Turn model spread into a research comparison
+#
+# The overlaid fits reveal where model choice matters even when CPU and CUDA
+# implementations agree within the asserted tolerance. In particular, a shared
+# non-attractive branch in these dimensionless expressions is not evidence that
+# physical repulsion has no effect; the dimensional construction still matters.
+#
+# For a charged-aerosol study, map the actual size, charge, temperature, and pressure
+# range into these coordinates before choosing a fit. Compare dimensional kernels
+# and population evolution for plausible alternatives, respecting each source's
+# regime. Use [ion balance](gpu_ion_balance.py) if charges must evolve through
+# attachment, rather than assuming that a collision fit also models charging.

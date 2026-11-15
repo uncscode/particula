@@ -1,6 +1,13 @@
 # Topic explorer and scientific narrative rollout
 
-## First increment
+## Current scope
+
+The user approved the preview and expanded this PR to the full `docs/examples/`
+collection and richer topic pages. The [conversion ledger](docs-example-conversion.md)
+records all 88 reviewed pages, scientific corrections, refreshed evidence, and
+final validation. The first-increment record below describes the earlier pilot.
+
+## First increment (historical)
 
 Branch: `codex/docs-topic-explorer`, based on upstream `103832806`.
 
@@ -44,7 +51,10 @@ For each pilot, read the opening question, computation, displayed output, and
 closing interpretation as one argument. Confirm that a researcher can explain
 what was established and identify a reasonable adaptation with necessary checks.
 
-## Remaining editorial backlog (not implemented)
+## Original editorial backlog and disposition
+
+Items 1 and 3–6 are addressed by the full example conversion. Item 2 remains
+a separate theory-page follow-up outside the expanded `docs/examples/` scope.
 
 1. **Scientific consistency:** reconcile the cloud-chamber single-cycle closing
    mass-drift statement with its opening inventory checks; inspect remaining
@@ -67,9 +77,10 @@ what was established and identify a reasonable adaptation with necessary checks.
 Use the packaged topic/narrative references and current contributor guide.
 Preserve URLs unless a move solves a demonstrated navigation problem. Any later
 scientific changes require complete workload refreshes and the relevant numerical
-checks. No global prose conversion or automatic publication is part of this PR.
+checks. The approved follow-up converts the complete example collection in this PR;
+publication remains a separate action.
 
-## Validation record
+## First-increment validation record (historical)
 
 - Production website build passed: 532 content pages; verification covered 662
   HTML pages including redirects, 303 API modules, and 1,860 legacy anchors,

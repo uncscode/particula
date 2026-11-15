@@ -13,14 +13,20 @@
 # ---
 
 # %% [markdown]
-# # Activity Example
+# # Follow water–organic mixing from composition to water activity
 #
-# This notebook demonstrates the Binary Activity Theory (BAT) model application, crucial for calculating the activity of water and organic compounds in mixtures and understanding phase separation. This model, as detailed in Gorkowski, K., Preston, T. C., & Zuend, A. (2019), provides critical insights into aerosol particle behavior, essential in environmental and climate change research.
+# Can one water activity correspond to different liquid compositions? The Binary
+# Activity Thermodynamics (BAT) model provides a reduced description of nonideal
+# water–organic mixing. We first inspect composition-dependent activities, then
+# ask for phase properties at prescribed water activities. This connects a
+# composition calculation to the humidity-controlled inputs used in
+# [organic partitioning](equilibria_part1.py).
 #
-#  Reference: Gorkowski, K., Preston, T. C., & Zuend, A. (2019).
-#  Relative-humidity-dependent organic aerosol thermodynamics Via an efficient
-#  reduced-complexity model. Atmospheric Chemistry and Physics
-#  https://doi.org/10.5194/acp-19-13383-2019
+# The model and its calibration are described by
+# [Gorkowski, Preston, and Zuend (2019)](https://doi.org/10.5194/acp-19-13383-2019).
+# These calculations illustrate its response to idealized molecular descriptors;
+# they are not measurements of a named organic compound or a simulation of
+# phase-separation kinetics.
 
 # %%
 # In Colab uncomment the following command to install particula:
@@ -39,10 +45,17 @@ from particula.particles.properties.organic_density_module import (
 )
 
 # %% [markdown]
-# ## Activity Calculation
+# ## Describe one generic organic component
 #
-# Define the parameters required by the activity module to calculate the activity of water and organic compounds in a mixture, as well as phase separation. These parameters include organic mole fraction, density, molecular weight ratio [water/organic], and the density of the organic compound. Using these parameters helps in accurately modeling the behavior of aerosol particles in various environmental conditions.
+# The organic has molar mass 100 g/mol and O:C=0.225. The water-to-organic
+# molar-mass ratio is dimensionless; the density helper takes g/mol and returns
+# kg/m³. Its default elemental assumptions are part of this illustrative density
+# estimate, not independently measured composition.
 #
+# Sweep organic mole fraction from 0.001 to 1. The returned arrays contain water
+# and organic activities, mass fractions, and activity coefficients. Keep those
+# quantities distinct: $a_i=\gamma_i x_i$, so an activity coefficient above one
+# is not by itself a phase-separation criterion.
 
 # %%
 # Define a range of organic mole fractions for the calculation
@@ -73,9 +86,17 @@ density = get_organic_density_estimate(
 )
 
 # %% [markdown]
-# ## Plotting the Activity and Phase Separation
+# ## Read activities and coefficients separately
 #
-# Here we plot the activity of water and the organic compound as a function of the organic mole fraction. Visualizing these activities helps in identifying phase separation or miscibility gaps, crucial for understanding the behavior of aerosols under different environmental conditions. Phase separation is indicated by activities greater than 1.0 or non-monotonic behavior in the activity curve, as shown below.
+# The horizontal coordinate is **water** mole fraction, the complement of the
+# input organic fraction. The first plot shows activities; the second shows
+# activity coefficients. Departures from ideal molar behavior reflect the BAT
+# model's nonideality for these descriptors.
+#
+# The separation helper inspects activity-curve monotonicity to select branches.
+# Nonmonotonic curves can signal a region requiring a phase treatment in this
+# model. Neither an arbitrary activity above one nor a large coefficient alone
+# constitutes experimental proof of liquid–liquid separation.
 
 # %%
 fig, ax = plt.subplots()
@@ -112,10 +133,15 @@ ax.legend()
 plt.show()
 
 # %% [markdown]
-# ## $ q^\alpha $
+# ## Understand the phase-transition weight
 #
-# The $q^\alpha$ parameter signifies the transition from an organic-rich phase to a water-rich phase. This transition is crucial for understanding the phase behavior of aerosol particles. It can be calculated using the `particula.activity.phase_separation` function. The plot below illustrates $q^\alpha$ based on the activity calculations performed earlier.
+# The helper extracts a separation activity and constructs a smooth $q^\alpha$
+# transition. This dimensionless parameter weights the water-rich alpha branch
+# relative to the organic-rich beta branch in the reduced model. It is not water
+# mass fraction, a time coordinate, or a measured fraction of droplets.
 #
+# The plot shows how that parameter varies with the computed water activity;
+# it does not evolve particles through a separation event.
 
 # %%
 # Finding phase separation points and calculating q_alpha
@@ -135,9 +161,23 @@ plt.ylabel("$q^{\\alpha}$ [Organic Rich to Water Rich]")
 plt.show()
 
 # %% [markdown]
-# ## Water Activity Focus
+# ## Prescribe water activity instead of composition
 #
-# In atmospheric aerosol modeling, water activity is often a more critical parameter than mole fraction. This is because water activity is typically a controllable or known variable in atmospheric conditions, unlike the exact mole fractions in a solution. To correlate water activity with the mole fraction required to achieve it, we utilize functions from the `particula.activity` module.
+# Now set O:C=0.25 and ask for properties over $a_w=0.5$ to 1. The density and
+# molar mass remain fixed from the preceding setup, isolating the descriptor
+# change rather than updating an entire material-property model. Under
+# flat-interface equilibrium at a common temperature, $a_w=\mathrm{RH}/100$.
+# Curvature and finite equilibration rates would change that connection.
+#
+# The first two returned objects hold phase properties; row 2 contains each
+# phase's water mass fraction. The beta object may be `None` when only one branch
+# is used. Plot water fractions alongside $q^\alpha$ to distinguish phase
+# composition from phase weighting. The endpoint near unit activity is limited
+# by the internal composition interpolation, not a pure-water measurement.
+# In the low-O:C panel, the alpha water fraction sits near one while its
+# weight is near zero over most of the plotted range. The helper clamps
+# out-of-branch interpolation to endpoint compositions. Do not read that
+# unweighted branch or the sharp final jump as a resolved physical transition.
 
 # %%
 # select the water activity desired
@@ -179,16 +219,22 @@ if beta is not None:
         label="beta phase mass fraction water",
     )
 ax.set_ylim()
-ax.set_xlabel("water activity (Relative Humidity/100)")
-ax.set_ylabel("mass fraction of water")
+ax.set_xlabel("Water activity")
+ax.set_ylabel("Water mass fraction or phase weight")
 plt.legend()
 plt.show()
 
 # %% [markdown]
-# ## Higher Oxygen to Carbon Ratios
+# ## Increase oxygenation while holding other descriptors fixed
 #
-# Higher oxygen to carbon ratios in the mixture tend to inhibit phase separation. The following analysis demonstrates this effect. This observation is crucial in predicting the behavior of aerosol particles under varying chemical compositions (more or less 'aged').
+# Repeat at O:C=0.6 with the same molar mass, density, and activity grid. In this
+# parameter comparison the higher-oxygenation case uses a single branch, with
+# $q^\alpha=1$ and no beta curve. Compare that with the lower-O:C panel rather
+# than interpreting the second panel as a later stage of chemical aging.
 #
+# Real oxidation can change molar mass, density, volatility, and functionality
+# together. This controlled descriptor change does not represent those coupled
+# processes or establish a universal O:C threshold for every organic aerosol.
 
 # %%
 # select the water activity desired
@@ -231,15 +277,21 @@ if beta is not None:
         label="beta phase mass fraction water",
     )
 ax.set_ylim()
-ax.set_xlabel("water activity (Relative Humidity/100)")
-ax.set_ylabel("mass fraction of water")
+ax.set_xlabel("Water activity")
+ax.set_ylabel("Water mass fraction or phase weight")
 plt.legend()
 plt.show()
 
 # %% [markdown]
-# ## Summary
+# ## Carry the phase information into a research question
 #
-# This notebook demonstrates how to use the activity module for calculating the activity of water and organic compounds in a mixture and assessing phase separation. The insights gained are vital for applications in aerosol thermodynamics, cloud condensation nuclei, and cloud microphysics.
+# The model can associate prescribed water activity with different phase
+# compositions and a transition weight. Those are distinct outputs: the amount
+# of water within a phase is not the weight assigned to that phase. The comparison
+# also shows why molecular descriptors matter when selecting a phase treatment.
 #
-# This is an implementation of the Binary Activity Theory (BAT) model
-# developed in Gorkowski, K., Preston, T. C., & Zuend, A. (2019).
+# A next investigation could vary O:C and molar mass together, record the water
+# activity at which the beta branch disappears, and compare that map with measured
+# phase-separation humidity. Include density sensitivity and the model's
+# calibration domain. To predict condensed organic mass rather than phase
+# properties alone, continue with [liquid–vapor partitioning](equilibria_part1.py).

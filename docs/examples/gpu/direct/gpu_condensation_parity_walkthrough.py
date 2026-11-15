@@ -1,6 +1,17 @@
 # %% [markdown]
 # # Check CUDA condensation against independent equations
 #
+# Would a perfectly conserved mass budget detect an incorrect transfer rate?
+# Not by itself. This walkthrough gives you three separate diagnostics and an
+# independent implementation of the specified update. Start with the
+# [direct condensation workflow](gpu_direct_kernels_quick_start.py), then follow
+# proposal, availability limiting, and gas update in that order.
+#
+# The two boxes use 298.15 and 305.15 K and a total interval of 0.08 s, split into
+# four 0.02 s updates. Both gases have an illustrative constant pure vapor pressure
+# of 0.01 Pa. The labels Water and Organic identify material lanes, not calibrated
+# vapor-pressure models for those temperatures.
+#
 # Two boxes have different temperatures, particle compositions and gas
 # inventories. Water uptake and organic evaporation occur in the same call.
 # An independent NumPy calculation evaluates four equal substeps before the
@@ -960,3 +971,21 @@ if __name__ == "__main__":
         run_publication()
     else:
         raise SystemExit(main())
+
+# %% [markdown]
+# ## Explain agreement at the right level
+#
+# Matching signed bars checks the transfer calculation; matching energy markers
+# checks count-weighted transfer times latent heat. The conservation check tests
+# material exchange with gas separately. The category called `physics` in the
+# printed report means agreement with this implemented oracle, not experimental
+# validation. The oracle uses shared scalar property functions but independently
+# organizes the proposal, bounds, and four-substep update; it is not an independent
+# validation of those shared property laws.
+#
+# The prescribed temperatures do not evolve with the energy diagnostic. For a
+# thermally coupled study, add an explicit heat budget and an independent limiting
+# solution. For a transfer study, vary gas availability and timestep while retaining
+# species-wise checks, so that clipping and integration errors cannot hide behind
+# a conserved total. See [latent-heat condensation](../../processes/condensation/condensation_latent_heat.py)
+# for the meaning of the heat-resistance correction.

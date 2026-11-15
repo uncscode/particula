@@ -1,6 +1,18 @@
 # %% [markdown]
 # # Multibox resident timesteps and continuation
 #
+# Why can a quantity called a conservation residual change even when the model
+# is working as configured? This example makes gas replacement and particle loss
+# visible alongside resident ownership. It is intended for readers examining the
+# low-level scheduler; begin with [session ownership](gpu_resident_session.py) or
+# use the [prepared interface](../prepared/gpu_prepared_quick_start.py) for a study.
+#
+# The three boxes have volumes 1, 2, and 3 m³ and prescribed gas densities
+# 0.25, 0.5, and 0.75 kg m⁻³. The sole lane is named water but uses an illustrative
+# constant pure vapor pressure of 800 Pa. These are test inputs, not a calibrated
+# water-cloud state. The request builds dependencies, binds physical state and
+# scratch arrays, then observes diagnostics after two one-second steps.
+#
 # Run the complete low-level resident schedule across three heterogeneous
 # boxes, inspect CPU diagnostics, and explicitly resume a checkpoint.
 # Run with `--cuda` to reproduce the saved figures. CUDA is required
@@ -928,3 +940,21 @@ if __name__ == "__main__":
         run_publication()
     else:
         main()
+
+# %% [markdown]
+# ## Explain the source and sink before the residual
+#
+# Each source step restores the prescribed gas, so particle uptake can be followed
+# by external vapor replenishment. Wall loss can export particle material. The
+# residual buffer uses the initial inventory and zero source/sink ledger arrays;
+# its plotted change consequently is not an accounted conservation error.
+# Communication has zero edges, prescribed volumes stay fixed, and nucleation has
+# a zero coefficient. Listing those schedule nodes does not mean they transport
+# material or create particles in this run.
+#
+# The restart check verifies gas and temperature before its additional step; the
+# plotted bars describe the original two-step state. There is no uninterrupted
+# three-step comparison here. For a coupled-box research model, add actual transfer
+# edges and an external-exchange ledger, then compare a complete resumed trajectory
+# with an uninterrupted control. The [prepared lifecycle](../prepared/gpu_prepared_lifecycle.py)
+# provides that stronger continuation and process-accounting example.

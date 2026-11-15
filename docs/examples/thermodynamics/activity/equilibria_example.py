@@ -13,28 +13,26 @@
 # ---
 
 # %% [markdown]
-# # Equilibria Partitioning Example
+# # Separate water uptake from organic partitioning
 #
-# Demonstrates using `LiquidVaporPartitioningStrategy` for computing
-# gas-particle equilibrium concentrations.
-#
-# ## What This Example Shows
-#
-# - Creating a liquid-vapor partitioning strategy
-# - Solving for equilibrium with organic species
-# - Interpreting the equilibrium results
-# - Observing the effect of relative humidity on partitioning
+# Can humidity add substantial particle water while barely changing how much
+# organic material is condensed? This equilibrium example solves three low-volatility
+# organic classes at prescribed water activity and inspects phase inventories.
+# It teaches how to read partition coefficients, associated water, and an optimizer
+# residual without confusing them with a time-dependent growth calculation.
 
 # %%
 import numpy as np
 import particula as par
 
 # %% [markdown]
-# ## 1. Define Organic Species Properties
+# ## Keep concentration units and volatility scales consistent
 #
-# Set up three organic species with different volatilities (C* values).
-# Lower C* means less volatile and more tendency to partition to the
-# particle phase.
+# The dry C* values are 10⁻⁶, 10⁻⁴, and 10⁻² µg m⁻³, in the same concentration
+# units as the total organic inputs 1, 5, and 10 µg m⁻³. They are all small relative
+# to the loading, so near-complete organic condensation is a plausible outcome.
+# This interface takes molar mass in g mol⁻¹, unlike many native process interfaces.
+# The O:C ratios and densities specify illustrative organic descriptors.
 
 # %%
 # Three species with different volatilities (C* values)
@@ -50,9 +48,11 @@ print(f"Total concentration: {concentration_organic} ug/m^3")
 print(f"O:C ratios: {o2c_ratio}")
 
 # %% [markdown]
-# ## 2. Create Partitioning Strategy at 75% RH
+# ## Prescribe water activity, with its equilibrium assumptions
 #
-# Water activity corresponds to relative humidity for aerosol systems.
+# The first solve sets a_w = 0.75. Interpreting that as 75% relative humidity
+# assumes equilibrium with the gas and neglects curvature. No radius, Kelvin
+# correction, finite water reservoir, or equilibration timescale is solved here.
 
 # %%
 strategy = par.equilibria.LiquidVaporPartitioningStrategy(
@@ -63,7 +63,12 @@ print(f"Strategy: {type(strategy).__name__}")
 print(f"Water activity (RH): {strategy.water_activity * 100:.0f}%")
 
 # %% [markdown]
-# ## 3. Solve for Equilibrium
+# ## Solve an endpoint rather than a trajectory
+#
+# The strategy computes phase partitioning at the imposed activity. Its return
+# value contains the modeled endpoint and numerical residual; the printed success
+# message alone is not the acceptance test. The explicit assertions later check
+# bounds, finite residual, and organic material accounting.
 
 # %%
 result = strategy.solve(
@@ -77,10 +82,14 @@ result = strategy.solve(
 print("Equilibrium solved successfully!")
 
 # %% [markdown]
-# ## 4. Print Equilibrium Results
+# ## Interpret phase entries before summing them
 #
-# The result contains partition coefficients (fraction in condensed phase),
-# phase concentrations, and water content.
+# Partition coefficients give condensed organic fractions. Phase species entries
+# include species-associated water, so subtract phase water before comparing with
+# organic-only input. At a_w = 0.75, the saved solution has about 4.51 µg m⁻³
+# water in the alpha phase and zero in beta, with organic partition coefficients
+# near one. The presence of a beta result object does not mean a populated second
+# phase has formed.
 
 # %%
 print("=== Liquid-Vapor Partitioning ===")
@@ -125,10 +134,13 @@ print(
 print(f"Optimization error: {result.error:.2e}")
 
 # %% [markdown]
-# ## 5. Effect of RH on Partitioning
+# ## Compare humidity sensitivity with the right diagnostic
 #
-# As relative humidity increases, more water is absorbed and partitioning
-# changes.
+# Across imposed activities 0.3–0.9, saved alpha-phase water rises from about
+# 0.66 to 13.42 µg m⁻³ while the mean organic partition coefficient remains near
+# one. The unweighted mean is not the total condensed mass fraction; species have
+# different loadings. The final inventory assertion applies to the first 0.75
+# solution, not every point in this sweep.
 
 # %%
 print("=== Effect of RH on Partitioning ===\n")
@@ -166,3 +178,17 @@ assert np.all(
     (result.partition_coefficients >= 0) & (result.partition_coefficients <= 1)
 )
 assert np.isfinite(result.error) and result.error < 1e-8
+
+# %% [markdown]
+# ## Choose a case that can answer your research question
+#
+# Under these low-C* inputs, humidity sensitivity is much more apparent in water
+# than in the rounded organic partition coefficients. That outcome should not
+# be generalized to all volatile mixtures. The small optimizer residual is a
+# numerical endpoint check, not validation of the activity model.
+#
+# To probe humidity-driven changes in organic mass, choose C* values spanning the
+# actual organic loading, preserve consistent concentration units, and track each
+# species' gas and condensed fractions plus total water. Check residuals and
+# inventories at every sweep point. Compare with a kinetic growth calculation only
+# after matching activity, volatility, reservoir, and curvature assumptions.

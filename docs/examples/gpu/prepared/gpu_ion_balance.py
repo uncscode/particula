@@ -1,6 +1,12 @@
 # %% [markdown]
 # # Explicit atmospheric ion balance on CUDA
 #
+# When only a few ions occupy each physical box, is the continuum balance an
+# adequate reference? You will compare a stochastic particle ensemble with both a
+# finite-population master equation and a continuum equation, then account for
+# supplied and exported mass. This is the prerequisite for interpreting the
+# [seed-survival experiment](gpu_lucky_few.py).
+#
 # Before asking whether charging helps a rare seed survive, check the ion
 # population itself. Here every ion is a unit-count particle of diameter
 # **0.5 nm**. Positive and negative ions carry +1 and −1 elementary charges
@@ -285,3 +291,19 @@ def run_example():
 # %%
 if __name__ == "__main__":
     run_example()
+
+# %% [markdown]
+# ## Choose the reference for the population you simulate
+#
+# The finite-box curve and continuum curve answer different questions: the former
+# retains discrete population fluctuations, while the latter evolves a smooth
+# concentration. The printed standardized discrepancy checks the sampled CUDA
+# means against the independent finite-box reference. Passing its six-standard-error
+# criterion is not a claim that every point lies within the plotted 95% interval.
+#
+# For a low-ion-concentration experiment, vary physical box volume at fixed source
+# rate density and compare the gap between the two references. Increase the number
+# of independent boxes to reduce sampling error without changing the physical
+# volume within each box. Then refine timestep and capacity before adding aerosol
+# attachment; otherwise finite-population effects and numerical bias can be
+# mistaken for a charging mechanism.

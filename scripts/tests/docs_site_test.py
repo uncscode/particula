@@ -3,6 +3,8 @@
 import sys
 from pathlib import Path
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import docs_site as site  # noqa: E402
 
@@ -55,6 +57,79 @@ def test_stale_results_are_separated_from_current_code(tmp_path, monkeypatch):
         < page.index("Previous run outputs")
         < page.index('class="result-output"')
     )
+
+
+@pytest.mark.parametrize("state", ["current", "stale", "missing"])
+def test_invocation_results_precede_closure(tmp_path, monkeypatch, state):
+    """Keep code outputs attached and final evidence before interpretation."""
+    source = tmp_path / "docs/example.py"
+    source.parent.mkdir()
+    source.write_text(
+        "# %% [markdown]\n# Opening question\n"
+        "# %%\nx = 3\n"
+        "# %% [markdown]\n# Explain the next stage\n"
+        "# %%\ndef run():\n    return x\n"
+        "# %% [markdown]\n# Interpret the figure\n"
+        "# %% [markdown]\n# Next investigation\n"
+    )
+    run = tmp_path / "run"
+    run.mkdir()
+    manifest = {
+        "device": "CPU",
+        "executed_at": "2026-11-15",
+        "revision": "abc123456789",
+        "outputs": [
+            [{"text": "first-stage-output"}],
+            [],
+            [{"image": "final-figure.png"}],
+        ],
+    }
+    monkeypatch.setattr(site, "ROOT", tmp_path)
+    monkeypatch.setattr(site, "SITE", tmp_path / "website")
+    monkeypatch.setattr(site, "CONTENT", tmp_path / "content")
+    monkeypatch.setattr(
+        site,
+        "bundle",
+        lambda _: (None, None) if state == "missing" else (run, manifest),
+    )
+    monkeypatch.setattr(site, "result_state", lambda *_: state)
+    site.render_example(
+        "demo",
+        {
+            "source": "docs/example.py",
+            "title": "Demo",
+            "invoke": "run()",
+            "device": "cpu",
+            "policy": "cpu",
+        },
+    )
+    page = (tmp_path / "content/example.md").read_text()
+    assert (
+        page.index("def run()")
+        < page.index("Explicit cpu invocation")
+        < page.index("Interpret the figure")
+        < page.index("Next investigation")
+    )
+    if state == "current":
+        assert (
+            page.index("x = 3")
+            < page.index("first-stage-output")
+            < page.index("Explain the next stage")
+        )
+        assert (
+            page.index("Explicit cpu invocation")
+            < page.index("final-figure.png")
+            < page.index("Interpret the figure")
+        )
+    elif state == "stale":
+        assert (
+            page.index("Next investigation")
+            < page.index("Previous run outputs")
+            < page.index("final-figure.png")
+        )
+    else:
+        assert "final-figure.png" not in page
+        assert "Awaiting saved results" in page
 
 
 def test_route_preserves_case_and_underscores():

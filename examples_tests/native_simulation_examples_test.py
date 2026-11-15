@@ -225,7 +225,8 @@ def test_cooled_soot_condensation_then_coagulation_inventory(monkeypatch):
     plt.close("all")
 
 
-def test_three_cloud_compositions_humidity_reset_and_dry_mass(monkeypatch):
+@pytest.mark.parametrize("dt", [1.0, 0.1])
+def test_three_cloud_compositions_humidity_reset_and_dry_mass(monkeypatch, dt):
     """Short cycles retain all three material mappings and prescribed forcing."""
     monkeypatch.setattr(plt, "show", lambda *args, **kwargs: None)
     values = _setup_through(
@@ -249,13 +250,22 @@ def test_three_cloud_compositions_humidity_reset_and_dry_mass(monkeypatch):
             values["wall_loss"],
             humid_duration=2,
             dry_duration=3,
+            dt=dt,
             water_index=water_index,
             c_water_humid=values["c_water_humid"],
             c_water_dry=values["c_water_dry"],
         )
         assert final is aerosol
-        assert [r["time"] for r in history] == [0, 1, 2, 3, 4, 5]
-        assert [r["phase"] for r in history] == ["humid"] * 3 + ["dry"] * 3
+        # Physical duration remains five seconds when dt is refined.
+        np.testing.assert_allclose(
+            [r["time"] for r in history],
+            np.linspace(0, 5, round(5 / dt) + 1),
+            rtol=0,
+            atol=1e-12,
+        )
+        assert [r["phase"] for r in history] == (
+            ["humid"] * (round(2 / dt) + 1) + ["dry"] * round(3 / dt)
+        )
         dry_after = final.particles.masses[0, :, :water_index].sum()
         assert 0 <= dry_after <= dry_before
         assert np.all(np.isfinite(final.particles.masses))

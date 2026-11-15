@@ -1,15 +1,15 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 3.473271686991211,
-  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "elapsed_seconds": 3.764826272963546,
+  "package_source_sha256": "8340db23fd0f933d97cccca5043297b3b1382b94bbaa2249dcaeb9fe1dc62879",
   "input_sha256": {},
   "example": "examples-thermodynamics-equilibria-equilibria-part1",
-  "fingerprint": "b287bd7a4b9c88a076bb638bf32660abfdf0acfc20f23624fa10b704ac71585d",
+  "fingerprint": "adf246ebb24f0e96ab9db5ff8cf99b3b49cd119591269c8ab37216bc89997b12",
   "source": "docs/examples/thermodynamics/equilibria/equilibria_part1.py",
-  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "revision": "277ccafb82ee7ed32af4ea96bec6ae301ce67df5",
   "package_dirty": false,
-  "executed_at": "2026-11-13T15:13:29.384282+00:00",
+  "executed_at": "2026-11-15T20:04:52.266661+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
@@ -42,7 +42,7 @@
     []
   ],
   "files": {
-    "source.py": "9f2fc7148b90ed9160920420cb1930affc2d8ab95e229fc701725f55232d0760",
-    "figure-5-1.png": "46dbfc2c7e0299e05e5f882f222fd99b73270d9558dda0a71eb6c4b8e1221be9"
+    "source.py": "3e5ae1bcb310e4bf4d86ebe285ce9c54816531709a9e5ac88fd5eb83e23889d6",
+    "figure-5-1.png": "fd93f1abae6e83607df73880bf2069c8f98feda1b877e9c407bbdde8136781c5"
   }
 }

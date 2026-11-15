@@ -1,100 +1,27 @@
-# Activity Examples
+# Activity and partitioning examples
 
-This section provides working code examples for computing chemical activity in aerosol particles using Particula's activity strategies. Learn how to use ideal, kappa-Kohler, and BAT (non-ideal) models through practical examples.
+Activity connects mixture composition to equilibrium vapor pressure. A useful
+first question is whether changing a mixing assumption materially changes the
+pressure reduction for the component you care about. The examples below build
+from that comparison to water uptake and condensed organic mass.
 
-## Overview
+| Follow this question | Example | Scope of the answer |
+| --- | --- | --- |
+| How does mass become a mole-fraction activity? | [Ideal activity](ideal_activity_example.py) | A two-component reference and partial-pressure calculation |
+| How does a solute's κ affect water activity? | [κ activity](kappa_activity_example.py) | A salt-like example and a separate generic parameter sweep |
+| How far can organic activity depart from ideal mixing? | [BAT activity](bat_activity_example.py) | A fixed-descriptor binary mixture at three compositions |
+| How do these approaches fit together? | [Activity model walkthrough](activity_tutorial.py) | Matched-component comparisons, water uptake, and partitioning |
+| How does activity enter an equilibrium mass calculation? | [Equilibrium partitioning](equilibria_example.py) | Three low-volatility surrogates and a water-activity sweep |
 
-Activity determines how species partition between gas and particle phases and controls water uptake in hygroscopic aerosols. These examples demonstrate:
+Start with ideal activity if mole fractions and partial pressure are unfamiliar.
+Then choose κ for the water-uptake question or BAT for water–organic nonideality.
+These models have different domains; a difference between curves is a sensitivity
+result, not proof that one is accurate for a particular aerosol.
 
-- Computing activity from mass concentrations
-- Comparing ideal vs. non-ideal activity models
-- Using the kappa parameter for hygroscopic growth
-- Integrating activity with equilibria calculations
-
-## Example Scripts
-
-<div class="grid cards" markdown>
-
--   __[Ideal Activity](ideal_activity_example.ipynb)__
-
-    ---
-
-    Basic ideal activity calculation using Raoult's Law with
-    `ActivityIdealMolar`. Good starting point for understanding
-    the activity API.
-
--   __[BAT Model Activity](bat_activity_example.ipynb)__
-
-    ---
-
-    Non-ideal activity using the Binary Activity Thermodynamic (BAT)
-    model with `ActivityNonIdealBinary`. Compares ideal vs. non-ideal
-    activity for organic-water mixtures.
-
--   __[Kappa Parameter Activity](kappa_activity_example.ipynb)__
-
-    ---
-
-    Hygroscopic activity using kappa-Kohler theory with
-    `ActivityKappaParameter`. Demonstrates water activity at
-    different compositions for inorganic aerosols.
-
--   __[Equilibria Partitioning](equilibria_example.ipynb)__
-
-    ---
-
-    Liquid-vapor partitioning using `LiquidVaporPartitioningStrategy`.
-    Shows how activity integrates with equilibria calculations for
-    gas-particle partitioning.
-
-</div>
-
-## Interactive Tutorial
-
-For a comprehensive hands-on introduction, see the interactive Jupyter notebook:
-
-[:octicons-arrow-right-24: Activity Tutorial](activity_tutorial.ipynb)
-
-This tutorial covers:
-
-- What is activity and why it matters for aerosol modeling
-- Ideal activity with Raoult's Law
-- Non-ideal activity with the BAT model
-- Kappa parameter for hygroscopic growth
-- Integration with equilibria calculations
-- Visualization of activity vs. composition
-
-## Related Resources
-
-- **Existing Tutorial**: [Activity Tutorial (Particle Phase)](../particle-properties/activity_tutorial.ipynb) - Covers Strategy, Builder, and Factory patterns
-- **Feature Guide**: [Activity System](../../../guide/processes/activity.md) - Comprehensive feature documentation
-- **Theory**: [Activity Theory](../../../theory/thermodynamics/activity-theory.md) - Mathematical foundations
-
-## Quick Reference
-
-### Available Strategies
-
-| Strategy | Import | Description |
-|----------|--------|-------------|
-| `ActivityIdealMolar` | `par.particles.ActivityIdealMolar` | Raoult's Law (mole fractions) |
-| `ActivityIdealMass` | `par.particles.ActivityIdealMass` | Ideal (mass fractions) |
-| `ActivityKappaParameter` | `par.particles.ActivityKappaParameter` | Kappa-Kohler model |
-| `ActivityNonIdealBinary` | `par.particles.ActivityNonIdealBinary` | BAT non-ideal model |
-
-### Basic Usage Pattern
-
-```python
-import numpy as np
-import particula as par
-
-# 1. Create strategy
-strategy = par.particles.ActivityIdealMolar(
-    molar_mass=np.array([18.015e-3, 200.0e-3]),  # kg/mol
-)
-
-# 2. Define mass concentrations
-mass = np.array([0.5e-9, 0.5e-9])  # kg/m^3
-
-# 3. Compute activity
-activity = strategy.activity(mass_concentration=mass)
-```
+For the same physical model expressed through different construction interfaces,
+use [strategies, builders, and factories](../particle-properties/activity_tutorial.py).
+For the meaning of alpha/beta phase outputs and a broader volatility range,
+continue to [equilibrium examples](../equilibria/index.md). The
+[activity guide](../../../guide/processes/activity.md) and
+[activity theory](../../../theory/thermodynamics/activity-theory.md) provide API
+contracts and mathematical context.

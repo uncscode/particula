@@ -13,28 +13,20 @@
 # ---
 
 # %% [markdown]
-# ## Biomass Burning Aerosol with Cloud Interactions
+# # How do collision models change a water-grown mixed aerosol?
 #
-# Welcome to the **Biomass Burning Aerosol with Cloud Interactions** notebook, your step‑by‑step guide to setting up and running multi‑component aerosol simulations using **Particula**. Even if you’re new to aerosol modeling or cloud microphysics, this notebook will walk you through:
+# A mixed aerosol can change size through water exchange and through collisions.
+# How can we compare collision assumptions without confusing them with different
+# starting populations? This example gives four scenarios copies of the same
+# water-grown, particle-resolved aerosol, then compares their size spectra and
+# one scenario's particle composition.
 #
-# 1. **What This Notebook Is About**
-#    This notebook demonstrates how to set up and run a multi‑component particle resolved aerosol simulation using Particula. The example focuses on biomass burning aerosols, which are a mixture of soot, organics, and water. The simulation will explore how these aerosols behave under cloud conditions, including their activation into cloud droplets and subsequent evolution through condensation and coagulation processes.
-#
-# 2. **Why It Matters**
-#    Biomass burning aerosols (soot + organics + water) play a critical role in cloud formation, climate forcing, and air quality. Understanding how these mixed particles activate into cloud droplets and evolve through condensation and coagulation helps bridge experiments and models.
-#
-# 3. **What You’ll Learn**
-#    - Configuring species properties (molar masses, densities, hygroscopicity)
-#    - Building gas‑phase and particle‑phase objects
-#    - Running isothermal condensation and four coagulation scenarios:
-#      - **Condensation Only**
-#      - **Condensation + Brownian Coagulation**
-#      - **Condensation + Brownian + Sedimentation Coagulation**
-#      - **Condensation + Turbulent DNS Coagulation**
-#    - Visualizing size distributions, number concentrations, and mass fractions
-#    - Comparing saturation ratios across processes
-#
-# > No prior experience with Particula is required—simply follow the markdown cells and code examples to explore how mixed‐phase aerosols behave under cloud‐like conditions.
+# The organics–soot–water mixture is inspired by biomass-burning aerosol, but its
+# properties and concentrations are illustrative. It is not a validated smoke
+# plume or cloud parcel: temperature stays fixed, and there is no spatial flow,
+# chemical aging, or wall removal. Use [resolved coagulation](../processes/coagulation/coagulation_3_particle_resolved_pattern.py)
+# and [condensation](../processes/condensation/condensation_3_massresolved.py)
+# first if the separate process contracts are unfamiliar.
 
 # %%
 # In Colab uncomment the following command to install particula:
@@ -68,48 +60,23 @@ plt.rcParams.update(
 )
 
 # %% [markdown]
-# ## Setup for Biomass‐Burning Organic Aerosol (BBOA) in a Cloud Environment
+# ## Build one mixed population and one finite vapor reservoir
 #
-# In this section we configure a particle‑resolved BBOA simulation under cloud‑like conditions:
+# Sample 10,000 particles in 10⁻⁶ m³, giving 10¹⁰ m⁻³ initially. Independent
+# organic and soot radius samples become masses in the same particle slots;
+# these are not two externally mixed populations. Initial water mass equals
+# organic plus soot mass, so particles already contain 50% water by mass.
 #
-# 1. **Reproducibility**
-#    – Fix the random seed (`np.random.seed(100)`) for consistent sampling across runs.
+# Densities are kg/m³ and molar masses kg/mol. Organic and soot κ values are
+# 0.15 and 0.01; water occupies lane 2 and its own κ entry is unused. The default
+# surface strategy supplies a water-like surface treatment, not a fitted
+# composition-dependent smoke surface model.
 #
-# 2. **Species Properties**
-#    – Molar masses (organics, soot, water)
-#    – Densities (kg m⁻³)
-#    – Hygroscopicity parameters (κ values)
-#
-# 3. **Simulation Parameters**
-#    – `number_of_samples` (particles)
-#    – Simulation volume (`1e‑6 m³`)
-#    – Initial water activity (`1.02`) and temperature (`298.15 K`)
-#
-# 4. **Vapor‑Pressure Strategies**
-#    – Constant builder for organics and soot
-#    – Buck equation for water vapor
-#
-# 5. **Gas‑Phase Composition**
-#    – Build a `GasData` object with condensable vapors and set concentrations
-#    – Store temperature and pressure separately in `EnvironmentData`
-#
-# 6. **Particle Size Distributions**
-#    – Draw lognormal samples for organics and soot modes
-#    – Initialize water mass as the sum of organic and soot masses
-#
-# 7. **Mass Speciation & Parameterization**
-#    – Stack species masses into an (N×3) array
-#    – Define a κ‑Köhler activity strategy and a surface‑volume strategy
-#
-# 8. **Particle‑Resolved Representation**
-#    – Use `create_resolved_particle_data` to combine mass, density, charge (0), and volume
-#
-# 9. **Aerosol Object & Initial Visualization**
-#    – Instantiate `Aerosol(particles, gas, environment)`
-#    – Plot a histogram of log₁₀ particle radii to verify the initial distribution
-#
-# > **Pro tip:** For fast prototyping, begin with `5 000 – 10 000` particles. Once your setup is validated, increase `number_of_samples`, simulation length, or time resolution.
-#
+# The variable named `water_activity` sets the initial **gas saturation ratio**
+# to 1.02 at 298.15 K. It is not a prescribed liquid activity or humidity
+# controller. Gas water can be depleted by condensation. The first histogram
+# counts sampled radii per logarithmic bin; it has not yet been normalized by
+# the represented volume.
 
 # %%
 # Reproducibility
@@ -239,25 +206,19 @@ ax.set_ylabel("Bin counts")
 ax.set_title("Initial Particle Size Distribution")
 
 # %% [markdown]
-# ## Simulation: Isothermal Condensation
+# ## Establish the shared water-grown starting state
 #
-# In this section we run an isothermal condensation on our activated aerosol, track how the size distribution evolves over time, and visualize the result as a contour of number concentration.
+# A 0.01 s spin-up uses 3000 substeps. The subsequent loop records 600 states
+# at nominal times 0–599 s, with eight condensation substeps per one-second
+# advance. Thus the state labeled “Start” below includes the spin-up plus 599 s
+# of evolution; it is not the original dry population.
 #
-# 1. **Define the Condensation Process**
-#    We use `CondensationIsothermal` with specified molar masses, diffusion coefficient, and accommodation coefficient, wrapped by `MassCondensation`.
-#
-# 2. **Pre‑activation Step**
-#    A small “spin‑up” condensation to initialize vapors on the dry aerosol.
-#
-# 3. **Time Loop**
-#    - Divide the total simulation time into equal “sub‑step” chunks.
-#    - At each time step, execute the condensation process and record the particle radii histogram.
-#
-# 4. **Post‑processing & Plotting**
-#    - Convert raw counts to number concentration (# m⁻³).
-#    - Build a 2D mesh of time vs. radius and plot `log10` of concentration on a log‑radius axis.
-#
-# > **Pro tip:** If the water saturation ratio is much lower than 1, in a cloud environment, the time step may be too large. Consider reducing the time step to ensure accurate results.
+# The contour divides histogram counts by represented volume, giving number
+# concentration per radius bin in m⁻³. It shows size redistribution, not dN/dr.
+# The final species-inventory comparison includes both gas and weighted particle
+# mass at rtol=10⁻¹² and atol=10⁻³⁰ kg. Conservation does not by itself establish
+# timestep convergence, equilibration, or a physically calibrated activation
+# threshold. A low final saturation ratio alone cannot diagnose numerical error.
 
 # %%
 # Condensation process setup
@@ -337,22 +298,22 @@ plt.tight_layout()
 plt.show()
 
 # %% [markdown]
-# ## Four Coagulation + Condensation Scenarios
+# ## Change the collision model while retaining condensation
 #
-# We apply each coagulation strategy in sequence with isothermal condensation to see how different particle interactions impact the final water saturation ratio:
+# Each branch starts from a copy of the same shared state and advances a further
+# 3600 s in 10,000 substeps (0.36 s each). The branches are condensation alone,
+# Brownian plus condensation, combined Brownian/sedimentation plus condensation,
+# and a turbulent-DNS-kernel model plus condensation.
 #
-# 1. **Condensation Only**
-#    No coagulation—particles grow only by condensation.
+# The DNS branch does not add the separate Brownian or sedimentation strategies.
+# It uses Reynolds lambda 72 and dissipation 1000 cm²/s³ (0.1 m²/s³), with zero
+# imposed relative velocity. This selects a collision parameterization; it does
+# not run a direct numerical flow simulation. Sedimentation here causes
+# collisions through differential settling, not removal from the box.
 #
-# 2. **Brownian Coagulation**
-#    Particle‐resolved Brownian collisions followed by condensation.
-#
-# 3. **Brownian + Sedimentation Coagulation**
-#    Combines Brownian motion and gravitational settling before condensation.
-#
-# 4. **Turbulent DNS Coagulation**
-#    Uses the DNS turbulent collision kernel before condensation. This branch does not add the separate Brownian strategy.
-#
+# The assertions test finite nonnegative masses and closed material inventories
+# for each branch. Differences between one stochastic realization of each branch
+# are not an ensemble estimate of a kernel's effect.
 
 # %%
 # Define coagulation strategies
@@ -425,24 +386,16 @@ for name, seq in [
     print("\n")
 
 # %% [markdown]
-# ## Processing Distributions and Final Graphs
+# ## Convert counts into a comparable diameter spectrum
 #
-# Before plotting, we convert each aerosol object into a `dN/dlogDp` distribution:
+# Exclude empty slots, double radius to obtain wet diameter, and bin particles
+# between 0.01 and 100 µm. Divide counts by sample volume in cm³ and convert the
+# bin totals into dN/dlogDp. This coordinate differs from the initial count
+# histogram and the radius-bin contour, so compare integrated number with the
+# appropriate measure rather than comparing raw vertical magnitudes.
 #
-# 1. **Define histogram bins**
-#    Create `num_bins+1` logarithmically spaced diameter edges from 0.01 to 100 µm.
-#
-# 2. **Utility functions**
-#    - `get_wet_diameters(aero_obj)`:
-#      Extract nonzero wet diameters (µm) from an aerosol’s radius array.
-#    - `compute_dndlogdp(diameters, volume_m3)`:
-#      - Bin diameters → raw counts
-#      - Convert counts to number concentration (# / cm³)
-#      - Convert to dN/dlogDp using Particula’s distribution strategy
-#
-# 3. **Assemble distributions**
-#    Loop over the “Initial,” “Start,” and each coagulation scenario to populate a `distributions` dict mapping label → `(diameter_centers, dN/dlogDp)`.
-#
+# “Initial” means the original wet seeds; “Start” means the shared result of the
+# condensation preparation. The four final curves add one hour to that state.
 
 # %%
 num_bins = 140
@@ -483,21 +436,17 @@ for label, aero_obj in cases:
     distributions[label] = (centers, dnd)
 
 # %% [markdown]
-# ### Graph Size Distribution Comparison
+# ## Read the scenario overlay as a controlled model comparison
 #
-# In this section we plot the wet‑diameter distributions for each scenario on a single log–log axis:
+# The overlay uses the same binning and units for every scenario. Empty bins are
+# hidden on logarithmic axes. Condensation moves sizes by exchanging vapor;
+# coagulation reduces occupied particle count by merging material. A peak height
+# alone does not measure total number or establish which process is dominant.
 #
-# 1. **Extract and clean each distribution**
-#    - Retrieve `(centers, dN/dlogDp)` for “Initial”, “Start”, “CondensationOnly”, “Brownian”, “Brownian+Sed”, and “TurbulentDNS”.
-#    - Replace zeros with `NaN` so they don’t appear as flat lines on the log scale.
-#
-# 2. **Plot each case**
-#    - **Initial**: thick, semi‑transparent slate line
-#    - **Activated start**: very thick sky‑blue line
-#    - **Condensation Only**: medium-thick sky‑blue line
-#    - **Brownian Only**: dashed light-slate line
-#    - **with Sedimentation**: rose‑colored circles
-#    - **with turbulentDNS**: amber solid line
+# The plot label “Brownian Only” identifies its **collision kernel only**;
+# condensation also runs in that branch. Likewise, “with Sedimentation” combines
+# Brownian and sedimentation kernels, while “with turbulentDNS” uses the DNS
+# kernel without the separate Brownian strategy.
 
 # %%
 # 1. Create figure & axes
@@ -600,38 +549,28 @@ plt.tight_layout()
 plt.show()
 
 # %% [markdown]
-# #### Interpretation of Final Size Distributions
+# ## Keep the comparison's evidence boundary in view
 #
-# The initial particles already contain water. The activated state follows
-# the shared condensation spin-up; all four scenarios begin from its copy.
-# Condensation redistributes water between vapor and particles. Coagulation
-# merges particles and reduces their number while conserving material.
-# Sedimentation here is a collision mechanism, not removal to chamber walls.
-# The DNS branch uses its turbulent kernel alone; it does not compose a
-# separate Brownian or sedimentation kernel. Compare the saved curves for
-# this sampled case rather than treating their peak positions as universal.
-#
+# All branches share their initial material inventory and retain the same
+# condensation model. Their differing spectra therefore motivate a collision-model
+# sensitivity study under these inputs. The plots and conservation checks do not
+# establish a universal ordering of peak sizes or validate any kernel against a
+# measured cloud. Repeated random seeds and temporal convergence are separate
+# requirements for a quantitative comparison.
 
 # %% [markdown]
-# ### Graph Organic Mass Fraction vs. Wet Diameter
+# ## Relate wet size to dry composition
 #
-# Here we compare each particle’s organic mass fraction before and after the turbulent DNS coagulation:
+# The scatter plot compares the original wet seeds with the final DNS-branch
+# particles. Its horizontal coordinate is wet diameter, while its vertical
+# coordinate is the **dry** organic fraction: organic mass divided by organic
+# plus soot mass. Water is excluded from that denominator only in copied arrays;
+# the simulation state remains unchanged.
 #
-# 1. **Extract species masses**
-#    - Get the final species‐mass array from the “TurbulentDNS” result and the initial aerosol.
-#    - Zero out the water column so fractions are computed from organics + soot only.
-#
-# 2. **Compute per‑particle organic fraction**
-#    - f_org = m_organics ∕ (m_organics + m_soot)
-#    - Apply a mask to exclude any zero‑radius particles.
-#
-# 1. **Convert to wet diameters**
-#    Use `get_wet_diameters(...)` to obtain each particle’s diameter in µm.
-#
-# 2. **Scatter plot**
-#    - **After DNS** (amber, semi‑transparent): shows how turbulence‐enhanced coagulation shifts organic fraction across sizes.
-#    - **Initial** (slate, very faint): baseline before any coagulation.
-#
+# The comparison includes both the shared condensation preparation and the later
+# DNS-plus-condensation stage. It is not a before/after test of turbulence alone.
+# A particle can shift horizontally by taking up water without changing its dry
+# organic fraction.
 
 # %%
 #  1. Retrieve and prepare mass arrays
@@ -684,34 +623,25 @@ plt.tight_layout()
 plt.show()
 
 # %% [markdown]
-# #### Impact of Turbulent DNS on Size–Composition Space
+# ## Avoid inferring a composition mechanism from size alone
 #
-# This scatter plot shows each particle’s organic mass fraction versus wet diameter **before** (brown) and **after** (blue) applying the Turbulent DNS coagulation sequence.
-#
-# **What this tells us:**
-# Turbulence‑enhanced coagulation preferentially drives mixed droplets to collide and merge into a narrower, organic‑rich population, while leaving a distinct soot‑rich mode of small particles. In other words, turbulent DNS “sorts” particles by both size and composition. The largest mixed droplets then concentrate organics into a tighter size band.
-#
+# Merging particles can mix their dry fractions, while condensation changes wet
+# size. A narrower band in the final scatter could reflect those effects and the
+# sampled population. This plot alone does not demonstrate that turbulence
+# selects organic-rich particles or leaves a distinct soot-rich mode. That claim
+# would require a matched control and a quantified composition diagnostic.
 
 # %% [markdown]
-# ## Take‑Home Messages
+# ## Turn the overlays into a research comparison
 #
-# - **End‑to‑End Workflow:**
-#   We walked through a complete Particula pipeline—from defining species properties and gas/particle builders, to running time‑resolved condensation and four coagulation scenarios—culminating in clear visualizations of size distributions and mass fractions.
+# The example connects a common water-grown population to several collision
+# assumptions and shows why both size and composition diagnostics are useful.
+# A conserved material inventory supports interpretation of transfers, but does
+# not choose the most accurate cloud model.
 #
-# - **Key Insights:**
-#   - **Condensation Only** produces the highest droplet peaks, since no particles are lost to collisions.
-#   - **Brownian Coagulation** alone has a minimal smoothing effect on the bimodal droplet distribution.
-#   - **Sedimentation** preferentially coagulates larger droplets, with smaller. On this time scale and droplet size the effect is similar to Turbulent DNS.
-#   - **Turbulent DNS** Broadens the size spectrum and grows large‐diameter droplets, illustrating the combined importance of Brownian, gravitational, and turbulent collisions.
-#
-# - **Particle‐Resolved Mass Analysis:**
-#   By plotting per‑particle organic mass fraction vs. wet diameter, we saw how turbulent coagulation alters composition across size bins—an approach you can adapt to other species or processes.
-#
-# - **Extensibility:**
-#   This modular, object‑oriented approach can be extended to:
-#   - Other dynamic processes (e.g., activation kinetics, heterogeneous chemistry)
-#   - Different aerosol types and multicomponent mixtures
-#   - Automated code lookup and suggestion via an LLM‑backed vector store
-#
-# > **Bottom Line:** Particula makes it straightforward to prototype complex aerosol–cloud interactions, compare physical mechanisms quantitatively, and extract particle‐resolved insights—all within a few hundred lines of Python.
-#
+# For a next study, compare every branch with the same post-preparation state,
+# repeat independent seeds, and report total number, wet-size quantiles, and dry
+# organic-fraction distributions. Vary turbulent dissipation while holding other
+# inputs fixed, then test timestep and sampling convergence. Measured size and
+# composition data would be needed to attribute a real smoke–cloud response to
+# one collision mechanism.

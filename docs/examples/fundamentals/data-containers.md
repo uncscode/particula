@@ -1,8 +1,10 @@
 # Data Containers
 
-This guide explains the shipped `ParticleData` and `GasData` container
-schemas, their single-box shapes, and the optional Warp CPU-backend transfer
-helpers.
+What must remain meaningful when an aerosol state moves between storage
+backends? Shape alone is insufficient: represented counts, physical volume,
+material ordering, and species identity determine the scientific interpretation.
+This page supports the [runnable container example](data_containers.py), helping
+you choose between CPU construction and explicit Warp transfers.
 
 Run the published entrypoint from the repository root:
 
@@ -55,6 +57,19 @@ CPU coagulation fallback. The example is a direct-kernel path, not a Runnable
 API.
 
 - [Feature guide: Data Containers and GPU Foundations](../../guide/data-model/index.md)
-- [Runnable entrypoint source on GitHub](https://github.com/Gorkowski/particula/blob/main/docs/examples/fundamentals/data_containers.py)
-- [Direct GPU kernels quick-start source on GitHub](https://github.com/Gorkowski/particula/blob/main/docs/examples/gpu/direct/gpu_direct_kernels_quick_start.py)
-- [Direct GPU coagulation source](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/direct/gpu_coagulation_direct.py)
+- [Container construction and transfer example](data_containers.py)
+- [Direct kernel quick start](../gpu/direct/gpu_direct_kernels_quick_start.py)
+- [Direct coagulation example](../gpu/direct/gpu_coagulation_direct.py)
+
+## Check the meaning of a round trip
+
+The published container example prints shapes and preserves explicit metadata
+in its transfer construction. A successful transfer is not a simulation result
+or a numerical parity study. For your own population, compare each transferred
+field and its count-weighted material inventory, and retain the gas-species names
+used by the caller. Shapes can agree even when species order is wrong.
+
+Once storage semantics are clear, the [state-access example](native_state_access.py)
+shows how live arrays and detached copies affect a control calculation. That
+connection matters when comparing two physical scenarios: a shared mutable
+container can change the nominal reference along with the experiment.

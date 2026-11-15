@@ -13,36 +13,21 @@
 # ---
 
 # %% [markdown]
-# # Spherical Wall Loss Strategy Tutorial
+# # Separate size-selective removal from particle growth
 #
-# This notebook demonstrates how to use the strategy-based wall loss API in
-# **particula**, focusing on `WallLossStrategy` and
-# `SphericalWallLossStrategy`.
-#
-# You will:
-#
-# - Build a simple radius-based particle distribution using
-# `create_lognormal_binned_particle_data`.
-# - Configure `SphericalWallLossStrategy` for a spherical chamber.
-# - Integrate wall loss over time and visualize concentration decay.
-# - See how wall loss strategies can plug into other dynamics components.
-#
-# For a full chamber forward simulation including dilution and coagulation,
-# see the separate `chamber_forward_simulation.ipynb` example in this folder.
+# Can a size distribution change even when no surviving particle changes size?
+# Wall loss removes different radii at different rates. This example follows
+# that effect in a spherical chamber, plotting both total-number decay and the
+# remaining spectrum. The distinction matters when interpreting chamber data
+# that might otherwise be attributed to condensation or coagulation.
 
 # %% [markdown]
-# ## Prerequisites
+# ## Prepare the reference calculation
 #
-# Before running this notebook, ensure you have:
-#
-# - Python 3.12+
-# - `particula` installed (via pip or conda)
-#
-# In Google Colab you can install particula with:
-#
-# ```bash
-# Install from the repository root: `python -m pip install -e ".[extra]"`
-# ```
+# Use Python 3.12 or newer, Particula, NumPy, and Matplotlib. Begin with
+# [distribution measures](../../fundamentals/particles/aerosol_distributions.py)
+# if a bin total and a density per radius are unfamiliar. The
+# [combined chamber example](chamber_forward_simulation.py) adds other mechanisms.
 
 # %%
 # If running in Colab, uncomment the next line to install particula:
@@ -53,10 +38,13 @@ import particula as par
 from matplotlib import pyplot as plt
 
 # %% [markdown]
-# ## 1. Build a lognormal particle distribution
+# ## Specify the initial population
 #
-# We use `create_lognormal_binned_particle_data` to create a `ParticleData`
-# with radius bins, number concentration, and default physical properties.
+# The preset uses 250 radius nodes from 1 nm–100 µm, lognormal radius
+# scales 100 nm and 1 µm, geometric standard deviations 1.2 and 1.4, and modal
+# number densities 10¹⁰ and 10⁹ m⁻³. Density is 1000 kg m⁻³. These are demonstration
+# inputs, not a chamber measurement. Bin concentrations are in m⁻³ and sum to
+# total number density.
 
 # %%
 # Build a simple radius-based particle distribution (discrete bins)
@@ -72,11 +60,12 @@ print(
 )
 
 # %% [markdown]
-# ## 2. Configure the spherical wall loss strategy
+# ## Translate geometry into a loss law
 #
-# We now create a `SphericalWallLossStrategy` instance. This strategy
-# computes a size-dependent wall loss coefficient and applies a first-order
-# loss to the particle concentration.
+# The sphere has radius 0.5 m and wall eddy parameter 10⁻³ s⁻¹, at fixed
+# 298.15 K and 101325 Pa. The strategy computes size-dependent first-order loss
+# coefficients. Its rate includes current bin abundance, so the printed first-bin
+# rate is not representative of the entire population.
 
 # %%
 # Configure spherical wall loss strategy
@@ -99,10 +88,16 @@ print("Rate array shape:", rate.shape)
 print("Example rate[0]:", float(rate.ravel()[0]))
 
 # %% [markdown]
-# ## 3. Integrate wall loss over time
+# ## Follow 100 minutes, with an explicit discrete reference
 #
-# Next, we integrate wall loss for one hour using a fixed time step and
-# track the total number concentration as a function of time.
+# The run lasts 6000 s (100 minutes) with 1 s output intervals. Internal substeps
+# bound the largest coefficient-times-step product by 0.9; the saved run uses two.
+# This prevents negative concentrations but does not guarantee a desired accuracy.
+#
+# Fixed radii make repeated Euler decay an independent expression for the expected
+# update. The assertion compares with that expression, checks nonnegative counts,
+# and requires unchanged individual masses. The continuous exponential solution
+# would supply a separate timestep-error comparison.
 
 # %%
 # Time integration setup
@@ -164,10 +159,12 @@ print(
 )
 
 # %% [markdown]
-# ### Plot normalized concentration decay
+# ## Read normalized total abundance
 #
-# We now plot the normalized total number concentration to visualize how
-# quickly particles are removed by wall loss.
+# The first figure divides the summed number density by its initial value. It
+# shows the fraction remaining in the modeled airborne population, not the
+# fraction of material evaporated. A mixture of size-dependent loss rates need
+# not produce a single exponential total.
 
 # %%
 fig, ax = plt.subplots(figsize=(6, 4))
@@ -183,10 +180,12 @@ plt.tight_layout()
 plt.show()
 
 # %% [markdown]
-# ### Compare initial and final size distributions
+# ## Locate the sizes that were preferentially removed
 #
-# Because wall loss is size-dependent, different radii experience different
-# loss rates. Here we compare the initial and final size distributions.
+# The second figure retains concentrations in m⁻³ per bin rather than normalizing
+# each spectrum. A change in relative mode heights reflects selective removal;
+# it is not evidence that particles moved between bins. The initial distribution
+# is rebuilt from the same deterministic preset for comparison.
 
 # %%
 # Rebuild the initial distribution for comparison
@@ -218,15 +217,13 @@ plt.tight_layout()
 plt.show()
 
 # %% [markdown]
-# ## 4. Composing wall loss with other dynamics
+# ## Distinguish a repeated-call sketch from coupled physics
 #
-# Wall loss strategies follow the same `rate` / `step` pattern as other
-# dynamics components (for example, condensation strategies). This makes it
-# easy to combine wall loss with other processes in a single time loop.
-#
-# The sketch below shows how you might apply wall loss repeatedly. For a
-# complete example that combines condensation with wall loss, see the
-# condensation tutorials in `docs/examples/Dynamics/`.
+# The short loop below rebuilds the initial distribution and repeats wall loss
+# for ten 1 s intervals. Despite its legacy comment about condensation, it calls
+# no condensation process. For an actual coupled comparison, use the
+# [wall-loss composition example](wall_loss_tutorial.py), where the growth and
+# reservoir assumptions are explicit.
 
 # %% tags=["example"]
 # Pseudo-code: combine condensation and wall loss
@@ -256,17 +253,15 @@ for _ in range(10):
         )
 
 # %% [markdown]
-# ## Summary
+# ## Carry the interpretation into an experiment
 #
-# In this notebook you:
+# The saved 100-minute trajectory ends at 1.009×10¹⁰ m⁻³ from 1.100×10¹⁰ m⁻³.
+# It demonstrates a changing spectrum through removal alone, with no individual
+# mass change. Matching the discrete decay formula checks implementation of this
+# update; it does not calibrate the wall-loss model.
 #
-# - Built a lognormal radius-based particle distribution using
-# `create_lognormal_binned_particle_data`.
-# - Configured `SphericalWallLossStrategy` and computed wall loss rates.
-# - Integrated wall loss over time and visualized concentration decay.
-# - Saw how wall loss strategies can be composed with other dynamics
-# processes in a shared simulation loop.
-#
-# For more background on dynamics and wall loss, see the main documentation
-# index (Dynamics and wall loss section) and the chamber wall loss examples
-# in `docs/examples/Chamber_Wall_Loss`.
+# A research extension is to infer size-dependent survival from repeated chamber
+# measurements and compare it with the modeled coefficients. First test timestep
+# refinement, then account for [dilution](../dilution/cpu_dilution.py) and possible
+# [coagulation](../coagulation/coagulation_5_time_evolution.py). Those mechanisms
+# can lower number for different reasons and should be separated by their budgets.

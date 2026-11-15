@@ -13,19 +13,27 @@
 # ---
 
 # %% [markdown]
-# # Wall Loss Tutorial: Spherical vs Rectangular Chambers
+# # Compare chamber geometry and competing particle processes
 #
-# Learn how to configure wall loss strategies, compare chamber geometries,
-# and chain wall loss with coagulation and condensation. All examples run
-# quickly (≤30 s) with small grids and reuse helper functions to avoid
-# recomputing simulations.
+# Does a change in particle lifetime come from chamber geometry, or from a process
+# that changes the particles before they reach a wall? This example progresses
+# from wall loss alone to coagulation plus wall loss, then a separate growth-and-loss
+# calculation. It teaches how to read those comparisons without treating every
+# curve as a controlled test of the same factor.
 
 # %% [markdown]
-# ## Setup
-# - Uses particula public APIs from `par.dynamics` re-exports.
-# - Time grid: 0–30 min with 30 s spacing (61 points).
-# - Distribution: preset discrete radius bins (small and fast).
-# - Plots: minutes on x-axis; log-scale concentrations.
+# ## Match the population before changing a mechanism
+#
+# The shared setup uses 150 radius nodes over 10 nm–10 µm, lognormal radius scales
+# 100 nm and 1 µm, geometric standard deviations 1.2 and 1.4, and modal abundances
+# 10¹⁰ and 10⁹ m⁻³. Density is 1000 kg m⁻³ at 298.15 K and 101325 Pa.
+# The broad preset tails are deliberately excluded here; this is a finite-grid
+# calculation, not a grid-convergence result.
+#
+# `build_aerosol` makes a fresh state for each case. `run_wall_loss` records 61
+# snapshots over 30 minutes. `safe_substeps` bounds the explicit loss update using
+# current sizes, while `plot_decay` normalizes total number by its initial value.
+# That positivity bound is not an error estimate for the full coupled sequence.
 
 # %%
 import numpy as np
@@ -115,9 +123,12 @@ print(
 )
 
 # %% [markdown]
-# ## Basic spherical wall loss
-# Spherical chamber with modest eddy diffusivity and radius. Uses two
-# substeps to satisfy the native nonnegative Euler update requirement.
+# ## Establish the spherical baseline
+#
+# The chamber radius is 0.5 m and wall eddy parameter 10⁻³ s⁻¹. The requested two
+# substeps per 30 s interval are increased if the loss coefficient requires more.
+# The saved endpoint is 1.061×10¹⁰ m⁻³ from 1.100×10¹⁰ m⁻³. The first curve shows
+# fractional number remaining; no particle growth or collision process is active.
 
 # %%
 spherical_strategy = par.dynamics.SphericalWallLossStrategy(
@@ -137,9 +148,13 @@ _ = plot_decay(
 )
 
 # %% [markdown]
-# ## Geometry comparison: spherical vs rectangular
-# Equal-volume comparison: a 0.5 m radius sphere (~0.52 m^3) vs a rectangular
-# chamber with dimensions (1.0, 0.72, 0.72) m.
+# ## Compare nearly equal chamber volumes
+#
+# The 0.5 m radius sphere has volume about 0.5236 m³; the 1.0 × 0.72 × 0.72 m
+# rectangle has volume 0.5184 m³. They are close, not exactly equal. The initial
+# population and wall eddy parameter match, so the overlay illustrates the
+# geometry dependence of these models with that small volume difference retained.
+# It does not isolate surface area, orientation, or model-form uncertainty.
 
 # %%
 rectangular_strategy = par.dynamics.RectangularWallLossStrategy(
@@ -156,9 +171,16 @@ fig_cmp, _ = plot_decay(
 fig_cmp.axes[0].set_title("Geometry comparison")
 
 # %% [markdown]
-# ## Advanced chaining: coagulation + wall loss
-# Demonstrates runnable composition with the `|` operator. Uses the same time
-#     grid and small bin counts to keep runtime low.
+# ## Add collisions to an otherwise matched loss calculation
+#
+# Fresh populations are advanced with wall loss alone and with Brownian coagulation
+# followed by wall loss. Coagulation changes number and redistributes sizes; wall
+# loss then acts on that evolving spectrum. Compare the two curves to see the
+# combined effect, but do not interpret their difference as the count of particles
+# that coagulated: changing size also changes subsequent wall removal.
+#
+# The sequence uses `|` composition and a shared physical interval. Grid refinement,
+# process ordering, and substep sensitivity are not tested by this overlay.
 
 # %%
 coag_strategy = par.dynamics.BrownianCoagulationStrategy(
@@ -203,10 +225,18 @@ _ = plot_decay(
 )
 
 # %% [markdown]
-# ### Concise condensation + wall loss snippet
-# Shows a lightweight condensation strategy chained with wall loss over a
-# short window (10 min). Parameters are intentionally small to keep runtime
-# modest; this is a fixed gas reservoir, not a closed mass budget.
+# ## Keep the growth example's reservoir assumption visible
+#
+# This separate ten-minute case uses a maintained illustrative organic gas
+# concentration of 10⁻⁸ kg m⁻³, constant vapor pressure 10⁻⁵ Pa, and molar mass
+# 0.12 kg mol⁻¹ for the mapped species. These are demonstration properties,
+# not a calibrated organic compound. `update_gases=False` means particle uptake
+# is supplied by an external reservoir.
+#
+# Condensation is applied before spherical wall loss. The plotted diagnostic is
+# total particle number, so it does not directly measure condensed mass. This
+# panel has a different duration and gas setup from the earlier comparisons;
+# it does not establish how much growth alone changes lifetime.
 
 # %%
 short_time = np.linspace(0.0, 600.0, 21)  # 10 min, 30 s spacing
@@ -253,9 +283,12 @@ _ = plot_decay(
 )
 
 # %% [markdown]
-# ## Assertions and sanity checks
-# Quick guards to keep the notebook honest during headless execution.
-
+# ## Check valid inputs and admissible output
+#
+# The final checks reject invalid chamber dimensions and require nonnegative
+# number histories. They do not test closed-system mass conservation, which would
+# be inappropriate for deposition and the maintained vapor reservoir, nor do they
+# establish numerical convergence.
 
 # %%
 # Geometry parameter validation
@@ -289,8 +322,15 @@ for name, series in [
 print("Assertions passed: parameter guards and non-negativity checks.")
 
 # %% [markdown]
-# ## Summary
-# - Built reusable helpers to construct aerosols and run wall loss quickly.
-# - Compared spherical vs rectangular chambers over a shared time grid.
-# - Demonstrated chaining with coagulation and a concise condensation variant.
-# - Added inline assertions for invalid geometry and non-negative concentrations.
+# ## Design the next comparison around one question
+#
+# These cases show how geometry and coupled dynamics enter a chamber model.
+# To ask whether growth changes deposition significantly, run growth-plus-wall-loss
+# and wall-loss-only cases with identical initial states, gas assumptions, duration,
+# and output diagnostics. Compare size-resolved survival and material removed,
+# then refine timestep and process ordering.
+#
+# For interpreting an observed decay, use the
+# [functional chamber calculation](chamber_forward_simulation.py) to inspect
+# individual rate contributions. Rate plots can suggest hypotheses; matched
+# process-removal experiments and measurements are needed to test them.
