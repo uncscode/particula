@@ -151,3 +151,14 @@ entries, discrete/resolved/PDF reductions and single/multiple layers.
   changing input values and invalid-result observation. Ruff/mypy pass.
   Bulk-only streaming execution and convenience admission for reduction kernels
   remain pending, as do examples, documentation and full qualification.
+- Added public `prepare_population_mie` streaming bulk workspaces. Particle
+  chunks share coefficient/angular scratch and accumulate population optical
+  coefficients, scattering-weighted g and differential Mueller matrices.
+  No full-population particle optical arrays are retained. Preparation and
+  observation retain the explicit device/stream contract. Tail chunks, repeated
+  reuse, zero weights, changing inputs and per-group failure isolation are
+  tested against CPU particle reductions. A Warp literal precision discrepancy
+  was fixed using a typed double constant without weakening tolerances.
+  Complete current optics suite: 190 passed on Warp CPU and native RTX 5060;
+  Ruff and mypy pass. Examples, documentation, further API/failure audit,
+  independent large-x angular checks and performance qualification remain.
