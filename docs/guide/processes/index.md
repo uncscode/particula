@@ -276,6 +276,60 @@ Failed and zero-duration substeps do not advance caller-owned streams.
 Single-box calls without a context retain existing strategy seed configuration.
 There is no implied equivalence to resident GPU RNG or checkpoint state.
 
+## Custom Python processes
+
+Use `BoxProcess` for a reusable class or `FunctionProcess` for a Python
+function. Both compose with native processes through `|`. Declare the arrays
+that the process reads and writes. Implement `validate(aerosol)` for required
+species, representation and parameter checks, and
+`advance(aerosol, *, time, time_step, context)` for one box. Both callbacks
+return `None`.
+
+```python
+from particula import FunctionProcess
+
+
+def warm_box(aerosol, *, time, time_step, context):
+    # Temperature is K, time and time_step are seconds.
+    aerosol.environment.temperature[:] += 0.01 * time_step
+
+
+warming = FunctionProcess(
+    warm_box,
+    name="experiment.warming",
+    reads=("environment.temperature",),
+    writes=("environment.temperature",),
+)
+warming.execute(aerosol, time_step=10.0, time=120.0)
+```
+
+Callbacks receive normal native containers with their leading box axis kept.
+They may execute arbitrary Python or call another scientific library. Particula
+stages the entire batch and publishes declared values only after every box
+succeeds. Invalid values, undeclared writes, species changes, replaced arrays
+or containers, and changed shapes reject. Earlier completed processes and
+substeps remain committed. External side effects and hidden mutable callback
+state are outside this rollback boundary. The custom process owns scientific
+source, sink and conservation accounting.
+
+`time` is the start of the complete call. Each substep advances it by
+`time_step / sub_steps`; all processes in one cycle receive the same interval.
+Supply the next start time on repeated calls. A zero duration validates but
+does not invoke advancement. Legacy overrides keep their own semantics.
+
+For stochastic callbacks, set `stochastic=True`, pass a `CPUExecutionContext`,
+and use `context.rng` inside the callback. `context.box_id` identifies the
+logical box. Random draws commit with successful numeric publication; failed
+substeps consume no caller-owned stream state. Use distinct process instance
+names within a sequence. Continuation state should live in managed state rather
+than mutable closures.
+
+Writable native destinations are particle masses, concentrations, charge and
+valid volume; gas concentrations; and environment temperature and pressure.
+Shared material/species metadata is read-only. The public interface does not
+make arbitrary Python functions GPU kernels; explicit GPU translation is a
+separate capability.
+
 Custom runnables that override `execute` or `rate` retain their own semantics.
 To adopt batching, implement the single-box hooks and declare writer fields;
 custom code owns any additional mutable state and publication behavior.

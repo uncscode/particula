@@ -52,6 +52,7 @@ from particula.execution import (
     UnsupportedProcessError,
 )
 from particula.runnable import RunnableSequence
+from particula.box_process import BoxProcess, FunctionProcess, BoxContext
 
 from particula.logger_setup import setup
 
