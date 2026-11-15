@@ -164,12 +164,16 @@ class PreparedSimulation:
         )
         from particula.execution.prepared_cohort import wrap_cohort_operations
         from particula.execution.prepared_diagnostics import setup_diagnostics
+        from particula.execution.prepared_particle_fields import (
+            wrap_particle_fields,
+        )
         from particula.execution.prepared_processes import _compile_process
         from particula.execution.prepared_updates import compose_operations
 
         with self._scope():
             self._plans = plans
             operations = tuple(_compile_process(plan, self) for plan in plans)
+            operations = wrap_particle_fields(self, plans, operations)
             operations = wrap_cohort_operations(self, plans, operations)
             composed = compose_operations(self, plans, operations)
             self._operations = tuple(
@@ -326,7 +330,8 @@ class PreparedSimulation:
                             "and a supported model environment"
                         ),
                         8: "ion attachment rate is unsupported",
-                        90: "custom GPU process produced invalid field values",
+                        90: "GPU process produced invalid field values",
+                        91: "GPU particle-field event contract violated",
                     }
                     if failure in messages:
                         raise ValueError(messages[failure])
@@ -642,10 +647,6 @@ def prepare_simulation(
     from particula import _cpu_batch
 
     _cpu_batch.validate(aerosol)
-    if aerosol.fields.particle_names():
-        raise ValueError(
-            "GPU particle field population events are not yet bound"
-        )
     if not processes:
         raise ValueError("prepared execution requires at least one process")
     from particula.execution.prepared_extensions import plan_extension
@@ -659,10 +660,14 @@ def prepare_simulation(
         else _plan_process(process, aerosol)
         for process in processes
     )
+    from particula.execution.prepared_particle_fields import (
+        validate_particle_fields,
+    )
     from particula.execution.prepared_updates import (
         validate_extension_freshness,
     )
 
+    validate_particle_fields(aerosol, plans)
     validate_extension_freshness(plans)
     validate_cohort_plans(plans)
     validate_ion_plans(plans)

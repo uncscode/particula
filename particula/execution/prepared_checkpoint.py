@@ -156,10 +156,14 @@ def _preflight(processes, saved, backend, device, process_registry=None):
         else _plan_process(p, host)
         for p in processes
     )
+    from particula.execution.prepared_particle_fields import (
+        validate_particle_fields,
+    )
     from particula.execution.prepared_updates import (
         validate_extension_freshness,
     )
 
+    validate_particle_fields(host, plans)
     validate_extension_freshness(plans)
     validate_cohort_plans(plans)
     validate_ion_plans(plans)

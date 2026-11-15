@@ -276,3 +276,20 @@ narrow passing suite. Leave merge, version bump and release outside this goal.
   missing RNG rejection before upload, and zero-duration preservation. Ruff and
   targeted mypy pass. Native GPU particle-field events and final deliverables
   remain pending.
+
+- Native GPU particle fields now follow compacted applied collision pairs, actual
+  source slot selections, and sparse overlaps recorded by the native resampling
+  sweep. Additive source/removal ledgers, passive integer births/retirement and
+  active-only field bounds run in retained device operations. Custom writers
+  cannot change slot activity; undefined passive mergers/resampling, volume
+  scaling and unbound ion events reject before upload, including restart.
+- Particle-event qualification: 119 tests passed with one intentional Warp-CPU
+  capture skip across particle fields, native exhaustion and prepared restart.
+  Expanded field suite passed 28 tests on Warp CPU and real CUDA, including
+  exact interval-remap values, nonzero collisions, separate scalar/vector
+  inventories, passive int32/int64 births, failure suppression, inert capture,
+  allocation/readback-free steps and byte-exact field/ledger restart. Targeted
+  Ruff and mypy passed. Typed built-in contexts, maintained examples, broader
+  qualification and the PR remain outstanding.
+- Combined affected extension/prepared/exhaustion regression completed with
+  285 passed and five skips; real CUDA particle-event/capture tests passed.
