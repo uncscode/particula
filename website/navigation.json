@@ -234,6 +234,10 @@
             ]
           }
         ]
+      },
+      {
+        "label": "Optical calculations",
+        "slug": "guide/optics"
       }
     ]
   },
@@ -688,6 +692,10 @@
             "slug": "examples/simulations/soot_formation_in_flames"
           }
         ]
+      },
+      {
+        "label": "Sphere optics",
+        "slug": "examples/optics/sphere_optics"
       }
     ]
   },

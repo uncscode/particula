@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 3.8477394689107314,
+  "package_source_sha256": "c8141ca8ddae25d5a2987d44178c80a05fe0817b714350d8246666d5614ca6d1",
+  "input_sha256": {},
+  "example": "sphere-optics",
+  "fingerprint": "5b0ee829ca9112a881dcfad86797adc4db096ecdd25b2a98a85d0590dda7a403",
+  "source": "docs/examples/optics/sphere_optics.py",
+  "revision": "d684d53c3f84057441b1ca5c46c460481717dc92",
+  "package_dirty": false,
+  "executed_at": "2026-11-15T15:17:57.134010+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [
+      {
+        "text": "Cloud extinction: 0.0535973 m\u207b\u00b9\nSingle-scattering albedo: 0.99999775\nScattering-weighted g: 0.865576\n"
+      },
+      {
+        "image": "figure-4-1.png"
+      },
+      {
+        "image": "figure-4-2.png"
+      },
+      {
+        "image": "figure-4-3.png"
+      }
+    ]
+  ],
+  "files": {
+    "figure-4-3.png": "9b4e81b917baa8ce662a0d0658f0d4619872557f0c9b1ecb27b04a1e6b265eab",
+    "figure-4-2.png": "6d67323157bf84fe0abed573fe77e0369c0c917f6c8c5d3df1ae748a4e612acc",
+    "figure-4-1.png": "a27f0ba6b78f4dc34ab6f38fee54d0c6172334bd4caf4c727272936e73167dc9",
+    "data.json": "a36890a259bda6bc6df975d6f9c30cf2afecdf24e98560d7d4d82d7d7919eb6e",
+    "source.py": "d56664fda209d99978ef5bd511ea02b4f3ec52b73179e1e7a984d71a3ced942a"
+  },
+  "simulation_fingerprint": "7e10c7a25f503912edca9a1069be5e10b60c84df30865295dfe032fa13db56b0"
+}

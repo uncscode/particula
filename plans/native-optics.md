@@ -183,3 +183,13 @@ entries, discrete/resolved/PDF reductions and single/multiple layers.
   are covered. Full optics suite: 240 passed on CPU and native RTX 5060;
   Ruff/format/mypy pass. Remaining API/failure review, examples, public guides,
   performance qualification and broad repository/packaging checks remain.
+- Added the public optics guide and a registered CPU example covering spectra,
+  polarized angular scattering and cloud depth/transmission. Full refresh
+  completed with three visually inspected figures, printed diagnostics and
+  compact saved plot data. Physical inputs are explicitly illustrative and
+  later thermal/evaporation feedback remains a separate state-changing model.
+  Source documentation structure passes; the site builds successfully with
+  API generation and its normal link verification. The additional rendered
+  structure checker reports six retired-route collisions requiring follow-up.
+  Broad changed-example validation (the registry selects all examples) and
+  documentation tests are running; do not treat those as passed yet.

@@ -20,6 +20,7 @@ Start with a small CPU simulation, then choose a process or execution path.
 | Simulate growth, collisions, sources, or losses | [Processes](processes/index.md) |
 | Use explicit Warp transfers and device execution | [GPU selection](gpu/backend-selection.md), then [resident checkpoints](gpu/resident/checkpoints.md) |
 | Capture a resident loop on native CUDA | [Graph-capture runbook](gpu/resident/graph-capture.md) |
+| Calculate spectra, polarization and cloud optical depth | [Optics](optics/index.md) |
 | Upgrade legacy scripts | [v0.3.0 migration](migration/v0.3.0/index.md) |
 
 CPU process examples are the first-use path. Direct Warp examples require
