@@ -43,6 +43,7 @@ class SimulationCheckpoint:
     extension_state: tuple[CheckpointPayload, ...] = ()
     clock: CheckpointPayload | None = None
     execution_mode: str = "resident"
+    host_rng: bytes | None = None
 
 
 @dataclass(frozen=True)

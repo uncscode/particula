@@ -54,6 +54,7 @@ class PreparedSimulation:
     _clock: Any
     _extension_fields: Any
     _extension_state: dict[str, dict[str, Any]]
+    _host_context: Any
 
     def __init__(self) -> None:
         """Reject direct construction without a validated process plan."""
@@ -151,6 +152,7 @@ class PreparedSimulation:
         result._clock = None
         result._extension_fields = None
         result._extension_state = {}
+        result._host_context = None
         result._stream = wp.Stream(target) if target.is_cuda else None
         return result
 
@@ -585,6 +587,7 @@ class PreparedSimulation:
                     self._clock = None
                     self._extension_fields = None
                     self._extension_state = {}
+                    self._host_context = None
                     self._bindings = {}
                     self._guard = self._registry = self._session = None
                     self._stream = None
@@ -651,6 +654,11 @@ def prepare_simulation(
         else _plan_process(process, aerosol)
         for process in processes
     )
+    from particula.execution.prepared_updates import (
+        validate_extension_freshness,
+    )
+
+    validate_extension_freshness(plans)
     validate_cohort_plans(plans)
     validate_ion_plans(plans)
     if len({plan.family for plan in plans}) != len(plans):

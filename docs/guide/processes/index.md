@@ -330,9 +330,48 @@ Shared material/species metadata is read-only. The public interface does not
 make arbitrary Python functions GPU kernels; explicit GPU translation is a
 separate capability.
 
+### Explicit Python execution in a GPU sequence
+
+Wrap a `BoxProcess` or `FunctionProcess` in `CPUTransfer` to select a host round
+trip inside a prepared GPU sequence:
+
+```python
+from particula import CPUTransfer
+
+with CPUTransfer(warming).prepare(
+    aerosol, device="cuda:0", time_step=10.0, time=120.0
+) as simulation:
+    simulation.run(3)
+    result = simulation.snapshot()
+    saved = simulation.checkpoint()
+
+with CPUTransfer(warming).resume(saved) as continuation:
+    continuation.step()
+```
+
+Each transfer waits for preceding GPU work, downloads the full native and
+registered state, runs the CPU process with the current simulation time, and
+validates every box. Only declared writes return to the existing device arrays.
+A rejected callback publishes none of its candidate values; earlier GPU work
+remains, and the prepared simulation faults. Host RNG words are checkpointed
+independently of native GPU random streams. Sequences with transfers reject
+CUDA graph capture before recording. Unwrapped Python processes require an
+explicit registered GPU adapter to prepare.
+
+A condensation process supplies thermodynamic refresh when a custom process
+changes gas concentrations or temperature. A sequence with saturation readers
+and such writers rejects preparation if it has no refresh provider, including
+when the reader precedes the writer and would see stale state on the next step.
+
+Declare immutable `parameters`, `extension_id`, and `version` on the CPU process
+when configuration affects its behavior. These join its instance name, reads,
+writes and representation support in checkpoint compatibility checks. Resume
+requires a compatible caller-supplied process; checkpoints do not serialize
+Python code, external library state or mutable callback closures.
+
 Custom runnables that override `execute` or `rate` retain their own semantics.
-To adopt batching, implement the single-box hooks and declare writer fields;
-custom code owns any additional mutable state and publication behavior.
+To adopt the public batching contract, implement `BoxProcess` or wrap a function
+with `FunctionProcess`; custom code owns additional external state.
 Legacy custom dilution strategies retain their original delegation path and
 cannot accept an execution context. `Equilibria` still uses auxiliary inputs
 and result attachments; native inventory mapping is a separate migration gap.

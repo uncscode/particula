@@ -362,9 +362,14 @@ class RunnableSequence:
         """
         from particula._cpu_batch import duration
         from particula.box_process import BoxProcess, validate_time
+        from particula.cpu_transfer import CPUTransfer
 
         time = validate_time(time)
-        names = [p.name for p in self.processes if isinstance(p, BoxProcess)]
+        names = [
+            p.process.name if isinstance(p, CPUTransfer) else p.name
+            for p in self.processes
+            if isinstance(p, (BoxProcess, CPUTransfer))
+        ]
         if len(names) != len(set(names)):
             raise ValueError("custom process instance names must be unique")
         sub_step_time_step = duration(time_step, sub_steps)
@@ -386,7 +391,7 @@ class RunnableSequence:
                     sub_steps=1,
                     **(
                         {"time": time + substep * sub_step_time_step}
-                        if isinstance(process, BoxProcess)
+                        if isinstance(process, (BoxProcess, CPUTransfer))
                         else {}
                     ),
                     **({"context": context} if context is not None else {}),

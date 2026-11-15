@@ -47,7 +47,7 @@ class BoxProcess(RunnableABC):
     External side effects and hidden callback state cannot be rolled back.
     """
 
-    def __init__(
+    def __init__(  # noqa: C901
         self,
         *,
         name,
@@ -57,6 +57,7 @@ class BoxProcess(RunnableABC):
         representations=("discrete", "continuous_pdf", "particle_resolved"),
         extension_id=None,
         version="1",
+        parameters=(),
     ):
         """Declare instance identity, field access and scientific support."""
         if not isinstance(name, str) or not name.strip():
@@ -94,6 +95,11 @@ class BoxProcess(RunnableABC):
         self.stochastic = stochastic
         self.representations = tuple(representations)
         self.extension_id = extension_id or name
+        from particula.execution.process_extensions import _immutable
+
+        if type(parameters) is not tuple or not _immutable(parameters):
+            raise ValueError("parameters must be immutable scalar tuples")
+        self.parameters = parameters
         self.version = version
 
     def validate(self, aerosol):
