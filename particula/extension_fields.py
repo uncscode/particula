@@ -38,7 +38,12 @@ class FieldSpec:
         """Reject ambiguous schemas before allocating storage."""
         if not isinstance(self.name, str) or "." not in self.name:
             raise ValueError("field name must be namespaced")
-        if self.name.split(".")[0] in {"particles", "gas", "environment"}:
+        if self.name.split(".")[0] in {
+            "particles",
+            "gas",
+            "environment",
+            "__field_ledger__",
+        }:
             raise ValueError("field namespace conflicts with native state")
         if any(not part.isidentifier() for part in self.name.split(".")):
             raise ValueError("field name must contain identifier components")
@@ -94,6 +99,7 @@ class ExtensionFields:
         self._dimensions = dict(dimensions)
         self._specs: dict[str, FieldSpec] = {}
         self._arrays: dict[str, np.ndarray] = {}
+        self._ledgers: dict[str, np.ndarray] = {}
 
     @property
     def specs(self):
@@ -124,12 +130,19 @@ class ExtensionFields:
             raise ValueError("particle field values must be finite")
         self._specs[spec.name] = spec
         self._arrays[spec.name] = array
+        if "particle" in spec.axes and spec.particle_policy == "additive":
+            ledger_shape = (shape[0],) + shape[2:]
+            for event in ("source", "removal"):
+                self._ledgers[f"__field_ledger__.{event}.{spec.name}"] = (
+                    np.zeros(ledger_shape, dtype=np.float64)
+                )
 
     def copy(self):
         """Detach every field while retaining immutable descriptors."""
         result = ExtensionFields(self._dimensions)
         for name, spec in self._specs.items():
             result.add(spec, self._arrays[name])
+        result._ledgers = {k: v.copy() for k, v in self._ledgers.items()}
         return result
 
     def items(self):
@@ -144,12 +157,17 @@ class ExtensionFields:
         result._arrays = {
             name: array[box : box + 1] for name, array in self._arrays.items()
         }
+        result._ledgers = {
+            name: array[box : box + 1] for name, array in self._ledgers.items()
+        }
         return result
 
     def validate_layout(self, dimensions, population, active):
         """Validate shape, population semantics and active-field values."""
         if self._specs and dimensions != self._dimensions:
             raise ValueError("extension field layout differs from aerosol")
+        if any(not np.all(np.isfinite(v)) for v in self._ledgers.values()):
+            raise ValueError("field inventory ledger must be finite")
         for name, spec in self._specs.items():
             array = self._arrays[name]
             shape = tuple(dimensions[axis] for axis in spec.axes)
@@ -163,6 +181,60 @@ class ExtensionFields:
                 spec.validate(array[active])
             else:
                 spec.validate(array)
+
+    def particle_names(self):
+        """Return names whose values follow resolved particle slots."""
+        return tuple(
+            name
+            for name, spec in self._specs.items()
+            if "particle" in spec.axes
+        )
+
+    def require_additive(self):
+        """Reject undefined merger rules before selecting collisions."""
+        for name in self.particle_names():
+            if self._specs[name].particle_policy != "additive":
+                raise ValueError("population merging requires additive fields")
+
+    def merge_particles(self, donor, recipient):
+        """Apply admitted single-box resolved pairs to additive quantities."""
+        self.require_additive()
+        candidates = {}
+        for name in self.particle_names():
+            values = self._arrays[name].copy()
+            with np.errstate(over="ignore", invalid="ignore"):
+                np.add.at(values[0], recipient, values[0, donor].copy())
+            values[0, donor] = 0
+            if not np.all(np.isfinite(values)):
+                raise ValueError("particle tracer merger overflow")
+            candidates[name] = values
+        for name, values in candidates.items():
+            np.copyto(self._arrays[name], values)
+
+    def transaction_arrays(self):
+        """Expose internal inventory arrays to transactional publication."""
+        return self._ledgers.items()
+
+    def inventory_changes(self, name):
+        """Return detached cumulative source and removal inventories per box."""
+        return {
+            event: self._ledgers[f"__field_ledger__.{event}.{name}"].copy()
+            for event in ("source", "removal")
+        }
+
+    def retire_particles(self, before_counts, after_counts):
+        """Account count-only sinks, then clear retired slot values."""
+        if np.any(after_counts > before_counts):
+            raise ValueError("sink unexpectedly increased represented counts")
+        removed = before_counts - after_counts
+        for name in self.particle_names():
+            values = self._arrays[name]
+            if self._specs[name].particle_policy == "additive":
+                weights = removed if values.ndim == 2 else removed[..., None]
+                self._ledgers[f"__field_ledger__.removal.{name}"] += np.sum(
+                    weights * values, axis=1
+                )
+            values[after_counts == 0] = 0
 
 
 def field_dimensions(particles, gas):

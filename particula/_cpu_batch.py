@@ -50,6 +50,7 @@ def arrays(aerosol):
     if p.radius_grid is not None:
         result["particles.radius_grid"] = p.radius_grid
     result.update(aerosol.fields.items())
+    result.update(aerosol.fields.transaction_arrays())
     return result
 
 
