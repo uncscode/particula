@@ -192,7 +192,7 @@ def test_retired_content_allows_only_declared_redirects(
     if noindex:
         html += '<meta name="robots" content="noindex">'
     if redirect:
-        html += '<html data-particula-redirect>'
+        html += "<html data-particula-redirect>"
     write(tmp_path, "old/index.html", html)
     write(tmp_path, "pagefind/pagefind.js", "")
     manifest = {

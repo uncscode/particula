@@ -5,7 +5,8 @@
 Equations and SI/index conventions match particula.optics.mie. Inputs here
 are flattened independent cases of relative n+ik and dimensionless x.
 Status codes: 0 success, 1 invalid input/capacity, 2 convergence failure,
-3 nonfinite coefficients. Failed results must not be consumed.
+3 nonfinite results, 4 unphysical efficiencies beyond roundoff. Failed
+results must not be consumed.
 """
 
 import warp as wp
@@ -16,6 +17,13 @@ from particula.optics.gpu._complex import (
     norm_squared,
     real_product_conjugate,
 )
+
+# Typed constants preserve double precision before Warp compiles expressions.
+_CF_TINY = wp.constant(wp.float64(1e-300))
+_CF_TOLERANCE_SQUARED = wp.constant(wp.float64(4e-28))
+_SMALL_TOLERANCE = wp.constant(wp.float64(2e-16))
+_ORDER_GROWTH = wp.constant(wp.float64(4.05))
+_ROUNDOFF = wp.constant(wp.float64(64 * 2.220446049250313e-16))
 
 
 @wp.func
@@ -29,7 +37,7 @@ def regular_small(x: wp.float64, order: int) -> wp.float64:
     for k in range(1, 100):
         term *= -x * x / wp.float64(2 * k * (2 * order + 2 * k + 1))
         value += term
-        if wp.abs(term) <= wp.abs(value) * wp.float64(2e-16):
+        if wp.abs(term) <= wp.abs(value) * _SMALL_TOLERANCE:
             break
     return value
 
@@ -49,14 +57,14 @@ def logarithmic_derivative(z: wp.vec2d, count: int):
         denominator = divide(wp.vec2d(wp.float64(2 * (count + j) + 1), zero), z)
         d = denominator - d
         c = denominator - divide(c_one, c)
-        if wp.max(wp.abs(d[0]), wp.abs(d[1])) < wp.float64(1e-300):
-            d = wp.vec2d(wp.float64(1e-300), zero)
-        if wp.max(wp.abs(c[0]), wp.abs(c[1])) < wp.float64(1e-300):
-            c = wp.vec2d(wp.float64(1e-300), zero)
+        if wp.max(wp.abs(d[0]), wp.abs(d[1])) < _CF_TINY:
+            d = wp.vec2d(_CF_TINY, zero)
+        if wp.max(wp.abs(c[0]), wp.abs(c[1])) < _CF_TINY:
+            c = wp.vec2d(_CF_TINY, zero)
         d = divide(c_one, d)
         delta = multiply(c, d)
         value = multiply(value, delta)
-        if norm_squared(delta - c_one) < wp.float64(4e-28):
+        if norm_squared(delta - c_one) < _CF_TOLERANCE_SQUARED:
             converged = 1
             break
     return value - divide(wp.vec2d(wp.float64(count), zero), z), converged
@@ -107,7 +115,7 @@ def mie_coefficients_kernel(
     count = int(
         wp.ceil(
             x
-            + wp.float64(4.05) * wp.pow(x, one / wp.float64(3.0))
+            + _ORDER_GROWTH * wp.pow(x, one / wp.float64(3.0))
             + wp.float64(2.0)
         )
     )
@@ -230,4 +238,25 @@ def mie_efficiencies_kernel(
     efficiencies[i, 2] = absorption
     efficiencies[i, 3] = g
     efficiencies[i, 4] = norm_squared(backward) / (x * x)
+    efficiencies[i, 5] = ext - g * sca
+    for j in range(6):
+        if not wp.isfinite(efficiencies[i, j]):
+            status[i] = 3
+            return
+    tolerance = _ROUNDOFF * wp.max(wp.abs(ext), sca)
+    if (
+        absorption < -tolerance
+        or ext < zero
+        or wp.abs(g) > wp.float64(1.0) + _ROUNDOFF
+    ):
+        status[i] = 4
+        return
+    # Only negative cancellation within roundoff is zeroed, preserving the
+    # extinction = scattering + absorption identity for downstream consumers.
+    absorption = wp.max(absorption, zero)
+    ext = wp.max(ext, sca)
+    g = wp.clamp(g, wp.float64(-1.0), wp.float64(1.0))
+    efficiencies[i, 0] = ext
+    efficiencies[i, 2] = absorption
+    efficiencies[i, 3] = g
     efficiencies[i, 5] = ext - g * sca

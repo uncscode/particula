@@ -134,6 +134,8 @@ def get_mie_coefficients(
         ValueError: If physical inputs are nonfinite or outside the domain.
         RuntimeError: If the numerical recurrence fails.
     """
+    if np.iscomplexobj(size_parameter):
+        raise ValueError("Size parameter must be real")
     m, x = np.broadcast_arrays(
         np.asarray(relative_refractive_index, dtype=np.complex128),
         np.asarray(size_parameter, dtype=np.float64),
@@ -155,9 +157,19 @@ def get_mie_coefficients(
     for index in np.ndindex(m.shape):
         count = int(counts[index])
         if count:
-            a[index][:count], b[index][:count] = _coefficients(
-                complex(m[index]), float(x[index]), count
-            )
+            try:
+                with np.errstate(over="raise", invalid="raise", divide="raise"):
+                    a[index][:count], b[index][:count] = _coefficients(
+                        complex(m[index]), float(x[index]), count
+                    )
+            except (
+                FloatingPointError,
+                OverflowError,
+                ZeroDivisionError,
+            ) as error:
+                raise RuntimeError(
+                    "Mie coefficient arithmetic is unresolved"
+                ) from error
     return MieCoefficients(a, b, counts)
 
 
@@ -181,8 +193,15 @@ def get_mie_efficiencies(
 
     Raises:
         ValueError: If inputs violate the physical domain or x exceeds 10000.
-        RuntimeError: If coefficient calculation fails.
+        RuntimeError: If arithmetic is unresolved, coefficient calculation
+            fails or efficiencies violate energy/physical bounds beyond
+            64 float64 eps of roundoff. Negative absorption within that
+            roundoff is set to zero with extinction adjusted to scattering.
     """
+    if any(
+        np.iscomplexobj(value) for value in (radius, wavelength, medium_index)
+    ):
+        raise ValueError("Radius, wavelength and medium index must be real")
     r, wave, m, medium = np.broadcast_arrays(
         np.asarray(radius, dtype=np.float64),
         np.asarray(wavelength, dtype=np.float64),
@@ -198,36 +217,66 @@ def get_mie_efficiencies(
         or np.any(medium <= 0)
     ):
         raise ValueError("Require finite radius>=0, wavelength>0, medium>0")
-    x = 2 * np.pi * r * medium / wave
-    coefficients = get_mie_coefficients(m / medium, x)
-    a, b = coefficients.electric, coefficients.magnetic
-    n = np.arange(1, a.shape[-1] + 1, dtype=np.float64)
-    factor = np.divide(2.0, x * x, out=np.zeros_like(x), where=x > 0)
-    ext = factor * np.sum((2 * n + 1) * (a + b).real, axis=-1)
-    sca = factor * np.sum((2 * n + 1) * (abs(a) ** 2 + abs(b) ** 2), axis=-1)
-    adjacent = np.sum(
-        (n[:-1] * (n[:-1] + 2) / (n[:-1] + 1))
-        * (
-            a[..., :-1] * a[..., 1:].conj() + b[..., :-1] * b[..., 1:].conj()
-        ).real,
-        axis=-1,
-    )
-    cross = np.sum((2 * n + 1) / (n * (n + 1)) * (a * b.conj()).real, axis=-1)
-    g = np.divide(
-        2 * factor * (adjacent + cross),
-        sca,
-        out=np.zeros_like(sca),
-        where=sca > 0,
-    )
-    back = (
-        factor
-        / 2
-        * abs(np.sum((2 * n + 1) * (-1.0) ** n * (a - b), axis=-1)) ** 2
-    )
-    absorption = ext - sca
-    # Lossless spheres have identically zero absorption; avoid cancellation.
-    absorption = np.where(m.imag == 0, 0.0, absorption)
-    ext = np.where(m.imag == 0, sca, ext)
-    return MieEfficiencies(
-        ext, sca, absorption, g, back, ext - g * sca, sca > 0
-    )
+    try:
+        with np.errstate(over="raise", invalid="raise", divide="raise"):
+            x = 2 * np.pi * r * medium / wave
+            coefficients = get_mie_coefficients(m / medium, x)
+            a, b = coefficients.electric, coefficients.magnetic
+            n = np.arange(1, a.shape[-1] + 1, dtype=np.float64)
+            factor = np.divide(
+                2.0,
+                x * x,
+                out=np.zeros_like(x),
+                where=coefficients.term_count > 0,
+            )
+            ext = factor * np.sum((2 * n + 1) * (a + b).real, axis=-1)
+            sca = factor * np.sum(
+                (2 * n + 1) * (abs(a) ** 2 + abs(b) ** 2), axis=-1
+            )
+            adjacent = np.sum(
+                (n[:-1] * (n[:-1] + 2) / (n[:-1] + 1))
+                * (
+                    a[..., :-1] * a[..., 1:].conj()
+                    + b[..., :-1] * b[..., 1:].conj()
+                ).real,
+                axis=-1,
+            )
+            cross = np.sum(
+                (2 * n + 1) / (n * (n + 1)) * (a * b.conj()).real, axis=-1
+            )
+            g = np.divide(
+                2 * factor * (adjacent + cross),
+                sca,
+                out=np.zeros_like(sca),
+                where=sca > 0,
+            )
+            back = (
+                factor
+                / 2
+                * abs(np.sum((2 * n + 1) * (-1.0) ** n * (a - b), axis=-1)) ** 2
+            )
+            absorption = ext - sca
+            # Lossless absorption is exactly zero; avoid cancellation.
+            absorption = np.where(m.imag == 0, 0.0, absorption)
+            ext = np.where(m.imag == 0, sca, ext)
+            outputs = (ext, sca, absorption, g, back, ext - g * sca)
+            if any(np.any(~np.isfinite(value)) for value in outputs):
+                raise RuntimeError("Nonfinite Mie efficiencies")
+            roundoff = 64 * np.finfo(np.float64).eps
+            tolerance = roundoff * np.maximum(abs(ext), sca)
+            if (
+                np.any(absorption < -tolerance)
+                or np.any(ext < 0)
+                or np.any(abs(g) > 1 + roundoff)
+            ):
+                raise RuntimeError(
+                    "Unphysical Mie efficiencies beyond roundoff"
+                )
+            ext = np.where(absorption < 0, sca, ext)
+            absorption = np.maximum(absorption, 0)
+            g = np.clip(g, -1, 1)
+            return MieEfficiencies(
+                ext, sca, absorption, g, back, ext - g * sca, sca > 0
+            )
+    except (FloatingPointError, OverflowError, ZeroDivisionError) as error:
+        raise RuntimeError("Mie efficiency arithmetic is unresolved") from error

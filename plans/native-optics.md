@@ -208,3 +208,14 @@ entries, discrete/resolved/PDF reductions and single/multiple layers.
   passed before adding the final benchmark record; final-site rebuild remains
   part of closeout. No PR until API/failure audit, full tests/coverage, clean
   packaging and final evidence review are complete.
+- Completed another numerical failure audit: double-typed Warp constants
+  preserve tiny continued-fraction safeguards and coefficient-order thresholds;
+  device efficiencies now report nonfinite/unphysical output explicitly.
+  CPU rejects complex physical coordinates and converts unresolved floating
+  arithmetic into documented errors. Negative absorption is corrected only
+  within 64 eps relative to extinction/scattering, with energy balance retained;
+  larger violations fail. Boundary, weak-absorption and fault-injection tests
+  pass on CPU and CUDA. Full focused suite: 250 passed. Repository-wide Ruff
+  and mypy pass; format check identified and corrected one test-file layout.
+  Full-package coverage validation is running. Numerical source changes require
+  a final optics-example refresh and updated current qualification evidence.
