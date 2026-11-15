@@ -71,11 +71,11 @@ entries, discrete/resolved/PDF reductions and single/multiple layers.
 
 ## Serial implementation and acceptance
 
-- [ ] Reference corpus, provenance, conventions and independent expectations.
-- [ ] CPU coefficients, efficiencies and cross sections.
-- [ ] CPU angular scattering, Mueller matrices and Stokes helpers.
-- [ ] Warp equivalents and CPU/Warp-CPU/real-CUDA parity.
-- [ ] Population optics, path/column helpers on both backends.
+- [x] Reference corpus, provenance, conventions and independent expectations.
+- [x] CPU coefficients, efficiencies and cross sections.
+- [x] CPU angular scattering, Mueller matrices and Stokes helpers.
+- [x] Warp equivalents and CPU/Warp-CPU/real-CUDA parity.
+- [x] Population optics, path/column helpers on both backends.
 - [ ] Executed spectral, polarization, cloud-depth and CUDA examples with
       saved compact numerical data; later-feedback usage sketch only.
 - [ ] Google-style SI/shape/domain docstrings, primary citations, guide/API
@@ -233,3 +233,17 @@ entries, discrete/resolved/PDF reductions and single/multiple layers.
   rerunning with that environment override removed. Do not record that rerun
   as passed before observing its terminal result. CUDA example timing refresh
   waits until concurrent validation workloads have completed.
+
+- Final review confirmed the five numerical implementation blocks against the
+  owning CPU/device modules and their reference/independent tests. Added CPU
+  overflow rejection for resolved/PDF weights, population scalar/Mueller sums
+  and mass-specific opacity, matching the existing device failure behavior;
+  complex number-density inputs also reject explicitly. Focused failure and
+  population suite: 24 passed on CPU/CUDA, Ruff/mypy pass. The ongoing full
+  suite began before these final reduction guards, so its result must be
+  distinguished from the final changed-module verification and final coverage
+  audit. Infrastructure rerun passed 298 tests; example suite passed 235 with
+  one skip. Current example provenance and final packaging must be refreshed
+  after the numerical changes settle.
+  Complete optics rerun after reduction guards: 251 passed on CPU and native
+  CUDA, with no tolerance changes.

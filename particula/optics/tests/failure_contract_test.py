@@ -108,3 +108,30 @@ def test_device_order_boundary_and_weak_absorption(device):
     np.testing.assert_allclose(
         actual, np.stack(expected, -1), rtol=1e-8, atol=1e-12
     )
+
+
+def test_population_and_opacity_overflow():
+    """Finite inputs must not produce apparently valid infinite bulk fields."""
+    from particula.optics import (
+        OpticalCrossSections,
+        get_mass_specific_opacity,
+        get_population_mueller_matrix,
+        get_population_optics,
+        get_population_weights,
+    )
+
+    with pytest.raises(ValueError, match="finite"):
+        get_population_weights([1e308], "particle_resolved", volume=1e-308)
+    with pytest.raises(ValueError, match="finite"):
+        get_population_weights(
+            [1e308, 1e308], "continuous_pdf", radius_grid=[1, 1e308]
+        )
+    with pytest.raises(ValueError, match="real"):
+        get_population_weights(np.array([1 + 1j]), "discrete")
+    cross = OpticalCrossSections(*(np.array([1e308]) for _ in range(5)))
+    with pytest.raises(ValueError, match="overflow"):
+        get_population_optics(cross, [0.5], [2])
+    with pytest.raises(ValueError, match="overflow"):
+        get_population_mueller_matrix(np.full((1, 1, 4, 4), 1e308), [2])
+    with pytest.raises(ValueError, match="overflow"):
+        get_mass_specific_opacity(1e308, 1e-308)
