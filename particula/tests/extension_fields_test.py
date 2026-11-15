@@ -88,3 +88,84 @@ def test_native_names_cannot_be_shadowed():
     """User fields cannot intercept native publication destinations."""
     with pytest.raises(ValueError, match="conflicts"):
         FieldSpec("gas.concentration", ("box",), "1")
+
+
+def test_native_coagulation_uses_actual_pairs_for_tracers(monkeypatch):
+    """A controlled collision conserves represented additive inventory."""
+    from particula import FieldSpec
+    from particula.dynamics import BrownianCoagulationStrategy, Coagulation
+    from particula.dynamics.coagulation.particle_resolved_step import (
+        particle_resolved_method,
+    )
+    from particula.dynamics.tests.native_runnable_test import state
+
+    aerosol = state()
+    aerosol.fields.add(
+        FieldSpec(
+            "lab.tracer", ("box", "particle"), "kg", particle_policy="additive"
+        ),
+        np.array([[3.0, 4.0]]),
+    )
+    before = np.sum(
+        aerosol.particles.concentration * aerosol.fields["lab.tracer"]
+    )
+    monkeypatch.setattr(
+        particle_resolved_method,
+        "get_particle_resolved_coagulation_step",
+        lambda **_: np.array([[0, 1]], dtype=np.int64),
+    )
+    Coagulation(BrownianCoagulationStrategy("particle_resolved")).execute(
+        aerosol, 1
+    )
+    np.testing.assert_array_equal(aerosol.fields["lab.tracer"], [[0, 7]])
+    assert (
+        np.sum(aerosol.particles.concentration * aerosol.fields["lab.tracer"])
+        == before
+    )
+
+
+def test_dilution_accounts_tracer_removal_without_changing_per_particle_value():
+    """Count decay exports tracer inventory rather than shrinking each value."""
+    from particula.dynamics import Dilution, DilutionStrategy
+    from particula.dynamics.tests.native_runnable_test import state
+
+    aerosol = state()
+    aerosol.fields.add(
+        FieldSpec(
+            "lab.tracer", ("box", "particle"), "kg", particle_policy="additive"
+        ),
+        np.array([[3.0, 4.0]]),
+    )
+    Dilution(DilutionStrategy(np.log(2))).execute(aerosol, 1)
+    np.testing.assert_array_equal(aerosol.fields["lab.tracer"], [[3, 4]])
+    changes = aerosol.fields.inventory_changes("lab.tracer")
+    np.testing.assert_allclose(changes["removal"], [7])
+    np.testing.assert_array_equal(changes["source"], [0])
+    changes["removal"][:] = 100
+    np.testing.assert_allclose(
+        aerosol.fields.inventory_changes("lab.tracer")["removal"], [7]
+    )
+
+
+def test_sink_clears_retired_tracers_and_preserves_budget():
+    """Complete count loss clears reusable slots and accounts their inventory."""
+    fields = ExtensionFields({"box": 1, "particle": 2})
+    fields.add(
+        FieldSpec(
+            "lab.tracer", ("box", "particle"), "kg", particle_policy="additive"
+        ),
+        np.array([[3.0, 4.0]]),
+    )
+    fields.retire_particles(np.array([[2.0, 2.0]]), np.array([[0.0, 2.0]]))
+    np.testing.assert_array_equal(fields["lab.tracer"], [[0, 4]])
+    np.testing.assert_array_equal(
+        fields.inventory_changes("lab.tracer")["removal"], [6]
+    )
+    detached = fields.copy()
+    detached.retire_particles(np.array([[0.0, 2.0]]), np.zeros((1, 2)))
+    np.testing.assert_array_equal(
+        detached.inventory_changes("lab.tracer")["removal"], [14]
+    )
+    np.testing.assert_array_equal(
+        fields.inventory_changes("lab.tracer")["removal"], [6]
+    )

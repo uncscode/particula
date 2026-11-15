@@ -205,7 +205,10 @@ def _direct_kernel(
 
 
 def _merge(
-    particle: ParticleData, active: NDArray[np.int64], pairs: Any
+    particle: ParticleData,
+    active: NDArray[np.int64],
+    pairs: Any,
+    extension_fields=None,
 ) -> None:
     """Validate selector output, stage the merge, then publish in place."""
     pairs = np.asarray(pairs)
@@ -249,6 +252,8 @@ def _merge(
         distribution_type="particle_resolved",
     )
     validate_particle(candidate, "particle_resolved")
+    if extension_fields is not None:
+        extension_fields.merge_particles(donor, recipient)
     np.copyto(particle.masses, masses)
     np.copyto(particle.concentration, counts)
     np.copyto(particle.charge, charge)
@@ -285,14 +290,18 @@ def _density_step(
     return particle
 
 
-def step_native(
+def step_native(  # noqa: C901
     strategy: Any,
     particle: ParticleData,
     temperature: float,
     pressure: float,
     time_step: float,
+    *,
+    extension_fields=None,
 ) -> ParticleData:
     """Apply an admitted native step without changing process/RNG ownership."""
+    if extension_fields is not None:
+        extension_fields.require_additive()
     kind = strategy.distribution_type
     validate_particle(particle, kind)
     positive_scalar(temperature, "temperature")
@@ -371,5 +380,5 @@ def step_native(
         kernel_func=point_kernel,
         kernel_index_func=direct,
     )
-    _merge(particle, active, pairs)
+    _merge(particle, active, pairs, extension_fields)
     return particle

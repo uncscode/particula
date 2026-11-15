@@ -243,7 +243,11 @@ class _NativeBatchRunnable(RunnableABC):
                 writers.extend(["particles.concentration", "particles.charge"])
             if getattr(self.condensation_strategy, "update_gases", True):
                 writers.append("gas.concentration")
-            return tuple(writers)
+            return (
+                tuple(writers)
+                + aerosol.fields.particle_names()
+                + tuple(name for name, _ in aerosol.fields.transaction_arrays())
+            )
         writers = ["particles.concentration"]
         resolved = aerosol.particles.distribution_type == "particle_resolved"
         if self._namespace == "nucleation" or (
@@ -254,10 +258,46 @@ class _NativeBatchRunnable(RunnableABC):
             writers.append("gas.concentration")
         if self._namespace == "nucleation":
             writers.append("particles.volume")
-        return tuple(writers)
+        return (
+            tuple(writers)
+            + aerosol.fields.particle_names()
+            + tuple(name for name, _ in aerosol.fields.transaction_arrays())
+        )
+
+    def _advance_box(self, aerosol, time_step):
+        """Update field sinks using the exact native count change."""
+        names = aerosol.fields.particle_names()
+        counts = aerosol.particles.concentration.copy() if names else None
+        result = self._execute_box(aerosol, time_step, sub_steps=1)
+        if names and self._namespace in (
+            "wall_loss",
+            "dilution",
+            "condensation",
+        ):
+            aerosol.fields.retire_particles(
+                counts, aerosol.particles.concentration
+            )
+        if names:
+            from particula.extension_fields import field_dimensions
+
+            aerosol.fields.validate_layout(
+                field_dimensions(aerosol.particles, aerosol.gas),
+                aerosol.particles.distribution_type,
+                aerosol.particles.concentration > 0,
+            )
+        return result
 
     def _validate_batch(self, aerosol):
         self._validate_gas_schema(aerosol.gas)
+        if aerosol.fields.particle_names() and self._namespace == "coagulation":
+            aerosol.fields.require_additive()
+            if (
+                type(self.coagulation_strategy).step
+                is not CoagulationStrategyABC.step
+            ):
+                raise ValueError(
+                    "custom coagulation step lacks field event support"
+                )
         if self._strategy_attribute is not None:
             strategy = getattr(self, self._strategy_attribute)
             expected = getattr(strategy, "distribution_type", None)
@@ -708,12 +748,26 @@ class Coagulation(_NativeBatchRunnable):
         duration = _native_duration(time_step, sub_steps)
         for _ in range(sub_steps):
             particles, _, temperature, pressure = _native_process_state(aerosol)
-            result = self.coagulation_strategy.step(
-                particle=particles,
-                temperature=temperature,
-                pressure=pressure,
-                time_step=duration,
-            )
+            if aerosol.fields.particle_names():
+                from .coagulation.coagulation_strategy import (
+                    _native_step,
+                )
+
+                result = _native_step.step_native(
+                    self.coagulation_strategy,
+                    particles,
+                    temperature,
+                    pressure,
+                    duration,
+                    extension_fields=aerosol.fields,
+                )
+            else:
+                result = self.coagulation_strategy.step(
+                    particle=particles,
+                    temperature=temperature,
+                    pressure=pressure,
+                    time_step=duration,
+                )
             if result is not particles:
                 raise ValueError(
                     "Native coagulation must retain its container."

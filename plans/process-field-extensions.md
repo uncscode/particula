@@ -192,3 +192,13 @@ narrow passing suite. Leave merge, version bump and release outside this goal.
 - Registered storage is connected to Aerosol, detached copies, box views,
   alias/publication checks and custom declarations. Storage/CPU/aerosol tests:
   43 passed. Native population-event integration remains pending.
+- Native resolved CPU coagulation now passes the actual admitted merge pairs
+  to additive field updates; passive policies reject before sampling. Remaining
+  population work: birth/removal ledgers, resampling weights and GPU events.
+- CPU additive fields follow exact coagulation pairs. Native dilution, wall
+  loss and condensation retirement now clear freed slots and accumulate
+  represented tracer removal in transactional per-box ledgers. Detached
+  `inventory_changes(name)` reports source/removal arrays; ledgers copy and
+  slice with field state and publish atomically. Source population ledger
+  integration remains pending. Focused CPU/multi-box suite: 115 passed;
+  field suite including independent dilution/removal budgets: 13 passed.

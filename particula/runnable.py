@@ -130,7 +130,7 @@ class RunnableABC:
             for box in range(boxes):
                 worker = self._box_worker(box, boxes, transaction)
                 view = _cpu_batch.box_view(candidate, box)
-                result = worker._execute_box(view, step, sub_steps=1)
+                result = worker._advance_box(view, step)
                 if result is not view:
                     raise ValueError(
                         "CPU box hooks must retain aerosol identity"
@@ -167,6 +167,10 @@ class RunnableABC:
     def _rate_box(self, aerosol):
         """Evaluate the single-box numerical building block."""
         raise NotImplementedError
+
+    def _advance_box(self, aerosol, time_step):
+        """Dispatch one staged interval through the native extension seam."""
+        return self._execute_box(aerosol, time_step, sub_steps=1)
 
     def _execute_box(self, aerosol, time_step, sub_steps=1):
         """Execute the single-box numerical building block."""
