@@ -22,6 +22,10 @@ sources remain runnable from the repository checkout.
 - [Equilibria](thermodynamics/equilibria/index.md)
 - [CPU dilution](../guide/processes/dilution.md#boundaries-and-example)
 
+## Optical calculations
+
+- [Sphere spectra, polarization and cloud optical depth](optics/sphere_optics.py)
+
 ## GPU examples
 
 These standalone examples use explicit caller-owned transfers and device state.

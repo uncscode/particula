@@ -767,5 +767,20 @@
       "plot_results"
     ],
     "plot_inputs": []
+  },
+  "sphere-optics": {
+    "title": "Sphere spectra, polarization and cloud optical depth",
+    "source": "docs/examples/optics/sphere_optics.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 300,
+    "inputs": [],
+    "invoke": "result = run_example()",
+    "data_expression": "result",
+    "replot_invoke": "result = plot_results(saved_data)",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": []
   }
 }
