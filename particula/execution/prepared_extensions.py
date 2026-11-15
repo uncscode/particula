@@ -64,7 +64,18 @@ def compile_extension(plan, owner):
         owner._clock = wp.array(
             [owner._initial_time], dtype=wp.float64, device=owner.device.native
         )
+    import numpy as np
+
     configuration = plan.configuration
+    state = {
+        spec.name: wp.array(
+            np.full(spec.shape, spec.initial_value, dtype=spec.dtype),
+            dtype=getattr(wp, spec.dtype),
+            device=owner.device.native,
+        )
+        for spec in configuration.state
+    }
+    owner._extension_state[configuration.name] = state
     arrays = {}
     for name in configuration.reads + configuration.writes:
         family, role = name.split(".", 1)
@@ -74,6 +85,7 @@ def compile_extension(plan, owner):
             arrays[name] = owner._extension_fields.arrays[name]
     context = GPUPreparationContext(
         arrays=arrays,
+        state=state,
         device=owner.device.native,
         stream=owner._stream,
         time_step=owner.time_step,
@@ -98,6 +110,7 @@ def compile_extension(plan, owner):
         (
             *operation.resources,
             *arrays.values(),
+            *state.values(),
             owner._clock,
             owner._device_failure,
         ),

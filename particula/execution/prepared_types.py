@@ -13,6 +13,8 @@ if TYPE_CHECKING:
         ResidentCheckpoint,
     )
     from particula.execution.prepared_processes import _ProcessPlan
+    from particula.execution.process_extensions import GPUProcessPlan
+    from particula.extension_fields import FieldSpec
 
 
 @dataclass(frozen=True)
@@ -21,16 +23,26 @@ class SimulationCheckpoint:
 
     Canonical resident bytes preserve primary state, acquired sidecars and
     random words. The frozen process plans and timestep identify the compatible
-    runnable sequence. Auxiliary bytes preserve last-step latent energy.
+    runnable sequence. Schema v2 adds absolute initial time, field descriptors
+    and bytes, declared adapter-state bytes, and the device clock. Python
+    implementations are supplied again through the registry at restart.
+    The explicit v1 reader accepts built-in-only state with a zero time origin.
+    Auxiliary bytes preserve last-step latent energy.
     Resident CPU inspection arrays are detached but are not restart authority.
     This is not a portable disk format or a device-migration interface.
     """
 
     schema_version: int
     resident: ResidentCheckpoint
-    processes: tuple[_ProcessPlan, ...]
+    processes: tuple[_ProcessPlan | GPUProcessPlan, ...]
     time_step: float
     auxiliary: tuple[CheckpointPayload, ...] = ()
+    initial_time: float = 0.0
+    field_specs: tuple[FieldSpec, ...] = ()
+    field_payloads: tuple[CheckpointPayload, ...] = ()
+    extension_state: tuple[CheckpointPayload, ...] = ()
+    clock: CheckpointPayload | None = None
+    execution_mode: str = "resident"
 
 
 @dataclass(frozen=True)

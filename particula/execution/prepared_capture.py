@@ -60,6 +60,7 @@ def _signature(owner):  # noqa: C901
         owner._device_failure,
         owner._clock,
         owner._extension_fields,
+        owner._extension_state,
         owner._refresh,
     ):
         visit(value)

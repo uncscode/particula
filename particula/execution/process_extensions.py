@@ -33,6 +33,48 @@ def _immutable(value: object) -> bool:
 
 
 @dataclass(frozen=True)
+class GPUStateSpec:
+    """Declare a fixed-shape persistent adapter array included in checkpoints.
+
+    Scratch allocated by an adapter is not continuation state. Counters, random
+    words and evolving parameters must use these declared arrays instead.
+    """
+
+    name: str
+    shape: tuple[int, ...]
+    dtype: str = "float64"
+    initial_value: float | int = 0
+
+    def __post_init__(self) -> None:
+        """Validate a portable primitive dtype and fixed nonempty shape."""
+        import numpy as np
+
+        if type(self.name) is not str or not self.name.isidentifier():
+            raise ValueError("state name must be an identifier")
+        if (
+            type(self.shape) is not tuple
+            or not 1 <= len(self.shape) <= 4
+            or any(type(n) is not int or n < 1 for n in self.shape)
+        ):
+            raise ValueError(
+                "state shape must contain positive integer lengths"
+            )
+        if self.dtype not in ("float64", "int32", "int64", "uint32"):
+            raise ValueError("unsupported persistent state dtype")
+        if type(self.initial_value) not in (float, int) or not isfinite(
+            self.initial_value
+        ):
+            raise ValueError("state initial value must be finite")
+        if self.dtype != "float64":
+            bounds = np.iinfo(self.dtype)
+            if (
+                int(self.initial_value) != self.initial_value
+                or not bounds.min <= self.initial_value <= bounds.max
+            ):
+                raise ValueError("state initial value exceeds integer dtype")
+
+
+@dataclass(frozen=True)
 class GPUProcessPlan:
     """Freeze one named implementation and its declared array requirements.
 
@@ -49,8 +91,9 @@ class GPUProcessPlan:
     writes: tuple[str, ...] = ()
     parameters: tuple[tuple[str, object], ...] = ()
     capabilities: ProcessCapabilities = ProcessCapabilities(resident=True)
+    state: tuple[GPUStateSpec, ...] = ()
 
-    def __post_init__(self) -> None:
+    def __post_init__(self) -> None:  # noqa: C901
         """Reject mutable configuration and ambiguous resource declarations."""
         for value in (self.name, self.extension_id, self.version):
             if type(value) is not str or not value.strip():
@@ -77,6 +120,12 @@ class GPUProcessPlan:
             raise ValueError("duplicate parameter name")
         if type(self.capabilities) is not ProcessCapabilities:
             raise TypeError("capabilities must be ProcessCapabilities")
+        if type(self.state) is not tuple or any(
+            type(spec) is not GPUStateSpec for spec in self.state
+        ):
+            raise TypeError("state must contain GPUStateSpec descriptors")
+        if len({spec.name for spec in self.state}) != len(self.state):
+            raise ValueError("duplicate state name")
         if not self.capabilities.resident:
             raise ValueError("GPU adapters require resident capability")
 
@@ -103,10 +152,12 @@ class GPUPreparationContext:
     clock: object
     failure: object
     logical_box_ids: tuple[str, ...]
+    state: Mapping[str, object]
 
     def __post_init__(self) -> None:
         """Detach the map while retaining exact device array objects."""
         object.__setattr__(self, "arrays", MappingProxyType(dict(self.arrays)))
+        object.__setattr__(self, "state", MappingProxyType(dict(self.state)))
 
 
 class GPUProcessAdapter(Protocol):

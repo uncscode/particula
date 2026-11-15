@@ -229,6 +229,7 @@ class RunnableABC:
         *,
         backend: "Backend | None" = None,
         device: str | None = None,
+        process_registry=None,
     ) -> "PreparedSimulation":
         """Resume exact saved state using the same process configuration.
 
@@ -236,6 +237,7 @@ class RunnableABC:
             checkpoint: SimulationCheckpoint from a prepared owner.
             backend: Backend.WARP by default.
             device: Exact checkpoint device by default; migration rejects.
+            process_registry: Compatible caller-supplied GPU implementations.
 
         Returns:
             A new owner preserving state, RNG words, timestep and counters.
@@ -254,6 +256,7 @@ class RunnableABC:
             checkpoint,
             backend=Backend.WARP if backend is None else backend,
             device=device,
+            process_registry=process_registry,
         )
 
     def __or__(self, other: "RunnableABC") -> "RunnableSequence":
@@ -443,6 +446,7 @@ class RunnableSequence:
         *,
         backend: "Backend | None" = None,
         device: str | None = None,
+        process_registry=None,
     ) -> "PreparedSimulation":
         """Resume exact saved state using the same process configuration.
 
@@ -450,6 +454,7 @@ class RunnableSequence:
             checkpoint: SimulationCheckpoint from a prepared owner.
             backend: Backend.WARP by default.
             device: Exact checkpoint device by default; migration rejects.
+            process_registry: Compatible caller-supplied GPU implementations.
 
         Returns:
             A new owner preserving state, RNG words, timestep and counters.
@@ -468,6 +473,7 @@ class RunnableSequence:
             checkpoint,
             backend=Backend.WARP if backend is None else backend,
             device=device,
+            process_registry=process_registry,
         )
 
     def __or__(self, process: RunnableABC) -> "RunnableSequence":

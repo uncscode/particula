@@ -19,15 +19,12 @@ def checkpoint(owner: Any) -> SimulationCheckpoint:
     )
     from particula.execution.process_extensions import _RegisteredPlan
 
-    if (
-        owner._initial_time != 0.0
-        or any(type(plan) is _RegisteredPlan for plan in owner._plans)
-        or (
-            owner._extension_fields is not None
-            and owner._extension_fields.specs
-        )
+    if any(
+        type(plan) is _RegisteredPlan
+        and not plan.configuration.capabilities.checkpoint
+        for plan in owner._plans
     ):
-        raise ValueError("registered process checkpoints require schema v2")
+        raise ValueError("registered process does not support checkpoints")
     owner.synchronize()
     if not owner._plans:
         raise ValueError("checkpoint requires a bound process plan")
@@ -42,8 +39,19 @@ def checkpoint(owner: Any) -> SimulationCheckpoint:
             _payload("prepared", role, array)
             for role, array in sorted(owner._auxiliary.items())
         )
+        from particula.execution.checkpoint_extensions import (
+            configurations,
+            save_extensions,
+        )
+
+        extensions = save_extensions(owner)
     return SimulationCheckpoint(
-        1, resident, owner._plans, owner.time_step, auxiliary
+        2,
+        resident,
+        configurations(owner._plans),
+        owner.time_step,
+        auxiliary,
+        **extensions,
     )
 
 
@@ -87,7 +95,7 @@ def _host_state(resident, primary) -> Aerosol:
     )
 
 
-def _preflight(processes, saved, backend, device):
+def _preflight(processes, saved, backend, device, process_registry=None):
     """Reject schema/configuration/device drift before any allocation/upload."""
     from particula._cpu_batch import duration
     from particula.execution.checkpoint import (
@@ -104,10 +112,20 @@ def _preflight(processes, saved, backend, device):
 
     if type(saved) is not SimulationCheckpoint:
         raise TypeError("checkpoint must be an exact SimulationCheckpoint")
-    if type(saved.schema_version) is not int or saved.schema_version != 1:
-        raise ValueError("unsupported prepared checkpoint schema")
+    from particula.execution.checkpoint_extensions import (
+        configurations,
+        restore_host_fields,
+        validate_envelope,
+        validate_extension_state,
+    )
+    from particula.execution.process_extensions import (
+        GPUProcessPlan,
+        _RegisteredPlan,
+    )
+
     if type(saved.resident) is not ResidentCheckpoint:
         raise TypeError("invalid resident checkpoint")
+    validate_envelope(saved)
     if backend is not Backend.WARP:
         raise ValueError("prepared execution requires Backend.WARP")
     target = Device(
@@ -118,17 +136,34 @@ def _preflight(processes, saved, backend, device):
     if (
         type(saved.processes) is not tuple
         or not saved.processes
-        or any(type(plan) is not _ProcessPlan for plan in saved.processes)
+        or any(
+            type(plan) not in (_ProcessPlan, GPUProcessPlan)
+            for plan in saved.processes
+        )
     ):
         raise ValueError("invalid prepared checkpoint process plans")
     host = _host_state(saved.resident, restart.primary)
+    host = restore_host_fields(saved, host)
     _preflight_cpu_session(host.particles, host.gas, host.environment, target)
-    plans = tuple(_plan_process(p, host) for p in processes)
+    from particula.execution.prepared_extensions import plan_extension
+
+    registry = (
+        process_registry.snapshot() if process_registry is not None else None
+    )
+    plans = tuple(
+        plan_extension(registry.resolve(p), p, host)
+        if registry is not None and registry.has_type(type(p))
+        else _plan_process(p, host)
+        for p in processes
+    )
     validate_cohort_plans(plans)
     validate_ion_plans(plans)
-    if plans != saved.processes or len({p.family for p in plans}) != len(plans):
+    if configurations(plans) != saved.processes or len(
+        {p.family for p in plans}
+    ) != len(plans):
         raise ValueError("runnable configuration/order differs from checkpoint")
-    families = {p.family for p in plans}
+    validate_extension_state(saved, plans)
+    families = {p.family for p in plans if type(p) is not _RegisteredPlan}
     actual = {p.family for p in restart.resource_payloads}
     if (
         actual
@@ -152,7 +187,7 @@ def _preflight(processes, saved, backend, device):
     }:
         raise ValueError("checkpoint random streams differ from process plan")
     _validate_auxiliary(saved, plans)
-    return target, dt, plans
+    return target, dt, plans, host
 
 
 def _validate_auxiliary(saved, plans):
@@ -241,8 +276,19 @@ def _restore_after_binding(owner, saved):
     targets.update(
         {("prepared", name): array for name, array in owner._auxiliary.items()}
     )
+    from particula.execution.checkpoint_extensions import restore_targets
+
+    targets.update(restore_targets(owner))
     staging = []
-    for item in (*saved.resident.payloads, *saved.auxiliary):
+    payloads = (
+        *saved.resident.payloads,
+        *saved.auxiliary,
+        *saved.field_payloads,
+        *saved.extension_state,
+    )
+    if saved.clock is not None:
+        payloads += (saved.clock,)
+    for item in payloads:
         target = targets[item.family, item.role]
         values = np.frombuffer(item.data, dtype=item.dtype).reshape(item.shape)
         source = wp.array(
@@ -261,13 +307,17 @@ def resume_simulation(
     *,
     backend: Backend = Backend.WARP,
     device: str | None = None,
+    process_registry=None,
 ):
     """Restore owned arrays and counters on the exact checkpoint device."""
     from particula.execution.checkpoint import restart_resident_session
     from particula.execution.prepared import PreparedSimulation
 
-    target, dt, plans = _preflight(processes, saved, backend, device)
+    target, dt, plans, host = _preflight(
+        processes, saved, backend, device, process_registry
+    )
     owner = PreparedSimulation._empty(target, dt)
+    owner._initial_time = saved.initial_time
     try:
         with owner._scope():
             owner._session, owner._registry, owner._guard = (
@@ -275,6 +325,14 @@ def resume_simulation(
             )
             owner._device_failure = owner._wp.zeros(
                 1, dtype=owner._wp.int32, device=owner.device.native
+            )
+            from particula.execution.field_buffers import FieldBuffers
+            from particula.extension_fields import field_dimensions
+
+            owner._extension_fields = FieldBuffers.upload(
+                host.fields,
+                field_dimensions(host.particles, host.gas),
+                owner.device.native,
             )
             owner._bind(plans)
             _restore_after_binding(owner, saved)
