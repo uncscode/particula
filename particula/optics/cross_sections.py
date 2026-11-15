@@ -131,3 +131,75 @@ def get_phase_matrix(
     result = np.zeros(shape + array.shape[-3:], dtype=np.float64)
     np.divide(array, denominator, out=result, where=denominator > 0)
     return result, valid
+
+
+class DifferentialCrossSections(NamedTuple):
+    """Angular scattering areas per solid angle in m²/sr.
+
+    Attributes:
+        perpendicular: Perpendicular incident polarization, |S1|²/k².
+        parallel: Parallel incident polarization, |S2|²/k².
+        unpolarized: Mean of the two polarized cross sections.
+    """
+
+    perpendicular: NDArray[np.float64]
+    parallel: NDArray[np.float64]
+    unpolarized: NDArray[np.float64]
+
+
+def get_differential_cross_sections(
+    perpendicular: ArrayLike,
+    parallel: ArrayLike,
+    wavelength: ArrayLike,
+    medium_index: ArrayLike = 1.0,
+) -> DifferentialCrossSections:
+    """Convert S1/S2 amplitudes to polarized differential cross sections.
+
+    Uses the nonabsorbing-medium wave number k=2*pi*n_medium/lambda_vacuum,
+    following Bohren and Huffman (1983), chapter 4,
+    https://doi.org/10.1002/9783527618156.
+
+    Args:
+        perpendicular: Dimensionless S1, shaped batch+(angles,).
+        parallel: Dimensionless S2, same shape as perpendicular.
+        wavelength: Positive finite vacuum wavelength [m]; broadcasts with
+            batch axes, not the angle axis.
+        medium_index: Positive finite real medium index, default one;
+            broadcasts with batch axes.
+
+    Returns:
+        Perpendicular, parallel and unpolarized differential scattering
+        cross sections [m²/sr], shaped broadcast batch+(angles,).
+        Inputs are unchanged; scalar angles must retain a length-one axis.
+
+    Raises:
+        ValueError: If amplitudes, shapes or physical inputs are invalid.
+        RuntimeError: If dimensional cross sections overflow.
+    """
+    s1 = np.asarray(perpendicular, dtype=np.complex128)
+    s2 = np.asarray(parallel, dtype=np.complex128)
+    if np.iscomplexobj(wavelength) or np.iscomplexobj(medium_index):
+        raise ValueError("Wavelength and medium index must be real")
+    wave = np.asarray(wavelength, dtype=np.float64)
+    medium = np.asarray(medium_index, dtype=np.float64)
+    if (
+        s1.ndim < 1
+        or s1.shape != s2.shape
+        or np.any(~np.isfinite(s1))
+        or np.any(~np.isfinite(s2))
+        or np.any(~np.isfinite(wave))
+        or np.any(~np.isfinite(medium))
+        or np.any(wave <= 0)
+        or np.any(medium <= 0)
+    ):
+        raise ValueError("Require finite angular amplitudes and wave/medium>0")
+    shape = np.broadcast_shapes(s1.shape[:-1], wave.shape, medium.shape)
+    with np.errstate(over="ignore", invalid="ignore"):
+        length = np.broadcast_to(wave / medium / (2 * np.pi), shape)
+        # Scale amplitudes before squaring to avoid avoidable overflow.
+        per = np.asarray(abs(s1 * length[..., None]) ** 2, dtype=np.float64)
+        par = np.asarray(abs(s2 * length[..., None]) ** 2, dtype=np.float64)
+        unpolarized = per / 2 + par / 2
+    if np.any(~np.isfinite(per)) or np.any(~np.isfinite(par)):
+        raise RuntimeError("Nonfinite differential cross sections")
+    return DifferentialCrossSections(per, par, unpolarized)

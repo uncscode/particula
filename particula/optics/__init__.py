@@ -10,8 +10,10 @@ from particula.optics.column import (
     get_mass_specific_opacity,
 )
 from particula.optics.cross_sections import (
+    DifferentialCrossSections,
     OpticalCrossSections,
     get_cross_sections,
+    get_differential_cross_sections,
     get_differential_mueller_matrix,
     get_phase_matrix,
 )
@@ -47,6 +49,8 @@ __all__ = [
     "get_mie_efficiencies",
     "ScatteringAmplitudes",
     "get_scattering_amplitudes",
+    "DifferentialCrossSections",
+    "get_differential_cross_sections",
     "OpticalCrossSections",
     "get_cross_sections",
     "get_differential_mueller_matrix",
