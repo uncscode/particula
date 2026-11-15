@@ -250,3 +250,65 @@ def test_bundle_preserves_explicit_data_destination(tmp_path, monkeypatch):
     ) as archive:
         assert archive.read("results.json") == source.read_bytes()
         assert "docs/data/results.json" not in archive.namelist()
+
+
+def test_llms_index_checks_published_file_and_repository_targets(
+    tmp_path, monkeypatch
+):
+    """Missing publication, renamed sources and wrong revisions fail offline."""
+    root = tmp_path / "repo"
+    public = root / "website/public"
+    public.mkdir(parents=True)
+    dist = root / "website/dist"
+    dist.mkdir()
+    monkeypatch.setattr(site, "ROOT", root)
+    monkeypatch.setattr(site, "SITE", root / "website")
+    assert site.check_llms_index(dist) == ["Missing published llms.txt"]
+    guide = root / "docs/guide.md"
+    guide.parent.mkdir()
+    guide.write_text("# Guide\n")
+    api = dist / "api/index.html"
+    api.parent.mkdir()
+    api.write_text("<h1>API</h1>")
+    text = (
+        "# Particula\n\n"
+        "- [Guide](https://raw.githubusercontent.com/uncscode/particula/"
+        "main/docs/guide.md)\n"
+        "- [API](https://uncscode.github.io/particula/api/)\n"
+    )
+    source = public / "llms.txt"
+    published = dist / "llms.txt"
+    source.write_text(text)
+    published.write_text(text)
+    assert site.check_llms_index(dist) == []
+    guide.unlink()
+    assert any("Missing or archived" in e for e in site.check_llms_index(dist))
+    guide.write_text("# Guide\n")
+    api.unlink()
+    assert any("/api/" in e for e in site.check_llms_index(dist))
+    api.write_text("<h1>API</h1>")
+    published.write_text(text.replace("main/", "old-release/"))
+    errors = site.check_llms_index(dist)
+    assert any("differs" in e for e in errors)
+    assert any("revision" in e for e in errors)
+
+
+def test_llms_index_rejects_empty_and_escaping_targets(tmp_path, monkeypatch):
+    """A present but useless index or an escaping file is not valid."""
+    public = tmp_path / "public"
+    public.mkdir()
+    dist = tmp_path / "dist"
+    dist.mkdir()
+    monkeypatch.setattr(site, "ROOT", tmp_path)
+    monkeypatch.setattr(site, "SITE", tmp_path)
+    for text, expected in (
+        ("# Particula\n", "heading and documentation links"),
+        (
+            "# Particula\n[Escape](https://raw.githubusercontent.com/"
+            "uncscode/particula/main/../outside.md)\n",
+            "escapes",
+        ),
+    ):
+        (public / "llms.txt").write_text(text)
+        (dist / "llms.txt").write_text(text)
+        assert any(expected in e for e in site.check_llms_index(dist))

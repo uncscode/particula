@@ -1,0 +1,31 @@
+# Particula
+
+> A Python aerosol particle simulator with documentation, executable examples,
+> and assistant skills for scientific studies and library development.
+
+These links follow upstream `main` and describe development documentation,
+not necessarily the latest published release. Check the installed Particula
+version before applying APIs or examples. For a fixed version, use documentation
+from the matching release tag or commit; do not assume development APIs exist
+in an older installation.
+
+Raw Markdown and Python links point directly to maintained repository files.
+Resolve relative links against the containing file's repository directory at
+the same revision. Python examples may require dependencies, helper files or
+CUDA; consult their prerequisites before execution. Published example pages
+include saved outputs that are not embedded in the Python sources.
+
+## Documentation and examples
+
+- [Installation](https://raw.githubusercontent.com/uncscode/particula/main/docs/guide/getting-started/installation/index.md): Choose an installation method.
+- [First simulation](https://raw.githubusercontent.com/uncscode/particula/main/docs/guide/getting-started/first-simulation.md): Build and run a small simulation.
+- [Data model](https://raw.githubusercontent.com/uncscode/particula/main/docs/guide/data-model/index.md): Native state, species and population semantics.
+- [Processes](https://raw.githubusercontent.com/uncscode/particula/main/docs/guide/processes/index.md): Supported physical processes.
+- [GPU support](https://raw.githubusercontent.com/uncscode/particula/main/docs/guide/gpu/support.md): Supported devices, operations and limitations.
+- [Migration to 0.3.0](https://raw.githubusercontent.com/uncscode/particula/main/docs/guide/migration/v0.3.0/index.md): Changes from older APIs.
+- [Native aerosol example](https://raw.githubusercontent.com/uncscode/particula/main/docs/examples/fundamentals/native_aerosol.py): Executable Python source.
+- [Particle data example](https://raw.githubusercontent.com/uncscode/particula/main/docs/examples/fundamentals/particles/particle_data.py): Executable Python source for particle state.
+- [AI assistants](https://raw.githubusercontent.com/uncscode/particula/main/docs/guide/ai-assistants/index.md): Install and use Particula Helper.
+- [Particula Helper](https://raw.githubusercontent.com/uncscode/particula/main/plugins/particula-helper/README.md): Scientific workflows and repository skills.
+- [Source discovery](https://raw.githubusercontent.com/uncscode/particula/main/plugins/particula-helper/references/sources.md): Find documentation matching the selected environment.
+- [API reference](https://uncscode.github.io/particula/API/particula/llms.txt): Generated Markdown index linking to module references.

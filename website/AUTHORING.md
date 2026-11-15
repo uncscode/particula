@@ -102,3 +102,19 @@ participate in freshness checks and are included in the downloadable ZIP with
 `example.py`, preserving their relative import paths (or `input_destinations`).
 The plain Python download remains available; use the ZIP when helpers or data
 are needed. Test extracted bundles independently before publication.
+
+## Maintain the LLM documentation index
+
+`website/public/llms.txt` is a small curated index published at
+`https://uncscode.github.io/particula/llms.txt`. Keep roughly 10–15 direct links
+to maintained guides, executable Python examples and Particula Helper resources.
+Prefer `https://raw.githubusercontent.com/uncscode/particula/main/` file URLs;
+use the published API Markdown index for generated API documentation. Do not link archives
+or generated local files. Raw documents retain repository-relative links.
+
+The index explicitly describes development `main`. If the site later publishes
+versioned release documentation, update the index and its verifier together to
+use matching tags or commits. Keep version guidance visible to readers.
+The normal build checks the published index and its targets offline against the
+checkout and built site. After deployment, verify the public index and links
+separately; a local build does not prove that GitHub Pages has updated.

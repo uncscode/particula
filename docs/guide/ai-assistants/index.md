@@ -6,6 +6,14 @@ development skills for planning, implementation, testing, documentation and revi
 instructions and Python examples; your assistant supplies the tools to read
 files and execute Python. No hosted simulation service or MCP server is included.
 
+## Find documentation from an assistant
+
+The [LLM documentation index](https://uncscode.github.io/particula/llms.txt)
+links directly to maintained Markdown guides, Python examples and helper skills
+in the upstream repository. It follows development `main`; check your installed
+Particula version before using its APIs. This optional index helps assistants
+retrieve documentation and does not provide a hosted agent or simulation API.
+
 ## Choose your assistant
 
 | Host | Installation | Execution environment |
