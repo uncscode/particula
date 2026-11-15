@@ -5,7 +5,10 @@ import pytest
 from particula.optics import get_mie_efficiencies
 
 wp = pytest.importorskip("warp")
-from particula.optics.gpu import prepare_mie  # noqa: E402
+from particula.optics.gpu import (  # noqa: E402
+    prepare_mie,
+    prepare_population_mie,
+)
 
 
 @pytest.mark.parametrize("device", ["cpu", "cuda:0"])
@@ -78,3 +81,56 @@ def test_workspace_metadata_rejection():
         prepare_mie(m, wp.zeros(2, dtype=wp.float32, device="cpu"))
     with pytest.raises(ValueError):
         prepare_mie(m, x, matrix_scale=x)
+
+
+@pytest.mark.parametrize("population", [False, True])
+@pytest.mark.parametrize("explicit_stream", [False, True])
+def test_workspace_replay_uses_prepared_cuda_stream(
+    population, explicit_stream
+):
+    """Capture on the prepared stream even when another stream is current."""
+    if not wp.is_cuda_available():
+        pytest.skip("Native CUDA is unavailable")
+    device = "cuda:0"
+    prepared_stream = wp.Stream(device)
+    other_stream = wp.Stream(device)
+    shape = (1, 1) if population else (1,)
+    m = wp.array(
+        np.full(shape + (2,), [1.5, 0.1]), dtype=wp.vec2d, device=device
+    )
+    x = wp.array(np.ones(shape), dtype=wp.float64, device=device)
+    radius = wp.array(np.full(shape, 1e-6), dtype=wp.float64, device=device)
+    weights = wp.array(np.full(shape, 1e8), dtype=wp.float64, device=device)
+    angles = wp.array([0.0, 1.0, np.pi], dtype=wp.float64, device=device)
+    with wp.ScopedStream(other_stream if explicit_stream else prepared_stream):
+        kwargs = dict(
+            coefficient_capacity=20,
+            angles=angles,
+            stream=prepared_stream if explicit_stream else None,
+        )
+        work = (
+            prepare_population_mie(m, x, radius, weights, **kwargs)
+            if population
+            else prepare_mie(m, x, **kwargs)
+        )
+    wp.synchronize_device(device)
+    with wp.ScopedStream(other_stream):
+        wp.capture_begin(stream=prepared_stream)
+        work.enqueue()
+        graph = wp.capture_end(stream=prepared_stream)
+    # Erase any accidental execution outside the captured stream. Only graph
+    # replay may now produce the expected scalar and angular optical outputs.
+    wp.synchronize_device(device)
+    output = work.optics if population else work.efficiencies
+    output.fill_(-123.0)
+    work.mueller.fill_(-123.0)
+    wp.synchronize_device(device)
+    wp.capture_launch(graph, stream=prepared_stream)
+    work.check()
+    expected = get_mie_efficiencies(1 / (2 * np.pi), 1.0, 1.5 + 0.1j)
+    scale = np.pi * 1e-12 * 1e8 if population else 1.0
+    np.testing.assert_allclose(
+        output.numpy()[0, 0], expected.extinction * scale
+    )
+    assert np.all(np.isfinite(work.mueller.numpy()))
+    assert np.all(work.mueller.numpy()[..., 0, 0] >= 0)

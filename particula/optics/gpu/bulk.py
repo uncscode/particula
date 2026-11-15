@@ -43,7 +43,7 @@ class PopulationWorkspace:
     def enqueue(self) -> None:
         """Enqueue the retained streaming calculation without host transfers."""
         for command in self._commands:
-            command.launch()
+            command.launch(stream=self._stream)
 
     def check(self) -> None:
         """Explicitly synchronize and reject failed population results."""
