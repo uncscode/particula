@@ -1,15 +1,15 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 3.5636509059695527,
-  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "elapsed_seconds": 2.924894994008355,
+  "package_source_sha256": "98021107918d76caafbd800e6f8ab4c66bb0905e1950a2fc7075c622655abf5a",
   "input_sha256": {},
   "example": "examples-processes-coagulation-charge-coagulation-with-charge-functional",
   "fingerprint": "3b8d43b9141cc4392dd9db9539cc4a2ea5c18e298dbe6a4fdad7521f9e7d88f8",
   "source": "docs/examples/processes/coagulation/charge/coagulation_with_charge_functional.py",
-  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "revision": "54ad1a812054da5361bdad2f2d397dd05615269e",
   "package_dirty": false,
-  "executed_at": "2026-11-13T15:00:02.729040+00:00",
+  "executed_at": "2026-11-14T17:18:06.134700+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
@@ -49,6 +49,6 @@
   "files": {
     "source.py": "b42da4c2c6d28c23b7d3c760cc363ee3d34095b017ebc5ede6d18ca7f6d4dacf",
     "figure-4-1.png": "21eaf506f3eeaab3bc6a1bf2ad8628b3e5afa9c79e9f59fc7ee8036755dd6550",
-    "figure-7-1.png": "168f7e492c34bc762de148a90f77e2ca015accde19f7c50cf66551876843aaa7"
+    "figure-7-1.png": "1254c7159fa72f921ad1aac334c80332de96ced581fcf2d5aee86c036c77ee89"
   }
 }

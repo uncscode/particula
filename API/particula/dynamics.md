@@ -35,6 +35,7 @@ helpers remain concrete-only.
 - `particula.dynamics.coagulation`
 - `particula.dynamics.condensation`
 - `particula.dynamics.dilution`
+- `particula.dynamics.ions`
 - `particula.dynamics.nucleation`
 - `particula.dynamics.particle_process`
 - `particula.dynamics.properties`

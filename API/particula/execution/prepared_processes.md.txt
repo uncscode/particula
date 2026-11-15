@@ -64,6 +64,18 @@ def __init__(family: str, parameters: tuple[tuple[str, Any], ...] = ()) -> None
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L0-L0)
 
+## particula.execution.prepared_processes._compile_coagulation
+
+*function*
+
+```python
+def _compile_coagulation(plan, owner)
+```
+
+Retain the common collision sampler with optional ion rate work.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L300-L352)
+
 ## particula.execution.prepared_processes._compile_process
 
 *function*
@@ -74,7 +86,7 @@ def _compile_process(plan: _ProcessPlan, owner: Any)
 
 Retain one existing prepared direct-kernel call and its resources.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L168-L273)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L206-L297)
 
 ## particula.execution.prepared_processes._plan_coagulation
 
@@ -86,7 +98,7 @@ def _plan_coagulation(process: Any, aerosol: Aerosol) -> _ProcessPlan
 
 Admit direct Brownian physics and equal active represented counts.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L75-L98)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L92-L136)
 
 ## particula.execution.prepared_processes._plan_dilution
 
@@ -98,7 +110,7 @@ def _plan_dilution(process: Any, _aerosol: Aerosol) -> _ProcessPlan
 
 Freeze the exact exponential dilution coefficient in inverse seconds.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L59-L72)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L76-L89)
 
 ## particula.execution.prepared_processes._plan_process
 
@@ -110,7 +122,7 @@ def _plan_process(process: Any, aerosol: Aerosol) -> _ProcessPlan
 
 Reject unknown runnable/strategy semantics before any GPU allocation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L31-L56)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L31-L73)
 
 ## particula.execution.prepared_processes._plan_wall_loss
 
@@ -122,4 +134,4 @@ def _plan_wall_loss(process: Any, aerosol: Aerosol) -> _ProcessPlan
 
 Freeze neutral/charged chamber geometry and explicit electric fields.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L101-L165)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L139-L203)

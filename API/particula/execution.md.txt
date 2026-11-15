@@ -3525,6 +3525,7 @@ invalid.
 - `particula.execution.adapters`
 - `particula.execution.availability`
 - `particula.execution.checkpoint`
+- `particula.execution.cohort`
 - `particula.execution.communication`
 - `particula.execution.cpu_context`
 - `particula.execution.diagnostics`
@@ -3534,11 +3535,14 @@ invalid.
 - `particula.execution.gpu_session`
 - `particula.execution.graph_capture`
 - `particula.execution.prepared`
+- `particula.execution.prepared_atmospheric`
 - `particula.execution.prepared_capture`
 - `particula.execution.prepared_checkpoint`
+- `particula.execution.prepared_cohort`
 - `particula.execution.prepared_condensation`
 - `particula.execution.prepared_diagnostics`
 - `particula.execution.prepared_guards`
+- `particula.execution.prepared_ions`
 - `particula.execution.prepared_nucleation`
 - `particula.execution.prepared_nucleation_kernels`
 - `particula.execution.prepared_processes`

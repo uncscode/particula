@@ -30,7 +30,7 @@ The *diffusive* Knudsen number (Kn_d) differs from the standard Knudsen
 number. It represents the ratio of the mean particle persistence
 distance to the effective Coulombic interaction scale. Mathematically:
 
-- Kn_d = [ √(k_B × T × μ_red) / f_red ] / [ (rᵢ + rⱼ) × (Γ_c / Γ_k) ]
+- Kn_d = [ √(k_B × T × μ_red) / f_red ] / [ (rᵢ + rⱼ) × (Γ_k / Γ_c) ]
     - k_B is the Boltzmann constant (J/K).
     - T is the temperature (K).
     - μ_red is the reduced mass of particles (kg).

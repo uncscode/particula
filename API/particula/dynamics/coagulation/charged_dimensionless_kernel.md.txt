@@ -60,9 +60,9 @@ the Dyachkov et al. (2007) approximation.
 - (`Union[float, NDArray[np.float64]]`) — The dimensionless coagulation kernel (H) [dimensionless].
 
 References:
-- Dyachkov, S. A., Kustova, E. V., & Kustov, A. V. (2007). Coagulation of
-  particles in the transition regime: The effect of the Coulomb potential.
-  Journal of Chemical Physics, 126(12).
+- D'yachkov, L. G., Khrapak, A. G., Khrapak, S. A., & Morfill, G. E.
+  (2007). Model of grain charging in collisional plasmas accounting for
+  collisionless layer. Physics of Plasmas, 14, 042102.
   https://doi.org/10.1063/1.2713719
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensionless_kernel.py#L109-L162)
@@ -189,9 +189,9 @@ coagulation kernel based on the diffusive Knudsen number.
 infinity.
 
 References:
-- Dyachkov, S. A., Kustova, E. V., & Kustov, A. V. (2007). Coagulation of
-  particles in the transition regime: The effect of the Coulomb potential.
-  Journal of Chemical Physics, 126(12).
-  https://doi.org/10.1063/1.2713719
+- Gopalakrishnan, R., & Hogan, C. J. (2012). Coulomb-influenced
+  collisions in aerosols and dusty plasmas. Physical Review E, 85, 026410,
+  equation (5) for the hard-sphere fit and its four coefficients.
+  https://doi.org/10.1103/PhysRevE.85.026410
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensionless_kernel.py#L59-L106)

@@ -20,7 +20,7 @@ def _activity_plan(activity, particles, gas, pairs, vapor)
 
 Require one participating volatile material lane.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L116-L190)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L118-L192)
 
 ## particula.execution.prepared_condensation._surface_plan
 
@@ -32,7 +32,7 @@ def _surface_plan(surface, particles)
 
 Require an exact static or single-phase volume-weighted surface law.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L70-L113)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L70-L115)
 
 ## particula.execution.prepared_condensation._vapor_plan
 
@@ -68,7 +68,7 @@ def compile_condensation(plan: _ProcessPlan, owner: Any)
 
 Allocate retained thermodynamics, species maps and transport sidecars.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L270-L367)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L277-L390)
 
 ## particula.execution.prepared_condensation.plan_condensation
 
@@ -80,4 +80,4 @@ def plan_condensation(process, aerosol) -> _ProcessPlan
 
 Freeze representable physical parameters before any upload.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L193-L267)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L195-L274)

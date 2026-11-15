@@ -8,6 +8,16 @@ All constants are given in their base units. We use scipy constants.
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/util/constants.py#L1-L1)
 
+## particula.util.constants.ATOMIC_MASS_UNIT
+
+*attribute* · *module attribute*
+
+```python
+ATOMIC_MASS_UNIT = scipy.constants.atomic_mass
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/util/constants.py#L13-L13)
+
 ## particula.util.constants.AVOGADRO_NUMBER
 
 *attribute* · *module attribute*
@@ -36,7 +46,7 @@ BOLTZMANN_CONSTANT = scipy.constants.k
 ELECTRIC_PERMITTIVITY = RELATIVE_PERMITTIVITY_AIR * VACUUM_PERMITTIVITY
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/util/constants.py#L36-L36)
+[View source](https://github.com/uncscode/particula/blob/main/particula/util/constants.py#L39-L39)
 
 ## particula.util.constants.ELEMENTARY_CHARGE_VALUE
 
@@ -46,7 +56,7 @@ ELECTRIC_PERMITTIVITY = RELATIVE_PERMITTIVITY_AIR * VACUUM_PERMITTIVITY
 ELEMENTARY_CHARGE_VALUE = scipy.constants.elementary_charge
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/util/constants.py#L16-L16)
+[View source](https://github.com/uncscode/particula/blob/main/particula/util/constants.py#L19-L19)
 
 ## particula.util.constants.GAS_CONSTANT
 
@@ -56,7 +66,7 @@ ELEMENTARY_CHARGE_VALUE = scipy.constants.elementary_charge
 GAS_CONSTANT = BOLTZMANN_CONSTANT * AVOGADRO_NUMBER
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/util/constants.py#L14-L14)
+[View source](https://github.com/uncscode/particula/blob/main/particula/util/constants.py#L17-L17)
 
 ## particula.util.constants.MOLECULAR_WEIGHT_AIR
 
@@ -66,7 +76,7 @@ GAS_CONSTANT = BOLTZMANN_CONSTANT * AVOGADRO_NUMBER
 MOLECULAR_WEIGHT_AIR = 0.0289644
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/util/constants.py#L44-L44)
+[View source](https://github.com/uncscode/particula/blob/main/particula/util/constants.py#L47-L47)
 
 ## particula.util.constants.REF_TEMPERATURE_STP
 
@@ -76,7 +86,7 @@ MOLECULAR_WEIGHT_AIR = 0.0289644
 REF_TEMPERATURE_STP = 273.15
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/util/constants.py#L42-L42)
+[View source](https://github.com/uncscode/particula/blob/main/particula/util/constants.py#L45-L45)
 
 ## particula.util.constants.REF_VISCOSITY_AIR_STP
 
@@ -86,7 +96,7 @@ REF_TEMPERATURE_STP = 273.15
 REF_VISCOSITY_AIR_STP = 1.716e-05
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/util/constants.py#L41-L41)
+[View source](https://github.com/uncscode/particula/blob/main/particula/util/constants.py#L44-L44)
 
 ## particula.util.constants.RELATIVE_PERMITTIVITY_AIR
 
@@ -96,7 +106,7 @@ REF_VISCOSITY_AIR_STP = 1.716e-05
 RELATIVE_PERMITTIVITY_AIR = RELATIVE_PERMITTIVITY_AIR_ROOM
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/util/constants.py#L29-L29)
+[View source](https://github.com/uncscode/particula/blob/main/particula/util/constants.py#L32-L32)
 
 ## particula.util.constants.RELATIVE_PERMITTIVITY_AIR_ROOM
 
@@ -106,7 +116,7 @@ RELATIVE_PERMITTIVITY_AIR = RELATIVE_PERMITTIVITY_AIR_ROOM
 RELATIVE_PERMITTIVITY_AIR_ROOM = 1.000530569
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/util/constants.py#L23-L23)
+[View source](https://github.com/uncscode/particula/blob/main/particula/util/constants.py#L26-L26)
 
 ## particula.util.constants.RELATIVE_PERMITTIVITY_AIR_STP
 
@@ -116,7 +126,7 @@ RELATIVE_PERMITTIVITY_AIR_ROOM = 1.000530569
 RELATIVE_PERMITTIVITY_AIR_STP = 1.00058986
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/util/constants.py#L26-L26)
+[View source](https://github.com/uncscode/particula/blob/main/particula/util/constants.py#L29-L29)
 
 ## particula.util.constants.STANDARD_GRAVITY
 
@@ -126,7 +136,7 @@ RELATIVE_PERMITTIVITY_AIR_STP = 1.00058986
 STANDARD_GRAVITY = scipy.constants.g
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/util/constants.py#L46-L46)
+[View source](https://github.com/uncscode/particula/blob/main/particula/util/constants.py#L49-L49)
 
 ## particula.util.constants.SUTHERLAND_CONSTANT
 
@@ -136,7 +146,7 @@ STANDARD_GRAVITY = scipy.constants.g
 SUTHERLAND_CONSTANT = 110.4
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/util/constants.py#L43-L43)
+[View source](https://github.com/uncscode/particula/blob/main/particula/util/constants.py#L46-L46)
 
 ## particula.util.constants.VACUUM_PERMITTIVITY
 
@@ -146,4 +156,4 @@ SUTHERLAND_CONSTANT = 110.4
 VACUUM_PERMITTIVITY = scipy.constants.epsilon_0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/util/constants.py#L34-L34)
+[View source](https://github.com/uncscode/particula/blob/main/particula/util/constants.py#L37-L37)

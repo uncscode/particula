@@ -26,7 +26,7 @@ pending work, and ``snapshot`` returns detached CPU data for analysis.
 Closing waits for outstanding work and releases owned storage without an
 automatic download. Instances serialize their own operations.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L23-L471)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L23-L547)
 
 ### particula.execution.prepared.PreparedSimulation._auxiliary
 
@@ -238,7 +238,7 @@ captured: bool
 
 Report whether subsequent steps use this owner's live CUDA graph.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L412-L415)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L488-L491)
 
 ### particula.execution.prepared.PreparedSimulation.closed
 
@@ -250,7 +250,7 @@ closed: bool
 
 Report whether owned resources have been released.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L215-L217)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L218-L220)
 
 ### particula.execution.prepared.PreparedSimulation.completed_steps
 
@@ -262,7 +262,7 @@ completed_steps: int
 
 Return enqueued steps; synchronization establishes device success.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L199-L204)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L202-L207)
 
 ### particula.execution.prepared.PreparedSimulation.device
 
@@ -274,7 +274,7 @@ device: Device
 
 Return the explicit backend and canonical native device.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L189-L191)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L192-L194)
 
 ### particula.execution.prepared.PreparedSimulation.gas_names
 
@@ -286,7 +286,7 @@ gas_names: tuple[str, ...]
 
 Return the fixed full-gas order for updates and analysis.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L331-L335)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L346-L350)
 
 ### particula.execution.prepared.PreparedSimulation.simulated_time
 
@@ -298,7 +298,7 @@ simulated_time: float
 
 Return enqueued simulated time in seconds.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L207-L212)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L210-L215)
 
 ### particula.execution.prepared.PreparedSimulation.time_step
 
@@ -310,7 +310,7 @@ time_step: float
 
 Return the frozen duration of one process sequence, in seconds.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L194-L196)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L197-L199)
 
 ### particula.execution.prepared.PreparedSimulation.__enter__
 
@@ -322,7 +322,7 @@ def __enter__() -> PreparedSimulation
 
 Enter an active simulation's explicit ownership scope.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L464-L467)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L540-L543)
 
 ### particula.execution.prepared.PreparedSimulation.__exit__
 
@@ -334,7 +334,7 @@ def __exit__(*_exc: object) -> None
 
 Release resources on normal exit and exceptions.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L469-L471)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L545-L547)
 
 ### particula.execution.prepared.PreparedSimulation.__init__
 
@@ -358,7 +358,7 @@ def _bind(plans: tuple[Any, ...]) -> None
 
 Compile a validated process plan against the owned resident state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L141-L151)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L141-L154)
 
 ### particula.execution.prepared.PreparedSimulation._empty
 
@@ -382,7 +382,7 @@ def _fault() -> None
 
 Preserve resident fault and graph invalidation semantics.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L175-L186)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L178-L189)
 
 ### particula.execution.prepared.PreparedSimulation._require_active
 
@@ -394,7 +394,7 @@ def _require_active() -> None
 
 Reject terminal state before observing or enqueueing anything.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L160-L168)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L163-L171)
 
 ### particula.execution.prepared.PreparedSimulation._scope
 
@@ -406,7 +406,7 @@ def _scope()
 
 Select this owner's device/stream without inter-stream events.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L153-L158)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L156-L161)
 
 ### particula.execution.prepared.PreparedSimulation._upload
 
@@ -430,7 +430,7 @@ def _wait() -> None
 
 Wait only for this simulation's CUDA stream (CPU work is eager).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L170-L173)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L173-L176)
 
 ### particula.execution.prepared.PreparedSimulation.capture
 
@@ -448,7 +448,7 @@ identities stay fixed; forcing updates may change values in place.
 Warp CPU rejects. Warp may instantiate its executable on first replay;
 performance measurements should warm up that replay separately.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L417-L429)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L493-L505)
 
 ### particula.execution.prepared.PreparedSimulation.checkpoint
 
@@ -464,7 +464,7 @@ Unlike a CPU snapshot, this in-memory checkpoint preserves random
 streams, GPU-only fields and step counters. Resume on the same device
 through the original runnable or an equivalently configured sequence.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L399-L409)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L475-L485)
 
 ### particula.execution.prepared.PreparedSimulation.close
 
@@ -476,7 +476,23 @@ def close() -> None
 
 Wait and release owned storage without downloading a final state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L437-L462)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L513-L538)
+
+### particula.execution.prepared.PreparedSimulation.cohort_diagnostics
+
+*method*
+
+```python
+def cohort_diagnostics()
+```
+
+Observe detached per-box original-lineage outcome counts.
+
+Counts partition initial seeds into reached, captured and unresolved.
+Unresolved lineages are censored at the chosen observation end time.
+These are lineage counts, not the number of surviving particles.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L456-L473)
 
 ### particula.execution.prepared.PreparedSimulation.diagnostics
 
@@ -493,7 +509,37 @@ Observe detached box/species reductions without downloading slots.
 - (`SimulationDiagnostics`) — SimulationDiagnostics with number, charge and mass concentrations,
 - (`SimulationDiagnostics`) — active-slot counts, forcing, and optional last-step latent energy.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L312-L328)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L327-L343)
+
+### particula.execution.prepared.PreparedSimulation.ion_cleanup_diagnostics
+
+*method*
+
+```python
+def ion_cleanup_diagnostics()
+```
+
+Observe cumulative exported particles and mass [kg, box by species].
+
+Exported charge is exactly zero by construction. Returned arrays are
+detached; this explicit observation synchronizes the prepared owner.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L437-L454)
+
+### particula.execution.prepared.PreparedSimulation.ion_source_diagnostics
+
+*method*
+
+```python
+def ion_source_diagnostics()
+```
+
+Return cumulative injected pairs and mass [kg] for each box.
+
+This explicit observation synchronizes and returns detached arrays.
+Mass is extensive, in the native particle species order.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L414-L435)
 
 ### particula.execution.prepared.PreparedSimulation.run
 
@@ -505,7 +551,7 @@ def run(steps: int) -> None
 
 Enqueue a nonnegative integer number of fixed-duration steps.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L247-L256)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L250-L259)
 
 ### particula.execution.prepared.PreparedSimulation.snapshot
 
@@ -522,7 +568,7 @@ snapshots, including when explicitly targeting Warp CPU. Derived vapor
 pressure and random streams belong to execution/checkpoint state rather
 than the CPU aerosol schema.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L281-L310)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L296-L325)
 
 ### particula.execution.prepared.PreparedSimulation.step
 
@@ -537,7 +583,7 @@ Enqueue one frozen process sequence without a host observation.
 A launch failure faults the binding. Earlier writes are not rolled back.
 Asynchronous errors surface at a later synchronization or snapshot.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L219-L245)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L222-L248)
 
 ### particula.execution.prepared.PreparedSimulation.synchronize
 
@@ -549,7 +595,7 @@ def synchronize() -> None
 
 Wait for pending work and surface asynchronous execution failures.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L258-L279)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L261-L294)
 
 ### particula.execution.prepared.PreparedSimulation.uncapture
 
@@ -561,7 +607,7 @@ def uncapture() -> None
 
 Wait, release the graph and return to ordinary prepared execution.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L431-L435)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L507-L511)
 
 ### particula.execution.prepared.PreparedSimulation.update_environment
 
@@ -580,7 +626,7 @@ condensation, saturation is derived and cannot be prescribed here.
 This explicit forcing boundary waits for prior work and its uploads.
 Invalid values reject before any resident field is changed.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L337-L376)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L352-L391)
 
 ### particula.execution.prepared.PreparedSimulation.update_gas
 
@@ -597,7 +643,7 @@ This explicit boundary waits for pending work, uploads owned values,
 and refreshes derived saturation when condensation supplies its law.
 It leaves particle state and process configuration unchanged.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L378-L397)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L393-L412)
 
 ## particula.execution.prepared.prepare_simulation
 
@@ -609,4 +655,4 @@ def prepare_simulation(processes: tuple[Any, ...], aerosol: Aerosol, *, backend:
 
 Validate the ordered process plan before uploading native state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L474-L517)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L550-L597)

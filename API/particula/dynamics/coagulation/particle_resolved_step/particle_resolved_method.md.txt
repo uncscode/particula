@@ -29,7 +29,7 @@ Calculate coagulation probabilities for sampled particle pairs.
 - (`Union[float, NDArray[np.float64]]`) — Probability (or array of probabilities) that collisions occur during
 - (`Union[float, NDArray[np.float64]]`) — the step.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method.py#L298-L318)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method.py#L316-L336)
 
 ## particula.dynamics.coagulation.particle_resolved_step.particle_resolved_method._final_coagulation_state
 
@@ -54,7 +54,7 @@ remaps merges so each small particle maps to one final large particle.
 
 - (`Tuple[NDArray[np.int64], NDArray[np.int64]]`) — Tuple of ``(small_indices, large_indices)`` with conflicts resolved.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method.py#L321-L355)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method.py#L339-L373)
 
 ## particula.dynamics.coagulation.particle_resolved_step.particle_resolved_method._interpolate_kernel
 
@@ -80,7 +80,7 @@ extrapolation outside the tabulated radius range.
 - (`RegularGridInterpolator`) — RegularGridInterpolator that maps ``[r_small, r_large]`` pairs to
 - (`RegularGridInterpolator`) — kernel values with safe bounds handling.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method.py#L267-L295)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method.py#L285-L313)
 
 ## particula.dynamics.coagulation.particle_resolved_step.particle_resolved_method.get_particle_resolved_coagulation_step
 
@@ -112,7 +112,7 @@ indices describe which small particles merged into which large particles.
 - (`NDArray[np.int64]`) — Array of shape ``(n, 2)`` with ``[small_index, large_index]`` pairs
 - (`NDArray[np.int64]`) — describing coagulation events.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method.py#L57-L264)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method.py#L57-L282)
 
 ## particula.dynamics.coagulation.particle_resolved_step.particle_resolved_method.get_particle_resolved_update_step
 

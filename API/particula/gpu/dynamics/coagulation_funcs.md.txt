@@ -14,6 +14,96 @@ It does not add public exports or higher-level charged coagulation APIs.
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/gpu/dynamics/coagulation_funcs.py#L1-L1)
 
+## particula.gpu.dynamics.coagulation_funcs._CHAHL_EXP_COEFFICIENT
+
+*attribute* · *module attribute*
+
+```python
+_CHAHL_EXP_COEFFICIENT = wp.constant(wp.float64(4.528))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/dynamics/coagulation_funcs.py#L529-L529)
+
+## particula.gpu.dynamics.coagulation_funcs._CHAHL_EXP_DECAY
+
+*attribute* · *module attribute*
+
+```python
+_CHAHL_EXP_DECAY = wp.constant(wp.float64(1.088))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/dynamics/coagulation_funcs.py#L530-L530)
+
+## particula.gpu.dynamics.coagulation_funcs._CHAHL_LOG_COEFFICIENT
+
+*attribute* · *module attribute*
+
+```python
+_CHAHL_LOG_COEFFICIENT = wp.constant(wp.float64(0.7091))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/dynamics/coagulation_funcs.py#L531-L531)
+
+## particula.gpu.dynamics.coagulation_funcs._CHAHL_LOG_FACTOR
+
+*attribute* · *module attribute*
+
+```python
+_CHAHL_LOG_FACTOR = wp.constant(wp.float64(1.527))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/dynamics/coagulation_funcs.py#L532-L532)
+
+## particula.gpu.dynamics.coagulation_funcs._CHAHL_OFFSET
+
+*attribute* · *module attribute*
+
+```python
+_CHAHL_OFFSET = wp.constant(wp.float64(10.33))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/dynamics/coagulation_funcs.py#L536-L536)
+
+## particula.gpu.dynamics.coagulation_funcs._CHAHL_POWER_COEFFICIENT
+
+*attribute* · *module attribute*
+
+```python
+_CHAHL_POWER_COEFFICIENT = wp.constant(wp.float64(11.36))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/dynamics/coagulation_funcs.py#L533-L533)
+
+## particula.gpu.dynamics.coagulation_funcs._CHAHL_POWER_EXPONENT
+
+*attribute* · *module attribute*
+
+```python
+_CHAHL_POWER_EXPONENT = wp.constant(wp.float64(0.272))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/dynamics/coagulation_funcs.py#L534-L534)
+
+## particula.gpu.dynamics.coagulation_funcs._CHAHL_SHAPE_INTERCEPT
+
+*attribute* · *module attribute*
+
+```python
+_CHAHL_SHAPE_INTERCEPT = wp.constant(wp.float64(0.05971))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/dynamics/coagulation_funcs.py#L537-L537)
+
+## particula.gpu.dynamics.coagulation_funcs._CHAHL_SHAPE_SLOPE
+
+*attribute* · *module attribute*
+
+```python
+_CHAHL_SHAPE_SLOPE = wp.constant(wp.float64(0.003533))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/dynamics/coagulation_funcs.py#L535-L535)
+
 ## particula.gpu.dynamics.coagulation_funcs._COULOMB_SERIES_THRESHOLD
 
 *attribute* · *module attribute*
@@ -23,6 +113,76 @@ _COULOMB_SERIES_THRESHOLD = wp.constant(wp.float64(1e-05))
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/gpu/dynamics/coagulation_funcs.py#L27-L27)
+
+## particula.gpu.dynamics.coagulation_funcs._FIT_SERIES_THRESHOLD
+
+*attribute* · *module attribute*
+
+```python
+_FIT_SERIES_THRESHOLD = wp.constant(wp.float64(1e-05))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/dynamics/coagulation_funcs.py#L521-L521)
+
+## particula.gpu.dynamics.coagulation_funcs._FIT_TRANSITION_SCALE
+
+*attribute* · *module attribute*
+
+```python
+_FIT_TRANSITION_SCALE = wp.constant(wp.float64(2.5))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/dynamics/coagulation_funcs.py#L525-L525)
+
+## particula.gpu.dynamics.coagulation_funcs._GATTI_FACTOR
+
+*attribute* · *module attribute*
+
+```python
+_GATTI_FACTOR = wp.constant(wp.float64(1.22))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/dynamics/coagulation_funcs.py#L522-L522)
+
+## particula.gpu.dynamics.coagulation_funcs._GATTI_FACTOR_CUBED
+
+*attribute* · *module attribute*
+
+```python
+_GATTI_FACTOR_CUBED = wp.constant(wp.float64(1.815848))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/dynamics/coagulation_funcs.py#L523-L523)
+
+## particula.gpu.dynamics.coagulation_funcs._GOPAL_COEFFICIENT
+
+*attribute* · *module attribute*
+
+```python
+_GOPAL_COEFFICIENT = wp.constant(wp.float64(1.598))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/dynamics/coagulation_funcs.py#L526-L526)
+
+## particula.gpu.dynamics.coagulation_funcs._GOPAL_EXPONENT
+
+*attribute* · *module attribute*
+
+```python
+_GOPAL_EXPONENT = wp.constant(wp.float64(1.1709))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/dynamics/coagulation_funcs.py#L527-L527)
+
+## particula.gpu.dynamics.coagulation_funcs._GOPAL_POTENTIAL_THRESHOLD
+
+*attribute* · *module attribute*
+
+```python
+_GOPAL_POTENTIAL_THRESHOLD = wp.constant(wp.float64(0.5))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/dynamics/coagulation_funcs.py#L524-L524)
 
 ## particula.gpu.dynamics.coagulation_funcs._HARD_SPHERE_DENOMINATOR_LINEAR
 
@@ -73,6 +233,26 @@ _KINETIC_LIMIT_CUTOFF = wp.constant(wp.float64(1e-80))
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/gpu/dynamics/coagulation_funcs.py#L28-L28)
+
+## particula.gpu.dynamics.coagulation_funcs._MIN_ATTRACTIVE_POTENTIAL
+
+*attribute* · *module attribute*
+
+```python
+_MIN_ATTRACTIVE_POTENTIAL = wp.constant(wp.float64(1e-16))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/dynamics/coagulation_funcs.py#L520-L520)
+
+## particula.gpu.dynamics.coagulation_funcs._MIN_CHAHL_POTENTIAL
+
+*attribute* · *module attribute*
+
+```python
+_MIN_CHAHL_POTENTIAL = wp.constant(wp.float64(1e-12))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/dynamics/coagulation_funcs.py#L528-L528)
 
 ## particula.gpu.dynamics.coagulation_funcs._MIN_NORMAL_FLOAT64
 
@@ -152,6 +332,22 @@ a scalar particle pair using the Fuchs correction to the continuum kernel.
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/gpu/dynamics/coagulation_funcs.py#L235-L283)
 
+## particula.gpu.dynamics.coagulation_funcs.charged_dimensionless_wp
+
+*function*
+
+```python
+def charged_dimensionless_wp(model: wp.int32, kn: wp.float64, phi: wp.float64, hard_sphere: wp.float64) -> wp.float64
+```
+
+Evaluate dimensionless CPU strategy formulas (model IDs 0 through 4).
+
+IDs: hard sphere, Dyachkov 2007, Gatti 2008, Gopalakrishnan 2012,
+Chahl 2019. The dimensional Coulomb enhancement is applied by the caller.
+References and fitted domains follow charged_dimensionless_kernel.py.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/dynamics/coagulation_funcs.py#L540-L636)
+
 ## particula.gpu.dynamics.coagulation_funcs.charged_hard_sphere_wp
 
 *function*
@@ -160,7 +356,19 @@ a scalar particle pair using the Fuchs correction to the continuum kernel.
 def charged_hard_sphere_wp(radius_i: wp.float64, radius_j: wp.float64, mass_i: wp.float64, mass_j: wp.float64, charge_i: wp.float64, charge_j: wp.float64, temperature: wp.float64, pressure: wp.float64, boltzmann_constant: wp.float64, elementary_charge_value: wp.float64, electric_permittivity: wp.float64, gas_constant: wp.float64, molecular_weight_air: wp.float64, ref_viscosity: wp.float64, ref_temperature: wp.float64, sutherland_constant: wp.float64) -> wp.float64
 ```
 
-Calculate an internal charged hard-sphere pair rate in SI units.
+Evaluate the backwards-compatible charged hard-sphere pair rate.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/dynamics/coagulation_funcs.py#L918-L956)
+
+## particula.gpu.dynamics.coagulation_funcs.charged_kernel_wp
+
+*function*
+
+```python
+def charged_kernel_wp(model: wp.int32, radius_i: wp.float64, radius_j: wp.float64, mass_i: wp.float64, mass_j: wp.float64, charge_i: wp.float64, charge_j: wp.float64, temperature: wp.float64, pressure: wp.float64, boltzmann_constant: wp.float64, elementary_charge_value: wp.float64, electric_permittivity: wp.float64, gas_constant: wp.float64, molecular_weight_air: wp.float64, ref_viscosity: wp.float64, ref_temperature: wp.float64, sutherland_constant: wp.float64) -> wp.float64
+```
+
+Calculate a selected charged Brownian pair rate in SI units.
 
 This device-only, concrete-module-only helper is the pair-rate primitive for
 charged-only and canonical Brownian-plus-charged particle-resolved low-level
@@ -172,6 +380,10 @@ hard-sphere fit from
 ``particula.dynamics.coagulation.charged_dimensionless_kernel``. It does
 not change public exports.
 
+Aerosol-pair electrostatics enter through the charge product. No separate
+image or polarization interaction is included. At fixed masses and radii,
+setting either charge to zero removes the Coulomb correction.
+
 Non-finite or non-positive radii, masses, thermodynamic state, or physical
 constants return exact safe zero. Charges must be finite but may be signed
 or zero. Invalid intermediates, finite-input intermediate overflow,
@@ -182,6 +394,7 @@ cutoff when its enhancement is below ``1e-80``.
 
 **Parameters**
 
+- `model` (`wp.int32`) — Fit identifier, 0=hard sphere, 1=Dyachkov, 2=Gatti, 3=Gopalakrishnan, 4=Chahl.
 - `radius_i` (`wp.float64`) — Radius of particle i [m]. Must be finite and positive.
 - `radius_j` (`wp.float64`) — Radius of particle j [m]. Must be finite and positive.
 - `mass_i` (`wp.float64`) — Mass of particle i [kg]. Must be finite and positive.
@@ -201,18 +414,32 @@ cutoff when its enhancement is below ``1e-80``.
 
 **Returns**
 
-- (`wp.float64`) — Finite, non-negative charged hard-sphere pair rate [m³/s], or exact
+- (`wp.float64`) — Finite, non-negative selected charged pair rate [m³/s], or exact
 - (`wp.float64`) — ``0.0`` for invalid inputs, invalid or overflowed intermediates,
 - (`wp.float64`) — finite extreme-repulsion clipping, or the kinetic cutoff.
 
 > **References**
 >
-> Dyachkov, S. A., Kustova, E. V., & Kustov, A. V. (2007).
-> Coagulation of particles in the transition regime: The effect of the
-> Coulomb potential. *Journal of Chemical Physics*, 126(12).
+> Gopalakrishnan, R., & Hogan, C. J., Jr. (2012). Coulomb-influenced
+> collisions in aerosols and dusty plasmas. *Physical Review E*, 85,
+> 026410. https://doi.org/10.1103/PhysRevE.85.026410
+> 
+> D'yachkov, L. G., Khrapak, A. G., Khrapak, S. A., & Morfill, G. E.
+> (2007). Model of grain charging in collisional plasmas accounting for
+> collisionless layer. *Physics of Plasmas*, 14, 042102.
 > https://doi.org/10.1063/1.2713719
+> 
+> Gatti, M., & Kortshagen, U. (2008). Analytical model of particle
+> charging in plasmas over a wide range of collisionality.
+> *Physical Review E*, 78, 046402.
+> https://doi.org/10.1103/PhysRevE.78.046402
+> 
+> Chahl, H. S., & Gopalakrishnan, R. (2019). High potential, near free
+> molecular regime Coulombic collisions in aerosols and dusty plasmas.
+> *Aerosol Science and Technology*, 53, 933-957.
+> https://doi.org/10.1080/02786826.2019.1614522
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/dynamics/coagulation_funcs.py#L520-L773)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/dynamics/coagulation_funcs.py#L639-L915)
 
 ## particula.gpu.dynamics.coagulation_funcs.coulomb_continuum_limit_wp
 

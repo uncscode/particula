@@ -55,11 +55,16 @@ Lazily resolve a supported public direct-kernel entry point.
 - `particula.gpu.kernels._population_validation`
 - `particula.gpu.kernels._wall_loss_native`
 - `particula.gpu.kernels.coagulation`
+- `particula.gpu.kernels.cohort`
 - `particula.gpu.kernels.communication`
 - `particula.gpu.kernels.condensation`
 - `particula.gpu.kernels.dilution`
 - `particula.gpu.kernels.environment`
 - `particula.gpu.kernels.exhaustion`
+- `particula.gpu.kernels.ion_cleanup`
+- `particula.gpu.kernels.ion_coagulation`
+- `particula.gpu.kernels.ion_condensation`
+- `particula.gpu.kernels.ion_source`
 - `particula.gpu.kernels.nucleation`
 - `particula.gpu.kernels.slot_management`
 - `particula.gpu.kernels.thermodynamics`

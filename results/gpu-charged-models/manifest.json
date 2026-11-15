@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 5.1965342910261825,
+  "package_source_sha256": "98021107918d76caafbd800e6f8ab4c66bb0905e1950a2fc7075c622655abf5a",
+  "input_sha256": {},
+  "example": "gpu-charged-models",
+  "fingerprint": "3ea16b3382e5d62c64f6f61f65474d0b42d3aa674a555ccc3a3d349a47585a1c",
+  "source": "docs/examples/gpu/prepared/gpu_charged_models.py",
+  "revision": "54ad1a812054da5361bdad2f2d397dd05615269e",
+  "package_dirty": false,
+  "executed_at": "2026-11-14T17:17:57.739394+00:00",
+  "device": "cuda:0: NVIDIA GeForce RTX 5060",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [
+      {
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     /tmp/particula-charged-warp\n"
+      },
+      {
+        "text": "Module particula_docs_example 3af101d load on device 'cuda:0' took 465.91 ms  (compiled)\nDevice: NVIDIA GeForce RTX 5060\nMaximum relative CPU/CUDA difference: 1.258e-13\nParity is numerical evidence, not atmospheric validation.\n"
+      },
+      {
+        "image": "figure-4-3.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "6b1912d3b0380e44ea7615781a441b78c62b00c2fc665ed7e572a5d0cabdfef5",
+    "figure-4-3.png": "b915713dae06d85f2f8787632daa862855d9b59a6b6a6d8e33a91927e4465f79"
+  }
+}

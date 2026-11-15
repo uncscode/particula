@@ -208,4 +208,7 @@ using ``lambda = 8 * diffusivity_particle / (pi * mean_thermal_speed)``.
 
 - `particula.gpu.dynamics.coagulation_funcs`
 - `particula.gpu.dynamics.condensation_funcs`
+- `particula.gpu.dynamics.ion_attachment`
+- `particula.gpu.dynamics.ion_pair_data`
+- `particula.gpu.dynamics.mobility_attachment`
 - `particula.gpu.dynamics.wall_loss_funcs`
