@@ -202,23 +202,25 @@ def prepare_mie(
     def empty(shape, dtype):
         return wp.empty(shape, dtype=dtype, device=device)
 
-    derivative = empty((tile, coefficient_capacity + 1), wp.vec2d)
-    a = empty((tile, coefficient_capacity), wp.vec2d)
-    b = empty((tile, coefficient_capacity), wp.vec2d)
-    terms = empty((count,), wp.int32)
-    status = wp.zeros(count, dtype=wp.int32, device=device)
-    efficiency = empty((count, 7), wp.float64)
-    s1 = s2 = matrix = angle_status = matrix_status = None
-    if angles is not None:
-        s1 = empty((count, angle_count), wp.vec2d)
-        s2 = empty((count, angle_count), wp.vec2d)
-        matrix = empty((count, angle_count, 4, 4), wp.float64)
-        angle_status = wp.zeros(
-            (count, angle_count), dtype=wp.int32, device=device
-        )
-        matrix_status = wp.zeros_like(angle_status)
-        if matrix_scale is None:
-            matrix_scale = wp.ones(count, dtype=wp.float64, device=device)
+    # Initialization and replay share stream order without a device barrier.
+    with wp.ScopedStream(stream, sync_enter=False):
+        derivative = empty((tile, coefficient_capacity + 1), wp.vec2d)
+        a = empty((tile, coefficient_capacity), wp.vec2d)
+        b = empty((tile, coefficient_capacity), wp.vec2d)
+        terms = empty((count,), wp.int32)
+        status = wp.zeros(count, dtype=wp.int32, device=device)
+        efficiency = empty((count, 7), wp.float64)
+        s1 = s2 = matrix = angle_status = matrix_status = None
+        if angles is not None:
+            s1 = empty((count, angle_count), wp.vec2d)
+            s2 = empty((count, angle_count), wp.vec2d)
+            matrix = empty((count, angle_count, 4, 4), wp.float64)
+            angle_status = wp.zeros(
+                (count, angle_count), dtype=wp.int32, device=device
+            )
+            matrix_status = wp.zeros_like(angle_status)
+            if matrix_scale is None:
+                matrix_scale = wp.ones(count, dtype=wp.float64, device=device)
     commands = []
 
     def record(kernel, dim, inputs):

@@ -134,3 +134,66 @@ def test_workspace_replay_uses_prepared_cuda_stream(
     )
     assert np.all(np.isfinite(work.mueller.numpy()))
     assert np.all(work.mueller.numpy()[..., 0, 0] >= 0)
+
+
+@pytest.mark.parametrize("population", [False, True])
+@pytest.mark.parametrize("invalid", [False, True])
+def test_workspace_initializes_on_prepared_stream(
+    monkeypatch, population, invalid
+):
+    """Initialization precedes first execution without cross-stream barriers."""
+    if not wp.is_cuda_available():
+        pytest.skip("Native CUDA is unavailable")
+    device = "cuda:0"
+    prepared = wp.Stream(device)
+    other = wp.Stream(device)
+    shape = (1, 1) if population else (1,)
+    with wp.ScopedStream(prepared, sync_enter=False):
+        m = wp.array(
+            np.full(shape + (2,), [1.5, 0.1]), dtype=wp.vec2d, device=device
+        )
+        x = wp.array(
+            np.full(shape, -1.0 if invalid else 1.0),
+            dtype=wp.float64,
+            device=device,
+        )
+        radius = wp.array(np.full(shape, 1e-6), dtype=wp.float64, device=device)
+        weights = wp.array(np.full(shape, 1e8), dtype=wp.float64, device=device)
+        angles = wp.array([0.0, 1.0, np.pi], dtype=wp.float64, device=device)
+
+    fills = []
+
+    def observe_fill(original):
+        def wrapped(*args, **kwargs):
+            fills.append(wp.get_stream(device))
+            return original(*args, **kwargs)
+
+        return wrapped
+
+    # Observe actual fill scheduling as well as numerical results, making the
+    # regression deterministic even when a wrong-stream fill finishes quickly.
+    for name in ("zeros", "zeros_like", "ones"):
+        monkeypatch.setattr(wp, name, observe_fill(getattr(wp, name)))
+    with wp.ScopedStream(other, sync_enter=False):
+        kwargs = dict(angles=angles, coefficient_capacity=20, stream=prepared)
+        work = (
+            prepare_population_mie(m, x, radius, weights, **kwargs)
+            if population
+            else prepare_mie(m, x, **kwargs)
+        )
+        assert wp.get_stream(device) == other
+        work.enqueue()
+        assert fills and all(stream == prepared for stream in fills)
+        if invalid:
+            with pytest.raises(RuntimeError):
+                work.check()
+        else:
+            work.check()
+            expected = get_mie_efficiencies(1 / (2 * np.pi), 1.0, 1.5 + 0.1j)
+            output = work.optics if population else work.efficiencies
+            scale = np.pi * 1e-12 * 1e8 if population else 1.0
+            np.testing.assert_allclose(
+                output.numpy()[0, 0], expected.extinction * scale
+            )
+            assert np.all(np.isfinite(work.mueller.numpy()))
+            assert np.all(work.mueller.numpy()[..., 0, 0] > 0)
