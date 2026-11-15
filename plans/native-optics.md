@@ -292,5 +292,14 @@ numerical source is baf393b18. The later evidence commits do not change it.
   tested retired-redirect checker correction; no dependency/version/README or
   unrelated working-tree changes. Upstream base remains a73fa1974.
 
-Remaining: push final evidence, create upstream PR, observe hosted checks and
-resolve actionable review/check failures. Do not merge or publish a release.
+Upstream PR #1653 is open. Hosted linting exposed a Warp 1.19 stub mismatch;
+the narrow typing annotation passed CI. Review then identified retained launch
+replay using the current stream instead of the prepared stream. Commit
+`4ce93ae09` fixes both workspaces, with four native-CUDA capture/replay
+regressions. All 255 optics tests pass; workspace tests also pass on Warp 1.19.
+The complete CUDA example was refreshed on the corrected source, with new
+provenance and timings in the qualification record. Earlier full-suite and
+installed-wheel counts above describe the pre-review numerical baseline.
+
+Remaining: observe hosted checks for the review correction and resolve any
+additional actionable failures. Do not merge or publish a release.
