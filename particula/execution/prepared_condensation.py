@@ -9,10 +9,10 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from dataclasses import replace
-from typing import Any
 
 import numpy as np
 
+from particula.execution.preparation_context import BuiltinPreparationContext
 from particula.execution.prepared_processes import _ProcessPlan
 
 
@@ -274,7 +274,9 @@ def plan_condensation(process, aerosol) -> _ProcessPlan:
     )
 
 
-def compile_condensation(plan: _ProcessPlan, owner: Any):
+def compile_condensation(
+    plan: _ProcessPlan, context: BuiltinPreparationContext
+):
     """Allocate retained thermodynamics, species maps and transport sidecars."""
     from particula.dynamics.condensation.species_mapping import (
         CondensationSpeciesMap,
@@ -297,12 +299,12 @@ def compile_condensation(plan: _ProcessPlan, owner: Any):
     from particula.gpu.kernels.thermodynamics import ThermodynamicsConfig
     from particula.gpu.species_mapping import prepare_condensation_species_map
 
-    wp, session = owner._wp, owner._session
+    wp, session = context.wp, context.session
     config = plan.values
 
     def array(values, dtype=None):
         return wp.array(
-            values, dtype=dtype or wp.float64, device=owner.device.native
+            values, dtype=dtype or wp.float64, device=context.device.native
         )
 
     pressure_parameters = np.zeros((len(config["vapor"]), 4))
@@ -319,10 +321,10 @@ def compile_condensation(plan: _ProcessPlan, owner: Any):
         array(config["kappas"]),
         array(config["references"]),
     )
-    resources = owner._registry.acquire_condensation()
+    resources = context.registry.acquire_condensation()
     species_binding = prepare_condensation_species_map(
-        session.particles,
-        session.gas,
+        context.particles,
+        context.gas,
         gas_names=session.metadata.gas_names,
         species_map=CondensationSpeciesMap(
             config["gas_names"], config["pairs"]
@@ -340,9 +342,9 @@ def compile_condensation(plan: _ProcessPlan, owner: Any):
     )
     state = WarpCondensationState(
         CondensationExecutionConfig(profile),
-        session.particles,
-        session.gas,
-        session.environment,
+        context.particles,
+        context.gas,
+        context.environment,
         thermodynamics,
         activity_surface=activity,
         scratch_buffers=resources.scratch_buffers,
@@ -351,9 +353,9 @@ def compile_condensation(plan: _ProcessPlan, owner: Any):
         mass_accommodation=array(config["accommodation"]),
         diffusion_coefficient_vapor=array(config["diffusion"]),
         energy_transfer=wp.zeros(
-            session.gas.concentration.shape,
+            context.gas.concentration.shape,
             dtype=wp.float64,
-            device=owner.device.native,
+            device=context.device.native,
         )
         if config["latent"] is not None
         else None,
@@ -362,10 +364,10 @@ def compile_condensation(plan: _ProcessPlan, owner: Any):
         else None,
     )
     binding = WarpCondensationExecutionAdapter().prepare(
-        WarpCondensationExecutionState(state, owner.time_step)
+        WarpCondensationExecutionState(state, context.time_step)
     )
     exclusion = next(
-        (p for p in owner._plans if p.family == "ion_condensation"), None
+        (p for p in context.plans if p.family == "ion_condensation"), None
     )
     ion_materials = (
         (
@@ -379,12 +381,12 @@ def compile_condensation(plan: _ProcessPlan, owner: Any):
         binding,
         prepared=replace(
             binding.prepared,
-            failure=owner._device_failure,
+            failure=context.failure,
             ion_material_indices=ion_materials,
             kelvin_density=config.get("kelvin_density", 0.0),
         ),
     )
-    owner._bindings[plan.family] = binding
+    context.bindings[plan.family] = binding
     if state.energy_transfer is not None:
-        owner._auxiliary["latent_heat_energy"] = state.energy_transfer
+        context.auxiliary["latent_heat_energy"] = state.energy_transfer
     return binding.execute

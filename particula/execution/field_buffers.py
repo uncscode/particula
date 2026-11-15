@@ -12,6 +12,15 @@ from particula.extension_fields import ExtensionFields, FieldSpec
 class _DeviceArray(Protocol):
     """The explicit observation surface required from retained device arrays."""
 
+    @property
+    def shape(self) -> tuple[int, ...]:
+        """Expose immutable dimensions without reading device values."""
+        ...
+
+    def reshape(self, shape: tuple[int, ...]) -> "_DeviceArray":
+        """Make a setup-only view sharing the same device allocation."""
+        ...
+
     def numpy(self) -> NDArray[np.generic]:
         """Download a host array at an explicit observation boundary."""
         ...

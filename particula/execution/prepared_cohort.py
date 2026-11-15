@@ -2,6 +2,8 @@
 
 import numpy as np
 
+from particula.execution.preparation_context import BuiltinPreparationContext
+
 
 def plan_cohort(process, aerosol):
     """Freeze the initial labeling rule and first-passage threshold."""
@@ -21,7 +23,7 @@ def plan_cohort(process, aerosol):
     )
 
 
-def compile_cohort(_plan, _owner):
+def compile_cohort(_plan, _context: BuiltinPreparationContext):
     """The observer is attached around physical operations after compilation."""
     return lambda: None
 
@@ -62,7 +64,9 @@ def validate_cohort_plans(plans):
                 )
 
 
-def wrap_cohort_operations(owner, plans, operations):
+def wrap_cohort_operations(
+    context: BuiltinPreparationContext, plans, operations
+):
     """Initialize labels and observe after each ordered physical process."""
     cohort = next((p for p in plans if p.family == "cohort"), None)
     if cohort is None:
@@ -73,13 +77,13 @@ def wrap_cohort_operations(owner, plans, operations):
         observe_cohort,
     )
 
-    wp, session = owner._wp, owner._session
-    p, device = session.particles, owner.device.native
+    wp = context.wp
+    p, device = context.particles, context.device.native
     shape = p.concentration.shape
     pending = wp.zeros(shape, dtype=wp.int64, device=device)
     background = wp.zeros(shape, dtype=wp.int32, device=device)
     statistics = wp.zeros((shape[0], 4), dtype=wp.int64, device=device)
-    owner._auxiliary.update(
+    context.auxiliary.update(
         cohort_pending=pending,
         cohort_background=background,
         cohort_statistics=statistics,
@@ -106,7 +110,7 @@ def wrap_cohort_operations(owner, plans, operations):
         pending,
         background,
         statistics,
-        owner._device_failure,
+        context.failure,
     ]
 
     def observe():
@@ -116,12 +120,14 @@ def wrap_cohort_operations(owner, plans, operations):
 
     observe()
     resources = (
-        owner._registry.acquire_coagulation(shape[1])
+        context.registry.acquire_coagulation(shape[1])
         if any(p.family == "coagulation" for p in plans)
         else None
     )
 
-    def wrap(operation, family):
+    from particula.execution.extension_registry import PreparedOperation
+
+    def wrap(operation: PreparedOperation, family):
         def enqueue():
             operation()
             if family == "coagulation":
@@ -134,12 +140,17 @@ def wrap_cohort_operations(owner, plans, operations):
                         resources.n_collisions,
                         pending,
                         background,
-                        owner._device_failure,
+                        context.failure,
                     ],
                 )
             observe()
 
-        return enqueue
+        return PreparedOperation(
+            operation.name + ".cohort",
+            enqueue,
+            (operation, pending, background, statistics, resources),
+            operation.capabilities,
+        )
 
     return tuple(
         operation if plan.family == "cohort" else wrap(operation, plan.family)
