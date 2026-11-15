@@ -324,3 +324,12 @@ narrow passing suite. Leave merge, version bump and release outside this goal.
   from an isolated temporary directory with warnings treated as errors.
   CPU/GPU downloadable example tests: 2 passed; documentation structure and
   focused Ruff passed. The particle-tracer example and final gates remain.
+- The particle-tracer example now demonstrates nonzero Brownian mergers,
+  dilution removal, changed tag distributions, exact source-resampling overlap
+  values, newborn defaults and passive-policy rejection. The 256-slot collision
+  case ends with 48 active slots and closes its inventory/removal budget; the
+  separate source case closes 70 + 14 = 84 tag equivalents and independently
+  conserves native material mass. Saved plots were inspected and saved-data
+  rendering verified. All three outside-checkout examples pass (3 tests),
+  including the actual CUDA helper ZIP. The data-model guide now documents
+  field schemas, copies, bounds, policies, ledgers and structural boundaries.

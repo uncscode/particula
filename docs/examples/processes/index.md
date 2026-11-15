@@ -66,3 +66,7 @@ Edit the `.py`, then sync and execute to refresh outputs for the site.
 - [Timed custom CPU chemistry](customization/timed_box_chemistry.py) —
   Compose a SciPy box process, scheduled emissions and native dilution;
   check analytical species evolution and per-box mass accounting.
+
+- [Registered particle tracers](customization/particle_tracers.py) —
+  Track additive inventories through mergers, dilution, resampling and births,
+  with explicit rejection of undefined passive-field merges.
