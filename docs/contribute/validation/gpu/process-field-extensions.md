@@ -1,7 +1,7 @@
 # Custom processes and fields: qualification
 
 This development record covers the `codex/process-field-extensions` branch.
-Qualification is in progress; this record does not imply merge or release.
+Local qualification is complete; this record does not imply merge or release.
 
 ## Performance protocol
 
@@ -79,6 +79,45 @@ rerun passed. Neither run was counted as a successful final package gate.
 
 ## Timing results
 
-Measurements are pending; the acceptance bound above was committed before
-collecting them. Final saved-example checks and the final site build also remain
-pending, followed by PR CI and review.
+Measured on revision `24c99ad8c` with Warp 1.11.1, NumPy 2.3.4 and Python
+3.12.12. This revision has the same library bytes as the full package run.
+The [complete samples and source hashes](https://github.com/uncscode/particula/blob/main/docs/data/gpu/process-field-extensions.json)
+retain seven samples per case and the benchmark script digest. Other GPU tests
+and saved-example validation finished before these measurements; each case
+checked for competing GPU processes before starting.
+
+| Execution | Median time per step | Sample range | Native overhead |
+| --- | ---: | ---: | ---: |
+| Pre-feature native | 91.954 µs | 89.572–93.776 µs | Baseline |
+| Current native | 101.203 µs | 99.758–102.545 µs | +10.1% |
+| Pre-feature native, captured | 124.135 µs | 123.555–131.212 µs | Baseline |
+| Current native, captured | 137.293 µs | 135.108–138.645 µs | +10.6% |
+| Custom resident + native | 129.000 µs | 127.049–130.842 µs | Different work |
+| Custom resident + native, captured | 163.099 µs | 155.962–167.565 µs | Different work |
+| Explicit CPU transfer + native | 1,890.613 µs | 1,850.797–1,915.288 µs | Different work |
+
+Both extension-free comparisons pass the predeclared 20% bound. Capture is
+slower for this small workload: these are complete host-enqueued step costs,
+including lifecycle/capture validation, rather than isolated device-kernel
+times. The result does not imply that capture slows larger physics workloads.
+The explicit transfer measurement includes the costs of ordinary Python and
+transactional staging; it supports the documented convenience/performance
+trade-off without claiming universal speedups.
+
+For each source tree, reproduce the native case with:
+
+```bash
+.venv/bin/python scripts/gpu_studies/extension_overhead.py \
+  --source-root /path/to/source --revision SOURCE_REVISION \
+  --mode native --steps 2000 --repeats 7 --output result.json
+```
+
+Add `--capture` for captured cases. Use the current source tree and
+`--mode resident` for the custom resident workload, or `--mode transfer
+--steps 200` for explicit host execution. Baseline and current runs must use the
+same interpreter and script. CUDA is mandatory; the harness rejects CPU fallback.
+
+Saved-example validation passed, with CUDA workloads explicitly skipped by that
+gate and the new CUDA example separately refreshed and tested on the GPU.
+The final site rebuild passed with zero rendered-link errors across 607 HTML
+pages and 286 API modules. Hosted PR CI/review remains a separate gate.
