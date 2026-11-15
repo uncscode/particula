@@ -1,6 +1,11 @@
 # %% [markdown]
 # # Measured CUDA scaling on an RTX 5060
 #
+# Would a faster timestep make your whole study faster? Use these measurements
+# to distinguish particle scaling, box scaling, and setup/transfer cost before
+# choosing an execution path. The [prepared quick start](gpu_prepared_quick_start.py)
+# explains the workflow whose costs are separated here.
+#
 # This CPU plotting script reads saved, qualified measurements. It does not
 # rerun the GPU campaign. Its small data file contains only plotted point/line
 # summaries and the provenance text shown below, not model states or image arrays. The underlying experiment uses float64, three
@@ -302,3 +307,18 @@ def run_example():
 
 if __name__ == "__main__":
     run_example()
+
+# %% [markdown]
+# ## Match the benchmark to the research workload
+#
+# The plots separate three decisions: how work scales within a box, how many
+# independent boxes can share the device, and whether setup is amortized over
+# enough steps. Smaller retained scratch memory does not remove the quadratic
+# pair work of Brownian coagulation. The plotted distribution is evidence that
+# the timing workload evolved, not a calibrated scientific result.
+#
+# To budget a parameter sweep, benchmark representative box sizes, occupancies,
+# process schedules, and observation intervals on your device. Report fresh-run
+# time alongside synchronized stepping, retain the same physical checks across
+# backends, and repeat timings. Extrapolating one large-box rate to many small
+# boxes—or this RTX 5060 campaign to another device—needs new measurements.

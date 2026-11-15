@@ -1,32 +1,26 @@
-# Index Equilibria
+# From phase properties to equilibrium aerosol mass
 
-## Notebooks
+A prescribed humidity does not uniquely specify aerosol composition without a
+thermodynamic model and an inventory of available material. These examples show
+the two parts of that calculation: how water and an organic component mix, and
+how a volatility distribution partitions between gas and condensed phases.
 
-- [Activity Coefficients](activity_part1.ipynb)
-- [Liquid-Liquid Equilibrium](equilibria_part1.ipynb)
+1. [Follow BAT phase properties](activity_part1.py). Compare activities with
+   activity coefficients, inspect the phase-transition weight, and evaluate
+   phase water fractions at prescribed water activity. The O:C comparison holds
+   molar mass and density fixed; it is not a chemical-aging simulation.
+2. [Solve multicomponent liquid–vapor partitioning](equilibria_part1.py). Combine
+   those properties with five surrogate volatilities and fixed organic loading.
+   Read aerosol water and condensed organic mass against their separate axes.
 
-## What is Equilibria?
+For a shorter introduction to the strategy interface, begin with the
+[compact partitioning example](../activity/equilibria_example.py). For the
+meaning of activity itself, use [ideal activity](../activity/ideal_activity_example.py)
+before interpreting phase behavior.
 
-Equilibria, a fundamental concept in physical chemistry, refers to the state where the concentrations of reactants and products in a chemical reaction remain constant over time. In the context of aerosol science, equilibria are essential in understanding how aerosol particles interact with their environment, particularly with respect to liquid and vapor phases. This balance is crucial in predicting how aerosols behave under different atmospheric conditions.
-
-## Why is Equilibria Important?
-
-Studying equilibria in aerosol systems is vital for several reasons:
-
-1. **Environmental Impact**: Aerosols play a significant role in air quality and climate change. Understanding their equilibrium behavior helps in assessing their environmental impact, such as their role in cloud formation and solar radiation scattering.
-
-2. **Health Implications**: Aerosols affect human health, especially in terms of respiratory issues. Knowledge of equilibrium states helps in evaluating exposure risks and designing mitigation strategies.
-
-3. **Atmospheric Chemistry**: Equilibria studies contribute to our understanding of atmospheric chemistry, particularly in the formation and transformation of aerosols.
-
-## How Does Equilibria Relate to These Notebooks?
-
-The notebooks presented here are dedicated to exploring various aspects of equilibria in aerosol science:
-
-1. **Activity Coefficients and Phase Behavior**: By calculating activity coefficients, we can predict how different components of aerosols partition between liquid and vapor phases. This is crucial in understanding the composition and concentration of aerosols under varying atmospheric conditions.
-
-2. **Liquid-Vapor Equilibrium**: The notebook delves into the equilibrium compositions of liquid-vapor mixtures, highlighting the role of relative humidity (RH) in shaping aerosol behavior.
-
-3. **Practical Applications**: Through examples and simulations, these notebooks provide practical insights into real-world scenarios, enhancing our understanding of aerosols in environmental and health contexts.
-
-Overall, the notebooks serve as an interactive platform to explore and understand the complex yet fascinating world of equilibria in aerosol science. Whether you're a student, researcher, or enthusiast, these materials offer valuable insights into the dynamic equilibrium processes that govern aerosol behavior in our atmosphere.
+Water activity corresponds to RH/100 under the flat-interface equilibrium
+assumption used here. These examples do not calculate equilibration times,
+particle curvature, or the kinetics of forming a second liquid phase. A useful
+research extension is to compare equilibrium mass across several organic
+loadings, assess solver residuals, and test the predicted humidity response
+against observations before coupling it to time-dependent condensation.

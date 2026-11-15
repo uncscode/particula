@@ -262,6 +262,7 @@ def render_example(key, config):
             "explicit; building this page does not run it.\n:::"
         )
     code_index = 0
+    invocation_index = len(chunks)
     for cell in sections(source):
         if cell.cell_type == "markdown":
             prose = re.sub(r"^# (.+)$", r"## \1", cell.source, flags=re.M)
@@ -279,18 +280,23 @@ def render_example(key, config):
                     )
                 )
             code_index += 1
+            invocation_index = len(chunks)
         elif cell.cell_type == "code":
             code_index += 1
+            invocation_index = len(chunks)
     if config.get("invoke"):
-        chunks.append(
+        invocation = [
             f"<details>\n<summary>Explicit {config['device']} "
             "invocation</summary>\n\n"
             f"```python\n{config['invoke']}\n```\n\n</details>"
-        )
+        ]
         if state == "current":
-            chunks.append(
+            invocation.append(
                 output_markdown(manifest["outputs"][-1], url, config["title"])
             )
+        # Execution appends this call after all code cells. Show its evidence
+        # there too, before the author's trailing interpretation and closure.
+        chunks[invocation_index:invocation_index] = invocation
     if state == "stale":
         chunks.append(
             "## Previous run outputs\n\nThese outputs belong to the executed "

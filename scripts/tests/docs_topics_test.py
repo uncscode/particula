@@ -25,6 +25,11 @@ def test_current_graph_covers_every_authored_page():
         (lambda d: d["topics"][1].update(parent="absent"), "missing parent"),
         (lambda d: d["topics"][0].update(parent="state"), "hierarchy cycle"),
         (lambda d: d["topics"][1].update(icon="absent"), "missing icon"),
+        (lambda d: d["topics"][1].pop("context"), "missing context"),
+        (
+            lambda d: d["topics"][1].update(investigation=" "),
+            "missing investigation",
+        ),
         (lambda d: d["topics"][1].update(related=["gas"]), "not reciprocal"),
         (
             lambda d: d["topics"][1].update(prerequisites=["state"]),

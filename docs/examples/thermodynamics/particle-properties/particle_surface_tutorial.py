@@ -17,33 +17,25 @@
 """Tutorial on surface strategies and Kelvin effect calculations for particles."""
 
 # %% [markdown]
-# # Particle Surface Tutorial
+# # How strongly does curvature raise equilibrium vapor pressure?
 #
-# Understanding how particle surfaces are represented is crucial in the study of condensation processes involving water and organic molecules. This is primarily influenced by the Kelvin curvature effect, which describes how the saturation vapor pressure of a liquid droplet varies with its size. This tutorial will introduce the fundamental approaches to modeling the particle surface in aerosol particle simulations.
+# A small droplet needs a higher vapor pressure to remain in equilibrium than
+# a flat liquid surface. How much of that increase comes from radius, and how
+# much comes from the condensing species and the assumed surface composition?
+# We compare glycerol, squalane, and glycerol in an illustrative mixed phase at
+# 300 K. This is a Kelvin-factor calculation, not a droplet-growth simulation.
 #
-# [Kelvin Curvature Effect](https://en.wikipedia.org/wiki/Kelvin_equation)
+# The dimensionless factor is $K_i=\exp(r_{K,i}/r)$, where
+# $r_{K,i}=2\sigma M_i/(RT\rho_i)$. Here $r$ and $r_K$ are in m,
+# $\sigma$ in N/m, $M_i$ in kg/mol, and $\rho_i$ in kg/m³.
+# The strategy uses each species' $M_i/\rho_i$ as its liquid molar-volume
+# approximation. It can average surface tension within assigned phases; it does
+# not replace species densities with a bulk mixture density.
 #
-# ## Strategies for Surface Representation
-#
-# To accurately simulate particle surfaces, one must adhere to the `SurfaceStrategy` abstract base class. This class outlines common methods required for all surface representation strategies:
-#
-# - `kelvin_radius`: Calculates the particle radius that corresponds to the Kelvin curvature effect.
-# - `kelvin_term`: Computes the Kelvin term, defined as exp(kelvin_radius / particle_radius).
-#
-# Specifically, the strategies differ in how they calculate:
-#
-# - `effective_surface_tension`: Determines the effective surface tension of species based on their concentration.
-# - `effective_density`: Computes the effective density of species based on their concentration.
-#
-# While each strategy may require additional parameters, defining surface tension is essential for all. The primary strategies include:
-#
-# - `SurfaceStrategyMolar`: Uses mole fraction weighted values to determine surface tension and density.
-# - `SurfaceStrategyMass`: Uses mass fraction weighted values to determine surface tension and density.
-# - `SurfaceStrategyVolume`: Uses volume fraction weighted values to determine surface tension and density.
-#
-# Each strategy is interchangeable and suitable for use in aerosol particle simulations. The choice of strategy should be guided by the available data and the level of detail required for the simulation.
-#
-# In this tutorial, we will demonstrate how to create and use these strategies, employing builders and factories to instantiate them and calculate both the Kelvin radius and term.
+# Read this alongside the [activity comparison](activity_tutorial.py): activity
+# and curvature are separate factors in equilibrium pressure. Material constants
+# below are illustrative fixed inputs, without temperature dependence or a fitted
+# surface-enrichment model.
 
 # %%
 # In Colab uncomment the following command to install particula:
@@ -53,12 +45,12 @@ import numpy as np
 import particula as par
 
 # %% [markdown]
-# ## Direct Strategy Creation
+# ## Establish a pure-component reference
 #
-# The following code demonstrates how directly create and instance of a molar surface strategy and calculate the Kelvin radius and term.
-#
-# Note this approach assumes base SI units, if you want conversions on the inputs and data validation checks then use the subsequent builder and factory methods.
-#
+# For one species, mole-, mass-, and volume-weighted surface tensions coincide.
+# Use named SI arguments to keep molar mass and surface tension distinct. The
+# printed Kelvin radius is a characteristic length, not the physical droplet
+# radius: at $r=r_K$, the Kelvin factor is $e$.
 
 # %%
 glycerol_molar_mass = 0.092093  # kg/mol
@@ -67,7 +59,9 @@ glycerol_surface_tension = 0.063  # N/m
 
 # Create a surface strategy
 glycerol_surface_strategy = par.particles.SurfaceStrategyMolar(
-    glycerol_molar_mass, glycerol_density, glycerol_surface_tension
+    surface_tension=glycerol_surface_tension,
+    density=glycerol_density,
+    molar_mass=glycerol_molar_mass,
 )
 
 glycerol_kelvin_radius = float(
@@ -83,17 +77,19 @@ glycerol_kelvin_radius = float(
 print(f"kelvin radius of glycerol {glycerol_kelvin_radius} m")
 
 # %% [markdown]
-# ### Kelvin term
+# ### Read the radius dependence
 #
-# To see the Kelvin term in action, we will calculate the Kelvin term for an array of glycerol particles. The Kelvin term is a dimensionless quantity that describes the effect of the Kelvin curvature on the saturation vapor pressure of a liquid droplet. It is defined as exp(kelvin_radius / particle_radius).
-#
-# So values of the Kelvin term greater than 1 indicate that the saturation vapor pressure required to maintain the particle's size is higher than the saturation vapor pressure of the bulk liquid (flat surface). This is due to the increased in curvature of the particle surface.
-#
+# The curve approaches one at large radius and rises rapidly as radius shrinks.
+# The dashed line marks $r_K$. The grid extends from 0.1 nm to 1 µm to expose the
+# formula's behavior; its molecular-scale end is an extrapolation of a continuum
+# surface model, not a reliable prediction for molecular clusters. The
+# implementation caps the exponent at 100; the smallest-radius squalane plateau
+# in the following plots is that numerical cap, not a physical saturation.
 
 # %%
 radii = np.logspace(-10, -6, 100)
 
-glycerol_kevlin_term = np.atleast_1d(
+glycerol_kelvin_term = np.atleast_1d(
     glycerol_surface_strategy.kelvin_term(
         radius=radii,
         molar_mass=glycerol_molar_mass,
@@ -103,10 +99,10 @@ glycerol_kevlin_term = np.atleast_1d(
 ).squeeze()
 
 fig, ax = plt.subplots(figsize=(8, 6))
-ax.plot(radii, glycerol_kevlin_term)
+ax.plot(radii, glycerol_kelvin_term)
 ax.plot(
     np.array([glycerol_kelvin_radius, glycerol_kelvin_radius]),
-    np.array([glycerol_kevlin_term.min(), glycerol_kevlin_term.max()]),
+    np.array([glycerol_kelvin_term.min(), glycerol_kelvin_term.max()]),
     color="red",
     linestyle="--",
 )
@@ -119,11 +115,13 @@ ax.legend(["Kelvin term", "Kelvin radius"])
 plt.show()
 
 # %% [markdown]
-# ## Builder for Squalane
+# ## Separate surface tension from molecular volume
 #
-# The following code demonstrates how to use the builder to create a surface strategy for squalane particles. The builder allows for the specification of the surface tension and density of the species, as well as the concentration of the species in the particle.
-#
-# Squalane is a larger molecule with a lower surface tension than glycerol, so the Kelvin term will be lower for the same particle size.
+# The builder converts 0.81 g/cm³ to 810 kg/m³ and 28 mN/m to 0.028 N/m for
+# squalane. Its surface tension is lower than glycerol's, but its $M/\rho$ is
+# larger. Compare the product $\sigma M/\rho$, rather than surface tension
+# alone: these inputs give a larger Kelvin radius and factor for squalane at
+# the same particle radius. The builder changes input handling, not the equation.
 
 # %%
 squalane_surface = (
@@ -167,13 +165,19 @@ ax.legend(["Kelvin term", "Kelvin radius"])
 plt.show()
 
 # %% [markdown]
-# ## Factory Approach
+# ## Put two species in one assumed phase
 #
-# Next example is the creation using a factory method, which is more flexible and allows for the use of different units and conversions. The factory method also performs data validation checks to ensure the input values are within the expected range. As the factory is just a wrapper around the builder, the same parameters can/must be used.
+# The factory exposes the volume-weighted builder. Assign both species to phase
+# zero explicitly: without a phase assignment, the strategy retains separate
+# species surface tensions. Equal mass contributions of 0.1 kg/m³ give unequal
+# volume fractions because the densities differ.
 #
-# Here we'll create a mixture of glycerol and squalane particles, and calculate the Kelvin term for a range of particle sizes for a volume fraction of 0.5 for each species. And assume glycerol is the condensing species.
-#
-# [double check the graph output, if the mixture should be lower than the pure or not]
+# This is an imposed homogeneous phase, not a prediction that glycerol and
+# squalane are miscible. Volume averaging sets one surface tension for that
+# phase. Each species still has its own molar mass and density. Calculate both
+# species lanes, then select glycerol's lane for comparison with pure glycerol.
+# That comparison isolates the chosen surface-tension mixing rule. The pure
+# squalane curve also changes the condensing species and is labeled separately.
 
 # %%
 parameters = {  # glycerol, squalane
@@ -183,44 +187,76 @@ parameters = {  # glycerol, squalane
     "surface_tension_units": "N/m",
 }
 
-mixture_surface = par.particles.SurfaceFactory().get_strategy(
-    strategy_type="volume",
-    parameters=parameters,
+mixture_surface = (
+    par.particles.SurfaceFactory()
+    .get_builders()["volume"]
+    .set_parameters(parameters)
+    .set_phase_index(np.array([0, 0]))
+    .build()
 )
 
 mixture_kelvin_radius = mixture_surface.kelvin_radius(
-    molar_mass=0.092093,
+    molar_mass=np.array([0.092093, 0.422]),
     mass_concentration=np.array([0.1, 0.1]),
     temperature=300,
 )
-mixture_kelvin_radius = np.atleast_1d(mixture_kelvin_radius).squeeze()
-print(f"kelvin radius of mixture {mixture_kelvin_radius} m")
+mixture_kelvin_radius = float(np.asarray(mixture_kelvin_radius).reshape(-1)[0])
+print(f"kelvin radius of glycerol in mixture {mixture_kelvin_radius} m")
 
 mixture_kelvin_term = np.atleast_1d(
     mixture_surface.kelvin_term(
         radius=radii,
-        molar_mass=0.092093,
+        molar_mass=np.array([0.092093, 0.422]),
         mass_concentration=np.array([0.1, 0.1]),
         temperature=300,
     )
-).squeeze()
+)[:, 0]
+
+# Independently check SI conversion and the chosen phase-average formula.
+from particula.util.constants import GAS_CONSTANT
+
+volume_contributions = np.array([0.1, 0.1]) / parameters["density"]
+volume_fractions = volume_contributions / volume_contributions.sum()
+expected_surface_tension = np.dot(
+    volume_fractions, parameters["surface_tension"]
+)
+np.testing.assert_allclose(
+    glycerol_kelvin_radius,
+    2
+    * glycerol_surface_tension
+    * glycerol_molar_mass
+    / (GAS_CONSTANT * 300 * glycerol_density),
+)
+np.testing.assert_allclose(
+    squalane_kelvin_radius, 2 * 0.028 * 0.422 / (GAS_CONSTANT * 300 * 810)
+)
+np.testing.assert_allclose(
+    mixture_kelvin_radius,
+    2
+    * expected_surface_tension
+    * glycerol_molar_mass
+    / (GAS_CONSTANT * 300 * glycerol_density),
+)
+np.testing.assert_allclose(
+    mixture_kelvin_term, np.exp(mixture_kelvin_radius / radii)
+)
 
 fig, ax = plt.subplots(figsize=(8, 6))
-ax.plot(radii, mixture_kelvin_term, label="Mixture")
+ax.plot(radii, mixture_kelvin_term, label="Glycerol in mixed phase")
 ax.plot(
     np.array([mixture_kelvin_radius, mixture_kelvin_radius]),
     np.array([mixture_kelvin_term.min(), mixture_kelvin_term.max()]),
     color="red",
     linestyle="--",
 )
-ax.plot(radii, glycerol_kevlin_term, label="Glycerol")
+ax.plot(radii, glycerol_kelvin_term, label="Pure glycerol")
 ax.plot(
     np.array([glycerol_kelvin_radius, glycerol_kelvin_radius]),
-    np.array([glycerol_kevlin_term.min(), glycerol_kevlin_term.max()]),
+    np.array([glycerol_kelvin_term.min(), glycerol_kelvin_term.max()]),
     color="red",
     linestyle="--",
 )
-ax.plot(radii, squalane_kelvin_term, label="Squalane")
+ax.plot(radii, squalane_kelvin_term, label="Pure squalane")
 ax.plot(
     np.array([squalane_kelvin_radius, squalane_kelvin_radius]),
     np.array([squalane_kelvin_term.min(), squalane_kelvin_term.max()]),
@@ -236,8 +272,17 @@ ax.legend()
 plt.show()
 
 # %% [markdown]
-# # Summary
+# ## What the comparison tells us
 #
-# This tutorial has demonstrated the fundamental approaches to modeling particle surfaces in aerosol particle simulations. By using the `SurfaceStrategy` abstract base class, we can create and use different strategies to calculate the Kelvin radius and term. The choice of strategy should be guided by the available data and the level of detail required for the simulation.
+# For these inputs, adding the lower-surface-tension component reduces the
+# Kelvin factor for **glycerol** relative to pure glycerol. Pure squalane has the
+# larger factor despite its lower surface tension, because its molar volume is
+# larger. Thus surface tension alone cannot rank curvature effects across species.
+# The equation checks verify parameter conversion and the imposed averaging rule;
+# they do not establish that the mixture is physically homogeneous.
 #
-# The `SurfaceStrategyMolar`, `SurfaceStrategyMass`, and `SurfaceStrategyVolume` strategies provide flexibility in determining the effective surface tension and density of species based on their concentration. By using builders and factories, we can create surface strategies with the necessary parameters and perform data validation checks to ensure the input values are within the expected range.
+# For a research extension, vary the squalane mass fraction and compare glycerol's
+# $K_i$ at a fixed 20 nm radius under mass-, mole-, and volume-weighted surface
+# tension rules. Keep the condensing species fixed. Measured mixture surface
+# tension and phase behavior would be needed to choose among those approximations
+# before using them in a [condensation calculation](../../processes/condensation/condensation_1_bin.py).

@@ -1,6 +1,12 @@
 # %% [markdown]
 # # Dry charged aerosols: ground level, mesopause and pressurized chambers
 #
+# How much of a collision response comes from the environment rather than the
+# starting aerosol abundance? This scan keeps the dry population controlled and
+# separates an atmospheric temperature-pressure path from a pressure-only chamber
+# comparison. Use it to design a sensitivity study, after reviewing the
+# [charged collision models](gpu_charged_models.py).
+#
 # This controlled CUDA scan starts with **2,490,368 resolved particles** across
 # 19 environments: sixteen reference altitudes from 0 to 86 km, followed by
 # 2, 5 and 10 atm chambers. The ground-level case is also the 1 atm chamber
@@ -179,3 +185,19 @@ def run_example():
 # %%
 if __name__ == "__main__":
     run_example()
+
+# %% [markdown]
+# ## From a scan to a testable environmental hypothesis
+#
+# The scan supports comparisons within the prescribed dry, fixed-concentration
+# model. Mass and charge conservation explain why number loss, larger particles,
+# and changing charge fractions can coexist. They do not establish the actual
+# abundance or charging history at any altitude.
+#
+# For a chamber question, use measured pressure and temperature, repeat seeds, and
+# compare number decay and charge distributions against observations. For an
+# atmospheric question, first replace the fixed concentration with an independently
+# justified profile and quantify how that choice changes the environmental trend.
+# Do not reuse liquid-water growth at mesospheric conditions merely because the
+# same device can execute it; the [humidity scan](gpu_environment_sweep.py) has a
+# different physical domain.

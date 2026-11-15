@@ -49,6 +49,10 @@ const icon = (id) => `${base.replace(/\/$/, '')}/topic-icons/${id}.svg`;
       </div>;
     })}
   </section>}
+  <section class="topic-context" aria-label="Scientific context">
+    <p>{topic.context}</p>
+    <div class="topic-investigation"><h3>A question to investigate</h3><p>{topic.investigation}</p></div>
+  </section>
   {starters.length > 0 && <section class="topic-start"><h3>Start here</h3>
     {starters.map((r) => <a href={resourcePath(r.source, base)}>{r.title} <span aria-hidden="true">→</span></a>)}
   </section>}
@@ -151,6 +155,10 @@ const icon = (id) => `${base.replace(/\/$/, '')}/topic-icons/${id}.svg`;
   .topic-card h3 { font-size: 1.1rem; margin: 0; color: var(--sl-color-white); }
   .topic-card p { color: var(--sl-color-gray-2); font-size: .9rem; margin: .5rem 0 1rem; }
   .topic-card-action { color: var(--sl-color-text-accent); font-size: .8rem; font-weight: 650; }
+  .topic-context { margin-block: 1.5rem; }
+  .topic-investigation { margin-top: 1rem; padding: 1rem 1.2rem; border: 1px solid var(--sl-color-gray-5); border-radius: .6rem; }
+  .topic-investigation h3 { color: var(--sl-color-text-accent); }
+  .topic-investigation p { margin: 0; }
   .topic-start { display: grid; gap: .5rem; padding: 1rem 1.2rem; border-left: 3px solid var(--sl-color-accent); border-radius: 0 .6rem .6rem 0; background: var(--sl-color-accent-low); margin-block: 1.5rem; }
   h3 { font-size: 1.1rem; margin: 0 0 .6rem; }
   .topic-start h3 { font-size: .85rem; text-transform: uppercase; letter-spacing: .05em; }

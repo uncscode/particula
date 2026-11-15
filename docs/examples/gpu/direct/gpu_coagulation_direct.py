@@ -1,6 +1,12 @@
 # %% [markdown]
 # # Direct Brownian coagulation on CUDA
 #
+# How can number fall while particle material remains in the box? Follow the
+# count-weighted inventory through two collision calls, including inactive slots
+# that retain old values. This is a useful bridge from
+# [resolved CPU coagulation](../../processes/coagulation/coagulation_3_particle_resolved_pattern.py)
+# to direct device execution.
+#
 # Six active particles and two inactive slots make the bookkeeping visible:
 # collisions reduce particle number while preserving represented mass and
 # charge. The same random stream and collision storage survive both calls.
@@ -326,3 +332,19 @@ if __name__ == "__main__":
         run_publication()
     else:
         main()
+
+# %% [markdown]
+# ## Separate a collision example from a population forecast
+#
+# The number-to-initial bar and mass-to-initial bar answer different questions:
+# mergers reduce represented number while the explicit assertion preserves
+# count-weighted material mass. Initial charge is carried through the Brownian
+# calculation, but it does not select a charged collision kernel; this example's
+# assertion checks mass, not a separate charge budget.
+#
+# The 10⁻¹⁸ m³ box contains only six active particles. Its two one-second calls
+# illustrate storage and stochastic continuation rather than a resolved kinetic
+# history. For a research comparison, vary timestep and independent seeds, check
+# charge as well as each material inventory, and compare distributions with the
+# [stochastic ensemble](../prepared/gpu_prepared_stochastic.py). Reinitializing the
+# random stream at every call would change that experiment.

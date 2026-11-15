@@ -40,6 +40,12 @@ mapped does not mean its science or editorial quality has been reviewed.
 - Every topic has a label, description, local SVG icon, and useful resources or
   children. Icons accompany text and illustrate concepts rather than measured
   results. Preserve accessible labels, theme contrast, and reduced motion.
+- Keep the card description short. Fill `context` with the scientific distinction
+  and evidence limits that make the topic useful; use `investigation` for one
+  concrete research question with a meaningful comparison or diagnostic. These
+  fields should connect the resources, not repeat their titles or promise results
+  that the linked examples have not established. Curate `start_here` resources
+  for a practical first reading, and recheck them when examples change.
 - Inventory operational guidance explicitly as supporting material where it does
   not belong in the scientific tree. Keep it reachable through existing sections.
 - Check graph coverage, links, icons, and rendered navigation after changes.

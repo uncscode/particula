@@ -1,58 +1,57 @@
 # Examples
 
-Start small, then build toward full scientific workloads. Begin with the
-[installation guide](../guide/getting-started/installation/index.md).
-Notebook pages display saved results in the full documentation build. Standalone
-sources remain runnable from the repository checkout.
+Choose a calculation by the question you want to answer. Each worked example
+connects physical assumptions, code, and saved results, then explains what the
+result supports and how to investigate further. If the topic name is unfamiliar,
+use the [topic explorer](../guide/topics/index.md) to move between a broad idea,
+its prerequisites, and related questions.
 
-## Fundamentals
+## Start with the meaning of the state
 
-1. [First CPU simulation](../guide/getting-started/first-simulation.md)
-2. [Native aerosol](fundamentals/index.md)
-3. [Data containers and explicit transfers](fundamentals/data-containers.md)
-4. [Gas and environment](fundamentals/gas/index.md)
-5. [Particle distributions and properties](fundamentals/particles/index.md)
+Follow the [first CPU simulation](../guide/getting-started/first-simulation.md),
+then work through [fundamentals](fundamentals/index.md). In particular,
+[size distributions](fundamentals/particles/aerosol_distributions.py) explains why
+count, concentration, and distribution density must be distinguished before
+comparing any plots. [Gas and environment](fundamentals/gas/index.md) connects
+stored vapor mass with saturation.
 
-## Processes and thermodynamics
+## Choose a scientific question
 
-- [Condensation and coagulation](processes/index.md)
-- [Wall loss](processes/wall-loss/index.md)
-- [Nucleation](processes/nucleation/index.md)
-- [Activity](thermodynamics/activity/index.md)
-- [Equilibria](thermodynamics/equilibria/index.md)
-- [CPU dilution](../guide/processes/dilution.md#boundaries-and-example)
-
-## Optical calculations
-
-- [Sphere spectra, polarization and cloud optical depth](optics/sphere_optics.py)
-- [CUDA particle batches and cloud spectrum](optics/cuda_optics.py)
-
-## GPU examples
-
-These standalone examples use explicit caller-owned transfers and device state.
-Warp CPU is the baseline when installed; CUDA capture is a separate path.
-
-| Purpose | Source | Requirement |
+| Question | Start here | What to compare |
 | --- | --- | --- |
-| Direct condensation | [Quick start](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/direct/gpu_direct_kernels_quick_start.py) | Optional Warp; CPU device by default |
-| Direct coagulation | [Brownian coagulation](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/direct/gpu_coagulation_direct.py) | Optional Warp; CPU device by default |
-| Combine direct processes | [Five-process sequence](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/direct/gpu_complete_process_sequence.py) | Optional Warp; illustrative explicit calls |
-| Inspect numerical agreement | [Condensation parity](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/direct/gpu_condensation_parity_walkthrough.py) | Validation demonstration, not general strategy parity |
-| Manage session state | [Resident lifecycle](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/resident/gpu_resident_session.py) | Optional Warp; explicit restart/finalization |
-| Run several resident steps | [Resident loop](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/resident/gpu_resident_multi_timestep.py) | Optional Warp; explicit scheduling |
-| Capture and replay | [Graph capture](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/resident/gpu_resident_graph_capture.py) | Native CUDA only; no CPU fallback |
+| Why do particles gain or lose material? | [Condensation and other processes](processes/index.md) | Gas plus particle inventories, size-dependent growth, and timestep sensitivity. |
+| Can number decrease while material is conserved? | [Coagulation representations](processes/coagulation/coagulation_4_compared.py) | Number, each material inventory, and the meaning of the distribution ordinate. |
+| Where do particles enter or leave a chamber? | [Nucleation](processes/nucleation/index.md) and [wall loss](processes/wall-loss/index.md) | Source and sink budgets, size-dependent survival, and stochastic spread. |
+| How does composition alter equilibrium? | [Thermodynamics](thermodynamics/index.md) | Activity, curvature, phase behavior, and the assumptions behind an equilibrium endpoint. |
+| How does a size population interact with light? | [Sphere optics](optics/sphere_optics.py) | Single-particle efficiencies, population-weighted coefficients, and optical depth. |
+| What changes when processes act together? | [Scientific simulations](simulations/index.md) | Controlled comparisons, external forcing, and limitations that a final plot can hide. |
+| How can many independent histories be practical? | [GPU studies](gpu/index.md) | Per-box response, ensemble variability, numerical checks, and complete-workflow cost. |
 
-## Full simulations
+## Build toward your research question
 
-[Scientific simulations](simulations/index.md) retain their complete workloads
-and limitations. They are longer studies, not installation smoke tests. Start
-with a process tutorial before adapting a full chamber or atmospheric case.
+Start with one mechanism and a quantity you can check independently. Combine
+processes only after you can explain their separate effects. A plausible graph
+or conserved total does not establish numerical convergence or agreement with
+measurements. Some retained simulations deliberately expose model or input
+failures; their explanations identify what must change before research use.
 
-## Tutorials
+For a new study, state the proposed comparison, hold appropriate inputs fixed,
+and choose a diagnostic that could distinguish the competing explanations.
+Use [Theory](../theory/index.md) for the physical basis and the
+[Guide](../guide/index.md) for supported interfaces. The
+[agentic plugins](../guide/ai-assistants/index.md) can help carry this structure into
+simulation design, execution, and analysis.
 
-The fundamentals and process indexes above are the tutorial entry points. For
-underlying equations, use [Theory](../theory/index.md); for support boundaries,
-use the [Guide](../guide/index.md).
+## Run and adapt an example
 
-[Choose a thermodynamics learning objective](thermodynamics/index.md) to compare
-activity strategies, mixing functions, and equilibrium calculations.
+Published pages render saved outputs from maintained Python sources. Download
+the Python file or the helper ZIP when a study uses shared code or data. Follow
+the page's environment and execution requirements; CUDA publication runs require
+CUDA, while the scaling report plots existing measurements on the CPU.
+
+The [GPU index](gpu/index.md) distinguishes prepared scientific studies from
+small direct-kernel and resident-interface demonstrations. Longer simulation
+workloads retain their full inputs and numerical checks; begin with a small
+process example before adapting them. See [installation](../guide/getting-started/installation/index.md)
+for setup and [example authoring](../../website/AUTHORING.md) for the source and
+saved-result workflow.

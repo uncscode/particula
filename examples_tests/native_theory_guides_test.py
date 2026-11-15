@@ -42,9 +42,15 @@ def test_object_oriented_native_builder_units():
     np.testing.assert_allclose(particles.radii, [radii], rtol=1e-12)
 
 
-def test_activity_index_molar_fractions():
+def test_linked_ideal_activity_molar_fractions():
     """The functional activity entrypoint remains independent of native state."""
-    namespace = execute_page("docs/examples/thermodynamics/activity/index.md")
+    import runpy
+
+    index = ROOT / "docs/examples/thermodynamics/activity/index.md"
+    assert "(ideal_activity_example.py)" in index.read_text()
+    namespace = runpy.run_path(
+        str(index.with_name("ideal_activity_example.py"))
+    )
     amounts = np.array([0.5e-9 / 18.015e-3, 0.5e-9 / 200e-3])
     np.testing.assert_allclose(
         namespace["activity"], amounts / amounts.sum(), rtol=1e-12

@@ -1,17 +1,21 @@
 # %% [markdown]
-# # Compose timed Python chemistry with native processes
+# # Distinguish chemical conversion from a timed emission and dilution
 #
-# This Particula 0.3 development example uses the public `BoxProcess` interface
-# to call SciPy inside a two-box simulation. A function supplies a scheduled
-# emission, SciPy integrates first-order A → B chemistry, and native dilution
-# removes gas and particles. A and B have equal molar masses; the reaction
-# conserves their combined mass. There is no exchange between boxes.
+# A concentration can change because material reacts, enters the box, or leaves
+# it. This CPU example composes all three mechanisms and compares the trajectory
+# with an analytic reference. You can use it as a template for checking timed
+# custom chemistry before introducing a more complicated reaction system.
 #
-# Requirements: NumPy, SciPy, Matplotlib and this development version of
-# Particula. This example runs on CPU. Gas concentrations are kg m⁻³, particle
-# concentrations are represented counts, box volumes are m³, and time is s.
-# The emission occurs on a timestep boundary. We check a closed-form reference
-# for each species and the extensive inventory in each box.
+# A and B have equal molar masses and undergo first-order A → B conversion at
+# 0.3 s⁻¹. Dilution removes both at 0.05 s⁻¹. At 4 s, a pulse adds A to two
+# independent boxes of volumes 1 and 2 m³; there is no exchange between boxes.
+# Their different temperatures are stored state, but this constant-rate chemistry
+# does not use temperature to change its coefficient.
+#
+# Gas concentration is kg m⁻³, particle weights are represented counts, volume
+# is m³, and time is s. The [dilution reference](../dilution/cpu_dilution.py)
+# provides the simplest limiting case. Here 0.5 s outer steps each contain two
+# substeps, and the pulse is deliberately aligned with a substep boundary.
 
 # %%
 """Timed public CPU process composition with a SciPy analytical check."""
@@ -73,17 +77,22 @@ class Chemistry(BoxProcess):
 
 
 # %% [markdown]
-# ## Stage, validate and publish
+# ## Publish a custom update only after each box succeeds
 #
-# Each callback receives a detached box with normal `particles`, `gas`,
-# `environment` and `fields` containers. Edit declared arrays in place and
-# return `None`. Particula publishes only after every box succeeds. It checks
-# shapes, identities, declared writes and valid values; the callback owns its
-# scientific accounting. Avoid external side effects if rollback matters.
+# Each callback receives a detached box with ordinary particle, gas, environment,
+# and registered-field containers. It edits declared arrays in place and returns
+# `None`. Particula checks shapes, identities, declared writes, and valid values
+# before publishing after all boxes succeed; the callback still owns scientific
+# accounting. External side effects are not undone by an array rollback.
 #
-# Species, shapes and capacity are fixed. Changing their structure requires a
-# separate explicit operation. `demo.injected` is a registered per-box field
-# recording this example's external input in kg; it does not alter physics.
+# Species order, shapes, and capacity stay fixed. `Chemistry.validate` also requires
+# equal reactant/product molar masses so the simple mass-based A → B transfer is
+# consistent. More general chemistry would need explicit stoichiometry and units.
+#
+# The registered field `demo.injected` records cumulative external mass in kg.
+# It is an accounting ledger, not a gas concentration subject to dilution. The
+# scheduled emission rejects a step that crosses the pulse time without starting
+# there, making a timing error visible rather than smearing the pulse.
 
 
 # %%
@@ -179,6 +188,20 @@ def simulate():
     )
 
 
+# %% [markdown]
+# ## Read concentration and extensive mass together
+#
+# The left panel distinguishes A decay from B production in µg m⁻³; dots show
+# the analytic species reference. The right panel multiplies A+B concentration
+# by each box volume to obtain µg. Reaction conserves A+B, whereas dilution
+# reduces it and the scheduled pulse adds it.
+#
+# The snapshot labeled 4 s is taken just before the pulse is applied at the start
+# of the next advance; the first recorded post-pulse state is 4.5 s. This sampling
+# convention explains why a plotted jump can appear after the forcing timestamp.
+# `run_example` invokes the plot only after checking species and inventory.
+
+
 # %%
 def plot_results(report):
     """Plot species evolution and independently checked extensive inventories."""
@@ -241,3 +264,19 @@ def run_example():
 
 if __name__ == "__main__":
     run_example()
+
+# %% [markdown]
+# ## What agreement with the reference means
+#
+# The species and extensive-inventory assertions compare every recorded state
+# with the closed-form pulse, reaction, and dilution solution. The injected masses
+# are 3×10⁻⁹ and 2×10⁻⁹ kg for the two boxes, despite their respective concentration
+# pulses of 3×10⁻⁹ and 1×10⁻⁹ kg m⁻³. Volume matters when interpreting the budget.
+# The agreement checks this linear reaction and aligned schedule; it does not
+# validate a nonlinear chemical mechanism or arbitrary event timing.
+#
+# To adapt the pattern to a measured emission history, split steps at every forcing
+# discontinuity and compare cumulative input, chemical transfers, and removals.
+# Then refine timesteps and solver tolerances for the actual mechanism. The
+# [custom backend example](../../gpu/prepared/custom_process_backends.py) explains
+# what additional work is needed before assuming a Python callback can run on CUDA.

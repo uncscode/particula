@@ -13,13 +13,13 @@
 # ---
 
 # %% [markdown]
-# # Native Gas Species Tutorial
+# # From stored vapor mass to saturation
 #
-# `GasData` stores ordered names, molar masses, concentrations and partitioning
-# flags. Vapor-pressure strategies are separate scientific configuration.
-# This example retains the water, butanol and styrene temperature sweeps.
-# The organic coefficients are illustrative inputs retained from this tutorial;
-# validate their temperature convention and applicability before research use.
+# Which gas is closest to saturation when the species have different molecular
+# weights and vapor pressures? This CPU example stores water, butanol, and styrene
+# in explicit order, then evaluates pure vapor pressures and saturation ratios.
+# The outcome is a thermodynamic diagnostic, not a condensation time history.
+# Read [vapor-pressure conventions](vapor_pressure.py) before changing coefficients.
 
 # %%
 import matplotlib.pyplot as plt
@@ -27,15 +27,22 @@ import numpy as np
 import particula as par
 
 # %% [markdown]
-# ## Define vapor-pressure strategies
+# ## Match a property model to each species
 #
-# Organics use Antoine; water uses Buck. These strategies calculate pressures
-# independently of storage and can later be supplied to a process.
+# Water uses the Buck relation. The organics use NIST Antoine coefficients,
+# converted from bar to the implementation's mmHg-based logarithm and from
+# `T + C` to `T - c`. The [vapor-pressure example](vapor_pressure.py) gives the
+# source table and conversion. The 304–333 K sweep lies within both selected
+# organic fits. A common method interface does not make coefficients interchangeable.
 
 # %%
 # Define the coefficients for Butanol using the Antoine equation.
 # 'a', 'b', and 'c' are coefficients specific to the Antoine equation used to calculate vapor pressure.
-butanol_coefficients = {"a": 7.838, "b": 1558.19, "c": 196.881}
+butanol_coefficients = {
+    "a": 4.54607 + np.log10(1e5 / 133.322387415),
+    "b": 1351.555,
+    "c": 93.34,
+}
 # Create a vapor pressure strategy for Butanol using the Antoine equation.
 butanol_antione = par.gas.VaporPressureFactory().get_strategy(
     strategy_type="antoine", parameters=butanol_coefficients
@@ -43,7 +50,11 @@ butanol_antione = par.gas.VaporPressureFactory().get_strategy(
 
 # Define the coefficients for Styrene, similar to Butanol, using the
 # Antoine equation.
-styrene_coefficients = {"a": 6.924, "b": 1420, "c": 226}
+styrene_coefficients = {
+    "a": 4.21948 + np.log10(1e5 / 133.322387415),
+    "b": 1525.059,
+    "c": 56.379,
+}
 # Create a vapor pressure strategy for Styrene using the Antoine equation.
 styrene_antione = par.gas.VaporPressureFactory().get_strategy(
     strategy_type="antoine", parameters=styrene_coefficients
@@ -86,12 +97,16 @@ print(water_species)
 print(organic_species)
 
 # %% [markdown]
-# ## Pure vapor pressures
+# ## Compare pure-substance reference pressures
 #
-# Evaluate each strategy in the same explicit order as the gas data.
+# Evaluate each strategy in the same order as its gas storage. The first plot
+# compares pure vapor pressure in pascals on a logarithmic axis. It describes each
+# substance's saturation reference, not the partial pressure of the stored mixture.
+# The curves do not by themselves rank how saturated the gases are: their actual
+# mass concentrations differ.
 
 # %%
-temperature_range = np.linspace(273.15, 373.15, 100)
+temperature_range = np.linspace(304.0, 333.0, 100)
 organic_pure_vapor_pressure = np.stack(
     [
         strategy.pure_vapor_pressure(temperature_range)
@@ -116,11 +131,13 @@ ax.legend()
 plt.show()
 
 # %% [markdown]
-# ## Saturation ratios
+# ## Compare the mixture with those references
 #
-# Saturation ratio is partial pressure divided by pure vapor pressure.
-# Values above one indicate supersaturation relative to the pure substance;
-# particle composition and curvature also affect actual condensation.
+# For each fixed gas mass concentration, the ideal-gas conversion gives partial
+# pressure; dividing by pure vapor pressure gives saturation ratio. The second
+# plot uses a logarithmic axis to resolve the small ratios for this dilute mixture.
+# A ratio of one refers to the pure-substance reference. Particle composition and
+# curvature would change the relevant surface equilibrium pressure.
 
 # %%
 organic_saturation_ratio = np.stack(
@@ -146,12 +163,22 @@ for i in range(len(organic_names)):
         temperature_range, organic_saturation_ratio[i], label=organic_names[i]
     )
 ax.plot(temperature_range, water_saturation_ratio, label="Water")
-ax.set_ylim(0, 5)
+ax.set_yscale("log")
 ax.set_xlabel("Temperature (K)")
 ax.set_ylabel("Saturation Ratio")
 ax.legend()
 plt.show()
 
 # %% [markdown]
-# Gas data owns storage; strategies own thermodynamics. The next tutorial
-# combines the ordered gas lanes with a separately held environment.
+# ## Separate abundance from volatility
+#
+# The printed water concentration demonstrates the unit conversion from
+# 100 µg m⁻³ to 10⁻⁷ kg m⁻³. The plots then separate two controls: the chosen
+# vapor-pressure model and the amount of vapor actually present. A larger pure
+# vapor pressure does not automatically imply a larger saturation ratio.
+#
+# To adapt this to measured vapor concentrations, preserve species order and
+# coefficient provenance, propagate measurement uncertainty, and inspect the
+# ratio over the experimental temperature range. Then add particle activity and
+# curvature before predicting uptake. Continue with the
+# [prescribed-environment sweep](environment_data.py) to isolate cooling effects.

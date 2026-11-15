@@ -11,7 +11,9 @@
       "aliases": [],
       "search_phrases": [],
       "prerequisites": [],
-      "related": []
+      "related": [],
+      "context": "An aerosol links a population of particles to a surrounding gas. A useful model starts with the quantity you need to explain—size, composition, lifetime, or an observable—and follows only the mechanisms needed to connect inputs to that quantity. These branches connect scientific explanations with runnable calculations and their evidence.",
+      "investigation": "Choose one measured change in your system. Which state variables and processes could cause it, and what diagnostic would distinguish competing explanations?"
     },
     {
       "id": "state",
@@ -23,7 +25,9 @@
       "aliases": [],
       "search_phrases": [],
       "prerequisites": [],
-      "related": []
+      "related": [],
+      "context": "Before evolving an aerosol, decide what each stored quantity represents. Radius and diameter, counts and number densities, and individual mass and bulk mass can describe the same system in different ways. Establishing those meanings makes later process comparisons interpretable.",
+      "investigation": "Can you reconstruct total number and material mass from your initial data, including the physical volume and distribution measure?"
     },
     {
       "id": "processes",
@@ -35,7 +39,9 @@
       "aliases": [],
       "search_phrases": [],
       "prerequisites": [],
-      "related": []
+      "related": [],
+      "context": "Different mechanisms can produce similar-looking size changes. Condensation transfers material between gas and particles; coagulation redistributes particle material while reducing number; sources and losses change the modeled inventory. Combining them requires diagnostics that retain those distinctions.",
+      "investigation": "If a size-distribution peak shifts, what simultaneous measurements of gas, particle number, and mass would identify the responsible mechanism?"
     },
     {
       "id": "methods",
@@ -47,7 +53,9 @@
       "aliases": [],
       "search_phrases": [],
       "prerequisites": [],
-      "related": []
+      "related": [],
+      "context": "A model result reflects both physical assumptions and numerical choices. Population representation, timesteps, precision, and execution path determine which details are resolved and what checks are possible. Conservation, numerical convergence, physical comparison, and performance answer separate questions.",
+      "investigation": "Which modeling choice could change your scientific conclusion, and what controlled comparison would measure that sensitivity?"
     },
     {
       "id": "applications",
@@ -59,7 +67,9 @@
       "aliases": [],
       "search_phrases": [],
       "prerequisites": [],
-      "related": []
+      "related": [],
+      "context": "Coupled examples show how processes interact around a research question. Their initial conditions, forcing, and material assumptions are illustrative unless an independent reference is supplied. Use them to develop a study design, then replace demonstration inputs with evidence for your own system.",
+      "investigation": "Which part of an example can transfer to your experiment, and which boundary conditions or material properties must be re-established?"
     },
     {
       "id": "size",
@@ -83,7 +93,9 @@
       "prerequisites": [],
       "related": [
         "optics"
-      ]
+      ],
+      "context": "A curve may represent number per bin, per unit radius, or per logarithmic interval. Its height and peak can change under conversion even when it describes the same particles. Integrated number and material provide checks when comparing instruments, model inputs, and simulation outputs.",
+      "investigation": "Transform a measured spectrum into your model representation. Does integrated number remain consistent after accounting for bin width and radius versus diameter?"
     },
     {
       "id": "composition",
@@ -95,7 +107,9 @@
       "aliases": [],
       "search_phrases": [],
       "prerequisites": [],
-      "related": []
+      "related": [],
+      "context": "Particles of equal size can contain different materials and respond differently to humidity or light. Bulk averages do not always preserve those responses. Material ordering, mixing state, density, and the chosen thermodynamic or optical model connect stored composition to an observable.",
+      "investigation": "Would two populations with the same bulk composition but different particle-to-particle mixing states produce the same observable under your assumptions?"
     },
     {
       "id": "gas",
@@ -107,7 +121,9 @@
       "aliases": [],
       "search_phrases": [],
       "prerequisites": [],
-      "related": []
+      "related": [],
+      "context": "Gas concentration, temperature, and pressure establish the environment for particle evolution. A stored saturation field is not automatically an evolving humidity diagnostic; current gas concentration and the selected vapor-pressure model may need to be evaluated together. Prescribed conditions and coupled reservoirs imply different budgets.",
+      "investigation": "Does your calculation hold vapor or temperature fixed, or update them as particles evolve? How does that choice change the inventory you should check?"
     },
     {
       "id": "activity",
@@ -128,8 +144,11 @@
       ],
       "prerequisites": [],
       "related": [
-        "condensation"
-      ]
+        "condensation",
+        "vapor"
+      ],
+      "context": "Chemical activity describes how a component in a mixture differs from its pure-substance reference. Ideal, κ-based, and nonideal models encode different assumptions and input requirements. Their consequences appear in equilibrium surface pressure, water uptake, and phase partitioning.",
+      "investigation": "At fixed dry material and humidity, how much does predicted water uptake change when the activity model changes, and which composition data support that choice?"
     },
     {
       "id": "surface",
@@ -146,7 +165,9 @@
       "prerequisites": [],
       "related": [
         "condensation"
-      ]
+      ],
+      "context": "Curvature and surface tension alter the equilibrium vapor pressure at a particle surface. This creates a size dependence that can compete with composition-driven lowering of vapor pressure. A surface mixing rule is a model assumption, especially when composition changes during growth.",
+      "investigation": "For your radius and composition range, does changing the surface-tension model alter the predicted direction of mass transfer or an activation threshold?"
     },
     {
       "id": "optics",
@@ -166,10 +187,14 @@
         "polarization",
         "optical depth"
       ],
-      "prerequisites": [],
+      "prerequisites": [
+        "size"
+      ],
       "related": [
         "size"
-      ]
+      ],
+      "context": "Optical calculations connect size, refractive index, and wavelength to scattering and absorption. Single-sphere quantities must be weighted by the population measure to obtain bulk properties. The sphere model and material optical constants bound the interpretation of a comparison with observations.",
+      "investigation": "Can two populations with similar total mass produce different extinction or angular scattering? Hold material assumptions fixed and vary the size distribution to test that sensitivity."
     },
     {
       "id": "vapor",
@@ -187,7 +212,11 @@
         "Clausius Clapeyron"
       ],
       "prerequisites": [],
-      "related": []
+      "related": [
+        "activity"
+      ],
+      "context": "Saturation vapor pressure is a material-and-temperature property; partial pressure also depends on the actual gas abundance. Their ratio determines saturation with respect to the chosen reference. Empirical fits require their own temperature domain, pressure units, and coefficient convention.",
+      "investigation": "Would a predicted growth or evaporation transition persist with another justified vapor-pressure fit over their common validity range?"
     },
     {
       "id": "transport",
@@ -206,7 +235,9 @@
       "prerequisites": [],
       "related": [
         "brownian"
-      ]
+      ],
+      "context": "Viscosity and mean free path connect gas conditions to particle drag and diffusion. Slip and transport-regime corrections become important as particle size approaches relevant molecular length scales. Supplying consistent temperature and pressure across helpers avoids an internally inconsistent kernel.",
+      "investigation": "At fixed particle sizes, how does changing gas pressure alter the transport regime and a collision or deposition rate?"
     },
     {
       "id": "exchange",
@@ -218,7 +249,9 @@
       "aliases": [],
       "search_phrases": [],
       "prerequisites": [],
-      "related": []
+      "related": [],
+      "context": "Gas–particle exchange can be studied as an instantaneous transfer rate, a time-dependent trajectory, or an equilibrium endpoint. These calculations answer different questions. Finite reservoirs couple particles through shared vapor, while prescribed vapor behaves as an external supply.",
+      "investigation": "Does your research require the time to approach equilibrium, or only the equilibrium state—and can the reservoir supply the required material?"
     },
     {
       "id": "collisions",
@@ -235,7 +268,9 @@
         "collision kernel"
       ],
       "prerequisites": [],
-      "related": []
+      "related": [],
+      "context": "A collision kernel describes a pairwise interaction coefficient. Population abundance determines how often those interactions occur. Brownian motion, electrical forces, turbulence, and settling can change pair rates, while the population representation determines how collisions change the stored distribution.",
+      "investigation": "Are differences in your predicted collision loss driven by the kernel, the initial abundance, or the numerical representation? Change one at a time."
     },
     {
       "id": "sources",
@@ -247,7 +282,9 @@
       "aliases": [],
       "search_phrases": [],
       "prerequisites": [],
-      "related": []
+      "related": [],
+      "context": "Particle formation, injection, dilution, and wall deposition all change abundance, but they cross different inventory boundaries. Formation can consume a modeled precursor; an external injection adds material; removal carries it away. Keep those budgets explicit before coupling processes.",
+      "investigation": "Can the change in particle material be reconciled with gas transfer and cumulative external inputs and losses over the same interval?"
     },
     {
       "id": "condensation",
@@ -272,8 +309,11 @@
         "surface",
         "numerics",
         "chambers",
-        "partitioning"
-      ]
+        "partitioning",
+        "nucleation"
+      ],
+      "context": "Growth is driven by the difference between ambient vapor and the composition- and curvature-dependent surface equilibrium. Particles in a finite reservoir compete for vapor; in a maintained reservoir they draw on an external supply. Size growth, water uptake, and latent-energy transfer are related diagnostics, not interchangeable ones.",
+      "investigation": "At fixed initial composition, does increasing particle abundance suppress growth through vapor depletion? Compare maintained and finite reservoirs while tracking total material."
     },
     {
       "id": "partitioning",
@@ -295,7 +335,9 @@
       ],
       "related": [
         "condensation"
-      ]
+      ],
+      "context": "Equilibrium partitioning asks how material is distributed among phases under the specified thermodynamic model. It does not supply the time needed to reach that state. Activity, volatility, and possible phase separation influence the endpoint and can change how bulk composition relates to particle composition.",
+      "investigation": "Does a kinetic simulation approach the same partitioning endpoint under matched assumptions, and what timescale prevents that endpoint from being reached?"
     },
     {
       "id": "brownian",
@@ -314,8 +356,11 @@
         "representations"
       ],
       "related": [
-        "transport"
-      ]
+        "transport",
+        "verification"
+      ],
+      "context": "Diffusive collisions merge particles, reducing number while ideally retaining material. PMF, PDF, and particle-resolved methods express the population differently, so compare integrated number and mass before interpreting spectra. Similar number-decay curves alone do not establish numerical convergence or identical mixing state.",
+      "investigation": "How does a predicted number-loss time change under grid, sample-size, and timestep refinement when physical concentration is held fixed?"
     },
     {
       "id": "charged",
@@ -336,7 +381,9 @@
       ],
       "related": [
         "atmosphere"
-      ]
+      ],
+      "context": "Electrical interactions can alter collisions, while ion attachment and recombination evolve charge populations. A prescribed charge-versus-size curve is distinct from a coupled charging calculation. Interpret pair kernels, particle number, material inventory, and charge inventory according to the processes actually enabled.",
+      "investigation": "Does a charge-dependent collision effect survive comparison with neutral particles at the same sizes and abundances, and does evolving the charge change the answer?"
     },
     {
       "id": "turbulent",
@@ -358,7 +405,9 @@
       ],
       "related": [
         "verification"
-      ]
+      ],
+      "context": "Cloud-droplet collision models describe how turbulent motion and settling influence pair encounters. Comparison with digitized DNS data requires matching the reference conditions, plotted quantity, and model assumptions. Agreement with one reference case does not establish universal applicability.",
+      "investigation": "Which radius pairs and flow conditions drive disagreement with a reference kernel, and can the difference be traced to assumptions rather than plotting or digitization conventions?"
     },
     {
       "id": "nucleation",
@@ -373,10 +422,16 @@
         "injection",
         "new particle formation"
       ],
-      "prerequisites": [],
+      "prerequisites": [
+        "representations",
+        "vapor"
+      ],
       "related": [
-        "custom"
-      ]
+        "custom",
+        "condensation"
+      ],
+      "context": "A formation law must be connected to particle size, composition, physical volume, and gas availability before it can populate a simulation. Fixed-capacity storage also requires an explicit exhaustion policy. Material conservation checks bookkeeping; it does not validate a nucleation coefficient or its domain.",
+      "investigation": "At the same available precursor mass, how does assumed formation diameter change particle number and subsequent competition for vapor?"
     },
     {
       "id": "losses",
@@ -392,8 +447,14 @@
         "removal",
         "dilution"
       ],
-      "prerequisites": [],
-      "related": []
+      "prerequisites": [
+        "size"
+      ],
+      "related": [
+        "chambers"
+      ],
+      "context": "Dilution removes an ideal well-mixed fraction without changing individual particle size. Wall deposition can depend on size, chamber geometry, and transport. Both lower modeled inventory, so apparent particle loss should be compared with a source-and-sink budget rather than a closed-mass assertion.",
+      "investigation": "Can a size-independent dilution baseline explain an observed decay, or is an additional size-dependent wall-loss mechanism required?"
     },
     {
       "id": "representations",
@@ -414,7 +475,11 @@
       "prerequisites": [
         "size"
       ],
-      "related": []
+      "related": [
+        "custom"
+      ],
+      "context": "Binned concentrations, densities per radius, and resolved count weights encode different population measures. Physical volume converts represented counts to number density. The representation also determines whether particle-to-particle composition differences are retained, averaged, or absent.",
+      "investigation": "What information would be lost by converting your population to a coarser representation, and would that information affect the observable you care about?"
     },
     {
       "id": "numerics",
@@ -433,8 +498,11 @@
       ],
       "prerequisites": [],
       "related": [
-        "condensation"
-      ]
+        "condensation",
+        "verification"
+      ],
+      "context": "A stable-looking trajectory can still have timestep or discretization error. Conservation tests detect inventory inconsistencies, whereas refinement tests assess sensitivity to resolution. Coupled-process ordering and stochastic variability need separate attention, especially near thresholds or depleted reservoirs.",
+      "investigation": "Does the quantity behind your conclusion converge when you refine the timestep, rather than merely keep the mass residual small?"
     },
     {
       "id": "execution",
@@ -450,7 +518,9 @@
         "CUDA"
       ],
       "prerequisites": [],
-      "related": []
+      "related": [],
+      "context": "CPU, direct Warp, resident, and prepared execution paths differ in ownership and lifecycle. Transfers and checkpoints determine which copy of state a diagnostic observes. Device choice should preserve the scientific model while making precision, supported processes, and synchronization explicit.",
+      "investigation": "Are two execution paths advancing the same inputs and process sequence, and are their diagnostics taken from equivalent synchronized states?"
     },
     {
       "id": "verification",
@@ -470,8 +540,12 @@
       "prerequisites": [],
       "related": [
         "turbulent",
-        "gpu"
-      ]
+        "gpu",
+        "brownian",
+        "numerics"
+      ],
+      "context": "Use several forms of evidence together: analytic limits, inventory checks, refinement, cross-implementation comparison, and external observations. Each rules out different errors. Performance measurements also need workload, device, synchronization, and accuracy context to be scientifically useful.",
+      "investigation": "What plausible error would remain undetected by your current checks, and which independent diagnostic would expose it?"
     },
     {
       "id": "cpu",
@@ -486,7 +560,9 @@
         "getting started"
       ],
       "prerequisites": [],
-      "related": []
+      "related": [],
+      "context": "A small native CPU calculation makes particle, gas, and environment state easy to inspect. Use it to establish units, source mappings, and process semantics before scaling the workload. An explicit reference case is also useful when comparing another execution backend.",
+      "investigation": "Can you explain each change after one process step using its material, number, and environmental assumptions before composing a longer simulation?"
     },
     {
       "id": "gpu",
@@ -505,10 +581,14 @@
         "slots",
         "scaling"
       ],
-      "prerequisites": [],
+      "prerequisites": [
+        "representations"
+      ],
       "related": [
         "verification"
-      ]
+      ],
+      "context": "Accelerated simulations benefit from retaining state on the device, but preparation, workspace capacity, checkpoints, and stochastic state become part of the workflow. Prepared examples expose these choices alongside scientific diagnostics. A faster run is useful only if its supported model and evidence answer the same question.",
+      "investigation": "For a representative workload, how much time is spent advancing physics versus transferring or inspecting state, and what numerical agreement is required?"
     },
     {
       "id": "custom",
@@ -524,10 +604,15 @@
         "custom chemistry",
         "tracers"
       ],
-      "prerequisites": [],
+      "prerequisites": [
+        "representations"
+      ],
       "related": [
-        "nucleation"
-      ]
+        "nucleation",
+        "representations"
+      ],
+      "context": "Custom processes and fields let a model retain research-specific quantities such as tracers or timed chemistry. Their update rules must remain consistent with particle identity, merging, source insertion, and execution backend. Registration alone does not establish the physical semantics of a field.",
+      "investigation": "If particles merge or new particles appear, what should happen to your tracer—and which controlled example would verify that rule?"
     },
     {
       "id": "chambers",
@@ -547,8 +632,11 @@
         "losses"
       ],
       "related": [
-        "condensation"
-      ]
+        "condensation",
+        "losses"
+      ],
+      "context": "Chamber studies combine forcing, finite reservoirs, growth, collisions, and losses within a defined geometry. Repeated cycles can depend on the state left by previous cycles. Match time-dependent boundary conditions and inventory accounting before treating a simulation as an experimental analogue.",
+      "investigation": "After a humidity cycle, which particle properties retain memory of the previous cycle, and can that memory be separated from wall loss or changing gas supply?"
     },
     {
       "id": "atmosphere",
@@ -569,7 +657,9 @@
       ],
       "related": [
         "charged"
-      ]
+      ],
+      "context": "Environmental sweeps reveal how a modeled response changes across prescribed conditions. They are not automatically trajectories of a moving air parcel or forecasts. Distinguish variables varied independently from those constrained by an atmospheric scenario, and keep material and charging assumptions visible.",
+      "investigation": "Does a trend persist when temperature, pressure, and humidity follow a physically justified path instead of an independently chosen parameter sweep?"
     },
     {
       "id": "emissions",
@@ -586,7 +676,9 @@
         "smoke"
       ],
       "prerequisites": [],
-      "related": []
+      "related": [],
+      "context": "Smoke, soot, and respiratory droplets combine source properties with changing environmental conditions. Demonstration scenarios help identify competing mechanisms, but source composition and exposure interpretation require independent evidence. A particle evolution model alone does not establish a health outcome.",
+      "investigation": "Which source property most affects the predicted size or lifetime in your scenario, and what measurement would constrain it before interpreting downstream exposure?"
     }
   ],
   "resources": [
@@ -740,7 +832,7 @@
       "topic": "verification",
       "also": [],
       "role": "Contribute",
-      "start_here": false
+      "start_here": true
     },
     {
       "source": "docs/contribute/validation/numerics/condensation-stiffness.md",
@@ -794,7 +886,7 @@
     },
     {
       "source": "docs/examples/fundamentals/data_containers.py",
-      "title": "Data Containers",
+      "title": "What survives a data transfer?",
       "topic": "representations",
       "also": [],
       "role": "Examples",
@@ -802,7 +894,7 @@
     },
     {
       "source": "docs/examples/fundamentals/gas/environment_data.py",
-      "title": "Gas Mixture and Environment Tutorial",
+      "title": "Cooling a gas: saturation without a parcel model",
       "topic": "gas",
       "also": [],
       "role": "Examples",
@@ -810,15 +902,15 @@
     },
     {
       "source": "docs/examples/fundamentals/gas/gas_data.py",
-      "title": "Native Gas Species Tutorial",
+      "title": "From stored vapor mass to saturation",
       "topic": "gas",
       "also": [],
       "role": "Examples",
-      "start_here": false
+      "start_here": true
     },
     {
       "source": "docs/examples/fundamentals/gas/index.md",
-      "title": "Gas Phase",
+      "title": "Gas properties and environmental forcing",
       "topic": "gas",
       "also": [],
       "role": "Examples",
@@ -826,15 +918,15 @@
     },
     {
       "source": "docs/examples/fundamentals/gas/vapor_pressure.py",
-      "title": "Vapor Pressure Tutorial",
+      "title": "Does heating make a fixed vapor inventory less saturated?",
       "topic": "vapor",
       "also": [],
       "role": "Examples",
-      "start_here": false
+      "start_here": true
     },
     {
       "source": "docs/examples/fundamentals/index.md",
-      "title": "Index: Aerosols",
+      "title": "Build a meaningful initial state",
       "topic": "representations",
       "also": [],
       "role": "Examples",
@@ -842,7 +934,7 @@
     },
     {
       "source": "docs/examples/fundamentals/native_aerosol.py",
-      "title": "Aerosol Tutorial",
+      "title": "From a population to an evolving aerosol",
       "topic": "representations",
       "also": [],
       "role": "Examples",
@@ -850,7 +942,7 @@
     },
     {
       "source": "docs/examples/fundamentals/native_state_access.py",
-      "title": "Native State Access",
+      "title": "Change a model state without losing its meaning",
       "topic": "representations",
       "also": [],
       "role": "Examples",
@@ -866,7 +958,7 @@
     },
     {
       "source": "docs/examples/fundamentals/particles/distribution_tutorial.py",
-      "title": "Native Distribution Storage",
+      "title": "Separate particle properties from population weights",
       "topic": "representations",
       "also": [],
       "role": "Examples",
@@ -874,7 +966,7 @@
     },
     {
       "source": "docs/examples/fundamentals/particles/index.md",
-      "title": "Index: Particle Phase",
+      "title": "Describe a particle population",
       "topic": "size",
       "also": [],
       "role": "Examples",
@@ -882,7 +974,7 @@
     },
     {
       "source": "docs/examples/fundamentals/particles/particle_data.py",
-      "title": "Native Particle Construction",
+      "title": "Turn measurements into particle state",
       "topic": "representations",
       "also": [],
       "role": "Examples",
@@ -890,7 +982,7 @@
     },
     {
       "source": "docs/examples/gpu/direct/gpu_coagulation_direct.py",
-      "title": "Direct CUDA coagulation",
+      "title": "Direct Brownian coagulation on CUDA",
       "topic": "gpu",
       "also": [],
       "role": "Examples",
@@ -898,7 +990,7 @@
     },
     {
       "source": "docs/examples/gpu/direct/gpu_complete_process_sequence.py",
-      "title": "CUDA Complete Process Sequence",
+      "title": "Five direct CUDA process boundaries",
       "topic": "gpu",
       "also": [],
       "role": "Examples",
@@ -906,7 +998,7 @@
     },
     {
       "source": "docs/examples/gpu/direct/gpu_condensation_parity_walkthrough.py",
-      "title": "CUDA Condensation Parity Walkthrough",
+      "title": "Check CUDA condensation against independent equations",
       "topic": "gpu",
       "also": [],
       "role": "Examples",
@@ -914,7 +1006,7 @@
     },
     {
       "source": "docs/examples/gpu/direct/gpu_direct_kernels_quick_start.py",
-      "title": "CUDA Direct Kernels Quick Start",
+      "title": "Direct CUDA condensation: upload, calculate, download",
       "topic": "gpu",
       "also": [],
       "role": "Examples",
@@ -922,7 +1014,7 @@
     },
     {
       "source": "docs/examples/gpu/direct/gpu_direct_nucleation.py",
-      "title": "CUDA Direct Nucleation",
+      "title": "Direct CUDA nucleation with explicit species mapping",
       "topic": "gpu",
       "also": [],
       "role": "Examples",
@@ -938,7 +1030,7 @@
     },
     {
       "source": "docs/examples/gpu/prepared/custom_process_backends.py",
-      "title": "Custom processes across CPU and CUDA",
+      "title": "Extend a process on CPU and CUDA",
       "topic": "custom",
       "also": [],
       "role": "Examples",
@@ -956,7 +1048,7 @@
     },
     {
       "source": "docs/examples/gpu/prepared/gpu_dry_environment_sweep.py",
-      "title": "Dry charged aerosols from ground to mesopause and high pressure",
+      "title": "Dry charged aerosols: ground level, mesopause and pressurized chambers",
       "topic": "atmosphere",
       "also": [
         "gpu",
@@ -999,7 +1091,7 @@
     },
     {
       "source": "docs/examples/gpu/prepared/gpu_prepared_cyclic_chamber.py",
-      "title": "Cyclic CUDA aerosol with repeated source pulses",
+      "title": "Repeated source pulses in a cooling and warming aerosol",
       "topic": "chambers",
       "also": [
         "condensation",
@@ -1010,7 +1102,7 @@
     },
     {
       "source": "docs/examples/gpu/prepared/gpu_prepared_forcing.py",
-      "title": "CUDA cooling and vapor pulses",
+      "title": "Cooling, heating and vapor pulses across sixteen boxes",
       "topic": "gpu",
       "also": [],
       "role": "Examples",
@@ -1018,7 +1110,7 @@
     },
     {
       "source": "docs/examples/gpu/prepared/gpu_prepared_lifecycle.py",
-      "title": "Million-particle CUDA lifecycle",
+      "title": "A million-particle source, collision and loss lifecycle",
       "topic": "gpu",
       "also": [],
       "role": "Examples",
@@ -1026,7 +1118,7 @@
     },
     {
       "source": "docs/examples/gpu/prepared/gpu_prepared_multibox.py",
-      "title": "64 heterogeneous CUDA boxes",
+      "title": "Sixty-four heterogeneous aerosol boxes on one GPU",
       "topic": "gpu",
       "also": [],
       "role": "Examples",
@@ -1034,7 +1126,7 @@
     },
     {
       "source": "docs/examples/gpu/prepared/gpu_prepared_quick_start.py",
-      "title": "Prepared CUDA: CPU state to GPU and back",
+      "title": "Build on the CPU, evolve on CUDA, analyze on the CPU",
       "topic": "gpu",
       "also": [],
       "role": "Examples",
@@ -1042,7 +1134,7 @@
     },
     {
       "source": "docs/examples/gpu/prepared/gpu_prepared_stochastic.py",
-      "title": "Sixteen-seed CUDA coagulation",
+      "title": "Separate stochastic coagulation from initial-state variability",
       "topic": "gpu",
       "also": [],
       "role": "Examples",
@@ -1050,7 +1142,7 @@
     },
     {
       "source": "docs/examples/gpu/prepared/gpu_scaling_results.py",
-      "title": "Measured RTX 5060 scaling",
+      "title": "Measured CUDA scaling on an RTX 5060",
       "topic": "gpu",
       "also": [],
       "role": "Examples",
@@ -1058,7 +1150,7 @@
     },
     {
       "source": "docs/examples/gpu/resident/gpu_resident_graph_capture.py",
-      "title": "CUDA Resident Graph Capture",
+      "title": "Capture and replay a native CUDA schedule",
       "topic": "gpu",
       "also": [],
       "role": "Examples",
@@ -1066,7 +1158,7 @@
     },
     {
       "source": "docs/examples/gpu/resident/gpu_resident_multi_timestep.py",
-      "title": "CUDA Resident Multi Timestep",
+      "title": "Multibox resident timesteps and continuation",
       "topic": "gpu",
       "also": [],
       "role": "Examples",
@@ -1074,7 +1166,7 @@
     },
     {
       "source": "docs/examples/gpu/resident/gpu_resident_session.py",
-      "title": "CUDA Resident Session",
+      "title": "CUDA resident ownership and checkpoint restart",
       "topic": "gpu",
       "also": [],
       "role": "Examples",
@@ -1090,7 +1182,7 @@
     },
     {
       "source": "docs/examples/optics/cuda_optics.py",
-      "title": "CUDA optics: particle batches and a cloud spectrum",
+      "title": "Qualify CUDA optics before interpreting a cloud spectrum",
       "topic": "optics",
       "also": [
         "gpu"
@@ -1100,7 +1192,7 @@
     },
     {
       "source": "docs/examples/optics/sphere_optics.py",
-      "title": "Sphere spectra, polarization and cloud optical depth",
+      "title": "From one sphere to a cloud's optical signal",
       "topic": "optics",
       "also": [],
       "role": "Examples",
@@ -1108,7 +1200,7 @@
     },
     {
       "source": "docs/examples/processes/coagulation/charge/coagulation_with_charge_functional.py",
-      "title": "Coagulation with Charge (Functional + Factory)",
+      "title": "Map charged collision rates with a factory",
       "topic": "charged",
       "also": [],
       "role": "Examples",
@@ -1116,15 +1208,15 @@
     },
     {
       "source": "docs/examples/processes/coagulation/charge/coagulation_with_charge_objects.py",
-      "title": "Coagulation with Charge (Builder pattern)",
+      "title": "Map charged collision rates with a builder",
       "topic": "charged",
       "also": [],
       "role": "Examples",
-      "start_here": false
+      "start_here": true
     },
     {
       "source": "docs/examples/processes/coagulation/coagulation_1_pmf_pattern.py",
-      "title": "Coagulation Pattern 1: PMF",
+      "title": "Brownian coagulation in a PMF population",
       "topic": "brownian",
       "also": [],
       "role": "Examples",
@@ -1132,7 +1224,7 @@
     },
     {
       "source": "docs/examples/processes/coagulation/coagulation_2_pdf_pattern.py",
-      "title": "Coagulation Pattern 2: PDF",
+      "title": "Brownian coagulation in a PDF population",
       "topic": "brownian",
       "also": [],
       "role": "Examples",
@@ -1140,7 +1232,7 @@
     },
     {
       "source": "docs/examples/processes/coagulation/coagulation_3_particle_resolved_pattern.py",
-      "title": "Coagulation Pattern 3: Particle Resolved",
+      "title": "Follow collisions through individual particles",
       "topic": "brownian",
       "also": [],
       "role": "Examples",
@@ -1148,7 +1240,7 @@
     },
     {
       "source": "docs/examples/processes/coagulation/coagulation_4_compared.py",
-      "title": "Coagulation Pattern 4: PMF vs PDF",
+      "title": "Compare coagulation after matching distribution units",
       "topic": "brownian",
       "also": [],
       "role": "Examples",
@@ -1156,7 +1248,7 @@
     },
     {
       "source": "docs/examples/processes/coagulation/coagulation_5_time_evolution.py",
-      "title": "Coagulation Pattern 5: Time Evolution Comparison",
+      "title": "Does particle-number decay depend on representation?",
       "topic": "brownian",
       "also": [],
       "role": "Examples",
@@ -1164,15 +1256,15 @@
     },
     {
       "source": "docs/examples/processes/coagulation/functional/coagulation_basic_1_pmf.py",
-      "title": "Coagulation Basic 1: PMF (Builder + Coagulation)",
+      "title": "A compact PMF coagulation calculation",
       "topic": "brownian",
       "also": [],
       "role": "Examples",
-      "start_here": false
+      "start_here": true
     },
     {
       "source": "docs/examples/processes/coagulation/functional/coagulation_basic_2_pdf.py",
-      "title": "Coagulation Basic 2: PDF (Builder + Coagulation)",
+      "title": "A compact PDF coagulation calculation",
       "topic": "brownian",
       "also": [],
       "role": "Examples",
@@ -1180,7 +1272,7 @@
     },
     {
       "source": "docs/examples/processes/coagulation/functional/coagulation_basic_3_compared.py",
-      "title": "Coagulation Basic 3: PMF vs PDF (Builder + Coagulation)",
+      "title": "A compact comparison of bin totals and radius densities",
       "topic": "brownian",
       "also": [],
       "role": "Examples",
@@ -1188,7 +1280,7 @@
     },
     {
       "source": "docs/examples/processes/coagulation/functional/coagulation_basic_4_particleresolved.py",
-      "title": "Coagulation Basic 4: Particle Resolved (Builder + Coagulation)",
+      "title": "A compact particle-resolved collision calculation",
       "topic": "brownian",
       "also": [],
       "role": "Examples",
@@ -1204,7 +1296,7 @@
     },
     {
       "source": "docs/examples/processes/condensation/condensation_2_massbin.py",
-      "title": "Condensation Tutorial: Mass Binned",
+      "title": "Water uptake from a maintained vapor reservoir",
       "topic": "condensation",
       "also": [],
       "role": "Examples",
@@ -1212,7 +1304,7 @@
     },
     {
       "source": "docs/examples/processes/condensation/condensation_3_massresolved.py",
-      "title": "Condensation Tutorial: Particle Resolved",
+      "title": "Competition for a finite water-vapor reservoir",
       "topic": "condensation",
       "also": [],
       "role": "Examples",
@@ -1220,7 +1312,7 @@
     },
     {
       "source": "docs/examples/processes/condensation/condensation_latent_heat.py",
-      "title": "CPU latent-heat condensation bookkeeping",
+      "title": "How much energy accompanies a condensation step?",
       "topic": "condensation",
       "also": [],
       "role": "Examples",
@@ -1228,15 +1320,15 @@
     },
     {
       "source": "docs/examples/processes/condensation/staggered_condensation_example.py",
-      "title": "Staggered Condensation Stepping",
+      "title": "Does update ordering change a condensation calculation?",
       "topic": "numerics",
       "also": [],
       "role": "Examples",
-      "start_here": false
+      "start_here": true
     },
     {
       "source": "docs/examples/processes/customization/adding_particles_during_simulation.py",
-      "title": "Adding Particles During Simulation",
+      "title": "Add an external population without changing existing particles",
       "topic": "custom",
       "also": [],
       "role": "Examples",
@@ -1244,7 +1336,7 @@
     },
     {
       "source": "docs/examples/processes/customization/particle_tracers.py",
-      "title": "Registered particle tracers",
+      "title": "Follow a source marker through collisions and removal",
       "topic": "custom",
       "also": [],
       "role": "Examples",
@@ -1252,23 +1344,23 @@
     },
     {
       "source": "docs/examples/processes/customization/timed_box_chemistry.py",
-      "title": "Timed custom CPU chemistry",
+      "title": "Distinguish chemical conversion from a timed emission and dilution",
       "topic": "custom",
       "also": [],
       "role": "Examples",
-      "start_here": false
+      "start_here": true
     },
     {
       "source": "docs/examples/processes/dilution/cpu_dilution.py",
-      "title": "Cpu Dilution",
+      "title": "Dilution changes abundance without shrinking particles",
       "topic": "losses",
       "also": [],
       "role": "Examples",
-      "start_here": false
+      "start_here": true
     },
     {
       "source": "docs/examples/processes/index.md",
-      "title": "Dynamics",
+      "title": "Processes: connect a mechanism to an observable change",
       "topic": "processes",
       "also": [],
       "role": "Examples",
@@ -1276,15 +1368,15 @@
     },
     {
       "source": "docs/examples/processes/nucleation/cpu_nucleation.py",
-      "title": "Cpu Nucleation",
+      "title": "Create particles by transferring a bounded precursor source",
       "topic": "nucleation",
       "also": [],
       "role": "Examples",
-      "start_here": false
+      "start_here": true
     },
     {
       "source": "docs/examples/processes/nucleation/custom_nucleation_single_species.py",
-      "title": "Custom Nucleation: Single Species",
+      "title": "Couple an illustrative particle source to growth and collisions",
       "topic": "nucleation",
       "also": [],
       "role": "Examples",
@@ -1292,7 +1384,7 @@
     },
     {
       "source": "docs/examples/processes/nucleation/index.md",
-      "title": "Nucleation",
+      "title": "Nucleation: connect formation rates to material and particle counts",
       "topic": "nucleation",
       "also": [],
       "role": "Examples",
@@ -1300,7 +1392,7 @@
     },
     {
       "source": "docs/examples/processes/wall-loss/chamber_forward_simulation.py",
-      "title": "Chamber Forward Simulation",
+      "title": "Explain a chamber spectrum using separate rate contributions",
       "topic": "losses",
       "also": [],
       "role": "Examples",
@@ -1308,7 +1400,7 @@
     },
     {
       "source": "docs/examples/processes/wall-loss/index.md",
-      "title": "Index: Chamber Wall Loss",
+      "title": "Wall loss: distinguish removal, redistribution, and geometry",
       "topic": "losses",
       "also": [],
       "role": "Examples",
@@ -1316,7 +1408,7 @@
     },
     {
       "source": "docs/examples/processes/wall-loss/rectangular_wall_loss_strategy.py",
-      "title": "Rectangular Wall Loss Strategy (interactive quick start)",
+      "title": "Track removal in a rectangular chamber",
       "topic": "losses",
       "also": [],
       "role": "Examples",
@@ -1324,7 +1416,7 @@
     },
     {
       "source": "docs/examples/processes/wall-loss/spherical_wall_loss_strategy.py",
-      "title": "Spherical Wall Loss Strategy Tutorial",
+      "title": "Separate size-selective removal from particle growth",
       "topic": "losses",
       "also": [],
       "role": "Examples",
@@ -1332,7 +1424,7 @@
     },
     {
       "source": "docs/examples/processes/wall-loss/wall_loss_builders_factory.py",
-      "title": "Wall Loss Builders and Factory (interactive)",
+      "title": "Configure chamber loss without a unit mismatch",
       "topic": "losses",
       "also": [],
       "role": "Examples",
@@ -1340,7 +1432,7 @@
     },
     {
       "source": "docs/examples/processes/wall-loss/wall_loss_tutorial.py",
-      "title": "Wall Loss Tutorial: Spherical vs Rectangular Chambers",
+      "title": "Compare chamber geometry and competing particle processes",
       "topic": "losses",
       "also": [],
       "role": "Examples",
@@ -1348,15 +1440,15 @@
     },
     {
       "source": "docs/examples/simulations/biomass_burning_cloud_interactions.py",
-      "title": "Biomass Burning Cloud Interactions",
+      "title": "How do collision models change a water-grown mixed aerosol?",
       "topic": "emissions",
       "also": [],
       "role": "Examples",
-      "start_here": false
+      "start_here": true
     },
     {
       "source": "docs/examples/simulations/cloud_chamber_multi_cycle.py",
-      "title": "Cloud Chamber Multi-Cycle Simulation",
+      "title": "Separate water cycling from seed loss in a chamber",
       "topic": "chambers",
       "also": [
         "condensation",
@@ -1367,7 +1459,7 @@
     },
     {
       "source": "docs/examples/simulations/cloud_chamber_single_cycle.py",
-      "title": "Cloud Chamber Activation-Deactivation Cycle (Single Run)",
+      "title": "Follow droplets through one wet–dry chamber cycle",
       "topic": "chambers",
       "also": [
         "condensation",
@@ -1378,7 +1470,7 @@
     },
     {
       "source": "docs/examples/simulations/cough_droplets_partitioning.py",
-      "title": "Cough Droplets Partitioning",
+      "title": "Audit a respiratory-droplet illustration before using its predictions",
       "topic": "emissions",
       "also": [],
       "role": "Examples",
@@ -1386,15 +1478,15 @@
     },
     {
       "source": "docs/examples/simulations/index.md",
-      "title": "Simulations",
+      "title": "Connect processes to a research question",
       "topic": "applications",
       "also": [],
       "role": "Examples",
-      "start_here": false
+      "start_here": true
     },
     {
       "source": "docs/examples/simulations/organic_partitioning_and_coagulation.py",
-      "title": "Organic Partitioning And Coagulation",
+      "title": "When a size-distribution plot hides a composition error",
       "topic": "partitioning",
       "also": [],
       "role": "Examples",
@@ -1402,7 +1494,7 @@
     },
     {
       "source": "docs/examples/simulations/soot_formation_in_flames.py",
-      "title": "Soot Formation in Flames",
+      "title": "Follow organic uptake onto seeds during imposed cooling",
       "topic": "emissions",
       "also": [],
       "role": "Examples",
@@ -1410,7 +1502,7 @@
     },
     {
       "source": "docs/examples/thermodynamics/activity/activity_tutorial.py",
-      "title": "Activity Tutorial",
+      "title": "Choose an activity model by the comparison it enables",
       "topic": "activity",
       "also": [],
       "role": "Examples",
@@ -1418,7 +1510,7 @@
     },
     {
       "source": "docs/examples/thermodynamics/activity/bat_activity_example.py",
-      "title": "BAT Model Activity Example",
+      "title": "Compare ideal and nonideal organic activity",
       "topic": "activity",
       "also": [],
       "role": "Examples",
@@ -1426,15 +1518,15 @@
     },
     {
       "source": "docs/examples/thermodynamics/activity/equilibria_example.py",
-      "title": "Equilibria Partitioning Example",
+      "title": "Separate water uptake from organic partitioning",
       "topic": "partitioning",
       "also": [],
       "role": "Examples",
-      "start_here": false
+      "start_here": true
     },
     {
       "source": "docs/examples/thermodynamics/activity/ideal_activity_example.py",
-      "title": "Ideal Activity Example",
+      "title": "Equal mass does not mean equal activity",
       "topic": "activity",
       "also": [],
       "role": "Examples",
@@ -1442,7 +1534,7 @@
     },
     {
       "source": "docs/examples/thermodynamics/activity/index.md",
-      "title": "Activity Examples",
+      "title": "Activity and partitioning examples",
       "topic": "activity",
       "also": [],
       "role": "Examples",
@@ -1450,7 +1542,7 @@
     },
     {
       "source": "docs/examples/thermodynamics/activity/kappa_activity_example.py",
-      "title": "Kappa Parameter Activity Example",
+      "title": "Connect water content to hygroscopicity",
       "topic": "activity",
       "also": [],
       "role": "Examples",
@@ -1458,7 +1550,7 @@
     },
     {
       "source": "docs/examples/thermodynamics/equilibria/activity_part1.py",
-      "title": "Activity Example",
+      "title": "Follow water–organic mixing from composition to water activity",
       "topic": "partitioning",
       "also": [],
       "role": "Examples",
@@ -1466,7 +1558,7 @@
     },
     {
       "source": "docs/examples/thermodynamics/equilibria/equilibria_part1.py",
-      "title": "Liquid Vapor Equilibrium",
+      "title": "How does water uptake change organic aerosol partitioning?",
       "topic": "partitioning",
       "also": [],
       "role": "Examples",
@@ -1474,7 +1566,7 @@
     },
     {
       "source": "docs/examples/thermodynamics/equilibria/index.md",
-      "title": "Index Equilibria",
+      "title": "From phase properties to equilibrium aerosol mass",
       "topic": "partitioning",
       "also": [],
       "role": "Examples",
@@ -1490,7 +1582,7 @@
     },
     {
       "source": "docs/examples/thermodynamics/particle-properties/activity_functions.py",
-      "title": "Activity Tutorial",
+      "title": "Compare activity rules along a composition path",
       "topic": "activity",
       "also": [],
       "role": "Examples",
@@ -1498,7 +1590,7 @@
     },
     {
       "source": "docs/examples/thermodynamics/particle-properties/activity_tutorial.py",
-      "title": "Activity Tutorial",
+      "title": "Which composition rule controls equilibrium pressure?",
       "topic": "activity",
       "also": [],
       "role": "Examples",
@@ -1506,11 +1598,11 @@
     },
     {
       "source": "docs/examples/thermodynamics/particle-properties/particle_surface_tutorial.py",
-      "title": "Particle Surface Tutorial",
+      "title": "How strongly does curvature raise equilibrium vapor pressure?",
       "topic": "surface",
       "also": [],
       "role": "Examples",
-      "start_here": false
+      "start_here": true
     },
     {
       "source": "docs/guide/data-model/construction.md",
@@ -1686,7 +1778,7 @@
       "topic": "aerosols",
       "also": [],
       "role": "Guide",
-      "start_here": false
+      "start_here": true
     },
     {
       "source": "docs/guide/optics/index.md",
@@ -1734,7 +1826,7 @@
       "topic": "processes",
       "also": [],
       "role": "Guide",
-      "start_here": false
+      "start_here": true
     },
     {
       "source": "docs/guide/processes/nucleation.md",

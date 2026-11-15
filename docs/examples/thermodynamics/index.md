@@ -1,23 +1,31 @@
 # Thermodynamics examples
 
-Start with the
-[activity strategy examples](activity/index.md), then choose a specific question.
-All notebook/source pairs are retained because their APIs, inputs, or scientific
-outputs differ; they are not independent copies of the same calculation.
+What controls the equilibrium pressure above a particle, and how does that
+pressure affect its composition? Start with activity for mixing, add curvature
+for a small particle's surface, then follow partitioning to predict condensed
+mass. These are complementary pieces of a model, with different assumptions.
 
-| Learning objective | Example |
-| --- | --- |
-| First ideal, kappa, and BAT strategy calculations | [Activity tutorial](activity/activity_tutorial.ipynb) |
-| Minimal ideal mole-fraction and partial-pressure calculation | [Ideal activity](activity/ideal_activity_example.ipynb) |
-| Builder setup and organic-water nonideality across O:C ratios | [BAT strategy](activity/bat_activity_example.ipynb) |
-| Hygroscopic water activity across composition | [Kappa strategy](activity/kappa_activity_example.ipynb) |
-| Strategy-based partitioning and relative-humidity response | [Equilibria strategy](activity/equilibria_example.ipynb) |
-| Compare Strategy, Builder, and Factory APIs for mixing rules | [Particle activity patterns](particle-properties/activity_tutorial.ipynb) |
-| Calculate the underlying mixing functions directly | [Activity functions](particle-properties/activity_functions.ipynb) |
-| Surface tension, composition, and Kelvin curvature | [Particle surface](particle-properties/particle_surface_tutorial.ipynb) |
-| Explore BAT phase-separation calculations and literature | [BAT analysis](equilibria/activity_part1.ipynb) |
-| Explore multicomponent equilibrium composition | [Liquid-vapor equilibrium](equilibria/equilibria_part1.ipynb) |
+| Your question | Start here | What to look for |
+| --- | --- | --- |
+| Why is equal mass not equal activity? | [Ideal molar activity](activity/ideal_activity_example.py) | Mole fraction and the flat-interface pressure reduction |
+| Which activity model should I compare? | [Activity models together](activity/activity_tutorial.py) | Ideal, κ, and BAT assumptions and matched-component comparisons |
+| How does hygroscopicity change water activity? | [κ activity](activity/kappa_activity_example.py) | Composition dependence and sensitivity to the solute parameter |
+| What does organic nonideality add? | [BAT strategy](activity/bat_activity_example.py) | Organic activity at fixed O:C and molar mass |
+| How do I express those rules in code? | [Strategy, builder, and factory](particle-properties/activity_tutorial.py) | Separate model choice from construction interface |
+| What changes along a composition path? | [Activity functions](particle-properties/activity_functions.py) | Mole-, volume-, and mass-based rules on a common coordinate |
+| How does radius change equilibrium pressure? | [Surface and Kelvin effect](particle-properties/particle_surface_tutorial.py) | Surface tension, species molar volume, and an imposed mixture rule |
+| Can water and organic material occupy different phases? | [BAT phase properties](equilibria/activity_part1.py) | Activities, phase compositions, and phase-transition weights |
+| How much organic material condenses? | [Compact partitioning example](activity/equilibria_example.py) | Available mass, volatility, and associated water |
+| How does humidity affect a volatility distribution? | [Multicomponent partitioning](equilibria/equilibria_part1.py) | Separate organic and water concentration responses |
 
-[Scientific theory](../../theory/thermodynamics/index.md) supplies equations and
-assumptions; the [activity guide](../../guide/processes/activity.md) owns the API
-explanation. Use [equilibrium examples](equilibria/index.md) for partitioning.
+The [activity collection](activity/index.md) offers short entry points; the
+[equilibrium collection](equilibria/index.md) develops the phase-property to
+partitioning connection. Each worked page includes downloadable Python source
+and saved results. The [theory](../../theory/thermodynamics/index.md) supplies
+model equations and assumptions; the [activity guide](../../guide/processes/activity.md)
+explains supported interfaces.
+
+For a research study, choose the material-property model and validate its domain
+before interpreting a growth calculation. Equilibrium composition is a useful
+reference for [condensation examples](../processes/index.md), but does not tell
+you how quickly particles reach that state.

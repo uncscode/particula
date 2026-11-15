@@ -1,6 +1,12 @@
 # %% [markdown]
 # # Repeated source pulses in a cooling and warming aerosol
 #
+# What must be saved to reproduce a simulation driven by repeated external
+# pulses? This example separates the evolving aerosol from the forcing schedule
+# and its source ledger. Start with the [prepared quick start](gpu_prepared_quick_start.py)
+# and [refined forcing example](gpu_prepared_forcing.py) before using this larger
+# composition and restart demonstration.
+#
 # This longer illustration evolves **196,608 initially active particles** in
 # 32 boxes for 600 one-second steps. Each box has 8,192 slots, a polydisperse
 # water/dry-material population and three gas species. Nucleation, Brownian
@@ -275,3 +281,18 @@ def plot_history(frames):
 
 if __name__ == "__main__":
     run_example()
+
+# %% [markdown]
+# ## Reproduce the experiment, then qualify its response
+#
+# The exact second-half continuation shows that the checkpoint and restored
+# application schedule reproduce this trajectory. The species ledger checks each
+# observed external exchange. Neither check establishes that one-second steps
+# resolve fast condensation following a source or humidity pulse.
+#
+# The radius-time panel averages box histograms; it can reveal new small-particle
+# cohorts but can hide differences between box temperatures. To investigate pulse
+# spacing, retain per-box distributions, hold total supplied material controlled,
+# and compare size and number after each cycle. Refine both timestep and forcing
+# resolution at identical physical event times before interpreting hysteresis or
+# cohort survival as a physical result.

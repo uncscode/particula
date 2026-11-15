@@ -13,32 +13,31 @@
 # ---
 
 # %% [markdown]
-# # Kappa Parameter Activity Example
+# # Connect water content to hygroscopicity
 #
-# Demonstrates using `ActivityKappaParameter` for computing water activity
-# in hygroscopic aerosol particles using kappa-Kohler theory.
+# At the same water content, how does hygroscopicity change the equilibrium
+# water activity? This example first varies the water mass fraction of a
+# water–ammonium-sulfate parameterization, then varies κ in a separate generic
+# solute system. It lets you distinguish composition sensitivity from parameter
+# sensitivity before coupling activity to particle growth.
 #
-# ## What is the Kappa Parameter?
-#
-# The kappa parameter provides a single-parameter representation of
-# hygroscopicity, relating dry particle volume to water activity. Higher
-# kappa values indicate more hygroscopic species that absorb more water.
-#
-# ## What This Example Shows
-#
-# - Creating a kappa parameter activity strategy
-# - Computing water activity at different water contents
-# - Understanding kappa values for common aerosol species
+# The κ relation used here is a_w = V_w / (V_w + κ V_s). This is the composition
+# contribution to equilibrium; curvature and ambient vapor are not included in
+# these activity-only calls.
 
 # %%
 import numpy as np
 import particula as par
 
 # %% [markdown]
-# ## 1. Define Species Properties
+# ## State the chosen salt approximation
 #
-# Set up properties for water and ammonium sulfate. Ammonium sulfate has
-# a kappa value of ~0.61, making it highly hygroscopic.
+# The first system uses κ = 0.61, density 1770 kg m⁻³, and molar mass 132.14 g mol⁻¹
+# for ammonium sulfate. The chosen κ corresponds to a CCN-derived value summarized
+# by [Petters and Kreidenweis (2007)](https://acp.copernicus.org/articles/7/1961/2007/);
+# it is not a universal constant across concentration and phase state.
+# The water lane's κ is unused in forming the dry-solute κ; setting it to zero
+# does not mean that pure water has zero activity.
 
 # %%
 # Define species properties for water and ammonium sulfate
@@ -55,7 +54,12 @@ print(f"Densities: {densities} kg/m^3")
 print(f"Molar masses: {molar_masses * 1e3} g/mol")
 
 # %% [markdown]
-# ## 2. Create Kappa Parameter Activity Strategy
+# ## Identify the water component explicitly
+#
+# `water_index=0` selects the component whose activity is replaced by the κ model.
+# In this implementation, the other component's returned activity remains its
+# mole fraction. The printed “salt activity” is therefore not a full electrolyte
+# activity or dissociation calculation.
 
 # %%
 strategy = par.particles.ActivityKappaParameter(
@@ -68,9 +72,12 @@ strategy = par.particles.ActivityKappaParameter(
 print(f"Strategy: {type(strategy).__name__}")
 
 # %% [markdown]
-# ## 3. Compute Activity at Different Water Contents
+# ## Dilute the solute with more water
 #
-# Vary the water mass fraction and observe how water activity changes.
+# The total mass concentration remains 1 µg m⁻³ while water mass fraction rises
+# from 0.3 to 0.9. Densities convert these mass fractions to volumes. The saved
+# water activity rises from about 0.5543 to 0.9631 as the solute is diluted.
+# These are prescribed compositions; no humidity-controlled growth is solved.
 
 # %%
 print("=== Kappa Parameter Activity ===")
@@ -87,10 +94,13 @@ for water_frac in water_fractions:
     print(f"  Salt activity:  {activity[1]:.4f}\n")
 
 # %% [markdown]
-# ## 4. Effect of Kappa on Water Activity
+# ## Change κ while holding a different composition model fixed
 #
-# Test how different kappa values affect water activity at a fixed composition
-# (50% water by mass).
+# This second sweep uses a generic solute density of 1500 kg m⁻³ and molar mass
+# 100 g mol⁻¹, with 50% water by mass throughout. It is not the same salt setup
+# as above. Increasing κ from zero to one lowers water activity from 1 to 0.6
+# for this fixed volume ratio. Compare points within this sweep to isolate κ;
+# do not attribute cross-sweep differences solely to κ.
 
 # %%
 print("=== Effect of Kappa on Water Activity ===")
@@ -108,3 +118,16 @@ for kappa in kappa_test_values:
     mass = np.array([0.5, 0.5]) * 1e-9
     activity = test_strategy.activity(mass_concentration=mass)
     print(f"kappa={kappa:.2f}: water activity = {activity[0]:.4f}")
+
+# %% [markdown]
+# ## Use the relation to pose a growth question
+#
+# A more hygroscopic solute lowers water activity at fixed water-to-solute volume
+# ratio. Under a maintained ambient humidity, that can support greater uptake
+# before equilibrium is reached, but this page has not simulated that uptake.
+#
+# To study a material, choose κ and density supported for its phase and conditions,
+# solve for water content at specified humidity, and include curvature when needed.
+# Compare the resulting growth factor with data or another activity model. The
+# [finite-vapor condensation example](../../processes/condensation/condensation_3_massresolved.py)
+# adds competition for a limited reservoir, where initial humidity is not maintained.

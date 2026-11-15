@@ -13,27 +13,24 @@
 # ---
 
 # %% [markdown]
-# # CPU latent-heat condensation bookkeeping
+# # How much energy accompanies a condensation step?
 #
-# This runnable example demonstrates a small CPU-only condensation workflow that
-# uses public builder and factory APIs, wraps the strategy in
-# `par.dynamics.MassCondensation`, and reports latent-heat bookkeeping from real
-# mass transfer. The reported energy is diagnostic only: it does not feed back
-# into the temperature state in this example.
+# A mass-conserving isothermal calculation does not tell us how the temperature
+# would change. This small CPU example isolates the latent-energy bookkeeping:
+# five 0.05 s condensation calls transfer water between four resolved particles
+# and a finite vapor reservoir in 10⁻⁶ m³. Initial water saturation is 1.03 at
+# 298.15 K. The energy is diagnostic only and never updates temperature.
 #
-# The setup is intentionally narrow:
+# Read [the finite-reservoir example](condensation_3_massresolved.py) for coupled
+# mass transfer. Here the constant latent heat is 2.26 × 10⁶ J kg⁻¹. Follow
+# `run_example()` from copied initial state through mass transfer to per-call and
+# cumulative energy density. Positive energy denotes net condensation; negative
+# energy denotes evaporation.
 #
-# - one condensable species (`H2O`)
-# - one well-mixed CPU aerosol box
-# - a few short `MassCondensation.execute(...)` calls
-#
-# After each runnable call we read
-# `condensation_strategy.last_latent_heat_energy`, which stores only the most
-# recent latent-heat bookkeeping value. This example therefore uses
-# `sub_steps=1` so each stored value matches the full runnable call, then
-# accumulates the cumulative signal explicitly in the outer loop. The
-# strategy reports extensive energy in joules. We divide each value by the
-# represented volume before reporting energy density in J/m³.
+# `last_latent_heat_energy` stores only the most recent substep's extensive energy
+# in joules. This example deliberately uses one substep per call, divides once by
+# physical volume to obtain J m⁻³, and sums the five call values explicitly.
+# Reading only the final value would not recover the accumulated signal.
 
 # %%
 """CPU-only latent-heat condensation example.
@@ -273,3 +270,18 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+# %% [markdown]
+# ## Interpret energy without claiming thermal feedback
+#
+# The saved cumulative energy density is about 0.0350 J m⁻³, consistent with the
+# reported particle mass-density gain of 1.549 × 10⁻⁸ kg m⁻³ times the constant
+# latent heat. Gas depletion supplies that gain. This is an accounting comparison,
+# not a prediction or measurement of temperature rise.
+#
+# To estimate a thermal response, specify the relevant heat capacity, heat exchange
+# with the chamber or surrounding gas, and whether properties change during the
+# step. Compare a coupled result with this isothermal reference and check energy
+# and species inventories independently. If you increase `sub_steps`, accumulate
+# energy at the appropriate update level rather than treating the last-substep
+# property as a full-call total.

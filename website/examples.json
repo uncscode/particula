@@ -16,7 +16,7 @@
     "inputs": []
   },
   "gpu-coagulation": {
-    "title": "Direct CUDA coagulation",
+    "title": "Direct Brownian coagulation on CUDA",
     "source": "docs/examples/gpu/direct/gpu_coagulation_direct.py",
     "policy": "cuda",
     "device": "cuda",
@@ -89,7 +89,7 @@
     "inputs": []
   },
   "examples-fundamentals-data-containers": {
-    "title": "Data Containers",
+    "title": "What survives a data transfer?",
     "source": "docs/examples/fundamentals/data_containers.py",
     "policy": "cpu",
     "device": "cpu",
@@ -97,7 +97,7 @@
     "inputs": []
   },
   "examples-fundamentals-gas-environment-data": {
-    "title": "Gas Mixture and Environment Tutorial",
+    "title": "Cooling a gas: saturation without a parcel model",
     "source": "docs/examples/fundamentals/gas/environment_data.py",
     "policy": "cpu",
     "device": "cpu",
@@ -105,7 +105,7 @@
     "inputs": []
   },
   "examples-fundamentals-gas-gas-data": {
-    "title": "Native Gas Species Tutorial",
+    "title": "From stored vapor mass to saturation",
     "source": "docs/examples/fundamentals/gas/gas_data.py",
     "policy": "cpu",
     "device": "cpu",
@@ -113,7 +113,7 @@
     "inputs": []
   },
   "examples-fundamentals-gas-vapor-pressure": {
-    "title": "Vapor Pressure Tutorial",
+    "title": "Does heating make a fixed vapor inventory less saturated?",
     "source": "docs/examples/fundamentals/gas/vapor_pressure.py",
     "policy": "cpu",
     "device": "cpu",
@@ -121,7 +121,7 @@
     "inputs": []
   },
   "examples-fundamentals-native-aerosol": {
-    "title": "Aerosol Tutorial",
+    "title": "From a population to an evolving aerosol",
     "source": "docs/examples/fundamentals/native_aerosol.py",
     "policy": "cpu",
     "device": "cpu",
@@ -129,7 +129,7 @@
     "inputs": []
   },
   "examples-fundamentals-native-state-access": {
-    "title": "Native State Access",
+    "title": "Change a model state without losing its meaning",
     "source": "docs/examples/fundamentals/native_state_access.py",
     "policy": "cpu",
     "device": "cpu",
@@ -137,7 +137,7 @@
     "inputs": []
   },
   "examples-fundamentals-particles-distribution-tutorial": {
-    "title": "Native Distribution Storage",
+    "title": "Separate particle properties from population weights",
     "source": "docs/examples/fundamentals/particles/distribution_tutorial.py",
     "policy": "cpu",
     "device": "cpu",
@@ -145,7 +145,7 @@
     "inputs": []
   },
   "examples-fundamentals-particles-particle-data": {
-    "title": "Native Particle Construction",
+    "title": "Turn measurements into particle state",
     "source": "docs/examples/fundamentals/particles/particle_data.py",
     "policy": "cpu",
     "device": "cpu",
@@ -153,7 +153,7 @@
     "inputs": []
   },
   "examples-gpu-direct-gpu-complete-process-sequence": {
-    "title": "CUDA Complete Process Sequence",
+    "title": "Five direct CUDA process boundaries",
     "source": "docs/examples/gpu/direct/gpu_complete_process_sequence.py",
     "policy": "cuda",
     "device": "cuda",
@@ -162,7 +162,7 @@
     "invoke": "result = run_publication()"
   },
   "examples-gpu-direct-gpu-condensation-parity-walkthrough": {
-    "title": "CUDA Condensation Parity Walkthrough",
+    "title": "Check CUDA condensation against independent equations",
     "source": "docs/examples/gpu/direct/gpu_condensation_parity_walkthrough.py",
     "policy": "cuda",
     "device": "cuda",
@@ -171,7 +171,7 @@
     "invoke": "result = run_publication()"
   },
   "examples-gpu-direct-gpu-direct-kernels-quick-start": {
-    "title": "CUDA Direct Kernels Quick Start",
+    "title": "Direct CUDA condensation: upload, calculate, download",
     "source": "docs/examples/gpu/direct/gpu_direct_kernels_quick_start.py",
     "policy": "cuda",
     "device": "cuda",
@@ -180,7 +180,7 @@
     "invoke": "result = run_publication()"
   },
   "examples-gpu-direct-gpu-direct-nucleation": {
-    "title": "CUDA Direct Nucleation",
+    "title": "Direct CUDA nucleation with explicit species mapping",
     "source": "docs/examples/gpu/direct/gpu_direct_nucleation.py",
     "policy": "cuda",
     "device": "cuda",
@@ -189,7 +189,7 @@
     "invoke": "result = run_publication()"
   },
   "examples-gpu-resident-gpu-resident-graph-capture": {
-    "title": "CUDA Resident Graph Capture",
+    "title": "Capture and replay a native CUDA schedule",
     "source": "docs/examples/gpu/resident/gpu_resident_graph_capture.py",
     "policy": "cuda",
     "device": "cuda",
@@ -200,7 +200,7 @@
     "invoke": "result = run_publication()"
   },
   "examples-gpu-resident-gpu-resident-multi-timestep": {
-    "title": "CUDA Resident Multi Timestep",
+    "title": "Multibox resident timesteps and continuation",
     "source": "docs/examples/gpu/resident/gpu_resident_multi_timestep.py",
     "policy": "cuda",
     "device": "cuda",
@@ -209,7 +209,7 @@
     "invoke": "result = run_publication()"
   },
   "examples-gpu-resident-gpu-resident-session": {
-    "title": "CUDA Resident Session",
+    "title": "CUDA resident ownership and checkpoint restart",
     "source": "docs/examples/gpu/resident/gpu_resident_session.py",
     "policy": "cuda",
     "device": "cuda",
@@ -218,7 +218,7 @@
     "invoke": "result = run_publication()"
   },
   "examples-processes-coagulation-charge-coagulation-with-charge-functional": {
-    "title": "Coagulation with Charge (Functional + Factory)",
+    "title": "Map charged collision rates with a factory",
     "source": "docs/examples/processes/coagulation/charge/coagulation_with_charge_functional.py",
     "policy": "cpu",
     "device": "cpu",
@@ -226,7 +226,7 @@
     "inputs": []
   },
   "examples-processes-coagulation-charge-coagulation-with-charge-objects": {
-    "title": "Coagulation with Charge (Builder pattern)",
+    "title": "Map charged collision rates with a builder",
     "source": "docs/examples/processes/coagulation/charge/coagulation_with_charge_objects.py",
     "policy": "cpu",
     "device": "cpu",
@@ -234,7 +234,7 @@
     "inputs": []
   },
   "examples-processes-coagulation-coagulation-1-pmf-pattern": {
-    "title": "Coagulation Pattern 1: PMF",
+    "title": "Brownian coagulation in a PMF population",
     "source": "docs/examples/processes/coagulation/coagulation_1_pmf_pattern.py",
     "policy": "cpu",
     "device": "cpu",
@@ -242,7 +242,7 @@
     "inputs": []
   },
   "examples-processes-coagulation-coagulation-2-pdf-pattern": {
-    "title": "Coagulation Pattern 2: PDF",
+    "title": "Brownian coagulation in a PDF population",
     "source": "docs/examples/processes/coagulation/coagulation_2_pdf_pattern.py",
     "policy": "cpu",
     "device": "cpu",
@@ -250,7 +250,7 @@
     "inputs": []
   },
   "examples-processes-coagulation-coagulation-3-particle-resolved-pattern": {
-    "title": "Coagulation Pattern 3: Particle Resolved",
+    "title": "Follow collisions through individual particles",
     "source": "docs/examples/processes/coagulation/coagulation_3_particle_resolved_pattern.py",
     "policy": "cpu",
     "device": "cpu",
@@ -258,7 +258,7 @@
     "inputs": []
   },
   "examples-processes-coagulation-coagulation-4-compared": {
-    "title": "Coagulation Pattern 4: PMF vs PDF",
+    "title": "Compare coagulation after matching distribution units",
     "source": "docs/examples/processes/coagulation/coagulation_4_compared.py",
     "policy": "cpu",
     "device": "cpu",
@@ -266,7 +266,7 @@
     "inputs": []
   },
   "examples-processes-coagulation-coagulation-5-time-evolution": {
-    "title": "Coagulation Pattern 5: Time Evolution Comparison",
+    "title": "Does particle-number decay depend on representation?",
     "source": "docs/examples/processes/coagulation/coagulation_5_time_evolution.py",
     "policy": "cpu",
     "device": "cpu",
@@ -274,7 +274,7 @@
     "inputs": []
   },
   "examples-processes-coagulation-functional-coagulation-basic-1-pmf": {
-    "title": "Coagulation Basic 1: PMF (Builder + Coagulation)",
+    "title": "A compact PMF coagulation calculation",
     "source": "docs/examples/processes/coagulation/functional/coagulation_basic_1_pmf.py",
     "policy": "cpu",
     "device": "cpu",
@@ -282,7 +282,7 @@
     "inputs": []
   },
   "examples-processes-coagulation-functional-coagulation-basic-2-pdf": {
-    "title": "Coagulation Basic 2: PDF (Builder + Coagulation)",
+    "title": "A compact PDF coagulation calculation",
     "source": "docs/examples/processes/coagulation/functional/coagulation_basic_2_pdf.py",
     "policy": "cpu",
     "device": "cpu",
@@ -290,7 +290,7 @@
     "inputs": []
   },
   "examples-processes-coagulation-functional-coagulation-basic-3-compared": {
-    "title": "Coagulation Basic 3: PMF vs PDF (Builder + Coagulation)",
+    "title": "A compact comparison of bin totals and radius densities",
     "source": "docs/examples/processes/coagulation/functional/coagulation_basic_3_compared.py",
     "policy": "cpu",
     "device": "cpu",
@@ -298,7 +298,7 @@
     "inputs": []
   },
   "examples-processes-coagulation-functional-coagulation-basic-4-particleresolved": {
-    "title": "Coagulation Basic 4: Particle Resolved (Builder + Coagulation)",
+    "title": "A compact particle-resolved collision calculation",
     "source": "docs/examples/processes/coagulation/functional/coagulation_basic_4_particleresolved.py",
     "policy": "cpu",
     "device": "cpu",
@@ -306,7 +306,7 @@
     "inputs": []
   },
   "examples-processes-condensation-condensation-2-massbin": {
-    "title": "Condensation Tutorial: Mass Binned",
+    "title": "Water uptake from a maintained vapor reservoir",
     "source": "docs/examples/processes/condensation/condensation_2_massbin.py",
     "policy": "cpu",
     "device": "cpu",
@@ -314,7 +314,7 @@
     "inputs": []
   },
   "examples-processes-condensation-condensation-3-massresolved": {
-    "title": "Condensation Tutorial: Particle Resolved",
+    "title": "Competition for a finite water-vapor reservoir",
     "source": "docs/examples/processes/condensation/condensation_3_massresolved.py",
     "policy": "cpu",
     "device": "cpu",
@@ -322,7 +322,7 @@
     "inputs": []
   },
   "examples-processes-condensation-condensation-latent-heat": {
-    "title": "CPU latent-heat condensation bookkeeping",
+    "title": "How much energy accompanies a condensation step?",
     "source": "docs/examples/processes/condensation/condensation_latent_heat.py",
     "policy": "cpu",
     "device": "cpu",
@@ -330,7 +330,7 @@
     "inputs": []
   },
   "examples-processes-condensation-staggered-condensation-example": {
-    "title": "Staggered Condensation Stepping",
+    "title": "Does update ordering change a condensation calculation?",
     "source": "docs/examples/processes/condensation/staggered_condensation_example.py",
     "policy": "cpu",
     "device": "cpu",
@@ -338,7 +338,7 @@
     "inputs": []
   },
   "examples-processes-customization-adding-particles-during-simulation": {
-    "title": "Adding Particles During Simulation",
+    "title": "Add an external population without changing existing particles",
     "source": "docs/examples/processes/customization/adding_particles_during_simulation.py",
     "policy": "cpu",
     "device": "cpu",
@@ -346,7 +346,7 @@
     "inputs": []
   },
   "examples-processes-dilution-cpu-dilution": {
-    "title": "Cpu Dilution",
+    "title": "Dilution changes abundance without shrinking particles",
     "source": "docs/examples/processes/dilution/cpu_dilution.py",
     "policy": "cpu",
     "device": "cpu",
@@ -354,7 +354,7 @@
     "inputs": []
   },
   "examples-processes-nucleation-cpu-nucleation": {
-    "title": "Cpu Nucleation",
+    "title": "Create particles by transferring a bounded precursor source",
     "source": "docs/examples/processes/nucleation/cpu_nucleation.py",
     "policy": "cpu",
     "device": "cpu",
@@ -362,7 +362,7 @@
     "inputs": []
   },
   "examples-processes-nucleation-custom-nucleation-single-species": {
-    "title": "Custom Nucleation: Single Species",
+    "title": "Couple an illustrative particle source to growth and collisions",
     "source": "docs/examples/processes/nucleation/custom_nucleation_single_species.py",
     "policy": "cpu",
     "device": "cpu",
@@ -370,7 +370,7 @@
     "inputs": []
   },
   "examples-processes-wall-loss-chamber-forward-simulation": {
-    "title": "Chamber Forward Simulation",
+    "title": "Explain a chamber spectrum using separate rate contributions",
     "source": "docs/examples/processes/wall-loss/chamber_forward_simulation.py",
     "policy": "cpu",
     "device": "cpu",
@@ -378,7 +378,7 @@
     "inputs": []
   },
   "examples-processes-wall-loss-rectangular-wall-loss-strategy": {
-    "title": "Rectangular Wall Loss Strategy (interactive quick start)",
+    "title": "Track removal in a rectangular chamber",
     "source": "docs/examples/processes/wall-loss/rectangular_wall_loss_strategy.py",
     "policy": "cpu",
     "device": "cpu",
@@ -386,7 +386,7 @@
     "inputs": []
   },
   "examples-processes-wall-loss-spherical-wall-loss-strategy": {
-    "title": "Spherical Wall Loss Strategy Tutorial",
+    "title": "Separate size-selective removal from particle growth",
     "source": "docs/examples/processes/wall-loss/spherical_wall_loss_strategy.py",
     "policy": "cpu",
     "device": "cpu",
@@ -394,7 +394,7 @@
     "inputs": []
   },
   "examples-processes-wall-loss-wall-loss-builders-factory": {
-    "title": "Wall Loss Builders and Factory (interactive)",
+    "title": "Configure chamber loss without a unit mismatch",
     "source": "docs/examples/processes/wall-loss/wall_loss_builders_factory.py",
     "policy": "cpu",
     "device": "cpu",
@@ -402,7 +402,7 @@
     "inputs": []
   },
   "examples-processes-wall-loss-wall-loss-tutorial": {
-    "title": "Wall Loss Tutorial: Spherical vs Rectangular Chambers",
+    "title": "Compare chamber geometry and competing particle processes",
     "source": "docs/examples/processes/wall-loss/wall_loss_tutorial.py",
     "policy": "cpu",
     "device": "cpu",
@@ -410,7 +410,7 @@
     "inputs": []
   },
   "examples-simulations-biomass-burning-cloud-interactions": {
-    "title": "Biomass Burning Cloud Interactions",
+    "title": "How do collision models change a water-grown mixed aerosol?",
     "source": "docs/examples/simulations/biomass_burning_cloud_interactions.py",
     "policy": "long",
     "device": "cpu",
@@ -418,7 +418,7 @@
     "inputs": []
   },
   "examples-simulations-cloud-chamber-multi-cycle": {
-    "title": "Cloud Chamber Multi-Cycle Simulation",
+    "title": "Separate water cycling from seed loss in a chamber",
     "source": "docs/examples/simulations/cloud_chamber_multi_cycle.py",
     "policy": "long",
     "device": "cpu",
@@ -426,7 +426,7 @@
     "inputs": []
   },
   "examples-simulations-cloud-chamber-single-cycle": {
-    "title": "Cloud Chamber Activation-Deactivation Cycle (Single Run)",
+    "title": "Follow droplets through one wet–dry chamber cycle",
     "source": "docs/examples/simulations/cloud_chamber_single_cycle.py",
     "policy": "long",
     "device": "cpu",
@@ -434,7 +434,7 @@
     "inputs": []
   },
   "examples-simulations-cough-droplets-partitioning": {
-    "title": "Cough Droplets Partitioning",
+    "title": "Audit a respiratory-droplet illustration before using its predictions",
     "source": "docs/examples/simulations/cough_droplets_partitioning.py",
     "policy": "long",
     "device": "cpu",
@@ -442,7 +442,7 @@
     "inputs": []
   },
   "examples-simulations-organic-partitioning-and-coagulation": {
-    "title": "Organic Partitioning And Coagulation",
+    "title": "When a size-distribution plot hides a composition error",
     "source": "docs/examples/simulations/organic_partitioning_and_coagulation.py",
     "policy": "long",
     "device": "cpu",
@@ -450,7 +450,7 @@
     "inputs": []
   },
   "examples-simulations-soot-formation-in-flames": {
-    "title": "Soot Formation in Flames",
+    "title": "Follow organic uptake onto seeds during imposed cooling",
     "source": "docs/examples/simulations/soot_formation_in_flames.py",
     "policy": "long",
     "device": "cpu",
@@ -458,7 +458,7 @@
     "inputs": []
   },
   "examples-thermodynamics-activity-activity-tutorial": {
-    "title": "Activity Tutorial",
+    "title": "Choose an activity model by the comparison it enables",
     "source": "docs/examples/thermodynamics/activity/activity_tutorial.py",
     "policy": "cpu",
     "device": "cpu",
@@ -466,7 +466,7 @@
     "inputs": []
   },
   "examples-thermodynamics-activity-bat-activity-example": {
-    "title": "BAT Model Activity Example",
+    "title": "Compare ideal and nonideal organic activity",
     "source": "docs/examples/thermodynamics/activity/bat_activity_example.py",
     "policy": "cpu",
     "device": "cpu",
@@ -474,7 +474,7 @@
     "inputs": []
   },
   "examples-thermodynamics-activity-equilibria-example": {
-    "title": "Equilibria Partitioning Example",
+    "title": "Separate water uptake from organic partitioning",
     "source": "docs/examples/thermodynamics/activity/equilibria_example.py",
     "policy": "cpu",
     "device": "cpu",
@@ -482,7 +482,7 @@
     "inputs": []
   },
   "examples-thermodynamics-activity-ideal-activity-example": {
-    "title": "Ideal Activity Example",
+    "title": "Equal mass does not mean equal activity",
     "source": "docs/examples/thermodynamics/activity/ideal_activity_example.py",
     "policy": "cpu",
     "device": "cpu",
@@ -490,7 +490,7 @@
     "inputs": []
   },
   "examples-thermodynamics-activity-kappa-activity-example": {
-    "title": "Kappa Parameter Activity Example",
+    "title": "Connect water content to hygroscopicity",
     "source": "docs/examples/thermodynamics/activity/kappa_activity_example.py",
     "policy": "cpu",
     "device": "cpu",
@@ -498,7 +498,7 @@
     "inputs": []
   },
   "examples-thermodynamics-equilibria-activity-part1": {
-    "title": "Activity Example",
+    "title": "Follow water–organic mixing from composition to water activity",
     "source": "docs/examples/thermodynamics/equilibria/activity_part1.py",
     "policy": "cpu",
     "device": "cpu",
@@ -506,7 +506,7 @@
     "inputs": []
   },
   "examples-thermodynamics-equilibria-equilibria-part1": {
-    "title": "Liquid Vapor Equilibrium",
+    "title": "How does water uptake change organic aerosol partitioning?",
     "source": "docs/examples/thermodynamics/equilibria/equilibria_part1.py",
     "policy": "cpu",
     "device": "cpu",
@@ -514,7 +514,7 @@
     "inputs": []
   },
   "examples-thermodynamics-particle-properties-activity-functions": {
-    "title": "Activity Tutorial",
+    "title": "Compare activity rules along a composition path",
     "source": "docs/examples/thermodynamics/particle-properties/activity_functions.py",
     "policy": "cpu",
     "device": "cpu",
@@ -522,7 +522,7 @@
     "inputs": []
   },
   "examples-thermodynamics-particle-properties-activity-tutorial": {
-    "title": "Activity Tutorial",
+    "title": "Which composition rule controls equilibrium pressure?",
     "source": "docs/examples/thermodynamics/particle-properties/activity_tutorial.py",
     "policy": "cpu",
     "device": "cpu",
@@ -530,7 +530,7 @@
     "inputs": []
   },
   "examples-thermodynamics-particle-properties-particle-surface-tutorial": {
-    "title": "Particle Surface Tutorial",
+    "title": "How strongly does curvature raise equilibrium vapor pressure?",
     "source": "docs/examples/thermodynamics/particle-properties/particle_surface_tutorial.py",
     "policy": "cpu",
     "device": "cpu",
@@ -551,7 +551,7 @@
     }
   },
   "gpu-prepared-quick-start": {
-    "title": "Prepared CUDA: CPU state to GPU and back",
+    "title": "Build on the CPU, evolve on CUDA, analyze on the CPU",
     "source": "docs/examples/gpu/prepared/gpu_prepared_quick_start.py",
     "policy": "cuda",
     "device": "cuda",
@@ -560,7 +560,7 @@
     "invoke": "result = run_example()"
   },
   "gpu-prepared-multibox": {
-    "title": "64 heterogeneous CUDA boxes",
+    "title": "Sixty-four heterogeneous aerosol boxes on one GPU",
     "source": "docs/examples/gpu/prepared/gpu_prepared_multibox.py",
     "policy": "cuda",
     "device": "cuda",
@@ -575,7 +575,7 @@
     "invoke": "result = run_example()"
   },
   "gpu-prepared-forcing": {
-    "title": "CUDA cooling and vapor pulses",
+    "title": "Cooling, heating and vapor pulses across sixteen boxes",
     "source": "docs/examples/gpu/prepared/gpu_prepared_forcing.py",
     "policy": "cuda",
     "device": "cuda",
@@ -590,7 +590,7 @@
     "invoke": "result = run_example()"
   },
   "gpu-prepared-stochastic": {
-    "title": "Sixteen-seed CUDA coagulation",
+    "title": "Separate stochastic coagulation from initial-state variability",
     "source": "docs/examples/gpu/prepared/gpu_prepared_stochastic.py",
     "policy": "cuda",
     "device": "cuda",
@@ -605,7 +605,7 @@
     "invoke": "result = run_example()"
   },
   "gpu-prepared-lifecycle": {
-    "title": "Million-particle CUDA lifecycle",
+    "title": "A million-particle source, collision and loss lifecycle",
     "source": "docs/examples/gpu/prepared/gpu_prepared_lifecycle.py",
     "policy": "cuda",
     "device": "cuda",
@@ -620,7 +620,7 @@
     "invoke": "result = run_example()"
   },
   "gpu-prepared-cyclic-chamber": {
-    "title": "Cyclic CUDA aerosol with repeated source pulses",
+    "title": "Repeated source pulses in a cooling and warming aerosol",
     "source": "docs/examples/gpu/prepared/gpu_prepared_cyclic_chamber.py",
     "policy": "cuda",
     "device": "cuda",
@@ -633,7 +633,7 @@
     "invoke": "result = run_example()"
   },
   "gpu-scaling-results": {
-    "title": "Measured RTX 5060 scaling",
+    "title": "Measured CUDA scaling on an RTX 5060",
     "source": "docs/examples/gpu/prepared/gpu_scaling_results.py",
     "policy": "cpu",
     "device": "cpu",
@@ -699,7 +699,7 @@
     ]
   },
   "gpu-dry-environment-sweep": {
-    "title": "Dry charged aerosols from ground to mesopause and high pressure",
+    "title": "Dry charged aerosols: ground level, mesopause and pressurized chambers",
     "source": "docs/examples/gpu/prepared/gpu_dry_environment_sweep.py",
     "policy": "cuda",
     "device": "cuda",
@@ -721,7 +721,7 @@
     ]
   },
   "timed-box-chemistry": {
-    "title": "Timed custom CPU chemistry",
+    "title": "Distinguish chemical conversion from a timed emission and dilution",
     "source": "docs/examples/processes/customization/timed_box_chemistry.py",
     "policy": "cpu",
     "device": "cpu",
@@ -736,7 +736,7 @@
     "plot_inputs": []
   },
   "custom-process-backends": {
-    "title": "Custom processes across CPU and CUDA",
+    "title": "Extend a process on CPU and CUDA",
     "source": "docs/examples/gpu/prepared/custom_process_backends.py",
     "policy": "cuda",
     "device": "cuda",
@@ -754,7 +754,7 @@
     "plot_inputs": []
   },
   "particle-tracers": {
-    "title": "Registered particle tracers",
+    "title": "Follow a source marker through collisions and removal",
     "source": "docs/examples/processes/customization/particle_tracers.py",
     "policy": "cpu",
     "device": "cpu",
@@ -769,7 +769,7 @@
     "plot_inputs": []
   },
   "sphere-optics": {
-    "title": "Sphere spectra, polarization and cloud optical depth",
+    "title": "From one sphere to a cloud's optical signal",
     "source": "docs/examples/optics/sphere_optics.py",
     "policy": "cpu",
     "device": "cpu",
@@ -784,7 +784,7 @@
     "plot_inputs": []
   },
   "cuda-optics": {
-    "title": "CUDA optics: particle batches and a cloud spectrum",
+    "title": "Qualify CUDA optics before interpreting a cloud spectrum",
     "source": "docs/examples/optics/cuda_optics.py",
     "policy": "cuda",
     "device": "cuda",

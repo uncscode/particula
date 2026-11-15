@@ -93,13 +93,12 @@ def test_gas_species_tutorial_units_and_pressure_ratios():
     np.testing.assert_allclose(water.concentration, [[1e-7]], rtol=1e-14)
     np.testing.assert_allclose(water.molar_mass, [0.01801528], rtol=1e-14)
     temperature = values["temperature_range"]
-    # Independent evaluation of the retained tutorial coefficient convention.
-    coefficients = [(7.838, 1558.19, 196.881), (6.924, 1420, 226)]
+    # Independent NIST bar-form fits, before conversion to library inputs.
+    # Source table and fit domains are cited in the vapor-pressure example.
+    assert temperature.min() >= 304 and temperature.max() <= 333
+    coefficients = [(4.54607, 1351.555, -93.34), (4.21948, 1525.059, -56.379)]
     pressures = np.array(
-        [
-            133.32238741499998 * 10 ** (a - b / (temperature - c))
-            for a, b, c in coefficients
-        ]
+        [1e5 * 10 ** (a - b / (temperature + c)) for a, b, c in coefficients]
     )
     np.testing.assert_allclose(
         values["organic_pure_vapor_pressure"], pressures, rtol=1e-12

@@ -28,15 +28,16 @@ Example:
 
 
 # %% [markdown]
-# # Coagulation Pattern 3: Particle Resolved
+# # Follow collisions through individual particles
 #
-# Brownian coagulation using the public `par.dynamics` API with a
-# particle-resolved representation:
+# What can an individual-particle representation reveal that a smooth size curve
+# hides? Each active slot carries mass, and a collision changes the surviving
+# particles and their counts. This single-material example establishes the
+# inventory accounting needed before studying composition mixing.
 #
-# 1. Build a Brownian coagulation strategy with
-#    `distribution_type="particle_resolved"`.
-# 2. Wrap it in `par.dynamics.Coagulation`.
-# 3. Run a short, fast step on a sampled aerosol and visualize the change.
+# Compare with the [bin example](coagulation_1_pmf_pattern.py), but note that its
+# initial concentration and distribution differ. These two pages demonstrate
+# representations; they are not a controlled accuracy or speed comparison.
 
 # %%
 # In Colab uncomment the following command to install particula:
@@ -46,10 +47,17 @@ import numpy as np
 import particula as par
 
 # %% [markdown]
-# ## Build a particle-resolved aerosol
+# ## Give sampled particles a physical volume
 #
-# Sample a modest bimodal lognormal distribution, assign mass/density, and
-# combine with a simple atmosphere.
+# The initial sample contains 50,000 radii from two lognormal components with
+# 80 and 200 nm radius scales, geometric standard deviations 1.4 and 1.5, and
+# relative weights 40,000:20,000. Unit represented counts in 10⁻³ m³ give an
+# initial number density of 5×10⁷ m⁻³. Density is 1000 kg m⁻³; the environment
+# stays at 298.15 K and 101325 Pa.
+#
+# The sampling seed makes this initial population reproducible. It does not
+# supply an uncertainty interval or guarantee identical collision histories
+# across execution backends.
 
 # %%
 # Seed the illustrative sampling; this is not cross-backend replay.
@@ -92,7 +100,12 @@ aerosol_resolved = par.Aerosol(
 )
 
 # %% [markdown]
-# ## Configure coagulation (particle_resolved)
+# ## Choose the collision mechanism
+#
+# The particle-resolved Brownian strategy merges sampled particles using the
+# size-dependent kernel. The carrier gas is non-partitioning; this calculation
+# has no condensation or external source. Count and mass diagnostics can therefore
+# be interpreted as collision effects within this closed particle inventory.
 
 # %%
 coagulation_strategy = (
@@ -107,7 +120,13 @@ coagulation_process = par.dynamics.Coagulation(
 print(coagulation_process)
 
 # %% [markdown]
-# ## Execute a short coagulation step
+# ## Advance one hour and check the inventory
+#
+# The call advances 3600 s with 20 substeps. The assertions require nonnegative
+# counts, no increase in total represented count, and conservation of the
+# count-weighted material inventory within the stated tolerance. Inactive slots
+# are excluded from the final radius sample. Array capacity is not the number
+# of surviving physical particles.
 
 # %%
 time_step = 3600  # seconds (1 hour)
@@ -140,7 +159,13 @@ assert np.sum(aerosol_after.particles.concentration) <= 50_000
 radii_after = radii_after[aerosol_after.particles.concentration[0] > 0]
 
 # %% [markdown]
-# ## Plot: particle-resolved histogram before/after
+# ## Separate size-distribution shape from number loss
+#
+# Both histograms use `density=True`: their areas are normalized independently.
+# They show probability density per metre of radius, not physical number density.
+# Thus their areas cannot reveal how many particles disappeared. Read the shape
+# comparison alongside the count and material checks above; a number-per-volume
+# histogram would be needed to display abundance on the same figure.
 
 # %%
 bins = np.logspace(np.log10(radii_before.min()), -5, 80).tolist()
@@ -172,9 +197,14 @@ ax.grid(alpha=0.3)
 plt.show()
 
 # %% [markdown]
-# ## Summary
+# ## Extend from size to mixing state
 #
-# - Strategy: `BrownianCoagulationBuilder().set_distribution_type("particle_resolved")`
-# - Runnable: `par.dynamics.Coagulation`
-# - Representation: particle-resolved sampled radii/mass
-# - Runtime guardrails: ~50k samples, 1-hour horizon, 20 sub-steps
+# The result demonstrates collision bookkeeping and a change in the sampled
+# size distribution while retaining material. It does not establish convergence
+# from one sample and timestep choice.
+#
+# A useful next experiment is to initialize two component populations and ask
+# how quickly collisions produce internally mixed particles. Track component-wise
+# inventory, composition conditional on size, and total number; repeat seeds and
+# refine substeps. The [time-evolution comparison](coagulation_5_time_evolution.py)
+# shows how to match initial physical abundance before comparing representations.

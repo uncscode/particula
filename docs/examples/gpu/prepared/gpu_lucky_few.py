@@ -1,6 +1,11 @@
 # %% [markdown]
 # # The lucky few: growth, charging and background capture
 #
+# The useful outcome is a defensible comparison of first-passage probabilities,
+# including unresolved lineages and uncertainty. Work through
+# [ion-only balance](gpu_ion_balance.py) first so that source and recombination
+# errors are not mistaken for an effect on aerosol survival.
+#
 # A large ensemble makes a rare survival fraction measurable. Each independent
 # box begins with one neutral **3 nm seed** and 32 neutral **100 nm background
 # particles**. The question is whether the original seed lineage reaches
@@ -296,3 +301,20 @@ if __name__ == "__main__":
         ),
         selected,
     )
+
+# %% [markdown]
+# ## Ask which uncertainty limits the conclusion
+#
+# The outcome partition answers whether an original seed reaches the size target
+# before background capture under the stated model. It does not give the number
+# of cloud-active particles remaining at a later time. A difference between ion
+# cases must be interpreted alongside both finite-ensemble intervals and the two
+# explicit attachment assumptions.
+#
+# A concrete follow-up is to vary the vapor feed while retaining the background
+# population and both omitted-rate policies. Compare success-minus-control
+# intervals, unresolved fractions, and time-to-target distributions. Declare the
+# smallest probability difference of scientific interest first, then choose enough
+# independent boxes and numerical refinement to resolve it. An atmospheric claim
+# would additionally require justified vapor, background, and attachment inputs;
+# more GPU realizations cannot remove uncertainty in those assumptions.

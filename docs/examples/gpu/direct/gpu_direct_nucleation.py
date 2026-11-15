@@ -1,6 +1,12 @@
 # %% [markdown]
 # # Direct CUDA nucleation with explicit species mapping
 #
+# Why does a larger simulated volume create more particles without changing the
+# formation rate per cubic metre? This deliberately tiny example separates unit
+# events, represented counts, and gas mass density. Read
+# [CPU nucleation](../../processes/nucleation/cpu_nucleation.py) for the source law
+# before following explicit device storage and species binding.
+#
 # Map precursor gas to particle material and inject unit-count neutral
 # particles into free slots. Counts and gas density use different units.
 # Run this script with `--cuda` to reproduce the published figures.
@@ -283,3 +289,21 @@ if __name__ == "__main__":
     else:
         run_example()
         print("Direct Warp nucleation example completed on device=cpu.")
+
+# %% [markdown]
+# ## Read the two bars together
+#
+# The 1 and 2 m³ cases inject one and two unit-count particles, respectively;
+# both give 1 m⁻³ after the one-second update. The coefficient and 1 kg m⁻³ gas
+# reservoir are chosen for this count-scaling demonstration. One precursor molecule
+# per nucleus is bookkeeping here, not a validated nanoparticle formation model.
+# The configuration's formation diameter should not be read as a measured output
+# size; material mass and density determine the represented particle radius.
+#
+# Each injected molecule is tiny compared with that reservoir. The aggregate
+# inventory tolerance alone cannot resolve its depletion, so do not use this case
+# as strong evidence of small gas-consumption accuracy. For a nucleation study,
+# choose a defensible rate and nucleus composition, compare event demand with
+# available gas and free slots, and test per-species source accounting at a
+# resolvable scale. The [prepared lifecycle](../prepared/gpu_prepared_lifecycle.py)
+# adds active source pulses to an evolving population.

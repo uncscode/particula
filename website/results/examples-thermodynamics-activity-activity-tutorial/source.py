@@ -16,26 +16,20 @@
 # Example workflow validation - edit-lint-sync-execute cycle verified
 
 # %% [markdown]
-# # Activity Tutorial
+# # Choose an activity model by the comparison it enables
 #
-# This tutorial provides a comprehensive introduction to computing chemical activity in aerosol particles using Particula's activity strategies. We'll cover ideal activity (Raoult's Law), non-ideal activity using the BAT model, kappa parameter activity for hygroscopic growth, and integration with equilibria calculations.
+# How does a composition assumption change the equilibrium pressure above an
+# aerosol solution? This sequence compares ideal mole-fraction activity, a BAT
+# organic–water approximation, and κ water activity, then connects activity to
+# phase partitioning. The outcome is a way to design matched comparisons, not a
+# universal ranking of models.
 #
-# ## What is Activity?
-#
-# Chemical activity is a measure of the "effective concentration" of a species that determines its thermodynamic behavior. In aerosol systems:
-#
-# - **Activity controls partitioning**: Species with higher activity in the condensed phase tend to evaporate
-# - **Water activity determines hygroscopic growth**: Low water activity drives water uptake from the gas phase
-# - **Non-ideality matters**: Real mixtures deviate from ideal behavior, especially organic-water systems
-#
-# ## Notebook Structure
-#
-# 1. **Ideal Activity** - Raoult's Law and ideal mixing
-# 2. **Non-Ideal Activity (BAT)** - Binary Activity Thermodynamic model
-# 3. **Kappa Hygroscopic Parameter** - Water activity from kappa values
-# 4. **Integration with Equilibria** - Liquid-vapor partitioning
-#
-# > **Note**: This tutorial complements the existing [Activity Tutorial](../particle-properties/activity_tutorial.ipynb) which demonstrates Strategy, Builder, and Factory patterns in detail.
+# Activity is dimensionless and relates a component to a specified reference
+# state. Evaporation or uptake depends on ambient vapor relative to the resulting
+# surface equilibrium pressure; activity alone does not determine the direction
+# of transfer. Read [vapor pressure](../../fundamentals/gas/vapor_pressure.py)
+# for that distinction. The [configuration example](../particle-properties/activity_tutorial.py)
+# focuses separately on strategies, builders, and factories.
 
 # %%
 # Install particula if needed (uncomment for Colab)
@@ -49,20 +43,12 @@ import particula as par
 plt.style.use("seaborn-v0_8-whitegrid")
 
 # %% [markdown]
-# ---
-# ## 1. Ideal Activity (Raoult's Law)
+# ## Establish an ideal mole-fraction reference
 #
-# For ideal solutions, activity equals the mole fraction of the species. This is known as **Raoult's Law**:
-#
-# $$a_i = x_i$$
-#
-# where $a_i$ is the activity and $x_i$ is the mole fraction of species $i$.
-#
-# The partial pressure is:
-#
-# $$p_i = a_i \cdot p_i^{\circ} = x_i \cdot p_i^{\circ}$$
-#
-# ### 1.1 Creating an Ideal Activity Strategy
+# For ideal mixing in the mole-fraction convention, aᵢ = xᵢ and the flat-interface
+# equilibrium pressure is pᵢ = aᵢ pᵢ°. The initial binary example uses water
+# (18.015 g mol⁻¹) and an illustrative 200 g mol⁻¹ organic. This is a chosen
+# approximation, not evidence that the actual mixture is ideal.
 
 # %%
 # Define species: water and organic
@@ -77,7 +63,11 @@ print(f"Strategy: {type(ideal_strategy).__name__}")
 print(f"Molar masses: {ideal_strategy.molar_mass * 1e3} g/mol")
 
 # %% [markdown]
-# ### 1.2 Computing Activity from Mass Concentrations
+# ### Convert the composition before interpreting activity
+#
+# Both components contribute 0.5 µg m⁻³, but water has many more moles. The direct
+# mole-fraction calculation provides an algebraic reference for the strategy;
+# the water activity is about 0.9174, not 0.5.
 
 # %%
 # Define mass concentrations (50% water, 50% organic by mass)
@@ -97,7 +87,12 @@ print(
 )
 
 # %% [markdown]
-# ### 1.3 Visualization: Activity vs Composition
+# ### Read the composition sweep in its plotted coordinate
+#
+# The horizontal axis is water mass fraction, whereas ideal activity is mole
+# fraction. Curvature in these plotted lines therefore does not demonstrate
+# nonideality: it follows from the different molar masses. The two activities
+# sum to one in this ideal binary model.
 
 # %%
 # Calculate activity across composition range
@@ -125,20 +120,17 @@ plt.tight_layout()
 plt.show()
 
 # %% [markdown]
-# Note that water activity is not linear with mass fraction due to the different molar masses. Even at 50% water by mass, water activity is high (~0.92) because water has many more moles than the heavy organic.
+# ## Introduce a composition-dependent activity coefficient
 #
-# ---
-# ## 2. Non-Ideal Activity (BAT Model)
+# BAT represents organic–water nonideality using reduced molecular descriptors;
+# aᵢ = γᵢ xᵢ separates activity from its coefficient. This case uses organic
+# molar mass 200 g mol⁻¹, O:C = 0.4, and density 1200 kg m⁻³ with the default
+# functional-group assumption. The
+# [BAT model paper](https://acp.copernicus.org/articles/19/13383/2019/)
+# provides its scientific basis and scope.
 #
-# The **Binary Activity Thermodynamic (BAT)** model accounts for non-ideal interactions between water and organic species. The model uses the organic's oxygen-to-carbon (O:C) ratio to predict activity coefficients.
-#
-# For non-ideal mixtures:
-#
-# $$a_i = \gamma_i \cdot x_i$$
-#
-# where $\gamma_i$ is the activity coefficient (deviates from 1 for non-ideal behavior).
-#
-# ### 2.1 Creating a BAT Activity Strategy
+# `ActivityNonIdealBinary` returns organic activity only. Compare that scalar
+# with the organic entry from the ideal model, not with water activity.
 
 # %%
 # Create non-ideal activity strategy using builder
@@ -154,7 +146,12 @@ print(f"Strategy: {type(bat_strategy).__name__}")
 print(f"Organic O:C ratio: {bat_strategy.oxygen2carbon}")
 
 # %% [markdown]
-# ### 2.2 Comparing Ideal vs Non-Ideal Activity
+# ### Compare one component at one composition
+#
+# At 50% water by mass, γ for the organic is computed by dividing BAT activity
+# by the organic mole fraction. A departure from one measures the difference
+# from the ideal reference at this composition. Neither value is a growth rate
+# or a phase-separation criterion by itself.
 
 # %%
 # Compute activities at 50% water
@@ -177,18 +174,25 @@ gamma_organic = bat_organic_activity / mole_frac[1]
 print(f"\n  Organic activity coefficient: gamma={gamma_organic:.4f}")
 
 # %% [markdown]
-# ### 2.3 Visualization: Ideal vs Non-Ideal Comparison
+# ### Compare organic activity across composition
+#
+# Both curves below now represent organic activity for the same prescribed
+# mass fractions. Their separation isolates the activity-model difference within
+# the stated descriptor assumptions. This replaces an earlier water-versus-organic
+# overlay, which could not support an ideality comparison.
 
 # %%
 # Calculate activities across composition range
 water_fractions = np.linspace(0.1, 0.9, 40)
 
-ideal_water = []
+ideal_organic_comparison = []
 bat_organic = []
 
 for wf in water_fractions:
     mass = np.array([wf, 1.0 - wf]) * 1e-9
-    ideal_water.append(ideal_strategy.activity(mass_concentration=mass)[0])
+    ideal_organic_comparison.append(
+        ideal_strategy.activity(mass_concentration=mass)[1]
+    )
     # BAT returns organic activity (scalar), not water activity
     bat_organic.append(float(bat_strategy.activity(mass_concentration=mass)))
 
@@ -196,10 +200,10 @@ for wf in water_fractions:
 fig, ax = plt.subplots(figsize=(8, 5))
 ax.plot(
     water_fractions,
-    ideal_water,
+    ideal_organic_comparison,
     "b--",
     linewidth=2,
-    label="Ideal Water Activity",
+    label="Ideal Organic Activity",
 )
 ax.plot(
     water_fractions,
@@ -218,7 +222,13 @@ plt.tight_layout()
 plt.show()
 
 # %% [markdown]
-# ### 2.4 Effect of O:C Ratio on Non-Ideality
+# ### Test O:C sensitivity without changing molecular mass
+#
+# The next panel varies O:C from 0.1 to 0.7 while keeping the other supplied
+# descriptors fixed. All lines represent organic activity. Compare deviations
+# from the ideal reference as a function of composition, rather than assuming
+# one O:C value must be closer to ideal everywhere. Nonideal activity can exceed
+# one in the chosen reference convention.
 
 # %%
 # Test different O:C ratios
@@ -267,23 +277,14 @@ plt.tight_layout()
 plt.show()
 
 # %% [markdown]
-# Higher O:C ratios (more polar organics) show behavior closer to ideal, while low O:C ratios (hydrophobic organics) show stronger non-ideality.
+# ## Use κ for a different question: water content and hygroscopicity
 #
-# ---
-# ## 3. Kappa Hygroscopic Parameter
-#
-# The **kappa parameter** ($\kappa$) provides a single-parameter representation of hygroscopicity from the Kohler equation. It relates the dry particle volume to water activity:
-#
-# $$a_w = \frac{V_w}{V_w + \kappa V_s}$$
-#
-# where $V_w$ is water volume and $V_s$ is solute volume.
-#
-# Common kappa values:
-# - Ammonium sulfate: $\kappa \approx 0.61$
-# - Sodium chloride: $\kappa \approx 1.28$
-# - Organics: $\kappa \approx 0.1$ (variable)
-#
-# ### 3.1 Creating a Kappa Parameter Strategy
+# The κ approximation describes water activity through a_w = V_w/(V_w + κV_s).
+# It does not by itself provide a full electrolyte model or a curvature correction.
+# The next case uses water and ammonium-sulfate properties, with κ = 0.61.
+# That choice is a CCN-derived value summarized by
+# [Petters and Kreidenweis (2007)](https://acp.copernicus.org/articles/7/1961/2007/),
+# not a universal value at all compositions and phases.
 
 # %%
 # Water + ammonium sulfate system
@@ -298,7 +299,11 @@ print(f"Strategy: {type(kappa_strategy).__name__}")
 print(f"Kappa values: {kappa_strategy.kappa}")
 
 # %% [markdown]
-# ### 3.2 Water Activity at Different Compositions
+# ### Change water content at fixed solute properties
+#
+# Mass fractions are converted to volume fractions using the specified densities.
+# The printed water activities increase as the salt is diluted. These are
+# prescribed compositions, not a simulated humidity-driven growth trajectory.
 
 # %%
 # Compute water activity at different water contents
@@ -312,7 +317,12 @@ for water_frac in [0.3, 0.5, 0.7, 0.9]:
     print(f"    {water_frac:.1f}        |     {activity[0]:.4f}")
 
 # %% [markdown]
-# ### 3.3 Visualization: Kappa Activity vs Composition
+# ### Isolate κ in a generic solute sweep
+#
+# This plot changes κ at fixed solute density 1500 kg m⁻³ and molar mass
+# 100 g mol⁻¹; it is a different system from the salt case above. Larger κ lowers
+# water activity at fixed water mass fraction. The consequence for equilibrium
+# uptake requires specifying ambient humidity and, for small particles, curvature.
 
 # %%
 # Compare different kappa values
@@ -352,14 +362,12 @@ plt.tight_layout()
 plt.show()
 
 # %% [markdown]
-# Higher kappa values (more hygroscopic) result in lower water activity at the same water content, driving more water uptake to reach equilibrium.
+# ## Connect thermodynamics to a partitioning endpoint
 #
-# ---
-# ## 4. Integration with Equilibria
-#
-# Activity calculations integrate with liquid-vapor partitioning to determine how organic species distribute between gas and particle phases.
-#
-# ### 4.1 Liquid-Vapor Partitioning Strategy
+# The final calculation prescribes water activity 0.75 in a liquid–vapor
+# partitioning model. Interpreting a_w as relative humidity requires equilibrium
+# and neglect of curvature. This solver does not advance a particle population
+# or determine a time to equilibrium.
 
 # %%
 # Create partitioning strategy at 75% RH
@@ -371,7 +379,13 @@ print(f"Strategy: {type(partitioning).__name__}")
 print(f"Target water activity: {partitioning.water_activity}")
 
 # %% [markdown]
-# ### 4.2 Solving for Equilibrium
+# ### Inspect volatility and concentration scales
+#
+# The three dry C* values, 10⁻⁶–10⁻² µg m⁻³, are small relative to the total
+# organic inputs of 1, 5, and 10 µg m⁻³. Near-complete condensation is therefore
+# expected for this example. This interface uses g mol⁻¹ for molar mass.
+# Read the partition coefficients together with water content and the numerical
+# residual, rather than interpreting solver return as physical validation.
 
 # %%
 # Define organic species (3 volatility classes)
@@ -396,7 +410,14 @@ print(f"Alpha phase water: {result.alpha_phase.water_concentration:.2f} ug/m^3")
 print(f"Optimization error: {result.error:.2e}")
 
 # %% [markdown]
-# ### 4.3 Effect of RH on Partitioning
+# ### Separate changes in water from changes in organic mass
+#
+# The left panel shows an unweighted mean of species partition coefficients;
+# it is not the loading-weighted condensed organic fraction. The right panel
+# shows alpha-phase water only. Because organic partitioning is already near
+# one, a small vertical range on the left can exaggerate its visual importance
+# relative to the water change. These prescribed-activity endpoints are not a
+# single time-dependent humidification experiment.
 
 # %%
 # Calculate partitioning at different RH values
@@ -435,27 +456,22 @@ plt.tight_layout()
 plt.show()
 
 # %% [markdown]
-# ---
-# ## Summary
+# ## Build a comparison that answers your question
 #
-# In this tutorial, we covered:
+# This sequence shows why activity-model choice, composition coordinate, and
+# output species must be explicit. Ideal mole fractions provide a checkable
+# reference; BAT and κ encode additional assumptions for different applications.
+# The partitioning example demonstrates that substantial water changes can
+# coexist with nearly unchanged condensed organic fractions.
 #
-# 1. **Ideal Activity (Raoult's Law)**: Activity equals mole fraction for ideal mixtures
-# 2. **Non-Ideal Activity (BAT)**: Activity coefficients deviate from 1, especially for low O:C organics
-# 3. **Kappa Parameter**: Single-parameter representation of hygroscopicity for water activity
-# 4. **Equilibria Integration**: Activity determines gas-particle partitioning
+# For your study, choose one observable—equilibrium pressure, water growth factor,
+# or condensed organic mass—and compare models with matched inputs. Check the
+# model domain, numerical residuals, and material accounting, then seek an
+# independent reference. If timescale matters, connect the endpoint to a
+# [condensation trajectory](../../processes/condensation/condensation_3_massresolved.py)
+# with the same reservoir and surface assumptions.
 #
-# ### Key Takeaways
-#
-# - Choose your activity model based on your system:
-#   - **Simple mixtures**: `ActivityIdealMolar`
-#   - **Hygroscopic aerosols**: `ActivityKappaParameter`
-#   - **Organic-water mixtures**: `ActivityNonIdealBinary` (BAT)
-# - Non-ideality is important for accurate aerosol thermodynamics
-# - Higher RH increases water uptake and organic partitioning
-#
-# ### Next Steps
-#
-# - [Activity Theory](../../../theory/thermodynamics/activity-theory.md) - Mathematical foundations
-# - [Equilibria Theory](../../../theory/thermodynamics/equilibria-theory.md) - Partitioning equations
-# - [Activity System Feature Guide](../../../guide/processes/activity.md) - Full API documentation
+# See [activity theory](../../../theory/thermodynamics/activity-theory.md),
+# [phase-equilibrium theory](../../../theory/thermodynamics/equilibria-theory.md),
+# and the [supported activity interfaces](../../../guide/processes/activity.md)
+# for the equations and implementation contracts.
