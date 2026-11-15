@@ -300,11 +300,19 @@ def check_search(site, manifest):
     """Keep retired routes and trash out of the public search index."""
     errors = []
     for source in manifest.get("retired", {}):
-        if (
-            source.endswith((".md", ".ipynb"))
-            and (site / published_path(source)).exists()
-        ):
-            errors.append(f"retired source in publication: {source}")
+        path = site / published_path(source)
+        if source.endswith((".md", ".ipynb")) and path.exists():
+            # A retired source may also have an explicitly retained redirect.
+            # check_published verifies its destination; noindex keeps the old
+            # route out of search. Do not exempt ordinary archived content.
+            text = path.read_text()
+            retained_redirect = (
+                source in manifest.get("moves", {})
+                and 'name="robots" content="noindex"' in text
+                and "data-particula-redirect" in text
+            )
+            if not retained_redirect:
+                errors.append(f"retired source in publication: {source}")
     if any(".trash" in p.relative_to(site).parts for p in site.rglob("*")):
         errors.append("archive in publication")
     if not (site / "pagefind/pagefind.js").exists():
