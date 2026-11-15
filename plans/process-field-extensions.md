@@ -227,3 +227,17 @@ narrow passing suite. Leave merge, version bump and release outside this goal.
   migration of built-in helpers to typed contexts remain pending. Until those
   implementations land, particle-field GPU execution and extension checkpoints
   reject explicitly rather than discard state.
+- Prepared checkpoint schema v2 now stores canonical registered field bytes,
+  descriptors, declared GPUStateSpec continuation arrays, absolute initial time,
+  and the exact device clock. Saved process configurations exclude live adapter
+  objects. Resume accepts caller-supplied exact-type registry implementations,
+  verifies their configuration and the full payload inventory before upload,
+  and restores into freshly prepared fixed buffers. An explicit v1 reader
+  admits only legacy built-in-only state at zero origin. Resident schema stays 5.
+- Checkpoint qualification: 170 prepared/extension/restart tests passed on Warp
+  CPU and CUDA, with one intentional CPU capture skip. Coverage includes two
+  independent custom instances, native captured replay before and after restart,
+  exact field/state/clock bytes, corrupted byte/shape inventory and version
+  rejection before allocation, and nonzero built-in initial time. Managed custom
+  RNG and CPU-transfer host RNG continuation remain pending; the generic device
+  state contract alone is not evidence those RNG requirements are complete.

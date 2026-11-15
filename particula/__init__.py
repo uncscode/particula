@@ -87,4 +87,5 @@ from particula.execution.process_extensions import (
     GPUPreparationContext,
     GPUProcessAdapter,
     GPUProcessPlan,
+    GPUStateSpec,
 )

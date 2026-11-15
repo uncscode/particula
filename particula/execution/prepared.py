@@ -53,6 +53,7 @@ class PreparedSimulation:
     _initial_time: float
     _clock: Any
     _extension_fields: Any
+    _extension_state: dict[str, dict[str, Any]]
 
     def __init__(self) -> None:
         """Reject direct construction without a validated process plan."""
@@ -149,6 +150,7 @@ class PreparedSimulation:
         result._capture = None
         result._clock = None
         result._extension_fields = None
+        result._extension_state = {}
         result._stream = wp.Stream(target) if target.is_cuda else None
         return result
 
@@ -582,6 +584,7 @@ class PreparedSimulation:
                     self._device_failure = None
                     self._clock = None
                     self._extension_fields = None
+                    self._extension_state = {}
                     self._bindings = {}
                     self._guard = self._registry = self._session = None
                     self._stream = None
