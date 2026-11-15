@@ -25,6 +25,7 @@ sources remain runnable from the repository checkout.
 ## Optical calculations
 
 - [Sphere spectra, polarization and cloud optical depth](optics/sphere_optics.py)
+- [CUDA particle batches and cloud spectrum](optics/cuda_optics.py)
 
 ## GPU examples
 

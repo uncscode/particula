@@ -6,6 +6,7 @@ Results are specific to their recorded revision, workload, and device.
 
 | Question | Record |
 | --- | --- |
+| What supports independent CPU/CUDA optics? | [Reference corpus](optics/reference-corpus.md) and [CUDA qualification](optics/cuda.md) |
 | Is the native migration approved for release? | [v0.3.0 gates](releases/v0.3.0.md): maintainer/release approval remains pending |
 | What supports the mass representation? | [Mass precision](numerics/mass-precision.md) |
 | What supports the fixed-four-substep condensation method? | [Stiffness study](numerics/condensation-stiffness.md) and [direct parity](gpu/condensation-parity.md) |

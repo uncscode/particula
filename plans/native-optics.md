@@ -193,3 +193,18 @@ entries, discrete/resolved/PDF reductions and single/multiple layers.
   structure checker reports six retired-route collisions requiring follow-up.
   Broad changed-example validation (the registry selects all examples) and
   documentation tests are running; do not treat those as passed yet.
+- Added and executed native-CUDA optics example: three particle batch sizes,
+  separated module/upload/preparation/execution/download timings, full CPU
+  efficiency comparisons, and four-wavelength streaming cloud Mueller checks.
+  Refreshed timings after other numerical validation completed; compact data
+  and two inspected figures are saved. Qualification record states exact
+  source hash/revision, device, timing boundaries and measured residuals.
+- Broad registered CPU-example validation finished successfully; configured
+  long/CUDA entries skipped. New CUDA optics workload was explicitly refreshed.
+  Documentation tests: 38 Python and 11 JavaScript tests passed. Corrected a
+  preexisting checker contradiction: retired sources with declared noindex
+  migration redirects are allowed, while ordinary retired content remains
+  rejected (17 focused tests passed). Site build and rendered structure check
+  passed before adding the final benchmark record; final-site rebuild remains
+  part of closeout. No PR until API/failure audit, full tests/coverage, clean
+  packaging and final evidence review are complete.

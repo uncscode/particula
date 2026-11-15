@@ -782,5 +782,20 @@
       "plot_results"
     ],
     "plot_inputs": []
+  },
+  "cuda-optics": {
+    "title": "CUDA optics: particle batches and a cloud spectrum",
+    "source": "docs/examples/optics/cuda_optics.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 600,
+    "inputs": [],
+    "invoke": "result = run_example()",
+    "data_expression": "result",
+    "replot_invoke": "result = plot_results(saved_data)",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": []
   }
 }
