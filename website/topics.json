@@ -1,0 +1,2042 @@
+{
+  "version": 1,
+  "topics": [
+    {
+      "id": "aerosols",
+      "label": "Aerosol science and modeling",
+      "description": "Follow a scientific question from particles and gases to processes, models, and research applications.",
+      "parent": null,
+      "order": 0,
+      "icon": "aerosol",
+      "aliases": [],
+      "search_phrases": [],
+      "prerequisites": [],
+      "related": []
+    },
+    {
+      "id": "state",
+      "label": "Describe an aerosol",
+      "description": "Connect size, composition, and the surrounding gas to the properties you can measure.",
+      "parent": "aerosols",
+      "order": 0,
+      "icon": "aerosol",
+      "aliases": [],
+      "search_phrases": [],
+      "prerequisites": [],
+      "related": []
+    },
+    {
+      "id": "processes",
+      "label": "Understand aerosol processes",
+      "description": "Explore how particles form, grow, collide, and leave a system.",
+      "parent": "aerosols",
+      "order": 1,
+      "icon": "process",
+      "aliases": [],
+      "search_phrases": [],
+      "prerequisites": [],
+      "related": []
+    },
+    {
+      "id": "methods",
+      "label": "Build and assess a model",
+      "description": "Choose a representation, advance it in time, and assess the evidence behind a result.",
+      "parent": "aerosols",
+      "order": 2,
+      "icon": "model",
+      "aliases": [],
+      "search_phrases": [],
+      "prerequisites": [],
+      "related": []
+    },
+    {
+      "id": "applications",
+      "label": "Explore research applications",
+      "description": "Bring processes together around laboratory and environmental questions.",
+      "parent": "aerosols",
+      "order": 3,
+      "icon": "research",
+      "aliases": [],
+      "search_phrases": [],
+      "prerequisites": [],
+      "related": []
+    },
+    {
+      "id": "size",
+      "label": "Size distributions",
+      "description": "Relate a size spectrum to particle number, bin widths, and changes of coordinates.",
+      "parent": "state",
+      "order": 0,
+      "icon": "distribution",
+      "aliases": [
+        "particle size distribution",
+        "PSD"
+      ],
+      "search_phrases": [
+        "distribution normalization",
+        "number concentration",
+        "lognormal",
+        "PDF",
+        "PMF",
+        "radius diameter"
+      ],
+      "prerequisites": [],
+      "related": [
+        "optics"
+      ]
+    },
+    {
+      "id": "composition",
+      "label": "Composition and properties",
+      "description": "Explore how material composition shapes water uptake, surface behavior, and interaction with light.",
+      "parent": "state",
+      "order": 1,
+      "icon": "composition",
+      "aliases": [],
+      "search_phrases": [],
+      "prerequisites": [],
+      "related": []
+    },
+    {
+      "id": "gas",
+      "label": "Gas and environment",
+      "description": "Specify the gas mixture, temperature, and pressure that surround the particles.",
+      "parent": "state",
+      "order": 2,
+      "icon": "gas",
+      "aliases": [],
+      "search_phrases": [],
+      "prerequisites": [],
+      "related": []
+    },
+    {
+      "id": "activity",
+      "label": "Chemical activity",
+      "description": "Compare ideal mixing, hygroscopicity, and nonideal organic–water interactions.",
+      "parent": "composition",
+      "order": 0,
+      "icon": "activity",
+      "aliases": [
+        "water activity"
+      ],
+      "search_phrases": [
+        "kappa",
+        "κ",
+        "hygroscopicity",
+        "BAT",
+        "Raoult"
+      ],
+      "prerequisites": [],
+      "related": [
+        "condensation"
+      ]
+    },
+    {
+      "id": "surface",
+      "label": "Surface and curvature",
+      "description": "Connect surface tension and particle curvature to the equilibrium vapor pressure.",
+      "parent": "composition",
+      "order": 1,
+      "icon": "surface",
+      "aliases": [],
+      "search_phrases": [
+        "Kelvin effect",
+        "surface tension"
+      ],
+      "prerequisites": [],
+      "related": [
+        "condensation"
+      ]
+    },
+    {
+      "id": "optics",
+      "label": "Optical properties",
+      "description": "Calculate sphere scattering, absorption, polarization, and population optical depth.",
+      "parent": "composition",
+      "order": 2,
+      "icon": "optics",
+      "aliases": [
+        "aerosol optics"
+      ],
+      "search_phrases": [
+        "Mie",
+        "light scattering",
+        "refractive index",
+        "extinction",
+        "polarization",
+        "optical depth"
+      ],
+      "prerequisites": [],
+      "related": [
+        "size"
+      ]
+    },
+    {
+      "id": "vapor",
+      "label": "Vapor pressure",
+      "description": "Relate saturation vapor pressure and gas concentration to temperature and humidity.",
+      "parent": "gas",
+      "order": 0,
+      "icon": "vapor",
+      "aliases": [
+        "vapour pressure"
+      ],
+      "search_phrases": [
+        "relative humidity",
+        "saturation",
+        "Clausius Clapeyron"
+      ],
+      "prerequisites": [],
+      "related": []
+    },
+    {
+      "id": "transport",
+      "label": "Gas transport properties",
+      "description": "Examine viscosity and mean free path before using them in particle transport calculations.",
+      "parent": "gas",
+      "order": 1,
+      "icon": "transport",
+      "aliases": [],
+      "search_phrases": [
+        "Sutherland",
+        "dynamic viscosity",
+        "mean free path",
+        "air viscosity"
+      ],
+      "prerequisites": [],
+      "related": [
+        "brownian"
+      ]
+    },
+    {
+      "id": "exchange",
+      "label": "Gas–particle exchange",
+      "description": "Follow material between vapor and particles, from growth rates to equilibrium composition.",
+      "parent": "processes",
+      "order": 0,
+      "icon": "exchange",
+      "aliases": [],
+      "search_phrases": [],
+      "prerequisites": [],
+      "related": []
+    },
+    {
+      "id": "collisions",
+      "label": "Particle collisions",
+      "description": "Compare collision mechanisms and the representations used to evolve a population.",
+      "parent": "processes",
+      "order": 1,
+      "icon": "collision",
+      "aliases": [
+        "coagulation"
+      ],
+      "search_phrases": [
+        "particle merging",
+        "collision kernel"
+      ],
+      "prerequisites": [],
+      "related": []
+    },
+    {
+      "id": "sources",
+      "label": "Formation and removal",
+      "description": "Account for particles entering, forming within, or leaving the modeled system.",
+      "parent": "processes",
+      "order": 2,
+      "icon": "source",
+      "aliases": [],
+      "search_phrases": [],
+      "prerequisites": [],
+      "related": []
+    },
+    {
+      "id": "condensation",
+      "label": "Condensation and evaporation",
+      "description": "Interpret mass-transfer rates, water uptake, and finite-vapor growth.",
+      "parent": "exchange",
+      "order": 0,
+      "icon": "condensation",
+      "aliases": [],
+      "search_phrases": [
+        "humidity growth",
+        "particle growth",
+        "evaporation",
+        "latent heat"
+      ],
+      "prerequisites": [
+        "vapor",
+        "size"
+      ],
+      "related": [
+        "activity",
+        "surface",
+        "numerics",
+        "chambers",
+        "partitioning"
+      ]
+    },
+    {
+      "id": "partitioning",
+      "label": "Phase equilibrium and partitioning",
+      "description": "Explore how compounds distribute among gas and condensed phases.",
+      "parent": "exchange",
+      "order": 1,
+      "icon": "partition",
+      "aliases": [
+        "gas particle partitioning"
+      ],
+      "search_phrases": [
+        "liquid vapor equilibrium",
+        "liquid liquid equilibrium",
+        "phase separation"
+      ],
+      "prerequisites": [
+        "activity"
+      ],
+      "related": [
+        "condensation"
+      ]
+    },
+    {
+      "id": "brownian",
+      "label": "Brownian coagulation",
+      "description": "Follow diffusion-driven collisions through binned and particle-resolved calculations.",
+      "parent": "collisions",
+      "order": 0,
+      "icon": "collision",
+      "aliases": [],
+      "search_phrases": [
+        "Brownian motion",
+        "PMF PDF comparison"
+      ],
+      "prerequisites": [
+        "size",
+        "representations"
+      ],
+      "related": [
+        "transport"
+      ]
+    },
+    {
+      "id": "charged",
+      "label": "Charged particles and ions",
+      "description": "Explore charge-dependent collisions, ion attachment, and charge inventories.",
+      "parent": "collisions",
+      "order": 1,
+      "icon": "charge",
+      "aliases": [],
+      "search_phrases": [
+        "Coulomb",
+        "ion recombination",
+        "electrostatic",
+        "LF2013"
+      ],
+      "prerequisites": [
+        "brownian"
+      ],
+      "related": [
+        "atmosphere"
+      ]
+    },
+    {
+      "id": "turbulent",
+      "label": "Cloud-droplet collision kernels",
+      "description": "Compare turbulence and sedimentation models with digitized DNS reference data.",
+      "parent": "collisions",
+      "order": 2,
+      "icon": "turbulence",
+      "aliases": [],
+      "search_phrases": [
+        "DNS",
+        "direct numerical simulation",
+        "Ayala",
+        "turbulent coagulation",
+        "collision comparison with DNS"
+      ],
+      "prerequisites": [
+        "transport"
+      ],
+      "related": [
+        "verification"
+      ]
+    },
+    {
+      "id": "nucleation",
+      "label": "Nucleation and particle sources",
+      "description": "Introduce new particles while tracking source rates and material inventories.",
+      "parent": "sources",
+      "order": 0,
+      "icon": "source",
+      "aliases": [],
+      "search_phrases": [
+        "particle formation",
+        "injection",
+        "new particle formation"
+      ],
+      "prerequisites": [],
+      "related": [
+        "custom"
+      ]
+    },
+    {
+      "id": "losses",
+      "label": "Wall loss and dilution",
+      "description": "Distinguish deposition on chamber walls from losses caused by dilution.",
+      "parent": "sources",
+      "order": 1,
+      "icon": "wall",
+      "aliases": [],
+      "search_phrases": [
+        "deposition",
+        "chamber loss",
+        "removal",
+        "dilution"
+      ],
+      "prerequisites": [],
+      "related": []
+    },
+    {
+      "id": "representations",
+      "label": "Population representations",
+      "description": "Choose binned or resolved storage and understand count, density, and volume semantics.",
+      "parent": "methods",
+      "order": 0,
+      "icon": "bins",
+      "aliases": [],
+      "search_phrases": [
+        "particle resolved",
+        "superparticles",
+        "multiplicity",
+        "native data",
+        "PMF",
+        "PDF"
+      ],
+      "prerequisites": [
+        "size"
+      ],
+      "related": []
+    },
+    {
+      "id": "numerics",
+      "label": "Numerical methods",
+      "description": "Examine timesteps, stiffness, conservation, and precision before interpreting trajectories.",
+      "parent": "methods",
+      "order": 1,
+      "icon": "steps",
+      "aliases": [],
+      "search_phrases": [
+        "staggered stepping",
+        "time step",
+        "convergence",
+        "stiffness",
+        "mass precision"
+      ],
+      "prerequisites": [],
+      "related": [
+        "condensation"
+      ]
+    },
+    {
+      "id": "execution",
+      "label": "CPU and GPU execution",
+      "description": "Choose an execution path with explicit device, transfer, and lifecycle requirements.",
+      "parent": "methods",
+      "order": 2,
+      "icon": "chip",
+      "aliases": [],
+      "search_phrases": [
+        "backend",
+        "Warp",
+        "CUDA"
+      ],
+      "prerequisites": [],
+      "related": []
+    },
+    {
+      "id": "verification",
+      "label": "Verification and comparison",
+      "description": "Read numerical comparisons and recorded qualification evidence with their limits.",
+      "parent": "methods",
+      "order": 3,
+      "icon": "check",
+      "aliases": [],
+      "search_phrases": [
+        "validation",
+        "benchmark",
+        "parity",
+        "reference data",
+        "performance"
+      ],
+      "prerequisites": [],
+      "related": [
+        "turbulent",
+        "gpu"
+      ]
+    },
+    {
+      "id": "cpu",
+      "label": "CPU workflows",
+      "description": "Construct native aerosol state and run supported processes on the CPU.",
+      "parent": "execution",
+      "order": 0,
+      "icon": "model",
+      "aliases": [],
+      "search_phrases": [
+        "first simulation",
+        "getting started"
+      ],
+      "prerequisites": [],
+      "related": []
+    },
+    {
+      "id": "gpu",
+      "label": "GPU workflows",
+      "description": "Prepare resident simulations, manage transfers and checkpoints, or use direct kernels.",
+      "parent": "execution",
+      "order": 1,
+      "icon": "chip",
+      "aliases": [
+        "CUDA workflows"
+      ],
+      "search_phrases": [
+        "graph capture",
+        "resident",
+        "checkpoint",
+        "slots",
+        "scaling"
+      ],
+      "prerequisites": [],
+      "related": [
+        "verification"
+      ]
+    },
+    {
+      "id": "custom",
+      "label": "Custom processes and fields",
+      "description": "Extend a calculation with timed chemistry, particle tracers, and explicit backend behavior.",
+      "parent": "execution",
+      "order": 2,
+      "icon": "custom",
+      "aliases": [],
+      "search_phrases": [
+        "extension",
+        "registered fields",
+        "custom chemistry",
+        "tracers"
+      ],
+      "prerequisites": [],
+      "related": [
+        "nucleation"
+      ]
+    },
+    {
+      "id": "chambers",
+      "label": "Chamber experiments",
+      "description": "Connect humidity forcing, droplet growth, and wall losses in illustrative chamber studies.",
+      "parent": "applications",
+      "order": 0,
+      "icon": "chamber",
+      "aliases": [],
+      "search_phrases": [
+        "cloud chamber",
+        "activation deactivation",
+        "humidity cycle"
+      ],
+      "prerequisites": [
+        "condensation",
+        "losses"
+      ],
+      "related": [
+        "condensation"
+      ]
+    },
+    {
+      "id": "atmosphere",
+      "label": "Atmospheric processes",
+      "description": "Explore environmental sweeps and coupled processes while keeping model assumptions visible.",
+      "parent": "applications",
+      "order": 1,
+      "icon": "atmosphere",
+      "aliases": [],
+      "search_phrases": [
+        "altitude",
+        "mesopause",
+        "humid environments",
+        "environment sweep"
+      ],
+      "prerequisites": [
+        "gas"
+      ],
+      "related": [
+        "charged"
+      ]
+    },
+    {
+      "id": "emissions",
+      "label": "Emissions and exposure",
+      "description": "Explore illustrative smoke, soot, and respiratory-droplet calculations.",
+      "parent": "applications",
+      "order": 2,
+      "icon": "emissions",
+      "aliases": [],
+      "search_phrases": [
+        "biomass burning",
+        "cough",
+        "flame",
+        "smoke"
+      ],
+      "prerequisites": [],
+      "related": []
+    }
+  ],
+  "resources": [
+    {
+      "source": "docs/contribute/architecture/warp/autodiff-limitations.md",
+      "title": "Warp Autodiff: Limitations and Stochastic Process Handling",
+      "topic": "gpu",
+      "also": [],
+      "role": "Contribute",
+      "start_here": false
+    },
+    {
+      "source": "docs/contribute/architecture/warp/datastructures.md",
+      "title": "Data Structures for Aerosol Simulation",
+      "topic": "gpu",
+      "also": [],
+      "role": "Contribute",
+      "start_here": false
+    },
+    {
+      "source": "docs/contribute/architecture/warp/index.md",
+      "title": "NVIDIA Warp for Particle Simulation",
+      "topic": "gpu",
+      "also": [],
+      "role": "Contribute",
+      "start_here": false
+    },
+    {
+      "source": "docs/contribute/architecture/warp/kernels.md",
+      "title": "Kernels and Function Inlining for Particle Simulation",
+      "topic": "gpu",
+      "also": [],
+      "role": "Contribute",
+      "start_here": false
+    },
+    {
+      "source": "docs/contribute/architecture/warp/teaching/fluids.md",
+      "title": "Aerosol Dynamics with NVIDIA Warp",
+      "topic": "gpu",
+      "also": [],
+      "role": "Contribute",
+      "start_here": false
+    },
+    {
+      "source": "docs/contribute/architecture/warp/teaching/geometry.md",
+      "title": "Particle Interactions and Wall Loss with NVIDIA Warp",
+      "topic": "gpu",
+      "also": [],
+      "role": "Contribute",
+      "start_here": false
+    },
+    {
+      "source": "docs/contribute/index.md",
+      "title": "Contribute",
+      "topic": "aerosols",
+      "also": [],
+      "role": "Contribute",
+      "start_here": false
+    },
+    {
+      "source": "docs/contribute/validation/gpu/charged-coagulation.md",
+      "title": "Charged coagulation and atmospheric ion validation",
+      "topic": "verification",
+      "also": [],
+      "role": "Contribute",
+      "start_here": false
+    },
+    {
+      "source": "docs/contribute/validation/gpu/coagulation-benchmarks.md",
+      "title": "Historical coagulation benchmark evidence",
+      "topic": "verification",
+      "also": [],
+      "role": "Contribute",
+      "start_here": false
+    },
+    {
+      "source": "docs/contribute/validation/gpu/coagulation.md",
+      "title": "GPU Coagulation Validation Record",
+      "topic": "verification",
+      "also": [],
+      "role": "Contribute",
+      "start_here": false
+    },
+    {
+      "source": "docs/contribute/validation/gpu/condensation-parity.md",
+      "title": "Condensation Parity Walkthrough Ownership Record",
+      "topic": "verification",
+      "also": [],
+      "role": "Contribute",
+      "start_here": false
+    },
+    {
+      "source": "docs/contribute/validation/gpu/environment-sweep.md",
+      "title": "Environmental dynamics: dry aerosols and humid air with ions",
+      "topic": "verification",
+      "also": [],
+      "role": "Contribute",
+      "start_here": false
+    },
+    {
+      "source": "docs/contribute/validation/gpu/graph-capture-profiling.md",
+      "title": "GPU graph-capture profiling record",
+      "topic": "verification",
+      "also": [],
+      "role": "Contribute",
+      "start_here": false
+    },
+    {
+      "source": "docs/contribute/validation/gpu/graph-capture-qualification.md",
+      "title": "Graph-capture qualification gates",
+      "topic": "verification",
+      "also": [],
+      "role": "Contribute",
+      "start_here": false
+    },
+    {
+      "source": "docs/contribute/validation/gpu/legacy-benchmarks/gpu_benchmarks.py",
+      "title": "Recorded GPU benchmark viewer",
+      "topic": "verification",
+      "also": [],
+      "role": "Contribute",
+      "start_here": false
+    },
+    {
+      "source": "docs/contribute/validation/gpu/prepared-rtx5060.md",
+      "title": "Prepared simulations: RTX 5060 qualification",
+      "topic": "verification",
+      "also": [],
+      "role": "Contribute",
+      "start_here": false
+    },
+    {
+      "source": "docs/contribute/validation/gpu/process-field-extensions.md",
+      "title": "Custom processes and fields: qualification",
+      "topic": "verification",
+      "also": [],
+      "role": "Contribute",
+      "start_here": false
+    },
+    {
+      "source": "docs/contribute/validation/gpu/resident-benchmarks.md",
+      "title": "Resident benchmark and memory-budget record",
+      "topic": "verification",
+      "also": [],
+      "role": "Contribute",
+      "start_here": false
+    },
+    {
+      "source": "docs/contribute/validation/index.md",
+      "title": "Validation records",
+      "topic": "verification",
+      "also": [],
+      "role": "Contribute",
+      "start_here": false
+    },
+    {
+      "source": "docs/contribute/validation/numerics/condensation-stiffness.md",
+      "title": "Condensation Stiffness Study and Recommendation Record",
+      "topic": "verification",
+      "also": [],
+      "role": "Contribute",
+      "start_here": false
+    },
+    {
+      "source": "docs/contribute/validation/numerics/mass-precision.md",
+      "title": "Mass Precision Recommendation Report",
+      "topic": "verification",
+      "also": [],
+      "role": "Contribute",
+      "start_here": false
+    },
+    {
+      "source": "docs/contribute/validation/optics/cuda.md",
+      "title": "CUDA optics qualification",
+      "topic": "optics",
+      "also": [
+        "gpu"
+      ],
+      "role": "Contribute",
+      "start_here": false
+    },
+    {
+      "source": "docs/contribute/validation/optics/reference-corpus.md",
+      "title": "PyMieScatt reference corpus",
+      "topic": "optics",
+      "also": [],
+      "role": "Contribute",
+      "start_here": false
+    },
+    {
+      "source": "docs/contribute/validation/releases/v0.3.0.md",
+      "title": "Native API migration validation and release gates",
+      "topic": "verification",
+      "also": [],
+      "role": "Contribute",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/fundamentals/data-containers.md",
+      "title": "Data Containers",
+      "topic": "representations",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/fundamentals/data_containers.py",
+      "title": "Data Containers",
+      "topic": "representations",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/fundamentals/gas/environment_data.py",
+      "title": "Gas Mixture and Environment Tutorial",
+      "topic": "gas",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/fundamentals/gas/gas_data.py",
+      "title": "Native Gas Species Tutorial",
+      "topic": "gas",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/fundamentals/gas/index.md",
+      "title": "Gas Phase",
+      "topic": "gas",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/fundamentals/gas/vapor_pressure.py",
+      "title": "Vapor Pressure Tutorial",
+      "topic": "vapor",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/fundamentals/index.md",
+      "title": "Index: Aerosols",
+      "topic": "representations",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/fundamentals/native_aerosol.py",
+      "title": "Aerosol Tutorial",
+      "topic": "representations",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/fundamentals/native_state_access.py",
+      "title": "Native State Access",
+      "topic": "representations",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/fundamentals/particles/aerosol_distributions.py",
+      "title": "Aerosol size distributions",
+      "topic": "size",
+      "also": [],
+      "role": "Examples",
+      "start_here": true
+    },
+    {
+      "source": "docs/examples/fundamentals/particles/distribution_tutorial.py",
+      "title": "Native Distribution Storage",
+      "topic": "representations",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/fundamentals/particles/index.md",
+      "title": "Index: Particle Phase",
+      "topic": "size",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/fundamentals/particles/particle_data.py",
+      "title": "Native Particle Construction",
+      "topic": "representations",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/gpu/direct/gpu_coagulation_direct.py",
+      "title": "Direct CUDA coagulation",
+      "topic": "gpu",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/gpu/direct/gpu_complete_process_sequence.py",
+      "title": "CUDA Complete Process Sequence",
+      "topic": "gpu",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/gpu/direct/gpu_condensation_parity_walkthrough.py",
+      "title": "CUDA Condensation Parity Walkthrough",
+      "topic": "gpu",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/gpu/direct/gpu_direct_kernels_quick_start.py",
+      "title": "CUDA Direct Kernels Quick Start",
+      "topic": "gpu",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/gpu/direct/gpu_direct_nucleation.py",
+      "title": "CUDA Direct Nucleation",
+      "topic": "gpu",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/gpu/index.md",
+      "title": "GPU examples",
+      "topic": "gpu",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/gpu/prepared/custom_process_backends.py",
+      "title": "Custom processes across CPU and CUDA",
+      "topic": "custom",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/gpu/prepared/gpu_charged_models.py",
+      "title": "Charge-dependent Brownian collisions on CUDA",
+      "topic": "charged",
+      "also": [
+        "gpu"
+      ],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/gpu/prepared/gpu_dry_environment_sweep.py",
+      "title": "Dry charged aerosols from ground to mesopause and high pressure",
+      "topic": "atmosphere",
+      "also": [
+        "gpu",
+        "charged"
+      ],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/gpu/prepared/gpu_environment_sweep.py",
+      "title": "Charged aerosols and ions across sixteen humid environments",
+      "topic": "atmosphere",
+      "also": [
+        "gpu",
+        "charged"
+      ],
+      "role": "Examples",
+      "start_here": true
+    },
+    {
+      "source": "docs/examples/gpu/prepared/gpu_ion_balance.py",
+      "title": "Explicit atmospheric ion balance on CUDA",
+      "topic": "charged",
+      "also": [
+        "gpu"
+      ],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/gpu/prepared/gpu_lucky_few.py",
+      "title": "The lucky few: growth, charging and background capture",
+      "topic": "atmosphere",
+      "also": [
+        "gpu",
+        "charged"
+      ],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/gpu/prepared/gpu_prepared_cyclic_chamber.py",
+      "title": "Cyclic CUDA aerosol with repeated source pulses",
+      "topic": "chambers",
+      "also": [
+        "condensation",
+        "losses"
+      ],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/gpu/prepared/gpu_prepared_forcing.py",
+      "title": "CUDA cooling and vapor pulses",
+      "topic": "gpu",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/gpu/prepared/gpu_prepared_lifecycle.py",
+      "title": "Million-particle CUDA lifecycle",
+      "topic": "gpu",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/gpu/prepared/gpu_prepared_multibox.py",
+      "title": "64 heterogeneous CUDA boxes",
+      "topic": "gpu",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/gpu/prepared/gpu_prepared_quick_start.py",
+      "title": "Prepared CUDA: CPU state to GPU and back",
+      "topic": "gpu",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/gpu/prepared/gpu_prepared_stochastic.py",
+      "title": "Sixteen-seed CUDA coagulation",
+      "topic": "gpu",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/gpu/prepared/gpu_scaling_results.py",
+      "title": "Measured RTX 5060 scaling",
+      "topic": "gpu",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/gpu/resident/gpu_resident_graph_capture.py",
+      "title": "CUDA Resident Graph Capture",
+      "topic": "gpu",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/gpu/resident/gpu_resident_multi_timestep.py",
+      "title": "CUDA Resident Multi Timestep",
+      "topic": "gpu",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/gpu/resident/gpu_resident_session.py",
+      "title": "CUDA Resident Session",
+      "topic": "gpu",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/index.md",
+      "title": "Examples",
+      "topic": "aerosols",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/optics/cuda_optics.py",
+      "title": "CUDA optics: particle batches and a cloud spectrum",
+      "topic": "optics",
+      "also": [
+        "gpu"
+      ],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/optics/sphere_optics.py",
+      "title": "Sphere spectra, polarization and cloud optical depth",
+      "topic": "optics",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/processes/coagulation/charge/coagulation_with_charge_functional.py",
+      "title": "Coagulation with Charge (Functional + Factory)",
+      "topic": "charged",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/processes/coagulation/charge/coagulation_with_charge_objects.py",
+      "title": "Coagulation with Charge (Builder pattern)",
+      "topic": "charged",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/processes/coagulation/coagulation_1_pmf_pattern.py",
+      "title": "Coagulation Pattern 1: PMF",
+      "topic": "brownian",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/processes/coagulation/coagulation_2_pdf_pattern.py",
+      "title": "Coagulation Pattern 2: PDF",
+      "topic": "brownian",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/processes/coagulation/coagulation_3_particle_resolved_pattern.py",
+      "title": "Coagulation Pattern 3: Particle Resolved",
+      "topic": "brownian",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/processes/coagulation/coagulation_4_compared.py",
+      "title": "Coagulation Pattern 4: PMF vs PDF",
+      "topic": "brownian",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/processes/coagulation/coagulation_5_time_evolution.py",
+      "title": "Coagulation Pattern 5: Time Evolution Comparison",
+      "topic": "brownian",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/processes/coagulation/functional/coagulation_basic_1_pmf.py",
+      "title": "Coagulation Basic 1: PMF (Builder + Coagulation)",
+      "topic": "brownian",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/processes/coagulation/functional/coagulation_basic_2_pdf.py",
+      "title": "Coagulation Basic 2: PDF (Builder + Coagulation)",
+      "topic": "brownian",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/processes/coagulation/functional/coagulation_basic_3_compared.py",
+      "title": "Coagulation Basic 3: PMF vs PDF (Builder + Coagulation)",
+      "topic": "brownian",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/processes/coagulation/functional/coagulation_basic_4_particleresolved.py",
+      "title": "Coagulation Basic 4: Particle Resolved (Builder + Coagulation)",
+      "topic": "brownian",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/processes/condensation/condensation_1_bin.py",
+      "title": "Condensation in radius bins",
+      "topic": "condensation",
+      "also": [],
+      "role": "Examples",
+      "start_here": true
+    },
+    {
+      "source": "docs/examples/processes/condensation/condensation_2_massbin.py",
+      "title": "Condensation Tutorial: Mass Binned",
+      "topic": "condensation",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/processes/condensation/condensation_3_massresolved.py",
+      "title": "Condensation Tutorial: Particle Resolved",
+      "topic": "condensation",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/processes/condensation/condensation_latent_heat.py",
+      "title": "CPU latent-heat condensation bookkeeping",
+      "topic": "condensation",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/processes/condensation/staggered_condensation_example.py",
+      "title": "Staggered Condensation Stepping",
+      "topic": "numerics",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/processes/customization/adding_particles_during_simulation.py",
+      "title": "Adding Particles During Simulation",
+      "topic": "custom",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/processes/customization/particle_tracers.py",
+      "title": "Registered particle tracers",
+      "topic": "custom",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/processes/customization/timed_box_chemistry.py",
+      "title": "Timed custom CPU chemistry",
+      "topic": "custom",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/processes/dilution/cpu_dilution.py",
+      "title": "Cpu Dilution",
+      "topic": "losses",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/processes/index.md",
+      "title": "Dynamics",
+      "topic": "processes",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/processes/nucleation/cpu_nucleation.py",
+      "title": "Cpu Nucleation",
+      "topic": "nucleation",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/processes/nucleation/custom_nucleation_single_species.py",
+      "title": "Custom Nucleation: Single Species",
+      "topic": "nucleation",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/processes/nucleation/index.md",
+      "title": "Nucleation",
+      "topic": "nucleation",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/processes/wall-loss/chamber_forward_simulation.py",
+      "title": "Chamber Forward Simulation",
+      "topic": "losses",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/processes/wall-loss/index.md",
+      "title": "Index: Chamber Wall Loss",
+      "topic": "losses",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/processes/wall-loss/rectangular_wall_loss_strategy.py",
+      "title": "Rectangular Wall Loss Strategy (interactive quick start)",
+      "topic": "losses",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/processes/wall-loss/spherical_wall_loss_strategy.py",
+      "title": "Spherical Wall Loss Strategy Tutorial",
+      "topic": "losses",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/processes/wall-loss/wall_loss_builders_factory.py",
+      "title": "Wall Loss Builders and Factory (interactive)",
+      "topic": "losses",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/processes/wall-loss/wall_loss_tutorial.py",
+      "title": "Wall Loss Tutorial: Spherical vs Rectangular Chambers",
+      "topic": "losses",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/simulations/biomass_burning_cloud_interactions.py",
+      "title": "Biomass Burning Cloud Interactions",
+      "topic": "emissions",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/simulations/cloud_chamber_multi_cycle.py",
+      "title": "Cloud Chamber Multi-Cycle Simulation",
+      "topic": "chambers",
+      "also": [
+        "condensation",
+        "losses"
+      ],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/simulations/cloud_chamber_single_cycle.py",
+      "title": "Cloud Chamber Activation-Deactivation Cycle (Single Run)",
+      "topic": "chambers",
+      "also": [
+        "condensation",
+        "losses"
+      ],
+      "role": "Examples",
+      "start_here": true
+    },
+    {
+      "source": "docs/examples/simulations/cough_droplets_partitioning.py",
+      "title": "Cough Droplets Partitioning",
+      "topic": "emissions",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/simulations/index.md",
+      "title": "Simulations",
+      "topic": "applications",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/simulations/organic_partitioning_and_coagulation.py",
+      "title": "Organic Partitioning And Coagulation",
+      "topic": "partitioning",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/simulations/soot_formation_in_flames.py",
+      "title": "Soot Formation in Flames",
+      "topic": "emissions",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/thermodynamics/activity/activity_tutorial.py",
+      "title": "Activity Tutorial",
+      "topic": "activity",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/thermodynamics/activity/bat_activity_example.py",
+      "title": "BAT Model Activity Example",
+      "topic": "activity",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/thermodynamics/activity/equilibria_example.py",
+      "title": "Equilibria Partitioning Example",
+      "topic": "partitioning",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/thermodynamics/activity/ideal_activity_example.py",
+      "title": "Ideal Activity Example",
+      "topic": "activity",
+      "also": [],
+      "role": "Examples",
+      "start_here": true
+    },
+    {
+      "source": "docs/examples/thermodynamics/activity/index.md",
+      "title": "Activity Examples",
+      "topic": "activity",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/thermodynamics/activity/kappa_activity_example.py",
+      "title": "Kappa Parameter Activity Example",
+      "topic": "activity",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/thermodynamics/equilibria/activity_part1.py",
+      "title": "Activity Example",
+      "topic": "partitioning",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/thermodynamics/equilibria/equilibria_part1.py",
+      "title": "Liquid Vapor Equilibrium",
+      "topic": "partitioning",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/thermodynamics/equilibria/index.md",
+      "title": "Index Equilibria",
+      "topic": "partitioning",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/thermodynamics/index.md",
+      "title": "Thermodynamics examples",
+      "topic": "activity",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/thermodynamics/particle-properties/activity_functions.py",
+      "title": "Activity Tutorial",
+      "topic": "activity",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/thermodynamics/particle-properties/activity_tutorial.py",
+      "title": "Activity Tutorial",
+      "topic": "activity",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/thermodynamics/particle-properties/particle_surface_tutorial.py",
+      "title": "Particle Surface Tutorial",
+      "topic": "surface",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/guide/data-model/construction.md",
+      "title": "Native aerosol construction and replacement",
+      "topic": "representations",
+      "also": [],
+      "role": "Guide",
+      "start_here": false
+    },
+    {
+      "source": "docs/guide/data-model/field-ownership.md",
+      "title": "Field ownership and transfer policy",
+      "topic": "representations",
+      "also": [],
+      "role": "Guide",
+      "start_here": false
+    },
+    {
+      "source": "docs/guide/data-model/index.md",
+      "title": "Data model",
+      "topic": "representations",
+      "also": [],
+      "role": "Guide",
+      "start_here": true
+    },
+    {
+      "source": "docs/guide/data-model/ownership.md",
+      "title": "Native container access and ownership",
+      "topic": "representations",
+      "also": [],
+      "role": "Guide",
+      "start_here": false
+    },
+    {
+      "source": "docs/guide/getting-started/first-simulation.md",
+      "title": "First CPU simulation",
+      "topic": "cpu",
+      "also": [],
+      "role": "Guide",
+      "start_here": true
+    },
+    {
+      "source": "docs/guide/gpu/backend-selection.md",
+      "title": "Backend Selection and Explicit CPU Fallback",
+      "topic": "gpu",
+      "also": [],
+      "role": "Guide",
+      "start_here": false
+    },
+    {
+      "source": "docs/guide/gpu/direct/coagulation-configuration.md",
+      "title": "Coagulation Configuration",
+      "topic": "gpu",
+      "also": [],
+      "role": "Guide",
+      "start_here": false
+    },
+    {
+      "source": "docs/guide/gpu/direct/coagulation.md",
+      "title": "Coagulation",
+      "topic": "gpu",
+      "also": [],
+      "role": "Guide",
+      "start_here": false
+    },
+    {
+      "source": "docs/guide/gpu/direct/condensation-configuration.md",
+      "title": "Condensation Configuration",
+      "topic": "gpu",
+      "also": [],
+      "role": "Guide",
+      "start_here": false
+    },
+    {
+      "source": "docs/guide/gpu/direct/condensation.md",
+      "title": "Condensation",
+      "topic": "gpu",
+      "also": [],
+      "role": "Guide",
+      "start_here": false
+    },
+    {
+      "source": "docs/guide/gpu/direct/dilution-and-wall-loss.md",
+      "title": "Dilution And Wall Loss",
+      "topic": "gpu",
+      "also": [],
+      "role": "Guide",
+      "start_here": false
+    },
+    {
+      "source": "docs/guide/gpu/execution.md",
+      "title": "Execution",
+      "topic": "gpu",
+      "also": [],
+      "role": "Guide",
+      "start_here": false
+    },
+    {
+      "source": "docs/guide/gpu/index.md",
+      "title": "GPU execution",
+      "topic": "gpu",
+      "also": [],
+      "role": "Guide",
+      "start_here": false
+    },
+    {
+      "source": "docs/guide/gpu/prepared.md",
+      "title": "Prepared GPU simulations",
+      "topic": "gpu",
+      "also": [],
+      "role": "Guide",
+      "start_here": true
+    },
+    {
+      "source": "docs/guide/gpu/resident/checkpoints.md",
+      "title": "GPU resident checkpoints",
+      "topic": "gpu",
+      "also": [],
+      "role": "Guide",
+      "start_here": false
+    },
+    {
+      "source": "docs/guide/gpu/resident/graph-capture.md",
+      "title": "GPU resident graph capture",
+      "topic": "gpu",
+      "also": [],
+      "role": "Guide",
+      "start_here": false
+    },
+    {
+      "source": "docs/guide/gpu/slot-exhaustion.md",
+      "title": "Fixed-Capacity Slot Exhaustion Primitives",
+      "topic": "gpu",
+      "also": [],
+      "role": "Guide",
+      "start_here": false
+    },
+    {
+      "source": "docs/guide/gpu/slots.md",
+      "title": "Slots",
+      "topic": "gpu",
+      "also": [],
+      "role": "Guide",
+      "start_here": false
+    },
+    {
+      "source": "docs/guide/gpu/support.md",
+      "title": "GPU support",
+      "topic": "gpu",
+      "also": [],
+      "role": "Guide",
+      "start_here": false
+    },
+    {
+      "source": "docs/guide/gpu/transfers.md",
+      "title": "Transfers",
+      "topic": "gpu",
+      "also": [],
+      "role": "Guide",
+      "start_here": false
+    },
+    {
+      "source": "docs/guide/gpu/troubleshooting.md",
+      "title": "Troubleshooting",
+      "topic": "gpu",
+      "also": [],
+      "role": "Guide",
+      "start_here": false
+    },
+    {
+      "source": "docs/guide/index.md",
+      "title": "Guide",
+      "topic": "aerosols",
+      "also": [],
+      "role": "Guide",
+      "start_here": false
+    },
+    {
+      "source": "docs/guide/optics/index.md",
+      "title": "Optical calculations",
+      "topic": "optics",
+      "also": [],
+      "role": "Guide",
+      "start_here": true
+    },
+    {
+      "source": "docs/guide/processes/activity.md",
+      "title": "Activity System",
+      "topic": "activity",
+      "also": [],
+      "role": "Guide",
+      "start_here": false
+    },
+    {
+      "source": "docs/guide/processes/coagulation.md",
+      "title": "Coagulation Strategy System",
+      "topic": "brownian",
+      "also": [],
+      "role": "Guide",
+      "start_here": false
+    },
+    {
+      "source": "docs/guide/processes/condensation.md",
+      "title": "Condensation Strategy System",
+      "topic": "condensation",
+      "also": [],
+      "role": "Guide",
+      "start_here": false
+    },
+    {
+      "source": "docs/guide/processes/dilution.md",
+      "title": "Dilution Strategy System",
+      "topic": "losses",
+      "also": [],
+      "role": "Guide",
+      "start_here": false
+    },
+    {
+      "source": "docs/guide/processes/index.md",
+      "title": "Scientific processes",
+      "topic": "processes",
+      "also": [],
+      "role": "Guide",
+      "start_here": false
+    },
+    {
+      "source": "docs/guide/processes/nucleation.md",
+      "title": "Nucleation Strategy System",
+      "topic": "nucleation",
+      "also": [],
+      "role": "Guide",
+      "start_here": false
+    },
+    {
+      "source": "docs/guide/processes/wall-loss.md",
+      "title": "Wall Loss Strategy System",
+      "topic": "losses",
+      "also": [],
+      "role": "Guide",
+      "start_here": false
+    },
+    {
+      "source": "docs/index.md",
+      "title": "Particula overview",
+      "topic": "aerosols",
+      "also": [],
+      "role": "Guide",
+      "start_here": false
+    },
+    {
+      "source": "docs/theory/dynamics/cloud-droplet-coagulation/dns-fluid-and-particle-properties-comparison.py",
+      "title": "Dns Fluid And Particle Properties Comparison",
+      "topic": "turbulent",
+      "also": [],
+      "role": "Theory",
+      "start_here": false
+    },
+    {
+      "source": "docs/theory/dynamics/cloud-droplet-coagulation/dns-horizontal-velocity-comparison.py",
+      "title": "Dns Horizontal Velocity Comparison",
+      "topic": "turbulent",
+      "also": [],
+      "role": "Theory",
+      "start_here": false
+    },
+    {
+      "source": "docs/theory/dynamics/cloud-droplet-coagulation/dns-kernel-comparison.py",
+      "title": "Dns Kernel Comparison",
+      "topic": "turbulent",
+      "also": [],
+      "role": "Theory",
+      "start_here": false
+    },
+    {
+      "source": "docs/theory/dynamics/cloud-droplet-coagulation/dns-radial-distribution-comparison.py",
+      "title": "Dns Radial Distribution Comparison",
+      "topic": "turbulent",
+      "also": [],
+      "role": "Theory",
+      "start_here": false
+    },
+    {
+      "source": "docs/theory/dynamics/cloud-droplet-coagulation/dns-radial-relative-velocity-comparison.py",
+      "title": "Dns Radial Relative Velocity Comparison",
+      "topic": "turbulent",
+      "also": [],
+      "role": "Theory",
+      "start_here": false
+    },
+    {
+      "source": "docs/theory/dynamics/cloud-droplet-coagulation/droplet-coagulation-kernel-ayala2008.md",
+      "title": "Droplet Coagulation Kernel Ayala 2008",
+      "topic": "turbulent",
+      "also": [],
+      "role": "Theory",
+      "start_here": false
+    },
+    {
+      "source": "docs/theory/dynamics/cloud-droplet-coagulation/index.md",
+      "title": "Cloud Droplet Coagulation",
+      "topic": "turbulent",
+      "also": [],
+      "role": "Theory",
+      "start_here": true
+    },
+    {
+      "source": "docs/theory/dynamics/condensation-equations.md",
+      "title": "Condensation Discussion",
+      "topic": "condensation",
+      "also": [],
+      "role": "Theory",
+      "start_here": false
+    },
+    {
+      "source": "docs/theory/dynamics/ionparticle-coagulation.py",
+      "title": "Ionparticle Coagulation",
+      "topic": "charged",
+      "also": [],
+      "role": "Theory",
+      "start_here": false
+    },
+    {
+      "source": "docs/theory/dynamics/nucleation-equations.md",
+      "title": "Nucleation Discussion",
+      "topic": "nucleation",
+      "also": [],
+      "role": "Theory",
+      "start_here": false
+    },
+    {
+      "source": "docs/theory/index.md",
+      "title": "Theory",
+      "topic": "aerosols",
+      "also": [],
+      "role": "Theory",
+      "start_here": false
+    },
+    {
+      "source": "docs/theory/properties/dynamic-viscosity.py",
+      "title": "Dynamic Viscosity",
+      "topic": "transport",
+      "also": [],
+      "role": "Theory",
+      "start_here": true
+    },
+    {
+      "source": "docs/theory/properties/mean-free-path.py",
+      "title": "Mean Free Path",
+      "topic": "transport",
+      "also": [],
+      "role": "Theory",
+      "start_here": false
+    },
+    {
+      "source": "docs/theory/thermodynamics/activity-theory.md",
+      "title": "Activity Theory",
+      "topic": "activity",
+      "also": [],
+      "role": "Theory",
+      "start_here": false
+    },
+    {
+      "source": "docs/theory/thermodynamics/equilibria-theory.md",
+      "title": "Equilibria Theory",
+      "topic": "partitioning",
+      "also": [],
+      "role": "Theory",
+      "start_here": false
+    },
+    {
+      "source": "docs/theory/thermodynamics/index.md",
+      "title": "Activity Calculations",
+      "topic": "activity",
+      "also": [],
+      "role": "Theory",
+      "start_here": false
+    },
+    {
+      "source": "api",
+      "title": "API reference",
+      "topic": "methods",
+      "also": [],
+      "role": "API",
+      "start_here": false
+    }
+  ],
+  "supporting": [
+    {
+      "source": "docs/contribute/CODE_OF_CONDUCT.md",
+      "reason": "Supporting contributor workflow; retained in Contribute navigation."
+    },
+    {
+      "source": "docs/contribute/CONTRIBUTING.md",
+      "reason": "Supporting contributor workflow; retained in Contribute navigation."
+    },
+    {
+      "source": "docs/contribute/Code_Specifications/Details/Class_docstring_format.md",
+      "reason": "Supporting contributor workflow; retained in Contribute navigation."
+    },
+    {
+      "source": "docs/contribute/Code_Specifications/Details/Function_docstring_format.md",
+      "reason": "Supporting contributor workflow; retained in Contribute navigation."
+    },
+    {
+      "source": "docs/contribute/Code_Specifications/Details/Linear_Git_Repository.md",
+      "reason": "Supporting contributor workflow; retained in Contribute navigation."
+    },
+    {
+      "source": "docs/contribute/Code_Specifications/index.md",
+      "reason": "Supporting contributor workflow; retained in Contribute navigation."
+    },
+    {
+      "source": "docs/contribute/Feature_Workflow/Details/Add_Class.md",
+      "reason": "Supporting contributor workflow; retained in Contribute navigation."
+    },
+    {
+      "source": "docs/contribute/Feature_Workflow/Details/Add_Example.md",
+      "reason": "Supporting contributor workflow; retained in Contribute navigation."
+    },
+    {
+      "source": "docs/contribute/Feature_Workflow/Details/Add_Function.md",
+      "reason": "Supporting contributor workflow; retained in Contribute navigation."
+    },
+    {
+      "source": "docs/contribute/Feature_Workflow/Details/Add_Theory.md",
+      "reason": "Supporting contributor workflow; retained in Contribute navigation."
+    },
+    {
+      "source": "docs/contribute/Feature_Workflow/Details/Add_Unit_Test.md",
+      "reason": "Supporting contributor workflow; retained in Contribute navigation."
+    },
+    {
+      "source": "docs/contribute/Feature_Workflow/Details/Add_to_init.md",
+      "reason": "Supporting contributor workflow; retained in Contribute navigation."
+    },
+    {
+      "source": "docs/contribute/Feature_Workflow/index.md",
+      "reason": "Supporting contributor workflow; retained in Contribute navigation."
+    },
+    {
+      "source": "docs/contribute/architecture/design-patterns.md",
+      "reason": "Supporting contributor workflow; retained in Contribute navigation."
+    },
+    {
+      "source": "docs/contribute/architecture/index.md",
+      "reason": "Supporting contributor workflow; retained in Contribute navigation."
+    },
+    {
+      "source": "docs/contribute/architecture/object-oriented-patterns.md",
+      "reason": "Supporting contributor workflow; retained in Contribute navigation."
+    },
+    {
+      "source": "docs/contribute/architecture/warmed-principle.md",
+      "reason": "Supporting contributor workflow; retained in Contribute navigation."
+    },
+    {
+      "source": "docs/contribute/documentation.md",
+      "reason": "Supporting contributor workflow; retained in Contribute navigation."
+    },
+    {
+      "source": "docs/contribute/roadmap.md",
+      "reason": "Supporting contributor workflow; retained in Contribute navigation."
+    },
+    {
+      "source": "docs/contribute/setup.md",
+      "reason": "Supporting contributor workflow; retained in Contribute navigation."
+    },
+    {
+      "source": "docs/guide/ai-assistants/claude.md",
+      "reason": "Supporting setup or migration guidance; retained in Guide navigation."
+    },
+    {
+      "source": "docs/guide/ai-assistants/codex.md",
+      "reason": "Supporting setup or migration guidance; retained in Guide navigation."
+    },
+    {
+      "source": "docs/guide/ai-assistants/index.md",
+      "reason": "Supporting setup or migration guidance; retained in Guide navigation."
+    },
+    {
+      "source": "docs/guide/ai-assistants/opencode.md",
+      "reason": "Supporting setup or migration guidance; retained in Guide navigation."
+    },
+    {
+      "source": "docs/guide/getting-started/installation/conda.md",
+      "reason": "Supporting setup or migration guidance; retained in Guide navigation."
+    },
+    {
+      "source": "docs/guide/getting-started/installation/index.md",
+      "reason": "Supporting setup or migration guidance; retained in Guide navigation."
+    },
+    {
+      "source": "docs/guide/getting-started/installation/new-to-python.md",
+      "reason": "Supporting setup or migration guidance; retained in Guide navigation."
+    },
+    {
+      "source": "docs/guide/getting-started/installation/pip.md",
+      "reason": "Supporting setup or migration guidance; retained in Guide navigation."
+    },
+    {
+      "source": "docs/guide/getting-started/installation/uv.md",
+      "reason": "Supporting setup or migration guidance; retained in Guide navigation."
+    },
+    {
+      "source": "docs/guide/migration/v0.3.0/construction.md",
+      "reason": "Supporting setup or migration guidance; retained in Guide navigation."
+    },
+    {
+      "source": "docs/guide/migration/v0.3.0/containers.md",
+      "reason": "Supporting setup or migration guidance; retained in Guide navigation."
+    },
+    {
+      "source": "docs/guide/migration/v0.3.0/dynamics.md",
+      "reason": "Supporting setup or migration guidance; retained in Guide navigation."
+    },
+    {
+      "source": "docs/guide/migration/v0.3.0/index.md",
+      "reason": "Supporting setup or migration guidance; retained in Guide navigation."
+    },
+    {
+      "source": "docs/guide/migration/v0.3.0/troubleshooting.md",
+      "reason": "Supporting setup or migration guidance; retained in Guide navigation."
+    },
+    {
+      "source": "docs/guide/topics/index.md",
+      "reason": "Offline entry to the generated topic explorer; avoids a self-referential resource."
+    }
+  ]
+}

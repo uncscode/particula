@@ -12,5 +12,10 @@ function collapseGroups(entries: typeof sidebar): typeof sidebar {
 }
 ---
 
+<a class="topic-entry" href={`${import.meta.env.BASE_URL.replace(/\/$/, "")}/guide/topics/`}>Explore topics <span aria-hidden="true">→</span></a>
 <SidebarSublist sublist={collapseGroups(sidebar)} />
 <div class="md:sl-hidden"><MobileMenuFooter /></div>
+
+<style>
+.topic-entry { display: block; padding: .8rem; margin-bottom: .8rem; border: 1px solid var(--sl-color-accent); border-radius: .5rem; font-weight: 600; text-decoration: none; }
+</style>

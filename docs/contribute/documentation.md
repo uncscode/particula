@@ -11,6 +11,25 @@ five sections; extend an existing topic before adding another page.
 | API | Call signatures and implementation reference | Generated from package docstrings |
 | Contribute | Developers changing the package, validating results, or setting up assistants | `docs/contribute/` |
 
+## Topic organization and scientific narratives
+
+The [topic explorer](../guide/topics/index.md) connects the existing sections
+around scientific questions. Its canonical `website/topics.json` classifies
+all authored pages and registered examples; operational pages have explicit
+supporting-page reasons. A mapped page is not automatically an editorially
+reviewed page.
+
+Use the shared [topic graph rules](../../plugins/particula-helper/references/documentation-topics.md)
+for branch sizes, relationships, naming, alternate terms, illustrations, and
+page ownership. Use the [scientific narrative framework](../../plugins/particula-helper/references/scientific-narratives.md)
+for purpose, explained calculations, interpretation, closure, and research
+extensions. These references also guide the packaged authoring and review skills.
+
+Add a page's disposition when adding the page. Validate with
+`python scripts/docs_topics.py`; the normal website build also checks the graph.
+Topic pages are generated from the registry. Keep the offline topic entry useful
+without duplicating the interactive map or editing generated pages.
+
 ## Before adding a page
 
 1. Identify its owning topic and distinct learning objective. Search that topic

@@ -1,6 +1,6 @@
 ---
 name: particula-docs
-description: "Maintain Particula repository docstrings, scientific guides, theory, and published Python examples in Astro/Starlight, including saved outputs and links. Not for unrelated document drafting or private simulation notebooks."
+description: "Organize and maintain Particula documentation, its topic graph, scientific narratives, docstrings, and published Python examples in Astro/Starlight. Not for unrelated document drafting or private simulation notebooks."
 ---
 
 # Maintain documentation
@@ -10,6 +10,18 @@ Then read its `docs/contribute/documentation.md` and `website/AUTHORING.md`
 for current placement and build rules. Use `../../references/docstrings.md`
 for function/class/module prose, and `../../references/scientific-boundaries.md`
 when documenting physical or execution contracts.
+
+For collection reviews and topic navigation, read
+`../../references/documentation-topics.md`. Inventory and classify the full
+requested scope, distinguish mapped pages from editorially reviewed pages, and
+record a prioritized backlog. Apply this workflow without rewriting articles
+when the request is only to audit or plan.
+
+For examples and scientific explanations, read
+`../../references/scientific-narratives.md`. Establish the question and intended
+reader capability, connect code to evidence, interpret results, and close with
+a bounded answer and concrete research extension. Use the topic graph to connect
+prerequisites and follow-on concepts. Keep short reference edits proportional.
 
 Choose the reader's task and extend its owning topic before creating a page:
 Guide for supported usage, Examples for calculations, Theory for scientific

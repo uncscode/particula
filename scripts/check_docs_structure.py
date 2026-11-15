@@ -11,6 +11,7 @@ from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
+import docs_topics
 import markdown
 
 SECTIONS = ("Guide", "Examples", "Theory", "API", "Contribute")
@@ -185,6 +186,8 @@ def check(root, site=None):
     for path in sorted(pages - reachable):
         errors.append(f"unreachable authored page: {path.relative_to(root)}")
     errors.extend(check_script_coverage(root, pages))
+    if (root / "website/topics.json").exists():
+        errors.extend(docs_topics.validate(docs_topics.load(root), root))
     if site is not None:
         errors.extend(check_published(root, site.resolve(), pages, manifest))
         errors.extend(check_rendered_links(root, site.resolve(), pages))
