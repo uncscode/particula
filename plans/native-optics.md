@@ -80,12 +80,12 @@ entries, discrete/resolved/PDF reductions and single/multiple layers.
       saved compact numerical data; later-feedback usage sketch only.
 - [ ] Google-style SI/shape/domain docstrings, primary citations, guide/API
       navigation and numerical/performance validation record.
-- [ ] Rayleigh limits, lossless energy balance, extinction=scattering+absorption,
+- [x] Rayleigh limits, lossless energy balance, extinction=scattering+absorption,
       bounded g; angular integrals recover Csca/g and normalized phase.
-- [ ] Polarization sign/rotation round trips, valid Stokes states, medium/unit
+- [x] Polarization sign/rotation round trips, valid Stokes states, medium/unit
       invariance, population equivalence, optical-depth additivity, near-zero
       and invalid inputs, chunk-size independence and workspace reuse.
-- [ ] Qualified reference Q target rtol=1e-6/atol=1e-12; CPU/CUDA target
+- [x] Qualified reference Q target rtol=1e-6/atol=1e-12; CPU/CUDA target
       rtol=1e-8/atol=1e-12. Document scale-aware angular errors near zeros and
       independent absolute checks of weak absorption. Investigate failures,
       never automatically weaken tolerances.
@@ -247,3 +247,14 @@ entries, discrete/resolved/PDF reductions and single/multiple layers.
   after the numerical changes settle.
   Complete optics rerun after reduction guards: 251 passed on CPU and native
   CUDA, with no tolerance changes.
+
+- Frozen numerical source at baf393b18. Final wheel installed offline into the
+  isolated newer-dependency environment: 251 optics tests passed on CPU/CUDA.
+  Final documentation-bundle verification passed both isolated installations
+  and offline sdist rebuild (210 files; 2,514,813 docs bytes; wheel 4,087,271
+  bytes; sdist 3,700,017 bytes). Repository-wide Ruff, format and mypy pass.
+  The prior full-suite run was deliberately stopped because it collected code
+  before the last numerical fixes (6327 passed, 2 skipped before interruption;
+  not a full-suite pass). A replacement full-suite/80%-coverage run now uses
+  the frozen final source. Its result remains pending. CPU/CUDA saved example
+  refresh and final site/evidence review follow completion of concurrent tests.
