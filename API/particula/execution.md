@@ -144,7 +144,7 @@ aerosol and process-physics validation.
 
 - `runnable` (`_CPURunnable | RunnableABC`) — Runnable invoked once for every valid execution state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1021-L1095)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1021-L1102)
 
 ### particula.execution.CPUExecutionAdapter._runnable
 
@@ -203,7 +203,7 @@ non-boolean real scalar.
 - `ValueError` — If controls are invalid or the runnable returns a
 different aerosol object.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1045-L1095)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1045-L1102)
 
 ## particula.execution.CPUExecutionContext
 
@@ -227,7 +227,7 @@ Reusing a context and process namespace deliberately continues its streams.
 Create a new context to reset them. Contexts are not thread-safe and must
 not be used concurrently. No CPU/GPU bitwise equivalence is implied.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L29-L90)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L36-L153)
 
 ### particula.execution.CPUExecutionContext._box_ids
 
@@ -237,7 +237,7 @@ not be used concurrently. No CPU/GPU bitwise equivalence is implied.
 _box_ids: tuple[str, ...] = _box_ids(box_ids)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L51-L51)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L58-L58)
 
 ### particula.execution.CPUExecutionContext._root_seed
 
@@ -247,7 +247,7 @@ _box_ids: tuple[str, ...] = _box_ids(box_ids)
 _root_seed: int = int(root_seed)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L50-L50)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L57-L57)
 
 ### particula.execution.CPUExecutionContext._streams
 
@@ -257,7 +257,7 @@ _root_seed: int = int(root_seed)
 _streams: dict[tuple[str, str], np.random.Generator] = {}
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L52-L52)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L59-L59)
 
 ### particula.execution.CPUExecutionContext.box_ids
 
@@ -269,7 +269,7 @@ box_ids: tuple[str, ...]
 
 Return logical IDs in this view's numeric-array order.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L60-L62)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L67-L69)
 
 ### particula.execution.CPUExecutionContext.root_seed
 
@@ -281,7 +281,7 @@ root_seed: int
 
 Return the immutable root seed.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L55-L57)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L62-L64)
 
 ### particula.execution.CPUExecutionContext.__init__
 
@@ -293,7 +293,7 @@ def __init__(root_seed: int, box_ids: tuple[str, ...]) -> None
 
 Validate metadata without creating or advancing random streams.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L42-L52)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L49-L59)
 
 ### particula.execution.CPUExecutionContext._begin
 
@@ -305,7 +305,19 @@ def _begin(n_boxes: int) -> _CPUStreamTransaction
 
 Validate layout and begin a private substep transaction.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L74-L78)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L81-L85)
+
+### particula.execution.CPUExecutionContext._checkpoint
+
+*method*
+
+```python
+def _checkpoint() -> bytes
+```
+
+Own canonical JSON bytes for exact PCG64 continuation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L87-L100)
 
 ### particula.execution.CPUExecutionContext._new_generator
 
@@ -317,7 +329,19 @@ def _new_generator(namespace: str, box_id: str) -> np.random.Generator
 
 Derive a versioned PCG64 stream independently of lane/order.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L80-L90)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L143-L153)
+
+### particula.execution.CPUExecutionContext._restore
+
+*method* · *classmethod*
+
+```python
+def _restore(payload: bytes, *, root_seed, box_ids, namespaces)
+```
+
+Validate continuation records before creating generators.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L102-L141)
 
 ### particula.execution.CPUExecutionContext.with_box_ids
 
@@ -332,7 +356,7 @@ Create a reordered, reduced, or extended continuation-sharing view.
 New IDs acquire streams lazily; existing IDs retain continuation even
 when absent from a view. The caller must reorder arrays consistently.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L64-L72)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_context.py#L71-L79)
 
 ## particula.execution.CPUExecutionState
 
@@ -1372,7 +1396,7 @@ registration state. Registration and selection are context-local only:
 neither invokes an adapter, probes availability, loads a backend, nor
 transfers data.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1170-L1238)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1177-L1245)
 
 ### particula.execution.ExecutionContext._matrix
 
@@ -1382,7 +1406,7 @@ transfers data.
 _matrix = matrix
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1190-L1190)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1197-L1197)
 
 ### particula.execution.ExecutionContext._registry
 
@@ -1392,7 +1416,7 @@ _matrix = matrix
 _registry = _AdapterRegistry()
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1191-L1191)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1198-L1198)
 
 ### particula.execution.ExecutionContext.__init__
 
@@ -1412,7 +1436,7 @@ Store a matrix and create an empty private adapter registry.
 
 - `TypeError` — If ``matrix`` is not a CapabilityMatrix.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1179-L1191)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1186-L1198)
 
 ### particula.execution.ExecutionContext.register_adapter
 
@@ -1440,7 +1464,7 @@ context and is selected later by its exact process/backend pair.
 order.
 - `ValueError` — If the process/backend pair is already registered.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1193-L1215)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1200-L1222)
 
 ### particula.execution.ExecutionContext.resolve
 
@@ -1469,7 +1493,7 @@ method does not catch adapter errors because it never executes adapters.
 - `ValueError` — If CPU device spelling is invalid or support is absent.
 - `LookupError` — If supported request has no exact registered adapter.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1217-L1238)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1224-L1245)
 
 ## particula.execution.ExecutionRequest
 
@@ -3525,15 +3549,22 @@ invalid.
 - `particula.execution.adapters`
 - `particula.execution.availability`
 - `particula.execution.checkpoint`
+- `particula.execution.checkpoint_extensions`
 - `particula.execution.cohort`
 - `particula.execution.communication`
 - `particula.execution.cpu_context`
 - `particula.execution.diagnostics`
 - `particula.execution.errors`
+- `particula.execution.extension_guards`
+- `particula.execution.extension_registry`
+- `particula.execution.extension_rng`
 - `particula.execution.fallback`
+- `particula.execution.field_buffers`
 - `particula.execution.gpu_resources`
 - `particula.execution.gpu_session`
 - `particula.execution.graph_capture`
+- `particula.execution.particle_field_kernels`
+- `particula.execution.preparation_context`
 - `particula.execution.prepared`
 - `particula.execution.prepared_atmospheric`
 - `particula.execution.prepared_capture`
@@ -3541,14 +3572,18 @@ invalid.
 - `particula.execution.prepared_cohort`
 - `particula.execution.prepared_condensation`
 - `particula.execution.prepared_diagnostics`
+- `particula.execution.prepared_extensions`
 - `particula.execution.prepared_guards`
 - `particula.execution.prepared_ions`
 - `particula.execution.prepared_nucleation`
 - `particula.execution.prepared_nucleation_kernels`
+- `particula.execution.prepared_particle_fields`
 - `particula.execution.prepared_processes`
+- `particula.execution.prepared_transfer`
 - `particula.execution.prepared_types`
 - `particula.execution.prepared_updates`
 - `particula.execution.process_adapters`
+- `particula.execution.process_extensions`
 - `particula.execution.process_graph`
 - `particula.execution.resident_communication`
 - `particula.execution.resident_enqueue`

@@ -454,7 +454,7 @@ class _CachedBoxState
 
 Hold one preflighted box's active values for planning only.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L209-L217)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L210-L218)
 
 ### particula.particles.exhaustion._CachedBoxState.active_indices
 
@@ -464,7 +464,7 @@ Hold one preflighted box's active values for planning only.
 active_indices: NDArray[np.intp]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L213-L213)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L214-L214)
 
 ### particula.particles.exhaustion._CachedBoxState.charges
 
@@ -474,7 +474,7 @@ active_indices: NDArray[np.intp]
 charges: NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L216-L216)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L217-L217)
 
 ### particula.particles.exhaustion._CachedBoxState.concentrations
 
@@ -484,7 +484,7 @@ charges: NDArray[np.float64]
 concentrations: NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L214-L214)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L215-L215)
 
 ### particula.particles.exhaustion._CachedBoxState.masses
 
@@ -494,7 +494,7 @@ concentrations: NDArray[np.float64]
 masses: NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L215-L215)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L216-L216)
 
 ### particula.particles.exhaustion._CachedBoxState.radii
 
@@ -504,7 +504,7 @@ masses: NDArray[np.float64]
 radii: NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L217-L217)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L218-L218)
 
 ### particula.particles.exhaustion._CachedBoxState.__init__
 
@@ -526,7 +526,7 @@ class _ResamplingBounds
 
 Hold finite nonnegative diagnostic tolerances for resampling.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L199-L206)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L200-L207)
 
 ### particula.particles.exhaustion._ResamplingBounds.diversity_absolute_error
 
@@ -536,7 +536,7 @@ Hold finite nonnegative diagnostic tolerances for resampling.
 diversity_absolute_error: float
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L206-L206)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L207-L207)
 
 ### particula.particles.exhaustion._ResamplingBounds.mean_radius_relative_error
 
@@ -546,7 +546,7 @@ diversity_absolute_error: float
 mean_radius_relative_error: float
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L204-L204)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L205-L205)
 
 ### particula.particles.exhaustion._ResamplingBounds.radius_cubed_relative_error
 
@@ -556,7 +556,7 @@ mean_radius_relative_error: float
 radius_cubed_relative_error: float
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L203-L203)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L204-L204)
 
 ### particula.particles.exhaustion._ResamplingBounds.surface_relative_error
 
@@ -566,7 +566,7 @@ radius_cubed_relative_error: float
 surface_relative_error: float
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L205-L205)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L206-L206)
 
 ### particula.particles.exhaustion._ResamplingBounds.__init__
 
@@ -593,7 +593,7 @@ receive
 replacement particles and released slots are cleared during the later,
 all-box commit. It does not provide GPU parity, activation, or scaling.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L167-L184)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L167-L185)
 
 ### particula.particles.exhaustion._ResamplingBoxPlan.released_indices
 
@@ -675,12 +675,22 @@ source_masses: tuple[tuple[np.float64, ...], ...] = ()
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L183-L183)
 
+### particula.particles.exhaustion._ResamplingBoxPlan.transport
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+transport: tuple[tuple[int, int, np.float64], ...] = ()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L185-L185)
+
 ### particula.particles.exhaustion._ResamplingBoxPlan.__init__
 
 *method*
 
 ```python
-def __init__(retained_indices: tuple[int, ...], released_indices: tuple[int, ...], replacement_masses: tuple[tuple[np.float64, ...], ...], replacement_concentrations: tuple[np.float64, ...], replacement_charges: tuple[np.float64, ...], source_concentrations: tuple[np.float64, ...] = (), source_masses: tuple[tuple[np.float64, ...], ...] = (), source_charges: tuple[np.float64, ...] = ()) -> None
+def __init__(retained_indices: tuple[int, ...], released_indices: tuple[int, ...], replacement_masses: tuple[tuple[np.float64, ...], ...], replacement_concentrations: tuple[np.float64, ...], replacement_charges: tuple[np.float64, ...], source_concentrations: tuple[np.float64, ...] = (), source_masses: tuple[tuple[np.float64, ...], ...] = (), source_charges: tuple[np.float64, ...] = (), transport: tuple[tuple[int, int, np.float64], ...] = ()) -> None
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L0-L0)
@@ -699,7 +709,7 @@ Empty per-box remaps preserve boxes that do not resample, including
 zero-release resampling boxes. The tuple-backed records retain no views
 into the policy resolution plan or particle storage.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L187-L196)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L188-L197)
 
 ### particula.particles.exhaustion._ResamplingPlan.box_plans
 
@@ -709,7 +719,7 @@ into the policy resolution plan or particle storage.
 box_plans: tuple[_ResamplingBoxPlan, ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L196-L196)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L197-L197)
 
 ### particula.particles.exhaustion._ResamplingPlan.__init__
 
@@ -731,7 +741,7 @@ def _build_box_remap(source: _CachedBoxState, required_release_count: int, densi
 
 Build a stable, linear-sweep equal-weight remap from cached state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L821-L964)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L822-L974)
 
 ## particula.particles.exhaustion._cache_particle_state
 
@@ -743,7 +753,7 @@ def _cache_particle_state(particles: ParticleData) -> tuple[_CachedBoxState, ...
 
 Fully validate particle state once and cache active values by box.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L584-L636)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L585-L637)
 
 ## particula.particles.exhaustion._relative_error
 
@@ -755,7 +765,7 @@ def _relative_error(before: np.float64, after: np.float64) -> float
 
 Calculate a finite relative diagnostic error, including zero values.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L733-L737)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L734-L738)
 
 ## particula.particles.exhaustion._riemer_diversity
 
@@ -767,7 +777,7 @@ def _riemer_diversity(masses: NDArray[np.float64], concentrations: NDArray[np.fl
 
 Calculate particle mixing-state Riemer diversity using natural logs.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L740-L772)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L741-L773)
 
 ## particula.particles.exhaustion._validate_capacity_counts
 
@@ -779,7 +789,7 @@ def _validate_capacity_counts(inputs: ExhaustionInputs, particle_count: int, *, 
 
 Validate count ranges against fixed particle capacity.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L255-L278)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L256-L279)
 
 ## particula.particles.exhaustion._validate_exact_float
 
@@ -791,7 +801,7 @@ def _validate_exact_float(name: str, value: object) -> float
 
 Return an exact finite nonnegative Python float diagnostic bound.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L500-L506)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L501-L507)
 
 ## particula.particles.exhaustion._validate_free_indices
 
@@ -803,7 +813,7 @@ def _validate_free_indices(inputs: ExhaustionInputs, particle_count: int) -> Non
 
 Validate free-index prefixes and unused suffix sentinels per box.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L281-L297)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L282-L298)
 
 ## particula.particles.exhaustion._validate_p1_plan
 
@@ -816,7 +826,7 @@ def _validate_p1_plan(exhaustion_plan: object, box_count: int, particle_count: i
 Validate policy resolution records without resolving policy or retaining
 their data.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L639-L730)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L640-L731)
 
 ## particula.particles.exhaustion._validate_p4_non_aliasing
 
@@ -829,7 +839,7 @@ def _validate_p4_non_aliasing(particles: ParticleData, sidecars: tuple[NDArray[A
 Reject volume scaling sidecar and writable particle-storage overlap
 before writes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L1237-L1254)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L1247-L1264)
 
 ## particula.particles.exhaustion._validate_p4_sidecar
 
@@ -841,7 +851,7 @@ def _validate_p4_sidecar(name: str, values: object, dtype: np.dtype[np.generic],
 
 Validate one writable contiguous volume scaling per-box sidecar.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L1215-L1234)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L1225-L1244)
 
 ## particula.particles.exhaustion._validate_particle_schema
 
@@ -853,7 +863,7 @@ def _validate_particle_schema(particles: object) -> ParticleData
 
 Validate resampling's exact writable CPU particle storage schema.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L534-L581)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L535-L582)
 
 ## particula.particles.exhaustion._validate_remap_diagnostics
 
@@ -865,7 +875,7 @@ def _validate_remap_diagnostics(source: _CachedBoxState, replacement_masses: NDA
 
 Check exact inventories and bounded scalar resampling diagnostics.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L775-L818)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L776-L819)
 
 ## particula.particles.exhaustion._validate_resampling_bounds
 
@@ -878,7 +888,7 @@ def _validate_resampling_bounds(radius_cubed_relative_error: object, mean_radius
 Validate and detach resampling diagnostic bounds before particle
 inspection.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L509-L531)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L510-L532)
 
 ## particula.particles.exhaustion._validate_resampling_plan
 
@@ -890,7 +900,7 @@ def _validate_resampling_plan(plan: object, particles: ParticleData) -> _Resampl
 
 Validate detached remaps before the apply boundary writes anything.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L1038-L1132)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L1048-L1142)
 
 ## particula.particles.exhaustion._validate_sidecar_schema
 
@@ -902,7 +912,7 @@ def _validate_sidecar_schema(inputs: ExhaustionInputs) -> None
 
 Validate sidecar array types, dtypes, and ranks without coercion.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L220-L238)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L221-L239)
 
 ## particula.particles.exhaustion._validate_sidecar_shapes
 
@@ -914,7 +924,7 @@ def _validate_sidecar_shapes(inputs: ExhaustionInputs) -> tuple[int, int]
 
 Validate cross-box sidecar shapes and return box and particle counts.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L241-L252)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L242-L253)
 
 ## particula.particles.exhaustion._validate_sidecars
 
@@ -926,7 +936,7 @@ def _validate_sidecars(inputs: ExhaustionInputs, *, allow_oversized_requests: bo
 
 Validate all sidecars without coercion, sorting, copying, or mutation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L300-L314)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L301-L315)
 
 ## particula.particles.exhaustion.apply_representative_volume_scaling
 
@@ -970,7 +980,7 @@ dtype.
 - `ValueError` — If schemas, physical values, factor bounds, or selected
 scaled-volume bounds are invalid. Rejection is atomic.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L1257-L1390)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L1267-L1400)
 
 ## particula.particles.exhaustion.apply_resampling
 
@@ -1003,7 +1013,7 @@ type or dtype.
 - `ValueError` — If the target state or plan is invalid, or the plan no
 longer exactly covers the active slots in a resampling box.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L1135-L1212)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L1145-L1222)
 
 ## particula.particles.exhaustion.get_weighted_inventory
 
@@ -1034,7 +1044,7 @@ array storage.
 
 - `ValueError` — If converted inputs have invalid shape or physical values.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L402-L497)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L403-L498)
 
 ## particula.particles.exhaustion.plan_resampling
 
@@ -1075,7 +1085,7 @@ an unsupported type or dtype.
 are invalid,
 resampling is infeasible, or a diagnostic exceeds its bound.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L967-L1035)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L977-L1045)
 
 ## particula.particles.exhaustion.resolve_exhaustion
 
@@ -1108,4 +1118,4 @@ deferred and therefore have empty release indices and a ``nan`` scale.
 - `ValueError` — If sidecars are invalid or no enabled policy can represent
 exhausted capacity.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L317-L399)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/exhaustion.py#L318-L400)

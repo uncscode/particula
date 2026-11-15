@@ -53,7 +53,7 @@ particle-only lanes included. Legacy residuals use the scaled-domain sum.
 - `representative_volume_scale` (`NDArray[np.float64]`) — Applied representative-volume scale, shape ``(n_boxes,)``.
 - `conservation_residual` (`NDArray[np.float64]`) — Final particle-plus-gas scaled-domain mass residual, shape ``(n_boxes, n_species)``.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L511-L605)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L512-L606)
 
 ### particula.dynamics.nucleation.particle_source.FinalizedSourceDiagnostics.activated_slot_count
 
@@ -63,7 +63,7 @@ particle-only lanes included. Legacy residuals use the scaled-domain sum.
 activated_slot_count: NDArray[np.int32]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L565-L565)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L566-L566)
 
 ### particula.dynamics.nucleation.particle_source.FinalizedSourceDiagnostics.conservation_residual
 
@@ -73,7 +73,7 @@ activated_slot_count: NDArray[np.int32]
 conservation_residual: NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L569-L569)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L570-L570)
 
 ### particula.dynamics.nucleation.particle_source.FinalizedSourceDiagnostics.event_count_units
 
@@ -83,7 +83,7 @@ conservation_residual: NDArray[np.float64]
 event_count_units: str = 'm^-3'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L570-L570)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L571-L571)
 
 ### particula.dynamics.nucleation.particle_source.FinalizedSourceDiagnostics.exhaustion_policy_code
 
@@ -93,7 +93,7 @@ event_count_units: str = 'm^-3'
 exhaustion_policy_code: NDArray[np.int32]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L567-L567)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L568-L568)
 
 ### particula.dynamics.nucleation.particle_source.FinalizedSourceDiagnostics.gas_admitted_event_count
 
@@ -103,7 +103,7 @@ exhaustion_policy_code: NDArray[np.int32]
 gas_admitted_event_count: NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L557-L557)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L558-L558)
 
 ### particula.dynamics.nucleation.particle_source.FinalizedSourceDiagnostics.gas_limited_event_count
 
@@ -113,7 +113,7 @@ gas_admitted_event_count: NDArray[np.float64]
 gas_limited_event_count: NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L559-L559)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L560-L560)
 
 ### particula.dynamics.nucleation.particle_source.FinalizedSourceDiagnostics.gas_mass_removed
 
@@ -123,7 +123,7 @@ gas_limited_event_count: NDArray[np.float64]
 gas_mass_removed: NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L563-L563)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L564-L564)
 
 ### particula.dynamics.nucleation.particle_source.FinalizedSourceDiagnostics.limiting_species_index
 
@@ -133,7 +133,7 @@ gas_mass_removed: NDArray[np.float64]
 limiting_species_index: NDArray[np.int32]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L562-L562)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L563-L563)
 
 ### particula.dynamics.nucleation.particle_source.FinalizedSourceDiagnostics.potential_event_count
 
@@ -143,7 +143,7 @@ limiting_species_index: NDArray[np.int32]
 potential_event_count: NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L556-L556)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L557-L557)
 
 ### particula.dynamics.nucleation.particle_source.FinalizedSourceDiagnostics.released_slot_count
 
@@ -153,7 +153,7 @@ potential_event_count: NDArray[np.float64]
 released_slot_count: NDArray[np.int32]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L566-L566)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L567-L567)
 
 ### particula.dynamics.nucleation.particle_source.FinalizedSourceDiagnostics.representation_reduction_event_count
 
@@ -163,7 +163,7 @@ released_slot_count: NDArray[np.int32]
 representation_reduction_event_count: NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L560-L560)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L561-L561)
 
 ### particula.dynamics.nucleation.particle_source.FinalizedSourceDiagnostics.representative_volume_scale
 
@@ -173,7 +173,7 @@ representation_reduction_event_count: NDArray[np.float64]
 representative_volume_scale: NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L568-L568)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L569-L569)
 
 ### particula.dynamics.nucleation.particle_source.FinalizedSourceDiagnostics.represented_event_count
 
@@ -183,7 +183,7 @@ representative_volume_scale: NDArray[np.float64]
 represented_event_count: NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L558-L558)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L559-L559)
 
 ### particula.dynamics.nucleation.particle_source.FinalizedSourceDiagnostics.requested_slot_count
 
@@ -193,7 +193,7 @@ represented_event_count: NDArray[np.float64]
 requested_slot_count: NDArray[np.int32]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L564-L564)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L565-L565)
 
 ### particula.dynamics.nucleation.particle_source.FinalizedSourceDiagnostics.residual_event_count
 
@@ -203,7 +203,7 @@ requested_slot_count: NDArray[np.int32]
 residual_event_count: NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L561-L561)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L562-L562)
 
 ### particula.dynamics.nucleation.particle_source.FinalizedSourceDiagnostics.__init__
 
@@ -225,7 +225,7 @@ def __post_init__() -> None
 
 Defensively own all finalized diagnostic arrays.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L572-L605)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L573-L606)
 
 ## particula.dynamics.nucleation.particle_source.ParticleSourceCommitConfig
 
@@ -258,7 +258,7 @@ match the exhaustion-policy boundary.
 - `surface_relative_error` (`float`) — Permitted resampling relative error for surface area.
 - `diversity_absolute_error` (`float`) — Permitted resampling absolute diversity error.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L429-L508)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L430-L509)
 
 ### particula.dynamics.nucleation.particle_source.ParticleSourceCommitConfig.diversity_absolute_error
 
@@ -268,7 +268,7 @@ match the exhaustion-policy boundary.
 diversity_absolute_error: float = 1.0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L471-L471)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L472-L472)
 
 ### particula.dynamics.nucleation.particle_source.ParticleSourceCommitConfig.exhaustion_controls
 
@@ -278,7 +278,7 @@ diversity_absolute_error: float = 1.0
 exhaustion_controls: ExhaustionControls
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L464-L464)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L465-L465)
 
 ### particula.dynamics.nucleation.particle_source.ParticleSourceCommitConfig.maximum_slot_weight
 
@@ -288,7 +288,7 @@ exhaustion_controls: ExhaustionControls
 maximum_slot_weight: float
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L462-L462)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L463-L463)
 
 ### particula.dynamics.nucleation.particle_source.ParticleSourceCommitConfig.mean_radius_relative_error
 
@@ -298,7 +298,7 @@ maximum_slot_weight: float
 mean_radius_relative_error: float = 1.0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L469-L469)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L470-L470)
 
 ### particula.dynamics.nucleation.particle_source.ParticleSourceCommitConfig.minimum_scale
 
@@ -308,7 +308,7 @@ mean_radius_relative_error: float = 1.0
 minimum_scale: NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L466-L466)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L467-L467)
 
 ### particula.dynamics.nucleation.particle_source.ParticleSourceCommitConfig.minimum_volume
 
@@ -318,7 +318,7 @@ minimum_scale: NDArray[np.float64]
 minimum_volume: NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L467-L467)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L468-L468)
 
 ### particula.dynamics.nucleation.particle_source.ParticleSourceCommitConfig.radius_cubed_relative_error
 
@@ -328,7 +328,7 @@ minimum_volume: NDArray[np.float64]
 radius_cubed_relative_error: float = 1.0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L468-L468)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L469-L469)
 
 ### particula.dynamics.nucleation.particle_source.ParticleSourceCommitConfig.requested_scale
 
@@ -338,7 +338,7 @@ radius_cubed_relative_error: float = 1.0
 requested_scale: NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L465-L465)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L466-L466)
 
 ### particula.dynamics.nucleation.particle_source.ParticleSourceCommitConfig.source_charge
 
@@ -348,7 +348,7 @@ requested_scale: NDArray[np.float64]
 source_charge: float
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L463-L463)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L464-L464)
 
 ### particula.dynamics.nucleation.particle_source.ParticleSourceCommitConfig.species_map
 
@@ -358,7 +358,7 @@ source_charge: float
 species_map: NucleationSpeciesMap | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L472-L472)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L473-L473)
 
 ### particula.dynamics.nucleation.particle_source.ParticleSourceCommitConfig.surface_relative_error
 
@@ -368,7 +368,7 @@ species_map: NucleationSpeciesMap | None = None
 surface_relative_error: float = 1.0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L470-L470)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L471-L471)
 
 ### particula.dynamics.nucleation.particle_source.ParticleSourceCommitConfig.__init__
 
@@ -391,7 +391,7 @@ def __post_init__() -> None
 Validate scalar controls and defensively own public construction
 inputs.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L474-L508)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L475-L509)
 
 ## particula.dynamics.nucleation.particle_source.PotentialEventData
 
@@ -408,7 +408,7 @@ Potential particle-formation rate and source duration.
 - `potential_rate` (`NDArray[np.float64]`) — Survival-adjusted event rate [#/m³/s] with shape ``(n_boxes,)``. The record owns a fresh read-only float64 copy.
 - `duration` (`float`) — Finite nonnegative source duration [s].
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L121-L160)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L122-L161)
 
 ### particula.dynamics.nucleation.particle_source.PotentialEventData.duration
 
@@ -418,7 +418,7 @@ Potential particle-formation rate and source duration.
 duration: float
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L132-L132)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L133-L133)
 
 ### particula.dynamics.nucleation.particle_source.PotentialEventData.potential_rate
 
@@ -428,7 +428,7 @@ duration: float
 potential_rate: NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L131-L131)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L132-L132)
 
 ### particula.dynamics.nucleation.particle_source.PotentialEventData.__init__
 
@@ -450,7 +450,7 @@ def __post_init__() -> None
 
 Validate and defensively own the potential-source inputs.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L134-L160)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L135-L161)
 
 ## particula.dynamics.nucleation.particle_source.SourceDemandData
 
@@ -468,7 +468,7 @@ Immutable demand planning gas mass demand for one common event count per
 - `per_event_mass` (`NDArray[np.float64]`) — Species mass per formed event [kg/event] with shape ``(n_species,)``. The record owns a fresh read-only float64 copy.
 - `gas_mass_removed` (`NDArray[np.float64]`) — Provisional gas demand [kg/m³], shape ``(n_boxes, n_species)``. The record owns a fresh read-only float64 copy. Demand planning does not apply this demand to gas.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L163-L195)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L164-L196)
 
 ### particula.dynamics.nucleation.particle_source.SourceDemandData.gas_mass_removed
 
@@ -478,7 +478,7 @@ Immutable demand planning gas mass demand for one common event count per
 gas_mass_removed: NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L177-L177)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L178-L178)
 
 ### particula.dynamics.nucleation.particle_source.SourceDemandData.per_event_mass
 
@@ -488,7 +488,7 @@ gas_mass_removed: NDArray[np.float64]
 per_event_mass: NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L176-L176)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L177-L177)
 
 ### particula.dynamics.nucleation.particle_source.SourceDemandData.__init__
 
@@ -510,7 +510,7 @@ def __post_init__() -> None
 
 Defensively own immutable float64 output payloads.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L179-L195)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L180-L196)
 
 ## particula.dynamics.nucleation.particle_source.SourceDiagnostics
 
@@ -533,7 +533,7 @@ zero-potential and zero-admitted rows.
 - `gas_limited_event_count` (`NDArray[np.float64]`) — Potential events not admitted by gas [#/m³] with shape ``(n_boxes,)``.
 - `limiting_species_index` (`NDArray[np.int32]`) — Participating gas species that limits each box, with shape ``(n_boxes,)`` and ``-1`` as the no-limiting sentinel.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L198-L234)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L199-L235)
 
 ### particula.dynamics.nucleation.particle_source.SourceDiagnostics.gas_admitted_event_count
 
@@ -543,7 +543,7 @@ zero-potential and zero-admitted rows.
 gas_admitted_event_count: NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L218-L218)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L219-L219)
 
 ### particula.dynamics.nucleation.particle_source.SourceDiagnostics.gas_limited_event_count
 
@@ -553,7 +553,7 @@ gas_admitted_event_count: NDArray[np.float64]
 gas_limited_event_count: NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L219-L219)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L220-L220)
 
 ### particula.dynamics.nucleation.particle_source.SourceDiagnostics.limiting_species_index
 
@@ -563,7 +563,7 @@ gas_limited_event_count: NDArray[np.float64]
 limiting_species_index: NDArray[np.int32]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L220-L220)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L221-L221)
 
 ### particula.dynamics.nucleation.particle_source.SourceDiagnostics.potential_event_count
 
@@ -573,7 +573,7 @@ limiting_species_index: NDArray[np.int32]
 potential_event_count: NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L217-L217)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L218-L218)
 
 ### particula.dynamics.nucleation.particle_source.SourceDiagnostics.__init__
 
@@ -595,7 +595,7 @@ def __post_init__() -> None
 
 Defensively own immutable output payloads.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L222-L234)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L223-L235)
 
 ## particula.dynamics.nucleation.particle_source._is_real_scalar
 
@@ -607,7 +607,7 @@ def _is_real_scalar(value: object) -> bool
 
 Return whether a value is a non-Boolean real scalar.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L112-L118)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L113-L119)
 
 ## particula.dynamics.nucleation.particle_source._readonly_copy
 
@@ -638,7 +638,7 @@ an aliased caller-owned NumPy array.
 - `TypeError` — If the value cannot be converted to the requested dtype.
 - `ValueError` — If the array rank differs from ``ndim``.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L50-L87)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L51-L88)
 
 ## particula.dynamics.nucleation.particle_source._readonly_vector
 
@@ -665,7 +665,7 @@ Copy a rank-one record payload into owned, read-only storage.
 - `TypeError` — If ``values`` cannot be converted to ``dtype``.
 - `ValueError` — If ``values`` is not rank one.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L90-L109)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L91-L110)
 
 ## particula.dynamics.nucleation.particle_source._request_counts
 
@@ -696,7 +696,7 @@ slots; zero count requests zero slots.
 - `ValueError` — If the derived request count is nonfinite, negative, or
 exceeds fixed particle capacity when ``enforce_capacity`` is true.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L858-L900)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L859-L901)
 
 ## particula.dynamics.nucleation.particle_source._validate_commit_inputs
 
@@ -734,7 +734,7 @@ boundary if validation fails.
 - `ValueError` — If records, schemas, aliasing, physical values, or scaling
 controls violate the source transaction transaction boundary.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L679-L855)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L680-L856)
 
 ## particula.dynamics.nucleation.particle_source._validate_commit_particle_schema
 
@@ -761,7 +761,7 @@ Validate writable, physically valid, non-overlapping source transaction
 - `ValueError` — If field schemas, mutability, aliasing, or physical values
 violate the source transaction transaction boundary.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L608-L676)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L609-L677)
 
 ## particula.dynamics.nucleation.particle_source._validate_gas
 
@@ -788,7 +788,7 @@ Validate gas schema and physical inventory inputs without mutation.
 
 - `ValueError` — If gas schemas, dtypes, or physical values are invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L237-L291)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L238-L292)
 
 ## particula.dynamics.nucleation.particle_source._weighted_particle_mass
 
@@ -809,14 +809,14 @@ Calculate per-box, per-species concentration-weighted particle mass.
 - (`NDArray[np.float64]`) — Particle mass concentration [kg/m³] with shape
 - (`NDArray[np.float64]`) — ``(n_boxes, n_species)``.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L903-L920)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L904-L921)
 
 ## particula.dynamics.nucleation.particle_source.commit_particle_source
 
 *function*
 
 ```python
-def commit_particle_source(demand: SourceDemandData, diagnostics: SourceDiagnostics, particles: ParticleData, gas: GasData, config: ParticleSourceCommitConfig) -> FinalizedSourceDiagnostics
+def commit_particle_source(demand: SourceDemandData, diagnostics: SourceDiagnostics, particles: ParticleData, gas: GasData, config: ParticleSourceCommitConfig, *, extension_fields: ExtensionFields | None = None) -> FinalizedSourceDiagnostics
 ```
 
 Commit a gas-admitted source into staged fixed-capacity particle storage.
@@ -842,6 +842,7 @@ own read-only arrays. Only caller ``masses``, ``concentration``, ``charge``,
 - `particles` (`ParticleData`) — Writable fixed-capacity particle data.
 - `gas` (`GasData`) — Writable gas concentration inventory.
 - `config` (`ParticleSourceCommitConfig`) — Immutable capacity, resampling, and public construction scaling controls.
+- `extension_fields` (`ExtensionFields | None`) (default: `None`) — Optional registered state staged and committed with the native source; particle births use descriptor defaults.
 
 **Returns**
 
@@ -855,7 +856,7 @@ own read-only arrays. Only caller ``masses``, ``concentration``, ``charge``,
 capacity policy,
 scaling, activation, gas inventory, or conservation are invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L923-L1181)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L924-L1223)
 
 ## particula.dynamics.nucleation.particle_source.finalize_particle_source
 
@@ -890,4 +891,4 @@ mutates inputs or ``gas`` nor accesses particle slots or exhaustion state.
 - `ValueError` — If schemas, physical values, or derived quantities are
 invalid or cannot be made inventory-safe after four ULP corrections.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L294-L426)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/nucleation/particle_source.py#L295-L427)

@@ -20,7 +20,17 @@ Array mutation remains caller-owned. Processes must revalidate their
 physical and chemical requirements. Construction never transfers data or
 rebinds prepared execution state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L9-L120)
+[View source](https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L10-L142)
+
+### particula.aerosol.Aerosol._fields
+
+*attribute* · *instance attribute*
+
+```python
+_fields = fields
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L39-L39)
 
 ### particula.aerosol.Aerosol.environment
 
@@ -32,7 +42,19 @@ environment: EnvironmentData
 
 Return the held environment container by identity.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L64-L66)
+[View source](https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L76-L78)
+
+### particula.aerosol.Aerosol.fields
+
+*property*
+
+```python
+fields: ExtensionFields
+```
+
+Return registered persistent extension storage by identity.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L45-L49)
 
 ### particula.aerosol.Aerosol.gas
 
@@ -44,7 +66,7 @@ gas: GasData
 
 Return the held full gas container by identity.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L52-L54)
+[View source](https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L64-L66)
 
 ### particula.aerosol.Aerosol.particles
 
@@ -56,14 +78,14 @@ particles: ParticleData
 
 Return the held particle container by identity.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L40-L42)
+[View source](https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L52-L54)
 
 ### particula.aerosol.Aerosol.__init__
 
 *method*
 
 ```python
-def __init__(particles: ParticleData, gas: GasData, environment: EnvironmentData) -> None
+def __init__(particles: ParticleData, gas: GasData, environment: EnvironmentData, fields: ExtensionFields | None = None) -> None
 ```
 
 Validate the complete triple before retaining supplied identities.
@@ -79,7 +101,7 @@ Validate the complete triple before retaining supplied identities.
 - `TypeError` — If a container has the wrong type.
 - `ValueError` — If structure or particle representation is invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L17-L37)
+[View source](https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L18-L42)
 
 ### particula.aerosol.Aerosol.__str__
 
@@ -91,7 +113,7 @@ def __str__() -> str
 
 Summarize the current three containers.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L118-L120)
+[View source](https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L140-L142)
 
 ### particula.aerosol.Aerosol._replace_data
 
@@ -103,7 +125,7 @@ def _replace_data(particles: ParticleData, gas: GasData, environment: Environmen
 
 Validate candidates before publishing their references.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L102-L116)
+[View source](https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L114-L138)
 
 ### particula.aerosol.Aerosol.replace_data
 
@@ -131,4 +153,4 @@ replacements revalidate current data. Success selects supplied state;
 it neither conserves/rescales inventory nor rebinds GPU resources.
 This is validation atomicity, not a concurrent-access guarantee.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L75-L100)
+[View source](https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L87-L112)

@@ -21,7 +21,7 @@ class _OwnedGraph
 
 Keep native storage private and pinned until its stream has drained.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_capture.py#L74-L107)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_capture.py#L78-L111)
 
 ### particula.execution.prepared_capture._OwnedGraph.arrays
 
@@ -31,7 +31,7 @@ Keep native storage private and pinned until its stream has drained.
 arrays: tuple[Any, ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_capture.py#L81-L81)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_capture.py#L85-L85)
 
 ### particula.execution.prepared_capture._OwnedGraph.graph
 
@@ -41,7 +41,7 @@ arrays: tuple[Any, ...]
 graph: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_capture.py#L79-L79)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_capture.py#L83-L83)
 
 ### particula.execution.prepared_capture._OwnedGraph.identities
 
@@ -51,7 +51,7 @@ graph: Any
 identities: tuple[Any, ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_capture.py#L80-L80)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_capture.py#L84-L84)
 
 ### particula.execution.prepared_capture._OwnedGraph.owner
 
@@ -61,7 +61,7 @@ identities: tuple[Any, ...]
 owner: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_capture.py#L78-L78)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_capture.py#L82-L82)
 
 ### particula.execution.prepared_capture._OwnedGraph.valid
 
@@ -71,7 +71,7 @@ owner: Any
 valid: bool = True
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_capture.py#L82-L82)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_capture.py#L86-L86)
 
 ### particula.execution.prepared_capture._OwnedGraph.__init__
 
@@ -93,7 +93,7 @@ def invalidate()
 
 Revoke replay without releasing storage used by queued work.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_capture.py#L84-L86)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_capture.py#L88-L90)
 
 ### particula.execution.prepared_capture._OwnedGraph.validate
 
@@ -105,7 +105,7 @@ def validate(owner)
 
 Reject stale bindings before graph launch or random draws.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_capture.py#L88-L107)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_capture.py#L92-L111)
 
 ## particula.execution.prepared_capture._admit_capture
 
@@ -117,7 +117,7 @@ def _admit_capture(owner)
 
 Check supported target, binding and stream before capture work.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_capture.py#L110-L121)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_capture.py#L114-L137)
 
 ## particula.execution.prepared_capture._signature
 
@@ -129,7 +129,7 @@ def _signature(owner)
 
 Retain identities and array descriptors without reading device values.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_capture.py#L13-L71)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_capture.py#L13-L75)
 
 ## particula.execution.prepared_capture.capture
 
@@ -141,7 +141,7 @@ def capture(owner)
 
 Capture launches only; recording performs no step or scientific write.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_capture.py#L124-L162)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_capture.py#L140-L178)
 
 ## particula.execution.prepared_capture.replay
 
@@ -153,4 +153,4 @@ def replay(owner)
 
 Launch only this owner's issued graph inside its single step token.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_capture.py#L165-L175)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_capture.py#L181-L191)

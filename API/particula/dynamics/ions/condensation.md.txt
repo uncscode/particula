@@ -115,7 +115,21 @@ combined_process = process1 | process2
 final_aerosol = combined_process.execute(aerosol, time_step=1.0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L246-L267)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L262-L283)
+
+### particula.dynamics.ions.condensation.IonCondensationExclusion._advance_box
+
+*method*
+
+```python
+def _advance_box(aerosol, time_step)
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Dispatch one staged interval through the native extension seam.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L171-L173)
 
 ### particula.dynamics.ions.condensation.IonCondensationExclusion._box_worker
 
@@ -129,7 +143,7 @@ Inherited from: `particula.runnable.RunnableABC`
 
 Create isolated hook state for a single box.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L156-L158)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L159-L161)
 
 ### particula.dynamics.ions.condensation.IonCondensationExclusion._execute_box
 
@@ -143,7 +157,7 @@ Inherited from: `particula.runnable.RunnableABC`
 
 Execute the single-box numerical building block.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L168-L170)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L175-L177)
 
 ### particula.dynamics.ions.condensation.IonCondensationExclusion._is_stochastic
 
@@ -157,7 +171,7 @@ Inherited from: `particula.runnable.RunnableABC`
 
 Report whether this process requires independent box streams.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L152-L154)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L155-L157)
 
 ### particula.dynamics.ions.condensation.IonCondensationExclusion._prepare_commit
 
@@ -171,7 +185,7 @@ Inherited from: `particula.runnable.RunnableABC`
 
 Prepare a non-failing diagnostics publisher before numeric writes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L160-L162)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L163-L165)
 
 ### particula.dynamics.ions.condensation.IonCondensationExclusion._rate_box
 
@@ -185,7 +199,7 @@ Inherited from: `particula.runnable.RunnableABC`
 
 Evaluate the single-box numerical building block.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L164-L166)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L167-L169)
 
 ### particula.dynamics.ions.condensation.IonCondensationExclusion._writer_fields
 
@@ -199,14 +213,14 @@ Inherited from: `particula.runnable.RunnableABC`
 
 Declare numeric destinations for transactional publication.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L148-L150)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L151-L153)
 
 ### particula.dynamics.ions.condensation.IonCondensationExclusion.prepare
 
 *method*
 
 ```python
-def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None) -> PreparedSimulation
+def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, time: float = 0.0) -> PreparedSimulation
 ```
 
 Inherited from: `particula.runnable.RunnableABC`
@@ -221,6 +235,8 @@ Upload native state once and prepare supported resident GPU physics.
 - `device` (`str`) (default: `'cuda:0'`) — Explicit Warp device, default CUDA device zero.
 - `root_seed` (`int`) (default: `0`) — Root seed for persistent independent process/box streams.
 - `logical_box_ids` (default: `None`) — Optional stable identities in physical box order.
+- `process_registry` (default: `None`) — Exact-type custom GPU adapter registrations.
+- `time` (`float`) (default: `0.0`) — Absolute initial simulation time [s].
 
 **Returns**
 
@@ -232,7 +248,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `ValueError` — If process physics or state cannot be represented.
 - `RuntimeError` — If the requested runtime/device is unavailable.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L172-L211)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L179-L224)
 
 ### particula.dynamics.ions.condensation.IonCondensationExclusion.rate
 
@@ -253,7 +269,7 @@ Evaluate detached box hooks and retain a leading box axis.
 *method*
 
 ```python
-def resume(checkpoint: SimulationCheckpoint, *, backend: Backend | None = None, device: str | None = None) -> PreparedSimulation
+def resume(checkpoint: SimulationCheckpoint, *, backend: Backend | None = None, device: str | None = None, process_registry=None) -> PreparedSimulation
 ```
 
 Inherited from: `particula.runnable.RunnableABC`
@@ -265,6 +281,7 @@ Resume exact saved state using the same process configuration.
 - `checkpoint` (`SimulationCheckpoint`) — SimulationCheckpoint from a prepared owner.
 - `backend` (`Backend | None`) (default: `None`) — Backend.WARP by default.
 - `device` (`str | None`) (default: `None`) — Exact checkpoint device by default; migration rejects.
+- `process_registry` (default: `None`) — Compatible caller-supplied GPU implementations.
 
 **Returns**
 
@@ -277,4 +294,4 @@ Resume exact saved state using the same process configuration.
 current population cannot be admitted (e.g. unequal Brownian
 counts after a later process injected new particles).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L213-L244)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L226-L260)

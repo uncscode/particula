@@ -317,7 +317,7 @@ transfer, synchronization, lookup, rebinding, or recovery. This private
 record is concrete-module-only. Rejection before scaling is pre-writer;
 rollback is not promised after a scaling writer launches.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1050-L1078)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1063-L1091)
 
 ### particula.gpu.kernels.exhaustion._PreparedRepresentativeVolumeScalingCall.charge
 
@@ -327,7 +327,7 @@ rollback is not promised after a scaling writer launches.
 charge: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1065-L1065)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1078-L1078)
 
 ### particula.gpu.kernels.exhaustion._PreparedRepresentativeVolumeScalingCall.concentration
 
@@ -337,7 +337,7 @@ charge: Any
 concentration: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1064-L1064)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1077-L1077)
 
 ### particula.gpu.kernels.exhaustion._PreparedRepresentativeVolumeScalingCall.density
 
@@ -347,7 +347,7 @@ concentration: Any
 density: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1066-L1066)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1079-L1079)
 
 ### particula.gpu.kernels.exhaustion._PreparedRepresentativeVolumeScalingCall.device
 
@@ -357,7 +357,7 @@ density: Any
 device: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1075-L1075)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1088-L1088)
 
 ### particula.gpu.kernels.exhaustion._PreparedRepresentativeVolumeScalingCall.dimensions
 
@@ -367,7 +367,7 @@ device: Any
 dimensions: tuple[int, int, int]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1074-L1074)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1087-L1087)
 
 ### particula.gpu.kernels.exhaustion._PreparedRepresentativeVolumeScalingCall.masses
 
@@ -377,7 +377,7 @@ dimensions: tuple[int, int, int]
 masses: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1063-L1063)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1076-L1076)
 
 ### particula.gpu.kernels.exhaustion._PreparedRepresentativeVolumeScalingCall.minimum_scale
 
@@ -387,7 +387,7 @@ masses: Any
 minimum_scale: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1071-L1071)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1084-L1084)
 
 ### particula.gpu.kernels.exhaustion._PreparedRepresentativeVolumeScalingCall.minimum_volume
 
@@ -397,7 +397,7 @@ minimum_scale: Any
 minimum_volume: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1072-L1072)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1085-L1085)
 
 ### particula.gpu.kernels.exhaustion._PreparedRepresentativeVolumeScalingCall.provisional_source_demand
 
@@ -407,7 +407,7 @@ minimum_volume: Any
 provisional_source_demand: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1068-L1068)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1081-L1081)
 
 ### particula.gpu.kernels.exhaustion._PreparedRepresentativeVolumeScalingCall.requested_scale
 
@@ -417,7 +417,7 @@ provisional_source_demand: Any
 requested_scale: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1070-L1070)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1083-L1083)
 
 ### particula.gpu.kernels.exhaustion._PreparedRepresentativeVolumeScalingCall.resolved_scale
 
@@ -427,7 +427,7 @@ requested_scale: Any
 resolved_scale: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1073-L1073)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1086-L1086)
 
 ### particula.gpu.kernels.exhaustion._PreparedRepresentativeVolumeScalingCall.result
 
@@ -437,7 +437,7 @@ resolved_scale: Any
 result: tuple[Any, Any, Any]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1062-L1062)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1075-L1075)
 
 ### particula.gpu.kernels.exhaustion._PreparedRepresentativeVolumeScalingCall.scaling_required
 
@@ -447,7 +447,7 @@ result: tuple[Any, Any, Any]
 scaling_required: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1069-L1069)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1082-L1082)
 
 ### particula.gpu.kernels.exhaustion._PreparedRepresentativeVolumeScalingCall.selected
 
@@ -457,7 +457,7 @@ scaling_required: Any
 selected: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1077-L1077)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1090-L1090)
 
 ### particula.gpu.kernels.exhaustion._PreparedRepresentativeVolumeScalingCall.status
 
@@ -467,7 +467,7 @@ selected: Any
 status: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1076-L1076)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1089-L1089)
 
 ### particula.gpu.kernels.exhaustion._PreparedRepresentativeVolumeScalingCall.upstream_invalid
 
@@ -477,7 +477,7 @@ status: Any
 upstream_invalid: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1078-L1078)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1091-L1091)
 
 ### particula.gpu.kernels.exhaustion._PreparedRepresentativeVolumeScalingCall.volume
 
@@ -487,7 +487,7 @@ upstream_invalid: Any
 volume: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1067-L1067)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1080-L1080)
 
 ### particula.gpu.kernels.exhaustion._PreparedRepresentativeVolumeScalingCall.__init__
 
@@ -516,7 +516,7 @@ transfer, synchronization, lookup, rebinding, or recovery. This private
 record is concrete-module-only. Rejection before commit is pre-writer;
 rollback is not promised after a commit writer launches.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1022-L1047)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1034-L1060)
 
 ### particula.gpu.kernels.exhaustion._PreparedResamplingCall.bounds
 
@@ -526,7 +526,7 @@ rollback is not promised after a commit writer launches.
 bounds: tuple[float, float, float, float]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1042-L1042)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1054-L1054)
 
 ### particula.gpu.kernels.exhaustion._PreparedResamplingCall.buffer_arrays
 
@@ -536,7 +536,7 @@ bounds: tuple[float, float, float, float]
 buffer_arrays: tuple[Any, ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1041-L1041)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1053-L1053)
 
 ### particula.gpu.kernels.exhaustion._PreparedResamplingCall.charge
 
@@ -546,7 +546,7 @@ buffer_arrays: tuple[Any, ...]
 charge: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1037-L1037)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1049-L1049)
 
 ### particula.gpu.kernels.exhaustion._PreparedResamplingCall.concentration
 
@@ -556,7 +556,7 @@ charge: Any
 concentration: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1036-L1036)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1048-L1048)
 
 ### particula.gpu.kernels.exhaustion._PreparedResamplingCall.density
 
@@ -566,7 +566,7 @@ concentration: Any
 density: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1038-L1038)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1050-L1050)
 
 ### particula.gpu.kernels.exhaustion._PreparedResamplingCall.device
 
@@ -576,7 +576,7 @@ density: Any
 device: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1044-L1044)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1056-L1056)
 
 ### particula.gpu.kernels.exhaustion._PreparedResamplingCall.dimensions
 
@@ -586,7 +586,7 @@ device: Any
 dimensions: tuple[int, int, int]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1043-L1043)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1055-L1055)
 
 ### particula.gpu.kernels.exhaustion._PreparedResamplingCall.invalid
 
@@ -596,7 +596,7 @@ dimensions: tuple[int, int, int]
 invalid: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1045-L1045)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1057-L1057)
 
 ### particula.gpu.kernels.exhaustion._PreparedResamplingCall.masses
 
@@ -606,7 +606,7 @@ invalid: Any
 masses: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1035-L1035)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1047-L1047)
 
 ### particula.gpu.kernels.exhaustion._PreparedResamplingCall.planning_failed
 
@@ -616,7 +616,7 @@ masses: Any
 planning_failed: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1046-L1046)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1058-L1058)
 
 ### particula.gpu.kernels.exhaustion._PreparedResamplingCall.required_release_counts
 
@@ -626,7 +626,7 @@ planning_failed: Any
 required_release_counts: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1040-L1040)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1052-L1052)
 
 ### particula.gpu.kernels.exhaustion._PreparedResamplingCall.result
 
@@ -636,7 +636,17 @@ required_release_counts: Any
 result: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1034-L1034)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1046-L1046)
+
+### particula.gpu.kernels.exhaustion._PreparedResamplingCall.transport
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+transport: tuple[Any, ...] | None = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1060-L1060)
 
 ### particula.gpu.kernels.exhaustion._PreparedResamplingCall.upstream_invalid
 
@@ -646,7 +656,7 @@ result: Any
 upstream_invalid: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1047-L1047)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1059-L1059)
 
 ### particula.gpu.kernels.exhaustion._PreparedResamplingCall.volume
 
@@ -656,14 +666,14 @@ upstream_invalid: Any
 volume: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1039-L1039)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1051-L1051)
 
 ### particula.gpu.kernels.exhaustion._PreparedResamplingCall.__init__
 
 *method*
 
 ```python
-def __init__(result: Any, masses: Any, concentration: Any, charge: Any, density: Any, volume: Any, required_release_counts: Any, buffer_arrays: tuple[Any, ...], bounds: tuple[float, float, float, float], dimensions: tuple[int, int, int], device: Any, invalid: Any, planning_failed: Any, upstream_invalid: Any) -> None
+def __init__(result: Any, masses: Any, concentration: Any, charge: Any, density: Any, volume: Any, required_release_counts: Any, buffer_arrays: tuple[Any, ...], bounds: tuple[float, float, float, float], dimensions: tuple[int, int, int], device: Any, invalid: Any, planning_failed: Any, upstream_invalid: Any, transport: tuple[Any, ...] | None = None) -> None
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L0-L0)
@@ -678,7 +688,7 @@ def _aggregate_planning_status(counts: wp.array(dtype=wp.int32), status: wp.arra
 
 Record whether any nonzero-demand box failed planning.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L736-L752)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L748-L764)
 
 ## particula.gpu.kernels.exhaustion._apply_representative_volume_scaling
 
@@ -690,7 +700,7 @@ def _apply_representative_volume_scaling(concentration: wp.array2d(dtype=wp.floa
 
 Scale only selected volume, concentration, and demand storage.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L876-L893)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L888-L905)
 
 ## particula.gpu.kernels.exhaustion._commit_resampling
 
@@ -702,7 +712,7 @@ def _commit_resampling(masses: wp.array3d(dtype=wp.float64), concentration: wp.a
 
 Commit all successful box plans in one fixed-shape launch.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L693-L733)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L705-L745)
 
 ## particula.gpu.kernels.exhaustion._enqueue_prepared_representative_volume_scaling_call
 
@@ -717,7 +727,7 @@ Enqueue one fixed scaling sequence using only pinned arrays.
 This phase performs no allocation, host readback, synchronization, or
 container lookup. Rollback is not promised after a writer launch.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1535-L1585)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1549-L1599)
 
 ## particula.gpu.kernels.exhaustion._enqueue_prepared_resampling_call
 
@@ -732,7 +742,7 @@ Enqueue one fixed resampling sequence using only pinned arrays.
 This phase performs no allocation, host readback, synchronization, or
 container lookup. A writer launch has the primitive's no-rollback boundary.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1285-L1346)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1298-L1360)
 
 ## particula.gpu.kernels.exhaustion._enqueue_resampling_validation
 
@@ -744,7 +754,7 @@ def _enqueue_resampling_validation(prepared: _PreparedResamplingCall) -> None
 
 Reset and enqueue the complete read-only resampling validation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1099-L1165)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1112-L1178)
 
 ## particula.gpu.kernels.exhaustion._enqueue_scaling_validation
 
@@ -756,7 +766,7 @@ def _enqueue_scaling_validation(prepared: _PreparedRepresentativeVolumeScalingCa
 
 Reset and enqueue complete read-only representative validation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1482-L1532)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1496-L1546)
 
 ## particula.gpu.kernels.exhaustion._field
 
@@ -768,7 +778,7 @@ def _field(container: Any, name: str) -> Any
 
 Return a required particle field with a stable validation error.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L924-L929)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L936-L941)
 
 ## particula.gpu.kernels.exhaustion._lane_read
 
@@ -816,7 +826,7 @@ def _observe_prepared_representative_volume_scaling_call(prepared: _PreparedRepr
 
 Observe scaling status and return the original caller identities.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1588-L1596)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1602-L1610)
 
 ## particula.gpu.kernels.exhaustion._observe_prepared_resampling_call
 
@@ -828,19 +838,19 @@ def _observe_prepared_resampling_call(prepared: _PreparedResamplingCall) -> Any
 
 Observe resampling status and return the original particle carrier.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1349-L1359)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1363-L1373)
 
 ## particula.gpu.kernels.exhaustion._plan_resampling
 
 *function*
 
 ```python
-def _plan_resampling(masses: wp.array3d(dtype=wp.float64), concentration: wp.array2d(dtype=wp.float64), charge: wp.array2d(dtype=wp.float64), density: wp.array(dtype=wp.float64), counts: wp.array(dtype=wp.int32), retained_counts: wp.array(dtype=wp.int32), released_counts: wp.array(dtype=wp.int32), retained_indices: wp.array2d(dtype=wp.int32), released_indices: wp.array2d(dtype=wp.int32), sorted_indices: wp.array2d(dtype=wp.int32), replacement_masses: wp.array3d(dtype=wp.float64), replacement_concentration: wp.array2d(dtype=wp.float64), replacement_charge: wp.array2d(dtype=wp.float64), source_radii: wp.array2d(dtype=wp.float64), radius_error: wp.array(dtype=wp.float64), mean_error: wp.array(dtype=wp.float64), surface_error: wp.array(dtype=wp.float64), diversity_error: wp.array(dtype=wp.float64), status: wp.array(dtype=wp.int32), invalid: wp.array(dtype=wp.int32), upstream_invalid: wp.array(dtype=wp.int32), radius_bound: wp.float64, mean_bound: wp.float64, surface_bound: wp.float64, diversity_bound: wp.float64) -> None
+def _plan_resampling(masses: wp.array3d(dtype=wp.float64), concentration: wp.array2d(dtype=wp.float64), charge: wp.array2d(dtype=wp.float64), density: wp.array(dtype=wp.float64), counts: wp.array(dtype=wp.int32), retained_counts: wp.array(dtype=wp.int32), released_counts: wp.array(dtype=wp.int32), retained_indices: wp.array2d(dtype=wp.int32), released_indices: wp.array2d(dtype=wp.int32), sorted_indices: wp.array2d(dtype=wp.int32), replacement_masses: wp.array3d(dtype=wp.float64), replacement_concentration: wp.array2d(dtype=wp.float64), replacement_charge: wp.array2d(dtype=wp.float64), source_radii: wp.array2d(dtype=wp.float64), radius_error: wp.array(dtype=wp.float64), mean_error: wp.array(dtype=wp.float64), surface_error: wp.array(dtype=wp.float64), diversity_error: wp.array(dtype=wp.float64), status: wp.array(dtype=wp.int32), invalid: wp.array(dtype=wp.int32), upstream_invalid: wp.array(dtype=wp.int32), radius_bound: wp.float64, mean_bound: wp.float64, surface_bound: wp.float64, diversity_bound: wp.float64, transport_counts: wp.array(dtype=wp.int32), transport_targets: wp.array2d(dtype=wp.int32), transport_donors: wp.array2d(dtype=wp.int32), transport_overlaps: wp.array2d(dtype=wp.float64)) -> None
 ```
 
 Plan one box sequentially; output rows remain caller-owned storage.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L378-L690)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L378-L702)
 
 ## particula.gpu.kernels.exhaustion._prepare_representative_volume_scaling_step_gpu
 
@@ -855,7 +865,7 @@ Validate metadata, allocate, and pin one private scaling invocation.
 This private setup phase validates fixed schemas but leaves mutable payload
 validation to enqueue and bounded status observation to the observer.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1388-L1479)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1402-L1493)
 
 ## particula.gpu.kernels.exhaustion._prepare_resampling_step_gpu
 
@@ -871,7 +881,7 @@ This private setup phase validates fixed schemas and controls but does not
 inspect mutable payload values. Enqueue owns device validation and all
 writes; observation is the sole status readback.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1168-L1282)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1181-L1295)
 
 ## particula.gpu.kernels.exhaustion._radius
 
@@ -893,7 +903,7 @@ def _ranges_overlap(left: Any, right: Any) -> bool
 
 Return whether two caller allocations have overlapping byte ranges.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L969-L980)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L981-L992)
 
 ## particula.gpu.kernels.exhaustion._require_contiguous_array
 
@@ -905,7 +915,7 @@ def _require_contiguous_array(value: Any, name: str) -> None
 
 Reject strided Warp views before pointer-range ownership checks.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L954-L966)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L966-L978)
 
 ## particula.gpu.kernels.exhaustion._require_exact_bound
 
@@ -917,7 +927,7 @@ def _require_exact_bound(name: str, value: Any) -> float
 
 Return a finite nonnegative exact Python-float diagnostic bound.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L915-L921)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L927-L933)
 
 ## particula.gpu.kernels.exhaustion._reset_prepared_scaling_status
 
@@ -929,7 +939,7 @@ def _reset_prepared_scaling_status(status: wp.array(dtype=wp.int32)) -> None
 
 Reset the invalid and selected scaling status lanes on device.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L906-L912)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L918-L924)
 
 ## particula.gpu.kernels.exhaustion._reset_prepared_status
 
@@ -941,7 +951,7 @@ def _reset_prepared_status(first: wp.array(dtype=wp.int32), second: wp.array(dty
 
 Reset two preparation-owned scalar status arrays on device.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L896-L903)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L908-L915)
 
 ## particula.gpu.kernels.exhaustion._resolve_representative_volume_selection
 
@@ -953,7 +963,7 @@ def _resolve_representative_volume_selection(demand: wp.array(dtype=wp.float64),
 
 Capture the immutable selected-row predicate before any writes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L837-L855)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L849-L867)
 
 ## particula.gpu.kernels.exhaustion._riemer_diversity_dense
 
@@ -1001,7 +1011,7 @@ def _scan_density_p4(density: wp.array(dtype=wp.float64), status: wp.array(dtype
 
 Validate global density state, including empty particle-box inputs.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L826-L834)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L838-L846)
 
 ## particula.gpu.kernels.exhaustion._scan_particle_values
 
@@ -1025,7 +1035,7 @@ def _scan_representative_volume_scaling(masses: wp.array3d(dtype=wp.float64), co
 
 Check physical and volume scaling sidecars in one read-only scan.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L755-L823)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L767-L835)
 
 ## particula.gpu.kernels.exhaustion._scan_slot_state
 
@@ -1049,7 +1059,7 @@ def _validate_array(value: Any, name: str, rank: int, shape: tuple[int, ...], dt
 
 Validate caller-owned Warp metadata without reading array values.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L932-L951)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L944-L963)
 
 ## particula.gpu.kernels.exhaustion._validate_buffers
 
@@ -1061,7 +1071,7 @@ def _validate_buffers(buffers: ResamplingBuffers, b: int, n: int, s: int, device
 
 Validate buffer metadata and enforce distinct non-aliasing storage.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L983-L1019)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L995-L1031)
 
 ## particula.gpu.kernels.exhaustion._validate_counts
 
@@ -1085,7 +1095,7 @@ def _validate_prepared_upstream(upstream_invalid: Any | None, device: Any) -> An
 
 Return a same-device scalar gate, allocating the standalone gate.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1081-L1096)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1094-L1109)
 
 ## particula.gpu.kernels.exhaustion._write_resolved_representative_scale
 
@@ -1097,7 +1107,7 @@ def _write_resolved_representative_scale(selected: wp.array(dtype=wp.int32), req
 
 Write the volume scaling diagnostic after read-only preflight.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L858-L873)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L870-L885)
 
 ## particula.gpu.kernels.exhaustion.representative_volume_scaling_step_gpu
 
@@ -1109,7 +1119,7 @@ def representative_volume_scaling_step_gpu(particles: Any, provisional_source_de
 
 Scale selected Warp particle-container volumes in place.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1599-L1619)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1613-L1633)
 
 ## particula.gpu.kernels.exhaustion.resampling_step_gpu
 
@@ -1122,4 +1132,4 @@ def resampling_step_gpu(particles: Any, required_release_counts: Any, buffers: R
 Apply deterministic fixed-capacity resampling equal-weight remapping in
 place.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1362-L1385)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/exhaustion.py#L1376-L1399)

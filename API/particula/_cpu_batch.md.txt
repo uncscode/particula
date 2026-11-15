@@ -16,7 +16,7 @@ def arrays(aerosol)
 
 List stored numeric arrays in a stable ownership order.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/_cpu_batch.py#L34-L52)
+[View source](https://github.com/uncscode/particula/blob/main/particula/_cpu_batch.py#L34-L54)
 
 ## particula._cpu_batch.box_view
 
@@ -28,7 +28,7 @@ def box_view(aerosol, box)
 
 Expose one staged box through existing native container types.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/_cpu_batch.py#L111-L138)
+[View source](https://github.com/uncscode/particula/blob/main/particula/_cpu_batch.py#L121-L149)
 
 ## particula._cpu_batch.detached
 
@@ -40,7 +40,7 @@ def detached(aerosol)
 
 Stage independent containers preserving population metadata.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/_cpu_batch.py#L102-L108)
+[View source](https://github.com/uncscode/particula/blob/main/particula/_cpu_batch.py#L111-L118)
 
 ## particula._cpu_batch.duration
 
@@ -64,7 +64,7 @@ def publish(aerosol, candidate, writers)
 
 Publish selected fields by identity with rollback on write failure.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/_cpu_batch.py#L141-L153)
+[View source](https://github.com/uncscode/particula/blob/main/particula/_cpu_batch.py#L152-L164)
 
 ## particula._cpu_batch.validate
 
@@ -76,4 +76,4 @@ def validate(aerosol, writers=())
 
 Validate original storage before detached copies can hide defects.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/_cpu_batch.py#L55-L99)
+[View source](https://github.com/uncscode/particula/blob/main/particula/_cpu_batch.py#L57-L108)

@@ -33,7 +33,7 @@ promised after a writer-capable failure.
 CPUCondensationAdapter = CPUCondensationExecutionAdapter
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L1034-L1034)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L1041-L1041)
 
 ## particula.execution.adapters.condensation.WarpCondensationAdapter
 
@@ -43,7 +43,7 @@ CPUCondensationAdapter = CPUCondensationExecutionAdapter
 WarpCondensationAdapter = WarpCondensationExecutionAdapter
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L1035-L1035)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L1042-L1042)
 
 ## particula.execution.adapters.condensation.CPUCondensationExecutionAdapter
 
@@ -63,7 +63,7 @@ return the original aerosol, and successful results declare state mutation.
 Backend exceptions propagate unchanged. This adapter is concrete-only and
 must be imported from ``particula.execution.adapters.condensation``.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L802-L854)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L802-L861)
 
 ### particula.execution.adapters.condensation.CPUCondensationExecutionAdapter.execute
 
@@ -90,7 +90,7 @@ Execute one exact CPU thermal correction state without fallback or
 - `ValueError` — If controls or the selected profile are invalid, latent
 heat is enabled, or the runnable returns another aerosol.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L814-L854)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L814-L861)
 
 ## particula.execution.adapters.condensation.CPUCondensationExecutionState
 
@@ -399,7 +399,7 @@ This concrete-only adapter is imported from
 ``particula.execution.adapters.condensation``. It forwards the exact
 native kernel tuple without reconstructing it.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L857-L964)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L864-L971)
 
 ### particula.execution.adapters.condensation.WarpCondensationExecutionAdapter.execute
 
@@ -435,7 +435,7 @@ Direct errors propagate unchanged.
 - `ImportError` — If the optional Warp kernel cannot be imported after
 successful preflight.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L933-L964)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L940-L971)
 
 ### particula.execution.adapters.condensation.WarpCondensationExecutionAdapter.prepare
 
@@ -462,7 +462,7 @@ Validate and bind one resident state for repeated device enqueues.
 - `ValueError` — If controls, profile, or selected sidecars are invalid.
 - `ImportError` — If the optional Warp kernel cannot be imported.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L876-L931)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L883-L938)
 
 ## particula.execution.adapters.condensation.WarpCondensationExecutionState
 
@@ -1134,7 +1134,7 @@ Validate semantic-profile sidecars before native kernel resolution.
 - `ValueError` — If a required sidecar is missing or incompatible with the
 selected latent-heat, activity, or surface-tension semantics.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L967-L1030)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L974-L1037)
 
 ## particula.execution.adapters.condensation._validate_time_step
 

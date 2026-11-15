@@ -21,7 +21,7 @@ path.
 __version__ = '0.3.0'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/__init__.py#L58-L58)
+[View source](https://github.com/uncscode/particula/blob/main/particula/__init__.py#L60-L60)
 
 ## particula.logger
 
@@ -31,7 +31,7 @@ __version__ = '0.3.0'
 logger = setup()
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/__init__.py#L61-L61)
+[View source](https://github.com/uncscode/particula/blob/main/particula/__init__.py#L63-L63)
 
 ## particula.__getattr__
 
@@ -43,7 +43,7 @@ def __getattr__(name: str)
 
 Expose prepared simulation types without loading optional runtimes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/__init__.py#L66-L76)
+[View source](https://github.com/uncscode/particula/blob/main/particula/__init__.py#L68-L78)
 
 **Modules**
 
@@ -54,10 +54,13 @@ Expose prepared simulation types without loading optional runtimes.
 - `particula.aerosol`
 - `particula.aerosol_builder`
 - `particula.aerosol_validation`
+- `particula.box_process`
 - `particula.builder_mixin`
+- `particula.cpu_transfer`
 - `particula.dynamics`
 - `particula.equilibria`
 - `particula.execution`
+- `particula.extension_fields`
 - `particula.gas`
 - `particula.gpu`
 - `particula.logger_setup`

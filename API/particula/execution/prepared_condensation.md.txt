@@ -63,12 +63,12 @@ Normalize finite nonnegative scalar/vector metadata without aliasing.
 *function*
 
 ```python
-def compile_condensation(plan: _ProcessPlan, owner: Any)
+def compile_condensation(plan: _ProcessPlan, context: BuiltinPreparationContext)
 ```
 
 Allocate retained thermodynamics, species maps and transport sidecars.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L277-L390)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L277-L392)
 
 ## particula.execution.prepared_condensation.plan_condensation
 

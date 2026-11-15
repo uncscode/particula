@@ -18,11 +18,15 @@ In-memory, exact-device continuation of a prepared simulation.
 
 Canonical resident bytes preserve primary state, acquired sidecars and
 random words. The frozen process plans and timestep identify the compatible
-runnable sequence. Auxiliary bytes preserve last-step latent energy.
+runnable sequence. Schema v2 adds absolute initial time, field descriptors
+and bytes, declared adapter-state bytes, and the device clock. Python
+implementations are supplied again through the registry at restart.
+The explicit v1 reader accepts built-in-only state with a zero time origin.
+Auxiliary bytes preserve last-step latent energy.
 Resident CPU inspection arrays are detached but are not restart authority.
 This is not a portable disk format or a device-migration interface.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L18-L33)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L20-L46)
 
 ### particula.execution.prepared_types.SimulationCheckpoint.auxiliary
 
@@ -32,17 +36,87 @@ This is not a portable disk format or a device-migration interface.
 auxiliary: tuple[CheckpointPayload, ...] = ()
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L33-L33)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L39-L39)
+
+### particula.execution.prepared_types.SimulationCheckpoint.clock
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+clock: CheckpointPayload | None = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L44-L44)
+
+### particula.execution.prepared_types.SimulationCheckpoint.execution_mode
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+execution_mode: str = 'resident'
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L45-L45)
+
+### particula.execution.prepared_types.SimulationCheckpoint.extension_state
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+extension_state: tuple[CheckpointPayload, ...] = ()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L43-L43)
+
+### particula.execution.prepared_types.SimulationCheckpoint.field_payloads
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+field_payloads: tuple[CheckpointPayload, ...] = ()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L42-L42)
+
+### particula.execution.prepared_types.SimulationCheckpoint.field_specs
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+field_specs: tuple[FieldSpec, ...] = ()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L41-L41)
+
+### particula.execution.prepared_types.SimulationCheckpoint.host_rng
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+host_rng: bytes | None = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L46-L46)
+
+### particula.execution.prepared_types.SimulationCheckpoint.initial_time
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+initial_time: float = 0.0
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L40-L40)
 
 ### particula.execution.prepared_types.SimulationCheckpoint.processes
 
 *attribute* · *instance attribute*
 
 ```python
-processes: tuple[_ProcessPlan, ...]
+processes: tuple[_ProcessPlan | GPUProcessPlan, ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L31-L31)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L37-L37)
 
 ### particula.execution.prepared_types.SimulationCheckpoint.resident
 
@@ -52,7 +126,7 @@ processes: tuple[_ProcessPlan, ...]
 resident: ResidentCheckpoint
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L30-L30)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L36-L36)
 
 ### particula.execution.prepared_types.SimulationCheckpoint.schema_version
 
@@ -62,7 +136,7 @@ resident: ResidentCheckpoint
 schema_version: int
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L29-L29)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L35-L35)
 
 ### particula.execution.prepared_types.SimulationCheckpoint.time_step
 
@@ -72,14 +146,14 @@ schema_version: int
 time_step: float
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L32-L32)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L38-L38)
 
 ### particula.execution.prepared_types.SimulationCheckpoint.__init__
 
 *method*
 
 ```python
-def __init__(schema_version: int, resident: ResidentCheckpoint, processes: tuple[_ProcessPlan, ...], time_step: float, auxiliary: tuple[CheckpointPayload, ...] = ()) -> None
+def __init__(schema_version: int, resident: ResidentCheckpoint, processes: tuple[_ProcessPlan | GPUProcessPlan, ...], time_step: float, auxiliary: tuple[CheckpointPayload, ...] = (), initial_time: float = 0.0, field_specs: tuple[FieldSpec, ...] = (), field_payloads: tuple[CheckpointPayload, ...] = (), extension_state: tuple[CheckpointPayload, ...] = (), clock: CheckpointPayload | None = None, execution_mode: str = 'resident', host_rng: bytes | None = None) -> None
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L0-L0)
@@ -101,7 +175,7 @@ includes multiplicity. Latent energy, when configured, is the last step's
 signed per-box/full-gas energy [J]. Temperature is K, pressure Pa,
 and volume m³.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L36-L60)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L49-L73)
 
 ### particula.execution.prepared_types.SimulationDiagnostics.active_slots
 
@@ -111,7 +185,7 @@ and volume m³.
 active_slots: np.ndarray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L51-L51)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L64-L64)
 
 ### particula.execution.prepared_types.SimulationDiagnostics.charge_concentration
 
@@ -121,7 +195,7 @@ active_slots: np.ndarray
 charge_concentration: np.ndarray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L53-L53)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L66-L66)
 
 ### particula.execution.prepared_types.SimulationDiagnostics.completed_steps
 
@@ -131,7 +205,7 @@ charge_concentration: np.ndarray
 completed_steps: int
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L48-L48)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L61-L61)
 
 ### particula.execution.prepared_types.SimulationDiagnostics.gas_concentration
 
@@ -141,7 +215,7 @@ completed_steps: int
 gas_concentration: np.ndarray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L55-L55)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L68-L68)
 
 ### particula.execution.prepared_types.SimulationDiagnostics.gas_names
 
@@ -151,7 +225,7 @@ gas_concentration: np.ndarray
 gas_names: tuple[str, ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L50-L50)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L63-L63)
 
 ### particula.execution.prepared_types.SimulationDiagnostics.latent_heat_energy
 
@@ -161,7 +235,7 @@ gas_names: tuple[str, ...]
 latent_heat_energy: np.ndarray | None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L60-L60)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L73-L73)
 
 ### particula.execution.prepared_types.SimulationDiagnostics.number_concentration
 
@@ -171,7 +245,7 @@ latent_heat_energy: np.ndarray | None
 number_concentration: np.ndarray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L52-L52)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L65-L65)
 
 ### particula.execution.prepared_types.SimulationDiagnostics.particle_mass_concentration
 
@@ -181,7 +255,7 @@ number_concentration: np.ndarray
 particle_mass_concentration: np.ndarray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L54-L54)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L67-L67)
 
 ### particula.execution.prepared_types.SimulationDiagnostics.pressure
 
@@ -191,7 +265,7 @@ particle_mass_concentration: np.ndarray
 pressure: np.ndarray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L57-L57)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L70-L70)
 
 ### particula.execution.prepared_types.SimulationDiagnostics.saturation_ratio
 
@@ -201,7 +275,7 @@ pressure: np.ndarray
 saturation_ratio: np.ndarray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L58-L58)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L71-L71)
 
 ### particula.execution.prepared_types.SimulationDiagnostics.simulated_time
 
@@ -211,7 +285,7 @@ saturation_ratio: np.ndarray
 simulated_time: float
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L49-L49)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L62-L62)
 
 ### particula.execution.prepared_types.SimulationDiagnostics.temperature
 
@@ -221,7 +295,7 @@ simulated_time: float
 temperature: np.ndarray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L56-L56)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L69-L69)
 
 ### particula.execution.prepared_types.SimulationDiagnostics.volume
 
@@ -231,7 +305,7 @@ temperature: np.ndarray
 volume: np.ndarray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L59-L59)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_types.py#L72-L72)
 
 ### particula.execution.prepared_types.SimulationDiagnostics.__init__
 

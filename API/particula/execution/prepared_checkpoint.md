@@ -16,19 +16,19 @@ def _host_state(resident, primary) -> Aerosol
 
 Materialize validation state from canonical bytes, never inspection.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_checkpoint.py#L40-L77)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_checkpoint.py#L58-L95)
 
 ## particula.execution.prepared_checkpoint._preflight
 
 *function*
 
 ```python
-def _preflight(processes, saved, backend, device)
+def _preflight(processes, saved, backend, device, process_registry=None)
 ```
 
 Reject schema/configuration/device drift before any allocation/upload.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_checkpoint.py#L80-L145)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_checkpoint.py#L98-L199)
 
 ## particula.execution.prepared_checkpoint._restore_after_binding
 
@@ -45,7 +45,7 @@ direct adapters initialize shared registry buffers and thermodynamics at
 setup, so restore their exact checkpoint contents after compilation. Keep
 staging alive until the dedicated stream finishes every copy.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_checkpoint.py#L213-L245)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_checkpoint.py#L267-L310)
 
 ## particula.execution.prepared_checkpoint._validate_auxiliary
 
@@ -57,7 +57,7 @@ def _validate_auxiliary(saved, plans)
 
 Validate the optional last-step energy before setup or upload.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_checkpoint.py#L148-L210)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_checkpoint.py#L202-L264)
 
 ## particula.execution.prepared_checkpoint.checkpoint
 
@@ -69,16 +69,16 @@ def checkpoint(owner: Any) -> SimulationCheckpoint
 
 Observe errors before saving canonical bytes and last-step results.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_checkpoint.py#L14-L37)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_checkpoint.py#L14-L55)
 
 ## particula.execution.prepared_checkpoint.resume_simulation
 
 *function*
 
 ```python
-def resume_simulation(processes: tuple[Any, ...], saved: SimulationCheckpoint, *, backend: Backend = Backend.WARP, device: str | None = None)
+def resume_simulation(processes: tuple[Any, ...], saved: SimulationCheckpoint, *, backend: Backend = Backend.WARP, device: str | None = None, process_registry=None)
 ```
 
 Restore owned arrays and counters on the exact checkpoint device.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_checkpoint.py#L248-L277)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_checkpoint.py#L313-L359)

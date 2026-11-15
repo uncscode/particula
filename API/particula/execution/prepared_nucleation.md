@@ -21,12 +21,12 @@ _BOUND_NAMES = ('radius_cubed_relative_error', 'mean_radius_relative_error', 'su
 *function*
 
 ```python
-def compile_nucleation(plan: _ProcessPlan, owner: Any)
+def compile_nucleation(plan: _ProcessPlan, context: BuiltinPreparationContext)
 ```
 
 Retain all source/exhaustion buffers and explicit status observation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_nucleation.py#L101-L197)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_nucleation.py#L101-L200)
 
 ## particula.execution.prepared_nucleation.plan_nucleation
 

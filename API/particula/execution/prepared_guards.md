@@ -16,6 +16,18 @@ _GAS_CONSTANT = wp.constant(wp.float64(GAS_CONSTANT))
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_guards.py#L9-L9)
 
+## particula.execution.prepared_guards.advance_clock
+
+*function*
+
+```python
+def advance_clock(clock: wp.array(dtype=wp.float64), time_step: wp.float64, failure: wp.array(dtype=wp.int32))
+```
+
+Advance absolute time only after a successful complete process cycle.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_guards.py#L93-L102)
+
 ## particula.execution.prepared_guards.equal_active_counts
 
 *function*

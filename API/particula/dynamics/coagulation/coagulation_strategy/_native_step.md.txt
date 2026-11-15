@@ -26,7 +26,7 @@ Size-dependent composition can produce persistent per-species inventory
 defects. This accepted PMF/PDF limitation is documented separately from
 the resolved merge's species/charge conservation contract.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/_native_step.py#L257-L285)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/_native_step.py#L262-L290)
 
 ## particula.dynamics.coagulation.coagulation_strategy._native_step._direct_kernel
 
@@ -45,12 +45,12 @@ Retain the existing charged-model direct callback and fallback policy.
 *function*
 
 ```python
-def _merge(particle: ParticleData, active: NDArray[np.int64], pairs: Any) -> None
+def _merge(particle: ParticleData, active: NDArray[np.int64], pairs: Any, extension_fields=None) -> None
 ```
 
 Validate selector output, stage the merge, then publish in place.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/_native_step.py#L207-L254)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/_native_step.py#L207-L259)
 
 ## particula.dynamics.coagulation.coagulation_strategy._native_step._validate_storage
 
@@ -97,12 +97,12 @@ Generate the existing logarithmic grid from active native slots.
 *function*
 
 ```python
-def step_native(strategy: Any, particle: ParticleData, temperature: float, pressure: float, time_step: float) -> ParticleData
+def step_native(strategy: Any, particle: ParticleData, temperature: float, pressure: float, time_step: float, *, extension_fields=None) -> ParticleData
 ```
 
 Apply an admitted native step without changing process/RNG ownership.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/_native_step.py#L288-L375)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/_native_step.py#L293-L384)
 
 ## particula.dynamics.coagulation.coagulation_strategy._native_step.validate_bin_controls
 
