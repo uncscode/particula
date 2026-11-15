@@ -2,8 +2,8 @@
 
 Astro + Starlight is the sole documentation build. Markdown and percent-cell
 Python sources live under `docs/`; builds consume saved results and never run
-scientific workloads. Retired MkDocs files and notebooks are reference material
-under `.trash/mkdocs-starlight-2026-11-13/`.
+scientific workloads. Retired MkDocs files and notebooks remain available in
+Git history at `4f669de11` and are no longer stored in the checkout.
 
 ## Run locally
 
@@ -28,7 +28,7 @@ production build served by `preview`. The Python launcher uses the repository's
 ## Source and output ownership
 
 - `docs/`: canonical narrative, homepage, scientific Python and shared assets.
-- `website/navigation.json`: the complete five-section navigation.
+- `website/navigation.json`: Explore topics and the five content sections.
 - `website/examples.json`: all runnable sources, entry points, CPU/CUDA policy,
   timeouts and declared helper/data dependencies.
 - `website/results/`: saved figures, tables, text, executed source and provenance.
@@ -63,10 +63,10 @@ without replacing published results. CUDA and long-running examples require an
 explicit local refresh; hosted CPU skips are reported honestly.
 
 PRs, main pushes and merge-queue builds upload `documentation-validation`,
-containing validation and execution reports, source/archive inventories and
-rollback notes. PRs and merge-queue builds do not upload a site preview.
+containing validation and execution reports, the source inventory, legacy API
+anchors, and API diagnostics. PRs and merge-queue builds do not upload a site preview.
 Production builds alone upload the verified site for the deployment job.
 
 Only successful upstream main builds publish to the existing `gh-pages` branch.
-PRs and merge-queue builds never publish production. See the archive README for
-the recorded previous publication revision and rollback procedure.
+PRs and merge-queue builds never publish production. Historical migration and
+rollback notes remain in Git history at `4f669de11`.

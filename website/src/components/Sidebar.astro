@@ -3,19 +3,14 @@ import SidebarSublist from '@astrojs/starlight/components/SidebarSublist.astro';
 import MobileMenuFooter from '@astrojs/starlight/components/MobileMenuFooter.astro';
 
 const { sidebar } = Astro.locals.starlightRoute;
-// Starlight opens groups containing the current page automatically. Start every
-// other group collapsed, without restoring unrelated branches from prior visits.
+// Keep the topic entry points visible. Starlight also opens groups containing
+// the current page; other sections start collapsed on each visit.
 function collapseGroups(entries: typeof sidebar): typeof sidebar {
   return entries.map((entry) => entry.type === 'group'
-    ? { ...entry, collapsed: true, entries: collapseGroups(entry.entries) }
+    ? { ...entry, collapsed: entry.label !== 'Explore topics', entries: collapseGroups(entry.entries) }
     : entry);
 }
 ---
 
-<a class="topic-entry" href={`${import.meta.env.BASE_URL.replace(/\/$/, "")}/guide/topics/`}>Explore topics <span aria-hidden="true">→</span></a>
 <SidebarSublist sublist={collapseGroups(sidebar)} />
 <div class="md:sl-hidden"><MobileMenuFooter /></div>
-
-<style>
-.topic-entry { display: block; padding: .8rem; margin-bottom: .8rem; border: 1px solid var(--sl-color-accent); border-radius: .5rem; font-weight: 600; text-decoration: none; }
-</style>

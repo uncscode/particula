@@ -81,8 +81,9 @@ separately from the updated code. Missing results show an awaiting-results note.
 Generated Markdown, API dumps, and the built website are disposable outputs.
 
 Starlight is the sole documentation build. Retired MkDocs assets and original
-notebooks are preserved under `.trash/mkdocs-starlight-2026-11-13/` and excluded
-from publication. Internal execution uses temporary notebook objects to capture
+notebooks remain in Git history at `4f669de11`, recorded as `archive_revision`
+in `website/migration-inventory.json`. They are no longer stored in the checkout.
+Internal execution uses temporary notebook objects to capture
 rich outputs, without introducing a second maintained source file.
 
 Figures are exported at 300 DPI. Captured diagnostics retain repository-relative

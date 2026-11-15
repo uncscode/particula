@@ -45,8 +45,9 @@ For using Particula in a scientific study, the plugin separately provides
   to obtain a passing result.
 - Use direct development commands from the
   [validation reference](plugins/particula-helper/references/repository-validation.md).
-  The retired ADW/OpenCode development system is not required. Its archive is
-  historical reference only; do not load it as active agent instructions.
+  The retired ADW/OpenCode development system is not required. Its removed
+  archive remains in Git history at `4f669de11`; do not restore it as a
+  dependency or load it as active agent instructions.
 - Outside the bounded Recent news block, edit the root `readme.md` only when
   the user explicitly requests README changes. General feature, documentation,
   packaging, or release tasks do not authorize other README additions.
@@ -91,8 +92,10 @@ Use ordinary search for documentation, configuration, or unavailable coverage.
 - [Documentation authoring](website/AUTHORING.md) and
   [documentation placement](docs/contribute/documentation.md): Python sources,
   saved results and Astro/Starlight builds; no paired notebook maintenance.
+- [Topic organization](plugins/particula-helper/references/documentation-topics.md):
+  topic graph ownership and the persistent Explore topics navigation folder.
 - [Conda release checks](conda/README.md) and
   [release evidence](docs/contribute/validation/releases/v0.3.0.md): validation
   is distinct from release approval and external feedstock success.
 
-**Last updated:** 2026-11-13
+**Last updated:** 2026-11-15

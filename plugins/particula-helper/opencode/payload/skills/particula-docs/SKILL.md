@@ -12,7 +12,8 @@ for function/class/module prose, and `../../references/scientific-boundaries.md`
 when documenting physical or execution contracts.
 
 For collection reviews and topic navigation, read
-`../../references/documentation-topics.md`. Inventory and classify the full
+`../../references/documentation-topics.md`, including the independent Explore
+topics menu folder and stable topic routes. Inventory and classify the full
 requested scope, distinguish mapped pages from editorially reviewed pages, and
 record a prioritized backlog. Apply this workflow without rewriting articles
 when the request is only to audit or plan.

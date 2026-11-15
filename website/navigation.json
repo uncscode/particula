@@ -1,15 +1,37 @@
 [
   {
+    "label": "Explore topics",
+    "collapsed": false,
+    "items": [
+      {
+        "label": "Topic explorer",
+        "slug": "guide/topics"
+      },
+      {
+        "label": "Describe an aerosol",
+        "slug": "guide/topics/state"
+      },
+      {
+        "label": "Understand aerosol processes",
+        "slug": "guide/topics/processes"
+      },
+      {
+        "label": "Build and assess a model",
+        "slug": "guide/topics/methods"
+      },
+      {
+        "label": "Explore research applications",
+        "slug": "guide/topics/applications"
+      }
+    ]
+  },
+  {
     "label": "Guide",
     "collapsed": true,
     "items": [
       {
         "label": "Guide",
         "slug": "guide"
-      },
-      {
-        "label": "Explore topics",
-        "slug": "guide/topics"
       },
       {
         "label": "Getting started",

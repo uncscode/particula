@@ -23,7 +23,13 @@ def write(root, path, text):
 @pytest.fixture
 def tree(tmp_path):
     """Create five sections, an indexed child, and a registered Python example."""
-    nav = []
+    write(tmp_path, "docs/guide/topics/index.md", "# Explore topics\n")
+    nav = [
+        {
+            "label": "Explore topics",
+            "items": [{"label": "Topic explorer", "slug": "guide/topics"}],
+        }
+    ]
     for title in structure.SECTIONS:
         if title == "API":
             nav.append({"label": title})
@@ -139,12 +145,40 @@ def test_section_tabs_open_their_landing(tree):
     """An otherwise reachable landing must still be the section entry point."""
     path = tree / "website/navigation.json"
     config = json.loads(path.read_text())
-    config[0]["items"] = [
+    guide = next(item for item in config if item["label"] == "Guide")
+    guide["items"] = [
         {"label": "Child", "slug": "guide/child"},
         {"label": "Guide", "slug": "guide"},
     ]
     path.write_text(json.dumps(config))
     assert "section landing must be first: Guide" in structure.check(tree)
+
+
+def test_topic_navigation_rejects_unregistered_generated_routes(tree):
+    """Generated topics resolve through the explorer; unknown topics fail."""
+    write(
+        tree,
+        "website/topics.json",
+        json.dumps({"topics": [{"id": "state"}]}),
+    )
+    docs = tree / "docs"
+    nav = structure.source_navigation(
+        [
+            {
+                "label": "Explore topics",
+                "items": [
+                    {"label": "Overview", "slug": "guide/topics"},
+                    {"label": "State", "slug": "guide/topics/state"},
+                    {"label": "Missing", "slug": "guide/topics/missing"},
+                ],
+            }
+        ],
+        docs,
+    )
+    _, errors = structure.check_navigation(
+        nav, docs, {docs / "guide/topics/index.md"}
+    )
+    assert errors == ["missing navigation destination: guide/topics/missing.md"]
 
 
 def test_rendered_notebook_urls_and_project_mount(tree):
