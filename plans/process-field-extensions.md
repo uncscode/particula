@@ -108,7 +108,7 @@ Recording advances neither scientific state, clock nor RNG.
 
 ## Serial commits and progress
 
-- [ ] docs(plan): record process and field extension design
+- [x] docs(plan): record process and field extension design
 - [ ] refactor(execution): introduce typed process bindings
 - [ ] feat(cpu): expose timed box process extensions
 - [ ] feat(data): add registered extension fields
@@ -164,3 +164,16 @@ Required evidence before completion:
 Use existing .venv and maintained validation commands. Record exact evidence
 and limitations. Do not infer completion from implementation intent or a
 narrow passing suite. Leave merge, version bump and release outside this goal.
+
+## Implementation evidence
+
+- Initial exact-type registry and immutable registration snapshots implemented;
+  two focused tests pass. Typed binding integration remains pending.
+
+- Prepared operation records now wrap built-in compiled operations and retain
+  resource identities for capture traversal. Registry/operation tests and Ruff
+  pass; mypy passes for extension_registry.py. Full typed context and built-in
+  configuration migration is still pending, so the refactor is not complete.
+- Initial restricted regression attempt: 58 passed, 69 skipped, 13 failed due
+  to an unwritable Warp compiler cache. Host CUDA rerun uses temporary cache;
+  running session 46417 at this checkpoint. Do not treat skips as CUDA evidence.
