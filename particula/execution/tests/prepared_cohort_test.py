@@ -148,3 +148,91 @@ def test_ion_source_cannot_reuse_cohort_markers():
     process = IonPairSource(1, 0, 1, 2e-25, 1e-25) | SeedCohort(0, 1)
     with pytest.raises(ValueError, match="distinct from cohort markers"):
         process.prepare(cohort_case(), device="cpu", time_step=1)
+
+
+@pytest.mark.parametrize(
+    "device", ["cpu", pytest.param("cuda:0", marks=pytest.mark.cuda)]
+)
+def test_evaporated_background_does_not_capture_after_slot_reuse(device):
+    """Retired background labels cannot turn a later ion merger into capture."""
+    from particula.execution.tests.prepared_ion_condensation_test import (
+        ion_condensation_case,
+    )
+    from particula.gpu.kernels.cohort import merge_cohort, observe_cohort
+
+    if device != "cpu" and not wp.is_cuda_available():
+        pytest.skip("CUDA unavailable")
+    initial, condensation = ion_condensation_case()
+    initial.particles.masses[:] = 0
+    initial.particles.masses[0, 0, 0] = 1e-24  # Volatile background.
+    initial.particles.masses[0, 1, 1] = 1e-21  # Nonvolatile seed.
+    initial.particles.concentration[:] = [[1, 1, 0, 0]]
+    initial.particles.charge[:] = 0
+    initial.gas.concentration[:, 2] = 0
+    process = condensation | SeedCohort(1, 0, target_diameter=1e-6)
+    with process.prepare(initial, device=device, time_step=1e-3) as owner:
+        owner.step()
+        after = owner.snapshot()
+        assert after.particles.concentration[0, 0] == 0
+        p = owner._session.particles
+        pending = owner._auxiliary["cohort_pending"]
+        background = owner._auxiliary["cohort_background"]
+        statistics = owner._auxiliary["cohort_statistics"]
+        # Model a source reusing slot 0 for an ion, then an applied pair with
+        # seed recipient 1 and ion donor 0. Physical post-merge state is known.
+        after.particles.masses[0, 1, 2] += 2e-25
+        wp.copy(
+            p.masses,
+            wp.array(after.particles.masses, dtype=wp.float64, device=device),
+        )
+        wp.launch(
+            merge_cohort,
+            dim=1,
+            device=device,
+            inputs=[
+                wp.array([[[1, 0]]], dtype=wp.int32, device=device),
+                wp.array([1], dtype=wp.int32, device=device),
+                pending,
+                background,
+                owner._device_failure,
+            ],
+        )
+        wp.launch(
+            observe_cohort,
+            dim=1,
+            device=device,
+            inputs=[
+                p.masses,
+                p.concentration,
+                p.density,
+                wp.float64(np.pi / 6 * 1e-18),
+                pending,
+                background,
+                statistics,
+                owner._device_failure,
+            ],
+        )
+        np.testing.assert_array_equal(statistics.numpy(), [[1, 0, 0, 1]])
+        np.testing.assert_array_equal(background.numpy(), 0)
+        np.testing.assert_array_equal(owner._device_failure.numpy(), 0)
+
+
+@pytest.mark.parametrize(
+    "device", ["cpu", pytest.param("cuda:0", marks=pytest.mark.cuda)]
+)
+def test_evaporated_unresolved_seed_still_faults(device):
+    """Clearing retired background metadata must not discard seed lineages."""
+    from particula.execution.tests.prepared_test import condensation_case
+
+    if device != "cpu" and not wp.is_cuda_available():
+        pytest.skip("CUDA unavailable")
+    initial, condensation = condensation_case()
+    initial.particles.masses[:] = 0
+    initial.particles.masses[..., 0] = 1e-24
+    initial.particles.concentration[:] = 1
+    initial.gas.concentration[:, 2] = 0
+    process = condensation | SeedCohort(0, 1, target_diameter=1e-6)
+    with process.prepare(initial, device=device, time_step=1e-3) as owner:
+        owner.step()
+        with pytest.raises(ValueError, match="cohort"):
+            owner.cohort_diagnostics()

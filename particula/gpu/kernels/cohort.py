@@ -70,14 +70,18 @@ def observe_cohort(
     unresolved = wp.int64(0)
     for slot in range(counts.shape[1]):
         count = counts[box, slot]
-        if count != wp.float64(0.0) and count != wp.float64(1.0):
+        lineages = pending[box, slot]
+        if (count != wp.float64(0.0) and count != wp.float64(1.0)) or (
+            count == wp.float64(0.0) and lineages > wp.int64(0)
+        ):
             wp.atomic_max(failure, 0, 6)
             return
-        lineages = pending[box, slot]
+        if count == wp.float64(0.0):
+            # Condensation can retire background particles without a merger.
+            # A later source must not inherit their labels when reusing slots.
+            background[box, slot] = wp.int32(0)
+            continue
         if lineages > wp.int64(0):
-            if count == wp.float64(0.0):
-                wp.atomic_max(failure, 0, 6)
-                return
             if background[box, slot] != 0:
                 statistics[box, 2] += lineages
                 pending[box, slot] = wp.int64(0)
