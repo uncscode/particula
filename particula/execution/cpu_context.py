@@ -15,6 +15,13 @@ from numbers import Integral
 import numpy as np
 
 
+def _extension_rng_namespace(extension_id: str, name: str) -> str:
+    """Encode identity components without delimiter collisions."""
+    return "extension:" + json.dumps(
+        [extension_id, name], ensure_ascii=True, separators=(",", ":")
+    )
+
+
 def _box_ids(values: tuple[str, ...]) -> tuple[str, ...]:
     """Validate stable, unique logical identities without normalization."""
     if not isinstance(values, tuple):
