@@ -92,3 +92,12 @@ new capture/replay cases with a different current stream. The full CUDA example
 was refreshed above after this correction. Mypy passed against Warp 1.19.0;
 the earlier installed-wheel and full-suite counts describe the pre-review
 baseline, whose scientific formulas are unchanged.
+
+Initialization follow-up `37d197c5c` places workspace buffer fills on the
+prepared stream as well. The optics suite passed 259 tests on CPU/native CUDA;
+all 11 workspace tests also passed with Warp 1.19.0. Four added cases check
+actual fill-stream selection and immediate execution without a device-wide
+barrier, including preservation of failure flags. Ruff, formatting and mypy
+passed. The complete CUDA example ran successfully again with separate local
+outputs; the published timing table above remains the recorded `4ce93ae09`
+measurement, not a measurement of this follow-up.
