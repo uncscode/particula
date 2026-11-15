@@ -1,1 +1,0 @@
-<!-- Section: testing_strategy -->
