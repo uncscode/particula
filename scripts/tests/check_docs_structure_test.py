@@ -1,16 +1,15 @@
 """Reject documentation regressions using small independent fixture trees."""
 
-import importlib.util
 import json
+import sys
 from pathlib import Path
 
 import pytest
 
-SCRIPT = Path(__file__).resolve().parents[1] / "check_docs_structure.py"
-SPEC = importlib.util.spec_from_file_location("check_docs_structure", SCRIPT)
-assert SPEC and SPEC.loader
-MODULE = importlib.util.module_from_spec(SPEC)
-SPEC.loader.exec_module(MODULE)
+# Match direct script execution so sibling helpers resolve even when this is
+# the first or only test module collected (as in the documentation CI job).
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+import check_docs_structure as structure  # noqa: E402
 
 
 def write(root, path, text):
@@ -25,7 +24,7 @@ def write(root, path, text):
 def tree(tmp_path):
     """Create five sections, an indexed child, and a registered Python example."""
     nav = []
-    for title in MODULE.SECTIONS:
+    for title in structure.SECTIONS:
         if title == "API":
             nav.append({"label": title})
         else:
@@ -71,7 +70,7 @@ def tree(tmp_path):
 def test_indexes_scripts_and_archives_are_accounted_for(tree):
     """Owning-index links classify pages; archives never enter discovery."""
     write(tree, ".trash/docs-v0.3.0/docs/obsolete.ipynb", "not JSON")
-    assert MODULE.check(tree) == []
+    assert structure.check(tree) == []
 
 
 @pytest.mark.parametrize(
@@ -104,7 +103,7 @@ def test_structural_regressions_are_rejected(tree, change, expected):
         (tree / path).unlink()
     else:
         write(tree, path, text)
-    assert any(expected in error for error in MODULE.check(tree))
+    assert any(expected in error for error in structure.check(tree))
 
 
 def test_percent_source_prose_links_are_checked_independently(tree):
@@ -120,7 +119,7 @@ def test_percent_source_prose_links_are_checked_independently(tree):
         "# [not prose](ignored.md)\n"
         "result = 1\n",
     )
-    errors = MODULE.check(tree)
+    errors = structure.check(tree)
     assert any("stale moved link" in e for e in errors)
     assert any("missing local link: missing.md" in e for e in errors)
     assert any("missing anchor" in e for e in errors)
@@ -133,7 +132,7 @@ def test_percent_source_prose_links_are_checked_independently(tree):
         "# [current](../guide/child.md#after)\n"
         "# %%\nresult = 1\n",
     )
-    assert MODULE.check(tree) == []
+    assert structure.check(tree) == []
 
 
 def test_section_tabs_open_their_landing(tree):
@@ -145,7 +144,7 @@ def test_section_tabs_open_their_landing(tree):
         {"label": "Guide", "slug": "guide"},
     ]
     path.write_text(json.dumps(config))
-    assert "section landing must be first: Guide" in MODULE.check(tree)
+    assert "section landing must be first: Guide" in structure.check(tree)
 
 
 def test_rendered_notebook_urls_and_project_mount(tree):
@@ -155,7 +154,7 @@ def test_rendered_notebook_urls_and_project_mount(tree):
     write(site, "examples/run/index.html", '<a href="../target.md">bad</a>')
     assert any(
         "broken rendered link" in e
-        for e in MODULE.check_rendered_links(tree, site, {page})
+        for e in structure.check_rendered_links(tree, site, {page})
     )
     write(
         site,
@@ -163,14 +162,15 @@ def test_rendered_notebook_urls_and_project_mount(tree):
         '<a href="/particula/guide/child/#after">ok</a>',
     )
     write(site, "guide/child/index.html", '<h1 id="after">After</h1>')
-    assert MODULE.check_rendered_links(tree, site, {page}) == []
+    assert structure.check_rendered_links(tree, site, {page}) == []
 
 
 def test_notebook_publication_sources_cannot_return(tree):
     """Original notebooks belong only in the excluded reference archive."""
     write(tree, "docs/examples/run.ipynb", "{}")
     assert any(
-        "retired notebook publication source" in e for e in MODULE.check(tree)
+        "retired notebook publication source" in e
+        for e in structure.check(tree)
     )
 
 
@@ -199,5 +199,5 @@ def test_retired_content_allows_only_declared_redirects(
         "retired": {source: "archived"},
         "moves": {source: "docs/guide/index.md"} if declared else {},
     }
-    errors = MODULE.check_search(tmp_path, manifest)
+    errors = structure.check_search(tmp_path, manifest)
     assert (errors == []) is allowed
