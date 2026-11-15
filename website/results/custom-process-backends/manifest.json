@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 5.647450568038039,
+  "package_source_sha256": "c8c0e7162c99fea1d7a3ddc183ff28e8fc38ccea661be0f2b03a98e754b2c004",
+  "input_sha256": {
+    "scripts/gpu_studies/__init__.py": "530c51f7c7f432a895623c9ba4548b7cf3e053a1a0f328a36ae8ae9e50cec9c4",
+    "scripts/gpu_studies/extension_kernels.py": "65fd62e0f916fc827f352493da3650f2971322e3d89c9881403ee0943d291932"
+  },
+  "example": "custom-process-backends",
+  "fingerprint": "d98a3086fea6dbaf3caa866266894018e31902fe5189dc3f17654bcff23b89a3",
+  "source": "docs/examples/gpu/prepared/custom_process_backends.py",
+  "revision": "ef128aafe9e00e7c52bcb584768bdc02d251edab",
+  "package_dirty": false,
+  "executed_at": "2026-11-15T15:19:31.698440+00:00",
+  "device": "cuda:0: NVIDIA GeForce RTX 5060",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [
+      {
+        "image": "figure-4-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "4b8456ec455cfc263ee50a70ba1539b7a24282cb48f732726aced79e768cb68b",
+    "data.json": "0887d3ce22a2baf536ce0cad4b83f134c6961db4c5dfea5f90619765bcabf854",
+    "executed_source.py": "4b8456ec455cfc263ee50a70ba1539b7a24282cb48f732726aced79e768cb68b",
+    "figure-4-1.png": "da415e6009a4aba0e902075a61f5613088bc119eed8ce5f32368bf5eb4eb3903"
+  },
+  "simulation_fingerprint": "aa86a98a56a3e01d5984ceda66143136425acaeedd8c33b340f806b153f2edb9",
+  "render_versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "render_device": "CPU",
+  "execution_input_sha256": {
+    "scripts/gpu_studies/__init__.py": "530c51f7c7f432a895623c9ba4548b7cf3e053a1a0f328a36ae8ae9e50cec9c4",
+    "scripts/gpu_studies/extension_kernels.py": "65fd62e0f916fc827f352493da3650f2971322e3d89c9881403ee0943d291932"
+  },
+  "rendered_at": "2026-11-15T15:21:00.538557+00:00",
+  "render_revision": "ef128aafe9e00e7c52bcb584768bdc02d251edab",
+  "render_elapsed_seconds": 4.0137979158898816
+}

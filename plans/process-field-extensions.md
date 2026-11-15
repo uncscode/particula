@@ -314,3 +314,13 @@ narrow passing suite. Leave merge, version bump and release outside this goal.
   checkout. Saved numerical data and inspected plots are published through the
   example registry; saved-data-only replot and documentation structure checks
   pass. Particle-tracer and resident/transfer examples remain outstanding.
+- The resident/transfer example now compares pure NumPy CPU, uncaptured CUDA,
+  captured CUDA and explicit CPUTransfer for the same time-dependent forcing.
+  It registers an owned warming field and explicit Warp adapter using public
+  APIs, checks all trajectories analytically, verifies detached snapshots,
+  inert capture/rejection and exact midpoint restart for every GPU mode.
+  Full refresh passed on NVIDIA GeForce RTX 5060; the figure was inspected.
+  The actual downloadable ZIP (including declared Warp helper files) passed
+  from an isolated temporary directory with warnings treated as errors.
+  CPU/GPU downloadable example tests: 2 passed; documentation structure and
+  focused Ruff passed. The particle-tracer example and final gates remain.
