@@ -127,3 +127,11 @@ entries, discrete/resolved/PDF reductions and single/multiple layers.
   particula/optics/tests --no-cov -q -Werror (shared existing environment).
   Public workspace validation, angular/polarization/reduction kernels, device
   tiling and full performance qualification are still pending.
+- Added direct Warp angular amplitudes, scaled full Mueller matrices, basis
+  rotations and Stokes application. Device coefficients are reused across
+  angles, with separate per-angle failure propagation. Full current optics
+  suite: 174 passed on Warp CPU and native RTX 5060. The angular pipeline
+  covers 27 cases through x=10000 and exact/fine forward/backward angles;
+  per-case peak-normalized CPU/CUDA angular error is bounded by 1e-8.
+  Mypy and Ruff pass. GPU population/column kernels, workspace API, tiling,
+  examples and independent large-x angular qualification remain pending.
