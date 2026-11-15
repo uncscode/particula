@@ -241,3 +241,20 @@ narrow passing suite. Leave merge, version bump and release outside this goal.
   rejection before allocation, and nonzero built-in initial time. Managed custom
   RNG and CPU-transfer host RNG continuation remain pending; the generic device
   state contract alone is not evidence those RNG requirements are complete.
+- CPUTransfer now explicitly wraps public Python box processes in prepared
+  sequences. It drains/checks earlier device work, downloads full state, stages
+  and validates all CPU boxes, and copies only declared writes through reusable
+  upload staging into retained device arrays. Transfer sequences reject capture.
+  CPU process metadata and immutable parameters participate in restart matching;
+  schema-v2 mode and canonical PCG64 host RNG bytes survive exact continuation.
+- Thermodynamic composition refreshes after custom gas/temperature writers when
+  condensation supplies the provider, and rejects dependent saturation readers
+  without one (including across repeated timesteps). A native saturation-gated
+  source participates in this check without restricting ungated source physics.
+- Transfer qualification: affected prepared/extension/restart suites passed 187
+  tests with one intentional CPU capture skip. Expanded transfer suite passed 19
+  tests on Warp CPU and real CUDA, including a same-step saturation reader,
+  multi-box callback failure atomicity, fixed device pointers, native GPU RNG
+  preservation, host RNG restart and corrupt-host-state rejection before upload.
+  Targeted Ruff and mypy pass. Device custom RNG, native GPU particle fields,
+  field-value guards, typed built-in contexts, examples and final PR gates remain.

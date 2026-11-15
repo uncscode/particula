@@ -89,3 +89,5 @@ from particula.execution.process_extensions import (
     GPUProcessPlan,
     GPUStateSpec,
 )
+
+from particula.cpu_transfer import CPUTransfer

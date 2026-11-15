@@ -139,3 +139,19 @@ def test_validator_cannot_mutate_state():
     with pytest.raises(ValueError, match="undeclared"):
         process.execute(aerosol, 0)
     np.testing.assert_array_equal(aerosol.gas.concentration, before)
+
+
+def test_cpu_transfer_preserves_sequence_substep_time():
+    """The explicit GPU wrapper also composes normally on the CPU."""
+    from particula import CPUTransfer, FunctionProcess
+    from particula.tests.cpu_batch_test import state
+
+    times = []
+
+    def record(_box, *, time, **_):
+        times.append(time)
+
+    first = FunctionProcess(record, name="first")
+    second = CPUTransfer(FunctionProcess(record, name="second"))
+    (first | second).execute(state(), time_step=1, sub_steps=2, time=3)
+    assert times == [3, 3, 3, 3, 3.5, 3.5, 3.5, 3.5]

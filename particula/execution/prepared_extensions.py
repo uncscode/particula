@@ -27,6 +27,13 @@ def plan_extension(adapter, process, aerosol):
     plan = adapter.plan(process, staged)
     if type(plan) is not GPUProcessPlan:
         raise TypeError("adapter.plan must return GPUProcessPlan")
+    if plan.execution_mode == "cpu_transfer":
+        from particula.cpu_transfer import _CPUTransferAdapter
+
+        if type(adapter) is not _CPUTransferAdapter:
+            raise ValueError(
+                "CPU transfers require the explicit CPUTransfer wrapper"
+            )
     import numpy as np
 
     after = _cpu_batch.arrays(staged)
@@ -66,6 +73,10 @@ def compile_extension(plan, owner):
         )
     import numpy as np
 
+    if plan.configuration.execution_mode == "cpu_transfer":
+        from particula.execution.prepared_transfer import compile_transfer
+
+        return compile_transfer(plan, owner)
     configuration = plan.configuration
     state = {
         spec.name: wp.array(

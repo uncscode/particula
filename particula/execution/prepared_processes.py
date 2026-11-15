@@ -30,6 +30,12 @@ class _ProcessPlan:
 
 def _plan_process(process: Any, aerosol: Aerosol) -> _ProcessPlan:
     """Reject unknown runnable/strategy semantics before any GPU allocation."""
+    from particula.cpu_transfer import CPUTransfer, _CPUTransferAdapter
+
+    if type(process) is CPUTransfer:
+        from particula.execution.prepared_extensions import plan_extension
+
+        return plan_extension(_CPUTransferAdapter(), process, aerosol)
     from particula.dynamics.ions.cleanup import IonNeutralCleanup
     from particula.dynamics.ions.coagulation import AtmosphericCoagulation
     from particula.dynamics.ions.condensation import IonCondensationExclusion

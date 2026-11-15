@@ -92,6 +92,7 @@ class GPUProcessPlan:
     parameters: tuple[tuple[str, object], ...] = ()
     capabilities: ProcessCapabilities = ProcessCapabilities(resident=True)
     state: tuple[GPUStateSpec, ...] = ()
+    execution_mode: str = "resident"
 
     def __post_init__(self) -> None:  # noqa: C901
         """Reject mutable configuration and ambiguous resource declarations."""
@@ -126,8 +127,20 @@ class GPUProcessPlan:
             raise TypeError("state must contain GPUStateSpec descriptors")
         if len({spec.name for spec in self.state}) != len(self.state):
             raise ValueError("duplicate state name")
-        if not self.capabilities.resident:
-            raise ValueError("GPU adapters require resident capability")
+        if self.execution_mode == "resident":
+            if not self.capabilities.resident:
+                raise ValueError("GPU adapters require resident capability")
+        elif self.execution_mode == "cpu_transfer":
+            if (
+                self.capabilities.resident
+                or self.capabilities.capture
+                or self.state
+            ):
+                raise ValueError(
+                    "CPU transfers cannot declare resident resources"
+                )
+        else:
+            raise ValueError("unsupported process execution mode")
 
     @property
     def values(self) -> Mapping[str, object]:

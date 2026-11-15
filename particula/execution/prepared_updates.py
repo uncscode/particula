@@ -90,11 +90,47 @@ def compose_operations(owner, plans, operations):
         )
 
     owner._refresh = refresh
+    from particula.execution.process_extensions import _RegisteredPlan
+
     result = []
     for plan, operation in zip(plans, operations, strict=True):
         if plan.family == "nucleation":
             result.append(refresh)
         result.append(operation)
+        if type(plan) is _RegisteredPlan and set(plan.configuration.writes) & {
+            "gas.concentration",
+            "environment.temperature",
+        }:
+            result.append(refresh)
     result.append(refresh)
     refresh()
     return tuple(result)
+
+
+def validate_extension_freshness(plans):
+    """Reject stale saturation consumers if no refresh provider is available."""
+    from particula.execution.process_extensions import _RegisteredPlan
+
+    if any(plan.family == "condensation" for plan in plans):
+        return
+    invalidates = {"gas.concentration", "environment.temperature"}
+    # The sequence repeats: a writer at the end affects a reader next timestep.
+    dirty = any(
+        type(plan) is _RegisteredPlan
+        and bool(set(plan.configuration.writes) & invalidates)
+        for plan in plans
+    )
+    if dirty and any(
+        (
+            type(plan) is _RegisteredPlan
+            and "environment.saturation_ratio" in plan.configuration.reads
+        )
+        or (
+            plan.family == "nucleation"
+            and dict(plan.values["config"])["saturation_lower"] is not None
+        )
+        for plan in plans
+    ):
+        raise ValueError(
+            "saturation consumers require a thermodynamic refresh provider"
+        )

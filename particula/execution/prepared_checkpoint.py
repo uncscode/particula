@@ -156,6 +156,11 @@ def _preflight(processes, saved, backend, device, process_registry=None):
         else _plan_process(p, host)
         for p in processes
     )
+    from particula.execution.prepared_updates import (
+        validate_extension_freshness,
+    )
+
+    validate_extension_freshness(plans)
     validate_cohort_plans(plans)
     validate_ion_plans(plans)
     if configurations(plans) != saved.processes or len(
@@ -335,6 +340,11 @@ def resume_simulation(
                 owner.device.native,
             )
             owner._bind(plans)
+            from particula.execution.checkpoint_extensions import (
+                restore_host_rng,
+            )
+
+            owner._host_context = restore_host_rng(saved, plans)
             _restore_after_binding(owner, saved)
     except BaseException:
         if owner._guard is not None:

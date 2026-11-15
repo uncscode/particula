@@ -77,6 +77,62 @@ class CPUExecutionContext:
             raise ValueError("context box_ids must match the aerosol box count")
         return _CPUStreamTransaction(self)
 
+    def _checkpoint(self) -> bytes:
+        """Own canonical JSON bytes for exact PCG64 continuation."""
+        payload = {
+            "version": 1,
+            "root_seed": self.root_seed,
+            "box_ids": list(self.box_ids),
+            "streams": [
+                [namespace, box, rng.bit_generator.state]
+                for (namespace, box), rng in sorted(self._streams.items())
+            ],
+        }
+        return json.dumps(
+            payload, sort_keys=True, separators=(",", ":")
+        ).encode("ascii")
+
+    @classmethod
+    def _restore(cls, payload: bytes, *, root_seed, box_ids, namespaces):
+        """Validate continuation records before creating generators."""
+        if type(payload) is not bytes:
+            raise TypeError("host RNG checkpoint must be bytes")
+        try:
+            saved = json.loads(payload)
+        except (ValueError, UnicodeError) as error:
+            raise ValueError("invalid host RNG checkpoint") from error
+        if (
+            type(saved) is not dict
+            or set(saved) != {"version", "root_seed", "box_ids", "streams"}
+            or type(saved["version"]) is not int
+            or saved["version"] != 1
+            or type(saved["root_seed"]) is not int
+            or saved["root_seed"] != root_seed
+            or saved["box_ids"] != list(box_ids)
+            or type(saved["streams"]) is not list
+        ):
+            raise ValueError("host RNG checkpoint metadata differs")
+        context = cls(root_seed, box_ids)
+        for row in saved["streams"]:
+            if type(row) is not list or len(row) != 3:
+                raise ValueError("invalid host RNG stream record")
+            namespace, box, state = row
+            if (
+                type(namespace) is not str
+                or type(box) is not str
+                or namespace not in namespaces
+                or box not in box_ids
+                or (namespace, box) in context._streams
+            ):
+                raise ValueError("host RNG stream identity differs")
+            _validate_pcg64_state(state)
+            rng = np.random.Generator(np.random.PCG64(0))
+            rng.bit_generator.state = state
+            context._streams[namespace, box] = rng
+        if context._checkpoint() != payload:
+            raise ValueError("host RNG checkpoint must use canonical bytes")
+        return context
+
     def _new_generator(
         self, namespace: str, box_id: str
     ) -> np.random.Generator:
@@ -114,3 +170,28 @@ class _CPUStreamTransaction:
     def commit(self) -> None:
         """Publish staged streams after successful numeric publication."""
         self._context._streams.update(self._staged)
+
+
+def _validate_pcg64_state(state):
+    """Reject coercible or out-of-range words before NumPy state assignment."""
+    if (
+        type(state) is not dict
+        or set(state) != {"bit_generator", "state", "has_uint32", "uinteger"}
+        or state["bit_generator"] != "PCG64"
+        or type(state["state"]) is not dict
+        or set(state["state"]) != {"state", "inc"}
+    ):
+        raise ValueError("invalid PCG64 checkpoint state")
+    words = (
+        (state["state"]["state"], 2**128),
+        (state["state"]["inc"], 2**128),
+        (state["has_uint32"], 2),
+        (state["uinteger"], 2**32),
+    )
+    if any(
+        type(value) is not int or not 0 <= value < limit
+        for value, limit in words
+    ):
+        raise ValueError("PCG64 checkpoint word is out of range")
+    if state["state"]["inc"] % 2 != 1:
+        raise ValueError("PCG64 increment must be odd")

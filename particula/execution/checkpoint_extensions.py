@@ -30,6 +30,14 @@ def save_extensions(owner):
     fields = owner._extension_fields
     return dict(
         initial_time=owner._initial_time,
+        execution_mode="cpu_transfer"
+        if owner._host_context is not None
+        else "resident",
+        host_rng=(
+            owner._host_context._checkpoint()
+            if owner._host_context is not None
+            else None
+        ),
         field_specs=fields.specs if fields is not None else (),
         field_payloads=(
             tuple(
@@ -67,7 +75,7 @@ def validate_envelope(saved):
         raise ValueError("unsupported prepared checkpoint schema")
     validate_time(saved.initial_time)
     validate_time(saved.initial_time + float(saved.resident.simulated_time))
-    if saved.execution_mode != "resident":
+    if saved.execution_mode not in ("resident", "cpu_transfer"):
         raise ValueError("unsupported checkpoint execution mode")
     if saved.schema_version == 1 and (
         saved.initial_time != 0
@@ -75,6 +83,8 @@ def validate_envelope(saved):
         or saved.field_payloads
         or saved.extension_state
         or saved.clock is not None
+        or saved.host_rng is not None
+        or saved.execution_mode != "resident"
         or any(type(plan) is GPUProcessPlan for plan in saved.processes)
     ):
         raise ValueError("v1 checkpoints cannot contain extension state")
@@ -153,6 +163,7 @@ def validate_extension_state(saved, plans):
                 spec.shape,
             )
     _payload_map(saved.extension_state, expected)
+    restore_host_rng(saved, plans)
     if not custom:
         if saved.clock is not None:
             raise ValueError("checkpoint contains an unexpected device clock")
@@ -204,3 +215,43 @@ def restore_targets(owner):
     if owner._clock is not None:
         targets["execution", "clock"] = owner._clock
     return targets
+
+
+def restore_host_rng(saved, plans):
+    """Validate transfer mode and host stream identities before upload."""
+    from particula.execution.cpu_context import CPUExecutionContext
+
+    transfers = [
+        p.configuration
+        for p in plans
+        if type(p) is _RegisteredPlan
+        and p.configuration.execution_mode == "cpu_transfer"
+    ]
+    expected_mode = "cpu_transfer" if transfers else "resident"
+    if saved.execution_mode != expected_mode:
+        raise ValueError("checkpoint execution mode differs from process plan")
+    if not transfers:
+        if saved.host_rng is not None:
+            raise ValueError("unexpected host RNG checkpoint")
+        return None
+    metadata = saved.resident.rng_continuation
+    namespaces = {
+        f"extension:{p.extension_id}:{p.name}"
+        for p in transfers
+        if p.values["stochastic"]
+    }
+    context = CPUExecutionContext._restore(
+        saved.host_rng,
+        root_seed=metadata.root_seed,
+        box_ids=metadata.logical_box_ids,
+        namespaces=namespaces,
+    )
+    if saved.resident.completed_steps > 0 and saved.time_step > 0:
+        expected = {
+            (namespace, box)
+            for namespace in namespaces
+            for box in context.box_ids
+        }
+        if set(context._streams) != expected:
+            raise ValueError("host RNG checkpoint stream inventory differs")
+    return context
