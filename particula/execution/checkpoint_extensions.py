@@ -157,6 +157,11 @@ def validate_extension_state(saved, plans):
     for plan in custom:
         if not plan.capabilities.checkpoint:
             raise ValueError("registered process does not support checkpoints")
+        if plan.stochastic:
+            expected["extension:" + plan.name, "__rng"] = (
+                "<u4",
+                (saved.resident.dimensions.n_boxes,),
+            )
         for spec in plan.state:
             expected["extension:" + plan.name, spec.name] = (
                 np.dtype(spec.dtype).str,

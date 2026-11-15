@@ -49,7 +49,11 @@ class GPUStateSpec:
         """Validate a portable primitive dtype and fixed nonempty shape."""
         import numpy as np
 
-        if type(self.name) is not str or not self.name.isidentifier():
+        if (
+            type(self.name) is not str
+            or not self.name.isidentifier()
+            or self.name.startswith("__")
+        ):
             raise ValueError("state name must be an identifier")
         if (
             type(self.shape) is not tuple
@@ -93,6 +97,7 @@ class GPUProcessPlan:
     capabilities: ProcessCapabilities = ProcessCapabilities(resident=True)
     state: tuple[GPUStateSpec, ...] = ()
     execution_mode: str = "resident"
+    stochastic: bool = False
 
     def __post_init__(self) -> None:  # noqa: C901
         """Reject mutable configuration and ambiguous resource declarations."""
@@ -127,6 +132,8 @@ class GPUProcessPlan:
             raise TypeError("state must contain GPUStateSpec descriptors")
         if len({spec.name for spec in self.state}) != len(self.state):
             raise ValueError("duplicate state name")
+        if type(self.stochastic) is not bool:
+            raise TypeError("stochastic must be a bool")
         if self.execution_mode == "resident":
             if not self.capabilities.resident:
                 raise ValueError("GPU adapters require resident capability")
@@ -135,6 +142,7 @@ class GPUProcessPlan:
                 self.capabilities.resident
                 or self.capabilities.capture
                 or self.state
+                or self.stochastic
             ):
                 raise ValueError(
                     "CPU transfers cannot declare resident resources"
@@ -156,6 +164,9 @@ class GPUPreparationContext:
     ``failure[0]`` is zero while healthy. Kernels must suppress work
     after any failure; extensions report their own failures with code 100 or
     above. Arrays have fixed shapes/dtypes and retain their device identities.
+    For a stochastic plan, ``rng`` holds one uint32 Warp random-state word per
+    logical box. Kernels load a word, draw from it, and store the advanced word.
+    One thread per box owns that update; CPU/GPU bitwise parity is not implied.
     """
 
     arrays: Mapping[str, object]
@@ -166,6 +177,7 @@ class GPUPreparationContext:
     failure: object
     logical_box_ids: tuple[str, ...]
     state: Mapping[str, object]
+    rng: object | None = None
 
     def __post_init__(self) -> None:
         """Detach the map while retaining exact device array objects."""
