@@ -219,3 +219,17 @@ entries, discrete/resolved/PDF reductions and single/multiple layers.
   and mypy pass; format check identified and corrected one test-file layout.
   Full-package coverage validation is running. Numerical source changes require
   a final optics-example refresh and updated current qualification evidence.
+- Built wheel/sdist and verified bundled documentation: 210 files, 2,514,813
+  documentation bytes; isolated installations and offline sdist rebuild passed.
+  Artifacts at numerical revision 364756969 were 4,086,798-byte wheel and
+  3,699,660-byte sdist. Clean /tmp wheel environment installed current declared
+  dependencies (NumPy 2.5.4, SciPy 1.18.1, Warp 1.19.0); all 250 installed
+  optics tests passed on CPU/CUDA with PyMieScatt, miepython and mpmath absent.
+  Saved fixtures are included in the wheel and were exercised offline.
+- Refreshed CPU optics example against numerical revision 364756969. Full
+  package/coverage and example-integration suites continue. Infrastructure
+  tests initially had one isolated-locator failure caused by inherited
+  PYTHONPATH; the standalone bundle verifier passed, and infrastructure is
+  rerunning with that environment override removed. Do not record that rerun
+  as passed before observing its terminal result. CUDA example timing refresh
+  waits until concurrent validation workloads have completed.
