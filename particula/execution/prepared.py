@@ -158,10 +158,6 @@ class PreparedSimulation:
 
     def _bind(self, plans: tuple[Any, ...]) -> None:
         """Compile a validated process plan against the owned resident state."""
-        from particula.execution.extension_registry import (
-            PreparedOperation,
-            ProcessCapabilities,
-        )
         from particula.execution.prepared_cohort import wrap_cohort_operations
         from particula.execution.prepared_diagnostics import setup_diagnostics
         from particula.execution.prepared_particle_fields import (
@@ -172,23 +168,38 @@ class PreparedSimulation:
 
         with self._scope():
             self._plans = plans
-            operations = tuple(_compile_process(plan, self) for plan in plans)
-            operations = wrap_particle_fields(self, plans, operations)
-            operations = wrap_cohort_operations(self, plans, operations)
-            composed = compose_operations(self, plans, operations)
-            self._operations = tuple(
-                operation
-                if type(operation) is PreparedOperation
-                else PreparedOperation(
-                    name=f"builtin.stage.{index}",
-                    handler=operation,
-                    resources=tuple(self._bindings.values()),
-                    capabilities=ProcessCapabilities(
-                        resident=True, capture=True, checkpoint=True
-                    ),
-                )
-                for index, operation in enumerate(composed)
+            from particula.execution.preparation_context import (
+                BuiltinPreparationContext,
             )
+            from particula.execution.prepared_extensions import (
+                compile_extension,
+            )
+            from particula.execution.process_extensions import _RegisteredPlan
+
+            context = BuiltinPreparationContext(
+                wp=self._wp,
+                session=self._session,
+                registry=self._registry,
+                device=self.device,
+                time_step=self.time_step,
+                failure=self._device_failure,
+                plans=plans,
+                fields=self._extension_fields,
+                bindings=self._bindings,
+                auxiliary=self._auxiliary,
+                observers=self._observers,
+            )
+            operations = tuple(
+                compile_extension(plan, self)
+                if type(plan) is _RegisteredPlan
+                else _compile_process(plan, context)
+                for plan in plans
+            )
+            operations = wrap_particle_fields(context, plans, operations)
+            operations = wrap_cohort_operations(context, plans, operations)
+            composed = compose_operations(context, plans, operations)
+            self._refresh = context.refresh
+            self._operations = composed
             if self._clock is not None:
                 from particula.execution.prepared_extensions import (
                     clock_operation,

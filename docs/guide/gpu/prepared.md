@@ -258,6 +258,12 @@ must not allocate, synchronize, download data or reseed streams during a step.
 Callbacks are trusted numerical implementations; declarations are not a Python
 or device-memory security boundary.
 
+Built-in physics uses the same exact-type registration and retained operation
+records. Its internal preparation context supplies native buffers, resource
+allocation and configuration without exposing simulation lifecycle methods.
+Composition preserves operation capabilities and resource identities through
+particle-field accounting, cohort observation and thermodynamic refreshes.
+
 Declare `GPUStateSpec` arrays for persistent counters or other continuation
 state. Access them through `context.state`. Scratch buffers are reconstructed
 on resume and are not checkpointed. Checkpoint schema v2 stores immutable

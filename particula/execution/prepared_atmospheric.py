@@ -1,6 +1,9 @@
 """Compile explicit ion collision laws into the existing prepared sampler."""
 
 from dataclasses import replace
+from typing import Any
+
+from particula.execution.preparation_context import BuiltinPreparationContext
 
 
 def plan_atmospheric(process, _aerosol):
@@ -27,7 +30,7 @@ def plan_atmospheric(process, _aerosol):
     )
 
 
-def configure_atmospheric(plan, owner, prepared):
+def configure_atmospheric(plan, context: BuiltinPreparationContext, prepared):
     """Retain derived classification and rate scratch; no checkpoint payload."""
     from particula.dynamics.ions.attachment_table import (
         centered_attachment_tables,
@@ -43,7 +46,7 @@ def configure_atmospheric(plan, owner, prepared):
         classify_ions,
     )
 
-    wp = owner._wp
+    wp = context.wp
     work = prepared.brownian_parallel
     if work is None:
         raise ValueError("atmospheric coagulation requires charged pair work")
@@ -56,7 +59,7 @@ def configure_atmospheric(plan, owner, prepared):
         centered_attachment_tables(), dtype=wp.float64, device=device
     )
     data = IonPairData()
-    data.enabled = 1
+    data.enabled = wp.int32(1)
     data.kinds = kinds
     data.attachment = rates
     data.recombination = wp.float64(plan.values["recombination"])
@@ -73,10 +76,10 @@ def configure_atmospheric(plan, owner, prepared):
         wp.float64(NEGATIVE_ION_MASS),
         kinds,
         presence,
-        owner._device_failure,
+        context.failure,
         int(values.get("attachment_model", "lf2013") == "mobility"),
     )
-    rate_args = (
+    rate_args: tuple[Any, ...] = (
         kinds,
         presence,
         args[15],
@@ -84,7 +87,7 @@ def configure_atmospheric(plan, owner, prepared):
         ("reject", "lower", "upper").index(values["omitted"]),
         tables,
         rates,
-        owner._device_failure,
+        context.failure,
     )
 
     rate_kernel = cache_attachment_rates
@@ -104,7 +107,7 @@ def configure_atmospheric(plan, owner, prepared):
             wp.float64(values["negative_mobility"]),
             wp.float64(values["ion_radius"]),
             rates,
-            owner._device_failure,
+            context.failure,
         )
 
     def setup():

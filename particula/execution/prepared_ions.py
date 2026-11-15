@@ -5,6 +5,8 @@ import json
 
 import numpy as np
 
+from particula.execution.preparation_context import BuiltinPreparationContext
+
 
 def plan_ion_source(process, aerosol):
     """Freeze physical configuration after native source validation."""
@@ -26,12 +28,12 @@ def plan_ion_source(process, aerosol):
     )
 
 
-def compile_ion_source(plan, owner):
+def compile_ion_source(plan, context: BuiltinPreparationContext):
     """Allocate source-owned state once; ordinary steps only enqueue kernels."""
     from particula.gpu.kernels.ion_source import inject_ion_pairs
 
-    wp, session = owner._wp, owner._session
-    p = session.particles
+    wp, session = context.wp, context.session
+    p = context.particles
     stream = session.metadata.stream
     words = [
         int.from_bytes(
@@ -52,13 +54,13 @@ def compile_ion_source(plan, owner):
     rng = wp.array(
         np.asarray(words, dtype=np.uint32),
         dtype=wp.uint32,
-        device=owner.device.native,
+        device=context.device.native,
     )
     injected = wp.zeros(
-        session.dimensions.n_boxes, dtype=wp.int64, device=owner.device.native
+        session.dimensions.n_boxes, dtype=wp.int64, device=context.device.native
     )
-    owner._auxiliary["ion_source_rng"] = rng
-    owner._auxiliary["ion_source_pairs"] = injected
+    context.auxiliary["ion_source_rng"] = rng
+    context.auxiliary["ion_source_pairs"] = injected
     v = plan.values
     args = [
         p.masses,
@@ -66,14 +68,14 @@ def compile_ion_source(plan, owner):
         p.charge,
         p.volume,
         wp.float64(v["production_rate"]),
-        wp.float64(owner.time_step),
+        wp.float64(context.time_step),
         v["positive_species"],
         v["negative_species"],
         wp.float64(v["positive_mass"]),
         wp.float64(v["negative_mass"]),
         rng,
         injected,
-        owner._device_failure,
+        context.failure,
     ]
 
     def enqueue():
@@ -81,7 +83,7 @@ def compile_ion_source(plan, owner):
             inject_ion_pairs,
             dim=session.dimensions.n_boxes,
             inputs=args,
-            device=owner.device.native,
+            device=context.device.native,
         )
 
     return enqueue
@@ -102,27 +104,27 @@ def plan_ion_cleanup(process, aerosol):
     )
 
 
-def compile_ion_cleanup(plan, owner):
+def compile_ion_cleanup(plan, context: BuiltinPreparationContext):
     """Allocate checkpointed export ledgers and retain one device launch."""
     from particula.gpu.kernels.ion_cleanup import remove_neutral_ion_products
 
-    wp, session = owner._wp, owner._session
+    wp, session = context.wp, context.session
     dimensions = session.dimensions
     mass = wp.zeros(
         (dimensions.n_boxes, dimensions.n_species),
         dtype=wp.float64,
-        device=owner.device.native,
+        device=context.device.native,
     )
     particles = wp.zeros(
-        dimensions.n_boxes, dtype=wp.int64, device=owner.device.native
+        dimensions.n_boxes, dtype=wp.int64, device=context.device.native
     )
     phase = wp.zeros(
-        dimensions.n_boxes, dtype=wp.int64, device=owner.device.native
+        dimensions.n_boxes, dtype=wp.int64, device=context.device.native
     )
-    owner._auxiliary["ion_cleanup_phase"] = phase
-    owner._auxiliary["ion_export_mass"] = mass
-    owner._auxiliary["ion_export_particles"] = particles
-    p = session.particles
+    context.auxiliary["ion_cleanup_phase"] = phase
+    context.auxiliary["ion_export_mass"] = mass
+    context.auxiliary["ion_export_particles"] = particles
+    p = context.particles
     args = [
         p.masses,
         p.concentration,
@@ -131,7 +133,7 @@ def compile_ion_cleanup(plan, owner):
         plan.values["negative_species"],
         mass,
         particles,
-        owner._device_failure,
+        context.failure,
         wp.int64(plan.values["interval_steps"]),
         phase,
     ]
@@ -141,7 +143,7 @@ def compile_ion_cleanup(plan, owner):
             remove_neutral_ion_products,
             dim=dimensions.n_boxes,
             inputs=args,
-            device=owner.device.native,
+            device=context.device.native,
         )
 
     return enqueue
@@ -161,7 +163,7 @@ def plan_ion_exclusion(process, aerosol):
     )
 
 
-def compile_ion_exclusion(_plan, _owner):
+def compile_ion_exclusion(_plan, _context: BuiltinPreparationContext):
     """Condensation compilation consumes this companion configuration."""
     return lambda: None
 

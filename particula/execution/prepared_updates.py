@@ -6,6 +6,8 @@ from typing import Any
 
 import numpy as np
 
+from particula.execution.preparation_context import BuiltinPreparationContext
+
 
 def forcing_array(value, shape, name, *, positive):
     """Own finite physical host values with scalar/species/box broadcasting."""
@@ -45,20 +47,20 @@ def apply_forcing(owner: Any, updates: tuple[tuple[Any, np.ndarray], ...]):
         raise
 
 
-def compose_operations(owner, plans, operations):
+def compose_operations(context: BuiltinPreparationContext, plans, operations):
     """Refresh saturation before source consumption and after complete steps."""
-    if "condensation" not in owner._bindings:
+    if "condensation" not in context.bindings:
         return operations
     from particula.execution.prepared_guards import refresh_saturation
     from particula.gpu.kernels.thermodynamics import (
         _refresh_vapor_pressure_kernel_guarded,
     )
 
-    prepared = owner._bindings["condensation"].prepared
-    session, wp = owner._session, owner._wp
-    saturation = session.environment.saturation_ratio
-    failure = owner._device_failure
-    dim = session.gas.concentration.shape
+    prepared = context.bindings["condensation"].prepared
+    wp = context.wp
+    saturation = context.environment.saturation_ratio
+    failure = context.failure
+    dim = context.gas.concentration.shape
     vapor_inputs = [
         prepared.thermodynamics_modes,
         prepared.thermodynamics_parameters,
@@ -89,20 +91,31 @@ def compose_operations(owner, plans, operations):
             device=prepared.device,
         )
 
-    owner._refresh = refresh
+    from particula.execution.extension_registry import (
+        PreparedOperation,
+        ProcessCapabilities,
+    )
+
+    refresh_operation = PreparedOperation(
+        "execution.thermodynamics",
+        refresh,
+        (tuple(vapor_inputs), tuple(ratio_inputs)),
+        ProcessCapabilities(resident=True, capture=True, checkpoint=True),
+    )
+    context.refresh = refresh_operation
     from particula.execution.process_extensions import _RegisteredPlan
 
     result = []
     for plan, operation in zip(plans, operations, strict=True):
         if plan.family == "nucleation":
-            result.append(refresh)
+            result.append(refresh_operation)
         result.append(operation)
         if type(plan) is _RegisteredPlan and set(plan.configuration.writes) & {
             "gas.concentration",
             "environment.temperature",
         }:
-            result.append(refresh)
-    result.append(refresh)
+            result.append(refresh_operation)
+    result.append(refresh_operation)
     refresh()
     return tuple(result)
 

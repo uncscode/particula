@@ -2,6 +2,7 @@
 
 from dataclasses import replace
 from math import ceil, floor
+from typing import Any
 
 import numpy as np
 
@@ -9,6 +10,7 @@ from particula.execution.extension_registry import (
     PreparedOperation,
     ProcessCapabilities,
 )
+from particula.execution.preparation_context import BuiltinPreparationContext
 from particula.execution.process_extensions import _RegisteredPlan
 
 
@@ -40,13 +42,13 @@ def validate_particle_fields(aerosol, plans):
                 aerosol.fields.require_additive()
 
 
-def attach_transport(prepared, owner):
+def attach_transport(prepared, context: BuiltinPreparationContext):
     """Retain sparse overlap records from the native resampling sweep."""
     if prepared.resampling is None or not any(
-        "particle" in spec.axes for spec in owner._extension_fields.specs
+        "particle" in spec.axes for spec in context.fields.specs
     ):
         return prepared
-    wp, device = owner._wp, owner.device.native
+    wp, device = context.wp, context.device.native
     boxes, slots, _ = prepared.dimensions
     transport = (
         wp.zeros(boxes, dtype=wp.int32, device=device),
@@ -59,25 +61,25 @@ def attach_transport(prepared, owner):
     )
 
 
-def wrap_particle_fields(owner, plans, operations):
+def wrap_particle_fields(context: BuiltinPreparationContext, plans, operations):
     """Retain lifecycle operations without per-step allocations or readbacks."""
-    specs = tuple(
-        s for s in owner._extension_fields.specs if "particle" in s.axes
-    )
+    specs = tuple(s for s in context.fields.specs if "particle" in s.axes)
     if not specs:
         return operations
-    wp, counts = owner._wp, owner._session.particles.concentration
+    wp, counts = context.wp, context.particles.concentration
     before = wp.empty_like(counts)
     fields = []
     for spec in specs:
-        array = owner._extension_fields.arrays[spec.name]
+        array = context.fields.arrays[spec.name]
         channels = 1 if len(array.shape) == 2 else array.shape[2]
         values = array.reshape((*counts.shape, channels))
         dtype = getattr(wp, spec.dtype)
+        lower: float | int
+        upper: float | int
         if spec.dtype == "float64":
-            limits = np.finfo(np.float64)
-            lower = spec.minimum if spec.minimum is not None else -limits.max
-            upper = spec.maximum if spec.maximum is not None else limits.max
+            maximum = float(np.finfo(np.float64).max)
+            lower = spec.minimum if spec.minimum is not None else -maximum
+            upper = spec.maximum if spec.maximum is not None else maximum
         else:
             limits = np.iinfo(spec.dtype)
             lower = (
@@ -93,10 +95,10 @@ def wrap_particle_fields(owner, plans, operations):
         source = removed = None
         additive = int(spec.particle_policy == "additive")
         if additive:
-            source = owner._extension_fields.ledgers[
+            source = context.fields.ledgers[
                 "__field_ledger__.source." + spec.name
             ].reshape((counts.shape[0], channels))
-            removed = owner._extension_fields.ledgers[
+            removed = context.fields.ledgers[
                 "__field_ledger__.removal." + spec.name
             ].reshape((counts.shape[0], channels))
         fields.append(
@@ -113,18 +115,18 @@ def wrap_particle_fields(owner, plans, operations):
             )
         )
     return tuple(
-        _wrap(owner, plan, operation, before, fields)
+        _wrap(context, plan, operation, before, fields)
         for plan, operation in zip(plans, operations, strict=True)
     )
 
 
-def _wrap(owner, plan, operation, before, fields):  # noqa: C901
+def _wrap(context: BuiltinPreparationContext, plan, operation, before, fields):  # noqa: C901
     """Prepare a single family's event launches against fixed buffers."""
     from particula.execution import particle_field_kernels as kernels
 
-    wp, counts = owner._wp, owner._session.particles.concentration
-    failure = owner._device_failure
-    after_launches = []
+    wp, counts = context.wp, context.particles.concentration
+    failure = context.failure
+    after_launches: list[tuple[Any, tuple[int, ...], tuple[Any, ...]]] = []
     copies = []
     for (
         _spec,
@@ -139,7 +141,7 @@ def _wrap(owner, plan, operation, before, fields):  # noqa: C901
     ) in fields:
         dim = (values.shape[0], values.shape[2])
         if plan.family == "coagulation":
-            resources = owner._registry.acquire_coagulation(counts.shape[1])
+            resources = context.registry.acquire_coagulation(counts.shape[1])
             after_launches.append(
                 (
                     kernels.merge_fields,
@@ -161,7 +163,7 @@ def _wrap(owner, plan, operation, before, fields):  # noqa: C901
                 )
             )
         elif plan.family == "nucleation":
-            binding = owner._bindings["nucleation"]
+            binding = context.bindings["nucleation"]
             if binding.resampling is not None and additive:
                 transport = binding.resampling.transport
                 original = wp.empty_like(values)
@@ -225,15 +227,15 @@ def _wrap(owner, plan, operation, before, fields):  # noqa: C901
                 kernels.preserve_activity,
                 dim=counts.shape,
                 inputs=(before, counts, failure),
-                device=owner.device.native,
+                device=context.device.native,
             )
         for kernel, dim, inputs in after_launches:
             if all(dim):
                 wp.launch(
-                    kernel, dim=dim, inputs=inputs, device=owner.device.native
+                    kernel, dim=dim, inputs=inputs, device=context.device.native
                 )
 
-    resources = (
+    retained = (
         before,
         operation,
         tuple(copies),
@@ -245,5 +247,5 @@ def _wrap(owner, plan, operation, before, fields):  # noqa: C901
         else ProcessCapabilities(resident=True, capture=True, checkpoint=True)
     )
     return PreparedOperation(
-        plan.family + ".fields", enqueue, resources, capabilities
+        plan.family + ".fields", enqueue, retained, capabilities
     )

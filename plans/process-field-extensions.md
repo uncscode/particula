@@ -109,7 +109,7 @@ Recording advances neither scientific state, clock nor RNG.
 ## Serial commits and progress
 
 - [x] docs(plan): record process and field extension design
-- [ ] refactor(execution): introduce typed process bindings
+- [x] refactor(execution): introduce typed process bindings
 - [ ] feat(cpu): expose timed box process extensions
 - [ ] feat(data): add registered extension fields
 - [ ] feat(particles): preserve additive fields through population events
@@ -293,3 +293,16 @@ narrow passing suite. Leave merge, version bump and release outside this goal.
   qualification and the PR remain outstanding.
 - Combined affected extension/prepared/exhaustion regression completed with
   285 passed and five skips; real CUDA particle-event/capture tests passed.
+
+- Built-in process preparation now receives a typed resource context instead of
+  the simulation owner. Native adapters use the common exact-type registry and
+  return retained PreparedOperation records; cohort and thermodynamic composition
+  preserve records, capabilities and resources. Lifecycle/transfer orchestration
+  remains with the simulation owner, while physics preparation cannot call its
+  step, snapshot, checkpoint or close methods. Native scientific admission and
+  checkpoint configuration formats remain unchanged.
+- Refactor qualification: 289 affected tests passed with one intentional
+  Warp-CPU capture skip, including native/charged/atmospheric/cohort processes,
+  particle fields, custom adapters, transfers and real CUDA capture/restart.
+  Ruff and targeted mypy for all 11 changed execution modules pass. Published
+  examples, full final qualification, performance evidence and the PR remain.

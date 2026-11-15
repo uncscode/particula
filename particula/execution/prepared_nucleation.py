@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 from dataclasses import replace
-from typing import Any
 
 import numpy as np
 
+from particula.execution.preparation_context import BuiltinPreparationContext
 from particula.execution.prepared_processes import _ProcessPlan
 
 _BOUND_NAMES = (
@@ -98,7 +98,7 @@ def plan_nucleation(process, aerosol) -> _ProcessPlan:
     )
 
 
-def compile_nucleation(plan: _ProcessPlan, owner: Any):
+def compile_nucleation(plan: _ProcessPlan, context: BuiltinPreparationContext):
     """Retain all source/exhaustion buffers and explicit status observation."""
     from particula.dynamics.nucleation.species_mapping import (
         NucleationSpeciesMap,
@@ -117,22 +117,22 @@ def compile_nucleation(plan: _ProcessPlan, owner: Any):
         prepare_nucleation_species_map,
     )
 
-    wp, session = owner._wp, owner._session
+    wp, session = context.wp, context.session
     values = plan.values
-    resources = owner._registry.acquire_nucleation()
+    resources = context.registry.acquire_nucleation()
     for name in ("requested_scale", "minimum_scale", "minimum_volume"):
         getattr(resources.exhaustion, name).assign(np.asarray(values[name]))
     binding = prepare_nucleation_species_map(
-        session.particles,
-        session.gas,
+        context.particles,
+        context.gas,
         gas_names=session.metadata.gas_names,
         species_map=NucleationSpeciesMap(values["gas_names"], values["pairs"]),
     )
     prepared = _prepare_nucleation_step_gpu(
-        session.particles,
-        session.gas,
+        context.particles,
+        context.gas,
         NucleationConfig(**dict(values["config"])),
-        owner.time_step,
+        context.time_step,
         scratch=resources.scratch,
         finalized_demand=resources.finalized_demand,
         diagnostics=resources.diagnostics,
@@ -140,7 +140,7 @@ def compile_nucleation(plan: _ProcessPlan, owner: Any):
         exhaustion_controls=NucleationExhaustionControls(
             values["resampling"], values["representative_volume_scaling"]
         ),
-        environment=session.environment,
+        environment=context.environment,
         species_binding=binding,
     )
     if prepared.resampling is not None:
@@ -152,18 +152,18 @@ def compile_nucleation(plan: _ProcessPlan, owner: Any):
         )
     from particula.execution.prepared_guards import latch_nucleation_failure
 
-    prepared = replace(prepared, upstream_failure=owner._device_failure)
+    prepared = replace(prepared, upstream_failure=context.failure)
     from particula.execution.prepared_particle_fields import attach_transport
 
-    prepared = attach_transport(prepared, owner)
-    owner._bindings[plan.family] = prepared
-    saved_status = wp.zeros(25, dtype=wp.int32, device=owner.device.native)
+    prepared = attach_transport(prepared, context)
+    context.bindings[plan.family] = prepared
+    saved_status = wp.zeros(25, dtype=wp.int32, device=context.device.native)
 
     def observe():
         _raise_nucleation_status(saved_status.numpy())
 
-    owner._observers.append(observe)
-    counts = session.particles.concentration
+    context.observers.append(observe)
+    counts = context.particles.concentration
     budget = resources.exhaustion.resampling_releasable_counts
 
     def enqueue():
@@ -171,7 +171,7 @@ def compile_nucleation(plan: _ProcessPlan, owner: Any):
             _releasable_slots,
             dim=counts.shape[0],
             inputs=[counts, budget],
-            device=owner.device.native,
+            device=context.device.native,
         )
         _enqueue_prepared_nucleation_call(prepared)
         wp.launch(
@@ -192,7 +192,7 @@ def compile_nucleation(plan: _ProcessPlan, owner: Any):
                 prepared.p4_final_status,
                 prepared.p5_status,
                 saved_status,
-                owner._device_failure,
+                context.failure,
             ],
             device=prepared.device,
         )
