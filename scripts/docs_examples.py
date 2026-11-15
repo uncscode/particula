@@ -575,7 +575,7 @@ def selected_changed(configs, base, root=ROOT):
 
 
 def validate_example(key, config):
-    """Validate rendering-only updates without repeating their simulation."""
+    """Reuse render-only data when science matches; otherwise run validation."""
     if config["policy"] != "cpu":
         print(
             f"SKIP {key}: {config['policy']} execution "
@@ -583,7 +583,13 @@ def validate_example(key, config):
         )
         return
     _, manifest = bundle(key)
-    if manifest.get("rendered_at") and config.get("data_expression"):
+    if (
+        manifest.get("rendered_at")
+        and config.get("data_expression")
+        and manifest.get("package_source_sha256") == package_source_hash(ROOT)
+        and manifest.get("simulation_fingerprint")
+        == simulation_fingerprint(config, ROOT)
+    ):
         _, _, data = load_replot_data(key, config, ROOT, RESULTS)
         execute(config, saved_data=data)
         print(f"PASS {key}: saved-data rendering; simulation not rerun")

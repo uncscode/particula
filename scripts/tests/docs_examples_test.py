@@ -374,13 +374,33 @@ def test_plot_data_requires_an_object_or_array(tmp_path):
         examples.write_plot_data(tmp_path / "data.json", None)
 
 
-def test_validation_reuses_data_after_a_render_only_publication(monkeypatch):
-    """CI validation must not undo the no-rerun contract for CPU examples."""
+@pytest.mark.parametrize("changed", [None, "library", "simulation"])
+def test_validation_reuses_data_after_a_render_only_publication(
+    monkeypatch, changed
+):
+    """Reuse matching data; validate changed science through fresh execution."""
     config = {"policy": "cpu", "data_expression": "result"}
     data = {"time": [0, 1], "count": [0, 4]}
     calls = []
     monkeypatch.setattr(
-        examples, "bundle", lambda key: (None, {"rendered_at": "now"})
+        examples,
+        "bundle",
+        lambda key: (
+            None,
+            {
+                "rendered_at": "now",
+                "package_source_sha256": "old"
+                if changed == "library"
+                else "library",
+                "simulation_fingerprint": "old"
+                if changed == "simulation"
+                else "simulation",
+            },
+        ),
+    )
+    monkeypatch.setattr(examples, "package_source_hash", lambda root: "library")
+    monkeypatch.setattr(
+        examples, "simulation_fingerprint", lambda config, root: "simulation"
     )
     monkeypatch.setattr(
         examples, "load_replot_data", lambda *args: (None, {}, data)
@@ -389,7 +409,7 @@ def test_validation_reuses_data_after_a_render_only_publication(monkeypatch):
         examples, "execute", lambda c, **kwargs: calls.append(kwargs)
     )
     examples.validate_example("demo", config)
-    assert calls == [{"saved_data": data}]
+    assert calls == ([{"saved_data": data}] if changed is None else [{}])
 
 
 def test_figure_names_do_not_depend_on_stdout_chunking(tmp_path):
