@@ -6,14 +6,29 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_timed_chemistry_download_runs_outside_checkout(tmp_path):
-    """The complete downloadable script checks both boxes analytically."""
-    source = ROOT / (
-        "docs/examples/processes/customization/timed_box_chemistry.py"
-    )
+@pytest.mark.parametrize(
+    ("filename", "message"),
+    [
+        (
+            "timed_box_chemistry.py",
+            "Analytical species and inventory checks passed",
+        ),
+        (
+            "particle_tracers.py",
+            "Tracer inventory, exact resampling and passive rejection passed",
+        ),
+    ],
+)
+def test_cpu_extension_download_runs_outside_checkout(
+    tmp_path, filename, message
+):
+    """Complete downloadable scripts retain their independent scientific checks."""
+    source = ROOT / "docs/examples/processes/customization" / filename
     shutil.copy2(source, tmp_path / "example.py")
     environment = os.environ.copy()
     environment.update(
@@ -36,15 +51,13 @@ def test_timed_chemistry_download_runs_outside_checkout(tmp_path):
         check=True,
         timeout=60,
     )
-    assert "Analytical species and inventory checks passed" in result.stdout
+    assert message in result.stdout
 
 
 def test_gpu_extension_zip_runs_outside_checkout(tmp_path, monkeypatch):
     """The published ZIP carries its Warp helper and runs on real CUDA."""
     import json
     import zipfile
-
-    import pytest
 
     wp = pytest.importorskip("warp")
     if not wp.is_cuda_available():

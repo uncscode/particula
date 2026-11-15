@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 3.9986322759650648,
+  "package_source_sha256": "c8c0e7162c99fea1d7a3ddc183ff28e8fc38ccea661be0f2b03a98e754b2c004",
+  "input_sha256": {},
+  "example": "particle-tracers",
+  "fingerprint": "eeb79dcabb5a4f5ba3bee90ec578ad1774499a95d02dc6e56aefc2120b1bef19",
+  "source": "docs/examples/processes/customization/particle_tracers.py",
+  "revision": "e9eb2917d55008b3bfe38b717472f61223272c8d",
+  "package_dirty": false,
+  "executed_at": "2026-11-15T15:24:02.364467+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [
+      {
+        "image": "figure-4-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "d874e076be056c31743db60d0c65437fa448685d2619d7463a939a7cdbcbb744",
+    "data.json": "3c09155d460a480a7371714b391733adefa6684da17e9918a15f67e52de78995",
+    "executed_source.py": "347acd93b43a63f7a7e18a0bdb5bdc5edc2f10518876289e8c695a61462567bb",
+    "figure-4-1.png": "bbe7049dc837367fb1c873df58b652b26a835c1ec86d70641c6083384ffc0ab2"
+  },
+  "simulation_fingerprint": "acb7661568d49d27b71e0472a24b25726ee7254d419c187c0cf0058f38c9e33c",
+  "render_versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "render_device": "CPU",
+  "execution_input_sha256": {},
+  "rendered_at": "2026-11-15T15:25:07.060199+00:00",
+  "render_revision": "e9eb2917d55008b3bfe38b717472f61223272c8d",
+  "render_elapsed_seconds": 3.762341737980023
+}

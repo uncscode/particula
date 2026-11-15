@@ -752,5 +752,20 @@
       "plot_results"
     ],
     "plot_inputs": []
+  },
+  "particle-tracers": {
+    "title": "Registered particle tracers",
+    "source": "docs/examples/processes/customization/particle_tracers.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 180,
+    "inputs": [],
+    "invoke": "report = run_example()",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\nplot_results(report)",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": []
   }
 }

@@ -398,3 +398,67 @@ materialize writable independent arrays when broadcasting concentration,
 charge, or volume. Already matching arrays retain their existing ownership
 behavior. A successful build does not imply an independent copy of every
 input; use `copy()` when isolation is required.
+
+## Registered extension fields
+
+`Aerosol.fields` owns an `ExtensionFields` store. Import `FieldSpec` and
+`ExtensionFields` from `particula`; use `aerosol.fields.add(spec, values)` to
+register data and `aerosol.fields[spec.name]` to access its array. Names must be
+namespaced, such as `lab.exposure` or `lab.tracer`. Native container names are
+reserved. Register fields before preparing a GPU simulation.
+
+A `FieldSpec` declares `name`, `axes`, `units`, `dtype`, `initial_value`, optional
+`minimum`/`maximum`, and `particle_policy`. Units are metadata, not automatic
+conversion. Supported dtypes are `float64`, `int32` and `int64`. Layouts are:
+
+| Axes | Meaning |
+| --- | --- |
+| `("box",)` | One value per independent box |
+| `("box", "gas_species")` | Full ordered gas-species values per box |
+| `("box", "particle_species")` | Particle-material values per box |
+| `("box", "particle")` | One value per fixed particle slot |
+| `("box", "particle", "particle_species")` | Particle-material values per slot |
+
+`add` copies supplied values and validates their shape and dtype. Omitting
+values fills the allocation with `initial_value`; for particle fields with
+free slots, supply values that are zero in those slots. Native container
+replacement must remain compatible with the registered schema. A new field
+adds storage, not a species or automatic participation in physical formulas.
+Declare its name in a custom process's `reads` and/or `writes`.
+
+Particle fields currently require `particle_resolved` state. Their policies
+are explicit:
+
+- `passive` preserves an identity-associated value, initializes births from
+  `initial_value` and clears retired slots. It rejects coagulation and enabled
+  resampling because no merge/redistribution rule is defined.
+- `additive` requires `float64`. A value is an extensive quantity per physical
+  particle; its represented inventory is `sum(count * value)`. Native mergers
+  sum the actual colliding values. Native resampling uses the same count-overlap
+  weights as particle mass, then births receive their declared default.
+  Dilution preserves per-particle values and records removed inventory.
+
+`inventory_changes(name)` returns detached per-box `source` and `removal`
+arrays for additive fields; vector fields retain the particle-species axis.
+These ledgers account for supported native events. Custom processes own their
+scientific source/sink accounting. Inventory preservation during resampling
+does not guarantee preservation of the joint tracer/particle distribution.
+Fields must be finite, inactive slots must be zero, and bounds apply to active
+slots. Custom value updates must preserve slot activity. Representative-volume
+scaling with particle fields is rejected; changing slot capacity or species
+structure requires a separate explicit contract.
+
+CPU staging, box views and successful transactional publication include fields.
+Prepared GPU execution uploads them once; snapshots detach their values,
+checkpoints retain their schema and exact bytes, and capture retains fixed
+array identities. Low-level calls outside native runnable orchestration do not
+automatically manage field population events. See the
+[prepared GPU contract](../gpu/prepared.md#registered-particle-fields) for its
+admission boundaries.
+
+Run the [particle tracer example](../../examples/processes/customization/particle_tracers.py)
+for merger/removal budgets and a hand-checked resampling/source case. The
+[timed chemistry example](../../examples/processes/customization/timed_box_chemistry.py)
+uses a per-box field for custom source accounting, and the
+[CPU/CUDA extension example](../../examples/gpu/prepared/custom_process_backends.py)
+shows field continuation through explicit transfer, capture and restart.

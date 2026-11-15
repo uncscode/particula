@@ -414,6 +414,10 @@
               {
                 "label": "Timed custom CPU chemistry",
                 "slug": "examples/processes/customization/timed_box_chemistry"
+              },
+              {
+                "label": "Registered particle tracers",
+                "slug": "examples/processes/customization/particle_tracers"
               }
             ]
           },
