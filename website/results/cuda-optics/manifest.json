@@ -1,15 +1,15 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 10.904253446962684,
-  "package_source_sha256": "c8141ca8ddae25d5a2987d44178c80a05fe0817b714350d8246666d5614ca6d1",
+  "elapsed_seconds": 11.908504402963445,
+  "package_source_sha256": "a2faecc9e7fb5cff47d09509cf98cc08b9e69dcda39c0b271c03295e2bee85cb",
   "input_sha256": {},
   "example": "cuda-optics",
   "fingerprint": "99a849e62fc4f3159be24a918cd1f8d0f5f901bf9f23f188116723c0330643c1",
   "source": "docs/examples/optics/cuda_optics.py",
-  "revision": "1b9f4f07967d2daaefa93b68eb096572a7683bee",
+  "revision": "d523321593a5669d8eabc4c421ea77eba543be6a",
   "package_dirty": false,
-  "executed_at": "2026-11-15T15:25:50.621683+00:00",
+  "executed_at": "2026-11-15T15:44:41.266102+00:00",
   "device": "cuda:0: NVIDIA GeForce RTX 5060",
   "python": "3.12.12",
   "versions": {
@@ -27,19 +27,19 @@
     [],
     [
       {
-        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     /tmp/optics-example-isolated-cache/warp/1.11.1\n"
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     /tmp/optics-final-evidence-cache/warp/1.11.1\n"
       },
       {
-        "text": "Module particula.optics.gpu.mie 5509a13 load on device 'cuda:0' took 534.60 ms  (compiled)\n"
+        "text": "Module particula.optics.gpu.mie 70b1f11 load on device 'cuda:0' took 1495.42 ms  (compiled)\n"
       },
       {
-        "text": "Module particula.optics.gpu.angular 91aee41 load on device 'cuda:0' took 495.44 ms  (compiled)\n"
+        "text": "Module particula.optics.gpu.angular 91aee41 load on device 'cuda:0' took 564.89 ms  (compiled)\n"
       },
       {
-        "text": "Module particula.optics.gpu._bulk 8686aab load on device 'cuda:0' took 449.94 ms  (compiled)\n"
+        "text": "Module particula.optics.gpu._bulk 8686aab load on device 'cuda:0' took 538.01 ms  (compiled)\n"
       },
       {
-        "text": "Device: NVIDIA GeForce RTX 5060 Warp 1.11.1\nModule compile/cache load [s]: {'mie': 0.6055617620004341, 'angular': 0.4970143180107698, '_bulk': 0.4513440140290186}\n64 cases, x\u226410: upload=0.000460315s, prepare=0.000447321s, download=2.31831e-05s, max Q error=1.55e-15\n512 cases, x\u2264100: upload=0.000152904s, prepare=0.000174535s, download=2.2572e-05s, max Q error=2e-15\n2048 cases, x\u22641000: upload=0.000259833s, prepare=0.000469602s, download=5.348e-05s, max Q error=5.33e-15\nAll particle efficiencies and full bulk Mueller matrices pass the declared CPU/CUDA comparisons.\n"
+        "text": "Device: NVIDIA GeForce RTX 5060 Warp 1.11.1\nModule compile/cache load [s]: {'mie': 1.5666696730768308, 'angular': 0.5666150850011036, '_bulk': 0.5393738989951089}\n64 cases, x\u226410: upload=0.000412035s, prepare=0.00046803s, download=2.6109e-05s, max Q error=1.55e-15\n512 cases, x\u2264100: upload=0.000148326s, prepare=0.000200623s, download=2.5908e-05s, max Q error=2e-15\n2048 cases, x\u22641000: upload=0.000238643s, prepare=0.000466837s, download=5.2858e-05s, max Q error=5.33e-15\nAll particle efficiencies and full bulk Mueller matrices pass the declared CPU/CUDA comparisons.\n"
       },
       {
         "image": "figure-4-1.png"
@@ -51,8 +51,8 @@
   ],
   "files": {
     "figure-4-2.png": "4dd0fb1e16fbaf4c0380b07c230645fb20ceaa06718fd8643534567a00e725ae",
-    "figure-4-1.png": "440c847783a6f3c56c390c5ac7c275f447bc5b91bbd95f64ae03ee27a5ad37d1",
-    "data.json": "c13d8f04f93798cc27d896382dedb8e91912fe0276e5838b7be46377b3647a0c",
+    "figure-4-1.png": "f14bca9e7295fc0df7cf7c685d1b4548dffb0942c6090e4963b8ba5483efd070",
+    "data.json": "83daa2e8d65461af2fc1d114a3e83cbb653e08f0a3d687402a507cc462d4cd71",
     "source.py": "4f42c5e68c0f82a6d43ae98cc8bc3d5fa9c1090d7219db6a8e124004c63b6222"
   },
   "simulation_fingerprint": "454b3b6eaddf926208589a14b32c0af015f2e8fd32287999c75d25d124f1b970"

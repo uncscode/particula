@@ -1,10 +1,10 @@
 # CUDA optics qualification
 
-Measured 2026-11-15T15:25:50.621683+00:00 on NVIDIA GeForce RTX 5060 (8 GiB),
+Measured 2026-11-15T15:44:41.266102+00:00 on NVIDIA GeForce RTX 5060 (8 GiB),
 AMD Ryzen AI 9 HX 370 CPU, Python 3.12.12 and Warp 1.11.1.
 Warp reported CUDA Toolkit 12.9 and driver API 13.4. The run used source revision
-`1b9f4f07967d2daaefa93b68eb096572a7683bee` with unchanged package source
-SHA-256 `c8141ca8ddae25d5a2987d44178c80a05fe0817b714350d8246666d5614ca6d1`.
+`d523321593a5669d8eabc4c421ea77eba543be6a` with unchanged package source
+SHA-256 `a2faecc9e7fb5cff47d09509cf98cc08b9e69dcda39c0b271c03295e2bee85cb`.
 The example source was newly authored; its exact executed bytes, execution
 fingerprint, installed distribution metadata and dependency versions are in
 `website/results/cuda-optics/manifest.json` and `source.py`.
@@ -21,7 +21,7 @@ python scripts/docs_examples.py refresh cuda-optics
 
 Use the selected environment and checkout on PYTHONPATH when reusing another
 worktree's environment. This run used a separate empty Warp cache under
-`XDG_CACHE_HOME=/tmp/optics-example-isolated-cache`. Other validation workloads
+`XDG_CACHE_HOME=/tmp/optics-final-evidence-cache`. Other validation workloads
 had completed before the retained timing run. Background OS load and frequency
 variation were not controlled; this is a local workload measurement, not a
 hardware-wide throughput claim.
@@ -36,11 +36,11 @@ CPU speed claim is made. Raw repetitions are retained in the saved plot data.
 
 | Cases | Maximum x | NumPy median [ms] | CUDA median [ms] | Upload [ms] | Preparation [ms] | Download [ms] |
 | --- | --- | --- | --- | --- | --- | --- |
-| 64 | 10 | 1.987 | 0.144 | 0.4603 | 0.4473 | 0.02318 |
-| 512 | 100 | 35.41 | 1.34 | 0.1529 | 0.1745 | 0.02257 |
-| 2048 | 1000 | 1045 | 20.95 | 0.2598 | 0.4696 | 0.05348 |
+| 64 | 10 | 2.976 | 0.1471 | 0.412 | 0.468 | 0.02611 |
+| 512 | 100 | 37.93 | 1.365 | 0.1483 | 0.2006 | 0.02591 |
+| 2048 | 1000 | 908.1 | 21.23 | 0.2386 | 0.4668 | 0.05286 |
 
-Module compile/cache-load observations [s]: mie=0.6056, angular=0.497, _bulk=0.4513.
+Module compile/cache-load observations [s]: mie=1.567, angular=0.5666, _bulk=0.5394.
 
 ## Numerical qualification
 
@@ -65,8 +65,24 @@ visually inspected. Optical numerical tests additionally cover Warp CPU,
 native CUDA, failures, zero cases, medium normalization, polarization,
 chunk independence and independent angular integrals through x=10000.
 
-## Remaining delivery gates
+## Delivery validation
 
-This record does not establish full-package coverage, clean-wheel validation,
-completion of every input/failure audit, release readiness or PR approval.
-Those gates are tracked separately in the implementation plan and final review.
+Final numerical source is commit `baf393b18`; subsequent commits before this
+measurement only update recorded evidence. Full source tests with native CUDA
+passed: 10,408 passed, 14 skipped, one expected failure, 91.36% total coverage
+(required 80%). Command: `python -m pytest -Werror --cov=particula
+--cov-report=term-missing --cov-fail-under=80`. The report includes Python
+wrappers and tests; Python line coverage does not instrument compiled Warp
+kernel bodies. Device execution is established by the numerical CUDA tests.
+
+The installed-wheel optics suite passed all 251 tests on CPU and native CUDA
+in a separate environment with NumPy 2.5.4, SciPy 1.18.1 and Warp 1.19.0.
+PyMieScatt, miepython and mpmath were absent. The wheel includes offline
+reference fixtures. Documentation bundle verification passed isolated installs
+and an offline source-archive rebuild (210 files, 2,514,813 documentation bytes).
+
+Repository-wide Ruff, formatting and mypy passed. Infrastructure tests passed
+298 tests; example integration passed 235 with one skip. The registered CPU
+example campaign passed, with configured long/CUDA skips; both new optics
+examples were separately refreshed in full on their required devices.
+These results are development qualification, not release or merge approval.
