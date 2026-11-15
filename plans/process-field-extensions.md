@@ -139,23 +139,23 @@ docstrings, navigation and example registry. No root README changes.
 
 Required evidence before completion:
 
-- [ ] Single/multiple boxes, reordering, timing/substeps/repeated calls, zero
+- [x] Single/multiple boxes, reordering, timing/substeps/repeated calls, zero
       duration, independent instances and transactional RNG.
-- [ ] Requirement, schema, alias, undeclared-write, invalid-value and array
+- [x] Requirement, schema, alias, undeclared-write, invalid-value and array
       replacement rejection, including later-box failure atomicity.
-- [ ] Field copy/view/transfer isolation and independent additive inventories
+- [x] Field copy/view/transfer isolation and independent additive inventories
       through slot reuse, merging, removal and exact resampling weights.
-- [ ] Unextended native behavior remains numerically unchanged.
-- [ ] Real CUDA resident execution has no per-step allocation/readback;
+- [x] Unextended native behavior remains numerically unchanged.
+- [x] Real CUDA resident execution has no per-step allocation/readback;
       transfers preserve device pointers and RNG and refresh dependencies.
-- [ ] Failures suppress dependent work and surface at observation.
-- [ ] Checkpoint bytes, time, host/device RNG, multiple instances, v1 compatibility
+- [x] Failures suppress dependent work and surface at observation.
+- [x] Checkpoint bytes, time, host/device RNG, multiple instances, v1 compatibility
       and corrupted/incompatible rejection before upload.
-- [ ] Real CUDA capture recording is inert; replay/restart matches uncaptured
+- [x] Real CUDA capture recording is inert; replay/restart matches uncaptured
       continuation; transfer capture rejects.
-- [ ] Extracted examples, saved results, docs checks/site tests/build, Ruff,
+- [x] Extracted examples, saved results, docs checks/site tests/build, Ruff,
       mypy, package/example/script suites and required coverage pass.
-- [ ] Bounded extension-free overhead and resident/transfer timing evidence;
+- [x] Bounded extension-free overhead and resident/transfer timing evidence;
       distinguish Warp CPU from real CUDA, never claim unmeasured speedup.
 - [ ] Verify final diff, current upstream, fork destination; push one branch and
       open one PR titled "feat: add custom processes and registered fields for
@@ -359,3 +359,20 @@ narrow passing suite. Leave merge, version bump and release outside this goal.
   timing measurements wait for other host validation workloads. A single draft
   PR will allow hosted CI to run while the remaining evidence is collected;
   draft creation is not completion or approval to merge.
+
+- Isolated RTX 5060 timing campaign completed on 24c99ad8c with identical
+  library bytes to the qualified package revision. Extension-free native
+  overhead is 10.1% uncaptured and 10.6% captured, below the predeclared 20%
+  bound. Custom resident execution is 129.000 microseconds/step, captured
+  resident 163.099 microseconds/step, and explicit transfer 1,890.613
+  microseconds/step for the documented bounded workload. Seven samples per
+  case, source hashes and versions are retained in the qualification data.
+- Full saved-example validation passed. Draft PR #1652 is open against
+  uncscode/particula:main from the verified Gorkowski fork; hosted CI is running.
+  Final site rebuild, final evidence push and live review follow-through remain.
+
+- Final site rebuild and rendered verification passed with zero errors across
+  607 HTML pages and 286 API modules. The qualification record and complete
+  timing samples are ready for the final evidence push. Local implementation,
+  examples, numerical checks, coverage, types, formatting and documentation
+  gates are complete; hosted final-commit CI and live reviews remain.
