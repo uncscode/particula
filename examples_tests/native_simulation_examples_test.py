@@ -226,7 +226,10 @@ def test_cooled_soot_condensation_then_coagulation_inventory(monkeypatch):
 
 
 @pytest.mark.parametrize("dt", [1.0, 0.1])
-def test_three_cloud_compositions_humidity_reset_and_dry_mass(monkeypatch, dt):
+@pytest.mark.parametrize("time_offset", [0.0, 8190.0])
+def test_three_cloud_compositions_humidity_reset_and_dry_mass(
+    monkeypatch, dt, time_offset
+):
     """Short cycles retain all three material mappings and prescribed forcing."""
     monkeypatch.setattr(plt, "show", lambda *args, **kwargs: None)
     values = _setup_through(
@@ -251,15 +254,17 @@ def test_three_cloud_compositions_humidity_reset_and_dry_mass(monkeypatch, dt):
             humid_duration=2,
             dry_duration=3,
             dt=dt,
+            time_offset=time_offset,
             water_index=water_index,
             c_water_humid=values["c_water_humid"],
             c_water_dry=values["c_water_dry"],
         )
         assert final is aerosol
-        # Physical duration remains five seconds when dt is refined.
+        # Refinement and a late-cycle offset must preserve the five-second
+        # duration. Compare absolute timestamps, avoiding cancellation in diffs.
         np.testing.assert_allclose(
             [r["time"] for r in history],
-            np.linspace(0, 5, round(5 / dt) + 1),
+            time_offset + np.linspace(0, 5, round(5 / dt) + 1),
             rtol=0,
             atol=1e-12,
         )

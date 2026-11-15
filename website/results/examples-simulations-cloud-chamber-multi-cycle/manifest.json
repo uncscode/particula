@@ -1,15 +1,15 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 60.770667069009505,
+  "elapsed_seconds": 59.06746559496969,
   "package_source_sha256": "8340db23fd0f933d97cccca5043297b3b1382b94bbaa2249dcaeb9fe1dc62879",
   "input_sha256": {},
   "example": "examples-simulations-cloud-chamber-multi-cycle",
-  "fingerprint": "12ff983b806e063c8c69534566e45b5b1c676818aba56ce3e800dd55d259db30",
+  "fingerprint": "cfca52a38b0f9eab0c48f7d767371d7e8a78b3fc157769310c6c8ddf361a7f06",
   "source": "docs/examples/simulations/cloud_chamber_multi_cycle.py",
-  "revision": "277ccafb82ee7ed32af4ea96bec6ae301ce67df5",
+  "revision": "e10895939774cf1e5153a64b47b03c8221ea58ab",
   "package_dirty": false,
-  "executed_at": "2026-11-15T20:32:00.738886+00:00",
+  "executed_at": "2026-11-15T21:11:00.146493+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
@@ -130,7 +130,7 @@
     ]
   ],
   "files": {
-    "source.py": "a3d0c45684591f2442689f3b75d5bb24f106177c3b51febe758f544cc9b45f55",
+    "source.py": "fc2a8cf1c47507637759e9ac411bb40e56801936ec41f7e842a8e3a1522b6ca7",
     "figure-8-1.png": "ace14020870858032658327bf9b2bb1948b3a22798a746029b58f08fde7f8bc4",
     "figure-9-1.png": "fddd09494abfbeb4e364a15bbf667a7f7696c63df3b0549c668218dff462cc19",
     "figure-10-1.png": "7aa9930753411137027a406904fcfb473e2b6c2af6dc819a56cd6737461c1bff",

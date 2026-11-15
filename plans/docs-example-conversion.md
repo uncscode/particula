@@ -267,3 +267,16 @@ resolution concern. CUDA demonstrations retain their specific workload and
 execution provenance; these editorial changes do not establish universal
 convergence, experimental validation, or new ensemble statistics. No library
 physics implementation changed.
+
+## PR review follow-up
+
+- Fixed standalone structure-test collection: explicitly add the scripts folder
+  before importing the checker, so its topic helper resolves independently of
+  test collection order. The isolated 17 tests and all 318 infrastructure tests
+  passed; all hosted workflows passed at `e10895939`.
+- Reproduced the later review's chamber timestamp failure at 8190 seconds with
+  dt=0.1 seconds. Validate spacing on local elapsed times, then add the absolute
+  offset, retaining the original 1e-12 second tolerance and all mass checks.
+  The 13 simulation tests cover zero and late offsets at both timesteps.
+  The full CPU workload was refreshed successfully; all 23 captured outputs
+  and all eight figure hashes match the previous run.

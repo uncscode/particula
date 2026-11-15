@@ -189,7 +189,7 @@ def run_cycle(
     # Record initial state
     history.append(
         {
-            "time": time_offset,
+            "time": 0.0,
             "phase": "humid",
             "masses": aerosol.particles.masses[0].copy(),
         }
@@ -219,7 +219,7 @@ def run_cycle(
         aerosol = wall_loss.execute(aerosol, time_step=dt)
         history.append(
             {
-                "time": time_offset + t_step * dt,
+                "time": t_step * dt,
                 "phase": "humid",
                 "masses": aerosol.particles.masses[0].copy(),
             }
@@ -253,16 +253,20 @@ def run_cycle(
         aerosol = wall_loss.execute(aerosol, time_step=dt)
         history.append(
             {
-                "time": time_offset + humid_duration + t_step * dt,
+                "time": humid_duration + t_step * dt,
                 "phase": "dry",
                 "masses": aerosol.particles.masses[0].copy(),
             }
         )
 
     assert len(history) == humid_steps + dry_steps + 1
+    # Check the elapsed clock before adding a large absolute offset: adjacent
+    # absolute timestamps can lose precision when subtracted in later cycles.
     np.testing.assert_allclose(
         np.diff([record["time"] for record in history]), dt, rtol=0, atol=1e-12
     )
+    for record in history:
+        record["time"] += time_offset
     return aerosol, history
 
 
