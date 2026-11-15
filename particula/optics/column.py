@@ -85,7 +85,8 @@ def get_mass_specific_opacity(
         A zero/zero vacuum returns zero and False.
 
     Raises:
-        ValueError: If values are invalid or nonzero optics has zero density.
+        ValueError: If inputs/results are invalid or nonzero optics has zero
+            density.
     """
     optical, density = np.broadcast_arrays(
         _nonnegative(coefficient, "Optical coefficient"),
@@ -94,7 +95,10 @@ def get_mass_specific_opacity(
     valid = density > 0
     if np.any((~valid) & (optical > 0)):
         raise ValueError("Nonzero optical coefficient requires mass density")
-    result = np.divide(
-        optical, density, out=np.zeros_like(optical), where=valid
-    )
+    with np.errstate(over="ignore", invalid="ignore"):
+        result = np.divide(
+            optical, density, out=np.zeros_like(optical), where=valid
+        )
+    if np.any(~np.isfinite(result)):
+        raise ValueError("Mass-specific opacity overflow")
     return result, valid

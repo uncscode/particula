@@ -41,6 +41,8 @@ class PopulationOptics(NamedTuple):
 
 def _nonnegative(values: ArrayLike, name: str) -> NDArray[np.float64]:
     """Coerce a finite nonnegative physical array without modifying it."""
+    if np.iscomplexobj(values):
+        raise ValueError(f"{name} must be real")
     array = np.asarray(values, dtype=np.float64)
     if np.any(~np.isfinite(array)) or np.any(array < 0):
         raise ValueError(f"{name} must be finite and nonnegative")
@@ -87,7 +89,9 @@ def get_population_weights(
         if np.any(physical_volume == 0):
             raise ValueError("Volume must be positive")
         physical_volume = np.broadcast_to(physical_volume, values.shape[:-1])
-        return values / physical_volume[..., None]
+        with np.errstate(over="ignore", invalid="ignore"):
+            result = values / physical_volume[..., None]
+        return _nonnegative(result, "Resolved number density")
     if distribution_type == "continuous_pdf":
         if radius_grid is None or volume is not None:
             raise ValueError("Radius PDF requires only its radius grid")
@@ -104,7 +108,9 @@ def get_population_weights(
         weights = np.zeros_like(grid)
         weights[:-1] += spacing / 2
         weights[1:] += spacing / 2
-        return values * weights
+        with np.errstate(over="ignore", invalid="ignore"):
+            result = values * weights
+        return _nonnegative(result, "PDF number weights")
     raise ValueError("Unknown optical population measure")
 
 
@@ -129,7 +135,7 @@ def get_population_optics(
         the particle axis removed. Empty/zero populations produce zeros.
 
     Raises:
-        ValueError: If values, shapes, or the reduction axis are invalid.
+        ValueError: If inputs, reduction axis or resulting values are invalid.
     """
     weights = _nonnegative(number_density_weights, "Number weights")
     g = np.asarray(asymmetry, dtype=np.float64)
@@ -145,21 +151,28 @@ def get_population_optics(
         or not -arrays[0].ndim <= particle_axis < arrays[0].ndim
     ):
         raise ValueError("Invalid particle axis")
-    totals = [np.sum(v * arrays[-1], axis=particle_axis) for v in arrays[:5]]
-    extinction, scattering = totals[:2]
-    albedo = np.divide(
-        scattering,
-        extinction,
-        out=np.zeros_like(scattering),
-        where=extinction > 0,
-    )
-    weighted_g = np.sum(arrays[1] * arrays[-2] * arrays[-1], axis=particle_axis)
-    bulk_g = np.divide(
-        weighted_g,
-        scattering,
-        out=np.zeros_like(scattering),
-        where=scattering > 0,
-    )
+    with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
+        totals = [
+            np.sum(v * arrays[-1], axis=particle_axis) for v in arrays[:5]
+        ]
+        extinction, scattering = totals[:2]
+        albedo = np.divide(
+            scattering,
+            extinction,
+            out=np.zeros_like(scattering),
+            where=extinction > 0,
+        )
+        weighted_g = np.sum(
+            arrays[1] * arrays[-2] * arrays[-1], axis=particle_axis
+        )
+        bulk_g = np.divide(
+            weighted_g,
+            scattering,
+            out=np.zeros_like(scattering),
+            where=scattering > 0,
+        )
+    if any(np.any(~np.isfinite(v)) for v in (*totals, albedo, bulk_g)):
+        raise ValueError("Population optical reduction overflow")
     return PopulationOptics(
         totals[0],
         totals[1],
@@ -194,7 +207,7 @@ def get_population_mueller_matrix(
         coefficient to obtain the population phase matrix.
 
     Raises:
-        ValueError: If shapes, finite values or weights are invalid.
+        ValueError: If inputs or resulting matrix values are invalid.
     """
     matrix = np.asarray(differential_matrix, dtype=np.float64)
     weights = _nonnegative(number_density_weights, "Number weights")
@@ -208,5 +221,11 @@ def get_population_mueller_matrix(
     if not -len(shape) <= particle_axis < len(shape):
         raise ValueError("Invalid particle axis")
     axis = particle_axis % len(shape)
-    weighted = matrix * np.broadcast_to(weights, shape)[..., None, None, None]
-    return np.sum(weighted, axis=axis)
+    with np.errstate(over="ignore", invalid="ignore"):
+        weighted = (
+            matrix * np.broadcast_to(weights, shape)[..., None, None, None]
+        )
+        result = np.sum(weighted, axis=axis)
+    if np.any(~np.isfinite(result)):
+        raise ValueError("Population Mueller reduction overflow")
+    return result
