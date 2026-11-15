@@ -351,6 +351,9 @@ A condensation process supplies thermodynamic refresh when a custom process
 changes gas concentrations or temperature. A sequence with saturation readers
 and such writers rejects preparation if it has no refresh provider, including
 when the reader precedes the writer and would see stale state on the next step.
+Declared custom saturation readers also refresh after preceding native updates.
+Combining these readers with native gas-changing dilution or nucleation requires
+a refresh provider, regardless of their order in the repeating sequence.
 
 Declare immutable `parameters`, `extension_id`, and `version` on the CPU process
 when configuration affects its behavior. These join its instance name, reads,
