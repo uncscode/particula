@@ -610,6 +610,40 @@ def check_inventory(dist, pages):
     return errors
 
 
+def check_llms_index(dist):
+    """Check the published LLM index and its targets without network access."""
+    index = dist / "llms.txt"
+    if not index.is_file():
+        return ["Missing published llms.txt"]
+    text = index.read_text()
+    errors = []
+    if text != (SITE / "public/llms.txt").read_text():
+        errors.append("Published llms.txt differs from its maintained source")
+    links = re.findall(r"\[[^\]\n]+\]\(([^)\s]+)\)", text)
+    if not text.startswith("# Particula\n") or not links:
+        errors.append(
+            "llms.txt needs a project heading and documentation links"
+        )
+    raw = "https://raw.githubusercontent.com/uncscode/particula/main/"
+    for href in links:
+        if href.startswith(raw):
+            root, relative = ROOT, href.removeprefix(raw)
+        elif href.startswith(PUBLISHED):
+            root, relative = dist, href.removeprefix(PUBLISHED)
+        else:
+            errors.append(f"Unsupported llms.txt target or revision: {href}")
+            continue
+        target = (root / unquote(urlsplit(relative).path)).resolve()
+        if not target.is_relative_to(root.resolve()):
+            errors.append(f"llms.txt target escapes its root: {href}")
+            continue
+        if href.startswith(PUBLISHED) and target.is_dir():
+            target /= "index.html"
+        if ".trash" in target.parts or not target.is_file():
+            errors.append(f"Missing or archived llms.txt target: {href}")
+    return errors
+
+
 def check_discovery(dist, pages):
     """Inspect actual search fragments and sitemap URLs for retired content."""
     errors = []
@@ -735,6 +769,7 @@ def verify():
     errors.extend(api_errors)
     errors.extend(check_inventory(dist, pages))
     errors.extend(check_discovery(dist, pages))
+    errors.extend(check_llms_index(dist))
     data = json.loads((SITE / ".cache/griffe.json").read_text())
     modules = []
 
