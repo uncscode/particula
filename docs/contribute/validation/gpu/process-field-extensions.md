@@ -36,12 +36,12 @@ Numerical, failure, ownership, capture and restart tests remain separate gates.
 
 ## Correctness and publication checks
 
-Library revision `dac1251fd`, Python 3.12.12, real NVIDIA GeForce RTX 5060:
+Library revision `8d108f454`, Python 3.12.12, real NVIDIA GeForce RTX 5060:
 
 | Check | Result |
 | --- | --- |
-| Full package, warnings as errors, no slow/performance exclusion | 10,304 passed, 20 skipped, one expected failure |
-| Full-package coverage | 91.78%; required minimum 80% |
+| Full package, warnings as errors, no slow/performance exclusion | 10,312 passed, 20 skipped, one expected failure |
+| Full-package coverage | 91.79%; required minimum 80% |
 | CI example suite | 238 passed, one skipped |
 | Full script suite | 294 passed |
 | Whole-library mypy | Passed, 612 source files |
@@ -53,11 +53,11 @@ The package run uses a separate coverage database so other local runs cannot
 overwrite its evidence:
 
 ```bash
-COVERAGE_FILE=.artifacts/process-field-extensions/.coverage-review \
+COVERAGE_FILE=.artifacts/process-field-extensions/.coverage-identity \
 WARP_CACHE_PATH=/tmp/particula-extension-warp \
 MPLCONFIGDIR=/tmp/particula-mpl \
 .venv/bin/pytest -q -Werror --cov=particula --cov-report=term-missing \
-  --cov-report=json:.artifacts/process-field-extensions/coverage-review.json \
+  --cov-report=json:.artifacts/process-field-extensions/coverage-identity.json \
   --cov-fail-under=80
 .venv/bin/pytest examples_tests -q -Werror \
   -m 'not slow and not performance' --no-cov
@@ -69,6 +69,9 @@ isolation and source/removal accounting; real CUDA resident and explicit-transfe
 execution; device pointer retention; failure suppression; checkpoint drift
 rejection; and capture recording/replay. Declared saturation consumers also match an independent ideal-gas oracle after
 native updates, including transfer, resident, capture and restart paths.
+Grouped sequences also preserve absolute time across calls and prepared
+restart; delimiter-bearing extension identities retain independent CPU RNG
+streams, including explicit CPU transfers.
 Native numerical regression remains
 part of the full package suite. The new downloadable GPU example also executes
 from its extracted ZIP outside the checkout, including its declared Warp helper.
@@ -81,7 +84,7 @@ rerun passed. Neither run was counted as a successful final package gate.
 
 ## Timing results
 
-Measured on revision `dac1251fd` with Warp 1.11.1, NumPy 2.3.4 and Python
+Measured on revision `8d108f454` with Warp 1.11.1, NumPy 2.3.4 and Python
 3.12.12. This revision has the same library bytes as the full package run.
 The [complete samples and source hashes](https://github.com/uncscode/particula/blob/main/docs/data/gpu/process-field-extensions.json)
 retain seven samples per case and the benchmark script digest. Other GPU tests
@@ -90,13 +93,13 @@ checked for competing GPU processes before starting.
 
 | Execution | Median time per step | Sample range | Native overhead |
 | --- | ---: | ---: | ---: |
-| Pre-feature native | 90.599 µs | 89.799–92.546 µs | Baseline |
-| Current native | 98.828 µs | 96.145–101.029 µs | +9.1% |
-| Pre-feature native, captured | 124.654 µs | 123.744–127.069 µs | Baseline |
-| Current native, captured | 136.901 µs | 134.709–137.938 µs | +9.8% |
-| Custom resident + native | 128.609 µs | 127.781–130.357 µs | Different work |
-| Custom resident + native, captured | 161.238 µs | 159.672–170.535 µs | Different work |
-| Explicit CPU transfer + native | 1,869.641 µs | 1,825.235–1,913.798 µs | Different work |
+| Pre-feature native | 93.458 µs | 92.809–98.497 µs | Baseline |
+| Current native | 99.466 µs | 97.234–102.141 µs | +6.4% |
+| Pre-feature native, captured | 124.269 µs | 122.302–126.730 µs | Baseline |
+| Current native, captured | 135.344 µs | 134.135–139.587 µs | +8.9% |
+| Custom resident + native | 129.603 µs | 129.223–130.583 µs | Different work |
+| Custom resident + native, captured | 162.355 µs | 154.531–166.474 µs | Different work |
+| Explicit CPU transfer + native | 1,898.879 µs | 1,821.333–2,045.339 µs | Different work |
 
 Both extension-free comparisons pass the predeclared 20% bound. Capture is
 slower for this small workload: these are complete host-enqueued step costs,
