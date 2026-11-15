@@ -76,3 +76,15 @@ def __getattr__(name: str):
 
         return getattr(execution, name)
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+
+from particula.execution.extension_registry import (
+    PreparedOperation,
+    ProcessCapabilities,
+    ProcessRegistry,
+)
+from particula.execution.process_extensions import (
+    GPUPreparationContext,
+    GPUProcessAdapter,
+    GPUProcessPlan,
+)

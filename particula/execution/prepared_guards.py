@@ -88,3 +88,15 @@ def refresh_saturation(
         * temperature[box]
         / (molar_mass[species] * vapor_pressure[box, species])
     )
+
+
+@no_type_check
+@wp.kernel
+def advance_clock(
+    clock: wp.array(dtype=wp.float64),
+    time_step: wp.float64,
+    failure: wp.array(dtype=wp.int32),
+):
+    """Advance absolute time only after a successful complete process cycle."""
+    if failure[0] == 0:
+        clock[0] = clock[0] + time_step

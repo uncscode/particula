@@ -17,7 +17,17 @@ def checkpoint(owner: Any) -> SimulationCheckpoint:
         ResidentCheckpointController,
         _payload,
     )
+    from particula.execution.process_extensions import _RegisteredPlan
 
+    if (
+        owner._initial_time != 0.0
+        or any(type(plan) is _RegisteredPlan for plan in owner._plans)
+        or (
+            owner._extension_fields is not None
+            and owner._extension_fields.specs
+        )
+    ):
+        raise ValueError("registered process checkpoints require schema v2")
     owner.synchronize()
     if not owner._plans:
         raise ValueError("checkpoint requires a bound process plan")

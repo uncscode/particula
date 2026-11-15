@@ -185,6 +185,8 @@ class RunnableABC:
         device: str = "cuda:0",
         root_seed: int = 0,
         logical_box_ids=None,
+        process_registry=None,
+        time: float = 0.0,
     ) -> "PreparedSimulation":
         """Upload native state once and prepare supported resident GPU physics.
 
@@ -195,6 +197,8 @@ class RunnableABC:
             device: Explicit Warp device, default CUDA device zero.
             root_seed: Root seed for persistent independent process/box streams.
             logical_box_ids: Optional stable identities in physical box order.
+            process_registry: Exact-type custom GPU adapter registrations.
+            time: Absolute initial simulation time [s].
 
         Returns:
             An owned PreparedSimulation. Use its context manager or close().
@@ -215,6 +219,8 @@ class RunnableABC:
             time_step=time_step,
             root_seed=root_seed,
             logical_box_ids=logical_box_ids,
+            process_registry=process_registry,
+            time=time,
         )
 
     def resume(
@@ -393,6 +399,8 @@ class RunnableSequence:
         device: str = "cuda:0",
         root_seed: int = 0,
         logical_box_ids=None,
+        process_registry=None,
+        time: float = 0.0,
     ) -> "PreparedSimulation":
         """Upload native state once and prepare supported resident GPU physics.
 
@@ -403,6 +411,8 @@ class RunnableSequence:
             device: Explicit Warp device, default CUDA device zero.
             root_seed: Root seed for persistent independent process/box streams.
             logical_box_ids: Optional stable identities in physical box order.
+            process_registry: Exact-type custom GPU adapter registrations.
+            time: Absolute initial simulation time [s].
 
         Returns:
             An owned PreparedSimulation. Use its context manager or close().
@@ -423,6 +433,8 @@ class RunnableSequence:
             time_step=time_step,
             root_seed=root_seed,
             logical_box_ids=logical_box_ids,
+            process_registry=process_registry,
+            time=time,
         )
 
     def resume(
