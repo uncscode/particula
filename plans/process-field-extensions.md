@@ -157,7 +157,7 @@ Required evidence before completion:
       mypy, package/example/script suites and required coverage pass.
 - [x] Bounded extension-free overhead and resident/transfer timing evidence;
       distinguish Warp CPU from real CUDA, never claim unmeasured speedup.
-- [ ] Verify final diff, current upstream, fork destination; push one branch and
+- [x] Verify final diff, current upstream, fork destination; push one branch and
       open one PR titled "feat: add custom processes and registered fields for
       CPU and GPU". Follow final-commit CI and live review threads to completion.
 
@@ -406,3 +406,11 @@ narrow passing suite. Leave merge, version bump and release outside this goal.
   the source-only fix correctly rejected the old saved-example package hash;
   this evidence commit includes the refreshed manifests already validated
   locally. Final-commit hosted CI remains the last delivery gate.
+
+- Hosted qualification completed successfully on 662a8119a: Python 3.12, 3.13
+  and 3.14 test jobs, documentation build/saved examples, Ruff, mypy, PyPI
+  packaging, conda build/feedstock contract and plugin validation all pass.
+  Release-only jobs are intentionally skipped. All live review threads are
+  resolved. PR #1652 is ready for maintainer review; no merge or release was
+  performed. This closeout changes only plan/evidence prose; final-head CI is
+  rechecked after pushing it.
