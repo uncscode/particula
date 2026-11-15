@@ -13,25 +13,28 @@
 # ---
 
 # %% [markdown]
-# # Rectangular Wall Loss Strategy (interactive quick start)
+# # Track removal in a rectangular chamber
 #
-# This notebook shows how to use `particula.dynamics.RectangularWallLossStrategy`
-# to compute wall loss rates and apply time stepping in a box-shaped chamber.
-# The full published duration is retained with explicit positivity substeps.
+# How does a size-dependent wall-loss law change total particle abundance while
+# leaving individual particle masses fixed? This example follows a prescribed
+# binned population for 30 minutes in a rectangular chamber. It connects an
+# instantaneous loss rate to a numerical decay trajectory and an explicit check
+# of the update formula.
 
 # %% [markdown]
-# ## Prerequisites
-# - Python 3.12+
-# - `particula` installed (pip or conda)
-# - NumPy for light array handling
+# ## Prepare a local calculation
 #
-# To run locally:
-# ```bash
-# Install from the repository root: `python -m pip install -e ".[extra]"`
-# ```
+# Use Python 3.12 or newer with Particula and its example dependencies installed.
+# The example prints diagnostics; the plotting cell is commented out and may be
+# enabled locally. For the distinction between removal and particle shrinkage,
+# see [CPU dilution](../dilution/cpu_dilution.py).
 
 # %% [markdown]
-# ## Imports and helpers
+# ## Keep units visible
+#
+# All geometry below is in metres, time in seconds, temperature in kelvin, and
+# pressure in pascals. NumPy printing suppresses very small values, so displayed
+# negative zeros in the first few rates do not establish exactly zero loss.
 
 # %%
 import numpy as np
@@ -40,8 +43,13 @@ import particula as par
 np.set_printoptions(precision=3, suppress=True)
 
 # %% [markdown]
-# ## 1) Build a discrete particle distribution
-# We use the preset radius-binned distribution to keep setup minimal.
+# ## Initialize a distribution whose total has a clear meaning
+#
+# The preset uses 250 radius nodes from 1 nm–100 µm, lognormal radius
+# scales 100 nm and 1 µm, geometric standard deviations 1.2 and 1.4, and modal
+# number densities 10¹⁰ and 10⁹ m⁻³. Density is 1000 kg m⁻³. These are demonstration
+# inputs, not a chamber measurement. Bin concentrations are in m⁻³ and sum to
+# total number density.
 
 # %%
 particle = par.particles.create_lognormal_binned_particle_data(
@@ -54,8 +62,14 @@ print(
 )
 
 # %% [markdown]
-# ## 2) Configure RectangularWallLossStrategy
-# Dimensions are given as `(x, y, z)` in meters.
+# <a id="2-configure-rectangularwalllossstrategy"></a>
+#
+# ## Specify geometry and environmental conditions
+#
+# The rectangular dimensions are 1.0 × 1.2 × 0.8 m. The wall eddy parameter is
+# 10⁻³ s⁻¹ at 298.15 K and 101325 Pa. These fixed conditions determine a loss
+# coefficient kᵢ for each radius. The model contains no growth, sources, dilution,
+# or collisions.
 
 # %%
 wall_loss = par.dynamics.RectangularWallLossStrategy(
@@ -67,8 +81,11 @@ T = 298.15  # K
 P = 101325.0  # Pa
 
 # %% [markdown]
-# ## 3) Compute instantaneous wall loss rate
-# This returns a per-bin concentration loss rate (m^-3 s^-1).
+# ## Distinguish coefficient from rate
+#
+# `loss_coefficient` returns kᵢ in s⁻¹. `rate` combines that coefficient with
+# current bin concentration, giving −kᵢ Cᵢ in m⁻³ s⁻¹. Consequently a sparsely
+# occupied bin can have a tiny rate even when its fractional loss is large.
 
 # %%
 rate = wall_loss.rate(particle=particle, temperature=T, pressure=P)
@@ -76,8 +93,17 @@ print("Rate shape:", rate.shape)
 print("First three rates (m^-3 s^-1):", rate.ravel()[:3])
 
 # %% [markdown]
-# ## 4) Apply a short transient (30 min, 5 s steps)
-# Keeps runtime small while showing concentration decay.
+# ## Advance 30 minutes with a positivity bound
+#
+# Output intervals are 5 s. Internal substeps are selected so the largest kᵢ Δt
+# is at most 0.9, avoiding negative concentrations in the explicit Euler update.
+# The saved run uses nine substeps per interval. This is a positivity condition,
+# not an accuracy criterion.
+#
+# Because radii and conditions remain fixed, the final array can be checked
+# against repeated Euler decay Cᵢ(0)(1−kᵢ Δt)ⁿ. The assertion checks that discrete
+# update and unchanged individual masses; convergence to continuous exponential
+# decay would require a separate timestep study.
 
 # %%
 dt = 5.0  # seconds
@@ -130,8 +156,11 @@ print("Final concentration:", f"{history[-1]:.3e} 1/m^3")
 print("Relative decay:", f"{history[-1] / history[0]:.3f}")
 
 # %% [markdown]
-# ### Optional: quick visualization
-# Uncomment to view a normalized decay curve (kept lightweight).
+# ### Optional view of the aggregate decay
+#
+# The commented plot would show total number divided by its initial value.
+# That total sums bins with different loss coefficients, so it need not follow
+# a single exponential. No figure is emitted by this cell in the published run.
 
 # %%
 # from matplotlib import pyplot as plt
@@ -145,9 +174,12 @@ print("Relative decay:", f"{history[-1] / history[0]:.3f}")
 # plt.show()
 
 # %% [markdown]
-# ## 5) Notes on other distribution types
-# The same API works for `"continuous_pdf"` and `"particle_resolved"`.
-# Only the underlying particle representation changes.
+# ## Keep representation semantics separate
+#
+# The PDF example below calculates an instantaneous rate and checks its sign and
+# finiteness. Its concentration measure differs from bin totals. The resolved
+# example constructs state and strategy, but its advance is commented out;
+# this page therefore does not demonstrate a resolved trajectory.
 
 # %%
 # Continuous PDF example (same call pattern)
@@ -175,9 +207,15 @@ wall_loss_resolved = par.dynamics.RectangularWallLossStrategy(
 # )
 
 # %% [markdown]
-# ## Summary
-# - Configure rectangular chambers with `chamber_dimensions` (x, y, z).
-# - Use `rate` for concentration loss rates; `loss_coefficient` gives 1/s.
-# - Use `step` to update particle concentrations over time.
-# - Switch `distribution_type` to target discrete, continuous PDF, or
-#   particle-resolved representations.
+# ## What the checked trajectory supports
+#
+# The saved binned run decreases from 1.100×10¹⁰ to 1.065×10¹⁰ m⁻³, retaining
+# about 96.8% after 30 minutes. The update preserves individual masses while
+# reducing abundance. It is evidence for the specified numerical calculation,
+# not validation against a chamber experiment.
+#
+# To estimate a size-dependent chamber lifetime, compare per-bin survival and
+# repeat with finer substeps. Then vary geometry or wall-mixing strength within
+# measurement uncertainty. The [spherical example](spherical_wall_loss_strategy.py)
+# uses different geometry and duration; match those comparison choices explicitly
+# rather than attributing every difference to shape.

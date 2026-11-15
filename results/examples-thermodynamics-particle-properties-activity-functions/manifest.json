@@ -1,15 +1,15 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 3.473205934977159,
-  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "elapsed_seconds": 4.045475755003281,
+  "package_source_sha256": "8340db23fd0f933d97cccca5043297b3b1382b94bbaa2249dcaeb9fe1dc62879",
   "input_sha256": {},
   "example": "examples-thermodynamics-particle-properties-activity-functions",
-  "fingerprint": "a1fa0d169b444707e36be90fc1bf665c2cb9c6236b5bd1b9089de39e40a07b69",
+  "fingerprint": "12fba6131add8674dee436853017c4523603a7ab1e88777e6ff965c9ecad85c9",
   "source": "docs/examples/thermodynamics/particle-properties/activity_functions.py",
-  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "revision": "277ccafb82ee7ed32af4ea96bec6ae301ce67df5",
   "package_dirty": false,
-  "executed_at": "2026-11-13T15:13:34.361620+00:00",
+  "executed_at": "2026-11-15T20:06:39.744160+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
@@ -24,7 +24,7 @@
   "outputs": [
     [
       {
-        "text": "'Explore mixing rules and activity coefficient calculations.\\n\\nThis notebook walks through mass-based, molar-based, and volume-based\\nmixing rules, compares ideal activity coefficients, and demonstrates the\\nkappa value parameterization to model non-ideal solution behavior. Each\\nsection builds the required data arrays, computes activities with the\\npublic ``par.particles`` helpers, and plots the results.\\n\\nExample:\\n    Run this notebook to generate activity coefficient plots for two- and\\nthree-component systems under different mixing assumptions.\\n'"
+        "text": "'Explore mixing rules and activity calculations.\\n\\nThis example walks through mass-based, molar-based, and volume-based\\nmixing rules, compares ideal activities, and demonstrates the\\nkappa value parameterization to model non-ideal solution behavior. Each\\nsection builds the required data arrays, computes activities with the\\npublic ``par.particles`` helpers, and plots the results.\\n\\nExample:\\n    Run this example to generate activity plots for two- and\\nthree-component systems under different mixing assumptions.\\n'"
       }
     ],
     [],
@@ -51,10 +51,10 @@
     ]
   ],
   "files": {
-    "source.py": "be46dd2f70186e012198b9d0cb2852795ed850d02871bc05e569af927f7d8765",
-    "figure-4-1.png": "279160110039fbeea65d5fea1209404b8d93ca8c4d5120b37abf2b6cae5e79ce",
-    "figure-5-1.png": "969729ae3bb740bf5483e8c60ea073f5dbe996f0071910ec04c69217c4ac6baf",
-    "figure-6-1.png": "2f70ff0c6c2ce994e6df81bc338fa5468eecab97d0fdd6b1dea2bdf767edc6e3",
-    "figure-7-1.png": "9ecbe35e56877cf4a884b19422202be45255528033c6e079d91de5c9c5fc0e81"
+    "source.py": "6e7f3cafae9ac83d8179c5693fcf969fc48afa48dee7d31abc54961ef8c004c0",
+    "figure-4-1.png": "f73471524a1e4868b975933b0e3f720fb7ee394124727752050b0a2f91dedb67",
+    "figure-5-1.png": "513fec6e416ae8a31d1d81edc4a0e6adc898d7b9fa4e5e4d3427e43b585dd836",
+    "figure-6-1.png": "d0bcc4842787cf833b4b1762b84083da48064bb5b7bcbbde8888ea75bf185296",
+    "figure-7-1.png": "bbac5e88020e9f348809c28c669a7cb90a3c4923638b0dc5f1f01f96f2073569"
   }
 }

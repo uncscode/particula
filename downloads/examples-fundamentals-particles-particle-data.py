@@ -13,12 +13,17 @@
 # ---
 
 # %% [markdown]
-# # Native Particle Construction
+# # Turn measurements into particle state
 #
-# ParticleData holds per-material masses, population weights, charge, density
-# and volume. Its explicit distribution type defines how to interpret weights.
-# This tutorial builds radius bins, speciated mass bins and a lognormal preset.
-# Activity and surface strategies remain separate process configuration.
+# A size spectrum, a table of component masses, and a fitted lognormal population
+# are different starting points for the same model. This CPU example constructs
+# all three and asks: which quantities describe individual particles, and which
+# describe how many particles they represent?
+#
+# You will be able to choose an initializer, supply units, and interpret the
+# resulting histograms. Read [size distributions](aerosol_distributions.py) for
+# bin number versus density. `ParticleData` stores masses, weights, charge,
+# densities, and volume; activity and surface models remain separate configuration.
 
 # %%
 import matplotlib.pyplot as plt
@@ -55,12 +60,13 @@ print("Radius [m]:", particle_data.radii)
 print("Material mass density [kg/m^3]:", particle_data.species_mass_density)
 
 # %% [markdown]
-# ## Build speciated mass bins
+# ## Keep component mass separate from population abundance
 #
-# The native builder replaces facade construction. Three material lanes each
-# have density 2500 kg/m^3. Use an explicit seed for reproducible illustrations.
-# Picograms are converted to kg explicitly (1 pg = 1e-15 kg). Activity and
-# surface strategy factories remain useful independently of data construction.
+# The second initialization gives each of 500 computational bins three material
+# masses and an independently sampled number concentration. The seed fixes this
+# illustration, not a physical composition law. Picograms are converted explicitly
+# to kilograms (1 pg = 10⁻¹⁵ kg), and all material densities are 2,500 kg m⁻³.
+# The printed species mass densities combine per-particle masses with bin weights.
 
 # %%
 rng = np.random.default_rng(42)
@@ -82,8 +88,13 @@ masses = speciated_data.total_mass[0]
 concentration = speciated_data.slot_concentration_density[0]
 
 # %% [markdown]
-# The mass histogram counts computational bins. The radius histogram weights
-# bins by their number density, so its vertical axis is a physical density.
+# ## Ask what each histogram counts
+#
+# The first histogram counts computational bins by their per-particle mass.
+# The second weights radii by number concentration and therefore describes
+# physical number per histogram interval in m⁻³. A heavily populated bin can
+# contribute little to the first plot and dominate the second. Compare the
+# ordinates before comparing the shapes; neither plot is a time evolution.
 
 # %%
 fig, ax = plt.subplots(figsize=(8, 6))
@@ -101,10 +112,13 @@ ax.set_title("Particle number distribution")
 plt.show()
 
 # %% [markdown]
-# ## Initialize a lognormal population
+# ## Use a compact population model
 #
-# Preserve the two 100 nm and 2000 nm modes, each contributing 1e4 cm^-3.
-# The discrete preset normalizes the sampled bins to the specified number.
+# The lognormal preset uses radius scale parameters of 100 nm and 2,000 nm,
+# with 10⁴ cm⁻³ assigned to each component. These are geometric mean radii in the
+# helper's parameterization, not necessarily the peaks of the plotted bin values.
+# The discrete preset normalizes sampled bin weights to the specified numbers.
+# The plotted ordinate is number per bin, so its total is a sum.
 
 # %%
 lognormal_data = par.particles.create_lognormal_binned_particle_data(
@@ -127,6 +141,17 @@ ax.legend()
 plt.show()
 
 # %% [markdown]
-# Native constructors and builders retain useful initialization choices.
-# Raw fields remain mutable; derived properties return computed values. Use
-# `copy()` for independent storage and validate after directly changing arrays.
+# ## Choose the input that matches the evidence
+#
+# Radius initialization is appropriate when size and density are known; component
+# mass input retains composition; a lognormal preset expresses a distributional
+# assumption. The two histograms demonstrate why computational sampling and
+# physical abundance must be distinguished. Random input arrays are not measured
+# aerosol composition.
+#
+# For an instrument-derived population, convert diameter to radius and the
+# reported distribution measure before construction. Compare number and material
+# mass densities with independent integrals of the input, and test sensitivity to
+# binning. If composition varies with size, preserve that information in material
+# lanes rather than replacing it with an effective density without checking its
+# consequences. Continue with [native storage](distribution_tutorial.py).

@@ -13,23 +13,28 @@
 # ---
 
 # %% [markdown]
-# # Cloud Chamber Multi-Cycle Simulation
+# # Separate water cycling from seed loss in a chamber
 #
-# This section extends the single-cycle simulation to run **4 complete activation-deactivation cycles** and implements **three seed composition scenarios** to demonstrate kappa-dependent activation behavior:
+# After repeated wet–dry forcing, how much of a droplet's change comes from water
+# exchange and how much from removal of its dry seed? Extend the
+# [single-cycle example](cloud_chamber_single_cycle.py) to four cycles and three
+# compositions: ammonium sulfate, sucrose, and particles containing both.
 #
-# 1. **Scenario A**: Ammonium sulfate only (kappa=0.61, high hygroscopicity)
-# 2. **Scenario B**: Sucrose only (kappa=0.10, lower hygroscopicity)
-# 3. **Scenario C**: Mixed AS + sucrose population (competition for water vapor)
-#
-# This is a fixed-step workflow illustration, not a timestep-convergence
-# study or a quantitative activation-order validation. The saved dry-phase
-# trajectories oscillate at the retained one-second step. Tight material
-# conservation does not establish trajectory accuracy. Refine timesteps and
-# evaluate convergence before interpreting activation fractions quantitatively.
-# The three scenarios retain different kappa values and sampled populations.
+# Every cycle has 30 s of humid evolution and 60 s of dry evolution at dt=0.1 s,
+# for 360 s in total. Vapor is reset at phase boundaries, not held at constant RH.
+# Condensation and wall removal are active; dilution and coagulation are absent.
+# The comparison is a fixed-step illustration with sampled populations, not a
+# converged activation-threshold study or a calibrated chamber experiment.
 
 # %% [markdown]
-# ## Imports, style, and reproducibility
+# ## Define the chamber and the reservoir resets
+#
+# A 1 m × 0.5 m × 0.5 m geometry matches the 0.25 m³ represented volume.
+# Temperature remains 298.15 K and pressure 101325 Pa. The vapor reset targets
+# are 100.4% saturation for humid phases and 75% for dry phases; water can then
+# move between gas and particles. The wall eddy parameter is 0.001 s⁻¹.
+# A sampling seed and an explicit wall-loss generator make the configured
+# realization repeatable, not statistically representative by themselves.
 
 # %%
 import copy
@@ -66,9 +71,18 @@ np.random.seed(100)  # reproducibility for sampling and wall-loss RNG
 
 
 # %% [markdown]
-# ## 9. Multi-Cycle Simulation Framework
+# ## Keep the integration clock and inventory boundaries aligned
 #
-# We define helper functions for running multiple activation-deactivation cycles with prescribed humidity resets; dilution disabled.
+# `run_cycle()` derives update counts from duration/dt and records physical times
+# at that same interval. `run_multi_cycle()` carries the final state into the next
+# cycle, resetting only the prescribed gas water at each phase boundary. It removes
+# duplicate boundary records while retaining the full elapsed duration.
+#
+# Before and after every condensation update, compare mapped gas-plus-particle
+# mass at rtol=10⁻¹² and atol=10⁻³⁰ kg. Wall removal follows that closed update;
+# humidity resets are external water exchanges. A count-dilution helper is tested
+# separately but never applied. Changing its unused coefficient does not alter
+# these histories.
 
 # %%
 # Common setup for all scenarios
@@ -156,6 +170,17 @@ def run_cycle(
     Returns:
         Tuple of (final_aerosol, history_list).
     """
+    if not np.isfinite(dt) or dt <= 0:
+        raise ValueError("dt must be finite and positive")
+    humid_steps = round(humid_duration / dt)
+    dry_steps = round(dry_duration / dt)
+    np.testing.assert_allclose(
+        [humid_steps * dt, dry_steps * dt],
+        [humid_duration, dry_duration],
+        rtol=0,
+        atol=1e-12,
+        err_msg="Phase durations must be whole multiples of dt",
+    )
     history = []
 
     # Set initial humid phase water concentration
@@ -164,14 +189,14 @@ def run_cycle(
     # Record initial state
     history.append(
         {
-            "time": time_offset,
+            "time": 0.0,
             "phase": "humid",
             "masses": aerosol.particles.masses[0].copy(),
         }
     )
 
     # Phase 1: Humid (activation)
-    for t_step in range(1, humid_duration + 1):
+    for t_step in range(1, humid_steps + 1):
         # Condensation handles mass transfer and updates gas concentration internally
         before = np.sum(
             aerosol.particles.masses
@@ -194,7 +219,7 @@ def run_cycle(
         aerosol = wall_loss.execute(aerosol, time_step=dt)
         history.append(
             {
-                "time": time_offset + t_step,
+                "time": t_step * dt,
                 "phase": "humid",
                 "masses": aerosol.particles.masses[0].copy(),
             }
@@ -204,7 +229,7 @@ def run_cycle(
     # Set dry phase water concentration at phase transition
     aerosol.gas.concentration[0, water_index] = c_water_dry
 
-    for t_step in range(1, dry_duration + 1):
+    for t_step in range(1, dry_steps + 1):
         # Retain the published condensation + wall-loss scenario. Dilution
         # is disabled; the separate count-decay exercise is not applied here.
         before = np.sum(
@@ -228,12 +253,20 @@ def run_cycle(
         aerosol = wall_loss.execute(aerosol, time_step=dt)
         history.append(
             {
-                "time": time_offset + humid_duration + t_step,
+                "time": humid_duration + t_step * dt,
                 "phase": "dry",
                 "masses": aerosol.particles.masses[0].copy(),
             }
         )
 
+    assert len(history) == humid_steps + dry_steps + 1
+    # Check the elapsed clock before adding a large absolute offset: adjacent
+    # absolute timestamps can lose precision when subtracted in later cycles.
+    np.testing.assert_allclose(
+        np.diff([record["time"] for record in history]), dt, rtol=0, atol=1e-12
+    )
+    for record in history:
+        record["time"] += time_offset
     return aerosol, history
 
 
@@ -301,9 +334,13 @@ print("Multi-cycle framework functions defined.")
 
 
 # %% [markdown]
-# ## 10. Scenario A: Ammonium Sulfate Seeds
+# ## Scenario A: one hygroscopic seed material
 #
-# Pure ammonium sulfate seeds with kappa=0.61 (high hygroscopicity). These should activate at lower supersaturation than sucrose.
+# Use 1000 ammonium-sulfate seeds sampled around a 100 nm mode radius with
+# geometric standard deviation 1.5. Their κ is 0.61; water occupies lane 1 and
+# starts at zero particle mass. The constant water-like surface tension and fixed
+# material properties are assumptions. The shared constructor adds air as an
+# unmapped gas lane and maps the condensing particle species explicitly.
 
 
 # %%
@@ -411,9 +448,13 @@ print(aerosol_as)
 
 
 # %% [markdown]
-# ## 11. Scenario B: Sucrose Seeds
+# ## Scenario B: change the material, and note the sampling difference
 #
-# Pure sucrose seeds with kappa=0.10 (lower hygroscopicity). These should activate at higher supersaturation than AS.
+# Sucrose uses κ=0.10 and its own density and molar mass, with the same nominal
+# size-distribution parameters. It receives a separate radius sample rather than
+# identical radii paired with Scenario A. Differences therefore combine composition
+# and sampling. A controlled κ-only experiment would retain the same initial
+# sizes and other properties.
 
 # %%
 # Scenario B: Sucrose only (2 species: sucrose, water)
@@ -472,9 +513,13 @@ print(aerosol_sucrose)
 
 
 # %% [markdown]
-# ## 12. Scenario C: Mixed AS + Sucrose Population
+# ## Scenario C: internally mixed dry seeds
 #
-# Mixed population with 5 AS particles and 5 sucrose particles at the same dry diameters. This demonstrates competition for water vapor - AS particles activate first due to higher kappa.
+# Every particle contains 60% ammonium sulfate and 40% sucrose by dry volume,
+# converted to masses through their densities. This is not an external mixture
+# of sulfate-only and sucrose-only particles. Water is lane 2. It tests one
+# internally mixed composition with its own sampled radii; it does not demonstrate
+# one separately seeded material activating before the other within this box.
 
 # %%
 # Scenario C: Mixed AS + Sucrose (3 species: AS, sucrose, water)
@@ -534,9 +579,13 @@ print(aerosol_mixed)
 
 
 # %% [markdown]
-# ## 13. Run Multi-Cycle Simulations
+# ## Execute all four complete cycles
 #
-# Execute 4 activation-deactivation cycles for each scenario using the framework defined above.
+# For each scenario, 300 humid steps and 600 dry steps per cycle give 3600
+# updates and 3601 stored states including the initial state. The same wall-loss
+# object supplies successive stochastic draws across scenarios, so the runs are
+# not paired by identical removal events. Retain the full workload when reproducing
+# the published comparison. No process or sampling convergence sweep is performed.
 
 # %%
 # Run multi-cycle simulations for all three scenarios
@@ -592,9 +641,14 @@ print("\nAll simulations completed successfully!")
 
 
 # %% [markdown]
-# ## 14. Particle Size Trajectories Over 4 Cycles
+# ## Compare individual wet-size trajectories
 #
-# Visualize particle diameter evolution for all three scenarios, showing the periodic activation-deactivation pattern.
+# Equivalent spherical diameter is reconstructed from the summed component
+# volumes. Empty removed slots plot at zero. Shading denotes the humid and dry
+# forcing phases, while cycle marks repeat every 90 s. A change in trajectory can
+# reflect water exchange or removal; the separate dry-mass diagnostics below
+# help distinguish them. Step-scale oscillations require a refinement study
+# before being interpreted as physical repeated activation.
 
 
 # %%
@@ -702,9 +756,14 @@ plt.show()
 
 
 # %% [markdown]
-# ## 15. Activated Fraction vs Dry Diameter
+# ## Define the plotted “activated fraction” precisely
 #
-# Compare activation behavior across scenarios. Particles are considered "activated" if their diameter exceeds 1 um during the humid phase.
+# For each original particle slot, count humid-phase records with diameter above
+# **2 µm**, then divide by the number of humid records. This is a fraction of
+# sampled humid states, not the fraction of the population activated at one time
+# and not an independently calculated Köhler critical point. Removed slots
+# contribute zero thereafter. The initial dry diameter locates each slot on the
+# horizontal axis.
 
 
 # %%
@@ -784,7 +843,7 @@ ax.scatter(
 
 ax.set_xlabel("Initial dry diameter (nm)")
 ax.set_ylabel("Activated fraction")
-ax.set_title("Activated Fraction vs Dry Diameter (threshold: 2 um)")
+ax.set_title("Humid-state threshold fraction vs initial dry diameter")
 ax.set_ylim(-0.05, 1.05)
 ax.set_xscale("log")
 ax.legend(loc="lower right")
@@ -795,9 +854,12 @@ plt.show()
 
 
 # %% [markdown]
-# ## 16. Water Mass Fraction Over Cycles
+# ## Average water fractions over surviving particles
 #
-# Track mean water mass fraction over time, showing periodic water uptake during humid phases.
+# This panel averages each nonempty particle's water/total-mass ratio with equal
+# particle weight. It answers a different question from the later bulk water
+# fraction, which divides total water mass by total particle mass. Preferential
+# removal can change either statistic even at similar humidity forcing.
 
 
 # %%
@@ -822,7 +884,12 @@ def calculate_mean_water_fraction(history: list, water_index: int) -> tuple:
         # Avoid division by zero
         valid = total_mass > 0
         if valid.any():
-            fractions = np.where(valid, water_mass / total_mass, 0)
+            fractions = np.divide(
+                water_mass,
+                total_mass,
+                out=np.zeros_like(water_mass),
+                where=valid,
+            )
             mean_frac = fractions[valid].mean()
         else:
             mean_frac = 0
@@ -887,14 +954,17 @@ plt.tight_layout()
 plt.show()
 
 print("Key observations:")
-print("  - Higher kappa (AS) leads to higher water uptake during humid phases")
+print("  - Compare water uptake for these sampled compositions and forcing")
 print("  - Periodic pattern reflects activation-deactivation cycles")
 
 
 # %% [markdown]
-# ## 17. Mass Accumulation Over Successive Cycles
+# ## Measure retained dry material after each cycle
 #
-# Track relative dry mass (non-water) retention for each size bin across cycles. Due to wall loss, dry mass decreases, but we examine relative retention.
+# The bars sum all nonwater mass at each cycle end and divide by its initial
+# value. This is whole-population dry-mass retention, not retention in separate
+# size bins. It is not a test of water conservation, because the reservoir is
+# reset repeatedly. Dry removal and wet-mass growth can occur simultaneously.
 
 
 # %%
@@ -993,9 +1063,12 @@ print(
 
 
 # %% [markdown]
-# ## 18. Comparing Activation Behavior Across Scenarios
+# ## Compare means without hiding selection effects
 #
-# Overlay plot showing mean diameter evolution for all three scenarios, highlighting kappa-dependent activation timing.
+# The mean-diameter curves include only nonempty particle slots. Water exchange
+# changes their sizes and wall loss changes which particles remain. The curves
+# therefore cannot isolate κ or define an activation ordering without considering
+# the different initial samples, loss histories, and numerical resolution.
 
 
 # %%
@@ -1087,7 +1160,7 @@ ax.plot(
 
 ax.set_xlabel("Time (minutes)")
 ax.set_ylabel("Mean particle diameter (um)")
-ax.set_title("Comparing Activation Behavior: kappa-Dependent Growth")
+ax.set_title("Mean wet size across three sampled compositions")
 ax.legend(loc="upper right")
 ax.grid(True, alpha=0.3)
 
@@ -1096,9 +1169,20 @@ plt.show()
 
 
 # %% [markdown]
-# ## 19. Internal Validation
+# ## Interpret each check at the scope it actually tests
 #
-# Comprehensive validation checks to verify the multi-cycle simulation results.
+# The checks cover the standalone dilution formula, history structure, species
+# widths, finite nonnegative masses, cycle count, and selected threshold timings.
+# They use several different definitions: the scatter uses 2 µm, the first-event
+# check uses 1 µm, and the per-particle check uses twice initial diameter.
+# These are diagnostics, not interchangeable definitions of critical activation.
+#
+# The adjacent-slot timing assertion retains a 5 s bound and does not sort the
+# sample by size; it cannot establish a monotonic size-dependent activation law.
+# Likewise, passing the sulfate-versus-sucrose first-event comparison is evidence
+# for this realization only. The printed “all checks passed” is not physical
+# validation. Closed condensation inventories were checked separately inside the
+# integration loop; a final wet/dry mass ratio is not their error measure.
 
 # %%
 # 18.1 Validate apply_count_dilution() produces expected decay
@@ -1251,7 +1335,7 @@ for i in range(len(as_act_times) - 1):
             f"activated at {as_act_times[i + 1]}s"
         )
 
-print("   Validated: larger particles activate earlier or at same time")
+print("   Adjacent-slot activation-time check passed within its 5 s bound")
 
 
 # %%
@@ -1371,7 +1455,7 @@ print("- Scenario setup: Correct species counts and water indices")
 print(
     "- kappa-dependent activation: AS activates at same time or before sucrose"
 )
-print("- Size-dependent activation: Larger particles activate earlier")
+print("- Adjacent-slot activation times pass the retained 5 s bound")
 print(
     "- Closed condensation conserves mapped inventory; wall deposition removes particles"
 )
@@ -1381,16 +1465,26 @@ print("=" * 60)
 
 
 # %% [markdown]
-# ## 20. Wall Loss Analysis
+# ## Compare instantaneous loss coefficients with accumulated removal
 #
-# Size-dependent wall loss using existing histories and the configured rectangular strategy.
+# The left panel evaluates a reference coefficient at density 1000 kg/m³ over
+# 40–800 nm diameter. The right panel bins **initial dry seed mass** by initial
+# dry diameter and measures the fraction belonging to slots removed by the end.
+# It is mass-weighted, not a lost-number fraction. Empty initial bins are reported
+# as zero and contain no evidence of low loss.
+#
+# Wet particles evolve outside those initial dry sizes, so the reference
+# coefficient curve is not their full loss history. The accumulated bars combine
+# growth, drying, and stochastic removal.
 
 # %% [markdown]
-# !!! note "Concept Box: Chamber Wall Losses"
-#     Size-dependent wall loss combines diffusion and settling. Larger
-#     droplets are removed faster, while submicron particles rely on
-#     turbulent mixing. We reuse the rectangular wall-loss coefficient
-#     configured at the start of the notebook.
+# ## Keep chamber removal distinct from water exchange
+#
+# Wall loss removes entire resolved particles and their dry material. Evaporation
+# returns water to the modeled gas reservoir; it is not wall deposition.
+# Humidity resets also add or remove water externally. Those processes need
+# separate budgets when comparing with a chamber measurement. This example does
+# not add a wall-desorption or deposited-water reservoir.
 
 
 # %%
@@ -1480,9 +1574,13 @@ plt.show()
 
 
 # %% [markdown]
-# ## 21. Summary Comparison Gallery (4 panels)
+# ## Use the gallery to ask four different questions
 #
-# A quick gallery contrasting activation, size evolution, mass balance, and water uptake for the three scenarios.
+# The panels compare surviving-particle mean diameter, its peak and final values,
+# initial/final dry mass and inferred dry deposition, and final bulk water fraction.
+# Peak **mean** diameter is not the largest individual droplet. Dry inventory can
+# decrease while wet diameter and wet mass increase. Read each diagnostic's
+# weighting rather than treating all bars as alternative measures of growth.
 
 # %%
 # Panel A: mean diameter overlays (reuse prior calculations)
@@ -1604,9 +1702,13 @@ plt.show()
 
 
 # %% [markdown]
-# ## 22. Water Mass Fraction Evolution
+# ## Contrast bulk water fraction with the earlier particle average
 #
-# Water mass fraction over time for each scenario, with cycle boundaries marked.
+# Here each curve is total particle water divided by total particle mass.
+# Larger wet particles therefore contribute more strongly than to the earlier
+# equal-particle mean. Comparing the two statistics can reveal a heterogeneous
+# population, but neither is a direct measure of wall deposition or critical
+# supersaturation.
 
 
 # %%
@@ -1633,7 +1735,7 @@ for hist, widx in [
     wf_times.append(t_vals)
     wf_fracs.append(f_vals)
 
-cycle_marks = np.arange(0, (n_cycles + 1) * cycle_duration + 1, cycle_duration)
+cycle_marks = np.arange(0, n_cycles * cycle_duration + 1, cycle_duration)
 
 plt.figure(figsize=(8, 4))
 for t_vals, f_vals, label, color in zip(
@@ -1654,42 +1756,28 @@ plt.show()
 
 
 # %% [markdown]
-# ## 23. What You Learned
+# ## What the combined diagnostics establish
 #
-# - Supersaturation drives activation when RH exceeds 100%.
-# - Size matters: larger particles have lower critical supersaturation.
-# - Composition matters: higher κ activates earlier and grows more.
-# - Mass accumulates in larger particles over repeated cycles.
-# - Wall loss is size-dependent: larger droplets are removed faster.
-# - Vapor competition: fast activators deplete vapor for slower seeds.
-# - Particle-resolved tracking captures per-particle activation history.
+# Repeated vapor resets exchange water with surviving seeds while wall loss
+# removes dry material. Tracking both species mass and particle identity separates
+# those effects better than a size curve alone. In the refreshed realization,
+# final dry-mass retention is about 16.1%, 11.2%, and 10.6% for sulfate, sucrose,
+# and mixed seeds, respectively. The first-event check records 0.1 s for both
+# pure compositions and therefore does not resolve an ordering between them.
+# The visible dry-phase oscillations remain a numerical-resolution concern;
+# do not interpret them as observed physical cycling. Composition changes the activity
+# model, but these separately sampled scenarios do not isolate a universal κ
+# ordering or demonstrate competition between external sulfate and sucrose modes.
 
 # %% [markdown]
-# ## 24. Summary and Conclusions
+# ## Design the next chamber comparison
 #
-# This notebook has demonstrated:
+# For a research study, first refine dt while keeping physical humid/dry durations
+# fixed. Compare full size trajectories, dry retention, and the explicitly chosen
+# activation diagnostic across independent random seeds. Then pair the initial
+# radii across compositions to separate material effects from sample variability.
 #
-# ### Single-Cycle Foundation (Part 1)
-# - Configured a rectangular cloud chamber with wall loss
-# - Defined mixed AS + sucrose seeds with kappa-theory activity
-# - Ran one activation-deactivation cycle showing droplet growth beyond 5 um
-#
-# ### Multi-Cycle Scenarios (Part 2)
-# - **Framework**: Created reusable `run_cycle()` and `run_multi_cycle()` functions with prescribed humidity resets; dilution disabled
-# - **Scenario A (AS)**: High hygroscopicity (kappa=0.61) leads to faster activation
-# - **Scenario B (Sucrose)**: Lower hygroscopicity (kappa=0.10) leads to slower activation
-# - **Scenario C (Mixed)**: Competition for water vapor with AS activating first
-#
-# ### Key Scientific Findings
-# 1. **kappa-dependent activation**: Higher kappa materials activate at lower supersaturation
-# 2. **Size-dependent activation**: Larger dry particles activate before smaller ones
-# 3. **Water uptake**: Higher kappa leads to higher water mass fraction during humid phases
-# 4. **Mass evolution**: Wall loss removes dry material; water mass also responds to humidity resets
-# 5. **Wall loss insight**: Size-binned losses highlight faster removal for larger droplets
-# 6. **Gallery recap**: Four-panel summary compares activation, size, mass balance, and hydration
-#
-# ### Next Steps
-# - Sensitivity studies: vary kappa, dilution coefficient, RH levels
-# - Extended cycle counts: 10+ cycles for long-term evolution
-# - Different size distributions: polydisperse populations
-# - Internal mixing: particles with both AS and sucrose
+# Measured humidity histories and chamber loss behavior would be needed to test
+# the forcing and removal model. If dilution is added, use a process that updates
+# the appropriate gas and particle inventories and account for its external flux;
+# the unused reference coefficient in this example is not such a process.

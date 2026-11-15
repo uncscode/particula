@@ -1,6 +1,12 @@
 # %% [markdown]
 # # Direct CUDA condensation: upload, calculate, download
 #
+# Which quantities must be weighted before a particle's mass gain can be compared
+# with gas depletion? You will follow two resolved slots through explicit upload,
+# physical update, and download, distinguishing per-particle quantities from
+# box totals. Read [native particle storage](../../fundamentals/particles/distribution_tutorial.py)
+# for the count convention.
+#
 # Build particles and gas on the CPU, upload each once, reuse the same device
 # scratch for two condensation calls, and download the result for plotting.
 # The figures below come from actual CUDA execution. Run this file with
@@ -427,3 +433,23 @@ if __name__ == "__main__":
         run_publication()
     else:
         main()
+
+# %% [markdown]
+# ## The transfer bookkeeping is the lesson
+#
+# The radius panel includes both 0.1 s calls; the mass-gain bars and signed energy
+# report only the last call. Each slot represents 10⁻⁶ particles in 10⁻⁶ m³, or
+# 1 m⁻³. Thus a per-particle mass gain must be multiplied by represented counts
+# before comparing with an extensive gas inventory.
+#
+# Despite the gas name `Water`, this fixture imposes a constant pure vapor pressure
+# of 10⁻⁶ Pa; it is not a physical water vapor-pressure model at 298.15 K. The
+# initial 2330 Pa upload is helper storage overwritten by that configuration.
+# Latent energy is a diagnostic, not an update of environmental temperature.
+#
+# For a real water-growth calculation, supply a justified vapor-pressure law and
+# material properties, verify species inventories, and refine the timestep. The
+# [independent condensation comparison](gpu_condensation_parity_walkthrough.py)
+# shows how to separate transfer, inventory, and energy checks; the
+# [prepared quick start](../prepared/gpu_prepared_quick_start.py) supplies an evolving
+# water example with a Buck reference and a refinement comparison.

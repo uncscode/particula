@@ -1,25 +1,3 @@
-# %%
-"""Distribution strategy tutorial for particle property calculations.
-
-This tutorial covers the distribution strategies implemented in particula
-for calculating particle properties. Strategies define how to compute
-derived properties like particle mass, radius, and total mass based on
-the distribution type (mass-based, radius-based, or speciated-mass).
-
-Strategies covered:
-    - MassBasedMovingBin: Calculate radius from known particle mass
-    - RadiiBasedMovingBin: Calculate mass from known particle radius
-    - SpeciatedMassMovingBin: Multi-species mass-based calculations
-
-Example:
-    Calculate particle radius from mass::
-
-        import numpy as np
-        import particula as par
-        mass = np.linspace(0, 10, 5)  # kg
-        density = np.array([1000.0])  # kg/m^3
-        radius = par.particles.MassBasedMovingBin().get_radius(mass, density)
-"""
 # ---
 # jupyter:
 #   jupytext:
@@ -35,13 +13,17 @@ Example:
 # ---
 
 # %% [markdown]
-# # Native Distribution Storage
+# # Separate particle properties from population weights
 #
-# Native particles store material masses consistently, independent of whether
-# initialization starts with mass or radius. Distribution metadata determines
-# how population weights are integrated: discrete bins sum number densities,
-# continuous PDFs integrate dN/dr on a radius grid, and resolved slots sum
-# represented counts before division by physical volume.
+# Does initializing from mass rather than radius change the physical population?
+# The answer depends on both the per-particle properties and the weights assigned
+# to them. This CPU example compares mass input, radius input, component masses,
+# and represented counts. Its deliberately large masses make the arithmetic easy
+# to inspect; they are not aerosol-scale experimental inputs.
+#
+# Read [size distributions](aerosol_distributions.py) first. Discrete bins sum
+# number densities, continuous PDFs integrate dN/dr, and resolved slots sum counts
+# before division by physical volume. The examples below use native `ParticleData` construction.
 
 # %%
 import numpy as np
@@ -131,3 +113,18 @@ resolved = par.particles.create_resolved_particle_data(
 )
 print("Number density [m^-3]:", resolved.number_density)
 print("Material inventory [kg]:", resolved.species_mass_inventory)
+
+# %% [markdown]
+# ## Explain the different totals
+#
+# The last resolved population represents four positive-material slots, each with
+# count two in 0.25 m³, giving the printed 32 m⁻³. Its material inventories differ
+# from the earlier bins because the weights and volume convention changed. The
+# examples are separate populations, not a conservation test of a conversion.
+#
+# For a faithful conversion, choose weights that preserve integrated number and
+# each material inventory, then compare those quantities before and after. Changing
+# only `distribution_type` cannot supply the missing bin widths or physical volume.
+# Use [particle construction](particle_data.py) to prepare realistic inputs, then
+# [compare coagulation representations](../../processes/coagulation/coagulation_4_compared.py)
+# to see why equal initial totals still do not guarantee identical trajectories.

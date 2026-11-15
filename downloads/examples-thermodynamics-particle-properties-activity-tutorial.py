@@ -27,31 +27,18 @@ Example:
 # ---
 
 # %% [markdown]
-# # Activity Tutorial
+# # Which composition rule controls equilibrium pressure?
 #
-# This Jupyter notebook is designed to deepen your understanding of mixing behaviors in solutions, focusing on both theoretical models and practical applications. We will explore ideal and non-ideal mixing rules, differentiate between mass-based and molar-based approaches, and introduce the kappa value parameterization for predicting water activity.
+# A mixture containing 20% water by mass need not have water activity 0.2.
+# Molecules, mass, and liquid volume weight the same composition differently.
+# Here we compare three activity approximations for water and a sucrose-like
+# solute, then see how each changes the flat-interface pressure $p_i=a_i p_i^0$.
 #
-# ## Introduction to Mixing Rules
-#
-# Mixing rules are essential for predicting the properties of solutions, including their thermodynamic behavior and phase equilibria. In this notebook, we will:
-#
-# - **Define and compare different mixing rules:** Understand how various rules apply to different types of solutions.
-# - **Mass-Based vs. Molar-Based Mixing:** Discuss the implications of choosing mass-based or molar-based calculations for different applications.
-# - **Kappa Value based Activity:** Learn about the kappa value parameterization and its role in modeling water activity in non-ideal solutions.
-#
-# ## Structure of the Notebook
-#
-# 1. **Mass-Based vs. Molar-Based Mixing**
-#    - Definitions and when to use each method
-#    - Examples and comparative analysis
-#
-# 2. **Kappa Value Parameterization**
-#    - Theory behind kappa values
-#    - Practical exercises on calculating water activity
-#
-# ## Strategies, Builders, and Factories
-#
-# We'll show examples for getting the strategy directly, form a builder, and from a factory.
+# The calculation separates two choices: the physical activity rule and the
+# construction interface (direct strategy, builder, or factory). Switching an
+# interface does not itself change the physics. Read the
+# [activity functions](activity_functions.py) for a wider composition comparison;
+# [curvature](particle_surface_tutorial.py) is an additional effect omitted here.
 
 # %%
 # In Colab uncomment the following command to install particula:
@@ -61,12 +48,14 @@ import numpy as np
 import particula as par
 
 # %% [markdown]
-# ## Strategy: Ideal Activity Mass-Based Mixing
+# ## Start with a mass-fraction approximation
 #
-# The ideal in this context refers to all the activity coefficients being equal to 1. This is the simplest case and is often used as a reference point for more complex models. In this case, then we are just mixing based on mass fractions in the solution. Let's start witha mixture of water and sucrose.
-#
-# With an Ideal mass based mixing rule, the activity and partial pressure reduction is just the mass fraction of the component in the mixture.
-#
+# `ActivityIdealMass` sets each activity equal to its mass fraction. This is a
+# mass-based approximation, distinct from the usual mole-fraction Raoult law.
+# The [water, solute] mass ratio is [0.2, 0.8]; its common absolute scale cancels.
+# The pressures [100, 10] Pa are deliberately illustrative, not measured water
+# and sucrose vapor pressures. The returned [20, 8] Pa simply exposes the
+# multiplication by activity.
 
 # %%
 activity_mass = par.particles.ActivityIdealMass()  # no parameters needed
@@ -86,11 +75,13 @@ partial_pressures = activity_mass.partial_pressure(
 print(f"Partial pressures: {partial_pressures}")
 
 # %% [markdown]
-# ## Builder: Molar-Based Mixing
+# ## Count molecules instead of mass
 #
-# All strategies have a builder method that can be used to create a new strategy with different parameters. In this case, we will create a molar-based mixing rule using the builder method.
-#
-# Using the same mixture of water and sucrose, we will now calculate the activity and partial pressure reduction based on molar fractions in the solution. We should see a large effect due to the difference in molecular weight between water and sucrose.
+# The builder takes molar masses in kg/mol. Water's smaller molar mass means that
+# 20% of the mixture's mass represents most of its molecules. Consequently the
+# ideal molar water activity exceeds the mass-based value, while the solute
+# activity is smaller. The pressure change follows from this different model;
+# it is not caused by using a builder instead of direct construction.
 
 # %%
 activity_molar = (
@@ -114,9 +105,13 @@ partial_pressures = activity_molar.partial_pressure(
 print(f"Partial pressures: {partial_pressures}")
 
 # %% [markdown]
-# ## Factory: Kappa Value Parameterization
+# ## Give water a hygroscopicity parameter
 #
-# Lastly, we will use the factory method to create a kappa value parameterization for predicting water activity in non-ideal solutions. This method is more complex and requires additional parameters to be defined. We will use the same water-sucrose mixture to demonstrate the kappa value approach.
+# The factory converts the supplied g/mol values and applies the κ water-activity
+# rule using species densities in kg/m³. The solute κ=0.3 and density 1500 kg/m³
+# are illustrative choices, not a fitted sucrose property set. Water occupies
+# lane zero. Nonwater activities retain the ideal molar rule, so this is not a
+# complete nonideal model for every species.
 
 # %%
 parameters_input = {
@@ -147,11 +142,17 @@ partial_pressures = activity_kappa.partial_pressure(
 print(f"Partial pressures: {partial_pressures}")
 
 # %% [markdown]
-# ## Plotting Mixing Rules
+# ## Follow the full composition path
 #
-# We will plot the activity and partial pressure reduction for the water-sucrose mixture using the ideal mass-based mixing rule, molar-based mixing rule, and kappa value parameterization. This will help us visualize the differences between the three methods and understand how they affect the prediction of water activity in the solution.
+# Increase water mass fraction while keeping total relative mass equal to one.
+# The solid curves compare water activity under the three assumptions. The dashed
+# κ solute curve coincides with the molar solute curve by construction. Only
+# activities are plotted; the preceding pressure calculations explain how these
+# curves would scale a chosen pure-component vapor pressure.
 #
-# Note: Only water is treated non-ideally in the kappa value parameterization. The other species are treated in a molar-based ideal mixing rule.
+# A separation between curves measures model sensitivity, not which model is
+# accurate. An experimental water-activity relation at the relevant temperature
+# and composition would be needed to decide that.
 
 # %%
 mass_water = np.linspace(0.001, 0.9999, 100)
@@ -192,8 +193,15 @@ ax.legend()
 plt.show()
 
 # %% [markdown]
-# ## Summary
+# ## Turn a model choice into a testable question
 #
-# By the end of this notebook, you should have a better understanding of mixing rules, mass-based vs. molar-based calculations, and the kappa value parameterization for predicting water activity in non-ideal solutions. You will also have learned how to apply these concepts to practical examples and visualize the results using plots.
+# Composition alone does not determine the pressure reduction until an activity
+# rule is specified. For a light solvent and heavy solute, replacing mass fraction
+# with mole fraction can substantially change that reduction. κ adds a separate
+# water-uptake assumption while leaving the nonwater molar rule intact.
 #
-# You saw how different mixing rules can be used to predict the properties of solutions and how they can affect the accuracy of the predictions. You also learned about the kappa value parameterization and how it can be used to model water activity in non-ideal solutions. These concepts are essential for condensation and phase equilibrium calculations when aerosol particles are present in the atmosphere.
+# As a useful interface check, construct the *same* molar model directly, through
+# a builder, and through the factory, then compare activities on this grid. For a
+# scientific extension, fit κ to measured water activity and compare residuals
+# against ideal molar predictions over the measured range. Neither exercise is
+# performed here; fitted behavior outside that range would need new evidence.

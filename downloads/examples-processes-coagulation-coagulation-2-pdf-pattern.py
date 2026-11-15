@@ -27,15 +27,18 @@ Example:
 """
 
 # %% [markdown]
-# # Coagulation Pattern 2: PDF
+# # Brownian coagulation in a PDF population
 #
-# Brownian coagulation using the public `par.dynamics` API with a
-# continuous PDF representation:
+# How can collisions reduce particle number while transferring material toward
+# larger sizes? This example follows a single-material aerosol through two hours
+# of Brownian coagulation. The central reading skill is distinguishing number
+# loss from material loss: a collision merges particles rather than removing
+# their constituent mass.
 #
-# 1. Build a Brownian coagulation strategy with
-#    `distribution_type="continuous_pdf"`.
-# 2. Wrap it in `par.dynamics.Coagulation`.
-# 3. Run multiple steps on a PDF aerosol and visualize the change.
+# Here the stored concentration has units m⁻⁴, number per volume per metre of radius. To obtain total
+# number density, integrate concentration over radius. Review
+# [distribution measures](../../fundamentals/particles/aerosol_distributions.py)
+# before comparing this plot with another representation.
 
 # %%
 # In Colab uncomment the following command to install particula:
@@ -45,10 +48,16 @@ import numpy as np
 import particula as par
 
 # %% [markdown]
-# ## Build a PDF aerosol
+# ## Establish the population and its measure
 #
-# We create a lognormal PDF and combine it with a native ambient environment. PDF units
-# are m^-3 * m^-1 = m^-4 (number per volume per size).
+# The 150 radius nodes span 10 nm–10 µm. A lognormal radius scale of 80 nm,
+# geometric standard deviation 1.5, and specified total number density 10¹⁰ m⁻³
+# set the initial population; density is 1000 kg m⁻³. The parameter named `mode`
+# is the lognormal scale, not the peak of every possible plotted measure.
+#
+# Temperature and pressure are held at 298.15 K and 101325 Pa. The zero-concentration
+# carrier satisfies the gas-container shape contract; coagulation does not consume
+# it. No condensation, dilution, charging, or wall loss is included.
 
 # %%
 # Radius bins (log-spaced, extended to 10 microns for visibility)
@@ -91,10 +100,13 @@ pdf_aerosol = par.Aerosol(
 )
 
 # %% [markdown]
-# ## Configure coagulation (continuous PDF)
+# ## Connect collision physics to the stored distribution
 #
-# Use the Brownian builder with `distribution_type="continuous_pdf"`, then wrap
-# in the public `Coagulation` runnable.
+# The Brownian strategy supplies size-dependent collision rates. Its distribution
+# setting must agree with the particle container: bin totals and densities per
+# radius require different numerical operations. The `Coagulation` wrapper
+# advances the supplied aerosol in place, so preserve a copy for an independent
+# control.
 
 # %%
 coagulation_strategy = (
@@ -109,10 +121,16 @@ coagulation_process = par.dynamics.Coagulation(
 print(coagulation_process)
 
 # %% [markdown]
-# ## Execute coagulation steps
+# ## Track two one-hour advances
 #
-# Run two coagulation steps to observe the evolution of the PDF distribution
-# over time.
+# Each call advances 3600 s with 100 substeps. The snapshots therefore represent
+# initial, one-hour, and two-hour states. The finite/nonnegative checks reject
+# invalid concentrations, while the printed relative mass change diagnoses
+# material drift on this finite grid. These checks answer different questions:
+# nonnegative output alone does not establish conservation or convergence.
+#
+# For mass density, weight by the spherical single-particle mass before you
+# integrate concentration over radius. Keep that integration convention consistent between snapshots.
 
 # %%
 # Set up time and sub-steps for the coagulation process
@@ -151,7 +169,12 @@ assert np.all(np.isfinite(pdf_after_step_2))
 assert np.all(pdf_after_step_2 >= 0)
 
 # %% [markdown]
-# ## Plot: concentration before/after
+# ## Read redistribution rather than peak height alone
+#
+# The vertical axis is m⁻⁴, number per volume per metre of radius; a lower peak is not by itself the
+# fraction of particles lost. Compare the small-radius depletion and larger-radius
+# redistribution, then use the appropriate total-number diagnostic. The logarithmic
+# horizontal axis changes visual spacing, not the definition of the stored measure.
 
 # %%
 fig, ax = plt.subplots(figsize=(8, 5))
@@ -178,20 +201,23 @@ ax.grid(alpha=0.3)
 plt.show()
 
 # %% [markdown]
-# ## Native initialization and numerical limits
+# ## Bound the numerical conclusion
 #
-# Native construction retains the explicitly generated concentration array.
-# Earlier versions used a preset builder that regenerated its default bimodal
-# distribution, replacing the declared inputs. The plots here therefore use
-# the stated mode and total number concentration, not that old preset result.
-# Finite-grid coagulation is not exactly mass conservative. Number loss and
-# distribution changes illustrate this workload; they are not a convergence
-# study or evidence of exact agreement between representations.
+# The explicitly generated input distribution is retained by native construction.
+# Finite-grid coagulation need not conserve mass exactly: truncation and numerical
+# redistribution can affect the result. This one grid and one substep choice do
+# not measure those errors independently.
 
 # %% [markdown]
-# ## Summary
+# ## From this curve to a defensible comparison
 #
-# - Strategy: `BrownianCoagulationBuilder().set_distribution_type(
-#   "continuous_pdf")`
-# - Runnable: `par.dynamics.Coagulation`
-# - Representation: PDF (continuous number concentration per size, m^-4)
+# This calculation connects collision-driven number loss to evolving size
+# occupancy. To determine whether the predicted loss is robust, vary radius-grid
+# resolution and extent separately from substep size; compare total number and
+# mass drift at the same physical times.
+#
+# Next use the [PMF/PDF comparison](coagulation_4_compared.py) to place both
+# representations in common units. For a composition-resolved research question,
+# explore [individual-particle coagulation](coagulation_3_particle_resolved_pattern.py)
+# and add independent stochastic realizations before attributing small differences
+# to the representation.

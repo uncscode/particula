@@ -1,6 +1,12 @@
 # %% [markdown]
 # # Extend a process on CPU and CUDA
 #
+# How can a new process change execution backend without changing its scientific
+# meaning? An exactly integrable forcing law provides a reference independent of
+# either implementation. You will compare numerical trajectories, state ownership,
+# and restart behavior before attempting a more complex physical extension.
+# Read the [prepared workflow](gpu_prepared_quick_start.py) first.
+#
 # This Particula 0.3 development example implements the same prescribed warming
 # law in NumPy and Warp: dT/dt = a t, with a in K s⁻² and absolute time t in s.
 # A registered box field records cumulative warming in K. This is an imposed
@@ -302,3 +308,19 @@ def run_example():
 
 if __name__ == "__main__":
     run_example()
+
+# %% [markdown]
+# ## Use a known answer before a complicated process
+#
+# The temperature panel shows the same warming increment in two boxes with
+# different initial temperatures; reference dots come from the analytic integral.
+# The residual panel compares all four execution paths with that reference over
+# absolute time 5–25 s. The registered warming field accumulates 6 K, independently
+# of the dilution of particles and gas. Agreement checks this imposed law and its
+# clock handling, not an atmospheric heat budget.
+#
+# For a custom chemistry or energy process, first choose a limiting case with an
+# independent solution and declared units, reads, writes, and conserved quantities.
+# Compare CPU, resident, and restart paths there before adding nonlinear coupling.
+# Use explicit host transfer when a needed solver has no resident implementation,
+# and measure the full transfer cost before deciding whether to port it.

@@ -1,6 +1,12 @@
 # %% [markdown]
 # # Cooling, heating and vapor pulses across sixteen boxes
 #
+# When vapor and temperature change externally, how can you distinguish a
+# particle response from mass supplied by the forcing? This example builds an
+# open-system inventory and compares response histories across boxes. Start with
+# the [prepared interface](gpu_prepared_quick_start.py); the key scientific step
+# is recording each imposed gas replacement before interpreting condensation.
+#
 # This study uses **49,152 active resolved particles**, four particle materials
 # and five gas lanes. Only water exchanges between gas and particle material;
 # the other materials and spectator gases provide independent accounting
@@ -79,3 +85,18 @@ def run_example():
 # %%
 if __name__ == "__main__":
     run_example()
+
+# %% [markdown]
+# ## Use the forcing ledger to ask a different question
+#
+# The curves describe finite-rate response to a prescribed millisecond experiment;
+# the inventory residual checks the accounting after external exchange and
+# dilution. The refinement check bounds the two reported final-state changes for
+# one timestep halving. It does not establish a timestep-independent response at
+# every forcing boundary or validate this forcing as a chamber experiment.
+#
+# For a measured humidity pulse, supply its temperature and vapor histories,
+# retain identical physical control times in a refinement run, and compare uptake
+# lag and peak saturation as well as final mass. Compare with a temperature-only
+# control to separate cooling from added water. The [heterogeneous-box example](gpu_prepared_multibox.py)
+# shows the corresponding calculation without imposed vapor pulses.

@@ -1,6 +1,17 @@
 # %% [markdown]
 # # Charged aerosols and ions across sixteen environments
 #
+# How can we distinguish humidity-driven size growth from changes caused by
+# particle collisions and ion attachment? This controlled factorial study
+# compares size, number, and charge diagnostics across temperature, pressure,
+# and initial humidity. It illustrates how several observables can separate
+# mechanisms that a size spectrum alone cannot identify.
+#
+# Use the [condensation](../../processes/condensation/condensation_1_bin.py)
+# and [prepared GPU guide](../../../guide/gpu/prepared.md) as prerequisites.
+# The intended outcome is to read these diagnostics together and design a
+# controlled follow-up, rather than infer atmospheric rates from the example.
+#
 # This CUDA example starts with **2,621,440 active resolved particles**:
 # 16 conditions × 1,024 independent boxes × (128 aerosols + 16 positive + 16 negative ions). All boxes remain
 # resident together. Each particle has its own material masses and integer
@@ -242,3 +253,24 @@ def run_example():
 # %%
 if __name__ == "__main__":
     run_example()
+
+# %% [markdown]
+# ## What the combined diagnostics tell us
+#
+# Read the saved figures together: size change can occur through water exchange,
+# while merger counts and aerosol-number loss diagnose collisions in this
+# source/sink configuration. Aerosol charge alone is an incomplete inventory;
+# the ion and neutral-product accounting supplies the rest of the interpretation.
+# The interval-averaged rates and single-realization totals do not establish a
+# statistically resolved ranking of environments.
+#
+# To investigate charge enhancement in your own system, add a matched neutral
+# control and repeat independent realizations. Compare merger counts with
+# uncertainty estimates while checking material and charge budgets. To investigate
+# humidity effects, hold the other environmental settings fixed and distinguish
+# initial RH from a continuously maintained humidity. These controls and repeats
+# are proposed extensions, not additional evidence in the saved run.
+#
+# The existing [dry environment sweep](gpu_dry_environment_sweep.py) explores a
+# different environmental domain; it does not extend the liquid-water assumptions
+# to the mesopause. Choose the applicable physical model before expanding a sweep.

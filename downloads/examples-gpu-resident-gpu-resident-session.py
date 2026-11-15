@@ -1,6 +1,12 @@
 # %% [markdown]
 # # CUDA resident ownership and checkpoint restart
 #
+# What makes a saved state sufficient for restarting, rather than merely plotting?
+# This example separates detached inspection values, canonical continuation state,
+# and new device ownership. Use the [prepared workflow](../prepared/gpu_prepared_quick_start.py)
+# for ordinary simulations; this lower-level example explains the underlying
+# lifecycle contract.
+#
 # Keep native particles, gas and environment on one device and restart
 # from a canonical checkpoint with new storage identities.
 # Run with `--cuda` to reproduce the saved figures. CUDA is required
@@ -300,3 +306,19 @@ if __name__ == "__main__":
         run_publication()
     else:
         main()
+
+# %% [markdown]
+# ## Preservation without evolution
+#
+# Equal bars are the expected result because no physical process is launched and
+# the two guarded steps have zero duration. The publication path also compares
+# restored masses, counts, and gas arrays exactly. New storage identity prevents
+# the restarted session from simply aliasing the original; it is distinct from
+# changing the physical state.
+#
+# For a long study, test restart after nonzero evolution and include random
+# continuation and external forcing position in the comparison. A matching final
+# mass total can conceal a different size distribution or random trajectory.
+# The [multi-timestep example](gpu_resident_multi_timestep.py) adds evolving physics,
+# while the [prepared cyclic study](../prepared/gpu_prepared_cyclic_chamber.py)
+# shows why an application must retain its forcing schedule as well.

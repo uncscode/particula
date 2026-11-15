@@ -1,6 +1,12 @@
 # %% [markdown]
 # # Capture and replay a native CUDA schedule
 #
+# Can recording an execution schedule be kept distinct from advancing the aerosol?
+# This example follows capture, physical replay, and invalidation as separate
+# operations. You will learn why changing structural dependencies requires a new
+# capture, and why a saved graph is not a scientific checkpoint. Read the
+# [resident schedule](gpu_resident_multi_timestep.py) for the underlying inputs.
+#
 # Record an owned resident schedule, replay it twice, and verify
 # invalidation and renewal without serializing an opaque CUDA graph.
 # Run with `--cuda` to reproduce the saved figures. CUDA is required
@@ -602,3 +608,21 @@ if __name__ == "__main__":
         run_publication()
     else:
         main()
+
+# %% [markdown]
+# ## Know what the replay result represents
+#
+# The two one-second replays reuse the three-box fixture and its prescribed gas
+# updates from the resident schedule. Its fixed 800 Pa vapor-pressure reference
+# and large gas densities are illustrative inputs. The gas and saturation bars
+# show state after those replays; they do not measure speedup or establish
+# convergence. Saturation one marks the configured flat-surface reference, not a
+# universal threshold for particle equilibrium.
+#
+# The deliberate structural change is rejected, then the old capture is retired
+# and renewed. Renewal does not add a third replay to these plotted observations.
+# For a long simulation, compare captured and ordinary final states and random
+# continuation before benchmarking replay. Recreate captures after a checkpoint
+# restart rather than treating an opaque graph handle as portable scientific
+# state. See [prepared lifecycle checks](../prepared/gpu_prepared_lifecycle.py) and
+# [measured scaling](../prepared/gpu_scaling_results.py) for those two comparisons.

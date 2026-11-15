@@ -22,20 +22,17 @@ runnables. Its native fixed-slot custom source is illustrative only; use
 """
 
 # %% [markdown]
-# # Custom Nucleation: Single Species
+# # Couple an illustrative particle source to growth and collisions
 #
-# In this *How-to Guide*, we demonstrate an illustrative custom single-species
-# workflow with a saturation-dependent rate. Its custom slot activation and
-# saturation-based mass source are not the supported CPU nucleation public API. Use the
-# supported `cpu_nucleation.py` script and CPU Nucleation Strategy System guide
-# for public `Nucleation` runnable usage.
+# When vapor is supplied continuously, does it grow existing particles or create
+# new ones? This example explores how to connect a custom saturation-dependent
+# mass source to condensation and coagulation, while accounting for external
+# input and finite particle capacity. The rate law and material model are
+# illustrative; they do not establish ammonium-sulfate nucleation kinetics.
 #
-# The 100 seeded initial particles share 100,000 fixed-capacity slots.
-# Unit count weights preserve the resolved coagulation contract. Gas debit
-# includes the physical volume; no arrays are squeezed or methods patched.
-# The plotted range includes both the 400 nm initial mode and 2 nm nuclei.
-#
-# **Imports**
+# Use the [supported bounded CPU example](cpu_nucleation.py) for the public
+# `Nucleation` runnable. Here explicit slot activation exposes the accounting
+# steps a custom source must satisfy.
 
 # %%
 # In Colab uncomment the following command to install particula:
@@ -51,11 +48,24 @@ from particula.dynamics.condensation.species_mapping import (
 from particula.particles.slot_management import activate_slots
 
 # %% [markdown]
-# ## Aerosol Setup
+# ## Establish an initial reservoir and available capacity
 #
-# We will begin by setting up ammonium sulfate vapor alongside a few pre-existing particles. The vapor phase will include a constant vapor pressure for ammonium sulfate, and a lognormal distribution will be used to represent the initial particle population.
+# The material uses ammonium-sulfate molar mass and density with an assumed
+# constant vapor pressure of 4×10⁻¹² atm. Treat this combination as a toy
+# single-component model, not an atmospheric sulfate chemistry mechanism.
+# Initial vapor is half its prescribed saturation concentration at 298.15 K.
 #
-# The pre-existing particles are also necessary as, the zero particle case is not supported in the current version of the model.
+# There are 100 unit-count seed particles with lognormal radius scale 400 nm and
+# geometric standard deviation 1.4 in 0.1 cm³, or 10⁹ m⁻³ initially. The arrays
+# reserve 100,000 slots; unused capacity is not part of the active population.
+# Seeds let this example include growth competition, rather than demonstrating a
+# requirement that the supported nucleation API must start with particles.
+#
+# `inject_custom_nuclei` converts a mass-concentration rate into extensive mass
+# using physical volume, limits it by available gas, and floors to whole nuclei.
+# Activation precedes gas debit, so a slot-capacity failure does not consume gas
+# for particles that were never inserted. The inventory assertion checks each
+# successful injection; it is not a rollback guarantee for the entire process sequence.
 
 # %%
 # Shared properties and initial builders
@@ -170,20 +180,17 @@ aerosol = build_aerosol()
 print(aerosol)
 
 # %% [markdown]
-# ## Simulation
+# ## Decide which processes compete for vapor
 #
-# This section performs a step in the simulation using a manual stepping method. The steps include:
+# Condensation uses an ideal-mass activity model and the prescribed vapor pressure;
+# Brownian coagulation merges resolved particles. A timestep will first add vapor,
+# then activate nuclei, then apply condensation and coagulation. This chosen
+# ordering is part of the numerical model and can affect a coupled result.
 #
-# 1. Adding more vapors to the gas phase.
-# 2. Calculating the new saturation ratio.
-# 3. Calculating the nucleation rate based on the saturation difference.
-# 4. Determining the number of new particles nucleated.
-# 5. Determining the number of resolved particles to be added to the aerosol.
-# 6. Creating and adding the new particles to the aerosol.
-# 7. Performing a condensation step to account for gas-phase condensation onto existing particles.
-# 8. Performing a coagulation step to account for particle-particle interactions.
-#
-# And before we start, we also need to initialize the condensation and coagulation runnables.
+# A nucleus has radius 2 nm (diameter 4 nm). The custom law is a mass source in
+# kg m⁻³ s⁻¹, proportional to the square of the positive saturation excess divided
+# by 500. Those scale choices illustrate a thresholded response; they are not
+# an empirically calibrated formation law.
 
 # %%
 # setup dynamics for condensation
@@ -210,7 +217,14 @@ coagulation_runnable = par.dynamics.Coagulation(
 step_count = 0
 
 # %% [markdown]
-# You can repeatedly run the next cell to see the evolution of the aerosol system.
+# ## Inspect one proposed source step before running a trajectory
+#
+# This cell adds one second of vapor supply and computes a requested rate and
+# particle count. It does not activate slots or execute condensation/coagulation.
+# Starting at saturation ratio 0.5, the added 0.2 saturation-concentration units
+# bring the ratio to 0.7, so the custom source remains zero at this demonstration
+# step. The intermediate “number” derived from mass concentration is per volume;
+# conversion by the simulation volume gives a represented particle count.
 
 # %%
 # Initialize or increment step counter
@@ -272,11 +286,16 @@ number_of_new_resolved_particles = int(
 )
 
 # %% [markdown]
-# ## Time Loop
+# ## Reset and track the externally supplied inventory
 #
-# Now that we see the simulation is working, we can put that into a loop and save out the distribution of particles at each time step.
+# The loop rebuilds the original seeded aerosol. It records t = 0, 1, 2, 3, 4 s:
+# five snapshots with four physical advances, not five seconds of evolution.
+# Each growth/collision call uses two substeps.
 #
-# We'll first reset the aerosol system to its initial state, create a output matrix, then run the previous simulation in a for loop.
+# At every snapshot, the particle-plus-gas inventory is compared with the initial
+# inventory plus cumulative vapor input. A rise in total inventory is therefore
+# expected. The fixed-capacity source conserves material by debiting gas, while
+# rounding to whole unit-count nuclei can postpone a small requested source.
 
 # %%
 # Reset to the same seeded initial sample and fixed capacity.
@@ -383,9 +402,18 @@ plot_edges = bin_edges
 number_distribution_binned = number_distribution_binned / volume_sim
 
 # %% [markdown]
-# ## Graphing
+# ## Read the size map together with mass and saturation
 #
-# In this section, we will visualize the nucleation events over time. The initial particles will be displayed, followed by their coagulated pairs. As the simulation progresses, particle growth results from both coagulation and condensation processes.
+# The color map is log₁₀ of number density per radius bin, not per metre of radius.
+# Its range includes the 400 nm seed scale and 2 nm injection radius; empty bins
+# are omitted. A new small-radius population would be evidence of activated
+# nuclei, whereas growth of the seed mode could occur through condensation alone.
+# The map does not identify individual collision partners.
+#
+# The second figure shows particle mass density and the gas saturation ratio for
+# the modeled sulfate surrogate. Interpret these alongside the known vapor input:
+# particle growth and increasing system mass are not interchangeable diagnostics.
+# No activation-time or process-attribution estimate is calculated here.
 
 # %%
 fig, ax = plt.subplots(figsize=(8, 5))
@@ -440,11 +468,16 @@ fig.tight_layout()
 plt.show(block=False)
 
 # %% [markdown]
-# ## Conclusion
+# ## Ask when formation competes with growth
 #
-# In this guide, we demonstrated how to integrate custom nucleation processes into the aerosol simulation. This shows the flexibility of the aerosol model, allowing for the addition of new processes before they are fully integrated into the core framework.
+# This workflow demonstrates how a custom source can be coupled to other processes
+# without losing track of supplied material. Its short trajectory and illustrative
+# rate law do not predict a physical nucleation threshold or atmospheric event.
 #
-# *Note*: Custom nucleation, particularly at high rates, can significantly
-# increase the number of particles simulated and slow computation. The supported
-# CPU-only `Nucleation` runnable uses its configured fixed-capacity exhaustion
-# policy to handle source-slot pressure.
+# A useful extension is to vary seed abundance at fixed vapor supply and compare
+# the first nonzero nucleus count, peak saturation, and material partitioning.
+# Repeat with smaller timesteps and alternate process ordering to test whether
+# an apparent threshold is numerical. For production work, use a sourced formation
+# law, explicit applicability limits, and the supported
+# [bounded nucleation interface](cpu_nucleation.py); check slot exhaustion before
+# raising the source strength.

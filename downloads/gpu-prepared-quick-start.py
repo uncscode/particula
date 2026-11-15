@@ -1,6 +1,13 @@
 # %% [markdown]
 # # Build on the CPU, evolve on CUDA, analyze on the CPU
 #
+# How do you keep a cooling experiment reproducible while its state lives on a
+# GPU? Follow construction, physical evolution, and detached analysis as separate
+# stages. You will learn which evidence comes from inventory checks, timestep
+# refinement, and checkpoint replay. Begin with
+# [native aerosol assembly](../../fundamentals/native_aerosol.py) if counts, volume,
+# or species ordering are unfamiliar.
+#
 # A prepared simulation owns the complete aerosol state on one GPU. Construct
 # particles, gas and environment normally, compose supported processes with
 # `|`, then call `prepare` once. `run` keeps state resident. `snapshot` returns
@@ -296,3 +303,18 @@ def plot_snapshots(initial, warm, final):
 
 if __name__ == "__main__":
     run_example()
+
+# %% [markdown]
+# ## What this short cooling experiment establishes
+#
+# The snapshots show how water exchange changes a distribution while dilution
+# changes its abundance. The tests separately establish the stated water ledger,
+# exact restart for the compared fields, unchanged CPU input, and bounded final
+# mass/vapor changes under one timestep halving. These do not validate the chosen
+# material properties or isolate cooling from continued evolution.
+#
+# For a cooling-rate question, add an otherwise identical uncooled control and
+# compare size-resolved water uptake at the same physical times. Keep gas/material
+# mapping explicit and refine any rapid forcing transitions. Continue with the
+# [heterogeneous ensemble](gpu_prepared_multibox.py) for more boxes or
+# [custom process example](custom_process_backends.py) to supply a new forcing law.

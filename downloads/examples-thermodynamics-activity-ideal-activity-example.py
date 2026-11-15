@@ -13,26 +13,25 @@
 # ---
 
 # %% [markdown]
-# # Ideal Activity Example
+# # Equal mass does not mean equal activity
 #
-# Demonstrates using `ActivityIdealMolar` to compute activity from mass
-# concentrations using Raoult's Law.
-#
-# ## What This Example Shows
-#
-# - Creating an ideal molar activity strategy
-# - Computing activity from mass concentrations
-# - Computing partial pressures from pure vapor pressures
-# - Verifying that activity equals mole fraction for ideal mixing
+# Why does a mixture containing half water by mass have water activity much
+# closer to one than to one-half? This ideal-solution calculation converts mass
+# concentrations to mole fractions and uses them to calculate equilibrium partial
+# pressures. It provides a transparent reference before introducing
+# [nonideal organic–water interactions](bat_activity_example.py).
 
 # %%
 import numpy as np
 import particula as par
 
 # %% [markdown]
-# ## 1. Create Ideal Activity Strategy
+# ## Specify the molecular bookkeeping
 #
-# Define molar masses for a two-component system: water and an organic compound.
+# The two components are water (18.015 g mol⁻¹) and an illustrative organic
+# (200 g mol⁻¹), ordered consistently in every array. `ActivityIdealMolar` uses
+# mole fraction as activity. An organic's molar mass alone does not establish that
+# its real mixture with water is ideal.
 
 # %%
 # Molar masses for water and an organic compound
@@ -44,10 +43,12 @@ print(f"Strategy: {type(strategy).__name__}")
 print(f"Molar masses: {strategy.molar_mass * 1e3} g/mol")
 
 # %% [markdown]
-# ## 2. Define Mass Concentrations and Compute Activity
+# ## Compare equal masses through their mole counts
 #
-# Use equal mass of water and organic (50/50 by mass) and compute activity.
-# For ideal mixing, activity equals mole fraction.
+# Each component contributes 0.5 µg m⁻³. Dividing by molar mass produces far more
+# water molecules than organic molecules, so the calculated water activity is
+# about 0.9174 and organic activity about 0.0826. Scaling both masses equally
+# would preserve these ratios and activities.
 
 # %%
 # Equal mass of water and organic (50/50 by mass)
@@ -61,10 +62,13 @@ print(f"Mass concentrations: {mass * 1e9} ug/m^3")
 print(f"Activity values: {activity}")
 
 # %% [markdown]
-# ## 3. Compute Partial Pressures
+# ## Translate activity into an equilibrium pressure
 #
-# Partial pressure is calculated as activity times pure vapor pressure:
-# $p_i = a_i \cdot p_i^{\circ}$
+# The relation pᵢ = aᵢ pᵢ° gives the flat-interface equilibrium partial pressure
+# for the specified mixture and pure-component reference pressures. The supplied
+# 3169 Pa water and 10⁻³ Pa organic values are illustrative inputs near 298 K.
+# This calculation does not specify the actual ambient gas pressure, include
+# curvature, or compute a condensation rate.
 
 # %%
 # Pure vapor pressures at 298 K (example values)
@@ -78,10 +82,12 @@ print(f"Pure vapor pressures: {pure_pressure} Pa")
 print(f"Partial pressures: {partial_pressure} Pa")
 
 # %% [markdown]
-# ## 4. Verify Activity Equals Mole Fraction
+# ## Verify the chosen model independently
 #
-# For ideal mixing (Raoult's Law), activity equals mole fraction.
-# Let's calculate mole fractions directly to verify.
+# The direct mole-fraction calculation checks the activity strategy, and a second
+# assertion checks multiplication by the pure-component pressure. These are
+# algebraic consistency checks under ideal mixing, not evidence that a particular
+# organic–water solution obeys that model.
 
 # %%
 # Calculate mole fractions directly for comparison
@@ -96,3 +102,17 @@ np.testing.assert_allclose(activity, mole_fractions, rtol=1e-12, atol=0)
 np.testing.assert_allclose(
     partial_pressure, mole_fractions * pure_pressure, rtol=1e-12, atol=0
 )
+
+# %% [markdown]
+# ## Carry the reference into a research question
+#
+# Mass fraction and mole fraction answer different questions even for an ideal
+# solution. The result explains why equal mass does not imply equal thermodynamic
+# activity; it does not demonstrate water uptake from an unspecified gas reservoir.
+#
+# To test whether ideality is adequate for your system, compare the organic
+# activity with a justified nonideal model at the same composition and molecular
+# properties. Then compare predicted equilibrium pressure with observations or an
+# independent thermodynamic reference. For small particles, include
+# [surface curvature](../particle-properties/particle_surface_tutorial.py) before
+# interpreting the pressure difference as a growth threshold.

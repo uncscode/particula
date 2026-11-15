@@ -13,12 +13,17 @@
 # ---
 
 # %% [markdown]
-# # Gas Mixture and Environment Tutorial
+# # Cooling a gas: saturation without a parcel model
 #
-# Native `GasData` holds all species in one explicit order. `EnvironmentData`
-# holds temperature, pressure, and saturation ratios in that same gas order.
-# Vapor-pressure strategies remain separate scientific configuration. See the
-# [gas tutorial](gas_data.ipynb) for the water and organic properties.
+# Can a fixed amount of vapor become more saturated as its surroundings cool?
+# This diagnostic sweep varies temperature along a prescribed altitude coordinate
+# while holding gas mass concentrations fixed. It connects thermodynamics to
+# [gas storage](gas_data.py), without simulating transport or condensation.
+#
+# `GasData` retains water, butanol, and styrene in one order. `EnvironmentData`
+# stores temperature in kelvin, pressure in pascals, and dimensionless saturation
+# ratios in that gas order. The sweep evaluates only water; zero organic ratios
+# are unevaluated placeholders, not predictions of organic undersaturation.
 
 # %%
 import matplotlib.pyplot as plt
@@ -28,10 +33,12 @@ import particula as par
 # %%
 water_buck = par.gas.VaporPressureFactory().get_strategy("water_buck")
 butanol_antione = par.gas.VaporPressureFactory().get_strategy(
-    "antoine", {"a": 7.838, "b": 1558.19, "c": 196.881}
+    "antoine",
+    {"a": 4.54607 + np.log10(1e5 / 133.322387415), "b": 1351.555, "c": 93.34},
 )
 styrene_antione = par.gas.VaporPressureFactory().get_strategy(
-    "antoine", {"a": 6.924, "b": 1420, "c": 226}
+    "antoine",
+    {"a": 4.21948 + np.log10(1e5 / 133.322387415), "b": 1525.059, "c": 56.379},
 )
 vapor_pressure_strategies = [water_buck, butanol_antione, styrene_antione]
 gas_mixture = (
@@ -51,47 +58,22 @@ print(gas_mixture)
 print(environment)
 
 # %% [markdown]
-# ## Prescribed altitude history
+# ## Prescribe conditions, then evaluate water saturation
 #
-# This diagnostic sweep holds gas mass concentrations fixed while prescribing
-# temperature and pressure. It is not an expanding-parcel transport model.
-# Background air sets the pressure without adding an implicit gas storage lane.
+# The altitude coordinate spans 0–10 km. Temperature follows
+# $T=T_0-Lh$, and pressure follows the constant-lapse-rate barometric expression
 #
-# ### Practical Example: Altitude Impact
+# $$P=P_0(1-Lh/T_0)^{gM/(RL)}.$$
 #
-# Consider a scenario where our gas mixture is transported from sea level to an altitude of 10 kilometers. Such a change in altitude significantly impacts both temperature and pressure, which in turn affects the behavior of each gas species in the mixture.
+# Here $T_0=288.15$ K, $P_0=101325$ Pa, and $L=0.0065$ K m⁻¹. The endpoint
+# is 223.15 K. This is a prescribed profile, not an observation or an expanding
+# parcel: dilution, latent heat, and water removal are absent.
 #
-# #### Geopotential Height Equation
-#
-# The pressure and temperature changes with altitude can be approximated by using the geopotential height equation. Here's how you can calculate these changes:
-#
-# 1. **Pressure Change**: The pressure at a given altitude can be estimated by:
-#
-# $$
-#    P = P_0 \left(1 - \frac{L \cdot h}{T_0}\right)^{\frac{g \cdot M}{R \cdot L}}
-# $$
-#
-#    where:
-#    - $ P $ is the pressure at altitude $ h $,
-#    - $ P_0 $ is the reference pressure at sea level (101325 Pa),
-#    - $ L $ is the standard temperature lapse rate (approximately 0.0065 K/m),
-#    - $ h $ is the altitude in meters (10000 m for 10 km),
-#    - $ T_0 $ is the reference temperature at sea level (288.15 K),
-#    - $ g $ is the acceleration due to gravity (9.80665 m/s²),
-#    - $ M $ is the molar mass of Earth's air (0.0289644 kg/mol),
-#    - $ R $ is the universal gas constant (8.314 J/(mol·K)).
-#
-# 1. **Temperature Change**: The temperature decreases linearly with altitude at the lapse rate $ L $:
-#
-#    $$
-#    T = T_0 - L h
-#    $$
-#
-#    Using this formula, we can estimate the temperature at an altitude of 10 km:
-#    - $T$ = 223.15 K
-#    - $L$ = 0.0065 K/m
-#    - $h$ = 10000 m
-#
+# At each point, water saturation concentration is recalculated and the fixed
+# 1 g m⁻³ vapor concentration is divided by it. The implementation's Buck relation
+# switches branches below freezing, so the cold portion uses an ice reference.
+# The recorded total pressure does not enter this particular ratio calculation.
+# Read the plot as a thermodynamic diagnostic under those assumptions.
 
 # %%
 # Constants for calculations
@@ -149,7 +131,16 @@ ax.legend()
 plt.show()
 
 # %% [markdown]
-# We retain the complete gas order while updating held environment arrays.
-# The water plot uses lane zero explicitly. A native Aerosol can hold these
-# two containers together with particle data; processes own species mappings
-# and validate their scientific requirements independently.
+# ## What the curve can tell you
+#
+# The curve shows how the same vapor concentration compares with a changing
+# saturation reference. A ratio above one signals supersaturation relative to that
+# reference; this calculation does not remove excess vapor or predict cloud onset.
+# Particle composition, curvature, and kinetics are not represented.
+#
+# For a cooling-chamber study, replace the prescribed temperature history with
+# measured conditions, evolve vapor depletion alongside particles, and account for
+# thermal feedback where needed. Compare this fixed-vapor diagnostic with the
+# coupled calculation to separate thermodynamic forcing from vapor consumption.
+# The [staggered condensation example](../../processes/condensation/staggered_condensation_example.py)
+# is a next step toward that coupled question.

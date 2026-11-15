@@ -14,18 +14,17 @@
 # ---
 
 # %% [markdown]
-# # Coagulation Basic 2: PDF (Builder + Coagulation)
+# # A compact PDF coagulation calculation
 #
-# This notebook shows Brownian coagulation for a **continuous/PDF** distribution
-# using the public builder pattern:
+# How do you connect a stored size distribution to a physical collision process?
+# This small example isolates the construction and execution choices for Brownian
+# coagulation. Its 200 s horizon is intended to make the workflow easy to inspect;
+# a subtle before/after difference is not evidence that coagulation is absent.
 #
-# 1. Build a Brownian coagulation strategy with
-#    `distribution_type="continuous_pdf"`.
-# 2. Wrap it in `par.dynamics.Coagulation`.
-# 3. Run a short, lightweight step on a PDF aerosol and visualize
-#    change.
-#
-# Grid sizes and time horizon are kept small for quick execution (<120 s).
+# Read [distribution measures](../../../fundamentals/particles/aerosol_distributions.py)
+# to connect these concentrations with measurements. The companion
+# [alternative representation](coagulation_basic_1_pmf.py) uses different initial parameters,
+# so the two pages are not a controlled solver comparison.
 
 # %%
 # In Colab uncomment the following command to install particula:
@@ -35,10 +34,16 @@ import numpy as np
 import particula as par
 
 # %% [markdown]
-# ## Build a PDF aerosol
+# ## Assign physical meaning to the array
 #
-# We build a lognormal PDF on a modest grid. PDF units are m⁻³·m⁻¹ (number per
-# volume per size).
+# The 140 radius nodes span 10 nm–1 µm. The lognormal radius scale is
+# 120 nm, geometric standard deviation 1.5, and target number density
+# 8×10⁸ m⁻³. Concentration stores number per volume per metre of radius (m⁻⁴);
+# integrate over radius to obtain the total. Density is 1000 kg m⁻³.
+#
+# The environment stays at 298.15 K and 101325 Pa. A zero-concentration carrier
+# fills the gas species axis but is not consumed. Condensation, charging, sources,
+# and external losses are absent.
 
 # %%
 # Radius bins (log-spaced)
@@ -80,7 +85,12 @@ aerosol_pdf = par.Aerosol(
 )
 
 # %% [markdown]
-# ## Configure coagulation (continuous PDF)
+# ## Select a strategy consistent with the measure
+#
+# The builder specifies Brownian collision physics and the distribution type.
+# The wrapper then advances the aerosol. This separation matters when replacing
+# the collision mechanism: changing a strategy must not silently reinterpret
+# the stored concentration units.
 
 # %%
 coagulation_strategy = (
@@ -95,7 +105,11 @@ coagulation_process = par.dynamics.Coagulation(
 print(coagulation_process)
 
 # %% [markdown]
-# ## Execute a short coagulation step
+# ## Preserve a reference before advancing
+#
+# The process mutates the supplied aerosol over 200 s with ten substeps. Copying
+# the initial array preserves the control for the plot. This single timestep
+# choice illustrates execution; the page does not test time-discretization error.
 
 # %%
 time_step = 200  # seconds
@@ -110,7 +124,12 @@ aerosol_pdf_after = coagulation_process.execute(
 pdf_after = aerosol_pdf_after.particles.concentration[0].copy()
 
 # %% [markdown]
-# ## Plot: PDF concentration before/after
+# ## Read a small change in the correct units
+#
+# The overlay compares number per volume per metre of radius (m⁻⁴). Nearly overlapping curves
+# can hide small changes in total number or mass; peak height alone is not either
+# quantity. For an abundance diagnostic, integrate over radius. To assess material,
+# weight by single-particle mass before applying the same operation.
 
 # %%
 fig, ax = plt.subplots(figsize=(8, 5))
@@ -125,16 +144,18 @@ ax.grid(alpha=0.3)
 plt.show()
 
 # %% [markdown]
-# ## Summary
+# ## Make the next comparison controlled
 #
-# - Strategy: `BrownianCoagulationBuilder().set_distribution_type(`
-#   "continuous_pdf").build()
-# - Runnable: `par.dynamics.Coagulation`
-# - Representation: PDF (continuous number concentration per size)
-# - Runtime guardrails: small grid, short horizon
+# This example supplies a runnable collision calculation and a visual comparison,
+# not a convergence result. The [compact PMF/PDF comparison](coagulation_basic_3_compared.py)
+# holds initial physical inputs fixed and converts measures before plotting.
+#
+# For a research adaptation, vary initial abundance while keeping the size law
+# fixed and measure fractional number loss at 200 s. Add mass-drift diagnostics
+# and refine substeps to separate physical concentration sensitivity from
+# numerical error.
 
 # %% [markdown]
-# Native construction uses the explicitly generated distribution above. The old
-# preset construction regenerated default modal inputs instead. Finite-grid
-# coagulation has numerical mass drift; these curves illustrate number loss,
-# not exact conservation or a time-step/grid-convergence claim.
+# The native container retains the generated distribution. Finite-grid
+# coagulation can introduce material drift, and the displayed overlay alone
+# neither measures that drift nor establishes exact conservation.

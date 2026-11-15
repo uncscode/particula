@@ -1,6 +1,12 @@
 # %% [markdown]
 # # Separate stochastic coagulation from initial-state variability
 #
+# Would a second simulation tell the same physical story if only its collision
+# seed changed? This experiment isolates process randomness from initial sampling.
+# It teaches you to compare an ensemble spread with a proposed model effect.
+# Start with [particle-resolved coagulation](../../processes/coagulation/coagulation_3_particle_resolved_pattern.py)
+# for the number-loss and material-conservation distinction.
+#
 # Sixteen boxes each begin with 1,024 active, mixed-material particles.
 # Temperature, pressure and volume differ between boxes. **The initial aerosol
 # is identical across all sixteen realizations**; only the process root seed
@@ -64,3 +70,17 @@ def run_example():
 # %%
 if __name__ == "__main__":
     run_example()
+
+# %% [markdown]
+# ## Compare a proposed effect with the spread
+#
+# Changing only process seeds produces a distribution of number and size outcomes
+# from the same starting state. The shaded bands summarize these sixteen runs;
+# they do not quantify uncertainty in concentration, material properties, or the
+# collision model, and sixteen seeds may poorly resolve rare tails.
+#
+# To test a small environmental effect, repeat both conditions over a larger seed
+# ensemble while holding initial populations controlled. Compare effect size with
+# seed-to-seed variation and verify that conclusions persist under timestep and
+# sample-size refinement. The [lucky-few study](gpu_lucky_few.py) extends this idea
+# to the much more demanding question of uncommon large-particle growth.
