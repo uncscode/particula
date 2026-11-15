@@ -553,7 +553,14 @@ class Nucleation(_NativeBatchRunnable):
             )
             if np.all(diagnostics.gas_admitted_event_count == 0):
                 break
-            _commit_particle_source(demand, diagnostics, particles, gas, config)
+            _commit_particle_source(
+                demand,
+                diagnostics,
+                particles,
+                gas,
+                config,
+                extension_fields=aerosol.fields,
+            )
         return aerosol
 
 

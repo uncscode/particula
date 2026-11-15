@@ -182,6 +182,7 @@ class _ResamplingBoxPlan:
     source_concentrations: tuple[np.float64, ...] = ()
     source_masses: tuple[tuple[np.float64, ...], ...] = ()
     source_charges: tuple[np.float64, ...] = ()
+    transport: tuple[tuple[int, int, np.float64], ...] = ()
 
 
 @dataclass(frozen=True)
@@ -865,6 +866,7 @@ def _build_box_remap(  # noqa: C901
         (retained_count, masses.shape[1]), dtype=np.float64
     )
     replacement_charges = np.zeros(retained_count, dtype=np.float64)
+    transport = []
     source_index = 0
     source_start = np.float64(0.0)
     source_end = concentrations[0]
@@ -880,6 +882,13 @@ def _build_box_remap(  # noqa: C901
         while cursor < target_end and source_index < active_count:
             overlap_end = min(target_end, source_end)
             overlap = overlap_end - cursor
+            transport.append(
+                (
+                    retained[target_index],
+                    int(source.active_indices[order[source_index]]),
+                    np.float64(overlap),
+                )
+            )
             replacement_masses[target_index] += overlap * masses[source_index]
             replacement_charges[target_index] += overlap * charges[source_index]
             cursor = overlap_end
@@ -961,6 +970,7 @@ def _build_box_remap(  # noqa: C901
             tuple(np.float64(value) for value in row) for row in source.masses
         ),
         source_charges=tuple(np.float64(value) for value in source.charges),
+        transport=tuple(transport),
     )
 
 
