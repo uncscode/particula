@@ -140,6 +140,10 @@ class PreparedSimulation:
 
     def _bind(self, plans: tuple[Any, ...]) -> None:
         """Compile a validated process plan against the owned resident state."""
+        from particula.execution.extension_registry import (
+            PreparedOperation,
+            ProcessCapabilities,
+        )
         from particula.execution.prepared_cohort import wrap_cohort_operations
         from particula.execution.prepared_diagnostics import setup_diagnostics
         from particula.execution.prepared_processes import _compile_process
@@ -149,7 +153,18 @@ class PreparedSimulation:
             self._plans = plans
             operations = tuple(_compile_process(plan, self) for plan in plans)
             operations = wrap_cohort_operations(self, plans, operations)
-            self._operations = compose_operations(self, plans, operations)
+            composed = compose_operations(self, plans, operations)
+            self._operations = tuple(
+                PreparedOperation(
+                    name=f"builtin.stage.{index}",
+                    handler=operation,
+                    resources=tuple(self._bindings.values()),
+                    capabilities=ProcessCapabilities(
+                        resident=True, capture=True, checkpoint=True
+                    ),
+                )
+                for index, operation in enumerate(composed)
+            )
             self._diagnostics = setup_diagnostics(self)
             self._plans = plans
 
