@@ -414,3 +414,11 @@ narrow passing suite. Leave merge, version bump and release outside this goal.
   resolved. PR #1652 is ready for maintainer review; no merge or release was
   performed. This closeout changes only plan/evidence prose; final-head CI is
   rechecked after pushing it.
+- A final live review refresh after passing CI found two further edge cases:
+  grouped sequences lost absolute time, and delimiter-bearing CPU extension
+  identities could share an RNG namespace. Execution now traverses grouped
+  leaves consistently for CPU, prepare and resume; duplicate-name validation
+  includes all leaves. CPU RNG creation and checkpoint restore share an
+  unambiguous JSON identity encoding. Six new regression cases failed before
+  the fixes; the expanded focused suite passes 120 tests with one skip on
+  CPU/CUDA. Ruff/format and mypy pass. Final qualification is refreshed below.

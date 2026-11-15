@@ -6,7 +6,10 @@ from numbers import Real
 import numpy as np
 
 from particula import _cpu_batch
-from particula.execution.cpu_context import CPUExecutionContext
+from particula.execution.cpu_context import (
+    CPUExecutionContext,
+    _extension_rng_namespace,
+)
 from particula.runnable import RunnableABC
 
 _WRITABLE = frozenset(
@@ -160,7 +163,8 @@ class BoxProcess(RunnableABC):
                 box_context = BoxContext(
                     str(box) if context is None else context.box_ids[box],
                     transaction.generator(
-                        f"extension:{self.extension_id}:{self.name}", box
+                        _extension_rng_namespace(self.extension_id, self.name),
+                        box,
                     )
                     if self.stochastic
                     else None,

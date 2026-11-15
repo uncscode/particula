@@ -155,3 +155,78 @@ def test_cpu_transfer_preserves_sequence_substep_time():
     second = CPUTransfer(FunctionProcess(record, name="second"))
     (first | second).execute(state(), time_step=1, sub_steps=2, time=3)
     assert times == [3, 3, 3, 3, 3.5, 3.5, 3.5, 3.5]
+
+
+@pytest.mark.parametrize("wrapped", [False, True])
+def test_nested_sequences_preserve_time_and_context(wrapped):
+    """Grouped processes share absolute intervals, including repeated calls."""
+    from particula import CPUExecutionContext, CPUTransfer
+
+    seen = []
+
+    def process(name):
+        def advance(box, *, time, time_step, context):
+            seen.append((name, time, time_step, context.box_id))
+            box.environment.temperature[:] += time * time_step
+
+        result = FunctionProcess(
+            advance, name=name, writes=("environment.temperature",)
+        )
+        return CPUTransfer(result) if wrapped else result
+
+    first, second, third = (process(name) for name in ("a", "b", "c"))
+    pipeline = first | (second | third)
+    aerosol = state()
+    context = CPUExecutionContext(17, ("chamber",))
+    pipeline.execute(aerosol, 2, sub_steps=2, time=10, context=context)
+    pipeline.execute(aerosol, 1, time=12, context=context)
+    assert seen == [
+        (name, time, 1, "chamber")
+        for time in (10, 11, 12)
+        for name in ("a", "b", "c")
+    ]
+    np.testing.assert_allclose(aerosol.environment.temperature, [397.15])
+
+
+def test_nested_duplicate_names_reject_before_any_callback():
+    """Grouping cannot bypass the sequence-wide instance identity check."""
+
+    def forbidden(*_, **__):
+        pytest.fail("nested duplicate reached a callback")
+
+    first = FunctionProcess(forbidden, name="duplicate")
+    second = FunctionProcess(forbidden, name="other")
+    third = FunctionProcess(forbidden, name="duplicate")
+    with pytest.raises(ValueError, match="unique"):
+        (first | (second | third)).execute(state(), 1)
+
+
+def test_cpu_rng_identity_components_cannot_collide():
+    """Inserting or reordering another identity cannot consume one's draws."""
+    from particula import CPUExecutionContext
+
+    def run(order):
+        draws = {"c": [], "b:c": []}
+
+        def process(extension_id, name):
+            def advance(_box, *, context, **_):
+                draws[name].append(context.rng.random())
+
+            return FunctionProcess(
+                advance, name=name, extension_id=extension_id, stochastic=True
+            )
+
+        processes = [process("a:b", "c"), process("a", "b:c")]
+        context = CPUExecutionContext(17, ("box",))
+        aerosol = state()
+        for _ in range(4):
+            for index in order:
+                processes[index].execute(aerosol, 1, context=context)
+        return draws
+
+    alone = run((0,))
+    forward = run((0, 1))
+    reverse = run((1, 0))
+    assert alone["c"] == forward["c"] == reverse["c"]
+    assert forward["b:c"] == reverse["b:c"]
+    assert forward["c"] != forward["b:c"]

@@ -42,9 +42,17 @@ def case(stochastic=False):
     )
 
 
-def test_transfer_composes_at_current_time_and_keeps_device_pointers(device):
+@pytest.mark.parametrize("nested", [False, True])
+def test_transfer_composes_at_current_time_and_keeps_device_pointers(
+    device, nested
+):
     """The transfer sees prior GPU writes and changes only permitted buffers."""
-    aerosol, _, pipeline = case()
+    aerosol, process, pipeline = case()
+    if nested:
+        noop = CPUTransfer(FunctionProcess(lambda *_a, **_k: None, name="noop"))
+        pipeline = Dilution(DilutionStrategy(0.1)) | (
+            CPUTransfer(process) | noop
+        )
     expected = aerosol.gas.concentration.copy()
     with pipeline.prepare(
         aerosol, time_step=0.5, time=3, device=device
@@ -265,3 +273,53 @@ def test_transfer_refreshes_saturation_before_next_consumer(device):
             result.fields["lab.saturation"], result.environment.saturation_ratio
         )
         assert not np.array_equal(seen[0], result.fields["lab.saturation"])
+
+
+def test_transfer_rng_identity_components_are_independent_and_restart(device):
+    """Delimiter-bearing identities retain separate streams through restart."""
+    aerosol = state()
+    for field in ("lab.first", "lab.second"):
+        aerosol.fields.add(FieldSpec(field, ("box",), "1"))
+
+    def process(extension_id, name, field):
+        def draw(box, *, context, **_):
+            box.fields[field][:] = context.rng.random()
+
+        return CPUTransfer(
+            FunctionProcess(
+                draw,
+                name=name,
+                extension_id=extension_id,
+                stochastic=True,
+                writes=(field,),
+            )
+        )
+
+    first = process("a:b", "c", "lab.first")
+    second = process("a", "b:c", "lab.second")
+    noop = CPUTransfer(FunctionProcess(lambda *_a, **_k: None, name="noop"))
+    pipeline = first | (second | noop)
+    with first.prepare(
+        aerosol, time_step=1, device=device, root_seed=17
+    ) as alone:
+        with pipeline.prepare(
+            aerosol, time_step=1, device=device, root_seed=17
+        ) as combined:
+            for _ in range(3):
+                alone.step()
+                combined.step()
+                np.testing.assert_array_equal(
+                    alone.snapshot().fields["lab.first"],
+                    combined.snapshot().fields["lab.first"],
+                )
+            with pipeline.resume(combined.checkpoint()) as restored:
+                combined.step()
+                restored.step()
+                assert (
+                    combined.checkpoint().host_rng
+                    == restored.checkpoint().host_rng
+                )
+                assert (
+                    combined.checkpoint().field_payloads
+                    == restored.checkpoint().field_payloads
+                )

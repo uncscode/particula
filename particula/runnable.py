@@ -328,6 +328,14 @@ class RunnableSequence:
         """
         self.processes.append(process)
 
+    def _leaf_processes(self):
+        """Yield grouped process leaves in execution order."""
+        for process in self.processes:
+            if isinstance(process, RunnableSequence):
+                yield from process._leaf_processes()
+            else:
+                yield process
+
     def execute(
         self,
         aerosol: Aerosol,
@@ -365,9 +373,10 @@ class RunnableSequence:
         from particula.cpu_transfer import CPUTransfer
 
         time = validate_time(time)
+        processes = tuple(self._leaf_processes())
         names = [
             p.process.name if isinstance(p, CPUTransfer) else p.name
-            for p in self.processes
+            for p in processes
             if isinstance(p, (BoxProcess, CPUTransfer))
         ]
         if len(names) != len(set(names)):
@@ -384,7 +393,7 @@ class RunnableSequence:
             )
         for substep in loop_iterator:
             # loop over each process in the sequence
-            for process in self.processes:
+            for process in processes:
                 aerosol = process.execute(
                     aerosol,
                     sub_step_time_step,
@@ -434,7 +443,7 @@ class RunnableSequence:
         from particula.execution.prepared import prepare_simulation
 
         return prepare_simulation(
-            tuple(self.processes),
+            tuple(self._leaf_processes()),
             aerosol,
             backend=Backend.WARP if backend is None else backend,
             device=device,
@@ -474,7 +483,7 @@ class RunnableSequence:
         from particula.execution.prepared_checkpoint import resume_simulation
 
         return resume_simulation(
-            tuple(self.processes),
+            tuple(self._leaf_processes()),
             checkpoint,
             backend=Backend.WARP if backend is None else backend,
             device=device,

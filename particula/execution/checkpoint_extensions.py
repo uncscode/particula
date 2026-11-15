@@ -224,7 +224,10 @@ def restore_targets(owner):
 
 def restore_host_rng(saved, plans):
     """Validate transfer mode and host stream identities before upload."""
-    from particula.execution.cpu_context import CPUExecutionContext
+    from particula.execution.cpu_context import (
+        CPUExecutionContext,
+        _extension_rng_namespace,
+    )
 
     transfers = [
         p.configuration
@@ -241,7 +244,7 @@ def restore_host_rng(saved, plans):
         return None
     metadata = saved.resident.rng_continuation
     namespaces = {
-        f"extension:{p.extension_id}:{p.name}"
+        _extension_rng_namespace(p.extension_id, p.name)
         for p in transfers
         if p.values["stochastic"]
     }
