@@ -122,4 +122,8 @@ same interpreter and script. CUDA is mandatory; the harness rejects CPU fallback
 Saved-example validation passed, with CUDA workloads explicitly skipped by that
 gate and the new CUDA example separately refreshed and tested on the GPU.
 The final site rebuild passed with zero rendered-link errors across 607 HTML
-pages and 286 API modules. Hosted PR CI/review remains a separate gate.
+pages and 286 API modules. Hosted PR #1652 checks passed on `662a8119a`,
+including the Python 3.12/3.13/3.14 matrix, documentation, lint, packaging,
+conda and plugin validation. The live saturation review finding is resolved.
+Final-head status remains visible on the PR; this record does not authorize
+merge or release.
