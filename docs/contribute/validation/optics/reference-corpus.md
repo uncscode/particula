@@ -116,3 +116,20 @@ For m=1.33, independent/production extinction agrees to about 1e-14:
 
 The precise upstream failure mechanism has not yet been isolated. No fixture
 values or acceptance tolerances were changed to hide these discrepancies.
+
+## Angular comparison convention
+
+Raw angular comparisons use maximum absolute error normalized by the case's
+peak amplitude or Mueller element, with a 1e-6 limit. This implements the
+planned scale-aware angular metric: pointwise relative errors are unsuitable
+at amplitude nodes and near forward-scattering polarization zeros. This does
+not replace independent polarization or energy checks.
+
+At x=50 the raw reference differs slightly from full Bessel coefficients,
+including pointwise amplitude differences around 2.4e-6 relative for m=1.33.
+All seven x=50 material cases additionally compare against independently
+computed SciPy Bessel coefficients and Legendre-polynomial derivatives at
+rtol=1e-9, atol=1e-10. Mueller sign conventions are independently checked by
+propagating complex Jones electric fields and constructing Stokes vectors.
+Angular integration tests recover total scattering and asymmetry through
+x=100. Angular qualification at larger size parameters remains pending.

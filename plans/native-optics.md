@@ -108,3 +108,7 @@ entries, discrete/resolved/PDF reductions and single/multiple layers.
   Bessel checks of nine documented upstream discrepancies, Rayleigh limits,
   zero cases, medium normalization, broadcasting and invalid-input rejection.
   Cross-section, angular, GPU and remaining full-stack work still pending.
+- Added CPU dimensional cross sections, reusable-coefficient angular amplitudes,
+  sphere Mueller/phase matrices, explicit Stokes rotations and matrix action.
+  Independent Jones-field and solid-angle integral checks accompany raw angular
+  references. Full high-x angular/CUDA qualification remains pending.
