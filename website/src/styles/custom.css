@@ -2,6 +2,8 @@
   --sl-color-accent-low: #123c3b;
   --sl-color-accent: #53c5b6;
   --sl-color-accent-high: #b5eee6;
+  --sl-color-text: #eef1f3;
+  --sl-color-gray-2: #e0e5e8;
   --sl-font: 'Inter', ui-sans-serif, system-ui, sans-serif;
   --sl-content-width: 52rem;
 }
@@ -11,7 +13,8 @@
   --sl-color-accent-high: #154b43;
   --sl-color-white: #18322d;
   --sl-color-gray-1: #29463f;
-  --sl-color-gray-2: #3f5c56;
+  --sl-color-text: #171b19;
+  --sl-color-gray-2: #252e2a;
   --sl-color-gray-3: #5b716b;
   --sl-color-gray-6: #eaf0ec;
   --sl-color-bg: #fcfdfb;
