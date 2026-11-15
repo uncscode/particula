@@ -142,3 +142,12 @@ entries, discrete/resolved/PDF reductions and single/multiple layers.
   and empty columns. Ruff/mypy pass. A local type annotation initially failed
   Warp compilation; removed it and reran the complete suite successfully.
   Explicit workspace/launch admission and tiled execution remain pending.
+- Added public explicit `particula.optics.gpu.prepare_mie` and immutable
+  MieWorkspace handles with retained input/output/scratch arrays and compiled
+  launch commands. Case and angle tiles reuse bounded coefficient scratch;
+  enqueue executes commands without host transfers, and check is the explicit
+  observation boundary. Metadata/stream/capacity admission precedes preparation.
+  Full optics suite: 185 passed with CPU/CUDA tile invariance, pointer reuse,
+  changing input values and invalid-result observation. Ruff/mypy pass.
+  Bulk-only streaming execution and convenience admission for reduction kernels
+  remain pending, as do examples, documentation and full qualification.
