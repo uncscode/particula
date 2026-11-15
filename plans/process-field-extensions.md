@@ -353,3 +353,9 @@ narrow passing suite. Leave merge, version bump and release outside this goal.
   Ruff, format and mypy pass; final package coverage and isolated timings remain
   in progress. The timing protocol declares its 20% native-overhead bound before
   measurement and uses an archived pre-feature source tree with the same runtime.
+- Final full package run on fb8c254f2: 10,290 passed, 18 skipped, one expected
+  failure; coverage 91.78% against the unchanged 80% gate. The run includes slow
+  and performance-marked tests and uses its own coverage database. Isolated
+  timing measurements wait for other host validation workloads. A single draft
+  PR will allow hosted CI to run while the remaining evidence is collected;
+  draft creation is not completion or approval to merge.
