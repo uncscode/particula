@@ -410,6 +410,10 @@
               {
                 "label": "Adding Particles During Simulation",
                 "slug": "examples/processes/customization/adding_particles_during_simulation"
+              },
+              {
+                "label": "Timed custom CPU chemistry",
+                "slug": "examples/processes/customization/timed_box_chemistry"
               }
             ]
           },

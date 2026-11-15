@@ -378,3 +378,7 @@ and result attachments; native inventory mapping is a separate migration gap.
 
 See the [Aerosol Tutorial](../../examples/fundamentals/native_aerosol.ipynb) for
 an executed two-box example with distinct volumes and stable box IDs.
+
+Run the [timed CPU chemistry example](../../examples/processes/customization/timed_box_chemistry.py)
+for a complete two-box SciPy process, a scheduled function callback, registered
+source accounting and analytical checks.

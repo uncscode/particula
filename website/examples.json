@@ -719,5 +719,20 @@
     "plot_inputs": [
       "scripts/gpu_studies/population_figures.py"
     ]
+  },
+  "timed-box-chemistry": {
+    "title": "Timed custom CPU chemistry",
+    "source": "docs/examples/processes/customization/timed_box_chemistry.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 120,
+    "inputs": [],
+    "invoke": "report = run_example()",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\nplot_results(report)",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": []
   }
 }

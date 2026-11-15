@@ -306,3 +306,11 @@ narrow passing suite. Leave merge, version bump and release outside this goal.
   particle fields, custom adapters, transfers and real CUDA capture/restart.
   Ruff and targeted mypy for all 11 changed execution modules pass. Published
   examples, full final qualification, performance evidence and the PR remain.
+- The first maintained example now demonstrates two-box SciPy chemistry,
+  time-aligned scheduled emissions via FunctionProcess, native dilution and a
+  registered per-box injected-mass ledger. Every observation is checked against
+  closed-form species evolution and volume-aware inventory. The complete CPU
+  script passes with isolated Python from a temporary directory outside the
+  checkout. Saved numerical data and inspected plots are published through the
+  example registry; saved-data-only replot and documentation structure checks
+  pass. Particle-tracer and resident/transfer examples remain outstanding.
