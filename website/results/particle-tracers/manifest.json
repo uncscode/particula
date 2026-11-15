@@ -1,15 +1,15 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 4.0769568380201235,
-  "package_source_sha256": "eadd01c345038fb4623c492f11454d1c547fe063f8f6d5fc579e0db74ef43149",
+  "elapsed_seconds": 3.7807844870258123,
+  "package_source_sha256": "6501d9940d7e5c883bfc0aeee62213fed01c4e3de1f17133b03100d0ef124f17",
   "input_sha256": {},
   "example": "particle-tracers",
   "fingerprint": "eeb79dcabb5a4f5ba3bee90ec578ad1774499a95d02dc6e56aefc2120b1bef19",
   "source": "docs/examples/processes/customization/particle_tracers.py",
-  "revision": "dac1251fd3d9119028422fc5f2c457c812570166",
+  "revision": "8d108f4543d98d493c4816b059a48ceb9d981aca",
   "package_dirty": false,
-  "executed_at": "2026-11-15T16:09:49.951661+00:00",
+  "executed_at": "2026-11-15T16:48:47.588270+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
@@ -49,7 +49,7 @@
   },
   "render_device": "CPU",
   "execution_input_sha256": {},
-  "rendered_at": "2026-11-15T16:10:41.251099+00:00",
-  "render_revision": "dac1251fd3d9119028422fc5f2c457c812570166",
-  "render_elapsed_seconds": 4.1623546270420775
+  "rendered_at": "2026-11-15T16:49:19.245951+00:00",
+  "render_revision": "8d108f4543d98d493c4816b059a48ceb9d981aca",
+  "render_elapsed_seconds": 4.197441522963345
 }

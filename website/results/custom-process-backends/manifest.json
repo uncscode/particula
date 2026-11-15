@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 5.4460137450369075,
-  "package_source_sha256": "eadd01c345038fb4623c492f11454d1c547fe063f8f6d5fc579e0db74ef43149",
+  "elapsed_seconds": 5.191039106925018,
+  "package_source_sha256": "6501d9940d7e5c883bfc0aeee62213fed01c4e3de1f17133b03100d0ef124f17",
   "input_sha256": {
     "scripts/gpu_studies/__init__.py": "530c51f7c7f432a895623c9ba4548b7cf3e053a1a0f328a36ae8ae9e50cec9c4",
     "scripts/gpu_studies/extension_kernels.py": "65fd62e0f916fc827f352493da3650f2971322e3d89c9881403ee0943d291932"
@@ -10,9 +10,9 @@
   "example": "custom-process-backends",
   "fingerprint": "d98a3086fea6dbaf3caa866266894018e31902fe5189dc3f17654bcff23b89a3",
   "source": "docs/examples/gpu/prepared/custom_process_backends.py",
-  "revision": "dac1251fd3d9119028422fc5f2c457c812570166",
+  "revision": "8d108f4543d98d493c4816b059a48ceb9d981aca",
   "package_dirty": false,
-  "executed_at": "2026-11-15T16:09:56.657992+00:00",
+  "executed_at": "2026-11-15T16:48:53.916598+00:00",
   "device": "cuda:0: NVIDIA GeForce RTX 5060",
   "python": "3.12.12",
   "versions": {
@@ -55,7 +55,7 @@
     "scripts/gpu_studies/__init__.py": "530c51f7c7f432a895623c9ba4548b7cf3e053a1a0f328a36ae8ae9e50cec9c4",
     "scripts/gpu_studies/extension_kernels.py": "65fd62e0f916fc827f352493da3650f2971322e3d89c9881403ee0943d291932"
   },
-  "rendered_at": "2026-11-15T16:10:47.005111+00:00",
-  "render_revision": "dac1251fd3d9119028422fc5f2c457c812570166",
-  "render_elapsed_seconds": 4.438104780972935
+  "rendered_at": "2026-11-15T16:49:25.176490+00:00",
+  "render_revision": "8d108f4543d98d493c4816b059a48ceb9d981aca",
+  "render_elapsed_seconds": 4.528772757039405
 }

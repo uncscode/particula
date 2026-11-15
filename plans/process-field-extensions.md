@@ -422,3 +422,15 @@ narrow passing suite. Leave merge, version bump and release outside this goal.
   unambiguous JSON identity encoding. Six new regression cases failed before
   the fixes; the expanded focused suite passes 120 tests with one skip on
   CPU/CUDA. Ruff/format and mypy pass. Final qualification is refreshed below.
+
+- Late-review corrected source 8d108f454 passes the complete package: 10,312
+  passed, 20 skipped, one expected failure; coverage 91.79%. Full examples:
+  238 passed, one skip. Full tooling suite: 294 passed. All three examples
+  refreshed and replotted with unchanged figures. Isolated final-source
+  timings pass the unchanged bound: native overhead 6.4%, captured 8.9%.
+  Source and refreshed evidence are pushed together; final-head hosted CI
+  and both new review threads are verified after this evidence commit.
+- The final-source site rebuild passes with zero errors across 607 HTML pages
+  and 286 API modules. A first local build had missing generated pages despite
+  intact authored sources; regeneration in the selected Python environment
+  restored all 191 authored/example pages and the full 477-page build.
