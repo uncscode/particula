@@ -150,14 +150,26 @@ class _CountingStrategy(EquilibriaStrategy):
         return _equilibrium_result()
 
 
-def test_sub_steps_calls_strategy_each_time_and_passes_dt():
+@pytest.mark.parametrize("time", [0.0, 12.5])
+def test_sub_steps_calls_strategy_each_time_and_passes_dt(time):
     """Verify each sub-step calls the strategy with the delta time."""
     aerosol = _AerosolStub()
     strategy = _CountingStrategy()
     runnable = Equilibria(strategy)
-    runnable.execute(aerosol, time_step=3.0, sub_steps=3)  # type: ignore[arg-type]
+    runnable.execute(aerosol, time_step=3.0, sub_steps=3, time=time)  # type: ignore[arg-type]
     assert strategy.calls == 3
     assert strategy.dts == [1.0, 1.0, 1.0]
+
+
+@pytest.mark.parametrize("time", [float("nan"), float("inf")])
+def test_invalid_time_rejects_before_equilibrium_solve(time):
+    """Invalid absolute time cannot invoke the solver or publish a result."""
+    aerosol = _AerosolStub()
+    strategy = _CountingStrategy()
+    with pytest.raises(ValueError, match="time must be finite"):
+        Equilibria(strategy).execute(aerosol, 1.0, time=time)  # type: ignore[arg-type]
+    assert strategy.calls == 0
+    assert not hasattr(aerosol, "equilibria_result")
 
 
 def test_invalid_sub_steps_raises():

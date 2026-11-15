@@ -838,12 +838,19 @@ class CPUCondensationExecutionAdapter:
         configuration = state.state.config.configuration
         require_condensation_profile(Backend.CPU, configuration)
         _require_isothermal(configuration)
-        aerosol = state.runnable.execute(
-            state.state.aerosol,
-            cast(float, state.time_step),
-            cast(int, state.sub_steps),
-            **({"context": state.context} if state.context is not None else {}),
-        )
+        if state.context is None:
+            aerosol = state.runnable.execute(
+                state.state.aerosol,
+                cast(float, state.time_step),
+                cast(int, state.sub_steps),
+            )
+        else:
+            aerosol = state.runnable.execute(
+                state.state.aerosol,
+                cast(float, state.time_step),
+                cast(int, state.sub_steps),
+                context=state.context,
+            )
         if aerosol is not state.state.aerosol:
             raise ValueError("CPU runnable must return the original aerosol.")
         return ExecutionResult(

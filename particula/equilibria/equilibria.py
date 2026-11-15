@@ -71,6 +71,7 @@ class Equilibria(RunnableABC):
         sub_steps: int = 1,
         *,
         context=None,
+        time: float = 0.0,
     ) -> Aerosol:
         """Run equilibria over the provided time step.
 
@@ -78,6 +79,9 @@ class Equilibria(RunnableABC):
             aerosol: Aerosol state passed to the strategy and updated in place.
             time_step: Simulation interval in seconds.
             sub_steps: Number of sub-divisions of ``time_step``. Must be > 0.
+            context: Unsupported; must be None.
+            time: Finite simulation start time in seconds. Equilibrium is
+                time independent; this argument supports timed composition.
 
         Returns:
             The updated aerosol after equilibrium application.
@@ -87,6 +91,9 @@ class Equilibria(RunnableABC):
             AttributeError: When required partitioning inputs are missing.
             TypeError: If the strategy returns ``None``.
         """
+        from particula.box_process import validate_time
+
+        validate_time(time)
         if context is not None:
             raise TypeError("Equilibria does not support CPU box contexts")
         if sub_steps <= 0:

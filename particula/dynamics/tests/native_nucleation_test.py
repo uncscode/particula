@@ -289,12 +289,12 @@ def test_later_substep_failure_keeps_earlier_commit(monkeypatch):
     commit = process_module._commit_particle_source
     attempts = 0
 
-    def fail_second(*args):
+    def fail_second(*args, **kwargs):
         nonlocal attempts
         attempts += 1
         if attempts == 2:
             raise RuntimeError("second source attempt")
-        return commit(*args)
+        return commit(*args, **kwargs)
 
     monkeypatch.setattr(process_module, "_commit_particle_source", fail_second)
     with pytest.raises(RuntimeError, match="second source attempt"):
