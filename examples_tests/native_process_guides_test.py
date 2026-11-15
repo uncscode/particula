@@ -209,11 +209,18 @@ def test_nucleation_guide_mapped_inventory():
     np.testing.assert_allclose(total, 2.5e-13, rtol=1e-12, atol=1e-30)
 
 
-def test_native_scientific_direct_calls():
+def test_native_scientific_direct_calls(monkeypatch):
     """Direct native composition preserves inert gas and accounts for sinks."""
     page = FEATURES / "index.md"
     blocks = re.findall(r"```python\n(.*?)\n```", page.read_text(), re.DOTALL)
     namespace = {}
+    monkeypatch.setattr(
+        par.runnable.RunnableABC,
+        "prepare",
+        lambda *args, **kwargs: pytest.fail(
+            "CPU process guide must not start prepared-device execution"
+        ),
+    )
     for block in blocks:
         exec(compile(block, str(page), "exec"), namespace)  # noqa: S102
     aerosol = namespace["aerosol"]
