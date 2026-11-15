@@ -13,6 +13,12 @@ physics, then connect the results to the underlying science.
   <LinkCard title="See the script-to-figure workflow" description="Readable explanations, expandable Python, and saved plots." href="/particula/examples/fundamentals/particles/aerosol_distributions/" />
 </CardGrid>
 
+## Explore by scientific topic
+
+[Explore aerosol topics](guide/topics/index.md) through illustrated branches,
+related concepts, and examples. Search for familiar terms even when you do not
+remember a page title.
+
 ## Dig deeper into the science
 
 <CardGrid>

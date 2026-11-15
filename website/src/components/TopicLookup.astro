@@ -1,0 +1,60 @@
+---
+const { compact = false } = Astro.props;
+---
+<topic-lookup data-base={import.meta.env.BASE_URL} data-compact={String(compact)} data-pagefind-ignore>
+  {!compact && <><label>Find a topic <input type="search" placeholder="Try humidity growth, DNS, or viscosity" autocomplete="off" disabled /></label><noscript>Follow the topic links below to browse without JavaScript.</noscript></>}
+  <div class="topic-matches" hidden>
+    <strong>Topics</strong>
+    <ul></ul>
+    <p role="status" aria-live="polite"></p>
+  </div>
+</topic-lookup>
+<script>
+  import { searchTopics, topicPath } from './topic-model.mjs';
+  class TopicLookup extends HTMLElement {
+    connectedCallback() {
+      if (this.dataset.ready) return;
+      this.dataset.ready = 'true';
+      const input = this.dataset.compact === 'true'
+        ? this.closest('particula-search')?.querySelector<HTMLInputElement>('#documentation-query')
+        : this.querySelector<HTMLInputElement>('input');
+      if (!input) return;
+      if (this.dataset.compact !== 'true') input.disabled = false;
+      const container = this.querySelector<HTMLElement>('.topic-matches')!;
+      const list = this.querySelector('ul')!;
+      const status = this.querySelector('[role="status"]')!;
+      const update = () => {
+        const matches = searchTopics(input.value);
+        list.replaceChildren();
+        container.hidden = !input.value.trim();
+        for (const { topic, path } of matches) {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+          a.href = topicPath(topic.id, this.dataset.base);
+          a.dataset.topicLink = '';
+          const strong = document.createElement('strong');
+          strong.textContent = topic.label;
+          const small = document.createElement('small');
+          small.textContent = path;
+          a.append(strong, small);
+          li.append(a); list.append(li);
+        }
+        status.textContent = matches.length ? `${matches.length} matching topics` : 'No matching topics. Browse the branches or try documentation search.';
+      };
+      input.addEventListener('input', update);
+    }
+  }
+  customElements.define('topic-lookup', TopicLookup);
+</script>
+<style>
+  topic-lookup { display: block; margin-block: 1.25rem; }
+  label { display: grid; gap: .4rem; font-size: .9rem; font-weight: 600; }
+  input { width: 100%; padding: .8rem 1rem; border: 1px solid var(--sl-color-gray-4); border-radius: .65rem; background: var(--sl-color-bg); color: var(--sl-color-text); font: inherit; font-weight: 400; }
+  .topic-matches { padding: 1rem; background: var(--sl-color-gray-6); border: 1px solid var(--sl-color-gray-5); border-radius: .65rem; }
+  .topic-matches[hidden] { display: none; }
+  .topic-matches :global(ul) { list-style: none; padding: 0; margin: .5rem 0; }
+  .topic-matches :global(li + li) { margin-top: .6rem; }
+  .topic-matches :global(a) { display: grid; text-decoration: none; line-height: 1.4; }
+  .topic-matches :global(small) { color: var(--sl-color-gray-2); font-size: .75rem; }
+  .topic-matches p { font-size: .8rem; margin: .6rem 0 0; color: var(--sl-color-gray-2); }
+</style>

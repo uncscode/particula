@@ -118,3 +118,16 @@ use matching tags or commits. Keep version guidance visible to readers.
 The normal build checks the published index and its targets offline against the
 checkout and built site. After deployment, verify the public index and links
 separately; a local build does not prove that GitHub Pages has updated.
+
+## Topic explorer and narrative review
+
+Use the [documentation guide](https://uncscode.github.io/particula/contribute/documentation/) for topic
+placement and the shared scientific narrative framework. The topic registry is
+`website/topics.json`; local SVGs live in `website/public/topic-icons/`.
+Preparation validates coverage and generates topic MDX adapters. Do not edit
+`website/src/content/docs/` directly. The offline entry remains maintained in
+`docs/guide/topics/index.md`.
+
+Review the opening question, code, figures, and conclusion together. Prose-only
+pilot revisions retain the original scientific outputs when executable cell
+fingerprints match. Topic icons are conceptual illustrations, never observations.

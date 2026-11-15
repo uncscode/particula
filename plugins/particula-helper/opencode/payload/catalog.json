@@ -16,7 +16,7 @@
     "name": "particula-develop"
   },
   {
-    "description": "Maintain Particula repository docstrings, scientific guides, theory, and published Python examples in Astro/Starlight, including saved outputs and links. Not for unrelated document drafting or private simulation notebooks.",
+    "description": "Organize and maintain Particula documentation, its topic graph, scientific narratives, docstrings, and published Python examples in Astro/Starlight. Not for unrelated document drafting or private simulation notebooks.",
     "name": "particula-docs"
   },
   {

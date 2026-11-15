@@ -8,6 +8,10 @@
         "slug": "guide"
       },
       {
+        "label": "Explore topics",
+        "slug": "guide/topics"
+      },
+      {
         "label": "Getting started",
         "collapsed": true,
         "items": [

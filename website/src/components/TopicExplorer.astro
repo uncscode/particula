@@ -1,0 +1,140 @@
+---
+import { graph, topics, ancestors, children, topicPath, resourcePath } from './topic-model.mjs';
+import TopicLookup from './TopicLookup.astro';
+const { topicId } = Astro.props;
+const topic = topics.get(topicId);
+if (!topic) throw new Error(`Unknown topic ${topicId}`);
+const base = import.meta.env.BASE_URL;
+const path = ancestors(topicId);
+const branches = children(topicId);
+const resources = graph.resources.filter((r) => r.topic === topicId || r.also.includes(topicId));
+const starters = resources.filter((r) => r.start_here && r.topic === topicId);
+const groups = ['Guide', 'Examples', 'Theory', 'API', 'Contribute'];
+const icon = (id) => `${base.replace(/\/$/, '')}/topic-icons/${id}.svg`;
+---
+<topic-explorer data-topic={topicId} data-base={base}>
+  <nav aria-label="Topic path" class="topic-path">
+    {path.map((item, index) => <>
+      {index > 0 && <span aria-hidden="true">/</span>}
+      {item.id === topicId ? <span aria-current="page">{item.label}</span> : <a data-topic-link href={topicPath(item.id, base)}>{item.label}</a>}
+    </>)}
+  </nav>
+  <div class="topic-intro">
+    <img src={icon(topic.icon)} alt="" width="72" height="72" />
+    <div><p class="topic-eyebrow">{topic.parent ? 'Follow the science' : 'Find your next question'}</p>
+      <h2 class="topic-title" tabindex="-1">{topic.label}</h2>
+      <p>{topic.description}</p>
+    </div>
+  </div>
+  <TopicLookup />
+  {branches.length > 0 && <section aria-label="Explore subtopics" class="topic-cards">
+    {branches.map((child) => <a data-topic-link class="topic-card" href={topicPath(child.id, base)}>
+      <img src={icon(child.icon)} alt="" width="56" height="56" />
+      <div><h3>{child.label}</h3><p>{child.description}</p><span class="topic-card-action">Explore topic <span aria-hidden="true">→</span></span></div>
+    </a>)}
+  </section>}
+  {starters.length > 0 && <section class="topic-start"><h3>Start here</h3>
+    {starters.map((r) => <a href={resourcePath(r.source, base)}>{r.title} <span aria-hidden="true">→</span></a>)}
+  </section>}
+  {(topic.prerequisites.length > 0 || topic.related.length > 0) && <div class="topic-connections">
+    {topic.prerequisites.length > 0 && <section><h3>Helpful background</h3><p>Concepts to have in mind before starting.</p><ul>{topic.prerequisites.map((id) => <li><a data-topic-link href={topicPath(id, base)}>{topics.get(id).label}</a></li>)}</ul></section>}
+    {topic.related.length > 0 && <section><h3>Connect the ideas</h3><p>Explore a neighboring question.</p><ul>{topic.related.map((id) => <li><a data-topic-link href={topicPath(id, base)}>{topics.get(id).label}</a></li>)}</ul></section>}
+  </div>}
+  {resources.length > 0 && <section class="topic-resources" aria-label="Topic resources"><h3>Read, calculate, investigate</h3>
+    <div class="topic-resource-groups">{groups.map((role) => {
+      const entries = resources.filter((r) => r.role === role);
+      return entries.length > 0 && <section><h4>{role}</h4><ul>{entries.map((r) => <li><a href={resourcePath(r.source, base)}>{r.title}</a></li>)}</ul></section>;
+    })}</div>
+  </section>}
+  {topic.aliases.length > 0 && <p class="topic-aliases">Also called: {topic.aliases.join(', ')}.</p>}
+  <p class="topic-footer">Choose a branch to narrow your question. Each topic connects explanations, runnable examples, and reference material.</p>
+</topic-explorer>
+<script>
+  class TopicExplorer extends HTMLElement {
+    controller?: AbortController;
+    cleanup?: () => void;
+    connectedCallback() {
+      this.cleanup?.();
+      const navigate = async (url: string, push: boolean) => {
+        this.controller?.abort();
+        const controller = new AbortController();
+        this.controller = controller;
+        this.setAttribute('aria-busy', 'true');
+        try {
+          const response = await fetch(url, { signal: controller.signal });
+          if (!response.ok) throw new Error('Topic unavailable');
+          const documentNext = new DOMParser().parseFromString(await response.text(), 'text/html');
+          const next = documentNext.querySelector('topic-explorer');
+          if (controller.signal.aborted) return;
+          if (!next) throw new Error('Topic unavailable');
+          // Only same-site, generated topic HTML is inserted. Scientific article
+          // links retain normal navigation and are never fetched into this view.
+          this.innerHTML = next.innerHTML;
+          this.dataset.topic = (next as HTMLElement).dataset.topic;
+          document.title = documentNext.title;
+          const heading = document.querySelector("h1#_top");
+          const nextHeading = documentNext.querySelector("h1#_top");
+          if (heading && nextHeading) heading.textContent = nextHeading.textContent;
+          const canonical = documentNext.querySelector('link[rel="canonical"]')?.getAttribute('href');
+          if (canonical) document.querySelector('link[rel="canonical"]')?.setAttribute('href', canonical);
+          if (push) history.pushState({}, '', url);
+          this.querySelector<HTMLElement>('.topic-title')?.focus({ preventScroll: true });
+          this.scrollIntoView({ block: 'start', behavior: 'instant' });
+        } catch {
+          if (!controller.signal.aborted) location.assign(url);
+        } finally {
+          if (this.controller === controller) this.removeAttribute('aria-busy');
+        }
+      };
+      const click = (event: MouseEvent) => {
+        const link = (event.target as Element).closest<HTMLAnchorElement>('a[data-topic-link]');
+        if (!link || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        if (link.origin !== location.origin) return;
+        event.preventDefault();
+        void navigate(link.href, true);
+      };
+      const pop = () => { void navigate(location.href, false); };
+      this.addEventListener('click', click);
+      window.addEventListener('popstate', pop);
+      this.cleanup = () => { this.controller?.abort(); this.removeEventListener('click', click); window.removeEventListener('popstate', pop); };
+    }
+    disconnectedCallback() { this.cleanup?.(); }
+  }
+  customElements.define('topic-explorer', TopicExplorer);
+</script>
+<style>
+  /* Keep Starlight's main heading for skip navigation without repeating the
+     illustrated topic title visually. This only affects explorer pages. */
+  :global(body:has(topic-explorer) .content-panel:has(h1#_top)) {
+    position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden;
+    clip-path: inset(50%); white-space: nowrap;
+  }
+  topic-explorer { display: block; scroll-margin-top: 6rem; }
+  .topic-path { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem .6rem; font-size: .75rem; color: var(--sl-color-gray-2); margin-bottom: 1.8rem; }
+  .topic-path a { text-decoration: none; }
+  .topic-intro { display: flex; align-items: flex-start; gap: 1.1rem; }
+  .topic-intro img { flex: 0 0 72px; padding: .3rem; background: var(--sl-color-accent-low); border-radius: 1rem; }
+  .topic-eyebrow { text-transform: uppercase; letter-spacing: .12em; font-size: .7rem; font-weight: 650; color: var(--sl-color-text-accent); margin: 0 0 .3rem; }
+  .topic-intro h2 { margin: 0; font-size: clamp(1.45rem, 3vw, 2rem); line-height: 1.15; }
+  .topic-intro p:last-child { color: var(--sl-color-gray-2); margin-top: .6rem; }
+  .topic-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin: 1.5rem 0 2rem; }
+  .topic-card { display: flex; flex-direction: column; gap: .8rem; padding: 1.3rem; border: 1px solid var(--sl-color-gray-5); border-radius: .9rem; background: var(--sl-color-bg); text-decoration: none; transition: border-color .18s, transform .18s, box-shadow .18s; }
+  .topic-card:hover { border-color: var(--sl-color-accent); transform: translateY(-3px); box-shadow: 0 8px 22px #159b8d15; }
+  .topic-card h3 { font-size: 1.1rem; margin: 0; color: var(--sl-color-white); }
+  .topic-card p { color: var(--sl-color-gray-2); font-size: .9rem; margin: .5rem 0 1rem; }
+  .topic-card-action { color: var(--sl-color-text-accent); font-size: .8rem; font-weight: 650; }
+  .topic-start { display: grid; gap: .5rem; padding: 1rem 1.2rem; border-left: 3px solid var(--sl-color-accent); border-radius: 0 .6rem .6rem 0; background: var(--sl-color-accent-low); margin-block: 1.5rem; }
+  h3 { font-size: 1.1rem; margin: 0 0 .6rem; }
+  .topic-start h3 { font-size: .85rem; text-transform: uppercase; letter-spacing: .05em; }
+  .topic-connections, .topic-resource-groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; margin-block: 1.5rem; }
+  .topic-connections p { color: var(--sl-color-gray-2); font-size: .85rem; }
+  .topic-connections ul, .topic-resources ul { padding-left: 1.2rem; font-size: .9rem; }
+  li + li { margin-top: .5rem; }
+  .topic-resources { padding-top: 1.5rem; border-top: 1px solid var(--sl-color-gray-5); }
+  h4 { margin: 0; color: var(--sl-color-gray-2); font-size: .85rem; }
+  .topic-footer, .topic-aliases { color: var(--sl-color-gray-2); font-size: .8rem; }
+  .topic-footer { border-top: 1px solid var(--sl-color-gray-5); padding-top: 1rem; margin-top: 2rem; }
+  a:focus-visible, input:focus-visible, .topic-title:focus-visible { outline: 2px solid var(--sl-color-accent); outline-offset: 4px; }
+  @media (max-width: 38rem) { .topic-cards, .topic-connections, .topic-resource-groups { grid-template-columns: 1fr; } .topic-intro img { width: 52px; height: 52px; flex-basis: 52px; } }
+  @media (prefers-reduced-motion: reduce) { .topic-card { transition: none; } .topic-card:hover { transform: none; } }
+</style>

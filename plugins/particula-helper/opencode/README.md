@@ -47,14 +47,15 @@ Python project or replace the six study-oriented skills.
 | [particula-plan](https://github.com/uncscode/particula/blob/main/plugins/particula-helper/skills/particula-plan/SKILL.md) | Scope changes with concrete code references and acceptance evidence |
 | [particula-develop](https://github.com/uncscode/particula/blob/main/plugins/particula-helper/skills/particula-develop/SKILL.md) | Implement native library, CPU process and GPU changes |
 | [particula-test](https://github.com/uncscode/particula/blob/main/plugins/particula-helper/skills/particula-test/SKILL.md) | Select suites and preserve independent scientific validation |
-| [particula-docs](https://github.com/uncscode/particula/blob/main/plugins/particula-helper/skills/particula-docs/SKILL.md) | Maintain docstrings, Starlight content and saved example outputs |
+| [particula-docs](https://github.com/uncscode/particula/blob/main/plugins/particula-helper/skills/particula-docs/SKILL.md) | Organize the topic graph and author scientific narratives, docstrings and saved examples |
 | [particula-review](https://github.com/uncscode/particula/blob/main/plugins/particula-helper/skills/particula-review/SKILL.md) | Review scientific/API correctness and prepare requested commits/PRs |
 
 In the repository, `AGENTS.md` routes to these canonical files. Shared guidance
 lives in `references/repository-conventions.md`, `scientific-boundaries.md`,
 `repository-validation.md`, and `docstrings.md`. This replaces the retired
 root development workflow; the OpenCode host adapter here remains supported.
-No skill requires the historical root workflow directory. Installed copies
+Documentation organization and narrative review share `references/documentation-topics.md`
+and `references/scientific-narratives.md`. No skill requires the historical root workflow directory. Installed copies
 must defer to the selected checkout's current instructions and configuration.
 
 ## Maintaining this package

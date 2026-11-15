@@ -16,6 +16,7 @@ from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
+import docs_topics
 import yaml
 from docs_examples import (
     ROOT,
@@ -49,6 +50,10 @@ def local_routes():
         {route(p) for p in PAGES}
         | {route(c["source"]) for c in registry().values()}
         | {"", "API", "api"}
+        | {
+            docs_topics.topic_route(t["id"])
+            for t in docs_topics.load()["topics"]
+        }
     )
 
 
@@ -106,6 +111,8 @@ def write_page(path, title, body, source=None, extra=None):
         )
     if extra:
         metadata.update(extra)
+    if source:
+        body += docs_topics.page_links(source, docs_topics.load(), BASE)
     destination.write_text(
         "---\n"
         + yaml.safe_dump(metadata, sort_keys=False)
@@ -397,6 +404,7 @@ def generate_api():
 
 def prepare():
     """Prepare documentation pages from source files and saved outputs."""
+    topic_graph = docs_topics.require_valid()
     if CONTENT.exists():
         shutil.rmtree(CONTENT)
     CONTENT.mkdir(parents=True)
@@ -406,6 +414,8 @@ def prepare():
             shutil.rmtree(target)
     shutil.copytree(ROOT / "docs/images", SITE / "public/images")
     for page in PAGES:
+        if page == "guide/topics/index.md":
+            continue  # The maintained offline entry has a generated explorer.
         source = ROOT / "docs" / page
         text = re.sub(r"\A---\n.*?\n---\n", "", source.read_text(), flags=re.S)
         heading = re.search(r"^# (.+)$", text, re.M)
@@ -455,13 +465,15 @@ def prepare():
     write_page(
         "api.md",
         "API reference",
-        (SITE / "templates/api.md").read_text(),
+        (SITE / "templates/api.md").read_text()
+        + docs_topics.page_links("api", topic_graph, BASE),
     )
     write_page(
         "contribute/script-examples.md",
         "Author a Python example",
         (SITE / "AUTHORING.md").read_text(),
     )
+    docs_topics.generate(write_page, topic_graph)
     generate_api()
     print(f"Prepared {len(list(CONTENT.rglob('*.*')))} authored/example pages")
 

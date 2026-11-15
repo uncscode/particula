@@ -23,6 +23,12 @@ optional CUDA, native-capture evidence and recorded historical measurements.
 Review changed example code and saved results together. Prose-only edits need
 not trigger every scientific workload.
 
+For documentation changes, consult `../../references/scientific-narratives.md`
+and, when organization changes, `../../references/documentation-topics.md`.
+Check that purpose, code, figures, and conclusion describe the same calculation;
+claims follow from displayed evidence; and the reader has a useful adaptation
+path. Verify topic placement and distinguish aliases from related search terms.
+
 Use read-only checks for a review request: Ruff `--no-fix` and format `--check`.
 Do not silently repair the branch or refresh evidence unless fixes are requested.
 Return actionable findings with affected file/line, trigger, consequence and
