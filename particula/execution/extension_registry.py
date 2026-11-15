@@ -65,6 +65,10 @@ class ProcessRegistry(Generic[AdapterT]):
             raise ValueError("process type already registered")
         self._adapters[process_type] = adapter
 
+    def has_type(self, process_type: type) -> bool:
+        """Report exact registration without invoking user adapter code."""
+        return process_type in self._adapters
+
     def resolve(self, process: object) -> AdapterT:
         """Resolve the exact type without inheriting parent registrations."""
         try:

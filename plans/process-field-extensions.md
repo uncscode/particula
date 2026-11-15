@@ -211,3 +211,19 @@ narrow passing suite. Leave merge, version bump and release outside this goal.
 - Source/resampling qualification: 227 tests passed across extension fields,
   source transactions, exhaustion, native runnables and CPU batching; Ruff and
   targeted mypy passed. GPU population events and public examples remain pending.
+- Registered resident adapters now connect to public `prepare(process_registry=)`:
+  immutable versioned GPUProcessPlan, narrow GPUPreparationContext, exact-type
+  registry snapshots and retained operations. Non-particle fields upload once
+  with their declared dtype and snapshots own detached values. Device time
+  advances within the captured sequence; `time=` and `current_time` preserve
+  absolute versus elapsed time. Tests cover explicit registration, bad planners,
+  immutable writes, duplicate instances, detached configuration, field ownership,
+  allocation/readback-free stepping and native CUDA capture with evolving time.
+- Qualification: prepared/restart/registry/extension suites passed 153 tests
+  (one intentional Warp-CPU capture skip). Added initial-time checks plus restart
+  regression passed 61 tests (same intentional skip); targeted Ruff and mypy
+  passed. This remains intermediate: schema-v2 checkpoints, field value guards,
+  GPU particle events, RNG/adapter state, CPUTransfer, refresh invalidations and
+  migration of built-in helpers to typed contexts remain pending. Until those
+  implementations land, particle-field GPU execution and extension checkpoints
+  reject explicitly rather than discard state.

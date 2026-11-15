@@ -51,12 +51,15 @@ def _signature(owner):  # noqa: C901
         owner._guard,
         owner._device,
         owner._time_step,
+        owner._initial_time,
         owner._stream,
         owner._operations,
         owner._plans,
         owner._bindings,
         owner._auxiliary,
         owner._device_failure,
+        owner._clock,
+        owner._extension_fields,
         owner._refresh,
     ):
         visit(value)
@@ -114,6 +117,18 @@ def _admit_capture(owner):
         raise ValueError("CUDA graph capture requires a CUDA device")
     if owner._operations is None:
         raise ValueError("capture requires a bound process plan")
+    from particula.execution.extension_registry import PreparedOperation
+    from particula.execution.process_extensions import _RegisteredPlan
+
+    if any(
+        type(plan) is _RegisteredPlan
+        and not plan.configuration.capabilities.capture
+        for plan in owner._plans
+    ) or any(
+        type(op) is PreparedOperation and not op.capabilities.capture
+        for op in owner._operations
+    ):
+        raise ValueError("a prepared operation does not support CUDA capture")
     if owner._capture is not None:
         raise ValueError("simulation already owns a graph; uncapture first")
     owner.synchronize()

@@ -50,6 +50,9 @@ class PreparedSimulation:
     _plans: tuple[Any, ...]
     _auxiliary: dict[str, Any]
     _capture: Any
+    _initial_time: float
+    _clock: Any
+    _extension_fields: Any
 
     def __init__(self) -> None:
         """Reject direct construction without a validated process plan."""
@@ -98,6 +101,14 @@ class PreparedSimulation:
                 result._device_failure = wp.zeros(
                     1, dtype=wp.int32, device=target
                 )
+                from particula.execution.field_buffers import FieldBuffers
+                from particula.extension_fields import field_dimensions
+
+                result._extension_fields = FieldBuffers.upload(
+                    aerosol.fields,
+                    field_dimensions(aerosol.particles, aerosol.gas),
+                    result.device.native,
+                )
                 result._registry = GPUResourceRegistry(result._session)
                 result._guard = ResidentStepGuard(
                     result._session, result._registry
@@ -123,6 +134,7 @@ class PreparedSimulation:
         result._closed = False
         result._last_steps = 0
         result._last_time = 0.0
+        result._initial_time = 0.0
         result._operations = None
         result._session = None
         result._registry = None
@@ -135,6 +147,8 @@ class PreparedSimulation:
         result._plans = ()
         result._auxiliary = {}
         result._capture = None
+        result._clock = None
+        result._extension_fields = None
         result._stream = wp.Stream(target) if target.is_cuda else None
         return result
 
@@ -155,7 +169,9 @@ class PreparedSimulation:
             operations = wrap_cohort_operations(self, plans, operations)
             composed = compose_operations(self, plans, operations)
             self._operations = tuple(
-                PreparedOperation(
+                operation
+                if type(operation) is PreparedOperation
+                else PreparedOperation(
                     name=f"builtin.stage.{index}",
                     handler=operation,
                     resources=tuple(self._bindings.values()),
@@ -165,6 +181,12 @@ class PreparedSimulation:
                 )
                 for index, operation in enumerate(composed)
             )
+            if self._clock is not None:
+                from particula.execution.prepared_extensions import (
+                    clock_operation,
+                )
+
+                self._operations += (clock_operation(self),)
             self._diagnostics = setup_diagnostics(self)
             self._plans = plans
 
@@ -228,6 +250,11 @@ class PreparedSimulation:
             if self._closed:
                 return self._last_time
             return float(self._guard.simulated_time)
+
+    @property
+    def current_time(self) -> float:
+        """Return absolute enqueued time [s], including the initial time."""
+        return self._initial_time + self.simulated_time
 
     @property
     def closed(self) -> bool:
@@ -326,6 +353,11 @@ class PreparedSimulation:
             self.synchronize()
             with self._scope():
                 return Aerosol(
+                    fields=(
+                        self._extension_fields.download()
+                        if self._extension_fields is not None
+                        else None
+                    ),
                     particles=from_warp_particle_data(
                         self._session.particles, sync=False
                     ).copy(),
@@ -548,6 +580,8 @@ class PreparedSimulation:
                     self._diagnostics = None
                     self._refresh = None
                     self._device_failure = None
+                    self._clock = None
+                    self._extension_fields = None
                     self._bindings = {}
                     self._guard = self._registry = self._session = None
                     self._stream = None
@@ -571,6 +605,8 @@ def prepare_simulation(
     time_step: float,
     root_seed: int = 0,
     logical_box_ids: tuple[str, ...] | None = None,
+    process_registry=None,
+    time: float = 0.0,
 ) -> PreparedSimulation:
     """Validate the ordered process plan before uploading native state."""
     from particula._cpu_batch import duration
@@ -581,16 +617,37 @@ def prepare_simulation(
 
     if backend is not Backend.WARP:
         raise ValueError("prepared execution requires Backend.WARP")
+    from particula.box_process import validate_time
+
+    initial_time = validate_time(time)
     target = Device(backend, device)
     dt = duration(time_step, 1)
+    validate_time(initial_time + dt)
     if type(aerosol) is not Aerosol:
         raise TypeError("prepared execution requires a native Aerosol")
     _preflight_cpu_session(
         aerosol.particles, aerosol.gas, aerosol.environment, target
     )
+    from particula import _cpu_batch
+
+    _cpu_batch.validate(aerosol)
+    if aerosol.fields.particle_names():
+        raise ValueError(
+            "GPU particle field population events are not yet bound"
+        )
     if not processes:
         raise ValueError("prepared execution requires at least one process")
-    plans = tuple(_plan_process(process, aerosol) for process in processes)
+    from particula.execution.prepared_extensions import plan_extension
+
+    registry = (
+        process_registry.snapshot() if process_registry is not None else None
+    )
+    plans = tuple(
+        plan_extension(registry.resolve(process), process, aerosol)
+        if registry is not None and registry.has_type(type(process))
+        else _plan_process(process, aerosol)
+        for process in processes
+    )
     validate_cohort_plans(plans)
     validate_ion_plans(plans)
     if len({plan.family for plan in plans}) != len(plans):
@@ -605,6 +662,7 @@ def prepare_simulation(
         logical_box_ids=logical_box_ids,
     )
     try:
+        owner._initial_time = initial_time
         owner._bind(plans)
     except BaseException:
         owner.close()

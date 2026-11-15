@@ -205,6 +205,12 @@ def _plan_wall_loss(process: Any, aerosol: Aerosol) -> _ProcessPlan:
 
 def _compile_process(plan: _ProcessPlan, owner: Any):
     """Retain one existing prepared direct-kernel call and its resources."""
+    from particula.execution.process_extensions import _RegisteredPlan
+
+    if type(plan) is _RegisteredPlan:
+        from particula.execution.prepared_extensions import compile_extension
+
+        return compile_extension(plan, owner)
     session, registry = owner._session, owner._registry
     if plan.family in (
         "ion_source",
