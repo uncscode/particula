@@ -7,6 +7,7 @@ if (!topic) throw new Error(`Unknown topic ${topicId}`);
 const base = import.meta.env.BASE_URL;
 const path = ancestors(topicId);
 const branches = children(topicId);
+const parent = topics.get(topic.parent);
 const resources = graph.resources.filter((r) => r.topic === topicId || r.also.includes(topicId));
 const starters = resources.filter((r) => r.start_here && r.topic === topicId);
 const groups = ['Guide', 'Examples', 'Theory', 'API', 'Contribute'];
@@ -19,6 +20,11 @@ const icon = (id) => `${base.replace(/\/$/, '')}/topic-icons/${id}.svg`;
       {item.id === topicId ? <span aria-current="page">{item.label}</span> : <a data-topic-link href={topicPath(item.id, base)}>{item.label}</a>}
     </>)}
   </nav>
+  {parent && <a data-topic-link class="topic-parent" href={topicPath(parent.id, base)}>
+    <span class="topic-parent-arrow" aria-hidden="true">↑</span>
+    <img src={icon(parent.icon)} alt="" width="48" height="48" />
+    <div><span class="topic-eyebrow">Broader topic</span><strong>{parent.label}</strong><p>{parent.description}</p></div>
+  </a>}
   <div class="topic-intro">
     <img src={icon(topic.icon)} alt="" width="72" height="72" />
     <div><p class="topic-eyebrow">{topic.parent ? 'Follow the science' : 'Find your next question'}</p>
@@ -28,10 +34,20 @@ const icon = (id) => `${base.replace(/\/$/, '')}/topic-icons/${id}.svg`;
   </div>
   <TopicLookup />
   {branches.length > 0 && <section aria-label="Explore subtopics" class="topic-cards">
-    {branches.map((child) => <a data-topic-link class="topic-card" href={topicPath(child.id, base)}>
-      <img src={icon(child.icon)} alt="" width="56" height="56" />
-      <div><h3>{child.label}</h3><p>{child.description}</p><span class="topic-card-action">Explore topic <span aria-hidden="true">→</span></span></div>
-    </a>)}
+    {branches.map((child) => {
+      const subtopics = children(child.id);
+      return <div class="topic-branch">
+        <a data-topic-link class="topic-card" href={topicPath(child.id, base)}>
+          <img src={icon(child.icon)} alt="" width="56" height="56" />
+          <div><h3>{child.label}</h3><p>{child.description}</p><span class="topic-card-action">Explore topic <span aria-hidden="true">→</span></span></div>
+        </a>
+        {subtopics.length > 0 && <ul class="topic-subtopics" aria-label={`Subtopics of ${child.label}`}>
+          {subtopics.map((subtopic) => <li><a data-topic-link href={topicPath(subtopic.id, base)}>
+            <img src={icon(subtopic.icon)} alt="" width="32" height="32" /><span>{subtopic.label}</span>
+          </a></li>)}
+        </ul>}
+      </div>;
+    })}
   </section>}
   {starters.length > 0 && <section class="topic-start"><h3>Start here</h3>
     {starters.map((r) => <a href={resourcePath(r.source, base)}>{r.title} <span aria-hidden="true">→</span></a>)}
@@ -112,12 +128,24 @@ const icon = (id) => `${base.replace(/\/$/, '')}/topic-icons/${id}.svg`;
   topic-explorer { display: block; scroll-margin-top: 6rem; }
   .topic-path { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem .6rem; font-size: .75rem; color: var(--sl-color-gray-2); margin-bottom: 1.8rem; }
   .topic-path a { text-decoration: none; }
-  .topic-intro { display: flex; align-items: flex-start; gap: 1.1rem; }
+  .topic-parent { display: flex; align-items: center; gap: .9rem; padding: 1rem 1.3rem; margin-bottom: 1rem; border: 1px solid var(--sl-color-gray-5); border-radius: .9rem; text-decoration: none; background: var(--sl-color-gray-6); }
+  .topic-parent img { flex-shrink: 0; }
+  .topic-parent strong { display: block; color: var(--sl-color-white); font-size: 1.1rem; }
+  .topic-parent p { margin: .25rem 0 0; font-size: .85rem; color: var(--sl-color-gray-2); }
+  .topic-parent-arrow { color: var(--sl-color-text-accent); font-size: 1.4rem; }
+  .topic-parent:hover { border-color: var(--sl-color-accent); }
+  .topic-intro { display: flex; align-items: flex-start; gap: 1.1rem; padding: 1.6rem; border: 1px solid var(--sl-color-accent); border-radius: 1rem; background: var(--sl-color-accent-low); }
   .topic-intro img { flex: 0 0 72px; padding: .3rem; background: var(--sl-color-accent-low); border-radius: 1rem; }
   .topic-eyebrow { text-transform: uppercase; letter-spacing: .12em; font-size: .7rem; font-weight: 650; color: var(--sl-color-text-accent); margin: 0 0 .3rem; }
   .topic-intro h2 { margin: 0; font-size: clamp(1.45rem, 3vw, 2rem); line-height: 1.15; }
   .topic-intro p:last-child { color: var(--sl-color-gray-2); margin-top: .6rem; }
   .topic-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin: 1.5rem 0 2rem; }
+  .topic-branch { display: grid; grid-template-rows: subgrid; grid-row: span 2; min-width: 0; margin: 0; }
+  .topic-subtopics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: start; gap: .5rem; list-style: none; padding: 0 .35rem .5rem; margin: 0; }
+  .topic-subtopics li { margin: 0; min-width: 0; }
+  .topic-subtopics a { display: flex; align-items: center; gap: .5rem; height: 100%; padding: .6rem; border-radius: .6rem; text-decoration: none; font-size: .8rem; line-height: 1.35; color: var(--sl-color-text); }
+  .topic-subtopics img { flex: 0 0 32px; }
+  .topic-subtopics a:hover { background: var(--sl-color-accent-low); color: var(--sl-color-text-accent); }
   .topic-card { display: flex; flex-direction: column; gap: .8rem; padding: 1.3rem; border: 1px solid var(--sl-color-gray-5); border-radius: .9rem; background: var(--sl-color-bg); text-decoration: none; transition: border-color .18s, transform .18s, box-shadow .18s; }
   .topic-card:hover { border-color: var(--sl-color-accent); transform: translateY(-3px); box-shadow: 0 8px 22px #159b8d15; }
   .topic-card h3 { font-size: 1.1rem; margin: 0; color: var(--sl-color-white); }
@@ -135,6 +163,6 @@ const icon = (id) => `${base.replace(/\/$/, '')}/topic-icons/${id}.svg`;
   .topic-footer, .topic-aliases { color: var(--sl-color-gray-2); font-size: .8rem; }
   .topic-footer { border-top: 1px solid var(--sl-color-gray-5); padding-top: 1rem; margin-top: 2rem; }
   a:focus-visible, input:focus-visible, .topic-title:focus-visible { outline: 2px solid var(--sl-color-accent); outline-offset: 4px; }
-  @media (max-width: 38rem) { .topic-cards, .topic-connections, .topic-resource-groups { grid-template-columns: 1fr; } .topic-intro img { width: 52px; height: 52px; flex-basis: 52px; } }
+  @media (max-width: 38rem) { .topic-cards, .topic-connections, .topic-resource-groups { grid-template-columns: 1fr; } .topic-intro { padding: 1rem; gap: .75rem; } .topic-intro img { width: 52px; height: 52px; flex-basis: 52px; } .topic-parent { padding: .85rem; gap: .6rem; } .topic-parent p { display: none; } }
   @media (prefers-reduced-motion: reduce) { .topic-card { transition: none; } .topic-card:hover { transform: none; } }
 </style>
