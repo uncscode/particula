@@ -384,3 +384,11 @@ narrow passing suite. Leave merge, version bump and release outside this goal.
   and the complete example suite passes 233 tests (six skips). Library source
   bytes are unchanged; the qualified numerical, timing and saved-example hashes
   remain valid. Final hosted checks must rerun on this correction.
+- Live review found that a custom saturation reader following native gas updates
+  could observe stale derived values inside the step. Prepared composition now
+  refreshes before declared saturation readers, and rejects native gas writers
+  plus custom readers before upload when no refresh provider exists. The new
+  independent ideal-gas checks reproduced the failure before the fix and pass
+  on Warp CPU, CUDA, capture and checkpoint/resume. Affected regression suite:
+  203 passed, three skips; whole-library Ruff/format and mypy (612 files) pass.
+  Full-package and saved-example qualification are being refreshed for this fix.

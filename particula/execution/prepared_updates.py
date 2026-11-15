@@ -48,7 +48,7 @@ def apply_forcing(owner: Any, updates: tuple[tuple[Any, np.ndarray], ...]):
 
 
 def compose_operations(context: BuiltinPreparationContext, plans, operations):
-    """Refresh saturation before source consumption and after complete steps."""
+    """Refresh saturation before declared consumers and after complete steps."""
     if "condensation" not in context.bindings:
         return operations
     from particula.execution.prepared_guards import refresh_saturation
@@ -107,7 +107,10 @@ def compose_operations(context: BuiltinPreparationContext, plans, operations):
 
     result = []
     for plan, operation in zip(plans, operations, strict=True):
-        if plan.family == "nucleation":
+        if plan.family == "nucleation" or (
+            type(plan) is _RegisteredPlan
+            and "environment.saturation_ratio" in plan.configuration.reads
+        ):
             result.append(refresh_operation)
         result.append(operation)
         if type(plan) is _RegisteredPlan and set(plan.configuration.writes) & {
@@ -133,16 +136,21 @@ def validate_extension_freshness(plans):
         and bool(set(plan.configuration.writes) & invalidates)
         for plan in plans
     )
-    if dirty and any(
-        (
-            type(plan) is _RegisteredPlan
-            and "environment.saturation_ratio" in plan.configuration.reads
-        )
-        or (
-            plan.family == "nucleation"
-            and dict(plan.values["config"])["saturation_lower"] is not None
-        )
+    custom_reader = any(
+        type(plan) is _RegisteredPlan
+        and "environment.saturation_ratio" in plan.configuration.reads
         for plan in plans
+    )
+    native_reader = any(
+        plan.family == "nucleation"
+        and dict(plan.values["config"])["saturation_lower"] is not None
+        for plan in plans
+    )
+    native_writer = any(
+        plan.family in {"dilution", "nucleation"} for plan in plans
+    )
+    if (dirty and (custom_reader or native_reader)) or (
+        native_writer and custom_reader
     ):
         raise ValueError(
             "saturation consumers require a thermodynamic refresh provider"
