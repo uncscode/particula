@@ -1,23 +1,18 @@
-import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
+import { CardGrid, LinkCard } from '@astrojs/starlight/components';
 
 
 <a id="particula"></a>
 
-## From a population to a process
+## Start your investigation
 
-Start with a small CPU simulation. Define your particles and gases, choose the
-physics, then connect the results to the underlying science.
+Follow a question through the [topic explorer](guide/topics/index.md), start
+with a small CPU simulation, or bring Particula's scientific workflows into
+your coding agent.
 
 <CardGrid>
   <LinkCard title="Run your first simulation" description="A native aerosol and a small CPU condensation step." href="/particula/guide/getting-started/first-simulation/" />
-  <LinkCard title="See the script-to-figure workflow" description="Readable explanations, expandable Python, and saved plots." href="/particula/examples/fundamentals/particles/aerosol_distributions/" />
+  <LinkCard title="Agentic plugins" description="Set up Particula Helper in Codex, Claude, or OpenCode to design simulations, analyze results, and develop models." href="/particula/guide/ai-assistants/" />
 </CardGrid>
-
-## Explore by scientific topic
-
-[Explore aerosol topics](guide/topics/index.md) through illustrated branches,
-related concepts, and examples. Search for familiar terms even when you do not
-remember a page title.
 
 ## Dig deeper into the science
 
@@ -32,7 +27,7 @@ remember a page title.
 ## Get started
 
 [Install Particula](guide/getting-started/installation/index.md) ·
-[Set up an AI assistant](guide/ai-assistants/index.md) ·
+[Set up agentic plugins](guide/ai-assistants/index.md) ·
 [Upgrade an older script](guide/migration/v0.3.0/index.md)
 
 <a id="community-and-citation"></a>

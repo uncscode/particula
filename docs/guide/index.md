@@ -1,6 +1,7 @@
 # Guide
 
-Start with a small CPU simulation, then choose a process or execution path.
+Start with a small CPU simulation, or [explore by scientific topic](topics/index.md)
+to connect a research question with explanations, examples, and model choices.
 
 ## Start here
 
@@ -15,7 +16,8 @@ Start with a small CPU simulation, then choose a process or execution path.
 
 | Task | Read next |
 | --- | --- |
-| Set up AI assistants | [Assistant setup](ai-assistants/index.md) |
+| Find the science behind a research question | [Explore topics](topics/index.md) |
+| Set up agentic plugins | [Agentic plugins](ai-assistants/index.md) |
 | Configure particle, gas, and environment state | [Data model](data-model/index.md) |
 | Simulate growth, collisions, sources, or losses | [Processes](processes/index.md) |
 | Use explicit Warp transfers and device execution | [GPU selection](gpu/backend-selection.md), then [resident checkpoints](gpu/resident/checkpoints.md) |

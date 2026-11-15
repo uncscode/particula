@@ -48,11 +48,11 @@
         ]
       },
       {
-        "label": "AI assistants",
+        "label": "Agentic plugins",
         "collapsed": true,
         "items": [
           {
-            "label": "AI assistants",
+            "label": "Agentic plugins",
             "slug": "guide/ai-assistants"
           },
           {

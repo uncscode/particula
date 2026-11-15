@@ -449,13 +449,14 @@ def prepare():
                 ),
                 "actions": [
                     {
-                        "text": "Start exploring",
-                        "link": BASE + "guide/",
+                        "text": "Explore topics",
+                        "link": BASE + "guide/topics/",
                         "icon": "right-arrow",
                     },
                     {
-                        "text": "Browse examples",
-                        "link": BASE + "examples/",
+                        "text": "Getting started",
+                        "link": BASE
+                        + "guide/getting-started/first-simulation/",
                         "variant": "minimal",
                     },
                 ],
