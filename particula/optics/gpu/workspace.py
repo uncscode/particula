@@ -77,7 +77,7 @@ class MieWorkspace:
         Numeric failures remain in status buffers until explicit observation.
         """
         for command in self._commands:
-            command.launch()
+            command.launch(stream=self._stream)
 
     def check(self) -> None:
         """Synchronize and inspect status arrays; raise on numeric failure.
