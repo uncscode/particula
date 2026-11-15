@@ -18,7 +18,8 @@ def multiply(a: wp.vec2d, b: wp.vec2d) -> wp.vec2d:
 def divide(a: wp.vec2d, b: wp.vec2d) -> wp.vec2d:
     """Return a/b using scaled division to avoid squaring large components."""
     result = wp.vec2d(wp.float64(0.0), wp.float64(0.0))
-    if wp.abs(b[0]) >= wp.abs(b[1]):
+    # Warp 1.19 stubs infer vector abs here; compiled components are scalars.
+    if wp.abs(b[0]) >= wp.abs(b[1]):  # type: ignore[operator]
         ratio = b[1] / b[0]
         denominator = b[0] + b[1] * ratio
         result = wp.vec2d(
