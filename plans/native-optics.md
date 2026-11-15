@@ -118,3 +118,12 @@ entries, discrete/resolved/PDF reductions and single/multiple layers.
 - Device access verified outside the restricted execution environment:
   NVIDIA GeForce RTX 5060, 8151 MiB, driver 615.78.08. Actual Warp CUDA
   numerical/performance validation remains pending kernel implementation.
+- Direct Warp float64 complex arithmetic, bounded continued-fraction Mie
+  coefficients and efficiencies implemented. Real RTX 5060 plus Warp CPU:
+  170 complete optics tests passed, including every saved sphere input through
+  x=10000, coefficient/efficiency parity at the planned tolerances, repeated
+  buffer reuse, invalid inputs and insufficient-capacity status propagation.
+  Command: XDG_CACHE_HOME=/tmp/optics-cache .venv/bin/pytest
+  particula/optics/tests --no-cov -q -Werror (shared existing environment).
+  Public workspace validation, angular/polarization/reduction kernels, device
+  tiling and full performance qualification are still pending.
