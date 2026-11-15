@@ -135,3 +135,10 @@ entries, discrete/resolved/PDF reductions and single/multiple layers.
   per-case peak-normalized CPU/CUDA angular error is bounded by 1e-8.
   Mypy and Ruff pass. GPU population/column kernels, workspace API, tiling,
   examples and independent large-x angular qualification remain pending.
+- Added direct Warp number-density/PDF weights, bulk scalar and signed Mueller
+  reductions, layer/column optical depth, direct transmission and mass opacity.
+  Current full optics suite: 182 passed on Warp CPU and RTX 5060, with three
+  population measures, unequal volumes, all bulk outputs, failure propagation
+  and empty columns. Ruff/mypy pass. A local type annotation initially failed
+  Warp compilation; removed it and reran the complete suite successfully.
+  Explicit workspace/launch admission and tiled execution remain pending.
