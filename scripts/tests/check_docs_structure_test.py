@@ -172,3 +172,32 @@ def test_notebook_publication_sources_cannot_return(tree):
     assert any(
         "retired notebook publication source" in e for e in MODULE.check(tree)
     )
+
+
+@pytest.mark.parametrize(
+    "declared,noindex,redirect,allowed",
+    [
+        (True, True, True, True),
+        (False, True, True, False),
+        (True, False, True, False),
+        (True, True, False, False),
+    ],
+)
+def test_retired_content_allows_only_declared_redirects(
+    tmp_path, declared, noindex, redirect, allowed
+):
+    """Retirement must coexist with required noindex migration redirects."""
+    source = "docs/old.md"
+    html = "<h1>Old route</h1>"
+    if noindex:
+        html += '<meta name="robots" content="noindex">'
+    if redirect:
+        html += '<html data-particula-redirect>'
+    write(tmp_path, "old/index.html", html)
+    write(tmp_path, "pagefind/pagefind.js", "")
+    manifest = {
+        "retired": {source: "archived"},
+        "moves": {source: "docs/guide/index.md"} if declared else {},
+    }
+    errors = MODULE.check_search(tmp_path, manifest)
+    assert (errors == []) is allowed
