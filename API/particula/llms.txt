@@ -69,6 +69,7 @@ Expose prepared simulation types without loading optional runtimes.
 - `particula.gas`
 - `particula.gpu`
 - `particula.logger_setup`
+- `particula.optics`
 - `particula.particles`
 - `particula.runnable`
 - `particula.util`
@@ -106612,6 +106613,3395 @@ def setup()
 Setup for logging in the particula package.
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/logger_setup.py#L61-L66)
+
+---
+
+# particula.optics
+
+*module*
+
+Optical functions for spherical aerosol particles in SI units.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/__init__.py#L1-L1)
+
+## particula.optics.ColumnOptics
+
+*class*
+
+```python
+class ColumnOptics(NamedTuple)
+```
+
+Bases: `NamedTuple`
+
+Re-exported from: `particula.optics.column`
+
+Layer and integrated optical depth and direct-beam transmission.
+
+**Attributes**
+
+- `layer_optical_depth` (`NDArray[np.float64]`) — Extinction times geometric path length [1].
+- `optical_depth` (`NDArray[np.float64]`) — Sum of layer depths along the selected layer axis [1].
+- `transmission` (`NDArray[np.float64]`) — Unscattered direct-beam fraction exp(-optical_depth).
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/column.py#L15-L26)
+
+### particula.optics.ColumnOptics.layer_optical_depth
+
+*attribute* · *instance attribute*
+
+```python
+layer_optical_depth: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/column.py#L24-L24)
+
+### particula.optics.ColumnOptics.optical_depth
+
+*attribute* · *instance attribute*
+
+```python
+optical_depth: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/column.py#L25-L25)
+
+### particula.optics.ColumnOptics.transmission
+
+*attribute* · *instance attribute*
+
+```python
+transmission: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/column.py#L26-L26)
+
+## particula.optics.DifferentialCrossSections
+
+*class*
+
+```python
+class DifferentialCrossSections(NamedTuple)
+```
+
+Bases: `NamedTuple`
+
+Re-exported from: `particula.optics.cross_sections`
+
+Angular scattering areas per solid angle in m²/sr.
+
+**Attributes**
+
+- `perpendicular` (`NDArray[np.float64]`) — Perpendicular incident polarization, |S1|²/k².
+- `parallel` (`NDArray[np.float64]`) — Parallel incident polarization, |S2|²/k².
+- `unpolarized` (`NDArray[np.float64]`) — Mean of the two polarized cross sections.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/cross_sections.py#L136-L147)
+
+### particula.optics.DifferentialCrossSections.parallel
+
+*attribute* · *instance attribute*
+
+```python
+parallel: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/cross_sections.py#L146-L146)
+
+### particula.optics.DifferentialCrossSections.perpendicular
+
+*attribute* · *instance attribute*
+
+```python
+perpendicular: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/cross_sections.py#L145-L145)
+
+### particula.optics.DifferentialCrossSections.unpolarized
+
+*attribute* · *instance attribute*
+
+```python
+unpolarized: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/cross_sections.py#L147-L147)
+
+## particula.optics.MieCoefficients
+
+*class*
+
+```python
+class MieCoefficients(NamedTuple)
+```
+
+Bases: `NamedTuple`
+
+Re-exported from: `particula.optics.mie`
+
+Complex coefficients, zero padded along the final order axis.
+
+**Attributes**
+
+- `electric` (`NDArray[np.complex128]`) — Electric coefficients a_n, starting at order one.
+- `magnetic` (`NDArray[np.complex128]`) — Magnetic coefficients b_n, starting at order one.
+- `term_count` (`NDArray[np.int64]`) — Valid number of coefficients for each broadcast case.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/mie.py#L15-L26)
+
+### particula.optics.MieCoefficients.electric
+
+*attribute* · *instance attribute*
+
+```python
+electric: NDArray[np.complex128]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/mie.py#L24-L24)
+
+### particula.optics.MieCoefficients.magnetic
+
+*attribute* · *instance attribute*
+
+```python
+magnetic: NDArray[np.complex128]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/mie.py#L25-L25)
+
+### particula.optics.MieCoefficients.term_count
+
+*attribute* · *instance attribute*
+
+```python
+term_count: NDArray[np.int64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/mie.py#L26-L26)
+
+## particula.optics.MieEfficiencies
+
+*class*
+
+```python
+class MieEfficiencies(NamedTuple)
+```
+
+Bases: `NamedTuple`
+
+Re-exported from: `particula.optics.mie`
+
+Dimensionless efficiencies and asymmetry for broadcast input cases.
+
+**Attributes**
+
+- `extinction` (`NDArray[np.float64]`) — Total extinction efficiency.
+- `scattering` (`NDArray[np.float64]`) — Scattering efficiency.
+- `absorption` (`NDArray[np.float64]`) — Absorption efficiency.
+- `asymmetry` (`NDArray[np.float64]`) — Scattering-weighted cosine, zero when undefined.
+- `backscatter` (`NDArray[np.float64]`) — Radar-convention backscatter efficiency.
+- `radiation_pressure` (`NDArray[np.float64]`) — Extinction minus asymmetry times scattering.
+- `scattering_valid` (`NDArray[np.bool_]`) — Whether asymmetry is defined.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/mie.py#L29-L48)
+
+### particula.optics.MieEfficiencies.absorption
+
+*attribute* · *instance attribute*
+
+```python
+absorption: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/mie.py#L44-L44)
+
+### particula.optics.MieEfficiencies.asymmetry
+
+*attribute* · *instance attribute*
+
+```python
+asymmetry: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/mie.py#L45-L45)
+
+### particula.optics.MieEfficiencies.backscatter
+
+*attribute* · *instance attribute*
+
+```python
+backscatter: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/mie.py#L46-L46)
+
+### particula.optics.MieEfficiencies.extinction
+
+*attribute* · *instance attribute*
+
+```python
+extinction: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/mie.py#L42-L42)
+
+### particula.optics.MieEfficiencies.radiation_pressure
+
+*attribute* · *instance attribute*
+
+```python
+radiation_pressure: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/mie.py#L47-L47)
+
+### particula.optics.MieEfficiencies.scattering
+
+*attribute* · *instance attribute*
+
+```python
+scattering: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/mie.py#L43-L43)
+
+### particula.optics.MieEfficiencies.scattering_valid
+
+*attribute* · *instance attribute*
+
+```python
+scattering_valid: NDArray[np.bool_]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/mie.py#L48-L48)
+
+## particula.optics.OpticalCrossSections
+
+*class*
+
+```python
+class OpticalCrossSections(NamedTuple)
+```
+
+Bases: `NamedTuple`
+
+Re-exported from: `particula.optics.cross_sections`
+
+Per-particle optical areas in m², with the broadcast input shape.
+
+**Attributes**
+
+- `extinction` (`NDArray[np.float64]`) — Extinction cross section [m²].
+- `scattering` (`NDArray[np.float64]`) — Scattering cross section [m²].
+- `absorption` (`NDArray[np.float64]`) — Absorption cross section [m²].
+- `backscatter` (`NDArray[np.float64]`) — Radar backscatter cross section [m²], not m²/sr.
+- `radiation_pressure` (`NDArray[np.float64]`) — Radiation-pressure cross section [m²].
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/cross_sections.py#L11-L26)
+
+### particula.optics.OpticalCrossSections.absorption
+
+*attribute* · *instance attribute*
+
+```python
+absorption: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/cross_sections.py#L24-L24)
+
+### particula.optics.OpticalCrossSections.backscatter
+
+*attribute* · *instance attribute*
+
+```python
+backscatter: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/cross_sections.py#L25-L25)
+
+### particula.optics.OpticalCrossSections.extinction
+
+*attribute* · *instance attribute*
+
+```python
+extinction: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/cross_sections.py#L22-L22)
+
+### particula.optics.OpticalCrossSections.radiation_pressure
+
+*attribute* · *instance attribute*
+
+```python
+radiation_pressure: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/cross_sections.py#L26-L26)
+
+### particula.optics.OpticalCrossSections.scattering
+
+*attribute* · *instance attribute*
+
+```python
+scattering: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/cross_sections.py#L23-L23)
+
+## particula.optics.PopulationOptics
+
+*class*
+
+```python
+class PopulationOptics(NamedTuple)
+```
+
+Bases: `NamedTuple`
+
+Re-exported from: `particula.optics.population`
+
+Bulk optical coefficients and intensive properties.
+
+**Attributes**
+
+- `extinction` (`NDArray[np.float64]`) — Extinction coefficient [m⁻¹].
+- `scattering` (`NDArray[np.float64]`) — Scattering coefficient [m⁻¹].
+- `absorption` (`NDArray[np.float64]`) — Absorption coefficient [m⁻¹].
+- `backscatter` (`NDArray[np.float64]`) — Radar backscatter coefficient [m⁻¹].
+- `radiation_pressure` (`NDArray[np.float64]`) — Radiation-pressure coefficient [m⁻¹].
+- `single_scattering_albedo` (`NDArray[np.float64]`) — Scattering/extinction, zero if undefined.
+- `asymmetry` (`NDArray[np.float64]`) — Scattering-weighted cosine, zero if undefined.
+- `extinction_valid` (`NDArray[np.bool_]`) — Whether single-scattering albedo is defined.
+- `scattering_valid` (`NDArray[np.bool_]`) — Whether asymmetry is defined.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L16-L39)
+
+### particula.optics.PopulationOptics.absorption
+
+*attribute* · *instance attribute*
+
+```python
+absorption: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L33-L33)
+
+### particula.optics.PopulationOptics.asymmetry
+
+*attribute* · *instance attribute*
+
+```python
+asymmetry: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L37-L37)
+
+### particula.optics.PopulationOptics.backscatter
+
+*attribute* · *instance attribute*
+
+```python
+backscatter: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L34-L34)
+
+### particula.optics.PopulationOptics.extinction
+
+*attribute* · *instance attribute*
+
+```python
+extinction: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L31-L31)
+
+### particula.optics.PopulationOptics.extinction_valid
+
+*attribute* · *instance attribute*
+
+```python
+extinction_valid: NDArray[np.bool_]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L38-L38)
+
+### particula.optics.PopulationOptics.radiation_pressure
+
+*attribute* · *instance attribute*
+
+```python
+radiation_pressure: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L35-L35)
+
+### particula.optics.PopulationOptics.scattering
+
+*attribute* · *instance attribute*
+
+```python
+scattering: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L32-L32)
+
+### particula.optics.PopulationOptics.scattering_valid
+
+*attribute* · *instance attribute*
+
+```python
+scattering_valid: NDArray[np.bool_]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L39-L39)
+
+### particula.optics.PopulationOptics.single_scattering_albedo
+
+*attribute* · *instance attribute*
+
+```python
+single_scattering_albedo: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L36-L36)
+
+## particula.optics.ScatteringAmplitudes
+
+*class*
+
+```python
+class ScatteringAmplitudes(NamedTuple)
+```
+
+Bases: `NamedTuple`
+
+Re-exported from: `particula.optics.angular`
+
+Dimensionless complex amplitudes with a final angle axis.
+
+**Attributes**
+
+- `perpendicular` (`NDArray[np.complex128]`) — S1 amplitude perpendicular to the scattering plane.
+- `parallel` (`NDArray[np.complex128]`) — S2 amplitude parallel to the scattering plane.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/angular.py#L16-L25)
+
+### particula.optics.ScatteringAmplitudes.parallel
+
+*attribute* · *instance attribute*
+
+```python
+parallel: NDArray[np.complex128]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/angular.py#L25-L25)
+
+### particula.optics.ScatteringAmplitudes.perpendicular
+
+*attribute* · *instance attribute*
+
+```python
+perpendicular: NDArray[np.complex128]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/angular.py#L24-L24)
+
+## particula.optics.apply_mueller_matrix
+
+*function*
+
+```python
+def apply_mueller_matrix(matrix: ArrayLike, stokes: ArrayLike, input_rotation: ArrayLike = 0.0, output_rotation: ArrayLike = 0.0) -> NDArray[np.float64]
+```
+
+Re-exported from: `particula.optics.polarization`
+
+Apply R(output_rotation) M R(input_rotation) to a Stokes vector.
+
+**Parameters**
+
+- `matrix` (`ArrayLike`) — Finite (..., 4, 4) Mueller array; units set output units.
+- `stokes` (`ArrayLike`) — Finite (..., 4) I,Q,U,V input, broadcastable with matrix.
+- `input_rotation` (`ArrayLike`) (default: `0.0`) — Rotation [rad] into the matrix's incident basis.
+- `output_rotation` (`ArrayLike`) (default: `0.0`) — Rotation [rad] from its outgoing basis.
+
+**Returns**
+
+- (`NDArray[np.float64]`) — New output Stokes vectors, without intensity normalization or
+- (`NDArray[np.float64]`) — propagation-distance factors. Signed linear combinations are allowed.
+
+**Raises**
+
+- `ValueError` — If matrix/vector shapes or finite values are invalid.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/polarization.py#L78-L106)
+
+## particula.optics.get_column_optics
+
+*function*
+
+```python
+def get_column_optics(extinction: ArrayLike, path_length: ArrayLike, *, layer_axis: int = -1) -> ColumnOptics
+```
+
+Re-exported from: `particula.optics.column`
+
+Integrate extinction along explicit path segments.
+
+**Parameters**
+
+- `extinction` (`ArrayLike`) — Nonnegative extinction coefficient [m⁻¹].
+- `path_length` (`ArrayLike`) — Nonnegative path through each layer [m], broadcastable with extinction. Supply slant lengths explicitly if applicable.
+- `layer_axis` (`int`) (default: `-1`) — Layer axis after broadcasting; scalar input is one layer.
+
+**Returns**
+
+- (`ColumnOptics`) — Dimensionless layer depths, total depth and direct transmission.
+- (`ColumnOptics`) — Empty columns have zero depth and unit transmission.
+
+**Raises**
+
+- `ValueError` — If inputs, resulting depths or layer axis are invalid.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/column.py#L29-L69)
+
+## particula.optics.get_cross_sections
+
+*function*
+
+```python
+def get_cross_sections(efficiencies: MieEfficiencies, radius: ArrayLike) -> OpticalCrossSections
+```
+
+Re-exported from: `particula.optics.cross_sections`
+
+Multiply efficiencies by geometric area pi*r² without recalculating.
+
+**Parameters**
+
+- `efficiencies` (`MieEfficiencies`) — Output of get_mie_efficiencies for the same radius.
+- `radius` (`ArrayLike`) — Nonnegative finite radius [m], broadcastable with efficiencies.
+
+**Returns**
+
+- (`OpticalCrossSections`) — Named cross sections [m²]. Inputs are not mutated.
+
+**Raises**
+
+- `ValueError` — If the radius is negative or nonfinite.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/cross_sections.py#L29-L59)
+
+## particula.optics.get_differential_cross_sections
+
+*function*
+
+```python
+def get_differential_cross_sections(perpendicular: ArrayLike, parallel: ArrayLike, wavelength: ArrayLike, medium_index: ArrayLike = 1.0) -> DifferentialCrossSections
+```
+
+Re-exported from: `particula.optics.cross_sections`
+
+Convert S1/S2 amplitudes to polarized differential cross sections.
+
+Uses the nonabsorbing-medium wave number k=2*pi*n_medium/lambda_vacuum,
+following Bohren and Huffman (1983), chapter 4,
+https://doi.org/10.1002/9783527618156.
+
+**Parameters**
+
+- `perpendicular` (`ArrayLike`) — Dimensionless S1, shaped batch+(angles,).
+- `parallel` (`ArrayLike`) — Dimensionless S2, same shape as perpendicular.
+- `wavelength` (`ArrayLike`) — Positive finite vacuum wavelength [m]; broadcasts with batch axes, not the angle axis.
+- `medium_index` (`ArrayLike`) (default: `1.0`) — Positive finite real medium index, default one; broadcasts with batch axes.
+
+**Returns**
+
+- (`DifferentialCrossSections`) — Perpendicular, parallel and unpolarized differential scattering
+- (`DifferentialCrossSections`) — cross sections [m²/sr], shaped broadcast batch+(angles,).
+- (`DifferentialCrossSections`) — Inputs are unchanged; scalar angles must retain a length-one axis.
+
+**Raises**
+
+- `ValueError` — If amplitudes, shapes or physical inputs are invalid.
+- `RuntimeError` — If dimensional cross sections overflow.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/cross_sections.py#L150-L205)
+
+## particula.optics.get_differential_mueller_matrix
+
+*function*
+
+```python
+def get_differential_mueller_matrix(matrix: ArrayLike, wavelength: ArrayLike, medium_index: ArrayLike = 1.0) -> NDArray[np.float64]
+```
+
+Re-exported from: `particula.optics.cross_sections`
+
+Convert unnormalized angular Mueller values to m²/sr.
+
+**Parameters**
+
+- `matrix` (`ArrayLike`) — Raw Mueller matrix shaped batch+(angles,4,4).
+- `wavelength` (`ArrayLike`) — Positive vacuum wavelength [m], broadcastable with batch.
+- `medium_index` (`ArrayLike`) (default: `1.0`) — Positive real medium index, broadcastable with batch.
+
+**Returns**
+
+- (`NDArray[np.float64]`) — Matrix divided by (2*pi*n_medium/lambda_vacuum)² [m²/sr].
+
+**Raises**
+
+- `ValueError` — If shapes or physical values are invalid.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/cross_sections.py#L62-L97)
+
+## particula.optics.get_mass_specific_opacity
+
+*function*
+
+```python
+def get_mass_specific_opacity(coefficient: ArrayLike, mass_density: ArrayLike) -> tuple[NDArray[np.float64], NDArray[np.bool_]]
+```
+
+Re-exported from: `particula.optics.column`
+
+Divide an optical coefficient by a specified material mass density.
+
+**Parameters**
+
+- `coefficient` (`ArrayLike`) — Nonnegative extinction or absorption [m⁻¹].
+- `mass_density` (`ArrayLike`) — Nonnegative density [kg/m³], broadcastable with coefficient. The caller specifies which material inventory it is.
+
+**Returns**
+
+- (`NDArray[np.float64]`) — Mass-specific opacity [m²/kg] and positive-density validity mask.
+- (`NDArray[np.bool_]`) — A zero/zero vacuum returns zero and False.
+
+**Raises**
+
+- `ValueError` — If inputs/results are invalid or nonzero optics has zero
+density.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/column.py#L72-L104)
+
+## particula.optics.get_mie_coefficients
+
+*function*
+
+```python
+def get_mie_coefficients(relative_refractive_index: ArrayLike, size_parameter: ArrayLike) -> MieCoefficients
+```
+
+Re-exported from: `particula.optics.mie`
+
+Calculate external coefficients for nonmagnetic homogeneous spheres.
+
+**Parameters**
+
+- `relative_refractive_index` (`ArrayLike`) — Particle/medium index n+ik, n>0, k>=0.
+- `size_parameter` (`ArrayLike`) — Dimensionless 2*pi*r*n_medium/lambda_vacuum, 0..10000.
+
+**Returns**
+
+- (`MieCoefficients`) — Broadcast coefficients with a final, zero-padded order axis and
+- (`MieCoefficients`) — per-case valid term counts. Inputs are not mutated.
+
+**Raises**
+
+- `ValueError` — If physical inputs are nonfinite or outside the domain.
+- `RuntimeError` — If the numerical recurrence fails.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/mie.py#L120-L173)
+
+## particula.optics.get_mie_efficiencies
+
+*function*
+
+```python
+def get_mie_efficiencies(radius: ArrayLike, wavelength: ArrayLike, refractive_index: ArrayLike, medium_index: ArrayLike = 1.0) -> MieEfficiencies
+```
+
+Re-exported from: `particula.optics.mie`
+
+Calculate efficiencies from SI radius and vacuum wavelength.
+
+**Parameters**
+
+- `radius` (`ArrayLike`) — Nonnegative sphere radius [m].
+- `wavelength` (`ArrayLike`) — Positive vacuum wavelength [m].
+- `refractive_index` (`ArrayLike`) — Absolute particle refractive index n+ik.
+- `medium_index` (`ArrayLike`) (default: `1.0`) — Positive real nonabsorbing medium index, default 1.
+
+**Returns**
+
+- (`MieEfficiencies`) — Named dimensionless arrays with the broadcast input shape. Zero
+- (`MieEfficiencies`) — scattering gives asymmetry zero and scattering_valid False.
+
+**Raises**
+
+- `ValueError` — If inputs violate the physical domain or x exceeds 10000.
+- `RuntimeError` — If arithmetic is unresolved, coefficient calculation
+fails or efficiencies violate energy/physical bounds beyond
+64 float64 eps of roundoff. Negative absorption within that
+roundoff is set to zero with extinction adjusted to scattering.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/mie.py#L176-L282)
+
+## particula.optics.get_mueller_matrix
+
+*function*
+
+```python
+def get_mueller_matrix(perpendicular: ArrayLike, parallel: ArrayLike) -> NDArray[np.float64]
+```
+
+Re-exported from: `particula.optics.polarization`
+
+Construct the unnormalized sphere Mueller matrix from S1 and S2.
+
+**Parameters**
+
+- `perpendicular` (`ArrayLike`) — Complex perpendicular amplitude S1, dimensionless.
+- `parallel` (`ArrayLike`) — Complex parallel amplitude S2, broadcastable with S1.
+
+**Returns**
+
+- (`NDArray[np.float64]`) — Real matrix with broadcast shape plus (4, 4), in the scattering
+- (`NDArray[np.float64]`) — plane. Divide by medium wavenumber squared for m²/sr.
+
+**Raises**
+
+- `ValueError` — If either amplitude is nonfinite.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/polarization.py#L14-L45)
+
+## particula.optics.get_phase_matrix
+
+*function*
+
+```python
+def get_phase_matrix(differential_matrix: ArrayLike, scattering_cross_section: ArrayLike) -> tuple[NDArray[np.float64], NDArray[np.bool_]]
+```
+
+Re-exported from: `particula.optics.cross_sections`
+
+Normalize a differential Mueller matrix by total scattering.
+
+**Parameters**
+
+- `differential_matrix` (`ArrayLike`) — Angular matrix [m²/sr], batch+(angles,4,4).
+- `scattering_cross_section` (`ArrayLike`) — Nonnegative total scattering [m²], broadcastable with batch, evaluated for the same particle.
+
+**Returns**
+
+- (`NDArray[np.float64]`) — Phase matrix [sr⁻¹] and batch validity mask. Element 11 integrates
+- (`NDArray[np.bool_]`) — to one over solid angle for valid cases. Zero scattering returns a
+- (`tuple[NDArray[np.float64], NDArray[np.bool_]]`) — zero matrix and False; this is not a uniform-scattering assumption.
+
+**Raises**
+
+- `ValueError` — If shapes or physical values are invalid.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/cross_sections.py#L100-L133)
+
+## particula.optics.get_population_mueller_matrix
+
+*function*
+
+```python
+def get_population_mueller_matrix(differential_matrix: ArrayLike, number_density_weights: ArrayLike, *, particle_axis: int = -1) -> NDArray[np.float64]
+```
+
+Re-exported from: `particula.optics.population`
+
+Sum independent-particle differential Mueller matrices by number.
+
+**Parameters**
+
+- `differential_matrix` (`ArrayLike`) — Per-particle matrix [m²/sr] with shape batch+(angles,4,4), where batch includes the particle axis. All matrices must use the same incident/outgoing reference frames.
+- `number_density_weights` (`ArrayLike`) — Nonnegative weights [m⁻³] broadcastable with batch. Negative polarized matrix entries are valid.
+- `particle_axis` (`int`) (default: `-1`) — Particle axis within the broadcast batch shape.
+
+**Returns**
+
+- (`NDArray[np.float64]`) — Bulk differential matrix [m⁻¹/sr]. Normalize by bulk scattering
+- (`NDArray[np.float64]`) — coefficient to obtain the population phase matrix.
+
+**Raises**
+
+- `ValueError` — If inputs or resulting matrix values are invalid.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L189-L231)
+
+## particula.optics.get_population_optics
+
+*function*
+
+```python
+def get_population_optics(cross_sections: OpticalCrossSections, asymmetry: ArrayLike, number_density_weights: ArrayLike, *, particle_axis: int = -1) -> PopulationOptics
+```
+
+Re-exported from: `particula.optics.population`
+
+Reduce per-particle optical areas to bulk optical coefficients.
+
+**Parameters**
+
+- `cross_sections` (`OpticalCrossSections`) — Nonnegative per-particle areas [m²].
+- `asymmetry` (`ArrayLike`) — Per-particle scattering-weighted cosine in [-1,1].
+- `number_density_weights` (`ArrayLike`) — Number weights [m⁻³]; use explicit singleton axes for wavelength broadcasting, e.g. (boxes,1,particles).
+- `particle_axis` (`int`) (default: `-1`) — Particle axis in the broadcast shape, default last.
+
+**Returns**
+
+- (`PopulationOptics`) — Bulk coefficients [m⁻¹], albedo, asymmetry and validity masks with
+- (`PopulationOptics`) — the particle axis removed. Empty/zero populations produce zeros.
+
+**Raises**
+
+- `ValueError` — If inputs, reduction axis or resulting values are invalid.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L117-L186)
+
+## particula.optics.get_population_weights
+
+*function*
+
+```python
+def get_population_weights(concentration: ArrayLike, distribution_type: str, *, volume: ArrayLike | None = None, radius_grid: ArrayLike | None = None) -> NDArray[np.float64]
+```
+
+Re-exported from: `particula.optics.population`
+
+Convert native population measures to number-density weights.
+
+**Parameters**
+
+- `concentration` (`ArrayLike`) — (..., particles) number density [m⁻³] for discrete, represented count for particle_resolved, or dn/dr [m⁻⁴] for continuous_pdf. The final axis is always the particle axis.
+- `distribution_type` (`str`) — discrete, particle_resolved, or continuous_pdf.
+- `volume` (`ArrayLike | None`) (default: `None`) — Required positive physical volume [m³] for resolved counts, broadcastable with concentration's leading axes. Omit otherwise.
+- `radius_grid` (`ArrayLike | None`) (default: `None`) — Required positive increasing 1D radius nodes [m] for continuous_pdf. At least two nodes; omit for other measures.
+
+**Returns**
+
+- (`NDArray[np.float64]`) — New number-density weights [m⁻³]. PDF weights implement trapezoidal
+- (`NDArray[np.float64]`) — integration of the complete optical-cross-section times PDF product.
+
+**Raises**
+
+- `ValueError` — If the measure, shape, values or supplied metadata conflict.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L52-L114)
+
+## particula.optics.get_scattering_amplitudes
+
+*function*
+
+```python
+def get_scattering_amplitudes(coefficients: MieCoefficients, angle: ArrayLike) -> ScatteringAmplitudes
+```
+
+Re-exported from: `particula.optics.angular`
+
+Calculate S1 and S2 without repeating the coefficient calculation.
+
+**Parameters**
+
+- `coefficients` (`MieCoefficients`) — Zero-padded results from get_mie_coefficients.
+- `angle` (`ArrayLike`) — Scalar or 1D scattering angles [rad] within [0, pi].
+
+**Returns**
+
+- (`ScatteringAmplitudes`) — Complex arrays shaped coefficient batch shape plus (n_angles,).
+- (`ScatteringAmplitudes`) — Scalar angle retains a length-one axis. Inputs are unchanged.
+
+**Raises**
+
+- `ValueError` — If angles, coefficient shapes or values are invalid.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/angular.py#L28-L80)
+
+## particula.optics.rotate_stokes
+
+*function*
+
+```python
+def rotate_stokes(stokes: ArrayLike, angle: ArrayLike) -> NDArray[np.float64]
+```
+
+Re-exported from: `particula.optics.polarization`
+
+Express a Stokes vector in axes rotated toward the perpendicular axis.
+
+**Parameters**
+
+- `stokes` (`ArrayLike`) — Finite (..., 4) array ordered I,Q,U,V, in caller units.
+- `angle` (`ArrayLike`) — Rotation [rad], broadcastable with the leading Stokes shape. Positive rotation uses Eparallel'=cos(angle)*Eparallel + sin(angle)*Eperpendicular.
+
+**Returns**
+
+- (`NDArray[np.float64]`) — New vectors with Q'=cos(2a)Q+sin(2a)U, U'=-sin(2a)Q+cos(2a)U.
+- (`NDArray[np.float64]`) — I and V are unchanged. This operation does not normalize intensity.
+
+**Raises**
+
+- `ValueError` — If shapes or finite values are invalid.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/polarization.py#L48-L75)
+
+**Modules**
+
+- `particula.optics.angular`
+- `particula.optics.column`
+- `particula.optics.cross_sections`
+- `particula.optics.gpu`
+- `particula.optics.mie`
+- `particula.optics.polarization`
+- `particula.optics.population`
+
+---
+
+# particula.optics.angular
+
+*module*
+
+Angular Mie amplitudes using reusable external field coefficients.
+
+Angular recurrences follow Bohren and Huffman (1983), chapter 4,
+https://doi.org/10.1002/9783527618156. Angles are radians; amplitudes use
+unnormalized S1/S2 so integral S11 dOmega = pi*x²*Qsca.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/angular.py#L1-L1)
+
+## particula.optics.angular.ScatteringAmplitudes
+
+*class*
+
+```python
+class ScatteringAmplitudes(NamedTuple)
+```
+
+Bases: `NamedTuple`
+
+Dimensionless complex amplitudes with a final angle axis.
+
+**Attributes**
+
+- `perpendicular` (`NDArray[np.complex128]`) — S1 amplitude perpendicular to the scattering plane.
+- `parallel` (`NDArray[np.complex128]`) — S2 amplitude parallel to the scattering plane.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/angular.py#L16-L25)
+
+### particula.optics.angular.ScatteringAmplitudes.parallel
+
+*attribute* · *instance attribute*
+
+```python
+parallel: NDArray[np.complex128]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/angular.py#L25-L25)
+
+### particula.optics.angular.ScatteringAmplitudes.perpendicular
+
+*attribute* · *instance attribute*
+
+```python
+perpendicular: NDArray[np.complex128]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/angular.py#L24-L24)
+
+## particula.optics.angular.get_scattering_amplitudes
+
+*function*
+
+```python
+def get_scattering_amplitudes(coefficients: MieCoefficients, angle: ArrayLike) -> ScatteringAmplitudes
+```
+
+Calculate S1 and S2 without repeating the coefficient calculation.
+
+**Parameters**
+
+- `coefficients` (`MieCoefficients`) — Zero-padded results from get_mie_coefficients.
+- `angle` (`ArrayLike`) — Scalar or 1D scattering angles [rad] within [0, pi].
+
+**Returns**
+
+- (`ScatteringAmplitudes`) — Complex arrays shaped coefficient batch shape plus (n_angles,).
+- (`ScatteringAmplitudes`) — Scalar angle retains a length-one axis. Inputs are unchanged.
+
+**Raises**
+
+- `ValueError` — If angles, coefficient shapes or values are invalid.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/angular.py#L28-L80)
+
+---
+
+# particula.optics.column
+
+*module*
+
+Path-integrated extinction and direct-beam attenuation.
+
+Beer-Lambert transmission describes the unscattered direct beam. It does not
+include diffuse multiple scattering or infer path geometry from box volume.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/column.py#L1-L1)
+
+## particula.optics.column.ColumnOptics
+
+*class*
+
+```python
+class ColumnOptics(NamedTuple)
+```
+
+Bases: `NamedTuple`
+
+Layer and integrated optical depth and direct-beam transmission.
+
+**Attributes**
+
+- `layer_optical_depth` (`NDArray[np.float64]`) — Extinction times geometric path length [1].
+- `optical_depth` (`NDArray[np.float64]`) — Sum of layer depths along the selected layer axis [1].
+- `transmission` (`NDArray[np.float64]`) — Unscattered direct-beam fraction exp(-optical_depth).
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/column.py#L15-L26)
+
+### particula.optics.column.ColumnOptics.layer_optical_depth
+
+*attribute* · *instance attribute*
+
+```python
+layer_optical_depth: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/column.py#L24-L24)
+
+### particula.optics.column.ColumnOptics.optical_depth
+
+*attribute* · *instance attribute*
+
+```python
+optical_depth: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/column.py#L25-L25)
+
+### particula.optics.column.ColumnOptics.transmission
+
+*attribute* · *instance attribute*
+
+```python
+transmission: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/column.py#L26-L26)
+
+## particula.optics.column.get_column_optics
+
+*function*
+
+```python
+def get_column_optics(extinction: ArrayLike, path_length: ArrayLike, *, layer_axis: int = -1) -> ColumnOptics
+```
+
+Integrate extinction along explicit path segments.
+
+**Parameters**
+
+- `extinction` (`ArrayLike`) — Nonnegative extinction coefficient [m⁻¹].
+- `path_length` (`ArrayLike`) — Nonnegative path through each layer [m], broadcastable with extinction. Supply slant lengths explicitly if applicable.
+- `layer_axis` (`int`) (default: `-1`) — Layer axis after broadcasting; scalar input is one layer.
+
+**Returns**
+
+- (`ColumnOptics`) — Dimensionless layer depths, total depth and direct transmission.
+- (`ColumnOptics`) — Empty columns have zero depth and unit transmission.
+
+**Raises**
+
+- `ValueError` — If inputs, resulting depths or layer axis are invalid.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/column.py#L29-L69)
+
+## particula.optics.column.get_mass_specific_opacity
+
+*function*
+
+```python
+def get_mass_specific_opacity(coefficient: ArrayLike, mass_density: ArrayLike) -> tuple[NDArray[np.float64], NDArray[np.bool_]]
+```
+
+Divide an optical coefficient by a specified material mass density.
+
+**Parameters**
+
+- `coefficient` (`ArrayLike`) — Nonnegative extinction or absorption [m⁻¹].
+- `mass_density` (`ArrayLike`) — Nonnegative density [kg/m³], broadcastable with coefficient. The caller specifies which material inventory it is.
+
+**Returns**
+
+- (`NDArray[np.float64]`) — Mass-specific opacity [m²/kg] and positive-density validity mask.
+- (`NDArray[np.bool_]`) — A zero/zero vacuum returns zero and False.
+
+**Raises**
+
+- `ValueError` — If inputs/results are invalid or nonzero optics has zero
+density.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/column.py#L72-L104)
+
+---
+
+# particula.optics.cross_sections
+
+*module*
+
+Dimensional and normalized optical quantities for individual spheres.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/cross_sections.py#L1-L1)
+
+## particula.optics.cross_sections.DifferentialCrossSections
+
+*class*
+
+```python
+class DifferentialCrossSections(NamedTuple)
+```
+
+Bases: `NamedTuple`
+
+Angular scattering areas per solid angle in m²/sr.
+
+**Attributes**
+
+- `perpendicular` (`NDArray[np.float64]`) — Perpendicular incident polarization, |S1|²/k².
+- `parallel` (`NDArray[np.float64]`) — Parallel incident polarization, |S2|²/k².
+- `unpolarized` (`NDArray[np.float64]`) — Mean of the two polarized cross sections.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/cross_sections.py#L136-L147)
+
+### particula.optics.cross_sections.DifferentialCrossSections.parallel
+
+*attribute* · *instance attribute*
+
+```python
+parallel: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/cross_sections.py#L146-L146)
+
+### particula.optics.cross_sections.DifferentialCrossSections.perpendicular
+
+*attribute* · *instance attribute*
+
+```python
+perpendicular: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/cross_sections.py#L145-L145)
+
+### particula.optics.cross_sections.DifferentialCrossSections.unpolarized
+
+*attribute* · *instance attribute*
+
+```python
+unpolarized: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/cross_sections.py#L147-L147)
+
+## particula.optics.cross_sections.OpticalCrossSections
+
+*class*
+
+```python
+class OpticalCrossSections(NamedTuple)
+```
+
+Bases: `NamedTuple`
+
+Per-particle optical areas in m², with the broadcast input shape.
+
+**Attributes**
+
+- `extinction` (`NDArray[np.float64]`) — Extinction cross section [m²].
+- `scattering` (`NDArray[np.float64]`) — Scattering cross section [m²].
+- `absorption` (`NDArray[np.float64]`) — Absorption cross section [m²].
+- `backscatter` (`NDArray[np.float64]`) — Radar backscatter cross section [m²], not m²/sr.
+- `radiation_pressure` (`NDArray[np.float64]`) — Radiation-pressure cross section [m²].
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/cross_sections.py#L11-L26)
+
+### particula.optics.cross_sections.OpticalCrossSections.absorption
+
+*attribute* · *instance attribute*
+
+```python
+absorption: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/cross_sections.py#L24-L24)
+
+### particula.optics.cross_sections.OpticalCrossSections.backscatter
+
+*attribute* · *instance attribute*
+
+```python
+backscatter: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/cross_sections.py#L25-L25)
+
+### particula.optics.cross_sections.OpticalCrossSections.extinction
+
+*attribute* · *instance attribute*
+
+```python
+extinction: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/cross_sections.py#L22-L22)
+
+### particula.optics.cross_sections.OpticalCrossSections.radiation_pressure
+
+*attribute* · *instance attribute*
+
+```python
+radiation_pressure: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/cross_sections.py#L26-L26)
+
+### particula.optics.cross_sections.OpticalCrossSections.scattering
+
+*attribute* · *instance attribute*
+
+```python
+scattering: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/cross_sections.py#L23-L23)
+
+## particula.optics.cross_sections.get_cross_sections
+
+*function*
+
+```python
+def get_cross_sections(efficiencies: MieEfficiencies, radius: ArrayLike) -> OpticalCrossSections
+```
+
+Multiply efficiencies by geometric area pi*r² without recalculating.
+
+**Parameters**
+
+- `efficiencies` (`MieEfficiencies`) — Output of get_mie_efficiencies for the same radius.
+- `radius` (`ArrayLike`) — Nonnegative finite radius [m], broadcastable with efficiencies.
+
+**Returns**
+
+- (`OpticalCrossSections`) — Named cross sections [m²]. Inputs are not mutated.
+
+**Raises**
+
+- `ValueError` — If the radius is negative or nonfinite.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/cross_sections.py#L29-L59)
+
+## particula.optics.cross_sections.get_differential_cross_sections
+
+*function*
+
+```python
+def get_differential_cross_sections(perpendicular: ArrayLike, parallel: ArrayLike, wavelength: ArrayLike, medium_index: ArrayLike = 1.0) -> DifferentialCrossSections
+```
+
+Convert S1/S2 amplitudes to polarized differential cross sections.
+
+Uses the nonabsorbing-medium wave number k=2*pi*n_medium/lambda_vacuum,
+following Bohren and Huffman (1983), chapter 4,
+https://doi.org/10.1002/9783527618156.
+
+**Parameters**
+
+- `perpendicular` (`ArrayLike`) — Dimensionless S1, shaped batch+(angles,).
+- `parallel` (`ArrayLike`) — Dimensionless S2, same shape as perpendicular.
+- `wavelength` (`ArrayLike`) — Positive finite vacuum wavelength [m]; broadcasts with batch axes, not the angle axis.
+- `medium_index` (`ArrayLike`) (default: `1.0`) — Positive finite real medium index, default one; broadcasts with batch axes.
+
+**Returns**
+
+- (`DifferentialCrossSections`) — Perpendicular, parallel and unpolarized differential scattering
+- (`DifferentialCrossSections`) — cross sections [m²/sr], shaped broadcast batch+(angles,).
+- (`DifferentialCrossSections`) — Inputs are unchanged; scalar angles must retain a length-one axis.
+
+**Raises**
+
+- `ValueError` — If amplitudes, shapes or physical inputs are invalid.
+- `RuntimeError` — If dimensional cross sections overflow.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/cross_sections.py#L150-L205)
+
+## particula.optics.cross_sections.get_differential_mueller_matrix
+
+*function*
+
+```python
+def get_differential_mueller_matrix(matrix: ArrayLike, wavelength: ArrayLike, medium_index: ArrayLike = 1.0) -> NDArray[np.float64]
+```
+
+Convert unnormalized angular Mueller values to m²/sr.
+
+**Parameters**
+
+- `matrix` (`ArrayLike`) — Raw Mueller matrix shaped batch+(angles,4,4).
+- `wavelength` (`ArrayLike`) — Positive vacuum wavelength [m], broadcastable with batch.
+- `medium_index` (`ArrayLike`) (default: `1.0`) — Positive real medium index, broadcastable with batch.
+
+**Returns**
+
+- (`NDArray[np.float64]`) — Matrix divided by (2*pi*n_medium/lambda_vacuum)² [m²/sr].
+
+**Raises**
+
+- `ValueError` — If shapes or physical values are invalid.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/cross_sections.py#L62-L97)
+
+## particula.optics.cross_sections.get_phase_matrix
+
+*function*
+
+```python
+def get_phase_matrix(differential_matrix: ArrayLike, scattering_cross_section: ArrayLike) -> tuple[NDArray[np.float64], NDArray[np.bool_]]
+```
+
+Normalize a differential Mueller matrix by total scattering.
+
+**Parameters**
+
+- `differential_matrix` (`ArrayLike`) — Angular matrix [m²/sr], batch+(angles,4,4).
+- `scattering_cross_section` (`ArrayLike`) — Nonnegative total scattering [m²], broadcastable with batch, evaluated for the same particle.
+
+**Returns**
+
+- (`NDArray[np.float64]`) — Phase matrix [sr⁻¹] and batch validity mask. Element 11 integrates
+- (`NDArray[np.bool_]`) — to one over solid angle for valid cases. Zero scattering returns a
+- (`tuple[NDArray[np.float64], NDArray[np.bool_]]`) — zero matrix and False; this is not a uniform-scattering assumption.
+
+**Raises**
+
+- `ValueError` — If shapes or physical values are invalid.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/cross_sections.py#L100-L133)
+
+---
+
+# particula.optics.gpu
+
+*module*
+
+Explicit Warp optical kernels and prepared numerical workspaces.
+
+Importing CPU optics does not load this namespace or initialize Warp.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/__init__.py#L1-L1)
+
+## particula.optics.gpu.MieWorkspace
+
+*class* · *dataclass*
+
+```python
+class MieWorkspace
+```
+
+Re-exported from: `particula.optics.gpu.workspace`
+
+Prepared numerical outputs and retained device launch commands.
+
+**Attributes**
+
+- `efficiencies` (`wp.array`) — (cases,7): Qext,Qsca,Qabs,g,Qback,Qpr,scattering-valid.
+- `status` (`wp.array`) — (cases,) coefficient status; zero means success.
+- `perpendicular` (`wp.array | None`) — Optional (cases,angles) complex S1 as vec2d.
+- `parallel` (`wp.array | None`) — Optional (cases,angles) complex S2 as vec2d.
+- `mueller` (`wp.array | None`) — Optional (cases,angles,4,4) scaled Mueller matrices.
+- `angular_status` (`wp.array | None`) — Optional per-angle amplitude status.
+- `mueller_status` (`wp.array | None`) — Optional per-angle matrix status.
+- `coefficient_capacity` (`int`) — Maximum orders retained in each tiled case.
+- `case_tile` (`int`) — Maximum cases sharing reusable coefficient scratch.
+- `angle_tile` (`int`) — Maximum angles in each angular launch.
+
+Outputs are undefined until enqueue and successful check. Direct device
+consumers may instead inspect status on-device. This object is not safe
+for concurrent execution on multiple streams.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/workspace.py#L37-L101)
+
+### particula.optics.gpu.MieWorkspace._commands
+
+*attribute* · *instance attribute*
+
+```python
+_commands: tuple
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/workspace.py#L68-L68)
+
+### particula.optics.gpu.MieWorkspace._device
+
+*attribute* · *instance attribute*
+
+```python
+_device: str
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/workspace.py#L70-L70)
+
+### particula.optics.gpu.MieWorkspace._resources
+
+*attribute* · *instance attribute*
+
+```python
+_resources: tuple
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/workspace.py#L69-L69)
+
+### particula.optics.gpu.MieWorkspace._stream
+
+*attribute* · *instance attribute*
+
+```python
+_stream: wp.Stream | None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/workspace.py#L71-L71)
+
+### particula.optics.gpu.MieWorkspace.angle_tile
+
+*attribute* · *instance attribute*
+
+```python
+angle_tile: int
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/workspace.py#L67-L67)
+
+### particula.optics.gpu.MieWorkspace.angular_status
+
+*attribute* · *instance attribute*
+
+```python
+angular_status: wp.array | None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/workspace.py#L63-L63)
+
+### particula.optics.gpu.MieWorkspace.case_tile
+
+*attribute* · *instance attribute*
+
+```python
+case_tile: int
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/workspace.py#L66-L66)
+
+### particula.optics.gpu.MieWorkspace.coefficient_capacity
+
+*attribute* · *instance attribute*
+
+```python
+coefficient_capacity: int
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/workspace.py#L65-L65)
+
+### particula.optics.gpu.MieWorkspace.efficiencies
+
+*attribute* · *instance attribute*
+
+```python
+efficiencies: wp.array
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/workspace.py#L58-L58)
+
+### particula.optics.gpu.MieWorkspace.mueller
+
+*attribute* · *instance attribute*
+
+```python
+mueller: wp.array | None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/workspace.py#L62-L62)
+
+### particula.optics.gpu.MieWorkspace.mueller_status
+
+*attribute* · *instance attribute*
+
+```python
+mueller_status: wp.array | None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/workspace.py#L64-L64)
+
+### particula.optics.gpu.MieWorkspace.parallel
+
+*attribute* · *instance attribute*
+
+```python
+parallel: wp.array | None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/workspace.py#L61-L61)
+
+### particula.optics.gpu.MieWorkspace.perpendicular
+
+*attribute* · *instance attribute*
+
+```python
+perpendicular: wp.array | None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/workspace.py#L60-L60)
+
+### particula.optics.gpu.MieWorkspace.status
+
+*attribute* · *instance attribute*
+
+```python
+status: wp.array
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/workspace.py#L59-L59)
+
+### particula.optics.gpu.MieWorkspace.__init__
+
+*method*
+
+```python
+def __init__(efficiencies: wp.array, status: wp.array, perpendicular: wp.array | None, parallel: wp.array | None, mueller: wp.array | None, angular_status: wp.array | None, mueller_status: wp.array | None, coefficient_capacity: int, case_tile: int, angle_tile: int, _commands: tuple, _resources: tuple, _device: str, _stream: wp.Stream | None) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/workspace.py#L0-L0)
+
+### particula.optics.gpu.MieWorkspace.check
+
+*method*
+
+```python
+def check() -> None
+```
+
+Synchronize and inspect status arrays; raise on numeric failure.
+
+**Raises**
+
+- `RuntimeError` — If any coefficient, angle or matrix case failed.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/workspace.py#L82-L101)
+
+### particula.optics.gpu.MieWorkspace.enqueue
+
+*method*
+
+```python
+def enqueue() -> None
+```
+
+Enqueue retained commands, without allocation or host readback.
+
+Callers order their input writes and consumers on the prepared stream.
+Numeric failures remain in status buffers until explicit observation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/workspace.py#L73-L80)
+
+## particula.optics.gpu.PopulationWorkspace
+
+*class* · *dataclass*
+
+```python
+class PopulationWorkspace
+```
+
+Re-exported from: `particula.optics.gpu.bulk`
+
+Retained streaming population outputs, commands and scratch.
+
+**Attributes**
+
+- `optics` (`wp.array`) — (groups,9): extinction, scattering, absorption, backscatter, radiation pressure [m⁻¹], SSA, g, extinction/scattering validity.
+- `mueller` (`wp.array`) — (groups,angles,4,4) differential matrices [m⁻¹/sr]; zero length angle axis when angular output was not requested.
+- `status` (`wp.array`) — Per-group status; 0 success, 2 input/upstream error, 3 overflow.
+- `particle_tile` (`int`) — Fixed maximum live particle scratch count.
+
+Groups flatten box/wavelength axes. Outputs require enqueue and successful
+observation; inputs may be updated in place on the prepared stream.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/bulk.py#L18-L56)
+
+### particula.optics.gpu.PopulationWorkspace._commands
+
+*attribute* · *instance attribute*
+
+```python
+_commands: tuple
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/bulk.py#L38-L38)
+
+### particula.optics.gpu.PopulationWorkspace._device
+
+*attribute* · *instance attribute*
+
+```python
+_device: str
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/bulk.py#L40-L40)
+
+### particula.optics.gpu.PopulationWorkspace._resources
+
+*attribute* · *instance attribute*
+
+```python
+_resources: tuple
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/bulk.py#L39-L39)
+
+### particula.optics.gpu.PopulationWorkspace._stream
+
+*attribute* · *instance attribute*
+
+```python
+_stream: wp.Stream | None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/bulk.py#L41-L41)
+
+### particula.optics.gpu.PopulationWorkspace.mueller
+
+*attribute* · *instance attribute*
+
+```python
+mueller: wp.array
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/bulk.py#L35-L35)
+
+### particula.optics.gpu.PopulationWorkspace.optics
+
+*attribute* · *instance attribute*
+
+```python
+optics: wp.array
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/bulk.py#L34-L34)
+
+### particula.optics.gpu.PopulationWorkspace.particle_tile
+
+*attribute* · *instance attribute*
+
+```python
+particle_tile: int
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/bulk.py#L37-L37)
+
+### particula.optics.gpu.PopulationWorkspace.status
+
+*attribute* · *instance attribute*
+
+```python
+status: wp.array
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/bulk.py#L36-L36)
+
+### particula.optics.gpu.PopulationWorkspace.__init__
+
+*method*
+
+```python
+def __init__(optics: wp.array, mueller: wp.array, status: wp.array, particle_tile: int, _commands: tuple, _resources: tuple, _device: str, _stream: wp.Stream | None) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/bulk.py#L0-L0)
+
+### particula.optics.gpu.PopulationWorkspace.check
+
+*method*
+
+```python
+def check() -> None
+```
+
+Explicitly synchronize and reject failed population results.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/bulk.py#L48-L56)
+
+### particula.optics.gpu.PopulationWorkspace.enqueue
+
+*method*
+
+```python
+def enqueue() -> None
+```
+
+Enqueue the retained streaming calculation without host transfers.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/bulk.py#L43-L46)
+
+## particula.optics.gpu.prepare_mie
+
+*function*
+
+```python
+def prepare_mie(relative_index: wp.array, size_parameter: wp.array, *, angles: wp.array | None = None, matrix_scale: wp.array | None = None, coefficient_capacity: int = 10090, case_tile: int = 256, angle_tile: int = 128, stream=None) -> MieWorkspace
+```
+
+Re-exported from: `particula.optics.gpu.workspace`
+
+Prepare tiled device optics for already-uploaded numeric inputs.
+
+**Parameters**
+
+- `relative_index` (`wp.array`) — Contiguous (cases,) vec2d relative n+ik on CPU/CUDA.
+- `size_parameter` (`wp.array`) — Contiguous (cases,) float64 x, same device.
+- `angles` (`wp.array | None`) (default: `None`) — Optional contiguous (angles,) float64 radians, same device.
+- `matrix_scale` (`wp.array | None`) (default: `None`) — Optional (cases,) float64 multiplier for Mueller values; default one. Only accepted when angles are requested.
+- `coefficient_capacity` (`int`) (default: `10090`) — Positive scratch order bound, at most 10090. Insufficient capacity reports per-case status rather than truncates.
+- `case_tile` (`int`) (default: `256`) — Positive maximum cases in coefficient scratch (default 256).
+- `angle_tile` (`int`) (default: `128`) — Positive angular launch width (default 128).
+- `stream` (default: `None`) — Optional CUDA stream on the same device. Input writes and downstream consumers must use this stream or explicit ordering.
+
+**Returns**
+
+- (`MieWorkspace`) — Workspace retaining inputs, output arrays, scratch and launch commands.
+- (`MieWorkspace`) — Scratch scales with case_tile times coefficient_capacity; requested
+- (`MieWorkspace`) — per-particle angular outputs still scale with cases times angles.
+- (`MieWorkspace`) — No host values are copied, and preparation launches no scientific work.
+
+**Raises**
+
+- `ValueError` — If input metadata, device, stream or capacities conflict.
+- `RuntimeError` — If the explicitly requested device cannot be used.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/workspace.py#L154-L313)
+
+## particula.optics.gpu.prepare_population_mie
+
+*function*
+
+```python
+def prepare_population_mie(relative_index: wp.array, size_parameter: wp.array, radius: wp.array, number_density_weights: wp.array, *, angles: wp.array | None = None, particle_tile: int = 256, angle_tile: int = 128, coefficient_capacity: int = 10090, stream=None) -> PopulationWorkspace
+```
+
+Re-exported from: `particula.optics.gpu.bulk`
+
+Prepare streamed bulk optics without retaining particle optical output.
+
+**Parameters**
+
+- `relative_index` (`wp.array`) — Contiguous (groups,particles) vec2d relative n+ik.
+- `size_parameter` (`wp.array`) — Same shape float64 x=2*pi*r*n_medium/lambda_vacuum.
+- `radius` (`wp.array`) — Same shape float64 SI radius [m], consistent with x.
+- `number_density_weights` (`wp.array`) — Same shape float64 density weights [m⁻³]. Callers supply discrete, resolved-count/volume or PDF weights.
+- `angles` (`wp.array | None`) (default: `None`) — Optional shared 1D float64 angles [rad], on the same device.
+- `particle_tile` (`int`) (default: `256`) — Maximum particles in scratch, default 256.
+- `angle_tile` (`int`) (default: `128`) — Angular launch width, default 128.
+- `coefficient_capacity` (`int`) (default: `10090`) — Maximum retained series order, default 10090.
+- `stream` (default: `None`) — Optional matching CUDA stream; used for all work and checks.
+
+**Returns**
+
+- (`PopulationWorkspace`) — Population workspace. Scratch is bounded by particle_tile, series
+- (`PopulationWorkspace`) — capacity and angle count, independently of total particle count.
+- (`PopulationWorkspace`) — No CPU transfers, fallback or scientific launches during preparation.
+
+**Raises**
+
+- `ValueError` — If shapes/devices/capacities conflict. Physical-value errors
+are reported by check after enqueue, without host input readback.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/bulk.py#L59-L223)
+
+**Modules**
+
+- `particula.optics.gpu._bulk`
+- `particula.optics.gpu._complex`
+- `particula.optics.gpu.angular`
+- `particula.optics.gpu.bulk`
+- `particula.optics.gpu.column`
+- `particula.optics.gpu.cross_sections`
+- `particula.optics.gpu.mie`
+- `particula.optics.gpu.population`
+- `particula.optics.gpu.workspace`
+
+---
+
+# particula.optics.gpu._bulk
+
+*module*
+
+Chunk gathering and accumulation for bounded-memory population optics.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/_bulk.py#L1-L1)
+
+## particula.optics.gpu._bulk._PI
+
+*attribute* · *module attribute*
+
+```python
+_PI = wp.constant(wp.float64(math.pi))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/_bulk.py#L9-L9)
+
+## particula.optics.gpu._bulk.accumulate_angular
+
+*function*
+
+```python
+def accumulate_angular(matrices: wp.array4d(dtype=wp.float64), weights: wp.array(dtype=wp.float64), input_status: wp.array2d(dtype=wp.int32), group: int, totals: wp.array3d(dtype=wp.float64), status: wp.array(dtype=wp.int32))
+```
+
+Accumulate scaled chunk matrices without full-population storage.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/_bulk.py#L104-L125)
+
+## particula.optics.gpu._bulk.accumulate_scalar
+
+*function*
+
+```python
+def accumulate_scalar(efficiencies: wp.array2d(dtype=wp.float64), radius: wp.array(dtype=wp.float64), weights: wp.array(dtype=wp.float64), gather_status: wp.array(dtype=wp.int32), optical_status: wp.array(dtype=wp.int32), group: int, totals: wp.array2d(dtype=wp.float64), status: wp.array(dtype=wp.int32))
+```
+
+Accumulate cross sections and scattering-weighted g in fixed order.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/_bulk.py#L78-L101)
+
+## particula.optics.gpu._bulk.clear_bulk
+
+*function*
+
+```python
+def clear_bulk(totals: wp.array2d(dtype=wp.float64), status: wp.array(dtype=wp.int32), matrices: wp.array3d(dtype=wp.float64))
+```
+
+Reset accumulated state once at the beginning of each evaluation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/_bulk.py#L62-L75)
+
+## particula.optics.gpu._bulk.finalize_bulk
+
+*function*
+
+```python
+def finalize_bulk(totals: wp.array2d(dtype=wp.float64), status: wp.array(dtype=wp.int32))
+```
+
+Convert accumulated moments to SSA/g and validate finite results.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/_bulk.py#L128-L147)
+
+## particula.optics.gpu._bulk.gather_cases
+
+*function*
+
+```python
+def gather_cases(indices: wp.array2d(dtype=wp.vec2d), sizes: wp.array2d(dtype=wp.float64), radii: wp.array2d(dtype=wp.float64), weights: wp.array2d(dtype=wp.float64), group: int, start: int, valid_count: int, index: wp.array(dtype=wp.vec2d), size: wp.array(dtype=wp.float64), radius: wp.array(dtype=wp.float64), weight: wp.array(dtype=wp.float64), scale: wp.array(dtype=wp.float64), status: wp.array(dtype=wp.int32))
+```
+
+Fill a fixed-size chunk; padding is an exact index-matched zero case.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/_bulk.py#L12-L59)
+
+---
+
+# particula.optics.gpu._complex
+
+*module*
+
+Float64 complex arithmetic for optical Warp kernels.
+
+Complex values are represented by (real, imaginary) wp.vec2d components.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/_complex.py#L1-L1)
+
+## particula.optics.gpu._complex.divide
+
+*function*
+
+```python
+def divide(a: wp.vec2d, b: wp.vec2d) -> wp.vec2d
+```
+
+Return a/b using scaled division to avoid squaring large components.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/_complex.py#L17-L36)
+
+## particula.optics.gpu._complex.multiply
+
+*function*
+
+```python
+def multiply(a: wp.vec2d, b: wp.vec2d) -> wp.vec2d
+```
+
+Return the complex product.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/_complex.py#L11-L14)
+
+## particula.optics.gpu._complex.norm_squared
+
+*function*
+
+```python
+def norm_squared(a: wp.vec2d) -> wp.float64
+```
+
+Return the squared complex modulus.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/_complex.py#L39-L42)
+
+## particula.optics.gpu._complex.real_product_conjugate
+
+*function*
+
+```python
+def real_product_conjugate(a: wp.vec2d, b: wp.vec2d) -> wp.float64
+```
+
+Return Re(a conjugate(b)).
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/_complex.py#L45-L48)
+
+---
+
+# particula.optics.gpu.angular
+
+*module*
+
+Direct device angular scattering and polarized optical operations.
+
+Conventions match the CPU optics modules: S1 perpendicular, S2 parallel,
+Stokes I,Q,U,V with V=-2 Im(Eparallel Eperpendicular*). Every output is
+caller-owned; kernels allocate and transfer no arrays.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/angular.py#L1-L1)
+
+## particula.optics.gpu.angular.apply_mueller_kernel
+
+*function*
+
+```python
+def apply_mueller_kernel(matrix: wp.array4d(dtype=wp.float64), matrix_status: wp.array2d(dtype=wp.int32), incident: wp.array2d(dtype=wp.vec4d), input_rotation: wp.array2d(dtype=wp.float64), output_rotation: wp.array2d(dtype=wp.float64), outgoing: wp.array2d(dtype=wp.vec4d), status: wp.array2d(dtype=wp.int32))
+```
+
+Apply R(output) M R(input) on-device to each (case,angle).
+
+Status 1 marks nonfinite vector/rotation/matrix, 2 upstream failure,
+3 numerical failure.
+No distance scaling or intensity normalization is applied.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/angular.py#L146-L196)
+
+## particula.optics.gpu.angular.mueller_kernel
+
+*function*
+
+```python
+def mueller_kernel(perpendicular: wp.array2d(dtype=wp.vec2d), parallel: wp.array2d(dtype=wp.vec2d), amplitude_status: wp.array2d(dtype=wp.int32), scale: wp.array(dtype=wp.float64), matrix: wp.array4d(dtype=wp.float64), status: wp.array2d(dtype=wp.int32))
+```
+
+Construct full Mueller matrices with an explicit per-case scale.
+
+Use scale=1 for raw amplitudes; (lambda/(2*pi*n_medium))² for m²/sr;
+divide that factor by scattering cross section for normalized phase.
+Zero scattering uses scale=0 and an externally retained validity mask.
+Shape is (cases,angles,4,4); status 1 invalid scale, 2 failed amplitudes,
+3 numerical failure.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/angular.py#L79-L130)
+
+## particula.optics.gpu.angular.rotated_stokes
+
+*function*
+
+```python
+def rotated_stokes(vector: wp.vec4d, angle: wp.float64) -> wp.vec4d
+```
+
+Rotate basis axes by angle, with Q'=cos(2a)Q+sin(2a)U.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/angular.py#L133-L143)
+
+## particula.optics.gpu.angular.scattering_amplitudes_kernel
+
+*function*
+
+```python
+def scattering_amplitudes_kernel(electric: wp.array2d(dtype=wp.vec2d), magnetic: wp.array2d(dtype=wp.vec2d), term_count: wp.array(dtype=wp.int32), coefficient_status: wp.array(dtype=wp.int32), angles: wp.array(dtype=wp.float64), perpendicular: wp.array2d(dtype=wp.vec2d), parallel: wp.array2d(dtype=wp.vec2d), status: wp.array2d(dtype=wp.int32))
+```
+
+Evaluate one (case,angle) per thread using cached coefficients.
+
+Outputs have shape (cases,angles). Status 0 is success, 1 invalid angle,
+2 failed coefficients, 3 numerical failure. Zero outputs on failure
+are not valid results.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/angular.py#L15-L76)
+
+---
+
+# particula.optics.gpu.bulk
+
+*module*
+
+Prepared bounded-memory optical reductions across particle populations.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/bulk.py#L1-L1)
+
+## particula.optics.gpu.bulk.PopulationWorkspace
+
+*class* · *dataclass*
+
+```python
+class PopulationWorkspace
+```
+
+Retained streaming population outputs, commands and scratch.
+
+**Attributes**
+
+- `optics` (`wp.array`) — (groups,9): extinction, scattering, absorption, backscatter, radiation pressure [m⁻¹], SSA, g, extinction/scattering validity.
+- `mueller` (`wp.array`) — (groups,angles,4,4) differential matrices [m⁻¹/sr]; zero length angle axis when angular output was not requested.
+- `status` (`wp.array`) — Per-group status; 0 success, 2 input/upstream error, 3 overflow.
+- `particle_tile` (`int`) — Fixed maximum live particle scratch count.
+
+Groups flatten box/wavelength axes. Outputs require enqueue and successful
+observation; inputs may be updated in place on the prepared stream.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/bulk.py#L18-L56)
+
+### particula.optics.gpu.bulk.PopulationWorkspace._commands
+
+*attribute* · *instance attribute*
+
+```python
+_commands: tuple
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/bulk.py#L38-L38)
+
+### particula.optics.gpu.bulk.PopulationWorkspace._device
+
+*attribute* · *instance attribute*
+
+```python
+_device: str
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/bulk.py#L40-L40)
+
+### particula.optics.gpu.bulk.PopulationWorkspace._resources
+
+*attribute* · *instance attribute*
+
+```python
+_resources: tuple
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/bulk.py#L39-L39)
+
+### particula.optics.gpu.bulk.PopulationWorkspace._stream
+
+*attribute* · *instance attribute*
+
+```python
+_stream: wp.Stream | None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/bulk.py#L41-L41)
+
+### particula.optics.gpu.bulk.PopulationWorkspace.mueller
+
+*attribute* · *instance attribute*
+
+```python
+mueller: wp.array
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/bulk.py#L35-L35)
+
+### particula.optics.gpu.bulk.PopulationWorkspace.optics
+
+*attribute* · *instance attribute*
+
+```python
+optics: wp.array
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/bulk.py#L34-L34)
+
+### particula.optics.gpu.bulk.PopulationWorkspace.particle_tile
+
+*attribute* · *instance attribute*
+
+```python
+particle_tile: int
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/bulk.py#L37-L37)
+
+### particula.optics.gpu.bulk.PopulationWorkspace.status
+
+*attribute* · *instance attribute*
+
+```python
+status: wp.array
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/bulk.py#L36-L36)
+
+### particula.optics.gpu.bulk.PopulationWorkspace.__init__
+
+*method*
+
+```python
+def __init__(optics: wp.array, mueller: wp.array, status: wp.array, particle_tile: int, _commands: tuple, _resources: tuple, _device: str, _stream: wp.Stream | None) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/bulk.py#L0-L0)
+
+### particula.optics.gpu.bulk.PopulationWorkspace.check
+
+*method*
+
+```python
+def check() -> None
+```
+
+Explicitly synchronize and reject failed population results.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/bulk.py#L48-L56)
+
+### particula.optics.gpu.bulk.PopulationWorkspace.enqueue
+
+*method*
+
+```python
+def enqueue() -> None
+```
+
+Enqueue the retained streaming calculation without host transfers.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/bulk.py#L43-L46)
+
+## particula.optics.gpu.bulk.prepare_population_mie
+
+*function*
+
+```python
+def prepare_population_mie(relative_index: wp.array, size_parameter: wp.array, radius: wp.array, number_density_weights: wp.array, *, angles: wp.array | None = None, particle_tile: int = 256, angle_tile: int = 128, coefficient_capacity: int = 10090, stream=None) -> PopulationWorkspace
+```
+
+Prepare streamed bulk optics without retaining particle optical output.
+
+**Parameters**
+
+- `relative_index` (`wp.array`) — Contiguous (groups,particles) vec2d relative n+ik.
+- `size_parameter` (`wp.array`) — Same shape float64 x=2*pi*r*n_medium/lambda_vacuum.
+- `radius` (`wp.array`) — Same shape float64 SI radius [m], consistent with x.
+- `number_density_weights` (`wp.array`) — Same shape float64 density weights [m⁻³]. Callers supply discrete, resolved-count/volume or PDF weights.
+- `angles` (`wp.array | None`) (default: `None`) — Optional shared 1D float64 angles [rad], on the same device.
+- `particle_tile` (`int`) (default: `256`) — Maximum particles in scratch, default 256.
+- `angle_tile` (`int`) (default: `128`) — Angular launch width, default 128.
+- `coefficient_capacity` (`int`) (default: `10090`) — Maximum retained series order, default 10090.
+- `stream` (default: `None`) — Optional matching CUDA stream; used for all work and checks.
+
+**Returns**
+
+- (`PopulationWorkspace`) — Population workspace. Scratch is bounded by particle_tile, series
+- (`PopulationWorkspace`) — capacity and angle count, independently of total particle count.
+- (`PopulationWorkspace`) — No CPU transfers, fallback or scientific launches during preparation.
+
+**Raises**
+
+- `ValueError` — If shapes/devices/capacities conflict. Physical-value errors
+are reported by check after enqueue, without host input readback.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/bulk.py#L59-L223)
+
+---
+
+# particula.optics.gpu.column
+
+*module*
+
+Device optical depth, direct-beam transmission and mass opacity.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/column.py#L1-L1)
+
+## particula.optics.gpu.column.column_optics_kernel
+
+*function*
+
+```python
+def column_optics_kernel(extinction: wp.array2d(dtype=wp.float64), path_length: wp.array2d(dtype=wp.float64), input_status: wp.array2d(dtype=wp.int32), layer_depth: wp.array2d(dtype=wp.float64), total_depth: wp.array(dtype=wp.float64), transmission: wp.array(dtype=wp.float64), status: wp.array(dtype=wp.int32))
+```
+
+Integrate (columns,layers) coefficients along explicit lengths.
+
+Extinction [m⁻¹], lengths [m], and outputs [1]. Status codes 1 invalid,
+2 upstream failure, 3 overflow; failed partial results are not usable.
+Empty columns have zero depth and unit transmission.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/column.py#L8-L53)
+
+## particula.optics.gpu.column.mass_opacity_kernel
+
+*function*
+
+```python
+def mass_opacity_kernel(coefficient: wp.array(dtype=wp.float64), mass_density: wp.array(dtype=wp.float64), input_status: wp.array(dtype=wp.int32), opacity: wp.array(dtype=wp.float64), valid: wp.array(dtype=wp.int32), status: wp.array(dtype=wp.int32))
+```
+
+Compute mass-specific opacity [m²/kg] from m⁻¹ and kg/m³.
+
+Zero/zero returns zero with valid=0; nonzero/zero is invalid. Status codes
+1 invalid input, 2 upstream failure, 3 nonfinite result.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/column.py#L56-L95)
+
+---
+
+# particula.optics.gpu.cross_sections
+
+*module*
+
+Per-particle dimensional optical cross sections with explicit status.
+
+Cross sections are Q*pi*r². Efficiencies follow Bohren and Huffman (1983),
+https://doi.org/10.1002/9783527618156. Particle absorption remains separate
+from any later energy transfer or aerosol/environment state mutation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/cross_sections.py#L1-L1)
+
+## particula.optics.gpu.cross_sections._PI
+
+*attribute* · *module attribute*
+
+```python
+_PI = wp.constant(wp.float64(math.pi))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/cross_sections.py#L14-L14)
+
+## particula.optics.gpu.cross_sections.cross_sections_kernel
+
+*function*
+
+```python
+def cross_sections_kernel(efficiencies: wp.array2d(dtype=wp.float64), radius: wp.array(dtype=wp.float64), input_status: wp.array(dtype=wp.int32), cross_sections: wp.array2d(dtype=wp.float64), status: wp.array(dtype=wp.int32))
+```
+
+Convert (cases,7) efficiencies to (cases,5) cross sections [m²].
+
+**Parameters**
+
+- `efficiencies` (`wp.array2d(dtype=wp.float64)`) — Standard Mie order: ext, sca, abs, g, back, pr, valid.
+- `radius` (`wp.array(dtype=wp.float64)`) — Nonnegative finite SI radii [m], shape (cases,).
+- `input_status` (`wp.array(dtype=wp.int32)`) — Upstream coefficient/efficiency status, shape (cases,).
+- `cross_sections` (`wp.array2d(dtype=wp.float64)`) — Caller-owned output (cases,5): ext, sca, abs, back, pr.
+- `status` (`wp.array(dtype=wp.int32)`) — Caller-owned (cases,) int32: 0 success, 1 invalid input, 2 upstream failure, 3 nonfinite result.
+
+Launch one thread per case, with all arrays on the same device. Shapes
+and float64/int32 dtypes are the caller's responsibility. Observe status
+before using outputs; a failed case can contain partial results. No
+synchronization, transfer, allocation or source mutation occurs here.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/cross_sections.py#L17-L64)
+
+---
+
+# particula.optics.gpu.mie
+
+*module*
+
+Direct float64 Warp Mie kernels with caller-owned buffers.
+
+Equations and SI/index conventions match particula.optics.mie. Inputs here
+are flattened independent cases of relative n+ik and dimensionless x.
+Status codes: 0 success, 1 invalid input/capacity, 2 convergence failure,
+3 nonfinite results, 4 unphysical efficiencies beyond roundoff. Failed
+results must not be consumed.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/mie.py#L1-L1)
+
+## particula.optics.gpu.mie._CF_TINY
+
+*attribute* · *module attribute*
+
+```python
+_CF_TINY = wp.constant(wp.float64(1e-300))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/mie.py#L22-L22)
+
+## particula.optics.gpu.mie._CF_TOLERANCE_SQUARED
+
+*attribute* · *module attribute*
+
+```python
+_CF_TOLERANCE_SQUARED = wp.constant(wp.float64(4e-28))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/mie.py#L23-L23)
+
+## particula.optics.gpu.mie._ORDER_GROWTH
+
+*attribute* · *module attribute*
+
+```python
+_ORDER_GROWTH = wp.constant(wp.float64(4.05))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/mie.py#L25-L25)
+
+## particula.optics.gpu.mie._ROUNDOFF
+
+*attribute* · *module attribute*
+
+```python
+_ROUNDOFF = wp.constant(wp.float64(64 * 2.220446049250313e-16))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/mie.py#L26-L26)
+
+## particula.optics.gpu.mie._SMALL_TOLERANCE
+
+*attribute* · *module attribute*
+
+```python
+_SMALL_TOLERANCE = wp.constant(wp.float64(2e-16))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/mie.py#L24-L24)
+
+## particula.optics.gpu.mie.logarithmic_derivative
+
+*function*
+
+```python
+def logarithmic_derivative(z: wp.vec2d, count: int)
+```
+
+Return the continued-fraction derivative and convergence flag.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/mie.py#L45-L70)
+
+## particula.optics.gpu.mie.mie_coefficients_kernel
+
+*function*
+
+```python
+def mie_coefficients_kernel(relative_index: wp.array(dtype=wp.vec2d), size_parameter: wp.array(dtype=wp.float64), derivatives: wp.array2d(dtype=wp.vec2d), electric: wp.array2d(dtype=wp.vec2d), magnetic: wp.array2d(dtype=wp.vec2d), term_count: wp.array(dtype=wp.int32), status: wp.array(dtype=wp.int32))
+```
+
+Evaluate one sphere per thread; overwrite counts/status every call.
+
+Workspace derivatives has coefficient width+1 columns. Electric and
+magnetic arrays share shape (cases, capacity). Trailing coefficients are
+zeroed. No host transfers, allocations or synchronization occur here.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/mie.py#L73-L172)
+
+## particula.optics.gpu.mie.mie_efficiencies_kernel
+
+*function*
+
+```python
+def mie_efficiencies_kernel(relative_index: wp.array(dtype=wp.vec2d), size_parameter: wp.array(dtype=wp.float64), electric: wp.array2d(dtype=wp.vec2d), magnetic: wp.array2d(dtype=wp.vec2d), term_count: wp.array(dtype=wp.int32), status: wp.array(dtype=wp.int32), efficiencies: wp.array2d(dtype=wp.float64))
+```
+
+Write Qext,Qsca,Qabs,g,Qback,Qpr and a scattering-valid flag.
+
+Shape is (cases,7). Failed upstream cases produce zero outputs but retain
+nonzero status; status must be checked before results are used.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/mie.py#L175-L262)
+
+## particula.optics.gpu.mie.regular_small
+
+*function*
+
+```python
+def regular_small(x: wp.float64, order: int) -> wp.float64
+```
+
+Evaluate x*j_order(x) using the convergent small-argument series.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/mie.py#L29-L42)
+
+---
+
+# particula.optics.gpu.population
+
+*module*
+
+Device population weighting and incoherent optical reductions.
+
+Caller-provided arrays retain stable shapes. Status 0 means success, 1 invalid
+input, 2 upstream failure, 3 nonfinite result. Failed output must not be used.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/population.py#L1-L1)
+
+## particula.optics.gpu.population.finite_output
+
+*function*
+
+```python
+def finite_output(output: wp.array2d(dtype=wp.float64), group: int) -> bool
+```
+
+Check a nine-column optical result for finite values.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/population.py#L67-L73)
+
+## particula.optics.gpu.population.population_mueller_kernel
+
+*function*
+
+```python
+def population_mueller_kernel(matrices: wp.array4d(dtype=wp.float64), weights: wp.array2d(dtype=wp.float64), input_status: wp.array3d(dtype=wp.int32), output: wp.array3d(dtype=wp.float64), status: wp.array3d(dtype=wp.int32))
+```
+
+Reduce (groups,particles,angles,16) differential Mueller matrices.
+
+Flatten the final 4x4 in row-major order. Output is (groups,angles,16)
+[m⁻¹/sr]; signed polarized elements are preserved. Status is per element.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/population.py#L131-L162)
+
+## particula.optics.gpu.population.population_optics_kernel
+
+*function*
+
+```python
+def population_optics_kernel(cross_sections: wp.array3d(dtype=wp.float64), asymmetry: wp.array2d(dtype=wp.float64), weights: wp.array2d(dtype=wp.float64), input_status: wp.array2d(dtype=wp.int32), output: wp.array2d(dtype=wp.float64), status: wp.array(dtype=wp.int32))
+```
+
+Reduce (groups,particles,5) cross sections to (groups,9) outputs.
+
+Groups can flatten box/wavelength axes. Cross-section columns are
+extinction, scattering, absorption, backscatter, radiation pressure [m²].
+Outputs are those five coefficients [m⁻¹], SSA, g, extinction-valid,
+scattering-valid. input_status combines optical and weight admission.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/population.py#L76-L128)
+
+## particula.optics.gpu.population.population_weights_kernel
+
+*function*
+
+```python
+def population_weights_kernel(concentration: wp.array2d(dtype=wp.float64), volume: wp.array(dtype=wp.float64), radius_grid: wp.array(dtype=wp.float64), measure: int, weights: wp.array2d(dtype=wp.float64), status: wp.array2d(dtype=wp.int32))
+```
+
+Produce (boxes,particles) number weights [m⁻³].
+
+Measure 0 is discrete density, 1 represented count divided by box volume,
+2 radius PDF times trapezoidal widths. PDF grid length matches particles
+and must be at least two. Volume/grid arrays are only read when needed.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/population.py#L12-L64)
+
+---
+
+# particula.optics.gpu.workspace
+
+*module*
+
+Explicit preparation and observation for tiled resident optical kernels.
+
+Preparation validates metadata, allocates storage and compiles retained launch
+commands without advancing the calculation. Enqueue reuses those resources;
+check is a deliberate synchronization/readback boundary. Input values may be
+updated in place on the selected stream between calls; layouts stay fixed.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/workspace.py#L1-L1)
+
+## particula.optics.gpu.workspace.MieWorkspace
+
+*class* · *dataclass*
+
+```python
+class MieWorkspace
+```
+
+Prepared numerical outputs and retained device launch commands.
+
+**Attributes**
+
+- `efficiencies` (`wp.array`) — (cases,7): Qext,Qsca,Qabs,g,Qback,Qpr,scattering-valid.
+- `status` (`wp.array`) — (cases,) coefficient status; zero means success.
+- `perpendicular` (`wp.array | None`) — Optional (cases,angles) complex S1 as vec2d.
+- `parallel` (`wp.array | None`) — Optional (cases,angles) complex S2 as vec2d.
+- `mueller` (`wp.array | None`) — Optional (cases,angles,4,4) scaled Mueller matrices.
+- `angular_status` (`wp.array | None`) — Optional per-angle amplitude status.
+- `mueller_status` (`wp.array | None`) — Optional per-angle matrix status.
+- `coefficient_capacity` (`int`) — Maximum orders retained in each tiled case.
+- `case_tile` (`int`) — Maximum cases sharing reusable coefficient scratch.
+- `angle_tile` (`int`) — Maximum angles in each angular launch.
+
+Outputs are undefined until enqueue and successful check. Direct device
+consumers may instead inspect status on-device. This object is not safe
+for concurrent execution on multiple streams.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/workspace.py#L37-L101)
+
+### particula.optics.gpu.workspace.MieWorkspace._commands
+
+*attribute* · *instance attribute*
+
+```python
+_commands: tuple
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/workspace.py#L68-L68)
+
+### particula.optics.gpu.workspace.MieWorkspace._device
+
+*attribute* · *instance attribute*
+
+```python
+_device: str
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/workspace.py#L70-L70)
+
+### particula.optics.gpu.workspace.MieWorkspace._resources
+
+*attribute* · *instance attribute*
+
+```python
+_resources: tuple
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/workspace.py#L69-L69)
+
+### particula.optics.gpu.workspace.MieWorkspace._stream
+
+*attribute* · *instance attribute*
+
+```python
+_stream: wp.Stream | None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/workspace.py#L71-L71)
+
+### particula.optics.gpu.workspace.MieWorkspace.angle_tile
+
+*attribute* · *instance attribute*
+
+```python
+angle_tile: int
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/workspace.py#L67-L67)
+
+### particula.optics.gpu.workspace.MieWorkspace.angular_status
+
+*attribute* · *instance attribute*
+
+```python
+angular_status: wp.array | None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/workspace.py#L63-L63)
+
+### particula.optics.gpu.workspace.MieWorkspace.case_tile
+
+*attribute* · *instance attribute*
+
+```python
+case_tile: int
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/workspace.py#L66-L66)
+
+### particula.optics.gpu.workspace.MieWorkspace.coefficient_capacity
+
+*attribute* · *instance attribute*
+
+```python
+coefficient_capacity: int
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/workspace.py#L65-L65)
+
+### particula.optics.gpu.workspace.MieWorkspace.efficiencies
+
+*attribute* · *instance attribute*
+
+```python
+efficiencies: wp.array
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/workspace.py#L58-L58)
+
+### particula.optics.gpu.workspace.MieWorkspace.mueller
+
+*attribute* · *instance attribute*
+
+```python
+mueller: wp.array | None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/workspace.py#L62-L62)
+
+### particula.optics.gpu.workspace.MieWorkspace.mueller_status
+
+*attribute* · *instance attribute*
+
+```python
+mueller_status: wp.array | None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/workspace.py#L64-L64)
+
+### particula.optics.gpu.workspace.MieWorkspace.parallel
+
+*attribute* · *instance attribute*
+
+```python
+parallel: wp.array | None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/workspace.py#L61-L61)
+
+### particula.optics.gpu.workspace.MieWorkspace.perpendicular
+
+*attribute* · *instance attribute*
+
+```python
+perpendicular: wp.array | None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/workspace.py#L60-L60)
+
+### particula.optics.gpu.workspace.MieWorkspace.status
+
+*attribute* · *instance attribute*
+
+```python
+status: wp.array
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/workspace.py#L59-L59)
+
+### particula.optics.gpu.workspace.MieWorkspace.__init__
+
+*method*
+
+```python
+def __init__(efficiencies: wp.array, status: wp.array, perpendicular: wp.array | None, parallel: wp.array | None, mueller: wp.array | None, angular_status: wp.array | None, mueller_status: wp.array | None, coefficient_capacity: int, case_tile: int, angle_tile: int, _commands: tuple, _resources: tuple, _device: str, _stream: wp.Stream | None) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/workspace.py#L0-L0)
+
+### particula.optics.gpu.workspace.MieWorkspace.check
+
+*method*
+
+```python
+def check() -> None
+```
+
+Synchronize and inspect status arrays; raise on numeric failure.
+
+**Raises**
+
+- `RuntimeError` — If any coefficient, angle or matrix case failed.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/workspace.py#L82-L101)
+
+### particula.optics.gpu.workspace.MieWorkspace.enqueue
+
+*method*
+
+```python
+def enqueue() -> None
+```
+
+Enqueue retained commands, without allocation or host readback.
+
+Callers order their input writes and consumers on the prepared stream.
+Numeric failures remain in status buffers until explicit observation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/workspace.py#L73-L80)
+
+## particula.optics.gpu.workspace._admit
+
+*function*
+
+```python
+def _admit(relative_index, size_parameter, angles, matrix_scale, coefficient_capacity, case_tile, angle_tile, stream)
+```
+
+Admit layouts and stream before allocating or compiling commands.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/workspace.py#L117-L151)
+
+## particula.optics.gpu.workspace._array
+
+*function*
+
+```python
+def _array(value, dtype, shape, device, name)
+```
+
+Validate device array metadata without inspecting its device values.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/workspace.py#L24-L34)
+
+## particula.optics.gpu.workspace._capacities
+
+*function*
+
+```python
+def _capacities(coefficient_capacity, case_tile, angle_tile)
+```
+
+Admit positive integer workspace capacities.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/workspace.py#L104-L114)
+
+## particula.optics.gpu.workspace.prepare_mie
+
+*function*
+
+```python
+def prepare_mie(relative_index: wp.array, size_parameter: wp.array, *, angles: wp.array | None = None, matrix_scale: wp.array | None = None, coefficient_capacity: int = 10090, case_tile: int = 256, angle_tile: int = 128, stream=None) -> MieWorkspace
+```
+
+Prepare tiled device optics for already-uploaded numeric inputs.
+
+**Parameters**
+
+- `relative_index` (`wp.array`) — Contiguous (cases,) vec2d relative n+ik on CPU/CUDA.
+- `size_parameter` (`wp.array`) — Contiguous (cases,) float64 x, same device.
+- `angles` (`wp.array | None`) (default: `None`) — Optional contiguous (angles,) float64 radians, same device.
+- `matrix_scale` (`wp.array | None`) (default: `None`) — Optional (cases,) float64 multiplier for Mueller values; default one. Only accepted when angles are requested.
+- `coefficient_capacity` (`int`) (default: `10090`) — Positive scratch order bound, at most 10090. Insufficient capacity reports per-case status rather than truncates.
+- `case_tile` (`int`) (default: `256`) — Positive maximum cases in coefficient scratch (default 256).
+- `angle_tile` (`int`) (default: `128`) — Positive angular launch width (default 128).
+- `stream` (default: `None`) — Optional CUDA stream on the same device. Input writes and downstream consumers must use this stream or explicit ordering.
+
+**Returns**
+
+- (`MieWorkspace`) — Workspace retaining inputs, output arrays, scratch and launch commands.
+- (`MieWorkspace`) — Scratch scales with case_tile times coefficient_capacity; requested
+- (`MieWorkspace`) — per-particle angular outputs still scale with cases times angles.
+- (`MieWorkspace`) — No host values are copied, and preparation launches no scientific work.
+
+**Raises**
+
+- `ValueError` — If input metadata, device, stream or capacities conflict.
+- `RuntimeError` — If the explicitly requested device cannot be used.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/workspace.py#L154-L313)
+
+---
+
+# particula.optics.mie
+
+*module*
+
+Independent homogeneous-sphere Mie calculations in SI units.
+
+The coefficient equations follow Bohren and Huffman (1983), chapter 4,
+https://doi.org/10.1002/9783527618156. Logarithmic derivatives use a bounded
+continued fraction followed by downward recurrence; external regular Bessel
+functions use a convergent power series for small arguments.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/mie.py#L1-L1)
+
+## particula.optics.mie.MieCoefficients
+
+*class*
+
+```python
+class MieCoefficients(NamedTuple)
+```
+
+Bases: `NamedTuple`
+
+Complex coefficients, zero padded along the final order axis.
+
+**Attributes**
+
+- `electric` (`NDArray[np.complex128]`) — Electric coefficients a_n, starting at order one.
+- `magnetic` (`NDArray[np.complex128]`) — Magnetic coefficients b_n, starting at order one.
+- `term_count` (`NDArray[np.int64]`) — Valid number of coefficients for each broadcast case.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/mie.py#L15-L26)
+
+### particula.optics.mie.MieCoefficients.electric
+
+*attribute* · *instance attribute*
+
+```python
+electric: NDArray[np.complex128]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/mie.py#L24-L24)
+
+### particula.optics.mie.MieCoefficients.magnetic
+
+*attribute* · *instance attribute*
+
+```python
+magnetic: NDArray[np.complex128]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/mie.py#L25-L25)
+
+### particula.optics.mie.MieCoefficients.term_count
+
+*attribute* · *instance attribute*
+
+```python
+term_count: NDArray[np.int64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/mie.py#L26-L26)
+
+## particula.optics.mie.MieEfficiencies
+
+*class*
+
+```python
+class MieEfficiencies(NamedTuple)
+```
+
+Bases: `NamedTuple`
+
+Dimensionless efficiencies and asymmetry for broadcast input cases.
+
+**Attributes**
+
+- `extinction` (`NDArray[np.float64]`) — Total extinction efficiency.
+- `scattering` (`NDArray[np.float64]`) — Scattering efficiency.
+- `absorption` (`NDArray[np.float64]`) — Absorption efficiency.
+- `asymmetry` (`NDArray[np.float64]`) — Scattering-weighted cosine, zero when undefined.
+- `backscatter` (`NDArray[np.float64]`) — Radar-convention backscatter efficiency.
+- `radiation_pressure` (`NDArray[np.float64]`) — Extinction minus asymmetry times scattering.
+- `scattering_valid` (`NDArray[np.bool_]`) — Whether asymmetry is defined.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/mie.py#L29-L48)
+
+### particula.optics.mie.MieEfficiencies.absorption
+
+*attribute* · *instance attribute*
+
+```python
+absorption: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/mie.py#L44-L44)
+
+### particula.optics.mie.MieEfficiencies.asymmetry
+
+*attribute* · *instance attribute*
+
+```python
+asymmetry: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/mie.py#L45-L45)
+
+### particula.optics.mie.MieEfficiencies.backscatter
+
+*attribute* · *instance attribute*
+
+```python
+backscatter: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/mie.py#L46-L46)
+
+### particula.optics.mie.MieEfficiencies.extinction
+
+*attribute* · *instance attribute*
+
+```python
+extinction: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/mie.py#L42-L42)
+
+### particula.optics.mie.MieEfficiencies.radiation_pressure
+
+*attribute* · *instance attribute*
+
+```python
+radiation_pressure: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/mie.py#L47-L47)
+
+### particula.optics.mie.MieEfficiencies.scattering
+
+*attribute* · *instance attribute*
+
+```python
+scattering: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/mie.py#L43-L43)
+
+### particula.optics.mie.MieEfficiencies.scattering_valid
+
+*attribute* · *instance attribute*
+
+```python
+scattering_valid: NDArray[np.bool_]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/mie.py#L48-L48)
+
+## particula.optics.mie._coefficients
+
+*function*
+
+```python
+def _coefficients(m: complex, x: float, count: int)
+```
+
+Calculate one admitted case without allocating broadcast outputs.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/mie.py#L88-L117)
+
+## particula.optics.mie._log_derivative
+
+*function*
+
+```python
+def _log_derivative(z: complex, order: int) -> complex
+```
+
+Evaluate D_order(z) using the modified Lentz continued fraction.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/mie.py#L51-L70)
+
+## particula.optics.mie._regular_small
+
+*function*
+
+```python
+def _regular_small(x: float, order: int) -> float
+```
+
+Evaluate x*j_order(x) by its convergent small-argument series.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/mie.py#L73-L85)
+
+## particula.optics.mie.get_mie_coefficients
+
+*function*
+
+```python
+def get_mie_coefficients(relative_refractive_index: ArrayLike, size_parameter: ArrayLike) -> MieCoefficients
+```
+
+Calculate external coefficients for nonmagnetic homogeneous spheres.
+
+**Parameters**
+
+- `relative_refractive_index` (`ArrayLike`) — Particle/medium index n+ik, n>0, k>=0.
+- `size_parameter` (`ArrayLike`) — Dimensionless 2*pi*r*n_medium/lambda_vacuum, 0..10000.
+
+**Returns**
+
+- (`MieCoefficients`) — Broadcast coefficients with a final, zero-padded order axis and
+- (`MieCoefficients`) — per-case valid term counts. Inputs are not mutated.
+
+**Raises**
+
+- `ValueError` — If physical inputs are nonfinite or outside the domain.
+- `RuntimeError` — If the numerical recurrence fails.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/mie.py#L120-L173)
+
+## particula.optics.mie.get_mie_efficiencies
+
+*function*
+
+```python
+def get_mie_efficiencies(radius: ArrayLike, wavelength: ArrayLike, refractive_index: ArrayLike, medium_index: ArrayLike = 1.0) -> MieEfficiencies
+```
+
+Calculate efficiencies from SI radius and vacuum wavelength.
+
+**Parameters**
+
+- `radius` (`ArrayLike`) — Nonnegative sphere radius [m].
+- `wavelength` (`ArrayLike`) — Positive vacuum wavelength [m].
+- `refractive_index` (`ArrayLike`) — Absolute particle refractive index n+ik.
+- `medium_index` (`ArrayLike`) (default: `1.0`) — Positive real nonabsorbing medium index, default 1.
+
+**Returns**
+
+- (`MieEfficiencies`) — Named dimensionless arrays with the broadcast input shape. Zero
+- (`MieEfficiencies`) — scattering gives asymmetry zero and scattering_valid False.
+
+**Raises**
+
+- `ValueError` — If inputs violate the physical domain or x exceeds 10000.
+- `RuntimeError` — If arithmetic is unresolved, coefficient calculation
+fails or efficiencies violate energy/physical bounds beyond
+64 float64 eps of roundoff. Negative absorption within that
+roundoff is set to zero with extinction adjusted to scattering.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/mie.py#L176-L282)
+
+---
+
+# particula.optics.polarization
+
+*module*
+
+Scattering-plane Mueller matrices and Stokes operations.
+
+Use (parallel, perpendicular) electric-field components with
+Q=|Eparallel|²-|Eperpendicular|², U=2 Re(Eparallel Eperpendicular*), and
+V=-2 Im(Eparallel Eperpendicular*). Sphere scattering has Jones diagonal
+(S2, S1). Equations follow Bohren and Huffman (1983), chapter 3,
+https://doi.org/10.1002/9783527618156.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/polarization.py#L1-L1)
+
+## particula.optics.polarization.apply_mueller_matrix
+
+*function*
+
+```python
+def apply_mueller_matrix(matrix: ArrayLike, stokes: ArrayLike, input_rotation: ArrayLike = 0.0, output_rotation: ArrayLike = 0.0) -> NDArray[np.float64]
+```
+
+Apply R(output_rotation) M R(input_rotation) to a Stokes vector.
+
+**Parameters**
+
+- `matrix` (`ArrayLike`) — Finite (..., 4, 4) Mueller array; units set output units.
+- `stokes` (`ArrayLike`) — Finite (..., 4) I,Q,U,V input, broadcastable with matrix.
+- `input_rotation` (`ArrayLike`) (default: `0.0`) — Rotation [rad] into the matrix's incident basis.
+- `output_rotation` (`ArrayLike`) (default: `0.0`) — Rotation [rad] from its outgoing basis.
+
+**Returns**
+
+- (`NDArray[np.float64]`) — New output Stokes vectors, without intensity normalization or
+- (`NDArray[np.float64]`) — propagation-distance factors. Signed linear combinations are allowed.
+
+**Raises**
+
+- `ValueError` — If matrix/vector shapes or finite values are invalid.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/polarization.py#L78-L106)
+
+## particula.optics.polarization.get_mueller_matrix
+
+*function*
+
+```python
+def get_mueller_matrix(perpendicular: ArrayLike, parallel: ArrayLike) -> NDArray[np.float64]
+```
+
+Construct the unnormalized sphere Mueller matrix from S1 and S2.
+
+**Parameters**
+
+- `perpendicular` (`ArrayLike`) — Complex perpendicular amplitude S1, dimensionless.
+- `parallel` (`ArrayLike`) — Complex parallel amplitude S2, broadcastable with S1.
+
+**Returns**
+
+- (`NDArray[np.float64]`) — Real matrix with broadcast shape plus (4, 4), in the scattering
+- (`NDArray[np.float64]`) — plane. Divide by medium wavenumber squared for m²/sr.
+
+**Raises**
+
+- `ValueError` — If either amplitude is nonfinite.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/polarization.py#L14-L45)
+
+## particula.optics.polarization.rotate_stokes
+
+*function*
+
+```python
+def rotate_stokes(stokes: ArrayLike, angle: ArrayLike) -> NDArray[np.float64]
+```
+
+Express a Stokes vector in axes rotated toward the perpendicular axis.
+
+**Parameters**
+
+- `stokes` (`ArrayLike`) — Finite (..., 4) array ordered I,Q,U,V, in caller units.
+- `angle` (`ArrayLike`) — Rotation [rad], broadcastable with the leading Stokes shape. Positive rotation uses Eparallel'=cos(angle)*Eparallel + sin(angle)*Eperpendicular.
+
+**Returns**
+
+- (`NDArray[np.float64]`) — New vectors with Q'=cos(2a)Q+sin(2a)U, U'=-sin(2a)Q+cos(2a)U.
+- (`NDArray[np.float64]`) — I and V are unchanged. This operation does not normalize intensity.
+
+**Raises**
+
+- `ValueError` — If shapes or finite values are invalid.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/polarization.py#L48-L75)
+
+---
+
+# particula.optics.population
+
+*module*
+
+Number-weighted optical properties of independent spherical particles.
+
+Population sums assume incoherent, independent scattering. Number weights
+are densities [m⁻³], including quadrature weights for continuous radius PDFs.
+Bulk asymmetry is weighted by scattering, not by particle number alone.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L1-L1)
+
+## particula.optics.population.PopulationOptics
+
+*class*
+
+```python
+class PopulationOptics(NamedTuple)
+```
+
+Bases: `NamedTuple`
+
+Bulk optical coefficients and intensive properties.
+
+**Attributes**
+
+- `extinction` (`NDArray[np.float64]`) — Extinction coefficient [m⁻¹].
+- `scattering` (`NDArray[np.float64]`) — Scattering coefficient [m⁻¹].
+- `absorption` (`NDArray[np.float64]`) — Absorption coefficient [m⁻¹].
+- `backscatter` (`NDArray[np.float64]`) — Radar backscatter coefficient [m⁻¹].
+- `radiation_pressure` (`NDArray[np.float64]`) — Radiation-pressure coefficient [m⁻¹].
+- `single_scattering_albedo` (`NDArray[np.float64]`) — Scattering/extinction, zero if undefined.
+- `asymmetry` (`NDArray[np.float64]`) — Scattering-weighted cosine, zero if undefined.
+- `extinction_valid` (`NDArray[np.bool_]`) — Whether single-scattering albedo is defined.
+- `scattering_valid` (`NDArray[np.bool_]`) — Whether asymmetry is defined.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L16-L39)
+
+### particula.optics.population.PopulationOptics.absorption
+
+*attribute* · *instance attribute*
+
+```python
+absorption: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L33-L33)
+
+### particula.optics.population.PopulationOptics.asymmetry
+
+*attribute* · *instance attribute*
+
+```python
+asymmetry: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L37-L37)
+
+### particula.optics.population.PopulationOptics.backscatter
+
+*attribute* · *instance attribute*
+
+```python
+backscatter: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L34-L34)
+
+### particula.optics.population.PopulationOptics.extinction
+
+*attribute* · *instance attribute*
+
+```python
+extinction: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L31-L31)
+
+### particula.optics.population.PopulationOptics.extinction_valid
+
+*attribute* · *instance attribute*
+
+```python
+extinction_valid: NDArray[np.bool_]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L38-L38)
+
+### particula.optics.population.PopulationOptics.radiation_pressure
+
+*attribute* · *instance attribute*
+
+```python
+radiation_pressure: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L35-L35)
+
+### particula.optics.population.PopulationOptics.scattering
+
+*attribute* · *instance attribute*
+
+```python
+scattering: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L32-L32)
+
+### particula.optics.population.PopulationOptics.scattering_valid
+
+*attribute* · *instance attribute*
+
+```python
+scattering_valid: NDArray[np.bool_]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L39-L39)
+
+### particula.optics.population.PopulationOptics.single_scattering_albedo
+
+*attribute* · *instance attribute*
+
+```python
+single_scattering_albedo: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L36-L36)
+
+## particula.optics.population._nonnegative
+
+*function*
+
+```python
+def _nonnegative(values: ArrayLike, name: str) -> NDArray[np.float64]
+```
+
+Coerce a finite nonnegative physical array without modifying it.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L42-L49)
+
+## particula.optics.population.get_population_mueller_matrix
+
+*function*
+
+```python
+def get_population_mueller_matrix(differential_matrix: ArrayLike, number_density_weights: ArrayLike, *, particle_axis: int = -1) -> NDArray[np.float64]
+```
+
+Sum independent-particle differential Mueller matrices by number.
+
+**Parameters**
+
+- `differential_matrix` (`ArrayLike`) — Per-particle matrix [m²/sr] with shape batch+(angles,4,4), where batch includes the particle axis. All matrices must use the same incident/outgoing reference frames.
+- `number_density_weights` (`ArrayLike`) — Nonnegative weights [m⁻³] broadcastable with batch. Negative polarized matrix entries are valid.
+- `particle_axis` (`int`) (default: `-1`) — Particle axis within the broadcast batch shape.
+
+**Returns**
+
+- (`NDArray[np.float64]`) — Bulk differential matrix [m⁻¹/sr]. Normalize by bulk scattering
+- (`NDArray[np.float64]`) — coefficient to obtain the population phase matrix.
+
+**Raises**
+
+- `ValueError` — If inputs or resulting matrix values are invalid.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L189-L231)
+
+## particula.optics.population.get_population_optics
+
+*function*
+
+```python
+def get_population_optics(cross_sections: OpticalCrossSections, asymmetry: ArrayLike, number_density_weights: ArrayLike, *, particle_axis: int = -1) -> PopulationOptics
+```
+
+Reduce per-particle optical areas to bulk optical coefficients.
+
+**Parameters**
+
+- `cross_sections` (`OpticalCrossSections`) — Nonnegative per-particle areas [m²].
+- `asymmetry` (`ArrayLike`) — Per-particle scattering-weighted cosine in [-1,1].
+- `number_density_weights` (`ArrayLike`) — Number weights [m⁻³]; use explicit singleton axes for wavelength broadcasting, e.g. (boxes,1,particles).
+- `particle_axis` (`int`) (default: `-1`) — Particle axis in the broadcast shape, default last.
+
+**Returns**
+
+- (`PopulationOptics`) — Bulk coefficients [m⁻¹], albedo, asymmetry and validity masks with
+- (`PopulationOptics`) — the particle axis removed. Empty/zero populations produce zeros.
+
+**Raises**
+
+- `ValueError` — If inputs, reduction axis or resulting values are invalid.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L117-L186)
+
+## particula.optics.population.get_population_weights
+
+*function*
+
+```python
+def get_population_weights(concentration: ArrayLike, distribution_type: str, *, volume: ArrayLike | None = None, radius_grid: ArrayLike | None = None) -> NDArray[np.float64]
+```
+
+Convert native population measures to number-density weights.
+
+**Parameters**
+
+- `concentration` (`ArrayLike`) — (..., particles) number density [m⁻³] for discrete, represented count for particle_resolved, or dn/dr [m⁻⁴] for continuous_pdf. The final axis is always the particle axis.
+- `distribution_type` (`str`) — discrete, particle_resolved, or continuous_pdf.
+- `volume` (`ArrayLike | None`) (default: `None`) — Required positive physical volume [m³] for resolved counts, broadcastable with concentration's leading axes. Omit otherwise.
+- `radius_grid` (`ArrayLike | None`) (default: `None`) — Required positive increasing 1D radius nodes [m] for continuous_pdf. At least two nodes; omit for other measures.
+
+**Returns**
+
+- (`NDArray[np.float64]`) — New number-density weights [m⁻³]. PDF weights implement trapezoidal
+- (`NDArray[np.float64]`) — integration of the complete optical-cross-section times PDF product.
+
+**Raises**
+
+- `ValueError` — If the measure, shape, values or supplied metadata conflict.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L52-L114)
 
 ---
 
