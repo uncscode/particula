@@ -330,6 +330,7 @@ class Marker(RunnableABC):
         sub_steps: int = 1,
         *,
         context=None,
+        time: float = 0.0,
     ) -> AerosolLike:
         self.calls.append("marker")
         return aerosol

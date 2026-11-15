@@ -234,7 +234,17 @@ def test_execute_commits_each_positive_substep_and_preserves_identities(
         assert not np.shares_memory(source_gas.concentration, gas.concentration)
         return object(), _admitted_diagnostics()
 
-    def commit(demand, diagnostics, source_particles, source_gas, config):
+    def commit(
+        demand,
+        diagnostics,
+        source_particles,
+        source_gas,
+        config,
+        *,
+        extension_fields,
+    ):
+        assert extension_fields is not aerosol.fields
+        assert extension_fields.specs == aerosol.fields.specs
         calls.append((config.maximum_slot_weight, source_particles, source_gas))
 
     monkeypatch.setattr(particle_process, "_finalize_particle_source", finalize)
@@ -605,7 +615,11 @@ def test_execute_uses_equal_duration_and_immutable_config_per_positive_substep(
         durations.append(events.duration)
         return object(), _admitted_diagnostics()
 
-    def commit(demand, diagnostics, particles, source_gas, config):
+    def commit(
+        demand, diagnostics, particles, source_gas, config, *, extension_fields
+    ):
+        assert extension_fields is not aerosol.fields
+        assert extension_fields.specs == aerosol.fields.specs
         assert source_gas is not gas
         assert not np.shares_memory(source_gas.concentration, gas.concentration)
         configs.append(config)
@@ -639,7 +653,7 @@ def test_later_substep_rate_uses_gas_depleted_by_prior_commit(
         observed_rates.append(rate)
         return rate
 
-    def commit(*args) -> None:
+    def commit(*args, extension_fields) -> None:
         if len(observed_rates) == 1:
             args[3].concentration[0, 0] *= 0.5
 
@@ -780,7 +794,7 @@ def test_later_commit_failure_preserves_prior_substep(
         lambda *args: (object(), _admitted_diagnostics()),
     )
 
-    def commit(*args):
+    def commit(*args, extension_fields):
         nonlocal commits
         commits += 1
         if commits == 1:

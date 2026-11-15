@@ -333,3 +333,16 @@ narrow passing suite. Leave merge, version bump and release outside this goal.
   rendering verified. All three outside-checkout examples pass (3 tests),
   including the actual CUDA helper ZIP. The data-model guide now documents
   field schemas, copies, bounds, policies, ledgers and structural boundaries.
+- Initial full qualification completed with 10,282 passed, 18 skipped, one
+  expected failure and five failures, at 92% coverage. All five failures were
+  source-transaction test spies missing the new field-store keyword. Updated
+  spies retain rollback, identity and numerical assertions. CPU adapters now
+  forward optional context through explicit typed branches, preserving omitted
+  keywords for legacy delegates; equilibrium accepts and validates absolute time.
+  Affected compatibility suite: 335 passed. Full-library mypy now passes all
+  611 source files. Final full-suite rerun remains required.
+- Website tests passed on the host (38 Python and 11 JavaScript tests); the
+  restricted notebook-kernel test stalled and was terminated before rerunning.
+  Site build passed: 477 generated pages, with rendered verification reporting
+  zero errors across 607 HTML pages and 286 API modules. Final saved-example
+  refresh after the compatibility corrections remains required.

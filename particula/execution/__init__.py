@@ -1079,12 +1079,19 @@ class CPUExecutionAdapter:
         ):
             raise ValueError("sub_steps must be a positive integer.")
 
-        returned_aerosol = self._runnable.execute(
-            cast("Aerosol", state.aerosol),
-            cast(float, state.time_step),
-            cast(int, state.sub_steps),
-            **({"context": state.context} if state.context is not None else {}),
-        )
+        if state.context is None:
+            returned_aerosol = self._runnable.execute(
+                cast("Aerosol", state.aerosol),
+                cast(float, state.time_step),
+                cast(int, state.sub_steps),
+            )
+        else:
+            returned_aerosol = cast("RunnableABC", self._runnable).execute(
+                cast("Aerosol", state.aerosol),
+                cast(float, state.time_step),
+                cast(int, state.sub_steps),
+                context=state.context,
+            )
         if returned_aerosol is not state.aerosol:
             raise ValueError("CPU runnable must return the original aerosol.")
         return ExecutionResult(

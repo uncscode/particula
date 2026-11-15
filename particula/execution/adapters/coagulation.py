@@ -372,12 +372,19 @@ class CPUCoagulationExecutionAdapter:
         ):
             raise ValueError("sub_steps must be a positive integer.")
         _validate_cpu_brownian_runnable(state.runnable)
-        aerosol = state.runnable.execute(
-            state.state.aerosol,
-            cast(float, state.time_step),
-            cast(int, state.sub_steps),
-            **({"context": state.context} if state.context is not None else {}),
-        )
+        if state.context is None:
+            aerosol = state.runnable.execute(
+                state.state.aerosol,
+                cast(float, state.time_step),
+                cast(int, state.sub_steps),
+            )
+        else:
+            aerosol = state.runnable.execute(
+                state.state.aerosol,
+                cast(float, state.time_step),
+                cast(int, state.sub_steps),
+                context=state.context,
+            )
         cpu_result = CPUCoagulationResult(state.state, aerosol)
         return ExecutionResult(
             state,
