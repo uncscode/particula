@@ -326,11 +326,16 @@ class PreparedSimulation:
                             "and a supported model environment"
                         ),
                         8: "ion attachment rate is unsupported",
+                        90: "custom GPU process produced invalid field values",
                     }
                     if failure in messages:
                         raise ValueError(messages[failure])
                     for observe in self._observers:
                         observe()
+                    if failure >= 100:
+                        raise ValueError(
+                            f"custom GPU process reported failure {failure}"
+                        )
                     if failure:
                         raise ValueError(
                             "prepared nucleation failed; dependent work stopped"
@@ -665,6 +670,15 @@ def prepare_simulation(
         raise ValueError(
             "prepared execution supports one occurrence per family"
         )
+    from particula.execution.extension_rng import validate_streams
+
+    validate_streams(
+        plans,
+        root_seed,
+        logical_box_ids
+        if logical_box_ids is not None
+        else tuple(str(i) for i in range(aerosol.particles.n_boxes)),
+    )
     owner = PreparedSimulation._upload(
         aerosol,
         device=target,

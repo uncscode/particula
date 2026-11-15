@@ -239,12 +239,59 @@ First passage is resolved at process boundaries, not interpolated within a
 condensation substep or physical time interval. A survival study must test
 timestep and process-order sensitivity before interpreting rare-event results.
 
+## Registered custom processes
+
+Register an exact process class in a caller-owned `ProcessRegistry` and pass it
+as `process_registry=` to `prepare()` and `resume()`. Registration does not
+implicitly apply to subclasses. An adapter implements two public methods:
+
+- `plan(process, aerosol)` validates detached CPU state and returns a frozen
+  `GPUProcessPlan` with instance name, extension ID/version, read/write names,
+  immutable parameters, capabilities and optional persistent-state descriptors.
+- `prepare(plan, context)` receives a `GPUPreparationContext` and returns a
+  `PreparedOperation` retaining a launch-only handler and its resources.
+
+The context exposes declared device arrays, the device and stream, timestep,
+logical box IDs, a device clock and shared failure flag. It exposes no private
+simulation owner. Allocate scratch during preparation. The retained operation
+must not allocate, synchronize, download data or reseed streams during a step.
+Callbacks are trusted numerical implementations; declarations are not a Python
+or device-memory security boundary.
+
+Declare `GPUStateSpec` arrays for persistent counters or other continuation
+state. Access them through `context.state`. Scratch buffers are reconstructed
+on resume and are not checkpointed. Checkpoint schema v2 stores immutable
+configuration and bytes, not Python implementations. Resume matches the
+caller-supplied registry and validates the payload inventory before upload.
+Built-in-only v1 checkpoints remain readable with a zero initial time.
+
+For managed Warp random streams, set `GPUProcessPlan(stochastic=True, ...)`.
+`context.rng` then supplies one uint32 state word per logical box. One kernel
+thread per box loads that word, draws with Warp's random functions, and writes
+the advanced word back. Streams depend on root seed, extension ID, instance
+name and logical box ID; reordering boxes or processes does not reseed them.
+Checkpoint/resume preserves these words exactly, and capture records without
+consuming draws. A zero timestep skips custom advancement. NumPy host random
+streams and Warp streams have distinct algorithms and continuation formats.
+
+Kernels must check `context.failure[0]` before writing and suppress work if it
+is nonzero. They can report their own failure using codes 100 or greater.
+Particula adds device-side finite/bounds checks for declared destinations and
+floating persistent state. These checks latch failure before later guarded
+operations, including subsequent captured replays; observation reports the
+failure and faults the owner. Earlier writes are not rolled back. Integer
+field checks retain integer precision, including int64 values above 2**53.
+
+`time=` selects the initial absolute time. `current_time` includes that origin;
+`simulated_time` remains elapsed time. Custom kernels read the current interval's
+start from `context.clock[0]`, so captured replay follows evolving time.
+
 ## State, forcing and observations
 
 `run(steps)` enqueues fixed-duration steps. `completed_steps` and
 `simulated_time` track enqueued work; synchronize or observe to establish device
-success. Ordinary prepared steps perform no simulation-state download or device
-array allocation. Explicit observation and forcing boundaries wait for pending
+success. Resident prepared steps perform no simulation-state download or device
+array allocation. Explicit `CPUTransfer` operations incur host round trips. Explicit observation and forcing boundaries wait for pending
 work and check status.
 
 | Operation | Result and cost |

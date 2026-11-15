@@ -86,6 +86,19 @@ def compile_extension(plan, owner):
         )
         for spec in configuration.state
     }
+    rng = None
+    if configuration.stochastic:
+        from particula.execution.extension_rng import initial_words
+
+        metadata = owner._session.metadata.stream
+        rng = wp.array(
+            initial_words(
+                configuration, metadata.root_seed, metadata.logical_box_ids
+            ),
+            dtype=wp.uint32,
+            device=owner.device.native,
+        )
+        state["__rng"] = rng
     owner._extension_state[configuration.name] = state
     arrays = {}
     for name in configuration.reads + configuration.writes:
@@ -96,7 +109,8 @@ def compile_extension(plan, owner):
             arrays[name] = owner._extension_fields.arrays[name]
     context = GPUPreparationContext(
         arrays=arrays,
-        state=state,
+        state={name: array for name, array in state.items() if name != "__rng"},
+        rng=rng,
         device=owner.device.native,
         stream=owner._stream,
         time_step=owner.time_step,
@@ -113,13 +127,26 @@ def compile_extension(plan, owner):
         raise ValueError(
             "prepared operation differs from admitted configuration"
         )
+    from particula.execution.extension_guards import prepare_validation
+
+    validate, validation_resources = prepare_validation(
+        configuration, arrays, state, owner
+    )
+    handler = operation.handler
+
+    def enqueue():
+        if owner.time_step != 0:
+            handler()
+        validate()
+
     # Keep array identity reachable to capture validation even if a callback
     # retains only an opaque kernel closure.
     operation = PreparedOperation(
         operation.name,
-        operation.handler,
+        enqueue,
         (
             *operation.resources,
+            *validation_resources,
             *arrays.values(),
             *state.values(),
             owner._clock,

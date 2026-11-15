@@ -258,3 +258,21 @@ narrow passing suite. Leave merge, version bump and release outside this goal.
   preservation, host RNG restart and corrupt-host-state rejection before upload.
   Targeted Ruff and mypy pass. Device custom RNG, native GPU particle fields,
   field-value guards, typed built-in contexts, examples and final PR gates remain.
+- Resident custom processes can now request managed uint32 Warp random words
+  keyed by root seed, extension ID, instance and logical box. Preparation checks
+  same-process word collisions; steps never reseed. Random bytes are reserved
+  continuation state and participate in schema-v2 validation, exact restart and
+  capture identities. Zero-duration resident custom calls skip advancement.
+- Declared custom writes and floating adapter state now have prepared device
+  validation launches. Finite/bounds failures latch code 90 and suppress later
+  guarded work and clock advancement; observation faults the owner. Integer
+  comparisons preserve int64 precision above 2**53. Guards allocate/read back
+  nothing per step. GPU callbacks still own the required failure-flag check and
+  scientific accounting; these checks are not a security boundary.
+- Qualification: 201 affected CPU/CUDA tests passed with three intentional CPU
+  capture skips. Expanded RNG/dtype qualification passed 17 tests with three
+  CPU capture skips, covering float64/int32/int64 bounds, logical-box/process
+  reordering, independent instances, inert capture and exact random continuation,
+  missing RNG rejection before upload, and zero-duration preservation. Ruff and
+  targeted mypy pass. Native GPU particle-field events and final deliverables
+  remain pending.
