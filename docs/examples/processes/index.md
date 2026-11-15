@@ -62,3 +62,7 @@ Edit the `.py`, then sync and execute to refresh outputs for the site.
 
 - [Adding Particles During Simulation](customization/adding_particles_during_simulation.py) –
   Demonstrates customizing the simulation by injecting new particles.
+
+- [Timed custom CPU chemistry](customization/timed_box_chemistry.py) —
+  Compose a SciPy box process, scheduled emissions and native dilution;
+  check analytical species evolution and per-box mass accounting.
