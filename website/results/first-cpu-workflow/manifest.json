@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 3.6255133600207046,
+  "package_source_sha256": "8a9131f660b9fc2981024f2ca5e885da7cd0b1ecce71aeb58dc0693f34bf7833",
+  "input_sha256": {},
+  "example": "first-cpu-workflow",
+  "fingerprint": "b396296025a363580d4cf778d6c5fd341b957adbc47b030ce696799873889b96",
+  "source": "docs/examples/fundamentals/first_cpu_workflow.py",
+  "revision": "0d21d18b734ac840dfaf2c1f360db8daec780c80",
+  "package_dirty": true,
+  "executed_at": "2026-11-16T03:10:21.324639+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.2.14",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [
+      {
+        "image": "figure-4-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "figure-4-1.png": "e6a610354aac1923fbfef6ac8191f7040341f5cd66a3b55e0ca386a5cdc5f4e4",
+    "data.json": "195765eab43bee413f2d0500fbc80a3909931a2a27c95543cbf640796ce5bd68",
+    "source.py": "5d8ecbf2f295bacaa039de445abecade814ddb2cf000d4f65d15d9856ddaddd4"
+  },
+  "simulation_fingerprint": "cba7b91385c8aa5aa9eff51b1489227fc3fe16e7f81e433efd0b82ef9a40acfe"
+}

@@ -1,99 +1,120 @@
 # First CPU simulation
 
+Follow a finite vapor reservoir as it grows 100 nm organic particles over ten
+minutes. The [complete executable example](../../examples/fundamentals/first_cpu_workflow.py)
+creates native state, records a time series, saves and reloads results, and
+checks an exact restart at five minutes. Its published page includes the plots.
+This workflow requires a development checkout containing the new concrete
+`particula.execution` modules; it is not a claim about an older installed release.
 
-This native single-box example initializes a lognormal PMF and performs one
-10-second condensation step. The retained
-100 kg/m³ vapor concentration is an exaggerated illustration, not a calibrated
-atmospheric case or an accuracy/convergence claim.
+## Run and save the experiment
+
+Download the example's Python source as `first_cpu_workflow.py`, install
+Particula and Matplotlib in the selected environment, and run:
+
+```bash
+python first_cpu_workflow.py
+```
+
+In a repository checkout, the equivalent command is:
+
+```bash
+python docs/examples/fundamentals/first_cpu_workflow.py
+```
+
+The script creates `first-cpu-results/` containing a growth figure, an analysis
+file and a separate restart file for each of two initial vapor concentrations.
+The publication pipeline uses temporary storage and retains only compact plot
+data, never the full restart files.
+
+The first case has 1000 particles cm⁻³, 10 µg m⁻³ initial organic vapor,
+298.15 K and 101325 Pa. One representative carries 1000 particles in a volume
+of 1 cm³: native resolved `concentration` is a count, while `number_density`
+is m⁻³. The second case doubles only initial vapor to 20 µg m⁻³. Both are
+illustrative single-material organic calculations with explicit constant
+properties, ideal activity and Kelvin curvature. They exclude dilution,
+coagulation, wall loss, heat feedback and external forcing.
+
+The adaptive RK3(2) method advances particle and gas mass together. The script
+sets `rtol=1e-5`, per-particle `particle_atol=1e-27` kg and
+`gas_atol=1e-15` kg m⁻³. It records every ten seconds by landing on those times.
+This can shorten a proposed step. These are local numerical controls, not
+experimental uncertainty or a guaranteed global error bound.
+
+## Reload and inspect results
+
+Run this from the directory containing `first-cpu-results/`:
 
 ```python
 import numpy as np
-import particula as par
-from particula.dynamics.condensation.species_mapping import CondensationSpeciesMap
+from particula.execution.analysis_io import load_analysis
 
-particles = par.particles.create_lognormal_binned_particle_data(
-    distribution_type="discrete",
-    radius_bins=np.logspace(-9, -4, 250),
-    mode=[100e-9], geometric_standard_deviation=[1.2],
-    number_concentration=[1e8], density=1000.0,
-)
-gas = par.gas.GasData(
-    name=["organic"], molar_mass=np.array([0.180]),
-    concentration=np.array([[100.0]]),  # kg/m³
-    partitioning=np.array([True]),
-)
-environment = par.gas.EnvironmentData(
-    temperature=[298.15], pressure=[101325.0], saturation_ratio=[[1.0]],
-)
-aerosol = par.Aerosol(particles=particles, gas=gas, environment=environment)
-initial_particle_mass = particles.species_mass_inventory.copy()
-
-strategy = par.dynamics.CondensationIsothermal(
-    molar_mass=gas.molar_mass.copy(),
-    diffusion_coefficient=2e-5, accommodation_coefficient=1.0,
-    activity_strategy=par.particles.ActivityIdealMass(),
-    surface_strategy=par.particles.SurfaceStrategyVolume(
-        surface_tension=0.072, density=1000.0
-    ),
-    vapor_pressure_strategy=par.gas.ConstantVaporPressureStrategy(100.0),
-    species_map=CondensationSpeciesMap(("organic",), ((0, 0),)),
-)
-process = par.dynamics.MassCondensation(strategy)
-result = process.execute(aerosol, time_step=10.0)
-print(result.particles.species_mass_density)  # kg/m³
+result = load_analysis("first-cpu-results/organic-10.analysis")
+time_s = result.arrays["time"]
+gas = result.arrays["gas_concentration"][:, 0, 0]
+particle = result.arrays["particle_mass_density"][:, 0, 0]
+np.testing.assert_allclose(gas + particle, gas[0] + particle[0], rtol=2e-13)
+print(result.metadata["configuration"])
+print("Final gas concentration:", gas[-1] * 1e9, "µg m^-3")
 ```
 
-The PMF stores bin number densities and uses the canonical 1 m³ reference
-volume. See [native construction](../data-model/construction.md)
-and [access and replacement](../data-model/ownership.md).
+Analysis output includes units, named axes, ordered gas species, population
+measure, volume, physical configuration, numerical settings and source/package
+identity. Histories contain selected diagnostics; full particle arrays are
+opt-in and storage is bounded. Analysis files cannot be used as exact restarts.
+The files use ZIP, JSON and numeric arrays and never require pickle to load.
 
+The saved calculation reaches radii of about 136.69 nm and 162.13 nm for the
+10 and 20 µg m⁻³ cases. Remaining vapor is about 0.89 and 0.87 µg m⁻³.
+More initial vapor supplies more particle material; growth slows as the vapor
+approaches its curvature-dependent equilibrium. Number remains constant and
+gas plus particle mass closes to floating-point precision. Conservation and
+successful restart verify bookkeeping; they do not establish agreement with a
+real organic aerosol or an independent numerical reference.
 
-## Combine condensation and coagulation
+## Resume the five-minute checkpoint
 
-This particle-resolved illustration constructs native containers with a 1e-6 m³
-representative volume and combines two processes. Use a checkout or installed
-release with the 0.3.0 native APIs; see the [installation guide](installation/index.md).
+Place the downloaded example beside your script so its explicit physics setup
+can be imported. From a checkout, add `docs/examples/fundamentals` to the Python
+module search path, or run this beside that source file with an absolute result
+path. Keep the same physical configuration and subsequent output boundaries:
 
 ```python
-import numpy as np
-import particula as par
-from particula.dynamics.condensation.species_mapping import CondensationSpeciesMap
+from first_cpu_workflow import build_case
+from particula.execution.cpu_restart import load_cpu_checkpoint, resume_condensation
+from particula.execution.recording import Recorder, run_until
 
-particles = par.particles.create_resolved_particle_data(
-    masses=[1e-18, 2e-18], density=1000.0,
-    concentration=[1.0, 1.0], volume=1e-6,  # counts and m³
+_, strategy = build_case(10.0)
+saved = load_cpu_checkpoint("first-cpu-results/organic-10.restart")
+resumed = resume_condensation(saved, strategy)
+history = Recorder()
+run_until(
+    resumed, 600.0,
+    output_times=np.linspace(300.0, 600.0, 31),
+    recorder=history,
 )
-gas = par.gas.GasData(
-    name=["organic"], molar_mass=np.array([0.180]),
-    concentration=np.array([[1e-6]]),  # kg/m³
-    partitioning=np.array([True]),
+np.testing.assert_array_equal(
+    history.arrays()["gas_concentration"],
+    result.arrays["gas_concentration"][30:],
 )
-environment = par.gas.EnvironmentData(
-    temperature=[298.15], pressure=[101325.0], saturation_ratio=[[1.0]],
-)
-aerosol = par.Aerosol(particles=particles, gas=gas, environment=environment)
-
-strategy = par.dynamics.CondensationIsothermal(
-    molar_mass=gas.molar_mass.copy(),
-    diffusion_coefficient=2e-5, accommodation_coefficient=1.0,
-    activity_strategy=par.particles.ActivityIdealMass(),
-    surface_strategy=par.particles.SurfaceStrategyVolume(density=1000.0),
-    vapor_pressure_strategy=par.gas.ConstantVaporPressureStrategy(1e-3),
-    species_map=CondensationSpeciesMap(("organic",), ((0, 0),)),
-)
-condensation = par.dynamics.MassCondensation(strategy)
-coagulation = par.dynamics.Coagulation(
-    par.dynamics.BrownianCoagulationStrategy("particle_resolved")
-)
-aerosol = (condensation | coagulation).execute(
-    aerosol, time_step=10.0, sub_steps=10
-)
-print(aerosol.particles.number_density)  # m⁻³, not raw counts
 ```
 
-The resolved concentration stores counts, while `number_density` reports m⁻³.
-See [native access and replacement](../data-model/ownership.md) for ownership,
-validation, and non-unit-volume inventory checks.
+The checkpoint retains accepted time, scaled native state, tolerances, the
+proposed next step and solver work counters. A different physics configuration
+or incompatible schema/runtime rejects. For this deterministic workflow, the
+same subsequent boundaries give exact continuation. Arbitrary callable forcing
+has no supported disk identity. Passive recording does not alter physics, but
+choosing different output boundaries can alter the numerical trajectory.
 
-Next: [process guides](../processes/index.md) or
-[examples](../../examples/index.md).
+## Adapt one scientific input
+
+The example already runs the controlled 10 versus 20 µg m⁻³ comparison. Change
+`CONFIGURATION["saturation_vapor_pressure_Pa"]` to investigate volatility next,
+then rerun and compare both remaining vapor and radius. Select a new output
+directory to preserve earlier files. Before interpreting a named compound,
+justify its material properties and compare with independent measurements.
+
+Next: [native construction](../data-model/construction.md),
+[ownership](../data-model/ownership.md), and
+[condensation](../processes/condensation.md). Process combinations and broader
+size distributions need their own numerical and scientific checks.

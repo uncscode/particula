@@ -797,5 +797,20 @@
       "plot_results"
     ],
     "plot_inputs": []
+  },
+  "first-cpu-workflow": {
+    "title": "Run, save and resume a closed aerosol growth experiment",
+    "source": "docs/examples/fundamentals/first_cpu_workflow.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 120,
+    "inputs": [],
+    "invoke": "report = simulate()\nfigure = plot_results(report)",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\nfigure = plot_results(report)",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": []
   }
 }

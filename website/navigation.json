@@ -42,6 +42,10 @@
             "slug": "guide/getting-started/first-simulation"
           },
           {
+            "label": "Saved CPU growth experiment",
+            "slug": "examples/fundamentals/first_cpu_workflow"
+          },
+          {
             "label": "Installation",
             "collapsed": true,
             "items": [

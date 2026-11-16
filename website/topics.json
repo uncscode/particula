@@ -2013,6 +2013,16 @@
       "also": [],
       "role": "Contribute",
       "start_here": false
+    },
+    {
+      "source": "docs/examples/fundamentals/first_cpu_workflow.py",
+      "title": "Run, save and resume a closed aerosol growth experiment",
+      "topic": "cpu",
+      "also": [
+        "condensation"
+      ],
+      "role": "Examples",
+      "start_here": true
     }
   ],
   "supporting": [

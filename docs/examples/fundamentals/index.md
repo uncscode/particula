@@ -18,3 +18,6 @@ if you want a complete small calculation before exploring the individual parts.
 After construction, use [process examples](../processes/index.md) to connect an
 initial condition with a physical tendency or time history. A constructor accepting
 an array does not establish that the input is a realistic aerosol.
+
+Follow the [saved CPU growth experiment](first_cpu_workflow.py) to record a
+physical-time history, reload it, and resume from an exact checkpoint.
