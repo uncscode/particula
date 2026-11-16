@@ -2,7 +2,8 @@
 
 Status: initial implementation delivered in
 [PR #1659](https://github.com/uncscode/particula/pull/1659). The discrete-bin review
-correction below is locally qualified and awaits publication authorization.
+correction below is qualified and published. Current hosted checks and review
+status are tracked in that PR.
 Worktree: `/tmp/particula-stage-02a`.
 Branch: `codex/stage-02a-numerical-integration`.
 Verified upstream base: `356fc054cd9a4f4ececc3c64c7144e889a789494`.
@@ -148,4 +149,6 @@ Commands: `PYTHONPATH=. .venv/bin/python -m pytest particula --cov=particula
 and Ruff check/format over `particula/ examples_tests/ scripts/`. Logs are in
 `.artifacts/discrete-bin-*.log`. Earlier scientific measurements retain their
 original source hashes; this regression qualification does not relabel them.
-The remote review thread remains unresolved until the correction is published.
+The correction was published on 2026-11-16, with a regression/validation reply,
+and the remote review thread is resolved. GitHub reports checks for each
+published head; earlier checks do not qualify later commits.
