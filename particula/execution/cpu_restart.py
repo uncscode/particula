@@ -14,7 +14,9 @@ from particula.execution.cpu_simulation import (
     pack_native,
     unpack_native,
 )
+from particula.execution.forcing import EnvironmentForcing, checkpoint_forcing
 from particula.execution.ode import AdaptiveSolver, StepStatistics
+from particula.execution.split_restart import SplitCheckpoint
 
 
 @dataclass(frozen=True)
@@ -37,18 +39,18 @@ class CondensationCheckpoint:
     last_error: float | None
     statistics: StepStatistics
     viscosity: np.ndarray | None
+    forcing: EnvironmentForcing | None
 
 
 def checkpoint_condensation(owner):
     """Capture adaptive state without advancing or resetting its controller."""
     if type(owner) is not CondensationODE:
         raise TypeError("requires CondensationODE")
-    if owner._forcing is not None:
-        raise ValueError("callable forcing has no exact disk identity")
+    forcing = checkpoint_forcing(owner._forcing)
     solver = owner.solver
     plan = condensation_identity(owner._strategy)
     return CondensationCheckpoint(
-        1,
+        2,
         pack_native(owner._base),
         plan,
         solver.state,
@@ -64,6 +66,7 @@ def checkpoint_condensation(owner):
         solver.last_error,
         replace(solver.statistics),
         None if owner._viscosity is None else owner._viscosity.copy(),
+        forcing,
     )
 
 
@@ -72,14 +75,20 @@ def resume_condensation(saved, strategy):
     if (
         type(saved) is not CondensationCheckpoint
         or type(saved.schema_version) is not int
-        or saved.schema_version != 1
+        or saved.schema_version != 2
     ):
         raise ValueError("unsupported adaptive condensation checkpoint")
     base = unpack_native(saved.base)
     plan = condensation_identity(strategy)
     if plan != saved.configuration:
         raise ValueError("condensation physics differs from checkpoint")
-    owner = CondensationODE(base, strategy, dynamic_viscosity=saved.viscosity)
+    owner = CondensationODE(
+        base,
+        strategy,
+        dynamic_viscosity=saved.viscosity,
+        forcing=checkpoint_forcing(saved.forcing),
+        time=saved.time,
+    )
     if not np.array_equal(saved.scale, owner._scale):
         raise ValueError("adaptive coordinates differ from checkpoint")
     if saved.last_error is not None and (
@@ -110,7 +119,11 @@ def resume_condensation(saved, strategy):
 
 def save_cpu_checkpoint(checkpoint, path, *, compressed=True):
     """Atomically save supported native CPU or adaptive controller data only."""
-    if type(checkpoint) not in (CPUCheckpoint, CondensationCheckpoint):
+    if type(checkpoint) not in (
+        CPUCheckpoint,
+        CondensationCheckpoint,
+        SplitCheckpoint,
+    ):
         raise TypeError("unsupported native CPU checkpoint")
     encoder = _Encoder()
     tree = encoder.encode(checkpoint)
@@ -149,7 +162,11 @@ def load_cpu_checkpoint(path, *, max_bytes=512 * 1024 * 1024):
             )
         records, enums = _types()
         saved = _decode(metadata["checkpoint"], arrays, blobs, records, enums)
-        if type(saved) not in (CPUCheckpoint, CondensationCheckpoint):
+        if type(saved) not in (
+            CPUCheckpoint,
+            CondensationCheckpoint,
+            SplitCheckpoint,
+        ):
             raise ValueError("unsupported CPU restart record")
         return saved
     except (KeyError, TypeError, AttributeError) as error:

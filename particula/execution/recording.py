@@ -148,13 +148,34 @@ class Recorder:
             if not np.all(np.isfinite(value)):
                 raise ValueError("observations must be finite")
             row[name] = value
+        self._append(time, metadata, row)
+
+    def _append(self, time, metadata, row):
+        """Append native/reduced values through one atomic boundary."""
+        time = _cpu_batch.duration(time, 1)
+        if self.last_time is not None:
+            if time < self.last_time:
+                raise ValueError("observation time must not move backwards")
+            if time == self.last_time:
+                return
+        if self._metadata is not None and metadata != self._metadata:
+            raise ValueError("observation layout or species provenance changed")
+        if set(row) != set(self.variables):
+            raise ValueError("observation variables changed")
+        row = {name: np.array(value, copy=True) for name, value in row.items()}
+        for name, value in row.items():
+            shape = tuple(
+                metadata["dimensions"][axis] for axis in OBSERVABLES[name][2]
+            )
+            if value.shape != shape or not np.all(np.isfinite(value)):
+                raise ValueError("observations require finite native shapes")
         size = 8 + sum(value.nbytes for value in row.values())
         if (
             len(self._times) >= self.max_records
             or self._bytes + size > self.max_bytes
         ):
             raise ValueError("recording storage limit exceeded")
-        self._metadata = metadata
+        self._metadata = deepcopy(metadata)
         self._times.append(time)
         for name, value in row.items():
             self._rows[name].append(value)
@@ -175,8 +196,10 @@ def run_until(simulation, end_time, *, output_times=(), recorder=None):
 
     The owner supplies time, step(bound), and detached snapshot(). Every output
     is at a complete accepted step. Resumed calls skip older output requests and
-    Recorder prevents duplicates at the joining time. GPU owners require an
-    explicit adapter defining transfer costs and permissible output boundaries.
+    Recorder prevents duplicates at the joining time. Adaptive GPU observation
+    explicitly downloads a full accepted snapshot at each requested output.
+    Fixed prepared owners instead use run_prepared and PreparedObserver, which
+    define their grid admission and explicit reduced/full download profiles.
     """
     end_time = _cpu_batch.duration(end_time, 1)
     start = _cpu_batch.duration(simulation.time, 1)
@@ -204,5 +227,9 @@ def run_until(simulation, end_time, *, output_times=(), recorder=None):
                     "owner failed to advance to an accepted bounded time"
                 )
         if recorder is not None:
+            if isinstance(recorder, Recorder) and (
+                recorder.last_time == simulation.time
+            ):
+                continue
             recorder.record(simulation.time, simulation.snapshot())
     return simulation

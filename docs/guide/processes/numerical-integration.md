@@ -139,11 +139,14 @@ at absolute integration stage times. It must not consume RNG, modify external
 state, or depend on the order of rejected evaluations. Snapshot evaluation
 also calls forcing at the accepted time.
 
-Discontinuous forcing requires explicit interval boundaries and a defined
-one-sided value at the boundary; merely requesting a snapshot there does not
-define that convention. Arbitrary callables do not carry a portable restart
-identity. Use workflow facilities only for combinations whose forcing and
-restart contracts are explicitly documented.
+For reproducible step or linear environmental histories, use the immutable
+`EnvironmentForcing` table described in the
+[recording and restart guide](../getting-started/recording-restart.md). Adaptive
+owners and built-in condensation split flows land at table knots. Endpoint
+stages use the previous segment; snapshots at a knot use its right-continuous
+environment. Tables have a supported disk identity. Arbitrary discontinuous
+callbacks still require caller-defined boundaries and one-sided values, and
+cannot be saved as exact restart forcing.
 
 Observe only after an accepted complete step or split cycle. Shortening a step
 to land on an output time can change the adaptive trajectory. Compare runs

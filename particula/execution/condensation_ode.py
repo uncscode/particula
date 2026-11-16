@@ -19,6 +19,7 @@ from particula.dynamics.condensation.species_mapping import (
     condensation_population_weights,
     validate_condensation_state,
 )
+from particula.execution.forcing import _EnvironmentSegment, forcing_interval
 from particula.execution.ode import AdaptiveSolver, ODEProblem, TrialDomainError
 
 
@@ -30,7 +31,8 @@ class CondensationODE:
     accepted clock and a maximum component error, so no small box/species can
     be hidden in an average. Forcing, if supplied, is a pure function of time
     returning (temperature[K], pressure[Pa]), each scalar or one value per box.
-    Discontinuities must be explicit run boundaries. Full evaporation of an
+    EnvironmentForcing tables impose knot boundaries; opaque discontinuous
+    callbacks require explicit run boundaries. Full evaporation of an
     active slot is a domain boundary; unsupported crossings fail at min_step.
     """
 
@@ -249,6 +251,10 @@ class CondensationODE:
         if self._forcing is None:
             return np.zeros_like(values)
         delta = np.sqrt(np.finfo(float).eps) * max(abs(time), 1.0)
+        if type(self._forcing) is _EnvironmentSegment:
+            delta = min(delta, self._forcing.end - time)
+        if delta <= 0:
+            return np.zeros_like(values)
         return (
             self._rate(time + delta, values) - self._rate(time, values)
         ) / delta
@@ -260,7 +266,9 @@ class CondensationODE:
 
     def step(self, bound):
         """Accept one physical step no later than bound [s]."""
-        return self.solver.step(bound)
+        bound = AdaptiveSolver._scalar(bound, "bound", positive=False)
+        with forcing_interval(self, bound) as endpoint:
+            return self.solver.step(endpoint)
 
     def snapshot(self):
         """Return detached accepted native state, including forcing."""

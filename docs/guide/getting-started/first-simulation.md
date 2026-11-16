@@ -114,7 +114,8 @@ then rerun and compare both remaining vapor and radius. Select a new output
 directory to preserve earlier files. Before interpreting a named compound,
 justify its material properties and compare with independent measurements.
 
-Next: [native construction](../data-model/construction.md),
+Next: [recording, forcing and restart](recording-restart.md),
+[native construction](../data-model/construction.md),
 [ownership](../data-model/ownership.md), and
 [condensation](../processes/condensation.md). Process combinations and broader
 size distributions need their own numerical and scientific checks.

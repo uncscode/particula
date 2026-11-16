@@ -138,3 +138,40 @@ def test_duplicate_json_keys_are_rejected(tmp_path):
         archive.writestr("manifest.json", '{"format":1,"format":2}')
     with pytest.raises(ValueError, match="duplicate JSON"):
         load_analysis(path)
+
+
+def test_writer_retries_failed_file_without_repeating_physics(
+    tmp_path, monkeypatch
+):
+    """An observer write failure retains the old archive and accepted new row."""
+    import particula.execution.archive as archive
+    from particula.execution.analysis_io import AnalysisWriter
+    from particula.execution.recording import run_until
+    from particula.execution.tests.recording_test import Owner
+
+    path = tmp_path / "growing.pca"
+    history, owner = Recorder(), Owner()
+    writer = AnalysisWriter(
+        history,
+        path,
+        configuration={"decay_s-1": 1},
+        numerical_settings={"maximum_step_s": 0.1},
+        source_identity={"test": True},
+    )
+    run_until(owner, 0.1, recorder=writer)
+    old = path.read_bytes()
+    with monkeypatch.context() as patch:
+
+        def fail(*args):
+            raise OSError("temporary storage failure")
+
+        patch.setattr(archive.os, "replace", fail)
+        with pytest.raises(OSError, match="storage"):
+            run_until(owner, 0.2, recorder=writer)
+    assert owner.time == history.last_time == 0.2
+    assert path.read_bytes() == old
+    calls = owner.calls
+    writer.flush()
+    assert owner.calls == calls
+    npt.assert_array_equal(load_analysis(path).arrays["time"], [0.1, 0.2])
+    assert not list(tmp_path.glob(".growing.pca.*"))

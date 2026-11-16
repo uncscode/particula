@@ -2023,6 +2023,24 @@
       ],
       "role": "Examples",
       "start_here": true
+    },
+    {
+      "source": "docs/guide/getting-started/recording-restart.md",
+      "title": "Record, save and restart a simulation",
+      "topic": "cpu",
+      "also": [
+        "gpu"
+      ],
+      "role": "Guide",
+      "start_here": false
+    },
+    {
+      "source": "docs/contribute/validation/numerics/simulation-workflow.md",
+      "title": "Simulation workflow qualification",
+      "topic": "verification",
+      "also": [],
+      "role": "Contribute",
+      "start_here": false
     }
   ],
   "supporting": [

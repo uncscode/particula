@@ -1,6 +1,7 @@
 # Stage 2B: Simulation workflow and reproducibility
 
-Status: implementation in progress; see the [delivery ledger](stage-02b-delivery.md).
+Status: implemented and locally validated; PR delivery pending.
+See the [delivery ledger](stage-02b-delivery.md).
 Entry dependency: an initial
 [Stage 1 reference case](stage-01-scientific-correctness.md).
 Coordinate accepted-step and time semantics with [Stage 2A](stage-02a-numerical-integration.md).

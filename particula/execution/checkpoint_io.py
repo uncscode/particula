@@ -29,13 +29,21 @@ def _types():
     )
     from particula.execution.cpu_restart import CondensationCheckpoint
     from particula.execution.cpu_simulation import CPUCheckpoint
+    from particula.execution.extension_registry import ProcessCapabilities
+    from particula.execution.forcing import EnvironmentForcing
+    from particula.execution.gpu_restart import GPUCondensationCheckpoint
     from particula.execution.gpu_session import (
         ResidentDimensions,
         ResidentLifecycle,
     )
     from particula.execution.ode import StepStatistics
     from particula.execution.prepared_processes import _ProcessPlan
+    from particula.execution.process_extensions import (
+        GPUProcessPlan,
+        GPUStateSpec,
+    )
     from particula.execution.rng import StreamDescriptor, StreamKey
+    from particula.execution.split_restart import SplitCheckpoint
     from particula.extension_fields import FieldSpec
     from particula.gas import EnvironmentData, GasData
     from particula.particles import ParticleData
@@ -43,6 +51,12 @@ def _types():
     records = (
         CPUCheckpoint,
         CondensationCheckpoint,
+        SplitCheckpoint,
+        GPUCondensationCheckpoint,
+        GPUProcessPlan,
+        GPUStateSpec,
+        ProcessCapabilities,
+        EnvironmentForcing,
         StepStatistics,
         FieldSpec,
         SimulationCheckpoint,

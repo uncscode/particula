@@ -8,6 +8,7 @@ Results are specific to their recorded revision, workload, and device.
 | --- | --- |
 | What supports the scientific baseline? | [Scientific correctness](numerics/scientific-correctness.md) |
 | Which adaptive method and splitting choices are qualified? | [Adaptive integration assessment](numerics/adaptive-methods.md) |
+| What supports recording and exact continuation? | [Simulation workflow](numerics/simulation-workflow.md) |
 | What supports independent CPU/CUDA optics? | [Reference corpus](optics/reference-corpus.md) and [CUDA qualification](optics/cuda.md) |
 | Is the native migration approved for release? | [v0.3.0 gates](releases/v0.3.0.md): maintainer/release approval remains pending |
 | What supports the mass representation? | [Mass precision](numerics/mass-precision.md) |

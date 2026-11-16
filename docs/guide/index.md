@@ -19,6 +19,7 @@ to connect a research question with explanations, examples, and model choices.
 | Find the science behind a research question | [Explore topics](topics/index.md) |
 | Set up agentic plugins | [Agentic plugins](ai-assistants/index.md) |
 | Configure particle, gas, and environment state | [Data model](data-model/index.md) |
+| Record selected output and continue a saved run | [Recording and restart](getting-started/recording-restart.md) |
 | Simulate growth, collisions, sources, or losses | [Processes](processes/index.md) |
 | Use explicit Warp transfers and device execution | [GPU selection](gpu/backend-selection.md), then [resident checkpoints](gpu/resident/checkpoints.md) |
 | Capture a resident loop on native CUDA | [Graph-capture runbook](gpu/resident/graph-capture.md) |

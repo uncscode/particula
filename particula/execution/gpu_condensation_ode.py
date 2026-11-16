@@ -15,6 +15,7 @@ import warp as wp
 from particula import _cpu_batch
 from particula.dynamics import CondensationIsothermal, MassCondensation
 from particula.execution import _condensation_ode_kernels as algebra
+from particula.execution.forcing import forcing_interval
 from particula.execution.ode import (
     AdaptiveSolver,
     StepStatistics,
@@ -38,8 +39,9 @@ class GPUCondensationODE:
     are rejected. Full active-slot evaporation remains a domain boundary.
 
     Optional forcing is a pure time -> (temperature[K], pressure[Pa]) callback.
-    Every stage explicitly uploads those box values. Discontinuities require
-    explicit step boundaries. No arbitrary/stochastic runnable is adapted.
+    Every stage explicitly uploads those box values. EnvironmentForcing tables
+    impose knot boundaries; opaque discontinuous callbacks require explicit
+    step boundaries. No arbitrary/stochastic runnable is adapted.
     Capture is unsupported because each trial reads control reductions on host.
     """
 
@@ -396,6 +398,11 @@ class GPUCondensationODE:
         """Accept one bounded device trial with scalar control readbacks."""
         self._check_ready()
         bound = AdaptiveSolver._scalar(bound, "bound", positive=False)
+        with forcing_interval(self, bound) as endpoint:
+            return self._step(endpoint)
+
+    def _step(self, bound):
+        """Advance within one smooth forcing interval."""
         if bound < self.time:
             raise ValueError("bound precedes accepted time")
         if bound == self.time:

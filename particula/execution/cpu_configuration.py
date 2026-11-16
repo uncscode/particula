@@ -28,6 +28,7 @@ from particula.dynamics.nucleation.nucleation_configuration import (
 from particula.dynamics.nucleation.species_mapping import NucleationSpeciesMap
 from particula.dynamics.particle_process import NucleationCommitConfig
 from particula.dynamics.wall_loss import wall_loss_strategies as wl
+from particula.execution.forcing import EnvironmentForcing
 from particula.gas import latent_heat_strategies as lh
 from particula.gas import vapor_pressure_strategies as vp
 from particula.particles import activity_strategies as ac
@@ -43,6 +44,7 @@ NATIVE_PROCESSES = (
 )
 
 _CONFIGURATION_TYPES = (
+    EnvironmentForcing,
     *NATIVE_PROCESSES,
     BrownianCoagulationStrategy,
     DilutionStrategy,

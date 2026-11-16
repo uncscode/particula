@@ -7,12 +7,14 @@ This bounded single-file format suits selected histories; it is not a streaming
 store for unlimited particle snapshots, nor an exact-restart format.
 """
 
+from copy import deepcopy
 from dataclasses import dataclass
+from pathlib import Path
 
 import numpy as np
 
 from particula import __version__
-from particula.execution.archive import read_archive, write_archive
+from particula.execution.archive import _json_bytes, read_archive, write_archive
 from particula.execution.recording import OBSERVABLES, Recorder
 
 
@@ -22,6 +24,61 @@ class AnalysisResult:
 
     metadata: dict
     arrays: dict[str, np.ndarray]
+
+
+class AnalysisWriter:
+    """Compose accepted recording with atomic replacement of an analysis file.
+
+    Each new output saves the bounded history so far. A write failure leaves
+    accepted physics and the new in-memory row intact; the prior file remains
+    usable. flush() retries that row without advancing physics or duplicating
+    history. File writing is a host observation action, outside CUDA capture.
+    """
+
+    def __init__(
+        self,
+        recorder,
+        path,
+        *,
+        configuration,
+        numerical_settings,
+        source_identity,
+        compressed=True,
+    ):
+        """Detach and validate provenance without creating an output file."""
+        if not isinstance(recorder, Recorder):
+            raise TypeError("AnalysisWriter requires a Recorder")
+        self.recorder = recorder
+        self.path = Path(path)
+        self._options = deepcopy(
+            dict(
+                configuration=configuration,
+                numerical_settings=numerical_settings,
+                source_identity=source_identity,
+                compressed=compressed,
+            )
+        )
+        for value in (configuration, numerical_settings, source_identity):
+            if not isinstance(value, dict):
+                raise TypeError("provenance inputs must be JSON objects")
+            _json_bytes(value)
+        self._saved_time = None
+
+    @property
+    def last_time(self):
+        """Return the last recorded time, including an unsaved row."""
+        return self.recorder.last_time
+
+    def record(self, time, state):
+        """Record a complete accepted state and save its accumulated history."""
+        self.recorder.record(time, state)
+        self.flush()
+
+    def flush(self):
+        """Save an unsaved row; successful repeats do not replace the file."""
+        if self.last_time is not None and self.last_time != self._saved_time:
+            save_analysis(self.recorder, self.path, **self._options)
+            self._saved_time = self.last_time
 
 
 def save_analysis(

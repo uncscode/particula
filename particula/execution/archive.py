@@ -60,6 +60,15 @@ def write_archive(path, *, kind, metadata, arrays, blobs=None, compressed=True):
     Parent directories must already exist. Compression occurs on host outside
     simulation execution/capture. blobs stores immutable checkpoint bytes.
     """
+    # Inspect only an already initialized runtime: CPU archive writing must
+    # neither initialize CUDA nor allocate a device just to check this guard.
+    from warp._src import context
+
+    runtime = context.runtime
+    if runtime is not None and any(
+        device.is_capturing for device in runtime.cuda_devices
+    ):
+        raise RuntimeError("archive writing cannot run during CUDA capture")
     if kind not in ("analysis", "restart"):
         raise ValueError("archive kind must be analysis or restart")
     payloads, descriptors = {}, {}

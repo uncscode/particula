@@ -1,124 +1,90 @@
-# Stage 2B execution target
+# Stage 2B delivery and evidence
 
-Status: in progress; no completion claim.
+Status: implemented, locally validated and reviewed; final PR delivery pending.
 Worktree: `/tmp/particula-stage-02b`.
 Branch: `codex/stage-02b-simulation-workflow`.
-Verified upstream base: `356fc054cd9a4f4ececc3c64c7144e889a789494`.
-Current integration base: Stage 2A commit
-`c6e8bf0967` (native CUDA adaptive condensation and measured method guide).
-PR target: `uncscode/particula:main`, with the stacked Stage 2A dependency
-identified explicitly. No matching PR existed at start; no PR created yet.
-Merge is outside execution scope.
+Verified upstream main: `356fc054cd9a4f4ececc3c64c7144e889a789494`.
+Dependency: Stage 2A [PR #1659](https://github.com/uncscode/particula/pull/1659).
+PR target: `uncscode/particula:codex/stage-02a-numerical-integration`, so the
+workflow diff is independently reviewable. Merge is outside execution scope.
 
-## Completion boundary and evidence ledger
+## Completion boundary
 
 All six work packages and acceptance criteria in
-[Stage 2B](stage-02b-simulation-workflow.md) remain required. Shared physics is
-Stage 1 monodisperse closed-box growth, with dilution for coupled checks.
+[Stage 2B](stage-02b-simulation-workflow.md) are covered by the declared profiles.
+Shared physics is Stage 1 monodisperse closed-box growth, with dilution for
+coupled checks. Concrete imports preserve existing public runnable APIs.
 
-- [ ] Duration, forcing, requested output times, variables and units contract.
-- [ ] Composable detached recorder/save actions at accepted complete steps.
-- [ ] Exact output landing, final outputs, coincident forcing and resumed joins.
+- [x] Duration, forcing, requested output times, variables and units contract.
+- [x] Composable detached recorder/save actions at accepted complete steps.
+- [x] Exact output landing, final outputs, coincident forcing and resumed joins.
 - [x] Analysis format comparison and portable non-executable schema.
 - [x] Reloadable diagnostics/optional bounded snapshots with units, dimensions,
       maps, population measure, volume, configuration and numerical provenance.
-- [ ] Versioned exact restart retaining state, physics, clock, RNG, controller
-      and auxiliary state for all declared CPU/GPU combinations.
-- [ ] Atomic replacement/corruption rejection and complete restart matrix.
-- [ ] Observer invariance and alternate-output accuracy; rejected trials,
+- [x] Versioned exact restart retaining state, physics, clock, RNG, controller
+      and auxiliary state for declared CPU/GPU combinations.
+- [x] Atomic replacement/corruption rejection and supported restart matrix.
+- [x] Observer invariance and alternate-output accuracy; rejected trials,
       complete split steps, final time, resumed schedules and forcing coverage.
-- [ ] Explicit GPU downloads and serialization outside CUDA capture.
+- [x] Explicit GPU downloads and serialization outside CUDA capture.
 - [x] Realistic first CPU example: full time series, plotted saved/reloaded data,
       exact restart and controlled scientific input variation; visually checked.
-- [ ] Supported workflow documentation, broad validation, review and PR.
+- [x] Supported workflow documentation, broad validation and implementation review.
+- [ ] Commit, push and separate dependent PR.
 
-Unchecked items have partial implementations below; no omitted requirement is
-implicitly waived. Interfaces remain concrete imports, not package-root exports.
+## Authoritative implementation and evidence
 
-## Implemented contracts and current evidence
+The [workflow guide](../docs/guide/getting-started/recording-restart.md) owns
+supported usage, output timing, forcing, transfer costs and restart boundaries.
+The [qualification record](../docs/contribute/validation/numerics/simulation-workflow.md)
+retains the requirement-to-test matrix, format decision, scientific reference
+limits, commands and results. The
+[first CPU experiment](../docs/examples/fundamentals/first_cpu_workflow.py)
+is the complete run/record/plot/save/load/restart/input-variation demonstration.
 
-`recording.Recorder` retains selected detached observations with units, axes,
-full gas names/molar masses/partitioning, density, volume and PDF metadata.
-Full slots are opt-in and storage is bounded. `run_until` lands on requested
-output/final times and skips older requests on resume without duplicate rows.
-Identical schedules preserve trajectory and RNG. Adaptive rejections emit no
-rows; complete Strang cycles preserve the independently expected growth/loss
-budget. Different output schedules meet an independent radius-quadrature target.
-Forcing/event integration and prepared-owner observation are still pending.
+Implemented owners are native `CPUSimulation`, CPU RK23/ROS2 condensation,
+GPU RK23 condensation, complete-cycle deterministic split simulation and existing
+prepared execution. `EnvironmentForcing` tables impose one-sided step/linear
+knots. `Recorder` and `AnalysisWriter` observe accepted complete work;
+`PreparedObserver` explicitly chooses reduced or full downloads on the fixed
+grid. Analysis and restart use separate versioned non-executable archives.
 
-Analysis uses versioned ZIP/JSON/NPY with payload hashes, byte limits, unique
-members/keys and NPY header checks before allocation. HDF5/Zarr offer chunked
-access but add dependencies/atomic multi-object complexity; the chosen format
-is for bounded single-file histories. Atomic temporary-file replacement protects
-the last complete file. Loaders do not use pickle or import file-named types.
-Analysis and restart are separate schemas and cannot substitute for one another.
+Exact continuation is tested for native CPU process/RNG/field state, adaptive
+scaled coordinates/controller/forcing, nested built-in split flows, six prepared
+process profiles, registered GPU state/clock/fields/multiple RNG streams, and
+explicit mixed CPU/GPU host RNG. Caller-supplied compatible physics and registries
+remain required. Arbitrary split callbacks and opaque forcing have no exact disk
+identity; unsupported schemas, changed devices or physics reject. These are the
+explicit supported-profile boundaries required by the plan, not omitted claims.
 
-Prepared disk restart transports SimulationCheckpoint v2 and ResidentCheckpoint
-v5 using fixed allowed records. Canonical immutable bytes remain authority;
-CPU inspection carriers are regenerated before saving. Exact package/NumPy/Warp
-and device/process compatibility remain required. Actual Warp CPU and RTX 5060
-checks preserve future canonical state/RNG after disk round trips for dilution,
-Brownian coagulation, wall loss, sequence, latent condensation and an integral
-nucleation pulse. Custom extension record qualification remains incomplete.
+## Validation and review
 
-Native `CPUSimulation` stages state, process diagnostics and CPU RNG together;
-it never launches Warp. Known native configuration signatures retain options
-that the GPU planner cannot represent. CPU checkpoints include native carriers,
-extension fields and additive ledgers, RNG, clock/cycle count and latent-energy
-diagnostics. Tests cover native stochastic processes, randomized staggered
-condensation, non-unit volumes, detached data, configuration rejection and
-later-component failure rollback. Unknown custom physics is rejected.
+- Combined package: **10679 passed, 19 skipped, 57 deselected, 1 xfailed**;
+  **91.18% coverage** with normal 80% gate and warnings as errors. Actual CUDA ran.
+- Tooling and examples: **565 passed, 1 skipped** with warnings as errors.
+- Final combined numerical/workflow set: **158 passed**; all fourteen changed
+  runtime modules have **90% aggregate coverage**. Capture rejection and mixed
+  CPU/GPU disk continuation are included.
+- Save/restart subset after the capture guard: **57 passed**; final prepared
+  codec matrix including mixed host RNG: **23 passed**.
+- Full Ruff and format checks passed (753 files), standard Mypy passed
+  (673 sources). No numerical tolerance or coverage gate was weakened.
+- All six workflow guide blocks executed, including real CUDA. The complete
+  first CPU example refreshed; its 300-DPI figure was inspected, and saved
+  summaries exclude full restart state. New navigation/topic/structure checks
+  passed. Final site build: **554 pages**; **684 HTML pages, 319 API modules
+  and 130 redirects** verified with zero errors; rendered structure also passed.
 
-Adaptive condensation checkpoints retain scaled coordinates, physical inputs,
-tolerances, accepted clock, next step, last error, work counters and viscosity.
-RK23 and ROS2 resume bitwise on identical future schedules. Arbitrary callable
-forcing has no supported disk identity. Split-owner and declarative forcing
-restart remain pending, not covered by the adaptive checkpoint claim.
+Review covered the full workflow diff and owning numerical/lifecycle contracts,
+with particular attention to no partial trial output, native species/volume
+metadata, detached histories, exact coordinate and RNG continuation, one-sided
+forcing and archive safety. One finding was fixed: already-created host data
+could be serialized inside active CUDA capture. The shared archive writer now
+rejects that before file replacement without initializing CUDA for CPU output.
+The actual-CUDA regression covers all four save APIs and preserves the old file.
+No unresolved implementation finding remains in the declared profile.
 
-## First simulation
-
-`docs/examples/fundamentals/first_cpu_workflow.py` replaces the exaggerated
-100 kg/m3 guide case with 600 s organic growth at 10 and 20 micrograms/m3 vapor,
-100 nm initial radius and 1000 particles/cm3. Each full workload records 61
-rows, saves/reloads analysis, restarts at 300 s and checks exact future state.
-Final radii are 136.6858 and 162.1279 nm; relative budget residuals are below
-7e-16. These are illustrative model predictions, not experimental validation.
-Both guide reload/restart snippets execute against actual saved output.
-
-The registered `first-cpu-workflow` bundle contains compact plotted summaries
-and one visually inspected 300-DPI figure. Restart files stay in temporary
-publication storage and are not committed. The report records executing source
-version 0.3.1; the environment's installed metadata still says 0.2.14 in the
-standard manifest. Source hash/revision/dirty state distinguish the actual
-checkout. Dependencies were not upgraded to conceal that metadata mismatch.
-
-## Current validation and remaining work
-
-Combined numerical/workflow/tutorial suite: **81 passed with -Werror**, including
-actual CUDA, using the selected worktree's `.venv` with `PYTHONPATH=.`. Coverage
-of the seven new runtime modules: **87% aggregate**, normal 80% gate passed;
-per-module coverage is analysis 74%, archive 86%, prepared codec 91%, native
-configuration 90%, CPU restart 86%, CPU owner 88%, recorder 90%.
-
-Coverage was collected with `coverage run --source=particula/execution` and
-reported with the seven explicit source paths. Dotted module discovery caused
-coverage to import/unload NumPy before collection; directory discovery avoids
-that failure without suppressing warnings or changing the coverage gate.
-Ruff/format and checked-body Mypy passed for new runtime sources. The complete
-example refresh succeeded with local Jupyter socket access. Astro used an
-isolated dependency copy, built 544 pages, and verified API/redirect targets
-without errors. Full-package coverage and final review remain pending.
-
-Next: forcing/event semantics and checkpoint identity; prepared GPU observations
-with explicit transfer costs and capture limits; split restart; GPU extension
-codecs; complete workflow/method guides; broad repository validation and PRs.
-Stage 2A native CUDA adaptive qualification and the measured method guide are
-now integrated. Its broad package/tooling checks passed; shared workflow
-compatibility and both PRs remain open. Neither stage is complete.
-
-After rebasing onto that numerical implementation, the recording/analysis/disk
-restart/native CPU restart/native GPU subset passed **70 tests with -Werror**,
-including actual CUDA. The two first-workflow example tests also passed. Both
-documentation topic additions were preserved and
-the combined graph validates. The Stage 2B workflow commit is `2cd525c9de`;
-no duplicate branch or PR was created.
+Stage 2A's source-hashed method measurements remain unchanged; workflow hooks
+are separately qualified by forcing and continuation tests. Hosted PR status
+will be reported separately from local validation; neither local checks nor PR
+creation claim a merge, release or production documentation deployment.

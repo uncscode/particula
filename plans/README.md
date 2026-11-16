@@ -1,6 +1,6 @@
 # Particula development plans
 
-Updated: 2026-11-15. Status: proposed development scope for discussion.
+Updated: 2026-11-15. Status: staged development and delivery tracking.
 
 These eight plans organize the next development work into six stages. The
 previous six plans are completed and retired; they are removed rather than
@@ -10,6 +10,11 @@ The aim is a dependable aerosol research framework: scientifically supported
 results, practical research workflows, useful acceleration, and reproducible
 inference. Stage numbers indicate the intended order of major outcomes, not a
 requirement to stop all other work until an entire stage is finished.
+
+Stage 1 is delivered in PR #1658; Stage 2A is delivered in
+[PR #1659](https://github.com/uncscode/particula/pull/1659). Stage 2B is implemented
+and locally validated; see its [delivery record](stage-02b-delivery.md).
+Stages 3–6 remain proposed.
 
 ## Staged development
 

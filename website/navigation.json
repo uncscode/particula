@@ -46,6 +46,10 @@
             "slug": "examples/fundamentals/first_cpu_workflow"
           },
           {
+            "label": "Record, save and restart",
+            "slug": "guide/getting-started/recording-restart"
+          },
+          {
             "label": "Installation",
             "collapsed": true,
             "items": [
@@ -1055,6 +1059,10 @@
               {
                 "label": "Adaptive integration assessment",
                 "slug": "contribute/validation/numerics/adaptive-methods"
+              },
+              {
+                "label": "Simulation workflow qualification",
+                "slug": "contribute/validation/numerics/simulation-workflow"
               },
               {
                 "label": "Mass Precision Recommendation Report",
