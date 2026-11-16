@@ -2,7 +2,7 @@
 
 Updated: 2026-11-15. Status: proposed development scope for discussion.
 
-These seven plans organize the next development work into five stages. The
+These eight plans organize the next development work into six stages. The
 previous six plans are completed and retired; they are removed rather than
 carried forward as unfinished work. Their history remains in Git.
 
@@ -18,10 +18,11 @@ requirement to stop all other work until an entire stage is finished.
 | 1 | [Scientific correctness and verification](stage-01-scientific-correctness.md) | Correct known defects and establish independent reference cases and accuracy boundaries. |
 | 2A | [Numerical integration and process splitting](stage-02a-numerical-integration.md) | Supported CPU/GPU stepping choices with measured accuracy, error control, and explicit process ordering. |
 | 2B | [Simulation workflow and reproducibility](stage-02b-simulation-workflow.md) | Convenient run, record, save, plot, and restart workflows with explicit scientific inputs. |
-| 3A | [Thermodynamics, chemistry, and additional physics](stage-03a-thermodynamics-and-chemistry.md) | First connect existing thermodynamic capabilities; select further physics from demonstrated research needs. |
+| 3A | [Thermodynamics and additional physics](stage-03a-thermodynamics.md) | First connect existing thermodynamic capabilities; select further physics from demonstrated research needs. |
 | 3B | [Scientific and experimental comparisons](stage-03b-scientific-comparisons.md) | Reproduce selected published results and compare predictions with independent measurements. |
 | 4 | [GPU scientific usefulness and reliability](stage-04-gpu-qualification.md) | Establish reliable acceleration of complete scientific workloads at comparable accuracy. |
 | 5 | [Inverse modeling and automatic differentiation](stage-05-inverse-modeling.md) | Recover supported initial-state quantities with tested inference and gradient methods. |
+| 6 | [Configurable chemistry model](stage-06-chemistry-model.md) | Bind reactions to user species with shared CPU/GPU configuration, then qualify gas, particle, and coupled chemistry. |
 
 Stage 2A and 2B can proceed together once a small Stage 1 reference set exists.
 Select Stage 3 comparison cases early so they guide both efforts. Stage 3A's
@@ -33,12 +34,65 @@ checks belong in every earlier plan that changes GPU behavior. Stage 5 depends
 on a qualified forward workflow for its chosen problem, not on finishing every
 possible physics extension or GPU benchmark.
 
+Stage 2A begins with an assessment of error estimation, higher-order methods,
+stiff methods, and conservative alternatives before selecting production
+solvers. Its small chemistry benchmark informs Stage 6 without bringing the
+full chemistry feature into the early stages.
+
+Stage 6 is a later development priority. Its technical prerequisites are
+verified state/accounting, suitable numerical methods, recording/restart, and
+the thermodynamics required by the selected mechanism. It does not depend on
+finishing autodiff; chemistry gradients are outside its initial scope.
+
 ## Continuous literature discovery, outside the stages
 
 The [literature scheduler](literature-scheduler.md) is a separate proposal for
-recurring discovery and candidate screening. It feeds Stage 3B and can run
-alongside any stage. Writing this proposal does not create an automation, set
-its execution time, or authorize automatic reproduction studies.
+recurring discovery, candidate selection, and reproducible comparisons. It
+feeds Stage 3B and can run alongside any stage. Each new selected study
+iteration gets its own worktree, branch, and completed-work PR. Updating these
+instructions does not itself activate the schedule or launch the studies.
+
+## Worktree, branch, and PR workflow
+
+Apply this workflow whenever executing any plan in this folder:
+
+Before implementation, record a bounded completion target: the selected case,
+included work packages, deliverables, acceptance metrics, supported backends,
+and deferred extensions. Resolve the open decisions needed for that target.
+Continuous verification and optional future physics do not make a plan's first
+delivery unfinishable. A smaller milestone must be labeled explicitly and must
+not claim completion of omitted acceptance criteria.
+
+1. **Create an isolated worktree and branch.** Before implementation, inspect
+   existing worktrees, branches, remotes, and open PRs. Fetch and verify the
+   intended upstream base; `origin` may be a fork. Create a dedicated Git
+   worktree and a new `codex/<plan-slug>` branch for that plan. Record the
+   worktree path, branch, and base revision in the execution report. Preserve
+   unrelated changes in the starting checkout. If prerequisites are still on
+   another branch, identify that dependency and the intended PR base explicitly.
+2. **Develop inside that worktree.** Read its current repository guidance and
+   carry out the plan's work packages, scientific acceptance criteria, and
+   relevant documentation changes on its dedicated branch. Use that checkout's
+   environment; do not accidentally import or test another worktree's code.
+3. **Validate and review.** Run the checks required by the changed behavior,
+   inspect the complete diff, and fix findings. Record commands, results,
+   scientific evidence, and remaining limitations. A missing required check
+   remains an incomplete requirement rather than a passing result.
+4. **Commit and open a PR when complete.** Commit the intended changes, push
+   the plan branch to the appropriate writable remote, and create a PR against
+   the verified target repository/base. Follow its PR template and describe the
+   outcome, validation, and limitations. Include the PR URL in the completion
+   report. PR creation is part of executing the plan; merging is a separate step.
+5. **Resume without duplicating work.** An interrupted execution resumes its
+   existing worktree and branch. Update an existing PR for the same work rather
+   than opening a duplicate. Keep unfinished work available for continuation.
+   After merge, record the merged revision and carry durable evidence forward.
+   Remove a worktree only after confirming its work is preserved and it has no
+   uncommitted changes or study outputs that still need retaining.
+
+Each staged plan owns its own worktree and branch. The literature scheduler
+uses this same workflow separately for **each new selected study iteration**;
+it must not accumulate different studies on one long-lived scheduler branch.
 
 ## Shared working agreements
 
@@ -67,6 +121,7 @@ its execution time, or authorize automatic reproduction studies.
 3. Agree on analysis-output and exact-restart requirements before committing to
    a storage format or a new simulation interface.
 4. Choose the first thermodynamic connection needed by the selected case.
-   Broader chemistry and additional physics remain separately scoped follow-ons.
+   Refine Stage 6's species binding and reaction schema separately from the
+   solver choice; choose one small mechanism for its first qualification case.
 5. Set the literature scheduler's cadence and time when activating it; those
    settings are independent of the development stages.

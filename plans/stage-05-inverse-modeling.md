@@ -6,6 +6,13 @@ with validated [numerics](stage-02a-numerical-integration.md), reproducible
 [observation comparison](stage-03b-scientific-comparisons.md).
 GPU-specific claims also require relevant [Stage 4 evidence](stage-04-gpu-qualification.md).
 
+## Execution and delivery
+
+Create a dedicated worktree and `codex/stage-05-inverse-modeling` branch when
+starting this plan. Develop and validate there, then commit, push, and create
+a PR when the plan's acceptance criteria are met. Follow the shared
+[worktree, branch, and PR workflow](README.md#worktree-branch-and-pr-workflow).
+
 ## Outcome
 
 Infer supported aerosol initial-state quantities from observations, quantify
@@ -70,5 +77,7 @@ requested, is a distinct scope decision rather than an implicit expansion.
   passing any one of them alone does not qualify the combination.
 
 Use the [validation reference](../plugins/particula-helper/references/repository-validation.md).
-This stage does not depend on implementing the entire future chemistry catalog,
-but it does depend on the physics required by its selected inverse problem.
+This stage does not depend on implementing the
+[later chemistry model](stage-06-chemistry-model.md), but it does depend on the
+physics required by its selected inverse problem. Chemistry differentiability
+would need its own qualification rather than being implied by either plan.

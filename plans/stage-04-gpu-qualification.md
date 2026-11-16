@@ -5,6 +5,13 @@ Status: proposed. Entry dependency: a supported forward workflow with relevant
 [numerical accuracy](stage-02a-numerical-integration.md), and
 [recording](stage-02b-simulation-workflow.md) evidence.
 
+## Execution and delivery
+
+Create a dedicated worktree and `codex/stage-04-gpu-qualification` branch when
+starting this plan. Develop and validate there, then commit, push, and create
+a PR when the plan's acceptance criteria are met. Follow the shared
+[worktree, branch, and PR workflow](README.md#worktree-branch-and-pr-workflow).
+
 ## Outcome
 
 Demonstrate where GPU execution makes a useful aerosol study faster or enables

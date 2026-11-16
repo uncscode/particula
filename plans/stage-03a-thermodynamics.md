@@ -1,16 +1,24 @@
-# Stage 3A: Thermodynamics, chemistry, and additional physics
+# Stage 3A: Thermodynamics and additional physics
 
 Status: proposed. Entry dependencies: relevant
 [scientific references](stage-01-scientific-correctness.md) and
 [numerical contracts](stage-02a-numerical-integration.md).
 Coordinate with [Stage 3B comparisons](stage-03b-scientific-comparisons.md).
 
+## Execution and delivery
+
+Create a dedicated worktree and `codex/stage-03a-thermodynamics` branch when
+starting this plan. Develop and validate there, then commit, push, and create
+a PR when the plan's acceptance criteria are met. Follow the shared
+[worktree, branch, and PR workflow](README.md#worktree-branch-and-pr-workflow).
+
 ## Outcome and initial scope
 
 Make existing activity and equilibrium capabilities usable in a scientifically
 consistent native-state workflow. Start with the connection needed by the first
-selected comparison. Subsequent chemistry and additional thermodynamics are
-separately scoped extensions, not prerequisites for every later stage.
+selected comparison. The configurable chemistry model has its own later
+[Stage 6 plan](stage-06-chemistry-model.md). Further thermodynamics and other
+physics remain separately scoped extensions, not prerequisites for every stage.
 
 ## Starting point
 
@@ -39,12 +47,12 @@ chemistry mechanism or thermodynamic coupling.
    independent equilibrium results, and the selected published study. Evaluate
    timestep/splitting sensitivity and consistency of long-time kinetic limits
    where the physical assumptions permit that comparison.
-5. **Define chemistry coupling from a research requirement.** Select a named
-   mechanism or external solver only after specifying species, reaction rates,
-   environmental forcing, and exchange intervals. Use existing custom-process
-   boundaries where suitable; track elemental, mass, and charge budgets as
-   appropriate. Do not assume a previously discussed mechanism is approved by
-   this broad plan.
+5. **Define the thermodynamic handoff to chemistry.** Identify which activities,
+   phase volumes, and equilibrium relations a later reaction mechanism may use.
+   Preserve distinct kinetic and equilibrium responsibilities and explicit
+   reservoir accounting. Species/reaction configuration and chemical integration
+   belong to Stage 6; connecting existing activity models does not claim a
+   chemistry mechanism or automatically supply reverse reaction rates.
 6. **Select further physics.** Candidate extensions include vapor wall loss,
    inorganic thermodynamics, activation/parcel feedback, aggregate properties,
    composition-conserving binned coagulation, and new-particle-formation laws.
@@ -74,14 +82,15 @@ chemistry mechanism or thermodynamic coupling.
 - A support table identifies CPU and GPU capabilities. Unsupported GPU
   thermodynamics are rejected explicitly; CPU support does not imply CUDA
   support. New GPU claims require real CUDA evidence.
-- Each later chemistry/physics extension names its reference, selected
-  mechanism, conservation expectations, coupling policy, and reproducible case
+- Each later physics extension names its reference, model assumptions,
+  conservation expectations, coupling policy, and reproducible case
   before being treated as part of the framework's supported science.
 
 ## Completion boundary
 
 The first Stage 3A milestone is the existing-model connection needed by the
-selected case. Broader chemistry and additional physics can continue in later
-increments without blocking qualified GPU studies or inference on that case.
+selected case. Chemistry proceeds through [Stage 6](stage-06-chemistry-model.md),
+and additional physics can continue in later increments without blocking
+qualified GPU studies or inference on that case.
 Follow the [validation reference](../plugins/particula-helper/references/repository-validation.md)
 for adjacent tests and affected example refreshes.
