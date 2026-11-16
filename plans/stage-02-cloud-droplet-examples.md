@@ -123,11 +123,12 @@ The numerical evidence record owns detailed commands, results and limitations.
 
 The full single-cycle repeat completed before those corrections. The live
 multi-cycle, respiratory and biomass runs were deliberately stopped because
-their numerical source was superseded. All four complete workloads are running in a detached validation checkout
+their numerical source was superseded. The complete workloads run in a detached validation checkout
 pinned to `12742e1c394c7a836d31aff3aeecbd8c0ff2b523`. The first CPU workflow and
 two CPU comparison examples have completed refresh, inspection and replot.
-Wait for the four complete workloads and verify their results before accepting
-the migration. Keep the library unchanged during each refresh; the publication
+The corrected full single-cycle chamber also completed and its figure was
+inspected. Finish and verify the multi-cycle, respiratory and biomass results
+before accepting the migration. Keep the library unchanged during each refresh; the publication
 hash guard rejects a changed runtime. Current process records are retained in
 `.artifacts/cloud-followthrough-runs.json`; verify live handles before resuming
 or replacing a run.

@@ -394,7 +394,12 @@ refreshes from the clean revision, with package hash
 Their bundle hashes and matching source were verified before import, figures
 inspected, and saved data replotted. Corrected wet–dry ROS3 maximum radius
 errors are 4.07786e-6 and 3.39075e-8, still requiring 330/1,247 accepted steps.
-All four larger publication workloads remain running at this checkpoint.
+The corrected full single-cycle chamber subsequently completed in 304.95 s,
+retaining 1,000 particles over 60 s. Its inspected plot shows smooth dry
+relaxation, with peak diameter 23.19 µm, 788 survivors and 180.6% final
+wet/initial dry mass at printed precision. Its source and bundle hashes were
+verified before importing the clean-revision result. The multi-cycle,
+respiratory and biomass workloads remain running at this checkpoint.
 The current 558-page website build and rendered structure check both pass
 with zero structural errors.
 
