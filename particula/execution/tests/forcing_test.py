@@ -29,7 +29,7 @@ from particula.execution.splitting import SplitSimulation, condensation_flow
 from particula.execution.tests.condensation_ode_test import case
 
 
-@pytest.fixture(params=["rk23", "ros2", "warp-cpu", "cuda:0"])
+@pytest.fixture(params=["rk23", "ros2", "ros3", "warp-cpu", "cuda:0"])
 def backend(request):
     """Separate native CPU solvers, Warp CPU and actual CUDA evidence."""
     if request.param == "cuda:0" and not wp.is_cuda_available():
@@ -39,7 +39,7 @@ def backend(request):
 
 def owner_for(backend, initial, strategy, table, **controls):
     """Construct the explicitly requested numerical backend."""
-    if backend in ("rk23", "ros2"):
+    if backend in ("rk23", "ros2", "ros3"):
         return CondensationODE(
             initial, strategy, method=backend, forcing=table, **controls
         )
@@ -223,7 +223,7 @@ def test_forcing_disk_restart_at_jump_preserves_future(backend, tmp_path):
     recorder = Recorder(("temperature", "gas_concentration"))
     run_until(owner, 0.2, output_times=[0], recorder=recorder)
     path = tmp_path / "forced.pcr"
-    if backend in ("rk23", "ros2"):
+    if backend in ("rk23", "ros2", "ros3"):
         save_cpu_checkpoint(checkpoint_condensation(owner), path)
         restored = resume_condensation(load_cpu_checkpoint(path), strategy)
     else:
@@ -243,7 +243,7 @@ def test_forcing_disk_restart_at_jump_preserves_future(backend, tmp_path):
         restored.snapshot().gas.concentration,
     )
     npt.assert_array_equal(recorder.arrays()["time"], [0, 0.2, 0.5, 1])
-    if backend in ("rk23", "ros2"):
+    if backend in ("rk23", "ros2", "ros3"):
         assert owner.solver.next_step == restored.solver.next_step
         assert owner.solver.statistics == restored.solver.statistics
     else:

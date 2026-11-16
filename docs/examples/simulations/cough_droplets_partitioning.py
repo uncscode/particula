@@ -46,6 +46,7 @@ import particula as par  # the main Particula package
 from particula.dynamics.condensation.species_mapping import (
     CondensationSpeciesMap,
 )
+from particula.execution.condensation_ode import CondensationODE
 from tqdm import tqdm  # optional: for progress bars during simulation
 
 # 🎨 Set default plot styling using Tailwind-inspired colors from Particula
@@ -322,7 +323,8 @@ def species_inventory(aero):
 initial_inventory = species_inventory(aerosol)
 
 # Optional: print summary of aerosol system
-print(aerosol)
+print("Particle slots:", aerosol.particles.masses.shape[1])
+print("Gas species:", ", ".join(aerosol.gas.name))
 
 # %% [markdown]
 # ## Inspect the initialized distribution on its own terms
@@ -389,11 +391,13 @@ coagulation_strategy = (
 coagulation_process = par.dynamics.Coagulation(coagulation_strategy)
 
 # %% [markdown]
-# ## Record 19.9 seconds of closed mass transfer
+# ## Record 20 seconds of adaptive closed mass transfer
 #
-# There are 200 stored states, including the initial one, and 199 updates of
-# 0.1 s. Each update uses ten condensation substeps. The optional fixed-humidity
-# line is inactive, so particle water exchanges with a finite gas reservoir.
+# There are 201 stored states, including both endpoints of the full 20 s run.
+# ROS3 adapts condensation steps inside each 0.1 s output interval, with rtol
+# 10⁻⁵, particle atol 10⁻²⁵ kg and gas atol 10⁻¹² kg/m³. Water exchanges with a
+# finite gas reservoir. Better integration does not repair uncertain chemical
+# properties or validate respiratory-fluid predictions.
 #
 # At every stored state, the assertion compares each gas-plus-particle inventory
 # with its initial value at rtol=10⁻¹² and atol=10⁻³⁰ kg. This checks material
@@ -403,7 +407,7 @@ coagulation_process = par.dynamics.Coagulation(coagulation_strategy)
 
 # %% Step 6: Run the simulation loop
 
-print(aerosol)  # print system state before simulation
+print("Initial gas concentration (kg/m^3):", aerosol.gas.concentration)
 
 # 🔁 Deep copy for simulation
 aerosol_process = copy.deepcopy(aerosol)
@@ -412,11 +416,8 @@ aerosol_process = copy.deepcopy(aerosol)
 total_time = 20  # seconds
 total_steps = 200
 
-condensation_sub_step = 10
-coagulation_sub_step = 1
-
 time_step = total_time / total_steps
-time_array = np.arange(total_steps) * time_step  # recorded 0..19.9 s
+time_array = np.linspace(0.0, total_time, total_steps + 1)
 time_len = len(time_array)
 
 # 📊 Initialize arrays for tracking outputs
@@ -425,29 +426,25 @@ distribution_counts = np.zeros((time_len, len(bins_lognormal) - 1))
 species_mass = np.zeros((time_len, len(list_of_chemicals)))
 vapor_saturation = np.zeros((time_len, len(list_of_chemicals)))
 
+simulation = CondensationODE(
+    aerosol_process,
+    condensation_strategy,
+    method="ros3",
+    rtol=1e-5,
+    particle_atol=1e-25,
+    gas_atol=1e-12,
+    first_step=1e-6,
+    max_step=time_step,
+)
+
 # 🌀 Time integration loop
 for step, _t in enumerate(
     tqdm(time_array, desc="Running Sim", mininterval=0.5)
 ):
     if step > 0:
-        # Optional: fix water vapor concentration (e.g. controlled RH)
-        # aerosol_process.gas.concentration[0, 0] = (
-        #     aerosol.gas.concentration[0, 0]
-        # )
-
-        # 💧 Execute condensation
-        aerosol_process = condensation_process.execute(
-            aerosol=aerosol_process,
-            time_step=time_step,
-            sub_steps=condensation_sub_step,
-        )
-
-        # ⚪ Optional: execute coagulation
-        # aerosol_process = coagulation_process.execute(
-        #     aerosol=aerosol_process,
-        #     time_step=time_step,
-        #     sub_steps=coagulation_sub_step,
-        # )
+        while simulation.time < float(_t):
+            simulation.step(float(_t))
+        aerosol_process = simulation.snapshot()
 
     # Record size distribution
     distribution_counts[step, :], edges = np.histogram(
@@ -483,8 +480,9 @@ for step, _t in enumerate(
 # Normalize counts to number concentration (#/m³)
 concentrations = distribution_counts / simulation_volume
 
-# Final system state
-print(aerosol_process)
+# Final system state and actual adaptive work
+print("Final gas concentration (kg/m^3):", aerosol_process.gas.concentration)
+print("Adaptive condensation work:", simulation.solver.statistics)
 
 # %% [markdown]
 # <a id="initial-and-final-sizes-what-to-look-for"></a>

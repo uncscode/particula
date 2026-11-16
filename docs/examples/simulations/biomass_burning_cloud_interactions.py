@@ -40,6 +40,8 @@ import particula as par
 from particula.dynamics.condensation.species_mapping import (
     CondensationSpeciesMap,
 )
+from particula.execution.condensation_ode import CondensationODE
+from particula.execution.splitting import condensation_flow
 from tqdm import tqdm
 
 # plot settings
@@ -195,7 +197,8 @@ def water_saturation(aero):
 
 
 initial_inventory = species_inventory(aerosol)
-print(aerosol)
+print("Particle slots:", aerosol.particles.masses.shape[1])
+print("Gas species:", ", ".join(aerosol.gas.name))
 
 
 # Plot initial size distribution
@@ -208,10 +211,10 @@ ax.set_title("Initial Particle Size Distribution")
 # %% [markdown]
 # ## Establish the shared water-grown starting state
 #
-# A 0.01 s spin-up uses 3000 substeps. The subsequent loop records 600 states
-# at nominal times 0–599 s, with eight condensation substeps per one-second
-# advance. Thus the state labeled “Start” below includes the spin-up plus 599 s
-# of evolution; it is not the original dry population.
+# Adaptive ROS3 integrates the same continuous condensation physics through
+# a 0.01 s spin-up and a full 600 s preparation. The 601 stored states include
+# both endpoints at one-second intervals after spin-up. The state labeled
+# “Start” below includes this preparation; it is not the original dry population.
 #
 # The contour divides histogram counts by represented volume, giving number
 # concentration per radius bin in m⁻³. It shows size redistribution, not dN/dr.
@@ -240,30 +243,37 @@ condensation_process = par.dynamics.MassCondensation(condensation_strategy)
 # Copy aerosol and define time bins
 aerosol_activated = copy.deepcopy(aerosol)
 time_step = 600  # total simulation time in seconds
-total_steps = 5_000  # total sub‑steps for finer resolution
-time = np.arange(time_step)  # recorded 0..599 s at one-second intervals
+time = np.arange(time_step + 1)  # include the full 600 s endpoint
 bins_lognormal = np.logspace(-8, -2, 200)  # radius bins from 10⁻⁸ to 10⁻² m
 distribution_counts = np.zeros((len(time), len(bins_lognormal) - 1))
 
-# Pre‑activation “spin‑up”
-aerosol_activated = condensation_process.execute(
-    aerosol=aerosol_activated, time_step=0.01, sub_steps=3_000
+# Adaptive preparation retains its accepted controller between observations.
+preparation = CondensationODE(
+    aerosol_activated,
+    condensation_strategy,
+    method="ros3",
+    rtol=1e-5,
+    particle_atol=1e-25,
+    gas_atol=1e-12,
+    first_step=1e-6,
+    max_step=1.0,
 )
-
-# Main simulation loop
-sub_steps_per_sec = int(total_steps / time_step)
+while preparation.time < 0.01:
+    preparation.step(0.01)
 for i, _t in enumerate(tqdm(time, desc="Condensing")):
-    if i > 0:
-        aerosol_activated = condensation_process.execute(
-            aerosol=aerosol_activated, time_step=1, sub_steps=sub_steps_per_sec
-        )
+    bound = 0.01 + float(_t)
+    while preparation.time < bound:
+        preparation.step(bound)
+    aerosol_activated = preparation.snapshot()
     # Record the size distribution at this time
     distribution_counts[i, :], edges = np.histogram(
         aerosol_activated.particles.radii[0].copy(), bins=bins_lognormal
     )
 
 # Print final state and water saturation
-print(aerosol_activated)
+print(
+    "Prepared gas concentration (kg/m^3):", aerosol_activated.gas.concentration
+)
 print(
     "Final water saturation ratio:",
     water_saturation(aerosol_activated),
@@ -343,35 +353,32 @@ turbulent_dns = (
     .build()
 )
 
-# Define Sequences for each Scenarios
-seq_condensation = par.RunnableSequence() | condensation_process
-seq_brown = (
-    par.RunnableSequence()
-    | par.dynamics.Coagulation(brownian)
-    | condensation_process
+# Collision draws occur once per existing 0.36 s outer interval. Adaptive
+# condensation trials never execute or repeat a stochastic collision operation.
+outer_dt = 3600.0 / 10_000
+growth = condensation_flow(
+    "water_exchange",
+    condensation_strategy,
+    method="ros3",
+    rtol=1e-5,
+    particle_atol=1e-25,
+    gas_atol=1e-12,
+    first_step=outer_dt,
+    max_step=outer_dt,
 )
-seq_comb = (
-    par.RunnableSequence()
-    | par.dynamics.Coagulation(combined_brown_sed)
-    | condensation_process
-)
-seq_turb = (
-    par.RunnableSequence()
-    | par.dynamics.Coagulation(turbulent_dns)
-    | condensation_process
-)
-
-# Run each
 results = {}
-for name, seq in [
-    ("CondensationOnly", seq_condensation),
-    ("Brownian", seq_brown),
-    ("Brownian+Sed", seq_comb),
-    ("TurbulentDNS", seq_turb),
+for name, collision in [
+    ("CondensationOnly", None),
+    ("Brownian", par.dynamics.Coagulation(brownian)),
+    ("Brownian+Sed", par.dynamics.Coagulation(combined_brown_sed)),
+    ("TurbulentDNS", par.dynamics.Coagulation(turbulent_dns)),
 ]:
     print("Started simulation:", name)
     obj = copy.deepcopy(aerosol_activated)
-    obj = seq.execute(aerosol=obj, time_step=3600, sub_steps=10_000)
+    for step in tqdm(range(10_000), desc=name):
+        if collision is not None:
+            obj = collision.execute(obj, time_step=outer_dt)
+        obj = growth.advance(obj, 600.01 + step * outer_dt, outer_dt)
     np.testing.assert_allclose(
         species_inventory(obj), initial_inventory, rtol=1e-12, atol=1e-30
     )

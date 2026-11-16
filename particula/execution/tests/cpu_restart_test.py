@@ -55,7 +55,7 @@ def test_native_cpu_disk_continuation_is_exact(tmp_path, name, monkeypatch):
     assert original.time == restored.time
 
 
-@pytest.mark.parametrize("method", ["rk23", "ros2"])
+@pytest.mark.parametrize("method", ["rk23", "ros2", "ros3"])
 def test_adaptive_restart_preserves_controller_and_future_bitwise(
     tmp_path, method
 ):

@@ -4,6 +4,7 @@ from dataclasses import replace
 
 import numpy as np
 import numpy.testing as npt
+import pytest
 from scipy.linalg import expm
 from scipy.sparse import csc_matrix, issparse
 
@@ -59,6 +60,30 @@ def mixture(slots=3):
     ), strategy
 
 
+@pytest.mark.parametrize("method", ["rk23", "ros2", "ros3"])
+def test_unchanged_scaled_inventory_is_exact(method):
+    """Construction and observation preserve physical inventories bitwise."""
+    initial, strategy = mixture(24)
+    rng = np.random.default_rng(43)
+    initial.particles.masses[:, :-1] = 10 ** rng.uniform(
+        -19, -13, initial.particles.masses[:, :-1].shape
+    )
+    owner = CondensationODE(initial, strategy, method=method)
+    snapshot = owner.snapshot()
+    np.testing.assert_array_equal(
+        snapshot.particles.masses, initial.particles.masses
+    )
+    np.testing.assert_array_equal(
+        snapshot.gas.concentration, initial.gas.concentration
+    )
+    # Preserve only exactly unchanged coordinates, with no small-change deadband.
+    values = owner.solver.state
+    values[0] = np.nextafter(values[0], np.inf)
+    changed = owner._unpack(0.0, values)
+    index = owner._mass_indices[0]
+    assert changed.particles.masses[index] == values[0] * owner._scale[0]
+
+
 def test_colored_jacobian_matches_individual_column_reference():
     """Cross-material, gas and per-box derivatives agree with dense differences."""
     initial, strategy = mixture()
@@ -83,14 +108,15 @@ def test_colored_jacobian_matches_individual_column_reference():
             npt.assert_allclose(weights @ sparse, 0, atol=1e-13)
 
 
-def test_sparse_ros2_matches_independent_stiff_linear_solution():
-    """Sparse factorization retains ROS2 accuracy and closed inventory."""
+@pytest.mark.parametrize("method", ["ros2", "ros3"])
+def test_sparse_rosenbrock_matches_independent_stiff_linear_solution(method):
+    """Sparse factorization retains stiff accuracy and closed inventory."""
     matrix = np.array([[-100.0, 0.2], [100.0, -0.2]])
     problem = replace(
         linear_problem(matrix), jacobian=lambda t, y: csc_matrix(matrix)
     )
     solver = AdaptiveSolver(
-        problem, [1.0, 0.0], method="ros2", rtol=1e-6, atol=1e-10
+        problem, [1.0, 0.0], method=method, rtol=1e-6, atol=1e-10
     )
     while solver.time < 1:
         solver.step(1)
@@ -174,7 +200,8 @@ def test_kappa_dry_start_and_wet_derivatives_match_dense_reference():
         )
 
 
-def test_sparse_adaptive_disk_continuation_is_exact(tmp_path):
+@pytest.mark.parametrize("method", ["ros2", "ros3"])
+def test_sparse_adaptive_disk_continuation_is_exact(tmp_path, method):
     """A restored large owner recreates its sparse solver without lost history."""
     from particula.execution.cpu_restart import (
         checkpoint_condensation,
@@ -185,11 +212,12 @@ def test_sparse_adaptive_disk_continuation_is_exact(tmp_path):
     from particula.execution.recording import run_until
 
     initial, strategy = mixture(24)
-    owner = CondensationODE(initial, strategy, method="ros2", rtol=1e-5)
+    owner = CondensationODE(initial, strategy, method=method, rtol=1e-5)
     run_until(owner, 0.01)
     path = tmp_path / "sparse.restart"
     save_cpu_checkpoint(checkpoint_condensation(owner), path)
     restored = resume_condensation(load_cpu_checkpoint(path), strategy)
+    assert restored.solver.method == method
     run_until(owner, 0.02)
     run_until(restored, 0.02)
     npt.assert_array_equal(owner.solver.state, restored.solver.state)

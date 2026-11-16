@@ -114,6 +114,8 @@ class CondensationODE:
             for b, g in self._gas_indices
         ]
         self._scale = np.array(mass_scale + gas_scale)
+        self._initial_physical = values.copy()
+        self._initial_scaled = values / self._scale
         mass_tol = self._tolerances(particle_atol, self._shape, "particle_atol")
         gas_tol = self._tolerances(
             gas_atol, self._base.gas.concentration.shape, "gas_atol"
@@ -127,7 +129,7 @@ class CondensationODE:
         )
         self.solver = AdaptiveSolver(
             self.problem,
-            values / self._scale,
+            self._initial_scaled,
             time=time,
             method=method,
             atol=tolerance / self._scale,
@@ -159,6 +161,10 @@ class CondensationODE:
     def _unpack(self, time, values):
         candidate = _cpu_batch.detached(self._base)
         physical = values * self._scale
+        # An unchanged coordinate must survive a scale/unscale round trip
+        # exactly. Changed coordinates retain their ordinary physical value.
+        unchanged = values == self._initial_scaled
+        physical[unchanged] = self._initial_physical[unchanged]
         for index, value in zip(
             self._mass_indices, physical[: self._mass_count], strict=True
         ):

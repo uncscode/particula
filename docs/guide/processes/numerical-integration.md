@@ -16,16 +16,18 @@ state automatically. Start with [native process setup](index.md) and the
 
 | Operation | CPU | Warp CPU / CUDA | Important boundary |
 | --- | --- | --- | --- |
-| Continuous isothermal condensation | `CondensationODE`, RK23 or ROS2 | `GPUCondensationODE`, RK23 | Adaptive mass rates, separate gas/particle tolerances |
+| Continuous isothermal condensation | `CondensationODE`, RK23, ROS2 or ROS3 | `GPUCondensationODE`, RK23 | Adaptive mass rates, separate gas/particle tolerances |
 | Existing finite-step condensation | Existing strategies | Existing direct/prepared fixed-four path | Inventory limits and fixed substeps; no embedded error estimate |
 | Exact dilution | Existing strategy and `dilution_flow` | Existing direct/prepared path | Keep the exact exponential update |
 | Grouped sequential or Strang composition | `SplitSimulation` | No resident adaptive split owner | Explicit deterministic component declarations |
 | Equilibrium projections or stochastic events | Existing process-specific execution | Existing qualified prepared processes | Not accepted as adaptive ODE or Strang components |
 
 For the measured growth, equilibrium and depletion cases, RK23 is the initial
-choice. ROS2 remains an explicit CPU option for stiff continuous problems with
-a suitable Jacobian; its lower-order error estimator can make it much more
-expensive. The [method assessment](../../contribute/validation/numerics/adaptive-methods.md)
+choice. ROS2 and ROS3 are explicit CPU options for stiff continuous problems
+with a suitable Jacobian. ROS3 uses a third-order solution and second-order
+embedded estimator; it substantially reduces accepted steps in the measured
+wet–dry relaxation case at the same tolerances. ROS2's lower-order estimator
+can be expensive. The [method assessment](../../contribute/validation/numerics/adaptive-methods.md)
 reports both accuracy and cost, including settings that failed the observable
 accuracy target. A local tolerance is not a guarantee on global radius or vapor
 error. Always refine tolerances and the outer split step for your own case.
@@ -91,8 +93,13 @@ and time remain at the last successful step; previously accepted work is not
 rolled back. `solver.statistics` records accepted/rejected trials, domain
 rejections and numerical work. It counts Jacobian callbacks separately from
 rate callbacks; a numerical Jacobian can itself evaluate many physical rates.
+For ROS2 and ROS3, each stage solve includes two residual corrections using
+the same factorization. The linear-solve counter includes those corrections.
+They reduce roundoff contamination of passive inventories; they do not clip
+small physical rates or replace the error estimator. Exactly unchanged scaled
+coordinates retain their initial physical values when converted for observation.
 
-CPU ROS2 accepts dense or SciPy sparse Jacobians. Native condensation uses a
+CPU ROS2 and ROS3 accept dense or SciPy sparse Jacobians. Native condensation uses a
 sparse Jacobian above 64 coordinates for the supported ideal mass/molar/volume
 and kappa activity models with mass/molar/volume surface models. Particle-local
 composition derivatives are grouped by material; gas rows retain the weighted
@@ -101,7 +108,7 @@ column differences, since arbitrary callbacks may couple different particles.
 Particle perturbations follow the current total particle mass, including dry
 cores, so an initially wet scale does not distort derivatives after evaporation.
 This reduces derivative work and storage for large populations; it does not
-change the ROS2 error estimator or remove its accuracy cost.
+change the chosen method's error estimator or remove its accuracy cost.
 
 The [wet–dry relaxation example](../../examples/simulations/adaptive_cloud_relaxation.py)
 compares stiff evaporation with independent Radau/BDF references. The
@@ -132,7 +139,7 @@ The GPU profile accepts native discrete or resolved state, exact isothermal
 strategy type, coupled gas updates and the existing mapped constant/Buck vapor
 pressure and activity/surface profile. It permits one volatile material,
 including a zero constant saturation pressure for involatile uptake. It does
-not accept arbitrary CPU activity callbacks, latent heat, PDF, or ROS2. An
+not accept arbitrary CPU activity callbacks, latent heat, PDF, ROS2 or ROS3. An
 unavailable requested CUDA device fails; there is no CPU fallback.
 
 Construction uploads state and configuration. Trial states, derivatives and

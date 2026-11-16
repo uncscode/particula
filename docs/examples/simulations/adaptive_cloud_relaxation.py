@@ -3,7 +3,7 @@
 #
 # Does a wet particle repeatedly grow and shrink after a humidity drop, or is
 # the timestep too large? This controlled calculation compares the existing
-# inventory-limited fixed update with adaptive ROS2 and an independent radius
+# inventory-limited fixed update with adaptive ROS2/ROS3 and an independent radius
 # equation. A 100 nm dry hygroscopic seed carries water; 10⁸ particles/m³ share
 # a finite vapor reservoir at 298.15 K. At 0.2 s we reset gas water from the wet
 # reservoir to 85% saturation. The reset is an external exchange, not a failure
@@ -186,7 +186,7 @@ def calculate(method, tolerance=1e-5):
                         state,
                         strategy,
                         time=float(TIMES[i - 1]),
-                        method="ros2",
+                        method=method,
                         rtol=tolerance,
                         particle_atol=1e-27,
                         gas_atol=1e-13,
@@ -237,6 +237,8 @@ def simulate():
         ("fixed 0.005 s", "fixed", 1e-5),
         ("ROS2 1e-5", "ros2", 1e-5),
         ("ROS2 1e-7", "ros2", 1e-7),
+        ("ROS3 1e-5", "ros3", 1e-5),
+        ("ROS3 1e-7", "ros3", 1e-7),
     ):
         values, work, budget = calculate(method, tolerance)
         radius = R_DRY * np.cbrt(1 + values[:, 0])
@@ -251,10 +253,11 @@ def simulate():
             "budget_error": budget,
             "work": work,
         }
-    assert (
-        results["ROS2 1e-7"]["radius_error"]
-        < results["ROS2 1e-5"]["radius_error"]
-    )
+    for method in ("ROS2", "ROS3"):
+        assert (
+            results[f"{method} 1e-7"]["radius_error"]
+            < results[f"{method} 1e-5"]["radius_error"]
+        )
     return {
         "time_s": TIMES.tolist(),
         "reference_radius_nm": (
@@ -317,14 +320,17 @@ def plot_results(report):
 # ## Interpret accuracy separately from conservation
 #
 # The printed errors compare the complete trajectory with an independent
-# reference. Tightening ROS2 tolerances should reduce radius error; the mass
+# reference. Tightening either method's tolerance should reduce radius error; the mass
 # residual tests a different property. A bounded, mass-conserving coarse update
 # may still fail to resolve evaporation. The initial wet growth and dry reset
 # explain why one timestep can behave differently in different parts of a run.
 # In the retained run, the fixed update oscillates after the reset despite a
 # relative mass residual below 10⁻¹⁴. Its maximum relative radius error is about
 # 3.70; ROS2 at tolerances 10⁻⁵ and 10⁻⁷ reduces that error to about 6.05×10⁻⁶
-# and 6.98×10⁻⁸, respectively. These are measured errors for this prescribed
+# and 6.98×10⁻⁸, respectively. ROS3 achieves about 4.07×10⁻⁶ and 3.41×10⁻⁸
+# with 330 and 1,247 accepted steps, versus ROS2's 3,667 and 36,161. Its higher
+# order reduces numerical work in this case; neither order nor conservation
+# guarantees that result in another regime. These are errors for this prescribed
 # case, not universal error bounds for other compositions or cloud histories.
 # For a chamber study, next vary dry composition and outer wall-loss timing while
 # retaining separate source/loss ledgers and convergence checks.

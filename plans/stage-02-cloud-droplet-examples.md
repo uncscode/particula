@@ -100,19 +100,42 @@ and visually inspected figures:
   and 6.74e-5 to 9.15e-8 for vapor. This small case is accuracy evidence, not a
   GPU performance claim or stiff-cloud qualification.
 
-The original full single-cycle, multi-cycle, respiratory-droplet and biomass
-publication workloads are running with adaptive CPU condensation. The
-multi-cycle helper's returned-aerosol identity regression was reproduced on a
-short cycle and corrected by copying accepted condensation inventories back to
-its existing arrays. The earlier long test run was deliberately terminated
-following that diagnosis; a corrected targeted run is pending. The running
-multi-cycle publication started before that ownership-only correction, so its
-output cannot serve as the final refreshed bundle for the corrected source.
+The full single-cycle ROS2 publication workload completed, retaining 1,000
+particles and the complete 60 s history. The inspected plot shows smooth dry
+relaxation; peak diameter is 23.19 µm with 788 survivors. A higher-order ROS3
+option now passes independent order/transient, forcing and exact restart checks.
+The refreshed wet–dry comparison requires 330/1,247 accepted ROS3 steps versus
+3,667/36,161 for ROS2 at the same 1e-5/1e-7 tolerances, with slightly smaller
+maximum radius errors. The full single-cycle ROS3 refresh also completed,
+matching the printed peak and survivor count in 299.3 s versus ROS2's 1,869.4 s.
+The successful ROS2 bundle remains retained for comparison. The added method
+passed 10,703 package tests with 91.21% coverage. These results do not qualify
+coupled GPU stepping.
+
+The complete ROS3 native-example suite exposed dry-inventory roundoff that
+was not covered by the package tests. Both causes are now corrected: residual
+refinement of the linear solve and exact conversion of unchanged scaled
+coordinates. The original dry-mass assertions remain intact. All 13 native
+example tests pass with the production corrections. The subsequent package
+selection passes 10,710 tests on actual CUDA, and the other example/tooling
+checks pass 554 tests. Unfiltered coverage validation remains in progress.
+The numerical evidence record owns detailed commands, results and limitations.
+
+The full single-cycle repeat completed before those corrections. The live
+multi-cycle, respiratory and biomass runs were deliberately stopped because
+their numerical source was superseded. Refresh all four complete workloads,
+plus the affected comparison examples, from a fixed revision before accepting
+the migration. Keep the library unchanged during each refresh; the publication
+hash guard rejects a changed runtime. Current process records are retained in
+`.artifacts/cloud-followthrough-runs.json`; verify live handles before resuming
+or replacing a run.
 
 GPU cyclic/forcing ownership has been inspected. The cyclic study includes
 source pulses, persistent stochastic collision state, captured fixed stepping
 and byte-exact checkpoint continuation. Adaptive condensation cannot simply be
-substituted into that captured graph. Its migration/qualification remains open;
-the new CUDA depletion example does not replace this outstanding work. Full
-example results, broader checks, final narrative updates, and PR readiness are
-still incomplete. No completion or merge is claimed.
+substituted into that captured graph. A resident ROS3 prototype passes an
+independent growth/refinement check on real CUDA, but is not yet part of the
+runtime. Complete forcing/restart support and coupled event ownership, then run
+the full cyclic chamber and prepared forcing workloads. The small CUDA examples
+do not replace that work. Full results, final narratives, review and PR readiness
+remain incomplete; no completion or merge is claimed.

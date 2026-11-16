@@ -274,3 +274,112 @@ include Kelvin curvature and kinetic correction, and keep external resets
 separate from closed budgets. They do not validate measured chamber material
 properties, thermal coupling, stochastic removal, or stiff CUDA condensation.
 The one-representative-particle CUDA calculation is accuracy evidence only.
+
+### Higher-order stiff follow-through: ROS3
+
+The full cloud migration exposed a practical cost limit in ROS2's first-order
+embedded estimator. A bounded comparison therefore revisited the original
+Stage 2A ROS3 candidate before selecting it for larger workloads. The concrete
+CPU solver now accepts `method="ros3"`; RK23 remains the default and the GPU
+owner remains RK23-only. The three-stage method shares one factorization and
+uses two rate evaluations per trial, with partial time derivatives for forcing.
+Coefficients were checked against the `Ros3` routine in
+[KPP's primary implementation](https://github.com/KineticPreProcessor/KPP/blob/main/int/rosenbrock.f90),
+file blob `baf1ef64538a5128db5e1154ac7fd1b39c41f665`.
+
+The exact nonautonomous and nonlinear solutions in `ode_test.py` demonstrate
+third-order convergence. Dense and sparse stiff transfer tests compare the
+whole transient with matrix exponentials: maximum errors decrease from
+8.69e-6 to 1.07e-7 to 1.13e-9 at relative tolerances 1e-4, 1e-6 and 1e-8.
+Independent budgets remain closed. Additional checks cover domain rejection,
+discontinuous/linear forcing, event-side observations and bitwise disk restart
+with both dense and sparse native condensation coordinates.
+
+The full wet–dry example was refreshed with both methods and unchanged physical
+inputs, absolute tolerances and observation times. Radau/BDF independently
+cross-check its reference. These are measured global errors, not promises
+derived from the local tolerance:
+
+| Method | Relative tolerance | Maximum relative radius error | Accepted / rejected |
+| --- | ---: | ---: | ---: |
+| ROS2 | 1e-5 | 6.04634e-6 | 3,667 / 2 |
+| ROS3 | 1e-5 | 4.07160e-6 | 330 / 0 |
+| ROS2 | 1e-7 | 6.98075e-8 | 36,161 / 4 |
+| ROS3 | 1e-7 | 3.41392e-8 | 1,247 / 2 |
+
+An additional eight-particle polydisperse screening case completed the same
+2 s wet/3 s dry schedule with unchanged tolerances. Final masses agreed between
+ROS2 and ROS3 to approximately 2e-13 relative. This endpoint agreement supports
+trying ROS3 on the complete examples; it is neither an independent transient
+oracle nor a replacement for those workloads. No full-cloud speedup claim is
+based on this small screening case.
+
+Focused checks passed 39 numerical/sparse/native/split-restart tests, 50 existing
+workflow tests, and five additional ROS3 forcing/restart cases. The full package
+then passed **10,703 tests**, 19 skips, 57 slow/performance deselections and one
+expected failure, with actual CUDA and **91.21% coverage**. Standard Ruff/format,
+Mypy (675 source files), and checked-body Mypy for the ODE module passed. The
+558-page website built with no link errors. The updated comparison figure was
+inspected and its compact saved data successfully replotted.
+
+The full single-cycle chamber completed with both ROS2 and ROS3, retaining
+1,000 particles over 60 s. Both report peak diameter 23.19 µm, 788 survivors and
+180.6% final wet/initial dry mass at the displayed precision. Both inspected
+plots show smooth dry relaxation. Elapsed refresh times were 1,869.4 s and
+299.3 s respectively on the same machine with other jobs running. These are
+end-to-end example timings, not an isolated solver benchmark; printed agreement
+does not establish a bound on every trajectory coordinate.
+
+Publication review found stale installed distribution metadata (0.2.14) while
+the executed checkout version is 0.3.1, and a library hash sampled only after
+execution. The publisher now records the checkout version and the distinct
+installed distribution version, captures library identity before execution,
+and refuses publication if that hash differs afterward. Twenty-two focused
+publisher tests passed, including preservation of the prior bundle after a
+mid-run library change. Fresh runs with these guards are pending for the full
+chamber/droplet/biomass workloads. Their coupled GPU migration and the complete
+native-cloud example test module remain outstanding.
+
+The guarded full single-cycle repeat subsequently completed in 293.0 s with
+the same printed peak and survivor count and source version 0.3.1. All 326
+tooling tests passed. The complete native-example module then exposed three
+dry-inventory failures despite passing the broader package suite. Two causes
+were reproduced independently: pivoted linear solves contaminated a zero-rate
+coordinate, and scaling/unscaling an unchanged mass changed its last bit.
+
+The production solver now applies two residual corrections with the existing
+LU factors at each Rosenbrock stage. All correction solves are included in the
+work counters. The condensation adapter preserves the original physical value
+only when its scaled coordinate is exactly unchanged; there is no tolerance,
+clipping, or small-rate suppression. The caches reconstruct from the original
+checkpoint base, preserving the existing restart representation. A separate
+three-coordinate linear system tests passive inventory, an exponential-matrix
+reference and weighted conservation with dense and sparse ROS2/ROS3 solves.
+
+After both corrections, the **unmodified full native-example test module passed
+all 13 tests in 313.76 s**, including three compositions, both output schedules,
+and shifted absolute times. The focused numerical/restart/forcing command passed
+73 tests with four CUDA skips in its restricted environment. The subsequent
+full source-CI package selection ran with actual CUDA: **10,710 passed, 19
+skipped, 57 slow/performance deselected and one expected failure** in 193.85 s.
+The remaining example/tooling suites passed **554 tests with one skip** in
+115.90 s. Ruff/format and ordinary Mypy passed; checked-body Mypy passed for both
+modified numerical modules. Full unfiltered coverage validation is in progress.
+Logs are retained under `.artifacts/ros3-refined-*`; the complete native run is
+`.artifacts/cloud-native-refined-production.log`.
+
+The three live multi-cycle, respiratory and biomass publishers using the earlier
+solver were deliberately stopped before changing runtime source. Their outputs
+are not qualification of the corrected solver. All four full workloads and the
+CPU comparison examples require fresh guarded publication from a fixed source
+revision; earlier successful bundles remain historical evidence.
+
+An isolated resident ROS3 feasibility prototype now executes physical GPU rates,
+colored derivatives and conservative arrowhead solves without downloading the
+trial state. An independent inverse-radius quadrature, with two boxes and
+non-unit volumes, gives CUDA relative radius errors 1.30e-6, 1.40e-8 and 1.40e-10
+at rtol 1e-4, 1e-6 and 1e-8. Weighted budgets, inert gas and inactive slots pass.
+The first prototype exposed float32 rounding of kernel coefficient literals;
+explicit module-level float64 constants restored refinement. This is prototype
+evidence only: forcing, restart, integration into the runtime, coupled event
+ownership, and the complete GPU chamber/forcing workloads remain unqualified.
