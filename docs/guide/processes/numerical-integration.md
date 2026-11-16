@@ -16,7 +16,7 @@ state automatically. Start with [native process setup](index.md) and the
 
 | Operation | CPU | Warp CPU / CUDA | Important boundary |
 | --- | --- | --- | --- |
-| Continuous isothermal condensation | `CondensationODE`, RK23, ROS2 or ROS3 | `GPUCondensationODE`, RK23 | Adaptive mass rates, separate gas/particle tolerances |
+| Continuous isothermal condensation | `CondensationODE`, RK23, ROS2 or ROS3 | `GPUCondensationODE`, RK23 or ROS3 | Adaptive mass rates, separate gas/particle tolerances |
 | Existing finite-step condensation | Existing strategies | Existing direct/prepared fixed-four path | Inventory limits and fixed substeps; no embedded error estimate |
 | Exact dilution | Existing strategy and `dilution_flow` | Existing direct/prepared path | Keep the exact exponential update |
 | Grouped sequential or Strang composition | `SplitSimulation` | No resident adaptive split owner | Explicit deterministic component declarations |
@@ -112,6 +112,8 @@ change the chosen method's error estimator or remove its accuracy cost.
 
 The [wet–dry relaxation example](../../examples/simulations/adaptive_cloud_relaxation.py)
 compares stiff evaporation with independent Radau/BDF references. The
+[CUDA wet–dry example](../../examples/simulations/adaptive_cloud_relaxation_cuda.py)
+qualifies device ROS3 against the same references and explicit humidity reset. The
 [finite-reservoir example](../../examples/simulations/adaptive_reservoir_depletion.py)
 and its [CUDA companion](../../examples/simulations/adaptive_reservoir_depletion_cuda.py)
 compare radius and vapor errors during depletion. Both distinguish mass closure
@@ -139,17 +141,34 @@ The GPU profile accepts native discrete or resolved state, exact isothermal
 strategy type, coupled gas updates and the existing mapped constant/Buck vapor
 pressure and activity/surface profile. It permits one volatile material,
 including a zero constant saturation pressure for involatile uptake. It does
-not accept arbitrary CPU activity callbacks, latent heat, PDF, ROS2 or ROS3. An
+not accept arbitrary CPU activity callbacks, latent heat, PDF or ROS2. An
 unavailable requested CUDA device fails; there is no CPU fallback.
+
+Select `method="ros3"` for the qualified stiff profile with exactly one mapped
+exchanging material. Its local particle derivatives and one gas reservoir per
+box form an arrowhead Jacobian: particle coordinates couple only through their
+shared gas. Colored finite differences use the native device mass rates;
+conservative elimination solves each stage in linear storage without a dense
+matrix or CPU rate evaluation. Other mapped exchanges are rejected before
+device allocation. Unmapped dry material and inert gases remain unchanged.
+The method uses float64 coefficients, a second-order embedded estimate, and
+the same maximum error norm and rejection policy as CPU ROS3. This does not
+make an enclosing fixed stochastic schedule adaptive or CUDA-capturable.
 
 Construction uploads state and configuration. Trial states, derivatives and
 accepted arrays remain on the requested device. A successful trial normally
-reads nine control scalars: stage-domain checks and the final error reduction.
+reads nine control scalars for RK23 or nineteen for autonomous ROS3:
+domain/linear-solve checks and the final error reduction.
 Rejected stages can read fewer. Optional forcing uploads temperature and
-pressure at each stage. The shared host controller synchronizes these reads;
+pressure at each rate evaluation. ROS3 also differentiates forcing at fixed
+state inside the current smooth interval, adding one device rate evaluation
+and two scalar checks. The shared host controller synchronizes these reads;
 this is not a fully asynchronous or CUDA-capturable adaptive loop.
 `control_readbacks` exposes the count, `statistics` exposes numerical work, and
 `device_storage_bytes` counts retained arrays, not measured peak GPU memory.
+ROS3 reports every physical rate call used by its finite differences, one
+Jacobian assembly per trial and three linear solves. It performs no LU
+factorization; its factorization counter is therefore zero.
 
 Calling `step()` or `snapshot()` during CUDA capture fails before launching
 adaptive work. Device/configuration failures fault the owner; it must not be

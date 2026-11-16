@@ -1,7 +1,7 @@
 # Adaptive integration and splitting assessment
 
 The selected development methods are RK3(2) for the measured continuous
-condensation regimes, an explicit CPU ROS2 option for stiff continuous systems,
+condensation regimes, CPU ROS2/ROS3 and a single-exchange GPU ROS3 option for stiff continuous systems,
 and sequential/Strang composition of declared deterministic flows. Existing
 finite-step strategies and fixed-four GPU condensation remain available.
 This record establishes a bounded numerical choice, not experimental validation
@@ -410,7 +410,56 @@ rejected trials. Closed-phase relative mass residuals stay below 4e-15.
 Independent Radau/BDF agreement and the explicit humidity-reset accounting are
 retained. This remains prototype evidence, not coupled GPU qualification.
 
-Latest validation commands (from the Stage 2B checkout with `PYTHONPATH=.`):
+## Integrated GPU ROS3 qualification
+
+The resident ROS3 method is now integrated into `GPUCondensationODE`, including
+stage-time forcing and exact same-device disk restart. The supported profile
+has exactly one exchanging material; unsupported multiple exchanges reject
+before device allocation. The stage solve uses conservative arrowhead
+elimination, with linear scratch storage and no dense factorization. This
+supersedes the prototype-only status above for the isolated condensation owner;
+coupled source/collision ownership remains unfinished.
+
+Independent dense-matrix tests cover scaled, reversed species maps, non-unit
+volumes, discrete/resolved measures and inactive slots on Warp CPU and CUDA.
+Inverse-radius quadrature verifies refinement. Exact passive-coordinate tests
+retain dry masses and inert gases bit for bit. Existing forcing, rejection,
+capture prohibition and restart tests now exercise ROS3 as well as RK23.
+Adaptive GPU checkpoint schema 3 rejects earlier numerical semantics rather
+than silently reinterpreting their scaled state.
+
+The full [CUDA wet–dry example](../../../examples/simulations/adaptive_cloud_relaxation_cuda.py)
+completed its 81-observation case on the RTX 5060. Relative tolerances 1e-5 and
+1e-7 give maximum radius errors 4.069403e-6 and 3.243418e-8 against independent
+Radau/BDF references. Accepted/rejected counts are 330/0 and 1,251/2; maximum
+closed-phase budget residuals are 7.09e-16 and 3.72e-15. The explicit humidity
+reset is accounted for separately. Autonomous trials use six physical rate
+calls, three linear solves and nineteen scalar readbacks, including derivative
+and domain checks. A shared host controller remains necessary; this is neither
+whole-loop CUDA capture nor a GPU acceleration claim.
+
+The guarded publication took 7.72 s and retained package source hash
+`d3dbf2bbc42010dc580e48635a3056b40dfcfede7b20b6405fae6cc8921002f6`.
+The figure was inspected, saved data replotted on CPU, and the extracted ZIP
+executed on CUDA using its bundled reference helper. The CUDA reservoir example
+also completed a fresh guarded publication and CPU replot.
+
+Validation of this integration passed **10,788 package tests**, with 20 skips
+and one expected failure, in 305.19 s; unfiltered coverage was **91.30%**.
+Tooling and examples excluding the separately qualified full native-cloud
+module passed **554 tests**, with one skip, in 124.75 s. The combined GPU
+numerics/restart/forcing subset passed 75 tests. Four later-added parameter
+cases extend the transfer/capture checks to ROS3; their focused selection passed
+all eight cases. Ruff/format and ordinary Mypy passed; checked-body Mypy passed
+for the four changed GPU modules. The 561-page website built successfully,
+with zero rendered structure errors. Logs are in `.artifacts/ros3-gpu-*` and
+`.artifacts/ros3-cuda-*`.
+
+The full coupled GPU cyclic chamber and forcing workloads are still required.
+These isolated-method results do not qualify the original fixed stochastic
+event schedule under adaptive deterministic condensation.
+
+Validation commands (from the Stage 2B checkout with `PYTHONPATH=.`):
 
 ```bash
 .venv/bin/pytest particula/execution/tests/ode_test.py particula/execution/tests/condensation_sparse_test.py particula/execution/tests/cpu_restart_test.py particula/execution/tests/forcing_test.py -q -Werror --no-cov

@@ -2069,6 +2069,17 @@
       ],
       "role": "Examples",
       "start_here": false
+    },
+    {
+      "source": "docs/examples/simulations/adaptive_cloud_relaxation_cuda.py",
+      "title": "Resolve stiff wet–dry droplet relaxation on CUDA",
+      "topic": "condensation",
+      "also": [
+        "gpu",
+        "chambers"
+      ],
+      "role": "Examples",
+      "start_here": false
     }
   ],
   "supporting": [

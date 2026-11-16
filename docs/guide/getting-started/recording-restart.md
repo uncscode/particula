@@ -13,8 +13,8 @@ for you. Choose tolerances using the
 | Owner | Advance and observe | Exact restart profile |
 | --- | --- | --- |
 | `CPUSimulation` | `run_until`; native CPU runnable cycles | Known native processes, CPU RNG, auxiliary fields and diagnostics |
-| `CondensationODE` | `run_until`; CPU RK23 or ROS2 accepted steps | Scaled state, controller and supported forcing table |
-| `GPUCondensationODE` | `run_until`; Warp CPU or CUDA RK23 | Same explicit device, scaled device state and controller |
+| `CondensationODE` | `run_until`; CPU RK23, ROS2 or ROS3 accepted steps | Scaled state, controller and supported forcing table |
+| `GPUCondensationODE` | `run_until`; Warp CPU or CUDA RK23/ROS3 | Same explicit device, scaled device state and controller |
 | `SplitSimulation` | `run_until`; complete sequential or Strang cycles | Nested built-in condensation/dilution flows and their controls |
 | `PreparedSimulation` | `run_prepared`; unchanged fixed step grid | Existing qualified prepared configuration and canonical resident checkpoint |
 
@@ -202,6 +202,12 @@ recreated. GPU capture of a checkpoint explicitly downloads state; loading its
 data alone does not allocate a device owner. Resuming uploads to the explicitly
 selected, exactly compatible saved device, including CUDA UUID identity.
 There is no cross-device continuation or hidden fallback.
+
+Adaptive GPU checkpoint records use schema 3. This includes ROS3 and exact
+restoration of unchanged physical coordinates during unscaling. Earlier
+adaptive GPU records are rejected rather than resumed with different numerical
+semantics. This version is distinct from the prepared resident checkpoint and
+the outer archive format. Retain the earlier checkout to continue an older run.
 
 CPU disk restart requires matching package and NumPy versions. GPU restart also
 requires matching Warp and the existing device/configuration contract. Unsupported

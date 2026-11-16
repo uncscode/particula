@@ -40,8 +40,9 @@ def assert_same(left, right):
     assert left.control_readbacks == right.control_readbacks
 
 
+@pytest.mark.parametrize("method", ["rk23", "ros3"])
 def test_disk_roundtrip_preserves_adaptive_future_with_rejections(
-    device, tmp_path
+    device, tmp_path, method
 ):
     """Saved next-step/controller state gives identical future accepted trials."""
     initial, strategy = case(3)
@@ -50,6 +51,7 @@ def test_disk_roundtrip_preserves_adaptive_future_with_rejections(
         initial,
         strategy,
         device=device,
+        method=method,
         rtol=1e-8,
         particle_atol=3.14159e-27,
         gas_atol=2.71828e-17,
@@ -167,12 +169,15 @@ def test_malformed_file_and_failed_save_preserve_previous_checkpoint(
         load_gpu_checkpoint(path)
 
 
-def test_active_capture_rejects_checkpoint_and_resume():
+@pytest.mark.parametrize("method", ["rk23", "ros3"])
+def test_active_capture_rejects_checkpoint_and_resume(method):
     """No adaptive checkpoint transfer or restore is admitted inside capture."""
     if not wp.is_cuda_available():
         pytest.skip("actual CUDA unavailable")
     initial, strategy = case()
-    owner = GPUCondensationODE(initial, strategy, device="cuda:0")
+    owner = GPUCondensationODE(
+        initial, strategy, device="cuda:0", method=method
+    )
     saved = checkpoint_gpu_condensation(owner)
     with wp.ScopedCapture(device="cuda:0"):
         with pytest.raises(RuntimeError, match="capture"):

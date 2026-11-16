@@ -857,5 +857,20 @@
     "replot_invoke": "report = saved_data\nfigure = plot_results(report)",
     "render_functions": [],
     "plot_inputs": []
+  },
+  "adaptive-cloud-relaxation-cuda": {
+    "title": "Resolve stiff wet–dry droplet relaxation on CUDA",
+    "source": "docs/examples/simulations/adaptive_cloud_relaxation_cuda.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 1800,
+    "inputs": [
+      "docs/examples/simulations/adaptive_cloud_relaxation.py"
+    ],
+    "invoke": "report = run_cuda()\nfigure = plot_results(report)",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\nfigure = plot_results(report)",
+    "render_functions": [],
+    "plot_inputs": []
   }
 }

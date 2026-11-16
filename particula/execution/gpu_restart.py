@@ -66,7 +66,7 @@ def checkpoint_gpu_condensation(owner):
     owner._check_ready()
     forcing = checkpoint_forcing(owner._forcing)
     return GPUCondensationCheckpoint(
-        2,
+        3,
         _runtime(),
         _device_identity(owner.device),
         pack_native(owner._base),
@@ -93,7 +93,7 @@ def _validate(saved):
     if (
         type(saved) is not GPUCondensationCheckpoint
         or type(saved.schema_version) is not int
-        or saved.schema_version != 2
+        or saved.schema_version != 3
         or saved.runtime != _runtime()
     ):
         raise ValueError(
@@ -167,8 +167,8 @@ def _validate_arrays(saved, base):
 
 def _validate_controls(saved):
     """Check the accepted clock, controller limits and work history."""
-    if saved.method != "rk23":
-        raise ValueError("adaptive GPU restart supports rk23 only")
+    if saved.method not in ("rk23", "ros3"):
+        raise ValueError("adaptive GPU restart supports rk23 or ros3")
     AdaptiveSolver._scalar(saved.time, "time", positive=False)
     for name in ("min_step", "max_step", "next_step"):
         AdaptiveSolver._scalar(getattr(saved, name), name)

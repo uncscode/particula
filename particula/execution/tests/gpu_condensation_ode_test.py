@@ -165,12 +165,13 @@ def test_domain_rejection_and_trial_exhaustion_preserve_accepted_state(device):
     assert owner.statistics.accepted > 0
 
 
+@pytest.mark.parametrize("method,readbacks", [("rk23", 9), ("ros3", 19)])
 def test_normal_steps_download_only_control_scalars_and_never_cpu_rates(
-    device, monkeypatch
+    device, monkeypatch, method, readbacks
 ):
     """The host handles control; physical arrays and derivatives stay on device."""
     initial, strategy = case()
-    owner = GPUCondensationODE(initial, strategy, device=device)
+    owner = GPUCondensationODE(initial, strategy, device=device, method=method)
     original_numpy = wp.array.numpy
 
     def scalar_only(array, *args, **kwargs):
@@ -183,7 +184,7 @@ def test_normal_steps_download_only_control_scalars_and_never_cpu_rates(
     monkeypatch.setattr(wp.array, "numpy", scalar_only)
     monkeypatch.setattr(type(strategy), "mass_transfer_rate", forbidden)
     owner.step(0.1)
-    assert owner.control_readbacks == 9
+    assert owner.control_readbacks == readbacks
 
 
 def test_absolute_stage_forcing_agrees_with_cpu(device):
@@ -218,16 +219,19 @@ def test_unsupported_methods_reject_before_upload(monkeypatch):
         )
 
     monkeypatch.setattr(wp, "get_device", forbidden)
-    with pytest.raises(ValueError, match="rk23 only"):
+    with pytest.raises(ValueError, match="rk23 or ros3"):
         GPUCondensationODE(initial, strategy, device="cuda:0", method="ros2")
 
 
-def test_cuda_capture_rejects_before_launch():
+@pytest.mark.parametrize("method", ["rk23", "ros3"])
+def test_cuda_capture_rejects_before_launch(method):
     """Native capture cannot include host-controlled adaptive trial decisions."""
     if not wp.is_cuda_available():
         pytest.skip("actual CUDA unavailable")
     initial, strategy = case()
-    owner = GPUCondensationODE(initial, strategy, device="cuda:0")
+    owner = GPUCondensationODE(
+        initial, strategy, device="cuda:0", method=method
+    )
     with wp.ScopedCapture(device=owner.device):
         with pytest.raises(RuntimeError, match="capture"):
             owner.step(0.1)

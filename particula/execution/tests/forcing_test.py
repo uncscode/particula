@@ -29,10 +29,20 @@ from particula.execution.splitting import SplitSimulation, condensation_flow
 from particula.execution.tests.condensation_ode_test import case
 
 
-@pytest.fixture(params=["rk23", "ros2", "ros3", "warp-cpu", "cuda:0"])
+@pytest.fixture(
+    params=[
+        "rk23",
+        "ros2",
+        "ros3",
+        "warp-cpu",
+        "cuda:0",
+        "warp-cpu-ros3",
+        "cuda:0-ros3",
+    ]
+)
 def backend(request):
     """Separate native CPU solvers, Warp CPU and actual CUDA evidence."""
-    if request.param == "cuda:0" and not wp.is_cuda_available():
+    if request.param.startswith("cuda:0") and not wp.is_cuda_available():
         pytest.skip("actual CUDA unavailable")
     return request.param
 
@@ -46,7 +56,8 @@ def owner_for(backend, initial, strategy, table, **controls):
     return GPUCondensationODE(
         initial,
         strategy,
-        device="cpu" if backend == "warp-cpu" else backend,
+        device=("cpu" if backend.startswith("warp-cpu") else "cuda:0"),
+        method="ros3" if backend.endswith("-ros3") else "rk23",
         forcing=table,
         **controls,
     )
@@ -231,7 +242,7 @@ def test_forcing_disk_restart_at_jump_preserves_future(backend, tmp_path):
         restored = resume_gpu_condensation(
             load_gpu_checkpoint(path),
             strategy,
-            device="cpu" if backend == "warp-cpu" else backend,
+            device="cpu" if backend.startswith("warp-cpu") else "cuda:0",
         )
     run_until(owner, 1, output_times=[0.2, 0.5])
     run_until(restored, 1, output_times=[0, 0.2, 0.5], recorder=recorder)

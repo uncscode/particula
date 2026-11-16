@@ -136,9 +136,13 @@ or replacing a run.
 GPU cyclic/forcing ownership has been inspected. The cyclic study includes
 source pulses, persistent stochastic collision state, captured fixed stepping
 and byte-exact checkpoint continuation. Adaptive condensation cannot simply be
-substituted into that captured graph. A resident ROS3 prototype passes an
-independent growth/refinement check on real CUDA, but is not yet part of the
-runtime. Complete forcing/restart support and coupled event ownership, then run
+substituted into that captured graph. Resident ROS3 is now integrated with
+forcing, exact same-device restart, passive-inventory preservation and actual
+CUDA growth/refinement checks. The new full CUDA wet–dry comparison completed
+publication, figure inspection, CPU replot and extracted-download execution.
+Its errors refine from 4.07e-6 to 3.24e-8. The integrated package passed 10,788
+tests with 91.30% coverage; detailed evidence belongs to the method record.
+Complete coupled event ownership, then run
 the full cyclic chamber and prepared forcing workloads. The small CUDA examples
 do not replace that work. Full results, final narratives, review and PR readiness
 remain incomplete; no completion or merge is claimed.
