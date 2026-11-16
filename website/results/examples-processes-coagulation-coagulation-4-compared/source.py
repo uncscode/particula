@@ -30,16 +30,16 @@ Example:
 
 
 # %% [markdown]
-# # Coagulation Pattern 4: PMF vs PDF
+# # Compare coagulation after matching distribution units
 #
-# Compare Brownian coagulation for PMF (discrete) and PDF (continuous)
-# representations using the public builder pattern:
+# Would two solvers disagree, or are their curves simply expressed in different
+# measures? This example evolves a PMF and a PDF with the same Brownian mechanism,
+# then converts each into the other's plotting units. You will learn to separate
+# a coordinate/measure difference from a numerical evolution difference.
 #
-# - `distribution_type="discrete"` → PMF
-# - `distribution_type="continuous_pdf"` → PDF
-#
-# Both are wrapped in `par.dynamics.Coagulation`. We run short steps for speed
-# and show PMF↔PDF conversion for like-for-like comparison.
+# Start with [PMF evolution](coagulation_1_pmf_pattern.py),
+# [PDF evolution](coagulation_2_pdf_pattern.py), or the
+# [distribution conversion example](../../fundamentals/particles/aerosol_distributions.py).
 
 # %%
 # In Colab uncomment the following command to install particula:
@@ -50,7 +50,13 @@ import particula as par
 from scipy.integrate import trapezoid
 
 # %% [markdown]
-# ## Build aerosols (PMF and PDF)
+# ## Match the physical inputs
+#
+# Both populations use 150 radius nodes over 10 nm–10 µm, a 120 nm lognormal
+# radius scale, geometric standard deviation 1.5, and target number density
+# 10¹⁰ m⁻³. Density is 1000 kg m⁻³, temperature 298.15 K, and pressure 101325 Pa.
+# The PMF stores m⁻³ per bin; the PDF stores m⁻⁴ per radius. Separate container
+# copies keep advancing one population from changing the other.
 
 # %%
 # Shared grid (modest resolution)
@@ -117,7 +123,12 @@ aerosol_pdf = par.Aerosol(
 )
 
 # %% [markdown]
-# ## Configure coagulation runnables
+# ## Hold the mechanism fixed
+#
+# Both wrappers use Brownian coagulation, selecting `discrete` or `continuous_pdf`
+# to match storage. There are no gas-phase transfers or external particle losses.
+# Changing this setting alone is not a conversion of an existing concentration
+# array; the initial arrays were constructed in their respective measures.
 
 # %%
 coagulation_pmf = par.dynamics.Coagulation(
@@ -140,7 +151,12 @@ print(coagulation_pmf)
 print(coagulation_pdf)
 
 # %% [markdown]
-# ## Execute short coagulation steps
+# ## Compare the same elapsed time
+#
+# Each population advances one hour using 100 substeps. Copies of concentration
+# before and after preserve the comparison even though execution mutates the
+# aerosol. Agreement in these snapshots would still require a refinement study
+# before it could establish accuracy.
 
 # %%
 time_step = 3600  # seconds (1 hour)
@@ -161,10 +177,13 @@ aerosol_pdf_after = coagulation_pdf.execute(
 pdf_after = aerosol_pdf_after.particles.concentration[0].copy()
 
 # %% [markdown]
-# ## Convert for apples-to-apples comparison
+# ## Put both results in common units
 #
-# Convert PDF⇄PMF using `par.particles.get_pdf_distribution_in_pmf` so both
-# representations can be compared on the same units.
+# The conversion uses radius-dependent bin widths, so it changes curve shape as
+# well as magnitude on this logarithmically spaced grid. The printed initial totals
+# compare a PMF sum with a trapezoidal PDF integral. Finite-grid quadrature and
+# conversion conventions can leave small differences; neither operation is an
+# independent physical benchmark.
 
 # %%
 pdf_as_pmf_before = par.particles.get_pdf_distribution_in_pmf(
@@ -188,7 +207,13 @@ print(f"Total number PMF: {number_pmf:.2e} m^-3")
 print(f"Total number PDF: {number_pdf:.2e} m^-3 (integrated)")
 
 # %% [markdown]
-# ## Plots
+# ## Read the two overlays as one comparison
+#
+# The first figure expresses both populations in number per volume per bin; the
+# second expresses both per unit radius. Compare corresponding before curves to
+# assess initialization and conversion, then corresponding after curves to assess
+# evolution. Do not compare raw peak heights between the two figures: their units
+# differ. A visual overlay can conceal small integrated mass or number errors.
 
 # %%
 fig, ax = plt.subplots(figsize=(8, 5))
@@ -245,23 +270,21 @@ ax.grid(alpha=0.3)
 plt.show()
 
 # %% [markdown]
-# ## Native initialization and numerical limits
+# ## Identify what this comparison cannot settle
 #
-# Native construction retains the explicitly generated concentration array.
-# Earlier versions used a preset builder that regenerated its default bimodal
-# distribution, replacing the declared inputs. The plots here therefore use
-# the stated mode and total number concentration, not that old preset result.
-# Finite-grid coagulation is not exactly mass conservative. Number loss and
-# distribution changes illustrate this workload; they are not a convergence
-# study or evidence of exact agreement between representations.
+# Native construction retains the declared input arrays. Neither finite-grid
+# method is guaranteed exactly mass conservative, and this run does not vary
+# grid extent, resolution, or timestep. Similar-looking spectra are evidence for
+# this workload, not proof of solver equivalence.
 
 # %% [markdown]
-# ## Summary
+# ## Turn an overlay into an error study
 #
-# - PMF: `distribution_type="discrete"` via `BrownianCoagulationBuilder`
-# - PDF: `distribution_type="continuous_pdf"`
-# - Both run through `par.dynamics.Coagulation`
-# - Conversions use `par.particles.get_pdf_distribution_in_pmf` for consistent
-#   comparisons across representations.
-# - Runtime with extended grids (10 nm–10 µm) and 1-hour step for visible
-#   coagulation effects.
+# Matching measures makes a scientific comparison possible; it does not complete
+# one. Refine the grid and substeps separately, report integrated number and mass,
+# and compare against an independent limiting-case solution when available.
+#
+# The [time-evolution example](coagulation_5_time_evolution.py) adds a
+# particle-resolved population and follows a common diagnostic through time.
+# That is a useful starting point for asking whether a research conclusion depends
+# on representation rather than on plotting convention.

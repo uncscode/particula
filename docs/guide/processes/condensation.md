@@ -52,6 +52,21 @@ This feature is built around user-facing APIs exposed via
   transport_k`, `get_mass_transfer`, `get_radius_transfer_rate` for reference
   and lower-level workflows.
 
+## Water phase and numerical accuracy
+
+`WaterBuckStrategy` uses the ice-pressure coefficients below 273.15 K and
+liquid-water coefficients at and above 273.15 K. This temperature switch does
+not model freezing or track particle phase. Do not interpret a subfreezing
+calculation using this strategy as supercooled-liquid equilibrium. Supply a
+vapor-pressure strategy qualified for the intended phase and temperature range.
+
+Inventory limiting prevents transfers larger than the available material; it
+does not establish timestep accuracy. Refine the timestep and compare radius,
+each particle species and each mapped gas species separately. The independent
+`condensation_reference_test.py` checks a zero-surface-vapor-pressure transport
+limit in a closed box and a fixed reservoir; it does not qualify stiff water
+equilibrium or latent-temperature feedback.
+
 ## Native data contract (v0.3.0)
 
 Direct native calls to `CondensationIsothermal`,

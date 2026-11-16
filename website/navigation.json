@@ -1047,6 +1047,10 @@
               {
                 "label": "Mass Precision Recommendation Report",
                 "slug": "contribute/validation/numerics/mass-precision"
+              },
+              {
+                "label": "Scientific correctness reference baseline",
+                "slug": "contribute/validation/numerics/scientific-correctness"
               }
             ]
           },

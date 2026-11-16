@@ -6,6 +6,7 @@ Results are specific to their recorded revision, workload, and device.
 
 | Question | Record |
 | --- | --- |
+| What supports the scientific baseline? | [Scientific correctness](numerics/scientific-correctness.md) |
 | What supports independent CPU/CUDA optics? | [Reference corpus](optics/reference-corpus.md) and [CUDA qualification](optics/cuda.md) |
 | Is the native migration approved for release? | [v0.3.0 gates](releases/v0.3.0.md): maintainer/release approval remains pending |
 | What supports the mass representation? | [Mass precision](numerics/mass-precision.md) |

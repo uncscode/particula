@@ -13,17 +13,22 @@
 # ---
 
 # %% [markdown]
-# # Chamber Forward Simulation
+# # Explain a chamber spectrum using separate rate contributions
 #
-# Comprehending particle dynamics within controlled environments is fundamental for the precise interpretation of experimental measurements. An aerosol chamber forward simulation is an approach employed to analyze and predict the behavior of particles under laboratory conditions. This method enables us to construct a virtual representation of the chamber dynamics, providing a platform to systematically examine the influence of different physical and chemical processes on aerosol populations. Specifically, we focus on three key processes: chamber aerosol dilution, particle coagulation, and wall loss (deposition). Each of these plays a pivotal role in shaping the size distribution of particles:
+# A declining particle count can reflect dilution, wall deposition, or collisions.
+# Which parts of the size distribution do those mechanisms change? This functional
+# example calculates their instantaneous contributions and advances their sum for
+# one hour. It helps distinguish a rate decomposition from a set of independent
+# process-on/process-off simulations.
 #
-# - **Chamber Aerosol Dilution**: Dilution refers to the reduction in particle concentration due to the introduction of clean air into the chamber. This process can lead to a decrease in the overall number of particles without altering the size distribution significantly. However, it can indirectly influence the dynamics of coagulation and deposition by changing the particle concentration.
-# - **Particle Coagulation**: Coagulation is the process where particles collide and stick together, forming larger particles. This leads to a shift in the size distribution towards larger sizes, reducing the number of smaller particles and increasing the average size of particles in the chamber. Coagulation is particularly significant for smaller particles due to their higher Brownian motion and likelihood of interaction.
-# - **Wall Loss** (Deposition): Wall loss occurs when particles deposit onto the walls of the chamber, removing them from the airborne population. This process preferentially affects larger particles due to their greater settling velocity and can lead to a decrease in the overall number of particles and a subtle shift in the size distribution towards smaller sizes.
+# The initial two lognormal radius scales are 100 and 500 nm, with geometric
+# standard deviations 1.3 and 1.5 and number densities 5×10¹⁰ and 5×10⁹ m⁻³.
+# There are 250 radius bins from 10 nm–10 µm. The first figure shows number per
+# volume per bin, not probability density. Density is 1000 kg m⁻³, temperature
+# 293.15 K, and pressure 101325 Pa.
 #
-# We'll be running a simulation of a chamber experiment, and turn on/off each of these processes to see how they affect the size distribution of particles. We'll also be able to see how the size distribution changes over time as the experiment progresses.
-#
-# The initial `particula` imports are next.
+# There is no condensation or chemistry. For the native container/runnable version
+# and actual matched process combinations, see the [wall-loss comparison](wall_loss_tutorial.py).
 
 # %%
 # In Colab uncomment the following command to install particula:
@@ -68,13 +73,18 @@ ax.set_ylabel(r"Particle Concentration (dN), $\dfrac{1}{m^{3}}$")
 plt.show()
 
 # %% [markdown]
-# ## Rates
+# ## Compare rates at one common initial state
 #
-# With the initial concentration setup we can now get the rates of change for the distribution of particles. These come from the `dynamics` module, which contains the functions to calculate the rates of change for each process. The `dynamics` module contains the following functions:
+# Brownian coagulation contributes a gain and a loss term: its net rate can be
+# positive at some radii even while total number falls. Dilution and wall loss
+# remove particles. The dilution coefficient is flow/volume = 2×10⁻⁶ s⁻¹ for
+# a 1 m³ well-mixed box. Wall loss uses a 1 × 1 × 1 m chamber and wall eddy
+# parameter 0.1 s⁻¹.
 #
-# - `dilution_rate`: Calculates the rate of change due to dilution.
-# - `coagulation_rate`: Calculates the rate of change due to coagulation.
-# - `wall_loss_rate`: Calculates the rate of change due to wall loss.
+# The rate plot has units m⁻³ s⁻¹ per bin. A large absolute loss may reflect
+# high abundance rather than a large fractional coefficient. Wall removal can
+# be size selective through multiple transport mechanisms; it is not generically
+# a process acting only on the largest particles.
 
 # %%
 # coagulation rate
@@ -156,9 +166,17 @@ plt.legend()
 plt.show()
 
 # %% [markdown]
-# ## For-loop Simulation
+# ## Integrate the combined model and retain each contribution
 #
-# With the an example of how to calculate the rates of change for each process, we can now simulate the chamber experiment. We'll iterate over a series of time steps and calculate the change in particle concentration due to each process. This is an iterative process where we update the particle distribution at each time step based on the rates of change calculated for dilution, coagulation, and wall loss. The rates are also updated at each time step to account for the changing particle concentration within the chamber.
+# The 1000 stored times span 0–3600 s, so there are 999 explicit Euler advances
+# of about 3.604 s. The Brownian kernel stays fixed because grid, mass, and gas
+# conditions are fixed; concentration-dependent rates are recomputed each step.
+# The rate arrays record contributions evaluated at the preceding state.
+#
+# Finite, nonnegative concentrations and nonincreasing total number are checked.
+# These are useful admissibility checks, not a convergence demonstration. The
+# functional route exposes the update directly, but shares underlying physical
+# functions with other interfaces and is not an independent physics benchmark.
 
 # %%
 # time steps
@@ -235,14 +253,17 @@ assert np.all(np.diff(concentration_matrix.sum(axis=1)) <= 0)
 print("Done")
 
 # %% [markdown]
-# ## Visualization of Particle Size Distribution Over Time
+# ## Read evolution without inventing missing control cases
 #
-# The output has 1000 time rows and 250 radius-bin columns. The plots compare
-# the initial, midpoint, and final distributions over the one-hour workload.
-# This retained functional example integrates explicit rates and provides a
-# reference independent of the native container/runnable examples.
+# The spectrum plot compares the initial and final states of the combined model;
+# no midpoint spectrum is plotted. The following panel compares initial rate
+# contributions with those evaluated at the last pre-update state, approximately
+# 3596.4 s. It therefore shows how the evolving population changes each rate,
+# not a set of separate coagulation-only or dilution-only trajectories.
 #
-# By comparing these three distributions, we can observe and analyze how the particle sizes have coalesced, dispersed, or shifted due to the underlying aerosol dynamics within the chamber.
+# Redistribution toward larger bins can come from coagulation, while external
+# losses lower airborne abundance. The combined spectrum alone does not assign
+# a unique fraction of total loss to each mechanism.
 
 # %%
 # Plotting the simulation results
@@ -317,14 +338,16 @@ plt.legend()
 plt.show()
 
 # %% [markdown]
-# ## Takeaways
+# ## Turn a rate decomposition into a causal comparison
 #
-# In this notebook, we conducted a series of simulations to study the behavior of aerosol particles within a controlled chamber environment. Our objective was to understand how different processes — namely coagulation, dilution, and wall loss — individually and collectively influence the size distribution of particles over time.
+# This run demonstrates a finite, nonnegative combined trajectory and exposes
+# its three rate contributions. It does not compare with experimental observations
+# or establish that one mechanism is required by data. No isolated-process
+# simulation is performed here.
 #
-# Our simulations revealed several key findings:
-#
-# - **Coagulation Alone**: When only coagulation was considered, the particle size distribution shifted towards larger particles as expected, since smaller particles tend to combine. However, this view was incomplete as it did not account for other loss mechanisms.
-# - **Importance of Wall Loss**: The inclusion of wall loss in the simulations proved to be significant. Wall loss, or deposition, especially affected the larger particles due to their higher probability of contact with the chamber walls. This process led to a noticeable reduction in the number concentration of particles, altering the peak and width of the size distribution.
-# - **Combined Processes**: By simulating a combination of processes, we observed a more complex and realistic representation of particle dynamics. The coagulation plus dilution scenario showed a lower overall concentration across all sizes, while adding wall loss further decreased the number concentration and altered the distribution shape, underscoring the importance of including wall loss in chamber simulations.
-#
-# The comparison between the different scenarios highlighted that coagulation alone could not fully explain the experimental observations. The absence of wall loss from the simulation would lead to discrepancies when comparing with empirical data, as wall loss is a critical process in chamber dynamics.
+# To test which mechanism controls a measured chamber decay, repeat from the same
+# initial spectrum with one process disabled at a time. Track number, airborne
+# mass, and cumulative external removal; refine timestep and radius grid to
+# separate numerical drift from physical loss. Compare those predictions with
+# size-resolved measurements and independent flow/geometry estimates before
+# attributing an observed change to wall loss or coagulation.

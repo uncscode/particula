@@ -1,15 +1,15 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 4.215818751021288,
-  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "elapsed_seconds": 4.602728847996332,
+  "package_source_sha256": "366188b5126fea8caca5653dccea55707aa58d180426291eb7b46a40eecaf715",
   "input_sha256": {},
   "example": "examples-processes-coagulation-coagulation-1-pmf-pattern",
   "fingerprint": "8d0e5757f3e22d64b0357e8a545bddce11d57ba48397a88e935a68c02b5b69ed",
   "source": "docs/examples/processes/coagulation/coagulation_1_pmf_pattern.py",
-  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
-  "package_dirty": false,
-  "executed_at": "2026-11-13T15:00:08.483458+00:00",
+  "revision": "894f603509f47c3f35bbfa7c45f45752136e7d52",
+  "package_dirty": true,
+  "executed_at": "2026-11-16T01:25:26.896465+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
@@ -31,7 +31,7 @@
     [],
     [
       {
-        "text": "<particula.dynamics.particle_process.Coagulation object at 0x7f17767163f0>\n"
+        "text": "<particula.dynamics.particle_process.Coagulation object at 0x7fddaf1531a0>\n"
       }
     ],
     [],
@@ -47,7 +47,7 @@
     ]
   ],
   "files": {
-    "source.py": "0e47b5a79447f0b8cc3ea22295c91d2b905eb550b79982aba033443d0b961660",
-    "figure-7-1.png": "4e23c3c22aa1c9dcbd3992381b0727f3c4649a6b035d7df26704d445a994a44a"
+    "figure-7-1.png": "4e23c3c22aa1c9dcbd3992381b0727f3c4649a6b035d7df26704d445a994a44a",
+    "source.py": "07d26ea9712791581bf8639ad103c065dbecba28ee839f1463968205ae7ea028"
   }
 }

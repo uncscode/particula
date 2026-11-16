@@ -1,7 +1,7 @@
 # AGENTS.md — Particula development
 
 Particula is a Python aerosol particle simulator. This checkout targets
-**0.3.0** and requires **Python 3.12+**. Upstream is
+**0.3.1** and requires **Python 3.12+**. Upstream is
 https://github.com/uncscode/particula; a local `origin` may be a fork.
 `particula/__init__.py` owns the version read dynamically by Flit.
 A version bump does not publish a release.

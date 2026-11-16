@@ -121,7 +121,10 @@ def get_coagulation_gain_rate_discrete(
     dpi = (np.transpose(radius) ** 3 - dpd**3) ** (1 / 3)
 
     # Compute gain using numerical integration
-    gain = radius**2 * np.trapezoid(interp.ev(dpd, dpi) / dpi**2, dpd, axis=0)  # type: ignore
+    # Cubic interpolation can undershoot in sparse tails. Collision event
+    # densities are nonnegative; project the interpolant, not the time update.
+    integrand = np.maximum(interp.ev(dpd, dpi), 0.0) / dpi**2
+    gain = radius**2 * np.trapezoid(integrand, dpd, axis=0)
 
     # Convert back to original scale (from PDF to PMF)
     return gain * delta_x_array
@@ -221,7 +224,8 @@ def get_coagulation_gain_rate_continuous(
     dpi = (np.transpose(radius) ** 3 - dpd**3) ** (1 / 3)
 
     return radius**2 * np.trapezoid(
-        interp.ev(dpd, dpi) / dpi**2,  # type: ignore
+        # Prevent cubic undershoot from creating negative collision births.
+        np.maximum(interp.ev(dpd, dpi), 0.0) / dpi**2,  # type: ignore
         dpd,
         axis=0,  # type: ignore
     )

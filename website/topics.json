@@ -1987,6 +1987,14 @@
       "also": [],
       "role": "API",
       "start_here": false
+    },
+    {
+      "source": "docs/contribute/validation/numerics/scientific-correctness.md",
+      "title": "Scientific correctness reference baseline",
+      "topic": "verification",
+      "also": [],
+      "role": "Contribute",
+      "start_here": false
     }
   ],
   "supporting": [

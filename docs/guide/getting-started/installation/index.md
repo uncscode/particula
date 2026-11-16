@@ -77,7 +77,7 @@ conda install -c conda-forge particula matplotlib pandas tqdm pint
 
 ## Local documentation
 
-Wheels built from this 0.3.0 source include version-matched documentation. After
+Wheels built from this source include version-matched documentation. After
 installing such a release with `pip install particula`, no checkout or network
 connection is needed to read or search it:
 
@@ -107,3 +107,17 @@ maintained documentation source; `particula/docs/` is generated in temporary
 build staging and must not be edited. Older releases without the locator can
 use their matching source documentation or the online documentation after
 checking version compatibility.
+
+## CPU dependencies and application logging
+
+The development package requires Python 3.12 or newer and installs NumPy,
+SciPy, typing extensions and Warp. CPU simulations do not require a CUDA GPU;
+Warp remains a declared dependency even for CPU use. A separate distribution
+without Warp is not currently provided.
+
+Importing Particula leaves application logging configuration unchanged and
+does not create package-local log files. Configure Python logging in your
+application when output is wanted, for example with `logging.basicConfig`.
+The `particula` logger accepts application handlers and levels. Calling
+`particula.logger_setup.setup()` explicitly retains the legacy file-logging
+configuration and requires write access to its configured destination.

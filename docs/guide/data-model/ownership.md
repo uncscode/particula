@@ -26,7 +26,7 @@ array widths alone never establishes chemical correspondence.
 | `particles.volume` | `(B,)` | Authoritative represented volume, m³ |
 | `particles.radii` | `(B,N)` | Fresh radii in m, derived from mass/material density |
 | `particles.total_mass` | `(B,N)` | Fresh total kg per particle; not bulk inventory |
-| `particles.effective_density` | `(B,N)` | Fresh retained mass-weighted material-density diagnostic |
+| `particles.effective_density` | `(B,N)` | Fresh total mass divided by additive material volume, kg/m³ |
 | `particles.mass_fractions` | `(B,N,P)` | Fresh per-particle mass fractions |
 | `particles.slot_concentration_density` | `(B,N)` | Fresh m⁻³ for discrete/resolved, m⁻⁴ for radius PDFs |
 | `particles.number_density` | `(B,)` | Fresh integrated/summed number density, m⁻³ |

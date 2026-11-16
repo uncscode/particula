@@ -55,14 +55,14 @@ from particula.execution import (
 from particula.runnable import RunnableSequence
 from particula.box_process import BoxProcess, FunctionProcess, BoxContext
 
+import logging
 from particula.logger_setup import setup
 
 __version__ = "0.3.1"
 
-# setup the logger
-logger = setup()
-# log the version of particula upon loading
-logger.info("particula version %s loaded.", __version__)
+# Libraries leave logging configuration and output destinations to callers.
+logger = logging.getLogger("particula")
+logger.addHandler(logging.NullHandler())
 
 
 def __getattr__(name: str):
