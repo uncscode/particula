@@ -58,7 +58,7 @@ const wisps = Array.from({ length: 32 }, (_, i) => {
   class ParticleCloud extends HTMLElement {
     connectedCallback() {
       this.cleanup?.();
-      if (!this.initialized) {
+      const showNextScene = () => {
         let storage;
         try { storage = sessionStorage; } catch {}
         const scene = nextScene(storage);
@@ -83,6 +83,9 @@ const wisps = Array.from({ length: 32 }, (_, i) => {
           circle.style.setProperty('--phase', `${-Math.random() * 32}s`);
           circle.style.setProperty('--dx', `${8 + Math.random() * 20}px`);
         });
+      };
+      if (!this.initialized) {
+        showNextScene();
         this.initialized = true;
       }
       const button = this.querySelector<HTMLButtonElement>('button')!;
@@ -107,9 +110,13 @@ const wisps = Array.from({ length: 32 }, (_, i) => {
       const observer = new IntersectionObserver(([entry]) => { inView = entry.isIntersecting; update(); });
       observer.observe(this);
       const timer = setTimeout(() => { ready = true; update(); }, 500);
+      const rotationTimer = setInterval(() => {
+        if (this.dataset.motion === 'running') showNextScene();
+      }, 30_000);
       update();
       this.cleanup = () => {
         clearTimeout(timer);
+        clearInterval(rotationTimer);
         observer.disconnect();
         button.removeEventListener('click', toggle);
         reducedMotion.removeEventListener('change', preferenceChanged);
