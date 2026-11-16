@@ -45,6 +45,7 @@ import particula as par
 from particula.dynamics.condensation.species_mapping import (
     CondensationSpeciesMap,
 )
+from particula.execution.splitting import condensation_flow
 
 # Optional: uncomment if many steps and you want a progress bar
 # from tqdm import tqdm
@@ -182,6 +183,16 @@ def run_cycle(
         err_msg="Phase durations must be whole multiples of dt",
     )
     history = []
+    growth = condensation_flow(
+        "water_exchange",
+        condensation.condensation_strategy,
+        method="ros3",
+        rtol=1e-5,
+        particle_atol=1e-25,
+        gas_atol=1e-12,
+        first_step=1e-6,
+        max_step=dt,
+    )
 
     # Set initial humid phase water concentration
     aerosol.gas.concentration[0, water_index] = c_water_humid
@@ -206,7 +217,9 @@ def run_cycle(
             aerosol.gas.concentration[:, :-1]
             * aerosol.particles.volume[:, None]
         )
-        aerosol = condensation.execute(aerosol, time_step=dt)
+        accepted = growth.advance(aerosol, time_offset + (t_step - 1) * dt, dt)
+        aerosol.particles.masses[:] = accepted.particles.masses
+        aerosol.gas.concentration[:] = accepted.gas.concentration
         after = np.sum(
             aerosol.particles.masses
             * aerosol.particles.concentration[..., None],
@@ -240,7 +253,11 @@ def run_cycle(
             aerosol.gas.concentration[:, :-1]
             * aerosol.particles.volume[:, None]
         )
-        aerosol = condensation.execute(aerosol, time_step=dt)
+        accepted = growth.advance(
+            aerosol, time_offset + humid_duration + (t_step - 1) * dt, dt
+        )
+        aerosol.particles.masses[:] = accepted.particles.masses
+        aerosol.gas.concentration[:] = accepted.gas.concentration
         after = np.sum(
             aerosol.particles.masses
             * aerosol.particles.concentration[..., None],
@@ -444,7 +461,9 @@ condensation_as = par.dynamics.MassCondensation(
 )
 
 print("Scenario A (AS-only) configured")
-print(aerosol_as)
+print(
+    f"{aerosol_as.particles.masses.shape[1]} slots; gases: {aerosol_as.gas.name}"
+)
 
 
 # %% [markdown]
@@ -509,7 +528,10 @@ condensation_sucrose = par.dynamics.MassCondensation(
 )
 
 print("Scenario B (Sucrose-only) configured")
-print(aerosol_sucrose)
+print(
+    f"{aerosol_sucrose.particles.masses.shape[1]} slots; "
+    f"gases: {aerosol_sucrose.gas.name}"
+)
 
 
 # %% [markdown]
@@ -575,7 +597,10 @@ condensation_mixed = par.dynamics.MassCondensation(
 )
 
 print("Scenario C (Mixed AS + Sucrose) configured")
-print(aerosol_mixed)
+print(
+    f"{aerosol_mixed.particles.masses.shape[1]} slots; "
+    f"gases: {aerosol_mixed.gas.name}"
+)
 
 
 # %% [markdown]
@@ -648,7 +673,9 @@ print("\nAll simulations completed successfully!")
 # forcing phases, while cycle marks repeat every 90 s. A change in trajectory can
 # reflect water exchange or removal; the separate dry-mass diagnostics below
 # help distinguish them. Step-scale oscillations require a refinement study
-# before being interpreted as physical repeated activation.
+# before being interpreted as physical repeated activation. Condensation now
+# uses adaptive ROS3 within each outer interval; the wall-loss/output schedule
+# still needs its own refinement and stochastic uncertainty assessment.
 
 
 # %%

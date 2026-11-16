@@ -35,7 +35,7 @@ Retain the source revision and study inputs alongside saved research output.
 | Analysis provenance and bounded storage | Units, dimensions, gas order, material densities, population measure, volume and caller-supplied configuration/numerics/source; detached arrays, opt-in slots and byte/row limits |
 | Atomic writes and corruption | `analysis_io_test.py` and checkpoint tests: failed replacement preserves prior file; pending AnalysisWriter row can be retried without advancing; hashes, schemas, NPY dimensions, duplicate keys/members and unknown types reject |
 | Native CPU restart | `cpu_restart_test.py`: known native processes, stochastic/condensation RNG, non-unit volumes, fields and ledgers, latent diagnostics and whole-cycle failure preservation |
-| Adaptive restart | CPU RK23/ROS2 and GPU RK23 retain exact scaled coordinates, controller settings/counters, accepted time and table forcing; identical future schedules give bitwise continuation |
+| Adaptive restart | CPU RK23/ROS2/ROS3 and GPU RK23/ROS3 retain exact scaled coordinates, controller settings/counters, accepted time and table forcing; identical future schedules give bitwise continuation |
 | Split restart | Nested sequential/Strang built-in condensation/dilution groups, shortened cycles, custom native fields and matching complete-cycle future state |
 | Prepared restart | Dilution, Brownian coagulation, wall loss, sequence, latent condensation and an integral nucleation pulse on Warp CPU and CUDA; canonical state and RNG match after disk round trip |
 | Registered prepared extensions | Custom clock/field/state and multiple managed stochastic streams survive disk restart with the caller's registry; missing registry rejects |
@@ -58,8 +58,10 @@ never pickle, arbitrary imports or serialized live process callbacks.
 
 Prepared files preserve SimulationCheckpoint v2 and ResidentCheckpoint v5
 canonical bytes; lossy CPU inspection carriers are regenerated from that
-authority. Native CPU and split records use schema 1, and adaptive CPU/GPU
-records use schema 2 for explicit table forcing. Container schemas remain
+authority. Native CPU and split records use schema 1. Adaptive CPU records use
+schema 2 for explicit table forcing; adaptive GPU records use schema 3 for
+ROS3 and exact unchanged-coordinate unscaling. Coupled GPU records use their
+own schema 1 for complete event boundaries. Container schemas remain
 separate from record versions. Unsupported schemas are rejected without guessed
 migration. Prepared/custom adapters remain caller-supplied; loading is data
 reconstruction, and resume validates the owner-specific configuration.
@@ -151,5 +153,7 @@ chamber still requires all 32 boxes, 8,192 slots, 600 one-second cycles, 128-eve
 pulses and complete second-half restart. The forcing example retains 16 boxes,
 4,096 slots, 6,000 one-microsecond intervals and the full doubled-step refinement
 with unchanged control times. Their updated sources and compact recording are
-implemented; publication, figure inspection and full-workload qualification are
-pending. No GPU speedup is inferred from this explicit transfer path.
+implemented. Both full publications are running in a detached checkout pinned
+to `480ecf2c1a`, separately from subsequent edits. Figure inspection and
+full-workload qualification are pending. No GPU speedup is inferred from this
+explicit transfer path.

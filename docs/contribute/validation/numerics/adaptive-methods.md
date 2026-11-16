@@ -399,7 +399,7 @@ retaining 1,000 particles over 60 s. Its inspected plot shows smooth dry
 relaxation, with peak diameter 23.19 µm, 788 survivors and 180.6% final
 wet/initial dry mass at printed precision. Its source and bundle hashes were
 verified before importing the clean-revision result. The multi-cycle,
-respiratory and biomass workloads remain running at this checkpoint.
+respiratory and biomass workloads remained running at that checkpoint.
 The current 558-page website build and rendered structure check both pass
 with zero structural errors.
 
@@ -458,6 +458,17 @@ with zero rendered structure errors. Logs are in `.artifacts/ros3-gpu-*` and
 The full coupled GPU cyclic chamber and forcing workloads are still required.
 These isolated-method results do not qualify the original fixed stochastic
 event schedule under adaptive deterministic condensation.
+
+The corrected **full multi-cycle CPU chamber** subsequently completed in
+2,308.69 s from the same clean `12742e1c39` revision and package source hash.
+All three 1,000-particle compositions produced 3,601 observations through
+360 s, covering four complete wet/dry cycles. All embedded physical checks
+passed. Bundle/source hashes were verified and all eight figures inspected
+before importing the results. The plotted dry phases are smooth at the stored
+0.1 s observation spacing. Final dry-mass retention is 14.1% for ammonium
+sulfate, 12.1% for sucrose and 11.5% for the mixed sample at printed precision.
+These stochastic sample results do not establish a composition ranking or
+experimental accuracy. The respiratory and biomass publications remain active.
 
 Validation commands (from the Stage 2B checkout with `PYTHONPATH=.`):
 

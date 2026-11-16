@@ -127,8 +127,10 @@ their numerical source was superseded. The complete workloads run in a detached 
 pinned to `12742e1c394c7a836d31aff3aeecbd8c0ff2b523`. The first CPU workflow and
 two CPU comparison examples have completed refresh, inspection and replot.
 The corrected full single-cycle chamber also completed and its figure was
-inspected. Finish and verify the multi-cycle, respiratory and biomass results
-before accepting the migration. Keep the library unchanged during each refresh; the publication
+inspected. The full multi-cycle chamber also completed: all three 1,000-particle
+compositions, four cycles and 3,601 observations each. Its bundle/source hashes
+and eight figures were verified and imported. Finish and verify the respiratory
+and biomass results before accepting the migration. Keep the library unchanged during each refresh; the publication
 hash guard rejects a changed runtime. Current process records are retained in
 `.artifacts/cloud-followthrough-runs.json`; verify live handles before resuming
 or replacing a run.
@@ -146,6 +148,9 @@ Coupled event ownership and exact restart are now implemented with explicit
 state transfers. The focused coupling/numerics/archive tests pass 65 cases;
 the full package gate and complete cyclic chamber/forcing publications remain
 pending. Run and inspect the full cyclic chamber and prepared forcing workloads.
+Both full CUDA publishers are active in `/tmp/particula-stage-02-gpu-validation`,
+pinned to `480ecf2c1a`. Their process records are in
+`.artifacts/coupled-runs.json`; verify live handles before making changes.
 The small CUDA examples
 do not replace that work. Full results, final narratives, review and PR readiness
 remain incomplete; no completion or merge is claimed.

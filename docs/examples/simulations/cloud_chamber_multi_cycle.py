@@ -1788,18 +1788,21 @@ plt.show()
 # Repeated vapor resets exchange water with surviving seeds while wall loss
 # removes dry material. Tracking both species mass and particle identity separates
 # those effects better than a size curve alone. In the refreshed realization,
-# final dry-mass retention is about 16.1%, 11.2%, and 10.6% for sulfate, sucrose,
+# final dry-mass retention is about 14.1%, 12.1%, and 11.5% for sulfate, sucrose,
 # and mixed seeds, respectively. The first-event check records 0.1 s for both
 # pure compositions and therefore does not resolve an ordering between them.
-# The visible dry-phase oscillations remain a numerical-resolution concern;
-# do not interpret them as observed physical cycling. Composition changes the activity
+# The adaptive ROS3 trajectories have smooth dry phases at the saved 0.1 s
+# observation spacing, replacing the previous fixed-step oscillations. This
+# does not establish convergence of the outer wall-loss schedule or accuracy
+# between observations. Composition changes the activity
 # model, but these separately sampled scenarios do not isolate a universal κ
 # ordering or demonstrate competition between external sulfate and sucrose modes.
 
 # %% [markdown]
 # ## Design the next chamber comparison
 #
-# For a research study, first refine dt while keeping physical humid/dry durations
+# For a research study, refine outer dt and condensation tolerances separately,
+# keeping physical humid/dry durations
 # fixed. Compare full size trajectories, dry retention, and the explicitly chosen
 # activation diagnostic across independent random seeds. Then pair the initial
 # radii across compositions to separate material effects from sample variability.

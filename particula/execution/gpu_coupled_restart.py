@@ -16,6 +16,7 @@ from particula.execution.gpu_coupled import (
 )
 from particula.execution.gpu_restart import _device_identity, _runtime
 from particula.execution.ode import StepStatistics
+from particula.execution.prepared_processes import _ProcessPlan
 from particula.execution.prepared_types import SimulationCheckpoint
 
 
@@ -80,7 +81,8 @@ def _validate(saved):
         or saved.events.host_rng is not None
         or saved.events.execution_mode != "resident"
         or any(
-            plan.family
+            type(plan) is not _ProcessPlan
+            or plan.family
             not in {"nucleation", "coagulation", "wall_loss", "dilution"}
             for plan in saved.events.processes
         )
