@@ -44,23 +44,24 @@ def checkpoint_coupled(owner):
     """Download exact continuation only after a successfully completed cycle."""
     if type(owner) is not GPUCoupledSimulation:
         raise TypeError("requires GPUCoupledSimulation")
-    owner._ready()
-    return GPUCoupledCheckpoint(
-        1,
-        _runtime(),
-        _device_identity(wp.get_device(owner.device.native)),
-        owner._events.checkpoint(),
-        condensation_identity(owner._strategy),
-        owner.controls,
-        owner.order,
-        replace(owner.statistics),
-        (
-            owner.coupling_cycles,
-            owner.coupling_downloads,
-            owner.coupling_uploads,
-            owner.control_readbacks,
-        ),
-    )
+    with owner._events._lock:
+        owner._ready()
+        return GPUCoupledCheckpoint(
+            1,
+            _runtime(),
+            _device_identity(wp.get_device(owner.device.native)),
+            owner._events.checkpoint(),
+            condensation_identity(owner._strategy),
+            owner.controls,
+            owner.order,
+            replace(owner.statistics),
+            (
+                owner.coupling_cycles,
+                owner.coupling_downloads,
+                owner.coupling_uploads,
+                owner.control_readbacks,
+            ),
+        )
 
 
 def _validate(saved):

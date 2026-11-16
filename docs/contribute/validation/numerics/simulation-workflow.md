@@ -172,3 +172,14 @@ an untouched-source final-head run. Logs are retained in
 `.artifacts/gpu-coupled-tooling-examples.log`,
 `.artifacts/gpu-coupled-final-focused.log` and
 `.artifacts/gpu-coupled-website.log`.
+
+Direct `checkpoint_coupled(owner)` calls now hold the same reentrant cycle lock
+as `owner.checkpoint()`. Review found that the standalone helper could otherwise
+copy the event checkpoint and aggregate counters at different cycle boundaries.
+A deterministic threaded regression fails against the previous unlocked helper
+and passes with the lock. The full coupled test module then passed **18 tests
+with one intentional Warp-CPU capture skip** in 62.25 s. Ruff, formatting and
+checked-body Mypy passed for the affected modules. The reproducer and focused
+logs are `.artifacts/gpu-coupled-lock-regression-before.log` and
+`.artifacts/gpu-coupled-checkpoint-lock.log`. The ongoing full publications use
+the already-locked owner method; this correction does not change their physics.

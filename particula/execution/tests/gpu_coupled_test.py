@@ -341,3 +341,69 @@ def test_unsupported_events_reject_before_allocation(monkeypatch):
             device="cpu",
             time_step=0.1,
         )
+
+
+def test_direct_checkpoint_waits_for_complete_cycle(monkeypatch):
+    """Concurrent direct checkpointing must not inspect intermediate events."""
+    from concurrent.futures import ThreadPoolExecutor
+    from threading import Event, current_thread
+
+    from particula.execution.gpu_coupled_restart import checkpoint_coupled
+
+    initial, strategy = case()
+    events = (Dilution(DilutionStrategy(0.2)),)
+    with GPUCoupledSimulation(
+        initial, events, strategy, device="cpu", time_step=0.001
+    ) as owner:
+        midcycle, release, attempted = Event(), Event(), Event()
+        original_lock = owner._events._lock
+        original_condense = owner._condense
+        original_ready = owner._ready
+        checkpoint_thread = []
+
+        class ObservedLock:
+            """Expose an acquisition attempt without changing lock behavior."""
+
+            def __enter__(self):
+                if (
+                    checkpoint_thread
+                    and current_thread() is checkpoint_thread[0]
+                ):
+                    attempted.set()
+                original_lock.acquire()
+                return self
+
+            def __exit__(self, *_exc):
+                original_lock.release()
+
+        def held_condense(start, end):
+            midcycle.set()
+            assert release.wait(10), "test failed to release the cycle"
+            return original_condense(start, end)
+
+        def checked_ready():
+            if checkpoint_thread and current_thread() is checkpoint_thread[0]:
+                unsafe = midcycle.is_set() and not release.is_set()
+                attempted.set()
+                assert not unsafe, "checkpoint observed an incomplete cycle"
+            return original_ready()
+
+        def direct_checkpoint():
+            checkpoint_thread.append(current_thread())
+            return checkpoint_coupled(owner)
+
+        monkeypatch.setattr(owner._events, "_lock", ObservedLock())
+        monkeypatch.setattr(owner, "_condense", held_condense)
+        monkeypatch.setattr(owner, "_ready", checked_ready)
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            advance = pool.submit(owner.step)
+            assert midcycle.wait(10), "cycle did not start"
+            checkpoint = pool.submit(direct_checkpoint)
+            try:
+                assert attempted.wait(10), "checkpoint did not start"
+            finally:
+                release.set()
+            advance.result(timeout=10)
+            saved = checkpoint.result(timeout=10)
+        assert saved.events.resident.completed_steps == saved.counters[0] == 1
+        assert saved.statistics == owner.statistics
