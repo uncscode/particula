@@ -1,6 +1,8 @@
 # Stage 2A: Numerical integration and process splitting
 
-Status: in progress; see the [delivery record](stage-02a-delivery.md).
+Status: implemented and locally validated; delivered in
+[PR #1659](https://github.com/uncscode/particula/pull/1659).
+See the [delivery record](stage-02a-delivery.md).
 Entry dependency: initial
 [Stage 1 reference cases](stage-01-scientific-correctness.md).
 Develop alongside [Stage 2B](stage-02b-simulation-workflow.md).
