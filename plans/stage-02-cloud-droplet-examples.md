@@ -156,3 +156,23 @@ pinned to `480ecf2c1a`. Their process records are in
 The small CUDA examples
 do not replace that work. Full results, final narratives, review and PR readiness
 remain incomplete; no completion or merge is claimed.
+
+The respiratory time-refinement requirement is a separate remaining gate.
+`scripts/assess_respiratory_refinement.py` reuses the complete published setup
+and coarse solver, then compares all 201 observations with a second full run
+using 100-fold tighter relative/absolute tolerances, half the maximum step and
+half the output interval. Prospective consistency targets are 0.1% maximum
+per-droplet relative radius difference and 0.1% phase-inventory difference
+normalized separately by each species' initial total inventory. The report also
+retains each material's maximum per-slot difference relative to its own initial
+mass, without normalizing small solutes by water. Both trajectories must retain
+the original per-species budget assertions. This is same-method consistency,
+not an independent oracle or validation of the known incorrect chemical-name
+matches. Execute the full assessment and retain its compact report before
+claiming this acceptance item is complete:
+
+```bash
+PYTHONPATH=. MPLBACKEND=Agg .venv/bin/python \
+  scripts/assess_respiratory_refinement.py \
+  --output .artifacts/respiratory-refinement.json
+```
