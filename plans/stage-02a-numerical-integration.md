@@ -1,6 +1,7 @@
 # Stage 2A: Numerical integration and process splitting
 
-Status: proposed. Entry dependency: initial
+Status: in progress; see the [delivery record](stage-02a-delivery.md).
+Entry dependency: initial
 [Stage 1 reference cases](stage-01-scientific-correctness.md).
 Develop alongside [Stage 2B](stage-02b-simulation-workflow.md).
 

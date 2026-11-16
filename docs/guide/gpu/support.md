@@ -21,6 +21,7 @@ hardware/runtime requirement; requesting CUDA never selects Warp CPU silently.
 | Continuation | `checkpoint()` and matching runnable `resume()` | Exact device/configuration and canonical bytes; no automatic CPU fallback. |
 | Native CUDA capture | `capture()`, then ordinary `step/run` | Non-advancing capture; fixed bindings; fresh capture after resume. |
 | Direct kernels | Supported process-specific fixed-shape interfaces | Caller owns transfers, scratch, species bindings and RNG sidecars. |
+| Continuous adaptive condensation | Concrete `GPUCondensationODE` with RK23 | Bounded isothermal profile, shared host controller and scalar readbacks; no CUDA capture. |
 | Warp CPU | Separate regression target | CPU evidence is labeled separately from actual CUDA execution and performance. |
 
 Prepared Brownian and charged coagulation are particle-resolved and require
@@ -32,6 +33,9 @@ ion masses, and the fixed LF2013 air conditions and fitted domains described in
 [atmospheric ion collisions](prepared.md#atmospheric-ion-collisions).
 Prepared condensation supports a bounded set of thermodynamic configurations and
 four equal fixed substeps; it does not imply general CPU-strategy equivalence.
+For the separate opt-in adaptive owner, see
+[numerical integration](../processes/numerical-integration.md) and its measured
+accuracy and transfer costs. It does not change prepared simulation semantics.
 
 ## Direct-kernel details
 

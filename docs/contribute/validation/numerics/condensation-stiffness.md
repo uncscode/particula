@@ -1,6 +1,8 @@
 # Condensation Stiffness Study and Recommendation Record
 
-This note is the canonical decision record for GPU condensation integration.
+This note is the decision record for the direct fixed-four GPU condensation path.
+The separate [adaptive integration assessment](adaptive-methods.md) qualifies
+the opt-in continuous-rate owner; it does not change the direct fixed-step API.
 The shipped production path uses four fixed equal substeps; baseline and candidate study candidate
 comparisons remain historical evidence only. The current production GPU path is
 `float64` bounded and couples inventory-limited particle transfer to gas
@@ -220,8 +222,9 @@ pytest particula/gpu/kernels/tests/condensation_autodiff_test.py -q -m "warp and
   boundaries, but the measured CPU-reference agreement is materially looser
   (`rtol <= 3.5e-1` / `max relative error <= 3.5e-1`) than the fixed-count
   candidate.
-- **Adaptive or dynamic-loop schemes:** deferred; no adaptive-stepping support
-  is documented by this record.
+- **Adaptive or dynamic-loop schemes:** not part of this direct fixed-step
+  interface. The separate [continuous-rate assessment](adaptive-methods.md)
+  documents adaptive owner support and its capture restrictions.
 
 ### Current gas-coupling boundary
 

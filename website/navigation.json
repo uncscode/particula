@@ -134,6 +134,10 @@
             "slug": "guide/processes/condensation"
           },
           {
+            "label": "Numerical integration and splitting",
+            "slug": "guide/processes/numerical-integration"
+          },
+          {
             "label": "Dilution Strategy System",
             "slug": "guide/processes/dilution"
           },
@@ -1043,6 +1047,10 @@
               {
                 "label": "Condensation Stiffness Study and Recommendation Record",
                 "slug": "contribute/validation/numerics/condensation-stiffness"
+              },
+              {
+                "label": "Adaptive integration assessment",
+                "slug": "contribute/validation/numerics/adaptive-methods"
               },
               {
                 "label": "Mass Precision Recommendation Report",
