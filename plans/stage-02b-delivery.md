@@ -100,7 +100,7 @@ creation claim a merge, release or production documentation deployment.
 
 ## Current follow-through gates
 
-The current library gate at executable revision `2b4bddefd8` passed 10,810 tests
+The earlier transferred-execution gate at revision `2b4bddefd8` passed 10,810 tests
 with 91.34% unfiltered coverage, including actual CUDA. The
 [workflow qualification record](../docs/contribute/validation/numerics/simulation-workflow.md)
 owns the commands, skips and subsequent full forcing results; the
@@ -115,13 +115,14 @@ outputs rather than library execution.
       references, saved-data replots and downloadable examples.
 - [x] Full CUDA forcing publication and its doubled-step/tighter-tolerance
       comparison, with explicit transfer and observation-timing limits.
-- [ ] Full biomass publication, including all four collision-model branches.
-- [ ] Full CUDA cyclic chamber, exact second-half continuation, figure review,
+- [x] Full biomass publication, including all four collision-model branches.
+- [x] Full CUDA cyclic chamber, exact second-half continuation, figure review,
       and saved-data replot with the corrected JSON-compatible renderer.
-- [ ] Full respiratory time-refinement report, including per-species and
+- [x] Full respiratory time-refinement report, including per-species and
       per-particle differences separately from inventory conservation.
-- [ ] Final source/output consistency review, documentation verification and
-      publication of the remaining local commits to the existing draft PR.
+- [x] Final source/output consistency review and documentation verification.
+- [ ] Publish the remaining local commits to the existing draft PR after direct
+      push authorization.
 - [ ] Mark the existing PR ready only after the preceding gates pass.
 
 The [follow-through plan](stage-02-cloud-droplet-examples.md) identifies the
@@ -134,7 +135,7 @@ The prior biomass, respiratory-refinement and cyclic-chamber runs were stopped
 at the user's request. Their partial output is not completion evidence. The
 replacement request preserves full workloads while requiring CUDA
 residency and device-owned adaptive decisions, including acceptance/rejection
-and step-size selection. All solver material profiles are being checked.
+and step-size selection. The supported solver material profiles have been checked.
 
 - [x] Qualify multi-material GPU RK23/ROS3 rates, surface phases, mappings and
       conservative block solves against independent CPU and dense references.
@@ -143,14 +144,15 @@ and step-size selection. All solver material profiles are being checked.
 - [x] Switch biomass AO2008/DNS to supported ST1956 turbulent shear, explicitly
       authorized by the user. Retain dissipation and fluid density, label this
       model change, and preserve all four branches and their full workloads.
-- [ ] Rerun 10,000-particle biomass preparation and four full-hour branches.
-- [ ] Rerun the 1,000-particle, twelve-material respiratory publication and full
+- [x] Rerun 10,000-particle biomass preparation and four full-hour branches.
+- [x] Rerun the 1,000-particle, twelve-material respiratory publication and full
       20-second coarse/fine comparison, with per-species/particle targets.
-- [ ] Rerun the 32-box cyclic chamber for 600 seconds and exact 300-second
+- [x] Rerun the 32-box cyclic chamber for 600 seconds and exact 300-second
       continuation, with all existing budgets, observations and forcing.
-- [ ] Refresh qualified outputs and provenance; run final package/docs gates.
+- [x] Refresh qualified outputs and provenance; run final package/docs gates.
 
-Changes under development do not inherit the earlier package validation claim.
+The current resident qualification below supersedes the earlier package gate
+for these changes.
 GitHub publication remains pending the outstanding direct push authorization.
 
 Local resident implementation evidence: multi-material rates and trajectories
@@ -167,3 +169,13 @@ costly at the full particle counts. Their partial respiratory comparisons and
 bounded biomass diagnostics are not full-run completion evidence. Final runs
 must use the qualified parallel-reduction revision and retain every original
 workload and tolerance, with the explicitly authorized ST1956 model change.
+
+The final resident implementation at `9c548d9d61` passed 10,874 package tests
+with 91.02% coverage on actual CUDA. The full biomass and respiratory reruns
+and the 201-observation respiratory refinement completed from that same fixed
+revision. Their refreshed bundles and compact refinement report retain source
+hashes and RTX 5060 identity. The full cyclic trajectory and exact restart passed
+at `9c548d9d61`, but plot-data serialization failed afterward. A corrected full
+publication completed at `3d3753d2b` with unchanged physics. All 31 frames,
+figure inspection and CPU-only replot passed; exact restart, conservation and
+zero state transfers between stages remain verified.

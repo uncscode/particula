@@ -1,8 +1,11 @@
 # Adaptive integration and splitting assessment
 
 The selected development methods are RK3(2) for the measured continuous
-condensation regimes, CPU ROS2/ROS3 and a single-exchange GPU ROS3 option for stiff continuous systems,
-and sequential/Strang composition of declared deterministic flows. Existing
+condensation regimes, CPU ROS2/ROS3 and multi-material GPU ROS3 for supported
+stiff continuous systems, and sequential/Strang composition of declared
+deterministic flows. The [resident workflow qualification](simulation-workflow.md#cuda-resident-material-solvers-and-respiratory-refinement)
+owns the subsequent multi-material and device-controlled adaptation evidence;
+the earlier single-exchange assessments below retain their original scope. Existing
 finite-step strategies and fixed-four GPU condensation remain available.
 This record establishes a bounded numerical choice, not experimental validation
 or a general GPU speedup. See the [usage and support matrix](../../../guide/processes/numerical-integration.md).
@@ -280,8 +283,8 @@ The one-representative-particle CUDA calculation is accuracy evidence only.
 The full cloud migration exposed a practical cost limit in ROS2's first-order
 embedded estimator. A bounded comparison therefore revisited the original
 Stage 2A ROS3 candidate before selecting it for larger workloads. The concrete
-CPU solver now accepts `method="ros3"`; RK23 remains the default and the GPU
-owner remains RK23-only. The three-stage method shares one factorization and
+CPU solver gained `method="ros3"`; RK23 remained the default, and the GPU
+owner was RK23-only at this assessment stage. The three-stage method shares one factorization and
 uses two rate evaluations per trial, with partial time derivatives for forcing.
 Coefficients were checked against the `Ros3` routine in
 [KPP's primary implementation](https://github.com/KineticPreProcessor/KPP/blob/main/int/rosenbrock.f90),
@@ -412,10 +415,11 @@ retained. This remains prototype evidence, not coupled GPU qualification.
 
 ## Integrated GPU ROS3 qualification
 
-The resident ROS3 method is now integrated into `GPUCondensationODE`, including
-stage-time forcing and exact same-device disk restart. The supported profile
-has exactly one exchanging material; unsupported multiple exchanges reject
-before device allocation. The stage solve uses conservative arrowhead
+This first integration added ROS3 to `GPUCondensationODE`, including
+stage-time forcing and exact same-device disk restart. Its qualified profile
+had exactly one exchanging material and rejected multiple exchanges before
+device allocation. The later multi-material extension is qualified in the
+[resident workflow record](simulation-workflow.md#cuda-resident-material-solvers-and-respiratory-refinement). The stage solve uses conservative arrowhead
 elimination, with linear scratch storage and no dense factorization. This
 supersedes the prototype-only status above for the isolated condensation owner.
 Coupled source/collision ownership was subsequently implemented and tested;

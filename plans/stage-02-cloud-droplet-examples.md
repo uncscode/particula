@@ -132,11 +132,12 @@ compositions, four cycles and 3,601 observations each. Its bundle/source hashes
 and eight figures were verified and imported. The full respiratory publication
 also completed, with all twelve species budgets intact, 201 observations and
 8,921 accepted ROS3 steps. Its hashes and five figures were verified and imported.
-Finish the biomass publication and the separate respiratory refinement before
-accepting the migration. Keep the library unchanged during each refresh; the publication
-hash guard rejects a changed runtime. Current process records are retained in
-`.artifacts/cloud-followthrough-runs.json`; verify live handles before resuming
-or replacing a run.
+Those earlier runs were superseded by the user's request for fully resident
+CUDA execution. The biomass publication and respiratory refinement are now
+complete on `9c548d9d61`, retaining full workloads and the original budgets.
+The biomass turbulence model was explicitly changed to supported ST1956 shear.
+The current acceptance status and remaining delivery gates are tracked in Stage 2B.
+
 
 GPU cyclic/forcing ownership has been inspected. The cyclic study includes
 source pulses, persistent stochastic collision state, captured fixed stepping
@@ -156,21 +157,18 @@ and its 12,000-cycle refinement, with unchanged physical forcing. Final mass and
 vapor differences are 2.32e-7 and 8.86e-9 relative. Hashes, figure inspection,
 CPU replot and extracted-download import/rendering passed; the compact bundle
 is retained. The workflow qualification record owns detailed measurements.
-The full cyclic chamber publisher remains active in
-`/tmp/particula-stage-02-gpu-validation`, pinned to `480ecf2c1a`.
-The process records are in
-`.artifacts/coupled-runs.json`; verify live handles before making changes.
-After the cyclic publication finishes, apply the current plotting-only source
-update in its validation checkout and replot there before importing the bundle.
-Review reproduced a JSON-list rendering failure; the corrected renderer accepts
-both arrays and lists, produces identical pixels and preserves saved data. Its
-simulation fingerprint matches the pinned run, so this does not require a new
-scientific calculation. The actual saved-data replot remains a required gate.
-The small CUDA examples
-do not replace that work. Full results, final narratives, review and PR readiness
-remain incomplete; no completion or merge is claimed.
+The earlier transferred cyclic-chamber run was stopped at the user's request.
+Its fully resident replacement runs from `/tmp/particula-stage-02b`, pinned to
+`9c548d9d61`; its complete 600 s trajectory and exact second-half continuation
+passed. Plot-data serialization then failed, so an output-only correction at
+`3d3753d2b` completed a fresh full publication with unchanged physics. All 31
+observations, figure inspection and CPU-only replot are retained. The bounded first-interval diagnostic passed its budget
+check, while later rapid evaporation required many small accepted steps.
+The scientific runs, retained results and local documentation verification
+are complete. GitHub publication/readiness remains pending direct push
+authorization.
 
-The respiratory time-refinement requirement is a separate remaining gate.
+The respiratory time-refinement requirement is a separate numerical gate.
 `scripts/assess_respiratory_refinement.py` reuses the complete published setup
 and coarse solver, then compares all 201 observations with a second full run
 using 100-fold tighter relative/absolute tolerances, half the maximum step and
@@ -181,8 +179,7 @@ retains each material's maximum per-slot difference relative to its own initial
 mass, without normalizing small solutes by water. Both trajectories must retain
 the original per-species budget assertions. This is same-method consistency,
 not an independent oracle or validation of the known incorrect chemical-name
-matches. Execute the full assessment and retain its compact report before
-claiming this acceptance item is complete:
+matches. The completed assessment retained its compact report using this command:
 
 ```bash
 PYTHONPATH=. MPLBACKEND=Agg .venv/bin/python \
@@ -190,7 +187,10 @@ PYTHONPATH=. MPLBACKEND=Agg .venv/bin/python \
   --output .artifacts/respiratory-refinement.json
 ```
 
-The full comparison is running in `/tmp/particula-stage-02-refinement`, pinned
-to `2b4bddefd8`. Its live process/status/log paths are recorded in the Stage 2B
-worktree's `.artifacts/respiratory-refinement-run.json`. Verify those handles
-before resuming; the initial-transient diagnostic is not full-run evidence.
+The older CPU comparison was stopped and superseded at the user's request.
+The complete CUDA-resident comparison subsequently passed all 201 observations
+on revision `9c548d9d61`, with maximum relative radius difference `3.92121e-6`
+and maximum per-species phase-inventory fraction `3.22563e-8`. The compact
+report is `docs/data/numerics/resident-respiratory-refinement.json`; the
+workflow qualification record owns the controls, work counts and evidence
+limits. This respiratory acceptance item is complete.

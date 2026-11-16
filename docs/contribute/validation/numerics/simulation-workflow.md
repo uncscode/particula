@@ -251,3 +251,142 @@ cyclic chamber and the remaining CPU scientific studies are still required.
 The imported bundle passed the 563-page website build and rendered verification
 with zero errors; see `.artifacts/coupled-forcing-website.log`. The final ZIP's
 executable source and all helper bytes match the independently tested download.
+
+
+## CUDA-resident material solvers and respiratory refinement
+
+Revision `9c548d9d617a93cd23a45773426f751e9e6ed9ec` qualifies the expanded
+multi-material RK23 and ROS3 GPU paths, device-owned adaptive decisions,
+selective gas forcing, and deterministic parallel reservoir reductions. The
+full package gate passed **10,874 tests**, with 21 skips and one expected
+failure, in **331.88 s**; coverage was **91.02%**. Actual CUDA ran on the
+RTX 5060. Full Ruff/format checks and Mypy (696 sources) passed. Focused
+independent reservoir and dense-solve oracles passed 38 tests, including
+12-material and larger-than-one-reduction-lane-group cases.
+
+The complete 1,000-particle, twelve-material respiratory example ran to 20 s
+on that revision in **286.82 s**. Its separate coarse/fine assessment completed
+all **201 observations** in **1,229.39 s**, retaining the original inventory
+assertions. The fine run used 100-fold tighter relative and absolute tolerances,
+half the maximum step and half the observation interval. Both prospective
+0.1% consistency targets passed:
+
+- Maximum per-particle relative radius difference: **3.92121347e-6**.
+- Maximum per-species phase-inventory difference: **3.22563458e-8** of that
+  species' initial total inventory.
+- Coarse: **8,921 accepted**, one rejected step; fine: **41,841 accepted**,
+  one rejected step. Neither run had domain rejections.
+
+The complete repository report at
+`docs/data/numerics/resident-respiratory-refinement.json` retains every
+observation, material identity, controls, source hashes and work counts. These
+elapsed times include concurrent GPU work and are not isolated performance
+benchmarks. This is same-method numerical consistency evidence;
+it does not independently validate the chemistry or correct the example's
+previously documented chemical-name matches. The refreshed publication records
+CUDA execution, fixed revision and source hashes. The cyclic chamber has
+completed its 600 s trajectory and exact checkpoint continuation; the first
+publication failed during plot-data serialization, as recorded below.
+
+
+### Full resident biomass publication
+
+The 10,000-particle, three-material biomass workload completed on the same
+revision and RTX 5060 in **4,148.09 s** with concurrent GPU work. It retained
+0.01 s initial adjustment, 600 s preparation and all four independent 3,600 s
+branches, each with 10,000 outer intervals of 0.36 s. The user-authorized model
+change replaces AO2008/DNS with **ST1956 turbulent shear**, retaining
+`epsilon = 0.1 m²/s³` and fluid density `1.225 kg/m³`. This is a changed collision
+model, not a CUDA implementation or validation of AO2008.
+
+All four branches passed the unchanged per-species inventory assertion
+(`rtol=1e-12`, `atol=1e-30`). Each coupled branch asserted zero physical-state
+uploads and downloads between process stages. Adaptive decisions remained in
+native CUDA conditional graphs. Physical-state downloads were limited to
+declared observations; control metadata was read at completed outer intervals.
+
+| Coupled branch | Accepted condensation steps | Rejected steps | Domain rejections |
+| --- | ---: | ---: | ---: |
+| Brownian | 31,450 | 7,221 | 0 |
+| Brownian + SP2016 settling | 21,902 | 3,612 | 0 |
+| ST1956 turbulent shear | 27,602 | 6,101 | 0 |
+
+The refreshed biomass bundle retains the executed source, package hash,
+revision, device identity, scientific stdout and all four figures. The final
+size-distribution and mixing-state figures explicitly identify turbulent shear.
+These are completion and conservation checks for this illustration, not a
+collision-model convergence study or experimental validation.
+
+
+### Publication runner timeout correction
+
+The full cyclic trajectory exceeded the registry's nominal two-hour limit.
+Inspection found that the synchronous Jupyter client blocked the notebook
+event loop while waiting for output, preventing the timeout from firing.
+The publisher now uses an asynchronous kernel manager and retains explicit
+kernel cleanup. A real-kernel regression (a seven-second cell with a
+five-second deadline) failed before this fix and passes after it, including
+verification that the timed-out kernel is released. All 23 publisher tests
+pass with warnings treated as errors; website tooling passes 61 Python and
+14 JavaScript tests. This runner change does not alter simulation physics.
+The already-running chamber retained its original loaded runner.
+
+
+### Full resident cyclic trajectory and output recovery
+
+The first complete resident cyclic run at `9c548d9d61` passed all 600 one-second
+cycles on the RTX 5060, with 32 boxes, 8,192 slots per box, 196,608 initially
+active particles and twelve prescribed source pulses. It finished with 37,064
+active particles. The maximum observed box/species inventory relative residual
+was **1.19682042e-13**, below the unchanged `rtol=2e-12` gate. Charge, unit
+counts and finite-state checks passed at all thirty observation times.
+
+The 300-second checkpoint reproduced the complete second half with byte-exact
+final state and random continuation. The original trajectory used **620,558
+accepted** and **378 rejected** condensation steps, with zero domain rejections,
+1,200 control readbacks and **zero physical-state coupling uploads/downloads**.
+These results are retained in the captured completion stdout; the first attempt
+did not publish a result bundle. Its subsequent plot-data writer rejected NumPy
+arrays, and kernel cleanup released the in-memory observations. No missing
+trajectory data have been reconstructed or substituted.
+
+The observation boundary now converts detached arrays to plain lists. This
+changes output representation only. A regression using the actual observation,
+JSON writer and CPU-only plotting path reproduces the failure before the fix
+and passes after it. Together with the publisher tests, **24 tests passed with
+warnings treated as errors**. The timeout is now 14,400 seconds to accommodate
+the measured full workload with enforced deadlines. The fresh full publication
+from `3d3753d2b` completed in **6,307.33 s**, using identical library bytes and
+scientific settings. It reproduced all work counts and accounting results above,
+including exact same-device restart and zero stage transfers. The retained
+**659,430-byte** data bundle contains all **31 frames** from 0 through 600 s.
+The four-panel figure was inspected before and after CPU-only replot. Replot
+preserved the data hash and original CUDA execution provenance; no simulation
+was rerun for rendering. The initial displayed point precedes the first forcing
+update, and the 20-second observations do not resolve every jump or peak. This
+completion time is not an isolated performance benchmark.
+
+
+The corrected runner also validated all **59 CPU-policy registry examples**
+without replacing their saved publications. This check called the existing
+`validate_example` path for each CPU-policy entry; all-library scientific
+bytes remained fixed during that pass and the chamber rerun.
+
+Key validation commands for the resident changes and output fixes were:
+
+```bash
+PYTHONPATH=. .venv/bin/python -m pytest particula \
+  --cov=particula --cov-report=term-missing --cov-fail-under=80 -Werror -q
+PYTHONPATH=. MPLBACKEND=Agg .venv/bin/python -m pytest \
+  examples_tests/gpu_cyclic_chamber_example_test.py \
+  scripts/tests/docs_examples_test.py -q --no-cov -Werror
+.venv/bin/ruff check particula/ examples_tests/ scripts/ --no-fix
+.venv/bin/ruff format particula/ examples_tests/ scripts/ --check
+```
+
+
+Final local documentation verification found all **89 registered bundles current**
+and zero structure errors. The website built **571 pages**; rendered verification
+checked 701 HTML pages, 332 API modules, 1,860 legacy anchors and 130 redirects
+with zero errors. The local Stage 2B branch retains the qualified outputs;
+GitHub publication remains pending direct push authorization.

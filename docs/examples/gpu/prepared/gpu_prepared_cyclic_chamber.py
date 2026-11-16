@@ -33,7 +33,7 @@
 # same external forcing schedule is continued from its saved step index.
 #
 # This is a deliberate manual CUDA study, excluded from CI execution. Its
-# refresh permits up to two hours; download the ZIP for all study helpers.
+# refresh permits up to four hours; download the ZIP for all study helpers.
 
 # %%
 """Longer coupled CUDA aerosol evolution with cyclic forcing and source pulses."""
@@ -275,6 +275,9 @@ def run_example():
 # number and shifts mass to larger particles. Prescribed vapor and temperature
 # changes alter water uptake and evaporation. The radius/time map shows the
 # resulting evolving population instead of only a final distribution.
+# The point at zero is the supplied initial state before the first forcing
+# update. Later observations are 20 seconds apart; they do not resolve every
+# forcing jump or transient peak.
 # Invariant checks establish accounting and restart correctness; this
 # fixed event schedule with adaptive condensation is not a converged prediction
 # for a physical chamber.
