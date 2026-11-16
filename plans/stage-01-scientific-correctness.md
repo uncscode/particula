@@ -1,6 +1,8 @@
 # Stage 1: Scientific correctness and verification
 
-Status: proposed. Entry dependency: none.
+Status: implemented and locally validated; PR delivery pending.
+Entry dependency: none. See the [delivery record](stage-01-delivery.md) and
+[scientific evidence](../docs/contribute/validation/numerics/scientific-correctness.md).
 
 ## Execution and delivery
 

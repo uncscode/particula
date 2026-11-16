@@ -49,7 +49,7 @@ Kernel values have units m³/s and use per-particle material mass, geometry and
 charge. They do not multiply physical mass by population count. Zero-mass,
 zero-count slots retain zero rows/columns in the original slot layout; occupied
 zero-mass particles reject. Existing CPU sedimentation and DNS retain their
-arithmetic mean of per-particle mass-weighted effective density. DNS retains its
+arithmetic mean of per-particle mass divided by additive material volume. DNS retains its
 existing ambient-pressure convention; this migration does not change its law.
 
 | Native quantity | Interpretation |

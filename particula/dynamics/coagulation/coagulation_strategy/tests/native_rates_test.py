@@ -102,9 +102,8 @@ def _physical(particle, temperature=298.15, pressure=101325.0):
     # cancellation can amplify its several-ulp radius bias across CPU builds.
     # Inputs remain independently derived from raw species masses/densities.
     radius = np.cbrt(3 * volumes / (4 * np.pi))
-    # The retained CPU effective-density contract is mass-weighted arithmetic
-    # density, distinct from the volume used to calculate physical radius.
-    density = np.sum(particle.masses[0] * particle.density, axis=1) / masses
+    # Density and radius share the same additive material volume.
+    density = masses / np.sum(particle.masses[0] / particle.density, axis=1)
     mu = (
         c.REF_VISCOSITY_AIR_STP
         * (temperature / c.REF_TEMPERATURE_STP) ** 1.5

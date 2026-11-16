@@ -196,14 +196,16 @@ def test_native_bulk_property_successors():
 
 @pytest.mark.parametrize("species", [1, 3])
 def test_native_effective_density_successors(species):
-    """Retain mass-weighted density and the original multispecies mean oracle."""
+    """Mixture density agrees with independently summed material volumes."""
     masses = np.arange(1, 13, dtype=np.float64).reshape(4, 3)[:, :species]
     density = np.arange(1, species + 1, dtype=np.float64)
     data = create_resolved_particle_data(masses=masses, density=density)
-    expected = np.sum(masses * density, axis=1) / np.sum(masses, axis=1)
+    expected = np.sum(masses, axis=1) / np.sum(masses / density, axis=1)
     npt.assert_allclose(data.effective_density[0], expected, rtol=1e-7)
     values = data.effective_density[0]
     mean = float(np.mean(values[values != 0]))
     assert np.isclose(
-        mean, 1.0 if species == 1 else 2.1526515151515153, rtol=1e-7
+        mean,
+        1.0 if species == 1 else (2 + 30 / 17 + 12 / 7 + 22 / 13) / 4,
+        rtol=1e-7,
     )

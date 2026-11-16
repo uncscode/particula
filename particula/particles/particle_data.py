@@ -340,19 +340,17 @@ class ParticleData:
 
     @property
     def effective_density(self) -> NDArray[np.float64]:
-        """Mass-weighted effective density per particle.
+        """Mixture density from total mass divided by additive material volume.
 
         Returns:
             Effective density in kg/m^3 with shape (n_boxes, n_particles).
         """
-        # Preserve the mass-weighted effective-density convention:
-        # sum_i(m_i * rho_i) / sum_i(m_i)
-        mass_weighted_density_sum = np.sum(self.masses * self.density, axis=-1)
+        total_volume = np.sum(self.masses / self.density, axis=-1)
         total_mass = self.total_mass
         return np.divide(
-            mass_weighted_density_sum,
             total_mass,
-            where=total_mass > 0,
+            total_volume,
+            where=total_volume > 0,
             out=np.zeros_like(total_mass),
         )
 

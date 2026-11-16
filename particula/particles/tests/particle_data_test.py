@@ -348,7 +348,7 @@ class TestParticleDataProperties:
         assert data.effective_density.shape == (1, 1)
 
     def test_effective_density_multi_species(self) -> None:
-        """Effective density is mass-weighted average density across species."""
+        """Effective density is total mass over additive material volume."""
         masses = np.array([[[1e-18, 2e-18, 3e-18]]])
         density = np.array([1000.0, 1200.0, 800.0])
         data = ParticleData(
@@ -358,11 +358,8 @@ class TestParticleDataProperties:
             density=density,
             volume=np.array([1e-6]),
         )
-        # Effective density uses mass-weighted species densities:
-        # sum(mass_i * density_i) / sum(mass_i)
-        mass_weighted_density = np.sum(masses * density, axis=-1)
-        total_mass = np.sum(masses, axis=-1)
-        expected_density = mass_weighted_density / total_mass
+        # Material volumes are 1, 5/3 and 15/4 in units of 1e-21 m3.
+        expected_density = np.array([[6000 / (1 + 5 / 3 + 15 / 4)]])
         np.testing.assert_allclose(data.effective_density, expected_density)
         assert data.effective_density.shape == (1, 1)
 

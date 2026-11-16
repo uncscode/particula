@@ -26,12 +26,17 @@ Examples:
 """
 
 # %% [markdown]
-# # Coagulation with Charge (Builder pattern)
-# This tutorial shows how to build a charged coagulation strategy using the public builder API in `particula.dynamics`. We:
-# - define a particle size distribution with assigned charges,
-# - compute supporting transport properties,
-# - build a charged coagulation strategy with a selected kernel, and
-# - visualize the resulting coagulation kernel.
+# # Map charged collision rates with a builder
+#
+# Which size pairs can collide readily when their charges differ? This example
+# constructs a two-particle collision-kernel matrix using the Coulomb Gatti 2008
+# strategy. It helps you connect a prescribed size–charge relation to pairwise
+# rates before attempting a population simulation.
+#
+# The [companion construction](coagulation_with_charge_functional.py) uses the same physics through another
+# configuration interface. Neither page evolves an aerosol or specifies how many
+# particles occupy each size; a kernel in m³ s⁻¹ is not an event rate until it is
+# combined with population abundance.
 
 # %%
 import matplotlib.pyplot as plt
@@ -41,7 +46,12 @@ import particula as par
 plt.rcParams["figure.dpi"] = 110
 
 # %% [markdown]
-# ## Define the particle size distribution We build a logarithmic radius grid (1 nm to 100 μm) and the corresponding mass bins assuming unit density.
+# ## Specify particle sizes without inventing a population
+#
+# The 250 radius nodes span 1 nm–100 µm. Spherical mass uses density 1000 kg m⁻³.
+# This broad grid explores kernel behavior; it is not a measured size distribution
+# or a claim that one material model is applicable over every radius. No bin
+# concentrations are supplied.
 
 # %%
 radius_bins = np.logspace(start=-9, stop=-4, num=250)  # m (1 nm to 100 μm)
@@ -49,8 +59,17 @@ mass_bins = 4 / 3 * np.pi * radius_bins**3 * 1e3  # kg (ρ = 1000 kg/m³)
 n_bins = len(radius_bins)
 
 # %% [markdown]
-# ## Assign particle charges
-# Negative charges are applied to the first third of the distribution and positive charges to the remainder.
+# ## Prescribe a size–charge relation
+#
+# The smallest third of nodes carries negative charge, varying from −10 to −1
+# in elementary-charge units. The remaining nodes carry positive charge from +1
+# to +500. The plotted discontinuity is imposed by this assignment, not predicted
+# by charging dynamics. Fractional values are used as a parameter sweep; individual
+# particle charges would be quantized.
+#
+# Use this first plot to locate unlike-sign and like-sign regions in the later
+# pair matrix. It does not represent a charge distribution at a given size or an
+# ion-balance calculation.
 
 # %%
 split_index = n_bins // 3
@@ -69,8 +88,16 @@ ax.grid(True, which="both", ls="--")
 plt.show()
 
 # %% [markdown]
-# ## Supporting properties
-# We compute the Coulomb potential ratio, gas properties, Knudsen numbers, slip correction, friction factor, and helper matrices used by the kernel strategies.
+# ## Connect electrostatics with transport
+#
+# At 298.15 K, the Coulomb ratio compares electrostatic interaction with thermal
+# energy. Gas viscosity, mean free path, slip correction, and friction connect
+# radius to transport; reduced mass and friction describe a pair. The diffusive
+# Knudsen matrix then places each pair in the kernel's transport regime.
+#
+# These calculations use the gas helpers' defaults where arguments are omitted.
+# A pressure-sensitivity study must explicitly set and propagate the intended gas
+# conditions rather than changing temperature alone.
 
 # %%
 temperature = 298.15  # K
@@ -114,8 +141,12 @@ reduced_friction_factor = par.util.get_reduced_self_broadcast(
 )
 
 # %% [markdown]
-# ## Build the charged coagulation strategy (builder)
-# We use the public builder to compose a charged coagulation strategy with the Coulomb Gatti 2008 kernel. The builder enforces the required distribution type and kernel strategy.
+# ## Compose the strategy explicitly
+#
+# The builder combines the discrete distribution setting and Coulomb Gatti 2008
+# kernel model. The subsequent calculation calls that selected model directly:
+# first its dimensionless expression, then its dimensional kernel. Constructing
+# `charged_coagulation` does not itself advance a population.
 
 # %%
 kernel_strategy = par.dynamics.CoulombGatti2008KernelStrategy()
@@ -141,11 +172,19 @@ dimensional_kernel: np.ndarray = kernel_strategy.kernel(
 )
 
 # %% [markdown]
-# ## Visualize the kernel
-# This broad charge/radius range produces underflow warnings in intermediate
-# expressions. The final kernel is finite and nonnegative; exactly zero
-# entries are masked on the logarithmic plot, not replaced by positive values.
-# Plot the dimensional coagulation kernel on a logarithmic grid.
+# ## Read the pair matrix and its numerical boundaries
+#
+# Each location refers to a pair of radii, with charges obtained from the first
+# plot. The color is the base-10 logarithm of the kernel's numerical value in
+# m³ s⁻¹. Like-sign repulsion and unlike-sign attraction influence the structure,
+# but transport and size also vary, so this matrix alone does not isolate the
+# charge effect from those other dependencies.
+#
+# The saved run emits divide-by-zero and invalid-operation warnings in intermediate
+# expressions over this broad range. The final assertions require finite,
+# nonnegative, symmetric kernel values. Exact zeros are masked on the logarithmic
+# plot; blank regions must not be interpreted as a measured positive rate.
+# Passing final-array checks does not validate an extreme parameter regime.
 
 # %%
 assert np.all(np.isfinite(dimensional_kernel))
@@ -163,3 +202,19 @@ ax.set_ylabel("Particle radius r_j (m)")
 ax.set_title("Coulomb Gatti 2008 Coagulation Kernel (Builder)")
 fig.colorbar(mesh, ax=ax, label="log10(Kernel) (m³/s)")
 plt.show()
+
+# %% [markdown]
+# ## Turn the map into a charging experiment
+#
+# The matrix identifies which prescribed pairs have larger or smaller modeled
+# collision coefficients. It cannot predict a population lifetime without number
+# concentrations, nor establish how the imposed charges arise.
+#
+# To isolate a charging effect, repeat the kernel calculation at the same radii
+# and gas conditions for neutral, same-sign, and opposite-sign assignments.
+# Compare ratios only where the reference is finite and nonzero, inspect limiting
+# behavior, and document the model's applicable regime. Then use an independently
+# specified size/charge population to compute collision rates. The
+# [Brownian time-evolution example](../coagulation_5_time_evolution.py) provides
+# a neutral population baseline; coupling charging dynamics would require
+# additional physics and validation.

@@ -311,7 +311,7 @@ def test_native_material_inputs_match_existing_physical_coefficient_laws(
     radius = (3 * np.sum(masses / particle.density, axis=1) / (4 * np.pi)) ** (
         1 / 3
     )
-    density = np.sum(masses * particle.density, axis=1) / masses.sum(axis=1)
+    density = masses.sum(axis=1) / np.sum(masses / particle.density, axis=1)
     if "charged" in family:
         # A stale legacy cache must not override current native charges.
         strategy._particle_charge_cache = np.full(selected.size, 1000.0)
