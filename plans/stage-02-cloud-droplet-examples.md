@@ -1,9 +1,10 @@
 # Cloud and droplet integration follow-through
 
-Status: in progress. Added to the active Stage 2A/2B objective by the user after
-core implementation and validation. The full goal is not complete until this
-work is implemented, executed and reviewed. Continue in the existing Stage 2B
-worktree and dependent draft [PR #1660](https://github.com/uncscode/particula/pull/1660).
+Status: implementation, full runs, refinement and output review complete locally.
+Added to the active Stage 2A/2B objective by the user after core implementation
+and validation. Later commits await direct publication authorization for the
+existing Stage 2B branch and dependent draft
+[PR #1660](https://github.com/uncscode/particula/pull/1660).
 
 ## Requested outcome
 

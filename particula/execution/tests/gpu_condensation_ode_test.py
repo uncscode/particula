@@ -349,8 +349,22 @@ def test_near_depletion_meets_independent_inventory_target(device):
     assert abs(final.gas.concentration[0, 1] - expected_gas) / 1e-5 < 1e-5
 
 
-def test_unpopulated_discrete_bins_preserve_mass_and_species_budget(device):
+@pytest.mark.parametrize("method", ["rk23", "ros3"])
+@pytest.mark.parametrize("resident", [False, True])
+def test_unpopulated_discrete_bins_preserve_mass_and_species_budget(
+    device, method, resident
+):
     """A zero-density bin retains its defining mass without exchanging vapor."""
+    from particula.execution.gpu_resident_condensation import (
+        GPUResidentCondensation,
+    )
+
+    if resident and (
+        device == "cpu" or not wp.is_conditional_graph_supported()
+    ):
+        pytest.skip(
+            "resident adaptation requires native CUDA conditional graphs"
+        )
     initial, strategy = case(3)
     initial.particles.distribution_type = "discrete"
     initial.particles.concentration /= initial.particles.volume[:, None]
@@ -363,10 +377,20 @@ def test_unpopulated_discrete_bins_preserve_mass_and_species_budget(device):
         np.sum(before[:, :, 0] * initial.particles.concentration, axis=1)
         + initial.gas.concentration[:, 1]
     )
-    owner = GPUCondensationODE(
-        initial, strategy, device=device, rtol=1e-8, max_step=0.01
+    factory = GPUResidentCondensation if resident else GPUCondensationODE
+    owner = factory(
+        initial,
+        strategy,
+        device=device,
+        method=method,
+        rtol=1e-8,
+        max_step=0.01,
     )
-    result = advance(owner, 0.1)
+    if resident:
+        owner.advance(0.1)
+        result = owner.snapshot()
+    else:
+        result = advance(owner, 0.1)
     reference = advance(
         CondensationODE(initial, strategy, rtol=1e-9, max_step=0.01), 0.1
     )

@@ -2,7 +2,8 @@
 
 Status: core workflow implemented, locally validated and reviewed; delivered
 in draft [PR #1660](https://github.com/uncscode/particula/pull/1660). The added
-[cloud/droplet examples](stage-02-cloud-droplet-examples.md) remain in progress.
+[cloud/droplet examples](stage-02-cloud-droplet-examples.md) are locally complete;
+publication of the later commits remains pending direct authorization.
 Worktree: `/tmp/particula-stage-02b`.
 Branch: `codex/stage-02b-simulation-workflow`.
 Verified upstream main: `356fc054cd9a4f4ececc3c64c7144e889a789494`.
@@ -14,8 +15,8 @@ workflow diff is independently reviewable. Merge is outside execution scope.
 
 The initial core delivery covered all six work packages and acceptance criteria
 in [Stage 2B](stage-02b-simulation-workflow.md) for its declared profiles.
-The expanded cloud/droplet objective remains incomplete until the follow-through
-gates below are satisfied.
+The expanded cloud/droplet implementation and full scientific runs are locally
+complete. Publication and PR readiness remain the delivery gates below.
 Shared physics is Stage 1 monodisperse closed-box growth, with dilution for
 coupled checks. Concrete imports preserve existing public runnable APIs.
 
@@ -35,8 +36,8 @@ coupled checks. Concrete imports preserve existing public runnable APIs.
       exact restart and controlled scientific input variation; visually checked.
 - [x] Supported workflow documentation, broad validation and implementation review.
 - [x] Commit, push and separate dependent draft PR.
-- [ ] User-added cloud/droplet migrations and stability demonstrations; complete
-      their full workloads and review before marking the PR ready.
+- [x] User-added cloud/droplet migrations and stability demonstrations, including
+      full workloads, refinement, restart and output review.
 
 ## Authoritative implementation and evidence
 
@@ -50,9 +51,12 @@ is the complete run/record/plot/save/load/restart/input-variation demonstration.
 
 Implemented owners now include native `CPUSimulation`, CPU RK23/ROS2/ROS3
 condensation, GPU RK23/ROS3 condensation, complete-cycle deterministic split
-simulation, prepared execution and `GPUCoupledSimulation`. The latter preserves
-fixed event schedules around adaptive condensation with explicit full-state
-transfers; it does not make the combined loop fully resident or capturable.
+simulation, prepared execution and `GPUCoupledSimulation`. Its default mode uses
+explicit full-state transfers between fixed events and adaptive condensation.
+With `resident=True`, particle/gas state and process handoffs remain on CUDA,
+and conditional graphs own adaptive acceptance and step-size decisions. CPU
+orchestration still supplies the fixed outer schedule and requested outputs;
+the entire scheduled simulation is not one captured graph.
 `EnvironmentForcing` tables impose one-sided step/linear
 knots. `Recorder` and `AnalysisWriter` observe accepted complete work;
 `PreparedObserver` explicitly chooses reduced or full downloads on the fixed
@@ -126,7 +130,7 @@ outputs rather than library execution.
 - [ ] Mark the existing PR ready only after the preceding gates pass.
 
 The [follow-through plan](stage-02-cloud-droplet-examples.md) identifies the
-remaining workloads and acceptance criteria. A completed package test suite
+completed workloads and acceptance criteria. A completed package test suite
 does not substitute for those scientific runs or establish experimental validity.
 
 ## Requested fully resident reruns (2026-11-16)
@@ -179,3 +183,37 @@ at `9c548d9d61`, but plot-data serialization failed afterward. A corrected full
 publication completed at `3d3753d2b` with unchanged physics. All 31 frames,
 figure inspection and CPU-only replot passed; exact restart, conservation and
 zero state transfers between stages remain verified.
+
+## Post-review discrete-bin qualification (2026-11-16)
+
+Stage 2A correction `bd52afd6f4` is integrated into this branch by merge
+`18641ea803`. The CUDA trial-domain guard had incorrectly required zero-density
+discrete bins to have zero defining masses. It now distinguishes discrete bins
+from resolved free slots, whose zero-mass rule remains enforced. Stage 2B extends
+the regression across host RK23/ROS3 and native resident CUDA RK23/ROS3, including
+heterogeneous three-box trajectories, unchanged empty-bin geometry, independent
+species budgets and CPU-reference agreement.
+
+The affected GPU ODE, resident and multi-material tests passed **69 tests** with
+**two intentional resident-on-CPU skips**. Full package validation passed **10,884 tests,
+23 skips and one expected failure**, with **91.02% coverage** and warnings
+as errors in 315.79 seconds on the actual RTX 5060.
+Standard Mypy passed **696 sources**; Ruff and format passed **780 files**.
+All **89** saved bundles pass source freshness using `scripts/docs_examples.py
+check --changed --base HEAD`; no example executable changed in this correction.
+Documentation structure reports zero errors.
+Commands and logs are retained in `.artifacts/discrete-bin-*.log`; the package
+command uses `--cov=particula --cov-fail-under=80 -Werror` without test filtering.
+
+The completed biomass, respiratory and cyclic-chamber workloads all use resolved
+particles. Their physical validation behavior is unchanged by this discrete-bin
+admission correction. Their retained full-run revisions and hashes remain
+`9c548d9d61` and `3d3753d2be`; no bundle is relabeled as executing the later code.
+The original scientific results and publication qualification above remain
+separate from this post-review package validation.
+
+Local plan headers and the pending PR description now reflect completed full
+runs and resident process handoffs. Both PRs still require authorized publication
+of the later commits; the Stage 2A remote review thread is not yet resolved, and
+Stage 2B remains a draft. Hosted checks on older heads do not qualify these local
+commits. No merge or release is claimed.
