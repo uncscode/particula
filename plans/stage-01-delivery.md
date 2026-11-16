@@ -25,12 +25,17 @@ coverage 91.34%. Installed selection: 5086 passed, 25 skipped, 1130 deselected.
 Examples: 241 passed, one skipped. Tooling: 319 passed. Ruff, formatting,
 Mypy, documentation build and rendered structure checks passed.
 
-## Remaining delivery steps
+## Delivery
 
-- Final documentation artifact rebuild/check: passed (0.3.1 wheel 4,234,936
-  bytes; sdist 3,821,804 bytes).
-- Final diff review, commit, push and PR against upstream main.
-- Record the PR URL. Merge and publication remain separate actions.
+Implemented, reviewed, committed and pushed in `dbd7a29d6`.
+[PR #1658](https://github.com/uncscode/particula/pull/1658) targets upstream
+`main` and is open and mergeable. Hosted checks were still running at delivery;
+local evidence above does not claim those checks have finished. Merge and
+publication remain separate actions.
+
+Final documentation artifact rebuild/check passed: version 0.3.1 wheel
+4,234,936 bytes; source archive 3,821,804 bytes. Scientific source changes were
+reviewed against the independent regressions without weakening tolerances.
 
 CPU and available CUDA evidence is scoped to the recorded tests. Experimental
 validation, adaptive solvers, new phase physics and arbitrary custom-kernel

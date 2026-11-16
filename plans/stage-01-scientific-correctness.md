@@ -1,6 +1,7 @@
 # Stage 1: Scientific correctness and verification
 
-Status: implemented and locally validated; PR delivery pending.
+Status: implemented and locally validated; delivered in
+[PR #1658](https://github.com/uncscode/particula/pull/1658).
 Entry dependency: none. See the [delivery record](stage-01-delivery.md) and
 [scientific evidence](../docs/contribute/validation/numerics/scientific-correctness.md).
 
