@@ -69,6 +69,45 @@ def test_failed_execution_never_replaces_saved_results(example, monkeypatch):
     assert pointer.read_text() == '{"generation": "previous"}'
 
 
+def test_library_change_during_execution_preserves_previous_bundle(
+    example, monkeypatch
+):
+    """A successful calculation cannot be attributed to different source bytes."""
+    root, config = example
+    library = root / "particula"
+    library.mkdir()
+    source = library / "physics.py"
+    source.write_text("coefficient = 1\n")
+    published = root / "results/demo"
+    published.mkdir(parents=True)
+    manifest = published / "manifest.json"
+    manifest.write_text("previous verified result")
+
+    def changed(*args):
+        source.write_text("coefficient = 2\n")
+        return [], "CPU"
+
+    monkeypatch.setattr(examples, "execute", changed)
+    with pytest.raises(RuntimeError, match="Library changed during execution"):
+        examples.refresh("demo", config, root, root / "results")
+    assert manifest.read_text() == "previous verified result"
+    assert not list((root / "results").glob(".pending-*"))
+
+
+def test_checkout_version_is_distinct_from_installed_metadata(
+    tmp_path, monkeypatch
+):
+    """Editable source identity wins without disguising stale wheel metadata."""
+    package = tmp_path / "particula"
+    package.mkdir()
+    (package / "__init__.py").write_text('__version__ = "9.8.7"\n')
+    monkeypatch.setattr(examples.importlib.metadata, "version", lambda _: "old")
+    versions = examples.package_versions(tmp_path)
+    assert versions["particula"] == "9.8.7"
+    assert versions["particula-distribution"] == "old"
+    assert versions["numpy"] == "old"
+
+
 def test_code_section_changes_invalidate_output_placement(example):
     """Splitting code must not reuse output attached to the wrong section."""
     root, config = example

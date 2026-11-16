@@ -230,8 +230,8 @@ def sanitize_execution_output(value, root=ROOT):
     return value
 
 
-def package_versions():
-    """Record installed versions relevant to scientific execution."""
+def package_versions(root=ROOT):
+    """Record checkout identity separately from stale installed metadata."""
     versions = {}
     for package in (
         "particula",
@@ -246,6 +246,14 @@ def package_versions():
             versions[package] = importlib.metadata.version(package)
         except importlib.metadata.PackageNotFoundError:
             continue
+    if (root / "particula" / "__init__.py").is_file():
+        from particula_docs import source_version
+
+        version = source_version(root / "particula")
+        installed = versions.get("particula")
+        if installed is not None and installed != version:
+            versions["particula-distribution"] = installed
+        versions["particula"] = version
     return versions
 
 
@@ -341,6 +349,8 @@ def refresh(example_id, config, root=ROOT, results=RESULTS, *, replot=False):
     """Publish a complete result generation only after successful execution."""
     source = (root / config["source"]).read_bytes()
     initial_fingerprint = fingerprint(config, root)
+    initial_package_hash = package_source_hash(root)
+    initial_versions = package_versions(root)
     original = None
     directory = None
     data = None
@@ -355,6 +365,10 @@ def refresh(example_id, config, root=ROOT, results=RESULTS, *, replot=False):
         else execute(config, root)
     )
     elapsed = time.monotonic() - started
+    if package_source_hash(root) != initial_package_hash:
+        raise RuntimeError(
+            "Library changed during execution; refusing to save results"
+        )
     validate_render(config, root, source, initial_fingerprint, cells, data)
     parent = results / example_id
     results.mkdir(parents=True, exist_ok=True)
@@ -387,7 +401,7 @@ def refresh(example_id, config, root=ROOT, results=RESULTS, *, replot=False):
             "schema": 1,
             "figure_dpi": FIGURE_DPI,
             "elapsed_seconds": elapsed,
-            "package_source_sha256": package_source_hash(root),
+            "package_source_sha256": initial_package_hash,
             "input_sha256": {
                 name: hashlib.sha256((root / name).read_bytes()).hexdigest()
                 for name in config.get("inputs", [])
@@ -400,7 +414,7 @@ def refresh(example_id, config, root=ROOT, results=RESULTS, *, replot=False):
             "executed_at": datetime.now(timezone.utc).isoformat(),
             "device": device,
             "python": sys.version.split()[0],
-            "versions": package_versions(),
+            "versions": initial_versions,
             "outputs": sanitize_execution_output(outputs, root),
             "files": {
                 p.name: hashlib.sha256(p.read_bytes()).hexdigest()

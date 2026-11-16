@@ -86,6 +86,12 @@ in `website/migration-inventory.json`. They are no longer stored in the checkout
 Internal execution uses temporary notebook objects to capture
 rich outputs, without introducing a second maintained source file.
 
+Keep the scientific library unchanged during a refresh. Publication records its
+source hash before execution and rejects a different hash afterward, preserving
+the previous bundle. The reported Particula version comes from that checkout;
+when installed distribution metadata differs, it is retained separately as
+`particula-distribution` rather than used to label the executed source.
+
 Figures are exported at 300 DPI. Captured diagnostics retain repository-relative
 filenames and line numbers; local account and checkout paths are redacted before
 saving publication bundles. Terminal progress bars render in closed disclosures.
