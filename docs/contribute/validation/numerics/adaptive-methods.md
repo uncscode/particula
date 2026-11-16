@@ -468,7 +468,22 @@ before importing the results. The plotted dry phases are smooth at the stored
 0.1 s observation spacing. Final dry-mass retention is 14.1% for ammonium
 sulfate, 12.1% for sucrose and 11.5% for the mixed sample at printed precision.
 These stochastic sample results do not establish a composition ranking or
-experimental accuracy. The respiratory and biomass publications remain active.
+experimental accuracy.
+
+The **full respiratory illustration** also completed from `12742e1c39` and the
+same pinned package hash in **4,333.83 s**. It retains 1,000 particles, twelve
+material lanes, the complete 20 s duration and 201 observations. All original
+per-species inventory assertions passed. ROS3 used **8,921 accepted steps and
+one rejected trial**, with no domain rejection. All saved-file hashes, the
+unchanged executable source and five figures were verified before importing the
+bundle. Its existing chemical-identity caveats remain: the results are not
+validated respiratory-fluid predictions. The separate full numerical-refinement
+assessment remains outstanding; successful publication does not establish that
+comparison. Biomass publication is still running.
+The imported respiratory result passed the 563-page website build and rendered
+verification (693 HTML pages, 324 API modules and 130 redirects; zero errors).
+Its retained bundle contains figures and captured text; the separate refinement
+assessment produces compact numerical comparison histories.
 
 Validation commands (from the Stage 2B checkout with `PYTHONPATH=.`):
 

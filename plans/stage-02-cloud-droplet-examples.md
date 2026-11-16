@@ -129,8 +129,11 @@ two CPU comparison examples have completed refresh, inspection and replot.
 The corrected full single-cycle chamber also completed and its figure was
 inspected. The full multi-cycle chamber also completed: all three 1,000-particle
 compositions, four cycles and 3,601 observations each. Its bundle/source hashes
-and eight figures were verified and imported. Finish and verify the respiratory
-and biomass results before accepting the migration. Keep the library unchanged during each refresh; the publication
+and eight figures were verified and imported. The full respiratory publication
+also completed, with all twelve species budgets intact, 201 observations and
+8,921 accepted ROS3 steps. Its hashes and five figures were verified and imported.
+Finish the biomass publication and the separate respiratory refinement before
+accepting the migration. Keep the library unchanged during each refresh; the publication
 hash guard rejects a changed runtime. Current process records are retained in
 `.artifacts/cloud-followthrough-runs.json`; verify live handles before resuming
 or replacing a run.

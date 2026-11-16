@@ -404,6 +404,11 @@ coagulation_process = par.dynamics.Coagulation(coagulation_strategy)
 # accounting for the supplied arrays; it cannot detect that a property array
 # belongs to the wrong chemical. Radius-bin counts, bulk particle species masses,
 # and vapor saturation ratios support distinct diagnostics below.
+#
+# The full saved ROS3 run completed with 8,921 accepted internal steps and one
+# rejected trial. These internal steps are distinct from the 201 observations;
+# adaptive control resolves fast evaporation between output times. The completed
+# history and budget checks do not by themselves establish timestep convergence.
 
 # %% Step 6: Run the simulation loop
 
