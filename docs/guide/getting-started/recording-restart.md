@@ -204,10 +204,11 @@ data alone does not allocate a device owner. Resuming uploads to the explicitly
 selected, exactly compatible saved device, including CUDA UUID identity.
 There is no cross-device continuation or hidden fallback.
 
-Adaptive GPU checkpoint records use schema 4. This includes material-coupled
+Adaptive GPU checkpoint records use schema 5. This includes material-coupled
 ROS3, the expanded thermodynamic profile, and exact restoration of unchanged
-physical coordinates during unscaling. Coupled records use schema 2, which
-retains the selected resident or transferred execution policy. Earlier
+physical coordinates during unscaling. Coupled records use schema 3, which
+retains the selected resident or transferred execution policy and the fixed
+parallel reservoir-reduction order. Earlier
 adaptive GPU records are rejected rather than resumed with different numerical
 semantics. This version is distinct from the prepared resident checkpoint and
 the outer archive format. Retain the earlier checkout to continue an older run.

@@ -150,10 +150,22 @@ def test_multiple_exchanges_match_cpu_and_conserve_each_species(
     np.testing.assert_array_equal(actual.particles.masses[:, -1], 0)
 
 
-@pytest.mark.parametrize("materials", [3, 12])
-def test_block_solve_matches_independent_dense_system(device, materials):
+@pytest.mark.parametrize("materials, repeats", [(3, 1), (12, 1), (3, 10)])
+def test_block_solve_matches_independent_dense_system(
+    device, materials, repeats
+):
     """Check independent rates, trajectories or dense linear solves."""
     initial, strategy = material_case(materials)
+    initial.particles.masses = np.tile(
+        initial.particles.masses, (1, repeats, 1)
+    )
+    initial.particles.concentration = np.tile(
+        initial.particles.concentration, (1, repeats)
+    )
+    initial.particles.charge = np.tile(initial.particles.charge, (1, repeats))
+    initial.particles.volume *= repeats
+    slots = initial.particles.n_particles
+
     owner = GPUCondensationODE(initial, strategy, device=device, method="ros3")
     stages = owner._ros3
     rng = np.random.default_rng(194)
@@ -177,8 +189,8 @@ def test_block_solve_matches_independent_dense_system(device, materials):
         for row, (source, target) in enumerate(pairs):
             gi = owner._mass_size + box * (materials + 1) + source
             weights[box * materials + row, gi] = 1
-            for slot in range(7):
-                p = box * 7 + slot
+            for slot in range(slots):
+                p = box * slots + slot
                 pi = p * materials + target
                 weight = (
                     count[box, slot]

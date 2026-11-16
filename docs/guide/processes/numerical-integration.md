@@ -353,3 +353,10 @@ simulation.update_gas_species(
 All targets validate before physical mutation. A scalar device status check
 rejects nonphysical derived concentrations. Requested observations can still
 check an independent external mass ledger on the CPU.
+
+Gas-rate and ROS3 reservoir sums use at most 64 fixed reduction lanes per box
+and gas or Schur entry. Each lane visits a fixed slot sequence, and a second
+kernel combines lanes in fixed order. No floating-point atomic sum determines
+an adaptive trial. This bounds scratch while allowing large populations to use
+parallel reservoir work. The reduction order differs from earlier checkpoints;
+exact continuation therefore requires the current numerical schema.

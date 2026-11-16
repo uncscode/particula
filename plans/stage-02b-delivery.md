@@ -136,11 +136,11 @@ replacement request preserves full workloads while requiring CUDA
 residency and device-owned adaptive decisions, including acceptance/rejection
 and step-size selection. All solver material profiles are being checked.
 
-- [ ] Qualify multi-material GPU RK23/ROS3 rates, surface phases, mappings and
+- [x] Qualify multi-material GPU RK23/ROS3 rates, surface phases, mappings and
       conservative block solves against independent CPU and dense references.
-- [ ] Qualify native conditional CUDA adaptation and resident event handoff,
+- [x] Qualify native conditional CUDA adaptation and resident event handoff,
       including exact restart and persistent collision/source RNG.
-- [ ] Switch biomass AO2008/DNS to supported ST1956 turbulent shear, explicitly
+- [x] Switch biomass AO2008/DNS to supported ST1956 turbulent shear, explicitly
       authorized by the user. Retain dissipation and fluid density, label this
       model change, and preserve all four branches and their full workloads.
 - [ ] Rerun 10,000-particle biomass preparation and four full-hour branches.
@@ -152,3 +152,18 @@ and step-size selection. All solver material profiles are being checked.
 
 Changes under development do not inherit the earlier package validation claim.
 GitHub publication remains pending the outstanding direct push authorization.
+
+Local resident implementation evidence: multi-material rates and trajectories
+cover 3 and 12 exchanging materials, inert and reversed gas mappings, mixed
+surface phases, and independent dense block solves. CUDA tests prohibit
+physical handoff downloads and host adaptive decisions. Native CPU RK23, ROS2,
+and ROS3 retain their existing multi-material support. Exact checkpoint tests
+include persistent Brownian, settling and shear RNG streams. Selective chamber
+forcing preserves untouched device gas and evaluates humidity on CUDA.
+
+The first resident full-run attempts were superseded during qualification:
+the chamber needed selective gas forcing, and serial reservoir sums were too
+costly at the full particle counts. Their partial respiratory comparisons and
+bounded biomass diagnostics are not full-run completion evidence. Final runs
+must use the qualified parallel-reduction revision and retain every original
+workload and tolerance, with the explicitly authorized ST1956 model change.

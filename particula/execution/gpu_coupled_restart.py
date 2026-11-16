@@ -48,7 +48,7 @@ def checkpoint_coupled(owner):
     with owner._events._lock:
         owner._ready()
         return GPUCoupledCheckpoint(
-            2,
+            3,
             _runtime(),
             _device_identity(wp.get_device(owner.device.native)),
             owner._events.checkpoint(),
@@ -71,7 +71,7 @@ def _validate(saved):
     if (
         type(saved) is not GPUCoupledCheckpoint
         or type(saved.schema_version) is not int
-        or saved.schema_version != 2
+        or saved.schema_version != 3
         or saved.runtime != _runtime()
         or type(saved.resident) is not bool
     ):

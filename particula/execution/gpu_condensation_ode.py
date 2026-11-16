@@ -15,6 +15,7 @@ import warp as wp
 from particula import _cpu_batch
 from particula.dynamics import CondensationIsothermal
 from particula.execution import _condensation_ode_kernels as algebra
+from particula.execution import _condensation_reservoirs as reservoirs
 from particula.execution._adaptive_condensation_physics import material_rates
 from particula.execution._adaptive_condensation_plan import (
     plan_adaptive_condensation,
@@ -211,6 +212,9 @@ class GPUCondensationODE:
         self._vapor = self._array(np.zeros(self._gas_shape))
         self._effective_tension = self._array(np.zeros(self._shape[:2]))
         self._mass_rate = self._array(np.zeros(self._shape))
+        self._gas_partials = self._array(
+            np.zeros((*self._gas_shape, max(1, min(64, self._shape[1]))))
+        )
         self._tension = self._array(config["tensions"])
         self._surface_density = self._array(config["surface_density"])
         self._surface_reference = self._array(config["surface_reference"])
@@ -349,7 +353,7 @@ class GPUCondensationODE:
         )
         self._launch(
             algebra.pack_rate,
-            self._size,
+            self._mass_size,
             [
                 self._mass_rate,
                 self._counts,
@@ -362,6 +366,32 @@ class GPUCondensationODE:
                     self._base.particles.distribution_type
                     == "particle_resolved"
                 ),
+            ],
+        )
+        self._launch(
+            reservoirs.gas_parts,
+            self._gas_partials.shape,
+            [
+                self._mass_rate,
+                self._counts,
+                self._volume,
+                self._reverse,
+                int(
+                    self._base.particles.distribution_type
+                    == "particle_resolved"
+                ),
+                self._gas_partials,
+            ],
+        )
+        self._launch(
+            reservoirs.finish_gas,
+            self._gas_shape,
+            [
+                self._gas_partials,
+                self._mass_size,
+                self._scale,
+                result,
+                self._invalid,
             ],
         )
         self._status()

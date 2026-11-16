@@ -4,6 +4,7 @@ import numpy as np
 import warp as wp
 
 from particula.execution import _condensation_block_kernels as block
+from particula.execution import _condensation_reservoirs as reservoirs
 from particula.execution import _condensation_ros3_kernels as algebra
 from particula.execution._gpu_condensation_ros3 import ROS3Stages
 from particula.execution.forcing import _EnvironmentSegment
@@ -32,6 +33,15 @@ class BlockROS3Stages(ROS3Stages):
         self.particular = owner._array(np.zeros((particles, self.width)))
         self.schur = owner._array(
             np.zeros((owner._shape[0], self.width, self.width + 1))
+        )
+        self.parts = owner._array(
+            np.zeros(
+                (
+                    owner._shape[0] * self.width,
+                    self.width + 1,
+                    max(1, min(64, owner._shape[1])),
+                )
+            )
         )
         self.sources = owner._array([s for s, _ in pairs], wp.int32)
         self.targets = owner._array([t for _, t in pairs], wp.int32)
@@ -141,8 +151,12 @@ class BlockROS3Stages(ROS3Stages):
             ],
         )
         owner._launch(
-            block.assemble_reservoirs,
-            self.schur.shape,
+            reservoirs.assemble_parts,
+            (
+                owner._shape[0],
+                self.width,
+                (self.width + 1) * self.parts.shape[2],
+            ),
             [
                 self.local,
                 self.response,
@@ -159,6 +173,19 @@ class BlockROS3Stages(ROS3Stages):
                     owner._base.particles.distribution_type
                     == "particle_resolved"
                 ),
+                self.h,
+                self.parts,
+            ],
+        )
+        owner._launch(
+            reservoirs.finish_schur,
+            self.schur.shape,
+            [
+                self.parts,
+                self.rhs,
+                self.sources,
+                owner._mass_size,
+                owner._gas_shape[1],
                 self.h,
                 self.schur,
             ],
