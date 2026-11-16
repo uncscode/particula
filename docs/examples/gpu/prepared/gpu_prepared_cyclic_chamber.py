@@ -274,8 +274,10 @@ def plot_history(frames):
     number = np.array([f["number"] for f in frames])
     temperature = np.array([f["temperature"] for f in frames])
     saturation = np.array([f["saturation"] for f in frames])
-    edges = frames[0]["edges"]
-    histogram = np.array([f["histogram"].mean(axis=0) for f in frames])
+    edges = np.asarray(frames[0]["edges"])
+    histogram = np.array(
+        [np.asarray(f["histogram"]).mean(axis=0) for f in frames]
+    )
     distribution = histogram / np.diff(np.log10(edges))
     fig, axes = plt.subplots(2, 2, figsize=(11, 8), constrained_layout=True)
     for box in (0, 15, 31):

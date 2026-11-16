@@ -153,6 +153,12 @@ the full cyclic chamber and prepared forcing workloads.
 Both full CUDA publishers are active in `/tmp/particula-stage-02-gpu-validation`,
 pinned to `480ecf2c1a`. Their process records are in
 `.artifacts/coupled-runs.json`; verify live handles before making changes.
+After the cyclic publication finishes, apply the current plotting-only source
+update in its validation checkout and replot there before importing the bundle.
+Review reproduced a JSON-list rendering failure; the corrected renderer accepts
+both arrays and lists, produces identical pixels and preserves saved data. Its
+simulation fingerprint matches the pinned run, so this does not require a new
+scientific calculation. The actual saved-data replot remains a required gate.
 The small CUDA examples
 do not replace that work. Full results, final narratives, review and PR readiness
 remain incomplete; no completion or merge is claimed.
