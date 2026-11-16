@@ -183,3 +183,27 @@ checked-body Mypy passed for the affected modules. The reproducer and focused
 logs are `.artifacts/gpu-coupled-lock-regression-before.log` and
 `.artifacts/gpu-coupled-checkpoint-lock.log`. The ongoing full publications use
 the already-locked owner method; this correction does not change their physics.
+
+The subsequent unfiltered package gate ran against executable revision
+`2b4bddefd8`, including the checkpoint lock and plan-type guards:
+
+```bash
+PYTHONPATH=. .venv/bin/python -m pytest \
+  --cov=particula --cov-report=term-missing --cov-fail-under=80
+```
+
+It passed **10,810 tests**, with 21 skips and one expected failure, in 514.17 s;
+coverage was **91.34%**. Actual CUDA cases ran. Full Ruff/format checks passed
+for 764 files, and ordinary Mypy passed for 681 sources. Documentation structure
+reported zero errors, and the topic graph validated 33 topics, 170 resources and
+35 supporting pages. Logs are `.artifacts/stage-02-current-package-coverage.log`,
+`.artifacts/stage-02-current-ruff.log`, `.artifacts/stage-02-current-mypy.log`,
+`.artifacts/stage-02-current-structure.log` and
+`.artifacts/stage-02-current-topics.log`.
+
+The separate respiratory-refinement diagnostics passed all three tests with
+warnings as errors. They verify complete source setup reuse without time
+advancement, detection of a minor-species budget defect and normalization that
+does not hide a small solute behind water. These are checks of the assessment,
+not completion of its full 20 s numerical comparison. The pinned full comparison
+and four outstanding full example publications remain required.

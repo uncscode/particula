@@ -176,3 +176,8 @@ PYTHONPATH=. MPLBACKEND=Agg .venv/bin/python \
   scripts/assess_respiratory_refinement.py \
   --output .artifacts/respiratory-refinement.json
 ```
+
+The full comparison is running in `/tmp/particula-stage-02-refinement`, pinned
+to `2b4bddefd8`. Its live process/status/log paths are recorded in the Stage 2B
+worktree's `.artifacts/respiratory-refinement-run.json`. Verify those handles
+before resuming; the initial-transient diagnostic is not full-run evidence.
