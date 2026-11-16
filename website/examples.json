@@ -630,7 +630,7 @@
     "source": "docs/examples/gpu/prepared/gpu_prepared_cyclic_chamber.py",
     "policy": "cuda",
     "device": "cuda",
-    "timeout": 7200,
+    "timeout": 14400,
     "inputs": [
       "scripts/gpu_studies/__init__.py",
       "scripts/gpu_studies/cases.py",

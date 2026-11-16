@@ -68,11 +68,11 @@ def frame(owner, step):
     edges, histogram = radius_histogram(snapshot)
     return {
         "time": step,
-        "number": diagnostics.number_concentration.copy(),
-        "temperature": diagnostics.temperature.copy(),
-        "saturation": diagnostics.saturation_ratio[:, 2].copy(),
-        "edges": edges,
-        "histogram": histogram,
+        "number": diagnostics.number_concentration.tolist(),
+        "temperature": diagnostics.temperature.tolist(),
+        "saturation": diagnostics.saturation_ratio[:, 2].tolist(),
+        "edges": edges.tolist(),
+        "histogram": histogram.tolist(),
     }, snapshot
 
 

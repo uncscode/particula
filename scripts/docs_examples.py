@@ -113,7 +113,8 @@ def result_state(config, manifest, root=ROOT):
 def execute(config, root=ROOT, *, saved_data=None):
     """Execute one script in a fresh kernel and temporary working directory."""
     import nbformat
-    from jupyter_client import KernelManager
+    from jupyter_client import AsyncKernelManager
+    from jupyter_core.utils import run_sync
     from nbclient import NotebookClient
 
     if config["device"] == "cuda" and saved_data is None:
@@ -162,7 +163,7 @@ def execute(config, root=ROOT, *, saved_data=None):
                 + ")"
             )
         )
-    km = KernelManager(kernel_name="python3")
+    km = AsyncKernelManager(kernel_name="python3")
     km.kernel_spec.argv = [
         sys.executable,
         "-m",
@@ -202,7 +203,7 @@ def execute(config, root=ROOT, *, saved_data=None):
                 notebook.cells[1].metadata["plot_data"] = data
         finally:
             if km.has_kernel:
-                km.shutdown_kernel(now=True)
+                run_sync(km.shutdown_kernel)(now=True)
     return notebook.cells[1:], device_name
 
 

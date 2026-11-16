@@ -476,3 +476,28 @@ def test_figure_names_do_not_depend_on_stdout_chunking(tmp_path):
     assert (quiet / "figure-1-1.png").read_bytes() == (
         noisy / "figure-1-1.png"
     ).read_bytes()
+
+
+def test_real_execution_timeout_stops_kernel(example, monkeypatch):
+    """A busy cell must time out and release its kernel, not block the deadline."""
+    import jupyter_client
+    from nbclient.exceptions import CellTimeoutError
+
+    root, config = example
+    config["timeout"] = 5
+    (root / config["source"]).write_text(
+        "import time\ntime.sleep(7)\nprint('should not complete')\n"
+    )
+    managers = []
+    manager_type = jupyter_client.AsyncKernelManager
+
+    def tracked_manager(**kwargs):
+        manager = manager_type(**kwargs)
+        managers.append(manager)
+        return manager
+
+    monkeypatch.setattr(jupyter_client, "AsyncKernelManager", tracked_manager)
+    with pytest.raises(CellTimeoutError, match="time.sleep"):
+        examples.execute(config, root)
+    assert len(managers) == 1
+    assert not managers[0].has_kernel
