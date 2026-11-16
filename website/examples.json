@@ -812,5 +812,50 @@
       "plot_results"
     ],
     "plot_inputs": []
+  },
+  "adaptive-cloud-relaxation": {
+    "title": "Distinguish dry-phase oscillation from physical droplet relaxation",
+    "source": "docs/examples/simulations/adaptive_cloud_relaxation.py",
+    "policy": "long",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": [],
+    "invoke": "report = simulate()\nplot_results(report)",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\nfigure = plot_results(report)",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": []
+  },
+  "adaptive-reservoir-depletion": {
+    "title": "Resolve growth as a finite vapor reservoir is depleted",
+    "source": "docs/examples/simulations/adaptive_reservoir_depletion.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": [],
+    "invoke": "report = simulate()\nfigure = plot_results(report)",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\nfigure = plot_results(report)",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": []
+  },
+  "adaptive-reservoir-depletion-cuda": {
+    "title": "Check adaptive CUDA growth against an independent depletion reference",
+    "source": "docs/examples/simulations/adaptive_reservoir_depletion_cuda.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 1800,
+    "inputs": [
+      "docs/examples/simulations/adaptive_reservoir_depletion.py"
+    ],
+    "invoke": "report = run_cuda()\nfigure = plot_results(report)",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\nfigure = plot_results(report)",
+    "render_functions": [],
+    "plot_inputs": []
   }
 }

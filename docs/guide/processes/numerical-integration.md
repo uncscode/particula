@@ -92,6 +92,24 @@ rolled back. `solver.statistics` records accepted/rejected trials, domain
 rejections and numerical work. It counts Jacobian callbacks separately from
 rate callbacks; a numerical Jacobian can itself evaluate many physical rates.
 
+CPU ROS2 accepts dense or SciPy sparse Jacobians. Native condensation uses a
+sparse Jacobian above 64 coordinates for the supported ideal mass/molar/volume
+and kappa activity models with mass/molar/volume surface models. Particle-local
+composition derivatives are grouped by material; gas rows retain the weighted
+reservoir coupling. Other activity or surface implementations retain individual
+column differences, since arbitrary callbacks may couple different particles.
+Particle perturbations follow the current total particle mass, including dry
+cores, so an initially wet scale does not distort derivatives after evaporation.
+This reduces derivative work and storage for large populations; it does not
+change the ROS2 error estimator or remove its accuracy cost.
+
+The [wet–dry relaxation example](../../examples/simulations/adaptive_cloud_relaxation.py)
+compares stiff evaporation with independent Radau/BDF references. The
+[finite-reservoir example](../../examples/simulations/adaptive_reservoir_depletion.py)
+and its [CUDA companion](../../examples/simulations/adaptive_reservoir_depletion_cuda.py)
+compare radius and vapor errors during depletion. Both distinguish mass closure
+from trajectory accuracy; the small CUDA case is not an acceleration benchmark.
+
 ## Explicit GPU execution and transfer costs
 
 ```python

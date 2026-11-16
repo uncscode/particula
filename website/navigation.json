@@ -706,6 +706,18 @@
             "slug": "examples/simulations"
           },
           {
+            "label": "Finite-reservoir growth accuracy",
+            "slug": "examples/simulations/adaptive_reservoir_depletion"
+          },
+          {
+            "label": "Adaptive CUDA depletion accuracy",
+            "slug": "examples/simulations/adaptive_reservoir_depletion_cuda"
+          },
+          {
+            "label": "Adaptive wet–dry relaxation",
+            "slug": "examples/simulations/adaptive_cloud_relaxation"
+          },
+          {
             "label": "Biomass burning cloud interactions",
             "slug": "examples/simulations/biomass_burning_cloud_interactions"
           },

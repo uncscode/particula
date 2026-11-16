@@ -2041,6 +2041,34 @@
       "also": [],
       "role": "Contribute",
       "start_here": false
+    },
+    {
+      "source": "docs/examples/simulations/adaptive_cloud_relaxation.py",
+      "title": "Distinguish dry-phase oscillation from physical droplet relaxation",
+      "topic": "condensation",
+      "also": [
+        "chambers"
+      ],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/simulations/adaptive_reservoir_depletion.py",
+      "title": "Resolve growth as a finite vapor reservoir is depleted",
+      "topic": "condensation",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/simulations/adaptive_reservoir_depletion_cuda.py",
+      "title": "Check adaptive CUDA growth against an independent depletion reference",
+      "topic": "condensation",
+      "also": [
+        "gpu"
+      ],
+      "role": "Examples",
+      "start_here": false
     }
   ],
   "supporting": [

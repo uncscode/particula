@@ -9,13 +9,17 @@ These names are concrete implementation APIs, not package-root exports.
 """
 
 from dataclasses import dataclass
-from typing import Callable
+from typing import Any, Callable, cast
 
 import numpy as np
 from scipy.linalg import lu_factor, lu_solve
+from scipy.sparse import eye as sparse_eye
+from scipy.sparse import issparse, sparray, spmatrix
+from scipy.sparse.linalg import splu
 
 Array = np.ndarray
 Rate = Callable[[float, Array], Array]
+Jacobian = Callable[[float, Array], Array | spmatrix | sparray]
 
 
 class TrialDomainError(ValueError):
@@ -34,7 +38,7 @@ class ODEProblem:
 
     rate: Rate
     admissible: Callable[[Array], bool]
-    jacobian: Rate | None = None
+    jacobian: Jacobian | None = None
     time_derivative: Rate | None = None
 
 
@@ -185,22 +189,37 @@ class AdaptiveSolver:
         gamma = 1 + 1 / np.sqrt(2)
         rate = self._rate(t, y)
         self.statistics.jacobian_calls += 1
-        jac = np.asarray(jacobian(t, _readonly(y)), dtype=np.float64)
+        raw_jac = cast(Any, jacobian(t, _readonly(y)))
+        sparse = issparse(raw_jac)
+        jac = (
+            raw_jac.astype(np.float64).tocsc()
+            if sparse
+            else np.asarray(raw_jac, dtype=np.float64)
+        )
         self.statistics.time_derivative_calls += 1
         partial = np.asarray(time_derivative(t, _readonly(y)), dtype=np.float64)
         if jac.shape != (y.size, y.size) or partial.shape != y.shape:
             raise ValueError("Jacobian or time derivative has incorrect shape")
-        if not np.all(np.isfinite(jac)) or not np.all(np.isfinite(partial)):
+        if not np.all(np.isfinite(jac.data if sparse else jac)) or not np.all(
+            np.isfinite(partial)
+        ):
             raise TrialDomainError("nonfinite linearization")
-        matrix = np.eye(y.size) / (h * gamma) - jac
-        factor = lu_factor(matrix)
+        if sparse:
+            matrix = sparse_eye(y.size, format="csc") / (h * gamma) - jac
+            factor = splu(matrix)
+            solve = factor.solve
+        else:
+            matrix = np.eye(y.size) / (h * gamma) - jac
+            dense_factor = lu_factor(matrix)
+
+            def solve(rhs):
+                return lu_solve(dense_factor, rhs)
+
         self.statistics.factorizations += 1
-        k1 = lu_solve(factor, rate + h * gamma * partial)
+        k1 = solve(rate + h * gamma * partial)
         self.statistics.linear_solves += 1
         rate2 = self._rate(t + h, y + k1 / gamma)
-        k2 = lu_solve(
-            factor, rate2 - 2 * k1 / (gamma * h) - h * gamma * partial
-        )
+        k2 = solve(rate2 - 2 * k1 / (gamma * h) - h * gamma * partial)
         self.statistics.linear_solves += 1
         candidate = y + (3 * k1 + k2) / (2 * gamma)
         self._check(candidate)

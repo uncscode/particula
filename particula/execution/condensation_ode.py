@@ -231,11 +231,21 @@ class CondensationODE:
         )
 
     def _jacobian(self, time, values):
-        # Perturb dimensionless coordinates to avoid kg-scale cancellation.
+        from particula.execution._condensation_jacobian import (
+            coordinate_steps,
+            sparse_jacobian,
+            supports_local_rates,
+        )
+
+        if values.size > 64 and supports_local_rates(self._strategy):
+            return sparse_jacobian(self, time, values)
+
+        # Keep physical perturbations local after large wet-to-dry changes.
+        differences = coordinate_steps(self, values)
         base = self._rate(time, values)
         jacobian = np.empty((values.size, values.size))
         for index in range(values.size):
-            delta = np.sqrt(np.finfo(float).eps) * max(abs(values[index]), 1.0)
+            delta = differences[index]
             plus, minus = values.copy(), values.copy()
             plus[index] += delta
             minus[index] -= delta

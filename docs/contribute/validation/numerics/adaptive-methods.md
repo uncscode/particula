@@ -207,3 +207,70 @@ package coverage was **91%**. Seven changed runtime modules together reached
 all **324** tooling tests. All three usage-guide snippets executed, including
 CUDA. The website build and rendered-link verification passed. Cross-workflow
 forcing and restart integration remains a separate required gate.
+
+## Cloud/droplet follow-through: sparse ROS2 and worked references
+
+The following additional evidence qualifies the sparse CPU linear solve and
+three controlled worked examples. Full cloud-chamber, respiratory-droplet,
+biomass and coupled GPU migrations remain a separate unfinished requirement;
+these small cases do not substitute for their complete workloads.
+
+CPU ROS2 now accepts sparse Jacobians. For known particle-local native activity
+and surface models above 64 coordinates, material-colored finite differences
+retain each particle's composition block and weighted gas-reservoir coupling.
+Unknown/custom models retain dense column differences. Physical mass
+perturbations use current particle mass, including dry cores, rather than the
+initial wet scaling. A regression reproduces the incorrect derivative after a
+water-mass change from 1e-12 to 1e-22 kg and verifies invariance to a freshly
+scaled owner at the same accepted state.
+
+Seven sparse-specific tests cover independently perturbed columns, two boxes,
+reordered gas/material maps, non-unit volumes, inactive slots, cross-material
+kappa derivatives, a matrix-exponential stiff oracle, derivative-work scaling,
+exact disk continuation, and a custom nonlocal activity whose cross-particle
+derivatives must remain present. The combined ODE/native/sparse subset passed
+26 tests before the custom-model case was added; the expanded sparse suite
+then passed all seven tests. No tolerance or workload was weakened.
+
+The complete package subsequently passed **10,690 tests**, with 19 skips,
+57 slow/performance deselections and one expected failure, using `-Werror` and
+actual CUDA. Coverage was **91.21%**, above the normal 80% gate. Standard Ruff
+and formatting checks passed for 755 files; ordinary Mypy passed for 675 source
+files. Checked-body Mypy also passed for the three changed numerical modules
+with imported-module diagnostics suppressed. That additional local check does
+not claim checked-body cleanliness for the full repository. Tooling and example
+checks excluding the separately running native-cloud test module passed
+**552 tests**, with one skip. The native-cloud module remains a required
+outstanding check for the example migrations.
+
+### Independent trajectory comparisons
+
+All three examples save compact numerical histories and work counters. Full
+refreshes and separate saved-data replots completed, and all figures were
+visually inspected. Their manifests retain execution versions, device, dirty
+source provenance and the common package-source SHA-256
+`fcd3e6e2e8939a530ae4aa3aaf4bd708172dca7cd6696678c501e9bf37822b06`.
+The CUDA download was extracted to a separate directory and executed with its
+bundled helper on the RTX 5060. Replots ran on CPU without advancing physics.
+
+| Example / profile | Maximum relative radius error | Other evidence |
+| --- | ---: | --- |
+| [Wet–dry relaxation](../../../examples/simulations/adaptive_cloud_relaxation.py), fixed 0.005 s | 3.70 | Artificial dry-phase oscillations despite mass closure below 1e-14 |
+| Wet–dry ROS2, rtol 1e-5 | 6.05e-6 | 3,667 accepted, 2 rejected trials |
+| Wet–dry ROS2, rtol 1e-7 | 6.98e-8 | 36,161 accepted, 4 rejected trials |
+| [Finite reservoir](../../../examples/simulations/adaptive_reservoir_depletion.py), fixed 0.5 s | 1.31e-2 | Vapor error / initial vapor: 5.17e-2 |
+| Finite reservoir, fixed 0.005 s | 1.22e-4 | Vapor error / initial vapor: 4.71e-4 |
+| Finite reservoir, CPU RK23 rtol 1e-7 | 2.57e-8 | Vapor error: 9.15e-8; 430 accepted trials |
+| Finite reservoir, CPU ROS2 rtol 1e-5 | 7.74e-7 | Vapor error: 2.86e-6; 2,574 accepted trials |
+| [CUDA reservoir](../../../examples/simulations/adaptive_reservoir_depletion_cuda.py), RK23 rtol 1e-4 | 1.82e-5 | Vapor error: 6.74e-5; 62 accepted trials |
+| CUDA reservoir, RK23 rtol 1e-7 | 2.57e-8 | Vapor error: 9.15e-8; 430 accepted trials |
+
+Wet–dry reference uncertainty is cross-checked with independently coded scalar
+water-volume equations solved by Radau and BDF. Finite-reservoir reference
+uncertainty is cross-checked with a separate scalar mass-ratio equation solved
+by DOP853 and Radau. The example sources contain the explicit equations,
+constants, comparison assertions and observable targets. Both calculations
+include Kelvin curvature and kinetic correction, and keep external resets
+separate from closed budgets. They do not validate measured chamber material
+properties, thermal coupling, stochastic removal, or stiff CUDA condensation.
+The one-representative-particle CUDA calculation is accuracy evidence only.
