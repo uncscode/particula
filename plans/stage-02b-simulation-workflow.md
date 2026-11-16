@@ -1,6 +1,8 @@
 # Stage 2B: Simulation workflow and reproducibility
 
-Status: implemented and locally validated; PR delivery pending.
+Status: core workflow delivered in draft
+[PR #1660](https://github.com/uncscode/particula/pull/1660);
+[cloud/droplet example follow-through](stage-02-cloud-droplet-examples.md) in progress.
 See the [delivery ledger](stage-02b-delivery.md).
 Entry dependency: an initial
 [Stage 1 reference case](stage-01-scientific-correctness.md).

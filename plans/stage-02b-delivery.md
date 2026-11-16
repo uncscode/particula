@@ -1,6 +1,8 @@
 # Stage 2B delivery and evidence
 
-Status: implemented, locally validated and reviewed; final PR delivery pending.
+Status: core workflow implemented, locally validated and reviewed; delivered
+in draft [PR #1660](https://github.com/uncscode/particula/pull/1660). The added
+[cloud/droplet examples](stage-02-cloud-droplet-examples.md) remain in progress.
 Worktree: `/tmp/particula-stage-02b`.
 Branch: `codex/stage-02b-simulation-workflow`.
 Verified upstream main: `356fc054cd9a4f4ececc3c64c7144e889a789494`.
@@ -30,7 +32,9 @@ coupled checks. Concrete imports preserve existing public runnable APIs.
 - [x] Realistic first CPU example: full time series, plotted saved/reloaded data,
       exact restart and controlled scientific input variation; visually checked.
 - [x] Supported workflow documentation, broad validation and implementation review.
-- [ ] Commit, push and separate dependent PR.
+- [x] Commit, push and separate dependent draft PR.
+- [ ] User-added cloud/droplet migrations and stability demonstrations; complete
+      their full workloads and review before marking the PR ready.
 
 ## Authoritative implementation and evidence
 
