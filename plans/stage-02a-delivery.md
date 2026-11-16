@@ -1,11 +1,12 @@
 # Stage 2A execution target and evidence
 
-Status: implemented, qualified and reviewed; PR delivery pending.
+Status: implemented, qualified, reviewed and delivered in
+[PR #1659](https://github.com/uncscode/particula/pull/1659).
 Worktree: `/tmp/particula-stage-02a`.
 Branch: `codex/stage-02a-numerical-integration`.
 Verified upstream base: `356fc054cd9a4f4ececc3c64c7144e889a789494`.
 PR target: `uncscode/particula:main`; separate from the Stage 2B PR.
-Merge is outside execution scope. No PR has been opened yet.
+Merge is outside execution scope. The PR is open; no merge is claimed.
 
 ## Completion boundary
 
@@ -45,7 +46,7 @@ local tolerances that meet those targets and settings that do not.
 - [x] Species/volume/inactive-slot budgets, nonautonomous forcing stage times,
       domain rejection and whole-cycle failure tests.
 - [x] Complete cross-workflow forcing/output/restart compatibility with Stage 2B.
-- [ ] Final full validation, complete diff review, commit, push and separate PR.
+- [x] Final full validation, complete diff review, commit, push and separate PR.
 
 ## Owning implementations and durable evidence
 
@@ -119,6 +120,6 @@ boundaries. No unresolved Stage 2A implementation finding remains. Stage 2B
 also closed a review finding in its archive writer: existing host checkpoints
 must not be serialized inside active CUDA capture.
 
-The separate Stage 2A PR is the remaining delivery item. Stage 2B will target
-this branch explicitly so its workflow changes can be reviewed independently.
-Merging either PR remains outside this task.
+Stage 2A is delivered in PR #1659 against the verified upstream main. Stage 2B
+targets this branch explicitly so its workflow changes can be reviewed
+independently. Merging either PR remains outside this task.
