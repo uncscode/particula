@@ -1,25 +1,26 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 4.217803235980682,
-  "package_source_sha256": "88b8ca0b1ddbeef344817431e40d23db7fae15be22cd18dd18376adfcc35b093",
+  "elapsed_seconds": 5.8778181170346215,
+  "package_source_sha256": "6d2e24246ad67da3f2dd23afebccde41af3e1ed32de51992c99ef898b3f88d13",
   "input_sha256": {},
   "example": "first-cpu-workflow",
   "fingerprint": "b396296025a363580d4cf778d6c5fd341b957adbc47b030ce696799873889b96",
   "source": "docs/examples/fundamentals/first_cpu_workflow.py",
-  "revision": "7a53906faa2aa3d964e2704aa65c713e0fc68c8a",
-  "package_dirty": true,
-  "executed_at": "2026-11-16T04:12:02.516170+00:00",
+  "revision": "12742e1c394c7a836d31aff3aeecbd8c0ff2b523",
+  "package_dirty": false,
+  "executed_at": "2026-11-16T06:04:23.303859+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.2.14",
+    "particula": "0.3.1",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
     "nbclient": "0.10.2",
     "jupytext": "1.17.3",
-    "warp-lang": "1.11.1"
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
   },
   "outputs": [
     [],
@@ -33,8 +34,24 @@
   ],
   "files": {
     "figure-4-1.png": "e6a610354aac1923fbfef6ac8191f7040341f5cd66a3b55e0ca386a5cdc5f4e4",
+    "executed_source.py": "5d8ecbf2f295bacaa039de445abecade814ddb2cf000d4f65d15d9856ddaddd4",
     "data.json": "195765eab43bee413f2d0500fbc80a3909931a2a27c95543cbf640796ce5bd68",
     "source.py": "5d8ecbf2f295bacaa039de445abecade814ddb2cf000d4f65d15d9856ddaddd4"
   },
-  "simulation_fingerprint": "cba7b91385c8aa5aa9eff51b1489227fc3fe16e7f81e433efd0b82ef9a40acfe"
+  "simulation_fingerprint": "cba7b91385c8aa5aa9eff51b1489227fc3fe16e7f81e433efd0b82ef9a40acfe",
+  "render_versions": {
+    "particula": "0.3.1",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "render_device": "CPU",
+  "execution_input_sha256": {},
+  "rendered_at": "2026-11-16T06:06:24.076510+00:00",
+  "render_revision": "12742e1c394c7a836d31aff3aeecbd8c0ff2b523",
+  "render_elapsed_seconds": 4.205651693046093
 }

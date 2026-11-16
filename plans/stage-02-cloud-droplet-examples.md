@@ -118,13 +118,15 @@ refinement of the linear solve and exact conversion of unchanged scaled
 coordinates. The original dry-mass assertions remain intact. All 13 native
 example tests pass with the production corrections. The subsequent package
 selection passes 10,710 tests on actual CUDA, and the other example/tooling
-checks pass 554 tests. Unfiltered coverage validation remains in progress.
+checks pass 554 tests. The unfiltered suite passes 10,766 tests with 91.41% coverage.
 The numerical evidence record owns detailed commands, results and limitations.
 
 The full single-cycle repeat completed before those corrections. The live
 multi-cycle, respiratory and biomass runs were deliberately stopped because
-their numerical source was superseded. Refresh all four complete workloads,
-plus the affected comparison examples, from a fixed revision before accepting
+their numerical source was superseded. All four complete workloads are running in a detached validation checkout
+pinned to `12742e1c394c7a836d31aff3aeecbd8c0ff2b523`. The first CPU workflow and
+two CPU comparison examples have completed refresh, inspection and replot.
+Wait for the four complete workloads and verify their results before accepting
 the migration. Keep the library unchanged during each refresh; the publication
 hash guard rejects a changed runtime. Current process records are retained in
 `.artifacts/cloud-followthrough-runs.json`; verify live handles before resuming

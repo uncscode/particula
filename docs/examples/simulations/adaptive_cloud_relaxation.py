@@ -327,7 +327,7 @@ def plot_results(report):
 # In the retained run, the fixed update oscillates after the reset despite a
 # relative mass residual below 10⁻¹⁴. Its maximum relative radius error is about
 # 3.70; ROS2 at tolerances 10⁻⁵ and 10⁻⁷ reduces that error to about 6.05×10⁻⁶
-# and 6.98×10⁻⁸, respectively. ROS3 achieves about 4.07×10⁻⁶ and 3.41×10⁻⁸
+# and 6.98×10⁻⁸, respectively. ROS3 achieves about 4.08×10⁻⁶ and 3.39×10⁻⁸
 # with 330 and 1,247 accepted steps, versus ROS2's 3,667 and 36,161. Its higher
 # order reduces numerical work in this case; neither order nor conservation
 # guarantees that result in another regime. These are errors for this prescribed

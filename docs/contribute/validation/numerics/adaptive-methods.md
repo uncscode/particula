@@ -364,7 +364,8 @@ full source-CI package selection ran with actual CUDA: **10,710 passed, 19
 skipped, 57 slow/performance deselected and one expected failure** in 193.85 s.
 The remaining example/tooling suites passed **554 tests with one skip** in
 115.90 s. Ruff/format and ordinary Mypy passed; checked-body Mypy passed for both
-modified numerical modules. Full unfiltered coverage validation is in progress.
+modified numerical modules. The full unfiltered coverage run passed **10,766 tests**, with 20 skips and one
+expected failure, in 276.26 s; coverage is **91.41%**, above the 80% gate.
 Logs are retained under `.artifacts/ros3-refined-*`; the complete native run is
 `.artifacts/cloud-native-refined-production.log`.
 
@@ -383,3 +384,37 @@ The first prototype exposed float32 rounding of kernel coefficient literals;
 explicit module-level float64 constants restored refinement. This is prototype
 evidence only: forcing, restart, integration into the runtime, coupled event
 ownership, and the complete GPU chamber/forcing workloads remain unqualified.
+
+The corrected production source was committed as `12742e1c394c7a836d31aff3aeecbd8c0ff2b523`.
+A detached validation checkout pins that revision while full examples execute;
+ongoing GPU development cannot change their imported source. The first CPU
+workflow, finite-reservoir comparison and wet–dry comparison completed guarded
+refreshes from the clean revision, with package hash
+`6d2e24246ad67da3f2dd23afebccde41af3e1ed32de51992c99ef898b3f88d13`.
+Their bundle hashes and matching source were verified before import, figures
+inspected, and saved data replotted. Corrected wet–dry ROS3 maximum radius
+errors are 4.07786e-6 and 3.39075e-8, still requiring 330/1,247 accepted steps.
+All four larger publication workloads remain running at this checkpoint.
+The current 558-page website build and rendered structure check both pass
+with zero structural errors.
+
+The isolated GPU prototype also completed the full 81-observation wet–dry
+reference case on Warp CPU and actual CUDA. On CUDA, rtol 1e-5/1e-7 gives
+maximum radius errors 4.06940e-6/3.24342e-8, with 330/1,251 accepted and 0/2
+rejected trials. Closed-phase relative mass residuals stay below 4e-15.
+Independent Radau/BDF agreement and the explicit humidity-reset accounting are
+retained. This remains prototype evidence, not coupled GPU qualification.
+
+Latest validation commands (from the Stage 2B checkout with `PYTHONPATH=.`):
+
+```bash
+.venv/bin/pytest particula/execution/tests/ode_test.py particula/execution/tests/condensation_sparse_test.py particula/execution/tests/cpu_restart_test.py particula/execution/tests/forcing_test.py -q -Werror --no-cov
+.venv/bin/pytest examples_tests/native_simulation_examples_test.py -q -Werror --no-cov
+.venv/bin/pytest -q -Werror -m 'not slow and not performance'
+.venv/bin/pytest --cov=particula --cov-report=term-missing --cov-fail-under=80 -q -Werror
+.venv/bin/pytest examples_tests scripts/tests -q -Werror --no-cov --ignore=examples_tests/native_simulation_examples_test.py
+.venv/bin/ruff check particula/ examples_tests/ scripts/ --no-fix
+.venv/bin/ruff format particula/ examples_tests/ scripts/ --check
+.venv/bin/mypy particula/ --ignore-missing-imports
+.venv/bin/mypy particula/execution/ode.py particula/execution/condensation_ode.py --ignore-missing-imports --check-untyped-defs --follow-imports=silent
+```

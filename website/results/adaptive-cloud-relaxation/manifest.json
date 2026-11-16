@@ -1,25 +1,26 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 124.33963786391541,
-  "package_source_sha256": "fcd3e6e2e8939a530ae4aa3aaf4bd708172dca7cd6696678c501e9bf37822b06",
+  "elapsed_seconds": 120.16698165005073,
+  "package_source_sha256": "6d2e24246ad67da3f2dd23afebccde41af3e1ed32de51992c99ef898b3f88d13",
   "input_sha256": {},
   "example": "adaptive-cloud-relaxation",
-  "fingerprint": "7a8c96075c3694225a208305e00f8fbdd8e1c1bf13afdd18632f47a956325ff4",
+  "fingerprint": "7724ff4dbab53f905ff5dbe326b4467e7cb6ae2a3179409209ba6d590f2630f2",
   "source": "docs/examples/simulations/adaptive_cloud_relaxation.py",
-  "revision": "f79b3d2d624c6bb364d257032b173db8cb5e99d1",
-  "package_dirty": true,
-  "executed_at": "2026-11-16T04:54:06.180883+00:00",
+  "revision": "12742e1c394c7a836d31aff3aeecbd8c0ff2b523",
+  "package_dirty": false,
+  "executed_at": "2026-11-16T06:06:17.408532+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.2.14",
+    "particula": "0.3.1",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
     "nbclient": "0.10.2",
     "jupytext": "1.17.3",
-    "warp-lang": "1.11.1"
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
   },
   "outputs": [
     [],
@@ -27,7 +28,7 @@
     [],
     [
       {
-        "text": "fixed 0.005 s max radius error: 3.6952062679162676 mass residual: 3.0014944683315325e-16 work: {'accepted': 0, 'rejected': 0, 'fixed_steps': 80}\nROS2 1e-5 max radius error: 6.046343321575165e-06 mass residual: 2.1271342484965573e-15 work: {'accepted': 3667, 'rejected': 2, 'fixed_steps': 0}\nROS2 1e-7 max radius error: 6.980752798035894e-08 mass residual: 5.849619183309799e-15 work: {'accepted': 36161, 'rejected': 4, 'fixed_steps': 0}\n"
+        "text": "fixed 0.005 s max radius error: 3.6952062679162676 mass residual: 3.0014944683315325e-16 work: {'accepted': 0, 'rejected': 0, 'fixed_steps': 80}\nROS2 1e-5 max radius error: 6.0462680853135e-06 mass residual: 2.6589178106206993e-15 work: {'accepted': 3667, 'rejected': 2, 'fixed_steps': 0}\nROS2 1e-7 max radius error: 6.984975953194805e-08 mass residual: 1.2408283116111686e-14 work: {'accepted': 36161, 'rejected': 4, 'fixed_steps': 0}\nROS3 1e-5 max radius error: 4.07786147638145e-06 mass residual: 2.481656623139604e-15 work: {'accepted': 330, 'rejected': 0, 'fixed_steps': 0}\nROS3 1e-7 max radius error: 3.390750791254504e-08 mass residual: 2.304395435846458e-15 work: {'accepted': 1247, 'rejected': 2, 'fixed_steps': 0}\n"
       },
       {
         "image": "figure-4-1.png"
@@ -35,24 +36,25 @@
     ]
   ],
   "files": {
-    "figure-4-1.png": "2dbadbd24d1b09a29df643bd4c4071eda894faa375aea0b49b8214514bf67226",
-    "executed_source.py": "e70ad4067ca047c5f5d8ac78e82879fe96aaf69f0a70186a3780fb2c288a26d3",
-    "data.json": "263a1dc9de6735166468344998640206c2b53085a820d10c8d8f90c96b344510",
-    "source.py": "e70ad4067ca047c5f5d8ac78e82879fe96aaf69f0a70186a3780fb2c288a26d3"
+    "figure-4-1.png": "5d8b6e45e23a9c0f789388020763b2450a941738a4ae9adbd7dadc9fbfbe8859",
+    "executed_source.py": "4b782c6a8fa40df71090b45517dd8ad4e093c931118609dbfbc8a1874ebbc1a2",
+    "data.json": "116f9664ff9c079ee5e991d1367ba71589da162d5dbeaa487e6ee309c7e1680f",
+    "source.py": "f1a94b503bae7e992905f49e400a6e5d4fb55615784fdf237f04b424d0da414d"
   },
-  "simulation_fingerprint": "31ac053a97d721125d5e2f1e368bb1d03b0f729cc9adae38021495622cbfb621",
+  "simulation_fingerprint": "0f487e3e543598e7803f090e9c3229c48877be130aa9abd35690e51256d98d00",
   "render_versions": {
-    "particula": "0.2.14",
+    "particula": "0.3.1",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
     "nbclient": "0.10.2",
     "jupytext": "1.17.3",
-    "warp-lang": "1.11.1"
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
   },
   "render_device": "CPU",
   "execution_input_sha256": {},
-  "rendered_at": "2026-11-16T04:54:47.592423+00:00",
-  "render_revision": "f79b3d2d624c6bb364d257032b173db8cb5e99d1",
-  "render_elapsed_seconds": 4.419206393999048
+  "rendered_at": "2026-11-16T06:07:49.816701+00:00",
+  "render_revision": "12742e1c394c7a836d31aff3aeecbd8c0ff2b523",
+  "render_elapsed_seconds": 4.292961593018845
 }

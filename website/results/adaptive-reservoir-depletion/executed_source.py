@@ -325,7 +325,13 @@ def plot_results(report):
 # radius and vapor errors. The vapor error is normalized by initial vapor so
 # an almost depleted denominator cannot exaggerate a tiny absolute difference.
 # Work counters explain the accuracy cost without treating unequal CPU/GPU
-# timings as a speedup. For a new compound, change its declared properties and
+# timings as a speedup. In the retained CPU comparison, reducing the fixed step
+# from 0.5 s to 0.005 s reduces the maximum radius error from 1.31% to 0.0122%.
+# RK23 at relative tolerance 10⁻⁷ reaches a radius error of 2.57×10⁻⁸ with
+# 430 accepted steps; the initial-vapor-normalized error is 9.15×10⁻⁸. ROS2
+# also meets the targets but takes 2,574 accepted steps at tolerance 10⁻⁵.
+# This nonstiff case therefore does not justify choosing a stiff method solely
+# because it is available. For a new compound, change its declared properties and
 # repeat this comparison before adding collisions, forcing, or thermal feedback.
 
 # %%
