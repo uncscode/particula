@@ -4,6 +4,13 @@ Status: proposed. Entry dependency: an initial
 [Stage 1 reference case](stage-01-scientific-correctness.md).
 Coordinate accepted-step and time semantics with [Stage 2A](stage-02a-numerical-integration.md).
 
+## Execution and delivery
+
+Create a dedicated worktree and `codex/stage-02b-simulation-workflow` branch
+when starting this plan. Develop and validate there, then commit, push, and
+create a PR when the plan's acceptance criteria are met. Follow the shared
+[worktree, branch, and PR workflow](README.md#worktree-branch-and-pr-workflow).
+
 ## Outcome
 
 Let a researcher configure explicit physics, run for a physical duration,
@@ -66,8 +73,12 @@ files. Reuse these capabilities and preserve their ownership boundaries.
 - Eligible CPU and GPU runs resume with the documented continuation guarantee,
   including stochastic state. Analysis-only files cannot masquerade as exact
   restart checkpoints.
-- Enabling observation does not change the simulation trajectory. Tests cover
-  rejected trials, split steps, final time, resumed schedules, and forcing.
+- Passive observation does not mutate state, consume physics RNG draws, or
+  change the accepted trajectory for a fixed step schedule. If output times
+  explicitly shorten steps, document that numerical policy and verify agreement
+  within the declared accuracy or stochastic uncertainty, rather than requiring
+  identical trajectories. Tests cover rejected trials, split steps, final time,
+  resumed schedules, and forcing.
 - Incomplete writes cannot replace the last usable checkpoint. Unsupported or
   corrupted files fail clearly; no arbitrary code execution is needed to load
   an analysis result.

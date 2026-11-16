@@ -2,6 +2,13 @@
 
 Status: proposed. Entry dependency: none.
 
+## Execution and delivery
+
+Create a dedicated worktree and `codex/stage-01-scientific-correctness` branch
+when starting this plan. Develop and validate there, then commit, push, and
+create a PR when the plan's acceptance criteria are met. Follow the shared
+[worktree, branch, and PR workflow](README.md#worktree-branch-and-pr-workflow).
+
 ## Outcome
 
 Establish a trustworthy reference baseline for the existing physics and resolve

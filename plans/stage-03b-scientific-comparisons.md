@@ -5,6 +5,15 @@ on the relevant [Stage 1](stage-01-scientific-correctness.md),
 [Stage 2A](stage-02a-numerical-integration.md), and
 [Stage 2B](stage-02b-simulation-workflow.md) outcomes.
 
+## Execution and delivery
+
+Create a dedicated worktree and `codex/stage-03b-scientific-comparisons` branch
+when starting this plan. Develop and validate there, then commit, push, and
+create a PR when the plan's acceptance criteria are met. Follow the shared
+[worktree, branch, and PR workflow](README.md#worktree-branch-and-pr-workflow).
+Studies selected by the [literature scheduler](literature-scheduler.md) each
+use their own iteration worktree and branch rather than this stage's branch.
+
 ## Outcome
 
 Demonstrate what Particula can reproduce or explain for a small set of relevant
@@ -48,8 +57,9 @@ stage sequence.
 Begin with one bounded study, then broaden to complementary physics. Do not
 make a full instrument-analysis platform a prerequisite for a case needing only
 one observation transformation. A missing model feature becomes a scoped
-[Stage 3A](stage-03a-thermodynamics-and-chemistry.md) proposal rather than an
-unrecorded approximation or automatic feature expansion.
+[Stage 3A](stage-03a-thermodynamics.md) proposal, or a
+[Stage 6 chemistry](stage-06-chemistry-model.md) case, rather than an unrecorded
+approximation or automatic feature expansion.
 
 Suitable comparison workflows can later supply
 [GPU workloads](stage-04-gpu-qualification.md) and
