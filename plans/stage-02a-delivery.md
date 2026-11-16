@@ -1,7 +1,8 @@
 # Stage 2A execution target and evidence
 
-Status: implemented, qualified, reviewed and delivered in
-[PR #1659](https://github.com/uncscode/particula/pull/1659).
+Status: initial implementation delivered in
+[PR #1659](https://github.com/uncscode/particula/pull/1659). The discrete-bin review
+correction below is locally qualified and awaits publication authorization.
 Worktree: `/tmp/particula-stage-02a`.
 Branch: `codex/stage-02a-numerical-integration`.
 Verified upstream base: `356fc054cd9a4f4ececc3c64c7144e889a789494`.
@@ -116,10 +117,35 @@ above remain tied to the unchanged Stage 2A executable sources.
 Review covered continuous-rate versus finite-step boundaries, RK/ROS coefficients,
 scaled tolerance units, shared maximum-error control, species/volume coupling,
 trial publication, split clocks, explicit GPU transfers and failure/capture
-boundaries. No unresolved Stage 2A implementation finding remains. Stage 2B
+boundaries. The later discrete-bin review finding and its correction are
+recorded below. Stage 2B
 also closed a review finding in its archive writer: existing host checkpoints
 must not be serialized inside active CUDA capture.
 
 Stage 2A is delivered in PR #1659 against the verified upstream main. Stage 2B
 targets this branch explicitly so its workflow changes can be reviewed
 independently. Merging either PR remains outside this task.
+
+## Discrete-bin review correction (2026-11-16)
+
+PR #1659 identified that zero-density discrete bins may retain their defining
+particle masses, unlike empty resolved-particle slots. The original CUDA trial
+guard applied the resolved rule to both representations. The failure reproduced
+on Warp CPU and actual CUDA with native-valid, unit-volume discrete fixtures.
+The guard now receives the population interpretation and requires zero mass only
+for resolved free slots. This changes admission of discrete states; resolved
+physics, rates and adaptive controls are unchanged.
+
+Regression coverage preserves zero-density bin masses, compares heterogeneous
+three-box evolution against CPU condensation, checks an independent species
+budget, and retains resolved free-slot rejection on both devices. All **27** GPU
+ODE tests pass. Full package validation with warnings as errors passed **10,636
+tests, 20 skips and one expected failure**, with **91.34% coverage** (80% gate).
+Standard Mypy passed **654 sources**; Ruff and format passed **734 files**.
+
+Commands: `PYTHONPATH=. .venv/bin/python -m pytest particula --cov=particula
+--cov-report=term-missing --cov-fail-under=80 -Werror -q`, full standard Mypy,
+and Ruff check/format over `particula/ examples_tests/ scripts/`. Logs are in
+`.artifacts/discrete-bin-*.log`. Earlier scientific measurements retain their
+original source hashes; this regression qualification does not relabel them.
+The remote review thread remains unresolved until the correction is published.

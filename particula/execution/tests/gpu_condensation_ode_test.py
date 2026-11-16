@@ -343,3 +343,72 @@ def test_near_depletion_meets_independent_inventory_target(device):
     assert expected_gas < 0.04 * 1e-5
     assert abs(final.particles.radii[0, 0] / 1e-6 - target_radius) < 1e-5
     assert abs(final.gas.concentration[0, 1] - expected_gas) / 1e-5 < 1e-5
+
+
+def test_unpopulated_discrete_bins_preserve_mass_and_species_budget(device):
+    """A zero-density bin retains its defining mass without exchanging vapor."""
+    initial, strategy = case(3)
+    initial.particles.distribution_type = "discrete"
+    initial.particles.concentration /= initial.particles.volume[:, None]
+    initial.particles.volume[:] = 1.0
+    initial.gas.concentration[:, 1] *= [0.5, 1.0, 2.0]
+    initial.particles.masses[:, 1] = initial.particles.masses[:, 0] * 0.5
+    before = initial.particles.masses.copy()
+    initial.particles.validate_representation()
+    expected = (
+        np.sum(before[:, :, 0] * initial.particles.concentration, axis=1)
+        + initial.gas.concentration[:, 1]
+    )
+    owner = GPUCondensationODE(
+        initial, strategy, device=device, rtol=1e-8, max_step=0.01
+    )
+    result = advance(owner, 0.1)
+    reference = advance(
+        CondensationODE(initial, strategy, rtol=1e-9, max_step=0.01), 0.1
+    )
+    npt.assert_array_equal(result.particles.masses[:, 1], before[:, 1])
+    npt.assert_array_equal(
+        result.particles.concentration, initial.particles.concentration
+    )
+    npt.assert_array_equal(result.gas.concentration[:, 0], [0.1] * 3)
+    npt.assert_allclose(
+        result.particles.masses[:, 0],
+        reference.particles.masses[:, 0],
+        rtol=1e-7,
+    )
+    npt.assert_allclose(
+        result.gas.concentration[:, 1],
+        reference.gas.concentration[:, 1],
+        rtol=1e-7,
+    )
+    npt.assert_allclose(
+        np.sum(
+            result.particles.masses[:, :, 0] * result.particles.concentration,
+            axis=1,
+        )
+        + result.gas.concentration[:, 1],
+        expected,
+        rtol=4e-13,
+    )
+    npt.assert_array_equal(initial.particles.masses, before)
+
+
+@pytest.mark.parametrize("resolved, expected", [(0, 0), (1, 1)])
+def test_zero_density_domain_distinguishes_bins_from_free_slots(
+    device, resolved, expected
+):
+    """Retained bin geometry is valid only for the discrete interpretation."""
+    from particula.execution._condensation_ode_kernels import check_slots
+
+    masses = wp.array(
+        np.array([[[1.0], [2.0]]]), dtype=wp.float64, device=device
+    )
+    counts = wp.array(np.array([[1.0, 0.0]]), dtype=wp.float64, device=device)
+    invalid = wp.zeros(1, dtype=wp.int32, device=device)
+    wp.launch(
+        check_slots,
+        dim=(1, 2),
+        inputs=[masses, counts, invalid, wp.int32(resolved)],
+        device=device,
+    )
+    assert invalid.numpy()[0] == expected
