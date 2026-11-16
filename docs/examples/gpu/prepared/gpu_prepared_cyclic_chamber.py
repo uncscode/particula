@@ -10,10 +10,12 @@
 # This longer illustration evolves **196,608 initially active particles** in
 # 32 boxes for 600 one-second steps. Each box has 8,192 slots, a polydisperse
 # water/dry-material population and three gas species. Nucleation, Brownian
-# coagulation and water condensation share one resident state. This coarse
-# fixed-step example stresses process composition, repeated injection and
-# restart; it is not a timestep-converged chamber prediction. For condensation
-# response with explicit refinement checks, use the multibox and forcing studies.
+# coagulation retain their fixed one-second event schedule. Water condensation
+# uses adaptive ROS3 between those boundaries. Event buffers and random streams
+# persist; each cycle explicitly transfers state to and from the condensation
+# owner. Only the event sequence is captured. Condensation error control does
+# not bound splitting or stochastic error, so this remains an illustrative
+# chamber calculation rather than a timestep-converged prediction.
 #
 # Every 50 seconds, a finite precursor pulse creates exactly 128 unit-count,
 # neutral particles per box. Remaining precursor is explicitly removed after
@@ -38,6 +40,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import warp as wp
+from particula.execution.gpu_coupled import GPUCoupledSimulation
+from particula.execution.gpu_coupled_restart import resume_coupled
 from particula.util.constants import AVOGADRO_NUMBER, GAS_CONSTANT
 from scripts.gpu_studies.cases import (
     StudyCase,
@@ -183,12 +187,13 @@ def run_example():
     initial, _, processes = build_case(case)
     initial.gas.concentration[:, 1] = 0.0
     source, coagulation, condensation = processes[:3]
-    process = source | coagulation | condensation
+    events = (source, coagulation)
+    strategy = condensation.condensation_strategy
     expected = mapped_inventory(initial)
-    with process.prepare(
-        initial, device="cuda:0", time_step=1.0, root_seed=42
+    with GPUCoupledSimulation(
+        initial, events, strategy, device="cuda:0", time_step=1.0, root_seed=42
     ) as owner:
-        owner.capture()
+        owner.capture_events()
         first, _ = frame(owner, 0)
         frames, error_a = advance(
             owner, 0, 300, initial, expected, observe=True
@@ -199,10 +204,19 @@ def run_example():
             owner, 300, STEPS, initial, expected, observe=True
         )
         final = owner.snapshot()
-    with process.resume(saved) as resumed:
-        resumed.capture()
+        work = {
+            **vars(owner.statistics),
+            "control_readbacks": owner.control_readbacks,
+            "coupling_downloads": owner.coupling_downloads,
+            "coupling_uploads": owner.coupling_uploads,
+        }
+        final_rng = owner.checkpoint().events.resident.rng_continuation
+    with resume_coupled(saved, events, strategy, device="cuda:0") as resumed:
+        resumed.capture_events()
         advance(resumed, 300, STEPS, initial, saved_expected, observe=False)
         continued = resumed.snapshot()
+        if resumed.checkpoint().events.resident.rng_continuation != final_rng:
+            raise AssertionError("Cyclic restart changed random continuation")
     if state_hash(final) != state_hash(continued):
         raise AssertionError("Cyclic restart changed the final state")
     np.testing.assert_allclose(
@@ -224,8 +238,19 @@ def run_example():
         "Maximum box/species inventory relative error:", max(error_a, error_b)
     )
     print("Second-half checkpoint continuation is byte-exact.")
+    print("Adaptive condensation and explicit coupling work:", work)
     plt.show()
-    return final
+    return {
+        "frames": [first, *frames, *later],
+        "work": work,
+        "max_inventory_relative_error": max(error_a, error_b),
+        "restart_exact": True,
+        "initial_active_particles": int(initial.particles.concentration.sum()),
+        "final_active_particles": int(
+            np.count_nonzero(final.particles.concentration)
+        ),
+        "duration_s": STEPS,
+    }
 
 
 # %% [markdown]
@@ -236,7 +261,7 @@ def run_example():
 # changes alter water uptake and evaporation. The radius/time map shows the
 # resulting evolving population instead of only a final distribution.
 # Invariant checks establish accounting and restart correctness; this
-# illustrative fixed-step calculation is not a timestep-converged prediction
+# fixed event schedule with adaptive condensation is not a converged prediction
 # for a physical chamber.
 
 

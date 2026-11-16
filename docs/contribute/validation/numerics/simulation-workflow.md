@@ -124,3 +124,32 @@ RNG and field continuation, atomic replacement and non-executable loading. The
 capture-save gap was corrected and covered by an actual CUDA regression.
 Publication and merge status belong to the plan delivery records; these results
 do not assert a released package or a deployed documentation site.
+
+## Coupled GPU event boundaries
+
+The follow-through implementation adds `GPUCoupledSimulation`: fixed native
+source/collision/removal/dilution events and a separately controlled GPU
+condensation flow. It preserves persistent event buffers/RNG, explicit
+sequential order and full host transfer boundaries. The controller resets
+at every event boundary. Its distinct schema-1 checkpoint contains canonical
+event continuation, condensation identity, scalar controls, order and work
+counters; the outer archive codec remains explicit data, without pickle.
+
+The focused coupled/numerics/archive/restart selection passed **65 tests with
+one deliberate Warp-CPU capture skip** on Warp CPU and the RTX 5060. It includes
+exact disk continuation with source and Brownian collisions, captured events,
+rejected condensation trials without repeated event draws, unchanged caller
+state and event-buffer identity, independent dilution/inventory checks,
+empty-population continuation, shorter-bound rejection and faulted-cycle
+observation rejection. The latter retains the last complete public clock while
+rejecting further snapshots and checkpoints after partial physical work.
+Changed condensation physics rejects before device access. Unsupported event
+families reject before allocation. All-package Mypy and Ruff checks passed.
+
+These tests do not substitute for the full published workloads. The cyclic
+chamber still requires all 32 boxes, 8,192 slots, 600 one-second cycles, 128-event
+pulses and complete second-half restart. The forcing example retains 16 boxes,
+4,096 slots, 6,000 one-microsecond intervals and the full doubled-step refinement
+with unchanged control times. Their updated sources and compact recording are
+implemented; publication, figure inspection and full-workload qualification are
+pending. No GPU speedup is inferred from this explicit transfer path.

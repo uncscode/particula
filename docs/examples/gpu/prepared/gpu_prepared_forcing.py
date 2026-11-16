@@ -20,10 +20,14 @@
 # sinks, so their actual per-box mass changes enter the ledger before dilution.
 #
 # `update_environment` and `update_gas` are explicit upload boundaries.
-# They change array values in place, so a captured schedule can keep replaying.
+# Exact dilution keeps its fixed schedule and can replay a captured event graph.
+# Condensation uses adaptive ROS3, with explicit state transfers every cycle;
+# its rejected trials never repeat dilution. This host-controlled composition
+# demonstrates correctness and error control, not fully resident acceleration.
 # The study helpers and plotting code are included in the downloadable ZIP.
-# A second run halves the integration timestep while retaining those exact
-# control times. Every particle's final total mass must change by less than
+# A second run halves the outer timestep and tightens the condensation relative
+# tolerance from 1e-5 to 1e-7, retaining the exact control times. Every particle's
+# final total mass must change by less than
 # 1%, and every box's final water vapor by less than 0.1%.
 
 # %%
@@ -32,8 +36,8 @@
 import matplotlib.pyplot as plt
 import warp as wp
 from scripts.docs_gpu_figures import history_figures
+from scripts.gpu_studies.adaptive_trajectories import run_adaptive_forcing
 from scripts.gpu_studies.cases import StudyCase, build_case
-from scripts.gpu_studies.trajectories import run_trajectory
 
 
 def run_example():
@@ -51,8 +55,8 @@ def run_example():
         heterogeneous=True,
         experiment="forcing",
     )
-    initial, process, processes = build_case(case)
-    report = run_trajectory(case, initial, process, processes)
+    initial, _, processes = build_case(case)
+    report = run_adaptive_forcing(case, initial, processes)
     history_figures(
         report,
         "Cooling and vapor pulses · " + wp.get_device("cuda:0").name,

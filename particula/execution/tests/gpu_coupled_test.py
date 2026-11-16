@@ -1,0 +1,343 @@
+"""Coupled event scheduling, explicit transfers and exact restart evidence."""
+
+from dataclasses import replace
+
+import numpy as np
+import pytest
+
+from particula import _cpu_batch
+from particula.dynamics import Dilution, DilutionStrategy
+from particula.execution.gpu_condensation_ode import GPUCondensationODE
+from particula.execution.gpu_coupled import (
+    GPUCondensationControls,
+    GPUCoupledSimulation,
+)
+from particula.execution.gpu_coupled_restart import (
+    load_coupled_checkpoint,
+    resume_coupled,
+    save_coupled_checkpoint,
+)
+from particula.execution.tests.condensation_ode_test import case
+from particula.execution.tests.prepared_restart_capture_test import (
+    canonical_equal,
+)
+
+wp = pytest.importorskip("warp")
+pytestmark = pytest.mark.warp
+
+
+@pytest.fixture(params=["cpu", "cuda:0"])
+def device(request):
+    """Require native CUDA for the CUDA half of each regression."""
+    if request.param != "cpu" and not wp.is_cuda_available():
+        pytest.skip("actual CUDA unavailable")
+    return request.param
+
+
+def equal_native(left, right):
+    """Compare all primary native arrays, independently of owner helpers."""
+    for family, names in (
+        (
+            "particles",
+            ("masses", "concentration", "charge", "density", "volume"),
+        ),
+        ("gas", ("concentration", "molar_mass", "partitioning")),
+        ("environment", ("temperature", "pressure")),
+    ):
+        for name in names:
+            np.testing.assert_array_equal(
+                getattr(getattr(left, family), name),
+                getattr(getattr(right, family), name),
+            )
+
+
+@pytest.mark.parametrize("order", ["events-first", "condensation-first"])
+def test_order_matches_explicit_flows_and_independent_budget(device, order):
+    """Retain exact dilution, native identity and explicit sequential order."""
+    from dataclasses import asdict
+
+    initial, strategy = case(2)
+    frozen = _cpu_batch.detached(initial)
+    events = (Dilution(DilutionStrategy(0.2)),)
+    controls = GPUCondensationControls()
+    dt = 0.01
+    reference = _cpu_batch.detached(initial)
+    if order == "events-first":
+        reference.particles.concentration *= np.exp(-0.2 * dt)
+        reference.gas.concentration *= np.exp(-0.2 * dt)
+    flow = GPUCondensationODE(
+        reference, strategy, device=device, **asdict(controls)
+    )
+    while flow.time < dt:
+        flow.step(dt)
+    reference = flow.snapshot()
+    if order == "condensation-first":
+        reference.particles.concentration *= np.exp(-0.2 * dt)
+        reference.gas.concentration *= np.exp(-0.2 * dt)
+    with GPUCoupledSimulation(
+        initial,
+        events,
+        strategy,
+        device=device,
+        time_step=dt,
+        order=order,
+    ) as owner:
+        bindings = owner._events._session.particles.masses
+        owner.step()
+        final = owner.snapshot()
+        equal_native(final, reference)
+        assert owner._events._session.particles.masses is bindings
+        assert owner.time == dt
+        assert owner.completed_steps == 1
+        assert owner.coupling_downloads == owner.coupling_uploads == 2
+        before = (
+            initial.gas.concentration[:, 1]
+            + np.sum(
+                initial.particles.masses[..., 0]
+                * initial.particles.concentration,
+                axis=1,
+            )
+            / initial.particles.volume
+        )
+        after = (
+            final.gas.concentration[:, 1]
+            + np.sum(
+                final.particles.masses[..., 0] * final.particles.concentration,
+                axis=1,
+            )
+            / final.particles.volume
+        )
+        np.testing.assert_allclose(
+            after, before * np.exp(-0.2 * dt), rtol=3e-13
+        )
+    equal_native(initial, frozen)
+
+
+def test_rejection_cannot_repeat_stochastic_events(device, monkeypatch):
+    """Rejected condensation trials leave the fixed event RNG schedule intact."""
+    from scripts.gpu_studies.cases import StudyCase, build_case
+
+    initial, _, processes = build_case(
+        StudyCase("test", "full", 2, 64, occupancy=0.75, time_step=1)
+    )
+    source, collision, condensation = processes[:3]
+    events = (source, collision)
+    called = 0
+    original = GPUCondensationODE._trial
+
+    def reject_once(self, h):
+        nonlocal called
+        called += 1
+        if called == 1:
+            return 8.0
+        return original(self, h)
+
+    with (source | collision).prepare(
+        initial, device=device, time_step=1, root_seed=17
+    ) as reference:
+        reference.step()
+        event_checkpoint = reference.checkpoint()
+    with GPUCoupledSimulation(
+        initial,
+        events,
+        condensation.condensation_strategy,
+        device=device,
+        time_step=1,
+        root_seed=17,
+    ) as owner:
+        monkeypatch.setattr(GPUCondensationODE, "_trial", reject_once)
+        owner.step()
+        actual = owner.checkpoint()
+        assert owner.statistics.rejected >= 1
+        assert actual.events.resident.completed_steps == 1
+        assert (
+            actual.events.resident.rng_continuation
+            == event_checkpoint.resident.rng_continuation
+        )
+        final = owner.snapshot()
+        np.testing.assert_array_equal(
+            final.particles.concentration,
+            event_checkpoint.resident.particles.concentration,
+        )
+        np.testing.assert_array_equal(
+            final.particles.charge, event_checkpoint.resident.particles.charge
+        )
+
+
+@pytest.mark.parametrize("capture", [False, True])
+def test_disk_restart_preserves_events_physics_and_random_words(
+    device, capture, tmp_path
+):
+    """A complete cycle checkpoint preserves stochastic continuation exactly."""
+    from scripts.gpu_studies.cases import StudyCase, build_case
+
+    if capture and device == "cpu":
+        pytest.skip("native CUDA graph test")
+    initial, _, processes = build_case(
+        StudyCase("test", "full", 2, 64, occupancy=0.75, time_step=1)
+    )
+    source, collision, condensation = processes[:3]
+    events = (source, collision)
+    strategy = condensation.condensation_strategy
+    with GPUCoupledSimulation(
+        initial, events, strategy, device=device, time_step=1, root_seed=42
+    ) as owner:
+        if capture:
+            before = owner.checkpoint()
+            owner.capture_events()
+            canonical_equal(before.events, owner.checkpoint().events)
+        owner.step()
+        gas = owner.diagnostics().gas_concentration.copy()
+        gas[:, 1] = 0
+        owner.update_gas(gas)
+        owner.update_environment(temperature=np.array([288.0, 299.0]))
+        saved = owner.checkpoint()
+        # Inspection carriers remain lossy, non-authoritative host views.
+        saved.events.resident.particles.masses[:] = -1
+        path = tmp_path / "coupled.npz"
+        save_coupled_checkpoint(saved, path)
+        loaded = load_coupled_checkpoint(path)
+        owner.run(2)
+        final, final_checkpoint = owner.snapshot(), owner.checkpoint()
+        with resume_coupled(loaded, events, strategy, device=device) as resumed:
+            if capture:
+                resumed.capture_events()
+            resumed.run(2)
+            equal_native(final, resumed.snapshot())
+            canonical_equal(
+                final_checkpoint.events, resumed.checkpoint().events
+            )
+            assert final_checkpoint.statistics == resumed.statistics
+            assert final_checkpoint.counters == resumed.checkpoint().counters
+            assert resumed.time == owner.time == 3
+
+
+def test_short_bound_rejects_before_events_and_failure_is_terminal(
+    device, monkeypatch
+):
+    """Never expose partially advanced physics as an accepted complete cycle."""
+    initial, strategy = case(2)
+    with GPUCoupledSimulation(
+        initial,
+        (Dilution(DilutionStrategy(0.2)),),
+        strategy,
+        device=device,
+        time_step=0.1,
+    ) as owner:
+        before = owner.checkpoint()
+        with pytest.raises(ValueError, match="complete fixed event"):
+            owner.step(0.05)
+        canonical_equal(before.events, owner.checkpoint().events)
+
+        def fail(*args):
+            raise RuntimeError("injected condensation failure")
+
+        monkeypatch.setattr(owner, "_condense", fail)
+        with pytest.raises(RuntimeError, match="injected"):
+            owner.step()
+        assert owner.time == 0
+        assert owner.completed_steps == 0
+        assert owner._events.completed_steps == 1
+        for action in (owner.snapshot, owner.checkpoint, owner.step):
+            with pytest.raises(RuntimeError, match="faulted"):
+                action()
+
+
+def test_bad_restart_does_not_replace_last_archive_or_allocate(
+    device, tmp_path, monkeypatch
+):
+    """Reject unknown schemas and changed condensation before creating owners."""
+    initial, strategy = case()
+    events = (Dilution(DilutionStrategy(0.2)),)
+    with GPUCoupledSimulation(
+        initial, events, strategy, device=device, time_step=0.1
+    ) as owner:
+        saved = owner.checkpoint()
+    path = tmp_path / "checkpoint.npz"
+    save_coupled_checkpoint(saved, path)
+    before = path.read_bytes()
+    with pytest.raises(ValueError, match="schema/runtime"):
+        save_coupled_checkpoint(replace(saved, schema_version=2), path)
+    assert path.read_bytes() == before
+    strategy.diffusion_coefficient *= 2
+
+    def forbidden(*args, **kwargs):
+        pytest.fail("changed physics accessed device")
+
+    monkeypatch.setattr(wp, "get_device", forbidden)
+    with pytest.raises(ValueError, match="physics differs"):
+        resume_coupled(saved, events, strategy, device=device)
+
+
+def test_empty_population_can_continue_and_restart(device, tmp_path):
+    """Complete evaporation/removal is not a reason to lose event continuation."""
+    initial, strategy = case()
+    initial.particles.masses[:] = 0
+    initial.particles.concentration[:] = 0
+    initial.particles.charge[:] = 0
+    events = (Dilution(DilutionStrategy(0.2)),)
+    with GPUCoupledSimulation(
+        initial, events, strategy, device=device, time_step=0.1
+    ) as owner:
+        owner.step()
+        assert owner.statistics.accepted == 0
+        saved = owner.checkpoint()
+        save_coupled_checkpoint(saved, tmp_path / "empty.npz")
+        with resume_coupled(
+            load_coupled_checkpoint(tmp_path / "empty.npz"),
+            events,
+            strategy,
+            device=device,
+        ) as restored:
+            owner.step()
+            restored.step()
+            equal_native(owner.snapshot(), restored.snapshot())
+            canonical_equal(
+                owner.checkpoint().events, restored.checkpoint().events
+            )
+        np.testing.assert_allclose(
+            owner.snapshot().gas.concentration,
+            initial.gas.concentration * np.exp(-0.04),
+            rtol=2e-15,
+        )
+
+
+def test_whole_cycle_capture_rejects_before_event_launch():
+    """The captured event optimization cannot imply capturable host control."""
+    if not wp.is_cuda_available():
+        pytest.skip("actual CUDA unavailable")
+    initial, strategy = case()
+    with GPUCoupledSimulation(
+        initial,
+        (Dilution(DilutionStrategy(0.2)),),
+        strategy,
+        device="cuda:0",
+        time_step=0.1,
+    ) as owner:
+        before = owner.checkpoint()
+        with wp.ScopedCapture(device="cuda:0"):
+            with pytest.raises(RuntimeError, match="during CUDA capture"):
+                owner.step()
+            with pytest.raises(RuntimeError, match="during CUDA capture"):
+                owner.checkpoint()
+        canonical_equal(before.events, owner.checkpoint().events)
+
+
+def test_unsupported_events_reject_before_allocation(monkeypatch):
+    """Do not execute fixed condensation in addition to the adaptive flow."""
+    from particula.dynamics import MassCondensation
+
+    initial, strategy = case()
+
+    def forbidden(*args, **kwargs):
+        pytest.fail("unsupported coupled plan reached device")
+
+    monkeypatch.setattr(wp, "get_device", forbidden)
+    with pytest.raises(ValueError, match="event family"):
+        GPUCoupledSimulation(
+            initial,
+            (MassCondensation(strategy),),
+            strategy,
+            device="cpu",
+            time_step=0.1,
+        )

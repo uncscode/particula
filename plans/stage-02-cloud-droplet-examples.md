@@ -142,7 +142,10 @@ CUDA growth/refinement checks. The new full CUDA wet–dry comparison completed
 publication, figure inspection, CPU replot and extracted-download execution.
 Its errors refine from 4.07e-6 to 3.24e-8. The integrated package passed 10,788
 tests with 91.30% coverage; detailed evidence belongs to the method record.
-Complete coupled event ownership, then run
-the full cyclic chamber and prepared forcing workloads. The small CUDA examples
+Coupled event ownership and exact restart are now implemented with explicit
+state transfers. The focused coupling/numerics/archive tests pass 65 cases;
+the full package gate and complete cyclic chamber/forcing publications remain
+pending. Run and inspect the full cyclic chamber and prepared forcing workloads.
+The small CUDA examples
 do not replace that work. Full results, final narratives, review and PR readiness
 remain incomplete; no completion or merge is claimed.

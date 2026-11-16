@@ -19,7 +19,7 @@ state automatically. Start with [native process setup](index.md) and the
 | Continuous isothermal condensation | `CondensationODE`, RK23, ROS2 or ROS3 | `GPUCondensationODE`, RK23 or ROS3 | Adaptive mass rates, separate gas/particle tolerances |
 | Existing finite-step condensation | Existing strategies | Existing direct/prepared fixed-four path | Inventory limits and fixed substeps; no embedded error estimate |
 | Exact dilution | Existing strategy and `dilution_flow` | Existing direct/prepared path | Keep the exact exponential update |
-| Grouped sequential or Strang composition | `SplitSimulation` | No resident adaptive split owner | Explicit deterministic component declarations |
+| Grouped sequential or Strang composition | `SplitSimulation` | Fixed native events with adaptive condensation through `GPUCoupledSimulation` | GPU composition is sequential with explicit host transfers; no resident adaptive Strang owner |
 | Equilibrium projections or stochastic events | Existing process-specific execution | Existing qualified prepared processes | Not accepted as adaptive ODE or Strang components |
 
 For the measured growth, equilibrium and depletion cases, RK23 is the initial
@@ -249,3 +249,74 @@ native state and must not mutate external resources or consume RNG. Declaring
 Existing runnable `rate()` methods are not automatically continuous derivatives.
 Stochastic updates and equilibrium projections need their own supported
 scheduling contracts and are rejected as flow kinds here.
+
+## Fixed GPU events with adaptive condensation
+
+`GPUCoupledSimulation` from `particula.execution.gpu_coupled` composes a fixed
+native event sequence with a supported `GPUCondensationODE` flow. It is useful
+when stiff condensation needs smaller error-controlled steps while sources,
+collisions or removal retain their chosen physical event schedule. For an
+existing native `aerosol`, configured `source`/`coagulation` runnables and an
+isothermal condensation `strategy`:
+
+```python
+from particula.execution.gpu_coupled import (
+    GPUCondensationControls,
+    GPUCoupledSimulation,
+)
+
+with GPUCoupledSimulation(
+    aerosol, (source, coagulation), strategy,
+    device="cuda:0", time_step=1.0, root_seed=42,
+    order="events-first",
+    controls=GPUCondensationControls(method="ros3", rtol=1e-5),
+) as simulation:
+    simulation.capture_events()
+    simulation.run(10)
+    result = simulation.snapshot()
+    checkpoint = simulation.checkpoint()
+```
+
+Use `order="condensation-first"` when condensation precedes the fixed events,
+for example exact dilution. This is sequential composition; condensation's
+local error estimate does not measure splitting or stochastic uncertainty.
+The complete event interval remains fixed. A shorter requested bound rejects
+before any physical work, so forcing and output schedules must use that grid.
+Temperature and gas replacements are explicit calls between complete cycles.
+
+Each cycle retains the event owner's buffers and random streams. It downloads
+native state, uploads a detached adaptive problem, downloads accepted masses
+and gas, then copies those fields into the existing event buffers. Physical
+rates run on the requested device. `coupling_downloads` and `coupling_uploads`
+count these full transfer boundaries (normally two each per cycle), excluding
+user-requested observations and checkpoints. `statistics` and
+`control_readbacks` aggregate condensation work. Rejected trials never repeat
+an event or draw event random numbers. Adaptive buffers and the controller are
+rebuilt at each event boundary; this policy is part of exact continuation.
+
+`capture_events()` captures only the fixed event sequence. Calling the whole
+cycle, observation or checkpoint inside an active CUDA capture rejects. The
+host-controlled composition makes no fully resident or acceleration claim.
+The [cyclic chamber](../../examples/gpu/prepared/gpu_prepared_cyclic_chamber.py)
+and [forcing study](../../examples/gpu/prepared/gpu_prepared_forcing.py)
+retain their full scientific schedules with this explicit transfer policy.
+
+Supported events are the existing prepared nucleation, coagulation, wall-loss
+and dilution families, at most one of each. Their normal species, population,
+capacity and equal-count restrictions still apply. Saturation-dependent
+nucleation and extension fields are currently rejected. Observed saturation
+is derived from the configured vapor-pressure law; it is not an input to the
+fixed event sequence. Empty populations preserve gas/event continuation and
+skip condensation until a source provides active particles.
+
+The owner publishes time and observations only after a complete cycle. If
+condensation or an upload fails after events have executed, the owner faults
+and rejects subsequent steps, snapshots and checkpoints. Earlier event writes
+are not rolled back. Resume the last successful checkpoint explicitly.
+
+`resume_coupled`, `save_coupled_checkpoint` and `load_coupled_checkpoint` from
+`particula.execution.gpu_coupled_restart` retain canonical event/RNG bytes,
+condensation configuration, controls, order and work counters. Supply the same
+event tuple and strategy and an explicitly matching device to `resume_coupled`.
+The versioned archive contains data only; analysis snapshots cannot replace
+it. Future forcing/source schedules remain the caller's responsibility.

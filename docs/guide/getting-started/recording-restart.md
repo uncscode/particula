@@ -15,6 +15,7 @@ for you. Choose tolerances using the
 | `CPUSimulation` | `run_until`; native CPU runnable cycles | Known native processes, CPU RNG, auxiliary fields and diagnostics |
 | `CondensationODE` | `run_until`; CPU RK23, ROS2 or ROS3 accepted steps | Scaled state, controller and supported forcing table |
 | `GPUCondensationODE` | `run_until`; Warp CPU or CUDA RK23/ROS3 | Same explicit device, scaled device state and controller |
+| `GPUCoupledSimulation` | Fixed complete event cycles, explicit snapshots | Canonical event/RNG state plus condensation configuration, controls and ordering |
 | `SplitSimulation` | `run_until`; complete sequential or Strang cycles | Nested built-in condensation/dilution flows and their controls |
 | `PreparedSimulation` | `run_prepared`; unchanged fixed step grid | Existing qualified prepared configuration and canonical resident checkpoint |
 

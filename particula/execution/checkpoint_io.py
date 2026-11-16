@@ -31,6 +31,8 @@ def _types():
     from particula.execution.cpu_simulation import CPUCheckpoint
     from particula.execution.extension_registry import ProcessCapabilities
     from particula.execution.forcing import EnvironmentForcing
+    from particula.execution.gpu_coupled import GPUCondensationControls
+    from particula.execution.gpu_coupled_restart import GPUCoupledCheckpoint
     from particula.execution.gpu_restart import GPUCondensationCheckpoint
     from particula.execution.gpu_session import (
         ResidentDimensions,
@@ -53,6 +55,8 @@ def _types():
         CondensationCheckpoint,
         SplitCheckpoint,
         GPUCondensationCheckpoint,
+        GPUCondensationControls,
+        GPUCoupledCheckpoint,
         GPUProcessPlan,
         GPUStateSpec,
         ProcessCapabilities,
