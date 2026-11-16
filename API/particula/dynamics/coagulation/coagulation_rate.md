@@ -62,7 +62,7 @@ print(gain_cont)
 > - Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
 >   physics, Chapter 13, Equation 13.61.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_rate.py#L175-L227)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_rate.py#L178-L231)
 
 ## particula.dynamics.coagulation.coagulation_rate.get_coagulation_gain_rate_discrete
 
@@ -112,7 +112,7 @@ print(gain_val)
 > - Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
 >   physics, Chapter 13, Equation 13.61.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_rate.py#L57-L127)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_rate.py#L57-L130)
 
 ## particula.dynamics.coagulation.coagulation_rate.get_coagulation_loss_rate_continuous
 
@@ -160,7 +160,7 @@ print(loss_cont)
 > - Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
 >   physics, Chapter 13, Equation 13.61.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_rate.py#L130-L172)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_rate.py#L133-L175)
 
 ## particula.dynamics.coagulation.coagulation_rate.get_coagulation_loss_rate_discrete
 

@@ -1,15 +1,15 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 3.7176423179917037,
-  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "elapsed_seconds": 3.7648431870620698,
+  "package_source_sha256": "902c8c0cdca613c13f0eb58c91cd38f8aab068ea984b3df178e99d68797b813d",
   "input_sha256": {},
   "example": "examples-processes-wall-loss-rectangular-wall-loss-strategy",
   "fingerprint": "27f933d508832e273b0efa3df7269e33e6811cabb82b5de47abc4309d817388d",
   "source": "docs/examples/processes/wall-loss/rectangular_wall_loss_strategy.py",
-  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
-  "package_dirty": false,
-  "executed_at": "2026-11-13T15:01:43.149287+00:00",
+  "revision": "894f603509f47c3f35bbfa7c45f45752136e7d52",
+  "package_dirty": true,
+  "executed_at": "2026-11-16T01:27:02.143630+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
@@ -36,16 +36,13 @@
     ],
     [
       {
-        "text": "Internal substeps per output interval: 9\n"
-      },
-      {
-        "text": "Final concentration: 1.065e+10 1/m^3\nRelative decay: 0.968\n"
+        "text": "Internal substeps per output interval: 9\nFinal concentration: 1.065e+10 1/m^3\nRelative decay: 0.968\n"
       }
     ],
     [],
     []
   ],
   "files": {
-    "source.py": "4deed184e6b621462c5b2e5c8bbda1e321fcc34266e1ebf8f2dc73be05bb5e09"
+    "source.py": "03b4a47a0746f97363d93c4576292d3e7aa09366b89247a2c9507eebe737f474"
   }
 }

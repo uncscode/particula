@@ -67,7 +67,7 @@ performance in tight simulation loops. Use copy() if immutability needed.
 
 - `ValueError` — If array shapes are inconsistent.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L39-L391)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L39-L389)
 
 ### particula.particles.particle_data.ParticleData.charge
 
@@ -147,13 +147,13 @@ volume: NDArray[np.float64]
 effective_density: NDArray[np.float64]
 ```
 
-Mass-weighted effective density per particle.
+Mixture density from total mass divided by additive material volume.
 
 **Returns**
 
 - (`NDArray[np.float64]`) — Effective density in kg/m^3 with shape (n_boxes, n_particles).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L342-L357)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L342-L355)
 
 ### particula.particles.particle_data.ParticleData.mass_fractions
 
@@ -169,7 +169,7 @@ Mass fractions per species for each particle.
 
 - (`NDArray[np.float64]`) — Mass fractions with shape (n_boxes, n_particles, n_species).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L360-L372)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L358-L370)
 
 ### particula.particles.particle_data.ParticleData.n_boxes
 
@@ -383,7 +383,7 @@ Create a deep copy of this ParticleData.
 - (`ParticleData`) — A new ParticleData with detached raw arrays and radius grid,
 - (`ParticleData`) — preserving the explicit distribution type when present.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L374-L391)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L372-L389)
 
 ### particula.particles.particle_data.ParticleData.validate_representation
 

@@ -1,15 +1,15 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 2.9596766470349394,
-  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "elapsed_seconds": 3.1452184868976474,
+  "package_source_sha256": "001be23dd50c3f7ba20ddde65465cfc75d611fb3f1a6f0d76564ce3c10c3e81c",
   "input_sha256": {},
   "example": "examples-processes-wall-loss-wall-loss-builders-factory",
   "fingerprint": "fd31eb57dd34c1f027d36f5cfe2152ace2133924432645db9d79830493b7dd6e",
   "source": "docs/examples/processes/wall-loss/wall_loss_builders_factory.py",
-  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
-  "package_dirty": false,
-  "executed_at": "2026-11-13T15:01:53.803503+00:00",
+  "revision": "894f603509f47c3f35bbfa7c45f45752136e7d52",
+  "package_dirty": true,
+  "executed_at": "2026-11-16T01:27:31.038289+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
@@ -35,6 +35,6 @@
     ]
   ],
   "files": {
-    "source.py": "f63fc65db0a1453d95e3889afcdbbd6240d4539447938fc9779ee4d26c59a427"
+    "source.py": "54d36af76a651f262a376cb29cd0c5e0fa46d1bdd590cef23ef0e3887375d5a8"
   }
 }

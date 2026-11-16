@@ -21,17 +21,17 @@ path.
 __version__ = '0.3.1'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/__init__.py#L60-L60)
+[View source](https://github.com/uncscode/particula/blob/main/particula/__init__.py#L61-L61)
 
 ## particula.logger
 
 *attribute* · *module attribute*
 
 ```python
-logger = setup()
+logger = logging.getLogger('particula')
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/__init__.py#L63-L63)
+[View source](https://github.com/uncscode/particula/blob/main/particula/__init__.py#L64-L64)
 
 ## particula.__getattr__
 

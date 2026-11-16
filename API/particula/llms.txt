@@ -26,17 +26,17 @@ path.
 __version__ = '0.3.1'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/__init__.py#L60-L60)
+[View source](https://github.com/uncscode/particula/blob/main/particula/__init__.py#L61-L61)
 
 ## particula.logger
 
 *attribute* · *module attribute*
 
 ```python
-logger = setup()
+logger = logging.getLogger('particula')
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/__init__.py#L63-L63)
+[View source](https://github.com/uncscode/particula/blob/main/particula/__init__.py#L64-L64)
 
 ## particula.__getattr__
 
@@ -8855,7 +8855,7 @@ print(gain_cont)
 > - Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
 >   physics, Chapter 13, Equation 13.61.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_rate.py#L175-L227)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_rate.py#L178-L231)
 
 ## particula.dynamics.coagulation.coagulation_rate.get_coagulation_gain_rate_discrete
 
@@ -8905,7 +8905,7 @@ print(gain_val)
 > - Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
 >   physics, Chapter 13, Equation 13.61.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_rate.py#L57-L127)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_rate.py#L57-L130)
 
 ## particula.dynamics.coagulation.coagulation_rate.get_coagulation_loss_rate_continuous
 
@@ -8953,7 +8953,7 @@ print(loss_cont)
 > - Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
 >   physics, Chapter 13, Equation 13.61.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_rate.py#L130-L172)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_rate.py#L133-L175)
 
 ## particula.dynamics.coagulation.coagulation_rate.get_coagulation_loss_rate_discrete
 
@@ -116103,7 +116103,7 @@ performance in tight simulation loops. Use copy() if immutability needed.
 
 - `ValueError` — If array shapes are inconsistent.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L39-L391)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L39-L389)
 
 ### particula.particles.particle_data.ParticleData.charge
 
@@ -116183,13 +116183,13 @@ volume: NDArray[np.float64]
 effective_density: NDArray[np.float64]
 ```
 
-Mass-weighted effective density per particle.
+Mixture density from total mass divided by additive material volume.
 
 **Returns**
 
 - (`NDArray[np.float64]`) — Effective density in kg/m^3 with shape (n_boxes, n_particles).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L342-L357)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L342-L355)
 
 ### particula.particles.particle_data.ParticleData.mass_fractions
 
@@ -116205,7 +116205,7 @@ Mass fractions per species for each particle.
 
 - (`NDArray[np.float64]`) — Mass fractions with shape (n_boxes, n_particles, n_species).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L360-L372)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L358-L370)
 
 ### particula.particles.particle_data.ParticleData.n_boxes
 
@@ -116419,7 +116419,7 @@ Create a deep copy of this ParticleData.
 - (`ParticleData`) — A new ParticleData with detached raw arrays and radius grid,
 - (`ParticleData`) — preserving the explicit distribution type when present.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L374-L391)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L372-L389)
 
 ### particula.particles.particle_data.ParticleData.validate_representation
 

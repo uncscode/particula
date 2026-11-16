@@ -1,15 +1,15 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 30.982149382005446,
-  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "elapsed_seconds": 23.42748601094354,
+  "package_source_sha256": "902c8c0cdca613c13f0eb58c91cd38f8aab068ea984b3df178e99d68797b813d",
   "input_sha256": {},
   "example": "examples-processes-wall-loss-spherical-wall-loss-strategy",
   "fingerprint": "f6bf4bb3328960ea6700b741f59f894dba0ca11c9349fd52ef6927e6b223295e",
   "source": "docs/examples/processes/wall-loss/spherical_wall_loss_strategy.py",
-  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
-  "package_dirty": false,
-  "executed_at": "2026-11-13T15:02:15.761014+00:00",
+  "revision": "894f603509f47c3f35bbfa7c45f45752136e7d52",
+  "package_dirty": true,
+  "executed_at": "2026-11-16T01:27:26.699434+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
@@ -54,8 +54,8 @@
     []
   ],
   "files": {
-    "source.py": "60f2a6c5dc99da5203df7f8b884a3cf38a503be56d46ed4f4502e9ebb2a900b0",
+    "figure-6-1.png": "e24535350fcf493881f93621351612cfe8970b83d16e5d46086cb4aa22fc5db0",
     "figure-5-1.png": "73a780025ffc5d82a2fe5a6bf85075a0517b414554ab0b98362a670d496458e8",
-    "figure-6-1.png": "e24535350fcf493881f93621351612cfe8970b83d16e5d46086cb4aa22fc5db0"
+    "source.py": "60e134640cdbd13256ea7b45906731d542d9ba161e69b7bcbb5335e82b208711"
   }
 }

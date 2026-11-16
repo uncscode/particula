@@ -14,18 +14,16 @@
 # ---
 
 # %% [markdown]
-# # Coagulation Basic 3: PMF vs PDF (Builder + Coagulation)
+# # A compact comparison of bin totals and radius densities
 #
-# This notebook compares Brownian coagulation for PMF (discrete) and PDF
-# (continuous) representations using the public builder pattern:
+# Can different-looking concentration arrays describe the same aerosol?
+# This example builds a PMF and a PDF from matching physical inputs, advances
+# each for 200 s, and converts units before comparing. It is a small starting
+# point for learning how representation enters a numerical comparison.
 #
-# - `distribution_type="discrete"` → PMF
-# - `distribution_type="continuous_pdf"` → PDF
-#
-# Both are wrapped in `par.dynamics.Coagulation`.
-# We run them over a short horizon for quick execution (<120 s).
-# We also show how to convert between PMF and PDF using
-# `par.particles.get_pdf_distribution_in_pmf` for like-for-like comparisons.
+# The [distribution-measure example](../../../fundamentals/particles/aerosol_distributions.py)
+# explains why bin width matters. The [longer coagulation comparison](../coagulation_4_compared.py)
+# uses a broader grid and a higher abundance to make evolution more visible.
 
 # %%
 # In Colab uncomment the following command to install particula:
@@ -36,7 +34,13 @@ import particula as par
 from scipy.integrate import trapezoid
 
 # %% [markdown]
-# ## Build aerosols (PMF and PDF)
+# ## Hold the intended population fixed
+#
+# Both representations use 140 radius nodes from 10 nm–1 µm, lognormal radius
+# scale 120 nm, geometric standard deviation 1.5, and target number density
+# 8×10⁸ m⁻³. Density is 1000 kg m⁻³ at 298.15 K and 101325 Pa.
+# The PMF stores bin totals (m⁻³); the PDF stores density per radius (m⁻⁴).
+# Independent copies of gas and environment isolate the two trajectories.
 
 # %%
 # Shared grid (modest resolution)
@@ -103,7 +107,11 @@ aerosol_pdf = par.Aerosol(
 )
 
 # %% [markdown]
-# ## Configure coagulation runnables
+# ## Match each strategy to its concentration measure
+#
+# Both strategies use Brownian collisions. Selecting `discrete` or
+# `continuous_pdf` controls the numerical interpretation; it does not convert
+# an array from one measure to the other.
 
 # %%
 coagulation_pmf = par.dynamics.Coagulation(
@@ -126,7 +134,12 @@ print(coagulation_pmf)
 print(coagulation_pdf)
 
 # %% [markdown]
-# ## Execute short coagulation steps
+# ## Advance equal physical time
+#
+# Each process advances 200 s with ten substeps. Copied concentration arrays
+# retain before/after snapshots despite in-place evolution. These modest
+# conditions can produce very small visible changes, so a later accuracy study
+# should compare numerical diagnostics as well as curves.
 
 # %%
 time_step = 200  # seconds
@@ -147,10 +160,12 @@ aerosol_pdf_after = coagulation_pdf.execute(
 pdf_after = aerosol_pdf_after.particles.concentration[0].copy()
 
 # %% [markdown]
-# ## Convert for apples-to-apples comparison
+# ## Convert before judging agreement
 #
-# We convert PDF⇄PMF using `par.particles.get_pdf_distribution_in_pmf` so both
-# representations can be compared on the same units.
+# Radius-dependent widths turn PDF density into per-bin number and vice versa.
+# The printed totals use a sum for PMF and a trapezoidal integral for PDF;
+# both round to 8×10⁸ m⁻³ in the saved run. Agreement at that precision checks
+# initial abundance, not equality of every bin or subsequent mass conservation.
 
 # %%
 pdf_as_pmf_before = par.particles.get_pdf_distribution_in_pmf(
@@ -174,7 +189,13 @@ print(f"Total number PMF: {number_pmf:.2e} m^-3")
 print(f"Total number PDF: {number_pdf:.2e} m^-3 (integrated)")
 
 # %% [markdown]
-# ## Plots
+# ## Use both panels to identify a measure mismatch
+#
+# The first panel puts all curves in PMF units; the second puts them in PDF units.
+# Compare initial curves within a panel before assessing the evolved curves.
+# Raw peak heights across panels are not comparable because the vertical units
+# differ. Logarithmic radius spacing does not turn a per-radius PDF into a
+# per-log-radius density.
 
 # %%
 fig, ax = plt.subplots(figsize=(8, 5))
@@ -229,17 +250,18 @@ ax.grid(alpha=0.3)
 plt.show()
 
 # %% [markdown]
-# ## Summary
+# ## From matching plots to a scientific test
 #
-# - PMF: `distribution_type="discrete"` via `BrownianCoagulationBuilder`
-# - PDF: `distribution_type="continuous_pdf"`
-# - Both run through `par.dynamics.Coagulation`
-# - Conversions use `par.particles.get_pdf_distribution_in_pmf` for consistent
-#   comparisons across representations.
-# - Runtime kept short with modest grids and a single 200 s step.
+# The conversions make the two simulations comparable. They do not prove either
+# method accurate. To test sensitivity, refine grid resolution and extent, then
+# substeps, and track total number and mass alongside the converted spectrum.
+#
+# If your research concerns the survival of a size-selected population, compare
+# integrated number within that radius interval rather than only the total.
+# The [time-evolution example](../coagulation_5_time_evolution.py) shows how to
+# extend a matched comparison through time.
 
 # %% [markdown]
-# Native construction uses the explicitly generated distribution above. The old
-# preset construction regenerated default modal inputs instead. Finite-grid
-# coagulation has numerical mass drift; these curves illustrate number loss,
-# not exact conservation or a time-step/grid-convergence claim.
+# Native construction preserves the generated arrays. Finite-grid coagulation
+# can exhibit mass drift; a successful run and a visual overlay are not
+# conservation or convergence tests.

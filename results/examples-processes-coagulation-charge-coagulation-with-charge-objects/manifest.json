@@ -1,15 +1,15 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 3.0506142280064523,
-  "package_source_sha256": "98021107918d76caafbd800e6f8ab4c66bb0905e1950a2fc7075c622655abf5a",
+  "elapsed_seconds": 3.8497453769668937,
+  "package_source_sha256": "366188b5126fea8caca5653dccea55707aa58d180426291eb7b46a40eecaf715",
   "input_sha256": {},
   "example": "examples-processes-coagulation-charge-coagulation-with-charge-objects",
   "fingerprint": "11a5ed1b7513efcba7f215c3cfbab56aaa62513a06cc44ded9ec2ead9045cf3d",
   "source": "docs/examples/processes/coagulation/charge/coagulation_with_charge_objects.py",
-  "revision": "54ad1a812054da5361bdad2f2d397dd05615269e",
-  "package_dirty": false,
-  "executed_at": "2026-11-14T17:18:10.292719+00:00",
+  "revision": "894f603509f47c3f35bbfa7c45f45752136e7d52",
+  "package_dirty": true,
+  "executed_at": "2026-11-16T01:25:21.203101+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
@@ -47,8 +47,8 @@
     ]
   ],
   "files": {
-    "source.py": "99d25c546562bf504d85402528f397a0d359e2df7a2982b76eb6781fef18d7d3",
+    "figure-7-1.png": "1231b913f390dfac46d47ab221d9c9ec7377adf6ed23c13bc5528a0b7913a502",
     "figure-4-1.png": "21eaf506f3eeaab3bc6a1bf2ad8628b3e5afa9c79e9f59fc7ee8036755dd6550",
-    "figure-7-1.png": "1231b913f390dfac46d47ab221d9c9ec7377adf6ed23c13bc5528a0b7913a502"
+    "source.py": "42be6f452388e7cd47ac7bfebfe4ec136a79b82e4097fc57067d444b56ec0a58"
   }
 }
