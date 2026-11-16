@@ -1,6 +1,6 @@
 # Stage 2A execution target and evidence
 
-Status: in progress; no stage completion claim.
+Status: implemented, qualified and reviewed; PR delivery pending.
 Worktree: `/tmp/particula-stage-02a`.
 Branch: `codex/stage-02a-numerical-integration`.
 Verified upstream base: `356fc054cd9a4f4ececc3c64c7144e889a789494`.
@@ -44,7 +44,7 @@ local tolerances that meet those targets and settings that do not.
       tests, no hidden CPU fallback and explicit capture rejection.
 - [x] Species/volume/inactive-slot budgets, nonautonomous forcing stage times,
       domain rejection and whole-cycle failure tests.
-- [ ] Complete cross-workflow forcing/output/restart compatibility with Stage 2B.
+- [x] Complete cross-workflow forcing/output/restart compatibility with Stage 2B.
 - [ ] Final full validation, complete diff review, commit, push and separate PR.
 
 ## Owning implementations and durable evidence
@@ -102,10 +102,23 @@ NumPy import/unload issue caused by dotted module discovery. No warning or
 coverage gate was weakened. Logs and coverage files remain under the ignored
 `.artifacts/numerics/`; scientific measurements are retained under `docs/data/`.
 
-## Remaining delivery work
+## Cross-workflow review and delivery
 
-Complete Stage 2B forcing/event policy, explicit prepared observations, adaptive
-GPU/split restart and extension codecs, then reconcile shared guides and resume
-validation. Finish the tooling suite, review the full branch against the verified
-upstream base, fix findings, and open separate Stage 2A and Stage 2B PRs with the
-stacked dependency explicit. The full goal remains active and incomplete.
+Stage 2B now supplies table forcing with one-sided knots, exact physical-time
+recording, prepared fixed-grid observation, and adaptive CPU/GPU and split disk
+restart. Its combined numerical/workflow tests passed 154 cases, including
+actual CUDA, with independent forcing references and exact future continuation.
+The complete combined package passed 10679 tests with 91.18% coverage. This
+integration evidence belongs to the Stage 2B branch; the method measurements
+above remain tied to the unchanged Stage 2A executable sources.
+
+Review covered continuous-rate versus finite-step boundaries, RK/ROS coefficients,
+scaled tolerance units, shared maximum-error control, species/volume coupling,
+trial publication, split clocks, explicit GPU transfers and failure/capture
+boundaries. No unresolved Stage 2A implementation finding remains. Stage 2B
+also closed a review finding in its archive writer: existing host checkpoints
+must not be serialized inside active CUDA capture.
+
+The separate Stage 2A PR is the remaining delivery item. Stage 2B will target
+this branch explicitly so its workflow changes can be reviewed independently.
+Merging either PR remains outside this task.
