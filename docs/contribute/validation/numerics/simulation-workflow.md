@@ -157,3 +157,18 @@ implemented. Both full publications are running in a detached checkout pinned
 to `480ecf2c1a`, separately from subsequent edits. Figure inspection and
 full-workload qualification are pending. No GPU speedup is inferred from this
 explicit transfer path.
+
+The broader integration gate completed with **10,809 package tests passed**, 21
+skips and one expected failure in 436.94 s; unfiltered coverage was **91.33%**.
+This includes actual CUDA. The additional intentional skip is the coupled
+native-capture case under the Warp-CPU fixture. Example/tooling checks passed
+**554 tests with one skip** in 141.64 s. The 563-page website build and rendered
+structure check passed with zero errors. A subsequent explicit checkpoint-plan
+type guard passed checked-body Mypy and all **17 coupled tests**, with the same
+single Warp-CPU capture skip. The full suite began before that small guard was
+added; its coverage is complemented by this focused rerun, not represented as
+an untouched-source final-head run. Logs are retained in
+`.artifacts/gpu-coupled-package-coverage.log`,
+`.artifacts/gpu-coupled-tooling-examples.log`,
+`.artifacts/gpu-coupled-final-focused.log` and
+`.artifacts/gpu-coupled-website.log`.

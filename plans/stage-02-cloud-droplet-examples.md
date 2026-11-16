@@ -146,8 +146,10 @@ Its errors refine from 4.07e-6 to 3.24e-8. The integrated package passed 10,788
 tests with 91.30% coverage; detailed evidence belongs to the method record.
 Coupled event ownership and exact restart are now implemented with explicit
 state transfers. The focused coupling/numerics/archive tests pass 65 cases;
-the full package gate and complete cyclic chamber/forcing publications remain
-pending. Run and inspect the full cyclic chamber and prepared forcing workloads.
+the full package gate passed 10,809 tests with 91.33% coverage. A subsequent
+checkpoint-plan guard passed all 17 focused coupled tests and checked-body Mypy.
+The complete cyclic chamber/forcing publications remain pending. Run and inspect
+the full cyclic chamber and prepared forcing workloads.
 Both full CUDA publishers are active in `/tmp/particula-stage-02-gpu-validation`,
 pinned to `480ecf2c1a`. Their process records are in
 `.artifacts/coupled-runs.json`; verify live handles before making changes.
