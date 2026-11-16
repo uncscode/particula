@@ -5,7 +5,7 @@ Worktree: `/tmp/particula-stage-02b`.
 Branch: `codex/stage-02b-simulation-workflow`.
 Verified upstream base: `356fc054cd9a4f4ececc3c64c7144e889a789494`.
 Current integration base: Stage 2A commit
-`0d21d18b734ac840dfaf2c1f360db8daec780c80`.
+`c6e8bf0967` (native CUDA adaptive condensation and measured method guide).
 PR target: `uncscode/particula:main`, with the stacked Stage 2A dependency
 identified explicitly. No matching PR existed at start; no PR created yet.
 Merge is outside execution scope.
@@ -112,5 +112,13 @@ without errors. Full-package coverage and final review remain pending.
 Next: forcing/event semantics and checkpoint identity; prepared GPU observations
 with explicit transfer costs and capture limits; split restart; GPU extension
 codecs; complete workflow/method guides; broad repository validation and PRs.
-Stage 2A also still needs native CUDA adaptive qualification and final measured
-method-selection evidence. Neither stage is complete.
+Stage 2A native CUDA adaptive qualification and the measured method guide are
+now integrated. Its broad package/tooling checks passed; shared workflow
+compatibility and both PRs remain open. Neither stage is complete.
+
+After rebasing onto that numerical implementation, the recording/analysis/disk
+restart/native CPU restart/native GPU subset passed **70 tests with -Werror**,
+including actual CUDA. The two first-workflow example tests also passed. Both
+documentation topic additions were preserved and
+the combined graph validates. The Stage 2B workflow commit is `2cd525c9de`;
+no duplicate branch or PR was created.
