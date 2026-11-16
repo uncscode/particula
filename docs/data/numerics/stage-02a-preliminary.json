@@ -1,0 +1,2640 @@
+{
+  "status": "preliminary assessment, not production qualification",
+  "base_revision": "356fc054cd9a4f4ececc3c64c7144e889a789494",
+  "studies": {
+    "screening": {
+      "report": {
+        "references": [
+          {
+            "case": "smooth_exchange",
+            "source": "analytic matrix exponential or scalar exponential",
+            "difference": 0.0
+          },
+          {
+            "case": "stiff_equilibrium",
+            "source": "analytic matrix exponential or scalar exponential",
+            "difference": 0.0
+          },
+          {
+            "case": "near_depletion",
+            "source": "analytic matrix exponential or scalar exponential",
+            "difference": 0.0
+          },
+          {
+            "case": "decay",
+            "source": "analytic matrix exponential or scalar exponential",
+            "difference": 0.0
+          },
+          {
+            "case": "robertson",
+            "source": "Radau rtol=1e-11 versus BDF rtol=1e-12",
+            "difference": 1.7531309737250922e-11
+          }
+        ],
+        "runs": [
+          {
+            "case": "smooth_exchange",
+            "method": "RK23",
+            "rtol": 0.001,
+            "status": "success",
+            "max_error_by_species": [
+              0.0013444717151635532,
+              0.0013444717151633867
+            ],
+            "minimum_by_species": [
+              0.2221874130884493,
+              0.0
+            ],
+            "closed_budget_error": 2.220446049250313e-16,
+            "accepted_steps": 15,
+            "derivative_calls": 50,
+            "jacobian_evaluations": 0,
+            "lu_factorizations": 0,
+            "seconds": 0.00040360994171351194,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "smooth_exchange",
+            "method": "RK23",
+            "rtol": 1e-05,
+            "status": "success",
+            "max_error_by_species": [
+              7.1528884159621775e-06,
+              7.152888416461778e-06
+            ],
+            "minimum_by_species": [
+              0.2223125516778091,
+              0.0
+            ],
+            "closed_budget_error": 6.661338147750939e-16,
+            "accepted_steps": 58,
+            "derivative_calls": 176,
+            "jacobian_evaluations": 0,
+            "lu_factorizations": 0,
+            "seconds": 0.0008686940418556333,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "smooth_exchange",
+            "method": "RK23",
+            "rtol": 1e-07,
+            "status": "success",
+            "max_error_by_species": [
+              5.721733220553915e-08,
+              5.721733220553915e-08
+            ],
+            "minimum_by_species": [
+              0.2223181647888551,
+              0.0
+            ],
+            "closed_budget_error": 5.551115123125783e-16,
+            "accepted_steps": 256,
+            "derivative_calls": 770,
+            "jacobian_evaluations": 0,
+            "lu_factorizations": 0,
+            "seconds": 0.0035235349787399173,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "smooth_exchange",
+            "method": "RK45",
+            "rtol": 0.001,
+            "status": "success",
+            "max_error_by_species": [
+              9.223384316026095e-05,
+              9.223384316014993e-05
+            ],
+            "minimum_by_species": [
+              0.22234086528072064,
+              0.0
+            ],
+            "closed_budget_error": 2.220446049250313e-16,
+            "accepted_steps": 11,
+            "derivative_calls": 68,
+            "jacobian_evaluations": 0,
+            "lu_factorizations": 0,
+            "seconds": 0.0003561009652912617,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "smooth_exchange",
+            "method": "RK45",
+            "rtol": 1e-05,
+            "status": "success",
+            "max_error_by_species": [
+              7.892366975514875e-07,
+              7.892366976625098e-07
+            ],
+            "minimum_by_species": [
+              0.22231855466235179,
+              0.0
+            ],
+            "closed_budget_error": 4.440892098500626e-16,
+            "accepted_steps": 19,
+            "derivative_calls": 116,
+            "jacobian_evaluations": 0,
+            "lu_factorizations": 0,
+            "seconds": 0.00043733289930969477,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "smooth_exchange",
+            "method": "RK45",
+            "rtol": 1e-07,
+            "status": "success",
+            "max_error_by_species": [
+              7.959702397197788e-09,
+              7.959701675552822e-09
+            ],
+            "minimum_by_species": [
+              0.22231821232738128,
+              0.0
+            ],
+            "closed_budget_error": 6.661338147750939e-16,
+            "accepted_steps": 39,
+            "derivative_calls": 236,
+            "jacobian_evaluations": 0,
+            "lu_factorizations": 0,
+            "seconds": 0.0008452900219708681,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "smooth_exchange",
+            "method": "Radau",
+            "rtol": 0.001,
+            "status": "success",
+            "max_error_by_species": [
+              3.978388115993825e-05,
+              3.9783881160104784e-05
+            ],
+            "minimum_by_species": [
+              0.2223189195856134,
+              0.0
+            ],
+            "closed_budget_error": 2.220446049250313e-16,
+            "accepted_steps": 12,
+            "derivative_calls": 89,
+            "jacobian_evaluations": 1,
+            "lu_factorizations": 20,
+            "seconds": 0.0012642790097743273,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "smooth_exchange",
+            "method": "Radau",
+            "rtol": 1e-05,
+            "status": "success",
+            "max_error_by_species": [
+              4.4365803708590335e-07,
+              4.436580372524368e-07
+            ],
+            "minimum_by_species": [
+              0.22231821666771484,
+              0.0
+            ],
+            "closed_budget_error": 2.220446049250313e-16,
+            "accepted_steps": 30,
+            "derivative_calls": 215,
+            "jacobian_evaluations": 1,
+            "lu_factorizations": 28,
+            "seconds": 0.00197686196770519,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "smooth_exchange",
+            "method": "Radau",
+            "rtol": 1e-07,
+            "status": "success",
+            "max_error_by_species": [
+              4.805006503794118e-09,
+              4.805006392771816e-09
+            ],
+            "minimum_by_species": [
+              0.22231820769654956,
+              0.0
+            ],
+            "closed_budget_error": 4.440892098500626e-16,
+            "accepted_steps": 88,
+            "derivative_calls": 637,
+            "jacobian_evaluations": 3,
+            "lu_factorizations": 38,
+            "seconds": 0.0054188460344448686,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "smooth_exchange",
+            "method": "BDF",
+            "rtol": 0.001,
+            "status": "success",
+            "max_error_by_species": [
+              0.00021503761804553267,
+              0.00021503761804553267
+            ],
+            "minimum_by_species": [
+              0.22232202270620702,
+              0.0
+            ],
+            "closed_budget_error": 2.220446049250313e-16,
+            "accepted_steps": 33,
+            "derivative_calls": 72,
+            "jacobian_evaluations": 1,
+            "lu_factorizations": 10,
+            "seconds": 0.0014971609925851226,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "smooth_exchange",
+            "method": "BDF",
+            "rtol": 1e-05,
+            "status": "success",
+            "max_error_by_species": [
+              7.932352922401797e-06,
+              7.932352922124242e-06
+            ],
+            "minimum_by_species": [
+              0.22231918416428811,
+              0.0
+            ],
+            "closed_budget_error": 4.440892098500626e-16,
+            "accepted_steps": 59,
+            "derivative_calls": 124,
+            "jacobian_evaluations": 1,
+            "lu_factorizations": 15,
+            "seconds": 0.0023757419548928738,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "smooth_exchange",
+            "method": "BDF",
+            "rtol": 1e-07,
+            "status": "success",
+            "max_error_by_species": [
+              9.65225099847089e-08,
+              9.652250942959739e-08
+            ],
+            "minimum_by_species": [
+              0.22231823201390358,
+              0.0
+            ],
+            "closed_budget_error": 2.220446049250313e-16,
+            "accepted_steps": 105,
+            "derivative_calls": 223,
+            "jacobian_evaluations": 1,
+            "lu_factorizations": 23,
+            "seconds": 0.0041109760059043765,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "stiff_equilibrium",
+            "method": "RK23",
+            "rtol": 0.001,
+            "status": "success",
+            "max_error_by_species": [
+              0.000718242011127912,
+              0.000718242011128023
+            ],
+            "minimum_by_species": [
+              0.000992520701702573,
+              0.0
+            ],
+            "closed_budget_error": 4.440892098500626e-16,
+            "accepted_steps": 418,
+            "derivative_calls": 1277,
+            "jacobian_evaluations": 0,
+            "lu_factorizations": 0,
+            "seconds": 0.0059954969910904765,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "stiff_equilibrium",
+            "method": "RK23",
+            "rtol": 1e-05,
+            "status": "success",
+            "max_error_by_species": [
+              4.84197176453538e-06,
+              4.841971764424358e-06
+            ],
+            "minimum_by_species": [
+              0.0009989515879801662,
+              0.0
+            ],
+            "closed_budget_error": 9.992007221626409e-16,
+            "accepted_steps": 509,
+            "derivative_calls": 1553,
+            "jacobian_evaluations": 0,
+            "lu_factorizations": 0,
+            "seconds": 0.007305869949050248,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "stiff_equilibrium",
+            "method": "RK23",
+            "rtol": 1e-07,
+            "status": "success",
+            "max_error_by_species": [
+              4.5304851703509286e-08,
+              4.530485153697583e-08
+            ],
+            "minimum_by_species": [
+              0.0009990005388811416,
+              0.0
+            ],
+            "closed_budget_error": 4.440892098500626e-16,
+            "accepted_steps": 934,
+            "derivative_calls": 2834,
+            "jacobian_evaluations": 0,
+            "lu_factorizations": 0,
+            "seconds": 0.013073793961666524,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "stiff_equilibrium",
+            "method": "RK45",
+            "rtol": 0.001,
+            "status": "success",
+            "max_error_by_species": [
+              0.00011296773654512204,
+              0.00011296773654523307
+            ],
+            "minimum_by_species": [
+              0.0009967830773651286,
+              0.0
+            ],
+            "closed_budget_error": 4.440892098500626e-16,
+            "accepted_steps": 314,
+            "derivative_calls": 2180,
+            "jacobian_evaluations": 0,
+            "lu_factorizations": 0,
+            "seconds": 0.007391078979708254,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "stiff_equilibrium",
+            "method": "RK45",
+            "rtol": 1e-05,
+            "status": "success",
+            "max_error_by_species": [
+              9.599041188024238e-07,
+              9.599041189689572e-07
+            ],
+            "minimum_by_species": [
+              0.000998980527288141,
+              0.0
+            ],
+            "closed_budget_error": 4.440892098500626e-16,
+            "accepted_steps": 331,
+            "derivative_calls": 2276,
+            "jacobian_evaluations": 0,
+            "lu_factorizations": 0,
+            "seconds": 0.007825225009582937,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "stiff_equilibrium",
+            "method": "RK45",
+            "rtol": 1e-07,
+            "status": "success",
+            "max_error_by_species": [
+              8.50743053781855e-09,
+              8.507430870885457e-09
+            ],
+            "minimum_by_species": [
+              0.000999000884716435,
+              0.0
+            ],
+            "closed_budget_error": 1.3322676295501878e-15,
+            "accepted_steps": 373,
+            "derivative_calls": 2468,
+            "jacobian_evaluations": 0,
+            "lu_factorizations": 0,
+            "seconds": 0.008426451939158142,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "stiff_equilibrium",
+            "method": "Radau",
+            "rtol": 0.001,
+            "status": "success",
+            "max_error_by_species": [
+              4.2949412278669996e-05,
+              4.2949412279114085e-05
+            ],
+            "minimum_by_species": [
+              0.0009989984719452664,
+              0.0
+            ],
+            "closed_budget_error": 4.440892098500626e-16,
+            "accepted_steps": 25,
+            "derivative_calls": 180,
+            "jacobian_evaluations": 1,
+            "lu_factorizations": 32,
+            "seconds": 0.0017963970312848687,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "stiff_equilibrium",
+            "method": "Radau",
+            "rtol": 1e-05,
+            "status": "success",
+            "max_error_by_species": [
+              4.2395394173055934e-07,
+              4.2395394161953703e-07
+            ],
+            "minimum_by_species": [
+              0.0009990009741884043,
+              0.0
+            ],
+            "closed_budget_error": 4.440892098500626e-16,
+            "accepted_steps": 62,
+            "derivative_calls": 439,
+            "jacobian_evaluations": 1,
+            "lu_factorizations": 44,
+            "seconds": 0.0038503319956362247,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "stiff_equilibrium",
+            "method": "Radau",
+            "rtol": 1e-07,
+            "status": "success",
+            "max_error_by_species": [
+              4.521154117753667e-09,
+              4.521153951220214e-09
+            ],
+            "minimum_by_species": [
+              0.000999000998930291,
+              0.0
+            ],
+            "closed_budget_error": 6.661338147750939e-16,
+            "accepted_steps": 184,
+            "derivative_calls": 1293,
+            "jacobian_evaluations": 1,
+            "lu_factorizations": 58,
+            "seconds": 0.01096653996501118,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "stiff_equilibrium",
+            "method": "BDF",
+            "rtol": 0.001,
+            "status": "success",
+            "max_error_by_species": [
+              0.00022377206540963313,
+              0.00022377206540968864
+            ],
+            "minimum_by_species": [
+              0.0009985941425204778,
+              0.0
+            ],
+            "closed_budget_error": 4.440892098500626e-16,
+            "accepted_steps": 62,
+            "derivative_calls": 130,
+            "jacobian_evaluations": 1,
+            "lu_factorizations": 16,
+            "seconds": 0.002616790938191116,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "stiff_equilibrium",
+            "method": "BDF",
+            "rtol": 1e-05,
+            "status": "success",
+            "max_error_by_species": [
+              1.0146875876859696e-05,
+              1.0146875876748673e-05
+            ],
+            "minimum_by_species": [
+              0.0009989995667445005,
+              0.0
+            ],
+            "closed_budget_error": 3.3306690738754696e-16,
+            "accepted_steps": 113,
+            "derivative_calls": 232,
+            "jacobian_evaluations": 1,
+            "lu_factorizations": 25,
+            "seconds": 0.00429296400398016,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "stiff_equilibrium",
+            "method": "BDF",
+            "rtol": 1e-07,
+            "status": "success",
+            "max_error_by_species": [
+              9.185134972056197e-08,
+              9.185134941525064e-08
+            ],
+            "minimum_by_species": [
+              0.000999000986039114,
+              0.0
+            ],
+            "closed_budget_error": 6.661338147750939e-16,
+            "accepted_steps": 209,
+            "derivative_calls": 424,
+            "jacobian_evaluations": 1,
+            "lu_factorizations": 41,
+            "seconds": 0.007681317976675928,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "near_depletion",
+            "method": "RK23",
+            "rtol": 0.001,
+            "status": "success",
+            "max_error_by_species": [
+              0.0007262449532302595,
+              0.0007262449532304815
+            ],
+            "minimum_by_species": [
+              -3.2569889620370423e-06,
+              0.0
+            ],
+            "closed_budget_error": 2.220446049250313e-16,
+            "accepted_steps": 61,
+            "derivative_calls": 212,
+            "jacobian_evaluations": 0,
+            "lu_factorizations": 0,
+            "seconds": 0.0010455319425091147,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "near_depletion",
+            "method": "RK23",
+            "rtol": 1e-05,
+            "status": "success",
+            "max_error_by_species": [
+              4.842548209038622e-06,
+              4.842548208983111e-06
+            ],
+            "minimum_by_species": [
+              -2.1277912500678616e-08,
+              0.0
+            ],
+            "closed_budget_error": 8.881784197001252e-16,
+            "accepted_steps": 157,
+            "derivative_calls": 491,
+            "jacobian_evaluations": 0,
+            "lu_factorizations": 0,
+            "seconds": 0.0023130460176616907,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "near_depletion",
+            "method": "RK23",
+            "rtol": 1e-07,
+            "status": "success",
+            "max_error_by_species": [
+              4.524760977009379e-08,
+              4.524760943702688e-08
+            ],
+            "minimum_by_species": [
+              7.538903458992099e-10,
+              0.0
+            ],
+            "closed_budget_error": 4.440892098500626e-16,
+            "accepted_steps": 615,
+            "derivative_calls": 1874,
+            "jacobian_evaluations": 0,
+            "lu_factorizations": 0,
+            "seconds": 0.009280617930926383,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "near_depletion",
+            "method": "RK45",
+            "rtol": 0.001,
+            "status": "success",
+            "max_error_by_species": [
+              0.00011433620463857652,
+              0.00011433620463852101
+            ],
+            "minimum_by_species": [
+              -1.296126937324542e-06,
+              0.0
+            ],
+            "closed_budget_error": 4.440892098500626e-16,
+            "accepted_steps": 43,
+            "derivative_calls": 278,
+            "jacobian_evaluations": 0,
+            "lu_factorizations": 0,
+            "seconds": 0.0010377670405432582,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "near_depletion",
+            "method": "RK45",
+            "rtol": 1e-05,
+            "status": "success",
+            "max_error_by_species": [
+              9.614213610231737e-07,
+              9.614213610786848e-07
+            ],
+            "minimum_by_species": [
+              -6.461007665384893e-09,
+              0.0
+            ],
+            "closed_budget_error": 2.220446049250313e-16,
+            "accepted_steps": 60,
+            "derivative_calls": 374,
+            "jacobian_evaluations": 0,
+            "lu_factorizations": 0,
+            "seconds": 0.0013229070464149117,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "near_depletion",
+            "method": "RK45",
+            "rtol": 1e-07,
+            "status": "success",
+            "max_error_by_species": [
+              8.850282950945143e-09,
+              8.850282895433992e-09
+            ],
+            "minimum_by_species": [
+              8.913664008122968e-10,
+              0.0
+            ],
+            "closed_budget_error": 4.440892098500626e-16,
+            "accepted_steps": 105,
+            "derivative_calls": 662,
+            "jacobian_evaluations": 0,
+            "lu_factorizations": 0,
+            "seconds": 0.0022823389153927565,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "near_depletion",
+            "method": "Radau",
+            "rtol": 0.001,
+            "status": "success",
+            "max_error_by_species": [
+              4.585687631958324e-05,
+              4.585687631963875e-05
+            ],
+            "minimum_by_species": [
+              4.4337417062292165e-10,
+              0.0
+            ],
+            "closed_budget_error": 3.3306690738754696e-16,
+            "accepted_steps": 24,
+            "derivative_calls": 173,
+            "jacobian_evaluations": 1,
+            "lu_factorizations": 28,
+            "seconds": 0.0020160949788987637,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "near_depletion",
+            "method": "Radau",
+            "rtol": 1e-05,
+            "status": "success",
+            "max_error_by_species": [
+              4.057742695184885e-07,
+              4.057742697405331e-07
+            ],
+            "minimum_by_species": [
+              9.94179435057364e-10,
+              0.0
+            ],
+            "closed_budget_error": 4.440892098500626e-16,
+            "accepted_steps": 65,
+            "derivative_calls": 460,
+            "jacobian_evaluations": 1,
+            "lu_factorizations": 42,
+            "seconds": 0.004031158052384853,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "near_depletion",
+            "method": "Radau",
+            "rtol": 1e-07,
+            "status": "success",
+            "max_error_by_species": [
+              4.552747068231611e-09,
+              4.552746957209308e-09
+            ],
+            "minimum_by_species": [
+              9.999424675147487e-10,
+              0.0
+            ],
+            "closed_budget_error": 4.440892098500626e-16,
+            "accepted_steps": 194,
+            "derivative_calls": 1363,
+            "jacobian_evaluations": 1,
+            "lu_factorizations": 56,
+            "seconds": 0.012927163043059409,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "near_depletion",
+            "method": "BDF",
+            "rtol": 0.001,
+            "status": "success",
+            "max_error_by_species": [
+              0.0002237353295304334,
+              0.00022373532953035014
+            ],
+            "minimum_by_species": [
+              -2.628401531778218e-07,
+              0.0
+            ],
+            "closed_budget_error": 4.440892098500626e-16,
+            "accepted_steps": 63,
+            "derivative_calls": 132,
+            "jacobian_evaluations": 1,
+            "lu_factorizations": 16,
+            "seconds": 0.0028989650309085846,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "near_depletion",
+            "method": "BDF",
+            "rtol": 1e-05,
+            "status": "success",
+            "max_error_by_species": [
+              1.0173496023224704e-05,
+              1.0173496023280215e-05
+            ],
+            "minimum_by_species": [
+              4.5688311175471113e-10,
+              0.0
+            ],
+            "closed_budget_error": 4.440892098500626e-16,
+            "accepted_steps": 116,
+            "derivative_calls": 238,
+            "jacobian_evaluations": 1,
+            "lu_factorizations": 25,
+            "seconds": 0.004711130983196199,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "near_depletion",
+            "method": "BDF",
+            "rtol": 1e-07,
+            "status": "success",
+            "max_error_by_species": [
+              9.189630811867744e-08,
+              9.189630856276665e-08
+            ],
+            "minimum_by_species": [
+              9.936239096626203e-10,
+              0.0
+            ],
+            "closed_budget_error": 4.440892098500626e-16,
+            "accepted_steps": 212,
+            "derivative_calls": 430,
+            "jacobian_evaluations": 1,
+            "lu_factorizations": 41,
+            "seconds": 0.007653636042959988,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "decay",
+            "method": "RK23",
+            "rtol": 0.001,
+            "status": "success",
+            "max_error_by_species": [
+              0.0009107817777559424
+            ],
+            "minimum_by_species": [
+              0.0008907654830915069
+            ],
+            "closed_budget_error": null,
+            "accepted_steps": 20,
+            "derivative_calls": 62,
+            "jacobian_evaluations": 0,
+            "lu_factorizations": 0,
+            "seconds": 0.00036378600634634495,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "decay",
+            "method": "RK23",
+            "rtol": 1e-05,
+            "status": "success",
+            "max_error_by_species": [
+              5.89187560062765e-06
+            ],
+            "minimum_by_species": [
+              0.000911761874500819
+            ],
+            "closed_budget_error": null,
+            "accepted_steps": 95,
+            "derivative_calls": 287,
+            "jacobian_evaluations": 0,
+            "lu_factorizations": 0,
+            "seconds": 0.0013013778952881694,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "decay",
+            "method": "RK23",
+            "rtol": 1e-07,
+            "status": "success",
+            "max_error_by_species": [
+              5.476346581767544e-08
+            ],
+            "minimum_by_species": [
+              0.000911880863593754
+            ],
+            "closed_budget_error": null,
+            "accepted_steps": 443,
+            "derivative_calls": 1331,
+            "jacobian_evaluations": 0,
+            "lu_factorizations": 0,
+            "seconds": 0.0058376340894028544,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "decay",
+            "method": "RK45",
+            "rtol": 0.001,
+            "status": "success",
+            "max_error_by_species": [
+              0.00014088558597036283
+            ],
+            "minimum_by_species": [
+              0.0009151909976075163
+            ],
+            "closed_budget_error": null,
+            "accepted_steps": 9,
+            "derivative_calls": 56,
+            "jacobian_evaluations": 0,
+            "lu_factorizations": 0,
+            "seconds": 0.00022493803407996893,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "decay",
+            "method": "RK45",
+            "rtol": 1e-05,
+            "status": "success",
+            "max_error_by_species": [
+              1.8929453524663131e-06
+            ],
+            "minimum_by_species": [
+              0.0009119033465856681
+            ],
+            "closed_budget_error": null,
+            "accepted_steps": 21,
+            "derivative_calls": 128,
+            "jacobian_evaluations": 0,
+            "lu_factorizations": 0,
+            "seconds": 0.00044517708010971546,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "decay",
+            "method": "RK45",
+            "rtol": 1e-07,
+            "status": "success",
+            "max_error_by_species": [
+              2.1560457308389402e-08
+            ],
+            "minimum_by_species": [
+              0.0009118821358661217
+            ],
+            "closed_budget_error": null,
+            "accepted_steps": 48,
+            "derivative_calls": 290,
+            "jacobian_evaluations": 0,
+            "lu_factorizations": 0,
+            "seconds": 0.0009681179653853178,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "decay",
+            "method": "Radau",
+            "rtol": 0.001,
+            "status": "success",
+            "max_error_by_species": [
+              6.993893112050564e-05
+            ],
+            "minimum_by_species": [
+              0.0009119523962912645
+            ],
+            "closed_budget_error": null,
+            "accepted_steps": 13,
+            "derivative_calls": 101,
+            "jacobian_evaluations": 2,
+            "lu_factorizations": 8,
+            "seconds": 0.001008672988973558,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "decay",
+            "method": "Radau",
+            "rtol": 1e-05,
+            "status": "success",
+            "max_error_by_species": [
+              1.0245630377436754e-06
+            ],
+            "minimum_by_species": [
+              0.0009118821992623979
+            ],
+            "closed_budget_error": null,
+            "accepted_steps": 39,
+            "derivative_calls": 286,
+            "jacobian_evaluations": 2,
+            "lu_factorizations": 6,
+            "seconds": 0.0023057620273903012,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "decay",
+            "method": "Radau",
+            "rtol": 1e-07,
+            "status": "success",
+            "max_error_by_species": [
+              1.118644232800392e-08
+            ],
+            "minimum_by_species": [
+              0.0009118819661094342
+            ],
+            "closed_budget_error": null,
+            "accepted_steps": 123,
+            "derivative_calls": 871,
+            "jacobian_evaluations": 2,
+            "lu_factorizations": 8,
+            "seconds": 0.006757452036254108,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "decay",
+            "method": "BDF",
+            "rtol": 0.001,
+            "status": "success",
+            "max_error_by_species": [
+              0.0005846867028114211
+            ],
+            "minimum_by_species": [
+              0.0009100983494315972
+            ],
+            "closed_budget_error": null,
+            "accepted_steps": 32,
+            "derivative_calls": 68,
+            "jacobian_evaluations": 1,
+            "lu_factorizations": 9,
+            "seconds": 0.0014037970686331391,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "decay",
+            "method": "BDF",
+            "rtol": 1e-05,
+            "status": "success",
+            "max_error_by_species": [
+              8.144242457208684e-06
+            ],
+            "minimum_by_species": [
+              0.0009119506858766352
+            ],
+            "closed_budget_error": null,
+            "accepted_steps": 62,
+            "derivative_calls": 128,
+            "jacobian_evaluations": 1,
+            "lu_factorizations": 15,
+            "seconds": 0.003115347004495561,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "decay",
+            "method": "BDF",
+            "rtol": 1e-07,
+            "status": "success",
+            "max_error_by_species": [
+              1.926414061603765e-07
+            ],
+            "minimum_by_species": [
+              0.0009118842421938338
+            ],
+            "closed_budget_error": null,
+            "accepted_steps": 118,
+            "derivative_calls": 240,
+            "jacobian_evaluations": 1,
+            "lu_factorizations": 25,
+            "seconds": 0.004950565053150058,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "robertson",
+            "method": "RK23",
+            "rtol": 0.001,
+            "status": "failed",
+            "reason": "200000 derivative evaluation limit"
+          },
+          {
+            "case": "robertson",
+            "method": "RK23",
+            "rtol": 1e-05,
+            "status": "failed",
+            "reason": "200000 derivative evaluation limit"
+          },
+          {
+            "case": "robertson",
+            "method": "RK23",
+            "rtol": 1e-07,
+            "status": "failed",
+            "reason": "200000 derivative evaluation limit"
+          },
+          {
+            "case": "robertson",
+            "method": "RK45",
+            "rtol": 0.001,
+            "status": "failed",
+            "reason": "Required step size is less than spacing between numbers."
+          },
+          {
+            "case": "robertson",
+            "method": "RK45",
+            "rtol": 1e-05,
+            "status": "failed",
+            "reason": "200000 derivative evaluation limit"
+          },
+          {
+            "case": "robertson",
+            "method": "RK45",
+            "rtol": 1e-07,
+            "status": "failed",
+            "reason": "200000 derivative evaluation limit"
+          },
+          {
+            "case": "robertson",
+            "method": "Radau",
+            "rtol": 0.001,
+            "status": "success",
+            "max_error_by_species": [
+              2.4639623763089702e-05,
+              4.994501464385448e-08,
+              2.4640648475071636e-05
+            ],
+            "minimum_by_species": [
+              0.6172421651875236,
+              0.0,
+              -3.9391202061288846e-08
+            ],
+            "closed_budget_error": 4.440892098500626e-16,
+            "accepted_steps": 20,
+            "derivative_calls": 242,
+            "jacobian_evaluations": 11,
+            "lu_factorizations": 50,
+            "seconds": 0.0026046280981972814,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "robertson",
+            "method": "Radau",
+            "rtol": 1e-05,
+            "status": "success",
+            "max_error_by_species": [
+              3.5763780037445514e-07,
+              2.4680850397204817e-09,
+              3.576471665489578e-07
+            ],
+            "minimum_by_species": [
+              0.6172349413456265,
+              0.0,
+              -1.819947757817941e-10
+            ],
+            "closed_budget_error": 4.440892098500626e-16,
+            "accepted_steps": 45,
+            "derivative_calls": 444,
+            "jacobian_evaluations": 16,
+            "lu_factorizations": 82,
+            "seconds": 0.003996012033894658,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "robertson",
+            "method": "Radau",
+            "rtol": 1e-07,
+            "status": "success",
+            "max_error_by_species": [
+              6.835248811398742e-09,
+              2.7260972720984306e-11,
+              6.83542905610679e-09
+            ],
+            "minimum_by_species": [
+              0.6172348839242421,
+              0.0,
+              -9.938466604343542e-12
+            ],
+            "closed_budget_error": 4.440892098500626e-16,
+            "accepted_steps": 130,
+            "derivative_calls": 1085,
+            "jacobian_evaluations": 20,
+            "lu_factorizations": 128,
+            "seconds": 0.009604249033145607,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "robertson",
+            "method": "BDF",
+            "rtol": 0.001,
+            "status": "success",
+            "max_error_by_species": [
+              0.00021211541002508216,
+              1.3371448236889139e-06,
+              0.00021212146578558633
+            ],
+            "minimum_by_species": [
+              0.6174084075256661,
+              0.0,
+              0.0
+            ],
+            "closed_budget_error": 2.220446049250313e-16,
+            "accepted_steps": 49,
+            "derivative_calls": 144,
+            "jacobian_evaluations": 5,
+            "lu_factorizations": 19,
+            "seconds": 0.002478103036992252,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "robertson",
+            "method": "BDF",
+            "rtol": 1e-05,
+            "status": "success",
+            "max_error_by_species": [
+              7.69801574751483e-06,
+              2.1650822354550895e-08,
+              7.698211448692316e-06
+            ],
+            "minimum_by_species": [
+              0.6172274584465153,
+              0.0,
+              0.0
+            ],
+            "closed_budget_error": 2.220446049250313e-16,
+            "accepted_steps": 108,
+            "derivative_calls": 313,
+            "jacobian_evaluations": 5,
+            "lu_factorizations": 30,
+            "seconds": 0.005403848015703261,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          },
+          {
+            "case": "robertson",
+            "method": "BDF",
+            "rtol": 1e-07,
+            "status": "success",
+            "max_error_by_species": [
+              1.5874301262375212e-07,
+              5.730243090958971e-10,
+              1.5874684827776875e-07
+            ],
+            "minimum_by_species": [
+              0.617235041139948,
+              0.0,
+              0.0
+            ],
+            "closed_budget_error": 8.881784197001252e-16,
+            "accepted_steps": 213,
+            "derivative_calls": 622,
+            "jacobian_evaluations": 5,
+            "lu_factorizations": 45,
+            "seconds": 0.009700848953798413,
+            "rejected_steps": null,
+            "peak_scratch_bytes": null
+          }
+        ],
+        "provenance": {
+          "python": "3.12.12",
+          "numpy": "2.3.4",
+          "scipy": "1.16.2",
+          "source_sha256": "d084f04d08b51ef60a1611252c6e0471c0e69cd3b4f1682249236bb2612f33ce",
+          "revision": "356fc054cd9a4f4ececc3c64c7144e889a789494",
+          "backend": "CPU float64; SciPy screening only",
+          "error_scale": "unit initial total; per-species errors retained",
+          "missing": [
+            "native condensation",
+            "CUDA",
+            "splitting",
+            "Patankar",
+            "local estimator reliability",
+            "rejection counts",
+            "memory"
+          ]
+        }
+      },
+      "source": "scripts/assess_numerical_methods.py",
+      "sha256": "d084f04d08b51ef60a1611252c6e0471c0e69cd3b4f1682249236bb2612f33ce"
+    },
+    "native-condensation": {
+      "report": {
+        "runs": [
+          {
+            "case": "smooth_growth",
+            "status": "success",
+            "method": "CondensationIsothermal",
+            "steps": 8,
+            "seconds": 0.004090356989763677,
+            "reference_difference": 6.714628852932947e-13,
+            "full_step_limiting_proposals": 0,
+            "radius_error": 0.0016608390291930064,
+            "vapor_error_over_initial": 0.0030213435663253765,
+            "relative_budget_error": 4.775786716297013e-16,
+            "minimum_vapor": 6.877711011215346e-06,
+            "equilibrium_vapor": 0.0
+          },
+          {
+            "case": "smooth_growth",
+            "status": "success",
+            "method": "CondensationIsothermal",
+            "steps": 16,
+            "seconds": 0.007631904911249876,
+            "reference_difference": 6.714628852932947e-13,
+            "full_step_limiting_proposals": 0,
+            "radius_error": 0.0008340501194070704,
+            "vapor_error_over_initial": 0.0015162338339848936,
+            "relative_budget_error": 2.3878933581485067e-16,
+            "minimum_vapor": 6.892762108538751e-06,
+            "equilibrium_vapor": 0.0
+          },
+          {
+            "case": "smooth_growth",
+            "status": "success",
+            "method": "CondensationIsothermal",
+            "steps": 32,
+            "seconds": 0.015750775928609073,
+            "reference_difference": 7.978062654956375e-13,
+            "full_step_limiting_proposals": 0,
+            "radius_error": 0.000417887630588476,
+            "vapor_error_over_initial": 0.0007594221452679648,
+            "relative_budget_error": 2.3878933581485067e-16,
+            "minimum_vapor": 6.90033022542592e-06,
+            "equilibrium_vapor": 0.0
+          },
+          {
+            "case": "smooth_growth",
+            "status": "success",
+            "method": "CondensationIsothermal",
+            "steps": 64,
+            "seconds": 0.028676404035650194,
+            "reference_difference": 7.978062654956375e-13,
+            "full_step_limiting_proposals": 0,
+            "radius_error": 0.00020915393291032203,
+            "vapor_error_over_initial": 0.000380026942443793,
+            "relative_budget_error": 4.775786716297013e-16,
+            "minimum_vapor": 6.904124177454162e-06,
+            "equilibrium_vapor": 0.0
+          },
+          {
+            "case": "smooth_growth",
+            "status": "success",
+            "method": "CondensationIsothermal",
+            "steps": 128,
+            "seconds": 0.05944447300862521,
+            "reference_difference": 7.978062654956375e-13,
+            "full_step_limiting_proposals": 0,
+            "radius_error": 0.00010462881153650017,
+            "vapor_error_over_initial": 0.00019009114694192597,
+            "relative_budget_error": 4.775786716297013e-16,
+            "minimum_vapor": 6.90602353540918e-06,
+            "equilibrium_vapor": 0.0
+          },
+          {
+            "case": "smooth_growth",
+            "status": "success",
+            "method": "CondensationIsothermalStaggered",
+            "steps": 8,
+            "seconds": 0.006555906962603331,
+            "reference_difference": 6.714628852932947e-13,
+            "full_step_limiting_proposals": 0,
+            "radius_error": 0.00036526571261497054,
+            "vapor_error_over_initial": 0.0005702753249960202,
+            "relative_budget_error": 2.3878933581485067e-16,
+            "minimum_vapor": 6.910278651209918e-06,
+            "equilibrium_vapor": 0.0
+          },
+          {
+            "case": "smooth_growth",
+            "status": "success",
+            "method": "CondensationIsothermalStaggered",
+            "steps": 16,
+            "seconds": 0.012500799028202891,
+            "reference_difference": 6.714628852932947e-13,
+            "full_step_limiting_proposals": 0,
+            "radius_error": 0.00017738794971755567,
+            "vapor_error_over_initial": 0.00027424338652586294,
+            "relative_budget_error": 2.3878933581485067e-16,
+            "minimum_vapor": 6.9089377040667585e-06,
+            "equilibrium_vapor": 0.0
+          },
+          {
+            "case": "smooth_growth",
+            "status": "success",
+            "method": "CondensationIsothermalStaggered",
+            "steps": 32,
+            "seconds": 0.02471468597650528,
+            "reference_difference": 7.978062654956375e-13,
+            "full_step_limiting_proposals": 0,
+            "radius_error": 8.706962289517506e-05,
+            "vapor_error_over_initial": 0.0001343748544530563,
+            "relative_budget_error": 3.58184003722276e-16,
+            "minimum_vapor": 6.908390121497548e-06,
+            "equilibrium_vapor": 0.0
+          },
+          {
+            "case": "smooth_growth",
+            "status": "success",
+            "method": "CondensationIsothermalStaggered",
+            "steps": 64,
+            "seconds": 0.05444496695417911,
+            "reference_difference": 7.978062654956375e-13,
+            "full_step_limiting_proposals": 0,
+            "radius_error": 4.3126887460775976e-05,
+            "vapor_error_over_initial": 6.649795080189847e-05,
+            "relative_budget_error": 4.775786716297013e-16,
+            "minimum_vapor": 6.908147048171387e-06,
+            "equilibrium_vapor": 0.0
+          },
+          {
+            "case": "smooth_growth",
+            "status": "success",
+            "method": "CondensationIsothermalStaggered",
+            "steps": 128,
+            "seconds": 0.10286669596098363,
+            "reference_difference": 7.978062654956375e-13,
+            "full_step_limiting_proposals": 0,
+            "radius_error": 2.1461238822961803e-05,
+            "vapor_error_over_initial": 3.308469209061866e-05,
+            "relative_budget_error": 7.16368007444552e-16,
+            "minimum_vapor": 6.908033188934483e-06,
+            "equilibrium_vapor": 0.0
+          },
+          {
+            "case": "smooth_growth",
+            "method": "RK23",
+            "rtol": 0.001,
+            "seconds": 0.0030139379668980837,
+            "accepted_steps": 4,
+            "nfev": 14,
+            "njev": 0,
+            "nlu": 0,
+            "reference_difference": 7.978062654956375e-13,
+            "radius_error": 1.895375792848597e-05,
+            "vapor_error_over_initial": 2.9636289185026222e-05,
+            "relative_budget_error": 2.3878933581485067e-16,
+            "minimum_vapor": 6.908022853180042e-06,
+            "equilibrium_vapor": 0.0,
+            "status": "success"
+          },
+          {
+            "case": "smooth_growth",
+            "method": "RK23",
+            "rtol": 1e-05,
+            "seconds": 0.00623889802955091,
+            "accepted_steps": 9,
+            "nfev": 29,
+            "njev": 0,
+            "nlu": 0,
+            "reference_difference": 7.978062654956375e-13,
+            "radius_error": 1.7913342609254812e-07,
+            "vapor_error_over_initial": 2.9659739350616234e-07,
+            "relative_budget_error": 2.3878933581485067e-16,
+            "minimum_vapor": 6.907925136687492e-06,
+            "equilibrium_vapor": 0.0,
+            "status": "success"
+          },
+          {
+            "case": "smooth_growth",
+            "method": "RK23",
+            "rtol": 1e-07,
+            "seconds": 0.018890127073973417,
+            "accepted_steps": 33,
+            "nfev": 101,
+            "njev": 0,
+            "nlu": 0,
+            "reference_difference": 7.978062654956375e-13,
+            "radius_error": 1.5142145315394373e-09,
+            "vapor_error_over_initial": 2.4595393945245e-09,
+            "relative_budget_error": 2.3878933581485067e-16,
+            "minimum_vapor": 6.907924444426615e-06,
+            "equilibrium_vapor": 0.0,
+            "status": "success"
+          },
+          {
+            "case": "smooth_growth",
+            "method": "RK45",
+            "rtol": 0.001,
+            "seconds": 0.003951890044845641,
+            "accepted_steps": 3,
+            "nfev": 20,
+            "njev": 0,
+            "nlu": 0,
+            "reference_difference": 7.978062654956375e-13,
+            "radius_error": 1.706831321168778e-06,
+            "vapor_error_over_initial": 2.4807152337912638e-06,
+            "relative_budget_error": 2.3878933581485067e-16,
+            "minimum_vapor": 6.907925182308215e-06,
+            "equilibrium_vapor": 0.0,
+            "status": "success"
+          },
+          {
+            "case": "smooth_growth",
+            "method": "RK45",
+            "rtol": 1e-05,
+            "seconds": 0.003915813053026795,
+            "accepted_steps": 3,
+            "nfev": 20,
+            "njev": 0,
+            "nlu": 0,
+            "reference_difference": 7.978062654956375e-13,
+            "radius_error": 4.5445064356108844e-07,
+            "vapor_error_over_initial": 7.195995284836522e-07,
+            "relative_budget_error": 2.3878933581485067e-16,
+            "minimum_vapor": 6.907924644323878e-06,
+            "equilibrium_vapor": 0.0,
+            "status": "success"
+          },
+          {
+            "case": "smooth_growth",
+            "method": "RK45",
+            "rtol": 1e-07,
+            "seconds": 0.006093287956900895,
+            "accepted_steps": 4,
+            "nfev": 32,
+            "njev": 0,
+            "nlu": 0,
+            "reference_difference": 7.978062654956375e-13,
+            "radius_error": 1.0836405506253755e-07,
+            "vapor_error_over_initial": 1.5495197694934994e-07,
+            "relative_budget_error": 2.3878933581485067e-16,
+            "minimum_vapor": 6.9079244909491555e-06,
+            "equilibrium_vapor": 0.0,
+            "status": "success"
+          },
+          {
+            "case": "smooth_growth",
+            "method": "Radau",
+            "rtol": 0.001,
+            "seconds": 0.004836031934246421,
+            "accepted_steps": 3,
+            "nfev": 23,
+            "njev": 1,
+            "nlu": 6,
+            "reference_difference": 7.978062654956375e-13,
+            "radius_error": 4.188086383472012e-06,
+            "vapor_error_over_initial": 5.581946031596809e-06,
+            "relative_budget_error": 2.3878933581485067e-16,
+            "minimum_vapor": 6.9079269939117636e-06,
+            "equilibrium_vapor": 0.0,
+            "status": "success"
+          },
+          {
+            "case": "smooth_growth",
+            "method": "Radau",
+            "rtol": 1e-05,
+            "seconds": 0.009005125961266458,
+            "accepted_steps": 6,
+            "nfev": 44,
+            "njev": 1,
+            "nlu": 8,
+            "reference_difference": 7.978062654956375e-13,
+            "radius_error": 3.4341003019022764e-07,
+            "vapor_error_over_initial": 4.762581669505048e-07,
+            "relative_budget_error": 2.3878933581485067e-16,
+            "minimum_vapor": 6.907924514985774e-06,
+            "equilibrium_vapor": 0.0,
+            "status": "success"
+          },
+          {
+            "case": "smooth_growth",
+            "method": "Radau",
+            "rtol": 1e-07,
+            "seconds": 0.02162419504020363,
+            "accepted_steps": 14,
+            "nfev": 106,
+            "njev": 2,
+            "nlu": 10,
+            "reference_difference": 7.978062654956375e-13,
+            "radius_error": 4.050248580966809e-09,
+            "vapor_error_over_initial": 6.551259778804843e-09,
+            "relative_budget_error": 2.3878933581485067e-16,
+            "minimum_vapor": 6.907924447255532e-06,
+            "equilibrium_vapor": 0.0,
+            "status": "success"
+          },
+          {
+            "case": "smooth_growth",
+            "method": "BDF",
+            "rtol": 0.001,
+            "seconds": 0.005466973991133273,
+            "accepted_steps": 9,
+            "nfev": 22,
+            "njev": 1,
+            "nlu": 5,
+            "reference_difference": 7.978062654956375e-13,
+            "radius_error": 0.0010810830190732812,
+            "vapor_error_over_initial": 0.00189083735508498,
+            "relative_budget_error": 2.3878933581485067e-16,
+            "minimum_vapor": 6.92640381129006e-06,
+            "equilibrium_vapor": 0.0,
+            "status": "success"
+          },
+          {
+            "case": "smooth_growth",
+            "method": "BDF",
+            "rtol": 1e-05,
+            "seconds": 0.007238063961267471,
+            "accepted_steps": 14,
+            "nfev": 30,
+            "njev": 1,
+            "nlu": 6,
+            "reference_difference": 7.978062654956375e-13,
+            "radius_error": 4.650811215034523e-06,
+            "vapor_error_over_initial": 8.33446582089136e-06,
+            "relative_budget_error": 2.3878933581485067e-16,
+            "minimum_vapor": 6.9080048711767175e-06,
+            "equilibrium_vapor": 0.0,
+            "status": "success"
+          },
+          {
+            "case": "smooth_growth",
+            "method": "BDF",
+            "rtol": 1e-07,
+            "seconds": 0.013848392060026526,
+            "accepted_steps": 28,
+            "nfev": 58,
+            "njev": 1,
+            "nlu": 9,
+            "reference_difference": 7.978062654956375e-13,
+            "radius_error": 4.16390906199382e-08,
+            "vapor_error_over_initial": 7.246366601180326e-08,
+            "relative_budget_error": 2.3878933581485067e-16,
+            "minimum_vapor": 6.907925097973601e-06,
+            "equilibrium_vapor": 0.0,
+            "status": "success"
+          },
+          {
+            "case": "equilibrium",
+            "status": "success",
+            "method": "CondensationIsothermal",
+            "steps": 8,
+            "seconds": 0.005818256991915405,
+            "reference_difference": 1.7392753903777702e-12,
+            "full_step_limiting_proposals": 0,
+            "radius_error": 0.0495788719419159,
+            "vapor_error_over_initial": 0.12413799179411056,
+            "relative_budget_error": 4.775786716297013e-16,
+            "minimum_vapor": 1.0007159260903623e-06,
+            "equilibrium_vapor": 1e-06
+          },
+          {
+            "case": "equilibrium",
+            "status": "success",
+            "method": "CondensationIsothermal",
+            "steps": 16,
+            "seconds": 0.007357756025157869,
+            "reference_difference": 1.7392753903777702e-12,
+            "full_step_limiting_proposals": 0,
+            "radius_error": 0.02292287083067923,
+            "vapor_error_over_initial": 0.053583381438454834,
+            "relative_budget_error": 4.775786716297013e-16,
+            "minimum_vapor": 1.0021696885367375e-06,
+            "equilibrium_vapor": 1e-06
+          },
+          {
+            "case": "equilibrium",
+            "status": "success",
+            "method": "CondensationIsothermal",
+            "steps": 32,
+            "seconds": 0.015030398033559322,
+            "reference_difference": 1.7392753903777702e-12,
+            "full_step_limiting_proposals": 0,
+            "radius_error": 0.01092507635587503,
+            "vapor_error_over_initial": 0.025708061323254306,
+            "relative_budget_error": 5.969733395371267e-16,
+            "minimum_vapor": 1.005405719398163e-06,
+            "equilibrium_vapor": 1e-06
+          },
+          {
+            "case": "equilibrium",
+            "status": "success",
+            "method": "CondensationIsothermal",
+            "steps": 64,
+            "seconds": 0.028671143925748765,
+            "reference_difference": 1.91624494050302e-12,
+            "full_step_limiting_proposals": 0,
+            "radius_error": 0.005353475175694067,
+            "vapor_error_over_initial": 0.012524999140200338,
+            "relative_budget_error": 4.775786716297013e-16,
+            "minimum_vapor": 1.0080028550851124e-06,
+            "equilibrium_vapor": 1e-06
+          },
+          {
+            "case": "equilibrium",
+            "status": "success",
+            "method": "CondensationIsothermal",
+            "steps": 128,
+            "seconds": 0.05739866301883012,
+            "reference_difference": 2.263300658000844e-12,
+            "full_step_limiting_proposals": 0,
+            "radius_error": 0.0026501943788816984,
+            "vapor_error_over_initial": 0.0061901141487317535,
+            "relative_budget_error": 7.16368007444552e-16,
+            "minimum_vapor": 1.0095751804793235e-06,
+            "equilibrium_vapor": 1e-06
+          },
+          {
+            "case": "equilibrium",
+            "status": "success",
+            "method": "CondensationIsothermalStaggered",
+            "steps": 8,
+            "seconds": 0.006798177026212215,
+            "reference_difference": 1.7392753903777702e-12,
+            "full_step_limiting_proposals": 0,
+            "radius_error": 0.012990345430416772,
+            "vapor_error_over_initial": 0.03168516010662557,
+            "relative_budget_error": 3.58184003722276e-16,
+            "minimum_vapor": 1.0024444289364666e-06,
+            "equilibrium_vapor": 1e-06
+          },
+          {
+            "case": "equilibrium",
+            "status": "success",
+            "method": "CondensationIsothermalStaggered",
+            "steps": 16,
+            "seconds": 0.012865245924331248,
+            "reference_difference": 1.7392753903777702e-12,
+            "full_step_limiting_proposals": 0,
+            "radius_error": 0.006771863024651381,
+            "vapor_error_over_initial": 0.016554675750443865,
+            "relative_budget_error": 4.775786716297013e-16,
+            "minimum_vapor": 1.0057013632276513e-06,
+            "equilibrium_vapor": 1e-06
+          },
+          {
+            "case": "equilibrium",
+            "status": "success",
+            "method": "CondensationIsothermalStaggered",
+            "steps": 32,
+            "seconds": 0.0246905010426417,
+            "reference_difference": 1.7392753903777702e-12,
+            "full_step_limiting_proposals": 0,
+            "radius_error": 0.0034488045077254448,
+            "vapor_error_over_initial": 0.008493383465108494,
+            "relative_budget_error": 3.58184003722276e-16,
+            "minimum_vapor": 1.0081948898669737e-06,
+            "equilibrium_vapor": 1e-06
+          },
+          {
+            "case": "equilibrium",
+            "status": "success",
+            "method": "CondensationIsothermalStaggered",
+            "steps": 64,
+            "seconds": 0.050887519028037786,
+            "reference_difference": 1.91624494050302e-12,
+            "full_step_limiting_proposals": 0,
+            "radius_error": 0.0017400733284747005,
+            "vapor_error_over_initial": 0.004265333845740665,
+            "relative_budget_error": 3.58184003722276e-16,
+            "minimum_vapor": 1.009682242442662e-06,
+            "equilibrium_vapor": 1e-06
+          },
+          {
+            "case": "equilibrium",
+            "status": "success",
+            "method": "CondensationIsothermalStaggered",
+            "steps": 128,
+            "seconds": 0.10605032905004919,
+            "reference_difference": 2.263300658000844e-12,
+            "full_step_limiting_proposals": 0,
+            "radius_error": 0.0008745301231460889,
+            "vapor_error_over_initial": 0.0021393005928556324,
+            "relative_budget_error": 8.357626753519773e-16,
+            "minimum_vapor": 1.0104887442736655e-06,
+            "equilibrium_vapor": 1e-06
+          },
+          {
+            "case": "equilibrium",
+            "method": "RK23",
+            "rtol": 0.001,
+            "seconds": 0.007383023970760405,
+            "accepted_steps": 10,
+            "nfev": 38,
+            "njev": 0,
+            "nlu": 0,
+            "reference_difference": 2.263300658000844e-12,
+            "radius_error": 0.003717674407814897,
+            "vapor_error_over_initial": 0.009567256416171361,
+            "relative_budget_error": 3.58184003722276e-16,
+            "minimum_vapor": 9.959150511356546e-07,
+            "equilibrium_vapor": 1e-06,
+            "status": "success"
+          },
+          {
+            "case": "equilibrium",
+            "method": "RK23",
+            "rtol": 1e-05,
+            "seconds": 0.021631007897667587,
+            "accepted_steps": 36,
+            "nfev": 116,
+            "njev": 0,
+            "nlu": 0,
+            "reference_difference": 2.263300658000844e-12,
+            "radius_error": 9.842528375214599e-06,
+            "vapor_error_over_initial": 2.6544583459398612e-05,
+            "relative_budget_error": 3.58184003722276e-16,
+            "minimum_vapor": 1.0111545708882435e-06,
+            "equilibrium_vapor": 1e-06,
+            "status": "success"
+          },
+          {
+            "case": "equilibrium",
+            "method": "RK23",
+            "rtol": 1e-07,
+            "seconds": 0.08910784998442978,
+            "accepted_steps": 156,
+            "nfev": 476,
+            "njev": 0,
+            "nlu": 0,
+            "reference_difference": 2.263300658000844e-12,
+            "radius_error": 7.56750206942769e-08,
+            "vapor_error_over_initial": 2.0415674494922775e-07,
+            "relative_budget_error": 3.58184003722276e-16,
+            "minimum_vapor": 1.0113362133528815e-06,
+            "equilibrium_vapor": 1e-06,
+            "status": "success"
+          },
+          {
+            "case": "equilibrium",
+            "method": "RK45",
+            "rtol": 0.001,
+            "seconds": 0.009447567979805171,
+            "accepted_steps": 7,
+            "nfev": 50,
+            "njev": 0,
+            "nlu": 0,
+            "reference_difference": 2.263300658000844e-12,
+            "radius_error": 0.0002274640077102319,
+            "vapor_error_over_initial": 0.0005785876435540976,
+            "relative_budget_error": 3.58184003722276e-16,
+            "minimum_vapor": 1.0118955415112778e-06,
+            "equilibrium_vapor": 1e-06,
+            "status": "success"
+          },
+          {
+            "case": "equilibrium",
+            "method": "RK45",
+            "rtol": 1e-05,
+            "seconds": 0.016045122989453375,
+            "accepted_steps": 13,
+            "nfev": 86,
+            "njev": 0,
+            "nlu": 0,
+            "reference_difference": 2.263300658000844e-12,
+            "radius_error": 7.750393746563944e-06,
+            "vapor_error_over_initial": 1.2509242245363156e-05,
+            "relative_budget_error": 3.58184003722276e-16,
+            "minimum_vapor": 1.0113536737136568e-06,
+            "equilibrium_vapor": 1e-06,
+            "status": "success"
+          },
+          {
+            "case": "equilibrium",
+            "method": "RK45",
+            "rtol": 1e-07,
+            "seconds": 0.03280093497596681,
+            "accepted_steps": 27,
+            "nfev": 176,
+            "njev": 0,
+            "nlu": 0,
+            "reference_difference": 2.263300658000844e-12,
+            "radius_error": 9.782557275350712e-08,
+            "vapor_error_over_initial": 1.4142117822125728e-07,
+            "relative_budget_error": 3.58184003722276e-16,
+            "minimum_vapor": 1.0113383197497662e-06,
+            "equilibrium_vapor": 1e-06,
+            "status": "success"
+          },
+          {
+            "case": "equilibrium",
+            "method": "Radau",
+            "rtol": 0.001,
+            "seconds": 0.015048059984110296,
+            "accepted_steps": 9,
+            "nfev": 71,
+            "njev": 3,
+            "nlu": 16,
+            "reference_difference": 2.263300658000844e-12,
+            "radius_error": 8.693957279914954e-05,
+            "vapor_error_over_initial": 0.0002203362753909165,
+            "relative_budget_error": 3.58184003722276e-16,
+            "minimum_vapor": 1.0113958983787121e-06,
+            "equilibrium_vapor": 1e-06,
+            "status": "success"
+          },
+          {
+            "case": "equilibrium",
+            "method": "Radau",
+            "rtol": 1e-05,
+            "seconds": 0.036379882018081844,
+            "accepted_steps": 23,
+            "nfev": 178,
+            "njev": 3,
+            "nlu": 30,
+            "reference_difference": 2.263300658000844e-12,
+            "radius_error": 4.863401883437035e-07,
+            "vapor_error_over_initial": 1.2447105918869986e-06,
+            "relative_budget_error": 3.58184003722276e-16,
+            "minimum_vapor": 1.0113387328787546e-06,
+            "equilibrium_vapor": 1e-06,
+            "status": "success"
+          },
+          {
+            "case": "equilibrium",
+            "method": "Radau",
+            "rtol": 1e-07,
+            "seconds": 0.08824929606635123,
+            "accepted_steps": 62,
+            "nfev": 445,
+            "njev": 4,
+            "nlu": 36,
+            "reference_difference": 2.263300658000844e-12,
+            "radius_error": 8.7580913632479e-09,
+            "vapor_error_over_initial": 2.1026809833628266e-08,
+            "relative_budget_error": 3.58184003722276e-16,
+            "minimum_vapor": 1.0113380918344708e-06,
+            "equilibrium_vapor": 1e-06,
+            "status": "success"
+          },
+          {
+            "case": "equilibrium",
+            "method": "BDF",
+            "rtol": 0.001,
+            "seconds": 0.012647241004742682,
+            "accepted_steps": 22,
+            "nfev": 57,
+            "njev": 1,
+            "nlu": 8,
+            "reference_difference": 2.263300658000844e-12,
+            "radius_error": 0.000935882136320787,
+            "vapor_error_over_initial": 0.002097505768309558,
+            "relative_budget_error": 3.58184003722276e-16,
+            "minimum_vapor": 1.0108118182378697e-06,
+            "equilibrium_vapor": 1e-06,
+            "status": "success"
+          },
+          {
+            "case": "equilibrium",
+            "method": "BDF",
+            "rtol": 1e-05,
+            "seconds": 0.026095560053363442,
+            "accepted_steps": 45,
+            "nfev": 109,
+            "njev": 1,
+            "nlu": 11,
+            "reference_difference": 2.263300658000844e-12,
+            "radius_error": 2.9758570099236437e-06,
+            "vapor_error_over_initial": 7.885823760076004e-06,
+            "relative_budget_error": 3.58184003722276e-16,
+            "minimum_vapor": 1.0113631979643923e-06,
+            "equilibrium_vapor": 1e-06,
+            "status": "success"
+          },
+          {
+            "case": "equilibrium",
+            "method": "BDF",
+            "rtol": 1e-07,
+            "seconds": 0.04950318799819797,
+            "accepted_steps": 88,
+            "nfev": 233,
+            "njev": 1,
+            "nlu": 19,
+            "reference_difference": 2.263300658000844e-12,
+            "radius_error": 1.1884741457635073e-07,
+            "vapor_error_over_initial": 3.0750945782538185e-07,
+            "relative_budget_error": 3.58184003722276e-16,
+            "minimum_vapor": 1.011338856193677e-06,
+            "equilibrium_vapor": 1e-06,
+            "status": "success"
+          },
+          {
+            "case": "near_depletion",
+            "status": "success",
+            "method": "CondensationIsothermal",
+            "steps": 8,
+            "seconds": 0.003944927011616528,
+            "reference_difference": 1.2931877790833823e-12,
+            "full_step_limiting_proposals": 0,
+            "radius_error": 0.05256359179696091,
+            "vapor_error_over_initial": 0.1383099079038669,
+            "relative_budget_error": 5.969733395371267e-16,
+            "minimum_vapor": 6.455019118469489e-13,
+            "equilibrium_vapor": 0.0
+          },
+          {
+            "case": "near_depletion",
+            "status": "success",
+            "method": "CondensationIsothermal",
+            "steps": 16,
+            "seconds": 0.0074019680032506585,
+            "reference_difference": 2.063460513568316e-12,
+            "full_step_limiting_proposals": 0,
+            "radius_error": 0.024194327541224414,
+            "vapor_error_over_initial": 0.05944719477998171,
+            "relative_budget_error": 4.775786716297013e-16,
+            "minimum_vapor": 1.2156691989007447e-09,
+            "equilibrium_vapor": 0.0
+          },
+          {
+            "case": "near_depletion",
+            "status": "success",
+            "method": "CondensationIsothermal",
+            "steps": 32,
+            "seconds": 0.019198048976249993,
+            "reference_difference": 2.191358206005134e-12,
+            "full_step_limiting_proposals": 0,
+            "radius_error": 0.011551813884298268,
+            "vapor_error_over_initial": 0.02853541354614322,
+            "relative_budget_error": 7.16368007444552e-16,
+            "minimum_vapor": 4.230440770522975e-09,
+            "equilibrium_vapor": 0.0
+          },
+          {
+            "case": "near_depletion",
+            "status": "success",
+            "method": "CondensationIsothermal",
+            "steps": 64,
+            "seconds": 0.0286397059680894,
+            "reference_difference": 2.191358206005134e-12,
+            "full_step_limiting_proposals": 0,
+            "radius_error": 0.005669016501153257,
+            "vapor_error_over_initial": 0.013909442466499854,
+            "relative_budget_error": 4.775786716297013e-16,
+            "minimum_vapor": 6.7333760553033996e-09,
+            "equilibrium_vapor": 0.0
+          },
+          {
+            "case": "near_depletion",
+            "status": "success",
+            "method": "CondensationIsothermal",
+            "steps": 128,
+            "seconds": 0.0596432319143787,
+            "reference_difference": 2.191358206005134e-12,
+            "full_step_limiting_proposals": 0,
+            "radius_error": 0.0028073072558381096,
+            "vapor_error_over_initial": 0.006876677696152708,
+            "relative_budget_error": 7.16368007444552e-16,
+            "minimum_vapor": 8.26843183217366e-09,
+            "equilibrium_vapor": 0.0
+          },
+          {
+            "case": "near_depletion",
+            "status": "success",
+            "method": "CondensationIsothermalStaggered",
+            "steps": 8,
+            "seconds": 0.006497969035990536,
+            "reference_difference": 1.2931877790833823e-12,
+            "full_step_limiting_proposals": 0,
+            "radius_error": 0.01302402195486474,
+            "vapor_error_over_initial": 0.033336443784839145,
+            "relative_budget_error": 5.969733395371267e-16,
+            "minimum_vapor": 1.4708871393859433e-09,
+            "equilibrium_vapor": 0.0
+          },
+          {
+            "case": "near_depletion",
+            "status": "success",
+            "method": "CondensationIsothermalStaggered",
+            "steps": 16,
+            "seconds": 0.014154451084323227,
+            "reference_difference": 2.063460513568316e-12,
+            "full_step_limiting_proposals": 0,
+            "radius_error": 0.00687507292220646,
+            "vapor_error_over_initial": 0.01786302668090263,
+            "relative_budget_error": 5.969733395371267e-16,
+            "minimum_vapor": 4.523631084260569e-09,
+            "equilibrium_vapor": 0.0
+          },
+          {
+            "case": "near_depletion",
+            "status": "success",
+            "method": "CondensationIsothermalStaggered",
+            "steps": 32,
+            "seconds": 0.026445659925229847,
+            "reference_difference": 2.191358206005134e-12,
+            "full_step_limiting_proposals": 0,
+            "radius_error": 0.0035215944769360075,
+            "vapor_error_over_initial": 0.009162085650213632,
+            "relative_budget_error": 4.775786716297013e-16,
+            "minimum_vapor": 6.927655640626781e-09,
+            "equilibrium_vapor": 0.0
+          },
+          {
+            "case": "near_depletion",
+            "status": "success",
+            "method": "CondensationIsothermalStaggered",
+            "steps": 64,
+            "seconds": 0.04998301900923252,
+            "reference_difference": 2.191358206005134e-12,
+            "full_step_limiting_proposals": 0,
+            "radius_error": 0.0017868312493891647,
+            "vapor_error_over_initial": 0.004610022466273429,
+            "relative_budget_error": 7.16368007444552e-16,
+            "minimum_vapor": 8.377599964183219e-09,
+            "equilibrium_vapor": 0.0
+          },
+          {
+            "case": "near_depletion",
+            "status": "success",
+            "method": "CondensationIsothermalStaggered",
+            "steps": 128,
+            "seconds": 0.10199669993016869,
+            "reference_difference": 2.191358206005134e-12,
+            "full_step_limiting_proposals": 0,
+            "radius_error": 0.000898069812313329,
+            "vapor_error_over_initial": 0.002312512189536804,
+            "relative_budget_error": 4.775786716297013e-16,
+            "minimum_vapor": 9.167784735144011e-09,
+            "equilibrium_vapor": 0.0
+          },
+          {
+            "case": "near_depletion",
+            "method": "RK23",
+            "rtol": 0.001,
+            "status": "failed",
+            "reason": "gas concentration and molar mass must be physical"
+          },
+          {
+            "case": "near_depletion",
+            "method": "RK23",
+            "rtol": 1e-05,
+            "seconds": 0.022687901044264436,
+            "accepted_steps": 37,
+            "nfev": 119,
+            "njev": 0,
+            "nlu": 0,
+            "reference_difference": 2.191358206005134e-12,
+            "radius_error": 1.015161335327086e-05,
+            "vapor_error_over_initial": 2.8747817288230444e-05,
+            "relative_budget_error": 3.58184003722276e-16,
+            "minimum_vapor": 9.799047865074675e-09,
+            "equilibrium_vapor": 0.0,
+            "status": "success"
+          },
+          {
+            "case": "near_depletion",
+            "method": "RK23",
+            "rtol": 1e-07,
+            "seconds": 0.09435816190671176,
+            "accepted_steps": 161,
+            "nfev": 491,
+            "njev": 0,
+            "nlu": 0,
+            "reference_difference": 2.191358206005134e-12,
+            "radius_error": 7.732180784536524e-08,
+            "vapor_error_over_initial": 2.1903879500928446e-07,
+            "relative_budget_error": 3.58184003722276e-16,
+            "minimum_vapor": 1.000055460729722e-08,
+            "equilibrium_vapor": 0.0,
+            "status": "success"
+          },
+          {
+            "case": "near_depletion",
+            "method": "RK45",
+            "rtol": 0.001,
+            "status": "failed",
+            "reason": "gas concentration and molar mass must be physical"
+          },
+          {
+            "case": "near_depletion",
+            "method": "RK45",
+            "rtol": 1e-05,
+            "seconds": 0.015971394954249263,
+            "accepted_steps": 13,
+            "nfev": 86,
+            "njev": 0,
+            "nlu": 0,
+            "reference_difference": 2.191358206005134e-12,
+            "radius_error": 7.526147747016765e-06,
+            "vapor_error_over_initial": 1.2445891430832937e-05,
+            "relative_budget_error": 3.58184003722276e-16,
+            "minimum_vapor": 1.0015969154848338e-08,
+            "equilibrium_vapor": 0.0,
+            "status": "success"
+          },
+          {
+            "case": "near_depletion",
+            "method": "RK45",
+            "rtol": 1e-07,
+            "seconds": 0.03276358509901911,
+            "accepted_steps": 27,
+            "nfev": 176,
+            "njev": 0,
+            "nlu": 0,
+            "reference_difference": 2.191358206005134e-12,
+            "radius_error": 8.347909985495505e-08,
+            "vapor_error_over_initial": 1.1680897863411897e-07,
+            "relative_budget_error": 3.58184003722276e-16,
+            "minimum_vapor": 1.0002817622320465e-08,
+            "equilibrium_vapor": 0.0,
+            "status": "success"
+          },
+          {
+            "case": "near_depletion",
+            "method": "Radau",
+            "rtol": 0.001,
+            "status": "failed",
+            "reason": "gas concentration and molar mass must be physical"
+          },
+          {
+            "case": "near_depletion",
+            "method": "Radau",
+            "rtol": 1e-05,
+            "seconds": 0.03211261611431837,
+            "accepted_steps": 22,
+            "nfev": 162,
+            "njev": 3,
+            "nlu": 26,
+            "reference_difference": 2.191358206005134e-12,
+            "radius_error": 7.174046690039404e-07,
+            "vapor_error_over_initial": 1.8521451216731912e-06,
+            "relative_budget_error": 3.58184003722276e-16,
+            "minimum_vapor": 1.0002935236484044e-08,
+            "equilibrium_vapor": 0.0,
+            "status": "success"
+          },
+          {
+            "case": "near_depletion",
+            "method": "Radau",
+            "rtol": 1e-07,
+            "seconds": 0.0954858660697937,
+            "accepted_steps": 66,
+            "nfev": 485,
+            "njev": 4,
+            "nlu": 42,
+            "reference_difference": 2.191358206005134e-12,
+            "radius_error": 4.7564860938820175e-09,
+            "vapor_error_over_initial": 1.3426852877684683e-08,
+            "relative_budget_error": 3.58184003722276e-16,
+            "minimum_vapor": 1.0002625903092556e-08,
+            "equilibrium_vapor": 0.0,
+            "status": "success"
+          },
+          {
+            "case": "near_depletion",
+            "method": "BDF",
+            "rtol": 0.001,
+            "seconds": 0.013495406019501388,
+            "accepted_steps": 23,
+            "nfev": 60,
+            "njev": 2,
+            "nlu": 9,
+            "reference_difference": 2.191358206005134e-12,
+            "radius_error": 0.0010804918138800357,
+            "vapor_error_over_initial": 0.0020008078714794687,
+            "relative_budget_error": 3.58184003722276e-16,
+            "minimum_vapor": 9.213003163856514e-09,
+            "equilibrium_vapor": 0.0,
+            "status": "success"
+          },
+          {
+            "case": "near_depletion",
+            "method": "BDF",
+            "rtol": 1e-05,
+            "seconds": 0.024827876011841,
+            "accepted_steps": 45,
+            "nfev": 112,
+            "njev": 1,
+            "nlu": 11,
+            "reference_difference": 2.191358206005134e-12,
+            "radius_error": 7.23770639510235e-06,
+            "vapor_error_over_initial": 1.455383410375123e-05,
+            "relative_budget_error": 3.58184003722276e-16,
+            "minimum_vapor": 1.0033416528733207e-08,
+            "equilibrium_vapor": 0.0,
+            "status": "success"
+          },
+          {
+            "case": "near_depletion",
+            "method": "BDF",
+            "rtol": 1e-07,
+            "seconds": 0.0512430090457201,
+            "accepted_steps": 90,
+            "nfev": 246,
+            "njev": 1,
+            "nlu": 19,
+            "reference_difference": 2.191358206005134e-12,
+            "radius_error": 1.526189750133966e-07,
+            "vapor_error_over_initial": 4.167698038556335e-07,
+            "relative_budget_error": 3.58184003722276e-16,
+            "minimum_vapor": 1.0003370924797407e-08,
+            "equilibrium_vapor": 0.0,
+            "status": "success"
+          }
+        ],
+        "volume_m3": 0.37,
+        "units": "SI; radius divided by initial radius",
+        "scope": "CPU single-box monodisperse research prototype"
+      },
+      "source": "scripts/assess_native_condensation.py",
+      "sha256": "316fc10c4e574b2872fcd07b1bec2447260a7d78a8a24eb3f2c54582ea61d2cf"
+    },
+    "splitting": {
+      "report": [
+        {
+          "method": "sequential",
+          "steps": 8,
+          "maximum_trajectory_error": 0.059513858615683035,
+          "observed_order": null,
+          "minimum_final_inventory": 0.0837431360906724
+        },
+        {
+          "method": "sequential",
+          "steps": 16,
+          "maximum_trajectory_error": 0.029966311311916183,
+          "observed_order": 0.9898841518505481,
+          "minimum_final_inventory": 0.08499375400057141
+        },
+        {
+          "method": "sequential",
+          "steps": 32,
+          "maximum_trajectory_error": 0.015018784800111151,
+          "observed_order": 0.9965734207212276,
+          "minimum_final_inventory": 0.08531053692542245
+        },
+        {
+          "method": "sequential",
+          "steps": 64,
+          "maximum_trajectory_error": 0.0075162190449684085,
+          "observed_order": 0.9986890693300106,
+          "minimum_final_inventory": 0.08538999351967948
+        },
+        {
+          "method": "sequential",
+          "steps": 128,
+          "maximum_trajectory_error": 0.0037595857008163036,
+          "observed_order": 0.9994334233768992,
+          "minimum_final_inventory": 0.08540987401682595
+        },
+        {
+          "method": "reversed",
+          "steps": 8,
+          "maximum_trajectory_error": 0.06013290237781316,
+          "observed_order": null,
+          "minimum_final_inventory": 0.0837431360906724
+        },
+        {
+          "method": "reversed",
+          "steps": 16,
+          "maximum_trajectory_error": 0.030119241292417775,
+          "observed_order": 0.9974691646158843,
+          "minimum_final_inventory": 0.08499375400057141
+        },
+        {
+          "method": "reversed",
+          "steps": 32,
+          "maximum_trajectory_error": 0.015056897920041667,
+          "observed_order": 1.0002608577443113,
+          "minimum_final_inventory": 0.08531053692542245
+        },
+        {
+          "method": "reversed",
+          "steps": 64,
+          "maximum_trajectory_error": 0.0075257397852080965,
+          "observed_order": 1.0005192592142396,
+          "minimum_final_inventory": 0.08538999351967944
+        },
+        {
+          "method": "reversed",
+          "steps": 128,
+          "maximum_trajectory_error": 0.0037619369706461403,
+          "observed_order": 1.0003577292849015,
+          "minimum_final_inventory": 0.08540987401682607
+        },
+        {
+          "method": "strang",
+          "steps": 8,
+          "maximum_trajectory_error": 0.004488878242926653,
+          "observed_order": null,
+          "minimum_final_inventory": 0.08707632926613873
+        },
+        {
+          "method": "strang",
+          "steps": 16,
+          "maximum_trajectory_error": 0.0011333494318718773,
+          "observed_order": 1.9857622264941612,
+          "minimum_final_inventory": 0.08583395926124404
+        },
+        {
+          "method": "strang",
+          "steps": 32,
+          "maximum_trajectory_error": 0.00028404025740108585,
+          "observed_order": 1.9964254139827917,
+          "minimum_final_inventory": 0.08552102298545225
+        },
+        {
+          "method": "strang",
+          "steps": 64,
+          "maximum_trajectory_error": 7.105526902262405e-05,
+          "observed_order": 1.9990818793398677,
+          "minimum_final_inventory": 0.08544264225408359
+        },
+        {
+          "method": "strang",
+          "steps": 128,
+          "maximum_trajectory_error": 1.77665611331701e-05,
+          "observed_order": 1.9997771721737982,
+          "minimum_final_inventory": 0.085423037902387
+        }
+      ],
+      "source": "scripts/assess_process_splitting.py",
+      "sha256": "15953225a7ed90bc0610a2c6dcc401bddb8cecdecf97a713358edead164f8b38"
+    },
+    "conservative-transfer": {
+      "report": [
+        {
+          "case": "smooth",
+          "steps": 8,
+          "error": 0.00046507234772497075,
+          "budget_error": 3.3306690738754696e-16,
+          "minimum": 0.0,
+          "observed_order": null,
+          "linear_solves": 16
+        },
+        {
+          "case": "smooth",
+          "steps": 16,
+          "error": 0.00013013495018898702,
+          "budget_error": 3.3306690738754696e-16,
+          "minimum": 0.0,
+          "observed_order": 1.837446685651722,
+          "linear_solves": 32
+        },
+        {
+          "case": "smooth",
+          "steps": 32,
+          "error": 3.468308204962467e-05,
+          "budget_error": 4.440892098500626e-16,
+          "minimum": 0.0,
+          "observed_order": 1.9077044651230413,
+          "linear_solves": 64
+        },
+        {
+          "case": "smooth",
+          "steps": 64,
+          "error": 8.985879119016715e-06,
+          "budget_error": 8.881784197001252e-16,
+          "minimum": 0.0,
+          "observed_order": 1.948500547253712,
+          "linear_solves": 128
+        },
+        {
+          "case": "smooth",
+          "steps": 128,
+          "error": 2.291090491879366e-06,
+          "budget_error": 1.9984014443252818e-15,
+          "minimum": 0.0,
+          "observed_order": 1.9716252120655566,
+          "linear_solves": 256
+        },
+        {
+          "case": "smooth",
+          "steps": 256,
+          "error": 5.78954482466365e-07,
+          "budget_error": 8.881784197001252e-16,
+          "minimum": 0.0,
+          "observed_order": 1.9845126095489782,
+          "linear_solves": 512
+        },
+        {
+          "case": "stiff",
+          "steps": 8,
+          "error": 0.000848728888620732,
+          "budget_error": 2.220446049250313e-16,
+          "minimum": 0.0,
+          "observed_order": null,
+          "linear_solves": 16
+        },
+        {
+          "case": "stiff",
+          "steps": 16,
+          "error": 0.000456742011855727,
+          "budget_error": 3.3306690738754696e-16,
+          "minimum": 0.0,
+          "observed_order": 0.8939242868414459,
+          "linear_solves": 32
+        },
+        {
+          "case": "stiff",
+          "steps": 32,
+          "error": 0.001009153324590506,
+          "budget_error": 1.7763568394002505e-15,
+          "minimum": 0.0,
+          "observed_order": -1.1436939830538237,
+          "linear_solves": 64
+        },
+        {
+          "case": "stiff",
+          "steps": 64,
+          "error": 0.0063665358594241495,
+          "budget_error": 1.1102230246251565e-15,
+          "minimum": 0.0,
+          "observed_order": -2.6573632056619774,
+          "linear_solves": 128
+        },
+        {
+          "case": "stiff",
+          "steps": 128,
+          "error": 0.024276953793079592,
+          "budget_error": 9.992007221626409e-16,
+          "minimum": 0.0,
+          "observed_order": -1.9310069113111317,
+          "linear_solves": 256
+        },
+        {
+          "case": "stiff",
+          "steps": 256,
+          "error": 0.059089197276334327,
+          "budget_error": 4.440892098500626e-16,
+          "minimum": 0.0,
+          "observed_order": -1.2833069926549887,
+          "linear_solves": 512
+        },
+        {
+          "case": "depletion",
+          "steps": 8,
+          "error": 0.0433921103563048,
+          "budget_error": 1.1102230246251565e-16,
+          "minimum": 0.0,
+          "observed_order": null,
+          "linear_solves": 16
+        },
+        {
+          "case": "depletion",
+          "steps": 16,
+          "error": 0.015287463081971375,
+          "budget_error": 1.1102230246251565e-16,
+          "minimum": 0.0,
+          "observed_order": 1.5050837379420272,
+          "linear_solves": 32
+        },
+        {
+          "case": "depletion",
+          "steps": 32,
+          "error": 0.004774204751894884,
+          "budget_error": 1.1102230246251565e-16,
+          "minimum": 0.0,
+          "observed_order": 1.679016668865765,
+          "linear_solves": 64
+        },
+        {
+          "case": "depletion",
+          "steps": 64,
+          "error": 0.0013319135383945135,
+          "budget_error": 2.220446049250313e-16,
+          "minimum": 0.0,
+          "observed_order": 1.8417600083570504,
+          "linear_solves": 128
+        },
+        {
+          "case": "depletion",
+          "steps": 128,
+          "error": 0.00035311221320732944,
+          "budget_error": 3.3306690738754696e-16,
+          "minimum": 0.0,
+          "observed_order": 1.9153018063884393,
+          "linear_solves": 256
+        },
+        {
+          "case": "depletion",
+          "steps": 256,
+          "error": 9.08588874000138e-05,
+          "budget_error": 6.661338147750939e-16,
+          "minimum": 0.0,
+          "observed_order": 1.9584271766324381,
+          "linear_solves": 512
+        }
+      ],
+      "source": "scripts/assess_conservative_transfer.py",
+      "sha256": "02fae095362e8c89221b3399daa6f2f1ec8f4ef9924b918be504526bd634ec48"
+    },
+    "cuda-stepping": {
+      "report": {
+        "device": "cuda:0",
+        "name": "NVIDIA GeForce RTX 5060",
+        "warp": "1.11.1",
+        "runs": [
+          {
+            "method": "rk23",
+            "boxes": 1,
+            "seconds_excluding_upload_download_compile": 0.0002954690717160702,
+            "maximum_endpoint_error": 3.8350425446420644e-08,
+            "accepted_range": [
+              104,
+              104
+            ],
+            "rejected_range": [
+              6,
+              6
+            ],
+            "device_array_bytes": 28
+          },
+          {
+            "method": "ros2",
+            "boxes": 1,
+            "seconds_excluding_upload_download_compile": 0.02246037602890283,
+            "maximum_endpoint_error": 2.4618140637144847e-08,
+            "accepted_range": [
+              7450,
+              7450
+            ],
+            "rejected_range": [
+              14,
+              14
+            ],
+            "device_array_bytes": 28
+          },
+          {
+            "method": "rk23",
+            "boxes": 4096,
+            "seconds_excluding_upload_download_compile": 0.010583046008832753,
+            "maximum_endpoint_error": 4.2849190529103964e-08,
+            "accepted_range": [
+              104,
+              1028
+            ],
+            "rejected_range": [
+              6,
+              402
+            ],
+            "device_array_bytes": 114688
+          },
+          {
+            "method": "ros2",
+            "boxes": 4096,
+            "seconds_excluding_upload_download_compile": 0.3160471289884299,
+            "maximum_endpoint_error": 2.7111852707317752e-08,
+            "accepted_range": [
+              7450,
+              34456
+            ],
+            "rejected_range": [
+              14,
+              24
+            ],
+            "device_array_bytes": 114688
+          }
+        ]
+      },
+      "source": "scripts/assess_cuda_stepping.py",
+      "sha256": "5c0027f51ec678c64ed2241b2021cd6f1a4880c88e3d87195f8eac3f59251256"
+    }
+  }
+}
