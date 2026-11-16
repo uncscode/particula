@@ -204,7 +204,9 @@ def test_workflow_builds_every_main_merge_without_path_filters():
     triggers = workflow.get("on", workflow.get(True))
     for event in ("push", "pull_request", "merge_group"):
         trigger = triggers[event]
-        assert trigger["branches"] == ["main"]
+        assert trigger["branches"] == (
+            ["main", "codex/stage-*"] if event == "pull_request" else ["main"]
+        )
         assert "paths" not in trigger
         assert "paths-ignore" not in trigger
 

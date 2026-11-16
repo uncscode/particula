@@ -1,9 +1,10 @@
 # Stage 2B delivery and evidence
 
 Status: core workflow implemented, locally validated and reviewed; delivered
-in draft [PR #1660](https://github.com/uncscode/particula/pull/1660). The added
+in [PR #1660](https://github.com/uncscode/particula/pull/1660). The added
 [cloud/droplet examples](stage-02-cloud-droplet-examples.md) are locally complete;
-publication of the later commits remains pending direct authorization.
+the later commits are published, with current hosted checks and review
+readiness tracked in that PR.
 Worktree: `/tmp/particula-stage-02b`.
 Branch: `codex/stage-02b-simulation-workflow`.
 Verified upstream main: `356fc054cd9a4f4ececc3c64c7144e889a789494`.
@@ -16,7 +17,8 @@ workflow diff is independently reviewable. Merge is outside execution scope.
 The initial core delivery covered all six work packages and acceptance criteria
 in [Stage 2B](stage-02b-simulation-workflow.md) for its declared profiles.
 The expanded cloud/droplet implementation and full scientific runs are locally
-complete. Publication and PR readiness remain the delivery gates below.
+complete and published. The linked PR records the hosted checks and readiness
+transition, which requires those checks to pass.
 Shared physics is Stage 1 monodisperse closed-box growth, with dilution for
 coupled checks. Concrete imports preserve existing public runnable APIs.
 
@@ -125,9 +127,9 @@ outputs rather than library execution.
 - [x] Full respiratory time-refinement report, including per-species and
       per-particle differences separately from inventory conservation.
 - [x] Final source/output consistency review and documentation verification.
-- [ ] Publish the remaining local commits to the existing draft PR after direct
-      push authorization.
-- [ ] Mark the existing PR ready only after the preceding gates pass.
+- [x] Publish the remaining commits to the existing PR after direct authorization.
+- Review readiness is tracked in [PR #1660](https://github.com/uncscode/particula/pull/1660);
+  transition from draft requires the preceding gates and hosted checks to pass.
 
 The [follow-through plan](stage-02-cloud-droplet-examples.md) identifies the
 completed workloads and acceptance criteria. A completed package test suite
@@ -157,7 +159,8 @@ and step-size selection. The supported solver material profiles have been checke
 
 The current resident qualification below supersedes the earlier package gate
 for these changes.
-GitHub publication remains pending the outstanding direct push authorization.
+The user authorized publication on 2026-11-16; both existing PR branches are
+published. Current hosted checks and readiness are recorded in GitHub.
 
 Local resident implementation evidence: multi-material rates and trajectories
 cover 3 and 12 exchanging materials, inert and reversed gas mappings, mixed
@@ -212,8 +215,14 @@ admission correction. Their retained full-run revisions and hashes remain
 The original scientific results and publication qualification above remain
 separate from this post-review package validation.
 
-Local plan headers and the pending PR description now reflect completed full
-runs and resident process handoffs. Both PRs still require authorized publication
-of the later commits; the Stage 2A remote review thread is not yet resolved, and
-Stage 2B remains a draft. Hosted checks on older heads do not qualify these local
-commits. No merge or release is claimed.
+Plan headers and the published PR descriptions reflect completed full runs and
+resident process handoffs. Both branches are published; the Stage 2A remote
+review thread is resolved with its regression evidence. Hosted checks on older
+heads do not qualify later commits. No merge or release is claimed.
+
+Publication exposed a CI trigger gap: workflows accepted PRs targeting `main`
+only, so the dependent 2B PR had no hosted checks. The six existing validation
+workflows now also accept PRs targeting `codex/stage-*`; push, release and
+deployment triggers are unchanged. The workflow/plugin/feedstock contract suite
+passed **93 tests**, and Ruff/format passed for the adjusted existing test.
+Hosted validation and review readiness are verified against each published head.

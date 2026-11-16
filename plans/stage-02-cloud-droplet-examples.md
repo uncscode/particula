@@ -1,9 +1,8 @@
 # Cloud and droplet integration follow-through
 
-Status: implementation, full runs, refinement and output review complete locally.
+Status: implementation, full runs, refinement and output review complete and published.
 Added to the active Stage 2A/2B objective by the user after core implementation
-and validation. Later commits await direct publication authorization for the
-existing Stage 2B branch and dependent draft
+and validation. Results are published on the existing Stage 2B branch and dependent
 [PR #1660](https://github.com/uncscode/particula/pull/1660).
 
 ## Requested outcome
@@ -166,8 +165,8 @@ passed. Plot-data serialization then failed, so an output-only correction at
 observations, figure inspection and CPU-only replot are retained. The bounded first-interval diagnostic passed its budget
 check, while later rapid evaporation required many small accepted steps.
 The scientific runs, retained results and local documentation verification
-are complete. GitHub publication/readiness remains pending direct push
-authorization.
+are complete and published. Current hosted checks and review readiness are
+tracked in PR #1660.
 
 The respiratory time-refinement requirement is a separate numerical gate.
 `scripts/assess_respiratory_refinement.py` reuses the complete published setup

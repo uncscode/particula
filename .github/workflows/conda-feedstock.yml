@@ -2,7 +2,7 @@ name: conda-feedstock
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, "codex/stage-*"]
     paths:
       - particula/__init__.py
       - particula/conftest.py
