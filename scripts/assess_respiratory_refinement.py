@@ -21,7 +21,9 @@ from time import monotonic
 
 import matplotlib
 import numpy as np
-from particula.execution.condensation_ode import CondensationODE
+from particula.execution.gpu_resident_condensation import (
+    GPUResidentCondensation,
+)
 from scripts.docs_examples import GIT, package_source_hash, package_versions
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -43,7 +45,7 @@ def load_setup(source, filename):
         )
         and isinstance(node.value, ast.Call)
         and isinstance(node.value.func, ast.Name)
-        and node.value.func.id == "CondensationODE"
+        and node.value.func.id == "GPUResidentCondensation"
     ]
     if len(constructors) != 1:
         raise ValueError("expected one explicit published condensation solver")
@@ -159,9 +161,7 @@ def advance(owner, bound, label):
     while owner.time < bound:
         owner.step(bound)
         if monotonic() - reported >= 30:
-            print(
-                label, owner.time, asdict(owner.solver.statistics), flush=True
-            )
+            print(label, owner.time, asdict(owner.statistics), flush=True)
             reported = monotonic()
 
 
@@ -185,11 +185,13 @@ def assess(output):
     for name in ("rtol", "particle_atol", "gas_atol"):
         fine_controls[name] /= 100
     fine_controls["max_step"] /= 2
-    fine = CondensationODE(
+    fine = GPUResidentCondensation(
         initial, namespace["condensation_strategy"], **fine_controls
     )
     report = {
-        "schema_version": 1,
+        "schema_version": 2,
+        "execution": "CUDA conditional graphs; device adaptive decisions",
+        "device": coarse.device.name,
         "status": "running",
         "interpretation": (
             "same-method numerical consistency, not independent validation"
@@ -229,8 +231,8 @@ def assess(output):
         row = compare(initial, coarse.snapshot(), fine.snapshot())
         report["observations"].append({"time_s": bound, **row})
         report["work"] = {
-            "coarse": asdict(coarse.solver.statistics),
-            "fine": asdict(fine.solver.statistics),
+            "coarse": asdict(coarse.statistics),
+            "fine": asdict(fine.statistics),
         }
         report["elapsed_seconds"] = monotonic() - started
         write_json(progress, report)

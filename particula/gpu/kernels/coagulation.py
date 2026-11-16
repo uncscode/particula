@@ -145,9 +145,9 @@ MAX_SCHEDULED_TRIALS_PER_BOX = 65_536
 # pair in one thread. This limit caps that O(A²) pre-launch work at 32,640
 # pairs per box and applies to every charged-containing execution mode.
 MAX_CHARGED_ACTIVE_PARTICLES_PER_BOX = 256
-# Exact SP2016 selection also visits every compact active pair in one thread.
-# Keep its work bounded independently of the charged-mode public contract.
-MAX_SEDIMENTATION_ACTIVE_PARTICLES_PER_BOX = 256
+# Parallel SP2016 pair maxima retain exact rates with bounded scratch.
+# Bound quadratic work independently of the charged-mode public contract.
+MAX_SEDIMENTATION_ACTIVE_PARTICLES_PER_BOX = 16_384
 
 
 @no_type_check
@@ -1895,6 +1895,8 @@ def _validate_sedimentation_particle_physics(
     n_boxes: int,
     n_particles: int,
     device: Any,
+    *,
+    parallel: bool = False,
 ) -> None:
     """Reject invalid or excessive SP2016 inputs through read-only scans.
 
@@ -1928,7 +1930,11 @@ def _validate_sedimentation_particle_physics(
             particles.concentration,
             particles.density,
             particles.charge,
-            wp.int32(MAX_SEDIMENTATION_ACTIVE_PARTICLES_PER_BOX),
+            wp.int32(
+                MAX_SEDIMENTATION_ACTIVE_PARTICLES_PER_BOX
+                if parallel
+                else min(256, MAX_SEDIMENTATION_ACTIVE_PARTICLES_PER_BOX)
+            ),
             invalid,
         ],
         device=device,
@@ -2038,7 +2044,11 @@ def _preflight_enabled_coagulation_terms(
         )
     if sedimentation_enabled:
         _validate_sedimentation_particle_physics(
-            particles, n_boxes, n_particles, device
+            particles,
+            n_boxes,
+            n_particles,
+            device,
+            parallel=mask in (4, 5),
         )
     if (
         validate_charge_finite
@@ -2665,10 +2675,11 @@ def _prepare_coagulation_step_gpu(  # noqa: C901
         Exact SP2016 sedimentation read-only-validates finite charge,
         finite/nonnegative masses and concentrations, finite/positive density,
         compatible positive concentrations, and its bounded active count before
-        time-step, environment, output, or RNG work. Its exact compact-active
-        O(A²) majorant is capped at 32,640 pairs per box. Zero masses and
-        concentrations remain valid inactive-slot state; this mode does not
-        impose charged-only constraints.
+        time-step, environment, output, or RNG work. Masks 4 and 5 evaluate
+        their exact O(A²) pair maximum in parallel, using bounded scratch and
+        at most 16,384 active slots per box. Other sedimentation mixtures
+        retain the serial 256-slot bound. Zero masses and concentrations are
+        valid inactive-slot state.
 
         A successful call allocates private, call-local selector scratch,
         including a ``wp.float64`` ``(n_boxes, n_particles)`` total-mass array.
@@ -2869,6 +2880,7 @@ def _prepare_coagulation_step_gpu(  # noqa: C901
     )
     if (
         brownian_enabled
+        or sedimentation_enabled
         or resolved_mechanism_config.mask == CHARGED_HARD_SPHERE_MECHANISM_FLAG
     ):
         diffusivities = wp.zeros(
@@ -2957,6 +2969,8 @@ def _prepare_coagulation_step_gpu(  # noqa: C901
     if resolved_mechanism_config.mask in (
         BROWNIAN_MECHANISM_FLAG,
         CHARGED_HARD_SPHERE_MECHANISM_FLAG,
+        SEDIMENTATION_SP2016_MECHANISM_FLAG,
+        BROWNIAN_MECHANISM_FLAG | SEDIMENTATION_SP2016_MECHANISM_FLAG,
     ):
         from particula.gpu.kernels._brownian_parallel import (
             prepare_brownian_work,

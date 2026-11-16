@@ -196,11 +196,14 @@ def _plan_dilution(process: Any, _aerosol: Aerosol) -> _ProcessPlan:
     return _ProcessPlan("dilution", (("coefficient", float(coefficient)),))
 
 
-def _plan_coagulation(process: Any, aerosol: Aerosol) -> _ProcessPlan:
-    """Admit direct Brownian physics and equal active represented counts."""
+def _plan_coagulation(process: Any, aerosol: Aerosol) -> _ProcessPlan:  # noqa: C901
+    """Freeze supported collision laws and equal represented counts."""
     from particula.dynamics import (
         BrownianCoagulationStrategy,
         ChargedCoagulationStrategy,
+        CombineCoagulationStrategy,
+        SedimentationCoagulationStrategy,
+        TurbulentShearCoagulationStrategy,
     )
     from particula.dynamics.coagulation import charged_kernel_strategy as models
 
@@ -211,36 +214,65 @@ def _plan_coagulation(process: Any, aerosol: Aerosol) -> _ProcessPlan:
         models.CoulombGopalakrishnan2012KernelStrategy: "gopalakrishnan2012",
         models.CoulumbChahl2019KernelStrategy: "chahl2019",
     }
-
     strategy = process.coagulation_strategy
-    charged_model = None
-    if type(strategy) is ChargedCoagulationStrategy:
-        charged_model = supported.get(type(strategy.kernel_strategy))
-        if charged_model is None:
-            raise ValueError("charged kernel has no prepared GPU translation")
-    elif type(strategy) is not BrownianCoagulationStrategy:
-        raise ValueError(
-            "prepared coagulation requires Brownian or charged strategy"
-        )
-    if aerosol.particles.distribution_type != "particle_resolved":
-        raise ValueError("prepared coagulation requires particle_resolved")
-    if (
-        strategy.particle_resolved_radius is not None
-        or strategy.particle_resolved_bins_number is not None
-        or strategy.particle_resolved_bins_per_decade != 10
+    components = (
+        tuple(strategy.strategies)
+        if type(strategy) is CombineCoagulationStrategy
+        else (strategy,)
+    )
+    if len(components) > 1 and (
+        len(components) != 2
+        or {type(child) for child in components}
+        != {BrownianCoagulationStrategy, SedimentationCoagulationStrategy}
     ):
         raise ValueError(
-            "CPU kernel interpolation controls have no GPU equivalent"
+            "prepared combination supports Brownian plus sedimentation"
         )
+    values: dict[str, Any] = {}
+    mechanisms = []
+    for child in components:
+        if type(child) is BrownianCoagulationStrategy:
+            mechanisms.append("brownian")
+        elif type(child) is ChargedCoagulationStrategy:
+            model = supported.get(type(child.kernel_strategy))
+            if model is None:
+                raise ValueError(
+                    "charged kernel has no prepared GPU translation"
+                )
+            values["charged_model"] = model
+            mechanisms.append("charged_hard_sphere")
+        elif type(child) is SedimentationCoagulationStrategy:
+            mechanisms.append("sedimentation_sp2016")
+            values["mean_sedimentation_density"] = True
+        elif type(child) is TurbulentShearCoagulationStrategy:
+            mechanisms.append("turbulent_shear_st1956")
+            values["turbulent_dissipation"] = float(child.turbulent_dissipation)
+            values["fluid_density"] = float(child.fluid_density)
+        else:
+            raise ValueError(
+                "coagulation strategy has no prepared GPU translation"
+            )
+    if aerosol.particles.distribution_type != "particle_resolved":
+        raise ValueError("prepared coagulation requires particle_resolved")
+    for child in (strategy, *components):
+        if (
+            child.particle_resolved_radius is not None
+            or child.particle_resolved_bins_number is not None
+            or child.particle_resolved_bins_per_decade != 10
+        ):
+            raise ValueError(
+                "CPU kernel interpolation controls have no GPU equivalent"
+            )
     for row in aerosol.particles.concentration:
         active = row[row > 0]
         if active.size and not np.all(active == active[0]):
             raise ValueError(
                 "Brownian GPU coagulation requires equal active counts"
             )
-    if charged_model is None:
-        return _ProcessPlan("coagulation")
-    return _ProcessPlan("coagulation", (("charged_model", charged_model),))
+    # Preserve the existing Brownian/charged checkpoint signatures.
+    if mechanisms not in (["brownian"], ["charged_hard_sphere"]):
+        values["mechanisms"] = tuple(sorted(mechanisms))
+    return _ProcessPlan("coagulation", tuple(values.items()))
 
 
 def _plan_wall_loss(process: Any, aerosol: Aerosol) -> _ProcessPlan:
@@ -393,12 +425,11 @@ def _compile_coagulation(plan, context: BuiltinPreparationContext):
     )
 
     model = plan.values.get("charged_model")
-    mechanism = (
-        CoagulationMechanismConfig(
-            mechanisms=("charged_hard_sphere",), charged_model=model
-        )
-        if model is not None
-        else CoagulationMechanismConfig()
+    mechanisms = plan.values.get("mechanisms")
+    if model is not None:
+        mechanisms = ("charged_hard_sphere",)
+    mechanism = CoagulationMechanismConfig(
+        mechanisms=mechanisms, charged_model=model or "hard_sphere"
     )
     resources = registry.acquire_coagulation(session.dimensions.n_particles)
     prepared = _prepare_coagulation_step_gpu(
@@ -412,7 +443,22 @@ def _compile_coagulation(plan, context: BuiltinPreparationContext):
         initialize_rng=False,
         environment=context.environment,
         mechanism_config=mechanism,
+        turbulent_dissipation=plan.values.get("turbulent_dissipation"),
+        fluid_density=plan.values.get("fluid_density"),
     )
+    if plan.values.get("mean_sedimentation_density"):
+        work = prepared.brownian_parallel
+        prepared = replace(
+            prepared,
+            brownian_parallel=replace(
+                work,
+                mean_density=context.wp.empty(
+                    session.dimensions.n_boxes,
+                    dtype=context.wp.float64,
+                    device=context.device.native,
+                ),
+            ),
+        )
     from particula.execution.prepared_guards import equal_active_counts
 
     prepared = replace(prepared, failure=context.failure)

@@ -15,7 +15,7 @@ for you. Choose tolerances using the
 | `CPUSimulation` | `run_until`; native CPU runnable cycles | Known native processes, CPU RNG, auxiliary fields and diagnostics |
 | `CondensationODE` | `run_until`; CPU RK23, ROS2 or ROS3 accepted steps | Scaled state, controller and supported forcing table |
 | `GPUCondensationODE` | `run_until`; Warp CPU or CUDA RK23/ROS3 | Same explicit device, scaled device state and controller |
-| `GPUCoupledSimulation` | Fixed complete event cycles, explicit snapshots | Canonical event/RNG state plus condensation configuration, controls and ordering |
+| `GPUCoupledSimulation` | Fixed complete event cycles, optional resident CUDA adaptation, explicit snapshots | Canonical event/RNG state plus condensation configuration, controls, execution profile and ordering |
 | `SplitSimulation` | `run_until`; complete sequential or Strang cycles | Nested built-in condensation/dilution flows and their controls |
 | `PreparedSimulation` | `run_prepared`; unchanged fixed step grid | Existing qualified prepared configuration and canonical resident checkpoint |
 
@@ -204,8 +204,10 @@ data alone does not allocate a device owner. Resuming uploads to the explicitly
 selected, exactly compatible saved device, including CUDA UUID identity.
 There is no cross-device continuation or hidden fallback.
 
-Adaptive GPU checkpoint records use schema 3. This includes ROS3 and exact
-restoration of unchanged physical coordinates during unscaling. Earlier
+Adaptive GPU checkpoint records use schema 4. This includes material-coupled
+ROS3, the expanded thermodynamic profile, and exact restoration of unchanged
+physical coordinates during unscaling. Coupled records use schema 2, which
+retains the selected resident or transferred execution policy. Earlier
 adaptive GPU records are rejected rather than resumed with different numerical
 semantics. This version is distinct from the prepared resident checkpoint and
 the outer archive format. Retain the earlier checkout to continue an older run.

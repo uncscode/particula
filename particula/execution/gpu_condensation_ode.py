@@ -13,18 +13,20 @@ import numpy as np
 import warp as wp
 
 from particula import _cpu_batch
-from particula.dynamics import CondensationIsothermal, MassCondensation
+from particula.dynamics import CondensationIsothermal
 from particula.execution import _condensation_ode_kernels as algebra
+from particula.execution._adaptive_condensation_physics import material_rates
+from particula.execution._adaptive_condensation_plan import (
+    plan_adaptive_condensation,
+)
 from particula.execution.forcing import forcing_interval
 from particula.execution.ode import (
     AdaptiveSolver,
     StepStatistics,
     TrialDomainError,
 )
-from particula.execution.prepared_condensation import plan_condensation
 from particula.gpu.kernels import condensation as physics
 from particula.gpu.kernels.thermodynamics import _refresh_vapor_pressure_kernel
-from particula.util import constants
 
 
 class GPUCondensationODE:
@@ -33,12 +35,13 @@ class GPUCondensationODE:
     particle_atol is kg per particle; gas_atol is kg/m3. Scalar or full native
     shapes are accepted. rtol is a dimensionless scalar. All boxes share one
     accepted time and a maximum error, including small species. The physical
-    profile is the existing mapped constant/Buck GPU rate with one volatile
-    material; zero constant vapor pressure also represents involatile uptake.
+    profile supports mapped constant/Buck vapor pressures, ideal/kappa activity
+    for all materials and mass/molar/volume surface phases. Zero constant vapor
+    pressure also represents involatile uptake.
     Native discrete and resolved measures are supported; PDF and latent heat
     are rejected. Full active-slot evaporation remains a domain boundary.
-    ROS3 requires exactly one mapped exchanging material and computes its
-    conservative local/gas Jacobian from device rates in linear storage.
+    ROS3 retains cross-material Jacobian blocks and conservative gas coupling
+    in storage linear in particle count and quadratic in exchanging materials.
 
     Optional forcing is a pure time -> (temperature[K], pressure[Pa]) callback.
     Every stage explicitly uploads those box values. EnvironmentForcing tables
@@ -79,23 +82,15 @@ class GPUCondensationODE:
             raise ValueError(
                 "GPU adaptive condensation requires discrete or resolved state"
             )
-        if not np.any(aerosol.particles.concentration > 0):
-            raise ValueError(
-                "GPU adaptive condensation requires an active population"
-            )
         self._base = _cpu_batch.detached(aerosol)
         self._strategy = deepcopy(strategy)
         self._forcing = forcing
-        self._plan = plan_condensation(
-            MassCondensation(self._strategy), self._base, allow_zero_vapor=True
-        )
+        self._plan = plan_adaptive_condensation(self._strategy, self._base)
         pairs = tuple(
             (source, target)
             for source, target in self._plan.values["pairs"]
             if self._base.gas.partitioning[source]
         )
-        if method == "ros3" and len(pairs) != 1:
-            raise ValueError("GPU ros3 requires one exchanging material")
         self._time = AdaptiveSolver._scalar(time, "time", positive=False)
         self.min_step = AdaptiveSolver._scalar(min_step, "min_step")
         self.max_step = AdaptiveSolver._scalar(max_step, "max_step")
@@ -169,7 +164,14 @@ class GPUCondensationODE:
         if method == "ros3":
             from particula.execution._gpu_condensation_ros3 import ROS3Stages
 
-            self._ros3 = ROS3Stages(self, pairs[0])
+            if len(pairs) == 1:
+                self._ros3 = ROS3Stages(self, pairs[0])
+            else:
+                from particula.execution._gpu_condensation_block_ros3 import (
+                    BlockROS3Stages,
+                )
+
+                self._ros3 = BlockROS3Stages(self, pairs)
         self.statistics = StepStatistics()
         self.control_readbacks = 0
 
@@ -210,6 +212,10 @@ class GPUCondensationODE:
         self._effective_tension = self._array(np.zeros(self._shape[:2]))
         self._mass_rate = self._array(np.zeros(self._shape))
         self._tension = self._array(config["tensions"])
+        self._surface_density = self._array(config["surface_density"])
+        self._surface_reference = self._array(config["surface_reference"])
+        self._phases = self._array(config["phases"], wp.int32)
+        self._activity_density = self._array(config["activity_density"])
         self._kappas = self._array(config["kappas"])
         self._references = self._array(config["references"])
         self._accommodation = self._array(config["accommodation"])
@@ -293,17 +299,6 @@ class GPUCondensationODE:
             self._temperature.assign(np.array(temperature, copy=True))
             self._pressure.assign(np.array(pressure, copy=True))
         config = self._plan.values
-        if config["surface_mode"]:
-            self._launch(
-                physics._effective_surface_tension_kernel,
-                self._shape[:2],
-                [
-                    self._masses,
-                    self._density,
-                    self._tension,
-                    self._effective_tension,
-                ],
-            )
         self._launch(
             _refresh_vapor_pressure_kernel,
             self._gas_shape,
@@ -326,8 +321,8 @@ class GPUCondensationODE:
         )
         self.statistics.rate_calls += 1
         self._launch(
-            physics._mapped_condensation_mass_transfer_kernel,
-            self._shape[:2],
+            material_rates,
+            self._shape,
             [
                 self._masses,
                 self._counts,
@@ -336,26 +331,20 @@ class GPUCondensationODE:
                 self._vapor,
                 self._molar,
                 self._tension,
-                self._kappas,
+                self._surface_density,
+                self._surface_reference,
+                self._phases,
                 self._references,
-                self._effective_tension,
-                wp.int32(1),
+                self._activity_density,
+                self._kappas,
                 wp.int32(config["activity_mode"]),
-                wp.int32(config["surface_mode"]),
                 wp.int32(config["water"]),
                 self._accommodation,
                 self._diffusion,
-                self._latent,
-                wp.int32(0),
-                self._viscosity,
                 self._mean_free_path,
-                wp.float64(constants.GAS_CONSTANT),
-                wp.float64(constants.BOLTZMANN_CONSTANT),
                 self._temperature,
-                wp.float64(1.0),
-                self._mass_rate,
                 self._forward,
-                wp.float64(config.get("kelvin_density", 0.0)),
+                self._mass_rate,
             ],
         )
         self._launch(

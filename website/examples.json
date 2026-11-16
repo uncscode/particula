@@ -413,8 +413,8 @@
     "title": "How do collision models change a water-grown mixed aerosol?",
     "source": "docs/examples/simulations/biomass_burning_cloud_interactions.py",
     "policy": "long",
-    "device": "cpu",
-    "timeout": 7200,
+    "device": "cuda",
+    "timeout": 14400,
     "inputs": []
   },
   "examples-simulations-cloud-chamber-multi-cycle": {
@@ -437,7 +437,7 @@
     "title": "Audit a respiratory-droplet illustration before using its predictions",
     "source": "docs/examples/simulations/cough_droplets_partitioning.py",
     "policy": "long",
-    "device": "cpu",
+    "device": "cuda",
     "timeout": 7200,
     "inputs": []
   },

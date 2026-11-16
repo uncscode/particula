@@ -40,8 +40,13 @@ import particula as par
 from particula.dynamics.condensation.species_mapping import (
     CondensationSpeciesMap,
 )
-from particula.execution.condensation_ode import CondensationODE
-from particula.execution.splitting import condensation_flow
+from particula.execution.gpu_coupled import (
+    GPUCondensationControls,
+    GPUCoupledSimulation,
+)
+from particula.execution.gpu_resident_condensation import (
+    GPUResidentCondensation,
+)
 from tqdm import tqdm
 
 # plot settings
@@ -247,10 +252,11 @@ time = np.arange(time_step + 1)  # include the full 600 s endpoint
 bins_lognormal = np.logspace(-8, -2, 200)  # radius bins from 10⁻⁸ to 10⁻² m
 distribution_counts = np.zeros((len(time), len(bins_lognormal) - 1))
 
-# Adaptive preparation retains its accepted controller between observations.
-preparation = CondensationODE(
+# CUDA preparation retains its device-owned controller between observations.
+preparation = GPUResidentCondensation(
     aerosol_activated,
     condensation_strategy,
+    device="cuda:0",
     method="ros3",
     rtol=1e-5,
     particle_atol=1e-25,
@@ -313,13 +319,20 @@ plt.show()
 # Each branch starts from a copy of the same shared state and advances a further
 # 3600 s in 10,000 substeps (0.36 s each). The branches are condensation alone,
 # Brownian plus condensation, combined Brownian/sedimentation plus condensation,
-# and a turbulent-DNS-kernel model plus condensation.
+# and Saffman–Turner (1956) turbulent shear plus condensation.
 #
-# The DNS branch does not add the separate Brownian or sedimentation strategies.
-# It uses Reynolds lambda 72 and dissipation 1000 cm²/s³ (0.1 m²/s³), with zero
-# imposed relative velocity. This selects a collision parameterization; it does
-# not run a direct numerical flow simulation. Sedimentation here causes
-# collisions through differential settling, not removal from the box.
+# The shear branch replaces the earlier AO2008/DNS parameterization with the
+# supported ST1956 kernel. It retains dissipation 1000 cm²/s³ (0.1 m²/s³) and
+# fluid density 1.225 kg/m³; Reynolds lambda and relative velocity are not
+# ST1956 inputs. It does not add separate Brownian or settling terms.
+# Sedimentation causes collisions through differential settling, not removal.
+# Its native mean-material-density convention is retained on the GPU.
+#
+# All four branches keep particle/gas state, physics and adaptive decisions on
+# CUDA. The host schedules 0.36 s boundaries; only requested observations are
+# downloaded. Direct collision pair evaluation replaces CPU bin interpolation.
+# A persistent seeded GPU collision stream makes repeated GPU runs reproducible;
+# it does not promise the same individual collisions as the former CPU sampler.
 #
 # The assertions test finite nonnegative masses and closed material inventories
 # for each branch. Differences between one stochastic realization of each branch
@@ -343,11 +356,9 @@ combined_brown_sed = (
     .build()
 )
 
-turbulent_dns = (
-    par.dynamics.TurbulentDNSCoagulationBuilder()
+turbulent_shear = (
+    par.dynamics.TurbulentShearCoagulationBuilder()
     .set_distribution_type("particle_resolved")
-    .set_relative_velocity(0, "m/s")
-    .set_reynolds_lambda(72, "dimensionless")
     .set_turbulent_dissipation(1000, "cm^2/s^3")
     .set_fluid_density(1.225, "kg/m^3")
     .build()
@@ -356,9 +367,7 @@ turbulent_dns = (
 # Collision draws occur once per existing 0.36 s outer interval. Adaptive
 # condensation trials never execute or repeat a stochastic collision operation.
 outer_dt = 3600.0 / 10_000
-growth = condensation_flow(
-    "water_exchange",
-    condensation_strategy,
+controls = GPUCondensationControls(
     method="ros3",
     rtol=1e-5,
     particle_atol=1e-25,
@@ -371,14 +380,44 @@ for name, collision in [
     ("CondensationOnly", None),
     ("Brownian", par.dynamics.Coagulation(brownian)),
     ("Brownian+Sed", par.dynamics.Coagulation(combined_brown_sed)),
-    ("TurbulentDNS", par.dynamics.Coagulation(turbulent_dns)),
+    ("TurbulentShear", par.dynamics.Coagulation(turbulent_shear)),
 ]:
     print("Started simulation:", name)
-    obj = copy.deepcopy(aerosol_activated)
-    for step in tqdm(range(10_000), desc=name):
-        if collision is not None:
-            obj = collision.execute(obj, time_step=outer_dt)
-        obj = growth.advance(obj, 600.01 + step * outer_dt, outer_dt)
+    if collision is None:
+        growth = GPUResidentCondensation(
+            aerosol_activated,
+            condensation_strategy,
+            device="cuda:0",
+            time=600.01,
+            method="ros3",
+            rtol=controls.rtol,
+            particle_atol=controls.particle_atol,
+            gas_atol=controls.gas_atol,
+            first_step=outer_dt,
+            max_step=outer_dt,
+        )
+        for step in tqdm(range(10_000), desc=name):
+            growth.restart_controller(outer_dt)
+            growth.advance(600.01 + (step + 1) * outer_dt)
+        obj = growth.snapshot()
+    else:
+        with GPUCoupledSimulation(
+            aerosol_activated,
+            (collision,),
+            condensation_strategy,
+            device="cuda:0",
+            resident=True,
+            time=600.01,
+            time_step=outer_dt,
+            controls=controls,
+            root_seed=100,
+        ) as coupled:
+            coupled.capture_events()
+            for _step in tqdm(range(10_000), desc=name):
+                coupled.step()
+            obj = coupled.snapshot()
+            assert coupled.coupling_uploads == coupled.coupling_downloads == 0
+            print("CUDA adaptive work:", coupled.statistics)
     np.testing.assert_allclose(
         species_inventory(obj), initial_inventory, rtol=1e-12, atol=1e-30
     )
@@ -452,7 +491,7 @@ for label, aero_obj in cases:
 #
 # The plot label “Brownian Only” identifies its **collision kernel only**;
 # condensation also runs in that branch. Likewise, “with Sedimentation” combines
-# Brownian and sedimentation kernels, while “with turbulentDNS” uses the DNS
+# Brownian and sedimentation kernels, while “with turbulent shear” uses the ST1956
 # kernel without the separate Brownian strategy.
 
 # %%
@@ -475,7 +514,7 @@ dnd_brown = np.where(dnd_brown == 0, np.nan, dnd_brown)
 centers_sed, dnd_sed = distributions["Brownian+Sed"]
 dnd_sed = np.where(dnd_sed == 0, np.nan, dnd_sed)
 
-centers_turb, dnd_turb = distributions["TurbulentDNS"]
+centers_turb, dnd_turb = distributions["TurbulentShear"]
 dnd_turb = np.where(dnd_turb == 0, np.nan, dnd_turb)
 
 # 3. Plot each line explicitly
@@ -533,7 +572,7 @@ ax.plot(
     linewidth=3,
     alpha=0.75,
     color=TAILWIND["amber"]["900"],
-    label="with turbulentDNS",
+    label="with turbulent shear (ST1956)",
 )
 
 # 5. Configure axes, grid, legend, and limits
@@ -568,45 +607,45 @@ plt.show()
 # %% [markdown]
 # ## Relate wet size to dry composition
 #
-# The scatter plot compares the original wet seeds with the final DNS-branch
+# The scatter plot compares the original wet seeds with the final shear-branch
 # particles. Its horizontal coordinate is wet diameter, while its vertical
 # coordinate is the **dry** organic fraction: organic mass divided by organic
 # plus soot mass. Water is excluded from that denominator only in copied arrays;
 # the simulation state remains unchanged.
 #
 # The comparison includes both the shared condensation preparation and the later
-# DNS-plus-condensation stage. It is not a before/after test of turbulence alone.
+# shear-plus-condensation stage. It is not a before/after test of turbulence alone.
 # A particle can shift horizontally by taking up water without changing its dry
 # organic fraction.
 
 # %%
 #  1. Retrieve and prepare mass arrays
-combined_dns_mass = results["TurbulentDNS"].particles.masses[0].copy()
+combined_shear_mass = results["TurbulentShear"].particles.masses[0].copy()
 initial_mass = aerosol.particles.masses[0].copy()
 
-mask = results["TurbulentDNS"].particles.radii[0] > 0
-combined_dns_mass[:, -1] = 0.0  # drop water
+mask = results["TurbulentShear"].particles.radii[0] > 0
+combined_shear_mass[:, -1] = 0.0  # drop water
 initial_mass[:, -1] = 0.0
 
-dns_mass_fraction = combined_dns_mass[mask, 0] / combined_dns_mass[mask].sum(
-    axis=1
-)
+shear_mass_fraction = combined_shear_mass[mask, 0] / combined_shear_mass[
+    mask
+].sum(axis=1)
 initial_mass_fraction = initial_mass[:, 0] / initial_mass.sum(axis=1)
 
 # 2. Compute wet diameters
-dns_dp = get_wet_diameters(results["TurbulentDNS"])
+shear_dp = get_wet_diameters(results["TurbulentShear"])
 initial_dp = get_wet_diameters(aerosol)
 
 # 3. Plot scatter
 fig, ax = plt.subplots(figsize=(5, 4))
 
 ax.scatter(
-    dns_dp,
-    dns_mass_fraction,
+    shear_dp,
+    shear_mass_fraction,
     s=1,
     alpha=0.3,
     color=TAILWIND["amber"]["800"],
-    label="After DNS",
+    label="After turbulent shear",
 )
 ax.scatter(
     initial_dp,

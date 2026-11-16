@@ -192,27 +192,6 @@ def test_unchanged_native_coordinates_remain_exact(device, method):
     )
 
 
-def test_ros3_multiple_exchange_rejects_before_device_access(monkeypatch):
-    """Do not silently ignore cross-material derivatives or fall back to CPU."""
-    from particula.execution.gpu_condensation_ode import GPUCondensationODE
-    from particula.execution.tests.condensation_sparse_test import mixture
-    from particula.gas.vapor_pressure_strategies import (
-        ConstantVaporPressureStrategy,
-    )
-    from particula.particles.surface_strategies import SurfaceStrategyVolume
-
-    initial, strategy = mixture()
-    strategy.surface_strategy = SurfaceStrategyVolume(density=1000.0)
-    strategy.vapor_pressure_strategy = ConstantVaporPressureStrategy(0.0)
-
-    def forbidden(*args, **kwargs):
-        raise AssertionError("unsupported exchange reached the device")
-
-    monkeypatch.setattr(wp, "get_device", forbidden)
-    with pytest.raises(ValueError, match="one exchanging material"):
-        GPUCondensationODE(initial, strategy, device="cuda:0", method="ros3")
-
-
 def test_old_gpu_numerical_schema_rejects_before_upload(monkeypatch):
     """Do not reinterpret old coordinates under changed unscaling semantics."""
     from dataclasses import replace

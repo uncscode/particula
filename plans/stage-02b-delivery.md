@@ -127,3 +127,28 @@ outputs rather than library execution.
 The [follow-through plan](stage-02-cloud-droplet-examples.md) identifies the
 remaining workloads and acceptance criteria. A completed package test suite
 does not substitute for those scientific runs or establish experimental validity.
+
+## Requested fully resident reruns (2026-11-16)
+
+The prior biomass, respiratory-refinement and cyclic-chamber runs were stopped
+at the user's request. Their partial output is not completion evidence. The
+replacement request preserves full workloads while requiring CUDA
+residency and device-owned adaptive decisions, including acceptance/rejection
+and step-size selection. All solver material profiles are being checked.
+
+- [ ] Qualify multi-material GPU RK23/ROS3 rates, surface phases, mappings and
+      conservative block solves against independent CPU and dense references.
+- [ ] Qualify native conditional CUDA adaptation and resident event handoff,
+      including exact restart and persistent collision/source RNG.
+- [ ] Switch biomass AO2008/DNS to supported ST1956 turbulent shear, explicitly
+      authorized by the user. Retain dissipation and fluid density, label this
+      model change, and preserve all four branches and their full workloads.
+- [ ] Rerun 10,000-particle biomass preparation and four full-hour branches.
+- [ ] Rerun the 1,000-particle, twelve-material respiratory publication and full
+      20-second coarse/fine comparison, with per-species/particle targets.
+- [ ] Rerun the 32-box cyclic chamber for 600 seconds and exact 300-second
+      continuation, with all existing budgets, observations and forcing.
+- [ ] Refresh qualified outputs and provenance; run final package/docs gates.
+
+Changes under development do not inherit the earlier package validation claim.
+GitHub publication remains pending the outstanding direct push authorization.

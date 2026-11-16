@@ -16,10 +16,10 @@ state automatically. Start with [native process setup](index.md) and the
 
 | Operation | CPU | Warp CPU / CUDA | Important boundary |
 | --- | --- | --- | --- |
-| Continuous isothermal condensation | `CondensationODE`, RK23, ROS2 or ROS3 | `GPUCondensationODE`, RK23 or ROS3 | Adaptive mass rates, separate gas/particle tolerances |
+| Continuous isothermal condensation | `CondensationODE`, RK23, ROS2 or ROS3 | `GPUCondensationODE` or `GPUResidentCondensation`, RK23 or ROS3 | Multiple exchanging materials; separate gas/particle tolerances |
 | Existing finite-step condensation | Existing strategies | Existing direct/prepared fixed-four path | Inventory limits and fixed substeps; no embedded error estimate |
 | Exact dilution | Existing strategy and `dilution_flow` | Existing direct/prepared path | Keep the exact exponential update |
-| Grouped sequential or Strang composition | `SplitSimulation` | Fixed native events with adaptive condensation through `GPUCoupledSimulation` | GPU composition is sequential with explicit host transfers; no resident adaptive Strang owner |
+| Grouped sequential or Strang composition | `SplitSimulation` | Fixed native events with adaptive condensation through `GPUCoupledSimulation` | Sequential composition; `resident=True` keeps stage handoff and adaptation on CUDA; no adaptive Strang owner |
 | Equilibrium projections or stochastic events | Existing process-specific execution | Existing qualified prepared processes | Not accepted as adaptive ODE or Strang components |
 
 For the measured growth, equilibrium and depletion cases, RK23 is the initial
@@ -138,37 +138,42 @@ result = simulation.snapshot()  # explicit full accepted-state download
 ```
 
 The GPU profile accepts native discrete or resolved state, exact isothermal
-strategy type, coupled gas updates and the existing mapped constant/Buck vapor
-pressure and activity/surface profile. It permits one volatile material,
-including a zero constant saturation pressure for involatile uptake. It does
-not accept arbitrary CPU activity callbacks, latent heat, PDF or ROS2. An
-unavailable requested CUDA device fails; there is no CPU fallback.
+strategy type and coupled gas updates. All mapped exchanging materials are
+retained, with constant/Buck vapor pressures, ideal mass/molar/volume or kappa
+activity, and static or phased mass/molar/volume surface tension. Surface
+material densities are distinct from particle material densities. Temperature
+surface tables, arbitrary CPU callbacks, latent heat, PDF and GPU ROS2 remain
+unsupported. Requesting unavailable CUDA fails without a CPU fallback.
 
-Select `method="ros3"` for the qualified stiff profile with exactly one mapped
-exchanging material. Its local particle derivatives and one gas reservoir per
-box form an arrowhead Jacobian: particle coordinates couple only through their
-shared gas. Colored finite differences use the native device mass rates;
-conservative elimination solves each stage in linear storage without a dense
-matrix or CPU rate evaluation. Other mapped exchanges are rejected before
-device allocation. Unmapped dry material and inert gases remain unchanged.
-The method uses float64 coefficients, a second-order embedded estimate, and
-the same maximum error norm and rejection policy as CPU ROS3. This does not
-make an enclosing fixed stochastic schedule adaptive or CUDA-capturable.
+RK23 operates on every material and gas coordinate. ROS3 retains dense local
+cross-material Jacobian blocks and the shared gas coupling. Colored finite
+differences evaluate native device rates; a conservative block-arrowhead solve
+uses storage linear in particle count and quadratic in exchanging materials.
+It does not form a population-sized dense matrix. The single-exchange path
+retains its scalar elimination. Unmapped dry materials and inert gases remain
+unchanged. CPU RK23/ROS2/ROS3 also support multiple exchanging materials.
 
-Construction uploads state and configuration. Trial states, derivatives and
-accepted arrays remain on the requested device. A successful trial normally
-reads nine control scalars for RK23 or nineteen for autonomous ROS3:
-domain/linear-solve checks and the final error reduction.
-Rejected stages can read fewer. Optional forcing uploads temperature and
-pressure at each rate evaluation. ROS3 also differentiates forcing at fixed
-state inside the current smooth interval, adding one device rate evaluation
-and two scalar checks. The shared host controller synchronizes these reads;
-this is not a fully asynchronous or CUDA-capturable adaptive loop.
-`control_readbacks` exposes the count, `statistics` exposes numerical work, and
-`device_storage_bytes` counts retained arrays, not measured peak GPU memory.
-ROS3 reports every physical rate call used by its finite differences, one
-Jacobian assembly per trial and three linear solves. It performs no LU
-factorization; its factorization counter is therefore zero.
+`GPUCondensationODE` keeps arrays and rates on device but uses a host controller.
+A successful single-exchange trial normally reads nine control scalars for RK23
+or nineteen for autonomous ROS3. Multiple-exchange ROS3 performs additional
+finite-difference domain checks. Optional host forcing uploads temperature and
+pressure at each rate evaluation. `control_readbacks` and `statistics` expose
+this work; `device_storage_bytes` counts allocated arrays rather than measured
+peak memory. This owner is not CUDA-capturable.
+
+For device-owned adaptation, import `GPUResidentCondensation` from
+`particula.execution.gpu_resident_condensation`. It accepts the same numerical
+controls and either `method="rk23"` or `method="ros3"`. Native CUDA conditional
+graphs require Warp's CUDA Toolkit and the driver to support CUDA 12.4 or later.
+`advance(bound)` (also exposed as `step(bound)`) runs all internal trials to the
+specified boundary. The accepted clock, error decision, rejection count and
+next step stay on the GPU. Two small control records are downloaded after the
+graph finishes; `snapshot()` explicitly downloads accepted physical state.
+Capture during construction does not advance the simulation. There is no Warp
+CPU or host-controller fallback. Arbitrary host forcing callbacks are rejected;
+environment is constant inside each segment. Standalone resident adaptive
+checkpoint serialization is not exposed; coupled boundary restart below is
+supported.
 
 Calling `step()` or `snapshot()` during CUDA capture fails before launching
 adaptive work. Device/configuration failures fault the owner; it must not be
@@ -268,7 +273,7 @@ from particula.execution.gpu_coupled import (
 with GPUCoupledSimulation(
     aerosol, (source, coagulation), strategy,
     device="cuda:0", time_step=1.0, root_seed=42,
-    order="events-first",
+    order="events-first", resident=True,
     controls=GPUCondensationControls(method="ros3", rtol=1e-5),
 ) as simulation:
     simulation.capture_events()
@@ -284,22 +289,30 @@ The complete event interval remains fixed. A shorter requested bound rejects
 before any physical work, so forcing and output schedules must use that grid.
 Temperature and gas replacements are explicit calls between complete cycles.
 
-Each cycle retains the event owner's buffers and random streams. It downloads
-native state, uploads a detached adaptive problem, downloads accepted masses
-and gas, then copies those fields into the existing event buffers. Physical
-rates run on the requested device. `coupling_downloads` and `coupling_uploads`
-count these full transfer boundaries (normally two each per cycle), excluding
-user-requested observations and checkpoints. `statistics` and
-`control_readbacks` aggregate condensation work. Rejected trials never repeat
-an event or draw event random numbers. Adaptive buffers and the controller are
-rebuilt at each event boundary; this policy is part of exact continuation.
+Each cycle retains the event owner's buffers and random streams. With
+`resident=True`, a persistent `GPUResidentCondensation` owner imports event
+state using device-to-device copies, resets scaled coordinates and its
+controller on the GPU, integrates on CUDA and commits accepted masses/gas to
+the same event buffers. `coupling_downloads` and `coupling_uploads` remain zero.
+Host code schedules fixed events, forcing boundaries and observations, but
+makes no adaptive acceptance or step-size decisions. Rejected trials never
+repeat events or consume event random numbers. The deliberate controller reset
+at each event boundary is part of exact continuation.
 
-`capture_events()` captures only the fixed event sequence. Calling the whole
-cycle, observation or checkpoint inside an active CUDA capture rejects. The
-host-controlled composition makes no fully resident or acceleration claim.
+The default `resident=False` preserves the explicit-transfer path: two full
+downloads and two uploads per cycle, with a host adaptive controller. Both
+profiles aggregate `statistics` and `control_readbacks`, and provide explicit
+observations and checkpoints. The checkpoint records the selected profile and
+rejects old numerical schemas. `capture_events()` captures the fixed event
+sequence; the resident adaptive owner separately captures its conditional loop.
+The whole Python cycle, observations and checkpoint serialization remain outside
+CUDA capture.
+
 The [cyclic chamber](../../examples/gpu/prepared/gpu_prepared_cyclic_chamber.py)
-and [forcing study](../../examples/gpu/prepared/gpu_prepared_forcing.py)
-retain their full scientific schedules with this explicit transfer policy.
+selects resident execution. The older
+[forcing study](../../examples/gpu/prepared/gpu_prepared_forcing.py) retains its
+explicit-transfer policy. Their scientific schedules and stochastic errors are
+separate from condensation's local error control.
 
 Supported events are the existing prepared nucleation, coagulation, wall-loss
 and dilution families, at most one of each. Their normal species, population,

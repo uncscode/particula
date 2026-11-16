@@ -1,11 +1,9 @@
-"""Explicitly transferred GPU condensation with a fixed prepared event grid.
+"""Adaptive GPU condensation with a fixed prepared event grid.
 
-This concrete owner retains the prepared event buffers and RNG streams. Each
-cycle downloads event state, uploads a detached adaptive condensation problem,
-then downloads and copies its accepted masses/gas into the same event buffers.
-Physical rates run on the requested Warp device; there is no CPU fallback.
-Only the event sequence can be captured. This is a correctness/workflow path,
-not a fully resident composition or a GPU acceleration claim.
+The default explicitly transfers state between stages. With ``resident=True``,
+particle/gas state stays on CUDA and native conditional graphs own every
+adaptive decision. Both modes retain prepared event buffers and RNG streams;
+the host orchestrates fixed physical boundaries and requested observations.
 """
 
 from copy import deepcopy
@@ -19,17 +17,18 @@ from particula import _cpu_batch
 from particula.dynamics import (
     Coagulation,
     Dilution,
-    MassCondensation,
     Nucleation,
     WallLoss,
 )
 from particula.dynamics.condensation.condensation_strategies import (
     CondensationIsothermal,
 )
+from particula.execution._adaptive_condensation_plan import (
+    plan_adaptive_condensation,
+)
 from particula.execution.gpu_condensation_ode import GPUCondensationODE
 from particula.execution.ode import AdaptiveSolver, StepStatistics
 from particula.execution.prepared import prepare_simulation
-from particula.execution.prepared_condensation import plan_condensation
 from particula.execution.prepared_processes import _plan_process
 from particula.execution.prepared_updates import apply_forcing
 from particula.gas.vapor_pressure_strategies import WaterBuckStrategy
@@ -115,16 +114,7 @@ def _condensation_profile(aerosol, strategy, method):
         "particle_resolved",
     ):
         raise ValueError("GPU coupled rates require discrete or resolved state")
-    plan = plan_condensation(
-        MassCondensation(strategy), aerosol, allow_zero_vapor=True
-    )
-    pairs = tuple(
-        (source, target)
-        for source, target in plan.values["pairs"]
-        if aerosol.gas.partitioning[source]
-    )
-    if method == "ros3" and len(pairs) != 1:
-        raise ValueError("GPU ros3 requires one exchanging material")
+    plan = plan_adaptive_condensation(strategy, aerosol)
     return plan
 
 
@@ -148,6 +138,7 @@ class GPUCoupledSimulation:
         root_seed: Seed for persistent prepared event random streams.
         logical_box_ids: Optional stable identifiers for those streams.
         time: Initial physical time in seconds.
+        resident: Keep stage handoff and adaptive decisions on CUDA.
     """
 
     def __init__(
@@ -163,8 +154,18 @@ class GPUCoupledSimulation:
         root_seed=0,
         logical_box_ids=None,
         time=0.0,
+        resident=False,
     ):
         """Validate both components and allocate persistent event resources."""
+        if type(resident) is not bool:
+            raise TypeError("resident must be a bool")
+        if resident and (
+            not wp.get_device(device).is_cuda
+            or not wp.is_conditional_graph_supported()
+        ):
+            raise ValueError(
+                "resident control requires native CUDA conditional graphs"
+            )
         _validate_events(events, aerosol)
         self._configure(
             strategy,
@@ -188,6 +189,30 @@ class GPUCoupledSimulation:
             time=time,
         )
         self._initialize_counters()
+        try:
+            self._initialize_condensation(aerosol, resident)
+        except BaseException:
+            self._events.close()
+            raise
+
+    def _initialize_condensation(self, aerosol, resident):
+        """Allocate one resident adaptive owner when explicitly requested."""
+        if type(resident) is not bool:
+            raise TypeError("resident must be a bool")
+        self.resident = resident
+        self._resident_flow = None
+        if resident:
+            from particula.execution.gpu_resident_condensation import (
+                GPUResidentCondensation,
+            )
+
+            self._resident_flow = GPUResidentCondensation(
+                aerosol,
+                self._strategy,
+                device=self.device.native,
+                time=self.time,
+                **asdict(self.controls),
+            )
 
     def _configure(self, strategy, order, controls):
         if order not in ("events-first", "condensation-first"):
@@ -248,6 +273,15 @@ class GPUCoupledSimulation:
             return self._completed_steps
 
     def _condense(self, start, end):
+        if self.resident:
+            flow = self._resident_flow
+            flow._reset_from_session(
+                self._events._session, start, self.controls.first_step
+            )
+            flow.advance(end)
+            flow._export_to_session(self._events._session)
+            self._accumulate_condensation_work(flow)
+            return
         initial = self._events.snapshot()
         self.coupling_downloads += 1
         if not np.any(initial.particles.concentration > 0):
@@ -291,6 +325,10 @@ class GPUCoupledSimulation:
             ),
         )
         self.coupling_uploads += 1
+        self._accumulate_condensation_work(flow)
+
+    def _accumulate_condensation_work(self, flow):
+        """Record work without downloading physical state."""
         self.control_readbacks += flow.control_readbacks
         for name, value in vars(flow.statistics).items():
             setattr(

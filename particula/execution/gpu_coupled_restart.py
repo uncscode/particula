@@ -38,6 +38,7 @@ class GPUCoupledCheckpoint:
     order: str
     statistics: StepStatistics
     counters: tuple[int, int, int, int]
+    resident: bool
 
 
 def checkpoint_coupled(owner):
@@ -47,7 +48,7 @@ def checkpoint_coupled(owner):
     with owner._events._lock:
         owner._ready()
         return GPUCoupledCheckpoint(
-            1,
+            2,
             _runtime(),
             _device_identity(wp.get_device(owner.device.native)),
             owner._events.checkpoint(),
@@ -61,6 +62,7 @@ def checkpoint_coupled(owner):
                 owner.coupling_uploads,
                 owner.control_readbacks,
             ),
+            owner.resident,
         )
 
 
@@ -69,8 +71,9 @@ def _validate(saved):
     if (
         type(saved) is not GPUCoupledCheckpoint
         or type(saved.schema_version) is not int
-        or saved.schema_version != 1
+        or saved.schema_version != 2
         or saved.runtime != _runtime()
+        or type(saved.resident) is not bool
     ):
         raise ValueError("coupled GPU restart requires matching schema/runtime")
     _validate_prepared(saved.events)
@@ -150,6 +153,7 @@ def resume_coupled(saved, events, strategy, *, device):
     result._molar_mass = native.gas.molar_mass.copy()
     result._events = resume_simulation(events, saved.events, device=device)
     result._initialize_counters()
+    result._initialize_condensation(native, saved.resident)
     result.statistics = replace(saved.statistics)
     (
         result.coupling_cycles,

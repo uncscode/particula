@@ -257,7 +257,7 @@ def test_bad_restart_does_not_replace_last_archive_or_allocate(
     save_coupled_checkpoint(saved, path)
     before = path.read_bytes()
     with pytest.raises(ValueError, match="schema/runtime"):
-        save_coupled_checkpoint(replace(saved, schema_version=2), path)
+        save_coupled_checkpoint(replace(saved, schema_version=999), path)
     assert path.read_bytes() == before
     strategy.diffusion_coefficient *= 2
 

@@ -12,8 +12,9 @@
 # water/dry-material population and three gas species. Nucleation, Brownian
 # coagulation retain their fixed one-second event schedule. Water condensation
 # uses adaptive ROS3 between those boundaries. Event buffers and random streams
-# persist; each cycle explicitly transfers state to and from the condensation
-# owner. Only the event sequence is captured. Condensation error control does
+# persist; condensation handoff stays in device memory. Adaptive acceptance,
+# rejection and step-size decisions run in a native CUDA conditional graph.
+# The host schedules fixed events and observations. Condensation error control does
 # not bound splitting or stochastic error, so this remains an illustrative
 # chamber calculation rather than a timestep-converged prediction.
 #
@@ -191,7 +192,13 @@ def run_example():
     strategy = condensation.condensation_strategy
     expected = mapped_inventory(initial)
     with GPUCoupledSimulation(
-        initial, events, strategy, device="cuda:0", time_step=1.0, root_seed=42
+        initial,
+        events,
+        strategy,
+        device="cuda:0",
+        time_step=1.0,
+        root_seed=42,
+        resident=True,
     ) as owner:
         owner.capture_events()
         first, _ = frame(owner, 0)

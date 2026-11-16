@@ -55,11 +55,16 @@ def test_minor_species_budget_failure_is_detected():
 
 def test_full_published_setup_is_reused_without_advancing():
     """Use all actual properties and samples, stopping before the costly loop."""
+    import warp as wp
+
+    if not wp.is_cuda_available() or not wp.is_conditional_graph_supported():
+        pytest.skip("native CUDA conditional graphs unavailable")
     namespace, controls = load_setup((ROOT / SOURCE).read_text(), SOURCE)
     assert namespace["simulation"].time == 0
-    assert namespace["simulation"].solver.statistics.accepted == 0
+    assert namespace["simulation"].statistics.accepted == 0
     assert namespace["aerosol"].particles.masses.shape == (1, 1000, 12)
     assert controls == {
+        "device": "cuda:0",
         "method": "ros3",
         "rtol": 1e-5,
         "particle_atol": 1e-25,

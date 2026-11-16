@@ -46,7 +46,9 @@ import particula as par  # the main Particula package
 from particula.dynamics.condensation.species_mapping import (
     CondensationSpeciesMap,
 )
-from particula.execution.condensation_ode import CondensationODE
+from particula.execution.gpu_resident_condensation import (
+    GPUResidentCondensation,
+)
 from tqdm import tqdm  # optional: for progress bars during simulation
 
 # 🎨 Set default plot styling using Tailwind-inspired colors from Particula
@@ -405,10 +407,10 @@ coagulation_process = par.dynamics.Coagulation(coagulation_strategy)
 # belongs to the wrong chemical. Radius-bin counts, bulk particle species masses,
 # and vapor saturation ratios support distinct diagnostics below.
 #
-# The full saved ROS3 run completed with 8,921 accepted internal steps and one
-# rejected trial. These internal steps are distinct from the 201 observations;
-# adaptive control resolves fast evaporation between output times. The completed
-# history and budget checks do not by themselves establish timestep convergence.
+# All twelve materials exchange on CUDA. The adaptive clock, acceptance and
+# step-size decisions execute inside a native CUDA conditional graph. Snapshots
+# explicitly download the 201 requested observations. Internal work counts are
+# printed by the run; inventory checks alone do not establish convergence.
 
 # %% Step 6: Run the simulation loop
 
@@ -431,9 +433,10 @@ distribution_counts = np.zeros((time_len, len(bins_lognormal) - 1))
 species_mass = np.zeros((time_len, len(list_of_chemicals)))
 vapor_saturation = np.zeros((time_len, len(list_of_chemicals)))
 
-simulation = CondensationODE(
+simulation = GPUResidentCondensation(
     aerosol_process,
     condensation_strategy,
+    device="cuda:0",
     method="ros3",
     rtol=1e-5,
     particle_atol=1e-25,
@@ -487,7 +490,7 @@ concentrations = distribution_counts / simulation_volume
 
 # Final system state and actual adaptive work
 print("Final gas concentration (kg/m^3):", aerosol_process.gas.concentration)
-print("Adaptive condensation work:", simulation.solver.statistics)
+print("Adaptive condensation work:", simulation.statistics)
 
 # %% [markdown]
 # <a id="initial-and-final-sizes-what-to-look-for"></a>

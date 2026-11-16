@@ -13,7 +13,7 @@ hardware/runtime requirement; requesting CUDA never selects Warp CPU silently.
 | --- | --- | --- |
 | Native CPU storage | Multi-box particle, gas and environment containers | Explicit leading box axis and population metadata. |
 | Native CPU dynamics | Five batched runnables through the shared box loop | Direct strategy methods remain single-box. |
-| Prepared runnables | Ordered subsets of condensation, Brownian/charged coagulation, dilution, wall loss, nucleation, atmospheric ion collisions, ion-pair production and neutral ion-product cleanup | One occurrence per family; exact supported configuration, fixed capacity and timestep. |
+| Prepared runnables | Ordered subsets of condensation, Brownian/charged/settling/shear coagulation, dilution, wall loss, nucleation, atmospheric ion collisions, ion-pair production and neutral ion-product cleanup | One occurrence per family; exact supported configuration, fixed capacity and timestep. |
 | CPU → CUDA | `runnable.prepare(aerosol, device="cuda:0", time_step=...)` | Validates, uploads once, owns private resources; initial CPU state is unchanged. |
 | CUDA → CPU | `simulation.snapshot()` or reduced `diagnostics()` | Explicit synchronized, detached observations; full snapshots preserve native names and measures. |
 | Forcing | Environment and full-gas updates between segments | Explicit uploads; condensation owns derived saturation. |
@@ -21,10 +21,11 @@ hardware/runtime requirement; requesting CUDA never selects Warp CPU silently.
 | Continuation | `checkpoint()` and matching runnable `resume()` | Exact device/configuration and canonical bytes; no automatic CPU fallback. |
 | Native CUDA capture | `capture()`, then ordinary `step/run` | Non-advancing capture; fixed bindings; fresh capture after resume. |
 | Direct kernels | Supported process-specific fixed-shape interfaces | Caller owns transfers, scratch, species bindings and RNG sidecars. |
-| Continuous adaptive condensation | Concrete `GPUCondensationODE` with RK23 | Bounded isothermal profile, shared host controller and scalar readbacks; no CUDA capture. |
+| Continuous adaptive condensation | Multi-material RK23/ROS3 with ideal/kappa activity and surface phases | `GPUCondensationODE` uses host control; `GPUResidentCondensation` uses native CUDA conditional graphs for adaptation. |
+| Coupled adaptive simulation | `GPUCoupledSimulation(..., resident=True)` | Fixed event schedule and persistent RNG; device-only stage handoff, explicit observations and boundary restart. |
 | Warp CPU | Separate regression target | CPU evidence is labeled separately from actual CUDA execution and performance. |
 
-Prepared Brownian and charged coagulation are particle-resolved and require
+Prepared coagulation are particle-resolved and require
 equal active counts. Prepared nucleation injects neutral unit-count events with integral
 demand and explicit capacity policies. Their evolving compatibility matters;
 see [failure boundaries](prepared.md#evolving-compatibility-and-failure).
@@ -42,8 +43,13 @@ accuracy and transfer costs. It does not change prepared simulation semantics.
 Direct coagulation supports singleton masks `1`, `2`, `4`, `8`, pairs `3`, `5`,
 `6`, `9`, `10`, `12`, and mask `15`. Three-way masks reject at their documented
 preflight boundaries; turbulent masks require explicit turbulent inputs.
-Sedimentation and turbulent mechanisms remain direct-only. Prepared charged
-coagulation selects one of the five existing charged models.
+Prepared coagulation admits Brownian, one of five charged models, SP2016
+settling, ST1956 shear, and Brownian plus SP2016. Prepared settling preserves
+the native strategy’s mean material density; the direct API uses each
+particle’s effective density. Both evaluate rates directly without CPU bin
+interpolation. Masks 4 and 5 use bounded-memory parallel exact pair maxima
+with at most 16,384 active slots per box; charged and other settling mixtures
+retain the 256-active-slot limit.
 See [configuration](direct/coagulation-configuration.md).
 
 Direct collision outputs and persistent RNG are caller-owned, same-device
