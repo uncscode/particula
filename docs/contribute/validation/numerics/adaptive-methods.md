@@ -417,8 +417,10 @@ stage-time forcing and exact same-device disk restart. The supported profile
 has exactly one exchanging material; unsupported multiple exchanges reject
 before device allocation. The stage solve uses conservative arrowhead
 elimination, with linear scratch storage and no dense factorization. This
-supersedes the prototype-only status above for the isolated condensation owner;
-coupled source/collision ownership remains unfinished.
+supersedes the prototype-only status above for the isolated condensation owner.
+Coupled source/collision ownership was subsequently implemented and tested;
+its separate full-workload evidence and remaining cyclic-chamber gate are in
+the [workflow record](simulation-workflow.md#coupled-gpu-event-boundaries).
 
 Independent dense-matrix tests cover scaled, reversed species maps, non-unit
 volumes, discrete/resolved measures and inactive slots on Warp CPU and CUDA.
@@ -455,9 +457,11 @@ for the four changed GPU modules. The 561-page website built successfully,
 with zero rendered structure errors. Logs are in `.artifacts/ros3-gpu-*` and
 `.artifacts/ros3-cuda-*`.
 
-The full coupled GPU cyclic chamber and forcing workloads are still required.
 These isolated-method results do not qualify the original fixed stochastic
-event schedule under adaptive deterministic condensation.
+event schedule under adaptive deterministic condensation. The full forcing
+workload and refinement subsequently completed; see the
+[forcing publication](simulation-workflow.md#full-cuda-forcing-publication).
+The full coupled GPU cyclic chamber remains required.
 
 The corrected **full multi-cycle CPU chamber** subsequently completed in
 2,308.69 s from the same clean `12742e1c39` revision and package source hash.

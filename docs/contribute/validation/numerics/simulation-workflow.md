@@ -153,10 +153,11 @@ chamber still requires all 32 boxes, 8,192 slots, 600 one-second cycles, 128-eve
 pulses and complete second-half restart. The forcing example retains 16 boxes,
 4,096 slots, 6,000 one-microsecond intervals and the full doubled-step refinement
 with unchanged control times. Their updated sources and compact recording are
-implemented. Both full publications are running in a detached checkout pinned
-to `480ecf2c1a`, separately from subsequent edits. Figure inspection and
-full-workload qualification are pending. No GPU speedup is inferred from this
-explicit transfer path.
+implemented. Both full publications were launched in a detached checkout pinned
+to `480ecf2c1a`, separately from subsequent edits. The forcing publication and
+figure inspection subsequently completed, as recorded below. The cyclic chamber
+still requires full-workload completion and figure review. No GPU speedup is
+inferred from this explicit transfer path.
 
 The broader integration gate completed with **10,809 package tests passed**, 21
 skips and one expected failure in 436.94 s; unfiltered coverage was **91.33%**.

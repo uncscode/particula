@@ -12,8 +12,10 @@ workflow diff is independently reviewable. Merge is outside execution scope.
 
 ## Completion boundary
 
-All six work packages and acceptance criteria in
-[Stage 2B](stage-02b-simulation-workflow.md) are covered by the declared profiles.
+The initial core delivery covered all six work packages and acceptance criteria
+in [Stage 2B](stage-02b-simulation-workflow.md) for its declared profiles.
+The expanded cloud/droplet objective remains incomplete until the follow-through
+gates below are satisfied.
 Shared physics is Stage 1 monodisperse closed-box growth, with dilution for
 coupled checks. Concrete imports preserve existing public runnable APIs.
 
@@ -46,9 +48,12 @@ limits, commands and results. The
 [first CPU experiment](../docs/examples/fundamentals/first_cpu_workflow.py)
 is the complete run/record/plot/save/load/restart/input-variation demonstration.
 
-Implemented owners are native `CPUSimulation`, CPU RK23/ROS2 condensation,
-GPU RK23 condensation, complete-cycle deterministic split simulation and existing
-prepared execution. `EnvironmentForcing` tables impose one-sided step/linear
+Implemented owners now include native `CPUSimulation`, CPU RK23/ROS2/ROS3
+condensation, GPU RK23/ROS3 condensation, complete-cycle deterministic split
+simulation, prepared execution and `GPUCoupledSimulation`. The latter preserves
+fixed event schedules around adaptive condensation with explicit full-state
+transfers; it does not make the combined loop fully resident or capturable.
+`EnvironmentForcing` tables impose one-sided step/linear
 knots. `Recorder` and `AnalysisWriter` observe accepted complete work;
 `PreparedObserver` explicitly chooses reduced or full downloads on the fixed
 grid. Analysis and restart use separate versioned non-executable archives.
@@ -61,7 +66,7 @@ remain required. Arbitrary split callbacks and opaque forcing have no exact disk
 identity; unsupported schemas, changed devices or physics reject. These are the
 explicit supported-profile boundaries required by the plan, not omitted claims.
 
-## Validation and review
+## Initial core validation and review
 
 - Combined package: **10679 passed, 19 skipped, 57 deselected, 1 xfailed**;
   **91.18% coverage** with normal 80% gate and warnings as errors. Actual CUDA ran.
@@ -92,3 +97,33 @@ Stage 2A's source-hashed method measurements remain unchanged; workflow hooks
 are separately qualified by forcing and continuation tests. Hosted PR status
 will be reported separately from local validation; neither local checks nor PR
 creation claim a merge, release or production documentation deployment.
+
+## Current follow-through gates
+
+The current library gate at executable revision `2b4bddefd8` passed 10,810 tests
+with 91.34% unfiltered coverage, including actual CUDA. The
+[workflow qualification record](../docs/contribute/validation/numerics/simulation-workflow.md)
+owns the commands, skips and subsequent full forcing results; the
+[method record](../docs/contribute/validation/numerics/adaptive-methods.md)
+owns the independent numerical references and CPU cloud/droplet results.
+Later source changes through `00b1c4f6f2` affect rendering, prose and retained
+outputs rather than library execution.
+
+- [x] Full corrected CPU single-cycle and multi-cycle chamber publications.
+- [x] Full respiratory publication, preserving its chemical-identity caveats.
+- [x] CPU/CUDA wet-to-dry and finite-reservoir comparisons with independent
+      references, saved-data replots and downloadable examples.
+- [x] Full CUDA forcing publication and its doubled-step/tighter-tolerance
+      comparison, with explicit transfer and observation-timing limits.
+- [ ] Full biomass publication, including all four collision-model branches.
+- [ ] Full CUDA cyclic chamber, exact second-half continuation, figure review,
+      and saved-data replot with the corrected JSON-compatible renderer.
+- [ ] Full respiratory time-refinement report, including per-species and
+      per-particle differences separately from inventory conservation.
+- [ ] Final source/output consistency review, documentation verification and
+      publication of the remaining local commits to the existing draft PR.
+- [ ] Mark the existing PR ready only after the preceding gates pass.
+
+The [follow-through plan](stage-02-cloud-droplet-examples.md) identifies the
+remaining workloads and acceptance criteria. A completed package test suite
+does not substitute for those scientific runs or establish experimental validity.
