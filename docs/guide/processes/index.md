@@ -4,6 +4,7 @@ Choose a process guide for practical setup and an executable example:
 
 - [Activity](activity.md)
 - [Condensation](condensation.md)
+- [Numerical integration and process splitting](numerical-integration.md)
 - [Coagulation](coagulation.md)
 - [Wall loss](wall-loss.md)
 - [Dilution](dilution.md)

@@ -144,7 +144,7 @@ def _builtin_registry() -> ProcessRegistry[_BuiltinAdapter]:
     )
     from particula.execution.prepared_nucleation import plan_nucleation
 
-    planners = {
+    planners: dict[type, Callable[[Any, Aerosol], _ProcessPlan]] = {
         AtmosphericCoagulation: plan_atmospheric,
         IonCondensationExclusion: plan_ion_exclusion,
         SeedCohort: plan_cohort,

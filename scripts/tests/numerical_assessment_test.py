@@ -73,3 +73,30 @@ def test_patankar_linear_zero_species_and_conservation():
     assert result[2] == 0
     smooth = [row for row in assess() if row["case"] == "smooth"]
     assert 1.9 < smooth[-1]["observed_order"] < 2.1
+
+
+def test_local_error_reference_from_noninitial_state():
+    """An independent inverse integral checks local physical mass/gas units."""
+    from scripts.assess_native_adaptive import VISCOSITY, local_reference
+
+    old_radius, new_radius = 1.1, 1.2
+    old_gas = VAPOR - NUMBER * MASS * (old_radius**3 - 1)
+    mean_free_path = (2 * VISCOSITY / PRESSURE) / np.sqrt(
+        8 * MOLAR_MASS / (np.pi * GAS_CONSTANT * TEMPERATURE)
+    )
+
+    def inverse(x):
+        kn = mean_free_path / (RADIUS * x)
+        correction = 0.75 * (1 + kn) / (kn**2 + 1.283 * kn + 0.75)
+        gas = VAPOR - NUMBER * MASS * (x**3 - 1)
+        return DENSITY * RADIUS**2 * x / (DIFFUSION * correction * gas)
+
+    duration, _ = quad(
+        inverse, old_radius, new_radius, epsabs=1e-12, epsrel=1e-12
+    )
+    values, uncertainty = local_reference(old_radius, old_gas, duration, 0.0)
+    expected = np.array(
+        [MASS * new_radius**3, VAPOR - NUMBER * MASS * (new_radius**3 - 1)]
+    )
+    npt.assert_allclose(values, expected, rtol=1e-10)
+    assert np.max(uncertainty / expected) < 1e-10

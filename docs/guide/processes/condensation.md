@@ -861,6 +861,9 @@ particle, gas = selective.step(
 
 ## Limitations
 
+- Continuous adaptive integration is available separately through the concrete
+  [numerical integration APIs](numerical-integration.md); it does not change
+  these strategies' finite-step or staggered behavior.
 - Staggered solver is Gauss-Seidel only; other solvers are not exposed.
 - Factory supports `"isothermal"`, `"isothermal_staggered"`, and
   `"latent_heat"` only.

@@ -1995,6 +1995,24 @@
       "also": [],
       "role": "Contribute",
       "start_here": false
+    },
+    {
+      "source": "docs/guide/processes/numerical-integration.md",
+      "title": "Numerical integration and process splitting",
+      "topic": "processes",
+      "also": [
+        "verification"
+      ],
+      "role": "Guide",
+      "start_here": false
+    },
+    {
+      "source": "docs/contribute/validation/numerics/adaptive-methods.md",
+      "title": "Adaptive integration and splitting assessment",
+      "topic": "verification",
+      "also": [],
+      "role": "Contribute",
+      "start_here": false
     }
   ],
   "supporting": [

@@ -31,7 +31,7 @@ def _vector(value, width, name, *, positive=False):
     return values
 
 
-def _vapor_plan(strategy, width):
+def _vapor_plan(strategy, width, *, allow_zero=False):
     """Freeze constant/Buck definitions in complete gas order."""
     from particula.gas.vapor_pressure_strategies import (
         ConstantVaporPressureStrategy,
@@ -47,7 +47,10 @@ def _vapor_plan(strategy, width):
                 values.append((1, 0.0))
             elif type(item) is ConstantVaporPressureStrategy:
                 value = _vector(
-                    item.vapor_pressure, 1, "vapor_pressure", positive=True
+                    item.vapor_pressure,
+                    1,
+                    "vapor_pressure",
+                    positive=not allow_zero,
                 )[0]
                 values.append((0, float(value)))
             else:
@@ -61,7 +64,10 @@ def _vapor_plan(strategy, width):
         return tuple(
             (0, float(value))
             for value in _vector(
-                strategy.vapor_pressure, width, "vapor_pressure", positive=True
+                strategy.vapor_pressure,
+                width,
+                "vapor_pressure",
+                positive=not allow_zero,
             )
         )
     raise ValueError("GPU vapor pressure supports constant/Buck only")
@@ -192,7 +198,9 @@ def _activity_plan(activity, particles, gas, pairs, vapor):  # noqa: C901
     )
 
 
-def plan_condensation(process, aerosol) -> _ProcessPlan:
+def plan_condensation(
+    process, aerosol, *, allow_zero_vapor=False
+) -> _ProcessPlan:
     """Freeze representable physical parameters before any upload."""
     from particula._cpu_batch import box_view
     from particula.dynamics.condensation.condensation_strategies import (
@@ -223,7 +231,11 @@ def plan_condensation(process, aerosol) -> _ProcessPlan:
     pairs = tuple(
         (int(s), int(t)) for s, t in zip(sources, targets, strict=True)
     )
-    vapor = _vapor_plan(strategy.vapor_pressure_strategy, len(aerosol.gas.name))
+    vapor = _vapor_plan(
+        strategy.vapor_pressure_strategy,
+        len(aerosol.gas.name),
+        allow_zero=allow_zero_vapor,
+    )
     tensions, surface_mode, kelvin_density = _surface_plan(
         strategy.surface_strategy, aerosol.particles
     )

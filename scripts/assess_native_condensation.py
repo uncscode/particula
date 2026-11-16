@@ -78,9 +78,9 @@ def initial(strategy_type, equilibrium):
     return particle, gas, strategy
 
 
-def reference(duration, equilibrium, times):
+def reference(duration, equilibrium, times, *, viscosity=VISCOSITY):
     """Cross-check radius equations with two tight independent integrations."""
-    mean_free_path = (2 * VISCOSITY / PRESSURE) / np.sqrt(
+    mean_free_path = (2 * viscosity / PRESSURE) / np.sqrt(
         8 * MOLAR_MASS / (np.pi * GAS_CONSTANT * TEMPERATURE)
     )
 

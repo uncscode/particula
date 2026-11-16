@@ -1,155 +1,111 @@
-# Stage 2A execution target
+# Stage 2A execution target and evidence
 
-Status: in progress; no completion claim.
+Status: in progress; no stage completion claim.
 Worktree: `/tmp/particula-stage-02a`.
 Branch: `codex/stage-02a-numerical-integration`.
 Verified upstream base: `356fc054cd9a4f4ececc3c64c7144e889a789494`.
-PR target: `uncscode/particula:main`. No open matching PR at start.
+PR target: `uncscode/particula:main`; separate from the Stage 2B PR.
+Merge is outside execution scope. No PR has been opened yet.
 
 ## Completion boundary
 
-All six work packages and every acceptance item in
-[Stage 2A](stage-02a-numerical-integration.md) remain required. The first
-assessment is a milestone, not completion of the stage.
+All six work packages and acceptance items in
+[Stage 2A](stage-02a-numerical-integration.md) remain required. Evidence below
+qualifies the stated methods and cases; it does not waive unsupported-regime
+rejection, workflow integration, review or delivery requirements.
 
-The shared scientific case is Stage 1 monodisperse closed-box growth with
-common dilution. Supplement with exact decay, reversible closed exchange,
-near-depletion exchange, noncommuting deterministic operators and a small stiff
-reaction system. Keep physical species budgets distinct from observable error.
-Predeclare dimensionless trajectory error targets of 1e-3, 1e-5 and 1e-7;
-scale radius by initial radius and each inventory by its own declared initial
-or characteristic inventory. Reference uncertainty must be below 1% of target.
-Use non-unit resolved volume and inert gas lanes in native integration tests.
+The shared case is Stage 1 monodisperse closed-box growth with common dilution.
+Additional assessment covers exact decay, smooth/stiff reversible exchange,
+near-depletion exchange, noncommuting deterministic operators and Robertson
+kinetics. Predeclared global radius/inventory targets are 1e-3, 1e-5 and 1e-7,
+with each observable scaled by its own characteristic inventory and reference
+uncertainty below 1% of target. The native adaptive report explicitly identifies
+local tolerances that meet those targets and settings that do not.
 
-## Required evidence ledger
+## Requirement ledger
 
-- [ ] Independent reference checks and fixed/adaptive method comparison.
-- [ ] Current condensation methods compared with shortlisted methods on native
-      growth, equilibrium and depletion cases; limiting activity retained.
-- [ ] Stiff candidate and conservative transfer prototype evaluated; SSP and
-      deferred correction screened with explicit reasons.
-- [ ] One-box and heterogeneous ensemble CUDA feasibility and measured costs.
-- [ ] Selected methods documented with support/regime matrix and uncertainty.
-- [ ] Continuous-rate, exact-map, equilibrium and stochastic stepping contracts.
-- [ ] Accepted/trial state, clocks, tolerance weights, step limits and diagnostics.
-- [ ] Sequential and grouped Strang schedules with correct absolute stage times.
-- [ ] Relevant CPU and actual CUDA implementations, independent accuracy tests.
-- [ ] Rejection preserves state/clock/output; unsupported stochastic/adaptive and
-      capture combinations reject explicitly without CPU fallback.
-- [ ] Units, maps, volume, inactive slots, species budgets and forcing tests.
-- [ ] Supported methods guide, full validation, diff review, commit and PR.
+- [x] Independent reference checks and fixed/adaptive method comparison:
+      analytical decay/exchange, radius quadrature, DOP853/Radau cross-checks,
+      Radau/BDF Robertson reference, and retained failures.
+- [x] Existing native condensation compared with shortlisted methods on growth,
+      equilibrium and depletion; full-step limiting proposals retained.
+- [x] Stiff candidate and conservative-transfer prototype evaluated; RK45, SSP
+      and deferred correction dispositions documented without invented timings.
+- [x] One-box and heterogeneous actual CUDA feasibility, shared/independent
+      controller work, synchronization, retained storage and measured timings.
+- [x] Measured method/regime decision and supported-method guide.
+- [x] Explicit continuous-rate/exact-map contracts; equilibrium/stochastic
+      inputs rejected rather than inferred to be deterministic ODEs.
+- [x] Detached trial/accepted states, clocks, physical tolerance weights,
+      bounded steps/trials, failure preservation and numerical work counters.
+- [x] Sequential and nested Strang schedules, unique component names,
+      component-order admission and absolute stage clocks.
+- [x] Native CPU RK23/ROS2 and bounded CUDA RK23 profile; independent accuracy
+      tests, no hidden CPU fallback and explicit capture rejection.
+- [x] Species/volume/inactive-slot budgets, nonautonomous forcing stage times,
+      domain rejection and whole-cycle failure tests.
+- [ ] Complete cross-workflow forcing/output/restart compatibility with Stage 2B.
+- [ ] Final full validation, complete diff review, commit, push and separate PR.
 
-## Shared Stage 2B decisions
+## Owning implementations and durable evidence
 
-Record only accepted complete steps. Explicit output times initially land on
-step boundaries by shortening the proposed step; this policy may change the
-numerical trajectory and must be measured. Observers never execute at internal
-stages or rejected trials. Restart must retain controller and scheduling state.
-Existing exact dilution remains exact. Existing runnable rate() methods are not
-assumed to be continuous derivatives. No new method becomes a default until
-assessment supports it. CPU and CUDA support must be stated separately.
+`execution.ode` supplies pure ODE callbacks and RK3(2)/KPP ROS2 controllers.
+`condensation_ode` owns scaled native CPU condensation; numerical Jacobian work
+is explicit and latent heat is excluded. `splitting` owns deterministic complete
+cycles, nested groups, exact dilution and continuous condensation adapters.
+`gpu_condensation_ode` owns device-resident RK23 trial arrays, a shared maximum
+error clock and explicit scalar readbacks. It reuses the mapped physical rate
+kernel; ordinary steps do not evaluate CPU physical rates or download states.
+Snapshots explicitly download accepted state. Full active-slot evaporation,
+native GPU ROS2, PDF on GPU and adaptive CUDA capture are rejected/excluded.
 
-## Preliminary assessment completed
+The [method assessment](../docs/contribute/validation/numerics/adaptive-methods.md)
+is the durable decision record. Its retained data include original preliminary
+reports and the source-hashed native CUDA assessment. The
+[method guide](../docs/guide/processes/numerical-integration.md) owns usage,
+tolerance units, support matrix, forcing and custom-flow contracts.
 
-`scripts/assess_numerical_methods.py` ran 60 CPU screening combinations on
-exact decay, smooth/stiff/near-depletion linear exchange and Robertson kinetics.
-The raw report is `.artifacts/numerics/screening.json`; it records source hash,
-versions, errors per species, positivity, budgets, timings and solver work.
-Both explicit candidates reached the declared 200000-evaluation cap for
-Robertson. Tight Radau/BDF references differ by 1.754e-11 or less.
-This motivates retaining a stiff candidate; it does not select a production
-method. Native condensation, conservative prototypes, splitting, CUDA and
-controller diagnostics remain unqualified. Ruff check and formatting passed.
-The shared environment was reused and import identity verified inside this
-worktree. No runtime methods or default behavior have changed yet.
+The final native study completed 27 baseline runs, eight added observable-target
+checks and two 32-box controller comparisons on RTX 5060 / Warp 1.11.1. Loose
+RK23 error estimates are unreliable near depletion; stricter qualified settings
+are recorded rather than masking those results. Native ROS2 meets the targets
+but costs substantially more. No general end-to-end speedup is claimed.
 
-## Native and splitting assessment
+## Current validation
 
-Added native growth/equilibrium/depletion comparisons (66 combinations) with
-non-unit resolved volume, inert gas and inactive slot checks. The reference
-uses an independent radius ODE with Kelvin curvature, cross-checked with
-DOP853/Radau and independently tested against inverse-radius quadrature.
-Some loose-tolerance adaptive native trials leave the physical inventory
-domain; failures are retained. Production stepping needs domain-aware trial
-rejection, not clipping or acceptance of an invalid stage.
+Run from this worktree with `PYTHONPATH=.` and the selected `.venv`:
 
-Exact noncommuting exchange/removal maps give finest-grid observed orders
-0.9994 and 1.0004 for sequential orderings and 1.9998 for Strang. This only
-qualifies the composition mathematics, not a production scheduler.
+- Full package, warnings as errors and standard non-slow/non-performance
+  selector: **10574 passed, 19 skipped, 57 deselected, 1 xfailed** in 217.16 s.
+  Actual CUDA tests ran. Skips/deselections remain outside the evidence claim.
+- Full package coverage: **91%**, normal 80% gate passed. Seven changed runtime
+  targets: **86% aggregate**. Per-target coverage: ODE 93%, CPU adapter 93%, GPU
+  owner 93%, splitting 91%, prepared condensation 88%, prepared registry 92%,
+  Warp algebra 21% (compiled bodies do not execute under Python line tracing).
+- Focused numerical/existing-condensation suite: 128 passed. After adding the
+  near-depletion and local-oracle regressions, the affected subset: 26 passed.
+- Full Ruff check and format check passed (734 files); full standard Mypy
+  passed (654 source files). Checked-body checks for new GPU modules and the
+  condensation planner pass with imported modules silent. A broader optional
+  checked-body pass exposes existing imported-module issues; it is not reported
+  as green. The standard full-repository check is green.
+- All three numerical guide code blocks executed to 10 s, including native CUDA
+  and coupled Strang simulation, using the declared native reference fixture.
+- Documentation topic/structure checks passed. Astro built 540 pages; post-build
+  verification checked 670 HTML pages, 308 API modules and 130 redirects with no
+  errors. Rendered documentation structure also reported zero errors.
+- Full `scripts/tests -Werror --no-cov`: **324 passed** in 58.58 s.
 
-All preliminary reports are retained in
-`docs/data/numerics/stage-02a-preliminary.json` with source hashes.
-`PYTHONPATH=. .venv/bin/python -m pytest
-scripts/tests/numerical_assessment_test.py -q -Werror --no-cov`: 3 passed.
-Ruff and format checks passed for all new assessment modules and tests.
+Coverage was collected with `coverage run --source=particula`, followed by the
+normal gate and explicit per-target reports. Directory discovery avoids the
+NumPy import/unload issue caused by dotted module discovery. No warning or
+coverage gate was weakened. Logs and coverage files remain under the ignored
+`.artifacts/numerics/`; scientific measurements are retained under `docs/data/`.
 
-Next: conservative transfer and stiff prototypes, actual CUDA feasibility,
-then supported method selection and the trial/accepted-state implementation.
-The complete Stage 2A/2B goal remains unchanged and incomplete.
+## Remaining delivery work
 
-## Stepping core and remaining qualification
-
-Implemented concrete `particula.execution.ode` with pure continuous-rate
-contracts, detached read-only callback state, embedded RK3(2), ROS-2 with
-explicit Jacobian/partial-time derivative, per-component absolute/relative
-tolerances, max-norm error control, bounded steps/trials and work counters.
-Domain-invalid stages are rejected before rate evaluation; failures preserve
-accepted state/time. No stochastic or arbitrary runnable is adapted implicitly.
-This core is not exported at package root and is not yet wired to aerosols.
-
-Independent manufactured nonautonomous solutions establish orders three/two.
-Closed exchange verifies tolerance refinement and material conservation.
-Failure, invalid controls, callback mutation, final time and detached inspection
-are covered. Combined focused run: 19 passed with -Werror. Mypy with
---check-untyped-defs and Ruff passed for the core.
-
-The linear MPRK22(1) prototype is conservative and nonnegative including zero
-lanes; smooth/depletion refinements approach second order. The stiff transient
-is unresolved on its tested grid (maximum error 0.0591 at 256 steps), so this
-prototype is not selected as a general production method. Zero-donor handling
-is a linear-rate limit only, not a claim about arbitrary chemistry.
-
-Actual CUDA access required execution outside the restricted environment.
-RTX 5060/Warp 1.11.1 ran independent per-box RK3(2) and ROS-2 controllers for
-one and 4096 heterogeneous exchange boxes. All boxes completed; endpoint
-errors were below 4.3e-8. The 4096-box warmed kernel times were 0.0106 s and
-0.316 s respectively, excluding compile/upload/download. This is one
-feasibility timing, not a speedup claim or native aerosol qualification.
-ROS-2's lower-order estimator required 7450--34456 accepted steps versus
-104--1028 for RK3(2); stiff stability alone does not make it the default.
-Device array sizes exclude compiler registers/spills and are not peak memory.
-
-Next implementation work: native mapped condensation continuous adapter,
-physical-domain-aware derivative/Jacobian construction, complete splitting
-scheduler, then Stage 2B recording and disk restart on those contracts.
-Native CPU/CUDA qualification, shared-versus-independent box control, method
-assessment publication, full validation, review, commits and PRs remain open.
-
-## Native adapter and complete-cycle scheduler
-
-Implemented `execution.condensation_ode.CondensationODE`: detached native
-state/configuration, explicit source/target maps, scaled kg and kg/m3
-coordinates with separate absolute tolerances, population weights, shared
-maximum-error control across boxes, optional absolute-time T/P forcing and
-bounded one-sided/central numerical Jacobian. Latent heat is rejected; full
-evaporation of active slots remains a domain boundary requiring explicit
-future event handling. This does not silently clip a failed trial.
-
-Implemented `execution.splitting`: declared continuous/exact Flow components,
-explicit nested sequential/Strang groups, local component stage times, complete
-cycle publication and failure rollback of the current cycle. Stochastic and
-equilibrium contracts are explicitly excluded from symmetric composition; no
-arbitrary runnable is inferred to be an ODE. Native condensation and exact
-dilution adapters exercise the shared growth/loss case.
-
-Independent growth quadrature, per-species budgets, non-unit batched volumes,
-inert/empty lanes, forcing, caller configuration detachment, component order,
-nested stage clocks and failed-cycle preservation pass. Coupled growth/dilution
-Strang error decreases by at least the required factor under time refinement
-and closes the species budget at rtol 3e-13. Focused core/native/scheduler/
-assessment suite: 30 passed with -Werror. Ruff and checked-body Mypy passed.
-
-The new CPU contracts are implemented but not yet publicly documented or
-exported. Broad native edge coverage, actual native CUDA integration, performance
-and full validation remain open. Stage 2B now has an independent recorder
-implementation on its own branch; cross-branch integration is pending.
+Complete Stage 2B forcing/event policy, explicit prepared observations, adaptive
+GPU/split restart and extension codecs, then reconcile shared guides and resume
+validation. Finish the tooling suite, review the full branch against the verified
+upstream base, fix findings, and open separate Stage 2A and Stage 2B PRs with the
+stacked dependency explicit. The full goal remains active and incomplete.
