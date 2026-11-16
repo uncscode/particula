@@ -253,7 +253,15 @@ class GPUCondensationODE:
         self._launch(
             algebra.check_slots,
             self._shape[:2],
-            [self._masses, self._counts, self._invalid],
+            [
+                self._masses,
+                self._counts,
+                self._invalid,
+                wp.int32(
+                    self._base.particles.distribution_type
+                    == "particle_resolved"
+                ),
+            ],
         )
         self._status()
         if self._forcing is not None:

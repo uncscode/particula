@@ -50,8 +50,9 @@ def check_slots(
     masses: FloatTensor,
     counts: FloatMatrix,
     invalid: IntVector,
+    resolved: wp.int32,
 ):
-    """Reject active-slot evaporation and any occupied formerly empty slot."""
+    """Reject active evaporation; only resolved free slots require zero mass."""
     box, slot = wp.tid()  # type: ignore[misc]
     total = wp.float64(0.0)
     for material in range(masses.shape[2]):
@@ -59,7 +60,7 @@ def check_slots(
     if counts[box, slot] > wp.float64(0.0):
         if total <= wp.float64(0.0) or not wp.isfinite(total):  # type: ignore[operator]
             wp.atomic_max(invalid, 0, 1)
-    elif total != wp.float64(0.0):
+    elif resolved == 1 and total != wp.float64(0.0):
         wp.atomic_max(invalid, 0, 1)
 
 
