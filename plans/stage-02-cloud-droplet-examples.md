@@ -151,10 +151,14 @@ Coupled event ownership and exact restart are now implemented with explicit
 state transfers. The focused coupling/numerics/archive tests pass 65 cases;
 the full package gate passed 10,809 tests with 91.33% coverage. A subsequent
 checkpoint-plan guard passed all 17 focused coupled tests and checked-body Mypy.
-The complete cyclic chamber/forcing publications remain pending. Run and inspect
-the full cyclic chamber and prepared forcing workloads.
-Both full CUDA publishers are active in `/tmp/particula-stage-02-gpu-validation`,
-pinned to `480ecf2c1a`. Their process records are in
+The full prepared forcing publication completed both the 6,000-cycle trajectory
+and its 12,000-cycle refinement, with unchanged physical forcing. Final mass and
+vapor differences are 2.32e-7 and 8.86e-9 relative. Hashes, figure inspection,
+CPU replot and extracted-download import/rendering passed; the compact bundle
+is retained. The workflow qualification record owns detailed measurements.
+The full cyclic chamber publisher remains active in
+`/tmp/particula-stage-02-gpu-validation`, pinned to `480ecf2c1a`.
+The process records are in
 `.artifacts/coupled-runs.json`; verify live handles before making changes.
 After the cyclic publication finishes, apply the current plotting-only source
 update in its validation checkout and replot there before importing the bundle.
