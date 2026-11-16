@@ -96,33 +96,42 @@ def advance(owner, start, stop, initial, expected, *, observe):
         pulse = step % PULSE_EVERY == 0
         if pulse:
             data = owner.diagnostics()
-            gas = data.gas_concentration.copy()
-            # Activation coefficient 0.25 s^-1 × 512 molecules × 1 s = 128.
-            gas[:, 1] = (
+            # Prescribed source demand, not a download/re-upload of evolving gas.
+            precursor = (
                 4
                 * EVENTS_PER_BOX
                 * initial.gas.molar_mass[1]
                 / AVOGADRO_NUMBER
-                / data.volume
+                / initial.particles.volume
             )
+            ratios = {}
             if step % 200 == 0:
-                humidity = (1.4, 0.7, 1.2)[step // 200]
-                gas[:, 2] = (
-                    humidity
+                ratios[initial.gas.name[2]] = (1.4, 0.7, 1.2)[step // 200]
+            owner.update_gas_species(
+                {initial.gas.name[1]: precursor}, saturation_ratios=ratios
+            )
+            forced = owner.diagnostics()
+            if ratios:
+                # Independent observation audit; this CPU result is never uploaded.
+                target = (
+                    ratios[initial.gas.name[2]]
                     * water_pressure(data.temperature)
                     * initial.gas.molar_mass[2]
                     / (GAS_CONSTANT * data.temperature)
                 )
+                np.testing.assert_allclose(
+                    forced.gas_concentration[:, 2], target, rtol=2e-14
+                )
             for gas_lane, material in ((2, 0), (1, 1)):
                 expected[:, material] += (
-                    gas[:, gas_lane] - data.gas_concentration[:, gas_lane]
+                    forced.gas_concentration[:, gas_lane]
+                    - data.gas_concentration[:, gas_lane]
                 ) * data.volume
-            owner.update_gas(gas)
         owner.step()
         if pulse:
             # Only nucleation consumes this precursor. Its observed depletion
             # independently verifies the unit-event demand through public data.
-            before_precursor = gas[:, 1].copy()
+            before_precursor = precursor.copy()
             data = owner.diagnostics()
             consumed_molecules = (
                 (before_precursor - data.gas_concentration[:, 1])
@@ -133,10 +142,8 @@ def advance(owner, start, stop, initial, expected, *, observe):
             np.testing.assert_allclose(
                 consumed_molecules, EVENTS_PER_BOX, rtol=2e-12, atol=0
             )
-            gas = data.gas_concentration.copy()
-            expected[:, 1] -= gas[:, 1] * data.volume
-            gas[:, 1] = 0
-            owner.update_gas(gas)
+            expected[:, 1] -= data.gas_concentration[:, 1] * data.volume
+            owner.update_gas_species({initial.gas.name[1]: 0.0})
         if observe and ((step + 1) % 20 == 0 or step + 1 == stop):
             observation, snapshot = frame(owner, step + 1)
             actual = mapped_inventory(snapshot)
@@ -158,6 +165,7 @@ def advance(owner, start, stop, initial, expected, *, observe):
                 max_error, float(np.max(np.abs(actual / expected - 1)))
             )
             frames.append(observation)
+            print(f"Verified CUDA chamber t={step + 1} s", flush=True)
     return frames, max_error
 
 

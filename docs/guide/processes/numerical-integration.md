@@ -333,3 +333,23 @@ condensation configuration, controls, order and work counters. Supply the same
 event tuple and strategy and an explicitly matching device to `resume_coupled`.
 The versioned archive contains data only; analysis snapshots cannot replace
 it. Future forcing/source schedules remain the caller's responsibility.
+
+### Selective forcing of a coupled GPU simulation
+
+`GPUCoupledSimulation.update_gas_species()` accepts dictionaries keyed by gas
+name. `concentrations` supplies kg/m³; `saturation_ratios` supplies dimensionless
+ratios. Each value is a scalar or per-box vector. A species may have only one
+target. Unspecified gas species remain untouched on the device. Saturation
+forcing evaluates the configured constant/Buck law at the device's current
+temperature; it does not download gas or temperature to compute a new target.
+These are explicit external forcing boundaries, separate from adaptive trials.
+
+```python
+simulation.update_gas_species(
+    {"precursor": 1e-9}, saturation_ratios={"water": 1.02}
+)
+```
+
+All targets validate before physical mutation. A scalar device status check
+rejects nonphysical derived concentrations. Requested observations can still
+check an independent external mass ledger on the CPU.

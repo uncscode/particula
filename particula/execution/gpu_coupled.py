@@ -430,6 +430,26 @@ class GPUCoupledSimulation:
             self._ready()
             self._events.update_gas(concentration)
 
+    def update_gas_species(
+        self, concentrations=None, *, saturation_ratios=None
+    ):
+        """Prescribe named gas targets while retaining other species on device.
+
+        ``concentrations`` maps gas names to kg/m³; ``saturation_ratios`` maps
+        names to dimensionless ratios. Values are scalars or box vectors.
+        Saturation targets use the configured constant/Buck pressure law and
+        current device temperature. Each species may occur in only one mapping.
+        Validation precedes physical mutation. This explicit forcing boundary
+        uploads only prescribed targets and reads scalar validation status.
+        """
+        from particula.execution._gpu_gas_forcing import apply_species_forcing
+
+        with self._events._lock:
+            self._ready()
+            apply_species_forcing(
+                self._events, self._vapor, concentrations, saturation_ratios
+            )
+
     def capture_events(self):
         """Capture only the fixed event sequence."""
         with self._events._lock:
