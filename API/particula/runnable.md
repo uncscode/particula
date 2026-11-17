@@ -72,7 +72,7 @@ class CustomProcess(Runnable):
 >
 > - No references available yet.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L43-L283)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L43-L286)
 
 ### particula.runnable.RunnableABC.__or__
 
@@ -102,7 +102,7 @@ combined_process = process1 | process2
 final_aerosol = combined_process.execute(aerosol, time_step=1.0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L262-L283)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L265-L286)
 
 ### particula.runnable.RunnableABC._advance_box
 
@@ -221,7 +221,7 @@ this method retain responsibility for their own execution semantics.
 *method*
 
 ```python
-def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, time: float = 0.0) -> PreparedSimulation
+def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, coagulation_work_config=None, time: float = 0.0) -> PreparedSimulation
 ```
 
 Upload native state once and prepare supported resident GPU physics.
@@ -235,6 +235,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `root_seed` (`int`) (default: `0`) — Root seed for persistent independent process/box streams.
 - `logical_box_ids` (default: `None`) — Optional stable identities in physical box order.
 - `process_registry` (default: `None`) — Exact-type custom GPU adapter registrations.
+- `coagulation_work_config` (default: `None`) — Optional coagulation resource budgets.
 - `time` (`float`) (default: `0.0`) — Absolute initial simulation time [s].
 
 **Returns**
@@ -247,7 +248,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `ValueError` — If process physics or state cannot be represented.
 - `RuntimeError` — If the requested runtime/device is unavailable.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L179-L224)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L179-L227)
 
 ### particula.runnable.RunnableABC.rate
 
@@ -289,7 +290,7 @@ Resume exact saved state using the same process configuration.
 current population cannot be admitted (e.g. unequal Brownian
 counts after a later process injected new particles).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L226-L260)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L229-L263)
 
 ## particula.runnable.RunnableSequence
 
@@ -324,7 +325,7 @@ sequence.add_process(AnotherProcess())
 final_aerosol = sequence.execute(aerosol, time_step=2.0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L286-L511)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L289-L517)
 
 ### particula.runnable.RunnableSequence.processes
 
@@ -334,7 +335,7 @@ final_aerosol = sequence.execute(aerosol, time_step=2.0)
 processes: list[RunnableABC] = []
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L315-L315)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L318-L318)
 
 ### particula.runnable.RunnableSequence.__init__
 
@@ -348,7 +349,7 @@ Initialize the RunnableSequence.
 
 Sets up an empty list to hold the sequence of Runnable processes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L310-L315)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L313-L318)
 
 ### particula.runnable.RunnableSequence.__or__
 
@@ -377,7 +378,7 @@ sequence |= CustomProcess()
 sequence = sequence | AnotherProcess()
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L493-L511)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L499-L517)
 
 ### particula.runnable.RunnableSequence._leaf_processes
 
@@ -389,7 +390,7 @@ def _leaf_processes()
 
 Yield grouped process leaves in execution order.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L331-L337)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L334-L340)
 
 ### particula.runnable.RunnableSequence.add_process
 
@@ -412,7 +413,7 @@ sequence = RunnableSequence()
 sequence.add_process(CustomProcess())
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L317-L329)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L320-L332)
 
 ### particula.runnable.RunnableSequence.execute
 
@@ -447,14 +448,14 @@ final_aerosol = sequence.execute(
 )
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L339-L408)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L342-L411)
 
 ### particula.runnable.RunnableSequence.prepare
 
 *method*
 
 ```python
-def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, time: float = 0.0) -> PreparedSimulation
+def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, coagulation_work_config=None, time: float = 0.0) -> PreparedSimulation
 ```
 
 Upload native state once and prepare supported resident GPU physics.
@@ -468,6 +469,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `root_seed` (`int`) (default: `0`) — Root seed for persistent independent process/box streams.
 - `logical_box_ids` (default: `None`) — Optional stable identities in physical box order.
 - `process_registry` (default: `None`) — Exact-type custom GPU adapter registrations.
+- `coagulation_work_config` (default: `None`) — Optional coagulation resource budgets.
 - `time` (`float`) (default: `0.0`) — Absolute initial simulation time [s].
 
 **Returns**
@@ -480,7 +482,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `ValueError` — If process physics or state cannot be represented.
 - `RuntimeError` — If the requested runtime/device is unavailable.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L410-L455)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L413-L461)
 
 ### particula.runnable.RunnableSequence.resume
 
@@ -510,4 +512,4 @@ Resume exact saved state using the same process configuration.
 current population cannot be admitted (e.g. unequal Brownian
 counts after a later process injected new particles).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L457-L491)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L463-L497)

@@ -224,7 +224,7 @@ combined_process = process1 | process2
 final_aerosol = combined_process.execute(aerosol, time_step=1.0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L262-L283)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L265-L286)
 
 ### particula.equilibria.equilibria.Equilibria._advance_box
 
@@ -343,7 +343,7 @@ Declare numeric destinations for transactional publication.
 *method*
 
 ```python
-def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, time: float = 0.0) -> PreparedSimulation
+def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, coagulation_work_config=None, time: float = 0.0) -> PreparedSimulation
 ```
 
 Inherited from: `particula.runnable.RunnableABC`
@@ -359,6 +359,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `root_seed` (`int`) (default: `0`) — Root seed for persistent independent process/box streams.
 - `logical_box_ids` (default: `None`) — Optional stable identities in physical box order.
 - `process_registry` (default: `None`) — Exact-type custom GPU adapter registrations.
+- `coagulation_work_config` (default: `None`) — Optional coagulation resource budgets.
 - `time` (`float`) (default: `0.0`) — Absolute initial simulation time [s].
 
 **Returns**
@@ -371,7 +372,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `ValueError` — If process physics or state cannot be represented.
 - `RuntimeError` — If the requested runtime/device is unavailable.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L179-L224)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L179-L227)
 
 ### particula.equilibria.equilibria.Equilibria.resume
 
@@ -403,4 +404,4 @@ Resume exact saved state using the same process configuration.
 current population cannot be admitted (e.g. unequal Brownian
 counts after a later process injected new particles).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L226-L260)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L229-L263)

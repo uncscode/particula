@@ -188,7 +188,7 @@ admission. It represents a READY attachment, not a captured graph.
 - `operations` (`tuple[PreparedResidentOperation, ...]`) — Ordered callables dispatched during enqueue.
 - `duration` (`object`) — Nonnegative timestep duration in seconds.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L167-L239)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L167-L263)
 
 ### particula.execution.resident_scheduler.PreparedResidentSimulation.capture_report
 
@@ -480,6 +480,22 @@ def __init__(timestep: PreparedResidentTimestep, request: ResidentSimulationRequ
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L0-L0)
 
+### particula.execution.resident_scheduler.PreparedResidentSimulation.synchronize
+
+*method*
+
+```python
+def synchronize() -> None
+```
+
+Wait and surface deferred admission errors before observing state.
+
+Low-level prepared owners call this boundary before checkpointing or
+interpreting outputs. Enqueue remains allocation/readback-free. A
+rejected operation does not roll back other processes in the schedule.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L241-L263)
+
 ## particula.execution.resident_scheduler.ResidentSimulationRequest
 
 *class* · *dataclass*
@@ -514,7 +530,7 @@ transfer, synchronize, or validate physical process inputs.
 - `capture_resource_requirements` (`CaptureResourceRequirements`) — Exact pre-published capture resource requirements retained for metadata-only admission checks.
 - `graph_capture_binding` (`object | None`) — Optional exact direct-module-only binding. It is attached only after final request construction and gates admission; it neither captures nor replays graphs nor changes dispatch.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L267-L381)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L291-L405)
 
 ### particula.execution.resident_scheduler.ResidentSimulationRequest.capture_resource_requirements
 
@@ -524,7 +540,7 @@ transfer, synchronize, or validate physical process inputs.
 capture_resource_requirements: CaptureResourceRequirements
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L318-L318)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L342-L342)
 
 ### particula.execution.resident_scheduler.ResidentSimulationRequest.coagulation
 
@@ -534,7 +550,7 @@ capture_resource_requirements: CaptureResourceRequirements
 coagulation: ResidentBrownianCoagulationExecutionState
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L310-L310)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L334-L334)
 
 ### particula.execution.resident_scheduler.ResidentSimulationRequest.communication
 
@@ -544,7 +560,7 @@ coagulation: ResidentBrownianCoagulationExecutionState
 communication: ResidentCommunicationRequest | None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L317-L317)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L341-L341)
 
 ### particula.execution.resident_scheduler.ResidentSimulationRequest.condensation
 
@@ -554,7 +570,7 @@ communication: ResidentCommunicationRequest | None
 condensation: WarpCondensationExecutionState
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L309-L309)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L333-L333)
 
 ### particula.execution.resident_scheduler.ResidentSimulationRequest.diagnostics
 
@@ -564,7 +580,7 @@ condensation: WarpCondensationExecutionState
 diagnostics: ResidentDiagnosticsPlan
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L314-L314)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L338-L338)
 
 ### particula.execution.resident_scheduler.ResidentSimulationRequest.dilution
 
@@ -574,7 +590,7 @@ diagnostics: ResidentDiagnosticsPlan
 dilution: ResidentDilutionRequest
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L311-L311)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L335-L335)
 
 ### particula.execution.resident_scheduler.ResidentSimulationRequest.environment_update
 
@@ -584,7 +600,7 @@ dilution: ResidentDilutionRequest
 environment_update: ResidentEnvironmentUpdateRequest | None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L315-L315)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L339-L339)
 
 ### particula.execution.resident_scheduler.ResidentSimulationRequest.gas_update
 
@@ -594,7 +610,7 @@ environment_update: ResidentEnvironmentUpdateRequest | None
 gas_update: ResidentGasUpdateRequest | None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L316-L316)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L340-L340)
 
 ### particula.execution.resident_scheduler.ResidentSimulationRequest.graph
 
@@ -604,7 +620,7 @@ gas_update: ResidentGasUpdateRequest | None
 graph: ResolvedProcessGraph
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L306-L306)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L330-L330)
 
 ### particula.execution.resident_scheduler.ResidentSimulationRequest.graph_capture_binding
 
@@ -614,7 +630,7 @@ graph: ResolvedProcessGraph
 graph_capture_binding: object | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L319-L319)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L343-L343)
 
 ### particula.execution.resident_scheduler.ResidentSimulationRequest.guard
 
@@ -624,7 +640,7 @@ graph_capture_binding: object | None = None
 guard: ResidentStepGuard
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L305-L305)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L329-L329)
 
 ### particula.execution.resident_scheduler.ResidentSimulationRequest.nucleation
 
@@ -634,7 +650,7 @@ guard: ResidentStepGuard
 nucleation: ResidentNucleationRequest
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L313-L313)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L337-L337)
 
 ### particula.execution.resident_scheduler.ResidentSimulationRequest.registry
 
@@ -644,7 +660,7 @@ nucleation: ResidentNucleationRequest
 registry: GPUResourceRegistry
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L304-L304)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L328-L328)
 
 ### particula.execution.resident_scheduler.ResidentSimulationRequest.schedule
 
@@ -654,7 +670,7 @@ registry: GPUResourceRegistry
 schedule: ResolvedTimestepSchedule
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L307-L307)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L331-L331)
 
 ### particula.execution.resident_scheduler.ResidentSimulationRequest.session
 
@@ -664,7 +680,7 @@ schedule: ResolvedTimestepSchedule
 session: ResidentSession
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L303-L303)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L327-L327)
 
 ### particula.execution.resident_scheduler.ResidentSimulationRequest.thermodynamics
 
@@ -674,7 +690,7 @@ session: ResidentSession
 thermodynamics: ThermodynamicsConfig
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L308-L308)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L332-L332)
 
 ### particula.execution.resident_scheduler.ResidentSimulationRequest.wall_loss
 
@@ -684,7 +700,7 @@ thermodynamics: ThermodynamicsConfig
 wall_loss: ResidentWallLossRequest
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L312-L312)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L336-L336)
 
 ### particula.execution.resident_scheduler.ResidentSimulationRequest.__init__
 
@@ -711,7 +727,7 @@ Validate exact request components and optional update types.
 - `TypeError` — If a required component or optional update has an
 inexact concrete type.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L321-L381)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L345-L405)
 
 ## particula.execution.resident_scheduler.ResidentSimulationScheduler
 
@@ -739,7 +755,7 @@ stream. An optional attached graph-capture binding is only a pre-dispatch
 metadata gate: the scheduler does not capture or replay graphs, recapture,
 transfer, synchronize, fall back, or replace resources for it.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L832-L1018)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L856-L1042)
 
 ### particula.execution.resident_scheduler.ResidentSimulationScheduler._request
 
@@ -749,7 +765,7 @@ transfer, synchronize, fall back, or replace resources for it.
 _request = request
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L865-L865)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L889-L889)
 
 ### particula.execution.resident_scheduler.ResidentSimulationScheduler.__init__
 
@@ -769,7 +785,7 @@ Retain one exact resident simulation request.
 
 - `TypeError` — If ``request`` is not an exact request instance.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L852-L865)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L876-L889)
 
 ### particula.execution.resident_scheduler.ResidentSimulationScheduler._validate
 
@@ -796,7 +812,7 @@ lifecycle state except for deliberate structural-drift invalidation.
 - `ValueError` — If duration, ownership, graph, schedule, request, or
 diagnostics validation fails.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L867-L906)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L891-L930)
 
 ### particula.execution.resident_scheduler.ResidentSimulationScheduler._validate_durations
 
@@ -808,7 +824,7 @@ def _validate_durations(duration: Real) -> None
 
 Require every process request to retain the exact step duration.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L914-L916)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L938-L940)
 
 ### particula.execution.resident_scheduler.ResidentSimulationScheduler._validate_request_nodes
 
@@ -820,7 +836,7 @@ def _validate_request_nodes(graph_by_id: dict[str, ProcessNode]) -> None
 
 Validate request bindings against exact resolved graph nodes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L908-L912)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L932-L936)
 
 ### particula.execution.resident_scheduler.ResidentSimulationScheduler._validate_virtual_refresh_windows
 
@@ -832,7 +848,7 @@ def _validate_virtual_refresh_windows(ids: tuple[str, ...], dependencies: tuple[
 
 Require the complete resolver freshness window.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L918-L923)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L942-L947)
 
 ### particula.execution.resident_scheduler.ResidentSimulationScheduler.execute
 
@@ -863,7 +879,7 @@ duration.
 operation reject execution.
 - `RuntimeError` — If lifecycle token handling rejects the timestep.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L925-L1018)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L949-L1042)
 
 ## particula.execution.resident_scheduler._capture_resource_requirements_type
 
@@ -875,7 +891,7 @@ def _capture_resource_requirements_type() -> type[object]
 
 Return the concrete capture requirements type without an import cycle.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L260-L264)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L284-L288)
 
 ## particula.execution.resident_scheduler._cleanup_resident_execution_failure
 
@@ -887,7 +903,7 @@ def _cleanup_resident_execution_failure(request: ResidentSimulationRequest, toke
 
 Close a failed token and preserve legacy lifecycle classification.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L770-L808)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L794-L832)
 
 ## particula.execution.resident_scheduler._enqueue_captured_prepared_operations
 
@@ -912,7 +928,7 @@ guard token, record thermodynamic progress, or clean up failures.
 
 - `BaseException` — Propagates an exception raised by a retained operation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L751-L767)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L775-L791)
 
 ## particula.execution.resident_scheduler._enqueue_prepared_diagnostics_window
 
@@ -924,7 +940,7 @@ def _enqueue_prepared_diagnostics_window(consumer: object, diagnostics: object) 
 
 Enqueue retained diagnostic saturation-refresh and copy operations.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L811-L817)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L835-L841)
 
 ## particula.execution.resident_scheduler._enqueue_prepared_operation_execute
 
@@ -944,7 +960,7 @@ Invoke one setup-bound prepared operation without resolving it again.
 
 - (`object`) — The result returned by the retained operation's ``execute`` method.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L820-L829)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L844-L853)
 
 ## particula.execution.resident_scheduler._graph_capture_binding_type
 
@@ -956,7 +972,7 @@ def _graph_capture_binding_type() -> type[object]
 
 Return the concrete optional graph-capture binding type lazily.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L253-L257)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L277-L281)
 
 ## particula.execution.resident_scheduler._registry_type
 
@@ -972,7 +988,7 @@ Return the concrete registry type without creating an import cycle.
 
 - (`type[object]`) — The direct-module-only GPU resource registry type.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L242-L250)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L266-L274)
 
 ## particula.execution.resident_scheduler._validate_complete_resident_timestep_metadata
 
@@ -1000,7 +1016,7 @@ state.
 - `ValueError` — If graph, schedule, request bindings, metadata, or duration
 agreement is invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L1021-L1072)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L1045-L1096)
 
 ## particula.execution.resident_scheduler._validate_prepared_resident_simulation
 
@@ -1022,7 +1038,7 @@ Perform the READY-only identity and signature gate before token entry.
 - `ValueError` — If any retained identity, operation, or READY attachment
 metadata has drifted.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L561-L702)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L585-L726)
 
 ## particula.execution.resident_scheduler._validate_resident_durations
 
@@ -1043,7 +1059,7 @@ Require every process request to retain the exact step duration.
 
 - `ValueError` — If any process timestep differs from ``duration``.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L1227-L1247)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L1251-L1271)
 
 ## particula.execution.resident_scheduler._validate_resident_request_nodes
 
@@ -1065,7 +1081,7 @@ Validate request bindings against resolved graph and resources.
 - `ValueError` — If a process, diagnostic, communication, or published
 resource binding does not match the resident request.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L1107-L1224)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L1131-L1248)
 
 ## particula.execution.resident_scheduler._validate_virtual_refresh_windows
 
@@ -1087,7 +1103,7 @@ Require the resolver's canonical thermodynamic refresh windows.
 - `ValueError` — If virtual refresh nodes do not retain their required order
 and dependency edges.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L1075-L1104)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L1099-L1128)
 
 ## particula.execution.resident_scheduler.enqueue_prepared_resident_simulation
 
@@ -1123,7 +1139,7 @@ or a fresh signature comparison detects structural drift before
 token entry.
 - `BaseException` — Propagates an operation failure after lifecycle cleanup.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L705-L748)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L729-L772)
 
 ## particula.execution.resident_scheduler.prepare_resident_simulation
 
@@ -1155,4 +1171,4 @@ retained callables under one lifecycle token.
 - `ValueError` — If resident metadata, schedule, or resource identities do
 not satisfy the READY preparation contract.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L384-L558)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L408-L582)

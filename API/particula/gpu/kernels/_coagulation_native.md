@@ -20,7 +20,7 @@ def _memory_range(array: Any) -> tuple[int, int]
 
 Check contiguous supported storage and return its byte range.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_native.py#L122-L138)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_native.py#L120-L136)
 
 ## particula.gpu.kernels._coagulation_native._validate_volume_and_derived
 
@@ -39,12 +39,12 @@ Check volume authority and finite derived population quantities.
 *function*
 
 ```python
-def validate_ownership(particles: Any, pairs: Any, counts: Any, states: Any, protected_inputs: tuple[Any, ...]) -> None
+def validate_ownership(particles: Any, pairs: Any, counts: Any, states: Any, protected_inputs: tuple[Any, ...], *, work_counts: Any = None) -> None
 ```
 
 Reject every native writer overlapping another writer or read source.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_native.py#L141-L177)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_native.py#L139-L178)
 
 ## particula.gpu.kernels._coagulation_native.validate_physics
 
@@ -56,7 +56,7 @@ def validate_physics(particles: Any, requested_volume: Any) -> None
 
 Admit equal active counts and physical state before any state writer.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_native.py#L70-L119)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_native.py#L70-L117)
 
 ## particula.gpu.kernels._coagulation_native.validate_schema
 

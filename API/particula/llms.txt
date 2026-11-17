@@ -2846,7 +2846,7 @@ combined_process = process1 | process2
 final_aerosol = combined_process.execute(aerosol, time_step=1.0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L262-L283)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L265-L286)
 
 ### particula.box_process.BoxProcess._advance_box
 
@@ -2965,7 +2965,7 @@ Declare numeric destinations for transactional publication.
 *method*
 
 ```python
-def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, time: float = 0.0) -> PreparedSimulation
+def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, coagulation_work_config=None, time: float = 0.0) -> PreparedSimulation
 ```
 
 Inherited from: `particula.runnable.RunnableABC`
@@ -2981,6 +2981,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `root_seed` (`int`) (default: `0`) — Root seed for persistent independent process/box streams.
 - `logical_box_ids` (default: `None`) — Optional stable identities in physical box order.
 - `process_registry` (default: `None`) — Exact-type custom GPU adapter registrations.
+- `coagulation_work_config` (default: `None`) — Optional coagulation resource budgets.
 - `time` (`float`) (default: `0.0`) — Absolute initial simulation time [s].
 
 **Returns**
@@ -2993,7 +2994,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `ValueError` — If process physics or state cannot be represented.
 - `RuntimeError` — If the requested runtime/device is unavailable.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L179-L224)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L179-L227)
 
 ### particula.box_process.BoxProcess.rate
 
@@ -3039,7 +3040,7 @@ Resume exact saved state using the same process configuration.
 current population cannot be admitted (e.g. unequal Brownian
 counts after a later process injected new particles).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L226-L260)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L229-L263)
 
 ## particula.box_process.FunctionProcess
 
@@ -3251,7 +3252,7 @@ combined_process = process1 | process2
 final_aerosol = combined_process.execute(aerosol, time_step=1.0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L262-L283)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L265-L286)
 
 ### particula.box_process.FunctionProcess._advance_box
 
@@ -3370,7 +3371,7 @@ Declare numeric destinations for transactional publication.
 *method*
 
 ```python
-def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, time: float = 0.0) -> PreparedSimulation
+def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, coagulation_work_config=None, time: float = 0.0) -> PreparedSimulation
 ```
 
 Inherited from: `particula.runnable.RunnableABC`
@@ -3386,6 +3387,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `root_seed` (`int`) (default: `0`) — Root seed for persistent independent process/box streams.
 - `logical_box_ids` (default: `None`) — Optional stable identities in physical box order.
 - `process_registry` (default: `None`) — Exact-type custom GPU adapter registrations.
+- `coagulation_work_config` (default: `None`) — Optional coagulation resource budgets.
 - `time` (`float`) (default: `0.0`) — Absolute initial simulation time [s].
 
 **Returns**
@@ -3398,7 +3400,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `ValueError` — If process physics or state cannot be represented.
 - `RuntimeError` — If the requested runtime/device is unavailable.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L179-L224)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L179-L227)
 
 ### particula.box_process.FunctionProcess.rate
 
@@ -3444,7 +3446,7 @@ Resume exact saved state using the same process configuration.
 current population cannot be admitted (e.g. unequal Brownian
 counts after a later process injected new particles).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L226-L260)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L229-L263)
 
 ## particula.box_process._check_candidate
 
@@ -4986,7 +4988,7 @@ combined_process = process1 | process2
 final_aerosol = combined_process.execute(aerosol, time_step=1.0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L262-L283)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L265-L286)
 
 ### particula.cpu_transfer.CPUTransfer._advance_box
 
@@ -5105,7 +5107,7 @@ Declare numeric destinations for transactional publication.
 *method*
 
 ```python
-def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, time: float = 0.0) -> PreparedSimulation
+def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, coagulation_work_config=None, time: float = 0.0) -> PreparedSimulation
 ```
 
 Inherited from: `particula.runnable.RunnableABC`
@@ -5121,6 +5123,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `root_seed` (`int`) (default: `0`) — Root seed for persistent independent process/box streams.
 - `logical_box_ids` (default: `None`) — Optional stable identities in physical box order.
 - `process_registry` (default: `None`) — Exact-type custom GPU adapter registrations.
+- `coagulation_work_config` (default: `None`) — Optional coagulation resource budgets.
 - `time` (`float`) (default: `0.0`) — Absolute initial simulation time [s].
 
 **Returns**
@@ -5133,7 +5136,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `ValueError` — If process physics or state cannot be represented.
 - `RuntimeError` — If the requested runtime/device is unavailable.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L179-L224)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L179-L227)
 
 ### particula.cpu_transfer.CPUTransfer.rate
 
@@ -5179,7 +5182,7 @@ Resume exact saved state using the same process configuration.
 current population cannot be admitted (e.g. unequal Brownian
 counts after a later process injected new particles).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L226-L260)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L229-L263)
 
 ## particula.cpu_transfer._CPUTransferAdapter
 
@@ -27250,7 +27253,7 @@ combined_process = process1 | process2
 final_aerosol = combined_process.execute(aerosol, time_step=1.0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L262-L283)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L265-L286)
 
 ### particula.dynamics.ions.cleanup.IonNeutralCleanup._advance_box
 
@@ -27355,7 +27358,7 @@ Declare numeric destinations for transactional publication.
 *method*
 
 ```python
-def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, time: float = 0.0) -> PreparedSimulation
+def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, coagulation_work_config=None, time: float = 0.0) -> PreparedSimulation
 ```
 
 Inherited from: `particula.runnable.RunnableABC`
@@ -27371,6 +27374,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `root_seed` (`int`) (default: `0`) — Root seed for persistent independent process/box streams.
 - `logical_box_ids` (default: `None`) — Optional stable identities in physical box order.
 - `process_registry` (default: `None`) — Exact-type custom GPU adapter registrations.
+- `coagulation_work_config` (default: `None`) — Optional coagulation resource budgets.
 - `time` (`float`) (default: `0.0`) — Absolute initial simulation time [s].
 
 **Returns**
@@ -27383,7 +27387,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `ValueError` — If process physics or state cannot be represented.
 - `RuntimeError` — If the requested runtime/device is unavailable.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L179-L224)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L179-L227)
 
 ### particula.dynamics.ions.cleanup.IonNeutralCleanup.rate
 
@@ -27429,7 +27433,7 @@ Resume exact saved state using the same process configuration.
 current population cannot be admitted (e.g. unequal Brownian
 counts after a later process injected new particles).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L226-L260)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L229-L263)
 
 ---
 
@@ -27653,7 +27657,7 @@ combined_process = process1 | process2
 final_aerosol = combined_process.execute(aerosol, time_step=1.0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L262-L283)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L265-L286)
 
 ### particula.dynamics.ions.coagulation.AtmosphericCoagulation._advance_box
 
@@ -27758,7 +27762,7 @@ Declare numeric destinations for transactional publication.
 *method*
 
 ```python
-def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, time: float = 0.0) -> PreparedSimulation
+def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, coagulation_work_config=None, time: float = 0.0) -> PreparedSimulation
 ```
 
 Inherited from: `particula.runnable.RunnableABC`
@@ -27774,6 +27778,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `root_seed` (`int`) (default: `0`) — Root seed for persistent independent process/box streams.
 - `logical_box_ids` (default: `None`) — Optional stable identities in physical box order.
 - `process_registry` (default: `None`) — Exact-type custom GPU adapter registrations.
+- `coagulation_work_config` (default: `None`) — Optional coagulation resource budgets.
 - `time` (`float`) (default: `0.0`) — Absolute initial simulation time [s].
 
 **Returns**
@@ -27786,7 +27791,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `ValueError` — If process physics or state cannot be represented.
 - `RuntimeError` — If the requested runtime/device is unavailable.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L179-L224)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L179-L227)
 
 ### particula.dynamics.ions.coagulation.AtmosphericCoagulation.rate
 
@@ -27832,7 +27837,7 @@ Resume exact saved state using the same process configuration.
 current population cannot be admitted (e.g. unequal Brownian
 counts after a later process injected new particles).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L226-L260)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L229-L263)
 
 ---
 
@@ -27953,7 +27958,7 @@ combined_process = process1 | process2
 final_aerosol = combined_process.execute(aerosol, time_step=1.0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L262-L283)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L265-L286)
 
 ### particula.dynamics.ions.condensation.IonCondensationExclusion._advance_box
 
@@ -28058,7 +28063,7 @@ Declare numeric destinations for transactional publication.
 *method*
 
 ```python
-def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, time: float = 0.0) -> PreparedSimulation
+def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, coagulation_work_config=None, time: float = 0.0) -> PreparedSimulation
 ```
 
 Inherited from: `particula.runnable.RunnableABC`
@@ -28074,6 +28079,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `root_seed` (`int`) (default: `0`) — Root seed for persistent independent process/box streams.
 - `logical_box_ids` (default: `None`) — Optional stable identities in physical box order.
 - `process_registry` (default: `None`) — Exact-type custom GPU adapter registrations.
+- `coagulation_work_config` (default: `None`) — Optional coagulation resource budgets.
 - `time` (`float`) (default: `0.0`) — Absolute initial simulation time [s].
 
 **Returns**
@@ -28086,7 +28092,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `ValueError` — If process physics or state cannot be represented.
 - `RuntimeError` — If the requested runtime/device is unavailable.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L179-L224)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L179-L227)
 
 ### particula.dynamics.ions.condensation.IonCondensationExclusion.rate
 
@@ -28132,7 +28138,7 @@ Resume exact saved state using the same process configuration.
 current population cannot be admitted (e.g. unequal Brownian
 counts after a later process injected new particles).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L226-L260)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L229-L263)
 
 ---
 
@@ -28337,7 +28343,7 @@ combined_process = process1 | process2
 final_aerosol = combined_process.execute(aerosol, time_step=1.0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L262-L283)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L265-L286)
 
 ### particula.dynamics.ions.source.IonPairSource._advance_box
 
@@ -28442,7 +28448,7 @@ Declare numeric destinations for transactional publication.
 *method*
 
 ```python
-def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, time: float = 0.0) -> PreparedSimulation
+def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, coagulation_work_config=None, time: float = 0.0) -> PreparedSimulation
 ```
 
 Inherited from: `particula.runnable.RunnableABC`
@@ -28458,6 +28464,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `root_seed` (`int`) (default: `0`) — Root seed for persistent independent process/box streams.
 - `logical_box_ids` (default: `None`) — Optional stable identities in physical box order.
 - `process_registry` (default: `None`) — Exact-type custom GPU adapter registrations.
+- `coagulation_work_config` (default: `None`) — Optional coagulation resource budgets.
 - `time` (`float`) (default: `0.0`) — Absolute initial simulation time [s].
 
 **Returns**
@@ -28470,7 +28477,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `ValueError` — If process physics or state cannot be represented.
 - `RuntimeError` — If the requested runtime/device is unavailable.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L179-L224)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L179-L227)
 
 ### particula.dynamics.ions.source.IonPairSource.rate
 
@@ -28516,7 +28523,7 @@ Resume exact saved state using the same process configuration.
 current population cannot be admitted (e.g. unequal Brownian
 counts after a later process injected new particles).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L226-L260)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L229-L263)
 
 ---
 
@@ -35484,7 +35491,7 @@ combined_process = process1 | process2
 final_aerosol = combined_process.execute(aerosol, time_step=1.0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L262-L283)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L265-L286)
 
 ### particula.dynamics.particle_process.Coagulation.execute
 
@@ -35509,7 +35516,7 @@ this method retain responsibility for their own execution semantics.
 *method*
 
 ```python
-def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, time: float = 0.0) -> PreparedSimulation
+def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, coagulation_work_config=None, time: float = 0.0) -> PreparedSimulation
 ```
 
 Inherited from: `particula.runnable.RunnableABC`
@@ -35525,6 +35532,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `root_seed` (`int`) (default: `0`) — Root seed for persistent independent process/box streams.
 - `logical_box_ids` (default: `None`) — Optional stable identities in physical box order.
 - `process_registry` (default: `None`) — Exact-type custom GPU adapter registrations.
+- `coagulation_work_config` (default: `None`) — Optional coagulation resource budgets.
 - `time` (`float`) (default: `0.0`) — Absolute initial simulation time [s].
 
 **Returns**
@@ -35537,7 +35545,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `ValueError` — If process physics or state cannot be represented.
 - `RuntimeError` — If the requested runtime/device is unavailable.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L179-L224)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L179-L227)
 
 ### particula.dynamics.particle_process.Coagulation.rate
 
@@ -35583,7 +35591,7 @@ Resume exact saved state using the same process configuration.
 current population cannot be admitted (e.g. unequal Brownian
 counts after a later process injected new particles).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L226-L260)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L229-L263)
 
 ## particula.dynamics.particle_process.Dilution
 
@@ -35860,14 +35868,14 @@ combined_process = process1 | process2
 final_aerosol = combined_process.execute(aerosol, time_step=1.0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L262-L283)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L265-L286)
 
 ### particula.dynamics.particle_process.Dilution.prepare
 
 *method*
 
 ```python
-def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, time: float = 0.0) -> PreparedSimulation
+def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, coagulation_work_config=None, time: float = 0.0) -> PreparedSimulation
 ```
 
 Inherited from: `particula.runnable.RunnableABC`
@@ -35883,6 +35891,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `root_seed` (`int`) (default: `0`) — Root seed for persistent independent process/box streams.
 - `logical_box_ids` (default: `None`) — Optional stable identities in physical box order.
 - `process_registry` (default: `None`) — Exact-type custom GPU adapter registrations.
+- `coagulation_work_config` (default: `None`) — Optional coagulation resource budgets.
 - `time` (`float`) (default: `0.0`) — Absolute initial simulation time [s].
 
 **Returns**
@@ -35895,7 +35904,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `ValueError` — If process physics or state cannot be represented.
 - `RuntimeError` — If the requested runtime/device is unavailable.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L179-L224)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L179-L227)
 
 ### particula.dynamics.particle_process.Dilution.resume
 
@@ -35927,7 +35936,7 @@ Resume exact saved state using the same process configuration.
 current population cannot be admitted (e.g. unequal Brownian
 counts after a later process injected new particles).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L226-L260)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L229-L263)
 
 ## particula.dynamics.particle_process.DilutionStrategyProtocol
 
@@ -36240,7 +36249,7 @@ combined_process = process1 | process2
 final_aerosol = combined_process.execute(aerosol, time_step=1.0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L262-L283)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L265-L286)
 
 ### particula.dynamics.particle_process.MassCondensation.execute
 
@@ -36265,7 +36274,7 @@ this method retain responsibility for their own execution semantics.
 *method*
 
 ```python
-def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, time: float = 0.0) -> PreparedSimulation
+def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, coagulation_work_config=None, time: float = 0.0) -> PreparedSimulation
 ```
 
 Inherited from: `particula.runnable.RunnableABC`
@@ -36281,6 +36290,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `root_seed` (`int`) (default: `0`) — Root seed for persistent independent process/box streams.
 - `logical_box_ids` (default: `None`) — Optional stable identities in physical box order.
 - `process_registry` (default: `None`) — Exact-type custom GPU adapter registrations.
+- `coagulation_work_config` (default: `None`) — Optional coagulation resource budgets.
 - `time` (`float`) (default: `0.0`) — Absolute initial simulation time [s].
 
 **Returns**
@@ -36293,7 +36303,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `ValueError` — If process physics or state cannot be represented.
 - `RuntimeError` — If the requested runtime/device is unavailable.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L179-L224)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L179-L227)
 
 ### particula.dynamics.particle_process.MassCondensation.rate
 
@@ -36339,7 +36349,7 @@ Resume exact saved state using the same process configuration.
 current population cannot be admitted (e.g. unequal Brownian
 counts after a later process injected new particles).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L226-L260)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L229-L263)
 
 ## particula.dynamics.particle_process.Nucleation
 
@@ -36593,7 +36603,7 @@ combined_process = process1 | process2
 final_aerosol = combined_process.execute(aerosol, time_step=1.0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L262-L283)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L265-L286)
 
 ### particula.dynamics.particle_process.Nucleation.execute
 
@@ -36618,7 +36628,7 @@ this method retain responsibility for their own execution semantics.
 *method*
 
 ```python
-def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, time: float = 0.0) -> PreparedSimulation
+def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, coagulation_work_config=None, time: float = 0.0) -> PreparedSimulation
 ```
 
 Inherited from: `particula.runnable.RunnableABC`
@@ -36634,6 +36644,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `root_seed` (`int`) (default: `0`) — Root seed for persistent independent process/box streams.
 - `logical_box_ids` (default: `None`) — Optional stable identities in physical box order.
 - `process_registry` (default: `None`) — Exact-type custom GPU adapter registrations.
+- `coagulation_work_config` (default: `None`) — Optional coagulation resource budgets.
 - `time` (`float`) (default: `0.0`) — Absolute initial simulation time [s].
 
 **Returns**
@@ -36646,7 +36657,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `ValueError` — If process physics or state cannot be represented.
 - `RuntimeError` — If the requested runtime/device is unavailable.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L179-L224)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L179-L227)
 
 ### particula.dynamics.particle_process.Nucleation.rate
 
@@ -36692,7 +36703,7 @@ Resume exact saved state using the same process configuration.
 current population cannot be admitted (e.g. unequal Brownian
 counts after a later process injected new particles).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L226-L260)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L229-L263)
 
 ## particula.dynamics.particle_process.NucleationCommitConfig
 
@@ -37117,7 +37128,7 @@ combined_process = process1 | process2
 final_aerosol = combined_process.execute(aerosol, time_step=1.0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L262-L283)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L265-L286)
 
 ### particula.dynamics.particle_process.WallLoss.execute
 
@@ -37142,7 +37153,7 @@ this method retain responsibility for their own execution semantics.
 *method*
 
 ```python
-def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, time: float = 0.0) -> PreparedSimulation
+def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, coagulation_work_config=None, time: float = 0.0) -> PreparedSimulation
 ```
 
 Inherited from: `particula.runnable.RunnableABC`
@@ -37158,6 +37169,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `root_seed` (`int`) (default: `0`) — Root seed for persistent independent process/box streams.
 - `logical_box_ids` (default: `None`) — Optional stable identities in physical box order.
 - `process_registry` (default: `None`) — Exact-type custom GPU adapter registrations.
+- `coagulation_work_config` (default: `None`) — Optional coagulation resource budgets.
 - `time` (`float`) (default: `0.0`) — Absolute initial simulation time [s].
 
 **Returns**
@@ -37170,7 +37182,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `ValueError` — If process physics or state cannot be represented.
 - `RuntimeError` — If the requested runtime/device is unavailable.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L179-L224)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L179-L227)
 
 ### particula.dynamics.particle_process.WallLoss.rate
 
@@ -37216,7 +37228,7 @@ Resume exact saved state using the same process configuration.
 current population cannot be admitted (e.g. unequal Brownian
 counts after a later process injected new particles).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L226-L260)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L229-L263)
 
 ## particula.dynamics.particle_process._NativeBatchRunnable
 
@@ -37360,7 +37372,7 @@ combined_process = process1 | process2
 final_aerosol = combined_process.execute(aerosol, time_step=1.0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L262-L283)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L265-L286)
 
 ### particula.dynamics.particle_process._NativeBatchRunnable._execute_box
 
@@ -37413,7 +37425,7 @@ this method retain responsibility for their own execution semantics.
 *method*
 
 ```python
-def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, time: float = 0.0) -> PreparedSimulation
+def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, coagulation_work_config=None, time: float = 0.0) -> PreparedSimulation
 ```
 
 Inherited from: `particula.runnable.RunnableABC`
@@ -37429,6 +37441,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `root_seed` (`int`) (default: `0`) — Root seed for persistent independent process/box streams.
 - `logical_box_ids` (default: `None`) — Optional stable identities in physical box order.
 - `process_registry` (default: `None`) — Exact-type custom GPU adapter registrations.
+- `coagulation_work_config` (default: `None`) — Optional coagulation resource budgets.
 - `time` (`float`) (default: `0.0`) — Absolute initial simulation time [s].
 
 **Returns**
@@ -37441,7 +37454,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `ValueError` — If process physics or state cannot be represented.
 - `RuntimeError` — If the requested runtime/device is unavailable.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L179-L224)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L179-L227)
 
 ### particula.dynamics.particle_process._NativeBatchRunnable.rate
 
@@ -37487,7 +37500,7 @@ Resume exact saved state using the same process configuration.
 current population cannot be admitted (e.g. unequal Brownian
 counts after a later process injected new particles).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L226-L260)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L229-L263)
 
 ## particula.dynamics.particle_process._is_real_scalar
 
@@ -43088,7 +43101,7 @@ combined_process = process1 | process2
 final_aerosol = combined_process.execute(aerosol, time_step=1.0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L262-L283)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L265-L286)
 
 ### particula.equilibria.Equilibria._advance_box
 
@@ -43207,7 +43220,7 @@ Declare numeric destinations for transactional publication.
 *method*
 
 ```python
-def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, time: float = 0.0) -> PreparedSimulation
+def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, coagulation_work_config=None, time: float = 0.0) -> PreparedSimulation
 ```
 
 Inherited from: `particula.runnable.RunnableABC`
@@ -43223,6 +43236,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `root_seed` (`int`) (default: `0`) — Root seed for persistent independent process/box streams.
 - `logical_box_ids` (default: `None`) — Optional stable identities in physical box order.
 - `process_registry` (default: `None`) — Exact-type custom GPU adapter registrations.
+- `coagulation_work_config` (default: `None`) — Optional coagulation resource budgets.
 - `time` (`float`) (default: `0.0`) — Absolute initial simulation time [s].
 
 **Returns**
@@ -43235,7 +43249,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `ValueError` — If process physics or state cannot be represented.
 - `RuntimeError` — If the requested runtime/device is unavailable.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L179-L224)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L179-L227)
 
 ### particula.equilibria.Equilibria.resume
 
@@ -43267,7 +43281,7 @@ Resume exact saved state using the same process configuration.
 current population cannot be admitted (e.g. unequal Brownian
 counts after a later process injected new particles).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L226-L260)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L229-L263)
 
 ## particula.equilibria.EquilibriaFactory
 
@@ -44159,7 +44173,7 @@ combined_process = process1 | process2
 final_aerosol = combined_process.execute(aerosol, time_step=1.0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L262-L283)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L265-L286)
 
 ### particula.equilibria.equilibria.Equilibria._advance_box
 
@@ -44278,7 +44292,7 @@ Declare numeric destinations for transactional publication.
 *method*
 
 ```python
-def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, time: float = 0.0) -> PreparedSimulation
+def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, coagulation_work_config=None, time: float = 0.0) -> PreparedSimulation
 ```
 
 Inherited from: `particula.runnable.RunnableABC`
@@ -44294,6 +44308,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `root_seed` (`int`) (default: `0`) — Root seed for persistent independent process/box streams.
 - `logical_box_ids` (default: `None`) — Optional stable identities in physical box order.
 - `process_registry` (default: `None`) — Exact-type custom GPU adapter registrations.
+- `coagulation_work_config` (default: `None`) — Optional coagulation resource budgets.
 - `time` (`float`) (default: `0.0`) — Absolute initial simulation time [s].
 
 **Returns**
@@ -44306,7 +44321,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `ValueError` — If process physics or state cannot be represented.
 - `RuntimeError` — If the requested runtime/device is unavailable.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L179-L224)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L179-L227)
 
 ### particula.equilibria.equilibria.Equilibria.resume
 
@@ -44338,7 +44353,7 @@ Resume exact saved state using the same process configuration.
 current population cannot be admitted (e.g. unequal Brownian
 counts after a later process injected new particles).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L226-L260)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L229-L263)
 
 ---
 
@@ -50381,7 +50396,7 @@ resident-owned configuration-derived coagulation sidecar with literal
 ``initialize_rng=False``. It does not acquire, allocate, seed, reset,
 inspect, transfer, or synchronize the stream.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L818-L934)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L823-L941)
 
 ### particula.execution.adapters.coagulation.ResidentBrownianCoagulationExecutionAdapter.execute
 
@@ -50410,7 +50425,7 @@ or inconsistent.
 - `ImportError` — If the optional direct Warp kernel is unavailable after
 preflight.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L904-L934)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L910-L941)
 
 ### particula.execution.adapters.coagulation.ResidentBrownianCoagulationExecutionAdapter.prepare
 
@@ -50437,7 +50452,7 @@ Preflight and freeze one resident Brownian kernel call.
 or inconsistent.
 - `ImportError` — If the optional direct Warp kernel is unavailable.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L828-L902)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L833-L908)
 
 ## particula.execution.adapters.coagulation.ResidentBrownianCoagulationExecutionState
 
@@ -50554,7 +50569,7 @@ state validation and calls it once. It forwards state resources by identity
 without conversion, synchronization, fallback, retry, or recovery. Kernel
 exceptions and any post-launch mutation remain governed by the kernel.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L951-L1009)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L958-L1016)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationExecutionAdapter.execute
 
@@ -50585,7 +50600,7 @@ unchanged.
 - `ImportError` — If optional Warp kernel dependencies are unavailable
 after local preflight.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L960-L1009)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L967-L1016)
 
 ## particula.execution.adapters.coagulation.WarpBrownianCoagulationExecutionState
 
@@ -51012,7 +51027,7 @@ boundary.
 - `prepared` (`Any`) — Frozen direct-kernel preparation record.
 - `enqueue` (`Any`) — Callable that issues the already prepared native operation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L793-L815)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L793-L820)
 
 ### particula.execution.adapters.coagulation._PreparedResidentBrownianCoagulationBinding.enqueue
 
@@ -51053,6 +51068,18 @@ def __init__(state: ResidentBrownianCoagulationExecutionState, prepared: Any, en
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L0-L0)
+
+### particula.execution.adapters.coagulation._PreparedResidentBrownianCoagulationBinding.check_admission
+
+*method*
+
+```python
+def check_admission() -> None
+```
+
+Surface budget rejection at a caller observation boundary.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L817-L820)
 
 ### particula.execution.adapters.coagulation._PreparedResidentBrownianCoagulationBinding.execute
 
@@ -51126,7 +51153,7 @@ Lazily resolve the optional direct Warp coagulation kernel.
 
 - `ImportError` — If optional Warp kernel dependencies are unavailable.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L937-L948)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L944-L955)
 
 ## particula.execution.adapters.coagulation._memory_range
 
@@ -54651,7 +54678,7 @@ combined_process = process1 | process2
 final_aerosol = combined_process.execute(aerosol, time_step=1.0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L262-L283)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L265-L286)
 
 ### particula.execution.cohort.SeedCohort._advance_box
 
@@ -54756,7 +54783,7 @@ Declare numeric destinations for transactional publication.
 *method*
 
 ```python
-def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, time: float = 0.0) -> PreparedSimulation
+def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, coagulation_work_config=None, time: float = 0.0) -> PreparedSimulation
 ```
 
 Inherited from: `particula.runnable.RunnableABC`
@@ -54772,6 +54799,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `root_seed` (`int`) (default: `0`) — Root seed for persistent independent process/box streams.
 - `logical_box_ids` (default: `None`) — Optional stable identities in physical box order.
 - `process_registry` (default: `None`) — Exact-type custom GPU adapter registrations.
+- `coagulation_work_config` (default: `None`) — Optional coagulation resource budgets.
 - `time` (`float`) (default: `0.0`) — Absolute initial simulation time [s].
 
 **Returns**
@@ -54784,7 +54812,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `ValueError` — If process physics or state cannot be represented.
 - `RuntimeError` — If the requested runtime/device is unavailable.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L179-L224)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L179-L227)
 
 ### particula.execution.cohort.SeedCohort.rate
 
@@ -54830,7 +54858,7 @@ Resume exact saved state using the same process configuration.
 current population cannot be admitted (e.g. unequal Brownian
 counts after a later process injected new particles).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L226-L260)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L229-L263)
 
 ---
 
@@ -72222,7 +72250,7 @@ pending work, and ``snapshot`` returns detached CPU data for analysis.
 Closing waits for outstanding work and releases owned storage without an
 automatic download. Instances serialize their own operations.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L23-L623)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L23-L654)
 
 ### particula.execution.prepared.PreparedSimulation._auxiliary
 
@@ -72484,7 +72512,7 @@ captured: bool
 
 Report whether subsequent steps use this owner's live CUDA graph.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L560-L563)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L591-L594)
 
 ### particula.execution.prepared.PreparedSimulation.closed
 
@@ -72544,7 +72572,7 @@ gas_names: tuple[str, ...]
 
 Return the fixed full-gas order for updates and analysis.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L418-L422)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L449-L453)
 
 ### particula.execution.prepared.PreparedSimulation.simulated_time
 
@@ -72580,7 +72608,7 @@ def __enter__() -> PreparedSimulation
 
 Enter an active simulation's explicit ownership scope.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L616-L619)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L647-L650)
 
 ### particula.execution.prepared.PreparedSimulation.__exit__
 
@@ -72592,7 +72620,7 @@ def __exit__(*_exc: object) -> None
 
 Release resources on normal exit and exceptions.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L621-L623)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L652-L654)
 
 ### particula.execution.prepared.PreparedSimulation.__init__
 
@@ -72706,7 +72734,7 @@ identities stay fixed; forcing updates may change values in place.
 Warp CPU rejects. Warp may instantiate its executable on first replay;
 performance measurements should warm up that replay separately.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L565-L577)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L596-L608)
 
 ### particula.execution.prepared.PreparedSimulation.checkpoint
 
@@ -72722,7 +72750,7 @@ Unlike a CPU snapshot, this in-memory checkpoint preserves random
 streams, GPU-only fields and step counters. Resume on the same device
 through the original runnable or an equivalently configured sequence.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L547-L557)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L578-L588)
 
 ### particula.execution.prepared.PreparedSimulation.close
 
@@ -72734,7 +72762,23 @@ def close() -> None
 
 Wait and release owned storage without downloading a final state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L585-L614)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L616-L645)
+
+### particula.execution.prepared.PreparedSimulation.coagulation_diagnostics
+
+*method*
+
+```python
+def coagulation_diagnostics() -> dict[str, Any]
+```
+
+Observe compact work counts for the latest successful coagulation.
+
+Counts describe this owner since preparation/restart; fresh owners
+report zeros until a step runs. Capture recording does not advance them.
+This observer does not download particle arrays.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L420-L446)
 
 ### particula.execution.prepared.PreparedSimulation.cohort_diagnostics
 
@@ -72750,7 +72794,7 @@ Counts partition initial seeds into reached, captured and unresolved.
 Unresolved lineages are censored at the chosen observation end time.
 These are lineage counts, not the number of surviving particles.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L528-L545)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L559-L576)
 
 ### particula.execution.prepared.PreparedSimulation.diagnostics
 
@@ -72767,7 +72811,7 @@ Observe detached box/species reductions without downloading slots.
 - (`SimulationDiagnostics`) — SimulationDiagnostics with number, charge and mass concentrations,
 - (`SimulationDiagnostics`) — active-slot counts, forcing, and optional last-step latent energy.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L399-L415)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L402-L418)
 
 ### particula.execution.prepared.PreparedSimulation.ion_cleanup_diagnostics
 
@@ -72782,7 +72826,7 @@ Observe cumulative exported particles and mass [kg, box by species].
 Exported charge is exactly zero by construction. Returned arrays are
 detached; this explicit observation synchronizes the prepared owner.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L509-L526)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L540-L557)
 
 ### particula.execution.prepared.PreparedSimulation.ion_source_diagnostics
 
@@ -72797,7 +72841,7 @@ Return cumulative injected pairs and mass [kg] for each box.
 This explicit observation synchronizes and returns detached arrays.
 Mass is extensive, in the native particle species order.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L486-L507)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L517-L538)
 
 ### particula.execution.prepared.PreparedSimulation.run
 
@@ -72826,7 +72870,7 @@ snapshots, including when explicitly targeting Warp CPU. Derived vapor
 pressure and random streams belong to execution/checkpoint state rather
 than the CPU aerosol schema.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L363-L397)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L366-L400)
 
 ### particula.execution.prepared.PreparedSimulation.step
 
@@ -72853,7 +72897,7 @@ def synchronize() -> None
 
 Wait for pending work and surface asynchronous execution failures.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L322-L361)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L322-L364)
 
 ### particula.execution.prepared.PreparedSimulation.uncapture
 
@@ -72865,7 +72909,7 @@ def uncapture() -> None
 
 Wait, release the graph and return to ordinary prepared execution.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L579-L583)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L610-L614)
 
 ### particula.execution.prepared.PreparedSimulation.update_environment
 
@@ -72884,7 +72928,7 @@ condensation, saturation is derived and cannot be prescribed here.
 This explicit forcing boundary waits for prior work and its uploads.
 Invalid values reject before any resident field is changed.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L424-L463)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L455-L494)
 
 ### particula.execution.prepared.PreparedSimulation.update_gas
 
@@ -72901,19 +72945,19 @@ This explicit boundary waits for pending work, uploads owned values,
 and refreshes derived saturation when condensation supplies its law.
 It leaves particle state and process configuration unchanged.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L465-L484)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L496-L515)
 
 ## particula.execution.prepared.prepare_simulation
 
 *function*
 
 ```python
-def prepare_simulation(processes: tuple[Any, ...], aerosol: Aerosol, *, backend: Backend = Backend.WARP, device: str = 'cuda:0', time_step: float, root_seed: int = 0, logical_box_ids: tuple[str, ...] | None = None, process_registry=None, time: float = 0.0) -> PreparedSimulation
+def prepare_simulation(processes: tuple[Any, ...], aerosol: Aerosol, *, backend: Backend = Backend.WARP, device: str = 'cuda:0', time_step: float, root_seed: int = 0, logical_box_ids: tuple[str, ...] | None = None, process_registry=None, coagulation_work_config=None, time: float = 0.0) -> PreparedSimulation
 ```
 
 Validate the ordered process plan before uploading native state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L626-L711)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared.py#L657-L748)
 
 ---
 
@@ -73152,7 +73196,7 @@ def _preflight(processes, saved, backend, device, process_registry=None)
 
 Reject schema/configuration/device drift before any allocation/upload.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_checkpoint.py#L98-L199)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_checkpoint.py#L98-L219)
 
 ## particula.execution.prepared_checkpoint._restore_after_binding
 
@@ -73169,7 +73213,7 @@ direct adapters initialize shared registry buffers and thermodynamics at
 setup, so restore their exact checkpoint contents after compilation. Keep
 staging alive until the dedicated stream finishes every copy.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_checkpoint.py#L267-L310)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_checkpoint.py#L287-L330)
 
 ## particula.execution.prepared_checkpoint._validate_auxiliary
 
@@ -73181,7 +73225,7 @@ def _validate_auxiliary(saved, plans)
 
 Validate the optional last-step energy before setup or upload.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_checkpoint.py#L202-L264)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_checkpoint.py#L222-L284)
 
 ## particula.execution.prepared_checkpoint.checkpoint
 
@@ -73205,7 +73249,7 @@ def resume_simulation(processes: tuple[Any, ...], saved: SimulationCheckpoint, *
 
 Restore owned arrays and counters on the exact checkpoint device.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_checkpoint.py#L313-L359)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_checkpoint.py#L333-L379)
 
 ---
 
@@ -73777,7 +73821,7 @@ class _BuiltinAdapter
 
 Pair admitted native planning with resource-only preparation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L54-L83)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L81-L110)
 
 ### particula.execution.prepared_processes._BuiltinAdapter.compiler
 
@@ -73787,7 +73831,7 @@ Pair admitted native planning with resource-only preparation.
 compiler: Callable[[_ProcessPlan, BuiltinPreparationContext], Callable[[], object]]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L59-L61)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L86-L88)
 
 ### particula.execution.prepared_processes._BuiltinAdapter.planner
 
@@ -73797,7 +73841,7 @@ compiler: Callable[[_ProcessPlan, BuiltinPreparationContext], Callable[[], objec
 planner: Callable[[Any, Aerosol], _ProcessPlan]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L58-L58)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L85-L85)
 
 ### particula.execution.prepared_processes._BuiltinAdapter.__init__
 
@@ -73819,7 +73863,7 @@ def plan(process: Any, aerosol: Aerosol) -> _ProcessPlan
 
 Keep exact native validation ahead of all GPU allocation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L63-L66)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L90-L93)
 
 ### particula.execution.prepared_processes._BuiltinAdapter.prepare
 
@@ -73831,7 +73875,7 @@ def prepare(plan: _ProcessPlan, context: BuiltinPreparationContext) -> PreparedO
 
 Retain the launch handler and fixed native resources explicitly.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L68-L83)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L95-L110)
 
 ## particula.execution.prepared_processes._ProcessPlan
 
@@ -73897,7 +73941,7 @@ def _builtin_adapters_by_family() -> dict[str, _BuiltinAdapter]
 
 Resolve normalized families without changing scientific admission.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L86-L120)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L113-L147)
 
 ## particula.execution.prepared_processes._builtin_registry
 
@@ -73909,7 +73953,7 @@ def _builtin_registry() -> ProcessRegistry[_BuiltinAdapter]
 
 Build exact-type native adapters using the common registry contract.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L123-L180)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L150-L207)
 
 ## particula.execution.prepared_processes._compile_coagulation
 
@@ -73921,7 +73965,7 @@ def _compile_coagulation(plan, context: BuiltinPreparationContext)
 
 Retain the common collision sampler with optional ion rate work.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L418-L484)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L439-L521)
 
 ## particula.execution.prepared_processes._compile_dilution
 
@@ -73933,7 +73977,7 @@ def _compile_dilution(plan: _ProcessPlan, context: BuiltinPreparationContext)
 
 Bind the native exponential dilution operation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L353-L374)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L374-L395)
 
 ## particula.execution.prepared_processes._compile_process
 
@@ -73945,7 +73989,7 @@ def _compile_process(plan: _ProcessPlan, context: BuiltinPreparationContext)
 
 Prepare a built-in through its explicit adapter contract.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L345-L350)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L366-L371)
 
 ## particula.execution.prepared_processes._compile_wall_loss
 
@@ -73957,7 +74001,7 @@ def _compile_wall_loss(plan: _ProcessPlan, context: BuiltinPreparationContext)
 
 Bind the admitted neutral or charged wall-loss operation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L377-L415)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L398-L436)
 
 ## particula.execution.prepared_processes._plan_coagulation
 
@@ -73969,7 +74013,7 @@ def _plan_coagulation(process: Any, aerosol: Aerosol) -> _ProcessPlan
 
 Freeze supported collision laws and equal represented counts.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L199-L275)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L226-L296)
 
 ## particula.execution.prepared_processes._plan_dilution
 
@@ -73981,7 +74025,7 @@ def _plan_dilution(process: Any, _aerosol: Aerosol) -> _ProcessPlan
 
 Freeze the exact exponential dilution coefficient in inverse seconds.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L183-L196)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L210-L223)
 
 ## particula.execution.prepared_processes._plan_process
 
@@ -73993,7 +74037,7 @@ def _plan_process(process: Any, aerosol: Aerosol) -> _ProcessPlan
 
 Reject unknown runnable/strategy semantics before any GPU allocation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L38-L51)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L65-L78)
 
 ## particula.execution.prepared_processes._plan_wall_loss
 
@@ -74005,7 +74049,19 @@ def _plan_wall_loss(process: Any, aerosol: Aerosol) -> _ProcessPlan
 
 Freeze neutral/charged chamber geometry and explicit electric fields.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L278-L342)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L299-L363)
+
+## particula.execution.prepared_processes.configure_coagulation_work
+
+*function*
+
+```python
+def configure_coagulation_work(plans, config=None)
+```
+
+Freeze resource policy and sampler version in built-in process plans.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L38-L62)
 
 ---
 
@@ -78399,7 +78455,7 @@ admission. It represents a READY attachment, not a captured graph.
 - `operations` (`tuple[PreparedResidentOperation, ...]`) — Ordered callables dispatched during enqueue.
 - `duration` (`object`) — Nonnegative timestep duration in seconds.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L167-L239)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L167-L263)
 
 ### particula.execution.resident_scheduler.PreparedResidentSimulation.capture_report
 
@@ -78691,6 +78747,22 @@ def __init__(timestep: PreparedResidentTimestep, request: ResidentSimulationRequ
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L0-L0)
 
+### particula.execution.resident_scheduler.PreparedResidentSimulation.synchronize
+
+*method*
+
+```python
+def synchronize() -> None
+```
+
+Wait and surface deferred admission errors before observing state.
+
+Low-level prepared owners call this boundary before checkpointing or
+interpreting outputs. Enqueue remains allocation/readback-free. A
+rejected operation does not roll back other processes in the schedule.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L241-L263)
+
 ## particula.execution.resident_scheduler.ResidentSimulationRequest
 
 *class* · *dataclass*
@@ -78725,7 +78797,7 @@ transfer, synchronize, or validate physical process inputs.
 - `capture_resource_requirements` (`CaptureResourceRequirements`) — Exact pre-published capture resource requirements retained for metadata-only admission checks.
 - `graph_capture_binding` (`object | None`) — Optional exact direct-module-only binding. It is attached only after final request construction and gates admission; it neither captures nor replays graphs nor changes dispatch.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L267-L381)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L291-L405)
 
 ### particula.execution.resident_scheduler.ResidentSimulationRequest.capture_resource_requirements
 
@@ -78735,7 +78807,7 @@ transfer, synchronize, or validate physical process inputs.
 capture_resource_requirements: CaptureResourceRequirements
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L318-L318)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L342-L342)
 
 ### particula.execution.resident_scheduler.ResidentSimulationRequest.coagulation
 
@@ -78745,7 +78817,7 @@ capture_resource_requirements: CaptureResourceRequirements
 coagulation: ResidentBrownianCoagulationExecutionState
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L310-L310)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L334-L334)
 
 ### particula.execution.resident_scheduler.ResidentSimulationRequest.communication
 
@@ -78755,7 +78827,7 @@ coagulation: ResidentBrownianCoagulationExecutionState
 communication: ResidentCommunicationRequest | None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L317-L317)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L341-L341)
 
 ### particula.execution.resident_scheduler.ResidentSimulationRequest.condensation
 
@@ -78765,7 +78837,7 @@ communication: ResidentCommunicationRequest | None
 condensation: WarpCondensationExecutionState
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L309-L309)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L333-L333)
 
 ### particula.execution.resident_scheduler.ResidentSimulationRequest.diagnostics
 
@@ -78775,7 +78847,7 @@ condensation: WarpCondensationExecutionState
 diagnostics: ResidentDiagnosticsPlan
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L314-L314)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L338-L338)
 
 ### particula.execution.resident_scheduler.ResidentSimulationRequest.dilution
 
@@ -78785,7 +78857,7 @@ diagnostics: ResidentDiagnosticsPlan
 dilution: ResidentDilutionRequest
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L311-L311)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L335-L335)
 
 ### particula.execution.resident_scheduler.ResidentSimulationRequest.environment_update
 
@@ -78795,7 +78867,7 @@ dilution: ResidentDilutionRequest
 environment_update: ResidentEnvironmentUpdateRequest | None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L315-L315)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L339-L339)
 
 ### particula.execution.resident_scheduler.ResidentSimulationRequest.gas_update
 
@@ -78805,7 +78877,7 @@ environment_update: ResidentEnvironmentUpdateRequest | None
 gas_update: ResidentGasUpdateRequest | None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L316-L316)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L340-L340)
 
 ### particula.execution.resident_scheduler.ResidentSimulationRequest.graph
 
@@ -78815,7 +78887,7 @@ gas_update: ResidentGasUpdateRequest | None
 graph: ResolvedProcessGraph
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L306-L306)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L330-L330)
 
 ### particula.execution.resident_scheduler.ResidentSimulationRequest.graph_capture_binding
 
@@ -78825,7 +78897,7 @@ graph: ResolvedProcessGraph
 graph_capture_binding: object | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L319-L319)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L343-L343)
 
 ### particula.execution.resident_scheduler.ResidentSimulationRequest.guard
 
@@ -78835,7 +78907,7 @@ graph_capture_binding: object | None = None
 guard: ResidentStepGuard
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L305-L305)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L329-L329)
 
 ### particula.execution.resident_scheduler.ResidentSimulationRequest.nucleation
 
@@ -78845,7 +78917,7 @@ guard: ResidentStepGuard
 nucleation: ResidentNucleationRequest
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L313-L313)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L337-L337)
 
 ### particula.execution.resident_scheduler.ResidentSimulationRequest.registry
 
@@ -78855,7 +78927,7 @@ nucleation: ResidentNucleationRequest
 registry: GPUResourceRegistry
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L304-L304)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L328-L328)
 
 ### particula.execution.resident_scheduler.ResidentSimulationRequest.schedule
 
@@ -78865,7 +78937,7 @@ registry: GPUResourceRegistry
 schedule: ResolvedTimestepSchedule
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L307-L307)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L331-L331)
 
 ### particula.execution.resident_scheduler.ResidentSimulationRequest.session
 
@@ -78875,7 +78947,7 @@ schedule: ResolvedTimestepSchedule
 session: ResidentSession
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L303-L303)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L327-L327)
 
 ### particula.execution.resident_scheduler.ResidentSimulationRequest.thermodynamics
 
@@ -78885,7 +78957,7 @@ session: ResidentSession
 thermodynamics: ThermodynamicsConfig
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L308-L308)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L332-L332)
 
 ### particula.execution.resident_scheduler.ResidentSimulationRequest.wall_loss
 
@@ -78895,7 +78967,7 @@ thermodynamics: ThermodynamicsConfig
 wall_loss: ResidentWallLossRequest
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L312-L312)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L336-L336)
 
 ### particula.execution.resident_scheduler.ResidentSimulationRequest.__init__
 
@@ -78922,7 +78994,7 @@ Validate exact request components and optional update types.
 - `TypeError` — If a required component or optional update has an
 inexact concrete type.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L321-L381)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L345-L405)
 
 ## particula.execution.resident_scheduler.ResidentSimulationScheduler
 
@@ -78950,7 +79022,7 @@ stream. An optional attached graph-capture binding is only a pre-dispatch
 metadata gate: the scheduler does not capture or replay graphs, recapture,
 transfer, synchronize, fall back, or replace resources for it.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L832-L1018)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L856-L1042)
 
 ### particula.execution.resident_scheduler.ResidentSimulationScheduler._request
 
@@ -78960,7 +79032,7 @@ transfer, synchronize, fall back, or replace resources for it.
 _request = request
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L865-L865)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L889-L889)
 
 ### particula.execution.resident_scheduler.ResidentSimulationScheduler.__init__
 
@@ -78980,7 +79052,7 @@ Retain one exact resident simulation request.
 
 - `TypeError` — If ``request`` is not an exact request instance.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L852-L865)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L876-L889)
 
 ### particula.execution.resident_scheduler.ResidentSimulationScheduler._validate
 
@@ -79007,7 +79079,7 @@ lifecycle state except for deliberate structural-drift invalidation.
 - `ValueError` — If duration, ownership, graph, schedule, request, or
 diagnostics validation fails.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L867-L906)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L891-L930)
 
 ### particula.execution.resident_scheduler.ResidentSimulationScheduler._validate_durations
 
@@ -79019,7 +79091,7 @@ def _validate_durations(duration: Real) -> None
 
 Require every process request to retain the exact step duration.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L914-L916)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L938-L940)
 
 ### particula.execution.resident_scheduler.ResidentSimulationScheduler._validate_request_nodes
 
@@ -79031,7 +79103,7 @@ def _validate_request_nodes(graph_by_id: dict[str, ProcessNode]) -> None
 
 Validate request bindings against exact resolved graph nodes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L908-L912)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L932-L936)
 
 ### particula.execution.resident_scheduler.ResidentSimulationScheduler._validate_virtual_refresh_windows
 
@@ -79043,7 +79115,7 @@ def _validate_virtual_refresh_windows(ids: tuple[str, ...], dependencies: tuple[
 
 Require the complete resolver freshness window.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L918-L923)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L942-L947)
 
 ### particula.execution.resident_scheduler.ResidentSimulationScheduler.execute
 
@@ -79074,7 +79146,7 @@ duration.
 operation reject execution.
 - `RuntimeError` — If lifecycle token handling rejects the timestep.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L925-L1018)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L949-L1042)
 
 ## particula.execution.resident_scheduler._capture_resource_requirements_type
 
@@ -79086,7 +79158,7 @@ def _capture_resource_requirements_type() -> type[object]
 
 Return the concrete capture requirements type without an import cycle.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L260-L264)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L284-L288)
 
 ## particula.execution.resident_scheduler._cleanup_resident_execution_failure
 
@@ -79098,7 +79170,7 @@ def _cleanup_resident_execution_failure(request: ResidentSimulationRequest, toke
 
 Close a failed token and preserve legacy lifecycle classification.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L770-L808)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L794-L832)
 
 ## particula.execution.resident_scheduler._enqueue_captured_prepared_operations
 
@@ -79123,7 +79195,7 @@ guard token, record thermodynamic progress, or clean up failures.
 
 - `BaseException` — Propagates an exception raised by a retained operation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L751-L767)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L775-L791)
 
 ## particula.execution.resident_scheduler._enqueue_prepared_diagnostics_window
 
@@ -79135,7 +79207,7 @@ def _enqueue_prepared_diagnostics_window(consumer: object, diagnostics: object) 
 
 Enqueue retained diagnostic saturation-refresh and copy operations.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L811-L817)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L835-L841)
 
 ## particula.execution.resident_scheduler._enqueue_prepared_operation_execute
 
@@ -79155,7 +79227,7 @@ Invoke one setup-bound prepared operation without resolving it again.
 
 - (`object`) — The result returned by the retained operation's ``execute`` method.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L820-L829)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L844-L853)
 
 ## particula.execution.resident_scheduler._graph_capture_binding_type
 
@@ -79167,7 +79239,7 @@ def _graph_capture_binding_type() -> type[object]
 
 Return the concrete optional graph-capture binding type lazily.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L253-L257)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L277-L281)
 
 ## particula.execution.resident_scheduler._registry_type
 
@@ -79183,7 +79255,7 @@ Return the concrete registry type without creating an import cycle.
 
 - (`type[object]`) — The direct-module-only GPU resource registry type.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L242-L250)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L266-L274)
 
 ## particula.execution.resident_scheduler._validate_complete_resident_timestep_metadata
 
@@ -79211,7 +79283,7 @@ state.
 - `ValueError` — If graph, schedule, request bindings, metadata, or duration
 agreement is invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L1021-L1072)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L1045-L1096)
 
 ## particula.execution.resident_scheduler._validate_prepared_resident_simulation
 
@@ -79233,7 +79305,7 @@ Perform the READY-only identity and signature gate before token entry.
 - `ValueError` — If any retained identity, operation, or READY attachment
 metadata has drifted.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L561-L702)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L585-L726)
 
 ## particula.execution.resident_scheduler._validate_resident_durations
 
@@ -79254,7 +79326,7 @@ Require every process request to retain the exact step duration.
 
 - `ValueError` — If any process timestep differs from ``duration``.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L1227-L1247)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L1251-L1271)
 
 ## particula.execution.resident_scheduler._validate_resident_request_nodes
 
@@ -79276,7 +79348,7 @@ Validate request bindings against resolved graph and resources.
 - `ValueError` — If a process, diagnostic, communication, or published
 resource binding does not match the resident request.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L1107-L1224)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L1131-L1248)
 
 ## particula.execution.resident_scheduler._validate_virtual_refresh_windows
 
@@ -79298,7 +79370,7 @@ Require the resolver's canonical thermodynamic refresh windows.
 - `ValueError` — If virtual refresh nodes do not retain their required order
 and dependency edges.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L1075-L1104)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L1099-L1128)
 
 ## particula.execution.resident_scheduler.enqueue_prepared_resident_simulation
 
@@ -79334,7 +79406,7 @@ or a fresh signature comparison detects structural drift before
 token entry.
 - `BaseException` — Propagates an operation failure after lifecycle cleanup.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L705-L748)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L729-L772)
 
 ## particula.execution.resident_scheduler.prepare_resident_simulation
 
@@ -79366,7 +79438,7 @@ retained callables under one lifecycle token.
 - `ValueError` — If resident metadata, schedule, or resource identities do
 not satisfy the READY preparation contract.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L384-L558)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/resident_scheduler.py#L408-L582)
 
 ---
 
@@ -98547,6 +98619,7 @@ Lazily resolve a supported public direct-kernel entry point.
 **Modules**
 
 - `particula.gpu.kernels._brownian_parallel`
+- `particula.gpu.kernels._coagulation_budget`
 - `particula.gpu.kernels._coagulation_config`
 - `particula.gpu.kernels._coagulation_native`
 - `particula.gpu.kernels._condensation_native`
@@ -98594,7 +98667,7 @@ class _PreparedBrownianWork
 
 Retain all parallel scratch and exact launch inputs during setup.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L409-L512)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L527-L619)
 
 ### particula.gpu.kernels._brownian_parallel._PreparedBrownianWork.active
 
@@ -98604,7 +98677,7 @@ Retain all parallel scratch and exact launch inputs during setup.
 active: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L415-L415)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L533-L533)
 
 ### particula.gpu.kernels._brownian_parallel._PreparedBrownianWork.counts
 
@@ -98614,7 +98687,7 @@ active: Any
 counts: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L416-L416)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L534-L534)
 
 ### particula.gpu.kernels._brownian_parallel._PreparedBrownianWork.device
 
@@ -98624,7 +98697,7 @@ counts: Any
 device: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L419-L419)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L537-L537)
 
 ### particula.gpu.kernels._brownian_parallel._PreparedBrownianWork.ion_data
 
@@ -98634,7 +98707,7 @@ device: Any
 ion_data: Any = field(default_factory=IonPairData)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L420-L420)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L539-L539)
 
 ### particula.gpu.kernels._brownian_parallel._PreparedBrownianWork.ion_setup
 
@@ -98644,7 +98717,7 @@ ion_data: Any = field(default_factory=IonPairData)
 ion_setup: Callable | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L421-L421)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L540-L540)
 
 ### particula.gpu.kernels._brownian_parallel._PreparedBrownianWork.majorants
 
@@ -98654,7 +98727,7 @@ ion_setup: Callable | None = None
 majorants: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L418-L418)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L536-L536)
 
 ### particula.gpu.kernels._brownian_parallel._PreparedBrownianWork.mean_density
 
@@ -98664,7 +98737,7 @@ majorants: Any
 mean_density: Any = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L422-L422)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L541-L541)
 
 ### particula.gpu.kernels._brownian_parallel._PreparedBrownianWork.partials
 
@@ -98674,7 +98747,7 @@ mean_density: Any = None
 partials: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L417-L417)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L535-L535)
 
 ### particula.gpu.kernels._brownian_parallel._PreparedBrownianWork.property_inputs
 
@@ -98684,7 +98757,7 @@ partials: Any
 property_inputs: tuple[Any, ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L414-L414)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L532-L532)
 
 ### particula.gpu.kernels._brownian_parallel._PreparedBrownianWork.selector_inputs
 
@@ -98694,14 +98767,24 @@ property_inputs: tuple[Any, ...]
 selector_inputs: tuple[Any, ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L413-L413)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L531-L531)
+
+### particula.gpu.kernels._brownian_parallel._PreparedBrownianWork.work_counts
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+work_counts: Any = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L538-L538)
 
 ### particula.gpu.kernels._brownian_parallel._PreparedBrownianWork.__init__
 
 *method*
 
 ```python
-def __init__(selector_inputs: tuple[Any, ...], property_inputs: tuple[Any, ...], active: Any, counts: Any, partials: Any, majorants: Any, device: Any, ion_data: Any = IonPairData(), ion_setup: Callable | None = None, mean_density: Any = None) -> None
+def __init__(selector_inputs: tuple[Any, ...], property_inputs: tuple[Any, ...], active: Any, counts: Any, partials: Any, majorants: Any, device: Any, work_counts: Any = None, ion_data: Any = IonPairData(), ion_setup: Callable | None = None, mean_density: Any = None) -> None
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L0-L0)
@@ -98714,9 +98797,45 @@ def __init__(selector_inputs: tuple[Any, ...], property_inputs: tuple[Any, ...],
 def enqueue(failure)
 ```
 
+Prepare rates and select using the legacy internal entry point.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L616-L619)
+
+### particula.gpu.kernels._brownian_parallel._PreparedBrownianWork.prepare_rates
+
+*method*
+
+```python
+def prepare_rates(failure)
+```
+
 Enqueue retained work without allocation or observation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L424-L512)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L543-L598)
+
+### particula.gpu.kernels._brownian_parallel._PreparedBrownianWork.select
+
+*method*
+
+```python
+def select(failure)
+```
+
+Select pairs only after all boxes pass budget admission.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L600-L614)
+
+## particula.gpu.kernels._brownian_parallel._additive_pair_maxima
+
+*function*
+
+```python
+def _additive_pair_maxima(masses: Any, concentration: Any, density: Any, volume: Any, temperature: Any, pressure: Any, gas_constant: Any, boltzmann_constant: Any, molecular_weight_air: Any, ref_viscosity: Any, ref_temperature: Any, sutherland_constant: Any, elementary_charge_value: Any, electric_permittivity: Any, time_step: Any, radii: Any, diffusivities: Any, g_terms: Any, speeds: Any, settling_velocities: Any, turbulent_dissipation: Any, fluid_density: Any, total_masses: Any, charge: Any, active_indices: Any, collision_pairs: Any, n_collisions: Any, rng_states: Any, mechanism_mask: Any, collision_capacity: Any, active_counts: wp.array(dtype=wp.int32), partials: wp.array2d(dtype=wp.float64), failure: wp.array(dtype=wp.int32), ion_data: IonPairData) -> None
+```
+
+Reduce exact additive rates with bounded scratch and int64 pair ranks.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L425-L524)
 
 ## particula.gpu.kernels._brownian_parallel._charged_pair_maxima
 
@@ -98728,7 +98847,7 @@ def _charged_pair_maxima(radii: wp.array2d(dtype=wp.float64), masses: wp.array2d
 
 Tile the upper pair matrix across bounded lanes without storing it.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L242-L306)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L243-L307)
 
 ## particula.gpu.kernels._brownian_parallel._compact_active
 
@@ -98740,7 +98859,7 @@ def _compact_active(active: wp.array2d(dtype=wp.int32), indices: wp.array2d(dtyp
 
 Preserve ascending source indices, independent of GPU scheduling.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L156-L176)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L157-L177)
 
 ## particula.gpu.kernels._brownian_parallel._finish_maxima
 
@@ -98752,7 +98871,7 @@ def _finish_maxima(partials: wp.array2d(dtype=wp.float64), majorants: wp.array(d
 
 Reduce finite maxima without floating-point sum reordering.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L309-L324)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L310-L325)
 
 ## particula.gpu.kernels._brownian_parallel._mean_material_density
 
@@ -98764,7 +98883,7 @@ def _mean_material_density(masses: wp.array3d(dtype=wp.float64), density: wp.arr
 
 Retain the native strategy's mean over positive-mass material slots.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L127-L153)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L128-L154)
 
 ## particula.gpu.kernels._brownian_parallel._pair_maxima
 
@@ -98776,7 +98895,7 @@ def _pair_maxima(radii: wp.array2d(dtype=wp.float64), diffusivities: wp.array2d(
 
 Tile the upper pair matrix across bounded lanes without storing it.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L179-L239)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L180-L240)
 
 ## particula.gpu.kernels._brownian_parallel._properties
 
@@ -98788,31 +98907,167 @@ def _properties(masses: wp.array3d(dtype=wp.float64), concentration: wp.array2d(
 
 Evaluate the original transport formulas independently per slot.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L39-L124)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L40-L125)
 
 ## particula.gpu.kernels._brownian_parallel._select_brownian
 
 *function*
 
 ```python
-def _select_brownian(masses: Any, concentration: Any, density: Any, volume: Any, temperature: Any, pressure: Any, gas_constant: Any, boltzmann_constant: Any, molecular_weight_air: Any, ref_viscosity: Any, ref_temperature: Any, sutherland_constant: Any, elementary_charge_value: Any, electric_permittivity: Any, time_step: Any, radii: Any, diffusivities: Any, g_terms: Any, speeds: Any, settling_velocities: Any, turbulent_dissipation: Any, fluid_density: Any, total_masses: Any, charge: Any, active_indices: Any, collision_pairs: Any, n_collisions: Any, rng_states: Any, mechanism_mask: Any, collision_capacity: Any, active_counts: wp.array(dtype=wp.int32), majorants: wp.array(dtype=wp.float64), failure: wp.array(dtype=wp.int32), ion_data: IonPairData) -> None
+def _select_brownian(masses: Any, concentration: Any, density: Any, volume: Any, temperature: Any, pressure: Any, gas_constant: Any, boltzmann_constant: Any, molecular_weight_air: Any, ref_viscosity: Any, ref_temperature: Any, sutherland_constant: Any, elementary_charge_value: Any, electric_permittivity: Any, time_step: Any, radii: Any, diffusivities: Any, g_terms: Any, speeds: Any, settling_velocities: Any, turbulent_dissipation: Any, fluid_density: Any, total_masses: Any, charge: Any, active_indices: Any, collision_pairs: Any, n_collisions: Any, rng_states: Any, mechanism_mask: Any, collision_capacity: Any, active_counts: wp.array(dtype=wp.int32), majorants: wp.array(dtype=wp.float64), failure: wp.array(dtype=wp.int32), ion_data: IonPairData, work_counts: wp.array2d(dtype=wp.int32)) -> None
 ```
 
 Select from parallel properties and maxima with the original RNG code.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L327-L406)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L328-L422)
 
 ## particula.gpu.kernels._brownian_parallel.prepare_brownian_work
 
 *function*
 
 ```python
-def prepare_brownian_work(selector_inputs, device)
+def prepare_brownian_work(selector_inputs, device, work_counts=None)
 ```
 
 Allocate O(BN) flags and at most 4096 fp64 maxima per box.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L515-L532)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L622-L642)
+
+---
+
+# particula.gpu.kernels._coagulation_budget
+
+*module*
+
+Explicit work admission for equal-count particle-resolved coagulation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_budget.py#L1-L1)
+
+## particula.gpu.kernels._coagulation_budget.CoagulationBudgetError
+
+*class*
+
+```python
+class CoagulationBudgetError(ValueError)
+```
+
+Bases: `ValueError`
+
+An entire coagulation operation was rejected before mutable work.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_budget.py#L60-L61)
+
+## particula.gpu.kernels._coagulation_budget.CoagulationWorkConfig
+
+*class* · *dataclass*
+
+```python
+class CoagulationWorkConfig
+```
+
+Bound execution work independently of the physical population size.
+
+**Attributes**
+
+- `max_trials_per_box` (`int`) — Maximum scheduled candidate trials per step.
+- `max_collision_buffer_bytes` (`int`) — Maximum collision-output allocation [byte].
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_budget.py#L10-L32)
+
+### particula.gpu.kernels._coagulation_budget.CoagulationWorkConfig.max_collision_buffer_bytes
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+max_collision_buffer_bytes: int = 256 * 1024 * 1024
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_budget.py#L20-L20)
+
+### particula.gpu.kernels._coagulation_budget.CoagulationWorkConfig.max_trials_per_box
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+max_trials_per_box: int = 65536
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_budget.py#L19-L19)
+
+### particula.gpu.kernels._coagulation_budget.CoagulationWorkConfig.__init__
+
+*method*
+
+```python
+def __init__(max_trials_per_box: int = 65536, max_collision_buffer_bytes: int = 256 * 1024 * 1024) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_budget.py#L0-L0)
+
+### particula.gpu.kernels._coagulation_budget.CoagulationWorkConfig.__post_init__
+
+*method*
+
+```python
+def __post_init__()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_budget.py#L22-L32)
+
+## particula.gpu.kernels._coagulation_budget.admit_coagulation_work
+
+*function*
+
+```python
+def admit_coagulation_work(counts: wp.array(dtype=wp.int32), indices: wp.array2d(dtype=wp.int32), concentration: wp.array2d(dtype=wp.float64), volume: wp.array(dtype=wp.float64), majorants: wp.array(dtype=wp.float64), time_step: wp.float64, trial_budget: wp.int32, collision_capacity: wp.int32, report: wp.array2d(dtype=wp.float64), failure: wp.array(dtype=wp.int32))
+```
+
+Report demand per box and latch rejection before any selector launch.
+
+Report columns are expected trials, conservative trial bound, available
+trials, and maximum budget-admissible timestep [s].
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_budget.py#L64-L113)
+
+## particula.gpu.kernels._coagulation_budget.initialize_admitted_rng
+
+*function*
+
+```python
+def initialize_admitted_rng(rng: wp.array(dtype=wp.uint32), pending: wp.array(dtype=wp.int32), seed: wp.int32, failure: wp.array(dtype=wp.int32))
+```
+
+Initialize each stream once after successful admission.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_budget.py#L128-L141)
+
+## particula.gpu.kernels._coagulation_budget.raise_budget_error
+
+*function*
+
+```python
+def raise_budget_error(report)
+```
+
+Observe only compact admission diagnostics, never particle state.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_budget.py#L116-L125)
+
+## particula.gpu.kernels._coagulation_budget.validate_coagulation_layout
+
+*function*
+
+```python
+def validate_coagulation_layout(boxes: int, slots: int, species: int) -> None
+```
+
+Reject unaddressable native layouts before allocating device scratch.
+
+Warp dimensions and slot indices are signed int32. Pair ranks use int64;
+host byte calculations use Python integers so multiplication cannot wrap.
+Physical allocation failures remain explicit device allocation errors.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_budget.py#L35-L57)
 
 ---
 
@@ -99117,7 +99372,7 @@ def _memory_range(array: Any) -> tuple[int, int]
 
 Check contiguous supported storage and return its byte range.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_native.py#L122-L138)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_native.py#L120-L136)
 
 ## particula.gpu.kernels._coagulation_native._validate_volume_and_derived
 
@@ -99136,12 +99391,12 @@ Check volume authority and finite derived population quantities.
 *function*
 
 ```python
-def validate_ownership(particles: Any, pairs: Any, counts: Any, states: Any, protected_inputs: tuple[Any, ...]) -> None
+def validate_ownership(particles: Any, pairs: Any, counts: Any, states: Any, protected_inputs: tuple[Any, ...], *, work_counts: Any = None) -> None
 ```
 
 Reject every native writer overlapping another writer or read source.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_native.py#L141-L177)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_native.py#L139-L178)
 
 ## particula.gpu.kernels._coagulation_native.validate_physics
 
@@ -99153,7 +99408,7 @@ def validate_physics(particles: Any, requested_volume: Any) -> None
 
 Admit equal active counts and physical state before any state writer.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_native.py#L70-L119)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_native.py#L70-L117)
 
 ## particula.gpu.kernels._coagulation_native.validate_schema
 
@@ -99669,71 +99924,15 @@ Admit current raw-count physics without imposing equal weights.
 
 *module*
 
-GPU direct-kernel utilities for additive particle-resolved coagulation.
+Native equal-count coagulation with tiled exact additive pair reductions.
 
-This module composes Warp ``@wp.func`` building blocks into a direct-kernel
-coagulation pipeline. The executable particle-resolved masks are the four
-singletons ``1``, ``2``, ``4``, and ``8``; the six unordered two-way masks
-``3``, ``5``, ``6``, ``9``, ``10``, and ``12``; and the four-way mask ``15``.
-Mask ``7`` rejects at capability preflight before particle metadata or
-enabled-term validation. Turbulent masks ``11``, ``13``, and ``14`` validate
-particle metadata and enabled terms, then raise
-``ValueError("Additive coagulation execution is deferred.")`` before downstream
-work.
-Mechanism tuples normalize to Brownian, charged hard-sphere, SP2016
-sedimentation, then ST1956 turbulent shear.
-
-Enabled fp64 component rates are sanitized and summed. A safe,
-potentially-conservative sum of component majorants satisfies
-``sum_m K_m(i, j) <= sum_m M_m``; component maxima may occur on different
-pairs. Production selection obtains its majorant from an exact compact-active
-scan of the summed rate. One shared candidate stream, acceptance stream,
-collision output, RNG stream, and apply pass serve every approved mask.
-Entry-point validation accepts scalar direct inputs, explicit
-``(n_boxes,)`` Warp arrays, or a ``WarpEnvironmentData`` container. Particle
-metadata and device checks run before normalizing environment inputs, setting up
-volume, initializing RNG state, or executing Brownian work. All native calls
-require explicit resolved metadata, equal positive active counts per box, and
-finite charge. Private prepared calls freeze the selected mechanism and pinned
-arrays after native preflight. Their enqueue performs retained device work only,
-with no validation,
-allocation, readback, transfer, synchronization, lookup, rebinding, or RNG
-initialization/reset. Rejection is pre-writer; rollback is not promised after a
-writer launches. The kernels
-operate on GPU-resident particle data and produce collision pairs that are
-applied in place: recipient particles receive donor mass and charge, while
-donor mass, concentration, and charge are cleared.
-
-``CoagulationMechanismConfig`` and its resolver are concrete-module APIs:
-import them from ``particula.gpu.kernels.coagulation``, not
-``particula.gpu.kernels``. The immutable, keyword-only configuration is
-host-side metadata, not device-resident simulation state. The public step
-defaults to Brownian, particle-resolved execution and accepts every singleton,
-two-way combination, and the four-way combination. Three-way masks remain
-deferred. Malformed, duplicate, unknown, and non-particle-resolved
-configurations reject before runtime state is accessed or mutated.
-Turbulent-shear-enabled masks validate and normalize explicit
-turbulent dissipation and fluid-density inputs after particle schema/device
-metadata is available. Supplied particles, collision outputs, and RNG sidecars
-are caller-owned same-device Warp resources.
-
-The ``SEDIMENTATION_SP2016_MECHANISM_FLAG`` is a public direct-kernel mode for
-particle-resolved, unit-efficiency SP2016 scheduling. It shares the bounded
-sampler and persistent RNG path. Sedimentation-enabled calls read-only validate
-finite, nonnegative masses and concentrations and finite, positive densities
-before any output, RNG, or particle-state mutation.
+All 15 nonempty mechanism subsets share one candidate and acceptance stream.
+Work budgets reject before particle, collision-output or RNG writers. Direct
+calls observe compact admission diagnostics; resident calls latch device errors.
+Configuration and preflight helpers are concrete-module APIs. No CPU fallback,
+hidden particle transfer, box subdivision or weight change is performed.
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1-L1)
-
-## particula.gpu.kernels.coagulation.MAX_CHARGED_ACTIVE_PARTICLES_PER_BOX
-
-*attribute* · *module attribute*
-
-```python
-MAX_CHARGED_ACTIVE_PARTICLES_PER_BOX = 256
-```
-
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L147-L147)
 
 ## particula.gpu.kernels.coagulation.MAX_COLLISION_PAIR_BUFFER_BYTES
 
@@ -99743,7 +99942,7 @@ MAX_CHARGED_ACTIVE_PARTICLES_PER_BOX = 256
 MAX_COLLISION_PAIR_BUFFER_BYTES = 256 * 1024 * 1024
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L142-L142)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L103-L103)
 
 ## particula.gpu.kernels.coagulation.MAX_SCHEDULED_TRIALS_PER_BOX
 
@@ -99753,17 +99952,7 @@ MAX_COLLISION_PAIR_BUFFER_BYTES = 256 * 1024 * 1024
 MAX_SCHEDULED_TRIALS_PER_BOX = 65536
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L143-L143)
-
-## particula.gpu.kernels.coagulation.MAX_SEDIMENTATION_ACTIVE_PARTICLES_PER_BOX
-
-*attribute* · *module attribute*
-
-```python
-MAX_SEDIMENTATION_ACTIVE_PARTICLES_PER_BOX = 16384
-```
-
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L150-L150)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L104-L104)
 
 ## particula.gpu.kernels.coagulation._PreparedCoagulationCall
 
@@ -99794,7 +99983,7 @@ already prepared writer.
 - `device` (`Any`) — Active Warp device for all launches.
 - `selector_inputs` (`tuple[Any, ...]`) — Frozen arguments for the selector kernel.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2406-L2440)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2344-L2388)
 
 ### particula.gpu.kernels.coagulation._PreparedCoagulationCall.brownian_parallel
 
@@ -99804,7 +99993,27 @@ already prepared writer.
 brownian_parallel: Any = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2440-L2440)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2378-L2378)
+
+### particula.gpu.kernels.coagulation._PreparedCoagulationCall.budget_failure
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+budget_failure: Any = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2381-L2381)
+
+### particula.gpu.kernels.coagulation._PreparedCoagulationCall.budget_report
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+budget_report: Any = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2380-L2380)
 
 ### particula.gpu.kernels.coagulation._PreparedCoagulationCall.charge
 
@@ -99814,7 +100023,7 @@ brownian_parallel: Any = None
 charge: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2432-L2432)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2370-L2370)
 
 ### particula.gpu.kernels.coagulation._PreparedCoagulationCall.collision_pairs
 
@@ -99824,7 +100033,7 @@ charge: Any
 collision_pairs: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2433-L2433)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2371-L2371)
 
 ### particula.gpu.kernels.coagulation._PreparedCoagulationCall.concentration
 
@@ -99834,7 +100043,7 @@ collision_pairs: Any
 concentration: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2431-L2431)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2369-L2369)
 
 ### particula.gpu.kernels.coagulation._PreparedCoagulationCall.device
 
@@ -99844,7 +100053,7 @@ concentration: Any
 device: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2437-L2437)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2375-L2375)
 
 ### particula.gpu.kernels.coagulation._PreparedCoagulationCall.failure
 
@@ -99854,7 +100063,7 @@ device: Any
 failure: Any = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2439-L2439)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2377-L2377)
 
 ### particula.gpu.kernels.coagulation._PreparedCoagulationCall.masses
 
@@ -99864,7 +100073,7 @@ failure: Any = None
 masses: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2430-L2430)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2368-L2368)
 
 ### particula.gpu.kernels.coagulation._PreparedCoagulationCall.max_collisions
 
@@ -99874,7 +100083,7 @@ masses: Any
 max_collisions: int
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2436-L2436)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2374-L2374)
 
 ### particula.gpu.kernels.coagulation._PreparedCoagulationCall.n_boxes
 
@@ -99884,7 +100093,7 @@ max_collisions: int
 n_boxes: int
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2435-L2435)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2373-L2373)
 
 ### particula.gpu.kernels.coagulation._PreparedCoagulationCall.n_collisions
 
@@ -99894,7 +100103,7 @@ n_boxes: int
 n_collisions: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2434-L2434)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2372-L2372)
 
 ### particula.gpu.kernels.coagulation._PreparedCoagulationCall.particles
 
@@ -99904,7 +100113,27 @@ n_collisions: Any
 particles: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2429-L2429)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2367-L2367)
+
+### particula.gpu.kernels.coagulation._PreparedCoagulationCall.rng_pending
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+rng_pending: Any = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2382-L2382)
+
+### particula.gpu.kernels.coagulation._PreparedCoagulationCall.rng_seed
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+rng_seed: int = 0
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2383-L2383)
 
 ### particula.gpu.kernels.coagulation._PreparedCoagulationCall.selector_inputs
 
@@ -99914,17 +100143,49 @@ particles: Any
 selector_inputs: tuple[Any, ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2438-L2438)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2376-L2376)
+
+### particula.gpu.kernels.coagulation._PreparedCoagulationCall.work_config
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+work_config: Any = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2379-L2379)
+
+### particula.gpu.kernels.coagulation._PreparedCoagulationCall.work_counts
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+work_counts: Any = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2384-L2384)
 
 ### particula.gpu.kernels.coagulation._PreparedCoagulationCall.__init__
 
 *method*
 
 ```python
-def __init__(particles: Any, masses: Any, concentration: Any, charge: Any, collision_pairs: Any, n_collisions: Any, n_boxes: int, max_collisions: int, device: Any, selector_inputs: tuple[Any, ...], failure: Any = None, brownian_parallel: Any = None) -> None
+def __init__(particles: Any, masses: Any, concentration: Any, charge: Any, collision_pairs: Any, n_collisions: Any, n_boxes: int, max_collisions: int, device: Any, selector_inputs: tuple[Any, ...], failure: Any = None, brownian_parallel: Any = None, work_config: Any = None, budget_report: Any = None, budget_failure: Any = None, rng_pending: Any = None, rng_seed: int = 0, work_counts: Any = None) -> None
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L0-L0)
+
+### particula.gpu.kernels.coagulation._PreparedCoagulationCall.check_admission
+
+*method*
+
+```python
+def check_admission() -> None
+```
+
+Observe compact diagnostics at an explicit host boundary.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2386-L2388)
 
 ## particula.gpu.kernels.coagulation._bound_scheduled_trials
 
@@ -99934,9 +100195,9 @@ def __init__(particles: Any, masses: Any, concentration: Any, charge: Any, colli
 def _bound_scheduled_trials(expected_trials: Any) -> Any
 ```
 
-Clamp scheduled-trial counts before any int32 conversion.
+Retain the legacy trial clamp for diagnostic oracles, not production.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L153-L163)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L109-L119)
 
 ## particula.gpu.kernels.coagulation._charged_majorant_from_active_pairs
 
@@ -99978,7 +100239,7 @@ nonpositive candidates contribute zero.
 - (`Any`) — Finite, nonnegative maximum charged hard-sphere rate for the selected
 - (`Any`) — box, or zero when no positive finite selected-pair rate exists.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L369-L452)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L325-L408)
 
 ## particula.gpu.kernels.coagulation._checked_positive_finite_add
 
@@ -99993,7 +100254,7 @@ Add two sanitized fp64 terms, failing closed on invalid arithmetic.
 Additive mechanism terms are independently optional, but an overflowing
 aggregate cannot safely be used as a selector rate or majorant.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L179-L190)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L135-L146)
 
 ## particula.gpu.kernels.coagulation._coagulation_selector_impl
 
@@ -100011,9 +100272,8 @@ inactive slots. The sampler computes one finite positive total majorant per
 box and one finite positive total pair rate per candidate. A valid candidate
 receives exactly one acceptance draw; invalid rates, invalid majorants, and
 rates above the majorant are skipped without collision-buffer or active-set
-mutation. Supported singleton, two-way, and four-way masks share this single
-candidate/acceptance/apply path; deferred masks return before scheduling or
-accessing the RNG state.
+mutation. All fifteen nonempty mechanism masks share this diagnostic
+candidate/acceptance path. Production obtains maxima from tiled reductions.
 
 **Parameters**
 
@@ -100049,7 +100309,19 @@ accessing the RNG state.
 - `collision_capacity` (`Any`) — Maximum accepted collisions per box for this call.
 - `box_idx` (`int`) — Box index supplied by the kernel launch entry point.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L943-L1256)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L896-L1196)
+
+## particula.gpu.kernels.coagulation._compact_applied_collision_pairs_guarded
+
+*function*
+
+```python
+def _compact_applied_collision_pairs_guarded(collision_pairs: Any, n_collisions: Any, failure: wp.array(dtype=wp.int32)) -> None
+```
+
+Remove rejected collision entries after the apply pass.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1681-L1703)
 
 ## particula.gpu.kernels.coagulation._compact_applied_collision_pairs_kernel
 
@@ -100061,7 +100333,7 @@ def _compact_applied_collision_pairs_kernel(collision_pairs: Any, n_collisions: 
 
 Remove rejected collision entries after the apply pass.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1707-L1727)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1658-L1678)
 
 ## particula.gpu.kernels.coagulation._enqueue_prepared_coagulation_call
 
@@ -100071,22 +100343,15 @@ Remove rejected collision entries after the apply pass.
 def _enqueue_prepared_coagulation_call(prepared: _PreparedCoagulationCall) -> tuple[Any, Any, Any]
 ```
 
-Issue only the frozen selector, apply, and compaction kernels.
+Evaluate rates, admit all boxes, then enqueue guarded collision writers.
 
-This private enqueue boundary performs no validation, allocation,
-normalization, RNG initialization, or resource lookup.
+Execution uses retained resources without allocation or host observation.
+The direct public wrapper observes compact budget diagnostics before
+returning; private prepared owners call check_admission explicitly.
+Failure preserves caller particle/output/RNG arrays for this operation;
+earlier successful operations are not rolled back.
 
-**Parameters**
-
-- `prepared` (`_PreparedCoagulationCall`) — Validated call record produced by ``_prepare_coagulation_step_gpu``.
-
-**Returns**
-
-- (`Any`) — The pinned particle container, collision-pair buffer, and
-- (`Any`) — collision-count buffer, in the same order as the public direct-kernel
-- (`Any`) — API.
-
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2988-L3042)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2698-L2761)
 
 ## particula.gpu.kernels.coagulation._ensure_turbulent_input_array
 
@@ -100122,7 +100387,7 @@ ST1956 turbulent shear.
 same-device ``wp.float64`` Warp array with shape ``(n_boxes,)``
 and positive finite values.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2275-L2307)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2214-L2246)
 
 ## particula.gpu.kernels.coagulation._ensure_volume_array
 
@@ -100153,7 +100418,7 @@ Ensure a GPU volume array is available.
 > Valid Warp arrays are returned unchanged so launch code can reuse
 > caller-owned per-box volume buffers.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2358-L2403)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2296-L2341)
 
 ## particula.gpu.kernels.coagulation._initialize_rng_states
 
@@ -100170,7 +100435,7 @@ Initialize or reset per-box RNG states from a seed.
 - `seed` (`Any`) — RNG seed value.
 - `rng_states` (`Any`) — RNG state buffer ``(n_boxes,)`` written in place.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L766-L777)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L722-L733)
 
 ## particula.gpu.kernels.coagulation._native_coagulation_kernel
 
@@ -100182,7 +100447,7 @@ def _native_coagulation_kernel(masses: Any, concentration: Any, density: Any, vo
 
 Schedule every native mechanism with its common raw particle count.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1444-L1511)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1395-L1462)
 
 ## particula.gpu.kernels.coagulation._native_coagulation_kernel_guarded
 
@@ -100194,7 +100459,7 @@ def _native_coagulation_kernel_guarded(masses: Any, concentration: Any, density:
 
 Skip this resident writer after a latched simulation failure.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1514-L1584)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1465-L1535)
 
 ## particula.gpu.kernels.coagulation._normalize_turbulent_input_array
 
@@ -100208,7 +100473,7 @@ Normalize an already-validated turbulent numerical validation input.
 
 This helper does not repeat validation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2310-L2321)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2249-L2260)
 
 ## particula.gpu.kernels.coagulation._preflight_enabled_coagulation_terms
 
@@ -100220,206 +100485,39 @@ def _preflight_enabled_coagulation_terms(resolved: _ResolvedCoagulationMechanism
 
 Run enabled-term validation before executable resource preparation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2013-L2058)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1949-L1993)
 
 ## particula.gpu.kernels.coagulation._prepare_coagulation_step_gpu
 
 *function*
 
 ```python
-def _prepare_coagulation_step_gpu(particles: Any, temperature: float | Any | None, pressure: float | Any | None, time_step: object, volume: float | Any | None = None, max_collisions: object = 256, rng_seed: int = 0, collision_pairs: Any | None = None, n_collisions: Any | None = None, rng_states: Any | None = None, *, mechanism_config: CoagulationMechanismConfig | None = None, initialize_rng: bool = False, environment: Any | None = None, validate_charge_finite: bool = False, turbulent_dissipation: float | Any | None = None, fluid_density: float | Any | None = None) -> _PreparedCoagulationCall
+def _prepare_coagulation_step_gpu(particles: Any, temperature: float | Any | None, pressure: float | Any | None, time_step: object, volume: float | Any | None = None, max_collisions: object = 256, rng_seed: int = 0, collision_pairs: Any | None = None, n_collisions: Any | None = None, rng_states: Any | None = None, *, mechanism_config: CoagulationMechanismConfig | None = None, work_config: CoagulationWorkConfig | None = None, work_counts: Any | None = None, initialize_rng: bool = False, environment: Any | None = None, validate_charge_finite: bool = False, turbulent_dissipation: float | Any | None = None, fluid_density: float | Any | None = None) -> _PreparedCoagulationCall
 ```
 
-Privately prepare one direct, particle-resolved Warp coagulation step.
+Prepare fixed resources for native equal-count resolved coagulation.
 
-This private helper performs the public wrapper's validation, normalization,
-allocation, and optional RNG initialization, then freezes launch references.
-It is not a CPU strategy-composition or ``Runnable`` API.
-It supports only ``"particle_resolved"`` execution: omission selects
-Brownian; the executable singleton masks are ``1``, ``2``, ``4``, and ``8``;
-unordered two-way masks are ``3``, ``5``, ``6``, ``9``, ``10``, and ``12``;
-and the four-way mask is ``15``. Supported mechanism tuples normalize to
-Brownian, charged hard-sphere, SP2016 sedimentation, and ST1956 turbulent
-shear. Mask ``7`` raises the stable deferred error at capability preflight,
-before particle metadata or enabled-term validation. Turbulent masks ``11``,
-``13``, and ``14`` validate particle metadata and enabled terms before
-raising that error, without downstream work.
-``mechanism_config`` is immutable, keyword-only host metadata and is
-structurally preflighted before any runtime input access, allocation,
-normalization, RNG work, or launch. Enabled fp64 pair-rate components are
-sanitized and summed. A component-majorant sum is safe but can be
-conservative because component maxima can occur on different pairs;
-production selection obtains the majorant by scanning the summed active-pair
-rates. Every approved mask uses one candidate stream, acceptance stream,
-collision-buffer set, RNG stream, and apply pass. Its active-pair work is
-O(A²), while
-collision and selector buffers are O(A), for active count A; this is bounded
-implementation scope, not a throughput or scaling claim. Malformed,
-duplicate, unknown, and unsupported-distribution combinations reject before
-particle state is accessed. A structurally valid turbulent-shear request
-reaches a later numerical validation boundary after particle metadata and
-device checks.
-Turbulent-shear-enabled executable masks normalize their explicit per-box
-inputs and calculate ST1956 rates. After particle metadata and device
-checks, direct temperature and pressure inputs are validated and normalized
-before volume setup or selector launches.
-``particles`` and supplied ``collision_pairs``, ``n_collisions``,
-and ``rng_states`` are caller-owned same-device Warp resources; the step
-mutates them in place as applicable. The three-item return tuple contains
-no RNG state: supplied collision buffers are returned by identity, while
-``rng_states`` remains caller-owned. Caller-owned RNG buffers are reset only
-when ``initialize_rng=True`` explicitly opts in.
+All nonempty subsets of Brownian, charged Brownian, SP2016 sedimentation
+and ST1956 shear use tiled exact additive majorants. Particle counts have
+no algorithmic cap; slot indices remain signed int32 and pair ranks int64.
+Fixed buffers retain caller identity. This phase validates and allocates
+workspace but never resets supplied RNG or writes collision outputs.
+RNG initialization and all simulation writers follow per-step admission.
 
-Explicitly tagged native inputs support resolved counts only. Every native
-mechanism requires equal positive active counts within each box, native
-fp64 primary arrays, and finite physical state. The selector multiplies its
-schedule by the current common count for every supported mechanism. An
-explicit volume must equal the particle container's positive physical
-volume. All native writers must be disjoint from each other and protected
-inputs. These read-only checks may allocate private flags and synchronize
-during preparation; frozen enqueue adds no validation or host work.
-Untagged populations reject before execution.
-
-**Parameters**
-
-- `particles` (`Any`) — Caller-owned, Warp-resident particle data. All required Warp arrays, including ``charge``, must be on the same device. ``charge`` must be ``wp.float64`` with shape ``(n_boxes, n_particles)``. Charged-containing calls scan it for finite values before output validation or allocation, RNG setup, or selector/apply work. Exact SP2016 sedimentation calls scan mass and concentration for finite nonnegative values and density for finite positive values before time-step, environment, output-buffer, or RNG work. Accepted collisions mutate mass, concentration, and charge in place: recipient particles receive donor mass and charge, and donor mass, concentration, and charge are cleared.
-- `temperature` (`float | Any | None`) — Direct gas temperature as either a scalar or a Warp array with shape ``(n_boxes,)``. Use ``None`` only with ``environment=...``.
-- `pressure` (`float | Any | None`) — Direct gas pressure as either a scalar or a Warp array with shape ``(n_boxes,)``. Use ``None`` only with ``environment=...``.
-- `time_step` (`object`) — Coagulation time step in seconds.
-- `volume` (`float | Any | None`) (default: `None`) — Per-box volume [m^3]. If None, uses ``particles.volume``.
-- `max_collisions` (`object`) (default: `256`) — Maximum number of collisions per box.
-- `rng_seed` (`int`) (default: `0`) — Seed used whenever this call initializes Warp RNG states. This always applies to the omitted-``rng_states`` convenience path. For caller-owned persistent buffers, the seed is only consumed when ``initialize_rng=True`` explicitly requests a reset.
-- `collision_pairs` (`Any | None`) (default: `None`) — Optional caller-owned, same-device Warp collision output buffer. The buffer is written in place. When omitted, the function allocates a call-local convenience buffer for this call.
-- `n_collisions` (`Any | None`) (default: `None`) — Optional caller-owned, same-device Warp per-box collision count output buffer. The buffer is written in place. When omitted, the function allocates a call-local convenience buffer for this call.
-- `rng_states` (`Any | None`) (default: `None`) — Optional caller-owned, same-device Warp RNG state buffer. The buffer is mutated in place. When omitted, this function allocates a call-local same-device ``(n_boxes,)`` buffer, seeds it from ``rng_seed``, and uses it only for the current call. When provided, the caller owns the persistent GPU-resident sidecar buffer and it is reused as-is across repeated calls unless ``initialize_rng=True`` explicitly requests a reset from  ``rng_seed``.
-- `mechanism_config` (`CoagulationMechanismConfig | None`) (default: `None`) — Optional immutable host-side ``CoagulationMechanismConfig`` imported from ``particula.gpu.kernels.coagulation``; it is not re-exported by ``particula.gpu.kernels``. This keyword-only configuration does not transfer, synchronize, or own Warp state. Omission selects Brownian, particle-resolved execution. The executable masks are ``1``, ``2``, ``4``, ``8``, ``3``, ``5``, ``6``, ``9``, ``10``, ``12``, and ``15``. Malformed configurations, unsupported distributions, and unrecognized mechanism combinations fail before particle state is accessed or mutated. Deferred mask ``7`` rejects at capability preflight before particle metadata or enabled-term validation. Turbulent masks ``11``, ``13``, and ``14`` validate particle metadata and enabled terms before rejecting. A wrong type raises exactly ``ValueError`` with the message ``"mechanism_config must be a CoagulationMechanismConfig."``; other errors are delegated to the resolver and capability gate.
-- `initialize_rng` (`bool`) (default: `False`) — Explicit reset flag for caller-provided ``rng_states``. The default ``False`` path validates the buffer and reuses its existing state without reseeding, even if ``rng_seed`` matches an earlier call. Set ``True`` to launch ``_initialize_rng_states`` after validation and reset the persistent buffer from ``rng_seed``. This argument does not affect omitted ``rng_states`` convenience allocation, which always initializes the internal buffer for the current call.
-- `environment` (`Any | None`) (default: `None`) — Optional ``WarpEnvironmentData`` with ``(n_boxes,)`` temperature and pressure arrays on the same device as ``particles``. This mode is supported when both direct inputs are ``None``.
-- `validate_charge_finite` (`bool`) (default: `False`) — When True, explicitly scan charge on device and synchronize for host-visible rejection of NaN or infinity. The native population validation requires finite charge in every mode. Native tagged inputs always validate charge. Every charged mode performs this scan before caller output or RNG mutation.
-- `turbulent_dissipation` (`float | Any | None`) (default: `None`) — Explicit turbulent kinetic-energy dissipation rate [m^2/s^3] for the turbulent-shear numerical validation boundary. For a structurally valid ST1956 turbulent request, accepts a positive finite Python or NumPy floating scalar, or a positive finite, active-device ``wp.float64`` Warp array with shape ``(n_boxes,)``. Supplied arrays retain identity; scalar broadcasts use private helper-owned storage. This input is not inferred from shared containers and is ignored by non-turbulent masks.
-- `fluid_density` (`float | Any | None`) (default: `None`) — Explicit carrier-fluid density [kg/m^3] for the turbulent-shear numerical validation boundary. It has the same conditional scalar and active-device ``wp.float64`` ``(n_boxes,)`` Warp-array contract as ``turbulent_dissipation``, is not inferred from shared containers, and is ignored by non-turbulent masks.
+The concrete work configuration controls trial and collision byte budgets.
+Direct calls report budget rejection after compact diagnostic readback;
+resident calls latch a device failure before all dependent writers.
+Particle concentration is represented count, volume is m^3, time is s,
+dissipation is m^2/s^3 and fluid density is kg/m^3. Positive represented
+counts must agree within each box. Turbulent inputs are required only for
+masks containing shear. Configuration validation precedes particle access.
 
 **Returns**
 
-- (`_PreparedCoagulationCall`) — A private frozen call record for the matching enqueue helper.
+- (`_PreparedCoagulationCall`) — A frozen binding owning reusable property, reduction, admission and
+- (`_PreparedCoagulationCall`) — RNG-initialization scratch alongside caller-owned simulation arrays.
 
-**Raises**
-
-- `ValueError` — If array shapes or devices mismatch expectations.
-- `ValueError` — If direct ``temperature`` or ``pressure`` inputs are mixed
-with ``environment``.
-- `ValueError` — If direct inputs are missing when ``environment`` is
-omitted.
-- `ValueError` — If environment arrays do not match ``(n_boxes,)`` or the
-caller device.
-- `ValueError` — If mechanism_config has the wrong type, is malformed, or
-requests an unsupported distribution or unrecognized mechanism
-combination.
-- `ValueError` — If an additive mechanism configuration is unsupported.
-- `ValueError` — If a structurally valid turbulent-shear request omits
-either explicit turbulent input or supplies an input with an
-unsupported type, shape, device, ``wp.float64`` dtype, or value
-domain. Deferred turbulent three-way combinations reject after this
-Numerical validation boundary.
-- `ValueError` — If particle charge does not have shape
-``(n_boxes, n_particles)``, dtype ``wp.float64``, or the particle
-device. Charged-containing and exact SP2016 sedimentation
-execution, and Brownian with ``validate_charge_finite=True``, also
-raise for NaN or infinity.
-- `ValueError` — If charged-containing masses or concentrations are
-non-finite or negative, species density is non-finite or
-nonpositive, or a box exceeds
-``MAX_CHARGED_ACTIVE_PARTICLES_PER_BOX`` active particles.
-- `ValueError` — If SP2016 sedimentation masses or concentrations are
-non-finite or negative, positive concentrations differ within a
-box, species density is non-finite or nonpositive, or a box exceeds
-``MAX_SEDIMENTATION_ACTIVE_PARTICLES_PER_BOX`` active particles.
-
-> **Notes**
->
-> Accepted environment sources are scalar direct inputs, direct
-> ``(n_boxes,)`` Warp arrays, hybrid scalar-plus-Warp-array direct
-> inputs, or keyword-only ``environment=...`` execution.
-> 
-> ``mechanism_config``, ``initialize_rng``, ``environment``,
-> ``validate_charge_finite``, ``turbulent_dissipation``, and
-> ``fluid_density`` remain keyword-only so existing positional scalar
-> callers stay source-compatible. Structural configuration preflight
-> occurs before all runtime input access, allocation, normalization, RNG
-> work, and launches. Deferred turbulent three-way masks validate their
-> explicit numerical validation inputs after particle schema/device
-> metadata, but cannot
-> reach downstream simulation, selector, apply launches, allocation,
-> normalization, RNG work, or caller-owned mutation. It does not make
-> unrelated later validation failures atomic.
-> 
-> Structurally valid turbulent-shear requests require explicit
-> ``turbulent_dissipation`` and ``fluid_density`` only after structural
-> configuration resolution and particle schema/device metadata validation.
-> Deferred turbulent three-way combinations then reject before
-> normalization, allocation, rate dispatch, sampling, majorant
-> construction, RNG work, or mutation. Executable turbulent masks
-> normalize both inputs and use their active-device values for ST1956
-> execution. Non-turbulent masks do not inspect or validate either input.
-> 
-> validation runs before volume normalization, RNG setup, and Brownian or
-> apply launches so invalid ``time_step``, shape, dtype, or device
-> combinations fail without mutating particle state or allocating
-> downstream work. The normalized environment arrays are forwarded
-> directly into the launch path.
-> 
-> Charged-containing execution read-only-validates finite/nonnegative
-> masses and concentrations, finite/positive density, its bounded active
-> count, and finite charge before time-step or environment normalization.
-> The active bound caps its exact compact-active O(A²) majorant at 32,640
-> pairs per box. Native population admission requires finite charge for
-> every supported mechanism, including Brownian execution.
-> 
-> Exact SP2016 sedimentation read-only-validates finite charge,
-> finite/nonnegative masses and concentrations, finite/positive density,
-> compatible positive concentrations, and its bounded active count before
-> time-step, environment, output, or RNG work. Masks 4 and 5 evaluate
-> their exact O(A²) pair maximum in parallel, using bounded scratch and
-> at most 16,384 active slots per box. Other sedimentation mixtures
-> retain the serial 256-slot bound. Zero masses and concentrations are
-> valid inactive-slot state.
-> 
-> A successful call allocates private, call-local selector scratch,
-> including a ``wp.float64`` ``(n_boxes, n_particles)`` total-mass array.
-> Sedimentation-enabled masks allocate a separate zero-initialized
-> settling-velocity array; non-sedimentation paths alias that storage to
-> radii. The selector clears its own scratch slots and sums each active
-> particle's species masses once for charged pair rates and their
-> compact-active majorant. It derives radii for ST1956 turbulent-shear
-> rates and populates settling velocities for valid active slots whenever
-> sedimentation is enabled, including mixed masks.
-> This scratch is not a caller-owned output, is not returned, and is
-> allocated only after caller-resource preflight succeeds.
-> 
-> Supported RNG setup cases are:
-> 
-> - Omitted ``rng_states``: allocate a call-local internal buffer and
->   initialize it from ``rng_seed`` for this call.
-> - Provided ``rng_states`` with ``initialize_rng=False``: validate the
->   caller-owned persistent buffer and reuse it without resetting.
-> - Provided ``rng_states`` with ``initialize_rng=True``: validate the
->   caller-owned persistent buffer, then reset it from ``rng_seed``.
-> - Validation failure: raise before RNG initialization or other Warp
->   launches mutate state.
-> 
-> Reusing the same ``rng_seed`` alongside a persistent ``rng_states``
-> buffer does not reseed that buffer on later calls unless
-> ``initialize_rng=True`` is passed. Initialize caller-owned buffers once
-> before repeated timesteps, then reuse them without hidden per-step
-> resets. Graph-capture support remains deferred.
-> 
-> After a successful preflight, this is an in-place asynchronous Warp API.
-> A device-launch or runtime failure has no rollback guarantee for
-> particles, collision outputs, or RNG state. Callers must synchronize and
-> check Warp errors, then restore or discard their own snapshots before
-> retrying.
-
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2443-L2985)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2391-L2695)
 
 ## particula.gpu.kernels.coagulation._remove_active_pair_by_rank_swap_pop
 
@@ -100431,7 +100529,7 @@ def _remove_active_pair_by_rank_swap_pop(active_indices: Any, box_idx: Any, acti
 
 Remove two active ranks from a compact active-index buffer.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L708-L733)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L664-L689)
 
 ## particula.gpu.kernels.coagulation._resolve_active_pair_by_rank
 
@@ -100443,14 +100541,14 @@ def _resolve_active_pair_by_rank(active_indices: Any, box_idx: Any, n_particles:
 
 Resolve two active-set ranks to particle indices in one scan.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L736-L763)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L692-L719)
 
 ## particula.gpu.kernels.coagulation._resolve_collision_capacity
 
 *function*
 
 ```python
-def _resolve_collision_capacity(max_collisions: object, n_boxes: int, n_particles: int) -> int
+def _resolve_collision_capacity(max_collisions: object, n_boxes: int, n_particles: int, byte_budget: int = MAX_COLLISION_PAIR_BUFFER_BYTES) -> int
 ```
 
 Resolve a bounded accepted-collision capacity for one call.
@@ -100472,7 +100570,7 @@ Resolve a bounded accepted-collision capacity for one call.
 > Allocation is also bounded by an explicit buffer-byte budget so invalid
 > requests cannot trigger unbounded internal allocation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2200-L2229)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2135-L2168)
 
 ## particula.gpu.kernels.coagulation._safe_acceptance_probability
 
@@ -100489,7 +100587,7 @@ tolerance; that narrow case maps exactly to one. Material violations and
 non-finite tolerance arithmetic fail closed before the caller draws an
 acceptance variate. Candidate-selection draws precede this calculation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L193-L228)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L149-L184)
 
 ## particula.gpu.kernels.coagulation._sanitize_positive_finite
 
@@ -100504,7 +100602,7 @@ Return a finite, strictly positive term or zero for safe accumulation.
 Invalid, zero, and negative terms make no contribution to an additive
 pair-rate or majorant total.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L166-L176)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L122-L132)
 
 ## particula.gpu.kernels.coagulation._sedimentation_majorant_from_active_pairs
 
@@ -100533,7 +100631,7 @@ Invalid, zero, and nonpositive rates contribute zero.
 - (`Any`) — Finite, nonnegative maximum sedimentation rate for the selected box,
 - (`Any`) — or zero when no positive finite selected-pair rate exists.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L455-L500)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L411-L456)
 
 ## particula.gpu.kernels.coagulation._select_active_pair_by_rank
 
@@ -100545,19 +100643,19 @@ def _select_active_pair_by_rank(active_indices: Any, box_idx: Any, rank_i: Any, 
 
 Resolve two active-set ranks from a compact active-index buffer.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L693-L705)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L649-L661)
 
 ## particula.gpu.kernels.coagulation._select_coagulation_pairs_impl
 
 *function*
 
 ```python
-def _select_coagulation_pairs_impl(masses: Any, concentration: Any, density: Any, volume: Any, temperature: Any, pressure: Any, gas_constant: Any, boltzmann_constant: Any, molecular_weight_air: Any, ref_viscosity: Any, ref_temperature: Any, sutherland_constant: Any, elementary_charge_value: Any, electric_permittivity: Any, time_step: Any, radii: Any, diffusivities: Any, g_terms: Any, speeds: Any, settling_velocities: Any, turbulent_dissipation: Any, fluid_density: Any, total_masses: Any, charge: Any, active_indices: Any, collision_pairs: Any, n_collisions: Any, rng_states: Any, mechanism_mask: Any, collision_capacity: Any, box_idx: int, majorant_total: wp.float64, active_count: wp.int32, kinematic_viscosity: wp.float64, ion_data: IonPairData) -> None
+def _select_coagulation_pairs_impl(masses: Any, concentration: Any, density: Any, volume: Any, temperature: Any, pressure: Any, gas_constant: Any, boltzmann_constant: Any, molecular_weight_air: Any, ref_viscosity: Any, ref_temperature: Any, sutherland_constant: Any, elementary_charge_value: Any, electric_permittivity: Any, time_step: Any, radii: Any, diffusivities: Any, g_terms: Any, speeds: Any, settling_velocities: Any, turbulent_dissipation: Any, fluid_density: Any, total_masses: Any, charge: Any, active_indices: Any, collision_pairs: Any, n_collisions: Any, rng_states: Any, mechanism_mask: Any, collision_capacity: Any, box_idx: int, majorant_total: wp.float64, active_count: wp.int32, kinematic_viscosity: wp.float64, ion_data: IonPairData) -> wp.vec2i
 ```
 
 Preserve sequential pair selection and the exact persistent RNG path.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1259-L1441)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1199-L1392)
 
 ## particula.gpu.kernels.coagulation._total_majorant
 
@@ -100577,7 +100675,7 @@ its dispatch does not make three-way masks executable. Brownian-containing
 production selection instead uses one exact active-pair scan through
 ``_total_pair_rate``.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L552-L690)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L508-L646)
 
 ## particula.gpu.kernels.coagulation._total_pair_rate
 
@@ -100596,7 +100694,7 @@ overflowing aggregate returns zero. This helper's bit dispatch does not
 itself grant sampler support; the entry-point capability gate admits only
 approved singleton, two-way, and four-way masks.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L231-L366)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L187-L322)
 
 ## particula.gpu.kernels.coagulation._turbulent_majorant_from_active_radii
 
@@ -100625,7 +100723,7 @@ term is monotonic, making this O(A) compact-rank scan a safe majorant.
 - (`Any`) — Finite, nonnegative ST1956 majorant for the selected box, or zero when
 - (`Any`) — fewer than two active particles exist or no finite positive rate exists.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L503-L549)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L459-L505)
 
 ## particula.gpu.kernels.coagulation._validate_charge_finite
 
@@ -100653,7 +100751,7 @@ scalar. It neither copies nor mutates the caller-owned charge array.
 
 - `ValueError` — If any charge value is NaN or infinite.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1801-L1833)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1777-L1809)
 
 ## particula.gpu.kernels.coagulation._validate_charge_finite_kernel
 
@@ -100670,7 +100768,7 @@ Record non-finite charge in a private status buffer without mutation.
 - `charge` (`Any`) — Caller-owned particle charge array ``(n_boxes, n_particles)`` read without modification.
 - `invalid` (`Any`) — Private one-element ``wp.int32`` status buffer set to one when any charge value is non-finite.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L780-L794)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L736-L750)
 
 ## particula.gpu.kernels.coagulation._validate_charged_density_kernel
 
@@ -100682,7 +100780,7 @@ def _validate_charged_density_kernel(density: Any, invalid: Any) -> None
 
 Record invalid charged species densities without mutation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L832-L840)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L788-L796)
 
 ## particula.gpu.kernels.coagulation._validate_charged_particle_physics
 
@@ -100692,19 +100790,12 @@ Record invalid charged species densities without mutation.
 def _validate_charged_particle_physics(particles: Any, n_boxes: int, n_particles: int, device: Any) -> None
 ```
 
-Reject invalid charged particle inputs and excessive active work.
+Reject invalid charged particle state before allocating writer resources.
 
-The exact charged majorant enumerates all unique active pairs in a single
-selector thread. This read-only preflight therefore bounds each box to
-``MAX_CHARGED_ACTIVE_PARTICLES_PER_BOX`` active particles before any output
-allocation, RNG initialization, selector launch, or caller-state mutation.
+Mass and concentration must be finite and nonnegative; density must be
+finite and positive. Physical population size is independent of work tiles.
 
-**Raises**
-
-- `ValueError` — If mass or concentration is non-finite/negative, density is
-non-finite/nonpositive, or a box exceeds the charged active limit.
-
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1836-L1890)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1812-L1855)
 
 ## particula.gpu.kernels.coagulation._validate_charged_particle_physics_kernel
 
@@ -100720,7 +100811,7 @@ Masses and concentrations may be zero for inactive slots, but all particle
 state must be finite and nonnegative; species density must be finite and
 strictly positive.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L797-L829)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L753-L785)
 
 ## particula.gpu.kernels.coagulation._validate_collision_counts
 
@@ -100742,7 +100833,7 @@ Validate collision count buffer shape and device.
 
 - `ValueError` — If the buffer shape or device mismatches.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2088-L2110)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2023-L2045)
 
 ## particula.gpu.kernels.coagulation._validate_collision_pairs
 
@@ -100764,7 +100855,7 @@ Validate collision pair buffer shape and device.
 
 - `ValueError` — If the buffer shape or device mismatches.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2061-L2085)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1996-L2020)
 
 ## particula.gpu.kernels.coagulation._validate_device_arrays
 
@@ -100785,7 +100876,7 @@ Validate particle arrays, including charge, share one Warp device.
 
 - `ValueError` — If any particle array is on a different device.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1782-L1798)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1758-L1774)
 
 ## particula.gpu.kernels.coagulation._validate_device_match
 
@@ -100807,7 +100898,7 @@ Validate that a Warp array is on the expected device.
 
 - `ValueError` — If the array is not on the expected device.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1766-L1779)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1742-L1755)
 
 ## particula.gpu.kernels.coagulation._validate_max_collisions
 
@@ -100831,7 +100922,7 @@ Validate the supported collision-buffer length before allocation.
 
 - `ValueError` — If ``max_collisions`` is not a supported positive integer.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2164-L2197)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2099-L2132)
 
 ## particula.gpu.kernels.coagulation._validate_particle_arrays
 
@@ -100855,7 +100946,7 @@ Validate particle array shapes, including the charge schema.
 - `ValueError` — If particle arrays do not match expected shapes, or charge
 is not ``wp.float64``.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1730-L1763)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1706-L1739)
 
 ## particula.gpu.kernels.coagulation._validate_rng_states
 
@@ -100877,53 +100968,35 @@ Validate RNG state buffer shape and device.
 
 - `ValueError` — If the buffer shape or device mismatches.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2113-L2135)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2048-L2070)
 
 ## particula.gpu.kernels.coagulation._validate_sedimentation_particle_physics
 
 *function*
 
 ```python
-def _validate_sedimentation_particle_physics(particles: Any, n_boxes: int, n_particles: int, device: Any, *, parallel: bool = False) -> None
+def _validate_sedimentation_particle_physics(particles: Any, n_boxes: int, n_particles: int, device: Any) -> None
 ```
 
-Reject invalid or excessive SP2016 inputs through read-only scans.
+Validate sedimentation state through a read-only device scan.
 
-The fixed-size error state permits one device-to-host readback while
-retaining field-specific errors. A single box-local reduction validates
-charge, particle state, derived totals, and bounded exact-pair work.
-Positive concentrations must agree within a box because this
-particle-resolved merge representation stores one concentration per slot.
-Zero mass and concentration are valid, allowing inactive slots without
-applying charged-only constraints. This preflight runs before time-step,
-environment, output-buffer, or RNG work.
+Reject nonfinite charge, invalid mass/density/counts, unequal positive
+counts and invalid derived mass or volume. No active-population cap is
+imposed. Only compact error status is transferred to the host.
 
-**Parameters**
-
-- `particles` (`Any`) — Caller-owned Warp particle data with validated shape and device placement.
-- `n_boxes` (`int`) — Number of simulation boxes.
-- `n_particles` (`int`) — Number of particle slots per box.
-- `device` (`Any`) — Warp device that owns the particle arrays and status buffer.
-
-**Raises**
-
-- `ValueError` — If mass or concentration is non-finite or negative, density
-is non-finite or nonpositive, concentrations are incompatible, or a
-box exceeds the sedimentation active limit.
-
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1893-L1972)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1858-L1908)
 
 ## particula.gpu.kernels.coagulation._validate_sedimentation_particle_physics_kernel
 
 *function*
 
 ```python
-def _validate_sedimentation_particle_physics_kernel(masses: Any, concentration: Any, density: Any, charge: Any, active_limit: Any, invalid: Any) -> None
+def _validate_sedimentation_particle_physics_kernel(masses: Any, concentration: Any, density: Any, charge: Any, invalid: Any) -> None
 ```
 
 Validate all SP2016 inputs with one box-local read-only reduction.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L885-L940)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L841-L893)
 
 ## particula.gpu.kernels.coagulation._validate_time_step
 
@@ -100947,7 +101020,7 @@ Validate the coagulation time step before any mutation.
 
 - `ValueError` — If ``time_step`` is not a finite nonnegative real value.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2138-L2161)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2073-L2096)
 
 ## particula.gpu.kernels.coagulation._validate_turbulent_input
 
@@ -100960,11 +101033,10 @@ def _validate_turbulent_input(name: str, value: Any, n_boxes: int, device: Any) 
 Validate a turbulent-shear numerical validation input without scalar
     normalization.
 
-This validation-only boundary validates turbulent requests before deferred
-three-way-mask capability rejection. Valid scalars do not create
-private broadcast storage here.
+This validation-only boundary checks turbulent requests before allocating
+private broadcast storage.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2324-L2355)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2263-L2293)
 
 ## particula.gpu.kernels.coagulation._validate_turbulent_particle_physics
 
@@ -100984,7 +101056,7 @@ totals before rate sanitization could turn them into no-collision behavior.
 This read-only scan runs before time, environment, output, or RNG
 processing.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1975-L2010)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1911-L1946)
 
 ## particula.gpu.kernels.coagulation._validate_turbulent_particle_physics_kernel
 
@@ -100996,7 +101068,7 @@ def _validate_turbulent_particle_physics_kernel(masses: Any, concentration: Any,
 
 Record invalid ST1956 particle state without mutating caller inputs.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L843-L882)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L799-L838)
 
 ## particula.gpu.kernels.coagulation.apply_coagulation_kernel
 
@@ -101008,7 +101080,7 @@ def apply_coagulation_kernel(masses: Any, concentration: Any, charge: Any, colli
 
 Run the shared device operation through the direct kernel API.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1660-L1679)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1611-L1630)
 
 ## particula.gpu.kernels.coagulation.apply_coagulation_kernel_body
 
@@ -101034,7 +101106,7 @@ removed from the collision output during the following compaction pass.
 - `collision_pairs` (`Any`) — Collision index buffer ``(n_boxes, max_collisions, 2)``.
 - `n_collisions` (`Any`) — Collision counts ``(n_boxes,)``.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1587-L1657)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1538-L1608)
 
 ## particula.gpu.kernels.coagulation.apply_coagulation_kernel_guarded
 
@@ -101046,28 +101118,60 @@ def apply_coagulation_kernel_guarded(masses: Any, concentration: Any, charge: An
 
 Skip this resident writer after a latched simulation failure.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1682-L1704)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1633-L1655)
+
+## particula.gpu.kernels.coagulation.coagulation_preflight_gpu
+
+*function*
+
+```python
+def coagulation_preflight_gpu(particles: Any, temperature: float | Any | None, pressure: float | Any | None, time_step: object, **kwargs: Any) -> dict[str, Any]
+```
+
+Inspect native capability, resources and trial demand without advancing.
+
+Accepts the direct step's keyword arguments. The report downloads compact
+per-box data, not particle arrays. Preparation allocates temporary workspace
+but leaves caller particle, collision-output and RNG buffers unchanged.
+Required bytes count unique bound collision, RNG, normalized environment,
+property, reduction and admission arrays (including caller-supplied
+sidecars). They exclude particle storage and runtime/compiler allocations;
+this is bound storage, not an estimate of incremental allocation.
+
+**Returns**
+
+- (`dict[str, Any]`) — Report containing active counts, unordered pair evaluations, expected
+- (`dict[str, Any]`) — trials, conservative required trials, available trial capacity,
+- (`dict[str, Any]`) — budget-admissible timestep [s], per-box admission and workspace bytes.
+- (`dict[str, Any]`) — The admissible timestep is a resource bound, not an accuracy estimate.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2825-L2907)
 
 ## particula.gpu.kernels.coagulation.coagulation_step_gpu
 
 *function*
 
 ```python
-def coagulation_step_gpu(particles: Any, temperature: float | Any | None, pressure: float | Any | None, time_step: object, volume: float | Any | None = None, max_collisions: object = 256, rng_seed: int = 0, collision_pairs: Any | None = None, n_collisions: Any | None = None, rng_states: Any | None = None, *, mechanism_config: CoagulationMechanismConfig | None = None, initialize_rng: bool = False, environment: Any | None = None, validate_charge_finite: bool = False, turbulent_dissipation: float | Any | None = None, fluid_density: float | Any | None = None) -> tuple[Any, Any, Any]
+def coagulation_step_gpu(particles: Any, temperature: float | Any | None, pressure: float | Any | None, time_step: object, volume: float | Any | None = None, max_collisions: object = 256, rng_seed: int = 0, collision_pairs: Any | None = None, n_collisions: Any | None = None, rng_states: Any | None = None, *, mechanism_config: CoagulationMechanismConfig | None = None, work_config: CoagulationWorkConfig | None = None, work_counts: Any | None = None, initialize_rng: bool = False, environment: Any | None = None, validate_charge_finite: bool = False, turbulent_dissipation: float | Any | None = None, fluid_density: float | Any | None = None) -> tuple[Any, Any, Any]
 ```
 
 Prepare and enqueue one direct particle-resolved coagulation step.
 
-This public wrapper preserves the direct API while keeping all validation,
-allocation, and optional RNG initialization in the private preparation
-phase. The enqueue phase uses only the resulting frozen call record.
+Preparation validates inputs and allocates workspace. Enqueue uses the
+frozen call record; optional RNG initialization follows successful device
+admission. This direct wrapper observes compact admission diagnostics.
+
+The optional ``work_counts`` buffer has shape (n_boxes, 2), dtype int32,
+and shares the particle device. Its columns contain scheduled and attempted
+candidate trials for this step. It must not overlap any other input/output.
+Admission rejection preserves it; successful calls overwrite every box.
 
 **Returns**
 
 - (`Any`) — The particle container, collision-pair output, and per-box collision
 - (`Any`) — counts returned by the direct kernel.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L3045-L3093)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2764-L2822)
 
 ## particula.gpu.kernels.coagulation.initialize_coagulation_rng_states
 
@@ -101094,7 +101198,7 @@ Initialize a caller-owned coagulation RNG state buffer from a seed.
 - `ValueError` — If ``rng_states`` is not a one-dimensional ``wp.uint32``
 buffer or if the provided device mismatches the buffer device.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2232-L2272)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2171-L2211)
 
 ---
 
@@ -129652,7 +129756,7 @@ class CustomProcess(Runnable):
 >
 > - No references available yet.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L43-L283)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L43-L286)
 
 ### particula.runnable.RunnableABC.__or__
 
@@ -129682,7 +129786,7 @@ combined_process = process1 | process2
 final_aerosol = combined_process.execute(aerosol, time_step=1.0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L262-L283)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L265-L286)
 
 ### particula.runnable.RunnableABC._advance_box
 
@@ -129801,7 +129905,7 @@ this method retain responsibility for their own execution semantics.
 *method*
 
 ```python
-def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, time: float = 0.0) -> PreparedSimulation
+def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, coagulation_work_config=None, time: float = 0.0) -> PreparedSimulation
 ```
 
 Upload native state once and prepare supported resident GPU physics.
@@ -129815,6 +129919,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `root_seed` (`int`) (default: `0`) — Root seed for persistent independent process/box streams.
 - `logical_box_ids` (default: `None`) — Optional stable identities in physical box order.
 - `process_registry` (default: `None`) — Exact-type custom GPU adapter registrations.
+- `coagulation_work_config` (default: `None`) — Optional coagulation resource budgets.
 - `time` (`float`) (default: `0.0`) — Absolute initial simulation time [s].
 
 **Returns**
@@ -129827,7 +129932,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `ValueError` — If process physics or state cannot be represented.
 - `RuntimeError` — If the requested runtime/device is unavailable.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L179-L224)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L179-L227)
 
 ### particula.runnable.RunnableABC.rate
 
@@ -129869,7 +129974,7 @@ Resume exact saved state using the same process configuration.
 current population cannot be admitted (e.g. unequal Brownian
 counts after a later process injected new particles).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L226-L260)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L229-L263)
 
 ## particula.runnable.RunnableSequence
 
@@ -129904,7 +130009,7 @@ sequence.add_process(AnotherProcess())
 final_aerosol = sequence.execute(aerosol, time_step=2.0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L286-L511)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L289-L517)
 
 ### particula.runnable.RunnableSequence.processes
 
@@ -129914,7 +130019,7 @@ final_aerosol = sequence.execute(aerosol, time_step=2.0)
 processes: list[RunnableABC] = []
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L315-L315)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L318-L318)
 
 ### particula.runnable.RunnableSequence.__init__
 
@@ -129928,7 +130033,7 @@ Initialize the RunnableSequence.
 
 Sets up an empty list to hold the sequence of Runnable processes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L310-L315)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L313-L318)
 
 ### particula.runnable.RunnableSequence.__or__
 
@@ -129957,7 +130062,7 @@ sequence |= CustomProcess()
 sequence = sequence | AnotherProcess()
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L493-L511)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L499-L517)
 
 ### particula.runnable.RunnableSequence._leaf_processes
 
@@ -129969,7 +130074,7 @@ def _leaf_processes()
 
 Yield grouped process leaves in execution order.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L331-L337)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L334-L340)
 
 ### particula.runnable.RunnableSequence.add_process
 
@@ -129992,7 +130097,7 @@ sequence = RunnableSequence()
 sequence.add_process(CustomProcess())
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L317-L329)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L320-L332)
 
 ### particula.runnable.RunnableSequence.execute
 
@@ -130027,14 +130132,14 @@ final_aerosol = sequence.execute(
 )
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L339-L408)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L342-L411)
 
 ### particula.runnable.RunnableSequence.prepare
 
 *method*
 
 ```python
-def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, time: float = 0.0) -> PreparedSimulation
+def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, coagulation_work_config=None, time: float = 0.0) -> PreparedSimulation
 ```
 
 Upload native state once and prepare supported resident GPU physics.
@@ -130048,6 +130153,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `root_seed` (`int`) (default: `0`) — Root seed for persistent independent process/box streams.
 - `logical_box_ids` (default: `None`) — Optional stable identities in physical box order.
 - `process_registry` (default: `None`) — Exact-type custom GPU adapter registrations.
+- `coagulation_work_config` (default: `None`) — Optional coagulation resource budgets.
 - `time` (`float`) (default: `0.0`) — Absolute initial simulation time [s].
 
 **Returns**
@@ -130060,7 +130166,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `ValueError` — If process physics or state cannot be represented.
 - `RuntimeError` — If the requested runtime/device is unavailable.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L410-L455)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L413-L461)
 
 ### particula.runnable.RunnableSequence.resume
 
@@ -130090,7 +130196,7 @@ Resume exact saved state using the same process configuration.
 current population cannot be admitted (e.g. unequal Brownian
 counts after a later process injected new particles).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L457-L491)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L463-L497)
 
 ---
 

@@ -415,7 +415,7 @@ resident-owned configuration-derived coagulation sidecar with literal
 ``initialize_rng=False``. It does not acquire, allocate, seed, reset,
 inspect, transfer, or synchronize the stream.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L818-L934)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L823-L941)
 
 ### particula.execution.adapters.coagulation.ResidentBrownianCoagulationExecutionAdapter.execute
 
@@ -444,7 +444,7 @@ or inconsistent.
 - `ImportError` — If the optional direct Warp kernel is unavailable after
 preflight.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L904-L934)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L910-L941)
 
 ### particula.execution.adapters.coagulation.ResidentBrownianCoagulationExecutionAdapter.prepare
 
@@ -471,7 +471,7 @@ Preflight and freeze one resident Brownian kernel call.
 or inconsistent.
 - `ImportError` — If the optional direct Warp kernel is unavailable.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L828-L902)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L833-L908)
 
 ## particula.execution.adapters.coagulation.ResidentBrownianCoagulationExecutionState
 
@@ -588,7 +588,7 @@ state validation and calls it once. It forwards state resources by identity
 without conversion, synchronization, fallback, retry, or recovery. Kernel
 exceptions and any post-launch mutation remain governed by the kernel.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L951-L1009)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L958-L1016)
 
 ### particula.execution.adapters.coagulation.WarpBrownianCoagulationExecutionAdapter.execute
 
@@ -619,7 +619,7 @@ unchanged.
 - `ImportError` — If optional Warp kernel dependencies are unavailable
 after local preflight.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L960-L1009)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L967-L1016)
 
 ## particula.execution.adapters.coagulation.WarpBrownianCoagulationExecutionState
 
@@ -1046,7 +1046,7 @@ boundary.
 - `prepared` (`Any`) — Frozen direct-kernel preparation record.
 - `enqueue` (`Any`) — Callable that issues the already prepared native operation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L793-L815)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L793-L820)
 
 ### particula.execution.adapters.coagulation._PreparedResidentBrownianCoagulationBinding.enqueue
 
@@ -1087,6 +1087,18 @@ def __init__(state: ResidentBrownianCoagulationExecutionState, prepared: Any, en
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L0-L0)
+
+### particula.execution.adapters.coagulation._PreparedResidentBrownianCoagulationBinding.check_admission
+
+*method*
+
+```python
+def check_admission() -> None
+```
+
+Surface budget rejection at a caller observation boundary.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L817-L820)
 
 ### particula.execution.adapters.coagulation._PreparedResidentBrownianCoagulationBinding.execute
 
@@ -1160,7 +1172,7 @@ Lazily resolve the optional direct Warp coagulation kernel.
 
 - `ImportError` — If optional Warp kernel dependencies are unavailable.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L937-L948)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/coagulation.py#L944-L955)
 
 ## particula.execution.adapters.coagulation._memory_range
 

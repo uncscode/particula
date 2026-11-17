@@ -28,7 +28,7 @@ def _preflight(processes, saved, backend, device, process_registry=None)
 
 Reject schema/configuration/device drift before any allocation/upload.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_checkpoint.py#L98-L199)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_checkpoint.py#L98-L219)
 
 ## particula.execution.prepared_checkpoint._restore_after_binding
 
@@ -45,7 +45,7 @@ direct adapters initialize shared registry buffers and thermodynamics at
 setup, so restore their exact checkpoint contents after compilation. Keep
 staging alive until the dedicated stream finishes every copy.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_checkpoint.py#L267-L310)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_checkpoint.py#L287-L330)
 
 ## particula.execution.prepared_checkpoint._validate_auxiliary
 
@@ -57,7 +57,7 @@ def _validate_auxiliary(saved, plans)
 
 Validate the optional last-step energy before setup or upload.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_checkpoint.py#L202-L264)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_checkpoint.py#L222-L284)
 
 ## particula.execution.prepared_checkpoint.checkpoint
 
@@ -81,4 +81,4 @@ def resume_simulation(processes: tuple[Any, ...], saved: SimulationCheckpoint, *
 
 Restore owned arrays and counters on the exact checkpoint device.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_checkpoint.py#L313-L359)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_checkpoint.py#L333-L379)

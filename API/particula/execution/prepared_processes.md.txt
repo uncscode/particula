@@ -20,7 +20,7 @@ class _BuiltinAdapter
 
 Pair admitted native planning with resource-only preparation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L54-L83)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L81-L110)
 
 ### particula.execution.prepared_processes._BuiltinAdapter.compiler
 
@@ -30,7 +30,7 @@ Pair admitted native planning with resource-only preparation.
 compiler: Callable[[_ProcessPlan, BuiltinPreparationContext], Callable[[], object]]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L59-L61)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L86-L88)
 
 ### particula.execution.prepared_processes._BuiltinAdapter.planner
 
@@ -40,7 +40,7 @@ compiler: Callable[[_ProcessPlan, BuiltinPreparationContext], Callable[[], objec
 planner: Callable[[Any, Aerosol], _ProcessPlan]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L58-L58)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L85-L85)
 
 ### particula.execution.prepared_processes._BuiltinAdapter.__init__
 
@@ -62,7 +62,7 @@ def plan(process: Any, aerosol: Aerosol) -> _ProcessPlan
 
 Keep exact native validation ahead of all GPU allocation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L63-L66)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L90-L93)
 
 ### particula.execution.prepared_processes._BuiltinAdapter.prepare
 
@@ -74,7 +74,7 @@ def prepare(plan: _ProcessPlan, context: BuiltinPreparationContext) -> PreparedO
 
 Retain the launch handler and fixed native resources explicitly.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L68-L83)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L95-L110)
 
 ## particula.execution.prepared_processes._ProcessPlan
 
@@ -140,7 +140,7 @@ def _builtin_adapters_by_family() -> dict[str, _BuiltinAdapter]
 
 Resolve normalized families without changing scientific admission.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L86-L120)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L113-L147)
 
 ## particula.execution.prepared_processes._builtin_registry
 
@@ -152,7 +152,7 @@ def _builtin_registry() -> ProcessRegistry[_BuiltinAdapter]
 
 Build exact-type native adapters using the common registry contract.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L123-L180)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L150-L207)
 
 ## particula.execution.prepared_processes._compile_coagulation
 
@@ -164,7 +164,7 @@ def _compile_coagulation(plan, context: BuiltinPreparationContext)
 
 Retain the common collision sampler with optional ion rate work.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L418-L484)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L439-L521)
 
 ## particula.execution.prepared_processes._compile_dilution
 
@@ -176,7 +176,7 @@ def _compile_dilution(plan: _ProcessPlan, context: BuiltinPreparationContext)
 
 Bind the native exponential dilution operation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L353-L374)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L374-L395)
 
 ## particula.execution.prepared_processes._compile_process
 
@@ -188,7 +188,7 @@ def _compile_process(plan: _ProcessPlan, context: BuiltinPreparationContext)
 
 Prepare a built-in through its explicit adapter contract.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L345-L350)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L366-L371)
 
 ## particula.execution.prepared_processes._compile_wall_loss
 
@@ -200,7 +200,7 @@ def _compile_wall_loss(plan: _ProcessPlan, context: BuiltinPreparationContext)
 
 Bind the admitted neutral or charged wall-loss operation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L377-L415)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L398-L436)
 
 ## particula.execution.prepared_processes._plan_coagulation
 
@@ -212,7 +212,7 @@ def _plan_coagulation(process: Any, aerosol: Aerosol) -> _ProcessPlan
 
 Freeze supported collision laws and equal represented counts.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L199-L275)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L226-L296)
 
 ## particula.execution.prepared_processes._plan_dilution
 
@@ -224,7 +224,7 @@ def _plan_dilution(process: Any, _aerosol: Aerosol) -> _ProcessPlan
 
 Freeze the exact exponential dilution coefficient in inverse seconds.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L183-L196)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L210-L223)
 
 ## particula.execution.prepared_processes._plan_process
 
@@ -236,7 +236,7 @@ def _plan_process(process: Any, aerosol: Aerosol) -> _ProcessPlan
 
 Reject unknown runnable/strategy semantics before any GPU allocation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L38-L51)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L65-L78)
 
 ## particula.execution.prepared_processes._plan_wall_loss
 
@@ -248,4 +248,16 @@ def _plan_wall_loss(process: Any, aerosol: Aerosol) -> _ProcessPlan
 
 Freeze neutral/charged chamber geometry and explicit electric fields.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L278-L342)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L299-L363)
+
+## particula.execution.prepared_processes.configure_coagulation_work
+
+*function*
+
+```python
+def configure_coagulation_work(plans, config=None)
+```
+
+Freeze resource policy and sampler version in built-in process plans.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L38-L62)
