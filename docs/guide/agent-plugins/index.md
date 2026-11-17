@@ -1,6 +1,7 @@
-# Agentic plugins
+# Agent plugins
 
 <a id="ai-assistants"></a>
+<a id="agentic-plugins"></a>
 
 Particula Helper provides seven researcher workflows: environment setup,
 guidance, simulation design, execution, analysis, debugging and issue reporting,

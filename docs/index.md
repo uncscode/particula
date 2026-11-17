@@ -11,7 +11,7 @@ your coding agent.
 
 <CardGrid>
   <LinkCard title="Run your first simulation" description="A native aerosol and a small CPU condensation step." href="/particula/guide/getting-started/first-simulation/" />
-  <LinkCard title="Agentic plugins" description="Set up Particula Helper in Codex, Claude, or OpenCode to design simulations, analyze results, and develop models." href="/particula/guide/ai-assistants/" />
+  <LinkCard title="Agent plugins" description="Set up Particula Helper in Codex, Claude, or OpenCode to design simulations, analyze results, and develop models." href="/particula/guide/agent-plugins/" />
 </CardGrid>
 
 ## Dig deeper into the science

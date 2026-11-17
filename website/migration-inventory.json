@@ -949,26 +949,26 @@
       "replacement": null
     },
     {
-      "source": "docs/guide/ai-assistants/claude.md",
-      "route": "/particula/guide/ai-assistants/claude/",
+      "source": "docs/guide/agent-plugins/claude.md",
+      "route": "/particula/guide/agent-plugins/claude/",
       "kind": "narrative",
       "replacement": null
     },
     {
-      "source": "docs/guide/ai-assistants/codex.md",
-      "route": "/particula/guide/ai-assistants/codex/",
+      "source": "docs/guide/agent-plugins/codex.md",
+      "route": "/particula/guide/agent-plugins/codex/",
       "kind": "narrative",
       "replacement": null
     },
     {
-      "source": "docs/guide/ai-assistants/index.md",
-      "route": "/particula/guide/ai-assistants/",
+      "source": "docs/guide/agent-plugins/index.md",
+      "route": "/particula/guide/agent-plugins/",
       "kind": "narrative",
       "replacement": null
     },
     {
-      "source": "docs/guide/ai-assistants/opencode.md",
-      "route": "/particula/guide/ai-assistants/opencode/",
+      "source": "docs/guide/agent-plugins/opencode.md",
+      "route": "/particula/guide/agent-plugins/opencode/",
       "kind": "narrative",
       "replacement": null
     },

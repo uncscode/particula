@@ -39,6 +39,6 @@
   "name": "particula-helper",
   "version": "0.3.4",
   "license": "MIT",
-  "homepage": "https://uncscode.github.io/particula/guide/ai-assistants/",
+  "homepage": "https://uncscode.github.io/particula/guide/agent-plugins/",
   "repository": "https://github.com/uncscode/particula"
 }

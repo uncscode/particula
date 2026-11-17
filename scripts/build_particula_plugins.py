@@ -212,7 +212,7 @@ def write_github_release_notes(output, manifest, provenance):
         "`sha256sum -c SHA256SUMS` to verify them.\n\n"
         "## Install or refresh\n\n"
         "Use the [assistant installation guides]"
-        "(https://uncscode.github.io/particula/guide/ai-assistants/) "
+        "(https://uncscode.github.io/particula/guide/agent-plugins/) "
         "for Codex, Claude and OpenCode. Repository marketplace installs "
         "track their configured branch or tag. Refresh/reinstall the plugin "
         "and start a new session to load updates. Publishing an archive "
