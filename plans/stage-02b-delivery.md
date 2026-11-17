@@ -226,3 +226,14 @@ workflows now also accept PRs targeting `codex/stage-*`; push, release and
 deployment triggers are unchanged. The workflow/plugin/feedstock contract suite
 passed **93 tests**, and Ruff/format passed for the adjusted existing test.
 Hosted validation and review readiness are verified against each published head.
+
+The first hosted Python 3.14 matrix run exposed cancellation sensitivity in the
+custom nonlocal-activity regression: its 1e-5 Pa vapor-pressure fixture produced
+cross-particle derivatives near the finite-difference roundoff floor. The test
+now uses 1 and 10 Pa and requires a derivative above 1e-3, retaining its original
+`rtol=3e-4, atol=1e-8` comparison. All **13** sparse-condensation tests pass on
+local Python 3.12 / NumPy 2.3.4 / SciPy 1.16.2 and Python 3.14 / NumPy 2.5.5 /
+SciPy 1.18.1. The original fixture passed locally, so its failure evidence is
+the hosted log rather than a claimed local reproduction. Solver code and the
+scientific example configurations are unchanged; full-run provenance remains
+as recorded above.

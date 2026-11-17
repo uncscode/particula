@@ -149,7 +149,10 @@ def test_large_native_owner_uses_sparse_without_particle_squared_work(
     assert owner.time > 0
 
 
-def test_custom_nonlocal_activity_retains_cross_particle_derivatives():
+@pytest.mark.parametrize("vapor_pressure", [1.0, 10.0])
+def test_custom_nonlocal_activity_retains_cross_particle_derivatives(
+    vapor_pressure,
+):
     """Custom models may couple particles; coloring must not erase that term."""
 
     class CollectiveActivity(ActivityIdealMass):
@@ -159,13 +162,17 @@ def test_custom_nonlocal_activity_retains_cross_particle_derivatives():
 
     initial, strategy = mixture(24)
     strategy.activity_strategy = CollectiveActivity()
+    # Resolve the nonlocal signal above finite-difference cancellation noise.
+    strategy.vapor_pressure_strategy = ConstantVaporPressureStrategy(
+        vapor_pressure
+    )
     owner = CondensationODE(initial, strategy, method="ros2")
     values = owner.solver.state
     jac = owner._jacobian(0, values)
     assert not issparse(jac)
     row = owner._mass_indices.index((0, 0, 0))
     column = owner._mass_indices.index((0, 1, 0))
-    assert abs(jac[row, column]) > 1e-10
+    assert abs(jac[row, column]) > 1e-3
     delta = 1e-6
     plus, minus = values.copy(), values.copy()
     plus[column] += delta
