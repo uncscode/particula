@@ -170,7 +170,9 @@ def test_variable_environment_capture_restart(device):  # noqa: F811
         )
     )
     process = AtmosphericCoagulation(0, 1, attachment_model="mobility")
-    with process.prepare(initial, device=device, time_step=2e-12 / rate) as sim:
+    with process.prepare(
+        initial, device=device, time_step=(1 - 1e-8) * 1e-12 / rate
+    ) as sim:
         before = sim.checkpoint()
         if device != "cpu":
             sim.capture()

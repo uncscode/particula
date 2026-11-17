@@ -660,6 +660,10 @@
                 "slug": "examples/gpu/direct/gpu_coagulation_direct"
               },
               {
+                "label": "Native coagulation work budgets",
+                "slug": "examples/gpu/direct/scalable_coagulation"
+              },
+              {
                 "label": "CUDA Complete Process Sequence",
                 "slug": "examples/gpu/direct/gpu_complete_process_sequence"
               },
@@ -714,11 +718,11 @@
             "slug": "examples/simulations/adaptive_reservoir_depletion_cuda"
           },
           {
-            "label": "Adaptive wet–dry relaxation",
+            "label": "Adaptive wet\u2013dry relaxation",
             "slug": "examples/simulations/adaptive_cloud_relaxation"
           },
           {
-            "label": "Stiff CUDA wet–dry relaxation",
+            "label": "Stiff CUDA wet\u2013dry relaxation",
             "slug": "examples/simulations/adaptive_cloud_relaxation_cuda"
           },
           {

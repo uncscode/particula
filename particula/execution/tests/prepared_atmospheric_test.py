@@ -65,7 +65,10 @@ def test_recombination_routing_and_inert_products(device, kinds):
     """Opposite ions merge once; equal signs and neutral products never merge."""
     initial = pair_case(kinds)
     process = AtmosphericCoagulation(0, 1)
-    with process.prepare(initial, device=device, time_step=1.0) as simulation:
+    step = (1 - 1e-8) * initial.particles.volume[0] / process.recombination
+    with process.prepare(
+        initial, device=device, time_step=float(step)
+    ) as simulation:
         simulation.step()
         result = simulation.snapshot()
         majorant = simulation._bindings[
@@ -97,7 +100,7 @@ def test_attachment_uses_lf_rate_and_conserves_charge(device, polarity):
     rate = attachment_coefficient(10e-9, 0, polarity)
     process = AtmosphericCoagulation(0, 1)
     with process.prepare(
-        initial, device=device, time_step=2e-12 / rate
+        initial, device=device, time_step=(1 - 1e-8) * 1e-12 / rate
     ) as simulation:
         before = simulation.checkpoint()
         if device != "cpu":

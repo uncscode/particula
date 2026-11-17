@@ -40,16 +40,13 @@ accuracy and transfer costs. It does not change prepared simulation semantics.
 
 ## Direct-kernel details
 
-Direct coagulation supports singleton masks `1`, `2`, `4`, `8`, pairs `3`, `5`,
-`6`, `9`, `10`, `12`, and mask `15`. Three-way masks reject at their documented
-preflight boundaries; turbulent masks require explicit turbulent inputs.
-Prepared coagulation admits Brownian, one of five charged models, SP2016
-settling, ST1956 shear, and Brownian plus SP2016. Prepared settling preserves
-the native strategy’s mean material density; the direct API uses each
-particle’s effective density. Both evaluate rates directly without CPU bin
-interpolation. Masks 4 and 5 use bounded-memory parallel exact pair maxima
-with at most 16,384 active slots per box; charged and other settling mixtures
-retain the 256-active-slot limit.
+Direct and prepared coagulation support all 15 nonempty subsets of Brownian,
+charged Brownian, SP2016 settling and ST1956 shear. There is no fixed physical
+population cap. Exact tiled pair reductions have bounded scratch but quadratic
+work; explicit trial and collision budgets reject overloaded steps before
+writers. Equal active represented counts remain required. Prepared settling
+preserves native mean density, while direct settling uses particle effective
+density. No CPU bin interpolation is introduced.
 See [configuration](direct/coagulation-configuration.md).
 
 Direct collision outputs and persistent RNG are caller-owned, same-device

@@ -12,7 +12,7 @@
       "search_phrases": [],
       "prerequisites": [],
       "related": [],
-      "context": "An aerosol links a population of particles to a surrounding gas. A useful model starts with the quantity you need to explain—size, composition, lifetime, or an observable—and follows only the mechanisms needed to connect inputs to that quantity. These branches connect scientific explanations with runnable calculations and their evidence.",
+      "context": "An aerosol links a population of particles to a surrounding gas. A useful model starts with the quantity you need to explain\u2014size, composition, lifetime, or an observable\u2014and follows only the mechanisms needed to connect inputs to that quantity. These branches connect scientific explanations with runnable calculations and their evidence.",
       "investigation": "Choose one measured change in your system. Which state variables and processes could cause it, and what diagnostic would distinguish competing explanations?"
     },
     {
@@ -128,7 +128,7 @@
     {
       "id": "activity",
       "label": "Chemical activity",
-      "description": "Compare ideal mixing, hygroscopicity, and nonideal organic–water interactions.",
+      "description": "Compare ideal mixing, hygroscopicity, and nonideal organic\u2013water interactions.",
       "parent": "composition",
       "order": 0,
       "icon": "activity",
@@ -137,7 +137,7 @@
       ],
       "search_phrases": [
         "kappa",
-        "κ",
+        "\u03ba",
         "hygroscopicity",
         "BAT",
         "Raoult"
@@ -147,7 +147,7 @@
         "condensation",
         "vapor"
       ],
-      "context": "Chemical activity describes how a component in a mixture differs from its pure-substance reference. Ideal, κ-based, and nonideal models encode different assumptions and input requirements. Their consequences appear in equilibrium surface pressure, water uptake, and phase partitioning.",
+      "context": "Chemical activity describes how a component in a mixture differs from its pure-substance reference. Ideal, \u03ba-based, and nonideal models encode different assumptions and input requirements. Their consequences appear in equilibrium surface pressure, water uptake, and phase partitioning.",
       "investigation": "At fixed dry material and humidity, how much does predicted water uptake change when the activity model changes, and which composition data support that choice?"
     },
     {
@@ -241,7 +241,7 @@
     },
     {
       "id": "exchange",
-      "label": "Gas–particle exchange",
+      "label": "Gas\u2013particle exchange",
       "description": "Follow material between vapor and particles, from growth rates to equilibrium composition.",
       "parent": "processes",
       "order": 0,
@@ -250,8 +250,8 @@
       "search_phrases": [],
       "prerequisites": [],
       "related": [],
-      "context": "Gas–particle exchange can be studied as an instantaneous transfer rate, a time-dependent trajectory, or an equilibrium endpoint. These calculations answer different questions. Finite reservoirs couple particles through shared vapor, while prescribed vapor behaves as an external supply.",
-      "investigation": "Does your research require the time to approach equilibrium, or only the equilibrium state—and can the reservoir supply the required material?"
+      "context": "Gas\u2013particle exchange can be studied as an instantaneous transfer rate, a time-dependent trajectory, or an equilibrium endpoint. These calculations answer different questions. Finite reservoirs couple particles through shared vapor, while prescribed vapor behaves as an external supply.",
+      "investigation": "Does your research require the time to approach equilibrium, or only the equilibrium state\u2014and can the reservoir supply the required material?"
     },
     {
       "id": "collisions",
@@ -612,7 +612,7 @@
         "representations"
       ],
       "context": "Custom processes and fields let a model retain research-specific quantities such as tracers or timed chemistry. Their update rules must remain consistent with particle identity, merging, source insertion, and execution backend. Registration alone does not establish the physical semantics of a field.",
-      "investigation": "If particles merge or new particles appear, what should happen to your tracer—and which controlled example would verify that rule?"
+      "investigation": "If particles merge or new particles appear, what should happen to your tracer\u2014and which controlled example would verify that rule?"
     },
     {
       "id": "chambers",
@@ -1459,7 +1459,7 @@
     },
     {
       "source": "docs/examples/simulations/cloud_chamber_single_cycle.py",
-      "title": "Follow droplets through one wet–dry chamber cycle",
+      "title": "Follow droplets through one wet\u2013dry chamber cycle",
       "topic": "chambers",
       "also": [
         "condensation",
@@ -1550,7 +1550,7 @@
     },
     {
       "source": "docs/examples/thermodynamics/equilibria/activity_part1.py",
-      "title": "Follow water–organic mixing from composition to water activity",
+      "title": "Follow water\u2013organic mixing from composition to water activity",
       "topic": "partitioning",
       "also": [],
       "role": "Examples",
@@ -2072,12 +2072,20 @@
     },
     {
       "source": "docs/examples/simulations/adaptive_cloud_relaxation_cuda.py",
-      "title": "Resolve stiff wet–dry droplet relaxation on CUDA",
+      "title": "Resolve stiff wet\u2013dry droplet relaxation on CUDA",
       "topic": "condensation",
       "also": [
         "gpu",
         "chambers"
       ],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/gpu/direct/scalable_coagulation.py",
+      "title": "Native coagulation work budgets",
+      "topic": "gpu",
+      "also": [],
       "role": "Examples",
       "start_here": false
     }

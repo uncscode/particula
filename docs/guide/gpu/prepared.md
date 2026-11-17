@@ -46,7 +46,7 @@ the full collection of CPU strategies or direct GPU mechanism masks.
 | Family | Prepared support | Boundaries |
 | --- | --- | --- |
 | Condensation | `MassCondensation` with isothermal or latent-heat strategy | Native discrete or resolved populations; explicit species maps; supported ideal/Kappa activity and constant/Water Buck vapor-pressure models; four fixed equal GPU substeps. |
-| Coagulation | `Coagulation` with Brownian or an existing charged strategy | Particle-resolved, equal positive active counts, default interpolation controls. Charged fits replace Brownian rather than add to it. |
+| Coagulation | `Coagulation` with Brownian, charged, SP2016 sedimentation, ST1956 shear, or their combined strategy | Particle-resolved, equal positive active counts, default interpolation controls; at most one of each mechanism. A charged strategy selects its fit; combining it explicitly with Brownian sums both terms. |
 | Dilution | `Dilution` with exact exponential strategy | Counts/densities and gas inventory decrease consistently; no volume change. |
 | Wall loss | `WallLoss` with spherical, rectangular or charged strategy | Particle-resolved; supported neutral/charged configuration is frozen at preparation; retired resolved slots retain the native raw-count semantics. |
 | Nucleation | `Nucleation` with activation or kinetic strategy | Resolved unit-count, neutral injection with explicit species mapping, integral event demand and fixed capacity; supported exhaustion/resampling policy is retained. |
@@ -62,6 +62,22 @@ inside `ChargedCoagulationStrategy`. The selected fit is frozen and included in
 checkpoint compatibility. Each uses the shared stochastic sampler and bounded
 parallel pair maximum reduction. Capture and resume use the same model.
 Custom subclasses and unsupported interpolation controls reject before upload.
+
+Pass `coagulation_work_config=CoagulationWorkConfig(...)` to `prepare()` to
+set the per-box trial budget and collision-buffer byte limit. Import this
+configuration from `particula.gpu.kernels.coagulation`. Budgets and sampler
+version are frozen in checkpoints. All 15 nonempty mechanism subsets share
+exact tiled pair reduction with quadratic work and bounded scratch; population
+size has no algorithmic cap. Slot indices remain signed int32. Prepared
+sedimentation retains the CPU strategy's mean material density convention;
+the direct kernel uses each particle's effective density.
+
+Each step admits conservative trial demand before touching coagulation outputs,
+particles or RNG. Excessive demand latches a failure; `synchronize()`,
+`snapshot()` or another observation boundary reports it. Reduce the configured
+timestep and prepare a fresh owner. Admission is a resource bound, not an
+accuracy criterion; no automatic subcycling or clipping occurs. See
+[direct configuration and preflight](direct/coagulation-configuration.md).
 See the [charged model comparison](../../examples/gpu/prepared/gpu_charged_models.py).
 The [charged coagulation validation record](../../contribute/validation/gpu/charged-coagulation.md)
 lists actual CUDA checks and remaining scientific boundaries.
@@ -462,3 +478,12 @@ are assumptions of this implementation.
 See [custom processes across CPU and CUDA](../../examples/gpu/prepared/custom_process_backends.py)
 for equivalent NumPy/Warp updates, explicit CPU transfers, a registered field,
 absolute-time capture, detached snapshots and exact restart checks.
+
+### Coagulation work diagnostics
+
+`prepared.coagulation_diagnostics()` synchronizes and returns per-box expected,
+required and available trials, the resource maximum timestep in seconds, and
+actual scheduled trials, attempted trials and accepted collisions. Counts refer
+to the latest step; fresh or resumed owners report zero until their first step.
+Capture recording does not advance these counts. This compact observation does
+not download particle arrays. The resource timestep is not an accuracy bound.

@@ -59,8 +59,16 @@ def test_original_lineage_partition_and_restart(
         BrownianCoagulationStrategy("particle_resolved")
     ) | SeedCohort(0, 1, target)
     initial = cohort_case(background, seed_diameter)
+    # One pair: choose a near-unit event probability from the CPU kernel.
+    # Keep the required merge and lineage assertions without clipped demand.
+    kernel = BrownianCoagulationStrategy("particle_resolved").kernel(
+        initial.particles,
+        float(initial.environment.temperature[0]),
+        float(initial.environment.pressure[0]),
+    )[0, 1]
+    step = (1 - 1e-8) * initial.particles.volume[0] / kernel
     with process.prepare(
-        initial, device=device, time_step=1, root_seed=17
+        initial, device=device, time_step=float(step), root_seed=17
     ) as simulation:
         before = simulation.checkpoint()
         if device != "cpu":

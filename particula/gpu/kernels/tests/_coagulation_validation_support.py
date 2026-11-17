@@ -39,7 +39,7 @@ class StochasticCase:
     sample_count: int = 100
 
 
-EXECUTABLE_ROWS = (
+EXECUTABLE_ROWS: tuple[MechanismRow, ...] = (
     MechanismRow(1, ("brownian",), (True, False, False, False)),
     MechanismRow(2, ("charged_hard_sphere",), (False, True, False, False)),
     MechanismRow(
@@ -79,7 +79,7 @@ EXECUTABLE_ROWS = (
         (True, True, True, True),
     ),
 )
-DEFERRED_ROWS = (
+TRIPLE_ROWS = (
     MechanismRow(
         7,
         ("brownian", "charged_hard_sphere", "sedimentation_sp2016"),
@@ -104,6 +104,10 @@ DEFERRED_ROWS = (
         ),
         (False, True, True, True),
     ),
+)
+
+EXECUTABLE_ROWS = tuple(
+    sorted((*EXECUTABLE_ROWS, *TRIPLE_ROWS), key=lambda row: row.mask)
 )
 
 
@@ -197,9 +201,19 @@ FIXTURE_NAMES_BY_MASK = {
     4: ("normal", "two_box", "equal_velocity"),
     5: ("normal", "two_box", "equal_velocity"),
     6: ("normal", "two_box", "repulsive", "equal_velocity"),
+    7: ("normal", "two_box", "repulsive", "equal_velocity"),
     8: ("normal", "zero_dissipation"),
     9: ("normal", "two_box", "zero_dissipation"),
     10: ("normal", "two_box", "repulsive", "zero_dissipation"),
+    11: ("normal", "two_box", "repulsive", "zero_dissipation"),
+    13: ("normal", "two_box", "equal_velocity", "zero_dissipation"),
+    14: (
+        "normal",
+        "two_box",
+        "repulsive",
+        "equal_velocity",
+        "zero_dissipation",
+    ),
     12: ("normal", "two_box", "equal_velocity", "zero_dissipation"),
     15: (
         "normal",

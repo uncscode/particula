@@ -379,7 +379,7 @@ def test_warp_adapter_preserves_resident_resources_and_conservation(
     wp = pytest.importorskip("warp")
     fixture = _fixture(boxes)
     bundle = _warp_bundle(fixture)
-    result = _dispatch(bundle, time_step=1.0e10, initialize_rng=True)
+    result = _dispatch(bundle, time_step=2.0e8, initialize_rng=True)
     wp.synchronize()
     _assert_warp_result_identities(result, bundle)
     _assert_warp_invariants(bundle, fixture)
@@ -395,7 +395,7 @@ def test_warp_adapter_supports_direct_scalar_thermo_inputs() -> None:
 
     result = _dispatch(
         bundle,
-        time_step=1.0e10,
+        time_step=2.0e8,
         initialize_rng=True,
         direct_thermo=True,
     )
@@ -425,12 +425,12 @@ def test_warp_adapter_keeps_boxes_isolated() -> None:
     baseline_bundle = _warp_bundle(fixture)
     altered_bundle = _warp_bundle(altered)
     baseline_result = _dispatch(
-        baseline_bundle, time_step=1.0e10, initialize_rng=True
+        baseline_bundle, time_step=2.0e8, initialize_rng=True
     )
     wp.synchronize()
     _assert_warp_result_identities(baseline_result, baseline_bundle)
     altered_result = _dispatch(
-        altered_bundle, time_step=1.0e10, initialize_rng=True
+        altered_bundle, time_step=2.0e8, initialize_rng=True
     )
     wp.synchronize()
     _assert_warp_result_identities(altered_result, altered_bundle)
@@ -541,7 +541,7 @@ def test_warp_explicit_rng_reset_replays_first_dispatch_exactly() -> None:
     wp = pytest.importorskip("warp")
     fixture = _fixture(active_count=3)
     first = _warp_bundle(fixture)
-    _dispatch(first, time_step=1.0e10, initialize_rng=True)
+    _dispatch(first, time_step=2.0e8, initialize_rng=True)
     wp.synchronize()
     expected = tuple(
         value.numpy().copy()
@@ -556,7 +556,7 @@ def test_warp_explicit_rng_reset_replays_first_dispatch_exactly() -> None:
     )
     second = _warp_bundle(fixture)
     second.rng = first.rng
-    _dispatch(second, time_step=1.0e10, initialize_rng=True)
+    _dispatch(second, time_step=2.0e8, initialize_rng=True)
     wp.synchronize()
     actual = tuple(
         value.numpy()
@@ -586,7 +586,7 @@ def test_warp_cuda_adapter_invariants_when_available(boxes: int) -> None:
         pytest.skip("CUDA not available")
     fixture = _fixture(boxes)
     bundle = _warp_bundle(fixture, device="cuda")
-    result = _dispatch(bundle, time_step=1.0e10, initialize_rng=True)
+    result = _dispatch(bundle, time_step=2.0e8, initialize_rng=True)
     wp.synchronize()
     _assert_warp_result_identities(result, bundle)
     _assert_warp_invariants(bundle, fixture)

@@ -1728,7 +1728,12 @@ def test_resident_adapter_prepares_then_enqueues_native_coagulation_once(
     state = coagulation_adapter.ResidentBrownianCoagulationExecutionState(
         request, session, registry, resources
     )
-    prepared = object()
+    from types import SimpleNamespace
+
+    observations = []
+    prepared = SimpleNamespace(
+        check_admission=lambda: observations.append(True)
+    )
     prepare_calls: list[tuple[tuple[object, ...], dict[str, object]]] = []
     enqueue_calls: list[object] = []
 
@@ -1774,6 +1779,7 @@ def test_resident_adapter_prepares_then_enqueues_native_coagulation_once(
     assert kwargs["initialize_rng"] is False
     assert kwargs["environment"] is environment
     assert enqueue_calls == [prepared]
+    assert observations == [True]
     assert result.backend_result is not None
     backend_result = cast(
         coagulation_adapter.WarpBrownianCoagulationResult,

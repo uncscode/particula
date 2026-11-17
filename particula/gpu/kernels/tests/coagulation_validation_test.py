@@ -32,10 +32,10 @@ from particula.gpu.kernels.tests._coagulation_public_step_support import (
     _run_public_case,
 )
 from particula.gpu.kernels.tests._coagulation_validation_support import (
-    DEFERRED_ROWS,
     EXECUTABLE_ROWS,
     FIXTURE_NAMES_BY_MASK,
     FIXTURES,
+    TRIPLE_ROWS,
     applicable_fixture_names,
     brownian_rate_from_properties,
     pair_rate,
@@ -259,24 +259,11 @@ def _observe(fixture_name: str, mask: int) -> dict[str, np.ndarray]:
 
 
 def test_frozen_mask_sets_are_exact() -> None:
-    """Freeze the literal executable and deferred fixed-mask boundaries."""
-    assert {row.mask for row in EXECUTABLE_ROWS} == {
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        8,
-        9,
-        10,
-        12,
-        15,
-    }
-    assert {row.mask for row in DEFERRED_ROWS} == {7, 11, 13, 14}
-    assert len(EXECUTABLE_ROWS) == 11
-    assert len(DEFERRED_ROWS) == 4
-    for row in (*EXECUTABLE_ROWS, *DEFERRED_ROWS):
+    """All fifteen nonempty mechanism subsets are executable."""
+    assert {row.mask for row in EXECUTABLE_ROWS} == set(range(1, 16))
+    assert {row.mask for row in TRIPLE_ROWS} == {7, 11, 13, 14}
+    assert len(EXECUTABLE_ROWS) == 15
+    for row in EXECUTABLE_ROWS:
         assert row.mask == sum(
             flag << bit for bit, flag in enumerate(row.enabled)
         )
@@ -366,18 +353,13 @@ def test_configuration_rows_are_canonical_and_executable(row: Any) -> None:
     validate_coagulation_mechanism_capabilities(resolved)
 
 
-@pytest.mark.parametrize(
-    "row", DEFERRED_ROWS, ids=lambda row: f"mask_{row.mask}"
-)
-def test_configuration_rows_report_stable_deferred_error(row: Any) -> None:
-    """Recognized three-way rows retain the explicit deferred boundary."""
+@pytest.mark.parametrize("row", TRIPLE_ROWS, ids=lambda row: f"mask_{row.mask}")
+def test_configuration_triples_are_executable(row: Any) -> None:
+    """Three-way rows use the same execution contract as other subsets."""
     resolved = resolve_coagulation_mechanism_config(
         CoagulationMechanismConfig(mechanisms=row.mechanisms)
     )
-    with pytest.raises(
-        ValueError, match="^Additive coagulation execution is deferred\\.$"
-    ):
-        validate_coagulation_mechanism_capabilities(resolved)
+    validate_coagulation_mechanism_capabilities(resolved)
 
 
 def test_host_configuration_defaults_and_canonicalizes_permuted_input() -> None:
@@ -577,7 +559,7 @@ def test_executable_masks_force_one_legal_merge(row: Any) -> None:
             n_species=2,
             max_collisions=1,
             device=device,
-            time_step=1.0e12,
+            time_step=None,
             active_by_box=active_by_box,
         )
         npt.assert_array_equal(final["counts"], [1])
@@ -593,7 +575,13 @@ def test_public_step_preserves_multi_pair_ordering_and_bookkeeping() -> None:
     """Two capacity slots produce two sorted, disjoint applied merges."""
     wp = _require_warp()
     row = next(row for row in EXECUTABLE_ROWS if row.mask == 1)
-    fixture = FIXTURES["normal"]
+    from dataclasses import replace
+
+    # Equal Brownian rates make both admitted proposals accept. The separate
+    # sparse tests retain the large inactive sentinel and heterogeneous rates.
+    fixture = replace(
+        FIXTURES["normal"], radii=np.full_like(FIXTURES["normal"].radii, 1e-7)
+    )
     active_by_box = ((0, 1, 2, 3),)
     for device in _run_on_warp_devices(wp):
         initial, final, _, _, _, _ = _run_public_case(
@@ -602,7 +590,7 @@ def test_public_step_preserves_multi_pair_ordering_and_bookkeeping() -> None:
             n_species=2,
             max_collisions=2,
             device=device,
-            time_step=1.0e12,
+            time_step=None,
             active_by_box=active_by_box,
         )
         npt.assert_array_equal(final["counts"], [2])
@@ -723,7 +711,10 @@ def test_persistent_rng_advances_only_after_explicit_initialization() -> None:
     """Caller-owned RNG state is reset only through initialize_rng=True."""
     wp = _require_warp()
     from particula.gpu.conversion import to_warp_particle_data
-    from particula.gpu.kernels.coagulation import coagulation_step_gpu
+    from particula.gpu.kernels.coagulation import (
+        coagulation_preflight_gpu,
+        coagulation_step_gpu,
+    )
 
     fixture = FIXTURES["normal"]
     row = next(row for row in EXECUTABLE_ROWS if row.mask == 1)
@@ -746,6 +737,8 @@ def test_persistent_rng_advances_only_after_explicit_initialization() -> None:
         rng_states=states,
         mechanism_config=CoagulationMechanismConfig(mechanisms=row.mechanisms),
     )
+    report = coagulation_preflight_gpu(particles, **kwargs)
+    kwargs["time_step"] = 0.5 * float(report["max_time_step"][0])
     coagulation_step_gpu(particles, initialize_rng=True, **kwargs)
     initialized = states.numpy().copy()
     coagulation_step_gpu(particles, initialize_rng=False, **kwargs)
@@ -785,15 +778,15 @@ def _assert_snapshot_unchanged(
 @pytest.mark.warp
 @pytest.mark.gpu_parity
 @pytest.mark.parametrize("mask", (7, 11, 13, 14))
-def test_deferred_masks_are_atomic_before_caller_owned_state_changes(
+def test_triple_mask_budget_rejection_preserves_caller_owned_state(
     mask: int,
 ) -> None:
-    """Deferred configurations leave particles, outputs, and RNG reusable."""
+    """An oversized triple-mask step leaves particles, outputs and RNG reusable."""
     wp = _require_warp()
     from particula.gpu.conversion import to_warp_particle_data
     from particula.gpu.kernels.coagulation import coagulation_step_gpu
 
-    row = next(row for row in DEFERRED_ROWS if row.mask == mask)
+    row = next(row for row in TRIPLE_ROWS if row.mask == mask)
     fixture = FIXTURES["normal"]
     particles = to_warp_particle_data(
         _materialize_public_particles(fixture, n_species=2), device="cpu"
@@ -805,14 +798,13 @@ def test_deferred_masks_are_atomic_before_caller_owned_state_changes(
     kwargs: dict[str, Any] = {}
     if mask & 8:
         kwargs = {"turbulent_dissipation": 2.0e-4, "fluid_density": 1.2}
-    with pytest.raises(
-        ValueError, match="^Additive coagulation execution is deferred\\.$"
-    ):
+    with pytest.raises(ValueError, match="requires.*trials"):
         coagulation_step_gpu(
             particles,
             temperature=298.15,
             pressure=101325.0,
-            time_step=1.0,
+            time_step=1e30,
+            max_collisions=1,
             collision_pairs=pairs,
             n_collisions=counts,
             rng_states=states,

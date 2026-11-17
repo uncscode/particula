@@ -156,6 +156,26 @@ def _preflight(processes, saved, backend, device, process_registry=None):
         else _plan_process(p, host)
         for p in processes
     )
+    from particula.execution.prepared_processes import (
+        configure_coagulation_work,
+    )
+    from particula.gpu.kernels._coagulation_budget import CoagulationWorkConfig
+
+    saved_coagulation = [
+        p
+        for p in saved.processes
+        if type(p) is _ProcessPlan and p.family == "coagulation"
+    ]
+    work_config = None
+    if saved_coagulation:
+        values = saved_coagulation[0].values
+        if values.get("coagulation_sampler_version") != 1:
+            raise ValueError("incompatible coagulation sampler checkpoint")
+        work_config = CoagulationWorkConfig(
+            max_trials_per_box=values["max_trials_per_box"],
+            max_collision_buffer_bytes=values["max_collision_buffer_bytes"],
+        )
+    plans = configure_coagulation_work(plans, work_config)
     from particula.execution.prepared_particle_fields import (
         validate_particle_fields,
     )

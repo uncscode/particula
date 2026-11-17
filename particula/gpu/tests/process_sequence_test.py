@@ -1448,18 +1448,44 @@ def _run_resident_sequence_on_device(
     )
     assert np.all(np.isfinite(mass_charge_before[0]))
     assert np.all(np.isfinite(mass_charge_before[1]))
-    returned = coagulation_step_gpu(
-        state.particles,
-        None,
-        None,
-        1.0e30,
-        max_collisions=state.collision_pairs.shape[1],
-        collision_pairs=state.collision_pairs,
-        n_collisions=state.collision_counts,
-        rng_states=state.coagulation_rng,
-        initialize_rng=True,
-        environment=state.environment,
-    )
+    from particula.gpu.kernels.coagulation import coagulation_preflight_gpu
+
+    collision_totals = np.zeros(state.collision_counts.shape, dtype=np.int64)
+    for collision_step in range(128):
+        report = coagulation_preflight_gpu(
+            state.particles,
+            None,
+            None,
+            1.0,
+            max_collisions=state.collision_pairs.shape[1],
+            environment=state.environment,
+        )
+        limits = report["max_time_step"]
+        positive = limits[limits > 0]
+        collision_dt = (
+            float(positive.min()) * (1 - 1e-8) if positive.size else 0.0
+        )
+        returned = coagulation_step_gpu(
+            state.particles,
+            None,
+            None,
+            collision_dt,
+            max_collisions=state.collision_pairs.shape[1],
+            collision_pairs=state.collision_pairs,
+            n_collisions=state.collision_counts,
+            rng_states=state.coagulation_rng,
+            initialize_rng=collision_step == 0,
+            environment=state.environment,
+        )
+        collision_totals += state.collision_counts.numpy()
+        if np.all(
+            np.count_nonzero(state.particles.concentration.numpy(), axis=1) < 2
+        ):
+            break
+    else:
+        pytest.fail(
+            "explicit admitted coagulation steps did not finish mergers"
+        )
     assert returned[0] is state.particles
     assert returned[1] is state.collision_pairs
     assert returned[2] is state.collision_counts
@@ -1475,7 +1501,7 @@ def _run_resident_sequence_on_device(
     npt.assert_allclose(
         mass_charge_after[1], mass_charge_before[1], rtol=1e-12, atol=1e-30
     )
-    collision_counts = state.collision_counts.numpy()
+    collision_counts = collision_totals
     collision_pairs = state.collision_pairs.numpy()
     assert np.all((collision_counts > 0) & (collision_counts <= 4))
     for box, count in enumerate(collision_counts):

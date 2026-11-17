@@ -814,6 +814,11 @@ class _PreparedResidentBrownianCoagulationBinding:
         """Enqueue the frozen native call without repeating setup."""
         return self.enqueue(self.prepared)
 
+    def check_admission(self) -> None:
+        """Surface budget rejection at a caller observation boundary."""
+        if self.prepared is not None:
+            self.prepared.check_admission()
+
 
 class ResidentBrownianCoagulationExecutionAdapter:
     """Dispatch one pre-acquired resident Brownian request by identity.
@@ -894,6 +899,7 @@ class ResidentBrownianCoagulationExecutionAdapter:
             _prepare_coagulation_step_gpu,
         )
 
+        call_kwargs["max_collisions"] = state.resources.collision_pairs.shape[1]
         prepared = _prepare_coagulation_step_gpu(*call_args, **call_kwargs)
         return _PreparedResidentBrownianCoagulationBinding(
             state,
@@ -923,6 +929,7 @@ class ResidentBrownianCoagulationExecutionAdapter:
         )
         request = binding.state.request.state
         particles, pairs, counts = binding.execute()
+        binding.check_admission()
         result = WarpBrownianCoagulationResult(
             request, particles, pairs, counts
         )

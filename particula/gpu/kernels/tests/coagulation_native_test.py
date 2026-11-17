@@ -87,6 +87,18 @@ def _state(device, row, weight=1.0, slots=5):
     )
 
 
+def _admit_state_step(state):
+    """Choose a finite step for ownership tests without clipping work."""
+    from particula.gpu.kernels.coagulation import coagulation_preflight_gpu
+
+    report = coagulation_preflight_gpu(state.p, **state.kwargs)
+    limits = report["max_time_step"]
+    positive = limits[limits > 0]
+    state.kwargs["time_step"] = (
+        float(positive.min()) * (1 - 1e-8) if positive.size else 0.0
+    )
+
+
 def _snapshot(state):
     """Read state only at the explicit test observation boundary."""
     return {
@@ -125,6 +137,7 @@ def test_native_merges_conserve_all_species_and_charge(  # noqa: C901
     from particula.gpu.kernels.coagulation import (
         _enqueue_prepared_coagulation_call,
         _prepare_coagulation_step_gpu,
+        coagulation_preflight_gpu,
         coagulation_step_gpu,
     )
 
@@ -135,16 +148,30 @@ def test_native_merges_conserve_all_species_and_charge(  # noqa: C901
         name: getattr(state.p, name)
         for name in ("masses", "concentration", "charge", "density", "volume")
     }
-    prepared = None
-    if mode == "prepared":
-        prepared = _prepare_coagulation_step_gpu(state.p, **state.kwargs)
-        assert not hasattr(prepared, "native_counts")
-    for replay, expected_collisions in enumerate((2, 1, 0)):
+    # The old fixture requested 1e30 s and depended on silent clipping.
+    # Reject that demand, then explicitly take admitted steps until every
+    # original particle has participated in conservative mergers.
+    from particula.gpu.kernels._coagulation_budget import CoagulationBudgetError
+
+    with pytest.raises(CoagulationBudgetError):
+        coagulation_step_gpu(state.p, **state.kwargs)
+    for name, value in _snapshot(state).items():
+        npt.assert_array_equal(value, initial[name])
+    cumulative = np.zeros(3, dtype=np.int64)
+    for replay in range(1024):
         before = _snapshot(state)
+        report = coagulation_preflight_gpu(state.p, **state.kwargs)
+        limits = report["max_time_step"]
+        positive = limits[limits > 0]
+        state.kwargs["time_step"] = (
+            float(positive.min()) * (1 - 1e-8) if positive.size else 0.0
+        )
+        state.kwargs["initialize_rng"] = replay == 0
         if mode == "direct":
             state.kwargs["initialize_rng"] = replay == 0
             result = coagulation_step_gpu(state.p, **state.kwargs)
         else:
+            prepared = _prepare_coagulation_step_gpu(state.p, **state.kwargs)
             result = _enqueue_prepared_coagulation_call(prepared)
         assert all(
             a is b
@@ -153,7 +180,9 @@ def test_native_merges_conserve_all_species_and_charge(  # noqa: C901
             )
         )
         after = _snapshot(state)
-        npt.assert_array_equal(after["counts"], expected_collisions)
+        cumulative += after["counts"]
+        assert np.all(after["counts"] >= 0)
+        assert np.all(after["counts"] <= 2)
         for actual, expected in zip(_inventory(after), inventory, strict=True):
             npt.assert_allclose(actual, expected, rtol=1e-12, atol=1e-30)
         for name, original in identities.items():
@@ -176,8 +205,12 @@ def test_native_merges_conserve_all_species_and_charge(  # noqa: C901
                 npt.assert_array_equal(after["masses"][box, donor], 0)
                 assert after["concentration"][box, donor] == 0
                 assert after["concentration"][box, recipient] == weight
-        if expected_collisions == 0:
+        if positive.size == 0:
             npt.assert_array_equal(after["rng"], before["rng"])
+            break
+    else:
+        pytest.fail("admitted steps did not merge the complete population")
+    npt.assert_array_equal(cumulative, 3)
 
 
 @pytest.mark.parametrize("row", EXECUTABLE_ROWS, ids=lambda row: str(row.mask))
@@ -424,6 +457,8 @@ def test_prepared_enqueue_has_no_host_rebinding_or_resource_setup(
     from particula.gpu.kernels import coagulation as module
 
     state = _state(device, row)
+    report = module.coagulation_preflight_gpu(state.p, **state.kwargs)
+    state.kwargs["time_step"] = 0.5 * float(report["max_time_step"].min())
     prepared = module._prepare_coagulation_step_gpu(state.p, **state.kwargs)
     # Warm compilation before asserting the enqueue boundary.
     module._enqueue_prepared_coagulation_call(prepared)
@@ -451,7 +486,9 @@ def test_prepared_enqueue_has_no_host_rebinding_or_resource_setup(
         patch.setattr(wp.array, "numpy", forbidden)
         patch.setattr(module, "initialize_coagulation_rng_states", forbidden)
         patch.setattr(module, "particle_distribution_code", forbidden)
-        module._enqueue_prepared_coagulation_call(prepared)
+        for _ in range(16):
+            module._enqueue_prepared_coagulation_call(prepared)
+    prepared.check_admission()
     npt.assert_array_equal(state.p.masses.numpy(), replacement)
     assert np.count_nonzero(
         np.sum(pinned_mass.numpy(), axis=2) > 0
@@ -526,10 +563,11 @@ def test_matching_explicit_volume_is_supported(device, form):
         state.kwargs["volume"] = 0.25
     else:
         state.kwargs["volume"] = wp.clone(state.p.volume)
+    _admit_state_step(state)
     before = _snapshot(state)
     coagulation_step_gpu(state.p, **state.kwargs)
     after = _snapshot(state)
-    npt.assert_array_equal(after["counts"], 2)
+    assert after["counts"].sum() > 0
     for expected, actual in zip(
         _inventory(before), _inventory(after), strict=True
     ):
@@ -554,26 +592,14 @@ def test_occupied_zero_material_rejects_and_inactive_zero_material_is_valid(
     counts = state.p.concentration.numpy()
     counts[:, 0] = 0
     state.p.concentration.assign(counts)
+    _admit_state_step(state)
     coagulation_step_gpu(state.p, **state.kwargs)
-    npt.assert_array_equal(state.counts.numpy(), 1)
+    assert state.counts.numpy().sum() > 0
 
 
-@pytest.mark.parametrize(
-    "mechanisms",
-    [
-        ("brownian", "charged_hard_sphere", "sedimentation_sp2016"),
-        ("brownian", "charged_hard_sphere", "turbulent_shear_st1956"),
-        ("brownian", "sedimentation_sp2016", "turbulent_shear_st1956"),
-        (
-            "charged_hard_sphere",
-            "sedimentation_sp2016",
-            "turbulent_shear_st1956",
-        ),
-        ("turbulent_dns",),
-    ],
-)
+@pytest.mark.parametrize("mechanisms", [("turbulent_dns",)])
 def test_native_metadata_does_not_expand_mechanism_support(device, mechanisms):
-    """Native provenance does not admit deferred triples or a GPU DNS law."""
+    """Native provenance does not admit an unimplemented GPU DNS law."""
     from particula.gpu.kernels.coagulation import (
         CoagulationMechanismConfig,
         coagulation_step_gpu,
@@ -616,6 +642,7 @@ def test_native_environment_sources_preserve_physical_state(device, form):
             temperature=None, pressure=None, environment=environment
         )
     before = _snapshot(state)
+    _admit_state_step(state)
     coagulation_step_gpu(state.p, **state.kwargs)
     restored = from_warp_particle_data(state.p)
     assert restored.distribution_type == "particle_resolved"
@@ -633,10 +660,8 @@ def test_native_environment_sources_preserve_physical_state(device, form):
 
 
 @pytest.mark.parametrize("mask", [1, 2, 4, 8])
-def test_native_admission_preserves_mechanism_specific_active_limits(
-    device, mask
-):
-    """The shared physical scan does not impose charged caps on other laws."""
+def test_native_admission_exceeds_former_charged_active_limit(device, mask):
+    """All supported laws admit populations above the former charged cap."""
     from particula.gpu import to_warp_particle_data
     from particula.gpu.kernels.coagulation import (
         CoagulationMechanismConfig,
@@ -657,14 +682,10 @@ def test_native_admission_preserves_mechanism_specific_active_limits(
     kwargs = dict(mechanism_config=CoagulationMechanismConfig(row.mechanisms))
     if mask == 8:
         kwargs.update(turbulent_dissipation=2e-4, fluid_density=1.2)
-    if mask == 2:
-        with pytest.raises(ValueError, match="active particle count exceeds"):
-            coagulation_step_gpu(particles, 298.15, 101325.0, 0.0, **kwargs)
-    else:
-        _, _, collisions = coagulation_step_gpu(
-            particles, 298.15, 101325.0, 0.0, **kwargs
-        )
-        npt.assert_array_equal(collisions.numpy(), 0)
+    _, _, collisions = coagulation_step_gpu(
+        particles, 298.15, 101325.0, 0.0, **kwargs
+    )
+    npt.assert_array_equal(collisions.numpy(), 0)
     npt.assert_array_equal(particles.masses.numpy(), cpu.masses)
     npt.assert_array_equal(particles.concentration.numpy(), cpu.concentration)
 

@@ -105,13 +105,41 @@ def test_material_coupling_restarts_persistent_collision_rng(kind):
     # Slow exchange isolates stochastic restart from an extreme reservoir transient.
     strategy.diffusion_coefficient = 1e-12
     events = (collision(kind),)
+    # Independently bound proposals with the CPU material law. Restart still
+    # exercises real random draws, without depending on clipped pair demand.
+    from particula.particles import ParticleData
+
+    limits = []
+    for box in range(initial.particles.n_boxes):
+        particles = initial.particles
+        local = ParticleData(
+            particles.masses[box : box + 1].copy(),
+            particles.concentration[box : box + 1].copy(),
+            particles.charge[box : box + 1].copy(),
+            particles.density.copy(),
+            particles.volume[box : box + 1].copy(),
+            distribution_type="particle_resolved",
+        )
+        active = local.concentration[0] > 0
+        rates = events[0].coagulation_strategy.kernel(
+            local,
+            float(initial.environment.temperature[box]),
+            float(initial.environment.pressure[box]),
+        )
+        rates = rates[np.ix_(active, active)].copy()
+        np.fill_diagonal(rates, 0)
+        count = int(active.sum())
+        rate = rates.max() * count * (count - 1) / 2
+        rate *= local.concentration[0, active][0] / local.volume[0]
+        limits.append((count // 2) / rate)
+    timestep = 0.5 * float(min(limits))
     with GPUCoupledSimulation(
         initial,
         events,
         strategy,
         device="cuda:0",
         resident=True,
-        time_step=1e-5,
+        time_step=timestep,
         root_seed=317,
     ) as owner:
         owner.capture_events()

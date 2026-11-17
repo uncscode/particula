@@ -41,8 +41,13 @@ Fail closed in this order:
 Replay requires an authentic issued record; the exact attached request, session,
 registry, and closed guard; an ACTIVE session; qualified CUDA availability; a
 CAPTURED lifecycle; an unchanged compatible signature; and the matching duration.
-One call is one replay. Before `.numpy()` or any other host observation, call
-`warp.synchronize_device(...)` explicitly.
+One call is one replay. Before `.numpy()`, checkpointing, or any other host
+observation, call `prepared.synchronize()` on the retained
+`PreparedResidentSimulation`. This explicitly waits for device work and reports
+coagulation work-budget failures, faulting the resident lifecycle on rejection.
+A bare `warp.synchronize_device(...)` only waits; it does not inspect those
+application diagnostics. Earlier or later processes in a low-level schedule
+are not rolled back when coagulation rejects its own operation.
 
 ## Structural changes require fresh capture
 

@@ -120,7 +120,7 @@ def wrap_cohort_operations(
 
     observe()
     resources = (
-        context.registry.acquire_coagulation(shape[1])
+        context.bindings["coagulation"]
         if any(p.family == "coagulation" for p in plans)
         else None
     )

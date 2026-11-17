@@ -72,10 +72,9 @@ def validate_physics(particles: Any, requested_volume: Any) -> None:
     from .coagulation import _validate_sedimentation_particle_physics_kernel
 
     device = particles.masses.device
-    boxes, slots, _ = particles.masses.shape
+    boxes = particles.masses.shape[0]
     invalid = wp.zeros(7, dtype=wp.int32, device=device)
-    # Reuse the established field/weight reduction without importing the
-    # sedimentation-specific active-count cap into unrelated mechanisms.
+    # Reuse the mechanism-independent physical and equal-weight checks.
     wp.launch(
         _validate_sedimentation_particle_physics_kernel,
         dim=boxes,
@@ -84,7 +83,6 @@ def validate_physics(particles: Any, requested_volume: Any) -> None:
             particles.concentration,
             particles.density,
             particles.charge,
-            wp.int32(slots),
             invalid,
         ],
         device=device,
@@ -144,6 +142,8 @@ def validate_ownership(
     counts: Any,
     states: Any,
     protected_inputs: tuple[Any, ...],
+    *,
+    work_counts: Any = None,
 ) -> None:
     """Reject every native writer overlapping another writer or read source."""
     writers = [
@@ -153,6 +153,7 @@ def validate_ownership(
         pairs,
         counts,
         states,
+        work_counts,
     ]
     protected = [particles.density, particles.volume, *protected_inputs]
     # Validate storage metadata for all arrays, even if a writer is empty.
