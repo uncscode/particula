@@ -238,6 +238,30 @@ class PreparedResidentSimulation:
     operations: tuple[PreparedResidentOperation, ...]
     duration: object
 
+    def synchronize(self) -> None:
+        """Wait and surface deferred admission errors before observing state.
+
+        Low-level prepared owners call this boundary before checkpointing or
+        interpreting outputs. Enqueue remains allocation/readback-free. A
+        rejected operation does not roll back other processes in the schedule.
+        """
+        import warp as wp
+
+        from particula.execution.gpu_session import (
+            _fault_resident_session_with_context,
+        )
+
+        guard = cast(ResidentStepGuard, self.guard)
+        session = cast(ResidentSession, self.session)
+        guard.assert_step_closed()
+        self.registry.assert_step_closed()
+        try:
+            wp.synchronize_device(cast(Any, session.particles).masses.device)
+            cast(Any, self.coagulation).check_admission()
+        except BaseException:
+            _fault_resident_session_with_context(session, self.registry, guard)
+            raise
+
 
 def _registry_type() -> type[object]:
     """Return the concrete registry type without creating an import cycle.

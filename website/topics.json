@@ -2467,6 +2467,14 @@
       ],
       "role": "Examples",
       "start_here": false
+    },
+    {
+      "source": "docs/examples/gpu/direct/scalable_coagulation.py",
+      "title": "Native coagulation work budgets",
+      "topic": "gpu-direct",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
     }
   ],
   "supporting": [

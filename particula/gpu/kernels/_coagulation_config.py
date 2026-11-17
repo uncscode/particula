@@ -143,6 +143,6 @@ def validate_coagulation_mechanism_capabilities(
     Raises:
         ValueError: If the mechanism mask is a deferred three-way combination.
     """
-    if resolved.mask in (1, 2, 3, 4, 5, 6, 8, 9, 10, 12, 15):
+    if 1 <= resolved.mask <= 15:
         return
     raise ValueError("Additive coagulation execution is deferred.")

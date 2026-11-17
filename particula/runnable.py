@@ -186,6 +186,7 @@ class RunnableABC:
         root_seed: int = 0,
         logical_box_ids=None,
         process_registry=None,
+        coagulation_work_config=None,
         time: float = 0.0,
     ) -> "PreparedSimulation":
         """Upload native state once and prepare supported resident GPU physics.
@@ -198,6 +199,7 @@ class RunnableABC:
             root_seed: Root seed for persistent independent process/box streams.
             logical_box_ids: Optional stable identities in physical box order.
             process_registry: Exact-type custom GPU adapter registrations.
+            coagulation_work_config: Optional coagulation resource budgets.
             time: Absolute initial simulation time [s].
 
         Returns:
@@ -220,6 +222,7 @@ class RunnableABC:
             root_seed=root_seed,
             logical_box_ids=logical_box_ids,
             process_registry=process_registry,
+            coagulation_work_config=coagulation_work_config,
             time=time,
         )
 
@@ -417,6 +420,7 @@ class RunnableSequence:
         root_seed: int = 0,
         logical_box_ids=None,
         process_registry=None,
+        coagulation_work_config=None,
         time: float = 0.0,
     ) -> "PreparedSimulation":
         """Upload native state once and prepare supported resident GPU physics.
@@ -429,6 +433,7 @@ class RunnableSequence:
             root_seed: Root seed for persistent independent process/box streams.
             logical_box_ids: Optional stable identities in physical box order.
             process_registry: Exact-type custom GPU adapter registrations.
+            coagulation_work_config: Optional coagulation resource budgets.
             time: Absolute initial simulation time [s].
 
         Returns:
@@ -451,6 +456,7 @@ class RunnableSequence:
             root_seed=root_seed,
             logical_box_ids=logical_box_ids,
             process_registry=process_registry,
+            coagulation_work_config=coagulation_work_config,
             time=time,
         )
 

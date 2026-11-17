@@ -239,11 +239,21 @@ def test_translated_brownian_has_collisions_and_conserves_inventory(device):
     from particula.execution.prepared import prepare_simulation
 
     initial = state(volume=1e-20)
+    from particula.gpu import to_warp_particle_data
+    from particula.gpu.kernels.coagulation import coagulation_preflight_gpu
+
+    report = coagulation_preflight_gpu(
+        to_warp_particle_data(initial.particles, device=device.native),
+        float(initial.environment.temperature[0]),
+        float(initial.environment.pressure[0]),
+        1.0,
+    )
+    admitted_step = float(report["max_time_step"][0]) * (1 - 1e-12)
     with prepare_simulation(
         (Coagulation(BrownianCoagulationStrategy("particle_resolved")),),
         initial,
         device=device.native,
-        time_step=1,
+        time_step=admitted_step,
         root_seed=17,
     ) as simulation:
         simulation.step()
@@ -632,7 +642,7 @@ def test_new_unit_particles_guard_unequal_coagulation_before_rng_draw(device):
         device=device.native,
         time_step=1.0,
     ) as simulation:
-        resources = simulation._registry.acquire_coagulation(4)
+        resources = simulation._registry.acquire_coagulation(2)
         before_rng = resources.rng_states.numpy().copy()
         simulation.run(3)
         simulation._wait()
@@ -844,7 +854,7 @@ def test_latched_failure_preserves_primary_arrays_and_random_streams(
             targets.append(simulation._registry.acquire_wall_loss().rng_states)
         elif family == "coagulation":
             targets.append(
-                simulation._registry.acquire_coagulation(2).rng_states
+                simulation._bindings["coagulation"].selector_inputs[27]
             )
         before = [array.numpy().copy() for array in targets]
         with simulation._scope():

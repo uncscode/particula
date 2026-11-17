@@ -341,9 +341,12 @@ class PreparedSimulation:
                             "and a supported model environment"
                         ),
                         8: "ion attachment rate is unsupported",
+                        9: ("coagulation budget exceeded; reduce timestep"),
                         90: "GPU process produced invalid field values",
                         91: "GPU particle-field event contract violated",
                     }
+                    if failure == 9:
+                        self._bindings["coagulation"].check_admission()
                     if failure in messages:
                         raise ValueError(messages[failure])
                     for observe in self._observers:
@@ -413,6 +416,34 @@ class PreparedSimulation:
             except BaseException:
                 self._fault()
                 raise
+
+    def coagulation_diagnostics(self) -> dict[str, Any]:
+        """Observe compact work counts for the latest successful coagulation.
+
+        Counts describe this owner since preparation/restart; fresh owners
+        report zeros until a step runs. Capture recording does not advance them.
+        This observer does not download particle arrays.
+        """
+        with self._lock:
+            self.synchronize()
+            binding = self._bindings.get("coagulation")
+            if binding is None:
+                raise ValueError("simulation has no coagulation process")
+            with self._scope():
+                report = binding.budget_report.numpy().copy()
+                counts = binding.work_counts.numpy().copy()
+                accepted = binding.n_collisions.numpy().copy()
+                # Checkpoints retain collision outputs, not last-step scratch.
+                accepted[report[:, 2] == 0] = 0
+                return {
+                    "expected_trials": report[:, 0],
+                    "required_trials": report[:, 1],
+                    "available_trials": report[:, 2],
+                    "max_time_step": report[:, 3],
+                    "scheduled_trials": counts[:, 0],
+                    "attempted_trials": counts[:, 1],
+                    "accepted_collisions": accepted,
+                }
 
     @property
     def gas_names(self) -> tuple[str, ...]:
@@ -633,6 +664,7 @@ def prepare_simulation(
     root_seed: int = 0,
     logical_box_ids: tuple[str, ...] | None = None,
     process_registry=None,
+    coagulation_work_config=None,
     time: float = 0.0,
 ) -> PreparedSimulation:
     """Validate the ordered process plan before uploading native state."""
@@ -671,6 +703,11 @@ def prepare_simulation(
         else _plan_process(process, aerosol)
         for process in processes
     )
+    from particula.execution.prepared_processes import (
+        configure_coagulation_work,
+    )
+
+    plans = configure_coagulation_work(plans, coagulation_work_config)
     from particula.execution.prepared_particle_fields import (
         validate_particle_fields,
     )

@@ -18,6 +18,7 @@ from particula.gpu.dynamics.ion_pair_data import (
 from particula.gpu.kernels.coagulation import (
     _sanitize_positive_finite,
     _select_coagulation_pairs_impl,
+    _total_pair_rate,
     aerodynamic_mobility_wp,
     brownian_diffusivity_wp,
     brownian_kernel_pair_wp,
@@ -361,13 +362,25 @@ def _select_brownian(  # noqa: C901
     majorants: wp.array(dtype=wp.float64),
     failure: wp.array(dtype=wp.int32),
     ion_data: IonPairData,
+    work_counts: wp.array2d(dtype=wp.int32),
 ) -> None:
     """Select from parallel properties and maxima with the original RNG code."""
     if failure:
         if failure[0] != 0:
             return
     box_idx = wp.tid()
-    _select_coagulation_pairs_impl(
+    kinematic_viscosity = wp.float64(0.0)
+    if mechanism_mask & 8:
+        kinematic_viscosity = (
+            dynamic_viscosity_wp(
+                temperature[box_idx],
+                ref_viscosity,
+                ref_temperature,
+                sutherland_constant,
+            )
+            / fluid_density[box_idx]
+        )
+    counters = _select_coagulation_pairs_impl(
         masses,
         concentration,
         density,
@@ -401,9 +414,114 @@ def _select_brownian(  # noqa: C901
         box_idx,
         majorants[box_idx],
         active_counts[box_idx],
-        wp.float64(0.0),
+        kinematic_viscosity,
         ion_data,
     )
+
+    work_counts[box_idx, 0] = counters[0]
+    work_counts[box_idx, 1] = counters[1]
+
+
+@no_type_check
+@wp.kernel
+def _additive_pair_maxima(  # noqa: C901
+    masses: Any,
+    concentration: Any,
+    density: Any,
+    volume: Any,
+    temperature: Any,
+    pressure: Any,
+    gas_constant: Any,
+    boltzmann_constant: Any,
+    molecular_weight_air: Any,
+    ref_viscosity: Any,
+    ref_temperature: Any,
+    sutherland_constant: Any,
+    elementary_charge_value: Any,
+    electric_permittivity: Any,
+    time_step: Any,
+    radii: Any,
+    diffusivities: Any,
+    g_terms: Any,
+    speeds: Any,
+    settling_velocities: Any,
+    turbulent_dissipation: Any,
+    fluid_density: Any,
+    total_masses: Any,
+    charge: Any,
+    active_indices: Any,
+    collision_pairs: Any,
+    n_collisions: Any,
+    rng_states: Any,
+    mechanism_mask: Any,
+    collision_capacity: Any,
+    active_counts: wp.array(dtype=wp.int32),
+    partials: wp.array2d(dtype=wp.float64),
+    failure: wp.array(dtype=wp.int32),
+    ion_data: IonPairData,
+) -> None:
+    """Reduce exact additive rates with bounded scratch and int64 pair ranks."""
+    if failure:
+        if failure[0] != 0:
+            return
+    box_idx, lane = wp.tid()
+    count = wp.int64(active_counts[box_idx])
+    temperature_value = temperature[box_idx]
+    pressure_value = pressure[box_idx]
+    kinematic_viscosity = wp.float64(0.0)
+    if mechanism_mask & 8:
+        kinematic_viscosity = (
+            dynamic_viscosity_wp(
+                temperature_value,
+                ref_viscosity,
+                ref_temperature,
+                sutherland_constant,
+            )
+            / fluid_density[box_idx]
+        )
+    maximum = wp.float64(0.0)
+    pair = wp.int64(lane)
+    while pair < count * count:
+        first = wp.int32(pair // count)
+        second = wp.int32(pair % count)
+        if first < second:
+            selected_i = active_indices[box_idx, first]
+            selected_j = active_indices[box_idx, second]
+            total_rate = _total_pair_rate(
+                mechanism_mask,
+                radii[box_idx, selected_i],
+                radii[box_idx, selected_j],
+                diffusivities[box_idx, selected_i],
+                diffusivities[box_idx, selected_j],
+                g_terms[box_idx, selected_i],
+                g_terms[box_idx, selected_j],
+                speeds[box_idx, selected_i],
+                speeds[box_idx, selected_j],
+                settling_velocities[box_idx, selected_i],
+                settling_velocities[box_idx, selected_j],
+                turbulent_dissipation[box_idx],
+                kinematic_viscosity,
+                total_masses[box_idx, selected_i],
+                total_masses[box_idx, selected_j],
+                charge[box_idx, selected_i],
+                charge[box_idx, selected_j],
+                temperature_value,
+                pressure_value,
+                boltzmann_constant,
+                elementary_charge_value,
+                electric_permittivity,
+                gas_constant,
+                molecular_weight_air,
+                ref_viscosity,
+                ref_temperature,
+                sutherland_constant,
+            )
+            total_rate = replace_ion_pair_rate(
+                ion_data, box_idx, selected_i, selected_j, total_rate
+            )
+            maximum = wp.max(maximum, total_rate)
+        pair += wp.int64(partials.shape[1])
+    partials[box_idx, lane] = maximum
 
 
 @dataclass(frozen=True)
@@ -417,11 +535,12 @@ class _PreparedBrownianWork:
     partials: Any
     majorants: Any
     device: Any
+    work_counts: Any = None
     ion_data: Any = field(default_factory=IonPairData)
     ion_setup: Callable | None = None
     mean_density: Any = None
 
-    def enqueue(self, failure):
+    def prepare_rates(self, failure):
         """Enqueue retained work without allocation or observation."""
         if self.mean_density is not None:
             wp.launch(
@@ -459,45 +578,27 @@ class _PreparedBrownianWork:
             ],
             device=self.device,
         )
-        if int(self.selector_inputs[28]) & 255 == 2:
-            args = self.selector_inputs
-            wp.launch(
-                _charged_pair_maxima,
-                dim=self.partials.shape,
-                inputs=[
-                    args[15],
-                    args[22],
-                    args[23],
-                    *args[4:14],
-                    args[28],
-                    args[24],
-                    self.counts,
-                    self.partials,
-                    failure,
-                    self.ion_data,
-                ],
-                device=self.device,
-            )
-        else:
-            wp.launch(
-                _pair_maxima,
-                dim=self.partials.shape,
-                inputs=[
-                    *self.selector_inputs[15:20],
-                    self.selector_inputs[28],
-                    self.selector_inputs[24],
-                    self.counts,
-                    self.partials,
-                    failure,
-                ],
-                device=self.device,
-            )
+        wp.launch(
+            _additive_pair_maxima,
+            dim=self.partials.shape,
+            inputs=(
+                *self.selector_inputs,
+                self.counts,
+                self.partials,
+                failure,
+                self.ion_data,
+            ),
+            device=self.device,
+        )
         wp.launch(
             _finish_maxima,
             dim=self.active.shape[0],
             inputs=[self.partials, self.majorants, failure],
             device=self.device,
         )
+
+    def select(self, failure):
+        """Select pairs only after all boxes pass budget admission."""
         wp.launch(
             _select_brownian,
             dim=self.active.shape[0],
@@ -507,14 +608,22 @@ class _PreparedBrownianWork:
                 self.majorants,
                 failure,
                 self.ion_data,
+                self.work_counts,
             ),
             device=self.device,
         )
 
+    def enqueue(self, failure):
+        """Prepare rates and select using the legacy internal entry point."""
+        self.prepare_rates(failure)
+        self.select(failure)
 
-def prepare_brownian_work(selector_inputs, device):
+
+def prepare_brownian_work(selector_inputs, device, work_counts=None):
     """Allocate O(BN) flags and at most 4096 fp64 maxima per box."""
     boxes, slots = selector_inputs[1].shape
+    if work_counts is None:
+        work_counts = wp.zeros((boxes, 2), dtype=wp.int32, device=device)
     lanes = max(1, min((slots * slots + 31) // 32, 4096))
     active = wp.empty((boxes, slots), dtype=wp.int32, device=device)
     counts = wp.empty(boxes, dtype=wp.int32, device=device)
@@ -529,4 +638,5 @@ def prepare_brownian_work(selector_inputs, device):
         partials,
         majorants,
         device,
+        work_counts=work_counts,
     )

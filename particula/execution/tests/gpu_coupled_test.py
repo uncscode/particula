@@ -177,19 +177,34 @@ def test_disk_restart_preserves_events_physics_and_random_words(
         StudyCase("test", "full", 2, 64, occupancy=0.75, time_step=1)
     )
     source, collision, condensation = processes[:3]
+    # Deliver the same two integral source events in the first 0.01 s pulse;
+    # the precursor is explicitly disabled immediately after that pulse.
+    source.source_config = replace(
+        source.source_config,
+        strategy=replace(source.source_config.strategy, coefficient=25.0),
+    )
     events = (source, collision)
     strategy = condensation.condensation_strategy
+    # Resolve the growing-population collision demand explicitly, preserving
+    # the original 1 s checkpoint and 3 s final physical observation times.
     with GPUCoupledSimulation(
-        initial, events, strategy, device=device, time_step=1, root_seed=42
+        initial, events, strategy, device=device, time_step=0.01, root_seed=42
     ) as owner:
         if capture:
             before = owner.checkpoint()
             owner.capture_events()
             canonical_equal(before.events, owner.checkpoint().events)
         owner.step()
+        collision_binding = owner._events._bindings["coagulation"]
+        np.testing.assert_array_equal(
+            owner._events._session.particles.concentration.numpy().sum(axis=1)
+            + collision_binding.n_collisions.numpy(),
+            initial.particles.concentration.sum(axis=1) + 2,
+        )
         gas = owner.diagnostics().gas_concentration.copy()
         gas[:, 1] = 0
         owner.update_gas(gas)
+        owner.run(99)
         owner.update_environment(temperature=np.array([288.0, 299.0]))
         saved = owner.checkpoint()
         # Inspection carriers remain lossy, non-authoritative host views.
@@ -197,19 +212,20 @@ def test_disk_restart_preserves_events_physics_and_random_words(
         path = tmp_path / "coupled.npz"
         save_coupled_checkpoint(saved, path)
         loaded = load_coupled_checkpoint(path)
-        owner.run(2)
+        owner.run(200)
         final, final_checkpoint = owner.snapshot(), owner.checkpoint()
         with resume_coupled(loaded, events, strategy, device=device) as resumed:
             if capture:
                 resumed.capture_events()
-            resumed.run(2)
+            resumed.run(200)
             equal_native(final, resumed.snapshot())
             canonical_equal(
                 final_checkpoint.events, resumed.checkpoint().events
             )
             assert final_checkpoint.statistics == resumed.statistics
             assert final_checkpoint.counters == resumed.checkpoint().counters
-            assert resumed.time == owner.time == 3
+            assert resumed.time == owner.time
+            assert owner.time == pytest.approx(3.0)
 
 
 def test_short_bound_rejects_before_events_and_failure_is_terminal(

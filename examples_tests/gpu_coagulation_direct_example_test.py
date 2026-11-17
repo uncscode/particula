@@ -264,7 +264,15 @@ def test_enabled_path_uses_selected_adapter_and_explicit_lifecycle(
         ),
     )
 
+    admission_calls = []
+
+    def admitted(particles, capacity):
+        admission_calls.append((particles, capacity))
+        return 1.0
+
+    monkeypatch.setattr(example_module, "_admitted_timestep", admitted)
     result = example_module.run_example()
+    assert admission_calls == [(gpu_particles, 4), (gpu_particles, 4)]
 
     assert events == ["convert", "restore"]
     assert _FakeWP.events == ["synchronize"]
@@ -355,6 +363,7 @@ def test_failures_propagate_without_fallback_or_restore(
         else lambda: (_ for _ in ()).throw(RuntimeError("loader")),
     )
 
+    monkeypatch.setattr(example_module, "_admitted_timestep", lambda *_: 1.0)
     with pytest.raises(RuntimeError, match=failure_at):
         example_module.run_example()
     assert restored is (failure_at == "restore")

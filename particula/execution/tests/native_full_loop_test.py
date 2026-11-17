@@ -410,7 +410,7 @@ def advance(loop, monkeypatch):
             patch.setattr(wp, name, forbidden)
         patch.setattr(type(p.masses), "numpy", forbidden)
         enqueue_prepared_resident_simulation(loop.prepared)
-    wp.synchronize()
+    loop.prepared.synchronize()
     np.testing.assert_allclose(
         inventory(loop), before * factor, rtol=1e-12, atol=1e-30
     )
@@ -496,4 +496,33 @@ def test_native_prepared_loop_rejects_replaced_map_before_token(
         np.testing.assert_array_equal(inventory(loop), before)
     finally:
         object.__setattr__(binding, "gas_to_particle", original)
+        loop.session.close(loop.registry, loop.guard)
+
+
+def test_low_level_synchronize_reports_budget_failure_and_faults(device):
+    """Deferred rejection preserves the coagulation writer and faults on read."""
+    from particula.execution.gpu_session import ResidentLifecycle
+    from particula.gpu.kernels._coagulation_budget import CoagulationBudgetError
+
+    loop = build_loop(device)
+    try:
+        particles = loop.session.particles
+        particles.volume.assign(particles.volume.numpy() * 1e-30)
+        binding = loop.prepared.coagulation
+        watched = (
+            particles.masses,
+            particles.concentration,
+            particles.charge,
+            binding.prepared.selector_inputs[27],
+            binding.prepared.collision_pairs,
+            binding.prepared.n_collisions,
+        )
+        before = [value.numpy().copy() for value in watched]
+        binding.execute()
+        with pytest.raises(CoagulationBudgetError, match="requires.*trials"):
+            loop.prepared.synchronize()
+        assert loop.session.lifecycle is ResidentLifecycle.FAULTED
+        for value, expected in zip(watched, before, strict=True):
+            np.testing.assert_array_equal(value.numpy(), expected)
+    finally:
         loop.session.close(loop.registry, loop.guard)

@@ -61,7 +61,6 @@ if wp is not None:
         CANONICAL_COAGULATION_MECHANISMS,
         CHARGED_HARD_SPHERE_MECHANISM,
         CHARGED_HARD_SPHERE_MECHANISM_FLAG,
-        MAX_CHARGED_ACTIVE_PARTICLES_PER_BOX,
         MAX_SCHEDULED_TRIALS_PER_BOX,
         SEDIMENTATION_SP2016_MECHANISM,
         SEDIMENTATION_SP2016_MECHANISM_FLAG,
@@ -132,7 +131,12 @@ def test_public_coagulation_wrapper_delegates_through_prepared_call(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """The public coagulation wrapper preserves prepare-then-enqueue delegation."""
-    prepared = object()
+    from types import SimpleNamespace
+
+    observations = []
+    prepared = SimpleNamespace(
+        check_admission=lambda: observations.append(True)
+    )
     result = (object(), object(), object())
     arguments = (object(), object(), object(), object())
     monkeypatch.setattr(
@@ -149,6 +153,7 @@ def test_public_coagulation_wrapper_delegates_through_prepared_call(
     )
 
     assert coagulation_module.coagulation_step_gpu(*arguments) is result
+    assert observations == [True]
 
 
 _TEST_BOLTZMANN_CONSTANT = wp.constant(wp.float64(constants.BOLTZMANN_CONSTANT))
@@ -487,7 +492,7 @@ def test_charged_only_step_runs_and_preserves_output_identity(
     counts = wp.zeros((1,), dtype=wp.int32, device=device)
     states = wp.zeros((1,), dtype=wp.uint32, device=device)
 
-    result_particles, result_pairs, result_counts = coagulation_step_gpu(
+    result_particles, result_pairs, result_counts = _admitted_identity_step(
         gpu_particles,
         temperature=298.15,
         pressure=101325.0,
@@ -524,7 +529,7 @@ def test_sedimentation_public_step_preserves_caller_owned_return_identity(
     counts = wp.zeros((1,), dtype=wp.int32, device=device)
     states = wp.zeros((1,), dtype=wp.uint32, device=device)
 
-    returned = coagulation_step_gpu(
+    returned = _admitted_identity_step(
         gpu_particles,
         temperature=298.15,
         pressure=101325.0,
@@ -600,7 +605,7 @@ def test_sedimentation_public_step_merges_sparse_multibox_particles(
     pairs = wp.full((2, 1, 2), -1, dtype=wp.int32, device=device)
     counts = wp.zeros((2,), dtype=wp.int32, device=device)
 
-    result_particles, result_pairs, result_counts = coagulation_step_gpu(
+    result_particles, result_pairs, result_counts = _admitted_identity_step(
         gpu_particles,
         temperature=temperature,
         pressure=pressure,
@@ -819,56 +824,25 @@ def test_sedimentation_rejects_unequal_positive_concentrations_atomically(
     npt.assert_array_equal(states.numpy(), [7])
 
 
-def test_sedimentation_active_cap_accepts_boundary_and_rejects_overflow(
-    monkeypatch: pytest.MonkeyPatch,
-    device: str,
-) -> None:
-    """SP2016 caps exact-pair work before caller-owned state changes."""
-    monkeypatch.setattr(
-        coagulation_module, "MAX_SEDIMENTATION_ACTIVE_PARTICLES_PER_BOX", 2
-    )
-    boundary = _make_particle_data(n_boxes=1, n_particles=2, n_species=1)
-    boundary_gpu = to_warp_particle_data(boundary, device=device)
-    _, _, boundary_counts = coagulation_step_gpu(
-        boundary_gpu,
+def test_sedimentation_accepts_former_cap_overflow(device: str) -> None:
+    """Former population caps do not reject an otherwise valid zero-time call."""
+    mechanisms = (SEDIMENTATION_SP2016_MECHANISM,)
+    particles = _make_particle_data(n_boxes=1, n_particles=16385, n_species=1)
+    initial = particles.copy()
+    gpu = to_warp_particle_data(particles, device=device)
+    states = wp.array([17], dtype=wp.uint32, device=device)
+    _, _, counts = coagulation_step_gpu(
+        gpu,
         temperature=298.15,
         pressure=101325.0,
         time_step=0.0,
         max_collisions=1,
-        mechanism_config=CoagulationMechanismConfig(
-            mechanisms=(SEDIMENTATION_SP2016_MECHANISM,)
-        ),
+        rng_states=states,
+        mechanism_config=CoagulationMechanismConfig(mechanisms=mechanisms),
     )
-    npt.assert_array_equal(boundary_counts.numpy(), [0])
-
-    overflow = _make_particle_data(n_boxes=1, n_particles=3, n_species=1)
-    overflow_initial = overflow.copy()
-    overflow_gpu = to_warp_particle_data(overflow, device=device)
-    pairs = wp.array([[[7, 7]]], dtype=wp.int32, device=device)
-    counts = wp.array([7], dtype=wp.int32, device=device)
-    states = wp.array([7], dtype=wp.uint32, device=device)
-    with pytest.raises(
-        ValueError, match="MAX_SEDIMENTATION_ACTIVE_PARTICLES_PER_BOX"
-    ):
-        coagulation_step_gpu(
-            overflow_gpu,
-            temperature=298.15,
-            pressure=101325.0,
-            time_step=1.0,
-            max_collisions=1,
-            collision_pairs=pairs,
-            n_collisions=counts,
-            rng_states=states,
-            initialize_rng=True,
-            mechanism_config=CoagulationMechanismConfig(
-                mechanisms=(SEDIMENTATION_SP2016_MECHANISM,)
-            ),
-        )
-
-    _assert_particles_unchanged(overflow_gpu, overflow_initial)
-    npt.assert_array_equal(pairs.numpy(), [[[7, 7]]])
-    npt.assert_array_equal(counts.numpy(), [7])
-    npt.assert_array_equal(states.numpy(), [7])
+    _assert_particles_unchanged(gpu, initial)
+    npt.assert_array_equal(counts.numpy(), [0])
+    npt.assert_array_equal(states.numpy(), [17])
 
 
 @pytest.mark.parametrize(
@@ -898,13 +872,13 @@ def test_combined_step_normalizes_order_and_preserves_output_identity(
 
     def _track_combined_launch(kernel: Any, *args: Any, **kwargs: Any) -> Any:
         key = getattr(kernel, "key", "")
-        if key in {"_native_coagulation_kernel", "apply_coagulation_kernel"}:
+        if key in {"_select_brownian", "apply_coagulation_kernel_guarded"}:
             launches.append(key)
         return original_launch(kernel, *args, **kwargs)
 
     monkeypatch.setattr(coagulation_module.wp, "launch", _track_combined_launch)
 
-    result_particles, result_pairs, result_counts = coagulation_step_gpu(
+    result_particles, result_pairs, result_counts = _admitted_identity_step(
         gpu_particles,
         temperature=298.15,
         pressure=101325.0,
@@ -922,8 +896,8 @@ def test_combined_step_normalizes_order_and_preserves_output_identity(
     assert result_counts is counts
     assert 0 <= int(counts.numpy()[0]) <= 1
     assert launches == [
-        "_native_coagulation_kernel",
-        "apply_coagulation_kernel",
+        "_select_brownian",
+        "apply_coagulation_kernel_guarded",
     ]
 
 
@@ -964,7 +938,7 @@ def test_approved_additive_masks_use_public_merge_path(
     counts = wp.zeros((2,), dtype=wp.int32, device=device)
     states = wp.zeros((2,), dtype=wp.uint32, device=device)
 
-    returned = coagulation_step_gpu(
+    returned = _admitted_identity_step(
         gpu_particles,
         temperature=298.15,
         pressure=101325.0,
@@ -1005,6 +979,14 @@ def test_approved_additive_masks_use_public_merge_path(
         (CHARGED_HARD_SPHERE_MECHANISM, TURBULENT_SHEAR_ST1956_MECHANISM),
         (SEDIMENTATION_SP2016_MECHANISM, TURBULENT_SHEAR_ST1956_MECHANISM),
         CANONICAL_COAGULATION_MECHANISMS,
+        *(
+            tuple(
+                name
+                for i, name in enumerate(CANONICAL_COAGULATION_MECHANISMS)
+                if i != excluded
+            )
+            for excluded in range(4)
+        ),
     ],
 )
 def test_additive_masks_public_mult_pair_counts_include_every_enabled_rate(
@@ -1022,7 +1004,7 @@ def test_additive_masks_public_mult_pair_counts_include_every_enabled_rate(
     pressure = 101325.0
     fluid_density = 1000.0
     turbulent_dissipation = 2.0e-4
-    observations = 2048
+    observations = 16384
     radii = np.array([0.7e-6, 0.9e-6, 1.1e-6, 1.3e-6])
     masses = ((4.0 / 3.0) * np.pi * radii**3 * 1000.0).astype(np.float64)
     particles = ParticleData(
@@ -1059,9 +1041,9 @@ def test_additive_masks_public_mult_pair_counts_include_every_enabled_rate(
     for bit in enabled_bits:
         assert float(np.sum(np.triu(component_rates[bit], k=1))) > 0.0
 
-    # Set 2.5 expected candidate draws before acceptance.  This keeps the
-    # event probability finite and makes a missing component discriminating.
-    volume = majorant * 6.0 / 2.5
+    # Use 0.9 expected trials so the one-event output cannot truncate work.
+    # More independent boxes retain sensitivity to missing rate components.
+    volume = majorant * 6.0 / 0.9
     particles.volume[:] = volume
     expected_probability = _one_collision_probability(
         total_rate=total_rate,
@@ -1148,7 +1130,7 @@ def test_charged_modes_merge_and_conserve_mass_and_charge(
     pairs = wp.zeros((1, 1, 2), dtype=wp.int32, device=device)
     counts = wp.zeros((1,), dtype=wp.int32, device=device)
 
-    result_particles, result_pairs, result_counts = coagulation_step_gpu(
+    result_particles, result_pairs, result_counts = _admitted_identity_step(
         gpu_particles,
         temperature=298.15,
         pressure=101325.0,
@@ -1192,7 +1174,7 @@ def test_combined_multibox_multispecies_conserves_mass_and_charge(
     initial_charge = np.sum(particles.charge, axis=1)
     gpu_particles = to_warp_particle_data(particles, device=device)
 
-    result_particles, _, _ = coagulation_step_gpu(
+    result_particles, _, _ = _admitted_identity_step(
         gpu_particles,
         temperature=298.15,
         pressure=101325.0,
@@ -1231,7 +1213,7 @@ def test_combined_requested_orders_produce_equivalent_outcomes(
         pairs = wp.full((1, 1, 2), -7, dtype=wp.int32, device=device)
         counts = wp.full((1,), -7, dtype=wp.int32, device=device)
         states = wp.zeros((1,), dtype=wp.uint32, device=device)
-        result, _, _ = coagulation_step_gpu(
+        result, _, _ = _admitted_identity_step(
             gpu_particles,
             temperature=298.15,
             pressure=101325.0,
@@ -1594,9 +1576,6 @@ def test_charged_preflight_excludes_volume_underflow_slots(
     mechanisms: tuple[str, ...],
 ) -> None:
     """Reject active underflow, then admit a valid inactive cap tail."""
-    monkeypatch.setattr(
-        coagulation_module, "MAX_CHARGED_ACTIVE_PARTICLES_PER_BOX", 2
-    )
     particles = _make_particle_data(n_boxes=1, n_particles=3, n_species=1)
     particles.masses[0, :, 0] = [1.0e-21, 1.0e-21, np.nextafter(0.0, 1.0)]
     gpu_particles = to_warp_particle_data(particles, device=device)
@@ -1635,42 +1614,26 @@ def test_charged_preflight_excludes_volume_underflow_slots(
         (BROWNIAN_MECHANISM, CHARGED_HARD_SPHERE_MECHANISM),
     ],
 )
-def test_charged_modes_reject_over_limit_active_particles_before_mutation(
-    device: str,
-    mechanisms: tuple[str, ...],
+def test_charged_modes_accept_former_cap_overflow(
+    device: str, mechanisms: tuple[str, ...]
 ) -> None:
-    """Charged modes bound exact-majorant work before output or RNG mutation."""
-    particles = _make_particle_data(
-        n_boxes=1,
-        n_particles=MAX_CHARGED_ACTIVE_PARTICLES_PER_BOX + 1,
-        n_species=1,
+    """Former population caps do not reject an otherwise valid zero-time call."""
+    particles = _make_particle_data(n_boxes=1, n_particles=257, n_species=1)
+    initial = particles.copy()
+    gpu = to_warp_particle_data(particles, device=device)
+    states = wp.array([17], dtype=wp.uint32, device=device)
+    _, _, counts = coagulation_step_gpu(
+        gpu,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=0.0,
+        max_collisions=1,
+        rng_states=states,
+        mechanism_config=CoagulationMechanismConfig(mechanisms=mechanisms),
     )
-    initial_particles = particles.copy()
-    gpu_particles = to_warp_particle_data(particles, device=device)
-    pairs = wp.array(np.full((1, 1, 2), -7), dtype=wp.int32, device=device)
-    counts = wp.array(np.array([-7]), dtype=wp.int32, device=device)
-    states = wp.array(np.array([17]), dtype=wp.uint32, device=device)
-
-    with pytest.raises(
-        ValueError, match="MAX_CHARGED_ACTIVE_PARTICLES_PER_BOX"
-    ):
-        coagulation_step_gpu(
-            gpu_particles,
-            temperature=298.15,
-            pressure=101325.0,
-            time_step=1.0,
-            max_collisions=1,
-            collision_pairs=pairs,
-            n_collisions=counts,
-            rng_states=states,
-            initialize_rng=True,
-            mechanism_config=CoagulationMechanismConfig(mechanisms=mechanisms),
-        )
-
-    _assert_particles_unchanged(gpu_particles, initial_particles)
-    npt.assert_array_equal(pairs.numpy(), np.full((1, 1, 2), -7))
-    npt.assert_array_equal(counts.numpy(), np.array([-7], dtype=np.int32))
-    npt.assert_array_equal(states.numpy(), np.array([17], dtype=np.uint32))
+    _assert_particles_unchanged(gpu, initial)
+    npt.assert_array_equal(counts.numpy(), [0])
+    npt.assert_array_equal(states.numpy(), [17])
 
 
 @pytest.mark.parametrize(
@@ -1687,7 +1650,7 @@ def test_charged_cap_ignores_positive_concentration_ineligible_slots(
     """Reject active zero mass, then exclude a valid inactive cap tail."""
     particles = _make_particle_data(
         n_boxes=1,
-        n_particles=MAX_CHARGED_ACTIVE_PARTICLES_PER_BOX + 1,
+        n_particles=257,
         n_species=1,
     )
     particles.masses[0, -1, :] = 0.0
@@ -3649,7 +3612,7 @@ def _run_seeded_coagulation_step(
     )
     collision_counts = wp.zeros((n_boxes,), dtype=wp.int32, device=device)
 
-    _, _, returned_counts = coagulation_step_gpu(
+    _, _, returned_counts = _admitted_identity_step(
         gpu_particles,
         temperature=temperature,
         pressure=pressure,
@@ -4171,6 +4134,18 @@ def _collect_test_local_attempt_diagnostics(
     )
 
     diagnostic_particles = to_warp_particle_data(particles, device=device)
+    from particula.gpu.kernels.coagulation import coagulation_preflight_gpu
+
+    report = coagulation_preflight_gpu(
+        diagnostic_particles,
+        temperature,
+        pressure,
+        time_step,
+        max_collisions=max_collisions,
+    )
+    if not np.all(report["admitted"]):
+        limits = report["max_time_step"]
+        time_step = float(np.min(limits[limits > 0])) * (1 - 1e-12)
     temperature_array = wp.array(
         np.full((n_boxes,), temperature, dtype=np.float64),
         dtype=wp.float64,
@@ -4361,7 +4336,9 @@ class _ParticlesAccessSentinel:
             "mechanisms must be a non-empty tuple of strings.",
         ),
         (
-            CoagulationMechanismConfig(mechanisms=[BROWNIAN_MECHANISM]),  # type: ignore[arg-type]
+            CoagulationMechanismConfig(
+                mechanisms=[BROWNIAN_MECHANISM],  # type: ignore[arg-type]
+            ),
             "mechanisms must be a non-empty tuple of strings.",
         ),
         (
@@ -4377,16 +4354,6 @@ class _ParticlesAccessSentinel:
         (
             CoagulationMechanismConfig(distribution_type="discrete"),
             "distribution_type must be exactly 'particle_resolved'.",
-        ),
-        (
-            CoagulationMechanismConfig(
-                mechanisms=(
-                    BROWNIAN_MECHANISM,
-                    CHARGED_HARD_SPHERE_MECHANISM,
-                    SEDIMENTATION_SP2016_MECHANISM,
-                )
-            ),
-            "Additive coagulation execution is deferred.",
         ),
     ],
 )
@@ -4416,19 +4383,19 @@ def test_coagulation_step_gpu_rejects_config_before_runtime_access(
         ),
         (
             CoagulationMechanismConfig(
-                mechanisms="brownian"  # type: ignore[arg-type]
+                mechanisms="brownian",  # type: ignore[arg-type]
             ),
             "mechanisms must be a non-empty tuple of strings.",
         ),
         (
             CoagulationMechanismConfig(
-                mechanisms=[BROWNIAN_MECHANISM]  # type: ignore[arg-type]
+                mechanisms=[BROWNIAN_MECHANISM],  # type: ignore[arg-type]
             ),
             "mechanisms must be a non-empty tuple of strings.",
         ),
         (
             CoagulationMechanismConfig(
-                mechanisms=(BROWNIAN_MECHANISM, 1)  # type: ignore[arg-type]
+                mechanisms=(BROWNIAN_MECHANISM, 1),  # type: ignore[arg-type]
             ),
             "mechanisms must contain only string identifiers.",
         ),
@@ -4449,16 +4416,6 @@ def test_coagulation_step_gpu_rejects_config_before_runtime_access(
         (
             CoagulationMechanismConfig(distribution_type="discrete"),
             "distribution_type must be exactly 'particle_resolved'.",
-        ),
-        (
-            CoagulationMechanismConfig(
-                mechanisms=(
-                    BROWNIAN_MECHANISM,
-                    CHARGED_HARD_SPHERE_MECHANISM,
-                    SEDIMENTATION_SP2016_MECHANISM,
-                )
-            ),
-            "Additive coagulation execution is deferred.",
         ),
     ],
 )
@@ -4563,10 +4520,10 @@ def test_coagulation_step_gpu_rejected_config_preserves_caller_state(
         ),
     ],
 )
-def test_deferred_masks_preserve_caller_owned_state(
+def test_three_way_invalid_timestep_preserves_caller_owned_state(
     device: str, mechanisms: tuple[str, ...], message: str
 ) -> None:
-    """Deferred masks finish read-only preflight without downstream mutation."""
+    """Admitted combinations reject invalid time before any caller mutation."""
     particles = _make_particle_data(n_boxes=1, n_particles=4, n_species=1)
     gpu_particles = to_warp_particle_data(particles, device=device)
     collision_pairs = wp.array(
@@ -4580,12 +4537,12 @@ def test_deferred_masks_preserve_caller_owned_state(
     initial_rng_states = rng_states.numpy().copy()
     turbulent_enabled = TURBULENT_SHEAR_ST1956_MECHANISM in mechanisms
 
-    with pytest.raises(ValueError, match=f"^{re.escape(message)}$"):
+    with pytest.raises(ValueError, match="time_step"):
         coagulation_step_gpu(
             gpu_particles,
             temperature=298.15,
             pressure=101325.0,
-            time_step=0.1,
+            time_step=-0.1,
             max_collisions=2,
             collision_pairs=collision_pairs,
             n_collisions=collision_counts,
@@ -4625,7 +4582,8 @@ def test_deferred_masks_preserve_caller_owned_state(
             0.0,
             None,
             None,
-            "Additive coagulation execution is deferred.",
+            "charged particle masses and concentrations must be finite and "
+            "nonnegative, and density must be finite and > 0",
         ),
         (
             (
@@ -4753,47 +4711,29 @@ def test_deferred_masks_reject_invalid_enabled_terms_atomically(
         ),
     ],
 )
-def test_deferred_masks_bypass_downstream_runtime_helpers(
+def test_three_way_masks_reach_time_step_validation(
     monkeypatch: pytest.MonkeyPatch,
     device: str,
     mechanisms: tuple[str, ...],
     message: str,
 ) -> None:
-    """Deferred masks retain their capability errors before runtime work."""
+    """Valid three-way physics reaches the ordinary runtime input guards."""
     particles = _make_particle_data(n_boxes=1, n_particles=4, n_species=1)
-    gpu_particles = to_warp_particle_data(particles, device=device)
-    turbulent_enabled = TURBULENT_SHEAR_ST1956_MECHANISM in mechanisms
+    gpu = to_warp_particle_data(particles, device=device)
 
-    def _unexpected(*args: Any, **kwargs: Any) -> None:
-        raise AssertionError("deferred mask reached downstream runtime work")
+    def reject_step(value):
+        raise ValueError("time-step sentinel")
 
-    for helper_name in (
-        "_normalize_turbulent_input_array",
-        "_validate_time_step",
-        "_ensure_environment_arrays",
-        "_ensure_volume_array",
-        "_resolve_collision_capacity",
-        "_validate_collision_counts",
-        "_validate_rng_states",
-        "initialize_coagulation_rng_states",
-    ):
-        monkeypatch.setattr(coagulation_module, helper_name, _unexpected)
-    monkeypatch.setattr(
-        coagulation_module, "_native_coagulation_kernel", _unexpected
-    )
-    monkeypatch.setattr(
-        coagulation_module, "apply_coagulation_kernel", _unexpected
-    )
-
-    with pytest.raises(ValueError, match=f"^{re.escape(message)}$"):
+    monkeypatch.setattr(coagulation_module, "_validate_time_step", reject_step)
+    with pytest.raises(ValueError, match="time-step sentinel"):
         coagulation_step_gpu(
-            gpu_particles,
-            temperature=298.15,
-            pressure=101325.0,
-            time_step=0.1,
+            gpu,
+            298.15,
+            101325.0,
+            0.1,
             mechanism_config=CoagulationMechanismConfig(mechanisms=mechanisms),
-            turbulent_dissipation=1.0 if turbulent_enabled else None,
-            fluid_density=1000.0 if turbulent_enabled else None,
+            turbulent_dissipation=1.0,
+            fluid_density=1000.0,
         )
 
 
@@ -5144,21 +5084,23 @@ def test_turbulent_singleton_executes_and_conserves_mass(
         dissipation = wp.array([1.0, 2.0], dtype=wp.float64, device=device)
         density = wp.array([1000.0, 997.0], dtype=wp.float64, device=device)
 
-    returned_particles, returned_pairs, returned_counts = coagulation_step_gpu(
-        gpu_particles,
-        temperature=298.15,
-        pressure=101325.0,
-        time_step=1.0e308,
-        max_collisions=1,
-        collision_pairs=pairs,
-        n_collisions=counts,
-        rng_states=states,
-        initialize_rng=True,
-        mechanism_config=CoagulationMechanismConfig(
-            mechanisms=(TURBULENT_SHEAR_ST1956_MECHANISM,)
-        ),
-        turbulent_dissipation=dissipation,
-        fluid_density=density,
+    returned_particles, returned_pairs, returned_counts = (
+        _admitted_identity_step(
+            gpu_particles,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=1.0e308,
+            max_collisions=1,
+            collision_pairs=pairs,
+            n_collisions=counts,
+            rng_states=states,
+            initialize_rng=True,
+            mechanism_config=CoagulationMechanismConfig(
+                mechanisms=(TURBULENT_SHEAR_ST1956_MECHANISM,)
+            ),
+            turbulent_dissipation=dissipation,
+            fluid_density=density,
+        )
     )
 
     assert returned_particles is gpu_particles
@@ -5354,7 +5296,7 @@ def test_turbulent_singleton_selector_handles_sparse_active_slots(
     counts = wp.zeros((1,), dtype=wp.int32, device=device)
     states = wp.zeros((1,), dtype=wp.uint32, device=device)
 
-    _, returned_pairs, returned_counts = coagulation_step_gpu(
+    _, returned_pairs, returned_counts = _admitted_identity_step(
         gpu_particles,
         temperature=298.15,
         pressure=101325.0,
@@ -5397,21 +5339,23 @@ def test_turbulent_selector_keeps_heterogeneous_box_pairs_active_and_sorted(
     counts = wp.zeros((2,), dtype=wp.int32, device=device)
     states = wp.zeros((2,), dtype=wp.uint32, device=device)
 
-    returned_particles, returned_pairs, returned_counts = coagulation_step_gpu(
-        gpu_particles,
-        temperature=298.15,
-        pressure=101325.0,
-        time_step=1.0e308,
-        max_collisions=1,
-        collision_pairs=pairs,
-        n_collisions=counts,
-        rng_states=states,
-        initialize_rng=True,
-        mechanism_config=CoagulationMechanismConfig(
-            mechanisms=(TURBULENT_SHEAR_ST1956_MECHANISM,)
-        ),
-        turbulent_dissipation=1.0,
-        fluid_density=1000.0,
+    returned_particles, returned_pairs, returned_counts = (
+        _admitted_identity_step(
+            gpu_particles,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=1.0e308,
+            max_collisions=1,
+            collision_pairs=pairs,
+            n_collisions=counts,
+            rng_states=states,
+            initialize_rng=True,
+            mechanism_config=CoagulationMechanismConfig(
+                mechanisms=(TURBULENT_SHEAR_ST1956_MECHANISM,)
+            ),
+            turbulent_dissipation=1.0,
+            fluid_density=1000.0,
+        )
     )
 
     assert returned_particles is gpu_particles
@@ -5443,7 +5387,7 @@ def test_turbulent_persistent_rng_reuses_state_and_explicit_reset_replays(
         gpu_particles = to_warp_particle_data(particles, device=device)
         collision_pairs = wp.full((1, 1, 2), -1, dtype=wp.int32, device=device)
         n_collisions = wp.zeros((1,), dtype=wp.int32, device=device)
-        coagulation_step_gpu(
+        _admitted_identity_step(
             gpu_particles,
             temperature=298.15,
             pressure=101325.0,
@@ -5519,10 +5463,10 @@ def test_turbulent_fresh_seed_acceptance_matches_rate_to_majorant_ratio(
     assert accepted > 0
 
 
-def test_turbulent_three_way_mask_rejects_before_runtime_mutation(
+def test_turbulent_three_way_invalid_time_rejects_before_mutation(
     device: str,
 ) -> None:
-    """Deferred turbulent three-way masks reject before runtime mutation."""
+    """Turbulent combinations reject invalid time before runtime mutation."""
     particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=1)
     gpu_particles = to_warp_particle_data(particles, device=device)
     pairs = wp.array([[[7, 7]]], dtype=wp.int32, device=device)
@@ -5532,13 +5476,13 @@ def test_turbulent_three_way_mask_rejects_before_runtime_mutation(
 
     with pytest.raises(
         ValueError,
-        match="^Additive coagulation execution is deferred\\.$",
+        match="time_step",
     ):
         coagulation_step_gpu(
             gpu_particles,
             temperature=298.15,
             pressure=101325.0,
-            time_step=1.0,
+            time_step=-1.0,
             collision_pairs=pairs,
             n_collisions=counts,
             rng_states=states,
@@ -5831,7 +5775,7 @@ def test_coagulation_step_gpu_explicit_brownian_matches_default_and_dispatches_m
                 _make_environment_data(n_boxes=2, n_species=1), device=device
             )
 
-        coagulation_step_gpu(
+        _admitted_identity_step(
             gpu_particles,
             temperature=temperature,
             pressure=pressure,
@@ -6918,8 +6862,8 @@ def test_coagulation_step_gpu_nonuniform_environment_changes_collision_trend(
     collision_totals = _accumulate_collision_counts(
         particles=particles,
         device=device,
-        seeds=range(31, 51),
-        time_step=0.5,
+        seeds=range(31, 71),
+        time_step=0.25,
         max_collisions=64,
         temperature=None,
         pressure=None,
@@ -7013,7 +6957,7 @@ def test_heterogeneous_majorant_retains_non_radius_extrema_collision(
         pairs = wp.zeros((1, 1, 2), dtype=wp.int32, device=device)
         counts = wp.zeros((1,), dtype=wp.int32, device=device)
         rng_states = wp.zeros((1,), dtype=wp.uint32, device=device)
-        coagulation_step_gpu(
+        _admitted_identity_step(
             gpu_particles,
             temperature=298.15,
             pressure=101325.0,
@@ -7117,9 +7061,9 @@ def test_mixed_scale_brownian_collision_totals_match_expected_mean_within_sigma_
     Brownian expected mean across repeated fresh seeded runs.
     """
     particles = _make_native_mixed_npf_droplet_particle_data()
-    seed_range = range(101, 201)
+    seed_range = range(101, 601)
     trial_count = len(seed_range)
-    time_step = 0.5
+    time_step = 0.1
     max_collisions = 8
     volume = 1.0e-10
     evaluated_path = "shipped E3-F2-P2 bounded selector path"
@@ -7315,10 +7259,10 @@ def test_mixed_scale_sparse_or_degenerate_active_sets_return_zero_collisions(
     assert np.all(acceptance_fraction >= 0.0)
 
 
-def test_mixed_scale_diagnostic_tracks_executed_trials_under_early_exit(
+def test_mixed_scale_admitted_diagnostics_execute_entire_schedule(
     device: str,
 ) -> None:
-    """Executed trials stop at the real early-exit point, not the schedule."""
+    """An admitted one-pair schedule executes without discarded trials."""
     particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=1)
     diagnostics = _collect_test_local_attempt_diagnostics(
         particles,
@@ -7329,7 +7273,7 @@ def test_mixed_scale_diagnostic_tracks_executed_trials_under_early_exit(
         volume=1.0e-18,
     )
 
-    assert diagnostics.scheduled_trial_counts[0] > 1
+    assert diagnostics.scheduled_trial_counts[0] == 1
     assert diagnostics.executed_trial_counts[0] == 1
     assert diagnostics.accepted_counts[0] == 1
     assert diagnostics.production_counts[0] == 1
@@ -7392,44 +7336,28 @@ def test_mixed_scale_two_active_particles_accept_the_only_valid_pair(
     assert np.all(acceptance_fraction >= 0.0)
 
 
-def test_mixed_scale_diagnostic_caps_scheduled_trials_to_operational_budget(
+def test_mixed_scale_overflow_schedule_rejects_before_rng_work(
     device: str,
 ) -> None:
-    """Diagnostic scheduled trials are capped at the shared budget."""
-    particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=1)
-    diagnostics = _collect_test_local_attempt_diagnostics(
-        particles,
-        device,
-        time_step=1.0,
-        max_collisions=8,
-        rng_seed=7,
-        volume=1.0e-300,
-    )
+    """Overflowing schedules fail explicitly rather than executing a capped step."""
+    from particula.gpu.kernels._coagulation_budget import CoagulationBudgetError
 
-    assert diagnostics.scheduled_trial_counts[0] == MAX_SCHEDULED_TRIALS_PER_BOX
-    assert diagnostics.executed_trial_counts[0] == 1
-    npt.assert_array_equal(
-        diagnostics.accepted_counts,
-        diagnostics.production_counts,
-    )
-    _assert_trimmed_collision_pairs_equal(
-        diagnostics.diagnostic_pairs,
-        diagnostics.accepted_counts,
-        diagnostics.production_pairs,
-        diagnostics.production_counts,
-    )
-    npt.assert_allclose(
-        diagnostics.diagnostic_masses,
-        diagnostics.production_masses,
-    )
-    npt.assert_allclose(
-        diagnostics.diagnostic_concentration,
-        diagnostics.production_concentration,
-    )
-    npt.assert_array_equal(
-        diagnostics.diagnostic_rng_states,
-        diagnostics.production_rng_states,
-    )
+    particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=1)
+    particles.volume[:] = 1e-300
+    gpu = to_warp_particle_data(particles, device=device)
+    rng = wp.array([17], dtype=wp.uint32, device=device)
+    with pytest.raises(CoagulationBudgetError, match="requires.*trials"):
+        coagulation_step_gpu(
+            gpu,
+            298.15,
+            101325.0,
+            1.0,
+            volume=1e-300,
+            max_collisions=8,
+            rng_states=rng,
+        )
+    _assert_particles_unchanged(gpu, particles)
+    npt.assert_array_equal(rng.numpy(), [17])
 
 
 def test_selector_guard_keeps_rank_resolution_available_for_later_attempts(
@@ -7533,7 +7461,7 @@ def test_mixed_scale_coagulation_conserves_total_mass(device: str) -> None:
     gpu_particles = to_warp_particle_data(particles, device=device)
     initial_mass = np.sum(particles.masses)
 
-    coagulation_step_gpu(
+    _admitted_identity_step(
         gpu_particles,
         temperature=298.15,
         pressure=101325.0,
@@ -7674,7 +7602,7 @@ def test_coagulation_step_gpu_persisted_rng_states_advance_across_repeated_valid
     assert repeated_rng_states is rng_states
 
     first_particles = to_warp_particle_data(particles, device=device)
-    coagulation_step_gpu(
+    _admitted_identity_step(
         first_particles,
         temperature=298.15,
         pressure=101325.0,
@@ -7688,7 +7616,7 @@ def test_coagulation_step_gpu_persisted_rng_states_advance_across_repeated_valid
     state_after_first_call = np.asarray(rng_states.numpy()).copy()
 
     second_particles = to_warp_particle_data(particles, device=device)
-    coagulation_step_gpu(
+    _admitted_identity_step(
         second_particles,
         temperature=298.15,
         pressure=101325.0,
@@ -7724,7 +7652,7 @@ def test_coagulation_step_gpu_multibox_persisted_rng_states_advance(
     initial_state = np.asarray(rng_states.numpy()).copy()
 
     first_particles = to_warp_particle_data(particles, device=device)
-    coagulation_step_gpu(
+    _admitted_identity_step(
         first_particles,
         temperature=298.15,
         pressure=101325.0,
@@ -7738,7 +7666,7 @@ def test_coagulation_step_gpu_multibox_persisted_rng_states_advance(
     state_after_first_call = np.asarray(rng_states.numpy()).copy()
 
     second_particles = to_warp_particle_data(particles, device=device)
-    coagulation_step_gpu(
+    _admitted_identity_step(
         second_particles,
         temperature=298.15,
         pressure=101325.0,
@@ -7774,7 +7702,7 @@ def test_coagulation_step_gpu_initialize_rng_false_reuses_caller_owned_state(
     initialized_state = np.asarray(rng_states.numpy()).copy()
 
     first_particles = to_warp_particle_data(particles, device=device)
-    coagulation_step_gpu(
+    _admitted_identity_step(
         first_particles,
         temperature=298.15,
         pressure=101325.0,
@@ -7789,7 +7717,7 @@ def test_coagulation_step_gpu_initialize_rng_false_reuses_caller_owned_state(
     state_after_first_call = np.asarray(rng_states.numpy()).copy()
 
     second_particles = to_warp_particle_data(particles, device=device)
-    coagulation_step_gpu(
+    _admitted_identity_step(
         second_particles,
         temperature=298.15,
         pressure=101325.0,
@@ -7834,7 +7762,7 @@ def test_coagulation_step_gpu_initialize_rng_true_resets_caller_owned_state(
     pre_reset_state = np.asarray(rng_states_a.numpy()).copy()
 
     first_particles = to_warp_particle_data(particles, device=device)
-    coagulation_step_gpu(
+    _admitted_identity_step(
         first_particles,
         temperature=298.15,
         pressure=101325.0,
@@ -7847,7 +7775,7 @@ def test_coagulation_step_gpu_initialize_rng_true_resets_caller_owned_state(
     )
 
     second_particles = to_warp_particle_data(particles, device=device)
-    coagulation_step_gpu(
+    _admitted_identity_step(
         second_particles,
         temperature=298.15,
         pressure=101325.0,
@@ -8017,7 +7945,7 @@ def test_coagulation_step_gpu_multibox_initialize_rng_true_resets_state(
     wp.synchronize()
 
     first_particles = to_warp_particle_data(particles, device=device)
-    coagulation_step_gpu(
+    _admitted_identity_step(
         first_particles,
         temperature=298.15,
         pressure=101325.0,
@@ -8030,7 +7958,7 @@ def test_coagulation_step_gpu_multibox_initialize_rng_true_resets_state(
     )
 
     second_particles = to_warp_particle_data(particles, device=device)
-    coagulation_step_gpu(
+    _admitted_identity_step(
         second_particles,
         temperature=298.15,
         pressure=101325.0,
@@ -8056,7 +7984,7 @@ def test_coagulation_step_gpu_omitted_rng_states_repeat_seed_replays_results(
     particles.volume[:] = 1e-18
 
     first_particles = to_warp_particle_data(particles, device=device)
-    _, first_pairs, first_counts = coagulation_step_gpu(
+    _, first_pairs, first_counts = _admitted_identity_step(
         first_particles,
         temperature=298.15,
         pressure=101325.0,
@@ -8068,7 +7996,7 @@ def test_coagulation_step_gpu_omitted_rng_states_repeat_seed_replays_results(
     wp.synchronize()
 
     second_particles = to_warp_particle_data(particles, device=device)
-    _, second_pairs, second_counts = coagulation_step_gpu(
+    _, second_pairs, second_counts = _admitted_identity_step(
         second_particles,
         temperature=298.15,
         pressure=101325.0,
@@ -8097,7 +8025,7 @@ def test_coagulation_step_gpu_multibox_omitted_rng_states_replay_results(
     particles.volume[:] = 1e-18
 
     first_particles = to_warp_particle_data(particles, device=device)
-    _, first_pairs, first_counts = coagulation_step_gpu(
+    _, first_pairs, first_counts = _admitted_identity_step(
         first_particles,
         temperature=298.15,
         pressure=101325.0,
@@ -8110,7 +8038,7 @@ def test_coagulation_step_gpu_multibox_omitted_rng_states_replay_results(
     wp.synchronize()
 
     second_particles = to_warp_particle_data(particles, device=device)
-    _, second_pairs, second_counts = coagulation_step_gpu(
+    _, second_pairs, second_counts = _admitted_identity_step(
         second_particles,
         temperature=298.15,
         pressure=101325.0,
@@ -8146,7 +8074,7 @@ def test_coagulation_marks_inactive_particles(device: str) -> None:
     particles.volume[:] = 1e-18
     gpu_particles = to_warp_particle_data(particles, device=device)
 
-    _, _, collision_counts = coagulation_step_gpu(
+    _, _, collision_counts = _admitted_identity_step(
         gpu_particles,
         temperature=temperature,
         pressure=pressure,
@@ -8258,7 +8186,7 @@ def test_private_sedimentation_sampler_bounds_pairs_and_advances_rng(
         masses,
         concentration,
         SEDIMENTATION_SP2016_MECHANISM_FLAG,
-        time_step=1.0e308,
+        time_step=1.0e18,
     )
     initial_states = np.asarray(first["states"].numpy()).copy()
     second = _launch_private_coagulation_sampler(
@@ -8266,7 +8194,7 @@ def test_private_sedimentation_sampler_bounds_pairs_and_advances_rng(
         masses,
         concentration,
         SEDIMENTATION_SP2016_MECHANISM_FLAG,
-        time_step=1.0e308,
+        time_step=1.0e18,
         states=first["states"],
     )
     count = int(first["counts"].numpy()[0])
@@ -8326,7 +8254,7 @@ def test_private_sedimentation_sampler_sparse_active_slots(
         np.array([[[1.0e-15], [8.0e-15], [2.7e-14], [6.4e-14]]]),
         concentration,
         SEDIMENTATION_SP2016_MECHANISM_FLAG,
-        time_step=1.0e308,
+        time_step=1.0e18,
     )
     count = int(result["counts"].numpy()[0])
     pairs = np.asarray(result["pairs"].numpy())[0, :count]
@@ -8338,10 +8266,10 @@ def test_private_sedimentation_sampler_sparse_active_slots(
         assert np.all(pairs[:, 0] < pairs[:, 1])
 
 
-def test_private_three_way_mask_rejects_without_rng_or_pair_work(
+def test_private_three_way_zero_time_keeps_rng_and_pairs(
     device: str,
 ) -> None:
-    """Deferred direct three-way masks perform no schedule work."""
+    """Three-way zero-time evaluation prepares rates without stochastic work."""
     masses = np.array([[[1.0e-15], [8.0e-15]]])
     result = _launch_private_coagulation_sampler(
         device,
@@ -8350,16 +8278,16 @@ def test_private_three_way_mask_rejects_without_rng_or_pair_work(
         BROWNIAN_MECHANISM_FLAG
         | CHARGED_HARD_SPHERE_MECHANISM_FLAG
         | SEDIMENTATION_SP2016_MECHANISM_FLAG,
-        time_step=1.0e308,
+        time_step=0.0,
     )
 
-    npt.assert_array_equal(result["counts"].numpy(), [-7])
+    npt.assert_array_equal(result["counts"].numpy(), [0])
     npt.assert_array_equal(result["pairs"].numpy(), [[[-7, -7], [-7, -7]]])
     npt.assert_array_equal(result["states"].numpy(), [17])
     npt.assert_array_equal(result["masses"].numpy(), masses)
     npt.assert_array_equal(result["concentration"].numpy(), [[1.0, 1.0]])
-    npt.assert_array_equal(result["radii"].numpy(), [[9.0, 9.0]])
-    npt.assert_array_equal(result["settling_velocities"].numpy(), [[0.0, 0.0]])
+    assert np.all(result["radii"].numpy() > 0)
+    assert np.all(result["settling_velocities"].numpy() > 0)
 
 
 def test_private_sampler_populates_sedimentation_velocity_scratch(
@@ -8511,7 +8439,7 @@ def test_brownian_coagulation_kernel_inactive_particles(
     npt.assert_allclose(np.asarray(speeds.numpy()), 0.0)
 
 
-def test_brownian_kernel_zero_mask_rejects_work_and_caps_overflow_schedule(
+def test_brownian_raw_kernel_rejects_zero_mask_and_overflow_schedule(
     device: str,
 ) -> None:
     """Private dispatch preserves no-mutation rejection and capped scheduling."""
@@ -8624,12 +8552,9 @@ def test_brownian_kernel_zero_mask_rejects_work_and_caps_overflow_schedule(
     )
     launch(BROWNIAN_MECHANISM_FLAG, 1.0e308)
 
-    assert np.asarray(n_collisions.numpy()).item() == 1
-    npt.assert_array_equal(
-        np.asarray(collision_pairs.numpy()),
-        np.array([[[0, 1]]], dtype=np.int32),
-    )
-    assert not np.array_equal(np.asarray(rng_states.numpy()), initial_rng_state)
+    assert np.asarray(n_collisions.numpy()).item() == 0
+    npt.assert_array_equal(collision_pairs.numpy(), [[[91, 92]]])
+    npt.assert_array_equal(rng_states.numpy(), initial_rng_state)
 
 
 def test_apply_coagulation_kernel_merges_particles(device: str) -> None:
@@ -9772,7 +9697,7 @@ def test_coagulation_step_gpu_invalid_followup_preserves_advanced_rng_states(
     wp.synchronize()
     initialized_state = np.asarray(rng_states.numpy()).copy()
 
-    coagulation_step_gpu(
+    _admitted_identity_step(
         first_gpu_particles,
         temperature=298.15,
         pressure=101325.0,
@@ -9789,7 +9714,7 @@ def test_coagulation_step_gpu_invalid_followup_preserves_advanced_rng_states(
 
     second_gpu_particles = to_warp_particle_data(particles, device=device)
     with pytest.raises(ValueError, match="volume must be finite and > 0"):
-        coagulation_step_gpu(
+        _admitted_identity_step(
             second_gpu_particles,
             temperature=298.15,
             pressure=101325.0,
@@ -10142,12 +10067,10 @@ def test_resolve_collision_capacity_clamps_to_physical_limit() -> None:
     assert _resolve_collision_capacity(2, n_boxes=1, n_particles=6) == 2
 
 
-def test_resolve_collision_capacity_clamps_to_buffer_budget() -> None:
-    """Collision capacity is bounded by the shared byte-budget ceiling."""
-    assert (
+def test_resolve_collision_capacity_reports_buffer_budget_overflow() -> None:
+    """Insufficient memory is explicit instead of silently shrinking outputs."""
+    with pytest.raises(MemoryError, match="collision outputs require"):
         _resolve_collision_capacity(512, n_boxes=70_000_000, n_particles=1024)
-        == 1
-    )
 
 
 def test_bound_scheduled_trials_preserves_values_below_int32_limit(
@@ -10341,3 +10264,21 @@ def test_initialize_rng_states_changes_output(device: str) -> None:
 
     rng_values = np.asarray(rng_states.numpy())
     assert np.any(rng_values != 0)
+
+
+def _admitted_identity_step(particles, **kwargs):
+    """Use a resource-admitted fixture step for identity/conservation tests.
+
+    These tests exercise mutation and RNG contracts, not a fixed physical
+    interval. Rate/statistical and overload tests call the public step directly.
+    Preflight never consumes RNG or resets caller outputs.
+    """
+    from particula.gpu.kernels.coagulation import coagulation_preflight_gpu
+
+    report = coagulation_preflight_gpu(particles, **kwargs)
+    if not np.all(report["admitted"]):
+        limits = report["max_time_step"]
+        positive = limits[limits > 0]
+        assert positive.size, "fixture has no admissible positive step"
+        kwargs["time_step"] = float(np.min(positive)) * (1.0 - 1e-12)
+    return coagulation_step_gpu(particles, **kwargs)

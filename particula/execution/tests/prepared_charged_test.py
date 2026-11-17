@@ -33,14 +33,21 @@ def test_prepared_charged_merge_and_restart(model, device):
     process = Coagulation(
         ChargedCoagulationStrategy("particle_resolved", model())
     )
+    expected = process.coagulation_strategy.kernel(
+        initial.particles,
+        float(initial.environment.temperature[0]),
+        float(initial.environment.pressure[0]),
+    )[0, 1]
+    # Retain a required merge with near-unit probability from the independent
+    # CPU rate, while fitting one admitted trial rather than clipping demand.
+    step = (
+        (1 - 1e-8)
+        * initial.particles.volume[0]
+        / (expected * initial.particles.concentration[0, 0])
+    )
     with prepare_simulation(
-        (process,), initial, device=device, time_step=1, root_seed=17
+        (process,), initial, device=device, time_step=float(step), root_seed=17
     ) as simulation:
-        expected = process.coagulation_strategy.kernel(
-            initial.particles,
-            float(initial.environment.temperature[0]),
-            float(initial.environment.pressure[0]),
-        )[0, 1]
         checkpoint = simulation.checkpoint()
         if device != "cpu":
             simulation.capture()

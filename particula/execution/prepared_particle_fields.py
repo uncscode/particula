@@ -141,7 +141,7 @@ def _wrap(context: BuiltinPreparationContext, plan, operation, before, fields): 
     ) in fields:
         dim = (values.shape[0], values.shape[2])
         if plan.family == "coagulation":
-            resources = context.registry.acquire_coagulation(counts.shape[1])
+            resources = context.bindings["coagulation"]
             after_launches.append(
                 (
                     kernels.merge_fields,

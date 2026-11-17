@@ -1,0 +1,107 @@
+{
+  "device": "cuda:0",
+  "warp_version": "1.11.1",
+  "rows": [
+    {
+      "particles": 255,
+      "timestep_s": 92.42142091505107,
+      "collisions": 1,
+      "scheduled_trials": 64,
+      "attempted_trials": 64,
+      "expected_trials_at_1s": 0.6870701550711482,
+      "workspace_bytes": 31660,
+      "inspection_seconds": 0.02730144001543522
+    },
+    {
+      "particles": 256,
+      "timestep_s": 92.78385785981598,
+      "collisions": 3,
+      "scheduled_trials": 64,
+      "attempted_trials": 64,
+      "expected_trials_at_1s": 0.6897751556816645,
+      "workspace_bytes": 31844,
+      "inspection_seconds": 0.002073116018436849
+    },
+    {
+      "particles": 257,
+      "timestep_s": 92.42142091505107,
+      "collisions": 0,
+      "scheduled_trials": 64,
+      "attempted_trials": 64,
+      "expected_trials_at_1s": 0.6924801562921808,
+      "workspace_bytes": 32036,
+      "inspection_seconds": 0.0014560509007424116
+    },
+    {
+      "particles": 2000,
+      "timestep_s": 23.67190219571211,
+      "collisions": 4,
+      "scheduled_trials": 128,
+      "attempted_trials": 128,
+      "expected_trials_at_1s": 5.407254513884639,
+      "workspace_bytes": 152868,
+      "inspection_seconds": 0.00997040793299675
+    },
+    {
+      "particles": 5000,
+      "timestep_s": 9.46585764479806,
+      "collisions": 6,
+      "scheduled_trials": 128,
+      "attempted_trials": 128,
+      "expected_trials_at_1s": 13.522282375579787,
+      "workspace_bytes": 332868,
+      "inspection_seconds": 0.042026427923701704
+    },
+    {
+      "particles": 10000,
+      "timestep_s": 4.732451226031869,
+      "collisions": 4,
+      "scheduled_trials": 128,
+      "attempted_trials": 128,
+      "expected_trials_at_1s": 27.047294073715623,
+      "workspace_bytes": 632868,
+      "inspection_seconds": 0.14268706506118178
+    },
+    {
+      "particles": 16383,
+      "timestep_s": 2.8885222454924793,
+      "collisions": 2,
+      "scheduled_trials": 128,
+      "attempted_trials": 128,
+      "expected_trials_at_1s": 44.31331633320228,
+      "workspace_bytes": 1015844,
+      "inspection_seconds": 0.4323692669859156
+    },
+    {
+      "particles": 16384,
+      "timestep_s": 2.8883459333246533,
+      "collisions": 1,
+      "scheduled_trials": 128,
+      "attempted_trials": 128,
+      "expected_trials_at_1s": 44.31602133358887,
+      "workspace_bytes": 1015908,
+      "inspection_seconds": 0.4433408930199221
+    },
+    {
+      "particles": 16385,
+      "timestep_s": 2.888169642679309,
+      "collisions": 4,
+      "scheduled_trials": 128,
+      "attempted_trials": 128,
+      "expected_trials_at_1s": 44.31872633397547,
+      "workspace_bytes": 1015964,
+      "inspection_seconds": 0.3575368080055341
+    },
+    {
+      "particles": 32768,
+      "timestep_s": 1.4441287899531008,
+      "collisions": 1,
+      "scheduled_trials": 128,
+      "attempted_trials": 128,
+      "expected_trials_at_1s": 88.63475397104776,
+      "workspace_bytes": 1998948,
+      "inspection_seconds": 1.4997819849522784
+    }
+  ],
+  "timing_scope": "Preflight wall time including setup/first-use compilation; concurrent validation; not throughput qualification"
+}

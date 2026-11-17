@@ -1,7 +1,5 @@
 """Exact continuation, physical maxima and memory bounds for parallel Brownian."""
 
-from dataclasses import replace
-
 import numpy as np
 import pytest
 
@@ -69,7 +67,7 @@ def prepare(cpu, device, seed):
         particles,
         temperature,
         101325.0,
-        0.1,
+        1e-5,
         max_collisions=max(cpu.masses.shape[1] // 2, 1),
         rng_seed=seed,
         initialize_rng=True,
@@ -89,12 +87,41 @@ def test_parallel_brownian_preserves_legacy_bytes_and_rng(
 
     cpu = population(slots, occupancy)
     optimized = prepare(cpu, device, seed)
-    legacy = replace(prepare(cpu, device, seed), brownian_parallel=None)
+    legacy = prepare(cpu, device, seed)
+    from particula.gpu.kernels.coagulation import (
+        _native_coagulation_kernel,
+        apply_coagulation_kernel,
+        initialize_coagulation_rng_states,
+    )
+
+    initialize_coagulation_rng_states(
+        seed,
+        legacy.selector_inputs[27],
+        device=device,
+    )
     initial_mass = np.sum(cpu.masses * cpu.concentration[..., None], axis=1)
     initial_charge = np.sum(cpu.charge * cpu.concentration, axis=1)
     events = 0
-    for _ in range(3):
-        _enqueue_prepared_coagulation_call(legacy)
+    for _ in range(100):
+        # The serial implementation is a test oracle, not a production fallback.
+        wp.launch(
+            _native_coagulation_kernel,
+            dim=legacy.n_boxes,
+            inputs=legacy.selector_inputs,
+            device=device,
+        )
+        wp.launch(
+            apply_coagulation_kernel,
+            dim=(legacy.n_boxes, legacy.max_collisions),
+            inputs=[
+                legacy.masses,
+                legacy.concentration,
+                legacy.charge,
+                legacy.collision_pairs,
+                legacy.n_collisions,
+            ],
+            device=device,
+        )
         _enqueue_prepared_coagulation_call(optimized)
         for name in (
             "masses",

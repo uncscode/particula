@@ -1,6 +1,11 @@
 # %% [markdown]
 # # Five direct CUDA process boundaries
 #
+# Can a final aerosol snapshot tell you which process caused a change? This
+# example exposes the ordered device boundaries and the limits of a before/after
+# comparison. Use the [direct condensation example](gpu_direct_kernels_quick_start.py)
+# first if transfers, species maps, or caller-owned storage are unfamiliar.
+#
 # Upload particles, gas and environment once, retain explicit sidecars, and
 # restore the complete CPU result after the ordered calls.
 # Run this script with `--cuda` to reproduce the published figures.
@@ -661,3 +666,19 @@ if __name__ == "__main__":
         run_publication()
     else:
         main()
+
+# %% [markdown]
+# ## A sequence of calls is not a common physical timestep
+#
+# Here condensation runs for 0.01 s, coagulation and wall loss for 1 s each,
+# dilution for 0.1 s, and nucleation for zero time. The before/after panels therefore
+# demonstrate composition of direct calls, not a synchronized chamber interval.
+# Both species use illustrative constant vapor pressures of 10⁻¹² Pa.
+#
+# The identity assertions check reuse of supplied storage; the plotted particle
+# and gas changes do not independently validate every process budget. To attribute
+# a response, observe inventories after each process and compare matched controls.
+# For a continuous simulation, define a consistent splitting schedule and test
+# its timestep and ordering. Continue with the
+# [prepared lifecycle](../prepared/gpu_prepared_lifecycle.py), which supplies a
+# per-process ledger and checkpoint continuation for an evolving population.

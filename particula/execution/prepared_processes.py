@@ -35,6 +35,33 @@ class _ProcessPlan:
         return dict(self.parameters)
 
 
+def configure_coagulation_work(plans, config=None):
+    """Freeze resource policy and sampler version in built-in process plans."""
+    from dataclasses import replace
+
+    from particula.gpu.kernels._coagulation_budget import CoagulationWorkConfig
+
+    config = CoagulationWorkConfig() if config is None else config
+    if not isinstance(config, CoagulationWorkConfig):
+        raise ValueError(
+            "coagulation_work_config must be a CoagulationWorkConfig"
+        )
+    result = []
+    for plan in plans:
+        if type(plan) is _ProcessPlan and plan.family == "coagulation":
+            values = plan.values
+            values.update(
+                coagulation_sampler_version=1,
+                max_trials_per_box=int(config.max_trials_per_box),
+                max_collision_buffer_bytes=int(
+                    config.max_collision_buffer_bytes
+                ),
+            )
+            plan = replace(plan, parameters=tuple(values.items()))
+        result.append(plan)
+    return tuple(result)
+
+
 def _plan_process(process: Any, aerosol: Aerosol) -> _ProcessPlan:
     """Reject unknown runnable/strategy semantics before any GPU allocation."""
     from particula.cpu_transfer import CPUTransfer, _CPUTransferAdapter
@@ -220,14 +247,8 @@ def _plan_coagulation(process: Any, aerosol: Aerosol) -> _ProcessPlan:  # noqa: 
         if type(strategy) is CombineCoagulationStrategy
         else (strategy,)
     )
-    if len(components) > 1 and (
-        len(components) != 2
-        or {type(child) for child in components}
-        != {BrownianCoagulationStrategy, SedimentationCoagulationStrategy}
-    ):
-        raise ValueError(
-            "prepared combination supports Brownian plus sedimentation"
-        )
+    if len({type(child) for child in components}) != len(components):
+        raise ValueError("prepared coagulation requires unique mechanisms")
     values: dict[str, Any] = {}
     mechanisms = []
     for child in components:
@@ -426,23 +447,39 @@ def _compile_coagulation(plan, context: BuiltinPreparationContext):
 
     model = plan.values.get("charged_model")
     mechanisms = plan.values.get("mechanisms")
-    if model is not None:
+    if model is not None and mechanisms is None:
         mechanisms = ("charged_hard_sphere",)
     mechanism = CoagulationMechanismConfig(
         mechanisms=mechanisms, charged_model=model or "hard_sphere"
     )
-    resources = registry.acquire_coagulation(session.dimensions.n_particles)
+    from particula.gpu.kernels._coagulation_budget import CoagulationWorkConfig
+
+    work_config = CoagulationWorkConfig(
+        max_trials_per_box=plan.values["max_trials_per_box"],
+        max_collision_buffer_bytes=plan.values["max_collision_buffer_bytes"],
+    )
+    from particula.gpu.kernels.coagulation import _resolve_collision_capacity
+
+    capacity = _resolve_collision_capacity(
+        max(1, session.dimensions.n_particles // 2),
+        session.dimensions.n_boxes,
+        session.dimensions.n_particles,
+        work_config.max_collision_buffer_bytes,
+    )
+    resources = registry.acquire_coagulation(capacity)
     prepared = _prepare_coagulation_step_gpu(
         context.particles,
         None,
         None,
         context.time_step,
+        max_collisions=capacity,
         collision_pairs=resources.collision_pairs,
         n_collisions=resources.n_collisions,
         rng_states=resources.rng_states,
         initialize_rng=False,
         environment=context.environment,
         mechanism_config=mechanism,
+        work_config=work_config,
         turbulent_dissipation=plan.values.get("turbulent_dissipation"),
         fluid_density=plan.values.get("fluid_density"),
     )
