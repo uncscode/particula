@@ -3546,12 +3546,14 @@ invalid.
 
 **Modules**
 
+- `particula.execution._condensation_ode_kernels`
 - `particula.execution.adapters`
 - `particula.execution.availability`
 - `particula.execution.checkpoint`
 - `particula.execution.checkpoint_extensions`
 - `particula.execution.cohort`
 - `particula.execution.communication`
+- `particula.execution.condensation_ode`
 - `particula.execution.cpu_context`
 - `particula.execution.diagnostics`
 - `particula.execution.errors`
@@ -3560,9 +3562,11 @@ invalid.
 - `particula.execution.extension_rng`
 - `particula.execution.fallback`
 - `particula.execution.field_buffers`
+- `particula.execution.gpu_condensation_ode`
 - `particula.execution.gpu_resources`
 - `particula.execution.gpu_session`
 - `particula.execution.graph_capture`
+- `particula.execution.ode`
 - `particula.execution.particle_field_kernels`
 - `particula.execution.preparation_context`
 - `particula.execution.prepared`
@@ -3590,6 +3594,7 @@ invalid.
 - `particula.execution.resident_scheduler`
 - `particula.execution.rng`
 - `particula.execution.scheduler`
+- `particula.execution.splitting`
 - `particula.execution.state_updates`
 - `particula.execution.thermodynamic_updates`
 - `particula.execution.validation`

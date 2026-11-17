@@ -20,7 +20,7 @@ def _activity_plan(activity, particles, gas, pairs, vapor)
 
 Require one participating volatile material lane.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L118-L192)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L124-L198)
 
 ## particula.execution.prepared_condensation._surface_plan
 
@@ -32,19 +32,19 @@ def _surface_plan(surface, particles)
 
 Require an exact static or single-phase volume-weighted surface law.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L70-L115)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L76-L121)
 
 ## particula.execution.prepared_condensation._vapor_plan
 
 *function*
 
 ```python
-def _vapor_plan(strategy, width)
+def _vapor_plan(strategy, width, *, allow_zero=False)
 ```
 
 Freeze constant/Buck definitions in complete gas order.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L34-L67)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L34-L73)
 
 ## particula.execution.prepared_condensation._vector
 
@@ -68,16 +68,16 @@ def compile_condensation(plan: _ProcessPlan, context: BuiltinPreparationContext)
 
 Allocate retained thermodynamics, species maps and transport sidecars.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L277-L392)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L289-L404)
 
 ## particula.execution.prepared_condensation.plan_condensation
 
 *function*
 
 ```python
-def plan_condensation(process, aerosol) -> _ProcessPlan
+def plan_condensation(process, aerosol, *, allow_zero_vapor=False) -> _ProcessPlan
 ```
 
 Freeze representable physical parameters before any upload.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L195-L274)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L201-L286)
