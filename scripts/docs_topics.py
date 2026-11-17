@@ -72,7 +72,7 @@ def check_relationships(t, by_id):
 def check_paths(by_id):
     """Require finite hierarchy paths and an acyclic prerequisite graph."""
     errors = []
-    for identifier, topic in by_id.items():
+    for identifier in by_id:
         visited = set()
         current = identifier
         while current in by_id:
@@ -81,8 +81,6 @@ def check_paths(by_id):
                 break
             visited.add(current)
             current = by_id[current]["parent"]
-        if len(visited) > 5 and not topic.get("depth_reason"):
-            errors.append(f"{identifier}: depth beyond four needs a reason")
 
     def visit(identifier, active, done):
         if identifier in active:

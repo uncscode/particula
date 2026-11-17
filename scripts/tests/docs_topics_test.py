@@ -2,6 +2,7 @@
 
 import copy
 import sys
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 import pytest
@@ -94,3 +95,71 @@ def test_topic_associations_link_to_primary_and_related_topics():
     assert "/particula/guide/topics/atmosphere/" in text
     assert "/particula/guide/topics/gpu/" in text
     assert docs_topics.page_links("unmapped", docs_topics.load(), "/") == ""
+
+
+@pytest.mark.parametrize("child_count", [1, 5])
+def test_each_branch_requires_two_to_four_children(child_count):
+    """Both sparse and overcrowded branches violate the same rule."""
+    data = docs_topics.load()
+    template = next(t for t in data["topics"] if t["id"] == "size")
+    for index in range(child_count):
+        node = copy.deepcopy(template)
+        node.update(
+            id=f"size-child-{index}", parent="size", order=index, related=[]
+        )
+        data["topics"].append(node)
+        data["resources"][0]["also"].append(node["id"])
+    assert "size: branching requires 2–4 children" in docs_topics.validate(data)
+
+
+def test_deep_tree_validates_and_generates_every_destination():
+    """Depth has no editorial cutoff; all branches still split in two."""
+    data = docs_topics.load()
+    template = next(t for t in data["topics"] if t["id"] == "size")
+    parent = "size"
+    for depth in range(8):
+        for suffix in ("path", "leaf"):
+            node = copy.deepcopy(template)
+            node.update(
+                id=f"deep-{depth}-{suffix}",
+                parent=parent,
+                order=int(suffix == "leaf"),
+                related=[],
+            )
+            data["topics"].append(node)
+            data["resources"][0]["also"].append(node["id"])
+        parent = f"deep-{depth}-path"
+    assert docs_topics.validate(data) == []
+    destinations = []
+    docs_topics.generate(
+        lambda path, *args, **kwargs: destinations.append(path), data
+    )
+    assert "guide/topics/deep-7-path.mdx" in destinations
+    assert len(destinations) == len(data["topics"])
+    # A cycle at the deepest level must still be rejected.
+    next(t for t in data["topics"] if t["id"] == "size")["parent"] = parent
+    assert any("hierarchy cycle" in e for e in docs_topics.validate(data))
+
+
+def test_topics_have_distinct_local_svg_illustrations():
+    """Each topic has its own vector artwork in the shared icon style."""
+    topics = docs_topics.load()["topics"]
+    assert len({topic["icon"] for topic in topics}) == len(topics)
+    drawings = set()
+    for topic in topics:
+        path = (
+            docs_topics.ROOT
+            / "website/public/topic-icons"
+            / (topic["icon"] + ".svg")
+        )
+        # Only trusted SVG artwork checked into this repository is parsed.
+        svg = ET.fromstring(path.read_text())  # noqa: S314
+        assert svg.tag == "{http://www.w3.org/2000/svg}svg"
+        assert svg.attrib["viewBox"] == "0 0 64 64"
+        geometry = tuple(
+            (child.tag, tuple(sorted(child.attrib.items())))
+            for child in svg
+            if child.tag != "{http://www.w3.org/2000/svg}title"
+        )
+        assert geometry and geometry not in drawings
+        drawings.add(geometry)
