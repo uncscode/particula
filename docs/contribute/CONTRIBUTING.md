@@ -172,7 +172,58 @@ Your contribution is now part of **Particula**—thank you!
 
 ---
 
-### 6. Need Help?
+### 6. Release automation
+
+The literal `__version__` in `particula/__init__.py` owns the Python library
+version. To prepare a stable release, increase its `MAJOR.MINOR.PATCH` value in
+a reviewed PR and update the checkout version in `AGENTS.md`. Merge after the
+applicable source, packaging and Conda checks pass. Local edits and PR builds
+do not publish anything.
+
+On a push to `uncscode/particula:main`, the **pypi** workflow compares the previous
+and current commit's versions without importing the package. Unchanged versions
+do not release; decreases or an unavailable previous version fail explicitly.
+Forks and other branches cannot publish. This automation supports stable
+three-part versions; prereleases require a separately designed release policy.
+
+For a version increase, the workflow:
+
+1. Runs source, example and infrastructure tests, builds the wheel and source
+   archive, and verifies the exact documentation bundles, including an offline
+   source rebuild and isolated installations.
+2. Validates and builds the accompanying plugin archives, then retains the exact
+   release assets as a workflow artifact for 30 days.
+3. Creates an annotated `vVERSION` tag at the tested commit and explicitly pushes
+   that tag. An existing tag must resolve to the same commit; it is never moved.
+4. Publishes a GitHub release with generated notes, Python packages,
+   `PYTHON-SHA256SUMS`, the documentation verification report, and the plugin
+   archives and their checksums. Existing drafts are not promoted automatically;
+   existing assets are verified and never overwritten.
+5. Runs the existing PyPI publishing action with `PYPI_API_TOKEN` using the same
+   tested Python packages. Identical files may be skipped on a retry, but a
+   different existing file with the same name fails the release.
+
+Manually publishing a matching stable library release remains supported.
+Plugin tags such as `particula-helper-v0.3.4` are excluded. The workflow invokes
+the PyPI action directly because releases created with `GITHUB_TOKEN` do not
+trigger another release workflow; see [GitHub's event-trigger rules](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow).
+No additional personal access token is needed. Repository rules must allow the
+workflow to create the library tags, and the existing PyPI secret must be valid.
+
+If publication fails after creating the tag or GitHub release, use **Re-run failed
+jobs** on that run to reuse its already verified artifacts. Inspect the GitHub
+and PyPI state before retrying; do not delete/move tags or overwrite packages to
+make a run pass. Re-running the entire build can produce different archive bytes,
+which the collision checks deliberately reject. If retained artifacts have
+expired, investigate and prepare a new version rather than replacing a published
+version. Check both the GitHub release assets and the PyPI job before announcing
+success. A GitHub release alone does not prove that PyPI upload succeeded.
+
+Conda validation and external feedstock publication remain separate; see
+[Conda release checks](../../conda/README.md). These workflows do not merge PRs
+or update the external feedstock automatically.
+
+### 7. Need Help?
 
 * **Questions:** open a “Discussion” or tag a maintainer in your PR.  
 * **Stuck on Git?** Try `git status`, `git restore`, or ask for pairing in the chat.  

@@ -373,7 +373,7 @@ def test_plugin_release_does_not_publish_python_or_reattach_assets(
 ):
     """Published plugin tags skip PyPI and the library asset attachment job."""
     for filename, job_name in [
-        ("pypi.yml", "pyping"),
+        ("pypi.yml", "release-plan"),
         ("assistant-plugins.yml", "release-assets"),
         ("assistant-plugins.yml", "validate"),
     ]:
