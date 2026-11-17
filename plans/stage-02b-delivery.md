@@ -7,10 +7,11 @@ the later commits are published, with current hosted checks and review
 readiness tracked in that PR.
 Worktree: `/tmp/particula-stage-02b`.
 Branch: `codex/stage-02b-simulation-workflow`.
-Verified upstream main: `356fc054cd9a4f4ececc3c64c7144e889a789494`.
-Dependency: Stage 2A [PR #1659](https://github.com/uncscode/particula/pull/1659).
-PR target: `uncscode/particula:codex/stage-02a-numerical-integration`, so the
-workflow diff is independently reviewable. Merge is outside execution scope.
+Verified upstream main: `c72e9be7c7cea60565acaa3e2e2ef82b5d0e10fc`.
+Dependency: Stage 2A [PR #1659](https://github.com/uncscode/particula/pull/1659),
+merged by the user on 2026-11-16.
+PR target: `uncscode/particula:main`; the merged 2A work is excluded from the
+remaining workflow diff. Merging Stage 2B is outside execution scope.
 
 ## Completion boundary
 
@@ -237,3 +238,11 @@ SciPy 1.18.1. The original fixture passed locally, so its failure evidence is
 the hosted log rather than a claimed local reproduction. Solver code and the
 scientific example configurations are unchanged; full-run provenance remains
 as recorded above.
+
+
+After the user merged Stage 2A, PR #1660 was retargeted to `main`. The squash
+commit's entire tree matches the incorporated 2A revision `7537dfa09` exactly.
+The overlap conflicts were resolved to the tested 2B versions; merge commit
+`3fe378e12e` has the same tree as its first parent. This preserves every 2B
+solver, workflow, example and result change without duplicating 2A in the PR
+diff. Only the delivery notes changed after that history synchronization.

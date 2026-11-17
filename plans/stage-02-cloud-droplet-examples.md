@@ -2,8 +2,9 @@
 
 Status: implementation, full runs, refinement and output review complete and published.
 Added to the active Stage 2A/2B objective by the user after core implementation
-and validation. Results are published on the existing Stage 2B branch and dependent
-[PR #1660](https://github.com/uncscode/particula/pull/1660).
+and validation. Results are published on the existing Stage 2B branch and
+[PR #1660](https://github.com/uncscode/particula/pull/1660), now targeting `main`
+after the user merged Stage 2A.
 
 ## Requested outcome
 

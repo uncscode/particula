@@ -11,9 +11,9 @@ results, practical research workflows, useful acceleration, and reproducible
 inference. Stage numbers indicate the intended order of major outcomes, not a
 requirement to stop all other work until an entire stage is finished.
 
-Stage 1 is delivered in PR #1658; Stage 2A is delivered in
+Stage 1 is delivered in PR #1658; Stage 2A is merged through
 [PR #1659](https://github.com/uncscode/particula/pull/1659). Stage 2B is published in
-[PR #1660](https://github.com/uncscode/particula/pull/1660), with
+[PR #1660](https://github.com/uncscode/particula/pull/1660) against `main`, with
 [cloud/droplet integration examples](stage-02-cloud-droplet-examples.md) now
 qualified and published, including the full resident CUDA reruns. Current
 review readiness and hosted checks are recorded in the linked PRs.
