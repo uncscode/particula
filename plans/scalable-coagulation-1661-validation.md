@@ -144,3 +144,13 @@ refreshed separately in full. Log: `/tmp/particula-1661-doc-examples-final.log`.
 Final example regressions: **242 passed, one skipped, zero failures** in
 369.87 s with native CUDA access. Log: `/tmp/particula-1661-examples-final.log`.
 All requested implementation, examples and validation are complete.
+
+## Upstream integration
+
+Merged upstream `57317f47c1d66d1109f3174484cfd6247b9e7f16` after opening
+PR #1663. Upstream changed documentation topics only; no scientific library
+code changed. The sole conflict was resolved by retaining the new hierarchy
+and placing the scalable example under `gpu-direct`. Post-merge website tests
+passed **66 Python + 15 Node tests**. The site rebuilt **597 pages** and passed
+link/API/redirect verification with zero errors. The graph validates with
+57 topics, 171 resources and 35 supporting pages.

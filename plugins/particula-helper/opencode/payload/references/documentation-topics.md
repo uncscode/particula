@@ -15,6 +15,11 @@ remain stable even though the menu folder is independent of Guide. Validate
 generated topic destinations against the registry rather than assuming each
 has an authored Markdown file.
 
+The explorer shows illustrated cards for immediate children and compact links
+for their subtopics. Selecting a topic opens its own next choices; do not expand
+a recursive tree inside the cards. This two-level preview does not limit how
+deeply concepts can be organized. Keep each branch to 2–4 meaningful choices.
+
 ## Review a collection
 
 Inventory all authored pages and registered Python examples before proposing
@@ -37,8 +42,9 @@ mapped does not mean its science or editorial quality has been reviewed.
   leaves have none. Collapse single-child branches. Resource lists are not
   branches and have no four-item limit. Never invent empty categories to meet
   a quota. Group concepts by meaningful scientific distinctions.
-- Aim for at most four selections from root to subject. Record a `depth_reason`
-  for a necessary deeper topic. Use stable IDs independent of display labels.
+- Nest topics as deeply as useful; there is no depth limit or `depth_reason`
+  requirement. Keep 2–4 children per branch at every depth, and use stable IDs
+  independent of display labels. Overview resources may remain on branches.
 - Each concept has one primary parent. Siblings should have comparable scope.
   Name the science using recognizable terms, not implementation filenames.
 - Keep hierarchy, prerequisites, related concepts, and page associations distinct.
@@ -49,8 +55,8 @@ mapped does not mean its science or editorial quality has been reviewed.
   one canonical article rather than copying explanations across branches.
 - Record true alternate names and abbreviations in `aliases`. Broader remembered
   phrases belong in `search_phrases`; do not declare them scientific synonyms.
-- Every topic has a label, description, local SVG icon, and useful resources or
-  children. Icons accompany text and illustrate concepts rather than measured
+- Every topic has a label, description, distinct local SVG icon, and useful
+  resources or children. Icons accompany text and illustrate concepts rather than measured
   results. Preserve accessible labels, theme contrast, and reduced motion.
 - Keep the card description short. Fill `context` with the scientific distinction
   and evidence limits that make the topic useful; use `investigation` for one
@@ -72,5 +78,5 @@ useful ordinary links; the website adds progressive interactive navigation.
 
 The distinction between preferred/alternate labels, broader/narrower concepts,
 and associated concepts follows [W3C SKOS](https://www.w3.org/TR/skos-primer/).
-The branching and depth limits are Particula editorial conventions, not a claim
+The branching rule is a Particula editorial convention, not a claim
 that SKOS or learning research mandates a particular number of choices.

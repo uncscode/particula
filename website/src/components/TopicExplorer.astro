@@ -9,7 +9,8 @@ const path = ancestors(topicId);
 const branches = children(topicId);
 const parent = topics.get(topic.parent);
 const resources = graph.resources.filter((r) => r.topic === topicId || r.also.includes(topicId));
-const starters = resources.filter((r) => r.start_here && r.topic === topicId);
+const starters = resources.filter((r) => r.start_here &&
+  (r.topic === topicId || ancestors(r.topic).some((item) => item.id === topicId)));
 const groups = ['Guide', 'Examples', 'Theory', 'API', 'Contribute'];
 const icon = (id) => `${base.replace(/\/$/, '')}/topic-icons/${id}.svg`;
 ---
