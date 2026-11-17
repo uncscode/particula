@@ -4,7 +4,7 @@
     "email": "kkgorkow@gmail.com",
     "name": "Kyle Gorkowski"
   },
-  "description": "Build, run and analyze aerosol simulations; organize scientific documentation and develop, test, and review Particula.",
+  "description": "Build, run and analyze aerosol simulations; investigate and report concerns; develop, test, document and review Particula.",
   "extensions": {
     "com.openai": {
       "interface": {
@@ -20,12 +20,12 @@
         "displayName": "Particula Helper",
         "logo": "./assets/icon.png",
         "logoDark": "./assets/icon-dark.png",
-        "longDescription": "Six scientific workflows for setup, guidance, simulation design, execution, analysis and debugging, plus five Particula repository skills for planning, development, testing, documentation and review. Uses the selected checkout and environment. No hosted service, automatic Python installation or MCP server is included.",
+        "longDescription": "Seven researcher workflows for setup, guidance, simulation design, execution, analysis, debugging and issue reporting, plus five Particula repository skills for planning, development, testing, documentation and review. Uses the selected checkout and environment. Reports require researcher review before posting. No hosted service, automatic Python installation or MCP server is included.",
         "shortDescription": "Learn, run, analyze aerosols"
       },
       "requires_local_executor": true,
       "publication": {
-        "release_notes": "Adds topic-graph organization and scientific narrative guidance to documentation authoring and review workflows."
+        "release_notes": "Adds researcher issue reporting with version-matched investigation, a scientific issue format and approval before posting. Validated plugin version bumps now publish GitHub releases automatically, independently of Python library releases."
       }
     }
   },
@@ -37,7 +37,7 @@
     "scientific-computing"
   ],
   "name": "particula-helper",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "license": "MIT",
   "homepage": "https://uncscode.github.io/particula/guide/ai-assistants/",
   "repository": "https://github.com/uncscode/particula"

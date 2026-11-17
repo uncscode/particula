@@ -28,6 +28,10 @@
     "name": "particula-plan"
   },
   {
+    "description": "Investigate and prepare a developer-facing GitHub issue for a researcher's suspected Particula bug, unexpected result, or perceived scientific error. Use for reporting concerns, not implementing fixes or submitting code PRs.",
+    "name": "particula-report"
+  },
+  {
     "description": "Review Particula repository changes or prepare requested commits and PR descriptions, prioritizing scientific correctness, native API contracts, validation, and evidence. Use for review/publication preparation rather than routine simulation analysis.",
     "name": "particula-review"
   },

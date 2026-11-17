@@ -60,3 +60,14 @@ release-matched documentation, with explicit fallback for older installations.
 Documentation packaging and locator checks do not expand the numerical or
 live-host qualification above. Repository development still uses the selected
 checkout, while reading a wheel's bundled documentation needs no checkout.
+
+## Researcher issue reporting
+
+Plugin 0.3.4 adds `particula-report`, bringing the catalog to twelve skills.
+It prepares suspected-error reports and requires researcher review before
+posting. Package checks cover the shipped skill, supporting reference paths
+and agreement with the GitHub issue template. These checks do not establish
+model-driven investigation quality or live GitHub submission in every host.
+Without execution or GitHub access, the skill records the missing evidence
+and provides a report draft rather than claiming successful reproduction or
+submission.

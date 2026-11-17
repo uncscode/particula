@@ -103,14 +103,14 @@ jobs:
               "Includes Codex, Claude and OpenCode ZIPs, SHA256SUMS, "
               "and GITHUB-RELEASE.md with installation instructions.\n\n"
               "Artifacts are retained for 30 days. A version increase on "
-              "upstream main also creates a draft GitHub release. "
+              "upstream main also publishes a GitHub release. "
               "Installed plugins require a marketplace refresh/reinstall.\n"
           )
           with Path(os.environ['GITHUB_STEP_SUMMARY']).open('a') as output:
               output.write(summary)
           PY
 
-  plugin-release-draft:
+  plugin-release:
     if: >-
       github.event_name == 'push' && github.ref == 'refs/heads/main' &&
       github.repository == 'uncscode/particula' &&
@@ -127,7 +127,7 @@ jobs:
         with:
           name: ${{ needs.validate.outputs.artifact }}
           path: plugin-dist
-      - name: Create an immutable draft for this plugin version
+      - name: Publish the tested packages for this plugin version
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
@@ -139,7 +139,7 @@ jobs:
             echo "Release $tag already exists; preserving its assets."
           else
             gh release create "$tag" plugin-dist/* \
-              --draft --latest=false --target "$SOURCE_COMMIT" \
+              --latest=false --target "$SOURCE_COMMIT" \
               --title "Particula Helper ${PLUGIN_VERSION}" \
               --notes-file plugin-dist/GITHUB-RELEASE.md
           fi
