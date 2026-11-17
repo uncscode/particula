@@ -657,7 +657,7 @@ def test_native_admission_preserves_mechanism_specific_active_limits(
     kwargs = dict(mechanism_config=CoagulationMechanismConfig(row.mechanisms))
     if mask == 8:
         kwargs.update(turbulent_dissipation=2e-4, fluid_density=1.2)
-    if mask in (2, 4):
+    if mask == 2:
         with pytest.raises(ValueError, match="active particle count exceeds"):
             coagulation_step_gpu(particles, 298.15, 101325.0, 0.0, **kwargs)
     else:

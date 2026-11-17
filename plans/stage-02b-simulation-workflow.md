@@ -1,6 +1,12 @@
 # Stage 2B: Simulation workflow and reproducibility
 
-Status: proposed. Entry dependency: an initial
+Status: workflow and full example results published in
+[PR #1660](https://github.com/uncscode/particula/pull/1660);
+[cloud/droplet example follow-through](stage-02-cloud-droplet-examples.md) locally
+complete and published. Current review readiness and hosted checks are tracked
+in the linked PR.
+See the [delivery ledger](stage-02b-delivery.md).
+Entry dependency: an initial
 [Stage 1 reference case](stage-01-scientific-correctness.md).
 Coordinate accepted-step and time semantics with [Stage 2A](stage-02a-numerical-integration.md).
 

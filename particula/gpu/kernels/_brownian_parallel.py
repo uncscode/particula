@@ -1,4 +1,4 @@
-"""Bounded-memory parallel properties and exact Brownian pair maxima.
+"""Bounded-memory parallel properties and exact collision pair maxima.
 
 Pair evaluation remains quadratic in the active cohort size. A fixed maximum
 of 4096 reduction lanes per box bounds scratch independently of pair count.
@@ -24,12 +24,15 @@ from particula.gpu.kernels.coagulation import (
     charged_kernel_wp,
     cunningham_slip_correction_wp,
     dynamic_viscosity_wp,
+    effective_density_wp,
     g_collection_term_wp,
     knudsen_number_wp,
     mean_thermal_speed_wp,
     molecule_mean_free_path_wp,
     particle_mean_free_path_wp,
     particle_radius_from_volume_wp,
+    sedimentation_sp2016_pair_rate_wp,
+    settling_velocity_stokes_from_transport_wp,
 )
 
 
@@ -52,6 +55,9 @@ def _properties(
     g_terms: wp.array2d(dtype=wp.float64),
     speeds: wp.array2d(dtype=wp.float64),
     total_masses: wp.array2d(dtype=wp.float64),
+    settling_velocities: wp.array2d(dtype=wp.float64),
+    mechanism_mask: wp.int32,
+    mean_density: wp.array(dtype=wp.float64),
     active: wp.array2d(dtype=wp.int32),
     failure: wp.array(dtype=wp.int32),
 ):
@@ -66,6 +72,8 @@ def _properties(
     g_terms[box, slot] = wp.float64(0.0)
     speeds[box, slot] = wp.float64(0.0)
     active[box, slot] = 0
+    if mechanism_mask & 4:
+        settling_velocities[box, slot] = wp.float64(0.0)
     if concentration[box, slot] <= wp.float64(0.0):
         return
     total_mass = wp.float64(0.0)
@@ -105,6 +113,44 @@ def _properties(
     g_terms[box, slot] = g_term
     total_masses[box, slot] = total_mass
     active[box, slot] = 1
+    if mechanism_mask & 4:
+        material_density = effective_density_wp(total_mass, total_volume)
+        if mean_density:
+            material_density = mean_density[box]
+        settling_velocities[box, slot] = (
+            settling_velocity_stokes_from_transport_wp(
+                radius, material_density, viscosity, free_path
+            )
+        )
+
+
+@no_type_check
+@wp.kernel
+def _mean_material_density(
+    masses: wp.array3d(dtype=wp.float64),
+    density: wp.array(dtype=wp.float64),
+    result: wp.array(dtype=wp.float64),
+    failure: wp.array(dtype=wp.int32),
+):
+    """Retain the native strategy's mean over positive-mass material slots."""
+    if failure:
+        if failure[0] != 0:
+            return
+    box = wp.tid()
+    total = wp.float64(0.0)
+    count = int(0)
+    for slot in range(masses.shape[1]):
+        mass = wp.float64(0.0)
+        volume = wp.float64(0.0)
+        for species in range(masses.shape[2]):
+            mass += masses[box, slot, species]
+            volume += masses[box, slot, species] / density[species]
+        if mass > wp.float64(0.0) and volume > wp.float64(0.0):
+            total += mass / volume
+            count += 1
+    result[box] = wp.float64(0.0)
+    if count > 0:
+        result[box] = total / wp.float64(count)
 
 
 @no_type_check
@@ -137,6 +183,8 @@ def _pair_maxima(
     diffusivities: wp.array2d(dtype=wp.float64),
     g_terms: wp.array2d(dtype=wp.float64),
     speeds: wp.array2d(dtype=wp.float64),
+    settling_velocities: wp.array2d(dtype=wp.float64),
+    mechanism_mask: wp.int32,
     indices: wp.array2d(dtype=wp.int32),
     counts: wp.array(dtype=wp.int32),
     partials: wp.array2d(dtype=wp.float64),
@@ -158,19 +206,33 @@ def _pair_maxima(
         if first_rank < second_rank:
             first = indices[box, first_rank]
             second = indices[box, second_rank]
-            rate = _sanitize_positive_finite(
-                brownian_kernel_pair_wp(
-                    radii[box, first],
-                    radii[box, second],
-                    diffusivities[box, first],
-                    diffusivities[box, second],
-                    g_terms[box, first],
-                    g_terms[box, second],
-                    speeds[box, first],
-                    speeds[box, second],
-                    wp.float64(1.0),
+            rate = wp.float64(0.0)
+            if mechanism_mask & 1:
+                rate = _sanitize_positive_finite(
+                    brownian_kernel_pair_wp(
+                        radii[box, first],
+                        radii[box, second],
+                        diffusivities[box, first],
+                        diffusivities[box, second],
+                        g_terms[box, first],
+                        g_terms[box, second],
+                        speeds[box, first],
+                        speeds[box, second],
+                        wp.float64(1.0),
+                    )
                 )
-            )
+            if mechanism_mask & 4:
+                rate = _sanitize_positive_finite(
+                    rate
+                    + _sanitize_positive_finite(
+                        sedimentation_sp2016_pair_rate_wp(
+                            radii[box, first],
+                            radii[box, second],
+                            settling_velocities[box, first],
+                            settling_velocities[box, second],
+                        )
+                    )
+                )
             if rate > maximum:
                 maximum = rate
         pair += wp.int64(partials.shape[1])
@@ -357,13 +419,31 @@ class _PreparedBrownianWork:
     device: Any
     ion_data: Any = field(default_factory=IonPairData)
     ion_setup: Callable | None = None
+    mean_density: Any = None
 
     def enqueue(self, failure):
         """Enqueue retained work without allocation or observation."""
+        if self.mean_density is not None:
+            wp.launch(
+                _mean_material_density,
+                dim=self.active.shape[0],
+                inputs=[
+                    self.selector_inputs[0],
+                    self.selector_inputs[2],
+                    self.mean_density,
+                    failure,
+                ],
+                device=self.device,
+            )
         wp.launch(
             _properties,
             dim=self.active.shape,
-            inputs=(*self.property_inputs, self.active, failure),
+            inputs=(
+                *self.property_inputs,
+                self.mean_density,
+                self.active,
+                failure,
+            ),
             device=self.device,
         )
         if self.ion_setup is not None:
@@ -403,7 +483,8 @@ class _PreparedBrownianWork:
                 _pair_maxima,
                 dim=self.partials.shape,
                 inputs=[
-                    *self.selector_inputs[15:19],
+                    *self.selector_inputs[15:20],
+                    self.selector_inputs[28],
                     self.selector_inputs[24],
                     self.counts,
                     self.partials,
@@ -439,7 +520,7 @@ def prepare_brownian_work(selector_inputs, device):
     counts = wp.empty(boxes, dtype=wp.int32, device=device)
     partials = wp.empty((boxes, lanes), dtype=wp.float64, device=device)
     majorants = wp.empty(boxes, dtype=wp.float64, device=device)
-    positions = (0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 15, 16, 17, 18, 22)
+    positions = (0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 15, 16, 17, 18, 22, 19, 28)
     return _PreparedBrownianWork(
         selector_inputs,
         tuple(selector_inputs[index] for index in positions),

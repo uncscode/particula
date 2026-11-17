@@ -8,6 +8,10 @@ material model.
 
 | Question | Example | What it helps you distinguish |
 | --- | --- | --- |
+| Does a conserved vapor budget guarantee correct growth timing? | [Finite-reservoir growth](adaptive_reservoir_depletion.py) | Independent radius/vapor errors, depletion, and numerical work |
+| Does adaptive CUDA meet the same depletion accuracy target? | [CUDA reservoir comparison](adaptive_reservoir_depletion_cuda.py) | Real-device accuracy, explicit downloads, and the limits of a small benchmark |
+| Can CUDA resolve stiff evaporation after a humidity reset? | [CUDA wet–dry relaxation](adaptive_cloud_relaxation_cuda.py) | ROS3 convergence, closed-phase budgets, and explicit host control |
+| Are wet–dry oscillations physical or numerical? | [Adaptive droplet relaxation](adaptive_cloud_relaxation.py) | Fixed-step error, adaptive tolerance refinement, and independent reference agreement |
 | How do collision assumptions change a water-grown mixed population? | [Biomass-burning-inspired aerosol](biomass_burning_cloud_interactions.py) | A common starting state, continued condensation, and alternative collision kernels |
 | Can a plausible size spectrum hide a species-inventory failure? | [Organic uptake followed by binned coagulation](organic_partitioning_and_coagulation.py) | A valid closed condensation check versus unsupported fixed-composition coagulation |
 | What changes when a vapor reservoir is reset from wet to dry? | [One chamber cycle](cloud_chamber_single_cycle.py) | Water exchange, surviving particles, and the limits of a fixed timestep |

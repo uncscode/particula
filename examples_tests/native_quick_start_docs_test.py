@@ -1,69 +1,54 @@
-"""Execute the published native quick start with independent inventory checks."""
+"""Execute the first CPU workflow and its published reload/restart snippets."""
 
 import re
 from pathlib import Path
 
 import numpy as np
-import particula as par
+import pytest
+from docs.examples.fundamentals.first_cpu_workflow import simulate
 
 
-def test_quick_start_runs():
-    """The resolved guide example retains native conservation."""
-    page = (
-        Path(__file__).resolve().parents[1]
-        / "docs/guide/getting-started/first-simulation.md"
+@pytest.fixture(scope="module")
+def workflow(tmp_path_factory):
+    """Run the complete published workloads, including both exact restarts."""
+    directory = tmp_path_factory.mktemp("first-cpu")
+    report = simulate(directory / "first-cpu-results")
+    return directory, report
+
+
+def test_first_workflow_has_physical_budget_and_controlled_input(workflow):
+    """Both cases retain initial number/mass and respond to added vapor."""
+    directory, report = workflow
+    for case in report["cases"]:
+        vapor = case["initial_vapor_ug_m3"]
+        total = np.asarray(case["gas_ug_m3"]) + case["particle_ug_m3"]
+        initial_particle = 4 * np.pi * 1400 * (100e-9) ** 3 / 3 * 1e9 * 1e9
+        np.testing.assert_allclose(total, vapor + initial_particle, rtol=2e-13)
+        np.testing.assert_array_equal(case["time_s"], np.linspace(0, 600, 61))
+        assert np.all(np.diff(case["radius_nm"]) > 0)
+        assert np.all(np.asarray(case["gas_ug_m3"]) >= 0)
+        assert (
+            directory / f"first-cpu-results/organic-{vapor:g}.analysis"
+        ).is_file()
+        assert (
+            directory / f"first-cpu-results/organic-{vapor:g}.restart"
+        ).is_file()
+    assert (
+        report["cases"][1]["radius_nm"][-1]
+        > report["cases"][0]["radius_nm"][-1]
     )
+
+
+def test_published_reload_and_resume_snippets(workflow, monkeypatch):
+    """The guide reads saved files and resumes with exact future gas history."""
+    directory, _ = workflow
+    root = Path(__file__).resolve().parents[1]
+    page = root / "docs/guide/getting-started/first-simulation.md"
     snippets = re.findall(r"```python\n(.*?)\n```", page.read_text(), re.DOTALL)
     assert len(snippets) == 2
+    monkeypatch.chdir(directory)
+    monkeypatch.syspath_prepend(str(root / "docs/examples/fundamentals"))
     namespace = {}
-    exec(compile(snippets[1], str(page), "exec"), namespace)  # noqa: S102
-    aerosol = namespace["aerosol"]
-    assert isinstance(aerosol, par.Aerosol)
-    assert aerosol.particles is namespace["particles"]
-    assert aerosol.gas is namespace["gas"]
-    assert aerosol.environment is namespace["environment"]
-    assert aerosol.particles.distribution_type == "particle_resolved"
-    assert aerosol.gas.name == ["organic"]
-    assert 0 <= aerosol.gas.concentration[0, 0] < 1e-6
-    inventory = (
-        np.sum(
-            aerosol.particles.masses
-            * aerosol.particles.concentration[..., None]
-        )
-        + aerosol.gas.concentration[0, 0] * 1e-6
-    )
-    np.testing.assert_allclose(inventory, 1e-12 + 3e-18, rtol=1e-12, atol=1e-30)
-    assert np.all(np.isfinite(aerosol.particles.masses))
-    assert np.all(aerosol.particles.masses >= 0)
-
-
-def test_documentation_quick_start_runs():
-    """The published PMF example preserves number and material inventory."""
-    page = (
-        Path(__file__).resolve().parents[1]
-        / "docs/guide/getting-started/first-simulation.md"
-    )
-    snippets = re.findall(r"```python\n(.*?)\n```", page.read_text(), re.DOTALL)
-    assert len(snippets) == 2
-    namespace = {}
-    exec(compile(snippets[0], str(page), "exec"), namespace)  # noqa: S102
-    aerosol = namespace["result"]
-    assert aerosol is namespace["aerosol"]
-    particles = aerosol.particles
-    assert particles.distribution_type == "discrete"
-    np.testing.assert_allclose(particles.number_density, [1e8], rtol=1e-12)
-    np.testing.assert_array_equal(particles.volume, [1.0])
-    assert 0 <= aerosol.gas.concentration[0, 0] < 100.0
-    final_particle_mass = np.sum(
-        particles.masses * particles.concentration[..., None]
-    )
-    initial_particle_mass = namespace["initial_particle_mass"].item()
-    assert final_particle_mass > initial_particle_mass
-    np.testing.assert_allclose(
-        final_particle_mass + aerosol.gas.concentration[0, 0],
-        initial_particle_mass + 100.0,
-        rtol=1e-12,
-        atol=1e-30,
-    )
-    assert np.all(np.isfinite(particles.masses))
-    assert np.all(particles.masses >= 0)
+    for snippet in snippets:
+        exec(compile(snippet, str(page), "exec"), namespace)  # noqa: S102
+    assert namespace["resumed"].time == 600

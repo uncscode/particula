@@ -413,8 +413,8 @@
     "title": "How do collision models change a water-grown mixed aerosol?",
     "source": "docs/examples/simulations/biomass_burning_cloud_interactions.py",
     "policy": "long",
-    "device": "cpu",
-    "timeout": 7200,
+    "device": "cuda",
+    "timeout": 14400,
     "inputs": []
   },
   "examples-simulations-cloud-chamber-multi-cycle": {
@@ -437,7 +437,7 @@
     "title": "Audit a respiratory-droplet illustration before using its predictions",
     "source": "docs/examples/simulations/cough_droplets_partitioning.py",
     "policy": "long",
-    "device": "cpu",
+    "device": "cuda",
     "timeout": 7200,
     "inputs": []
   },
@@ -585,9 +585,15 @@
       "scripts/gpu_studies/__init__.py",
       "scripts/gpu_studies/cases.py",
       "scripts/gpu_studies/validation.py",
-      "scripts/gpu_studies/trajectories.py"
+      "scripts/gpu_studies/adaptive_trajectories.py"
     ],
-    "invoke": "result = run_example()"
+    "invoke": "result = run_example()",
+    "data_expression": "result",
+    "replot_invoke": "result = saved_data\nhistory_figures(result, \"Cooling and vapor pulses · saved CUDA results\", forcing=True)\nplt.show()",
+    "render_functions": [],
+    "plot_inputs": [
+      "scripts/docs_gpu_figures.py"
+    ]
   },
   "gpu-prepared-stochastic": {
     "title": "Separate stochastic coagulation from initial-state variability",
@@ -624,13 +630,19 @@
     "source": "docs/examples/gpu/prepared/gpu_prepared_cyclic_chamber.py",
     "policy": "cuda",
     "device": "cuda",
-    "timeout": 7200,
+    "timeout": 14400,
     "inputs": [
       "scripts/gpu_studies/__init__.py",
       "scripts/gpu_studies/cases.py",
       "scripts/gpu_studies/validation.py"
     ],
-    "invoke": "result = run_example()"
+    "invoke": "result = run_example()",
+    "data_expression": "result",
+    "replot_invoke": "result = saved_data\nplot_history(result[\"frames\"])",
+    "render_functions": [
+      "plot_history"
+    ],
+    "plot_inputs": []
   },
   "gpu-scaling-results": {
     "title": "Measured CUDA scaling on an RTX 5060",
@@ -796,6 +808,81 @@
     "render_functions": [
       "plot_results"
     ],
+    "plot_inputs": []
+  },
+  "first-cpu-workflow": {
+    "title": "Run, save and resume a closed aerosol growth experiment",
+    "source": "docs/examples/fundamentals/first_cpu_workflow.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 120,
+    "inputs": [],
+    "invoke": "report = simulate()\nfigure = plot_results(report)",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\nfigure = plot_results(report)",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": []
+  },
+  "adaptive-cloud-relaxation": {
+    "title": "Distinguish dry-phase oscillation from physical droplet relaxation",
+    "source": "docs/examples/simulations/adaptive_cloud_relaxation.py",
+    "policy": "long",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": [],
+    "invoke": "report = simulate()\nplot_results(report)",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\nfigure = plot_results(report)",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": []
+  },
+  "adaptive-reservoir-depletion": {
+    "title": "Resolve growth as a finite vapor reservoir is depleted",
+    "source": "docs/examples/simulations/adaptive_reservoir_depletion.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 1800,
+    "inputs": [],
+    "invoke": "report = simulate()\nfigure = plot_results(report)",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\nfigure = plot_results(report)",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": []
+  },
+  "adaptive-reservoir-depletion-cuda": {
+    "title": "Check adaptive CUDA growth against an independent depletion reference",
+    "source": "docs/examples/simulations/adaptive_reservoir_depletion_cuda.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 1800,
+    "inputs": [
+      "docs/examples/simulations/adaptive_reservoir_depletion.py"
+    ],
+    "invoke": "report = run_cuda()\nfigure = plot_results(report)",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\nfigure = plot_results(report)",
+    "render_functions": [],
+    "plot_inputs": []
+  },
+  "adaptive-cloud-relaxation-cuda": {
+    "title": "Resolve stiff wet–dry droplet relaxation on CUDA",
+    "source": "docs/examples/simulations/adaptive_cloud_relaxation_cuda.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 1800,
+    "inputs": [
+      "docs/examples/simulations/adaptive_cloud_relaxation.py"
+    ],
+    "invoke": "report = run_cuda()\nfigure = plot_results(report)",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\nfigure = plot_results(report)",
+    "render_functions": [],
     "plot_inputs": []
   }
 }

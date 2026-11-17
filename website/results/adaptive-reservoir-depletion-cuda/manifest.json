@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 13.560020606033504,
+  "package_source_sha256": "d3dbf2bbc42010dc580e48635a3056b40dfcfede7b20b6405fae6cc8921002f6",
+  "input_sha256": {
+    "docs/examples/simulations/adaptive_reservoir_depletion.py": "ffef5fdaeac743063e0de3edde0b562d2e40620c8bec03cf23347858309c68e7"
+  },
+  "example": "adaptive-reservoir-depletion-cuda",
+  "fingerprint": "700ad2acb18cb30acbc00f6ed1ca910bff3cc031025e9fc7556e5322063c6ecb",
+  "source": "docs/examples/simulations/adaptive_reservoir_depletion_cuda.py",
+  "revision": "b1e68d76201dd9d33a761aa197677de684977c19",
+  "package_dirty": true,
+  "executed_at": "2026-11-16T06:23:30.884362+00:00",
+  "device": "cuda:0: NVIDIA GeForce RTX 5060",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.1",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [],
+    [
+      {
+        "text": "Fixed 0.5 s radius error: 0.013104491968154663 vapor error / initial vapor: 0.051724928104230926 mass residual: 1.3348093070485667e-16 work: {'fixed_steps': 20}\nFixed 0.005 s radius error: 0.00012153195858566335 vapor error / initial vapor: 0.00047126688190263693 mass residual: 5.339237228194267e-16 work: {'fixed_steps': 2000}\nCPU RK23 1e-4 radius error: 1.820119292772482e-05 vapor error / initial vapor: 6.736678437977377e-05 mass residual: 4.0044279211457e-16 work: {'accepted': 62, 'rejected': 1, 'domain_rejected': 0, 'rate_calls': 252, 'jacobian_calls': 0, 'time_derivative_calls': 0, 'factorizations': 0, 'linear_solves': 0}\nCPU RK23 1e-7 radius error: 2.573387414273043e-08 vapor error / initial vapor: 9.152069530558079e-08 mass residual: 8.0088558422914e-16 work: {'accepted': 430, 'rejected': 2, 'domain_rejected': 0, 'rate_calls': 1728, 'jacobian_calls': 0, 'time_derivative_calls': 0, 'factorizations': 0, 'linear_solves': 0}\nCPU ROS2 1e-5 radius error: 7.743971802698368e-07 vapor error / initial vapor: 2.8580766376794065e-06 mass residual: 2.2691758219825635e-15 work: {'accepted': 2574, 'rejected': 1, 'domain_rejected': 0, 'rate_calls': 5150, 'jacobian_calls': 2575, 'time_derivative_calls': 2575, 'factorizations': 2575, 'linear_solves': 15450}\nCUDA RK23 1e-4 radius error: 1.819961694282668e-05 vapor error / initial vapor: 6.736250729474167e-05 mass residual: 2.6696186140971333e-16 work: {'accepted': 62, 'rejected': 1, 'domain_rejected': 0, 'rate_calls': 252, 'jacobian_calls': 0, 'time_derivative_calls': 0, 'factorizations': 0, 'linear_solves': 0}\nCUDA RK23 1e-7 radius error: 2.5733596586974272e-08 vapor error / initial vapor: 9.151970898865327e-08 mass residual: 1.4682902377534233e-15 work: {'accepted': 430, 'rejected': 2, 'domain_rejected': 0, 'rate_calls': 1728, 'jacobian_calls': 0, 'time_derivative_calls': 0, 'factorizations': 0, 'linear_solves': 0}\n"
+      },
+      {
+        "image": "figure-3-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "figure-3-1.png": "1168cbf1353dbacab1b7af1a23c99fa08146113d5db06d42938e1de77e6d3e25",
+    "executed_source.py": "131f67052c2bc69fd5bf57a1acde303dffadf80bed929dacaa6dd52137208ad0",
+    "data.json": "6169ac6cc861cd484e1d509a2436578f2ffb82b3b168d4373aba82b0f2e9abea",
+    "source.py": "131f67052c2bc69fd5bf57a1acde303dffadf80bed929dacaa6dd52137208ad0"
+  },
+  "simulation_fingerprint": "1fe27cc508b171a06efc88bfe26b292e31c23396f49a5c5ff9f568bb9f034a7a",
+  "render_versions": {
+    "particula": "0.3.1",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "render_device": "CPU",
+  "execution_input_sha256": {
+    "docs/examples/simulations/adaptive_reservoir_depletion.py": "ffef5fdaeac743063e0de3edde0b562d2e40620c8bec03cf23347858309c68e7"
+  },
+  "rendered_at": "2026-11-16T06:24:10.730723+00:00",
+  "render_revision": "b1e68d76201dd9d33a761aa197677de684977c19",
+  "render_elapsed_seconds": 4.7614333289675415
+}

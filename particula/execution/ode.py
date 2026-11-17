@@ -3,19 +3,23 @@
 Rates have units of state per second. Callbacks receive detached read-only
 arrays and must be pure: no RNG, observation, or external mutation. The caller
 owns state scaling, physical admissibility and linear conservation invariants.
-Bogacki-Shampine RK3(2) is for nonstiff rates; ROS-2 uses the KPP coefficients:
+Bogacki-Shampine RK3(2) is for nonstiff rates; ROS-2/3 use the KPP coefficients:
 https://kpp.readthedocs.io/en/stable/num_methods/rosenbrock-methods.html
 These names are concrete implementation APIs, not package-root exports.
 """
 
 from dataclasses import dataclass
-from typing import Callable
+from typing import Any, Callable, cast
 
 import numpy as np
 from scipy.linalg import lu_factor, lu_solve
+from scipy.sparse import eye as sparse_eye
+from scipy.sparse import issparse, sparray, spmatrix
+from scipy.sparse.linalg import splu
 
 Array = np.ndarray
 Rate = Callable[[float, Array], Array]
+Jacobian = Callable[[float, Array], Array | spmatrix | sparray]
 
 
 class TrialDomainError(ValueError):
@@ -26,7 +30,7 @@ class TrialDomainError(ValueError):
 class ODEProblem:
     """Declare pure continuous derivatives and optional stiff-method inputs.
 
-    jacobian[i,j] is df_i/dy_j. ROS-2 requires both jacobian and
+    jacobian[i,j] is df_i/dy_j. ROS-2/3 require both jacobian and
     time_derivative (partial f/partial t at fixed state); autonomous problems
     explicitly supply zeros for the latter. admissible checks all internal
     stages and the accepted candidate, without changing either.
@@ -34,7 +38,7 @@ class ODEProblem:
 
     rate: Rate
     admissible: Callable[[Array], bool]
-    jacobian: Rate | None = None
+    jacobian: Jacobian | None = None
     time_derivative: Rate | None = None
 
 
@@ -86,13 +90,13 @@ class AdaptiveSolver:
         """Validate configuration and detach initial state before any rates."""
         if not isinstance(problem, ODEProblem):
             raise TypeError("problem must explicitly declare continuous rates")
-        if method not in ("rk23", "ros2"):
-            raise ValueError("method must be rk23 or ros2")
-        if method == "ros2" and (
+        if method not in ("rk23", "ros2", "ros3"):
+            raise ValueError("method must be rk23, ros2 or ros3")
+        if method in ("ros2", "ros3") and (
             problem.jacobian is None or problem.time_derivative is None
         ):
             raise ValueError(
-                "ros2 requires Jacobian and partial time derivative"
+                f"{method} requires Jacobian and partial time derivative"
             )
         value = np.array(state, dtype=np.float64, copy=True)
         if value.ndim != 1 or not value.size:
@@ -177,34 +181,105 @@ class AdaptiveSolver:
         error = h * (-5 * k1 / 72 + k2 / 12 + k3 / 9 - k4 / 8)
         return candidate, error
 
-    def _ros2(self, t, y, h):
+    def _linearize(self, t, y, h, gamma):
+        """Factor the Rosenbrock matrix once for all stages of one trial."""
         jacobian = self.problem.jacobian
         time_derivative = self.problem.time_derivative
         if jacobian is None or time_derivative is None:
-            raise ValueError("ros2 requires both derivative callbacks")
-        gamma = 1 + 1 / np.sqrt(2)
+            raise ValueError("Rosenbrock requires both derivative callbacks")
         rate = self._rate(t, y)
         self.statistics.jacobian_calls += 1
-        jac = np.asarray(jacobian(t, _readonly(y)), dtype=np.float64)
+        raw_jac = cast(Any, jacobian(t, _readonly(y)))
+        sparse = issparse(raw_jac)
+        jac = (
+            raw_jac.astype(np.float64).tocsc()
+            if sparse
+            else np.asarray(raw_jac, dtype=np.float64)
+        )
         self.statistics.time_derivative_calls += 1
         partial = np.asarray(time_derivative(t, _readonly(y)), dtype=np.float64)
         if jac.shape != (y.size, y.size) or partial.shape != y.shape:
             raise ValueError("Jacobian or time derivative has incorrect shape")
-        if not np.all(np.isfinite(jac)) or not np.all(np.isfinite(partial)):
+        if not np.all(np.isfinite(jac.data if sparse else jac)) or not np.all(
+            np.isfinite(partial)
+        ):
             raise TrialDomainError("nonfinite linearization")
-        matrix = np.eye(y.size) / (h * gamma) - jac
-        factor = lu_factor(matrix)
+        if sparse:
+            matrix = sparse_eye(y.size, format="csc") / (h * gamma) - jac
+            factor = splu(matrix)
+            raw_solve = factor.solve
+        else:
+            matrix = np.eye(y.size) / (h * gamma) - jac
+            dense_factor = lu_factor(matrix)
+
+            def raw_solve(rhs):
+                return lu_solve(dense_factor, rhs)
+
         self.statistics.factorizations += 1
-        k1 = lu_solve(factor, rate + h * gamma * partial)
-        self.statistics.linear_solves += 1
+
+        def solve(rhs):
+            result = raw_solve(rhs)
+            self.statistics.linear_solves += 1
+            # Pivoting can feed roundoff into zero-rate inventory coordinates.
+            # Correct the residual with the same factors, without clipping
+            # coordinates or treating small physical rates as zero.
+            for _ in range(2):
+                result += raw_solve(rhs - matrix @ result)
+                self.statistics.linear_solves += 1
+            return result
+
+        return rate, partial, solve
+
+    def _ros2(self, t, y, h):
+        gamma = 1 + 1 / np.sqrt(2)
+        rate, partial, solve = self._linearize(t, y, h, gamma)
+        k1 = solve(rate + h * gamma * partial)
         rate2 = self._rate(t + h, y + k1 / gamma)
-        k2 = lu_solve(
-            factor, rate2 - 2 * k1 / (gamma * h) - h * gamma * partial
-        )
-        self.statistics.linear_solves += 1
+        k2 = solve(rate2 - 2 * k1 / (gamma * h) - h * gamma * partial)
         candidate = y + (3 * k1 + k2) / (2 * gamma)
         self._check(candidate)
         return candidate, (k1 + k2) / (2 * gamma)
+
+    def _ros3(self, t, y, h):
+        """Take a KPP ROS-3 trial with an embedded second-order estimate.
+
+        Three stage solves share one factorization and two rate evaluations.
+        Each stage includes two residual-correction solves, counted in stats.
+        Coefficients: KineticPreProcessor/KPP int/rosenbrock.f90, Ros3,
+        Git blob baf1ef64538a5128db5e1154ac7fd1b39c41f665. The Jacobian
+        convention here is df_i/dy_j, without KPP's storage transpose.
+        """
+        gamma = 0.43586652150845899941601945119356
+        rate, partial, solve = self._linearize(t, y, h, gamma)
+        k1 = solve(rate + h * gamma * partial)
+        rate2 = self._rate(t + gamma * h, y + k1)
+        k2 = solve(
+            rate2
+            - 1.0156171083877702091975600115545 * k1 / h
+            + h * 0.24291996454816804366592249683314 * partial
+        )
+        k3 = solve(
+            rate2
+            + (
+                4.0759956452537699824805835358067 * k1
+                + 9.2076794298330791242156818474003 * k2
+            )
+            / h
+            + h * 2.1851380027664058511513169485832 * partial
+        )
+        candidate = (
+            y
+            + k1
+            + 6.1697947043828245592553615689730 * k2
+            - 0.42772256543218573326238373806514 * k3
+        )
+        self._check(candidate)
+        error = (
+            0.5 * k1
+            - 2.9079558716805469821718236208017 * k2
+            + 0.22354069897811569627360909276199 * k3
+        )
+        return candidate, error
 
     def step(self, bound):
         """Accept one step no later than bound [s]; return its accepted time.
@@ -226,11 +301,12 @@ class AdaptiveSolver:
             domain_failure = False
             try:
                 with np.errstate(over="raise", invalid="raise", divide="raise"):
-                    candidate, error = (
-                        self._rk23(self.time, self._state, h)
-                        if self.method == "rk23"
-                        else self._ros2(self.time, self._state, h)
-                    )
+                    trial = {
+                        "rk23": self._rk23,
+                        "ros2": self._ros2,
+                        "ros3": self._ros3,
+                    }[self.method]
+                    candidate, error = trial(self.time, self._state, h)
                     scale = self.atol + self.rtol * np.maximum(
                         np.abs(self._state), np.abs(candidate)
                     )
@@ -243,7 +319,7 @@ class AdaptiveSolver:
                 self._time = bound if h == bound - self.time else self.time + h
                 self.statistics.accepted += 1
                 self.last_error = norm
-                exponent = -1 / (3 if self.method == "rk23" else 2)
+                exponent = -1 / (2 if self.method == "ros2" else 3)
                 factor = (
                     5.0
                     if norm == 0
@@ -255,7 +331,7 @@ class AdaptiveSolver:
                 return self.time
             self.statistics.rejected += 1
             self.statistics.domain_rejected += int(domain_failure)
-            exponent = -1 / (3 if self.method == "rk23" else 2)
+            exponent = -1 / (2 if self.method == "ros2" else 3)
             h *= (
                 0.5
                 if not np.isfinite(norm)

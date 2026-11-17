@@ -41,6 +41,11 @@ rendering time/revision separately. `executed_source.py` preserves the original
 source when the renderer changes. Missing numerical data requires one data-saving
 refresh; images and printed endpoint tables cannot recover missing histories.
 
+The execution banner displays the original script's elapsed wall time from
+`elapsed_seconds`, never `render_elapsed_seconds`. This measures the complete
+original execution, including setup and any plotting within that script; it is
+not an isolated physics-kernel benchmark. Replotting preserves this duration.
+
 Save compact plotted summaries: observation times, counts, histogram bins,
 quantiles and the settings needed to interpret them. Do not save full particle
 states, checkpoints, trajectories or unused diagnostics. The serialized numeric
@@ -85,6 +90,12 @@ notebooks remain in Git history at `4f669de11`, recorded as `archive_revision`
 in `website/migration-inventory.json`. They are no longer stored in the checkout.
 Internal execution uses temporary notebook objects to capture
 rich outputs, without introducing a second maintained source file.
+
+Keep the scientific library unchanged during a refresh. Publication records its
+source hash before execution and rejects a different hash afterward, preserving
+the previous bundle. The reported Particula version comes from that checkout;
+when installed distribution metadata differs, it is retained separately as
+`particula-distribution` rather than used to label the executed source.
 
 Figures are exported at 300 DPI. Captured diagnostics retain repository-relative
 filenames and line numbers; local account and checkout paths are redacted before

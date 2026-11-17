@@ -13,34 +13,24 @@
 # ---
 
 # %% [markdown]
-# # Cough Droplets Partitioning
+# # Audit a respiratory-droplet illustration before using its predictions
 #
-# Welcome to the **Cough Droplets Partitioning** notebook—a step-by-step walkthrough to help you set up and run **multi-component aerosol simulations** using the [**Particula**](https://github.com/uncscode/particula) Python package.
+# An evaporation calculation can conserve mass and still represent the wrong
+# materials. This example follows a multicomponent droplet population in initially
+# 30% RH air, while exposing a necessary earlier step: checking that requested
+# chemical names resolve to the intended species.
 #
-# This example focuses on modeling **cough droplets**, a mixture of water, salts, and biological materials, as they **evaporate** under different humidity conditions.
+# **The retained property lookup fails that identity check.** In the saved output,
+# “Lysozyme” resolves to hexachlorophene and “IgA” to isoguanine; the requested
+# calcium and magnesium bicarbonates resolve to carbonates. Those are different
+# substances, not acceptable protein or salt surrogates established by this example.
+# Consequently the results illustrate the workflow and its input-audit failure;
+# they must not be interpreted as quantitative respiratory-droplet or exposure
+# predictions.
 #
-# ### 🌟 What This Notebook Covers
-#
-# In this notebook, you’ll learn how to:
-#
-# 1. **Model realistic aerosol particles** (like cough droplets)
-# 2. **Set up species properties** (molar masses, densities, hygroscopicity)
-# 3. **Construct gas-phase and particle-phase objects**
-# 4. **Run isothermal evaporation simulations**
-# 5. **Visualize how particle size and composition change over time**
-#
-# ### 💡 Why It Matters
-#
-# Cough droplets are central to human exposure studies:
-#
-# * They can carry infectious agents
-# * Influence **indoor air quality**
-# * Affect **aerosol dynamics** in confined environments like classrooms, hospitals, or aircraft cabins
-#
-# ### 🚀 Getting Started
-#
-# This notebook is beginner-friendly. No prior experience with **Particula** or aerosol modeling is needed. Each step is clearly explained and includes code snippets to help you build intuition and experiment with your own setups.
-#
+# Read [condensation and evaporation](../processes/condensation/condensation_3_massresolved.py)
+# for the mass-transfer mechanism. The useful question here is what additional
+# checks are required before adapting that mechanism to a material mixture.
 
 # %%
 # 🚧 Install Particula if you're running this in Google Colab
@@ -55,6 +45,9 @@ import numpy as np  # numerical tools
 import particula as par  # the main Particula package
 from particula.dynamics.condensation.species_mapping import (
     CondensationSpeciesMap,
+)
+from particula.execution.gpu_resident_condensation import (
+    GPUResidentCondensation,
 )
 from tqdm import tqdm  # optional: for progress bars during simulation
 
@@ -78,47 +71,20 @@ plt.rcParams.update(
 
 
 # %% [markdown]
-# ## 🧪 Defining Chemical Species in Cough Droplets
+# ## Compare requested labels with resolved identities
 #
-# In this section, we define the **chemical makeup** of the simulated cough droplets. These are **multi-component aerosols** made up of water, salts, buffers, proteins, and other organics commonly found in human respiratory fluids.
+# The twelve requested labels span water, salts, small organics, and biological
+# materials. The utility first attempts an exact lookup and can fall back to a
+# similar name. Printing the returned name, CAS identifier, and structure is
+# therefore a scientific input check, not merely a status message. The mismatches
+# identified above invalidate the claim that these arrays describe the requested
+# respiratory-fluid composition.
 #
-# ### 🔬 Chemical Components
-#
-# We create a list of **12 representative chemicals** that capture the diversity of real cough droplet composition:
-#
-# * **Water** (main solvent)
-# * **Inorganic salts** like NaCl, KHCO₃, KH₂PO₄, Ca(HCO₃)₂, Mg(HCO₃)₂
-# * **Organic compounds** like urea, glucose, and lactate
-# * **Biological macromolecules** like **lysozyme**, **IgA**, and **cholesterol**
-#
-# ### 📊 Initial Mass Fractions
-#
-# For each chemical, we define a **range of initial mass fractions** that represent its likely concentration in fresh respiratory droplets. These values are approximate and intended to capture real-world variability.
-#
-# ### ⚙️ Automatic Property Retrieval
-#
-# Using Particula’s `get_chemical_search()` and `get_chemical_stp_properties()` utilities, we fetch:
-#
-# * **Molar mass** *(kg/mol)*
-# * **Density** *(kg/m³)*
-# * **Surface tension** *(N/m)*
-# * **Vapor pressure** *(Pa)*
-# * **Molecular identity** (e.g. SMILES, CAS)
-#
-# These properties are needed to accurately simulate **evaporation, condensation, and phase partitioning**.
-#
-# ### 🛠 Manual Adjustment
-#
-# We manually correct the surface tension for **NaCl**, since tabulated value was for the solid phase. Here, we use a typical value of `0.091 N/m`.
-#
-# ### 🧾 Output
-#
-# For each species, the notebook prints:
-#
-# * Name, CAS identifier, SMILES string
-# * Molar mass, density, surface tension, and vapor pressure
-#
-# This lets you verify the chemical setup before moving forward with building the aerosol system.
+# The independently sampled mass ranges are illustrative and lack a cited
+# composition dataset here. Molar masses are kg/mol, densities kg/m³, surface
+# tensions N/m, and vapor pressures Pa. The NaCl surface-tension override is an
+# assumed constant; it is not a concentration-dependent electrolyte model.
+# A verified identity and a numerical property value are separate requirements.
 
 # %%
 list_of_chemicals = [
@@ -185,39 +151,16 @@ for chem, props in chemical_dict.items():
     print(f"  Vapor Pressure: {props['pure_vapor_pressure']} Pa\n")
 
 # %% [markdown]
-# ## 🧮 Step 1: Set Up Particle and Species Properties
+# ## Distinguish reproducible inputs from validated inputs
 #
-# ### 🎲 Reproducibility
+# The sample contains 1000 particles at 10⁻⁴ cm⁻³ (100 m⁻³), corresponding to
+# 10 m³ represented volume, at 298.15 K. The fixed sampling seed controls this
+# realization, not the accuracy of the material model.
 #
-# To ensure that simulations can be reproduced exactly (e.g. for comparison or debugging), we seed NumPy’s random number generator:
-#
-# ```python
-# np.random.seed(100)
-# ```
-#
-# ---
-#
-# ### 🧫 1a. Define Particle Sampling and Environmental Conditions
-#
-# We now define the **simulation scale** and **temperature conditions**:
-#
-# * `number_of_samples`: number of particles we’ll track individually
-# * `total_number_per_cm3`: assumed number concentration in the air
-# * `simulation_volume`: computed simulation volume based on the above
-# * `temperature`: constant system temperature (isothermal)
-#
-# This configuration controls the **scale and realism** of the simulation.
-#
-# ---
-#
-# ### 🌡 1b. Assign Vapor Pressure Strategies
-#
-# Each species needs a **vapor pressure strategy**, which defines how readily it transitions between the gas and particle phases.
-#
-# We retrieve each species’ vapor pressure (at room temperature), and if missing, assign a **small fallback value**. Then we use Particula’s `ConstantVaporPressureBuilder` to build the vapor behavior for each compound.
-#
-# > ⚠️ Surface tensions are also cleaned: if missing, a default of `0.072 N/m` is applied (typical for water at 25°C).
-#
+# Missing vapor pressures are replaced by 10⁻³⁰ Pa, making those lanes nearly
+# nonvolatile. Missing surface tensions receive 0.072 N/m. These substitutions
+# allow execution; they do not resolve missing measurements or incorrect
+# identities. Record them as assumptions before interpreting any partitioning.
 
 # %%
 # %% Step 1: Define system size, temperature, and vapor pressure strategies
@@ -258,32 +201,15 @@ surface_tension_array = np.array(
 )
 
 # %% [markdown]
-# ## 🌬 Step 2: Set Up the Gas-Phase Environment
+# ## Initialize a finite gas reservoir at 30% saturation
 #
-# To simulate how particles exchange mass with the air (e.g. water evaporating), we need to define the surrounding **gas-phase composition** and **thermodynamic conditions**.
+# Water gas concentration is 0.3 times its modeled saturation concentration;
+# other vapor lanes start near zero. Gas names retain the requested labels even
+# when property lookup returned another substance, so names in a container do
+# not certify the underlying material identity.
 #
-# ### 💧 Relative Humidity for Water
-#
-# We begin by setting **near-zero concentrations** for all species in the gas phase to simulate dry air. Then we adjust the water vapor concentration to simulate a **30% relative humidity** environment:
-#
-# * The saturation concentration for water is calculated using its vapor pressure strategy.
-# * The RH is applied by multiplying by 0.3.
-#
-# ### 🧪 Building Gas-Phase Species
-#
-# We use native `GasData` to define:
-#
-# * Species names and molar masses
-# * Their ability to partition
-# * Gas mass concentrations in kg/m³
-#
-# Vapor-pressure strategies are supplied explicitly to the process below.
-# * Initial gas-phase concentrations
-#
-# ### 🌡 Creating gas and environment state
-#
-# Finally, we construct the atmosphere with temperature, pressure, and link the gas-phase species. This environment will be used to govern **evaporation/condensation dynamics** during the simulation.
-#
+# Temperature is fixed at 298.15 K and pressure at 101325 Pa. Humidity is only
+# initialized here. The active loop does not reset it to 30% at each step.
 
 # %% Step 2: Define gas-phase concentrations and thermodynamic environment
 
@@ -310,40 +236,20 @@ environment = par.gas.EnvironmentData(
 )
 
 # %% [markdown]
-# ## 💠 Step 3: Define Particle Composition and Build the Aerosol Phase
+# ## Track what the composition sampling actually constructs
 #
-# Now that the gas-phase environment is ready, we define the **particle-phase system**—realistic cough droplets containing a mix of water, salts, organics, and proteins.
+# The three supplied radius modes are 0.3, 4, and 40 µm with relative weights
+# 15, 2, and 0.2. They define an illustrative sample, not a validated cough-size
+# distribution. Water-equivalent spherical mass is multiplied independently by
+# each sampled composition factor. Those factors are not jointly normalized,
+# so the final total mass and reconstructed radius need not exactly equal the
+# water-only sample from which they were built.
 #
-# ### 🌡 3a. Size Distribution of Cough Droplets
-#
-# Human coughs produce droplets from different regions of the respiratory tract, which can be modeled using **lognormal size distributions**:
-#
-# * **Bronchiolar:** smaller mode (\~0.3 μm radius)
-# * **Laryngeal:** medium mode (\~4 μm radius)
-# * **Oropharyngeal:** large mode (\~40 μm radius)
-#
-# We use `par.particles.get_lognormal_sample_distribution()` to sample droplet **radii** based on these modes, weighted by their relative occurrence.
-#
-# ### 💧 3b. Assign Mass Composition
-#
-# We assume all particles start as **water droplets**, then apply **random mass fractions** to simulate different droplet compositions. These fractions are sampled from the ranges defined earlier for each chemical species.
-#
-# ### ⚗️ 3c. Define Activity and Surface Strategies
-#
-# We use **κ-Köhler theory** to estimate hygroscopicity, setting `kappa` values for each species. This is fed into `ActivityKappaParameterBuilder`.
-#
-# We also define a **surface tension strategy** that accounts for the mass of each component using `SurfaceStrategyMassBuilder`.
-#
-# ---
-#
-# ### 🧱 Create the Resolved Particle and Aerosol System
-#
-# We construct native resolved `ParticleData` and an **Aerosol** from:
-#
-# * Particle-phase definition (`resolved_masses`)
-# * Ordered `GasData` and separate `EnvironmentData`
-#
-# This sets up the full simulation-ready aerosol system.
+# The κ array is assumed, with water in lane zero. Each species receives its
+# own surface-phase label, so this configuration retains species-specific surface
+# tensions rather than averaging them across one shared liquid phase. It does
+# not calculate physical phase separation. The inventory helper counts weighted
+# particle mass plus gas mass in the represented volume.
 
 # %% Step 3: Define particle composition and create aerosol object
 
@@ -419,38 +325,17 @@ def species_inventory(aero):
 initial_inventory = species_inventory(aerosol)
 
 # Optional: print summary of aerosol system
-print(aerosol)
+print("Particle slots:", aerosol.particles.masses.shape[1])
+print("Gas species:", ", ".join(aerosol.gas.name))
 
 # %% [markdown]
-# ## 📊 Step 4: Visualize the Initial Particle Size Distribution
+# ## Inspect the initialized distribution on its own terms
 #
-# Before simulating evaporation or chemical evolution, let’s examine the initial state of the aerosol system we’ve just created.
-#
-# ### 🧾 Summary of the Initialized System
-#
-# At this point, the system contains:
-#
-# * **Gas Mixture** at:
-#
-#   * Temperature: `298.15 K`
-#   * Pressure: `101325 Pa` (1 atm)
-#   * Partitioning Species: Water, salts, organics, proteins
-# * **Particle Representation**:
-#
-#   * Strategy: `ParticleResolvedSpeciatedMass`
-#   * Activity Model: `ActivityKappaParameter`
-#   * Surface Model: `SurfaceStrategyMass`
-#   * Mass Concentration: \~`1.6 × 10⁻⁹ kg/m³`
-#   * Number Concentration: `1.0 × 10² #/m³`
-#
-# ### 📈 Plotting Initial Size Distribution
-#
-# To visualize the initial aerosol size distribution:
-#
-# * We extract particle **radii** using `aerosol.particles.radii[0]`
-# * Convert to **log10 scale** (standard for aerosol data)
-# * Plot a histogram to show how particle sizes are distributed
-#
+# The histogram counts sampled **radii** per logarithmic bin. It is not yet a
+# number concentration or a diameter spectrum. The native `ParticleData` stores
+# the species masses and represented counts; its derived radii include the
+# sampled composition and densities. This is the appropriate initialized state
+# to compare with later sizes.
 
 # %% Step 4: Plot initial particle size distribution
 
@@ -471,29 +356,14 @@ plt.tight_layout()
 plt.show()
 
 # %% [markdown]
-# ## 🔁 Step 5: Define Aerosol Dynamics – Condensation & Coagulation
+# ## Separate a configured process from an executed process
 #
-# To simulate how aerosol particles **evolve in time**, we need to define physical processes that change their size, mass, and composition.
-#
-# In this example, we model:
-#
-# ### 💧 5a. Isothermal Condensation
-#
-# We simulate **mass transfer from the gas phase to particles** via isothermal condensation. Particula’s `CondensationIsothermal` model accounts for:
-#
-# * **Molar mass** of each species
-# * **Diffusion coefficient** (typically \~2e-5 m²/s for air)
-# * **Accommodation coefficient** (set to 1 for full sticking)
-#
-# This sets up a `MassCondensation` process that can be used during time evolution.
-#
-# ### ⚪ 5b. Brownian Coagulation
-#
-# We also define a **Brownian coagulation process**, where particles randomly collide and merge based on their sizes and thermal motion. This uses Particula’s:
-#
-# * `BrownianCoagulationBuilder()` with `particle_resolved` distribution
-# * Wrapped into a `Coagulation` object
-#
+# Condensation/evaporation maps all twelve lanes, with a common diffusivity
+# 2×10⁻⁵ m²/s and accommodation one. These are simplifying assumptions across
+# a chemically diverse set of requested labels. A Brownian process is also
+# constructed, but its execution is commented out in the loop below. The saved
+# calculation therefore contains mass transfer alone, without coagulation,
+# ventilation, sedimentation removal, or temperature feedback.
 
 # %%
 # %% Step 5: Set up physical aerosol processes
@@ -523,51 +393,28 @@ coagulation_strategy = (
 coagulation_process = par.dynamics.Coagulation(coagulation_strategy)
 
 # %% [markdown]
-# ## ⏱ Step 6: Run the Simulation Loop
+# ## Record 20 seconds of adaptive closed mass transfer
 #
-# Now that the aerosol system and physical processes are set up, we simulate how particles **change over time** due to **condensation** and optionally **coagulation**.
+# There are 201 stored states, including both endpoints of the full 20 s run.
+# ROS3 adapts condensation steps inside each 0.1 s output interval, with rtol
+# 10⁻⁵, particle atol 10⁻²⁵ kg and gas atol 10⁻¹² kg/m³. Water exchanges with a
+# finite gas reservoir. Better integration does not repair uncertain chemical
+# properties or validate respiratory-fluid predictions.
 #
-# ---
+# At every stored state, the assertion compares each gas-plus-particle inventory
+# with its initial value at rtol=10⁻¹² and atol=10⁻³⁰ kg. This checks material
+# accounting for the supplied arrays; it cannot detect that a property array
+# belongs to the wrong chemical. Radius-bin counts, bulk particle species masses,
+# and vapor saturation ratios support distinct diagnostics below.
 #
-# ### ⚙️ Simulation Settings
-#
-# * **Duration:** 19.9 seconds
-# * **Stored states:** 200 (199 updates at 0.1 s)
-# * **Condensation sub-steps:** 10 (to improve resolution for fast vapor interactions)
-# * **Coagulation sub-steps:** 1 (low priority here due to low concentration)
-#
-# ```python
-# time_step = total_time / total_steps
-# time_array = np.arange(total_steps) * time_step  # recorded 0..19.9 s
-# ```
-#
-# ---
-#
-# ### 💾 Data Tracking
-#
-# At each time step, we record:
-#
-# * Particle **size distribution** (histogram of radii)
-# * **Species mass** across all particles
-# * **Gas-phase saturation ratio** for each chemical
-#
-# The size distribution is stored in log-spaced bins ranging from **10⁻⁸ to 10⁻⁴ m** — a typical range for atmospheric aerosol particles.
-#
-# ---
-#
-# ### 🧪 Optional: Toggle Physical Processes
-#
-# Users can choose to:
-#
-# * **Fix the water vapor concentration** (e.g. simulate a constant RH environment)
-# * **Disable condensation or coagulation** individually to isolate effects
-#
-# These are included as commented lines in the code and easy to turn on/off.
-#
+# All twelve materials exchange on CUDA. The adaptive clock, acceptance and
+# step-size decisions execute inside a native CUDA conditional graph. Snapshots
+# explicitly download the 201 requested observations. Internal work counts are
+# printed by the run; inventory checks alone do not establish convergence.
 
 # %% Step 6: Run the simulation loop
 
-print(aerosol)  # print system state before simulation
+print("Initial gas concentration (kg/m^3):", aerosol.gas.concentration)
 
 # 🔁 Deep copy for simulation
 aerosol_process = copy.deepcopy(aerosol)
@@ -576,11 +423,8 @@ aerosol_process = copy.deepcopy(aerosol)
 total_time = 20  # seconds
 total_steps = 200
 
-condensation_sub_step = 10
-coagulation_sub_step = 1
-
 time_step = total_time / total_steps
-time_array = np.arange(total_steps) * time_step  # recorded 0..19.9 s
+time_array = np.linspace(0.0, total_time, total_steps + 1)
 time_len = len(time_array)
 
 # 📊 Initialize arrays for tracking outputs
@@ -589,29 +433,26 @@ distribution_counts = np.zeros((time_len, len(bins_lognormal) - 1))
 species_mass = np.zeros((time_len, len(list_of_chemicals)))
 vapor_saturation = np.zeros((time_len, len(list_of_chemicals)))
 
+simulation = GPUResidentCondensation(
+    aerosol_process,
+    condensation_strategy,
+    device="cuda:0",
+    method="ros3",
+    rtol=1e-5,
+    particle_atol=1e-25,
+    gas_atol=1e-12,
+    first_step=1e-6,
+    max_step=time_step,
+)
+
 # 🌀 Time integration loop
 for step, _t in enumerate(
     tqdm(time_array, desc="Running Sim", mininterval=0.5)
 ):
     if step > 0:
-        # Optional: fix water vapor concentration (e.g. controlled RH)
-        # aerosol_process.gas.concentration[0, 0] = (
-        #     aerosol.gas.concentration[0, 0]
-        # )
-
-        # 💧 Execute condensation
-        aerosol_process = condensation_process.execute(
-            aerosol=aerosol_process,
-            time_step=time_step,
-            sub_steps=condensation_sub_step,
-        )
-
-        # ⚪ Optional: execute coagulation
-        # aerosol_process = coagulation_process.execute(
-        #     aerosol=aerosol_process,
-        #     time_step=time_step,
-        #     sub_steps=coagulation_sub_step,
-        # )
+        while simulation.time < float(_t):
+            simulation.step(float(_t))
+        aerosol_process = simulation.snapshot()
 
     # Record size distribution
     distribution_counts[step, :], edges = np.histogram(
@@ -647,27 +488,20 @@ for step, _t in enumerate(
 # Normalize counts to number concentration (#/m³)
 concentrations = distribution_counts / simulation_volume
 
-# Final system state
-print(aerosol_process)
+# Final system state and actual adaptive work
+print("Final gas concentration (kg/m^3):", aerosol_process.gas.concentration)
+print("Adaptive condensation work:", simulation.statistics)
 
 # %% [markdown]
-# ## 📉 Step 7: Compare Initial and Final Size Distributions
+# <a id="initial-and-final-sizes-what-to-look-for"></a>
 #
-# This plot shows how the **particle size distribution** evolved during the simulation.
+# ## Compare initial and final sizes
 #
-# ### 📌 What It Shows:
-#
-# * **Dashed line**: Initial size distribution before simulation
-# * **Solid line**: Final distribution after 19.9 seconds
-# * **X-axis (log scale)**: Particle radius in meters
-# * **Y-axis**: Particle number concentration (#/m³)
-#
-# ### 🧪 Initial and final sizes: what to look for
-#
-# * If the **final peak shifts left**, particles are **shrinking** due to **evaporation**
-# * If the peak moves right or broadens, it may indicate **condensation or growth**
-# * In this case, we observe a **leftward shift** for larger particles, consistent with **net evaporation**
-#
+# The dashed and solid curves use the same radius bins. Their vertical values
+# are number concentration **per bin** in m⁻³, not dN/dr. A shift toward smaller
+# radii is consistent with net evaporation under the modeled inputs; it does not
+# by itself prove equilibrium or a validated droplet lifetime. Particles moving
+# outside the histogram's limits would also change the plotted bin sum.
 
 # %% Step 7: Plot initial vs final size distributions
 
@@ -712,30 +546,17 @@ plt.tight_layout()
 plt.show()
 
 # %% [markdown]
-# ## 💧 Step 8: Track Water Vapor Saturation Over Time
+# ## Read gas saturation separately from particle equilibrium
 #
-# To understand how the gas phase responds during the simulation, we track the **vapor saturation ratio for water** (RH) throughout the 19.9 seconds.
+# The water saturation ratio divides gas concentration by pure-water saturation
+# concentration at the fixed temperature. Unity means saturation relative to that
+# reference, not equilibrium for every curved, multicomponent particle.
 #
-# ### 🔍 What Is the Saturation Ratio?
-#
-# The **saturation ratio** is the ratio of actual vapor concentration to the saturation vapor concentration at a given temperature. For water:
-#
-# $$
-# \text{Saturation Ratio} = \frac{C_{\text{vapor}}}{C_{\text{sat}}}
-# $$
-#
-# * **1.0** indicates equilibrium (100% RH)
-# * **< 1.0** indicates subsaturation
-# * **> 1.0** indicates supersaturation
-#
-# ### 📌 What We Learn:
-#
-# In this case, the saturation ratio remains **nearly constant**, meaning:
-#
-# * The **amount of water vapor in the gas phase** is high enough
-# * The **mass transferred into particles** (via condensation or evaporation) is **too small** to significantly disturb the vapor reservoir
-#
-# This is typical in **low mass-loading regimes**, such as indoor air with sparse respiratory aerosols.
+# The small reservoir change in the saved run reflects this population's low
+# loading relative to gas water. It is an outcome of the chosen volume and
+# concentrations, not a general claim that humidity stays constant near a cough.
+# The lower axis limit is 0.3, so inspect the actual vertical scale when judging
+# the change.
 
 # %% Step 8: Plot water vapor saturation ratio over time
 
@@ -759,18 +580,17 @@ plt.tight_layout()
 plt.show()
 
 # %% [markdown]
-# ## 🧪 Step 9: Track Composition Evolution – Particle Mass Fractions
+# ## Identify the weighting behind a composition plot
 #
-# As water evaporates from particles, their **composition changes** over time. This plot shows the **mean mass fraction** of each species remaining in the particles during the simulation.
+# The stack plot divides **summed particle species mass** by **summed total
+# particle mass**. It is a bulk mass fraction, not an arithmetic average of each
+# particle's composition, despite the retained “Mean” axis label. Larger
+# particles can dominate this diagnostic. It cannot on its own identify which
+# size class retains water longer.
 #
-# ### 📌 What This Plot Tells Us:
-#
-# * **Water** (sky blue) dominates at the start
-# * As evaporation progresses, **non-volatile species** (salts, organics, proteins) become **relatively more concentrated**
-# * **Supermicron particles** (initially 4–40 μm) retain water much longer, showing water mass persists before stabilizing.
-#
-# This plot illustrates **size-dependent evaporation timescales**: larger droplets lose water more slowly due to lower surface-area-to-volume ratios.
-#
+# Legend names come from the resolved property entries. Their disagreement with
+# the requested labels is further evidence of the identity problem, not a change
+# of species caused by evaporation.
 
 # %% Step 9: Plot particle mass fraction evolution
 
@@ -817,24 +637,16 @@ plt.tight_layout()
 plt.show()
 
 # %% [markdown]
-# ## 📈 Step 10: Size Distribution Evolution Over Time
+# <a id="time-evolution-what-to-look-for"></a>
 #
-# This **contour plot** shows how the **number concentration** of aerosol particles changes **across time and particle size**. It's an excellent way to visualize both **evaporation dynamics** and **distribution narrowing**.
+# ## Follow size redistribution without overinterpreting a plateau
 #
-# ### 🔍 Time evolution: what to look for
-#
-# * The **Y-axis (log scale)** shows particle radius from $10^{-7}$ to $10^{-4}$ meters
-# * The **X-axis** tracks simulation time from 0 to 19.9 seconds
-# * The **color map** shows $\log_{10}$ of number concentration (#/m³)
-#
-# ### 💧 Interpretation:
-#
-# * **Supermicron particles** (initially >1 µm) evaporate **rapidly** in the first few seconds
-# * As water is lost, particles shrink and the size distribution **stabilizes**
-# * Smaller droplets reach their equilibrium sizes **faster** due to greater surface-to-volume ratios
-#
-# This plot captures the **transient drying behavior** of cough droplets in a controlled environment.
-#
+# The contour displays log₁₀ of number concentration per radius bin through time.
+# It complements the bulk mass-fraction plot by retaining size information.
+# A slowly changing band is not sufficient evidence of thermodynamic equilibrium;
+# that would require examining mass-transfer rates and convergence as well.
+# The plotted range omits radii below 0.1 µm even though the stored histogram
+# extends lower.
 
 # %% Step 10: Contour plot of particle size distribution over time
 
@@ -865,36 +677,16 @@ plt.tight_layout()
 plt.show()
 
 # %% [markdown]
-# ## ✅ Summary: Modeling Cough Droplet Evaporation with Particula
+# ## Carry forward the audit, not an unsupported material prediction
 #
-# In this notebook, we used **Particula** to simulate the **isothermal evaporation of cough droplets** in a well-mixed air environment. We walked step-by-step through the setup of both **gas-phase and particle-phase systems**, created a realistic **multicomponent chemical composition**, and applied condensation dynamics to understand how droplets evolve over time.
+# The workflow links sampled composition, finite-reservoir evaporation, and size
+# and mass diagnostics. Its inventory checks pass for the supplied numerical
+# species, but the identity mismatches prevent interpreting those results as
+# respiratory-fluid behavior. Successful execution is not material validation.
 #
-# The simulated particles ranged from **submicron to supermicron sizes**, following a lognormal distribution that reflects real-world respiratory emissions. As expected, **supermicron particles took significantly longer for their water mass fraction to decrease**, highlighting the importance of size when modeling indoor exposure or transport of pathogens.
-#
-# We tracked changes in **size distribution**, **vapor saturation ratio**, and **particle composition** over time, and visualized how water loss drives dynamic shifts in mass fraction and droplet behavior.
-#
-# ---
-#
-# ## 🧠 Take-Home Points
-#
-# 1. **Multicomponent aerosols are easy to build with Particula**
-#    You can represent realistic droplet mixtures using species-specific mass fractions, thermodynamic properties, and hygroscopicity (κ values).
-#
-# 2. **Water loss dominates early evaporation dynamics**
-#    In low humidity environments, water rapidly evaporates from smaller particles, while larger ones persist due to slower mass transfer rates.
-#
-# 3. **Gas–particle coupling is size- and concentration-dependent**
-#    In this example, the **gas-phase RH stayed nearly constant**, showing that low particle loading may have minimal impact on ambient vapor conditions.
-#
-# 4. **Particula supports modular, testable dynamics**
-#    Processes like condensation, coagulation, and even fixed-RH simulations can be toggled and combined, offering flexibility for exploring a wide range of scenarios.
-#
-# ---
-#
-# This notebook provides a **foundational example** for respiratory aerosol simulations. You can now extend it to test:
-#
-# * Different **relative humidity levels**
-# * Effects of **ventilation or air exchange**
-# * **Indoor vs. outdoor aerosol transport scenarios**
-# * Inclusion of **more complex chemistry or temperature effects**
-#
+# Before a research adaptation, replace fuzzy matches with verified identifiers
+# and documented properties or explicitly justified macromolecular surrogates.
+# Normalize the intended starting composition, choose a defensible activity and
+# surface model, then rerun the full calculation. Compare size-resolved water
+# loss across humidity and timestep, using measured evaporation data to test the
+# material assumptions. None of that validation is supplied by the retained run.

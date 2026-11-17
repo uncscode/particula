@@ -1,4 +1,4 @@
-"""Native Warp condensation with device-resident RK3(2) trial state.
+"""Native Warp condensation with resident RK3(2) or ROS3 trial state.
 
 Construction explicitly uploads detached native state/configuration. Each
 step uses a host-controlled shared maximum-error clock and downloads only
@@ -13,17 +13,21 @@ import numpy as np
 import warp as wp
 
 from particula import _cpu_batch
-from particula.dynamics import CondensationIsothermal, MassCondensation
+from particula.dynamics import CondensationIsothermal
 from particula.execution import _condensation_ode_kernels as algebra
+from particula.execution import _condensation_reservoirs as reservoirs
+from particula.execution._adaptive_condensation_physics import material_rates
+from particula.execution._adaptive_condensation_plan import (
+    plan_adaptive_condensation,
+)
+from particula.execution.forcing import forcing_interval
 from particula.execution.ode import (
     AdaptiveSolver,
     StepStatistics,
     TrialDomainError,
 )
-from particula.execution.prepared_condensation import plan_condensation
 from particula.gpu.kernels import condensation as physics
 from particula.gpu.kernels.thermodynamics import _refresh_vapor_pressure_kernel
-from particula.util import constants
 
 
 class GPUCondensationODE:
@@ -32,14 +36,18 @@ class GPUCondensationODE:
     particle_atol is kg per particle; gas_atol is kg/m3. Scalar or full native
     shapes are accepted. rtol is a dimensionless scalar. All boxes share one
     accepted time and a maximum error, including small species. The physical
-    profile is the existing mapped constant/Buck GPU rate with one volatile
-    material; zero constant vapor pressure also represents involatile uptake.
+    profile supports mapped constant/Buck vapor pressures, ideal/kappa activity
+    for all materials and mass/molar/volume surface phases. Zero constant vapor
+    pressure also represents involatile uptake.
     Native discrete and resolved measures are supported; PDF and latent heat
     are rejected. Full active-slot evaporation remains a domain boundary.
+    ROS3 retains cross-material Jacobian blocks and conservative gas coupling
+    in storage linear in particle count and quadratic in exchanging materials.
 
     Optional forcing is a pure time -> (temperature[K], pressure[Pa]) callback.
-    Every stage explicitly uploads those box values. Discontinuities require
-    explicit step boundaries. No arbitrary/stochastic runnable is adapted.
+    Every stage explicitly uploads those box values. EnvironmentForcing tables
+    impose knot boundaries; opaque discontinuous callbacks require explicit
+    step boundaries. No arbitrary/stochastic runnable is adapted.
     Capture is unsupported because each trial reads control reductions on host.
     """
 
@@ -61,8 +69,8 @@ class GPUCondensationODE:
         forcing=None,
     ):
         """Validate physics and explicitly upload fixed buffers."""
-        if method != "rk23":
-            raise ValueError("native GPU condensation supports rk23 only")
+        if method not in ("rk23", "ros3"):
+            raise ValueError("native GPU condensation supports rk23 or ros3")
         if type(strategy) is not CondensationIsothermal:
             raise TypeError(
                 "GPU adaptive rates require isothermal condensation"
@@ -75,15 +83,14 @@ class GPUCondensationODE:
             raise ValueError(
                 "GPU adaptive condensation requires discrete or resolved state"
             )
-        if not np.any(aerosol.particles.concentration > 0):
-            raise ValueError(
-                "GPU adaptive condensation requires an active population"
-            )
         self._base = _cpu_batch.detached(aerosol)
         self._strategy = deepcopy(strategy)
         self._forcing = forcing
-        self._plan = plan_condensation(
-            MassCondensation(self._strategy), self._base, allow_zero_vapor=True
+        self._plan = plan_adaptive_condensation(self._strategy, self._base)
+        pairs = tuple(
+            (source, target)
+            for source, target in self._plan.values["pairs"]
+            if self._base.gas.partitioning[source]
         )
         self._time = AdaptiveSolver._scalar(time, "time", positive=False)
         self.min_step = AdaptiveSolver._scalar(min_step, "min_step")
@@ -138,7 +145,11 @@ class GPUCondensationODE:
         )
         relative = AdaptiveSolver._scalar(rtol, "rtol", positive=False)
         self.device_storage_bytes = 0
-        self._state = self._array(physical / self._host_scale)
+        self._host_initial_physical = physical.copy()
+        self._host_initial_scaled = physical / self._host_scale
+        self._initial_physical = self._array(self._host_initial_physical)
+        self._initial_scaled = self._array(self._host_initial_scaled)
+        self._state = self._array(self._host_initial_scaled)
         self._scale = self._array(self._host_scale)
         self._atol = self._array(absolute)
         self._rtol = self._array(np.full(self._size, relative))
@@ -150,6 +161,18 @@ class GPUCondensationODE:
         self._allocate_physics()
         # Probe the actual device rate before exposing a usable owner.
         self._rate(self.time, self._state, self._rates[0])
+        self._ros3: Any = None
+        if method == "ros3":
+            from particula.execution._gpu_condensation_ros3 import ROS3Stages
+
+            if len(pairs) == 1:
+                self._ros3 = ROS3Stages(self, pairs[0])
+            else:
+                from particula.execution._gpu_condensation_block_ros3 import (
+                    BlockROS3Stages,
+                )
+
+                self._ros3 = BlockROS3Stages(self, pairs)
         self.statistics = StepStatistics()
         self.control_readbacks = 0
 
@@ -189,7 +212,14 @@ class GPUCondensationODE:
         self._vapor = self._array(np.zeros(self._gas_shape))
         self._effective_tension = self._array(np.zeros(self._shape[:2]))
         self._mass_rate = self._array(np.zeros(self._shape))
+        self._gas_partials = self._array(
+            np.zeros((*self._gas_shape, max(1, min(64, self._shape[1]))))
+        )
         self._tension = self._array(config["tensions"])
+        self._surface_density = self._array(config["surface_density"])
+        self._surface_reference = self._array(config["surface_reference"])
+        self._phases = self._array(config["phases"], wp.int32)
+        self._activity_density = self._array(config["activity_density"])
         self._kappas = self._array(config["kappas"])
         self._references = self._array(config["references"])
         self._accommodation = self._array(config["accommodation"])
@@ -243,12 +273,21 @@ class GPUCondensationODE:
             for value in values
         )
 
-    def _rate(self, time, state, result):
+    def _unpack_trial(self, state):
+        """Validate and unpack device coordinates without a physical rate."""
         self._invalid.zero_()
         self._launch(
             algebra.unpack,
             self._size,
-            [state, self._scale, self._masses, self._gas, self._invalid],
+            [
+                state,
+                self._scale,
+                self._initial_scaled,
+                self._initial_physical,
+                self._masses,
+                self._gas,
+                self._invalid,
+            ],
         )
         self._launch(
             algebra.check_slots,
@@ -264,22 +303,14 @@ class GPUCondensationODE:
             ],
         )
         self._status()
+
+    def _rate(self, time, state, result):
+        self._unpack_trial(state)
         if self._forcing is not None:
             temperature, pressure = self._environment(time)
             self._temperature.assign(np.array(temperature, copy=True))
             self._pressure.assign(np.array(pressure, copy=True))
         config = self._plan.values
-        if config["surface_mode"]:
-            self._launch(
-                physics._effective_surface_tension_kernel,
-                self._shape[:2],
-                [
-                    self._masses,
-                    self._density,
-                    self._tension,
-                    self._effective_tension,
-                ],
-            )
         self._launch(
             _refresh_vapor_pressure_kernel,
             self._gas_shape,
@@ -302,8 +333,8 @@ class GPUCondensationODE:
         )
         self.statistics.rate_calls += 1
         self._launch(
-            physics._mapped_condensation_mass_transfer_kernel,
-            self._shape[:2],
+            material_rates,
+            self._shape,
             [
                 self._masses,
                 self._counts,
@@ -312,31 +343,25 @@ class GPUCondensationODE:
                 self._vapor,
                 self._molar,
                 self._tension,
-                self._kappas,
+                self._surface_density,
+                self._surface_reference,
+                self._phases,
                 self._references,
-                self._effective_tension,
-                wp.int32(1),
+                self._activity_density,
+                self._kappas,
                 wp.int32(config["activity_mode"]),
-                wp.int32(config["surface_mode"]),
                 wp.int32(config["water"]),
                 self._accommodation,
                 self._diffusion,
-                self._latent,
-                wp.int32(0),
-                self._viscosity,
                 self._mean_free_path,
-                wp.float64(constants.GAS_CONSTANT),
-                wp.float64(constants.BOLTZMANN_CONSTANT),
                 self._temperature,
-                wp.float64(1.0),
-                self._mass_rate,
                 self._forward,
-                wp.float64(config.get("kelvin_density", 0.0)),
+                self._mass_rate,
             ],
         )
         self._launch(
             algebra.pack_rate,
-            self._size,
+            self._mass_size,
             [
                 self._mass_rate,
                 self._counts,
@@ -349,6 +374,32 @@ class GPUCondensationODE:
                     self._base.particles.distribution_type
                     == "particle_resolved"
                 ),
+            ],
+        )
+        self._launch(
+            reservoirs.gas_parts,
+            self._gas_partials.shape,
+            [
+                self._mass_rate,
+                self._counts,
+                self._volume,
+                self._reverse,
+                int(
+                    self._base.particles.distribution_type
+                    == "particle_resolved"
+                ),
+                self._gas_partials,
+            ],
+        )
+        self._launch(
+            reservoirs.finish_gas,
+            self._gas_shape,
+            [
+                self._gas_partials,
+                self._mass_size,
+                self._scale,
+                result,
+                self._invalid,
             ],
         )
         self._status()
@@ -367,6 +418,8 @@ class GPUCondensationODE:
         )
 
     def _trial(self, h):
+        if self._ros3 is not None:
+            return self._ros3.trial(self, h)
         k1, k2, k3, k4 = self._rates
         self._rate(self.time, self._state, k1)
         self._combine(h, (0.5, 0, 0), self._stage)
@@ -404,6 +457,11 @@ class GPUCondensationODE:
         """Accept one bounded device trial with scalar control readbacks."""
         self._check_ready()
         bound = AdaptiveSolver._scalar(bound, "bound", positive=False)
+        with forcing_interval(self, bound) as endpoint:
+            return self._step(endpoint)
+
+    def _step(self, bound):
+        """Advance within one smooth forcing interval."""
         if bound < self.time:
             raise ValueError("bound precedes accepted time")
         if bound == self.time:
@@ -450,7 +508,10 @@ class GPUCondensationODE:
     def snapshot(self):
         """Download detached accepted native state, never trial buffers."""
         self._check_ready()
-        values = self._state.numpy() * self._host_scale
+        scaled = self._state.numpy()
+        values = scaled * self._host_scale
+        unchanged = scaled == self._host_initial_scaled
+        values[unchanged] = self._host_initial_physical[unchanged]
         result = _cpu_batch.detached(self._base)
         result.particles.masses[:] = values[: self._mass_size].reshape(
             self._shape

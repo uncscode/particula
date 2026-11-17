@@ -126,8 +126,11 @@ installed. CUDA is optional additive evidence and guarded suites skip cleanly
 when unavailable. The direct call itself provides no automatic transfer or
 CPU fallback.
 Brownian and charged models are also available through the separate
-[prepared runnable interface](../prepared.md); sedimentation and turbulence
-remain direct-only.
+[prepared runnable interface](../prepared.md). It also admits SP2016, ST1956,
+and Brownian plus SP2016. Prepared SP2016 retains the native mean-density
+convention; direct SP2016 uses each particle’s effective density. Masks 4 and 5
+use parallel exact pair maxima with bounded scratch and a 16,384-active-slot
+limit. Other settling mixtures and charged modes retain the 256-slot limit.
 
 Future mechanisms must provide a stable identifier; required host and device
 inputs; property preparation; a sanitized additive pair-rate term; a proven-safe

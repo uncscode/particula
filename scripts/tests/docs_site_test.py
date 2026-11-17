@@ -30,8 +30,11 @@ def test_figures_are_visible_and_stdout_is_escaped():
     assert "<details>" not in result
 
 
-def test_stale_results_are_separated_from_current_code(tmp_path, monkeypatch):
-    """Stale results are separated from current code."""
+@pytest.mark.parametrize("replotted", [False, True])
+def test_stale_results_are_separated_from_current_code(
+    tmp_path, monkeypatch, replotted
+):
+    """Stale results retain original execution timing, including after replot."""
     source = tmp_path / "docs/example.py"
     source.parent.mkdir()
     source.write_text("# %%\nx = 3\n")
@@ -42,8 +45,15 @@ def test_stale_results_are_separated_from_current_code(tmp_path, monkeypatch):
         "device": "CPU",
         "executed_at": "2026-11-13",
         "revision": "abc123456789",
+        "elapsed_seconds": 46.779719744983595,
         "outputs": [[{"text": "2"}]],
     }
+    if replotted:
+        manifest.update(
+            rendered_at="2026-11-16",
+            render_revision="def123456789",
+            render_elapsed_seconds=0.25,
+        )
     monkeypatch.setattr(site, "ROOT", tmp_path)
     monkeypatch.setattr(site, "SITE", tmp_path / "website")
     monkeypatch.setattr(site, "CONTENT", tmp_path / "content")
@@ -52,6 +62,8 @@ def test_stale_results_are_separated_from_current_code(tmp_path, monkeypatch):
     site.render_example("demo", {"source": "docs/example.py", "title": "Demo"})
     page = (tmp_path / "content/example.md").read_text()
     assert "refresh needed" in page
+    assert "Script runtime: **46.78 s**" in page
+    assert "0.25 s" not in page
     assert (
         page.index("x = 3")
         < page.index("Previous run outputs")

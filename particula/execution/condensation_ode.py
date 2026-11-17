@@ -19,6 +19,7 @@ from particula.dynamics.condensation.species_mapping import (
     condensation_population_weights,
     validate_condensation_state,
 )
+from particula.execution.forcing import _EnvironmentSegment, forcing_interval
 from particula.execution.ode import AdaptiveSolver, ODEProblem, TrialDomainError
 
 
@@ -30,7 +31,8 @@ class CondensationODE:
     accepted clock and a maximum component error, so no small box/species can
     be hidden in an average. Forcing, if supplied, is a pure function of time
     returning (temperature[K], pressure[Pa]), each scalar or one value per box.
-    Discontinuities must be explicit run boundaries. Full evaporation of an
+    EnvironmentForcing tables impose knot boundaries; opaque discontinuous
+    callbacks require explicit run boundaries. Full evaporation of an
     active slot is a domain boundary; unsupported crossings fail at min_step.
     """
 
@@ -112,6 +114,8 @@ class CondensationODE:
             for b, g in self._gas_indices
         ]
         self._scale = np.array(mass_scale + gas_scale)
+        self._initial_physical = values.copy()
+        self._initial_scaled = values / self._scale
         mass_tol = self._tolerances(particle_atol, self._shape, "particle_atol")
         gas_tol = self._tolerances(
             gas_atol, self._base.gas.concentration.shape, "gas_atol"
@@ -125,7 +129,7 @@ class CondensationODE:
         )
         self.solver = AdaptiveSolver(
             self.problem,
-            values / self._scale,
+            self._initial_scaled,
             time=time,
             method=method,
             atol=tolerance / self._scale,
@@ -157,6 +161,10 @@ class CondensationODE:
     def _unpack(self, time, values):
         candidate = _cpu_batch.detached(self._base)
         physical = values * self._scale
+        # An unchanged coordinate must survive a scale/unscale round trip
+        # exactly. Changed coordinates retain their ordinary physical value.
+        unchanged = values == self._initial_scaled
+        physical[unchanged] = self._initial_physical[unchanged]
         for index, value in zip(
             self._mass_indices, physical[: self._mass_count], strict=True
         ):
@@ -229,11 +237,21 @@ class CondensationODE:
         )
 
     def _jacobian(self, time, values):
-        # Perturb dimensionless coordinates to avoid kg-scale cancellation.
+        from particula.execution._condensation_jacobian import (
+            coordinate_steps,
+            sparse_jacobian,
+            supports_local_rates,
+        )
+
+        if values.size > 64 and supports_local_rates(self._strategy):
+            return sparse_jacobian(self, time, values)
+
+        # Keep physical perturbations local after large wet-to-dry changes.
+        differences = coordinate_steps(self, values)
         base = self._rate(time, values)
         jacobian = np.empty((values.size, values.size))
         for index in range(values.size):
-            delta = np.sqrt(np.finfo(float).eps) * max(abs(values[index]), 1.0)
+            delta = differences[index]
             plus, minus = values.copy(), values.copy()
             plus[index] += delta
             minus[index] -= delta
@@ -249,6 +267,10 @@ class CondensationODE:
         if self._forcing is None:
             return np.zeros_like(values)
         delta = np.sqrt(np.finfo(float).eps) * max(abs(time), 1.0)
+        if type(self._forcing) is _EnvironmentSegment:
+            delta = min(delta, self._forcing.end - time)
+        if delta <= 0:
+            return np.zeros_like(values)
         return (
             self._rate(time + delta, values) - self._rate(time, values)
         ) / delta
@@ -260,7 +282,9 @@ class CondensationODE:
 
     def step(self, bound):
         """Accept one physical step no later than bound [s]."""
-        return self.solver.step(bound)
+        bound = AdaptiveSolver._scalar(bound, "bound", positive=False)
+        with forcing_interval(self, bound) as endpoint:
+            return self.solver.step(endpoint)
 
     def snapshot(self):
         """Return detached accepted native state, including forcing."""

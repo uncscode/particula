@@ -42,6 +42,14 @@
             "slug": "guide/getting-started/first-simulation"
           },
           {
+            "label": "Saved CPU growth experiment",
+            "slug": "examples/fundamentals/first_cpu_workflow"
+          },
+          {
+            "label": "Record, save and restart",
+            "slug": "guide/getting-started/recording-restart"
+          },
+          {
             "label": "Installation",
             "collapsed": true,
             "items": [
@@ -698,6 +706,22 @@
             "slug": "examples/simulations"
           },
           {
+            "label": "Finite-reservoir growth accuracy",
+            "slug": "examples/simulations/adaptive_reservoir_depletion"
+          },
+          {
+            "label": "Adaptive CUDA depletion accuracy",
+            "slug": "examples/simulations/adaptive_reservoir_depletion_cuda"
+          },
+          {
+            "label": "Adaptive wet–dry relaxation",
+            "slug": "examples/simulations/adaptive_cloud_relaxation"
+          },
+          {
+            "label": "Stiff CUDA wet–dry relaxation",
+            "slug": "examples/simulations/adaptive_cloud_relaxation_cuda"
+          },
+          {
             "label": "Biomass burning cloud interactions",
             "slug": "examples/simulations/biomass_burning_cloud_interactions"
           },
@@ -1051,6 +1075,10 @@
               {
                 "label": "Adaptive integration assessment",
                 "slug": "contribute/validation/numerics/adaptive-methods"
+              },
+              {
+                "label": "Simulation workflow qualification",
+                "slug": "contribute/validation/numerics/simulation-workflow"
               },
               {
                 "label": "Mass Precision Recommendation Report",

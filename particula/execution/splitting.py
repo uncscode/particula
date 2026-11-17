@@ -141,6 +141,13 @@ class SplitSimulation:
             raise ValueError("bound precedes accepted time")
         if bound == self.time:
             return self.time
+        from particula.execution.forcing import EnvironmentForcing
+
+        for flow in _leaves(self.group):
+            if type(flow.advance) is _CondensationAdvance:
+                forcing = flow.advance._controls.get("forcing")
+                if type(forcing) is EnvironmentForcing:
+                    bound = min(bound, forcing.next_event(self.time))
         duration = min(self.time_step, bound - self.time)
         if self.time + duration == self.time:
             raise RuntimeError(
@@ -163,37 +170,49 @@ class SplitSimulation:
         return _cpu_batch.detached(self._state)
 
 
+class _CondensationAdvance:
+    """Retain a detached component for explicit restart identification."""
+
+    def __init__(self, strategy, controls):
+        self._strategy = deepcopy(strategy)
+        self._controls = deepcopy(controls)
+
+    def __call__(self, state, time, duration):
+        from particula.execution.condensation_ode import CondensationODE
+
+        owner = CondensationODE(
+            state, self._strategy, time=time, **self._controls
+        )
+        bound = time + duration
+        while owner.time < bound:
+            owner.step(bound)
+        return owner.snapshot()
+
+
+class _DilutionAdvance:
+    """Retain exact dilution configuration independently of caller objects."""
+
+    def __init__(self, coefficient):
+        from particula.dynamics.dilution import DilutionStrategy
+
+        self._strategy = DilutionStrategy(coefficient)
+
+    def __call__(self, state, time, duration):
+        for box in range(state.particles.n_boxes):
+            view = _cpu_batch.box_view(state, box)
+            self._strategy.step(view, duration)
+        return state
+
+
 def condensation_flow(name, strategy, **controls):
     """Construct continuous native condensation with explicit controls.
 
     Component controllers restart at split boundaries. The outer step and
     component tolerances must both be refined to establish trajectory accuracy.
     """
-    from particula.execution.condensation_ode import CondensationODE
-
-    configuration = deepcopy(strategy)
-    options = deepcopy(controls)
-
-    def advance(state, time, duration):
-        owner = CondensationODE(state, configuration, time=time, **options)
-        bound = time + duration
-        while owner.time < bound:
-            owner.step(bound)
-        return owner.snapshot()
-
-    return Flow(name, advance, order=2)
+    return Flow(name, _CondensationAdvance(strategy, controls), order=2)
 
 
 def dilution_flow(name, coefficient):
     """Construct exact native gas/particle dilution with hazard [s^-1]."""
-    from particula.dynamics.dilution import DilutionStrategy
-
-    strategy = DilutionStrategy(coefficient)
-
-    def advance(state, time, duration):
-        for box in range(state.particles.n_boxes):
-            view = _cpu_batch.box_view(state, box)
-            strategy.step(view, duration)
-        return state
-
-    return Flow(name, advance, kind="exact")
+    return Flow(name, _DilutionAdvance(coefficient), kind="exact")

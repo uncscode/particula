@@ -25,6 +25,8 @@ else:
 def unpack(
     state: FloatVector,
     scale: FloatVector,
+    initial_scaled: FloatVector,
+    initial_physical: FloatVector,
     masses: FloatTensor,
     gas: FloatMatrix,
     invalid: IntVector,
@@ -32,6 +34,8 @@ def unpack(
     """Unpack a trial and flag nonfinite/negative physical inventories."""
     i = wp.tid()
     value = state[i] * scale[i]
+    if state[i] == initial_scaled[i]:
+        value = initial_physical[i]
     if not wp.isfinite(value) or value < wp.float64(0.0):
         wp.atomic_max(invalid, 0, 1)
     mass_size = masses.shape[0] * masses.shape[1] * masses.shape[2]

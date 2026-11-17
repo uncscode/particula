@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 12.832493498921394,
+  "package_source_sha256": "6d2e24246ad67da3f2dd23afebccde41af3e1ed32de51992c99ef898b3f88d13",
+  "input_sha256": {},
+  "example": "adaptive-reservoir-depletion",
+  "fingerprint": "34e6eb23371ec3f85510878705981b96164de19f97ae01634ccfd52f346d503e",
+  "source": "docs/examples/simulations/adaptive_reservoir_depletion.py",
+  "revision": "12742e1c394c7a836d31aff3aeecbd8c0ff2b523",
+  "package_dirty": false,
+  "executed_at": "2026-11-16T06:04:30.155062+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.1",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [
+      {
+        "text": "Fixed 0.5 s radius error: 0.013104491968154663 vapor error / initial vapor: 0.051724928104230926 mass residual: 1.3348093070485667e-16 work: {'fixed_steps': 20}\nFixed 0.005 s radius error: 0.00012153195858566335 vapor error / initial vapor: 0.00047126688190263693 mass residual: 5.339237228194267e-16 work: {'fixed_steps': 2000}\nCPU RK23 1e-4 radius error: 1.820119292772482e-05 vapor error / initial vapor: 6.736678437977377e-05 mass residual: 4.0044279211457e-16 work: {'accepted': 62, 'rejected': 1, 'domain_rejected': 0, 'rate_calls': 252, 'jacobian_calls': 0, 'time_derivative_calls': 0, 'factorizations': 0, 'linear_solves': 0}\nCPU RK23 1e-7 radius error: 2.573387414273043e-08 vapor error / initial vapor: 9.152069530558079e-08 mass residual: 8.0088558422914e-16 work: {'accepted': 430, 'rejected': 2, 'domain_rejected': 0, 'rate_calls': 1728, 'jacobian_calls': 0, 'time_derivative_calls': 0, 'factorizations': 0, 'linear_solves': 0}\nCPU ROS2 1e-5 radius error: 7.743971802698368e-07 vapor error / initial vapor: 2.8580766376794065e-06 mass residual: 2.2691758219825635e-15 work: {'accepted': 2574, 'rejected': 1, 'domain_rejected': 0, 'rate_calls': 5150, 'jacobian_calls': 2575, 'time_derivative_calls': 2575, 'factorizations': 2575, 'linear_solves': 15450}\n"
+      },
+      {
+        "image": "figure-4-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "figure-4-1.png": "47bd4a9a35d5efc6f02cc97d16811a9101b82644758042b87d28669a1200ccba",
+    "executed_source.py": "ffef5fdaeac743063e0de3edde0b562d2e40620c8bec03cf23347858309c68e7",
+    "data.json": "0a2d354fde18add4a11107b9d2d984b3de724cf507f158e777c9765fc62ede0f",
+    "source.py": "ffef5fdaeac743063e0de3edde0b562d2e40620c8bec03cf23347858309c68e7"
+  },
+  "simulation_fingerprint": "bce76281d2a736fba33ec9fadfcb03bffef22bd91e23d7a7f12bab74bba63941",
+  "render_versions": {
+    "particula": "0.3.1",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "render_device": "CPU",
+  "execution_input_sha256": {},
+  "rendered_at": "2026-11-16T06:06:30.016034+00:00",
+  "render_revision": "12742e1c394c7a836d31aff3aeecbd8c0ff2b523",
+  "render_elapsed_seconds": 4.428437338094227
+}

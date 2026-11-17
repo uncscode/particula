@@ -1,6 +1,12 @@
 # %% [markdown]
 # # Cooling, heating and vapor pulses across sixteen boxes
 #
+# When vapor and temperature change externally, how can you distinguish a
+# particle response from mass supplied by the forcing? This example builds an
+# open-system inventory and compares response histories across boxes. Start with
+# the [prepared interface](gpu_prepared_quick_start.py); the key scientific step
+# is recording each imposed gas replacement before interpreting condensation.
+#
 # This study uses **49,152 active resolved particles**, four particle materials
 # and five gas lanes. Only water exchanges between gas and particle material;
 # the other materials and spectator gases provide independent accounting
@@ -9,16 +15,20 @@
 #
 # A prescribed temperature cycle cools the boxes toward 275 K, heats them
 # toward 310 K, then returns toward 298 K. Each box has a fixed temperature
-# offset, updated at 120 fixed control times. Water gas is replaced twice, at nominal saturation ratios 1.6 and
-# 0.8. These replacements are external mass sources or sinks, so their actual
-# per-box mass changes are added to the conservation ledger before dilution.
+# offset, updated at 120 fixed control times. Water gas is replaced twice, at
+# nominal saturation ratios 1.6 and 0.8. These are external mass sources or
+# sinks, so their actual per-box mass changes enter the ledger before dilution.
 #
 # `update_environment` and `update_gas` are explicit upload boundaries.
-# They change array values in place, so a captured schedule can keep replaying.
+# Exact dilution keeps its fixed schedule and can replay a captured event graph.
+# Condensation uses adaptive ROS3, with explicit state transfers every cycle;
+# its rejected trials never repeat dilution. This host-controlled composition
+# demonstrates correctness and error control, not fully resident acceleration.
 # The study helpers and plotting code are included in the downloadable ZIP.
-# A second run halves the integration timestep while retaining those exact
-# control times. Every particle total mass must change by less than 1%, and
-# every box's water vapor by less than 0.1%.
+# A second run halves the outer timestep and tightens the condensation relative
+# tolerance from 1e-5 to 1e-7, retaining the exact control times. Every particle's
+# final total mass must change by less than
+# 1%, and every box's final water vapor by less than 0.1%.
 
 # %%
 """Manually refreshed CUDA forcing and independent-species-width study."""
@@ -26,8 +36,8 @@
 import matplotlib.pyplot as plt
 import warp as wp
 from scripts.docs_gpu_figures import history_figures
+from scripts.gpu_studies.adaptive_trajectories import run_adaptive_forcing
 from scripts.gpu_studies.cases import StudyCase, build_case
-from scripts.gpu_studies.trajectories import run_trajectory
 
 
 def run_example():
@@ -45,8 +55,8 @@ def run_example():
         heterogeneous=True,
         experiment="forcing",
     )
-    initial, process, processes = build_case(case)
-    report = run_trajectory(case, initial, process, processes)
+    initial, _, processes = build_case(case)
+    report = run_adaptive_forcing(case, initial, processes)
     history_figures(
         report,
         "Cooling and vapor pulses · " + wp.get_device("cuda:0").name,
@@ -79,3 +89,18 @@ def run_example():
 # %%
 if __name__ == "__main__":
     run_example()
+
+# %% [markdown]
+# ## Use the forcing ledger to ask a different question
+#
+# The curves describe finite-rate response to a prescribed millisecond experiment;
+# the inventory residual checks the accounting after external exchange and
+# dilution. The refinement check bounds the two reported final-state changes for
+# one timestep halving. It does not establish a timestep-independent response at
+# every forcing boundary or validate this forcing as a chamber experiment.
+#
+# For a measured humidity pulse, supply its temperature and vapor histories,
+# retain identical physical control times in a refinement run, and compare uptake
+# lag and peak saturation as well as final mass. Compare with a temperature-only
+# control to separate cooling from added water. The [heterogeneous-box example](gpu_prepared_multibox.py)
+# shows the corresponding calculation without imposed vapor pulses.

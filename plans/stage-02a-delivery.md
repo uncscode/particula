@@ -1,6 +1,6 @@
 # Stage 2A execution target and evidence
 
-Status: initial implementation delivered in
+Status: implementation and review correction merged by the user through
 [PR #1659](https://github.com/uncscode/particula/pull/1659). The discrete-bin review
 correction below is qualified and published. Current hosted checks and review
 status are tracked in that PR.
@@ -8,7 +8,8 @@ Worktree: `/tmp/particula-stage-02a`.
 Branch: `codex/stage-02a-numerical-integration`.
 Verified upstream base: `356fc054cd9a4f4ececc3c64c7144e889a789494`.
 PR target: `uncscode/particula:main`; separate from the Stage 2B PR.
-Merge is outside execution scope. The PR is open; no merge is claimed.
+The user merged the PR on 2026-11-16 as
+`c72e9be7c7cea60565acaa3e2e2ef82b5d0e10fc`. No agent merge was performed.
 
 ## Completion boundary
 
@@ -123,9 +124,9 @@ recorded below. Stage 2B
 also closed a review finding in its archive writer: existing host checkpoints
 must not be serialized inside active CUDA capture.
 
-Stage 2A is delivered in PR #1659 against the verified upstream main. Stage 2B
-targets this branch explicitly so its workflow changes can be reviewed
-independently. Merging either PR remains outside this task.
+Stage 2A was delivered in PR #1659 and subsequently merged by the user.
+Stage 2B originally targeted the 2A branch and now targets `main`, with the
+merged 2A tree incorporated. Merging Stage 2B remains outside this task.
 
 ## Discrete-bin review correction (2026-11-16)
 
