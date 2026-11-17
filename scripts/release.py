@@ -133,6 +133,8 @@ def fetch_json(url: str, *, github: bool = False) -> dict | None:
         with urlopen(Request(url, headers=headers), timeout=30) as response:  # noqa: S310 - fixed HTTPS services
             return json.load(response)
     except HTTPError as error:
+        # HTTPError owns a response stream, including on the missing path.
+        error.close()
         if error.code == 404:
             return None
         raise

@@ -313,15 +313,12 @@ def test_pypi_retry_checks_digests(repository, monkeypatch):
 )
 def test_only_http_404_means_absence(monkeypatch, status, absent):
     """Authentication/server errors must not masquerade as missing releases."""
+    error = HTTPError(
+        "https://pypi.org/pypi/particula/0.3.2/json", status, "test", {}, None
+    )
 
     def fail(*args, **kwargs):
-        raise HTTPError(
-            "https://pypi.org/pypi/particula/0.3.2/json",
-            status,
-            "test",
-            {},
-            None,
-        )
+        raise error
 
     monkeypatch.setattr(release, "urlopen", fail)
     if absent:
@@ -330,8 +327,10 @@ def test_only_http_404_means_absence(monkeypatch, status, absent):
             is None
         )
     else:
-        with pytest.raises(HTTPError):
+        with pytest.raises(HTTPError) as caught:
             release.fetch_json("https://pypi.org/pypi/particula/0.3.2/json")
+        assert caught.value is error
+    assert error.closed
 
 
 def test_workflow_keeps_publication_gated_and_uses_one_artifact():
