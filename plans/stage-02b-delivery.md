@@ -246,3 +246,32 @@ The overlap conflicts were resolved to the tested 2B versions; merge commit
 `3fe378e12e` has the same tree as its first parent. This preserves every 2B
 solver, workflow, example and result change without duplicating 2A in the PR
 diff. Only the delivery notes changed after that history synchronization.
+
+## Fixed-grid bound review correction
+
+A subsequent PR review reproduced rejection of `step(0.3)` after two 0.1-second
+cycles, because the event clock's accumulated endpoint is slightly larger.
+Provided bounds now compare with the initial time plus the integer next-step
+index times the fixed interval. An eight-local-spacing allowance applies only
+below one quarter of a cycle. Truly shortened intervals still reject before
+physical work, including when a large absolute clock would otherwise make the
+roundoff allowance too permissive.
+
+The reproducer failed in five cases before correction, including Warp CPU,
+actual CUDA, resident adaptation, long decimal grids and very small intervals.
+The expanded coupled/resident/prepared-recording suite passes **54 tests with
+five intentional CPU capture/residency skips**. It checks decimal and nonzero
+origins, 1,000 steps, exact restart, rejection before event changes, independent
+dilution budgets, and byte-exact active-condensation parity with unbounded
+cycles in both process orders. Full package validation passed **10,900 tests,
+27 skips and one expected failure**, with **91.03% coverage** and warnings as
+errors in 309.05 seconds, including actual RTX 5060 CUDA.
+Full standard Mypy, Ruff/format, documentation structure and all 89 saved-result
+freshness checks pass. Logs are in `.artifacts/coupled-grid-*.log`.
+
+Only provided-bound admission changed: unbounded stepping, event clocks,
+physical integration intervals, RNG and restart schemas remain unchanged.
+The full biomass and cyclic-chamber workloads use unbounded coupled `step()`;
+the respiratory example uses the separate resident condensation owner. Their
+retained execution revisions and hashes remain unchanged, with this new
+regression qualification recorded separately.

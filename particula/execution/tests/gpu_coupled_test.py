@@ -407,3 +407,125 @@ def test_direct_checkpoint_waits_for_complete_cycle(monkeypatch):
             saved = checkpoint.result(timeout=10)
         assert saved.events.resident.completed_steps == saved.counters[0] == 1
         assert saved.statistics == owner.statistics
+
+
+@pytest.mark.parametrize("resident", [False, True])
+@pytest.mark.parametrize("origin", [0.0, 2.0])
+def test_decimal_bounds_preserve_cycles_and_restart(device, resident, origin):
+    """Decimal grid requests retain exact unbounded physics and continuation."""
+    if resident and (
+        device == "cpu" or not wp.is_conditional_graph_supported()
+    ):
+        pytest.skip(
+            "resident adaptation requires native CUDA conditional graphs"
+        )
+    initial, strategy = case()
+    initial.particles.masses[:] = 0
+    initial.particles.concentration[:] = 0
+    initial.particles.charge[:] = 0
+    events = (Dilution(DilutionStrategy(0.2)),)
+    options = dict(device=device, time_step=0.1, time=origin, resident=resident)
+    with (
+        GPUCoupledSimulation(initial, events, strategy, **options) as bounded,
+        GPUCoupledSimulation(initial, events, strategy, **options) as reference,
+    ):
+        for index in (1, 2):
+            bounded.step(origin + index / 10)
+            reference.step()
+        saved = bounded.checkpoint()
+        with resume_coupled(saved, events, strategy, device=device) as resumed:
+            for index in range(3, 11):
+                bound = origin + index / 10
+                before = bounded.checkpoint()
+                with pytest.raises(ValueError, match="complete fixed event"):
+                    bounded.step(bound - 0.001)
+                canonical_equal(before.events, bounded.checkpoint().events)
+                bounded.step(bound)
+                resumed.step(bound)
+                reference.step()
+            equal_native(bounded.snapshot(), reference.snapshot())
+            equal_native(bounded.snapshot(), resumed.snapshot())
+            canonical_equal(
+                bounded.checkpoint().events, resumed.checkpoint().events
+            )
+            assert bounded.time == resumed.time == reference.time
+            assert bounded.completed_steps == resumed.completed_steps == 10
+            assert bounded.statistics == resumed.statistics
+        np.testing.assert_allclose(
+            bounded.snapshot().gas.concentration,
+            initial.gas.concentration * np.exp(-0.2),
+            rtol=3e-14,
+        )
+
+
+def test_decimal_bounds_do_not_accumulate_admission_drift():
+    """A thousand fixed decimal cycles are admitted on their integer grid."""
+    initial, strategy = case()
+    initial.particles.masses[:] = 0
+    initial.particles.concentration[:] = 0
+    initial.particles.charge[:] = 0
+    events = (Dilution(DilutionStrategy(0.0)),)
+    with GPUCoupledSimulation(
+        initial, events, strategy, device="cpu", time_step=0.1
+    ) as owner:
+        for index in range(1, 1001):
+            owner.step(index / 10)
+        assert owner.completed_steps == 1000
+        equal_native(initial, owner.snapshot())
+
+
+@pytest.mark.parametrize(
+    "origin, dt, admit", [(0.0, 1e-20, True), (1e15, 1.0, False)]
+)
+def test_bound_roundoff_is_scaled_and_smaller_than_a_cycle(origin, dt, admit):
+    """Small times admit roundoff; coarse clocks cannot waive a partial cycle."""
+    initial, strategy = case()
+    initial.particles.masses[:] = 0
+    initial.particles.concentration[:] = 0
+    initial.particles.charge[:] = 0
+    events = (Dilution(DilutionStrategy(0.0)),)
+    with GPUCoupledSimulation(
+        initial, events, strategy, device="cpu", time_step=dt, time=origin
+    ) as owner:
+        bound = np.nextafter(origin + dt, origin)
+        before = owner.checkpoint()
+        if admit:
+            owner.step(bound)
+            assert owner.completed_steps == 1
+        else:
+            with pytest.raises(ValueError, match="complete fixed event"):
+                owner.step(bound)
+            canonical_equal(before.events, owner.checkpoint().events)
+            assert owner.completed_steps == 0
+
+
+@pytest.mark.parametrize("resident", [False, True])
+@pytest.mark.parametrize("order", ["events-first", "condensation-first"])
+def test_decimal_bounds_preserve_active_condensation(device, resident, order):
+    """Bound admission does not change physical trials, budgets or event order."""
+    if resident and (
+        device == "cpu" or not wp.is_conditional_graph_supported()
+    ):
+        pytest.skip(
+            "resident adaptation requires native CUDA conditional graphs"
+        )
+    initial, strategy = case(2)
+    events = (Dilution(DilutionStrategy(0.2)),)
+    options = dict(device=device, time_step=0.1, resident=resident, order=order)
+    with (
+        GPUCoupledSimulation(initial, events, strategy, **options) as bounded,
+        GPUCoupledSimulation(initial, events, strategy, **options) as reference,
+    ):
+        for index in (1, 2, 3):
+            bounded.step(index / 10)
+            reference.step()
+        equal_native(bounded.snapshot(), reference.snapshot())
+        canonical_equal(
+            bounded.checkpoint().events, reference.checkpoint().events
+        )
+        assert bounded.statistics == reference.statistics
+        assert bounded.checkpoint().counters == reference.checkpoint().counters
+        # A later, off-grid bound still includes the next complete interval.
+        bounded.step(0.45)
+        reference.step()
+        equal_native(bounded.snapshot(), reference.snapshot())

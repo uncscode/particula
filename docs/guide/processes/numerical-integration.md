@@ -285,9 +285,13 @@ with GPUCoupledSimulation(
 Use `order="condensation-first"` when condensation precedes the fixed events,
 for example exact dilution. This is sequential composition; condensation's
 local error estimate does not measure splitting or stochastic uncertainty.
-The complete event interval remains fixed. A shorter requested bound rejects
-before any physical work, so forcing and output schedules must use that grid.
-Temperature and gas replacements are explicit calls between complete cycles.
+The complete event interval remains fixed. `step(bound)` compares a requested
+bound with the next point on the integer-indexed event grid. Roundoff-equivalent
+decimal endpoints are admitted with a bounded floating-point tolerance; a
+genuinely shorter interval rejects before any physical work. This admission
+check does not shorten a cycle or change the event clock. Forcing and output
+schedules use complete cycles, with temperature and gas replacements applied
+explicitly between cycles.
 
 Each cycle retains the event owner's buffers and random streams. With
 `resident=True`, a persistent `GPUResidentCondensation` owner imports event

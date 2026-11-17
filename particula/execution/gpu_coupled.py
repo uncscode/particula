@@ -336,7 +336,13 @@ class GPUCoupledSimulation:
             )
 
     def step(self, bound=None):
-        """Complete one fixed cycle, rejecting a shorter bound before work."""
+        """Complete one fixed cycle with integer-grid bound admission.
+
+        Decimal bounds within eight local float spacings of the next nominal
+        grid point are admitted only when that tolerance is below a quarter
+        cycle. The event clock, physical interval and restart state are
+        unchanged.
+        """
         with self._events._lock:
             self._ready()
             start = self._time
@@ -347,10 +353,25 @@ class GPUCoupledSimulation:
                 raise ValueError("event grid cannot advance representable time")
             if bound is not None:
                 bound = AdaptiveSolver._scalar(bound, "bound", positive=False)
-                if bound < end:
+                grid_end = (
+                    self._events._initial_time
+                    + (self._events.completed_steps + 1) * self.time_step
+                )
+                if not np.isfinite(grid_end):
                     raise ValueError(
-                        "bound must include a complete fixed event interval"
+                        "event grid cannot represent the next bound"
                     )
+                if bound < grid_end:
+                    # Use the integer grid, not accumulated event-clock drift.
+                    # Downward spacing stays finite even at the largest float.
+                    tolerance = 8 * (grid_end - np.nextafter(grid_end, 0.0))
+                    if (
+                        tolerance >= self.time_step / 4
+                        or grid_end - bound > tolerance
+                    ):
+                        raise ValueError(
+                            "bound must include a complete fixed event interval"
+                        )
             try:
                 # Reuse one stream and retain all event bindings/RNG throughout.
                 with self._events._scope():
