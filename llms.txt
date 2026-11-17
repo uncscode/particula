@@ -25,7 +25,7 @@ include saved outputs that are not embedded in the Python sources.
 - [Migration to 0.3.0](https://raw.githubusercontent.com/uncscode/particula/main/docs/guide/migration/v0.3.0/index.md): Changes from older APIs.
 - [Native aerosol example](https://raw.githubusercontent.com/uncscode/particula/main/docs/examples/fundamentals/native_aerosol.py): Executable Python source.
 - [Particle data example](https://raw.githubusercontent.com/uncscode/particula/main/docs/examples/fundamentals/particles/particle_data.py): Executable Python source for particle state.
-- [AI assistants](https://raw.githubusercontent.com/uncscode/particula/main/docs/guide/ai-assistants/index.md): Install and use Particula Helper.
+- [Agent plugins](https://raw.githubusercontent.com/uncscode/particula/main/docs/guide/agent-plugins/index.md): Install and use Particula Helper.
 - [Particula Helper](https://raw.githubusercontent.com/uncscode/particula/main/plugins/particula-helper/README.md): Scientific workflows and repository skills.
 - [Source discovery](https://raw.githubusercontent.com/uncscode/particula/main/plugins/particula-helper/references/sources.md): Find documentation matching the selected environment.
 - [API reference](https://uncscode.github.io/particula/API/particula/llms.txt): Generated Markdown index linking to module references.
