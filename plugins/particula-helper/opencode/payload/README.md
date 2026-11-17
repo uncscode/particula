@@ -1,7 +1,8 @@
 # Particula Helper
 
-Six scientific skills for environment setup, aerosol science guidance, simulation
-design, execution, analysis and debugging, plus five repository development skills. The host supplies filesystem and
+Seven researcher skills for environment setup, aerosol science guidance, simulation
+design, execution, analysis, debugging and issue reporting, plus five repository
+development skills. The host supplies filesystem and
 Python execution tools. Installing this plugin does not install Particula,
 change Python environments, start a server, or run simulations.
 
@@ -37,10 +38,19 @@ installs include local guides, theory, contributor guidance, Python examples,
 and data/images; editable installs point to the maintained repository docs.
 See `references/sources.md` for search commands and older-version fallback.
 
+## Report a research concern
+
+Use [particula-report](https://github.com/uncscode/particula/blob/main/plugins/particula-helper/skills/particula-report/SKILL.md)
+to investigate a suspected bug, unexpected result or perceived scientific error.
+The agent searches version-matched source and existing issues, prepares a report
+using `references/issue-report.md`, and asks you to review it before posting to
+GitHub. A full checkout, proven root cause or fix is not required. Without
+GitHub access, it provides copyable Markdown.
+
 ## Repository development skills
 
 Use these in a selected Particula source checkout. They do not apply to every
-Python project or replace the six study-oriented skills.
+Python project or replace the seven researcher-oriented skills.
 
 | Skill | Use |
 | --- | --- |
@@ -71,6 +81,11 @@ python scripts/build_particula_plugins.py --check --output /tmp/particula-plugin
 The committed OpenCode payload is generated so Git subdirectory installation
 works without accessing parent folders or running a prepare/install hook.
 CI rejects drift. Plugin versions are independent of the Python library;
-change all three plugin manifests and the OpenCode package version together.
-Release archives are attached to normal Particula releases, not published to
-an npm registry or public plugin directory automatically.
+change all three plugin manifests, the OpenCode package version and both root
+version entries in its shrinkwrap file together. Update release notes and
+regenerate the payload. After validation, a version increase on upstream main
+automatically publishes `particula-helper-vVERSION` with the tested archives.
+Plugin releases do not replace the library release as GitHub Latest or publish
+the Python package. Existing releases and historical drafts are preserved.
+Archives are also attached to normal Particula releases; npm registry and
+public plugin directory publication are separate actions.

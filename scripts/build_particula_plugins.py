@@ -26,6 +26,7 @@ SKILLS = {
     "particula-run",
     "particula-analyze",
     "particula-debug",
+    "particula-report",
     "particula-plan",
     "particula-develop",
     "particula-test",
@@ -219,8 +220,9 @@ def write_github_release_notes(output, manifest, provenance):
         "download under [Assistant plugins workflow runs]"
         "(https://github.com/uncscode/particula/actions/workflows/"
         "assistant-plugins.yml?query=branch%3Amain+event%3Apush). "
-        "Workflow downloads expire after 30 days. Version bumps create "
-        "draft GitHub releases for longer-term distribution.\n\n"
+        "Workflow downloads expire after 30 days. Validated version bumps "
+        "on upstream main publish GitHub releases for longer-term "
+        "distribution, independently of Python library releases.\n\n"
         "This distribution does not require OpenAI store verification.\n"
     )
 

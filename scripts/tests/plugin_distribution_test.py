@@ -4,10 +4,12 @@ import importlib.util
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import zipfile
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 import yaml
@@ -211,18 +213,205 @@ def test_workflow_builds_every_main_merge_without_path_filters():
         assert "paths-ignore" not in trigger
 
 
-def test_repository_skills_relocate_with_their_references(tmp_path):
-    """Every host carries repository guidance without the retired tree."""
+@pytest.mark.parametrize(
+    "exists, create_status", [(False, 0), (True, 0), (False, 9)]
+)
+def test_workflow_publishes_or_preserves_release(
+    tmp_path, exists, create_status
+):
+    """Execute the release shell with a fake CLI, never contacting GitHub."""
+    workflow = yaml.safe_load(
+        (builder.ROOT / ".github/workflows/assistant-plugins.yml").read_text()
+    )
+    job = workflow["jobs"]["plugin-release"]
+    step = next(step for step in job["steps"] if "run" in step)
+    assets = tmp_path / "plugin-dist"
+    assets.mkdir()
+    names = [
+        "particula-helper-codex.zip",
+        "particula-helper-claude.zip",
+        "particula-helper-opencode.zip",
+        "SHA256SUMS",
+        "GITHUB-RELEASE.md",
+    ]
+    for name in names:
+        (assets / name).write_text(name)
+    log = tmp_path / "calls.jsonl"
+    cli = tmp_path / "gh"
+    cli.write_text(
+        f"#!{sys.executable}\n"
+        "import json, os, sys\n"
+        "with open(os.environ['CALL_LOG'], 'a') as out:\n"
+        "    out.write(json.dumps(sys.argv[1:]) + '\\n')\n"
+        "if sys.argv[1:3] == ['release', 'view']:\n"
+        "    sys.exit(0 if os.environ['EXISTS'] == 'true' else 1)\n"
+        "if sys.argv[1:3] == ['release', 'create']:\n"
+        "    sys.exit(int(os.environ['CREATE_STATUS']))\n"
+        "sys.exit(99)\n"
+    )
+    cli.chmod(0o755)
+    bash = shutil.which("bash")
+    assert bash is not None
+    result = subprocess.run(  # noqa: S603 - trusted workflow with a local fake CLI
+        [
+            bash,
+            "--noprofile",
+            "--norc",
+            "-e",
+            "-o",
+            "pipefail",
+            "-c",
+            step["run"],
+        ],
+        cwd=tmp_path,
+        env={
+            **os.environ,
+            "PATH": f"{tmp_path}{os.pathsep}{os.environ['PATH']}",
+            "CALL_LOG": str(log),
+            "EXISTS": str(exists).lower(),
+            "CREATE_STATUS": str(create_status),
+            "PLUGIN_VERSION": "0.3.4",
+            "SOURCE_COMMIT": "b" * 40,
+        },
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    calls = [json.loads(line) for line in log.read_text().splitlines()]
+    tag = "particula-helper-v0.3.4"
+    assert calls[0] == ["release", "view", tag]
+    assert result.returncode == (0 if exists else create_status)
+    if exists:
+        # The existing release can be published or a historical draft.
+        assert len(calls) == 1
+    else:
+        assert len(calls) == 2
+        creation = calls[1]
+        assert creation[:3] == ["release", "create", tag]
+        assert "--draft" not in creation
+        assert "--latest=false" in creation
+        assert creation[creation.index("--target") + 1] == "b" * 40
+        assert (
+            creation[creation.index("--title") + 1] == "Particula Helper 0.3.4"
+        )
+        assert (
+            creation[creation.index("--notes-file") + 1]
+            == "plugin-dist/GITHUB-RELEASE.md"
+        )
+        assert all(f"plugin-dist/{name}" in creation for name in names)
+
+
+def _workflow_condition(condition, event, repo, ref, increased, tag):
+    """Evaluate the small trusted expression subset used by release guards."""
+    # GitHub permits hyphens in property names; Python uses a local binding.
+    expression = condition.replace(
+        "needs.validate.outputs.version-increased", "increased"
+    )
+    expression = expression.replace("&&", " and ").replace("||", " or ")
+    expression = re.sub(r"!(?!=)", "not ", expression).strip()
+    return eval(  # noqa: S307 - trusted repository condition, no builtins
+        expression,
+        {"__builtins__": {}},
+        {
+            "github": SimpleNamespace(
+                event_name=event,
+                repository=repo,
+                ref=ref,
+                event=SimpleNamespace(release=SimpleNamespace(tag_name=tag)),
+            ),
+            "increased": increased,
+            "startsWith": lambda value, prefix: value.startswith(prefix),
+        },
+    )
+
+
+@pytest.mark.parametrize(
+    "event, repo, ref, increased, expected",
+    [
+        ("push", "uncscode/particula", "refs/heads/main", "true", True),
+        ("push", "Gorkowski/particula", "refs/heads/main", "true", False),
+        ("push", "uncscode/particula", "refs/heads/topic", "true", False),
+        ("push", "uncscode/particula", "refs/heads/main", "false", False),
+        (
+            "pull_request",
+            "uncscode/particula",
+            "refs/heads/main",
+            "true",
+            False,
+        ),
+        ("merge_group", "uncscode/particula", "refs/heads/main", "true", False),
+        (
+            "workflow_dispatch",
+            "uncscode/particula",
+            "refs/heads/main",
+            "true",
+            False,
+        ),
+        ("release", "uncscode/particula", "refs/heads/main", "true", False),
+    ],
+)
+def test_publication_requires_validated_upstream_version_bump(
+    event, repo, ref, increased, expected
+):
+    """Forks, other events/branches and same-version pushes cannot publish."""
+    workflow = yaml.safe_load(
+        (builder.ROOT / ".github/workflows/assistant-plugins.yml").read_text()
+    )
+    job = workflow["jobs"]["plugin-release"]
+    assert job["needs"] == "validate"
+    assert (
+        _workflow_condition(job["if"], event, repo, ref, increased, "")
+        is expected
+    )
+
+
+@pytest.mark.parametrize(
+    "tag, expected", [("particula-helper-v0.3.4", False), ("v0.3.1", True)]
+)
+def test_plugin_release_does_not_publish_python_or_reattach_assets(
+    tag, expected
+):
+    """Published plugin tags skip PyPI and the library asset attachment job."""
+    for filename, job_name in [
+        ("pypi.yml", "pyping"),
+        ("assistant-plugins.yml", "release-assets"),
+        ("assistant-plugins.yml", "validate"),
+    ]:
+        workflow = yaml.safe_load(
+            (builder.ROOT / ".github/workflows" / filename).read_text()
+        )
+        assert (
+            _workflow_condition(
+                workflow["jobs"][job_name]["if"],
+                "release",
+                "uncscode/particula",
+                "refs/heads/main",
+                "false",
+                tag,
+            )
+            is expected
+        )
+
+
+def test_report_format_matches_issue_template():
+    """Researchers and packaged agents submit the same triage fields."""
+    template = (
+        builder.ROOT / ".github/ISSUE_TEMPLATE/bug_report.md"
+    ).read_text()
+    metadata = yaml.safe_load(template.split("---", 2)[1])
+    assert not metadata.get("labels")
+    reference = (builder.PLUGIN / "references/issue-report.md").read_text()
+    assert (
+        template[template.index("## Summary and impact") :]
+        == reference[reference.index("## Summary and impact") :]
+    )
+
+
+def test_skills_relocate_with_their_references(tmp_path):
+    """Every host carries all skills and their contained supporting references."""
     manifest, _ = builder.validate()
     output = tmp_path / "archives"
     builder.build(output, manifest)
-    repository_skills = {
-        "particula-plan",
-        "particula-develop",
-        "particula-test",
-        "particula-docs",
-        "particula-review",
-    }
     for archive_path in output.glob("*.zip"):
         destination = tmp_path / archive_path.stem
         with zipfile.ZipFile(archive_path) as archive:
@@ -236,7 +425,7 @@ def test_repository_skills_relocate_with_their_references(tmp_path):
             else [destination / "skills"]
         )
         for root in roots:
-            pending = [root / name / "SKILL.md" for name in repository_skills]
+            pending = [root / name / "SKILL.md" for name in builder.SKILLS]
             visited = set()
             while pending:
                 source = pending.pop().resolve()

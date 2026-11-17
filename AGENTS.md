@@ -28,8 +28,9 @@ For using Particula in a scientific study, the plugin separately provides
 [science guidance](plugins/particula-helper/skills/particula-guide/SKILL.md),
 [simulation design](plugins/particula-helper/skills/particula-build/SKILL.md),
 [execution](plugins/particula-helper/skills/particula-run/SKILL.md),
-[analysis](plugins/particula-helper/skills/particula-analyze/SKILL.md), and
-[debugging](plugins/particula-helper/skills/particula-debug/SKILL.md).
+[analysis](plugins/particula-helper/skills/particula-analyze/SKILL.md),
+[debugging](plugins/particula-helper/skills/particula-debug/SKILL.md), and
+[issue reporting](plugins/particula-helper/skills/particula-report/SKILL.md).
 `particula-build` designs studies; `particula-develop` changes the library.
 
 ## Authority and working rules
@@ -98,4 +99,4 @@ Use ordinary search for documentation, configuration, or unavailable coverage.
   [release evidence](docs/contribute/validation/releases/v0.3.0.md): validation
   is distinct from release approval and external feedstock success.
 
-**Last updated:** 2026-11-15
+**Last updated:** 2026-11-17

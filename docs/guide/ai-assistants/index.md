@@ -2,11 +2,12 @@
 
 <a id="ai-assistants"></a>
 
-Particula Helper provides six scientific workflows: environment setup, guidance,
-simulation design, execution, analysis and debugging, plus five repository
-development skills for planning, implementation, testing, documentation and review. It packages
-instructions and Python examples; your assistant supplies the tools to read
-files and execute Python. No hosted simulation service or MCP server is included.
+Particula Helper provides seven researcher workflows: environment setup,
+guidance, simulation design, execution, analysis, debugging and issue reporting,
+plus five repository development skills for planning, implementation, testing,
+documentation and review. It packages instructions and Python examples; your
+assistant supplies the tools to read files and execute Python. No hosted
+simulation service or MCP server is included.
 
 ## Find documentation from an assistant
 
@@ -50,6 +51,21 @@ Other prompts:
 - “Explain the units and assumptions in this condensation model.”
 - “Compare the results after halving the time step.”
 - “Debug this traceback against my installed Particula version.”
+
+## Report a suspected error
+
+Ask: “Use particula-report to investigate this unexpected result and prepare an
+issue for the developers.” The agent checks the installed version, relevant
+source and documentation, a minimal reproduction when feasible, and existing
+issues or fixes. It separates observations from hypotheses and unresolved
+questions; a proven bug or proposed fix is not required.
+
+The report includes summary and research impact, reproduction status, relevant
+environment, minimal reproduction, expected behavior and its basis, observed
+behavior, investigation, and scope and uncertainty. Share only sanitized code
+and inputs. The agent shows you the complete report for approval before posting
+to GitHub; without write access it supplies copyable Markdown. For a duplicate,
+it proposes a comment on the existing issue for your review.
 
 ## Contribute to the library
 
@@ -142,7 +158,7 @@ GitHub is the primary distribution route. The **Assistant plugins** workflow
 validates every pull request targeting `main`, merge-queue build, and push to
 `main`, with no changed-path filter. This also checks plugin compatibility when
 only the Python library changes. A failed check prevents package upload and
-draft-release creation. Maintainers can require the workflow's `validate` check
+release publication. Maintainers can require the workflow's `validate` check
 in branch protection; this source change does not modify repository rules.
 
 After each successful merge build, open the latest successful `main` push in
@@ -154,12 +170,13 @@ commit and retained for 30 days. GitHub requires sign-in to download workflow
 artifacts. Manual workflow runs also build packages.
 
 After a successful upstream `main` push that increases the plugin version, the
-workflow creates a draft GitHub release named `particula-helper-vVERSION`,
-targeting the exact tested commit. Reruns preserve existing release assets;
-same-version merges still produce fresh workflow artifacts. Forks do not create
-these drafts. Publish a draft when a durable public download is wanted. Plugin
-release tags do not trigger Python package publication. No OpenAI credentials
-or public-directory access are required for GitHub distribution.
+workflow publishes a GitHub release tagged `particula-helper-vVERSION`,
+targeting the exact tested commit. Reruns preserve existing releases, including
+historical drafts, and their assets; same-version merges still produce fresh
+workflow artifacts. Forks do not publish these releases. Plugin releases do not
+replace the library release as GitHub Latest, and their tags do not trigger
+Python package publication. No OpenAI credentials or public-directory access
+are required for GitHub distribution.
 
 Existing installations need a marketplace refresh/reinstall and a new session;
 merging a change does not update installed plugin caches automatically. See the

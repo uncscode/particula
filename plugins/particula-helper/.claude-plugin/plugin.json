@@ -1,7 +1,7 @@
 {
   "name": "particula-helper",
-  "version": "0.3.3",
-  "description": "Build, run and analyze aerosol simulations; plan, develop, test, document and review the Particula library.",
+  "version": "0.3.4",
+  "description": "Build, run and analyze aerosol simulations; investigate and report concerns; develop, test, document and review Particula.",
   "author": {
     "email": "kkgorkow@gmail.com",
     "name": "Kyle Gorkowski"

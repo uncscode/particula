@@ -12,6 +12,12 @@ description: "Diagnose Particula exceptions, incorrect results, version migratio
 6. Explain the root cause only as strongly as the evidence supports. If not reproduced, state what remains uncertain and provide the next diagnostic action.
 Deliver the minimal correction, before/after behavior, verification evidence and any unresolved limitations.
 
+## Report an unresolved concern
+For a researcher who wants to report a suspected bug or scientific discrepancy,
+use particula-report to investigate source and existing issues, prepare the
+structured report, and obtain approval before posting. The report format is
+`../../references/issue-report.md`; a proven root cause or fix is not required.
+
 ## Shared operating rules
 Use the selected interpreter’s `python -m particula_docs --json` to locate and search version-matched installed docs before relying on the live site; see `../../references/sources.md` for commands and older-version fallback.
 Read `../../references/compatibility.md` for tested versions and known numerical limitations.

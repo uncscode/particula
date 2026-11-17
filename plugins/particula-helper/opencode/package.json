@@ -1,7 +1,7 @@
 {
   "name": "particula-helper-opencode",
-  "version": "0.3.3",
-  "description": "Particula science and repository workflows for OpenCode 2",
+  "version": "0.3.4",
+  "description": "Build, run and analyze aerosol simulations; investigate and report concerns; develop, test, document and review Particula.",
   "type": "module",
   "license": "MIT",
   "repository": {
