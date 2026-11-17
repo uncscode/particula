@@ -18,7 +18,7 @@
     {
       "id": "state",
       "label": "Describe an aerosol",
-      "description": "Connect size, composition, and the surrounding gas to the properties you can measure.",
+      "description": "Connect size, composition, population representation, and the surrounding gas to the properties you can measure.",
       "parent": "aerosols",
       "order": 0,
       "icon": "state",
@@ -45,16 +45,21 @@
     },
     {
       "id": "methods",
-      "label": "Build and assess a model",
-      "description": "Choose a representation, advance it in time, and assess the evidence behind a result.",
+      "label": "Numerical modeling",
+      "description": "Choose numerical methods and execution paths, then assess the evidence behind a model result.",
       "parent": "aerosols",
       "order": 2,
       "icon": "model",
       "aliases": [],
-      "search_phrases": [],
+      "search_phrases": [
+        "build and assess a model",
+        "build a model"
+      ],
       "prerequisites": [],
-      "related": [],
-      "context": "A model result reflects both physical assumptions and numerical choices. Population representation, timesteps, precision, and execution path determine which details are resolved and what checks are possible. Conservation, numerical convergence, physical comparison, and performance answer separate questions.",
+      "related": [
+        "representations"
+      ],
+      "context": "Build on a defined aerosol population to choose timesteps, numerical precision, and an execution path. Representation choices still affect what the model resolves. Conservation, numerical convergence, physical comparison, and performance answer separate questions.",
       "investigation": "Which modeling choice could change your scientific conclusion, and what controlled comparison would measure that sensitivity?"
     },
     {
@@ -460,8 +465,8 @@
       "id": "representations",
       "label": "Population representations",
       "description": "Choose binned or resolved storage and understand count, density, and volume semantics.",
-      "parent": "methods",
-      "order": 0,
+      "parent": "state",
+      "order": 3,
       "icon": "bins",
       "aliases": [],
       "search_phrases": [
@@ -476,7 +481,8 @@
         "size"
       ],
       "related": [
-        "custom"
+        "custom",
+        "methods"
       ],
       "context": "Binned concentrations, densities per radius, and resolved count weights encode different population measures. Physical volume converts represented counts to number density. The representation also determines whether particle-to-particle composition differences are retained, averaged, or absent.",
       "investigation": "What information would be lost by converting your population to a coarser representation, and would that information affect the observable you care about?"
@@ -486,7 +492,7 @@
       "label": "Numerical methods",
       "description": "Examine timesteps, stiffness, conservation, and precision before interpreting trajectories.",
       "parent": "methods",
-      "order": 1,
+      "order": 0,
       "icon": "steps",
       "aliases": [],
       "search_phrases": [
@@ -509,7 +515,7 @@
       "label": "CPU and GPU execution",
       "description": "Choose an execution path with explicit device, transfer, and lifecycle requirements.",
       "parent": "methods",
-      "order": 2,
+      "order": 1,
       "icon": "chip",
       "aliases": [],
       "search_phrases": [
@@ -527,7 +533,7 @@
       "label": "Verification and comparison",
       "description": "Read numerical comparisons and recorded qualification evidence with their limits.",
       "parent": "methods",
-      "order": 3,
+      "order": 2,
       "icon": "check",
       "aliases": [],
       "search_phrases": [
