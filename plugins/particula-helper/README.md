@@ -22,7 +22,7 @@ opencode plugin add 'github:uncscode/particula#main::path:plugins/particula-help
 
 Choose the commands for your host, then start a new session and ask:
 "Use particula-setup to check my project's existing .venv."
-See the [installation and compatibility guide](https://uncscode.github.io/particula/guide/ai-assistants/).
+See the [installation and compatibility guide](https://uncscode.github.io/particula/guide/agent-plugins/).
 
 ## Environment and science
 

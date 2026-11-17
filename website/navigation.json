@@ -78,24 +78,24 @@
         ]
       },
       {
-        "label": "Agentic plugins",
+        "label": "Agent plugins",
         "collapsed": true,
         "items": [
           {
-            "label": "Agentic plugins",
-            "slug": "guide/ai-assistants"
+            "label": "Agent plugins",
+            "slug": "guide/agent-plugins"
           },
           {
             "label": "Claude Code, Desktop, and Cowork",
-            "slug": "guide/ai-assistants/claude"
+            "slug": "guide/agent-plugins/claude"
           },
           {
             "label": "Codex and ChatGPT",
-            "slug": "guide/ai-assistants/codex"
+            "slug": "guide/agent-plugins/codex"
           },
           {
             "label": "OpenCode",
-            "slug": "guide/ai-assistants/opencode"
+            "slug": "guide/agent-plugins/opencode"
           }
         ]
       },

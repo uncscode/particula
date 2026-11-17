@@ -39,7 +39,7 @@ For a new study, state the proposed comparison, hold appropriate inputs fixed,
 and choose a diagnostic that could distinguish the competing explanations.
 Use [Theory](../theory/index.md) for the physical basis and the
 [Guide](../guide/index.md) for supported interfaces. The
-[agentic plugins](../guide/ai-assistants/index.md) can help carry this structure into
+[agent plugins](../guide/agent-plugins/index.md) can help carry this structure into
 simulation design, execution, and analysis.
 
 ## Run and adapt an example

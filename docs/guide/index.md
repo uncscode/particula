@@ -17,7 +17,7 @@ to connect a research question with explanations, examples, and model choices.
 | Task | Read next |
 | --- | --- |
 | Find the science behind a research question | [Explore topics](topics/index.md) |
-| Set up agentic plugins | [Agentic plugins](ai-assistants/index.md) |
+| Set up agent plugins | [Agent plugins](agent-plugins/index.md) |
 | Configure particle, gas, and environment state | [Data model](data-model/index.md) |
 | Record selected output and continue a saved run | [Recording and restart](getting-started/recording-restart.md) |
 | Simulate growth, collisions, sources, or losses | [Processes](processes/index.md) |

@@ -11,8 +11,8 @@ A simple, fast, and powerful particle simulator for aerosol science.
   evolve supported processes on the GPU, and download analysis snapshots.
   Explore [the workflow](https://uncscode.github.io/particula/guide/gpu/prepared/)
   and [illustrated GPU studies](https://uncscode.github.io/particula/examples/gpu/).
-- **AI assistants:** added setup, simulation, analysis, and development skills
-  through [Particula Helper](https://uncscode.github.io/particula/guide/ai-assistants/).
+- **Agent plugins:** added setup, simulation, analysis, and development skills
+  through [Particula Helper](https://uncscode.github.io/particula/guide/agent-plugins/).
 - **Native data storage:** the 0.3.0 development version uses particle, gas, and
   environment containers. See the [migration guide](https://uncscode.github.io/particula/guide/migration/v0.3.0/).
 <!-- RECENT_NEWS_END -->
@@ -36,7 +36,7 @@ conda install -c conda-forge particula
 - [Explore topics](https://uncscode.github.io/particula/guide/topics/) — browse aerosol properties, processes, modeling methods, and research applications.
 - [Installation](https://uncscode.github.io/particula/guide/getting-started/installation/) and [your first simulation](https://uncscode.github.io/particula/guide/getting-started/first-simulation/)
 - [Examples](https://uncscode.github.io/particula/examples/), [theory](https://uncscode.github.io/particula/theory/), and [API reference](https://uncscode.github.io/particula/api/)
-- [AI assistants](https://uncscode.github.io/particula/guide/ai-assistants/) and [migration to 0.3.0](https://uncscode.github.io/particula/guide/migration/v0.3.0/)
+- [Agent plugins](https://uncscode.github.io/particula/guide/agent-plugins/) and [migration to 0.3.0](https://uncscode.github.io/particula/guide/migration/v0.3.0/)
 - [Contributing](https://uncscode.github.io/particula/contribute/CONTRIBUTING/)
 
 ## Citation

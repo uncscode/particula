@@ -2565,19 +2565,19 @@
       "reason": "Supporting contributor workflow; retained in Contribute navigation."
     },
     {
-      "source": "docs/guide/ai-assistants/claude.md",
+      "source": "docs/guide/agent-plugins/claude.md",
       "reason": "Supporting setup or migration guidance; retained in Guide navigation."
     },
     {
-      "source": "docs/guide/ai-assistants/codex.md",
+      "source": "docs/guide/agent-plugins/codex.md",
       "reason": "Supporting setup or migration guidance; retained in Guide navigation."
     },
     {
-      "source": "docs/guide/ai-assistants/index.md",
+      "source": "docs/guide/agent-plugins/index.md",
       "reason": "Supporting setup or migration guidance; retained in Guide navigation."
     },
     {
-      "source": "docs/guide/ai-assistants/opencode.md",
+      "source": "docs/guide/agent-plugins/opencode.md",
       "reason": "Supporting setup or migration guidance; retained in Guide navigation."
     },
     {
