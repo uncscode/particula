@@ -1,56 +1,146 @@
 name: pypi
 
 on:
+  push:
+    branches: [main]
   release:
     types: [published]
   pull_request:
     branches: [main, "codex/stage-*"]
   merge_group:
-    branches: [ main ]
+    branches: [main]
+
+permissions:
+  contents: read
 
 jobs:
-  pyping:
+  release-plan:
     if: github.event_name != 'release' || !startsWith(github.event.release.tag_name, 'particula-helper-v')
-
     runs-on: ubuntu-latest
-
+    outputs:
+      version: ${{ steps.plan.outputs.version }}
+      tag: ${{ steps.plan.outputs.tag }}
+      build: ${{ steps.plan.outputs.build }}
+      publish: ${{ steps.plan.outputs.publish }}
     steps:
-    - uses: actions/checkout@v7
-    - name: Set up Python
-      uses: actions/setup-python@v7.1.0
-      with:
-        python-version: '3.12'
-        cache: 'pip' # caching pip dependencies
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install build 'flit_core>=3.12,<4' pytest PyYAML
-    - name: Test documentation packaging
-      run: python -m pytest scripts/tests/doc_bundle_test.py -q -Werror
-    - name: Validate release source before publication
-      if: github.event_name == 'release'
-      run: |
-        python -m pip install ".[dev,extra]"
-        python -m pytest -Werror -m "not slow and not performance"
-        python -m pytest examples_tests -Werror -m "not slow and not performance"
-        python -m pytest scripts/tests -Werror
-    - name: Build package
-      run: python -m build
-    - name: Verify exact release documentation bundles
-      run: >-
-        python scripts/check_doc_bundle.py
-        --wheel dist/particula-*.whl --sdist dist/particula-*.tar.gz
-        --report .artifacts/docs-bundle.json
-    - name: Save documentation bundle evidence
-      uses: actions/upload-artifact@v7
-      with:
-        name: docs-bundle
-        path: .artifacts/docs-bundle.json
-        include-hidden-files: true
-        if-no-files-found: error
-    - if: ${{ github.event.action == 'published' }}
-      name: Publish package
-      uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086
-      with:
-        user: __token__
-        password: ${{ secrets.PYPI_API_TOKEN }}
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v7.1.0
+        with:
+          python-version: '3.12'
+      - name: Identify an upstream library version increase
+        id: plan
+        run: python scripts/release.py plan
+
+  pyping:
+    needs: release-plan
+    if: needs.release-plan.outputs.build == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@v7.1.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build 'flit_core>=3.12,<4' pytest PyYAML
+      - name: Test documentation packaging
+        run: python -m pytest scripts/tests/doc_bundle_test.py -q -Werror
+      - name: Validate release source before publication
+        if: needs.release-plan.outputs.publish == 'true'
+        run: |
+          python -m pip install ".[dev,extra]"
+          python -m pytest -Werror -m "not slow and not performance"
+          python -m pytest examples_tests -Werror -m "not slow and not performance"
+          python -m pytest scripts/tests -Werror
+      - name: Build package
+        run: python -m build
+      - name: Verify exact release documentation bundles
+        run: >-
+          python scripts/check_doc_bundle.py
+          --wheel dist/particula-*.whl --sdist dist/particula-*.tar.gz
+          --report .artifacts/docs-bundle.json
+      - name: Save documentation bundle evidence
+        uses: actions/upload-artifact@v7
+        with:
+          name: docs-bundle
+          path: .artifacts/docs-bundle.json
+          include-hidden-files: true
+          if-no-files-found: error
+      - uses: actions/setup-node@v6
+        if: needs.release-plan.outputs.publish == 'true'
+        with:
+          node-version: '22'
+      - name: Validate plugin archives accompanying the library release
+        if: needs.release-plan.outputs.publish == 'true'
+        working-directory: plugins/particula-helper/opencode
+        run: |
+          npm ci --ignore-scripts
+          npm pack --ignore-scripts --pack-destination "$RUNNER_TEMP"
+          mkdir "$RUNNER_TEMP/plugin-installed"
+          tar -xzf "$RUNNER_TEMP"/particula-helper-opencode-*.tgz -C "$RUNNER_TEMP/plugin-installed"
+          npm ci --ignore-scripts --prefix "$RUNNER_TEMP/plugin-installed/package"
+          PARTICULA_PLUGIN_ENTRY="$RUNNER_TEMP/plugin-installed/package/index.js" node adapter_test.mjs
+      - name: Assemble tested release assets
+        if: needs.release-plan.outputs.publish == 'true'
+        run: |
+          python scripts/build_particula_plugins.py --check --output release-assets
+          cp dist/*.whl dist/*.tar.gz .artifacts/docs-bundle.json release-assets/
+      - name: Save exact release assets for publication and retries
+        if: needs.release-plan.outputs.publish == 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: python-release-${{ github.sha }}
+          path: release-assets/*
+          if-no-files-found: error
+          retention-days: 30
+
+  publish:
+    needs: [release-plan, pyping]
+    if: github.repository == 'uncscode/particula' && needs.release-plan.outputs.publish == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: particula-release-${{ needs.release-plan.outputs.version }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v7.1.0
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          name: python-release-${{ github.sha }}
+          path: release-assets
+      - name: Verify any previously uploaded PyPI files
+        env:
+          RELEASE_VERSION: ${{ needs.release-plan.outputs.version }}
+        run: python scripts/release.py pypi-check --version "$RELEASE_VERSION"
+      - name: Tag the tested commit and publish the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_VERSION: ${{ needs.release-plan.outputs.version }}
+          SOURCE_COMMIT: ${{ github.sha }}
+        run: python scripts/release.py github --version "$RELEASE_VERSION" --sha "$SOURCE_COMMIT"
+      - name: Select the verified Python distributions
+        run: |
+          mkdir dist
+          cp release-assets/*.whl release-assets/*.tar.gz dist/
+      # GITHUB_TOKEN-created releases do not trigger another release workflow.
+      # Keep the existing PyPI action in this run for both automatic and manual releases.
+      - name: Publish package
+        uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}
+          skip-existing: true

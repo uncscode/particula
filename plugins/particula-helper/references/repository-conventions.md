@@ -22,7 +22,12 @@ use ordinary source search. No retired agent workflow tools are required.
 
 The 0.3.0 source tree requires Python 3.12+. `particula/__init__.py` owns
 `__version__`; Flit reads it dynamically. Plugin versions are independent.
-Neither changing a version nor passing tests publishes a release.
+A local version change or passing local tests does not publish a release.
+Merging a library version increase to upstream `main` runs release validation,
+creates the matching `vVERSION` tag and GitHub release, and invokes the existing
+PyPI publisher. Plugin version increases use their separate release workflow.
+Check the current workflows and contributor release guidance before preparing
+a version change; a passing build alone is not proof of publication.
 
 For library development, read the selected checkout's maintained `docs/` tree.
 For questions about an installed release, locate its matching bundle with that

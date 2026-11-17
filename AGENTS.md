@@ -4,7 +4,9 @@ Particula is a Python aerosol particle simulator. This checkout targets
 **0.3.2** and requires **Python 3.12+**. Upstream is
 https://github.com/uncscode/particula; a local `origin` may be a fork.
 `particula/__init__.py` owns the version read dynamically by Flit.
-A version bump does not publish a release.
+A local version bump does not publish a release. Merging a library version
+increase to upstream `main` starts validation, tagging, GitHub release creation
+and the existing PyPI publisher in `.github/workflows/pypi.yml`.
 
 ## Task guidance
 

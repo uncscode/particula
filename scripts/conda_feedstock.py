@@ -25,9 +25,11 @@ ROOT = Path(__file__).resolve().parents[1]
 VERSION_PATH = "particula/__init__.py"
 RELEASE_PATHS = {
     ".github/workflows/conda-feedstock.yml",
+    ".github/workflows/pypi.yml",
     "scripts/conda_feedstock.py",
     "scripts/check_feedstock_contract.py",
     "scripts/run_release_tests.py",
+    "scripts/release.py",
     "pyproject.toml",
     "_particula_build.py",
     "particula_docs.py",

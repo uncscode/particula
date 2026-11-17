@@ -221,13 +221,23 @@ def test_publication_requires_bundle_verification():
     """Both integration tests and exact-artifact checks gate the upload step."""
     workflow = yaml.safe_load((ROOT / ".github/workflows/pypi.yml").read_text())
     steps = workflow["jobs"]["pyping"]["steps"]
-    publish = next(
-        i for i, s in enumerate(steps) if "pypi-publish" in s.get("uses", "")
+    upload = next(
+        i
+        for i, s in enumerate(steps)
+        if s.get("with", {}).get("name", "").startswith("python-release-")
     )
     for command in (
         "scripts/tests/doc_bundle_test.py",
         "scripts/check_doc_bundle.py",
     ):
-        step = next(s for s in steps[:publish] if command in s.get("run", ""))
+        step = next(s for s in steps[:upload] if command in s.get("run", ""))
         assert not step.get("continue-on-error")
         assert "if" not in step
+    publish = workflow["jobs"]["publish"]
+    assert "pyping" in publish["needs"]
+    assert not publish.get("continue-on-error")
+    download = next(
+        s for s in publish["steps"] if "download-artifact" in s.get("uses", "")
+    )
+    assert download["with"]["name"] == steps[upload]["with"]["name"]
+    assert any("pypi-publish" in s.get("uses", "") for s in publish["steps"])
