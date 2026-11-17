@@ -4,8 +4,8 @@
 
 Particula Helper provides seven researcher workflows: environment setup,
 guidance, simulation design, execution, analysis, debugging and issue reporting,
-plus five repository development skills for planning, implementation, testing,
-documentation and review. It packages instructions and Python examples; your
+plus six repository development skills for planning, implementation, testing,
+documentation, example authoring and review. It packages instructions and Python examples; your
 assistant supplies the tools to read files and execute Python. No hosted
 simulation service or MCP server is included.
 
@@ -67,10 +67,26 @@ and inputs. The agent shows you the complete report for approval before posting
 to GitHub; without write access it supplies copyable Markdown. For a duplicate,
 it proposes a comment on the existing issue for your review.
 
+## Create or improve a published example
+
+Ask: “Use particula-examples to turn this calculation into a worked example
+with plots, explained code and topic links.” The skill provides an adaptable
+format: question and physical setup, prose introducing each code block, visual
+evidence with interpretation, conclusions/reflections and a next investigation.
+Quantitative examples normally include plots; a process schematic can explain
+the setup or serve a qualitative example. The structure can be adjusted to the
+problem without losing the scientific explanation.
+
+The workflow covers percent-cell Python, saved results and their provenance,
+example registration, primary topic categorization, related reading links and
+navigation. It distinguishes a full scientific refresh from a saved-data replot
+or a prose-only edit, and checks the rendered figures and page. Private study
+scripts remain the responsibility of particula-build.
+
 ## Contribute to the library
 
 Repository contributors can use `particula-plan`, `particula-develop`,
-`particula-test`, `particula-docs`, and `particula-review`. The repository's
+`particula-test`, `particula-docs`, `particula-examples`, and `particula-review`. The repository's
 [agent entry point](../../../AGENTS.md) links directly to each skill and its
 shared references; installation is optional when working from that checkout.
 The [plugin source](https://github.com/uncscode/particula/tree/main/plugins/particula-helper)
@@ -122,7 +138,7 @@ are illustrative parameters, not measured or calibrated research results.
 | Model-driven end-to-end conversations | Separate from installation tests; not claimed by the automated checks |
 | GPU | Not qualified by CPU smoke tests |
 
-The five repository skills are new package content; the historical host checks
+The six repository skills include example authoring; the historical host checks
 above do not establish live discovery or model-driven execution of the expanded
 catalog. Validate the updated package in the target host after installation.
 

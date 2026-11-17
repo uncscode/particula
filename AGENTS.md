@@ -20,7 +20,8 @@ selected checkout, not on their cached installation directory.
 | Plan a library feature, maintenance change or research task | [particula-plan](plugins/particula-helper/skills/particula-plan/SKILL.md) |
 | Implement/refactor library or GPU code | [particula-develop](plugins/particula-helper/skills/particula-develop/SKILL.md) |
 | Write/run tests, lint or release validation | [particula-test](plugins/particula-helper/skills/particula-test/SKILL.md) |
-| Edit docstrings, guides, theory or published examples | [particula-docs](plugins/particula-helper/skills/particula-docs/SKILL.md) |
+| Edit docstrings, guides, theory or topic navigation | [particula-docs](plugins/particula-helper/skills/particula-docs/SKILL.md) |
+| Create/edit published examples with visuals and topic links | [particula-examples](plugins/particula-helper/skills/particula-examples/SKILL.md) |
 | Review changes or prepare requested commits/PRs | [particula-review](plugins/particula-helper/skills/particula-review/SKILL.md) |
 
 For using Particula in a scientific study, the plugin separately provides

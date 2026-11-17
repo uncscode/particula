@@ -14,8 +14,9 @@ objectives boxes, and quizzes are not required:
 2. What can the reader do or decide afterward? What knowledge is assumed?
 3. What physical system, parameters, units, initial conditions, and exclusions
    make the calculation interpretable? Explain important parameter choices.
-4. Why does each meaningful code stage advance the question? Place explanations
-   beside the relevant stages. Avoid line-by-line narration of obvious Python.
+4. Why does each code block advance the question? Introduce every block with
+   nearby prose explaining purpose, inputs and what to inspect in the output.
+   Group tiny related fragments; avoid line-by-line narration of obvious Python.
 5. What should the reader notice in each important result? Identify a specific
    trend or comparison, the mechanism or hypothesis, and uncertainty or limits.
 6. What answer does the evidence support? Distinguish a calculation that ran,
@@ -24,6 +25,9 @@ objectives boxes, and quizzes are not required:
 7. How could the reader adapt it? Give a concrete question, parameter or model
    change, diagnostic to compare, and additional evidence needed. Mark unrun
    extensions as proposals rather than results.
+
+For the adaptable worked-example format, plots/process visuals and publication
+checks, use [example-authoring.md](example-authoring.md) with particula-examples.
 
 Preserve the source-to-result contract. Prose-only edits must not accidentally
 change executable cells or output association. Explain figures near the figure;

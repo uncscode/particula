@@ -16,8 +16,12 @@
     "name": "particula-develop"
   },
   {
-    "description": "Organize and maintain Particula documentation, its topic graph, scientific narratives, docstrings, and published Python examples in Astro/Starlight. Not for unrelated document drafting or private simulation notebooks.",
+    "description": "Organize and maintain Particula guides, theory, topic navigation and docstrings in Astro/Starlight. Route creating or editing published worked examples to particula-examples. Not for unrelated document drafting or private study scripts.",
     "name": "particula-docs"
+  },
+  {
+    "description": "Create or edit published Particula examples in docs with an adaptable scientific narrative, explanations for every code block, plots or process visuals, closing reflections, saved results and topic/navigation integration. Not for private study scripts, general guides or API docstrings.",
+    "name": "particula-examples"
   },
   {
     "description": "Explain aerosol science and Particula APIs with authoritative sources; use for tutorials, feature questions, equations, units, or choosing a modeling approach.",
