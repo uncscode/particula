@@ -60,7 +60,7 @@ def check_slots(masses: FloatTensor, counts: FloatMatrix, invalid: IntVector, re
 
 Reject active evaporation; only resolved free slots require zero mass.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_ode_kernels.py#L48-L64)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_ode_kernels.py#L52-L68)
 
 ## particula.execution._condensation_ode_kernels.error_norm
 
@@ -72,7 +72,7 @@ def error_norm(old: FloatVector, candidate: FloatVector, k1: FloatVector, k2: Fl
 
 Reduce the shared Bogacki-Shampine local estimate across every lane.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_ode_kernels.py#L128-L155)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_ode_kernels.py#L132-L159)
 
 ## particula.execution._condensation_ode_kernels.pack_rate
 
@@ -84,7 +84,7 @@ def pack_rate(rate: FloatTensor, counts: FloatMatrix, volume: FloatVector, gas_t
 
 Couple gas to particle flux with native population weights.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_ode_kernels.py#L67-L101)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_ode_kernels.py#L71-L105)
 
 ## particula.execution._condensation_ode_kernels.stage
 
@@ -96,16 +96,16 @@ def stage(state: FloatVector, k1: FloatVector, k2: FloatVector, k3: FloatVector,
 
 Form one out-of-place stage without touching accepted state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_ode_kernels.py#L104-L125)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_ode_kernels.py#L108-L129)
 
 ## particula.execution._condensation_ode_kernels.unpack
 
 *function*
 
 ```python
-def unpack(state: FloatVector, scale: FloatVector, masses: FloatTensor, gas: FloatMatrix, invalid: IntVector)
+def unpack(state: FloatVector, scale: FloatVector, initial_scaled: FloatVector, initial_physical: FloatVector, masses: FloatTensor, gas: FloatMatrix, invalid: IntVector)
 ```
 
 Unpack a trial and flag nonfinite/negative physical inventories.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_ode_kernels.py#L24-L45)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_ode_kernels.py#L24-L49)

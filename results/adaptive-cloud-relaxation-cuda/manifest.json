@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 7.719782760948874,
+  "package_source_sha256": "d3dbf2bbc42010dc580e48635a3056b40dfcfede7b20b6405fae6cc8921002f6",
+  "input_sha256": {
+    "docs/examples/simulations/adaptive_cloud_relaxation.py": "f1a94b503bae7e992905f49e400a6e5d4fb55615784fdf237f04b424d0da414d"
+  },
+  "example": "adaptive-cloud-relaxation-cuda",
+  "fingerprint": "16aaaaac3e42a6e2c72e12f433b0013563aef21c77a3794036bfd802e311000d",
+  "source": "docs/examples/simulations/adaptive_cloud_relaxation_cuda.py",
+  "revision": "b1e68d76201dd9d33a761aa197677de684977c19",
+  "package_dirty": true,
+  "executed_at": "2026-11-16T06:23:20.816146+00:00",
+  "device": "cuda:0: NVIDIA GeForce RTX 5060",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.1",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [
+      {
+        "text": "CUDA ROS3 1e-05 max radius error: 4.06940316399762e-06 mass residual: 7.090447494683783e-16 work: {'accepted': 330, 'rejected': 0, 'domain_rejected': 0, 'rate_calls': 1980, 'jacobian_calls': 330, 'time_derivative_calls': 0, 'factorizations': 0, 'linear_solves': 990, 'control_readbacks': 6270}\nCUDA ROS3 1e-07 max radius error: 3.2434184449314785e-08 mass residual: 3.722484934828969e-15 work: {'accepted': 1251, 'rejected': 2, 'domain_rejected': 0, 'rate_calls': 7518, 'jacobian_calls': 1253, 'time_derivative_calls': 0, 'factorizations': 0, 'linear_solves': 3759, 'control_readbacks': 23807}\n"
+      },
+      {
+        "image": "figure-4-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "figure-4-1.png": "6349b8bc99d987c4c1982f9c0efc909424d89425ee95d325b5eb3bdaf0bb9786",
+    "executed_source.py": "2eb37fd0b1f790464fa8cdc99557c0b63ab52c9f33e5d66570bcafdd886211a1",
+    "data.json": "d7917816400d67af69243ed62bd7f8b9a1c8b540703357e830704bc8bc611dfd",
+    "source.py": "6c64791d0d4ab184998e0a7a82fb96e9cd28362349800953fd8b651d0784df99"
+  },
+  "simulation_fingerprint": "88740b89a1115682f78cf39d2d5ae9d1e1442274e6f94dd8d45f0ff7715bb6cb",
+  "render_versions": {
+    "particula": "0.3.1",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "render_device": "CPU",
+  "execution_input_sha256": {
+    "docs/examples/simulations/adaptive_cloud_relaxation.py": "f1a94b503bae7e992905f49e400a6e5d4fb55615784fdf237f04b424d0da414d"
+  },
+  "rendered_at": "2026-11-16T06:24:04.551587+00:00",
+  "render_revision": "b1e68d76201dd9d33a761aa197677de684977c19",
+  "render_elapsed_seconds": 4.878946100012399
+}

@@ -164,7 +164,7 @@ def _compile_coagulation(plan, context: BuiltinPreparationContext)
 
 Retain the common collision sampler with optional ion rate work.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L386-L438)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L418-L484)
 
 ## particula.execution.prepared_processes._compile_dilution
 
@@ -176,7 +176,7 @@ def _compile_dilution(plan: _ProcessPlan, context: BuiltinPreparationContext)
 
 Bind the native exponential dilution operation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L321-L342)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L353-L374)
 
 ## particula.execution.prepared_processes._compile_process
 
@@ -188,7 +188,7 @@ def _compile_process(plan: _ProcessPlan, context: BuiltinPreparationContext)
 
 Prepare a built-in through its explicit adapter contract.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L313-L318)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L345-L350)
 
 ## particula.execution.prepared_processes._compile_wall_loss
 
@@ -200,7 +200,7 @@ def _compile_wall_loss(plan: _ProcessPlan, context: BuiltinPreparationContext)
 
 Bind the admitted neutral or charged wall-loss operation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L345-L383)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L377-L415)
 
 ## particula.execution.prepared_processes._plan_coagulation
 
@@ -210,9 +210,9 @@ Bind the admitted neutral or charged wall-loss operation.
 def _plan_coagulation(process: Any, aerosol: Aerosol) -> _ProcessPlan
 ```
 
-Admit direct Brownian physics and equal active represented counts.
+Freeze supported collision laws and equal represented counts.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L199-L243)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L199-L275)
 
 ## particula.execution.prepared_processes._plan_dilution
 
@@ -248,4 +248,4 @@ def _plan_wall_loss(process: Any, aerosol: Aerosol) -> _ProcessPlan
 
 Freeze neutral/charged chamber geometry and explicit electric fields.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L246-L310)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L278-L342)

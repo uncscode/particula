@@ -10,10 +10,13 @@
 # This longer illustration evolves **196,608 initially active particles** in
 # 32 boxes for 600 one-second steps. Each box has 8,192 slots, a polydisperse
 # water/dry-material population and three gas species. Nucleation, Brownian
-# coagulation and water condensation share one resident state. This coarse
-# fixed-step example stresses process composition, repeated injection and
-# restart; it is not a timestep-converged chamber prediction. For condensation
-# response with explicit refinement checks, use the multibox and forcing studies.
+# coagulation retain their fixed one-second event schedule. Water condensation
+# uses adaptive ROS3 between those boundaries. Event buffers and random streams
+# persist; condensation handoff stays in device memory. Adaptive acceptance,
+# rejection and step-size decisions run in a native CUDA conditional graph.
+# The host schedules fixed events and observations. Condensation error control does
+# not bound splitting or stochastic error, so this remains an illustrative
+# chamber calculation rather than a timestep-converged prediction.
 #
 # Every 50 seconds, a finite precursor pulse creates exactly 128 unit-count,
 # neutral particles per box. Remaining precursor is explicitly removed after
@@ -30,7 +33,7 @@
 # same external forcing schedule is continued from its saved step index.
 #
 # This is a deliberate manual CUDA study, excluded from CI execution. Its
-# refresh permits up to two hours; download the ZIP for all study helpers.
+# refresh permits up to four hours; download the ZIP for all study helpers.
 
 # %%
 """Longer coupled CUDA aerosol evolution with cyclic forcing and source pulses."""
@@ -38,6 +41,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import warp as wp
+from particula.execution.gpu_coupled import GPUCoupledSimulation
+from particula.execution.gpu_coupled_restart import resume_coupled
 from particula.util.constants import AVOGADRO_NUMBER, GAS_CONSTANT
 from scripts.gpu_studies.cases import (
     StudyCase,
@@ -63,11 +68,11 @@ def frame(owner, step):
     edges, histogram = radius_histogram(snapshot)
     return {
         "time": step,
-        "number": diagnostics.number_concentration.copy(),
-        "temperature": diagnostics.temperature.copy(),
-        "saturation": diagnostics.saturation_ratio[:, 2].copy(),
-        "edges": edges,
-        "histogram": histogram,
+        "number": diagnostics.number_concentration.tolist(),
+        "temperature": diagnostics.temperature.tolist(),
+        "saturation": diagnostics.saturation_ratio[:, 2].tolist(),
+        "edges": edges.tolist(),
+        "histogram": histogram.tolist(),
     }, snapshot
 
 
@@ -91,33 +96,42 @@ def advance(owner, start, stop, initial, expected, *, observe):
         pulse = step % PULSE_EVERY == 0
         if pulse:
             data = owner.diagnostics()
-            gas = data.gas_concentration.copy()
-            # Activation coefficient 0.25 s^-1 × 512 molecules × 1 s = 128.
-            gas[:, 1] = (
+            # Prescribed source demand, not a download/re-upload of evolving gas.
+            precursor = (
                 4
                 * EVENTS_PER_BOX
                 * initial.gas.molar_mass[1]
                 / AVOGADRO_NUMBER
-                / data.volume
+                / initial.particles.volume
             )
+            ratios = {}
             if step % 200 == 0:
-                humidity = (1.4, 0.7, 1.2)[step // 200]
-                gas[:, 2] = (
-                    humidity
+                ratios[initial.gas.name[2]] = (1.4, 0.7, 1.2)[step // 200]
+            owner.update_gas_species(
+                {initial.gas.name[1]: precursor}, saturation_ratios=ratios
+            )
+            forced = owner.diagnostics()
+            if ratios:
+                # Independent observation audit; this CPU result is never uploaded.
+                target = (
+                    ratios[initial.gas.name[2]]
                     * water_pressure(data.temperature)
                     * initial.gas.molar_mass[2]
                     / (GAS_CONSTANT * data.temperature)
                 )
+                np.testing.assert_allclose(
+                    forced.gas_concentration[:, 2], target, rtol=2e-14
+                )
             for gas_lane, material in ((2, 0), (1, 1)):
                 expected[:, material] += (
-                    gas[:, gas_lane] - data.gas_concentration[:, gas_lane]
+                    forced.gas_concentration[:, gas_lane]
+                    - data.gas_concentration[:, gas_lane]
                 ) * data.volume
-            owner.update_gas(gas)
         owner.step()
         if pulse:
             # Only nucleation consumes this precursor. Its observed depletion
             # independently verifies the unit-event demand through public data.
-            before_precursor = gas[:, 1].copy()
+            before_precursor = precursor.copy()
             data = owner.diagnostics()
             consumed_molecules = (
                 (before_precursor - data.gas_concentration[:, 1])
@@ -128,10 +142,8 @@ def advance(owner, start, stop, initial, expected, *, observe):
             np.testing.assert_allclose(
                 consumed_molecules, EVENTS_PER_BOX, rtol=2e-12, atol=0
             )
-            gas = data.gas_concentration.copy()
-            expected[:, 1] -= gas[:, 1] * data.volume
-            gas[:, 1] = 0
-            owner.update_gas(gas)
+            expected[:, 1] -= data.gas_concentration[:, 1] * data.volume
+            owner.update_gas_species({initial.gas.name[1]: 0.0})
         if observe and ((step + 1) % 20 == 0 or step + 1 == stop):
             observation, snapshot = frame(owner, step + 1)
             actual = mapped_inventory(snapshot)
@@ -153,6 +165,7 @@ def advance(owner, start, stop, initial, expected, *, observe):
                 max_error, float(np.max(np.abs(actual / expected - 1)))
             )
             frames.append(observation)
+            print(f"Verified CUDA chamber t={step + 1} s", flush=True)
     return frames, max_error
 
 
@@ -183,12 +196,19 @@ def run_example():
     initial, _, processes = build_case(case)
     initial.gas.concentration[:, 1] = 0.0
     source, coagulation, condensation = processes[:3]
-    process = source | coagulation | condensation
+    events = (source, coagulation)
+    strategy = condensation.condensation_strategy
     expected = mapped_inventory(initial)
-    with process.prepare(
-        initial, device="cuda:0", time_step=1.0, root_seed=42
+    with GPUCoupledSimulation(
+        initial,
+        events,
+        strategy,
+        device="cuda:0",
+        time_step=1.0,
+        root_seed=42,
+        resident=True,
     ) as owner:
-        owner.capture()
+        owner.capture_events()
         first, _ = frame(owner, 0)
         frames, error_a = advance(
             owner, 0, 300, initial, expected, observe=True
@@ -199,10 +219,19 @@ def run_example():
             owner, 300, STEPS, initial, expected, observe=True
         )
         final = owner.snapshot()
-    with process.resume(saved) as resumed:
-        resumed.capture()
+        work = {
+            **vars(owner.statistics),
+            "control_readbacks": owner.control_readbacks,
+            "coupling_downloads": owner.coupling_downloads,
+            "coupling_uploads": owner.coupling_uploads,
+        }
+        final_rng = owner.checkpoint().events.resident.rng_continuation
+    with resume_coupled(saved, events, strategy, device="cuda:0") as resumed:
+        resumed.capture_events()
         advance(resumed, 300, STEPS, initial, saved_expected, observe=False)
         continued = resumed.snapshot()
+        if resumed.checkpoint().events.resident.rng_continuation != final_rng:
+            raise AssertionError("Cyclic restart changed random continuation")
     if state_hash(final) != state_hash(continued):
         raise AssertionError("Cyclic restart changed the final state")
     np.testing.assert_allclose(
@@ -224,8 +253,19 @@ def run_example():
         "Maximum box/species inventory relative error:", max(error_a, error_b)
     )
     print("Second-half checkpoint continuation is byte-exact.")
+    print("Adaptive condensation and explicit coupling work:", work)
     plt.show()
-    return final
+    return {
+        "frames": [first, *frames, *later],
+        "work": work,
+        "max_inventory_relative_error": max(error_a, error_b),
+        "restart_exact": True,
+        "initial_active_particles": int(initial.particles.concentration.sum()),
+        "final_active_particles": int(
+            np.count_nonzero(final.particles.concentration)
+        ),
+        "duration_s": STEPS,
+    }
 
 
 # %% [markdown]
@@ -235,8 +275,11 @@ def run_example():
 # number and shifts mass to larger particles. Prescribed vapor and temperature
 # changes alter water uptake and evaporation. The radius/time map shows the
 # resulting evolving population instead of only a final distribution.
+# The point at zero is the supplied initial state before the first forcing
+# update. Later observations are 20 seconds apart; they do not resolve every
+# forcing jump or transient peak.
 # Invariant checks establish accounting and restart correctness; this
-# illustrative fixed-step calculation is not a timestep-converged prediction
+# fixed event schedule with adaptive condensation is not a converged prediction
 # for a physical chamber.
 
 
@@ -249,8 +292,10 @@ def plot_history(frames):
     number = np.array([f["number"] for f in frames])
     temperature = np.array([f["temperature"] for f in frames])
     saturation = np.array([f["saturation"] for f in frames])
-    edges = frames[0]["edges"]
-    histogram = np.array([f["histogram"].mean(axis=0) for f in frames])
+    edges = np.asarray(frames[0]["edges"])
+    histogram = np.array(
+        [np.asarray(f["histogram"]).mean(axis=0) for f in frames]
+    )
     distribution = histogram / np.diff(np.log10(edges))
     fig, axes = plt.subplots(2, 2, figsize=(11, 8), constrained_layout=True)
     for box in (0, 15, 31):

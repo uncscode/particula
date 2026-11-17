@@ -3546,15 +3546,31 @@ invalid.
 
 **Modules**
 
+- `particula.execution._adaptive_condensation_physics`
+- `particula.execution._adaptive_condensation_plan`
+- `particula.execution._condensation_block_kernels`
+- `particula.execution._condensation_device_control`
+- `particula.execution._condensation_jacobian`
 - `particula.execution._condensation_ode_kernels`
+- `particula.execution._condensation_reservoirs`
+- `particula.execution._condensation_ros3_kernels`
+- `particula.execution._gpu_condensation_block_ros3`
+- `particula.execution._gpu_condensation_ros3`
+- `particula.execution._gpu_gas_forcing`
 - `particula.execution.adapters`
+- `particula.execution.analysis_io`
+- `particula.execution.archive`
 - `particula.execution.availability`
 - `particula.execution.checkpoint`
 - `particula.execution.checkpoint_extensions`
+- `particula.execution.checkpoint_io`
 - `particula.execution.cohort`
 - `particula.execution.communication`
 - `particula.execution.condensation_ode`
+- `particula.execution.cpu_configuration`
 - `particula.execution.cpu_context`
+- `particula.execution.cpu_restart`
+- `particula.execution.cpu_simulation`
 - `particula.execution.diagnostics`
 - `particula.execution.errors`
 - `particula.execution.extension_guards`
@@ -3562,8 +3578,13 @@ invalid.
 - `particula.execution.extension_rng`
 - `particula.execution.fallback`
 - `particula.execution.field_buffers`
+- `particula.execution.forcing`
 - `particula.execution.gpu_condensation_ode`
+- `particula.execution.gpu_coupled`
+- `particula.execution.gpu_coupled_restart`
+- `particula.execution.gpu_resident_condensation`
 - `particula.execution.gpu_resources`
+- `particula.execution.gpu_restart`
 - `particula.execution.gpu_session`
 - `particula.execution.graph_capture`
 - `particula.execution.ode`
@@ -3583,17 +3604,20 @@ invalid.
 - `particula.execution.prepared_nucleation_kernels`
 - `particula.execution.prepared_particle_fields`
 - `particula.execution.prepared_processes`
+- `particula.execution.prepared_recording`
 - `particula.execution.prepared_transfer`
 - `particula.execution.prepared_types`
 - `particula.execution.prepared_updates`
 - `particula.execution.process_adapters`
 - `particula.execution.process_extensions`
 - `particula.execution.process_graph`
+- `particula.execution.recording`
 - `particula.execution.resident_communication`
 - `particula.execution.resident_enqueue`
 - `particula.execution.resident_scheduler`
 - `particula.execution.rng`
 - `particula.execution.scheduler`
+- `particula.execution.split_restart`
 - `particula.execution.splitting`
 - `particula.execution.state_updates`
 - `particula.execution.thermodynamic_updates`

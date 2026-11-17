@@ -45,6 +45,7 @@ import particula as par
 from particula.dynamics.condensation.species_mapping import (
     CondensationSpeciesMap,
 )
+from particula.execution.splitting import condensation_flow
 
 # Optional: uncomment if many steps and you want a progress bar
 # from tqdm import tqdm
@@ -182,6 +183,16 @@ def run_cycle(
         err_msg="Phase durations must be whole multiples of dt",
     )
     history = []
+    growth = condensation_flow(
+        "water_exchange",
+        condensation.condensation_strategy,
+        method="ros3",
+        rtol=1e-5,
+        particle_atol=1e-25,
+        gas_atol=1e-12,
+        first_step=1e-6,
+        max_step=dt,
+    )
 
     # Set initial humid phase water concentration
     aerosol.gas.concentration[0, water_index] = c_water_humid
@@ -206,7 +217,9 @@ def run_cycle(
             aerosol.gas.concentration[:, :-1]
             * aerosol.particles.volume[:, None]
         )
-        aerosol = condensation.execute(aerosol, time_step=dt)
+        accepted = growth.advance(aerosol, time_offset + (t_step - 1) * dt, dt)
+        aerosol.particles.masses[:] = accepted.particles.masses
+        aerosol.gas.concentration[:] = accepted.gas.concentration
         after = np.sum(
             aerosol.particles.masses
             * aerosol.particles.concentration[..., None],
@@ -240,7 +253,11 @@ def run_cycle(
             aerosol.gas.concentration[:, :-1]
             * aerosol.particles.volume[:, None]
         )
-        aerosol = condensation.execute(aerosol, time_step=dt)
+        accepted = growth.advance(
+            aerosol, time_offset + humid_duration + (t_step - 1) * dt, dt
+        )
+        aerosol.particles.masses[:] = accepted.particles.masses
+        aerosol.gas.concentration[:] = accepted.gas.concentration
         after = np.sum(
             aerosol.particles.masses
             * aerosol.particles.concentration[..., None],
@@ -444,7 +461,9 @@ condensation_as = par.dynamics.MassCondensation(
 )
 
 print("Scenario A (AS-only) configured")
-print(aerosol_as)
+print(
+    f"{aerosol_as.particles.masses.shape[1]} slots; gases: {aerosol_as.gas.name}"
+)
 
 
 # %% [markdown]
@@ -509,7 +528,10 @@ condensation_sucrose = par.dynamics.MassCondensation(
 )
 
 print("Scenario B (Sucrose-only) configured")
-print(aerosol_sucrose)
+print(
+    f"{aerosol_sucrose.particles.masses.shape[1]} slots; "
+    f"gases: {aerosol_sucrose.gas.name}"
+)
 
 
 # %% [markdown]
@@ -575,7 +597,10 @@ condensation_mixed = par.dynamics.MassCondensation(
 )
 
 print("Scenario C (Mixed AS + Sucrose) configured")
-print(aerosol_mixed)
+print(
+    f"{aerosol_mixed.particles.masses.shape[1]} slots; "
+    f"gases: {aerosol_mixed.gas.name}"
+)
 
 
 # %% [markdown]
@@ -648,7 +673,9 @@ print("\nAll simulations completed successfully!")
 # forcing phases, while cycle marks repeat every 90 s. A change in trajectory can
 # reflect water exchange or removal; the separate dry-mass diagnostics below
 # help distinguish them. Step-scale oscillations require a refinement study
-# before being interpreted as physical repeated activation.
+# before being interpreted as physical repeated activation. Condensation now
+# uses adaptive ROS3 within each outer interval; the wall-loss/output schedule
+# still needs its own refinement and stochastic uncertainty assessment.
 
 
 # %%
@@ -1761,18 +1788,21 @@ plt.show()
 # Repeated vapor resets exchange water with surviving seeds while wall loss
 # removes dry material. Tracking both species mass and particle identity separates
 # those effects better than a size curve alone. In the refreshed realization,
-# final dry-mass retention is about 16.1%, 11.2%, and 10.6% for sulfate, sucrose,
+# final dry-mass retention is about 14.1%, 12.1%, and 11.5% for sulfate, sucrose,
 # and mixed seeds, respectively. The first-event check records 0.1 s for both
 # pure compositions and therefore does not resolve an ordering between them.
-# The visible dry-phase oscillations remain a numerical-resolution concern;
-# do not interpret them as observed physical cycling. Composition changes the activity
+# The adaptive ROS3 trajectories have smooth dry phases at the saved 0.1 s
+# observation spacing, replacing the previous fixed-step oscillations. This
+# does not establish convergence of the outer wall-loss schedule or accuracy
+# between observations. Composition changes the activity
 # model, but these separately sampled scenarios do not isolate a universal κ
 # ordering or demonstrate competition between external sulfate and sucrose modes.
 
 # %% [markdown]
 # ## Design the next chamber comparison
 #
-# For a research study, first refine dt while keeping physical humid/dry durations
+# For a research study, refine outer dt and condensation tolerances separately,
+# keeping physical humid/dry durations
 # fixed. Compare full size trajectories, dry retention, and the explicitly chosen
 # activation diagnostic across independent random seeds. Then pair the initial
 # radii across compositions to separate material effects from sample variability.

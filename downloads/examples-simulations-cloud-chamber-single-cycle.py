@@ -24,8 +24,9 @@
 # The two humidity settings initialize phases; they are not held fixed by a
 # continuous controller. Each condensation step conserves its mapped species,
 # whereas wall removal and the imposed humidity reset open that inventory.
-# The retained 0.1 s calculation exhibits dry-phase oscillations. Its checks do
-# not establish timestep convergence or a quantitative activation threshold.
+# Adaptive ROS3 resolves condensation inside each 0.1 s wall-loss/output
+# interval. Its local error control is distinct from convergence of the outer
+# stochastic wall-loss schedule and from a quantitative activation threshold.
 #
 # Start with [condensation](../processes/condensation/condensation_1_bin.py) and
 # [rectangular wall loss](../processes/wall-loss/rectangular_wall_loss_strategy.py)
@@ -49,6 +50,7 @@ import particula as par
 from particula.dynamics.condensation.species_mapping import (
     CondensationSpeciesMap,
 )
+from particula.execution.splitting import condensation_flow
 
 # Optional: uncomment if many steps and you want a progress bar
 # from tqdm import tqdm
@@ -211,14 +213,19 @@ def species_inventory(aero):
     ) + (aero.gas.concentration[:, :3] * aero.particles.volume[:, None])
 
 
-print(aerosol)
+print(
+    "Particle slots:", n_particles, "represented volume (m^3):", chamber_volume
+)
+print("Gas species:", ", ".join(gas.name))
 
 # %% [markdown]
 # ## Set phase boundaries without imposing a continuous RH ramp
 #
-# The staggered condensation strategy updates both particle and gas inventories.
-# Its explicit species map excludes air. The two phases span a nominal 30 s each
-# at a fixed 0.1 s step; the reset occurs before the step stored at t=30 s.
+# The configured strategy supplies continuous particle/gas mass rates to ROS3;
+# its randomized staggered finite-step sweeps are not executed. Its explicit
+# species map excludes air. Each phase spans exactly 30 s. Condensation uses
+# adaptive accepted steps; wall removal and observation retain 0.1 s intervals.
+# The vapor reset occurs at t=30 s after the wet interval has finished.
 # Water vapor is initialized at 100.4% saturation and reset to 85% at the phase
 # boundary. Between resets it evolves through mass transfer.
 #
@@ -246,6 +253,16 @@ condensation_strategy = par.dynamics.CondensationIsothermalStaggered(
 )
 condensation = par.dynamics.MassCondensation(
     condensation_strategy=condensation_strategy
+)
+growth_flow = condensation_flow(
+    "water_exchange",
+    condensation_strategy,
+    method="ros3",
+    rtol=1e-5,
+    particle_atol=1e-25,
+    gas_atol=1e-12,
+    first_step=1e-6,
+    max_step=0.1,
 )
 
 # Time grid
@@ -294,9 +311,9 @@ print(
 #
 # Store particle masses, equivalent spherical diameters, and gas water for the
 # same times. Zero-mass removed particles have zero plotted diameter. The saved
-# realization reaches a 24.41 µm peak diameter and ends with 779 of 1000 particle
-# slots retaining mass; those are outcomes of this setup, not general chamber
-# performance estimates.
+# realization reports its peak diameter and surviving slots below. These
+# outcomes belong to this setup and random seed, not general chamber performance
+# estimates. Particle tolerance is kg per particle; gas tolerance is kg/m³.
 
 # %%
 n_particles = aerosol.particles.masses[0].copy().shape[0]
@@ -349,18 +366,9 @@ gas_conc_hist[0] = aerosol_state.gas.concentration[0, 2]
 
 # Run simulation - condensation strategy tracks gas-phase mass internally
 for i in range(1, n_steps):
-    # Switch to deactivation concentration at phase boundary
-    if i == activation_steps:
-        aerosol_state = set_water_concentration(
-            aerosol_state, c_water_deactivation
-        )
-        print(
-            f"Phase transition at step {i} (t={t[i]:.1f}s): switching to deactivation RH"
-        )
-
     # Condensation handles mass transfer and updates gas concentration internally
     before_condensation = species_inventory(aerosol_state)
-    aerosol_state = condensation.execute(aerosol_state, time_step=dt)
+    aerosol_state = growth_flow.advance(aerosol_state, float(t[i - 1]), dt)
     np.testing.assert_allclose(
         species_inventory(aerosol_state),
         before_condensation,
@@ -373,6 +381,14 @@ for i in range(1, n_steps):
     np.testing.assert_allclose(
         aerosol_state.gas.concentration[0, 3], 1.2, rtol=0, atol=0
     )
+
+    # Finish the wet interval before applying the instantaneous reservoir reset.
+    # The row at the event shows its right-hand gas value and accepted particles.
+    if i == activation_steps:
+        aerosol_state = set_water_concentration(
+            aerosol_state, c_water_deactivation
+        )
+        print(f"Dry reservoir imposed at t={t[i]:.1f} s")
 
     mass_hist[i] = aerosol_state.particles.masses[0].copy()
     diam_hist[i] = masses_to_diameter(mass_hist[i])
@@ -396,9 +412,10 @@ print("Survivors:", survivors.sum(), "of", n_particles)
 # the imposed reset changes the reservoir, after which evaporation can return
 # water to the gas. Removal is a separate sink.
 #
-# The retained dry-phase oscillations are a numerical limitation of this fixed
-# step. Do not interpret every size reversal as a physical evaporation cycle or
-# use the trajectories to infer a converged activation criterion.
+# Condensation now uses the stiff adaptive method rather than one fixed
+# condensation update per plotted interval. Check tolerance refinement before
+# interpreting small size reversals, and refine the outer wall-loss schedule
+# separately before inferring a converged activation criterion.
 
 # %%
 colors = [
@@ -498,9 +515,11 @@ print("Simulation completed successfully.")
 # ## What this cycle supports—and what to investigate next
 #
 # The calculation connects a humidity change to particle water exchange while
-# wall removal reduces the surviving population. A consistent local inventory
-# can coexist with oscillatory size trajectories: mass conservation alone does
-# not establish temporal accuracy.
+# wall removal reduces the surviving population. The adaptive result resolves
+# smooth dry-phase relaxation. The independent
+# [wet–dry accuracy comparison](adaptive_cloud_relaxation.py) shows why mass
+# conservation alone cannot establish temporal accuracy, and compares ROS2 and
+# ROS3 work at the same tolerances.
 #
 # Before using this setup to interpret an experiment, reduce the timestep and
 # compare peak diameter, dry-phase size histories, and gas water. Then repeat

@@ -160,7 +160,7 @@ A component failure discards the full current cycle; earlier accepted cycles
 remain. Callbacks must obey Flow's pure-resource contract. Fixed outer steps
 limit splitting error independently of adaptive component error control.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/splitting.py#L111-L163)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/splitting.py#L111-L170)
 
 ### particula.execution.splitting.SplitSimulation._state
 
@@ -246,7 +246,7 @@ def snapshot()
 
 Return detached state after a complete accepted cycle.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/splitting.py#L161-L163)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/splitting.py#L168-L170)
 
 ### particula.execution.splitting.SplitSimulation.step
 
@@ -258,7 +258,101 @@ def step(bound)
 
 Advance one complete cycle, shortened to land on bound [s].
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/splitting.py#L137-L159)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/splitting.py#L137-L166)
+
+## particula.execution.splitting._CondensationAdvance
+
+*class*
+
+```python
+class _CondensationAdvance
+```
+
+Retain a detached component for explicit restart identification.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/splitting.py#L173-L189)
+
+### particula.execution.splitting._CondensationAdvance._controls
+
+*attribute* · *instance attribute*
+
+```python
+_controls = deepcopy(controls)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/splitting.py#L178-L178)
+
+### particula.execution.splitting._CondensationAdvance._strategy
+
+*attribute* · *instance attribute*
+
+```python
+_strategy = deepcopy(strategy)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/splitting.py#L177-L177)
+
+### particula.execution.splitting._CondensationAdvance.__call__
+
+*method*
+
+```python
+def __call__(state, time, duration)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/splitting.py#L180-L189)
+
+### particula.execution.splitting._CondensationAdvance.__init__
+
+*method*
+
+```python
+def __init__(strategy, controls)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/splitting.py#L176-L178)
+
+## particula.execution.splitting._DilutionAdvance
+
+*class*
+
+```python
+class _DilutionAdvance
+```
+
+Retain exact dilution configuration independently of caller objects.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/splitting.py#L192-L204)
+
+### particula.execution.splitting._DilutionAdvance._strategy
+
+*attribute* · *instance attribute*
+
+```python
+_strategy = DilutionStrategy(coefficient)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/splitting.py#L198-L198)
+
+### particula.execution.splitting._DilutionAdvance.__call__
+
+*method*
+
+```python
+def __call__(state, time, duration)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/splitting.py#L200-L204)
+
+### particula.execution.splitting._DilutionAdvance.__init__
+
+*method*
+
+```python
+def __init__(coefficient)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/splitting.py#L195-L198)
 
 ## particula.execution.splitting._advance
 
@@ -303,7 +397,7 @@ Construct continuous native condensation with explicit controls.
 Component controllers restart at split boundaries. The outer step and
 component tolerances must both be refined to establish trajectory accuracy.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/splitting.py#L166-L184)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/splitting.py#L207-L213)
 
 ## particula.execution.splitting.dilution_flow
 
@@ -315,4 +409,4 @@ def dilution_flow(name, coefficient)
 
 Construct exact native gas/particle dilution with hazard [s^-1].
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/splitting.py#L187-L199)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/splitting.py#L216-L218)

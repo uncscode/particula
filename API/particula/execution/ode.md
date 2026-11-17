@@ -7,7 +7,7 @@ Concrete deterministic ODE stepping, separate from runnable finite-step maps.
 Rates have units of state per second. Callbacks receive detached read-only
 arrays and must be pure: no RNG, observation, or external mutation. The caller
 owns state scaling, physical admissibility and linear conservation invariants.
-Bogacki-Shampine RK3(2) is for nonstiff rates; ROS-2 uses the KPP coefficients:
+Bogacki-Shampine RK3(2) is for nonstiff rates; ROS-2/3 use the KPP coefficients:
 https://kpp.readthedocs.io/en/stable/num_methods/rosenbrock-methods.html
 These names are concrete implementation APIs, not package-root exports.
 
@@ -21,7 +21,17 @@ These names are concrete implementation APIs, not package-root exports.
 Array = np.ndarray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L17-L17)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L20-L20)
+
+## particula.execution.ode.Jacobian
+
+*attribute* · *module attribute*
+
+```python
+Jacobian = Callable[[float, Array], Array | spmatrix | sparray]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L22-L22)
 
 ## particula.execution.ode.Rate
 
@@ -31,7 +41,7 @@ Array = np.ndarray
 Rate = Callable[[float, Array], Array]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L18-L18)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L21-L21)
 
 ## particula.execution.ode.AdaptiveSolver
 
@@ -50,7 +60,7 @@ A failed call preserves the last accepted state/time, but retains work
 counters. Earlier accepted steps are never rolled back. Output/restart
 orchestration observes this owner only between successful step() calls.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L61-L266)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L65-L342)
 
 ### particula.execution.ode.AdaptiveSolver._state
 
@@ -60,7 +70,7 @@ orchestration observes this owner only between successful step() calls.
 _state = value
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L103-L103)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L107-L107)
 
 ### particula.execution.ode.AdaptiveSolver._time
 
@@ -70,7 +80,7 @@ _state = value
 _time = self._scalar(time, 'time', positive=False)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L104-L104)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L108-L108)
 
 ### particula.execution.ode.AdaptiveSolver.atol
 
@@ -80,7 +90,7 @@ _time = self._scalar(time, 'time', positive=False)
 atol = self._tolerance(atol, value.shape, 'atol', True)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L118-L118)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L122-L122)
 
 ### particula.execution.ode.AdaptiveSolver.last_error
 
@@ -90,7 +100,7 @@ atol = self._tolerance(atol, value.shape, 'atol', True)
 last_error = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L121-L121)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L125-L125)
 
 ### particula.execution.ode.AdaptiveSolver.max_step
 
@@ -100,7 +110,7 @@ last_error = None
 max_step = self._scalar(max_step, 'max_step')
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L106-L106)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L110-L110)
 
 ### particula.execution.ode.AdaptiveSolver.max_trials
 
@@ -110,7 +120,7 @@ max_step = self._scalar(max_step, 'max_step')
 max_trials = max_trials
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L116-L116)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L120-L120)
 
 ### particula.execution.ode.AdaptiveSolver.method
 
@@ -120,7 +130,7 @@ max_trials = max_trials
 method = method
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L101-L101)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L105-L105)
 
 ### particula.execution.ode.AdaptiveSolver.min_step
 
@@ -130,7 +140,7 @@ method = method
 min_step = self._scalar(min_step, 'min_step')
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L105-L105)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L109-L109)
 
 ### particula.execution.ode.AdaptiveSolver.next_step
 
@@ -140,7 +150,7 @@ min_step = self._scalar(min_step, 'min_step')
 next_step = first_step
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L119-L119)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L123-L123)
 
 ### particula.execution.ode.AdaptiveSolver.problem
 
@@ -150,7 +160,7 @@ next_step = first_step
 problem = problem
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L100-L100)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L104-L104)
 
 ### particula.execution.ode.AdaptiveSolver.rtol
 
@@ -160,7 +170,7 @@ problem = problem
 rtol = self._tolerance(rtol, value.shape, 'rtol', False)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L117-L117)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L121-L121)
 
 ### particula.execution.ode.AdaptiveSolver.statistics
 
@@ -170,7 +180,7 @@ rtol = self._tolerance(rtol, value.shape, 'rtol', False)
 statistics = StepStatistics()
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L120-L120)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L124-L124)
 
 ### particula.execution.ode.AdaptiveSolver.state
 
@@ -182,7 +192,7 @@ state
 
 Return detached accepted state in the caller's declared units.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L144-L146)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L148-L150)
 
 ### particula.execution.ode.AdaptiveSolver.time
 
@@ -194,7 +204,7 @@ time
 
 Return accepted absolute time in seconds.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L149-L151)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L153-L155)
 
 ### particula.execution.ode.AdaptiveSolver.__init__
 
@@ -206,7 +216,7 @@ def __init__(problem, state, *, time=0.0, method='rk23', rtol=1e-05, atol=1e-12,
 
 Validate configuration and detach initial state before any rates.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L72-L121)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L76-L125)
 
 ### particula.execution.ode.AdaptiveSolver._check
 
@@ -216,7 +226,19 @@ Validate configuration and detach initial state before any rates.
 def _check(state)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L153-L157)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L157-L161)
+
+### particula.execution.ode.AdaptiveSolver._linearize
+
+*method*
+
+```python
+def _linearize(t, y, h, gamma)
+```
+
+Factor the Rosenbrock matrix once for all stages of one trial.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L184-L231)
 
 ### particula.execution.ode.AdaptiveSolver._rate
 
@@ -226,7 +248,7 @@ def _check(state)
 def _rate(time, state)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L159-L169)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L163-L173)
 
 ### particula.execution.ode.AdaptiveSolver._rk23
 
@@ -236,7 +258,7 @@ def _rate(time, state)
 def _rk23(t, y, h)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L171-L178)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L175-L182)
 
 ### particula.execution.ode.AdaptiveSolver._ros2
 
@@ -246,7 +268,25 @@ def _rk23(t, y, h)
 def _ros2(t, y, h)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L180-L207)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L233-L241)
+
+### particula.execution.ode.AdaptiveSolver._ros3
+
+*method*
+
+```python
+def _ros3(t, y, h)
+```
+
+Take a KPP ROS-3 trial with an embedded second-order estimate.
+
+Three stage solves share one factorization and two rate evaluations.
+Each stage includes two residual-correction solves, counted in stats.
+Coefficients: KineticPreProcessor/KPP int/rosenbrock.f90, Ros3,
+Git blob baf1ef64538a5128db5e1154ac7fd1b39c41f665. The Jacobian
+convention here is df_i/dy_j, without KPP's storage transpose.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L243-L282)
 
 ### particula.execution.ode.AdaptiveSolver._scalar
 
@@ -256,7 +296,7 @@ def _ros2(t, y, h)
 def _scalar(value, name, positive=True)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L123-L130)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L127-L134)
 
 ### particula.execution.ode.AdaptiveSolver._tolerance
 
@@ -266,7 +306,7 @@ def _scalar(value, name, positive=True)
 def _tolerance(value, shape, name, positive)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L132-L141)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L136-L145)
 
 ### particula.execution.ode.AdaptiveSolver.step
 
@@ -282,7 +322,7 @@ At an already reached bound this is a no-op. Only explicit domain
 failures are retried; configuration errors and callback bugs propagate.
 Repeated rejection or unrepresentable time advance raises RuntimeError.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L209-L266)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L284-L342)
 
 ## particula.execution.ode.ODEProblem
 
@@ -294,12 +334,12 @@ class ODEProblem
 
 Declare pure continuous derivatives and optional stiff-method inputs.
 
-jacobian[i,j] is df_i/dy_j. ROS-2 requires both jacobian and
+jacobian[i,j] is df_i/dy_j. ROS-2/3 require both jacobian and
 time_derivative (partial f/partial t at fixed state); autonomous problems
 explicitly supply zeros for the latter. admissible checks all internal
 stages and the accepted candidate, without changing either.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L25-L38)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L29-L42)
 
 ### particula.execution.ode.ODEProblem.admissible
 
@@ -309,17 +349,17 @@ stages and the accepted candidate, without changing either.
 admissible: Callable[[Array], bool]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L36-L36)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L40-L40)
 
 ### particula.execution.ode.ODEProblem.jacobian
 
 *attribute* · *class attribute* · *instance attribute*
 
 ```python
-jacobian: Rate | None = None
+jacobian: Jacobian | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L37-L37)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L41-L41)
 
 ### particula.execution.ode.ODEProblem.rate
 
@@ -329,7 +369,7 @@ jacobian: Rate | None = None
 rate: Rate
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L35-L35)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L39-L39)
 
 ### particula.execution.ode.ODEProblem.time_derivative
 
@@ -339,14 +379,14 @@ rate: Rate
 time_derivative: Rate | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L38-L38)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L42-L42)
 
 ### particula.execution.ode.ODEProblem.__init__
 
 *method*
 
 ```python
-def __init__(rate: Rate, admissible: Callable[[Array], bool], jacobian: Rate | None = None, time_derivative: Rate | None = None) -> None
+def __init__(rate: Rate, admissible: Callable[[Array], bool], jacobian: Jacobian | None = None, time_derivative: Rate | None = None) -> None
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L0-L0)
@@ -361,7 +401,7 @@ class StepStatistics
 
 Count trial work separately from accepted steps.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L41-L52)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L45-L56)
 
 ### particula.execution.ode.StepStatistics.accepted
 
@@ -371,7 +411,7 @@ Count trial work separately from accepted steps.
 accepted: int = 0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L45-L45)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L49-L49)
 
 ### particula.execution.ode.StepStatistics.domain_rejected
 
@@ -381,7 +421,7 @@ accepted: int = 0
 domain_rejected: int = 0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L47-L47)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L51-L51)
 
 ### particula.execution.ode.StepStatistics.factorizations
 
@@ -391,7 +431,7 @@ domain_rejected: int = 0
 factorizations: int = 0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L51-L51)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L55-L55)
 
 ### particula.execution.ode.StepStatistics.jacobian_calls
 
@@ -401,7 +441,7 @@ factorizations: int = 0
 jacobian_calls: int = 0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L49-L49)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L53-L53)
 
 ### particula.execution.ode.StepStatistics.linear_solves
 
@@ -411,7 +451,7 @@ jacobian_calls: int = 0
 linear_solves: int = 0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L52-L52)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L56-L56)
 
 ### particula.execution.ode.StepStatistics.rate_calls
 
@@ -421,7 +461,7 @@ linear_solves: int = 0
 rate_calls: int = 0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L48-L48)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L52-L52)
 
 ### particula.execution.ode.StepStatistics.rejected
 
@@ -431,7 +471,7 @@ rate_calls: int = 0
 rejected: int = 0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L46-L46)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L50-L50)
 
 ### particula.execution.ode.StepStatistics.time_derivative_calls
 
@@ -441,7 +481,7 @@ rejected: int = 0
 time_derivative_calls: int = 0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L50-L50)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L54-L54)
 
 ### particula.execution.ode.StepStatistics.__init__
 
@@ -465,7 +505,7 @@ Bases: `ValueError`
 
 A proposed intermediate state is outside the model's physical domain.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L21-L22)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L25-L26)
 
 ## particula.execution.ode._readonly
 
@@ -475,4 +515,4 @@ A proposed intermediate state is outside the model's physical domain.
 def _readonly(value)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L55-L58)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L59-L62)
