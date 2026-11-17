@@ -21,7 +21,7 @@
       "description": "Connect size, composition, and the surrounding gas to the properties you can measure.",
       "parent": "aerosols",
       "order": 0,
-      "icon": "aerosol",
+      "icon": "state",
       "aliases": [],
       "search_phrases": [],
       "prerequisites": [],
@@ -345,7 +345,7 @@
       "description": "Follow diffusion-driven collisions through binned and particle-resolved calculations.",
       "parent": "collisions",
       "order": 0,
-      "icon": "collision",
+      "icon": "brownian",
       "aliases": [],
       "search_phrases": [
         "Brownian motion",
@@ -415,7 +415,7 @@
       "description": "Introduce new particles while tracking source rates and material inventories.",
       "parent": "sources",
       "order": 0,
-      "icon": "source",
+      "icon": "nucleation",
       "aliases": [],
       "search_phrases": [
         "particle formation",
@@ -553,7 +553,7 @@
       "description": "Construct native aerosol state and run supported processes on the CPU.",
       "parent": "execution",
       "order": 0,
-      "icon": "model",
+      "icon": "cpu",
       "aliases": [],
       "search_phrases": [
         "first simulation",
@@ -570,16 +570,13 @@
       "description": "Prepare resident simulations, manage transfers and checkpoints, or use direct kernels.",
       "parent": "execution",
       "order": 1,
-      "icon": "chip",
+      "icon": "gpu",
       "aliases": [
         "CUDA workflows"
       ],
       "search_phrases": [
-        "graph capture",
-        "resident",
-        "checkpoint",
-        "slots",
-        "scaling"
+        "GPU workflows",
+        "accelerated simulations"
       ],
       "prerequisites": [
         "representations"
@@ -679,21 +676,401 @@
       "related": [],
       "context": "Smoke, soot, and respiratory droplets combine source properties with changing environmental conditions. Demonstration scenarios help identify competing mechanisms, but source composition and exposure interpretation require independent evidence. A particle evolution model alone does not establish a health outcome.",
       "investigation": "Which source property most affects the predicted size or lifetime in your scenario, and what measurement would constrain it before interpreting downstream exposure?"
+    },
+    {
+      "id": "gpu-direct",
+      "label": "Direct kernels",
+      "description": "Control individual CUDA process calls and explicit transfers.",
+      "parent": "gpu",
+      "order": 0,
+      "icon": "gpu-direct",
+      "aliases": [],
+      "search_phrases": [
+        "direct CUDA",
+        "direct kernels"
+      ],
+      "prerequisites": [],
+      "related": [],
+      "context": "Direct kernels expose the boundary between host state, device buffers, and individual aerosol processes. Each call needs compatible configuration and capacity; a successful launch alone does not establish physical agreement.",
+      "investigation": "How does a direct condensation or coagulation step compare with an independent reference at matched initial conditions?"
+    },
+    {
+      "id": "gpu-prepared",
+      "label": "Prepared simulations",
+      "description": "Prepare a process sequence and evolve one or many aerosol boxes.",
+      "parent": "gpu",
+      "order": 1,
+      "icon": "gpu-prepared",
+      "aliases": [],
+      "search_phrases": [
+        "prepared CUDA",
+        "GPU scaling"
+      ],
+      "prerequisites": [],
+      "related": [],
+      "context": "Preparation binds state, process choices, and workspaces before repeated execution. Forcing, stochastic state, and heterogeneous boxes affect both interpretation and cost; comparisons should retain the same workload.",
+      "investigation": "How do forcing and the number of boxes change evolution and runtime for the same process configuration?"
+    },
+    {
+      "id": "gpu-resident",
+      "label": "Resident execution",
+      "description": "Continue device-resident runs, save checkpoints, and replay schedules.",
+      "parent": "gpu",
+      "order": 2,
+      "icon": "gpu-resident",
+      "aliases": [],
+      "search_phrases": [
+        "resident",
+        "checkpoint",
+        "graph capture"
+      ],
+      "prerequisites": [],
+      "related": [],
+      "context": "Resident workflows retain device state across timesteps. Restart and graph replay must preserve the supported state and execution contracts; reusable schedules have explicit qualification boundaries.",
+      "investigation": "Does a checkpoint restart reproduce uninterrupted evolution, including the stochastic state?"
+    },
+    {
+      "id": "gpu-foundations",
+      "label": "GPU foundations",
+      "description": "Choose a supported backend and understand device ownership.",
+      "parent": "gpu",
+      "order": 3,
+      "icon": "gpu-foundations",
+      "aliases": [],
+      "search_phrases": [],
+      "prerequisites": [],
+      "related": [],
+      "context": "GPU setup, data movement, and kernel implementation answer different questions. Backend availability does not imply every scientific model or execution path is supported.",
+      "investigation": "Which setup, data ownership, and implementation constraints determine whether a proposed GPU study is supported?"
+    },
+    {
+      "id": "gpu-foundations-setup",
+      "label": "Setup and support",
+      "description": "Check backend availability, supported features, and failures.",
+      "parent": "gpu-foundations",
+      "order": 0,
+      "icon": "gpu-foundations-setup",
+      "aliases": [],
+      "search_phrases": [
+        "CUDA setup",
+        "GPU troubleshooting"
+      ],
+      "prerequisites": [],
+      "related": [],
+      "context": "Device selection and support tables establish which execution paths are available. Explicit fallback choices and diagnostic messages should be checked before interpreting results as CUDA evidence.",
+      "investigation": "Can the selected backend execute the required processes without an unintended fallback?"
+    },
+    {
+      "id": "gpu-foundations-data",
+      "label": "Device data and capacity",
+      "description": "Manage transfers, slots, and finite device capacity.",
+      "parent": "gpu-foundations",
+      "order": 1,
+      "icon": "gpu-foundations-data",
+      "aliases": [],
+      "search_phrases": [
+        "GPU slots",
+        "capacity",
+        "device transfers"
+      ],
+      "prerequisites": [],
+      "related": [],
+      "context": "Transfers establish ownership boundaries between host and device state. Finite slot capacity can limit source and collision workflows; capacity exhaustion must remain visible rather than silently changing the population.",
+      "investigation": "How much capacity does a source-driven run need, and what happens when that capacity is exhausted?"
+    },
+    {
+      "id": "gpu-foundations-warp",
+      "label": "Warp implementation",
+      "description": "Understand data structures, kernels, and differentiation limits.",
+      "parent": "gpu-foundations",
+      "order": 2,
+      "icon": "gpu-foundations-warp",
+      "aliases": [],
+      "search_phrases": [
+        "NVIDIA Warp",
+        "autodiff"
+      ],
+      "prerequisites": [],
+      "related": [],
+      "context": "Warp architecture and teaching material explain how particle operations map to device execution. Teaching examples and differentiation discussions do not by themselves qualify a production aerosol model.",
+      "investigation": "Which operations in a particle workflow are differentiable, and which stochastic or discrete choices break that interpretation?"
+    },
+    {
+      "id": "verification-scientific",
+      "label": "Scientific and numerical correctness",
+      "description": "Compare equations, conservation, and numerical refinement.",
+      "parent": "verification",
+      "order": 0,
+      "icon": "verification-scientific",
+      "aliases": [],
+      "search_phrases": [],
+      "prerequisites": [],
+      "related": [],
+      "context": "Analytic limits, independent calculations, and refinement studies constrain different numerical errors. A parity result establishes agreement for its tested conditions, not universal physical validity.",
+      "investigation": "Do conservation and refinement checks agree with an independent reference across the intended parameter range?"
+    },
+    {
+      "id": "verification-qualification",
+      "label": "Execution and release qualification",
+      "description": "Inspect evidence for supported workflows and release gates.",
+      "parent": "verification",
+      "order": 1,
+      "icon": "verification-qualification",
+      "aliases": [],
+      "search_phrases": [],
+      "prerequisites": [],
+      "related": [],
+      "context": "Qualification records tie claims to a particular implementation, workload, and device. Passing one workflow or release gate does not imply qualification of other backends or configurations.",
+      "investigation": "Which recorded gates cover the exact workflow and revision needed for a new study?"
+    },
+    {
+      "id": "verification-performance",
+      "label": "Performance and memory evidence",
+      "description": "Interpret timings, scaling, and device memory budgets.",
+      "parent": "verification",
+      "order": 2,
+      "icon": "verification-performance",
+      "aliases": [],
+      "search_phrases": [
+        "benchmarks",
+        "memory budget",
+        "profiling"
+      ],
+      "prerequisites": [],
+      "related": [],
+      "context": "Runtime and memory measurements depend on workload, synchronization, hardware, and numerical agreement. Historical benchmarks retain their provenance and should not be presented as current measurements.",
+      "investigation": "How does throughput change with population size when accuracy and device memory limits are held explicit?"
+    },
+    {
+      "id": "representations-construction",
+      "label": "Constructing aerosol state",
+      "description": "Build particle, gas, and environment state from scientific inputs.",
+      "parent": "representations",
+      "order": 0,
+      "icon": "representations-construction",
+      "aliases": [],
+      "search_phrases": [],
+      "prerequisites": [],
+      "related": [],
+      "context": "Initial state encodes units, species mapping, physical volume, and population measure. Construction should preserve the intended number and material inventories before any process advances.",
+      "investigation": "Do the constructed state and input measurements represent the same integrated number and species mass?"
+    },
+    {
+      "id": "representations-measures",
+      "label": "Population measures and weights",
+      "description": "Distinguish particle properties from population weights.",
+      "parent": "representations",
+      "order": 1,
+      "icon": "representations-measures",
+      "aliases": [],
+      "search_phrases": [
+        "population weights",
+        "PMF PDF"
+      ],
+      "prerequisites": [],
+      "related": [],
+      "context": "Bin totals, densities per coordinate, and resolved count weights have different integration rules. Matching array shapes is insufficient to establish that two populations represent the same aerosol.",
+      "investigation": "Which integration and volume factors make two population representations comparable?"
+    },
+    {
+      "id": "representations-ownership",
+      "label": "State ownership and transfers",
+      "description": "Access and transfer native state without losing its meaning.",
+      "parent": "representations",
+      "order": 2,
+      "icon": "representations-ownership",
+      "aliases": [],
+      "search_phrases": [],
+      "prerequisites": [],
+      "related": [],
+      "context": "Container access, field ownership, and transfer rules determine whether a change updates the intended state. Shape, species metadata, and population semantics must survive supported transfers.",
+      "investigation": "Which state values and metadata remain invariant after a supported transfer and reconstruction?"
+    },
+    {
+      "id": "activity-ideal",
+      "label": "Ideal mixtures",
+      "description": "Connect composition measures to ideal chemical activity.",
+      "parent": "activity",
+      "order": 0,
+      "icon": "activity-ideal",
+      "aliases": [],
+      "search_phrases": [
+        "ideal activity"
+      ],
+      "prerequisites": [],
+      "related": [],
+      "context": "Ideal mixing uses a specified composition measure and pure-component reference. Equal mass fractions need not imply equal mole fractions or equal equilibrium contributions.",
+      "investigation": "How do ideal activities change when the same mixture is expressed in mass and mole fractions?"
+    },
+    {
+      "id": "activity-kappa",
+      "label": "Hygroscopicity and κ models",
+      "description": "Relate water content to a hygroscopicity approximation.",
+      "parent": "activity",
+      "order": 1,
+      "icon": "activity-kappa",
+      "aliases": [],
+      "search_phrases": [
+        "kappa activity",
+        "hygroscopicity"
+      ],
+      "prerequisites": [],
+      "related": [],
+      "context": "A κ model summarizes water uptake with an effective hygroscopicity parameter. Its assumptions and composition inputs bound comparisons with more detailed activity models.",
+      "investigation": "How sensitive is predicted water uptake to κ at fixed dry composition?"
+    },
+    {
+      "id": "activity-nonideal",
+      "label": "Nonideal mixtures",
+      "description": "Explore composition-dependent departures from ideal activity.",
+      "parent": "activity",
+      "order": 2,
+      "icon": "activity-nonideal",
+      "aliases": [],
+      "search_phrases": [
+        "BAT activity",
+        "nonideal activity"
+      ],
+      "prerequisites": [],
+      "related": [],
+      "context": "Nonideal models introduce interactions beyond an ideal mixing rule. Comparisons require matched composition, temperature, and model applicability; departures from unity are model predictions rather than direct observations.",
+      "investigation": "Where does the BAT activity prediction depart most from ideal mixing along a composition path?"
+    },
+    {
+      "id": "brownian-binned",
+      "label": "Binned populations",
+      "description": "Follow Brownian collisions with bin totals or size densities.",
+      "parent": "brownian",
+      "order": 0,
+      "icon": "brownian-binned",
+      "aliases": [],
+      "search_phrases": [],
+      "prerequisites": [],
+      "related": [],
+      "context": "PMF and PDF populations encode different measures of the same size coordinate. Collision changes should be interpreted through integrated number and mass with the appropriate bin weights.",
+      "investigation": "Do PMF and PDF calculations agree after integrating both over identical size bins?"
+    },
+    {
+      "id": "brownian-resolved",
+      "label": "Particle-resolved populations",
+      "description": "Track collisions through individual representative particles.",
+      "parent": "brownian",
+      "order": 1,
+      "icon": "brownian-resolved",
+      "aliases": [],
+      "search_phrases": [
+        "particle resolved coagulation"
+      ],
+      "prerequisites": [],
+      "related": [],
+      "context": "Resolved collisions change particle properties and represented counts through discrete events. Random variation and count weights must be considered when comparing with a deterministic population calculation.",
+      "investigation": "How does ensemble particle-number decay compare with a matched binned calculation?"
+    },
+    {
+      "id": "brownian-comparison",
+      "label": "Comparing representations",
+      "description": "Match units and inventories before comparing coagulation.",
+      "parent": "brownian",
+      "order": 2,
+      "icon": "brownian-comparison",
+      "aliases": [],
+      "search_phrases": [],
+      "prerequisites": [],
+      "related": [],
+      "context": "Similar spectra or number-decay curves can hide differences in population measure or mixing state. Cross-representation comparisons need matched initial inventories and numerical refinement.",
+      "investigation": "Which apparent differences disappear after matching population measures, and which persist under refinement?"
+    },
+    {
+      "id": "condensation-reservoirs",
+      "label": "Population growth and vapor reservoirs",
+      "description": "Compare growth in maintained and finite vapor reservoirs.",
+      "parent": "condensation",
+      "order": 0,
+      "icon": "condensation-reservoirs",
+      "aliases": [],
+      "search_phrases": [],
+      "prerequisites": [],
+      "related": [],
+      "context": "A maintained reservoir supplies vapor externally, whereas a finite reservoir couples particles through vapor depletion. Growth and water uptake therefore require different inventory accounting.",
+      "investigation": "How does finite vapor availability change growth relative to a maintained reservoir?"
+    },
+    {
+      "id": "condensation-adaptive",
+      "label": "Adaptive growth and relaxation",
+      "description": "Resolve depletion and stiff wet–dry relaxation on CPU and CUDA.",
+      "parent": "condensation",
+      "order": 1,
+      "icon": "condensation-adaptive",
+      "aliases": [],
+      "search_phrases": [
+        "stiff condensation",
+        "adaptive growth"
+      ],
+      "prerequisites": [],
+      "related": [],
+      "context": "Adaptive studies examine error control when growth and equilibration timescales vary. Oscillations in a dry regime must be distinguished from resolved physical relaxation using independent references and refinement.",
+      "investigation": "Do tighter integration tolerances remove dry-phase oscillations while preserving the wet-phase relaxation?"
+    },
+    {
+      "id": "condensation-energy",
+      "label": "Latent-energy transfer",
+      "description": "Relate phase-change mass transfer to its energy diagnostic.",
+      "parent": "condensation",
+      "order": 2,
+      "icon": "condensation-energy",
+      "aliases": [],
+      "search_phrases": [
+        "latent heat"
+      ],
+      "prerequisites": [],
+      "related": [],
+      "context": "Latent energy follows from transferred material and the chosen thermodynamic properties. Computing that diagnostic does not by itself imply that temperature feedback is coupled into the simulation.",
+      "investigation": "How does the latent-energy diagnostic change with the mass condensed during a step?"
+    },
+    {
+      "id": "losses-dilution",
+      "label": "Dilution",
+      "description": "Remove a well-mixed fraction without shrinking particles.",
+      "parent": "losses",
+      "order": 0,
+      "icon": "losses-dilution",
+      "aliases": [],
+      "search_phrases": [],
+      "prerequisites": [],
+      "related": [],
+      "context": "Ideal dilution reduces population abundance while leaving individual particle size unchanged. Inventory loss belongs to an explicit sink budget rather than a closed-system conservation assertion.",
+      "investigation": "Does dilution reduce integrated number and mass by the same factor while preserving particle size?"
+    },
+    {
+      "id": "losses-deposition",
+      "label": "Wall deposition",
+      "description": "Compare geometry and size-dependent wall removal.",
+      "parent": "losses",
+      "order": 1,
+      "icon": "losses-deposition",
+      "aliases": [],
+      "search_phrases": [
+        "wall deposition"
+      ],
+      "prerequisites": [],
+      "related": [],
+      "context": "Wall deposition depends on transport, particle size, and chamber geometry. A changing spectrum can combine removal with coagulation or growth, so separate process contributions are needed.",
+      "investigation": "How do spherical and rectangular chamber models change size-resolved loss under comparable conditions?"
     }
   ],
   "resources": [
     {
       "source": "docs/contribute/architecture/warp/autodiff-limitations.md",
       "title": "Warp Autodiff: Limitations and Stochastic Process Handling",
-      "topic": "gpu",
+      "topic": "gpu-foundations-warp",
       "also": [],
       "role": "Contribute",
-      "start_here": false
+      "start_here": true
     },
     {
       "source": "docs/contribute/architecture/warp/datastructures.md",
       "title": "Data Structures for Aerosol Simulation",
-      "topic": "gpu",
+      "topic": "gpu-foundations-warp",
       "also": [],
       "role": "Contribute",
       "start_here": false
@@ -701,7 +1078,7 @@
     {
       "source": "docs/contribute/architecture/warp/index.md",
       "title": "NVIDIA Warp for Particle Simulation",
-      "topic": "gpu",
+      "topic": "gpu-foundations-warp",
       "also": [],
       "role": "Contribute",
       "start_here": false
@@ -709,7 +1086,7 @@
     {
       "source": "docs/contribute/architecture/warp/kernels.md",
       "title": "Kernels and Function Inlining for Particle Simulation",
-      "topic": "gpu",
+      "topic": "gpu-foundations-warp",
       "also": [],
       "role": "Contribute",
       "start_here": false
@@ -717,7 +1094,7 @@
     {
       "source": "docs/contribute/architecture/warp/teaching/fluids.md",
       "title": "Aerosol Dynamics with NVIDIA Warp",
-      "topic": "gpu",
+      "topic": "gpu-foundations-warp",
       "also": [],
       "role": "Contribute",
       "start_here": false
@@ -725,7 +1102,7 @@
     {
       "source": "docs/contribute/architecture/warp/teaching/geometry.md",
       "title": "Particle Interactions and Wall Loss with NVIDIA Warp",
-      "topic": "gpu",
+      "topic": "gpu-foundations-warp",
       "also": [],
       "role": "Contribute",
       "start_here": false
@@ -741,23 +1118,23 @@
     {
       "source": "docs/contribute/validation/gpu/charged-coagulation.md",
       "title": "Charged coagulation and atmospheric ion validation",
-      "topic": "verification",
+      "topic": "verification-scientific",
       "also": [],
       "role": "Contribute",
-      "start_here": false
+      "start_here": true
     },
     {
       "source": "docs/contribute/validation/gpu/coagulation-benchmarks.md",
       "title": "Historical coagulation benchmark evidence",
-      "topic": "verification",
+      "topic": "verification-performance",
       "also": [],
       "role": "Contribute",
-      "start_here": false
+      "start_here": true
     },
     {
       "source": "docs/contribute/validation/gpu/coagulation.md",
       "title": "GPU Coagulation Validation Record",
-      "topic": "verification",
+      "topic": "verification-scientific",
       "also": [],
       "role": "Contribute",
       "start_here": false
@@ -765,7 +1142,7 @@
     {
       "source": "docs/contribute/validation/gpu/condensation-parity.md",
       "title": "Condensation Parity Walkthrough Ownership Record",
-      "topic": "verification",
+      "topic": "verification-scientific",
       "also": [],
       "role": "Contribute",
       "start_here": false
@@ -773,7 +1150,7 @@
     {
       "source": "docs/contribute/validation/gpu/environment-sweep.md",
       "title": "Environmental dynamics: dry aerosols and humid air with ions",
-      "topic": "verification",
+      "topic": "verification-scientific",
       "also": [],
       "role": "Contribute",
       "start_here": false
@@ -781,7 +1158,7 @@
     {
       "source": "docs/contribute/validation/gpu/graph-capture-profiling.md",
       "title": "GPU graph-capture profiling record",
-      "topic": "verification",
+      "topic": "verification-performance",
       "also": [],
       "role": "Contribute",
       "start_here": false
@@ -789,15 +1166,15 @@
     {
       "source": "docs/contribute/validation/gpu/graph-capture-qualification.md",
       "title": "Graph-capture qualification gates",
-      "topic": "verification",
+      "topic": "verification-qualification",
       "also": [],
       "role": "Contribute",
-      "start_here": false
+      "start_here": true
     },
     {
       "source": "docs/contribute/validation/gpu/legacy-benchmarks/gpu_benchmarks.py",
       "title": "Recorded GPU benchmark viewer",
-      "topic": "verification",
+      "topic": "verification-performance",
       "also": [],
       "role": "Contribute",
       "start_here": false
@@ -805,7 +1182,7 @@
     {
       "source": "docs/contribute/validation/gpu/prepared-rtx5060.md",
       "title": "Prepared simulations: RTX 5060 qualification",
-      "topic": "verification",
+      "topic": "verification-qualification",
       "also": [],
       "role": "Contribute",
       "start_here": false
@@ -813,7 +1190,7 @@
     {
       "source": "docs/contribute/validation/gpu/process-field-extensions.md",
       "title": "Custom processes and fields: qualification",
-      "topic": "verification",
+      "topic": "verification-qualification",
       "also": [],
       "role": "Contribute",
       "start_here": false
@@ -821,7 +1198,7 @@
     {
       "source": "docs/contribute/validation/gpu/resident-benchmarks.md",
       "title": "Resident benchmark and memory-budget record",
-      "topic": "verification",
+      "topic": "verification-performance",
       "also": [],
       "role": "Contribute",
       "start_here": false
@@ -837,7 +1214,7 @@
     {
       "source": "docs/contribute/validation/numerics/condensation-stiffness.md",
       "title": "Condensation Stiffness Study and Recommendation Record",
-      "topic": "verification",
+      "topic": "verification-scientific",
       "also": [],
       "role": "Contribute",
       "start_here": false
@@ -845,7 +1222,7 @@
     {
       "source": "docs/contribute/validation/numerics/mass-precision.md",
       "title": "Mass Precision Recommendation Report",
-      "topic": "verification",
+      "topic": "verification-scientific",
       "also": [],
       "role": "Contribute",
       "start_here": false
@@ -871,7 +1248,7 @@
     {
       "source": "docs/contribute/validation/releases/v0.3.0.md",
       "title": "Native API migration validation and release gates",
-      "topic": "verification",
+      "topic": "verification-qualification",
       "also": [],
       "role": "Contribute",
       "start_here": false
@@ -879,7 +1256,7 @@
     {
       "source": "docs/examples/fundamentals/data-containers.md",
       "title": "Data Containers",
-      "topic": "representations",
+      "topic": "representations-ownership",
       "also": [],
       "role": "Examples",
       "start_here": false
@@ -887,7 +1264,7 @@
     {
       "source": "docs/examples/fundamentals/data_containers.py",
       "title": "What survives a data transfer?",
-      "topic": "representations",
+      "topic": "representations-ownership",
       "also": [],
       "role": "Examples",
       "start_here": false
@@ -935,7 +1312,7 @@
     {
       "source": "docs/examples/fundamentals/native_aerosol.py",
       "title": "From a population to an evolving aerosol",
-      "topic": "representations",
+      "topic": "representations-construction",
       "also": [],
       "role": "Examples",
       "start_here": false
@@ -943,7 +1320,7 @@
     {
       "source": "docs/examples/fundamentals/native_state_access.py",
       "title": "Change a model state without losing its meaning",
-      "topic": "representations",
+      "topic": "representations-ownership",
       "also": [],
       "role": "Examples",
       "start_here": false
@@ -959,10 +1336,10 @@
     {
       "source": "docs/examples/fundamentals/particles/distribution_tutorial.py",
       "title": "Separate particle properties from population weights",
-      "topic": "representations",
+      "topic": "representations-measures",
       "also": [],
       "role": "Examples",
-      "start_here": false
+      "start_here": true
     },
     {
       "source": "docs/examples/fundamentals/particles/index.md",
@@ -975,7 +1352,7 @@
     {
       "source": "docs/examples/fundamentals/particles/particle_data.py",
       "title": "Turn measurements into particle state",
-      "topic": "representations",
+      "topic": "representations-construction",
       "also": [],
       "role": "Examples",
       "start_here": false
@@ -983,7 +1360,7 @@
     {
       "source": "docs/examples/gpu/direct/gpu_coagulation_direct.py",
       "title": "Direct Brownian coagulation on CUDA",
-      "topic": "gpu",
+      "topic": "gpu-direct",
       "also": [],
       "role": "Examples",
       "start_here": false
@@ -991,7 +1368,7 @@
     {
       "source": "docs/examples/gpu/direct/gpu_complete_process_sequence.py",
       "title": "Five direct CUDA process boundaries",
-      "topic": "gpu",
+      "topic": "gpu-direct",
       "also": [],
       "role": "Examples",
       "start_here": false
@@ -999,7 +1376,7 @@
     {
       "source": "docs/examples/gpu/direct/gpu_condensation_parity_walkthrough.py",
       "title": "Check CUDA condensation against independent equations",
-      "topic": "gpu",
+      "topic": "gpu-direct",
       "also": [],
       "role": "Examples",
       "start_here": false
@@ -1007,7 +1384,7 @@
     {
       "source": "docs/examples/gpu/direct/gpu_direct_kernels_quick_start.py",
       "title": "Direct CUDA condensation: upload, calculate, download",
-      "topic": "gpu",
+      "topic": "gpu-direct",
       "also": [],
       "role": "Examples",
       "start_here": false
@@ -1015,7 +1392,7 @@
     {
       "source": "docs/examples/gpu/direct/gpu_direct_nucleation.py",
       "title": "Direct CUDA nucleation with explicit species mapping",
-      "topic": "gpu",
+      "topic": "gpu-direct",
       "also": [],
       "role": "Examples",
       "start_here": false
@@ -1103,7 +1480,7 @@
     {
       "source": "docs/examples/gpu/prepared/gpu_prepared_forcing.py",
       "title": "Cooling, heating and vapor pulses across sixteen boxes",
-      "topic": "gpu",
+      "topic": "gpu-prepared",
       "also": [],
       "role": "Examples",
       "start_here": false
@@ -1111,7 +1488,7 @@
     {
       "source": "docs/examples/gpu/prepared/gpu_prepared_lifecycle.py",
       "title": "A million-particle source, collision and loss lifecycle",
-      "topic": "gpu",
+      "topic": "gpu-prepared",
       "also": [],
       "role": "Examples",
       "start_here": false
@@ -1119,7 +1496,7 @@
     {
       "source": "docs/examples/gpu/prepared/gpu_prepared_multibox.py",
       "title": "Sixty-four heterogeneous aerosol boxes on one GPU",
-      "topic": "gpu",
+      "topic": "gpu-prepared",
       "also": [],
       "role": "Examples",
       "start_here": false
@@ -1127,7 +1504,7 @@
     {
       "source": "docs/examples/gpu/prepared/gpu_prepared_quick_start.py",
       "title": "Build on the CPU, evolve on CUDA, analyze on the CPU",
-      "topic": "gpu",
+      "topic": "gpu-prepared",
       "also": [],
       "role": "Examples",
       "start_here": false
@@ -1135,7 +1512,7 @@
     {
       "source": "docs/examples/gpu/prepared/gpu_prepared_stochastic.py",
       "title": "Separate stochastic coagulation from initial-state variability",
-      "topic": "gpu",
+      "topic": "gpu-prepared",
       "also": [],
       "role": "Examples",
       "start_here": false
@@ -1143,7 +1520,7 @@
     {
       "source": "docs/examples/gpu/prepared/gpu_scaling_results.py",
       "title": "Measured CUDA scaling on an RTX 5060",
-      "topic": "gpu",
+      "topic": "gpu-prepared",
       "also": [],
       "role": "Examples",
       "start_here": false
@@ -1151,7 +1528,7 @@
     {
       "source": "docs/examples/gpu/resident/gpu_resident_graph_capture.py",
       "title": "Capture and replay a native CUDA schedule",
-      "topic": "gpu",
+      "topic": "gpu-resident",
       "also": [],
       "role": "Examples",
       "start_here": false
@@ -1159,7 +1536,7 @@
     {
       "source": "docs/examples/gpu/resident/gpu_resident_multi_timestep.py",
       "title": "Multibox resident timesteps and continuation",
-      "topic": "gpu",
+      "topic": "gpu-resident",
       "also": [],
       "role": "Examples",
       "start_here": false
@@ -1167,7 +1544,7 @@
     {
       "source": "docs/examples/gpu/resident/gpu_resident_session.py",
       "title": "CUDA resident ownership and checkpoint restart",
-      "topic": "gpu",
+      "topic": "gpu-resident",
       "also": [],
       "role": "Examples",
       "start_here": false
@@ -1217,7 +1594,7 @@
     {
       "source": "docs/examples/processes/coagulation/coagulation_1_pmf_pattern.py",
       "title": "Brownian coagulation in a PMF population",
-      "topic": "brownian",
+      "topic": "brownian-binned",
       "also": [],
       "role": "Examples",
       "start_here": false
@@ -1225,7 +1602,7 @@
     {
       "source": "docs/examples/processes/coagulation/coagulation_2_pdf_pattern.py",
       "title": "Brownian coagulation in a PDF population",
-      "topic": "brownian",
+      "topic": "brownian-binned",
       "also": [],
       "role": "Examples",
       "start_here": false
@@ -1233,23 +1610,23 @@
     {
       "source": "docs/examples/processes/coagulation/coagulation_3_particle_resolved_pattern.py",
       "title": "Follow collisions through individual particles",
-      "topic": "brownian",
+      "topic": "brownian-resolved",
       "also": [],
       "role": "Examples",
-      "start_here": false
+      "start_here": true
     },
     {
       "source": "docs/examples/processes/coagulation/coagulation_4_compared.py",
       "title": "Compare coagulation after matching distribution units",
-      "topic": "brownian",
+      "topic": "brownian-comparison",
       "also": [],
       "role": "Examples",
-      "start_here": false
+      "start_here": true
     },
     {
       "source": "docs/examples/processes/coagulation/coagulation_5_time_evolution.py",
       "title": "Does particle-number decay depend on representation?",
-      "topic": "brownian",
+      "topic": "brownian-comparison",
       "also": [],
       "role": "Examples",
       "start_here": false
@@ -1257,15 +1634,17 @@
     {
       "source": "docs/examples/processes/coagulation/functional/coagulation_basic_1_pmf.py",
       "title": "A compact PMF coagulation calculation",
-      "topic": "brownian",
-      "also": [],
+      "topic": "brownian-binned",
+      "also": [
+        "brownian"
+      ],
       "role": "Examples",
       "start_here": true
     },
     {
       "source": "docs/examples/processes/coagulation/functional/coagulation_basic_2_pdf.py",
       "title": "A compact PDF coagulation calculation",
-      "topic": "brownian",
+      "topic": "brownian-binned",
       "also": [],
       "role": "Examples",
       "start_here": false
@@ -1273,7 +1652,7 @@
     {
       "source": "docs/examples/processes/coagulation/functional/coagulation_basic_3_compared.py",
       "title": "A compact comparison of bin totals and radius densities",
-      "topic": "brownian",
+      "topic": "brownian-comparison",
       "also": [],
       "role": "Examples",
       "start_here": false
@@ -1281,7 +1660,7 @@
     {
       "source": "docs/examples/processes/coagulation/functional/coagulation_basic_4_particleresolved.py",
       "title": "A compact particle-resolved collision calculation",
-      "topic": "brownian",
+      "topic": "brownian-resolved",
       "also": [],
       "role": "Examples",
       "start_here": false
@@ -1289,15 +1668,17 @@
     {
       "source": "docs/examples/processes/condensation/condensation_1_bin.py",
       "title": "Condensation in radius bins",
-      "topic": "condensation",
-      "also": [],
+      "topic": "condensation-reservoirs",
+      "also": [
+        "condensation"
+      ],
       "role": "Examples",
       "start_here": true
     },
     {
       "source": "docs/examples/processes/condensation/condensation_2_massbin.py",
       "title": "Water uptake from a maintained vapor reservoir",
-      "topic": "condensation",
+      "topic": "condensation-reservoirs",
       "also": [],
       "role": "Examples",
       "start_here": false
@@ -1305,7 +1686,7 @@
     {
       "source": "docs/examples/processes/condensation/condensation_3_massresolved.py",
       "title": "Competition for a finite water-vapor reservoir",
-      "topic": "condensation",
+      "topic": "condensation-reservoirs",
       "also": [],
       "role": "Examples",
       "start_here": false
@@ -1313,10 +1694,10 @@
     {
       "source": "docs/examples/processes/condensation/condensation_latent_heat.py",
       "title": "How much energy accompanies a condensation step?",
-      "topic": "condensation",
+      "topic": "condensation-energy",
       "also": [],
       "role": "Examples",
-      "start_here": false
+      "start_here": true
     },
     {
       "source": "docs/examples/processes/condensation/staggered_condensation_example.py",
@@ -1353,8 +1734,10 @@
     {
       "source": "docs/examples/processes/dilution/cpu_dilution.py",
       "title": "Dilution changes abundance without shrinking particles",
-      "topic": "losses",
-      "also": [],
+      "topic": "losses-dilution",
+      "also": [
+        "losses"
+      ],
       "role": "Examples",
       "start_here": true
     },
@@ -1393,7 +1776,7 @@
     {
       "source": "docs/examples/processes/wall-loss/chamber_forward_simulation.py",
       "title": "Explain a chamber spectrum using separate rate contributions",
-      "topic": "losses",
+      "topic": "losses-deposition",
       "also": [],
       "role": "Examples",
       "start_here": false
@@ -1409,7 +1792,7 @@
     {
       "source": "docs/examples/processes/wall-loss/rectangular_wall_loss_strategy.py",
       "title": "Track removal in a rectangular chamber",
-      "topic": "losses",
+      "topic": "losses-deposition",
       "also": [],
       "role": "Examples",
       "start_here": false
@@ -1417,7 +1800,7 @@
     {
       "source": "docs/examples/processes/wall-loss/spherical_wall_loss_strategy.py",
       "title": "Separate size-selective removal from particle growth",
-      "topic": "losses",
+      "topic": "losses-deposition",
       "also": [],
       "role": "Examples",
       "start_here": false
@@ -1425,7 +1808,7 @@
     {
       "source": "docs/examples/processes/wall-loss/wall_loss_builders_factory.py",
       "title": "Configure chamber loss without a unit mismatch",
-      "topic": "losses",
+      "topic": "losses-deposition",
       "also": [],
       "role": "Examples",
       "start_here": false
@@ -1433,7 +1816,7 @@
     {
       "source": "docs/examples/processes/wall-loss/wall_loss_tutorial.py",
       "title": "Compare chamber geometry and competing particle processes",
-      "topic": "losses",
+      "topic": "losses-deposition",
       "also": [],
       "role": "Examples",
       "start_here": false
@@ -1511,10 +1894,10 @@
     {
       "source": "docs/examples/thermodynamics/activity/bat_activity_example.py",
       "title": "Compare ideal and nonideal organic activity",
-      "topic": "activity",
+      "topic": "activity-nonideal",
       "also": [],
       "role": "Examples",
-      "start_here": false
+      "start_here": true
     },
     {
       "source": "docs/examples/thermodynamics/activity/equilibria_example.py",
@@ -1527,8 +1910,10 @@
     {
       "source": "docs/examples/thermodynamics/activity/ideal_activity_example.py",
       "title": "Equal mass does not mean equal activity",
-      "topic": "activity",
-      "also": [],
+      "topic": "activity-ideal",
+      "also": [
+        "activity"
+      ],
       "role": "Examples",
       "start_here": true
     },
@@ -1543,10 +1928,10 @@
     {
       "source": "docs/examples/thermodynamics/activity/kappa_activity_example.py",
       "title": "Connect water content to hygroscopicity",
-      "topic": "activity",
+      "topic": "activity-kappa",
       "also": [],
       "role": "Examples",
-      "start_here": false
+      "start_here": true
     },
     {
       "source": "docs/examples/thermodynamics/equilibria/activity_part1.py",
@@ -1607,18 +1992,18 @@
     {
       "source": "docs/guide/data-model/construction.md",
       "title": "Native aerosol construction and replacement",
-      "topic": "representations",
+      "topic": "representations-construction",
       "also": [],
       "role": "Guide",
-      "start_here": false
+      "start_here": true
     },
     {
       "source": "docs/guide/data-model/field-ownership.md",
       "title": "Field ownership and transfer policy",
-      "topic": "representations",
+      "topic": "representations-ownership",
       "also": [],
       "role": "Guide",
-      "start_here": false
+      "start_here": true
     },
     {
       "source": "docs/guide/data-model/index.md",
@@ -1631,7 +2016,7 @@
     {
       "source": "docs/guide/data-model/ownership.md",
       "title": "Native container access and ownership",
-      "topic": "representations",
+      "topic": "representations-ownership",
       "also": [],
       "role": "Guide",
       "start_here": false
@@ -1647,23 +2032,23 @@
     {
       "source": "docs/guide/gpu/backend-selection.md",
       "title": "Backend Selection and Explicit CPU Fallback",
-      "topic": "gpu",
+      "topic": "gpu-foundations-setup",
       "also": [],
       "role": "Guide",
-      "start_here": false
+      "start_here": true
     },
     {
       "source": "docs/guide/gpu/direct/coagulation-configuration.md",
       "title": "Coagulation Configuration",
-      "topic": "gpu",
+      "topic": "gpu-direct",
       "also": [],
       "role": "Guide",
-      "start_here": false
+      "start_here": true
     },
     {
       "source": "docs/guide/gpu/direct/coagulation.md",
       "title": "Coagulation",
-      "topic": "gpu",
+      "topic": "gpu-direct",
       "also": [],
       "role": "Guide",
       "start_here": false
@@ -1671,7 +2056,7 @@
     {
       "source": "docs/guide/gpu/direct/condensation-configuration.md",
       "title": "Condensation Configuration",
-      "topic": "gpu",
+      "topic": "gpu-direct",
       "also": [],
       "role": "Guide",
       "start_here": false
@@ -1679,7 +2064,7 @@
     {
       "source": "docs/guide/gpu/direct/condensation.md",
       "title": "Condensation",
-      "topic": "gpu",
+      "topic": "gpu-direct",
       "also": [],
       "role": "Guide",
       "start_here": false
@@ -1687,7 +2072,7 @@
     {
       "source": "docs/guide/gpu/direct/dilution-and-wall-loss.md",
       "title": "Dilution And Wall Loss",
-      "topic": "gpu",
+      "topic": "gpu-direct",
       "also": [],
       "role": "Guide",
       "start_here": false
@@ -1711,23 +2096,25 @@
     {
       "source": "docs/guide/gpu/prepared.md",
       "title": "Prepared GPU simulations",
-      "topic": "gpu",
-      "also": [],
+      "topic": "gpu-prepared",
+      "also": [
+        "gpu"
+      ],
       "role": "Guide",
       "start_here": true
     },
     {
       "source": "docs/guide/gpu/resident/checkpoints.md",
       "title": "GPU resident checkpoints",
-      "topic": "gpu",
+      "topic": "gpu-resident",
       "also": [],
       "role": "Guide",
-      "start_here": false
+      "start_here": true
     },
     {
       "source": "docs/guide/gpu/resident/graph-capture.md",
       "title": "GPU resident graph capture",
-      "topic": "gpu",
+      "topic": "gpu-resident",
       "also": [],
       "role": "Guide",
       "start_here": false
@@ -1735,15 +2122,15 @@
     {
       "source": "docs/guide/gpu/slot-exhaustion.md",
       "title": "Fixed-Capacity Slot Exhaustion Primitives",
-      "topic": "gpu",
+      "topic": "gpu-foundations-data",
       "also": [],
       "role": "Guide",
-      "start_here": false
+      "start_here": true
     },
     {
       "source": "docs/guide/gpu/slots.md",
       "title": "Slots",
-      "topic": "gpu",
+      "topic": "gpu-foundations-data",
       "also": [],
       "role": "Guide",
       "start_here": false
@@ -1751,7 +2138,7 @@
     {
       "source": "docs/guide/gpu/support.md",
       "title": "GPU support",
-      "topic": "gpu",
+      "topic": "gpu-foundations-setup",
       "also": [],
       "role": "Guide",
       "start_here": false
@@ -1759,7 +2146,7 @@
     {
       "source": "docs/guide/gpu/transfers.md",
       "title": "Transfers",
-      "topic": "gpu",
+      "topic": "gpu-foundations-data",
       "also": [],
       "role": "Guide",
       "start_here": false
@@ -1767,7 +2154,7 @@
     {
       "source": "docs/guide/gpu/troubleshooting.md",
       "title": "Troubleshooting",
-      "topic": "gpu",
+      "topic": "gpu-foundations-setup",
       "also": [],
       "role": "Guide",
       "start_here": false
@@ -1815,7 +2202,7 @@
     {
       "source": "docs/guide/processes/dilution.md",
       "title": "Dilution Strategy System",
-      "topic": "losses",
+      "topic": "losses-dilution",
       "also": [],
       "role": "Guide",
       "start_here": false
@@ -1839,10 +2226,10 @@
     {
       "source": "docs/guide/processes/wall-loss.md",
       "title": "Wall Loss Strategy System",
-      "topic": "losses",
+      "topic": "losses-deposition",
       "also": [],
       "role": "Guide",
-      "start_here": false
+      "start_here": true
     },
     {
       "source": "docs/index.md",
@@ -1991,7 +2378,7 @@
     {
       "source": "docs/contribute/validation/numerics/scientific-correctness.md",
       "title": "Scientific correctness reference baseline",
-      "topic": "verification",
+      "topic": "verification-scientific",
       "also": [],
       "role": "Contribute",
       "start_here": false
@@ -2009,7 +2396,7 @@
     {
       "source": "docs/contribute/validation/numerics/adaptive-methods.md",
       "title": "Adaptive integration and splitting assessment",
-      "topic": "verification",
+      "topic": "verification-scientific",
       "also": [],
       "role": "Contribute",
       "start_here": false
@@ -2037,7 +2424,7 @@
     {
       "source": "docs/contribute/validation/numerics/simulation-workflow.md",
       "title": "Simulation workflow qualification",
-      "topic": "verification",
+      "topic": "verification-qualification",
       "also": [],
       "role": "Contribute",
       "start_here": false
@@ -2045,17 +2432,17 @@
     {
       "source": "docs/examples/simulations/adaptive_cloud_relaxation.py",
       "title": "Distinguish dry-phase oscillation from physical droplet relaxation",
-      "topic": "condensation",
+      "topic": "condensation-adaptive",
       "also": [
         "chambers"
       ],
       "role": "Examples",
-      "start_here": false
+      "start_here": true
     },
     {
       "source": "docs/examples/simulations/adaptive_reservoir_depletion.py",
       "title": "Resolve growth as a finite vapor reservoir is depleted",
-      "topic": "condensation",
+      "topic": "condensation-adaptive",
       "also": [],
       "role": "Examples",
       "start_here": false
@@ -2063,7 +2450,7 @@
     {
       "source": "docs/examples/simulations/adaptive_reservoir_depletion_cuda.py",
       "title": "Check adaptive CUDA growth against an independent depletion reference",
-      "topic": "condensation",
+      "topic": "condensation-adaptive",
       "also": [
         "gpu"
       ],
@@ -2073,7 +2460,7 @@
     {
       "source": "docs/examples/simulations/adaptive_cloud_relaxation_cuda.py",
       "title": "Resolve stiff wet–dry droplet relaxation on CUDA",
-      "topic": "condensation",
+      "topic": "condensation-adaptive",
       "also": [
         "gpu",
         "chambers"

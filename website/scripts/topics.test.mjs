@@ -21,3 +21,15 @@ test('hierarchy has predictable root, children, and breadcrumbs', () => {
   assert.deepEqual(ancestors('condensation').map(t => t.id), ['aerosols', 'processes', 'exchange', 'condensation']);
   assert.deepEqual(ancestors('missing'), []);
 });
+
+
+test('organized topics remain discoverable beyond four selections from the root', () => {
+  assert.deepEqual(ancestors('gpu-foundations-warp').map(t => t.id), [
+    'aerosols', 'methods', 'execution', 'gpu', 'gpu-foundations', 'gpu-foundations-warp',
+  ]);
+  assert.equal(searchTopics('graph capture')[0].topic.id, 'gpu-resident');
+  assert.equal(searchTopics('GPU slots')[0].topic.id, 'gpu-foundations-data');
+  assert.deepEqual(children('gpu').map(t => t.id), [
+    'gpu-direct', 'gpu-prepared', 'gpu-resident', 'gpu-foundations',
+  ]);
+});
