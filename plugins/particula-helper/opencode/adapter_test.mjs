@@ -12,7 +12,7 @@ const { default: plugin, loadSkills } = await import(
 
 const expectedSkills = [
   "particula-analyze", "particula-build", "particula-debug", "particula-develop",
-  "particula-docs", "particula-guide", "particula-plan", "particula-report", "particula-review",
+  "particula-docs", "particula-examples", "particula-guide", "particula-plan", "particula-report", "particula-review",
   "particula-run", "particula-setup", "particula-test",
 ];
 

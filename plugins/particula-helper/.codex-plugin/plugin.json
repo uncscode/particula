@@ -1,7 +1,7 @@
 {
   "name": "particula-helper",
   "version": "0.3.4",
-  "description": "Build, run and analyze aerosol simulations; investigate and report concerns; develop, test, document and review Particula.",
+  "description": "Build, run and analyze aerosol simulations; report concerns; develop, test and document Particula with illustrated examples.",
   "skills": "./skills/",
   "interface": {
     "category": "Scientific Research",
@@ -16,7 +16,7 @@
     "displayName": "Particula Helper",
     "logo": "./assets/icon.png",
     "logoDark": "./assets/icon-dark.png",
-    "longDescription": "Seven researcher workflows for setup, guidance, simulation design, execution, analysis, debugging and issue reporting, plus five Particula repository skills for planning, development, testing, documentation and review. Uses the selected checkout and environment. Reports require researcher review before posting. No hosted service, automatic Python installation or MCP server is included.",
+    "longDescription": "Seven researcher workflows for setup, guidance, simulation design, execution, analysis, debugging and issue reporting, plus six Particula repository skills for planning, development, testing, documentation, illustrated example authoring and review. Uses the selected checkout and environment. Reports require researcher review before posting. No hosted service, automatic Python installation or MCP server is included.",
     "shortDescription": "Learn, run, analyze aerosols"
   },
   "requires_local_executor": true

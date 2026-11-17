@@ -1,7 +1,7 @@
 # Particula Helper
 
 Seven researcher skills for environment setup, aerosol science guidance, simulation
-design, execution, analysis, debugging and issue reporting, plus five repository
+design, execution, analysis, debugging and issue reporting, plus six repository
 development skills. The host supplies filesystem and
 Python execution tools. Installing this plugin does not install Particula,
 change Python environments, start a server, or run simulations.
@@ -57,8 +57,14 @@ Python project or replace the seven researcher-oriented skills.
 | [particula-plan](https://github.com/uncscode/particula/blob/main/plugins/particula-helper/skills/particula-plan/SKILL.md) | Scope changes with concrete code references and acceptance evidence |
 | [particula-develop](https://github.com/uncscode/particula/blob/main/plugins/particula-helper/skills/particula-develop/SKILL.md) | Implement native library, CPU process and GPU changes |
 | [particula-test](https://github.com/uncscode/particula/blob/main/plugins/particula-helper/skills/particula-test/SKILL.md) | Select suites and preserve independent scientific validation |
-| [particula-docs](https://github.com/uncscode/particula/blob/main/plugins/particula-helper/skills/particula-docs/SKILL.md) | Organize the topic graph and author scientific narratives, docstrings and saved examples |
+| [particula-docs](https://github.com/uncscode/particula/blob/main/plugins/particula-helper/skills/particula-docs/SKILL.md) | Organize the topic graph and maintain guides, theory and docstrings |
+| [particula-examples](https://github.com/uncscode/particula/blob/main/plugins/particula-helper/skills/particula-examples/SKILL.md) | Create/edit worked examples with explained code, plots or process visuals, reflections and topic links |
 | [particula-review](https://github.com/uncscode/particula/blob/main/plugins/particula-helper/skills/particula-review/SKILL.md) | Review scientific/API correctness and prepare requested commits/PRs |
+
+For examples, `references/example-authoring.md` provides an adaptable structure:
+question and setup, explained code, visual evidence, interpretation, closing
+reflections and a next investigation. Introduce every code block in prose and
+complete registration, topic categorization and navigation links.
 
 In the repository, `AGENTS.md` routes to these canonical files. Shared guidance
 lives in `references/repository-conventions.md`, `scientific-boundaries.md`,

@@ -63,11 +63,21 @@ checkout, while reading a wheel's bundled documentation needs no checkout.
 
 ## Researcher issue reporting
 
-Plugin 0.3.4 adds `particula-report`, bringing the catalog to twelve skills.
-It prepares suspected-error reports and requires researcher review before
+Plugin 0.3.4 adds `particula-report` and `particula-examples`, bringing the
+catalog to thirteen skills. The reporting skill prepares suspected-error
+reports and requires researcher review before
 posting. Package checks cover the shipped skill, supporting reference paths
 and agreement with the GitHub issue template. These checks do not establish
 model-driven investigation quality or live GitHub submission in every host.
 Without execution or GitHub access, the skill records the missing evidence
 and provides a report draft rather than claiming successful reproduction or
 submission.
+
+## Published example authoring
+
+Plugin 0.3.4 adds `particula-examples` as the sixth repository skill. It provides
+an adaptable scientific format, explanations before code, plots or process
+visuals, closing reflections and topic/navigation completion. Package checks
+cover its catalog entry and relocated references, not the scientific or visual
+quality of future authored examples. Those require execution and inspection in
+the selected checkout according to the example's own evidence requirements.
