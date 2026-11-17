@@ -244,9 +244,14 @@ def render_example(key, config):
             if "data.json" in manifest.get("files", {})
             else ""
         )
+        runtime = (
+            f" · Script runtime: **{manifest['elapsed_seconds']:,.2f} s**"
+            if "elapsed_seconds" in manifest
+            else ""
+        )
         chunks.append(
             f":::{kind}[{status}]\nExecution: **{manifest['device']}** · "
-            f"{manifest['executed_at'][:10]} UTC. "
+            f"{manifest['executed_at'][:10]} UTC{runtime}. "
             f"Particula revision `{manifest['revision'][:9]}`. "
             f"[Executed source]({url}/{executed_source}) · "
             f"[Run metadata]({url}/manifest.json).\n\n"

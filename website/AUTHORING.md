@@ -41,6 +41,11 @@ rendering time/revision separately. `executed_source.py` preserves the original
 source when the renderer changes. Missing numerical data requires one data-saving
 refresh; images and printed endpoint tables cannot recover missing histories.
 
+The execution banner displays the original script's elapsed wall time from
+`elapsed_seconds`, never `render_elapsed_seconds`. This measures the complete
+original execution, including setup and any plotting within that script; it is
+not an isolated physics-kernel benchmark. Replotting preserves this duration.
+
 Save compact plotted summaries: observation times, counts, histogram bins,
 quantiles and the settings needed to interpret them. Do not save full particle
 states, checkpoints, trajectories or unused diagnostics. The serialized numeric
