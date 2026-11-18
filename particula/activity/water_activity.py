@@ -10,7 +10,7 @@ Atmospheric Chemistry and Physics
 https://doi.org/10.5194/acp-19-13383-2019
 """
 
-from typing import Optional, Tuple, Union
+from typing import NamedTuple, Optional, Union
 
 import numpy as np
 from numpy.typing import NDArray
@@ -96,33 +96,40 @@ def biphasic_water_activity_point(
     return water_activity_cross_point
 
 
+_PhaseProperties = tuple[float | NDArray[np.float64], ...] | NDArray[np.float64]
+
+
+class FixedWaterActivityResult(NamedTuple):
+    """Properties of the water-rich and optional organic-rich liquid branches.
+
+    Each phase contains water and organic activities, water and organic mass
+    fractions, then water and organic activity coefficients, in that order.
+    The last axis of a sweep follows the requested water activities.
+    """
+
+    alpha: _PhaseProperties
+    beta: _PhaseProperties | None
+    q_alpha: float | NDArray[np.float64]
+
+
 def fixed_water_activity(
     water_activity: Union[float, NDArray[np.float64]],
     molar_mass_ratio: Union[float, NDArray[np.float64]],
     oxygen2carbon: Union[float, NDArray[np.float64]],
     density: Union[float, NDArray[np.float64]],
-) -> Tuple[
-    Union[float, NDArray[np.float64]],
-    Optional[Union[float, NDArray[np.float64]]],
-    Union[float, NDArray[np.float64]],
-]:
-    """Activity coefficients in organic-water mixtures.
-
-    This function assumes a fixed water activity value (e.g., RH = 75%
-    corresponds to 0.75 water activity in equilibrium).
-    It calculates the activity coefficients for different phases and
-    determines phase separations if they occur.
+) -> FixedWaterActivityResult:
+    """Evaluate binary BAT liquid branches at prescribed water activities.
 
     Args:
-        water_activity: An array of water activity values.
-        molar_mass_ratio: Array of molar mass ratios of the components.
-        oxygen2carbon: Array of oxygen-to-carbon ratios.
-        density: Array of densities of the mixture, in kg/m^3.
+        water_activity: Dimensionless target activity, scalar or 1-D sweep.
+        molar_mass_ratio: Water molar mass divided by organic molar mass.
+        oxygen2carbon: Organic atomic O:C ratio.
+        density: Organic liquid density in kg/m³.
 
     Returns:
-        A tuple containing the activity coefficients for alpha and beta
-            phases, and the q_alpha (phase separation) value.
-            If no phase separation occurs, the beta phase values are None.
+        Phase properties and the model's alpha-phase allocation fraction.
+        The result supports tuple unpacking as (alpha, beta, q_alpha).
+        A homogeneous solution has beta equal to None and q_alpha equal to 1.
     """
     # pylint: disable=too-many-locals
 
@@ -178,9 +185,11 @@ def fixed_water_activity(
         q_alpha = np.ones(water_activity.size)
         # change back to original order
         if flip:
-            activities_alpha = np.flip(activities_alpha)
+            activities_alpha = np.flip(activities_alpha, axis=-1)
             q_alpha = np.flip(q_alpha)
-        return (activities_alpha, activities_beta, q_alpha)
+        return FixedWaterActivityResult(
+            activities_alpha, activities_beta, q_alpha
+        )
 
     # else phase separation occurs
     # split the activities into alpha and beta phases
@@ -233,12 +242,12 @@ def fixed_water_activity(
     )
     # change back to original order
     if flip:
-        activities_alpha = np.flip(activities_alpha)
-        activities_beta = np.flip(activities_beta)
+        activities_alpha = np.flip(activities_alpha, axis=-1)
+        activities_beta = np.flip(activities_beta, axis=-1)
         q_alpha = np.flip(q_alpha)
 
     activities_alpha = np.asarray(activities_alpha, dtype=np.float64)
     activities_beta = np.asarray(activities_beta, dtype=np.float64)
     q_alpha = np.asarray(q_alpha, dtype=np.float64)
 
-    return (activities_alpha, activities_beta, q_alpha)
+    return FixedWaterActivityResult(activities_alpha, activities_beta, q_alpha)

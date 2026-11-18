@@ -297,3 +297,42 @@ def test_bat_ros3_mass_jacobian_at_table_knots(device):
                 np.testing.assert_allclose(
                     local[box, :6, row, column], expected, rtol=2e-5, atol=1e-8
                 )
+
+
+def test_bat_flux_sign_near_equilibrium(device):
+    """Near zero flux, compare absolute pressure error for each volatile lane."""
+    from particula.particles import ActivityBAT
+    from particula.util.constants import GAS_CONSTANT
+
+    initial, strategy = material_case(2)
+    strategy.activity_strategy = ActivityBAT(0.2, 0.5, 1243.4933333333333)
+    pairs = strategy.species_map.gas_to_particle
+    sources, targets = np.array(pairs).T
+    view = _cpu_batch.box_view(initial, 0)
+    temperature = float(view.environment.temperature[0])
+    _, equilibrium = strategy._native_pressure_terms(
+        view.particles,
+        view.gas,
+        temperature,
+        view.particles.radii[0],
+        sources,
+        targets,
+    )
+    # At fixed composition p_eq / activity = pure vapor pressure times Kelvin.
+    a = strategy.activity_strategy.activity(view.particles.masses[0, 0])
+    bound = 1e-4 * equilibrium[0, targets] / a[targets]
+    rates = []
+    for displacement in (-2, 0, 2):
+        pressure = equilibrium[0, targets] + displacement * bound
+        initial.gas.concentration[0, sources] = (
+            pressure
+            * view.gas.molar_mass[sources]
+            / (GAS_CONSTANT * temperature)
+        )
+        owner = GPUCondensationODE(initial, strategy, device=device)
+        rates.append(owner._mass_rate.numpy()[0, 0, targets])
+    assert np.all(rates[0] < 0) and np.all(rates[2] > 0)
+    # Gas pressure enters the flux linearly in this isothermal case. Convert
+    # the zero-driving-force residual back to pascals using the measured slope.
+    flux_per_pascal = (rates[2] - rates[0]) / (4 * bound)
+    assert np.all(np.abs(rates[1] / flux_per_pascal) <= bound)

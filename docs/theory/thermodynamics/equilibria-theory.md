@@ -122,54 +122,41 @@ Here each species balance counts organic mass only. Associated water supplied
 by the prescribed humidity reservoir is reported separately; adding it to the
 organic species inventory would create a false mass imbalance.
 
-## Implementation in Particula
+## Standalone equilibrium calculations
 
-The equilibria calculations are implemented in the `particula.equilibria` module:
-
-| API | Purpose |
-|-----|---------|
-| `Equilibria` | High-level interface for gas–particle equilibrium calculations |
-| `LiquidVaporPartitioningStrategy` | Strategy class implementing liquid–vapor partitioning behavior |
-| `liquid_vapor_partitioning()` | Convenience function wrapping the main equilibrium solver |
-| `get_properties_for_liquid_vapor_partitioning()` | Compute activity/phase inputs used by the solver |
-
-### Example Usage
+For a single water–organic pair, call `fixed_water_activity` with the imposed water activity, the **water/organic** molar mass ratio, the organic O:C ratio, and the organic density in kg/m³. The water-rich branch, optional organic-rich branch and alpha allocation fraction are available as named fields and by tuple unpacking. Within a branch, the six quantities are water and organic activities, water and organic mass fractions, then water and organic activity coefficients. Sweep results follow the requested activity order. The allocation fraction is the BAT parameterization used by the partitioning calculation.
 
 ```python
 import numpy as np
-from particula.equilibria.partitioning import (
-    liquid_vapor_partitioning,
-    get_properties_for_liquid_vapor_partitioning,
+from particula.activity.water_activity import fixed_water_activity
+
+binary = fixed_water_activity(
+    water_activity=np.array([0.8, 0.6]),
+    molar_mass_ratio=18.01528 / 200.0,
+    oxygen2carbon=0.5,
+    density=1243.493333,
 )
-
-# Define species properties
-c_star_dry = np.array([1e-1, 1e0, 1e1])  # ug/m3
-c_organic = np.array([1.0, 2.0, 3.0])  # ug/m3
-molar_mass = np.array([200.0, 180.0, 220.0])  # g/mol
-oxygen2carbon = np.array([0.4, 0.5, 0.6])
-density = np.array([1400.0, 1300.0, 1500.0])  # kg/m3
-
-# Get activity properties at 70% RH
-gamma_ab, mf_water_ab, q_ab = get_properties_for_liquid_vapor_partitioning(
-    water_activity_desired=0.7,
-    molar_mass=molar_mass,
-    oxygen2carbon=oxygen2carbon,
-    density=density,
-)
-
-# Solve equilibrium
-alpha, beta, system, result = liquid_vapor_partitioning(
-    c_star_j_dry=c_star_dry,
-    concentration_organic_matter=c_organic,
-    molar_mass=molar_mass,
-    gamma_organic_ab=gamma_ab,
-    mass_fraction_water_ab=mf_water_ab,
-    q_ab=q_ab,
-)
-
-print(f"Total liquid organic concentration: {system[0]:.3f} ug/m3")
-print(f"Partition coefficients: {system[2]}")
+water_mass_fraction = binary.alpha[2]
 ```
+
+For a volatility-basis-set calculation at fixed water activity, use the existing partitioning strategy. Supply dry saturation concentrations and total organic inventories in µg/m³, molar masses in g/mol and organic densities in kg/m³. The solver returns species partition coefficients, water in each phase and the optimization residual. Multiply each organic inventory by its partition coefficient to obtain condensed **organic** mass. These calculations diagnose prescribed equilibrium states independently of a simulation timestep.
+
+```python
+from particula.equilibria import LiquidVaporPartitioningStrategy
+
+inventory = np.array([1.0, 2.0, 3.0])
+result = LiquidVaporPartitioningStrategy(water_activity=0.7).solve(
+    c_star_j_dry=np.array([0.1, 1.0, 10.0]),
+    concentration_organic_matter=inventory,
+    molar_mass=np.array([200.0, 180.0, 220.0]),
+    oxygen2carbon=np.array([0.4, 0.5, 0.6]),
+    density=np.array([1400.0, 1300.0, 1500.0]),
+)
+condensed_organic = inventory * result.partition_coefficients
+print(condensed_organic, result.water_content, result.error)
+```
+
+The concrete `particula.equilibria.partitioning.liquid_vapor_partitioning` function also returns the underlying optimizer result for diagnostics. [Worked equilibrium examples](../../examples/thermodynamics/equilibria/index.md)
 
 ## Key Equations Summary
 

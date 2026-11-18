@@ -18,8 +18,8 @@ def to_molar_mass_ratio(
     """Convert to molar mass ratio (MW water / MW organic).
 
     Args:
-        molar_mass: Molar mass of the organic compound. Must be positive.
-        other_molar_mass: Reference molar mass (default water, 18.01528).
+        molar_mass: Organic molar mass, in the same units as the reference.
+        other_molar_mass: Reference molar mass (default water, 18.01528 g/mol).
             Must be positive.
 
     Returns:
@@ -58,7 +58,7 @@ def from_molar_mass_ratio(
     Args:
         molar_mass_ratio: Molar mass ratio (MW water / MW organic).
             Must be positive.
-        other_molar_mass: Reference molar mass (default water, 18.01528).
+        other_molar_mass: Reference molar mass (default water, 18.01528 g/mol).
             Must be positive.
 
     Returns:
@@ -70,14 +70,14 @@ def from_molar_mass_ratio(
 
     Examples:
         >>> from_molar_mass_ratio(0.5)
-        9.00764
+        36.03056
         >>> from_molar_mass_ratio([0.5, 1.0])
-        array([ 9.00764, 18.01528])
+        array([36.03056, 18.01528])
         >>> from_molar_mass_ratio(np.array([0.25]))
-        array([4.50382])
+        array([72.06112])
     """
     molar_mass_ratio_array = np.asarray(molar_mass_ratio, dtype=np.float64)
-    molar_mass = other_molar_mass * molar_mass_ratio_array
+    molar_mass = other_molar_mass / molar_mass_ratio_array
     if np.isscalar(molar_mass_ratio) and not isinstance(
         molar_mass_ratio, np.ndarray
     ):

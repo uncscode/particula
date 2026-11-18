@@ -1,6 +1,6 @@
 # Stage 3A: Thermodynamics and additional physics
 
-Updated: 2026-11-17. Status: revised proposal; implementation not started.
+Status: implemented on the Stage 3A branch. The [validation record](../docs/contribute/validation/thermodynamics/bat-activity.md) lists the supported homogeneous profile, CPU and CUDA evidence, and limits of the lower-O:C comparison.
 Stages 1, 2A and 2B are merged; reuse their scientific references, numerical
 contracts and recording/restart infrastructure. Their completion does not
 qualify the new thermodynamic coupling.
