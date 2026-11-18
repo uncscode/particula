@@ -50,6 +50,33 @@ Reviewed against checkout `afd4f65856`:
 - The current GPU support guide documents adaptive RK23/ROS3 with ideal/kappa
   activity. That evidence does not establish BAT or equilibrium GPU support.
 
+## BAT activity in GPU-resident condensation
+
+For one water/organic pair with fixed BAT parameters, organic mole fraction
+determines the binary composition. Generate a one-dimensional table on the CPU
+with the existing BAT calculation, retaining both water and organic activity.
+Identify each table by its organic properties, functional group, model version,
+phase convention and supported conditions. Upload it once during preparation.
+At each condensation evaluation, compute organic mole fraction from the current
+particle masses and molar masses on device, interpolate both activities, and
+pass them to the surface vapor pressure calculation. This keeps BAT evaluation
+on the CPU and all per-step particle data and lookups on the GPU.
+
+Set an error tolerance for each activity before choosing the grid. Check
+interpolation against direct CPU BAT at independent compositions between nodes,
+including dilute and near-pure limits. Specify the pure-component limits and
+skip empty slots before computing mole fractions. If the case includes phase
+separation, qualify the lookup on each supported phase branch and specify how
+the caller supplies phase composition. A lookup on bulk composition alone
+cannot determine coexisting phase amounts.
+
+On actual CUDA, compare the resident trajectory with direct CPU activities
+under matched physical and numerical settings. Check particle growth, gas
+depletion and species budgets under grid and timestep refinement. For ROS3,
+qualify the interpolant derivatives used by the Jacobian, including grid knots,
+before listing support. For supported capture and restart, verify stable device
+buffers on replay and verify table identity when restoring a checkpoint.
+
 ## Decisions before implementation
 
 Record a bounded case specification in this plan before coding. Resolve:
