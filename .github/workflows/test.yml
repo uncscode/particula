@@ -8,6 +8,11 @@ on:
   merge_group:
     branches: [ main ]
 
+# Stop superseded PR revisions; keep each push and merge-group check.
+concurrency:
+  group: test-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   testing:
 
@@ -32,8 +37,11 @@ jobs:
         # Native examples exercise plotting, unit conversion, and chemistry.
         python -m pip install ".[extra]"
 
-    - name: Test with pytest
-      run: |
-        pytest -Werror -m "not slow and not performance"
-        pytest examples_tests -Werror -m "not slow and not performance"
-        pytest scripts/tests -Werror
+    - name: Test package
+      run: pytest -Werror -m "not slow and not performance" --durations=10
+
+    - name: Test examples
+      run: pytest examples_tests -Werror -m "not slow and not performance" --durations=10
+
+    - name: Test repository scripts
+      run: pytest scripts/tests -Werror --durations=10

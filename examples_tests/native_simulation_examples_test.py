@@ -225,12 +225,34 @@ def test_cooled_soot_condensation_then_coagulation_inventory(monkeypatch):
     plt.close("all")
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("dt", [1.0, 0.1])
 @pytest.mark.parametrize("time_offset", [0.0, 8190.0])
 def test_three_cloud_compositions_humidity_reset_and_dry_mass(
     monkeypatch, dt, time_offset
 ):
-    """Short cycles retain all three material mappings and prescribed forcing."""
+    """Five-second cycles exercise both refinements at both clock offsets."""
+    _check_chamber_cycle(
+        monkeypatch, dt, time_offset, humid_duration=2, dry_duration=3, slots=8
+    )
+
+
+def test_short_chamber_humidity_cycle(monkeypatch):
+    """Exercise both humidity phases for all compositions in the CI matrix."""
+    _check_chamber_cycle(
+        monkeypatch,
+        dt=1.0,
+        time_offset=8190.0,
+        humid_duration=1,
+        dry_duration=1,
+        slots=1,
+    )
+
+
+def _check_chamber_cycle(
+    monkeypatch, dt, time_offset, *, humid_duration, dry_duration, slots
+):
+    """Check the published integrator, material budgets, phases and clock."""
     monkeypatch.setattr(plt, "show", lambda *args, **kwargs: None)
     values = _setup_through(
         SIMULATIONS / "cloud_chamber_multi_cycle.py", "condensation_mixed"
@@ -239,7 +261,7 @@ def test_three_cloud_compositions_humidity_reset_and_dry_mass(
         source = values[f"aerosol_{suffix}"]
         aerosol = par.Aerosol(
             particles=par.particles.create_resolved_particle_data(
-                masses=source.particles.masses[0, :8].copy(),
+                masses=source.particles.masses[0, :slots].copy(),
                 density=source.particles.density.copy(),
                 volume=0.25,
             ),
@@ -251,8 +273,8 @@ def test_three_cloud_compositions_humidity_reset_and_dry_mass(
             aerosol,
             values[f"condensation_{suffix}"],
             values["wall_loss"],
-            humid_duration=2,
-            dry_duration=3,
+            humid_duration=humid_duration,
+            dry_duration=dry_duration,
             dt=dt,
             time_offset=time_offset,
             water_index=water_index,
@@ -260,17 +282,20 @@ def test_three_cloud_compositions_humidity_reset_and_dry_mass(
             c_water_dry=values["c_water_dry"],
         )
         assert final is aerosol
-        # Refinement and a late-cycle offset must preserve the five-second
-        # duration. Compare absolute timestamps, avoiding cancellation in diffs.
+        # Compare absolute timestamps to avoid cancellation at late offsets.
+        duration = humid_duration + dry_duration
         np.testing.assert_allclose(
             [r["time"] for r in history],
-            time_offset + np.linspace(0, 5, round(5 / dt) + 1),
+            time_offset + np.linspace(0, duration, round(duration / dt) + 1),
             rtol=0,
             atol=1e-12,
         )
         assert [r["phase"] for r in history] == (
-            ["humid"] * (round(2 / dt) + 1) + ["dry"] * round(3 / dt)
+            ["humid"] * (round(humid_duration / dt) + 1)
+            + ["dry"] * round(dry_duration / dt)
         )
+        # The published seeds start dry. A no-op growth step must fail.
+        assert history[1]["masses"][:, water_index].sum() > 0
         dry_after = final.particles.masses[0, :, :water_index].sum()
         assert 0 <= dry_after <= dry_before
         assert np.all(np.isfinite(final.particles.masses))

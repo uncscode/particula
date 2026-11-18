@@ -58,7 +58,7 @@ jobs:
         run: |
           python -m pip install ".[dev,extra]"
           python -m pytest -Werror -m "not slow and not performance"
-          python -m pytest examples_tests -Werror -m "not slow and not performance"
+          python -m pytest examples_tests -Werror -m "not performance"
           python -m pytest scripts/tests -Werror
       - name: Build package
         run: python -m build
