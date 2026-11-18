@@ -135,6 +135,8 @@ if __name__ == "__main__":
     parser.add_argument("supplement_zip", type=Path)
     parser.add_argument("mat_folder", type=Path)
     args = parser.parse_args()
-    destination = Path(__file__).resolve().parent
+    destination = (
+        Path(__file__).resolve().parents[2] / "docs/data/thermodynamics/bat-ccn"
+    )
     extract_measurements(args.supplement_zip, destination)
     extract_activation(args.mat_folder, destination)

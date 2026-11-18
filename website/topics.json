@@ -2481,21 +2481,17 @@
       "also": [],
       "role": "Examples",
       "start_here": false
+    },
+    {
+      "source": "docs/contribute/validation/thermodynamics/bat-ccn.md",
+      "title": "Cloud activation in the BAT publication",
+      "topic": "verification-scientific",
+      "also": [],
+      "role": "Contribute",
+      "start_here": false
     }
   ],
   "supporting": [
-    {
-      "source": "docs/data/thermodynamics/bat-ccn/README.md",
-      "reason": "Dataset provenance and results, linked from the scientific validation index."
-    },
-    {
-      "source": "docs/data/thermodynamics/bat-ccn/compare.py",
-      "reason": "Companion script for reproducing the published CCN dataset comparison."
-    },
-    {
-      "source": "docs/data/thermodynamics/bat-ccn/extract.py",
-      "reason": "Companion script for extracting source data from the publisher and MATLAB archives."
-    },
     {
       "source": "docs/contribute/CODE_OF_CONDUCT.md",
       "reason": "Supporting contributor workflow; retained in Contribute navigation."
