@@ -29,6 +29,14 @@ python -m pip install -e . matplotlib
 python docs/examples/thermodynamics/activity/citric_acid_hygroscopicity.py
 ```
 
+On a headless machine, save the figure from the repository root:
+
+```bash
+MPLBACKEND=Agg python -c 'from docs.examples.thermodynamics.activity.citric_acid_hygroscopicity import plot_results, simulate; plot_results(simulate()).savefig("citric-acid.png", dpi=150)'
+```
+
+A maintainer-side clean installation of revision `01755e91ce` reproduced the two-panel figure and the reported bias and RMS error using Python 3.14.8, NumPy 2.5.5, SciPy 1.18.1, Warp 1.19.0 and Matplotlib 3.11.2. Only the editable Particula checkout and Matplotlib were requested from pip.
+
 For an independent reproduction, record the checkout revision, Python and package versions, the printed metrics and any steps needed to display the figure. In the documentation development environment, to rebuild the saved figure and data, run `python scripts/docs_examples.py refresh citric-acid-hygroscopicity` from the study checkout. The registry packages the CSV with the downloadable example. A second researcher's reproduction is pending.
 
 Data attribution: Marsh et al. (2017), Table S9.2 in the article supplement, reproduced under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) with column headings normalized to machine-readable names. Numeric values are as published.
