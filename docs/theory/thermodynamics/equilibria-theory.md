@@ -1,6 +1,6 @@
 # Equilibria Theory
 
-Gas-particle partitioning determines how semi-volatile organic compounds distribute between the gas phase and particulate matter. This equilibrium process is central to understanding aerosol formation, growth, and composition. This page covers the theoretical basis for equilibria calculations in particula.
+The standalone partitioning calculation solves for bulk liquid and gas amounts at prescribed water activity. In kinetic aerosol simulations the current particle masses determine activities, and vapor transport advances those masses in time. The standalone result can provide a long-time reference when temperature, curvature, species inventories and reservoir conditions agree. [Particle-phase activity](activity-theory.md)
 
 ## Introduction
 
@@ -14,7 +14,7 @@ Understanding these equilibria is essential for predicting secondary organic aer
 
 ## Liquid-Vapor Partitioning Fundamentals
 
-At thermodynamic equilibrium, the partial pressure of each species in the gas phase equals its equilibrium vapor pressure above the liquid (particle) phase:
+At thermodynamic equilibrium, the partial pressure of each species in the gas phase equals its equilibrium vapor pressure above a flat liquid surface:
 
 $$p_i = a_i \cdot p_i^{\circ}$$
 
@@ -38,16 +38,7 @@ $$C^*_{dry} = \frac{p^{\circ} \cdot M}{R \cdot T}$$
 
 where $M$ is the molecular weight, $R$ is the gas constant, and $T$ is temperature.
 
-In a real mixture with water and multiple organics, the **effective C*** depends on activity coefficients and phase composition:
-
-$$C^*_j = C^*_{j,\mathrm{dry}} \cdot \gamma_{j,\mathrm{phase}} \cdot q_{\mathrm{phase}} \cdot \frac{C_{\mathrm{liq}}}{M_j \cdot \overline{M}_{\mathrm{phase}}}$$
-
-where:
-
-- $\gamma_{j,\mathrm{phase}}$ is the activity coefficient in the target phase
-- $q_{\mathrm{phase}}$ is the fraction of mass in that phase
-- $C_{\mathrm{liq}}$ is the total liquid concentration
-- $\overline{M}_{\mathrm{phase}}$ is the mass-weighted mean molar mass
+For a single flat liquid phase and ideal vapor, the equilibrium gas mass concentration is $C_{g,j}=a_j C^*_{j,\mathrm{dry}}$. Evaluating the activity requires the liquid composition. In a partitioning solve that composition itself depends on the amount condensed.
 
 ### Volatility Basis Set
 
@@ -79,16 +70,12 @@ This relationship shows that partitioning depends on both the compound's volatil
 
 Under certain conditions, organic-water mixtures can undergo **Liquid-Liquid Phase Separation (LLPS)**, forming distinct alpha ($\alpha$) and beta ($\beta$) phases:
 
-- **Alpha phase**: Typically organic-rich, with lower water content
-- **Beta phase**: Typically water-rich, with higher water content
+- **Alpha phase**: Water-rich liquid
+- **Beta phase**: Organic-rich liquid
 
 ### When Does Phase Separation Occur?
 
-Phase separation occurs when the Gibbs free energy of a two-phase system is lower than a single homogeneous phase. This typically happens at:
-
-- Intermediate relative humidity (40-80%)
-- Higher O:C ratios (more oxygenated organics)
-- Specific organic-water composition ranges
+Phase separation occurs when the Gibbs free energy of a two-phase system is lower than a single homogeneous phase. The coexistence interval depends on organic properties and composition. At the two coexisting compositions each component has the same chemical potential in both liquids. Figure 9 of the BAT paper illustrates the contrast at fixed organic molar mass as O:C varies. [Gorkowski et al. (2019)](https://doi.org/10.5194/acp-19-13383-2019)
 
 ### Phase Fraction (q)
 
@@ -191,11 +178,10 @@ print(f"Partition coefficients: {system[2]}")
 | $p_i = a_i \cdot p_i^{\circ}$ | Vapor-liquid equilibrium |
 | $a_i = \gamma_i \cdot x_i$ | Activity from coefficient and mole fraction |
 | $\varepsilon_j = \frac{1}{1 + C^*_j / C_{liq}}$ | Partition coefficient |
-| $C^*_j = C^*_{j,dry} \cdot \gamma_j \cdot q \cdot \frac{C_{liq}}{M_j \cdot \overline{M}}$ | Effective saturation concentration |
 
 ## References
 
-Gorkowski, K., Preston, T. C., & Zuend, A. (2019). Relative-humidity-dependent organic aerosol thermodynamics via an efficient reduced-complexity model. *Atmospheric Chemistry and Physics*, 19(19), 13383-13407. [https://doi.org/10.5194/acp-19-13383-2019](https://doi.org/10.5194/acp-19-13383-2019)
+Gorkowski, K., Preston, T. C., & Zuend, A. (2019). Relative-humidity-dependent organic aerosol thermodynamics via an efficient reduced-complexity model. *Atmospheric Chemistry and Physics*, 19, 13383-13407. [https://doi.org/10.5194/acp-19-13383-2019](https://doi.org/10.5194/acp-19-13383-2019)
 
 ---
 
