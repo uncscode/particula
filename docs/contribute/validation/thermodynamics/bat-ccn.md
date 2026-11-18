@@ -13,7 +13,7 @@ Gorkowski, Preston and Zuend (2019) report the hygroscopicity parameter for clou
 
 Pinic acid has the largest absolute discrepancy (BAT 0.1141, measured 0.2480). For phthalic acid the sign reverses (BAT 0.1552, measured 0.0510). The small overall bias therefore masks much larger errors for individual compounds. The all-record slope and RMSE reproduce the paper's rounded 0.799 and 0.055. Its reported 0.66 is reproduced by computing 1 − SSE/SST for the constrained fit with modeled κ as the response. Squaring the Pearson correlation of the two columns gives 0.6952. The worksheet footer lists subset RMSE 0.060701, slightly below 0.060729 recomputed from the 16 marked records. The reason for that difference is unresolved. The comparison uses the authors’ BAT outputs.
 
-![Published BAT and measured CCN hygroscopicities. Horizontal bars show reported measurement errors where available.](https://raw.githubusercontent.com/Gorkowski/particula/0accbb62575869858c20446a33f174275ed94813/docs/data/thermodynamics/bat-ccn/figure12-comparison.png)
+![Published BAT and measured CCN hygroscopicities. Horizontal bars show reported measurement errors where available.](../../../images/thermodynamics/bat-ccn-figure12.png)
 
 ## Figure 9 modeled activation
 

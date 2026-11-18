@@ -6,7 +6,8 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 
-BASE = Path(__file__).resolve().parents[2] / "docs/data/thermodynamics/bat-ccn"
+DOCS = Path(__file__).resolve().parents[2] / "docs"
+BASE = DOCS / "data/thermodynamics/bat-ccn"
 
 
 def main():
@@ -71,7 +72,7 @@ def main():
         aspect="equal",
     )
     ax.legend(frameon=False, fontsize=9)
-    fig.savefig(BASE / "figure12-comparison.png", dpi=180)
+    fig.savefig(DOCS / "images/thermodynamics/bat-ccn-figure12.png", dpi=180)
     plt.close(fig)
 
 
