@@ -1,136 +1,137 @@
-# Literature scheduler: continuous discovery and comparison
+# Literature scheduler for independent aerosol research
 
-Status: proposed; no automation has been created or enabled by this plan.
-Placement: independent of the [development stages](README.md).
+Status: proposed. Choose the cadence at activation.
 
-## Purpose
+## Scientific purpose
 
-Periodically identify aerosol papers with accessible data or sufficiently
-specified simulations that Particula could reproduce. Select a suitable study,
-develop a reproducible comparison, validate the work, and create a PR. Use the
-scientific requirements in
-[Stage 3B](stage-03b-scientific-comparisons.md) and retain a small candidate queue
-and evidence for selecting future physics work.
+An automated research agent uses Particula to conduct independent aerosol
+comparisons and support researchers in extending and clarifying published
+results. Choose questions whose answer matters to aerosol science. A comparison
+might establish where a published relationship holds, clarify which assumption
+controls a prediction, or identify a measurement or model capability that
+would distinguish two explanations. Record what the agent and other researchers
+can test next and why the answer would matter.
 
-When activated, each selected study iteration follows the same
-[worktree, branch, and PR workflow](README.md#worktree-branch-and-pr-workflow)
-as the staged plans. The difference is that **each new iteration creates a
-fresh worktree and branch**, rather than reusing a single scheduler branch.
+Search primary papers, supplements, author-maintained repositories and archived
+model inputs. Include older reference studies. Initial topics include
+condensation and evaporation, coagulation, chamber growth and loss, charged
+particles and organic/water thermodynamics. Follow the scientific comparison
+requirements in [Stage 3B](stage-03b-scientific-comparisons.md).
 
-## Proposed cadence and activation
+Experimental comparisons, model intercomparisons and process studies are all
+eligible. A target can be a measured distribution, another model's published
+trajectory, an analytical scaling, or the change between two specified process
+configurations. For example, varying coagulation while holding wall loss and
+initial conditions fixed can show when coagulation affects a predicted chamber
+size distribution. That comparison quantifies sensitivity within the model.
 
-- Start with one search per week; consider twice weekly if the candidate yield
-  and review capacity justify it. The cadence is a proposal, not a saved setting.
-- Choose the day/time in America/Denver and the delivery destination when
-  activating the scheduler. Reuse or update an existing matching automation
-  rather than creating a duplicate.
-- Set a persistent candidate/iteration record location accessible from all
-  worktrees, a maximum number of active studies, and per-study runtime,
-  CPU/GPU, and storage budgets. Keep the record outside disposable worktrees.
-  These are activation settings, not unlimited resource allocations.
-- At activation, use the application's automation controls and confirm the
-  resulting saved schedule. No scheduler script or operating-system cron job
-  is part of this repository plan.
-- The scheduled instructions must include the full search-to-PR workflow
-  below, not only a request for a shortlist. Editing this plan alone does not
-  activate a schedule or start an implementation run.
+## Scheduling and selection
 
-## Search and screening scope
+- Set the interval according to how long studies and researcher review take.
+  Invocations may be weekly or more frequent when capacity permits. At
+  activation, choose the timing in America/Denver, the delivery destination,
+  and the per-study and total compute
+  and storage budgets. Use the application's automation controls, check for an
+  existing schedule, and verify the saved settings.
+- Each invocation can select **zero to three new comparisons**. Resume
+  interrupted work first and consider work already awaiting review.
+  Queue additional candidates when capacity or resources are committed. An
+  open PR keeps its study identity for follow-up. Never start a second copy.
+- Report up to three strong candidates. For each, identify the paper and data
+  sources, specific comparison target, original contribution, proposed
+  question, scientific value, available inputs and uncertainties, reuse terms,
+  supported physics and backend, and expected effort. Name the decision the
+  result could inform. If none qualifies, record why and close the search.
+- Select comparisons that the current Particula checkout already supports.
+  Verify the process, domain, representation and quantity to compare for that
+  target. A supported subset of a paper can answer a worthwhile question in
+  its own right. Record missing study inputs separately from gaps in
+  Particula. Revisit deferred candidates when data or model support change.
 
-Search primary papers, publisher supplements, author-maintained data/code
-repositories, and archived model inputs. Include older reproducible reference
-studies as well as new publications; recency alone is not the selection goal.
+## Shared record and draft storage
 
-Initial topics are condensation/evaporation, coagulation, chamber growth and
-loss, charged particles/ion interactions, and organic/water thermodynamics.
-Reassess topics against the current capability and support guides at each run.
-An unsupported capability must be labeled as a gap rather than inferred from a
-similar function name or an earlier development plan.
+Keep the study register and review packets under `.artifacts/literature/` in
+**the persistent main checkout**. Resolve this shared directory once at
+activation and give every study worktree its absolute path. A worktree's own
+`.artifacts/` is a different directory. Configure storage and retention at
+activation so a pending review survives worktree cleanup and interruptions.
 
-For each candidate, check:
+Identify a comparison by DOI or stable identifier **and comparison target**.
+Record a unique iteration ID, status, study directory, worktree, branch, base
+and execution revisions, review decision, and any issue or PR link. Track
+queued, active, awaiting review, blocked, approved for publication and closed
+outcomes. Record the reason for a deferral or closure. Use one writer or an
+atomic claim to reserve the comparison and capacity together before creating
+a worktree. On restart, reconcile the register with existing worktrees and PRs.
 
-1. Accessible data or reference output, with reuse conditions and provenance.
-2. Sufficient initial conditions, forcing, material properties, and numerical
-   or experimental setup to make a meaningful comparison.
-3. Physics and observables that match supported Particula capabilities, or a
-   clearly bounded missing capability.
-4. A defined figure, table, time series, or metric to reproduce.
-5. Scientific value, approximate effort, and likely ambiguity or uncertainty.
+## From comparison to reviewed example
 
-## Screening report and iteration record
+1. **Specify the comparison.** Identify the reference or baseline. For
+   measurements, match the sampling and instrument conventions. For model
+   intercomparisons, match inputs and output definitions and document differing
+   assumptions. For process studies, specify what varies, what stays fixed,
+   and which response would distinguish the cases. Define units,
+   fixed and fitted inputs, metrics, relevant uncertainties and
+   numerical refinement before evaluating the target. A proposed extension
+   gets its own question and is labeled as a new prediction. Follow the
+   [worktree and branch workflow](README.md#worktree-branch-and-pr-workflow)
+   for each new study, with a fresh worktree and branch such as
+   `codex/literature-<timestamp>-<paper-slug>`. Resume that same iteration
+   after interruption.
+2. **Run and retain a review packet.** Run against the study checkout and keep
+   the draft percent-format Python script, source and data provenance, inputs
+   or retrieval instructions, run/replot commands, versions, compact numerical
+   results, figure and interpretation in `.artifacts/literature/<iteration-id>/`
+   in the shared location. Record refinement, uncertainty and applicable
+   budgets. Keep bulky or restricted data in suitable storage and record their
+   location and reuse conditions. If a budget is exhausted, save progress and
+   the outstanding check.
+3. **Review the science with the researcher.** Deliver the packet path and a
+   short discussion of what was tested, what the evidence supports and what
+   would resolve the main uncertainty. Record the researcher's decision to
+   publish, revise or archive. A revision resumes the same study. A measured
+   disagreement can merit publication, and an inconclusive comparison can
+   still identify the next experiment. Pending drafts stay in `.artifacts/`.
+4. **Publish the approved comparison.** Promote the reviewed script into the
+   relevant topic under [docs/examples/](../docs/examples/). Put durable
+   evidence and limitations in [docs/contribute/validation/](../docs/contribute/validation/)
+   and any compact, redistributable inputs in [docs/data/](../docs/data/).
+   Register the example, refresh its saved results in `website/results/`, and
+   verify that the documented workflow reproduces the reviewed principal metric
+   and figure. Follow the [example authoring workflow](../website/AUTHORING.md).
+   After validation and diff review, open one PR for that study and record its
+   URL. Material changes to the scientific result return to research review.
 
-Return at most three strong candidates per run, or state that no suitable new
-candidate was found. For each include the citation and source links, scientific
-question, target result, data/code availability, required physics, compatibility
-gaps, and a short recommendation. Separate verified information from inference
-and do not claim to have reproduced results during screening.
+## Diagnosing a Particula limitation
 
-Maintain a deduplicated record of previously screened/selected candidates in
-the agreed destination. Distinguish ready now, needs bounded development,
-insufficient information, in progress, PR open, and already evaluated. Record
-the DOI or stable paper identifier, iteration ID, target comparison, worktree
-path, branch/base revision, and PR URL when available. Check this record and
-existing worktrees/open PRs before starting work. Revisit a completed candidate
-only when new evidence or new model support changes its suitability.
+When a result is unexpected, check units, inputs, measurement conventions,
+model assumptions, numerical convergence and the version-matched implementation.
+Reduce a suspected implementation problem to a small shareable case when
+possible. Compare expected and observed behavior, state the research impact,
+and distinguish a defect, an unsupported capability and an unresolved physical
+discrepancy. A residual against a paper alone does not diagnose a software bug.
 
-Use a single scheduler writer or an atomic claim in that shared record so
-overlapping invocations cannot select the same study simultaneously. Save the
-claim before creating the worktree and record progress after each durable
-milestone. Reconcile interrupted claims with existing branches and PRs before
-retrying; recover the same iteration rather than silently abandoning it.
+For a diagnosed Particula defect or capability gap, follow the
+[issue reporting workflow](../plugins/particula-helper/skills/particula-report/SKILL.md).
+Search existing issues and fixes, show the researcher the complete proposed
+report, then file the reviewed issue or add the approved evidence to an
+existing issue. Link it in the study record. Pause the affected claim until
+the required capability is available. Independent supported comparisons can
+continue. Library implementation belongs to the follow-up issue.
 
-## Execution: one new worktree per selected iteration
+## Communicating the contribution
 
-1. **Select a bounded study.** From the screened candidates, select at most
-   one new study per scheduler run. Define its target result, input provenance,
-   comparison metrics, uncertainty, and expected computational cost before
-   implementation. Prefer supported physics; identify any bounded corrections
-   needed for the comparison. If no candidate is suitable, report that outcome
-   without creating an empty development branch or PR.
-   Check available study capacity and the configured compute/storage budgets;
-   keep additional candidates queued when capacity is exhausted. If a study
-   reaches its budget, preserve its work and report the remaining requirement.
-2. **Create the iteration's worktree and branch.** Follow the shared workflow
-   to verify remotes and the current upstream base. Assign a unique iteration
-   ID and create a new worktree with a branch such as
-   `codex/literature-<YYYYMMDD-HHMMSS>-<paper-slug>`. Keep each study's changes,
-   tests, and evidence in that worktree. Do not reuse a previous study's
-   worktree or branch, or use the main checkout for its implementation.
-3. **Develop the comparison.** Implement the executable example, input/data
-   provenance, analysis, and relevant tests. Include bounded library corrections
-   when needed, with independent regressions and the required backend checks.
-   Use the maintained example/output workflow and scientific boundaries in
-   Stage 3B. A substantial missing capability becomes a separately scoped
-   development plan rather than an unsupported substitute model.
-4. **Validate and interpret.** Run the comparison and relevant repository
-   checks. Preserve inputs, commands, revision, numerical settings, outputs,
-   uncertainty, and limitations in the maintained example and validation
-   records. Distinguish agreement, measured disagreement, and insufficient
-   evidence; do not tune acceptance criteria to manufacture agreement.
-5. **Deliver a PR.** Once the scoped study and required checks are complete,
-   commit and push the iteration branch and create its own PR. Include the
-   paper citation, target result, reproduction instructions, observed outcome,
-   validation, and remaining limitations. A scientifically useful disagreement
-   can be a completed study; it must not be described as successful physical
-   validation. Return the PR URL and update the iteration record.
+Identify the work as an automated, independent Particula analysis and credit the
+paper, data and methods. In reports, examples, PRs and issue drafts, lead with
+what the authors made possible. Describe the observable, conditions, size and
+uncertainty of the effect. Attribute choices to the team that made them, name
+plausible explanations as hypotheses, and identify one concrete next test and
+who could use its result. State what received human review when applicable.
 
-An interrupted run resumes the same iteration's worktree and branch. A newly
-selected study, or a justified new evaluation of a previously completed paper,
-gets a new iteration ID, worktree, branch, and PR. Do not launch a duplicate
-while that study is already in progress or has an open PR; continue its existing
-work and report its status. Retain incomplete work and record blockers without
-claiming completion.
-
-## Handoff and success criteria
-
-A selected candidate applies Stage 3B's comparison specification and declared
-acceptance metrics in its own iteration. A feature gap becomes a scoped
-proposal under
-[thermodynamics](stage-03a-thermodynamics.md),
-[later chemistry](stage-06-chemistry-model.md), or the appropriate numerical
-plan. Selection does not imply successful validation.
-
-The scheduler is useful when selected studies produce reviewable PRs containing
-reproducible comparisons and clear scientific conclusions. Each completed study
-must have its own recorded worktree/branch identity, evidence, and PR. Evaluate
-candidate quality and completed comparisons, not the number of papers found.
+The [citric-acid comparison](../docs/contribute/validation/thermodynamics/citric-acid-comparison.md)
+illustrates this tone. “Marsh and colleagues reported uncertainties in both
+composition and water activity, which let us test the model across all 12
+measured compositions. Our BAT calculation gives higher water activity at
+each point. Measurements at matched compositions across temperatures could
+help establish how much temperature contributes to that difference and where
+the model is useful for predicting droplet water uptake.”
