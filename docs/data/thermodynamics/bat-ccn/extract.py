@@ -53,9 +53,10 @@ def extract_measurements(supplement, output):
     with ZipFile(supplement) as archive:
         workbook = archive.read("SI_for_ACP/data_used_in_paper.xlsx")
     with ZipFile(BytesIO(workbook)) as book:
+        string_xml = book.read("xl/sharedStrings.xml")
         strings = [
             "".join(item.itertext())
-            for item in ElementTree.fromstring(book.read("xl/sharedStrings.xml"))
+            for item in ElementTree.fromstring(string_xml)
         ]
         sheet = ElementTree.fromstring(book.read("xl/worksheets/sheet12.xml"))
     rows = []
