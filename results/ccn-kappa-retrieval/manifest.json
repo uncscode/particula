@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 3.7707223339239135,
+  "package_source_sha256": "0587f4b83a0caa2c877058728a1667c3e36ec7dde2fda79a1e7e25d6fe93e47d",
+  "input_sha256": {},
+  "example": "ccn-kappa-retrieval",
+  "fingerprint": "2aa19794aa8788875a132775ab2b4c59db83503f530aedccc3d6e21563c9050e",
+  "source": "docs/examples/thermodynamics/activity/ccn_kappa_retrieval.py",
+  "revision": "87e018f3e202549aa750353f184bc1f78592d45a",
+  "package_dirty": false,
+  "executed_at": "2026-11-18T15:00:04.542222+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.2",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [],
+    [
+      {
+        "text": "Full fit at 100 nm: \u03ba = 0.11037\nRelative RMS error at held-out 50\u2013200 nm sizes: 0.43%\n"
+      },
+      {
+        "image": "figure-5-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "figure-5-1.png": "7d69efde25b53de709be15f7f072356f464d7c835088b6c922f8087328387d65",
+    "data.json": "095bb3b5c1d967b2c679fe90a73c345fa90dc3fc834d23ce39a10999e1a6501b",
+    "source.py": "c06e8458e6f3782ca34bdf0773320eb8b0f1e3063a3040a8cf0b7598839ba839"
+  },
+  "simulation_fingerprint": "5eee2881571fc8103678b56bc245bc5bf3eddcf501f6ef0b6d220d078d8c9785"
+}
