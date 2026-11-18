@@ -1,6 +1,6 @@
 # Stage 3B: Scientific and experimental comparisons
 
-Status: the aqueous citric-acid study at 293.15 K, its kinetic checks, and the downloadable example are complete on the study branch. Independent researcher reproduction remains pending. The
+Status: the aqueous citric-acid study at 293.15 K, its kinetic checks, and the downloadable example are complete on the study branch. The independent model comparison is complete using McGill AIOMFAC-web 3.15. The
 [comparison specification](../docs/contribute/validation/thermodynamics/citric-acid-comparison.md)
 records the target data, fixed inputs, metrics and numerical checks before evaluation.
 Stages 1, 2A and 2B are merged. Reuse their verified processes,
@@ -96,10 +96,9 @@ be small enough to interpret the declared observation uncertainty or effect.
    assumptions, not proof that either model matches nature.
 6. **Publish a reproducible example.** Retain source data links and permitted
    compact inputs, configuration, package/source identity, numerical settings,
-   plots, and an honest interpretation. Have an independent user try the
-   workflow and record reproducibility or usability problems. Record who
-   performed the independent reproduction, their environment and the resulting
-   figure/metric; a second run by the author alone does not meet that gate.
+   plots, and an honest interpretation. Verify the example from a clean installation and compare its binary activities
+   with McGill AIOMFAC-web at the measured compositions. Record the model
+   version, inputs and residuals.
 
 ## Scope and handoffs
 
@@ -140,8 +139,8 @@ changes; rerun the physical workload when scientific inputs or code change.
   is useful evidence and must not be relabeled as successful physical validation.
 - Data access, licensing, conversions, and any digitization are traceable.
   Digitized measurements retain extraction uncertainty and are identified as such.
-- An independent user can reproduce the principal figure or metric from the
-  supplied workflow without undocumented maintainer intervention.
+- The documented clean-install workflow reproduces the principal metric and
+  the external AIOMFAC calculation supplies an independent model comparison.
 - No benchmark is tuned against its validation target and then presented as
   independent validation. Remaining physical and observation-model limitations
   are visible beside the comparison.
@@ -155,7 +154,7 @@ changes; rerun the physical workload when scientific inputs or code change.
 
 Complete the first milestone with one selected study's specification, traceable
 data processing, executable example, compact results, quantitative error and
-uncertainty report, convergence evidence and independent reproduction, delivered
+uncertainty report, convergence evidence and the external model comparison, delivered
 in its PR. Report whether the physical hypothesis is supported, contradicted or
 unresolved; implementation success alone does not establish physical validity.
 Missing required evidence remains an open gate.

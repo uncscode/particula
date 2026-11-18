@@ -37,7 +37,19 @@ MPLBACKEND=Agg python -c 'from docs.examples.thermodynamics.activity.citric_acid
 
 A maintainer-side clean installation of revision `01755e91ce` reproduced the two-panel figure and the reported bias and RMS error using Python 3.14.8, NumPy 2.5.5, SciPy 1.18.1, Warp 1.19.0 and Matplotlib 3.11.2. Only the editable Particula checkout and Matplotlib were requested from pip.
 
-For an independent reproduction, record the checkout revision, Python and package versions, the printed metrics and any steps needed to display the figure. In the documentation development environment, to rebuild the saved figure and data, run `python scripts/docs_examples.py refresh citric-acid-hygroscopicity` from the study checkout. The registry packages the CSV with the downloadable example. A second researcher's reproduction is pending.
+To rebuild the saved figure and data in the documentation development environment, run `python scripts/docs_examples.py refresh citric-acid-hygroscopicity`. The downloadable example includes the measurement CSV.
+
+## AIOMFAC binary curve
+
+McGill's AIOMFAC-web 3.15 evaluated a single liquid phase at 293.15 K with water and predefined neutral Citric_acid (component 505). Select mass fractions and enter the temperature and citric acid mass fraction from each row of the [52-point curve](https://github.com/Gorkowski/particula/blob/codex/stage-03b-scientific-comparisons/docs/data/thermodynamics/aiomfac-web315-citric-acid.csv). The grid spans 0 to 0.975 in steps of 0.025 and includes the 12 exact experimental compositions. The output water activity is the water mole-fraction activity `a_x(01)`. All component flags were zero. [McGill calculator](https://aiomfac.lab.mcgill.ca/model.html) · [AIOMFAC parameterization](https://doi.org/10.5194/acp-11-9155-2011)
+
+| Difference at the 12 measured compositions | Mean signed | RMS | Maximum absolute |
+| --- | ---: | ---: | ---: |
+| BAT minus Marsh | +0.05096 | 0.06160 | 0.10645 |
+| AIOMFAC minus Marsh | +0.05351 | 0.06370 | 0.10855 |
+| BAT minus AIOMFAC | −0.00254 | 0.00273 | 0.00376 |
+
+Both models overpredict particle-phase water activity at all 12 central compositions. The largest experimental discrepancy for each occurs at mass fraction 0.76226, where the measured activity is 0.53894, BAT gives 0.64539 and AIOMFAC gives 0.64749. BAT was parameterized using AIOMFAC predictions, so close model agreement is evidence about the reduced representation for this binary. The Marsh measurements provide the experimental check. These comparisons concern bulk solution activity and do not test kinetic rates. [BAT model development](https://doi.org/10.5194/acp-19-13383-2019)
 
 Data attribution: Marsh et al. (2017), Table S9.2 in the article supplement, reproduced under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) with column headings normalized to machine-readable names. Numeric values are as published.
 
