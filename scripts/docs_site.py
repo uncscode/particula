@@ -73,6 +73,8 @@ def rewrite_links(text, source):
         fragment = "#" + parts.fragment if parts.fragment else ""
         if target.startswith("docs/images/"):
             destination = BASE + target.removeprefix("docs/")
+        elif target.startswith("website/results/"):
+            destination = BASE + target.removeprefix("website/")
         elif Path(target).suffix == ".py":
             ids = {c["source"]: key for key, c in registry().items()}
             destination = (

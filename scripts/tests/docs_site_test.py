@@ -18,6 +18,15 @@ def test_links_use_base_for_complete_site():
     assert "print('[x](fake.md)')" in result
 
 
+def test_guide_embeds_saved_figure_from_local_result_bundle():
+    """The guide and runnable example share the published image asset."""
+    result = site.rewrite_links(
+        "![Calibration](../../../website/results/demo/figure-1.png)",
+        "docs/guide/processes/demo.md",
+    )
+    assert result == "![Calibration](/particula/results/demo/figure-1.png)"
+
+
 def test_figures_are_visible_and_stdout_is_escaped():
     """Figures are visible and stdout is escaped."""
     result = site.output_markdown(
