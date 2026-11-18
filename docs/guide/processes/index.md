@@ -3,6 +3,7 @@
 Choose a process guide for practical setup and an executable example:
 
 - [Activity](activity.md)
+- [Designing a size-resolved CCN experiment](ccn-retrieval.md)
 - [Condensation](condensation.md)
 - [Numerical integration and process splitting](numerical-integration.md)
 - [Coagulation](coagulation.md)

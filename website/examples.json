@@ -930,5 +930,20 @@
       "plot_results"
     ],
     "plot_inputs": []
+  },
+  "ccn-kappa-retrieval": {
+    "title": "Fit hygroscopicity to an activation measurement",
+    "source": "docs/examples/thermodynamics/activity/ccn_kappa_retrieval.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 300,
+    "inputs": [],
+    "invoke": "result = run_example()",
+    "data_expression": "result",
+    "replot_invoke": "result = saved_data\nplot_results(result)\nplt.show()",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": []
   }
 }
