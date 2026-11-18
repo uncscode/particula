@@ -72,3 +72,96 @@ miscible organic the direct coefficient is 1.84162 at both zero and
 Using the analytic limit in the Gibbs derivative also preserves the exact
 8,208 bytes of the previously qualified 513-node, two-activity table for
 this case.
+
+## One-box humidity pulse timing and refinement
+
+The same humidity pulse was rerun on revision
+`92615153d2dc0b191d349fe928d13927e0f6b2de` using an AMD Ryzen AI 9 HX 370,
+an NVIDIA GeForce RTX 5060, driver 615.78.08, Warp 1.11.1 and Python 3.12.12.
+One computational slot represented 100,000 identical droplets in 10⁻⁶ m³.
+Both workflows took 1,024 outer steps with four equal substeps each and
+recorded the same 66 observations. The CPU evaluated BAT directly. Prepared
+CUDA used the 513-node table and captured steps. The ratio therefore includes
+the choice of activity evaluation and execution path.
+
+| Workflow | Five warm-process elapsed times, in run order (s) | Median (s) |
+| --- | --- | ---: |
+| Native CPU | 2.535, 2.525, 2.498, 2.505, 2.516 | 2.516 |
+| Captured CUDA | 0.786, 0.827, 0.848, 0.811, 0.845 | 0.827 |
+
+The ratio of medians was 3.04. Each timed run began with construction of
+a fresh chamber and ended after saving and flushing the four-column history.
+CUDA preparation, capture, snapshots, checks and teardown were inside that
+interval. Imports, device initialization, the first warmup on each backend
+and plotting were outside it. The device reported 0% utilization immediately
+before the pilot. Peak memory, cold startup cost and the effect of batch size
+remain unmeasured.
+
+| Comparison with direct CPU at 128 outer steps per observation | Max wet-radius difference (%) | Wetting transfer difference (%) | Drying transfer difference (%) |
+| --- | ---: | ---: | ---: |
+| Native CPU, 16 steps per observation | 0.03751 | 0.34099 | 0.09935 |
+| Captured CUDA, 16 steps per observation | 0.03753 | 0.34119 | 0.10092 |
+| Direct CPU, 64 steps per observation | 0.00531 | 0.04829 | 0.01477 |
+
+For radius, take the maximum absolute relative difference over all observations.
+For transfer, subtract each leg's initial value from its vapor and particle
+water histories separately (kg/m³). Take the largest absolute difference from
+the reference over both histories and all samples on the leg, then divide by
+the peak absolute reference particle-water change on that leg. Both sides of
+the imposed vapor jump are retained. The checks within the example passed on
+all runs. The 64-to-128 comparison measures sensitivity to another timestep
+halving. Both calculations use the same physical model.
+
+To repeat with the checked-out example, run the following from the repository
+root in the CUDA environment. Use the same local filesystem for both saves.
+The two finer CPU runs supply the comparison histories.
+
+```bash
+python - <<'PY'
+import os
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from time import perf_counter
+
+import numpy as np
+import warp as wp
+from docs.examples.thermodynamics.activity.bat_humidity_pulse import trajectory
+
+wp.init()
+device = wp.get_device("cuda:0")
+histories = {}
+with TemporaryDirectory() as destination:
+    for pair in range(6):
+        # Pair zero warms both paths. The first measured pair starts with CPU.
+        order = (device.alias, None) if pair in (2, 4) else (None, device.alias)
+        for backend in order:
+            if backend:
+                wp.synchronize_device(device)
+            start = perf_counter()
+            rows = trajectory(backend, 16)
+            if backend:
+                wp.synchronize_device(device)
+            with (Path(destination) / "history.npy").open("wb") as output:
+                np.save(output, rows)
+                output.flush()
+                os.fsync(output.fileno())
+            elapsed = perf_counter() - start
+            if pair:
+                histories[backend or "cpu"] = rows
+                print(pair, backend or "cpu", elapsed)
+reference64 = trajectory(None, 64)
+reference128 = trajectory(None, 128)
+histories["refinement64"] = reference64
+for label, rows in histories.items():
+    radius_error = np.max(np.abs(rows[:, 1] / reference128[:, 1] - 1))
+    errors = [radius_error]
+    for leg, ref in zip(np.split(rows, 2), np.split(reference128, 2)):
+        difference = (leg - leg[0]) - (ref - ref[0])
+        scale = np.max(np.abs(ref[:, 3] - ref[0, 3]))
+        errors.append(np.max(np.abs(difference[:, 2:4])) / scale)
+    print(label, "radius, wetting and drying differences (%)", 100 * np.array(errors))
+PY
+```
+
+The [ensemble campaign](../gpu/bat-humidity-pulse.md) extends this pilot to
+128 boxes and measures performance at matched accuracy.

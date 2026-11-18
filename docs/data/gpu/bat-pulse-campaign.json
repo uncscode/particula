@@ -1,0 +1,3992 @@
+{
+ "environment": {
+  "revision": "ccf972aafee7101acb6a3d82c34338a278fe4418",
+  "sha256": {
+   "docs/examples/thermodynamics/activity/bat_humidity_pulse.py": "ea6e9a82db4a8cca96393556f83160ff47955e01976454646798bbe19085ad22",
+   "scripts/gpu_studies/humidity_campaign.py": "6f842a0c520d189437e2e655ef70ff5e45febe86f8eb3b7d8e5f70eb018be314",
+   "scripts/gpu_studies/humidity_matrix.py": "29d242ba1d02f89f8e302c689611462fb48add55c5251b3f9ee3d76d11a5fb92",
+   "scripts/gpu_studies/humidity_references.py": "fcdecbc70b7d177c36581dd6e7862c15e814e03f41dd27bdc94b3c8bf24b7068",
+   "scripts/gpu_studies/humidity_restart.py": "a47932fdf8b4b77d1d4820a231acfa9569ec96725ba4b17b38148570398a2fca"
+  },
+  "python": "3.12.12",
+  "versions": {
+   "warp-lang": "1.11.1",
+   "numpy": "2.3.4",
+   "scipy": "1.16.2",
+   "matplotlib": "3.10.7"
+  },
+  "warp_runtime": [
+   "CUDA Toolkit 12.9, Driver 13.4",
+   "\"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)"
+  ]
+ },
+ "cases": [
+  {
+   "boxes": 1,
+   "mode": "cpu",
+   "steps": 8,
+   "passed": false,
+   "cold_process_seconds": 3.444720263942145,
+   "cached_process_seconds": 3.469487615977414,
+   "compiled_module_loads": 0,
+   "compiled_module_load_seconds": 0,
+   "reset_water_kg_m3_range": [
+    -0.009222688476670446,
+    -0.009222688476670446
+   ],
+   "max_water_budget_residual_kg_m3": 8.673617379884035e-18,
+   "maximum_errors_percent": [
+    0.08130112685620361,
+    0.7394653114846901,
+    0.20088795917901126
+   ]
+  },
+  {
+   "boxes": 1,
+   "mode": "cpu",
+   "steps": 16,
+   "passed": true,
+   "cold_process_seconds": 4.6692957419436425,
+   "cached_process_seconds": 4.748596822028048,
+   "compiled_module_loads": 0,
+   "compiled_module_load_seconds": 0,
+   "reset_water_kg_m3_range": [
+    -0.009222688476830186,
+    -0.009222688476830186
+   ],
+   "max_water_budget_residual_kg_m3": 1.0408340855860843e-17,
+   "maximum_errors_percent": [
+    0.037507072297748856,
+    0.34099204617989265,
+    0.09934820345740486
+   ],
+   "warmups": [
+    {
+     "construct": 0.0003741650143638253,
+     "observations": 0.005031555658206344,
+     "step": 2.546669602394104,
+     "save": 0.00017174903769046068,
+     "total": 2.5530766650335863,
+     "peak_rss_kib": 347648
+    },
+    {
+     "construct": 0.00016625900752842426,
+     "observations": 0.005076718400232494,
+     "step": 2.551679410855286,
+     "save": 0.00015158194582909346,
+     "total": 2.5574337070574984,
+     "peak_rss_kib": 347648
+    },
+    {
+     "construct": 0.00015604996588081121,
+     "observations": 0.004883189918473363,
+     "step": 2.5859666977776214,
+     "save": 0.0001858050236478448,
+     "total": 2.59155330597423,
+     "peak_rss_kib": 347648
+    }
+   ],
+   "repetitions": [
+    {
+     "construct": 0.00017293100245296955,
+     "observations": 0.004685661988332868,
+     "step": 2.591610317584127,
+     "save": 0.00018914206884801388,
+     "total": 2.5970020840177312,
+     "peak_rss_kib": 347648
+    },
+    {
+     "construct": 0.0001696649705991149,
+     "observations": 0.004602143191732466,
+     "step": 2.6148400388192385,
+     "save": 0.00013663398567587137,
+     "total": 2.6200746989343315,
+     "peak_rss_kib": 347648
+    },
+    {
+     "construct": 0.00015969597734510899,
+     "observations": 0.00400922482367605,
+     "step": 2.4880626073572785,
+     "save": 0.00013261591084301472,
+     "total": 2.492663086974062,
+     "peak_rss_kib": 347648
+    },
+    {
+     "construct": 0.00015582004562020302,
+     "observations": 0.0041545984568074346,
+     "step": 2.5102901803329587,
+     "save": 0.00014014996122568846,
+     "total": 2.5150636540492997,
+     "peak_rss_kib": 347648
+    },
+    {
+     "construct": 0.00015805300790816545,
+     "observations": 0.004577215062454343,
+     "step": 2.5046361077111214,
+     "save": 0.00014586001634597778,
+     "total": 2.5098753889324144,
+     "peak_rss_kib": 347648
+    },
+    {
+     "construct": 0.00015874498058110476,
+     "observations": 0.004933843505568802,
+     "step": 2.489030950702727,
+     "save": 0.0001545570557937026,
+     "total": 2.494629518012516,
+     "peak_rss_kib": 347648
+    },
+    {
+     "construct": 0.00016063801012933254,
+     "observations": 0.004904276924207807,
+     "step": 2.527279287809506,
+     "save": 0.0001575220376253128,
+     "total": 2.5328680759994313,
+     "peak_rss_kib": 347648
+    }
+   ]
+  },
+  {
+   "boxes": 1,
+   "mode": "prepared",
+   "steps": 8,
+   "passed": false,
+   "cold_process_seconds": 17.293868278968148,
+   "cached_process_seconds": 3.6060256680939347,
+   "compiled_module_loads": 19,
+   "compiled_module_load_seconds": 13.4681,
+   "reset_water_kg_m3_range": [
+    -0.00922268485377192,
+    -0.00922268485377192
+   ],
+   "max_water_budget_residual_kg_m3": 1.5612511283791264e-17,
+   "maximum_errors_percent": [
+    0.08132858815774746,
+    0.7397152857632053,
+    0.2024592619187114
+   ]
+  },
+  {
+   "boxes": 1,
+   "mode": "prepared",
+   "steps": 16,
+   "passed": true,
+   "cold_process_seconds": 17.088354338076897,
+   "cached_process_seconds": 4.187205240014009,
+   "compiled_module_loads": 19,
+   "compiled_module_load_seconds": 13.02832,
+   "reset_water_kg_m3_range": [
+    -0.009222684853934352,
+    -0.009222684853934352
+   ],
+   "max_water_budget_residual_kg_m3": 3.642919299551295e-17,
+   "maximum_errors_percent": [
+    0.037528621362681314,
+    0.34118803101001627,
+    0.10091841569211779
+   ],
+   "warmups": [
+    {
+     "construct": 0.07036056905053556,
+     "prepare_upload": 0.14269494300242513,
+     "observations": 0.04034098866395652,
+     "step": 0.9422552516916767,
+     "reset": 0.0002070240443572402,
+     "device_pool_peak_bytes": 8648,
+     "close": 0.004221630049869418,
+     "save": 0.00020767608657479286,
+     "total": 1.2009862000122666,
+     "peak_rss_kib": 722088
+    },
+    {
+     "construct": 0.00025438203010708094,
+     "prepare_upload": 0.0061412539798766375,
+     "observations": 0.0350288909394294,
+     "step": 0.9234563127392903,
+     "reset": 0.00020686397328972816,
+     "device_pool_peak_bytes": 8648,
+     "close": 0.00041863799560815096,
+     "save": 0.0001778609585016966,
+     "total": 0.966192250023596,
+     "peak_rss_kib": 722088
+    },
+    {
+     "construct": 0.00021788501180708408,
+     "prepare_upload": 0.00678809592500329,
+     "observations": 0.03945446223951876,
+     "step": 0.8890577947022393,
+     "reset": 0.00020802603103220463,
+     "device_pool_peak_bytes": 8648,
+     "close": 0.000356392003595829,
+     "save": 0.00015216204337775707,
+     "total": 0.9367353180423379,
+     "peak_rss_kib": 722088
+    }
+   ],
+   "repetitions": [
+    {
+     "construct": 0.00021422805730253458,
+     "prepare_upload": 0.0053644010331481695,
+     "observations": 0.037108926684595644,
+     "step": 0.9243379140971228,
+     "reset": 0.00019414094276726246,
+     "device_pool_peak_bytes": 8648,
+     "close": 0.000357283977791667,
+     "save": 0.000141652999445796,
+     "total": 0.9681916720001027,
+     "peak_rss_kib": 722088
+    },
+    {
+     "construct": 0.0001908239210024476,
+     "prepare_upload": 0.005538333905860782,
+     "observations": 0.03405758715234697,
+     "step": 0.9017125162063166,
+     "reset": 0.0002781871007755399,
+     "device_pool_peak_bytes": 8648,
+     "close": 0.0003726020222529769,
+     "save": 0.0001538050128147006,
+     "total": 0.9427679310319945,
+     "peak_rss_kib": 722280
+    },
+    {
+     "construct": 0.00018277904018759727,
+     "prepare_upload": 0.005300072953104973,
+     "observations": 0.02833269804250449,
+     "step": 0.9011053981957957,
+     "reset": 0.00019819801673293114,
+     "device_pool_peak_bytes": 8648,
+     "close": 0.0003774109063670039,
+     "save": 0.0001622309209778905,
+     "total": 0.9360899199964479,
+     "peak_rss_kib": 722280
+    },
+    {
+     "construct": 0.00017945305444300175,
+     "prepare_upload": 0.005459728999994695,
+     "observations": 0.03027853788807988,
+     "step": 0.9022505662869662,
+     "reset": 0.00019311904907226562,
+     "device_pool_peak_bytes": 8648,
+     "close": 0.00037565804086625576,
+     "save": 0.00016725098248571157,
+     "total": 0.9393426600145176,
+     "peak_rss_kib": 722280
+    },
+    {
+     "construct": 0.00019874901045113802,
+     "prepare_upload": 0.005386461969465017,
+     "observations": 0.033434032928198576,
+     "step": 0.9093008957570419,
+     "reset": 0.00019777799025177956,
+     "device_pool_peak_bytes": 8648,
+     "close": 0.00037532695569097996,
+     "save": 0.00016297295223921537,
+     "total": 0.9495309200137854,
+     "peak_rss_kib": 722280
+    },
+    {
+     "construct": 0.00018961308524012566,
+     "prepare_upload": 0.005395880085416138,
+     "observations": 0.03306814597453922,
+     "step": 0.9097020615590736,
+     "reset": 0.00019210705067962408,
+     "device_pool_peak_bytes": 8648,
+     "close": 0.0003770110197365284,
+     "save": 0.00016185094136744738,
+     "total": 0.9495431219693273,
+     "peak_rss_kib": 722280
+    },
+    {
+     "construct": 0.0001816069707274437,
+     "prepare_upload": 0.0052743039559572935,
+     "observations": 0.03361704701092094,
+     "step": 0.9215519551653415,
+     "reset": 0.0002189859515056014,
+     "device_pool_peak_bytes": 8648,
+     "close": 0.0003785730805248022,
+     "save": 0.0001562798861414194,
+     "total": 0.9618423719657585,
+     "peak_rss_kib": 722280
+    }
+   ]
+  },
+  {
+   "boxes": 1,
+   "mode": "captured",
+   "steps": 8,
+   "passed": false,
+   "cold_process_seconds": 26.467330071958713,
+   "cached_process_seconds": 3.7846675460459664,
+   "compiled_module_loads": 37,
+   "compiled_module_load_seconds": 22.54686,
+   "reset_water_kg_m3_range": [
+    -0.00922268485377192,
+    -0.00922268485377192
+   ],
+   "max_water_budget_residual_kg_m3": 1.5612511283791264e-17,
+   "maximum_errors_percent": [
+    0.08132858815774746,
+    0.7397152857632053,
+    0.2024592619187114
+   ]
+  },
+  {
+   "boxes": 1,
+   "mode": "captured",
+   "steps": 16,
+   "passed": true,
+   "cold_process_seconds": 26.399793810909614,
+   "cached_process_seconds": 3.903402941999957,
+   "compiled_module_loads": 37,
+   "compiled_module_load_seconds": 22.12744,
+   "reset_water_kg_m3_range": [
+    -0.009222684853934352,
+    -0.009222684853934352
+   ],
+   "max_water_budget_residual_kg_m3": 3.642919299551295e-17,
+   "maximum_errors_percent": [
+    0.037528621362681314,
+    0.34118803101001627,
+    0.10091841569211779
+   ],
+   "warmups": [
+    {
+     "construct": 0.06820820190478116,
+     "prepare_upload": 0.12572389806155115,
+     "capture": 0.06784768297802657,
+     "observations": 0.030628796783275902,
+     "first_replay": 0.0009388528997078538,
+     "step": 0.6309655769728124,
+     "reset": 0.0003273080801591277,
+     "device_pool_peak_bytes": 8648,
+     "close": 0.004991058027371764,
+     "save": 0.00018669699784368277,
+     "total": 0.931106292991899,
+     "peak_rss_kib": 755176
+    },
+    {
+     "construct": 0.0002062530256807804,
+     "prepare_upload": 0.0056014820002019405,
+     "capture": 0.2854710560059175,
+     "observations": 0.030755311250686646,
+     "first_replay": 0.000956036034040153,
+     "step": 0.6617698557674885,
+     "reset": 0.0003068801015615463,
+     "device_pool_peak_bytes": 17208,
+     "close": 0.00015167100355029106,
+     "save": 0.00016915402375161648,
+     "total": 0.9858270989498124,
+     "peak_rss_kib": 826216
+    },
+    {
+     "construct": 0.00017543602734804153,
+     "prepare_upload": 0.005123734939843416,
+     "capture": 0.0020054340129718184,
+     "observations": 0.038524349220097065,
+     "first_replay": 0.0008772789733484387,
+     "step": 0.7123636277392507,
+     "reset": 0.0003077209694311023,
+     "device_pool_peak_bytes": 25768,
+     "close": 0.0001457809703424573,
+     "save": 0.0001522529637441039,
+     "total": 0.7601781019475311,
+     "peak_rss_kib": 826216
+    }
+   ],
+   "repetitions": [
+    {
+     "construct": 0.0001980781089514494,
+     "prepare_upload": 0.005377757013775408,
+     "capture": 0.004473928944207728,
+     "observations": 0.03289068921003491,
+     "first_replay": 0.0010783429024741054,
+     "step": 0.6746220500208437,
+     "reset": 0.0003020309377461672,
+     "device_pool_peak_bytes": 34328,
+     "close": 0.00013579207006841898,
+     "save": 0.0001521629747003317,
+     "total": 0.7196751480223611,
+     "peak_rss_kib": 826216
+    },
+    {
+     "construct": 0.0001734619727358222,
+     "prepare_upload": 0.005155694088898599,
+     "capture": 0.004120741970837116,
+     "observations": 0.03142449620645493,
+     "first_replay": 0.0008485650178045034,
+     "step": 0.6667613782919943,
+     "reset": 0.0003233100287616253,
+     "device_pool_peak_bytes": 42888,
+     "close": 0.00013294699601829052,
+     "save": 0.00016848300583660603,
+     "total": 0.7095462189754471,
+     "peak_rss_kib": 826216
+    },
+    {
+     "construct": 0.00017553591169416904,
+     "prepare_upload": 0.005070725921541452,
+     "capture": 0.003579678013920784,
+     "observations": 0.029882388073019683,
+     "first_replay": 0.0008245320059359074,
+     "step": 0.6650503051932901,
+     "reset": 0.0003023019526153803,
+     "device_pool_peak_bytes": 51448,
+     "close": 0.00013587204739451408,
+     "save": 0.00016930396668612957,
+     "total": 0.7056131149875,
+     "peak_rss_kib": 826216
+    },
+    {
+     "construct": 0.0001734520774334669,
+     "prepare_upload": 0.005109578953124583,
+     "capture": 0.0037237050710245967,
+     "observations": 0.03215016156900674,
+     "first_replay": 0.0008388779824599624,
+     "step": 0.6860532131977379,
+     "reset": 0.00030571804381906986,
+     "device_pool_peak_bytes": 60008,
+     "close": 0.00013654399663209915,
+     "save": 0.0001681919675320387,
+     "total": 0.7291072430089116,
+     "peak_rss_kib": 826216
+    },
+    {
+     "construct": 0.00017524603754281998,
+     "prepare_upload": 0.0051926219603046775,
+     "capture": 0.0038017500191926956,
+     "observations": 0.030366498394869268,
+     "first_replay": 0.0011284849606454372,
+     "step": 0.6662596716778353,
+     "reset": 0.0003203650703653693,
+     "device_pool_peak_bytes": 68568,
+     "close": 0.00014124205335974693,
+     "save": 0.0001559500815346837,
+     "total": 0.7079824639949948,
+     "peak_rss_kib": 826216
+    },
+    {
+     "construct": 0.00017595698591321707,
+     "prepare_upload": 0.005202471045777202,
+     "capture": 0.004456926020793617,
+     "observations": 0.031148562557063997,
+     "first_replay": 0.0008510809857398272,
+     "step": 0.6785147314658388,
+     "reset": 0.0003026520134881139,
+     "device_pool_peak_bytes": 77128,
+     "close": 0.00013170496094971895,
+     "save": 0.00014538993127644062,
+     "total": 0.7213733309181407,
+     "peak_rss_kib": 826216
+    },
+    {
+     "construct": 0.00017291097901761532,
+     "prepare_upload": 0.005145073984749615,
+     "capture": 0.0046002831077203155,
+     "observations": 0.03117540304083377,
+     "first_replay": 0.0008903540438041091,
+     "step": 0.6755658233305439,
+     "reset": 0.0003001170698553324,
+     "device_pool_peak_bytes": 85688,
+     "close": 0.00013415899593383074,
+     "save": 0.00016679998952895403,
+     "total": 0.7185809260699898,
+     "peak_rss_kib": 826216
+    }
+   ]
+  },
+  {
+   "boxes": 8,
+   "mode": "cpu",
+   "steps": 8,
+   "passed": false,
+   "cold_process_seconds": 10.069690227974206,
+   "cached_process_seconds": 9.863764583016746,
+   "compiled_module_loads": 0,
+   "compiled_module_load_seconds": 0,
+   "reset_water_kg_m3_range": [
+    -0.009316401525915393,
+    -0.009060474792303281
+   ],
+   "max_water_budget_residual_kg_m3": 2.6020852139652106e-17,
+   "maximum_errors_percent": [
+    0.0824478256349126,
+    0.8145605206608968,
+    0.21137241195335882
+   ]
+  },
+  {
+   "boxes": 8,
+   "mode": "cpu",
+   "steps": 16,
+   "passed": true,
+   "cold_process_seconds": 17.78666877595242,
+   "cached_process_seconds": 17.706244510016404,
+   "compiled_module_loads": 0,
+   "compiled_module_load_seconds": 0,
+   "reset_water_kg_m3_range": [
+    -0.009316401526664953,
+    -0.00906047479230774
+   ],
+   "max_water_budget_residual_kg_m3": 7.112366251504909e-17,
+   "maximum_errors_percent": [
+    0.039425927429403984,
+    0.3896235721436392,
+    0.10426406554462768
+   ],
+   "warmups": [
+    {
+     "construct": 0.00037568702828139067,
+     "observations": 0.005467042326927185,
+     "step": 15.959046203643084,
+     "save": 0.000187839032150805,
+     "total": 15.965481839957647,
+     "peak_rss_kib": 347648
+    },
+    {
+     "construct": 0.00022276397794485092,
+     "observations": 0.005415579886175692,
+     "step": 15.814904100261629,
+     "save": 0.0001613099593669176,
+     "total": 15.821074972045608,
+     "peak_rss_kib": 347648
+    },
+    {
+     "construct": 0.00021397799719125032,
+     "observations": 0.005421683774329722,
+     "step": 15.732481788378209,
+     "save": 0.00016002694610506296,
+     "total": 15.738625366939232,
+     "peak_rss_kib": 347648
+    }
+   ],
+   "repetitions": [
+    {
+     "construct": 0.00025593501050025225,
+     "observations": 0.005477270227856934,
+     "step": 15.83160666830372,
+     "save": 0.00015506800264120102,
+     "total": 15.837840070948005,
+     "peak_rss_kib": 347648
+    },
+    {
+     "construct": 0.00019509298726916313,
+     "observations": 0.005429318291135132,
+     "step": 15.853586093056947,
+     "save": 0.0001555390190333128,
+     "total": 15.859714625985362,
+     "peak_rss_kib": 347648
+    },
+    {
+     "construct": 0.00019429100211709738,
+     "observations": 0.005369078717194498,
+     "step": 15.731832042802125,
+     "save": 0.0001475340686738491,
+     "total": 15.73788913199678,
+     "peak_rss_kib": 347648
+    },
+    {
+     "construct": 0.00019561301451176405,
+     "observations": 0.005395981133915484,
+     "step": 15.90159587492235,
+     "save": 0.00014415790792554617,
+     "total": 15.907671759021468,
+     "peak_rss_kib": 347648
+    },
+    {
+     "construct": 0.00019573303870856762,
+     "observations": 0.005322651355527341,
+     "step": 15.832321094349027,
+     "save": 0.0001577329821884632,
+     "total": 15.83833987498656,
+     "peak_rss_kib": 347648
+    },
+    {
+     "construct": 0.00019694596994668245,
+     "observations": 0.005401387345045805,
+     "step": 15.822258365922607,
+     "save": 0.00014999904669821262,
+     "total": 15.828347153961658,
+     "peak_rss_kib": 347648
+    },
+    {
+     "construct": 0.00019765703473240137,
+     "observations": 0.005573730333708227,
+     "step": 15.837300907820463,
+     "save": 0.00015304400585591793,
+     "total": 15.843567371950485,
+     "peak_rss_kib": 347648
+    }
+   ]
+  },
+  {
+   "boxes": 8,
+   "mode": "prepared",
+   "steps": 8,
+   "passed": false,
+   "cold_process_seconds": 15.721979280002415,
+   "cached_process_seconds": 3.4481083740247414,
+   "compiled_module_loads": 19,
+   "compiled_module_load_seconds": 12.1912,
+   "reset_water_kg_m3_range": [
+    -0.00931639932088358,
+    -0.009060469658786454
+   ],
+   "max_water_budget_residual_kg_m3": 2.7755575615628914e-17,
+   "maximum_errors_percent": [
+    0.08246707313650514,
+    0.8147857799028158,
+    0.21319104007564452
+   ]
+  },
+  {
+   "boxes": 8,
+   "mode": "prepared",
+   "steps": 16,
+   "passed": true,
+   "cold_process_seconds": 16.206964362063445,
+   "cached_process_seconds": 3.838370932964608,
+   "compiled_module_loads": 19,
+   "compiled_module_load_seconds": 12.298919999999999,
+   "reset_water_kg_m3_range": [
+    -0.009316399321643468,
+    -0.009060469658790996
+   ],
+   "max_water_budget_residual_kg_m3": 2.6020852139652106e-17,
+   "maximum_errors_percent": [
+    0.03944775795317046,
+    0.3898366967588279,
+    0.10607122122269501
+   ],
+   "warmups": [
+    {
+     "construct": 0.07180644397158176,
+     "prepare_upload": 0.12947793793864548,
+     "observations": 0.029348700656555593,
+     "step": 0.9035185653483495,
+     "reset": 0.0001990199089050293,
+     "device_pool_peak_bytes": 10692,
+     "close": 0.0038982690311968327,
+     "save": 0.00016472593415528536,
+     "total": 1.138922065962106,
+     "peak_rss_kib": 725536
+    },
+    {
+     "construct": 0.00024066702462732792,
+     "prepare_upload": 0.005883776000700891,
+     "observations": 0.02733601233921945,
+     "step": 0.8715685060014948,
+     "reset": 0.00020297709852457047,
+     "device_pool_peak_bytes": 10692,
+     "close": 0.0003753469791263342,
+     "save": 0.00016919407062232494,
+     "total": 0.9062051059445366,
+     "peak_rss_kib": 725536
+    },
+    {
+     "construct": 0.00022229296155273914,
+     "prepare_upload": 0.0056915790773928165,
+     "observations": 0.02720382623374462,
+     "step": 0.8777402188861743,
+     "reset": 0.00019211694598197937,
+     "device_pool_peak_bytes": 10692,
+     "close": 0.00036449695471674204,
+     "save": 0.0001667289761826396,
+     "total": 0.9119962999830022,
+     "peak_rss_kib": 725728
+    }
+   ],
+   "repetitions": [
+    {
+     "construct": 0.00021521002054214478,
+     "prepare_upload": 0.005660381051711738,
+     "observations": 0.026763098896481097,
+     "step": 0.8783091367222369,
+     "reset": 0.0001946809934452176,
+     "device_pool_peak_bytes": 10692,
+     "close": 0.0003513229312375188,
+     "save": 0.00015108997467905283,
+     "total": 0.9120528450002894,
+     "peak_rss_kib": 725728
+    },
+    {
+     "construct": 0.00021852506324648857,
+     "prepare_upload": 0.005648639053106308,
+     "observations": 0.026513198856264353,
+     "step": 0.8702999873785302,
+     "reset": 0.0002014740603044629,
+     "device_pool_peak_bytes": 10692,
+     "close": 0.0003549690591171384,
+     "save": 0.00016803189646452665,
+     "total": 0.9038187040714547,
+     "peak_rss_kib": 725728
+    },
+    {
+     "construct": 0.00021429802291095257,
+     "prepare_upload": 0.006089719012379646,
+     "observations": 0.02742385503370315,
+     "step": 0.8822401517536491,
+     "reset": 0.0001923569943755865,
+     "device_pool_peak_bytes": 10692,
+     "close": 0.0003781119594350457,
+     "save": 0.00015986710786819458,
+     "total": 0.9171293620020151,
+     "peak_rss_kib": 725728
+    },
+    {
+     "construct": 0.00022027897648513317,
+     "prepare_upload": 0.005654128966853023,
+     "observations": 0.027844959986396134,
+     "step": 0.880476241116412,
+     "reset": 0.00018945103511214256,
+     "device_pool_peak_bytes": 10692,
+     "close": 0.000368824927136302,
+     "save": 0.0001534449402242899,
+     "total": 0.9153245199704543,
+     "peak_rss_kib": 725728
+    },
+    {
+     "construct": 0.0002238050801679492,
+     "prepare_upload": 0.005616849986836314,
+     "observations": 0.029474785667844117,
+     "step": 0.8831938767107204,
+     "reset": 0.00019004300702363253,
+     "device_pool_peak_bytes": 10692,
+     "close": 0.0003498300211504102,
+     "save": 0.00014771404676139355,
+     "total": 0.9196081450209022,
+     "peak_rss_kib": 725728
+    },
+    {
+     "construct": 0.00021282501984387636,
+     "prepare_upload": 0.005633540917187929,
+     "observations": 0.02720722451340407,
+     "step": 0.8777239526389167,
+     "reset": 0.0001916459295898676,
+     "device_pool_peak_bytes": 10692,
+     "close": 0.00036612001713365316,
+     "save": 0.000158765004016459,
+     "total": 0.9119089680025354,
+     "peak_rss_kib": 725728
+    },
+    {
+     "construct": 0.00021469895727932453,
+     "prepare_upload": 0.00557506293989718,
+     "observations": 0.027116255019791424,
+     "step": 0.8798210299573839,
+     "reset": 0.00020228594075888395,
+     "device_pool_peak_bytes": 10692,
+     "close": 0.00036866404116153717,
+     "save": 0.00015177205204963684,
+     "total": 0.913865469978191,
+     "peak_rss_kib": 725728
+    }
+   ]
+  },
+  {
+   "boxes": 8,
+   "mode": "captured",
+   "steps": 8,
+   "passed": false,
+   "cold_process_seconds": 24.828589080949314,
+   "cached_process_seconds": 3.345311527955346,
+   "compiled_module_loads": 37,
+   "compiled_module_load_seconds": 21.17053,
+   "reset_water_kg_m3_range": [
+    -0.00931639932088358,
+    -0.009060469658786454
+   ],
+   "max_water_budget_residual_kg_m3": 2.7755575615628914e-17,
+   "maximum_errors_percent": [
+    0.08246707313650514,
+    0.8147857799028158,
+    0.21319104007564452
+   ]
+  },
+  {
+   "boxes": 8,
+   "mode": "captured",
+   "steps": 16,
+   "passed": true,
+   "cold_process_seconds": 25.062940765055828,
+   "cached_process_seconds": 3.6771976120071486,
+   "compiled_module_loads": 37,
+   "compiled_module_load_seconds": 21.13193,
+   "reset_water_kg_m3_range": [
+    -0.009316399321643468,
+    -0.009060469658790996
+   ],
+   "max_water_budget_residual_kg_m3": 2.6020852139652106e-17,
+   "maximum_errors_percent": [
+    0.03944775795317046,
+    0.3898366967588279,
+    0.10607122122269501
+   ],
+   "warmups": [
+    {
+     "construct": 0.06726953794714063,
+     "prepare_upload": 0.12579335598275065,
+     "capture": 0.06458269897848368,
+     "observations": 0.03493091173004359,
+     "first_replay": 0.0009153800783678889,
+     "step": 0.6863843224709854,
+     "reset": 0.0003069300437346101,
+     "device_pool_peak_bytes": 10692,
+     "close": 0.004903195076622069,
+     "save": 0.00016512698493897915,
+     "total": 0.9857974259648472,
+     "peak_rss_kib": 754656
+    },
+    {
+     "construct": 0.00024133792612701654,
+     "prepare_upload": 0.005723088048398495,
+     "capture": 0.28939671406988055,
+     "observations": 0.03125061618629843,
+     "first_replay": 0.0009880850557237864,
+     "step": 0.6614893188234419,
+     "reset": 0.0003182410728186369,
+     "device_pool_peak_bytes": 20680,
+     "close": 0.00016711000353097916,
+     "save": 0.00017474498599767685,
+     "total": 0.99021629197523,
+     "peak_rss_kib": 825696
+    },
+    {
+     "construct": 0.00022161193192005157,
+     "prepare_upload": 0.00573067192453891,
+     "capture": 0.0020895199850201607,
+     "observations": 0.03346890292596072,
+     "first_replay": 0.0008763679070398211,
+     "step": 0.6927087943768129,
+     "reset": 0.00030073802918195724,
+     "device_pool_peak_bytes": 30668,
+     "close": 0.0001571619650349021,
+     "save": 0.00017707899678498507,
+     "total": 0.7362437599804252,
+     "peak_rss_kib": 825696
+    }
+   ],
+   "repetitions": [
+    {
+     "construct": 0.00025451299734413624,
+     "prepare_upload": 0.005631227046251297,
+     "capture": 0.004796867957338691,
+     "observations": 0.030996915884315968,
+     "first_replay": 0.0010587159777060151,
+     "step": 0.6711201383732259,
+     "reset": 0.00029615999665111303,
+     "device_pool_peak_bytes": 40656,
+     "close": 0.00014376698527485132,
+     "save": 0.00020435999613255262,
+     "total": 0.7149397080065683,
+     "peak_rss_kib": 825696
+    },
+    {
+     "construct": 0.00022623990662395954,
+     "prepare_upload": 0.006241410039365292,
+     "capture": 0.003910191007889807,
+     "observations": 0.03220193972811103,
+     "first_replay": 0.0008518520044162869,
+     "step": 0.6832399158738554,
+     "reset": 0.000301470048725605,
+     "device_pool_peak_bytes": 50644,
+     "close": 0.00014080095570534468,
+     "save": 0.00016908394172787666,
+     "total": 0.7277254819637164,
+     "peak_rss_kib": 825696
+    },
+    {
+     "construct": 0.0002199190203100443,
+     "prepare_upload": 0.005615507951006293,
+     "capture": 0.004620400024577975,
+     "observations": 0.030889592948369682,
+     "first_replay": 0.0008591560181230307,
+     "step": 0.672477820655331,
+     "reset": 0.0003001469885930419,
+     "device_pool_peak_bytes": 60632,
+     "close": 0.00014222401659935713,
+     "save": 0.0001631930936127901,
+     "total": 0.7157179530477151,
+     "peak_rss_kib": 825696
+    },
+    {
+     "construct": 0.0002255589934065938,
+     "prepare_upload": 0.0056033850414678454,
+     "capture": 0.004662827937863767,
+     "observations": 0.029301962815225124,
+     "first_replay": 0.0008648360380902886,
+     "step": 0.659300793078728,
+     "reset": 0.00031371309887617826,
+     "device_pool_peak_bytes": 70620,
+     "close": 0.0001432759454473853,
+     "save": 0.000184351927600801,
+     "total": 0.7010332640493289,
+     "peak_rss_kib": 825696
+    },
+    {
+     "construct": 0.00022922595962882042,
+     "prepare_upload": 0.006060685031116009,
+     "capture": 0.005350336083211005,
+     "observations": 0.03201258566696197,
+     "first_replay": 0.0011431729653850198,
+     "step": 0.6763561067637056,
+     "reset": 0.0002967610489577055,
+     "device_pool_peak_bytes": 80608,
+     "close": 0.00014155299868434668,
+     "save": 0.00016387400683015585,
+     "total": 0.7221916550770402,
+     "peak_rss_kib": 825696
+    },
+    {
+     "construct": 0.0002150489017367363,
+     "prepare_upload": 0.0055982149206101894,
+     "capture": 0.004553145030513406,
+     "observations": 0.03062287380453199,
+     "first_replay": 0.0008704860229045153,
+     "step": 0.6778261912986636,
+     "reset": 0.00032327999360859394,
+     "device_pool_peak_bytes": 90596,
+     "close": 0.00013519194908440113,
+     "save": 0.0001667100004851818,
+     "total": 0.7207377449376509,
+     "peak_rss_kib": 825696
+    },
+    {
+     "construct": 0.00021546008065342903,
+     "prepare_upload": 0.005624155048280954,
+     "capture": 0.004673738963901997,
+     "observations": 0.03085547615773976,
+     "first_replay": 0.0008363029919564724,
+     "step": 0.869030746165663,
+     "reset": 0.0003205749671906233,
+     "device_pool_peak_bytes": 100584,
+     "close": 0.00016132008749991655,
+     "save": 0.00015369500033557415,
+     "total": 0.912332954001613,
+     "peak_rss_kib": 825696
+    }
+   ]
+  },
+  {
+   "boxes": 32,
+   "mode": "cpu",
+   "steps": 8,
+   "passed": false,
+   "cold_process_seconds": 32.795349661959335,
+   "cached_process_seconds": 32.67126090498641,
+   "compiled_module_loads": 0,
+   "compiled_module_load_seconds": 0,
+   "reset_water_kg_m3_range": [
+    -0.009316401525915393,
+    -0.009060474792303281
+   ],
+   "max_water_budget_residual_kg_m3": 4.683753385137379e-17,
+   "maximum_errors_percent": [
+    0.08267418422833739,
+    0.8145605206608968,
+    0.21137241195335882
+   ]
+  },
+  {
+   "boxes": 32,
+   "mode": "cpu",
+   "steps": 16,
+   "passed": true,
+   "cold_process_seconds": 64.92023377493024,
+   "cached_process_seconds": 63.76178678206634,
+   "compiled_module_loads": 0,
+   "compiled_module_load_seconds": 0,
+   "reset_water_kg_m3_range": [
+    -0.009316401526664953,
+    -0.00906047479230774
+   ],
+   "max_water_budget_residual_kg_m3": 4.163336342344337e-17,
+   "maximum_errors_percent": [
+    0.03955469605596562,
+    0.3896235721436392,
+    0.10426406554462768
+   ],
+   "warmups": [
+    {
+     "construct": 0.0003371360944584012,
+     "observations": 0.005557489930652082,
+     "step": 62.23634737927932,
+     "save": 0.0001575220376253128,
+     "total": 62.24280948995147,
+     "peak_rss_kib": 347648
+    },
+    {
+     "construct": 0.00021309498697519302,
+     "observations": 0.005446642870083451,
+     "step": 62.30159475328401,
+     "save": 0.00017313100397586823,
+     "total": 62.30787819297984,
+     "peak_rss_kib": 347648
+    },
+    {
+     "construct": 0.00020438001956790686,
+     "observations": 0.005479516228660941,
+     "step": 61.93464092351496,
+     "save": 0.00015604996588081121,
+     "total": 61.94085160992108,
+     "peak_rss_kib": 347648
+    }
+   ],
+   "repetitions": [
+    {
+     "construct": 0.00020095298532396555,
+     "observations": 0.00548345991410315,
+     "step": 61.80630798637867,
+     "save": 0.00017848203424364328,
+     "total": 61.812538526020944,
+     "peak_rss_kib": 347648
+    },
+    {
+     "construct": 0.0002044900320470333,
+     "observations": 0.0057800940703600645,
+     "step": 64.21099220938049,
+     "save": 0.00016954506281763315,
+     "total": 64.21753408503719,
+     "peak_rss_kib": 347648
+    },
+    {
+     "construct": 0.00022038910537958145,
+     "observations": 0.005687903729267418,
+     "step": 64.23589113005437,
+     "save": 0.00015468697529286146,
+     "total": 64.24233190901577,
+     "peak_rss_kib": 347648
+    },
+    {
+     "construct": 0.00020240608137100935,
+     "observations": 0.0056278802221640944,
+     "step": 62.69347569078673,
+     "save": 0.00015597895253449678,
+     "total": 62.699852303019725,
+     "peak_rss_kib": 347648
+    },
+    {
+     "construct": 0.00019794702529907227,
+     "observations": 0.005502785905264318,
+     "step": 62.60991973197088,
+     "save": 0.00015214295126497746,
+     "total": 62.6161410639761,
+     "peak_rss_kib": 347648
+    },
+    {
+     "construct": 0.00019913900177925825,
+     "observations": 0.005722233559936285,
+     "step": 63.831296464661136,
+     "save": 0.000162622076459229,
+     "total": 63.83776379795745,
+     "peak_rss_kib": 347648
+    },
+    {
+     "construct": 0.0001962939277291298,
+     "observations": 0.005712301237508655,
+     "step": 63.79003593197558,
+     "save": 0.00015222199726849794,
+     "total": 63.7964761829935,
+     "peak_rss_kib": 347648
+    }
+   ]
+  },
+  {
+   "boxes": 32,
+   "mode": "prepared",
+   "steps": 8,
+   "passed": false,
+   "cold_process_seconds": 16.011282720020972,
+   "cached_process_seconds": 3.4964354559779167,
+   "compiled_module_loads": 19,
+   "compiled_module_load_seconds": 12.42785,
+   "reset_water_kg_m3_range": [
+    -0.00931639932088358,
+    -0.009060469658786454
+   ],
+   "max_water_budget_residual_kg_m3": 3.8163916471489756e-17,
+   "maximum_errors_percent": [
+    0.08269294342777567,
+    0.8147857799028158,
+    0.21319104007564452
+   ]
+  },
+  {
+   "boxes": 32,
+   "mode": "prepared",
+   "steps": 16,
+   "passed": true,
+   "cold_process_seconds": 16.273205612087622,
+   "cached_process_seconds": 3.9670545329572633,
+   "compiled_module_loads": 19,
+   "compiled_module_load_seconds": 12.311770000000001,
+   "reset_water_kg_m3_range": [
+    -0.009316399321643468,
+    -0.009060469658790996
+   ],
+   "max_water_budget_residual_kg_m3": 4.336808689942018e-17,
+   "maximum_errors_percent": [
+    0.03957744458167323,
+    0.3898366967588279,
+    0.10607122122269501
+   ],
+   "warmups": [
+    {
+     "construct": 0.0684558309148997,
+     "prepare_upload": 0.1273798110196367,
+     "observations": 0.0315767441643402,
+     "step": 0.9377646452048793,
+     "reset": 0.00019727705512195826,
+     "device_pool_peak_bytes": 17700,
+     "close": 0.0041011059656739235,
+     "save": 0.00017166894394904375,
+     "total": 1.170206292066723,
+     "peak_rss_kib": 724364
+    },
+    {
+     "construct": 0.0002457670634612441,
+     "prepare_upload": 0.007454803911969066,
+     "observations": 0.028137605171650648,
+     "step": 0.8938453069422394,
+     "reset": 0.00019113498274236917,
+     "device_pool_peak_bytes": 17700,
+     "close": 0.00039105594623833895,
+     "save": 0.00017304194625467062,
+     "total": 0.9308983730152249,
+     "peak_rss_kib": 724364
+    },
+    {
+     "construct": 0.000218666042201221,
+     "prepare_upload": 0.007047416991554201,
+     "observations": 0.027182368910871446,
+     "step": 0.8900961260078475,
+     "reset": 0.00019224709831178188,
+     "device_pool_peak_bytes": 17700,
+     "close": 0.00046155694872140884,
+     "save": 0.00018956209532916546,
+     "total": 0.9258992000250146,
+     "peak_rss_kib": 724556
+    }
+   ],
+   "repetitions": [
+    {
+     "construct": 0.00023965502623468637,
+     "prepare_upload": 0.007134718005545437,
+     "observations": 0.02739030751399696,
+     "step": 0.8901131689781323,
+     "reset": 0.0001882889773696661,
+     "device_pool_peak_bytes": 17700,
+     "close": 0.00038108706939965487,
+     "save": 0.00019342894665896893,
+     "total": 0.9260945529676974,
+     "peak_rss_kib": 724556
+    },
+    {
+     "construct": 0.00024343200493603945,
+     "prepare_upload": 0.0072276509599760175,
+     "observations": 0.028568610083311796,
+     "step": 0.8977256764192134,
+     "reset": 0.00019206700380891562,
+     "device_pool_peak_bytes": 17700,
+     "close": 0.00038255099207162857,
+     "save": 0.00017292099073529243,
+     "total": 0.9349525619763881,
+     "peak_rss_kib": 724556
+    },
+    {
+     "construct": 0.0002247079974040389,
+     "prepare_upload": 0.007015067036263645,
+     "observations": 0.028054924914613366,
+     "step": 0.8949860036373138,
+     "reset": 0.00021520897280424833,
+     "device_pool_peak_bytes": 17700,
+     "close": 0.00037109898403286934,
+     "save": 0.0001773289404809475,
+     "total": 0.9314864450134337,
+     "peak_rss_kib": 724556
+    },
+    {
+     "construct": 0.00022103998344391584,
+     "prepare_upload": 0.007032849942333996,
+     "observations": 0.028012002585455775,
+     "step": 0.8943890450755134,
+     "reset": 0.00019679497927427292,
+     "device_pool_peak_bytes": 17700,
+     "close": 0.0003728129668161273,
+     "save": 0.00017220992594957352,
+     "total": 0.9308530889684334,
+     "peak_rss_kib": 724556
+    },
+    {
+     "construct": 0.00022248306777328253,
+     "prepare_upload": 0.007282995036803186,
+     "observations": 0.028624097118154168,
+     "step": 0.888583863619715,
+     "reset": 0.00020424893591552973,
+     "device_pool_peak_bytes": 17700,
+     "close": 0.00037765095476061106,
+     "save": 0.0001660590060055256,
+     "total": 0.9259060620097443,
+     "peak_rss_kib": 724556
+    },
+    {
+     "construct": 0.00022084999363869429,
+     "prepare_upload": 0.007035534945316613,
+     "observations": 0.02888981474097818,
+     "step": 0.9039366854121909,
+     "reset": 0.00018747802823781967,
+     "device_pool_peak_bytes": 17700,
+     "close": 0.00037643907126039267,
+     "save": 0.0001689631026238203,
+     "total": 0.9412627191049978,
+     "peak_rss_kib": 724556
+    },
+    {
+     "construct": 0.00022485689260065556,
+     "prepare_upload": 0.008705615997314453,
+     "observations": 0.02786806144285947,
+     "step": 0.8876173583557829,
+     "reset": 0.00018910190556198359,
+     "device_pool_peak_bytes": 17700,
+     "close": 0.0003785329172387719,
+     "save": 0.00017411296721547842,
+     "total": 0.9255949549842626,
+     "peak_rss_kib": 724556
+    }
+   ]
+  },
+  {
+   "boxes": 32,
+   "mode": "captured",
+   "steps": 8,
+   "passed": false,
+   "cold_process_seconds": 29.020732742967084,
+   "cached_process_seconds": 3.347998467972502,
+   "compiled_module_loads": 37,
+   "compiled_module_load_seconds": 25.397569999999998,
+   "reset_water_kg_m3_range": [
+    -0.00931639932088358,
+    -0.009060469658786454
+   ],
+   "max_water_budget_residual_kg_m3": 3.8163916471489756e-17,
+   "maximum_errors_percent": [
+    0.08269294342777567,
+    0.8147857799028158,
+    0.21319104007564452
+   ]
+  },
+  {
+   "boxes": 32,
+   "mode": "captured",
+   "steps": 16,
+   "passed": true,
+   "cold_process_seconds": 25.094013673020527,
+   "cached_process_seconds": 3.7411876369733363,
+   "compiled_module_loads": 37,
+   "compiled_module_load_seconds": 21.17586,
+   "reset_water_kg_m3_range": [
+    -0.009316399321643468,
+    -0.009060469658790996
+   ],
+   "max_water_budget_residual_kg_m3": 4.336808689942018e-17,
+   "maximum_errors_percent": [
+    0.03957744458167323,
+    0.3898366967588279,
+    0.10607122122269501
+   ],
+   "warmups": [
+    {
+     "construct": 0.06562397792004049,
+     "prepare_upload": 0.13436248095240444,
+     "capture": 0.06539527291897684,
+     "observations": 0.03143179975450039,
+     "first_replay": 0.0008899059612303972,
+     "step": 0.65678495017346,
+     "reset": 0.00044301501475274563,
+     "device_pool_peak_bytes": 17700,
+     "close": 0.004931936040520668,
+     "save": 0.0001803250052034855,
+     "total": 0.9606381329940632,
+     "peak_rss_kib": 752304
+    },
+    {
+     "construct": 0.0002476510126143694,
+     "prepare_upload": 0.00938735599629581,
+     "capture": 0.29318448796402663,
+     "observations": 0.03126498241908848,
+     "first_replay": 0.0010664650471881032,
+     "step": 0.6878365414449945,
+     "reset": 0.00030864402651786804,
+     "device_pool_peak_bytes": 32584,
+     "close": 0.0001620620023459196,
+     "save": 0.00016546796541661024,
+     "total": 1.0240925590042025,
+     "peak_rss_kib": 825344
+    },
+    {
+     "construct": 0.0002223330084234476,
+     "prepare_upload": 0.006935563986189663,
+     "capture": 0.001990713062696159,
+     "observations": 0.031351190293207765,
+     "first_replay": 0.0008717919699847698,
+     "step": 0.6890304830158129,
+     "reset": 0.00032852194271981716,
+     "device_pool_peak_bytes": 47468,
+     "close": 0.00014208396896719933,
+     "save": 0.00016960594803094864,
+     "total": 0.7315230598906055,
+     "peak_rss_kib": 825344
+    }
+   ],
+   "repetitions": [
+    {
+     "construct": 0.00021458894480019808,
+     "prepare_upload": 0.007098768022842705,
+     "capture": 0.004132037982344627,
+     "observations": 0.029460794641636312,
+     "first_replay": 0.0010773040121421218,
+     "step": 0.663995748735033,
+     "reset": 0.0003175500314682722,
+     "device_pool_peak_bytes": 62352,
+     "close": 0.00014410796575248241,
+     "save": 0.0001535660121589899,
+     "total": 0.7070365000981838,
+     "peak_rss_kib": 825344
+    },
+    {
+     "construct": 0.0002131359651684761,
+     "prepare_upload": 0.00696432706899941,
+     "capture": 0.004755598027259111,
+     "observations": 0.0300571407424286,
+     "first_replay": 0.0008338519837707281,
+     "step": 0.681295666960068,
+     "reset": 0.0003105079522356391,
+     "device_pool_peak_bytes": 77236,
+     "close": 0.0001501999795436859,
+     "save": 0.0001990899909287691,
+     "total": 0.7252369889756665,
+     "peak_rss_kib": 825344
+    },
+    {
+     "construct": 0.00022851501125842333,
+     "prepare_upload": 0.007133802981115878,
+     "capture": 0.0035108719021081924,
+     "observations": 0.030175716499798,
+     "first_replay": 0.000838299049064517,
+     "step": 0.6840222248574719,
+     "reset": 0.0003096959553658962,
+     "device_pool_peak_bytes": 92120,
+     "close": 0.00015444692689925432,
+     "save": 0.00025373208336532116,
+     "total": 0.7270836120005697,
+     "peak_rss_kib": 825344
+    },
+    {
+     "construct": 0.00022558891214430332,
+     "prepare_upload": 0.007176583050750196,
+     "capture": 0.004092253977432847,
+     "observations": 0.032222161651588976,
+     "first_replay": 0.0008579770801588893,
+     "step": 0.70431557984557,
+     "reset": 0.0003103381022810936,
+     "device_pool_peak_bytes": 107004,
+     "close": 0.00014037091750651598,
+     "save": 0.00017292203847318888,
+     "total": 0.7499900269322097,
+     "peak_rss_kib": 825344
+    },
+    {
+     "construct": 0.00021125294733792543,
+     "prepare_upload": 0.007116861059330404,
+     "capture": 0.0039427661104127765,
+     "observations": 0.032652340712957084,
+     "first_replay": 0.00105878000613302,
+     "step": 0.7000521627487615,
+     "reset": 0.00030753202736377716,
+     "device_pool_peak_bytes": 121888,
+     "close": 0.0001573119079694152,
+     "save": 0.00016286293976008892,
+     "total": 0.7461269460618496,
+     "peak_rss_kib": 825344
+    },
+    {
+     "construct": 0.00021765497513115406,
+     "prepare_upload": 0.007112303050234914,
+     "capture": 0.004647066001780331,
+     "observations": 0.03209494077600539,
+     "first_replay": 0.0009235780453309417,
+     "step": 0.6959789041429758,
+     "reset": 0.000297573977150023,
+     "device_pool_peak_bytes": 136772,
+     "close": 0.00014216499403119087,
+     "save": 0.00016380497254431248,
+     "total": 0.742025273037143,
+     "peak_rss_kib": 825344
+    },
+    {
+     "construct": 0.00022437795996665955,
+     "prepare_upload": 0.007085082004778087,
+     "capture": 0.004159848904237151,
+     "observations": 0.030819130828604102,
+     "first_replay": 0.0008802879601716995,
+     "step": 0.6989132850430906,
+     "reset": 0.0003269889857620001,
+     "device_pool_peak_bytes": 151656,
+     "close": 0.00015266402624547482,
+     "save": 0.00021510000806301832,
+     "total": 0.7432292390149087,
+     "peak_rss_kib": 825344
+    }
+   ]
+  },
+  {
+   "boxes": 128,
+   "mode": "cpu",
+   "steps": 8,
+   "passed": false,
+   "cold_process_seconds": 124.47742032201495,
+   "cached_process_seconds": 124.90284121001605,
+   "compiled_module_loads": 0,
+   "compiled_module_load_seconds": 0,
+   "reset_water_kg_m3_range": [
+    -0.009316401525915393,
+    -0.009060474792303281
+   ],
+   "max_water_budget_residual_kg_m3": 3.9898639947466563e-17,
+   "maximum_errors_percent": [
+    0.08277151769353619,
+    0.8145605206608968,
+    0.21137241195335882
+   ]
+  },
+  {
+   "boxes": 128,
+   "mode": "cpu",
+   "steps": 16,
+   "passed": true,
+   "cold_process_seconds": 248.7502936819801,
+   "cached_process_seconds": 250.215811634087,
+   "compiled_module_loads": 0,
+   "compiled_module_load_seconds": 0,
+   "reset_water_kg_m3_range": [
+    -0.009316401526664953,
+    -0.00906047479230774
+   ],
+   "max_water_budget_residual_kg_m3": 5.551115123125783e-17,
+   "maximum_errors_percent": [
+    0.03960067083597085,
+    0.3896235721436392,
+    0.10426406554462768
+   ],
+   "warmups": [
+    {
+     "construct": 0.0006538250017911196,
+     "observations": 0.006041994667612016,
+     "step": 249.44929524918552,
+     "save": 0.00020769599359482527,
+     "total": 249.4567581010051,
+     "peak_rss_kib": 348032
+    },
+    {
+     "construct": 0.0002134570386260748,
+     "observations": 0.005675736349076033,
+     "step": 244.79578427155502,
+     "save": 0.00019979092758148909,
+     "total": 244.80231008701958,
+     "peak_rss_kib": 348032
+    },
+    {
+     "construct": 0.000213425955735147,
+     "observations": 0.005695333820767701,
+     "step": 244.28509288013447,
+     "save": 0.00019442103803157806,
+     "total": 244.29161441500764,
+     "peak_rss_kib": 348032
+    }
+   ],
+   "repetitions": [
+    {
+     "construct": 0.00019812898244708776,
+     "observations": 0.005659884540364146,
+     "step": 244.693972769659,
+     "save": 0.0001983089605346322,
+     "total": 244.700442575966,
+     "peak_rss_kib": 348032
+    },
+    {
+     "construct": 0.0001999119995161891,
+     "observations": 0.005667261080816388,
+     "step": 244.99505209829658,
+     "save": 0.0001937400083988905,
+     "total": 245.00153265800327,
+     "peak_rss_kib": 348032
+    },
+    {
+     "construct": 0.00019792804960161448,
+     "observations": 0.005852385074831545,
+     "step": 252.09366290085018,
+     "save": 0.0001963350223377347,
+     "total": 252.1003273410024,
+     "peak_rss_kib": 348032
+    },
+    {
+     "construct": 0.00019447098020464182,
+     "observations": 0.005644482909701765,
+     "step": 244.23323042772245,
+     "save": 0.00019657495431602,
+     "total": 244.23968455498107,
+     "peak_rss_kib": 348032
+    },
+    {
+     "construct": 0.00020281702745705843,
+     "observations": 0.005718488711863756,
+     "step": 247.51198446727358,
+     "save": 0.00019695505034178495,
+     "total": 247.51852219598368,
+     "peak_rss_kib": 348032
+    },
+    {
+     "construct": 0.000197888002730906,
+     "observations": 0.005719990469515324,
+     "step": 244.91027414263226,
+     "save": 0.00018716708291321993,
+     "total": 244.91679717495572,
+     "peak_rss_kib": 348032
+    },
+    {
+     "construct": 0.00019735703244805336,
+     "observations": 0.00566584977786988,
+     "step": 244.80618135258555,
+     "save": 0.00019098492339253426,
+     "total": 244.81266491499264,
+     "peak_rss_kib": 348032
+    }
+   ]
+  },
+  {
+   "boxes": 128,
+   "mode": "prepared",
+   "steps": 8,
+   "passed": false,
+   "cold_process_seconds": 15.849025554023683,
+   "cached_process_seconds": 3.515985229983926,
+   "compiled_module_loads": 19,
+   "compiled_module_load_seconds": 12.22854,
+   "reset_water_kg_m3_range": [
+    -0.00931639932088358,
+    -0.009060469658786454
+   ],
+   "max_water_budget_residual_kg_m3": 4.163336342344337e-17,
+   "maximum_errors_percent": [
+    0.08279015204804008,
+    0.8147857799028158,
+    0.21319104007564452
+   ]
+  },
+  {
+   "boxes": 128,
+   "mode": "prepared",
+   "steps": 16,
+   "passed": true,
+   "cold_process_seconds": 16.296238636947237,
+   "cached_process_seconds": 3.895648812991567,
+   "compiled_module_loads": 19,
+   "compiled_module_load_seconds": 12.26507,
+   "reset_water_kg_m3_range": [
+    -0.009316399321643468,
+    -0.009060469658790996
+   ],
+   "max_water_budget_residual_kg_m3": 6.245004513516506e-17,
+   "maximum_errors_percent": [
+    0.03962395198384705,
+    0.3898366967588279,
+    0.10607122122269501
+   ],
+   "warmups": [
+    {
+     "construct": 0.06646781298331916,
+     "prepare_upload": 0.1344659080496058,
+     "observations": 0.031654757796786726,
+     "step": 0.9721193235600367,
+     "reset": 0.00020045205019414425,
+     "device_pool_peak_bytes": 45732,
+     "close": 0.00399290700443089,
+     "save": 0.00020812696311622858,
+     "total": 1.2097009270219132,
+     "peak_rss_kib": 721780
+    },
+    {
+     "construct": 0.00025292905047535896,
+     "prepare_upload": 0.012860137969255447,
+     "observations": 0.029542274423874915,
+     "step": 0.9625042460393161,
+     "reset": 0.00019950105343014002,
+     "device_pool_peak_bytes": 45732,
+     "close": 0.00040088396053761244,
+     "save": 0.0002014640485867858,
+     "total": 1.0064665629761294,
+     "peak_rss_kib": 721780
+    },
+    {
+     "construct": 0.00021434808149933815,
+     "prepare_upload": 0.012504456914030015,
+     "observations": 0.03066084173042327,
+     "step": 0.9645297289825976,
+     "reset": 0.00018529396038502455,
+     "device_pool_peak_bytes": 45732,
+     "close": 0.00039825006388127804,
+     "save": 0.00019362999591976404,
+     "total": 1.0091660369653255,
+     "peak_rss_kib": 721780
+    }
+   ],
+   "repetitions": [
+    {
+     "construct": 0.0002180549781769514,
+     "prepare_upload": 0.012579465983435512,
+     "observations": 0.0296741328202188,
+     "step": 0.9647028136532754,
+     "reset": 0.00019815796986222267,
+     "device_pool_peak_bytes": 45732,
+     "close": 0.00039315002504736185,
+     "save": 0.0002081270795315504,
+     "total": 1.008460244978778,
+     "peak_rss_kib": 721972
+    },
+    {
+     "construct": 0.00022183195687830448,
+     "prepare_upload": 0.012817337992601097,
+     "observations": 0.028802411979995668,
+     "step": 0.9450403265655041,
+     "reset": 0.00019135500770062208,
+     "device_pool_peak_bytes": 45732,
+     "close": 0.0004006440285593271,
+     "save": 0.0002008330775424838,
+     "total": 0.988168835057877,
+     "peak_rss_kib": 721972
+    },
+    {
+     "construct": 0.0002191669773310423,
+     "prepare_upload": 0.012654606020078063,
+     "observations": 0.03434786444995552,
+     "step": 0.9907519553089514,
+     "reset": 0.0003779319813475013,
+     "device_pool_peak_bytes": 45732,
+     "close": 0.0004045208916068077,
+     "save": 0.00020508107263594866,
+     "total": 1.0394911960465834,
+     "peak_rss_kib": 721972
+    },
+    {
+     "construct": 0.00022076000459492207,
+     "prepare_upload": 0.01275344891473651,
+     "observations": 0.028457270353101194,
+     "step": 0.9490968408063054,
+     "reset": 0.00019619404338300228,
+     "device_pool_peak_bytes": 45732,
+     "close": 0.00039239798206835985,
+     "save": 0.00020173494704067707,
+     "total": 0.9918073340086266,
+     "peak_rss_kib": 721972
+    },
+    {
+     "construct": 0.00023042806424200535,
+     "prepare_upload": 0.012969099916517735,
+     "observations": 0.028369139065034688,
+     "step": 0.9493628832278773,
+     "reset": 0.00024715892504900694,
+     "device_pool_peak_bytes": 45732,
+     "close": 0.0003914269618690014,
+     "save": 0.00019499193876981735,
+     "total": 0.9922581010032445,
+     "peak_rss_kib": 721972
+    },
+    {
+     "construct": 0.00022030901163816452,
+     "prepare_upload": 0.013785827090032399,
+     "observations": 0.02929033210966736,
+     "step": 0.9559072608826682,
+     "reset": 0.0001894719898700714,
+     "device_pool_peak_bytes": 45732,
+     "close": 0.00040859903674572706,
+     "save": 0.00020037195645272732,
+     "total": 1.0005098190158606,
+     "peak_rss_kib": 721972
+    },
+    {
+     "construct": 0.00021863600704818964,
+     "prepare_upload": 0.013707471080124378,
+     "observations": 0.027393884025514126,
+     "step": 0.9448134214617312,
+     "reset": 0.00019069400150328875,
+     "device_pool_peak_bytes": 45732,
+     "close": 0.00039293000008910894,
+     "save": 0.00020402891095727682,
+     "total": 0.9874081920133904,
+     "peak_rss_kib": 721972
+    }
+   ]
+  },
+  {
+   "boxes": 128,
+   "mode": "captured",
+   "steps": 8,
+   "passed": false,
+   "cold_process_seconds": 24.714920936035924,
+   "cached_process_seconds": 3.4464811420766637,
+   "compiled_module_loads": 37,
+   "compiled_module_load_seconds": 21.09987,
+   "reset_water_kg_m3_range": [
+    -0.00931639932088358,
+    -0.009060469658786454
+   ],
+   "max_water_budget_residual_kg_m3": 4.163336342344337e-17,
+   "maximum_errors_percent": [
+    0.08279015204804008,
+    0.8147857799028158,
+    0.21319104007564452
+   ]
+  },
+  {
+   "boxes": 128,
+   "mode": "captured",
+   "steps": 16,
+   "passed": true,
+   "cold_process_seconds": 25.222605358925648,
+   "cached_process_seconds": 3.815177427022718,
+   "compiled_module_loads": 37,
+   "compiled_module_load_seconds": 21.18078,
+   "reset_water_kg_m3_range": [
+    -0.009316399321643468,
+    -0.009060469658790996
+   ],
+   "max_water_budget_residual_kg_m3": 6.245004513516506e-17,
+   "maximum_errors_percent": [
+    0.03962395198384705,
+    0.3898366967588279,
+    0.10607122122269501
+   ],
+   "warmups": [
+    {
+     "construct": 0.06772672093939036,
+     "prepare_upload": 0.13295741705223918,
+     "capture": 0.065186933032237,
+     "observations": 0.03259226703085005,
+     "first_replay": 0.0009583299979567528,
+     "step": 0.7431185191962868,
+     "reset": 0.00030571804381906986,
+     "device_pool_peak_bytes": 45732,
+     "close": 0.0048460320103913546,
+     "save": 0.0002197379944846034,
+     "total": 1.0485639120452106,
+     "peak_rss_kib": 751332
+    },
+    {
+     "construct": 0.0002508860779926181,
+     "prepare_upload": 0.012756834970787168,
+     "capture": 0.28771633899305016,
+     "observations": 0.031182399136014283,
+     "first_replay": 0.0011123360600322485,
+     "step": 0.7604521254543215,
+     "reset": 0.000305136083625257,
+     "device_pool_peak_bytes": 80200,
+     "close": 0.00022069003898650408,
+     "save": 0.0002203499898314476,
+     "total": 1.0948141620028764,
+     "peak_rss_kib": 825060
+    },
+    {
+     "construct": 0.0002427709987387061,
+     "prepare_upload": 0.013095714966766536,
+     "capture": 0.0020917850779369473,
+     "observations": 0.03166214423254132,
+     "first_replay": 0.0009580089244991541,
+     "step": 0.765895135467872,
+     "reset": 0.0003149649128317833,
+     "device_pool_peak_bytes": 114668,
+     "close": 0.0001797639997676015,
+     "save": 0.00022016908042132854,
+     "total": 0.815164195955731,
+     "peak_rss_kib": 825060
+    }
+   ],
+   "repetitions": [
+    {
+     "construct": 0.0002217619912698865,
+     "prepare_upload": 0.012646179995499551,
+     "capture": 0.004005540045909584,
+     "observations": 0.032360914163291454,
+     "first_replay": 0.001127355033531785,
+     "step": 0.768663223600015,
+     "reset": 0.00029364496003836393,
+     "device_pool_peak_bytes": 149136,
+     "close": 0.00017986400052905083,
+     "save": 0.00024498498532921076,
+     "total": 0.8202707910677418,
+     "peak_rss_kib": 825060
+    },
+    {
+     "construct": 0.00023022806271910667,
+     "prepare_upload": 0.012785168015398085,
+     "capture": 0.004137826035730541,
+     "observations": 0.03307481820229441,
+     "first_replay": 0.000930028036236763,
+     "step": 0.7800546827493235,
+     "reset": 0.0003304639831185341,
+     "device_pool_peak_bytes": 183604,
+     "close": 0.00018109602387994528,
+     "save": 0.0001984679838642478,
+     "total": 0.8324414879316464,
+     "peak_rss_kib": 825060
+    },
+    {
+     "construct": 0.00022606004495173693,
+     "prepare_upload": 0.012669923948124051,
+     "capture": 0.004488247097469866,
+     "observations": 0.03179655096028,
+     "first_replay": 0.0009393650107085705,
+     "step": 0.768221182981506,
+     "reset": 0.0003002169542014599,
+     "device_pool_peak_bytes": 218072,
+     "close": 0.0001698059495538473,
+     "save": 0.00018902099691331387,
+     "total": 0.8195134750567377,
+     "peak_rss_kib": 825060
+    },
+    {
+     "construct": 0.00022634107153862715,
+     "prepare_upload": 0.012675264035351574,
+     "capture": 0.004669092013500631,
+     "observations": 0.04056139511521906,
+     "first_replay": 0.0010476659517735243,
+     "step": 0.8492863160790876,
+     "reset": 0.0003019709838554263,
+     "device_pool_peak_bytes": 252540,
+     "close": 0.00016658904496580362,
+     "save": 0.00022328493651002645,
+     "total": 0.9097029999829829,
+     "peak_rss_kib": 825060
+    },
+    {
+     "construct": 0.0002302679931744933,
+     "prepare_upload": 0.013184710987843573,
+     "capture": 0.0050115580670535564,
+     "observations": 0.03274024149868637,
+     "first_replay": 0.0012404139852151275,
+     "step": 0.7701844185357913,
+     "reset": 0.00029280397575348616,
+     "device_pool_peak_bytes": 287008,
+     "close": 0.00017698900774121284,
+     "save": 0.0002344059757888317,
+     "total": 0.8238091140519828,
+     "peak_rss_kib": 825060
+    },
+    {
+     "construct": 0.00022589904256165028,
+     "prepare_upload": 0.012710418901406229,
+     "capture": 0.0041070489678531885,
+     "observations": 0.03355325816664845,
+     "first_replay": 0.0009202290093526244,
+     "step": 0.7746365838684142,
+     "reset": 0.0002897890517488122,
+     "device_pool_peak_bytes": 321476,
+     "close": 0.00017358292825520039,
+     "save": 0.00022046000231057405,
+     "total": 0.8273597300285473,
+     "peak_rss_kib": 825060
+    },
+    {
+     "construct": 0.0002224340569227934,
+     "prepare_upload": 0.012681956985034049,
+     "capture": 0.0038825420197099447,
+     "observations": 0.033138754428364336,
+     "first_replay": 0.0009729380253702402,
+     "step": 0.7808152623474598,
+     "reset": 0.0003235309850424528,
+     "device_pool_peak_bytes": 355944,
+     "close": 0.00017900194507092237,
+     "save": 0.0001962550450116396,
+     "total": 0.8329272110713646,
+     "peak_rss_kib": 825060
+    }
+   ]
+  }
+ ],
+ "references": [
+  [
+   0.5,
+   128,
+   [
+    0.005386914449045932,
+    0.04619140158989397,
+    0.015472029058150597
+   ]
+  ],
+  [
+   0.5054877486444894,
+   128,
+   [
+    0.005386119544037449,
+    0.04621663579900467,
+    0.015463131425055102
+   ]
+  ],
+  [
+   0.5110357280593489,
+   128,
+   [
+    0.005385315689276915,
+    0.04624209318161921,
+    0.01545416769593751
+   ]
+  ],
+  [
+   0.5166445993072356,
+   128,
+   [
+    0.005384502781868861,
+    0.046267775197606505,
+    0.015445137620481487
+   ]
+  ],
+  [
+   0.5223150307062978,
+   128,
+   [
+    0.0053836807177409796,
+    0.046293683283596614,
+    0.015436041006091701
+   ]
+  ],
+  [
+   0.5228670741112436,
+   128,
+   [
+    0.005383600673369848,
+    0.046296202563559166,
+    0.0154351571440625
+   ]
+  ],
+  [
+   0.5280476979098077,
+   128,
+   [
+    0.005382849391666333,
+    0.04631981888965205,
+    0.015426877621536255
+   ]
+  ],
+  [
+   0.5338432839866682,
+   128,
+   [
+    0.005382008696930285,
+    0.04634618348118887,
+    0.015417647277739288
+   ]
+  ],
+  [
+   0.5397024795028035,
+   128,
+   [
+    0.005381158525752383,
+    0.046372778481572105,
+    0.015408349754018478
+   ]
+  ],
+  [
+   0.5456259826034416,
+   128,
+   [
+    0.005380298769019909,
+    0.04639960535218684,
+    0.015398984874674115
+   ]
+  ],
+  [
+   0.5467799543793054,
+   128,
+   [
+    0.005380131247978426,
+    0.046404824555602686,
+    0.015397164510340799
+   ]
+  ],
+  [
+   0.551614499096302,
+   128,
+   [
+    0.0053794293162656714,
+    0.04642666553659365,
+    0.015389552397623857
+   ]
+  ],
+  [
+   0.5576687425356949,
+   128,
+   [
+    0.0053785500558012345,
+    0.04645396045124131,
+    0.01538005217363918
+   ]
+  ],
+  [
+   0.5637894343075437,
+   128,
+   [
+    0.005377660874517076,
+    0.04648149156378505,
+    0.01537048399174511
+   ]
+  ],
+  [
+   0.5699773037153409,
+   128,
+   [
+    0.005376761658015816,
+    0.04650926027389452,
+    0.015360847680234501
+   ]
+  ],
+  [
+   0.5717864698579733,
+   128,
+   [
+    0.0053764986990278985,
+    0.04651736687065816,
+    0.015358037264655256
+   ]
+  ],
+  [
+   0.5762330880670482,
+   128,
+   [
+    0.005375852290612215,
+    0.046537268036209854,
+    0.015351143079254958
+   ]
+  ],
+  [
+   0.582557532762948,
+   128,
+   [
+    0.005374932655000109,
+    0.04656551626795242,
+    0.01534136998052158
+   ]
+  ],
+  [
+   0.5889513913844618,
+   128,
+   [
+    0.005374002632652086,
+    0.04659400638980214,
+    0.015331528242285217
+   ]
+  ],
+  [
+   0.5954154257839424,
+   128,
+   [
+    0.00537306210370847,
+    0.04662273981946996,
+    0.015321617686155673
+   ]
+  ],
+  [
+   0.5979366370220706,
+   128,
+   [
+    0.005372695181327103,
+    0.04663392807506626,
+    0.015317762833510397
+   ]
+  ],
+  [
+   0.6019504061754501,
+   128,
+   [
+    0.005372110946688657,
+    0.04665171796788336,
+    0.015311638170402334
+   ]
+  ],
+  [
+   0.6085571112265284,
+   128,
+   [
+    0.005371149038690959,
+    0.046680942253574914,
+    0.01530158953088894
+   ]
+  ],
+  [
+   0.6095068271022377,
+   128,
+   [
+    0.005371010738430826,
+    0.0466851373279682,
+    0.015300148359757428
+   ]
+  ],
+  [
+   0.615236328150984,
+   128,
+   [
+    0.005370176255525827,
+    0.04671041404231751,
+    0.015291471611279786
+   ]
+  ],
+  [
+   0.6219888528026863,
+   128,
+   [
+    0.005369192471293971,
+    0.04674013476914808,
+    0.015281284294456821
+   ]
+  ],
+  [
+   0.6252827598072934,
+   128,
+   [
+    0.005368712459508096,
+    0.04675460553789002,
+    0.01527632998799387
+   ]
+  ],
+  [
+   0.6288154897703973,
+   128,
+   [
+    0.005368197558763832,
+    0.046770105797592866,
+    0.015271027422682402
+   ]
+  ],
+  [
+   0.6357170524736402,
+   128,
+   [
+    0.005367191388994108,
+    0.04680032853379152,
+    0.015260700880858423
+   ]
+  ],
+  [
+   0.6426943632596223,
+   128,
+   [
+    0.0053661738317112295,
+    0.04683080431587255,
+    0.015250304536064215
+   ]
+  ],
+  [
+   0.6497482535012201,
+   128,
+   [
+    0.005365144754909679,
+    0.04686153454880526,
+    0.015239838244955898
+   ]
+  ],
+  [
+   0.6538795342252861,
+   128,
+   [
+    0.005364541887553642,
+    0.04687949519980002,
+    0.01523372891383454
+   ]
+  ],
+  [
+   0.6568795636960415,
+   128,
+   [
+    0.005364104025096239,
+    0.04689252057056728,
+    0.015229301930699882
+   ]
+  ],
+  [
+   0.664089143566573,
+   128,
+   [
+    0.005363051507178973,
+    0.04692376374507447,
+    0.015218695453853197
+   ]
+  ],
+  [
+   0.6713778521614282,
+   128,
+   [
+    0.0053619870644006085,
+    0.046955265405983396,
+    0.015208018733109839
+   ]
+  ],
+  [
+   0.6787465579577063,
+   128,
+   [
+    0.0053609105583829475,
+    0.046987026884956325,
+    0.01519727165979773
+   ]
+  ],
+  [
+   0.6837841577631961,
+   128,
+   [
+    0.005360174387591954,
+    0.047008691037950905,
+    0.015189951371339178
+   ]
+  ],
+  [
+   0.6861961389644748,
+   128,
+   [
+    0.005359821849126867,
+    0.04701904951875054,
+    0.015186454153062726
+   ]
+  ],
+  [
+   0.6937274828273872,
+   128,
+   [
+    0.005358720794856886,
+    0.04705133461625392,
+    0.015175566107221188
+   ]
+  ],
+  [
+   0.7013414869344492,
+   128,
+   [
+    0.005357607252154395,
+    0.047083883481878655,
+    0.015164607464623222
+   ]
+  ],
+  [
+   0.7090390585229466,
+   128,
+   [
+    0.005356481075957653,
+    0.04711669740889999,
+    0.01515357812086471
+   ]
+  ],
+  [
+   0.7150564437865267,
+   128,
+   [
+    0.005355600427847662,
+    0.04714228460693651,
+    0.015144990699886868
+   ]
+  ],
+  [
+   0.7168211147875453,
+   128,
+   [
+    0.00535534211936195,
+    0.04714977768077864,
+    0.015142478044236367
+   ]
+  ],
+  [
+   0.7246885829895787,
+   128,
+   [
+    0.005354190233575196,
+    0.04718312557355746,
+    0.01513130715736481
+   ]
+  ],
+  [
+   0.7326424005675348,
+   128,
+   [
+    0.005353025268317602,
+    0.04721674234067289,
+    0.015120065404603037
+   ]
+  ],
+  [
+   0.7406835152487546,
+   128,
+   [
+    0.005351847071310978,
+    0.04725062920844517,
+    0.0151087527520409
+   ]
+  ],
+  [
+   0.7429971445684742,
+   128,
+   [
+    0.005351507991702142,
+    0.047260360971923265,
+    0.015105507521336069
+   ]
+  ],
+  [
+   0.7477589411741042,
+   128,
+   [
+    0.005350809998660999,
+    0.04728036464380495,
+    0.015098841972178086
+   ]
+  ],
+  [
+   0.7488128851623587,
+   128,
+   [
+    0.005350655488389755,
+    0.04728478744375214,
+    0.015097369133003708
+   ]
+  ],
+  [
+   0.7570314789534106,
+   128,
+   [
+    0.005349450363745234,
+    0.0473192182484454,
+    0.015085914525609872
+   ]
+  ],
+  [
+   0.7653402758983353,
+   128,
+   [
+    0.005348231539437087,
+    0.047353922832649796,
+    0.015074388898817235
+   ]
+  ],
+  [
+   0.7737402660216037,
+   128,
+   [
+    0.005346998855859653,
+    0.0473889023857057,
+    0.015062792238761688
+   ]
+  ],
+  [
+   0.7819570594244508,
+   128,
+   [
+    0.0053457925880850965,
+    0.047423016480257575,
+    0.015051502004352187
+   ]
+  ],
+  [
+   0.7822324502136976,
+   128,
+   [
+    0.00534575215127564,
+    0.04742415808929236,
+    0.015051124518770697
+   ]
+  ],
+  [
+   0.7908178403503693,
+   128,
+   [
+    0.0053444912621714025,
+    0.0474596910849877,
+    0.015039385733721562
+   ]
+  ],
+  [
+   0.7994974594132108,
+   128,
+   [
+    0.005343216022923869,
+    0.04749550254121931,
+    0.015027575876889316
+   ]
+  ],
+  [
+   0.8082723416115459,
+   128,
+   [
+    0.005341926266000385,
+    0.047531593567085265,
+    0.015015694959246827
+   ]
+  ],
+  [
+   0.8171435325056601,
+   128,
+   [
+    0.005340621821869895,
+    0.04756796527326757,
+    0.015003742994007231
+   ]
+  ],
+  [
+   0.8177191994837889,
+   128,
+   [
+    0.005340537155751335,
+    0.047570321506746095,
+    0.015002969459807385
+   ]
+  ],
+  [
+   0.8261120891313826,
+   128,
+   [
+    0.005339302518825306,
+    0.04760461876425582,
+    0.014991719999266536
+   ]
+  ],
+  [
+   0.8351790801260366,
+   128,
+   [
+    0.005337968183205533,
+    0.04764155509959061,
+    0.014979625997678386
+   ]
+  ],
+  [
+   0.8443455858557717,
+   128,
+   [
+    0.005336618639173452,
+    0.04767877535762204,
+    0.014967461017155822
+   ]
+  ],
+  [
+   0.8536126985442929,
+   128,
+   [
+    0.005335253708871335,
+    0.04771628053735995,
+    0.014955225090934514
+   ]
+  ],
+  [
+   0.8551168905573541,
+   128,
+   [
+    0.005335032105757698,
+    0.04772235650717624,
+    0.014953244914002824
+   ]
+  ],
+  [
+   0.8629815224030036,
+   128,
+   [
+    0.005333873212198803,
+    0.04775407167661854,
+    0.0149429182862869
+   ]
+  ],
+  [
+   0.8724531737625767,
+   128,
+   [
+    0.005332476966968258,
+    0.047792149759782535,
+    0.014930540637600681
+   ]
+  ],
+  [
+   0.8820287812059687,
+   128,
+   [
+    0.005331064788660633,
+    0.0478305157713355,
+    0.014918092220779954
+   ]
+  ],
+  [
+   0.8917094857028962,
+   128,
+   [
+    0.005329636490580825,
+    0.04786917065835478,
+    0.01490557309585127
+   ]
+  ],
+  [
+   0.8942249331776565,
+   128,
+   [
+    0.00532926525773636,
+    0.04787919312220333,
+    0.014902330887593124
+   ]
+  ],
+  [
+   0.901496440745785,
+   128,
+   [
+    0.005328191883835487,
+    0.047908115337810836,
+    0.014892983331533341
+   ]
+  ],
+  [
+   0.9057236642639066,
+   128,
+   [
+    0.005327567726887139,
+    0.04792489486241875,
+    0.014887566113473
+   ]
+  ],
+  [
+   0.9113908124872144,
+   128,
+   [
+    0.005326730777177602,
+    0.047947350728267765,
+    0.01488032301864016
+   ]
+  ],
+  [
+   0.921393779878868,
+   128,
+   [
+    0.005325252977095296,
+    0.04798687769633188,
+    0.014867592236754375
+   ]
+  ],
+  [
+   0.9315065348120104,
+   128,
+   [
+    0.005323758287700819,
+    0.048026697107489955,
+    0.014854791094823464
+   ]
+  ],
+  [
+   0.9351215488158471,
+   128,
+   [
+    0.005323223816944278,
+    0.04804089702852065,
+    0.014850231849293289
+   ]
+  ],
+  [
+   0.9417302822595057,
+   128,
+   [
+    0.005322246510752748,
+    0.0480668097886222,
+    0.014841919689074817
+   ]
+  ],
+  [
+   0.9520662404193941,
+   128,
+   [
+    0.005320717445611578,
+    0.04810721654394609,
+    0.014828978119341661
+   ]
+  ],
+  [
+   0.9625156408600455,
+   128,
+   [
+    0.005319170889195313,
+    0.04814791815015354,
+    0.01481596652033673
+   ]
+  ],
+  [
+   0.9730797286669046,
+   128,
+   [
+    0.005317606635935057,
+    0.04818891536838332,
+    0.01480288500931052
+   ]
+  ],
+  [
+   0.9778885363354328,
+   128,
+   [
+    0.00531689434268845,
+    0.048207527312256776,
+    0.01479695435111178
+   ]
+  ],
+  [
+   0.9837597625908484,
+   128,
+   [
+    0.005316024477908243,
+    0.04823020888858732,
+    0.014789733722044798
+   ]
+  ],
+  [
+   0.9945570151981706,
+   128,
+   [
+    0.005314424204549972,
+    0.048271799430305594,
+    0.01477651279107281
+   ]
+  ],
+  [
+   1.0,
+   128,
+   [
+    0.00531361720801371,
+    0.048292706294607385,
+    0.014769876265844636
+   ]
+  ],
+  [
+   1.005472773022213,
+   128,
+   [
+    0.005312805602608606,
+    0.04831368765158413,
+    0.01476322238333616
+   ]
+  ],
+  [
+   1.0165083367166603,
+   128,
+   [
+    0.005311168456589854,
+    0.04835587418449629,
+    0.014749862629192471
+   ]
+  ],
+  [
+   1.0226114356012685,
+   128,
+   [
+    0.005310262715196856,
+    0.04837913559552483,
+    0.014742506933287648
+   ]
+  ],
+  [
+   1.0276650212105183,
+   128,
+   [
+    0.005309512548223871,
+    0.04839835961914772,
+    0.014736433690316499
+   ]
+  ],
+  [
+   1.0389441558647927,
+   128,
+   [
+    0.005307837656420844,
+    0.04844114454531551,
+    0.014722935756466405
+   ]
+  ],
+  [
+   1.050347084630887,
+   128,
+   [
+    0.005306143557759491,
+    0.048484229471863996,
+    0.014709368980016875
+   ]
+  ],
+  [
+   1.0618751662107404,
+   128,
+   [
+    0.005304430025820928,
+    0.048527614914129755,
+    0.014695733564831599
+   ]
+  ],
+  [
+   1.0693796985710673,
+   128,
+   [
+    0.005303314101112733,
+    0.04855576522817115,
+    0.014686900175080352
+   ]
+  ],
+  [
+   1.0735297742187202,
+   128,
+   [
+    0.005302696831588349,
+    0.048571301352942194,
+    0.014682029685748488
+   ]
+  ],
+  [
+   1.0853122973452958,
+   128,
+   [
+    0.005300943743291597,
+    0.04861528919161755,
+    0.014668257542152084
+   ]
+  ],
+  [
+   1.0972241395225044,
+   128,
+   [
+    0.00529917052620732,
+    0.04865957885118865,
+    0.014654417340820765
+   ]
+  ],
+  [
+   1.1040895136738123,
+   128,
+   [
+    0.005298148130727931,
+    0.04868502286609638,
+    0.014646478196896483
+   ]
+  ],
+  [
+   1.1092667200912358,
+   128,
+   [
+    0.005297376942969834,
+    0.04870417066969675,
+    0.01464050930988149
+   ]
+  ],
+  [
+   1.1182868682116351,
+   128,
+   [
+    0.005296032917323501,
+    0.048737450379486624,
+    0.014630146718479627
+   ]
+  ],
+  [
+   1.1214414739703515,
+   128,
+   [
+    0.005295562753104832,
+    0.04874906498384626,
+    0.01462653362925859
+   ]
+  ],
+  [
+   1.1337498518276614,
+   128,
+   [
+    0.005293727713429064,
+    0.04879426207508987,
+    0.014612490550312964
+   ]
+  ],
+  [
+   1.146193320252776,
+   128,
+   [
+    0.00529187157778388,
+    0.04883976217270855,
+    0.01459838030870137
+   ]
+  ],
+  [
+   1.158773361931856,
+   128,
+   [
+    0.005289994096879802,
+    0.048885565487205185,
+    0.014584203133476224
+   ]
+  ],
+  [
+   1.169430765597687,
+   128,
+   [
+    0.005288402792968938,
+    0.04892421507994039,
+    0.01457226117214119
+   ]
+  ],
+  [
+   1.17149147582428,
+   128,
+   [
+    0.005288095018651795,
+    0.048931672166894355,
+    0.014569959270986615
+   ]
+  ],
+  [
+   1.1843491773412511,
+   128,
+   [
+    0.005286174087748563,
+    0.04897808234553768,
+    0.014555648981766627
+   ]
+  ],
+  [
+   1.1973479985263644,
+   128,
+   [
+    0.005284231045865617,
+    0.049024796093921075,
+    0.014541272504687588
+   ]
+  ],
+  [
+   1.2104894882381547,
+   128,
+   [
+    0.005282265631634253,
+    0.04907181341463839,
+    0.01452683014591496
+   ]
+  ],
+  [
+   1.2229136855674683,
+   128,
+   [
+    0.005280406530028259,
+    0.04911607219981566,
+    0.014513260119410586
+   ]
+  ],
+  [
+   1.22377521233465,
+   128,
+   [
+    0.005280277580266279,
+    0.049119134321044096,
+    0.014512322143317118
+   ]
+  ],
+  [
+   1.2372067538599483,
+   128,
+   [
+    0.005278266624131334,
+    0.049166758739286276,
+    0.014497748779610284
+   ]
+  ],
+  [
+   1.2507857132328444,
+   128,
+   [
+    0.0052762324919797265,
+    0.04921468656813492,
+    0.014483110355642976
+   ]
+  ],
+  [
+   1.2645137084375249,
+   128,
+   [
+    0.005274174909675189,
+    0.04926291762073183,
+    0.01446840715971495
+   ]
+  ],
+  [
+   1.2783923752163575,
+   128,
+   [
+    0.005272093599462124,
+    0.049311451710991175,
+    0.014453639482507136
+   ]
+  ],
+  [
+   1.278842601326519,
+   128,
+   [
+    0.0052720260622418635,
+    0.049313022365124706,
+    0.014453162047500754
+   ]
+  ],
+  [
+   1.2924233672647958,
+   128,
+   [
+    0.005269988280409699,
+    0.04936028856815268,
+    0.014438807641996402
+   ]
+  ],
+  [
+   1.3066083564284234,
+   128,
+   [
+    0.005267858668100978,
+    0.04940942788850427,
+    0.01442391193525666
+   ]
+  ],
+  [
+   1.3209490329021605,
+   128,
+   [
+    0.0052657044747439485,
+    0.04945886930311814,
+    0.014408952685538202
+   ]
+  ],
+  [
+   1.3354471054316575,
+   128,
+   [
+    0.00526352540901609,
+    0.04950861239300783,
+    0.014393930215014531
+   ]
+  ],
+  [
+   1.3373293784088172,
+   128,
+   [
+    0.0052632424123233434,
+    0.0495150528070683,
+    0.014391987247754052
+   ]
+  ],
+  [
+   1.3459001926323562,
+   128,
+   [
+    0.005261953542357034,
+    0.04954432761377449,
+    0.014383161355722696
+   ]
+  ],
+  [
+   1.3501043015168972,
+   128,
+   [
+    0.0052613211761975975,
+    0.049558656684643175,
+    0.014378844856910765
+   ]
+  ],
+  [
+   1.3649223676180346,
+   128,
+   [
+    0.005259091477927136,
+    0.04960900164792698,
+    0.014363696948694717
+   ]
+  ],
+  [
+   1.3799030693634928,
+   128,
+   [
+    0.005256836012268451,
+    0.04965964669812629,
+    0.014348486822157802
+   ]
+  ],
+  [
+   1.3950481917603452,
+   128,
+   [
+    0.005254554473621553,
+    0.04971059117419932,
+    0.014333214819963575
+   ]
+  ],
+  [
+   1.3984909984232525,
+   128,
+   [
+    0.005254035647372923,
+    0.04972213614225124,
+    0.014329757777587916
+   ]
+  ],
+  [
+   1.4103595394070056,
+   128,
+   [
+    0.005252246552900353,
+    0.04976183438478898,
+    0.01431788130322378
+   ]
+  ],
+  [
+   1.4258389367082527,
+   128,
+   [
+    0.0052499119369997516,
+    0.04981337555909121,
+    0.014302486624877727
+   ]
+  ],
+  [
+   1.4414882280926145,
+   128,
+   [
+    0.005247550309261939,
+    0.04986521386640077,
+    0.014287031144973488
+   ]
+  ],
+  [
+   1.45730927823214,
+   128,
+   [
+    0.0052451613491433235,
+    0.04991734841321381,
+    0.01427151524111212
+   ]
+  ],
+  [
+   1.4624497930329556,
+   128,
+   [
+    0.0052443848328698195,
+    0.04993422905250204,
+    0.01426649727274167
+   ]
+  ],
+  [
+   1.4733039722645804,
+   128,
+   [
+    0.005242744732414373,
+    0.049969778242180865,
+    0.014255939262770013
+   ]
+  ],
+  [
+   1.4894742160180119,
+   256,
+   [
+    0.0026149275690112717,
+    0.02495878528577422,
+    0.007190789807296093
+   ]
+  ],
+  [
+   1.5058219362379215,
+   256,
+   [
+    0.0026136963368950106,
+    0.024985265950421526,
+    0.007182941226831292
+   ]
+  ],
+  [
+   1.5223490808167857,
+   256,
+   [
+    0.002612450837791158,
+    0.02501189270608038,
+    0.007175063098681448
+   ]
+  ],
+  [
+   1.5293336886354705,
+   256,
+   [
+    0.0026119242451771996,
+    0.0250231020982511,
+    0.007171750615652191
+   ]
+  ],
+  [
+   1.5390576190261696,
+   256,
+   [
+    0.002611190902279681,
+    0.02503866494182675,
+    0.007167155611031904
+   ]
+  ],
+  [
+   1.5559495417513736,
+   256,
+   [
+    0.0026099163589421437,
+    0.025065582028351432,
+    0.007159218962064965
+   ]
+  ],
+  [
+   1.5730268617286536,
+   256,
+   [
+    0.002608627034406119,
+    0.025092643266709236,
+    0.007151253364856469
+   ]
+  ],
+  [
+   1.5902916137850474,
+   256,
+   [
+    0.0026073227530343246,
+    0.025119847954944506,
+    0.00714325900709525
+   ]
+  ],
+  [
+   1.5992764622331683,
+   256,
+   [
+    0.0026066436654481606,
+    0.025133944956491183,
+    0.007139121691587204
+   ]
+  ],
+  [
+   1.6077458550808308,
+   256,
+   [
+    0.0026060033373465075,
+    0.025147195327831127,
+    0.007135236077985493
+   ]
+  ],
+  [
+   1.6253916653546374,
+   256,
+   [
+    0.002604668607508742,
+    0.025174684611211036,
+    0.0071271847973971144
+   ]
+  ],
+  [
+   1.6406707120152757,
+   256,
+   [
+    0.002603512226850846,
+    0.025198359156830396,
+    0.007120261290849731
+   ]
+  ],
+  [
+   1.643231147171266,
+   256,
+   [
+    0.0026033183817775196,
+    0.025202314953307412,
+    0.007119105371551712
+   ]
+  ],
+  [
+   1.6612664261722097,
+   256,
+   [
+    0.0026019524761000667,
+    0.02523008548394003,
+    0.007110997998593314
+   ]
+  ],
+  [
+   1.6724180090056748,
+   256,
+   [
+    0.0026011074778287124,
+    0.025247175041089042,
+    0.007106015247911311
+   ]
+  ],
+  [
+   1.6794996513289342,
+   256,
+   [
+    0.002600570704269778,
+    0.02525799530584651,
+    0.007102862887820732
+   ]
+  ],
+  [
+   1.6979329951989357,
+   256,
+   [
+    0.0025991728779706236,
+    0.025286043460257434,
+    0.007094700259670635
+   ]
+  ],
+  [
+   1.7165686541846092,
+   256,
+   [
+    0.0025977588064440837,
+    0.0253142289496148,
+    0.007086510321102146
+   ]
+  ],
+  [
+   1.7354088487949584,
+   256,
+   [
+    0.002596328296888828,
+    0.02534255073920063,
+    0.007078293287909132
+   ]
+  ],
+  [
+   1.7489046221194973,
+   256,
+   [
+    0.0025953030174941105,
+    0.02536273216685523,
+    0.007072445503728695
+   ]
+  ],
+  [
+   1.7544558239101773,
+   256,
+   [
+    0.0025948811542830796,
+    0.02537100774285994,
+    0.007070049351615031
+   ]
+  ],
+  [
+   1.7737118490491364,
+   256,
+   [
+    0.002593417181029345,
+    0.025399598838756962,
+    0.007061778752666181
+   ]
+  ],
+  [
+   1.7931792186398048,
+   256,
+   [
+    0.002591936177465115,
+    0.025428322855264175,
+    0.007053481680475367
+   ]
+  ],
+  [
+   1.8128602522926391,
+   256,
+   [
+    0.0025904379413299594,
+    0.025457178574077918,
+    0.007045158381531351
+   ]
+  ],
+  [
+   1.8288892853345031,
+   256,
+   [
+    0.002589216994963728,
+    0.02548054438953311,
+    0.007038427069741896
+   ]
+  ],
+  [
+   1.8327572950769744,
+   256,
+   [
+    0.002588922268409455,
+    0.025486164732993123,
+    0.007036809059658041
+   ]
+  ],
+  [
+   1.8528727178004483,
+   256,
+   [
+    0.0025873889516025983,
+    0.02551528001914622,
+    0.007028433918012551
+   ]
+  ],
+  [
+   1.8732089172914899,
+   256,
+   [
+    0.002585837781743372,
+    0.025544523077321704,
+    0.007020033196907437
+   ]
+  ],
+  [
+   1.8937683166849135,
+   256,
+   [
+    0.002584268547156654,
+    0.02557389248657262,
+    0.0070116070946681635
+   ]
+  ],
+  [
+   1.9125319789925102,
+   256,
+   [
+    0.002582835468767364,
+    0.025600527093311155,
+    0.007003974808404262
+   ]
+  ],
+  [
+   1.9145533657106426,
+   256,
+   [
+    0.002582681033591605,
+    0.02560338679887465,
+    0.007003155855853928
+   ]
+  ],
+  [
+   1.9355665409856049,
+   256,
+   [
+    0.0025810750242660774,
+    0.0256330045045351,
+    0.006994679671603153
+   ]
+  ],
+  [
+   1.9568103463088304,
+   256,
+   [
+    0.002579450300266295,
+    0.02566274402558552,
+    0.006986178783043979
+   ]
+  ],
+  [
+   1.9782873129597887,
+   256,
+   [
+    0.002577806639658675,
+    0.025692603762008877,
+    0.0069776533976658945
+   ]
+  ],
+  [
+   2.0,
+   256,
+   [
+    0.002576143818266985,
+    0.025722582041216527,
+    0.0069691037252661734
+   ]
+  ]
+ ],
+ "radius_um": [
+  [
+   1.0474523876035484,
+   1.0474523876035484,
+   1.0474523876035484
+  ],
+  [
+   1.1321978803323565,
+   1.1312439922817263,
+   1.1293626237473497
+  ],
+  [
+   1.156074694726505,
+   1.1537983810314363,
+   1.1494631733002396
+  ],
+  [
+   1.1676014624835895,
+   1.164124643099256,
+   1.1577293738590213
+  ],
+  [
+   1.1739216231700311,
+   1.1694624781788163,
+   1.1615231236613281
+  ],
+  [
+   1.177583991352519,
+   1.172365180735412,
+   1.163338910833418
+  ],
+  [
+   1.1797676794883647,
+   1.1739832439578295,
+   1.1642244183328834
+  ],
+  [
+   1.1810905849505846,
+   1.1748974231804175,
+   1.1646595367264134
+  ],
+  [
+   1.181899628345884,
+   1.1754169635295684,
+   1.164874795238169
+  ],
+  [
+   1.1823964851849558,
+   1.1757140614662869,
+   1.1649815127510226
+  ],
+  [
+   1.182703217239588,
+   1.1758844019124357,
+   1.165034459229817
+  ],
+  [
+   1.182893122704139,
+   1.1759821592569961,
+   1.165060737692875
+  ],
+  [
+   1.1830108067481586,
+   1.1760382921909558,
+   1.1650737826581252
+  ],
+  [
+   1.1830837770418083,
+   1.1760705341809021,
+   1.1650802589383507
+  ],
+  [
+   1.1831290384831448,
+   1.1760890568618476,
+   1.165083474286939
+  ],
+  [
+   1.1831571190555945,
+   1.176099699041687,
+   1.165085070681674
+  ],
+  [
+   1.1831745428452196,
+   1.1761058138527118,
+   1.1650858632877035
+  ],
+  [
+   1.1831853550914742,
+   1.1761093274359777,
+   1.16508625681682
+  ],
+  [
+   1.1831920649285435,
+   1.1761113463877402,
+   1.1650864522046762
+  ],
+  [
+   1.1831962290379214,
+   1.1761125065173448,
+   1.1650865492152023
+  ],
+  [
+   1.1831988133266709,
+   1.1761131731550543,
+   1.1650865973811877
+  ],
+  [
+   1.1832004171826895,
+   1.1761135562221536,
+   1.1650866212957365
+  ],
+  [
+   1.1832014125722716,
+   1.1761137763427871,
+   1.1650866331693797
+  ],
+  [
+   1.1832020303366984,
+   1.1761139028301641,
+   1.1650866390646788
+  ],
+  [
+   1.1832024137383679,
+   1.1761139755133447,
+   1.1650866419917125
+  ],
+  [
+   1.1832026516884782,
+   1.176114017279148,
+   1.1650866434449936
+  ],
+  [
+   1.1832027993673342,
+   1.1761140412789608,
+   1.1650866441665517
+  ],
+  [
+   1.1832028910212533,
+   1.176114055069934,
+   1.1650866445248078
+  ],
+  [
+   1.1832029479044448,
+   1.1761140629946198,
+   1.1650866447026829
+  ],
+  [
+   1.1832029832078814,
+   1.1761140675483697,
+   1.1650866447909984
+  ],
+  [
+   1.1832030051182707,
+   1.1761140701650838,
+   1.1650866448348474
+  ],
+  [
+   1.1832030187165277,
+   1.1761140716687224,
+   1.1650866448566188
+  ],
+  [
+   1.183203027156022,
+   1.176114072532756,
+   1.1650866448674284
+  ],
+  [
+   1.183203027156022,
+   1.176114072532756,
+   1.1650866448674284
+  ],
+  [
+   1.0260278443548656,
+   1.0265345597432236,
+   1.0274951194407584
+  ],
+  [
+   1.0252162659704829,
+   1.025818750313808,
+   1.026906702123942
+  ],
+  [
+   1.0252157881225055,
+   1.0258183001489125,
+   1.0269062884162363
+  ],
+  [
+   1.0252157878440389,
+   1.025818299868372,
+   1.0269062881269242
+  ],
+  [
+   1.0252157878438766,
+   1.025818299868197,
+   1.0269062881267221
+  ],
+  [
+   1.0252157878438763,
+   1.025818299868197,
+   1.026906288126722
+  ],
+  [
+   1.0252157878438763,
+   1.025818299868197,
+   1.026906288126722
+  ],
+  [
+   1.0252157878438763,
+   1.025818299868197,
+   1.026906288126722
+  ],
+  [
+   1.0252157878438763,
+   1.025818299868197,
+   1.026906288126722
+  ],
+  [
+   1.0252157878438763,
+   1.025818299868197,
+   1.026906288126722
+  ],
+  [
+   1.0252157878438763,
+   1.025818299868197,
+   1.026906288126722
+  ],
+  [
+   1.0252157878438763,
+   1.025818299868197,
+   1.026906288126722
+  ],
+  [
+   1.0252157878438763,
+   1.025818299868197,
+   1.026906288126722
+  ],
+  [
+   1.0252157878438763,
+   1.025818299868197,
+   1.026906288126722
+  ],
+  [
+   1.0252157878438763,
+   1.025818299868197,
+   1.026906288126722
+  ],
+  [
+   1.0252157878438763,
+   1.025818299868197,
+   1.026906288126722
+  ],
+  [
+   1.0252157878438763,
+   1.025818299868197,
+   1.026906288126722
+  ],
+  [
+   1.0252157878438763,
+   1.025818299868197,
+   1.026906288126722
+  ],
+  [
+   1.0252157878438763,
+   1.025818299868197,
+   1.026906288126722
+  ],
+  [
+   1.0252157878438763,
+   1.025818299868197,
+   1.026906288126722
+  ],
+  [
+   1.0252157878438763,
+   1.025818299868197,
+   1.026906288126722
+  ],
+  [
+   1.0252157878438763,
+   1.025818299868197,
+   1.026906288126722
+  ],
+  [
+   1.0252157878438763,
+   1.025818299868197,
+   1.026906288126722
+  ],
+  [
+   1.0252157878438763,
+   1.025818299868197,
+   1.026906288126722
+  ],
+  [
+   1.0252157878438763,
+   1.025818299868197,
+   1.026906288126722
+  ],
+  [
+   1.0252157878438763,
+   1.025818299868197,
+   1.026906288126722
+  ],
+  [
+   1.0252157878438763,
+   1.025818299868197,
+   1.026906288126722
+  ],
+  [
+   1.0252157878438763,
+   1.025818299868197,
+   1.026906288126722
+  ],
+  [
+   1.0252157878438763,
+   1.025818299868197,
+   1.026906288126722
+  ],
+  [
+   1.0252157878438763,
+   1.025818299868197,
+   1.026906288126722
+  ],
+  [
+   1.0252157878438763,
+   1.025818299868197,
+   1.026906288126722
+  ],
+  [
+   1.0252157878438763,
+   1.025818299868197,
+   1.026906288126722
+  ]
+ ],
+ "wetting_mg_m3": [
+  106.23375901474674,
+  107.32212302559167,
+  108.42090553013223,
+  109.53019253754219,
+  110.65007052257023,
+  111.78062642390222,
+  112.921947642601,
+  114.07412204076431,
+  115.23723794116735,
+  116.41138413291664,
+  117.59665607113935,
+  118.79394170976789,
+  120.00254928435379,
+  121.22256981409544,
+  122.45409476928715,
+  123.69721606883137,
+  124.9520260776124,
+  126.21861760381717,
+  127.49708389612984,
+  128.78751864087954,
+  130.09001595904203,
+  131.40467040317534,
+  132.7315769542971,
+  134.07083101858944,
+  135.4225284240795,
+  136.78676541720793,
+  138.16363865928417,
+  139.55324522289902,
+  140.95568258821962,
+  142.37104863927777,
+  143.79944166026664,
+  145.24096033223435,
+  146.69570373195322,
+  148.16377136575207,
+  149.64624680252777,
+  151.14250016223164,
+  152.65241136742705,
+  154.17608198492013,
+  155.71361395421667,
+  157.26510958280784,
+  158.83067154126374,
+  160.41040285830996,
+  162.00440691578328,
+  163.61278744345248,
+  165.23564851378632,
+  166.87309453659964,
+  168.52523025364022,
+  170.1921607330109,
+  171.87399136361637,
+  173.5708278494713,
+  175.28277620413726,
+  177.00994274575805,
+  178.75243409834,
+  180.51123671718184,
+  182.28638520485717,
+  184.0772235167874,
+  185.88386013993187,
+  187.70640383540672,
+  189.54496363185686,
+  191.3996488188071,
+  193.2705689398708,
+  195.157833785884,
+  197.06155338794628,
+  198.98183801037212,
+  200.91879814357037,
+  202.8725444967921,
+  204.84318799090184,
+  206.83083975114837,
+  208.83561110058497,
+  210.8576135718751,
+  212.89897143081697,
+  214.9579801048166,
+  217.0346102275128,
+  219.12897487203765,
+  221.24118727010577,
+  223.37136080391912,
+  225.519608997948,
+  227.6860455107103,
+  229.87078412634867,
+  232.07393874626277,
+  234.2956233805689,
+  236.53595213957738,
+  238.79503922525348,
+  241.07299892339623,
+  243.370725297872,
+  245.68947885062127,
+  248.0275134810146,
+  250.38494471290164,
+  252.7618881168323,
+  255.15845930083847,
+  257.57477390121363,
+  260.0109475731406,
+  262.4670959812984,
+  264.9433347904274,
+  267.4397796558,
+  269.9565462136587,
+  272.4937500719178,
+  275.05197260732393,
+  277.633649312205,
+  280.2361858332288,
+  282.8596986647326,
+  285.50430423164914,
+  288.1701188794991,
+  290.8572588643032,
+  293.56584034247686,
+  296.29597936061424,
+  299.04779184528877,
+  301.821393592809,
+  304.6169002590137,
+  307.4350867899421,
+  310.278578834166,
+  313.1444085046811,
+  316.0326919780884,
+  318.9435452459828,
+  321.8770841043561,
+  324.833424142965,
+  327.8126807345487,
+  330.8149690242386,
+  333.8404039186749,
+  336.88910007541415,
+  339.96185218678465,
+  343.0618304170306,
+  346.18550932502126,
+  349.3330037234144,
+  352.50442812843824,
+  355.69989674882726,
+  358.91952347486273,
+  362.1634218672529
+ ],
+ "drying_loss_mg_m3": [
+  121.23974293249705,
+  122.48813021911508,
+  123.74859418832736,
+  125.02123703310664,
+  126.30616154949074,
+  127.60347113568773,
+  128.91326979125287,
+  130.23566211647642,
+  131.57075331274513,
+  132.9186491888835,
+  134.27946233597834,
+  135.65409468255714,
+  137.0418750959406,
+  138.44291218037264,
+  139.8573225944893,
+  141.28521559148973,
+  142.72669509661563,
+  144.1818720960285,
+  145.65085816368065,
+  147.1337654590978,
+  148.63070672500427,
+  150.14179528487279,
+  151.6671450404032,
+  153.20687046881815,
+  154.76108662012217,
+  156.3299091142356,
+  157.91345413800363,
+  159.5118384421477,
+  161.12517933808672,
+  162.75359469473597,
+  164.3972029352996,
+  166.05612303444164,
+  167.7304745176055,
+  169.42037749509154,
+  171.12693100677123,
+  172.84952988044745,
+  174.58807627676404,
+  176.34271491568526,
+  178.1135483610957,
+  179.90070000041146,
+  181.70429421269725,
+  183.52445589362102,
+  185.36131045068458,
+  187.214983798297,
+  189.08560235277233,
+  190.97329302718202,
+  192.87818322612364,
+  194.80040084030082,
+  196.74007424110147,
+  198.69733227501126,
+  200.67230425812747,
+  202.66511997123942,
+  204.675909661083,
+  206.7056777289159,
+  208.75448300984277,
+  210.8217078100034,
+  212.90749935945914,
+  215.01196811318545,
+  217.1352476866469,
+  219.27747211554592,
+  221.43877584879326,
+  223.61929374136693,
+  225.81916104704152,
+  228.03851341098985,
+  230.27748686227386,
+  232.53621780616442,
+  234.81484301644306,
+  237.11349962766042,
+  239.43232512799582,
+  241.77145737031128,
+  244.13303096261816,
+  246.51539335047457,
+  248.91856604197207,
+  251.3426562364778,
+  253.7878042552968,
+  256.2541507207262,
+  258.7418365468942,
+  261.2510029305416,
+  263.78179134154954,
+  266.3343435134646,
+  268.90880143379627,
+  271.5053073342717,
+  274.12400368101595,
+  276.7650331653794,
+  279.4293110932051,
+  282.11812506305785,
+  284.8298158054079,
+  287.56447930447035,
+  290.32226022318423,
+  293.10330339369654,
+  295.9077538063228,
+  298.7357565982841,
+  301.5874570423488,
+  304.463000535355,
+  307.36253258656404,
+  310.28619880589906,
+  313.2341448923647,
+  316.2069773846263,
+  319.20717873222054,
+  322.2322070842687,
+  325.2821765015185,
+  328.35723404980286,
+  331.45752681707836,
+  334.58320190042747,
+  337.7344063929461,
+  340.91128737042607,
+  344.11399187794973,
+  347.34266691634286,
+  350.59745942855807,
+  353.87917940565933,
+  357.19052405290455,
+  360.5285139687802,
+  363.8932969084415,
+  367.28502050541124,
+  370.7038322568863,
+  374.1498795088899,
+  377.6233094411525,
+  381.12426905205854,
+  384.65290514317644,
+  388.2093643039467,
+  391.7945382820121,
+  395.4115550945974,
+  399.05693118528336,
+  402.7308133901543,
+  406.4333482594823,
+  410.1646820410946,
+  413.9249606636962,
+  417.7143297198839
+ ]
+}

@@ -1122,6 +1122,14 @@
       "start_here": false
     },
     {
+      "source": "docs/contribute/validation/gpu/bat-humidity-pulse.md",
+      "title": "BAT humidity-pulse ensemble on CPU and CUDA",
+      "topic": "verification-performance",
+      "also": ["verification-qualification"],
+      "role": "Contribute",
+      "start_here": false
+    },
+    {
       "source": "docs/contribute/validation/gpu/charged-coagulation.md",
       "title": "Charged coagulation and atmospheric ion validation",
       "topic": "verification-scientific",
