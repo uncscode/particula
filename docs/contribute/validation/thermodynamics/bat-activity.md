@@ -64,3 +64,11 @@ On the Stage 3A checkout at `47e7dd392b`, the standard package suite
 available. Package Ruff checks and formatting passed, and mypy reported no
 issues across 699 source files. The humidity-pulse and native activity/equilibria
 example checks passed (8 tests), and the Astro site build and link audit passed.
+
+At pure water, organic activity vanishes while its infinite-dilution activity
+coefficient has a finite, composition-dependent limit. For the Figure 9
+miscible organic the direct coefficient is 1.84162 at both zero and
+1e-20 organic mole fraction. The final archived `ycalc_org` is 1.84168.
+Using the analytic limit in the Gibbs derivative also preserves the exact
+8,208 bytes of the previously qualified 513-node, two-activity table for
+this case.

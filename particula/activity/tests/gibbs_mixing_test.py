@@ -96,3 +96,15 @@ class TestGibbsMixing(unittest.TestCase):
             np.shape(derivative_gibbs),
             np.shape(self.organic_mole_fraction_array),
         )
+
+
+def test_gibbs_derivative_with_pure_water_in_a_vector_of_mixtures():
+    """Each descriptor set retains its own derivative on a mixed batch."""
+    x = np.array([0.0, 0.25, 1.0])
+    density = np.array([1100.0, 1200.0, 1300.0])
+    _, derivative = gibbs_of_mixing(0.09, x, 0.5, density, G19_FIT_MID)
+    for i, fraction in enumerate(x):
+        _, expected = gibbs_of_mixing(
+            0.09, fraction, 0.5, density[i], G19_FIT_MID
+        )
+        np.testing.assert_allclose(derivative[i], expected, rtol=1e-14)
