@@ -1089,6 +1089,10 @@
                 "slug": "contribute/validation/numerics/mass-precision"
               },
               {
+                "label": "Binary BAT reference checks",
+                "slug": "contribute/validation/thermodynamics/bat-activity"
+              },
+              {
                 "label": "Scientific correctness reference baseline",
                 "slug": "contribute/validation/numerics/scientific-correctness"
               }
