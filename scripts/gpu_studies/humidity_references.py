@@ -3,6 +3,7 @@
 import argparse
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
 import numpy as np
 from scripts.gpu_studies.humidity_campaign import run
@@ -30,7 +31,11 @@ def refine(job):
     for steps in (64, 128, 256, 512, 1024):
         path = output / f"{factor.hex()}-{steps}.npy"
         if not path.exists():
-            run(1, "cpu", steps, path, factors=np.array([factor]))
+            # Publish only complete arrays if a worker loses disk space.
+            with TemporaryDirectory(dir=output) as temp:
+                pending = Path(temp) / path.name
+                run(1, "cpu", steps, pending, factors=np.array([factor]))
+                pending.replace(path)
         current = np.load(path)
         if previous is not None:
             change = errors(previous, current)
