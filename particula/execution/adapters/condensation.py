@@ -1002,7 +1002,7 @@ def _validate_selected_warp_sidecars(
         )
 
     requires_activity_surface = (
-        configuration.activity_mode.value == "kappa"
+        configuration.activity_mode.value in ("kappa", "bat")
         or configuration.surface_mode.value == "composition_weighted"
     )
     sidecar = state.activity_surface
@@ -1017,7 +1017,9 @@ def _validate_selected_warp_sidecars(
     ):
         raise ValueError("activity_surface must provide profile selectors.")
     sidecar = cast(Any, sidecar)
-    expected_activity = 1 if configuration.activity_mode.value == "kappa" else 0
+    expected_activity = {"ideal": 0, "kappa": 1, "bat": 2}[
+        configuration.activity_mode.value
+    ]
     expected_surface = (
         1 if configuration.surface_mode.value == "composition_weighted" else 0
     )

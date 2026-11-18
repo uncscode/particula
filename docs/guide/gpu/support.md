@@ -21,7 +21,7 @@ hardware/runtime requirement; requesting CUDA never selects Warp CPU silently.
 | Continuation | `checkpoint()` and matching runnable `resume()` | Exact device/configuration and canonical bytes; no automatic CPU fallback. |
 | Native CUDA capture | `capture()`, then ordinary `step/run` | Non-advancing capture; fixed bindings; fresh capture after resume. |
 | Direct kernels | Supported process-specific fixed-shape interfaces | Caller owns transfers, scratch, species bindings and RNG sidecars. |
-| Continuous adaptive condensation | Multi-material RK23/ROS3 with ideal/kappa activity and surface phases | `GPUCondensationODE` uses host control; `GPUResidentCondensation` uses native CUDA conditional graphs for adaptation. |
+| Continuous adaptive condensation | Multi-material RK23/ROS3 with ideal, κ and binary BAT activities and surface phases | `GPUCondensationODE` uses host control; `GPUResidentCondensation` uses native CUDA conditional graphs for adaptation. |
 | Coupled adaptive simulation | `GPUCoupledSimulation(..., resident=True)` | Fixed event schedule and persistent RNG; device-only stage handoff, explicit observations and boundary restart. |
 | Warp CPU | Separate regression target | CPU evidence is labeled separately from actual CUDA execution and performance. |
 

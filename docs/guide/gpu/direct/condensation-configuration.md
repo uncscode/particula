@@ -62,10 +62,14 @@ standalone `refresh_vapor_pressure_gpu` only from
 ### Condensation activity and surface sidecars
 
 The optional `CondensationActivitySurfaceConfig` is a direct-kernel-only,
-caller-owned configuration sidecar for `condensation_step_gpu()`. Activity mode
-`0` is ideal and mode `1` is kappa; surface-tension mode `0` is static and mode
-`1` is composition-weighted. Activity applies only to `water_species_index`;
-all non-water species use unit activity. Static tension uses the current
+caller-owned configuration sidecar for `condensation_step_gpu()`. Modes 0 (ideal) and 1 (κ) apply activity to the selected water material.
+Mode 2 (BAT) applies separate water and organic activities to the two particle
+materials in that order. Supply a same-device float64 `bat_table` containing
+alternating water and organic activities on a uniformly spaced grid of organic
+mole fractions from zero to one. The first pair is (1, 0) and the last is
+(0, 1). Preparation generates the table from the configured homogeneous BAT fit.
+Surface-tension mode 0 is static and mode 1 is composition-weighted.
+Static tension uses the current
 species' supplied value, while composition-weighted tension computes one
 particle-wide value from the per-species tensions.
 
@@ -73,9 +77,9 @@ For native calls, let `Sp` be particle-material width and `Sg` full gas width.
 `kappas` and `molar_mass_reference` are same-device `wp.float64` arrays shaped
 `(Sp,)`. The water selector addresses a particle-material lane. Kappas are
 finite and nonnegative; reference molar masses are finite and positive.
-Every mapped particle reference must exactly equal its corresponding gas
+For ideal and κ modes, every mapped particle reference must exactly equal its corresponding gas
 molar mass through the explicit species map; unmapped particle references
-remain particle-order data. Only the legacy equal-width path uses positional
+remain particle-order data. BAT uses the water and organic molar masses of its binary fit to convert particle masses to mole fraction. Gas-side transport uses the gas-species molar masses. Only the legacy ideal and κ equal-width path uses positional
 whole-array equality with `gas.molar_mass`. The frozen dataclass prevents
 rebinding, not array mutation; callers must not mutate storage during launch.
 

@@ -125,6 +125,7 @@ _SUTHERLAND_CONSTANT = wp.constant(wp.float64(constants.SUTHERLAND_CONSTANT))
 
 ACTIVITY_MODE_IDEAL = wp.int32(0)
 ACTIVITY_MODE_KAPPA = wp.int32(1)
+ACTIVITY_MODE_BAT = wp.int32(2)
 SURFACE_TENSION_MODE_STATIC = wp.int32(0)
 SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED = wp.int32(1)
 
@@ -138,23 +139,25 @@ class CondensationActivitySurfaceConfig:
     caller-owned mutable ``wp.float64`` arrays with shape ``(n_species,)``;
     native species order is particle material order. Callers must retain
     their lifetime and must not modify them concurrently
-    with a launch. Activity is evaluated only for ``water_species_index``;
+    with a launch. Binary BAT evaluates both material activities.
+    Ideal and kappa modes evaluate activity only for ``water_species_index``;
     every non-water vapor uses unit activity. Static tension uses the current
     condensing-species index, while composition-weighted tension computes one
     particle-wide value for every condensing species.
 
     Attributes:
-        activity_mode: Integer selector: ``0`` for ideal or ``1`` for kappa
-            water activity.
+        activity_mode: Select ideal (0), kappa (1) or binary BAT (2).
         surface_tension_mode: Integer selector: ``0`` for static or ``1`` for
             composition-weighted surface tension.
-        water_species_index: Index of the sole species receiving activity;
-            all other vapor species use unit activity.
+        water_species_index: Water material index. BAT requires zero.
+        bat_table: Interleaved water and organic activities on a uniform
+            organic mole-fraction grid from zero to one (BAT only).
         kappas: Caller-owned finite, non-negative ``wp.float64`` array of
             per-species kappa parameters with shape ``(n_species,)``.
         molar_mass_reference: Caller-owned positive ``wp.float64`` array of
             per-species molar masses [kg/mol], shaped ``(n_species,)`` and
-            equal to mapped full-gas values for native calls. Unmapped material
+            equal to mapped gas values for native ideal and kappa calls. BAT
+            uses the molar masses of its binary fit. Unmapped material
             molar masses are independent. Legacy calls require gas order.
     """
 
@@ -163,6 +166,7 @@ class CondensationActivitySurfaceConfig:
     water_species_index: Any
     kappas: Any
     molar_mass_reference: Any
+    bat_table: Any = None
 
 
 @dataclass(frozen=True)
@@ -386,6 +390,31 @@ def _validate_int32_selector(
     return result
 
 
+def _validate_binary_activity_table(
+    table, n_species, water_index, device, caller_name
+):
+    """Check both columns before any state update or device launch."""
+    if n_species != 2 or water_index != 0 or not _is_warp_array_like(table):
+        raise ValueError("BAT requires a table and [water, organic] materials")
+    size = table.size
+    if size < 4 or size % 2:
+        raise ValueError("BAT requires two activities per grid point")
+    _validate_array_metadata(
+        "bat_table",
+        table,
+        (size,),
+        wp.float64,
+        device,
+        caller_name,
+        "activity_surface",
+    )
+    values = _read_float64_array(table)
+    if not np.all(np.isfinite(values)) or np.any(values < 0):
+        raise ValueError("BAT activities must be finite and nonnegative")
+    if not np.array_equal(values[[0, 1, -2, -1]], [1, 0, 0, 1]):
+        raise ValueError("BAT table requires pure water and organic endpoints")
+
+
 def validate_condensation_activity_surface_config(
     activity_surface: CondensationActivitySurfaceConfig | Any,
     n_species: int,
@@ -424,7 +453,7 @@ def validate_condensation_activity_surface_config(
             f"in {caller_name}."
         )
     _validate_int32_selector(
-        "activity_mode", activity_surface.activity_mode, (0, 1)
+        "activity_mode", activity_surface.activity_mode, (0, 1, 2)
     )
     _validate_int32_selector(
         "surface_tension_mode", activity_surface.surface_tension_mode, (0, 1)
@@ -476,6 +505,17 @@ def validate_condensation_activity_surface_config(
         raise ValueError(
             "activity_surface.molar_mass_reference must be finite and positive."
         )
+    if activity_surface.activity_mode == 2:
+        _validate_binary_activity_table(
+            activity_surface.bat_table,
+            n_species,
+            water_index,
+            device,
+            caller_name,
+        )
+        return activity_surface
+    if activity_surface.bat_table is not None:
+        raise ValueError("only BAT uses an activity table")
     if species_binding is not None:
         if any(
             references[p] != gas_masses[g]
@@ -493,6 +533,20 @@ def validate_condensation_activity_surface_config(
 
 
 @wp.func
+def binary_activity_wp(table: Any, organic_fraction: wp.float64, material: int):
+    """Interpolate one material on the uniform binary mole-fraction grid."""
+    intervals = table.shape[0] // 2 - 1
+    position = wp.clamp(
+        organic_fraction, wp.float64(0.0), wp.float64(1.0)
+    ) * wp.float64(intervals)
+    left = wp.min(wp.int32(position), intervals - 1)
+    offset = 2 * left + material
+    return wp.lerp(
+        table[offset], table[offset + 2], position - wp.float64(left)
+    )
+
+
+@wp.func
 def _condensation_mass_transfer_impl(  # noqa: C901
     masses: Any,
     concentration: Any,
@@ -501,7 +555,7 @@ def _condensation_mass_transfer_impl(  # noqa: C901
     vapor_pressure: Any,
     molar_mass: Any,
     surface_tension: Any,
-    kappas: Any,
+    activity_parameters: Any,
     molar_mass_reference: Any,
     effective_surface_tension: Any,
     activity_enabled: wp.int32,
@@ -620,7 +674,7 @@ def _condensation_mass_transfer_impl(  # noqa: C901
                 activity_factor = water_activity_kappa_wp(
                     masses,
                     density,
-                    kappas,
+                    activity_parameters,
                     box_idx,
                     particle_idx,
                     0,
@@ -738,6 +792,15 @@ def _condensation_mass_transfer_impl(  # noqa: C901
         activity_factor = wp.float64(1.0)
         if (
             activity_enabled == wp.int32(1)
+            and activity_mode == ACTIVITY_MODE_BAT
+        ):
+            organic = masses[box_idx, particle_idx, 1] / molar_mass_reference[1]
+            water = masses[box_idx, particle_idx, 0] / molar_mass_reference[0]
+            activity_factor = binary_activity_wp(
+                activity_parameters, organic / (water + organic), species_idx
+            )
+        elif (
+            activity_enabled == wp.int32(1)
             and species_idx == water_species_index
         ):
             water_species_index_int = int(water_species_index)
@@ -753,7 +816,7 @@ def _condensation_mass_transfer_impl(  # noqa: C901
                 activity_factor = water_activity_kappa_wp(
                     masses,
                     density,
-                    kappas,
+                    activity_parameters,
                     box_idx,
                     particle_idx,
                     water_species_index_int,
@@ -836,11 +899,11 @@ def condensation_mass_transfer_kernel(  # noqa: C901
         vapor_pressure: Gas-phase vapor pressure array.
         molar_mass: Gas-phase molar mass array.
         surface_tension: Per-species surface tension array.
-        kappas: Per-species kappa activity parameters.
+        kappas: Per-species kappa parameters or the flat BAT activity table.
         molar_mass_reference: Per-species activity reference molar masses.
         effective_surface_tension: Per-particle weighted tension buffer.
         activity_enabled: Flag enabling configured water activity.
-        activity_mode: Selector for ideal or kappa water activity.
+        activity_mode: Selector for ideal, kappa or binary BAT activity.
         surface_tension_mode: Selector for static or weighted tension.
         water_species_index: Index of the sole activity-adjusted species.
         mass_accommodation: Per-species mass accommodation coefficients.
@@ -2198,6 +2261,7 @@ def _validate_native_ownership(
         pressure,
     ]
     if activity_surface is not None:
+        protected.append(activity_surface.bat_table)
         protected.extend(
             (activity_surface.kappas, activity_surface.molar_mass_reference)
         )
@@ -2676,6 +2740,12 @@ def _prepare_condensation_step_gpu(  # noqa: C901
                     else None,
                 ),
                 (
+                    "activity_surface.bat_table",
+                    activity_surface.bat_table
+                    if activity_surface is not None
+                    else None,
+                ),
+                (
                     "activity_surface.kappas",
                     activity_surface.kappas
                     if activity_surface is not None
@@ -2718,6 +2788,9 @@ def _prepare_condensation_step_gpu(  # noqa: C901
                 pressure_array,
                 latent_heat,
                 thermal_work,
+                activity_surface.bat_table
+                if activity_surface is not None
+                else None,
                 (
                     activity_surface.kappas
                     if activity_surface is not None
@@ -2837,14 +2910,18 @@ def _prepare_condensation_step_gpu(  # noqa: C901
         and scratch_buffers.mean_free_path is not None
         else wp.zeros((n_boxes,), dtype=wp.float64, device=device)
     )
-    kappas = wp.zeros(n_species, dtype=wp.float64, device=device)
+    activity_parameters = wp.zeros(n_species, dtype=wp.float64, device=device)
     molar_mass_reference = gas.molar_mass
     activity_enabled = wp.int32(0)
     activity_mode = ACTIVITY_MODE_IDEAL
     surface_tension_mode = SURFACE_TENSION_MODE_STATIC
     water_species_index = wp.int32(0)
     if activity_surface is not None:
-        kappas = activity_surface.kappas
+        activity_parameters = (
+            activity_surface.bat_table
+            if activity_surface.activity_mode == 2
+            else activity_surface.kappas
+        )
         molar_mass_reference = activity_surface.molar_mass_reference
         activity_enabled = wp.int32(1)
         activity_mode = wp.int32(activity_surface.activity_mode)
@@ -2899,7 +2976,7 @@ def _prepare_condensation_step_gpu(  # noqa: C901
         gas_delta,
         dynamic_viscosity,
         mean_free_path,
-        kappas,
+        activity_parameters,
         molar_mass_reference,
         activity_enabled,
         activity_mode,

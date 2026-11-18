@@ -1051,3 +1051,59 @@ def test_counter_read_serializes_with_close(device, counter, expected):
             assert future.result(timeout=5) == expected
     finally:
         simulation.close()
+
+
+def fixed_bat_case(*, latent=False, weighted=True):
+    """Two volatile materials with reversed gas order and an inert gas."""
+    from particula.dynamics.condensation.species_mapping import (
+        CondensationSpeciesMap,
+    )
+    from particula.particles import ActivityBAT
+
+    initial, process = condensation_case(latent=latent, weighted=weighted)
+    strategy = process.condensation_strategy
+    strategy.activity_strategy = ActivityBAT(0.046, 0.8, 1000.0)
+    strategy.species_map = CondensationSpeciesMap(
+        tuple(initial.gas.name), ((2, 0), (1, 1))
+    )
+    initial.particles.masses[0] = [[9e-19, 1e-19], [1e-19, 9e-19]]
+    initial.gas.concentration[:, 1] = 0
+    return initial, process
+
+
+@pytest.mark.parametrize("latent,weighted", [(False, True), (True, False)])
+def test_binary_bat_fixed_step_both_vapors(device, latent, weighted):
+    """Resolve each species transfer against direct CPU BAT."""
+    from particula._cpu_batch import detached
+
+    initial, process = fixed_bat_case(latent=latent, weighted=weighted)
+    strategy = process.condensation_strategy
+    cpu = detached(initial)
+    dt = 1e-5
+    process.execute(cpu, time_step=dt, sub_steps=4)
+    with process.prepare(initial, device=device.native, time_step=dt) as owner:
+        owner.step()
+        result = owner.snapshot()
+    for gas, material in strategy.species_map.gas_to_particle:
+        change = (
+            result.particles.masses[..., material]
+            - initial.particles.masses[..., material]
+        )
+        expected = (
+            cpu.particles.masses[..., material]
+            - initial.particles.masses[..., material]
+        )
+        assert np.all(np.abs(expected) > 0)
+        np.testing.assert_allclose(change, expected, rtol=1e-3, atol=0)
+        np.testing.assert_allclose(
+            change
+            @ initial.particles.concentration[0]
+            / initial.particles.volume,
+            initial.gas.concentration[:, gas]
+            - result.gas.concentration[:, gas],
+            rtol=1e-8,
+            atol=1e-18,
+        )
+    np.testing.assert_array_equal(
+        result.gas.concentration[:, 0], initial.gas.concentration[:, 0]
+    )
