@@ -16,7 +16,7 @@ create a PR when the plan's acceptance criteria are met. Follow the shared
 
 Add BAT alongside κ as a particle activity option for kinetic condensation and evaporation. Start with one internally homogeneous water–organic liquid in each active particle. Compute both activities from current particle masses at every rate evaluation. Existing transport, Kelvin correction, gas inventories and external vapor forcing determine the subsequent trajectory. All simulated mass transfer remains kinetic.
 
-Use the miscible case in Fig. 9 of Gorkowski et al. as a reference configuration (generic organic, 200 g/mol, O:C 0.5, 298.15 K). Verify the remaining descriptors and phase stability from the authors’ inputs before freezing the fixture. Reproduce direct activities with the published implementation and record its revision. This is a model verification case. Stage 3B owns the choice of independent measurements. [Theory and primary references](../docs/theory/thermodynamics/activity-theory.md)
+Use the miscible case in Fig. 9 of Gorkowski et al. as a reference configuration (generic organic, 200 g/mol, O:C 0.5). The caption specifies 298.15 K and the archived Kelvin calculation uses 293 K. The [binary reference checks](../docs/contribute/validation/thermodynamics/bat-activity.md) record the descriptors and the archived phase flag. Reproduce direct activities with the published implementation and record its revision. This is a model verification case. Stage 3B owns the choice of independent measurements. [Theory and primary references](../docs/theory/thermodynamics/activity-theory.md)
 
 ## BAT activity in GPU-resident condensation
 

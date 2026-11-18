@@ -130,3 +130,19 @@ def test_citric_acid_figure_2b_reference():
         rtol=0,
         atol=2e-14,
     )
+
+
+def test_miscible_figure_9_reference():
+    """Check three compositions from the authors' archived mid-O:C curve."""
+    water, organic, *_ = bat_activity_coefficients(
+        molar_mass_ratio=0.09008,
+        organic_mole_fraction=np.array([0.9, 0.5, 0.1]),
+        oxygen2carbon=0.5,
+        density=1243.4933333333333,
+    )
+    np.testing.assert_allclose(
+        water, [0.0771364279, 0.4581165422, 0.9302584435], rtol=0, atol=3e-6
+    )
+    np.testing.assert_allclose(
+        organic, [0.8988582008, 0.4564539978, 0.0787672383], rtol=0, atol=2e-6
+    )

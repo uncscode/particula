@@ -2382,6 +2382,16 @@
       "start_here": false
     },
     {
+      "source": "docs/contribute/validation/thermodynamics/bat-activity.md",
+      "title": "Binary BAT reference checks",
+      "topic": "verification-scientific",
+      "also": [
+        "activity-nonideal"
+      ],
+      "role": "Contribute",
+      "start_here": false
+    },
+    {
       "source": "docs/contribute/validation/numerics/scientific-correctness.md",
       "title": "Scientific correctness reference baseline",
       "topic": "verification-scientific",
