@@ -13,8 +13,13 @@ Create a dedicated worktree and `codex/stage-03b-scientific-comparisons` branch
 when starting the selected study. Develop and validate there, then commit,
 push, and create a PR when the plan's acceptance criteria are met. Follow the shared
 [worktree, branch, and PR workflow](README.md#worktree-branch-and-pr-workflow).
-Studies selected by the [literature scheduler](literature-scheduler.md) each
-use their own iteration worktree and branch rather than this stage's branch.
+The [literature scheduler](literature-scheduler.md) reuses this stage's
+scientific criteria for up to three new comparisons per invocation. Each has its own
+worktree and branch. The automated agent keeps the draft in the main
+checkout's `.artifacts/literature/<iteration-id>/` for researcher review.
+An approved study becomes a documented example in its own PR. The independent
+AIOMFAC calculation below belongs to the citric-acid case; each later study
+declares the reference appropriate to its question.
 
 ## Outcome
 
@@ -54,11 +59,11 @@ validation record:
 
 | Item | Required information |
 | --- | --- |
-| Scientific question | Observable, proposed explanation and the claim a comparison could support. |
-| Reference | Primary source, dataset/version, figure/table, source uncertainty, and whether the target is a measurement or another model. |
+| Scientific question | Quantity or process response of interest, proposed explanation and claim the comparison could support. |
+| Reference or baseline | Primary source and target, such as a measured series, versioned model output, analytical solution or specified baseline calculation for a process study. Record relevant uncertainties. |
 | Inputs | Species identities, composition, concentration basis, geometry/volume, size distribution, temperature, humidity, forcing and times; units and conversions. |
 | Model boundary | Processes, activity/phase assumptions, wall losses and reservoirs; known differences and excluded mechanisms. |
-| Observation mapping | Radius versus diameter, number/mass weighting, wet/dry basis, sampling times and instrument response where material. |
+| Comparable quantities | Match units, population weighting and time basis. For measurements, include instrument response where material. For a model or process study, define the output and the assumptions shared or varied between cases. |
 | Metrics | Absolute/relative error definitions, uncertainty treatment, zero-value handling, and thresholds set before evaluating the result. |
 | Calibration | Fixed and fitted inputs, fitting bounds/data, and held-out validation data; label a fit as calibration when independent data are unavailable. |
 | Numerical evidence | Solver/tolerances, timestep and population/bin refinement, process order, random seeds/ensemble size where relevant, and budget residual limits. |
@@ -86,10 +91,10 @@ be small enough to interpret the declared observation uncertainty or effect.
    particle-resolution convergence as relevant, and sampling uncertainty.
    Check process-order sensitivity and budgets. Numerical uncertainty should
    be small enough to interpret the selected physical discrepancy.
-4. **Map predictions to observations.** Use the measurement's observable and
-   sampling convention, including instrument response when it matters.
-   Distinguish model number distributions from measured distributions and
-   mass-derived quantities from directly observed values.
+4. **Compare equivalent quantities.** For measurements, use the instrument's
+   observable and sampling convention. For model comparisons, align the
+   definitions, inputs and evaluation times. For a process study, quantify
+   the response to the declared change against its baseline.
 5. **Compare and diagnose.** Report bias, residual structure, uncertainties,
    and parameter sensitivity. Separate calibration data from independent
    validation. Cross-model agreement establishes agreement under matched

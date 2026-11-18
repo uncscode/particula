@@ -28,7 +28,7 @@ AIOMFAC activity is a separate follow-on; viscosity remains deferred.
 | 2A | [Numerical integration and process splitting](stage-02a-numerical-integration.md) | Supported CPU/GPU stepping choices with measured accuracy, error control, and explicit process ordering. |
 | 2B | [Simulation workflow and reproducibility](stage-02b-simulation-workflow.md) | Convenient run, record, save, plot, and restart workflows with explicit scientific inputs. |
 | 3A | [Thermodynamics and additional physics](stage-03a-thermodynamics.md) | Add binary BAT activities to kinetic condensation on CPU and resident GPU, starting with homogeneous droplets. |
-| 3B | [Scientific and experimental comparisons](stage-03b-scientific-comparisons.md) | Reproduce selected published results and compare predictions with independent measurements. |
+| 3B | [Scientific and experimental comparisons](stage-03b-scientific-comparisons.md) | Reproduce and extend published results through experimental comparisons, model intercomparisons and process studies. |
 | 4 | [GPU scientific usefulness and reliability](stage-04-gpu-qualification.md) | Establish reliable acceleration of complete scientific workloads at comparable accuracy. |
 | 5 | [Inverse modeling and automatic differentiation](stage-05-inverse-modeling.md) | Recover supported initial-state quantities with tested inference and gradient methods. |
 | 6 | [Configurable chemistry model](stage-06-chemistry-model.md) | Bind reactions to user species with shared CPU/GPU configuration, then qualify gas, particle, and coupled chemistry. |
@@ -55,11 +55,15 @@ finishing autodiff; chemistry gradients are outside its initial scope.
 
 ## Continuous literature discovery, outside the stages
 
-The [literature scheduler](literature-scheduler.md) is a separate proposal for
-recurring discovery, candidate selection, and reproducible comparisons. It
-feeds Stage 3B and can run alongside any stage. Each new selected study
-iteration gets its own worktree, branch, and completed-work PR. Updating these
-instructions does not itself activate the schedule or launch the studies.
+The proposed [literature scheduler](literature-scheduler.md) uses an automated
+agent to conduct independent aerosol research alongside the stages. Each
+invocation can select up to three comparisons using supported Particula
+physics. Study duration and review capacity guide the scheduling interval. Each
+study has a fresh worktree and branch. Drafts live in the main checkout's
+`.artifacts/literature/` for researcher review. Approved comparisons become
+documented examples in individual PRs. Diagnosed Particula gaps go through
+issue review. A useful outcome clarifies a published result, tests its reach,
+or identifies a follow-up that matters to aerosol researchers.
 
 ## Worktree, branch, and PR workflow
 
