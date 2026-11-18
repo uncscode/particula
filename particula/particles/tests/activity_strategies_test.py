@@ -9,6 +9,7 @@ import pytest
 from particula.activity.activity_coefficients import bat_activity_coefficients
 from particula.activity.ratio import to_molar_mass_ratio
 from particula.particles.activity_strategies import (
+    ActivityBAT,
     ActivityIdealMass,
     ActivityIdealMolar,
     ActivityKappaParameter,
@@ -211,6 +212,18 @@ def test_activity_non_ideal_binary_single_component_limit():
     )
     result = strategy.activity(mass_concentration)
     np.testing.assert_allclose(result, expected, rtol=1e-6)
+
+
+def test_bat_partial_pressure_preserves_material_axis():
+    """Pure-component pressure limits distinguish water and organic lanes."""
+    strategy = ActivityBAT(0.2, 0.5, 1400.0)
+    pressure = np.array([3100.0, 0.12])
+    masses = np.array([[1.0, 0.0], [0.0, 1.0], [0.3, 0.7]])
+    surface = strategy.partial_pressure(pressure, masses)
+    np.testing.assert_allclose(surface[:2], [[3100.0, 0.0], [0.0, 0.12]])
+    np.testing.assert_allclose(
+        surface[2], strategy.partial_pressure(pressure, masses[2] * 10)
+    )
 
 
 # Test MolarIdealActivity

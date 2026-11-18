@@ -287,6 +287,10 @@ class ActivityNonIdealBinary(ActivityStrategy):
             ValueError: If the input is scalar or last dimension is not 2.
             ValueError: If any total moles are non-positive.
         """
+        return self._activity_pair(mass_concentration)[1]
+
+    def _activity_pair(self, mass_concentration):
+        """Evaluate water and organic activities at the same composition."""
         mass_array = np.asarray(mass_concentration, dtype=np.float64)
         if mass_array.ndim == 0 or mass_array.shape[-1] != 2:
             raise ValueError(
@@ -307,7 +311,7 @@ class ActivityNonIdealBinary(ActivityStrategy):
         molar_mass_ratio = to_molar_mass_ratio(self.molar_mass_g)
 
         (
-            _activity_water,
+            activity_water,
             activity_organic,
             _mass_water,
             _mass_organic,
@@ -321,11 +325,42 @@ class ActivityNonIdealBinary(ActivityStrategy):
             functional_group=self.functional_group,
         )
 
-        return activity_organic
+        return activity_water, activity_organic
 
     def get_name(self) -> str:
         """Return the strategy identifier."""
         return "ActivityNonIdealBinary"
+
+
+class ActivityBAT(ActivityNonIdealBinary):
+    """Homogeneous binary BAT activities in [water, organic] material order.
+
+    Configure organic properties as for ActivityNonIdealBinary. Both species
+    activities enter the kinetic condensation surface-pressure calculation.
+    """
+
+    def activity(self, mass_concentration):
+        """Return [water, organic] activities on the final material axis.
+
+        Masses share a common mass basis. Empty rows represent unused slots
+        and contribute zero surface pressure to both lanes.
+        """
+        mass = np.asarray(mass_concentration, dtype=np.float64)
+        if mass.ndim == 0 or mass.shape[-1] != 2:
+            raise ValueError("BAT requires [water, organic] material order")
+        if not np.all(np.isfinite(mass)) or np.any(mass < 0):
+            raise ValueError("BAT masses must be finite and nonnegative")
+        active = np.any(mass > 0, axis=-1)
+        result = np.zeros_like(mass)
+        if np.any(active):
+            result[active] = np.stack(
+                self._activity_pair(mass[active]), axis=-1
+            )
+        return result
+
+    def get_name(self) -> str:
+        """Return the two-species strategy identifier."""
+        return type(self).__name__
 
 
 class ActivityKappaParameter(ActivityStrategy):

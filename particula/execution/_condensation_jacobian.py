@@ -18,6 +18,7 @@ def supports_local_rates(strategy):
     from particula.particles import surface_strategies as su
 
     return type(strategy.activity_strategy) in (
+        ac.ActivityBAT,
         ac.ActivityIdealMass,
         ac.ActivityIdealMolar,
         ac.ActivityIdealVolume,
