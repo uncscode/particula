@@ -1,6 +1,7 @@
 """Test for water activity calculation."""
 
 import numpy as np
+import pytest
 from particula.activity.water_activity import (
     biphasic_water_activity_point,
     fixed_water_activity,
@@ -60,3 +61,20 @@ def test_biphasic_water_activity_point():
         functional_group=None,
     )
     assert np.all(activity_point >= 0)
+
+
+@pytest.mark.parametrize("oxygen2carbon", [0.25, 0.5])
+def test_sweep_order_preserves_each_phase_property(oxygen2carbon):
+    """Reversing humidity reverses each quantity along its sample axis."""
+    desired = np.array([0.3, 0.6, 0.9])
+    args = (0.09008, oxygen2carbon, 1243.49)
+    ascending = fixed_water_activity(desired, *args)
+    descending = fixed_water_activity(desired[::-1], *args)
+    for left, right in zip(ascending, descending, strict=True):
+        if left is None:
+            assert right is None
+        else:
+            np.testing.assert_allclose(right, np.asarray(left)[..., ::-1])
+    assert ascending.alpha is ascending[0]
+    assert (ascending.beta is None) == (oxygen2carbon == 0.5)
+    np.testing.assert_array_equal(ascending.q_alpha, ascending[-1])

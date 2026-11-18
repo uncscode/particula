@@ -42,7 +42,7 @@ def test_to_molar_mass_ratio_validation():
 def test_from_molar_mass_ratio_scalar():
     """Scalar ratio returns float molar mass."""
     molar_mass_ratio = 0.5
-    expected_molar_mass = 18.01528 * molar_mass_ratio
+    expected_molar_mass = 36.03056
     result = from_molar_mass_ratio(molar_mass_ratio)
     assert isinstance(result, float)
     assert result == expected_molar_mass
@@ -51,14 +51,14 @@ def test_from_molar_mass_ratio_scalar():
 def test_from_molar_mass_ratio_array_and_list():
     """List/array inputs return ndarray with expected values."""
     molar_mass_ratios = [0.2, 0.4, 0.6]
-    expected_molar_masses = [18.01528 * mm for mm in molar_mass_ratios]
+    expected_molar_masses = [90.0764, 45.0382, 30.02546666666667]
     result_list = from_molar_mass_ratio(molar_mass_ratios)
     assert isinstance(result_list, np.ndarray)
     assert result_list.shape == (3,)
     assert np.allclose(result_list, expected_molar_masses)
 
     molar_mass_ratios_array = np.array([0.25, 1.0])
-    expected_array = np.array([4.50382, 18.01528])
+    expected_array = np.array([72.06112, 18.01528])
     result_array = from_molar_mass_ratio(molar_mass_ratios_array)
     assert isinstance(result_array, np.ndarray)
     assert result_array.shape == (2,)
@@ -71,3 +71,10 @@ def test_from_molar_mass_ratio_validation():
         from_molar_mass_ratio(0)
     with pytest.raises(ValueError, match="positive"):
         from_molar_mass_ratio(-0.1)
+
+
+def test_ratio_inverse_returns_original_mass_in_matching_units():
+    """A water-to-organic mass ratio has the same meaning in g/mol and kg/mol."""
+    mass = np.array([0.15, 0.2, 0.25])
+    ratio = to_molar_mass_ratio(mass, other_molar_mass=0.01801528)
+    np.testing.assert_allclose(from_molar_mass_ratio(ratio, 0.01801528), mass)
