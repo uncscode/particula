@@ -12,43 +12,11 @@ starting implementation. Develop and validate there, then commit, push, and
 create a PR when the plan's acceptance criteria are met. Follow the shared
 [worktree, branch, and PR workflow](README.md#worktree-branch-and-pr-workflow).
 
-## Outcome and initial scope
+## First milestone
 
-Deliver one conservative native particle/gas workflow using existing activity
-and equilibrium calculations. The first milestone connects existing models;
-AIOMFAC activity is a separate follow-on, and viscosity remains deferred.
-Selectable models have distinct required inputs and mixture domains; sharing
-an interface does not make BAT, kappa and AIOMFAC interchangeable.
+Add BAT alongside κ as a particle activity option for kinetic condensation and evaporation. Start with one internally homogeneous water–organic liquid in each active particle. Compute both activities from current particle masses at every rate evaluation. Existing transport, Kelvin correction, gas inventories and external vapor forcing determine the subsequent trajectory. All simulated mass transfer remains kinetic.
 
-Stage 3A owns library coupling and its scientific qualification.
-[Stage 3B](stage-03b-scientific-comparisons.md) owns a reproducible published-study
-comparison. Its early case screening should inform this milestone, but neither
-plan requires the other to be fully completed before work begins. If external
-study inputs are unavailable, 3A can proceed with a specified thermodynamic
-reference case and independent published/reference-model evidence; it must not
-claim that the experimental comparison is complete.
-
-## Starting point
-
-Reviewed against checkout `afd4f65856`:
-
-- `Equilibria` obtains auxiliary `partitioning_inputs` and attaches an
-  `EquilibriumResult`. The built-in partitioning result path does not update
-  native particle masses or gas concentrations, and the runnable rejects CPU
-  box contexts. Existing attachment tests do not establish native conservation.
-- `LiquidVaporPartitioningStrategy` takes concentrations in micrograms per
-  cubic metre and molar masses in grams per mole. Native gas concentrations are
-  kg/m³, particle masses are kg per represented particle, and native molar
-  masses are kg/mol. Conversion and population weighting need explicit owners.
-- `ActivityNonIdealBinary` accepts `[water, organic]` and returns organic
-  activity only. It has no temperature argument. A water/organic activity
-  vector for coupled condensation must be specified and tested explicitly.
-- The activity guide claims temperature-dependent BAT parameters and a
-  250–310 K range. Those claims are not established by the inspected strategy
-  interface; audit the underlying model and primary references before retaining
-  them. Do not infer a physical validity range from an accepted input range.
-- The current GPU support guide documents adaptive RK23/ROS3 with ideal/kappa
-  activity. That evidence does not establish BAT or equilibrium GPU support.
+Use the miscible case in Fig. 9 of Gorkowski et al. as a reference configuration (generic organic, 200 g/mol, O:C 0.5, 298.15 K). Verify the remaining descriptors and phase stability from the authors’ inputs before freezing the fixture. Reproduce direct activities with the published implementation and record its revision. This is a model verification case. Stage 3B owns the choice of independent measurements. [Theory and primary references](../docs/theory/thermodynamics/activity-theory.md)
 
 ## BAT activity in GPU-resident condensation
 
@@ -77,115 +45,12 @@ qualify the interpolant derivatives used by the Jacobian, including grid knots,
 before listing support. For supported capture and restart, verify stable device
 buffers on replay and verify table identity when restoring a checkpoint.
 
-## Decisions before implementation
+## Implementation and acceptance
 
-Record a bounded case specification in this plan before coding. Resolve:
+1. Extend the CPU condensation configuration to select BAT and map water and organic activities to the intended species. Preserve the scalar organic strategy for existing callers. Test reordered gas species, inert lanes, inactive slots, the pure limits and the documented units. Reject unsupported mixtures before changing state.
+2. Generate and qualify the resident table as described above. As initial engineering targets, require absolute error at most 0.0001 for each activity on held-out compositions and relative error at most 0.1% in final wet radius against a refined direct-BAT kinetic run. Check near-zero flux with an absolute pressure residual, and tighten the grid where errors change the growth direction outside that residual. Record separate timestep, grid and per-species budget checks using the existing conservation tolerances. These targets measure approximation error relative to BAT.
+3. Publish a matched CPU and actual CUDA uptake/evaporation example. Record gas and particle water separately, test a change in ambient humidity with finite-time relaxation and qualify the advertised solver, capture and restart profiles.
+4. Keep standalone fixed-water-activity and VBS partitioning calculations functional. Clean up input units, naming, return values and examples while preserving existing callers and numerical results. This work does not require applying an equilibrium result to simulation state.
+5. Evaluate a phase-separation extension with the published Fig. 9 lower-O:C cases. Include it if a binary coexistence lookup reproduces both phase endpoints, equal activities and lever-rule amounts under an explicit rapid internal equilibration assumption using the existing state. Otherwise record the unsupported interval and deliver the homogeneous case. Internal diffusion and evolving morphology require a separate model.
 
-| Decision | Required record |
-| --- | --- |
-| Physical problem | Named species, model, phases, composition and temperature range, and target observable. Prefer a small organic/water partitioning case if its inputs and references are adequate; no study is selected yet. |
-| Water boundary | Prescribed water activity with an accounted external reservoir, or finite closed water inventory with a qualified coupled solve. Fixed water activity alone does not implement the latter. |
-| Population and phases | Supported native distribution, boxes and slot layout; rule for distributing bulk equilibrium mass among particles; treatment of alpha/beta phases and curvature. |
-| Coupling | Which species are equilibrated, which evolve kinetically, and the accepted-step/process-order boundary at which updates occur. |
-| Evidence | Independent reference, exact observables, absolute/relative tolerances and numerical refinement criteria set before evaluation. |
-| Execution | CPU baseline and explicit GPU, solver and restart support matrix; unsupported combinations must reject before mutation. |
-
-Use the smallest scientifically adequate population model for the first case.
-A bulk equilibrium result does not determine size-resolved composition or phase
-morphology. Either supply and qualify that allocation rule or reject the layout.
-Do not silently collapse separated phases or assign identical composition to a
-heterogeneous population. A representation change needs its own explicit scope.
-
-## Work packages
-
-1. **Qualify model inputs and outputs.** Audit activity reference states, units,
-   water/organic output ordering, phase selection, domain limits and solver
-   convergence reporting. Keep existing standalone calculations compatible;
-   decide explicitly whether native application is an opt-in adapter or a new
-   process contract. Deliver the case specification, independent reference
-   fixtures and any corrections to misleading thermodynamics guidance.
-2. **Connect equilibrium to native inventories.** Build explicit particle-to-gas
-   species maps, including inert/unmapped lanes. Compute bulk inputs using
-   population weights and represented volume, solve into detached candidate
-   state, and validate residuals, nonnegativity, phase allocation and budgets
-   before publishing coordinated particle/gas changes. Specify failure
-   atomicity, ownership and batched behavior; retain slot capacity and counts
-   unless a separately justified process changes them. Deliver a native-state
-   regression that fails with result attachment alone.
-3. **Integrate kinetics and workflow.** Apply equilibrium only at the declared
-   process boundary, avoid duplicate kinetic/equilibrium transfer, and account
-   for imposed water exchange as a source/sink. Qualify the selected timestep
-   and splitting policies. Record physical outputs and reservoir budgets using
-   Stage 2B; test restart with matching thermodynamic configuration or explicitly
-   reject unsupported restart profiles. Repeated equilibrium applications must
-   not introduce drift beyond the declared tolerance.
-4. **Qualify and publish the bounded case.** Demonstrate ideal/limiting behavior,
-   agreement with an independent equilibrium reference, and numerical
-   refinement. Compare long-time kinetics only where activities, phases,
-   curvature and reservoir assumptions match. Publish a runnable example,
-   compact outputs, CPU/GPU support table and durable validation record. Link
-   the Stage 3B comparison when available without duplicating its study report.
-
-## Owning code and evidence
-
-- [Activity calculations](../particula/activity/),
-  [particle activity strategies](../particula/particles/activity_strategies.py),
-  and [equilibria](../particula/equilibria/).
-- [Condensation](../particula/dynamics/condensation/),
-  [custom box processes](../particula/box_process.py), and
-  [process extension support](../particula/execution/process_extensions.py).
-- [Activity guide](../docs/guide/processes/activity.md) and
-  [activity/equilibrium example tests](../examples_tests/native_activity_equilibria_examples_test.py).
-- [Equilibrium tests](../particula/equilibria/tests/),
-  [activity strategy tests](../particula/particles/tests/activity_strategies_test.py),
-  [native ownership](../docs/guide/data-model/ownership.md), and
-  [GPU support](../docs/guide/gpu/support.md).
-
-## Acceptance and validation
-
-- The selected case and numerical tolerances are recorded before implementation;
-  physical assumptions and reference provenance remain visible beside results.
-- The integrated example changes native particle/gas state, preserves closed
-  species inventories independently of the production conversion helpers, and
-  reports external water exchange separately. Check gas and particle errors
-  separately so a large reservoir cannot hide a bad particle result.
-- Independent ideal/limiting results and a relevant published/reference-model
-  comparison support the claimed range. Numerical convergence and experimental
-  validity remain distinct; using the same BAT helper twice is not independent
-  validation.
-- Unequal particle/gas species widths, reordered and inert gas lanes, non-unit
-  resolved volumes, heterogeneous boxes, inactive slots, phase-boundary cases,
-  invalid inputs and failed solves have explicit support or rejection tests.
-  Unsupported population/phase layouts fail before mutation. No silent clipping
-  of negative inventories or activity values substitutes for a valid solve.
-- Failure tests verify the promised state/identity boundary; deterministic
-  repeat application and any supported restart retain the specified budgets.
-- A support table identifies CPU and GPU capabilities. Unsupported GPU
-  thermodynamics are rejected explicitly; CPU support does not imply CUDA
-  support. New GPU claims require real CUDA evidence.
-- Adjacent activity/equilibrium/process tests and the affected published example
-  pass under the repository validation policy. Any new CUDA behavior also needs
-  parity and lifecycle checks for the supported execution profiles.
-
-## Completion boundary
-
-The first milestone is complete when the selected existing-model case meets
-the acceptance criteria and its implementation, example, evidence and support
-boundaries are delivered in a PR. A case specification alone is planning
-completion, not completion of Stage 3A implementation. No version bump or
-release is part of this milestone.
-
-AIOMFAC remains a separately scoped follow-on: preserve its own reference,
-packaging/licensing, supported-speciation, CPU/CUDA resident and bounded-table
-qualification decisions when drafting that plan. No AIOMFAC implementation or
-table support is claimed here; viscosity remains outside its activity scope.
-
-Further vapor wall loss, inorganic thermodynamics, activation/parcel feedback,
-aggregate properties, composition-conserving binned coagulation and nucleation
-laws require a demonstrated comparison gap and separate acceptance case.
-Chemistry belongs to [Stage 6](stage-06-chemistry-model.md). The handoff documents
-available activities, reference states, phase volumes and reservoir ownership;
-it does not supply a reaction mechanism or infer reverse reaction rates.
-
-Follow the [validation reference](../plugins/particula-helper/references/repository-validation.md)
-for adjacent tests and affected example refreshes.
+AIOMFAC remains a separate follow-on. The evidence for this milestone belongs in a runnable example and the repository validation records. Follow the [validation guidance](../plugins/particula-helper/references/repository-validation.md).

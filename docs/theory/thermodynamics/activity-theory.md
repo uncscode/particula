@@ -1,72 +1,14 @@
-# Activity Theory
+# Particle-phase activity in kinetic condensation
 
-Thermodynamic activity is a fundamental concept for understanding how chemical species behave in mixtures. In aerosol science, activity determines the effective concentration of a species, accounting for molecular interactions that cause deviations from ideal behavior. This page covers the theoretical basis for activity calculations in particula.
+A droplet can evaporate in humid air or grow in subsaturated air. The direction depends on how the ambient vapor pressure compares with the vapor pressure at the droplet surface. Particle-phase water activity gives the composition contribution to that surface pressure. It changes as water or organic material enters or leaves the particle.
 
-## Introduction
+## From particle masses to activities
 
-When organic compounds mix with water in atmospheric aerosols, they rarely behave ideally. The interactions between water molecules and organic molecules create non-ideal behavior that affects:
+Consider a homogeneous liquid containing water and one organic compound. For particle masses $m_w,m_o$ in kg and molar masses $M_w,M_o$ in kg/mol, its organic mole fraction is
 
-- **Vapor pressure**: How readily compounds evaporate from particles
-- **Water uptake**: How much water aerosols absorb at a given relative humidity
-- **Phase behavior**: Whether the mixture remains homogeneous or separates into phases
+$$x_o = \frac{m_o/M_o}{m_o/M_o+m_w/M_w}, \qquad x_w=1-x_o.$$
 
-Understanding and predicting these behaviors requires accurate activity models, which particula provides through the Binary Activity Thermodynamics (BAT) framework.
-
-## Ideal Activity (Raoult's Law)
-
-In an ideal solution, the activity of each component equals its mole fraction. This relationship is known as **Raoult's Law**:
-
-$$a_i = x_i$$
-
-where:
-
-- $a_i$ is the thermodynamic activity of component $i$
-- $x_i$ is the mole fraction of component $i$
-
-Raoult's Law assumes that all molecular interactions (solute-solute, solvent-solvent, and solute-solvent) are equivalent. This holds true only for:
-
-- Dilute solutions
-- Mixtures of very similar molecules (e.g., isotopes)
-- Ideal gases
-
-For organic-water mixtures in aerosols, Raoult's Law is rarely valid because organic molecules and water have very different properties.
-
-## Activity Coefficients
-
-Real mixtures deviate from ideal behavior, and we quantify this deviation using the **activity coefficient** $\gamma_i$:
-
-$$a_i = \gamma_i \cdot x_i$$
-
-The activity coefficient captures all non-ideal effects:
-
-- **$\gamma_i = 1$**: Ideal behavior (Raoult's Law)
-- **$\gamma_i > 1$**: Positive deviation (repulsive interactions, higher volatility)
-- **$\gamma_i < 1$**: Negative deviation (attractive interactions, lower volatility)
-
-For organic-water mixtures, activity coefficients can vary significantly with composition and temperature, making accurate models essential for aerosol thermodynamics.
-
-## Binary Activity Thermodynamics (BAT) Model
-
-The **Binary Activity Thermodynamics (BAT)** model provides a computationally efficient approach to estimate activity coefficients for organic-water mixtures. Developed by Gorkowski et al. (2019), the BAT model uses fits derived from the comprehensive AIOMFAC thermodynamic model.
-
-### Key Features
-
-The BAT model:
-
-1. **Reduces complexity**: Instead of computing detailed molecular interactions, BAT uses empirical fits based on the oxygen-to-carbon (O:C) ratio
-2. **Covers realistic ranges**: Valid for O:C ratios from 0 to 2, covering most atmospheric organics
-3. **Captures phase separation**: Predicts when mixtures separate into distinct liquid phases
-
-### Model Inputs
-
-The BAT model requires:
-
-| Parameter | Description | Typical Range |
-|-----------|-------------|---------------|
-| `molar_mass_ratio` | Ratio of water to organic molecular weight | 0.05 - 0.5 |
-| `organic_mole_fraction` | Mole fraction of organic in mixture | 0 - 1 |
-| `oxygen2carbon` | Oxygen-to-carbon ratio of organic | 0 - 2 |
-| `density` | Mixture density | 1000 - 2000 kg/m^3 |
+The mole-fraction activity of species $i$ is $a_i=x_i\gamma_i$, referenced to the pure liquid at the same temperature. Ideal mixing gives $\gamma_i=1$. The Binary Activity Thermodynamics (BAT) model describes departures from ideality using a fit to the excess molar Gibbs energy. Composition varies along one coordinate for each fixed water–organic pair. The organic descriptors include molar mass, organic density, O:C and, where applicable, functional-group translation. The original fit used AIOMFAC calculations at 298.15 K. Particula's binary activity function takes no temperature argument. Temperature still enters the pure-component vapor pressure and curvature correction. [Gorkowski, Preston and Zuend (2019), sections 3.1–3.3](https://acp.copernicus.org/articles/19/13383/2019/)
 
 ### Mathematical Formulation
 
@@ -88,79 +30,25 @@ $$a_w = \gamma_w \cdot (1 - x_{org})$$
 
 $$a_{org} = \gamma_{org} \cdot x_{org}$$
 
-### Fit Coefficients
+## BAT and κ in a kinetic simulation
 
-The BAT model uses three sets of fit coefficients depending on the O:C ratio:
+The κ formulation parameterizes water uptake through hygroscopicity and dry volume. For one dry component, the usual volume relation is $a_w=V_w/(V_w+\kappa V_{dry})$. BAT supplies both water and organic activities from the same binary composition. Choose the activity model according to the known material properties and the species whose vapor flux is needed. [Petters and Kreidenweis (2007)](https://doi.org/10.5194/acp-7-1961-2007)
 
-| O:C Range | Fit Set | Description |
-|-----------|---------|-------------|
-| Low (< 0.3) | `G19_FIT_LOW` | Hydrophobic organics |
-| Mid (0.3 - 0.6) | `G19_FIT_MID` | Moderately oxygenated |
-| High (> 0.6) | `G19_FIT_HIGH` | Highly oxygenated organics |
+For an ideal vapor above a spherical liquid droplet, write the equilibrium **surface** partial pressure as
 
-These coefficients are interpolated smoothly to provide continuous predictions across the full O:C range.
+$$p_{i,s}=a_i\,p_i^{sat}(T)\,K_i(r,T),$$
 
-## Activity Calculation Flow
+where $K_i$ is the Kelvin factor from the selected surface model. At a common temperature, a positive $p_{i,gas}-p_{i,s}$ drives condensation and a negative difference drives evaporation. The kinetic transport law sets the rate. The solver updates the masses and reevaluates activity at the new composition. Each particle can therefore have a different $a_w$ in the same ambient RH.
 
-The following diagram shows how particula calculates activities using the BAT model:
+For example, at 90% RH a particle with $a_w=0.85$ has an inward water driving force in the flat-surface limit. A sufficiently large curvature correction ($K_w>0.90/0.85$) reverses the sign. Equality $\mathrm{RH}/100=a_w K_w$ describes zero net water flux under these assumptions. In a standalone equilibrium calculation one can instead prescribe water activity and solve for the compatible composition. [Equilibria theory](equilibria-theory.md)
 
-```mermaid
-flowchart TD
-    A[Input: Mass Fractions, O:C, Density] --> B[Convert to Mole Fractions]
-    B --> C{Activity Model}
-    C -->|Ideal| D["a = x (Raoult's Law)"]
-    C -->|BAT Model| E[Compute Gibbs Mixing Weights]
-    E --> F[Calculate gamma from BAT Coefficients]
-    F --> G["a = gamma × x"]
-    D --> H[Activity Values]
-    G --> H
-    H --> I[Use in Partitioning/Equilibria]
-```
+## Single liquids and miscibility gaps
 
-## Gibbs Free Energy and Thermodynamics
+A homogeneous activity curve can pass through compositions where two liquids are thermodynamically favored. The coexistence compositions have equal water activities and equal organic activities across phases. In a binary equilibrium calculation, a common tangent to the molar Gibbs energy gives the two endpoints, and the overall mole fraction determines their molar proportions by the lever rule. Between the endpoints, evaluating the homogeneous curve at the bulk composition gives a different physical state. Using coexistence activities in a kinetic droplet model also assumes internal redistribution is fast on the timescale of vapor exchange. Surface composition and internal transport require additional treatment when this assumption fails. [BAT paper, Fig. 3 and section 4](https://acp.copernicus.org/articles/19/13383/2019/)
 
-The activity coefficient is fundamentally connected to the **Gibbs free energy of mixing** ($\Delta G_{mix}$), which describes the thermodynamic driving force for mixing:
+## Evaluating the binary function
 
-$$\Delta G_{mix} = RT \sum_i x_i \ln(a_i)$$
-
-For an ideal mixture:
-
-$$\Delta G_{mix}^{ideal} = RT \sum_i x_i \ln(x_i)$$
-
-The **excess Gibbs energy** captures non-ideal contributions:
-
-$$G^E = \Delta G_{mix} - \Delta G_{mix}^{ideal} = RT \sum_i x_i \ln(\gamma_i)$$
-
-The BAT model parameterizes $G^E$ using empirical fits, allowing efficient computation of activity coefficients without solving complex molecular interaction equations.
-
-## Functional Group Corrections
-
-Some organic compounds with specific functional groups (alcohols, carboxylic acids, ethers) behave differently than predicted by O:C ratio alone. The BAT model can optionally apply **OH-equivalent corrections** to account for these effects:
-
-```python
-from particula.activity import bat_activity_coefficients
-
-# With functional group correction
-a_w, a_org, m_w, m_org, g_w, g_org = bat_activity_coefficients(
-    molar_mass_ratio=0.09,
-    organic_mole_fraction=0.3,
-    oxygen2carbon=0.4,
-    density=1400.0,
-    functional_group="alcohol",  # Optional correction
-)
-```
-
-This converts the functional group information to an OH-equivalent form before computing activities.
-
-## Implementation in Particula
-
-The BAT activity calculations are implemented in the `particula.activity` module:
-
-| Function | Purpose |
-|----------|---------|
-| `bat_activity_coefficients()` | Main entry point for BAT calculations |
-| `gibbs_mix_weight()` | Computes Gibbs mixing weights |
-| `coefficients_c()` | Applies BAT fit coefficients |
+The functional API returns both activities, both mass fractions and both activity coefficients. The existing particle strategy `ActivityNonIdealBinary.activity()` returns organic activity. For direct evaluation of particle-phase water activity use the first output below. At fixed organic properties these same two activity curves can be tabulated against $x_o$. Off-grid errors matter especially near zero net flux, where a small surface-pressure error can change the sign of growth.
 
 ### Example Usage
 
@@ -183,10 +71,6 @@ print(f"Water activity coefficient: {gamma_water:.3f}")
 print(f"Organic activity coefficient: {gamma_organic:.3f}")
 ```
 
-## References
+## Reference implementation
 
-Gorkowski, K., Preston, T. C., & Zuend, A. (2019). Relative-humidity-dependent organic aerosol thermodynamics via an efficient reduced-complexity model. *Atmospheric Chemistry and Physics*, 19(19), 13383-13407. [https://doi.org/10.5194/acp-19-13383-2019](https://doi.org/10.5194/acp-19-13383-2019)
-
----
-
-**Next**: [Equilibria Theory](equilibria-theory.md) - Learn how activities are used in gas-particle partitioning calculations.
+Gorkowski, K., Preston, T. C., and Zuend, A. (2019). Relative-humidity-dependent organic aerosol thermodynamics via an efficient reduced-complexity model. *Atmospheric Chemistry and Physics*, 19, 13383–13407. The authors provide the original MATLAB implementation and study data for checking direct activity calculations. [Paper](https://doi.org/10.5194/acp-19-13383-2019) · [Supplement](https://doi.org/10.5194/acp-19-13383-2019-supplement) · [Model and data](https://github.com/Gorkowski/Binary_Activity_Thermodynamics_Model)

@@ -366,15 +366,15 @@ result = partitioning.solve(
 1. **Match model to system**: Use ideal strategies for simple mixtures, kappa for inorganic hygroscopic aerosols, and BAT for organic-water systems
 2. **Use builder validation**: Set parameters through builders to ensure unit conversion and validity checks
 3. **Check finite, nonnegative activities**: Non-ideal activity can exceed one; do not clip it to a mole-fraction bound.
-4. **Consider temperature effects**: The BAT model includes temperature-dependent parameters; ensure consistency
+4. **Consider temperature effects**: The BAT coefficients were fitted at 298.15 K. Specify the temperature used for vapor pressure separately
 5. **Validate with experiments**: Compare model predictions against measured hygroscopic growth or partitioning data
 6. **Use consistent units**: Mass concentrations are expected in kg/m^3; use builders for automatic conversion
 
 ## Limitations
 
-- **Binary organic-water only**: `ActivityNonIdealBinary` assumes a binary organic-water system; multi-organic mixtures use mean properties
+- **Binary organic-water only**: `ActivityNonIdealBinary` assumes a binary organic-water system. Its output is organic activity. Use the binary function for both species activities
 - **No solid-liquid equilibria**: Current strategies handle liquid-vapor systems only
-- **Temperature range**: BAT model parameters are optimized for ambient temperatures (250-310 K)
+- **Temperature range**: The published fit uses 298.15 K training data. See [activity theory](../../theory/thermodynamics/activity-theory.md) for temperature assumptions
 - **Kappa model assumptions**: Assumes volume additivity and spherical particles
 
 ## Related Documentation

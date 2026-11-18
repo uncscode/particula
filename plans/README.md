@@ -28,13 +28,13 @@ AIOMFAC activity is a separate follow-on; viscosity remains deferred.
 | 1 | [Scientific correctness and verification](stage-01-scientific-correctness.md) | Correct known defects and establish independent reference cases and accuracy boundaries. |
 | 2A | [Numerical integration and process splitting](stage-02a-numerical-integration.md) | Supported CPU/GPU stepping choices with measured accuracy, error control, and explicit process ordering. |
 | 2B | [Simulation workflow and reproducibility](stage-02b-simulation-workflow.md) | Convenient run, record, save, plot, and restart workflows with explicit scientific inputs. |
-| 3A | [Thermodynamics and additional physics](stage-03a-thermodynamics.md) | First connect existing thermodynamic capabilities; select further physics from demonstrated research needs. |
+| 3A | [Thermodynamics and additional physics](stage-03a-thermodynamics.md) | Add binary BAT activities to kinetic condensation on CPU and resident GPU, starting with homogeneous droplets. |
 | 3B | [Scientific and experimental comparisons](stage-03b-scientific-comparisons.md) | Reproduce selected published results and compare predictions with independent measurements. |
 | 4 | [GPU scientific usefulness and reliability](stage-04-gpu-qualification.md) | Establish reliable acceleration of complete scientific workloads at comparable accuracy. |
 | 5 | [Inverse modeling and automatic differentiation](stage-05-inverse-modeling.md) | Recover supported initial-state quantities with tested inference and gradient methods. |
 | 6 | [Configurable chemistry model](stage-06-chemistry-model.md) | Bind reactions to user species with shared CPU/GPU configuration, then qualify gas, particle, and coupled chemistry. |
 
-Next, define Stage 3A's bounded thermodynamic case and screen Stage 3B comparison
+Next, qualify Stage 3A’s homogeneous binary BAT case and screen Stage 3B comparison
 candidates. Stage 3A owns native thermodynamic coupling; Stage 3B owns data,
 observation mapping and comparison. Case selection can inform 3A without
 requiring a completed study first. A comparison using current supported physics
