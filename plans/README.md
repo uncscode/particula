@@ -17,8 +17,7 @@ Stages 1, 2A and 2B are merged through
 [PR #1660](https://github.com/uncscode/particula/pull/1660), respectively, with
 [cloud/droplet integration examples](stage-02-cloud-droplet-examples.md) now
 qualified and published, including the full resident CUDA reruns.
-Stages 3–6 remain proposed. The revised Stage 3 plans separate an existing-model
-thermodynamics milestone (3A) from one published-study comparison (3B).
+Stage 3A has a qualified homogeneous BAT implementation on its delivery branch. Stage 3B covers one published-study comparison. Stages 4–6 remain proposed.
 AIOMFAC activity is a separate follow-on; viscosity remains deferred.
 
 ## Staged development
@@ -34,12 +33,10 @@ AIOMFAC activity is a separate follow-on; viscosity remains deferred.
 | 5 | [Inverse modeling and automatic differentiation](stage-05-inverse-modeling.md) | Recover supported initial-state quantities with tested inference and gradient methods. |
 | 6 | [Configurable chemistry model](stage-06-chemistry-model.md) | Bind reactions to user species with shared CPU/GPU configuration, then qualify gas, particle, and coupled chemistry. |
 
-Next, qualify Stage 3A’s homogeneous binary BAT case and screen Stage 3B comparison
-candidates. Stage 3A owns native thermodynamic coupling; Stage 3B owns data,
-observation mapping and comparison. Case selection can inform 3A without
-requiring a completed study first. A comparison using current supported physics
-can proceed independently; one requiring new coupling depends only on that
-specific qualified capability. No external study has been selected yet.
+The [Stage 3A validation record](../docs/contribute/validation/thermodynamics/bat-activity.md)
+tracks direct BAT verification, CPU/CUDA transfer, capture, restart and phase
+limits. Stage 3B owns comparison data, observation mapping and independent
+reproduction. Its separate branch carries the citric-acid study.
 
 Stage 4 owns the broader GPU workload qualification campaign. CUDA correctness
 checks belong in every earlier plan that changes GPU behavior. Stage 5 depends

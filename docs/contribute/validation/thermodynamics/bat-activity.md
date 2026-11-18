@@ -55,3 +55,12 @@ At the direct CPU zero-flux composition, the absolute pressure error for each ma
 ## Standalone equilibrium helpers
 
 Descending activity sweeps now retain the six physical quantities in the same order as ascending sweeps, for both homogeneous and split branches. The outer result supports named fields and existing three-value unpacking. In the optional density-estimation path, the inverse of the water/organic molar-mass ratio now returns the organic molar mass by division. A ratio of 0.5 with a water reference of 18.01528 g/mol gives 36.03056 g/mol. Standalone partitioning with explicitly supplied densities avoids that conversion. The VBS solver and optimizer are unchanged.
+
+## Repository qualification
+
+On the Stage 3A checkout at `47e7dd392b`, the standard package suite
+(`python -m pytest -q -Werror -m "not slow and not performance"`) reported
+11,069 passes, 26 skips, 65 deselections and one expected failure with CUDA
+available. Package Ruff checks and formatting passed, and mypy reported no
+issues across 699 source files. The humidity-pulse and native activity/equilibria
+example checks passed (8 tests), and the Astro site build and link audit passed.
