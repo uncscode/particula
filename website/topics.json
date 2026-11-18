@@ -2206,6 +2206,37 @@
       "start_here": true
     },
     {
+      "source": "docs/guide/processes/ccn-retrieval.md",
+      "title": "Design a size-resolved CCN experiment",
+      "topic": "activity-kappa",
+      "also": [
+        "activity-nonideal",
+        "condensation-reservoirs"
+      ],
+      "role": "Guide",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/thermodynamics/activity/ccn_kappa_retrieval.py",
+      "title": "Fit hygroscopicity to an activation measurement",
+      "topic": "activity-kappa",
+      "also": [
+        "activity-nonideal"
+      ],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/contribute/validation/thermodynamics/ccn-retrieval.md",
+      "title": "CCN retrieval study",
+      "topic": "verification-scientific",
+      "also": [
+        "activity-kappa"
+      ],
+      "role": "Contribute",
+      "start_here": false
+    },
+    {
       "source": "docs/guide/processes/activity.md",
       "title": "Activity System",
       "topic": "activity",

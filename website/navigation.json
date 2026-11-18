@@ -134,6 +134,10 @@
             "slug": "guide/processes/activity"
           },
           {
+            "label": "Design a size-resolved CCN experiment",
+            "slug": "guide/processes/ccn-retrieval"
+          },
+          {
             "label": "Coagulation Strategy System",
             "slug": "guide/processes/coagulation"
           },
@@ -532,6 +536,10 @@
               {
                 "label": "Citric acid droplet hygroscopicity",
                 "slug": "examples/thermodynamics/activity/citric_acid_hygroscopicity"
+              },
+              {
+                "label": "Fit hygroscopicity to an activation measurement",
+                "slug": "examples/thermodynamics/activity/ccn_kappa_retrieval"
               },
               {
                 "label": "BAT Model Activity Example",
@@ -1083,6 +1091,10 @@
           {
             "label": "Cloud activation in the BAT publication",
             "slug": "contribute/validation/thermodynamics/bat-ccn"
+          },
+          {
+            "label": "CCN retrieval study",
+            "slug": "contribute/validation/thermodynamics/ccn-retrieval"
           },
           {
             "label": "Numerical methods",
