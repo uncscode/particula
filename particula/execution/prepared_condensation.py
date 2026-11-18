@@ -1,6 +1,6 @@
 """Host-side condensation capability checks and retained GPU compilation.
 
-The direct solver has four equal substeps, one activity-corrected material,
+The direct solver has four equal substeps, material activity corrections,
 and a mixture Kelvin density. Admit only CPU configuration that can be
 represented by those controls; do not discard unsupported strategy choices.
 """
@@ -12,6 +12,7 @@ from dataclasses import replace
 
 import numpy as np
 
+from particula.execution._bat_table import _binary_activity_table
 from particula.execution.preparation_context import BuiltinPreparationContext
 from particula.execution.prepared_processes import _ProcessPlan
 
@@ -122,14 +123,25 @@ def _surface_plan(surface, particles):
 
 
 def _activity_plan(activity, particles, gas, pairs, vapor):  # noqa: C901
-    """Require one participating volatile material lane."""
+    """Translate material activities to the direct solver configuration."""
     from particula.particles.activity_strategies import (
+        ActivityBAT,
         ActivityIdealMass,
         ActivityIdealMolar,
         ActivityIdealVolume,
         ActivityKappaParameter,
     )
 
+    if type(activity) is ActivityBAT:
+        if particles.n_species != 2:
+            raise ValueError("BAT requires [water, organic] material order")
+        return (
+            2,
+            0,
+            (0.0, 0.0),
+            (0.01801528, activity.molar_mass_kg),
+            tuple(_binary_activity_table(activity).tolist()),
+        )
     if type(activity) not in (
         ActivityIdealMass,
         ActivityIdealMolar,
@@ -195,6 +207,7 @@ def _activity_plan(activity, particles, gas, pairs, vapor):  # noqa: C901
         water,
         tuple(float(x) for x in kappas),
         tuple(float(x) for x in references),
+        None,
     )
 
 
@@ -239,7 +252,7 @@ def plan_condensation(
     tensions, surface_mode, kelvin_density = _surface_plan(
         strategy.surface_strategy, aerosol.particles
     )
-    activity_mode, water, kappas, references = _activity_plan(
+    activity_mode, water, kappas, references, bat_table = _activity_plan(
         strategy.activity_strategy, aerosol.particles, aerosol.gas, pairs, vapor
     )
     latent = None
@@ -279,6 +292,7 @@ def plan_condensation(
                 activity_mode=activity_mode,
                 water=water,
                 kappas=kappas,
+                **({"bat_table": bat_table} if bat_table is not None else {}),
                 references=references,
                 latent=latent,
             ).items()
@@ -332,6 +346,7 @@ def compile_condensation(
         config["water"],
         array(config["kappas"]),
         array(config["references"]),
+        array(config["bat_table"]) if "bat_table" in config else None,
     )
     resources = context.registry.acquire_condensation()
     species_binding = prepare_condensation_species_map(
@@ -345,9 +360,11 @@ def compile_condensation(
     profile = CondensationConfiguration(
         CondensationExecutionMode.EQUAL_STEP,
         config["latent"] is not None,
-        CondensationActivityMode.KAPPA
-        if config["activity_mode"]
-        else CondensationActivityMode.IDEAL,
+        (
+            CondensationActivityMode.IDEAL,
+            CondensationActivityMode.KAPPA,
+            CondensationActivityMode.BAT,
+        )[config["activity_mode"]],
         CondensationSurfaceMode.COMPOSITION_WEIGHTED
         if config["surface_mode"]
         else CondensationSurfaceMode.STATIC,

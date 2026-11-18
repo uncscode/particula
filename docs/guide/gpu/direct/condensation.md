@@ -16,7 +16,7 @@ preparation. Full-gas partitioning remains live device state.
 | Native quantity | Species order / units |
 |---|---|
 | Particle masses and work/total transfer | Full material order; kg per particle, `(boxes, slots, materials)` |
-| Activity kappas, reference molar masses and surface tension | Full material order; mapped reference masses must match the declared gas species |
+| Activity kappas, reference molar masses and surface tension | Full material order; ideal and κ references match mapped gas species, BAT references define binary composition |
 | Thermodynamics, accommodation, diffusion and latent/thermal arrays | Full gas order, including unused/nonpartitioning gas species |
 | Demand/release/scale scratch and energy output | Full gas width, `(boxes, gas_species)` |
 | Gas inventory coupling | kg/m³: transfer weighted by N/V for resolved counts, stored density for PMF |
@@ -183,9 +183,9 @@ and its [GPU thermodynamics and condensation refresh record](condensation-config
 
 | Selection/backend case | Contract |
 | --- | --- |
-| CPU semantic catalogue | All 36 equal-step/staggered, latent, activity, and surface semantic combinations are declared, including `NONREPRESENTABLE` categories. This is catalogue support only. |
+| CPU semantic catalogue | All 48 equal-step/staggered, latent, activity, and surface semantic combinations are declared, including `NONREPRESENTABLE` categories. This is catalogue support only. |
 | Selected CPU execution | The concrete adapter accepts declared catalogue metadata but does not bind it to the supplied runnable; it is isothermal only (`latent_heat=False`) and calls the caller-owned `MassCondensation` once. Equal-step or staggered semantics remain CPU-side. |
-| Selected Warp execution | Exactly 8 declared profiles: equal-step, latent heat enabled or disabled, ideal or kappa activity, and static or composition-weighted surface tension. Profile preflight requires enabled latent-heat storage, checks activity/surface mode selectors, and validates their particle-width arrays. Native species bindings validate exact carrier ownership separately. |
+| Selected Warp execution | Twelve declared profiles cover equal-step, latent heat enabled or disabled, ideal, κ or binary BAT activity, and static or composition-weighted surface tension. Profile preflight requires enabled latent-heat storage, checks activity/surface mode selectors, and validates their particle-width arrays. Native species bindings validate exact carrier ownership separately. |
 | Unavailable selected Warp mapping | Staggered/Gauss-Seidel and every `NONREPRESENTABLE`/BAT activity or surface mapping reject during capability-profile preflight before lazy kernel resolution, native dispatch, or adapter-driven writes; no conversion, approximation, or fallback occurs. |
 
 Warp delegation executes exactly four equal `time_step / 4.0` substeps. Each

@@ -45,7 +45,7 @@ the full collection of CPU strategies or direct GPU mechanism masks.
 
 | Family | Prepared support | Boundaries |
 | --- | --- | --- |
-| Condensation | `MassCondensation` with isothermal or latent-heat strategy | Native discrete or resolved populations; explicit species maps; supported ideal/Kappa activity and constant/Water Buck vapor-pressure models; four fixed equal GPU substeps. |
+| Condensation | `MassCondensation` with isothermal or latent-heat strategy | Native discrete or resolved populations; explicit species maps; supported ideal, κ and homogeneous binary BAT activities and constant/Water Buck vapor-pressure models; four fixed equal GPU substeps. |
 | Coagulation | `Coagulation` with Brownian, charged, SP2016 sedimentation, ST1956 shear, or their combined strategy | Particle-resolved, equal positive active counts, default interpolation controls; at most one of each mechanism. A charged strategy selects its fit; combining it explicitly with Brownian sums both terms. |
 | Dilution | `Dilution` with exact exponential strategy | Counts/densities and gas inventory decrease consistently; no volume change. |
 | Wall loss | `WallLoss` with spherical, rectangular or charged strategy | Particle-resolved; supported neutral/charged configuration is frozen at preparation; retired resolved slots retain the native raw-count semantics. |

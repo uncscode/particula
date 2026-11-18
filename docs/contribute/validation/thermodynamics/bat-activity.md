@@ -24,3 +24,20 @@ For O:C 0.25, the lower convex hull of the calculated molar mixing Gibbs energy 
 ## Adaptive GPU restart
 
 The adaptive checkpoint records the organic descriptors, the linear organic-mole-fraction interpolation convention and a SHA-256 digest of both activity columns in grid order (little-endian float64). The disk round trip on Warp CPU and CUDA reproduces the scaled state and controller exactly. Changing organic O:C rejects the saved checkpoint. The CUDA resident coupled test also covers both process orders with dilution, unchanged device buffers across the handoff, and a rejected table digest. These checks exercise the adaptive condensation paths.
+
+## Fixed-step transfer and table resolution
+
+For the 200 g/mol, O:C 0.5 miscible organic with density 1243.493333 kg/m³,
+preparation selects 513 equally spaced organic mole fractions. At 20,002
+independent uniform compositions including both endpoints, maximum absolute
+interpolation errors were 7.86e-6 for water and 2.85e-5 for organic activity.
+Using every other table entry (257 nodes) gave 3.06e-5 and 1.09e-4,
+respectively. Errors here compare the interpolation with direct Particula BAT.
+
+A separate two-volatile test uses two initial compositions, a reversed gas map
+and one inert gas. The four fixed substeps evaluate both activities at the
+current particle masses. Against direct CPU BAT, each nonzero particle mass
+increment agrees within 0.1% on both Warp CPU and CUDA. The test checks both
+species budgets for isothermal exchange with a composition-weighted surface
+and latent-heat exchange with a static surface. CUDA graph replay and resumed
+execution reproduce the uncaptured fixed-step checkpoint state exactly.

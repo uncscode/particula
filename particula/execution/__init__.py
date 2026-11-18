@@ -394,12 +394,14 @@ class CondensationActivityMode(str, Enum):
 
     Attributes:
         IDEAL: Ideal activity-coefficient semantics.
+        BAT: Homogeneous binary BAT activities for water and organic.
         KAPPA: Kappa activity-coefficient semantics.
         NONREPRESENTABLE: Semantics not representable by a profile.
     """
 
     IDEAL = "ideal"
     KAPPA = "kappa"
+    BAT = "bat"
     NONREPRESENTABLE = "nonrepresentable"
 
 
@@ -481,6 +483,7 @@ CONDENSATION_NO_LATENT_HEAT_CAPABILITY = Capability(
 CONDENSATION_IDEAL_ACTIVITY_CAPABILITY = Capability(
     "condensation_ideal_activity"
 )
+CONDENSATION_BAT_ACTIVITY_CAPABILITY = Capability("condensation_bat_activity")
 CONDENSATION_KAPPA_ACTIVITY_CAPABILITY = Capability(
     "condensation_kappa_activity"
 )
@@ -507,6 +510,7 @@ _CONDENSATION_LATENT_HEAT_CAPABILITIES = {
 }
 _CONDENSATION_ACTIVITY_CAPABILITIES = {
     CondensationActivityMode.IDEAL: CONDENSATION_IDEAL_ACTIVITY_CAPABILITY,
+    CondensationActivityMode.BAT: CONDENSATION_BAT_ACTIVITY_CAPABILITY,
     CondensationActivityMode.KAPPA: CONDENSATION_KAPPA_ACTIVITY_CAPABILITY,
     CondensationActivityMode.NONREPRESENTABLE: (
         CONDENSATION_NONREPRESENTABLE_ACTIVITY_CAPABILITY

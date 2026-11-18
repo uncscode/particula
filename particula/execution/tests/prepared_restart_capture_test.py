@@ -21,6 +21,7 @@ from particula.execution import SimulationCheckpoint
 from particula.execution.prepared import PreparedSimulation
 from particula.execution.tests.prepared_test import (
     condensation_case,
+    fixed_bat_case,
     nucleation_case,
 )
 from particula.particles import ParticleData
@@ -39,6 +40,9 @@ def device(request):
 
 def scenario(name):
     """Use nonzero physics and unequal particle/gas widths for every family."""
+    if name == "binary_bat":
+        initial, process = fixed_bat_case()
+        return initial, process, 1e-5
     if name == "condensation":
         initial, process = condensation_case(
             latent=True, kappa=True, weighted=True
@@ -96,6 +100,7 @@ def canonical_equal(left, right):
         "coagulation",
         "wall_loss",
         "condensation",
+        "binary_bat",
         "nucleation",
         "nucleation_resampling",
         "sequence",
@@ -243,6 +248,7 @@ def test_restart_rechecks_evolved_equal_count_capability(device, monkeypatch):
         "coagulation",
         "wall_loss",
         "condensation",
+        "binary_bat",
         "nucleation",
         "nucleation_resampling",
         "sequence",

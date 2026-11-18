@@ -16,6 +16,7 @@ from particula.aerosol import Aerosol
 from particula.dynamics.dilution import DilutionStrategy
 from particula.dynamics.particle_process import Dilution
 from particula.execution import (
+    CONDENSATION_BAT_ACTIVITY_CAPABILITY,
     CONDENSATION_CAPABILITY_MATRIX,
     CONDENSATION_COMPOSITION_WEIGHTED_SURFACE_CAPABILITY,
     CONDENSATION_EQUAL_STEP_CAPABILITY,
@@ -494,6 +495,7 @@ def _condensation_expected_requirements(
     }
     activity_capabilities = {
         CondensationActivityMode.IDEAL: CONDENSATION_IDEAL_ACTIVITY_CAPABILITY,
+        CondensationActivityMode.BAT: CONDENSATION_BAT_ACTIVITY_CAPABILITY,
         CondensationActivityMode.KAPPA: CONDENSATION_KAPPA_ACTIVITY_CAPABILITY,
         CondensationActivityMode.NONREPRESENTABLE: (
             CONDENSATION_NONREPRESENTABLE_ACTIVITY_CAPABILITY
@@ -535,9 +537,9 @@ def test_condensation_catalogue_maps_all_cpu_configurations() -> None:
         if declaration.device == CPU_CONDENSATION_PROFILE_DEVICE
     }
 
-    assert len(configurations) == 36
-    assert len(cpu_declarations) == 36
-    assert len(CONDENSATION_CAPABILITY_MATRIX.declarations) == 44
+    assert len(configurations) == 48
+    assert len(cpu_declarations) == 48
+    assert len(CONDENSATION_CAPABILITY_MATRIX.declarations) == 60
     assert all(
         len(entry.requirements.values) == 4
         for entry in CONDENSATION_CAPABILITY_MATRIX.declarations
@@ -565,6 +567,7 @@ def test_condensation_catalogue_maps_exact_warp_profile_rows() -> None:
         for activity in (
             CondensationActivityMode.IDEAL,
             CondensationActivityMode.KAPPA,
+            CondensationActivityMode.BAT,
         )
         for surface in (
             CondensationSurfaceMode.STATIC,
@@ -577,9 +580,9 @@ def test_condensation_catalogue_maps_exact_warp_profile_rows() -> None:
         if declaration.device == WARP_CONDENSATION_PROFILE_DEVICE
     }
 
-    assert len(configurations) == 8
-    assert len(warp_declarations) == 8
-    assert len(CONDENSATION_CAPABILITY_MATRIX.declarations) == 44
+    assert len(configurations) == 12
+    assert len(warp_declarations) == 12
+    assert len(CONDENSATION_CAPABILITY_MATRIX.declarations) == 60
     assert all(
         len(entry.requirements.values) == 4 for entry in warp_declarations
     )
