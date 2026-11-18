@@ -70,6 +70,7 @@ _CONFIGURATION_TYPES = (
     ac.ActivityIdealVolume,
     ac.ActivityKappaParameter,
     ac.ActivityNonIdealBinary,
+    ac.ActivityBAT,
     su.SurfaceStrategyMass,
     su.SurfaceStrategyMolar,
     su.SurfaceStrategyVolume,

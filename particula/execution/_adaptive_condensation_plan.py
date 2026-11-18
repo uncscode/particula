@@ -4,9 +4,12 @@ This profile is separate from the inventory-limited, four-substep prepared
 process. It retains every mapped material and the CPU surface phase law.
 """
 
+from hashlib import sha256
+
 import numpy as np
 
 from particula import _cpu_batch
+from particula.execution.cpu_configuration import condensation_identity
 from particula.execution.prepared_condensation import _vapor_plan, _vector
 from particula.execution.prepared_processes import _ProcessPlan
 from particula.particles.activity_strategies import (
@@ -41,6 +44,17 @@ def _binary_activity_table(activity):
         else:
             return table.ravel()
     raise ValueError("BAT activity table exceeded its interpolation budget")
+
+
+def adaptive_condensation_identity(strategy, bat_table=None):
+    """Identify the material laws and exact resident activity table."""
+    identity = condensation_identity(strategy)
+    if type(strategy.activity_strategy) is not ActivityBAT:
+        return identity
+    if bat_table is None:
+        bat_table = _binary_activity_table(strategy.activity_strategy)
+    digest = sha256(np.asarray(bat_table, dtype="<f8").tobytes()).hexdigest()
+    return (identity, "BAT-linear-organic-mole-fraction-v1", digest)
 
 
 def plan_adaptive_condensation(strategy, aerosol):  # noqa: C901

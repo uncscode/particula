@@ -175,6 +175,7 @@ class GPUCoupledSimulation:
         plan = _condensation_profile(
             aerosol, self._strategy, self.controls.method
         )
+        self._bat_table = plan.values["bat_table"]
         self._vapor = plan.values["vapor"]
         self._molar_mass = aerosol.gas.molar_mass.copy()
         if wp.get_device(device).is_capturing:

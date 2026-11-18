@@ -11,9 +11,11 @@ import numpy as np
 import warp as wp
 
 from particula import __version__, _cpu_batch
+from particula.execution._adaptive_condensation_plan import (
+    adaptive_condensation_identity,
+)
 from particula.execution.archive import read_archive, write_archive
 from particula.execution.checkpoint_io import _decode, _Encoder, _types
-from particula.execution.cpu_configuration import condensation_identity
 from particula.execution.cpu_simulation import pack_native, unpack_native
 from particula.execution.forcing import EnvironmentForcing, checkpoint_forcing
 from particula.execution.gpu_condensation_ode import GPUCondensationODE
@@ -70,7 +72,9 @@ def checkpoint_gpu_condensation(owner):
         _runtime(),
         _device_identity(owner.device),
         pack_native(owner._base),
-        condensation_identity(owner._strategy),
+        adaptive_condensation_identity(
+            owner._strategy, owner._plan.values["bat_table"]
+        ),
         owner._state.numpy().copy(),
         owner._host_scale.copy(),
         owner._rtol.numpy().copy(),
@@ -196,7 +200,7 @@ def _validate_controls(saved):
 def resume_gpu_condensation(saved, strategy, *, device):
     """Restore exact coordinates and controller on the same explicit device."""
     base, absolute = _validate(saved)
-    if condensation_identity(strategy) != saved.configuration:
+    if adaptive_condensation_identity(strategy) != saved.configuration:
         raise ValueError("condensation physics differs from checkpoint")
     target = wp.get_device(device)
     if _device_identity(target) != saved.device:
