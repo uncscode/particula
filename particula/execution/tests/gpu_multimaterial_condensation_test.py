@@ -223,3 +223,77 @@ def test_block_solve_matches_independent_dense_system(
         np.testing.assert_allclose(
             weights @ actual, weights @ rhs / q, rtol=2e-10, atol=2e-8
         )
+
+
+def test_bat_ros3_mass_jacobian_at_table_knots(device):
+    """Compare device slopes at knots and inside cells to host rate differences."""
+    from particula.particles import ActivityBAT
+
+    initial, strategy = material_case(2)
+    bat = ActivityBAT(0.2, 0.5, 1243.4933333333333)
+    strategy.activity_strategy = bat
+    molar = np.array([0.01801528, 0.2])
+    # Exact dyadic knots and interior points on the qualified 513-node grid.
+    x = np.array([0.125, 0.25, 0.5, 0.75, 180.25 / 512, 200.75 / 512])
+    initial.particles.masses[:, :6] = (
+        np.column_stack((1 - x, x)) * molar * 2e-14
+    )
+    owner = GPUCondensationODE(initial, strategy, device=device, method="ros3")
+    stages = owner._ros3
+    stages.linearize(owner)
+    local = stages.local.numpy().reshape(2, 7, 2, 2)
+    scales = owner._host_scale[: owner._mass_size].reshape(2, 7, 2)
+    table = np.array(owner._plan.values["bat_table"]).reshape((-1, 2))
+    grid = np.linspace(0, 1, len(table))
+    np.testing.assert_allclose(
+        grid[np.rint(x[:4] * (len(grid) - 1)).astype(int)], x[:4]
+    )
+
+    class InterpolatedBAT(ActivityBAT):
+        def activity(self, mass_concentration):
+            moles = np.asarray(mass_concentration) / molar
+            amount = moles.sum(axis=-1)
+            organic = np.divide(
+                moles[..., 1],
+                amount,
+                out=np.zeros_like(amount),
+                where=amount > 0,
+            )
+            values = np.stack(
+                [np.interp(organic, grid, col) for col in table.T], axis=-1
+            )
+            return np.where(amount[..., None] > 0, values, 0)
+
+    strategy.activity_strategy = InterpolatedBAT(0.2, 0.5, 1243.4933333333333)
+
+    def rates(view):
+        return strategy._native_mass_transfer_rate(
+            view.particles,
+            view.gas,
+            float(view.environment.temperature[0]),
+            float(view.environment.pressure[0]),
+        )
+
+    for box in range(2):
+        view = _cpu_batch.box_view(initial, box)
+
+        for column, (_, material) in enumerate(stages.pairs):
+            original = view.particles.masses.copy()
+            delta = 1e-7 * original.sum(axis=-1)
+            view.particles.masses[..., material] += delta
+            plus = rates(view)
+            view.particles.masses[..., material] -= 2 * delta
+            minus = rates(view)
+            view.particles.masses[:] = original
+            for row, (_, target) in enumerate(stages.pairs):
+                # CPU native rates are in mass per particle per second. ROS3
+                # stores derivatives of scaled rates against scaled masses.
+                slope = (plus[:6, target] - minus[:6, target]) / (
+                    2 * delta[0, :6]
+                )
+                expected = (
+                    slope * scales[box, :6, material] / scales[box, :6, target]
+                )
+                np.testing.assert_allclose(
+                    local[box, :6, row, column], expected, rtol=2e-5, atol=1e-8
+                )

@@ -10,6 +10,7 @@ from that comparison to water uptake and condensed organic mass.
 | How does mass become a mole-fraction activity? | [Ideal activity](ideal_activity_example.py) | A two-component reference and partial-pressure calculation |
 | How does a solute's κ affect water activity? | [κ activity](kappa_activity_example.py) | A salt-like example and a separate generic parameter sweep |
 | How far can organic activity depart from ideal mixing? | [BAT activity](bat_activity_example.py) | A fixed-descriptor binary mixture at three compositions |
+| How does a droplet respond when the water vapor changes? | [Binary BAT humidity pulse](bat_humidity_pulse.py) | Matched CPU and captured CUDA wetting and drying trajectories |
 | How do these approaches fit together? | [Activity model walkthrough](activity_tutorial.py) | Matched-component comparisons, water uptake, and partitioning |
 | How does activity enter an equilibrium mass calculation? | [Equilibrium partitioning](equilibria_example.py) | Three low-volatility surrogates and a water-activity sweep |
 
