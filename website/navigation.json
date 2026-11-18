@@ -530,6 +530,10 @@
                 "slug": "examples/thermodynamics/activity/activity_tutorial"
               },
               {
+                "label": "Citric acid droplet hygroscopicity",
+                "slug": "examples/thermodynamics/activity/citric_acid_hygroscopicity"
+              },
+              {
                 "label": "BAT Model Activity Example",
                 "slug": "examples/thermodynamics/activity/bat_activity_example"
               },
@@ -1099,6 +1103,10 @@
               {
                 "label": "Binary BAT reference checks",
                 "slug": "contribute/validation/thermodynamics/bat-activity"
+              },
+              {
+                "label": "Citric acid droplet hygroscopicity",
+                "slug": "contribute/validation/thermodynamics/citric-acid-comparison"
               },
               {
                 "label": "Scientific correctness reference baseline",

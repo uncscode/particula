@@ -1906,6 +1906,14 @@
       "start_here": true
     },
     {
+      "source": "docs/examples/thermodynamics/activity/citric_acid_hygroscopicity.py",
+      "title": "Citric acid droplet hygroscopicity",
+      "topic": "activity-nonideal",
+      "also": [],
+      "role": "Examples",
+      "start_here": true
+    },
+    {
       "source": "docs/examples/thermodynamics/activity/bat_humidity_pulse.py",
       "title": "Water uptake and evaporation after a humidity pulse",
       "topic": "activity-nonideal",
@@ -2392,6 +2400,16 @@
     {
       "source": "docs/contribute/validation/thermodynamics/bat-activity.md",
       "title": "Binary BAT reference checks",
+      "topic": "verification-scientific",
+      "also": [
+        "activity-nonideal"
+      ],
+      "role": "Contribute",
+      "start_here": false
+    },
+    {
+      "source": "docs/contribute/validation/thermodynamics/citric-acid-comparison.md",
+      "title": "Citric acid droplet hygroscopicity",
       "topic": "verification-scientific",
       "also": [
         "activity-nonideal"
