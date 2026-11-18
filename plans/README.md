@@ -1,6 +1,6 @@
 # Particula development plans
 
-Updated: 2026-11-16. Status: staged development and delivery tracking.
+Updated: 2026-11-17. Status: staged development and delivery tracking.
 
 These eight plans organize the next development work into six stages. The
 previous six plans are completed and retired; they are removed rather than
@@ -11,13 +11,15 @@ results, practical research workflows, useful acceleration, and reproducible
 inference. Stage numbers indicate the intended order of major outcomes, not a
 requirement to stop all other work until an entire stage is finished.
 
-Stage 1 is delivered in PR #1658; Stage 2A is merged through
-[PR #1659](https://github.com/uncscode/particula/pull/1659). Stage 2B is published in
-[PR #1660](https://github.com/uncscode/particula/pull/1660) against `main`, with
+Stages 1, 2A and 2B are merged through
+[PR #1658](https://github.com/uncscode/particula/pull/1658),
+[PR #1659](https://github.com/uncscode/particula/pull/1659), and
+[PR #1660](https://github.com/uncscode/particula/pull/1660), respectively, with
 [cloud/droplet integration examples](stage-02-cloud-droplet-examples.md) now
-qualified and published, including the full resident CUDA reruns. Current
-review readiness and hosted checks are recorded in the linked PRs.
-Stages 3–6 remain proposed.
+qualified and published, including the full resident CUDA reruns.
+Stages 3–6 remain proposed. The revised Stage 3 plans separate an existing-model
+thermodynamics milestone (3A) from one published-study comparison (3B).
+AIOMFAC activity is a separate follow-on; viscosity remains deferred.
 
 ## Staged development
 
@@ -32,10 +34,12 @@ Stages 3–6 remain proposed.
 | 5 | [Inverse modeling and automatic differentiation](stage-05-inverse-modeling.md) | Recover supported initial-state quantities with tested inference and gradient methods. |
 | 6 | [Configurable chemistry model](stage-06-chemistry-model.md) | Bind reactions to user species with shared CPU/GPU configuration, then qualify gas, particle, and coupled chemistry. |
 
-Stage 2A and 2B can proceed together once a small Stage 1 reference set exists.
-Select Stage 3 comparison cases early so they guide both efforts. Stage 3A's
-initial thermodynamics integration and Stage 3B's comparisons can also proceed
-together; a case using current physics need not wait for new chemistry.
+Next, define Stage 3A's bounded thermodynamic case and screen Stage 3B comparison
+candidates. Stage 3A owns native thermodynamic coupling; Stage 3B owns data,
+observation mapping and comparison. Case selection can inform 3A without
+requiring a completed study first. A comparison using current supported physics
+can proceed independently; one requiring new coupling depends only on that
+specific qualified capability. No external study has been selected yet.
 
 Stage 4 owns the broader GPU workload qualification campaign. CUDA correctness
 checks belong in every earlier plan that changes GPU behavior. Stage 5 depends
