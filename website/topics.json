@@ -1906,6 +1906,14 @@
       "start_here": true
     },
     {
+      "source": "docs/examples/thermodynamics/activity/bat_humidity_pulse.py",
+      "title": "Water uptake and evaporation after a humidity pulse",
+      "topic": "activity-nonideal",
+      "also": ["condensation-reservoirs"],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
       "source": "docs/examples/thermodynamics/activity/equilibria_example.py",
       "title": "Separate water uptake from organic partitioning",
       "topic": "partitioning",

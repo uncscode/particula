@@ -534,6 +534,10 @@
                 "slug": "examples/thermodynamics/activity/bat_activity_example"
               },
               {
+                "label": "Binary BAT humidity pulse",
+                "slug": "examples/thermodynamics/activity/bat_humidity_pulse"
+              },
+              {
                 "label": "Equilibria Partitioning Example",
                 "slug": "examples/thermodynamics/activity/equilibria_example"
               },

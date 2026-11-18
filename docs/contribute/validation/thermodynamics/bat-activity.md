@@ -41,3 +41,11 @@ increment agrees within 0.1% on both Warp CPU and CUDA. The test checks both
 species budgets for isothermal exchange with a composition-weighted surface
 and latent-heat exchange with a static surface. CUDA graph replay and resumed
 execution reproduce the uncaptured fixed-step checkpoint state exactly.
+
+## Humidity reversal and ROS3 derivatives
+
+The [humidity-pulse example](../../../examples/thermodynamics/activity/bat_humidity_pulse.py) uses a finite water reservoir and an involatile organic.
+At 293 K the captured CUDA run grew from 1.04745 to 1.17604 µm during wetting. Replacing vapor at 80 ms set the gas to 35% RH and the particle dried to 1.02582 µm by 160 ms.
+Across all 66 observations, the maximum radius difference from the directly evaluated CPU run at the same outer step (156.25 µs) was 0.00018%. Against CPU with the outer step halved it was 0.0215%. Within-leg CUDA water-budget residuals stayed below 2.65e-17 kg/m³ (maximum observed, rounded). Execution used cuda:0: NVIDIA GeForce RTX 5060 and the saved manifest identifies the source revision.
+
+ROS3 finite differences can straddle a table knot, where the linear interpolant has distinct one-sided slopes. A separate derivative regression compares the device's scaled local mass Jacobian with centered differences of the CPU kinetic rates using independent NumPy interpolation. It covers both exchanged materials at four exact grid knots and two points inside cells on Warp CPU and CUDA. The test uses relative tolerance 2e-5 and absolute tolerance 1e-8 s⁻¹.
