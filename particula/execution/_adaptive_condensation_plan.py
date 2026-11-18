@@ -10,6 +10,7 @@ from particula import _cpu_batch
 from particula.execution.prepared_condensation import _vapor_plan, _vector
 from particula.execution.prepared_processes import _ProcessPlan
 from particula.particles.activity_strategies import (
+    ActivityBAT,
     ActivityIdealMass,
     ActivityIdealMolar,
     ActivityIdealVolume,
@@ -20,6 +21,26 @@ from particula.particles.surface_strategies import (
     SurfaceStrategyMolar,
     SurfaceStrategyVolume,
 )
+
+
+def _binary_activity_table(activity):
+    """Tabulate both activities on a uniform organic mole-fraction grid."""
+    molar = np.array([0.01801528, activity.molar_mass_kg])
+
+    def evaluate(x):
+        return activity.activity(np.column_stack((1.0 - x, x)) * molar)
+
+    for power in range(8, 17):
+        grid = np.linspace(0.0, 1.0, 2**power + 1)
+        table = evaluate(grid)
+        for fraction in (0.25, 0.5, 0.75):
+            probe = grid[:-1] + fraction / (len(grid) - 1)
+            interpolated = table[:-1] + fraction * np.diff(table, axis=0)
+            if not np.all(np.abs(evaluate(probe) - interpolated) <= 1e-4):
+                break
+        else:
+            return table.ravel()
+    raise ValueError("BAT activity table exceeded its interpolation budget")
 
 
 def plan_adaptive_condensation(strategy, aerosol):  # noqa: C901
@@ -45,10 +66,17 @@ def plan_adaptive_condensation(strategy, aerosol):  # noqa: C901
     kappas = np.zeros(width)
     water = 0
     mode = 0
+    bat_table = np.zeros(0)
     if type(activity) in (ActivityIdealMolar, ActivityKappaParameter):
         references = _vector(
             activity.molar_mass, width, "activity molar mass", positive=True
         )
+    elif type(activity) is ActivityBAT:
+        if width != 2:
+            raise ValueError("BAT requires exactly two particle materials")
+        references = np.array([0.01801528, activity.molar_mass_kg])
+        bat_table = _binary_activity_table(activity)
+        mode = 2
     elif type(activity) is ActivityIdealVolume:
         references = _vector(
             activity.density, width, "activity density", positive=True
@@ -116,6 +144,7 @@ def plan_adaptive_condensation(strategy, aerosol):  # noqa: C901
         activity_mode=mode,
         water=int(water),
         kappas=kappas,
+        bat_table=bat_table,
         references=references,
         activity_density=activity_density,
     )

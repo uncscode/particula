@@ -22,6 +22,7 @@ from particula.particles.distribution_factories import (
     DistributionFactory,
 )
 from particula.particles.activity_strategies import (
+    ActivityBAT,
     ActivityIdealMass,
     ActivityIdealMolar,
     ActivityKappaParameter,

@@ -220,6 +220,7 @@ class GPUCondensationODE:
         self._surface_reference = self._array(config["surface_reference"])
         self._phases = self._array(config["phases"], wp.int32)
         self._activity_density = self._array(config["activity_density"])
+        self._bat_table = self._array(config["bat_table"])
         self._kappas = self._array(config["kappas"])
         self._references = self._array(config["references"])
         self._accommodation = self._array(config["accommodation"])
@@ -349,6 +350,7 @@ class GPUCondensationODE:
                 self._references,
                 self._activity_density,
                 self._kappas,
+                self._bat_table,
                 wp.int32(config["activity_mode"]),
                 wp.int32(config["water"]),
                 self._accommodation,

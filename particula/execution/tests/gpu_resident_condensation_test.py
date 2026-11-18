@@ -145,3 +145,42 @@ def test_empty_resident_population_retains_gas(cuda, method):
     np.testing.assert_array_equal(
         actual.particles.masses, initial.particles.masses
     )
+
+
+@pytest.mark.parametrize("method", ["rk23", "ros3"])
+def test_binary_bat_resident_against_direct_cpu(cuda, method):
+    """Tabulated material pressures drive a conservative kinetic trajectory."""
+    from particula.execution.condensation_ode import CondensationODE
+    from particula.particles import ActivityBAT
+
+    initial, strategy = material_case(2)
+    strategy.activity_strategy = ActivityBAT(0.2, 0.5, 1400.0)
+    controls = dict(rtol=1e-7, particle_atol=1e-27, gas_atol=1e-16)
+    gpu = GPUResidentCondensation(
+        initial, strategy, method=method, device=cuda, **controls
+    )
+    cpu = CondensationODE(initial, strategy, method="rk23", **controls)
+    for end in (0.001, 0.01):
+        gpu.advance(end)
+        got = gpu.snapshot()
+        ref = advance(cpu, end)
+        np.testing.assert_allclose(
+            got.particles.radii, ref.particles.radii, rtol=1e-3
+        )
+        np.testing.assert_array_equal(
+            got.gas.concentration[:, 1], initial.gas.concentration[:, 1]
+        )
+        for source, target in strategy.species_map.gas_to_particle:
+            np.testing.assert_allclose(
+                got.gas.concentration[:, source]
+                + got.particles.species_mass_density[:, target],
+                initial.gas.concentration[:, source]
+                + initial.particles.species_mass_density[:, target],
+                rtol=3e-13,
+            )
+            np.testing.assert_allclose(
+                got.particles.masses[..., target],
+                ref.particles.masses[..., target],
+                rtol=3e-4,
+                atol=1e-27,
+            )

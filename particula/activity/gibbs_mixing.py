@@ -173,46 +173,36 @@ def gibbs_mix_weight(
         functional_group=functional_group,
     )
 
-    weights = bat_blending_weights(
-        molar_mass_ratio=molar_mass_ratio, oxygen2carbon=oxygen2carbon
-    )
-
-    if np.size(oxygen2carbon) == 1:
-        # Cast scalar arrays to float for single value case
+    if all(np.size(v) == 1 for v in (oxygen2carbon, molar_mass_ratio, density)):
+        weights = bat_blending_weights(molar_mass_ratio, oxygen2carbon)
         return _calculate_gibbs_mix_single(
-            float(np.asarray(molar_mass_ratio).flat[0]),
-            float(np.asarray(organic_mole_fraction).flat[0]),
-            float(np.asarray(oxygen2carbon).flat[0]),
-            float(density.flat[0]),
+            float(np.asarray(molar_mass_ratio).item()),
+            organic_mole_fraction,
+            float(np.asarray(oxygen2carbon).item()),
+            float(density.item()),
             weights,
         )
 
-    # Cast to arrays for iteration
-    oxygen2carbon_arr = np.asarray(oxygen2carbon, dtype=np.float64)
-    molar_mass_ratio_arr = np.asarray(molar_mass_ratio, dtype=np.float64)
-    organic_mole_fraction_arr = np.asarray(
-        organic_mole_fraction, dtype=np.float64
+    ratios, fractions, oxygen, densities = np.broadcast_arrays(
+        molar_mass_ratio, organic_mole_fraction, oxygen2carbon, density
     )
-    density_arr = np.asarray(density, dtype=np.float64)
-
-    gibbs_mix = np.zeros((len(oxygen2carbon_arr)))
-    derivative_gibbs = np.zeros((len(oxygen2carbon_arr)))
-
-    for i, o2c in enumerate(oxygen2carbon_arr):
-        gibbs_mix[i], derivative_gibbs[i] = _calculate_gibbs_mix_single(
-            molar_mass_ratio=float(molar_mass_ratio_arr[i]),
-            organic_mole_fraction=float(organic_mole_fraction_arr[i]),
-            oxygen2carbon=float(o2c),
-            density=float(density_arr[i]),
-            weights=weights[i],
+    weights = bat_blending_weights(ratios.ravel(), oxygen.ravel())
+    gibbs_mix = np.empty(oxygen.shape, dtype=np.float64)
+    derivative = np.empty_like(gibbs_mix)
+    for i in range(oxygen.size):
+        gibbs_mix.flat[i], derivative.flat[i] = _calculate_gibbs_mix_single(
+            ratios.flat[i],
+            fractions.flat[i],
+            oxygen.flat[i],
+            densities.flat[i],
+            weights[i],
         )
-
-    return gibbs_mix, derivative_gibbs
+    return gibbs_mix, derivative
 
 
 def _calculate_gibbs_mix_single(
     molar_mass_ratio: float,
-    organic_mole_fraction: float,
+    organic_mole_fraction: Union[float, NDArray[np.float64]],
     oxygen2carbon: float,
     density: float,
     weights: NDArray[np.float64],
