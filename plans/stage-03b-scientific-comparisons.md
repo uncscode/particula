@@ -1,7 +1,9 @@
 # Stage 3B: Scientific and experimental comparisons
 
-Updated: 2026-11-17. Status: revised proposal; no study selected or executed
-under this plan. Stages 1, 2A and 2B are merged. Reuse their verified processes,
+Status: selected the aqueous citric-acid study at 293.15 K. The
+[comparison specification](../docs/contribute/validation/thermodynamics/citric-acid-comparison.md)
+records the target data, fixed inputs, metrics and numerical checks before evaluation.
+Stages 1, 2A and 2B are merged. Reuse their verified processes,
 numerical controls and reproducibility workflow, qualifying the actual study
 configuration before interpreting agreement with measurements.
 
