@@ -8,6 +8,7 @@ Results are specific to their recorded revision, workload, and device.
 | --- | --- |
 | How well does direct BAT reproduce the published activity curves? | [Binary BAT reference checks](thermodynamics/bat-activity.md) |
 | How well does BAT reproduce measured citric acid water activity? | [Citric acid droplet hygroscopicity](thermodynamics/citric-acid-comparison.md) |
+| How does CPU/CUDA cost scale for a humidity sensitivity study? | [BAT humidity-pulse ensemble](gpu/bat-humidity-pulse.md) |
 | What supports the scientific baseline? | [Scientific correctness](numerics/scientific-correctness.md) |
 | Which adaptive method and splitting choices are qualified? | [Adaptive integration assessment](numerics/adaptive-methods.md) |
 | What supports recording and exact continuation? | [Simulation workflow](numerics/simulation-workflow.md) |

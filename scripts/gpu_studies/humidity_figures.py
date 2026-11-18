@@ -48,8 +48,8 @@ def sensitivity(report, destination):
 
 def timing(cases, destination):
     """Plot the full range of seven timed repetitions at each size."""
-    fig, (total, memory) = plt.subplots(
-        1, 2, figsize=(9.2, 3.6), layout="constrained"
+    fig, (total, cold, memory) = plt.subplots(
+        1, 3, figsize=(12.6, 3.6), layout="constrained"
     )
     for mode, label, color in (
         ("cpu", "Native CPU", "#444444"),
@@ -74,6 +74,9 @@ def timing(cases, destination):
             color=color,
             capsize=3,
         )
+        cold.plot(
+            boxes, [c["cold_process_seconds"] for c in batch], "o-", color=color
+        )
         memory.plot(
             boxes,
             [
@@ -84,12 +87,14 @@ def timing(cases, destination):
             color=color,
             label=label,
         )
-    for ax in (total, memory):
+    for ax in (total, cold, memory):
         ax.set_xscale("log", base=2)
         ax.set_xticks([1, 8, 32, 128], ["1", "8", "32", "128"])
         ax.set_xlabel("Independent boxes")
     total.set_yscale("log")
-    total.set_ylabel("Time to saved history (s)")
+    total.set_ylabel("Warm time to saved history (s)")
+    cold.set_yscale("log")
+    cold.set_ylabel("Cold process wall time (s)")
     memory.set_ylabel("Peak host RSS (MiB)")
     total.legend(frameon=False)
     fig.savefig(destination, dpi=180)

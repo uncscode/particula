@@ -1033,6 +1033,10 @@
             "collapsed": true,
             "items": [
               {
+                "label": "BAT humidity-pulse ensemble",
+                "slug": "contribute/validation/gpu/bat-humidity-pulse"
+              },
+              {
                 "label": "Prepared simulations: RTX 5060",
                 "slug": "contribute/validation/gpu/prepared-rtx5060"
               },

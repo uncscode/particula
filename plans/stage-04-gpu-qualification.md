@@ -1,15 +1,17 @@
 # Stage 4: GPU scientific usefulness and reliability
 
-Status: proposed. Entry dependency: a supported forward workflow with relevant
+Status: first campaign qualified on CPU and actual CUDA at 1, 8, 32 and 128 boxes.
+[Measurements, figures and reproduction](../docs/contribute/validation/gpu/bat-humidity-pulse.md).
+Entry dependency: a supported forward workflow with relevant
 [verification](stage-01-scientific-correctness.md),
 [numerical accuracy](stage-02a-numerical-integration.md), and
 [recording](stage-02b-simulation-workflow.md) evidence.
 
 ## Execution and delivery
 
-Create a dedicated worktree and `codex/stage-04-gpu-qualification` branch when
-starting this plan. Develop and validate there, then commit, push, and create
-a PR when the plan's acceptance criteria are met. Follow the shared
+The pilot used `codex/stage-04-gpu-qualification`. The ensemble campaign used
+`/tmp/particula-stage-04-campaign` on `codex/stage-04-campaign`, based on
+upstream main at `92615153d2`. Follow the shared
 [worktree, branch, and PR workflow](README.md#worktree-branch-and-pr-workflow).
 
 ## Outcome
@@ -29,6 +31,92 @@ CUDA examples already exist. Existing benchmark and qualification records are
 revision- and workload-specific. Reuse their methodology where appropriate;
 neither historical speedups nor CPU/GPU parity establish accuracy for a new
 solver, physics combination, or research case.
+
+## First campaign
+
+**Scientific question.** How does aerosol number concentration affect water
+uptake during humidification and water loss after a drying pulse when droplets
+compete for a finite vapor reservoir? Use the Stage 3A homogeneous BAT case
+at 293 K. Hold dry size, composition and box volume fixed. Measure wet radius
+in metres, vapor and condensed water in kg/m³, and signed transfer during each
+leg. Record both sides of the vapor reset at 80 ms. The one-box pilot found
+that the water-transfer history was more sensitive to timestep than wet radius.
+[Pulse implementation](../docs/examples/thermodynamics/activity/bat_humidity_pulse.py)
+· [Pilot measurements](../docs/contribute/validation/thermodynamics/bat-activity.md#one-box-humidity-pulse-timing-and-refinement)
+
+| Candidate | Evidence available | Role in this campaign |
+| --- | --- | --- |
+| Generic, miscible BAT humidity pulse | Matched CPU and captured CUDA trajectories, explicit forcing and within-leg water budgets | Primary transient and batch-scaling case |
+| Citric acid hygroscopicity | Twelve experimental water-activity/composition points with uncertainties, plus a native equilibrium endpoint | Independent context for bulk thermodynamics. The measurements do not resolve the pulse timescale. |
+| Cyclic chamber with source pulses and coagulation | Qualified CUDA example and same-device continuation | Follow-on stochastic workload. Recheck equal represented counts at every collision boundary and compare distributions over independent seeds. |
+
+The generic organic uses the miscible Figure 9 descriptors of Gorkowski et al.
+The citric acid observations are for a different material. Particle-based
+cloud model studies give precedent for measuring cost versus computational
+population and backend. Their machine timings do not supply a Particula
+speedup or accuracy target.
+[BAT paper](https://doi.org/10.5194/acp-19-13383-2019) ·
+[Marsh et al.](https://doi.org/10.5194/acp-17-5583-2017) ·
+[libcloudph++ performance study](https://doi.org/10.5194/gmd-8-1677-2015)
+
+1. **Population and batch size.** Start with independent boxes at 0.5, 1 and 2
+   times the baseline number concentration of 10¹¹ m⁻³. The reference box is
+   10⁻⁶ m³ with one resolved slot representing 10⁵ identical droplets.
+   For the cost curve use the baseline alone, then 8, 32 and 128
+   distinct log-spaced concentrations over this range. Report uptake at 80 ms,
+   retained water at 160 ms and the full trajectories. Treat concentration
+   as a controlled sensitivity variable. Replicating identical boxes would
+   measure throughput only. If varying slots within a box, split its represented count among
+   slots while preserving the initial number, dry mass and vapor per volume.
+2. **Accuracy before timing.** Proposed maximum errors over all 66 observations
+   in each box are 0.1% in relative wet radius and 0.5% in each leg's gas and
+   particle water transfer, normalized by peak absolute reference transfer on
+   that leg. Refine the direct CPU reference until further halving changes each
+   metric by less than one tenth of its target. For a vanishing transfer use
+   an explicit absolute tolerance in kg/m³ declared before the run. Keep the
+   example's independent closed-leg budget check, unchanged dry mass and an
+   explicit external vapor-reset ledger. Check direct BAT against its external
+   reference and qualify the table between nodes. A shared transport model
+   limits claims about physical accuracy.
+3. **Cost and decision.** Compare the native CPU workflow, prepared CUDA and
+   captured CUDA at the same observation times and saved output. Include a
+   matched-step comparison as well as the fastest tested configuration on each
+   backend that meets both accuracy targets. Record CPU thread count and
+   batching strategy. The primary ratio compares the direct-BAT CPU and
+   tabulated-BAT CUDA workflows. Attribute speed to the hardware alone only
+   with an additional CPU control using the same interpolation and solver.
+   Report first use with empty and populated compiler
+   caches, preparation and upload, capture and first replay, synchronized
+   stepping, observations/downloads, saving, and wall time to saved history.
+   Record peak host RSS and device pool high-water bytes with context/driver
+   exclusions. Reuse the historical three warmups and seven repetitions for
+   warmed measurements. Retain individual times and report median and spread.
+   Identify the first measured batch size with an advantage and report any
+   overlap or slower cases. Profile the largest cost before suggesting
+   consolidation. The full curve may favor one backend throughout.
+   [Historical RTX campaign](../docs/contribute/validation/gpu/prepared-rtx5060.md)
+   · [NVIDIA timing guidance](https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/#timing)
+4. **Repeatable CUDA checks.** On a designated CUDA host, use the strict
+   [qualification runner](../scripts/qualify_gpu.py) with explicit BAT test
+   selections for changes to BAT, capture, or checkpoint handling. Check
+   captured versus ordinary fixed steps and exact same-device continuation
+   across the scheduled reset. Retain revision, device, command, counts and
+   skip reasons. A skipped or empty selection leaves this gate open. Run the
+   full performance matrix separately, on an idle device, for claims about
+   speed or memory.
+
+The existing binary BAT capture/restart test passed on the RTX 5060 at
+`92615153d2` (one pass, zero skips, 9.72 s of pytest time). It changes
+temperature and pressure during replay and resumes a saved checkpoint. The
+[ensemble restart check](../docs/contribute/validation/gpu/bat-humidity-pulse.md#restart-and-capture)
+subsequently verified exact continuation across the vapor replacement at all four sizes.
+Reproduce the short regression from the repository root:
+
+```bash
+python scripts/qualify_gpu.py \
+  'particula/execution/tests/prepared_restart_capture_test.py::test_capture_records_without_advancing_and_replays_exactly[binary_bat]' \
+  --output .artifacts/qualification/stage-04/bat-capture.json
+```
 
 ## Work packages
 
