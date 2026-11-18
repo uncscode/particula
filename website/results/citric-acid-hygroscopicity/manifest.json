@@ -1,17 +1,17 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 4.821043618954718,
-  "package_source_sha256": "e5547a551c796125d41059c1773409134bffa040b1b0ab77862e90c2cc856b48",
+  "elapsed_seconds": 16.32486956100911,
+  "package_source_sha256": "f87778d6e6df13348763a901c19dc33c6f61956fd551d3b390af28f6b56e5d84",
   "input_sha256": {
     "docs/data/thermodynamics/marsh2017-citric-acid.csv": "8f32cf31349ddf3b420b230186a70190c0b7ce40f026b12414b0b96b97117a20"
   },
   "example": "citric-acid-hygroscopicity",
-  "fingerprint": "01c025866de2b3f36d5c6049dfa1794f3ef4d915662ed7468c96abedbbac13ad",
+  "fingerprint": "0571a870e4df83c3f39da311de854f7f433cc59d40306f13bf861c7980ede7f3",
   "source": "docs/examples/thermodynamics/activity/citric_acid_hygroscopicity.py",
-  "revision": "ef3d0c7c189cbd0f0f75e0a530027fd87339581d",
+  "revision": "b88aa68d7813730cee2a1c0a936af7080e179b39",
   "package_dirty": false,
-  "executed_at": "2026-11-18T01:06:17.478660+00:00",
+  "executed_at": "2026-11-18T01:35:15.099271+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
@@ -29,19 +29,20 @@
     [],
     [],
     [],
+    [],
     [
       {
         "text": "Bias +0.05096, RMS 0.06160, overlapping uncertainty intervals 0/12\nMaximum kinetic endpoint activity residual: 3.33e-15\n"
       },
       {
-        "image": "figure-5-1.png"
+        "image": "figure-6-1.png"
       }
     ]
   ],
   "files": {
-    "figure-5-1.png": "87bdc33966e6ced4584ff62193c32aa6453b157c7358058d665abbc4db84ba74",
-    "data.json": "6ca0a96a71c0cedaade3c19555172e3f57a6acbf6d04027d435d3cd0b64bb72e",
-    "source.py": "3cc0a673a2a09a0af6ec7470ad6e573b0b073f136e250f48db65e93b2e4f6903"
+    "figure-6-1.png": "87bdc33966e6ced4584ff62193c32aa6453b157c7358058d665abbc4db84ba74",
+    "data.json": "7a0e9513b106fd9e5a2896dfb687e99a93e878c3dafac27b679179007c80adb3",
+    "source.py": "d0beb5d6e3beb10ee64cdc2c130183a0b5a579f404aedb4a8a1446f27ee0a6e1"
   },
-  "simulation_fingerprint": "5da047b0f78a7e7b8e0c2bd399b8775ca4418bb8b781606e5d3fc232d8218a41"
+  "simulation_fingerprint": "0465ba1d4f874407de890fef01b82bed3738772be4b9127886c17423443d2ae6"
 }

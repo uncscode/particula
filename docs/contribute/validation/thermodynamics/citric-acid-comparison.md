@@ -16,6 +16,24 @@ Using all 12 Table S9.2 rows in the downloadable study bundle, the signed bias (
 
 These residuals exceed the tabulated measurement errors for this configuration. The model uses reduced organic descriptors, and its room-temperature fit was applied at the experimental temperature without an activity-temperature correction. This comparison alone cannot assign the discrepancy to either approximation. The [executable comparison](../../../examples/thermodynamics/activity/citric_acid_hygroscopicity.py) integrates fixed-reservoir kinetic exchange from water-to-solute mass ratios of 0.05 and 80 at each of the 12 activities. Doubling the terminal time from 2000 to 4000 seconds while tightening the relative solver tolerance from 1e-7 to 1e-9 passed the 0.0001 endpoint activity criterion. The fine runs reproduced imposed activity within 3.4e-15 and the independent root mass fractions within 8.0e-14. Dry radius and diffusivity set the diagnostic time scale. These endpoints carry no inference about experimental drying times.
 
-To regenerate the principal figure and metrics, run `python scripts/docs_examples.py refresh citric-acid-hygroscopicity` from the study checkout. The registry packages the CSV with the downloadable example. A second researcher's reproduction is pending.
+At the measured water activity closest to 0.75 (0.74592), the example also runs the native isothermal condensation process with a fixed water reservoir, transition-regime transport and finite-radius Kelvin pressure. Both initial droplets approach a citric acid mass fraction of 0.69009270. The independently solved Kelvin-corrected equilibrium gives the same result within 1e-6. Native output recording spans a 10 s checkpoint, and the resumed particle masses at 2000 s equal those from uninterrupted continuation.
+
+To reproduce from a fresh checkout, use Python 3.12 or later and the Stage 3B branch. In a virtual environment from the repository root, run the following commands. The example reads the source CSV directly, prints the principal metrics, and displays the figure.
+
+```bash
+git clone --branch codex/stage-03b-scientific-comparisons https://github.com/Gorkowski/particula.git
+cd particula
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -e . matplotlib
+python docs/examples/thermodynamics/activity/citric_acid_hygroscopicity.py
+```
+
+For an independent reproduction, record the checkout revision, Python and package versions, the printed metrics and any steps needed to display the figure. In the documentation development environment, to rebuild the saved figure and data, run `python scripts/docs_examples.py refresh citric-acid-hygroscopicity` from the study checkout. The registry packages the CSV with the downloadable example. A second researcher's reproduction is pending.
 
 Data attribution: Marsh et al. (2017), Table S9.2 in the article supplement, reproduced under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) with column headings normalized to machine-readable names. Numeric values are as published.
+
+
+## Handoff
+
+The quantitative observable for a future inference study is water activity at a measured citric acid mass fraction and 293.15 K. The present comparison fitted no parameters. A future fit would require a separate validation dataset. The two-species humidity pulse in Stage 3A supplies a matched CPU/CUDA forward configuration for Stage 4. This 12-point study establishes experimental residuals and makes no speedup claim.

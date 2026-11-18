@@ -1,7 +1,6 @@
 """Scientific regression for the 12-point CK-EDB citric acid comparison."""
 
 import numpy as np
-
 from docs.examples.thermodynamics.activity.citric_acid_hygroscopicity import (
     simulate,
 )
@@ -16,3 +15,10 @@ def test_hygroscopicity_inference_and_kinetic_endpoints():
     exchange = np.asarray(result["reservoir_exchange_kg"])
     assert exchange.shape == (2, 12)
     assert np.all(exchange[0] < 0) and np.all(exchange[1] > 0)
+    native = result["native_restart"]
+    np.testing.assert_allclose(
+        native["kinetic_mfs"], native["root_mfs"], atol=1e-6
+    )
+    np.testing.assert_equal(
+        native["observation_times_s"], [0.0, 1.0, 10.0, 2000.0]
+    )
