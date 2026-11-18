@@ -1,6 +1,6 @@
 # Stage 3B: Scientific and experimental comparisons
 
-Status: selected the aqueous citric-acid study at 293.15 K. The
+Status: the aqueous citric-acid study at 293.15 K, its kinetic checks, and the downloadable example are complete on the study branch. Independent researcher reproduction remains pending. The
 [comparison specification](../docs/contribute/validation/thermodynamics/citric-acid-comparison.md)
 records the target data, fixed inputs, metrics and numerical checks before evaluation.
 Stages 1, 2A and 2B are merged. Reuse their verified processes,

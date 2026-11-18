@@ -14,7 +14,26 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
-from particula.particles import ActivityBAT
+from particula import Aerosol
+from particula.dynamics.condensation.condensation_strategies import (
+    CondensationIsothermal,
+)
+from particula.dynamics.condensation.species_mapping import (
+    CondensationSpeciesMap,
+)
+from particula.execution.condensation_ode import CondensationODE
+from particula.execution.cpu_restart import (
+    checkpoint_condensation,
+    resume_condensation,
+)
+from particula.execution.recording import Recorder, run_until
+from particula.gas import EnvironmentData, GasData
+from particula.gas.vapor_pressure_strategies import (
+    ConstantVaporPressureStrategy,
+)
+from particula.particles import ActivityBAT, ParticleData
+from particula.particles.surface_strategies import SurfaceStrategyVolume
+from particula.util.constants import GAS_CONSTANT
 from scipy.integrate import solve_ivp
 from scipy.optimize import brentq
 
@@ -99,6 +118,96 @@ def relax(target, duration, tolerance):
     ).reshape(2, -1)
 
 
+# %% [markdown]
+# ## Check the native condensation and restart workflow
+#
+# At the measured activity nearest 0.75, integrate the two initial droplets
+# with Particula's isothermal transport and ROS3 solver. The water reservoir
+# is held fixed, and the Kelvin correction uses a constant 0.072 N/m surface
+# tension and 998.2 kg/m³ surface density. Compare against an independent root
+# with that same curvature correction. Record accepted states and continue
+# from a checkpoint at 10 s to test reproduction of the 2000 s endpoint.
+# The experimental comparison above uses bulk activity.
+
+
+# %%
+def native_check(target):
+    """Check a finite-radius native trajectory and its resumed endpoint."""
+    temperature = 293.15
+    dry_mass = 4 * np.pi / 3 * (5e-6) ** 3 * DENSITY
+    initial = Aerosol(
+        particles=ParticleData(
+            masses=dry_mass * np.array([[[0.05, 1.0], [80.0, 1.0]]]),
+            concentration=np.ones((1, 2)),
+            charge=np.zeros((1, 2)),
+            density=np.array([998.2, DENSITY]),
+            volume=np.ones(1),
+            distribution_type="particle_resolved",
+        ),
+        gas=GasData(
+            ["water"],
+            np.array([M_WATER]),
+            np.array([[target * 0.0173]]),
+            np.array([True]),
+        ),
+        environment=EnvironmentData([temperature], [101325.0], [[target]]),
+    )
+    strategy = CondensationIsothermal(
+        molar_mass=np.array([M_WATER]),
+        diffusion_coefficient=2.5e-5,
+        accommodation_coefficient=1.0,
+        update_gases=False,
+        activity_strategy=ActivityBAT(M_ORGANIC, 1.16667, DENSITY),
+        surface_strategy=SurfaceStrategyVolume(
+            density=998.2, surface_tension=0.072
+        ),
+        vapor_pressure_strategy=ConstantVaporPressureStrategy(
+            0.0173 * GAS_CONSTANT * temperature / M_WATER
+        ),
+        species_map=CondensationSpeciesMap(("water",), ((0, 0),)),
+    )
+    owner = CondensationODE(
+        initial,
+        strategy,
+        method="ros3",
+        rtol=1e-5,
+        particle_atol=1e-20,
+        first_step=0.01,
+    )
+    history = Recorder()
+    run_until(owner, 10.0, output_times=[0.0, 1.0, 10.0], recorder=history)
+    resumed = resume_condensation(checkpoint_condensation(owner), strategy)
+    run_until(owner, 2000.0)
+    run_until(resumed, 2000.0, recorder=history)
+    state = resumed.snapshot()
+    np.testing.assert_array_equal(
+        owner.snapshot().particles.masses, state.particles.masses
+    )
+    np.testing.assert_array_equal(
+        state.particles.masses[..., 1], initial.particles.masses[..., 1]
+    )
+    np.testing.assert_array_equal(
+        state.gas.concentration, initial.gas.concentration
+    )
+    final = dry_mass / state.particles.masses[0].sum(axis=1)
+
+    def surface_ratio(mfs):
+        volume = dry_mass * (1 / DENSITY + (1 / mfs - 1) / 998.2)
+        radius = np.cbrt(3 * volume / (4 * np.pi))
+        return water_activity(mfs) * np.exp(
+            2 * 0.072 * M_WATER / (998.2 * GAS_CONSTANT * temperature * radius)
+        )
+
+    root = brentq(lambda f: surface_ratio(f) - target, 1e-6, 1.0)
+    np.testing.assert_allclose(final, root, rtol=0, atol=1e-6)
+    return {
+        "target_activity": float(target),
+        "root_mfs": float(root),
+        "kinetic_mfs": final.tolist(),
+        "observation_times_s": history.arrays()["time"].tolist(),
+    }
+
+
 def simulate():
     """Compute residuals, sensitivity and kinetic convergence."""
     aw, plus, minus, mfs, dm = read_points()
@@ -124,6 +233,7 @@ def simulate():
     ):
         raise ArithmeticError("Kinetic endpoints exceed the activity tolerance")
     return dict(
+        native_restart=native_check(aw[np.argmin(np.abs(aw - 0.75))]),
         activity=aw.tolist(),
         plus=plus.tolist(),
         minus=minus.tolist(),
