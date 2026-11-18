@@ -355,7 +355,7 @@ def test_workflow_keeps_publication_gated_and_uses_one_artifact():
     assert tests["if"] == "needs.release-plan.outputs.publish == 'true'"
     for suite in (
         "python -m pytest -Werror",
-        "python -m pytest examples_tests",
+        'python -m pytest examples_tests -Werror -m "not performance"',
         "python -m pytest scripts/tests",
     ):
         assert suite in tests["run"]
