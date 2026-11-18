@@ -145,18 +145,44 @@ For a volatility-basis-set calculation at fixed water activity, use the existing
 from particula.equilibria import LiquidVaporPartitioningStrategy
 
 inventory = np.array([1.0, 2.0, 3.0])
-result = LiquidVaporPartitioningStrategy(water_activity=0.7).solve(
-    c_star_j_dry=np.array([0.1, 1.0, 10.0]),
-    concentration_organic_matter=inventory,
+species = dict(
     molar_mass=np.array([200.0, 180.0, 220.0]),
     oxygen2carbon=np.array([0.4, 0.5, 0.6]),
     density=np.array([1400.0, 1300.0, 1500.0]),
+)
+dry_saturation = np.array([0.1, 1.0, 10.0])
+result = LiquidVaporPartitioningStrategy(water_activity=0.7).solve(
+    c_star_j_dry=dry_saturation,
+    concentration_organic_matter=inventory,
+    **species,
 )
 condensed_organic = inventory * result.partition_coefficients
 print(condensed_organic, result.water_content, result.error)
 ```
 
 The concrete `particula.equilibria.partitioning.liquid_vapor_partitioning` function also returns the underlying optimizer result for diagnostics. [Worked equilibrium examples](../../examples/thermodynamics/equilibria/index.md)
+
+For a species-by-species mass balance and optimizer status, request the individual organic and aqueous arrays from the functional solver at the same conditions.
+
+```python
+from particula.equilibria.partitioning import (
+    get_properties_for_liquid_vapor_partitioning,
+    liquid_vapor_partitioning,
+)
+
+gamma, water_fraction, phase_fraction = get_properties_for_liquid_vapor_partitioning(
+    water_activity_desired=0.7, **species
+)
+alpha, beta, system, optimizer = liquid_vapor_partitioning(
+    c_star_j_dry=dry_saturation,
+    concentration_organic_matter=inventory,
+    molar_mass=species["molar_mass"],
+    gamma_organic_ab=gamma,
+    mass_fraction_water_ab=water_fraction,
+    q_ab=phase_fraction,
+)
+print(optimizer.success, alpha[0] + beta[0])
+```
 
 ## Key Equations Summary
 

@@ -113,7 +113,10 @@ def test_activity_theory_coefficient_identity():
 def test_equilibrium_theory_species_balance():
     """The functional solver preserves each organic species with water separate."""
     namespace = execute_page("docs/theory/thermodynamics/equilibria-theory.md")
-    assert namespace["result"].success
+    assert namespace["optimizer"].success
+    np.testing.assert_allclose(
+        namespace["result"].partition_coefficients, namespace["system"][2]
+    )
     alpha, beta, system = (
         namespace["alpha"],
         namespace["beta"],
