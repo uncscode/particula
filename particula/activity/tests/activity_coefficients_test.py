@@ -146,3 +146,15 @@ def test_miscible_figure_9_reference():
     np.testing.assert_allclose(
         organic, [0.8988582008, 0.4564539978, 0.0787672383], rtol=0, atol=2e-6
     )
+
+
+def test_figure_9_organic_infinite_dilution_limit():
+    """Pure water retains unit water activity and a nonideal organic coefficient."""
+    x = np.array([0.0, 1e-20])
+    aw, ao, _, _, _, gamma = bat_activity_coefficients(
+        0.09008, x, 0.5, 1243.4933333333333
+    )
+    assert aw[0] == 1.0 and ao[0] == 0.0
+    np.testing.assert_allclose(gamma[0], gamma[1], rtol=1e-13)
+    # Last ycalc_org in the archived Figure 9 mid-O:C MATLAB scan.
+    np.testing.assert_allclose(gamma[0], 1.841680684611998, rtol=4e-5)

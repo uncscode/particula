@@ -103,12 +103,16 @@ def gibbs_of_mixing(
     sum1 = c1 + c2 * (1 - 2 * phi2)
     gibbs_mix = phi2 * (1.0 - phi2) * sum1
 
-    # Initialize result with zeros
-    dphi2dx2 = np.zeros_like(organic_mole_fraction)
-    non_zero = organic_mole_fraction != 0
-    dphi2dx2[non_zero] = (scaled_molar_mass_ratio / rhor) * (
-        phi2[non_zero] / organic_mole_fraction[non_zero]
-    ) ** 2
+    # phi2 / x tends to rhor / scaled_molar_mass_ratio at pure water.
+    # Keep the interior evaluation used to generate resident lookup tables.
+    limit = np.broadcast_to(rhor / scaled_molar_mass_ratio, phi2.shape)
+    phi_over_x = np.divide(
+        phi2,
+        organic_mole_fraction,
+        out=limit.copy(),
+        where=organic_mole_fraction != 0,
+    )
+    dphi2dx2 = (scaled_molar_mass_ratio / rhor) * phi_over_x**2
 
     derivative_gibbs_mix = (
         (1.0 - 2.0 * phi2) * sum1 - 2 * c2 * phi2 * (1.0 - phi2)
