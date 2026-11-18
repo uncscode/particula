@@ -4,7 +4,7 @@
 
 Host-side condensation capability checks and retained GPU compilation.
 
-The direct solver has four equal substeps, one activity-corrected material,
+The direct solver has four equal substeps, material activity corrections,
 and a mixture Kelvin density. Admit only CPU configuration that can be
 represented by those controls; do not discard unsupported strategy choices.
 
@@ -18,9 +18,9 @@ represented by those controls; do not discard unsupported strategy choices.
 def _activity_plan(activity, particles, gas, pairs, vapor)
 ```
 
-Require one participating volatile material lane.
+Translate material activities to the direct solver configuration.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L124-L198)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L125-L211)
 
 ## particula.execution.prepared_condensation._surface_plan
 
@@ -32,7 +32,7 @@ def _surface_plan(surface, particles)
 
 Require an exact static or single-phase volume-weighted surface law.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L76-L121)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L77-L122)
 
 ## particula.execution.prepared_condensation._vapor_plan
 
@@ -44,7 +44,7 @@ def _vapor_plan(strategy, width, *, allow_zero=False)
 
 Freeze constant/Buck definitions in complete gas order.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L34-L73)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L35-L74)
 
 ## particula.execution.prepared_condensation._vector
 
@@ -56,7 +56,7 @@ def _vector(value, width, name, *, positive=False)
 
 Normalize finite nonnegative scalar/vector metadata without aliasing.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L19-L31)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L20-L32)
 
 ## particula.execution.prepared_condensation.compile_condensation
 
@@ -68,7 +68,7 @@ def compile_condensation(plan: _ProcessPlan, context: BuiltinPreparationContext)
 
 Allocate retained thermodynamics, species maps and transport sidecars.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L289-L404)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L303-L421)
 
 ## particula.execution.prepared_condensation.plan_condensation
 
@@ -80,4 +80,4 @@ def plan_condensation(process, aerosol, *, allow_zero_vapor=False) -> _ProcessPl
 
 Freeze representable physical parameters before any upload.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L201-L286)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L214-L300)

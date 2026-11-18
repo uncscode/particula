@@ -17,7 +17,7 @@ https://doi.org/10.5194/acp-19-13383-2019
 *function*
 
 ```python
-def _calculate_gibbs_mix_single(molar_mass_ratio: float, organic_mole_fraction: float, oxygen2carbon: float, density: float, weights: NDArray[np.float64]) -> Tuple[Union[float, NDArray[np.float64]], Union[float, NDArray[np.float64]]]
+def _calculate_gibbs_mix_single(molar_mass_ratio: float, organic_mole_fraction: Union[float, NDArray[np.float64]], oxygen2carbon: float, density: float, weights: NDArray[np.float64]) -> Tuple[Union[float, NDArray[np.float64]], Union[float, NDArray[np.float64]]]
 ```
 
 Compute Gibbs free energy for one compound using blended weights.
@@ -28,7 +28,7 @@ combinations (low/mid or mid/high O:C) from Gorkowski et al. (2019).
 **Parameters**
 
 - `molar_mass_ratio` (`float`) — Ratio of water to organic molar mass.
-- `organic_mole_fraction` (`float`) — Mole fraction of the organic component.
+- `organic_mole_fraction` (`Union[float, NDArray[np.float64]]`) — Mole fraction of the organic component.
 - `oxygen2carbon` (`float`) — Oxygen-to-carbon atomic ratio.
 - `density` (`float`) — Density of the organic compound in kg/m^3.
 - `weights` (`NDArray[np.float64]`) — Three-element array of blending weights for low, mid, high O:C regions.
@@ -38,7 +38,7 @@ combinations (low/mid or mid/high O:C) from Gorkowski et al. (2019).
 - `gibbs_mix` (`Union[float, NDArray[np.float64]]`) — Gibbs energy of mixing normalized by :math:`RT`.
 - `derivative_gibbs` (`Union[float, NDArray[np.float64]]`) — Derivative of Gibbs energy with respect to the organic mole fraction, normalized by :math:`RT`.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/activity/gibbs_mixing.py#L213-L283)
+[View source](https://github.com/uncscode/particula/blob/main/particula/activity/gibbs_mixing.py#L207-L277)
 
 ## particula.activity.gibbs_mixing.gibbs_mix_weight
 
@@ -85,7 +85,7 @@ vectorized batches.
 > Gorkowski et al. (2019), Section 2.2 and SI S2.
 > https://doi.org/10.5194/acp-19-13383-2019
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/activity/gibbs_mixing.py#L121-L210)
+[View source](https://github.com/uncscode/particula/blob/main/particula/activity/gibbs_mixing.py#L125-L204)
 
 ## particula.activity.gibbs_mixing.gibbs_of_mixing
 
@@ -134,4 +134,4 @@ by :math:`RT` to remain dimensionless.
 > Gorkowski, K., Preston, T. C., & Zuend, A. (2019), Equations 1-6 and
 > Supplementary Information S1-S2. https://doi.org/10.5194/acp-19-13383-2019
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/activity/gibbs_mixing.py#L29-L117)
+[View source](https://github.com/uncscode/particula/blob/main/particula/activity/gibbs_mixing.py#L29-L121)

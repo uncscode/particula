@@ -20,7 +20,7 @@ No in-progress adaptive controller is carried across a fixed event boundary:
 every cycle deliberately resets it from the new accepted physical state.
 Future forcing and source schedules are supplied again by the caller.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L23-L41)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L25-L43)
 
 ### particula.execution.gpu_coupled_restart.GPUCoupledCheckpoint.configuration
 
@@ -30,7 +30,7 @@ Future forcing and source schedules are supplied again by the caller.
 configuration: object
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L36-L36)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L38-L38)
 
 ### particula.execution.gpu_coupled_restart.GPUCoupledCheckpoint.controls
 
@@ -40,7 +40,7 @@ configuration: object
 controls: GPUCondensationControls
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L37-L37)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L39-L39)
 
 ### particula.execution.gpu_coupled_restart.GPUCoupledCheckpoint.counters
 
@@ -50,7 +50,7 @@ controls: GPUCondensationControls
 counters: tuple[int, int, int, int]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L40-L40)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L42-L42)
 
 ### particula.execution.gpu_coupled_restart.GPUCoupledCheckpoint.device
 
@@ -60,7 +60,7 @@ counters: tuple[int, int, int, int]
 device: tuple
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L34-L34)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L36-L36)
 
 ### particula.execution.gpu_coupled_restart.GPUCoupledCheckpoint.events
 
@@ -70,7 +70,7 @@ device: tuple
 events: SimulationCheckpoint
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L35-L35)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L37-L37)
 
 ### particula.execution.gpu_coupled_restart.GPUCoupledCheckpoint.order
 
@@ -80,7 +80,7 @@ events: SimulationCheckpoint
 order: str
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L38-L38)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L40-L40)
 
 ### particula.execution.gpu_coupled_restart.GPUCoupledCheckpoint.resident
 
@@ -90,7 +90,7 @@ order: str
 resident: bool
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L41-L41)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L43-L43)
 
 ### particula.execution.gpu_coupled_restart.GPUCoupledCheckpoint.runtime
 
@@ -100,7 +100,7 @@ resident: bool
 runtime: tuple
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L33-L33)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L35-L35)
 
 ### particula.execution.gpu_coupled_restart.GPUCoupledCheckpoint.schema_version
 
@@ -110,7 +110,7 @@ runtime: tuple
 schema_version: int
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L32-L32)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L34-L34)
 
 ### particula.execution.gpu_coupled_restart.GPUCoupledCheckpoint.statistics
 
@@ -120,7 +120,7 @@ schema_version: int
 statistics: StepStatistics
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L39-L39)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L41-L41)
 
 ### particula.execution.gpu_coupled_restart.GPUCoupledCheckpoint.__init__
 
@@ -142,7 +142,7 @@ def _validate(saved)
 
 Check the complete host envelope without allocating device state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L69-L125)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L71-L127)
 
 ## particula.execution.gpu_coupled_restart.checkpoint_coupled
 
@@ -154,7 +154,7 @@ def checkpoint_coupled(owner)
 
 Download exact continuation only after a successfully completed cycle.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L44-L66)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L46-L68)
 
 ## particula.execution.gpu_coupled_restart.load_coupled_checkpoint
 
@@ -166,7 +166,7 @@ def load_coupled_checkpoint(path, *, max_bytes=512 * 1024 * 1024)
 
 Load validated host records without physics or CUDA allocation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L205-L222)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L208-L225)
 
 ## particula.execution.gpu_coupled_restart.resume_coupled
 
@@ -178,7 +178,7 @@ def resume_coupled(saved, events, strategy, *, device)
 
 Restore exact event streams and controls on the saved explicit device.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L128-L164)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L130-L167)
 
 ## particula.execution.gpu_coupled_restart.save_coupled_checkpoint
 
@@ -190,4 +190,4 @@ def save_coupled_checkpoint(saved, path, *, compressed=True)
 
 Atomically save canonical host bytes without pickle or uploads.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L167-L202)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L170-L205)

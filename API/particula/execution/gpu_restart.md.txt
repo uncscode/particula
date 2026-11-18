@@ -20,7 +20,7 @@ class GPUCondensationCheckpoint
 
 Own accepted arrays, exact device identity and controller data.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L23-L45)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L25-L47)
 
 ### particula.execution.gpu_restart.GPUCondensationCheckpoint.atol
 
@@ -30,7 +30,7 @@ Own accepted arrays, exact device identity and controller data.
 atol: np.ndarray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L35-L35)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L37-L37)
 
 ### particula.execution.gpu_restart.GPUCondensationCheckpoint.base
 
@@ -40,7 +40,7 @@ atol: np.ndarray
 base: tuple
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L30-L30)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L32-L32)
 
 ### particula.execution.gpu_restart.GPUCondensationCheckpoint.configuration
 
@@ -50,7 +50,7 @@ base: tuple
 configuration: object
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L31-L31)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L33-L33)
 
 ### particula.execution.gpu_restart.GPUCondensationCheckpoint.control_readbacks
 
@@ -60,7 +60,7 @@ configuration: object
 control_readbacks: int
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L44-L44)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L46-L46)
 
 ### particula.execution.gpu_restart.GPUCondensationCheckpoint.device
 
@@ -70,7 +70,7 @@ control_readbacks: int
 device: tuple
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L29-L29)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L31-L31)
 
 ### particula.execution.gpu_restart.GPUCondensationCheckpoint.forcing
 
@@ -80,7 +80,7 @@ device: tuple
 forcing: EnvironmentForcing | None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L45-L45)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L47-L47)
 
 ### particula.execution.gpu_restart.GPUCondensationCheckpoint.last_error
 
@@ -90,7 +90,7 @@ forcing: EnvironmentForcing | None
 last_error: float | None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L42-L42)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L44-L44)
 
 ### particula.execution.gpu_restart.GPUCondensationCheckpoint.max_step
 
@@ -100,7 +100,7 @@ last_error: float | None
 max_step: float
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L40-L40)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L42-L42)
 
 ### particula.execution.gpu_restart.GPUCondensationCheckpoint.max_trials
 
@@ -110,7 +110,7 @@ max_step: float
 max_trials: int
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L41-L41)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L43-L43)
 
 ### particula.execution.gpu_restart.GPUCondensationCheckpoint.method
 
@@ -120,7 +120,7 @@ max_trials: int
 method: str
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L37-L37)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L39-L39)
 
 ### particula.execution.gpu_restart.GPUCondensationCheckpoint.min_step
 
@@ -130,7 +130,7 @@ method: str
 min_step: float
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L39-L39)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L41-L41)
 
 ### particula.execution.gpu_restart.GPUCondensationCheckpoint.next_step
 
@@ -140,7 +140,7 @@ min_step: float
 next_step: float
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L38-L38)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L40-L40)
 
 ### particula.execution.gpu_restart.GPUCondensationCheckpoint.rtol
 
@@ -150,7 +150,7 @@ next_step: float
 rtol: np.ndarray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L34-L34)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L36-L36)
 
 ### particula.execution.gpu_restart.GPUCondensationCheckpoint.runtime
 
@@ -160,7 +160,7 @@ rtol: np.ndarray
 runtime: tuple
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L28-L28)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L30-L30)
 
 ### particula.execution.gpu_restart.GPUCondensationCheckpoint.scale
 
@@ -170,7 +170,7 @@ runtime: tuple
 scale: np.ndarray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L33-L33)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L35-L35)
 
 ### particula.execution.gpu_restart.GPUCondensationCheckpoint.schema_version
 
@@ -180,7 +180,7 @@ scale: np.ndarray
 schema_version: int
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L27-L27)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L29-L29)
 
 ### particula.execution.gpu_restart.GPUCondensationCheckpoint.state
 
@@ -190,7 +190,7 @@ schema_version: int
 state: np.ndarray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L32-L32)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L34-L34)
 
 ### particula.execution.gpu_restart.GPUCondensationCheckpoint.statistics
 
@@ -200,7 +200,7 @@ state: np.ndarray
 statistics: StepStatistics
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L43-L43)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L45-L45)
 
 ### particula.execution.gpu_restart.GPUCondensationCheckpoint.time
 
@@ -210,7 +210,7 @@ statistics: StepStatistics
 time: float
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L36-L36)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L38-L38)
 
 ### particula.execution.gpu_restart.GPUCondensationCheckpoint.__init__
 
@@ -230,7 +230,7 @@ def __init__(schema_version: int, runtime: tuple, device: tuple, base: tuple, co
 def _device_identity(device)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L52-L59)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L54-L61)
 
 ## particula.execution.gpu_restart._runtime
 
@@ -240,7 +240,7 @@ def _device_identity(device)
 def _runtime()
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L48-L49)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L50-L51)
 
 ## particula.execution.gpu_restart._validate
 
@@ -252,7 +252,7 @@ def _validate(saved)
 
 Validate all host state before allocation or archive replacement.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L91-L117)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L95-L121)
 
 ## particula.execution.gpu_restart._validate_arrays
 
@@ -264,7 +264,7 @@ def _validate_arrays(saved, base)
 
 Check scaled arrays and native inventory before any device upload.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L120-L165)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L124-L169)
 
 ## particula.execution.gpu_restart._validate_controls
 
@@ -276,7 +276,7 @@ def _validate_controls(saved)
 
 Check the accepted clock, controller limits and work history.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L168-L193)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L172-L197)
 
 ## particula.execution.gpu_restart.checkpoint_gpu_condensation
 
@@ -288,7 +288,7 @@ def checkpoint_gpu_condensation(owner)
 
 Explicitly download an accepted adaptive checkpoint outside capture.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L62-L88)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L64-L92)
 
 ## particula.execution.gpu_restart.load_gpu_checkpoint
 
@@ -300,7 +300,7 @@ def load_gpu_checkpoint(path, *, max_bytes=512 * 1024 * 1024)
 
 Load validated adaptive host data without creating a device owner.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L252-L269)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L256-L273)
 
 ## particula.execution.gpu_restart.resume_gpu_condensation
 
@@ -312,7 +312,7 @@ def resume_gpu_condensation(saved, strategy, *, device)
 
 Restore exact coordinates and controller on the same explicit device.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L196-L230)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L200-L234)
 
 ## particula.execution.gpu_restart.save_gpu_checkpoint
 
@@ -324,4 +324,4 @@ def save_gpu_checkpoint(checkpoint, path, *, compressed=True)
 
 Atomically store downloaded adaptive state as non-executable data.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L233-L249)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L237-L253)

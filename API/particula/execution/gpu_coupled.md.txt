@@ -159,7 +159,17 @@ Observations/checkpoints are available only between complete cycles.
 - `time` (default: `0.0`) — Initial physical time in seconds.
 - `resident` (default: `False`) — Keep stage handoff and adaptive decisions on CUDA.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L121-L499)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L121-L500)
+
+### particula.execution.gpu_coupled.GPUCoupledSimulation._bat_table
+
+*attribute* · *instance attribute*
+
+```python
+_bat_table = plan.values['bat_table']
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L178-L178)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation._events
 
@@ -169,7 +179,7 @@ Observations/checkpoints are available only between complete cycles.
 _events = prepare_simulation(events, aerosol, device=device, time_step=time_step, root_seed=root_seed, logical_box_ids=logical_box_ids, time=time)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L182-L190)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L183-L191)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation._molar_mass
 
@@ -179,7 +189,7 @@ _events = prepare_simulation(events, aerosol, device=device, time_step=time_step
 _molar_mass = aerosol.gas.molar_mass.copy()
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L179-L179)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L180-L180)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation._vapor
 
@@ -189,7 +199,7 @@ _molar_mass = aerosol.gas.molar_mass.copy()
 _vapor = plan.values['vapor']
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L178-L178)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L179-L179)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation.completed_steps
 
@@ -201,7 +211,7 @@ completed_steps
 
 Return successfully completed coupled cycles.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L270-L273)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L271-L274)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation.controls
 
@@ -213,7 +223,7 @@ controls
 
 Return immutable condensation controls.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L233-L235)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L234-L236)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation.device
 
@@ -225,7 +235,7 @@ device
 
 Return the prepared event device.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L254-L256)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L255-L257)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation.order
 
@@ -237,7 +247,7 @@ order
 
 Return the frozen sequential composition order.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L228-L230)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L229-L231)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation.time
 
@@ -249,7 +259,7 @@ time
 
 Return the last complete cycle time, never an intermediate time.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L264-L267)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L265-L268)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation.time_step
 
@@ -261,7 +271,7 @@ time_step
 
 Return the frozen event interval [s].
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L259-L261)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L260-L262)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation.__enter__
 
@@ -273,7 +283,7 @@ def __enter__()
 
 Enter the active owner's explicit resource scope.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L492-L495)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L493-L496)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation.__exit__
 
@@ -285,7 +295,7 @@ def __exit__(*_exc)
 
 Release event resources on normal exit and exceptions.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L497-L499)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L498-L500)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation.__init__
 
@@ -297,7 +307,7 @@ def __init__(aerosol, events, strategy, *, device, time_step, order='events-firs
 
 Validate both components and allocate persistent event resources.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L144-L196)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L144-L197)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation._accumulate_condensation_work
 
@@ -309,7 +319,7 @@ def _accumulate_condensation_work(flow)
 
 Record work without downloading physical state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L330-L336)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L331-L337)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation._condense
 
@@ -319,7 +329,7 @@ Record work without downloading physical state.
 def _condense(start, end)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L275-L328)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L276-L329)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation._configure
 
@@ -329,7 +339,7 @@ def _condense(start, end)
 def _configure(strategy, order, controls)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L217-L225)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L218-L226)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation._initialize_condensation
 
@@ -341,7 +351,7 @@ def _initialize_condensation(aerosol, resident)
 
 Allocate one resident adaptive owner when explicitly requested.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L198-L215)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L199-L216)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation._initialize_counters
 
@@ -351,7 +361,7 @@ Allocate one resident adaptive owner when explicitly requested.
 def _initialize_counters()
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L237-L244)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L238-L245)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation._ready
 
@@ -361,7 +371,7 @@ def _initialize_counters()
 def _ready()
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L246-L251)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L247-L252)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation._saturation
 
@@ -371,7 +381,7 @@ def _ready()
 def _saturation(gas, temperature)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L403-L416)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L404-L417)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation.capture_events
 
@@ -383,7 +393,7 @@ def capture_events()
 
 Capture only the fixed event sequence.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L474-L478)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L475-L479)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation.checkpoint
 
@@ -395,7 +405,7 @@ def checkpoint()
 
 Explicitly download exact event/RNG continuation between cycles.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L480-L486)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L481-L487)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation.close
 
@@ -407,7 +417,7 @@ def close()
 
 Release persistent event resources, including captured graphs.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L488-L490)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L489-L491)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation.diagnostics
 
@@ -419,7 +429,7 @@ def diagnostics()
 
 Download box reductions and derive observed saturation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L428-L438)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L429-L439)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation.run
 
@@ -431,7 +441,7 @@ def run(steps)
 
 Complete a nonnegative integer number of fixed coupled cycles.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L392-L401)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L393-L402)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation.snapshot
 
@@ -443,7 +453,7 @@ def snapshot()
 
 Explicitly download detached native state after a complete cycle.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L418-L426)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L419-L427)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation.step
 
@@ -460,7 +470,7 @@ grid point are admitted only when that tolerance is below a quarter
 cycle. The event clock, physical interval and restart state are
 unchanged.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L338-L390)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L339-L391)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation.update_environment
 
@@ -472,7 +482,7 @@ def update_environment(temperature=None, pressure=None)
 
 Explicitly upload between-cycle temperature [K] and pressure [Pa].
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L440-L446)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L441-L447)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation.update_gas
 
@@ -484,7 +494,7 @@ def update_gas(concentration)
 
 Explicitly upload full-gas concentration [kg/m³] between cycles.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L448-L452)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L449-L453)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation.update_gas_species
 
@@ -503,7 +513,7 @@ current device temperature. Each species may occur in only one mapping.
 Validation precedes physical mutation. This explicit forcing boundary
 uploads only prescribed targets and reads scalar validation status.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L454-L472)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L455-L473)
 
 ## particula.execution.gpu_coupled._condensation_profile
 

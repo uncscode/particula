@@ -877,7 +877,7 @@ Convert molar mass ratio to organic molar mass.
 **Parameters**
 
 - `molar_mass_ratio` (`Union[float, Iterable[float], NDArray[np.float64]]`) — Molar mass ratio (MW water / MW organic). Must be positive.
-- `other_molar_mass` (`float`) (default: `18.01528`) — Reference molar mass (default water, 18.01528). Must be positive.
+- `other_molar_mass` (`float`) (default: `18.01528`) — Reference molar mass (default water, 18.01528 g/mol). Must be positive.
 
 **Returns**
 
@@ -892,11 +892,11 @@ Convert molar mass ratio to organic molar mass.
 
 ```pycon
 >>> from_molar_mass_ratio(0.5)
-9.00764
+36.03056
 >>> from_molar_mass_ratio([0.5, 1.0])
-array([ 9.00764, 18.01528])
+array([36.03056, 18.01528])
 >>> from_molar_mass_ratio(np.array([0.25]))
-array([4.50382])
+array([72.06112])
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/activity/ratio.py#L46-L85)
@@ -983,7 +983,7 @@ vectorized batches.
 > Gorkowski et al. (2019), Section 2.2 and SI S2.
 > https://doi.org/10.5194/acp-19-13383-2019
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/activity/gibbs_mixing.py#L121-L210)
+[View source](https://github.com/uncscode/particula/blob/main/particula/activity/gibbs_mixing.py#L125-L204)
 
 ## particula.activity.gibbs_of_mixing
 
@@ -1034,7 +1034,7 @@ by :math:`RT` to remain dimensionless.
 > Gorkowski, K., Preston, T. C., & Zuend, A. (2019), Equations 1-6 and
 > Supplementary Information S1-S2. https://doi.org/10.5194/acp-19-13383-2019
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/activity/gibbs_mixing.py#L29-L117)
+[View source](https://github.com/uncscode/particula/blob/main/particula/activity/gibbs_mixing.py#L29-L121)
 
 ## particula.activity.organic_water_single_phase
 
@@ -1124,8 +1124,8 @@ Convert to molar mass ratio (MW water / MW organic).
 
 **Parameters**
 
-- `molar_mass` (`Union[float, Iterable[float], NDArray[np.float64]]`) — Molar mass of the organic compound. Must be positive.
-- `other_molar_mass` (`float`) (default: `18.01528`) — Reference molar mass (default water, 18.01528). Must be positive.
+- `molar_mass` (`Union[float, Iterable[float], NDArray[np.float64]]`) — Organic molar mass, in the same units as the reference.
+- `other_molar_mass` (`float`) (default: `18.01528`) — Reference molar mass (default water, 18.01528 g/mol). Must be positive.
 
 **Returns**
 
@@ -1643,7 +1643,7 @@ https://doi.org/10.5194/acp-19-13383-2019
 *function*
 
 ```python
-def _calculate_gibbs_mix_single(molar_mass_ratio: float, organic_mole_fraction: float, oxygen2carbon: float, density: float, weights: NDArray[np.float64]) -> Tuple[Union[float, NDArray[np.float64]], Union[float, NDArray[np.float64]]]
+def _calculate_gibbs_mix_single(molar_mass_ratio: float, organic_mole_fraction: Union[float, NDArray[np.float64]], oxygen2carbon: float, density: float, weights: NDArray[np.float64]) -> Tuple[Union[float, NDArray[np.float64]], Union[float, NDArray[np.float64]]]
 ```
 
 Compute Gibbs free energy for one compound using blended weights.
@@ -1654,7 +1654,7 @@ combinations (low/mid or mid/high O:C) from Gorkowski et al. (2019).
 **Parameters**
 
 - `molar_mass_ratio` (`float`) — Ratio of water to organic molar mass.
-- `organic_mole_fraction` (`float`) — Mole fraction of the organic component.
+- `organic_mole_fraction` (`Union[float, NDArray[np.float64]]`) — Mole fraction of the organic component.
 - `oxygen2carbon` (`float`) — Oxygen-to-carbon atomic ratio.
 - `density` (`float`) — Density of the organic compound in kg/m^3.
 - `weights` (`NDArray[np.float64]`) — Three-element array of blending weights for low, mid, high O:C regions.
@@ -1664,7 +1664,7 @@ combinations (low/mid or mid/high O:C) from Gorkowski et al. (2019).
 - `gibbs_mix` (`Union[float, NDArray[np.float64]]`) — Gibbs energy of mixing normalized by :math:`RT`.
 - `derivative_gibbs` (`Union[float, NDArray[np.float64]]`) — Derivative of Gibbs energy with respect to the organic mole fraction, normalized by :math:`RT`.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/activity/gibbs_mixing.py#L213-L283)
+[View source](https://github.com/uncscode/particula/blob/main/particula/activity/gibbs_mixing.py#L207-L277)
 
 ## particula.activity.gibbs_mixing.gibbs_mix_weight
 
@@ -1711,7 +1711,7 @@ vectorized batches.
 > Gorkowski et al. (2019), Section 2.2 and SI S2.
 > https://doi.org/10.5194/acp-19-13383-2019
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/activity/gibbs_mixing.py#L121-L210)
+[View source](https://github.com/uncscode/particula/blob/main/particula/activity/gibbs_mixing.py#L125-L204)
 
 ## particula.activity.gibbs_mixing.gibbs_of_mixing
 
@@ -1760,7 +1760,7 @@ by :math:`RT` to remain dimensionless.
 > Gorkowski, K., Preston, T. C., & Zuend, A. (2019), Equations 1-6 and
 > Supplementary Information S1-S2. https://doi.org/10.5194/acp-19-13383-2019
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/activity/gibbs_mixing.py#L29-L117)
+[View source](https://github.com/uncscode/particula/blob/main/particula/activity/gibbs_mixing.py#L29-L121)
 
 ---
 
@@ -1965,7 +1965,7 @@ Convert molar mass ratio to organic molar mass.
 **Parameters**
 
 - `molar_mass_ratio` (`Union[float, Iterable[float], NDArray[np.float64]]`) — Molar mass ratio (MW water / MW organic). Must be positive.
-- `other_molar_mass` (`float`) (default: `18.01528`) — Reference molar mass (default water, 18.01528). Must be positive.
+- `other_molar_mass` (`float`) (default: `18.01528`) — Reference molar mass (default water, 18.01528 g/mol). Must be positive.
 
 **Returns**
 
@@ -1980,11 +1980,11 @@ Convert molar mass ratio to organic molar mass.
 
 ```pycon
 >>> from_molar_mass_ratio(0.5)
-9.00764
+36.03056
 >>> from_molar_mass_ratio([0.5, 1.0])
-array([ 9.00764, 18.01528])
+array([36.03056, 18.01528])
 >>> from_molar_mass_ratio(np.array([0.25]))
-array([4.50382])
+array([72.06112])
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/activity/ratio.py#L46-L85)
@@ -2001,8 +2001,8 @@ Convert to molar mass ratio (MW water / MW organic).
 
 **Parameters**
 
-- `molar_mass` (`Union[float, Iterable[float], NDArray[np.float64]]`) — Molar mass of the organic compound. Must be positive.
-- `other_molar_mass` (`float`) (default: `18.01528`) — Reference molar mass (default water, 18.01528). Must be positive.
+- `molar_mass` (`Union[float, Iterable[float], NDArray[np.float64]]`) — Organic molar mass, in the same units as the reference.
+- `other_molar_mass` (`float`) (default: `18.01528`) — Reference molar mass (default water, 18.01528 g/mol). Must be positive.
 
 **Returns**
 
@@ -2044,6 +2044,64 @@ https://doi.org/10.5194/acp-19-13383-2019
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/activity/water_activity.py#L1-L1)
 
+## particula.activity.water_activity._PhaseProperties
+
+*attribute* · *module attribute*
+
+```python
+_PhaseProperties = tuple[float | NDArray[np.float64], ...] | NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/activity/water_activity.py#L99-L99)
+
+## particula.activity.water_activity.FixedWaterActivityResult
+
+*class*
+
+```python
+class FixedWaterActivityResult(NamedTuple)
+```
+
+Bases: `NamedTuple`
+
+Properties of the water-rich and optional organic-rich liquid branches.
+
+Each phase contains water and organic activities, water and organic mass
+fractions, then water and organic activity coefficients, in that order.
+The last axis of a sweep follows the requested water activities.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/activity/water_activity.py#L102-L112)
+
+### particula.activity.water_activity.FixedWaterActivityResult.alpha
+
+*attribute* · *instance attribute*
+
+```python
+alpha: _PhaseProperties
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/activity/water_activity.py#L110-L110)
+
+### particula.activity.water_activity.FixedWaterActivityResult.beta
+
+*attribute* · *instance attribute*
+
+```python
+beta: _PhaseProperties | None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/activity/water_activity.py#L111-L111)
+
+### particula.activity.water_activity.FixedWaterActivityResult.q_alpha
+
+*attribute* · *instance attribute*
+
+```python
+q_alpha: float | NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/activity/water_activity.py#L112-L112)
+
 ## particula.activity.water_activity.biphasic_water_activity_point
 
 *function*
@@ -2072,28 +2130,25 @@ Computes the biphasic to single phase water activity (RH*100).
 *function*
 
 ```python
-def fixed_water_activity(water_activity: Union[float, NDArray[np.float64]], molar_mass_ratio: Union[float, NDArray[np.float64]], oxygen2carbon: Union[float, NDArray[np.float64]], density: Union[float, NDArray[np.float64]]) -> Tuple[Union[float, NDArray[np.float64]], Optional[Union[float, NDArray[np.float64]]], Union[float, NDArray[np.float64]]]
+def fixed_water_activity(water_activity: Union[float, NDArray[np.float64]], molar_mass_ratio: Union[float, NDArray[np.float64]], oxygen2carbon: Union[float, NDArray[np.float64]], density: Union[float, NDArray[np.float64]]) -> FixedWaterActivityResult
 ```
 
-Activity coefficients in organic-water mixtures.
-
-This function assumes a fixed water activity value (e.g., RH = 75%
-corresponds to 0.75 water activity in equilibrium).
-It calculates the activity coefficients for different phases and
-determines phase separations if they occur.
+Evaluate binary BAT liquid branches at prescribed water activities.
 
 **Parameters**
 
-- `water_activity` (`Union[float, NDArray[np.float64]]`) — An array of water activity values.
-- `molar_mass_ratio` (`Union[float, NDArray[np.float64]]`) — Array of molar mass ratios of the components.
-- `oxygen2carbon` (`Union[float, NDArray[np.float64]]`) — Array of oxygen-to-carbon ratios.
-- `density` (`Union[float, NDArray[np.float64]]`) — Array of densities of the mixture, in kg/m^3.
+- `water_activity` (`Union[float, NDArray[np.float64]]`) — Dimensionless target activity, scalar or 1-D sweep.
+- `molar_mass_ratio` (`Union[float, NDArray[np.float64]]`) — Water molar mass divided by organic molar mass.
+- `oxygen2carbon` (`Union[float, NDArray[np.float64]]`) — Organic atomic O:C ratio.
+- `density` (`Union[float, NDArray[np.float64]]`) — Organic liquid density in kg/m³.
 
 **Returns**
 
-- (`Tuple[Union[float, NDArray[np.float64]], Optional[Union[float, NDArray[np.float64]]], Union[float, NDArray[np.float64]]]`) — A tuple containing the activity coefficients for alpha and beta phases, and the q_alpha (phase separation) value. If no phase separation occurs, the beta phase values are None.
+- (`FixedWaterActivityResult`) — Phase properties and the model's alpha-phase allocation fraction.
+- (`FixedWaterActivityResult`) — The result supports tuple unpacking as (alpha, beta, q_alpha).
+- (`FixedWaterActivityResult`) — A homogeneous solution has beta equal to None and q_alpha equal to 1.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/activity/water_activity.py#L99-L244)
+[View source](https://github.com/uncscode/particula/blob/main/particula/activity/water_activity.py#L115-L253)
 
 ---
 
@@ -45377,7 +45432,7 @@ Retain opaque backend result values by identity without inspection.
 - `value` (`object`) — Opaque backend-owned result value.
 - `diagnostics` (`object | None`) (default: `None`) — Optional opaque backend-owned diagnostic value.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L854-L864)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L858-L868)
 
 ### particula.execution.BackendResult.diagnostics
 
@@ -45387,7 +45442,7 @@ Retain opaque backend result values by identity without inspection.
 diagnostics: object | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L864-L864)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L868-L868)
 
 ### particula.execution.BackendResult.value
 
@@ -45397,7 +45452,7 @@ diagnostics: object | None = None
 value: object
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L863-L863)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L867-L867)
 
 ### particula.execution.BackendResult.__init__
 
@@ -45431,7 +45486,7 @@ aerosol and process-physics validation.
 
 - `runnable` (`_CPURunnable | RunnableABC`) — Runnable invoked once for every valid execution state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1021-L1102)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1025-L1106)
 
 ### particula.execution.CPUExecutionAdapter._runnable
 
@@ -45441,7 +45496,7 @@ aerosol and process-physics validation.
 _runnable = runnable
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1043-L1043)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1047-L1047)
 
 ### particula.execution.CPUExecutionAdapter.__init__
 
@@ -45457,7 +45512,7 @@ Retain the runnable by identity without inspecting it.
 
 - `runnable` (`_CPURunnable | RunnableABC`) — CPU runnable invoked once by :meth:`execute` for each valid state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1036-L1043)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1040-L1047)
 
 ### particula.execution.CPUExecutionAdapter.execute
 
@@ -45490,7 +45545,7 @@ non-boolean real scalar.
 - `ValueError` — If controls are invalid or the runnable returns a
 different aerosol object.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1045-L1102)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1049-L1106)
 
 ## particula.execution.CPUExecutionContext
 
@@ -45665,7 +45720,7 @@ boundary. The carrier neither copies nor validates the aerosol or controls.
 - `time_step` (`object`) — Caller-supplied total execution duration.
 - `sub_steps` (`object`) — Caller-supplied number of runnable substeps.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L996-L1018)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1000-L1022)
 
 ### particula.execution.CPUExecutionState.aerosol
 
@@ -45675,7 +45730,7 @@ boundary. The carrier neither copies nor validates the aerosol or controls.
 aerosol: object
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1010-L1010)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1014-L1014)
 
 ### particula.execution.CPUExecutionState.context
 
@@ -45685,7 +45740,7 @@ aerosol: object
 context: object = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1013-L1013)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1017-L1017)
 
 ### particula.execution.CPUExecutionState.sub_steps
 
@@ -45695,7 +45750,7 @@ context: object = None
 sub_steps: object
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1012-L1012)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1016-L1016)
 
 ### particula.execution.CPUExecutionState.time_step
 
@@ -45705,7 +45760,7 @@ sub_steps: object
 time_step: object
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1011-L1011)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1015-L1015)
 
 ### particula.execution.CPUExecutionState.backend_payload
 
@@ -45717,7 +45772,7 @@ backend_payload: object
 
 Return the caller-owned aerosol as the opaque CPU payload.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1016-L1018)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1020-L1022)
 
 ### particula.execution.CPUExecutionState.__init__
 
@@ -46108,10 +46163,21 @@ support. It does not inspect or detect concrete activity implementations.
 **Attributes**
 
 - `IDEAL` — Ideal activity-coefficient semantics.
+- `BAT` — Homogeneous binary BAT activities for water and organic.
 - `KAPPA` — Kappa activity-coefficient semantics.
 - `NONREPRESENTABLE` — Semantics not representable by a profile.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L389-L403)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L389-L405)
+
+### particula.execution.CondensationActivityMode.BAT
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+BAT = 'bat'
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L404-L404)
 
 ### particula.execution.CondensationActivityMode.IDEAL
 
@@ -46121,7 +46187,7 @@ support. It does not inspect or detect concrete activity implementations.
 IDEAL = 'ideal'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L401-L401)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L402-L402)
 
 ### particula.execution.CondensationActivityMode.KAPPA
 
@@ -46131,7 +46197,7 @@ IDEAL = 'ideal'
 KAPPA = 'kappa'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L402-L402)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L403-L403)
 
 ### particula.execution.CondensationActivityMode.NONREPRESENTABLE
 
@@ -46141,7 +46207,7 @@ KAPPA = 'kappa'
 NONREPRESENTABLE = 'nonrepresentable'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L403-L403)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L405-L405)
 
 ## particula.execution.CondensationConfiguration
 
@@ -46168,7 +46234,7 @@ It also does not select an adapter or determine runtime availability.
 
 - `TypeError` — If a field is not its exact declared metadata type.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L423-L466)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L425-L468)
 
 ### particula.execution.CondensationConfiguration.activity_mode
 
@@ -46178,7 +46244,7 @@ It also does not select an adapter or determine runtime availability.
 activity_mode: CondensationActivityMode
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L443-L443)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L445-L445)
 
 ### particula.execution.CondensationConfiguration.execution_mode
 
@@ -46188,7 +46254,7 @@ activity_mode: CondensationActivityMode
 execution_mode: CondensationExecutionMode
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L441-L441)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L443-L443)
 
 ### particula.execution.CondensationConfiguration.latent_heat
 
@@ -46198,7 +46264,7 @@ execution_mode: CondensationExecutionMode
 latent_heat: bool
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L442-L442)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L444-L444)
 
 ### particula.execution.CondensationConfiguration.surface_mode
 
@@ -46208,7 +46274,7 @@ latent_heat: bool
 surface_mode: CondensationSurfaceMode
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L444-L444)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L446-L446)
 
 ### particula.execution.CondensationConfiguration.__init__
 
@@ -46230,7 +46296,7 @@ def __post_init__() -> None
 
 Validate the exact semantic configuration field types.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L446-L466)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L448-L468)
 
 ## particula.execution.CondensationExecutionMode
 
@@ -46295,7 +46361,7 @@ support. It does not inspect or detect concrete surface implementations.
 - `COMPOSITION_WEIGHTED` — Composition-weighted surface-tension semantics.
 - `NONREPRESENTABLE` — Semantics not representable by a profile.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L406-L420)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L408-L422)
 
 ### particula.execution.CondensationSurfaceMode.COMPOSITION_WEIGHTED
 
@@ -46305,7 +46371,7 @@ support. It does not inspect or detect concrete surface implementations.
 COMPOSITION_WEIGHTED = 'composition_weighted'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L419-L419)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L421-L421)
 
 ### particula.execution.CondensationSurfaceMode.NONREPRESENTABLE
 
@@ -46315,7 +46381,7 @@ COMPOSITION_WEIGHTED = 'composition_weighted'
 NONREPRESENTABLE = 'nonrepresentable'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L420-L420)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L422-L422)
 
 ### particula.execution.CondensationSurfaceMode.STATIC
 
@@ -46325,7 +46391,7 @@ NONREPRESENTABLE = 'nonrepresentable'
 STATIC = 'static'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L418-L418)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L420-L420)
 
 ## particula.execution.Device
 
@@ -46416,7 +46482,7 @@ attribute without invoking or probing it. Selection returns the registered
 adapter by identity and does not establish an execution, state, or result
 contract.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L762-L774)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L766-L778)
 
 ### particula.execution.ExecutionAdapter.execute
 
@@ -46428,7 +46494,7 @@ execute: Callable[..., object]
 
 Return the callable execution seam without fixing its signature.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L773-L774)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L777-L778)
 
 ## particula.execution.ExecutionCapabilityError
 
@@ -46683,7 +46749,7 @@ registration state. Registration and selection are context-local only:
 neither invokes an adapter, probes availability, loads a backend, nor
 transfers data.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1177-L1245)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1181-L1249)
 
 ### particula.execution.ExecutionContext._matrix
 
@@ -46693,7 +46759,7 @@ transfers data.
 _matrix = matrix
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1197-L1197)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1201-L1201)
 
 ### particula.execution.ExecutionContext._registry
 
@@ -46703,7 +46769,7 @@ _matrix = matrix
 _registry = _AdapterRegistry()
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1198-L1198)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1202-L1202)
 
 ### particula.execution.ExecutionContext.__init__
 
@@ -46723,7 +46789,7 @@ Store a matrix and create an empty private adapter registry.
 
 - `TypeError` — If ``matrix`` is not a CapabilityMatrix.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1186-L1198)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1190-L1202)
 
 ### particula.execution.ExecutionContext.register_adapter
 
@@ -46751,7 +46817,7 @@ context and is selected later by its exact process/backend pair.
 order.
 - `ValueError` — If the process/backend pair is already registered.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1200-L1222)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1204-L1226)
 
 ### particula.execution.ExecutionContext.resolve
 
@@ -46780,7 +46846,7 @@ method does not catch adapter errors because it never executes adapters.
 - `ValueError` — If CPU device spelling is invalid or support is absent.
 - `LookupError` — If supported request has no exact registered adapter.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1224-L1245)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1228-L1249)
 
 ## particula.execution.ExecutionRequest
 
@@ -46807,7 +46873,7 @@ state, nor establishes execution state or result contracts.
 - `TypeError` — If a field is not its declared metadata type.
 - `ValueError` — If the backend does not match the device backend.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L702-L746)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L706-L750)
 
 ### particula.execution.ExecutionRequest.backend
 
@@ -46817,7 +46883,7 @@ state, nor establishes execution state or result contracts.
 backend: Backend
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L720-L720)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L724-L724)
 
 ### particula.execution.ExecutionRequest.device
 
@@ -46827,7 +46893,7 @@ backend: Backend
 device: Device
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L721-L721)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L725-L725)
 
 ### particula.execution.ExecutionRequest.process
 
@@ -46837,7 +46903,7 @@ device: Device
 process: Process
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L722-L722)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L726-L726)
 
 ### particula.execution.ExecutionRequest.requirements
 
@@ -46847,7 +46913,7 @@ process: Process
 requirements: CapabilityRequirements
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L723-L723)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L727-L727)
 
 ### particula.execution.ExecutionRequest.__init__
 
@@ -46874,7 +46940,7 @@ Validate request metadata without resolving or executing it.
 - `TypeError` — If a field is not its declared metadata type.
 - `ValueError` — If backend and device backend differ.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L725-L746)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L729-L750)
 
 ## particula.execution.ExecutionResult
 
@@ -46896,7 +46962,7 @@ boundary, including that ``state`` is the original caller-owned object.
 - `mutation` (`MutationDeclaration`) — Explicit permission for in-place state mutation.
 - `backend_result` (`BackendResult | None`) (default: `None`) — Optional opaque backend result retained by identity.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L867-L884)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L871-L888)
 
 ### particula.execution.ExecutionResult.backend_result
 
@@ -46906,7 +46972,7 @@ boundary, including that ``state`` is the original caller-owned object.
 backend_result: BackendResult | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L884-L884)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L888-L888)
 
 ### particula.execution.ExecutionResult.metadata
 
@@ -46916,7 +46982,7 @@ backend_result: BackendResult | None = None
 metadata: tuple[tuple[str, str], ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L882-L882)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L886-L886)
 
 ### particula.execution.ExecutionResult.mutation
 
@@ -46926,7 +46992,7 @@ metadata: tuple[tuple[str, str], ...]
 mutation: MutationDeclaration
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L883-L883)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L887-L887)
 
 ### particula.execution.ExecutionResult.state
 
@@ -46936,7 +47002,7 @@ mutation: MutationDeclaration
 state: ExecutionState
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L881-L881)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L885-L885)
 
 ### particula.execution.ExecutionResult.__init__
 
@@ -46963,7 +47029,7 @@ Describe retained caller-owned state with an opaque backend payload.
 The payload is not inspected by this module. Boundary validation requires
 the same state object supplied by the caller and retains it by identity.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L749-L759)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L753-L763)
 
 ### particula.execution.ExecutionState.backend_payload
 
@@ -46975,7 +47041,7 @@ backend_payload: object
 
 Return opaque backend-owned payload state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L758-L759)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L762-L763)
 
 ## particula.execution.FallbackBoundary
 
@@ -47347,7 +47413,7 @@ Declare exactly one explicit state-mutation permission.
 - `TypeError` — If scopes is not an exact frozenset of MutationScope values.
 - `ValueError` — If scopes is empty or combines mutation scopes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L789-L805)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L793-L809)
 
 ### particula.execution.MutationDeclaration.scopes
 
@@ -47357,7 +47423,7 @@ Declare exactly one explicit state-mutation permission.
 scopes: frozenset[MutationScope]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L801-L801)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L805-L805)
 
 ### particula.execution.MutationDeclaration.__init__
 
@@ -47379,7 +47445,7 @@ def __post_init__() -> None
 
 Validate the closed, immutable mutation declaration.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L803-L805)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L807-L809)
 
 ## particula.execution.MutationScope
 
@@ -47397,7 +47463,7 @@ Declare the one allowed mutation scope for an execution result.
 not infer or
 verify that a declared mutation occurred.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L777-L786)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L781-L790)
 
 ### particula.execution.MutationScope.NONE
 
@@ -47407,7 +47473,7 @@ verify that a declared mutation occurred.
 NONE = 'none'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L785-L785)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L789-L789)
 
 ### particula.execution.MutationScope.STATE
 
@@ -47417,7 +47483,7 @@ NONE = 'none'
 STATE = 'state'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L786-L786)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L790-L790)
 
 ## particula.execution.Process
 
@@ -48748,7 +48814,7 @@ an adapter, import an optional backend, or determine runtime availability.
 
 - (`bool`) — True when the exact configuration is declared by the backend profile.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L627-L649)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L631-L653)
 
 ## particula.execution.get_condensation_requirements
 
@@ -48775,7 +48841,7 @@ inspect runtime, device, or optional-backend state.
 
 - `TypeError` — If ``configuration`` is not a CondensationConfiguration.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L526-L560)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L530-L564)
 
 ## particula.execution.require_condensation_profile
 
@@ -48801,7 +48867,7 @@ import an optional backend, or determine runtime availability.
 - `TypeError` — If either argument is not its declared metadata type.
 - `ValueError` — If the configuration is not declared by the profile.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L652-L676)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L656-L680)
 
 ## particula.execution.validate_execution_result
 
@@ -48829,12 +48895,13 @@ Validate and return an immutable state ownership result without executing
 invalid.
 - `ValueError` — If state was replaced or metadata is otherwise invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L930-L966)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L934-L970)
 
 **Modules**
 
 - `particula.execution._adaptive_condensation_physics`
 - `particula.execution._adaptive_condensation_plan`
+- `particula.execution._bat_table`
 - `particula.execution._condensation_block_kernels`
 - `particula.execution._condensation_device_control`
 - `particula.execution._condensation_jacobian`
@@ -48946,7 +49013,7 @@ _R = wp.constant(wp.float64(GAS_CONSTANT))
 *function*
 
 ```python
-def material_rates(masses: FloatTensor, counts: FloatMatrix, density: FloatVector, gas: FloatMatrix, vapor: FloatMatrix, molar: FloatVector, tension: FloatVector, surface_density: FloatVector, surface_reference: FloatVector, phases: IntVector, references: FloatVector, activity_density: FloatVector, kappas: FloatVector, activity_mode: wp.int32, water: wp.int32, accommodation: FloatVector, diffusion: FloatVector, mean_free_path: FloatVector, temperature: FloatVector, forward: IntVector, rate: FloatTensor)
+def material_rates(masses: FloatTensor, counts: FloatMatrix, density: FloatVector, gas: FloatMatrix, vapor: FloatMatrix, molar: FloatVector, tension: FloatVector, surface_density: FloatVector, surface_reference: FloatVector, phases: IntVector, references: FloatVector, activity_density: FloatVector, kappas: FloatVector, bat_table: FloatVector, activity_mode: wp.int32, water: wp.int32, accommodation: FloatVector, diffusion: FloatVector, mean_free_path: FloatVector, temperature: FloatVector, forward: IntVector, rate: FloatTensor)
 ```
 
 Evaluate all exchanging lanes, including phase-weighted surface tension.
@@ -48955,7 +49022,7 @@ Masses are kg per particle, gas kg/m3, densities kg/m3, diffusivity m2/s,
 tensions N/m, molar masses kg/mol, temperature K, and rates kg/s.
 The caller validates the physical trial before accepting it.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_adaptive_condensation_physics.py#L18-L106)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_adaptive_condensation_physics.py#L18-L112)
 
 ---
 
@@ -48970,6 +49037,18 @@ process. It retains every mapped material and the CPU surface phase law.
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/execution/_adaptive_condensation_plan.py#L1-L1)
 
+## particula.execution._adaptive_condensation_plan.adaptive_condensation_identity
+
+*function*
+
+```python
+def adaptive_condensation_identity(strategy, bat_table=None)
+```
+
+Identify the material laws and exact resident activity table.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_adaptive_condensation_plan.py#L30-L38)
+
 ## particula.execution._adaptive_condensation_plan.plan_adaptive_condensation
 
 *function*
@@ -48980,7 +49059,29 @@ def plan_adaptive_condensation(strategy, aerosol)
 
 Validate and freeze constant/Buck, ideal/kappa and phased surfaces.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_adaptive_condensation_plan.py#L25-L133)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_adaptive_condensation_plan.py#L41-L157)
+
+---
+
+# particula.execution._bat_table
+
+*module*
+
+Tabulate homogeneous binary particle activities for device interpolation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_bat_table.py#L1-L1)
+
+## particula.execution._bat_table._binary_activity_table
+
+*function*
+
+```python
+def _binary_activity_table(activity)
+```
+
+Tabulate both activities on a uniform organic mole-fraction grid.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_bat_table.py#L6-L23)
 
 ---
 
@@ -49214,7 +49315,7 @@ magnitude. A fixed perturbation in those coordinates then probes a different
 physical regime. Use the current slot mass as the composition scale, also
 for a currently empty material. Gas dependence is linear at fixed particles.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_jacobian.py#L32-L47)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_jacobian.py#L33-L48)
 
 ## particula.execution._condensation_jacobian.sparse_jacobian
 
@@ -49226,7 +49327,7 @@ def sparse_jacobian(owner, time, values)
 
 Differentiate mapped continuous rates without a dense particle matrix.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_jacobian.py#L50-L114)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_jacobian.py#L51-L115)
 
 ## particula.execution._condensation_jacobian.supports_local_rates
 
@@ -49238,7 +49339,7 @@ def supports_local_rates(strategy)
 
 Restrict coloring to known particle-local activity/surface formulas.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_jacobian.py#L15-L29)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_jacobian.py#L15-L30)
 
 ---
 
@@ -51402,7 +51503,7 @@ promised after a writer-capable failure.
 CPUCondensationAdapter = CPUCondensationExecutionAdapter
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L1041-L1041)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L1043-L1043)
 
 ## particula.execution.adapters.condensation.WarpCondensationAdapter
 
@@ -51412,7 +51513,7 @@ CPUCondensationAdapter = CPUCondensationExecutionAdapter
 WarpCondensationAdapter = WarpCondensationExecutionAdapter
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L1042-L1042)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L1044-L1044)
 
 ## particula.execution.adapters.condensation.CPUCondensationExecutionAdapter
 
@@ -52503,7 +52604,7 @@ Validate semantic-profile sidecars before native kernel resolution.
 - `ValueError` — If a required sidecar is missing or incompatible with the
 selected latent-heat, activity, or surface-tension semantics.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L974-L1037)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L974-L1039)
 
 ## particula.execution.adapters.condensation._validate_time_step
 
@@ -56057,10 +56158,10 @@ NATIVE_PROCESSES = (MassCondensation, Coagulation, WallLoss, Dilution, Nucleatio
 *attribute* · *module attribute*
 
 ```python
-_CONFIGURATION_TYPES = (EnvironmentForcing, *NATIVE_PROCESSES, BrownianCoagulationStrategy, DilutionStrategy, wl.SphericalWallLossStrategy, wl.RectangularWallLossStrategy, wl.ChargedWallLossStrategy, NucleationSourceConfig, NucleationSpeciesMap, NucleationCommitConfig, ExhaustionControls, ns.ActivationNucleationStrategy, ns.KineticNucleationStrategy, ns.ClosedInterval, ns.NucleationValidityDomain, ns.InjectionComposition, ns.FormationMetadata, cs.CondensationIsothermal, cs.CondensationIsothermalStaggered, cs.CondensationLatentHeat, CondensationSpeciesMap, ac.ActivityIdealMass, ac.ActivityIdealMolar, ac.ActivityIdealVolume, ac.ActivityKappaParameter, ac.ActivityNonIdealBinary, su.SurfaceStrategyMass, su.SurfaceStrategyMolar, su.SurfaceStrategyVolume, vp.ConstantVaporPressureStrategy, vp.AntoineVaporPressureStrategy, vp.ClausiusClapeyronStrategy, vp.WaterBuckStrategy, vp.TableVaporPressureStrategy, vp.ArblasterLiquidVaporPressureStrategy, vp.LiquidClausiusHybridStrategy, lh.ConstantLatentHeat, lh.LinearLatentHeat, lh.PowerLawLatentHeat)
+_CONFIGURATION_TYPES = (EnvironmentForcing, *NATIVE_PROCESSES, BrownianCoagulationStrategy, DilutionStrategy, wl.SphericalWallLossStrategy, wl.RectangularWallLossStrategy, wl.ChargedWallLossStrategy, NucleationSourceConfig, NucleationSpeciesMap, NucleationCommitConfig, ExhaustionControls, ns.ActivationNucleationStrategy, ns.KineticNucleationStrategy, ns.ClosedInterval, ns.NucleationValidityDomain, ns.InjectionComposition, ns.FormationMetadata, cs.CondensationIsothermal, cs.CondensationIsothermalStaggered, cs.CondensationLatentHeat, CondensationSpeciesMap, ac.ActivityIdealMass, ac.ActivityIdealMolar, ac.ActivityIdealVolume, ac.ActivityKappaParameter, ac.ActivityNonIdealBinary, ac.ActivityBAT, su.SurfaceStrategyMass, su.SurfaceStrategyMolar, su.SurfaceStrategyVolume, vp.ConstantVaporPressureStrategy, vp.AntoineVaporPressureStrategy, vp.ClausiusClapeyronStrategy, vp.WaterBuckStrategy, vp.TableVaporPressureStrategy, vp.ArblasterLiquidVaporPressureStrategy, vp.LiquidClausiusHybridStrategy, lh.ConstantLatentHeat, lh.LinearLatentHeat, lh.PowerLawLatentHeat)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_configuration.py#L46-L86)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_configuration.py#L46-L87)
 
 ## particula.execution.cpu_configuration._freeze
 
@@ -56072,7 +56173,7 @@ def _freeze(value)
 
 Represent configuration as data, without retaining live objects.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_configuration.py#L89-L129)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_configuration.py#L90-L130)
 
 ## particula.execution.cpu_configuration.condensation_identity
 
@@ -56084,7 +56185,7 @@ def condensation_identity(strategy)
 
 Retain all declared CPU transport, mapping and thermodynamic inputs.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_configuration.py#L132-L134)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_configuration.py#L133-L135)
 
 ## particula.execution.cpu_configuration.cpu_process_identity
 
@@ -56096,7 +56197,7 @@ def cpu_process_identity(process)
 
 Retain native configuration without imposing GPU capability limits.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_configuration.py#L137-L141)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_configuration.py#L138-L142)
 
 ---
 
@@ -61032,7 +61133,7 @@ impose knot boundaries; opaque discontinuous callbacks require explicit
 step boundaries. No arbitrary/stochastic runnable is adapted.
 Capture is unsupported because each trial reads control reductions on host.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L33-L525)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L33-L527)
 
 ### particula.execution.gpu_condensation_ode.GPUCondensationODE._atol
 
@@ -61394,7 +61495,7 @@ time
 
 Return the accepted shared physical time [s].
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L452-L454)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L454-L456)
 
 ### particula.execution.gpu_condensation_ode.GPUCondensationODE.__init__
 
@@ -61416,7 +61517,7 @@ Validate physics and explicitly upload fixed buffers.
 def _allocate_physics()
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L199-L240)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L199-L241)
 
 ### particula.execution.gpu_condensation_ode.GPUCondensationODE._array
 
@@ -61436,7 +61537,7 @@ def _array(values, dtype=wp.float64)
 def _check_ready()
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L242-L250)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L243-L251)
 
 ### particula.execution.gpu_condensation_ode.GPUCondensationODE._combine
 
@@ -61446,7 +61547,7 @@ def _check_ready()
 def _combine(h, coefficients, output)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L407-L418)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L409-L420)
 
 ### particula.execution.gpu_condensation_ode.GPUCondensationODE._environment
 
@@ -61456,7 +61557,7 @@ def _combine(h, coefficients, output)
 def _environment(time)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L262-L274)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L263-L275)
 
 ### particula.execution.gpu_condensation_ode.GPUCondensationODE._launch
 
@@ -61466,7 +61567,7 @@ def _environment(time)
 def _launch(kernel, dim, inputs)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L252-L253)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L253-L254)
 
 ### particula.execution.gpu_condensation_ode.GPUCondensationODE._rate
 
@@ -61476,7 +61577,7 @@ def _launch(kernel, dim, inputs)
 def _rate(time, state, result)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L307-L405)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L308-L407)
 
 ### particula.execution.gpu_condensation_ode.GPUCondensationODE._status
 
@@ -61486,7 +61587,7 @@ def _rate(time, state, result)
 def _status()
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L255-L260)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L256-L261)
 
 ### particula.execution.gpu_condensation_ode.GPUCondensationODE._step
 
@@ -61498,7 +61599,7 @@ def _step(bound)
 
 Advance within one smooth forcing interval.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L463-L506)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L465-L508)
 
 ### particula.execution.gpu_condensation_ode.GPUCondensationODE._tolerance
 
@@ -61518,7 +61619,7 @@ def _tolerance(value, shape, name)
 def _trial(h)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L420-L449)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L422-L451)
 
 ### particula.execution.gpu_condensation_ode.GPUCondensationODE._unpack_trial
 
@@ -61530,7 +61631,7 @@ def _unpack_trial(state)
 
 Validate and unpack device coordinates without a physical rate.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L276-L305)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L277-L306)
 
 ### particula.execution.gpu_condensation_ode.GPUCondensationODE.snapshot
 
@@ -61542,7 +61643,7 @@ def snapshot()
 
 Download detached accepted native state, never trial buffers.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L508-L525)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L510-L527)
 
 ### particula.execution.gpu_condensation_ode.GPUCondensationODE.step
 
@@ -61554,7 +61655,7 @@ def step(bound)
 
 Accept one bounded device trial with scalar control readbacks.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L456-L461)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L458-L463)
 
 ---
 
@@ -61719,7 +61820,17 @@ Observations/checkpoints are available only between complete cycles.
 - `time` (default: `0.0`) — Initial physical time in seconds.
 - `resident` (default: `False`) — Keep stage handoff and adaptive decisions on CUDA.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L121-L499)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L121-L500)
+
+### particula.execution.gpu_coupled.GPUCoupledSimulation._bat_table
+
+*attribute* · *instance attribute*
+
+```python
+_bat_table = plan.values['bat_table']
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L178-L178)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation._events
 
@@ -61729,7 +61840,7 @@ Observations/checkpoints are available only between complete cycles.
 _events = prepare_simulation(events, aerosol, device=device, time_step=time_step, root_seed=root_seed, logical_box_ids=logical_box_ids, time=time)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L182-L190)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L183-L191)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation._molar_mass
 
@@ -61739,7 +61850,7 @@ _events = prepare_simulation(events, aerosol, device=device, time_step=time_step
 _molar_mass = aerosol.gas.molar_mass.copy()
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L179-L179)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L180-L180)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation._vapor
 
@@ -61749,7 +61860,7 @@ _molar_mass = aerosol.gas.molar_mass.copy()
 _vapor = plan.values['vapor']
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L178-L178)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L179-L179)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation.completed_steps
 
@@ -61761,7 +61872,7 @@ completed_steps
 
 Return successfully completed coupled cycles.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L270-L273)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L271-L274)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation.controls
 
@@ -61773,7 +61884,7 @@ controls
 
 Return immutable condensation controls.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L233-L235)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L234-L236)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation.device
 
@@ -61785,7 +61896,7 @@ device
 
 Return the prepared event device.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L254-L256)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L255-L257)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation.order
 
@@ -61797,7 +61908,7 @@ order
 
 Return the frozen sequential composition order.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L228-L230)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L229-L231)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation.time
 
@@ -61809,7 +61920,7 @@ time
 
 Return the last complete cycle time, never an intermediate time.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L264-L267)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L265-L268)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation.time_step
 
@@ -61821,7 +61932,7 @@ time_step
 
 Return the frozen event interval [s].
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L259-L261)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L260-L262)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation.__enter__
 
@@ -61833,7 +61944,7 @@ def __enter__()
 
 Enter the active owner's explicit resource scope.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L492-L495)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L493-L496)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation.__exit__
 
@@ -61845,7 +61956,7 @@ def __exit__(*_exc)
 
 Release event resources on normal exit and exceptions.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L497-L499)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L498-L500)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation.__init__
 
@@ -61857,7 +61968,7 @@ def __init__(aerosol, events, strategy, *, device, time_step, order='events-firs
 
 Validate both components and allocate persistent event resources.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L144-L196)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L144-L197)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation._accumulate_condensation_work
 
@@ -61869,7 +61980,7 @@ def _accumulate_condensation_work(flow)
 
 Record work without downloading physical state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L330-L336)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L331-L337)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation._condense
 
@@ -61879,7 +61990,7 @@ Record work without downloading physical state.
 def _condense(start, end)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L275-L328)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L276-L329)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation._configure
 
@@ -61889,7 +62000,7 @@ def _condense(start, end)
 def _configure(strategy, order, controls)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L217-L225)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L218-L226)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation._initialize_condensation
 
@@ -61901,7 +62012,7 @@ def _initialize_condensation(aerosol, resident)
 
 Allocate one resident adaptive owner when explicitly requested.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L198-L215)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L199-L216)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation._initialize_counters
 
@@ -61911,7 +62022,7 @@ Allocate one resident adaptive owner when explicitly requested.
 def _initialize_counters()
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L237-L244)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L238-L245)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation._ready
 
@@ -61921,7 +62032,7 @@ def _initialize_counters()
 def _ready()
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L246-L251)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L247-L252)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation._saturation
 
@@ -61931,7 +62042,7 @@ def _ready()
 def _saturation(gas, temperature)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L403-L416)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L404-L417)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation.capture_events
 
@@ -61943,7 +62054,7 @@ def capture_events()
 
 Capture only the fixed event sequence.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L474-L478)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L475-L479)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation.checkpoint
 
@@ -61955,7 +62066,7 @@ def checkpoint()
 
 Explicitly download exact event/RNG continuation between cycles.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L480-L486)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L481-L487)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation.close
 
@@ -61967,7 +62078,7 @@ def close()
 
 Release persistent event resources, including captured graphs.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L488-L490)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L489-L491)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation.diagnostics
 
@@ -61979,7 +62090,7 @@ def diagnostics()
 
 Download box reductions and derive observed saturation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L428-L438)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L429-L439)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation.run
 
@@ -61991,7 +62102,7 @@ def run(steps)
 
 Complete a nonnegative integer number of fixed coupled cycles.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L392-L401)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L393-L402)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation.snapshot
 
@@ -62003,7 +62114,7 @@ def snapshot()
 
 Explicitly download detached native state after a complete cycle.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L418-L426)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L419-L427)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation.step
 
@@ -62020,7 +62131,7 @@ grid point are admitted only when that tolerance is below a quarter
 cycle. The event clock, physical interval and restart state are
 unchanged.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L338-L390)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L339-L391)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation.update_environment
 
@@ -62032,7 +62143,7 @@ def update_environment(temperature=None, pressure=None)
 
 Explicitly upload between-cycle temperature [K] and pressure [Pa].
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L440-L446)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L441-L447)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation.update_gas
 
@@ -62044,7 +62155,7 @@ def update_gas(concentration)
 
 Explicitly upload full-gas concentration [kg/m³] between cycles.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L448-L452)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L449-L453)
 
 ### particula.execution.gpu_coupled.GPUCoupledSimulation.update_gas_species
 
@@ -62063,7 +62174,7 @@ current device temperature. Each species may occur in only one mapping.
 Validation precedes physical mutation. This explicit forcing boundary
 uploads only prescribed targets and reads scalar validation status.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L454-L472)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled.py#L455-L473)
 
 ## particula.execution.gpu_coupled._condensation_profile
 
@@ -62113,7 +62224,7 @@ No in-progress adaptive controller is carried across a fixed event boundary:
 every cycle deliberately resets it from the new accepted physical state.
 Future forcing and source schedules are supplied again by the caller.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L23-L41)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L25-L43)
 
 ### particula.execution.gpu_coupled_restart.GPUCoupledCheckpoint.configuration
 
@@ -62123,7 +62234,7 @@ Future forcing and source schedules are supplied again by the caller.
 configuration: object
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L36-L36)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L38-L38)
 
 ### particula.execution.gpu_coupled_restart.GPUCoupledCheckpoint.controls
 
@@ -62133,7 +62244,7 @@ configuration: object
 controls: GPUCondensationControls
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L37-L37)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L39-L39)
 
 ### particula.execution.gpu_coupled_restart.GPUCoupledCheckpoint.counters
 
@@ -62143,7 +62254,7 @@ controls: GPUCondensationControls
 counters: tuple[int, int, int, int]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L40-L40)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L42-L42)
 
 ### particula.execution.gpu_coupled_restart.GPUCoupledCheckpoint.device
 
@@ -62153,7 +62264,7 @@ counters: tuple[int, int, int, int]
 device: tuple
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L34-L34)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L36-L36)
 
 ### particula.execution.gpu_coupled_restart.GPUCoupledCheckpoint.events
 
@@ -62163,7 +62274,7 @@ device: tuple
 events: SimulationCheckpoint
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L35-L35)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L37-L37)
 
 ### particula.execution.gpu_coupled_restart.GPUCoupledCheckpoint.order
 
@@ -62173,7 +62284,7 @@ events: SimulationCheckpoint
 order: str
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L38-L38)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L40-L40)
 
 ### particula.execution.gpu_coupled_restart.GPUCoupledCheckpoint.resident
 
@@ -62183,7 +62294,7 @@ order: str
 resident: bool
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L41-L41)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L43-L43)
 
 ### particula.execution.gpu_coupled_restart.GPUCoupledCheckpoint.runtime
 
@@ -62193,7 +62304,7 @@ resident: bool
 runtime: tuple
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L33-L33)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L35-L35)
 
 ### particula.execution.gpu_coupled_restart.GPUCoupledCheckpoint.schema_version
 
@@ -62203,7 +62314,7 @@ runtime: tuple
 schema_version: int
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L32-L32)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L34-L34)
 
 ### particula.execution.gpu_coupled_restart.GPUCoupledCheckpoint.statistics
 
@@ -62213,7 +62324,7 @@ schema_version: int
 statistics: StepStatistics
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L39-L39)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L41-L41)
 
 ### particula.execution.gpu_coupled_restart.GPUCoupledCheckpoint.__init__
 
@@ -62235,7 +62346,7 @@ def _validate(saved)
 
 Check the complete host envelope without allocating device state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L69-L125)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L71-L127)
 
 ## particula.execution.gpu_coupled_restart.checkpoint_coupled
 
@@ -62247,7 +62358,7 @@ def checkpoint_coupled(owner)
 
 Download exact continuation only after a successfully completed cycle.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L44-L66)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L46-L68)
 
 ## particula.execution.gpu_coupled_restart.load_coupled_checkpoint
 
@@ -62259,7 +62370,7 @@ def load_coupled_checkpoint(path, *, max_bytes=512 * 1024 * 1024)
 
 Load validated host records without physics or CUDA allocation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L205-L222)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L208-L225)
 
 ## particula.execution.gpu_coupled_restart.resume_coupled
 
@@ -62271,7 +62382,7 @@ def resume_coupled(saved, events, strategy, *, device)
 
 Restore exact event streams and controls on the saved explicit device.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L128-L164)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L130-L167)
 
 ## particula.execution.gpu_coupled_restart.save_coupled_checkpoint
 
@@ -62283,7 +62394,7 @@ def save_coupled_checkpoint(saved, path, *, compressed=True)
 
 Atomically save canonical host bytes without pickle or uploads.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L167-L202)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_coupled_restart.py#L170-L205)
 
 ---
 
@@ -62828,7 +62939,7 @@ Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
 Return the accepted shared physical time [s].
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L452-L454)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L454-L456)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation.__init__
 
@@ -62973,7 +63084,7 @@ def _allocate_physics()
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L199-L240)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L199-L241)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._array
 
@@ -62997,7 +63108,7 @@ def _check_ready()
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L242-L250)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L243-L251)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._combine
 
@@ -63009,7 +63120,7 @@ def _combine(h, coefficients, output)
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L407-L418)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L409-L420)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._environment
 
@@ -63021,7 +63132,7 @@ def _environment(time)
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L262-L274)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L263-L275)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._launch
 
@@ -63033,7 +63144,7 @@ def _launch(kernel, dim, inputs)
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L252-L253)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L253-L254)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._rate
 
@@ -63045,7 +63156,7 @@ def _rate(time, state, result)
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L307-L405)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L308-L407)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._step
 
@@ -63059,7 +63170,7 @@ Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
 Advance within one smooth forcing interval.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L463-L506)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L465-L508)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._tolerance
 
@@ -63083,7 +63194,7 @@ def _trial(h)
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L420-L449)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L422-L451)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._unpack_trial
 
@@ -63097,7 +63208,7 @@ Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
 Validate and unpack device coordinates without a physical rate.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L276-L305)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L277-L306)
 
 ---
 
@@ -66438,7 +66549,7 @@ class GPUCondensationCheckpoint
 
 Own accepted arrays, exact device identity and controller data.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L23-L45)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L25-L47)
 
 ### particula.execution.gpu_restart.GPUCondensationCheckpoint.atol
 
@@ -66448,7 +66559,7 @@ Own accepted arrays, exact device identity and controller data.
 atol: np.ndarray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L35-L35)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L37-L37)
 
 ### particula.execution.gpu_restart.GPUCondensationCheckpoint.base
 
@@ -66458,7 +66569,7 @@ atol: np.ndarray
 base: tuple
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L30-L30)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L32-L32)
 
 ### particula.execution.gpu_restart.GPUCondensationCheckpoint.configuration
 
@@ -66468,7 +66579,7 @@ base: tuple
 configuration: object
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L31-L31)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L33-L33)
 
 ### particula.execution.gpu_restart.GPUCondensationCheckpoint.control_readbacks
 
@@ -66478,7 +66589,7 @@ configuration: object
 control_readbacks: int
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L44-L44)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L46-L46)
 
 ### particula.execution.gpu_restart.GPUCondensationCheckpoint.device
 
@@ -66488,7 +66599,7 @@ control_readbacks: int
 device: tuple
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L29-L29)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L31-L31)
 
 ### particula.execution.gpu_restart.GPUCondensationCheckpoint.forcing
 
@@ -66498,7 +66609,7 @@ device: tuple
 forcing: EnvironmentForcing | None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L45-L45)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L47-L47)
 
 ### particula.execution.gpu_restart.GPUCondensationCheckpoint.last_error
 
@@ -66508,7 +66619,7 @@ forcing: EnvironmentForcing | None
 last_error: float | None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L42-L42)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L44-L44)
 
 ### particula.execution.gpu_restart.GPUCondensationCheckpoint.max_step
 
@@ -66518,7 +66629,7 @@ last_error: float | None
 max_step: float
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L40-L40)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L42-L42)
 
 ### particula.execution.gpu_restart.GPUCondensationCheckpoint.max_trials
 
@@ -66528,7 +66639,7 @@ max_step: float
 max_trials: int
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L41-L41)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L43-L43)
 
 ### particula.execution.gpu_restart.GPUCondensationCheckpoint.method
 
@@ -66538,7 +66649,7 @@ max_trials: int
 method: str
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L37-L37)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L39-L39)
 
 ### particula.execution.gpu_restart.GPUCondensationCheckpoint.min_step
 
@@ -66548,7 +66659,7 @@ method: str
 min_step: float
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L39-L39)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L41-L41)
 
 ### particula.execution.gpu_restart.GPUCondensationCheckpoint.next_step
 
@@ -66558,7 +66669,7 @@ min_step: float
 next_step: float
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L38-L38)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L40-L40)
 
 ### particula.execution.gpu_restart.GPUCondensationCheckpoint.rtol
 
@@ -66568,7 +66679,7 @@ next_step: float
 rtol: np.ndarray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L34-L34)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L36-L36)
 
 ### particula.execution.gpu_restart.GPUCondensationCheckpoint.runtime
 
@@ -66578,7 +66689,7 @@ rtol: np.ndarray
 runtime: tuple
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L28-L28)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L30-L30)
 
 ### particula.execution.gpu_restart.GPUCondensationCheckpoint.scale
 
@@ -66588,7 +66699,7 @@ runtime: tuple
 scale: np.ndarray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L33-L33)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L35-L35)
 
 ### particula.execution.gpu_restart.GPUCondensationCheckpoint.schema_version
 
@@ -66598,7 +66709,7 @@ scale: np.ndarray
 schema_version: int
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L27-L27)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L29-L29)
 
 ### particula.execution.gpu_restart.GPUCondensationCheckpoint.state
 
@@ -66608,7 +66719,7 @@ schema_version: int
 state: np.ndarray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L32-L32)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L34-L34)
 
 ### particula.execution.gpu_restart.GPUCondensationCheckpoint.statistics
 
@@ -66618,7 +66729,7 @@ state: np.ndarray
 statistics: StepStatistics
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L43-L43)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L45-L45)
 
 ### particula.execution.gpu_restart.GPUCondensationCheckpoint.time
 
@@ -66628,7 +66739,7 @@ statistics: StepStatistics
 time: float
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L36-L36)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L38-L38)
 
 ### particula.execution.gpu_restart.GPUCondensationCheckpoint.__init__
 
@@ -66648,7 +66759,7 @@ def __init__(schema_version: int, runtime: tuple, device: tuple, base: tuple, co
 def _device_identity(device)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L52-L59)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L54-L61)
 
 ## particula.execution.gpu_restart._runtime
 
@@ -66658,7 +66769,7 @@ def _device_identity(device)
 def _runtime()
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L48-L49)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L50-L51)
 
 ## particula.execution.gpu_restart._validate
 
@@ -66670,7 +66781,7 @@ def _validate(saved)
 
 Validate all host state before allocation or archive replacement.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L91-L117)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L95-L121)
 
 ## particula.execution.gpu_restart._validate_arrays
 
@@ -66682,7 +66793,7 @@ def _validate_arrays(saved, base)
 
 Check scaled arrays and native inventory before any device upload.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L120-L165)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L124-L169)
 
 ## particula.execution.gpu_restart._validate_controls
 
@@ -66694,7 +66805,7 @@ def _validate_controls(saved)
 
 Check the accepted clock, controller limits and work history.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L168-L193)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L172-L197)
 
 ## particula.execution.gpu_restart.checkpoint_gpu_condensation
 
@@ -66706,7 +66817,7 @@ def checkpoint_gpu_condensation(owner)
 
 Explicitly download an accepted adaptive checkpoint outside capture.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L62-L88)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L64-L92)
 
 ## particula.execution.gpu_restart.load_gpu_checkpoint
 
@@ -66718,7 +66829,7 @@ def load_gpu_checkpoint(path, *, max_bytes=512 * 1024 * 1024)
 
 Load validated adaptive host data without creating a device owner.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L252-L269)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L256-L273)
 
 ## particula.execution.gpu_restart.resume_gpu_condensation
 
@@ -66730,7 +66841,7 @@ def resume_gpu_condensation(saved, strategy, *, device)
 
 Restore exact coordinates and controller on the same explicit device.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L196-L230)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L200-L234)
 
 ## particula.execution.gpu_restart.save_gpu_checkpoint
 
@@ -66742,7 +66853,7 @@ def save_gpu_checkpoint(checkpoint, path, *, compressed=True)
 
 Atomically store downloaded adaptive state as non-executable data.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L233-L249)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_restart.py#L237-L253)
 
 ---
 
@@ -73329,7 +73440,7 @@ Initialize labels and observe after each ordered physical process.
 
 Host-side condensation capability checks and retained GPU compilation.
 
-The direct solver has four equal substeps, one activity-corrected material,
+The direct solver has four equal substeps, material activity corrections,
 and a mixture Kelvin density. Admit only CPU configuration that can be
 represented by those controls; do not discard unsupported strategy choices.
 
@@ -73343,9 +73454,9 @@ represented by those controls; do not discard unsupported strategy choices.
 def _activity_plan(activity, particles, gas, pairs, vapor)
 ```
 
-Require one participating volatile material lane.
+Translate material activities to the direct solver configuration.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L124-L198)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L125-L211)
 
 ## particula.execution.prepared_condensation._surface_plan
 
@@ -73357,7 +73468,7 @@ def _surface_plan(surface, particles)
 
 Require an exact static or single-phase volume-weighted surface law.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L76-L121)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L77-L122)
 
 ## particula.execution.prepared_condensation._vapor_plan
 
@@ -73369,7 +73480,7 @@ def _vapor_plan(strategy, width, *, allow_zero=False)
 
 Freeze constant/Buck definitions in complete gas order.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L34-L73)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L35-L74)
 
 ## particula.execution.prepared_condensation._vector
 
@@ -73381,7 +73492,7 @@ def _vector(value, width, name, *, positive=False)
 
 Normalize finite nonnegative scalar/vector metadata without aliasing.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L19-L31)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L20-L32)
 
 ## particula.execution.prepared_condensation.compile_condensation
 
@@ -73393,7 +73504,7 @@ def compile_condensation(plan: _ProcessPlan, context: BuiltinPreparationContext)
 
 Allocate retained thermodynamics, species maps and transport sidecars.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L289-L404)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L303-L421)
 
 ## particula.execution.prepared_condensation.plan_condensation
 
@@ -73405,7 +73516,7 @@ def plan_condensation(process, aerosol, *, allow_zero_vapor=False) -> _ProcessPl
 
 Freeze representable physical parameters before any upload.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L201-L286)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L214-L300)
 
 ---
 
@@ -102303,6 +102414,16 @@ launches.
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1-L1)
 
+## particula.gpu.kernels.condensation.ACTIVITY_MODE_BAT
+
+*attribute* · *module attribute*
+
+```python
+ACTIVITY_MODE_BAT = wp.int32(2)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L128-L128)
+
 ## particula.gpu.kernels.condensation.ACTIVITY_MODE_IDEAL
 
 *attribute* · *module attribute*
@@ -102331,7 +102452,7 @@ ACTIVITY_MODE_KAPPA = wp.int32(1)
 SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED = wp.int32(1)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L129-L129)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L130-L130)
 
 ## particula.gpu.kernels.condensation.SURFACE_TENSION_MODE_STATIC
 
@@ -102341,7 +102462,7 @@ SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED = wp.int32(1)
 SURFACE_TENSION_MODE_STATIC = wp.int32(0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L128-L128)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L129-L129)
 
 ## particula.gpu.kernels.condensation._DEFAULT_DIFFUSION_COEFFICIENT
 
@@ -102448,20 +102569,22 @@ arrays immutable. ``kappas`` and ``molar_mass_reference`` therefore remain
 caller-owned mutable ``wp.float64`` arrays with shape ``(n_species,)``;
 native species order is particle material order. Callers must retain
 their lifetime and must not modify them concurrently
-with a launch. Activity is evaluated only for ``water_species_index``;
+with a launch. Binary BAT evaluates both material activities.
+Ideal and kappa modes evaluate activity only for ``water_species_index``;
 every non-water vapor uses unit activity. Static tension uses the current
 condensing-species index, while composition-weighted tension computes one
 particle-wide value for every condensing species.
 
 **Attributes**
 
-- `activity_mode` (`Any`) — Integer selector: ``0`` for ideal or ``1`` for kappa water activity.
+- `activity_mode` (`Any`) — Select ideal (0), kappa (1) or binary BAT (2).
 - `surface_tension_mode` (`Any`) — Integer selector: ``0`` for static or ``1`` for composition-weighted surface tension.
-- `water_species_index` (`Any`) — Index of the sole species receiving activity; all other vapor species use unit activity.
+- `water_species_index` (`Any`) — Water material index. BAT requires zero.
+- `bat_table` (`Any`) — Interleaved water and organic activities on a uniform organic mole-fraction grid from zero to one (BAT only).
 - `kappas` (`Any`) — Caller-owned finite, non-negative ``wp.float64`` array of per-species kappa parameters with shape ``(n_species,)``.
-- `molar_mass_reference` (`Any`) — Caller-owned positive ``wp.float64`` array of per-species molar masses [kg/mol], shaped ``(n_species,)`` and equal to mapped full-gas values for native calls. Unmapped material molar masses are independent. Legacy calls require gas order.
+- `molar_mass_reference` (`Any`) — Caller-owned positive ``wp.float64`` array of per-species molar masses [kg/mol], shaped ``(n_species,)`` and equal to mapped gas values for native ideal and kappa calls. BAT uses the molar masses of its binary fit. Unmapped material molar masses are independent. Legacy calls require gas order.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L132-L165)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L133-L169)
 
 ### particula.gpu.kernels.condensation.CondensationActivitySurfaceConfig.activity_mode
 
@@ -102471,7 +102594,17 @@ particle-wide value for every condensing species.
 activity_mode: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L161-L161)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L164-L164)
+
+### particula.gpu.kernels.condensation.CondensationActivitySurfaceConfig.bat_table
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+bat_table: Any = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L169-L169)
 
 ### particula.gpu.kernels.condensation.CondensationActivitySurfaceConfig.kappas
 
@@ -102481,7 +102614,7 @@ activity_mode: Any
 kappas: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L164-L164)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L167-L167)
 
 ### particula.gpu.kernels.condensation.CondensationActivitySurfaceConfig.molar_mass_reference
 
@@ -102491,7 +102624,7 @@ kappas: Any
 molar_mass_reference: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L165-L165)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L168-L168)
 
 ### particula.gpu.kernels.condensation.CondensationActivitySurfaceConfig.surface_tension_mode
 
@@ -102501,7 +102634,7 @@ molar_mass_reference: Any
 surface_tension_mode: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L162-L162)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L165-L165)
 
 ### particula.gpu.kernels.condensation.CondensationActivitySurfaceConfig.water_species_index
 
@@ -102511,14 +102644,14 @@ surface_tension_mode: Any
 water_species_index: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L163-L163)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L166-L166)
 
 ### particula.gpu.kernels.condensation.CondensationActivitySurfaceConfig.__init__
 
 *method*
 
 ```python
-def __init__(activity_mode: Any, surface_tension_mode: Any, water_species_index: Any, kappas: Any, molar_mass_reference: Any) -> None
+def __init__(activity_mode: Any, surface_tension_mode: Any, water_species_index: Any, kappas: Any, molar_mass_reference: Any, bat_table: Any = None) -> None
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L0-L0)
@@ -102566,7 +102699,7 @@ leaves caller-owned state unchanged.
 - `negative_mass_transfer_release` (`Any | None`) — Optional inventory finalization-only per-box, per-species reduction storage. Proposal gating validates but does not read or write it.
 - `positive_mass_transfer_scale` (`Any | None`) — Optional inventory finalization-only per-box, per-species scale storage. Proposal gating validates but does not read or write it.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L168-L224)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L172-L228)
 
 ### particula.gpu.kernels.condensation.CondensationScratchBuffers.dynamic_viscosity
 
@@ -102576,7 +102709,7 @@ leaves caller-owned state unchanged.
 dynamic_viscosity: Any | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L220-L220)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L224-L224)
 
 ### particula.gpu.kernels.condensation.CondensationScratchBuffers.mean_free_path
 
@@ -102586,7 +102719,7 @@ dynamic_viscosity: Any | None = None
 mean_free_path: Any | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L221-L221)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L225-L225)
 
 ### particula.gpu.kernels.condensation.CondensationScratchBuffers.negative_mass_transfer_release
 
@@ -102596,7 +102729,7 @@ mean_free_path: Any | None = None
 negative_mass_transfer_release: Any | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L223-L223)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L227-L227)
 
 ### particula.gpu.kernels.condensation.CondensationScratchBuffers.positive_mass_transfer_demand
 
@@ -102606,7 +102739,7 @@ negative_mass_transfer_release: Any | None = None
 positive_mass_transfer_demand: Any | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L222-L222)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L226-L226)
 
 ### particula.gpu.kernels.condensation.CondensationScratchBuffers.positive_mass_transfer_scale
 
@@ -102616,7 +102749,7 @@ positive_mass_transfer_demand: Any | None = None
 positive_mass_transfer_scale: Any | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L224-L224)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L228-L228)
 
 ### particula.gpu.kernels.condensation.CondensationScratchBuffers.total_mass_transfer
 
@@ -102626,7 +102759,7 @@ positive_mass_transfer_scale: Any | None = None
 total_mass_transfer: Any | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L219-L219)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L223-L223)
 
 ### particula.gpu.kernels.condensation.CondensationScratchBuffers.work_mass_transfer
 
@@ -102636,7 +102769,7 @@ total_mass_transfer: Any | None = None
 work_mass_transfer: Any | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L218-L218)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L222-L222)
 
 ### particula.gpu.kernels.condensation.CondensationScratchBuffers.__init__
 
@@ -102677,7 +102810,7 @@ after a writer launches.
 - `device` (`Any`) — Active Warp device for all retained arrays.
 - `substep_time_step` (`Any`) — Equal duration of each of four substeps [s].
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L227-L303)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L231-L307)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.activity_enabled
 
@@ -102687,7 +102820,7 @@ after a writer launches.
 activity_enabled: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L270-L270)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L274-L274)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.activity_mode
 
@@ -102697,7 +102830,7 @@ activity_enabled: Any
 activity_mode: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L271-L271)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L275-L275)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.candidate
 
@@ -102707,7 +102840,7 @@ activity_mode: Any
 candidate: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L263-L263)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L267-L267)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.demand
 
@@ -102717,7 +102850,7 @@ candidate: Any
 demand: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L260-L260)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L264-L264)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.device
 
@@ -102727,7 +102860,7 @@ demand: Any
 device: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L282-L282)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L286-L286)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.diffusion_coefficient_vapor
 
@@ -102737,7 +102870,7 @@ device: Any
 diffusion_coefficient_vapor: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L257-L257)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L261-L261)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.dimensions
 
@@ -102747,7 +102880,7 @@ diffusion_coefficient_vapor: Any
 dimensions: tuple[int, int, int]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L281-L281)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L285-L285)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.distribution_kind
 
@@ -102757,7 +102890,7 @@ dimensions: tuple[int, int, int]
 distribution_kind: int
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L298-L298)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L302-L302)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.dynamic_viscosity
 
@@ -102767,7 +102900,7 @@ distribution_kind: int
 dynamic_viscosity: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L266-L266)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L270-L270)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.effective_surface_tension
 
@@ -102777,7 +102910,7 @@ dynamic_viscosity: Any
 effective_surface_tension: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L274-L274)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L278-L278)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.energy_transfer
 
@@ -102787,7 +102920,7 @@ effective_surface_tension: Any
 energy_transfer: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L280-L280)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L284-L284)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.failure
 
@@ -102797,7 +102930,7 @@ energy_transfer: Any
 failure: Any = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L300-L300)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L304-L304)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.finalized
 
@@ -102807,7 +102940,7 @@ failure: Any = None
 finalized: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L264-L264)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L268-L268)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.gas
 
@@ -102817,7 +102950,7 @@ finalized: Any
 gas: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L253-L253)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L257-L257)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.gas_concentration
 
@@ -102827,7 +102960,7 @@ gas: Any
 gas_concentration: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L287-L287)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L291-L291)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.gas_delta
 
@@ -102837,7 +102970,7 @@ gas_concentration: Any
 gas_delta: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L265-L265)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L269-L269)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.gas_molar_mass
 
@@ -102847,7 +102980,7 @@ gas_delta: Any
 gas_molar_mass: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L289-L289)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L293-L293)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.gas_partitioning
 
@@ -102857,7 +102990,7 @@ gas_molar_mass: Any
 gas_partitioning: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L290-L290)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L294-L294)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.gas_species_count
 
@@ -102867,7 +103000,7 @@ gas_partitioning: Any
 gas_species_count: int
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L299-L299)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L303-L303)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.gas_to_particle
 
@@ -102877,7 +103010,7 @@ gas_species_count: int
 gas_to_particle: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L295-L295)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L299-L299)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.gas_vapor_pressure
 
@@ -102887,7 +103020,7 @@ gas_to_particle: Any
 gas_vapor_pressure: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L288-L288)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L292-L292)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.ion_material_indices
 
@@ -102897,7 +103030,7 @@ gas_vapor_pressure: Any
 ion_material_indices: tuple[int, int] | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L302-L302)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L306-L306)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.kappas
 
@@ -102907,7 +103040,7 @@ ion_material_indices: tuple[int, int] | None = None
 kappas: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L268-L268)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L272-L272)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.kelvin_density
 
@@ -102917,7 +103050,7 @@ kappas: Any
 kelvin_density: float = 0.0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L303-L303)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L307-L307)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.kernel_pressure
 
@@ -102927,7 +103060,7 @@ kelvin_density: float = 0.0
 kernel_pressure: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L276-L276)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L280-L280)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.latent_heat
 
@@ -102937,7 +103070,7 @@ kernel_pressure: Any
 latent_heat: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L277-L277)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L281-L281)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.latent_heat_enabled
 
@@ -102947,7 +103080,7 @@ latent_heat: Any
 latent_heat_enabled: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L279-L279)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L283-L283)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.latent_heat_values
 
@@ -102957,7 +103090,7 @@ latent_heat_enabled: Any
 latent_heat_values: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L278-L278)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L282-L282)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.mass_accommodation
 
@@ -102967,7 +103100,7 @@ latent_heat_values: Any
 mass_accommodation: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L256-L256)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L260-L260)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.mean_free_path
 
@@ -102977,7 +103110,7 @@ mass_accommodation: Any
 mean_free_path: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L267-L267)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L271-L271)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.molar_mass_reference
 
@@ -102987,7 +103120,7 @@ mean_free_path: Any
 molar_mass_reference: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L269-L269)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L273-L273)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.parallel_reductions
 
@@ -102997,7 +103130,7 @@ molar_mass_reference: Any
 parallel_reductions: Any = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L301-L301)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L305-L305)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.particle_charge
 
@@ -103007,7 +103140,7 @@ parallel_reductions: Any = None
 particle_charge: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L297-L297)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L301-L301)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.particle_concentration
 
@@ -103017,7 +103150,7 @@ particle_charge: Any
 particle_concentration: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L285-L285)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L289-L289)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.particle_density
 
@@ -103027,7 +103160,7 @@ particle_concentration: Any
 particle_density: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L286-L286)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L290-L290)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.particle_masses
 
@@ -103037,7 +103170,7 @@ particle_density: Any
 particle_masses: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L284-L284)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L288-L288)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.particle_to_gas
 
@@ -103047,7 +103180,7 @@ particle_masses: Any
 particle_to_gas: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L294-L294)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L298-L298)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.particle_volume
 
@@ -103057,7 +103190,7 @@ particle_to_gas: Any
 particle_volume: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L296-L296)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L300-L300)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.particles
 
@@ -103067,7 +103200,7 @@ particle_volume: Any
 particles: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L252-L252)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L256-L256)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.refresh_temperature
 
@@ -103077,7 +103210,7 @@ particles: Any
 refresh_temperature: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L275-L275)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L279-L279)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.release
 
@@ -103087,7 +103220,7 @@ refresh_temperature: Any
 release: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L261-L261)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L265-L265)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.scale
 
@@ -103097,7 +103230,7 @@ release: Any
 scale: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L262-L262)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L266-L266)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.species_binding
 
@@ -103107,7 +103240,7 @@ scale: Any
 species_binding: CondensationSpeciesBinding
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L293-L293)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L297-L297)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.substep_time_step
 
@@ -103117,7 +103250,7 @@ species_binding: CondensationSpeciesBinding
 substep_time_step: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L283-L283)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L287-L287)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.surface_tension
 
@@ -103127,7 +103260,7 @@ substep_time_step: Any
 surface_tension: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L255-L255)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L259-L259)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.surface_tension_mode
 
@@ -103137,7 +103270,7 @@ surface_tension: Any
 surface_tension_mode: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L272-L272)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L276-L276)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.thermodynamics
 
@@ -103147,7 +103280,7 @@ surface_tension_mode: Any
 thermodynamics: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L254-L254)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L258-L258)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.thermodynamics_modes
 
@@ -103157,7 +103290,7 @@ thermodynamics: Any
 thermodynamics_modes: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L291-L291)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L295-L295)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.thermodynamics_parameters
 
@@ -103167,7 +103300,7 @@ thermodynamics_modes: Any
 thermodynamics_parameters: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L292-L292)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L296-L296)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.total_mass_transfer
 
@@ -103177,7 +103310,7 @@ thermodynamics_parameters: Any
 total_mass_transfer: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L258-L258)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L262-L262)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.water_species_index
 
@@ -103187,7 +103320,7 @@ total_mass_transfer: Any
 water_species_index: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L273-L273)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L277-L277)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.work_mass_transfer
 
@@ -103197,7 +103330,7 @@ water_species_index: Any
 work_mass_transfer: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L259-L259)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L263-L263)
 
 ### particula.gpu.kernels.condensation._PreparedCondensationCall.__init__
 
@@ -103219,7 +103352,7 @@ def _accumulate_finalized_mass_transfer_kernel(finalized: Any, total_mass_transf
 
 Add one inventory-limited transfer to the whole-call total.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1128-L1139)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1191-L1202)
 
 ## particula.gpu.kernels.condensation._bound_evaporation_candidate_kernel
 
@@ -103237,7 +103370,7 @@ Copy a gated proposal while bounding evaporation by owned mass.
 - `gated_transfer` (`Any`) — Already partitioning-gated transfer proposal matching ``masses`` [kg].
 - `candidate` (`Any`) — Output bounded proposal matching ``masses`` [kg].
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1195-L1217)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1258-L1280)
 
 ## particula.gpu.kernels.condensation._clear_energy_transfer_kernel
 
@@ -103249,7 +103382,7 @@ def _clear_energy_transfer_kernel(energy_transfer: Any) -> None
 
 Clear caller-owned whole-call energy diagnostic storage.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1117-L1125)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1180-L1188)
 
 ## particula.gpu.kernels.condensation._clear_mass_transfer_kernel
 
@@ -103261,19 +103394,19 @@ def _clear_mass_transfer_kernel(total_mass_transfer: Any) -> None
 
 Clear the fixed-shape accumulator before the four-substep update.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1104-L1114)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1167-L1177)
 
 ## particula.gpu.kernels.condensation._condensation_mass_transfer_impl
 
 *function*
 
 ```python
-def _condensation_mass_transfer_impl(masses: Any, concentration: Any, density: Any, gas_concentration: Any, vapor_pressure: Any, molar_mass: Any, surface_tension: Any, kappas: Any, molar_mass_reference: Any, effective_surface_tension: Any, activity_enabled: wp.int32, activity_mode: wp.int32, surface_tension_mode: wp.int32, water_species_index: wp.int32, mass_accommodation: Any, diffusion_coefficient_vapor: Any, latent_heat: Any, latent_heat_enabled: wp.int32, dynamic_viscosity: Any, mean_free_path: Any, gas_constant: Any, boltzmann_constant: Any, temperature: Any, time_step: Any, mass_transfer: Any, particle_to_gas: Any, native: wp.int32, kelvin_density: Any, box_idx: int, particle_idx: int) -> None
+def _condensation_mass_transfer_impl(masses: Any, concentration: Any, density: Any, gas_concentration: Any, vapor_pressure: Any, molar_mass: Any, surface_tension: Any, activity_parameters: Any, molar_mass_reference: Any, effective_surface_tension: Any, activity_enabled: wp.int32, activity_mode: wp.int32, surface_tension_mode: wp.int32, water_species_index: wp.int32, mass_accommodation: Any, diffusion_coefficient_vapor: Any, latent_heat: Any, latent_heat_enabled: wp.int32, dynamic_viscosity: Any, mean_free_path: Any, gas_constant: Any, boltzmann_constant: Any, temperature: Any, time_step: Any, mass_transfer: Any, particle_to_gas: Any, native: wp.int32, kelvin_density: Any, box_idx: int, particle_idx: int) -> None
 ```
 
 Shared raw proposal with explicit gas lookup only for native calls.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L495-L790)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L549-L853)
 
 ## particula.gpu.kernels.condensation._copy_pressure_to_float64_kernel
 
@@ -103290,7 +103423,7 @@ Copy normalized pressures into a float64 device buffer.
 - `pressure` (`Any`) — Normalized per-box pressure array ``(n_boxes,)`` [Pa].
 - `output` (`Any`) — Float64 per-box output array ``(n_boxes,)`` [Pa].
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L997-L1010)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1060-L1073)
 
 ## particula.gpu.kernels.condensation._copy_temperature_to_float64_kernel
 
@@ -103310,7 +103443,7 @@ thermodynamic vapor-pressure refresh without changing the input buffer.
 - `temperature` (`Any`) — Normalized per-box temperature array ``(n_boxes,)`` [K].
 - `output` (`Any`) — Float64 per-box output array ``(n_boxes,)`` [K].
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L978-L994)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1041-L1057)
 
 ## particula.gpu.kernels.condensation._couple_finalized_transfer_to_gas_kernel
 
@@ -103322,7 +103455,7 @@ def _couple_finalized_transfer_to_gas_kernel(gas_delta: Any, gas_concentration: 
 
 Run the shared device operation through the direct kernel API.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1166-L1176)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1229-L1239)
 
 ## particula.gpu.kernels.condensation._couple_finalized_transfer_to_gas_kernel_body
 
@@ -103338,7 +103471,7 @@ Each box-species lane subtracts a finite, concentration-weighted particle
 transfer delta from gas. Negative finalized transfer therefore adds
 evaporated inventory to gas.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1142-L1163)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1205-L1226)
 
 ## particula.gpu.kernels.condensation._couple_finalized_transfer_to_gas_kernel_guarded
 
@@ -103350,7 +103483,7 @@ def _couple_finalized_transfer_to_gas_kernel_guarded(gas_delta: Any, gas_concent
 
 Skip this resident writer after a latched simulation failure.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1179-L1192)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1242-L1255)
 
 ## particula.gpu.kernels.condensation._effective_surface_tension_kernel
 
@@ -103366,7 +103499,7 @@ The output is recalculated from the current mass in each substep and reused
 for every condensing species of that particle, avoiding a full composition
 reduction per species.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L959-L975)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1022-L1038)
 
 ## particula.gpu.kernels.condensation._enqueue_prepared_condensation_call
 
@@ -103397,7 +103530,7 @@ coupling, and diagnostic sequence four times.
 - (`Any`) — A tuple containing the resident particle container and the accumulated
 - (`Any`) — finalized mass-transfer buffer, both retained by the prepared record.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L2942-L3196)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L3019-L3273)
 
 ## particula.gpu.kernels.condensation._finalize_and_apply_inventory_transfer_kernel
 
@@ -103420,7 +103553,7 @@ therefore does not perform gas coupling.
 - `scale` (`Any`) — Positive-transfer fractions by box and species.
 - `finalized` (`Any`) — Output applied transfer matching ``masses`` [kg].
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1292-L1317)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1355-L1380)
 
 ## particula.gpu.kernels.condensation._finalize_inventory_limited_mass_transfer
 
@@ -103469,7 +103602,7 @@ peer storage.
 > failures leave caller-owned state unchanged; this does not promise
 > rollback after a post-launch device-runtime failure.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1991-L2134)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L2054-L2197)
 
 ## particula.gpu.kernels.condensation._mapped_condensation_mass_transfer_kernel
 
@@ -103481,7 +103614,7 @@ def _mapped_condensation_mass_transfer_kernel(masses: Any, concentration: Any, d
 
 Compute particle-ordered proposals from full-gas mapped sources.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L893-L956)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L956-L1019)
 
 ## particula.gpu.kernels.condensation._prepare_condensation_step_gpu
 
@@ -103621,7 +103754,7 @@ before launch to prevent non-isothermal arithmetic overflow.
 > only writes it. This write-only contract permits stale finite values and
 > NaN/Inf before a call.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L2228-L2939)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L2292-L3016)
 
 ## particula.gpu.kernels.condensation._prepare_environment_properties_kernel
 
@@ -103640,7 +103773,7 @@ Precompute box-level gas properties for one condensation substep.
 - `dynamic_viscosity` (`Any`) — Output dynamic viscosity array ``(n_boxes,)`` [Pa·s].
 - `mean_free_path` (`Any`) — Output mean free path array ``(n_boxes,)`` [m].
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1013-L1046)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1076-L1109)
 
 ## particula.gpu.kernels.condensation._read_float64_array
 
@@ -103652,7 +103785,7 @@ def _read_float64_array(array: Any) -> np.ndarray
 
 Return a Warp array's values as a float64 NumPy array for validation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L306-L308)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L310-L312)
 
 ## particula.gpu.kernels.condensation._reduce_inventory_candidates_kernel
 
@@ -103675,7 +103808,7 @@ negative candidates contribute their magnitude to release.
 - `demand` (`Any`) — Output positive transfer demand ``(n_boxes, n_species)`` [kg/m^3].
 - `release` (`Any`) — Output evaporation release ``(n_boxes, n_species)`` [kg/m^3].
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1220-L1253)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1283-L1316)
 
 ## particula.gpu.kernels.condensation._scale_inventory_uptake_kernel
 
@@ -103698,7 +103831,19 @@ and otherwise the available-to-demand ratio clamped to ``[0, 1]``.
 - `release` (`Any`) — Evaporation release ``(n_boxes, n_species)`` [kg/m^3].
 - `scale` (`Any`) — Output positive-transfer fractions ``(n_boxes, n_species)``.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1256-L1289)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1319-L1352)
+
+## particula.gpu.kernels.condensation._validate_binary_activity_table
+
+*function*
+
+```python
+def _validate_binary_activity_table(table, n_species, water_index, device, caller_name)
+```
+
+Check both columns before any state update or device launch.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L393-L415)
 
 ## particula.gpu.kernels.condensation._validate_device_arrays
 
@@ -103720,7 +103865,7 @@ Validate particle and gas arrays share the same Warp device.
 
 - `ValueError` — If any particle or gas array is on a different device.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1970-L1988)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L2033-L2051)
 
 ## particula.gpu.kernels.condensation._validate_device_match
 
@@ -103742,7 +103887,7 @@ Validate that a Warp array is on the expected device.
 
 - `ValueError` — If the array is not on the expected device.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1954-L1967)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L2017-L2030)
 
 ## particula.gpu.kernels.condensation._validate_energy_transfer_buffer
 
@@ -103754,7 +103899,7 @@ def _validate_energy_transfer_buffer(energy_transfer: Any, expected_shape: tuple
 
 Validate metadata for caller-owned write-only energy output storage.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1445-L1465)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1508-L1528)
 
 ## particula.gpu.kernels.condensation._validate_energy_transfer_ownership
 
@@ -103766,7 +103911,7 @@ def _validate_energy_transfer_ownership(energy_transfer: Any, mutable_arrays: tu
 
 Reject energy output storage overlapping condensation state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1521-L1540)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1584-L1603)
 
 ## particula.gpu.kernels.condensation._validate_finite_gas_delta
 
@@ -103778,7 +103923,7 @@ def _validate_finite_gas_delta(gas_delta: Any, device: Any) -> None
 
 Reject non-finite finalized-transfer reductions before gas mutation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1715-L1729)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1778-L1792)
 
 ## particula.gpu.kernels.condensation._validate_float64_species_array
 
@@ -103794,7 +103939,7 @@ Numeric-domain validation runs before the step can clear or mutate any
 caller-owned output. CUDA values are checked by a device-side preflight
 kernel; only its one-element validation result is read back.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1349-L1392)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1412-L1455)
 
 ## particula.gpu.kernels.condensation._validate_gas_arrays
 
@@ -103816,7 +103961,7 @@ Validate gas array shapes and lengths.
 
 - `ValueError` — If gas array shapes do not match expectations.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1871-L1897)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1934-L1960)
 
 ## particula.gpu.kernels.condensation._validate_gas_delta_values_kernel
 
@@ -103828,7 +103973,7 @@ def _validate_gas_delta_values_kernel(gas_delta: Any, invalid: Any) -> None
 
 Record a non-finite finalized-transfer gas reduction.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1601-L1607)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1664-L1670)
 
 ## particula.gpu.kernels.condensation._validate_int32_selector
 
@@ -103840,7 +103985,7 @@ def _validate_int32_selector(name: str, value: Any, allowed: tuple[int, ...]) ->
 
 Validate a non-boolean integer selector before Warp int32 conversion.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L371-L386)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L375-L390)
 
 ## particula.gpu.kernels.condensation._validate_mass_transfer_buffer
 
@@ -103862,7 +104007,7 @@ Validate mass transfer buffer shape and device.
 
 - `ValueError` — If the shape or device does not match expectations.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1414-L1442)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1477-L1505)
 
 ## particula.gpu.kernels.condensation._validate_mass_transfer_ownership
 
@@ -103874,7 +104019,7 @@ def _validate_mass_transfer_ownership(mass_transfer: Any, state_arrays: tuple[An
 
 Reject a total-transfer output that aliases condensation state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1543-L1564)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1606-L1627)
 
 ## particula.gpu.kernels.condensation._validate_native_ownership
 
@@ -103889,7 +104034,7 @@ Reject overlaps involving any native writer before normalization.
 Primary arrays, outputs and supplied scratch must not overwrite any peer
 or configuration array. Read-only configuration may share storage.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L2137-L2225)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L2200-L2289)
 
 ## particula.gpu.kernels.condensation._validate_no_overlap
 
@@ -103901,7 +104046,7 @@ def _validate_no_overlap(read_only_arrays: tuple[Any | None, ...], writable_arra
 
 Reject thermal sidecars that alias writable scratch property storage.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1499-L1518)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1562-L1581)
 
 ## particula.gpu.kernels.condensation._validate_p2_commit_values
 
@@ -103914,7 +104059,7 @@ def _validate_p2_commit_values(particles: Any, finalized: Any, total_mass_transf
 Validate every prospective inventory finalization state value before its
 first commit.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1732-L1776)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1795-L1839)
 
 ## particula.gpu.kernels.condensation._validate_p2_commit_values_kernel
 
@@ -103927,7 +104072,7 @@ def _validate_p2_commit_values_kernel(masses: Any, finalized: Any, total_mass_tr
 Record invalid prospective inventory finalization values before mutating
 public state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1610-L1645)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1673-L1708)
 
 ## particula.gpu.kernels.condensation._validate_p2_primary_state
 
@@ -103940,7 +104085,7 @@ def _validate_p2_primary_state(particles: Any, gas: Any, dimensions: tuple[int, 
 Validate finite, non-negative primary inventory finalization state before
 launch.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1648-L1691)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1711-L1754)
 
 ## particula.gpu.kernels.condensation._validate_p2_primary_values_kernel
 
@@ -103953,7 +104098,7 @@ def _validate_p2_primary_values_kernel(masses: Any, concentration: Any, gas_conc
 Record invalid primary inventory finalization state without changing
 caller data.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1567-L1588)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1630-L1651)
 
 ## particula.gpu.kernels.condensation._validate_p2_proposal_finiteness
 
@@ -103966,7 +104111,7 @@ def _validate_p2_proposal_finiteness(proposal: Any, dimensions: tuple[int, int, 
 Validate a freshly written proposal gating proposal immediately before
 inventory finalization mutation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1694-L1712)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1757-L1775)
 
 ## particula.gpu.kernels.condensation._validate_p2_proposal_values_kernel
 
@@ -103978,7 +104123,7 @@ def _validate_p2_proposal_values_kernel(proposal: Any, invalid: Any) -> None
 
 Record a non-finite freshly generated proposal gating proposal.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1591-L1598)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1654-L1661)
 
 ## particula.gpu.kernels.condensation._validate_p2_sidecar_ownership
 
@@ -103991,7 +104136,7 @@ def _validate_p2_sidecar_ownership(demand: Any | None, release: Any | None, scal
 Reject inventory finalization reduction sidecars overlapping protected or
 peer storage.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1779-L1806)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1842-L1869)
 
 ## particula.gpu.kernels.condensation._validate_particle_arrays
 
@@ -104014,7 +104159,7 @@ Validate particle array shapes and lengths.
 
 - `ValueError` — If particle array shapes do not match expectations.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1846-L1868)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1909-L1931)
 
 ## particula.gpu.kernels.condensation._validate_partitioning_metadata
 
@@ -104026,7 +104171,7 @@ def _validate_partitioning_metadata(partitioning: Any, n_boxes: int, n_species: 
 
 Validate an active-device per-box partitioning mask's metadata.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1912-L1928)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1975-L1991)
 
 ## particula.gpu.kernels.condensation._validate_partitioning_values
 
@@ -104042,7 +104187,7 @@ The one-element status buffer is private disposable preflight state. Its
 readback is necessary to make arbitrary device-resident non-binary values
 observable before any caller-owned state is changed.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1931-L1951)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1994-L2014)
 
 ## particula.gpu.kernels.condensation._validate_partitioning_values_kernel
 
@@ -104054,7 +104199,7 @@ def _validate_partitioning_values_kernel(partitioning: Any, invalid: Any) -> Non
 
 Record non-binary entries in a per-box partitioning mask.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1900-L1909)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1963-L1972)
 
 ## particula.gpu.kernels.condensation._validate_scratch_ownership
 
@@ -104066,7 +104211,7 @@ def _validate_scratch_ownership(scratch_buffers: CondensationScratchBuffers, pro
 
 Reject all supplied scratch buffers overlapping peers or public state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1809-L1843)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1872-L1906)
 
 ## particula.gpu.kernels.condensation._validate_species_array
 
@@ -104089,7 +104234,7 @@ Validate per-species array length and device.
 
 - `ValueError` — If the array length or device mismatches expectations.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1320-L1346)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1383-L1409)
 
 ## particula.gpu.kernels.condensation._validate_species_values_kernel
 
@@ -104101,7 +104246,7 @@ def _validate_species_values_kernel(values: Any, require_nonnegative: wp.int32, 
 
 Record whether a species sidecar has an invalid numeric value.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1395-L1411)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1458-L1474)
 
 ## particula.gpu.kernels.condensation._warp_array_memory_range
 
@@ -104116,7 +104261,7 @@ Return a contiguous Warp array's byte range.
 Ownership checks reject strided views because a single address range cannot
 distinguish their gaps from overlapping storage.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1468-L1496)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1531-L1559)
 
 ## particula.gpu.kernels.condensation.apply_mass_transfer_kernel
 
@@ -104128,7 +104273,7 @@ def apply_mass_transfer_kernel(masses: Any, mass_transfer: Any) -> None
 
 Run the shared device operation through the direct kernel API.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1075-L1085)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1138-L1148)
 
 ## particula.gpu.kernels.condensation.apply_mass_transfer_kernel_body
 
@@ -104145,7 +104290,7 @@ Apply condensation mass transfer and clamp masses to non-negative.
 - `masses` (`Any`) — Particle masses array ``(n_boxes, n_particles, n_species)``.
 - `mass_transfer` (`Any`) — Mass transfer array matching ``masses`` shape.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1049-L1072)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1112-L1135)
 
 ## particula.gpu.kernels.condensation.apply_mass_transfer_kernel_guarded
 
@@ -104157,7 +104302,19 @@ def apply_mass_transfer_kernel_guarded(masses: Any, mass_transfer: Any, failure:
 
 Skip this resident writer after a latched simulation failure.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1088-L1101)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1151-L1164)
+
+## particula.gpu.kernels.condensation.binary_activity_wp
+
+*function*
+
+```python
+def binary_activity_wp(table: Any, organic_fraction: wp.float64, material: int)
+```
+
+Interpolate one material on the uniform binary mole-fraction grid.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L535-L546)
 
 ## particula.gpu.kernels.condensation.condensation_mass_transfer_kernel
 
@@ -104186,11 +104343,11 @@ the original isothermal rate path.
 - `vapor_pressure` (`Any`) — Gas-phase vapor pressure array.
 - `molar_mass` (`Any`) — Gas-phase molar mass array.
 - `surface_tension` (`Any`) — Per-species surface tension array.
-- `kappas` (`Any`) — Per-species kappa activity parameters.
+- `kappas` (`Any`) — Per-species kappa parameters or the flat BAT activity table.
 - `molar_mass_reference` (`Any`) — Per-species activity reference molar masses.
 - `effective_surface_tension` (`Any`) — Per-particle weighted tension buffer.
 - `activity_enabled` (`wp.int32`) — Flag enabling configured water activity.
-- `activity_mode` (`wp.int32`) — Selector for ideal or kappa water activity.
+- `activity_mode` (`wp.int32`) — Selector for ideal, kappa or binary BAT activity.
 - `surface_tension_mode` (`wp.int32`) — Selector for static or weighted tension.
 - `water_species_index` (`wp.int32`) — Index of the sole activity-adjusted species.
 - `mass_accommodation` (`Any`) — Per-species mass accommodation coefficients.
@@ -104205,7 +104362,7 @@ the original isothermal rate path.
 - `time_step` (`Any`) — Condensation substep duration [s].
 - `mass_transfer` (`Any`) — Output raw mass-transfer proposal array.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L793-L890)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L856-L953)
 
 ## particula.gpu.kernels.condensation.condensation_step_gpu
 
@@ -104254,7 +104411,7 @@ API.
 - `ValueError` — If preflight rejects the containers, inputs, sidecars, or
 output ownership, or if a post-launch runtime validation fails.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L3199-L3283)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L3276-L3360)
 
 ## particula.gpu.kernels.condensation.validate_condensation_activity_surface_config
 
@@ -104290,7 +104447,7 @@ ordered molar-mass reference violates the contract.
 > sidecar therefore leaves particle, gas, environment, and supplied
 > output buffers unchanged; it never falls back to legacy physics.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L389-L492)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L418-L532)
 
 ## particula.gpu.kernels.condensation.validate_condensation_scratch_buffers
 
@@ -104325,7 +104482,7 @@ synchronizes.
 - `ValueError` — If ``candidate`` is not the exact sidecar type or a
 supplied field has incompatible shape, dtype, or device.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L311-L368)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L315-L372)
 
 ---
 
@@ -117988,6 +118145,161 @@ parameterizations.
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L1-L1)
 
+## particula.particles.activity_strategies.ActivityBAT
+
+*class*
+
+```python
+class ActivityBAT(ActivityNonIdealBinary)
+```
+
+Bases: `particula.particles.activity_strategies.ActivityNonIdealBinary`
+
+Homogeneous binary BAT activities in [water, organic] material order.
+
+Configure organic properties as for ActivityNonIdealBinary. Both species
+activities enter the kinetic condensation surface-pressure calculation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L335-L363)
+
+### particula.particles.activity_strategies.ActivityBAT.density
+
+*attribute* · *instance attribute*
+
+```python
+density = density
+```
+
+Inherited from: `particula.particles.activity_strategies.ActivityNonIdealBinary`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L271-L271)
+
+### particula.particles.activity_strategies.ActivityBAT.functional_group
+
+*attribute* · *instance attribute*
+
+```python
+functional_group = functional_group
+```
+
+Inherited from: `particula.particles.activity_strategies.ActivityNonIdealBinary`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L272-L272)
+
+### particula.particles.activity_strategies.ActivityBAT.molar_mass_g
+
+*attribute* · *instance attribute*
+
+```python
+molar_mass_g = self.molar_mass_kg * 1000.0
+```
+
+Inherited from: `particula.particles.activity_strategies.ActivityNonIdealBinary`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L269-L269)
+
+### particula.particles.activity_strategies.ActivityBAT.molar_mass_kg
+
+*attribute* · *instance attribute*
+
+```python
+molar_mass_kg = float(molar_mass)
+```
+
+Inherited from: `particula.particles.activity_strategies.ActivityNonIdealBinary`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L268-L268)
+
+### particula.particles.activity_strategies.ActivityBAT.oxygen2carbon
+
+*attribute* · *instance attribute*
+
+```python
+oxygen2carbon = oxygen2carbon
+```
+
+Inherited from: `particula.particles.activity_strategies.ActivityNonIdealBinary`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L270-L270)
+
+### particula.particles.activity_strategies.ActivityBAT.activity
+
+*method*
+
+```python
+def activity(mass_concentration)
+```
+
+Return [water, organic] activities on the final material axis.
+
+Masses share a common mass basis. Empty rows represent unused slots
+and contribute zero surface pressure to both lanes.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L342-L359)
+
+### particula.particles.activity_strategies.ActivityBAT.get_name
+
+*method*
+
+```python
+def get_name() -> str
+```
+
+Return the two-species strategy identifier.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L361-L363)
+
+### particula.particles.activity_strategies.ActivityBAT.__init__
+
+*method*
+
+```python
+def __init__(molar_mass: float, oxygen2carbon: float, density: float, functional_group: Optional[Union[str, List[str]]] = None) -> None
+```
+
+Inherited from: `particula.particles.activity_strategies.ActivityNonIdealBinary`
+
+Initialize the binary non-ideal activity strategy.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L260-L272)
+
+### particula.particles.activity_strategies.ActivityBAT._activity_pair
+
+*method*
+
+```python
+def _activity_pair(mass_concentration)
+```
+
+Inherited from: `particula.particles.activity_strategies.ActivityNonIdealBinary`
+
+Evaluate water and organic activities at the same composition.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L292-L328)
+
+### particula.particles.activity_strategies.ActivityBAT.partial_pressure
+
+*method*
+
+```python
+def partial_pressure(pure_vapor_pressure: Union[float, NDArray[np.float64]], mass_concentration: Union[float, NDArray[np.float64]]) -> Union[float, NDArray[np.float64]]
+```
+
+Inherited from: `particula.particles.activity_strategies.ActivityStrategy`
+
+Calculate the vapor pressure of species in the particle phase.
+
+**Parameters**
+
+- `pure_vapor_pressure` (`Union[float, NDArray[np.float64]]`) — Pure vapor pressure of the species in Pa.
+- `mass_concentration` (`Union[float, NDArray[np.float64]]`) — Concentration of the species in kg/m^3.
+
+**Returns**
+
+- (`Union[float, NDArray[np.float64]]`) — Vapor pressure of the particle in Pa.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L73-L90)
+
 ## particula.particles.activity_strategies.ActivityIdealMass
 
 *class*
@@ -118356,7 +118668,7 @@ a = strategy.activity(np.array([1.0, 2.0]))
 >   nucleus activity. Atmospheric Chemistry and Physics, 7(8),
 >   1961-1971. [DOI](https://doi.org/10.5194/acp-7-1961-2007).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L331-L418)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L366-L453)
 
 ### particula.particles.activity_strategies.ActivityKappaParameter.density
 
@@ -118366,7 +118678,7 @@ a = strategy.activity(np.array([1.0, 2.0]))
 density = density if density is not None else np.array([0.0], dtype=np.float64)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L383-L387)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L418-L422)
 
 ### particula.particles.activity_strategies.ActivityKappaParameter.kappa
 
@@ -118376,7 +118688,7 @@ density = density if density is not None else np.array([0.0], dtype=np.float64)
 kappa = kappa if kappa is not None else np.array([0.0], dtype=np.float64)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L380-L382)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L415-L417)
 
 ### particula.particles.activity_strategies.ActivityKappaParameter.molar_mass
 
@@ -118386,7 +118698,7 @@ kappa = kappa if kappa is not None else np.array([0.0], dtype=np.float64)
 molar_mass = molar_mass if molar_mass is not None else np.array([0.0], dtype=np.float64)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L388-L392)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L423-L427)
 
 ### particula.particles.activity_strategies.ActivityKappaParameter.water_index
 
@@ -118396,7 +118708,7 @@ molar_mass = molar_mass if molar_mass is not None else np.array([0.0], dtype=np.
 water_index = water_index
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L393-L393)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L428-L428)
 
 ### particula.particles.activity_strategies.ActivityKappaParameter.__init__
 
@@ -118415,7 +118727,7 @@ Initialize the ActivityKappaParameter strategy.
 - `molar_mass` (`Optional[NDArray[np.float64]]`) (default: `None`) — Molar masses in kg/mol (array or scalar).
 - `water_index` (`int`) (default: `0`) — Index of the water species.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L365-L393)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L400-L428)
 
 ### particula.particles.activity_strategies.ActivityKappaParameter.activity
 
@@ -118442,7 +118754,7 @@ Calculate the activity of a species based on mass concentration.
 >   nucleus activity. Atmospheric Chemistry and Physics, 7(8),
 >   1961-1971. [DOI](https://doi.org/10.5194/acp-7-1961-2007).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L395-L418)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L430-L453)
 
 ### particula.particles.activity_strategies.ActivityKappaParameter.get_name
 
@@ -118531,7 +118843,7 @@ ordered as [water, organic].
 > efficient reduced-complexity model. Atmospheric Chemistry and
 > Physics, 19(19), 13383-13410. https://doi.org/10.5194/acp-19-13383-2019
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L222-L328)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L222-L332)
 
 ### particula.particles.activity_strategies.ActivityNonIdealBinary.density
 
@@ -118595,6 +118907,18 @@ Initialize the binary non-ideal activity strategy.
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L260-L272)
 
+### particula.particles.activity_strategies.ActivityNonIdealBinary._activity_pair
+
+*method*
+
+```python
+def _activity_pair(mass_concentration)
+```
+
+Evaluate water and organic activities at the same composition.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L292-L328)
+
 ### particula.particles.activity_strategies.ActivityNonIdealBinary.activity
 
 *method*
@@ -118618,7 +118942,7 @@ Calculate organic activity using the BAT model.
 - `ValueError` — If the input is scalar or last dimension is not 2.
 - `ValueError` — If any total moles are non-positive.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L274-L324)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L274-L290)
 
 ### particula.particles.activity_strategies.ActivityNonIdealBinary.get_name
 
@@ -118630,7 +118954,7 @@ def get_name() -> str
 
 Return the strategy identifier.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L326-L328)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L330-L332)
 
 ### particula.particles.activity_strategies.ActivityNonIdealBinary.partial_pressure
 

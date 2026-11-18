@@ -29,7 +29,7 @@ Convert molar mass ratio to organic molar mass.
 **Parameters**
 
 - `molar_mass_ratio` (`Union[float, Iterable[float], NDArray[np.float64]]`) — Molar mass ratio (MW water / MW organic). Must be positive.
-- `other_molar_mass` (`float`) (default: `18.01528`) — Reference molar mass (default water, 18.01528). Must be positive.
+- `other_molar_mass` (`float`) (default: `18.01528`) — Reference molar mass (default water, 18.01528 g/mol). Must be positive.
 
 **Returns**
 
@@ -44,11 +44,11 @@ Convert molar mass ratio to organic molar mass.
 
 ```pycon
 >>> from_molar_mass_ratio(0.5)
-9.00764
+36.03056
 >>> from_molar_mass_ratio([0.5, 1.0])
-array([ 9.00764, 18.01528])
+array([36.03056, 18.01528])
 >>> from_molar_mass_ratio(np.array([0.25]))
-array([4.50382])
+array([72.06112])
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/activity/ratio.py#L46-L85)
@@ -65,8 +65,8 @@ Convert to molar mass ratio (MW water / MW organic).
 
 **Parameters**
 
-- `molar_mass` (`Union[float, Iterable[float], NDArray[np.float64]]`) — Molar mass of the organic compound. Must be positive.
-- `other_molar_mass` (`float`) (default: `18.01528`) — Reference molar mass (default water, 18.01528). Must be positive.
+- `molar_mass` (`Union[float, Iterable[float], NDArray[np.float64]]`) — Organic molar mass, in the same units as the reference.
+- `other_molar_mass` (`float`) (default: `18.01528`) — Reference molar mass (default water, 18.01528 g/mol). Must be positive.
 
 **Returns**
 

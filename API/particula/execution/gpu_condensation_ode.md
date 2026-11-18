@@ -38,7 +38,7 @@ impose knot boundaries; opaque discontinuous callbacks require explicit
 step boundaries. No arbitrary/stochastic runnable is adapted.
 Capture is unsupported because each trial reads control reductions on host.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L33-L525)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L33-L527)
 
 ### particula.execution.gpu_condensation_ode.GPUCondensationODE._atol
 
@@ -400,7 +400,7 @@ time
 
 Return the accepted shared physical time [s].
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L452-L454)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L454-L456)
 
 ### particula.execution.gpu_condensation_ode.GPUCondensationODE.__init__
 
@@ -422,7 +422,7 @@ Validate physics and explicitly upload fixed buffers.
 def _allocate_physics()
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L199-L240)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L199-L241)
 
 ### particula.execution.gpu_condensation_ode.GPUCondensationODE._array
 
@@ -442,7 +442,7 @@ def _array(values, dtype=wp.float64)
 def _check_ready()
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L242-L250)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L243-L251)
 
 ### particula.execution.gpu_condensation_ode.GPUCondensationODE._combine
 
@@ -452,7 +452,7 @@ def _check_ready()
 def _combine(h, coefficients, output)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L407-L418)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L409-L420)
 
 ### particula.execution.gpu_condensation_ode.GPUCondensationODE._environment
 
@@ -462,7 +462,7 @@ def _combine(h, coefficients, output)
 def _environment(time)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L262-L274)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L263-L275)
 
 ### particula.execution.gpu_condensation_ode.GPUCondensationODE._launch
 
@@ -472,7 +472,7 @@ def _environment(time)
 def _launch(kernel, dim, inputs)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L252-L253)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L253-L254)
 
 ### particula.execution.gpu_condensation_ode.GPUCondensationODE._rate
 
@@ -482,7 +482,7 @@ def _launch(kernel, dim, inputs)
 def _rate(time, state, result)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L307-L405)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L308-L407)
 
 ### particula.execution.gpu_condensation_ode.GPUCondensationODE._status
 
@@ -492,7 +492,7 @@ def _rate(time, state, result)
 def _status()
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L255-L260)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L256-L261)
 
 ### particula.execution.gpu_condensation_ode.GPUCondensationODE._step
 
@@ -504,7 +504,7 @@ def _step(bound)
 
 Advance within one smooth forcing interval.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L463-L506)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L465-L508)
 
 ### particula.execution.gpu_condensation_ode.GPUCondensationODE._tolerance
 
@@ -524,7 +524,7 @@ def _tolerance(value, shape, name)
 def _trial(h)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L420-L449)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L422-L451)
 
 ### particula.execution.gpu_condensation_ode.GPUCondensationODE._unpack_trial
 
@@ -536,7 +536,7 @@ def _unpack_trial(state)
 
 Validate and unpack device coordinates without a physical rate.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L276-L305)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L277-L306)
 
 ### particula.execution.gpu_condensation_ode.GPUCondensationODE.snapshot
 
@@ -548,7 +548,7 @@ def snapshot()
 
 Download detached accepted native state, never trial buffers.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L508-L525)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L510-L527)
 
 ### particula.execution.gpu_condensation_ode.GPUCondensationODE.step
 
@@ -560,4 +560,4 @@ def step(bound)
 
 Accept one bounded device trial with scalar control readbacks.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L456-L461)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L458-L463)

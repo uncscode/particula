@@ -26,10 +26,10 @@ NATIVE_PROCESSES = (MassCondensation, Coagulation, WallLoss, Dilution, Nucleatio
 *attribute* · *module attribute*
 
 ```python
-_CONFIGURATION_TYPES = (EnvironmentForcing, *NATIVE_PROCESSES, BrownianCoagulationStrategy, DilutionStrategy, wl.SphericalWallLossStrategy, wl.RectangularWallLossStrategy, wl.ChargedWallLossStrategy, NucleationSourceConfig, NucleationSpeciesMap, NucleationCommitConfig, ExhaustionControls, ns.ActivationNucleationStrategy, ns.KineticNucleationStrategy, ns.ClosedInterval, ns.NucleationValidityDomain, ns.InjectionComposition, ns.FormationMetadata, cs.CondensationIsothermal, cs.CondensationIsothermalStaggered, cs.CondensationLatentHeat, CondensationSpeciesMap, ac.ActivityIdealMass, ac.ActivityIdealMolar, ac.ActivityIdealVolume, ac.ActivityKappaParameter, ac.ActivityNonIdealBinary, su.SurfaceStrategyMass, su.SurfaceStrategyMolar, su.SurfaceStrategyVolume, vp.ConstantVaporPressureStrategy, vp.AntoineVaporPressureStrategy, vp.ClausiusClapeyronStrategy, vp.WaterBuckStrategy, vp.TableVaporPressureStrategy, vp.ArblasterLiquidVaporPressureStrategy, vp.LiquidClausiusHybridStrategy, lh.ConstantLatentHeat, lh.LinearLatentHeat, lh.PowerLawLatentHeat)
+_CONFIGURATION_TYPES = (EnvironmentForcing, *NATIVE_PROCESSES, BrownianCoagulationStrategy, DilutionStrategy, wl.SphericalWallLossStrategy, wl.RectangularWallLossStrategy, wl.ChargedWallLossStrategy, NucleationSourceConfig, NucleationSpeciesMap, NucleationCommitConfig, ExhaustionControls, ns.ActivationNucleationStrategy, ns.KineticNucleationStrategy, ns.ClosedInterval, ns.NucleationValidityDomain, ns.InjectionComposition, ns.FormationMetadata, cs.CondensationIsothermal, cs.CondensationIsothermalStaggered, cs.CondensationLatentHeat, CondensationSpeciesMap, ac.ActivityIdealMass, ac.ActivityIdealMolar, ac.ActivityIdealVolume, ac.ActivityKappaParameter, ac.ActivityNonIdealBinary, ac.ActivityBAT, su.SurfaceStrategyMass, su.SurfaceStrategyMolar, su.SurfaceStrategyVolume, vp.ConstantVaporPressureStrategy, vp.AntoineVaporPressureStrategy, vp.ClausiusClapeyronStrategy, vp.WaterBuckStrategy, vp.TableVaporPressureStrategy, vp.ArblasterLiquidVaporPressureStrategy, vp.LiquidClausiusHybridStrategy, lh.ConstantLatentHeat, lh.LinearLatentHeat, lh.PowerLawLatentHeat)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_configuration.py#L46-L86)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_configuration.py#L46-L87)
 
 ## particula.execution.cpu_configuration._freeze
 
@@ -41,7 +41,7 @@ def _freeze(value)
 
 Represent configuration as data, without retaining live objects.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_configuration.py#L89-L129)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_configuration.py#L90-L130)
 
 ## particula.execution.cpu_configuration.condensation_identity
 
@@ -53,7 +53,7 @@ def condensation_identity(strategy)
 
 Retain all declared CPU transport, mapping and thermodynamic inputs.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_configuration.py#L132-L134)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_configuration.py#L133-L135)
 
 ## particula.execution.cpu_configuration.cpu_process_identity
 
@@ -65,4 +65,4 @@ def cpu_process_identity(process)
 
 Retain native configuration without imposing GPU capability limits.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_configuration.py#L137-L141)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_configuration.py#L138-L142)

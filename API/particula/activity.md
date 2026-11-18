@@ -354,7 +354,7 @@ Convert molar mass ratio to organic molar mass.
 **Parameters**
 
 - `molar_mass_ratio` (`Union[float, Iterable[float], NDArray[np.float64]]`) — Molar mass ratio (MW water / MW organic). Must be positive.
-- `other_molar_mass` (`float`) (default: `18.01528`) — Reference molar mass (default water, 18.01528). Must be positive.
+- `other_molar_mass` (`float`) (default: `18.01528`) — Reference molar mass (default water, 18.01528 g/mol). Must be positive.
 
 **Returns**
 
@@ -369,11 +369,11 @@ Convert molar mass ratio to organic molar mass.
 
 ```pycon
 >>> from_molar_mass_ratio(0.5)
-9.00764
+36.03056
 >>> from_molar_mass_ratio([0.5, 1.0])
-array([ 9.00764, 18.01528])
+array([36.03056, 18.01528])
 >>> from_molar_mass_ratio(np.array([0.25]))
-array([4.50382])
+array([72.06112])
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/activity/ratio.py#L46-L85)
@@ -460,7 +460,7 @@ vectorized batches.
 > Gorkowski et al. (2019), Section 2.2 and SI S2.
 > https://doi.org/10.5194/acp-19-13383-2019
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/activity/gibbs_mixing.py#L121-L210)
+[View source](https://github.com/uncscode/particula/blob/main/particula/activity/gibbs_mixing.py#L125-L204)
 
 ## particula.activity.gibbs_of_mixing
 
@@ -511,7 +511,7 @@ by :math:`RT` to remain dimensionless.
 > Gorkowski, K., Preston, T. C., & Zuend, A. (2019), Equations 1-6 and
 > Supplementary Information S1-S2. https://doi.org/10.5194/acp-19-13383-2019
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/activity/gibbs_mixing.py#L29-L117)
+[View source](https://github.com/uncscode/particula/blob/main/particula/activity/gibbs_mixing.py#L29-L121)
 
 ## particula.activity.organic_water_single_phase
 
@@ -601,8 +601,8 @@ Convert to molar mass ratio (MW water / MW organic).
 
 **Parameters**
 
-- `molar_mass` (`Union[float, Iterable[float], NDArray[np.float64]]`) — Molar mass of the organic compound. Must be positive.
-- `other_molar_mass` (`float`) (default: `18.01528`) — Reference molar mass (default water, 18.01528). Must be positive.
+- `molar_mass` (`Union[float, Iterable[float], NDArray[np.float64]]`) — Organic molar mass, in the same units as the reference.
+- `other_molar_mass` (`float`) (default: `18.01528`) — Reference molar mass (default water, 18.01528 g/mol). Must be positive.
 
 **Returns**
 
