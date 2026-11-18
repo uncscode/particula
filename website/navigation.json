@@ -1073,6 +1073,10 @@
             ]
           },
           {
+            "label": "Cloud activation in the BAT publication",
+            "slug": "contribute/validation/thermodynamics/bat-ccn"
+          },
+          {
             "label": "Numerical methods",
             "collapsed": true,
             "items": [

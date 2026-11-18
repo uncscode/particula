@@ -6,7 +6,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 
-BASE = Path(__file__).resolve().parent
+BASE = Path(__file__).resolve().parents[2] / "docs/data/thermodynamics/bat-ccn"
 
 
 def main():
@@ -28,7 +28,7 @@ def main():
         )
         residual = modeled - observed
         print(
-            f"{label} (n={mask.sum()})  RMSE={np.mean(residual**2)**0.5:.6f}  "
+            f"{label} (n={mask.sum()}) RMSE={np.mean(residual**2) ** 0.5:.6f}  "
             f"bias={residual.mean():+.6f}  slope={slope:.6f}  "
             f"centered R²={r2:.6f}"
         )
