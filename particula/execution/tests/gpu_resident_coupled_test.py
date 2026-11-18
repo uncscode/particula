@@ -1,5 +1,7 @@
 """Check resident stage handoff and exact stochastic continuation on CUDA."""
 
+from dataclasses import replace
+
 import numpy as np
 import pytest
 import warp as wp
@@ -15,16 +17,20 @@ from particula.execution.tests.gpu_coupled_test import equal_native
 from particula.execution.tests.gpu_multimaterial_condensation_test import (
     material_case,
 )
+from particula.particles import ActivityBAT
 
 
+@pytest.mark.parametrize("bat", [False, True])
 @pytest.mark.parametrize("order", ["events-first", "condensation-first"])
 def test_resident_handoff_has_no_physical_download_and_restarts_exactly(
-    order, monkeypatch, tmp_path
+    order, bat, monkeypatch, tmp_path
 ):
     """Fixed event order and restart survive device-only mass/gas handoff."""
     if not wp.is_cuda_available() or not wp.is_conditional_graph_supported():
         pytest.skip("native conditional CUDA unavailable")
-    initial, strategy = material_case(3)
+    initial, strategy = material_case(2 if bat else 3)
+    if bat:
+        strategy.activity_strategy = ActivityBAT(0.2, 0.5, 1400.0)
     events = (Dilution(DilutionStrategy(0.2)),)
     with GPUCoupledSimulation(
         initial,
@@ -63,8 +69,16 @@ def test_resident_handoff_has_no_physical_download_and_restarts_exactly(
             np.testing.assert_allclose(
                 after, before * np.exp(-0.2 * 0.03), rtol=3e-13
             )
+        saved = load_coupled_checkpoint(path)
+        if bat:
+            identity, interpolation, digest = saved.configuration
+            changed = replace(
+                saved, configuration=(identity, interpolation, digest[::-1])
+            )
+            with pytest.raises(ValueError, match="physics differs"):
+                resume_coupled(changed, events, strategy, device="cuda:0")
         with resume_coupled(
-            load_coupled_checkpoint(path), events, strategy, device="cuda:0"
+            saved, events, strategy, device="cuda:0"
         ) as restored:
             assert restored.resident
             restored.run(2)

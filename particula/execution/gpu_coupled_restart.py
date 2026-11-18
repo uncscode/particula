@@ -4,10 +4,12 @@ from dataclasses import dataclass, replace
 
 import warp as wp
 
+from particula.execution._adaptive_condensation_plan import (
+    adaptive_condensation_identity,
+)
 from particula.execution.archive import read_archive, write_archive
 from particula.execution.checkpoint_io import _decode, _Encoder, _types
 from particula.execution.checkpoint_io import _validate as _validate_prepared
-from particula.execution.cpu_configuration import condensation_identity
 from particula.execution.gpu_coupled import (
     GPUCondensationControls,
     GPUCoupledSimulation,
@@ -52,7 +54,7 @@ def checkpoint_coupled(owner):
             _runtime(),
             _device_identity(wp.get_device(owner.device.native)),
             owner._events.checkpoint(),
-            condensation_identity(owner._strategy),
+            adaptive_condensation_identity(owner._strategy, owner._bat_table),
             owner.controls,
             owner.order,
             replace(owner.statistics),
@@ -134,7 +136,7 @@ def resume_coupled(saved, events, strategy, *, device):
     )
 
     _validate(saved)
-    if condensation_identity(strategy) != saved.configuration:
+    if adaptive_condensation_identity(strategy) != saved.configuration:
         raise ValueError("condensation physics differs from coupled checkpoint")
     target = wp.get_device(device)
     if _device_identity(target) != saved.device:
@@ -149,6 +151,7 @@ def resume_coupled(saved, events, strategy, *, device):
     result = object.__new__(GPUCoupledSimulation)
     result._configure(strategy, saved.order, saved.controls)
     plan = _condensation_profile(native, strategy, saved.controls.method)
+    result._bat_table = plan.values["bat_table"]
     result._vapor = plan.values["vapor"]
     result._molar_mass = native.gas.molar_mass.copy()
     result._events = resume_simulation(events, saved.events, device=device)

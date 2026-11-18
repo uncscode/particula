@@ -185,3 +185,28 @@ def test_active_capture_rejects_checkpoint_and_resume(method):
         with pytest.raises(RuntimeError, match="capture"):
             resume_gpu_condensation(saved, strategy, device="cuda:0")
     assert owner.time == 0
+
+
+def test_bat_restart_preserves_table_and_rejects_changed_organic(
+    device, tmp_path
+):
+    """Disk restart continues identical rates only for the same binary fit."""
+    from particula.execution.tests.gpu_multimaterial_condensation_test import (
+        material_case,
+    )
+    from particula.particles import ActivityBAT
+
+    initial, strategy = material_case(2)
+    strategy.activity_strategy = ActivityBAT(0.2, 0.5, 1400.0)
+    owner = GPUCondensationODE(initial, strategy, device=device)
+    run_until(owner, 0.01)
+    path = tmp_path / "binary.pcr"
+    save_gpu_checkpoint(checkpoint_gpu_condensation(owner), path)
+    saved = load_gpu_checkpoint(path)
+    restored = resume_gpu_condensation(saved, strategy, device=device)
+    run_until(owner, 0.02)
+    run_until(restored, 0.02)
+    assert_same(owner, restored)
+    strategy.activity_strategy = ActivityBAT(0.2, 0.51, 1400.0)
+    with pytest.raises(ValueError, match="physics differs"):
+        resume_gpu_condensation(saved, strategy, device=device)

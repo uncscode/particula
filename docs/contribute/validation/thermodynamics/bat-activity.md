@@ -20,3 +20,7 @@ The authors archive three binary composition scans as `DATA for figure kappaCCN 
 | 0 | 701.300000 | 1 | 2.82e-2 | 35.19 |
 
 For O:C 0.25, the lower convex hull of the calculated molar mixing Gibbs energy identifies a gap. Refining both endpoints to equal water and organic activities gives organic mole fractions 0.00353327 and 0.41275286, with shared activities 0.99679965 (water) and 0.41214449 (organic). Values inside this interval on the raw homogeneous curve describe a constrained liquid. The O:C 0 case gives a substantial discrepancy even on the raw activity curve. Two-phase kinetic calculations require verification of the reference endpoints and phase amounts. Only the miscible case is used here for the homogeneous Figure 9 regression.
+
+## Adaptive GPU restart
+
+The adaptive checkpoint records the organic descriptors, the linear organic-mole-fraction interpolation convention and a SHA-256 digest of both activity columns in grid order (little-endian float64). The disk round trip on Warp CPU and CUDA reproduces the scaled state and controller exactly. Changing organic O:C rejects the saved checkpoint. The CUDA resident coupled test also covers both process orders with dilution, unchanged device buffers across the handoff, and a rejected table digest. These checks exercise the adaptive condensation paths.
