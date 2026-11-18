@@ -48,6 +48,8 @@ def main():
             "Source or environment changed. Use a fresh output directory."
         )
     provenance.write_text(json.dumps(environment, indent=2))
+    cache_root = output / "compiler-cache"
+    cache_root.mkdir(exist_ok=True)
     refs = output / "refs"
     reference_steps = {
         f: n for f, n, _ in json.loads((refs / "references.json").read_text())
@@ -80,7 +82,7 @@ def main():
                 ]
 
                 with tempfile.TemporaryDirectory(
-                    prefix="bat-compiler-"
+                    prefix="bat-compiler-", dir=cache_root
                 ) as cache:
                     settings = dict(
                         env, WARP_CACHE_PATH=cache, CUDA_CACHE_PATH=cache
