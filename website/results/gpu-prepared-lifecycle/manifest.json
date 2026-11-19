@@ -12,7 +12,7 @@
     "scripts/gpu_studies/trajectories.py": "41d64b0ef3351bb41c12cd3314b02b7ea7c87d8e225d7b9b6508663f6eca84af"
   },
   "example": "gpu-prepared-lifecycle",
-  "fingerprint": "1512228c2a4576cf44f13294ffc4df2343f854431a17734d80d2451531911a20",
+  "fingerprint": "97f53e43a9f32a283f81b320426398a2f9d1661e9174a5db078a96610acf6518",
   "source": "docs/examples/gpu/prepared/gpu_prepared_lifecycle.py",
   "revision": "da142e3dfcf190010d21f1ac07aca1a12e4c9fd0",
   "package_dirty": false,

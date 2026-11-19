@@ -6,7 +6,7 @@
   "scientific_source_sha256": "c491d38a0f3b014be11117e77bf7f5ed27e4a834ba024ddbac813c1eefd5b6db",
   "input_sha256": {},
   "example": "ccn-kappa-retrieval",
-  "fingerprint": "922292eacfa427fad5503c87a5ecb86e4a62f60e72e9bb2a45b8c805fe335f49",
+  "fingerprint": "5f8feb5ba8f1ff963ddce879bb7c6f95fc200ac83ee909c08f996aab46ca1fae",
   "source": "docs/examples/thermodynamics/activity/ccn_kappa_retrieval.py",
   "revision": "6af97152d1570464ac5ccae56e3110001657e170",
   "package_dirty": false,

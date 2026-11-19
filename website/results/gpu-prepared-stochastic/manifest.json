@@ -12,7 +12,7 @@
     "scripts/gpu_studies/trajectories.py": "41d64b0ef3351bb41c12cd3314b02b7ea7c87d8e225d7b9b6508663f6eca84af"
   },
   "example": "gpu-prepared-stochastic",
-  "fingerprint": "767d8f3b670080f16ef4721fc0782837b23f41b1fcd5dede96f58d25cd800b62",
+  "fingerprint": "2118626d7ec0287503df4a4293ae391b760d8eb41c35a5f75ac131cfdafb7947",
   "source": "docs/examples/gpu/prepared/gpu_prepared_stochastic.py",
   "revision": "da142e3dfcf190010d21f1ac07aca1a12e4c9fd0",
   "package_dirty": false,

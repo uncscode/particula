@@ -6,7 +6,7 @@
   "scientific_source_sha256": "c491d38a0f3b014be11117e77bf7f5ed27e4a834ba024ddbac813c1eefd5b6db",
   "input_sha256": {},
   "example": "bat-humidity-pulse",
-  "fingerprint": "0c5da440398b411ca9ab7ea006c784be775abb474b00ed3483c25b13a443b377",
+  "fingerprint": "334d96c612490223b80376cc3c3c0ee594024f6cae8e0c43fb20b2f8f44c525a",
   "source": "docs/examples/thermodynamics/activity/bat_humidity_pulse.py",
   "revision": "d918c3f7cb549a4baa1d5a35e674171ff72570fa",
   "package_dirty": false,

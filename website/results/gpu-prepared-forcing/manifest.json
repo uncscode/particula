@@ -12,7 +12,7 @@
     "scripts/gpu_studies/adaptive_trajectories.py": "ec4aed0025824b8c8c1c2e19373c9e6e90596c937c5172b2c6d96cf498c9c934"
   },
   "example": "gpu-prepared-forcing",
-  "fingerprint": "f64c851739598f016499dbf5a6b399837dc6be38db5ca1ce8c10f736487c4ac7",
+  "fingerprint": "256b91a38d0a98b15f9bd349540cd87b309b9c429b0968358edf43667c2cbe0b",
   "source": "docs/examples/gpu/prepared/gpu_prepared_forcing.py",
   "revision": "480ecf2c1aa95da42985098c53e4ecdc66133d7b",
   "package_dirty": false,

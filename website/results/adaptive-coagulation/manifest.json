@@ -6,7 +6,7 @@
   "scientific_source_sha256": "9ccd4e777e1987db076b9ac5b19f8cd1c309a0a8e54f496c0a8bbdfe42a87a5d",
   "input_sha256": {},
   "example": "adaptive-coagulation",
-  "fingerprint": "b8ecf231d04bac979eca2a44214c83043f681233ef79a048ef8e218272959c42",
+  "fingerprint": "51088100cd7bc65ecc22067fe0d5ea3f0c7a31dd91fc18d1010f8d2af1cb1481",
   "source": "docs/examples/gpu/prepared/adaptive_coagulation.py",
   "revision": "271d3adda24cf05325bddd40fb30c0c965193112",
   "package_dirty": false,

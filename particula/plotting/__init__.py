@@ -3,6 +3,7 @@
 Use `plt.style.context("particula.default")` around figure construction.
 """
 
+import warnings
 from math import ceil
 
 import matplotlib.pyplot as plt
@@ -125,6 +126,31 @@ def _check_panel_aspect(ax, panel):
         raise ValueError("Data aspect is incompatible with the panel size")
 
 
+def _draw_for_fit(fig):
+    """Resize a collapsed layout before measuring the data panels."""
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            "error", message="constrained_layout not applied because.*"
+        )
+        try:
+            fig.draw_without_rendering()
+            return True
+        except UserWarning as exc:
+            if not str(exc).startswith("constrained_layout not applied"):
+                raise
+            # Matplotlib kept the old positions. Measure the decorations
+            # extending beyond the canvas and retry the layout at that size.
+            low, high = fig.get_tightbbox().get_points()
+            canvas = fig.get_size_inches()
+            overflow = np.maximum(-low, 0) + np.maximum(high - canvas, 0)
+            if not np.any(overflow > 0):
+                raise ValueError(
+                    "Figure decorations do not fit the available canvas"
+                ) from exc
+            fig.set_size_inches(canvas + overflow)
+            return False
+
+
 def fit(fig):
     """Size the canvas to labels, legends and colorbars at fixed panel size.
 
@@ -154,7 +180,8 @@ def fit(fig):
     engine.gutters = gutters
     engine.finished = False
     for _ in range(16):
-        fig.draw_without_rendering()
+        if not _draw_for_fit(fig):
+            continue
         canvas = fig.get_size_inches()
         sizes = np.array([ax.get_position().size * canvas for ax in axes])
         errors = engine.panel - sizes

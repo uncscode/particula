@@ -5,7 +5,7 @@
   "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "examples-processes-customization-adding-particles-during-simulation",
-  "fingerprint": "34cd10a73d374b2e09d33bf0f389b41fd437b6aa2d8cbe95c724756bd7b3da1c",
+  "fingerprint": "b029dd0e138158b76b4c4577832bfe50d60f473e418f1788530f6fa277dcf0e9",
   "source": "docs/examples/processes/customization/adding_particles_during_simulation.py",
   "revision": "6af97152d1570464ac5ccae56e3110001657e170",
   "package_dirty": false,

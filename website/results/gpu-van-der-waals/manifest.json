@@ -6,7 +6,7 @@
   "scientific_source_sha256": "c491d38a0f3b014be11117e77bf7f5ed27e4a834ba024ddbac813c1eefd5b6db",
   "input_sha256": {},
   "example": "gpu-van-der-waals",
-  "fingerprint": "aab9fcb9cd225ed28ddd53f31a6242850afbac308543afbbb777b8cebdd3c3fb",
+  "fingerprint": "eeebe27e5e98c207b4d6879cae16c942b0101ac039a4e228cdedd9e8cbf0f987",
   "source": "docs/examples/gpu/prepared/van_der_waals.py",
   "revision": "d918c3f7cb549a4baa1d5a35e674171ff72570fa",
   "package_dirty": false,

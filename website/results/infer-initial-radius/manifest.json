@@ -12,7 +12,7 @@
     "scripts/inverse_studies/scalar_reference.py": "00b118758d61cd58e2470ff55730892ba52e7cdaa2be38b2e0d97baccbc4eed6"
   },
   "example": "infer-initial-radius",
-  "fingerprint": "a34edc26ba3b95fc2f55c2627b09eaf5d68ae4f8f3a896f64dad9ee60f6e2736",
+  "fingerprint": "9e98b6e8c70c485cd7e131ab6f08f17c7a3ed7f8b9c76f6d7c120a01fb12f4a7",
   "source": "docs/examples/processes/condensation/infer_initial_radius.py",
   "revision": "9ab2fa66ef3d5e94551cc8942cc955990b732397",
   "package_dirty": false,

@@ -6,7 +6,7 @@
   "scientific_source_sha256": "c491d38a0f3b014be11117e77bf7f5ed27e4a834ba024ddbac813c1eefd5b6db",
   "input_sha256": {},
   "example": "spherical-wall-loss-theory",
-  "fingerprint": "fdc9f1642cd3bfe046999d35ac8c7a1846d46285f2f52ca7888e31bd1860cf20",
+  "fingerprint": "989aeea4c977598bedb7efa692675bb042a103997097db30c397ac79d2033103",
   "source": "docs/examples/processes/wall-loss/spherical_wall_loss_theory.py",
   "revision": "9ab2fa66ef3d5e94551cc8942cc955990b732397",
   "package_dirty": false,

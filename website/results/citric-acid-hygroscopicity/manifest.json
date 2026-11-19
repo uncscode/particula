@@ -8,7 +8,7 @@
     "docs/data/thermodynamics/marsh2017-citric-acid.csv": "8f32cf31349ddf3b420b230186a70190c0b7ce40f026b12414b0b96b97117a20"
   },
   "example": "citric-acid-hygroscopicity",
-  "fingerprint": "5f0ce396c1d1bde46dfe530aef168057957fe873ac1b5e52f89a2a22939a0552",
+  "fingerprint": "05c0a4bd9903384aa402c30f35f7b6b79c8562dfbb842abd2d0684e034107b00",
   "source": "docs/examples/thermodynamics/activity/citric_acid_hygroscopicity.py",
   "revision": "6af97152d1570464ac5ccae56e3110001657e170",
   "package_dirty": false,

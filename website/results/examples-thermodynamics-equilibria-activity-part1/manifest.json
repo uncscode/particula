@@ -5,7 +5,7 @@
   "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "examples-thermodynamics-equilibria-activity-part1",
-  "fingerprint": "29a015119c18f24637de163a97cb1d7d1ed81ec11cec4ea58c9b38faa33bb5bb",
+  "fingerprint": "e564a66f613dbda16962bf3d56bb42863bb6c7ed39202c42ab696180fa3b33fd",
   "source": "docs/examples/thermodynamics/equilibria/activity_part1.py",
   "revision": "e6d8de004d68d2f8054a7654be48430a2af02cb9",
   "package_dirty": false,

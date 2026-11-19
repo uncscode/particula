@@ -8,7 +8,7 @@
     "docs/examples/simulations/adaptive_reservoir_depletion.py": "b92f76d6fecb5e2e342687a7cf40a2d7e938271cb6f1ce023a2fbab45c2b3f86"
   },
   "example": "adaptive-reservoir-depletion-cuda",
-  "fingerprint": "3290e4237ec2f45fd9902ea24cb44261184c82c77dc882c07237c19ad24a025d",
+  "fingerprint": "30fbf25b0a2c08a424c6f0357771187e698729a5827d64b675cabe08f80bb186",
   "source": "docs/examples/simulations/adaptive_reservoir_depletion_cuda.py",
   "revision": "e6d8de004d68d2f8054a7654be48430a2af02cb9",
   "package_dirty": false,

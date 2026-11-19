@@ -9,7 +9,7 @@
     "scripts/gpu_studies/extension_kernels.py": "65fd62e0f916fc827f352493da3650f2971322e3d89c9881403ee0943d291932"
   },
   "example": "custom-process-backends",
-  "fingerprint": "42a518fb566ce96e6456d005d53427c51c672d7dc5a72dcf79ef58660a7bea35",
+  "fingerprint": "5d3c1e1cc67e14fe2b4433087d4dd5f36adf34547cbaff0e99df762e90d0134a",
   "source": "docs/examples/gpu/prepared/custom_process_backends.py",
   "revision": "e6d8de004d68d2f8054a7654be48430a2af02cb9",
   "package_dirty": false,

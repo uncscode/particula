@@ -6,7 +6,7 @@
   "scientific_source_sha256": "c491d38a0f3b014be11117e77bf7f5ed27e4a834ba024ddbac813c1eefd5b6db",
   "input_sha256": {},
   "example": "sphere-optics",
-  "fingerprint": "1f05abb20fa3cf715ccac11f3b8dc92e1fa9a15f3691e130a1c1ad90597a5dc7",
+  "fingerprint": "53c26fdcff5b4058d549bedbded01f5169afdba9733ab1f83d65f359d05b7399",
   "source": "docs/examples/optics/sphere_optics.py",
   "revision": "6af97152d1570464ac5ccae56e3110001657e170",
   "package_dirty": false,

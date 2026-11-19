@@ -8,7 +8,7 @@
     "docs/examples/simulations/adaptive_cloud_relaxation.py": "957aa1b2193a07694123345e554ac96cc73978ed65b0b20000796020be411446"
   },
   "example": "adaptive-cloud-relaxation-cuda",
-  "fingerprint": "650083dab4731e3c2866ba112a77948ce298212dc9a1ec8167aa48a166090595",
+  "fingerprint": "18e29a175152e6914f8d8f104899b4623135933fe92aefdd422364cec3ad1ac8",
   "source": "docs/examples/simulations/adaptive_cloud_relaxation_cuda.py",
   "revision": "d918c3f7cb549a4baa1d5a35e674171ff72570fa",
   "package_dirty": false,

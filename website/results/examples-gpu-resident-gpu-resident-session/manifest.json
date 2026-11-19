@@ -6,7 +6,7 @@
   "scientific_source_sha256": "9ccd4e777e1987db076b9ac5b19f8cd1c309a0a8e54f496c0a8bbdfe42a87a5d",
   "input_sha256": {},
   "example": "examples-gpu-resident-gpu-resident-session",
-  "fingerprint": "06ede0776027ff49c2e2ae6805f2e57e5c1543129db4cab14179257c472a8b57",
+  "fingerprint": "c253d0510f1443711fad01c4db165a2f03b5f094de8104dd02b394da001febe8",
   "source": "docs/examples/gpu/resident/gpu_resident_session.py",
   "revision": "c718cc37f6e9929c56bfb7c39dc765fc220b453b",
   "package_dirty": false,

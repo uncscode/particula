@@ -11,7 +11,7 @@
     "scripts/gpu_studies/population_figures.py": "3f2f5199abbee90be50cdfcf4adc4bd0b3f5afa8bb4c9211d29cfc9e501803be"
   },
   "example": "gpu-environment-sweep",
-  "fingerprint": "b2a2289e12b383100d769e0b38415b7eb52af614e4ec227032eb9c9a4f12909d",
+  "fingerprint": "96de99fe52e398bad292b520f9dca51d501965850f507d30aa7971419d5abe5a",
   "source": "docs/examples/gpu/prepared/gpu_environment_sweep.py",
   "revision": "54edfe13b7c99ec01b3a5f853e3ee45e6454ab61",
   "package_dirty": false,

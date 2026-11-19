@@ -5,7 +5,7 @@
   "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "examples-fundamentals-particles-particle-data",
-  "fingerprint": "ee3ea145bbd8d719230e88e0cef33d62da818a8b879ecea2ba4d6a8506addaa0",
+  "fingerprint": "bcdc1ecd18a1429e626693a96bea1bcb70ab820387e86892eacdb4226a533605",
   "source": "docs/examples/fundamentals/particles/particle_data.py",
   "revision": "6af97152d1570464ac5ccae56e3110001657e170",
   "package_dirty": false,

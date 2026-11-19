@@ -6,7 +6,7 @@
   "scientific_source_sha256": "c491d38a0f3b014be11117e77bf7f5ed27e4a834ba024ddbac813c1eefd5b6db",
   "input_sha256": {},
   "example": "cuda-optics",
-  "fingerprint": "3a43c1aef2e90a8bbd72b11ccf83ca9e0145a627e6bfd039965cc1f1ab8a101d",
+  "fingerprint": "15f23c2642ae65d5ec87e8849baab57a24c0d0d99f973d7dff13a23be9f325e3",
   "source": "docs/examples/optics/cuda_optics.py",
   "revision": "e6d8de004d68d2f8054a7654be48430a2af02cb9",
   "package_dirty": false,

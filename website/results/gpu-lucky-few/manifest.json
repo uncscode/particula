@@ -9,7 +9,7 @@
     "scripts/gpu_studies/lucky_few.py": "5f61eb0415b560e577b8f6d841053c3cf8eda7e9a4a3acb184812663d9ec8ca1"
   },
   "example": "gpu-lucky-few",
-  "fingerprint": "ad1e25f15a6478a6512e901c084efe4a1c13184db164f881ce108a3aed387408",
+  "fingerprint": "9bf099b72462383dc232ab4e28b78b12bafd6f43bfa889c806eef37597e0153f",
   "source": "docs/examples/gpu/prepared/gpu_lucky_few.py",
   "revision": "9f408350e33d112c4fc7e567f13d7521dfb918f1",
   "package_dirty": false,

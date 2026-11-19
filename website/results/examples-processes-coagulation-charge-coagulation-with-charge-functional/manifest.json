@@ -5,7 +5,7 @@
   "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "examples-processes-coagulation-charge-coagulation-with-charge-functional",
-  "fingerprint": "93d892832a2252d2ccf240e285af3838e0f3438d16e5d09160d7615cc1d7314a",
+  "fingerprint": "68ca4f9535ce177da8a89167dd9000a4f4b26983c0e129c82ca2e173d8d70972",
   "source": "docs/examples/processes/coagulation/charge/coagulation_with_charge_functional.py",
   "revision": "dd92d3c1ca71f36eacad56b49661b32c0da77ac7",
   "package_dirty": false,

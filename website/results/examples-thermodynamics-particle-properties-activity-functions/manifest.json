@@ -5,7 +5,7 @@
   "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "examples-thermodynamics-particle-properties-activity-functions",
-  "fingerprint": "2202635f10501ff9b79149affb8e17dd36fbc29998e1884e56c909c13c8c930a",
+  "fingerprint": "9a781f65b7a04fc1a7cf4729255311e9286f2fb686c3c45af572a96934c839fa",
   "source": "docs/examples/thermodynamics/particle-properties/activity_functions.py",
   "revision": "6af97152d1570464ac5ccae56e3110001657e170",
   "package_dirty": false,

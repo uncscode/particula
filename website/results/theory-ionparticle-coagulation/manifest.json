@@ -6,7 +6,7 @@
   "scientific_source_sha256": "9ccd4e777e1987db076b9ac5b19f8cd1c309a0a8e54f496c0a8bbdfe42a87a5d",
   "input_sha256": {},
   "example": "theory-ionparticle-coagulation",
-  "fingerprint": "bbf869031217cf62b39d7b4cf98784d1df42218200994c98640407152fc2936d",
+  "fingerprint": "0392716fd05490e6ec098b7ee79b80a4b2cb77d8a062ce49b409c1a514e70c7e",
   "source": "docs/theory/dynamics/ionparticle-coagulation.py",
   "revision": "f5be504b2ecb3d768eb5a41a2be1be19b0d2d96d",
   "package_dirty": false,

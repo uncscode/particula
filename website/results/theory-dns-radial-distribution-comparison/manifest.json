@@ -5,7 +5,7 @@
   "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "theory-dns-radial-distribution-comparison",
-  "fingerprint": "9d27661ac479ab7b716e1f3103e7e1ba9b3b30a2ceaffc0597f8a6adc77595c2",
+  "fingerprint": "fb55b2b8e7306263706e9c0961bf42254589fd088f995d1c7ed5f94d664d899f",
   "source": "docs/theory/dynamics/cloud-droplet-coagulation/dns-radial-distribution-comparison.py",
   "revision": "6af97152d1570464ac5ccae56e3110001657e170",
   "package_dirty": false,

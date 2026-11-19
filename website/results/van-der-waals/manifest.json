@@ -8,7 +8,7 @@
     "docs/data/coagulation/van-der-waals-measurements.json": "3a71041539a09b562d6ee5ad3992e3aaaa9f812e48d9f8430789a4117ebbdf39"
   },
   "example": "van-der-waals",
-  "fingerprint": "b623da487e0f35775ef138fb765d7e8c9a8428d1fca6f595fc3411ef67783da1",
+  "fingerprint": "141e96241db042098aac055d2ef6cfe99f9f979efc8a45f962fa9907e7fd974f",
   "source": "docs/examples/processes/coagulation/van_der_waals.py",
   "revision": "b860b8be1294f4f029e2a23b488195c9d71c8812",
   "package_dirty": false,

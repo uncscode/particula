@@ -8,7 +8,7 @@
     "docs/data/transport/kim2005-psl-slip.csv": "03a91ba6cea6cf93f6f009d9a11da68905b4cda7e5030edd56caa52595cefefd"
   },
   "example": "psl-mobility",
-  "fingerprint": "e96f2a2e39a7de1a4ff746bf8f39f978b9363c8bed65ed2e81d1259cfa05d4d4",
+  "fingerprint": "e763012cf0b9800ca8ab4896a07266cee4fcc5d2f400ba2fba46213cd01fa09b",
   "source": "docs/examples/fundamentals/particles/psl_mobility.py",
   "revision": "b860b8be1294f4f029e2a23b488195c9d71c8812",
   "package_dirty": false,

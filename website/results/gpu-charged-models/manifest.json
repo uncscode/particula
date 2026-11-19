@@ -5,7 +5,7 @@
   "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "gpu-charged-models",
-  "fingerprint": "4fcb1961612628caba4eb98a7608c71c635539df715732737778783d2d0f1bb7",
+  "fingerprint": "297fe9f9766c33bb09a4c8cff0f25aafea0812ede4f767b1315e7d28b27419c6",
   "source": "docs/examples/gpu/prepared/gpu_charged_models.py",
   "revision": "e6d8de004d68d2f8054a7654be48430a2af02cb9",
   "package_dirty": false,

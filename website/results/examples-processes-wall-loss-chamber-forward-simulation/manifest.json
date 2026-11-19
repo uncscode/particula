@@ -6,7 +6,7 @@
   "scientific_source_sha256": "9ccd4e777e1987db076b9ac5b19f8cd1c309a0a8e54f496c0a8bbdfe42a87a5d",
   "input_sha256": {},
   "example": "examples-processes-wall-loss-chamber-forward-simulation",
-  "fingerprint": "5c28a651f0b6cbda0ef72d2564301fbef5d8f9db065d48b77f30664ae9fd132d",
+  "fingerprint": "56401936a37ab773fce126032fcf30e9a280f7b12b94f6a2c6543cc84e218a83",
   "source": "docs/examples/processes/wall-loss/chamber_forward_simulation.py",
   "revision": "f5be504b2ecb3d768eb5a41a2be1be19b0d2d96d",
   "package_dirty": false,

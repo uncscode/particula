@@ -138,3 +138,17 @@ def test_refit_after_growing_outside_legend():
         np.testing.assert_allclose(
             ax.get_position().size * fig.get_size_inches(), (3, 3), atol=0.01
         )
+
+
+def test_refit_after_tick_label_outgrows_canvas():
+    """A long replacement tick label fits beside the original 3-inch panel."""
+    fig, ax = plotting.subplots()
+    ax.set_yticks([0.5], labels=["short"])
+    plotting.fit(fig)
+    ax.set_yticks([0.5], labels=["long condition label " * 8])
+    plotting.fit(fig)
+    bounds = ax.get_yticklabels()[0].get_window_extent()
+    assert fig.bbox.x0 <= bounds.x0 < bounds.x1 <= ax.bbox.x0
+    np.testing.assert_allclose(
+        ax.get_position().size * fig.get_size_inches(), (3, 3), atol=0.01
+    )

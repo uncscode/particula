@@ -10,7 +10,7 @@
     "scripts/gpu_studies/validation.py": "816f83d10024feef14daa05112688ea7d26faa3ddde8e05ba12e8dc29f6a4a45"
   },
   "example": "gpu-prepared-cyclic-chamber",
-  "fingerprint": "81db0684163f06ee6d3ab566f501354a81c5322d3751f47fa29e095111cac384",
+  "fingerprint": "4bbc4b1c7e538ba8b078f32b16972d13e6aeb0ea69b612cd594e9cb153f03c36",
   "source": "docs/examples/gpu/prepared/gpu_prepared_cyclic_chamber.py",
   "revision": "3d3753d2be9973c94b4064047fa8452e717f1311",
   "package_dirty": false,

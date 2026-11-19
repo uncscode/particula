@@ -5,7 +5,7 @@
   "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "examples-processes-condensation-staggered-condensation-example",
-  "fingerprint": "fb1474d029a3b9f17d240edf5ecd5b3cbf6a5874cd3ef9841dbe5399e9c88996",
+  "fingerprint": "bf4d09357b6a7313b7057cc3249c3de201e57b75a875c8adce65a9d9028a123d",
   "source": "docs/examples/processes/condensation/staggered_condensation_example.py",
   "revision": "6af97152d1570464ac5ccae56e3110001657e170",
   "package_dirty": false,

@@ -5,7 +5,7 @@
   "package_source_sha256": "3303484dc6e27a4f0667a71ca48d1def24ba18b76a72dbf0c80ded2c5db762ad",
   "input_sha256": {},
   "example": "examples-simulations-biomass-burning-cloud-interactions",
-  "fingerprint": "0a0a4bf6ad82b26d5c9ecb5552c423a9a73d64967cf4e25da5956b78d62a2269",
+  "fingerprint": "7a6ee6972fecd1254b0da57930616dddc4b8969ed92807bac30680785b275bf0",
   "source": "docs/examples/simulations/biomass_burning_cloud_interactions.py",
   "revision": "d1bdf025f114a398220070a52e2c33be24d3a506",
   "package_dirty": false,

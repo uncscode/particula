@@ -8,7 +8,7 @@
     "docs/examples/gpu/resident/gpu_resident_multi_timestep.py": "2300fe5833affb015d4a2b81a5647abd8e8d5d8f9ff10291a80fedd5683859e6"
   },
   "example": "examples-gpu-resident-gpu-resident-graph-capture",
-  "fingerprint": "e4a497a871c79c589fe2c1dc3cdb7d8ce67bdb1c395c72eed9ea6596f0656426",
+  "fingerprint": "c82c582864902ef61b62f771d8f18cf2592f86c3d7df111e7ab1718e76e8fa5e",
   "source": "docs/examples/gpu/resident/gpu_resident_graph_capture.py",
   "revision": "c718cc37f6e9929c56bfb7c39dc765fc220b453b",
   "package_dirty": false,

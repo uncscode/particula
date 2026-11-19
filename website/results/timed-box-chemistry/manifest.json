@@ -6,7 +6,7 @@
   "scientific_source_sha256": "c491d38a0f3b014be11117e77bf7f5ed27e4a834ba024ddbac813c1eefd5b6db",
   "input_sha256": {},
   "example": "timed-box-chemistry",
-  "fingerprint": "eb15affe6cb5fcd99353a8273e49171c4a0c8025171bcc59085713e3260563af",
+  "fingerprint": "13b197874c9c834c600a62c5a17b2cc7f9bd365aaf451e9f04db8b3c8c77ad0f",
   "source": "docs/examples/processes/customization/timed_box_chemistry.py",
   "revision": "6af97152d1570464ac5ccae56e3110001657e170",
   "package_dirty": false,
