@@ -120,7 +120,12 @@ def rollback_buffers(owner, call):
             continue
         visited.add(id(item))
         if isinstance(item, wp.array):
-            if item.ptr:
+            # A reshape or prefix view can share its base pointer. Preserve
+            # the widest reachable extent for the restore copy.
+            current = arrays.get(item.ptr)
+            if item.ptr and (
+                current is None or item.capacity > current.capacity
+            ):
                 arrays[item.ptr] = item
         else:
             pending.extend(_bound_children(item, wp))

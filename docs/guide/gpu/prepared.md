@@ -166,7 +166,9 @@ work limits and their ties, scheduled and attempted trials, and actual mergers.
 `include_pairs=True` downloads the ordered interval log. For pass i in box b,
 slice from the previous `pair_end_offsets[i-1,b]` (zero for the first pass)
 to `pair_end_offsets[i,b]`. The device scratch pair buffer holds the last pass.
-`last_rejection` preserves tentative counts separately, marked `rolled_back`.
+`last_rejection` preserves tentative counts separately, marked `rolled_back`. Its `last_*` fields
+include the last candidate duration, demand for the remaining interval,
+active counts and controlling capacities, even on a first-pass rejection.
 `allocation_bytes` reports retained live and restore storage. Fresh owners
 collect diagnostics starting at their first step.
 

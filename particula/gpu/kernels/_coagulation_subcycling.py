@@ -287,12 +287,25 @@ class AdaptiveInterval:
         if code == 13:
             reason = "floating-point progress"
         row = self.history.numpy()[k - 1 if exhausted else k]
-        box = int(np.argmax(row[:, 1] - row[:, 2]))
+        available = row[:, 2].copy()
+        # Zero-capacity boxes have fewer than two live slots and zero demand.
+        load = np.divide(
+            row[:, 1],
+            available,
+            out=np.zeros_like(available),
+            where=available > 0,
+        )
+        box = int(np.argmax(load))
+        remedy = (
+            "Increase the controlling capacity or use a shorter outer interval."
+            if code == 13
+            else f"Relax {reason} and retry."
+        )
         error = CoagulationSubcyclingError(
             f"{reason} exhausted after {k} substeps. "
             f"{remaining:g} s remain. "
             f"Last admission in box {box} requested {row[box, 1]:g} trials "
-            f"with {row[box, 2]:g} available. Relax {reason} and retry."
+            f"with {available[box]:g} available. {remedy}"
         )
         error.diagnostics = dict(
             self.diagnostics(call),
@@ -301,7 +314,13 @@ class AdaptiveInterval:
             rolled_back=True,
             limiting_box=box,
             last_required_trials=row[:, 1].copy(),
-            last_available_trials=row[:, 2].copy(),
+            last_available_trials=available,
+            last_trial_limited=available == call.work_config.max_trials_per_box,
+            last_buffer_limited=available == call.max_collisions,
+            last_disjoint_pair_limited=available == row[:, 3],
+            last_active_counts=row[:, 9].astype(np.int64),
+            last_majorants=row[:, 8].copy(),
+            last_candidate_seconds=float(self.dt.numpy()[0]),
         )
         return error
 
