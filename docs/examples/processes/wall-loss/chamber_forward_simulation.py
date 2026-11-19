@@ -302,18 +302,21 @@ ax.plot(
     coagulation_net_matrix[1, :],
     color=plotting.COLORS["teal"],
     label="Initial Coagulation Net",
+    linestyle="-",
 )
 ax.plot(
     radius_bins,
     dilution_loss_matrix[1, :],
     color=plotting.COLORS["rust"],
     label="Initial Dilution Loss",
+    linestyle="-",
 )
 ax.plot(
     radius_bins,
     chamber_wall_loss_rate_matrix[1, :],
     color=plotting.COLORS["indigo"],
     label="Initial Chamber Wall Loss",
+    linestyle="-",
 )
 ax.plot(
     radius_bins,

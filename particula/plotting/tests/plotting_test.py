@@ -122,3 +122,19 @@ def test_aspect_error_can_be_corrected():
     np.testing.assert_allclose(
         ax.get_position().size * fig.get_size_inches(), [5, 3.5], atol=0.01
     )
+
+
+def test_refit_after_growing_outside_legend():
+    """Keep a new or enlarged right legend on the canvas after fitting."""
+    fig, ax = plotting.subplots()
+    ax.plot([0, 1], label="First")
+    plotting.fit(fig)
+    entry = plotting.legend(ax, placement="right")
+    for label in ("A longer label " * 6, "An even longer label " * 9):
+        entry.get_texts()[0].set_text(label)
+        plotting.fit(fig)
+        box = entry.get_window_extent()
+        assert ax.bbox.x1 <= box.x0 < box.x1 <= fig.bbox.x1
+        np.testing.assert_allclose(
+            ax.get_position().size * fig.get_size_inches(), (3, 3), atol=0.01
+        )

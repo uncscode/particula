@@ -173,23 +173,25 @@ for i, mass in enumerate(mass_mixture):
     activities_kappa[i] = activity_kappa.activity(mass_concentration=mass)
 
 fig, ax = plotting.subplots(size="wide")
-ax.plot(mass_water, activities_mass[:, 0], label="Mass: Water")
-ax.plot(
-    mass_water, activities_mass[:, 1], label="Mass: Sucrose", linestyle="--"
-)
-ax.plot(mass_water, activities_molar[:, 0], label="Molar: Water")
-ax.plot(
-    mass_water,
-    activities_molar[:, 1],
-    label="Molar: Sucrose",
-    linestyle="--",
-    linewidth=3,
-    alpha=0.85,
-)
-ax.plot(mass_water, activities_kappa[:, 0], label="Kappa: Water")
-ax.plot(
-    mass_water, activities_kappa[:, 1], label="Kappa: Sucrose", linestyle="--"
-)
+for name, activities, color in (
+    ("Mass", activities_mass, plotting.COLORS["teal"]),
+    ("Molar", activities_molar, plotting.COLORS["rust"]),
+    ("Kappa", activities_kappa, plotting.COLORS["indigo"]),
+):
+    ax.plot(
+        mass_water,
+        activities[:, 0],
+        label=f"{name}: Water",
+        color=color,
+        linestyle="-",
+    )
+    ax.plot(
+        mass_water,
+        activities[:, 1],
+        label=f"{name}: Sucrose",
+        color=color,
+        linestyle="--",
+    )
 ax.set_xlabel("Mass fraction water")
 ax.set_ylabel("Activity")
 plotting.legend(ax)

@@ -521,6 +521,42 @@ def test_full_canvas_fingerprints_style_without_invalidating_legacy(example):
     assert examples.fingerprint(config, root) == legacy
 
 
+def test_replot_distinguishes_scientific_and_rendering_sources(example):
+    """A renderer edit invalidates the picture while preserving usable data."""
+    root, config = example
+    config["full_canvas"] = True
+    package = root / "particula"
+    renderer = root / examples.STYLE_INPUTS[1]
+    renderer.parent.mkdir(parents=True)
+    renderer.write_text("color = 'blue'\n")
+    (root / examples.STYLE_INPUTS[0]).write_text("lines.linewidth: 2\n")
+    model = package / "physics.py"
+    model.write_text("rate = 3\n")
+    results = root / "results"
+    folder = results / "demo"
+    folder.mkdir(parents=True)
+    data = b'{"value":3}'
+    (folder / "data.json").write_bytes(data)
+    manifest = {
+        "fingerprint": examples.fingerprint(config, root),
+        "simulation_fingerprint": examples.simulation_fingerprint(config, root),
+        "package_source_sha256": examples.package_source_hash(root),
+        "scientific_source_sha256": examples.package_source_hash(
+            root, science_only=True
+        ),
+        "files": {"data.json": hashlib.sha256(data).hexdigest()},
+    }
+    (folder / "manifest.json").write_text(json.dumps(manifest))
+    renderer.write_text("color = 'red'\n")
+    assert examples.result_state(config, manifest, root) == "stale"
+    assert examples.load_replot_data("demo", config, root, results)[2] == {
+        "value": 3
+    }
+    model.write_text("rate = 4\n")
+    with pytest.raises(ValueError, match="Library source changed"):
+        examples.load_replot_data("demo", config, root, results)
+
+
 def test_historical_replot_checks_original_inputs_and_pinned_data(tmp_path):
     """An archive must match the original source, library and observations."""
     science = tmp_path / "original"
@@ -563,7 +599,15 @@ def test_historical_replot_checks_original_inputs_and_pinned_data(tmp_path):
     }
     (directory / "manifest.json").write_text(json.dumps(manifest))
     pin = {"revision": revision, "data_sha256": digest}
+    pin["package_source_sha256"] = examples.package_source_hash(science)
     current = {**config, "historical_run": pin}
+    examples.verify_execution_checkout(current, science)
+    (science / "particula").mkdir()
+    extra = science / "particula/modified.py"
+    extra.write_text("changed = True")
+    with pytest.raises(ValueError, match="differs from the pinned execution"):
+        examples.verify_execution_checkout(current, science)
+    extra.unlink()
     assert examples.load_historical_data("demo", current, science, results)[
         2
     ] == {"observation": 3}

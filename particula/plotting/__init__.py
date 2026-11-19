@@ -68,6 +68,7 @@ class _PaperLayout(ConstrainedLayoutEngine):
         self.grid = np.array([ncols, nrows])
         self.finished = False
         self.outside = {}
+        self.gutters = np.zeros(ncols)
 
     def execute(self, fig):
         """Preserve solved positions when redrawing for PNG, PDF or display."""
@@ -146,8 +147,11 @@ def fit(fig):
             legend_width = entry.get_window_extent().width / fig.dpi
             gutters[col] = max(gutters[col], legend_width + 0.2)
     minimum_width = (engine.panel[0] + 0.8) * engine.grid[0] + gutters.sum()
-    if fig.get_figwidth() < minimum_width and not engine.finished:
+    if fig.get_figwidth() < minimum_width and (
+        not engine.finished or np.any(gutters > engine.gutters)
+    ):
         fig.set_figwidth(minimum_width)
+    engine.gutters = gutters
     engine.finished = False
     for _ in range(16):
         fig.draw_without_rendering()

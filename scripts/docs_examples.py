@@ -341,7 +341,7 @@ def load_replot_data(example_id, config, root, results, *, science_root=None):
         raise ValueError(
             "Simulation inputs changed; refresh required before replot"
         )
-    if original["package_source_sha256"] != package_source_hash(root):
+    if not science_matches(original, root):
         raise ValueError(
             "Library source changed; refresh required before replot"
         )
@@ -492,6 +492,9 @@ def refresh(
     source = (root / config["source"]).read_bytes()
     initial_fingerprint = fingerprint(config, root)
     initial_package_hash = package_source_hash(execution_root)
+    initial_science_hash = package_source_hash(
+        science_root or execution_root, science_only=True
+    )
     initial_versions = package_versions(execution_root)
     original = None
     directory = None
@@ -541,6 +544,7 @@ def refresh(
             "figure_dpi": FIGURE_DPI,
             "elapsed_seconds": elapsed,
             "package_source_sha256": initial_package_hash,
+            "scientific_source_sha256": initial_science_hash,
             "input_sha256": {
                 name: hashlib.sha256((root / name).read_bytes()).hexdigest()
                 for name in config.get("inputs", [])
@@ -588,12 +592,24 @@ def refresh(
     )
 
 
-def package_source_hash(root=ROOT):
-    """Identify the scientific library used to generate saved numerical data."""
+def science_matches(manifest, root):
+    """Verify data against science alone, or the full tree for legacy runs."""
+    if "scientific_source_sha256" in manifest:
+        return manifest["scientific_source_sha256"] == package_source_hash(
+            root, science_only=True
+        )
+    return manifest["package_source_sha256"] == package_source_hash(root)
+
+
+def package_source_hash(root=ROOT, *, science_only=False):
+    """Hash Python sources, optionally omitting the plotting package."""
     return hashlib.sha256(
         b"".join(
             str(p.relative_to(root)).encode() + p.read_bytes()
             for p in sorted((root / "particula").rglob("*.py"))
+            if not (
+                science_only and p.is_relative_to(root / "particula/plotting")
+            )
         )
     ).hexdigest()
 
@@ -733,7 +749,7 @@ def validate_example(key, config):
     if (
         manifest.get("rendered_at")
         and config.get("data_expression")
-        and manifest.get("package_source_sha256") == package_source_hash(ROOT)
+        and science_matches(manifest, ROOT)
         and manifest.get("simulation_fingerprint")
         == simulation_fingerprint(config, ROOT)
     ):

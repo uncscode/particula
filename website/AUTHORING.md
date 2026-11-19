@@ -33,8 +33,10 @@ Replottable examples separate `simulate()` from `plot_results(report)`.
 The registry declares `data_expression`, `replot_invoke`, `render_functions`
 and `plot_inputs`. Only pure rendering functions/helpers belong in these
 exclusions: they must not change scientific parameters, processes or diagnostics.
-Replot checks saved-file hashes, the simulation fingerprint and library hash;
-changes to simulation code or inputs require a full refresh. It executes the
+Replot checks saved-file hashes, the simulation fingerprint and the scientific
+Python sources. Changes under `particula/plotting/` affect figure rendering.
+The full package hash still identifies the original execution. Changes to
+simulation code or inputs require a full refresh. Replot executes the
 renderer on CPU, without requiring CUDA or advancing a simulation. It preserves
 the original execution timestamp, device, revision and versions, and records
 rendering time/revision separately. `executed_source.py` preserves the original
@@ -53,9 +55,9 @@ JSON has a **10 MiB hard limit per example**, enforced while writing. This limit
 saved plot data, not simulation RAM or figure size. Oversized data fails clearly
 and preserves the previous successful bundle; it is never silently truncated.
 
-A historical study can pin its original scientific revision and the SHA-256
-of its published `data.json` in the registry under `historical_run`. To redraw
-it, point the same verification checks at a checkout of the executed revision:
+A historical study can pin its original revision, the full Python package
+hash and the SHA-256 of its published `data.json` in the registry under
+`historical_run`. To redraw it, point the same verification checks at a checkout of the executed revision:
 
 ```bash
 python scripts/docs_examples.py replot gpu-prepared-cyclic-chamber --science-checkout ../particula-original
