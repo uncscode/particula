@@ -945,5 +945,22 @@
       "plot_results"
     ],
     "plot_inputs": []
+  },
+  "psl-mobility": {
+    "title": "Dry PSL mobility sizing",
+    "source": "docs/examples/fundamentals/particles/psl_mobility.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 300,
+    "inputs": [
+      "docs/data/transport/kim2005-psl-slip.csv"
+    ],
+    "invoke": "result = run_example()",
+    "data_expression": "result",
+    "replot_invoke": "result = saved_data\nplot_results(result)\nplt.show()",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": []
   }
 }

@@ -7,6 +7,7 @@ all of them.
 | Starting question | Example | Connection |
 | --- | --- | --- |
 | Why do two spectra of the same population look different? | [Size distributions](aerosol_distributions.py) | Density, bin number, and coordinate conversion |
+| How accurately does mobility recover a reference diameter? | [Dry PSL mobility sizing](psl_mobility.py) | Measured slip and transfer of a one-point calibration |
 | How do I initialize from radii or component masses? | [Particle construction](particle_data.py) | Units and population-weighted diagnostics |
 | What changes when I use bins or represented counts? | [Native storage](distribution_tutorial.py) | Number density versus physical inventory |
 | How does composition change equilibrium pressure? | [Activity models](../../thermodynamics/particle-properties/activity_tutorial.py) | Mixing assumptions and effective activity |
