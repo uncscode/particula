@@ -47,8 +47,6 @@ def outlet(d, charges):
 def chamber_ions(q, collector_number, weights):
     """Solve the steady balance for negative and positive ions (cm⁻³)."""
     alpha = 2.3e-6  # cm3/s, Franchin et al. at 20 C
-    if not collector_number:
-        return np.full(2, np.sqrt(q / alpha))
     rates = lf2013_coag_full(
         radius_vals=np.array([50e-9]), charge_vals=list(LARGE)
     )
