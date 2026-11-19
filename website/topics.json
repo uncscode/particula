@@ -93,7 +93,8 @@
         "lognormal",
         "PDF",
         "PMF",
-        "radius diameter"
+        "radius diameter",
+        "mobility diameter"
       ],
       "prerequisites": [],
       "related": [
@@ -235,7 +236,9 @@
         "Sutherland",
         "dynamic viscosity",
         "mean free path",
-        "air viscosity"
+        "air viscosity",
+        "Cunningham slip correction",
+        "PSL mobility sizing"
       ],
       "prerequisites": [],
       "related": [
@@ -2204,6 +2207,37 @@
       "also": [],
       "role": "Guide",
       "start_here": true
+    },
+    {
+      "source": "docs/guide/processes/psl-mobility.md",
+      "title": "Dry PSL mobility sizing",
+      "topic": "transport",
+      "also": [
+        "size"
+      ],
+      "role": "Guide",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/fundamentals/particles/psl_mobility.py",
+      "title": "Diameter from measured PSL mobility",
+      "topic": "size",
+      "also": [
+        "transport"
+      ],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/contribute/validation/transport/psl-mobility.md",
+      "title": "Dry PSL mobility validation",
+      "topic": "verification-scientific",
+      "also": [
+        "transport",
+        "size"
+      ],
+      "role": "Contribute",
+      "start_here": false
     },
     {
       "source": "docs/guide/processes/ccn-retrieval.md",
