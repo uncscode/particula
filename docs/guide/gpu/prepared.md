@@ -72,11 +72,10 @@ size has no algorithmic cap. Slot indices remain signed int32. Prepared
 sedimentation retains the CPU strategy's mean material density convention;
 the direct kernel uses each particle's effective density.
 
-Each step admits conservative trial demand before touching coagulation outputs,
+By default, each step admits conservative trial demand before touching coagulation outputs,
 particles or RNG. Excessive demand latches a failure; `synchronize()`,
 `snapshot()` or another observation boundary reports it. Reduce the configured
-timestep and prepare a fresh owner. Admission is a resource bound, not an
-accuracy criterion; no automatic subcycling or clipping occurs. See
+timestep and prepare a fresh owner. Adaptive admission is available through the optional policy below. See
 [direct configuration and preflight](direct/coagulation-configuration.md).
 See the [charged model comparison](../../examples/gpu/prepared/gpu_charged_models.py).
 The [charged coagulation validation record](../../contribute/validation/gpu/charged-coagulation.md)
@@ -104,6 +103,82 @@ Process configuration, timestep, box layout and buffer capacity are frozen.
 Editing the original Python strategy after preparation does not change a running
 simulation. Changing these requires a new preparation; a checkpoint resume also
 requires matching configuration and the exact supported device.
+
+## Adaptive coagulation intervals
+
+Use an adaptive interval when a physical box outgrows its original trial
+budget during a run. Each admitted pass recomputes the rate majorant from the
+current particles. All boxes first try the time remaining to the observation.
+The controller halves this duration until every box can schedule its full
+demand. It consumes random draws only after admission. The final duration
+covers the observation interval within eight fp64 ULPs. Timestep convergence
+and sampling of rare particles require separate scientific checks.
+
+```python
+from particula.gpu.kernels.coagulation import (
+    CoagulationSubcyclingConfig, CoagulationSubcyclingError,
+    CoagulationWorkConfig,
+)
+
+policy = CoagulationSubcyclingConfig(
+    min_substep=0.001, max_subcycles=32, max_device_bytes=64 * 1024**2
+)
+with processes.prepare(
+    aerosol, device="cuda:0", time_step=1.0,
+    coagulation_work_config=CoagulationWorkConfig(max_trials_per_box=256),
+    coagulation_subcycling=policy,
+) as sim:
+    try:
+        sim.step()
+    except CoagulationSubcyclingError as error:
+        print(error.diagnostics["reason"], error.diagnostics["remaining_seconds"])
+        committed = sim.checkpoint()
+        with processes.resume(
+            committed, retry_subcycling=CoagulationSubcyclingConfig(
+                min_substep=0.0001, max_subcycles=128, max_device_bytes=128 * 1024**2
+            ),
+        ) as retry:
+            retry.step()
+            print(retry.coagulation_diagnostics()["substep_sizes"])
+```
+
+The trial cap, allocated collision slots and half the active slot count all
+limit a pass. The byte cap on the scratch pair buffer determines its capacity
+at setup. The device-memory ceiling covers a conservative reservation for
+Particula's live arrays, rollback copies, bounded history and ordered pair
+log. A one-pair-per-box buffer is the minimum. The reservation can exceed the
+eventual allocation when a process shares scratch arrays. CUDA context,
+allocator pool, compiled modules and graph runtime storage are additional
+driver costs. No arrays grow during a step.
+
+A prepared step saves device state before running the first process and reads
+one compact commit status at the end. Condensation, sources, dilution and
+wall loss each run once at their declared positions with the outer timestep.
+Field and cohort updates follow every admitted merge. A subcycling limit
+restores the entire attempted interval on device, including earlier processes,
+pair buffers and RNG. Earlier steps in `run(n)` stay committed. Custom process
+adapters are excluded because their external writes cannot be restored.
+Physical-domain and unexpected execution errors follow the terminal fault path.
+
+`coagulation_diagnostics()` returns a row per accepted pass and box, including
+majorant, active slots, remaining-interval demand, accepted-duration demand,
+work limits and their ties, scheduled and attempted trials, and actual mergers.
+`include_pairs=True` downloads the ordered interval log. For pass i in box b,
+slice from the previous `pair_end_offsets[i-1,b]` (zero for the first pass)
+to `pair_end_offsets[i,b]`. The device scratch pair buffer holds the last pass.
+`last_rejection` preserves tentative counts separately, marked `rolled_back`.
+`allocation_bytes` reports retained live and restore storage. Fresh owners
+collect diagnostics starting at their first step.
+
+Adaptive checkpoints freeze the controller version, policy, outer timestep and
+sampler configuration. Ordinary resume uses the same random streams and
+policy. An explicit retry can lower the minimum, raise the pass or memory
+ceiling, or combine these changes. The new owner records the change in
+`policy_change` and requires explicit capture for graph execution. Captured
+steps use the same bounded device decisions as ordinary steps. Once a step
+finishes, unused passes skip physics and RNG. A recoverable rejection keeps
+the existing owner's graph valid. The worked example follows two cloud boxes
+through exhaustion and retry. [Adaptive cloud coagulation](../../examples/gpu/prepared/adaptive_coagulation.py)
 
 ## Atmospheric ion collisions
 

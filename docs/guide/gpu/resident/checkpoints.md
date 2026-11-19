@@ -1,5 +1,11 @@
 # GPU resident checkpoints
 
+Prepared adaptive coagulation checkpoints also retain the controller version,
+outer duration and subcycling limits. After a recoverable policy rejection,
+checkpoint the active owner and use the runnable's `resume(...,
+retry_subcycling=policy)` to relax the limits on the same device. The prepared
+owner restores the last committed outer state before this checkpoint. [Adaptive prepared execution](../prepared.md#adaptive-coagulation-intervals)
+
 For public runnable continuation, use [prepared checkpoints and resume](../prepared.md#state-forcing-and-observations). The detailed concrete resident schema below remains the underlying continuation authority.
 
 Current controllers create schema-v5 checkpoints with explicit population type

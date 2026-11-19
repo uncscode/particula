@@ -1069,5 +1069,20 @@
       "plot_separation"
     ],
     "plot_inputs": []
+  },
+  "adaptive-coagulation": {
+    "title": "Adaptive cloud coagulation on CUDA",
+    "source": "docs/examples/gpu/prepared/adaptive_coagulation.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 600,
+    "inputs": [],
+    "invoke": "report = simulate()\nprint(report)\nfigure = plot_results(report)\nplt.show()",
+    "data_expression": "report",
+    "replot_invoke": "figure = plot_results(saved_data)\nplt.show()",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": []
   }
 }

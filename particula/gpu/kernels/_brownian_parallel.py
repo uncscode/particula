@@ -365,6 +365,7 @@ def _select_brownian(  # noqa: C901
     ion_data: IonPairData,
     capture: CaptureData,
     work_counts: wp.array2d(dtype=wp.int32),
+    selected_dt: wp.array(dtype=wp.float64),
 ) -> None:
     """Select from parallel properties and maxima with the original RNG code."""
     if failure:
@@ -382,6 +383,9 @@ def _select_brownian(  # noqa: C901
             )
             / fluid_density[box_idx]
         )
+    duration = time_step
+    if selected_dt:
+        duration = selected_dt[0]
     counters = _select_coagulation_pairs_impl(
         masses,
         concentration,
@@ -397,7 +401,7 @@ def _select_brownian(  # noqa: C901
         sutherland_constant,
         elementary_charge_value,
         electric_permittivity,
-        time_step,
+        duration,
         radii,
         diffusivities,
         g_terms,
@@ -620,7 +624,7 @@ class _PreparedBrownianWork:
             device=self.device,
         )
 
-    def select(self, failure):
+    def select(self, failure, selected_dt=None):
         """Select pairs only after all boxes pass budget admission."""
         wp.launch(
             _select_brownian,
@@ -633,6 +637,7 @@ class _PreparedBrownianWork:
                 self.ion_data,
                 self.capture,
                 self.work_counts,
+                selected_dt,
             ),
             device=self.device,
         )
