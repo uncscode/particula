@@ -2716,6 +2716,26 @@
       ],
       "role": "Contribute",
       "start_here": false
+    },
+    {
+      "source": "docs/examples/processes/condensation/infer_initial_radius.py",
+      "title": "Recovering initial particle sizes after condensation",
+      "topic": "condensation-reservoirs",
+      "also": [
+        "condensation"
+      ],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/contribute/validation/numerics/initial-size-inversion.md",
+      "title": "Recovering initial size after closed-box condensation",
+      "topic": "verification-scientific",
+      "also": [
+        "condensation-reservoirs"
+      ],
+      "role": "Contribute",
+      "start_here": false
     }
   ],
   "supporting": [

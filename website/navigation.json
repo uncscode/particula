@@ -444,6 +444,10 @@
             "collapsed": true,
             "items": [
               {
+                "label": "Recovering initial particle sizes after condensation",
+                "slug": "examples/processes/condensation/infer_initial_radius"
+              },
+              {
                 "label": "Condensation Tutorial: Radius Bin",
                 "slug": "examples/processes/condensation/condensation_1_bin"
               },
@@ -1147,6 +1151,10 @@
               {
                 "label": "Condensation Stiffness Study and Recommendation Record",
                 "slug": "contribute/validation/numerics/condensation-stiffness"
+              },
+              {
+                "label": "Initial-size inversion",
+                "slug": "contribute/validation/numerics/initial-size-inversion"
               },
               {
                 "label": "Adaptive integration assessment",
