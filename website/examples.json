@@ -1003,7 +1003,10 @@
     "device": "cpu",
     "timeout": 300,
     "inputs": [
-      "docs/data/nacl-scavenging/comparison.csv"
+      "docs/data/nacl-scavenging/comparison.csv",
+      "docs/data/nacl-scavenging/capture-pairs.csv",
+      "docs/data/nacl-scavenging/capture-steady.csv",
+      "docs/data/nacl-scavenging/other-kernels-steady.csv"
     ]
   }
 }

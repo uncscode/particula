@@ -2679,6 +2679,7 @@
       "title": "Estimate bipolar charges and multiply charged diameters",
       "topic": "charged",
       "also": [
+        "interparticle-forces",
         "brownian"
       ],
       "role": "Examples",
@@ -2689,6 +2690,7 @@
       "title": "NaCl nanoparticle scavenging in a chamber",
       "topic": "verification-scientific",
       "also": [
+        "interparticle-forces",
         "charged",
         "brownian"
       ],

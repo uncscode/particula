@@ -1,0 +1,16 @@
+{
+  "revision": "850e03c322e6783752ac1baeabf818904b37b381",
+  "device": "NVIDIA GeForce RTX 5060",
+  "air_density_kg_m3": 1.2041183163746156,
+  "dissipation_m2_s3": [
+    0.001,
+    0.1,
+    1.0,
+    10.0
+  ],
+  "ao2008_taylor_reynolds": 100,
+  "ao2008_imposed_slip_m_s": 0,
+  "temperature_K": 293.15,
+  "pressure_Pa": 101325.0,
+  "rows": 209
+}

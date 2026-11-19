@@ -1,17 +1,20 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 3.339950605062768,
-  "package_source_sha256": "9c32ac1e3330a07adc687b53840485972efe598748cdfbe8fa6ca29669f0e8ff",
+  "elapsed_seconds": 3.650470199994743,
+  "package_source_sha256": "803167c38ca3a1c7cc22a52518848fcd3ff697892265cbe60e7af3d15062e0f2",
   "input_sha256": {
-    "docs/data/nacl-scavenging/comparison.csv": "2045ce2175f2c5d3331c214421c2e6d7e4089548a17e990580ae8f11b4770e76"
+    "docs/data/nacl-scavenging/comparison.csv": "2045ce2175f2c5d3331c214421c2e6d7e4089548a17e990580ae8f11b4770e76",
+    "docs/data/nacl-scavenging/capture-pairs.csv": "42303c25b01bc45c963fba407de736fd0077f708460e832a1cf52d0d2167074f",
+    "docs/data/nacl-scavenging/capture-steady.csv": "1716d8be9f8cf8c678f3b1213ae0e495e9ba408a87473f8b13ef9d72d9dfad63",
+    "docs/data/nacl-scavenging/other-kernels-steady.csv": "5b77d3cd7855025df84354a03d5904356a25c15182d727f50eaa781e81a255e8"
   },
   "example": "nacl-scavenging",
-  "fingerprint": "75974af34893c51a518cc94b665f19975fac54ca9dda7fddf60e22a6912472b9",
+  "fingerprint": "dde9b392a76c879547b05f753d377c8555133d57591bd73fc9272f3d7535c557",
   "source": "docs/examples/processes/coagulation/charge/nacl_scavenging.py",
-  "revision": "d092dbde6fc1654db3b27542314a5ea1902f0a31",
+  "revision": "850e03c322e6783752ac1baeabf818904b37b381",
   "package_dirty": false,
-  "executed_at": "2026-11-19T01:59:06.225997+00:00",
+  "executed_at": "2026-11-19T03:27:30.036540+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
@@ -39,10 +42,22 @@
       {
         "image": "figure-3-1.png"
       }
+    ],
+    [
+      {
+        "image": "figure-4-1.png"
+      }
+    ],
+    [
+      {
+        "image": "figure-5-1.png"
+      }
     ]
   ],
   "files": {
-    "figure-3-1.png": "700a4dd723e8166314716ca3d8a1440f462cf5e6eea79518aa247f4ebca9498c",
-    "source.py": "2579acc2f93ea900301b3a541d42cc5dcf40e54c35e6bd4b24a6825a59136cdb"
+    "figure-5-1.png": "bb19564fb3e00c071ca74fbeb4fe66b4a6d13e9033004d461682c5a0d8b51a22",
+    "figure-4-1.png": "f681a42b8faef1e11d0d4942dab6cdbecf593561bfea88a9d963a3e2fc650e80",
+    "figure-3-1.png": "a444d81560854e2e58c816580e73e4c61f59589be2023f830bf2e63250d4de70",
+    "source.py": "2e2338892df4c147c1df82e9fade2da14756aa9272a161f07d729496d34ade13"
   }
 }

@@ -2,6 +2,8 @@
 
 Cai et al. measured how fast nominally 100 nm NaCl particles captured 3.6–10 nm NaCl particles. Capture was 1.84–2.14 times faster than Particula’s neutral Brownian hard-sphere prediction. At 4 nm, our calculation of electrostatic attraction adds only 2.7% at the expected neutralizer outlet charge distribution. A larger effect arises because doubly and triply charged collectors can pass the upstream classifier at larger physical diameters. Under the reference source spectrum, the combined effect of finite classifier widths and multiple charges raises the dispersion calculation by 16% at 4 nm. [Cai et al. (2022)](https://doi.org/10.5194/acp-22-11529-2022) · [Runlong Cai’s archived figure data, CC BY 4.0](https://doi.org/10.5281/zenodo.6982767)
 
+Using Particula’s native dielectric-sphere kernel, dispersion accounts for most of the modeled increase at the measured charge distribution. In the recorded 4 nm scan it raises the apparent rate from 0.926 to 1.065 × 10⁻⁷ cm³/s. Adding dielectric polarization gives 1.066, against 1.760 measured. These figures use charged hard-sphere rates for unsupported pairs. The largest unresolved group consists of large collectors admitted on multiply charged classifier branches. [Matched process comparisons and domain coverage](#what-changes-with-the-native-dispersion-and-dielectric-kernel)
+
 ## What charge reached the chamber?
 
 Cai et al. identify a 90 MBq ⁶³Ni neutralizer on the chamber inlet, **after** mobility selection. Bipolar ion attachment establishes a distribution of signed charges. The authors describe electrostatic loss of charged sub-10 nm particles in the Teflon inlet. The sampling SMPS has a separate charger and classifier. Its charge distribution determines the probability of detection at each mobility setting. The total-count CPC monitoring collector abundance counts each particle once. [Experiment layout and methods, Fig. 1 and §2.1](https://acp.copernicus.org/articles/22/11529/2022/)
@@ -49,6 +51,50 @@ All rates are in 10⁻⁷ cm³/s. The last column anchors the absolute rate for 
 
 For a tracer growing from 3.6 to 10 nm at a prescribed 3 nm/h, the concentration of 100 nm collectors giving 50% survival is 2,096/cm³ using neutral Particula rates and 1,010/cm³ using log-log interpolation of the five measurements. Linear interpolation gives 916/cm³. This calculation integrates coagulation loss alone and shows how the unmeasured 5–10 nm interval affects inferred survival. [Survival calculations](https://github.com/uncscode/particula/blob/main/docs/data/nacl-scavenging/survival.csv)
 
+## What changes with the native dispersion and dielectric kernel?
+
+We repeated the continuous-source retrieval with the same injection, charging, wall loss, classifier transfer and SMPS response. Four calculations switch the effective Hamaker constant between zero and 8.9 × 10⁻²⁰ J and the static relative permittivity between 1 and 5.9. Every calculation retains the signed monopole charges. The values represent a dry, homogeneous NaCl sphere scenario at 293.15 K and 101325 Pa, with unit sticking. The native CUDA pair law evaluates dispersion and dielectric polarization along the same encounter trajectory. The earlier calculation added an approximate neutral dispersion correction to a charged kernel. [Kernel theory](../../../theory/dynamics/interparticle-forces.md) · [Capture model validation](van-der-waals.md) · [Cai et al., supplement](https://doi.org/10.5194/acp-22-11529-2022-supplement)
+
+| Tracer diameter (nm) | Measured | Bare charge | With dispersion | With dispersion and polarization | Pairs inside capture domain |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 3.6 | 1.890 | 1.127 | 1.2851 | 1.2858 | 81.3% |
+| 3.7 | 1.740 | 1.080 | 1.2338 | 1.2345 | 82.0% |
+| 4.0 | 1.760 | 0.953 | 1.0950 | 1.0957 | 82.8% |
+| 5.0 | 1.220 | 0.668 | 0.8016 | 0.8023 | 94.8% |
+| 10.0 | 0.425 | 0.221 | 0.2810 | 0.2815 | 99.3% |
+
+The coefficients are apparent rates in 10⁻⁷ cm³/s for the reference classifier settings. Measured values come from the five NaCl points in the authors’ archive. Dispersion increases the predicted retrieval by 14.1–27.0%. Adding dielectric polarization raises it a further 0.06–0.19%. With both forces active, the five rates are still 29–38% low. Doubling the number of diameter samples per transmitted branch and halving the interpolation-grid spacing changes every reference result by less than 0.065%. These are numerical sensitivities. They do not quantify uncertainty in the assumed source distribution or material properties. [Steady results](https://github.com/uncscode/particula/blob/main/docs/data/nacl-scavenging/capture-steady.csv)
+
+**Which partner carries charge matters.** For one 4 nm tracer and one 100 nm collector, dispersion with both particles neutral gives 0.97169 × 10⁻⁷ cm³/s. Giving the collector one charge and including dielectric response gives 0.97170. Giving that charge to the tracer instead gives 1.31622, a 35% increase over dispersion alone for that pair. In the reference chamber, only about 0.4% of the loaded 4 nm tracers are charged. Even allowing every charged tracer through the connecting tubing gives an apparent rate of 1.101, compared with 1.096 at reference transmission. Increasing the ion-production setting from 2 to 100 ion pairs cm⁻³ s⁻¹ gives 1.098. Dielectric attraction can therefore matter to individual collisions while changing this population measurement very little. [Nominal pair calculations](https://github.com/uncscode/particula/blob/main/docs/data/nacl-scavenging/capture-pairs.csv) · [Worked example and figures](../../../examples/processes/coagulation/charge/nacl_scavenging.py)
+
+**The collector size distribution affects the inference.** At 4 nm, restricting the source classifier to its singly charged branch gives 0.972. Admitting the double and triple branches gives 1.096. Moving the assumed collector source geometric mean from 70 to 160 nm changes the result from 1.034 to 1.250 and increases the fraction of pairs outside the model’s range from 9.3% to 35.4%. A downstream physical-size measurement would constrain both effects.
+
+**The uncovered population is consequential.** We check the actual size ratio, charge strength and opposite-charge attraction for each pair. We assign the earlier charged hard-sphere rate to every uncovered pair in all four controls and retain its full population weight. At 4 nm, 17.2% of pairs lie outside the domain, primarily because the collector-to-tracer size ratio exceeds 32. These pairs supply 26.4% of the reference true collision rate under that assumption. Pair fractions use steady number populations. Collision-rate fractions use flux weighting.
+
+With the seven recorded 4 nm SMPS channels, the full calculation gives **1.066** against **1.760** measured. Assigning zero capture to uncovered pairs gives 0.780. Giving them the older additive dispersion correction gives 1.159. These are sensitivity scenarios; 1.159 is not a physical upper bound. Halving or doubling the Hamaker constant on the supported pairs gives 1.038 and 1.099 with the same hard-sphere treatment outside. The previously reported 1.672 uses the authors’ neutral attraction curve to set the absolute scale. Its closer agreement cannot identify dielectric polarization as the cause of the measured excess. At 10 nm, 99.3% of pairs are covered and the full prediction is still 34% low. The two alternative treatments of the uncovered pairs give 0.279 and 0.282 there, compared with 0.425 measured. [Measurement and scan sources](https://doi.org/10.5281/zenodo.13291658) · [Native campaign provenance](https://github.com/uncscode/particula/blob/main/docs/data/nacl-scavenging/capture-run.json)
+
+## Can settling, turbulence or another thermal kernel explain the residual?
+
+Cai et al. report a low-speed mixing fan and a verified well-mixed chamber. We found no measured turbulent energy dissipation rate in the article. We therefore swept dissipation over 0.001, 0.1, 1 and 10 m²/s³, with air density 1.204 kg/m³. We applied the geometric settling kernel at unit collection efficiency and the Saffman–Turner turbulent shear kernel to all modeled tracer–collector diameters. For each addition we recomputed the loaded chamber populations and the apparent rate with the same blank retrieval. Settling here means particles catching one another because their fall speeds differ. Wall deposition is already included in the separately fitted blank. [Cai et al., chamber methods](https://acp.copernicus.org/articles/22/11529/2022/#section2) · [Saffman and Turner (1956)](https://doi.org/10.1017/S0022112056000020)
+
+For a **4 nm tracer and 100 nm collector**, the nominal pair kernel from differential settling is **1.53 × 10⁻¹⁴ cm³/s**. The shear kernel ranges from **1.48 × 10⁻¹⁵ to 1.48 × 10⁻¹³ cm³/s** across the sweep. The measured coefficient is 1.76 × 10⁻⁷ cm³/s. The small collision cross-section limits both mechanisms and the differential fall speed is also small. Even after accounting for the classifier’s larger collectors, settling plus the highest shear changes the reference apparent rate by **0.00023% at 4 nm** and by at most **0.0011% across all five sizes**. Refining the size quadrature changes these paired increments by less than 0.01% relative. In the recorded scan, the largest mechanical addition is 2.53 × 10⁻¹³ cm³/s against a residual of 6.94 × 10⁻⁸ cm³/s. These calculations test direct collisions; fan-driven changes to spatial mixing or deposition would require independent chamber information. [Nominal mechanical pair rates](https://github.com/uncscode/particula/blob/main/docs/data/nacl-scavenging/other-kernels-pairs.csv)
+
+The Ayala turbulence kernel includes gravity and inertial effects. We evaluated it separately at a Taylor-scale Reynolds number of 100, dissipation of 0.01 m²/s³ and zero imposed air–particle slip. It gives 5.50 × 10⁻¹⁵ cm³/s for the nominal 4/100 nm pair. This is an extrapolation from cloud-droplet DNS covering radii of 10–60 µm. Both experimental particles are far smaller. The study does not add this kernel to the settling or shear terms. [Ayala et al., DNS](https://doi.org/10.1088/1367-2630/10/7/075015) · [Ayala et al., theory](https://doi.org/10.1088/1367-2630/10/7/075016)
+
+The thermal kernels describe alternative models of the same Brownian encounters. We substituted each kernel in the retrieval and repeated the Coulomb fits with the collision partners set to zero charge. The classifiers, ion attachment, source populations, detection model and blank calculation are identical in both columns.
+
+| Thermal model, recorded 4 nm scan | With modeled charges | With zero charge in the collision law |
+| --- | ---: | ---: |
+| Fuchs Brownian | — | 0.970 |
+| Dimensionless hard-sphere fit | 0.926 | 0.926 |
+| D’yachkov | 0.926 | 0.925 |
+| Gopalakrishnan | 0.926 | 0.926 |
+| Chahl | 0.926 | 0.926 |
+| Gatti–Kortshagen | **1.241** | **1.240** |
+| Measured | **1.760** | — |
+
+Rates are in 10⁻⁷ cm³/s. The Gatti–Kortshagen fit comes closest among the tested unanchored thermal laws for this scan. Its predicted rate is already 1.240 with both collision charges zero. The difference is primarily the fit’s transition-regime interpolation. It does not establish that additional charged collisions occurred. The fit was developed for particle charging in plasmas. Even its charged predictions remain 16–28% below the five measurements under the reference instrument settings. Adding a second complete thermal kernel would double-count encounters. [Gatti and Kortshagen (2008)](https://doi.org/10.1103/PhysRevE.78.046402) · [All 209 retrievals](https://github.com/uncscode/particula/blob/main/docs/data/nacl-scavenging/other-kernels-steady.csv) · [Run settings](https://github.com/uncscode/particula/blob/main/docs/data/nacl-scavenging/other-kernels-run.json)
+
 ## What did the particle-resolved runs check?
 
 The CUDA calculation follows 300 s source-off pulses. Each independent volume initially contains one tagged tracer and zero or eight collectors. Two salt mass inventories distinguish the cohorts after collisions. We track wall deposition, dilution, charge exchanged with a prescribed ion bath, collector depletion and the capture exposure experienced by live tracers. The ensembles check number, mass and signed charge at each output. The chamber uses the conductive-particle ion-attachment rates at their tabulated 298.15 K, with pair collisions calculated at 293.15 K. The assumed ion balance includes recombination, dilution and initial collector uptake. [Attachment model](https://doi.org/10.1080/02786826.2013.783684) · [Ion recombination](https://doi.org/10.5194/acp-15-7203-2015)
@@ -59,7 +105,7 @@ The GPU dispersion calculation adds $(E_{\mathrm{vdW}}-1)K_0$ to the native char
 
 ## Reproduce the calculations
 
-Run these commands from the repository root with Particula’s scientific Python environment active and Warp installed. The campaign requires a CUDA device. The other calculations run on the CPU. Results are written to `.artifacts/nacl-scavenging/`. Set `PARTICULA_SCAVENGING_OUTPUT` to choose a different destination.
+Run these commands from the repository root with Particula’s scientific Python environment active and Warp installed. The particle-resolved campaign and both kernel sweeps require CUDA. The capture sweep evaluates pair rates on the GPU and solves the steady chamber balances on the CPU. Results are written to `.artifacts/nacl-scavenging/`. Set `PARTICULA_SCAVENGING_OUTPUT` to choose a different destination.
 
 ```bash
 export PYTHONPATH=.
@@ -68,6 +114,8 @@ python "$study/study.py"
 python "$study/charge_study.py"
 python "$study/campaign.py"
 OPENBLAS_NUM_THREADS=1 python "$study/steady.py"
+OPENBLAS_NUM_THREADS=1 python "$study/capture_study.py"
+OPENBLAS_NUM_THREADS=1 python "$study/other_kernels.py"
 python "$study/summarize.py"
 ```
 
