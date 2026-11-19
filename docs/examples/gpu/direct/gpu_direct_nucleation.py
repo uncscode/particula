@@ -253,6 +253,7 @@ def run_example(
 def run_publication():
     """Require CUDA and compare one- and two-cubic-metre source events."""
     import matplotlib.pyplot as plt
+    from particula import plotting
 
     if not wp.is_cuda_available():
         raise RuntimeError("This publication run requires CUDA")
@@ -260,24 +261,28 @@ def run_publication():
     count = np.array([p.concentration.sum() for p, _, _ in results])
     volumes = np.array([1.0, 2.0])
     npt.assert_array_equal(count, volumes)
-    fig, axes = plt.subplots(1, 2, figsize=(8, 3.5), constrained_layout=True)
-    axes[0].bar(volumes, count, color="#287a90", width=0.6)
-    axes[0].set(
-        xlabel="Represented volume (m³)",
-        ylabel="Injected count",
-        xticks=volumes,
-        yticks=[0, 1, 2],
-    )
-    axes[1].bar(volumes, count / volumes, color="#be6c39", width=0.6)
-    axes[1].set(
-        xlabel="Represented volume (m³)",
-        ylabel="Injected number density (m$^{-3}$)",
-        xticks=volumes,
-    )
-    fig.suptitle("Unit-event nucleation · " + wp.get_device("cuda:0").name)
-    print("Counts:", count, "Number densities (m^-3):", count / volumes)
-    print("Per-species particle + gas inventory checks passed.")
-    plt.show()
+    with plt.style.context("particula.default"):
+        fig, axes = plotting.subplots(1, 2)
+        axes[0].bar(volumes, count, color=plotting.COLORS["teal"], width=0.6)
+        axes[0].set(
+            xlabel="Represented volume (m³)",
+            ylabel="Injected count",
+            xticks=volumes,
+            yticks=[0, 1, 2],
+        )
+        axes[1].bar(
+            volumes, count / volumes, color=plotting.COLORS["rust"], width=0.6
+        )
+        axes[1].set(
+            xlabel="Represented volume (m³)",
+            ylabel="Injected number density (m$^{-3}$)",
+            xticks=volumes,
+        )
+        fig.suptitle("Unit-event nucleation · " + wp.get_device("cuda:0").name)
+        print("Counts:", count, "Number densities (m^-3):", count / volumes)
+        print("Per-species particle + gas inventory checks passed.")
+        plotting.fit(fig)
+        plt.show()
     return results
 
 

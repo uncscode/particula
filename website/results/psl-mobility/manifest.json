@@ -1,17 +1,18 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 3.767676205956377,
-  "package_source_sha256": "0587f4b83a0caa2c877058728a1667c3e36ec7dde2fda79a1e7e25d6fe93e47d",
+  "elapsed_seconds": 4.846794530050829,
+  "package_source_sha256": "497407730cbc76793fb12405a106766432bb18a77fc6a4bc730d36c0531e33d0",
+  "scientific_source_sha256": "803167c38ca3a1c7cc22a52518848fcd3ff697892265cbe60e7af3d15062e0f2",
   "input_sha256": {
     "docs/data/transport/kim2005-psl-slip.csv": "03a91ba6cea6cf93f6f009d9a11da68905b4cda7e5030edd56caa52595cefefd"
   },
   "example": "psl-mobility",
-  "fingerprint": "9e5d7d98a3c2697e78e17a87aeb0dde81a910274bd98d4e489d234ad5d1ea0ef",
+  "fingerprint": "e763012cf0b9800ca8ab4896a07266cee4fcc5d2f400ba2fba46213cd01fa09b",
   "source": "docs/examples/fundamentals/particles/psl_mobility.py",
-  "revision": "2303121c905aabdd99da6ec7e398bba89633891c",
+  "revision": "b860b8be1294f4f029e2a23b488195c9d71c8812",
   "package_dirty": false,
-  "executed_at": "2026-11-19T01:14:45.204390+00:00",
+  "executed_at": "2026-11-19T13:48:38.067359+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
@@ -39,9 +40,9 @@
     ]
   ],
   "files": {
-    "figure-5-1.png": "34e6f6197e7b7a064eb4aed0515e611b73de105fdac2152e7ba275dac59415ae",
+    "figure-5-1.png": "8edd6def289307118ac9b794807dcdf1616d547250988662c7599ce374367207",
     "data.json": "2f99d11cf2051be807edcf8ef0200fe118b5ca8a6d9ef3e7c1d44ab08f2b3e53",
-    "source.py": "35b3042733af9ce1ba55fee20fbb1b0cb949200f281601ad5904b90235907d6e"
+    "source.py": "80a73c8583ab4021413af1b4b0c7ac2ddea2af3b75d352a15275f896834b2bad"
   },
   "simulation_fingerprint": "998bfb6e53ecadefef20f4e48e264bd25c3f202a0efd983faaf44f8508fa90c4"
 }

@@ -36,6 +36,9 @@
 import numpy as np
 import particula as par
 from matplotlib import pyplot as plt
+from particula import plotting
+
+plt.style.use("particula.default")
 
 # %% [markdown]
 # ## Specify the initial population
@@ -167,7 +170,7 @@ print(
 # not produce a single exponential total.
 
 # %%
-fig, ax = plt.subplots(figsize=(6, 4))
+fig, ax = plotting.subplots(size="wide")
 
 ax.plot(times / 60.0, total_concentration / total_concentration[0])
 
@@ -176,7 +179,7 @@ ax.set_ylabel("Normalized total concentration")
 ax.set_title("Spherical wall loss: concentration decay")
 ax.grid(True)
 
-plt.tight_layout()
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
@@ -193,7 +196,7 @@ initial_particle = par.particles.create_lognormal_binned_particle_data(
     distribution_type="discrete"
 )
 
-fig, ax = plt.subplots(figsize=(6, 4))
+fig, ax = plotting.subplots(size="wide")
 
 ax.plot(
     initial_particle.radii[0],
@@ -211,9 +214,9 @@ ax.set_xlabel("Particle radius (m)")
 ax.set_ylabel("Number concentration (1/m^3)")
 ax.set_title("Size distribution before/after wall loss")
 ax.grid(True)
-ax.legend()
+plotting.legend(ax)
 
-plt.tight_layout()
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]

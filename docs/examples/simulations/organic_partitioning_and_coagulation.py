@@ -47,6 +47,7 @@ import copy
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from particula import plotting
 from particula.dynamics.condensation.species_mapping import (
     CondensationSpeciesMap,
 )
@@ -55,22 +56,10 @@ from particula.dynamics.condensation.species_mapping import (
 from particula.particles import get_organic_density_array
 from tqdm import tqdm
 
+plt.style.use("particula.default")
+
 # plot settings
 TAILWIND = par.util.colors.TAILWIND
-base_color = TAILWIND["gray"]["600"]
-plt.rcParams.update(
-    {
-        "text.color": base_color,
-        "figure.figsize": (5, 4),
-        "font.size": 14,
-        "axes.edgecolor": base_color,
-        "axes.labelcolor": base_color,
-        "xtick.color": base_color,
-        "ytick.color": base_color,
-        "pdf.fonttype": 42,
-        "ps.fonttype": 42,
-    }
-)
 
 # %% [markdown]
 # ## Make the illustrative inputs explicit
@@ -365,7 +354,7 @@ np.testing.assert_allclose(
 )
 print(aerosol_soa)
 
-fig, ax = plt.subplots(figsize=(7, 5))
+fig, ax = plotting.subplots(size="wide")
 ax.plot(
     aerosol_initial.particles.radii[0],
     aerosol_initial.particles.concentration[0],
@@ -376,13 +365,14 @@ ax.plot(
     aerosol_soa.particles.concentration[0],
     label="Seeds+SOA",
 )
-ax.legend(loc="upper left")
+plotting.legend(ax, loc="upper left")
 ax.set_xscale("log")
 ax.set_xlabel("Particle radius (m)")
 ax.set_ylabel("Number concentration per bin (m$^{-3}$)")
 ax.set_xlim(left=1e-8, right=1e-6)
 ax.grid(alpha=0.25)
-fig.tight_layout()
+plotting.fit(fig)
+plt.show()
 
 # %% [markdown]
 # ## Apply the binned Brownian method at its boundary
@@ -447,7 +437,7 @@ for _ in tqdm(range(total_steps), desc="Running Sim", mininterval=0.5):
 # a visual peak shift is not an independently calculated median radius.
 
 # %%
-fig, ax = plt.subplots(figsize=(7, 5))
+fig, ax = plotting.subplots(size="wide")
 ax.plot(
     aerosol_initial.particles.radii[0],
     aerosol_initial.particles.concentration[0],
@@ -464,13 +454,14 @@ ax.plot(
     label="600 sec coagulation",
     # marker=".",
 )
-ax.legend(loc="upper left")
+plotting.legend(ax, loc="upper left")
 ax.set_xscale("log")
 ax.set_xlabel("Particle radius (m)")
 ax.set_ylabel("Number concentration per bin (m$^{-3}$)")
 ax.grid(alpha=0.25)
 ax.set_xlim(left=1e-8, right=1e-6)
-fig.tight_layout()
+plotting.fit(fig)
+plt.show()
 
 # %% [markdown]
 # ## Check the quantity a size plot cannot show

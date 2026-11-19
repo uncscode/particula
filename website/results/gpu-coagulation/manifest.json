@@ -1,19 +1,20 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 19.42487851297483,
-  "package_source_sha256": "c6b3846203da7ecd32e44ad027514b5e7ec297027bfa7dc9ab9bfba9d23e021c",
+  "elapsed_seconds": 4.527288031997159,
+  "package_source_sha256": "cdc38cb651641b0a7701c1eab385e2ca9c9db1f45ee0cc6bce0b2da1f0d3c114",
+  "scientific_source_sha256": "9ccd4e777e1987db076b9ac5b19f8cd1c309a0a8e54f496c0a8bbdfe42a87a5d",
   "input_sha256": {},
   "example": "gpu-coagulation",
-  "fingerprint": "eb3205b582835e2bee6d327a9db5f089138b1f907dcdce5458ab21c680a3a790",
+  "fingerprint": "c7c0af6f5bf8f0f2e27a1900e23438c6a3999cff1a69182e0921c685af21bea4",
   "source": "docs/examples/gpu/direct/gpu_coagulation_direct.py",
-  "revision": "eea5699f770c4c9a10a132fd7784a1d1ef75f699",
-  "package_dirty": true,
-  "executed_at": "2026-11-17T03:30:51.484158+00:00",
+  "revision": "c718cc37f6e9929c56bfb7c39dc765fc220b453b",
+  "package_dirty": false,
+  "executed_at": "2026-11-19T20:36:41.399725+00:00",
   "device": "cuda:0: NVIDIA GeForce RTX 5060",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.3.1",
+    "particula": "0.3.2",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
@@ -27,28 +28,7 @@
     [],
     [
       {
-        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     <checkout>-cache/warp/1.11.1\n"
-      },
-      {
-        "text": "Module particula.gpu.kernels.environment e11375e load on device 'cuda:0' took 190.85 ms  (compiled)\n"
-      },
-      {
-        "text": "Module particula.gpu.kernels.coagulation 84ae354 load on device 'cuda:0' took 252.24 ms  (compiled)\nModule particula.gpu.kernels._coagulation_native f93a244 load on device 'cuda:0' took 90.89 ms  (compiled)\n"
-      },
-      {
-        "text": "Module particula.gpu.kernels._brownian_parallel eb4ead5 load on device 'cuda:0' took 1922.16 ms  (compiled)\n"
-      },
-      {
-        "text": "Module particula.gpu.kernels._brownian_parallel 5d7e673 load on device 'cuda:0' took 3907.33 ms  (compiled)\nModule particula.gpu.kernels._coagulation_budget b4a3978 load on device 'cuda:0' took 183.17 ms  (compiled)\n"
-      },
-      {
-        "text": "Module particula.gpu.kernels._brownian_parallel fb55880 load on device 'cuda:0' took 6858.83 ms  (compiled)\n"
-      },
-      {
-        "text": "Module particula.gpu.kernels.coagulation fd5b5c9 load on device 'cuda:0' took 465.37 ms  (compiled)\n"
-      },
-      {
-        "text": "Module particula.gpu.kernels.coagulation 79e9aa8 load on device 'cuda:0' took 529.66 ms  (compiled)\nCanonical path: docs/examples/gpu/direct/gpu_coagulation_direct.py\nParticleData constructed: masses=(1, 8, 1), concentration=(1, 8), charge=(1, 8), density=(1,), volume=(1,)\nExplicit helpers: CPU\u2192Warp conversion -> selected-adapter dispatch -> CPU restoration\nSelected Brownian coagulation complete: device=cuda:0, calls=2, collision_pairs=(1, 4, 2), n_collisions=(1,)\nFinal particle data restored: particle_masses=(1, 8, 1)\nAdapter result retains supplied collision and RNG sidecars by identity.\nPersistent RNG state is initialized once and reused by the second call.\n"
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\nModule particula.gpu.kernels.environment e11375e load on device 'cuda:0' took 0.35 ms  (cached)\nModule particula.gpu.kernels.coagulation 84ae354 load on device 'cuda:0' took 0.40 ms  (cached)\nModule particula.gpu.kernels._coagulation_native f93a244 load on device 'cuda:0' took 0.28 ms  (cached)\nModule particula.gpu.kernels._brownian_parallel 5433dfc load on device 'cuda:0' took 1.11 ms  (cached)\nModule particula.gpu.kernels._brownian_parallel f84feee load on device 'cuda:0' took 2.04 ms  (cached)\nModule particula.gpu.kernels._coagulation_budget b4a3978 load on device 'cuda:0' took 0.28 ms  (cached)\nModule particula.gpu.kernels._brownian_parallel c0acfec load on device 'cuda:0' took 2.87 ms  (cached)\nModule particula.gpu.kernels.coagulation fd5b5c9 load on device 'cuda:0' took 0.40 ms  (cached)\nModule particula.gpu.kernels.coagulation 79e9aa8 load on device 'cuda:0' took 0.34 ms  (cached)\nCanonical path: docs/examples/gpu/direct/gpu_coagulation_direct.py\nParticleData constructed: masses=(1, 8, 1), concentration=(1, 8), charge=(1, 8), density=(1,), volume=(1,)\nExplicit helpers: CPU\u2192Warp conversion -> selected-adapter dispatch -> CPU restoration\nSelected Brownian coagulation complete: device=cuda:0, calls=2, collision_pairs=(1, 4, 2), n_collisions=(1,)\nFinal particle data restored: particle_masses=(1, 8, 1)\nAdapter result retains supplied collision and RNG sidecars by identity.\nPersistent RNG state is initialized once and reused by the second call.\n"
       },
       {
         "image": "figure-3-1.png"
@@ -56,7 +36,7 @@
     ]
   ],
   "files": {
-    "figure-3-1.png": "658ba5d62324e93facfdb377d2a4bc11e0061a2bf257a795fb9cd45e4e27d006",
-    "source.py": "9baa0b8e05081dbd164ef0e5b78b831fc1c0777297a0449eac055153949eaf82"
+    "figure-3-1.png": "376785e80cc483b3bacc25ab62afd72b164e33f4e8ac307562d181857f3b5288",
+    "source.py": "b3c5efab902fe8e6b056b2ea95bea772f32698565ab92a9cb4770a8cf0e130cb"
   }
 }

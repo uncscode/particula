@@ -31,24 +31,19 @@
 # %%
 # In Colab uncomment the following command to install particula:
 # #!pip install particula[extra] --quiet
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 import particula as par
-
+from particula import plotting
 from particula.dynamics import (
     get_turbulent_dns_kernel_ao2008,
-)
-from particula.dynamics.coagulation.turbulent_dns_kernel.radial_velocity_module import (
-    get_radial_relative_velocity_dz2002,
-)
-from particula.dynamics.coagulation.turbulent_dns_kernel.g12_radial_distribution_ao2008 import (
-    get_g12_radial_distribution_ao2008,
 )
 from particula.dynamics.coagulation.turbulent_dns_kernel.sigma_relative_velocity_ao2008 import (
     get_relative_velocity_variance,
 )
 from particula.util import get_unit_conversion
-from particula.util.constants import STANDARD_GRAVITY
+
+plt.style.use("particula.default")
 
 # Case 1: Comparison of Collision Kernel
 
@@ -96,6 +91,7 @@ reynolds_lambda = 72.41  # Example value
 # ## Define the Kernel Calculation Function
 #
 # This function calculates the collision kernel values using the specified parameters and the `particula` package implementations. This are the full steps of the function. Use this as a reference to understand how the kernels are calculated.
+
 
 # %%
 def kernel_calc(particle_radius, turbulent_dissipation, reynolds_lambda):
@@ -181,10 +177,8 @@ def kernel_calc(particle_radius, turbulent_dissipation, reynolds_lambda):
     )
     # Keep the Taylor-scale Reynolds number supplied for the flow;
     # particle Reynolds numbers describe a different physical quantity.
-    normalized_accel_variance = (
-        par.gas.get_normalized_accel_variance_ao2008(
-            re_lambda=reynolds_lambda,
-        )
+    normalized_accel_variance = par.gas.get_normalized_accel_variance_ao2008(
+        re_lambda=reynolds_lambda,
     )
     kolmogorov_velocity = par.gas.get_kolmogorov_velocity(
         kinematic_viscosity=kinematic_viscosity,
@@ -238,14 +232,16 @@ kernel_values = kernel_calc(
 #
 
 # %%
-kernel_via_system_state = par.dynamics.get_turbulent_dns_kernel_ao2008_via_system_state(
-    particle_radius=particle_radius,
-    particle_density=1000,
-    fluid_density=1.0,
-    temperature=273,
-    turbulent_dissipation=400 * get_unit_conversion("cm^2/s^3", "m^2/s^3"),
-    re_lambda=72.41,
-    relative_velocity=0.0,
+kernel_via_system_state = (
+    par.dynamics.get_turbulent_dns_kernel_ao2008_via_system_state(
+        particle_radius=particle_radius,
+        particle_density=1000,
+        fluid_density=1.0,
+        temperature=273,
+        turbulent_dissipation=400 * get_unit_conversion("cm^2/s^3", "m^2/s^3"),
+        re_lambda=72.41,
+        relative_velocity=0.0,
+    )
 )
 
 # Both calculation paths should describe the same configured flow.
@@ -264,14 +260,16 @@ np.testing.assert_allclose(
 # %%
 index = np.argmin(np.abs(particle_radius - 30e-6))
 
-fig, ax = plt.subplots(figsize=(5, 4))
+fig, ax = plotting.subplots()
 
-ax.scatter(data[:, 0], data[:, 1], label="DNS Data", color="blue")
+ax.scatter(
+    data[:, 0], data[:, 1], label="DNS Data", color=plotting.COLORS["teal"]
+)
 ax.plot(
     particle_radius * 1e6,
     kernel_values[:, index] * get_unit_conversion("m^3/s", "cm^3/s"),
     label="Kernel",
-    color="orange",
+    color=plotting.COLORS["rust"],
     alpha=0.5,
     linewidth=5,
 )
@@ -279,14 +277,15 @@ ax.plot(
     particle_radius * 1e6,
     kernel_via_system_state[:, index] * get_unit_conversion("m^3/s", "cm^3/s"),
     label="Kernel via System State",
-    color="green",
+    color=plotting.COLORS["indigo"],
     alpha=0.5,
 )
 ax.set_xlabel("Particle Radius (µm)")
 ax.set_ylabel("Collision Kernel (cm³/s)")
 plt.title("Collision Kernel Comparison")
-ax.legend()
+plotting.legend(ax)
 ax.grid(True)
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]

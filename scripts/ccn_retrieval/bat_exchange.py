@@ -26,6 +26,8 @@ from dynamic import (
     save_csv,
     shortcut,
 )
+from matplotlib import style as mplstyle
+from particula import plotting
 from particula.activity import bat_activity_coefficients
 from scipy.integrate import solve_ivp
 from scipy.sparse import bmat, csr_matrix, diags
@@ -375,12 +377,17 @@ def reduce_counts(d, wet, organic, median, width):
     )
 
 
+@mplstyle.context("particula.default")
 def plot():
     """Plot the scan curves and matched count differences."""
     with (OUT / "bat-lab-scan.csv").open() as file:
         rows = list(csv.DictReader(file))
-    fig, axes = plt.subplots(1, 2, figsize=(10, 4.5), layout="constrained")
-    colors = {0.0: "#444d56", 10.0: "#087e83", 30.0: "#aa5729"}
+    fig, axes = plotting.subplots(1, 2)
+    colors = {
+        0.0: "#444d56",
+        10.0: plotting.COLORS["teal"],
+        30.0: plotting.COLORS["rust"],
+    }
     for model, gas in CASES:
         r = [
             x
@@ -404,14 +411,15 @@ def plot():
             )
             ax.set(xlabel="Water supersaturation (%)", xlim=(0.05, 0.8))
     axes[0].set_ylabel("Particles reaching 1 µm (%)")
-    axes[1].set_ylabel("Change in particle organic mass (%)")
-    axes[0].legend(fontsize=8)
+    axes[1].set_ylabel("Particle organic mass change (%)")
+    plotting.legend(axes[0])
     axes[1].grid(alpha=0.2)
     axes[0].grid(alpha=0.2)
     fig.suptitle(
         "Water + a miscible organic  |  100 nm dry median, GSD 1.10, 5 s"
     )
-    fig.savefig(OUT / "bat-cocondensation.png", dpi=170)
+    plotting.fit(fig)
+    fig.savefig(OUT / "bat-cocondensation.png", dpi=300)
     plt.close(fig)
 
     # Compare one physical assumption at a time on the common size/forcing grid.
@@ -432,24 +440,23 @@ def plot():
 
     fixed = surface("BAT", 0.0)
     contrasts = (fixed - surface("ideal", 0.0), surface("BAT", 10.0) - fixed)
-    fig, axes = plt.subplots(
-        1, 2, figsize=(10.5, 4.65), layout="constrained", sharey=True
-    )
+    fig, axes = plotting.subplots(1, 2, size="wide", sharey=True)
     for ax, delta, title in zip(
         axes,
         contrasts,
         (
-            "BAT minus ideal, organic mass fixed",
-            "Organic uptake minus fixed mass, both BAT",
+            "BAT minus ideal\nFixed organic mass",
+            "Uptake minus fixed mass\nBAT in both cases",
         ),
         strict=True,
     ):
         extent = max(1, np.ceil(abs(delta).max()))
+        ax.grid(False)
         g = ax.pcolormesh(
             MEDIANS,
             SS,
             delta,
-            cmap="RdBu_r",
+            cmap=plotting.colormap("difference"),
             vmin=-extent,
             vmax=extent,
             shading="nearest",
@@ -476,7 +483,8 @@ def plot():
         "Sensitivity of the 1 µm optical count  ·  GSD 1.10, 5 "
         "s, supplied vapor 10 µg/m³"
     )
-    fig.savefig(OUT / "bat-design-contrast.png", dpi=170)
+    plotting.fit(fig)
+    fig.savefig(OUT / "bat-design-contrast.png", dpi=300)
     plt.close(fig)
 
 

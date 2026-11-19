@@ -14,7 +14,8 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
-from particula import Aerosol
+from matplotlib import style as mplstyle
+from particula import Aerosol, plotting
 from particula.dynamics.condensation.condensation_strategies import (
     CondensationIsothermal,
 )
@@ -264,12 +265,13 @@ def simulate():
 
 
 # %%
+@mplstyle.context("particula.default")
 def plot_results(result):
     """Plot published observations and the signed BAT discrepancies."""
     f = np.array(result["mfs"])
     aw = np.array(result["activity"])
     pred = np.array(result["predicted"])
-    fig, axes = plt.subplots(1, 2, figsize=(10, 4), constrained_layout=True)
+    fig, axes = plotting.subplots(1, 2)
     axes[0].errorbar(
         f,
         aw,
@@ -281,7 +283,7 @@ def plot_results(result):
     )
     axes[0].plot(f, pred, "s--", label="BAT")
     axes[0].set_ylabel("Particle water activity")
-    axes[0].legend()
+    plotting.legend(axes[0])
     axes[1].axhline(0, color="0.45", lw=1)
     axes[1].errorbar(
         f,
@@ -294,6 +296,7 @@ def plot_results(result):
     axes[1].set_ylabel("Predicted − measured activity")
     for ax in axes:
         ax.set_xlabel("Citric acid mass fraction")
+    plotting.fit(fig)
     return fig
 
 

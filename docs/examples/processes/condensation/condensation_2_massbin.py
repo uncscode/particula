@@ -33,9 +33,12 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from particula import plotting
 from particula.dynamics.condensation.species_mapping import (
     CondensationSpeciesMap,
 )
+
+plt.style.use("particula.default")
 
 # %% [markdown]
 # ## Define the reservoir and component assumptions
@@ -109,11 +112,12 @@ particles_sample = par.particles.get_lognormal_sample_distribution(
 bins_lognormal = np.logspace(-8, -4, 100)
 bins, edges = np.histogram(particles_sample, bins=bins_lognormal, density=True)
 # plot
-fig, ax = plt.subplots(figsize=(8, 6))
+fig, ax = plotting.subplots(size="wide")
 ax.bar(edges[:-1], bins, width=np.diff(edges), align="edge")
 ax.set_xscale("log")
 ax.set_xlabel("Radius (m)")
 ax.set_ylabel("Probability density per metre of radius")
+plotting.fit(fig)
 plt.show()
 
 # %%
@@ -204,7 +208,7 @@ total_mass = np.zeros_like(time_array)
 aerosol_sim = []
 
 
-fig, ax = plt.subplots(figsize=(8, 6))
+fig, ax = plotting.subplots(size="wide")
 bins, edges = np.histogram(aerosol.particles.radii[0], bins=bins_lognormal)
 ax.bar(edges[:-1], bins, width=np.diff(edges), align="edge", label="Initial")
 
@@ -239,9 +243,10 @@ print(aerosol)
 
 ax.set_xscale("log")
 # ax.set_yscale("log")
-plt.legend()
+plotting.legend(plt.gca())
 ax.set_xlabel("Radius (m)")
 ax.set_ylabel("Computational bins")
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]

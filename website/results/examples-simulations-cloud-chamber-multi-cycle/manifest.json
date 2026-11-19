@@ -1,19 +1,19 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 2308.68520257005,
-  "package_source_sha256": "6d2e24246ad67da3f2dd23afebccde41af3e1ed32de51992c99ef898b3f88d13",
+  "elapsed_seconds": 2247.5506859150482,
+  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "examples-simulations-cloud-chamber-multi-cycle",
-  "fingerprint": "e64af893a436844c68a573c0274abb956d357dc3a2326030bc2c92663b0ebb87",
+  "fingerprint": "84f61ab80bdfe0c39355f490afde523db49510eb1b3740b632ec8077de37edf7",
   "source": "docs/examples/simulations/cloud_chamber_multi_cycle.py",
-  "revision": "12742e1c394c7a836d31aff3aeecbd8c0ff2b523",
+  "revision": "0d602f8a0cf13a18f9a3581b4cbdfb1346f18d9f",
   "package_dirty": false,
-  "executed_at": "2026-11-16T06:42:46.088797+00:00",
+  "executed_at": "2026-11-19T15:09:27.662416+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.3.1",
+    "particula": "0.3.2",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
@@ -106,13 +106,7 @@
     ],
     [
       {
-        "text": "6. Mass accounting:\n   AS: Total 1.61e-14 -> 4.57e-15 kg (28.4%), Dry 1.61e-14 -> 2.27e-15 kg (14.1%)\n   Sucrose: Total 1.49e-14 -> 2.13e-15 kg (14.3%), Dry 1.49e-14 -> 1.80e-15 kg (12.1%)\n   Mixed: Total 1.53e-14 -> 2.98e-15 kg (19.5%), Dry 1.53e-14 -> 1.75e-15 kg (11.5%)\n"
-      },
-      {
-        "text": "7. AS: All values finite and non-negative\n"
-      },
-      {
-        "text": "7. Sucrose: All values finite and non-negative\n7. Mixed: All values finite and non-negative\n8. Cycle count:\n   AS: 4 cycles completed\n   Sucrose: 4 cycles completed\n   Mixed: 4 cycles completed\n"
+        "text": "6. Mass accounting:\n   AS: Total 1.61e-14 -> 4.57e-15 kg (28.4%), Dry 1.61e-14 -> 2.27e-15 kg (14.1%)\n   Sucrose: Total 1.49e-14 -> 2.13e-15 kg (14.3%), Dry 1.49e-14 -> 1.80e-15 kg (12.1%)\n   Mixed: Total 1.53e-14 -> 2.98e-15 kg (19.5%), Dry 1.53e-14 -> 1.75e-15 kg (11.5%)\n7. AS: All values finite and non-negative\n7. Sucrose: All values finite and non-negative\n7. Mixed: All values finite and non-negative\n8. Cycle count:\n   AS: 4 cycles completed\n   Sucrose: 4 cycles completed\n   Mixed: 4 cycles completed\n"
       }
     ],
     [
@@ -137,14 +131,14 @@
     ]
   ],
   "files": {
-    "figure-19-1.png": "1ada78fa917b822defb11073b3bb1ce9c90d7ef4d0d7f5df53bb10354c05523a",
-    "figure-18-1.png": "0513f41fdebc6472e81448632375ce18c8d6acd9c60fdc95d22daa643fe78236",
-    "figure-17-1.png": "80706d1e172b16c611e9652470dcbf4592d94305fc4f504f4c73306e5daf028a",
-    "figure-12-1.png": "7f65fd61f94d5fa4b9c5618f5b13c395df19b369504457eed639f8b4a2fe97f5",
-    "figure-11-1.png": "0ce1c7a246c8fc5246a71dd744c36bbf84c637d79f73b4e8d3599cf90811908f",
-    "figure-10-1.png": "e78c18db8b046c33889bdc83e5b6d230bc96ae6a04e904fcba9ba6cee7409194",
-    "figure-9-1.png": "066363d9900c3b8b32261dd14959b424b0ae9dbc2b28a96884faa08860468360",
-    "figure-8-1.png": "0e9b9793359ba81848fe20f4cf4414ce0ae9cd1d08dad0badd6b0e863eec375a",
-    "source.py": "80ab905b1b0627e32e4d216d525da5be12357d87017e353f5ba7fd8283c9c047"
+    "figure-19-1.png": "efff7967f2999a95663877b85b3b3b5454e75216a64d9eef58f1a3ee58107e98",
+    "figure-18-1.png": "8987929454bfdf5d8a2824316e2b14ea367849c8d3565cabd486d40cd650c595",
+    "figure-17-1.png": "f29ca12d234df2f7352da05efeaa4daa79c0e5d3124f49847f9e8ba7d093c489",
+    "figure-12-1.png": "3f52ebe2a1a42ddb482562dfae158d4edd865aa1344405019842c80332d48130",
+    "figure-11-1.png": "5abaa689f0a106db687f0141ae50e9ae8d853fd4b825407ef20698e07543efb9",
+    "figure-10-1.png": "2fec96518719027528e04b43d80140cb12f1d229e3ea046cb9dc028cb308096d",
+    "figure-9-1.png": "5a21d29089f6044c0a6aa9454cc013ae76ef07dc60ad4653a14cf2c1e5d1bd09",
+    "figure-8-1.png": "aae99e611f4ba8b65b8c1ea1ca62c59c82233247158e63465fdca85998cbb7a0",
+    "source.py": "31962ca9f2e70ac0cf861ba69e46200dacb07989bd840df473c2727be1515c91"
   }
 }

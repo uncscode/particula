@@ -501,3 +501,236 @@ def test_real_execution_timeout_stops_kernel(example, monkeypatch):
         examples.execute(config, root)
     assert len(managers) == 1
     assert not managers[0].has_kernel
+
+
+def test_full_canvas_fingerprints_style_without_invalidating_legacy(example):
+    """Only full-canvas publication records depend on the style inputs."""
+    root, config = example
+    legacy = examples.fingerprint(config, root)
+    for name in examples.STYLE_INPUTS:
+        path = root / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("original")
+    styled = {**config, "full_canvas": True}
+    initial = examples.fingerprint(styled, root)
+    assert initial != legacy
+    for name in examples.STYLE_INPUTS:
+        (root / name).write_text("updated")
+        assert examples.fingerprint(styled, root) != initial
+        (root / name).write_text("original")
+    assert examples.fingerprint(config, root) == legacy
+
+
+def test_replot_distinguishes_scientific_and_rendering_sources(example):
+    """A renderer edit invalidates the picture while preserving usable data."""
+    root, config = example
+    config["full_canvas"] = True
+    package = root / "particula"
+    renderer = root / examples.STYLE_INPUTS[1]
+    renderer.parent.mkdir(parents=True)
+    renderer.write_text("color = 'blue'\n")
+    (root / examples.STYLE_INPUTS[0]).write_text("lines.linewidth: 2\n")
+    model = package / "physics.py"
+    model.write_text("rate = 3\n")
+    results = root / "results"
+    folder = results / "demo"
+    folder.mkdir(parents=True)
+    data = b'{"value":3}'
+    (folder / "data.json").write_bytes(data)
+    manifest = {
+        "fingerprint": examples.fingerprint(config, root),
+        "simulation_fingerprint": examples.simulation_fingerprint(config, root),
+        "package_source_sha256": examples.package_source_hash(root),
+        "scientific_source_sha256": examples.package_source_hash(
+            root, science_only=True
+        ),
+        "files": {"data.json": hashlib.sha256(data).hexdigest()},
+    }
+    (folder / "manifest.json").write_text(json.dumps(manifest))
+    renderer.write_text("color = 'red'\n")
+    assert examples.result_state(config, manifest, root) == "stale"
+    assert examples.load_replot_data("demo", config, root, results)[2] == {
+        "value": 3
+    }
+    model.write_text("rate = 4\n")
+    with pytest.raises(ValueError, match="Library source changed"):
+        examples.load_replot_data("demo", config, root, results)
+
+
+def test_historical_replot_checks_original_inputs_and_pinned_data(tmp_path):
+    """An archive must match the original source, library and observations."""
+    science = tmp_path / "original"
+    science.mkdir()
+    (science / "website").mkdir()
+    config = {"source": "study.py", "device": "cuda"}
+    (science / "study.py").write_text("value = 3\n")
+    (science / "website/examples.json").write_text(json.dumps({"demo": config}))
+
+    def git(*args):
+        return subprocess.check_output(  # noqa: S603 -- local test repository
+            [examples.GIT, *args], cwd=science, text=True
+        ).strip()
+
+    git("init", "-q")
+    git("add", ".")
+    git(
+        "-c",
+        "user.name=Test",
+        "-c",
+        "user.email=test@example.org",
+        "commit",
+        "-qm",
+        "Original study",
+    )
+    revision = git("rev-parse", "HEAD")
+    results = tmp_path / "results"
+    directory = results / "demo"
+    directory.mkdir(parents=True)
+    data = b'{"observation": 3}'
+    (directory / "data.json").write_bytes(data)
+    digest = hashlib.sha256(data).hexdigest()
+    manifest = {
+        "revision": revision,
+        "files": {"data.json": digest},
+        "simulation_fingerprint": examples.simulation_fingerprint(
+            config, science
+        ),
+        "package_source_sha256": examples.package_source_hash(science),
+    }
+    (directory / "manifest.json").write_text(json.dumps(manifest))
+    pin = {"revision": revision, "data_sha256": digest}
+    pin["package_source_sha256"] = examples.package_source_hash(science)
+    current = {**config, "historical_run": pin}
+    examples.verify_execution_checkout(current, science)
+    (science / "particula").mkdir()
+    extra = science / "particula/modified.py"
+    extra.write_text("changed = True")
+    with pytest.raises(ValueError, match="differs from the pinned execution"):
+        examples.verify_execution_checkout(current, science)
+    extra.unlink()
+
+    def load_archive(config):
+        return examples.load_replot_data(
+            "demo", config, tmp_path, results, science_root=science
+        )
+
+    assert load_archive(current)[2] == {"observation": 3}
+    with pytest.raises(ValueError, match="no pinned"):
+        load_archive(config)
+    pin["data_sha256"] = "0" * 64
+    with pytest.raises(ValueError, match="pinned historical run"):
+        load_archive(current)
+    pin["data_sha256"] = digest
+    (science / "study.py").write_text("value = 4\n")
+    with pytest.raises(ValueError, match="Simulation inputs changed"):
+        load_archive(current)
+
+
+def test_archived_science_uses_only_current_plotting_module(tmp_path):
+    """The isolated kernel can use old science with the current plot style."""
+    package = tmp_path / "particula"
+    package.mkdir()
+    (package / "__init__.py").write_text("archive_marker = True\n")
+    code = (
+        "from scripts.docs_examples import ROOT, use_historical_package\n"
+        "import sys\n"
+        f"use_historical_package({str(tmp_path)!r}, str(ROOT))\n"
+        "import particula\n"
+        "import matplotlib.pyplot as plt\n"
+        "from pathlib import Path\n"
+        "assert particula.archive_marker\n"
+        f"assert {str(tmp_path)!r} not in sys.path\n"
+        "assert Path(particula.plotting.__file__) == "
+        "ROOT / 'particula/plotting/__init__.py'\n"
+        "with plt.style.context('particula.default'):\n"
+        "    fig, ax = particula.plotting.subplots()\n"
+        "    assert not ax.spines['top'].get_visible()\n"
+    )
+    subprocess.run(  # noqa: S603 -- isolated fixed test program
+        [sys.executable, "-c", code], cwd=examples.ROOT, check=True
+    )
+
+
+def test_fresh_archived_library_run_replots_from_executed_study(
+    tmp_path, monkeypatch
+):
+    """Retain the current study, its inputs and its own observed data on redraw."""
+    science = tmp_path / "archive"
+    author = tmp_path / "author"
+
+    def git(repo, *args):
+        return subprocess.check_output(  # noqa: S603 -- local Git fixtures
+            [examples.GIT, *args], cwd=repo, text=True
+        ).strip()
+
+    for repo in (science, author):
+        repo.mkdir()
+        git(repo, "init", "-q")
+        git(
+            repo,
+            "-c",
+            "user.name=Test",
+            "-c",
+            "user.email=test@example.org",
+            "commit",
+            "-qm",
+            repo.name,
+            "--allow-empty",
+        )
+    revision = git(science, "rev-parse", "HEAD")
+    config = {
+        "source": "study.py",
+        "device": "cpu",
+        "inputs": ["input.txt"],
+        "data_expression": "data",
+        "historical_run": {
+            "revision": revision,
+            "package_source_sha256": examples.package_source_hash(science),
+            "data_sha256": hashlib.sha256(b"original observations").hexdigest(),
+        },
+    }
+    source = author / "study.py"
+    source.write_text("data = {'time': 7}\n")
+    (author / "input.txt").write_text("material A")
+    (science / "study.py").write_text("data = {'time': 3}\n")
+    calls = []
+
+    def execute(config, root, *, saved_data=None, science_root=None):
+        calls.append((science_root, saved_data))
+        return [{"metadata": {"plot_data": {"time": 7}}, "outputs": []}], "CPU"
+
+    monkeypatch.setattr(examples, "execute", execute)
+    results = tmp_path / "results"
+
+    def publish(replot=False):
+        examples.refresh(
+            "demo", config, author, results, replot=replot, science_root=science
+        )
+
+    publish()
+    folder, before = examples.bundle("demo", results)
+    with pytest.raises(ValueError, match="pinned science checkout"):
+        examples.load_replot_data("demo", config, author, results)
+    for _ in range(2):
+        publish(replot=True)
+        _, after = examples.bundle("demo", results)
+        for key in (
+            "execution_data_sha256",
+            "plot_source_revision",
+            "simulation_fingerprint",
+            "executed_at",
+            "revision",
+        ):
+            assert before[key] == after[key]
+        assert after["files"]["data.json"] == before["execution_data_sha256"]
+    assert calls == [(science, None), (None, {"time": 7}), (None, {"time": 7})]
+    (author / "input.txt").write_text("material B")
+    with pytest.raises(ValueError, match="Simulation inputs changed"):
+        publish(replot=True)
+    (author / "input.txt").write_text("material A")
+    new = b'{"time":9}'
+    (folder / "data.json").write_bytes(new)
+    after["files"]["data.json"] = hashlib.sha256(new).hexdigest()
+    (folder / "manifest.json").write_text(json.dumps(after))
+    with pytest.raises(ValueError, match="pinned historical run"):
+        publish(replot=True)

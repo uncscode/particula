@@ -1,27 +1,28 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 1.5243487870320678,
-  "package_source_sha256": "3dac41bba262547612a4d2db087d86999d8856d8f95ca109acd1a7c44940026d",
+  "elapsed_seconds": 4.574643497006036,
+  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {
     "docs/data/gpu_benchmark_results.json": "8352b7bae01663a01d9cf451a5ed48be2095750b9807105d94392c675f5df44e"
   },
   "example": "contribute-validation-gpu-legacy-benchmarks-gpu-benchmarks",
-  "fingerprint": "9b83752aa1b15d8f5589ea2d331ef303fb66a706e99ab501a895c624a3c8dd0d",
+  "fingerprint": "36b87c337fb4bb88d6de74a93405c55844f77435365828910a20455a8781b7d1",
   "source": "docs/contribute/validation/gpu/legacy-benchmarks/gpu_benchmarks.py",
-  "revision": "b4e98034b2150dad71d6e8f53085640a64561e64",
-  "package_dirty": true,
-  "executed_at": "2026-11-14T00:30:39.407669+00:00",
+  "revision": "6af97152d1570464ac5ccae56e3110001657e170",
+  "package_dirty": false,
+  "executed_at": "2026-11-19T14:34:14.008450+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.2.14",
+    "particula": "0.3.2",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
     "nbclient": "0.10.2",
     "jupytext": "1.17.3",
-    "warp-lang": "1.11.1"
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
   },
   "outputs": [
     [],
@@ -52,7 +53,7 @@
     ]
   ],
   "files": {
-    "source.py": "97035b1aba1dc932fe155c05b339417c3c66bee72b57255cbbd11956a0c3f937",
-    "figure-6-1.png": "7095074fa919a3ca74fc3c723229c582fc5fd4a850c7582719991246615af034"
+    "figure-6-1.png": "84641966861330d62035c622ebb1e36cd3a70a774cd9a7d498bef99bd991ca6b",
+    "source.py": "a619fc141b1bd20a9a638b6ae121d7a5842599e3f52f12e1130e453352ae93e0"
   }
 }

@@ -33,6 +33,7 @@
 # Install from the repository root: `python -m pip install -e ".[extra]"`
 import matplotlib.pyplot as plt  # For plotting graphs
 import numpy as np  # For numerical operations
+from particula import plotting
 
 # Specific functions from the particula package for activity calculations
 from particula.activity import (
@@ -43,6 +44,8 @@ from particula.activity import (
 from particula.particles.properties.organic_density_module import (
     get_organic_density_estimate,
 )
+
+plt.style.use("particula.default")
 
 # %% [markdown]
 # ## Describe one generic organic component
@@ -99,7 +102,7 @@ density = get_organic_density_estimate(
 # constitutes experimental proof of liquid–liquid separation.
 
 # %%
-fig, ax = plt.subplots()
+fig, ax = plotting.subplots()
 ax.plot(
     1 - organic_mole_fraction,
     activity_water,
@@ -114,10 +117,11 @@ ax.plot(
 ax.set_ylim()
 ax.set_xlabel("water mole fraction")
 ax.set_ylabel("activity")
-ax.legend()
+plotting.legend(ax)
+plotting.fit(fig)
 plt.show()
 
-fig, ax = plt.subplots()
+fig, ax = plotting.subplots()
 ax.plot(
     1 - organic_mole_fraction, gamma_water, label="water", linestyle="dashed"
 )
@@ -129,7 +133,8 @@ ax.plot(
 ax.set_ylim()
 ax.set_xlabel("water mole fraction")
 ax.set_ylabel("activity coefficient")
-ax.legend()
+plotting.legend(ax)
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
@@ -154,10 +159,11 @@ q_alpha = phase_separation.q_alpha(
 )
 
 # Plotting q_alpha
-fig, ax = plt.subplots()
+fig, ax = plotting.subplots()
 plt.plot(activity_water, q_alpha)
 plt.xlabel("Water Activity")
 plt.ylabel("$q^{\\alpha}$ [Organic Rich to Water Rich]")
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
@@ -201,7 +207,7 @@ beta = (
 )
 
 # plot the results vs water activity
-fig, ax = plt.subplots()
+fig, ax = plotting.subplots()
 ax.plot(
     water_activity_desired,
     alpha[2],
@@ -220,8 +226,9 @@ if beta is not None:
     )
 ax.set_ylim()
 ax.set_xlabel("Water activity")
-ax.set_ylabel("Water mass fraction or phase weight")
-plt.legend()
+ax.set_ylabel("Water mass fraction\nor phase weight")
+plotting.legend(plt.gca())
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
@@ -259,7 +266,7 @@ beta = (
 )
 
 # plot the results vs water activity
-fig, ax = plt.subplots()
+fig, ax = plotting.subplots()
 ax.plot(
     water_activity_desired,
     alpha[2],
@@ -278,8 +285,9 @@ if beta is not None:
     )
 ax.set_ylim()
 ax.set_xlabel("Water activity")
-ax.set_ylabel("Water mass fraction or phase weight")
-plt.legend()
+ax.set_ylabel("Water mass fraction\nor phase weight")
+plotting.legend(plt.gca())
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]

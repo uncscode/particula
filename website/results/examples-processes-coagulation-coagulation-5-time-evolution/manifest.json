@@ -1,25 +1,26 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 36.79000702500343,
-  "package_source_sha256": "8a51561059e8f51db8f4ca2e138c60a1b1e0040fd7caec3dc892c85621947875",
+  "elapsed_seconds": 45.5280148970196,
+  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "examples-processes-coagulation-coagulation-5-time-evolution",
-  "fingerprint": "a17c834e9ef0d6d39ee1ca9ff61b246383cf451be458ad548b5465e9d0a8f64f",
+  "fingerprint": "8b7d66f038c8d39098a4147a25bba36f1f61f677a8d56fc0239591d33c1c2859",
   "source": "docs/examples/processes/coagulation/coagulation_5_time_evolution.py",
-  "revision": "894f603509f47c3f35bbfa7c45f45752136e7d52",
-  "package_dirty": true,
-  "executed_at": "2026-11-16T01:26:22.418981+00:00",
+  "revision": "dd92d3c1ca71f36eacad56b49661b32c0da77ac7",
+  "package_dirty": false,
+  "executed_at": "2026-11-19T14:43:17.630546+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.2.14",
+    "particula": "0.3.2",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
     "nbclient": "0.10.2",
     "jupytext": "1.17.3",
-    "warp-lang": "1.11.1"
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
   },
   "outputs": [
     [
@@ -46,7 +47,7 @@
     ],
     [
       {
-        "text": "PMF: <particula.dynamics.particle_process.Coagulation object at 0x7fd7e7104e90>\nPDF: <particula.dynamics.particle_process.Coagulation object at 0x7fd7a774bb60>\nResolved: <particula.dynamics.particle_process.Coagulation object at 0x7fd7a6fc0bc0>\n"
+        "text": "PMF: <particula.dynamics.particle_process.Coagulation object at 0x7f6d802c4a40>\nPDF: <particula.dynamics.particle_process.Coagulation object at 0x7f6d45029eb0>\nResolved: <particula.dynamics.particle_process.Coagulation object at 0x7f6d4502b080>\n"
       }
     ],
     [
@@ -62,7 +63,7 @@
         "text": "Step 2/12: PMF=9.91e+09, PDF=9.92e+09, Resolved=9.91e+09\n"
       },
       {
-        "text": "Step 3/12: PMF=9.87e+09, PDF=9.88e+09, Resolved=9.87e+09\n"
+        "text": "Step 3/12: PMF=9.87e+09, PDF=9.88e+09, Resolved=9.88e+09\n"
       },
       {
         "text": "Step 4/12: PMF=9.83e+09, PDF=9.83e+09, Resolved=9.83e+09\n"
@@ -71,13 +72,13 @@
         "text": "Step 5/12: PMF=9.79e+09, PDF=9.79e+09, Resolved=9.79e+09\n"
       },
       {
-        "text": "Step 6/12: PMF=9.75e+09, PDF=9.75e+09, Resolved=9.76e+09\n"
+        "text": "Step 6/12: PMF=9.75e+09, PDF=9.75e+09, Resolved=9.75e+09\n"
       },
       {
-        "text": "Step 7/12: PMF=9.71e+09, PDF=9.71e+09, Resolved=9.72e+09\n"
+        "text": "Step 7/12: PMF=9.71e+09, PDF=9.71e+09, Resolved=9.71e+09\n"
       },
       {
-        "text": "Step 8/12: PMF=9.67e+09, PDF=9.68e+09, Resolved=9.68e+09\n"
+        "text": "Step 8/12: PMF=9.67e+09, PDF=9.68e+09, Resolved=9.67e+09\n"
       },
       {
         "text": "Step 9/12: PMF=9.63e+09, PDF=9.64e+09, Resolved=9.64e+09\n"
@@ -89,7 +90,7 @@
         "text": "Step 11/12: PMF=9.55e+09, PDF=9.56e+09, Resolved=9.56e+09\n"
       },
       {
-        "text": "Step 12/12: PMF=9.51e+09, PDF=9.52e+09, Resolved=9.51e+09\n"
+        "text": "Step 12/12: PMF=9.51e+09, PDF=9.52e+09, Resolved=9.52e+09\n"
       }
     ],
     [
@@ -102,13 +103,13 @@
         "image": "figure-11-1.png"
       },
       {
-        "text": "\nFinal concentrations:\n  PMF: 9.51e+09 m^-3 (95.1% remaining)\n  PDF: 9.52e+09 m^-3 (95.2% remaining)\n  Resolved: 9.51e+09 m^-3 (95.1% remaining)\n"
+        "text": "\nFinal concentrations:\n  PMF: 9.51e+09 m^-3 (95.1% remaining)\n  PDF: 9.52e+09 m^-3 (95.2% remaining)\n  Resolved: 9.52e+09 m^-3 (95.2% remaining)\n"
       }
     ]
   ],
   "files": {
-    "figure-11-1.png": "3f66a258a08631f668708b622c3270239c8ecd183e7a6c12691d634428cea232",
-    "figure-10-1.png": "98346d2f2678f7ea6e6067562eb457b7b910fb137abd770dd7718844c21d2a6f",
-    "source.py": "01c6d0c5150b1dddebb275c3d90ec60e1a054b7780472286e6f8d78526cd15c0"
+    "figure-11-1.png": "d293abd9c0aff0b9b1ae7f7f64d3570fc62691dd121b7720c3a08ad6b5638961",
+    "figure-10-1.png": "700f91d1b0a86d5dac3b15b35c46db0f1e642778eb921643b58b3a559cadd442",
+    "source.py": "ab682b01844cd3232b93a821c53ddc7463fc1dfd9f0946d407d0855e4d01ce8c"
   }
 }

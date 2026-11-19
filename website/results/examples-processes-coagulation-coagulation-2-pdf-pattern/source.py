@@ -46,6 +46,9 @@ Example:
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from particula import plotting
+
+plt.style.use("particula.default")
 
 # %% [markdown]
 # ## Establish the population and its measure
@@ -177,27 +180,28 @@ assert np.all(pdf_after_step_2 >= 0)
 # horizontal axis changes visual spacing, not the definition of the stored measure.
 
 # %%
-fig, ax = plt.subplots(figsize=(8, 5))
-ax.plot(radii, pdf_before, label="Initial", color="tab:blue")
+fig, ax = plotting.subplots(size="wide")
+ax.plot(radii, pdf_before, label="Initial", color=plotting.COLORS["teal"])
 ax.plot(
     radii_after_step_1,
     pdf_after_step_1,
     label="After step 1",
-    color="tab:orange",
+    color=plotting.COLORS["rust"],
 )
 ax.plot(
     radii_after_step_2,
     pdf_after_step_2,
     label="After step 2",
-    color="tab:green",
+    color=plotting.COLORS["indigo"],
 )
 ax.set_xscale("log")
 ax.set_xlim(1e-8, 1e-5)  # 10 nm to 10 um
 ax.set_xlabel("Particle radius (m)")
 ax.set_ylabel(r"PDF concentration ($m^{-4}$)")
 ax.set_title("PDF coagulation (Brownian, continuous)")
-ax.legend()
+plotting.legend(ax)
 ax.grid(alpha=0.3)
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]

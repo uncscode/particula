@@ -396,3 +396,28 @@ def test_real_warp_selected_adapter_reuses_rng_and_preserves_identity(
     assert result.collision_pairs.shape == (1, 4, 2)
     assert result.n_collisions.shape == result.rng_states.shape == (1,)
     assert 0 <= int(result.n_collisions.numpy()[0]) <= 4
+
+
+def test_numerical_walkthroughs_import_without_matplotlib():
+    """Core users can import GPU walkthroughs before choosing to plot."""
+    gpu = EXAMPLES_ROOT.parent
+    sources = [
+        *sorted((gpu / "direct").glob("gpu_*.py")),
+        *sorted((gpu / "resident").glob("gpu_*.py")),
+        gpu / "prepared/gpu_prepared_quick_start.py",
+    ]
+    subprocess.run(  # noqa: S603
+        [
+            sys.executable,
+            "-c",
+            "import runpy, sys\n"
+            "sys.modules['matplotlib'] = None\n"
+            "for path in sys.argv[1:]:\n"
+            "    runpy.run_path(path)\n"
+            "runpy.run_path(sys.argv[1], run_name='__main__')\n",
+            *map(str, sources),
+        ],
+        env={**os.environ, "PARTICULA_EXAMPLE_FORCE_NO_WARP": "1"},
+        check=True,
+        timeout=30,
+    )

@@ -1,6 +1,11 @@
 # %% [markdown]
 # # Repeated source pulses in a cooling and warming aerosol
 #
+# The figures use the archived November 16 CUDA run. At its one-second
+# coagulation interval, current Particula requests 275,911 collision trials
+# in the first box and has capacity for 3,136. The current simulation stops
+# at that check. The archived arrays retain the original interval and model.
+#
 # What must be saved to reproduce a simulation driven by repeated external
 # pulses? This example separates the evolving aerosol from the forcing schedule
 # and its source ledger. Start with the [prepared quick start](gpu_prepared_quick_start.py)
@@ -41,6 +46,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import warp as wp
+from matplotlib import style as mplstyle
+from particula import plotting
 from particula.execution.gpu_coupled import GPUCoupledSimulation
 from particula.execution.gpu_coupled_restart import resume_coupled
 from particula.util.constants import AVOGADRO_NUMBER, GAS_CONSTANT
@@ -284,6 +291,7 @@ def run_example():
 
 
 # %%
+@mplstyle.context("particula.default")
 def plot_history(frames):
     """Plot CPU observations without any further GPU calculation."""
     from matplotlib.colors import LogNorm
@@ -297,7 +305,7 @@ def plot_history(frames):
         [np.asarray(f["histogram"]).mean(axis=0) for f in frames]
     )
     distribution = histogram / np.diff(np.log10(edges))
-    fig, axes = plt.subplots(2, 2, figsize=(11, 8), constrained_layout=True)
+    fig, axes = plotting.subplots(2, 2, size="wide")
     for box in (0, 15, 31):
         axes[0, 0].plot(time, temperature[:, box], label=f"Box {box + 1}")
         axes[0, 1].plot(time, number[:, box], label=f"Box {box + 1}")
@@ -307,21 +315,23 @@ def plot_history(frames):
     axes[1, 0].set(xlabel="Time (s)", ylabel="Water saturation ratio")
     axes[1, 0].axhline(1, color="0.5", linestyle="--")
     for ax in (axes[0, 0], axes[0, 1], axes[1, 0]):
-        ax.legend(fontsize=8)
+        plotting.legend(ax)
     centres = np.sqrt(edges[:-1] * edges[1:]) * 1e9
+    axes[1, 1].grid(False)
     mesh = axes[1, 1].pcolormesh(
         centres,
         time,
         np.ma.masked_less_equal(distribution, 0),
         norm=LogNorm(),
         shading="nearest",
-        cmap="viridis",
+        cmap=plotting.colormap("magnitude"),
     )
     axes[1, 1].set(xscale="log", xlabel="Radius (nm)", ylabel="Time (s)")
     fig.colorbar(mesh, ax=axes[1, 1], label="Mean dN / dlog₁₀ r (m$^{-3}$)")
     fig.suptitle(
         "Cyclic CUDA aerosol · source pulses, Brownian collisions and condensation"
     )
+    plotting.fit(fig)
 
 
 if __name__ == "__main__":

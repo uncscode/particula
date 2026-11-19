@@ -16,6 +16,8 @@
 # %%
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import style as mplstyle
+from particula import plotting
 from particula.optics import (
     apply_mueller_matrix,
     get_column_optics,
@@ -113,28 +115,30 @@ def simulate():
     }
 
 
+@mplstyle.context("particula.default")
 def plot_results(report):
     """Render compact saved optical observations without rerunning physics."""
-    fig, ax = plt.subplots(figsize=(7, 4), constrained_layout=True)
+    fig, ax = plotting.subplots(size="wide")
     for label, values in report["cross_sections_m2"].items():
         ax.plot(report["wavelength_nm"], np.array(values) * 1e12, label=label)
     ax.set(
         xlabel="Vacuum wavelength [nm]",
         ylabel="Cross section [µm²]",
-        title="200 nm radius sphere · illustrative index 1.5 + 0.02i",
+        title="200 nm sphere radius\nIllustrative index 1.5 + 0.02i",
     )
-    ax.legend()
+    plotting.legend(ax)
     ax.grid(alpha=0.2)
 
-    fig, axes = plt.subplots(1, 2, figsize=(10, 4), constrained_layout=True)
+    plotting.fit(fig)
+    fig, axes = plotting.subplots(1, 2, size="wide")
     for label, values in report["differential_m2_sr"].items():
         axes[0].semilogy(report["angle_degrees"], values, label=label)
     axes[0].set(
         xlabel="Scattering angle [degrees]",
         ylabel="Differential cross section [m²/sr]",
-        title="500 nm radius sphere · 550 nm light",
+        title="500 nm sphere radius\n550 nm light",
     )
-    axes[0].legend()
+    plotting.legend(axes[0])
     axes[1].plot(report["angle_degrees"], report["linear_polarization"])
     axes[1].set(
         xlabel="Scattering angle [degrees]",
@@ -145,7 +149,8 @@ def plot_results(report):
     for ax in axes:
         ax.grid(alpha=0.2)
 
-    fig, axes = plt.subplots(1, 2, figsize=(10, 4), constrained_layout=True)
+    plotting.fit(fig)
+    fig, axes = plotting.subplots(1, 2)
     for ax, key, label in zip(
         axes,
         ["optical_depth", "transmission"],
@@ -161,6 +166,7 @@ def plot_results(report):
         f"Single-scattering albedo: {report['cloud_single_scattering_albedo']:.8f}"
     )
     print(f"Scattering-weighted g: {report['cloud_asymmetry']:.6f}")
+    plotting.fit(fig)
     return report
 
 

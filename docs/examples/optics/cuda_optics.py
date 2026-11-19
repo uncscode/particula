@@ -22,6 +22,8 @@ import time
 import matplotlib.pyplot as plt
 import numpy as np
 import warp as wp
+from matplotlib import style as mplstyle
+from particula import plotting
 from particula.optics import (
     get_cross_sections,
     get_differential_mueller_matrix,
@@ -198,12 +200,13 @@ def simulate():
     }
 
 
+@mplstyle.context("particula.default")
 def plot_results(report):
     """Plot compact saved timings and cloud optics without CUDA execution."""
     cases = report["benchmarks"]
     labels = [f"{v['cases']} cases\nx ≤ {v['maximum_x']:g}" for v in cases]
     position = np.arange(len(cases))
-    fig, ax = plt.subplots(figsize=(8, 4), constrained_layout=True)
+    fig, ax = plotting.subplots(size="wide")
     for offset, key, label in [
         (-0.18, "cpu_seconds", "NumPy CPU"),
         (0.18, "gpu_seconds", "CUDA, warm"),
@@ -217,9 +220,10 @@ def plot_results(report):
         ylabel="Median execution time [s]",
         title=report["device"],
     )
-    ax.legend()
+    plotting.legend(ax)
     cloud = report["cloud"]
-    fig, axes = plt.subplots(1, 2, figsize=(10, 4), constrained_layout=True)
+    plotting.fit(fig)
+    fig, axes = plotting.subplots(1, 2)
     axes[0].plot(cloud["wavelength_nm"], cloud["extinction_m_inv"], marker="o")
     axes[0].set(
         xlabel="Vacuum wavelength [nm]",
@@ -233,7 +237,7 @@ def plot_results(report):
     ):
         axes[1].semilogy(cloud["angle_degrees"], values, label=f"{wave:g} nm")
     axes[1].set(xlabel="Scattering angle [degrees]", ylabel="Bulk S11 [m⁻¹/sr]")
-    axes[1].legend()
+    plotting.legend(axes[1])
     print("Device:", report["device"], "Warp", report["warp_version"])
     print(
         "Module compile/cache load [s]:",
@@ -251,6 +255,7 @@ def plot_results(report):
         "All particle efficiencies and full bulk Mueller matrices pass "
         "the declared CPU/CUDA comparisons."
     )
+    plotting.fit(fig)
     return report
 
 

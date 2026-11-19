@@ -3,7 +3,6 @@
 import csv
 from pathlib import Path
 
-import matplotlib.pyplot as plt
 import numpy as np
 from particula import Aerosol
 from particula.dynamics.condensation.condensation_strategies import (
@@ -164,10 +163,7 @@ def publish():
     """Check the tolerances and save the figure and tabulated evidence."""
     out = ROOT / "docs/data/pi-chamber"
     all_rows = []
-    fig, axes = plt.subplots(
-        1, 2, figsize=(8.4, 3.6), layout="constrained", sharey=True
-    )
-    for ax, cstar in zip(axes, [1.0, 10.0], strict=True):
+    for cstar in (1.0, 10.0):
         coarse = run(cstar, 1e-4, BAT)
         fine = run(cstar, 1e-6, BAT)
         all_rows.extend(coarse + fine)
@@ -180,46 +176,15 @@ def publish():
             np.testing.assert_allclose(
                 [r[field] for r in coarse], [r[field] for r in fine], rtol=1e-4
             )
-        for rh, style in [(90.0, "--"), (99.55, "-")]:
-            for dose, color in [
-                (0.0, "#a13b2c"),
-                (1.0, "#265f91"),
-                (5.0, "#22784c"),
-            ]:
-                subset = [
-                    r
-                    for r in fine
-                    if np.isclose(r["rh_pct"], rh)
-                    and r["initial_vapor_ug_m3"] == dose
-                ]
-                change = [
-                    r["particle_organic_ug_m3"]
-                    - subset[0]["particle_organic_ug_m3"]
-                    for r in subset
-                ]
-                ax.plot(
-                    TIMES,
-                    change,
-                    style,
-                    color=color,
-                    marker=".",
-                    label=f"{dose:g} µg/m³ · {rh:g}%",
-                )
-        ax.axhline(0, lw=0.6, color="#666")
-        ax.set(xlabel="Time (s)", title=f"C* = {cstar:g} µg/m³")
-    axes[0].set_ylabel("Change in particle organic mass (µg/m³)")
-    axes[1].legend(frameon=False, fontsize=8, ncols=2)
-    fig.savefig(
-        ROOT / "docs/images/thermodynamics/pi-chamber-organic-vapor.png",
-        dpi=190,
-    )
-    plt.close(fig)
     with (out / "organic-vapor.csv").open("w") as f:
         writer = csv.DictWriter(
             f, fieldnames=list(all_rows[0]), lineterminator="\n"
         )
         writer.writeheader()
         writer.writerows(all_rows)
+    from scripts.pi_chamber.figures import organic_vapor
+
+    organic_vapor()
     for name, k in [("NaCl", 1.28), ("ammonium sulfate proxy", 0.61)]:
         print(name, salt_curve(k))
 

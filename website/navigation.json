@@ -46,6 +46,14 @@
             "slug": "examples/fundamentals/first_cpu_workflow"
           },
           {
+            "label": "Figure styles",
+            "slug": "guide/getting-started/figure-styles"
+          },
+          {
+            "label": "Figure gallery",
+            "slug": "examples/fundamentals/figure_styles"
+          },
+          {
             "label": "Record, save and restart",
             "slug": "guide/getting-started/recording-restart"
           },

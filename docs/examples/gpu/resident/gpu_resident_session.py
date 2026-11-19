@@ -237,6 +237,7 @@ def run_publication():
     """Require CUDA and visualize state preservation across ownership changes."""
     import matplotlib.pyplot as plt
     import warp as wp
+    from particula import plotting
 
     if not _warp_enabled() or not wp.is_cuda_available():
         raise RuntimeError("This publication run requires CUDA")
@@ -275,15 +276,19 @@ def run_publication():
         ]
     finally:
         restarted.close(registry, guard)
-    fig, axes = plt.subplots(1, 2, figsize=(9, 3.5), constrained_layout=True)
-    labels = ["CPU initial", "Checkpoint", "CUDA restart"]
-    axes[0].bar(labels, numbers, color="#287a90")
-    axes[0].set(ylabel="Represented particle count")
-    axes[1].bar(labels, np.array(inventories) * 1e18, color="#be6c39")
-    axes[1].set(ylabel="Particle + gas inventory (fg)")
-    fig.suptitle("State preservation · " + wp.get_device("cuda:0").name)
-    print("\n".join(result.output))
-    plt.show()
+    with plt.style.context("particula.default"):
+        fig, axes = plotting.subplots(1, 2, size="wide")
+        labels = ["CPU initial", "Checkpoint", "CUDA restart"]
+        axes[0].bar(labels, numbers, color=plotting.COLORS["teal"])
+        axes[0].set(ylabel="Represented particle count")
+        axes[1].bar(
+            labels, np.array(inventories) * 1e18, color=plotting.COLORS["rust"]
+        )
+        axes[1].set(ylabel="Particle + gas inventory (fg)")
+        fig.suptitle("State preservation · " + wp.get_device("cuda:0").name)
+        print("\n".join(result.output))
+        plotting.fit(fig)
+        plt.show()
     return result
 
 

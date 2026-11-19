@@ -33,8 +33,10 @@ Replottable examples separate `simulate()` from `plot_results(report)`.
 The registry declares `data_expression`, `replot_invoke`, `render_functions`
 and `plot_inputs`. Only pure rendering functions/helpers belong in these
 exclusions: they must not change scientific parameters, processes or diagnostics.
-Replot checks saved-file hashes, the simulation fingerprint and library hash;
-changes to simulation code or inputs require a full refresh. It executes the
+Replot checks saved-file hashes, the simulation fingerprint and the scientific
+Python sources. Changes under `particula/plotting/` affect figure rendering.
+The full package hash still identifies the original execution. Changes to
+simulation code or inputs require a full refresh. Replot executes the
 renderer on CPU, without requiring CUDA or advancing a simulation. It preserves
 the original execution timestamp, device, revision and versions, and records
 rendering time/revision separately. `executed_source.py` preserves the original
@@ -52,6 +54,50 @@ states, checkpoints, trajectories or unused diagnostics. The serialized numeric
 JSON has a **10 MiB hard limit per example**, enforced while writing. This limits
 saved plot data, not simulation RAM or figure size. Oversized data fails clearly
 and preserves the previous successful bundle; it is never silently truncated.
+
+A historical study can pin its original revision, the full Python package
+hash and the SHA-256 of its published `data.json` in the registry under
+`historical_run`. To redraw it, point the same verification checks at a checkout of the executed revision:
+
+```bash
+python scripts/docs_examples.py replot gpu-prepared-cyclic-chamber --science-checkout ../particula-original
+```
+
+The current checkout supplies the renderer. The historical checkout supplies
+the scientific source and inputs for verification. The page identifies the
+historical simulation and links its executed source, arrays and original
+device. A full refresh with `--science-checkout` runs the current study script
+and its declared inputs against the pinned library. Subsequent replots check
+that study and the digest of its freshly recorded data. The registry's data
+digest identifies the original archive, whose timing fields may differ. To
+publish a result from the current model, run a full refresh without the flag.
+
+For the stochastic and lifecycle tutorials, the example files were first
+committed after the scientific checkout. In a dedicated checkout of the pinned
+`revision`, restore the published study files from its pinned `study_revision`
+before verifying the saved observations. Both pins appear in the registry.
+
+```bash
+git restore --source=535d02b7b06ba782aa2bd5d1c60890e06adbb654 -- website/examples.json docs/examples/gpu/prepared/gpu_prepared_stochastic.py docs/examples/gpu/prepared/gpu_prepared_lifecycle.py scripts/docs_gpu_figures.py scripts/gpu_studies
+```
+
+Those two original runs saved images alone. The new native CUDA executions
+save the returned trajectory report and its initial radius histogram. The
+lifecycle panel uses the mean initial histogram across boxes. The saved
+executed source and input hashes identify the scientific calculation.
+
+
+The biomass aerosol tutorial generates four plots during a full CUDA run.
+Use the current checkout to run its condensation control and three collision
+models from the same 10,000-particle starting population.
+
+```bash
+python scripts/docs_examples.py refresh examples-simulations-biomass-burning-cloud-interactions
+```
+
+The tutorial records split intervals, maximum collision passes and total
+mergers for each collision model. Its saved output includes the conservation
+checks, device and library revision.
 
 ## Validate changes
 
@@ -96,6 +142,14 @@ source hash before execution and rejects a different hash afterward, preserving
 the previous bundle. The reported Particula version comes from that checkout;
 when installed distribution metadata differs, it is retained separately as
 `particula-distribution` rather than used to label the executed source.
+
+For styled scientific figures, follow the
+[figure style guide](https://uncscode.github.io/particula/guide/getting-started/figure-styles/) and
+[gallery](https://uncscode.github.io/particula/examples/fundamentals/figure_styles/). Use one PNG per
+figure for both website themes. Set `"full_canvas": true` in the example
+registry for Particula preset figures. This preserves their physical canvas
+and fingerprints the shared style and layout code. Call `plotting.fit(fig)`
+after all labels and colorbars are in place.
 
 Figures are exported at 300 DPI. Captured diagnostics retain repository-relative
 filenames and line numbers; local account and checkout paths are redacted before

@@ -23,7 +23,8 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
-from particula import Aerosol, FieldSpec
+from matplotlib import style as mplstyle
+from particula import Aerosol, FieldSpec, plotting
 from particula.dynamics import (
     ActivationNucleationBuilder,
     BrownianCoagulationStrategy,
@@ -276,10 +277,11 @@ def simulate():
 
 
 # %%
+@mplstyle.context("particula.default")
 def plot_results(report):
     """Show inventory closure, changed distributions and explicit source tags."""
     coag, source = report["coagulation"], report["source"]
-    fig, axes = plt.subplots(1, 3, figsize=(13, 4), constrained_layout=True)
+    fig, axes = plotting.subplots(1, 3)
     axes[0].plot(coag["time"], coag["inventory"], label="In-box inventory")
     axes[0].plot(coag["time"], coag["removal"], label="Removed inventory")
     axes[0].plot(
@@ -298,7 +300,7 @@ def plot_results(report):
     axes[1].set(
         xlabel="Tag units per particle",
         ylabel="Represented count",
-        title="Mergers change the distribution",
+        title="Distribution after mergers",
     )
     slots = np.arange(4)
     axes[2].bar(slots - 0.18, source["before"], 0.36, label="Before source")
@@ -306,12 +308,13 @@ def plot_results(report):
     axes[2].set(
         xlabel="Storage slot",
         ylabel="Tag units per particle",
-        title="Resampling then two births",
+        title="Resampling and two births",
         xticks=slots,
     )
     for ax in axes:
-        ax.legend(fontsize=8)
+        plotting.legend(ax)
         ax.grid(alpha=0.2)
+    plotting.fit(fig)
     plt.show()
 
 

@@ -20,8 +20,10 @@ from dynamic import (
     shortcut,
     thresholds,
 )
+from matplotlib import style as mplstyle
 from matplotlib.colors import SymLogNorm
 from matplotlib.ticker import FormatStrFormatter
+from particula import plotting
 from scipy.special import ndtr, ndtri
 
 SIZES = np.unique(np.r_[np.geomspace(10, 200, 65), 20, 30, 50, 75, 100, 150])
@@ -194,18 +196,15 @@ def generate():  # noqa: C901 -- scan and verification sequence
     )
 
 
+@mplstyle.context("particula.default")
 def plot_setpoints():
     """Plot 10%, 50% and 90% optical counting setpoints."""
     with (OUT / "lab-setpoints.csv").open() as file:
         rows = list(csv.DictReader(file))
-    fig, axes = plt.subplots(
-        1, 2, figsize=(10.1, 5.25), sharey=True, layout="constrained"
-    )
+    fig, axes = plotting.subplots(1, 2, sharey=True)
     for ax, width in zip(axes, WIDTHS, strict=True):
         ax.axhspan(0.05, 1.4, color="#eef1f0")
-        for k, color in zip(
-            KAPPAS, ["#006960", "#1972ab", "#a54b1c", "#6d4989"], strict=True
-        ):
+        for k, color in zip(KAPPAS, plotting.COLORS.values(), strict=True):
             selected = [
                 r
                 for r in rows
@@ -231,19 +230,19 @@ def plot_setpoints():
             yscale="log",
             xlim=(10, 200),
             ylim=(0.05, 25),
-            title=f"Geometric standard deviation {width:.2f}",
+            title=f"GSD {width:.2f}",
             xlabel="Median dry mobility diameter (nm)",
         )
         ax.set_xticks(
-            [10, 20, 40, 70, 100, 150, 200],
-            labels=["10", "20", "40", "70", "100", "150", "200"],
+            [10, 20, 40, 70, 100, 200],
+            labels=["10", "20", "40", "70", "100", "200"],
         )
         ax.set_yticks(
             [0.05, 0.1, 0.2, 0.5, 1, 1.4, 3, 10, 20],
             labels=["0.05", "0.1", "0.2", "0.5", "1", "1.4", "3", "10", "20"],
         )
         ax.grid(alpha=0.16)
-        ax.legend(fontsize=8, ncol=2, loc="upper right")
+        plotting.legend(ax, loc="upper right")
     axes[0].set_ylabel("Supersaturation setpoint (%)")
     fig.suptitle(
         "Choose a 5 s supersaturation scan"
@@ -251,29 +250,31 @@ def plot_setpoints():
         "Gray = example 0.05–1.4% scan window",
         fontsize=12,
     )
-    fig.savefig(OUT / "lab-scan-planner.png", dpi=180)
+    plotting.fit(fig)
+    fig.savefig(OUT / "lab-scan-planner.png", dpi=300)
     plt.close(fig)
 
 
+@mplstyle.context("particula.default")
 def plot():
     """Plot the laboratory setpoints, count contours and κ error."""
     plot_setpoints()
     with np.load(OUT / "lab-contours.npz") as data:
         d, ss = data["dry_nm"], data["ss_pct"]
-        fig, axes = plt.subplots(
-            2,
-            2,
-            figsize=(9.6, 7.2),
-            sharex=True,
-            sharey=True,
-            layout="constrained",
+        fig, axes = plotting.subplots(
+            2, 2, sharex=True, sharey=True, size="wide"
         )
         for row, t in enumerate((1.0, 5.0)):
             for col, width in enumerate(WIDTHS):
                 ax = axes[row, col]
                 counts = data["count_pct"][list(TIMES).index(t), col]
+                ax.grid(False)
                 field = ax.contourf(
-                    d, ss, counts, levels=np.arange(0, 101, 5), cmap="viridis"
+                    d,
+                    ss,
+                    counts,
+                    levels=np.arange(0, 101, 5),
+                    cmap=plotting.colormap("magnitude"),
                 )
                 levels = ax.contour(
                     d,
@@ -283,7 +284,7 @@ def plot():
                     colors="white",
                     linewidths=[0.8, 1.6, 0.8],
                 )
-                ax.clabel(levels, fmt="%d%%", fontsize=8)
+                ax.clabel(levels, fmt="%d%%", fontsize=12)
                 ax.set(
                     xscale="log",
                     yscale="log",
@@ -299,8 +300,8 @@ def plot():
             ax.set_xlabel("Median dry mobility diameter (nm)")
         for ax in axes.flat:
             ax.set_xticks(
-                [10, 20, 40, 70, 100, 150, 200],
-                labels=["10", "20", "40", "70", "100", "150", "200"],
+                [10, 20, 40, 70, 100, 200],
+                labels=["10", "20", "40", "70", "100", "200"],
             )
             ax.minorticks_off()
         fig.suptitle(
@@ -314,23 +315,23 @@ def plot():
             label="Particles reaching 1 µm (%)",
             ticks=[0, 20, 40, 60, 80, 100],
         )
-        fig.savefig(OUT / "lab-count-reference.png", dpi=180)
+        plotting.fit(fig)
+        fig.savefig(OUT / "lab-count-reference.png", dpi=300)
         plt.close(fig)
-        fig, axes = plt.subplots(
-            1, 2, figsize=(10.8, 4.9), sharey=True, layout="constrained"
-        )
+        fig, axes = plotting.subplots(1, 2, sharey=True)
         for i, t in enumerate((1.0, 5.0)):
             ax = axes[i]
             kk = data["kappa"]
             e = data["shortcut_error_pct"][i]
             extent = 150
             ax.set_facecolor("#dedede")
+            ax.grid(False)
             field = ax.pcolormesh(
                 d,
                 kk,
                 e,
                 norm=SymLogNorm(linthresh=5, vmin=-extent, vmax=extent),
-                cmap="RdBu_r",
+                cmap=plotting.colormap("difference"),
                 shading="auto",
                 rasterized=True,
             )
@@ -342,7 +343,7 @@ def plot():
                 colors="#303030",
                 linewidths=0.7,
             )
-            ax.clabel(lines, fmt="%g%%", fontsize=8)
+            ax.clabel(lines, fmt="%g%%", fontsize=12)
             ax.contour(
                 d,
                 kk,
@@ -383,7 +384,8 @@ def plot():
             format=FormatStrFormatter("%g"),
             extend="both",
         )
-        fig.savefig(OUT / "lab-kappa-error.png", dpi=180)
+        plotting.fit(fig)
+        fig.savefig(OUT / "lab-kappa-error.png", dpi=300)
         plt.close(fig)
 
 

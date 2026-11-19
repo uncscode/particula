@@ -139,6 +139,8 @@ class GPUCoupledSimulation:
         logical_box_ids: Optional stable identifiers for those streams.
         time: Initial physical time in seconds.
         resident: Keep stage handoff and adaptive decisions on CUDA.
+        coagulation_subcycling: Optional prepared coagulation policy for
+            splitting collision work within each fixed event interval.
     """
 
     def __init__(
@@ -155,6 +157,7 @@ class GPUCoupledSimulation:
         logical_box_ids=None,
         time=0.0,
         resident=False,
+        coagulation_subcycling=None,
     ):
         """Validate both components and allocate persistent event resources."""
         if type(resident) is not bool:
@@ -187,6 +190,7 @@ class GPUCoupledSimulation:
             time_step=time_step,
             root_seed=root_seed,
             logical_box_ids=logical_box_ids,
+            coagulation_subcycling=coagulation_subcycling,
             time=time,
         )
         self._initialize_counters()
@@ -471,6 +475,10 @@ class GPUCoupledSimulation:
             apply_species_forcing(
                 self._events, self._vapor, concentrations, saturation_ratios
             )
+
+    def coagulation_diagnostics(self):
+        """Return compact diagnostics for the most recent collision interval."""
+        return self._events.coagulation_diagnostics()
 
     def capture_events(self):
         """Capture only the fixed event sequence."""

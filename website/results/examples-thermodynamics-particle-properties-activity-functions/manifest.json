@@ -1,25 +1,26 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 4.045475755003281,
-  "package_source_sha256": "8340db23fd0f933d97cccca5043297b3b1382b94bbaa2249dcaeb9fe1dc62879",
+  "elapsed_seconds": 5.651890515931882,
+  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "examples-thermodynamics-particle-properties-activity-functions",
-  "fingerprint": "12fba6131add8674dee436853017c4523603a7ab1e88777e6ff965c9ecad85c9",
+  "fingerprint": "9a781f65b7a04fc1a7cf4729255311e9286f2fb686c3c45af572a96934c839fa",
   "source": "docs/examples/thermodynamics/particle-properties/activity_functions.py",
-  "revision": "277ccafb82ee7ed32af4ea96bec6ae301ce67df5",
+  "revision": "6af97152d1570464ac5ccae56e3110001657e170",
   "package_dirty": false,
-  "executed_at": "2026-11-15T20:06:39.744160+00:00",
+  "executed_at": "2026-11-19T14:34:07.926012+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.2.14",
+    "particula": "0.3.2",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
     "nbclient": "0.10.2",
     "jupytext": "1.17.3",
-    "warp-lang": "1.11.1"
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
   },
   "outputs": [
     [
@@ -51,10 +52,10 @@
     ]
   ],
   "files": {
-    "source.py": "6e7f3cafae9ac83d8179c5693fcf969fc48afa48dee7d31abc54961ef8c004c0",
-    "figure-4-1.png": "f73471524a1e4868b975933b0e3f720fb7ee394124727752050b0a2f91dedb67",
-    "figure-5-1.png": "513fec6e416ae8a31d1d81edc4a0e6adc898d7b9fa4e5e4d3427e43b585dd836",
-    "figure-6-1.png": "d0bcc4842787cf833b4b1762b84083da48064bb5b7bcbbde8888ea75bf185296",
-    "figure-7-1.png": "bbac5e88020e9f348809c28c669a7cb90a3c4923638b0dc5f1f01f96f2073569"
+    "figure-7-1.png": "2c01fa5a7b27d2f1647408861e00ab8e958e25269ef0162d3843e7009b28616c",
+    "figure-6-1.png": "9d9fc760111ba783ef2ca7dbc120d5715f8610a6ecdfc35791c68980b0c0aea0",
+    "figure-5-1.png": "05f8700a6caee25f5676ebcba8f58f245130f967afe1c4a0bb09c812f57b4482",
+    "figure-4-1.png": "352e1d2906798e5c70405285788f73b05a6d74fd749e81835439c83ff4c297fc",
+    "source.py": "57e0125160d4987ae6f545aa88f5d1cb311d5f40dac9fa6870f4e9fcb55571f7"
   }
 }

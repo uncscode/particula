@@ -29,8 +29,9 @@
 # %%
 """Longer dry-coagulation dynamics across an ordered environmental scan."""
 
-import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import style as mplstyle
+from particula import plotting
 from scripts.gpu_studies.dry_environment_sweep import (
     DryEnvironmentSweep,
     run_dry_sweep,
@@ -70,13 +71,14 @@ def simulate():
     return report
 
 
+@mplstyle.context("particula.default")
 def plot_results(report):
     """Render saved observations without advancing the simulation."""
     labels = report["labels"]
     first, last = report["history"][0], report["history"][-1]
     n0, n1 = np.array(first["number"]), np.array(last["number"])
     loss = 100 * (n0 - n1) / n0
-    fig, axes = plt.subplots(1, 2, figsize=(12, 8), constrained_layout=True)
+    fig, axes = plotting.subplots(1, 2)
     for ax, indices, title in zip(
         axes,
         [list(range(16)), [0, 16, 17, 18]],
@@ -97,9 +99,10 @@ def plot_results(report):
         ax.invert_yaxis()
         ax.set(title=title, xlabel="Initial particle number lost [%]")
         ax.set_xlim(0, max(loss.max() * 1.15, 0.01))
-        ax.bar_label(ax.containers[0], fmt="%.2f", padding=3, fontsize=9)
+        ax.bar_label(ax.containers[0], fmt="%.2f", padding=3, fontsize=12)
     fig.suptitle("Accepted mergers = number loss · 1,000 s")
-    fig, axes = plt.subplots(1, 2, figsize=(10, 4), constrained_layout=True)
+    plotting.fit(fig)
+    fig, axes = plotting.subplots(1, 2)
     altitude = report["altitude_km"]
     axes[0].plot(np.array(report["temperature"])[:16], altitude, marker=".")
     axes[0].set(xlabel="Temperature [K]", ylabel="Geometric altitude [km]")
@@ -123,6 +126,7 @@ def plot_results(report):
         f"At fixed 288.15 K, observed number loss is {loss[0]:.3f}% at 1 atm "
         f"and {loss[-1]:.3f}% at 10 atm."
     )
+    plotting.fit(fig)
     return report
 
 

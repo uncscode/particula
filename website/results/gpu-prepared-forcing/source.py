@@ -98,6 +98,14 @@ if __name__ == "__main__":
 # dilution. The refinement check bounds the two reported final-state changes for
 # one timestep halving. It does not establish a timestep-independent response at
 # every forcing boundary or validate this forcing as a chamber experiment.
+# The saved full comparison gives maximum relative changes of 2.32×10⁻⁷ in
+# final particle total mass and 8.86×10⁻⁹ in final water vapor. The respective
+# coarse/fine inventory residuals are 1.15×10⁻¹⁴ and 2.93×10⁻¹⁴.
+#
+# The figure retains 13 observations. Its zero-time point is the supplied initial
+# state, before the first control update. Later points show completed cycles
+# before the next scheduled update. Lines join those observations; they do not
+# resolve all 120 control changes or the immediate response to each vapor pulse.
 #
 # For a measured humidity pulse, supply its temperature and vapor histories,
 # retain identical physical control times in a refinement run, and compare uptake

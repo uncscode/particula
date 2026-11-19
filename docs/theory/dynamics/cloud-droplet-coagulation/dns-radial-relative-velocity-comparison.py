@@ -13,7 +13,7 @@
 # ---
 
 # %% [markdown]
-# # Radial Relative Velocity Comparison
+# # Radial relative velocity\ncomparison
 #
 # This notebook provides a comparison between DNS (Direct Numerical Simulation) radial relative velocities and the model predictions from the particula library.
 #
@@ -23,16 +23,18 @@
 # Ayala, O., Rosa, B., & Wang, L. P. (2008). *Effects of turbulence on the geometric collision rate of sedimenting droplets. Part 2. Theory and parameterization*. New Journal of Physics, 10. https://doi.org/10.1088/1367-2630/10/7/075016
 
 # %%
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 import particula as par
-
+from particula import plotting
 from particula.dynamics.coagulation.turbulent_dns_kernel.radial_velocity_module import (
     get_radial_relative_velocity_dz2002,
 )
 from particula.dynamics.coagulation.turbulent_dns_kernel.sigma_relative_velocity_ao2008 import (
     get_relative_velocity_variance,
 )
+
+plt.style.use("particula.default")
 
 # data from AO2008 Fig. 13
 data = np.array(
@@ -65,7 +67,9 @@ particle_density = 1000  # Particle density in kg/m³
 fluid_density = 1.0  # Fluid (air) density in kg/m³
 
 # Convert turbulent dissipation rate from cm²/s³ to m²/s³
-turbulent_dissipation = 400 * par.util.get_unit_conversion("cm^2/s^3", "m^2/s^3")
+turbulent_dissipation = 400 * par.util.get_unit_conversion(
+    "cm^2/s^3", "m^2/s^3"
+)
 reynolds_lambda = 72.41  # Example value
 
 
@@ -99,7 +103,9 @@ mean_free_path = par.gas.get_molecule_mean_free_path(
 knudsen_number = par.particles.get_knudsen_number(
     mean_free_path=mean_free_path, particle_radius=particle_radius
 )
-slip_correction_factor = par.particles.get_cunningham_slip_correction(knudsen_number)
+slip_correction_factor = par.particles.get_cunningham_slip_correction(
+    knudsen_number
+)
 particle_settling_velocity = (
     par.particles.get_particle_settling_velocity_with_drag(
         particle_radius=particle_radius,
@@ -138,10 +144,8 @@ lagrangian_integral_time = par.gas.get_lagrangian_integral_time(
     fluid_rms_velocity=fluid_rms_velocity,
     turbulent_dissipation=turbulent_dissipation,
 )
-normalized_accel_variance = (
-    par.gas.get_normalized_accel_variance_ao2008(
-        re_lambda=reynolds_lambda
-    )
+normalized_accel_variance = par.gas.get_normalized_accel_variance_ao2008(
+    re_lambda=reynolds_lambda
 )
 lagrangian_taylor_microscale_time = (
     par.gas.get_lagrangian_taylor_microscale_time(
@@ -175,12 +179,16 @@ velocity_dispersion = get_relative_velocity_variance(
     lagrangian_taylor_microscale_time=lagrangian_taylor_microscale_time,
 )
 
-fig, ax = plt.subplots(figsize=(5, 5))
-graph = ax.contourf(velocity_dispersion, cmap="viridis", origin="lower")
+fig, ax = plotting.subplots()
+ax.grid(False)
+graph = ax.contourf(
+    velocity_dispersion, cmap=plotting.colormap("magnitude"), origin="lower"
+)
 ax.set_xlabel("Particle Radius")
 ax.set_ylabel("Particle Radius")
 ax.set_title("Velocity Dispersion")
 plt.colorbar(graph)
+plotting.fit(fig)
 plt.show()
 
 
@@ -214,7 +222,7 @@ radial_relative_velocity = radial_velocity_calc(
 
 # %%
 index = np.argmin(np.abs(particle_radius - 30e-6))
-fig, ax = plt.subplots(figsize=(5, 5))
+fig, ax = plotting.subplots()
 # Plot the average radial relative velocity over all particle pairs
 ax.plot(
     particle_radius * 1e6,
@@ -227,22 +235,31 @@ ax.plot(
     particle_radius * 1e6,
     radial_relative_velocity[:, index] * 100,
     label="Model Prediction at 30 µm",
-    color="blue",
+    color=plotting.COLORS["teal"],
     linestyle="--",
 )
-ax.scatter(data[:, 0], data[:, 1], label="DNS Data", color="purple")
+ax.scatter(
+    data[:, 0], data[:, 1], label="DNS Data", color=plotting.COLORS["berry"]
+)
 ax.set_xlabel("Particle Radius (µm)")
 ax.set_ylabel("Radial Relative Velocity (cm/s)")
-ax.set_title("Radial Relative Velocity Comparison")
+ax.set_title("Radial relative velocity\ncomparison")
 ax.grid(True)
+plotting.fit(fig)
 plt.show()
 
-fig, ax = plt.subplots(figsize=(5, 5))
-graph = ax.contourf(radial_relative_velocity, cmap="viridis", origin="lower")
+fig, ax = plotting.subplots()
+ax.grid(False)
+graph = ax.contourf(
+    radial_relative_velocity,
+    cmap=plotting.colormap("magnitude"),
+    origin="lower",
+)
 ax.set_xlabel("Particle Radius (µm)")
 ax.set_ylabel("Particle Radius (µm)")
 ax.set_title("Radial Relative Velocity")
 plt.colorbar(graph)
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]

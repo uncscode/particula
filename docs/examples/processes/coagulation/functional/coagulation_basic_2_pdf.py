@@ -32,6 +32,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from particula import plotting
+
+plt.style.use("particula.default")
 
 # %% [markdown]
 # ## Assign physical meaning to the array
@@ -132,15 +135,16 @@ pdf_after = aerosol_pdf_after.particles.concentration[0].copy()
 # weight by single-particle mass before applying the same operation.
 
 # %%
-fig, ax = plt.subplots(figsize=(8, 5))
-ax.plot(radii, pdf_before, label="Before", color="tab:blue")
-ax.plot(radii, pdf_after, label="After", color="tab:orange")
+fig, ax = plotting.subplots(size="wide")
+ax.plot(radii, pdf_before, label="Before", color=plotting.COLORS["teal"])
+ax.plot(radii, pdf_after, label="After", color=plotting.COLORS["rust"])
 ax.set_xscale("log")
 ax.set_xlabel("Particle radius (m)")
 ax.set_ylabel(r"PDF concentration ($m^{-4}$)")
 ax.set_title("PDF coagulation (Brownian, continuous)")
-ax.legend()
+plotting.legend(ax)
 ax.grid(alpha=0.3)
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]

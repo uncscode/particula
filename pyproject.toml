@@ -37,6 +37,7 @@ repository = "https://github.com/uncscode/particula"
 particula-docs = "particula_docs:main"
 
 [project.optional-dependencies]
+plot = ["matplotlib>=3.8"]
 dev = [
     "pytest", "pytest-cov", "PyYAML", "jupyterlab", "nbclient", "nbconvert",
     "build", "flit_core>=3.12,<4", "jupytext", "Markdown", "pymdown-extensions",
@@ -44,7 +45,7 @@ dev = [
 ]
 extra = [
     "ipykernel", "nbclient", "nbconvert", "nbformat",
-    "matplotlib", "pandas", "pint", "thermo", "tqdm",
+    "matplotlib>=3.8", "pandas", "pint", "thermo", "tqdm",
 ]
 all = [
     "particula[dev]",

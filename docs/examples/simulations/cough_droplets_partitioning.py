@@ -43,6 +43,7 @@ import copy  # to safely duplicate Python objects
 import matplotlib.pyplot as plt  # for plotting
 import numpy as np  # numerical tools
 import particula as par  # the main Particula package
+from particula import plotting
 from particula.dynamics.condensation.species_mapping import (
     CondensationSpeciesMap,
 )
@@ -51,23 +52,10 @@ from particula.execution.gpu_resident_condensation import (
 )
 from tqdm import tqdm  # optional: for progress bars during simulation
 
+plt.style.use("particula.default")
+
 # 🎨 Set default plot styling using Tailwind-inspired colors from Particula
 TAILWIND = par.util.colors.TAILWIND
-base_color = TAILWIND["gray"]["600"]
-
-plt.rcParams.update(
-    {
-        "text.color": base_color,
-        "axes.labelcolor": base_color,
-        "figure.figsize": (5, 4),
-        "font.size": 14,
-        "axes.edgecolor": base_color,
-        "xtick.color": base_color,
-        "ytick.color": base_color,
-        "pdf.fonttype": 42,
-        "ps.fonttype": 42,
-    }
-)
 
 
 # %% [markdown]
@@ -339,7 +327,7 @@ print("Gas species:", ", ".join(aerosol.gas.name))
 
 # %% Step 4: Plot initial particle size distribution
 
-fig, ax = plt.subplots()
+fig, ax = plotting.subplots()
 
 # Log-scale histogram of particle radii
 ax.hist(
@@ -351,8 +339,9 @@ ax.hist(
 
 ax.set_xlabel("log₁₀(Radius [m])")
 ax.set_ylabel("Bin Counts")
-ax.set_title("Initial Particle Size Distribution")
-plt.tight_layout()
+ax.set_title("Initial size distribution")
+ax.locator_params(nbins=4)
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
@@ -505,7 +494,7 @@ print("Adaptive condensation work:", simulation.statistics)
 
 # %% Step 7: Plot initial vs final size distributions
 
-fig, ax = plt.subplots(figsize=(7, 5))
+fig, ax = plotting.subplots(size="wide")
 
 # Get radii before and after simulation
 initial_distribution = aerosol.particles.radii[0].copy()
@@ -541,8 +530,8 @@ ax.plot(
 ax.set_xscale("log")
 ax.set_xlabel("Particle Radius (m)")
 ax.set_ylabel("Concentration (#/m⁻³)")
-ax.legend()
-plt.tight_layout()
+plotting.legend(ax)
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
@@ -560,7 +549,7 @@ plt.show()
 
 # %% Step 8: Plot water vapor saturation ratio over time
 
-fig, ax = plt.subplots(figsize=(7, 5))
+fig, ax = plotting.subplots(size="wide")
 
 # Plot water vapor saturation ratio (species index 0)
 ax.plot(
@@ -574,9 +563,9 @@ ax.set_ylim(bottom=0.3)
 ax.set_xlabel("Time (s)")
 ax.set_ylabel("Vapor Saturation Ratio")
 ax.set_title("Vapor Saturation Ratio for Water Over Time")
-ax.legend()
+plotting.legend(ax)
 
-plt.tight_layout()
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
@@ -614,7 +603,7 @@ color_list = [
 ]
 
 # Create stackplot of species mass fraction
-fig, ax = plt.subplots(figsize=(8, 5))
+fig, ax = plotting.subplots(size="wide")
 ax.stackplot(
     time_array,
     mass_fraction.T,  # Each row = one species
@@ -627,13 +616,8 @@ ax.set_xlabel("Time (s)")
 ax.set_ylabel("Mean Mass Fraction in Particles")
 ax.set_ylim(0, 1)
 ax.grid(True)
-ax.legend(
-    title="Species",
-    loc="lower left",
-    framealpha=0.9,
-    fontsize=10,
-)
-plt.tight_layout()
+plotting.legend(ax, title="Species", loc="lower left", framealpha=0.9)
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
@@ -650,7 +634,7 @@ plt.show()
 
 # %% Step 10: Contour plot of particle size distribution over time
 
-fig, ax = plt.subplots(figsize=(7, 5))
+fig, ax = plotting.subplots(size="wide")
 
 # Create 2D mesh grid for time and particle radius
 X, Y = np.meshgrid(time_array, edges[:-1])
@@ -663,7 +647,8 @@ log_conc = np.log10(
 )
 
 # Contour plot of log concentration
-cont = ax.contourf(X, Y, log_conc.T)
+ax.grid(False)
+cont = ax.contourf(X, Y, log_conc.T, cmap=plotting.colormap("magnitude"))
 
 # Axis settings
 ax.set_yscale("log")
@@ -673,7 +658,7 @@ ax.set_ylabel("Particle Radius (m)")
 
 # Add colorbar
 fig.colorbar(cont, label="Log₁₀ Number Concentration")
-plt.tight_layout()
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]

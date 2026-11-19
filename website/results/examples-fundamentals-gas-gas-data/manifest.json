@@ -1,25 +1,26 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 3.6667602990055457,
-  "package_source_sha256": "8340db23fd0f933d97cccca5043297b3b1382b94bbaa2249dcaeb9fe1dc62879",
+  "elapsed_seconds": 4.072282120003365,
+  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "examples-fundamentals-gas-gas-data",
-  "fingerprint": "a5ca85b7120554d26f62635124da1f7b4ca42a1b62afa061a23c1c5fd09967ec",
+  "fingerprint": "cede368ad9befcd73e1cb450a974d9b43795327253ad475edfcc050858f4f50c",
   "source": "docs/examples/fundamentals/gas/gas_data.py",
-  "revision": "277ccafb82ee7ed32af4ea96bec6ae301ce67df5",
+  "revision": "6af97152d1570464ac5ccae56e3110001657e170",
   "package_dirty": false,
-  "executed_at": "2026-11-15T19:32:35.946043+00:00",
+  "executed_at": "2026-11-19T14:32:22.949885+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.2.14",
+    "particula": "0.3.2",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
     "nbclient": "0.10.2",
     "jupytext": "1.17.3",
-    "warp-lang": "1.11.1"
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
   },
   "outputs": [
     [],
@@ -41,8 +42,8 @@
     ]
   ],
   "files": {
-    "source.py": "65dc0eeca4d3f2efba555f3be35298580eb57750b807bcdd536b15a8a9f81ebc",
-    "figure-4-1.png": "4f959b4d7c8c57e03f843801c47dc93c063051463aaddb49efadcaa4d6873728",
-    "figure-5-1.png": "c43e28243e5481979cfa45606486631087531c676e43af904a0e94fc3c9c266a"
+    "figure-5-1.png": "ec206087a8fb04b5a8bc323edc7efb7e10c741c27a9fb5faf86b2e713fdd6eac",
+    "figure-4-1.png": "ea45a1b63577a56e9994cb577c08b30f2624d6b66c5c11a1deda8c0d9013a846",
+    "source.py": "0205bbd543523d658ccca9f2fd0846cd9721c61aa1c8369d563fa911289d14cf"
   }
 }

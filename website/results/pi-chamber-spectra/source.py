@@ -24,6 +24,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.colors import LogNorm
+from particula import plotting
 from scripts.pi_chamber.retrieval import fit_humidity
 from scripts.pi_chamber.temporal import simulate_history
 
@@ -49,29 +50,24 @@ def simulate():
 
 
 # %%
+@plt.style.context("particula.default")
 def plot_results(report):
     """Plot the time-dependent spectra and separation between starts."""
     main = report["main"]
     d = np.array(main["edges_um"])
     times = np.array(main["seconds"])
     spectra = np.array(main["bin_cm3"]) / np.diff(np.log10(d))
-    fig, axes = plt.subplots(
-        2,
-        2,
-        figsize=(10.5, 6.4),
-        sharex=True,
-        sharey=True,
-        layout="constrained",
-    )
+    fig, axes = plotting.subplots(2, 2, size="wide", sharex=True, sharey=True)
     ticks = [0, 1, 3, 5, 7, 9, 11, 13, 15]
     for i, ax in enumerate(axes.flat):
         data = np.ma.masked_equal(spectra[:, i].T, 0)
+        ax.grid(False)
         mesh = ax.pcolormesh(
             np.arange(len(times) + 1) - 0.5,
             d,
             data,
             shading="flat",
-            cmap="viridis",
+            cmap=plotting.colormap("magnitude"),
             norm=LogNorm(1, 3e4),
             rasterized=True,
         )
@@ -95,6 +91,7 @@ def plot_results(report):
     fig.colorbar(
         mesh, ax=axes.ravel().tolist(), label="dN/dlog₁₀D (cm⁻³)", extend="both"
     )
+    plotting.fit(fig)
     return fig
 
 
@@ -109,13 +106,17 @@ def plot_results(report):
 
 
 # %%
+@plt.style.context("particula.default")
 def plot_separation(report):
     """Compare the sensitivity to initialization at two timestep settings."""
-    fig, ax = plt.subplots(figsize=(8, 3.3), layout="constrained")
+    fig, ax = plotting.subplots(size="wide")
     for method, style in [("main", "-"), ("refined", "--")]:
         result = report[method]
         for i, (name, color) in enumerate(
-            [("Fresh water", "#206184"), ("Salt water", "#ba572b")]
+            [
+                ("Fresh water", plotting.COLORS["teal"]),
+                ("Salt water", plotting.COLORS["rust"]),
+            ]
         ):
             ax.plot(
                 result["seconds"],
@@ -133,7 +134,8 @@ def plot_separation(report):
         xlabel="Elapsed model time (s)",
         ylabel="Difference between spectra (%)",
     )
-    ax.legend(frameon=False, ncols=2, fontsize=8)
+    plotting.legend(ax)
+    plotting.fit(fig)
     return fig
 
 

@@ -21,6 +21,8 @@
 # %%
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import style as mplstyle
+from particula import plotting
 from particula.activity import bat_activity_coefficients
 from particula.particles import get_kelvin_radius
 from scipy.optimize import brentq, minimize_scalar
@@ -133,27 +135,27 @@ def simulate():
 
 
 # %%
+@mplstyle.context("particula.default")
 def plot_results(result):
     """Show size-resolved κ and threshold error from a 100 nm calibration."""
     size = result["diameter_nm"]
-    fig, (left, right) = plt.subplots(
-        1, 2, figsize=(10, 4), layout="constrained"
-    )
+    fig, (left, right) = plotting.subplots(1, 2)
     left.plot(size, result["full_kappa"], label="Full κ-Köhler inversion")
     left.plot(size, result["shortcut_kappa"], "--", label="Eq. 10 shortcut")
     left.set_ylabel("Effective κ")
-    left.legend()
+    plotting.legend(left)
     right.plot(size, result["prediction_error_percent"], color="#087f78")
     right.axhline(0, color="0.5", linewidth=0.8)
     right.plot(100, 0, "o", color="black", label="Calibration")
     right.set_ylabel("Critical supersaturation error (%)")
-    right.legend()
+    plotting.legend(right)
     for ax in (left, right):
         ax.set_xscale("log")
         ax.set_xticks(
             [10, 20, 50, 100, 200], labels=["10", "20", "50", "100", "200"]
         )
         ax.set_xlabel("Dry diameter (nm)")
+    plotting.fit(fig)
     return fig
 
 

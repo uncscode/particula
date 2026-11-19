@@ -1,19 +1,20 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 120.16698165005073,
-  "package_source_sha256": "6d2e24246ad67da3f2dd23afebccde41af3e1ed32de51992c99ef898b3f88d13",
+  "elapsed_seconds": 120.3812182409456,
+  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
+  "scientific_source_sha256": "c491d38a0f3b014be11117e77bf7f5ed27e4a834ba024ddbac813c1eefd5b6db",
   "input_sha256": {},
   "example": "adaptive-cloud-relaxation",
-  "fingerprint": "7724ff4dbab53f905ff5dbe326b4467e7cb6ae2a3179409209ba6d590f2630f2",
+  "fingerprint": "56ba4d499b8df75619627134650ca8b255cb966e5f8b9eff345f77c262d9b77c",
   "source": "docs/examples/simulations/adaptive_cloud_relaxation.py",
-  "revision": "12742e1c394c7a836d31aff3aeecbd8c0ff2b523",
+  "revision": "dd92d3c1ca71f36eacad56b49661b32c0da77ac7",
   "package_dirty": false,
-  "executed_at": "2026-11-16T06:06:17.408532+00:00",
+  "executed_at": "2026-11-19T14:44:16.366085+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.3.1",
+    "particula": "0.3.2",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
@@ -36,25 +37,9 @@
     ]
   ],
   "files": {
-    "figure-4-1.png": "5d8b6e45e23a9c0f789388020763b2450a941738a4ae9adbd7dadc9fbfbe8859",
-    "executed_source.py": "4b782c6a8fa40df71090b45517dd8ad4e093c931118609dbfbc8a1874ebbc1a2",
+    "figure-4-1.png": "8e6cf8cd04d6498e2529b15fee8962219a12e0ebcbcaafaa194d20df5a98d309",
     "data.json": "116f9664ff9c079ee5e991d1367ba71589da162d5dbeaa487e6ee309c7e1680f",
-    "source.py": "f1a94b503bae7e992905f49e400a6e5d4fb55615784fdf237f04b424d0da414d"
+    "source.py": "957aa1b2193a07694123345e554ac96cc73978ed65b0b20000796020be411446"
   },
-  "simulation_fingerprint": "0f487e3e543598e7803f090e9c3229c48877be130aa9abd35690e51256d98d00",
-  "render_versions": {
-    "particula": "0.3.1",
-    "numpy": "2.3.4",
-    "scipy": "1.16.2",
-    "matplotlib": "3.10.7",
-    "nbclient": "0.10.2",
-    "jupytext": "1.17.3",
-    "warp-lang": "1.11.1",
-    "particula-distribution": "0.2.14"
-  },
-  "render_device": "CPU",
-  "execution_input_sha256": {},
-  "rendered_at": "2026-11-16T06:07:49.816701+00:00",
-  "render_revision": "12742e1c394c7a836d31aff3aeecbd8c0ff2b523",
-  "render_elapsed_seconds": 4.292961593018845
+  "simulation_fingerprint": "e0ff2693094ba6f11f6b8ac2de454e5f68f7edede950b1ad74a0c16c2e4f648f"
 }

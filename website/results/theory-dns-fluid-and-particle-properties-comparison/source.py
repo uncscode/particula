@@ -27,12 +27,14 @@
 # By conducting this comparison, we aim to ensure that the `Particula` library produces reliable results that align with established literature, which is crucial for accurate simulations in aerosol science and cloud physics.
 
 # %%
-import numpy as np
 import matplotlib.pyplot as plt
-import particula as par
-
+import numpy as np
 import pandas as pd
+import particula as par
 from IPython.display import display
+from particula import plotting
+
+plt.style.use("particula.default")
 
 # %% [markdown]
 # ## Model Equations and Parameters
@@ -82,7 +84,9 @@ mean_free_path = par.gas.get_molecule_mean_free_path(
 knudsen_number = par.particles.get_knudsen_number(
     mean_free_path=mean_free_path, particle_radius=particle_radius
 )
-slip_correction_factor = par.particles.get_cunningham_slip_correction(knudsen_number)
+slip_correction_factor = par.particles.get_cunningham_slip_correction(
+    knudsen_number
+)
 # iterative terminal settling velocity
 iterative_settling_velocity = (
     par.particles.get_particle_settling_velocity_with_drag(
@@ -149,7 +153,7 @@ particle_settling_velocity = (
 
 # %%
 # Plot comparison
-fig, ax = plt.subplots(3, 1, figsize=(5, 7))
+fig, ax = plotting.subplots(3, 1, size="wide")
 
 ax[0].plot(
     particle_radius * 1e6,
@@ -165,13 +169,13 @@ ax[0].plot(
 ax[0].set_title("Reynolds Number Comparison")
 ax[0].set_xlabel("Particle Radius (micrometers)")
 ax[0].set_ylabel("Reynolds Number (Re_p)")
-ax[0].legend()
+plotting.legend(ax[0])
 
 ax[1].plot(
     particle_radius * 1e6,
     ao2008_t_p,
     "o-",
-    color="#E69F00",
+    color=plotting.COLORS["rust"],
     alpha=0.6,
     label="ao2008 t_p",
 )
@@ -179,19 +183,19 @@ ax[1].plot(
     particle_radius * 1e6,
     particle_inertia_time,
     "x--",
-    color="#E69F00",
+    color=plotting.COLORS["rust"],
     label="Particula t_p",
 )
 ax[1].set_title("Particle Inertia Time Comparison")
 ax[1].set_xlabel("Particle Radius (micrometers)")
 ax[1].set_ylabel("Inertia Time (seconds)")
-ax[1].legend()
+plotting.legend(ax[1])
 
 ax[2].plot(
     particle_radius * 1e6,
     ao2008_velocity * 100,
     "o-",
-    color="#56B4E9",
+    color=plotting.COLORS["teal"],
     alpha=0.6,
     label="ao2008 Velocity",
 )
@@ -199,15 +203,15 @@ ax[2].plot(
     particle_radius * 1e6,
     particle_settling_velocity * 100,
     "x--",
-    color="#56B4E9",
+    color=plotting.COLORS["teal"],
     label="Particula Velocity",
 )
 ax[2].set_title("Particle Settling Velocity Comparison")
 ax[2].set_xlabel("Particle Radius (micrometers)")
 ax[2].set_ylabel("Settling Velocity (centimeters per second)")
-ax[2].legend()
+plotting.legend(ax[2])
 
-plt.tight_layout()
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
@@ -288,11 +292,13 @@ length_kolmogorov = par.gas.get_kolmogorov_length(
 
 timescale_kolmogorov_10 = par.gas.get_kolmogorov_time(
     kinematic_viscosity=kinematic_viscosity,
-    turbulent_dissipation=10 * par.util.get_unit_conversion("cm^2/s^3", "m^2/s^3"),
+    turbulent_dissipation=10
+    * par.util.get_unit_conversion("cm^2/s^3", "m^2/s^3"),
 )
 velocity_kolmogorov_10 = par.gas.get_kolmogorov_velocity(
     kinematic_viscosity=kinematic_viscosity,
-    turbulent_dissipation=10 * par.util.get_unit_conversion("cm^2/s^3", "m^2/s^3"),
+    turbulent_dissipation=10
+    * par.util.get_unit_conversion("cm^2/s^3", "m^2/s^3"),
 )
 stokes_number_10 = par.particles.get_stokes_number(
     particle_inertia_time=particle_inertia_time,
@@ -303,11 +309,13 @@ stokes_velocity_10 = particle_settling_velocity / velocity_kolmogorov_10
 # 100 cm^2/s^3
 timescale_kolmogorov_100 = par.gas.get_kolmogorov_time(
     kinematic_viscosity=kinematic_viscosity,
-    turbulent_dissipation=100 * par.util.get_unit_conversion("cm^2/s^3", "m^2/s^3"),
+    turbulent_dissipation=100
+    * par.util.get_unit_conversion("cm^2/s^3", "m^2/s^3"),
 )
 velocity_kolmogorov_100 = par.gas.get_kolmogorov_velocity(
     kinematic_viscosity=kinematic_viscosity,
-    turbulent_dissipation=100 * par.util.get_unit_conversion("cm^2/s^3", "m^2/s^3"),
+    turbulent_dissipation=100
+    * par.util.get_unit_conversion("cm^2/s^3", "m^2/s^3"),
 )
 stokes_number_100 = par.particles.get_stokes_number(
     particle_inertia_time=particle_inertia_time,
@@ -318,11 +326,13 @@ stokes_velocity_100 = particle_settling_velocity / velocity_kolmogorov_100
 # 400 cm^2/s^3
 timescale_kolmogorov_400 = par.gas.get_kolmogorov_time(
     kinematic_viscosity=kinematic_viscosity,
-    turbulent_dissipation=400 * par.util.get_unit_conversion("cm^2/s^3", "m^2/s^3"),
+    turbulent_dissipation=400
+    * par.util.get_unit_conversion("cm^2/s^3", "m^2/s^3"),
 )
 velocity_kolmogorov_400 = par.gas.get_kolmogorov_velocity(
     kinematic_viscosity=kinematic_viscosity,
-    turbulent_dissipation=400 * par.util.get_unit_conversion("cm^2/s^3", "m^2/s^3"),
+    turbulent_dissipation=400
+    * par.util.get_unit_conversion("cm^2/s^3", "m^2/s^3"),
 )
 stokes_number_400 = par.particles.get_stokes_number(
     particle_inertia_time=particle_inertia_time,
@@ -360,7 +370,7 @@ sv_ao2008 = np.array(
 
 # %%
 # Plot Stokes number comparison
-fig, ax = plt.subplots(2, 1, figsize=(6, 6))
+fig, ax = plotting.subplots(2, 1, size="wide")
 
 ax[0].plot(
     particle_radius * 1e6,
@@ -381,7 +391,7 @@ ax[0].plot(
     particle_radius * 1e6,
     st_ao2008[:, 1],
     "o-",
-    color="#E69F00",
+    color=plotting.COLORS["rust"],
     alpha=0.6,
     label="ao2008 St (100 cm^2/s^3)",
 )
@@ -389,14 +399,14 @@ ax[0].plot(
     particle_radius * 1e6,
     stokes_number_100,
     "x--",
-    color="#E69F00",
+    color=plotting.COLORS["rust"],
     label="Particula St (100 cm^2/s^3)",
 )
 ax[0].plot(
     particle_radius * 1e6,
     st_ao2008[:, 2],
     "o-",
-    color="#56B4E9",
+    color=plotting.COLORS["teal"],
     alpha=0.6,
     label="ao2008 St (400 cm^2/s^3)",
 )
@@ -404,7 +414,7 @@ ax[0].plot(
     particle_radius * 1e6,
     stokes_number_400,
     "x--",
-    color="#56B4E9",
+    color=plotting.COLORS["teal"],
     label="Particula St (400 cm^2/s^3)",
 )
 ax[0].set_title("Stokes Number Comparison")
@@ -431,7 +441,7 @@ ax[1].plot(
     particle_radius * 1e6,
     sv_ao2008[:, 1],
     "o-",
-    color="#E69F00",
+    color=plotting.COLORS["rust"],
     alpha=0.6,
     label="ao2008 Sv (100 cm^2/s^3)",
 )
@@ -439,14 +449,14 @@ ax[1].plot(
     particle_radius * 1e6,
     stokes_velocity_100,
     "x--",
-    color="#E69F00",
+    color=plotting.COLORS["rust"],
     label="Particula Sv (100 cm^2/s^3)",
 )
 ax[1].plot(
     particle_radius * 1e6,
     sv_ao2008[:, 2],
     "o-",
-    color="#56B4E9",
+    color=plotting.COLORS["teal"],
     alpha=0.6,
     label="ao2008 Sv (400 cm^2/s^3)",
 )
@@ -454,15 +464,15 @@ ax[1].plot(
     particle_radius * 1e6,
     stokes_velocity_400,
     "x--",
-    color="#56B4E9",
+    color=plotting.COLORS["teal"],
     label="Particula Sv (400 cm^2/s^3)",
 )
 ax[1].set_title("Stokes Velocity Comparison")
 ax[1].set_xlabel("Particle Radius (micrometers)")
 ax[1].set_ylabel("Stokes Velocity (dimensionless)")
 
-ax[1].legend(loc="lower center", ncol=2, bbox_to_anchor=(0.5, -0.8))
-plt.tight_layout()
+plotting.legend(ax[1], placement="right")
+plotting.fit(fig)
 plt.show()
 
 # %%

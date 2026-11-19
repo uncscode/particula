@@ -49,6 +49,9 @@ three-component systems under different mixing assumptions.
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from particula import plotting
+
+plt.style.use("particula.default")
 
 # %% [markdown]
 # ## Define the path before interpreting the curves
@@ -114,52 +117,52 @@ activity_3component_molar = par.particles.get_ideal_activity_molar(
 
 
 # Create the figure and axis objects
-fig, ax = plt.subplots(2, 1, figsize=(5, 8))
+fig, ax = plotting.subplots(2, 1)
 
 # Plot each component in the 2-component system with separate colors
 ax[0].plot(
     mole_fractions_2component[:, 0],
     activity_2component_molar[:, 0],
-    color="blue",
+    color=plotting.COLORS["teal"],
     label="Water (1)",
 )
 ax[0].plot(
     mole_fractions_2component[:, 0],
     activity_2component_molar[:, 1],
-    color="green",
+    color=plotting.COLORS["indigo"],
     label="Component 2",
 )
 ax[0].set_xlabel("Water Mole Fraction")
 ax[0].set_ylabel("Activity")
 ax[0].set_title("Binary molar-based activity")
-ax[0].legend()
+plotting.legend(ax[0])
 
 # Plot the 3-component system without setting specific colors
 ax[1].plot(
     mole_fractions_3component[:, 0],
     activity_3component_molar[:, 0],
     label="Water (1)",
-    color="blue",
+    color=plotting.COLORS["teal"],
 )
 ax[1].plot(
     mole_fractions_3component[:, 0],
     activity_3component_molar[:, 1],
     label="Component 2",
-    color="green",
+    color=plotting.COLORS["indigo"],
 )
 ax[1].plot(
     mole_fractions_3component[:, 0],
     activity_3component_molar[:, 2],
     label="Component 3",
-    color="red",
+    color=plotting.COLORS["rust"],
 )
 ax[1].set_xlabel("Water Mole Fraction")
 ax[1].set_ylabel("Activity")
 ax[1].set_title("Ternary molar-based activity")
-ax[1].legend()
+plotting.legend(ax[1])
 
 # Display the plot
-plt.tight_layout()
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
@@ -184,52 +187,52 @@ activity_3component_volume = par.particles.get_ideal_activity_volume(
 )
 
 # Create the figure and axis objects
-fig, ax = plt.subplots(2, 1, figsize=(5, 8))
+fig, ax = plotting.subplots(2, 1)
 
 # Plot each component in the 2-component system with separate colors
 ax[0].plot(
     mole_fractions_2component[:, 0],
     activity_2component_volume[:, 0],
-    color="blue",
+    color=plotting.COLORS["teal"],
     label="Water (1)",
 )
 ax[0].plot(
     mole_fractions_2component[:, 0],
     activity_2component_volume[:, 1],
-    color="green",
+    color=plotting.COLORS["indigo"],
     label="Component 2",
 )
 ax[0].set_xlabel("Water Mole Fraction")
 ax[0].set_ylabel("Activity")
 ax[0].set_title("Binary volume-based activity")
-ax[0].legend()
+plotting.legend(ax[0])
 
 # Plot the 3-component system without setting specific colors
 ax[1].plot(
     mole_fractions_3component[:, 0],
     activity_3component_volume[:, 0],
     label="Water (1)",
-    color="blue",
+    color=plotting.COLORS["teal"],
 )
 ax[1].plot(
     mole_fractions_3component[:, 0],
     activity_3component_volume[:, 1],
     label="Component 2",
-    color="green",
+    color=plotting.COLORS["indigo"],
 )
 ax[1].plot(
     mole_fractions_3component[:, 0],
     activity_3component_volume[:, 2],
     label="Component 3",
-    color="red",
+    color=plotting.COLORS["rust"],
 )
 ax[1].set_xlabel("Water Mole Fraction")
 ax[1].set_ylabel("Activity")
 ax[1].set_title("Ternary volume-based activity")
-ax[1].legend()
+plotting.legend(ax[1])
 
 # Display the plot
-plt.tight_layout()
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
@@ -250,13 +253,13 @@ activity_3component_mass = par.particles.get_ideal_activity_mass(
 )
 
 # Create the figure and axis objects
-fig, ax = plt.subplots(2, 1, figsize=(5, 8))
+fig, ax = plotting.subplots(2, 1)
 
 # Plot each component in the 2-component system with separate colors
 ax[0].plot(
     mole_fractions_2component[:, 0],
     activity_2component_mass[:, 0],
-    color="blue",
+    color=plotting.COLORS["teal"],
     label="Water (1)",
     linewidth=4,
     linestyle="--",
@@ -264,20 +267,20 @@ ax[0].plot(
 ax[0].plot(
     mole_fractions_2component[:, 0],
     activity_2component_mass[:, 1],
-    color="green",
+    color=plotting.COLORS["indigo"],
     label="Component 2",
 )
 ax[0].set_xlabel("Water Mole Fraction")
 ax[0].set_ylabel("Activity")
 ax[0].set_title("Binary mass-based activity")
-ax[0].legend()
+plotting.legend(ax[0])
 
 # Plot the 3-component system without setting specific colors
 ax[1].plot(
     mole_fractions_3component[:, 0],
     activity_3component_mass[:, 0],
     label="Water (1)",
-    color="blue",
+    color=plotting.COLORS["teal"],
     linewidth=4,
     linestyle="--",
 )
@@ -285,22 +288,22 @@ ax[1].plot(
     mole_fractions_3component[:, 0],
     activity_3component_mass[:, 1],
     label="Component 2",
-    color="green",
+    color=plotting.COLORS["indigo"],
     linewidth=3,
 )
 ax[1].plot(
     mole_fractions_3component[:, 0],
     activity_3component_mass[:, 2],
     label="Component 3",
-    color="red",
+    color=plotting.COLORS["rust"],
 )
 ax[1].set_xlabel("Water Mole Fraction")
 ax[1].set_ylabel("Activity")
 ax[1].set_title("Ternary mass-based activity")
-ax[1].legend()
+plotting.legend(ax[1])
 
 # Display the plot
-plt.tight_layout()
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
@@ -343,52 +346,52 @@ activity_3component_kappa = par.particles.get_kappa_activity(
 )
 
 # Create the figure and axis objects
-fig, ax = plt.subplots(2, 1, figsize=(5, 8))
+fig, ax = plotting.subplots(2, 1)
 
 # Plot each component in the 2-component system with separate colors
 ax[0].plot(
     mole_fractions_2component[:, 0],
     activity_2component_kappa[:, 0],
-    color="blue",
+    color=plotting.COLORS["teal"],
     label="Water (1)",
 )
 ax[0].plot(
     mole_fractions_2component[:, 0],
     activity_2component_kappa[:, 1],
-    color="green",
+    color=plotting.COLORS["indigo"],
     label="Component 2",
 )
 ax[0].set_xlabel("Water Mole Fraction")
 ax[0].set_ylabel("Activity")
 ax[0].set_title("Binary κ activity")
-ax[0].legend()
+plotting.legend(ax[0])
 
 # Plot the 3-component system without setting specific colors
 ax[1].plot(
     mole_fractions_3component[:, 0],
     activity_3component_kappa[:, 0],
     label="Water (1)",
-    color="blue",
+    color=plotting.COLORS["teal"],
 )
 ax[1].plot(
     mole_fractions_3component[:, 0],
     activity_3component_kappa[:, 1],
     label="Component 2",
-    color="green",
+    color=plotting.COLORS["indigo"],
 )
 ax[1].plot(
     mole_fractions_3component[:, 0],
     activity_3component_kappa[:, 2],
     label="Component 3",
-    color="red",
+    color=plotting.COLORS["rust"],
 )
 ax[1].set_xlabel("Water Mole Fraction")
 ax[1].set_ylabel("Activity")
 ax[1].set_title("Ternary κ activity")
-ax[1].legend()
+plotting.legend(ax[1])
 
 # Display the plot
-plt.tight_layout()
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]

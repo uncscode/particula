@@ -1,0 +1,33 @@
+# The order and stroke patterns also distinguish curves in grayscale.
+axes.prop_cycle: cycler('color', ['08786C', 'C2410C', '4338CA', 'BE185D']) + cycler('linestyle', ['-', '--', '-.', ':'])
+font.family: DejaVu Sans
+font.size: 12
+axes.labelsize: 13
+axes.titlesize: 14
+axes.titlelocation: left
+axes.titleweight: bold
+axes.titlepad: 8
+xtick.labelsize: 12
+ytick.labelsize: 12
+legend.fontsize: 12
+legend.frameon: False
+legend.handlelength: 1.6
+legend.handletextpad: 0.5
+lines.linewidth: 2
+text.color: 18322d
+axes.labelcolor: 18322d
+xtick.color: 344740
+ytick.color: 344740
+axes.edgecolor: 667872
+axes.spines.top: False
+axes.spines.right: False
+axes.axisbelow: True
+axes.grid: True
+axes.grid.axis: y
+grid.color: dee7e3
+grid.linewidth: 0.65
+axes.facecolor: white
+figure.facecolor: white
+savefig.facecolor: white
+savefig.dpi: 300
+pdf.fonttype: 42

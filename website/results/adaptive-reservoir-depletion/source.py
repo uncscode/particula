@@ -20,6 +20,8 @@ from dataclasses import asdict
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from matplotlib import style as mplstyle
+from particula import plotting
 from particula.dynamics.condensation.species_mapping import (
     CondensationSpeciesMap,
 )
@@ -278,9 +280,10 @@ def simulate(device=None):
     }
 
 
+@mplstyle.context("particula.default")
 def plot_results(report):
     """Render compact saved histories and separate error/work diagnostics."""
-    fig, axes = plt.subplots(1, 2, figsize=(11, 4), layout="constrained")
+    fig, axes = plotting.subplots(1, 2, size="wide")
     for axis, key, ylabel in zip(
         axes,
         ("radius_nm", "vapor_ug_m3"),
@@ -303,7 +306,7 @@ def plot_results(report):
                 alpha=0.8,
             )
         axis.set(xlabel="Time (s)", ylabel=ylabel)
-    axes[0].legend(fontsize=7)
+    plotting.legend(axes[0])
     for name, result in report["results"].items():
         print(
             name,
@@ -316,6 +319,7 @@ def plot_results(report):
             "work:",
             result["work"],
         )
+    plotting.fit(fig)
     return fig
 
 

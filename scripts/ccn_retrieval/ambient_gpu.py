@@ -35,6 +35,8 @@ from dynamic import (
     seq,
     shortcut,
 )
+from matplotlib import style as mplstyle
+from particula import plotting
 from particula.gpu.properties.particle_properties import kelvin_term_wp
 
 COMPONENTS = np.array([0.03, 0.12, 0.61, 0.0])
@@ -311,14 +313,15 @@ def solve():  # noqa: C901 -- scan and verification sequence
     print(metadata)
 
 
+@mplstyle.context("particula.default")
 def plot():
     """Plot the particle-resolved counts and mixing-state differences."""
     with (OUT / "ambient-cuda-summary.csv").open() as file:
         rows = list(csv.DictReader(file))
-    fig, axes = plt.subplots(1, 2, figsize=(10.5, 4.5), layout="constrained")
+    fig, axes = plotting.subplots(1, 2)
     for variant, color, label in zip(
         VARIANTS,
-        ["#00757c", "#c16a25", "#563d7c"],
+        [plotting.COLORS[k] for k in ("teal", "rust", "indigo")],
         [
             "Individual compositions",
             "Same composition within size band",
@@ -346,12 +349,13 @@ def plot():
             labels=["0.05", "0.1", "0.2", "0.4", "0.7", "1.4"],
         )
         ax.grid(alpha=0.2)
-        ax.legend(fontsize=8)
+        plotting.legend(ax)
     axes[0].set_ylabel("Particles reaching 1 µm (%)")
-    axes[1].set_ylabel("Difference from individual compositions (pp)")
+    axes[1].set_ylabel("Difference from individual\ncompositions (pp)")
     axes[1].axhline(0, color="gray", lw=0.8)
     fig.suptitle("Particle-resolved ambient aerosol   ·   5 s exposure")
-    fig.savefig(OUT / "ambient-cuda-reference.png", dpi=180)
+    plotting.fit(fig)
+    fig.savefig(OUT / "ambient-cuda-reference.png", dpi=300)
     plt.close(fig)
 
 

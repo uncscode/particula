@@ -6,15 +6,16 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import style as mplstyle
+from particula import plotting
 
 
+@mplstyle.context("particula.default")
 def sensitivity(report, destination):
     """Show radius transients and the size of both water transfers."""
     factors = np.geomspace(0.5, 2, 128)
     time = np.r_[np.arange(33), 32 + np.arange(33)] * 2.5
-    fig, (radius, transfer) = plt.subplots(
-        1, 2, figsize=(9.2, 3.6), layout="constrained"
-    )
+    fig, (radius, transfer) = plotting.subplots(1, 2, size="wide")
     for index, color in zip(
         (0, 63, 127), ("#2166ac", "#555555", "#b35806"), strict=True
     ):
@@ -26,7 +27,7 @@ def sensitivity(report, destination):
         )
     radius.axvline(80, color="0.6", ls=":")
     radius.set(xlabel="Time (ms)", ylabel="Wet radius (µm)")
-    radius.legend(frameon=False)
+    plotting.legend(radius, frameon=False)
     for key, label, color in (
         ("wetting_mg_m3", "Wetting uptake", "#2166ac"),
         ("drying_loss_mg_m3", "Drying loss", "#b35806"),
@@ -41,16 +42,16 @@ def sensitivity(report, destination):
         xlabel="Number concentration / 10¹¹ m⁻³",
         ylabel="Particle water transferred (mg m⁻³)",
     )
-    transfer.legend(frameon=False)
-    fig.savefig(destination, dpi=180)
+    plotting.legend(transfer, frameon=False)
+    plotting.fit(fig)
+    fig.savefig(destination, dpi=300)
     plt.close(fig)
 
 
+@mplstyle.context("particula.default")
 def timing(cases, destination):
     """Plot the full range of seven timed repetitions at each size."""
-    fig, (total, cold, memory) = plt.subplots(
-        1, 3, figsize=(12.6, 3.6), layout="constrained"
-    )
+    fig, (total, cold, memory) = plotting.subplots(1, 3)
     for mode, label, color in (
         ("cpu", "Native CPU", "#444444"),
         ("prepared", "Prepared CUDA", "#b35806"),
@@ -96,8 +97,9 @@ def timing(cases, destination):
     cold.set_yscale("log")
     cold.set_ylabel("Cold process wall time (s)")
     memory.set_ylabel("Peak host RSS (MiB)")
-    total.legend(frameon=False)
-    fig.savefig(destination, dpi=180)
+    plotting.legend(total, frameon=False)
+    plotting.fit(fig)
+    fig.savefig(destination, dpi=300)
     plt.close(fig)
 
 

@@ -1,6 +1,19 @@
 # %% [markdown]
 # # Charged aerosols and ions across sixteen environments
 #
+# Each humidity, pressure and temperature condition starts with 131,072 aerosols.
+#
+# How can we distinguish humidity-driven size growth from changes caused by
+# particle collisions and ion attachment? This controlled factorial study
+# compares size, number, and charge diagnostics across temperature, pressure,
+# and initial humidity. It illustrates how several observables can separate
+# mechanisms that a size spectrum alone cannot identify.
+#
+# Use the [condensation](../../processes/condensation/condensation_1_bin.py)
+# and [prepared GPU guide](../../../guide/gpu/prepared.md) as prerequisites.
+# The intended outcome is to read these diagnostics together and design a
+# controlled follow-up, rather than infer atmospheric rates from the example.
+#
 # This CUDA example starts with **2,621,440 active resolved particles**:
 # 16 conditions × 1,024 independent boxes × (128 aerosols + 16 positive + 16 negative ions). All boxes remain
 # resident together. Each particle has its own material masses and integer
@@ -24,8 +37,9 @@
 # %%
 """Run a manually refreshed two-million-particle charged CUDA sweep."""
 
-import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import style as mplstyle
+from particula import plotting
 from scripts.gpu_studies.environment_sweep import (
     EnvironmentSweep,
     run_environment_sweep,
@@ -85,6 +99,7 @@ def simulate():
     return report
 
 
+@mplstyle.context("particula.default")
 def plot_results(report):
     """Render saved observations without advancing the simulation."""
     history = report["history"]
@@ -92,7 +107,7 @@ def plot_results(report):
     time_ms = np.array([row["time"] for row in history]) * 1000
     water = np.array([row["water_mass"] for row in history])
     counts = np.array([row["count"] for row in history])
-    fig, axes = plt.subplots(2, 2, figsize=(10, 7), constrained_layout=True)
+    fig, axes = plotting.subplots(2, 2, size="wide")
     for panel, ax in enumerate(axes.flat):
         for i in range(panel * 4, panel * 4 + 4):
             ax.plot(
@@ -107,26 +122,29 @@ def plot_results(report):
             xlabel="Time [ms]",
             ylabel="Particle water mass / initial",
         )
-        ax.legend(fontsize=8)
+        plotting.legend(ax)
         ax.grid(alpha=0.2)
     fig.suptitle("Closed water uptake · 2,097,152 initial aerosols")
 
-    fig, ax = plt.subplots(figsize=(10, 8), constrained_layout=True)
+    plotting.fit(fig)
+    fig, ax = plotting.subplots()
     mergers = counts[0] - counts[-1]
-    colors = plt.get_cmap("viridis")(np.tile(np.linspace(0.15, 0.9, 4), 4))
+    colors = plotting.colormap("magnitude")(
+        np.tile(np.linspace(0.15, 0.9, 4), 4)
+    )
     ax.barh(np.arange(16), mergers, color=colors)
     ax.set_yticks(
         np.arange(16),
         [f"{t:.2f} K · {p / 1000:g} kPa · RH {rh:.0%}" for t, p, rh in grid],
     )
-    ax.tick_params(axis="y", labelsize=9)
+    ax.tick_params(axis="y", labelsize=12)
     ax.invert_yaxis()
     ax.set_xlim(0, max(mergers.max() * 1.1, 1))
     ax.set(
         xlabel="Accepted mergers in 3 ms",
-        title="Rare collisions across 131,072 initial aerosols per condition",
+        title="Mergers by condition",
     )
-    ax.bar_label(ax.containers[0], fontsize=8)
+    ax.bar_label(ax.containers[0], fontsize=12)
     print(f"Device: {report['device']}")
     print(f"Initial active aerosols + ions: {report['initial_particles']:,}")
     print(f"Final active aerosols: {counts[-1].sum():,}")
@@ -150,9 +168,11 @@ def plot_results(report):
     labels = [
         f"{t:.2f} K · {p / 1000:g} kPa · RH {rh:.0%}" for t, p, rh in grid
     ]
-    population_figures(report, labels, time_scale=1000, time_unit="ms")
+    panel_labels = [label.replace(" · RH ", "\nRH ") for label in labels]
+    population_figures(report, panel_labels, time_scale=1000, time_unit="ms")
     describe_population(report, labels)
-    ion_figures(report, labels)
+    ion_figures(report, panel_labels)
+    plotting.fit(fig)
     return report
 
 
@@ -242,3 +262,24 @@ def run_example():
 # %%
 if __name__ == "__main__":
     run_example()
+
+# %% [markdown]
+# ## What the combined diagnostics tell us
+#
+# Read the saved figures together: size change can occur through water exchange,
+# while merger counts and aerosol-number loss diagnose collisions in this
+# source/sink configuration. Aerosol charge alone is an incomplete inventory;
+# the ion and neutral-product accounting supplies the rest of the interpretation.
+# The interval-averaged rates and single-realization totals do not establish a
+# statistically resolved ranking of environments.
+#
+# To investigate charge enhancement in your own system, add a matched neutral
+# control and repeat independent realizations. Compare merger counts with
+# uncertainty estimates while checking material and charge budgets. To investigate
+# humidity effects, hold the other environmental settings fixed and distinguish
+# initial RH from a continuously maintained humidity. These controls and repeats
+# are proposed extensions, not additional evidence in the saved run.
+#
+# The existing [dry environment sweep](gpu_dry_environment_sweep.py) explores a
+# different environmental domain; it does not extend the liquid-water assumptions
+# to the mesopause. Choose the applicable physical model before expanding a sweep.

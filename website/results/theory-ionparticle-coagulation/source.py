@@ -32,10 +32,13 @@
 # In Colab uncomment the following command to install particula:
 # #!pip install particula[extra] --quiet
 import numpy as np
-from matplotlib import pyplot as plt
 
 # from particula.util.lf2013_coagulation import lf2013_coag_full
 import particula as par
+from matplotlib import pyplot as plt
+from particula import plotting
+
+plt.style.use("particula.default")
 
 # %% [markdown]
 # ## Setup
@@ -227,7 +230,7 @@ coulomb_chahl20019_dimensionless_kernel = (
 )
 
 # plot the first index ion attachment to the other particles
-fig, ax = plt.subplots()
+fig, ax = plotting.subplots()
 ax.plot(
     charge[1:], hard_sphere_dimensionless_kernel[0, 1:], label="Hard Sphere"
 )
@@ -250,13 +253,18 @@ ax.plot(
     charge[1:],
     coulomb_chahl20019_dimensionless_kernel[0, 1:],
     label="Coulomb Chahl 2019",
+    color="0.3",
+    linestyle="-",
+    marker="o",
+    markersize=3,
 )
 ax.set_yscale("log")
 ax.set_xlim(-1, 12)
 ax.set_xlabel("Charge")
 ax.set_ylabel("Dimensionless Kernel (unitless)")
 ax.set_title("Dimensionless Kernel for Ion Attachment")
-ax.legend()
+plotting.legend(ax)
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
@@ -344,16 +352,18 @@ coulomb_g2012_dimensional_kernel = par.dynamics.get_dimensional_kernel(
 )
 
 # coulomb dimensional kernel for Chahl et al. (2019) via system state
-coulomb_chahl20019_dimensional_kernel = par.dynamics.get_coulomb_kernel_dyachkov2007_via_system_state(
-    particle_radius=particle_radius,
-    particle_mass=particle_mass,
-    particle_charge=charge,
-    temperature=temperature,
-    pressure=pressure,
+coulomb_chahl20019_dimensional_kernel = (
+    par.dynamics.get_coulomb_kernel_dyachkov2007_via_system_state(
+        particle_radius=particle_radius,
+        particle_mass=particle_mass,
+        particle_charge=charge,
+        temperature=temperature,
+        pressure=pressure,
+    )
 )
 
 # plot the first index ion attachment to the other particles
-fig, ax = plt.subplots()
+fig, ax = plotting.subplots()
 ax.plot(charge[1:], hard_sphere_dimensional_kernel[0, 1:], label="Hard Sphere")
 ax.plot(
     charge[1:],
@@ -374,13 +384,18 @@ ax.plot(
     charge[1:],
     coulomb_chahl20019_dimensional_kernel[0, 1:],
     label="Coulomb Chahl 2019",
+    color="0.3",
+    linestyle="-",
+    marker="o",
+    markersize=3,
 )
 ax.set_yscale("log")
 ax.set_xlim(-1, 12)
 ax.set_xlabel("Charge (integer count)")
 ax.set_ylabel(r"Dimensional Kernel $m^3/s$")
 ax.set_title("Dimensional Kernel for Ion Attachment")
-ax.legend(loc="lower right")
+plotting.legend(ax, loc="lower right")
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]

@@ -28,18 +28,18 @@
 # Ayala, O., Rosa, B., & Wang, L. P. (2008). *Effects of turbulence on the geometric collision rate of sedimenting droplets. Part 2. Theory and parameterization*. New Journal of Physics, 10. https://doi.org/10.1088/1367-2630/10/7/075016
 
 # %%
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 import particula as par
-
+from particula import plotting
 from particula.dynamics.coagulation.turbulent_dns_kernel.sigma_relative_velocity_ao2008 import (
-    _compute_rms_fluctuation_velocity,
     VelocityCorrelationTerms,
+    _compute_rms_fluctuation_velocity,
 )
-
 from particula.dynamics.coagulation.turbulent_dns_kernel.velocity_correlation_terms_ao2008 import (
     compute_b1,
     compute_b2,
+    compute_beta,
     compute_c1,
     compute_c2,
     compute_d1,
@@ -47,8 +47,9 @@ from particula.dynamics.coagulation.turbulent_dns_kernel.velocity_correlation_te
     compute_e1,
     compute_e2,
     compute_z,
-    compute_beta,
 )
+
+plt.style.use("particula.default")
 
 # %% [markdown]
 #
@@ -138,7 +139,9 @@ mean_free_path = par.gas.get_molecule_mean_free_path(
 knudsen_number = par.particles.get_knudsen_number(
     mean_free_path=mean_free_path, particle_radius=particle_radius
 )
-slip_correction_factor = par.particles.get_cunningham_slip_correction(knudsen_number)
+slip_correction_factor = par.particles.get_cunningham_slip_correction(
+    knudsen_number
+)
 # iterative terminal settling velocity
 particle_settling_velocity = (
     par.particles.get_particle_settling_velocity_with_drag(
@@ -159,8 +162,7 @@ particle_inertia_time = par.particles.get_particle_inertia_time(
 
 
 def calculate_horizontal_velocity(turbulent_dissipation, reynolds_lambda):
-    """
-    Helper function to calculate the mean-square horizontal velocity of particles
+    """Helper function to calculate the mean-square horizontal velocity of particles
     for these specific cases.
     """
     # Calculate Fluid RMS Velocity
@@ -184,10 +186,8 @@ def calculate_horizontal_velocity(turbulent_dissipation, reynolds_lambda):
         fluid_rms_velocity=fluid_rms_velocity,
         turbulent_dissipation=turbulent_dissipation,
     )
-    normalized_accel_variance = (
-        par.gas.get_normalized_accel_variance_ao2008(
-            re_lambda=reynolds_lambda
-        )
+    normalized_accel_variance = par.gas.get_normalized_accel_variance_ao2008(
+        re_lambda=reynolds_lambda
     )
     kolmogorov_time = par.gas.get_kolmogorov_time(
         kinematic_viscosity=kinematic_viscosity,
@@ -231,16 +231,19 @@ def calculate_horizontal_velocity(turbulent_dissipation, reynolds_lambda):
 
 # %%
 model_rms_10cm2_s3 = calculate_horizontal_velocity(
-    turbulent_dissipation=10 * par.util.get_unit_conversion("cm^2/s^3", "m^2/s^3"),
+    turbulent_dissipation=10
+    * par.util.get_unit_conversion("cm^2/s^3", "m^2/s^3"),
     reynolds_lambda=reynolds_lambda,
 )
 model_rms_100cm2_s3 = calculate_horizontal_velocity(
-    turbulent_dissipation=100 * par.util.get_unit_conversion("cm^2/s^3", "m^2/s^3"),
+    turbulent_dissipation=100
+    * par.util.get_unit_conversion("cm^2/s^3", "m^2/s^3"),
     reynolds_lambda=reynolds_lambda,
 )
 
 model_rms_400cm2_s3 = calculate_horizontal_velocity(
-    turbulent_dissipation=400 * par.util.get_unit_conversion("cm^2/s^3", "m^2/s^3"),
+    turbulent_dissipation=400
+    * par.util.get_unit_conversion("cm^2/s^3", "m^2/s^3"),
     reynolds_lambda=reynolds_lambda,
 )
 
@@ -254,21 +257,21 @@ model_rms_400cm2_s3 = calculate_horizontal_velocity(
 #
 
 # %%
-fig, ax = plt.subplots(figsize=(8, 6))
+fig, ax = plotting.subplots(size="wide")
 
 # Case 1: R_lambda = 72.41, epsilon = 10 cm²/s³
 ax.scatter(
     dns_10cm2_s3[:, 0],
     dns_10cm2_s3[:, 1],
     label=r"DNS: $R_\lambda=72.41$, $\varepsilon=10$",
-    color="blue",
+    color=plotting.COLORS["teal"],
     marker="o",
 )
 ax.plot(
     particle_radius * 1e6,
     model_rms_10cm2_s3 * 1e4,
     label=r"Model: $R_\lambda=72.41$, $\varepsilon=10$",
-    color="blue",
+    color=plotting.COLORS["teal"],
 )
 
 # Case 2: R_lambda = 72.41, epsilon = 100 cm²/s³
@@ -276,14 +279,14 @@ ax.scatter(
     dns_100_cm2_s3[:, 0],
     dns_100_cm2_s3[:, 1],
     label=r"DNS: $R_\lambda=72.41$, $\varepsilon=100$",
-    color="green",
+    color=plotting.COLORS["indigo"],
     marker="^",
 )
 ax.plot(
     particle_radius * 1e6,
     model_rms_100cm2_s3 * 1e4,
     label=r"Model: $R_\lambda=72.41$, $\varepsilon=100$",
-    color="green",
+    color=plotting.COLORS["indigo"],
 )
 
 # Case 3: R_lambda = 72.41, epsilon = 400 cm²/s³
@@ -291,14 +294,14 @@ ax.scatter(
     dns_400_cm2_s3[:, 0],
     dns_400_cm2_s3[:, 1],
     label=r"DNS: $R_\lambda=72.41$, $\varepsilon=400$",
-    color="red",
+    color=plotting.COLORS["rust"],
     marker="s",
 )
 ax.plot(
     particle_radius * 1e6,
     model_rms_400cm2_s3 * 1e4,
     label=r"Model: $R_\lambda=72.41$, $\varepsilon=400$",
-    color="red",
+    color=plotting.COLORS["rust"],
 )
 
 # Set labels, title, legend, etc.
@@ -307,9 +310,9 @@ ax.set_ylabel(r"$<(v'_x)^2>$ (cm²/s²)")
 ax.set_ylim(0, 180)
 ax.set_xlim(5, 65)
 ax.set_title("Mean-Square Horizontal Velocity Comparison")
-ax.legend(loc="upper right")
+plotting.legend(ax, loc="upper right")
 ax.grid(True)
-plt.subplots_adjust(bottom=0.2)
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]

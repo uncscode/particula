@@ -36,6 +36,9 @@
 import numpy as np
 import particula as par
 from matplotlib import pyplot as plt
+from particula import plotting
+
+plt.style.use("particula.default")
 
 # %%
 # Define initial simulation parameters
@@ -63,13 +66,14 @@ concentration_pmf = par.particles.get_lognormal_pmf_distribution(
 
 
 # plot the initial particle distribution
-fig, ax = plt.subplots()
+fig, ax = plotting.subplots()
 ax.plot(
     radius_bins, concentration_pmf, label="Initial distribution", marker="."
 )
 ax.set_xscale("log")
 ax.set_xlabel("Particle radius (m)")
 ax.set_ylabel(r"Particle Concentration (dN), $\dfrac{1}{m^{3}}$")
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
@@ -135,7 +139,7 @@ chamber_wall_loss_rate = par.dynamics.get_rectangle_wall_loss_rate(
 )
 
 # plot rates
-fig, ax = plt.subplots()
+fig, ax = plotting.subplots()
 ax.plot(
     radius_bins,
     coagulation_net,
@@ -161,8 +165,9 @@ ax.set_xscale("log")
 # ax.set_yscale("log")
 ax.set_xlabel("Particle radius (m)")
 ax.set_ylabel(r"Rate $\dfrac{1}{m^{3} s^{1}}$")
-ax.grid()
-plt.legend()
+ax.grid(True, axis="y")
+plotting.legend(plt.gca())
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
@@ -268,7 +273,7 @@ print("Done")
 # %%
 # Plotting the simulation results
 # Adjusting the figure size for better clarity
-fig, ax = plt.subplots(1, 1, figsize=[8, 6])
+fig, ax = plotting.subplots(1, 1, size="wide")
 
 # plot the initial particle distribution
 ax.plot(
@@ -285,56 +290,61 @@ ax.plot(
 ax.set_xscale("log")
 ax.set_xlabel("Particle radius (m)")
 ax.set_ylabel(r"Particle Concentration (dN), $\dfrac{1}{m^{3}}$")
-plt.legend()
+plotting.legend(plt.gca())
+plotting.fit(fig)
 plt.show()
 
 # %%
 # plot the Initial and Final rates
-fig, ax = plt.subplots()
+fig, ax = plotting.subplots()
 ax.plot(
     radius_bins,
     coagulation_net_matrix[1, :],
-    color="tab:blue",
+    color=plotting.COLORS["teal"],
     label="Initial Coagulation Net",
+    linestyle="-",
 )
 ax.plot(
     radius_bins,
     dilution_loss_matrix[1, :],
-    color="tab:orange",
+    color=plotting.COLORS["rust"],
     label="Initial Dilution Loss",
+    linestyle="-",
 )
 ax.plot(
     radius_bins,
     chamber_wall_loss_rate_matrix[1, :],
-    color="tab:green",
+    color=plotting.COLORS["indigo"],
     label="Initial Chamber Wall Loss",
+    linestyle="-",
 )
 ax.plot(
     radius_bins,
     coagulation_net_matrix[-1, :],
-    color="tab:blue",
+    color=plotting.COLORS["teal"],
     label="Final Coagulation Net",
     linestyle="--",
 )
 ax.plot(
     radius_bins,
     dilution_loss_matrix[-1, :],
-    color="tab:orange",
+    color=plotting.COLORS["rust"],
     label="Final Dilution Loss",
     linestyle="--",
 )
 ax.plot(
     radius_bins,
     chamber_wall_loss_rate_matrix[-1, :],
-    color="tab:green",
+    color=plotting.COLORS["indigo"],
     label="Final Chamber Wall Loss",
     linestyle="--",
 )
 ax.set_xscale("log")
 ax.set_xlabel("Particle radius (m)")
 ax.set_ylabel(r"Rate $\dfrac{1}{m^{3} s^{1}}$")
-ax.grid()
-plt.legend()
+ax.grid(True, axis="y")
+plotting.legend(plt.gca())
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]

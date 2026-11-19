@@ -1,17 +1,18 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 16.32486956100911,
-  "package_source_sha256": "f87778d6e6df13348763a901c19dc33c6f61956fd551d3b390af28f6b56e5d84",
+  "elapsed_seconds": 20.615242874948308,
+  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
+  "scientific_source_sha256": "c491d38a0f3b014be11117e77bf7f5ed27e4a834ba024ddbac813c1eefd5b6db",
   "input_sha256": {
     "docs/data/thermodynamics/marsh2017-citric-acid.csv": "8f32cf31349ddf3b420b230186a70190c0b7ce40f026b12414b0b96b97117a20"
   },
   "example": "citric-acid-hygroscopicity",
-  "fingerprint": "0571a870e4df83c3f39da311de854f7f433cc59d40306f13bf861c7980ede7f3",
+  "fingerprint": "05c0a4bd9903384aa402c30f35f7b6b79c8562dfbb842abd2d0684e034107b00",
   "source": "docs/examples/thermodynamics/activity/citric_acid_hygroscopicity.py",
-  "revision": "b88aa68d7813730cee2a1c0a936af7080e179b39",
+  "revision": "6af97152d1570464ac5ccae56e3110001657e170",
   "package_dirty": false,
-  "executed_at": "2026-11-18T01:35:15.099271+00:00",
+  "executed_at": "2026-11-19T14:34:47.255865+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
@@ -40,9 +41,9 @@
     ]
   ],
   "files": {
-    "figure-6-1.png": "87bdc33966e6ced4584ff62193c32aa6453b157c7358058d665abbc4db84ba74",
+    "figure-6-1.png": "23838734ddcc72dfc9d50526b8cfc52bf9bf1d5493fcc7bb87dd9c26af6c6be6",
     "data.json": "7a0e9513b106fd9e5a2896dfb687e99a93e878c3dafac27b679179007c80adb3",
-    "source.py": "d0beb5d6e3beb10ee64cdc2c130183a0b5a579f404aedb4a8a1446f27ee0a6e1"
+    "source.py": "b4f71f1d60956361e5168841499289d1c61a1e8bc458786a253fed4f33b946e3"
   },
-  "simulation_fingerprint": "0465ba1d4f874407de890fef01b82bed3738772be4b9127886c17423443d2ae6"
+  "simulation_fingerprint": "434a55186a8152baa44f85a4e2514f46d76e42cef1e3d25edfc047a91818b3e1"
 }

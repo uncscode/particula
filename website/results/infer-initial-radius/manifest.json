@@ -1,8 +1,9 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 9.060029572923668,
-  "package_source_sha256": "c491d38a0f3b014be11117e77bf7f5ed27e4a834ba024ddbac813c1eefd5b6db",
+  "elapsed_seconds": 20.202823090949096,
+  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
+  "scientific_source_sha256": "c491d38a0f3b014be11117e77bf7f5ed27e4a834ba024ddbac813c1eefd5b6db",
   "input_sha256": {
     "scripts/assess_native_condensation.py": "041f93deb8732c3200193c0aa0ba4005ba2a46cabcd31bb23df77c451cdc45b7",
     "scripts/assess_native_adaptive.py": "b012bc43a8be6253aa19ccb60e95e29f0d5d6850d23e3a8ba1077978f2312b38",
@@ -11,11 +12,11 @@
     "scripts/inverse_studies/scalar_reference.py": "00b118758d61cd58e2470ff55730892ba52e7cdaa2be38b2e0d97baccbc4eed6"
   },
   "example": "infer-initial-radius",
-  "fingerprint": "c317d0c2966cc58a168ac92418292407b3887aee96c1851802beb3d3c6c344a0",
+  "fingerprint": "9e98b6e8c70c485cd7e131ab6f08f17c7a3ed7f8b9c76f6d7c120a01fb12f4a7",
   "source": "docs/examples/processes/condensation/infer_initial_radius.py",
-  "revision": "9fa5880745e74a36497f71101c4a75ee6a9ecdac",
+  "revision": "9ab2fa66ef3d5e94551cc8942cc955990b732397",
   "package_dirty": false,
-  "executed_at": "2026-11-19T13:19:10.324970+00:00",
+  "executed_at": "2026-11-19T15:00:04.815360+00:00",
   "device": "cuda:0: NVIDIA GeForce RTX 5060",
   "python": "3.12.12",
   "versions": {
@@ -34,7 +35,7 @@
     [],
     [
       {
-        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\nModule particula.execution.inverse_condensation 9d6d8ab load on device 'cuda:0' took 0.68 ms  (cached)\n"
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\nModule particula.execution.inverse_condensation 9d6d8ab load on device 'cuda:0' took 3.51 ms  (cached)\n"
       },
       {
         "image": "figure-4-1.png"
@@ -42,9 +43,9 @@
     ]
   ],
   "files": {
-    "figure-4-1.png": "3fa543da62748f4f168aeb124fcfa240fc016cb88c1063763b4e7ccf0bb02250",
-    "data.json": "be2c0bb6fa9a2c93a44865b79e5e939640a713f5b66ccff982544a1e834c55f0",
-    "source.py": "ce5fde0a4a25ece618e87ef82cc88fc4327a00e98160ef07c1a7d125c8c5d558"
+    "figure-4-1.png": "0f954b9d1a80f412dc5b55b962fd644991900206614be69027570990a3fe4fb0",
+    "data.json": "fdb89e1dbd9f8a6f885f1c1a2f27187804639cc7e393d91d2bed98418e2b7041",
+    "source.py": "ec82c79feeb292b06aaad32ed9e92bc57f4f1249830282d8d744eea3977821c1"
   },
-  "simulation_fingerprint": "f2280fa68c6599748d23ced414a9e555914259a60e1b3661d5adf8a524c2c5bf"
+  "simulation_fingerprint": "eefa48988995b54fd6df5184c388e76510a241b42d5e19affd27f9a1daf7f909"
 }

@@ -5,7 +5,8 @@
     "policy": "cpu",
     "device": "cpu",
     "timeout": 300,
-    "inputs": []
+    "inputs": [],
+    "full_canvas": true
   },
   "condensation": {
     "title": "Condensation in radius bins",
@@ -13,7 +14,8 @@
     "policy": "cpu",
     "device": "cpu",
     "timeout": 300,
-    "inputs": []
+    "inputs": [],
+    "full_canvas": true
   },
   "gpu-coagulation": {
     "title": "Direct Brownian coagulation on CUDA",
@@ -22,7 +24,8 @@
     "device": "cuda",
     "timeout": 300,
     "inputs": [],
-    "invoke": "result = run_publication()"
+    "invoke": "result = run_publication()",
+    "full_canvas": true
   },
   "theory-dns-fluid-and-particle-properties-comparison": {
     "title": "Dns Fluid And Particle Properties Comparison",
@@ -30,7 +33,8 @@
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
-    "inputs": []
+    "inputs": [],
+    "full_canvas": true
   },
   "theory-dns-horizontal-velocity-comparison": {
     "title": "Dns Horizontal Velocity Comparison",
@@ -38,7 +42,8 @@
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
-    "inputs": []
+    "inputs": [],
+    "full_canvas": true
   },
   "theory-dns-kernel-comparison": {
     "title": "Dns Kernel Comparison",
@@ -46,7 +51,8 @@
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
-    "inputs": []
+    "inputs": [],
+    "full_canvas": true
   },
   "theory-dns-radial-distribution-comparison": {
     "title": "Dns Radial Distribution Comparison",
@@ -54,7 +60,8 @@
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
-    "inputs": []
+    "inputs": [],
+    "full_canvas": true
   },
   "theory-dns-radial-relative-velocity-comparison": {
     "title": "Dns Radial Relative Velocity Comparison",
@@ -62,7 +69,8 @@
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
-    "inputs": []
+    "inputs": [],
+    "full_canvas": true
   },
   "theory-ionparticle-coagulation": {
     "title": "Ionparticle Coagulation",
@@ -70,7 +78,8 @@
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
-    "inputs": []
+    "inputs": [],
+    "full_canvas": true
   },
   "theory-dynamic-viscosity": {
     "title": "Dynamic Viscosity",
@@ -102,7 +111,8 @@
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
-    "inputs": []
+    "inputs": [],
+    "full_canvas": true
   },
   "examples-fundamentals-gas-gas-data": {
     "title": "From stored vapor mass to saturation",
@@ -110,7 +120,8 @@
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
-    "inputs": []
+    "inputs": [],
+    "full_canvas": true
   },
   "examples-fundamentals-gas-vapor-pressure": {
     "title": "Does heating make a fixed vapor inventory less saturated?",
@@ -118,7 +129,8 @@
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
-    "inputs": []
+    "inputs": [],
+    "full_canvas": true
   },
   "examples-fundamentals-native-aerosol": {
     "title": "From a population to an evolving aerosol",
@@ -150,7 +162,8 @@
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
-    "inputs": []
+    "inputs": [],
+    "full_canvas": true
   },
   "examples-gpu-direct-gpu-complete-process-sequence": {
     "title": "Five direct CUDA process boundaries",
@@ -159,7 +172,8 @@
     "device": "cuda",
     "timeout": 1800,
     "inputs": [],
-    "invoke": "result = run_publication()"
+    "invoke": "result = run_publication()",
+    "full_canvas": true
   },
   "examples-gpu-direct-gpu-condensation-parity-walkthrough": {
     "title": "Check CUDA condensation against independent equations",
@@ -168,7 +182,8 @@
     "device": "cuda",
     "timeout": 1800,
     "inputs": [],
-    "invoke": "result = run_publication()"
+    "invoke": "result = run_publication()",
+    "full_canvas": true
   },
   "examples-gpu-direct-gpu-direct-kernels-quick-start": {
     "title": "Direct CUDA condensation: upload, calculate, download",
@@ -177,7 +192,8 @@
     "device": "cuda",
     "timeout": 1800,
     "inputs": [],
-    "invoke": "result = run_publication()"
+    "invoke": "result = run_publication()",
+    "full_canvas": true
   },
   "examples-gpu-direct-gpu-direct-nucleation": {
     "title": "Direct CUDA nucleation with explicit species mapping",
@@ -186,7 +202,8 @@
     "device": "cuda",
     "timeout": 1800,
     "inputs": [],
-    "invoke": "result = run_publication()"
+    "invoke": "result = run_publication()",
+    "full_canvas": true
   },
   "examples-gpu-resident-gpu-resident-graph-capture": {
     "title": "Capture and replay a native CUDA schedule",
@@ -197,7 +214,8 @@
     "inputs": [
       "docs/examples/gpu/resident/gpu_resident_multi_timestep.py"
     ],
-    "invoke": "result = run_publication()"
+    "invoke": "result = run_publication()",
+    "full_canvas": true
   },
   "examples-gpu-resident-gpu-resident-multi-timestep": {
     "title": "Multibox resident timesteps and continuation",
@@ -206,7 +224,8 @@
     "device": "cuda",
     "timeout": 1800,
     "inputs": [],
-    "invoke": "result = run_publication()"
+    "invoke": "result = run_publication()",
+    "full_canvas": true
   },
   "examples-gpu-resident-gpu-resident-session": {
     "title": "CUDA resident ownership and checkpoint restart",
@@ -215,7 +234,8 @@
     "device": "cuda",
     "timeout": 1800,
     "inputs": [],
-    "invoke": "result = run_publication()"
+    "invoke": "result = run_publication()",
+    "full_canvas": true
   },
   "examples-processes-coagulation-charge-coagulation-with-charge-functional": {
     "title": "Map charged collision rates with a factory",
@@ -223,7 +243,8 @@
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
-    "inputs": []
+    "inputs": [],
+    "full_canvas": true
   },
   "examples-processes-coagulation-charge-coagulation-with-charge-objects": {
     "title": "Map charged collision rates with a builder",
@@ -231,7 +252,8 @@
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
-    "inputs": []
+    "inputs": [],
+    "full_canvas": true
   },
   "examples-processes-coagulation-coagulation-1-pmf-pattern": {
     "title": "Brownian coagulation in a PMF population",
@@ -239,7 +261,8 @@
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
-    "inputs": []
+    "inputs": [],
+    "full_canvas": true
   },
   "examples-processes-coagulation-coagulation-2-pdf-pattern": {
     "title": "Brownian coagulation in a PDF population",
@@ -247,7 +270,8 @@
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
-    "inputs": []
+    "inputs": [],
+    "full_canvas": true
   },
   "examples-processes-coagulation-coagulation-3-particle-resolved-pattern": {
     "title": "Follow collisions through individual particles",
@@ -255,7 +279,8 @@
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
-    "inputs": []
+    "inputs": [],
+    "full_canvas": true
   },
   "examples-processes-coagulation-coagulation-4-compared": {
     "title": "Compare coagulation after matching distribution units",
@@ -263,7 +288,8 @@
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
-    "inputs": []
+    "inputs": [],
+    "full_canvas": true
   },
   "examples-processes-coagulation-coagulation-5-time-evolution": {
     "title": "Does particle-number decay depend on representation?",
@@ -271,7 +297,8 @@
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
-    "inputs": []
+    "inputs": [],
+    "full_canvas": true
   },
   "examples-processes-coagulation-functional-coagulation-basic-1-pmf": {
     "title": "A compact PMF coagulation calculation",
@@ -279,7 +306,8 @@
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
-    "inputs": []
+    "inputs": [],
+    "full_canvas": true
   },
   "examples-processes-coagulation-functional-coagulation-basic-2-pdf": {
     "title": "A compact PDF coagulation calculation",
@@ -287,7 +315,8 @@
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
-    "inputs": []
+    "inputs": [],
+    "full_canvas": true
   },
   "examples-processes-coagulation-functional-coagulation-basic-3-compared": {
     "title": "A compact comparison of bin totals and radius densities",
@@ -295,7 +324,8 @@
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
-    "inputs": []
+    "inputs": [],
+    "full_canvas": true
   },
   "examples-processes-coagulation-functional-coagulation-basic-4-particleresolved": {
     "title": "A compact particle-resolved collision calculation",
@@ -303,7 +333,8 @@
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
-    "inputs": []
+    "inputs": [],
+    "full_canvas": true
   },
   "examples-processes-condensation-condensation-2-massbin": {
     "title": "Water uptake from a maintained vapor reservoir",
@@ -311,7 +342,8 @@
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
-    "inputs": []
+    "inputs": [],
+    "full_canvas": true
   },
   "examples-processes-condensation-condensation-3-massresolved": {
     "title": "Competition for a finite water-vapor reservoir",
@@ -319,7 +351,8 @@
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
-    "inputs": []
+    "inputs": [],
+    "full_canvas": true
   },
   "examples-processes-condensation-condensation-latent-heat": {
     "title": "How much energy accompanies a condensation step?",
@@ -335,7 +368,8 @@
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
-    "inputs": []
+    "inputs": [],
+    "full_canvas": true
   },
   "examples-processes-customization-adding-particles-during-simulation": {
     "title": "Add an external population without changing existing particles",
@@ -343,7 +377,8 @@
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
-    "inputs": []
+    "inputs": [],
+    "full_canvas": true
   },
   "examples-processes-dilution-cpu-dilution": {
     "title": "Dilution changes abundance without shrinking particles",
@@ -367,7 +402,8 @@
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
-    "inputs": []
+    "inputs": [],
+    "full_canvas": true
   },
   "examples-processes-wall-loss-chamber-forward-simulation": {
     "title": "Explain a chamber spectrum using separate rate contributions",
@@ -375,7 +411,8 @@
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
-    "inputs": []
+    "inputs": [],
+    "full_canvas": true
   },
   "examples-processes-wall-loss-rectangular-wall-loss-strategy": {
     "title": "Track removal in a rectangular chamber",
@@ -391,7 +428,8 @@
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
-    "inputs": []
+    "inputs": [],
+    "full_canvas": true
   },
   "examples-processes-wall-loss-wall-loss-builders-factory": {
     "title": "Configure chamber loss without a unit mismatch",
@@ -407,7 +445,8 @@
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
-    "inputs": []
+    "inputs": [],
+    "full_canvas": true
   },
   "examples-simulations-biomass-burning-cloud-interactions": {
     "title": "How do collision models change a water-grown mixed aerosol?",
@@ -415,7 +454,8 @@
     "policy": "long",
     "device": "cuda",
     "timeout": 14400,
-    "inputs": []
+    "inputs": [],
+    "full_canvas": true
   },
   "examples-simulations-cloud-chamber-multi-cycle": {
     "title": "Separate water cycling from seed loss in a chamber",
@@ -423,7 +463,8 @@
     "policy": "long",
     "device": "cpu",
     "timeout": 7200,
-    "inputs": []
+    "inputs": [],
+    "full_canvas": true
   },
   "examples-simulations-cloud-chamber-single-cycle": {
     "title": "Follow droplets through one wet\u2013dry chamber cycle",
@@ -431,7 +472,8 @@
     "policy": "long",
     "device": "cpu",
     "timeout": 7200,
-    "inputs": []
+    "inputs": [],
+    "full_canvas": true
   },
   "examples-simulations-cough-droplets-partitioning": {
     "title": "Audit a respiratory-droplet illustration before using its predictions",
@@ -439,7 +481,8 @@
     "policy": "long",
     "device": "cuda",
     "timeout": 7200,
-    "inputs": []
+    "inputs": [],
+    "full_canvas": true
   },
   "examples-simulations-organic-partitioning-and-coagulation": {
     "title": "When a size-distribution plot hides a composition error",
@@ -447,7 +490,8 @@
     "policy": "long",
     "device": "cpu",
     "timeout": 7200,
-    "inputs": []
+    "inputs": [],
+    "full_canvas": true
   },
   "examples-simulations-soot-formation-in-flames": {
     "title": "Follow organic uptake onto seeds during imposed cooling",
@@ -455,7 +499,8 @@
     "policy": "long",
     "device": "cpu",
     "timeout": 7200,
-    "inputs": []
+    "inputs": [],
+    "full_canvas": true
   },
   "examples-thermodynamics-activity-activity-tutorial": {
     "title": "Choose an activity model by the comparison it enables",
@@ -463,7 +508,8 @@
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
-    "inputs": []
+    "inputs": [],
+    "full_canvas": true
   },
   "examples-thermodynamics-activity-bat-activity-example": {
     "title": "Compare ideal and nonideal organic activity",
@@ -503,7 +549,8 @@
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
-    "inputs": []
+    "inputs": [],
+    "full_canvas": true
   },
   "examples-thermodynamics-equilibria-equilibria-part1": {
     "title": "How does water uptake change organic aerosol partitioning?",
@@ -511,7 +558,8 @@
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
-    "inputs": []
+    "inputs": [],
+    "full_canvas": true
   },
   "examples-thermodynamics-particle-properties-activity-functions": {
     "title": "Compare activity rules along a composition path",
@@ -519,7 +567,8 @@
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
-    "inputs": []
+    "inputs": [],
+    "full_canvas": true
   },
   "examples-thermodynamics-particle-properties-activity-tutorial": {
     "title": "Which composition rule controls equilibrium pressure?",
@@ -527,7 +576,8 @@
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
-    "inputs": []
+    "inputs": [],
+    "full_canvas": true
   },
   "examples-thermodynamics-particle-properties-particle-surface-tutorial": {
     "title": "How strongly does curvature raise equilibrium vapor pressure?",
@@ -535,7 +585,8 @@
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
-    "inputs": []
+    "inputs": [],
+    "full_canvas": true
   },
   "contribute-validation-gpu-legacy-benchmarks-gpu-benchmarks": {
     "title": "Recorded GPU benchmark viewer",
@@ -548,7 +599,8 @@
     ],
     "input_destinations": {
       "docs/data/gpu_benchmark_results.json": "gpu_benchmark_results.json"
-    }
+    },
+    "full_canvas": true
   },
   "gpu-prepared-quick-start": {
     "title": "Build on the CPU, evolve on CUDA, analyze on the CPU",
@@ -557,7 +609,8 @@
     "device": "cuda",
     "timeout": 600,
     "inputs": [],
-    "invoke": "result = run_example()"
+    "invoke": "result = run_example()",
+    "full_canvas": true
   },
   "gpu-prepared-multibox": {
     "title": "Sixty-four heterogeneous aerosol boxes on one GPU",
@@ -572,7 +625,8 @@
       "scripts/gpu_studies/validation.py",
       "scripts/gpu_studies/trajectories.py"
     ],
-    "invoke": "result = run_example()"
+    "invoke": "result = run_example()",
+    "full_canvas": true
   },
   "gpu-prepared-forcing": {
     "title": "Cooling, heating and vapor pulses across sixteen boxes",
@@ -593,7 +647,13 @@
     "render_functions": [],
     "plot_inputs": [
       "scripts/docs_gpu_figures.py"
-    ]
+    ],
+    "historical_run": {
+      "revision": "480ecf2c1aa95da42985098c53e4ecdc66133d7b",
+      "data_sha256": "0733f192493bd2bda1bf37521296593018e4c16bd2df4b7cf233094c0573e0c6",
+      "package_source_sha256": "bbe6cb05017e86b19f7dc166c18cac96c0d762b5300c03990d91cd1a4e08ce8b"
+    },
+    "full_canvas": true
   },
   "gpu-prepared-stochastic": {
     "title": "Separate stochastic coagulation from initial-state variability",
@@ -608,7 +668,22 @@
       "scripts/gpu_studies/validation.py",
       "scripts/gpu_studies/trajectories.py"
     ],
-    "invoke": "result = run_example()"
+    "invoke": "result = run_example()",
+    "full_canvas": true,
+    "data_expression": "result",
+    "replot_invoke": "result = saved_data\nplot_results(result)\nplt.show()",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": [
+      "scripts/docs_gpu_figures.py"
+    ],
+    "historical_run": {
+      "revision": "da142e3dfcf190010d21f1ac07aca1a12e4c9fd0",
+      "study_revision": "535d02b7b06ba782aa2bd5d1c60890e06adbb654",
+      "data_sha256": "54bfec9b176c86f848c7d490a50f7e2055b1c94ab56fb2a7a9aea4a716b2a0da",
+      "package_source_sha256": "1d2bf0708c00d6e34107e200c143eb76cae07571fd4e691f1ce7cb88cd95a134"
+    }
   },
   "gpu-prepared-lifecycle": {
     "title": "A million-particle source, collision and loss lifecycle",
@@ -623,7 +698,22 @@
       "scripts/gpu_studies/validation.py",
       "scripts/gpu_studies/trajectories.py"
     ],
-    "invoke": "result = run_example()"
+    "invoke": "result = run_example()",
+    "full_canvas": true,
+    "data_expression": "result",
+    "replot_invoke": "result = saved_data\nplot_results(result)\nplt.show()",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": [
+      "scripts/docs_gpu_figures.py"
+    ],
+    "historical_run": {
+      "revision": "da142e3dfcf190010d21f1ac07aca1a12e4c9fd0",
+      "study_revision": "535d02b7b06ba782aa2bd5d1c60890e06adbb654",
+      "data_sha256": "d48c6313d8e85f2d4538d621e3984d0de27551562473a4f40d46640294d4913c",
+      "package_source_sha256": "1d2bf0708c00d6e34107e200c143eb76cae07571fd4e691f1ce7cb88cd95a134"
+    }
   },
   "gpu-prepared-cyclic-chamber": {
     "title": "Repeated source pulses in a cooling and warming aerosol",
@@ -642,7 +732,13 @@
     "render_functions": [
       "plot_history"
     ],
-    "plot_inputs": []
+    "plot_inputs": [],
+    "historical_run": {
+      "revision": "3d3753d2be9973c94b4064047fa8452e717f1311",
+      "data_sha256": "3bb6c13e674f95c5f5ee38b0e4eb5ce27a39f4437359edf4d1cdea0e8e8f4883",
+      "package_source_sha256": "cab2ecf96c60a0d1d005885793a221697dc3037bb3be50d8438b4de458423cbc"
+    },
+    "full_canvas": true
   },
   "gpu-scaling-results": {
     "title": "Measured CUDA scaling on an RTX 5060",
@@ -656,7 +752,8 @@
     "input_destinations": {
       "docs/data/gpu/rtx5060.json": "rtx5060.json"
     },
-    "invoke": "result = run_example()"
+    "invoke": "result = run_example()",
+    "full_canvas": true
   },
   "gpu-charged-models": {
     "title": "Charge-dependent Brownian collisions on CUDA",
@@ -665,7 +762,8 @@
     "device": "cuda",
     "timeout": 600,
     "inputs": [],
-    "invoke": "result = run_example()"
+    "invoke": "result = run_example()",
+    "full_canvas": true
   },
   "gpu-ion-balance": {
     "title": "Explicit atmospheric ion balance on CUDA",
@@ -674,7 +772,8 @@
     "device": "cuda",
     "timeout": 1200,
     "inputs": [],
-    "invoke": "result = run_example()"
+    "invoke": "result = run_example()",
+    "full_canvas": true
   },
   "gpu-lucky-few": {
     "title": "The lucky few: growth, charging and background capture",
@@ -686,7 +785,19 @@
       "scripts/gpu_studies/__init__.py",
       "scripts/gpu_studies/lucky_few.py"
     ],
-    "invoke": "result = run_example()"
+    "invoke": "result = run_example()",
+    "full_canvas": true,
+    "data_expression": "plot_data(result)",
+    "replot_invoke": "result = saved_data\nfigure = plot_results(result)",
+    "render_functions": [
+      "plot_results",
+      "plot_data"
+    ],
+    "historical_run": {
+      "revision": "9f408350e33d112c4fc7e567f13d7521dfb918f1",
+      "data_sha256": "218b884c4345ecf289b07a6e79805ed96d5798689d86775c2cd2482eaf1677e6",
+      "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106"
+    }
   },
   "gpu-environment-sweep": {
     "title": "Charged aerosols and ions across sixteen humid environments",
@@ -708,7 +819,13 @@
     ],
     "plot_inputs": [
       "scripts/gpu_studies/population_figures.py"
-    ]
+    ],
+    "full_canvas": true,
+    "historical_run": {
+      "revision": "54edfe13b7c99ec01b3a5f853e3ee45e6454ab61",
+      "data_sha256": "a36f8b3dc9a1d8d5979e050442aa6fb2886ffb43b27b09733645059eefd044b1",
+      "package_source_sha256": "98021107918d76caafbd800e6f8ab4c66bb0905e1950a2fc7075c622655abf5a"
+    }
   },
   "gpu-dry-environment-sweep": {
     "title": "Dry charged aerosols: ground level, mesopause and pressurized chambers",
@@ -730,7 +847,13 @@
     ],
     "plot_inputs": [
       "scripts/gpu_studies/population_figures.py"
-    ]
+    ],
+    "historical_run": {
+      "revision": "54edfe13b7c99ec01b3a5f853e3ee45e6454ab61",
+      "data_sha256": "8aab526a58e745252e1baa1ff9c13471219320a3495dabfc89a47c5856961924",
+      "package_source_sha256": "98021107918d76caafbd800e6f8ab4c66bb0905e1950a2fc7075c622655abf5a"
+    },
+    "full_canvas": true
   },
   "timed-box-chemistry": {
     "title": "Distinguish chemical conversion from a timed emission and dilution",
@@ -745,7 +868,8 @@
     "render_functions": [
       "plot_results"
     ],
-    "plot_inputs": []
+    "plot_inputs": [],
+    "full_canvas": true
   },
   "custom-process-backends": {
     "title": "Extend a process on CPU and CUDA",
@@ -763,7 +887,8 @@
     "render_functions": [
       "plot_results"
     ],
-    "plot_inputs": []
+    "plot_inputs": [],
+    "full_canvas": true
   },
   "particle-tracers": {
     "title": "Follow a source marker through collisions and removal",
@@ -778,7 +903,8 @@
     "render_functions": [
       "plot_results"
     ],
-    "plot_inputs": []
+    "plot_inputs": [],
+    "full_canvas": true
   },
   "sphere-optics": {
     "title": "From one sphere to a cloud's optical signal",
@@ -793,7 +919,8 @@
     "render_functions": [
       "plot_results"
     ],
-    "plot_inputs": []
+    "plot_inputs": [],
+    "full_canvas": true
   },
   "cuda-optics": {
     "title": "Qualify CUDA optics before interpreting a cloud spectrum",
@@ -808,7 +935,8 @@
     "render_functions": [
       "plot_results"
     ],
-    "plot_inputs": []
+    "plot_inputs": [],
+    "full_canvas": true
   },
   "first-cpu-workflow": {
     "title": "Run, save and resume a closed aerosol growth experiment",
@@ -823,7 +951,8 @@
     "render_functions": [
       "plot_results"
     ],
-    "plot_inputs": []
+    "plot_inputs": [],
+    "full_canvas": true
   },
   "adaptive-cloud-relaxation": {
     "title": "Distinguish dry-phase oscillation from physical droplet relaxation",
@@ -838,7 +967,8 @@
     "render_functions": [
       "plot_results"
     ],
-    "plot_inputs": []
+    "plot_inputs": [],
+    "full_canvas": true
   },
   "adaptive-reservoir-depletion": {
     "title": "Resolve growth as a finite vapor reservoir is depleted",
@@ -853,7 +983,8 @@
     "render_functions": [
       "plot_results"
     ],
-    "plot_inputs": []
+    "plot_inputs": [],
+    "full_canvas": true
   },
   "adaptive-reservoir-depletion-cuda": {
     "title": "Check adaptive CUDA growth against an independent depletion reference",
@@ -868,7 +999,8 @@
     "data_expression": "report",
     "replot_invoke": "report = saved_data\nfigure = plot_results(report)",
     "render_functions": [],
-    "plot_inputs": []
+    "plot_inputs": [],
+    "full_canvas": true
   },
   "adaptive-cloud-relaxation-cuda": {
     "title": "Resolve stiff wet\u2013dry droplet relaxation on CUDA",
@@ -883,7 +1015,8 @@
     "data_expression": "report",
     "replot_invoke": "report = saved_data\nfigure = plot_results(report)",
     "render_functions": [],
-    "plot_inputs": []
+    "plot_inputs": [],
+    "full_canvas": true
   },
   "scalable-coagulation": {
     "title": "Native coagulation work budgets",
@@ -897,7 +1030,8 @@
     "render_functions": [
       "plot_results"
     ],
-    "plot_inputs": []
+    "plot_inputs": [],
+    "full_canvas": true
   },
   "bat-humidity-pulse": {
     "title": "Water uptake and evaporation after a humidity pulse",
@@ -912,7 +1046,8 @@
     "render_functions": [
       "plot_results"
     ],
-    "plot_inputs": []
+    "plot_inputs": [],
+    "full_canvas": true
   },
   "citric-acid-hygroscopicity": {
     "title": "Citric acid droplet hygroscopicity",
@@ -929,7 +1064,8 @@
     "render_functions": [
       "plot_results"
     ],
-    "plot_inputs": []
+    "plot_inputs": [],
+    "full_canvas": true
   },
   "ccn-kappa-retrieval": {
     "title": "Fit hygroscopicity to an activation measurement",
@@ -944,7 +1080,8 @@
     "render_functions": [
       "plot_results"
     ],
-    "plot_inputs": []
+    "plot_inputs": [],
+    "full_canvas": true
   },
   "psl-mobility": {
     "title": "Dry PSL mobility sizing",
@@ -961,7 +1098,8 @@
     "render_functions": [
       "plot_results"
     ],
-    "plot_inputs": []
+    "plot_inputs": [],
+    "full_canvas": true
   },
   "van-der-waals": {
     "title": "How does attraction change a Brownian collision rate?",
@@ -980,7 +1118,8 @@
     ],
     "input_destinations": {
       "docs/data/coagulation/van-der-waals-measurements.json": "van-der-waals-measurements.json"
-    }
+    },
+    "full_canvas": true
   },
   "gpu-van-der-waals": {
     "title": "Follow bipolar coagulation through a CUDA restart",
@@ -994,7 +1133,8 @@
     "replot_invoke": "report = saved_data\nplot_results(report)",
     "render_functions": [
       "plot_results"
-    ]
+    ],
+    "full_canvas": true
   },
   "nacl-scavenging": {
     "title": "What passes through a 100 nm mobility channel?",
@@ -1009,7 +1149,8 @@
       "docs/data/nacl-scavenging/other-kernels-steady.csv",
       "docs/data/nacl-scavenging/pulse-kernels-summary.csv",
       "docs/data/nacl-scavenging/pulse-smps-spectrum.csv"
-    ]
+    ],
+    "full_canvas": true
   },
   "spherical-wall-loss-theory": {
     "title": "CUDA wall loss agrees with spherical deposition theory",
@@ -1024,7 +1165,8 @@
     "render_functions": [
       "plot_results"
     ],
-    "plot_inputs": []
+    "plot_inputs": [],
+    "full_canvas": true
   },
   "infer-initial-radius": {
     "title": "Recovering initial particle sizes after condensation",
@@ -1045,10 +1187,20 @@
     "render_functions": [
       "plot_results"
     ],
-    "plot_inputs": []
+    "plot_inputs": [],
+    "full_canvas": true
+  },
+  "figure-styles": {
+    "title": "Figure styles and paper layouts",
+    "source": "docs/examples/fundamentals/figure_styles.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 120,
+    "inputs": [],
+    "full_canvas": true
   },
   "pi-chamber-spectra": {
-    "title": "Time-resolved wet-size spectra in the Π Chamber",
+    "title": "Time-resolved wet-size spectra in the \u03a0 Chamber",
     "source": "docs/examples/simulations/pi_chamber_spectra.py",
     "policy": "cuda",
     "device": "cuda",
@@ -1068,7 +1220,8 @@
       "plot_results",
       "plot_separation"
     ],
-    "plot_inputs": []
+    "plot_inputs": [],
+    "full_canvas": true
   },
   "adaptive-coagulation": {
     "title": "Adaptive cloud coagulation on CUDA",
@@ -1083,6 +1236,7 @@
     "render_functions": [
       "plot_results"
     ],
-    "plot_inputs": []
+    "plot_inputs": [],
+    "full_canvas": true
   }
 }
