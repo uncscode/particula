@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 401.4297583210282,
+  "package_source_sha256": "c491d38a0f3b014be11117e77bf7f5ed27e4a834ba024ddbac813c1eefd5b6db",
+  "input_sha256": {
+    "scripts/pi_chamber/retrieval.py": "dbdae547aa5ba03d81acec2e79d1eea9b819709f10cf0409ae396de99d34c03d",
+    "docs/data/pi-chamber/haze-target.json": "fba8c167dfd3b2ab9ff0a9e08a29329724cbd092c11f613204f7ccba7e8d8078",
+    "docs/data/pi-chamber/haze-grid.csv": "928b8f9e1d3077ba98d129d2b9c2c2665ae5f0b213c2a3eb9f273bc01d49b4be",
+    "scripts/pi_chamber/growth.py": "10157308bd92f0d3ab56a3361fd26e130157222174d31d722e6664241fafcdcb",
+    "scripts/pi_chamber/temporal.py": "9470b83300975e602362b25a5551aa699bbc0b4fec1331ef92eeb32d35144051",
+    "docs/data/pi-chamber/restart.json": "7f3a9a092788a2b35d439eab3be67a69379f3adfa42ec7f969dbcbeb0465258d"
+  },
+  "example": "pi-chamber-spectra",
+  "fingerprint": "0885bd69c894bb92b0c84e0860fbfa74a471bd88d3a1c78d176237a79123fd59",
+  "source": "docs/examples/simulations/pi_chamber_spectra.py",
+  "revision": "22af40bb252c2384d65366765199648b32fc4261",
+  "package_dirty": false,
+  "executed_at": "2026-11-19T14:41:00.339316+00:00",
+  "device": "cuda:0: NVIDIA GeForce RTX 5060",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.2",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [],
+    [
+      {
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\nModule scripts.pi_chamber.growth a5c9ec3 load on device 'cuda:0' took 1.56 ms  (cached)\n"
+      },
+      {
+        "text": "Module scripts.pi_chamber.temporal 09e0b46 load on device 'cuda:0' took 1.22 ms  (cached)\n"
+      },
+      {
+        "image": "figure-5-1.png"
+      },
+      {
+        "image": "figure-5-2.png"
+      }
+    ]
+  ],
+  "files": {
+    "figure-5-2.png": "810422747c40391cf5a28d872f02a88cb0bbd9e1c49f9190adb83239775cc33e",
+    "figure-5-1.png": "20199120ed8c33f40a7874ec2006ab8dda0289080b7f52a3e7fb2e877e10d110",
+    "data.json": "79fec87acaebbe0914c073d1639f04fe2d4fa605759219ecb81e203487276a73",
+    "source.py": "fa9514db21304095932899183db6f874ca7157d95bdd3433a1a59f04f32fba89"
+  },
+  "simulation_fingerprint": "5681812e022dc5ce4617fabcce60ee3dca021614891b8dd6c4345afc376ae409"
+}
