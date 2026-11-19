@@ -339,7 +339,8 @@ ax.hist(
 
 ax.set_xlabel("log₁₀(Radius [m])")
 ax.set_ylabel("Bin Counts")
-ax.set_title("Initial Particle Size Distribution")
+ax.set_title("Initial size distribution")
+ax.locator_params(nbins=4)
 plotting.fit(fig)
 plt.show()
 

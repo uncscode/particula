@@ -42,31 +42,19 @@ import copy
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from particula import plotting
 from particula.dynamics.condensation.species_mapping import (
     CondensationSpeciesMap,
 )
 from particula.execution.splitting import condensation_flow
+
+plt.style.use("particula.default")
 
 # Optional: uncomment if many steps and you want a progress bar
 # from tqdm import tqdm
 
 # Plot style (Tailwind gray palette)
 TAILWIND = par.util.colors.TAILWIND
-base_color = TAILWIND["gray"]["600"]
-plt.rcParams.update(
-    {
-        "text.color": base_color,
-        "axes.labelcolor": base_color,
-        "figure.figsize": (5, 4),
-        "font.size": 14,
-        "axes.edgecolor": base_color,
-        "xtick.color": base_color,
-        "ytick.color": base_color,
-        "pdf.fonttype": 42,
-        "ps.fonttype": 42,
-        "savefig.dpi": 150,
-    }
-)
 
 np.random.seed(100)  # reproducibility for sampling and wall-loss RNG
 
@@ -710,7 +698,7 @@ cycle_duration = humid_duration + dry_duration  # 90 seconds
 n_cycles = 4
 
 # Create figure with 3 subplots
-fig, axes = plt.subplots(3, 1, figsize=(10, 12))
+fig, axes = plotting.subplots(3, 1, size="wide")
 
 # Plot colors for particles
 particle_colors = [
@@ -776,9 +764,9 @@ legend_elements = [
     Patch(facecolor=TAILWIND["gray"]["200"], alpha=0.3, label="Humid phase"),
     Patch(facecolor=TAILWIND["gray"]["300"], alpha=0.2, label="Dry phase"),
 ]
-axes[0].legend(handles=legend_elements, loc="upper right")
+plotting.legend(axes[0], handles=legend_elements, loc="upper right")
 
-plt.tight_layout()
+plotting.fit(fig)
 plt.show()
 
 
@@ -841,7 +829,7 @@ initial_diams_mixed = (
 )  # nm
 
 # Create scatter plot of activated fraction vs dry diameter
-fig, ax = plt.subplots(figsize=(8, 5))
+fig, ax = plotting.subplots(size="wide")
 
 ax.scatter(
     initial_diams_as,
@@ -873,10 +861,10 @@ ax.set_ylabel("Activated fraction")
 ax.set_title("Humid-state threshold fraction vs initial dry diameter")
 ax.set_ylim(-0.05, 1.05)
 ax.set_xscale("log")
-ax.legend(loc="lower right")
+plotting.legend(ax, loc="lower right")
 ax.grid(True, alpha=0.3)
 
-plt.tight_layout()
+plotting.fit(fig)
 plt.show()
 
 
@@ -939,7 +927,7 @@ times_mixed, water_frac_mixed = calculate_mean_water_fraction(
 )
 
 # Create plot
-fig, ax = plt.subplots(figsize=(10, 5))
+fig, ax = plotting.subplots(size="wide")
 
 # Shade phases
 for cycle in range(n_cycles):
@@ -974,10 +962,10 @@ ax.plot(
 ax.set_xlabel("Time (minutes)")
 ax.set_ylabel("Mean water mass fraction")
 ax.set_title("Water Mass Fraction Evolution Over 4 Cycles")
-ax.legend()
+plotting.legend(ax)
 ax.grid(True, alpha=0.3)
 
-plt.tight_layout()
+plotting.fit(fig)
 plt.show()
 
 print("Key observations:")
@@ -1044,7 +1032,7 @@ retention_as = [dm / initial_dry_as for dm in dry_mass_as]
 retention_sucrose = [dm / initial_dry_sucrose for dm in dry_mass_sucrose]
 retention_mixed = [dm / initial_dry_mixed for dm in dry_mass_mixed]
 
-fig, ax = plt.subplots(figsize=(8, 5))
+fig, ax = plotting.subplots(size="wide")
 
 x = np.arange(1, n_cycles + 1)
 width = 0.25
@@ -1075,11 +1063,11 @@ ax.set_xlabel("Cycle number")
 ax.set_ylabel("Dry mass retention fraction")
 ax.set_title("Dry Mass Retention Over Cycles")
 ax.set_xticks(x)
-ax.legend()
+plotting.legend(ax)
 ax.set_ylim(0, 1.1)
 ax.grid(True, alpha=0.3, axis="y")
 
-plt.tight_layout()
+plotting.fit(fig)
 plt.show()
 
 print("Key observations:")
@@ -1135,7 +1123,7 @@ times_mixed, mean_diam_mixed = calculate_mean_diameter(
 )
 
 # Create overlay plot
-fig, ax = plt.subplots(figsize=(10, 6))
+fig, ax = plotting.subplots(size="wide")
 
 # Shade phases
 for cycle in range(n_cycles):
@@ -1188,10 +1176,10 @@ ax.plot(
 ax.set_xlabel("Time (minutes)")
 ax.set_ylabel("Mean particle diameter (um)")
 ax.set_title("Mean wet size across three sampled compositions")
-ax.legend(loc="upper right")
+plotting.legend(ax, loc="upper right")
 ax.grid(True, alpha=0.3)
 
-plt.tight_layout()
+plotting.fit(fig)
 plt.show()
 
 
@@ -1556,7 +1544,7 @@ coeff_grid = wall_loss_strategy.loss_coefficient_for_particles(
 )
 coeff_grid = np.clip(coeff_grid, 0, None)
 
-fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+fig, axes = plotting.subplots(1, 2)
 
 axes[0].semilogx(
     diam_grid * 1e9, coeff_grid, color=TAILWIND["blue"]["600"], linewidth=2
@@ -1593,10 +1581,10 @@ axes[1].set_xlabel("Dry diameter (nm)")
 axes[1].set_ylabel("Cumulative loss fraction")
 axes[1].set_ylim(0, 1)
 axes[1].set_title("Size-dependent cumulative loss (4 cycles)")
-axes[1].legend()
+plotting.legend(axes[1])
 axes[1].grid(True, which="both", alpha=0.3)
 
-plt.tight_layout()
+plotting.fit(fig)
 plt.show()
 
 
@@ -1658,7 +1646,7 @@ water_fracs = [
     water_fraction(history_mixed, water_index=2),
 ]
 
-fig, axes = plt.subplots(2, 2, figsize=(10, 8))
+fig, axes = plotting.subplots(2, 2)
 
 # A
 axes[0, 0].set_title("Mean diameter over 4 cycles")
@@ -1668,7 +1656,7 @@ for t, md, label, color in zip(
     axes[0, 0].plot(t / 60, md * 1e6, label=label, color=color, linewidth=2)
 axes[0, 0].set_xlabel("Time (minutes)")
 axes[0, 0].set_ylabel("Mean diameter (um)")
-axes[0, 0].legend()
+plotting.legend(axes[0, 0])
 axes[0, 0].grid(alpha=0.3)
 
 # B
@@ -1691,7 +1679,7 @@ axes[0, 1].set_xticks(xpos)
 axes[0, 1].set_xticklabels(panel_labels)
 axes[0, 1].set_ylabel("Diameter (um)")
 axes[0, 1].set_title("Peak vs final mean diameter")
-axes[0, 1].legend()
+plotting.legend(axes[0, 1])
 
 # C
 width = 0.25
@@ -1716,7 +1704,7 @@ axes[1, 0].set_xticks(xpos)
 axes[1, 0].set_xticklabels(panel_labels)
 axes[1, 0].set_ylabel("Dry material mass (kg)")
 axes[1, 0].set_title("Dry inventory after 4 cycles")
-axes[1, 0].legend()
+plotting.legend(axes[1, 0])
 
 # D
 axes[1, 1].bar(panel_labels, water_fracs, color=panel_colors)
@@ -1724,7 +1712,7 @@ axes[1, 1].set_ylabel("Water / total mass")
 axes[1, 1].set_ylim(0, 1)
 axes[1, 1].set_title("Final water mass fraction")
 
-plt.tight_layout()
+plotting.fit(fig)
 plt.show()
 
 
@@ -1764,7 +1752,7 @@ for hist, widx in [
 
 cycle_marks = np.arange(0, n_cycles * cycle_duration + 1, cycle_duration)
 
-plt.figure(figsize=(8, 4))
+fig, ax = plotting.subplots(size="wide")
 for t_vals, f_vals, label, color in zip(
     wf_times, wf_fracs, panel_labels, panel_colors
 ):
@@ -1777,8 +1765,8 @@ plt.ylim(0, 1)
 plt.xlabel("Time (minutes)")
 plt.ylabel("Water mass fraction")
 plt.title("Water mass fraction evolution across cycles")
-plt.legend(loc="best")
-plt.tight_layout()
+plotting.legend(plt.gca(), loc="best")
+plotting.fit(fig)
 plt.show()
 
 
@@ -1788,18 +1776,21 @@ plt.show()
 # Repeated vapor resets exchange water with surviving seeds while wall loss
 # removes dry material. Tracking both species mass and particle identity separates
 # those effects better than a size curve alone. In the refreshed realization,
-# final dry-mass retention is about 16.1%, 11.2%, and 10.6% for sulfate, sucrose,
+# final dry-mass retention is about 14.1%, 12.1%, and 11.5% for sulfate, sucrose,
 # and mixed seeds, respectively. The first-event check records 0.1 s for both
 # pure compositions and therefore does not resolve an ordering between them.
-# The visible dry-phase oscillations remain a numerical-resolution concern;
-# do not interpret them as observed physical cycling. Composition changes the activity
+# The adaptive ROS3 trajectories have smooth dry phases at the saved 0.1 s
+# observation spacing, replacing the previous fixed-step oscillations. This
+# does not establish convergence of the outer wall-loss schedule or accuracy
+# between observations. Composition changes the activity
 # model, but these separately sampled scenarios do not isolate a universal κ
 # ordering or demonstrate competition between external sulfate and sucrose modes.
 
 # %% [markdown]
 # ## Design the next chamber comparison
 #
-# For a research study, first refine dt while keeping physical humid/dry durations
+# For a research study, refine outer dt and condensation tolerances separately,
+# keeping physical humid/dry durations
 # fixed. Compare full size trajectories, dry retention, and the explicitly chosen
 # activation diagnostic across independent random seeds. Then pair the initial
 # radii across compositions to separate material effects from sample variability.
