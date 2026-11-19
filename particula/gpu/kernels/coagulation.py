@@ -74,6 +74,12 @@ from particula.gpu.kernels._coagulation_config import (
     resolve_coagulation_mechanism_config,
     validate_coagulation_mechanism_capabilities,
 )
+from particula.gpu.kernels._coagulation_subcycling import (
+    CoagulationSubcyclingConfig as CoagulationSubcyclingConfig,
+)
+from particula.gpu.kernels._coagulation_subcycling import (
+    CoagulationSubcyclingError as CoagulationSubcyclingError,
+)
 from particula.gpu.kernels.environment import (
     _broadcast_scalar_array,
     _ensure_environment_arrays,
@@ -2397,6 +2403,7 @@ class _PreparedCoagulationCall:
     failure: Any = None
     brownian_parallel: Any = None
     work_config: Any = None
+    adaptive: Any = None
     budget_report: Any = None
     budget_failure: Any = None
     rng_pending: Any = None
@@ -2746,30 +2753,33 @@ def _enqueue_prepared_coagulation_call(
         raise ValueError("coagulation requires prepared parallel resources")
     work.prepare_rates(failure)
     args = prepared.selector_inputs
-    wp.launch(
-        admit_coagulation_work,
-        dim=prepared.n_boxes,
-        inputs=[
-            work.counts,
-            args[24],
-            args[1],
-            args[3],
-            work.majorants,
-            args[14],
-            prepared.work_config.max_trials_per_box,
-            prepared.max_collisions,
-            prepared.budget_report,
-            failure,
-        ],
-        device=prepared.device,
-    )
+    if prepared.adaptive is not None:
+        prepared.adaptive.choose(prepared, failure)
+    else:
+        wp.launch(
+            admit_coagulation_work,
+            dim=prepared.n_boxes,
+            inputs=[
+                work.counts,
+                args[24],
+                args[1],
+                args[3],
+                work.majorants,
+                args[14],
+                prepared.work_config.max_trials_per_box,
+                prepared.max_collisions,
+                prepared.budget_report,
+                failure,
+            ],
+            device=prepared.device,
+        )
     wp.launch(
         initialize_admitted_rng,
         dim=prepared.n_boxes,
         inputs=[args[27], prepared.rng_pending, prepared.rng_seed, failure],
         device=prepared.device,
     )
-    work.select(failure)
+    work.select(failure, prepared.adaptive.dt if prepared.adaptive else None)
 
     wp.launch(
         apply_coagulation_kernel_guarded,
@@ -2943,3 +2953,124 @@ def coagulation_preflight_gpu(
             array.capacity for array in unique.values()
         ),
     }
+
+
+@dataclass(frozen=True)
+class AdaptiveCoagulationResult:
+    """Outer interval output with ordered pairs and per-box boundaries."""
+
+    particles: Any
+    collision_pairs: Any
+    n_collisions: Any
+    diagnostics: dict[str, Any]
+
+
+def adaptive_coagulation_step_gpu(
+    particles: Any,
+    temperature: float | Any | None,
+    pressure: float | Any | None,
+    time_step: float,
+    *,
+    subcycling: CoagulationSubcyclingConfig,
+    work_config: CoagulationWorkConfig | None = None,
+    **kwargs: Any,
+) -> AdaptiveCoagulationResult:
+    """Run a synchronous, atomic direct interval on the particle device.
+
+    Accepts the fixed call's optional inputs. Supplied collision and work
+    buffers hold the final accepted pass. Returned device pairs span the whole
+    interval in application order. Each diagnostics pair_end_offsets row gives
+    the exclusive end of that pass per box. Reuse rng_states for continuation.
+    """
+    from functools import partial
+
+    from particula.gpu.kernels._coagulation_subcycling import (
+        AdaptiveInterval,
+        adaptive_capacity,
+        check_memory,
+        interval_bytes,
+        workspace_bytes,
+    )
+
+    if not isinstance(subcycling, CoagulationSubcyclingConfig):
+        raise TypeError("expected CoagulationSubcyclingConfig")
+    work_config = (
+        work_config if work_config is not None else CoagulationWorkConfig()
+    )
+    if not isinstance(work_config, CoagulationWorkConfig):
+        raise TypeError("expected CoagulationWorkConfig")
+    from particula.gpu.kernels._coagulation_native import validate_schema
+
+    validate_schema(particles)
+    boxes, slots, _ = particles.masses.shape
+    cap = adaptive_capacity(
+        boxes, slots, work_config.max_collision_buffer_bytes
+    )
+    cap = min(cap, _validate_max_collisions(kwargs.pop("max_collisions", cap)))
+    mechanism = kwargs.get("mechanism_config")
+    sampler = workspace_bytes(
+        boxes,
+        slots,
+        cap,
+        getattr(mechanism, "relative_permittivity", None),
+        getattr(mechanism, "hamaker_constant", None) is not None,
+    )
+    particle_bytes = sum(
+        getattr(particles, name).capacity
+        for name in ("masses", "charge", "concentration")
+    )
+    outputs = sum(
+        getattr(kwargs.get(key), "capacity", 0)
+        for key in (
+            "collision_pairs",
+            "work_counts",
+            "n_collisions",
+            "rng_states",
+        )
+    )
+    categories = dict(
+        sampler=sampler,
+        controller=interval_bytes(boxes, slots, subcycling.max_subcycles),
+        rollback=particle_bytes + outputs + boxes * (8 * cap + 16),
+    )
+    check_memory(subcycling, categories)
+    prepared = _prepare_coagulation_step_gpu(
+        particles,
+        temperature,
+        pressure,
+        time_step,
+        max_collisions=cap,
+        work_config=work_config,
+        **kwargs,
+    )
+    controller = AdaptiveInterval(prepared, subcycling, time_step)
+    prepared = replace(prepared, adaptive=controller)
+    outputs_to_restore = (
+        prepared.masses,
+        prepared.charge,
+        prepared.concentration,
+        prepared.collision_pairs,
+        prepared.n_collisions,
+        prepared.work_counts,
+        prepared.selector_inputs[27],
+    )
+    backups = [(a, wp.clone(a)) for a in outputs_to_restore]
+    failure = prepared.budget_failure
+    controller.enqueue(
+        prepared, failure, partial(_enqueue_prepared_coagulation_call, prepared)
+    )
+    code = int(failure.numpy()[0])
+    if code:
+        for array, backup in backups:
+            wp.copy(array, backup)
+        wp.synchronize_device(prepared.device)
+        if code in (11, 13):
+            raise controller.rejection(prepared, code)
+        if code == 10:
+            raise ValueError("pair exceeds van der Waals capture table domain")
+        raise ValueError("invalid coagulation rate majorant")
+    diagnostics = controller.diagnostics(prepared)
+    diagnostics["reserved_bytes"] = categories
+    return AdaptiveCoagulationResult(
+        particles, controller.pairs, controller.offsets, diagnostics
+    )

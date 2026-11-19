@@ -650,6 +650,10 @@
                 "slug": "examples/gpu/prepared/gpu_prepared_quick_start"
               },
               {
+                "label": "Adaptive cloud coagulation on CUDA",
+                "slug": "examples/gpu/prepared/adaptive_coagulation"
+              },
+              {
                 "label": "Charged Brownian models",
                 "slug": "examples/gpu/prepared/gpu_charged_models"
               },

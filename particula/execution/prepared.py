@@ -54,6 +54,10 @@ class PreparedSimulation:
     _clock: Any
     _extension_fields: Any
     _extension_state: dict[str, dict[str, Any]]
+    _rollback: Any
+    _policy_change: Any
+    _last_rejection: Any
+    _adaptive_allocation: dict
     _host_context: Any
 
     def __init__(self) -> None:
@@ -137,6 +141,10 @@ class PreparedSimulation:
         result._last_steps = 0
         result._last_time = 0.0
         result._initial_time = 0.0
+        result._rollback = None
+        result._policy_change = None
+        result._last_rejection = None
+        result._adaptive_allocation = {}
         result._operations = None
         result._session = None
         result._registry = None
@@ -197,6 +205,15 @@ class PreparedSimulation:
             )
             operations = wrap_particle_fields(context, plans, operations)
             operations = wrap_cohort_operations(context, plans, operations)
+            coag = self._bindings.get("coagulation")
+            if coag is not None and coag.adaptive is not None:
+                from particula.gpu.kernels._coagulation_subcycling import (
+                    wrap_subcycles,
+                )
+
+                operations = wrap_subcycles(
+                    operations, plans, coag, self._device_failure
+                )
             composed = compose_operations(context, plans, operations)
             self._refresh = context.refresh
             self._operations = composed
@@ -208,6 +225,13 @@ class PreparedSimulation:
                 self._operations += (clock_operation(self),)
             self._diagnostics = setup_diagnostics(self)
             self._plans = plans
+
+            if coag is not None and coag.adaptive is not None:
+                from particula.execution.prepared_subcycling import (
+                    rollback_buffers,
+                )
+
+                self._rollback = rollback_buffers(self, coag)
 
     @contextmanager
     def _scope(self):
@@ -281,7 +305,10 @@ class PreparedSimulation:
         return self._closed
 
     def step(self) -> None:
-        """Enqueue one frozen process sequence without a host observation.
+        """Advance one frozen process sequence.
+
+        Adaptive coagulation observes commit status and restores an exhausted
+        outer step on-device. Fixed steps defer observation.
 
         A launch failure faults the binding. Earlier writes are not rolled back.
         Asynchronous errors surface at a later synchronization or snapshot.
@@ -291,8 +318,12 @@ class PreparedSimulation:
             if self._operations is None:
                 raise RuntimeError("prepared process plan has not been bound")
             token = self._guard.begin_step(self._time_step)
+            restored = False
             try:
                 with self._scope():
+                    if self._rollback is not None:
+                        for live, backup in self._rollback:
+                            self._wp.copy(backup, live)
                     if self._capture is None:
                         for operation in self._operations:
                             operation()
@@ -300,13 +331,38 @@ class PreparedSimulation:
                         from particula.execution.prepared_capture import replay
 
                         replay(self)
+                    if self._rollback is not None:
+                        failure = self._finish_adaptive_step()
+                        if failure is not None:
+                            self._guard._abort_step(token)
+                            restored = True
+                            raise failure
                 self._guard.complete_step(token)
             except BaseException:
+                if restored:
+                    raise
                 try:
                     self._guard._abort_step(token)
                 finally:
                     self._fault()
                 raise
+
+    def _finish_adaptive_step(self):
+        """Observe status once and restore before releasing a rejected token."""
+        code = int(self._device_failure.numpy()[0])
+        if code in (11, 13):
+            from copy import deepcopy
+
+            call = self._bindings["coagulation"]
+            error = call.adaptive.rejection(call, code)
+            self._last_rejection = deepcopy(error.diagnostics)
+            for live, backup in self._rollback:
+                self._wp.copy(live, backup)
+            self._wait()
+            return error
+        if code:
+            self._check_device_failure(code)
+        return None
 
     def run(self, steps: int) -> None:
         """Enqueue a nonnegative integer number of fixed-duration steps."""
@@ -327,42 +383,42 @@ class PreparedSimulation:
                 self._wait()
                 with self._scope():
                     failure = int(self._device_failure.numpy()[0])
-                    messages = {
-                        2: (
-                            "Brownian GPU coagulation requires "
-                            "equal active counts"
-                        ),
-                        3: "ion source capacity exhausted",
-                        4: "ion source Poisson mean exceeds supported range",
-                        5: "ion cleanup requires unit active counts",
-                        6: "seed cohort lineage invariant violated",
-                        7: (
-                            "atmospheric coagulation requires valid unit ions "
-                            "and a supported model environment"
-                        ),
-                        8: "ion attachment rate is unsupported",
-                        9: ("coagulation budget exceeded; reduce timestep"),
-                        10: "pair exceeds van der Waals capture table domain",
-                        90: "GPU process produced invalid field values",
-                        91: "GPU particle-field event contract violated",
-                    }
-                    if failure == 9:
-                        self._bindings["coagulation"].check_admission()
-                    if failure in messages:
-                        raise ValueError(messages[failure])
-                    for observe in self._observers:
-                        observe()
-                    if failure >= 100:
-                        raise ValueError(
-                            f"custom GPU process reported failure {failure}"
-                        )
-                    if failure:
-                        raise ValueError(
-                            "prepared nucleation failed; dependent work stopped"
-                        )
+                    self._check_device_failure(failure)
             except BaseException:
                 self._fault()
                 raise
+
+    def _check_device_failure(self, failure):
+        """Interpret the compact device status on the owner stream."""
+        messages = {
+            2: ("Brownian GPU coagulation requires equal active counts"),
+            3: "ion source capacity exhausted",
+            4: "ion source Poisson mean exceeds supported range",
+            5: "ion cleanup requires unit active counts",
+            6: "seed cohort lineage invariant violated",
+            7: (
+                "atmospheric coagulation requires valid unit ions "
+                "and a supported model environment"
+            ),
+            8: "ion attachment rate is unsupported",
+            9: ("coagulation budget exceeded; reduce timestep"),
+            10: "pair exceeds van der Waals capture table domain",
+            12: "invalid coagulation rate majorant",
+            90: "GPU process produced invalid field values",
+            91: "GPU particle-field event contract violated",
+        }
+        if failure == 9:
+            self._bindings["coagulation"].check_admission()
+        if failure in messages:
+            raise ValueError(messages[failure])
+        for observe in self._observers:
+            observe()
+        if failure >= 100:
+            raise ValueError(f"custom GPU process reported failure {failure}")
+        if failure:
+            raise ValueError(
+                "prepared nucleation failed; dependent work stopped"
+            )
 
     def snapshot(self) -> Aerosol:
         """Download detached native CPU state, preserving names and measures.
@@ -418,25 +474,48 @@ class PreparedSimulation:
                 self._fault()
                 raise
 
-    def coagulation_diagnostics(self) -> dict[str, Any]:
+    def coagulation_diagnostics(
+        self, *, include_pairs: bool = False
+    ) -> dict[str, Any]:
         """Observe compact work counts for the latest successful coagulation.
 
         Counts describe this owner since preparation/restart; fresh owners
         report zeros until a step runs. Capture recording does not advance them.
-        This observer does not download particle arrays.
+        With include_pairs=True the ordered collision log is downloaded. Each
+        adaptive pass ends at pair_end_offsets[pass, box]. Entries beyond
+        the final offset are unused. This observer never downloads particles.
         """
+        from copy import deepcopy
+
         with self._lock:
             self.synchronize()
             binding = self._bindings.get("coagulation")
             if binding is None:
                 raise ValueError("simulation has no coagulation process")
             with self._scope():
+                pairs = {}
+                if include_pairs:
+                    log = (
+                        binding.adaptive.pairs
+                        if binding.adaptive is not None
+                        else binding.collision_pairs
+                    )
+                    pairs["collision_pairs"] = log.numpy().copy()
+                if binding.adaptive is not None:
+                    return dict(
+                        binding.adaptive.diagnostics(binding),
+                        **pairs,
+                        last_rejection=deepcopy(self._last_rejection),
+                        policy_change=deepcopy(self._policy_change),
+                        allocation_bytes=self._adaptive_allocation.copy(),
+                    )
                 report = binding.budget_report.numpy().copy()
                 counts = binding.work_counts.numpy().copy()
                 accepted = binding.n_collisions.numpy().copy()
                 # Checkpoints retain collision outputs, not last-step scratch.
                 accepted[report[:, 2] == 0] = 0
                 return {
+                    **pairs,
                     "expected_trials": report[:, 0],
                     "required_trials": report[:, 1],
                     "available_trials": report[:, 2],
@@ -634,6 +713,7 @@ class PreparedSimulation:
                     self._plans = ()
                     self._auxiliary = {}
                     self._observers = []
+                    self._rollback = None
                     self._diagnostics = None
                     self._refresh = None
                     self._device_failure = None
@@ -666,6 +746,7 @@ def prepare_simulation(
     logical_box_ids: tuple[str, ...] | None = None,
     process_registry=None,
     coagulation_work_config=None,
+    coagulation_subcycling=None,
     time: float = 0.0,
 ) -> PreparedSimulation:
     """Validate the ordered process plan before uploading native state."""
@@ -708,7 +789,9 @@ def prepare_simulation(
         configure_coagulation_work,
     )
 
-    plans = configure_coagulation_work(plans, coagulation_work_config)
+    plans = configure_coagulation_work(
+        plans, coagulation_work_config, coagulation_subcycling
+    )
     from particula.execution.prepared_particle_fields import (
         validate_particle_fields,
     )
@@ -733,6 +816,12 @@ def prepare_simulation(
         if logical_box_ids is not None
         else tuple(str(i) for i in range(aerosol.particles.n_boxes)),
     )
+    if any(
+        "subcycling" in p.values for p in plans if p.family == "coagulation"
+    ):
+        from particula.execution.prepared_subcycling import reserve_prepared
+
+        reserve_prepared(aerosol, plans)
     owner = PreparedSimulation._upload(
         aerosol,
         device=target,

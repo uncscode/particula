@@ -2664,6 +2664,14 @@
       "start_here": false
     },
     {
+      "source": "docs/examples/gpu/prepared/adaptive_coagulation.py",
+      "title": "Adaptive cloud coagulation on CUDA",
+      "topic": "gpu-prepared",
+      "also": ["gpu-direct"],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
       "source": "docs/examples/gpu/direct/scalable_coagulation.py",
       "title": "Native coagulation work budgets",
       "topic": "gpu-direct",

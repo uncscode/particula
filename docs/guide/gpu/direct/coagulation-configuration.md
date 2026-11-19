@@ -87,7 +87,7 @@ outputs. These are configurable resource budgets. A request exceeding the byte
 budget raises an actionable allocation error instead of shrinking the buffer.
 An overloaded step raises `CoagulationBudgetError` with the box, required and
 available trials, and a budget-admissible timestep. Infinite demand rejects.
-No collision demand is silently clipped, and no automatic subcycling is used.
+The fixed-step API rejects the whole call on excess demand.
 A smaller admitted timestep still requires a separate convergence study.
 
 Preflight returns active counts, unordered pair evaluations, expected/required
@@ -138,3 +138,22 @@ uploads a dimensionless dielectric geometry table. The exact tiled maximum
 and the sampler use the same fp64 pair calculation. An out-of-domain pair
 rejects the step before collision outputs, particle storage or RNG change.
 [Validation and ranges](../../../contribute/validation/coagulation/van-der-waals.md)
+
+
+## Adaptive direct intervals
+
+Call `adaptive_coagulation_step_gpu(particles, temperature, pressure, time_step,
+subcycling=policy, work_config=work, rng_states=rng)` from
+`particula.gpu.kernels.coagulation`. Each call allocates interval scratch and
+returns an `AdaptiveCoagulationResult`. Its `collision_pairs` and `n_collisions`
+are device arrays for the complete interval. Per-box exclusive end offsets in
+`diagnostics["pair_end_offsets"]` divide the ordered log into passes. Caller
+supplied single-pass outputs retain the last pass. Reuse a persistent RNG
+array across calls. If a policy limit rejects after tentative merges, the call
+restores particle, RNG and supplied output arrays before raising.
+
+The direct memory reservation includes sampler scratch, history and copies of
+mutable caller storage. Original caller allocations belong to the caller.
+Prepared execution retains its buffers across steps and supports CUDA graph
+replay. The standalone resident adapter continues to run one fixed pass.
+[Prepared lifecycle and retry](../prepared.md#adaptive-coagulation-intervals)

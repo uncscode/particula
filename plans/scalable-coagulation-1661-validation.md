@@ -154,3 +154,8 @@ and placing the scalable example under `gpu-direct`. Post-merge website tests
 passed **66 Python + 15 Node tests**. The site rebuilt **597 pages** and passed
 link/API/redirect verification with zero errors. The graph validates with
 57 topics, 171 resources and 35 supporting pages.
+
+Issue #1679 adds opt-in adaptive outer intervals on top of the fixed sampler
+qualified here. The follow-up records evolving-state admission, rollback,
+exact-device retry and two 600 s CUDA runs.
+[Adaptive validation](../docs/contribute/validation/gpu/coagulation.md#adaptive-outer-intervals-on-native-cuda)

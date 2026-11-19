@@ -187,6 +187,7 @@ class RunnableABC:
         logical_box_ids=None,
         process_registry=None,
         coagulation_work_config=None,
+        coagulation_subcycling=None,
         time: float = 0.0,
     ) -> "PreparedSimulation":
         """Upload native state once and prepare supported resident GPU physics.
@@ -200,6 +201,7 @@ class RunnableABC:
             logical_box_ids: Optional stable identities in physical box order.
             process_registry: Exact-type custom GPU adapter registrations.
             coagulation_work_config: Optional coagulation resource budgets.
+            coagulation_subcycling: Optional bounded adaptive policy.
             time: Absolute initial simulation time [s].
 
         Returns:
@@ -223,6 +225,7 @@ class RunnableABC:
             logical_box_ids=logical_box_ids,
             process_registry=process_registry,
             coagulation_work_config=coagulation_work_config,
+            coagulation_subcycling=coagulation_subcycling,
             time=time,
         )
 
@@ -233,6 +236,7 @@ class RunnableABC:
         backend: "Backend | None" = None,
         device: str | None = None,
         process_registry=None,
+        retry_subcycling=None,
     ) -> "PreparedSimulation":
         """Resume exact saved state using the same process configuration.
 
@@ -241,6 +245,8 @@ class RunnableABC:
             backend: Backend.WARP by default.
             device: Exact checkpoint device by default; migration rejects.
             process_registry: Compatible caller-supplied GPU implementations.
+            retry_subcycling: Explicitly relax a saved adaptive coagulation
+                policy while retaining the outer timestep and random streams.
 
         Returns:
             A new owner preserving state, RNG words, timestep and counters.
@@ -260,6 +266,7 @@ class RunnableABC:
             backend=Backend.WARP if backend is None else backend,
             device=device,
             process_registry=process_registry,
+            retry_subcycling=retry_subcycling,
         )
 
     def __or__(self, other: "RunnableABC") -> "RunnableSequence":
@@ -421,6 +428,7 @@ class RunnableSequence:
         logical_box_ids=None,
         process_registry=None,
         coagulation_work_config=None,
+        coagulation_subcycling=None,
         time: float = 0.0,
     ) -> "PreparedSimulation":
         """Upload native state once and prepare supported resident GPU physics.
@@ -434,6 +442,7 @@ class RunnableSequence:
             logical_box_ids: Optional stable identities in physical box order.
             process_registry: Exact-type custom GPU adapter registrations.
             coagulation_work_config: Optional coagulation resource budgets.
+            coagulation_subcycling: Optional bounded adaptive policy.
             time: Absolute initial simulation time [s].
 
         Returns:
@@ -457,6 +466,7 @@ class RunnableSequence:
             logical_box_ids=logical_box_ids,
             process_registry=process_registry,
             coagulation_work_config=coagulation_work_config,
+            coagulation_subcycling=coagulation_subcycling,
             time=time,
         )
 
@@ -467,6 +477,7 @@ class RunnableSequence:
         backend: "Backend | None" = None,
         device: str | None = None,
         process_registry=None,
+        retry_subcycling=None,
     ) -> "PreparedSimulation":
         """Resume exact saved state using the same process configuration.
 
@@ -475,6 +486,8 @@ class RunnableSequence:
             backend: Backend.WARP by default.
             device: Exact checkpoint device by default; migration rejects.
             process_registry: Compatible caller-supplied GPU implementations.
+            retry_subcycling: Explicitly relax a saved adaptive coagulation
+                policy while retaining the outer timestep and random streams.
 
         Returns:
             A new owner preserving state, RNG words, timestep and counters.
@@ -494,6 +507,7 @@ class RunnableSequence:
             backend=Backend.WARP if backend is None else backend,
             device=device,
             process_registry=process_registry,
+            retry_subcycling=retry_subcycling,
         )
 
     def __or__(self, process: RunnableABC) -> "RunnableSequence":

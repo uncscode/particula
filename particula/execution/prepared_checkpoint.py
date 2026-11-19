@@ -95,6 +95,62 @@ def _host_state(resident, primary) -> Aerosol:
     )
 
 
+def _restore_work_policy(plans, saved):
+    """Recover the exact sampler and optional adaptive controller versions."""
+    from particula.execution.prepared_processes import (
+        _ProcessPlan,
+        configure_coagulation_work,
+    )
+    from particula.gpu.kernels._coagulation_budget import CoagulationWorkConfig
+
+    saved_coagulation = [
+        p
+        for p in saved.processes
+        if type(p) is _ProcessPlan and p.family == "coagulation"
+    ]
+    work_config = None
+    policy = None
+    if saved_coagulation:
+        values = saved_coagulation[0].values
+        if values.get("coagulation_sampler_version") != 1:
+            raise ValueError("incompatible coagulation sampler checkpoint")
+        work_config = CoagulationWorkConfig(
+            max_trials_per_box=values["max_trials_per_box"],
+            max_collision_buffer_bytes=values["max_collision_buffer_bytes"],
+        )
+        if "subcycling" in values:
+            from particula.gpu.kernels.coagulation import (
+                CoagulationSubcyclingConfig,
+            )
+
+            version, *settings = values["subcycling"]
+            if version != 1:
+                raise ValueError(
+                    "incompatible coagulation subcycling checkpoint"
+                )
+            policy = CoagulationSubcyclingConfig(*settings)
+            from particula.gpu.kernels._coagulation_subcycling import (
+                adaptive_capacity,
+            )
+
+            dimensions = saved.resident.dimensions
+            capacity = adaptive_capacity(
+                dimensions.n_boxes,
+                dimensions.n_particles,
+                work_config.max_collision_buffer_bytes,
+            )
+            if any(
+                item.capacity != capacity
+                for item in saved.resident.payloads
+                if item.family == "coagulation"
+                and item.role == "collision_pairs"
+            ):
+                raise ValueError(
+                    "adaptive checkpoint collision capacity differs"
+                )
+    return configure_coagulation_work(plans, work_config, policy)
+
+
 def _preflight(processes, saved, backend, device, process_registry=None):
     """Reject schema/configuration/device drift before any allocation/upload."""
     from particula._cpu_batch import duration
@@ -156,26 +212,7 @@ def _preflight(processes, saved, backend, device, process_registry=None):
         else _plan_process(p, host)
         for p in processes
     )
-    from particula.execution.prepared_processes import (
-        configure_coagulation_work,
-    )
-    from particula.gpu.kernels._coagulation_budget import CoagulationWorkConfig
-
-    saved_coagulation = [
-        p
-        for p in saved.processes
-        if type(p) is _ProcessPlan and p.family == "coagulation"
-    ]
-    work_config = None
-    if saved_coagulation:
-        values = saved_coagulation[0].values
-        if values.get("coagulation_sampler_version") != 1:
-            raise ValueError("incompatible coagulation sampler checkpoint")
-        work_config = CoagulationWorkConfig(
-            max_trials_per_box=values["max_trials_per_box"],
-            max_collision_buffer_bytes=values["max_collision_buffer_bytes"],
-        )
-    plans = configure_coagulation_work(plans, work_config)
+    plans = _restore_work_policy(plans, saved)
     from particula.execution.prepared_particle_fields import (
         validate_particle_fields,
     )
@@ -317,12 +354,13 @@ def _restore_after_binding(owner, saved):
     )
     if saved.clock is not None:
         payloads += (saved.clock,)
+    staging_device = (
+        "cpu" if owner._rollback is not None else owner.device.native
+    )
     for item in payloads:
         target = targets[item.family, item.role]
         values = np.frombuffer(item.data, dtype=item.dtype).reshape(item.shape)
-        source = wp.array(
-            values, dtype=target.dtype, device=owner.device.native
-        )
+        source = wp.array(values, dtype=target.dtype, device=staging_device)
         staging.append(source)
         wp.copy(target, source)
     # Existing restart restores RNG words. Compilation acquires the exact
@@ -337,6 +375,7 @@ def resume_simulation(
     backend: Backend = Backend.WARP,
     device: str | None = None,
     process_registry=None,
+    retry_subcycling=None,
 ):
     """Restore owned arrays and counters on the exact checkpoint device."""
     from particula.execution.checkpoint import restart_resident_session
@@ -345,7 +384,50 @@ def resume_simulation(
     target, dt, plans, host = _preflight(
         processes, saved, backend, device, process_registry
     )
+    if retry_subcycling is not None:
+        from dataclasses import replace
+
+        from particula.gpu.kernels.coagulation import (
+            CoagulationSubcyclingConfig,
+        )
+
+        if not isinstance(retry_subcycling, CoagulationSubcyclingConfig):
+            raise TypeError("expected CoagulationSubcyclingConfig")
+        index = next(
+            (i for i, p in enumerate(plans) if p.family == "coagulation"), None
+        )
+        if index is None or "subcycling" not in plans[index].values:
+            raise ValueError("retry requires an adaptive checkpoint")
+        values = plans[index].values
+        _, minimum, passes, ceiling = values["subcycling"]
+        if (
+            retry_subcycling.min_substep > minimum
+            or retry_subcycling.max_subcycles < passes
+            or retry_subcycling.max_device_bytes < ceiling
+        ):
+            raise ValueError("retry may only relax the subcycling limits")
+        values["subcycling"] = (
+            1,
+            retry_subcycling.min_substep,
+            retry_subcycling.max_subcycles,
+            retry_subcycling.max_device_bytes,
+        )
+        plans = tuple(
+            replace(p, parameters=tuple(values.items())) if i == index else p
+            for i, p in enumerate(plans)
+        )
+    if any(
+        "subcycling" in p.values for p in plans if p.family == "coagulation"
+    ):
+        from particula.execution.prepared_subcycling import reserve_prepared
+
+        reserve_prepared(host, plans)
     owner = PreparedSimulation._empty(target, dt)
+    if retry_subcycling is not None:
+        owner._policy_change = {
+            "previous": (minimum, passes, ceiling),
+            "current": values["subcycling"][1:],
+        }
     owner._initial_time = saved.initial_time
     try:
         with owner._scope():
