@@ -110,6 +110,22 @@ def test_package_staging_does_not_require_example_inputs(release, tmp_path):
     assert not (destination / "docs").exists()
 
 
+def test_coupled_cpu_stages_only_test_and_study_fixture(release, tmp_path):
+    """Exercise the original feedstock boundary without checkout imports."""
+    destination = tmp_path / "inputs"
+    release.stage_test_inputs(SCRIPTS.parent, destination, "coupled-cpu")
+    assert {
+        path.relative_to(destination).as_posix()
+        for path in destination.rglob("*")
+        if path.is_file()
+    } == {
+        "conftest.py",
+        "pyproject.toml",
+        "scripts/gpu_studies/cases.py",
+        "particula/execution/tests/gpu_coupled_test.py",
+    }
+
+
 def test_unknown_suite_rejects_before_staging(release, source, tmp_path):
     """Direct staging callers cannot silently select an unintended suite."""
     destination = tmp_path / "inputs"

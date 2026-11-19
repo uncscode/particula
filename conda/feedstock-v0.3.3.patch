@@ -1,0 +1,38 @@
+--- a/recipe/meta.yaml
++++ b/recipe/meta.yaml
+@@ -12,5 +12,5 @@
+   number: 0
+   noarch: python
+-  script: {{ PYTHON }} -m pip install . -vv
++  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+
+ requirements:
+@@ -18,5 +18,5 @@
+     - python {{ python_min }}
+     - pip
+-    - flit-core >=3.2,<4
++    - flit-core >=3.12,<4
+   run:
+     - warp-lang
+@@ -33,8 +33,18 @@
+   source_files:
+     - particula
++    - pyproject.toml
++    - conftest.py
++    - scripts/run_release_tests.py
++    - scripts/gpu_studies/cases.py
++    - docs/examples/processes/dilution/cpu_dilution.py
++    - docs/examples/processes/nucleation/cpu_nucleation.py
++    - docs/examples/processes/condensation/condensation_latent_heat.py
++    - examples_tests/dilution_example_test.py
++    - examples_tests/nucleation_example_test.py
++    - examples_tests/condensation_latent_heat_example_test.py
+   commands:
+-    - pip check
+-    - python -c "import particula; print(particula.__version__)"
+-    - pytest -W error -W "ignore::pytest.PytestUnknownMarkWarning" -m "not slow and not performance"
++    - python scripts/run_release_tests.py --installed
++    - python scripts/run_release_tests.py --installed --suite examples
++    - python scripts/run_release_tests.py --installed --suite coupled-cpu
+
+ about:

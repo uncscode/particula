@@ -19,7 +19,12 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-from run_release_tests import CPU_EXAMPLE_TESTS, CPU_EXAMPLES
+from run_release_tests import (
+    COUPLED_FIXTURE,
+    COUPLED_TEST,
+    CPU_EXAMPLE_TESTS,
+    CPU_EXAMPLES,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 VERSION_PATH = "particula/__init__.py"
@@ -35,6 +40,8 @@ RELEASE_PATHS = {
     "particula_docs.py",
     "conftest.py",
     "particula/conftest.py",
+    COUPLED_FIXTURE,
+    COUPLED_TEST,
     *CPU_EXAMPLES,
     *CPU_EXAMPLE_TESTS,
 }
@@ -134,6 +141,7 @@ def stage_source(source: Path, destination: Path) -> None:
         "license",
         "conftest.py",
         "scripts/run_release_tests.py",
+        COUPLED_FIXTURE,
         *CPU_EXAMPLES,
         *CPU_EXAMPLE_TESTS,
     ):
