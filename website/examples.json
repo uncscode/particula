@@ -995,5 +995,20 @@
     "render_functions": [
       "plot_results"
     ]
+  },
+  "nacl-scavenging": {
+    "title": "What passes through a 100 nm mobility channel?",
+    "source": "docs/examples/processes/coagulation/charge/nacl_scavenging.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 300,
+    "inputs": [
+      "docs/data/nacl-scavenging/comparison.csv",
+      "docs/data/nacl-scavenging/capture-pairs.csv",
+      "docs/data/nacl-scavenging/capture-steady.csv",
+      "docs/data/nacl-scavenging/other-kernels-steady.csv",
+      "docs/data/nacl-scavenging/pulse-kernels-summary.csv",
+      "docs/data/nacl-scavenging/pulse-smps-spectrum.csv"
+    ]
   }
 }

@@ -1,0 +1,16 @@
+{
+  "revision": "2303121c905aabdd99da6ec7e398bba89633891c",
+  "python": "3.12.12",
+  "particula": "0.3.2",
+  "warp": "1.11.1",
+  "numpy": "2.3.4",
+  "scipy": "1.16.2",
+  "device": "NVIDIA GeForce RTX 5060",
+  "production_runs": 32,
+  "box_histories": 655360,
+  "slots_per_box": 9,
+  "production_seconds": 84.41404571023304,
+  "accepted_native_collisions": 54442,
+  "accepted_added_dispersion_collisions": 8060,
+  "max_relative_steady_quadrature_change": 0.0006492187882296552
+}

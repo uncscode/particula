@@ -1,0 +1,13 @@
+{
+  "device": "NVIDIA GeForce RTX 5060",
+  "warp": "1.11.1",
+  "revision": "0c44f729125ff72909df302a07f714a2b2dc8f86",
+  "temperature_K": 293.15,
+  "pressure_Pa": 101325.0,
+  "density_kg_m3": 2160.0,
+  "hamaker_J": 8.9e-20,
+  "relative_permittivity": 5.9,
+  "rows": 168,
+  "pair_kernel_unit": "cm3/s",
+  "collector_number_cm3": 10000.0
+}

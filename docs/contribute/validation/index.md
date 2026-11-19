@@ -6,6 +6,7 @@ Results are specific to their recorded revision, workload, and device.
 
 | Question | Record |
 | --- | --- |
+| Can bipolar charge and mobility selection explain NaCl capture rates? | [NaCl chamber scavenging](coagulation/nacl-scavenging.md) |
 | How accurately does the slip law recover a dry PSL diameter? | [Mobility sizing against 49 published measurements](transport/psl-mobility.md) |
 | How well does direct BAT reproduce the published activity curves? | [Binary BAT reference checks](thermodynamics/bat-activity.md) |
 | How well does BAT reproduce measured citric acid water activity? | [Citric acid droplet hygroscopicity](thermodynamics/citric-acid-comparison.md) |

@@ -1,0 +1,212 @@
+{
+  "revision": "05fa6412f988b6575081b2b737b2abcb188eea14",
+  "device": "NVIDIA GeForce RTX 5060",
+  "warp": "1.11.1",
+  "numpy": "2.3.4",
+  "python": "3.12.12",
+  "models": {
+    "bare": [
+      0,
+      0,
+      1,
+      false,
+      0,
+      false
+    ],
+    "dispersion_only": [
+      -1,
+      8.9e-20,
+      1,
+      false,
+      0,
+      false
+    ],
+    "polarization_only": [
+      -1,
+      0,
+      5.9,
+      false,
+      0,
+      false
+    ],
+    "full": [
+      -1,
+      8.9e-20,
+      5.9,
+      false,
+      0,
+      false
+    ],
+    "full_settling": [
+      -1,
+      8.9e-20,
+      5.9,
+      true,
+      0,
+      false
+    ],
+    "full_settling_shear_10": [
+      -1,
+      8.9e-20,
+      5.9,
+      true,
+      10,
+      false
+    ],
+    "full_ao2008_0.01": [
+      -1,
+      8.9e-20,
+      5.9,
+      false,
+      0,
+      true
+    ],
+    "full_shear_0.001": [
+      -1,
+      8.9e-20,
+      5.9,
+      false,
+      0.001,
+      false
+    ],
+    "full_shear_0.1": [
+      -1,
+      8.9e-20,
+      5.9,
+      false,
+      0.1,
+      false
+    ],
+    "full_shear_1": [
+      -1,
+      8.9e-20,
+      5.9,
+      false,
+      1.0,
+      false
+    ],
+    "full_shear_10": [
+      -1,
+      8.9e-20,
+      5.9,
+      false,
+      10.0,
+      false
+    ],
+    "fuchs_neutral": [
+      -2,
+      0,
+      1,
+      false,
+      0,
+      false
+    ],
+    "dyachkov": [
+      1,
+      0,
+      1,
+      false,
+      0,
+      false
+    ],
+    "gatti": [
+      2,
+      0,
+      1,
+      false,
+      0,
+      false
+    ],
+    "gopalakrishnan": [
+      3,
+      0,
+      1,
+      false,
+      0,
+      false
+    ],
+    "chahl": [
+      4,
+      0,
+      1,
+      false,
+      0,
+      false
+    ],
+    "bare_neutral": [
+      0,
+      0,
+      1,
+      false,
+      0,
+      false
+    ],
+    "dyachkov_neutral": [
+      1,
+      0,
+      1,
+      false,
+      0,
+      false
+    ],
+    "gatti_neutral": [
+      2,
+      0,
+      1,
+      false,
+      0,
+      false
+    ],
+    "gopalakrishnan_neutral": [
+      3,
+      0,
+      1,
+      false,
+      0,
+      false
+    ],
+    "chahl_neutral": [
+      4,
+      0,
+      1,
+      false,
+      0,
+      false
+    ]
+  },
+  "refined": [
+    "bare",
+    "dispersion_only",
+    "full",
+    "full_settling_shear_10",
+    "gatti"
+  ],
+  "seeds": [
+    103,
+    227,
+    431,
+    653
+  ],
+  "reps_per_condition": 2048,
+  "targets_nm": [
+    3.6,
+    3.7,
+    4.0,
+    5.0,
+    10.0
+  ],
+  "slots": 9,
+  "loaded_cm3": 10000.0,
+  "duration_s": 300,
+  "steps_s": [
+    5.0,
+    2.5
+  ],
+  "origin": "source-off pulse",
+  "fitted_tracer_log_slope": 11.982880538506345,
+  "runs": 208,
+  "box_histories": 2555904,
+  "accepted_collisions": 246920,
+  "seconds": 56.96754205459729,
+  "mass_charge_number_checks": true
+}
