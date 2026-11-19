@@ -66,3 +66,5 @@ additional geometric constraint and must agree with the requested panel shape.
 The gallery's full-brightness PNGs double as publication downloads. On the
 website, switch between light and dark mode to compare the same file at full
 and 80% opacity. The PDF recipe above retains vector lines and text.
+
+![The square size-distribution plot in the light and dark website themes.](../../images/plotting/website-themes.webp)
