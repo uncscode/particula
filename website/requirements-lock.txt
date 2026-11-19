@@ -17,7 +17,7 @@ fastjsonschema==2.21.2
 flexcache==0.3
 flexparser==0.4
 fluids==1.1.0
-fonttools==4.60.1
+fonttools==4.60.2
 griffe==1.14.0
 iniconfig==2.1.0
 ipykernel==6.30.1
