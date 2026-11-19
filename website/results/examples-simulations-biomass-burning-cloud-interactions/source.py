@@ -15,6 +15,11 @@
 # %% [markdown]
 # # How do collision models change a water-grown mixed aerosol?
 #
+# The figures use a native CUDA execution with the archived scientific library
+# at revision `9c548d9d6` and the current plotting code. With the same 0.36 s
+# step, current Particula requested 644 collision trials when 630 were
+# available. The historical run retains the published interval and branches.
+#
 # A mixed aerosol can change size through water exchange and through collisions.
 # How can we compare collision assumptions without confusing them with different
 # starting populations? This example gives four scenarios copies of the same
@@ -37,6 +42,7 @@ import copy
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from particula import plotting
 from particula.dynamics.condensation.species_mapping import (
     CondensationSpeciesMap,
 )
@@ -49,22 +55,10 @@ from particula.execution.gpu_resident_condensation import (
 )
 from tqdm import tqdm
 
+plt.style.use("particula.default")
+
 # plot settings
 TAILWIND = par.util.colors.TAILWIND
-base_color = TAILWIND["gray"]["600"]
-plt.rcParams.update(
-    {
-        "text.color": base_color,
-        "figure.figsize": (5, 4),
-        "font.size": 14,
-        "axes.edgecolor": base_color,
-        "axes.labelcolor": base_color,
-        "xtick.color": base_color,
-        "ytick.color": base_color,
-        "pdf.fonttype": 42,
-        "ps.fonttype": 42,
-    }
-)
 
 # %% [markdown]
 # ## Build one mixed population and one finite vapor reservoir
@@ -207,11 +201,14 @@ print("Gas species:", ", ".join(aerosol.gas.name))
 
 
 # Plot initial size distribution
-fig, ax = plt.subplots()
+fig, ax = plotting.subplots()
 ax.hist(np.log10(resolved_masses.radii[0]), bins=50, density=False, alpha=0.5)
 ax.set_xlabel("log10(Radius [m])")
 ax.set_ylabel("Bin counts")
-ax.set_title("Initial Particle Size Distribution")
+ax.set_title("Initial size distribution")
+ax.locator_params(nbins=4)
+plotting.fit(fig)
+plt.show()
 
 # %% [markdown]
 # ## Establish the shared water-grown starting state
@@ -296,21 +293,22 @@ np.testing.assert_allclose(
 concentrations = distribution_counts / simulation_volume
 
 # Contour plot of log10(number concentration)
-fig, ax = plt.subplots(figsize=(7, 5))
+fig, ax = plotting.subplots(size="wide")
 X, Y = np.meshgrid(time, edges[:-1])
 log_conc = np.log10(
     concentrations,
     where=concentrations > 0,
     out=np.full_like(concentrations, np.nan),
 )
-cont = ax.contourf(X, Y, log_conc.T)
+ax.grid(False)
+cont = ax.contourf(X, Y, log_conc.T, cmap=plotting.colormap("magnitude"))
 
 ax.set_yscale("log")
 ax.set_ylim(1e-7, 1e-5)
 ax.set_xlabel("Time (s)")
 ax.set_ylabel("Particle Radius (m)")
 fig.colorbar(cont, label="Log₁₀ Number Concentration")
-plt.tight_layout()
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
@@ -496,7 +494,7 @@ for label, aero_obj in cases:
 
 # %%
 # 1. Create figure & axes
-fig, ax = plt.subplots(figsize=(8, 4))
+fig, ax = plotting.subplots(size="wide")
 
 # 2. Extract & clean data for each case
 centers_init, dnd_init = distributions["Initial"]
@@ -541,7 +539,7 @@ ax.plot(
     dnd_cond,
     linewidth=6,
     alpha=0.5,
-    color=TAILWIND["sky"]["800"],
+    color=plotting.COLORS["teal"],
     label="Condensation Only",
 )
 
@@ -550,7 +548,7 @@ ax.plot(
     dnd_brown,
     linewidth=2,
     linestyle="--",
-    color=TAILWIND["slate"]["100"],
+    color=plotting.COLORS["indigo"],
     label="Brownian Only",
 )
 
@@ -561,7 +559,7 @@ ax.plot(
     markersize=4,
     linewidth=5,
     alpha=1,
-    color=TAILWIND["rose"]["300"],
+    color=plotting.COLORS["berry"],
     linestyle="",
     label="with Sedimentation",
 )
@@ -571,7 +569,7 @@ ax.plot(
     dnd_turb,
     linewidth=3,
     alpha=0.75,
-    color=TAILWIND["amber"]["900"],
+    color=plotting.COLORS["rust"],
     label="with turbulent shear (ST1956)",
 )
 
@@ -583,15 +581,8 @@ ax.set_ylim(10, 3e5)
 ax.set_xlabel("Wet Diameter [µm]")
 ax.set_ylabel("dN/dlogDp [#/cm³]")
 ax.grid(alpha=0.5, which="both")
-ax.legend(
-    loc="center left",  # anchor the legend’s “center left” corner
-    bbox_to_anchor=(
-        1.02,
-        0.5,
-    ),  # (x, y) in axes coordinates: x=1.02 is just past the right edge
-    borderaxespad=0.5,  # padding between axes and legend
-)
-plt.tight_layout()
+plotting.legend(ax, borderaxespad=0.5, placement="right")
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
@@ -637,7 +628,7 @@ shear_dp = get_wet_diameters(results["TurbulentShear"])
 initial_dp = get_wet_diameters(aerosol)
 
 # 3. Plot scatter
-fig, ax = plt.subplots(figsize=(5, 4))
+fig, ax = plotting.subplots()
 
 ax.scatter(
     shear_dp,
@@ -663,9 +654,9 @@ ax.set_ylim(0, 1.0)
 ax.set_xlabel("Wet Diameter [µm]")
 ax.set_ylabel("Organic Mass Fraction")
 ax.grid(alpha=0.5, which="both")
-ax.legend(loc="upper right")
+plotting.legend(ax, loc="upper right")
 
-plt.tight_layout()
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
