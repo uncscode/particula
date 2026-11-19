@@ -333,7 +333,7 @@ def test_only_http_404_means_absence(monkeypatch, status, absent):
     assert error.closed
 
 
-def test_workflow_keeps_publication_gated_and_uses_one_artifact():
+def test_workflow_requires_same_run_tests_and_verified_artifacts():
     """Validate before any writes; run existing PyPI action in the same run."""
     workflow = yaml.safe_load(
         (
@@ -346,20 +346,37 @@ def test_workflow_keeps_publication_gated_and_uses_one_artifact():
     jobs = workflow["jobs"]
     assert jobs["pyping"]["needs"] == "release-plan"
     assert jobs["pyping"]["if"] == "needs.release-plan.outputs.build == 'true'"
-    steps = jobs["pyping"]["steps"]
-    tests = next(
-        s
-        for s in steps
-        if s.get("name") == "Validate release source before publication"
+    assert jobs["testing"]["strategy"]["matrix"]["python-version"] == [
+        "3.12",
+        "3.13",
+        "3.14",
+    ]
+    commands = [step.get("run", "") for step in jobs["testing"]["steps"]]
+    for suite in ("pytest -Werror", "pytest examples_tests"):
+        assert any(
+            suite in cmd and "not slow and not performance" in cmd
+            for cmd in commands
+        )
+    assert any("pytest scripts/tests -Werror" in cmd for cmd in commands)
+    slow = jobs["slow-examples"]
+    assert slow["needs"] == "release-plan"
+    assert slow["if"] == "needs.release-plan.outputs.publish == 'true'"
+    assert any(
+        'pytest examples_tests -Werror -m "slow and not performance"'
+        in step.get("run", "")
+        for step in slow["steps"]
     )
-    assert tests["if"] == "needs.release-plan.outputs.publish == 'true'"
-    for suite in (
-        "python -m pytest -Werror",
-        'python -m pytest examples_tests -Werror -m "not performance"',
-        "python -m pytest scripts/tests",
-    ):
-        assert suite in tests["run"]
-    assert jobs["publish"]["needs"] == ["release-plan", "pyping"]
+    # GitHub's default success() gate requires every dependency to succeed;
+    # failed, cancelled and skipped prerequisites must all block publication.
+    prerequisites = {
+        "release-plan",
+        "testing",
+        "slow-examples",
+        "pyping",
+        "validate",
+    }
+    assert set(jobs["publish"]["needs"]) == prerequisites
+    assert all(not jobs[job].get("continue-on-error") for job in prerequisites)
     assert (
         jobs["publish"]["if"]
         == "github.repository == 'uncscode/particula' && needs.release-plan.outputs.publish == 'true'"
@@ -372,6 +389,55 @@ def test_workflow_keeps_publication_gated_and_uses_one_artifact():
         < names.index("Tag the tested commit and publish the GitHub release")
         < names.index("Publish package")
     )
+    producer = jobs["validate"]
+    assert any(
+        step.get("with", {}).get("name")
+        == "${{ steps.package.outputs.artifact }}"
+        for step in producer["steps"]
+    )
+    for job in (jobs["publish"], jobs["plugin-release"]):
+        assert any(
+            step.get("with", {}).get("name")
+            == "${{ needs.validate.outputs.artifact }}"
+            for step in job["steps"]
+        )
+    verify = names.index("Verify downloaded release files")
+    assert verify < names.index("Verify any previously uploaded PyPI files")
+    assert "check PYTHON-SHA256SUMS" in publish[verify]["run"]
+    assert "check SHA256SUMS" in publish[verify]["run"]
     action = next(s for s in publish if "pypi-publish" in s.get("uses", ""))
     assert action["with"]["skip-existing"] is True
     assert action["with"]["password"] == "${{ secrets.PYPI_API_TOKEN }}"  # noqa: S105 - workflow secret reference, not a credential
+
+
+@pytest.mark.parametrize("asset", ["particula-1.2.3.tar.gz", "helper.zip"])
+def test_downloaded_assets_are_verified_before_publication(tmp_path, asset):
+    """The publisher accepts both producers' bytes and rejects a changed file."""
+    import hashlib
+
+    workflow = yaml.safe_load(
+        (
+            Path(__file__).resolve().parents[2] / ".github/workflows/pypi.yml"
+        ).read_text()
+    )
+    verify = next(
+        step["run"]
+        for step in workflow["jobs"]["publish"]["steps"]
+        if step.get("name") == "Verify downloaded release files"
+    )
+    for filename, manifest in (
+        ("particula-1.2.3.tar.gz", "PYTHON-SHA256SUMS"),
+        ("helper.zip", "SHA256SUMS"),
+    ):
+        data = filename.encode()
+        (tmp_path / filename).write_bytes(data)
+        (tmp_path / manifest).write_text(
+            f"{hashlib.sha256(data).hexdigest()}  {filename}\n"
+        )
+    bash = shutil.which("bash")
+    assert bash
+    command = [bash, "-e", "-c", verify]
+    subprocess.run(command, cwd=tmp_path, check=True)  # noqa: S603
+    (tmp_path / asset).write_bytes(b"changed")
+    result = subprocess.run(command, cwd=tmp_path, check=False)  # noqa: S603
+    assert result.returncode != 0

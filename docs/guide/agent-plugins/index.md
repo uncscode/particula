@@ -179,7 +179,7 @@ release publication. Maintainers can require the workflow's `validate` check
 in branch protection; this source change does not modify repository rules.
 
 After each successful merge build, open the latest successful `main` push in
-[Assistant plugins](https://github.com/uncscode/particula/actions/workflows/assistant-plugins.yml?query=branch%3Amain+event%3Apush)
+[Python CI and releases](https://github.com/uncscode/particula/actions/workflows/pypi.yml?query=branch%3Amain+event%3Apush)
 and follow **Download tested plugin packages** in the run summary. The artifact
 contains the Codex, Claude and OpenCode ZIPs, checksums, and `GITHUB-RELEASE.md`
 with installation instructions. Artifacts are named by version and source
