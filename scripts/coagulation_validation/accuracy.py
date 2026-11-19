@@ -67,3 +67,10 @@ if __name__ == "__main__":
             records.append(row)
             print(ratio, charges, attraction, row["relative_error"], flush=True)
             args.output.write_text(json.dumps(records, indent=2) + "\n")
+    for row in records:
+        for actual, target in zip(
+            row["production"], row["reference"], strict=True
+        ):
+            tolerance = 0.01 * target if target >= 1e-8 else 1e-10
+            if not np.isfinite(actual) or abs(actual - target) > tolerance:
+                raise SystemExit(f"capture limit outside tolerance: {row}")

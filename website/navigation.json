@@ -58,7 +58,7 @@
                 "slug": "guide/getting-started/installation"
               },
               {
-                "label": "Setup via conda",
+                "label": "Setup via\u00a0conda",
                 "slug": "guide/getting-started/installation/conda"
               },
               {
@@ -66,7 +66,7 @@
                 "slug": "guide/getting-started/installation/new-to-python"
               },
               {
-                "label": "Setup via pip",
+                "label": "Setup via\u00a0pip",
                 "slug": "guide/getting-started/installation/pip"
               },
               {
@@ -750,11 +750,11 @@
             "slug": "examples/simulations/adaptive_reservoir_depletion_cuda"
           },
           {
-            "label": "Adaptive wet–dry relaxation",
+            "label": "Adaptive wet\u2013dry relaxation",
             "slug": "examples/simulations/adaptive_cloud_relaxation"
           },
           {
-            "label": "Stiff CUDA wet–dry relaxation",
+            "label": "Stiff CUDA wet\u2013dry relaxation",
             "slug": "examples/simulations/adaptive_cloud_relaxation_cuda"
           },
           {
@@ -828,7 +828,7 @@
             "slug": "theory/dynamics/condensation-equations"
           },
           {
-            "label": "Ion–Particle Coagulation",
+            "label": "Ion\u2013Particle Coagulation",
             "slug": "theory/dynamics/ionparticle-coagulation"
           },
           {
@@ -1003,7 +1003,7 @@
             "slug": "contribute/architecture/design-patterns"
           },
           {
-            "label": "Object‑Oriented Patterns",
+            "label": "Object\u2011Oriented Patterns",
             "slug": "contribute/architecture/object-oriented-patterns"
           },
           {

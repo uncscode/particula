@@ -245,3 +245,14 @@ if __name__ == "__main__":
                 )
                 + "\n"
             )
+    # The strong unlike controls measure where the closure breaks down.
+    # Use each finest-step trajectory estimate to check the admitted cases.
+    for row in records:
+        if row["step_scale"] != 0.06:
+            continue
+        bare = row["coupling"] * np.prod(row["charges"])
+        if bare >= -0.5 and (
+            abs(row["relative_residual"]) > 0.1
+            or 2 * row["ci95_half"] / row["rate"] > 0.1
+        ):
+            raise SystemExit(f"trajectory comparison exceeds tolerance: {row}")
