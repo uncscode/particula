@@ -1046,5 +1046,28 @@
       "plot_results"
     ],
     "plot_inputs": []
+  },
+  "pi-chamber-spectra": {
+    "title": "Time-resolved wet-size spectra in the Π Chamber",
+    "source": "docs/examples/simulations/pi_chamber_spectra.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 900,
+    "inputs": [
+      "scripts/pi_chamber/retrieval.py",
+      "docs/data/pi-chamber/haze-target.json",
+      "docs/data/pi-chamber/haze-grid.csv",
+      "scripts/pi_chamber/growth.py",
+      "scripts/pi_chamber/temporal.py",
+      "docs/data/pi-chamber/restart.json"
+    ],
+    "invoke": "result = simulate()\nplot_results(result)\nplot_separation(result)\nplt.show()",
+    "data_expression": "result",
+    "replot_invoke": "result = saved_data\nplot_results(result)\nplot_separation(result)\nplt.show()",
+    "render_functions": [
+      "plot_results",
+      "plot_separation"
+    ],
+    "plot_inputs": []
   }
 }
