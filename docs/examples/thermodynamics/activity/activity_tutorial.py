@@ -38,9 +38,11 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from particula import plotting
+
+plt.style.use("particula.default")
 
 # Set plot style
-plt.style.use("seaborn-v0_8-whitegrid")
 
 # %% [markdown]
 # ## Establish an ideal mole-fraction reference
@@ -107,16 +109,16 @@ for wf in water_fractions:
     organic_activities.append(activity[1])
 
 # Plot
-fig, ax = plt.subplots(figsize=(8, 5))
+fig, ax = plotting.subplots(size="wide")
 ax.plot(water_fractions, water_activities, "b-", linewidth=2, label="Water")
 ax.plot(water_fractions, organic_activities, "r-", linewidth=2, label="Organic")
 ax.set_xlabel("Water Mass Fraction", fontsize=12)
 ax.set_ylabel("Activity", fontsize=12)
 ax.set_title("Ideal Activity (Raoult's Law)", fontsize=14)
-ax.legend(fontsize=11)
+plotting.legend(ax)
 ax.set_xlim(0, 1)
 ax.set_ylim(0, 1)
-plt.tight_layout()
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
@@ -197,7 +199,7 @@ for wf in water_fractions:
     bat_organic.append(float(bat_strategy.activity(mass_concentration=mass)))
 
 # Plot
-fig, ax = plt.subplots(figsize=(8, 5))
+fig, ax = plotting.subplots(size="wide")
 ax.plot(
     water_fractions,
     ideal_organic_comparison,
@@ -215,10 +217,10 @@ ax.plot(
 ax.set_xlabel("Water Mass Fraction", fontsize=12)
 ax.set_ylabel("Activity", fontsize=12)
 ax.set_title("Activity: Ideal vs Non-Ideal (BAT)", fontsize=14)
-ax.legend(fontsize=11)
+plotting.legend(ax)
 ax.set_xlim(0, 1)
 ax.set_ylim(0, 1)
-plt.tight_layout()
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
@@ -235,7 +237,7 @@ plt.show()
 o2c_values = [0.1, 0.3, 0.5, 0.7]
 water_fractions = np.linspace(0.1, 0.9, 40)
 
-fig, ax = plt.subplots(figsize=(8, 5))
+fig, ax = plotting.subplots(size="wide")
 
 # Ideal reference (organic activity)
 ideal_organic = [
@@ -245,7 +247,7 @@ ideal_organic = [
 ax.plot(water_fractions, ideal_organic, "k--", linewidth=1.5, label="Ideal")
 
 # BAT at different O:C ratios (returns organic activity)
-colors = plt.colormaps["viridis"](np.linspace(0.2, 0.8, len(o2c_values)))
+colors = plotting.colormap("magnitude")(np.linspace(0.2, 0.8, len(o2c_values)))
 for o2c, color in zip(o2c_values, colors):
     strat = (
         par.particles.ActivityNonIdealBinaryBuilder()
@@ -270,10 +272,10 @@ for o2c, color in zip(o2c_values, colors):
 ax.set_xlabel("Water Mass Fraction", fontsize=12)
 ax.set_ylabel("Organic Activity", fontsize=12)
 ax.set_title("Effect of O:C Ratio on Organic Activity (BAT Model)", fontsize=14)
-ax.legend(fontsize=10, loc="lower right")
+plotting.legend(ax, loc="lower right")
 ax.set_xlim(0, 1)
 ax.set_ylim(bottom=0)  # Non-ideal activity may exceed one.
-plt.tight_layout()
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
@@ -329,9 +331,11 @@ for water_frac in [0.3, 0.5, 0.7, 0.9]:
 kappa_values = [0.1, 0.3, 0.61, 1.0]
 water_fractions = np.linspace(0.2, 0.95, 40)
 
-fig, ax = plt.subplots(figsize=(8, 5))
+fig, ax = plotting.subplots(size="wide")
 
-colors = plt.colormaps["plasma"](np.linspace(0.2, 0.8, len(kappa_values)))
+colors = plotting.colormap("magnitude")(
+    np.linspace(0.2, 0.8, len(kappa_values))
+)
 for kappa, color in zip(kappa_values, colors):
     strat = par.particles.ActivityKappaParameter(
         kappa=np.array([0.0, kappa]),
@@ -355,10 +359,10 @@ for kappa, color in zip(kappa_values, colors):
 ax.set_xlabel("Water Mass Fraction", fontsize=12)
 ax.set_ylabel("Water Activity", fontsize=12)
 ax.set_title("Effect of Kappa on Water Activity", fontsize=14)
-ax.legend(fontsize=11)
+plotting.legend(ax)
 ax.set_xlim(0, 1)
 ax.set_ylim(0, 1)
-plt.tight_layout()
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
@@ -438,7 +442,7 @@ for rh in rh_values:
     water_contents.append(res.alpha_phase.water_concentration)
 
 # Plot
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4.5))
+fig, (ax1, ax2) = plotting.subplots(1, 2, size="wide")
 
 ax1.plot(rh_values * 100, mean_partitions, "b-", linewidth=2)
 ax1.set_xlabel("Relative Humidity (%)", fontsize=12)
@@ -452,7 +456,7 @@ ax2.set_ylabel("Water Content ($\\mu$g/m$^3$)", fontsize=12)
 ax2.set_title("Water Uptake vs RH", fontsize=14)
 ax2.set_xlim(30, 100)
 
-plt.tight_layout()
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]

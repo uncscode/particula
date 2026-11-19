@@ -49,6 +49,8 @@ import time
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from matplotlib import style as mplstyle
+from particula import plotting
 from particula.dynamics.properties.wall_loss_coefficient import (
     get_spherical_wall_loss_coefficient_via_system_state as beta_cpu,
 )
@@ -293,9 +295,10 @@ def simulate():
 # Carlo intervals, often smaller than the symbols. Everything is synthetic.
 # The figure is generated from the saved report; replotting needs no GPU.
 # %%
+@mplstyle.context("particula.default")
 def plot_results(report):
     """Plot retained numerical predictions without advancing a simulation."""
-    fig, axes = plt.subplots(1, 3, figsize=(12, 3.8), sharey=True)
+    fig, axes = plotting.subplots(1, 3, sharey=True)
     for ax, ke in zip(axes, [0.36, 3.6, 36.0]):
         sub = [
             r
@@ -307,13 +310,13 @@ def plot_results(report):
             ds,
             [r["survival_reference"] for r in sub],
             label="Coupled theory",
-            color="#156b89",
+            color=plotting.COLORS["teal"],
         )
         ax.semilogx(
             ds,
             [r["survival_additive"] for r in sub],
             label="Additive limits",
-            color="#c25227",
+            color=plotting.COLORS["rust"],
             ls="--",
         )
         rr = [
@@ -336,11 +339,11 @@ def plot_results(report):
         ax.grid(alpha=0.2)
         ax.set_ylim(0, 1)
     axes[0].set_ylabel("Surviving fraction after 1 hour")
-    axes[1].legend(fontsize=8, loc="lower left")
+    plotting.legend(axes[1], loc="lower left")
     fig.suptitle(
         "CUDA wall loss agrees with spherical deposition theory", fontsize=12
     )
-    fig.tight_layout()
+    plotting.fit(fig)
     return fig
 
 

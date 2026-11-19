@@ -5,11 +5,14 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import style as mplstyle
+from particula import plotting
 
 DOCS = Path(__file__).resolve().parents[2] / "docs"
 BASE = DOCS / "data/thermodynamics/bat-ccn"
 
 
+@mplstyle.context("particula.default")
 def main():
     """Compare the 30 published model–measurement pairs."""
     with (BASE / "figure12-measurements.csv").open(encoding="utf-8") as stream:
@@ -33,10 +36,15 @@ def main():
             f"bias={residual.mean():+.6f}  slope={slope:.6f}  "
             f"centered R²={r2:.6f}"
         )
-    fig, ax = plt.subplots(figsize=(6.4, 5.2), layout="constrained")
+    fig, ax = plotting.subplots()
     for flags, label, color, marker in (
-        (~validation, "Other published records", "#466d81", "o"),
-        (validation, "Authors’ validation subset", "#aa4b25", "s"),
+        (~validation, "Other published records", plotting.COLORS["teal"], "o"),
+        (
+            validation,
+            "Authors’ validation subset",
+            plotting.COLORS["rust"],
+            "s",
+        ),
     ):
         ax.scatter(
             x[flags],
@@ -71,8 +79,12 @@ def main():
         ylabel="Published BAT CCN hygroscopicity, κ",
         aspect="equal",
     )
-    ax.legend(frameon=False, fontsize=9)
-    fig.savefig(DOCS / "images/thermodynamics/bat-ccn-figure12.png", dpi=180)
+    low = min(*ax.get_xlim(), *ax.get_ylim())
+    high = max(*ax.get_xlim(), *ax.get_ylim())
+    ax.set(xlim=(low, high), ylim=(low, high))
+    plotting.legend(ax, frameon=False)
+    plotting.fit(fig)
+    fig.savefig(DOCS / "images/thermodynamics/bat-ccn-figure12.png", dpi=300)
     plt.close(fig)
 
 

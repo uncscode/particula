@@ -34,6 +34,8 @@ from dataclasses import dataclass
 from typing import Any
 
 import numpy as np
+from matplotlib import style as mplstyle
+from particula import plotting
 from particula.gas import GasData
 from particula.gpu import (
     WARP_AVAILABLE,
@@ -382,6 +384,7 @@ def run_example(device: str = "cpu") -> ExampleRun:
 
 
 # %%
+@mplstyle.context("particula.default")
 def run_publication():
     """Require CUDA, execute the complete example and plot physical outputs."""
     import matplotlib.pyplot as plt
@@ -393,7 +396,7 @@ def run_publication():
     result = run_example(device="cuda:0")
     if result.particle_data is None:
         raise RuntimeError("CUDA produced no particle snapshot")
-    fig, axes = plt.subplots(1, 2, figsize=(9, 3.6), constrained_layout=True)
+    fig, axes = plotting.subplots(1, 2)
     slots = np.arange(initial.n_particles) + 1
     for particles, label, marker in (
         (initial, "Initial", "o"),
@@ -403,15 +406,16 @@ def run_publication():
         radius_nm = np.cbrt(3 * volume / (4 * np.pi)) * 1e9
         axes[0].plot(slots, radius_nm, marker=marker, label=label)
     axes[0].set(xlabel="Particle slot", ylabel="Radius (nm)", xticks=slots)
-    axes[0].legend()
+    plotting.legend(axes[0])
     transfer = result.total_mass_transfer.numpy()[0, :, 0]
-    axes[1].bar(slots, transfer * 1e21, color="#287a90")
+    axes[1].bar(slots, transfer * 1e21, color=plotting.COLORS["teal"])
     axes[1].set(
         xlabel="Particle slot", ylabel="Last-call mass gain (ag)", xticks=slots
     )
     fig.suptitle("Direct condensation · " + wp.get_device("cuda:0").name)
     print("\n".join(result.output))
     print("Last-call signed latent energy (J):", result.energy_transfer.numpy())
+    plotting.fit(fig)
     plt.show()
     return result
 

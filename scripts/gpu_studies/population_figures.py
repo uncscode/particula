@@ -1,30 +1,27 @@
 """Readable dynamics figures and data-derived descriptions for box ensembles."""
 
-import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import style as mplstyle
+from particula import plotting
 
 
+@mplstyle.context("particula.default")
 def _facets(labels, title, width=4):
     """Use one condition per panel so legends never encode nineteen curves."""
     height = (len(labels) + width - 1) // width
-    fig, axes = plt.subplots(
-        height,
-        width,
-        figsize=(13, 2.5 * height),
-        constrained_layout=True,
-        squeeze=False,
-    )
+    fig, axes = plotting.subplots(height, width, squeeze=False)
     for i, ax in enumerate(axes.flat):
         if i >= len(labels):
             ax.set_visible(False)
         else:
-            ax.set_title(labels[i], fontsize=9)
-            ax.tick_params(labelsize=8)
+            ax.set_title(labels[i], fontsize=12)
+            ax.tick_params(labelsize=12)
             ax.grid(alpha=0.15)
     fig.suptitle(title)
     return fig, axes.flat
 
 
+@mplstyle.context("particula.default")
 def population_figures(report, labels, *, time_scale=1.0, time_unit="s"):
     """Plot overview, size spectra, charge evolution and cumulative mergers.
 
@@ -42,7 +39,7 @@ def population_figures(report, labels, *, time_scale=1.0, time_unit="s"):
     quantiles = (
         np.array([r["pooled_diameter_quantiles"] for r in history]) * 1e9
     )
-    fig, axes = plt.subplots(2, 2, figsize=(11, 7), constrained_layout=True)
+    fig, axes = plotting.subplots(2, 2, size="wide")
     ax = axes[0, 0]
     ax.plot(shown_time, mergers, marker=".")
     ax.set(
@@ -72,7 +69,7 @@ def population_figures(report, labels, *, time_scale=1.0, time_unit="s"):
         ylabel="Diameter [nm]",
         title="Number quantiles · all conditions pooled",
     )
-    axes[1, 0].legend()
+    plotting.legend(axes[1, 0])
     categories = [
         lambda q: q == 0,
         lambda q: abs(q) == 1,
@@ -91,9 +88,10 @@ def population_figures(report, labels, *, time_scale=1.0, time_unit="s"):
         ylabel="Current particles [%]",
         title="Charge-state fractions · all boxes pooled",
     )
-    axes[1, 1].legend()
+    plotting.legend(axes[1, 1])
     fig.suptitle(f"Dynamics overview · {initial:,} initial aerosols")
 
+    plotting.fit(fig)
     fig, axes = _facets(labels, "Size distributions over time")
     sample = sorted(set([0, 1, len(history) // 2, len(history) - 1]))
     edges = np.array(report["diameter_edges"])
@@ -116,6 +114,7 @@ def population_figures(report, labels, *, time_scale=1.0, time_unit="s"):
     handles, legend = fig.axes[0].get_legend_handles_labels()
     fig.legend(handles, legend, loc="outside lower center", ncols=4)
 
+    plotting.fit(fig)
     fig, axes = _facets(
         labels, "Charge population changes · aerosol population"
     )
@@ -149,6 +148,7 @@ def population_figures(report, labels, *, time_scale=1.0, time_unit="s"):
     handles, legend = fig.axes[0].get_legend_handles_labels()
     fig.legend(handles, legend, loc="outside lower center", ncols=5)
 
+    plotting.fit(fig)
     fig, axes = _facets(
         labels, "Sampled cumulative mergers · markers are observations"
     )
@@ -157,6 +157,7 @@ def population_figures(report, labels, *, time_scale=1.0, time_unit="s"):
             break
         ax.plot(shown_time, number[0, i] - number[:, i], marker=".")
         ax.set(xlabel=f"Time [{time_unit}]", ylabel="Accepted mergers = N₀ − N")
+    plotting.fit(fig)
     return number
 
 
@@ -217,6 +218,7 @@ def ion_figures(report, labels):
         loc="outside lower center",
         ncols=2,
     )
+    plotting.fit(fig)
     fig, axes = _facets(
         labels, "Cumulative ion events · balances checked against material mass"
     )
@@ -255,3 +257,4 @@ def ion_figures(report, labels):
         "recombination removes two free ions and creates one "
         "inert neutral product."
     )
+    plotting.fit(fig)

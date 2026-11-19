@@ -35,9 +35,10 @@
 import argparse
 from dataclasses import replace
 
-import matplotlib.pyplot as plt
 import numpy as np
 import warp as wp
+from matplotlib import style as mplstyle
+from particula import plotting
 from scripts.gpu_studies.lucky_few import (
     SurvivalConfig,
     difference_interval,
@@ -187,9 +188,10 @@ def run_example(config=None, policies=("lower", "upper")):
     return results
 
 
+@mplstyle.context("particula.default")
 def plot_results(results):
     """Plot reduced lineage summaries; no particle states are downloaded."""
-    figure, axes = plt.subplots(1, 3, figsize=(14, 4), constrained_layout=True)
+    figure, axes = plotting.subplots(1, 3)
     labels, final = [], []
     for index, result in enumerate(results):
         config = result["config"]
@@ -215,16 +217,17 @@ def plot_results(results):
         axes[2].bar(labels, final[:, index], bottom=bottom, label=name)
         bottom += final[:, index]
     axes[0].set(xlabel="Time [h]", ylabel="Fraction reaching 50 nm")
-    axes[0].legend(title="Omitted K [m³/s]", fontsize=8, title_fontsize=8)
+    plotting.legend(axes[0], title="Omitted K [m³/s]", title_fontsize=12)
     axes[1].set(
         xticks=np.arange(len(labels)),
         xticklabels=labels,
         ylabel="Success fraction with exact 95% interval",
     )
     axes[2].set(ylabel="Fraction of original seed lineages", ylim=(0, 1))
-    axes[2].legend(fontsize=8)
+    plotting.legend(axes[2])
     for axis in axes[1:]:
         axis.tick_params(axis="x", rotation=30)
+    plotting.fit(figure)
     return figure
 
 

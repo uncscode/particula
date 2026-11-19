@@ -45,7 +45,10 @@ Example:
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from particula import plotting
 from scipy.integrate import trapezoid
+
+plt.style.use("particula.default")
 
 # %% [markdown]
 # ## Match a target population, not every individual radius
@@ -314,13 +317,13 @@ number_resolved = np.array(number_resolved)
 # so a concentration mismatch would change the experiment itself.
 
 # %%
-fig, ax = plt.subplots(figsize=(10, 6))
+fig, ax = plotting.subplots(size="wide")
 
 ax.plot(
     times,
     number_pmf,
     "o-",
-    color="tab:blue",
+    color=plotting.COLORS["teal"],
     label="PMF (discrete)",
     markersize=6,
 )
@@ -328,7 +331,7 @@ ax.plot(
     times,
     number_pdf,
     "s-",
-    color="tab:orange",
+    color=plotting.COLORS["rust"],
     label="PDF (continuous)",
     markersize=6,
 )
@@ -336,7 +339,7 @@ ax.plot(
     times,
     number_resolved,
     "^-",
-    color="tab:green",
+    color=plotting.COLORS["indigo"],
     label="Particle-resolved",
     markersize=6,
 )
@@ -344,7 +347,7 @@ ax.plot(
 ax.set_xlabel("Time (s)")
 ax.set_ylabel(r"Total number concentration (m$^{-3}$)")
 ax.set_title("Coagulation time evolution: PMF vs PDF vs Particle-resolved")
-ax.legend()
+plotting.legend(ax)
 ax.grid(alpha=0.3)
 
 # Add secondary x-axis for time in hours
@@ -354,7 +357,7 @@ ax2.set_xticks(np.arange(0, 7201, 1800))
 ax2.set_xticklabels([f"{t / 3600:.1f}" for t in np.arange(0, 7201, 1800)])
 ax2.set_xlabel("Time (hours)")
 
-plt.tight_layout()
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
@@ -368,13 +371,13 @@ plt.show()
 
 # %%
 # Normalize to initial concentration for easier comparison
-fig, ax = plt.subplots(figsize=(10, 6))
+fig, ax = plotting.subplots(size="wide")
 
 ax.plot(
     times,
     number_pmf / number_pmf[0],
     "o-",
-    color="tab:blue",
+    color=plotting.COLORS["teal"],
     label="PMF (discrete)",
     markersize=6,
 )
@@ -382,7 +385,7 @@ ax.plot(
     times,
     number_pdf / number_pdf[0],
     "s-",
-    color="tab:orange",
+    color=plotting.COLORS["rust"],
     label="PDF (continuous)",
     markersize=6,
 )
@@ -390,7 +393,7 @@ ax.plot(
     times,
     number_resolved / number_resolved[0],
     "^-",
-    color="tab:green",
+    color=plotting.COLORS["indigo"],
     label="Particle-resolved",
     markersize=6,
 )
@@ -398,7 +401,7 @@ ax.plot(
 ax.set_xlabel("Time (s)")
 ax.set_ylabel("Normalized number concentration (N/N0)")
 ax.set_title("Normalized coagulation decay: PMF vs PDF vs Particle-resolved")
-ax.legend()
+plotting.legend(ax)
 ax.grid(alpha=0.3)
 
 # Add secondary x-axis for time in hours
@@ -408,7 +411,7 @@ ax2.set_xticks(np.arange(0, 7201, 1800))
 ax2.set_xticklabels([f"{t / 3600:.1f}" for t in np.arange(0, 7201, 1800)])
 ax2.set_xlabel("Time (hours)")
 
-plt.tight_layout()
+plotting.fit(fig)
 plt.show()
 
 # Print final values

@@ -42,28 +42,17 @@ import numpy as np  # numerical tools
 import particula as par  # the main Particula package
 from matplotlib.colors import LogNorm
 from numpy.typing import NDArray
+from particula import plotting
 from particula.dynamics.condensation.species_mapping import (
     CondensationSpeciesMap,
 )
 from tqdm import tqdm  # optional: for progress bars during simulation
 
+plt.style.use("particula.default")
+
 # 🎨 Set default plot styling using Tailwind-inspired colors from Particula
 TAILWIND = par.util.colors.TAILWIND
-base_color = TAILWIND["gray"]["600"]
 
-plt.rcParams.update(
-    {
-        "text.color": base_color,
-        "axes.labelcolor": base_color,
-        "figure.figsize": (5, 4),
-        "font.size": 14,
-        "axes.edgecolor": base_color,
-        "xtick.color": base_color,
-        "ytick.color": base_color,
-        "pdf.fonttype": 42,
-        "ps.fonttype": 42,
-    }
-)
 
 # 🌌 Define the colors for the chemical species involved in the simulation
 color_list = (
@@ -297,7 +286,7 @@ surface_tension_table = np.clip(surface_tension_table, a_min=2e-2, a_max=None)
 vapor_pressure_table = np.clip(vapor_pressure_table, a_min=1e-50, a_max=1e100)
 
 # 🔍 Plot property tables
-fig, ax = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
+fig, ax = plotting.subplots(2, 1, sharex=True, size="wide")
 
 for i, chem in enumerate(list_of_chemicals):
     ax[0].plot(
@@ -317,23 +306,17 @@ for i, chem in enumerate(list_of_chemicals):
 
 ax[0].set_ylabel("Surface Tension (N/m)")
 ax[0].set_title("Surface Tension vs Temperature")
-ax[0].grid()
+ax[0].grid(True, axis="y")
 
 ax[1].set_yscale("log")
 ax[1].set_ylabel("Vapor Pressure (Pa)")
 ax[1].set_xlabel("Temperature (K)")
 ax[1].set_title("Vapor Pressure vs Temperature")
-ax[1].grid()
+ax[1].grid(True, axis="y")
 
 # Combined legend
-fig.legend(
-    list_of_chemicals,
-    loc="center left",
-    bbox_to_anchor=(1.02, 0.5),
-    title="Chemicals",
-    fontsize="small",
-)
-plt.tight_layout(rect=(0, 0, 1, 1))
+fig.legend(list_of_chemicals, title="Chemicals", loc="outside right center")
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
@@ -436,11 +419,12 @@ initial_inventory = species_inventory(aerosol)
 print(aerosol)
 
 # 📊 Plot the initial size distribution
-fig, ax = plt.subplots()
+fig, ax = plotting.subplots()
 ax.hist(np.log10(resolved_masses.radii[0]), bins=50, alpha=0.5)
 ax.set_xlabel("log10(Radius [m])")
 ax.set_ylabel("Bin counts")
 ax.set_title("Initial Particle Size Distribution")
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
@@ -580,7 +564,7 @@ temperature_array = temperature_profile(
 aerosol_process.environment.temperature[0] = temperature_array[0]
 
 # Plot the cooling profile
-fig, ax = plt.subplots(figsize=(7, 5))
+fig, ax = plotting.subplots(size="wide")
 ax.plot(
     time_array,
     temperature_array,
@@ -592,8 +576,8 @@ ax.plot(
 ax.set_xlabel("Time (s)")
 ax.set_ylabel("Temperature (K)")
 ax.set_title("Flame Emission Temperature Profile")
-ax.grid()
-plt.tight_layout()
+ax.grid(True, axis="y")
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
@@ -694,7 +678,7 @@ print(aerosol_process)
 dp_in_nm = 2 * 1e9  # Convert radius [m] → diameter [nm]
 
 # Plot 1: Mass concentration over time
-fig, ax = plt.subplots(figsize=(7, 5))
+fig, ax = plotting.subplots(size="wide")
 ax.plot(
     time_array,
     mass_concentration,
@@ -704,7 +688,7 @@ ax.plot(
 ax.set_xlabel("Time (s)")
 ax.set_ylabel("Mass Concentration (kg/m³)")
 ax.set_title("Mass Concentration Over Time")
-ax.grid()
+ax.grid(True, axis="y")
 
 # Add temperature on second axis
 twinx = ax.twinx()
@@ -719,11 +703,11 @@ twinx.set_ylabel("Temperature (K)", color=TAILWIND["rose"]["500"])
 twinx.tick_params(axis="y", labelcolor=TAILWIND["rose"]["500"])
 
 plt.xticks(rotation=45)
-plt.tight_layout()
+plotting.fit(fig)
 plt.show()
 
 # Plot 2: Mean diameter over time
-fig, ax = plt.subplots(figsize=(7, 5))
+fig, ax = plotting.subplots(size="wide")
 ax.plot(
     time_array,
     mode_diameter * dp_in_nm,  # mean diameter [nm]
@@ -733,7 +717,7 @@ ax.plot(
 ax.set_xlabel("Time (s)")
 ax.set_ylabel("Mean Diameter (nm)")
 ax.set_title("Mean Particle Diameter Over Time")
-ax.grid()
+ax.grid(True, axis="y")
 
 # Add temperature on second axis
 twinx = ax.twinx()
@@ -749,7 +733,7 @@ twinx.set_ylabel("Temperature (K)", color=TAILWIND["rose"]["500"])
 twinx.tick_params(axis="y", labelcolor=TAILWIND["rose"]["500"])
 
 plt.xticks(rotation=45)
-plt.tight_layout()
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
@@ -767,7 +751,7 @@ plt.show()
 
 # %%
 # 📊 Plot 1: Absolute species mass concentration [kg/m³]
-fig, ax = plt.subplots(figsize=(8, 6))
+fig, ax = plotting.subplots(size="wide")
 
 # stackplot expects shape (n_series, n_times), so transpose
 ax.stackplot(
@@ -797,20 +781,14 @@ twinx.set_ylabel("Temperature (K)", color=TAILWIND["rose"]["500"])
 twinx.tick_params(axis="y", labelcolor=TAILWIND["rose"]["500"])
 
 # External legend
-fig.legend(
-    list_of_chemicals,
-    loc="center left",
-    bbox_to_anchor=(1.02, 0.5),
-    title="Chemicals",
-    fontsize="small",
-)
-plt.tight_layout(rect=(0, 0, 1, 1))
+fig.legend(list_of_chemicals, title="Chemicals", loc="outside right center")
+plotting.fit(fig)
 plt.show()
 
 # 📊 Plot 2: Mass fraction (normalized by total particle mass)
 mass_fraction = species_mass / np.sum(species_mass, axis=1, keepdims=True)
 
-fig, ax = plt.subplots(figsize=(8, 6))
+fig, ax = plotting.subplots(size="wide")
 ax.stackplot(
     time_array,
     mass_fraction.T,
@@ -837,14 +815,8 @@ twinx.plot(
 twinx.set_ylabel("Temperature (K)", color=TAILWIND["rose"]["500"])
 twinx.tick_params(axis="y", labelcolor=TAILWIND["rose"]["500"])
 
-fig.legend(
-    list_of_chemicals,
-    loc="center left",
-    bbox_to_anchor=(1.02, 0.5),
-    title="Chemicals",
-    fontsize="small",
-)
-plt.tight_layout(rect=(0, 0, 1, 1))
+fig.legend(list_of_chemicals, title="Chemicals", loc="outside right center")
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
@@ -860,12 +832,13 @@ plt.show()
 # bound interpretation of the smallest sizes.
 
 # %%
-fig, ax = plt.subplots(figsize=(7, 5))
+fig, ax = plotting.subplots(size="wide")
 
 # Create mesh grid: time vs radius bins (left edges only)
 X, Y = np.meshgrid(time_array, edges[:-1])
 
 # Plot number concentration on a log scale
+ax.grid(False)
 mesh = ax.pcolormesh(
     X,
     Y,
@@ -875,6 +848,7 @@ mesh = ax.pcolormesh(
         vmin=concentrations[concentrations > 0].min(),
         vmax=concentrations.max(),
     ),
+    cmap=plotting.colormap("magnitude"),
 )
 
 ax.set_yscale("log")
@@ -886,7 +860,7 @@ ax.set_title("Time-Evolving Particle Size Distribution")
 # Colorbar for number concentration
 fig.colorbar(mesh, label="Number Concentration (#/m³)")
 
-plt.tight_layout()
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]

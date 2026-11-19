@@ -34,6 +34,8 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import style as mplstyle
+from particula import plotting
 
 LABELS = {
     "numpy": "Native NumPy CPU",
@@ -115,9 +117,10 @@ def curve(ax, rows, mode, x_field, *, timing="resident", throughput=False):
 
 
 # %%
+@mplstyle.context("particula.default")
 def scaling_figures(rows):
     """Compare actual execution modes across particle and box counts."""
-    fig, axes = plt.subplots(2, 2, figsize=(12, 9), constrained_layout=True)
+    fig, axes = plotting.subplots(2, 2, size="wide")
     for column, family in enumerate(("condensation", "dilution")):
         selected = [
             r
@@ -139,10 +142,11 @@ def scaling_figures(rows):
     axes[1, 1].set(
         xlabel="Boxes (1,024 slots each)", ylabel="Initial particle-steps / s"
     )
-    axes[0, 0].legend(fontsize=8)
+    plotting.legend(axes[0, 0])
     fig.suptitle(
         "RTX 5060 · float64 scaling · median and min–max of seven runs"
     )
+    plotting.fit(fig)
 
 
 # %% [markdown]
@@ -157,14 +161,15 @@ def scaling_figures(rows):
 
 
 # %%
+@mplstyle.context("particula.default")
 def brownian_figures(rows):
     """Separate old/new GPU improvement from native-CPU comparisons."""
     selected = [r for r in rows if r["case"]["name"].startswith("brownian-")]
-    fig, axes = plt.subplots(1, 2, figsize=(11, 4.5), constrained_layout=True)
+    fig, axes = plotting.subplots(1, 2)
     for mode in ("legacy", "direct", "prepared", "captured"):
         curve(axes[0], selected, mode, "slots")
     axes[0].set(xlabel="Initial particles per box", ylabel="Time / step (ms)")
-    axes[0].legend(fontsize=8)
+    plotting.legend(axes[0])
     for mode in ("legacy", "prepared", "captured"):
         group = sorted(
             (r for r in selected if r["mode"] == mode),
@@ -180,9 +185,10 @@ def brownian_figures(rows):
     axes[1].set(
         xlabel="Initial particles per box", ylabel="Warp pool peak (MiB)"
     )
-    axes[1].legend(fontsize=8)
+    plotting.legend(axes[1])
     axes[1].grid(True, alpha=0.2)
     fig.suptitle("Brownian CUDA comparison · same final state, bounded storage")
+    plotting.fit(fig)
 
 
 # %% [markdown]
@@ -200,9 +206,10 @@ def brownian_figures(rows):
 
 
 # %%
+@mplstyle.context("particula.default")
 def cost_and_science_figures(rows):
     """Show complete-workflow costs alongside variability and a distribution."""
-    fig, axes = plt.subplots(2, 2, figsize=(12, 9), constrained_layout=True)
+    fig, axes = plotting.subplots(2, 2, size="wide")
     selected = [
         r for r in rows if r["case"]["name"] == "particles-condensation-1048576"
     ]
@@ -227,7 +234,7 @@ def cost_and_science_figures(rows):
         yscale="log",
         title="One million particles · three steps",
     )
-    axes[0, 0].legend(fontsize=8)
+    plotting.legend(axes[0, 0])
     for family, style in (("condensation", "-"), ("brownian", "--")):
         group = sorted(
             (
@@ -254,7 +261,7 @@ def cost_and_science_figures(rows):
         ylabel="Captured step (ms)",
         title="8 boxes × 2,048 slots · 4 materials / 5 gases",
     )
-    axes[0, 1].legend(fontsize=8)
+    plotting.legend(axes[0, 1])
     row = next(r for r in selected if r["mode"] == "captured")
     edges = np.array(row["radius_edges_m"])
     centres = np.sqrt(edges[:-1] * edges[1:]) * 1e9
@@ -268,7 +275,7 @@ def cost_and_science_figures(rows):
     axes[1, 0].set(
         xlabel="Radius (nm)", ylabel="dN / dlog₁₀ r (m$^{-3}$)", xlim=(5, 500)
     )
-    axes[1, 0].legend()
+    plotting.legend(axes[1, 0])
     modes = [r for r in selected if r["mode"] != "numpy"]
     axes[1, 1].bar(
         [LABELS[r["mode"]].replace(" ", "\n", 1) for r in modes],
@@ -279,6 +286,7 @@ def cost_and_science_figures(rows):
         ylabel="Warp pool peak (MiB)", title="Excludes CUDA context and driver"
     )
     fig.suptitle("Workflow costs and physical response · RTX 5060")
+    plotting.fit(fig)
 
 
 def run_example():

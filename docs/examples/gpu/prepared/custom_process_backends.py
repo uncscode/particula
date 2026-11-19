@@ -27,6 +27,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import warp as wp
+from matplotlib import style as mplstyle
 from particula import (
     Aerosol,
     BoxProcess,
@@ -36,6 +37,7 @@ from particula import (
     PreparedOperation,
     ProcessCapabilities,
     ProcessRegistry,
+    plotting,
 )
 from particula.dynamics import Dilution, DilutionStrategy
 from particula.gas import EnvironmentData, GasData
@@ -262,10 +264,11 @@ def simulate():
 
 
 # %%
+@mplstyle.context("particula.default")
 def plot_results(report):
     """Compare trajectories and numerical residuals from compact saved data."""
     reference = np.asarray(report["reference"])
-    fig, axes = plt.subplots(1, 2, figsize=(11, 4.2), constrained_layout=True)
+    fig, axes = plotting.subplots(1, 2, size="wide")
     colors = {
         "cpu": "black",
         "resident": "tab:blue",
@@ -292,8 +295,9 @@ def plot_results(report):
     )
     for ax in axes:
         ax.set_xlabel("Absolute simulation time (s)")
-        ax.legend()
+        plotting.legend(ax)
         ax.grid(alpha=0.2)
+    plotting.fit(fig)
     plt.show()
 
 

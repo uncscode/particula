@@ -47,6 +47,8 @@ from dataclasses import dataclass
 from typing import Any, Literal
 
 import numpy as np
+from matplotlib import style as mplstyle
+from particula import plotting
 from particula.dynamics.condensation.mass_transfer import (
     get_first_order_mass_transport_k,
     get_mass_transfer_rate_latent_heat,
@@ -890,6 +892,7 @@ def run_example(device: str = "cpu") -> ExampleRun:
 
 
 # %%
+@mplstyle.context("particula.default")
 def run_publication():
     """Require successful CUDA acceptance before rendering the comparison."""
     import matplotlib.pyplot as plt
@@ -900,7 +903,7 @@ def run_publication():
     result = run_example(device="cuda:0")
     if any(item.status != "passed" for item in result.acceptance):
         raise AssertionError("CUDA condensation acceptance failed")
-    fig, axes = plt.subplots(1, 2, figsize=(10, 3.8), constrained_layout=True)
+    fig, axes = plotting.subplots(1, 2, size="wide")
     labels = [
         f"B{b + 1} P{p + 1} {s}"
         for b in range(2)
@@ -925,7 +928,7 @@ def run_publication():
     )
     axes[0].tick_params(axis="x", rotation=65)
     axes[0].axhline(0, color="0.5", linewidth=0.8)
-    axes[0].legend()
+    plotting.legend(axes[0])
     x = np.arange(4)
     axes[1].plot(
         x,
@@ -947,11 +950,12 @@ def run_publication():
     )
     axes[1].tick_params(axis="x", rotation=35)
     axes[1].axhline(0, color="0.5", linewidth=0.8)
-    axes[1].legend()
+    plotting.legend(axes[1])
     fig.suptitle(
         "Independent condensation check · " + wp.get_device("cuda:0").name
     )
     print("\n".join(result.output))
+    plotting.fit(fig)
     plt.show()
     return result
 

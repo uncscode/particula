@@ -30,12 +30,15 @@
 # - Run this script to generate and display the comparison graph.
 
 # %%
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 import particula as par
+from particula import plotting
 from particula.dynamics.coagulation.turbulent_dns_kernel.g12_radial_distribution_ao2008 import (
     get_g12_radial_distribution_ao2008,
 )
+
+plt.style.use("particula.default")
 
 
 def g12_calc(particle_radius, turbulent_dissipation, reynolds_lambda):
@@ -67,10 +70,8 @@ def g12_calc(particle_radius, turbulent_dissipation, reynolds_lambda):
         kinematic_viscosity=kinematic_viscosity,
         turbulent_dissipation=turbulent_dissipation,
     )
-    normalized_accel_variance = (
-        par.gas.get_normalized_accel_variance_ao2008(
-            re_lambda=reynolds_lambda
-        )
+    normalized_accel_variance = par.gas.get_normalized_accel_variance_ao2008(
+        re_lambda=reynolds_lambda
     )
     kolmogorov_velocity = par.gas.get_kolmogorov_velocity(
         kinematic_viscosity=kinematic_viscosity,
@@ -171,8 +172,12 @@ r72_4_e400 = np.array(
 particle_radius = np.linspace(1e-6, 60e-6, 100)  # From 1 µm to 60 µm
 
 # Convert turbulent dissipation from cm²/s³ to m²/s³
-turbulent_dissipation_100 = 100 * par.util.get_unit_conversion("cm^2/s^3", "m^2/s^3")
-turbulent_dissipation_400 = 400 * par.util.get_unit_conversion("cm^2/s^3", "m^2/s^3")
+turbulent_dissipation_100 = 100 * par.util.get_unit_conversion(
+    "cm^2/s^3", "m^2/s^3"
+)
+turbulent_dissipation_400 = 400 * par.util.get_unit_conversion(
+    "cm^2/s^3", "m^2/s^3"
+)
 
 # %% [markdown]
 # ## Compute g₁₂ Values for Each Case
@@ -204,21 +209,21 @@ g12_values_re72_4_e400 = g12_calc(
 # - The legend entries follow the order of DNS data and model prediction for each case.
 
 # %%
-fig, ax = plt.subplots(figsize=(6, 6))
+fig, ax = plotting.subplots()
 
 # case 1: R_lambda = 23, epsilon = 100
 ax.scatter(
     r23_e100[:, 0],
     r23_e100[:, 1],
     label=r"DNS: $R_\lambda=23$, $\varepsilon=100$",
-    color="blue",
+    color=plotting.COLORS["teal"],
     marker="o",
 )
 ax.plot(
     particle_radius * 1e6,
     np.diagonal(g12_values_re23_e100),
     label=r"Model: $R_\lambda=23$, $\varepsilon=100$",
-    color="blue",
+    color=plotting.COLORS["teal"],
 )
 
 # Case 2: R_lambda = 23, epsilon = 400
@@ -226,14 +231,14 @@ ax.scatter(
     r23_e400[:, 0],
     r23_e400[:, 1],
     label=r"DNS: $R_\lambda=23$, $\varepsilon=400$",
-    color="green",
+    color=plotting.COLORS["indigo"],
     marker="^",
 )
 ax.plot(
     particle_radius * 1e6,
     np.diagonal(g12_values_re23_e400),
     label=r"Model: $R_\lambda=23$, $\varepsilon=400$",
-    color="green",
+    color=plotting.COLORS["indigo"],
 )
 
 # Case 3: R_lambda = 72.4, epsilon = 100
@@ -241,14 +246,14 @@ ax.scatter(
     r72_4_e100[:, 0],
     r72_4_e100[:, 1],
     label=r"DNS: $R_\lambda=72.4$, $\varepsilon=100$",
-    color="red",
+    color=plotting.COLORS["rust"],
     marker="s",
 )
 ax.plot(
     particle_radius * 1e6,
     np.diagonal(g12_values_re72_4_e100),
     label=r"Model: $R_\lambda=72.4$, $\varepsilon=100$",
-    color="red",
+    color=plotting.COLORS["rust"],
 )
 
 # Case 4: R_lambda = 72.4, epsilon = 400
@@ -256,23 +261,24 @@ ax.scatter(
     r72_4_e400[:, 0],
     r72_4_e400[:, 1],
     label=r"DNS: $R_\lambda=72.4$, $\varepsilon=400$",
-    color="purple",
+    color=plotting.COLORS["berry"],
     marker="d",
 )
 ax.plot(
     particle_radius * 1e6,
     np.diagonal(g12_values_re72_4_e400),
     label=r"Model: $R_\lambda=72.4$, $\varepsilon=400$",
-    color="purple",
+    color=plotting.COLORS["berry"],
 )
 
 # Set labels, title, legend, etc.
 ax.set_xlabel("Particle Radius (µm)")
 ax.set_ylabel("Radial Distribution Function $g_{12}$")
 ax.set_title("Radial Distribution Function Comparison")
-ax.legend(loc="upper left")
+plotting.legend(ax, loc="upper left")
 ax.grid(True)
 ax.set_ylim(0, 40)
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]

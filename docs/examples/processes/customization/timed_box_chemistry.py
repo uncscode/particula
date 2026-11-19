@@ -22,7 +22,8 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
-from particula import Aerosol, BoxProcess, FieldSpec, FunctionProcess
+from matplotlib import style as mplstyle
+from particula import Aerosol, BoxProcess, FieldSpec, FunctionProcess, plotting
 from particula.dynamics import Dilution, DilutionStrategy
 from particula.gas import EnvironmentData, GasData
 from particula.particles import ParticleData
@@ -203,13 +204,14 @@ def simulate():
 
 
 # %%
+@mplstyle.context("particula.default")
 def plot_results(report):
     """Plot species evolution and independently checked extensive inventories."""
     values, reference = (
         np.asarray(report["concentrations"]),
         np.asarray(report["reference"]),
     )
-    fig, axes = plt.subplots(1, 2, figsize=(11, 4.2), constrained_layout=True)
+    fig, axes = plotting.subplots(1, 2, size="wide")
     for box, color in enumerate(("tab:blue", "tab:orange")):
         for species, linestyle in enumerate(("-", "--")):
             axes[0].plot(
@@ -247,9 +249,10 @@ def plot_results(report):
     axes[1].set(ylabel="A + B inventory (µg)", title="External pulse at 4 s")
     for ax in axes:
         ax.set_xlabel("Time (s)")
-        ax.legend()
+        plotting.legend(ax)
         ax.grid(alpha=0.2)
     fig.suptitle("Lines: simulation · dots: analytical reference")
+    plotting.fit(fig)
     plt.show()
 
 

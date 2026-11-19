@@ -38,7 +38,8 @@
 # %%
 import numpy as np
 import particula as par
-from matplotlib import pyplot as plt
+from matplotlib import style as mplstyle
+from particula import plotting
 from particula.dynamics.condensation.species_mapping import (
     CondensationSpeciesMap,
 )
@@ -101,16 +102,17 @@ def run_wall_loss(strategy: par.dynamics.WallLossStrategy, sub_steps: int = 1):
     return series, aerosol
 
 
+@mplstyle.context("particula.default")
 def plot_decay(times_min, *series_with_labels):
-    fig, ax = plt.subplots(figsize=(6, 4))
+    fig, ax = plotting.subplots(size="wide")
     for series, label, style in series_with_labels:
         ax.plot(times_min, series / series[0], style, label=label, linewidth=2)
     ax.set_xlabel("Time (min)")
     ax.set_ylabel("Normalized concentration")
     ax.set_yscale("log")
     ax.grid(True)
-    ax.legend()
-    plt.tight_layout()
+    plotting.legend(ax)
+    plotting.fit(fig)
     return fig, ax
 
 

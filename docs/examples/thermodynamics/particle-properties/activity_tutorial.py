@@ -46,6 +46,9 @@ Example:
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from particula import plotting
+
+plt.style.use("particula.default")
 
 # %% [markdown]
 # ## Start with a mass-fraction approximation
@@ -169,7 +172,7 @@ for i, mass in enumerate(mass_mixture):
     activities_molar[i] = activity_molar.activity(mass_concentration=mass)
     activities_kappa[i] = activity_kappa.activity(mass_concentration=mass)
 
-fig, ax = plt.subplots(figsize=(8, 6))
+fig, ax = plotting.subplots(size="wide")
 ax.plot(mass_water, activities_mass[:, 0], label="Mass: Water")
 ax.plot(
     mass_water, activities_mass[:, 1], label="Mass: Sucrose", linestyle="--"
@@ -189,7 +192,8 @@ ax.plot(
 )
 ax.set_xlabel("Mass fraction water")
 ax.set_ylabel("Activity")
-ax.legend()
+plotting.legend(ax)
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]

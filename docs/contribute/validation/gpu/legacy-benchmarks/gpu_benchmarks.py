@@ -39,6 +39,9 @@ from pathlib import Path
 from typing import Any
 
 import matplotlib.pyplot as plt
+from particula import plotting
+
+plt.style.use("particula.default")
 
 # %% [markdown]
 # ## Load benchmark data
@@ -190,7 +193,7 @@ cond_plot_rows = [
 if not cond_plot_rows:
     print("No condensation benchmark entries found; skipping plot.")
 else:
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+    fig, (ax1, ax2) = plotting.subplots(1, 2)
 
     # Left: GPU time vs total particles
     totals = [r["total"] for r in cond_plot_rows]
@@ -212,7 +215,7 @@ else:
     if cpu_rows:
         labels = [r["label"] for r in cpu_rows]
         speedups = [r["speedup"] for r in cpu_rows]
-        bars = ax2.barh(labels, speedups, color="steelblue")
+        bars = ax2.barh(labels, speedups, color=plotting.COLORS["teal"])
         ax2.set_xlabel("GPU speedup vs CPU (x)")
         ax2.set_title("Condensation: GPU vs CPU speedup")
         ax2.set_xscale("log")
@@ -222,14 +225,14 @@ else:
                 bar.get_y() + bar.get_height() / 2,
                 f"{spd:.0f}x",
                 va="center",
-                fontsize=9,
+                fontsize=12,
             )
         ax2.grid(True, alpha=0.3, axis="x")
     else:
         ax2.axis("off")
         ax2.set_title("Condensation: no CPU speedup data")
 
-    fig.tight_layout()
+    plotting.fit(fig)
     plt.show()
 
 # %% [markdown]
@@ -289,7 +292,7 @@ coag_plot_rows = [
 if not coag_plot_rows:
     print("No coagulation benchmark entries found; skipping plot.")
 else:
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+    fig, (ax1, ax2) = plotting.subplots(1, 2)
 
     # Separate single-box vs multi-box for color coding
     single_box = [r for r in coag_plot_rows if r["n_boxes"] == 1]
@@ -310,7 +313,7 @@ else:
     ax1.set_xlabel("Particles per box")
     ax1.set_ylabel("GPU time per step (ms)")
     ax1.set_title("Coagulation: GPU scaling")
-    ax1.legend()
+    plotting.legend(ax1)
     ax1.grid(True, alpha=0.3)
 
     # Right: Speedup (where CPU data exists)
@@ -330,14 +333,14 @@ else:
                 bar.get_y() + bar.get_height() / 2,
                 f"{spd:.1f}x",
                 va="center",
-                fontsize=9,
+                fontsize=12,
             )
         ax2.grid(True, alpha=0.3, axis="x")
     else:
         ax2.axis("off")
         ax2.set_title("Coagulation: no CPU speedup data")
 
-    fig.tight_layout()
+    plotting.fit(fig)
     plt.show()
 
 # %% [markdown]

@@ -32,6 +32,8 @@ from types import SimpleNamespace
 from typing import Any
 
 import numpy as np
+from matplotlib import style as mplstyle
+from particula import plotting
 from particula.gas import EnvironmentData, GasData
 from particula.particles import ParticleData
 
@@ -233,6 +235,7 @@ def run_example(device: str = "cpu") -> ExampleRun:
 
 
 # %%
+@mplstyle.context("particula.default")
 def run_publication():
     """Require CUDA and visualize state preservation across ownership changes."""
     import matplotlib.pyplot as plt
@@ -275,14 +278,17 @@ def run_publication():
         ]
     finally:
         restarted.close(registry, guard)
-    fig, axes = plt.subplots(1, 2, figsize=(9, 3.5), constrained_layout=True)
+    fig, axes = plotting.subplots(1, 2, size="wide")
     labels = ["CPU initial", "Checkpoint", "CUDA restart"]
-    axes[0].bar(labels, numbers, color="#287a90")
+    axes[0].bar(labels, numbers, color=plotting.COLORS["teal"])
     axes[0].set(ylabel="Represented particle count")
-    axes[1].bar(labels, np.array(inventories) * 1e18, color="#be6c39")
+    axes[1].bar(
+        labels, np.array(inventories) * 1e18, color=plotting.COLORS["rust"]
+    )
     axes[1].set(ylabel="Particle + gas inventory (fg)")
     fig.suptitle("State preservation · " + wp.get_device("cuda:0").name)
     print("\n".join(result.output))
+    plotting.fit(fig)
     plt.show()
     return result
 

@@ -1,10 +1,12 @@
 """CPU plotting helpers for the manually refreshed CUDA scientific examples."""
 
-import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import style as mplstyle
 from matplotlib.colors import LogNorm
+from particula import plotting
 
 
+@mplstyle.context("particula.default")
 def history_figures(report, title, *, forcing):
     """Plot recorded box histories and particle-resolved size distributions."""
     frames = report["frames"]
@@ -18,12 +20,12 @@ def history_figures(report, title, *, forcing):
     distribution = histograms / widths
     boxes = temperature.shape[1]
     selected = sorted({0, boxes // 2, boxes - 1})
-    fig, axes = plt.subplots(2, 2, figsize=(11, 8), constrained_layout=True)
+    fig, axes = plotting.subplots(2, 2, size="wide")
     if forcing:
         for box in selected:
             axes[0, 0].plot(time, temperature[:, box], label=f"Box {box + 1}")
         axes[0, 0].set(xlabel="Time (s)", ylabel="Prescribed temperature (K)")
-        axes[0, 0].legend()
+        plotting.legend(axes[0, 0])
     else:
         scatter = axes[0, 0].scatter(
             temperature[0],
@@ -41,8 +43,8 @@ def history_figures(report, title, *, forcing):
         axes[0, 1].plot(time, saturation[:, box], label=f"Box {box + 1}")
     axes[0, 1].axhline(1, color="0.5", linestyle="--")
     axes[0, 1].set(xlabel="Time (s)", ylabel="Water saturation ratio")
-    axes[0, 1].legend()
-    colors = ("#287a90", "#be6c39", "#684a8c")
+    plotting.legend(axes[0, 1])
+    colors = (plotting.COLORS["teal"], plotting.COLORS["rust"], "#684a8c")
     for box, color in zip(selected, colors, strict=True):
         for index, style, label in ((0, "--", "initial"), (-1, "-", "final")):
             axes[1, 0].stairs(
@@ -55,13 +57,14 @@ def history_figures(report, title, *, forcing):
     axes[1, 0].set(
         xscale="log", xlabel="Radius (nm)", ylabel="dN / dlog₁₀ r (m$^{-3}$)"
     )
-    axes[1, 0].legend(fontsize=8)
+    plotting.legend(axes[1, 0])
+    axes[1, 1].grid(False)
     mesh = axes[1, 1].pcolormesh(
         edges * 1e9,
         np.arange(boxes + 1) + 0.5,
         np.ma.masked_less_equal(distribution[-1], 0),
         norm=LogNorm(),
-        cmap="viridis",
+        cmap=plotting.colormap("magnitude"),
         shading="flat",
     )
     axes[1, 1].set(xscale="log", xlabel="Radius (nm)", ylabel="Box")
@@ -77,9 +80,11 @@ def history_figures(report, title, *, forcing):
             "Net prescribed water addition across boxes (kg):",
             source[:, 0].sum(),
         )
+    plotting.fit(fig)
     return fig
 
 
+@mplstyle.context("particula.default")
 def stochastic_figures(report, initial_histogram, title):
     """Show seed spread with identical initial state across realizations."""
     time = np.array(report["time_s"])
@@ -87,9 +92,11 @@ def stochastic_figures(report, initial_histogram, title):
     histogram = np.array(report["final_histogram_by_seed_box"])
     edges = np.array(report["radius_edges_m"])
     selected = [0, number.shape[2] // 2, number.shape[2] - 1]
-    fig, axes = plt.subplots(1, 2, figsize=(11, 4), constrained_layout=True)
+    fig, axes = plotting.subplots(1, 2, size="wide")
     for box, color in zip(
-        selected, ("#287a90", "#be6c39", "#684a8c"), strict=True
+        selected,
+        (plotting.COLORS["teal"], plotting.COLORS["rust"], "#684a8c"),
+        strict=True,
     ):
         fraction = number[:, :, box] / number[:, :1, box]
         low, high = np.percentile(fraction, [5, 95], axis=0)
@@ -98,7 +105,7 @@ def stochastic_figures(report, initial_histogram, title):
         )
         axes[0].fill_between(time, low, high, color=color, alpha=0.2)
     axes[0].set(xlabel="Time (s)", ylabel="Number concentration / initial")
-    axes[0].legend()
+    plotting.legend(axes[0])
     box = selected[1]
     width = np.diff(np.log10(edges))
     distribution = histogram[:, box] / width
@@ -122,20 +129,22 @@ def stochastic_figures(report, initial_histogram, title):
         ylabel="dN / dlog₁₀ r (m$^{-3}$)",
         title=f"Box {box + 1}",
     )
-    axes[1].legend(fontsize=8)
+    plotting.legend(axes[1])
     fig.suptitle(
         title + "\n16 stream seeds · shaded spread is not a confidence interval"
     )
     print(report["band_definition"])
     print("Distinct final trajectories:", len(set(report["result_hashes"])))
+    plotting.fit(fig)
     return fig
 
 
+@mplstyle.context("particula.default")
 def lifecycle_figures(report, initial_histogram, title):
     """Show population changes and the independently checked process ledger."""
     edges = np.array(report["radius_edges_m"])
     width = np.diff(np.log10(edges))
-    fig, axes = plt.subplots(1, 2, figsize=(11, 4), constrained_layout=True)
+    fig, axes = plotting.subplots(1, 2, size="wide")
     axes[0].stairs(
         initial_histogram.mean(axis=0) / width,
         edges * 1e9,
@@ -152,7 +161,7 @@ def lifecycle_figures(report, initial_histogram, title):
         xlabel="Radius (nm)",
         ylabel="Mean dN / dlog₁₀ r (m$^{-3}$)",
     )
-    axes[0].legend()
+    plotting.legend(axes[0])
     ledger = report["process_ledger"]
     change = np.array(
         [row["number_after"] - row["number_before"] for row in ledger]
@@ -160,7 +169,9 @@ def lifecycle_figures(report, initial_histogram, title):
     axes[1].bar(
         np.arange(len(ledger)),
         change,
-        color=np.where(change >= 0, "#287a90", "#be6c39"),
+        color=np.where(
+            change >= 0, plotting.COLORS["teal"], plotting.COLORS["rust"]
+        ),
     )
     axes[1].set(
         xticks=np.arange(len(ledger)),
@@ -182,4 +193,5 @@ def lifecycle_figures(report, initial_histogram, title):
         report["snapshot_isolated"],
     )
     print("Explicit precursor removal (kg):", report["removed_precursor_kg"])
+    plotting.fit(fig)
     return fig

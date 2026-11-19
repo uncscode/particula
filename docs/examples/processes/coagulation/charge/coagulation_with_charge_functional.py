@@ -44,6 +44,9 @@ Examples:
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from particula import plotting
+
+plt.style.use("particula.default")
 
 plt.rcParams["figure.dpi"] = 110
 
@@ -79,7 +82,7 @@ neg_charges = -np.logspace(np.log10(10), np.log10(1), num=split_index)
 pos_charges = np.logspace(np.log10(1), np.log10(500), num=n_bins - split_index)
 charge_array = np.concatenate((neg_charges, pos_charges))
 
-fig, ax = plt.subplots()
+fig, ax = plotting.subplots()
 ax.plot(radius_bins, charge_array, marker="o", linestyle="none")
 ax.set_xscale("log")
 ax.set_yscale("symlog", linthresh=1)
@@ -87,6 +90,7 @@ ax.set_xlabel("Particle radius (m)")
 ax.set_ylabel("Particle charge (elementary charges)")
 ax.set_title("Particle Charge vs. Radius")
 ax.grid(True, which="both", ls="--")
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
@@ -196,14 +200,22 @@ np.testing.assert_allclose(
     dimensional_kernel, dimensional_kernel.T, rtol=1e-12, atol=0
 )
 log_kernel = np.ma.log10(np.ma.masked_less_equal(dimensional_kernel, 0))
-fig, ax = plt.subplots()
-mesh = ax.pcolormesh(radius_bins, radius_bins, log_kernel, shading="auto")
+fig, ax = plotting.subplots()
+ax.grid(False)
+mesh = ax.pcolormesh(
+    radius_bins,
+    radius_bins,
+    log_kernel,
+    shading="auto",
+    cmap=plotting.colormap("magnitude"),
+)
 ax.set_xscale("log")
 ax.set_yscale("log")
 ax.set_xlabel("Particle radius r_i (m)")
 ax.set_ylabel("Particle radius r_j (m)")
 ax.set_title("Coulomb Gatti 2008 Coagulation Kernel (Factory)")
 fig.colorbar(mesh, ax=ax, label="log10(Kernel) (m³/s)")
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]

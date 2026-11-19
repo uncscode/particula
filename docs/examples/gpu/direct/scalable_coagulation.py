@@ -19,6 +19,8 @@ import time
 import matplotlib.pyplot as plt
 import numpy as np
 import warp as wp
+from matplotlib import style as mplstyle
+from particula import plotting
 from particula.gpu import from_warp_particle_data, to_warp_particle_data
 from particula.gpu.kernels.coagulation import (
     CoagulationMechanismConfig,
@@ -105,16 +107,18 @@ def simulate(device="cpu", sizes=(257, 2000, 5000)):
     return {"device": device, "warp_version": wp.__version__, "rows": rows}
 
 
+@mplstyle.context("particula.default")
 def plot_results(report):
     """Show demand and selected resource-admitted step without timing claims."""
     rows = report["rows"]
-    fig, axes = plt.subplots(1, 2, figsize=(9, 3.5), constrained_layout=True)
+    fig, axes = plotting.subplots(1, 2, size="wide")
     sizes = [row["particles"] for row in rows]
     axes[0].plot(sizes, [r["expected_trials_at_1s"] for r in rows], "o-")
     axes[0].set(xlabel="Active particles", ylabel="Expected trials at 1 s")
     axes[1].plot(sizes, [r["timestep_s"] for r in rows], "o-")
     axes[1].set(xlabel="Active particles", ylabel="Admitted timestep (s)")
     fig.suptitle(f"Brownian + settling + shear — {report['device']}")
+    plotting.fit(fig)
     return fig
 
 
