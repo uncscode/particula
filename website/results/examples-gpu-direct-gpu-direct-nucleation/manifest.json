@@ -1,15 +1,16 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 5.000835657003336,
-  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
+  "elapsed_seconds": 4.65226869401522,
+  "package_source_sha256": "cdc38cb651641b0a7701c1eab385e2ca9c9db1f45ee0cc6bce0b2da1f0d3c114",
+  "scientific_source_sha256": "9ccd4e777e1987db076b9ac5b19f8cd1c309a0a8e54f496c0a8bbdfe42a87a5d",
   "input_sha256": {},
   "example": "examples-gpu-direct-gpu-direct-nucleation",
-  "fingerprint": "e8f2127c5cec88679c91954b80c37a3a011c6cfc1bdb9fa87fab14539c84c6b5",
+  "fingerprint": "095ae35c78feb32b9b1b768a95fb41433d62b28d9cfbe89bbcbc2a1793a4750f",
   "source": "docs/examples/gpu/direct/gpu_direct_nucleation.py",
-  "revision": "e6d8de004d68d2f8054a7654be48430a2af02cb9",
+  "revision": "c718cc37f6e9929c56bfb7c39dc765fc220b453b",
   "package_dirty": false,
-  "executed_at": "2026-11-19T14:50:08.837893+00:00",
+  "executed_at": "2026-11-19T20:37:06.529954+00:00",
   "device": "cuda:0: NVIDIA GeForce RTX 5060",
   "python": "3.12.12",
   "versions": {
@@ -27,7 +28,7 @@
     [],
     [
       {
-        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\nModule particula.gpu.kernels.nucleation 1124f09 load on device 'cuda:0' took 3.80 ms  (cached)\nModule particula.gpu.kernels._population_validation 65eaa49 load on device 'cuda:0' took 1.03 ms  (cached)\nModule particula.gpu.kernels.slot_management 0375e2c load on device 'cuda:0' took 0.73 ms  (cached)\nModule particula.gpu.kernels.exhaustion 616f81d load on device 'cuda:0' took 1.40 ms  (cached)\nCounts: [1. 2.] Number densities (m^-3): [1. 1.]\nPer-species particle + gas inventory checks passed.\n"
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\nModule particula.gpu.kernels.nucleation 1124f09 load on device 'cuda:0' took 2.24 ms  (cached)\nModule particula.gpu.kernels._population_validation 65eaa49 load on device 'cuda:0' took 0.45 ms  (cached)\nModule particula.gpu.kernels.slot_management 0375e2c load on device 'cuda:0' took 0.53 ms  (cached)\nModule particula.gpu.kernels.exhaustion 616f81d load on device 'cuda:0' took 1.31 ms  (cached)\nCounts: [1. 2.] Number densities (m^-3): [1. 1.]\nPer-species particle + gas inventory checks passed.\n"
       },
       {
         "image": "figure-3-1.png"
@@ -36,6 +37,6 @@
   ],
   "files": {
     "figure-3-1.png": "04119ea98f56f61da72e6297023f4e7ff19e972d5b391ffdaee628113f54eee2",
-    "source.py": "5908ed2d0871fa463a71675a12a03b5d592148134790d1244e2c4a075d9b3075"
+    "source.py": "4dfa6bf7aa1de8a68df5f7f8bda8bee32dd80109b2b189b84ef226edb78cff40"
   }
 }

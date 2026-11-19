@@ -39,8 +39,6 @@ from types import SimpleNamespace
 from typing import Any
 
 import numpy as np
-from matplotlib import style as mplstyle
-from particula import plotting
 from particula.gas import EnvironmentData, GasData
 from particula.particles import ParticleData
 
@@ -886,11 +884,11 @@ def run_example(device: str = "cpu") -> ExampleRun:
 
 
 # %%
-@mplstyle.context("particula.default")
 def run_publication():
     """Require CUDA and plot heterogeneous gas and open-system inventories."""
     import matplotlib.pyplot as plt
     import warp as wp
+    from particula import plotting
 
     if not _warp_enabled() or not wp.is_cuda_available():
         raise RuntimeError("This publication run requires CUDA")
@@ -899,35 +897,38 @@ def run_publication():
     if result.gas_snapshot is None or result.conservation_residual is None:
         raise RuntimeError("CUDA produced no diagnostic snapshots")
     boxes = np.arange(3) + 1
-    fig, axes = plotting.subplots(1, 2)
-    axes[0].bar(
-        boxes - 0.18,
-        initial_gas.concentration[:, 0],
-        width=0.36,
-        label="Initial",
-    )
-    axes[0].bar(
-        boxes + 0.18,
-        result.gas_snapshot[:, 0],
-        width=0.36,
-        label="After two steps",
-    )
-    axes[0].set(xlabel="Box", ylabel="Water gas (kg m$^{-3}$)", xticks=boxes)
-    plotting.legend(axes[0])
-    relative = np.asarray(result.conservation_residual).reshape(3, -1)[:, 0]
-    relative = relative / result.initial_total_mass[:, 0]
-    axes[1].bar(boxes, relative, color=plotting.COLORS["rust"])
-    axes[1].set(
-        xlabel="Box", ylabel="Net inventory change / initial", xticks=boxes
-    )
-    axes[1].axhline(0, color="0.5", linewidth=0.8)
-    fig.suptitle(
-        "Resident multibox evolution · " + wp.get_device("cuda:0").name
-    )
-    print("\n".join(result.output))
-    print("Checkpoint forcing matched exactly before continuation.")
-    plotting.fit(fig)
-    plt.show()
+    with plt.style.context("particula.default"):
+        fig, axes = plotting.subplots(1, 2)
+        axes[0].bar(
+            boxes - 0.18,
+            initial_gas.concentration[:, 0],
+            width=0.36,
+            label="Initial",
+        )
+        axes[0].bar(
+            boxes + 0.18,
+            result.gas_snapshot[:, 0],
+            width=0.36,
+            label="After two steps",
+        )
+        axes[0].set(
+            xlabel="Box", ylabel="Water gas (kg m$^{-3}$)", xticks=boxes
+        )
+        plotting.legend(axes[0])
+        relative = np.asarray(result.conservation_residual).reshape(3, -1)[:, 0]
+        relative = relative / result.initial_total_mass[:, 0]
+        axes[1].bar(boxes, relative, color=plotting.COLORS["rust"])
+        axes[1].set(
+            xlabel="Box", ylabel="Net inventory change / initial", xticks=boxes
+        )
+        axes[1].axhline(0, color="0.5", linewidth=0.8)
+        fig.suptitle(
+            "Resident multibox evolution · " + wp.get_device("cuda:0").name
+        )
+        print("\n".join(result.output))
+        print("Checkpoint forcing matched exactly before continuation.")
+        plotting.fit(fig)
+        plt.show()
     return result
 
 

@@ -1,15 +1,16 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 15.525786604965106,
-  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
+  "elapsed_seconds": 5.308934650965966,
+  "package_source_sha256": "cdc38cb651641b0a7701c1eab385e2ca9c9db1f45ee0cc6bce0b2da1f0d3c114",
+  "scientific_source_sha256": "9ccd4e777e1987db076b9ac5b19f8cd1c309a0a8e54f496c0a8bbdfe42a87a5d",
   "input_sha256": {},
   "example": "examples-gpu-direct-gpu-condensation-parity-walkthrough",
-  "fingerprint": "121489df39fef3fa1e6be311650e60f4a3f20e1a90353bdddf97344b2cd0f642",
+  "fingerprint": "2117a360cc2eb828a57ba0c449d05a2c070900afe90dc2b9f868ff62f355d43e",
   "source": "docs/examples/gpu/direct/gpu_condensation_parity_walkthrough.py",
-  "revision": "e6d8de004d68d2f8054a7654be48430a2af02cb9",
+  "revision": "c718cc37f6e9929c56bfb7c39dc765fc220b453b",
   "package_dirty": false,
-  "executed_at": "2026-11-19T14:49:56.220520+00:00",
+  "executed_at": "2026-11-19T20:36:54.427287+00:00",
   "device": "cuda:0: NVIDIA GeForce RTX 5060",
   "python": "3.12.12",
   "versions": {
@@ -27,28 +28,10 @@
     [],
     [
       {
-        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\nModule particula.gpu.kernels.condensation 14a649a load on device 'cuda:0' took 1.44 ms  (cached)\nModule particula.gpu.kernels.environment e11375e load on device 'cuda:0' took 1.89 ms  (cached)\nModule particula.gpu.kernels.condensation 2c7d291 load on device 'cuda:0' took 1.72 ms  (cached)\nModule particula.gpu.kernels._condensation_native 34375de load on device 'cuda:0' took 1.32 ms  (cached)\nModule particula.gpu.kernels.condensation c7ee7df load on device 'cuda:0' took 1.00 ms  (cached)\n"
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\nModule particula.gpu.kernels.condensation 14a649a load on device 'cuda:0' took 0.57 ms  (cached)\nModule particula.gpu.kernels.environment e11375e load on device 'cuda:0' took 0.36 ms  (cached)\nModule particula.gpu.kernels.condensation 2c7d291 load on device 'cuda:0' took 0.32 ms  (cached)\nModule particula.gpu.kernels._condensation_native 34375de load on device 'cuda:0' took 0.41 ms  (cached)\nModule particula.gpu.kernels.condensation c7ee7df load on device 'cuda:0' took 0.31 ms  (cached)\nModule particula.gpu.kernels.condensation f9b041d load on device 'cuda:0' took 0.37 ms  (cached)\nModule particula.gpu.kernels.thermodynamics 10b2126 load on device 'cuda:0' took 0.27 ms  (cached)\nModule particula.gpu.kernels.condensation e17dab7 load on device 'cuda:0' took 0.34 ms  (cached)\nModule particula.gpu.kernels.condensation 8e3ec5c load on device 'cuda:0' took 0.72 ms  (cached)\nModule particula.gpu.kernels._condensation_native 9623455 load on device 'cuda:0' took 0.28 ms  (cached)\nModule particula.gpu.kernels.condensation 5be46cb load on device 'cuda:0' took 0.63 ms  (cached)\nModule particula.gpu.kernels._condensation_native 76403ad load on device 'cuda:0' took 0.35 ms  (cached)\nModule particula.gpu.kernels.condensation daec62e load on device 'cuda:0' took 0.66 ms  (cached)\nModule particula.gpu.kernels._condensation_native c295a4d load on device 'cuda:0' took 0.37 ms  (cached)\nModule particula.gpu.kernels._condensation_native a80ebff load on device 'cuda:0' took 0.44 ms  (cached)\nModule particula.gpu.kernels.condensation fa471cb load on device 'cuda:0' took 0.87 ms  (cached)\nModule particula.gpu.kernels.condensation bd2ba31 load on device 'cuda:0' took 0.72 ms  (cached)\nModule particula.gpu.kernels.condensation 554f3d8 load on device 'cuda:0' took 0.84 ms  (cached)\n"
       },
       {
-        "text": "Module particula.gpu.kernels.condensation f9b041d load on device 'cuda:0' took 96.24 ms  (cached)\nModule particula.gpu.kernels.thermodynamics 10b2126 load on device 'cuda:0' took 0.94 ms  (cached)\nModule particula.gpu.kernels.condensation e17dab7 load on device 'cuda:0' took 156.77 ms  (cached)\n"
-      },
-      {
-        "text": "Module particula.gpu.kernels.condensation 8e3ec5c load on device 'cuda:0' took 1586.86 ms  (compiled)\nModule particula.gpu.kernels._condensation_native 9623455 load on device 'cuda:0' took 0.83 ms  (cached)\n"
-      },
-      {
-        "text": "Module particula.gpu.kernels.condensation 5be46cb load on device 'cuda:0' took 1637.32 ms  (compiled)\nModule particula.gpu.kernels._condensation_native 76403ad load on device 'cuda:0' took 2.62 ms  (cached)\n"
-      },
-      {
-        "text": "Module particula.gpu.kernels.condensation daec62e load on device 'cuda:0' took 1650.01 ms  (compiled)\nModule particula.gpu.kernels._condensation_native c295a4d load on device 'cuda:0' took 2.64 ms  (cached)\nModule particula.gpu.kernels._condensation_native a80ebff load on device 'cuda:0' took 2.50 ms  (cached)\n"
-      },
-      {
-        "text": "Module particula.gpu.kernels.condensation fa471cb load on device 'cuda:0' took 1800.82 ms  (compiled)\n"
-      },
-      {
-        "text": "Module particula.gpu.kernels.condensation bd2ba31 load on device 'cuda:0' took 1924.15 ms  (compiled)\nModule particula.gpu.kernels.condensation 554f3d8 load on device 'cuda:0' took 6.34 ms  (cached)\nModule particula.gpu.kernels._condensation_native 6dc00df load on device 'cuda:0' took 4.47 ms  (cached)\n"
-      },
-      {
-        "text": "Module particula.gpu.kernels._condensation_native bc27112 load on device 'cuda:0' took 603.58 ms  (cached)\nIndependent NumPy oracle completed (four fixed substeps).\nSynchronized Warp direct-kernel observations completed.\nphysics: passed - criteria satisfied\nconservation: passed - criteria satisfied\nenergy: passed - criteria satisfied\n"
+        "text": "Module particula.gpu.kernels._condensation_native 6dc00df load on device 'cuda:0' took 521.61 ms  (cached)\nModule particula.gpu.kernels._condensation_native bc27112 load on device 'cuda:0' took 0.62 ms  (cached)\nIndependent NumPy oracle completed (four fixed substeps).\nSynchronized Warp direct-kernel observations completed.\nphysics: passed - criteria satisfied\nconservation: passed - criteria satisfied\nenergy: passed - criteria satisfied\n"
       },
       {
         "image": "figure-3-1.png"
@@ -57,6 +40,6 @@
   ],
   "files": {
     "figure-3-1.png": "2042c3e1320ed843f1278f2b4109c5b3220bd27869e67535d0e852712c1dbcfb",
-    "source.py": "3240604d6fefe2fad56d7bc32a4e64a81e238d1795c63fa9d7bcd786e06cf887"
+    "source.py": "21dfeea38fa8ce2986368a908c3f0db145fbed5d14e7991352939fee18a5d5c5"
   }
 }

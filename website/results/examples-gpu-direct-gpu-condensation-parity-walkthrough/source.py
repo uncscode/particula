@@ -47,8 +47,6 @@ from dataclasses import dataclass
 from typing import Any, Literal
 
 import numpy as np
-from matplotlib import style as mplstyle
-from particula import plotting
 from particula.dynamics.condensation.mass_transfer import (
     get_first_order_mass_transport_k,
     get_mass_transfer_rate_latent_heat,
@@ -892,71 +890,72 @@ def run_example(device: str = "cpu") -> ExampleRun:
 
 
 # %%
-@mplstyle.context("particula.default")
 def run_publication():
     """Require successful CUDA acceptance before rendering the comparison."""
     import matplotlib.pyplot as plt
     import warp as wp
+    from particula import plotting
 
     if not _warp_enabled() or not wp.is_cuda_available():
         raise RuntimeError("This publication run requires CUDA")
     result = run_example(device="cuda:0")
     if any(item.status != "passed" for item in result.acceptance):
         raise AssertionError("CUDA condensation acceptance failed")
-    fig, axes = plotting.subplots(1, 2, size="wide")
-    labels = [
-        f"B{b + 1} P{p + 1} {s}"
-        for b in range(2)
-        for p in range(2)
-        for s in ("water", "organic")
-    ]
-    x = np.arange(8)
-    axes[0].bar(
-        x - 0.18,
-        result.oracle.total_mass_transfer.ravel() * 1e21,
-        width=0.36,
-        label="Independent NumPy",
-    )
-    axes[0].bar(
-        x + 0.18,
-        result.total_mass_transfer.ravel() * 1e21,
-        width=0.36,
-        label="CUDA",
-    )
-    axes[0].set(
-        ylabel="Signed mass transfer (ag)", xticks=x, xticklabels=labels
-    )
-    axes[0].tick_params(axis="x", rotation=65)
-    axes[0].axhline(0, color="0.5", linewidth=0.8)
-    plotting.legend(axes[0])
-    x = np.arange(4)
-    axes[1].plot(
-        x,
-        result.oracle.energy_transfer.ravel() * 1e12,
-        "o",
-        label="Independent NumPy",
-    )
-    axes[1].plot(
-        x,
-        result.energy_transfer.ravel() * 1e12,
-        "x",
-        markersize=9,
-        label="CUDA",
-    )
-    axes[1].set(
-        ylabel="Signed latent energy (pJ)",
-        xticks=x,
-        xticklabels=["B1 water", "B1 organic", "B2 water", "B2 organic"],
-    )
-    axes[1].tick_params(axis="x", rotation=35)
-    axes[1].axhline(0, color="0.5", linewidth=0.8)
-    plotting.legend(axes[1])
-    fig.suptitle(
-        "Independent condensation check · " + wp.get_device("cuda:0").name
-    )
-    print("\n".join(result.output))
-    plotting.fit(fig)
-    plt.show()
+    with plt.style.context("particula.default"):
+        fig, axes = plotting.subplots(1, 2, size="wide")
+        labels = [
+            f"B{b + 1} P{p + 1} {s}"
+            for b in range(2)
+            for p in range(2)
+            for s in ("water", "organic")
+        ]
+        x = np.arange(8)
+        axes[0].bar(
+            x - 0.18,
+            result.oracle.total_mass_transfer.ravel() * 1e21,
+            width=0.36,
+            label="Independent NumPy",
+        )
+        axes[0].bar(
+            x + 0.18,
+            result.total_mass_transfer.ravel() * 1e21,
+            width=0.36,
+            label="CUDA",
+        )
+        axes[0].set(
+            ylabel="Signed mass transfer (ag)", xticks=x, xticklabels=labels
+        )
+        axes[0].tick_params(axis="x", rotation=65)
+        axes[0].axhline(0, color="0.5", linewidth=0.8)
+        plotting.legend(axes[0])
+        x = np.arange(4)
+        axes[1].plot(
+            x,
+            result.oracle.energy_transfer.ravel() * 1e12,
+            "o",
+            label="Independent NumPy",
+        )
+        axes[1].plot(
+            x,
+            result.energy_transfer.ravel() * 1e12,
+            "x",
+            markersize=9,
+            label="CUDA",
+        )
+        axes[1].set(
+            ylabel="Signed latent energy (pJ)",
+            xticks=x,
+            xticklabels=["B1 water", "B1 organic", "B2 water", "B2 organic"],
+        )
+        axes[1].tick_params(axis="x", rotation=35)
+        axes[1].axhline(0, color="0.5", linewidth=0.8)
+        plotting.legend(axes[1])
+        fig.suptitle(
+            "Independent condensation check · " + wp.get_device("cuda:0").name
+        )
+        print("\n".join(result.output))
+        plotting.fit(fig)
+        plt.show()
     return result
 
 

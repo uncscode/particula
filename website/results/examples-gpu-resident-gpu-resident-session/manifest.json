@@ -1,15 +1,16 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 5.216187146026641,
-  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
+  "elapsed_seconds": 4.5094276670133695,
+  "package_source_sha256": "cdc38cb651641b0a7701c1eab385e2ca9c9db1f45ee0cc6bce0b2da1f0d3c114",
+  "scientific_source_sha256": "9ccd4e777e1987db076b9ac5b19f8cd1c309a0a8e54f496c0a8bbdfe42a87a5d",
   "input_sha256": {},
   "example": "examples-gpu-resident-gpu-resident-session",
-  "fingerprint": "6c955956716008d12fb8ee06b5ecad49a48680c0a8cea2f7b0bad61fcc41d8bc",
+  "fingerprint": "06ede0776027ff49c2e2ae6805f2e57e5c1543129db4cab14179257c472a8b57",
   "source": "docs/examples/gpu/resident/gpu_resident_session.py",
-  "revision": "e6d8de004d68d2f8054a7654be48430a2af02cb9",
+  "revision": "c718cc37f6e9929c56bfb7c39dc765fc220b453b",
   "package_dirty": false,
-  "executed_at": "2026-11-19T14:50:30.721452+00:00",
+  "executed_at": "2026-11-19T20:37:26.683591+00:00",
   "device": "cuda:0: NVIDIA GeForce RTX 5060",
   "python": "3.12.12",
   "versions": {
@@ -27,10 +28,7 @@
     [],
     [
       {
-        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\n"
-      },
-      {
-        "text": "Canonical path: docs/examples/gpu/resident/gpu_resident_session.py\nFinalization terminalizes its source; returned checkpoint is ACTIVE and cached.\nRestart is explicit, same-device, and never automatic.\nInspection is lossy; canonical checkpoint bytes are restart authority.\nCheckpoint schema version 5 compatibility is exact and fail-closed.\nExclusions: no scheduling, transport, fallback, or physics orchestration.\n"
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\nCanonical path: docs/examples/gpu/resident/gpu_resident_session.py\nFinalization terminalizes its source; returned checkpoint is ACTIVE and cached.\nRestart is explicit, same-device, and never automatic.\nInspection is lossy; canonical checkpoint bytes are restart authority.\nCheckpoint schema version 5 compatibility is exact and fail-closed.\nExclusions: no scheduling, transport, fallback, or physics orchestration.\n"
       },
       {
         "image": "figure-3-1.png"
@@ -39,6 +37,6 @@
   ],
   "files": {
     "figure-3-1.png": "b105abde35fe4a5385c3ff63902a1a52fd4c8419a77ac8c853616dece78941f6",
-    "source.py": "461919c3f6b811b448f2d15d42f940d21bc5c3b728202aca5d0a0e31172ab423"
+    "source.py": "1ba75984ec23d3122006a2846dbfd3de00a26b3647f7d968d67ba7748d041d83"
   }
 }
