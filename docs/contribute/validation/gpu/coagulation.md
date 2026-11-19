@@ -108,8 +108,9 @@ Python 3.12.12 and NumPy 2.3.4.
 A separate two-box, three-material fixture isolates evolving disjoint-pair
 capacity. At seed zero, a fixed 0.1 s step passes in both boxes. After the
 first merger in box zero, five active particles permit only two disjoint
-trials. The next interval requests three trials. The adaptive controller
-subdivides the interval using the updated majorant.
+trials. Its live majorant is 2.5088956262 × 10⁻¹⁵ m³ s⁻¹ on both Warp
+CPU and CUDA. Both boxes need three trials at 0.1 s and complete the
+interval in two admitted 0.05 s passes.
 
 The focused tests compare complete particle, field, collision, RNG and
 checkpoint state after a rejected composed step. They check ordinary versus
@@ -117,9 +118,11 @@ captured continuation, ordered direct collisions against manual replay,
 independent work limits, ULP boundaries, nonfinite demand and cohort
 accounting. A separate Warp CPU comparison uses 32 independent seeds per
 arm over 0.2 s. The adaptive 0.1 s and fixed 0.0125 s arms compare merger
-counts and mean squared active radius against four pooled standard errors.
-Passing that test establishes agreement for those two statistics and inputs.
-It does not establish general timestep convergence.
+counts and mean squared active radius against four combined standard errors.
+The adaptive and refined arms averaged 5.28 ± 0.19 and 4.88 ± 0.24 mergers,
+respectively. Their mean squared active radii were 1.077 ± 0.021 and
+1.041 ± 0.032 µm² (mean ± one standard error across seeds). Both
+differences fall within the specified band for this small fixture.
 
 ```bash
 python -m pytest particula/execution/tests/coagulation_subcycling_test.py -q -Werror
