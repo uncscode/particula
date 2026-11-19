@@ -188,6 +188,10 @@ def plot_results(report):
     plt.show()
 
 
+if __name__ == "__main__":
+    plot_results(simulate())
+
+
 # %% [markdown]
 # ## Interpretation
 #

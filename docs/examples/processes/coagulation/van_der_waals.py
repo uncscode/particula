@@ -62,7 +62,9 @@ def matrix(diameters, density, charge, hamaker, epsilon):
 def simulate():
     """Retain numerical values and assumptions needed to redraw the panels."""
     filename = "van-der-waals-measurements.json"
-    path = Path(filename)
+    path = Path(__file__).with_name(filename)
+    if not path.is_file():
+        path = Path(filename)
     if not path.is_file():
         path = (
             Path(__file__).resolve().parents[3] / "data/coagulation" / filename
@@ -173,6 +175,10 @@ def plot_results(report):
     )
     axes[1, 1].legend(fontsize=8)
     plt.show()
+
+
+if __name__ == "__main__":
+    plot_results(simulate())
 
 
 # %% [markdown]
