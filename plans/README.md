@@ -17,7 +17,9 @@ Stages 1, 2A and 2B are merged through
 [PR #1660](https://github.com/uncscode/particula/pull/1660), respectively, with
 [cloud/droplet integration examples](stage-02-cloud-droplet-examples.md) now
 qualified and published, including the full resident CUDA reruns.
-Stage 3A has a qualified homogeneous BAT implementation on its delivery branch. Stage 3B covers one published-study comparison. Stage 4 qualified the [BAT humidity-pulse ensemble](../docs/contribute/validation/gpu/bat-humidity-pulse.md) through 128 boxes. Stages 5–6 remain proposed.
+Stage 3A has a qualified homogeneous BAT implementation on its delivery branch. Stage 3B covers one published-study comparison. Stage 4 qualified the [BAT humidity-pulse ensemble](../docs/contribute/validation/gpu/bat-humidity-pulse.md) through 128 boxes. Stage 5 now qualifies closed-box initial-size recovery on CPU and CUDA.
+[Recovery, resolution and memory evidence](../docs/contribute/validation/numerics/initial-size-inversion.md).
+Stage 6 chemistry remains proposed.
 AIOMFAC activity is a separate follow-on; viscosity remains deferred.
 
 ## Staged development

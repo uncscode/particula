@@ -17,6 +17,9 @@ the reservoir appropriate to your question:
 - [Latent-energy accounting](condensation/condensation_latent_heat.py): diagnose transferred energy without assuming temperature feedback.
 - [Staggered stepping](condensation/staggered_condensation_example.py): distinguish a small conservation residual from trajectory accuracy.
 
+To estimate initial sizes from a final measurement, work through the
+[closed-box inversion](condensation/infer_initial_radius.py).
+
 Compare [activity models](../thermodynamics/activity/index.md) and
 [phase equilibrium](../thermodynamics/equilibria/index.md) when the thermodynamic
 assumptions, rather than the transfer algorithm, are your main uncertainty.

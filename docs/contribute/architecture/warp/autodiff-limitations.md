@@ -344,7 +344,7 @@ parameters are fixed.
 
 | Process | Recommended state-gradient path |
 | --- | --- |
-| Condensation (deterministic) | Bounded raw-rate autodiff evidence only; public-step differentiation unsupported |
+| Condensation (deterministic) | Fixed-step closed-box growth and terminal-radius loss qualified on CPU/CUDA. Public in-place steps require separate qualification. |
 | Gas partitioning / rates | Direct autodiff or reparameterization |
 | Coagulation, size distribution target | Deterministic sectional Smoluchowski surrogate |
 | Coagulation, mixing-state/hygroscopicity target | Composition-resolved sectional surrogate |
@@ -352,8 +352,9 @@ parameters are fixed.
 
 ## Particula-Specific Assessment
 
-Nothing in the production code uses gradients today. All GPU arrays are
-allocated with the default `requires_grad=False`. The physics building blocks
+The [closed-box inversion](../../validation/numerics/initial-size-inversion.md)
+uses dedicated fp64 gradient arrays. Ordinary forward execution keeps its
+existing allocation policy. The physics building blocks
 are already gradient-friendly; the stochastic control flow is not.
 
 ### Differentiable-friendly today

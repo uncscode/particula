@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 9.060029572923668,
+  "package_source_sha256": "c491d38a0f3b014be11117e77bf7f5ed27e4a834ba024ddbac813c1eefd5b6db",
+  "input_sha256": {
+    "scripts/assess_native_condensation.py": "041f93deb8732c3200193c0aa0ba4005ba2a46cabcd31bb23df77c451cdc45b7",
+    "scripts/assess_native_adaptive.py": "b012bc43a8be6253aa19ccb60e95e29f0d5d6850d23e3a8ba1077978f2312b38",
+    "scripts/inverse_studies/distribution.py": "70adbdda612388fd2a798be3b5cb867d67aa4b834e2328ff6a70b80069d9e848",
+    "scripts/inverse_studies/scalar_campaign.py": "6f6d5400323231fb4cc2404cda0aebc49145155c4e56d6673b74abef4ecaf0d8",
+    "scripts/inverse_studies/scalar_reference.py": "00b118758d61cd58e2470ff55730892ba52e7cdaa2be38b2e0d97baccbc4eed6"
+  },
+  "example": "infer-initial-radius",
+  "fingerprint": "c317d0c2966cc58a168ac92418292407b3887aee96c1851802beb3d3c6c344a0",
+  "source": "docs/examples/processes/condensation/infer_initial_radius.py",
+  "revision": "9fa5880745e74a36497f71101c4a75ee6a9ecdac",
+  "package_dirty": false,
+  "executed_at": "2026-11-19T13:19:10.324970+00:00",
+  "device": "cuda:0: NVIDIA GeForce RTX 5060",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.2",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [
+      {
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\nModule particula.execution.inverse_condensation 9d6d8ab load on device 'cuda:0' took 0.68 ms  (cached)\n"
+      },
+      {
+        "image": "figure-4-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "figure-4-1.png": "3fa543da62748f4f168aeb124fcfa240fc016cb88c1063763b4e7ccf0bb02250",
+    "data.json": "be2c0bb6fa9a2c93a44865b79e5e939640a713f5b66ccff982544a1e834c55f0",
+    "source.py": "ce5fde0a4a25ece618e87ef82cc88fc4327a00e98160ef07c1a7d125c8c5d558"
+  },
+  "simulation_fingerprint": "f2280fa68c6599748d23ced414a9e555914259a60e1b3661d5adf8a524c2c5bf"
+}

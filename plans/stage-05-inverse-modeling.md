@@ -1,6 +1,12 @@
 # Stage 5: Inverse modeling and automatic differentiation
 
-Next proposed stage, reviewed at `5ec711e600` on 2026-11-19. Entry dependency: a scientifically supported forward case
+The closed-box delivery used `/tmp/particula-stage-05` on
+`codex/stage-05-inverse-modeling`, based on upstream `c76cfb5993`.
+The executed implementation revision is `9fa5880745`.
+[Validation and representation decisions](../docs/contribute/validation/numerics/initial-size-inversion.md)
+· [Worked example](../docs/examples/processes/condensation/infer_initial_radius.py)
+
+Planning baseline reviewed at `5ec711e600` on 2026-11-19. Entry dependency: a scientifically supported forward case
 with validated [numerics](stage-02a-numerical-integration.md), reproducible
 [outputs](stage-02b-simulation-workflow.md), and a defined
 [observation comparison](stage-03b-scientific-comparisons.md).
