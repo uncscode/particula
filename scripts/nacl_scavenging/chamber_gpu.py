@@ -10,10 +10,12 @@ from instrument import (
     HERE,
     LOG_D,
     PRESSURE,
+    SCAN_CENTERS,
     TARGETS,
     TEMP,
     D,
     attachment_coefficient,
+    condition_scan,
     fit_walls,
     ion_density,
     probabilities,
@@ -218,7 +220,10 @@ def simulate(args):  # noqa: C901 -- ordered pulse and inventory checks
         100, p, large=True, mode_ratio=args.parent, ideal=args.ideal
     )
     reps = args.reps
-    groups = [(d, n) for d in TARGETS for n in [0, N100]]
+    conditioned = getattr(args, "conditioned", False)
+    targets = (4.0,) if conditioned else TARGETS
+    slope = 0.0
+    groups = [(d, n) for d in targets for n in [0, N100]]
     batches = len(groups) * reps
     mass = np.zeros((batches, 1 + COLLECTORS, 2))
     counts = np.zeros(mass.shape[:2])
@@ -227,6 +232,8 @@ def simulate(args):  # noqa: C901 -- ordered pulse and inventory checks
     for k, (target, n) in enumerate(groups):
         sl = slice(k * reps, (k + 1) * reps)
         small = selected(target, p, ideal=args.ideal)
+        if conditioned:
+            small, slope = condition_scan(small, p, args.tube)
         ds, qs, _ = sample(small, p, reps, rng, args.tube)
         mass[sl, 0, 0] = (np.pi / 6 * DENSITY * 1e-27) * ds**3
         counts[sl, 0] = 1
@@ -279,6 +286,15 @@ def simulate(args):  # noqa: C901 -- ordered pulse and inventory checks
     ]
     area = wp.zeros(batches, dtype=wp.float64, device=DEVICE)
     extra = wp.zeros(batches, dtype=int, device=DEVICE)
+    pairs = None
+    if getattr(args, "model", None):
+        from pulse_pairs import PulsePairs
+
+        if args.vdw:
+            raise ValueError("Select one thermal collision model")
+        pairs = PulsePairs(
+            args.model, batches, COLLECTORS + 1, DEVICE, N100 * 1e6 / COLLECTORS
+        )
     dispersion_table = arr(vdw_table()) if args.vdw else None
     diam0 = np.cbrt(initial_mass[:, 0] / (np.pi / 6 * DENSITY * 1e-27))
     collision_total = np.zeros(batches)
@@ -292,7 +308,15 @@ def simulate(args):  # noqa: C901 -- ordered pulse and inventory checks
         mechanism_config=CoagulationMechanismConfig(("charged_hard_sphere",)),
     )
     smps = {d: response(d, 0.10, 0.03, p, 1) for d in (*TARGETS, 100.0)}
-    rows = []
+    channels = (
+        {
+            center: response(center, 0.30, 0.03, p, 1).sum(axis=1)
+            for center in SCAN_CENTERS
+        }
+        if pairs
+        else {}
+    )
+    rows, scan_rows = [], []
     for step in range(round(args.duration / args.dt) + 1):
         if step:
             wp.launch(
@@ -321,10 +345,13 @@ def simulate(args):  # noqa: C901 -- ordered pulse and inventory checks
                 ],
                 device=DEVICE,
             )
-            _, _, events = coagulation_step_gpu(
-                aerosol, initialize_rng=step == 1, **params
-            )
-            collision_total += events.numpy()
+            if pairs:
+                pairs.step(aerosol, args.dt, args.seed + 1000003 * step, fault)
+            else:
+                _, _, events = coagulation_step_gpu(
+                    aerosol, initialize_rng=step == 1, **params
+                )
+                collision_total += events.numpy()
             if args.vdw:
                 wp.launch(
                     dispersion,
@@ -356,6 +383,9 @@ def simulate(args):  # noqa: C901 -- ordered pulse and inventory checks
             )
         if step * args.dt not in (0, 60, 150, args.duration):
             continue
+        if pairs:
+            collision_total = pairs.events.numpy()
+            hazard = pairs.ledger.numpy()
         m = aerosol.masses.numpy()
         c = aerosol.concentration.numpy().astype(bool)
         z = aerosol.charge.numpy()
@@ -400,6 +430,33 @@ def simulate(args):  # noqa: C901 -- ordered pulse and inventory checks
                 np.testing.assert_equal(
                     np.all((captured == 0) | (captured == 1)), True
                 )
+                if pairs and mode == "small":
+                    readouts = {"reference": smps[d].sum(axis=1)}
+                    if target == 4.0:
+                        readouts.update(channels)
+                    for channel, sensitivity in readouts.items():
+                        w = np.interp(diam0[sl], D, sensitivity)
+                        scan_rows.append(
+                            dict(
+                                target_nm=target,
+                                readout=channel,
+                                loading_cm3=n,
+                                time_s=step * args.dt,
+                                signal_sum=np.interp(
+                                    diam, D, sensitivity
+                                ).sum(),
+                                weighted_exposure=w @ risk[sl],
+                                weighted_capture=w @ captured,
+                                thermal_expectation=w @ hazard[sl, 0],
+                                mechanical_expectation=w @ hazard[sl, 1],
+                                fallback_expectation=w @ hazard[sl, 2],
+                                mechanical_events=hazard[sl, 3].sum(),
+                                unweighted_mechanical_expectation=hazard[
+                                    sl, 1
+                                ].sum(),
+                                unweighted_capture=captured.sum(),
+                            )
+                        )
                 rows.append(
                     dict(
                         weighted_capture_sum=weight @ captured,
@@ -437,6 +494,8 @@ def simulate(args):  # noqa: C901 -- ordered pulse and inventory checks
                         - balance[sl, 1:3].sum() / reps,
                     )
                 )
+    if scan_rows:
+        save(args.label + "-channels.csv", scan_rows)
     save(args.label + ".csv", rows)
     save("wall-fits.csv", fits)
     meta = dict(
@@ -444,6 +503,7 @@ def simulate(args):  # noqa: C901 -- ordered pulse and inventory checks
         device=wp.get_device(DEVICE).name,
         seconds=time.perf_counter() - tic,
         boxes=batches,
+        tracer_prior_log_slope=slope,
         slots=mass.size // 2,
         accepted_collisions=int(collision_total.sum()),
         dispersion_events=int(extra.numpy().sum()),
@@ -467,5 +527,9 @@ if __name__ == "__main__":
     parser.add_argument("--parent", type=float, default=1.0)
     parser.add_argument("--ideal", action="store_true")
     parser.add_argument("--vdw", action="store_true")
+    parser.add_argument(
+        "--model", help="Collision model from pulse_pairs.MODELS"
+    )
+    parser.add_argument("--conditioned", action="store_true")
     parser.add_argument("--label", default="pulse")
     simulate(parser.parse_args())

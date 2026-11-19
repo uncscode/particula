@@ -9,13 +9,14 @@ from particula.dynamics.ions.attachment import attachment_coefficient
 from scipy.constants import elementary_charge
 from scipy.ndimage import gaussian_filter1d
 from scipy.optimize import brentq, curve_fit
-from study import OUT, PRESSURE, TEMP, archive_table
+from study import OUT, PRESSURE, ROOT, TEMP, archive_table
 
 HERE = OUT / "resolved"
 
 D = np.geomspace(1.6, 600, 1601)
 LOG_D = np.log(D)
 STATES = np.arange(-8, 9)
+SCAN_CENTERS = (3.59, 3.72, 3.85, 4.00, 4.14, 4.29, 4.45)
 TARGETS = (3.6, 3.7, 4.0, 5.0, 10.0)
 DILUTION = 0.6 / 3600
 MU = gas.get_dynamic_viscosity(TEMP)
@@ -115,6 +116,36 @@ def selected(
     )
     joint = parent[:, None] * response(target, width, blur, p, sign, max_z)
     return joint / joint.sum()
+
+
+def condition_scan(joint, p, tube):
+    """Tilt the tracer size prior to match the pooled detected mean channel.
+
+    This one-parameter sensitivity retains the classifier branches, inlet
+    neutralization, tube losses and the seven-channel detector response.
+    """
+    observed = np.genfromtxt(
+        ROOT / "docs/data/nacl-scavenging/archived-smps-counts.csv",
+        names=True,
+        delimiter=",",
+    )
+    centers = np.asarray(SCAN_CENTERS)
+    np.testing.assert_array_equal(observed["channel_nm"], centers)
+    centroid = np.average(centers, weights=observed["pooled_raw_counts"])
+    sensor = np.stack(
+        [response(d, 0.30, 0.03, p, 1).sum(axis=1) for d in centers], axis=1
+    )
+    transmitted = p[:, 8] + tube * (1 - p[:, 8])
+    base = joint.sum(axis=1) * transmitted
+    log_d = np.log(D / 4.0)
+
+    def error(slope):
+        signals = (base * np.exp(slope * log_d)) @ sensor
+        return np.average(centers, weights=signals) - centroid
+
+    slope = brentq(error, -40, 40)
+    tilted = joint * np.exp(slope * log_d)[:, None]
+    return tilted / tilted.sum(), slope
 
 
 def fit_walls():
