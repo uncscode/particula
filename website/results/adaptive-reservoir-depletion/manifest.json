@@ -1,19 +1,19 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 12.832493498921394,
-  "package_source_sha256": "6d2e24246ad67da3f2dd23afebccde41af3e1ed32de51992c99ef898b3f88d13",
+  "elapsed_seconds": 11.188644053065218,
+  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "adaptive-reservoir-depletion",
-  "fingerprint": "34e6eb23371ec3f85510878705981b96164de19f97ae01634ccfd52f346d503e",
+  "fingerprint": "b70ca628378e220efb3289b0415af2acca0d643462debbceadf2364d17e5810a",
   "source": "docs/examples/simulations/adaptive_reservoir_depletion.py",
-  "revision": "12742e1c394c7a836d31aff3aeecbd8c0ff2b523",
+  "revision": "6af97152d1570464ac5ccae56e3110001657e170",
   "package_dirty": false,
-  "executed_at": "2026-11-16T06:04:30.155062+00:00",
+  "executed_at": "2026-11-19T14:34:33.128120+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.3.1",
+    "particula": "0.3.2",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
@@ -36,25 +36,9 @@
     ]
   ],
   "files": {
-    "figure-4-1.png": "47bd4a9a35d5efc6f02cc97d16811a9101b82644758042b87d28669a1200ccba",
-    "executed_source.py": "ffef5fdaeac743063e0de3edde0b562d2e40620c8bec03cf23347858309c68e7",
+    "figure-4-1.png": "aa89fa06278bc4390c2c9cfa0bea3aa315f4872ba44d9ec91c4aa106351c72a2",
     "data.json": "0a2d354fde18add4a11107b9d2d984b3de724cf507f158e777c9765fc62ede0f",
-    "source.py": "ffef5fdaeac743063e0de3edde0b562d2e40620c8bec03cf23347858309c68e7"
+    "source.py": "b92f76d6fecb5e2e342687a7cf40a2d7e938271cb6f1ce023a2fbab45c2b3f86"
   },
-  "simulation_fingerprint": "bce76281d2a736fba33ec9fadfcb03bffef22bd91e23d7a7f12bab74bba63941",
-  "render_versions": {
-    "particula": "0.3.1",
-    "numpy": "2.3.4",
-    "scipy": "1.16.2",
-    "matplotlib": "3.10.7",
-    "nbclient": "0.10.2",
-    "jupytext": "1.17.3",
-    "warp-lang": "1.11.1",
-    "particula-distribution": "0.2.14"
-  },
-  "render_device": "CPU",
-  "execution_input_sha256": {},
-  "rendered_at": "2026-11-16T06:06:30.016034+00:00",
-  "render_revision": "12742e1c394c7a836d31aff3aeecbd8c0ff2b523",
-  "render_elapsed_seconds": 4.428437338094227
+  "simulation_fingerprint": "2001bee1d1842cb053684cf951a3925a19685d98c413b8074b3f9e0e678bd304"
 }

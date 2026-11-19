@@ -33,12 +33,15 @@
 # Importing necessary libraries
 import matplotlib.pyplot as plt  # For creating plots and visualizations
 import numpy as np  # For numerical operations
+from particula import plotting
 
 # For partitioning calculations in liquid-vapor equilibrium
 from particula.equilibria import partitioning
 from particula.particles.properties.organic_density_module import (
     get_organic_density_array,
 )  # For calculating species density
+
+plt.style.use("particula.default")
 
 # %% [markdown]
 # ## Span volatility while fixing the available organic mass
@@ -166,7 +169,7 @@ print("Calculation complete")
 # %% [markdown]
 # ## Interpret the two concentration scales
 #
-# The green curve uses the left axis for organic aerosol and the blue curve uses
+# The organic aerosol curve uses the left axis and the water curve uses
 # the right axis for aerosol water, both in µg/m³. Follow each axis separately:
 # a line crossing is not equality of concentrations. The high-activity water
 # response illustrates how strongly water uptake can change while organic mass
@@ -176,31 +179,32 @@ print("Calculation complete")
 # of how quickly an ambient aerosol responds or of validated multiphase kinetics.
 
 # %%
-fig, ax = plt.subplots()
+fig, ax = plotting.subplots()
 ax.plot(
     water_activity_curve,
     total_oa_concentration,
     label="total organic concentration",
-    color="green",
+    color=plotting.COLORS["indigo"],
 )
 aw = ax.twinx()
 aw.plot(
     water_activity_curve,
     water_concentration,
     label="water concentration",
-    color="blue",
+    color=plotting.COLORS["teal"],
 )
-plt.legend(loc="upper left")
+plotting.legend(plt.gca(), loc="upper left")
 ax.set_xlabel("Water activity")
 
 handles, labels = ax.get_legend_handles_labels()
 aw_handles, aw_labels = aw.get_legend_handles_labels()
 handles.extend(aw_handles)
 labels.extend(aw_labels)
-plt.legend(handles, labels, loc="upper left")
+plotting.legend(plt.gca(), loc="upper left", handles=handles, labels=labels)
 
 ax.set_ylabel("organic aerosol concentration [ug/m3]")
 aw.set_ylabel("aerosol water concentration [ug/m3]")
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]

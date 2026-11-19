@@ -271,9 +271,9 @@ def plot_results(report):
     fig, axes = plotting.subplots(1, 2, size="wide")
     colors = {
         "cpu": "black",
-        "resident": "tab:blue",
-        "captured": "tab:green",
-        "transfer": "tab:orange",
+        "resident": plotting.COLORS["teal"],
+        "captured": plotting.COLORS["indigo"],
+        "transfer": plotting.COLORS["rust"],
     }
     for mode, history in report["trajectories"].items():
         values = np.asarray(history)

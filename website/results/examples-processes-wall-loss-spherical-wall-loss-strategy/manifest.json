@@ -1,25 +1,26 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 23.42748601094354,
-  "package_source_sha256": "902c8c0cdca613c13f0eb58c91cd38f8aab068ea984b3df178e99d68797b813d",
+  "elapsed_seconds": 29.56100000301376,
+  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "examples-processes-wall-loss-spherical-wall-loss-strategy",
-  "fingerprint": "f6bf4bb3328960ea6700b741f59f894dba0ca11c9349fd52ef6927e6b223295e",
+  "fingerprint": "8448c569728b5158a620ae0cb7576d8b5a2cdeb86bdbcd35bb1e114d4705bc8a",
   "source": "docs/examples/processes/wall-loss/spherical_wall_loss_strategy.py",
-  "revision": "894f603509f47c3f35bbfa7c45f45752136e7d52",
-  "package_dirty": true,
-  "executed_at": "2026-11-16T01:27:26.699434+00:00",
+  "revision": "6af97152d1570464ac5ccae56e3110001657e170",
+  "package_dirty": false,
+  "executed_at": "2026-11-19T14:34:08.588292+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.2.14",
+    "particula": "0.3.2",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
     "nbclient": "0.10.2",
     "jupytext": "1.17.3",
-    "warp-lang": "1.11.1"
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
   },
   "outputs": [
     [],
@@ -54,8 +55,8 @@
     []
   ],
   "files": {
-    "figure-6-1.png": "e24535350fcf493881f93621351612cfe8970b83d16e5d46086cb4aa22fc5db0",
-    "figure-5-1.png": "73a780025ffc5d82a2fe5a6bf85075a0517b414554ab0b98362a670d496458e8",
-    "source.py": "60e134640cdbd13256ea7b45906731d542d9ba161e69b7bcbb5335e82b208711"
+    "figure-6-1.png": "b48409e443ceb6e9c81b32993d2d76fd1e2a2437d6cb766346047de458d852eb",
+    "figure-5-1.png": "98ada833f36b90ee9041ebf327741e3d795ff12c400c5a41109829b1ddfad4b1",
+    "source.py": "0a52510169d923db4689c2692b77c545e272ad42501c9e0169cec53eb5407b63"
   }
 }

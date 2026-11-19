@@ -227,7 +227,7 @@ for model, label, style in [
     )
 ax.set(
     xlabel="Nominal tracer diameter (nm)",
-    ylabel="Difference in apparent capture rate (cm³/s)",
+    ylabel="Apparent capture-rate\ndifference (cm³/s)",
 )
 plotting.legend(ax)
 plotting.fit(fig)
@@ -271,7 +271,7 @@ inlet = spectrum[
     & (spectrum["loading_cm3"] > 0)
 ]
 readout = pulse[(pulse["readout"] == "archived_scan") & (pulse["dt_s"] == 2.5)]
-fig, (channels_ax, rates_ax) = plotting.subplots(1, 2)
+fig, (channels_ax, rates_ax) = plotting.subplots(1, 2, size="wide")
 data = inlet[inlet["source"] == "reference"]
 channels_ax.plot(
     data["channel_nm"],
@@ -281,8 +281,14 @@ channels_ax.plot(
 )
 models = ["bare", "dispersion_only", "full", "full_settling_shear_10", "gatti"]
 for source, label, color, marker, shift in [
-    ("reference", "Reference source", "tab:blue", "o", -0.1),
-    ("smps_conditioned", "Fit to mean channel", "tab:orange", "s", 0.1),
+    ("reference", "Reference source", plotting.COLORS["teal"], "o", -0.1),
+    (
+        "smps_conditioned",
+        "Fit to mean channel",
+        plotting.COLORS["rust"],
+        "s",
+        0.1,
+    ),
 ]:
     subset = inlet[inlet["source"] == source]
     channels_ax.plot(
@@ -312,7 +318,7 @@ rates_ax.axhline(
     1.76, color="black", linestyle="--", label="Steady measurement"
 )
 rates_ax.set(
-    ylabel="Pulse capture coefficient (10⁻⁷ cm³/s)",
+    ylabel="Pulse capture coefficient\n(10⁻⁷ cm³/s)",
     xticks=np.arange(5),
     xticklabels=[
         "Bare",

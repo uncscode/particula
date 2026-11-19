@@ -1,15 +1,15 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 3.7707223339239135,
-  "package_source_sha256": "0587f4b83a0caa2c877058728a1667c3e36ec7dde2fda79a1e7e25d6fe93e47d",
+  "elapsed_seconds": 5.2412494759773836,
+  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "ccn-kappa-retrieval",
-  "fingerprint": "2aa19794aa8788875a132775ab2b4c59db83503f530aedccc3d6e21563c9050e",
+  "fingerprint": "9088c335d2be6ff6f72031e2374819f6158e0349e05089baad2c16d5fc6a4df5",
   "source": "docs/examples/thermodynamics/activity/ccn_kappa_retrieval.py",
-  "revision": "87e018f3e202549aa750353f184bc1f78592d45a",
+  "revision": "6af97152d1570464ac5ccae56e3110001657e170",
   "package_dirty": false,
-  "executed_at": "2026-11-18T15:00:04.542222+00:00",
+  "executed_at": "2026-11-19T14:34:37.190697+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
@@ -37,9 +37,9 @@
     ]
   ],
   "files": {
-    "figure-5-1.png": "7d69efde25b53de709be15f7f072356f464d7c835088b6c922f8087328387d65",
+    "figure-5-1.png": "0dc742dba72138b6a99cb9a1568c8e6398f2ca9a0b3952273ec8d03fec449534",
     "data.json": "095bb3b5c1d967b2c679fe90a73c345fa90dc3fc834d23ce39a10999e1a6501b",
-    "source.py": "c06e8458e6f3782ca34bdf0773320eb8b0f1e3063a3040a8cf0b7598839ba839"
+    "source.py": "1bb78a5d6b19cf40abb2b07fa464c69cad953483e426f3b1d68b4f927078e526"
   },
-  "simulation_fingerprint": "5eee2881571fc8103678b56bc245bc5bf3eddcf501f6ef0b6d220d078d8c9785"
+  "simulation_fingerprint": "00a652b9d76f1e0b363998dd4b63aec361661f2220e0c7a2de579fe4648388ee"
 }

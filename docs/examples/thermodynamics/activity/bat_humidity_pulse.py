@@ -206,8 +206,8 @@ def plot_results(result):
         )
         for i, segment in enumerate(np.array_split(np.arange(len(t)), 2)):
             for amounts, name, color in (
-                (vapor, "Vapor", "tab:blue"),
-                (particle, "Particle", "tab:orange"),
+                (vapor, "Vapor", plotting.COLORS["teal"]),
+                (particle, "Particle", plotting.COLORS["rust"]),
             ):
                 axes[1].plot(
                     1000 * t[segment],

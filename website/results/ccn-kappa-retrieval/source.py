@@ -21,6 +21,8 @@
 # %%
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import style as mplstyle
+from particula import plotting
 from particula.activity import bat_activity_coefficients
 from particula.particles import get_kelvin_radius
 from scipy.optimize import brentq, minimize_scalar
@@ -133,27 +135,27 @@ def simulate():
 
 
 # %%
+@mplstyle.context("particula.default")
 def plot_results(result):
     """Show size-resolved κ and threshold error from a 100 nm calibration."""
     size = result["diameter_nm"]
-    fig, (left, right) = plt.subplots(
-        1, 2, figsize=(10, 4), layout="constrained"
-    )
+    fig, (left, right) = plotting.subplots(1, 2)
     left.plot(size, result["full_kappa"], label="Full κ-Köhler inversion")
     left.plot(size, result["shortcut_kappa"], "--", label="Eq. 10 shortcut")
     left.set_ylabel("Effective κ")
-    left.legend()
+    plotting.legend(left)
     right.plot(size, result["prediction_error_percent"], color="#087f78")
     right.axhline(0, color="0.5", linewidth=0.8)
     right.plot(100, 0, "o", color="black", label="Calibration")
     right.set_ylabel("Critical supersaturation error (%)")
-    right.legend()
+    plotting.legend(right)
     for ax in (left, right):
         ax.set_xscale("log")
         ax.set_xticks(
             [10, 20, 50, 100, 200], labels=["10", "20", "50", "100", "200"]
         )
         ax.set_xlabel("Dry diameter (nm)")
+    plotting.fit(fig)
     return fig
 
 
@@ -180,3 +182,45 @@ if __name__ == "__main__":
 # diameter below saturation and compare growth at the same dry size and RH.
 # The [technical note](../../../guide/processes/ccn-retrieval.md) carries
 # that comparison through to an experimental decision.
+#
+# ## Choose a supersaturation scan
+#
+# These four figures come from the companion kinetic simulations. Start with
+# the expected κ and the median dry mobility diameter. The line gives the
+# predicted 50% counting point after 5 s and the band spans 10–90% counted.
+# For 100 nm particles with κ = 0.030, increasing the geometric standard
+# deviation from 1.10 to 1.20 widens the interval from 0.54–0.77% to
+# 0.46–0.90% supersaturation.
+#
+# ![Five-second supersaturation scan planner for 10–200 nm particles at two selection widths.](../../../images/thermodynamics/ccn-retrieval/lab-scan-planner.png)
+#
+# ## Check whether residence time changes the fit
+#
+# Compare the same size and κ in the 1 s and 5 s panels. Color gives the
+# signed relative error in the Eq. 10 retrieval. In the gray region a droplet
+# can reach the 1 µm optical gate before crossing its equilibrium maximum.
+#
+# ![Signed error in retrieved κ at the optical midpoint for one- and five-second exposures.](../../../images/thermodynamics/ccn-retrieval/lab-kappa-error.png)
+#
+# ## Test the effect of organic vapor
+#
+# The cross marks 100 nm and 0.35% supersaturation. With organic mass fixed,
+# changing from ideal mixing to BAT lowers the count by about 2 percentage
+# points. Supplying 10 µg/m³ of organic vapor raises the BAT count by 36
+# percentage points. Read each panel against its own color scale.
+#
+# ![Count differences from BAT nonideality and from organic co-condensation at five seconds.](../../../images/thermodynamics/ccn-retrieval/bat-design-contrast.png)
+#
+# ## Compare an ambient population
+#
+# In this separate four-component simulation, 44.57% of individually
+# composed particles reach the optical gate at 0.40% supersaturation in 5 s.
+# Averaging composition within narrow size bands gives 45.25%. The right
+# panel shows where the count is most sensitive to that assumption.
+#
+# ![Particle-resolved ambient scan and change in counts when size-band composition is averaged.](../../../images/thermodynamics/ccn-retrieval/ambient-cuda-reference.png)
+#
+# An experiment can test the mixing assumption by measuring composition
+# within the mobility bands where these count curves diverge. See the
+# [study methods](../../../contribute/validation/thermodynamics/ccn-retrieval.md)
+# for the population, numerical checks and scripts behind these figures.

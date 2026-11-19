@@ -13,12 +13,18 @@
 # ---
 
 # %% [markdown]
-# # Condensation Tutorial: Particle Resolved
+# # Competition for a finite water-vapor reservoir
 #
-# A particle resolved model is a model that tracks the properties of individual particles or collection of particles (e.g., super droplets). This is in contrast to a bulk model, which tracks the properties of the entire aerosol population. The particle resolved model can be more computationally expensive, but can provide more detailed information about the aerosol population.
+# What changes when particles consume the vapor that drives their growth? This
+# CPU calculation follows individual component masses while updating a shared
+# gas reservoir. It contrasts with the maintained-vapor assumption in the
+# [moving-bin example](condensation_2_massbin.py), but uses different initial
+# conditions rather than forming a direct numerical comparison.
 #
-# To run this type of model we will need to use a speciated distribution representation. This is so that we can track the properties of individual particles.
-#
+# The goal is to read size-distribution evolution together with water depletion
+# and particle mass. Familiarity with [represented counts and volume](../../fundamentals/particles/distribution_tutorial.py)
+# and [κ activity](../../thermodynamics/activity/kappa_activity_example.py) helps
+# interpret the bookkeeping.
 
 # %%
 # In Colab uncomment the following command to install particula:
@@ -26,15 +32,24 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from particula import plotting
 from particula.dynamics.condensation.species_mapping import (
     CondensationSpeciesMap,
 )
 
+plt.style.use("particula.default")
+
 # %% [markdown]
-# ## Setup Aerosol
+# ## Specify a closed material inventory
 #
-# First we'll draw from a lognormal distribution to create a set of particles. We'll will then build an aerosol object to represent the aerosol population.
+# The initial water saturation ratio is 1.025 at 298.15 K. Gas updates are enabled,
+# so this is an initial condition, not humidity maintained throughout the run.
+# Temperature remains fixed; latent-heat feedback is absent. Water and a
+# low-volatility hygroscopic component share the particle state.
 #
+# The legacy gas label `NH4HSO4` is an identifier, not a complete chemical model.
+# The supplied molar mass, density, κ, and surface tension require a consistent
+# material specification before applying this setup to a particular salt.
 
 # %%
 initial_water_vapor_activity = 1.025  # Relative humidity/100
@@ -74,9 +89,16 @@ environment = par.gas.EnvironmentData(
 )
 
 # %% [markdown]
-# **Sample Distribution**
+# ## Resolve the distribution without confusing radius and diameter
 #
-# Next we'll sample the distribution to get a set of particles. We'll then build an aerosol object to represent the aerosol population.
+# The samples are used as radii in the spherical mass calculation. The two radius
+# scales are 100 and 400 nm, and 10,000 unit-count particles occupy 1 cm³. Thus the
+# initial number density is 10¹⁰ m⁻³. The fixed seed selects one initial sample;
+# it does not quantify uncertainty in a measured population.
+#
+# Each slot initially has dry-component mass and zero water. As water accumulates,
+# its activity and the curvature correction change, allowing size-dependent
+# responses even though all particles share one vapor reservoir.
 
 # %%
 density = 1.77e3  # kg/m^3
@@ -140,9 +162,17 @@ aerosol_resolved = par.Aerosol(
 print(aerosol_resolved)
 
 # %% [markdown]
-# ## Condensation Process
+# ## Couple particle uptake to gas depletion
 #
-# Using the same iso thermal condensation process we now setup the particle resolved simulation. We'll track the properties of each particle as they grow.
+# `update_gases=True` couples material transfer to the gas inventory. The loop
+# records the initial state and then 999 advances of 0.01 s, each with ten
+# substeps; the last recorded time is 9.99 s. At every recorded state, the
+# assertion checks each gas-plus-particle material inventory using physical volume.
+#
+# The diagnostic water saturation ratio is recomputed from current gas and
+# temperature. The environment's stored initial ratio is not the evolving
+# humidity record. Conservation checks constrain material accounting, while
+# timestep refinement would test trajectory accuracy.
 
 # %%
 # define the condensation process
@@ -232,13 +262,21 @@ number_distribution_binned = number_distribution_binned / volume_sim
 print(aerosol_resolved)
 
 # %% [markdown]
-# ## Visualization
+# ## Read size, mass, and vapor together
 #
-# Finally we'll visualize the results of the simulation. The first plot is a histogram of the particle size distribution. The second plot is 2D distribution plot vs time. Third is our limiting varible of water vapor saturation ratio, and the mass transferred to the particles.
+# The first plot compares the initial distribution, the selected 1 s snapshot,
+# and the last recorded state. The legend's “CCN overshoot” label identifies that
+# chosen snapshot; it is not an independently detected activation threshold.
+# Histogram values are number per volume in each interval, not density per metre.
+#
+# The time–radius map shows how occupancy shifts between intervals; empty bins
+# are omitted from the logarithmic color scale. The final panel relates particle
+# mass density to the recomputed water saturation ratio. Size changes alone cannot
+# show whether the vapor reservoir was depleted.
 
 # %%
 # plot the initial and final distributions
-fig, ax = plt.subplots(figsize=(8, 5))
+fig, ax = plotting.subplots(size="wide")
 
 ax.bar(
     edges[:-1],
@@ -246,7 +284,7 @@ ax.bar(
     width=np.diff(edges),
     align="edge",
     label="Resolved initial",
-    color="red",
+    color=plotting.COLORS["rust"],
     alpha=0.7,
 )
 plot_index = 100
@@ -256,7 +294,7 @@ ax.bar(
     width=np.diff(edges),
     align="edge",
     label="CCN overshoot time: {:.1f} s".format(time[plot_index]),
-    color="purple",
+    color=plotting.COLORS["berry"],
     alpha=0.5,
 )
 ax.bar(
@@ -265,18 +303,19 @@ ax.bar(
     width=np.diff(edges),
     align="edge",
     label="Resolved final",
-    color="blue",
+    color=plotting.COLORS["teal"],
     alpha=0.7,
 )
 ax.set_yscale("log")
 ax.set_xscale("log")
 ax.set_xlabel("Particle radius (m)")
 ax.set_ylabel("Number concentration (m^-3)")
-ax.legend()
+plotting.legend(ax)
+plotting.fit(fig)
 plt.show()
 
 # %%
-fig, ax = plt.subplots(figsize=(8, 5))
+fig, ax = plotting.subplots(size="wide")
 
 # Swap X and Y to reverse axes
 X, Y = np.meshgrid(
@@ -289,11 +328,12 @@ log_of_number_distribution_binned = np.log10(
     out=np.nan * np.ones_like(number_distribution_binned),
     where=number_distribution_binned > 0,
 )
+ax.grid(False)
 contour = ax.contourf(
     X,
     Y,
     log_of_number_distribution_binned.T,
-    cmap="viridis",
+    cmap=plotting.colormap("magnitude"),
     vmin=5,
 )
 
@@ -307,27 +347,45 @@ ax.set_ylim([1e-8, 1e-5])  # Set limits for y-axis
 ax.set_yscale("log")  # Log scale for particle radius on y-axis
 ax.set_xlabel("Time (s)")
 ax.set_ylabel("Particle radius (m)")
-fig.tight_layout()
+plotting.fit(fig)
 plt.show()
 
 # %%
 # plot the total mass and water saturation on twin y-axis
-fig, ax1 = plt.subplots(figsize=(8, 5))
+fig, ax1 = plotting.subplots(size="wide")
 
-ax1.plot(time, total_mass_resolved, label="Total mass", color="blue")
+ax1.plot(
+    time, total_mass_resolved, label="Total mass", color=plotting.COLORS["teal"]
+)
 ax1.set_xlabel("Time (s)")
-ax1.set_ylabel("Total Particle mass (kg/m^3)", color="blue")
-ax1.tick_params(axis="y", labelcolor="blue")
+ax1.set_ylabel("Total Particle mass (kg/m^3)", color=plotting.COLORS["teal"])
+ax1.tick_params(axis="y", labelcolor=plotting.COLORS["teal"])
 
 ax2 = ax1.twinx()
-ax2.plot(time, water_saturation_in_time, label="Water saturation", color="red")
-ax2.set_ylabel("Water saturation", color="red")
-ax2.tick_params(axis="y", labelcolor="red")
+ax2.plot(
+    time,
+    water_saturation_in_time,
+    label="Water saturation",
+    color=plotting.COLORS["rust"],
+)
+ax2.set_ylabel("Water saturation", color=plotting.COLORS["rust"])
+ax2.tick_params(axis="y", labelcolor=plotting.COLORS["rust"])
 
-fig.tight_layout()
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
-# ## Summary
+# ## What the coupled history establishes
 #
-# This tutorial demonstrates how to run a particle resolved model. We performed a cloud condensation simulation and visualized the results. We can see once the aerosol particles activate there is a redistribution of water vapor to the larger particles as the smaller ones are out of equilibrium and evaporate.
+# The saved run gains particle water while the gas water concentration decreases;
+# per-material assertions keep their combined inventory fixed. These diagnostics
+# establish transfer within the specified closed, isothermal system. A size
+# histogram alone cannot establish which individual particles activated or whether
+# a transient is numerically resolved.
+#
+# For a cloud-activation question, define an explicit activation diagnostic and
+# track individual radius histories alongside the vapor budget. Repeat the initial
+# sampling and halve the timestep before interpreting a transient peak. To study
+# feedback from heating, add a thermal model rather than interpreting the
+# isothermal trajectory as adiabatic. The [latent-heat bookkeeping example](condensation_latent_heat.py)
+# shows the energy signal that such a model would need.

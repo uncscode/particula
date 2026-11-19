@@ -130,7 +130,7 @@ def plot_results(report):
     ax.grid(alpha=0.2)
 
     plotting.fit(fig)
-    fig, axes = plotting.subplots(1, 2)
+    fig, axes = plotting.subplots(1, 2, size="wide")
     for label, values in report["differential_m2_sr"].items():
         axes[0].semilogy(report["angle_degrees"], values, label=label)
     axes[0].set(

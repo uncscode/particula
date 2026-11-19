@@ -1,25 +1,26 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 3.7807844870258123,
-  "package_source_sha256": "6501d9940d7e5c883bfc0aeee62213fed01c4e3de1f17133b03100d0ef124f17",
+  "elapsed_seconds": 5.376489183981903,
+  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "particle-tracers",
-  "fingerprint": "eeb79dcabb5a4f5ba3bee90ec578ad1774499a95d02dc6e56aefc2120b1bef19",
+  "fingerprint": "37fa940807e708339a119d6f6b86c283dac8cab12c3d3a73af36169cbd90a2b6",
   "source": "docs/examples/processes/customization/particle_tracers.py",
-  "revision": "8d108f4543d98d493c4816b059a48ceb9d981aca",
+  "revision": "dd92d3c1ca71f36eacad56b49661b32c0da77ac7",
   "package_dirty": false,
-  "executed_at": "2026-11-15T16:48:47.588270+00:00",
+  "executed_at": "2026-11-19T14:42:54.161157+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.2.14",
+    "particula": "0.3.2",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
     "nbclient": "0.10.2",
     "jupytext": "1.17.3",
-    "warp-lang": "1.11.1"
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
   },
   "outputs": [
     [],
@@ -27,29 +28,287 @@
     [],
     [
       {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 161.39it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 188.04it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 202.22it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 216.45it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 170.69it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 181.43it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 185.11it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 204.80it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 186.70it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 194.36it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 171.94it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 180.85it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 184.27it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 181.82it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 187.10it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 179.55it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 188.47it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 217.76it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 206.58it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 210.85it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 219.04it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 206.25it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 224.46it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 224.38it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 224.98it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 219.86it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 211.26it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 184.92it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 268.42it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 274.17it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "Tracer inventory, exact resampling and passive rejection passed.\nActive slots after coagulation: 48\nSource inventory: 70 + 14.0 = 84.0\n"
+      },
+      {
         "image": "figure-4-1.png"
       }
     ]
   ],
   "files": {
-    "source.py": "d874e076be056c31743db60d0c65437fa448685d2619d7463a939a7cdbcbb744",
+    "figure-4-1.png": "c789b8751d4a3405c4b02924ecb956c60cfbd4979295c93ba87ec681efffd6bb",
     "data.json": "3c09155d460a480a7371714b391733adefa6684da17e9918a15f67e52de78995",
-    "executed_source.py": "d874e076be056c31743db60d0c65437fa448685d2619d7463a939a7cdbcbb744",
-    "figure-4-1.png": "bbe7049dc837367fb1c873df58b652b26a835c1ec86d70641c6083384ffc0ab2"
+    "source.py": "56c8764149fac53691ecd586d9cd2001479f43ea421d744d69fd6fc8d7d16bc6"
   },
-  "simulation_fingerprint": "acb7661568d49d27b71e0472a24b25726ee7254d419c187c0cf0058f38c9e33c",
-  "render_versions": {
-    "particula": "0.2.14",
-    "numpy": "2.3.4",
-    "scipy": "1.16.2",
-    "matplotlib": "3.10.7",
-    "nbclient": "0.10.2",
-    "jupytext": "1.17.3",
-    "warp-lang": "1.11.1"
-  },
-  "render_device": "CPU",
-  "execution_input_sha256": {},
-  "rendered_at": "2026-11-15T16:49:19.245951+00:00",
-  "render_revision": "8d108f4543d98d493c4816b059a48ceb9d981aca",
-  "render_elapsed_seconds": 4.197441522963345
+  "simulation_fingerprint": "b90acddc3aae7c971c4a144583607c37a6c1aec768c6db002b95208758db2303"
 }

@@ -43,6 +43,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from particula import plotting
+
+plt.style.use("particula.default")
 
 # %% [markdown]
 # ## Establish a pure-component reference
@@ -82,7 +85,9 @@ print(f"kelvin radius of glycerol {glycerol_kelvin_radius} m")
 # The curve approaches one at large radius and rises rapidly as radius shrinks.
 # The dashed line marks $r_K$. The grid extends from 0.1 nm to 1 µm to expose the
 # formula's behavior; its molecular-scale end is an extrapolation of a continuum
-# surface model, not a reliable prediction for molecular clusters.
+# surface model, not a reliable prediction for molecular clusters. The
+# implementation caps the exponent at 100; the smallest-radius squalane plateau
+# in the following plots is that numerical cap, not a physical saturation.
 
 # %%
 radii = np.logspace(-10, -6, 100)
@@ -96,12 +101,12 @@ glycerol_kelvin_term = np.atleast_1d(
     )
 ).squeeze()
 
-fig, ax = plt.subplots(figsize=(8, 6))
+fig, ax = plotting.subplots(size="wide")
 ax.plot(radii, glycerol_kelvin_term)
 ax.plot(
     np.array([glycerol_kelvin_radius, glycerol_kelvin_radius]),
     np.array([glycerol_kelvin_term.min(), glycerol_kelvin_term.max()]),
-    color="red",
+    color=plotting.COLORS["rust"],
     linestyle="--",
 )
 ax.set_yscale("log")
@@ -109,7 +114,8 @@ ax.set_xscale("log")
 ax.set_title("Kelvin term of glycerol")
 ax.set_xlabel("radius (m)")
 ax.set_ylabel("Kelvin term")
-ax.legend(["Kelvin term", "Kelvin radius"])
+plotting.legend(ax, labels=["Kelvin term", "Kelvin radius"])
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
@@ -146,12 +152,12 @@ squalane_kelvin_term = np.atleast_1d(
     )
 ).squeeze()
 
-fig, ax = plt.subplots(figsize=(8, 6))
+fig, ax = plotting.subplots(size="wide")
 ax.plot(radii, squalane_kelvin_term)
 ax.plot(
     np.array([squalane_kelvin_radius, squalane_kelvin_radius]),
     np.array([squalane_kelvin_term.min(), squalane_kelvin_term.max()]),
-    color="red",
+    color=plotting.COLORS["rust"],
     linestyle="--",
 )
 ax.set_yscale("log")
@@ -159,7 +165,8 @@ ax.set_xscale("log")
 ax.set_title("Kelvin term of squalane")
 ax.set_xlabel("radius (m)")
 ax.set_ylabel("Kelvin term")
-ax.legend(["Kelvin term", "Kelvin radius"])
+plotting.legend(ax, labels=["Kelvin term", "Kelvin radius"])
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
@@ -239,26 +246,26 @@ np.testing.assert_allclose(
     mixture_kelvin_term, np.exp(mixture_kelvin_radius / radii)
 )
 
-fig, ax = plt.subplots(figsize=(8, 6))
+fig, ax = plotting.subplots(size="wide")
 ax.plot(radii, mixture_kelvin_term, label="Glycerol in mixed phase")
 ax.plot(
     np.array([mixture_kelvin_radius, mixture_kelvin_radius]),
     np.array([mixture_kelvin_term.min(), mixture_kelvin_term.max()]),
-    color="red",
+    color=plotting.COLORS["rust"],
     linestyle="--",
 )
 ax.plot(radii, glycerol_kelvin_term, label="Pure glycerol")
 ax.plot(
     np.array([glycerol_kelvin_radius, glycerol_kelvin_radius]),
     np.array([glycerol_kelvin_term.min(), glycerol_kelvin_term.max()]),
-    color="red",
+    color=plotting.COLORS["rust"],
     linestyle="--",
 )
 ax.plot(radii, squalane_kelvin_term, label="Pure squalane")
 ax.plot(
     np.array([squalane_kelvin_radius, squalane_kelvin_radius]),
     np.array([squalane_kelvin_term.min(), squalane_kelvin_term.max()]),
-    color="red",
+    color=plotting.COLORS["rust"],
     linestyle="--",
 )
 ax.set_yscale("log")
@@ -266,7 +273,8 @@ ax.set_xscale("log")
 ax.set_title("Kelvin term of mixture")
 ax.set_xlabel("radius (m)")
 ax.set_ylabel("Kelvin term")
-ax.legend()
+plotting.legend(ax)
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]

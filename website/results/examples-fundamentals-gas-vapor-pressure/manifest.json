@@ -1,25 +1,26 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 4.13590390898753,
-  "package_source_sha256": "8340db23fd0f933d97cccca5043297b3b1382b94bbaa2249dcaeb9fe1dc62879",
+  "elapsed_seconds": 5.349624629947357,
+  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "examples-fundamentals-gas-vapor-pressure",
-  "fingerprint": "861f7705f7398610b5fd346a1c6007087a2f5638f7aca9b79eae22403778457b",
+  "fingerprint": "b45e966056449bc25661962db2a7e26216d7b1a062f0464c18bfc8615f983714",
   "source": "docs/examples/fundamentals/gas/vapor_pressure.py",
-  "revision": "277ccafb82ee7ed32af4ea96bec6ae301ce67df5",
+  "revision": "6af97152d1570464ac5ccae56e3110001657e170",
   "package_dirty": false,
-  "executed_at": "2026-11-15T19:32:31.127203+00:00",
+  "executed_at": "2026-11-19T14:32:25.798397+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.2.14",
+    "particula": "0.3.2",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
     "nbclient": "0.10.2",
     "jupytext": "1.17.3",
-    "warp-lang": "1.11.1"
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
   },
   "outputs": [
     [],
@@ -29,9 +30,6 @@
       }
     ],
     [
-      {
-        "text": "[ERROR|abc_builder|L150]: Required parameter(s) not set: b, c\n"
-      },
       {
         "text": "Required parameter(s) not set: b, c\n"
       }
@@ -63,11 +61,11 @@
     ]
   ],
   "files": {
-    "source.py": "e6b1b7f5bcddb0c2c760b332f038b5448d8f72e2488a315ad5a0e5d9907a87e7",
-    "figure-4-1.png": "0d65b019f7343483ab2a9201803bc21821f5f2ea21cee7d28424d195ad5eb807",
-    "figure-5-1.png": "2a345652d0b668d8b70a7ab1322155f3646c4085fda7458d3e8534de4de9cb8f",
-    "figure-6-1.png": "8d38168add51614574cbc362bff47aae3157718954853d6c0d4cca285ac71cf3",
-    "figure-7-1.png": "e30aef82948384a8c9fe0a978d1359f2bd17795f20d18404696e99292ce177d6",
-    "figure-8-1.png": "350ff57e7c0aaa40a0b3af56f2d96900a9b52bb17426c068b859129279c6e481"
+    "figure-8-1.png": "deed6631f824d8fb2d94033d803cf5216a7202c8e1e3e370a2da3eb6500e0678",
+    "figure-7-1.png": "530a2c10ffeac1ff787f40689e79e6a735cf0f7466cbb1c6cbd334ade39d280c",
+    "figure-6-1.png": "b5434f94d8f8e0d1f190534b4054ed6445b240ba8f3ab19ce4aefbad20d202b0",
+    "figure-5-1.png": "6d1c230e81dc26db0cbec7b0c941a8542e34f31029beb931c7774ced649a6a4b",
+    "figure-4-1.png": "b963f75daddea81f003f53ac493c1c62e681779efa96028a864b01ed13bc797a",
+    "source.py": "576743483618d525e0c087c1f27717198ea6170dfe543ea88738e8f47d3baaf0"
   }
 }

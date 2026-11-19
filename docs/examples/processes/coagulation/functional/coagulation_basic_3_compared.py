@@ -225,7 +225,7 @@ ax.plot(
 ax.set_xscale("log")
 ax.set_xlabel("Particle radius (m)")
 ax.set_ylabel(r"Number concentration ($m^{-3}$)")
-ax.set_title("PMF vs PDF coagulation (converted to PMF units)")
+ax.set_title("PMF and PDF in PMF units")
 plotting.legend(ax)
 ax.grid(alpha=0.3)
 plotting.fit(fig)

@@ -1,25 +1,30 @@
 # %% [markdown]
-# # Carry registered tracers through particle events
+# # Follow a source marker through collisions and removal
 #
-# This Particula 0.3 development example registers an additive per-particle tag.
-# A tag is a dimensionless extensive marker, not an extra material species or a
-# change to aerosol physics. Its represented inventory is sum(nᵢ qᵢ), where nᵢ
-# is represented particle count and qᵢ is tag amount per physical particle.
+# Can a tracer still tell you where particle material came from after particles
+# merge or storage is resampled? This CPU example registers an additive per-particle
+# marker and checks its represented inventory, Σ nᵢ qᵢ. The marker is dimensionless
+# and extensive per physical particle; it is not a material species and does not
+# change aerosol physics.
 #
-# The first CPU case composes Brownian coagulation with dilution. Mergers add
-# the tags of the actual colliding particles; dilution changes counts while
-# preserving per-particle tags and recording removed inventory. The second,
-# separate case uses native nucleation to force fixed-capacity resampling and
-# initialize newborn tags. It checks the interval-overlap redistribution by hand.
-# Requirements: NumPy, SciPy, Matplotlib and this development Particula version.
-# This example runs on CPU and makes no CPU/GPU stochastic trajectory claim.
+# The first case combines actual Brownian mergers with dilution. It uses 256
+# particles with radii 20–80 nm, number density 10¹⁵ m⁻³, and an alternating 0/1
+# tag. The high abundance makes mergers observable in a short 15 s calculation.
+# Merging adds partner tags; dilution at 0.03 s⁻¹ changes counts and records the
+# removed inventory while preserving each survivor's per-particle tag.
+#
+# The second, independent case forces fixed-capacity resampling during nucleation
+# and assigns newborn tags. Read [represented counts](../../fundamentals/particles/distribution_tutorial.py)
+# and [bounded sources](../nucleation/cpu_nucleation.py) first. These cases check
+# CPU bookkeeping; they make no CPU/GPU stochastic-trajectory claim.
 
 # %%
 """Registered particle-field inventory and redistribution examples."""
 
 import matplotlib.pyplot as plt
 import numpy as np
-from particula import Aerosol, FieldSpec
+from matplotlib import style as mplstyle
+from particula import Aerosol, FieldSpec, plotting
 from particula.dynamics import (
     ActivationNucleationBuilder,
     BrownianCoagulationStrategy,
@@ -257,11 +262,26 @@ def simulate():
     return dict(coagulation=coagulation_case(), source=source_case())
 
 
+# %% [markdown]
+# ## Read three different accounting views
+#
+# The first panel tests inventory closure under removal. The second shows how
+# mergers change tag amount per particle; its vertical axis is represented count,
+# not a normalized probability. The third shows per-particle tag values in storage
+# slots after resampling and births. Multiply by the displayed case's counts
+# (1.5, 1.5, 1, 1) before summing that panel into an inventory.
+#
+# `passive_rejection` separately verifies that a label with no additive policy
+# is rejected without changing particle masses or labels. The following renderer
+# is called by `run_example` after these scientific checks.
+
+
 # %%
+@mplstyle.context("particula.default")
 def plot_results(report):
     """Show inventory closure, changed distributions and explicit source tags."""
     coag, source = report["coagulation"], report["source"]
-    fig, axes = plt.subplots(1, 3, figsize=(13, 4), constrained_layout=True)
+    fig, axes = plotting.subplots(1, 3)
     axes[0].plot(coag["time"], coag["inventory"], label="In-box inventory")
     axes[0].plot(coag["time"], coag["removal"], label="Removed inventory")
     axes[0].plot(
@@ -280,7 +300,7 @@ def plot_results(report):
     axes[1].set(
         xlabel="Tag units per particle",
         ylabel="Represented count",
-        title="Mergers change the distribution",
+        title="Distribution after mergers",
     )
     slots = np.arange(4)
     axes[2].bar(slots - 0.18, source["before"], 0.36, label="Before source")
@@ -288,12 +308,13 @@ def plot_results(report):
     axes[2].set(
         xlabel="Storage slot",
         ylabel="Tag units per particle",
-        title="Resampling then two births",
+        title="Resampling and two births",
         xticks=slots,
     )
     for ax in axes:
-        ax.legend(fontsize=8)
+        plotting.legend(ax)
         ax.grid(alpha=0.2)
+    plotting.fit(fig)
     plt.show()
 
 
@@ -316,3 +337,19 @@ def run_example():
 
 if __name__ == "__main__":
     run_example()
+
+# %% [markdown]
+# ## Preserve an inventory without overinterpreting a label
+#
+# The first case checks that retained plus removed tag inventory equals the
+# initial 128 units, and that retained inventory follows the analytic dilution
+# factor. The second gives 70 old tag units plus 14 newborn units, totaling 84.
+# Those are separate experiments; their inventories must not be combined.
+#
+# This establishes additive-field accounting and a controlled resampling example,
+# not preservation of every size–tag correlation. To adapt the tracer to source
+# mixing, tag two initial sources and compare tag fraction conditional on size
+# before and after mergers. Vary resampling pressure and stochastic realization
+# to determine whether an inferred mixing trend survives changes in representation.
+# A categorical source name needs an explicit merging rule; the passive-label
+# rejection shows why arbitrary labels cannot be silently added.

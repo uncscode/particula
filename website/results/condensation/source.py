@@ -13,28 +13,17 @@
 # ---
 
 # %% [markdown]
-# # Condensation Tutorial: Radius Bin
+# # Will this population initially grow or evaporate?
 #
-# This example constructs native binned data and evaluates the initial
-# condensation rate. For a time-evolving particle-resolved example, see
-# `staggered_condensation_example.ipynb`.
+# Before integrating a condensation model, inspect the direction and meaning of
+# its initial mass-transfer rate. A class named `MassCondensation` can describe
+# evaporation too: the sign follows the gas-to-surface vapor-pressure difference.
 #
-# Condensation is the first process where this framework we have been building
-# up is applied. Here we need to account for the gas phase and the particle
-# phase, then ensure that the partial pressures of species at the surface of
-# the particle are equal to the partial pressure in the gas.
-#
-# **Core Concepts:**
-#
-# - **Runnable**: An abstract base class defining the interface for aerosol
-#   transformation processes. An aerosol object is passed to the process, and
-#   the process is expected to modify the aerosol object in place, returning
-#   the modified object.
-# - **MassCondensation**: A concrete class implementing the RunnableProcess
-#   interface for the condensation process. It adds mass to the aerosol object
-#   based on the partial pressures of the gas phase and the particle phase,
-#   then removes the mass from the gas phase.
-#
+# This CPU example constructs a glycerol population and evaluates its initial
+# rate at 298.15 K. It does not advance time. The aim is to distinguish the
+# population's initial size distribution from its tendency to gain or lose mass.
+# Read [size distributions](../../fundamentals/particles/aerosol_distributions.py)
+# and [vapor pressure](../../fundamentals/gas/vapor_pressure.py) for prerequisites.
 
 # %%
 # In Colab uncomment the following command to install particula:
@@ -44,14 +33,26 @@ import numpy as np
 
 # particula imports
 import particula as par
+from particula import plotting
 from particula.dynamics.condensation.species_mapping import (
     CondensationSpeciesMap,
 )
 
+plt.style.use("particula.default")
+
 # %% [markdown]
-# ## Setup Aerosol
+# ## Specify the particles and their vapor reservoir
 #
-# First we will repeat the aerosol object that we have been using in the previous notebooks. This object will be passed to the `Runnable` processes `MassCondensation`, and modified in place.
+# The example uses a single material, spherical particles with density
+# 1,260 kg m⁻³, a lognormal radius distribution, and total number concentration
+# 10¹⁰ m⁻³. Radii are in metres; `discrete` concentration stores number per volume
+# in each bin. The 500 radius points span 10 nm–10 µm.
+#
+# Gas concentration starts at 1% of the saturation concentration calculated by
+# the configured Clausius–Clapeyron relation. The vapor-pressure parameters are
+# demonstration inputs, not a calibration established here. This strongly
+# undersaturated setting gives a clear reason to inspect evaporation. Surface
+# curvature and activity enter the equilibrium surface pressure separately.
 
 # %%
 # Glycerol gas
@@ -105,15 +106,23 @@ aerosol = par.Aerosol(
 print(aerosol)
 
 # %% [markdown]
-# ## Condensation Process (Isothermal)
+# ## Evaluate a rate without advancing the state
 #
-# In code this process is implemented as a `Runnable` process. This means that the process is expected to modify the aerosol object in place, returning the modified aerosol object. This is defined in `Particle_processes.py` as the `MassCondensation` class.
+# `CondensationIsothermal` combines vapor pressure, ideal activity, surface
+# curvature, transport parameters, and an explicit gas-to-particle species map.
+# The map connects the glycerol gas lane to the glycerol particle material.
+# `MassCondensation` wraps that strategy for native aerosol state.
 #
-# The `MassCondensation` class takes a `CondensationStrategy` object as an input. This object defines and evaluates the $dm_{i}/dt$ equation for the condensation process. More strategies can be added into the `condensation.py` file.
+# The call below uses `rate(aerosol)`. Its output retains box, particle-slot,
+# and material axes, even with one box and one material. For this binned
+# population, entries are contributions to mass-density change in kg m⁻³ s⁻¹,
+# including each bin's number concentration. They are not individual-particle
+# rates in kg s⁻¹. Summing over slots would give the population rate; the printed
+# mean is only an average of bin contributions.
 #
-# For now, let's just run it for a few time steps and see what happens.
-#
-# Note: We have a moving bin particle representation, so we would expect all the bins to move.
+# Positive entries indicate uptake and negative entries evaporation. The
+# pressure driving force is described in the [condensation equations](../../../theory/dynamics/condensation-equations.md).
+# The figure shows the initial PMF, not a growth trajectory.
 
 # %%
 # define the condensation process
@@ -145,7 +154,7 @@ print(f"Mean rate: {np.mean(rate):.2e} kg/m^3/s per slot")
 
 # %%
 # Plot the initial particle distribution
-fig, ax = plt.subplots(figsize=(8, 6))
+fig, ax = plotting.subplots(size="wide")
 ax.semilogx(
     initial_radii * 1e9,
     initial_concentration,
@@ -154,28 +163,38 @@ ax.semilogx(
 )
 ax.set_xlabel("Radius (nm)")
 ax.set_ylabel("Concentration (1/m^3)")
-ax.legend()
+plotting.legend(ax)
 ax.set_title("Initial Particle Distribution (PMF)")
 ax.grid(alpha=0.3)
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
-# > **Note:** Full time evolution with bin-based representations requires
-# > careful handling of the distribution array dimensions. For complete
-# > working examples of condensation dynamics, see
-# > `staggered_condensation_example.ipynb` which uses particle-resolved
-# > representations that are designed for multi-step simulations.
+# ## Interpret the displayed state and rate
+#
+# The initial spectrum identifies where particles are placed in radius bins.
+# Its ordinate is bin number concentration, so it should be summed rather than
+# integrated against radius. It cannot show growth because no timestep has run.
+#
+# Use the printed signed rate to interpret the initial tendency in the chosen
+# undersaturated environment. Neither the mean rate nor the initial PMF tells
+# us how long evaporation takes: radii, surface pressure, and gas concentration
+# would change during integration.
 
 # %% [markdown]
-# ## Summary
+# ## From an initial tendency to a research question
 #
-# This notebook demonstrated the basic setup for condensation with:
+# This calculation connects a specified aerosol and vapor reservoir to an
+# initial mass-transfer tendency. It establishes neither an equilibrium endpoint
+# nor a numerically converged time history.
 #
-# - **Vapor Pressure Strategy**: Clausius-Clapeyron equation for glycerol
-# - **Gas Species**: Native `GasData` with partitioning enabled
-# - **Particle Distribution**: PMF (bin-based) representation
-# - **Condensation Strategy**: `CondensationIsothermal` for simple mass transfer
-# - **Runnable Process**: `MassCondensation` wraps the strategy
+# A useful next investigation is to vary the initial saturation factor and
+# compare the rate by radius, checking where its sign changes. Keep the species
+# map and units fixed; account for curvature before equating flat-surface
+# saturation with zero rate for every particle. This is a proposed extension,
+# not a scan executed here.
 #
-# For complete time evolution examples with particle-resolved representations,
-# see `staggered_condensation_example.ipynb`.
+# For an actual time history, continue to the
+# [staggered condensation example](staggered_condensation_example.py).
+# Check gas-plus-particle inventories and timestep sensitivity separately:
+# conservation alone does not establish trajectory accuracy.

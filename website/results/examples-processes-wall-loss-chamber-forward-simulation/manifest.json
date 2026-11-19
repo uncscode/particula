@@ -1,25 +1,26 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 15.658292983076535,
-  "package_source_sha256": "5783b7add1e7369bf8061316ea117038715af63e3ca90fb1e6d299925f5f330f",
+  "elapsed_seconds": 19.98621976992581,
+  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "examples-processes-wall-loss-chamber-forward-simulation",
-  "fingerprint": "fedb36b3eec4a23cf7cd3d7e3c5c0f478e637dcff266977c25a07d3f2302fb6b",
+  "fingerprint": "46a0dea3e9210f914e5377a17d0ced17bdbad84e35975b6409aa78d8fe2072f8",
   "source": "docs/examples/processes/wall-loss/chamber_forward_simulation.py",
-  "revision": "894f603509f47c3f35bbfa7c45f45752136e7d52",
-  "package_dirty": true,
-  "executed_at": "2026-11-16T01:26:57.308337+00:00",
+  "revision": "6af97152d1570464ac5ccae56e3110001657e170",
+  "package_dirty": false,
+  "executed_at": "2026-11-19T14:33:53.983712+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.2.14",
+    "particula": "0.3.2",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
     "nbclient": "0.10.2",
     "jupytext": "1.17.3",
-    "warp-lang": "1.11.1"
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
   },
   "outputs": [
     [],
@@ -50,10 +51,10 @@
     ]
   ],
   "files": {
-    "figure-6-1.png": "26b24040e10800934d78661f57fcf99ecfa3472a15991eff2efdfabe33b1d54f",
-    "figure-5-1.png": "b5f50a1038a82dff99ace51ce7f25972b2538766b6b36d17e17ebd5ec2388a2b",
-    "figure-3-1.png": "9d7b81cb2699ecf213402f5b66f69469a59c26ac4f7bcca6c9f94059cf4d8ade",
-    "figure-2-1.png": "e32f30426a53c45fd8eccd8db7704f2265e9203061cf56b6ca58fdd03d04ca74",
-    "source.py": "4446b8a761917f20f6e28c9d652113a45ce18ad3b5e1f888a42a7f05dcf52337"
+    "figure-6-1.png": "03de3c4847aa05f1d8f345a4a88902b916eeb48b512a0d4bc45dcc08a4fcc308",
+    "figure-5-1.png": "8f4c6adc4f588b28bdf37184c1589b80cb4b0b07e026a6112a642c6ec5edaf47",
+    "figure-3-1.png": "a47814ae681e865104ba847cfe6f85e1f33309e03be72315c7f99f49cff42be8",
+    "figure-2-1.png": "323656c26080291540edadc5595a54dad7f9c5a099a2249a3b74fc6a81765af0",
+    "source.py": "b1c2daa685e217655d36f33bb6397c8395eb6626984b2fc89764bfc606669f21"
   }
 }

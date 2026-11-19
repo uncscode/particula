@@ -1,27 +1,28 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 3.1431765150045976,
-  "package_source_sha256": "063362866e7bedffc54aa322ccb01cdfa0313e8f5897ffb2b12a22099209b228",
+  "elapsed_seconds": 8.507034605019726,
+  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {
     "docs/data/gpu/rtx5060.json": "253c5eb30214086edf5341178aa5e6e399a85da0db6e13ac66f25333d15ef6d7"
   },
   "example": "gpu-scaling-results",
-  "fingerprint": "715036e72f39decd8dbc5dd5c1ad81dfaba5ebc41333ef98903ccfeca59894b3",
+  "fingerprint": "6e0732548a9b23b33599ed37ff8e732209c62065654205d5f32d74ffb4f8725c",
   "source": "docs/examples/gpu/prepared/gpu_scaling_results.py",
-  "revision": "a57ea66897293112ea28a0dc566f44195e1fcfe9",
+  "revision": "dd92d3c1ca71f36eacad56b49661b32c0da77ac7",
   "package_dirty": false,
-  "executed_at": "2026-11-14T03:19:49.310657+00:00",
+  "executed_at": "2026-11-19T14:42:56.954362+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.2.14",
+    "particula": "0.3.2",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
     "nbclient": "0.10.2",
     "jupytext": "1.17.3",
-    "warp-lang": "1.11.1"
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
   },
   "outputs": [
     [],
@@ -33,20 +34,20 @@
         "text": "GPU: NVIDIA GeForce RTX 5060 Warp: 1.11.1\nCPU: AMD Ryzen AI 9 HX 370 w/ Radeon 890M\nCampaign start: 2026-11-13T23:40:44.667614+00:00\nExecutable SHA256: c853675d08921a1f7eb2c860ca5650fce0458ec4a31743bc8e64666c29a86ef2\nSource revision: 464738b147526193709ba206e51c9b946d375494\nQualified jobs: 104\nAll direct/prepared/captured/legacy CUDA states match exactly.\nFull-array CPU/CUDA parity cases: 17\nMemory method: Warp CUDA mempool high-water mark; excludes CUDA context/driver allocations\n"
       },
       {
+        "image": "figure-5-1.png"
+      },
+      {
         "image": "figure-5-2.png"
       },
       {
         "image": "figure-5-3.png"
-      },
-      {
-        "image": "figure-5-4.png"
       }
     ]
   ],
   "files": {
-    "source.py": "ef48200f7df99aeb5511a4453edda278d5e6bd58b99bfda09484ca03921d8cc8",
-    "figure-5-2.png": "903a98c00a161e6936388a87c76da0cba8fdcb7b05e9d613c4fdf9c5f6fca8f7",
-    "figure-5-3.png": "8c44fd9c3056e22721ff3b88d26bbe671089c025dd3e557d6251292d9cdb8e3b",
-    "figure-5-4.png": "b4116fd479192a74ed45e505d11314c2debfa0b6465ffba8e1cb350f7ca0ee08"
+    "figure-5-3.png": "4231f4d396953dc060c7713ea72ae76441fdb0d54c5a4a50fbffa53fe62539e4",
+    "figure-5-2.png": "34a49beaa66e7f99d876617d6efd7f32d4045b9d8faf889a9111db50f106f97c",
+    "figure-5-1.png": "3a3fa2ae66874a32d9932f2177a8ffccd26e7919862e621c2744eeb512f3708e",
+    "source.py": "936a79caeb2c1c73381825f5d334cc0e2f17177a8b7f3819a5856354fa111c0e"
   }
 }

@@ -440,13 +440,13 @@ def plot():
 
     fixed = surface("BAT", 0.0)
     contrasts = (fixed - surface("ideal", 0.0), surface("BAT", 10.0) - fixed)
-    fig, axes = plotting.subplots(1, 2, sharey=True)
+    fig, axes = plotting.subplots(1, 2, size="wide", sharey=True)
     for ax, delta, title in zip(
         axes,
         contrasts,
         (
             "BAT minus ideal\nFixed organic mass",
-            "Organic uptake minus fixed mass\nBAT in both cases",
+            "Uptake minus fixed mass\nBAT in both cases",
         ),
         strict=True,
     ):
@@ -477,7 +477,7 @@ def plot():
             [0.05, 0.1, 0.2, 0.35, 0.7, 1.4],
             labels=["0.05", "0.1", "0.2", "0.35", "0.7", "1.4"],
         )
-        fig.colorbar(g, ax=ax, label="Count difference\n(percentage points)")
+        fig.colorbar(g, ax=ax, label="Count difference (percentage points)")
     axes[0].set_ylabel("Water supersaturation (%)")
     fig.suptitle(
         "Sensitivity of the 1 µm optical count  ·  GSD 1.10, 5 "

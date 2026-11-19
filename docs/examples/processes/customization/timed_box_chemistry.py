@@ -212,7 +212,9 @@ def plot_results(report):
         np.asarray(report["reference"]),
     )
     fig, axes = plotting.subplots(1, 2, size="wide")
-    for box, color in enumerate(("tab:blue", "tab:orange")):
+    for box, color in enumerate(
+        (plotting.COLORS["teal"], plotting.COLORS["rust"])
+    ):
         for species, linestyle in enumerate(("-", "--")):
             axes[0].plot(
                 report["time"],

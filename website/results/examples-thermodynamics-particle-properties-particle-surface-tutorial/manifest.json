@@ -1,25 +1,26 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 4.0254674749448895,
-  "package_source_sha256": "8340db23fd0f933d97cccca5043297b3b1382b94bbaa2249dcaeb9fe1dc62879",
+  "elapsed_seconds": 5.671671182033606,
+  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "examples-thermodynamics-particle-properties-particle-surface-tutorial",
-  "fingerprint": "e959266fd47d56cec1f1ba6370c8a237062defedbc26039e7631695af6ff4c83",
+  "fingerprint": "ca966a75a3afaeea697f0d5ce63d42f79c9437ce9e2724cfa602e550ddbb9b4c",
   "source": "docs/examples/thermodynamics/particle-properties/particle_surface_tutorial.py",
-  "revision": "277ccafb82ee7ed32af4ea96bec6ae301ce67df5",
+  "revision": "6af97152d1570464ac5ccae56e3110001657e170",
   "package_dirty": false,
-  "executed_at": "2026-11-15T20:02:06.389355+00:00",
+  "executed_at": "2026-11-19T14:34:13.900157+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.2.14",
+    "particula": "0.3.2",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
     "nbclient": "0.10.2",
     "jupytext": "1.17.3",
-    "warp-lang": "1.11.1"
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
   },
   "outputs": [
     [
@@ -53,9 +54,9 @@
     ]
   ],
   "files": {
-    "source.py": "492028de17f7cfa3a47fdccab3b2d77cce2648e18fe152ae1958cfaa2a25fe71",
-    "figure-4-1.png": "cba4034571eae05ecac21a284cafcb72cd39f4787ecf27a282eb0ba1a613f1e4",
-    "figure-5-1.png": "c4d1a13ad2e7c7fbe7ea867d844f02a9f7aac5c1fecfe45a8e9b3d49d718d3d9",
-    "figure-6-1.png": "387c0486227f904b61b6f059acd0b237e654f99613157cc134b9e56f7f02acd6"
+    "figure-6-1.png": "0ff252b7f667fc9dca84a86ba7396a320bb1bfa6367bad897178803aaa62648b",
+    "figure-5-1.png": "b04ba03fcd78e0c77eadd6bf546ccc555591c26602780eed9916a70aea812c5a",
+    "figure-4-1.png": "1b6b15f2b290dac0095ed44c89576ee8e02a02e6fad1c278b5ec1cc3914b6aed",
+    "source.py": "b6dcdaf93a64b9a2555f64bc5fc05365be82e2f1cc94d1132f0a121e8c70913f"
   }
 }

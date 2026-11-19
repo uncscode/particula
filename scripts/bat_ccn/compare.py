@@ -83,6 +83,7 @@ def main():
     high = max(*ax.get_xlim(), *ax.get_ylim())
     ax.set(xlim=(low, high), ylim=(low, high))
     plotting.legend(ax, frameon=False)
+    fig.get_layout_engine().set(w_pad=0.12, h_pad=0.10)
     plotting.fit(fig)
     fig.savefig(DOCS / "images/thermodynamics/bat-ccn-figure12.png", dpi=300)
     plt.close(fig)

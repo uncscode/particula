@@ -47,7 +47,10 @@ Example:
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from particula import plotting
 from scipy.integrate import trapezoid
+
+plt.style.use("particula.default")
 
 # %% [markdown]
 # ## Match the physical inputs
@@ -216,57 +219,73 @@ print(f"Total number PDF: {number_pdf:.2e} m^-3 (integrated)")
 # differ. A visual overlay can conceal small integrated mass or number errors.
 
 # %%
-fig, ax = plt.subplots(figsize=(8, 5))
-ax.plot(radius_bins, pmf_before, label="PMF before", color="tab:blue")
-ax.plot(radius_bins, pmf_after, label="PMF after", color="tab:orange")
+fig, ax = plotting.subplots(size="wide")
+ax.plot(
+    radius_bins, pmf_before, label="PMF before", color=plotting.COLORS["teal"]
+)
+ax.plot(
+    radius_bins, pmf_after, label="PMF after", color=plotting.COLORS["rust"]
+)
 ax.plot(
     radius_bins,
     pdf_as_pmf_before,
     label="PDF→PMF before",
-    color="tab:green",
+    color=plotting.COLORS["indigo"],
     linestyle="--",
 )
 ax.plot(
     radius_bins,
     pdf_as_pmf_after,
     label="PDF→PMF after",
-    color="tab:red",
+    color=plotting.COLORS["berry"],
     linestyle="--",
 )
 ax.set_xscale("log")
 ax.set_xlim(1e-8, 1e-5)
 ax.set_xlabel("Particle radius (m)")
 ax.set_ylabel(r"Number concentration ($m^{-3}$)")
-ax.set_title("PMF vs PDF coagulation (converted to PMF units)")
-ax.legend()
+ax.set_title("PMF and PDF in PMF units")
+plotting.legend(ax)
 ax.grid(alpha=0.3)
+plotting.fit(fig)
 plt.show()
 
 # %%
-fig, ax = plt.subplots(figsize=(8, 5))
+fig, ax = plotting.subplots(size="wide")
 ax.plot(
-    radius_bins, pmf_as_pdf_before, label="PMF→PDF before", color="tab:blue"
+    radius_bins,
+    pmf_as_pdf_before,
+    label="PMF→PDF before",
+    color=plotting.COLORS["teal"],
 )
 ax.plot(
-    radius_bins, pmf_as_pdf_after, label="PMF→PDF after", color="tab:orange"
+    radius_bins,
+    pmf_as_pdf_after,
+    label="PMF→PDF after",
+    color=plotting.COLORS["rust"],
 )
 ax.plot(
     radius_bins,
     pdf_before,
     label="PDF before",
-    color="tab:green",
+    color=plotting.COLORS["indigo"],
     linestyle="--",
 )
 ax.plot(
-    radius_bins, pdf_after, label="PDF after", color="tab:red", linestyle="--"
+    radius_bins,
+    pdf_after,
+    label="PDF after",
+    color=plotting.COLORS["berry"],
+    linestyle="--",
 )
 ax.set_xscale("log")
 ax.set_xlim(1e-8, 1e-5)
 ax.set_xlabel("Particle radius (m)")
 ax.set_ylabel(r"PDF concentration ($m^{-4}$)")
 ax.set_title("PMF vs PDF coagulation (PDF units)")
-ax.legend()
+plotting.legend(ax)
 ax.grid(alpha=0.3)
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]

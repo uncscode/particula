@@ -1,25 +1,26 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 2.7370773219736293,
-  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "elapsed_seconds": 4.451377599034458,
+  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "examples-thermodynamics-particle-properties-activity-tutorial",
-  "fingerprint": "ae23cde78283ace04d56bb84a15a71f96b47ea911ac7c072ac1a270073b99869",
+  "fingerprint": "1fd884d63609cda5e5684578d65ffeae3ab4483c29f72639aec20b2b45ab3680",
   "source": "docs/examples/thermodynamics/particle-properties/activity_tutorial.py",
-  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "revision": "6af97152d1570464ac5ccae56e3110001657e170",
   "package_dirty": false,
-  "executed_at": "2026-11-13T15:13:38.452575+00:00",
+  "executed_at": "2026-11-19T14:34:06.752818+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.2.14",
+    "particula": "0.3.2",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
     "nbclient": "0.10.2",
     "jupytext": "1.17.3",
-    "warp-lang": "1.11.1"
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
   },
   "outputs": [
     [
@@ -50,7 +51,7 @@
     ]
   ],
   "files": {
-    "source.py": "b307ef19df877f6a7c98b83cca7b16de1cce1674305c3449ecf979a40ad21e41",
-    "figure-6-1.png": "8f1e86789c1ce96fc182b13cc1ef8b3802f0810e90da7d30e4cfa71f90434d0b"
+    "figure-6-1.png": "f1bfecb1bd4adfd63b1dbf9db028c0d2391eed1ec3c126f2669d12b114a8f1bf",
+    "source.py": "4ed466b79faa806ab5a6ed4d31aa60816e3bbdc7f1dff948315a17fa0f1487e8"
   }
 }

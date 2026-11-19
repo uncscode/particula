@@ -6,6 +6,8 @@ contour map the same type sizes and color conventions. The
 five rendered examples and a downloadable Python script. The curves and fields
 in that gallery are illustrative.
 
+For examples with scientific data, compare the [neutralizer and chamber measurements](../../examples/processes/coagulation/charge/nacl_scavenging.py), the [GPU convergence panels](../../contribute/validation/numerics/scientific-correctness.md), and the [CCN retrieval contour maps](../../contribute/validation/thermodynamics/ccn-retrieval.md).
+
 ## Start with a paper-sized panel
 
 Install the plotting extra with `pip install 'particula[plot]'` from a version

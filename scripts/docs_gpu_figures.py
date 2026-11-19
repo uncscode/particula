@@ -31,7 +31,7 @@ def history_figures(report, title, *, forcing):
             temperature[0],
             mass[-1, :, 0] / mass[0, :, 0],
             c=np.arange(boxes) + 1,
-            cmap="viridis",
+            cmap=plotting.colormap("magnitude"),
             s=25,
         )
         axes[0, 0].set(

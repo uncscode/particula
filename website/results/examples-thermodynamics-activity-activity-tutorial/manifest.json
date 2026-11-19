@@ -1,25 +1,26 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 4.234531534020789,
-  "package_source_sha256": "8340db23fd0f933d97cccca5043297b3b1382b94bbaa2249dcaeb9fe1dc62879",
+  "elapsed_seconds": 6.448566942010075,
+  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "examples-thermodynamics-activity-activity-tutorial",
-  "fingerprint": "bf1780ba6de3287148249748e97add5db3621752cfaebefd1ceab851daf54cc9",
+  "fingerprint": "7c0d73ac0c9da7a216566f484d38e3631704c641d2f87ebfee514d982706eb7b",
   "source": "docs/examples/thermodynamics/activity/activity_tutorial.py",
-  "revision": "277ccafb82ee7ed32af4ea96bec6ae301ce67df5",
+  "revision": "dd92d3c1ca71f36eacad56b49661b32c0da77ac7",
   "package_dirty": false,
-  "executed_at": "2026-11-15T19:57:09.324608+00:00",
+  "executed_at": "2026-11-19T14:42:46.621249+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.2.14",
+    "particula": "0.3.2",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
     "nbclient": "0.10.2",
     "jupytext": "1.17.3",
-    "warp-lang": "1.11.1"
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
   },
   "outputs": [
     [],
@@ -81,7 +82,7 @@
     ],
     [
       {
-        "text": "=== Equilibrium Results ===\nPartition coefficients: [0.99999998 0.99999838 0.9998916 ]\nAlpha phase water: 4.51 ug/m^3\nOptimization error: 5.57e-14\n"
+        "text": "=== Equilibrium Results ===\nPartition coefficients: [0.99999991 0.99999147 0.99979622]\nAlpha phase water: 2.44 ug/m^3\nOptimization error: 1.32e-10\n"
       }
     ],
     [
@@ -91,11 +92,11 @@
     ]
   ],
   "files": {
-    "source.py": "eb80555d4fd5daace2750616a1b217178b4b600e391c1a9044d9729c2f1f8edb",
-    "figure-5-1.png": "eaa8e5e9a47e636d578d841d6a1916fd45b58aa75d12d446a8df615724d557ba",
-    "figure-8-1.png": "cc8671371a701812113325a446276436f3a56f1cc591a663efbd6ee9f86cb759",
-    "figure-9-1.png": "0199666bee64d1adba32addb8f41e5344808ea092f8cb577dbe98321ae196c33",
-    "figure-12-1.png": "045753c4ef601359e84c18236e6412ff54d3b1e091640101800bdb180cb0dd72",
-    "figure-15-1.png": "d8317fb3a1e81e08657abd0e058b016a1d3ee4441aa038c2c608277c7d5f3e2f"
+    "figure-15-1.png": "3c53a500cab6e27c018bfddbf7e5fb4ee2275439e6d7c9d97b010f94f69d1feb",
+    "figure-12-1.png": "77f9bdb8529d6fedadba79b0aa02be585f0811a687e295a0a418d4455d423004",
+    "figure-9-1.png": "22342347bf5cce5f78da9fb4a1c7fd24deb6936919832df3088951bdf50e99e6",
+    "figure-8-1.png": "95fb2e11b6d2ddc4e33493143d517332b42a57b594224f90e5b1aed7d7e83e0a",
+    "figure-5-1.png": "67be94026c8384a81db02c1565381c6cef1aa986b8d552973341e72cf9efa57f",
+    "source.py": "e8337b6e4b5c3681bcaea1c28b5e7b67226ab58cd61d9a6f28ef52bc98f75afe"
   }
 }

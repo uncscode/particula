@@ -13,10 +13,18 @@
 # ---
 
 # %% [markdown]
-# # Size Distributions Tutorial
+# # One population, different size spectra
 #
-# In this tutorial, we will explore how to calculate and plot lognormal distributions for aerosol particles. This is commonly used in aerosol science to model the size distribution of particles in different environmental or experimental conditions.
+# Why can two plots of the same aerosol population have different heights and
+# shapes? The ordinate may describe number per unit diameter, number in a bin,
+# or number per logarithmic interval. Recognizing that distinction is essential
+# when comparing an instrument spectrum with a model's initial conditions.
 #
+# Here we construct one- and two-component lognormal populations, compare a
+# diameter density with bin-integrated numbers, and convert the density into
+# Particula's native radius coordinate. The calculation uses CPU NumPy arrays;
+# familiarity with [native particle construction](particle_data.py) helps with
+# the last step. The populations are illustrative, not fitted measurements.
 
 # %%
 # In Colab uncomment the following command to install particula:
@@ -24,45 +32,50 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from particula import plotting
+
+plt.style.use("particula.default")
 
 # %% [markdown]
-# ## Probability Density Function
+# ## A density needs a coordinate
 #
-# (fix this, more details for aerosol science)
-#
-# The probability density function (PDF) of a lognormal distribution is given by:
+# For diameter $D>0$, a lognormal number density has the form
 #
 # $$
-# f(x, s) = \frac{1}{s x \sqrt{2\pi}} \exp\left(-\frac{\log^2(x)}{2s^2}\right)
-#
+# \frac{dN}{dD}=\frac{N}{D\ln\sigma_g\sqrt{2\pi}}
+# \exp\left[-\frac{\ln^2(D/D_g)}{2\ln^2\sigma_g}\right].
 # $$
 #
-# where $x$ is the particle diameter, and $s$ is the standard deviation of the distribution.
-# $$
-# for x > 0, s > 0
-# $$
+# Here $D_g$ is the geometric mean diameter and $\sigma_g>1$ the geometric
+# standard deviation. Particula's argument is named `mode`, but the helper passes
+# it to SciPy as `scale`: it is $D_g$, not the peak of $dN/dD$. The latter occurs
+# at $D_g\exp[-\ln^2\sigma_g]$. See [SciPy's lognormal parameterization](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.lognorm.html).
 #
-# The `scale` parameter is defined as the mode of the distribution.
+# The helper normalizes each component numerically over the supplied grid to its
+# requested total $N$. Thus a correct total alone does not prove that the grid
+# captures the tails of the intended untruncated distribution.
 #
-# The probability density above is defined in the “standardized” form. To shift and/or scale the distribution use the loc and scale parameters. Specifically, `lognorm.pdf(x, s, loc, scale)` is identically equivalent to `lognorm.pdf(y, s) / scale` with `y = (x - loc) / scale`. Note that shifting the location of a distribution does not make it a “noncentral” distribution; noncentral generalizations of some distributions are available in separate classes.
-#
-# - [PDF Wikipedia](https://en.wikipedia.org/wiki/probability_density_function)
-# - [Log-normal Wikipedia](https://en.wikipedia.org/wiki/Log-normal_distribution)
-# - [Log-normal Scipy](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.lognorm.html)
+# For the first plots, $D$ is in micrometres and the supplied totals are numbers,
+# so the PDF ordinate is number per micrometre. Dividing by $N$ would give a
+# probability density; the plotted quantity itself is population-scaled.
 
 # %% [markdown]
-# ### Define Particle Size Ranges
+# ### Choose the size range
 #
-# We use logarithmic spacing for particle diameters to cover a broad size range typically observed in aerosol particles.
+# Logarithmic spacing resolves several size decades with a manageable grid.
+# The domain below is 0.001–10 µm in diameter. Logarithmic spacing of the points
+# does not itself turn a density per diameter into a density per log diameter.
 
 # %%
 # Define the x_values as a range of particle diameters
 x_values = np.logspace(-3, 1, 2000)  # From 0.001 to 10 microns
 
 # %% [markdown]
-# ### Single Mode PDF Particle Size Distribution
+# ### Start with one component
 #
-# In this section, we explore modeling a distribution with a single mode, typical for scenarios where particle populations are relatively uniform. The single mode represents a common characteristic size (mode) and spread (geometric standard deviation) of aerosol particles. We utilize parameters for the geometric standard deviation and the modal particle diameter to define this distribution. The distribution is scaled such that the area under the probability density function (PDF) equals the total number of particles, ensuring that it accurately reflects the particle count in terms of probability across different sizes. This method is particularly useful for representing aerosol populations where a single predominant size class exists, making it easier to analyze and predict aerosol behavior in environmental or laboratory settings.
+# The first component has a geometric mean diameter of 0.02 µm, geometric
+# standard deviation 1.4, and total number 1,000. Keeping the total separate
+# from size and spread lets us distinguish abundance from distribution shape.
 
 # %%
 # %%
@@ -76,9 +89,11 @@ single_mode_distribution = par.particles.get_lognormal_pdf_distribution(
 )
 
 # %% [markdown]
-# ### Multi-Mode PDF Particle Distribution
+# ### Add a second component
 #
-# For more complex scenarios, such as urban air samples, we often observe multiple modes. Here we define and calculate distributions for a two-mode system.
+# The second population retains the first component and adds a broader one
+# centered at 1 µm, also with total number 1,000. Equal component totals do not
+# imply equal peak heights in a density per unit diameter.
 
 # %%
 # %%
@@ -92,27 +107,36 @@ multi_mode_distribution = par.particles.get_lognormal_pdf_distribution(
 )
 
 # %% [markdown]
-# ### Plotting the PDFs of Particle Size Distributions
+# ### Compare densities per diameter
 #
-# Visualizing the probability density functions (PDFs) helps in understanding the frequency of different particle sizes.
+# The next plot uses a logarithmic horizontal axis but retains $dN/dD$ on the
+# vertical axis. Look for the narrow small-particle peak and the broader
+# large-particle component. Their height difference reflects width and coordinate
+# choice as well as abundance. Visual area on this log-axis figure is not the
+# integral over linear diameter.
 
 # %%
 # %%
-plt.figure(figsize=(10, 6))
+fig, ax = plotting.subplots(size="wide")
 plt.plot(x_values, single_mode_distribution, label="Single Mode", linewidth=4)
 plt.plot(x_values, multi_mode_distribution, label="Multi Mode")
 plt.title("Lognormal Particle Size Distribution")
 plt.xlabel("Particle Diameter (μm)")
 plt.ylabel("Number per micrometre of diameter")
 plt.xscale("log")
-plt.legend()
+plotting.legend(plt.gca())
 plt.grid(True)
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
-# ### Calculate and Display Total Concentration from PDFs
+# ### Recover the total with the matching integral
 #
-# Total concentration is important for understanding the overall particle load in a sample.
+# The printed integrals use the diameter coordinates, rather than summing the
+# PDF values. Compare them with the supplied totals: 1,000 for the single
+# component and 2,000 for the mixture. This checks the normalization convention;
+# the helper's explicit normalization means it is not an independent test of
+# physical realism or tail coverage.
 
 # %%
 # %%
@@ -125,15 +149,16 @@ print(f"Total Concentration for Single Mode: {single_mode_total_concentration}")
 print(f"Total Concentration for Multi Mode: {multi_mode_total_concentration}")
 
 # %% [markdown]
-# ## Probability Mass Function (PMF) for Aerosol Distributions
+# ## Convert density to number in each bin
 #
-# The Probability Mass Function (PMF) of aerosol distributions provides a distinct perspective compared to the Probability Density Function (PDF). While the PDF represents the probability of particle sizes occurring within a continuous range, ensuring that the integral over all sizes equals the total number of particles, the PMF deals directly with discrete particle counts.
+# A bin-integrated distribution stores a contribution $N_i$ for each interval;
+# its total is $\sum_i N_i$. Particula calls this representation a PMF. Here
+# "mass" in probability mass function does not mean particle material mass.
 #
-# In PMF, each value represents the actual number of particles expected at a specific size interval, rather than the probability density. This approach is particularly advantageous when quantifying and visualizing the actual particle counts across various size classes, making it ideal for detailed statistical analysis and practical applications like filter testing or health impact studies.
-#
-# Unlike the PDF, where the area under the curve corresponds to the total number of particles (when scaled appropriately), the PMF sums directly to the total number of particles without needing any integral calculation. Each point on the PMF curve directly indicates the number of particles in that particular size class, thus providing a more intuitive grasp of the size distribution's impact, especially in contexts where the exact count of particles is more relevant than their probability density.
-#
-# [PMF Wikipedia](https://en.wikipedia.org/wiki/probability_mass_function)
+# The helper weights the PDF by bin widths and rescales the sum to the requested
+# total. On a logarithmic grid, large-diameter bins are wider in linear diameter,
+# so weighting changes the relative heights. Both plots still describe the same
+# chosen population, within the numerical discretization.
 
 # %%
 single_pmf_distribution = par.particles.get_lognormal_pmf_distribution(
@@ -144,26 +169,31 @@ multi_pmf_distribution = par.particles.get_lognormal_pmf_distribution(
 )
 
 # %% [markdown]
-# ### Plotting the PMFs of Particle Size Distributions
+# ### Read the bin-integrated spectrum
 #
-# Particle mass functions (PMFs) tell us about the actual number of particles at different sizes.
+# Compare this plot with the PDF above. Bin width is now included, so peak heights
+# cannot be compared directly across the two ordinates. Refining the grid changes
+# number per bin even when the underlying continuous population is unchanged.
 
 # %%
-plt.figure(figsize=(10, 6))
+fig, ax = plotting.subplots(size="wide")
 plt.plot(x_values, single_pmf_distribution, label="Single Mode", linewidth=4)
 plt.plot(x_values, multi_pmf_distribution, label="Multi Mode")
 plt.title("Lognormal PMF Particle Size Distribution")
 plt.xlabel("Particle Diameter (μm)")
 plt.ylabel("Number of Particles")
 plt.xscale("log")
-plt.legend()
+plotting.legend(plt.gca())
 plt.grid(True)
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
-# ### Calculate and Display Total Number of Particles from PMFs
+# ### Recover the total with a sum
 #
-# This helps quantify the actual particle count in different modes.
+# The PMF is already integrated over bins, so sum its entries without multiplying
+# by bin widths again. The printed values can be compared with the earlier PDF
+# integrals. Agreement checks consistent bookkeeping between representations.
 
 # %%
 # %%
@@ -174,25 +204,26 @@ print(f"Total Concentration for Single Mode: {single_mode_total_concentration}")
 print(f"Total Concentration for Multi Mode: {multi_mode_total_concentration}")
 
 # %% [markdown]
-# ## Summary of PDF vs. PMF in Aerosol Distributions
+# ## Carry the measure into the model
 #
-# In this tutorial, we explored two fundamental representations of aerosol size distributions: the Probability Density Function (PDF) and the Particle Mass Function (PMF). Both offer valuable insights into aerosol characteristics but serve different analytical purposes:
-#
-# - **Probability Density Function (PDF)**: The PDF provides a normalized view of particle size distribution where the area under the curve represents the total number of particles. It is ideal for understanding the relative frequency of different particle sizes within a continuous range and for conducting probability-based analyses. The PDF is particularly useful in theoretical studies and simulations where understanding the likelihood of particle sizes is crucial.
-#
-# - **Particle Mass Function (PMF)**: Conversely, the PMF directly quantifies the actual number of particles in each size interval. This discrete representation is especially useful for practical applications such as air quality monitoring and aerosol delivery systems where knowing the exact count of particles at different sizes is necessary. The PMF is straightforward as it adds up to the total particle count directly, providing a more tangible grasp of particle distribution without requiring integration.
-#
-# Both methods play critical roles in aerosol science, each complementing the other by offering different perspectives on particle size distributions. Understanding when to use each can significantly enhance the accuracy and relevance of aerosol studies.
-
+# The useful distinction is the integration rule: integrate a density against
+# its coordinate, or sum bin contributions. A change in plot shape can therefore
+# come entirely from representation. Before attributing it to aerosol physics,
+# check the coordinate, units, bin widths, and normalization.
 
 # %% [markdown]
-# ## Native radius-PDF storage
+# ### Native radius-PDF storage
 #
-# The plots use diameter D in micrometres. Native continuous_pdf storage uses
-# radius r in metres and dN/dr. Since D = 2e6 r, the Jacobian is 2e6:
-# dN/dr = (dN/dD) * 2e6. In this native example interpret the modal totals as
-# number densities in m^-3, so dN/dr has units m^-4. This changes coordinates,
-# not the integrated population. The radius grid must accompany PDF storage.
+# Native `continuous_pdf` storage uses radius $r$ in metres and $dN/dr$.
+# With $D$ in micrometres, $D=2\times10^6 r$, hence
+# $dN/dr=(dN/dD)\,2\times10^6$. Changing the coordinate requires changing the
+# ordinate too; rescaling the horizontal axis alone would change the integral.
+#
+# For this final model construction, interpret the supplied component totals as
+# number concentrations in m⁻³. The same numerical spectrum then has units
+# m⁻³ µm⁻¹ before conversion and m⁻⁴ afterward. This concentration convention is
+# an input assumption, not a volume measurement. The radius grid accompanies
+# the stored PDF.
 
 # %%
 radius_grid_m = x_values * 1e-6 / 2
@@ -204,3 +235,19 @@ native_pdf = par.particles.create_particle_data_from_radii(
     density=1000.0,
 )
 print("Native radius-PDF number density [m^-3]:", native_pdf.number_density)
+
+# %% [markdown]
+# ## What this lets you compare
+#
+# The final printed native number density should retain the mixture's supplied
+# 2,000 m⁻³ under the stated concentration convention. The key result is that
+# PDF, bin-integrated number, and native radius PDF require different ordinates
+# while preserving the represented population.
+#
+# To adapt this to an instrument spectrum, first identify whether its ordinate
+# is $dN/dD$, $dN/d\log_{10}D$, or number in a bin. For example,
+# $dN/d\log_{10}D=D\ln(10)\,dN/dD$. Then compare integrated concentration before
+# and after conversion, and test sensitivity to the grid and measurement range.
+# These would be additional checks, not results established by this example.
+# Continue to [population storage](distribution_tutorial.py) or use the same
+# representation distinction in [coagulation comparisons](../../processes/coagulation/coagulation_4_compared.py).

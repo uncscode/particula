@@ -72,6 +72,7 @@ def plot():
         / "docs/images/coagulation/van-der-waals-potentials.png"
     )
     path.parent.mkdir(parents=True, exist_ok=True)
+    fig.get_layout_engine().set(w_pad=0.12, h_pad=0.10)
     plotting.fit(fig)
     fig.savefig(path, dpi=300)
     plt.close(fig)

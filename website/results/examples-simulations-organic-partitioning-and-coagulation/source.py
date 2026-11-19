@@ -13,54 +13,32 @@
 # ---
 
 # %% [markdown]
-#  # Organic Partitioning & Coagulation Simulation
+# # When a size-distribution plot hides a composition error
 #
-# **Important limitation:** condensation conserves each mapped species, but
-# the subsequent fixed-composition binned coagulation does not transport
-# species between bins. Condensation creates size-dependent composition, so
-# this 600 s coagulation stage is a demonstration of the retained method's
-# limitation, **not a quantitatively reliable species-composition forecast**.
-# In the saved run, relative species-inventory changes range from about
-# -59% to +35%. These are observed defects, not acceptable error tolerances.
-# Reducing the timestep does not supply the missing species transport.
-# Use a supported particle-resolved workflow when composition varies by size;
-# see the [coagulation contract](../../guide/processes/coagulation.md)
-# and [resolved example](../processes/coagulation/coagulation_3_particle_resolved_pattern.ipynb).
-
+# Can a representation that conserves each species during condensation remain
+# suitable after coagulation begins? This example follows organic uptake onto
+# sulfate seeds, then exposes a limitation of fixed-composition binned coagulation.
+# The question matters when interpreting secondary organic aerosol: a plausible
+# size curve does not guarantee a valid species inventory.
 #
-#  This notebook demonstrates how to form secondary organic aerosol (SOA)
-#  from a mixture of gas-phase organics and to follow its evolution by
-#  Brownian coagulation.
+# **This is a method-boundary demonstration, not a reliable composition forecast.**
+# Condensation creates size-dependent composition. The subsequent binned
+# coagulation changes bin populations without transporting donor species into
+# destination bins. Its saved per-species inventory changes range from about
+# −59% to +35%. Those are observed defects, not acceptable tolerances, and a
+# smaller timestep cannot supply the missing species transport.
 #
-#  We will use a moving bin representation of particles, with vapor-liquid partitioning of organic vapours.
-#
-#  **Road-map**
-#  1. Define physicochemical inputs
-#  2. Build gas species and the atmosphere
-#  3. Create seed particles and a particle representation
-#  4. Assemble an `Aerosol` object
-#  5. Run isothermal condensation (20 s)
-#  6. Add Brownian coagulation and continue for 10 min
-#  7. Visualise & discuss results
-#
-#
-#  > **Concept – Secondary Organic Aerosol (SOA):** particles that originate when low-volatility organic vapours condense onto pre-existing seeds.
-#
-#  > **Concept – Partitioning:** the reversible transfer of a compound between the gas phase and the particle phase until thermodynamic equilibrium is reached.
-#
-#  > **Concept – Brownian Coagulation:** random collisions driven by thermal motion that merge individual particles into larger ones, reducing number concentration while conserving mass.
+# Read the [coagulation contract](../../guide/processes/coagulation.md). Use a
+# [supported resolved representation](../processes/coagulation/coagulation_3_particle_resolved_pattern.py)
+# when collisions must mix size-dependent species composition.
 
 # %% [markdown]
-# <details> <summary>▶️ Install Particula</summary>
-# try:
-#     import google.colab
-# except ImportError:
-#     # not Colab → do nothing
-#     pass
-# else:
-#     # in Colab → install quietly
-# Install from the repository root: `python -m pip install -e ".[extra]"`
-# </details>
+# ## Prepare the calculation and the comparison
+#
+# The imports support native aerosol construction, process execution, and plotting.
+# Keep the full 250-bin grid and 100,000 condensation substeps when reproducing
+# the saved run. The important comparison is between inventories before and after
+# each stage, not merely whether the script finishes.
 
 # %%
 
@@ -69,6 +47,7 @@ import copy
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from particula import plotting
 from particula.dynamics.condensation.species_mapping import (
     CondensationSpeciesMap,
 )
@@ -77,39 +56,25 @@ from particula.dynamics.condensation.species_mapping import (
 from particula.particles import get_organic_density_array
 from tqdm import tqdm
 
+plt.style.use("particula.default")
+
 # plot settings
 TAILWIND = par.util.colors.TAILWIND
-base_color = TAILWIND["gray"]["600"]
-plt.rcParams.update(
-    {
-        "text.color": base_color,
-        "figure.figsize": (5, 4),
-        "font.size": 14,
-        "axes.edgecolor": base_color,
-        "axes.labelcolor": base_color,
-        "xtick.color": base_color,
-        "ytick.color": base_color,
-        "pdf.fonttype": 42,
-        "ps.fonttype": 42,
-    }
-)
 
 # %% [markdown]
-#  ## Physicochemical inputs
+# ## Make the illustrative inputs explicit
 #
-#  Molecular weight, O:C & H:C ratios, saturation concentrations and
-#  total gas-phase concentrations gathered from the literature.
+# Ten organic surrogates have specified molar masses in g/mol, O:C and H:C
+# ratios, and dry saturation concentrations in µg/m³. Density estimates use those
+# elemental descriptors. The initial gas concentrations are multiplied by 10,000;
+# this intentionally concentrated setup is not a typical ambient loading or a
+# validated experimental mixture. The source does not supply traceable material
+# references for every numerical input.
 #
-#  >
-#  > **O:C ratio (oxygen-to-carbon):** proxy for oxidation state – a
-#  > higher ratio usually implies higher polarity and lower volatility.
-#  >
-#  > **c_sat:** saturation concentration (often noted *C\**); at this
-#  > concentration the compound is in equilibrium between gas and
-#  > particle phases.
-#  >
-#  > All concentrations are specified in µg m⁻³ to mimic experimental
-#  > data and are converted to SI units by the builders.
+# Saturation concentration characterizes pure-component volatility at the chosen
+# temperature. It does not mean that a mixture is at equilibrium whenever its gas
+# concentration reaches that value: activity and curvature also enter the
+# particle-surface pressure.
 
 # %%
 M_gmol = np.array(
@@ -173,19 +138,12 @@ sulfate_molar_mass = 96.06  # g/mol
 temperature_K = 298.15
 
 # %% [markdown]
-#  ## Build gas-phase species
-#  Each species receives a vapour-pressure *strategy* so that the code
-#  can evaluate temperature-dependent properties on the fly.
-#  Note: the saturation-concentration builder is a convenient wrapper
-#  converting **μg m⁻³ → Pa**.
+# ## Convert saturation concentration to a pressure model
 #
-#
-#  > **Strategy pattern:** every species owns a *strategy* object that
-#  > knows how to compute its pure vapour pressure – we can switch
-#  > correlations without touching core logic.
-#  >
-#  > `SaturationConcentrationVaporPressureBuilder` back-calculates
-#  > vapour pressure from the published saturation concentration *C\**.
+# Each organic receives a strategy constructed from its saturation concentration
+# and molar mass at 298.15 K. The builder converts µg/m³ and g/mol to consistent
+# pressure inputs. A conversion at this reference temperature does not itself
+# supply a measured temperature dependence or a vapor-pressure validation.
 
 # %%
 # vapor pressures
@@ -201,16 +159,13 @@ for i in range(len(name)):
     vapor_pressure_strategies.append(vapor_pressure_organic)
 
 # %% [markdown]
-#  ## Compose gas and environment state
+# ## Align gas and particle species
 #
-#  Keep the ordered gas mixture in `GasData` and temperature and pressure
-#  in `EnvironmentData`; the native aerosol holds both containers.
-#
-#
-#  > **EnvironmentData:** central thermodynamic context (temperature &
-#  > pressure).  All processes query these values rather than carrying
-#  > their own copies.
-#  sulfate vapor pressure
+# The unified order is sulfate followed by the ten organics. Gas concentrations
+# are converted to kg/m³; temperature and pressure occupy the environment
+# container. Sulfate starts with zero gas concentration and an effectively
+# nonvolatile vapor-pressure input. Its later exclusion from condensation is
+# explicit, rather than inferred from its name.
 
 # %%
 sulfate_vapor_pressure = (
@@ -232,19 +187,18 @@ environment = par.gas.EnvironmentData(
 )
 
 # %% [markdown]
-# ## Seed particles
+# ## Construct seeds with a known number measure
 #
-#  Generate a log-normal size distribution of sulfate seeds and assign
-#  species-resolved mass bins.
-#  Tip: for speed you may reduce the radius grid – 250 points is rather
-#  fine for demonstration purposes.
+# The 250 radii span about 32–501 nm. A lognormal PMF assigns number concentration
+# **per bin**, with nominal total 10¹³ m⁻³, mode radius 100 nm, and geometric
+# standard deviation 1.4. Per-particle sulfate mass comes from spherical volume;
+# organic masses initially vanish. Summing bin concentrations, rather than
+# integrating them as dN/dr, gives the represented number density.
 #
-#  > **Log-normal distribution:** widely observed for atmospheric
-#  > aerosols; characterised by a modal radius and geometric standard
-#  > deviation (GSD).
-#  >
-#  > We convert the number distribution to a probability-mass function
-#  > (PMF) so the integral equals the desired particle count.
+# Ideal molar activity is assumed. Sulfate and organics occupy separate surface
+# phase labels; the low organic surface tension of 0.0003 N/m is an illustrative
+# assumption, not a measured property. These inputs limit the physical
+# interpretation even before the coagulation representation becomes unsuitable.
 
 # %%
 total_number_concentration = np.array([1e13])  # /m-3
@@ -293,16 +247,13 @@ surface_strategy = (
 )
 
 # %% [markdown]
-# ## Particle representation
+# ## Identify what each process can change
 #
-# Native discrete `ParticleData` stores per-bin number density at unit
-# reference volume. Condensation changes species masses and therefore radii.
-# Coagulation subsequently updates number density at fixed per-bin masses;
-# it does not mix donor compositions into destination bins.
-#
-# **Activity & surface strategies:** thermodynamics (ideal,
-# etc.) and surface tension models are swappable components, keeping
-# the main algorithm clean.
+# Native discrete `ParticleData` stores per-bin number density at unit reference
+# volume. Condensation changes species masses and hence radius. The later binned
+# coagulation changes number density at fixed per-bin masses and compositions.
+# This distinction is the central test: after unequal uptake across sizes,
+# reweighting fixed compositions need not conserve individual species.
 
 # %%
 particle_data = (
@@ -317,14 +268,12 @@ particle_data = (
 )
 
 # %% [markdown]
-# ## Assemble aerosol
+# ## Record the reference species inventory
 #
-#  Wrap particles, gas and environment into a single object that the
-#  dynamical processes will modify in place.
-#
-# **Big picture:** `Aerosol` holds native particle, gas, and environment data.
-# Every subsequent *Runnable* process expects a single aerosol object
-# and modifies it in place.
+# Assemble particles, gas, and environment, then independently sum particle
+# species mass times bin number density and add gas concentration. The result is
+# a species mass density in kg/m³. This reference includes vapor, so transfer
+# between gas and particles should not change it in the closed condensation stage.
 
 # %%
 # Build aerosol
@@ -346,18 +295,13 @@ initial_inventory = species_inventory(aerosol)
 print(aerosol)
 
 # %% [markdown]
-#  ## Condensation process
+# ## Configure closed isothermal condensation
 #
-#  We use an isothermal Fuchs–Sutugin formulation.
-#  `skip_partitioning_indices=[0]` excludes sulfate from condensation.
-#
-#  > **Performance hint** – the number of sub-steps controls accuracy.
-#  >
-#  > `update_gases=True` removes vapours from the gas pool as they
-#  > condense, enforcing mass conservation.
-#  >
-#  > The `RunnableSequence` uses the `|` pipe operator for a fluent
-#  > interface
+# The species map aligns all eleven lanes, while `skip_partitioning_indices=[0]`
+# excludes sulfate. Diffusivity is 2×10⁻⁵ m²/s and accommodation is one.
+# Updating gas concentrations accounts for vapor removed by condensation or
+# returned by evaporation. Separate copies preserve the initial and post-uptake
+# states for comparison.
 
 # %%
 # Condensation Coagulation process setup
@@ -387,14 +331,16 @@ aerosol_initial = copy.deepcopy(aerosol)
 aerosol_soa = copy.deepcopy(aerosol)
 
 # %% [markdown]
-#  ### Single 20 s condensation pulse
+# ## Inspect uptake before collisions begin
 #
-#  Useful for inspecting how much SOA forms before coagulation starts.
+# Advance condensation for 20 s with 100,000 substeps, giving 0.0002 s per
+# substep. The assertion checks each mapped gas-plus-particle species inventory
+# at rtol=10⁻¹² and atol=10⁻³⁰ kg/m³. It establishes this conservation check,
+# not convergence or equilibrium.
 #
-#  > We pick a very small internal sub-step
-#  > (`Δt_sub = 20 s / 100 000 ≈ 2×10⁻⁴ s`) to capture the rapid initial
-#  > uptake of vapours onto nano-particles.
-#  20 s condensation pulse
+# The first plot places unchanged bin populations at their grown radii. A shift
+# in radius therefore describes mass uptake; it should not be interpreted as a
+# newly formed population or a number-density-per-radius curve.
 
 # %%
 aerosol_soa = sequence_condensation.execute(
@@ -408,7 +354,7 @@ np.testing.assert_allclose(
 )
 print(aerosol_soa)
 
-fig, ax = plt.subplots(figsize=(7, 5))
+fig, ax = plotting.subplots(size="wide")
 ax.plot(
     aerosol_initial.particles.radii[0],
     aerosol_initial.particles.concentration[0],
@@ -419,23 +365,22 @@ ax.plot(
     aerosol_soa.particles.concentration[0],
     label="Seeds+SOA",
 )
-ax.legend(loc="upper left")
+plotting.legend(ax, loc="upper left")
 ax.set_xscale("log")
 ax.set_xlabel("Particle radius (m)")
 ax.set_ylabel("Number concentration per bin (m$^{-3}$)")
 ax.set_xlim(left=1e-8, right=1e-6)
 ax.grid(alpha=0.25)
-fig.tight_layout()
+plotting.fit(fig)
+plt.show()
 
 # %% [markdown]
-#  ## Coagulation process
+# ## Apply the binned Brownian method at its boundary
 #
-#  Builder selects a discrete Brownian kernel.  Other kernels are
-#  available and can be swapped by changing the builder called.
-#
-#  > **Brownian kernel:** collision frequency determined solely by random
-#  > thermal motion; other kernels
-#  > can be swapped by changing a single builder call.
+# The discrete Brownian strategy models thermally driven collisions. Here it is
+# applied after condensation has produced size-dependent composition, so this
+# stage tests a known representation mismatch. Changing the collision kernel
+# would not resolve the missing species transport.
 
 # %%
 # coagulation process setup
@@ -447,21 +392,12 @@ coagulation_strategy = (
 coagulation_process = par.dynamics.Coagulation(coagulation_strategy)
 
 # %% [markdown]
-#  ## Coagulation after the condensation pulse (10 min)
+# ## Run coagulation alone for 600 s
 #
-#  We alternate long, finely-resolved condensation steps with coarse
-#  coagulation steps.
-#  Rule of thumb: `time_step / sub_steps ≈ 0.01 s` keeps condensation
-#  stable while minimising overhead.
-#
-# Experiment: toggle condensation on to see if coagulation+condensation changes the particle size distribution.
-#
-#
-#  > We loop over 60 outer steps of 10 s each to reach 10 min.  Inside
-#  > every step we *could* run condensation with many sub-steps while
-#  > keeping coagulation coarse – a trade-off between accuracy and
-#  > speed.
-# .
+# The loop contains 60 steps of 10 s with one coagulation substep each.
+# Condensation is commented out throughout this stage. The unused condensation
+# substep setting does not make the run a coupled or alternating calculation.
+# The final gas equality check confirms that the gas reservoir remains unchanged.
 
 # %%
 # %% staggered time stepping
@@ -492,20 +428,16 @@ for _ in tqdm(range(total_steps), desc="Running Sim", mininterval=0.5):
     )
 
 # %% [markdown]
-#  ## Results
+# ## Compare distributions without treating them as validation
 #
-#  The figure contrasts (i) the initial seed distribution, (ii) mass
-#  growth after 20 s of SOA partitioning, and (iii) its further
-#  evolution through coagulation.
-#
-#
-#  > Observe how number concentration drops (coagulation) while the
-#  > median radius grows (condensation + coagulation).
-#  > The 600 s stage already runs coagulation alone. Its binned numerical
-#  > mass drift is reported below; this is not exact inventory conservation.
+# The three curves show initial seeds, the result after 20 s of condensation,
+# and the result after 600 s of coagulation alone. The latter redistributes bin
+# number, but the final inventory diagnostic is needed to judge its species
+# meaning. All vertical values remain number concentration per bin, not dN/dr;
+# a visual peak shift is not an independently calculated median radius.
 
 # %%
-fig, ax = plt.subplots(figsize=(7, 5))
+fig, ax = plotting.subplots(size="wide")
 ax.plot(
     aerosol_initial.particles.radii[0],
     aerosol_initial.particles.concentration[0],
@@ -522,23 +454,23 @@ ax.plot(
     label="600 sec coagulation",
     # marker=".",
 )
-ax.legend(loc="upper left")
+plotting.legend(ax, loc="upper left")
 ax.set_xscale("log")
 ax.set_xlabel("Particle radius (m)")
 ax.set_ylabel("Number concentration per bin (m$^{-3}$)")
 ax.grid(alpha=0.25)
 ax.set_xlim(left=1e-8, right=1e-6)
-fig.tight_layout()
+plotting.fit(fig)
+plt.show()
 
 # %% [markdown]
-# ## Summary
+# ## Check the quantity a size plot cannot show
 #
-# This notebook demonstrates how to simulate the formation of secondary
-# organic aerosol (SOA) from gas-phase organics and its evolution by
-# Brownian coagulation.  We used a moving bin representation of particles
-# with vapour-liquid partitioning, allowing us to model the complex
-# interactions between gas-phase species and particle growth.
-#
+# The final block requires finite, nonnegative populations, a reduction in total
+# number, and unchanged gas. It then reports each species' relative inventory
+# drift without accepting that drift as conservation. This distinguishes a run
+# that produces a size distribution from one that can support composition-based
+# research conclusions.
 
 # %%
 assert (
@@ -556,3 +488,17 @@ coagulation_inventory_drift = (
 ) / species_inventory(aerosol_soa)
 print("Per-species relative inventory drift during binned coagulation:")
 print(coagulation_inventory_drift)
+
+# %% [markdown]
+# ## Use the failure to choose a representation
+#
+# Condensation passes the stated closed-species check, but fixed-composition
+# binned coagulation fails to preserve the size-dependent species inventories
+# created by that uptake. Consequently the final composition is not a trustworthy
+# SOA prediction, even though particle number decreases and the plot looks smooth.
+#
+# A useful next study would initialize an equivalent particle-resolved population,
+# run the same staged forcing, and compare both size spectra and each species'
+# gas-plus-particle inventory. Test timestep and sampling convergence separately.
+# Only after the representation passes those checks should measured volatility,
+# surface tension, and loading be used to investigate a particular SOA system.

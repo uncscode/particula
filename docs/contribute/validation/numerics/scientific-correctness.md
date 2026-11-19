@@ -162,6 +162,10 @@ are 225.101, 112.551 and 56.275 s, with explicit resource-bound checks in the
 study driver. The library itself does not subcycle. Both paths check mass and
 charge inventories; device steps also check number loss against accepted events.
 
+The error bars span two combined standard errors about each CUDA minus CPU
+difference. Redraw these panels from the published JSON with
+`python -m scripts.gpu_studies.coagulation_convergence_figure`.
+
 ![Differences from the independent CPU reference with ensemble uncertainty](../../../images/gpu/coagulation-convergence-1661.png)
 
 | Particles | CPU events | CUDA events at finest step | Largest finest-step discrepancy / combined standard error |

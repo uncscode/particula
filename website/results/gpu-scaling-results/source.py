@@ -1,6 +1,11 @@
 # %% [markdown]
 # # Measured CUDA scaling on an RTX 5060
 #
+# Would a faster timestep make your whole study faster? Use these measurements
+# to distinguish particle scaling, box scaling, and setup/transfer cost before
+# choosing an execution path. The [prepared quick start](gpu_prepared_quick_start.py)
+# explains the workflow whose costs are separated here.
+#
 # This CPU plotting script reads saved, qualified measurements. It does not
 # rerun the GPU campaign. Its small data file contains only plotted point/line
 # summaries and the provenance text shown below, not model states or image arrays. The underlying experiment uses float64, three
@@ -29,6 +34,8 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import style as mplstyle
+from particula import plotting
 
 LABELS = {
     "numpy": "Native NumPy CPU",
@@ -37,7 +44,7 @@ LABELS = {
     "captured": "Captured CUDA",
     "legacy": "Previous CUDA Brownian",
 }
-COLORS = dict(zip(LABELS, ("0.35", "#d97706", "#2563eb", "#059669", "#b91c1c")))
+COLORS = dict(zip(LABELS, ("0.35", *plotting.COLORS.values())))
 
 
 def read_results():
@@ -110,9 +117,10 @@ def curve(ax, rows, mode, x_field, *, timing="resident", throughput=False):
 
 
 # %%
+@mplstyle.context("particula.default")
 def scaling_figures(rows):
     """Compare actual execution modes across particle and box counts."""
-    fig, axes = plt.subplots(2, 2, figsize=(12, 9), constrained_layout=True)
+    fig, axes = plotting.subplots(2, 2, size="wide")
     for column, family in enumerate(("condensation", "dilution")):
         selected = [
             r
@@ -134,10 +142,11 @@ def scaling_figures(rows):
     axes[1, 1].set(
         xlabel="Boxes (1,024 slots each)", ylabel="Initial particle-steps / s"
     )
-    axes[0, 0].legend(fontsize=8)
+    plotting.legend(axes[0, 0])
     fig.suptitle(
         "RTX 5060 · float64 scaling · median and min–max of seven runs"
     )
+    plotting.fit(fig)
 
 
 # %% [markdown]
@@ -152,14 +161,15 @@ def scaling_figures(rows):
 
 
 # %%
+@mplstyle.context("particula.default")
 def brownian_figures(rows):
     """Separate old/new GPU improvement from native-CPU comparisons."""
     selected = [r for r in rows if r["case"]["name"].startswith("brownian-")]
-    fig, axes = plt.subplots(1, 2, figsize=(11, 4.5), constrained_layout=True)
+    fig, axes = plotting.subplots(1, 2)
     for mode in ("legacy", "direct", "prepared", "captured"):
         curve(axes[0], selected, mode, "slots")
     axes[0].set(xlabel="Initial particles per box", ylabel="Time / step (ms)")
-    axes[0].legend(fontsize=8)
+    plotting.legend(axes[0])
     for mode in ("legacy", "prepared", "captured"):
         group = sorted(
             (r for r in selected if r["mode"] == mode),
@@ -175,9 +185,10 @@ def brownian_figures(rows):
     axes[1].set(
         xlabel="Initial particles per box", ylabel="Warp pool peak (MiB)"
     )
-    axes[1].legend(fontsize=8)
+    plotting.legend(axes[1])
     axes[1].grid(True, alpha=0.2)
     fig.suptitle("Brownian CUDA comparison · same final state, bounded storage")
+    plotting.fit(fig)
 
 
 # %% [markdown]
@@ -195,9 +206,10 @@ def brownian_figures(rows):
 
 
 # %%
+@mplstyle.context("particula.default")
 def cost_and_science_figures(rows):
     """Show complete-workflow costs alongside variability and a distribution."""
-    fig, axes = plt.subplots(2, 2, figsize=(12, 9), constrained_layout=True)
+    fig, axes = plotting.subplots(2, 2, size="wide")
     selected = [
         r for r in rows if r["case"]["name"] == "particles-condensation-1048576"
     ]
@@ -222,7 +234,7 @@ def cost_and_science_figures(rows):
         yscale="log",
         title="One million particles · three steps",
     )
-    axes[0, 0].legend(fontsize=8)
+    plotting.legend(axes[0, 0])
     for family, style in (("condensation", "-"), ("brownian", "--")):
         group = sorted(
             (
@@ -249,7 +261,7 @@ def cost_and_science_figures(rows):
         ylabel="Captured step (ms)",
         title="8 boxes × 2,048 slots · 4 materials / 5 gases",
     )
-    axes[0, 1].legend(fontsize=8)
+    plotting.legend(axes[0, 1])
     row = next(r for r in selected if r["mode"] == "captured")
     edges = np.array(row["radius_edges_m"])
     centres = np.sqrt(edges[:-1] * edges[1:]) * 1e9
@@ -263,7 +275,7 @@ def cost_and_science_figures(rows):
     axes[1, 0].set(
         xlabel="Radius (nm)", ylabel="dN / dlog₁₀ r (m$^{-3}$)", xlim=(5, 500)
     )
-    axes[1, 0].legend()
+    plotting.legend(axes[1, 0])
     modes = [r for r in selected if r["mode"] != "numpy"]
     axes[1, 1].bar(
         [LABELS[r["mode"]].replace(" ", "\n", 1) for r in modes],
@@ -274,6 +286,7 @@ def cost_and_science_figures(rows):
         ylabel="Warp pool peak (MiB)", title="Excludes CUDA context and driver"
     )
     fig.suptitle("Workflow costs and physical response · RTX 5060")
+    plotting.fit(fig)
 
 
 def run_example():
@@ -302,3 +315,18 @@ def run_example():
 
 if __name__ == "__main__":
     run_example()
+
+# %% [markdown]
+# ## Match the benchmark to the research workload
+#
+# The plots separate three decisions: how work scales within a box, how many
+# independent boxes can share the device, and whether setup is amortized over
+# enough steps. Smaller retained scratch memory does not remove the quadratic
+# pair work of Brownian coagulation. The plotted distribution is evidence that
+# the timing workload evolved, not a calibrated scientific result.
+#
+# To budget a parameter sweep, benchmark representative box sizes, occupancies,
+# process schedules, and observation intervals on your device. Report fresh-run
+# time alongside synchronized stepping, retain the same physical checks across
+# backends, and repeat timings. Extrapolating one large-box rate to many small
+# boxes—or this RTX 5060 campaign to another device—needs new measurements.

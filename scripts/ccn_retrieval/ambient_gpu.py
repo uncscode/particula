@@ -351,7 +351,7 @@ def plot():
         ax.grid(alpha=0.2)
         plotting.legend(ax)
     axes[0].set_ylabel("Particles reaching 1 µm (%)")
-    axes[1].set_ylabel("Difference from individual compositions (pp)")
+    axes[1].set_ylabel("Difference from individual\ncompositions (pp)")
     axes[1].axhline(0, color="gray", lw=0.8)
     fig.suptitle("Particle-resolved ambient aerosol   ·   5 s exposure")
     plotting.fit(fig)

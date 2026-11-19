@@ -1,25 +1,26 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 3.019109045038931,
-  "package_source_sha256": "98021107918d76caafbd800e6f8ab4c66bb0905e1950a2fc7075c622655abf5a",
+  "elapsed_seconds": 5.493225228972733,
+  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "theory-ionparticle-coagulation",
-  "fingerprint": "f5f9be330f436c33409434e30d23352227ede0fdea623c4191c14a6683de81b3",
+  "fingerprint": "8919a1a007a2c1757b47a80a55d54dcb8cbc9b1b2cfd0b8025def1b3c777cfa3",
   "source": "docs/theory/dynamics/ionparticle-coagulation.py",
-  "revision": "54ad1a812054da5361bdad2f2d397dd05615269e",
+  "revision": "6af97152d1570464ac5ccae56e3110001657e170",
   "package_dirty": false,
-  "executed_at": "2026-11-14T17:18:02.120093+00:00",
+  "executed_at": "2026-11-19T14:32:18.624918+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.2.14",
+    "particula": "0.3.2",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
     "nbclient": "0.10.2",
     "jupytext": "1.17.3",
-    "warp-lang": "1.11.1"
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
   },
   "outputs": [
     [],
@@ -29,7 +30,7 @@
         "text": "particula/dynamics/coagulation/charged_dimensionless_kernel.py:203: RuntimeWarning: divide by zero encountered in divide\n  factored_term = (pi_sqrt * continuum * coulomb_potential_ratio * 1.22) / (\nparticula/dynamics/coagulation/charged_dimensionless_kernel.py:208: RuntimeWarning: invalid value encountered in multiply\n  term1 = continuum_limit * (1 - (1 + factored_term) * exponential_decay)\nparticula/dynamics/coagulation/charged_dimensionless_kernel.py:214: RuntimeWarning: divide by zero encountered in divide\n  + (\nparticula/dynamics/coagulation/charged_dimensionless_kernel.py:210: RuntimeWarning: invalid value encountered in multiply\n  np.sqrt(8 * np.pi)\nparticula/dynamics/coagulation/charged_dimensionless_kernel.py:313: RuntimeWarning: divide by zero encountered in log\n  diff_knudsen_log = np.log(diffusive_knudsen)\n"
       },
       {
-        "image": "figure-3-2.png"
+        "image": "figure-3-1.png"
       }
     ],
     [
@@ -39,8 +40,8 @@
     ]
   ],
   "files": {
-    "source.py": "04829c25ef807617b621cfc9995a42c3f6cc341ef6bdb5e4e6b4b76350f182e6",
-    "figure-3-2.png": "0cc909db762f0f3b23e0b6ec2cc3e2c8af3a4fbb8ec19b25912d7a00971c1089",
-    "figure-4-1.png": "386dc066e758c12324c064ce34aeb695385c0d08d9b7e7558a4997144a5f89f7"
+    "figure-4-1.png": "9a82538c6bfb62d06e695e7a053690fe575581cca7c58719210d4b9262d0d5e5",
+    "figure-3-1.png": "f181d83b77ef999773798506f90eeaa58130e35cf1e39b15d7693c0a82bfe229",
+    "source.py": "386ff63e96b0f2f98be149f3825e64b666d5f682693fafa0861a0861bf7b6605"
   }
 }

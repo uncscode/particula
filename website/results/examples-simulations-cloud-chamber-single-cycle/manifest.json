@@ -1,19 +1,19 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 304.9465813350398,
-  "package_source_sha256": "6d2e24246ad67da3f2dd23afebccde41af3e1ed32de51992c99ef898b3f88d13",
+  "elapsed_seconds": 313.44656674400903,
+  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "examples-simulations-cloud-chamber-single-cycle",
-  "fingerprint": "fbe3bf88409ef333a0a786feb0fbb2ff5b8190e3c111e32e7d2a95766c26db61",
+  "fingerprint": "915f702e4e5192a38e7eb478aea39e461f2da7e6e215499e2cda9e3f48af5c7a",
   "source": "docs/examples/simulations/cloud_chamber_single_cycle.py",
-  "revision": "12742e1c394c7a836d31aff3aeecbd8c0ff2b523",
+  "revision": "6af97152d1570464ac5ccae56e3110001657e170",
   "package_dirty": false,
-  "executed_at": "2026-11-16T06:09:22.295109+00:00",
+  "executed_at": "2026-11-19T14:37:13.694076+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.3.1",
+    "particula": "0.3.2",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
@@ -60,7 +60,7 @@
     ]
   ],
   "files": {
-    "figure-7-1.png": "702bf5effab83e7c6a3c10caacc6836af78f86b7015388c427f270fdcdfc71a7",
-    "source.py": "0705806effb434384c4598f7983d3e0f47731492201a2552ba3b8654c3c56702"
+    "figure-7-1.png": "0e96341b9abee402d894958f995ba23bd2e9c38a8a5c81f7602fc9c6d77afea0",
+    "source.py": "4eeeaa5a963bb1ca441ea0c2d87f93836d0fa918dac8776fc8d42f287db20348"
   }
 }

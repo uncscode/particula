@@ -1,25 +1,26 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 4.814404278993607,
-  "package_source_sha256": "001be23dd50c3f7ba20ddde65465cfc75d611fb3f1a6f0d76564ce3c10c3e81c",
+  "elapsed_seconds": 7.978565631899983,
+  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "examples-processes-wall-loss-wall-loss-tutorial",
-  "fingerprint": "455e9df3ce537117cf4537b66a708a7de97589adefb9557eda66ce531b7a5e91",
+  "fingerprint": "b9d485f3281e01c131c5d561be75442528591140328f8383c4c3bf1ac7cdf8c2",
   "source": "docs/examples/processes/wall-loss/wall_loss_tutorial.py",
-  "revision": "894f603509f47c3f35bbfa7c45f45752136e7d52",
-  "package_dirty": true,
-  "executed_at": "2026-11-16T01:27:36.889998+00:00",
+  "revision": "dd92d3c1ca71f36eacad56b49661b32c0da77ac7",
+  "package_dirty": false,
+  "executed_at": "2026-11-19T14:42:47.198568+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.2.14",
+    "particula": "0.3.2",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
     "nbclient": "0.10.2",
     "jupytext": "1.17.3",
-    "warp-lang": "1.11.1"
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
   },
   "outputs": [
     [],
@@ -51,7 +52,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 159.20it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 93.21it/s]"
       },
       {
         "text": "\n"
@@ -60,7 +61,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 170.65it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 99.82it/s]"
       },
       {
         "text": "\n"
@@ -69,7 +70,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 171.88it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 100.16it/s]"
       },
       {
         "text": "\n"
@@ -78,7 +79,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 168.82it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 97.96it/s]"
       },
       {
         "text": "\n"
@@ -87,7 +88,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 154.52it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 99.11it/s]"
       },
       {
         "text": "\n"
@@ -96,7 +97,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 166.84it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 100.99it/s]"
       },
       {
         "text": "\n"
@@ -105,7 +106,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 165.92it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 94.42it/s]"
       },
       {
         "text": "\n"
@@ -114,7 +115,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 171.15it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 96.98it/s]"
       },
       {
         "text": "\n"
@@ -123,7 +124,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 170.52it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 99.97it/s]"
       },
       {
         "text": "\n"
@@ -132,7 +133,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 172.99it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 96.38it/s]"
       },
       {
         "text": "\n"
@@ -141,7 +142,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 167.15it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 98.58it/s]"
       },
       {
         "text": "\n"
@@ -150,7 +151,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 168.58it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 99.22it/s]"
       },
       {
         "text": "\n"
@@ -159,7 +160,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 156.55it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 101.33it/s]"
       },
       {
         "text": "\n"
@@ -168,7 +169,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 156.76it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 98.57it/s]"
       },
       {
         "text": "\n"
@@ -177,7 +178,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 162.16it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 96.23it/s]"
       },
       {
         "text": "\n"
@@ -186,7 +187,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 153.74it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 100.98it/s]"
       },
       {
         "text": "\n"
@@ -195,7 +196,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 167.57it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 90.50it/s]"
       },
       {
         "text": "\n"
@@ -204,7 +205,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 169.15it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 81.75it/s]"
       },
       {
         "text": "\n"
@@ -213,7 +214,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 174.28it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 102.96it/s]"
       },
       {
         "text": "\n"
@@ -222,7 +223,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 155.51it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 95.62it/s]"
       },
       {
         "text": "\n"
@@ -231,7 +232,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 163.60it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 95.93it/s]"
       },
       {
         "text": "\n"
@@ -240,7 +241,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 147.37it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 101.03it/s]"
       },
       {
         "text": "\n"
@@ -249,7 +250,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 164.96it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 93.05it/s]"
       },
       {
         "text": "\n"
@@ -258,7 +259,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 167.25it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 96.09it/s]"
       },
       {
         "text": "\n"
@@ -267,7 +268,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 171.55it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 98.98it/s]"
       },
       {
         "text": "\n"
@@ -276,7 +277,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 170.74it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 97.74it/s]"
       },
       {
         "text": "\n"
@@ -285,7 +286,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 165.23it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 93.81it/s]"
       },
       {
         "text": "\n"
@@ -294,7 +295,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 156.98it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 98.47it/s]"
       },
       {
         "text": "\n"
@@ -303,7 +304,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 165.41it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 76.16it/s]"
       },
       {
         "text": "\n"
@@ -312,7 +313,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 164.84it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 95.29it/s]"
       },
       {
         "text": "\n"
@@ -321,7 +322,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 168.60it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 98.03it/s]"
       },
       {
         "text": "\n"
@@ -330,7 +331,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 170.97it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 95.47it/s]"
       },
       {
         "text": "\n"
@@ -339,7 +340,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 169.85it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 97.42it/s]"
       },
       {
         "text": "\n"
@@ -348,7 +349,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 168.62it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 95.56it/s]"
       },
       {
         "text": "\n"
@@ -357,7 +358,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 168.28it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 103.81it/s]"
       },
       {
         "text": "\n"
@@ -366,7 +367,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 165.12it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 100.99it/s]"
       },
       {
         "text": "\n"
@@ -375,7 +376,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 164.86it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 97.62it/s]"
       },
       {
         "text": "\n"
@@ -384,7 +385,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 166.08it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 103.43it/s]"
       },
       {
         "text": "\n"
@@ -393,7 +394,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 177.25it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 99.11it/s]"
       },
       {
         "text": "\n"
@@ -402,7 +403,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 174.46it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 98.00it/s]"
       },
       {
         "text": "\n"
@@ -411,7 +412,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 159.00it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 101.47it/s]"
       },
       {
         "text": "\n"
@@ -420,7 +421,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 161.41it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 100.31it/s]"
       },
       {
         "text": "\n"
@@ -429,7 +430,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 163.37it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 97.77it/s]"
       },
       {
         "text": "\n"
@@ -438,7 +439,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 154.58it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 99.23it/s]"
       },
       {
         "text": "\n"
@@ -447,7 +448,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 161.97it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 100.27it/s]"
       },
       {
         "text": "\n"
@@ -456,7 +457,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 165.08it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 97.82it/s]"
       },
       {
         "text": "\n"
@@ -465,7 +466,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 160.41it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 83.08it/s]"
       },
       {
         "text": "\n"
@@ -474,7 +475,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 165.48it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 101.14it/s]"
       },
       {
         "text": "\n"
@@ -483,7 +484,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 160.46it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 93.34it/s]"
       },
       {
         "text": "\n"
@@ -492,7 +493,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 144.65it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 99.51it/s]"
       },
       {
         "text": "\n"
@@ -501,7 +502,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 149.40it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 103.04it/s]"
       },
       {
         "text": "\n"
@@ -510,7 +511,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 158.69it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 97.57it/s]"
       },
       {
         "text": "\n"
@@ -519,7 +520,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 159.75it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 96.85it/s]"
       },
       {
         "text": "\n"
@@ -528,7 +529,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 164.26it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 92.53it/s]"
       },
       {
         "text": "\n"
@@ -537,7 +538,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 161.15it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 95.89it/s]"
       },
       {
         "text": "\n"
@@ -546,7 +547,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 167.40it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 96.80it/s]"
       },
       {
         "text": "\n"
@@ -555,7 +556,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 158.81it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 98.64it/s]"
       },
       {
         "text": "\n"
@@ -564,7 +565,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 164.09it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 101.34it/s]"
       },
       {
         "text": "\n"
@@ -573,7 +574,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 166.60it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 98.03it/s]"
       },
       {
         "text": "\n"
@@ -582,7 +583,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 161.16it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 92.62it/s]"
       },
       {
         "text": "\n"
@@ -596,7 +597,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 390.46it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 224.38it/s]"
       },
       {
         "text": "\n"
@@ -605,7 +606,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 458.34it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 234.74it/s]"
       },
       {
         "text": "\n"
@@ -614,7 +615,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 408.05it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 220.22it/s]"
       },
       {
         "text": "\n"
@@ -623,7 +624,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 488.56it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 213.54it/s]"
       },
       {
         "text": "\n"
@@ -632,7 +633,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 483.55it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 226.89it/s]"
       },
       {
         "text": "\n"
@@ -641,7 +642,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 481.16it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 269.45it/s]"
       },
       {
         "text": "\n"
@@ -650,7 +651,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 507.23it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 254.02it/s]"
       },
       {
         "text": "\n"
@@ -659,7 +660,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 473.29it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 216.86it/s]"
       },
       {
         "text": "\n"
@@ -668,7 +669,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 419.68it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 203.77it/s]"
       },
       {
         "text": "\n"
@@ -677,7 +678,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 521.16it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 202.87it/s]"
       },
       {
         "text": "\n"
@@ -686,7 +687,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 492.64it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 200.69it/s]"
       },
       {
         "text": "\n"
@@ -695,7 +696,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 478.53it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 190.64it/s]"
       },
       {
         "text": "\n"
@@ -704,7 +705,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 512.56it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 210.95it/s]"
       },
       {
         "text": "\n"
@@ -713,7 +714,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 517.88it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 217.68it/s]"
       },
       {
         "text": "\n"
@@ -722,7 +723,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 525.01it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 215.91it/s]"
       },
       {
         "text": "\n"
@@ -731,7 +732,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 520.39it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 200.34it/s]"
       },
       {
         "text": "\n"
@@ -740,7 +741,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 524.29it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 210.79it/s]"
       },
       {
         "text": "\n"
@@ -749,7 +750,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 460.56it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 200.96it/s]"
       },
       {
         "text": "\n"
@@ -758,7 +759,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 350.69it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 201.62it/s]"
       },
       {
         "text": "\n"
@@ -767,7 +768,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 438.41it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 208.20it/s]"
       },
       {
         "text": "\n"
@@ -783,10 +784,10 @@
     ]
   ],
   "files": {
-    "figure-7-1.png": "b011ce220ca0c5eaa856c3674ee92051611fd8967d2483d5f9f03815c1da4473",
-    "figure-6-1.png": "e7bca1affd76ea14fc649e8cfcddb1c88f85c7f6f309d6d79924befa1eb3e6f0",
-    "figure-5-1.png": "013e51a6a1a79ba558bcb531e06f63de017a9f7f93d2f51003674ecd78ae57c0",
-    "figure-4-1.png": "61864549664a9d9f0c197cf18cc67850acbab372ae97e7b1d01739d1114d78c6",
-    "source.py": "3520ff994aa7e36387fd9a911720db36a91744bcb2ee8dba29f8f5162b21d088"
+    "figure-7-1.png": "25a54ba508a7b3c8e5811ad0f325d19e6c1d8b374994261281b0232f974ef03c",
+    "figure-6-1.png": "6b7a9d7316b0f32eedd534816d6400a3bb6e63bd36ccaa19521dfe8a5c52d0bf",
+    "figure-5-1.png": "8809bd74cf6a27b66218d5dd1f7cdf0c1305c9c39047f484d0f10009405a802d",
+    "figure-4-1.png": "5133efe4ec7c76b8d2ec2737a9fd3ff39575efbebba2dab1af478b4a5940b55e",
+    "source.py": "a6f1a008cc4993b95e770e20190c7119e0e61217985d72121066ad4a2ec6f436"
   }
 }

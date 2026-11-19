@@ -1,32 +1,33 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 3.3850296809105203,
-  "package_source_sha256": "8a51561059e8f51db8f4ca2e138c60a1b1e0040fd7caec3dc892c85621947875",
+  "elapsed_seconds": 4.977613820927218,
+  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "examples-processes-coagulation-functional-coagulation-basic-2-pdf",
-  "fingerprint": "fbc7b20e23f05fc53ef7993a293af2b78793a59cf993bb552c21b4948adcf3a3",
+  "fingerprint": "0141e1a1585b502ac0d4d25ad0de19b521da804cf5318bda947b3dc7912de748",
   "source": "docs/examples/processes/coagulation/functional/coagulation_basic_2_pdf.py",
-  "revision": "894f603509f47c3f35bbfa7c45f45752136e7d52",
-  "package_dirty": true,
-  "executed_at": "2026-11-16T01:26:31.360819+00:00",
+  "revision": "6af97152d1570464ac5ccae56e3110001657e170",
+  "package_dirty": false,
+  "executed_at": "2026-11-19T14:32:48.322660+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.2.14",
+    "particula": "0.3.2",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
     "nbclient": "0.10.2",
     "jupytext": "1.17.3",
-    "warp-lang": "1.11.1"
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
   },
   "outputs": [
     [],
     [],
     [
       {
-        "text": "<particula.dynamics.particle_process.Coagulation object at 0x7ff1463f2f30>\n"
+        "text": "<particula.dynamics.particle_process.Coagulation object at 0x7f9a5ebad7f0>\n"
       }
     ],
     [],
@@ -37,7 +38,7 @@
     ]
   ],
   "files": {
-    "figure-5-1.png": "7d296b25aa0dd2fd7f2a0fcb73976886fcdff957f951f583485e53022113f936",
-    "source.py": "2a60e90cbc2ac05af1f6de3a48e1fa43d18fd4073934047632647189896169e8"
+    "figure-5-1.png": "813fe417d011b7f52478f89cdb9818a8f38b0ef8a9ca362d1a2fee9cac1da94b",
+    "source.py": "4e87e304ffe6cf0c6266d5dbbaee371f28e64d8f261f7d4cb721a172d0d1d11b"
   }
 }

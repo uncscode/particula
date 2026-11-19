@@ -1,25 +1,26 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 3.598040557000786,
-  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "elapsed_seconds": 4.8004098769742996,
+  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "theory-dns-fluid-and-particle-properties-comparison",
-  "fingerprint": "81437029c2c06834d054e9e5b92b0306532431094ccd1fbb98ee23408182ad4f",
+  "fingerprint": "3f200999182fc53d5f10370423eed1dad146d2b1fc61304a7bc83f98ae82ef02",
   "source": "docs/theory/dynamics/cloud-droplet-coagulation/dns-fluid-and-particle-properties-comparison.py",
-  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "revision": "6af97152d1570464ac5ccae56e3110001657e170",
   "package_dirty": false,
-  "executed_at": "2026-11-13T14:59:24.476901+00:00",
+  "executed_at": "2026-11-19T14:32:04.908791+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.2.14",
+    "particula": "0.3.2",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
     "nbclient": "0.10.2",
     "jupytext": "1.17.3",
-    "warp-lang": "1.11.1"
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
   },
   "outputs": [
     [],
@@ -101,8 +102,8 @@
     ]
   ],
   "files": {
-    "source.py": "b5893cea61411ed6ac65d6e8a4375079f6f3381581cb273d5f6e42b134f33aa7",
-    "figure-9-1.png": "c01d4dfdf10341589b59e4e2cb0110ec175af61f7b5dabb0ef3c1bf4168be1d8",
-    "figure-12-1.png": "d61e242663f4ee44caf4f6a3253274e25142c05440ff2c0318733ef11f687f03"
+    "figure-12-1.png": "a98ac0e223501950f293a3c8171d01f92d0a9ce99c4dd470d9b77499134877c2",
+    "figure-9-1.png": "b2bb949bb8cc9c3fbe23a0e7b51ecf58ff0445c45c53f40a4e1ff723a4c672e2",
+    "source.py": "24887f81d282776d462ce751627fd84a5d971822107c1172751268f173332c1f"
   }
 }
