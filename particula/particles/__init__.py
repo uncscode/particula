@@ -76,6 +76,9 @@ from particula.particles.properties.aerodynamic_size import (
     get_aerodynamic_length,
     get_aerodynamic_shape_factor,
 )
+from particula.particles.properties.bipolar_charge import (
+    get_bipolar_charge_probability,
+)
 from particula.particles.properties.collision_radius_module import (
     get_collision_radius_mg1988,
     get_collision_radius_sr1992,
