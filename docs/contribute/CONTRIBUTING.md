@@ -180,7 +180,7 @@ a reviewed PR and update the checkout version in `AGENTS.md`. Merge after the
 applicable source, packaging and Conda checks pass. Local edits and PR builds
 do not publish anything.
 
-On a push to `uncscode/particula:main`, the **pypi** workflow compares the previous
+On a push to `uncscode/particula:main`, the **Python CI and releases** workflow compares the previous
 and current commit's versions without importing the package. Unchanged versions
 do not release; decreases or an unavailable previous version fail explicitly.
 Forks and other branches cannot publish. This automation supports stable
@@ -188,11 +188,15 @@ three-part versions; prereleases require a separately designed release policy.
 
 For a version increase, the workflow:
 
-1. Runs source, example and infrastructure tests, builds the wheel and source
-   archive, and verifies the exact documentation bundles, including an offline
-   source rebuild and isolated installations.
-2. Validates and builds the accompanying plugin archives, then retains the exact
-   release assets as a workflow artifact for 30 days.
+1. Runs the Python 3.12–3.14 test matrix, the additional slow scientific examples
+   on Python 3.12, Python packaging, and plugin validation as parallel jobs.
+   The required `pyping` check builds the wheel and source archive, verifies
+   bundled documentation, rebuilds offline, and checks isolated installations.
+2. Waits for all four checks on the same commit. The publisher downloads the
+   verified Python and plugin artifacts from that run and checks their hashes.
+   Both artifacts are retained for 30 days. A plugin version bump can publish
+   its own release from the same plugin artifact. Manual dispatch runs plugin
+   validation without publishing.
 3. Creates an annotated `vVERSION` tag at the tested commit and explicitly pushes
    that tag. An existing tag must resolve to the same commit; it is never moved.
 4. Publishes a GitHub release with generated notes, Python packages,

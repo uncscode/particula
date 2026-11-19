@@ -40,8 +40,7 @@ jobs:
           npm --prefix website ci
       - name: Test publishing infrastructure
         run: |
-          npm --prefix website test
-          python -m pytest scripts/tests/check_docs_structure_test.py -q --no-cov
+          npm --prefix website run test:js
           python scripts/check_docs_structure.py
       - name: Check saved results and changed examples
         env:

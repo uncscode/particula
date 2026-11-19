@@ -31,15 +31,18 @@ jobs:
         python-version: "3.12"
         cache: 'pip'
 
-    - name: Install dependencies
-      run: |
-        python -m pip install -e ".[dev]"
-        python -m pip install ${{ matrix.linter }}
+    - name: Install pinned Ruff
+      if: ${{ matrix.linter == 'ruff' }}
+      run: python -m pip install ruff==0.14.1
+
+    - name: Install type-checking dependencies
+      if: ${{ matrix.linter == 'mypy' }}
+      run: python -m pip install -e ".[dev]"
 
     - name: Lint with ruff
       if: ${{ matrix.linter == 'ruff' }}
       run: |
-        ruff check particula/ examples_tests/ scripts/ _particula_build.py particula_docs.py
+        ruff check --no-fix particula/ examples_tests/ scripts/ _particula_build.py particula_docs.py
         ruff format particula/ examples_tests/ scripts/ _particula_build.py particula_docs.py --check
 
     - name: Type check with mypy

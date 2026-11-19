@@ -95,6 +95,7 @@ def test_version_gate_writes_action_output(runner, monkeypatch, tmp_path):
         "scripts/check_feedstock_contract.py",
         "scripts/tests/new_test.py",
         ".github/workflows/conda-feedstock.yml",
+        ".github/workflows/pypi.yml",
         "pyproject.toml",
         "_particula_build.py",
         "particula_docs.py",
