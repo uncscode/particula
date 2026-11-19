@@ -328,12 +328,18 @@ def write_plot_data(path, data):
 
 def load_replot_data(example_id, config, root, results, *, science_root=None):
     """Reject missing, altered or scientifically stale numerical data."""
-    if science_root is not None:
-        return load_historical_data(example_id, config, science_root, results)
     directory, original = bundle(example_id, results)
     if not original or "data.json" not in original["files"]:
         raise ValueError(
             "No saved numerical data; a data-saving refresh is required"
+        )
+    if original.get("historical_run") and science_root is None:
+        raise ValueError(
+            "Historical replot requires the pinned science checkout"
+        )
+    if science_root is not None:
+        config, root = historical_study_inputs(
+            example_id, config, root, science_root, original
         )
     if original.get("simulation_fingerprint") != simulation_fingerprint(
         config, root
@@ -341,7 +347,7 @@ def load_replot_data(example_id, config, root, results, *, science_root=None):
         raise ValueError(
             "Simulation inputs changed; refresh required before replot"
         )
-    if not science_matches(original, root):
+    if not science_matches(original, science_root or root):
         raise ValueError(
             "Library source changed; refresh required before replot"
         )
@@ -353,29 +359,37 @@ def load_replot_data(example_id, config, root, results, *, science_root=None):
     return directory, original, data
 
 
-def load_historical_data(example_id, config, science_root, results):
-    """Check saved observations against their original scientific checkout."""
+def historical_study_inputs(example_id, config, root, science_root, original):
+    """Locate the study that executed against the pinned scientific library."""
     pin = config.get("historical_run")
     if not pin:
         raise ValueError("This example has no pinned historical run")
-    revision = subprocess.check_output(  # noqa: S603 -- Git argv without a shell
-        [GIT, "rev-parse", "HEAD"], cwd=science_root, text=True
-    ).strip()
-    if revision != pin["revision"]:
-        raise ValueError(
-            "Historical checkout does not match the pinned revision"
-        )
-    historical_config = json.loads(
-        (science_root / "website/examples.json").read_text()
-    )[example_id]
-    directory, original, data = load_replot_data(
-        example_id, historical_config, science_root, results
+    verify_execution_checkout(
+        config,
+        science_root,
+        recorded_package_hash=original["package_source_sha256"],
     )
-    if original["revision"] != revision or (
-        original["files"]["data.json"] != pin["data_sha256"]
-    ):
+    if original["revision"] != pin["revision"]:
         raise ValueError("Saved data does not match the pinned historical run")
-    return directory, original, data
+
+    # A fresh archived-library run executes the study in the author checkout.
+    # Its observed data may include new timings. Keep its execution digest
+    # across redraws, independently of the reference archive's data digest.
+    if "plot_source_revision" in original:
+        recorded_pin = original["historical_run"]
+        if recorded_pin["data_sha256"] != pin["data_sha256"]:
+            raise ValueError("Historical reference data pin changed")
+        expected = original.get("execution_data_sha256", pin["data_sha256"])
+        study_config, study_root = config, root
+    else:
+        expected = pin["data_sha256"]
+        study_config = json.loads(
+            (science_root / "website/examples.json").read_text()
+        )[example_id]
+        study_root = science_root
+    if original["files"]["data.json"] != expected:
+        raise ValueError("Saved data does not match the pinned historical run")
+    return study_config, study_root
 
 
 def save_cell_outputs(cells, pending):
@@ -429,6 +443,9 @@ def retain_execution_metadata(
     if science_root is not None:
         manifest["historical_run"] = config["historical_run"]
         manifest["simulation_fingerprint"] = original["simulation_fingerprint"]
+    for key in ("plot_source_revision", "execution_data_sha256"):
+        if key in original:
+            manifest[key] = original[key]
     manifest["render_versions"] = manifest["versions"]
     manifest["render_device"] = device
     for key in (
@@ -450,14 +467,17 @@ def retain_execution_metadata(
     manifest["render_elapsed_seconds"] = elapsed
 
 
-def verify_execution_checkout(config, science_root):
+def verify_execution_checkout(
+    config, science_root, *, recorded_package_hash=None
+):
     """Require the recorded scientific revision and exact package contents."""
     pin = config.get("historical_run", {})
     revision = subprocess.check_output(  # noqa: S603 -- fixed Git arguments
         [GIT, "rev-parse", "HEAD"], cwd=science_root, text=True
     ).strip()
     if revision != pin.get("revision") or (
-        package_source_hash(science_root) != pin.get("package_source_sha256")
+        package_source_hash(science_root)
+        != pin.get("package_source_sha256", recorded_package_hash)
     ):
         raise ValueError(
             "Scientific checkout differs from the pinned execution"
@@ -469,6 +489,8 @@ def record_historical_execution(manifest, config, historical):
     if historical:
         manifest["historical_run"] = config["historical_run"]
         manifest["plot_source_revision"] = manifest["revision"]
+        if "data.json" in manifest["files"]:
+            manifest["execution_data_sha256"] = manifest["files"]["data.json"]
         manifest["revision"] = config["historical_run"]["revision"]
 
 

@@ -608,18 +608,22 @@ def test_historical_replot_checks_original_inputs_and_pinned_data(tmp_path):
     with pytest.raises(ValueError, match="differs from the pinned execution"):
         examples.verify_execution_checkout(current, science)
     extra.unlink()
-    assert examples.load_historical_data("demo", current, science, results)[
-        2
-    ] == {"observation": 3}
+
+    def load_archive(config):
+        return examples.load_replot_data(
+            "demo", config, tmp_path, results, science_root=science
+        )
+
+    assert load_archive(current)[2] == {"observation": 3}
     with pytest.raises(ValueError, match="no pinned"):
-        examples.load_historical_data("demo", config, science, results)
+        load_archive(config)
     pin["data_sha256"] = "0" * 64
     with pytest.raises(ValueError, match="pinned historical run"):
-        examples.load_historical_data("demo", current, science, results)
+        load_archive(current)
     pin["data_sha256"] = digest
     (science / "study.py").write_text("value = 4\n")
     with pytest.raises(ValueError, match="Simulation inputs changed"):
-        examples.load_historical_data("demo", current, science, results)
+        load_archive(current)
 
 
 def test_archived_science_uses_only_current_plotting_module(tmp_path):
@@ -645,3 +649,88 @@ def test_archived_science_uses_only_current_plotting_module(tmp_path):
     subprocess.run(  # noqa: S603 -- isolated fixed test program
         [sys.executable, "-c", code], cwd=examples.ROOT, check=True
     )
+
+
+def test_fresh_archived_library_run_replots_from_executed_study(
+    tmp_path, monkeypatch
+):
+    """Retain the current study, its inputs and its own observed data on redraw."""
+    science = tmp_path / "archive"
+    author = tmp_path / "author"
+
+    def git(repo, *args):
+        return subprocess.check_output(  # noqa: S603 -- local Git fixtures
+            [examples.GIT, *args], cwd=repo, text=True
+        ).strip()
+
+    for repo in (science, author):
+        repo.mkdir()
+        git(repo, "init", "-q")
+        git(
+            repo,
+            "-c",
+            "user.name=Test",
+            "-c",
+            "user.email=test@example.org",
+            "commit",
+            "-qm",
+            repo.name,
+            "--allow-empty",
+        )
+    revision = git(science, "rev-parse", "HEAD")
+    config = {
+        "source": "study.py",
+        "device": "cpu",
+        "inputs": ["input.txt"],
+        "data_expression": "data",
+        "historical_run": {
+            "revision": revision,
+            "package_source_sha256": examples.package_source_hash(science),
+            "data_sha256": hashlib.sha256(b"original observations").hexdigest(),
+        },
+    }
+    source = author / "study.py"
+    source.write_text("data = {'time': 7}\n")
+    (author / "input.txt").write_text("material A")
+    (science / "study.py").write_text("data = {'time': 3}\n")
+    calls = []
+
+    def execute(config, root, *, saved_data=None, science_root=None):
+        calls.append((science_root, saved_data))
+        return [{"metadata": {"plot_data": {"time": 7}}, "outputs": []}], "CPU"
+
+    monkeypatch.setattr(examples, "execute", execute)
+    results = tmp_path / "results"
+
+    def publish(replot=False):
+        examples.refresh(
+            "demo", config, author, results, replot=replot, science_root=science
+        )
+
+    publish()
+    folder, before = examples.bundle("demo", results)
+    with pytest.raises(ValueError, match="pinned science checkout"):
+        examples.load_replot_data("demo", config, author, results)
+    for _ in range(2):
+        publish(replot=True)
+        _, after = examples.bundle("demo", results)
+        for key in (
+            "execution_data_sha256",
+            "plot_source_revision",
+            "simulation_fingerprint",
+            "executed_at",
+            "revision",
+        ):
+            assert before[key] == after[key]
+        assert after["files"]["data.json"] == before["execution_data_sha256"]
+    assert calls == [(science, None), (None, {"time": 7}), (None, {"time": 7})]
+    (author / "input.txt").write_text("material B")
+    with pytest.raises(ValueError, match="Simulation inputs changed"):
+        publish(replot=True)
+    (author / "input.txt").write_text("material A")
+    new = b'{"time":9}'
+    (folder / "data.json").write_bytes(new)
+    after["files"]["data.json"] = hashlib.sha256(new).hexdigest()
+    (folder / "manifest.json").write_text(json.dumps(after))
+    with pytest.raises(ValueError, match="pinned historical run"):
+        publish(replot=True)

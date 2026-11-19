@@ -226,19 +226,20 @@ def result_notice(state, manifest):
 
 def render_credit(manifest):
     """Describe the source of a historical run or saved-data redraw."""
+    credit = ""
     if "plot_source_revision" in manifest:
-        return (
+        credit = (
             "This native execution used the archived scientific package "
             "and the example and plotting code from "
             f"revision `{manifest['plot_source_revision'][:9]}`.\n\n"
         )
     if "rendered_at" in manifest:
-        return (
+        credit += (
             f"Plots rendered from saved data on {manifest['rendered_at'][:10]} "
             f"UTC (revision `{manifest['render_revision'][:9]}`); "
             "simulation not rerun.\n\n"
         )
-    return ""
+    return credit
 
 
 def render_example(key, config):

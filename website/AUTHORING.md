@@ -66,7 +66,11 @@ python scripts/docs_examples.py replot gpu-prepared-cyclic-chamber --science-che
 The current checkout supplies the renderer. The historical checkout supplies
 the scientific source and inputs for verification. The page identifies the
 historical simulation and links its executed source, arrays and original
-device. To publish a result from the current model, run a full refresh.
+device. A full refresh with `--science-checkout` runs the current study script
+and its declared inputs against the pinned library. Subsequent replots check
+that study and the digest of its freshly recorded data. The registry's data
+digest identifies the original archive, whose timing fields may differ. To
+publish a result from the current model, run a full refresh without the flag.
 
 For the stochastic and lifecycle tutorials, the example files were first
 committed after the scientific checkout. In a dedicated checkout of the pinned
