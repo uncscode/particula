@@ -14,6 +14,7 @@ from particula.dynamics import (
     Dilution,
     MassCondensation,
     Nucleation,
+    VanDerWaalsCoagulationStrategy,
     WallLoss,
 )
 from particula.dynamics.condensation import condensation_strategies as cs
@@ -47,6 +48,7 @@ _CONFIGURATION_TYPES = (
     EnvironmentForcing,
     *NATIVE_PROCESSES,
     BrownianCoagulationStrategy,
+    VanDerWaalsCoagulationStrategy,
     DilutionStrategy,
     wl.SphericalWallLossStrategy,
     wl.RectangularWallLossStrategy,

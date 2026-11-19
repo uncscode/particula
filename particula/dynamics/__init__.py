@@ -109,6 +109,15 @@ from particula.dynamics.condensation.mass_transfer import (
 )
 
 # particula.dynamics.coagulation
+from particula.dynamics.coagulation.van_der_waals_kernel import (
+    get_van_der_waals_kernel_via_system_state,
+)
+from particula.dynamics.coagulation.coagulation_strategy.van_der_waals_coagulation_strategy import (
+    VanDerWaalsCoagulationStrategy,
+)
+from particula.dynamics.coagulation.coagulation_builder.van_der_waals_coagulation_builder import (
+    VanDerWaalsCoagulationBuilder,
+)
 from particula.dynamics.coagulation.brownian_kernel import (
     get_brownian_kernel,
     get_brownian_kernel_via_system_state,

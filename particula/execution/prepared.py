@@ -342,6 +342,7 @@ class PreparedSimulation:
                         ),
                         8: "ion attachment rate is unsupported",
                         9: ("coagulation budget exceeded; reduce timestep"),
+                        10: "pair exceeds van der Waals capture table domain",
                         90: "GPU process produced invalid field values",
                         91: "GPU particle-field event contract violated",
                     }

@@ -22,6 +22,7 @@ from particula.dynamics.coagulation.particle_resolved_step import (
 from particula.particles.particle_data import ParticleData
 
 from ._native_validation import (
+    _thermal_mechanisms,
     positive_scalar,
     validate_controls,
     validate_particle,
@@ -347,6 +348,28 @@ def step_native(  # noqa: C901
         strategy.particle_resolved_bins_number,
         strategy.particle_resolved_bins_per_decade,
     )
+    if "van_der_waals" in _thermal_mechanisms(strategy):
+        # A single radius can contain opposite charges. Bound each bin pair
+        # with the actual pair rates, then sample those same matrix entries.
+        if np.any(material.radii[0] >= edges[-1]):
+            raise ValueError(
+                "kernel radius edges must cover every active particle"
+            )
+        actual = strategy.kernel(material, temperature, pressure)
+        np.fill_diagonal(actual, 0)
+        if time_step == 0:
+            return particle
+        pairs = particle_resolved_method.get_particle_resolved_coagulation_step(
+            particle_radius=material.radii[0],
+            kernel=actual,
+            kernel_radius=edges,
+            volume=float(particle.volume[0]),
+            time_step=scaled_time,
+            random_generator=strategy.random_generator,
+            exact_pair_rates=actual,
+        )
+        _merge(particle, active, pairs, extension_fields)
+        return particle
     binned = binned_kernel_data(material, edges)
     kernel = validate_rate_kernel(
         binned, strategy.kernel(binned, temperature, pressure)

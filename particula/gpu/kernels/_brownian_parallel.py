@@ -15,6 +15,7 @@ from particula.gpu.dynamics.ion_pair_data import (
     IonPairData,
     replace_ion_pair_rate,
 )
+from particula.gpu.dynamics.van_der_waals import CaptureData, capture_pair_wp
 from particula.gpu.kernels.coagulation import (
     _sanitize_positive_finite,
     _select_coagulation_pairs_impl,
@@ -362,6 +363,7 @@ def _select_brownian(  # noqa: C901
     majorants: wp.array(dtype=wp.float64),
     failure: wp.array(dtype=wp.int32),
     ion_data: IonPairData,
+    capture: CaptureData,
     work_counts: wp.array2d(dtype=wp.int32),
 ) -> None:
     """Select from parallel properties and maxima with the original RNG code."""
@@ -416,6 +418,7 @@ def _select_brownian(  # noqa: C901
         active_counts[box_idx],
         kinematic_viscosity,
         ion_data,
+        capture,
     )
 
     work_counts[box_idx, 0] = counters[0]
@@ -459,6 +462,7 @@ def _additive_pair_maxima(  # noqa: C901
     partials: wp.array2d(dtype=wp.float64),
     failure: wp.array(dtype=wp.int32),
     ion_data: IonPairData,
+    capture: CaptureData,
 ) -> None:
     """Reduce exact additive rates with bounded scratch and int64 pair ranks."""
     if failure:
@@ -516,6 +520,23 @@ def _additive_pair_maxima(  # noqa: C901
                 ref_temperature,
                 sutherland_constant,
             )
+            if mechanism_mask & 16:
+                thermal_rate = capture_pair_wp(
+                    capture,
+                    radii[box_idx, selected_i],
+                    radii[box_idx, selected_j],
+                    total_masses[box_idx, selected_i],
+                    total_masses[box_idx, selected_j],
+                    charge[box_idx, selected_i],
+                    charge[box_idx, selected_j],
+                    diffusivities[box_idx, selected_i]
+                    + diffusivities[box_idx, selected_j],
+                    temperature_value,
+                )
+                if thermal_rate < wp.float64(0.0):
+                    wp.atomic_cas(failure, 0, 0, 10)
+                    return
+                total_rate += thermal_rate
             total_rate = replace_ion_pair_rate(
                 ion_data, box_idx, selected_i, selected_j, total_rate
             )
@@ -537,6 +558,7 @@ class _PreparedBrownianWork:
     device: Any
     work_counts: Any = None
     ion_data: Any = field(default_factory=IonPairData)
+    capture: Any = field(default_factory=CaptureData)
     ion_setup: Callable | None = None
     mean_density: Any = None
 
@@ -587,6 +609,7 @@ class _PreparedBrownianWork:
                 self.partials,
                 failure,
                 self.ion_data,
+                self.capture,
             ),
             device=self.device,
         )
@@ -608,6 +631,7 @@ class _PreparedBrownianWork:
                 self.majorants,
                 failure,
                 self.ion_data,
+                self.capture,
                 self.work_counts,
             ),
             device=self.device,
@@ -619,7 +643,9 @@ class _PreparedBrownianWork:
         self.select(failure)
 
 
-def prepare_brownian_work(selector_inputs, device, work_counts=None):
+def prepare_brownian_work(
+    selector_inputs, device, work_counts=None, capture=None
+):
     """Allocate O(BN) flags and at most 4096 fp64 maxima per box."""
     boxes, slots = selector_inputs[1].shape
     if work_counts is None:
@@ -639,4 +665,5 @@ def prepare_brownian_work(selector_inputs, device, work_counts=None):
         majorants,
         device,
         work_counts=work_counts,
+        capture=CaptureData() if capture is None else capture,
     )

@@ -17,7 +17,11 @@ from numpy.typing import NDArray
 
 from particula.particles.particle_data import ParticleData
 
-from ._native_validation import _evaluate_material_kernel, native_kernel
+from ._native_validation import (
+    _evaluate_material_kernel,
+    native_kernel,
+    validate_controls,
+)
 from .coagulation_strategy_abc import CoagulationStrategyABC
 
 logger = logging.getLogger("particula")
@@ -89,6 +93,7 @@ class CombineCoagulationStrategy(CoagulationStrategyABC):
 
         super().__init__(distribution_type=distribution_type)
         self.strategies = strategies
+        validate_controls(self, distribution_type)
 
     def dimensionless_kernel(
         self,
