@@ -1213,6 +1213,7 @@
       "plot_results",
       "plot_separation"
     ],
-    "plot_inputs": []
+    "plot_inputs": [],
+    "full_canvas": true
   }
 }
