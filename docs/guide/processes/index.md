@@ -2,6 +2,7 @@
 
 Choose a process guide for practical setup and an executable example:
 
+- [Dry PSL mobility sizing](psl-mobility.md)
 - [Activity](activity.md)
 - [Designing a size-resolved CCN experiment](ccn-retrieval.md)
 - [Condensation](condensation.md)

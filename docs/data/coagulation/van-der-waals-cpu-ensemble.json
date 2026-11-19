@@ -1,0 +1,22 @@
+[
+  {
+    "steps": 8,
+    "trials": 1024,
+    "hits": 667,
+    "probability": 0.6513671875,
+    "continuous_probability": 0.6321205588285577,
+    "finite_step_probability": 0.6563910841941833,
+    "dt_s": 7.291541197235696,
+    "seed_start": 80000
+  },
+  {
+    "steps": 32,
+    "trials": 1024,
+    "hits": 665,
+    "probability": 0.6494140625,
+    "continuous_probability": 0.6321205588285577,
+    "finite_step_probability": 0.6379447107436834,
+    "dt_s": 1.822885299308924,
+    "seed_start": 320000
+  }
+]

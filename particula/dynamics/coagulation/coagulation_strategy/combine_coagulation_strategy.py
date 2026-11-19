@@ -17,7 +17,12 @@ from numpy.typing import NDArray
 
 from particula.particles.particle_data import ParticleData
 
-from ._native_validation import _evaluate_material_kernel, native_kernel
+from ._native_validation import (
+    _evaluate_material_kernel,
+    _thermal_mechanisms,
+    native_kernel,
+    validate_controls,
+)
 from .coagulation_strategy_abc import CoagulationStrategyABC
 
 logger = logging.getLogger("particula")
@@ -89,6 +94,7 @@ class CombineCoagulationStrategy(CoagulationStrategyABC):
 
         super().__init__(distribution_type=distribution_type)
         self.strategies = strategies
+        validate_controls(self, distribution_type)
 
     def dimensionless_kernel(
         self,
@@ -124,6 +130,8 @@ class CombineCoagulationStrategy(CoagulationStrategyABC):
         particle: ParticleData,
         temperature: float,
         pressure: float,
+        *,
+        exclude_self_pairs: bool = False,
     ) -> Union[float, NDArray[np.float64]]:
         """Compute the total coagulation kernel by summing the kernels from all
         underlying strategies.
@@ -133,6 +141,7 @@ class CombineCoagulationStrategy(CoagulationStrategyABC):
                 particle data (radii, distribution, etc.).
             temperature: The temperature in Kelvin [K].
             pressure: The pressure in Pascals [Pa].
+            exclude_self_pairs: Omit a resolved slot paired with itself.
 
         Returns:
             float or NDArray[np.float64]: The combined coagulation kernel,
@@ -152,7 +161,14 @@ class CombineCoagulationStrategy(CoagulationStrategyABC):
         # Type narrowing: initialize as Union type to match return signature
         combined_kernel: Union[float, NDArray[np.float64]] = 0.0
         for strategy in self.strategies:
+            options = {}
+            if exclude_self_pairs and "van_der_waals" in _thermal_mechanisms(
+                strategy
+            ):
+                options["exclude_self_pairs"] = True
             combined_kernel += _evaluate_material_kernel(
-                strategy, particle, temperature, pressure
+                strategy, particle, temperature, pressure, **options
             )
+        if exclude_self_pairs and isinstance(combined_kernel, np.ndarray):
+            np.fill_diagonal(combined_kernel, 0.0)
         return combined_kernel

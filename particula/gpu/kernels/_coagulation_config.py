@@ -8,8 +8,12 @@ CHARGED_HARD_SPHERE_MECHANISM = "charged_hard_sphere"
 SEDIMENTATION_SP2016_MECHANISM = "sedimentation_sp2016"
 TURBULENT_SHEAR_ST1956_MECHANISM = "turbulent_shear_st1956"
 
+VAN_DER_WAALS_MECHANISM = "van_der_waals"
+VAN_DER_WAALS_MECHANISM_FLAG = 16
+
 CANONICAL_COAGULATION_MECHANISMS = (
     BROWNIAN_MECHANISM,
+    VAN_DER_WAALS_MECHANISM,
     CHARGED_HARD_SPHERE_MECHANISM,
     SEDIMENTATION_SP2016_MECHANISM,
     TURBULENT_SHEAR_ST1956_MECHANISM,
@@ -22,6 +26,7 @@ TURBULENT_SHEAR_ST1956_MECHANISM_FLAG = 8
 
 _COAGULATION_MECHANISM_FLAGS = MappingProxyType(
     {
+        VAN_DER_WAALS_MECHANISM: VAN_DER_WAALS_MECHANISM_FLAG,
         BROWNIAN_MECHANISM: BROWNIAN_MECHANISM_FLAG,
         CHARGED_HARD_SPHERE_MECHANISM: CHARGED_HARD_SPHERE_MECHANISM_FLAG,
         SEDIMENTATION_SP2016_MECHANISM: SEDIMENTATION_SP2016_MECHANISM_FLAG,
@@ -41,11 +46,15 @@ class CoagulationMechanismConfig:
         charged_model: Alternative charged Brownian fit: hard_sphere,
             dyachkov2007, gatti2008, gopalakrishnan2012 or chahl2019.
             Nondefault selection requires the charged mechanism.
+        hamaker_constant: Effective dispersion constant across air [J].
+        relative_permittivity: Static relative permittivity of both spheres.
     """
 
     mechanisms: tuple[str, ...] | None = None
     distribution_type: str = "particle_resolved"
     charged_model: str = "hard_sphere"
+    hamaker_constant: float | None = None
+    relative_permittivity: float | None = None
 
 
 @dataclass(frozen=True)
@@ -56,6 +65,25 @@ class _ResolvedCoagulationMechanismConfig:
     distribution_type: str
     mask: int
     charged_model: int = 0
+
+
+def _validate_dispersion_config(config, seen):
+    """Check explicit material inputs and overlapping thermal mechanisms."""
+    if VAN_DER_WAALS_MECHANISM in seen:
+        from particula.dynamics.coagulation.van_der_waals_kernel import (
+            validate_material,
+        )
+
+        validate_material(config.hamaker_constant, config.relative_permittivity)
+        if seen & {BROWNIAN_MECHANISM, CHARGED_HARD_SPHERE_MECHANISM}:
+            raise ValueError(
+                "van_der_waals already includes the Brownian encounter rate"
+            )
+    elif (
+        config.hamaker_constant is not None
+        or config.relative_permittivity is not None
+    ):
+        raise ValueError("dispersion material constants require van_der_waals")
 
 
 def resolve_coagulation_mechanism_config(
@@ -119,6 +147,7 @@ def resolve_coagulation_mechanism_config(
         and CHARGED_HARD_SPHERE_MECHANISM not in mechanisms
     ):
         raise ValueError("charged_model requires the charged mechanism")
+    _validate_dispersion_config(config, seen)
     return _ResolvedCoagulationMechanismConfig(
         charged_model=models.index(config.charged_model),
         mechanisms=normalized_mechanisms,
@@ -143,6 +172,6 @@ def validate_coagulation_mechanism_capabilities(
     Raises:
         ValueError: If the mechanism mask is a deferred three-way combination.
     """
-    if 1 <= resolved.mask <= 15:
+    if 1 <= resolved.mask <= 15 or resolved.mask in (16, 20, 24, 28):
         return
     raise ValueError("Additive coagulation execution is deferred.")

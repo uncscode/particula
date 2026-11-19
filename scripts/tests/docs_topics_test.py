@@ -65,7 +65,9 @@ def test_invalid_branching_and_empty_leaf():
     assert any("branching requires" in e for e in errors)
     data = docs_topics.load()
     data["resources"] = [
-        r for r in data["resources"] if r["topic"] != "transport"
+        r
+        for r in data["resources"]
+        if r["topic"] != "transport" and "transport" not in r["also"]
     ]
     assert "transport: empty topic leaf" in docs_topics.validate(data)
 

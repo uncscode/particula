@@ -7,6 +7,7 @@ Results are specific to their recorded revision, workload, and device.
 | Question | Record |
 | --- | --- |
 | Can bipolar charge and mobility selection explain NaCl capture rates? | [NaCl chamber scavenging](coagulation/nacl-scavenging.md) |
+| How accurately does the slip law recover a dry PSL diameter? | [Mobility sizing against 49 published measurements](transport/psl-mobility.md) |
 | How well does direct BAT reproduce the published activity curves? | [Binary BAT reference checks](thermodynamics/bat-activity.md) |
 | How well does BAT reproduce measured citric acid water activity? | [Citric acid droplet hygroscopicity](thermodynamics/citric-acid-comparison.md) |
 | How well does a CCN-derived κ transfer across sizes and humidities? | [Size-resolved CCN retrieval study](thermodynamics/ccn-retrieval.md) |
@@ -29,3 +30,7 @@ Results are specific to their recorded revision, workload, and device.
 
 Missing reviewed artifacts are unavailable and unmeasured. A passing source
 test or closed implementation plan cannot populate a missing measurement row.
+
+[Dispersion and dielectric capture](coagulation/van-der-waals.md) compares
+CPU and CUDA pair kernels with orbit integrals, independent Langevin
+trajectories, and neutral and charged chamber measurements.

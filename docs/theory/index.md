@@ -14,3 +14,7 @@ for runnable workflows.
 
 Software architecture and acceleration teaching material are grouped under
 Contribute in the navigation, separately from the physical theory.
+
+[Dispersion and dielectric polarization](dynamics/interparticle-forces.md)
+derives capture rates for neutral and charged compact spheres from their
+separation-dependent energy.

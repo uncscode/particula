@@ -538,6 +538,33 @@ _CHAHL_SHAPE_INTERCEPT = wp.constant(wp.float64(0.05971))
 
 
 @wp.func
+def hard_sphere_transition_wp(diffusive_knudsen: wp.float64):
+    """Dimensionless hard-sphere transition kernel H(Kn_D)."""
+    pi_value = _PI
+    continuum = (
+        wp.float64(4.0) * pi_value * diffusive_knudsen * diffusive_knudsen
+    )
+    numerator = (
+        continuum
+        + _HARD_SPHERE_LINEAR * wp.pow(diffusive_knudsen, wp.float64(3.0))
+        + wp.sqrt(wp.float64(8.0) * pi_value)
+        * _HARD_SPHERE_QUARTIC
+        * wp.pow(diffusive_knudsen, wp.float64(4.0))
+    )
+    denominator = (
+        wp.float64(1.0)
+        + _HARD_SPHERE_DENOMINATOR_LINEAR * diffusive_knudsen
+        + _HARD_SPHERE_DENOMINATOR_QUADRATIC
+        * diffusive_knudsen
+        * diffusive_knudsen
+        + _HARD_SPHERE_QUARTIC * wp.pow(diffusive_knudsen, wp.float64(3.0))
+    )
+    if not wp.isfinite(numerator) or not wp.isfinite(denominator):
+        return wp.float64(-1.0)
+    return numerator / denominator
+
+
+@wp.func
 def charged_dimensionless_wp(
     model: wp.int32,
     kn: wp.float64,
@@ -870,34 +897,14 @@ def charged_kernel_wp(  # noqa: C901
     if not wp.isfinite(diffusive_knudsen) or diffusive_knudsen < zero:
         return zero
 
-    pi_value = _PI
-    continuum = (
-        wp.float64(4.0) * pi_value * diffusive_knudsen * diffusive_knudsen
-    )
-    numerator = (
-        continuum
-        + _HARD_SPHERE_LINEAR * wp.pow(diffusive_knudsen, wp.float64(3.0))
-        + wp.sqrt(wp.float64(8.0) * pi_value)
-        * _HARD_SPHERE_QUARTIC
-        * wp.pow(diffusive_knudsen, wp.float64(4.0))
-    )
-    denominator = (
-        wp.float64(1.0)
-        + _HARD_SPHERE_DENOMINATOR_LINEAR * diffusive_knudsen
-        + _HARD_SPHERE_DENOMINATOR_QUADRATIC
-        * diffusive_knudsen
-        * diffusive_knudsen
-        + _HARD_SPHERE_QUARTIC * wp.pow(diffusive_knudsen, wp.float64(3.0))
-    )
-    if (
-        not wp.isfinite(numerator)
-        or numerator < zero
-        or not wp.isfinite(denominator)
-        or denominator <= zero
-    ):
+    hard_sphere = hard_sphere_transition_wp(diffusive_knudsen)
+    if hard_sphere < zero:
         return zero
     dimensionless_kernel = charged_dimensionless_wp(
-        model, diffusive_knudsen, potential_ratio, numerator / denominator
+        model,
+        diffusive_knudsen,
+        potential_ratio,
+        hard_sphere,
     )
     if not wp.isfinite(dimensionless_kernel) or dimensionless_kernel < zero:
         return zero

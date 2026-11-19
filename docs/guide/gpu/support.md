@@ -70,3 +70,8 @@ approximation at variable temperature and pressure. LF2013 remains the default
 and retains its reference-condition restrictions. See
 [variable-environment ion attachment](prepared.md#variable-temperaturepressure-ion-attachment)
 for mobility scaling, fixed recombination, and omitted physical processes.
+
+Direct and prepared CUDA also support the complete dispersion and dielectric
+thermal mechanism, alone or with settling and shear. The tested range and
+strong opposite-charge boundary are recorded in the
+[dielectric capture validation](../../contribute/validation/coagulation/van-der-waals.md).

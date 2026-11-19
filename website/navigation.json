@@ -138,6 +138,10 @@
             "slug": "guide/processes/ccn-retrieval"
           },
           {
+            "label": "Dry PSL mobility sizing",
+            "slug": "guide/processes/psl-mobility"
+          },
+          {
             "label": "Coagulation Strategy System",
             "slug": "guide/processes/coagulation"
           },
@@ -342,6 +346,10 @@
                 "slug": "examples/fundamentals/particles/aerosol_distributions"
               },
               {
+                "label": "Diameter from measured PSL mobility",
+                "slug": "examples/fundamentals/particles/psl_mobility"
+              },
+              {
                 "label": "Native Distribution Storage",
                 "slug": "examples/fundamentals/particles/distribution_tutorial"
               },
@@ -384,6 +392,10 @@
               {
                 "label": "Coagulation Pattern 5: Time Evolution Comparison",
                 "slug": "examples/processes/coagulation/coagulation_5_time_evolution"
+              },
+              {
+                "label": "Dispersion and measured collision rates",
+                "slug": "examples/processes/coagulation/van_der_waals"
               },
               {
                 "label": "Charged coagulation",
@@ -626,6 +638,10 @@
                 "slug": "examples/gpu/prepared/gpu_charged_models"
               },
               {
+                "label": "Bipolar coagulation and restart",
+                "slug": "examples/gpu/prepared/van_der_waals"
+              },
+              {
                 "label": "Explicit atmospheric ion balance",
                 "slug": "examples/gpu/prepared/gpu_ion_balance"
               },
@@ -818,6 +834,10 @@
           {
             "label": "Ion\u2013Particle Coagulation",
             "slug": "theory/dynamics/ionparticle-coagulation"
+          },
+          {
+            "label": "Dispersion and dielectric polarization",
+            "slug": "theory/dynamics/interparticle-forces"
           },
           {
             "label": "Nucleation Discussion",
@@ -1041,6 +1061,10 @@
             "slug": "contribute/validation"
           },
           {
+            "label": "Dispersion and dielectric capture",
+            "slug": "contribute/validation/coagulation/van-der-waals"
+          },
+          {
             "label": "GPU",
             "collapsed": true,
             "items": [
@@ -1103,6 +1127,10 @@
           {
             "label": "NaCl chamber scavenging",
             "slug": "contribute/validation/coagulation/nacl-scavenging"
+          },
+          {
+            "label": "Dry PSL mobility validation",
+            "slug": "contribute/validation/transport/psl-mobility"
           },
           {
             "label": "Numerical methods",

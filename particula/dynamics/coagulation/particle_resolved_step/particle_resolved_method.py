@@ -69,6 +69,8 @@ def get_particle_resolved_coagulation_step(  # noqa: C901
     kernel_index_func: Optional[
         Callable[[NDArray[np.int64], NDArray[np.int64]], NDArray[np.float64]]
     ] = None,
+    *,
+    exact_pair_rates: Optional[NDArray[np.float64]] = None,
 ) -> NDArray[np.int64]:
     """Perform one stochastic coagulation step for a particle population.
 
@@ -86,6 +88,8 @@ def get_particle_resolved_coagulation_step(  # noqa: C901
         kernel_func: Optional callable for direct kernel evaluation. When
             provided, it is called with ``(r_small, r_large)`` inputs and
             should return a 1D array of kernel values.
+        exact_pair_rates: Optional actual slot-pair matrix for both trial bounds
+            and acceptance, with zero diagonal and units m³/s.
         kernel_index_func: Optional callable for direct kernel evaluation
             using particle indices. When provided, it is called with
             ``(small_index, large_index)`` arrays and should return a 1D
@@ -102,10 +106,42 @@ def get_particle_resolved_coagulation_step(  # noqa: C901
     # Step 2: Precompute unique bin pairs for efficient coagulation
     pair_indices = _get_bin_pairs(bin_indices=bin_indices)
 
+    if exact_pair_rates is not None:
+        rates = np.asarray(exact_pair_rates)
+        if (
+            rates.shape != (particle_radius.size, particle_radius.size)
+            or rates.dtype.kind not in "fiu"
+            or not np.all(np.isfinite(rates))
+            or np.any(rates < 0)
+            or np.any(rates.diagonal())
+            or not np.array_equal(rates, rates.T)
+        ):
+            raise ValueError("invalid symmetric slot-pair rate matrix")
+        # Bound work before consuming any random draws. Removing candidates
+        # later can only lower the number of trials per largest bin size.
+        for lo, hi in pair_indices:
+            small = np.flatnonzero((bin_indices == lo) & (particle_radius > 0))
+            large = np.flatnonzero((bin_indices == hi) & (particle_radius > 0))
+            if small.size and large.size:
+                pairs = small.size * large.size
+                if lo == hi:
+                    pairs = small.size * (large.size - 1) // 2
+                majorant = np.max(rates[np.ix_(small, large)])
+                if majorant * time_step * pairs / volume > 10 * max(
+                    small.size, large.size
+                ):
+                    raise ValueError(
+                        "exact resolved coagulation requires a smaller timestep"
+                    )
+
     # Step 3: Interpolate the coagulation kernel for efficient lookups during
     # the coagulation process (unless a direct kernel callable is provided)
     interp_kernel: Optional[RegularGridInterpolator] = None
-    if kernel_func is None and kernel_index_func is None:
+    if (
+        exact_pair_rates is None
+        and kernel_func is None
+        and kernel_index_func is None
+    ):
         interp_kernel = _interpolate_kernel(kernel, kernel_radius)
 
     # Create output arrays to store the indices of small and large particles
@@ -135,7 +171,11 @@ def get_particle_resolved_coagulation_step(  # noqa: C901
         # Step 5: Retrieve the maximum kernel value for the current bin pair
         small_sample = np.min(particle_radius[small_indices])
         large_sample = np.max(particle_radius[large_indices])
-        if kernel_index_func is not None:
+        if exact_pair_rates is not None:
+            kernel_values = np.atleast_1d(
+                np.max(exact_pair_rates[np.ix_(small_indices, large_indices)])
+            )
+        elif kernel_index_func is not None:
             small_ref = small_indices[np.argmin(particle_radius[small_indices])]
             large_ref = large_indices[np.argmax(particle_radius[large_indices])]
             kernel_values = np.atleast_1d(
@@ -201,7 +241,9 @@ def get_particle_resolved_coagulation_step(  # noqa: C901
             large_index = random_generator.choice(large_indices, tests)
 
         # Step 9: Calculate the kernel value for the selected particle pairs
-        if kernel_index_func is not None:
+        if exact_pair_rates is not None:
+            kernel_value = exact_pair_rates[small_index, large_index]
+        elif kernel_index_func is not None:
             kernel_value = np.atleast_1d(
                 np.asarray(
                     kernel_index_func(

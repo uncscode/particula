@@ -127,3 +127,14 @@ The returned `n_collisions` contains accepted, applied collisions. These are
 last-step counts, distinct from preflight expectations. Admission rejection
 preserves caller-owned counters, RNG and collision outputs. Counters do not
 consume random draws. Download them only at an explicit observation boundary.
+
+## Dispersion and dielectric capture
+
+The `van_der_waals` mechanism uses bit 16 and takes `hamaker_constant` [J]
+and `relative_permittivity` on `CoagulationMechanismConfig`. It supports
+standalone use and combinations with settling, shear, or both. Each pair's
+current radii, masses and signed charges determine the rate. Preparation
+uploads a dimensionless dielectric geometry table. The exact tiled maximum
+and the sampler use the same fp64 pair calculation. An out-of-domain pair
+rejects the step before collision outputs, particle storage or RNG change.
+[Validation and ranges](../../../contribute/validation/coagulation/van-der-waals.md)

@@ -57,8 +57,9 @@ finishing autodiff; chemistry gradients are outside its initial scope.
 
 The proposed [literature scheduler](literature-scheduler.md) uses an automated
 agent to conduct independent aerosol research alongside the stages. Each
-invocation can select up to three comparisons using supported Particula
-physics. Study duration and review capacity guide the scheduling interval. Each
+run starts in a fresh project chat, shortlists up to three papers, and takes
+on at most one new study. Selection rotates across aerosol processes and favors
+questions that benefit from multiple high-fidelity GPU simulations. Each
 study has a fresh worktree and branch. Drafts live in the main checkout's
 `.artifacts/literature/` for researcher review. Approved comparisons become
 documented examples in individual PRs. Diagnosed Particula gaps go through
