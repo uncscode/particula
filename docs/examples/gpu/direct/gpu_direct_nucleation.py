@@ -23,8 +23,6 @@ Warp is required; this example intentionally has no CPU-physics fallback.
 import numpy as np
 import numpy.testing as npt
 import warp as wp
-from matplotlib import style as mplstyle
-from particula import plotting
 from particula.dynamics.nucleation.species_mapping import NucleationSpeciesMap
 from particula.gas import EnvironmentData, GasData
 from particula.gpu import (
@@ -252,10 +250,10 @@ def run_example(
 
 
 # %%
-@mplstyle.context("particula.default")
 def run_publication():
     """Require CUDA and compare one- and two-cubic-metre source events."""
     import matplotlib.pyplot as plt
+    from particula import plotting
 
     if not wp.is_cuda_available():
         raise RuntimeError("This publication run requires CUDA")
@@ -263,27 +261,28 @@ def run_publication():
     count = np.array([p.concentration.sum() for p, _, _ in results])
     volumes = np.array([1.0, 2.0])
     npt.assert_array_equal(count, volumes)
-    fig, axes = plotting.subplots(1, 2)
-    axes[0].bar(volumes, count, color=plotting.COLORS["teal"], width=0.6)
-    axes[0].set(
-        xlabel="Represented volume (m³)",
-        ylabel="Injected count",
-        xticks=volumes,
-        yticks=[0, 1, 2],
-    )
-    axes[1].bar(
-        volumes, count / volumes, color=plotting.COLORS["rust"], width=0.6
-    )
-    axes[1].set(
-        xlabel="Represented volume (m³)",
-        ylabel="Injected number density (m$^{-3}$)",
-        xticks=volumes,
-    )
-    fig.suptitle("Unit-event nucleation · " + wp.get_device("cuda:0").name)
-    print("Counts:", count, "Number densities (m^-3):", count / volumes)
-    print("Per-species particle + gas inventory checks passed.")
-    plotting.fit(fig)
-    plt.show()
+    with plt.style.context("particula.default"):
+        fig, axes = plotting.subplots(1, 2)
+        axes[0].bar(volumes, count, color=plotting.COLORS["teal"], width=0.6)
+        axes[0].set(
+            xlabel="Represented volume (m³)",
+            ylabel="Injected count",
+            xticks=volumes,
+            yticks=[0, 1, 2],
+        )
+        axes[1].bar(
+            volumes, count / volumes, color=plotting.COLORS["rust"], width=0.6
+        )
+        axes[1].set(
+            xlabel="Represented volume (m³)",
+            ylabel="Injected number density (m$^{-3}$)",
+            xticks=volumes,
+        )
+        fig.suptitle("Unit-event nucleation · " + wp.get_device("cuda:0").name)
+        print("Counts:", count, "Number densities (m^-3):", count / volumes)
+        print("Per-species particle + gas inventory checks passed.")
+        plotting.fit(fig)
+        plt.show()
     return results
 
 
