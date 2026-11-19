@@ -188,6 +188,22 @@ def run_example(config=None, policies=("lower", "upper")):
     return results
 
 
+def plot_data(results):
+    """Keep the lineage counts, observation times and intervals used below."""
+    return [
+        {
+            "config": {
+                key: row["config"][key]
+                for key in ("boxes", "ion_pairs_cm3_s", "omitted")
+            },
+            "outcomes": np.asarray(row["outcomes"]).tolist(),
+            "time": np.asarray(row["time"]).tolist(),
+            "success_interval95": list(row["success_interval95"]),
+        }
+        for row in results
+    ]
+
+
 @mplstyle.context("particula.default")
 def plot_results(results):
     """Plot reduced lineage summaries; no particle states are downloaded."""
@@ -199,11 +215,13 @@ def plot_results(results):
         coefficient = "0" if policy == "lower" else "10⁻¹⁵"
         label = "No ions" if q == 0 else f"q={q:g}, K={coefficient}"
         labels.append(label)
-        fractions = result["outcomes"] / config["boxes"]
+        fractions = np.asarray(result["outcomes"]) / config["boxes"]
         final.append(fractions[-1])
         low, high, _ = result["success_interval95"]
         value = fractions[-1, 0]
-        axes[0].plot(result["time"] / 3600, fractions[:, 0], label=label)
+        axes[0].plot(
+            np.asarray(result["time"]) / 3600, fractions[:, 0], label=label
+        )
         axes[1].errorbar(
             index,
             value,
@@ -221,7 +239,7 @@ def plot_results(results):
     axes[1].set(
         xticks=np.arange(len(labels)),
         xticklabels=labels,
-        ylabel="Success fraction with exact 95% interval",
+        ylabel="Success fraction\n(exact 95% interval)",
     )
     axes[2].set(ylabel="Fraction of original seed lineages", ylim=(0, 1))
     plotting.legend(axes[2])

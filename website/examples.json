@@ -782,7 +782,13 @@
       "scripts/gpu_studies/lucky_few.py"
     ],
     "invoke": "result = run_example()",
-    "full_canvas": true
+    "full_canvas": true,
+    "data_expression": "plot_data(result)",
+    "replot_invoke": "result = saved_data\nplot_results(result)\nplt.show()",
+    "render_functions": [
+      "plot_results",
+      "plot_data"
+    ]
   },
   "gpu-environment-sweep": {
     "title": "Charged aerosols and ions across sixteen humid environments",

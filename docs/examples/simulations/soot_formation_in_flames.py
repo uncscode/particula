@@ -315,9 +315,7 @@ ax[1].set_title("Vapor Pressure vs Temperature")
 ax[1].grid(True, axis="y")
 
 # Combined legend
-fig.legend(
-    list_of_chemicals, title="Chemicals", ncols=3, loc="outside right center"
-)
+plotting.legend(ax[0], title="Chemicals", placement="right", ncols=2)
 plotting.fit(fig)
 plt.show()
 
@@ -783,8 +781,8 @@ twinx.set_ylabel("Temperature (K)", color=TAILWIND["rose"]["500"])
 twinx.tick_params(axis="y", labelcolor=TAILWIND["rose"]["500"])
 
 # External legend
-fig.legend(
-    list_of_chemicals, title="Chemicals", ncols=3, loc="outside right center"
+plotting.legend(
+    ax, title="Chemicals", placement="right", ncols=2, borderaxespad=4.5
 )
 plotting.fit(fig)
 plt.show()
@@ -819,8 +817,8 @@ twinx.plot(
 twinx.set_ylabel("Temperature (K)", color=TAILWIND["rose"]["500"])
 twinx.tick_params(axis="y", labelcolor=TAILWIND["rose"]["500"])
 
-fig.legend(
-    list_of_chemicals, title="Chemicals", ncols=3, loc="outside right center"
+plotting.legend(
+    ax, title="Chemicals", placement="right", ncols=2, borderaxespad=4.5
 )
 plotting.fit(fig)
 plt.show()
