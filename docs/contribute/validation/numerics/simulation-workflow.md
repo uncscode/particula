@@ -318,6 +318,26 @@ These are completion and conservation checks for this illustration, not a
 collision-model convergence study or experimental validation.
 
 
+### Biomass rerun with adaptive GPU coagulation
+
+The current [biomass example](../../../examples/simulations/biomass_burning_cloud_interactions.py)
+completed the same 600 s preparation and four one-hour branches on the RTX 5060.
+The original seeds, population of 10,000, event order, condensation tolerances
+and 0.36 s outer interval were retained. The sampler can subdivide just the
+collision stage when a full interval needs more disjoint pairs than the active
+population permits. It recomputes the rate bound after each admitted pass.
+
+The run used revision `d1bdf025f1` and took 2,131 s. The preceding scientific reference used `9c548d9d61`. The table compares final gas-water saturation ratios for one seeded realization.
+
+| Branch | Split intervals out of 10,000 | Most passes in one interval | Mergers | Final saturation ratio | Archived ratio |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Condensation alone | — | — | — | 1.000102995 | 1.000102995 |
+| Brownian | 0 | 1 | 240 | 1.000102961 | 1.000102961 |
+| Brownian + settling | 179 | 2 | 9,319 | 1.000038092 | 1.000025847 |
+| ST1956 shear | 0 | 1 | 448 | 1.000102017 | 1.000102017 |
+
+All four branches passed the per-species gas-plus-particle inventory check (relative tolerance 10⁻¹², absolute tolerance 10⁻³⁰ kg). In each collision branch, the loss of occupied particle slots equaled the number of accepted mergers, and the GPU passed particle and gas state directly between stages. The comparison covers one stochastic realization.
+
 ### Publication runner timeout correction
 
 The full cyclic trajectory exceeded the registry's nominal two-hour limit.

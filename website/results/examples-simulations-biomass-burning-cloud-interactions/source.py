@@ -15,11 +15,6 @@
 # %% [markdown]
 # # How do collision models change a water-grown mixed aerosol?
 #
-# The figures use a native CUDA execution with the archived scientific library
-# at revision `9c548d9d6` and the current plotting code. With the same 0.36 s
-# step, current Particula requested 644 collision trials when 630 were
-# available. The historical run retains the published interval and branches.
-#
 # A mixed aerosol can change size through water exchange and through collisions.
 # How can we compare collision assumptions without confusing them with different
 # starting populations? This example gives four scenarios copies of the same
@@ -53,6 +48,7 @@ from particula.execution.gpu_coupled import (
 from particula.execution.gpu_resident_condensation import (
     GPUResidentCondensation,
 )
+from particula.gpu.kernels.coagulation import CoagulationSubcyclingConfig
 from tqdm import tqdm
 
 plt.style.use("particula.default")
@@ -327,8 +323,10 @@ plt.show()
 # Its native mean-material-density convention is retained on the GPU.
 #
 # All four branches keep particle/gas state, physics and adaptive decisions on
-# CUDA. The host schedules 0.36 s boundaries; only requested observations are
-# downloaded. Direct collision pair evaluation replaces CPU bin interpolation.
+# CUDA. The host schedules 0.36 s boundaries. Within each interval the
+# collision sampler uses the live population to admit a duration, merges pairs,
+# then recomputes the rate bound if time remains. Condensation follows once
+# per outer interval. Only requested observations and diagnostics are downloaded. Direct collision pair evaluation replaces CPU bin interpolation.
 # A persistent seeded GPU collision stream makes repeated GPU runs reproducible;
 # it does not promise the same individual collisions as the former CPU sampler.
 #
@@ -362,9 +360,14 @@ turbulent_shear = (
     .build()
 )
 
-# Collision draws occur once per existing 0.36 s outer interval. Adaptive
-# condensation trials never execute or repeat a stochastic collision operation.
+# The policy bounds collision work independently of condensation error control.
+# Rejected condensation trials never repeat an accepted collision pass.
 outer_dt = 3600.0 / 10_000
+collision_policy = CoagulationSubcyclingConfig(
+    min_substep=outer_dt / 1024,
+    max_subcycles=8,
+    max_device_bytes=256 * 1024**2,
+)
 controls = GPUCondensationControls(
     method="ros3",
     rtol=1e-5,
@@ -409,12 +412,27 @@ for name, collision in [
             time_step=outer_dt,
             controls=controls,
             root_seed=100,
+            coagulation_subcycling=collision_policy,
         ) as coupled:
             coupled.capture_events()
+            split_intervals = max_passes = mergers = 0
             for _step in tqdm(range(10_000), desc=name):
                 coupled.step()
+                work = coupled.coagulation_diagnostics()
+                passes = work["substep_count"]
+                split_intervals += int(passes > 1)
+                max_passes = max(max_passes, passes)
+                mergers += int(work["accepted_collisions"].sum())
             obj = coupled.snapshot()
             assert coupled.coupling_uploads == coupled.coupling_downloads == 0
+            assert coupled.completed_steps == 10_000
+            assert np.count_nonzero(obj.particles.concentration) == (
+                number_of_samples - mergers
+            )
+            print(
+                f"{name}: {split_intervals} split intervals, "
+                f"{max_passes} maximum passes per interval, {mergers} mergers."
+            )
             print("CUDA adaptive work:", coupled.statistics)
     np.testing.assert_allclose(
         species_inventory(obj), initial_inventory, rtol=1e-12, atol=1e-30

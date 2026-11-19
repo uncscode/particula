@@ -606,6 +606,13 @@ plt.show()
 # %% [markdown]
 # ## Keep the comparison's evidence boundary in view
 #
+# In this seeded run, Brownian coagulation plus settling needed two collision
+# passes in 179 of the 10,000 intervals and merged 9,319 particle pairs.
+# Brownian alone and turbulent shear each finished every interval in one pass,
+# with 240 and 448 mergers respectively. The settling branch ended with 681
+# occupied slots. All four branches conserved the three species inventories.
+# [Comparison with the archived run](../../contribute/validation/numerics/simulation-workflow.md#biomass-rerun-with-adaptive-gpu-coagulation)
+#
 # All branches share their initial material inventory and retain the same
 # condensation model. Their differing spectra therefore motivate a collision-model
 # sensitivity study under these inputs. The plots and conservation checks do not
