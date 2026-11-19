@@ -25,6 +25,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from particula import plotting
+
+plt.style.use("particula.default")
 
 # %% [markdown]
 # ## Match a property model to each species
@@ -116,7 +119,7 @@ organic_pure_vapor_pressure = np.stack(
 water_pure_vapor_pressure = water_buck.pure_vapor_pressure(temperature_range)
 
 # Plotting the vapor pressure curves for the organic species.
-fig, ax = plt.subplots(figsize=(8, 6))
+fig, ax = plotting.subplots(size="wide")
 for i in range(len(organic_names)):
     ax.plot(
         temperature_range,
@@ -127,7 +130,8 @@ ax.plot(temperature_range, water_pure_vapor_pressure, label="Water")
 ax.set_xlabel("Temperature (K)")
 ax.set_ylabel("Vapor Pressure (Pa)")
 ax.set_yscale("log")
-ax.legend()
+plotting.legend(ax)
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
@@ -157,7 +161,7 @@ water_saturation_ratio = water_buck.saturation_ratio(
 )
 
 # Plotting the saturation ratio curves for the organic species.
-fig, ax = plt.subplots(figsize=(8, 6))
+fig, ax = plotting.subplots(size="wide")
 for i in range(len(organic_names)):
     ax.plot(
         temperature_range, organic_saturation_ratio[i], label=organic_names[i]
@@ -166,7 +170,8 @@ ax.plot(temperature_range, water_saturation_ratio, label="Water")
 ax.set_yscale("log")
 ax.set_xlabel("Temperature (K)")
 ax.set_ylabel("Saturation Ratio")
-ax.legend()
+plotting.legend(ax)
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]

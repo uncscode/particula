@@ -31,6 +31,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from particula import plotting
+
+plt.style.use("particula.default")
 
 # %% [markdown]
 # ## Separate sampling weights from physical abundance
@@ -147,12 +150,12 @@ bins = np.logspace(
     np.log10(radii_before.min()), np.log10(radii_before.max()), 80
 ).tolist()
 
-fig, ax = plt.subplots(figsize=(8, 5))
+fig, ax = plotting.subplots(size="wide")
 ax.hist(
     radii_before,
     bins=bins,
     histtype="step",
-    color="tab:blue",
+    color=plotting.COLORS["teal"],
     label="Before",
     density=True,
 )
@@ -160,7 +163,7 @@ ax.hist(
     radii_after,
     bins=bins,
     histtype="step",
-    color="tab:orange",
+    color=plotting.COLORS["rust"],
     label="After",
     density=True,
 )
@@ -168,8 +171,9 @@ ax.set_xscale("log")
 ax.set_xlabel("Particle radius (m)")
 ax.set_ylabel("Active-particle probability density (m$^{-1}$)")
 ax.set_title("Particle-resolved coagulation (Brownian)")
-ax.legend()
+plotting.legend(ax)
 ax.grid(alpha=0.3)
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]

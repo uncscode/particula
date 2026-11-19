@@ -1,25 +1,26 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 3.742766108014621,
-  "package_source_sha256": "366188b5126fea8caca5653dccea55707aa58d180426291eb7b46a40eecaf715",
+  "elapsed_seconds": 5.5262373860459775,
+  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "examples-processes-coagulation-charge-coagulation-with-charge-functional",
-  "fingerprint": "3b8d43b9141cc4392dd9db9539cc4a2ea5c18e298dbe6a4fdad7521f9e7d88f8",
+  "fingerprint": "68ca4f9535ce177da8a89167dd9000a4f4b26983c0e129c82ca2e173d8d70972",
   "source": "docs/examples/processes/coagulation/charge/coagulation_with_charge_functional.py",
-  "revision": "894f603509f47c3f35bbfa7c45f45752136e7d52",
-  "package_dirty": true,
-  "executed_at": "2026-11-16T01:25:16.096618+00:00",
+  "revision": "dd92d3c1ca71f36eacad56b49661b32c0da77ac7",
+  "package_dirty": false,
+  "executed_at": "2026-11-19T14:42:30.511137+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.2.14",
+    "particula": "0.3.2",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
     "nbclient": "0.10.2",
     "jupytext": "1.17.3",
-    "warp-lang": "1.11.1"
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
   },
   "outputs": [
     [
@@ -47,8 +48,8 @@
     ]
   ],
   "files": {
-    "figure-7-1.png": "1254c7159fa72f921ad1aac334c80332de96ced581fcf2d5aee86c036c77ee89",
-    "figure-4-1.png": "21eaf506f3eeaab3bc6a1bf2ad8628b3e5afa9c79e9f59fc7ee8036755dd6550",
-    "source.py": "2be88edbe9f59b0cd300f8ec36185779d827a3f7135ab0b6df34fc7ee9d35011"
+    "figure-7-1.png": "17cdbc2ad566629cd590250bddd3fcc05f0497bf1c151087e2b7d1ab98bd1a33",
+    "figure-4-1.png": "276c3df23f7c35bc01569e61944b76ee976b92a9be44f203f88114040b901e7d",
+    "source.py": "2ec40876e2b5bbe14160fa89fd2cdedeee9142601d7cd445475bc1c614f79504"
   }
 }

@@ -1,25 +1,27 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 3.019109045038931,
-  "package_source_sha256": "98021107918d76caafbd800e6f8ab4c66bb0905e1950a2fc7075c622655abf5a",
+  "elapsed_seconds": 3.823984780930914,
+  "package_source_sha256": "cdc38cb651641b0a7701c1eab385e2ca9c9db1f45ee0cc6bce0b2da1f0d3c114",
+  "scientific_source_sha256": "9ccd4e777e1987db076b9ac5b19f8cd1c309a0a8e54f496c0a8bbdfe42a87a5d",
   "input_sha256": {},
   "example": "theory-ionparticle-coagulation",
-  "fingerprint": "f5f9be330f436c33409434e30d23352227ede0fdea623c4191c14a6683de81b3",
+  "fingerprint": "0392716fd05490e6ec098b7ee79b80a4b2cb77d8a062ce49b409c1a514e70c7e",
   "source": "docs/theory/dynamics/ionparticle-coagulation.py",
-  "revision": "54ad1a812054da5361bdad2f2d397dd05615269e",
+  "revision": "f5be504b2ecb3d768eb5a41a2be1be19b0d2d96d",
   "package_dirty": false,
-  "executed_at": "2026-11-14T17:18:02.120093+00:00",
+  "executed_at": "2026-11-19T19:37:16.928355+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.2.14",
+    "particula": "0.3.2",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
     "nbclient": "0.10.2",
     "jupytext": "1.17.3",
-    "warp-lang": "1.11.1"
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
   },
   "outputs": [
     [],
@@ -29,7 +31,7 @@
         "text": "particula/dynamics/coagulation/charged_dimensionless_kernel.py:203: RuntimeWarning: divide by zero encountered in divide\n  factored_term = (pi_sqrt * continuum * coulomb_potential_ratio * 1.22) / (\nparticula/dynamics/coagulation/charged_dimensionless_kernel.py:208: RuntimeWarning: invalid value encountered in multiply\n  term1 = continuum_limit * (1 - (1 + factored_term) * exponential_decay)\nparticula/dynamics/coagulation/charged_dimensionless_kernel.py:214: RuntimeWarning: divide by zero encountered in divide\n  + (\nparticula/dynamics/coagulation/charged_dimensionless_kernel.py:210: RuntimeWarning: invalid value encountered in multiply\n  np.sqrt(8 * np.pi)\nparticula/dynamics/coagulation/charged_dimensionless_kernel.py:313: RuntimeWarning: divide by zero encountered in log\n  diff_knudsen_log = np.log(diffusive_knudsen)\n"
       },
       {
-        "image": "figure-3-2.png"
+        "image": "figure-3-1.png"
       }
     ],
     [
@@ -39,8 +41,8 @@
     ]
   ],
   "files": {
-    "source.py": "04829c25ef807617b621cfc9995a42c3f6cc341ef6bdb5e4e6b4b76350f182e6",
-    "figure-3-2.png": "0cc909db762f0f3b23e0b6ec2cc3e2c8af3a4fbb8ec19b25912d7a00971c1089",
-    "figure-4-1.png": "386dc066e758c12324c064ce34aeb695385c0d08d9b7e7558a4997144a5f89f7"
+    "figure-4-1.png": "acfee3843e10be32995f3e0c2ef244094114dfb20e64aa4dc64ad7d5fe91d9cf",
+    "figure-3-1.png": "4d5024a2e14efd6a20af2f7df40a6bc2b5cc8828cd66359e5649b04ad3e67568",
+    "source.py": "e26616c2bad67ed5b9c5f07783493a8b58f31e9a9521b954c7c1e5270a7ab591"
   }
 }

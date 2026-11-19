@@ -19,6 +19,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from matplotlib import style as mplstyle
+from particula import plotting
 from particula.dynamics.condensation.species_mapping import (
     CondensationSpeciesMap,
 )
@@ -272,9 +274,10 @@ def simulate():
     }
 
 
+@mplstyle.context("particula.default")
 def plot_results(report):
     """Plot saved trajectories and report accuracy separately from mass closure."""
-    fig, axes = plt.subplots(1, 2, figsize=(11, 4))
+    fig, axes = plotting.subplots(1, 2, size="wide")
     axes[0].plot(
         report["time_s"],
         report["reference_radius_nm"],
@@ -311,8 +314,8 @@ def plot_results(report):
         axis.set_xlabel("Time (s)")
     axes[0].set_ylabel("Wet radius (nm)")
     axes[1].set_ylabel("Relative radius error")
-    axes[0].legend(fontsize=8)
-    fig.tight_layout()
+    plotting.legend(axes[0])
+    plotting.fit(fig)
     plt.show()
 
 

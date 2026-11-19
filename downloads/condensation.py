@@ -33,9 +33,12 @@ import numpy as np
 
 # particula imports
 import particula as par
+from particula import plotting
 from particula.dynamics.condensation.species_mapping import (
     CondensationSpeciesMap,
 )
+
+plt.style.use("particula.default")
 
 # %% [markdown]
 # ## Specify the particles and their vapor reservoir
@@ -151,7 +154,7 @@ print(f"Mean rate: {np.mean(rate):.2e} kg/m^3/s per slot")
 
 # %%
 # Plot the initial particle distribution
-fig, ax = plt.subplots(figsize=(8, 6))
+fig, ax = plotting.subplots(size="wide")
 ax.semilogx(
     initial_radii * 1e9,
     initial_concentration,
@@ -160,9 +163,10 @@ ax.semilogx(
 )
 ax.set_xlabel("Radius (nm)")
 ax.set_ylabel("Concentration (1/m^3)")
-ax.legend()
+plotting.legend(ax)
 ax.set_title("Initial Particle Distribution (PMF)")
 ax.grid(alpha=0.3)
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]

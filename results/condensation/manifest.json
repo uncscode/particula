@@ -1,25 +1,26 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 3.4198568610008806,
-  "package_source_sha256": "4f670fa90711c3e04809890aa397fedf0654a56ec8d6ae25e182c95a890a36d1",
+  "elapsed_seconds": 4.531170806963928,
+  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "condensation",
-  "fingerprint": "7075cd3175ea91eacf588275358912a3905dbdc653c8a74a1ebe4d19c24281d6",
+  "fingerprint": "33e02b2eae1e416eccc7fe3cfc9c9e3b6d6b324f879a7614a086e0bbe1ca52a9",
   "source": "docs/examples/processes/condensation/condensation_1_bin.py",
-  "revision": "366d7ee5ca6fb37a5418ba96aa8c13a41b4d7a39",
-  "package_dirty": true,
-  "executed_at": "2026-11-13T20:31:40.903418+00:00",
+  "revision": "6af97152d1570464ac5ccae56e3110001657e170",
+  "package_dirty": false,
+  "executed_at": "2026-11-19T14:32:04.627133+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.2.14",
+    "particula": "0.3.2",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
     "nbclient": "0.10.2",
     "jupytext": "1.17.3",
-    "warp-lang": "1.11.1"
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
   },
   "outputs": [
     [],
@@ -30,7 +31,7 @@
     ],
     [
       {
-        "text": "Strategy: <particula.dynamics.condensation.condensation_strategies.CondensationIsothermal object at 0x7f365d6a2ff0>\nRunnable: <particula.dynamics.particle_process.MassCondensation object at 0x7f365dde0200>\n"
+        "text": "Strategy: <particula.dynamics.condensation.condensation_strategies.CondensationIsothermal object at 0x7f4173340aa0>\nRunnable: <particula.dynamics.particle_process.MassCondensation object at 0x7f4173072db0>\n"
       }
     ],
     [
@@ -45,7 +46,7 @@
     ]
   ],
   "files": {
-    "source.py": "f57031146ff3dc23a5324056d77c092cef8e5e761228648309d5b13f1e57456d",
-    "figure-5-1.png": "05b7e62d1b091b848a2d32f453549dccf8fa2a5a9efc6257946feb15dde7cccd"
+    "figure-5-1.png": "98b84a6754ea055f70956181adba441373e9a1886b0f74cdd25907a208f054e2",
+    "source.py": "4046348a18e10983e6d1f5ecb01780de4e435df29f1395d673431aa9ed7f6162"
   }
 }

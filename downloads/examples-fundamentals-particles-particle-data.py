@@ -29,6 +29,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from particula import plotting
+
+plt.style.use("particula.default")
 
 # %% [markdown]
 # ## Initialize from radii with explicit units
@@ -97,18 +100,26 @@ concentration = speciated_data.slot_concentration_density[0]
 # ordinates before comparing the shapes; neither plot is a time evolution.
 
 # %%
-fig, ax = plt.subplots(figsize=(8, 6))
-ax.hist(masses * 1e15, bins=20, color="blue", alpha=0.7)
+fig, ax = plotting.subplots(size="wide")
+ax.hist(masses * 1e15, bins=20, color=plotting.COLORS["teal"], alpha=0.7)
 ax.set_xlabel("Per-particle mass (pg)")
 ax.set_ylabel("Computational bins")
 ax.set_title("Speciated particle masses")
+plotting.fit(fig)
 plt.show()
 
-fig, ax = plt.subplots(figsize=(8, 6))
-ax.hist(radius * 1e9, weights=concentration, bins=20, color="red", alpha=0.7)
+fig, ax = plotting.subplots(size="wide")
+ax.hist(
+    radius * 1e9,
+    weights=concentration,
+    bins=20,
+    color=plotting.COLORS["rust"],
+    alpha=0.7,
+)
 ax.set_ylabel("Number density per histogram bin (1/m^3)")
 ax.set_xlabel("Radius (nm)")
 ax.set_title("Particle number distribution")
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
@@ -127,17 +138,18 @@ lognormal_data = par.particles.create_lognormal_binned_particle_data(
     geometric_standard_deviation=[1.5, 2.0],
     number_concentration=[1e10, 1e10],
 )
-fig, ax = plt.subplots(figsize=(8, 6))
+fig, ax = plotting.subplots(size="wide")
 ax.semilogx(
     lognormal_data.radii[0],
     lognormal_data.slot_concentration_density[0],
     label="Number distribution",
-    color="blue",
+    color=plotting.COLORS["teal"],
 )
 ax.set_xlabel("Radius (m)")
 ax.set_ylabel("Bin number density (1/m^3)")
 ax.set_title("Lognormal particle population")
-ax.legend()
+plotting.legend(ax)
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]

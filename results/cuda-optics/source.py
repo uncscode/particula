@@ -1,15 +1,20 @@
 # %% [markdown]
-# # CUDA optics: particle batches and a cloud spectrum
+# # Qualify CUDA optics before interpreting a cloud spectrum
 #
-# Requires native CUDA, Warp and Particula's development optics API. No CPU
-# fallback is used. CPU calculations below are explicit comparison oracles.
-# Timings separate module compilation/cache loading, upload, preparation,
-# synchronized execution and download. They describe this machine and workload,
-# not universal speedups. CPU timings use the NumPy implementation, not Warp CPU.
+# When does a batch of optical calculations benefit from CUDA, and can the device
+# calculation preserve the CPU optical quantities? This example pairs a timing
+# study with explicit numerical comparisons, then computes extinction and angular
+# scattering for an illustrative droplet population at four wavelengths.
 #
-# The cloud's fixed refractive index is illustrative. Its angular matrices
-# assume independent particles and one common scattering-plane reference frame.
-# See the [optics guide](../../guide/optics/index.md) for scope and units.
+# Requires native CUDA, Warp, and Particula's development optics API. CPU runs
+# are explicit comparison oracles; there is no CPU fallback. Start with the
+# [sphere-to-cloud walkthrough](sphere_optics.py) for the physical quantities and
+# the [optics guide](../../guide/optics/index.md) for units and reference frames.
+#
+# The physics assumes independent homogeneous spheres with a fixed illustrative
+# refractive index. Population Mueller matrices share one scattering-plane frame.
+# This is an optical calculation, not a particle-growth or multiple-scattering
+# radiative-transfer simulation.
 
 # %%
 import time
@@ -17,6 +22,8 @@ import time
 import matplotlib.pyplot as plt
 import numpy as np
 import warp as wp
+from matplotlib import style as mplstyle
+from particula import plotting
 from particula.optics import (
     get_cross_sections,
     get_differential_mueller_matrix,
@@ -28,6 +35,29 @@ from particula.optics import (
     get_scattering_amplitudes,
 )
 from particula.optics.gpu import prepare_mie, prepare_population_mie
+
+# %% [markdown]
+# ## Separate numerical agreement from timing
+#
+# The benchmark increases both batch size (64, 512, 2048) and maximum size
+# parameter x (10, 100, 1000). Because both change, this is not a pure batch-size
+# scaling experiment. Index 1.5 + 0.1i is held fixed. Upload and workspace
+# preparation happen explicitly; warm runs reuse the output storage.
+#
+# All efficiency outputs are compared with NumPy at rtol=10⁻⁸ and atol=10⁻¹².
+# The pointer assertion checks storage reuse. Synchronization closes each timed
+# CUDA run, while five device repetitions and three NumPy repetitions supply
+# execution medians. Module loading, transfers, and preparation are recorded
+# separately and excluded from the warm bars.
+#
+# The cloud calculation uses 512 radius bins from 0.5–20 µm, four wavelengths
+# from 450–900 nm, and 61 scattering angles. Weights sum to 10⁸ particles/m³
+# at each wavelength. Tiled processing retains bulk optics and differential
+# Mueller matrices, rather than a permanent full population of angular outputs.
+# Scalar population outputs use the same relative/absolute tolerance as particle
+# efficiencies. Matrix errors are normalized by each wavelength's largest
+# reference element, then bounded absolutely by 10⁻⁸; that is not a relative
+# error guarantee for every small matrix element.
 
 
 # %%
@@ -170,12 +200,13 @@ def simulate():
     }
 
 
+@mplstyle.context("particula.default")
 def plot_results(report):
     """Plot compact saved timings and cloud optics without CUDA execution."""
     cases = report["benchmarks"]
     labels = [f"{v['cases']} cases\nx ≤ {v['maximum_x']:g}" for v in cases]
     position = np.arange(len(cases))
-    fig, ax = plt.subplots(figsize=(8, 4), constrained_layout=True)
+    fig, ax = plotting.subplots(size="wide")
     for offset, key, label in [
         (-0.18, "cpu_seconds", "NumPy CPU"),
         (0.18, "gpu_seconds", "CUDA, warm"),
@@ -189,9 +220,10 @@ def plot_results(report):
         ylabel="Median execution time [s]",
         title=report["device"],
     )
-    ax.legend()
+    plotting.legend(ax)
     cloud = report["cloud"]
-    fig, axes = plt.subplots(1, 2, figsize=(10, 4), constrained_layout=True)
+    plotting.fit(fig)
+    fig, axes = plotting.subplots(1, 2)
     axes[0].plot(cloud["wavelength_nm"], cloud["extinction_m_inv"], marker="o")
     axes[0].set(
         xlabel="Vacuum wavelength [nm]",
@@ -205,7 +237,7 @@ def plot_results(report):
     ):
         axes[1].semilogy(cloud["angle_degrees"], values, label=f"{wave:g} nm")
     axes[1].set(xlabel="Scattering angle [degrees]", ylabel="Bulk S11 [m⁻¹/sr]")
-    axes[1].legend()
+    plotting.legend(axes[1])
     print("Device:", report["device"], "Warp", report["warp_version"])
     print(
         "Module compile/cache load [s]:",
@@ -223,6 +255,7 @@ def plot_results(report):
         "All particle efficiencies and full bulk Mueller matrices pass "
         "the declared CPU/CUDA comparisons."
     )
+    plotting.fit(fig)
     return report
 
 
@@ -231,7 +264,41 @@ def run_example():
     return plot_results(simulate())
 
 
+# %% [markdown]
+# ## Read the saved timing and optical evidence
+#
+# The timing bars compare warm synchronized CUDA execution with the NumPy CPU
+# implementation on the recorded machine. They do not include full one-shot cost
+# or establish universal speedups. Use the separately printed upload, preparation,
+# and download times when judging a workflow that cannot reuse device inputs.
+#
+# In the cloud panels, extinction is a bulk coefficient in m⁻¹, while S11 is
+# angle-dependent scattering in m⁻¹/sr. The strong forward peak shows why a
+# single extinction coefficient cannot describe the directional signal. The
+# 61-angle grid samples that structure; finer angular convergence would be
+# needed to resolve a narrow peak for a particular instrument. Fixed refractive
+# index makes the wavelength comparison a size-parameter effect in this model.
+#
+# The checks qualify CPU/CUDA agreement for these cases. They do not test the
+# homogeneous-sphere assumption against measured cloud scattering.
+
+
 # %%
 if __name__ == "__main__":
     result = run_example()
     plt.show()
+
+
+# %% [markdown]
+# ## Choose the next comparison deliberately
+#
+# CUDA can reuse prepared storage while reproducing the tested CPU optical
+# quantities. Whether that helps a research workflow depends on batch size,
+# size parameter, repeated use, transfers, and the requested angular outputs.
+#
+# For a controlled performance study, fix the size-parameter range and vary only
+# batch size, reporting both warm and full-pipeline times. For a scientific study,
+# vary the droplet size distribution at fixed number density and compare spectral
+# extinction and angle-resolved S11 with observations. Use measured refractive
+# indices and convergence checks; device agreement alone cannot validate those
+# physical inputs or an instrument's viewing geometry.

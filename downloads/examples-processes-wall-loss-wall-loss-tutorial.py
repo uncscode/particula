@@ -38,7 +38,8 @@
 # %%
 import numpy as np
 import particula as par
-from matplotlib import pyplot as plt
+from matplotlib import style as mplstyle
+from particula import plotting
 from particula.dynamics.condensation.species_mapping import (
     CondensationSpeciesMap,
 )
@@ -101,16 +102,24 @@ def run_wall_loss(strategy: par.dynamics.WallLossStrategy, sub_steps: int = 1):
     return series, aerosol
 
 
+@mplstyle.context("particula.default")
 def plot_decay(times_min, *series_with_labels):
-    fig, ax = plt.subplots(figsize=(6, 4))
-    for series, label, style in series_with_labels:
-        ax.plot(times_min, series / series[0], style, label=label, linewidth=2)
+    fig, ax = plotting.subplots(size="wide")
+    for series, label, style, color in series_with_labels:
+        ax.plot(
+            times_min,
+            series / series[0],
+            style,
+            color=plotting.COLORS[color],
+            label=label,
+            linewidth=2,
+        )
     ax.set_xlabel("Time (min)")
     ax.set_ylabel("Normalized concentration")
     ax.set_yscale("log")
     ax.grid(True)
-    ax.legend()
-    plt.tight_layout()
+    plotting.legend(ax)
+    plotting.fit(fig)
     return fig, ax
 
 
@@ -144,7 +153,7 @@ print("Final conc (spherical):", f"{spherical_series[-1]:.3e} 1/m^3")
 # %%
 _ = plot_decay(
     times_minutes,
-    (spherical_series, "Spherical (0.5 m)", "b-"),
+    (spherical_series, "Spherical (0.5 m)", "-", "teal"),
 )
 
 # %% [markdown]
@@ -165,8 +174,8 @@ rectangular_strategy = par.dynamics.RectangularWallLossStrategy(
 rect_series, _ = run_wall_loss(rectangular_strategy)
 fig_cmp, _ = plot_decay(
     times_minutes,
-    (spherical_series, "Spherical (0.5 m)", "b-"),
-    (rect_series, "Rectangular (1.0x0.72x0.72 m)", "r--"),
+    (spherical_series, "Spherical (0.5 m)", "-", "teal"),
+    (rect_series, "Rectangular (1.0x0.72x0.72 m)", "--", "rust"),
 )
 fig_cmp.axes[0].set_title("Geometry comparison")
 
@@ -220,8 +229,8 @@ for idx in range(1, TIME_GRID.size):
 
 _ = plot_decay(
     times_minutes,
-    (wall_only_series, "Wall loss only", "b-"),
-    (coag_wall_series, "Coagulation | Wall loss", "g--"),
+    (wall_only_series, "Wall loss only", "-", "teal"),
+    (coag_wall_series, "Coagulation | Wall loss", "--", "indigo"),
 )
 
 # %% [markdown]
@@ -279,7 +288,7 @@ assert np.all(np.isfinite(cond_series))
 assert np.all(np.diff(cond_series) <= 0)
 _ = plot_decay(
     short_time / 60.0,
-    (cond_series, "Condensation | Wall loss (10 min)", "m-"),
+    (cond_series, "Condensation | Wall loss (10 min)", "-", "berry"),
 )
 
 # %% [markdown]

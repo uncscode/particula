@@ -1,6 +1,8 @@
 # %% [markdown]
 # # Charged aerosols and ions across sixteen environments
 #
+# Each humidity, pressure and temperature condition starts with 131,072 aerosols.
+#
 # How can we distinguish humidity-driven size growth from changes caused by
 # particle collisions and ion attachment? This controlled factorial study
 # compares size, number, and charge diagnostics across temperature, pressure,
@@ -35,8 +37,9 @@
 # %%
 """Run a manually refreshed two-million-particle charged CUDA sweep."""
 
-import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import style as mplstyle
+from particula import plotting
 from scripts.gpu_studies.environment_sweep import (
     EnvironmentSweep,
     run_environment_sweep,
@@ -96,6 +99,7 @@ def simulate():
     return report
 
 
+@mplstyle.context("particula.default")
 def plot_results(report):
     """Render saved observations without advancing the simulation."""
     history = report["history"]
@@ -103,7 +107,7 @@ def plot_results(report):
     time_ms = np.array([row["time"] for row in history]) * 1000
     water = np.array([row["water_mass"] for row in history])
     counts = np.array([row["count"] for row in history])
-    fig, axes = plt.subplots(2, 2, figsize=(10, 7), constrained_layout=True)
+    fig, axes = plotting.subplots(2, 2, size="wide")
     for panel, ax in enumerate(axes.flat):
         for i in range(panel * 4, panel * 4 + 4):
             ax.plot(
@@ -118,26 +122,29 @@ def plot_results(report):
             xlabel="Time [ms]",
             ylabel="Particle water mass / initial",
         )
-        ax.legend(fontsize=8)
+        plotting.legend(ax)
         ax.grid(alpha=0.2)
     fig.suptitle("Closed water uptake · 2,097,152 initial aerosols")
 
-    fig, ax = plt.subplots(figsize=(10, 8), constrained_layout=True)
+    plotting.fit(fig)
+    fig, ax = plotting.subplots()
     mergers = counts[0] - counts[-1]
-    colors = plt.get_cmap("viridis")(np.tile(np.linspace(0.15, 0.9, 4), 4))
+    colors = plotting.colormap("magnitude")(
+        np.tile(np.linspace(0.15, 0.9, 4), 4)
+    )
     ax.barh(np.arange(16), mergers, color=colors)
     ax.set_yticks(
         np.arange(16),
         [f"{t:.2f} K · {p / 1000:g} kPa · RH {rh:.0%}" for t, p, rh in grid],
     )
-    ax.tick_params(axis="y", labelsize=9)
+    ax.tick_params(axis="y", labelsize=12)
     ax.invert_yaxis()
     ax.set_xlim(0, max(mergers.max() * 1.1, 1))
     ax.set(
         xlabel="Accepted mergers in 3 ms",
-        title="Rare collisions across 131,072 initial aerosols per condition",
+        title="Mergers by condition",
     )
-    ax.bar_label(ax.containers[0], fontsize=8)
+    ax.bar_label(ax.containers[0], fontsize=12)
     print(f"Device: {report['device']}")
     print(f"Initial active aerosols + ions: {report['initial_particles']:,}")
     print(f"Final active aerosols: {counts[-1].sum():,}")
@@ -161,9 +168,11 @@ def plot_results(report):
     labels = [
         f"{t:.2f} K · {p / 1000:g} kPa · RH {rh:.0%}" for t, p, rh in grid
     ]
-    population_figures(report, labels, time_scale=1000, time_unit="ms")
+    panel_labels = [label.replace(" · RH ", "\nRH ") for label in labels]
+    population_figures(report, panel_labels, time_scale=1000, time_unit="ms")
     describe_population(report, labels)
-    ion_figures(report, labels)
+    ion_figures(report, panel_labels)
+    plotting.fit(fig)
     return report
 
 

@@ -1,6 +1,12 @@
 # %% [markdown]
 # # Explicit atmospheric ion balance on CUDA
 #
+# When only a few ions occupy each physical box, is the continuum balance an
+# adequate reference? You will compare a stochastic particle ensemble with both a
+# finite-population master equation and a continuum equation, then account for
+# supplied and exported mass. This is the prerequisite for interpreting the
+# [seed-survival experiment](gpu_lucky_few.py).
+#
 # Before asking whether charging helps a rare seed survive, check the ion
 # population itself. Here every ion is a unit-count particle of diameter
 # **0.5 nm**. Positive and negative ions carry +1 and −1 elementary charges
@@ -21,7 +27,8 @@ from time import perf_counter
 import matplotlib.pyplot as plt
 import numpy as np
 import warp as wp
-from particula import Aerosol
+from matplotlib import style as mplstyle
+from particula import Aerosol, plotting
 from particula.dynamics.ions.cleanup import IonNeutralCleanup
 from particula.dynamics.ions.coagulation import (
     NEGATIVE_ION_MASS,
@@ -224,11 +231,12 @@ def run_case(q_cm3, *, boxes=64, capacity=256, time_step=1.0):
 
 
 # %%
+@mplstyle.context("particula.default")
 def run_example():
     """Compare CUDA ensembles with independent references and inspect budgets."""
     if not wp.is_cuda_available():
         raise RuntimeError("This example requires CUDA; no CPU fallback")
-    figure, axes = plt.subplots(1, 3, figsize=(12, 4), constrained_layout=True)
+    figure, axes = plotting.subplots(1, 3)
     conversion = 1 / VOLUME / 1e6  # pairs per box → ions per polarity per cm³
     for axis, q in zip(axes, [0, 2, 10], strict=True):
         times, mean, sem, reference = run_case(q)
@@ -255,7 +263,8 @@ def run_example():
             xlabel="Time [s]",
             ylabel="Free ions per polarity [cm⁻³]",
         )
-    axes[0].legend(fontsize=8)
+    plotting.legend(axes[0])
+    plotting.fit(figure)
     plt.show()
     return figure
 
@@ -285,3 +294,19 @@ def run_example():
 # %%
 if __name__ == "__main__":
     run_example()
+
+# %% [markdown]
+# ## Choose the reference for the population you simulate
+#
+# The finite-box curve and continuum curve answer different questions: the former
+# retains discrete population fluctuations, while the latter evolves a smooth
+# concentration. The printed standardized discrepancy checks the sampled CUDA
+# means against the independent finite-box reference. Passing its six-standard-error
+# criterion is not a claim that every point lies within the plotted 95% interval.
+#
+# For a low-ion-concentration experiment, vary physical box volume at fixed source
+# rate density and compare the gap between the two references. Increase the number
+# of independent boxes to reduce sampling error without changing the physical
+# volume within each box. Then refine timestep and capacity before adding aerosol
+# attachment; otherwise finite-population effects and numerical bias can be
+# mistaken for a charging mechanism.

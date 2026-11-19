@@ -1,6 +1,13 @@
 # %% [markdown]
 # # Build on the CPU, evolve on CUDA, analyze on the CPU
 #
+# How do you keep a cooling experiment reproducible while its state lives on a
+# GPU? Follow construction, physical evolution, and detached analysis as separate
+# stages. You will learn which evidence comes from inventory checks, timestep
+# refinement, and checkpoint replay. Begin with
+# [native aerosol assembly](../../fundamentals/native_aerosol.py) if counts, volume,
+# or species ordering are unfamiliar.
+#
 # A prepared simulation owns the complete aerosol state on one GPU. Construct
 # particles, gas and environment normally, compose supported processes with
 # `|`, then call `prepare` once. `run` keeps state resident. `snapshot` returns
@@ -236,8 +243,9 @@ def verify_refinement(initial, process, coarse, expected_inventory):
 # %%
 def plot_snapshots(initial, warm, final):
     """Plot distributions using only CPU NumPy arrays."""
-    import matplotlib.pyplot as plt
+    from matplotlib import style as mplstyle
     from matplotlib.colors import LogNorm
+    from particula import plotting
 
     edges = np.geomspace(5e-9, 2e-6, 55)
 
@@ -255,44 +263,67 @@ def plot_snapshots(initial, warm, final):
             ]
         ) / np.diff(np.log10(edges))
 
-    fig, axes = plt.subplots(1, 2, figsize=(11, 4), constrained_layout=True)
-    for box, color in ((0, "#287a90"), (7, "#be6c39")):
-        for state, style, label in (
-            (initial, ":", "initial"),
-            (warm, "--", "1 ms"),
-            (final, "-", "3 ms"),
+    with mplstyle.context("particula.default"):
+        fig, axes = plotting.subplots(1, 2, size="wide")
+        for box, color in (
+            (0, plotting.COLORS["teal"]),
+            (7, plotting.COLORS["rust"]),
         ):
-            axes[0].stairs(
-                histogram(state)[box],
-                edges * 1e9,
-                color=color,
-                linestyle=style,
-                label=f"Box {box + 1}, {label}",
-            )
-    axes[0].set(
-        xscale="log", xlabel="Radius (nm)", ylabel="dN / dlog₁₀ r (m$^{-3}$)"
-    )
-    axes[0].legend(fontsize=8)
-    values = histogram(final)
-    mesh = axes[1].pcolormesh(
-        edges * 1e9,
-        np.arange(9) + 0.5,
-        np.ma.masked_less_equal(values, 0),
-        norm=LogNorm(),
-        cmap="viridis",
-        shading="flat",
-    )
-    axes[1].set(
-        xscale="log",
-        xlabel="Radius (nm)",
-        ylabel="Box",
-        yticks=np.arange(8) + 1,
-    )
-    fig.colorbar(mesh, ax=axes[1], label="dN / dlog₁₀ r (m$^{-3}$)")
-    fig.suptitle(
-        "Prepared CUDA simulation · cooling eight particle-resolved boxes"
-    )
+            for state, style, label in (
+                (initial, ":", "initial"),
+                (warm, "--", "1 ms"),
+                (final, "-", "3 ms"),
+            ):
+                axes[0].stairs(
+                    histogram(state)[box],
+                    edges * 1e9,
+                    color=color,
+                    linestyle=style,
+                    label=f"Box {box + 1}, {label}",
+                )
+        axes[0].set(
+            xscale="log",
+            xlabel="Radius (nm)",
+            ylabel="dN / dlog₁₀ r (m$^{-3}$)",
+        )
+        plotting.legend(axes[0])
+        values = histogram(final)
+        axes[1].grid(False)
+        mesh = axes[1].pcolormesh(
+            edges * 1e9,
+            np.arange(9) + 0.5,
+            np.ma.masked_less_equal(values, 0),
+            norm=LogNorm(),
+            cmap=plotting.colormap("magnitude"),
+            shading="flat",
+        )
+        axes[1].set(
+            xscale="log",
+            xlabel="Radius (nm)",
+            ylabel="Box",
+            yticks=np.arange(8) + 1,
+        )
+        fig.colorbar(mesh, ax=axes[1], label="dN / dlog₁₀ r (m$^{-3}$)")
+        fig.suptitle(
+            "Prepared CUDA simulation · cooling eight particle-resolved boxes"
+        )
+        plotting.fit(fig)
 
 
 if __name__ == "__main__":
     run_example()
+
+# %% [markdown]
+# ## What this short cooling experiment establishes
+#
+# The snapshots show how water exchange changes a distribution while dilution
+# changes its abundance. The tests separately establish the stated water ledger,
+# exact restart for the compared fields, unchanged CPU input, and bounded final
+# mass/vapor changes under one timestep halving. These do not validate the chosen
+# material properties or isolate cooling from continued evolution.
+#
+# For a cooling-rate question, add an otherwise identical uncooled control and
+# compare size-resolved water uptake at the same physical times. Keep gas/material
+# mapping explicit and refine any rapid forcing transitions. Continue with the
+# [heterogeneous ensemble](gpu_prepared_multibox.py) for more boxes or
+# [custom process example](custom_process_backends.py) to supply a new forcing law.

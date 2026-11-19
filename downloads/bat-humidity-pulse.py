@@ -13,7 +13,8 @@
 # %%
 import matplotlib.pyplot as plt
 import numpy as np
-from particula import Aerosol
+from matplotlib import style as mplstyle
+from particula import Aerosol, plotting
 from particula.dynamics import MassCondensation
 from particula.dynamics.condensation.condensation_strategies import (
     CondensationIsothermal,
@@ -186,11 +187,10 @@ def simulate():
 
 
 # %%
+@mplstyle.context("particula.default")
 def plot_results(result):
     """Show radius and the equal and opposite changes in water storage."""
-    fig, axes = plt.subplots(
-        2, 1, sharex=True, figsize=(7, 6), layout="constrained"
-    )
+    fig, axes = plotting.subplots(2, 1, sharex=True, size="wide")
     for key, style, label in (
         ("cpu", "-", "Direct CPU"),
         ("cuda", "o", "Tabulated CUDA"),
@@ -206,8 +206,8 @@ def plot_results(result):
         )
         for i, segment in enumerate(np.array_split(np.arange(len(t)), 2)):
             for amounts, name, color in (
-                (vapor, "Vapor", "tab:blue"),
-                (particle, "Particle", "tab:orange"),
+                (vapor, "Vapor", plotting.COLORS["teal"]),
+                (particle, "Particle", plotting.COLORS["rust"]),
             ):
                 axes[1].plot(
                     1000 * t[segment],
@@ -220,10 +220,11 @@ def plot_results(result):
                 )
     for axis in axes:
         axis.axvline(80, ls=":", color="0.45")
-        axis.legend()
+        plotting.legend(axis)
     axes[0].set_ylabel("Wet radius (µm)")
     axes[1].set_ylabel("Water change within leg (mg/m³)")
     axes[1].set_xlabel("Time (ms)")
+    plotting.fit(fig)
     return fig
 
 

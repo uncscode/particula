@@ -30,6 +30,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from particula import plotting
+
+plt.style.use("particula.default")
 
 # %% [markdown]
 # ## Translate the correlation before constructing a strategy
@@ -153,7 +156,7 @@ for strategy, (a_bar, b_kelvin, c_kelvin) in [
 
 
 # Plot the vapor pressures for each substance.
-fig, ax = plt.subplots(figsize=(8, 6))
+fig, ax = plotting.subplots(size="wide")
 ax.plot(temperatures, butanol_vapor_pressure, label="Butanol")
 ax.plot(temperatures, styrene_vapor_pressure, label="Styrene", linestyle="--")
 ax.plot(temperatures, water_vapor_pressure, label="Water", linestyle="-.")
@@ -161,7 +164,8 @@ ax.set_yscale("log")
 ax.set_xlabel("Temperature (K)")
 ax.set_ylabel("Pure Vapor Pressure (Pa)")
 ax.set_title("Pure Vapor Pressure vs Temperature")
-ax.legend()
+plotting.legend(ax)
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
@@ -194,7 +198,7 @@ water_saturation_concentration = water_antione.saturation_concentration(
 )
 
 # Plot the saturation concentrations for each substance.
-fig, ax = plt.subplots(figsize=(8, 6))
+fig, ax = plotting.subplots(size="wide")
 ax.plot(temperatures, butanol_saturation_concentration, label="Butanol")
 ax.plot(
     temperatures,
@@ -209,7 +213,8 @@ ax.set_yscale("log")
 ax.set_xlabel("Temperature (K)")
 ax.set_ylabel("Saturation Concentration (kg/m^3)")
 ax.set_title("Saturation Concentration vs Temperature")
-ax.legend()
+plotting.legend(ax)
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
@@ -247,7 +252,7 @@ water_partial_pressure = water_antione.partial_pressure(
 )
 
 # Plot the partial pressures for each substance.
-fig, ax = plt.subplots(figsize=(8, 6))
+fig, ax = plotting.subplots(size="wide")
 ax.plot(temperatures, butanol_partial_pressure, label="Butanol")
 ax.plot(temperatures, styrene_partial_pressure, label="Styrene", linestyle="--")
 ax.plot(temperatures, water_partial_pressure, label="Water", linestyle="-.")
@@ -255,7 +260,8 @@ ax.set_yscale("log")
 ax.set_xlabel("Temperature (K)")
 ax.set_ylabel("Partial Pressure (Pa)")
 ax.set_title("Partial Pressure vs Temperature")
-ax.legend()
+plotting.legend(ax)
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
@@ -290,14 +296,15 @@ water_saturation_ratio = water_antione.saturation_ratio(
 )
 
 # Plot the saturation ratios for each substance.
-fig, ax = plt.subplots(figsize=(8, 6))
+fig, ax = plotting.subplots(size="wide")
 ax.plot(temperatures, butanol_saturation_ratio, label="Butanol")
 ax.plot(temperatures, styrene_saturation_ratio, label="Styrene", linestyle="--")
 ax.plot(temperatures, water_saturation_ratio, label="Water", linestyle="-.")
 ax.set_xlabel("Temperature (K)")
 ax.set_ylabel("Saturation Ratio")
 ax.set_title("Saturation Ratio vs Temperature")
-ax.legend()
+plotting.legend(ax)
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
@@ -365,7 +372,7 @@ water_pure_buck = [
 ]
 
 # Plotting the results using Matplotlib
-fig, ax = plt.subplots(figsize=(8, 6))
+fig, ax = plotting.subplots(size="wide")
 ax.plot(temperatures, water_pure_constant, label="Constant", linestyle="-")
 ax.plot(temperatures, water_pure_antione, label="Antoine", linestyle="--")
 ax.plot(
@@ -379,7 +386,8 @@ ax.set_yscale("log")
 ax.set_xlabel("Temperature (K)")
 ax.set_ylabel("Pure Vapor Pressure (Pa)")
 ax.set_title("Comparison of Water Vapor Pressure Calculations")
-ax.legend(loc="lower right")
+plotting.legend(ax, loc="lower right")
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]

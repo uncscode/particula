@@ -1,25 +1,27 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 4.7718485810328275,
-  "package_source_sha256": "a2faecc9e7fb5cff47d09509cf98cc08b9e69dcda39c0b271c03295e2bee85cb",
+  "elapsed_seconds": 6.102623465936631,
+  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
+  "scientific_source_sha256": "c491d38a0f3b014be11117e77bf7f5ed27e4a834ba024ddbac813c1eefd5b6db",
   "input_sha256": {},
   "example": "sphere-optics",
-  "fingerprint": "5b0ee829ca9112a881dcfad86797adc4db096ecdd25b2a98a85d0590dda7a403",
+  "fingerprint": "53c26fdcff5b4058d549bedbded01f5169afdba9733ab1f83d65f359d05b7399",
   "source": "docs/examples/optics/sphere_optics.py",
-  "revision": "d523321593a5669d8eabc4c421ea77eba543be6a",
+  "revision": "6af97152d1570464ac5ccae56e3110001657e170",
   "package_dirty": false,
-  "executed_at": "2026-11-15T15:40:29.888733+00:00",
+  "executed_at": "2026-11-19T14:34:24.839312+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.2.14",
+    "particula": "0.3.2",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
     "nbclient": "0.10.2",
     "jupytext": "1.17.3",
-    "warp-lang": "1.11.1"
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
   },
   "outputs": [
     [],
@@ -41,11 +43,27 @@
     ]
   ],
   "files": {
-    "figure-4-3.png": "9b4e81b917baa8ce662a0d0658f0d4619872557f0c9b1ecb27b04a1e6b265eab",
-    "figure-4-2.png": "6d67323157bf84fe0abed573fe77e0369c0c917f6c8c5d3df1ae748a4e612acc",
-    "figure-4-1.png": "a27f0ba6b78f4dc34ab6f38fee54d0c6172334bd4caf4c727272936e73167dc9",
+    "figure-4-3.png": "15c9f9a1696b5378968979acf34b9e7ac014d70d87a67f9bd9d18c18e0f5804c",
+    "figure-4-2.png": "e283d887d725cfd08eec6b21ce6e71b2349269c746f1b5eb1a3c9ddd6ccf5b67",
+    "figure-4-1.png": "08e36c8c71a39fcd8433c4fc554e44674d457d7361b8ca9d13eea01762df10a9",
+    "executed_source.py": "88bcb65d83d44287c1db1ceacd8619c545af69e4119865dde45f1a53753fc782",
     "data.json": "a36890a259bda6bc6df975d6f9c30cf2afecdf24e98560d7d4d82d7d7919eb6e",
-    "source.py": "d56664fda209d99978ef5bd511ea02b4f3ec52b73179e1e7a984d71a3ced942a"
+    "source.py": "4a88af76b1c42f2a3e593106a6b2fba9091b923f5b808196fed81826d3e5f640"
   },
-  "simulation_fingerprint": "7e10c7a25f503912edca9a1069be5e10b60c84df30865295dfe032fa13db56b0"
+  "simulation_fingerprint": "2f4dda756db700f0fcea7ba009485e191dcd9f36999e0193ea5eb1108276ef95",
+  "render_versions": {
+    "particula": "0.3.2",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "render_device": "CPU",
+  "execution_input_sha256": {},
+  "rendered_at": "2026-11-19T14:44:30.361792+00:00",
+  "render_revision": "dd92d3c1ca71f36eacad56b49661b32c0da77ac7",
+  "render_elapsed_seconds": 4.551219107001089
 }

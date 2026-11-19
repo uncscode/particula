@@ -614,6 +614,7 @@ def run_publication():
     """Run all five direct boundaries on CUDA and plot restored state."""
     import matplotlib.pyplot as plt
     import warp as wp
+    from particula import plotting
 
     if not _warp_enabled() or not wp.is_cuda_available():
         raise RuntimeError("This publication run requires CUDA")
@@ -621,31 +622,39 @@ def run_publication():
     result = run_example(device="cuda:0")
     if result.particle_data is None or result.gas_data is None:
         raise RuntimeError("CUDA produced no complete snapshot")
-    fig, axes = plt.subplots(1, 2, figsize=(9, 3.8), constrained_layout=True)
-    x = np.arange(2)
-    for offset, p, g, label in (
-        (-0.18, particles, gas, "Initial"),
-        (0.18, result.particle_data, result.gas_data, "Final"),
-    ):
-        particle_mass = np.sum(p.masses * p.concentration[..., None], axis=1)[0]
-        particle_density = particle_mass / p.volume[0]
-        axes[0].bar(x + offset, particle_density * 1e9, width=0.36, label=label)
-        axes[1].bar(
-            x + offset, g.concentration[0] * 1e9, width=0.36, label=label
+    with plt.style.context("particula.default"):
+        fig, axes = plotting.subplots(1, 2)
+        x = np.arange(2)
+        for offset, p, g, label in (
+            (-0.18, particles, gas, "Initial"),
+            (0.18, result.particle_data, result.gas_data, "Final"),
+        ):
+            particle_mass = np.sum(
+                p.masses * p.concentration[..., None], axis=1
+            )[0]
+            particle_density = particle_mass / p.volume[0]
+            axes[0].bar(
+                x + offset, particle_density * 1e9, width=0.36, label=label
+            )
+            axes[1].bar(
+                x + offset, g.concentration[0] * 1e9, width=0.36, label=label
+            )
+        for ax in axes:
+            ax.set(xticks=x, xticklabels=gas.name)
+            plotting.legend(ax)
+        axes[0].set(ylabel="Particle mass density (µg m$^{-3}$)")
+        axes[1].set(ylabel="Gas mass density (µg m$^{-3}$)")
+        fig.suptitle(
+            "Combined direct sequence · " + wp.get_device("cuda:0").name
         )
-    for ax in axes:
-        ax.set(xticks=x, xticklabels=gas.name)
-        ax.legend()
-    axes[0].set(ylabel="Particle mass density (µg m$^{-3}$)")
-    axes[1].set(ylabel="Gas mass density (µg m$^{-3}$)")
-    fig.suptitle("Combined direct sequence · " + wp.get_device("cuda:0").name)
-    print("\n".join(result.output))
-    print(
-        "Represented number, initial/final:",
-        particles.concentration.sum(),
-        result.particle_data.concentration.sum(),
-    )
-    plt.show()
+        print("\n".join(result.output))
+        print(
+            "Represented number, initial/final:",
+            particles.concentration.sum(),
+            result.particle_data.concentration.sum(),
+        )
+        plotting.fit(fig)
+        plt.show()
     return result
 
 

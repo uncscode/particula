@@ -47,31 +47,19 @@ import copy
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from particula import plotting
 from particula.dynamics.condensation.species_mapping import (
     CondensationSpeciesMap,
 )
 from particula.execution.splitting import condensation_flow
+
+plt.style.use("particula.default")
 
 # Optional: uncomment if many steps and you want a progress bar
 # from tqdm import tqdm
 
 # Plot style (Tailwind gray palette)
 TAILWIND = par.util.colors.TAILWIND
-base_color = TAILWIND["gray"]["600"]
-plt.rcParams.update(
-    {
-        "text.color": base_color,
-        "axes.labelcolor": base_color,
-        "figure.figsize": (5, 4),
-        "font.size": 14,
-        "axes.edgecolor": base_color,
-        "xtick.color": base_color,
-        "ytick.color": base_color,
-        "pdf.fonttype": 42,
-        "ps.fonttype": 42,
-        "savefig.dpi": 150,
-    }
-)
 
 np.random.seed(100)  # reproducibility for sampling and wall-loss RNG
 
@@ -426,7 +414,7 @@ colors = [
     TAILWIND["violet"]["500"],
 ]
 
-fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(6, 8), sharex=True)
+fig, (ax1, ax2) = plotting.subplots(2, 1, sharex=True, size="wide")
 
 # Plot particle diameters
 for j in range(n_particles):
@@ -448,7 +436,7 @@ ax1.axvspan(
 )
 ax1.set_ylabel("Particle diameter (um)")
 ax1.set_title("Activation -> Deactivation")
-ax1.legend()
+plotting.legend(ax1)
 
 # Plot gas-phase water concentration (as effective RH)
 effective_rh = gas_conc_hist / c_sat_water
@@ -466,9 +454,9 @@ ax2.axvspan(
 ax2.set_xlabel("Time (minutes)")
 ax2.set_ylabel("Effective RH (%)")
 ax2.set_title("Gas-phase water (equilibrates internally)")
-ax2.legend()
+plotting.legend(ax2)
 
-plt.tight_layout()
+plotting.fit(fig)
 plt.show()
 
 

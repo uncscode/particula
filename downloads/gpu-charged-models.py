@@ -21,9 +21,10 @@
 # %%
 """Compare all five charge-dependent collision fits on a real CUDA device."""
 
-import matplotlib.pyplot as plt
 import numpy as np
 import warp as wp
+from matplotlib import style as mplstyle
+from particula import plotting
 from particula.dynamics.coagulation import charged_dimensionless_kernel as cpu
 from particula.gpu.dynamics.coagulation_funcs import charged_dimensionless_wp
 
@@ -56,6 +57,7 @@ def evaluate(
 
 
 # %%
+@mplstyle.context("particula.default")
 def run_example():
     """Verify CUDA parity and plot model differences across three potentials."""
     if not wp.is_cuda_available():
@@ -73,7 +75,7 @@ def run_example():
     kn_gpu = wp.array(kn, dtype=wp.float64, device=device)
     hard_gpu = wp.array(hard, dtype=wp.float64, device=device)
     result = wp.empty(kn.size, dtype=wp.float64, device=device)
-    fig, axes = plt.subplots(1, 3, figsize=(12, 4), constrained_layout=True)
+    fig, axes = plotting.subplots(1, 3)
     maximum_error = 0.0
     for ax, phi in zip(axes, [-1.0, 0.0, 5.0], strict=True):
         potentials = np.full_like(kn, phi)
@@ -97,11 +99,12 @@ def run_example():
             ylabel="Dimensionless kernel H",
             title=f"Coulomb potential = {phi:g}",
         )
-    axes[-1].legend(fontsize=8)
+    plotting.legend(axes[-1])
     fig.suptitle("Charged Brownian models · verified CUDA evaluations")
     print(f"Device: {wp.get_device(device).name}")
     print(f"Maximum relative CPU/CUDA difference: {maximum_error:.3e}")
     print("Parity is numerical evidence, not atmospheric validation.")
+    plotting.fit(fig)
     return {"maximum_relative_error": maximum_error}
 
 

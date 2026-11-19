@@ -33,7 +33,10 @@ import numpy as np
 
 # particula imports
 import particula as par
+from particula import plotting
 from particula.particles.slot_management import activate_slots
+
+plt.style.use("particula.default")
 
 # %% [markdown]
 # ## Reserve capacity around a known initial population
@@ -196,7 +199,7 @@ np.testing.assert_array_equal(
 bins_lognormal = np.logspace(-10, -6, 100)
 
 # Create figure for visualizing the histogram of particle radii
-fig, ax = plt.subplots(figsize=(8, 6))
+fig, ax = plotting.subplots(size="wide")
 
 # Plot radii distribution after step 2
 bins, edges = np.histogram(radii_after_step_2, bins=bins_lognormal)
@@ -239,9 +242,10 @@ ax.set_yscale("log")
 # Add labels and legend
 ax.set_xlabel("Radius (m)")
 ax.set_ylabel("Number of particles")
-plt.legend()
+plotting.legend(plt.gca())
 
 # Show the plot
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]

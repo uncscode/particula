@@ -290,6 +290,7 @@ def run_publication():
     """Require CUDA and show particle-number change alongside conserved mass."""
     import matplotlib.pyplot as plt
     import warp as wp
+    from particula import plotting
 
     if not _warp_enabled() or not wp.is_cuda_available():
         raise RuntimeError("This publication run requires CUDA")
@@ -298,37 +299,41 @@ def run_publication():
     final = result.particle_data
     if final is None:
         raise RuntimeError("CUDA produced no particle snapshot")
-    fig, axes = plt.subplots(1, 2, figsize=(9, 3.6), constrained_layout=True)
-    edges = np.geomspace(1, 30, 16)
-    for data, label in ((initial, "Initial"), (final, "After two calls")):
-        volume = np.sum(data.masses / data.density, axis=2)[0]
-        radius = np.cbrt(3 * volume / (4 * np.pi)) * 1e9
-        histogram, _ = np.histogram(
-            radius, bins=edges, weights=data.concentration[0] / data.volume[0]
+    with plt.style.context("particula.default"):
+        fig, axes = plotting.subplots(1, 2)
+        edges = np.geomspace(1, 30, 16)
+        for data, label in ((initial, "Initial"), (final, "After two calls")):
+            volume = np.sum(data.masses / data.density, axis=2)[0]
+            radius = np.cbrt(3 * volume / (4 * np.pi)) * 1e9
+            histogram, _ = np.histogram(
+                radius,
+                bins=edges,
+                weights=data.concentration[0] / data.volume[0],
+            )
+            axes[0].stairs(histogram, edges, label=label, linewidth=2)
+        axes[0].set(
+            xscale="log",
+            xlabel="Radius (nm)",
+            ylabel="Number density per bin (m$^{-3}$)",
         )
-        axes[0].stairs(histogram, edges, label=label, linewidth=2)
-    axes[0].set(
-        xscale="log",
-        xlabel="Radius (nm)",
-        ylabel="Number density per bin (m$^{-3}$)",
-    )
-    axes[0].legend()
-    initial_mass = np.sum(initial.masses * initial.concentration[..., None])
-    final_mass = np.sum(final.masses * final.concentration[..., None])
-    fraction = [
-        final.concentration.sum() / initial.concentration.sum(),
-        final_mass / initial_mass,
-    ]
-    axes[1].bar(
-        ["Represented number", "Represented mass"],
-        fraction,
-        color=["#be6c39", "#287a90"],
-    )
-    axes[1].axhline(1, color="0.5", linestyle="--")
-    axes[1].set(ylabel="Final / initial", ylim=(0, 1.1))
-    fig.suptitle("Brownian collisions · " + wp.get_device("cuda:0").name)
-    print("\n".join(result.output))
-    plt.show()
+        plotting.legend(axes[0])
+        initial_mass = np.sum(initial.masses * initial.concentration[..., None])
+        final_mass = np.sum(final.masses * final.concentration[..., None])
+        fraction = [
+            final.concentration.sum() / initial.concentration.sum(),
+            final_mass / initial_mass,
+        ]
+        axes[1].bar(
+            ["Represented number", "Represented mass"],
+            fraction,
+            color=[plotting.COLORS["rust"], plotting.COLORS["teal"]],
+        )
+        axes[1].axhline(1, color="0.5", linestyle="--")
+        axes[1].set(ylabel="Final / initial", ylim=(0, 1.1))
+        fig.suptitle("Brownian collisions · " + wp.get_device("cuda:0").name)
+        print("\n".join(result.output))
+        plotting.fit(fig)
+        plt.show()
     return result
 
 

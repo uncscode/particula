@@ -13,13 +13,17 @@
 # ---
 
 # %% [markdown]
-# # Adding Particles During Simulation
+# # Add an external population without changing existing particles
 #
-# In this tutorial, we demonstrate how add particles to an aerosol object. This is useful when you want to modify a custom aerosol process during a simulation.
+# How should a simulation represent an incoming particle pulse? This example
+# inserts two populations into reserved slots and checks the added material
+# explicitly. It distinguishes an external particle source from
+# [nucleation](../nucleation/cpu_nucleation.py), which transfers material from a
+# modeled precursor reservoir.
 #
-# This particle-resolved example reserves fixed capacity for two additions. It does not resize storage or describe a binned insertion API.
-#
-# **Imports**
+# The example uses particle-resolved storage, fixed capacity, and unit represented
+# counts. It does not resize arrays, evolve the particles between additions, or
+# define a binned insertion method.
 
 # %%
 # In Colab uncomment the following command to install particula:
@@ -29,12 +33,23 @@ import numpy as np
 
 # particula imports
 import particula as par
+from particula import plotting
 from particula.particles.slot_management import activate_slots
 
+plt.style.use("particula.default")
+
 # %% [markdown]
-# ## Aerosol Setup
+# ## Reserve capacity around a known initial population
 #
-# We need to first make the aerosol object. Details on this can be found in the Aerosol Tutorial.
+# The 100,000 initial samples have lognormal radius scale 100 nm, geometric
+# standard deviation 1.3, and material density 1500 kg m⁻³. Despite legacy comments
+# mentioning diameter, the samples are used as radii in the mass calculation.
+# Unit counts in 1 cm³ imply number density 10¹¹ m⁻³.
+#
+# Another 20,000 slots begin with zero mass, count, and charge. They reserve space
+# for two pulses; they are not physical zero-size particles. Temperature and
+# pressure stay at 298.15 K and 101325 Pa, with no gas or dynamical process involved
+# in the insertion.
 
 # %%
 gas = par.gas.GasData(
@@ -86,13 +101,17 @@ aerosol = par.Aerosol(
 print(aerosol)
 
 # %% [markdown]
-# ## Particles to Add
+# ## Define the source and account for its inventory
 #
-# Requests carry masses `(boxes, requests, species)`, represented counts and
-# charge `(boxes, requests)`, and a per-box integer prefix count. Each request
-# here represents one particle. Activation fills ascending free slots and
-# rejects insufficient capacity before mutation. This is an external particle
-# source: gas is unchanged, and particle inventory increases by the injected mass.
+# Each pulse contains the same sampled 10,000 unit-count particles, with radius
+# scale 1 nm and geometric standard deviation 1.1. These inputs illustrate slot
+# insertion; they are not a physical cluster-formation model at nanometre scales.
+#
+# Requests specify material masses, represented counts, charges, and the active
+# request length in each box. Activation fills free slots and rejects insufficient
+# capacity before mutation. The checks below require unchanged gas, stable held
+# arrays, and particle material equal to initial inventory plus cumulative injection.
+# After the second pulse, the reserved capacity is exactly exhausted.
 
 # %%
 # particles to add
@@ -163,16 +182,24 @@ np.testing.assert_array_equal(
 )
 
 # %% [markdown]
-# ## Graphing
+# ## Identify an added mode rather than apparent growth
 #
-# We now visualize the two particle add steps
+# The overlay shows raw counts in radius intervals. With unit weights and fixed
+# volume, dividing those counts by 10⁻⁶ m³ would give number density per bin.
+# No distribution normalization is applied, so the added small-radius population
+# changes the histogram abundance directly.
+#
+# The saved number densities are 1.1×10¹¹ and 1.2×10¹¹ m⁻³ after the two pulses.
+# The larger seed mode is retained because no growth or collision step occurs
+# between them. The two pulses reuse the same sample, so their fine histogram
+# structure is not independent sampling evidence.
 
 # %%
 # Define lognormal bins for particle radius histogram
 bins_lognormal = np.logspace(-10, -6, 100)
 
 # Create figure for visualizing the histogram of particle radii
-fig, ax = plt.subplots(figsize=(8, 6))
+fig, ax = plotting.subplots(size="wide")
 
 # Plot radii distribution after step 2
 bins, edges = np.histogram(radii_after_step_2, bins=bins_lognormal)
@@ -215,12 +242,22 @@ ax.set_yscale("log")
 # Add labels and legend
 ax.set_xlabel("Radius (m)")
 ax.set_ylabel("Number of particles")
-plt.legend()
+plotting.legend(plt.gca())
 
 # Show the plot
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
-# ## Conclusion
+# ## Turn insertion into a source experiment
 #
-# We have demonstrated how to add particles to an aerosol object. This is useful when you want to modify a aerosol object with a custom process during a simulation.
+# The result establishes controlled external additions with an explicit material
+# budget and finite capacity. It does not establish what the new particles do
+# after entering the system.
+#
+# To study whether fresh nuclei survive in an existing aerosol, add a growth and
+# collision interval between pulses. Compare surviving small-particle number,
+# material inventory, and required slot capacity while refining the interval.
+# For a tracer or source label, define its birth and merging behavior using the
+# [registered-field example](particle_tracers.py), rather than assuming array
+# position remains a particle identity.

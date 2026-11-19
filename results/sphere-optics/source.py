@@ -1,18 +1,23 @@
 # %% [markdown]
-# # Sphere spectra, polarization and cloud optical depth
+# # From one sphere to a cloud's optical signal
 #
-# Particula 0.3.0 development optics uses independent CPU functions and SI units.
-# This example needs NumPy and Matplotlib. It calculates optical properties;
-# it does not evolve temperature, liquid mass or gas composition.
+# How can particle size and concentration become a spectrum, a polarization
+# signature, or an attenuated light beam? This CPU example connects three levels:
+# single-particle cross sections, angle-dependent scattering, and population
+# extinction integrated over a path. They answer different observational questions;
+# one bulk extinction number cannot recover all the angular information.
 #
-# The constant indices below are illustrative, not measured spectral material
-# data. The cloud is a dilute population of independent homogeneous spheres.
-# Direct-beam transmission excludes multiple scattering and diffuse radiation.
-# See the [optics guide](../../guide/optics/index.md) for conventions.
+# The calculation uses homogeneous independent spheres in a nonabsorbing medium,
+# with radius and vacuum wavelength in metres and angles in radians. The constant
+# complex refractive indices are illustrative, not measured spectral material data.
+# See the [optics guide](../../guide/optics/index.md) for conventions and exclusions.
+# The calculation changes no particle mass, temperature, or gas composition.
 
 # %%
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import style as mplstyle
+from particula import plotting
 from particula.optics import (
     apply_mueller_matrix,
     get_column_optics,
@@ -25,6 +30,18 @@ from particula.optics import (
     get_population_weights,
     get_scattering_amplitudes,
 )
+
+# %% [markdown]
+# ## Connect particle, population, and path calculations
+#
+# `simulate()` first converts Mie efficiencies into cross sections and checks
+# extinction closure. It then calculates angular amplitudes and applies the
+# Mueller matrix to unpolarized light. Finally it weights droplet cross sections
+# by number density and integrates extinction through a uniform column.
+#
+# The count-to-density equality and τ=extinction×length assertion check two
+# places where otherwise plausible unit mistakes would alter the result.
+# `plot_results()` renders the compact observations; it does not rerun the physics.
 
 
 # %%
@@ -98,28 +115,30 @@ def simulate():
     }
 
 
+@mplstyle.context("particula.default")
 def plot_results(report):
     """Render compact saved optical observations without rerunning physics."""
-    fig, ax = plt.subplots(figsize=(7, 4), constrained_layout=True)
+    fig, ax = plotting.subplots(size="wide")
     for label, values in report["cross_sections_m2"].items():
         ax.plot(report["wavelength_nm"], np.array(values) * 1e12, label=label)
     ax.set(
         xlabel="Vacuum wavelength [nm]",
         ylabel="Cross section [µm²]",
-        title="200 nm radius sphere · illustrative index 1.5 + 0.02i",
+        title="200 nm sphere radius\nIllustrative index 1.5 + 0.02i",
     )
-    ax.legend()
+    plotting.legend(ax)
     ax.grid(alpha=0.2)
 
-    fig, axes = plt.subplots(1, 2, figsize=(10, 4), constrained_layout=True)
+    plotting.fit(fig)
+    fig, axes = plotting.subplots(1, 2, size="wide")
     for label, values in report["differential_m2_sr"].items():
         axes[0].semilogy(report["angle_degrees"], values, label=label)
     axes[0].set(
         xlabel="Scattering angle [degrees]",
         ylabel="Differential cross section [m²/sr]",
-        title="500 nm radius sphere · 550 nm light",
+        title="500 nm sphere radius\n550 nm light",
     )
-    axes[0].legend()
+    plotting.legend(axes[0])
     axes[1].plot(report["angle_degrees"], report["linear_polarization"])
     axes[1].set(
         xlabel="Scattering angle [degrees]",
@@ -130,7 +149,8 @@ def plot_results(report):
     for ax in axes:
         ax.grid(alpha=0.2)
 
-    fig, axes = plt.subplots(1, 2, figsize=(10, 4), constrained_layout=True)
+    plotting.fit(fig)
+    fig, axes = plotting.subplots(1, 2)
     for ax, key, label in zip(
         axes,
         ["optical_depth", "transmission"],
@@ -146,6 +166,7 @@ def plot_results(report):
         f"Single-scattering albedo: {report['cloud_single_scattering_albedo']:.8f}"
     )
     print(f"Scattering-weighted g: {report['cloud_asymmetry']:.6f}")
+    plotting.fit(fig)
     return report
 
 
@@ -155,12 +176,52 @@ def run_example():
 
 
 # %% [markdown]
-# The particle absorption spectrum can supply a later energy calculation.
-# A heating model also needs incident spectral irradiance, thermal properties,
-# emission and an energy balance. Evaporation additionally needs mass transfer
-# and latent heat. None of those state changes are implied by this calculation.
+# ## Read the three optical observations together
+#
+# The first figure uses a 200 nm radius sphere with index 1.5 + 0.02i across
+# 400–1000 nm. Extinction is scattering plus absorption; the assertion checks
+# that identity. Cross sections are areas, not dimensionless efficiencies.
+# The varying spectrum here comes from size parameter, since the refractive index
+# is held fixed. A measured material spectrum could add another dependence.
+#
+# The second figure changes the particle to a 500 nm radius sphere with index
+# 1.33 + 10⁻⁸i at 550 nm. Differential cross sections describe scattering into
+# a direction, in m²/sr. The adjoining −Q/I curve uses unpolarized incident light
+# and the scattering-plane convention: positive values favor perpendicular
+# linear polarization. Its sign and angular structure contain information absent
+# from a total cross section; the magnitude check enforces a basic bound.
+#
+# The third figure sums a discrete lognormal-shaped set of 64 radius bins from
+# 1–30 µm at a total 10⁸ particles/m³ (100/cm³). These weights are number per
+# bin per volume, not dN/dr. The recorded extinction is about 0.0536 m⁻¹ and the
+# scattering-weighted asymmetry is about 0.866. Optical depth grows linearly with
+# path length; direct-beam transmission falls as exp(−τ). The 2×10⁻⁶ m³
+# representative volume used in the count conversion is not a light-path length.
+#
+# A nearly unit single-scattering albedo means little absorption per extinction
+# event. It does not imply high direct transmission: scattering also removes
+# photons from the unscattered beam. Diffuse radiation and multiple scattering
+# are outside this calculation.
 
 # %%
 if __name__ == "__main__":
     result = run_example()
     plt.show()
+
+
+# %% [markdown]
+# ## Adapt the observation to your research question
+#
+# A sphere's optical response can be aggregated into a population signal only
+# after specifying the number-density measure, and into transmission only after
+# specifying the path. Keeping those choices explicit prevents confusing a sample
+# volume with a viewing geometry.
+#
+# To investigate whether an observed extinction change comes from particle number
+# or size, vary those inputs separately and compare both extinction and angular
+# polarization. Use measured wavelength-dependent indices before identifying a
+# material. The absorption spectrum could also feed a heating calculation, but
+# that extension needs incident irradiance, thermal properties, emission and an
+# energy balance; evaporation additionally needs mass transfer and latent heat.
+# For large batches, the [CUDA optics example](cuda_optics.py) tests the same
+# optical quantities against CPU calculations.

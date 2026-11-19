@@ -1,6 +1,12 @@
 # %% [markdown]
 # # Direct CUDA condensation: upload, calculate, download
 #
+# Which quantities must be weighted before a particle's mass gain can be compared
+# with gas depletion? You will follow two resolved slots through explicit upload,
+# physical update, and download, distinguishing per-particle quantities from
+# box totals. Read [native particle storage](../../fundamentals/particles/distribution_tutorial.py)
+# for the count convention.
+#
 # Build particles and gas on the CPU, upload each once, reuse the same device
 # scratch for two condensation calls, and download the result for plotting.
 # The figures below come from actual CUDA execution. Run this file with
@@ -380,6 +386,7 @@ def run_publication():
     """Require CUDA, execute the complete example and plot physical outputs."""
     import matplotlib.pyplot as plt
     import warp as wp
+    from particula import plotting
 
     if not _warp_enabled() or not wp.is_cuda_available():
         raise RuntimeError("This publication run requires CUDA")
@@ -387,26 +394,33 @@ def run_publication():
     result = run_example(device="cuda:0")
     if result.particle_data is None:
         raise RuntimeError("CUDA produced no particle snapshot")
-    fig, axes = plt.subplots(1, 2, figsize=(9, 3.6), constrained_layout=True)
-    slots = np.arange(initial.n_particles) + 1
-    for particles, label, marker in (
-        (initial, "Initial", "o"),
-        (result.particle_data, "After 0.2 s", "s"),
-    ):
-        volume = np.sum(particles.masses / particles.density, axis=2)[0]
-        radius_nm = np.cbrt(3 * volume / (4 * np.pi)) * 1e9
-        axes[0].plot(slots, radius_nm, marker=marker, label=label)
-    axes[0].set(xlabel="Particle slot", ylabel="Radius (nm)", xticks=slots)
-    axes[0].legend()
-    transfer = result.total_mass_transfer.numpy()[0, :, 0]
-    axes[1].bar(slots, transfer * 1e21, color="#287a90")
-    axes[1].set(
-        xlabel="Particle slot", ylabel="Last-call mass gain (ag)", xticks=slots
-    )
-    fig.suptitle("Direct condensation · " + wp.get_device("cuda:0").name)
-    print("\n".join(result.output))
-    print("Last-call signed latent energy (J):", result.energy_transfer.numpy())
-    plt.show()
+    with plt.style.context("particula.default"):
+        fig, axes = plotting.subplots(1, 2)
+        slots = np.arange(initial.n_particles) + 1
+        for particles, label, marker in (
+            (initial, "Initial", "o"),
+            (result.particle_data, "After 0.2 s", "s"),
+        ):
+            volume = np.sum(particles.masses / particles.density, axis=2)[0]
+            radius_nm = np.cbrt(3 * volume / (4 * np.pi)) * 1e9
+            axes[0].plot(slots, radius_nm, marker=marker, label=label)
+        axes[0].set(xlabel="Particle slot", ylabel="Radius (nm)", xticks=slots)
+        plotting.legend(axes[0])
+        transfer = result.total_mass_transfer.numpy()[0, :, 0]
+        axes[1].bar(slots, transfer * 1e21, color=plotting.COLORS["teal"])
+        axes[1].set(
+            xlabel="Particle slot",
+            ylabel="Last-call mass gain (ag)",
+            xticks=slots,
+        )
+        fig.suptitle("Direct condensation · " + wp.get_device("cuda:0").name)
+        print("\n".join(result.output))
+        print(
+            "Last-call signed latent energy (J):",
+            result.energy_transfer.numpy(),
+        )
+        plotting.fit(fig)
+        plt.show()
     return result
 
 
@@ -427,3 +441,23 @@ if __name__ == "__main__":
         run_publication()
     else:
         main()
+
+# %% [markdown]
+# ## The transfer bookkeeping is the lesson
+#
+# The radius panel includes both 0.1 s calls; the mass-gain bars and signed energy
+# report only the last call. Each slot represents 10⁻⁶ particles in 10⁻⁶ m³, or
+# 1 m⁻³. Thus a per-particle mass gain must be multiplied by represented counts
+# before comparing with an extensive gas inventory.
+#
+# Despite the gas name `Water`, this fixture imposes a constant pure vapor pressure
+# of 10⁻⁶ Pa; it is not a physical water vapor-pressure model at 298.15 K. The
+# initial 2330 Pa upload is helper storage overwritten by that configuration.
+# Latent energy is a diagnostic, not an update of environmental temperature.
+#
+# For a real water-growth calculation, supply a justified vapor-pressure law and
+# material properties, verify species inventories, and refine the timestep. The
+# [independent condensation comparison](gpu_condensation_parity_walkthrough.py)
+# shows how to separate transfer, inventory, and energy checks; the
+# [prepared quick start](../prepared/gpu_prepared_quick_start.py) supplies an evolving
+# water example with a Buck reference and a refinement comparison.

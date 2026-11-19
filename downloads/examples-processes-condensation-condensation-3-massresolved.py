@@ -32,9 +32,12 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from particula import plotting
 from particula.dynamics.condensation.species_mapping import (
     CondensationSpeciesMap,
 )
+
+plt.style.use("particula.default")
 
 # %% [markdown]
 # ## Specify a closed material inventory
@@ -273,7 +276,7 @@ print(aerosol_resolved)
 
 # %%
 # plot the initial and final distributions
-fig, ax = plt.subplots(figsize=(8, 5))
+fig, ax = plotting.subplots(size="wide")
 
 ax.bar(
     edges[:-1],
@@ -281,7 +284,7 @@ ax.bar(
     width=np.diff(edges),
     align="edge",
     label="Resolved initial",
-    color="red",
+    color=plotting.COLORS["rust"],
     alpha=0.7,
 )
 plot_index = 100
@@ -291,7 +294,7 @@ ax.bar(
     width=np.diff(edges),
     align="edge",
     label="CCN overshoot time: {:.1f} s".format(time[plot_index]),
-    color="purple",
+    color=plotting.COLORS["berry"],
     alpha=0.5,
 )
 ax.bar(
@@ -300,18 +303,19 @@ ax.bar(
     width=np.diff(edges),
     align="edge",
     label="Resolved final",
-    color="blue",
+    color=plotting.COLORS["teal"],
     alpha=0.7,
 )
 ax.set_yscale("log")
 ax.set_xscale("log")
 ax.set_xlabel("Particle radius (m)")
 ax.set_ylabel("Number concentration (m^-3)")
-ax.legend()
+plotting.legend(ax)
+plotting.fit(fig)
 plt.show()
 
 # %%
-fig, ax = plt.subplots(figsize=(8, 5))
+fig, ax = plotting.subplots(size="wide")
 
 # Swap X and Y to reverse axes
 X, Y = np.meshgrid(
@@ -324,11 +328,12 @@ log_of_number_distribution_binned = np.log10(
     out=np.nan * np.ones_like(number_distribution_binned),
     where=number_distribution_binned > 0,
 )
+ax.grid(False)
 contour = ax.contourf(
     X,
     Y,
     log_of_number_distribution_binned.T,
-    cmap="viridis",
+    cmap=plotting.colormap("magnitude"),
     vmin=5,
 )
 
@@ -342,24 +347,31 @@ ax.set_ylim([1e-8, 1e-5])  # Set limits for y-axis
 ax.set_yscale("log")  # Log scale for particle radius on y-axis
 ax.set_xlabel("Time (s)")
 ax.set_ylabel("Particle radius (m)")
-fig.tight_layout()
+plotting.fit(fig)
 plt.show()
 
 # %%
 # plot the total mass and water saturation on twin y-axis
-fig, ax1 = plt.subplots(figsize=(8, 5))
+fig, ax1 = plotting.subplots(size="wide")
 
-ax1.plot(time, total_mass_resolved, label="Total mass", color="blue")
+ax1.plot(
+    time, total_mass_resolved, label="Total mass", color=plotting.COLORS["teal"]
+)
 ax1.set_xlabel("Time (s)")
-ax1.set_ylabel("Total Particle mass (kg/m^3)", color="blue")
-ax1.tick_params(axis="y", labelcolor="blue")
+ax1.set_ylabel("Total Particle mass (kg/m^3)", color=plotting.COLORS["teal"])
+ax1.tick_params(axis="y", labelcolor=plotting.COLORS["teal"])
 
 ax2 = ax1.twinx()
-ax2.plot(time, water_saturation_in_time, label="Water saturation", color="red")
-ax2.set_ylabel("Water saturation", color="red")
-ax2.tick_params(axis="y", labelcolor="red")
+ax2.plot(
+    time,
+    water_saturation_in_time,
+    label="Water saturation",
+    color=plotting.COLORS["rust"],
+)
+ax2.set_ylabel("Water saturation", color=plotting.COLORS["rust"])
+ax2.tick_params(axis="y", labelcolor=plotting.COLORS["rust"])
 
-fig.tight_layout()
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]

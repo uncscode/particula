@@ -32,6 +32,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from particula import plotting
+
+plt.style.use("particula.default")
 
 # %% [markdown]
 # ## A density needs a coordinate
@@ -114,15 +117,16 @@ multi_mode_distribution = par.particles.get_lognormal_pdf_distribution(
 
 # %%
 # %%
-plt.figure(figsize=(10, 6))
+fig, ax = plotting.subplots(size="wide")
 plt.plot(x_values, single_mode_distribution, label="Single Mode", linewidth=4)
 plt.plot(x_values, multi_mode_distribution, label="Multi Mode")
 plt.title("Lognormal Particle Size Distribution")
 plt.xlabel("Particle Diameter (μm)")
 plt.ylabel("Number per micrometre of diameter")
 plt.xscale("log")
-plt.legend()
+plotting.legend(plt.gca())
 plt.grid(True)
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
@@ -172,15 +176,16 @@ multi_pmf_distribution = par.particles.get_lognormal_pmf_distribution(
 # number per bin even when the underlying continuous population is unchanged.
 
 # %%
-plt.figure(figsize=(10, 6))
+fig, ax = plotting.subplots(size="wide")
 plt.plot(x_values, single_pmf_distribution, label="Single Mode", linewidth=4)
 plt.plot(x_values, multi_pmf_distribution, label="Multi Mode")
 plt.title("Lognormal PMF Particle Size Distribution")
 plt.xlabel("Particle Diameter (μm)")
 plt.ylabel("Number of Particles")
 plt.xscale("log")
-plt.legend()
+plotting.legend(plt.gca())
 plt.grid(True)
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]

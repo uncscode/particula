@@ -1,6 +1,11 @@
 # %% [markdown]
 # # The lucky few: growth, charging and background capture
 #
+# The useful outcome is a defensible comparison of first-passage probabilities,
+# including unresolved lineages and uncertainty. Work through
+# [ion-only balance](gpu_ion_balance.py) first so that source and recombination
+# errors are not mistaken for an effect on aerosol survival.
+#
 # A large ensemble makes a rare survival fraction measurable. Each independent
 # box begins with one neutral **3 nm seed** and 32 neutral **100 nm background
 # particles**. The question is whether the original seed lineage reaches
@@ -30,9 +35,10 @@
 import argparse
 from dataclasses import replace
 
-import matplotlib.pyplot as plt
 import numpy as np
 import warp as wp
+from matplotlib import style as mplstyle
+from particula import plotting
 from scripts.gpu_studies.lucky_few import (
     SurvivalConfig,
     difference_interval,
@@ -182,9 +188,26 @@ def run_example(config=None, policies=("lower", "upper")):
     return results
 
 
+def plot_data(results):
+    """Keep the lineage counts, observation times and intervals used below."""
+    return [
+        {
+            "config": {
+                key: row["config"][key]
+                for key in ("boxes", "ion_pairs_cm3_s", "omitted")
+            },
+            "outcomes": np.asarray(row["outcomes"]).tolist(),
+            "time": np.asarray(row["time"]).tolist(),
+            "success_interval95": list(row["success_interval95"]),
+        }
+        for row in results
+    ]
+
+
+@mplstyle.context("particula.default")
 def plot_results(results):
     """Plot reduced lineage summaries; no particle states are downloaded."""
-    figure, axes = plt.subplots(1, 3, figsize=(14, 4), constrained_layout=True)
+    figure, axes = plotting.subplots(1, 3)
     labels, final = [], []
     for index, result in enumerate(results):
         config = result["config"]
@@ -192,16 +215,32 @@ def plot_results(results):
         coefficient = "0" if policy == "lower" else "10⁻¹⁵"
         label = "No ions" if q == 0 else f"q={q:g}, K={coefficient}"
         labels.append(label)
-        fractions = result["outcomes"] / config["boxes"]
+        color = {
+            0: "0.3",
+            2: plotting.COLORS["teal"],
+            10: plotting.COLORS["rust"],
+        }[q]
+        marker = {"reject": "s", "lower": "o", "upper": "^"}[policy]
+        fractions = np.asarray(result["outcomes"]) / config["boxes"]
         final.append(fractions[-1])
         low, high, _ = result["success_interval95"]
         value = fractions[-1, 0]
-        axes[0].plot(result["time"] / 3600, fractions[:, 0], label=label)
+        axes[0].plot(
+            np.asarray(result["time"]) / 3600,
+            fractions[:, 0],
+            label=label,
+            color=color,
+            linestyle="--" if policy == "upper" else "-",
+            marker=marker,
+            markevery=max(1, len(fractions) // 8),
+            markersize=4,
+        )
         axes[1].errorbar(
             index,
             value,
             yerr=np.array([[value - low], [high - value]]),
-            fmt="o",
+            fmt=marker,
+            color=color,
             capsize=4,
         )
     final = np.asarray(final)
@@ -210,16 +249,17 @@ def plot_results(results):
         axes[2].bar(labels, final[:, index], bottom=bottom, label=name)
         bottom += final[:, index]
     axes[0].set(xlabel="Time [h]", ylabel="Fraction reaching 50 nm")
-    axes[0].legend(title="Omitted K [m³/s]", fontsize=8, title_fontsize=8)
+    plotting.legend(axes[0], title="Omitted K [m³/s]", title_fontsize=12)
     axes[1].set(
         xticks=np.arange(len(labels)),
         xticklabels=labels,
-        ylabel="Success fraction with exact 95% interval",
+        ylabel="Success fraction\n(exact 95% interval)",
     )
     axes[2].set(ylabel="Fraction of original seed lineages", ylim=(0, 1))
-    axes[2].legend(fontsize=8)
+    plotting.legend(axes[2])
     for axis in axes[1:]:
         axis.tick_params(axis="x", rotation=30)
+    plotting.fit(figure)
     return figure
 
 
@@ -296,3 +336,20 @@ if __name__ == "__main__":
         ),
         selected,
     )
+
+# %% [markdown]
+# ## Ask which uncertainty limits the conclusion
+#
+# The outcome partition answers whether an original seed reaches the size target
+# before background capture under the stated model. It does not give the number
+# of cloud-active particles remaining at a later time. A difference between ion
+# cases must be interpreted alongside both finite-ensemble intervals and the two
+# explicit attachment assumptions.
+#
+# A concrete follow-up is to vary the vapor feed while retaining the background
+# population and both omitted-rate policies. Compare success-minus-control
+# intervals, unresolved fractions, and time-to-target distributions. Declare the
+# smallest probability difference of scientific interest first, then choose enough
+# independent boxes and numerical refinement to resolve it. An atmospheric claim
+# would additionally require justified vapor, background, and attachment inputs;
+# more GPU realizations cannot remove uncertainty in those assumptions.

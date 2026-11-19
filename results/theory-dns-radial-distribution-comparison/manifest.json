@@ -1,25 +1,26 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 3.1828678760211915,
-  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "elapsed_seconds": 4.125911755952984,
+  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "theory-dns-radial-distribution-comparison",
-  "fingerprint": "9fadcad7d28356f6fe33001924f2f1b6c7aebfe22e0e70babb864bb0411b99c7",
+  "fingerprint": "fb55b2b8e7306263706e9c0961bf42254589fd088f995d1c7ed5f94d664d899f",
   "source": "docs/theory/dynamics/cloud-droplet-coagulation/dns-radial-distribution-comparison.py",
-  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "revision": "6af97152d1570464ac5ccae56e3110001657e170",
   "package_dirty": false,
-  "executed_at": "2026-11-13T14:59:33.721012+00:00",
+  "executed_at": "2026-11-19T14:32:11.100487+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.2.14",
+    "particula": "0.3.2",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
     "nbclient": "0.10.2",
     "jupytext": "1.17.3",
-    "warp-lang": "1.11.1"
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
   },
   "outputs": [
     [],
@@ -33,7 +34,7 @@
     ]
   ],
   "files": {
-    "source.py": "f928951319a7d6dfed7a18d352a189a7e44000950f76b4281607f0efeea1500d",
-    "figure-5-1.png": "9d5baabbd331b3e25daff249eb96fe5f298f204a920c71a8a5550ffa434534dc"
+    "figure-5-1.png": "3f1797a2f7c63bfacfe47c12ef038849e5eb4839ef9fdd16ebf55fdb894593b3",
+    "source.py": "695d142f053e157e37067ba54b72b3476c2ef2f06ce90be577f07cb006afddd6"
   }
 }

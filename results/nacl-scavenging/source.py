@@ -18,8 +18,10 @@
 # %%
 import matplotlib.pyplot as plt
 import numpy as np
-from particula import gas, particles
+from particula import gas, particles, plotting
 from scipy.optimize import brentq
+
+plt.style.use("particula.default")
 
 for diameter_nm, states in [(4, [-1, 0, 1]), (100, [-2, -1, 0, 1, 2])]:
     fractions = particles.get_bipolar_charge_probability(
@@ -85,7 +87,7 @@ capture = np.genfromtxt(
 )
 full = capture[(capture["case"] == "reference") & (capture["model"] == "full")]
 np.testing.assert_array_equal(full["target_nm"], rates["d_nm"])
-fig, ax = plt.subplots(layout="constrained")
+fig, ax = plotting.subplots()
 for field, label, style in [
     ("measured_cm3_s", "Cai measurements", "ko"),
     ("native_steady_cm3_s", "Charged hard spheres", "v-"),
@@ -97,14 +99,15 @@ ax.plot(
     full["target_nm"],
     full["apparent_cm3_s"] * 1e7,
     "D--",
-    color="#8e4875",
+    color=plotting.COLORS["berry"],
     label="Dielectric spheres, hard-sphere tail",
 )
 ax.set(
     xlabel="Nominal tracer diameter (nm)",
     ylabel="Capture coefficient (10⁻⁷ cm³/s)",
 )
-ax.legend(frameon=False)
+plotting.legend(ax, frameon=False)
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
@@ -127,9 +130,7 @@ pairs = np.genfromtxt(
     "docs/data/nacl-scavenging/capture-pairs.csv", names=True, delimiter=","
 )
 probe = pairs[pairs["target_nm"] == 4]
-fig, (left, right) = plt.subplots(
-    1, 2, figsize=(9.2, 4.0), layout="constrained"
-)
+fig, (left, right) = plotting.subplots(1, 2)
 labels = [
     f"({int(a):+d}, {int(b):+d})"
     for a, b in zip(
@@ -151,7 +152,7 @@ left.set(
     ylabel="Pair rate (10⁻⁷ cm³/s)",
     title="4 nm tracer and 100 nm collector",
 )
-left.legend(fontsize=8)
+plotting.legend(left)
 x = np.arange(len(full))
 right.bar(
     x - 0.19,
@@ -174,7 +175,8 @@ right.set(
     ylabel="Outside model domain (%)",
     title="Pairs assigned the hard-sphere rate",
 )
-right.legend(fontsize=8)
+plotting.legend(right)
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
@@ -204,7 +206,7 @@ other = np.genfromtxt(
 )
 reference = other[other["case"] == "reference"]
 baseline = reference[reference["model"] == "full"]
-fig, ax = plt.subplots(figsize=(6.8, 4.1), layout="constrained")
+fig, ax = plotting.subplots(size="wide")
 ax.semilogy(
     baseline["target_nm"],
     baseline["measured_cm3_s"] - baseline["apparent_cm3_s"],
@@ -225,9 +227,10 @@ for model, label, style in [
     )
 ax.set(
     xlabel="Nominal tracer diameter (nm)",
-    ylabel="Difference in apparent capture rate (cm³/s)",
+    ylabel="Apparent capture-rate\ndifference (cm³/s)",
 )
-ax.legend(fontsize=8)
+plotting.legend(ax)
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
@@ -268,9 +271,7 @@ inlet = spectrum[
     & (spectrum["loading_cm3"] > 0)
 ]
 readout = pulse[(pulse["readout"] == "archived_scan") & (pulse["dt_s"] == 2.5)]
-fig, (channels_ax, rates_ax) = plt.subplots(
-    1, 2, figsize=(10, 4.3), layout="constrained"
-)
+fig, (channels_ax, rates_ax) = plotting.subplots(1, 2, size="wide")
 data = inlet[inlet["source"] == "reference"]
 channels_ax.plot(
     data["channel_nm"],
@@ -280,8 +281,14 @@ channels_ax.plot(
 )
 models = ["bare", "dispersion_only", "full", "full_settling_shear_10", "gatti"]
 for source, label, color, marker, shift in [
-    ("reference", "Reference source", "tab:blue", "o", -0.1),
-    ("smps_conditioned", "Fit to mean channel", "tab:orange", "s", 0.1),
+    ("reference", "Reference source", plotting.COLORS["teal"], "o", -0.1),
+    (
+        "smps_conditioned",
+        "Fit to mean channel",
+        plotting.COLORS["rust"],
+        "s",
+        0.1,
+    ),
 ]:
     subset = inlet[inlet["source"] == source]
     channels_ax.plot(
@@ -306,12 +313,12 @@ channels_ax.set(
     xlabel="SMPS channel diameter (nm)",
     ylabel="Share of seven-channel signal (%)",
 )
-channels_ax.legend(fontsize=8)
+plotting.legend(channels_ax)
 rates_ax.axhline(
     1.76, color="black", linestyle="--", label="Steady measurement"
 )
 rates_ax.set(
-    ylabel="Pulse capture coefficient (10⁻⁷ cm³/s)",
+    ylabel="Pulse capture coefficient\n(10⁻⁷ cm³/s)",
     xticks=np.arange(5),
     xticklabels=[
         "Bare",
@@ -321,8 +328,9 @@ rates_ax.set(
         "Gatti",
     ],
 )
-rates_ax.tick_params(axis="x", labelsize=8)
-rates_ax.legend(fontsize=8)
+rates_ax.tick_params(axis="x", labelsize=12)
+plotting.legend(rates_ax)
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]

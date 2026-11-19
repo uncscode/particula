@@ -166,15 +166,16 @@ def simulate():
 
 
 # %%
+@plt.style.context("particula.default")
 def plot_results(result):
     """Show measured slip residuals and the transfer of a 100 nm calibration."""
-    fig, (left, right) = plt.subplots(
-        1, 2, figsize=(10.4, 4.7), layout="constrained"
-    )
+    from particula import plotting
+
+    fig, (left, right) = plotting.subplots(1, 2)
     for d, color, marker in [
-        (19.9, "#14766b", "o"),
-        (100.7, "#2861a2", "s"),
-        (269, "#aa501c", "^"),
+        (19.9, plotting.COLORS["teal"], "o"),
+        (100.7, plotting.COLORS["indigo"], "s"),
+        (269, plotting.COLORS["rust"], "^"),
     ]:
         group = [r for r in result["measured"] if r["diameter_nm"] == d]
         left.scatter(
@@ -189,13 +190,21 @@ def plot_results(result):
         xscale="log",
         xlabel="Published Knudsen number",
         ylabel="Slip factor difference (%)",
-        title="Particula versus measured PSL slip",
+        title="Measured PSL slip",
     )
-    left.legend(title="Assigned diameter")
+    plotting.legend(left, placement="inside", title="Diameter")
     scan = result["scan"]
     for key, label, color in [
-        ("size_error_pct", "Original mobility scale", "#2861a2"),
-        ("calibrated_size_error_pct", "Matched at 100 nm", "#aa501c"),
+        (
+            "size_error_pct",
+            "Original mobility scale",
+            plotting.COLORS["indigo"],
+        ),
+        (
+            "calibrated_size_error_pct",
+            "Matched at 100 nm",
+            plotting.COLORS["rust"],
+        ),
     ]:
         right.plot(
             [r["diameter_nm"] for r in scan],
@@ -210,21 +219,20 @@ def plot_results(result):
         color=".92",
         zorder=0,
     )
-    right.plot(100, 0, "o", color="#aa501c", ms=4)
+    right.plot(100, 0, "o", color=plotting.COLORS["rust"], ms=4)
     right.set(
         xscale="log",
         xlabel="Reference diameter (nm)",
         ylabel="Retrieved diameter difference (%)",
-        title="Synthetic sizing at 101.3 kPa",
+        title="Sizing at 101.3 kPa",
     )
     right.set_xticks(
         [20, 50, 100, 200, 300], labels=["20", "50", "100", "200", "300"]
     )
-    right.legend()
+    plotting.legend(right)
     for ax in (left, right):
         ax.axhline(0, color=".4", lw=0.7)
-        ax.grid(axis="y", alpha=0.18)
-        ax.spines[["top", "right"]].set_visible(False)
+    plotting.fit(fig)
     return fig
 
 

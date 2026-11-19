@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 4.958355674054474,
+  "package_source_sha256": "497407730cbc76793fb12405a106766432bb18a77fc6a4bc730d36c0531e33d0",
+  "input_sha256": {},
+  "example": "figure-styles",
+  "fingerprint": "d6a7a187fb16f9d52536d5c720299b3c51bd0e12d4c0fa219d491a07887cc435",
+  "source": "docs/examples/fundamentals/figure_styles.py",
+  "revision": "141a0e74983c9ee190d161e8bbd9c12e2070f3c2",
+  "package_dirty": false,
+  "executed_at": "2026-11-19T13:50:51.645888+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.2",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [
+      {
+        "image": "figure-2-1.png"
+      }
+    ],
+    [
+      {
+        "text": "Finished wide figure (inches): [8.35 4.12]\n"
+      },
+      {
+        "image": "figure-3-1.png"
+      }
+    ],
+    [
+      {
+        "image": "figure-4-1.png"
+      }
+    ],
+    [
+      {
+        "image": "figure-5-1.png"
+      }
+    ],
+    [
+      {
+        "image": "figure-6-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "figure-6-1.png": "8eddae60f6748c21def4084563a68292ccd82996e56ac8a8e1cfb29caa778f27",
+    "figure-5-1.png": "276ab64495d798a6a6f8d19fa54f8a735ebcc10371963b282bf21b8d7bd8a1ad",
+    "figure-4-1.png": "3ddb61d7041e994e782833c3ad003a34282753c04121a4cc8cadc42d27f92ae8",
+    "figure-3-1.png": "f2c8feffff2728ffa364d19d2556adf44a62cea2a48cfbf3ce3483386e21097d",
+    "figure-2-1.png": "38f32b58c05698a5b14482ac2b01f45e127b97ae137d4cba11fa543559984e31",
+    "source.py": "ab98e1b2e66adf6c1c73058d8a9dd2716d31b1c15dbd9758d13c25db6bce68ef"
+  }
+}

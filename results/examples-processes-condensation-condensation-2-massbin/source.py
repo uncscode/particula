@@ -13,13 +13,19 @@
 # ---
 
 # %% [markdown]
-# # Condensation Tutorial: Mass Binned
+# # Water uptake from a maintained vapor reservoir
 #
-# The published 10,000-substep integration is retained. Gas is a prescribed
-# reservoir (`update_gases=False`); this is an open-system uptake example.
+# Can a hygroscopic particle grow when the gas is below pure-water saturation?
+# This example integrates composition-dependent uptake at prescribed 80% water
+# saturation. Activity lowers the surface equilibrium pressure; curvature opposes
+# uptake. The gas reservoir is maintained (`update_gases=False`), so particle mass
+# can increase without a matching decrease in the stored gas concentration.
 #
-# A mass binned model is relaxes the assumption of a single composition for all particles in a given bin. Instead, it allows for a distribution of compositions within each bin. This is useful when the composition of particles is separated by masses. This does not account for the same sized particles having different compositions, but rather different sized particles having different compositions.
-#
+# Begin with the [initial-rate example](condensation_1_bin.py) and
+# [activity models](../../thermodynamics/activity/index.md). Here each moving bin
+# stores a component-mass vector and a number concentration. Different bins may
+# have different compositions; the model does not represent a composition
+# distribution within one bin.
 
 # %%
 # In Colab uncomment the following command to install particula:
@@ -27,15 +33,22 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from particula import plotting
 from particula.dynamics.condensation.species_mapping import (
     CondensationSpeciesMap,
 )
 
+plt.style.use("particula.default")
+
 # %% [markdown]
-# ## Aerosol Setup
+# ## Define the reservoir and component assumptions
 #
-# First we'll draw from a lognormal distribution to create a set of particles. We'll will then build an aerosol object to represent the aerosol population.
-#
+# Water starts at 0.8 times its Buck saturation concentration at 298.15 K and
+# 101325 Pa. The second component is assigned negligible vapor pressure. The
+# retained label `NH4HSO4` is a storage identifier; the molar mass, density, and
+# κ parameters are illustrative and should not be read as a consistent chemical
+# specification of ammonium bisulfate. A material-specific study must reconcile
+# those inputs with its chosen substance.
 
 # %%
 # Ammonium sulfate and water vapor pressure
@@ -73,9 +86,17 @@ environment = par.gas.EnvironmentData(
 )
 
 # %% [markdown]
-# **Sample Distribution**
+# ## Sample sizes, then assign physical abundance
 #
-# Next we'll sample the distribution to get a set of particles. We'll then build an aerosol object to represent the aerosol population.
+# The first figure is a probability density per metre of radius for 1,000 sampled
+# sizes. The two lognormal radius scales and relative sampling weights determine
+# its shape. Each resulting computational bin is subsequently assigned 10 cm⁻³,
+# so the physical number concentration is determined by these assigned weights,
+# not by the normalized histogram height.
+#
+# Material lanes are water followed by the hygroscopic component. The κ model
+# and volume-weighted surface model connect evolving composition to equilibrium
+# surface pressure. Follow this ordering into the explicit gas-to-material map.
 
 # %%
 # sample
@@ -91,11 +112,12 @@ particles_sample = par.particles.get_lognormal_sample_distribution(
 bins_lognormal = np.logspace(-8, -4, 100)
 bins, edges = np.histogram(particles_sample, bins=bins_lognormal, density=True)
 # plot
-fig, ax = plt.subplots(figsize=(8, 6))
+fig, ax = plotting.subplots(size="wide")
 ax.bar(edges[:-1], bins, width=np.diff(edges), align="edge")
 ax.set_xscale("log")
 ax.set_xlabel("Radius (m)")
 ax.set_ylabel("Probability density per metre of radius")
+plotting.fit(fig)
 plt.show()
 
 # %%
@@ -147,9 +169,17 @@ aerosol = par.Aerosol(
 print(aerosol)
 
 # %% [markdown]
-# ## Condensation Process
+# ## Advance mass while keeping the reservoir fixed
 #
-# Using the same iso thermal condensation process as in the bulk model, we'll update the properties of the particles in the aerosol object. In this cas we will change the water saturation ratio to be 80% and simulate the condensation process.
+# The accommodation coefficient is 0.1. Each `execute` call advances 11 s with
+# 10,000 substeps; the two calls therefore display 11 s and 22 s after initialization.
+# The unused time-array setup does not define the displayed timeline. Temperature
+# and gas concentration stay prescribed.
+#
+# The overlay counts computational bins by radius, unlike the earlier normalized
+# probability-density plot. All bins have equal number concentration here, so its
+# shape also tracks the population shape up to a common factor. It does not show
+# component mass or prove an equilibrium endpoint.
 
 # %%
 # define the condensation process
@@ -178,7 +208,7 @@ total_mass = np.zeros_like(time_array)
 aerosol_sim = []
 
 
-fig, ax = plt.subplots(figsize=(8, 6))
+fig, ax = plotting.subplots(size="wide")
 bins, edges = np.histogram(aerosol.particles.radii[0], bins=bins_lognormal)
 ax.bar(edges[:-1], bins, width=np.diff(edges), align="edge", label="Initial")
 
@@ -213,16 +243,19 @@ print(aerosol)
 
 ax.set_xscale("log")
 # ax.set_yscale("log")
-plt.legend()
+plotting.legend(plt.gca())
 ax.set_xlabel("Radius (m)")
 ax.set_ylabel("Computational bins")
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
-# ## Summary
+# ## Check the open-system interpretation
 #
-# We built out the condensation process, and the equations that define the process. We also defined the inputs and outputs of the process. Next we will build out coagulation and nucleation processes, to complete the aerosol dynamics framework.
-
+# The following checks require unchanged gas concentration, finite nonnegative
+# particle masses, and positive net water uptake. They match the intended maintained
+# reservoir. A gas-plus-particle closed-inventory assertion would be inappropriate:
+# water supplied from outside this modeled inventory supports the growth.
 
 # %%
 # Open-system checks: the fixed reservoir supplies net condensed water.
@@ -231,3 +264,18 @@ if not np.all(np.isfinite(particles.masses)) or np.any(particles.masses < 0):
     raise AssertionError("Nonphysical particle masses")
 if particles.species_mass_density[0, 0] <= initial_water_mass:
     raise AssertionError("Expected water uptake from the prescribed reservoir")
+
+# %% [markdown]
+# ## Turn uptake into a comparison
+#
+# The calculation demonstrates why pure-water subsaturation need not imply drying
+# for a hygroscopic solution. Its evidence is net water uptake under the specified
+# activity, curvature, and maintained-vapor assumptions, not validation of a
+# particular salt or convergence of the 22 s state.
+#
+# To ask whether a chamber's finite vapor supply limits growth, compare with the
+# [particle-resolved finite-reservoir example](condensation_3_massresolved.py).
+# Hold initial composition and physical number density fixed when making that
+# comparison, track gas-plus-particle water, and refine the timestep separately
+# from checking conservation. The published examples have different initial
+# conditions and cannot be interpreted as a controlled method comparison as-is.

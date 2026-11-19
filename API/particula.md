@@ -66,5 +66,6 @@ Expose prepared simulation types without loading optional runtimes.
 - `particula.logger_setup`
 - `particula.optics`
 - `particula.particles`
+- `particula.plotting`
 - `particula.runnable`
 - `particula.util`

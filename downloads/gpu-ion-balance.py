@@ -27,7 +27,8 @@ from time import perf_counter
 import matplotlib.pyplot as plt
 import numpy as np
 import warp as wp
-from particula import Aerosol
+from matplotlib import style as mplstyle
+from particula import Aerosol, plotting
 from particula.dynamics.ions.cleanup import IonNeutralCleanup
 from particula.dynamics.ions.coagulation import (
     NEGATIVE_ION_MASS,
@@ -230,11 +231,12 @@ def run_case(q_cm3, *, boxes=64, capacity=256, time_step=1.0):
 
 
 # %%
+@mplstyle.context("particula.default")
 def run_example():
     """Compare CUDA ensembles with independent references and inspect budgets."""
     if not wp.is_cuda_available():
         raise RuntimeError("This example requires CUDA; no CPU fallback")
-    figure, axes = plt.subplots(1, 3, figsize=(12, 4), constrained_layout=True)
+    figure, axes = plotting.subplots(1, 3)
     conversion = 1 / VOLUME / 1e6  # pairs per box → ions per polarity per cm³
     for axis, q in zip(axes, [0, 2, 10], strict=True):
         times, mean, sem, reference = run_case(q)
@@ -261,7 +263,8 @@ def run_example():
             xlabel="Time [s]",
             ylabel="Free ions per polarity [cm⁻³]",
         )
-    axes[0].legend(fontsize=8)
+    plotting.legend(axes[0])
+    plotting.fit(figure)
     plt.show()
     return figure
 

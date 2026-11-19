@@ -29,6 +29,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from particula import plotting
+
+plt.style.use("particula.default")
 
 # %%
 water_buck = par.gas.VaporPressureFactory().get_strategy("water_buck")
@@ -121,13 +124,14 @@ for index, (temperature, pressure) in enumerate(
     saturation_ratio[index] = environment.saturation_ratio[0, 0]
 
 # Plot the saturation ratio of water vapor at each altitude
-fig, ax = plt.subplots()
+fig, ax = plotting.subplots()
 ax.plot(saturation_ratio, altitude_range, label="Water")
 ax.set_xscale("log")
 ax.set_ylabel("Altitude (m)")
 ax.set_xlabel("Water Saturation Ratio")
-ax.set_title("Saturation Ratio of Water Vapor at Different Altitudes")
-ax.legend()
+ax.set_title("Water vapor saturation")
+plotting.legend(ax)
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]

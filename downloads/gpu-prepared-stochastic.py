@@ -1,6 +1,11 @@
 # %% [markdown]
 # # Separate stochastic coagulation from initial-state variability
 #
+# The figure uses a new CUDA run with the archived scientific code. Its
+# library, example source and input files matched the original publication
+# by SHA-256. With the same one-second interval, current Particula requests
+# 6,512 collision trials in box zero and has capacity for 512.
+#
 # Would a second simulation tell the same physical story if only its collision
 # seed changed? This experiment isolates process randomness from initial sampling.
 # It teaches you to compare an ensemble spread with a proposed model effect.
@@ -23,7 +28,7 @@
 """Manually refreshed sixteen-seed CUDA particle-resolved coagulation study."""
 
 import matplotlib.pyplot as plt
-import warp as wp
+import numpy as np
 from scripts.docs_gpu_figures import stochastic_figures
 from scripts.gpu_studies.cases import StudyCase, build_case, radius_histogram
 from scripts.gpu_studies.trajectories import run_trajectory
@@ -44,13 +49,19 @@ def run_example():
     initial, process, processes = build_case(case)
     _, histogram = radius_histogram(initial)
     report = run_trajectory(case, initial, process, processes)
-    stochastic_figures(
-        report,
-        histogram,
-        "Brownian particle histories · " + wp.get_device("cuda:0").name,
-    )
+    report["initial_histogram"] = histogram.tolist()
+    plot_results(report)
     plt.show()
     return report
+
+
+def plot_results(report):
+    """Draw the measured histories from a completed CUDA run."""
+    return stochastic_figures(
+        report,
+        np.asarray(report["initial_histogram"]),
+        "Brownian particle histories",
+    )
 
 
 # %% [markdown]

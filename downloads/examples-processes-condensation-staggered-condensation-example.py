@@ -32,9 +32,12 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from particula import plotting
 from particula.dynamics.condensation.species_mapping import (
     CondensationSpeciesMap,
 )
+
+plt.style.use("particula.default")
 
 # Set random seed for reproducibility
 RANDOM_SEED = 42
@@ -243,7 +246,7 @@ for mode in modes:
 # %%
 time = np.arange(n_steps + 1) * time_step
 
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
+fig, (ax1, ax2) = plotting.subplots(1, 2, size="wide")
 
 # Plot total mass over time
 for mode, data in results.items():
@@ -252,7 +255,7 @@ for mode, data in results.items():
 ax1.set_xlabel("Time (s)")
 ax1.set_ylabel("Total System Mass (kg)")
 ax1.set_title("Total Mass Over Time")
-ax1.legend()
+plotting.legend(ax1)
 ax1.ticklabel_format(style="scientific", axis="y", scilimits=(0, 0))
 
 # Plot relative mass error
@@ -265,12 +268,12 @@ ax2.set_xlabel("Time (s)")
 ax2.set_ylabel("Relative Mass Error")
 ax2.set_title("Mass Conservation Error")
 ax2.set_yscale("log")
-ax2.legend()
+plotting.legend(ax2)
 ax2.axhline(
     y=1e-10, color="gray", linestyle="--", alpha=0.5, label="Target (1e-10)"
 )
 
-plt.tight_layout()
+plotting.fit(fig)
 plt.show()
 
 # Print final relative errors
@@ -323,7 +326,7 @@ simultaneous_mass, simultaneous_gas = run_simulation(
 # Plot comparison
 time_stability = np.arange(n_steps_stability + 1) * large_time_step
 
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
+fig, (ax1, ax2) = plotting.subplots(1, 2, size="wide")
 
 # Particle mass evolution
 ax1.plot(
@@ -339,7 +342,7 @@ ax1.plot(
 ax1.set_xlabel("Time (s)")
 ax1.set_ylabel("Particle Mass (kg)")
 ax1.set_title(f"Particle Mass (dt = {large_time_step}s)")
-ax1.legend()
+plotting.legend(ax1)
 
 # Mass conservation comparison
 staggered_total = staggered_mass + staggered_gas
@@ -364,9 +367,9 @@ ax2.set_xlabel("Time (s)")
 ax2.set_ylabel("Relative Mass Error")
 ax2.set_title("Mass Conservation at Large Time Steps")
 ax2.set_yscale("log")
-ax2.legend()
+plotting.legend(ax2)
 
-plt.tight_layout()
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
@@ -403,7 +406,7 @@ for num_batches in batch_counts:
     batch_results[num_batches] = particle_mass + gas_mass
 
 # Plot mass conservation vs batch count
-fig, ax = plt.subplots(figsize=(8, 5))
+fig, ax = plotting.subplots(size="wide")
 
 for num_batches, total_mass in batch_results.items():
     initial = total_mass[0]
@@ -414,8 +417,8 @@ ax.set_xlabel("Time (s)")
 ax.set_ylabel("Relative Mass Error")
 ax.set_title("Effect of Batch Count on Mass Conservation")
 ax.set_yscale("log")
-ax.legend()
-plt.tight_layout()
+plotting.legend(ax)
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]

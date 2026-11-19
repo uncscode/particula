@@ -1,6 +1,11 @@
 # %% [markdown]
 # # A million-particle source, collision and loss lifecycle
 #
+# The figure uses a new CUDA run with the archived scientific code. Its
+# library, example source and input files matched the original publication
+# by SHA-256. With the same one-second interval, current Particula requests
+# 564 collision trials in box zero and has capacity for 193.
+#
 # Can a multi-process run explain why particles disappear while also preserving
 # its exact continuation after a restart? Follow the first-cycle process ledger
 # before reading the final size distribution. This connects physical source and
@@ -28,7 +33,7 @@
 """Manually refreshed large native CUDA lifecycle with exact continuation."""
 
 import matplotlib.pyplot as plt
-import warp as wp
+import numpy as np
 from scripts.docs_gpu_figures import lifecycle_figures
 from scripts.gpu_studies.cases import StudyCase, build_case, radius_histogram
 from scripts.gpu_studies.trajectories import run_trajectory
@@ -49,15 +54,21 @@ def run_example():
     initial, process, processes = build_case(case)
     _, histogram = radius_histogram(initial)
     report = run_trajectory(case, initial, process, processes)
-    lifecycle_figures(
-        report,
-        histogram,
-        "1.57 million active particles · " + wp.get_device("cuda:0").name,
-    )
+    report["initial_histogram"] = histogram.mean(axis=0, keepdims=True).tolist()
+    plot_results(report)
     print("Initial active count:", int(initial.particles.concentration.sum()))
     print("Slot capacity:", case.boxes * case.slots)
     plt.show()
     return report
+
+
+def plot_results(report):
+    """Draw the measured histories from a completed CUDA run."""
+    return lifecycle_figures(
+        report,
+        np.asarray(report["initial_histogram"]),
+        "1.57 million active particles",
+    )
 
 
 # %% [markdown]

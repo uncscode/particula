@@ -1,25 +1,26 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 248.32820226298645,
-  "package_source_sha256": "1dd84196d906621c955f448b78f5dcddad63ec0157ac16bb8d2884f7a6fe6371",
+  "elapsed_seconds": 299.327586948988,
+  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "examples-simulations-organic-partitioning-and-coagulation",
-  "fingerprint": "dd06c313595fa3717bc9d2ec49ffd4ad42152adac651add3605ee87eb2355a5f",
+  "fingerprint": "124b556dc8cba1536b205825ef6791fbbf14877d3e770efc17e22151103062ee",
   "source": "docs/examples/simulations/organic_partitioning_and_coagulation.py",
-  "revision": "b4e98034b2150dad71d6e8f53085640a64561e64",
-  "package_dirty": true,
-  "executed_at": "2026-11-14T00:37:19.219307+00:00",
+  "revision": "dd92d3c1ca71f36eacad56b49661b32c0da77ac7",
+  "package_dirty": false,
+  "executed_at": "2026-11-19T14:42:14.554227+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.2.14",
+    "particula": "0.3.2",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
     "nbclient": "0.10.2",
     "jupytext": "1.17.3",
-    "warp-lang": "1.11.1"
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
   },
   "outputs": [
     [],
@@ -39,1450 +40,1681 @@
         "text": "\rExecuting Runnable:   0%|          | 0/100000 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   0%|          | 207/100000 [00:00<04:01, 412.47it/s]"
+        "text": "\rExecuting Runnable:   0%|          | 141/100000 [00:00<05:54, 281.45it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   0%|          | 414/100000 [00:01<04:07, 402.54it/s]"
+        "text": "\rExecuting Runnable:   0%|          | 282/100000 [00:01<06:08, 270.70it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   1%|          | 621/100000 [00:01<04:04, 406.87it/s]"
+        "text": "\rExecuting Runnable:   0%|          | 428/100000 [00:01<05:56, 279.69it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   1%|          | 825/100000 [00:02<04:04, 405.85it/s]"
+        "text": "\rExecuting Runnable:   1%|          | 629/100000 [00:02<05:04, 326.68it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   1%|          | 1039/100000 [00:02<03:59, 413.69it/s]"
+        "text": "\rExecuting Runnable:   1%|          | 830/100000 [00:02<04:40, 353.46it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   1%|\u258f         | 1254/100000 [00:03<03:55, 419.09it/s]"
+        "text": "\rExecuting Runnable:   1%|          | 1022/100000 [00:03<04:32, 363.52it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   1%|\u258f         | 1464/100000 [00:03<03:55, 418.23it/s]"
+        "text": "\rExecuting Runnable:   1%|          | 1217/100000 [00:03<04:25, 372.03it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   2%|\u258f         | 1674/100000 [00:04<04:04, 402.31it/s]"
+        "text": "\rExecuting Runnable:   1%|\u258f         | 1418/100000 [00:04<04:18, 380.95it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   2%|\u258f         | 1881/100000 [00:04<04:02, 405.30it/s]"
+        "text": "\rExecuting Runnable:   2%|\u258f         | 1619/100000 [00:04<04:13, 387.42it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   2%|\u258f         | 2085/100000 [00:05<04:01, 404.71it/s]"
+        "text": "\rExecuting Runnable:   2%|\u258f         | 1817/100000 [00:05<04:12, 389.53it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   2%|\u258f         | 2292/100000 [00:05<04:00, 407.06it/s]"
+        "text": "\rExecuting Runnable:   2%|\u258f         | 2012/100000 [00:05<04:15, 383.01it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   2%|\u258f         | 2497/100000 [00:06<03:59, 407.91it/s]"
+        "text": "\rExecuting Runnable:   2%|\u258f         | 2211/100000 [00:06<04:12, 387.16it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   3%|\u258e         | 2704/100000 [00:06<03:57, 409.55it/s]"
+        "text": "\rExecuting Runnable:   2%|\u258f         | 2410/100000 [00:06<04:10, 389.99it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   3%|\u258e         | 2911/100000 [00:07<03:56, 410.59it/s]"
+        "text": "\rExecuting Runnable:   3%|\u258e         | 2606/100000 [00:07<04:12, 385.15it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   3%|\u258e         | 3118/100000 [00:07<03:55, 411.31it/s]"
+        "text": "\rExecuting Runnable:   3%|\u258e         | 2804/100000 [00:07<04:10, 388.15it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   3%|\u258e         | 3324/100000 [00:08<03:56, 408.09it/s]"
+        "text": "\rExecuting Runnable:   3%|\u258e         | 3007/100000 [00:08<04:06, 393.28it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   4%|\u258e         | 3533/100000 [00:08<03:54, 410.50it/s]"
+        "text": "\rExecuting Runnable:   3%|\u258e         | 3210/100000 [00:08<04:03, 396.92it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   4%|\u258e         | 3739/100000 [00:09<03:57, 404.51it/s]"
+        "text": "\rExecuting Runnable:   3%|\u258e         | 3409/100000 [00:09<04:03, 395.89it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   4%|\u258d         | 3951/100000 [00:09<03:54, 410.09it/s]"
+        "text": "\rExecuting Runnable:   4%|\u258e         | 3608/100000 [00:09<04:07, 390.06it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   4%|\u258d         | 4157/100000 [00:10<03:59, 400.45it/s]"
+        "text": "\rExecuting Runnable:   4%|\u258d         | 3810/100000 [00:10<04:04, 393.65it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   4%|\u258d         | 4358/100000 [00:10<04:06, 387.49it/s]"
+        "text": "\rExecuting Runnable:   4%|\u258d         | 4013/100000 [00:10<04:01, 396.95it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   5%|\u258d         | 4567/100000 [00:11<04:00, 396.06it/s]"
+        "text": "\rExecuting Runnable:   4%|\u258d         | 4214/100000 [00:11<04:00, 398.40it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   5%|\u258d         | 4772/100000 [00:11<03:58, 399.92it/s]"
+        "text": "\rExecuting Runnable:   4%|\u258d         | 4414/100000 [00:11<04:04, 391.29it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   5%|\u258d         | 4974/100000 [00:12<03:56, 400.98it/s]"
+        "text": "\rExecuting Runnable:   5%|\u258d         | 4617/100000 [00:12<04:01, 395.19it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   5%|\u258c         | 5175/100000 [00:12<03:58, 397.42it/s]"
+        "text": "\rExecuting Runnable:   5%|\u258d         | 4822/100000 [00:12<03:58, 399.27it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   5%|\u258c         | 5383/100000 [00:13<03:55, 402.30it/s]"
+        "text": "\rExecuting Runnable:   5%|\u258c         | 5026/100000 [00:13<03:56, 401.76it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   6%|\u258c         | 5590/100000 [00:13<03:52, 405.38it/s]"
+        "text": "\rExecuting Runnable:   5%|\u258c         | 5229/100000 [00:13<03:55, 403.00it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   6%|\u258c         | 5793/100000 [00:14<03:55, 400.18it/s]"
+        "text": "\rExecuting Runnable:   5%|\u258c         | 5431/100000 [00:14<04:01, 391.32it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   6%|\u258c         | 5994/100000 [00:14<03:55, 399.90it/s]"
+        "text": "\rExecuting Runnable:   6%|\u258c         | 5628/100000 [00:14<04:31, 347.74it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   6%|\u258c         | 6199/100000 [00:15<03:52, 402.58it/s]"
+        "text": "\rExecuting Runnable:   6%|\u258c         | 5807/100000 [00:15<04:46, 328.69it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   6%|\u258b         | 6416/100000 [00:15<03:47, 411.42it/s]"
+        "text": "\rExecuting Runnable:   6%|\u258c         | 5976/100000 [00:16<04:58, 314.75it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   7%|\u258b         | 6622/100000 [00:16<03:51, 402.89it/s]"
+        "text": "\rExecuting Runnable:   6%|\u258c         | 6136/100000 [00:16<05:03, 308.91it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   7%|\u258b         | 6824/100000 [00:16<03:52, 400.59it/s]"
+        "text": "\rExecuting Runnable:   6%|\u258b         | 6293/100000 [00:17<05:09, 302.71it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   7%|\u258b         | 7033/100000 [00:17<03:49, 405.52it/s]"
+        "text": "\rExecuting Runnable:   6%|\u258b         | 6446/100000 [00:17<05:17, 294.42it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   7%|\u258b         | 7236/100000 [00:17<03:50, 401.95it/s]"
+        "text": "\rExecuting Runnable:   7%|\u258b         | 6600/100000 [00:18<05:13, 297.62it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   7%|\u258b         | 7448/100000 [00:18<03:46, 407.98it/s]"
+        "text": "\rExecuting Runnable:   7%|\u258b         | 6760/100000 [00:18<05:07, 303.62it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   8%|\u258a         | 7653/100000 [00:18<03:46, 407.75it/s]"
+        "text": "\rExecuting Runnable:   7%|\u258b         | 6943/100000 [00:19<04:49, 321.49it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   8%|\u258a         | 7857/100000 [00:19<03:47, 404.96it/s]"
+        "text": "\rExecuting Runnable:   7%|\u258b         | 7142/100000 [00:19<04:30, 343.29it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   8%|\u258a         | 8066/100000 [00:19<03:45, 408.56it/s]"
+        "text": "\rExecuting Runnable:   7%|\u258b         | 7341/100000 [00:20<04:18, 358.87it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   8%|\u258a         | 8271/100000 [00:20<03:46, 405.76it/s]"
+        "text": "\rExecuting Runnable:   8%|\u258a         | 7525/100000 [00:20<04:15, 361.53it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   8%|\u258a         | 8481/100000 [00:20<03:43, 409.47it/s]"
+        "text": "\rExecuting Runnable:   8%|\u258a         | 7709/100000 [00:21<04:14, 363.06it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   9%|\u258a         | 8687/100000 [00:21<03:42, 409.65it/s]"
+        "text": "\rExecuting Runnable:   8%|\u258a         | 7891/100000 [00:21<04:20, 354.20it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   9%|\u2589         | 8892/100000 [00:21<03:42, 409.40it/s]"
+        "text": "\rExecuting Runnable:   8%|\u258a         | 8087/100000 [00:22<04:11, 365.13it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   9%|\u2589         | 9097/100000 [00:22<03:42, 408.74it/s]"
+        "text": "\rExecuting Runnable:   8%|\u258a         | 8283/100000 [00:22<04:05, 372.86it/s]"
       },
       {
-        "text": "\rExecuting Runnable:   9%|\u2589         | 9308/100000 [00:22<03:40, 411.97it/s]"
+        "text": "\rExecuting Runnable:   8%|\u258a         | 8476/100000 [00:23<04:03, 376.28it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  10%|\u2589         | 9515/100000 [00:23<03:42, 406.19it/s]"
+        "text": "\rExecuting Runnable:   9%|\u258a         | 8665/100000 [00:23<04:03, 374.93it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  10%|\u2589         | 9727/100000 [00:23<03:39, 411.35it/s]"
+        "text": "\rExecuting Runnable:   9%|\u2589         | 8862/100000 [00:24<03:59, 380.19it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  10%|\u2589         | 9935/100000 [00:24<03:38, 412.23it/s]"
+        "text": "\rExecuting Runnable:   9%|\u2589         | 9064/100000 [00:24<03:55, 386.89it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  10%|\u2588         | 10142/100000 [00:24<03:40, 407.51it/s]"
+        "text": "\rExecuting Runnable:   9%|\u2589         | 9258/100000 [00:25<03:56, 384.33it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  10%|\u2588         | 10355/100000 [00:25<03:37, 412.64it/s]"
+        "text": "\rExecuting Runnable:   9%|\u2589         | 9462/100000 [00:25<03:51, 391.29it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  11%|\u2588         | 10562/100000 [00:25<03:36, 412.21it/s]"
+        "text": "\rExecuting Runnable:  10%|\u2589         | 9663/100000 [00:26<03:49, 393.86it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  11%|\u2588         | 10773/100000 [00:26<03:34, 415.09it/s]"
+        "text": "\rExecuting Runnable:  10%|\u2589         | 9861/100000 [00:26<03:49, 393.18it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  11%|\u2588         | 10982/100000 [00:26<03:34, 415.53it/s]"
+        "text": "\rExecuting Runnable:  10%|\u2588         | 10061/100000 [00:27<03:47, 394.72it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  11%|\u2588         | 11191/100000 [00:27<03:33, 415.81it/s]"
+        "text": "\rExecuting Runnable:  10%|\u2588         | 10259/100000 [00:27<03:58, 376.10it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  11%|\u2588\u258f        | 11400/100000 [00:27<03:32, 416.06it/s]"
+        "text": "\rExecuting Runnable:  10%|\u2588         | 10461/100000 [00:28<03:53, 384.15it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  12%|\u2588\u258f        | 11613/100000 [00:28<03:31, 418.58it/s]"
+        "text": "\rExecuting Runnable:  11%|\u2588         | 10663/100000 [00:28<03:49, 389.43it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  12%|\u2588\u258f        | 11823/100000 [00:28<03:31, 416.66it/s]"
+        "text": "\rExecuting Runnable:  11%|\u2588         | 10866/100000 [00:29<03:46, 393.74it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  12%|\u2588\u258f        | 12036/100000 [00:29<03:30, 418.86it/s]"
+        "text": "\rExecuting Runnable:  11%|\u2588         | 11064/100000 [00:30<03:49, 387.65it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  12%|\u2588\u258f        | 12246/100000 [00:29<03:29, 417.90it/s]"
+        "text": "\rExecuting Runnable:  11%|\u2588\u258f        | 11266/100000 [00:30<03:46, 391.89it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  12%|\u2588\u258f        | 12458/100000 [00:30<03:28, 419.51it/s]"
+        "text": "\rExecuting Runnable:  11%|\u2588\u258f        | 11467/100000 [00:31<03:44, 394.86it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  13%|\u2588\u258e        | 12668/100000 [00:31<03:29, 416.78it/s]"
+        "text": "\rExecuting Runnable:  12%|\u2588\u258f        | 11665/100000 [00:31<03:46, 390.82it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  13%|\u2588\u258e        | 12882/100000 [00:31<03:27, 419.81it/s]"
+        "text": "\rExecuting Runnable:  12%|\u2588\u258f        | 11867/100000 [00:32<03:43, 394.54it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  13%|\u2588\u258e        | 13100/100000 [00:32<03:24, 424.63it/s]"
+        "text": "\rExecuting Runnable:  12%|\u2588\u258f        | 12065/100000 [00:32<03:46, 388.14it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  13%|\u2588\u258e        | 13315/100000 [00:32<03:23, 426.22it/s]"
+        "text": "\rExecuting Runnable:  12%|\u2588\u258f        | 12265/100000 [00:33<03:44, 391.18it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  14%|\u2588\u258e        | 13536/100000 [00:33<03:20, 430.50it/s]"
+        "text": "\rExecuting Runnable:  12%|\u2588\u258f        | 12461/100000 [00:33<03:46, 386.73it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  14%|\u2588\u258d        | 13756/100000 [00:33<03:19, 432.85it/s]"
+        "text": "\rExecuting Runnable:  13%|\u2588\u258e        | 12655/100000 [00:34<04:17, 338.77it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  14%|\u2588\u258d        | 13973/100000 [00:34<03:19, 430.46it/s]"
+        "text": "\rExecuting Runnable:  13%|\u2588\u258e        | 12830/100000 [00:34<04:34, 317.85it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  14%|\u2588\u258d        | 14192/100000 [00:34<03:18, 432.56it/s]"
+        "text": "\rExecuting Runnable:  13%|\u2588\u258e        | 12994/100000 [00:35<04:32, 319.41it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  14%|\u2588\u258d        | 14410/100000 [00:35<03:17, 433.45it/s]"
+        "text": "\rExecuting Runnable:  13%|\u2588\u258e        | 13193/100000 [00:35<04:14, 340.83it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  15%|\u2588\u258d        | 14627/100000 [00:35<03:17, 431.37it/s]"
+        "text": "\rExecuting Runnable:  13%|\u2588\u258e        | 13378/100000 [00:36<04:08, 348.72it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  15%|\u2588\u258d        | 14843/100000 [00:36<03:18, 428.74it/s]"
+        "text": "\rExecuting Runnable:  14%|\u2588\u258e        | 13579/100000 [00:36<03:57, 363.71it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  15%|\u2588\u258c        | 15058/100000 [00:36<03:18, 427.79it/s]"
+        "text": "\rExecuting Runnable:  14%|\u2588\u258d        | 13779/100000 [00:37<03:50, 374.20it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  15%|\u2588\u258c        | 15274/100000 [00:37<03:17, 428.97it/s]"
+        "text": "\rExecuting Runnable:  14%|\u2588\u258d        | 13973/100000 [00:37<03:47, 378.19it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  15%|\u2588\u258c        | 15489/100000 [00:37<03:17, 428.01it/s]"
+        "text": "\rExecuting Runnable:  14%|\u2588\u258d        | 14165/100000 [00:38<03:45, 379.89it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  16%|\u2588\u258c        | 15707/100000 [00:38<03:15, 430.35it/s]"
+        "text": "\rExecuting Runnable:  14%|\u2588\u258d        | 14361/100000 [00:38<03:43, 383.28it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  16%|\u2588\u258c        | 15923/100000 [00:38<03:16, 427.65it/s]"
+        "text": "\rExecuting Runnable:  15%|\u2588\u258d        | 14556/100000 [00:39<03:42, 384.80it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  16%|\u2588\u258c        | 16137/100000 [00:39<03:16, 426.23it/s]"
+        "text": "\rExecuting Runnable:  15%|\u2588\u258d        | 14754/100000 [00:39<03:39, 387.92it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  16%|\u2588\u258b        | 16352/100000 [00:39<03:15, 426.95it/s]"
+        "text": "\rExecuting Runnable:  15%|\u2588\u258d        | 14949/100000 [00:40<03:43, 381.27it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  17%|\u2588\u258b        | 16569/100000 [00:40<03:14, 428.77it/s]"
+        "text": "\rExecuting Runnable:  15%|\u2588\u258c        | 15147/100000 [00:41<03:40, 385.35it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  17%|\u2588\u258b        | 16784/100000 [00:40<03:15, 425.51it/s]"
+        "text": "\rExecuting Runnable:  15%|\u2588\u258c        | 15344/100000 [00:41<03:38, 387.67it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  17%|\u2588\u258b        | 17002/100000 [00:41<03:13, 428.33it/s]"
+        "text": "\rExecuting Runnable:  16%|\u2588\u258c        | 15539/100000 [00:42<03:43, 378.04it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  17%|\u2588\u258b        | 17217/100000 [00:41<03:13, 427.26it/s]"
+        "text": "\rExecuting Runnable:  16%|\u2588\u258c        | 15733/100000 [00:42<03:41, 380.88it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  17%|\u2588\u258b        | 17432/100000 [00:42<03:12, 428.02it/s]"
+        "text": "\rExecuting Runnable:  16%|\u2588\u258c        | 15924/100000 [00:43<03:52, 361.13it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  18%|\u2588\u258a        | 17647/100000 [00:42<03:12, 427.82it/s]"
+        "text": "\rExecuting Runnable:  16%|\u2588\u258c        | 16106/100000 [00:43<04:07, 339.06it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  18%|\u2588\u258a        | 17863/100000 [00:43<03:11, 428.56it/s]"
+        "text": "\rExecuting Runnable:  16%|\u2588\u258b        | 16278/100000 [00:44<04:20, 321.49it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  18%|\u2588\u258a        | 18078/100000 [00:43<03:11, 428.82it/s]"
+        "text": "\rExecuting Runnable:  16%|\u2588\u258b        | 16462/100000 [00:44<04:10, 333.85it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  18%|\u2588\u258a        | 18294/100000 [00:44<03:10, 429.44it/s]"
+        "text": "\rExecuting Runnable:  17%|\u2588\u258b        | 16651/100000 [00:45<04:00, 345.91it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  19%|\u2588\u258a        | 18510/100000 [00:44<03:09, 430.20it/s]"
+        "text": "\rExecuting Runnable:  17%|\u2588\u258b        | 16847/100000 [00:45<03:51, 358.76it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  19%|\u2588\u258a        | 18726/100000 [00:45<03:10, 427.75it/s]"
+        "text": "\rExecuting Runnable:  17%|\u2588\u258b        | 17040/100000 [00:46<03:46, 366.17it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  19%|\u2588\u2589        | 18943/100000 [00:45<03:08, 429.27it/s]"
+        "text": "\rExecuting Runnable:  17%|\u2588\u258b        | 17225/100000 [00:46<03:46, 364.95it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  19%|\u2588\u2589        | 19160/100000 [00:46<03:07, 430.32it/s]"
+        "text": "\rExecuting Runnable:  17%|\u2588\u258b        | 17427/100000 [00:47<03:39, 376.28it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  19%|\u2588\u2589        | 19376/100000 [00:46<03:07, 430.11it/s]"
+        "text": "\rExecuting Runnable:  18%|\u2588\u258a        | 17630/100000 [00:47<03:34, 384.71it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  20%|\u2588\u2589        | 19592/100000 [00:47<03:07, 428.96it/s]"
+        "text": "\rExecuting Runnable:  18%|\u2588\u258a        | 17833/100000 [00:48<03:30, 390.98it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  20%|\u2588\u2589        | 19811/100000 [00:47<03:05, 431.25it/s]"
+        "text": "\rExecuting Runnable:  18%|\u2588\u258a        | 18037/100000 [00:48<03:27, 395.84it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  20%|\u2588\u2588        | 20030/100000 [00:48<03:04, 432.86it/s]"
+        "text": "\rExecuting Runnable:  18%|\u2588\u258a        | 18239/100000 [00:49<03:25, 397.93it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  20%|\u2588\u2588        | 20247/100000 [00:48<03:04, 432.13it/s]"
+        "text": "\rExecuting Runnable:  18%|\u2588\u258a        | 18439/100000 [00:49<03:30, 386.97it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  20%|\u2588\u2588        | 20464/100000 [00:49<03:07, 424.74it/s]"
+        "text": "\rExecuting Runnable:  19%|\u2588\u258a        | 18633/100000 [00:50<03:45, 360.04it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  21%|\u2588\u2588        | 20679/100000 [00:49<03:06, 426.21it/s]"
+        "text": "\rExecuting Runnable:  19%|\u2588\u2589        | 18825/100000 [00:51<03:41, 366.74it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  21%|\u2588\u2588        | 20893/100000 [00:50<03:05, 426.41it/s]"
+        "text": "\rExecuting Runnable:  19%|\u2588\u2589        | 19011/100000 [00:51<03:47, 355.98it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  21%|\u2588\u2588        | 21110/100000 [00:50<03:04, 428.09it/s]"
+        "text": "\rExecuting Runnable:  19%|\u2588\u2589        | 19191/100000 [00:52<04:07, 326.68it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  21%|\u2588\u2588\u258f       | 21325/100000 [00:51<03:06, 422.09it/s]"
+        "text": "\rExecuting Runnable:  19%|\u2588\u2589        | 19358/100000 [00:52<04:17, 312.81it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  22%|\u2588\u2588\u258f       | 21538/100000 [00:51<03:05, 422.85it/s]"
+        "text": "\rExecuting Runnable:  20%|\u2588\u2589        | 19546/100000 [00:53<04:04, 329.71it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  22%|\u2588\u2588\u258f       | 21750/100000 [00:52<03:08, 416.15it/s]"
+        "text": "\rExecuting Runnable:  20%|\u2588\u2589        | 19720/100000 [00:53<04:00, 334.11it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  22%|\u2588\u2588\u258f       | 21959/100000 [00:52<03:12, 404.88it/s]"
+        "text": "\rExecuting Runnable:  20%|\u2588\u2589        | 19910/100000 [00:54<03:50, 346.77it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  22%|\u2588\u2588\u258f       | 22162/100000 [00:53<03:12, 404.09it/s]"
+        "text": "\rExecuting Runnable:  20%|\u2588\u2588        | 20117/100000 [00:54<03:38, 365.84it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  22%|\u2588\u2588\u258f       | 22366/100000 [00:53<03:11, 404.87it/s]"
+        "text": "\rExecuting Runnable:  20%|\u2588\u2588        | 20323/100000 [00:55<03:30, 378.96it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  23%|\u2588\u2588\u258e       | 22569/100000 [00:54<03:13, 399.90it/s]"
+        "text": "\rExecuting Runnable:  21%|\u2588\u2588        | 20514/100000 [00:55<03:29, 379.17it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  23%|\u2588\u2588\u258e       | 22788/100000 [00:54<03:07, 410.94it/s]"
+        "text": "\rExecuting Runnable:  21%|\u2588\u2588        | 20721/100000 [00:56<03:23, 389.05it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  23%|\u2588\u2588\u258e       | 22994/100000 [00:55<03:11, 402.27it/s]"
+        "text": "\rExecuting Runnable:  21%|\u2588\u2588        | 20928/100000 [00:56<03:19, 396.18it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  23%|\u2588\u2588\u258e       | 23201/100000 [00:55<03:09, 405.69it/s]"
+        "text": "\rExecuting Runnable:  21%|\u2588\u2588        | 21134/100000 [00:57<03:16, 400.77it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  23%|\u2588\u2588\u258e       | 23407/100000 [00:56<03:08, 407.33it/s]"
+        "text": "\rExecuting Runnable:  21%|\u2588\u2588\u258f       | 21340/100000 [00:57<03:14, 403.59it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  24%|\u2588\u2588\u258e       | 23617/100000 [00:56<03:05, 410.96it/s]"
+        "text": "\rExecuting Runnable:  22%|\u2588\u2588\u258f       | 21543/100000 [00:58<03:21, 390.02it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  24%|\u2588\u2588\u258d       | 23823/100000 [00:57<03:07, 405.70it/s]"
+        "text": "\rExecuting Runnable:  22%|\u2588\u2588\u258f       | 21743/100000 [00:58<03:19, 392.53it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  24%|\u2588\u2588\u258d       | 24028/100000 [00:57<03:06, 406.80it/s]"
+        "text": "\rExecuting Runnable:  22%|\u2588\u2588\u258f       | 21940/100000 [00:59<03:25, 379.10it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  24%|\u2588\u2588\u258d       | 24235/100000 [00:58<03:05, 408.85it/s]"
+        "text": "\rExecuting Runnable:  22%|\u2588\u2588\u258f       | 22133/100000 [01:00<03:24, 380.68it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  24%|\u2588\u2588\u258d       | 24451/100000 [00:58<03:01, 415.52it/s]"
+        "text": "\rExecuting Runnable:  22%|\u2588\u2588\u258f       | 22330/100000 [01:00<03:22, 384.07it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  25%|\u2588\u2588\u258d       | 24659/100000 [00:59<03:01, 415.02it/s]"
+        "text": "\rExecuting Runnable:  23%|\u2588\u2588\u258e       | 22525/100000 [01:01<03:20, 385.54it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  25%|\u2588\u2588\u258d       | 24869/100000 [00:59<03:00, 416.48it/s]"
+        "text": "\rExecuting Runnable:  23%|\u2588\u2588\u258e       | 22719/100000 [01:01<03:22, 380.94it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  25%|\u2588\u2588\u258c       | 25079/100000 [01:00<02:59, 417.11it/s]"
+        "text": "\rExecuting Runnable:  23%|\u2588\u2588\u258e       | 22916/100000 [01:02<03:20, 384.64it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  25%|\u2588\u2588\u258c       | 25288/100000 [01:00<02:59, 417.35it/s]"
+        "text": "\rExecuting Runnable:  23%|\u2588\u2588\u258e       | 23113/100000 [01:02<03:18, 386.93it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  25%|\u2588\u2588\u258c       | 25497/100000 [01:01<02:59, 413.96it/s]"
+        "text": "\rExecuting Runnable:  23%|\u2588\u2588\u258e       | 23310/100000 [01:03<03:17, 388.49it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  26%|\u2588\u2588\u258c       | 25712/100000 [01:01<02:57, 418.66it/s]"
+        "text": "\rExecuting Runnable:  24%|\u2588\u2588\u258e       | 23506/100000 [01:03<03:16, 389.41it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  26%|\u2588\u2588\u258c       | 25922/100000 [01:02<02:58, 415.87it/s]"
+        "text": "\rExecuting Runnable:  24%|\u2588\u2588\u258e       | 23703/100000 [01:04<03:15, 390.47it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  26%|\u2588\u2588\u258c       | 26137/100000 [01:02<02:56, 419.53it/s]"
+        "text": "\rExecuting Runnable:  24%|\u2588\u2588\u258d       | 23900/100000 [01:04<03:14, 391.42it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  26%|\u2588\u2588\u258b       | 26353/100000 [01:03<02:54, 422.93it/s]"
+        "text": "\rExecuting Runnable:  24%|\u2588\u2588\u258d       | 24098/100000 [01:05<03:13, 392.73it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  27%|\u2588\u2588\u258b       | 26566/100000 [01:03<02:53, 423.27it/s]"
+        "text": "\rExecuting Runnable:  24%|\u2588\u2588\u258d       | 24295/100000 [01:05<03:16, 384.74it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  27%|\u2588\u2588\u258b       | 26778/100000 [01:04<02:52, 423.33it/s]"
+        "text": "\rExecuting Runnable:  24%|\u2588\u2588\u258d       | 24496/100000 [01:06<03:13, 389.42it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  27%|\u2588\u2588\u258b       | 26990/100000 [01:04<02:53, 421.36it/s]"
+        "text": "\rExecuting Runnable:  25%|\u2588\u2588\u258d       | 24692/100000 [01:06<03:13, 390.17it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  27%|\u2588\u2588\u258b       | 27201/100000 [01:05<02:53, 420.36it/s]"
+        "text": "\rExecuting Runnable:  25%|\u2588\u2588\u258d       | 24888/100000 [01:07<03:16, 382.63it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  27%|\u2588\u2588\u258b       | 27412/100000 [01:05<02:53, 417.47it/s]"
+        "text": "\rExecuting Runnable:  25%|\u2588\u2588\u258c       | 25088/100000 [01:07<03:13, 387.67it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  28%|\u2588\u2588\u258a       | 27622/100000 [01:06<02:53, 417.65it/s]"
+        "text": "\rExecuting Runnable:  25%|\u2588\u2588\u258c       | 25289/100000 [01:08<03:10, 391.62it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  28%|\u2588\u2588\u258a       | 27837/100000 [01:06<02:51, 421.10it/s]"
+        "text": "\rExecuting Runnable:  25%|\u2588\u2588\u258c       | 25489/100000 [01:08<03:09, 393.79it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  28%|\u2588\u2588\u258a       | 28052/100000 [01:07<02:49, 423.51it/s]"
+        "text": "\rExecuting Runnable:  26%|\u2588\u2588\u258c       | 25687/100000 [01:09<03:09, 392.29it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  28%|\u2588\u2588\u258a       | 28264/100000 [01:07<02:50, 420.28it/s]"
+        "text": "\rExecuting Runnable:  26%|\u2588\u2588\u258c       | 25884/100000 [01:09<03:14, 381.01it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  28%|\u2588\u2588\u258a       | 28476/100000 [01:08<02:49, 421.02it/s]"
+        "text": "\rExecuting Runnable:  26%|\u2588\u2588\u258c       | 26078/100000 [01:10<03:13, 382.50it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  29%|\u2588\u2588\u258a       | 28689/100000 [01:08<02:48, 422.33it/s]"
+        "text": "\rExecuting Runnable:  26%|\u2588\u2588\u258b       | 26273/100000 [01:10<03:11, 384.31it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  29%|\u2588\u2588\u2589       | 28904/100000 [01:09<02:47, 424.22it/s]"
+        "text": "\rExecuting Runnable:  26%|\u2588\u2588\u258b       | 26469/100000 [01:11<03:10, 386.52it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  29%|\u2588\u2588\u2589       | 29117/100000 [01:09<02:49, 418.49it/s]"
+        "text": "\rExecuting Runnable:  27%|\u2588\u2588\u258b       | 26663/100000 [01:11<03:12, 380.02it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  29%|\u2588\u2588\u2589       | 29327/100000 [01:10<02:49, 416.93it/s]"
+        "text": "\rExecuting Runnable:  27%|\u2588\u2588\u258b       | 26856/100000 [01:12<03:11, 381.32it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  30%|\u2588\u2588\u2589       | 29538/100000 [01:10<02:48, 418.05it/s]"
+        "text": "\rExecuting Runnable:  27%|\u2588\u2588\u258b       | 27057/100000 [01:12<03:08, 387.14it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  30%|\u2588\u2588\u2589       | 29748/100000 [01:11<02:48, 416.69it/s]"
+        "text": "\rExecuting Runnable:  27%|\u2588\u2588\u258b       | 27251/100000 [01:13<03:10, 381.95it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  30%|\u2588\u2588\u2589       | 29957/100000 [01:12<02:48, 415.39it/s]"
+        "text": "\rExecuting Runnable:  27%|\u2588\u2588\u258b       | 27450/100000 [01:13<03:07, 386.68it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  30%|\u2588\u2588\u2588       | 30174/100000 [01:12<02:46, 420.39it/s]"
+        "text": "\rExecuting Runnable:  28%|\u2588\u2588\u258a       | 27647/100000 [01:14<03:06, 388.59it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  30%|\u2588\u2588\u2588       | 30385/100000 [01:13<02:47, 415.40it/s]"
+        "text": "\rExecuting Runnable:  28%|\u2588\u2588\u258a       | 27842/100000 [01:14<03:05, 388.97it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  31%|\u2588\u2588\u2588       | 30597/100000 [01:13<02:46, 417.46it/s]"
+        "text": "\rExecuting Runnable:  28%|\u2588\u2588\u258a       | 28037/100000 [01:15<03:05, 387.63it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  31%|\u2588\u2588\u2588       | 30806/100000 [01:14<02:46, 416.46it/s]"
+        "text": "\rExecuting Runnable:  28%|\u2588\u2588\u258a       | 28234/100000 [01:15<03:04, 389.33it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  31%|\u2588\u2588\u2588       | 31015/100000 [01:14<02:45, 416.87it/s]"
+        "text": "\rExecuting Runnable:  28%|\u2588\u2588\u258a       | 28429/100000 [01:16<03:04, 388.41it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  31%|\u2588\u2588\u2588       | 31224/100000 [01:15<02:47, 411.80it/s]"
+        "text": "\rExecuting Runnable:  29%|\u2588\u2588\u258a       | 28627/100000 [01:16<03:02, 390.49it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  31%|\u2588\u2588\u2588\u258f      | 31434/100000 [01:15<02:45, 413.77it/s]"
+        "text": "\rExecuting Runnable:  29%|\u2588\u2588\u2589       | 28823/100000 [01:17<03:08, 377.23it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  32%|\u2588\u2588\u2588\u258f      | 31647/100000 [01:16<02:43, 416.92it/s]"
+        "text": "\rExecuting Runnable:  29%|\u2588\u2588\u2589       | 29023/100000 [01:17<03:05, 383.50it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  32%|\u2588\u2588\u2588\u258f      | 31857/100000 [01:16<02:43, 417.32it/s]"
+        "text": "\rExecuting Runnable:  29%|\u2588\u2588\u2589       | 29216/100000 [01:18<03:05, 381.13it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  32%|\u2588\u2588\u2588\u258f      | 32066/100000 [01:17<02:44, 413.71it/s]"
+        "text": "\rExecuting Runnable:  29%|\u2588\u2588\u2589       | 29407/100000 [01:18<03:10, 371.13it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  32%|\u2588\u2588\u2588\u258f      | 32273/100000 [01:17<02:44, 411.36it/s]"
+        "text": "\rExecuting Runnable:  30%|\u2588\u2588\u2589       | 29604/100000 [01:19<03:06, 377.72it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  32%|\u2588\u2588\u2588\u258f      | 32479/100000 [01:18<02:47, 402.33it/s]"
+        "text": "\rExecuting Runnable:  30%|\u2588\u2588\u2589       | 29803/100000 [01:19<03:02, 383.63it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  33%|\u2588\u2588\u2588\u258e      | 32681/100000 [01:18<02:47, 402.19it/s]"
+        "text": "\rExecuting Runnable:  30%|\u2588\u2588\u2588       | 30003/100000 [01:20<03:00, 388.11it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  33%|\u2588\u2588\u2588\u258e      | 32894/100000 [01:19<02:44, 408.51it/s]"
+        "text": "\rExecuting Runnable:  30%|\u2588\u2588\u2588       | 30203/100000 [01:20<02:58, 391.43it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  33%|\u2588\u2588\u2588\u258e      | 33106/100000 [01:19<02:41, 412.98it/s]"
+        "text": "\rExecuting Runnable:  30%|\u2588\u2588\u2588       | 30404/100000 [01:21<02:56, 394.31it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  33%|\u2588\u2588\u2588\u258e      | 33314/100000 [01:20<02:41, 413.62it/s]"
+        "text": "\rExecuting Runnable:  31%|\u2588\u2588\u2588       | 30610/100000 [01:21<02:53, 399.24it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  34%|\u2588\u2588\u2588\u258e      | 33521/100000 [01:20<02:41, 411.98it/s]"
+        "text": "\rExecuting Runnable:  31%|\u2588\u2588\u2588       | 30816/100000 [01:22<02:51, 402.98it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  34%|\u2588\u2588\u2588\u258e      | 33729/100000 [01:21<02:40, 412.79it/s]"
+        "text": "\rExecuting Runnable:  31%|\u2588\u2588\u2588       | 31022/100000 [01:22<02:50, 405.28it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  34%|\u2588\u2588\u2588\u258d      | 33937/100000 [01:21<02:39, 413.44it/s]"
+        "text": "\rExecuting Runnable:  31%|\u2588\u2588\u2588       | 31228/100000 [01:23<02:49, 406.83it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  34%|\u2588\u2588\u2588\u258d      | 34148/100000 [01:22<02:38, 415.95it/s]"
+        "text": "\rExecuting Runnable:  31%|\u2588\u2588\u2588\u258f      | 31434/100000 [01:23<02:48, 407.87it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  34%|\u2588\u2588\u2588\u258d      | 34359/100000 [01:22<02:37, 417.74it/s]"
+        "text": "\rExecuting Runnable:  32%|\u2588\u2588\u2588\u258f      | 31641/100000 [01:24<02:46, 409.41it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  35%|\u2588\u2588\u2588\u258d      | 34568/100000 [01:23<02:36, 417.45it/s]"
+        "text": "\rExecuting Runnable:  32%|\u2588\u2588\u2588\u258f      | 31848/100000 [01:24<02:46, 410.43it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  35%|\u2588\u2588\u2588\u258d      | 34777/100000 [01:23<02:36, 416.24it/s]"
+        "text": "\rExecuting Runnable:  32%|\u2588\u2588\u2588\u258f      | 32054/100000 [01:25<02:45, 410.22it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  35%|\u2588\u2588\u2588\u258d      | 34989/100000 [01:24<02:35, 418.12it/s]"
+        "text": "\rExecuting Runnable:  32%|\u2588\u2588\u2588\u258f      | 32260/100000 [01:26<02:55, 386.94it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  35%|\u2588\u2588\u2588\u258c      | 35199/100000 [01:24<02:34, 418.61it/s]"
+        "text": "\rExecuting Runnable:  32%|\u2588\u2588\u2588\u258f      | 32460/100000 [01:26<02:53, 390.15it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  35%|\u2588\u2588\u2588\u258c      | 35409/100000 [01:25<02:34, 417.32it/s]"
+        "text": "\rExecuting Runnable:  33%|\u2588\u2588\u2588\u258e      | 32660/100000 [01:27<02:51, 392.91it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  36%|\u2588\u2588\u2588\u258c      | 35620/100000 [01:25<02:33, 418.70it/s]"
+        "text": "\rExecuting Runnable:  33%|\u2588\u2588\u2588\u258e      | 32859/100000 [01:27<02:50, 394.22it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  36%|\u2588\u2588\u2588\u258c      | 35831/100000 [01:26<02:32, 419.52it/s]"
+        "text": "\rExecuting Runnable:  33%|\u2588\u2588\u2588\u258e      | 33060/100000 [01:28<02:49, 395.95it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  36%|\u2588\u2588\u2588\u258c      | 36043/100000 [01:26<02:31, 420.83it/s]"
+        "text": "\rExecuting Runnable:  33%|\u2588\u2588\u2588\u258e      | 33261/100000 [01:28<02:48, 397.20it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  36%|\u2588\u2588\u2588\u258b      | 36259/100000 [01:27<02:30, 423.85it/s]"
+        "text": "\rExecuting Runnable:  33%|\u2588\u2588\u2588\u258e      | 33461/100000 [01:29<02:47, 397.86it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  36%|\u2588\u2588\u2588\u258b      | 36471/100000 [01:27<02:31, 420.15it/s]"
+        "text": "\rExecuting Runnable:  34%|\u2588\u2588\u2588\u258e      | 33661/100000 [01:29<02:51, 386.63it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  37%|\u2588\u2588\u2588\u258b      | 36688/100000 [01:28<02:29, 423.71it/s]"
+        "text": "\rExecuting Runnable:  34%|\u2588\u2588\u2588\u258d      | 33855/100000 [01:30<02:52, 383.36it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  37%|\u2588\u2588\u2588\u258b      | 36900/100000 [01:28<02:33, 410.53it/s]"
+        "text": "\rExecuting Runnable:  34%|\u2588\u2588\u2588\u258d      | 34058/100000 [01:30<02:49, 389.94it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  37%|\u2588\u2588\u2588\u258b      | 37106/100000 [01:29<02:33, 410.43it/s]"
+        "text": "\rExecuting Runnable:  34%|\u2588\u2588\u2588\u258d      | 34259/100000 [01:31<02:47, 393.24it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  37%|\u2588\u2588\u2588\u258b      | 37312/100000 [01:29<02:34, 405.03it/s]"
+        "text": "\rExecuting Runnable:  34%|\u2588\u2588\u2588\u258d      | 34459/100000 [01:31<02:45, 395.24it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  38%|\u2588\u2588\u2588\u258a      | 37523/100000 [01:30<02:32, 409.70it/s]"
+        "text": "\rExecuting Runnable:  35%|\u2588\u2588\u2588\u258d      | 34660/100000 [01:32<02:44, 397.13it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  38%|\u2588\u2588\u2588\u258a      | 37729/100000 [01:30<02:31, 409.95it/s]"
+        "text": "\rExecuting Runnable:  35%|\u2588\u2588\u2588\u258d      | 34861/100000 [01:32<02:43, 398.28it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  38%|\u2588\u2588\u2588\u258a      | 37938/100000 [01:31<02:30, 411.86it/s]"
+        "text": "\rExecuting Runnable:  35%|\u2588\u2588\u2588\u258c      | 35061/100000 [01:33<02:43, 397.11it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  38%|\u2588\u2588\u2588\u258a      | 38145/100000 [01:31<02:30, 411.85it/s]"
+        "text": "\rExecuting Runnable:  35%|\u2588\u2588\u2588\u258c      | 35260/100000 [01:33<02:43, 396.23it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  38%|\u2588\u2588\u2588\u258a      | 38354/100000 [01:32<02:29, 413.33it/s]"
+        "text": "\rExecuting Runnable:  35%|\u2588\u2588\u2588\u258c      | 35459/100000 [01:34<02:49, 381.47it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  39%|\u2588\u2588\u2588\u258a      | 38565/100000 [01:32<02:27, 415.46it/s]"
+        "text": "\rExecuting Runnable:  36%|\u2588\u2588\u2588\u258c      | 35662/100000 [01:34<02:45, 388.24it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  39%|\u2588\u2588\u2588\u2589      | 38774/100000 [01:33<02:27, 415.55it/s]"
+        "text": "\rExecuting Runnable:  36%|\u2588\u2588\u2588\u258c      | 35865/100000 [01:35<02:43, 393.43it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  39%|\u2588\u2588\u2588\u2589      | 38984/100000 [01:33<02:26, 416.45it/s]"
+        "text": "\rExecuting Runnable:  36%|\u2588\u2588\u2588\u258c      | 36065/100000 [01:35<02:41, 395.35it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  39%|\u2588\u2588\u2588\u2589      | 39193/100000 [01:34<02:27, 413.19it/s]"
+        "text": "\rExecuting Runnable:  36%|\u2588\u2588\u2588\u258b      | 36263/100000 [01:36<02:41, 395.24it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  39%|\u2588\u2588\u2588\u2589      | 39400/100000 [01:34<02:27, 410.86it/s]"
+        "text": "\rExecuting Runnable:  36%|\u2588\u2588\u2588\u258b      | 36461/100000 [01:36<02:56, 359.28it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  40%|\u2588\u2588\u2588\u2589      | 39606/100000 [01:35<02:28, 405.39it/s]"
+        "text": "\rExecuting Runnable:  37%|\u2588\u2588\u2588\u258b      | 36644/100000 [01:37<03:10, 332.10it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  40%|\u2588\u2588\u2588\u2589      | 39815/100000 [01:35<02:27, 409.04it/s]"
+        "text": "\rExecuting Runnable:  37%|\u2588\u2588\u2588\u258b      | 36846/100000 [01:38<02:59, 351.13it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  40%|\u2588\u2588\u2588\u2588      | 40024/100000 [01:36<02:25, 411.15it/s]"
+        "text": "\rExecuting Runnable:  37%|\u2588\u2588\u2588\u258b      | 37048/100000 [01:38<02:52, 365.47it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  40%|\u2588\u2588\u2588\u2588      | 40232/100000 [01:36<02:24, 412.24it/s]"
+        "text": "\rExecuting Runnable:  37%|\u2588\u2588\u2588\u258b      | 37234/100000 [01:39<03:05, 338.76it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  40%|\u2588\u2588\u2588\u2588      | 40443/100000 [01:37<02:23, 414.65it/s]"
+        "text": "\rExecuting Runnable:  37%|\u2588\u2588\u2588\u258b      | 37408/100000 [01:39<03:11, 326.61it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  41%|\u2588\u2588\u2588\u2588      | 40653/100000 [01:37<02:22, 415.82it/s]"
+        "text": "\rExecuting Runnable:  38%|\u2588\u2588\u2588\u258a      | 37605/100000 [01:40<03:01, 344.66it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  41%|\u2588\u2588\u2588\u2588      | 40864/100000 [01:38<02:21, 417.62it/s]"
+        "text": "\rExecuting Runnable:  38%|\u2588\u2588\u2588\u258a      | 37806/100000 [01:40<02:52, 360.43it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  41%|\u2588\u2588\u2588\u2588      | 41075/100000 [01:38<02:20, 418.49it/s]"
+        "text": "\rExecuting Runnable:  38%|\u2588\u2588\u2588\u258a      | 37989/100000 [01:41<03:06, 333.22it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  41%|\u2588\u2588\u2588\u2588\u258f     | 41285/100000 [01:39<02:20, 417.19it/s]"
+        "text": "\rExecuting Runnable:  38%|\u2588\u2588\u2588\u258a      | 38182/100000 [01:41<02:57, 347.51it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  42%|\u2588\u2588\u2588\u2588\u258f     | 41502/100000 [01:39<02:18, 421.64it/s]"
+        "text": "\rExecuting Runnable:  38%|\u2588\u2588\u2588\u258a      | 38379/100000 [01:42<02:51, 360.06it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  42%|\u2588\u2588\u2588\u2588\u258f     | 41714/100000 [01:40<02:18, 422.11it/s]"
+        "text": "\rExecuting Runnable:  39%|\u2588\u2588\u2588\u258a      | 38576/100000 [01:42<02:46, 369.59it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  42%|\u2588\u2588\u2588\u2588\u258f     | 41926/100000 [01:40<02:19, 415.26it/s]"
+        "text": "\rExecuting Runnable:  39%|\u2588\u2588\u2588\u2589      | 38771/100000 [01:43<02:43, 375.28it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  42%|\u2588\u2588\u2588\u2588\u258f     | 42134/100000 [01:41<02:21, 408.85it/s]"
+        "text": "\rExecuting Runnable:  39%|\u2588\u2588\u2588\u2589      | 38970/100000 [01:43<02:39, 381.83it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  42%|\u2588\u2588\u2588\u2588\u258f     | 42339/100000 [01:41<02:21, 407.32it/s]"
+        "text": "\rExecuting Runnable:  39%|\u2588\u2588\u2588\u2589      | 39170/100000 [01:44<02:37, 386.96it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  43%|\u2588\u2588\u2588\u2588\u258e     | 42547/100000 [01:42<02:20, 409.34it/s]"
+        "text": "\rExecuting Runnable:  39%|\u2588\u2588\u2588\u2589      | 39370/100000 [01:44<02:35, 390.51it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  43%|\u2588\u2588\u2588\u2588\u258e     | 42755/100000 [01:42<02:19, 411.23it/s]"
+        "text": "\rExecuting Runnable:  40%|\u2588\u2588\u2588\u2589      | 39566/100000 [01:45<02:35, 388.97it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  43%|\u2588\u2588\u2588\u2588\u258e     | 42963/100000 [01:43<02:18, 412.40it/s]"
+        "text": "\rExecuting Runnable:  40%|\u2588\u2588\u2588\u2589      | 39762/100000 [01:45<02:34, 389.55it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  43%|\u2588\u2588\u2588\u2588\u258e     | 43171/100000 [01:43<02:17, 412.92it/s]"
+        "text": "\rExecuting Runnable:  40%|\u2588\u2588\u2588\u2589      | 39958/100000 [01:46<02:34, 389.81it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  43%|\u2588\u2588\u2588\u2588\u258e     | 43380/100000 [01:44<02:16, 414.22it/s]"
+        "text": "\rExecuting Runnable:  40%|\u2588\u2588\u2588\u2588      | 40158/100000 [01:46<02:32, 392.41it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  44%|\u2588\u2588\u2588\u2588\u258e     | 43594/100000 [01:44<02:14, 417.94it/s]"
+        "text": "\rExecuting Runnable:  40%|\u2588\u2588\u2588\u2588      | 40357/100000 [01:47<02:31, 393.72it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  44%|\u2588\u2588\u2588\u2588\u258d     | 43803/100000 [01:45<02:15, 415.46it/s]"
+        "text": "\rExecuting Runnable:  41%|\u2588\u2588\u2588\u2588      | 40556/100000 [01:47<02:30, 394.88it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  44%|\u2588\u2588\u2588\u2588\u258d     | 44016/100000 [01:45<02:14, 417.69it/s]"
+        "text": "\rExecuting Runnable:  41%|\u2588\u2588\u2588\u2588      | 40754/100000 [01:48<02:31, 392.06it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  44%|\u2588\u2588\u2588\u2588\u258d     | 44228/100000 [01:46<02:13, 419.03it/s]"
+        "text": "\rExecuting Runnable:  41%|\u2588\u2588\u2588\u2588      | 40951/100000 [01:49<02:50, 347.08it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  44%|\u2588\u2588\u2588\u2588\u258d     | 44438/100000 [01:46<02:13, 414.65it/s]"
+        "text": "\rExecuting Runnable:  41%|\u2588\u2588\u2588\u2588      | 41130/100000 [01:49<03:01, 324.38it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  45%|\u2588\u2588\u2588\u2588\u258d     | 44649/100000 [01:47<02:12, 416.24it/s]"
+        "text": "\rExecuting Runnable:  41%|\u2588\u2588\u2588\u2588\u258f     | 41297/100000 [01:50<03:09, 309.68it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  45%|\u2588\u2588\u2588\u2588\u258d     | 44859/100000 [01:47<02:12, 417.18it/s]"
+        "text": "\rExecuting Runnable:  41%|\u2588\u2588\u2588\u2588\u258f     | 41455/100000 [01:51<03:15, 300.03it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  45%|\u2588\u2588\u2588\u2588\u258c     | 45068/100000 [01:48<02:15, 403.99it/s]"
+        "text": "\rExecuting Runnable:  42%|\u2588\u2588\u2588\u2588\u258f     | 41621/100000 [01:51<03:09, 308.44it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  45%|\u2588\u2588\u2588\u2588\u258c     | 45271/100000 [01:49<02:15, 402.45it/s]"
+        "text": "\rExecuting Runnable:  42%|\u2588\u2588\u2588\u2588\u258f     | 41824/100000 [01:52<02:53, 335.24it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  45%|\u2588\u2588\u2588\u2588\u258c     | 45487/100000 [01:49<02:12, 410.58it/s]"
+        "text": "\rExecuting Runnable:  42%|\u2588\u2588\u2588\u2588\u258f     | 42027/100000 [01:52<02:43, 354.96it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  46%|\u2588\u2588\u2588\u2588\u258c     | 45696/100000 [01:50<02:11, 412.57it/s]"
+        "text": "\rExecuting Runnable:  42%|\u2588\u2588\u2588\u2588\u258f     | 42228/100000 [01:53<02:36, 368.31it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  46%|\u2588\u2588\u2588\u2588\u258c     | 45909/100000 [01:50<02:09, 416.48it/s]"
+        "text": "\rExecuting Runnable:  42%|\u2588\u2588\u2588\u2588\u258f     | 42415/100000 [01:53<02:40, 358.41it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  46%|\u2588\u2588\u2588\u2588\u258c     | 46125/100000 [01:51<02:08, 420.67it/s]"
+        "text": "\rExecuting Runnable:  43%|\u2588\u2588\u2588\u2588\u258e     | 42596/100000 [01:54<02:55, 327.50it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  46%|\u2588\u2588\u2588\u2588\u258b     | 46341/100000 [01:51<02:06, 423.98it/s]"
+        "text": "\rExecuting Runnable:  43%|\u2588\u2588\u2588\u2588\u258e     | 42764/100000 [01:54<03:04, 309.41it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  47%|\u2588\u2588\u2588\u2588\u258b     | 46556/100000 [01:52<02:05, 425.66it/s]"
+        "text": "\rExecuting Runnable:  43%|\u2588\u2588\u2588\u2588\u258e     | 42922/100000 [01:55<03:11, 297.47it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  47%|\u2588\u2588\u2588\u2588\u258b     | 46771/100000 [01:52<02:04, 426.73it/s]"
+        "text": "\rExecuting Runnable:  43%|\u2588\u2588\u2588\u2588\u258e     | 43073/100000 [01:56<03:16, 289.59it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  47%|\u2588\u2588\u2588\u2588\u258b     | 46985/100000 [01:53<02:05, 420.96it/s]"
+        "text": "\rExecuting Runnable:  43%|\u2588\u2588\u2588\u2588\u258e     | 43220/100000 [01:56<03:20, 283.75it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  47%|\u2588\u2588\u2588\u2588\u258b     | 47199/100000 [01:53<02:04, 422.50it/s]"
+        "text": "\rExecuting Runnable:  43%|\u2588\u2588\u2588\u2588\u258e     | 43363/100000 [01:57<03:22, 279.73it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  47%|\u2588\u2588\u2588\u2588\u258b     | 47411/100000 [01:54<02:05, 420.28it/s]"
+        "text": "\rExecuting Runnable:  44%|\u2588\u2588\u2588\u2588\u258e     | 43504/100000 [01:57<03:24, 276.89it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  48%|\u2588\u2588\u2588\u2588\u258a     | 47622/100000 [01:54<02:04, 419.52it/s]"
+        "text": "\rExecuting Runnable:  44%|\u2588\u2588\u2588\u2588\u258e     | 43643/100000 [01:58<03:25, 274.54it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  48%|\u2588\u2588\u2588\u2588\u258a     | 47832/100000 [01:55<02:04, 418.16it/s]"
+        "text": "\rExecuting Runnable:  44%|\u2588\u2588\u2588\u2588\u258d     | 43781/100000 [01:58<03:26, 272.77it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  48%|\u2588\u2588\u2588\u2588\u258a     | 48044/100000 [01:55<02:03, 419.37it/s]"
+        "text": "\rExecuting Runnable:  44%|\u2588\u2588\u2588\u2588\u258d     | 43918/100000 [01:59<03:26, 272.07it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  48%|\u2588\u2588\u2588\u2588\u258a     | 48254/100000 [01:56<02:03, 418.88it/s]"
+        "text": "\rExecuting Runnable:  44%|\u2588\u2588\u2588\u2588\u258d     | 44055/100000 [01:59<03:25, 272.42it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  48%|\u2588\u2588\u2588\u2588\u258a     | 48464/100000 [01:56<02:03, 417.28it/s]"
+        "text": "\rExecuting Runnable:  44%|\u2588\u2588\u2588\u2588\u258d     | 44192/100000 [02:00<03:25, 271.91it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  49%|\u2588\u2588\u2588\u2588\u258a     | 48673/100000 [01:57<02:02, 417.33it/s]"
+        "text": "\rExecuting Runnable:  44%|\u2588\u2588\u2588\u2588\u258d     | 44328/100000 [02:00<03:25, 271.33it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  49%|\u2588\u2588\u2588\u2588\u2589     | 48891/100000 [01:57<02:00, 422.72it/s]"
+        "text": "\rExecuting Runnable:  44%|\u2588\u2588\u2588\u2588\u258d     | 44489/100000 [02:01<03:14, 286.02it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  49%|\u2588\u2588\u2588\u2588\u2589     | 49103/100000 [01:58<02:01, 420.17it/s]"
+        "text": "\rExecuting Runnable:  45%|\u2588\u2588\u2588\u2588\u258d     | 44639/100000 [02:01<03:11, 289.61it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  49%|\u2588\u2588\u2588\u2588\u2589     | 49314/100000 [01:58<02:00, 419.85it/s]"
+        "text": "\rExecuting Runnable:  45%|\u2588\u2588\u2588\u2588\u258d     | 44784/100000 [02:02<03:14, 283.52it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  50%|\u2588\u2588\u2588\u2588\u2589     | 49524/100000 [01:59<02:01, 415.79it/s]"
+        "text": "\rExecuting Runnable:  45%|\u2588\u2588\u2588\u2588\u258d     | 44926/100000 [02:02<03:16, 279.80it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  50%|\u2588\u2588\u2588\u2588\u2589     | 49738/100000 [01:59<01:59, 419.19it/s]"
+        "text": "\rExecuting Runnable:  45%|\u2588\u2588\u2588\u2588\u258c     | 45088/100000 [02:03<03:07, 292.59it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  50%|\u2588\u2588\u2588\u2588\u2589     | 49948/100000 [02:00<01:59, 419.33it/s]"
+        "text": "\rExecuting Runnable:  45%|\u2588\u2588\u2588\u2588\u258c     | 45235/100000 [02:03<03:12, 284.38it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  50%|\u2588\u2588\u2588\u2588\u2588     | 50163/100000 [02:00<01:58, 422.20it/s]"
+        "text": "\rExecuting Runnable:  45%|\u2588\u2588\u2588\u2588\u258c     | 45378/100000 [02:04<03:14, 280.63it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  50%|\u2588\u2588\u2588\u2588\u2588     | 50376/100000 [02:01<01:57, 422.92it/s]"
+        "text": "\rExecuting Runnable:  46%|\u2588\u2588\u2588\u2588\u258c     | 45519/100000 [02:04<03:16, 277.43it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  51%|\u2588\u2588\u2588\u2588\u2588     | 50588/100000 [02:01<01:57, 422.03it/s]"
+        "text": "\rExecuting Runnable:  46%|\u2588\u2588\u2588\u2588\u258c     | 45658/100000 [02:05<03:17, 275.06it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  51%|\u2588\u2588\u2588\u2588\u2588     | 50805/100000 [02:02<01:55, 425.45it/s]"
+        "text": "\rExecuting Runnable:  46%|\u2588\u2588\u2588\u2588\u258c     | 45796/100000 [02:05<03:18, 272.98it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  51%|\u2588\u2588\u2588\u2588\u2588     | 51018/100000 [02:02<01:56, 419.68it/s]"
+        "text": "\rExecuting Runnable:  46%|\u2588\u2588\u2588\u2588\u258c     | 45933/100000 [02:06<03:18, 272.21it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  51%|\u2588\u2588\u2588\u2588\u2588     | 51231/100000 [02:03<01:55, 421.52it/s]"
+        "text": "\rExecuting Runnable:  46%|\u2588\u2588\u2588\u2588\u258c     | 46070/100000 [02:06<03:18, 271.41it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  51%|\u2588\u2588\u2588\u2588\u2588\u258f    | 51445/100000 [02:03<01:54, 422.97it/s]"
+        "text": "\rExecuting Runnable:  46%|\u2588\u2588\u2588\u2588\u258c     | 46206/100000 [02:07<03:18, 270.46it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  52%|\u2588\u2588\u2588\u2588\u2588\u258f    | 51657/100000 [02:04<01:54, 422.12it/s]"
+        "text": "\rExecuting Runnable:  46%|\u2588\u2588\u2588\u2588\u258b     | 46342/100000 [02:07<03:22, 265.02it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  52%|\u2588\u2588\u2588\u2588\u2588\u258f    | 51869/100000 [02:04<01:55, 417.71it/s]"
+        "text": "\rExecuting Runnable:  46%|\u2588\u2588\u2588\u2588\u258b     | 46475/100000 [02:08<03:23, 262.41it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  52%|\u2588\u2588\u2588\u2588\u2588\u258f    | 52082/100000 [02:05<01:54, 419.89it/s]"
+        "text": "\rExecuting Runnable:  47%|\u2588\u2588\u2588\u2588\u258b     | 46632/100000 [02:08<03:12, 277.30it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  52%|\u2588\u2588\u2588\u2588\u2588\u258f    | 52293/100000 [02:05<01:54, 416.45it/s]"
+        "text": "\rExecuting Runnable:  47%|\u2588\u2588\u2588\u2588\u258b     | 46819/100000 [02:09<02:54, 305.29it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  53%|\u2588\u2588\u2588\u2588\u2588\u258e    | 52504/100000 [02:06<01:53, 417.97it/s]"
+        "text": "\rExecuting Runnable:  47%|\u2588\u2588\u2588\u2588\u258b     | 47000/100000 [02:09<02:44, 322.05it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  53%|\u2588\u2588\u2588\u2588\u2588\u258e    | 52714/100000 [02:06<01:52, 418.52it/s]"
+        "text": "\rExecuting Runnable:  47%|\u2588\u2588\u2588\u2588\u258b     | 47188/100000 [02:10<02:36, 337.71it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  53%|\u2588\u2588\u2588\u2588\u2588\u258e    | 52924/100000 [02:07<01:52, 418.21it/s]"
+        "text": "\rExecuting Runnable:  47%|\u2588\u2588\u2588\u2588\u258b     | 47387/100000 [02:10<02:28, 355.44it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  53%|\u2588\u2588\u2588\u2588\u2588\u258e    | 53135/100000 [02:07<01:51, 418.86it/s]"
+        "text": "\rExecuting Runnable:  48%|\u2588\u2588\u2588\u2588\u258a     | 47589/100000 [02:11<02:21, 369.70it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  53%|\u2588\u2588\u2588\u2588\u2588\u258e    | 53348/100000 [02:08<01:50, 420.46it/s]"
+        "text": "\rExecuting Runnable:  48%|\u2588\u2588\u2588\u2588\u258a     | 47775/100000 [02:12<02:38, 328.58it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  54%|\u2588\u2588\u2588\u2588\u2588\u258e    | 53559/100000 [02:08<01:50, 419.44it/s]"
+        "text": "\rExecuting Runnable:  48%|\u2588\u2588\u2588\u2588\u258a     | 47944/100000 [02:12<02:46, 313.44it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  54%|\u2588\u2588\u2588\u2588\u2588\u258d    | 53772/100000 [02:09<01:49, 421.14it/s]"
+        "text": "\rExecuting Runnable:  48%|\u2588\u2588\u2588\u2588\u258a     | 48105/100000 [02:13<02:51, 302.38it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  54%|\u2588\u2588\u2588\u2588\u2588\u258d    | 53987/100000 [02:09<01:48, 423.34it/s]"
+        "text": "\rExecuting Runnable:  48%|\u2588\u2588\u2588\u2588\u258a     | 48259/100000 [02:13<02:54, 296.18it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  54%|\u2588\u2588\u2588\u2588\u2588\u258d    | 54199/100000 [02:10<01:48, 421.69it/s]"
+        "text": "\rExecuting Runnable:  48%|\u2588\u2588\u2588\u2588\u258a     | 48409/100000 [02:14<02:55, 294.49it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  54%|\u2588\u2588\u2588\u2588\u2588\u258d    | 54410/100000 [02:10<01:48, 418.90it/s]"
+        "text": "\rExecuting Runnable:  49%|\u2588\u2588\u2588\u2588\u258a     | 48558/100000 [02:14<02:59, 286.87it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  55%|\u2588\u2588\u2588\u2588\u2588\u258d    | 54624/100000 [02:11<01:47, 421.15it/s]"
+        "text": "\rExecuting Runnable:  49%|\u2588\u2588\u2588\u2588\u258a     | 48703/100000 [02:15<02:59, 285.87it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  55%|\u2588\u2588\u2588\u2588\u2588\u258d    | 54835/100000 [02:11<01:47, 420.29it/s]"
+        "text": "\rExecuting Runnable:  49%|\u2588\u2588\u2588\u2588\u2589     | 48847/100000 [02:15<03:00, 284.10it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  55%|\u2588\u2588\u2588\u2588\u2588\u258c    | 55046/100000 [02:12<01:47, 419.04it/s]"
+        "text": "\rExecuting Runnable:  49%|\u2588\u2588\u2588\u2588\u2589     | 48990/100000 [02:16<03:03, 277.56it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  55%|\u2588\u2588\u2588\u2588\u2588\u258c    | 55260/100000 [02:12<01:46, 420.74it/s]"
+        "text": "\rExecuting Runnable:  49%|\u2588\u2588\u2588\u2588\u2589     | 49166/100000 [02:17<02:50, 298.79it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  55%|\u2588\u2588\u2588\u2588\u2588\u258c    | 55471/100000 [02:13<01:45, 420.95it/s]"
+        "text": "\rExecuting Runnable:  49%|\u2588\u2588\u2588\u2588\u2589     | 49317/100000 [02:17<02:55, 288.61it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  56%|\u2588\u2588\u2588\u2588\u2588\u258c    | 55684/100000 [02:13<01:45, 422.05it/s]"
+        "text": "\rExecuting Runnable:  49%|\u2588\u2588\u2588\u2588\u2589     | 49463/100000 [02:18<02:59, 281.81it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  56%|\u2588\u2588\u2588\u2588\u2588\u258c    | 55898/100000 [02:14<01:44, 423.29it/s]"
+        "text": "\rExecuting Runnable:  50%|\u2588\u2588\u2588\u2588\u2589     | 49605/100000 [02:18<03:01, 278.18it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  56%|\u2588\u2588\u2588\u2588\u2588\u258c    | 56110/100000 [02:14<01:43, 422.51it/s]"
+        "text": "\rExecuting Runnable:  50%|\u2588\u2588\u2588\u2588\u2589     | 49745/100000 [02:19<03:04, 272.26it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  56%|\u2588\u2588\u2588\u2588\u2588\u258b    | 56322/100000 [02:15<01:44, 418.35it/s]"
+        "text": "\rExecuting Runnable:  50%|\u2588\u2588\u2588\u2588\u2589     | 49888/100000 [02:19<03:01, 275.64it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  57%|\u2588\u2588\u2588\u2588\u2588\u258b    | 56532/100000 [02:15<01:43, 418.64it/s]"
+        "text": "\rExecuting Runnable:  50%|\u2588\u2588\u2588\u2588\u2588     | 50030/100000 [02:20<02:59, 277.84it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  57%|\u2588\u2588\u2588\u2588\u2588\u258b    | 56742/100000 [02:16<01:43, 416.43it/s]"
+        "text": "\rExecuting Runnable:  50%|\u2588\u2588\u2588\u2588\u2588     | 50172/100000 [02:20<02:58, 279.26it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  57%|\u2588\u2588\u2588\u2588\u2588\u258b    | 56952/100000 [02:16<01:43, 417.38it/s]"
+        "text": "\rExecuting Runnable:  50%|\u2588\u2588\u2588\u2588\u2588     | 50312/100000 [02:21<02:59, 276.64it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  57%|\u2588\u2588\u2588\u2588\u2588\u258b    | 57164/100000 [02:17<01:42, 418.98it/s]"
+        "text": "\rExecuting Runnable:  50%|\u2588\u2588\u2588\u2588\u2588     | 50464/100000 [02:21<02:54, 284.59it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  57%|\u2588\u2588\u2588\u2588\u2588\u258b    | 57374/100000 [02:17<01:41, 418.29it/s]"
+        "text": "\rExecuting Runnable:  51%|\u2588\u2588\u2588\u2588\u2588     | 50658/100000 [02:22<02:36, 314.82it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  58%|\u2588\u2588\u2588\u2588\u2588\u258a    | 57591/100000 [02:18<01:40, 422.69it/s]"
+        "text": "\rExecuting Runnable:  51%|\u2588\u2588\u2588\u2588\u2588     | 50855/100000 [02:22<02:25, 337.90it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  58%|\u2588\u2588\u2588\u2588\u2588\u258a    | 57807/100000 [02:18<01:39, 424.98it/s]"
+        "text": "\rExecuting Runnable:  51%|\u2588\u2588\u2588\u2588\u2588     | 51049/100000 [02:23<02:18, 352.34it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  58%|\u2588\u2588\u2588\u2588\u2588\u258a    | 58021/100000 [02:19<01:38, 425.39it/s]"
+        "text": "\rExecuting Runnable:  51%|\u2588\u2588\u2588\u2588\u2588     | 51226/100000 [02:23<02:28, 329.08it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  58%|\u2588\u2588\u2588\u2588\u2588\u258a    | 58234/100000 [02:19<01:38, 424.95it/s]"
+        "text": "\rExecuting Runnable:  51%|\u2588\u2588\u2588\u2588\u2588\u258f    | 51393/100000 [02:24<02:37, 309.21it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  58%|\u2588\u2588\u2588\u2588\u2588\u258a    | 58447/100000 [02:20<01:38, 421.73it/s]"
+        "text": "\rExecuting Runnable:  52%|\u2588\u2588\u2588\u2588\u2588\u258f    | 51550/100000 [02:25<02:40, 300.99it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  59%|\u2588\u2588\u2588\u2588\u2588\u258a    | 58658/100000 [02:20<01:38, 418.67it/s]"
+        "text": "\rExecuting Runnable:  52%|\u2588\u2588\u2588\u2588\u2588\u258f    | 51702/100000 [02:25<02:48, 286.98it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  59%|\u2588\u2588\u2588\u2588\u2588\u2589    | 58868/100000 [02:21<01:38, 418.60it/s]"
+        "text": "\rExecuting Runnable:  52%|\u2588\u2588\u2588\u2588\u2588\u258f    | 51847/100000 [02:26<02:51, 281.38it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  59%|\u2588\u2588\u2588\u2588\u2588\u2589    | 59078/100000 [02:21<01:38, 416.23it/s]"
+        "text": "\rExecuting Runnable:  52%|\u2588\u2588\u2588\u2588\u2588\u258f    | 51989/100000 [02:26<02:52, 277.91it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  59%|\u2588\u2588\u2588\u2588\u2588\u2589    | 59287/100000 [02:22<01:37, 416.08it/s]"
+        "text": "\rExecuting Runnable:  52%|\u2588\u2588\u2588\u2588\u2588\u258f    | 52129/100000 [02:27<02:54, 274.65it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  59%|\u2588\u2588\u2588\u2588\u2588\u2589    | 59496/100000 [02:22<01:37, 416.53it/s]"
+        "text": "\rExecuting Runnable:  52%|\u2588\u2588\u2588\u2588\u2588\u258f    | 52267/100000 [02:27<02:53, 274.86it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  60%|\u2588\u2588\u2588\u2588\u2588\u2589    | 59705/100000 [02:23<01:36, 415.42it/s]"
+        "text": "\rExecuting Runnable:  52%|\u2588\u2588\u2588\u2588\u2588\u258f    | 52466/100000 [02:28<02:33, 310.23it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  60%|\u2588\u2588\u2588\u2588\u2588\u2589    | 59918/100000 [02:23<01:35, 418.37it/s]"
+        "text": "\rExecuting Runnable:  53%|\u2588\u2588\u2588\u2588\u2588\u258e    | 52631/100000 [02:28<02:29, 315.85it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  60%|\u2588\u2588\u2588\u2588\u2588\u2588    | 60128/100000 [02:24<01:36, 413.07it/s]"
+        "text": "\rExecuting Runnable:  53%|\u2588\u2588\u2588\u2588\u2588\u258e    | 52820/100000 [02:29<02:21, 333.74it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  60%|\u2588\u2588\u2588\u2588\u2588\u2588    | 60341/100000 [02:24<01:35, 416.74it/s]"
+        "text": "\rExecuting Runnable:  53%|\u2588\u2588\u2588\u2588\u2588\u258e    | 53021/100000 [02:29<02:12, 353.67it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  61%|\u2588\u2588\u2588\u2588\u2588\u2588    | 60550/100000 [02:25<01:34, 416.55it/s]"
+        "text": "\rExecuting Runnable:  53%|\u2588\u2588\u2588\u2588\u2588\u258e    | 53221/100000 [02:30<02:07, 367.17it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  61%|\u2588\u2588\u2588\u2588\u2588\u2588    | 60759/100000 [02:25<01:35, 411.30it/s]"
+        "text": "\rExecuting Runnable:  53%|\u2588\u2588\u2588\u2588\u2588\u258e    | 53406/100000 [02:30<02:06, 367.74it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  61%|\u2588\u2588\u2588\u2588\u2588\u2588    | 60965/100000 [02:26<01:34, 411.18it/s]"
+        "text": "\rExecuting Runnable:  54%|\u2588\u2588\u2588\u2588\u2588\u258e    | 53599/100000 [02:31<02:04, 373.08it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  61%|\u2588\u2588\u2588\u2588\u2588\u2588    | 61171/100000 [02:26<01:37, 399.80it/s]"
+        "text": "\rExecuting Runnable:  54%|\u2588\u2588\u2588\u2588\u2588\u258d    | 53799/100000 [02:31<02:01, 380.86it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  61%|\u2588\u2588\u2588\u2588\u2588\u2588\u258f   | 61372/100000 [02:27<01:38, 393.92it/s]"
+        "text": "\rExecuting Runnable:  54%|\u2588\u2588\u2588\u2588\u2588\u258d    | 53992/100000 [02:32<02:00, 382.12it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  62%|\u2588\u2588\u2588\u2588\u2588\u2588\u258f   | 61578/100000 [02:27<01:36, 399.15it/s]"
+        "text": "\rExecuting Runnable:  54%|\u2588\u2588\u2588\u2588\u2588\u258d    | 54193/100000 [02:32<01:58, 387.50it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  62%|\u2588\u2588\u2588\u2588\u2588\u2588\u258f   | 61778/100000 [02:28<01:42, 372.31it/s]"
+        "text": "\rExecuting Runnable:  54%|\u2588\u2588\u2588\u2588\u2588\u258d    | 54394/100000 [02:33<01:56, 391.34it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  62%|\u2588\u2588\u2588\u2588\u2588\u2588\u258f   | 61979/100000 [02:29<01:39, 380.50it/s]"
+        "text": "\rExecuting Runnable:  55%|\u2588\u2588\u2588\u2588\u2588\u258d    | 54590/100000 [02:33<01:56, 391.22it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  62%|\u2588\u2588\u2588\u2588\u2588\u2588\u258f   | 62171/100000 [02:29<01:43, 365.99it/s]"
+        "text": "\rExecuting Runnable:  55%|\u2588\u2588\u2588\u2588\u2588\u258d    | 54786/100000 [02:34<01:56, 388.43it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  62%|\u2588\u2588\u2588\u2588\u2588\u2588\u258f   | 62367/100000 [02:30<01:40, 372.98it/s]"
+        "text": "\rExecuting Runnable:  55%|\u2588\u2588\u2588\u2588\u2588\u258d    | 54981/100000 [02:34<01:55, 388.65it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  63%|\u2588\u2588\u2588\u2588\u2588\u2588\u258e   | 62555/100000 [02:30<01:43, 361.95it/s]"
+        "text": "\rExecuting Runnable:  55%|\u2588\u2588\u2588\u2588\u2588\u258c    | 55176/100000 [02:35<01:55, 388.13it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  63%|\u2588\u2588\u2588\u2588\u2588\u2588\u258e   | 62757/100000 [02:31<01:39, 373.85it/s]"
+        "text": "\rExecuting Runnable:  55%|\u2588\u2588\u2588\u2588\u2588\u258c    | 55371/100000 [02:35<01:55, 387.25it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  63%|\u2588\u2588\u2588\u2588\u2588\u2588\u258e   | 62953/100000 [02:31<01:37, 378.98it/s]"
+        "text": "\rExecuting Runnable:  56%|\u2588\u2588\u2588\u2588\u2588\u258c    | 55566/100000 [02:36<01:54, 387.92it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  63%|\u2588\u2588\u2588\u2588\u2588\u2588\u258e   | 63144/100000 [02:32<01:37, 376.25it/s]"
+        "text": "\rExecuting Runnable:  56%|\u2588\u2588\u2588\u2588\u2588\u258c    | 55762/100000 [02:36<01:53, 388.61it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  63%|\u2588\u2588\u2588\u2588\u2588\u2588\u258e   | 63357/100000 [02:32<01:33, 390.29it/s]"
+        "text": "\rExecuting Runnable:  56%|\u2588\u2588\u2588\u2588\u2588\u258c    | 55957/100000 [02:37<01:53, 388.99it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  64%|\u2588\u2588\u2588\u2588\u2588\u2588\u258e   | 63553/100000 [02:33<01:33, 388.34it/s]"
+        "text": "\rExecuting Runnable:  56%|\u2588\u2588\u2588\u2588\u2588\u258c    | 56152/100000 [02:37<01:52, 389.22it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  64%|\u2588\u2588\u2588\u2588\u2588\u2588\u258d   | 63754/100000 [02:33<01:32, 391.98it/s]"
+        "text": "\rExecuting Runnable:  56%|\u2588\u2588\u2588\u2588\u2588\u258b    | 56347/100000 [02:38<01:56, 376.30it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  64%|\u2588\u2588\u2588\u2588\u2588\u2588\u258d   | 63951/100000 [02:34<01:33, 384.24it/s]"
+        "text": "\rExecuting Runnable:  57%|\u2588\u2588\u2588\u2588\u2588\u258b    | 56536/100000 [02:38<02:02, 354.87it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  64%|\u2588\u2588\u2588\u2588\u2588\u2588\u258d   | 64160/100000 [02:34<01:31, 393.84it/s]"
+        "text": "\rExecuting Runnable:  57%|\u2588\u2588\u2588\u2588\u2588\u258b    | 56715/100000 [02:39<02:09, 334.11it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  64%|\u2588\u2588\u2588\u2588\u2588\u2588\u258d   | 64358/100000 [02:35<01:30, 394.39it/s]"
+        "text": "\rExecuting Runnable:  57%|\u2588\u2588\u2588\u2588\u2588\u258b    | 56884/100000 [02:40<02:14, 320.53it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  65%|\u2588\u2588\u2588\u2588\u2588\u2588\u258d   | 64563/100000 [02:35<01:28, 398.30it/s]"
+        "text": "\rExecuting Runnable:  57%|\u2588\u2588\u2588\u2588\u2588\u258b    | 57046/100000 [02:40<02:17, 311.78it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  65%|\u2588\u2588\u2588\u2588\u2588\u2588\u258d   | 64769/100000 [02:36<01:27, 401.81it/s]"
+        "text": "\rExecuting Runnable:  57%|\u2588\u2588\u2588\u2588\u2588\u258b    | 57203/100000 [02:41<02:19, 305.78it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  65%|\u2588\u2588\u2588\u2588\u2588\u2588\u258d   | 64976/100000 [02:36<01:26, 405.19it/s]"
+        "text": "\rExecuting Runnable:  57%|\u2588\u2588\u2588\u2588\u2588\u258b    | 57357/100000 [02:41<02:21, 301.64it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  65%|\u2588\u2588\u2588\u2588\u2588\u2588\u258c   | 65179/100000 [02:37<01:25, 405.08it/s]"
+        "text": "\rExecuting Runnable:  58%|\u2588\u2588\u2588\u2588\u2588\u258a    | 57509/100000 [02:42<02:22, 298.91it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  65%|\u2588\u2588\u2588\u2588\u2588\u2588\u258c   | 65387/100000 [02:37<01:24, 407.84it/s]"
+        "text": "\rExecuting Runnable:  58%|\u2588\u2588\u2588\u2588\u2588\u258a    | 57659/100000 [02:42<02:22, 296.13it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  66%|\u2588\u2588\u2588\u2588\u2588\u2588\u258c   | 65594/100000 [02:38<01:24, 409.21it/s]"
+        "text": "\rExecuting Runnable:  58%|\u2588\u2588\u2588\u2588\u2588\u258a    | 57808/100000 [02:43<02:23, 294.01it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  66%|\u2588\u2588\u2588\u2588\u2588\u2588\u258c   | 65799/100000 [02:38<01:24, 402.60it/s]"
+        "text": "\rExecuting Runnable:  58%|\u2588\u2588\u2588\u2588\u2588\u258a    | 57956/100000 [02:43<02:23, 293.08it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  66%|\u2588\u2588\u2588\u2588\u2588\u2588\u258c   | 66001/100000 [02:39<01:24, 400.70it/s]"
+        "text": "\rExecuting Runnable:  58%|\u2588\u2588\u2588\u2588\u2588\u258a    | 58103/100000 [02:44<02:23, 292.70it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  66%|\u2588\u2588\u2588\u2588\u2588\u2588\u258c   | 66203/100000 [02:39<01:24, 401.57it/s]"
+        "text": "\rExecuting Runnable:  58%|\u2588\u2588\u2588\u2588\u2588\u258a    | 58250/100000 [02:44<02:22, 292.48it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  66%|\u2588\u2588\u2588\u2588\u2588\u2588\u258b   | 66404/100000 [02:40<01:24, 396.05it/s]"
+        "text": "\rExecuting Runnable:  58%|\u2588\u2588\u2588\u2588\u2588\u258a    | 58397/100000 [02:45<02:22, 291.21it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  67%|\u2588\u2588\u2588\u2588\u2588\u2588\u258b   | 66603/100000 [02:40<01:26, 386.00it/s]"
+        "text": "\rExecuting Runnable:  59%|\u2588\u2588\u2588\u2588\u2588\u258a    | 58543/100000 [02:45<02:23, 289.70it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  67%|\u2588\u2588\u2588\u2588\u2588\u2588\u258b   | 66805/100000 [02:41<01:24, 390.94it/s]"
+        "text": "\rExecuting Runnable:  59%|\u2588\u2588\u2588\u2588\u2588\u258a    | 58690/100000 [02:46<02:22, 290.69it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  67%|\u2588\u2588\u2588\u2588\u2588\u2588\u258b   | 67001/100000 [02:41<01:24, 389.51it/s]"
+        "text": "\rExecuting Runnable:  59%|\u2588\u2588\u2588\u2588\u2588\u2589    | 58836/100000 [02:46<02:21, 290.44it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  67%|\u2588\u2588\u2588\u2588\u2588\u2588\u258b   | 67196/100000 [02:42<01:25, 381.67it/s]"
+        "text": "\rExecuting Runnable:  59%|\u2588\u2588\u2588\u2588\u2588\u2589    | 58982/100000 [02:47<02:21, 290.52it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  67%|\u2588\u2588\u2588\u2588\u2588\u2588\u258b   | 67401/100000 [02:42<01:23, 389.68it/s]"
+        "text": "\rExecuting Runnable:  59%|\u2588\u2588\u2588\u2588\u2588\u2589    | 59165/100000 [02:47<02:10, 312.61it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  68%|\u2588\u2588\u2588\u2588\u2588\u2588\u258a   | 67598/100000 [02:43<01:22, 390.91it/s]"
+        "text": "\rExecuting Runnable:  59%|\u2588\u2588\u2588\u2588\u2588\u2589    | 59359/100000 [02:48<02:01, 334.98it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  68%|\u2588\u2588\u2588\u2588\u2588\u2588\u258a   | 67800/100000 [02:43<01:21, 394.76it/s]"
+        "text": "\rExecuting Runnable:  60%|\u2588\u2588\u2588\u2588\u2588\u2589    | 59527/100000 [02:48<02:02, 329.97it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  68%|\u2588\u2588\u2588\u2588\u2588\u2588\u258a   | 67998/100000 [02:44<01:23, 381.20it/s]"
+        "text": "\rExecuting Runnable:  60%|\u2588\u2588\u2588\u2588\u2588\u2589    | 59693/100000 [02:49<02:06, 319.02it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  68%|\u2588\u2588\u2588\u2588\u2588\u2588\u258a   | 68199/100000 [02:45<01:22, 387.12it/s]"
+        "text": "\rExecuting Runnable:  60%|\u2588\u2588\u2588\u2588\u2588\u2589    | 59867/100000 [02:49<02:02, 327.05it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  68%|\u2588\u2588\u2588\u2588\u2588\u2588\u258a   | 68397/100000 [02:45<01:21, 389.58it/s]"
+        "text": "\rExecuting Runnable:  60%|\u2588\u2588\u2588\u2588\u2588\u2588    | 60067/100000 [02:50<01:54, 347.98it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  69%|\u2588\u2588\u2588\u2588\u2588\u2588\u258a   | 68593/100000 [02:46<01:20, 388.94it/s]"
+        "text": "\rExecuting Runnable:  60%|\u2588\u2588\u2588\u2588\u2588\u2588    | 60266/100000 [02:50<01:49, 362.52it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  69%|\u2588\u2588\u2588\u2588\u2588\u2588\u2589   | 68796/100000 [02:46<01:19, 393.89it/s]"
+        "text": "\rExecuting Runnable:  60%|\u2588\u2588\u2588\u2588\u2588\u2588    | 60464/100000 [02:51<01:46, 372.09it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  69%|\u2588\u2588\u2588\u2588\u2588\u2588\u2589   | 68999/100000 [02:47<01:18, 397.06it/s]"
+        "text": "\rExecuting Runnable:  61%|\u2588\u2588\u2588\u2588\u2588\u2588    | 60651/100000 [02:51<01:45, 372.29it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  69%|\u2588\u2588\u2588\u2588\u2588\u2588\u2589   | 69198/100000 [02:47<01:17, 396.46it/s]"
+        "text": "\rExecuting Runnable:  61%|\u2588\u2588\u2588\u2588\u2588\u2588    | 60838/100000 [02:52<01:46, 368.62it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  69%|\u2588\u2588\u2588\u2588\u2588\u2588\u2589   | 69397/100000 [02:48<01:17, 396.21it/s]"
+        "text": "\rExecuting Runnable:  61%|\u2588\u2588\u2588\u2588\u2588\u2588    | 61034/100000 [02:52<01:43, 374.97it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  70%|\u2588\u2588\u2588\u2588\u2588\u2588\u2589   | 69601/100000 [02:48<01:16, 399.39it/s]"
+        "text": "\rExecuting Runnable:  61%|\u2588\u2588\u2588\u2588\u2588\u2588    | 61230/100000 [02:53<01:42, 379.89it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  70%|\u2588\u2588\u2588\u2588\u2588\u2588\u2589   | 69804/100000 [02:49<01:15, 400.96it/s]"
+        "text": "\rExecuting Runnable:  61%|\u2588\u2588\u2588\u2588\u2588\u2588\u258f   | 61426/100000 [02:53<01:40, 382.96it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  70%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588   | 70005/100000 [02:49<01:15, 397.79it/s]"
+        "text": "\rExecuting Runnable:  62%|\u2588\u2588\u2588\u2588\u2588\u2588\u258f   | 61618/100000 [02:54<01:41, 378.34it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  70%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588   | 70204/100000 [02:50<01:15, 395.97it/s]"
+        "text": "\rExecuting Runnable:  62%|\u2588\u2588\u2588\u2588\u2588\u2588\u258f   | 61816/100000 [02:55<01:39, 383.44it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  70%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588   | 70403/100000 [02:50<01:15, 394.26it/s]"
+        "text": "\rExecuting Runnable:  62%|\u2588\u2588\u2588\u2588\u2588\u2588\u258f   | 62014/100000 [02:55<01:38, 386.82it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  71%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588   | 70608/100000 [02:51<01:13, 398.42it/s]"
+        "text": "\rExecuting Runnable:  62%|\u2588\u2588\u2588\u2588\u2588\u2588\u258f   | 62212/100000 [02:56<01:37, 389.25it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  71%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588   | 70812/100000 [02:51<01:12, 400.90it/s]"
+        "text": "\rExecuting Runnable:  62%|\u2588\u2588\u2588\u2588\u2588\u2588\u258f   | 62407/100000 [02:56<01:49, 342.33it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  71%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588   | 71015/100000 [02:52<01:12, 402.04it/s]"
+        "text": "\rExecuting Runnable:  63%|\u2588\u2588\u2588\u2588\u2588\u2588\u258e   | 62584/100000 [02:57<01:57, 318.49it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  71%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588   | 71223/100000 [02:52<01:10, 405.79it/s]"
+        "text": "\rExecuting Runnable:  63%|\u2588\u2588\u2588\u2588\u2588\u2588\u258e   | 62748/100000 [02:57<02:02, 304.80it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  71%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f  | 71427/100000 [02:53<01:10, 406.17it/s]"
+        "text": "\rExecuting Runnable:  63%|\u2588\u2588\u2588\u2588\u2588\u2588\u258e   | 62904/100000 [02:58<02:06, 294.30it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  72%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f  | 71631/100000 [02:53<01:09, 405.45it/s]"
+        "text": "\rExecuting Runnable:  63%|\u2588\u2588\u2588\u2588\u2588\u2588\u258e   | 63054/100000 [02:59<02:08, 288.03it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  72%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f  | 71837/100000 [02:54<01:09, 407.03it/s]"
+        "text": "\rExecuting Runnable:  63%|\u2588\u2588\u2588\u2588\u2588\u2588\u258e   | 63200/100000 [02:59<02:09, 283.91it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  72%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f  | 72046/100000 [02:54<01:08, 410.04it/s]"
+        "text": "\rExecuting Runnable:  63%|\u2588\u2588\u2588\u2588\u2588\u2588\u258e   | 63343/100000 [03:00<02:10, 280.26it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  72%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f  | 72252/100000 [02:55<01:08, 405.10it/s]"
+        "text": "\rExecuting Runnable:  63%|\u2588\u2588\u2588\u2588\u2588\u2588\u258e   | 63484/100000 [03:00<02:11, 277.74it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  72%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f  | 72461/100000 [02:55<01:07, 408.68it/s]"
+        "text": "\rExecuting Runnable:  64%|\u2588\u2588\u2588\u2588\u2588\u2588\u258e   | 63624/100000 [03:01<02:11, 276.87it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  73%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258e  | 72669/100000 [02:56<01:06, 410.73it/s]"
+        "text": "\rExecuting Runnable:  64%|\u2588\u2588\u2588\u2588\u2588\u2588\u258d   | 63785/100000 [03:01<02:04, 289.74it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  73%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258e  | 72875/100000 [02:56<01:06, 404.93it/s]"
+        "text": "\rExecuting Runnable:  64%|\u2588\u2588\u2588\u2588\u2588\u2588\u258d   | 63962/100000 [03:02<01:56, 308.13it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  73%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258e  | 73078/100000 [02:57<01:07, 398.16it/s]"
+        "text": "\rExecuting Runnable:  64%|\u2588\u2588\u2588\u2588\u2588\u2588\u258d   | 64117/100000 [03:02<02:01, 295.06it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  73%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258e  | 73280/100000 [02:57<01:06, 399.63it/s]"
+        "text": "\rExecuting Runnable:  64%|\u2588\u2588\u2588\u2588\u2588\u2588\u258d   | 64274/100000 [03:03<01:59, 300.09it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  73%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258e  | 73480/100000 [02:58<01:07, 394.91it/s]"
+        "text": "\rExecuting Runnable:  64%|\u2588\u2588\u2588\u2588\u2588\u2588\u258d   | 64472/100000 [03:03<01:48, 327.83it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  74%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258e  | 73678/100000 [02:58<01:07, 390.71it/s]"
+        "text": "\rExecuting Runnable:  65%|\u2588\u2588\u2588\u2588\u2588\u2588\u258d   | 64666/100000 [03:04<01:42, 345.39it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  74%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258d  | 73874/100000 [02:59<01:07, 388.92it/s]"
+        "text": "\rExecuting Runnable:  65%|\u2588\u2588\u2588\u2588\u2588\u2588\u258d   | 64840/100000 [03:04<01:50, 317.51it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  74%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258d  | 74076/100000 [02:59<01:05, 392.91it/s]"
+        "text": "\rExecuting Runnable:  65%|\u2588\u2588\u2588\u2588\u2588\u2588\u258c   | 65002/100000 [03:05<01:55, 302.54it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  74%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258d  | 74273/100000 [03:00<01:06, 389.60it/s]"
+        "text": "\rExecuting Runnable:  65%|\u2588\u2588\u2588\u2588\u2588\u2588\u258c   | 65156/100000 [03:06<01:59, 292.70it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  74%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258d  | 74474/100000 [03:00<01:04, 393.20it/s]"
+        "text": "\rExecuting Runnable:  65%|\u2588\u2588\u2588\u2588\u2588\u2588\u258c   | 65304/100000 [03:06<02:01, 285.33it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  75%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258d  | 74681/100000 [03:01<01:03, 398.87it/s]"
+        "text": "\rExecuting Runnable:  65%|\u2588\u2588\u2588\u2588\u2588\u2588\u258c   | 65448/100000 [03:07<02:03, 279.38it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  75%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258d  | 74882/100000 [03:01<01:02, 399.80it/s]"
+        "text": "\rExecuting Runnable:  66%|\u2588\u2588\u2588\u2588\u2588\u2588\u258c   | 65595/100000 [03:07<02:01, 283.04it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  75%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258c  | 75082/100000 [03:02<01:03, 392.54it/s]"
+        "text": "\rExecuting Runnable:  66%|\u2588\u2588\u2588\u2588\u2588\u2588\u258c   | 65791/100000 [03:08<01:49, 313.52it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  75%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258c  | 75279/100000 [03:02<01:03, 387.91it/s]"
+        "text": "\rExecuting Runnable:  66%|\u2588\u2588\u2588\u2588\u2588\u2588\u258c   | 65987/100000 [03:08<01:41, 336.01it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  75%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258c  | 75482/100000 [03:03<01:02, 392.73it/s]"
+        "text": "\rExecuting Runnable:  66%|\u2588\u2588\u2588\u2588\u2588\u2588\u258c   | 66184/100000 [03:09<01:35, 352.40it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  76%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258c  | 75680/100000 [03:03<01:01, 393.48it/s]"
+        "text": "\rExecuting Runnable:  66%|\u2588\u2588\u2588\u2588\u2588\u2588\u258b   | 66380/100000 [03:09<01:32, 364.00it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  76%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258c  | 75879/100000 [03:04<01:01, 394.63it/s]"
+        "text": "\rExecuting Runnable:  67%|\u2588\u2588\u2588\u2588\u2588\u2588\u258b   | 66563/100000 [03:10<01:40, 331.86it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  76%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258c  | 76081/100000 [03:04<01:00, 397.30it/s]"
+        "text": "\rExecuting Runnable:  67%|\u2588\u2588\u2588\u2588\u2588\u2588\u258b   | 66733/100000 [03:11<01:46, 311.59it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  76%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b  | 76285/100000 [03:05<00:59, 400.28it/s]"
+        "text": "\rExecuting Runnable:  67%|\u2588\u2588\u2588\u2588\u2588\u2588\u258b   | 66892/100000 [03:11<01:51, 297.77it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  76%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b  | 76486/100000 [03:05<00:59, 396.43it/s]"
+        "text": "\rExecuting Runnable:  67%|\u2588\u2588\u2588\u2588\u2588\u2588\u258b   | 67044/100000 [03:12<01:54, 288.96it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  77%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b  | 76693/100000 [03:06<00:58, 401.25it/s]"
+        "text": "\rExecuting Runnable:  67%|\u2588\u2588\u2588\u2588\u2588\u2588\u258b   | 67191/100000 [03:12<01:55, 283.06it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  77%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b  | 76894/100000 [03:06<00:58, 394.87it/s]"
+        "text": "\rExecuting Runnable:  67%|\u2588\u2588\u2588\u2588\u2588\u2588\u258b   | 67334/100000 [03:13<01:57, 279.05it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  77%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b  | 77105/100000 [03:07<00:56, 402.60it/s]"
+        "text": "\rExecuting Runnable:  67%|\u2588\u2588\u2588\u2588\u2588\u2588\u258b   | 67475/100000 [03:13<01:57, 276.56it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  77%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b  | 77309/100000 [03:07<00:56, 404.14it/s]"
+        "text": "\rExecuting Runnable:  68%|\u2588\u2588\u2588\u2588\u2588\u2588\u258a   | 67614/100000 [03:14<01:57, 275.05it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  78%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a  | 77513/100000 [03:08<00:55, 404.78it/s]"
+        "text": "\rExecuting Runnable:  68%|\u2588\u2588\u2588\u2588\u2588\u2588\u258a   | 67752/100000 [03:14<01:57, 274.15it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  78%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a  | 77716/100000 [03:08<00:55, 399.54it/s]"
+        "text": "\rExecuting Runnable:  68%|\u2588\u2588\u2588\u2588\u2588\u2588\u258a   | 67890/100000 [03:15<01:58, 271.50it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  78%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a  | 77917/100000 [03:09<00:55, 400.11it/s]"
+        "text": "\rExecuting Runnable:  68%|\u2588\u2588\u2588\u2588\u2588\u2588\u258a   | 68026/100000 [03:15<01:57, 271.22it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  78%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a  | 78119/100000 [03:09<00:54, 401.20it/s]"
+        "text": "\rExecuting Runnable:  68%|\u2588\u2588\u2588\u2588\u2588\u2588\u258a   | 68228/100000 [03:16<01:42, 310.01it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  78%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a  | 78323/100000 [03:10<00:53, 402.81it/s]"
+        "text": "\rExecuting Runnable:  68%|\u2588\u2588\u2588\u2588\u2588\u2588\u258a   | 68431/100000 [03:16<01:33, 337.93it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  79%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a  | 78525/100000 [03:10<00:53, 401.60it/s]"
+        "text": "\rExecuting Runnable:  69%|\u2588\u2588\u2588\u2588\u2588\u2588\u258a   | 68631/100000 [03:17<01:28, 355.98it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  79%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a  | 78728/100000 [03:11<00:52, 402.89it/s]"
+        "text": "\rExecuting Runnable:  69%|\u2588\u2588\u2588\u2588\u2588\u2588\u2589   | 68810/100000 [03:17<01:32, 336.00it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  79%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589  | 78930/100000 [03:11<00:52, 397.82it/s]"
+        "text": "\rExecuting Runnable:  69%|\u2588\u2588\u2588\u2588\u2588\u2588\u2589   | 68980/100000 [03:18<01:36, 320.56it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  79%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589  | 79135/100000 [03:12<00:52, 400.92it/s]"
+        "text": "\rExecuting Runnable:  69%|\u2588\u2588\u2588\u2588\u2588\u2588\u2589   | 69142/100000 [03:19<01:39, 309.26it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  79%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589  | 79341/100000 [03:12<00:51, 404.16it/s]"
+        "text": "\rExecuting Runnable:  69%|\u2588\u2588\u2588\u2588\u2588\u2588\u2589   | 69298/100000 [03:19<01:41, 301.38it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  80%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589  | 79546/100000 [03:13<00:50, 405.55it/s]"
+        "text": "\rExecuting Runnable:  69%|\u2588\u2588\u2588\u2588\u2588\u2588\u2589   | 69450/100000 [03:20<01:42, 296.68it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  80%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589  | 79749/100000 [03:13<00:50, 402.02it/s]"
+        "text": "\rExecuting Runnable:  70%|\u2588\u2588\u2588\u2588\u2588\u2588\u2589   | 69599/100000 [03:20<01:43, 293.38it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  80%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589  | 79955/100000 [03:14<00:49, 404.83it/s]"
+        "text": "\rExecuting Runnable:  70%|\u2588\u2588\u2588\u2588\u2588\u2588\u2589   | 69746/100000 [03:21<01:43, 291.66it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  80%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588  | 80158/100000 [03:14<00:49, 404.70it/s]"
+        "text": "\rExecuting Runnable:  70%|\u2588\u2588\u2588\u2588\u2588\u2588\u2589   | 69892/100000 [03:21<01:43, 290.00it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  80%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588  | 80365/100000 [03:15<00:48, 407.34it/s]"
+        "text": "\rExecuting Runnable:  70%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588   | 70038/100000 [03:22<01:43, 289.41it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  81%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588  | 80569/100000 [03:15<00:48, 404.46it/s]"
+        "text": "\rExecuting Runnable:  70%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588   | 70207/100000 [03:22<01:38, 303.35it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  81%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588  | 80772/100000 [03:16<00:47, 404.73it/s]"
+        "text": "\rExecuting Runnable:  70%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588   | 70359/100000 [03:23<01:39, 296.86it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  81%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588  | 80975/100000 [03:16<00:47, 402.23it/s]"
+        "text": "\rExecuting Runnable:  71%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588   | 70508/100000 [03:23<01:41, 289.72it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  81%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588  | 81178/100000 [03:17<00:46, 402.97it/s]"
+        "text": "\rExecuting Runnable:  71%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588   | 70654/100000 [03:24<01:43, 284.44it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  81%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f | 81380/100000 [03:18<00:47, 392.69it/s]"
+        "text": "\rExecuting Runnable:  71%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588   | 70797/100000 [03:24<01:43, 281.12it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  82%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f | 81577/100000 [03:18<00:46, 392.68it/s]"
+        "text": "\rExecuting Runnable:  71%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588   | 70938/100000 [03:25<01:44, 278.18it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  82%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f | 81778/100000 [03:19<00:46, 395.06it/s]"
+        "text": "\rExecuting Runnable:  71%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588   | 71078/100000 [03:25<01:44, 276.54it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  82%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f | 81984/100000 [03:19<00:45, 399.92it/s]"
+        "text": "\rExecuting Runnable:  71%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588   | 71217/100000 [03:26<01:44, 275.81it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  82%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f | 82186/100000 [03:20<00:44, 400.82it/s]"
+        "text": "\rExecuting Runnable:  71%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f  | 71355/100000 [03:26<01:44, 274.80it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  82%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f | 82387/100000 [03:20<00:43, 401.05it/s]"
+        "text": "\rExecuting Runnable:  71%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f  | 71493/100000 [03:27<01:44, 272.27it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  83%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258e | 82592/100000 [03:21<00:43, 403.47it/s]"
+        "text": "\rExecuting Runnable:  72%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f  | 71630/100000 [03:27<01:44, 272.50it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  83%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258e | 82794/100000 [03:21<00:42, 401.99it/s]"
+        "text": "\rExecuting Runnable:  72%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f  | 71767/100000 [03:28<01:43, 272.75it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  83%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258e | 82999/100000 [03:22<00:42, 404.22it/s]"
+        "text": "\rExecuting Runnable:  72%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f  | 71904/100000 [03:28<01:42, 272.79it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  83%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258e | 83202/100000 [03:22<00:41, 404.12it/s]"
+        "text": "\rExecuting Runnable:  72%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f  | 72041/100000 [03:29<01:42, 272.50it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  83%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258e | 83409/100000 [03:23<00:40, 406.87it/s]"
+        "text": "\rExecuting Runnable:  72%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f  | 72178/100000 [03:29<01:42, 272.31it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  84%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258e | 83613/100000 [03:23<00:40, 406.31it/s]"
+        "text": "\rExecuting Runnable:  72%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f  | 72315/100000 [03:30<01:41, 272.23it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  84%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258d | 83826/100000 [03:24<00:39, 411.80it/s]"
+        "text": "\rExecuting Runnable:  72%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f  | 72473/100000 [03:30<01:36, 284.98it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  84%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258d | 84034/100000 [03:24<00:38, 412.67it/s]"
+        "text": "\rExecuting Runnable:  73%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258e  | 72616/100000 [03:31<01:37, 280.74it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  84%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258d | 84245/100000 [03:25<00:37, 415.17it/s]"
+        "text": "\rExecuting Runnable:  73%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258e  | 72757/100000 [03:32<01:37, 278.31it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  84%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258d | 84453/100000 [03:25<00:37, 414.62it/s]"
+        "text": "\rExecuting Runnable:  73%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258e  | 72920/100000 [03:32<01:32, 292.20it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  85%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258d | 84664/100000 [03:26<00:36, 416.47it/s]"
+        "text": "\rExecuting Runnable:  73%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258e  | 73119/100000 [03:33<01:23, 323.46it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  85%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258d | 84873/100000 [03:26<00:36, 415.30it/s]"
+        "text": "\rExecuting Runnable:  73%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258e  | 73320/100000 [03:33<01:17, 346.43it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  85%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258c | 85084/100000 [03:27<00:35, 417.24it/s]"
+        "text": "\rExecuting Runnable:  74%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258e  | 73521/100000 [03:34<01:13, 362.53it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  85%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258c | 85293/100000 [03:27<00:35, 416.50it/s]"
+        "text": "\rExecuting Runnable:  74%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258e  | 73708/100000 [03:34<01:11, 365.48it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  86%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258c | 85502/100000 [03:28<00:35, 410.61it/s]"
+        "text": "\rExecuting Runnable:  74%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258d  | 73891/100000 [03:35<01:17, 337.04it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  86%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258c | 85708/100000 [03:28<00:35, 404.01it/s]"
+        "text": "\rExecuting Runnable:  74%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258d  | 74062/100000 [03:35<01:23, 311.06it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  86%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258c | 85913/100000 [03:29<00:34, 405.72it/s]"
+        "text": "\rExecuting Runnable:  74%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258d  | 74221/100000 [03:36<01:25, 303.01it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  86%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258c | 86119/100000 [03:29<00:34, 407.41it/s]"
+        "text": "\rExecuting Runnable:  74%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258d  | 74375/100000 [03:36<01:26, 296.86it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  86%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b | 86323/100000 [03:30<00:33, 405.08it/s]"
+        "text": "\rExecuting Runnable:  75%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258d  | 74525/100000 [03:37<01:28, 286.84it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  87%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b | 86532/100000 [03:30<00:32, 408.69it/s]"
+        "text": "\rExecuting Runnable:  75%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258d  | 74670/100000 [03:38<01:28, 285.11it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  87%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b | 86744/100000 [03:31<00:32, 412.89it/s]"
+        "text": "\rExecuting Runnable:  75%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258d  | 74815/100000 [03:38<01:28, 285.74it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  87%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b | 86951/100000 [03:31<00:31, 408.70it/s]"
+        "text": "\rExecuting Runnable:  75%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258d  | 74986/100000 [03:39<01:22, 301.41it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  87%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b | 87162/100000 [03:32<00:31, 412.31it/s]"
+        "text": "\rExecuting Runnable:  75%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258c  | 75169/100000 [03:39<01:17, 320.02it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  87%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b | 87369/100000 [03:32<00:31, 404.50it/s]"
+        "text": "\rExecuting Runnable:  75%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258c  | 75366/100000 [03:40<01:12, 341.29it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  88%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a | 87573/100000 [03:33<00:30, 405.42it/s]"
+        "text": "\rExecuting Runnable:  76%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258c  | 75562/100000 [03:40<01:08, 355.94it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  88%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a | 87776/100000 [03:33<00:30, 398.60it/s]"
+        "text": "\rExecuting Runnable:  76%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258c  | 75753/100000 [03:41<01:06, 363.50it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  88%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a | 87976/100000 [03:34<00:30, 398.92it/s]"
+        "text": "\rExecuting Runnable:  76%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258c  | 75936/100000 [03:41<01:06, 364.06it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  88%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a | 88176/100000 [03:34<00:29, 399.14it/s]"
+        "text": "\rExecuting Runnable:  76%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258c  | 76119/100000 [03:42<01:07, 354.17it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  88%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a | 88376/100000 [03:35<00:29, 398.20it/s]"
+        "text": "\rExecuting Runnable:  76%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b  | 76297/100000 [03:42<01:09, 342.15it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  89%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a | 88577/100000 [03:35<00:28, 399.12it/s]"
+        "text": "\rExecuting Runnable:  76%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b  | 76469/100000 [03:43<01:12, 323.68it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  89%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589 | 88777/100000 [03:36<00:28, 389.26it/s]"
+        "text": "\rExecuting Runnable:  77%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b  | 76633/100000 [03:43<01:14, 313.06it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  89%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589 | 88983/100000 [03:36<00:27, 395.83it/s]"
+        "text": "\rExecuting Runnable:  77%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b  | 76791/100000 [03:44<01:15, 305.73it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  89%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589 | 89182/100000 [03:37<00:27, 386.90it/s]"
+        "text": "\rExecuting Runnable:  77%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b  | 76945/100000 [03:44<01:16, 301.15it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  89%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589 | 89382/100000 [03:37<00:27, 390.68it/s]"
+        "text": "\rExecuting Runnable:  77%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b  | 77096/100000 [03:45<01:17, 297.22it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  90%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589 | 89582/100000 [03:38<00:26, 392.94it/s]"
+        "text": "\rExecuting Runnable:  77%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b  | 77245/100000 [03:45<01:18, 290.20it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  90%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589 | 89788/100000 [03:38<00:25, 398.56it/s]"
+        "text": "\rExecuting Runnable:  77%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b  | 77391/100000 [03:46<01:18, 287.05it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  90%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589 | 89991/100000 [03:39<00:24, 400.52it/s]"
+        "text": "\rExecuting Runnable:  78%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a  | 77559/100000 [03:46<01:14, 300.99it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  90%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 | 90196/100000 [03:39<00:24, 402.83it/s]"
+        "text": "\rExecuting Runnable:  78%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a  | 77710/100000 [03:47<01:16, 292.46it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  90%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 | 90402/100000 [03:40<00:23, 405.44it/s]"
+        "text": "\rExecuting Runnable:  78%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a  | 77857/100000 [03:48<01:16, 290.78it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  91%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 | 90610/100000 [03:40<00:22, 408.52it/s]"
+        "text": "\rExecuting Runnable:  78%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a  | 78003/100000 [03:48<01:17, 285.02it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  91%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 | 90816/100000 [03:41<00:22, 409.01it/s]"
+        "text": "\rExecuting Runnable:  78%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a  | 78148/100000 [03:49<01:16, 286.21it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  91%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 | 91021/100000 [03:41<00:21, 408.53it/s]"
+        "text": "\rExecuting Runnable:  78%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a  | 78293/100000 [03:49<01:15, 287.29it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  91%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 | 91228/100000 [03:42<00:21, 409.82it/s]"
+        "text": "\rExecuting Runnable:  78%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a  | 78437/100000 [03:50<01:17, 278.43it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  91%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f| 91433/100000 [03:42<00:20, 409.18it/s]"
+        "text": "\rExecuting Runnable:  79%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a  | 78582/100000 [03:50<01:16, 281.56it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  92%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f| 91638/100000 [03:43<00:20, 409.29it/s]"
+        "text": "\rExecuting Runnable:  79%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a  | 78724/100000 [03:51<01:15, 281.51it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  92%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f| 91846/100000 [03:43<00:19, 410.99it/s]"
+        "text": "\rExecuting Runnable:  79%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589  | 78875/100000 [03:51<01:13, 287.27it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  92%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f| 92053/100000 [03:44<00:19, 411.63it/s]"
+        "text": "\rExecuting Runnable:  79%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589  | 79031/100000 [03:52<01:11, 294.19it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  92%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f| 92261/100000 [03:44<00:18, 412.78it/s]"
+        "text": "\rExecuting Runnable:  79%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589  | 79200/100000 [03:52<01:07, 306.74it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  92%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f| 92468/100000 [03:45<00:18, 410.35it/s]"
+        "text": "\rExecuting Runnable:  79%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589  | 79391/100000 [03:53<01:02, 328.70it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  93%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258e| 92677/100000 [03:45<00:17, 412.32it/s]"
+        "text": "\rExecuting Runnable:  80%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589  | 79582/100000 [03:53<00:59, 344.44it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  93%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258e| 92884/100000 [03:46<00:17, 408.12it/s]"
+        "text": "\rExecuting Runnable:  80%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589  | 79763/100000 [03:54<00:57, 349.56it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  93%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258e| 93093/100000 [03:46<00:16, 410.56it/s]"
+        "text": "\rExecuting Runnable:  80%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589  | 79958/100000 [03:54<00:55, 361.13it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  93%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258e| 93299/100000 [03:47<00:16, 407.99it/s]"
+        "text": "\rExecuting Runnable:  80%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588  | 80154/100000 [03:55<00:53, 369.90it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  94%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258e| 93505/100000 [03:47<00:15, 408.71it/s]"
+        "text": "\rExecuting Runnable:  80%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588  | 80349/100000 [03:55<00:52, 375.81it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  94%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258e| 93710/100000 [03:48<00:16, 392.66it/s]"
+        "text": "\rExecuting Runnable:  81%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588  | 80545/100000 [03:56<00:51, 380.34it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  94%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258d| 93907/100000 [03:48<00:15, 392.95it/s]"
+        "text": "\rExecuting Runnable:  81%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588  | 80736/100000 [03:56<00:51, 372.92it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  94%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258d| 94104/100000 [03:49<00:15, 392.79it/s]"
+        "text": "\rExecuting Runnable:  81%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588  | 80925/100000 [03:57<00:50, 374.41it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  94%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258d| 94301/100000 [03:49<00:14, 392.45it/s]"
+        "text": "\rExecuting Runnable:  81%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588  | 81120/100000 [03:57<00:49, 378.73it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  94%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258d| 94498/100000 [03:50<00:14, 390.45it/s]"
+        "text": "\rExecuting Runnable:  81%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f | 81310/100000 [03:58<00:50, 373.57it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  95%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258d| 94702/100000 [03:50<00:13, 395.51it/s]"
+        "text": "\rExecuting Runnable:  82%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f | 81505/100000 [03:58<00:48, 377.94it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  95%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258d| 94900/100000 [03:51<00:12, 393.43it/s]"
+        "text": "\rExecuting Runnable:  82%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f | 81695/100000 [03:59<00:48, 376.17it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  95%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258c| 95106/100000 [03:51<00:12, 398.58it/s]"
+        "text": "\rExecuting Runnable:  82%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f | 81884/100000 [03:59<00:48, 373.50it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  95%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258c| 95308/100000 [03:52<00:11, 399.82it/s]"
+        "text": "\rExecuting Runnable:  82%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f | 82081/100000 [04:00<00:47, 379.07it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  96%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258c| 95508/100000 [03:52<00:11, 398.55it/s]"
+        "text": "\rExecuting Runnable:  82%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f | 82271/100000 [04:00<00:51, 346.75it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  96%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258c| 95715/100000 [03:53<00:10, 402.87it/s]"
+        "text": "\rExecuting Runnable:  82%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f | 82448/100000 [04:01<00:53, 325.48it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  96%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258c| 95919/100000 [03:53<00:10, 403.95it/s]"
+        "text": "\rExecuting Runnable:  83%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258e | 82614/100000 [04:02<00:56, 307.14it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  96%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258c| 96126/100000 [03:54<00:09, 406.67it/s]"
+        "text": "\rExecuting Runnable:  83%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258e | 82770/100000 [04:02<00:57, 298.97it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  96%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b| 96330/100000 [03:54<00:09, 406.52it/s]"
+        "text": "\rExecuting Runnable:  83%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258e | 82921/100000 [04:03<00:57, 296.62it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  97%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b| 96534/100000 [03:55<00:08, 398.87it/s]"
+        "text": "\rExecuting Runnable:  83%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258e | 83122/100000 [04:03<00:51, 325.62it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  97%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b| 96734/100000 [03:56<00:08, 390.87it/s]"
+        "text": "\rExecuting Runnable:  83%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258e | 83322/100000 [04:04<00:48, 346.46it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  97%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b| 96930/100000 [03:56<00:07, 389.48it/s]"
+        "text": "\rExecuting Runnable:  84%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258e | 83523/100000 [04:04<00:45, 362.25it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  97%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b| 97125/100000 [03:57<00:07, 388.90it/s]"
+        "text": "\rExecuting Runnable:  84%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258e | 83709/100000 [04:05<00:44, 365.03it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  97%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b| 97338/100000 [03:57<00:06, 399.64it/s]"
+        "text": "\rExecuting Runnable:  84%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258d | 83894/100000 [04:05<00:43, 366.09it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  98%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a| 97538/100000 [03:58<00:06, 394.82it/s]"
+        "text": "\rExecuting Runnable:  84%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258d | 84078/100000 [04:06<00:47, 332.75it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  98%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a| 97739/100000 [03:58<00:05, 396.89it/s]"
+        "text": "\rExecuting Runnable:  84%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258d | 84248/100000 [04:06<00:47, 330.73it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  98%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a| 97938/100000 [03:59<00:05, 394.72it/s]"
+        "text": "\rExecuting Runnable:  84%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258d | 84443/100000 [04:07<00:44, 346.95it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  98%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a| 98139/100000 [03:59<00:04, 396.83it/s]"
+        "text": "\rExecuting Runnable:  85%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258d | 84637/100000 [04:07<00:42, 358.68it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  98%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a| 98350/100000 [04:00<00:04, 404.10it/s]"
+        "text": "\rExecuting Runnable:  85%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258d | 84833/100000 [04:08<00:41, 367.81it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  99%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a| 98557/100000 [04:00<00:03, 406.65it/s]"
+        "text": "\rExecuting Runnable:  85%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258c | 85028/100000 [04:08<00:40, 374.28it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  99%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 98762/100000 [04:01<00:03, 407.48it/s]"
+        "text": "\rExecuting Runnable:  85%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258c | 85231/100000 [04:09<00:38, 383.21it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  99%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 98969/100000 [04:01<00:02, 409.08it/s]"
+        "text": "\rExecuting Runnable:  85%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258c | 85434/100000 [04:09<00:37, 389.84it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  99%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 99178/100000 [04:02<00:01, 411.60it/s]"
+        "text": "\rExecuting Runnable:  86%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258c | 85638/100000 [04:10<00:36, 395.20it/s]"
       },
       {
-        "text": "\rExecuting Runnable:  99%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 99388/100000 [04:02<00:01, 413.66it/s]"
+        "text": "\rExecuting Runnable:  86%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258c | 85841/100000 [04:10<00:35, 398.22it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 99595/100000 [04:03<00:01, 400.92it/s]"
+        "text": "\rExecuting Runnable:  86%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258c | 86046/100000 [04:11<00:34, 401.38it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 99796/100000 [04:03<00:00, 379.93it/s]"
+        "text": "\rExecuting Runnable:  86%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b | 86252/100000 [04:11<00:34, 404.07it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 99988/100000 [04:04<00:00, 372.21it/s]"
+        "text": "\rExecuting Runnable:  86%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b | 86456/100000 [04:12<00:33, 404.70it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 100000/100000 [04:04<00:00, 409.28it/s]"
+        "text": "\rExecuting Runnable:  87%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b | 86659/100000 [04:12<00:33, 402.03it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  87%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b | 86861/100000 [04:13<00:32, 399.93it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  87%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b | 87062/100000 [04:13<00:32, 398.98it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  87%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b | 87262/100000 [04:14<00:31, 398.53it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  87%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b | 87462/100000 [04:14<00:31, 397.51it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  88%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a | 87661/100000 [04:15<00:31, 395.28it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  88%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a | 87859/100000 [04:16<00:34, 356.37it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  88%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a | 88041/100000 [04:16<00:35, 333.95it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  88%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a | 88212/100000 [04:17<00:35, 329.19it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  88%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a | 88408/100000 [04:17<00:33, 346.35it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  89%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a | 88599/100000 [04:18<00:32, 356.20it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  89%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589 | 88787/100000 [04:18<00:31, 361.59it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  89%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589 | 88979/100000 [04:19<00:29, 367.80it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  89%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589 | 89169/100000 [04:19<00:29, 370.89it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  89%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589 | 89356/100000 [04:20<00:31, 338.12it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  90%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589 | 89529/100000 [04:21<00:32, 322.31it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  90%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589 | 89693/100000 [04:21<00:32, 312.59it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  90%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589 | 89852/100000 [04:22<00:33, 304.85it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  90%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 | 90006/100000 [04:22<00:33, 297.56it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  90%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 | 90156/100000 [04:23<00:33, 292.10it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  90%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 | 90303/100000 [04:23<00:33, 292.56it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  90%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 | 90450/100000 [04:24<00:35, 266.20it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  91%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 | 90589/100000 [04:25<00:34, 269.15it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  91%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 | 90726/100000 [04:25<00:35, 264.51it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  91%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 | 90860/100000 [04:26<00:35, 256.77it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  91%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 | 91001/100000 [04:26<00:34, 263.69it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  91%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 | 91144/100000 [04:27<00:32, 269.68it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  91%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f| 91284/100000 [04:27<00:31, 272.63it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  91%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f| 91424/100000 [04:28<00:31, 274.62it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  92%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f| 91567/100000 [04:28<00:30, 277.93it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  92%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f| 91712/100000 [04:29<00:29, 281.37it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  92%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f| 91911/100000 [04:29<00:25, 315.59it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  92%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f| 92111/100000 [04:30<00:23, 340.47it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  92%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f| 92282/100000 [04:30<00:23, 323.71it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  92%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f| 92445/100000 [04:31<00:24, 308.31it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  93%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258e| 92637/100000 [04:31<00:22, 329.25it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  93%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258e| 92839/100000 [04:32<00:20, 350.58it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  93%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258e| 93016/100000 [04:32<00:20, 342.50it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  93%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258e| 93214/100000 [04:33<00:18, 357.50it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  93%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258e| 93413/100000 [04:33<00:17, 369.10it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  94%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258e| 93602/100000 [04:34<00:17, 371.49it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  94%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258d| 93789/100000 [04:34<00:17, 349.80it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  94%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258d| 93966/100000 [04:35<00:18, 328.94it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  94%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258d| 94133/100000 [04:36<00:18, 316.37it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  94%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258d| 94293/100000 [04:36<00:18, 309.12it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  94%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258d| 94449/100000 [04:37<00:18, 303.33it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  95%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258d| 94602/100000 [04:37<00:18, 298.64it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  95%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258d| 94752/100000 [04:38<00:17, 296.26it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  95%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258d| 94901/100000 [04:38<00:17, 294.68it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  95%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258c| 95049/100000 [04:39<00:16, 293.17it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  95%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258c| 95196/100000 [04:39<00:16, 292.30it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  95%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258c| 95385/100000 [04:40<00:14, 316.98it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  96%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258c| 95574/100000 [04:40<00:13, 334.44it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  96%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258c| 95764/100000 [04:41<00:12, 347.48it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  96%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258c| 95954/100000 [04:41<00:11, 356.64it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  96%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258c| 96142/100000 [04:42<00:10, 362.23it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  96%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b| 96331/100000 [04:42<00:10, 366.58it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  97%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b| 96519/100000 [04:43<00:09, 369.13it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  97%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b| 96715/100000 [04:43<00:08, 375.74it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  97%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b| 96912/100000 [04:44<00:08, 380.89it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  97%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b| 97103/100000 [04:44<00:07, 380.07it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  97%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b| 97294/100000 [04:45<00:07, 377.79it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  97%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b| 97483/100000 [04:46<00:07, 343.52it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  98%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a| 97658/100000 [04:46<00:06, 334.86it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  98%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a| 97843/100000 [04:47<00:06, 344.26it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  98%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a| 98027/100000 [04:47<00:05, 350.81it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  98%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a| 98208/100000 [04:48<00:05, 353.68it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  98%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a| 98389/100000 [04:48<00:04, 355.81it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  99%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a| 98575/100000 [04:49<00:03, 360.46it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  99%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 98761/100000 [04:49<00:03, 363.56it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  99%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 98947/100000 [04:50<00:02, 365.80it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  99%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 99131/100000 [04:50<00:02, 338.47it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  99%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 99303/100000 [04:51<00:02, 322.93it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable:  99%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 99467/100000 [04:51<00:01, 312.09it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 99625/100000 [04:52<00:01, 304.46it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 99779/100000 [04:52<00:00, 300.48it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589| 99930/100000 [04:53<00:00, 297.70it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 100000/100000 [04:53<00:00, 340.44it/s]"
       },
       {
         "text": "\n"
@@ -1491,7 +1723,7 @@
         "text": "ParticleData(masses=array([[[2.34456283e-19, 8.96251122e-19, 4.15985621e-19, ...,\n         5.90076805e-19, 4.12197257e-20, 1.78201013e-19],\n        [2.42392795e-19, 9.03643061e-19, 4.19416965e-19, ...,\n         5.91879760e-19, 4.15596812e-20, 1.78758824e-19],\n        [2.50597964e-19, 9.11229195e-19, 4.22938443e-19, ...,\n         5.93702982e-19, 4.19085674e-20, 1.79323063e-19],\n        ...,\n        [8.73265319e-16, 4.66494584e-16, 1.15739971e-16, ...,\n         3.83007853e-18, 2.06040209e-17, 1.20059327e-18],\n        [9.02825972e-16, 4.81535302e-16, 1.17772661e-16, ...,\n         3.87217448e-18, 2.12148406e-17, 1.21390253e-18],\n        [9.33387275e-16, 4.97064420e-16, 1.19825550e-16, ...,\n         3.91475792e-18, 2.18409779e-17, 1.22736600e-18]]],\n      shape=(1, 250, 11)), concentration=array([[3.77557707e+08, 4.22430627e+08, 4.72122922e+08, 5.27087124e+08,\n        5.87810526e+08, 6.54816994e+08, 7.28668770e+08, 8.09968263e+08,\n        8.99359817e+08, 9.97531430e+08, 1.10521642e+09, 1.22319501e+09,\n        1.35229581e+09, 1.49339721e+09, 1.64742861e+09, 1.81537144e+09,\n        1.99826015e+09, 2.19718279e+09, 2.41328148e+09, 2.64775260e+09,\n        2.90184664e+09, 3.17686780e+09, 3.47417315e+09, 3.79517151e+09,\n        4.14132188e+09, 4.51413142e+09, 4.91515300e+09, 5.34598228e+09,\n        5.80825427e+09, 6.30363934e+09, 6.83383872e+09, 7.40057944e+09,\n        8.00560865e+09, 8.65068740e+09, 9.33758380e+09, 1.00680656e+10,\n        1.08438923e+10, 1.16668062e+10, 1.25385236e+10, 1.34607250e+10,\n        1.44350448e+10, 1.54630603e+10, 1.65462809e+10, 1.76861364e+10,\n        1.88839646e+10, 2.01409994e+10, 2.14583581e+10, 2.28370283e+10,\n        2.42778556e+10, 2.57815301e+10, 2.73485739e+10, 2.89793281e+10,\n        3.06739405e+10, 3.24323533e+10, 3.42542911e+10, 3.61392501e+10,\n        3.80864875e+10, 4.00950111e+10, 4.21635710e+10, 4.42906511e+10,\n        4.64744624e+10, 4.87129372e+10, 5.10037243e+10, 5.33441862e+10,\n        5.57313971e+10, 5.81621427e+10, 6.06329217e+10, 6.31399490e+10,\n        6.56791597e+10, 6.82462167e+10, 7.08365180e+10, 7.34452073e+10,\n        7.60671856e+10, 7.86971250e+10, 8.13294840e+10, 8.39585247e+10,\n        8.65783313e+10, 8.91828312e+10, 9.17658161e+10, 9.43209656e+10,\n        9.68418721e+10, 9.93220664e+10, 1.01755044e+11, 1.04134295e+11,\n        1.06453328e+11, 1.08705706e+11, 1.10885068e+11, 1.12985165e+11,\n        1.14999887e+11, 1.16923292e+11, 1.18749636e+11, 1.20473401e+11,\n        1.22089324e+11, 1.23592419e+11, 1.24978012e+11, 1.26241754e+11,\n        1.27379653e+11, 1.28388089e+11, 1.29263836e+11, 1.30004077e+11,\n        1.30606424e+11, 1.31068925e+11, 1.31390077e+11, 1.31568835e+11,\n        1.31604615e+11, 1.31497303e+11, 1.31247246e+11, 1.30855260e+11,\n        1.30322620e+11, 1.29651054e+11, 1.28842734e+11, 1.27900265e+11,\n        1.26826670e+11, 1.25625373e+11, 1.24300183e+11, 1.22855275e+11,\n        1.21295161e+11, 1.19624676e+11, 1.17848947e+11, 1.15973368e+11,\n        1.14003574e+11, 1.11945410e+11, 1.09804907e+11, 1.07588249e+11,\n        1.05301743e+11, 1.02951792e+11, 1.00544864e+11, 9.80874643e+10,\n        9.55861024e+10, 9.30472690e+10, 9.04774057e+10, 8.78828797e+10,\n        8.52699584e+10, 8.26447849e+10, 8.00133563e+10, 7.73815017e+10,\n        7.47548632e+10, 7.21388773e+10, 6.95387595e+10, 6.69594890e+10,\n        6.44057962e+10, 6.18821519e+10, 5.93927580e+10, 5.69415402e+10,\n        5.45321422e+10, 5.21679220e+10, 4.98519498e+10, 4.75870071e+10,\n        4.53755880e+10, 4.32199013e+10, 4.11218749e+10, 3.90831605e+10,\n        3.71051401e+10, 3.51889337e+10, 3.33354075e+10, 3.15451838e+10,\n        2.98186507e+10, 2.81559733e+10, 2.65571051e+10, 2.50218002e+10,\n        2.35496254e+10, 2.21399729e+10, 2.07920733e+10, 1.95050085e+10,\n        1.82777242e+10, 1.71090434e+10, 1.59976786e+10, 1.49422445e+10,\n        1.39412700e+10, 1.29932105e+10, 1.20964584e+10, 1.12493553e+10,\n        1.04502014e+10, 9.69726628e+09, 8.98879780e+09, 8.32303140e+09,\n        7.69819817e+09, 7.11253262e+09, 6.56427985e+09, 6.05170201e+09,\n        5.57308432e+09, 5.12674037e+09, 4.71101694e+09, 4.32429824e+09,\n        3.96500960e+09, 3.63162067e+09, 3.32264809e+09, 3.03665774e+09,\n        2.77226649e+09, 2.52814359e+09, 2.30301162e+09, 2.09564712e+09,\n        1.90488083e+09, 1.72959769e+09, 1.56873655e+09, 1.42128956e+09,\n        1.28630141e+09, 1.16286838e+09, 1.05013711e+09, 9.47303365e+08,\n        8.53610575e+08, 7.68348283e+08, 6.90850530e+08, 6.20494157e+08,\n        5.56697062e+08, 4.98916415e+08, 4.46646863e+08, 3.99418720e+08,\n        3.56796161e+08, 3.18375444e+08, 2.83783136e+08, 2.52674396e+08,\n        2.24731277e+08, 1.99661089e+08, 1.77194804e+08, 1.57085522e+08,\n        1.39106995e+08, 1.23052208e+08, 1.08732027e+08, 9.59739096e+07,\n        8.46206821e+07, 7.45293765e+07, 6.55701363e+07, 5.76251827e+07,\n        5.05878447e+07, 4.43616477e+07, 3.88594627e+07, 3.40027112e+07,\n        2.97206247e+07, 2.59495572e+07, 2.26323474e+07, 1.97177284e+07,\n        1.71597830e+07, 1.49174412e+07, 1.29540184e+07, 1.12367913e+07,\n        9.73660954e+06, 8.42754001e+06, 7.28654286e+06, 6.29317568e+06,\n        5.42932474e+06, 4.67896087e+06, 4.02791817e+06, 3.46369383e+06,\n        2.97526727e+06, 2.55293705e+06, 2.18817402e+06, 1.87348940e+06,\n        1.60231631e+06, 1.36890371e+06]]), charge=array([[0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,\n        0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,\n        0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,\n        0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,\n        0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,\n        0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,\n        0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,\n        0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,\n        0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,\n        0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,\n        0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,\n        0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,\n        0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,\n        0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,\n        0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,\n        0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]]), density=array([1770.        , 1183.16545455, 1164.55492716, 1222.15826087,\n       1197.98801712, 1209.19172662, 1206.47228128, 1307.89897511,\n       1178.38100559, 1142.17777778, 1276.42666667]), volume=array([1.]), distribution_type='discrete', radius_grid=None)\nGasData(name=['Sulfate', 'C107OOH', 'C97OOH', 'C108OOH', 'ALDOL_dimer_C19H28O7', 'PINIC', 'C921OOH', 'C812OOH', 'ESTER_dimer', 'C811OH', 'C813OOH'], molar_mass=array([0.09606, 0.2    , 0.188  , 0.216  , 0.368  , 0.186  , 0.204  ,\n       0.195  , 0.368  , 0.158  , 0.206  ]), concentration=array([[0.00000000e+00, 1.63363612e-06, 4.88434935e-08, 5.48806592e-09,\n        1.57587600e-16, 4.42214151e-10, 8.60168698e-11, 2.68692453e-11,\n        5.16724959e-17, 2.42382901e-08, 4.16625076e-13]]), partitioning=array([ True,  True,  True,  True,  True,  True,  True,  True,  True,\n        True,  True]))\nEnvironmentData(temperature=array([298.15]), pressure=array([101325.]), saturation_ratio=array([[0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]]))\n"
       },
       {
-        "image": "figure-9-486.png"
+        "image": "figure-9-1.png"
       }
     ],
     [],
@@ -1501,10 +1733,13 @@
         "text": "\rRunning Sim:   0%|          | 0/60 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rRunning Sim:  67%|\u2588\u2588\u2588\u2588\u2588\u2588\u258b   | 40/60 [00:00<00:00, 78.63it/s]"
+        "text": "\rRunning Sim:  48%|\u2588\u2588\u2588\u2588\u258a     | 29/60 [00:00<00:00, 56.68it/s]"
       },
       {
-        "text": "\rRunning Sim: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 60/60 [00:00<00:00, 74.57it/s]"
+        "text": "\rRunning Sim:  97%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b| 58/60 [00:01<00:00, 56.76it/s]"
+      },
+      {
+        "text": "\rRunning Sim: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 60/60 [00:01<00:00, 56.69it/s]"
       },
       {
         "text": "\n"
@@ -1522,8 +1757,8 @@
     ]
   ],
   "files": {
-    "source.py": "9b4e5a1f107f7a3f91bcc51db05b137a5d62858e62159f4864a54922a69d44d3",
-    "figure-9-486.png": "7d189d8186aba51a7bd29dc69e2c6968b3f9a5f3bfe452e99f1aac77f170a549",
-    "figure-13-1.png": "9bfda26ad84ec6cc28ee5f360e828d5110fcf91039af4b49b8ae02ae226fe391"
+    "figure-13-1.png": "57d4f7a7c3256d949bd6dc9a91e290efd006c17d09e64b0c42199911f8148311",
+    "figure-9-1.png": "844eb22ab0daf80095ad0488d909caf9b6fb185bdd12016113cae361a0f10ab7",
+    "source.py": "91a59e2daa2260af30ead94800e017c2e82d488234418c93b879a018f56e57aa"
   }
 }

@@ -15,6 +15,8 @@
 
 # %%
 import matplotlib.pyplot as plt
+from matplotlib import style as mplstyle
+from particula import plotting
 from scripts.inverse_studies.distribution import assess_fit
 from scripts.inverse_studies.scalar_campaign import assess
 
@@ -55,9 +57,10 @@ def simulate():
 
 
 # %%
+@mplstyle.context("particula.default")
 def plot_results(report):
     """Plot scalar uncertainty and the two-mode resolution experiment."""
-    fig, axes = plt.subplots(1, 2, figsize=(9, 3.8), layout="constrained")
+    fig, axes = plotting.subplots(1, 2)
     rows = report["scalar"]["cases"]
     axes[0].errorbar(
         [r["initial_um"] for r in rows],
@@ -82,6 +85,7 @@ def plot_results(report):
         ylabel="Largest radius error (nm)",
         title="Two modes sharing vapor",
     )
+    plotting.fit(fig)
     return fig
 
 

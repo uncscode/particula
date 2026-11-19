@@ -46,6 +46,9 @@ Example:
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from particula import plotting
+
+plt.style.use("particula.default")
 
 # %% [markdown]
 # ## Start with a mass-fraction approximation
@@ -169,27 +172,30 @@ for i, mass in enumerate(mass_mixture):
     activities_molar[i] = activity_molar.activity(mass_concentration=mass)
     activities_kappa[i] = activity_kappa.activity(mass_concentration=mass)
 
-fig, ax = plt.subplots(figsize=(8, 6))
-ax.plot(mass_water, activities_mass[:, 0], label="Mass: Water")
-ax.plot(
-    mass_water, activities_mass[:, 1], label="Mass: Sucrose", linestyle="--"
-)
-ax.plot(mass_water, activities_molar[:, 0], label="Molar: Water")
-ax.plot(
-    mass_water,
-    activities_molar[:, 1],
-    label="Molar: Sucrose",
-    linestyle="--",
-    linewidth=3,
-    alpha=0.85,
-)
-ax.plot(mass_water, activities_kappa[:, 0], label="Kappa: Water")
-ax.plot(
-    mass_water, activities_kappa[:, 1], label="Kappa: Sucrose", linestyle="--"
-)
+fig, ax = plotting.subplots(size="wide")
+for name, activities, color in (
+    ("Mass", activities_mass, plotting.COLORS["teal"]),
+    ("Molar", activities_molar, plotting.COLORS["rust"]),
+    ("Kappa", activities_kappa, plotting.COLORS["indigo"]),
+):
+    ax.plot(
+        mass_water,
+        activities[:, 0],
+        label=f"{name}: Water",
+        color=color,
+        linestyle="-",
+    )
+    ax.plot(
+        mass_water,
+        activities[:, 1],
+        label=f"{name}: Sucrose",
+        color=color,
+        linestyle="--",
+    )
 ax.set_xlabel("Mass fraction water")
 ax.set_ylabel("Activity")
-ax.legend()
+plotting.legend(ax)
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]

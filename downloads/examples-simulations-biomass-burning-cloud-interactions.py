@@ -37,6 +37,7 @@ import copy
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from particula import plotting
 from particula.dynamics.condensation.species_mapping import (
     CondensationSpeciesMap,
 )
@@ -47,24 +48,13 @@ from particula.execution.gpu_coupled import (
 from particula.execution.gpu_resident_condensation import (
     GPUResidentCondensation,
 )
+from particula.gpu.kernels.coagulation import CoagulationSubcyclingConfig
 from tqdm import tqdm
+
+plt.style.use("particula.default")
 
 # plot settings
 TAILWIND = par.util.colors.TAILWIND
-base_color = TAILWIND["gray"]["600"]
-plt.rcParams.update(
-    {
-        "text.color": base_color,
-        "figure.figsize": (5, 4),
-        "font.size": 14,
-        "axes.edgecolor": base_color,
-        "axes.labelcolor": base_color,
-        "xtick.color": base_color,
-        "ytick.color": base_color,
-        "pdf.fonttype": 42,
-        "ps.fonttype": 42,
-    }
-)
 
 # %% [markdown]
 # ## Build one mixed population and one finite vapor reservoir
@@ -207,11 +197,14 @@ print("Gas species:", ", ".join(aerosol.gas.name))
 
 
 # Plot initial size distribution
-fig, ax = plt.subplots()
+fig, ax = plotting.subplots()
 ax.hist(np.log10(resolved_masses.radii[0]), bins=50, density=False, alpha=0.5)
 ax.set_xlabel("log10(Radius [m])")
 ax.set_ylabel("Bin counts")
-ax.set_title("Initial Particle Size Distribution")
+ax.set_title("Initial size distribution")
+ax.locator_params(nbins=4)
+plotting.fit(fig)
+plt.show()
 
 # %% [markdown]
 # ## Establish the shared water-grown starting state
@@ -296,21 +289,22 @@ np.testing.assert_allclose(
 concentrations = distribution_counts / simulation_volume
 
 # Contour plot of log10(number concentration)
-fig, ax = plt.subplots(figsize=(7, 5))
+fig, ax = plotting.subplots(size="wide")
 X, Y = np.meshgrid(time, edges[:-1])
 log_conc = np.log10(
     concentrations,
     where=concentrations > 0,
     out=np.full_like(concentrations, np.nan),
 )
-cont = ax.contourf(X, Y, log_conc.T)
+ax.grid(False)
+cont = ax.contourf(X, Y, log_conc.T, cmap=plotting.colormap("magnitude"))
 
 ax.set_yscale("log")
 ax.set_ylim(1e-7, 1e-5)
 ax.set_xlabel("Time (s)")
 ax.set_ylabel("Particle Radius (m)")
 fig.colorbar(cont, label="Log₁₀ Number Concentration")
-plt.tight_layout()
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
@@ -329,8 +323,10 @@ plt.show()
 # Its native mean-material-density convention is retained on the GPU.
 #
 # All four branches keep particle/gas state, physics and adaptive decisions on
-# CUDA. The host schedules 0.36 s boundaries; only requested observations are
-# downloaded. Direct collision pair evaluation replaces CPU bin interpolation.
+# CUDA. The host schedules 0.36 s boundaries. Within each interval the
+# collision sampler uses the live population to admit a duration, merges pairs,
+# then recomputes the rate bound if time remains. Condensation follows once
+# per outer interval. Only requested observations and diagnostics are downloaded. Direct collision pair evaluation replaces CPU bin interpolation.
 # A persistent seeded GPU collision stream makes repeated GPU runs reproducible;
 # it does not promise the same individual collisions as the former CPU sampler.
 #
@@ -364,9 +360,14 @@ turbulent_shear = (
     .build()
 )
 
-# Collision draws occur once per existing 0.36 s outer interval. Adaptive
-# condensation trials never execute or repeat a stochastic collision operation.
+# The policy bounds collision work independently of condensation error control.
+# Rejected condensation trials never repeat an accepted collision pass.
 outer_dt = 3600.0 / 10_000
+collision_policy = CoagulationSubcyclingConfig(
+    min_substep=outer_dt / 1024,
+    max_subcycles=8,
+    max_device_bytes=256 * 1024**2,
+)
 controls = GPUCondensationControls(
     method="ros3",
     rtol=1e-5,
@@ -411,12 +412,27 @@ for name, collision in [
             time_step=outer_dt,
             controls=controls,
             root_seed=100,
+            coagulation_subcycling=collision_policy,
         ) as coupled:
             coupled.capture_events()
+            split_intervals = max_passes = mergers = 0
             for _step in tqdm(range(10_000), desc=name):
                 coupled.step()
+                work = coupled.coagulation_diagnostics()
+                passes = work["substep_count"]
+                split_intervals += int(passes > 1)
+                max_passes = max(max_passes, passes)
+                mergers += int(work["accepted_collisions"].sum())
             obj = coupled.snapshot()
             assert coupled.coupling_uploads == coupled.coupling_downloads == 0
+            assert coupled.completed_steps == 10_000
+            assert np.count_nonzero(obj.particles.concentration) == (
+                number_of_samples - mergers
+            )
+            print(
+                f"{name}: {split_intervals} split intervals, "
+                f"{max_passes} maximum passes per interval, {mergers} mergers."
+            )
             print("CUDA adaptive work:", coupled.statistics)
     np.testing.assert_allclose(
         species_inventory(obj), initial_inventory, rtol=1e-12, atol=1e-30
@@ -496,7 +512,7 @@ for label, aero_obj in cases:
 
 # %%
 # 1. Create figure & axes
-fig, ax = plt.subplots(figsize=(8, 4))
+fig, ax = plotting.subplots(size="wide")
 
 # 2. Extract & clean data for each case
 centers_init, dnd_init = distributions["Initial"]
@@ -541,7 +557,7 @@ ax.plot(
     dnd_cond,
     linewidth=6,
     alpha=0.5,
-    color=TAILWIND["sky"]["800"],
+    color=plotting.COLORS["teal"],
     label="Condensation Only",
 )
 
@@ -550,7 +566,7 @@ ax.plot(
     dnd_brown,
     linewidth=2,
     linestyle="--",
-    color=TAILWIND["slate"]["100"],
+    color=plotting.COLORS["indigo"],
     label="Brownian Only",
 )
 
@@ -561,7 +577,7 @@ ax.plot(
     markersize=4,
     linewidth=5,
     alpha=1,
-    color=TAILWIND["rose"]["300"],
+    color=plotting.COLORS["berry"],
     linestyle="",
     label="with Sedimentation",
 )
@@ -571,7 +587,7 @@ ax.plot(
     dnd_turb,
     linewidth=3,
     alpha=0.75,
-    color=TAILWIND["amber"]["900"],
+    color=plotting.COLORS["rust"],
     label="with turbulent shear (ST1956)",
 )
 
@@ -583,19 +599,19 @@ ax.set_ylim(10, 3e5)
 ax.set_xlabel("Wet Diameter [µm]")
 ax.set_ylabel("dN/dlogDp [#/cm³]")
 ax.grid(alpha=0.5, which="both")
-ax.legend(
-    loc="center left",  # anchor the legend’s “center left” corner
-    bbox_to_anchor=(
-        1.02,
-        0.5,
-    ),  # (x, y) in axes coordinates: x=1.02 is just past the right edge
-    borderaxespad=0.5,  # padding between axes and legend
-)
-plt.tight_layout()
+plotting.legend(ax, borderaxespad=0.5, placement="right")
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
 # ## Keep the comparison's evidence boundary in view
+#
+# In this seeded run, Brownian coagulation plus settling needed two collision
+# passes in 179 of the 10,000 intervals and merged 9,319 particle pairs.
+# Brownian alone and turbulent shear each finished every interval in one pass,
+# with 240 and 448 mergers respectively. The settling branch ended with 681
+# occupied slots. All four branches conserved the three species inventories.
+# [Comparison with the archived run](../../contribute/validation/numerics/simulation-workflow.md#biomass-rerun-with-adaptive-gpu-coagulation)
 #
 # All branches share their initial material inventory and retain the same
 # condensation model. Their differing spectra therefore motivate a collision-model
@@ -637,7 +653,7 @@ shear_dp = get_wet_diameters(results["TurbulentShear"])
 initial_dp = get_wet_diameters(aerosol)
 
 # 3. Plot scatter
-fig, ax = plt.subplots(figsize=(5, 4))
+fig, ax = plotting.subplots()
 
 ax.scatter(
     shear_dp,
@@ -663,9 +679,9 @@ ax.set_ylim(0, 1.0)
 ax.set_xlabel("Wet Diameter [µm]")
 ax.set_ylabel("Organic Mass Fraction")
 ax.grid(alpha=0.5, which="both")
-ax.legend(loc="upper right")
+plotting.legend(ax, loc="upper right")
 
-plt.tight_layout()
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
