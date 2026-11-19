@@ -426,7 +426,7 @@
     "inputs": []
   },
   "examples-simulations-cloud-chamber-single-cycle": {
-    "title": "Follow droplets through one wet\u2013dry chamber cycle",
+    "title": "Follow droplets through one wet–dry chamber cycle",
     "source": "docs/examples/simulations/cloud_chamber_single_cycle.py",
     "policy": "long",
     "device": "cpu",
@@ -498,7 +498,7 @@
     "inputs": []
   },
   "examples-thermodynamics-equilibria-activity-part1": {
-    "title": "Follow water\u2013organic mixing from composition to water activity",
+    "title": "Follow water–organic mixing from composition to water activity",
     "source": "docs/examples/thermodynamics/equilibria/activity_part1.py",
     "policy": "cpu",
     "device": "cpu",
@@ -589,7 +589,7 @@
     ],
     "invoke": "result = run_example()",
     "data_expression": "result",
-    "replot_invoke": "result = saved_data\nhistory_figures(result, \"Cooling and vapor pulses \u00b7 saved CUDA results\", forcing=True)\nplt.show()",
+    "replot_invoke": "result = saved_data\nhistory_figures(result, \"Cooling and vapor pulses · saved CUDA results\", forcing=True)\nplt.show()",
     "render_functions": [],
     "plot_inputs": [
       "scripts/docs_gpu_figures.py"
@@ -871,7 +871,7 @@
     "plot_inputs": []
   },
   "adaptive-cloud-relaxation-cuda": {
-    "title": "Resolve stiff wet\u2013dry droplet relaxation on CUDA",
+    "title": "Resolve stiff wet–dry droplet relaxation on CUDA",
     "source": "docs/examples/simulations/adaptive_cloud_relaxation_cuda.py",
     "policy": "cuda",
     "device": "cuda",
@@ -938,6 +938,23 @@
     "device": "cpu",
     "timeout": 300,
     "inputs": [],
+    "invoke": "result = run_example()",
+    "data_expression": "result",
+    "replot_invoke": "result = saved_data\nplot_results(result)\nplt.show()",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": []
+  },
+  "psl-mobility": {
+    "title": "Dry PSL mobility sizing",
+    "source": "docs/examples/fundamentals/particles/psl_mobility.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 300,
+    "inputs": [
+      "docs/data/transport/kim2005-psl-slip.csv"
+    ],
     "invoke": "result = run_example()",
     "data_expression": "result",
     "replot_invoke": "result = saved_data\nplot_results(result)\nplt.show()",

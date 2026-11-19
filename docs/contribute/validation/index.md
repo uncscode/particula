@@ -6,6 +6,7 @@ Results are specific to their recorded revision, workload, and device.
 
 | Question | Record |
 | --- | --- |
+| How accurately does the slip law recover a dry PSL diameter? | [Mobility sizing against 49 published measurements](transport/psl-mobility.md) |
 | How well does direct BAT reproduce the published activity curves? | [Binary BAT reference checks](thermodynamics/bat-activity.md) |
 | How well does BAT reproduce measured citric acid water activity? | [Citric acid droplet hygroscopicity](thermodynamics/citric-acid-comparison.md) |
 | How well does a CCN-derived κ transfer across sizes and humidities? | [Size-resolved CCN retrieval study](thermodynamics/ccn-retrieval.md) |

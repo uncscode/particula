@@ -138,6 +138,10 @@
             "slug": "guide/processes/ccn-retrieval"
           },
           {
+            "label": "Dry PSL mobility sizing",
+            "slug": "guide/processes/psl-mobility"
+          },
+          {
             "label": "Coagulation Strategy System",
             "slug": "guide/processes/coagulation"
           },
@@ -340,6 +344,10 @@
               {
                 "label": "Size Distributions Tutorial",
                 "slug": "examples/fundamentals/particles/aerosol_distributions"
+              },
+              {
+                "label": "Diameter from measured PSL mobility",
+                "slug": "examples/fundamentals/particles/psl_mobility"
               },
               {
                 "label": "Native Distribution Storage",
@@ -1111,6 +1119,10 @@
           {
             "label": "CCN retrieval study",
             "slug": "contribute/validation/thermodynamics/ccn-retrieval"
+          },
+          {
+            "label": "Dry PSL mobility validation",
+            "slug": "contribute/validation/transport/psl-mobility"
           },
           {
             "label": "Numerical methods",

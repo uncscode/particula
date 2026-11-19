@@ -33,10 +33,18 @@ size distribution. That comparison quantifies sensitivity within the model.
   and the per-study and total compute
   and storage budgets. Use the application's automation controls, check for an
   existing schedule, and verify the saved settings.
-- Each invocation can select **zero to three new comparisons**. Resume
-  interrupted work first and consider work already awaiting review.
-  Queue additional candidates when capacity or resources are committed. An
-  open PR keeps its study identity for follow-up. Never start a second copy.
+- Start each scheduled run in a **fresh project chat**. Read the shared
+  register for topic history, capacity and researcher decisions. If a study
+  was interrupted, resume from its packet under its existing ID. Otherwise
+  choose **at most one new study** for this chat and queue other promising
+  papers for later runs. Deliver the review link in the run's own chat.
+- For each new selection, choose a different paper and scientific question
+  in a different process family from the last new study. Search across
+  underexplored families first. Check recent and pending register entries
+  for repeated observables and experiments, including older entries whose
+  topic you can infer from their comparison target. Changing a parameter in
+  the same experiment belongs in that study. Record the selected family,
+  observable and reason for choosing it in the register.
 - Report up to three strong candidates. For each, identify the paper and data
   sources, specific comparison target, original contribution, proposed
   question, scientific value, available inputs and uncertainties, reuse terms,
@@ -47,6 +55,29 @@ size distribution. That comparison quantifies sensitivity within the model.
   target. A supported subset of a paper can answer a worthwhile question in
   its own right. Record missing study inputs separately from gaps in
   Particula. Revisit deferred candidates when data or model support change.
+
+### Choosing a paper for a GPU simulation campaign
+
+Look for papers with a measured response across conditions, documented inputs,
+and an observable that could distinguish a simpler model from a more detailed
+one. Shortlist across process families. Give priority to a paper for which
+many simulations can resolve a physical question. For example, a chamber size
+distribution measured over time at several initial concentrations could test
+whether including particle-resolved coagulation alongside wall loss improves
+the predicted decay. Match the paper's wall-loss treatment and identify which
+additional process is the Particula hypothesis.
+
+For each promising campaign, state what the reference calculation predicts,
+which added physics or resolution might change it, and which observations
+could distinguish the predictions. Check the exact configuration against the
+[GPU support guide](../docs/guide/gpu/support.md). Pilot a reference case and
+one higher-fidelity case, then use their runtime and memory to choose the
+campaign size within the local budget. Batch independent conditions on CUDA,
+add independent seeds when sampling variability matters, and refine timestep
+or particle count where a numerical shift could obscure the physical effect.
+Record the device, completed cases and spread alongside the change in the
+observable. An unavailable CUDA run stays pending. If a different paper with
+a simpler comparison has stronger evidence, explain the choice in the packet.
 
 ## Shared record and draft storage
 
@@ -85,7 +116,8 @@ a worktree. On restart, reconcile the register with existing worktrees and PRs.
    in the shared location. Record refinement, uncertainty and applicable
    budgets. Keep bulky or restricted data in suitable storage and record their
    location and reuse conditions. If a budget is exhausted, save progress and
-   the outstanding check.
+   the outstanding check. Write the packet's [researcher-facing review](#writing-reviewmd)
+   in `review.md` and link it from the handoff.
 3. **Review the science with the researcher.** Deliver the packet path and a
    short discussion of what was tested, what the evidence supports and what
    would resolve the main uncertainty. Record the researcher's decision to
@@ -101,6 +133,52 @@ a worktree. On restart, reconcile the register with existing worktrees and PRs.
    and figure. Follow the [example authoring workflow](../website/AUTHORING.md).
    After validation and diff review, open one PR for that study and record its
    URL. Material changes to the scientific result return to research review.
+
+## Writing `review.md`
+
+Write a short technical note for a researcher who knows aerosol science and
+has not read the paper. Give each review one scientific question. Open with
+what the authors measured or modeled, what Particula compared, and what the
+result means for someone designing an experiment or interpreting data. If
+the evidence leaves the question open, say what remains unresolved and why
+it matters.
+
+Use the title and section headings to state findings. For example,
+“Particula assigns 102 nm to a 100.7 nm dry PSL standard near atmospheric
+pressure” names the quantity, reference and conditions. In the text, spell
+out polystyrene latex (PSL) and explain how electrical mobility is converted
+to diameter. The +1.3% is a shift in **inferred dry diameter** relative to
+the reference sphere. A claim about hygroscopicity would require a separate
+comparison. Define symbols where they first affect the interpretation, such
+as the Knudsen number (Kn), the ratio of gas mean free path to particle radius.
+
+Build the narrative around the evidence and the decision it supports.
+
+- **Put a number in context.** Give the reference and comparison values,
+  units, direction and conditions for the main result. For a percentage,
+  identify the denominator. Use “uncertainty” for a quantified uncertainty
+  estimate and “shift” or “difference” for a change between calculations.
+- **Explain when the effect matters.** Show where it is small or large
+  relative to a stated measurement uncertainty or experimental tolerance,
+  when available. Explain the physical reason if known. Identify which
+  assumptions came from the authors and which the Particula analysis added.
+  For example, in a chamber study, say whether the authors used size-dependent
+  wall loss, a constant rate, or left the treatment unspecified. Explain how
+  that limits what particle decay can tell the reader about collisions.
+- **Label the evidence where it appears.** Distinguish observations,
+  quantities inferred from observations, and synthetic predictions in the
+  prose and figure captions. Use a table or figure when it makes a comparison
+  easier to read. Its caption should identify the observable, conditions and
+  reference that give the pattern meaning.
+- **Close with a research decision.** Say what the reader can do with the
+  result, where it applies, and which next measurement or calculation could
+  resolve the main uncertainty. Put reproduction commands and supporting
+  files at the end. Link the paper's specific table, figure or equation
+  beside the claim it supports.
+
+Before handing off, read just the title, headings and first paragraph. A
+researcher skimming those lines should be able to say what changed, under
+which conditions, and why it matters.
 
 ## Diagnosing a Particula limitation
 
