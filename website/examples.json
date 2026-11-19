@@ -792,7 +792,12 @@
     "render_functions": [
       "plot_results",
       "plot_data"
-    ]
+    ],
+    "historical_run": {
+      "revision": "9f408350e33d112c4fc7e567f13d7521dfb918f1",
+      "data_sha256": "218b884c4345ecf289b07a6e79805ed96d5798689d86775c2cd2482eaf1677e6",
+      "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106"
+    }
   },
   "gpu-environment-sweep": {
     "title": "Charged aerosols and ions across sixteen humid environments",

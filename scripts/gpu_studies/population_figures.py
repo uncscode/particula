@@ -118,21 +118,17 @@ def population_figures(report, labels, *, time_scale=1.0, time_unit="s"):
     fig, axes = _facets(
         labels, "Charge population changes · aerosol population"
     )
-    selectors = [
-        lambda q: q <= -2,
-        lambda q: q == -1,
-        lambda q: q == 0,
-        lambda q: q == 1,
-        lambda q: q >= 2,
+    charge_classes = [
+        (lambda q: q <= -2, "q ≤ −2", plotting.COLORS["indigo"], "v", "--"),
+        (lambda q: q == -1, "q = −1", plotting.COLORS["teal"], "v", "-"),
+        (lambda q: q == 0, "q = 0", "0.3", "o", ":"),
+        (lambda q: q == 1, "q = +1", plotting.COLORS["rust"], "^", "-"),
+        (lambda q: q >= 2, "q ≥ +2", plotting.COLORS["berry"], "^", "--"),
     ]
     for i, ax in enumerate(axes):
         if i >= len(labels):
             break
-        for select, label in zip(
-            selectors,
-            ["q ≤ −2", "q = −1", "q = 0", "q = +1", "q ≥ +2"],
-            strict=True,
-        ):
+        for select, label, color, marker, stroke in charge_classes:
             values = np.array(
                 [
                     sum(
@@ -143,7 +139,16 @@ def population_figures(report, labels, *, time_scale=1.0, time_unit="s"):
                     for row in history
                 ]
             )
-            ax.plot(shown_time, values - values[0], label=label)
+            ax.plot(
+                shown_time,
+                values - values[0],
+                label=label,
+                color=color,
+                marker=marker,
+                markersize=4,
+                linestyle=stroke,
+                markevery=max(1, len(shown_time) // 8),
+            )
         ax.set(xlabel=f"Time [{time_unit}]", ylabel="Δ particle count")
     handles, legend = fig.axes[0].get_legend_handles_labels()
     fig.legend(handles, legend, loc="outside lower center", ncols=5)

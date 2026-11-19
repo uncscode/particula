@@ -215,18 +215,32 @@ def plot_results(results):
         coefficient = "0" if policy == "lower" else "10⁻¹⁵"
         label = "No ions" if q == 0 else f"q={q:g}, K={coefficient}"
         labels.append(label)
+        color = {
+            0: "0.3",
+            2: plotting.COLORS["teal"],
+            10: plotting.COLORS["rust"],
+        }[q]
+        marker = {"reject": "s", "lower": "o", "upper": "^"}[policy]
         fractions = np.asarray(result["outcomes"]) / config["boxes"]
         final.append(fractions[-1])
         low, high, _ = result["success_interval95"]
         value = fractions[-1, 0]
         axes[0].plot(
-            np.asarray(result["time"]) / 3600, fractions[:, 0], label=label
+            np.asarray(result["time"]) / 3600,
+            fractions[:, 0],
+            label=label,
+            color=color,
+            linestyle="--" if policy == "upper" else "-",
+            marker=marker,
+            markevery=max(1, len(fractions) // 8),
+            markersize=4,
         )
         axes[1].errorbar(
             index,
             value,
             yerr=np.array([[value - low], [high - value]]),
-            fmt="o",
+            fmt=marker,
+            color=color,
             capsize=4,
         )
     final = np.asarray(final)
