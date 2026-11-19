@@ -346,7 +346,7 @@ ax.plot(
 
 ax.set_xlabel("Time (s)")
 ax.set_ylabel(r"Total number concentration (m$^{-3}$)")
-ax.set_title("Coagulation time evolution: PMF vs PDF vs Particle-resolved")
+ax.set_title("Coagulation over time")
 plotting.legend(ax)
 ax.grid(alpha=0.3)
 
@@ -400,7 +400,7 @@ ax.plot(
 
 ax.set_xlabel("Time (s)")
 ax.set_ylabel("Normalized number concentration (N/N0)")
-ax.set_title("Normalized coagulation decay: PMF vs PDF vs Particle-resolved")
+ax.set_title("Normalized coagulation decay")
 plotting.legend(ax)
 ax.grid(alpha=0.3)
 

@@ -44,7 +44,7 @@ LABELS = {
     "captured": "Captured CUDA",
     "legacy": "Previous CUDA Brownian",
 }
-COLORS = dict(zip(LABELS, ("0.35", "#d97706", "#2563eb", "#059669", "#b91c1c")))
+COLORS = dict(zip(LABELS, ("0.35", *plotting.COLORS.values())))
 
 
 def read_results():

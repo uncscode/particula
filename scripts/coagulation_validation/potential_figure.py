@@ -26,15 +26,13 @@ def plot():
     )[0, 1]
     gap = np.geomspace(0.35, 500, 350)
     x = r.sum() / (r.sum() + gap * 1e-9)
-    fig, (energy, rates) = plotting.subplots(
-        1, 2, gridspec_kw={"width_ratios": [1.8, 1]}
-    )
+    fig, (energy, rates) = plotting.subplots(1, 2)
     for k, (z, color) in enumerate(
         [
             ((0, 0), "#43505c"),
-            ((1, 0), "#008078"),
-            ((2, 2), "#b45423"),
-            ((1, -1), "#844985"),
+            ((1, 0), plotting.COLORS["teal"]),
+            ((2, 2), plotting.COLORS["rust"]),
+            ((1, -1), plotting.COLORS["berry"]),
         ]
     ):
         _, u = potential_profile(

@@ -13,7 +13,7 @@
 # ---
 
 # %% [markdown]
-# # Radial Relative Velocity Comparison
+# # Radial relative velocity\ncomparison
 #
 # This notebook provides a comparison between DNS (Direct Numerical Simulation) radial relative velocities and the model predictions from the particula library.
 #
@@ -243,7 +243,7 @@ ax.scatter(
 )
 ax.set_xlabel("Particle Radius (µm)")
 ax.set_ylabel("Radial Relative Velocity (cm/s)")
-ax.set_title("Radial Relative Velocity Comparison")
+ax.set_title("Radial relative velocity\ncomparison")
 ax.grid(True)
 plotting.fit(fig)
 plt.show()

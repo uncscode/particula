@@ -383,7 +383,11 @@ def plot():
     with (OUT / "bat-lab-scan.csv").open() as file:
         rows = list(csv.DictReader(file))
     fig, axes = plotting.subplots(1, 2)
-    colors = {0.0: "#444d56", 10.0: "#087e83", 30.0: "#aa5729"}
+    colors = {
+        0.0: "#444d56",
+        10.0: plotting.COLORS["teal"],
+        30.0: plotting.COLORS["rust"],
+    }
     for model, gas in CASES:
         r = [
             x
@@ -407,7 +411,7 @@ def plot():
             )
             ax.set(xlabel="Water supersaturation (%)", xlim=(0.05, 0.8))
     axes[0].set_ylabel("Particles reaching 1 µm (%)")
-    axes[1].set_ylabel("Change in particle organic mass (%)")
+    axes[1].set_ylabel("Particle organic mass change (%)")
     plotting.legend(axes[0])
     axes[1].grid(alpha=0.2)
     axes[0].grid(alpha=0.2)
@@ -441,8 +445,8 @@ def plot():
         axes,
         contrasts,
         (
-            "BAT minus ideal, organic mass fixed",
-            "Organic uptake minus fixed mass, both BAT",
+            "BAT minus ideal\nFixed organic mass",
+            "Organic uptake minus fixed mass\nBAT in both cases",
         ),
         strict=True,
     ):
@@ -473,7 +477,7 @@ def plot():
             [0.05, 0.1, 0.2, 0.35, 0.7, 1.4],
             labels=["0.05", "0.1", "0.2", "0.35", "0.7", "1.4"],
         )
-        fig.colorbar(g, ax=ax, label="Count difference (percentage points)")
+        fig.colorbar(g, ax=ax, label="Count difference\n(percentage points)")
     axes[0].set_ylabel("Water supersaturation (%)")
     fig.suptitle(
         "Sensitivity of the 1 µm optical count  ·  GSD 1.10, 5 "

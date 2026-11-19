@@ -110,8 +110,22 @@ for wf in water_fractions:
 
 # Plot
 fig, ax = plotting.subplots(size="wide")
-ax.plot(water_fractions, water_activities, "b-", linewidth=2, label="Water")
-ax.plot(water_fractions, organic_activities, "r-", linewidth=2, label="Organic")
+ax.plot(
+    water_fractions,
+    water_activities,
+    "-",
+    color=plotting.COLORS["teal"],
+    linewidth=2,
+    label="Water",
+)
+ax.plot(
+    water_fractions,
+    organic_activities,
+    "-",
+    color=plotting.COLORS["rust"],
+    linewidth=2,
+    label="Organic",
+)
 ax.set_xlabel("Water Mass Fraction", fontsize=12)
 ax.set_ylabel("Activity", fontsize=12)
 ax.set_title("Ideal Activity (Raoult's Law)", fontsize=14)
@@ -203,14 +217,16 @@ fig, ax = plotting.subplots(size="wide")
 ax.plot(
     water_fractions,
     ideal_organic_comparison,
-    "b--",
+    "--",
+    color=plotting.COLORS["teal"],
     linewidth=2,
     label="Ideal Organic Activity",
 )
 ax.plot(
     water_fractions,
     bat_organic,
-    "r-",
+    "-",
+    color=plotting.COLORS["rust"],
     linewidth=2,
     label="Non-Ideal Organic Activity (BAT, O:C=0.4)",
 )
@@ -247,7 +263,9 @@ ideal_organic = [
 ax.plot(water_fractions, ideal_organic, "k--", linewidth=1.5, label="Ideal")
 
 # BAT at different O:C ratios (returns organic activity)
-colors = plotting.colormap("magnitude")(np.linspace(0.2, 0.8, len(o2c_values)))
+colors = plotting.colormap("magnitude")(
+    np.linspace(0.40, 0.95, len(o2c_values))
+)
 for o2c, color in zip(o2c_values, colors):
     strat = (
         par.particles.ActivityNonIdealBinaryBuilder()
@@ -334,7 +352,7 @@ water_fractions = np.linspace(0.2, 0.95, 40)
 fig, ax = plotting.subplots(size="wide")
 
 colors = plotting.colormap("magnitude")(
-    np.linspace(0.2, 0.8, len(kappa_values))
+    np.linspace(0.40, 0.95, len(kappa_values))
 )
 for kappa, color in zip(kappa_values, colors):
     strat = par.particles.ActivityKappaParameter(
@@ -444,13 +462,25 @@ for rh in rh_values:
 # Plot
 fig, (ax1, ax2) = plotting.subplots(1, 2, size="wide")
 
-ax1.plot(rh_values * 100, mean_partitions, "b-", linewidth=2)
+ax1.plot(
+    rh_values * 100,
+    mean_partitions,
+    "-",
+    color=plotting.COLORS["teal"],
+    linewidth=2,
+)
 ax1.set_xlabel("Relative Humidity (%)", fontsize=12)
 ax1.set_ylabel("Mean Partition Coefficient", fontsize=12)
 ax1.set_title("Partitioning vs RH", fontsize=14)
 ax1.set_xlim(30, 100)
 
-ax2.plot(rh_values * 100, water_contents, "g-", linewidth=2)
+ax2.plot(
+    rh_values * 100,
+    water_contents,
+    "-",
+    color=plotting.COLORS["indigo"],
+    linewidth=2,
+)
 ax2.set_xlabel("Relative Humidity (%)", fontsize=12)
 ax2.set_ylabel("Water Content ($\\mu$g/m$^3$)", fontsize=12)
 ax2.set_title("Water Uptake vs RH", fontsize=14)

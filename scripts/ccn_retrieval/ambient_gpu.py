@@ -321,7 +321,7 @@ def plot():
     fig, axes = plotting.subplots(1, 2)
     for variant, color, label in zip(
         VARIANTS,
-        ["#00757c", "#c16a25", "#563d7c"],
+        [plotting.COLORS[k] for k in ("teal", "rust", "indigo")],
         [
             "Individual compositions",
             "Same composition within size band",

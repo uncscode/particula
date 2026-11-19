@@ -204,9 +204,7 @@ def plot_setpoints():
     fig, axes = plotting.subplots(1, 2, sharey=True)
     for ax, width in zip(axes, WIDTHS, strict=True):
         ax.axhspan(0.05, 1.4, color="#eef1f0")
-        for k, color in zip(
-            KAPPAS, ["#006960", "#1972ab", "#a54b1c", "#6d4989"], strict=True
-        ):
+        for k, color in zip(KAPPAS, plotting.COLORS.values(), strict=True):
             selected = [
                 r
                 for r in rows
@@ -232,12 +230,12 @@ def plot_setpoints():
             yscale="log",
             xlim=(10, 200),
             ylim=(0.05, 25),
-            title=f"Geometric standard deviation {width:.2f}",
+            title=f"GSD {width:.2f}",
             xlabel="Median dry mobility diameter (nm)",
         )
         ax.set_xticks(
-            [10, 20, 40, 70, 100, 150, 200],
-            labels=["10", "20", "40", "70", "100", "150", "200"],
+            [10, 20, 40, 70, 100, 200],
+            labels=["10", "20", "40", "70", "100", "200"],
         )
         ax.set_yticks(
             [0.05, 0.1, 0.2, 0.5, 1, 1.4, 3, 10, 20],
@@ -302,8 +300,8 @@ def plot():
             ax.set_xlabel("Median dry mobility diameter (nm)")
         for ax in axes.flat:
             ax.set_xticks(
-                [10, 20, 40, 70, 100, 150, 200],
-                labels=["10", "20", "40", "70", "100", "150", "200"],
+                [10, 20, 40, 70, 100, 200],
+                labels=["10", "20", "40", "70", "100", "200"],
             )
             ax.minorticks_off()
         fig.suptitle(

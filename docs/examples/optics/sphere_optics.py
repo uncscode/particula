@@ -124,7 +124,7 @@ def plot_results(report):
     ax.set(
         xlabel="Vacuum wavelength [nm]",
         ylabel="Cross section [µm²]",
-        title="200 nm radius sphere · illustrative index 1.5 + 0.02i",
+        title="200 nm sphere radius\nIllustrative index 1.5 + 0.02i",
     )
     plotting.legend(ax)
     ax.grid(alpha=0.2)
@@ -136,7 +136,7 @@ def plot_results(report):
     axes[0].set(
         xlabel="Scattering angle [degrees]",
         ylabel="Differential cross section [m²/sr]",
-        title="500 nm radius sphere · 550 nm light",
+        title="500 nm sphere radius\n550 nm light",
     )
     plotting.legend(axes[0])
     axes[1].plot(report["angle_degrees"], report["linear_polarization"])

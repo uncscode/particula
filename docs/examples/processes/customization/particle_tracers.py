@@ -300,7 +300,7 @@ def plot_results(report):
     axes[1].set(
         xlabel="Tag units per particle",
         ylabel="Represented count",
-        title="Mergers change the distribution",
+        title="Distribution after mergers",
     )
     slots = np.arange(4)
     axes[2].bar(slots - 0.18, source["before"], 0.36, label="Before source")
@@ -308,7 +308,7 @@ def plot_results(report):
     axes[2].set(
         xlabel="Storage slot",
         ylabel="Tag units per particle",
-        title="Resampling then two births",
+        title="Resampling and two births",
         xticks=slots,
     )
     for ax in axes:

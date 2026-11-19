@@ -9,6 +9,7 @@ import numpy as np
 import particula
 import scipy
 import warp
+from particula import plotting
 from study import revision
 
 matplotlib.use("Agg")
@@ -119,6 +120,67 @@ def pulse_summary():
     return results, meta
 
 
+@plt.style.context("particula.default")
+def plot_comparison(results, comparison, destination):
+    """Draw the chamber comparison from the published numerical tables."""
+
+    def sampled(case, key):
+        return np.array([float(r[key]) for r in results if r["case"] == case])
+
+    fig, (ax, bx) = plotting.subplots(1, 2, size="wide")
+    ax.plot(
+        TARGETS,
+        [float(r["measured_cm3_s"]) * 1e7 for r in comparison],
+        "ko",
+        label="Cai measurements",
+    )
+    ax.plot(
+        TARGETS,
+        [float(r["native_plus_vdw_steady_cm3_s"]) * 1e7 for r in comparison],
+        color=plotting.COLORS["teal"],
+        label="Steady SMPS retrieval, dispersion",
+    )
+    ax.errorbar(
+        TARGETS,
+        sampled("dispersion_refined", "beta_weighted_cm3_s") * 1e7,
+        yerr=sampled("dispersion_refined", "beta_mc95_halfwidth") * 1e7,
+        fmt="x",
+        color=plotting.COLORS["rust"],
+        capsize=3,
+        label="Refined GPU pulse (95% MC)",
+    )
+    ax.plot(
+        TARGETS,
+        [float(r["anchored_published_cm3_s"]) * 1e7 for r in comparison],
+        "--",
+        color=plotting.COLORS["indigo"],
+        label="Published attraction, with transfer",
+    )
+    ax.set(
+        xlabel="Nominal tracer diameter (nm)",
+        ylabel="Capture coefficient (10⁻⁷ cm³/s)",
+    )
+    plotting.legend(ax)
+    p = probabilities(D, "upper")
+    dist = selected(100, p, large=True)
+    for j, col in enumerate(list(plotting.COLORS.values())[:3]):
+        bx.plot(
+            D,
+            dist[:, j] / np.log(D[1] / D[0]),
+            color=col,
+            label=f"Selected at +{j + 1} charge",
+        )
+    bx.set(
+        xlim=(75, 240),
+        xlabel="True collector diameter (nm)",
+        ylabel="Transmitted number\nper ln(diameter)",
+    )
+    plotting.legend(bx)
+    plotting.fit(fig)
+    fig.savefig(destination, dpi=300)
+    plt.close(fig)
+
+
 def main():
     """Compare the pulse ensembles and the steady retrieval with experiment."""
     results, meta = pulse_summary()
@@ -158,60 +220,7 @@ def main():
         )
     save("comparison.csv", comparison)
 
-    def sampled(case, key):
-        return np.array([r[key] for r in results if r["case"] == case])
-
-    fig, (ax, bx) = plt.subplots(1, 2, figsize=(11, 4.4), layout="constrained")
-    ax.plot(
-        TARGETS,
-        [float(r["measured"]) * 1e7 for r in prior],
-        "ko",
-        label="Cai measurements",
-    )
-    ax.plot(
-        TARGETS,
-        [r["native_plus_vdw_steady_cm3_s"] * 1e7 for r in comparison],
-        color="#00796b",
-        label="Steady SMPS retrieval, dispersion",
-    )
-    ax.errorbar(
-        TARGETS,
-        sampled("dispersion_refined", "beta_weighted_cm3_s") * 1e7,
-        yerr=sampled("dispersion_refined", "beta_mc95_halfwidth") * 1e7,
-        fmt="x",
-        color="#cc5900",
-        capsize=3,
-        label="Refined GPU pulse (95% MC)",
-    )
-    ax.plot(
-        TARGETS,
-        [r["anchored_published_cm3_s"] * 1e7 for r in comparison],
-        "--",
-        color="#514a94",
-        label="Published attraction, with transfer",
-    )
-    ax.set(
-        xlabel="Nominal tracer diameter (nm)",
-        ylabel="Capture coefficient (10⁻⁷ cm³/s)",
-    )
-    ax.legend(frameon=False, fontsize=8)
-    p = probabilities(D, "upper")
-    dist = selected(100, p, large=True)
-    for j, col in enumerate(["#38658d", "#d17727", "#429b83"]):
-        bx.plot(
-            D,
-            dist[:, j] / np.log(D[1] / D[0]),
-            color=col,
-            label=f"Selected at +{j + 1} charge",
-        )
-    bx.set(
-        xlim=(75, 240),
-        xlabel="True collector diameter (nm)",
-        ylabel="Transmitted number per ln(diameter)",
-    )
-    bx.legend(frameon=False, fontsize=8)
-    fig.savefig(HERE / "chamber-comparison.png", dpi=180)
-    plt.close(fig)
+    plot_comparison(results, comparison, HERE / "chamber-comparison.png")
     numerical = max(
         abs(app("numerical", m, d) / app("reference", m, d) - 1)
         for d in TARGETS

@@ -75,8 +75,8 @@ def main():
         label="1:1 agreement",
     )
     ax.set(
-        xlabel="Measured CCN hygroscopicity, κ",
-        ylabel="Published BAT CCN hygroscopicity, κ",
+        xlabel="Measured CCN κ",
+        ylabel="Published BAT CCN κ",
         aspect="equal",
     )
     low = min(*ax.get_xlim(), *ax.get_ylim())
