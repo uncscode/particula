@@ -1,6 +1,11 @@
 # %% [markdown]
 # # Sixty-four heterogeneous aerosol boxes on one GPU
 #
+# What does an ensemble average hide when every box starts under different
+# conditions? Here you will compare per-box inventories and distributions without
+# mistaking co-varying inputs for isolated causes. Read the
+# [prepared quick start](gpu_prepared_quick_start.py) for state ownership first.
+#
 # Each box contains 4,096 slots, with 75% initially active: **196,608 resolved
 # particles** in total. Temperature varies from 275 to 310 K, pressure from
 # 85 to 105 kPa, relative humidity from 0.8 to 1.8, and physical volume by a
@@ -15,8 +20,8 @@
 # against the independent exponential dilution factor. The reusable study
 # helpers are included in the downloadable ZIP; they are also used by the
 # controlled benchmark campaign. The same trajectory is repeated at half the
-# timestep: every particle's total mass must change by less than 1%, and each
-# box's water vapor by less than 0.1%. Conservation alone cannot detect an
+# timestep: every particle's final total mass must change by less than 1%, and
+# each box's final water vapor by less than 0.1%. Conservation cannot detect an
 # unstable integration; the former coarse timestep produced oscillations.
 
 # %%
@@ -71,3 +76,18 @@ def run_example():
 # %%
 if __name__ == "__main__":
     run_example()
+
+# %% [markdown]
+# ## Preserve the differences that matter to your question
+#
+# Keeping each box visible lets this calculation expose heterogeneous response
+# that a pooled size distribution would obscure. The independent dilution ledger
+# checks inventory; the halved timestep checks selected final values. Neither
+# turns the co-varying temperature, pressure, water fraction, and volume into a
+# causal estimate of any one parameter.
+#
+# For a temperature-sensitivity study, keep initial number density, composition,
+# pressure, and saturation definition controlled while varying temperature.
+# Compare the water uptake per box and size-resolved growth, then refine both
+# timestep and parameter spacing. The [environment sweep](gpu_environment_sweep.py)
+# provides a more controlled route through environmental comparisons.

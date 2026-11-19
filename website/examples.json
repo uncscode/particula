@@ -648,6 +648,10 @@
     "plot_inputs": [
       "scripts/docs_gpu_figures.py"
     ],
+    "historical_run": {
+      "revision": "480ecf2c1aa95da42985098c53e4ecdc66133d7b",
+      "data_sha256": "0733f192493bd2bda1bf37521296593018e4c16bd2df4b7cf233094c0573e0c6"
+    },
     "full_canvas": true
   },
   "gpu-prepared-stochastic": {
@@ -798,6 +802,10 @@
     "plot_inputs": [
       "scripts/gpu_studies/population_figures.py"
     ],
+    "historical_run": {
+      "revision": "54edfe13b7c99ec01b3a5f853e3ee45e6454ab61",
+      "data_sha256": "8aab526a58e745252e1baa1ff9c13471219320a3495dabfc89a47c5856961924"
+    },
     "full_canvas": true
   },
   "timed-box-chemistry": {

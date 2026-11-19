@@ -315,7 +315,9 @@ ax[1].set_title("Vapor Pressure vs Temperature")
 ax[1].grid(True, axis="y")
 
 # Combined legend
-fig.legend(list_of_chemicals, title="Chemicals", loc="outside right center")
+fig.legend(
+    list_of_chemicals, title="Chemicals", ncols=3, loc="outside right center"
+)
 plotting.fit(fig)
 plt.show()
 
@@ -423,7 +425,7 @@ fig, ax = plotting.subplots()
 ax.hist(np.log10(resolved_masses.radii[0]), bins=50, alpha=0.5)
 ax.set_xlabel("log10(Radius [m])")
 ax.set_ylabel("Bin counts")
-ax.set_title("Initial Particle Size Distribution")
+ax.set_title("Initial size distribution")
 plotting.fit(fig)
 plt.show()
 
@@ -763,7 +765,7 @@ ax.stackplot(
 )
 
 ax.set_xlabel("Time (s)")
-ax.set_ylabel("Species Mass Concentration (kg/m³)")
+ax.set_ylabel("Species mass concentration\n(kg/m³)")
 ax.set_title("Particle-Phase Species Mass Over Time")
 ax.grid(True)
 
@@ -781,7 +783,9 @@ twinx.set_ylabel("Temperature (K)", color=TAILWIND["rose"]["500"])
 twinx.tick_params(axis="y", labelcolor=TAILWIND["rose"]["500"])
 
 # External legend
-fig.legend(list_of_chemicals, title="Chemicals", loc="outside right center")
+fig.legend(
+    list_of_chemicals, title="Chemicals", ncols=3, loc="outside right center"
+)
 plotting.fit(fig)
 plt.show()
 
@@ -815,7 +819,9 @@ twinx.plot(
 twinx.set_ylabel("Temperature (K)", color=TAILWIND["rose"]["500"])
 twinx.tick_params(axis="y", labelcolor=TAILWIND["rose"]["500"])
 
-fig.legend(list_of_chemicals, title="Chemicals", loc="outside right center")
+fig.legend(
+    list_of_chemicals, title="Chemicals", ncols=3, loc="outside right center"
+)
 plotting.fit(fig)
 plt.show()
 

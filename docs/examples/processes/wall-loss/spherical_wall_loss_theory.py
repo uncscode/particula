@@ -334,7 +334,7 @@ def plot_results(report):
             capsize=3,
             label="CUDA mean, 95% MC interval",
         )
-        ax.set_title(f"Wall mixing coefficient = {ke:g} s⁻¹")
+        ax.set_title(f"Wall mixing\n$k_e$ = {ke:g} s⁻¹")
         ax.set_xlabel("Particle diameter (µm)")
         ax.grid(alpha=0.2)
         ax.set_ylim(0, 1)
