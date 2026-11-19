@@ -40,7 +40,7 @@ A separate synthetic experiment held dry constituent volumes fixed at each size 
 
 ![Particle-specific and instrument-detected activation across three mixing states and three mean supersaturations for the synthetic continental source.](../../../images/thermodynamics/pi-chamber-mixtures.png)
 
-The [continental mixing-state figure data](../../../data/pi-chamber/continental-spectra-summary.csv) contain the 45 reference campaign rows used for both panels at each mean supersaturation. Redraw the chamber study figures from the saved tables with `python -m scripts.pi_chamber.figures`.
+The continental mixing-state plots use 45 rows from the reference campaign. To redraw all three study figures from the published tables, run `python -m scripts.pi_chamber.figures`. [Mixing-state figure data](https://github.com/Gorkowski/particula/blob/172090a0b2369eb6620583387464b9a21b1e81c3/docs/data/pi-chamber/continental-spectra-summary.csv)
 
 
 The [species and organic vapor companion](pi-chamber-species.md) compares NaCl and ammonium sulfate at 130 nm and tests semivolatile organic uptake and evaporation with BAT.
