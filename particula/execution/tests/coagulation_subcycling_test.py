@@ -229,8 +229,16 @@ def test_reject_before_allocation_and_minimum(device, monkeypatch):
     ) as sim:
         sim.step()
         saved = sim.checkpoint()
-        with pytest.raises(CoagulationSubcyclingError, match="min_substep"):
+        with pytest.raises(
+            CoagulationSubcyclingError, match="min_substep"
+        ) as exc:
             sim.step()
+        rejection = exc.value.diagnostics
+        assert rejection["last_disjoint_pair_limited"][0]
+        assert not rejection["last_buffer_limited"][0]
+        assert rejection["last_active_counts"][0] == 5
+        assert rejection["last_required_trials"][0] == 3
+        assert rejection["last_candidate_seconds"] < limited.min_substep
         canonical_equal(saved, sim.checkpoint())
         with pytest.raises(ValueError, match="relax"):
             process.resume(
