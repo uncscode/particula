@@ -66,6 +66,21 @@ the scientific source and inputs for verification. The page identifies the
 historical simulation and links its executed source, arrays and original
 device. To publish a result from the current model, run a full refresh.
 
+For the stochastic and lifecycle tutorials, the example files were first
+committed after the scientific checkout. In a dedicated checkout of the pinned
+`revision`, restore the published study files from its pinned `study_revision`
+before verifying the saved observations. Both pins appear in the registry.
+
+```bash
+git restore --source=535d02b7b06ba782aa2bd5d1c60890e06adbb654 -- website/examples.json docs/examples/gpu/prepared/gpu_prepared_stochastic.py docs/examples/gpu/prepared/gpu_prepared_lifecycle.py scripts/docs_gpu_figures.py scripts/gpu_studies
+```
+
+Those two original runs saved images alone. The new native CUDA executions
+save the returned trajectory report and its initial radius histogram. The
+lifecycle panel uses the mean initial histogram across boxes. The saved
+executed source and input hashes identify the scientific calculation.
+
+
 ## Validate changes
 
 ```bash

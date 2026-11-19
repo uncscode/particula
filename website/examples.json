@@ -668,7 +668,20 @@
       "scripts/gpu_studies/trajectories.py"
     ],
     "invoke": "result = run_example()",
-    "full_canvas": true
+    "full_canvas": true,
+    "data_expression": "result",
+    "replot_invoke": "result = saved_data\nplot_results(result)",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": [
+      "scripts/docs_gpu_figures.py"
+    ],
+    "historical_run": {
+      "revision": "da142e3dfcf190010d21f1ac07aca1a12e4c9fd0",
+      "study_revision": "535d02b7b06ba782aa2bd5d1c60890e06adbb654",
+      "data_sha256": "54bfec9b176c86f848c7d490a50f7e2055b1c94ab56fb2a7a9aea4a716b2a0da"
+    }
   },
   "gpu-prepared-lifecycle": {
     "title": "A million-particle source, collision and loss lifecycle",
@@ -684,7 +697,20 @@
       "scripts/gpu_studies/trajectories.py"
     ],
     "invoke": "result = run_example()",
-    "full_canvas": true
+    "full_canvas": true,
+    "data_expression": "result",
+    "replot_invoke": "result = saved_data\nplot_results(result)",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": [
+      "scripts/docs_gpu_figures.py"
+    ],
+    "historical_run": {
+      "revision": "da142e3dfcf190010d21f1ac07aca1a12e4c9fd0",
+      "study_revision": "535d02b7b06ba782aa2bd5d1c60890e06adbb654",
+      "data_sha256": "d48c6313d8e85f2d4538d621e3984d0de27551562473a4f40d46640294d4913c"
+    }
   },
   "gpu-prepared-cyclic-chamber": {
     "title": "Repeated source pulses in a cooling and warming aerosol",
