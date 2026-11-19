@@ -37,7 +37,7 @@ fig, ax = plotting.subplots()
 for center in (50, 120):
     ax.semilogx(diameter, profile(center), label=f"{center} nm")
 ax.set(xlabel="Particle diameter (nm)", ylabel="Normalized count")
-plotting.legend(ax)
+plotting.legend(ax, loc="upper left")
 plotting.fit(fig)
 plt.show()
 
