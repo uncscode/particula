@@ -93,16 +93,17 @@ original campaign comprised 300 cases across a wider concentration range.
 
 | Initial slots | Accepted passes in successive 100 s intervals | Mergers | Live + rollback bytes | Synchronous step time |
 | ---: | --- | ---: | ---: | ---: |
-| 5,000 | 8, 9, 10, 10, 10, 10 | 184 | 503,876 + 503,876 | 0.86–1.06 s |
-| 10,000 | 16, 18, 18, 19, 22, 22 | 433 | 964,516 + 964,516 | 6.33–8.35 s |
+| 5,000 | 8, 9, 10, 10, 10, 10 | 184 | 503,876 + 503,876 | 0.56–0.68 s |
+| 10,000 | 16, 18, 18, 19, 22, 22 | 433 | 964,516 + 964,516 | 4.13–5.35 s |
 
 Each final active count equalled initial count minus accepted mergers.
 Survivors retained unit weight, charge remained zero and both relative
 mass drifts rounded to zero in fp64. Times include the restore-point copies,
 graph replay and status readback. An additional status check immediately
-after each committed step took 92–166 µs on the idle stream. This measures
+after each committed step took 105–142 µs on the idle stream. This measures
 host observation overhead separately from time waiting for pending physics.
-The run used an RTX 5060, Warp 1.11.1, Python 3.12.12 and NumPy 2.3.4.
+The saved run used revision `410d6bc858`, an RTX 5060, Warp 1.11.1,
+Python 3.12.12 and NumPy 2.3.4.
 
 A separate two-box, three-material fixture isolates evolving disjoint-pair
 capacity. At seed zero, a fixed 0.1 s step passes in both boxes. After the
