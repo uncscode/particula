@@ -245,6 +245,12 @@ def render_example(key, config):
             if "rendered_at" in manifest
             else ""
         )
+        if "plot_source_revision" in manifest:
+            rendering = (
+                "This native execution used the archived scientific package "
+                f"and the example and plotting code from "
+                f"revision `{manifest['plot_source_revision'][:9]}`.\n\n"
+            )
         data_link = (
             f"[Numerical plot data]({url}/data.json).\n\n"
             if "data.json" in manifest.get("files", {})

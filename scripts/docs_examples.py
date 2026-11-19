@@ -118,7 +118,35 @@ def result_state(config, manifest, root=ROOT):
     )
 
 
-def execute(config, root=ROOT, *, saved_data=None):
+def use_historical_package(science_root, renderer_root):
+    """Load the pinned science package and its separately versioned renderer."""
+    from importlib.util import module_from_spec, spec_from_file_location
+
+    import matplotlib as mpl
+    from matplotlib import style
+
+    sys.path.insert(0, science_root)
+    import particula
+
+    if (
+        Path(particula.__file__).resolve().parent
+        != Path(science_root) / "particula"
+    ):
+        raise RuntimeError(
+            "The kernel imported a different scientific checkout"
+        )
+    root = Path(renderer_root)
+    spec = spec_from_file_location("particula.plotting", root / STYLE_INPUTS[1])
+    module = module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    particula.plotting = module
+    style.library["particula.default"] = mpl.rc_params_from_file(
+        root / STYLE_INPUTS[0], use_default_template=False
+    )
+
+
+def execute(config, root=ROOT, *, saved_data=None, science_root=None):
     """Execute one script in a fresh kernel and temporary working directory."""
     import nbformat
     from jupyter_client import AsyncKernelManager
@@ -155,6 +183,13 @@ def execute(config, root=ROOT, *, saved_data=None):
         "InlineBackend.instance().print_figure_kwargs = "
         f"{{'bbox_inches': {bbox!r}, 'dpi': {FIGURE_DPI}}}\n"
     )
+    if science_root is not None:
+        bootstrap += (
+            "import runpy\n"
+            f"tool = runpy.run_path({__file__!r})\n"
+            "tool['use_historical_package']("
+            f"{str(science_root)!r}, {str(root)!r})\n"
+        )
     notebook = nbformat.v4.new_notebook(
         cells=[nbformat.v4.new_code_cell(bootstrap), *cells]
     )
@@ -410,6 +445,28 @@ def retain_execution_metadata(
     manifest["render_elapsed_seconds"] = elapsed
 
 
+def verify_execution_checkout(config, science_root):
+    """Require the recorded scientific revision and exact package contents."""
+    pin = config.get("historical_run", {})
+    revision = subprocess.check_output(  # noqa: S603 -- fixed Git arguments
+        [GIT, "rev-parse", "HEAD"], cwd=science_root, text=True
+    ).strip()
+    if revision != pin.get("revision") or (
+        package_source_hash(science_root) != pin.get("package_source_sha256")
+    ):
+        raise ValueError(
+            "Scientific checkout differs from the pinned execution"
+        )
+
+
+def record_historical_execution(manifest, config, historical):
+    """Record both source revisions of a fresh run with an archived model."""
+    if historical:
+        manifest["historical_run"] = config["historical_run"]
+        manifest["plot_source_revision"] = manifest["revision"]
+        manifest["revision"] = config["historical_run"]["revision"]
+
+
 def refresh(
     example_id,
     config,
@@ -420,10 +477,17 @@ def refresh(
     science_root=None,
 ):
     """Publish a complete result generation only after successful execution."""
+    historical_execution = science_root is not None and not replot
+    execution_root = root
+    options = {}
+    if historical_execution:
+        execution_root = Path(science_root).resolve()
+        verify_execution_checkout(config, execution_root)
+        options["science_root"] = execution_root
     source = (root / config["source"]).read_bytes()
     initial_fingerprint = fingerprint(config, root)
-    initial_package_hash = package_source_hash(root)
-    initial_versions = package_versions(root)
+    initial_package_hash = package_source_hash(execution_root)
+    initial_versions = package_versions(execution_root)
     original = None
     directory = None
     data = None
@@ -431,14 +495,11 @@ def refresh(
         directory, original, data = load_replot_data(
             example_id, config, root, results, science_root=science_root
         )
+        options["saved_data"] = data
     started = time.monotonic()
-    cells, device = (
-        execute(config, root, saved_data=data)
-        if replot
-        else execute(config, root)
-    )
+    cells, device = execute(config, root, **options)
     elapsed = time.monotonic() - started
-    if package_source_hash(root) != initial_package_hash:
+    if package_source_hash(execution_root) != initial_package_hash:
         raise RuntimeError(
             "Library changed during execution; refusing to save results"
         )
@@ -466,7 +527,7 @@ def refresh(
         dirty = bool(
             subprocess.check_output(  # noqa: S603 -- Git argv without a shell
                 [GIT, "status", "--porcelain", "--", "particula"],
-                cwd=root,
+                cwd=execution_root,
                 text=True,
             )
         )
@@ -494,6 +555,7 @@ def refresh(
                 for p in pending.iterdir()
             },
         }
+        record_historical_execution(manifest, config, historical_execution)
         if config.get("data_expression"):
             manifest["simulation_fingerprint"] = simulation_fingerprint(
                 config, root
@@ -684,6 +746,7 @@ def main():
     sub = parser.add_subparsers(dest="command", required=True)
     run = sub.add_parser("refresh")
     run.add_argument("example")
+    run.add_argument("--science-checkout", type=Path)
     replot = sub.add_parser("replot")
     replot.add_argument("example")
     replot.add_argument(

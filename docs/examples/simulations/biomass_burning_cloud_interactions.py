@@ -15,6 +15,11 @@
 # %% [markdown]
 # # How do collision models change a water-grown mixed aerosol?
 #
+# The figures use a native CUDA execution with the archived scientific library
+# at revision `9c548d9d6` and the current plotting code. With the same 0.36 s
+# step, current Particula requested 644 collision trials when 630 were
+# available. The historical run retains the published interval and branches.
+#
 # A mixed aerosol can change size through water exchange and through collisions.
 # How can we compare collision assumptions without confusing them with different
 # starting populations? This example gives four scenarios copies of the same
@@ -534,7 +539,7 @@ ax.plot(
     dnd_cond,
     linewidth=6,
     alpha=0.5,
-    color=TAILWIND["sky"]["800"],
+    color=plotting.COLORS["teal"],
     label="Condensation Only",
 )
 
@@ -543,7 +548,7 @@ ax.plot(
     dnd_brown,
     linewidth=2,
     linestyle="--",
-    color=TAILWIND["slate"]["100"],
+    color=plotting.COLORS["indigo"],
     label="Brownian Only",
 )
 
@@ -554,7 +559,7 @@ ax.plot(
     markersize=4,
     linewidth=5,
     alpha=1,
-    color=TAILWIND["rose"]["300"],
+    color=plotting.COLORS["berry"],
     linestyle="",
     label="with Sedimentation",
 )
@@ -564,7 +569,7 @@ ax.plot(
     dnd_turb,
     linewidth=3,
     alpha=0.75,
-    color=TAILWIND["amber"]["900"],
+    color=plotting.COLORS["rust"],
     label="with turbulent shear (ST1956)",
 )
 

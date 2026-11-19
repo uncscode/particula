@@ -455,7 +455,11 @@
     "device": "cuda",
     "timeout": 14400,
     "inputs": [],
-    "full_canvas": true
+    "full_canvas": true,
+    "historical_run": {
+      "revision": "9c548d9d617a93cd23a45773426f751e9e6ed9ec",
+      "package_source_sha256": "cab2ecf96c60a0d1d005885793a221697dc3037bb3be50d8438b4de458423cbc"
+    }
   },
   "examples-simulations-cloud-chamber-multi-cycle": {
     "title": "Separate water cycling from seed loss in a chamber",
