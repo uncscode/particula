@@ -17,7 +17,7 @@ from time import perf_counter
 import matplotlib.pyplot as plt
 import numpy as np
 import warp as wp
-from particula import Aerosol
+from particula import Aerosol, plotting
 from particula.dynamics import (
     BrownianCoagulationStrategy,
     Coagulation,
@@ -169,25 +169,29 @@ def simulate():
 
 
 # %%
+@plt.style.context("particula.default")
 def plot_results(report):
     """Plot observed subcycle counts and cumulative accepted mergers."""
-    fig, axes = plt.subplots(1, 2, figsize=(9, 3.4), constrained_layout=True)
+    fig, axes = plotting.subplots(1, 2)
     for row in report["rows"]:
         events = row["events"]
         times = [e["time_s"] for e in events]
         label = f"{row['slots']:,} initial particles"
-        axes[0].plot(times, [e["passes"] for e in events], "o-", label=label)
+        axes[0].plot(
+            times, [e["passes"] for e in events], marker="o", label=label
+        )
         axes[1].plot(
             times,
             np.cumsum([e["collisions"] for e in events]),
-            "o-",
+            marker="o",
             label=label,
         )
     for ax in axes:
         ax.set_xlabel("Simulated time (s)")
     axes[0].set_ylabel("Passes per 100 s interval")
     axes[1].set_ylabel("Cumulative mergers")
-    axes[0].legend()
+    plotting.legend(axes[0])
+    plotting.fit(fig)
     return fig
 
 

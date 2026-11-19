@@ -1225,6 +1225,7 @@
     "render_functions": [
       "plot_results"
     ],
-    "plot_inputs": []
+    "plot_inputs": [],
+    "full_canvas": true
   }
 }

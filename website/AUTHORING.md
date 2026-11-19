@@ -81,13 +81,17 @@ lifecycle panel uses the mean initial histogram across boxes. The saved
 executed source and input hashes identify the scientific calculation.
 
 
-The biomass aerosol tutorial has four plots interleaved with its simulation.
-To run the full tutorial against its archived scientific implementation, use
-`python scripts/docs_examples.py refresh examples-simulations-biomass-burning-cloud-interactions --science-checkout ../particula-original`.
-Check out the registry's pinned library revision in that directory first. The
-runner verifies all scientific Python sources against the recorded package
-digest and executes on native CUDA. The example and Matplotlib renderer come
-from the plotting checkout. The manifest records both revisions.
+The biomass aerosol tutorial generates four plots during a full CUDA run.
+Use the current checkout to run its condensation control and three collision
+models from the same 10,000-particle starting population.
+
+```bash
+python scripts/docs_examples.py refresh examples-simulations-biomass-burning-cloud-interactions
+```
+
+The tutorial records split intervals, maximum collision passes and total
+mergers for each collision model. Its saved output includes the conservation
+checks, device and library revision.
 
 ## Validate changes
 

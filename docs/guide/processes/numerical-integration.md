@@ -293,6 +293,16 @@ check does not shorten a cycle or change the event clock. Forcing and output
 schedules use complete cycles, with temperature and gas replacements applied
 explicitly between cycles.
 
+Pass `coagulation_subcycling=CoagulationSubcyclingConfig(...)` to let the
+collision sampler split its work within an outer interval. Condensation and
+the other event families keep their outer schedule. After a completed
+cycle, `simulation.coagulation_diagnostics()` reports accepted pass durations
+and merger counts for that interval. If a coupled cycle fails, resume a
+checkpoint saved before the failed cycle. The biomass example records how
+often each collision model requires multiple passes.
+[Adaptive work limits](../gpu/prepared.md#adaptive-coagulation-intervals) ·
+[Biomass simulation](../../examples/simulations/biomass_burning_cloud_interactions.py)
+
 Each cycle retains the event owner's buffers and random streams. With
 `resident=True`, a persistent `GPUResidentCondensation` owner imports event
 state using device-to-device copies, resets scaled coordinates and its
