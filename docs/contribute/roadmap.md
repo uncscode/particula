@@ -2,10 +2,11 @@
 
 ## Differentiability and initial-state optimization (Epic I)
 
-**Status: pending, after the v0.3.0 container migration.** No differentiable
-process path or release approval is implied by this roadmap. Open release gates
-remain in [v0.3.0 validation](validation/releases/v0.3.0.md); missing CUDA evidence
-remains in [graph-capture qualification](validation/gpu/graph-capture-qualification.md).
+**The smooth single-material condensation inversion has been qualified on CPU
+and CUDA.** The [validation record](validation/numerics/initial-size-inversion.md)
+covers multi-box recovery, global and gradient-based fits, memory recomputation
+and captured observation noise. Composition, hygroscopicity and stochastic
+collision gradients remain open.
 
 Start from the [native data model](../guide/data-model/index.md) and the
 [autodiff design constraints](architecture/warp/autodiff-limitations.md).

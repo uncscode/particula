@@ -1,0 +1,432 @@
+{
+  "coagulation": {
+    "initial": 256,
+    "boxes": 256,
+    "kernel_m3_s": 1e-15,
+    "volume_m3": 2.56e-09,
+    "time_s": 10000.0,
+    "labels": [
+      "1",
+      "2",
+      "3",
+      "4+"
+    ],
+    "mean_fraction": [
+      0.442138671875,
+      0.14959716796875,
+      0.0500946044921875,
+      0.02410888671875
+    ],
+    "standard_error": [
+      0.002222544874192054,
+      0.0012708412649605465,
+      0.0008080019606908604,
+      0.0005538718297882172
+    ],
+    "deterministic": [
+      0.4444444444444444,
+      0.14814814814814814,
+      0.04938271604938271,
+      0.024691358024691353
+    ],
+    "max_z": 1.1402052015102335
+  },
+  "refinement": [
+    {
+      "initial_um": 0.8,
+      "steps": 16,
+      "device": "cpu",
+      "radius_error_nm": 0.10120544503733342,
+      "vapor_error_kg_m3": 1.3913311588056531e-09,
+      "slope_relative_error": 0.00692112498198405
+    },
+    {
+      "initial_um": 0.8,
+      "steps": 64,
+      "device": "cpu",
+      "radius_error_nm": 0.02890364932306433,
+      "vapor_error_kg_m3": 3.9732810862654804e-10,
+      "slope_relative_error": 0.0017065474969797378
+    },
+    {
+      "initial_um": 0.8,
+      "steps": 256,
+      "device": "cpu",
+      "radius_error_nm": 0.007450187653024187,
+      "vapor_error_kg_m3": 1.024129589201453e-10,
+      "slope_relative_error": 0.00042513716572245563
+    },
+    {
+      "initial_um": 1.0,
+      "steps": 16,
+      "device": "cpu",
+      "radius_error_nm": 0.8310832753826158,
+      "vapor_error_kg_m3": 1.5103915110688555e-08,
+      "slope_relative_error": 0.0030312475991292054
+    },
+    {
+      "initial_um": 1.0,
+      "steps": 64,
+      "device": "cpu",
+      "radius_error_nm": 0.20841736324217486,
+      "vapor_error_kg_m3": 3.7857678632278004e-09,
+      "slope_relative_error": 0.0007427254505243397
+    },
+    {
+      "initial_um": 1.0,
+      "steps": 256,
+      "device": "cpu",
+      "radius_error_nm": 0.05214346192583541,
+      "vapor_error_kg_m3": 9.47029465322302e-10,
+      "slope_relative_error": 0.0001847450834886466
+    },
+    {
+      "initial_um": 1.2,
+      "steps": 16,
+      "device": "cpu",
+      "radius_error_nm": 1.1758084968385152,
+      "vapor_error_kg_m3": 2.7731689047166007e-08,
+      "slope_relative_error": 0.0013247550832451438
+    },
+    {
+      "initial_um": 1.2,
+      "steps": 64,
+      "device": "cpu",
+      "radius_error_nm": 0.2925385564005456,
+      "vapor_error_kg_m3": 6.8951349148305426e-09,
+      "slope_relative_error": 0.00032120047527772755
+    },
+    {
+      "initial_um": 1.2,
+      "steps": 256,
+      "device": "cpu",
+      "radius_error_nm": 0.07304648637740385,
+      "vapor_error_kg_m3": 1.7214300410636716e-09,
+      "slope_relative_error": 7.968678119762984e-05
+    },
+    {
+      "initial_um": 0.8,
+      "steps": 16,
+      "device": "cuda:0",
+      "radius_error_nm": 0.10120544503733342,
+      "vapor_error_kg_m3": 1.3913311588056531e-09,
+      "slope_relative_error": 0.00692112498198405
+    },
+    {
+      "initial_um": 0.8,
+      "steps": 64,
+      "device": "cuda:0",
+      "radius_error_nm": 0.02890364932306433,
+      "vapor_error_kg_m3": 3.9732810862654804e-10,
+      "slope_relative_error": 0.0017065474969792938
+    },
+    {
+      "initial_um": 0.8,
+      "steps": 256,
+      "device": "cuda:0",
+      "radius_error_nm": 0.007450187652802143,
+      "vapor_error_kg_m3": 1.024129589176042e-10,
+      "slope_relative_error": 0.00042513716572245563
+    },
+    {
+      "initial_um": 1.0,
+      "steps": 16,
+      "device": "cuda:0",
+      "radius_error_nm": 0.8310832753826158,
+      "vapor_error_kg_m3": 1.5103915110688555e-08,
+      "slope_relative_error": 0.0030312475991292054
+    },
+    {
+      "initial_um": 1.0,
+      "steps": 64,
+      "device": "cuda:0",
+      "radius_error_nm": 0.20841736324217486,
+      "vapor_error_kg_m3": 3.7857678632278004e-09,
+      "slope_relative_error": 0.0007427254505243397
+    },
+    {
+      "initial_um": 1.0,
+      "steps": 256,
+      "device": "cuda:0",
+      "radius_error_nm": 0.05214346192583541,
+      "vapor_error_kg_m3": 9.47029465322302e-10,
+      "slope_relative_error": 0.00018474508348842456
+    },
+    {
+      "initial_um": 1.2,
+      "steps": 16,
+      "device": "cuda:0",
+      "radius_error_nm": 1.1758084968387372,
+      "vapor_error_kg_m3": 2.7731689047171936e-08,
+      "slope_relative_error": 0.0013247550832453658
+    },
+    {
+      "initial_um": 1.2,
+      "steps": 64,
+      "device": "cuda:0",
+      "radius_error_nm": 0.29253855640076765,
+      "vapor_error_kg_m3": 6.895134914836472e-09,
+      "slope_relative_error": 0.00032120047527772755
+    },
+    {
+      "initial_um": 1.2,
+      "steps": 256,
+      "device": "cuda:0",
+      "radius_error_nm": 0.07304648637740385,
+      "vapor_error_kg_m3": 1.7214300410636716e-09,
+      "slope_relative_error": 7.968678119762984e-05
+    }
+  ],
+  "memory": [
+    {
+      "boxes": 2,
+      "steps": 32,
+      "segment_steps": null,
+      "high_water_bytes": 3344,
+      "initial_high_water_bytes": 1,
+      "seconds": 0.004627065034583211,
+      "radius_um": [
+        [
+          1.073421415249314,
+          1.3262033868958276
+        ],
+        [
+          1.051780499439639,
+          1.2738146328615978
+        ]
+      ],
+      "adjoint": [
+        [
+          0.785030489636786,
+          0.8313671188990335
+        ],
+        [
+          0.8069534369733127,
+          0.8686753100142537
+        ]
+      ],
+      "warp": "1.11.1",
+      "device": "NVIDIA GeForce RTX 5060"
+    },
+    {
+      "boxes": 2,
+      "steps": 32,
+      "segment_steps": 8,
+      "high_water_bytes": 1328,
+      "initial_high_water_bytes": 1,
+      "seconds": 0.006936535006389022,
+      "radius_um": [
+        [
+          1.073421415249314,
+          1.3262033868958276
+        ],
+        [
+          1.051780499439639,
+          1.2738146328615978
+        ]
+      ],
+      "adjoint": [
+        [
+          0.785030489636786,
+          0.8313671188990335
+        ],
+        [
+          0.8069534369733127,
+          0.8686753100142537
+        ]
+      ],
+      "warp": "1.11.1",
+      "device": "NVIDIA GeForce RTX 5060"
+    },
+    {
+      "boxes": 2,
+      "steps": 128,
+      "segment_steps": null,
+      "high_water_bytes": 12560,
+      "initial_high_water_bytes": 1,
+      "seconds": 0.01409076398704201,
+      "radius_um": [
+        [
+          1.0732041268087957,
+          1.3258158349394267
+        ],
+        [
+          1.051554245912872,
+          1.2734970305155635
+        ]
+      ],
+      "adjoint": [
+        [
+          0.7837643181149102,
+          0.8305748827440731
+        ],
+        [
+          0.8059171025563208,
+          0.8682413928378391
+        ]
+      ],
+      "warp": "1.11.1",
+      "device": "NVIDIA GeForce RTX 5060"
+    },
+    {
+      "boxes": 2,
+      "steps": 128,
+      "segment_steps": 8,
+      "high_water_bytes": 2096,
+      "initial_high_water_bytes": 1,
+      "seconds": 0.017916408949531615,
+      "radius_um": [
+        [
+          1.0732041268087957,
+          1.3258158349394267
+        ],
+        [
+          1.051554245912872,
+          1.2734970305155635
+        ]
+      ],
+      "adjoint": [
+        [
+          0.7837643181149102,
+          0.8305748827440731
+        ],
+        [
+          0.8059171025563208,
+          0.8682413928378391
+        ]
+      ],
+      "warp": "1.11.1",
+      "device": "NVIDIA GeForce RTX 5060"
+    },
+    {
+      "boxes": 128,
+      "steps": 32,
+      "segment_steps": null,
+      "high_water_bytes": 214016,
+      "initial_high_water_bytes": 1,
+      "seconds": 0.005155215971171856,
+      "radius_um": [
+        [
+          1.073421415249314,
+          1.3262033868958276
+        ],
+        [
+          1.051780499439639,
+          1.2738146328615978
+        ]
+      ],
+      "adjoint": [
+        [
+          0.785030489636786,
+          0.8313671188990335
+        ],
+        [
+          0.8069534369733127,
+          0.8686753100142537
+        ]
+      ],
+      "warp": "1.11.1",
+      "device": "NVIDIA GeForce RTX 5060"
+    },
+    {
+      "boxes": 128,
+      "steps": 32,
+      "segment_steps": 8,
+      "high_water_bytes": 84992,
+      "initial_high_water_bytes": 1,
+      "seconds": 0.006089461036026478,
+      "radius_um": [
+        [
+          1.073421415249314,
+          1.3262033868958276
+        ],
+        [
+          1.051780499439639,
+          1.2738146328615978
+        ]
+      ],
+      "adjoint": [
+        [
+          0.785030489636786,
+          0.8313671188990335
+        ],
+        [
+          0.8069534369733127,
+          0.8686753100142537
+        ]
+      ],
+      "warp": "1.11.1",
+      "device": "NVIDIA GeForce RTX 5060"
+    },
+    {
+      "boxes": 128,
+      "steps": 128,
+      "segment_steps": null,
+      "high_water_bytes": 803840,
+      "initial_high_water_bytes": 1,
+      "seconds": 0.012792672030627728,
+      "radius_um": [
+        [
+          1.0732041268087957,
+          1.3258158349394267
+        ],
+        [
+          1.051554245912872,
+          1.2734970305155635
+        ]
+      ],
+      "adjoint": [
+        [
+          0.7837643181149102,
+          0.8305748827440731
+        ],
+        [
+          0.8059171025563208,
+          0.8682413928378391
+        ]
+      ],
+      "warp": "1.11.1",
+      "device": "NVIDIA GeForce RTX 5060"
+    },
+    {
+      "boxes": 128,
+      "steps": 128,
+      "segment_steps": 8,
+      "high_water_bytes": 134144,
+      "initial_high_water_bytes": 1,
+      "seconds": 0.01632202696055174,
+      "radius_um": [
+        [
+          1.0732041268087957,
+          1.3258158349394267
+        ],
+        [
+          1.051554245912872,
+          1.2734970305155635
+        ]
+      ],
+      "adjoint": [
+        [
+          0.7837643181149102,
+          0.8305748827440731
+        ],
+        [
+          0.8059171025563208,
+          0.8682413928378391
+        ]
+      ],
+      "warp": "1.11.1",
+      "device": "NVIDIA GeForce RTX 5060"
+    }
+  ],
+  "source_sha256": {
+    "particula/execution/inverse_condensation.py": "6b27b00a7da714ffa970f22e67a360900bca48c344ec12596bcd65861bbabc6f",
+    "scripts/inverse_studies/coagulation_reference.py": "12895cf8224421c25dbfe7a33bd4178fb6fbbb7302c1cd46c6e478bb040dbc34",
+    "scripts/inverse_studies/distribution.py": "70adbdda612388fd2a798be3b5cb867d67aa4b834e2328ff6a70b80069d9e848",
+    "scripts/inverse_studies/forward_checks.py": "baf595f89e69f2311c2aac49e1edf1fb03981c4cd57fa5335c8a012de29160e1",
+    "scripts/inverse_studies/qualification.py": "7dc8b2e6c36c5b986324b5692b429ced9aa08fe86006f4452a0a6430e907044e",
+    "scripts/inverse_studies/scalar_campaign.py": "6f6d5400323231fb4cc2404cda0aebc49145155c4e56d6673b74abef4ecaf0d8",
+    "scripts/inverse_studies/scalar_reference.py": "00b118758d61cd58e2470ff55730892ba52e7cdaa2be38b2e0d97baccbc4eed6",
+    "scripts/inverse_studies/tape_memory.py": "ed5f0499f51e4e62e794d736dce1e7243084188c4f069da76bbc538a016da6ec"
+  }
+}
