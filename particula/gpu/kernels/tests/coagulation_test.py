@@ -211,6 +211,14 @@ def test_mechanism_flags_have_documented_numeric_values() -> None:
     assert TURBULENT_SHEAR_ST1956_MECHANISM_FLAG == 8
 
 
+ADDITIVE_MECHANISMS = (
+    BROWNIAN_MECHANISM,
+    CHARGED_HARD_SPHERE_MECHANISM,
+    SEDIMENTATION_SP2016_MECHANISM,
+    TURBULENT_SHEAR_ST1956_MECHANISM,
+)
+
+
 def test_mechanism_flag_mapping_is_immutable() -> None:
     """Mechanism flag mapping cannot be changed after module initialization."""
     flag_mapping = coagulation_module._COAGULATION_MECHANISM_FLAGS
@@ -220,7 +228,9 @@ def test_mechanism_flag_mapping_is_immutable() -> None:
         CHARGED_HARD_SPHERE_MECHANISM: 2,
         SEDIMENTATION_SP2016_MECHANISM: 4,
         TURBULENT_SHEAR_ST1956_MECHANISM: 8,
+        "van_der_waals": 16,
     }
+    assert set(CANONICAL_COAGULATION_MECHANISMS) == set(flag_mapping)
     mutable_flag_mapping = cast(Any, flag_mapping)
     with pytest.raises(TypeError):
         mutable_flag_mapping[BROWNIAN_MECHANISM] = 16
@@ -245,7 +255,7 @@ def test_mechanism_canonicalizes_order_and_mask() -> None:
         )
     )
 
-    assert resolved.mechanisms == CANONICAL_COAGULATION_MECHANISMS
+    assert resolved.mechanisms == ADDITIVE_MECHANISMS
     assert resolved.mask == 15
 
 
@@ -290,7 +300,7 @@ def test_mechanism_canonicalizes_order_and_mask() -> None:
             ("turbulent", "turbulent", "turbulent_particle", "sedimentation"),
         ),
         (
-            CANONICAL_COAGULATION_MECHANISMS,
+            ADDITIVE_MECHANISMS,
             (
                 "turbulent",
                 "turbulent",
@@ -978,11 +988,11 @@ def test_approved_additive_masks_use_public_merge_path(
         (BROWNIAN_MECHANISM, TURBULENT_SHEAR_ST1956_MECHANISM),
         (CHARGED_HARD_SPHERE_MECHANISM, TURBULENT_SHEAR_ST1956_MECHANISM),
         (SEDIMENTATION_SP2016_MECHANISM, TURBULENT_SHEAR_ST1956_MECHANISM),
-        CANONICAL_COAGULATION_MECHANISMS,
+        ADDITIVE_MECHANISMS,
         *(
             tuple(
                 name
-                for i, name in enumerate(CANONICAL_COAGULATION_MECHANISMS)
+                for i, name in enumerate(ADDITIVE_MECHANISMS)
                 if i != excluded
             )
             for excluded in range(4)
@@ -1028,7 +1038,7 @@ def test_additive_masks_public_mult_pair_counts_include_every_enabled_rate(
         bit
         for bit, mechanism in zip(
             (1, 2, 4, 8),
-            CANONICAL_COAGULATION_MECHANISMS,
+            ADDITIVE_MECHANISMS,
             strict=True,
         )
         if mechanism in mechanisms

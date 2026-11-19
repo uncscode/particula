@@ -231,6 +231,7 @@ def _plan_coagulation(process: Any, aerosol: Aerosol) -> _ProcessPlan:  # noqa: 
         CombineCoagulationStrategy,
         SedimentationCoagulationStrategy,
         TurbulentShearCoagulationStrategy,
+        VanDerWaalsCoagulationStrategy,
     )
     from particula.dynamics.coagulation import charged_kernel_strategy as models
 
@@ -254,6 +255,21 @@ def _plan_coagulation(process: Any, aerosol: Aerosol) -> _ProcessPlan:  # noqa: 
     for child in components:
         if type(child) is BrownianCoagulationStrategy:
             mechanisms.append("brownian")
+        elif type(child) is VanDerWaalsCoagulationStrategy:
+            from particula.dynamics.coagulation.van_der_waals_kernel import (
+                TABLE_VERSION,
+                validate_material,
+            )
+
+            validate_material(
+                child.hamaker_constant, child.relative_permittivity
+            )
+            values.update(
+                hamaker_constant=child.hamaker_constant,
+                relative_permittivity=child.relative_permittivity,
+                capture_table_version=TABLE_VERSION,
+            )
+            mechanisms.append("van_der_waals")
         elif type(child) is ChargedCoagulationStrategy:
             model = supported.get(type(child.kernel_strategy))
             if model is None:
@@ -450,7 +466,10 @@ def _compile_coagulation(plan, context: BuiltinPreparationContext):
     if model is not None and mechanisms is None:
         mechanisms = ("charged_hard_sphere",)
     mechanism = CoagulationMechanismConfig(
-        mechanisms=mechanisms, charged_model=model or "hard_sphere"
+        mechanisms=mechanisms,
+        charged_model=model or "hard_sphere",
+        hamaker_constant=plan.values.get("hamaker_constant"),
+        relative_permittivity=plan.values.get("relative_permittivity"),
     )
     from particula.gpu.kernels._coagulation_budget import CoagulationWorkConfig
 

@@ -962,5 +962,38 @@
       "plot_results"
     ],
     "plot_inputs": []
+  },
+  "van-der-waals": {
+    "title": "How does attraction change a Brownian collision rate?",
+    "source": "docs/examples/processes/coagulation/van_der_waals.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 600,
+    "inputs": [
+      "docs/data/coagulation/van-der-waals-measurements.json"
+    ],
+    "invoke": "report = simulate()\nplot_results(report)",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\nplot_results(report)",
+    "render_functions": [
+      "plot_results"
+    ],
+    "input_destinations": {
+      "docs/data/coagulation/van-der-waals-measurements.json": "van-der-waals-measurements.json"
+    }
+  },
+  "gpu-van-der-waals": {
+    "title": "Follow bipolar coagulation through a CUDA restart",
+    "source": "docs/examples/gpu/prepared/van_der_waals.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 600,
+    "inputs": [],
+    "invoke": "report = simulate()\nplot_results(report)",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\nplot_results(report)",
+    "render_functions": [
+      "plot_results"
+    ]
   }
 }

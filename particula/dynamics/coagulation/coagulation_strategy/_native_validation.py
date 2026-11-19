@@ -65,6 +65,25 @@ def validate_particle(particle: ParticleData, distribution_type: str) -> None:
         raise ValueError("occupied coagulation particles require positive mass")
 
 
+def _thermal_mechanisms(strategy):
+    """Yield thermal encounter laws inside a validated, acyclic combination."""
+    from .brownian_coagulation_strategy import BrownianCoagulationStrategy
+    from .charged_coagulation_strategy import ChargedCoagulationStrategy
+    from .van_der_waals_coagulation_strategy import (
+        VanDerWaalsCoagulationStrategy,
+    )
+
+    if isinstance(strategy, VanDerWaalsCoagulationStrategy):
+        yield "van_der_waals"
+    elif isinstance(
+        strategy, (BrownianCoagulationStrategy, ChargedCoagulationStrategy)
+    ):
+        yield "brownian"
+    else:
+        for child in getattr(strategy, "strategies", ()):
+            yield from _thermal_mechanisms(child)
+
+
 def validate_controls(  # noqa: C901
     strategy: Any, kind: str, visiting: set[int] | None = None
 ) -> None:
@@ -81,6 +100,14 @@ def validate_controls(  # noqa: C901
                 zero_allowed=name == "turbulent_dissipation"
                 and not hasattr(strategy, "reynolds_lambda"),
             )
+    if hasattr(strategy, "hamaker_constant"):
+        from particula.dynamics.coagulation.van_der_waals_kernel import (
+            validate_material,
+        )
+
+        validate_material(
+            strategy.hamaker_constant, strategy.relative_permittivity
+        )
     if hasattr(strategy, "relative_velocity"):
         positive_scalar(
             strategy.relative_velocity, "relative_velocity", zero_allowed=True
@@ -113,6 +140,12 @@ def validate_controls(  # noqa: C901
                 )
             validate_controls(child, kind, visiting)
         visiting.remove(id(strategy))
+        if not visiting:
+            mechanisms = list(_thermal_mechanisms(strategy))
+            if "van_der_waals" in mechanisms and len(mechanisms) > 1:
+                raise ValueError(
+                    "van_der_waals already includes the Brownian encounter rate"
+                )
 
 
 def native_kernel(method: _KernelMethod) -> _KernelMethod:
@@ -120,7 +153,11 @@ def native_kernel(method: _KernelMethod) -> _KernelMethod:
 
     @wraps(method)
     def evaluate(
-        self: Any, particle: Any, temperature: float, pressure: float
+        self: Any,
+        particle: Any,
+        temperature: float,
+        pressure: float,
+        **options: Any,
     ) -> Any:
         validate_particle(particle, self.distribution_type)
         positive_scalar(temperature, "temperature")
@@ -143,7 +180,8 @@ def native_kernel(method: _KernelMethod) -> _KernelMethod:
             volume=particle.volume,
         )
         values = np.asarray(
-            method(self, material, temperature, pressure), dtype=np.float64
+            method(self, material, temperature, pressure, **options),
+            dtype=np.float64,
         )
         if (
             values.shape != (indices.size, indices.size)
@@ -193,7 +231,11 @@ def rate_radius(particle: ParticleData) -> NDArray[np.float64]:
 
 
 def _evaluate_material_kernel(
-    strategy: Any, material: ParticleData, temperature: float, pressure: float
+    strategy: Any,
+    material: ParticleData,
+    temperature: float,
+    pressure: float,
+    **options: Any,
 ) -> Any:
     """Evaluate an admitted combination's child without public re-admission.
 
@@ -204,5 +246,7 @@ def _evaluate_material_kernel(
     method = strategy.kernel
     law = getattr(method, "_coagulation_material_kernel", None)
     if law is not None:
-        return law(strategy, material, temperature, pressure)
-    return method(particle=material, temperature=temperature, pressure=pressure)
+        return law(strategy, material, temperature, pressure, **options)
+    return method(
+        particle=material, temperature=temperature, pressure=pressure, **options
+    )

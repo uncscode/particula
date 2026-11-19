@@ -46,6 +46,11 @@ from particula.gpu.dynamics.ion_pair_data import (
     IonPairData,
     replace_ion_pair_rate,
 )
+from particula.gpu.dynamics.van_der_waals import (
+    CaptureData,
+    capture_pair_wp,
+    prepare_capture,
+)
 from particula.gpu.kernels._coagulation_budget import (
     CoagulationWorkConfig,
     admit_coagulation_work,
@@ -1193,6 +1198,7 @@ def _coagulation_selector_impl(  # noqa: C901
         active_count,
         kinematic_viscosity,
         IonPairData(),
+        CaptureData(),
     )
 
 
@@ -1234,6 +1240,7 @@ def _select_coagulation_pairs_impl(  # noqa: C901
     active_count: wp.int32,
     kinematic_viscosity: wp.float64,
     ion_data: IonPairData,
+    capture: CaptureData,
 ) -> wp.vec2i:
     """Preserve sequential pair selection and the exact persistent RNG path."""
     n_species = masses.shape[2]
@@ -1348,6 +1355,19 @@ def _select_coagulation_pairs_impl(  # noqa: C901
             ref_temperature,
             sutherland_constant,
         )
+        if mechanism_mask & 16:
+            total_rate += capture_pair_wp(
+                capture,
+                radii[box_idx, selected_i],
+                radii[box_idx, selected_j],
+                total_masses[box_idx, selected_i],
+                total_masses[box_idx, selected_j],
+                charge[box_idx, selected_i],
+                charge[box_idx, selected_j],
+                diffusivities[box_idx, selected_i]
+                + diffusivities[box_idx, selected_j],
+                temperature_value,
+            )
         total_rate = replace_ion_pair_rate(
             ion_data, box_idx, selected_i, selected_j, total_rate
         )
@@ -1959,7 +1979,7 @@ def _preflight_enabled_coagulation_terms(
     """Run enabled-term validation before executable resource preparation."""
     mask = resolved.mask
     turbulent_enabled = bool(mask & TURBULENT_SHEAR_ST1956_MECHANISM_FLAG)
-    charged_enabled = bool(mask & CHARGED_HARD_SPHERE_MECHANISM_FLAG)
+    charged_enabled = bool(mask & (CHARGED_HARD_SPHERE_MECHANISM_FLAG | 16))
     sedimentation_enabled = bool(mask & SEDIMENTATION_SP2016_MECHANISM_FLAG)
 
     if turbulent_enabled:
@@ -2385,6 +2405,11 @@ class _PreparedCoagulationCall:
 
     def check_admission(self) -> None:
         """Observe compact diagnostics at an explicit host boundary."""
+        if (
+            self.brownian_parallel.capture.x
+            and self.budget_failure.numpy()[0] == 10
+        ):
+            raise ValueError("pair exceeds van der Waals capture table domain")
         raise_budget_error(self.budget_report)
 
 
@@ -2676,6 +2701,13 @@ def _prepare_coagulation_step_gpu(  # noqa: C901
 
     from particula.gpu.kernels._brownian_parallel import prepare_brownian_work
 
+    capture = CaptureData()
+    if resolved_mechanism_config.mask & 16:
+        capture = prepare_capture(
+            mechanism_config.hamaker_constant,
+            mechanism_config.relative_permittivity,
+            device,
+        )
     return replace(
         prepared,
         work_config=work_config,
@@ -2690,7 +2722,7 @@ def _prepare_coagulation_step_gpu(  # noqa: C901
         rng_seed=rng_seed,
         work_counts=work_counts,
         brownian_parallel=prepare_brownian_work(
-            prepared.selector_inputs, device, work_counts
+            prepared.selector_inputs, device, work_counts, capture
         ),
     )
 
@@ -2849,7 +2881,7 @@ def coagulation_preflight_gpu(
         particles, temperature, pressure, time_step, **kwargs
     )
     work = prepared.brownian_parallel
-    work.prepare_rates(None)
+    work.prepare_rates(prepared.budget_failure)
     args = prepared.selector_inputs
     wp.launch(
         admit_coagulation_work,
@@ -2869,6 +2901,8 @@ def coagulation_preflight_gpu(
         device=prepared.device,
     )
     rows = prepared.budget_report.numpy()
+    if work.capture.x and prepared.budget_failure.numpy()[0] == 10:
+        raise ValueError("pair exceeds van der Waals capture table domain")
     counts = work.counts.numpy().astype(np.int64)
     arrays = [
         *args[3:6],
@@ -2886,6 +2920,10 @@ def coagulation_preflight_gpu(
         getattr(particles, name).ptr
         for name in ("masses", "concentration", "density", "volume", "charge")
     }
+    if work.capture.x:
+        arrays.append(work.capture.x)
+        if work.capture.response:
+            arrays.append(work.capture.response)
     unique = {
         array.ptr: array
         for array in arrays

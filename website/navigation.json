@@ -394,6 +394,10 @@
                 "slug": "examples/processes/coagulation/coagulation_5_time_evolution"
               },
               {
+                "label": "Dispersion and measured collision rates",
+                "slug": "examples/processes/coagulation/van_der_waals"
+              },
+              {
                 "label": "Charged coagulation",
                 "collapsed": true,
                 "items": [
@@ -630,6 +634,10 @@
                 "slug": "examples/gpu/prepared/gpu_charged_models"
               },
               {
+                "label": "Bipolar coagulation and restart",
+                "slug": "examples/gpu/prepared/van_der_waals"
+              },
+              {
                 "label": "Explicit atmospheric ion balance",
                 "slug": "examples/gpu/prepared/gpu_ion_balance"
               },
@@ -822,6 +830,10 @@
           {
             "label": "Ion\u2013Particle Coagulation",
             "slug": "theory/dynamics/ionparticle-coagulation"
+          },
+          {
+            "label": "Dispersion and dielectric polarization",
+            "slug": "theory/dynamics/interparticle-forces"
           },
           {
             "label": "Nucleation Discussion",
@@ -1043,6 +1055,10 @@
           {
             "label": "Validation",
             "slug": "contribute/validation"
+          },
+          {
+            "label": "Dispersion and dielectric capture",
+            "slug": "contribute/validation/coagulation/van-der-waals"
           },
           {
             "label": "GPU",

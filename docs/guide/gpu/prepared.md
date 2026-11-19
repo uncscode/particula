@@ -487,3 +487,12 @@ actual scheduled trials, attempted trials and accepted collisions. Counts refer
 to the latest step; fresh or resumed owners report zero until their first step.
 Capture recording does not advance these counts. This compact observation does
 not download particle arrays. The resource timestep is not an accuracy bound.
+
+## Prepared dielectric-sphere coagulation
+
+Prepare a `Coagulation` runnable with `VanDerWaalsCoagulationStrategy`
+on a particle-resolved population. Preparation freezes the Hamaker constant,
+static dielectric constant and geometry table version in the restart identity.
+Graph replay evaluates live radii, environment and signed charges, including
+charges produced by earlier merges. The existing equal-count and work-admission
+rules apply to all boxes. [CUDA restart example](../../examples/gpu/prepared/van_der_waals.py)

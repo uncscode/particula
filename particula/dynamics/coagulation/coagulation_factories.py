@@ -19,6 +19,9 @@ from .coagulation_builder.turbulent_dns_coagulation_builder import (
 from .coagulation_builder.turbulent_shear_coagulation_builder import (
     TurbulentShearCoagulationBuilder,
 )
+from .coagulation_builder.van_der_waals_coagulation_builder import (
+    VanDerWaalsCoagulationBuilder,
+)
 from .coagulation_strategy.coagulation_strategy_abc import (
     CoagulationStrategyABC,
 )
@@ -29,6 +32,7 @@ class CoagulationFactory(
         Union[
             BrownianCoagulationBuilder,
             ChargedCoagulationBuilder,
+            VanDerWaalsCoagulationBuilder,
             TurbulentShearCoagulationBuilder,
             TurbulentDNSCoagulationBuilder,
             CombineCoagulationStrategyBuilder,
@@ -62,6 +66,7 @@ class CoagulationFactory(
         """
         return {
             "brownian": BrownianCoagulationBuilder(),
+            "van_der_waals": VanDerWaalsCoagulationBuilder(),
             "charged": ChargedCoagulationBuilder(),
             "turbulent_shear": TurbulentShearCoagulationBuilder(),
             "turbulent_dns": TurbulentDNSCoagulationBuilder(),
