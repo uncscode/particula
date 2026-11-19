@@ -31,6 +31,25 @@
 .sl-markdown-content figure.scientific-figure { margin-inline: 0; padding: 1rem; background: white; border: 1px solid #dce8e2; border-radius: .7rem; }
 .sl-markdown-content figure.scientific-figure img { width: 100%; height: auto; }
 .sl-markdown-content figure.scientific-figure figcaption { color: #456058; font-size: .85rem; padding-top: .5rem; }
+@media screen {
+  :root[data-theme='dark'] .sl-markdown-content figure.scientific-figure {
+    background: var(--sl-color-bg);
+    border-color: var(--sl-color-hairline-shade);
+  }
+  :root[data-theme='dark'] .sl-markdown-content figure.scientific-figure figcaption {
+    color: var(--sl-color-gray-2);
+  }
+  :root[data-theme='dark'] .sl-markdown-content :is(
+    figure.scientific-figure img,
+    img[src*='/results/'][src$='.png'],
+    img[src*='/images/coagulation/'][src$='.png'],
+    img[src*='/images/thermodynamics/'][src$='.png'],
+    img[src*='/images/gpu/'][src$='.png']
+  ) {
+    background-color: white;
+    opacity: 0.8;
+  }
+}
 .sl-markdown-content mjx-container:not([display='true']) > svg { display: inline; }
 .sl-markdown-content mjx-container[display='true'] { display: block; overflow-x: auto; margin-block: 1.5rem; }
 .result-output { max-height: 20rem; overflow: auto; }

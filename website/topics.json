@@ -2549,6 +2549,22 @@
       "start_here": false
     },
     {
+      "source": "docs/examples/fundamentals/figure_styles.py",
+      "title": "Figure styles and paper layouts",
+      "topic": "methods",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/guide/getting-started/figure-styles.md",
+      "title": "Figure styles for papers and the web",
+      "topic": "methods",
+      "also": [],
+      "role": "Guide",
+      "start_here": false
+    },
+    {
       "source": "docs/examples/fundamentals/first_cpu_workflow.py",
       "title": "Run, save and resume a closed aerosol growth experiment",
       "topic": "cpu",

@@ -501,3 +501,21 @@ def test_real_execution_timeout_stops_kernel(example, monkeypatch):
         examples.execute(config, root)
     assert len(managers) == 1
     assert not managers[0].has_kernel
+
+
+def test_full_canvas_fingerprints_style_without_invalidating_legacy(example):
+    """Only full-canvas publication records depend on the style inputs."""
+    root, config = example
+    legacy = examples.fingerprint(config, root)
+    for name in examples.STYLE_INPUTS:
+        path = root / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("original")
+    styled = {**config, "full_canvas": True}
+    initial = examples.fingerprint(styled, root)
+    assert initial != legacy
+    for name in examples.STYLE_INPUTS:
+        (root / name).write_text("updated")
+        assert examples.fingerprint(styled, root) != initial
+        (root / name).write_text("original")
+    assert examples.fingerprint(config, root) == legacy

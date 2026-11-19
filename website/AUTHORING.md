@@ -97,6 +97,14 @@ the previous bundle. The reported Particula version comes from that checkout;
 when installed distribution metadata differs, it is retained separately as
 `particula-distribution` rather than used to label the executed source.
 
+For styled scientific figures, follow the
+[figure style guide](../docs/guide/getting-started/figure-styles.md) and
+[gallery](../docs/examples/fundamentals/figure_styles.py). Use one PNG per
+figure for both website themes. Set `"full_canvas": true` in the example
+registry for Particula preset figures. This preserves their physical canvas
+and fingerprints the shared style and layout code. Call `plotting.fit(fig)`
+after all labels and colorbars are in place.
+
 Figures are exported at 300 DPI. Captured diagnostics retain repository-relative
 filenames and line numbers; local account and checkout paths are redacted before
 saving publication bundles. Terminal progress bars render in closed disclosures.

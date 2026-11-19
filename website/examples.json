@@ -823,7 +823,8 @@
     "render_functions": [
       "plot_results"
     ],
-    "plot_inputs": []
+    "plot_inputs": [],
+    "full_canvas": true
   },
   "adaptive-cloud-relaxation": {
     "title": "Distinguish dry-phase oscillation from physical droplet relaxation",
@@ -961,7 +962,8 @@
     "render_functions": [
       "plot_results"
     ],
-    "plot_inputs": []
+    "plot_inputs": [],
+    "full_canvas": true
   },
   "van-der-waals": {
     "title": "How does attraction change a Brownian collision rate?",
@@ -980,7 +982,8 @@
     ],
     "input_destinations": {
       "docs/data/coagulation/van-der-waals-measurements.json": "van-der-waals-measurements.json"
-    }
+    },
+    "full_canvas": true
   },
   "gpu-van-der-waals": {
     "title": "Follow bipolar coagulation through a CUDA restart",
@@ -1025,5 +1028,14 @@
       "plot_results"
     ],
     "plot_inputs": []
+  },
+  "figure-styles": {
+    "title": "Figure styles and paper layouts",
+    "source": "docs/examples/fundamentals/figure_styles.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 120,
+    "inputs": [],
+    "full_canvas": true
   }
 }

@@ -27,6 +27,7 @@ ROOT = Path(__file__).resolve().parents[1]
 CONFIG = ROOT / "website/examples.json"
 RESULTS = ROOT / "website/results"
 FIGURE_DPI = 300
+STYLE_INPUTS = ("particula/default.mplstyle", "particula/plotting/__init__.py")
 MAX_PLOT_DATA_BYTES = 10 * 1024 * 1024
 
 
@@ -64,6 +65,12 @@ def fingerprint(config, root=ROOT):
             for name in config.get("inputs", [])
         },
     }
+    if config.get("full_canvas"):
+        payload["full_canvas"] = True
+        payload["style_files"] = {
+            path: hashlib.sha256((root / path).read_bytes()).hexdigest()
+            for path in STYLE_INPUTS
+        }
     for key in (
         "data_expression",
         "replot_invoke",
@@ -134,6 +141,7 @@ def execute(config, root=ROOT, *, saved_data=None):
     module_name = (
         "particula_docs_example" if config.get("invoke") else "__main__"
     )
+    bbox = None if config.get("full_canvas") else "tight"
     bootstrap = (
         "import sys\n"
         f"sys.path[:0] = {json.dumps([str(root), str(source_path.parent)])}\n"
@@ -144,7 +152,7 @@ def execute(config, root=ROOT, *, saved_data=None):
         "from matplotlib_inline.backend_inline import InlineBackend\n"
         "InlineBackend.instance().figure_formats = {'png'}\n"
         "InlineBackend.instance().print_figure_kwargs = "
-        f"{{'bbox_inches': 'tight', 'dpi': {FIGURE_DPI}}}\n"
+        f"{{'bbox_inches': {bbox!r}, 'dpi': {FIGURE_DPI}}}\n"
     )
     notebook = nbformat.v4.new_notebook(
         cells=[nbformat.v4.new_code_cell(bootstrap), *cells]
@@ -570,7 +578,10 @@ def selected_changed(configs, base, root=ROOT):
     )
     selected = []
     for key, config in configs.items():
-        if all_changed or changed.intersection(config.get("inputs", [])):
+        dependencies = set(config.get("inputs", []))
+        if config.get("full_canvas"):
+            dependencies.update(STYLE_INPUTS)
+        if all_changed or changed.intersection(dependencies):
             selected.append(key)
         elif config["source"] in changed:
             previous = subprocess.run(  # noqa: S603 -- Git argv without a shell

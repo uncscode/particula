@@ -113,12 +113,20 @@ def simulate():
 
 
 # %%
+@plt.style.context("particula.default")
 def plot_results(report):
     """Plot the pair map, absolute chamber rates and relative residuals."""
-    fig, axes = plt.subplots(2, 2, figsize=(10, 7), layout="constrained")
+    from particula import plotting
+
+    fig, axes = plotting.subplots(2, 2)
     size = report["grid_nm"]
+    axes[0, 0].grid(False)
     mesh = axes[0, 0].pcolormesh(
-        size, size, report["ratio"], shading="auto", cmap="viridis"
+        size,
+        size,
+        report["ratio"],
+        shading="auto",
+        cmap=plotting.colormap("magnitude"),
     )
     axes[0, 0].set(
         xscale="log",
@@ -129,9 +137,9 @@ def plot_results(report):
     )
     fig.colorbar(mesh, ax=axes[0, 0], label="K / hard-sphere K")
     for key, label, color in [
-        ("acid", "Acid droplets", "#884968"),
-        ("borenn", "Neutral pair", "#176a84"),
-        ("borenc", "Charged–neutral", "#a55119"),
+        ("acid", "Acid droplets", plotting.COLORS["berry"]),
+        ("borenn", "Neutral pair", plotting.COLORS["teal"]),
+        ("borenc", "Charged–neutral", plotting.COLORS["rust"]),
     ]:
         data = report[key]
         x = np.asarray(data["diameter_nm"])
@@ -142,7 +150,7 @@ def plot_results(report):
         ax.errorbar(
             x, y, yerr=dy, fmt="o", ms=3, color=color, capsize=2, label=label
         )
-        ax.plot(x, model, color=color)
+        ax.plot(x, model, color=color, ls="-")
         ax.plot(
             x, np.array(data["hard"]) * 1e15, color=color, ls=":", alpha=0.7
         )
@@ -166,14 +174,15 @@ def plot_results(report):
             xlabel="Partner diameter (nm)",
             ylabel="Pair kernel (10⁻¹⁵ m³/s)",
         )
-        ax.legend(fontsize=8)
+        plotting.legend(ax, placement="inside")
     axes[1, 1].axhline(0, color=".4", lw=1)
     axes[1, 1].set(
         title="Model residual",
         xlabel="Partner diameter (nm)",
         ylabel="(model / measured − 1) × 100 (%)",
     )
-    axes[1, 1].legend(fontsize=8)
+    plotting.legend(axes[1, 1], placement="inside")
+    plotting.fit(fig)
     plt.show()
 
 

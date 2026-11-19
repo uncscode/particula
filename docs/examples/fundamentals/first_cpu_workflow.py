@@ -217,9 +217,12 @@ def simulate(output_directory=None):
 
 
 # %%
+@plt.style.context("particula.default")
 def plot_results(report):
     """Plot only the saved compact diagnostic histories."""
-    fig, axes = plt.subplots(1, 2, figsize=(10, 4), layout="constrained")
+    from particula import plotting
+
+    fig, axes = plotting.subplots(2, 1)
     for index, case in enumerate(report["cases"]):
         color = f"C{index}"
         label = f"{case['initial_vapor_ug_m3']:g} µg m⁻³ initial vapor"
@@ -229,6 +232,7 @@ def plot_results(report):
             minutes,
             case["gas_ug_m3"],
             color=color,
+            linestyle="-",
             label=f"Gas, {case['initial_vapor_ug_m3']:g} µg m⁻³",
         )
         axes[1].plot(
@@ -241,11 +245,8 @@ def plot_results(report):
     axes[0].set(xlabel="Time (min)", ylabel="Particle radius (nm)")
     axes[1].set(xlabel="Time (min)", ylabel="Mass concentration (µg m⁻³)")
     for axis in axes:
-        axis.grid(alpha=0.25)
-    axes[0].legend(fontsize=8)
-    axes[1].legend(
-        fontsize=8, loc="lower center", bbox_to_anchor=(0.5, 1.01), ncol=2
-    )
+        plotting.legend(axis)
+    plotting.fit(fig)
     return fig
 
 
