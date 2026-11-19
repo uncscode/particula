@@ -5,7 +5,7 @@
   "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "examples-gpu-direct-gpu-direct-kernels-quick-start",
-  "fingerprint": "135abe235cffa0a6bf88e22efa5ba1817ab22fc0266456353103bcf35a567311",
+  "fingerprint": "3e8c9b6a1f351063e3dd643cb303c07945ba36563331dd909f4d385987e0666b",
   "source": "docs/examples/gpu/direct/gpu_direct_kernels_quick_start.py",
   "revision": "e6d8de004d68d2f8054a7654be48430a2af02cb9",
   "package_dirty": false,

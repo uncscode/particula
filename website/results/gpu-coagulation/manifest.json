@@ -5,7 +5,7 @@
   "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "gpu-coagulation",
-  "fingerprint": "1667e08b1193df205938502622587b06e4194cee510c273ae5620c7778bc56fa",
+  "fingerprint": "5efbe3bb1b444fc808b7db91136fde39426c6950241ee9b5a0f60aac88bccce2",
   "source": "docs/examples/gpu/direct/gpu_coagulation_direct.py",
   "revision": "e6d8de004d68d2f8054a7654be48430a2af02cb9",
   "package_dirty": false,

@@ -3,12 +3,13 @@
   "figure_dpi": 300,
   "elapsed_seconds": 5.8281130290124565,
   "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
+  "scientific_source_sha256": "c491d38a0f3b014be11117e77bf7f5ed27e4a834ba024ddbac813c1eefd5b6db",
   "input_sha256": {
     "scripts/gpu_studies/__init__.py": "530c51f7c7f432a895623c9ba4548b7cf3e053a1a0f328a36ae8ae9e50cec9c4",
     "scripts/gpu_studies/extension_kernels.py": "65fd62e0f916fc827f352493da3650f2971322e3d89c9881403ee0943d291932"
   },
   "example": "custom-process-backends",
-  "fingerprint": "87ec67c53555806eeaf5c0365a6f9fe0e982b9f7d45a3bd12959120e3f5f8e5b",
+  "fingerprint": "42a518fb566ce96e6456d005d53427c51c672d7dc5a72dcf79ef58660a7bea35",
   "source": "docs/examples/gpu/prepared/custom_process_backends.py",
   "revision": "e6d8de004d68d2f8054a7654be48430a2af02cb9",
   "package_dirty": false,

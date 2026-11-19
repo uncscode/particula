@@ -3,11 +3,12 @@
   "figure_dpi": 300,
   "elapsed_seconds": 21.850231859018095,
   "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
+  "scientific_source_sha256": "c491d38a0f3b014be11117e77bf7f5ed27e4a834ba024ddbac813c1eefd5b6db",
   "input_sha256": {
     "docs/examples/simulations/adaptive_reservoir_depletion.py": "b92f76d6fecb5e2e342687a7cf40a2d7e938271cb6f1ce023a2fbab45c2b3f86"
   },
   "example": "adaptive-reservoir-depletion-cuda",
-  "fingerprint": "6b38ac8c6a61a2a211cef7bb7e8c9a95cffb1b101c7a057782a3b24213eca6d6",
+  "fingerprint": "3290e4237ec2f45fd9902ea24cb44261184c82c77dc882c07237c19ad24a025d",
   "source": "docs/examples/simulations/adaptive_reservoir_depletion_cuda.py",
   "revision": "e6d8de004d68d2f8054a7654be48430a2af02cb9",
   "package_dirty": false,

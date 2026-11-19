@@ -3,6 +3,7 @@
   "figure_dpi": 300,
   "elapsed_seconds": 27.09017544600647,
   "package_source_sha256": "1d2bf0708c00d6e34107e200c143eb76cae07571fd4e691f1ce7cb88cd95a134",
+  "scientific_source_sha256": "1d2bf0708c00d6e34107e200c143eb76cae07571fd4e691f1ce7cb88cd95a134",
   "input_sha256": {
     "scripts/docs_gpu_figures.py": "3aeac1a9de599df908d6951e21c60b1d331bdd4f977125af5fcc6ed5d85925fb",
     "scripts/gpu_studies/__init__.py": "530c51f7c7f432a895623c9ba4548b7cf3e053a1a0f328a36ae8ae9e50cec9c4",
@@ -11,7 +12,7 @@
     "scripts/gpu_studies/trajectories.py": "41d64b0ef3351bb41c12cd3314b02b7ea7c87d8e225d7b9b6508663f6eca84af"
   },
   "example": "gpu-prepared-stochastic",
-  "fingerprint": "b80b728823fc0a273587e638d37505baa5d5a2c4bd1ede7deea451c747dff35e",
+  "fingerprint": "767d8f3b670080f16ef4721fc0782837b23f41b1fcd5dede96f58d25cd800b62",
   "source": "docs/examples/gpu/prepared/gpu_prepared_stochastic.py",
   "revision": "da142e3dfcf190010d21f1ac07aca1a12e4c9fd0",
   "package_dirty": false,
@@ -50,7 +51,8 @@
   "historical_run": {
     "revision": "da142e3dfcf190010d21f1ac07aca1a12e4c9fd0",
     "study_revision": "535d02b7b06ba782aa2bd5d1c60890e06adbb654",
-    "data_sha256": "54bfec9b176c86f848c7d490a50f7e2055b1c94ab56fb2a7a9aea4a716b2a0da"
+    "data_sha256": "54bfec9b176c86f848c7d490a50f7e2055b1c94ab56fb2a7a9aea4a716b2a0da",
+    "package_source_sha256": "1d2bf0708c00d6e34107e200c143eb76cae07571fd4e691f1ce7cb88cd95a134"
   },
   "render_versions": {
     "particula": "0.3.2",
@@ -70,7 +72,7 @@
     "scripts/gpu_studies/validation.py": "816f83d10024feef14daa05112688ea7d26faa3ddde8e05ba12e8dc29f6a4a45",
     "scripts/gpu_studies/trajectories.py": "41d64b0ef3351bb41c12cd3314b02b7ea7c87d8e225d7b9b6508663f6eca84af"
   },
-  "rendered_at": "2026-11-19T15:09:54.857542+00:00",
-  "render_revision": "0d602f8a0cf13a18f9a3581b4cbdfb1346f18d9f",
-  "render_elapsed_seconds": 4.302083173999563
+  "rendered_at": "2026-11-19T19:37:27.271227+00:00",
+  "render_revision": "f5be504b2ecb3d768eb5a41a2be1be19b0d2d96d",
+  "render_elapsed_seconds": 3.6000824630027637
 }

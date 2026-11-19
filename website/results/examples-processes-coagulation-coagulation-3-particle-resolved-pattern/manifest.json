@@ -5,7 +5,7 @@
   "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "examples-processes-coagulation-coagulation-3-particle-resolved-pattern",
-  "fingerprint": "6c118e4454b4c3baeb1d06180ea0f32cc01779fa60902ce8d6147483d22a5ea5",
+  "fingerprint": "eebfe90929a25bb2f15a38a63ebcec617f4b0f7d1a4bf18cdd284dbaa26d5e90",
   "source": "docs/examples/processes/coagulation/coagulation_3_particle_resolved_pattern.py",
   "revision": "6af97152d1570464ac5ccae56e3110001657e170",
   "package_dirty": false,

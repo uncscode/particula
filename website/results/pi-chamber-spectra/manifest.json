@@ -3,6 +3,7 @@
   "figure_dpi": 300,
   "elapsed_seconds": 137.00655828707386,
   "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
+  "scientific_source_sha256": "c491d38a0f3b014be11117e77bf7f5ed27e4a834ba024ddbac813c1eefd5b6db",
   "input_sha256": {
     "scripts/pi_chamber/retrieval.py": "dbdae547aa5ba03d81acec2e79d1eea9b819709f10cf0409ae396de99d34c03d",
     "docs/data/pi-chamber/haze-target.json": "fba8c167dfd3b2ab9ff0a9e08a29329724cbd092c11f613204f7ccba7e8d8078",
@@ -12,7 +13,7 @@
     "docs/data/pi-chamber/restart.json": "7f3a9a092788a2b35d439eab3be67a69379f3adfa42ec7f969dbcbeb0465258d"
   },
   "example": "pi-chamber-spectra",
-  "fingerprint": "d9b8f01b679b0e299c2c13aa52b05d79a3c9a6a6fb7d4a7f295c96d15e703ebf",
+  "fingerprint": "50e212b090a487163a868657b5dccf8ee35e5d6f11d281c87a22d2117e8856a3",
   "source": "docs/examples/simulations/pi_chamber_spectra.py",
   "revision": "acb2035d668009b65b7c9e6f818e03c5da2b797a",
   "package_dirty": false,

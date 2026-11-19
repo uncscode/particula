@@ -7,7 +7,7 @@
     "docs/data/gpu_benchmark_results.json": "8352b7bae01663a01d9cf451a5ed48be2095750b9807105d94392c675f5df44e"
   },
   "example": "contribute-validation-gpu-legacy-benchmarks-gpu-benchmarks",
-  "fingerprint": "edc3153a07b4b9f2bede68c535ad4745416638919b90bbbd6702dd75c8532922",
+  "fingerprint": "6c5de6fc5864f402bffcf5454350863c6bf9d911b6476f2a2b406ecfff58692c",
   "source": "docs/contribute/validation/gpu/legacy-benchmarks/gpu_benchmarks.py",
   "revision": "6af97152d1570464ac5ccae56e3110001657e170",
   "package_dirty": false,

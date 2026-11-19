@@ -3,13 +3,14 @@
   "figure_dpi": 300,
   "elapsed_seconds": 6307.33176787605,
   "package_source_sha256": "cab2ecf96c60a0d1d005885793a221697dc3037bb3be50d8438b4de458423cbc",
+  "scientific_source_sha256": "cab2ecf96c60a0d1d005885793a221697dc3037bb3be50d8438b4de458423cbc",
   "input_sha256": {
     "scripts/gpu_studies/__init__.py": "530c51f7c7f432a895623c9ba4548b7cf3e053a1a0f328a36ae8ae9e50cec9c4",
     "scripts/gpu_studies/cases.py": "8728bdc1bb583d849d7228055c5bbc27606c021e1564f2d531b8c9a9e93787ec",
     "scripts/gpu_studies/validation.py": "816f83d10024feef14daa05112688ea7d26faa3ddde8e05ba12e8dc29f6a4a45"
   },
   "example": "gpu-prepared-cyclic-chamber",
-  "fingerprint": "e4c36a4794852a4687e360b97dbe4dbf42c628ae0c10af7e00bbef5b884fee02",
+  "fingerprint": "81db0684163f06ee6d3ab566f501354a81c5322d3751f47fa29e095111cac384",
   "source": "docs/examples/gpu/prepared/gpu_prepared_cyclic_chamber.py",
   "revision": "3d3753d2be9973c94b4064047fa8452e717f1311",
   "package_dirty": false,
@@ -45,7 +46,8 @@
   "simulation_fingerprint": "eedd8c327de95c03589f34946c21bfe34c26863795c194e2442344da34dd9156",
   "historical_run": {
     "revision": "3d3753d2be9973c94b4064047fa8452e717f1311",
-    "data_sha256": "3bb6c13e674f95c5f5ee38b0e4eb5ce27a39f4437359edf4d1cdea0e8e8f4883"
+    "data_sha256": "3bb6c13e674f95c5f5ee38b0e4eb5ce27a39f4437359edf4d1cdea0e8e8f4883",
+    "package_source_sha256": "cab2ecf96c60a0d1d005885793a221697dc3037bb3be50d8438b4de458423cbc"
   },
   "render_versions": {
     "particula": "0.3.2",
@@ -63,7 +65,7 @@
     "scripts/gpu_studies/cases.py": "8728bdc1bb583d849d7228055c5bbc27606c021e1564f2d531b8c9a9e93787ec",
     "scripts/gpu_studies/validation.py": "816f83d10024feef14daa05112688ea7d26faa3ddde8e05ba12e8dc29f6a4a45"
   },
-  "rendered_at": "2026-11-19T14:54:12.337803+00:00",
-  "render_revision": "d918c3f7cb549a4baa1d5a35e674171ff72570fa",
-  "render_elapsed_seconds": 5.8381534710060805
+  "rendered_at": "2026-11-19T19:37:37.747949+00:00",
+  "render_revision": "f5be504b2ecb3d768eb5a41a2be1be19b0d2d96d",
+  "render_elapsed_seconds": 4.736303271027282
 }

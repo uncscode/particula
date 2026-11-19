@@ -5,7 +5,7 @@
   "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "theory-dns-horizontal-velocity-comparison",
-  "fingerprint": "50df86932424524253a1748b699b5378285379b3f22dfbf0d8c992e053d0590e",
+  "fingerprint": "9d1a0fa78c6bb57c8930c8a8bc01a3ce0e981431def3ef8521ef1ae61daa1f11",
   "source": "docs/theory/dynamics/cloud-droplet-coagulation/dns-horizontal-velocity-comparison.py",
   "revision": "6af97152d1570464ac5ccae56e3110001657e170",
   "package_dirty": false,

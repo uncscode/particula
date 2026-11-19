@@ -5,7 +5,7 @@
   "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "examples-gpu-direct-gpu-condensation-parity-walkthrough",
-  "fingerprint": "0d92a6ed09ccfc084472555456b893dd452ee968d96bedbad33a1866f188eb75",
+  "fingerprint": "121489df39fef3fa1e6be311650e60f4a3f20e1a90353bdddf97344b2cd0f642",
   "source": "docs/examples/gpu/direct/gpu_condensation_parity_walkthrough.py",
   "revision": "e6d8de004d68d2f8054a7654be48430a2af02cb9",
   "package_dirty": false,

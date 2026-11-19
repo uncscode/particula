@@ -5,7 +5,7 @@
   "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "examples-processes-coagulation-coagulation-1-pmf-pattern",
-  "fingerprint": "707b14734b8d6733efac58c12c80da9c9eb5f9856d8a09c7b5cbb8564583ffe2",
+  "fingerprint": "850789c6c8706c43720a4e29450207c91a2c412ae5950c1bf5e63185b82030e6",
   "source": "docs/examples/processes/coagulation/coagulation_1_pmf_pattern.py",
   "revision": "6af97152d1570464ac5ccae56e3110001657e170",
   "package_dirty": false,

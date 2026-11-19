@@ -5,7 +5,7 @@
   "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "gpu-prepared-quick-start",
-  "fingerprint": "a9334052688c4972edb2e5a236ca2c51350c7827a0d34c1462629e89b1df3a33",
+  "fingerprint": "7fad2c5f0d6ef93162c8e6d0a3062f6862bdfa44127f6b6e5008a6b59249be6b",
   "source": "docs/examples/gpu/prepared/gpu_prepared_quick_start.py",
   "revision": "e6d8de004d68d2f8054a7654be48430a2af02cb9",
   "package_dirty": false,

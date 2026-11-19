@@ -5,7 +5,7 @@
   "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "examples-processes-condensation-condensation-2-massbin",
-  "fingerprint": "e92d3e004654ffe8904b9d395e612542a7946277de3f2aef7265ed3ee93c212d",
+  "fingerprint": "2905d45a315ef137ecd4cbe110ea9b622430812a46cdcc727a85311147d39769",
   "source": "docs/examples/processes/condensation/condensation_2_massbin.py",
   "revision": "6af97152d1570464ac5ccae56e3110001657e170",
   "package_dirty": false,

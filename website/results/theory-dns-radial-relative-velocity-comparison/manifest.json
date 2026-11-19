@@ -5,7 +5,7 @@
   "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "theory-dns-radial-relative-velocity-comparison",
-  "fingerprint": "6fb66bc0e7b5db09487e5ea16744e4ab85122640259a69e821f1deb6daf8a20b",
+  "fingerprint": "45028269c9c54a63368f39d76aabdf19a3f8403dac8feee535f67b8b79051775",
   "source": "docs/theory/dynamics/cloud-droplet-coagulation/dns-radial-relative-velocity-comparison.py",
   "revision": "dd92d3c1ca71f36eacad56b49661b32c0da77ac7",
   "package_dirty": false,

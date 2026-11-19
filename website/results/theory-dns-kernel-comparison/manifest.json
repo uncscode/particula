@@ -5,7 +5,7 @@
   "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "theory-dns-kernel-comparison",
-  "fingerprint": "e40beaa67697366e185511b15d8b35809d0af32a9cc3cdfffe2a55b0a1b76ad2",
+  "fingerprint": "faf210e6d648d79caea6837736a71ad08db8e22c6e7a82e865f0a7aa3353ac65",
   "source": "docs/theory/dynamics/cloud-droplet-coagulation/dns-kernel-comparison.py",
   "revision": "6af97152d1570464ac5ccae56e3110001657e170",
   "package_dirty": false,

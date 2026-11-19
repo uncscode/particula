@@ -5,7 +5,7 @@
   "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "examples-processes-coagulation-functional-coagulation-basic-4-particleresolved",
-  "fingerprint": "bfeef1f45e6bd0301abbb8492508318c6f5ea7955371e13ad895bd975856876f",
+  "fingerprint": "70d54f30eee5125c2dd1b658111cd4deee1c93e1cccd4aa03b5aa55bc5e4c08b",
   "source": "docs/examples/processes/coagulation/functional/coagulation_basic_4_particleresolved.py",
   "revision": "6af97152d1570464ac5ccae56e3110001657e170",
   "package_dirty": false,

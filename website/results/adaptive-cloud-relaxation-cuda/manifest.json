@@ -3,11 +3,12 @@
   "figure_dpi": 300,
   "elapsed_seconds": 69.52776940201875,
   "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
+  "scientific_source_sha256": "c491d38a0f3b014be11117e77bf7f5ed27e4a834ba024ddbac813c1eefd5b6db",
   "input_sha256": {
     "docs/examples/simulations/adaptive_cloud_relaxation.py": "957aa1b2193a07694123345e554ac96cc73978ed65b0b20000796020be411446"
   },
   "example": "adaptive-cloud-relaxation-cuda",
-  "fingerprint": "73441e4b0418043b0a000409fd78a36791bbb4be97eb0946166e3c35e7a0a7d5",
+  "fingerprint": "650083dab4731e3c2866ba112a77948ce298212dc9a1ec8167aa48a166090595",
   "source": "docs/examples/simulations/adaptive_cloud_relaxation_cuda.py",
   "revision": "d918c3f7cb549a4baa1d5a35e674171ff72570fa",
   "package_dirty": false,

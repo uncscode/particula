@@ -5,7 +5,7 @@
   "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "examples-thermodynamics-activity-activity-tutorial",
-  "fingerprint": "7c0d73ac0c9da7a216566f484d38e3631704c641d2f87ebfee514d982706eb7b",
+  "fingerprint": "d6a6bae96aac47baecf47f60692639cf0c92911f42891862687c175dfa5f7dfa",
   "source": "docs/examples/thermodynamics/activity/activity_tutorial.py",
   "revision": "dd92d3c1ca71f36eacad56b49661b32c0da77ac7",
   "package_dirty": false,

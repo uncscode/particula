@@ -5,7 +5,7 @@
   "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "examples-gpu-direct-gpu-direct-nucleation",
-  "fingerprint": "ece044d3efded8760792ef3308524cc213f252351fd0f9099afbf7d5cfdadfaa",
+  "fingerprint": "e8f2127c5cec88679c91954b80c37a3a011c6cfc1bdb9fa87fab14539c84c6b5",
   "source": "docs/examples/gpu/direct/gpu_direct_nucleation.py",
   "revision": "e6d8de004d68d2f8054a7654be48430a2af02cb9",
   "package_dirty": false,

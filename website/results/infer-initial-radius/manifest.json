@@ -3,6 +3,7 @@
   "figure_dpi": 300,
   "elapsed_seconds": 20.202823090949096,
   "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
+  "scientific_source_sha256": "c491d38a0f3b014be11117e77bf7f5ed27e4a834ba024ddbac813c1eefd5b6db",
   "input_sha256": {
     "scripts/assess_native_condensation.py": "041f93deb8732c3200193c0aa0ba4005ba2a46cabcd31bb23df77c451cdc45b7",
     "scripts/assess_native_adaptive.py": "b012bc43a8be6253aa19ccb60e95e29f0d5d6850d23e3a8ba1077978f2312b38",
@@ -11,7 +12,7 @@
     "scripts/inverse_studies/scalar_reference.py": "00b118758d61cd58e2470ff55730892ba52e7cdaa2be38b2e0d97baccbc4eed6"
   },
   "example": "infer-initial-radius",
-  "fingerprint": "60afb7f6d87af24849184afa434d14fb14f5b3d22c677ae156aea6552bf3d30b",
+  "fingerprint": "a34edc26ba3b95fc2f55c2627b09eaf5d68ae4f8f3a896f64dad9ee60f6e2736",
   "source": "docs/examples/processes/condensation/infer_initial_radius.py",
   "revision": "9ab2fa66ef3d5e94551cc8942cc955990b732397",
   "package_dirty": false,

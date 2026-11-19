@@ -253,6 +253,10 @@ ax.plot(
     charge[1:],
     coulomb_chahl20019_dimensionless_kernel[0, 1:],
     label="Coulomb Chahl 2019",
+    color="0.3",
+    linestyle="-",
+    marker="o",
+    markersize=3,
 )
 ax.set_yscale("log")
 ax.set_xlim(-1, 12)
@@ -380,6 +384,10 @@ ax.plot(
     charge[1:],
     coulomb_chahl20019_dimensional_kernel[0, 1:],
     label="Coulomb Chahl 2019",
+    color="0.3",
+    linestyle="-",
+    marker="o",
+    markersize=3,
 )
 ax.set_yscale("log")
 ax.set_xlim(-1, 12)

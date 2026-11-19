@@ -1,15 +1,16 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 19.98621976992581,
-  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
+  "elapsed_seconds": 16.12858942791354,
+  "package_source_sha256": "cdc38cb651641b0a7701c1eab385e2ca9c9db1f45ee0cc6bce0b2da1f0d3c114",
+  "scientific_source_sha256": "9ccd4e777e1987db076b9ac5b19f8cd1c309a0a8e54f496c0a8bbdfe42a87a5d",
   "input_sha256": {},
   "example": "examples-processes-wall-loss-chamber-forward-simulation",
-  "fingerprint": "46a0dea3e9210f914e5377a17d0ced17bdbad84e35975b6409aa78d8fe2072f8",
+  "fingerprint": "5c28a651f0b6cbda0ef72d2564301fbef5d8f9db065d48b77f30664ae9fd132d",
   "source": "docs/examples/processes/wall-loss/chamber_forward_simulation.py",
-  "revision": "6af97152d1570464ac5ccae56e3110001657e170",
+  "revision": "f5be504b2ecb3d768eb5a41a2be1be19b0d2d96d",
   "package_dirty": false,
-  "executed_at": "2026-11-19T14:33:53.983712+00:00",
+  "executed_at": "2026-11-19T19:37:33.720226+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
@@ -51,10 +52,10 @@
     ]
   ],
   "files": {
-    "figure-6-1.png": "03de3c4847aa05f1d8f345a4a88902b916eeb48b512a0d4bc45dcc08a4fcc308",
+    "figure-6-1.png": "8a4248312891e8b40698a4df9cfc342ac95e61db6b9eeac90b0cc47381393d5f",
     "figure-5-1.png": "8f4c6adc4f588b28bdf37184c1589b80cb4b0b07e026a6112a642c6ec5edaf47",
     "figure-3-1.png": "a47814ae681e865104ba847cfe6f85e1f33309e03be72315c7f99f49cff42be8",
     "figure-2-1.png": "323656c26080291540edadc5595a54dad7f9c5a099a2249a3b74fc6a81765af0",
-    "source.py": "b1c2daa685e217655d36f33bb6397c8395eb6626984b2fc89764bfc606669f21"
+    "source.py": "40d18de5c1eeaf161f03de26776a8a2fd68253d4378106c300def6a78152bd44"
   }
 }

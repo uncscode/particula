@@ -12,7 +12,7 @@
     "docs/data/nacl-scavenging/pulse-smps-spectrum.csv": "e24c96c7f2ba71080a7f90479d812e99a875170b32cf88f8022841459b843159"
   },
   "example": "nacl-scavenging",
-  "fingerprint": "c01147fdbbb28a22309cc46fc42f6e2ce7655a4d51a3bade1b06f20df7fba7e9",
+  "fingerprint": "5210020337dd152cbda7aa3af76333ad0db455f7b5433b4facad9b38ef4a17b8",
   "source": "docs/examples/processes/coagulation/charge/nacl_scavenging.py",
   "revision": "e6d8de004d68d2f8054a7654be48430a2af02cb9",
   "package_dirty": false,

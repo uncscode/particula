@@ -11,7 +11,7 @@
     "scripts/gpu_studies/trajectories.py": "41d64b0ef3351bb41c12cd3314b02b7ea7c87d8e225d7b9b6508663f6eca84af"
   },
   "example": "gpu-prepared-multibox",
-  "fingerprint": "88f046c3b695b772e5a2c177938b0956692077007088b1298fd41bcfc850ebf7",
+  "fingerprint": "f0c72aaf809e76c37ab136249d1b84096c6ec0c81f21ff7f930c8269f268342d",
   "source": "docs/examples/gpu/prepared/gpu_prepared_multibox.py",
   "revision": "9ab2fa66ef3d5e94551cc8942cc955990b732397",
   "package_dirty": false,

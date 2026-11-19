@@ -3,11 +3,12 @@
   "figure_dpi": 300,
   "elapsed_seconds": 4.846794530050829,
   "package_source_sha256": "497407730cbc76793fb12405a106766432bb18a77fc6a4bc730d36c0531e33d0",
+  "scientific_source_sha256": "803167c38ca3a1c7cc22a52518848fcd3ff697892265cbe60e7af3d15062e0f2",
   "input_sha256": {
     "docs/data/transport/kim2005-psl-slip.csv": "03a91ba6cea6cf93f6f009d9a11da68905b4cda7e5030edd56caa52595cefefd"
   },
   "example": "psl-mobility",
-  "fingerprint": "c974d40ed959972dc889d091f9e1b348109125d588b76992f95bf56c5c3c90a0",
+  "fingerprint": "e96f2a2e39a7de1a4ff746bf8f39f978b9363c8bed65ed2e81d1259cfa05d4d4",
   "source": "docs/examples/fundamentals/particles/psl_mobility.py",
   "revision": "b860b8be1294f4f029e2a23b488195c9d71c8812",
   "package_dirty": false,

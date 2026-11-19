@@ -7,7 +7,7 @@
     "docs/data/gpu/rtx5060.json": "253c5eb30214086edf5341178aa5e6e399a85da0db6e13ac66f25333d15ef6d7"
   },
   "example": "gpu-scaling-results",
-  "fingerprint": "6e0732548a9b23b33599ed37ff8e732209c62065654205d5f32d74ffb4f8725c",
+  "fingerprint": "3e813f2edb3cf365bd08cf1e0d0bf2124863fcf070df98739e013afd926c5372",
   "source": "docs/examples/gpu/prepared/gpu_scaling_results.py",
   "revision": "dd92d3c1ca71f36eacad56b49661b32c0da77ac7",
   "package_dirty": false,

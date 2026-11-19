@@ -3,6 +3,7 @@
   "figure_dpi": 300,
   "elapsed_seconds": 35.906419553095475,
   "package_source_sha256": "1d2bf0708c00d6e34107e200c143eb76cae07571fd4e691f1ce7cb88cd95a134",
+  "scientific_source_sha256": "1d2bf0708c00d6e34107e200c143eb76cae07571fd4e691f1ce7cb88cd95a134",
   "input_sha256": {
     "scripts/docs_gpu_figures.py": "3aeac1a9de599df908d6951e21c60b1d331bdd4f977125af5fcc6ed5d85925fb",
     "scripts/gpu_studies/__init__.py": "530c51f7c7f432a895623c9ba4548b7cf3e053a1a0f328a36ae8ae9e50cec9c4",
@@ -11,7 +12,7 @@
     "scripts/gpu_studies/trajectories.py": "41d64b0ef3351bb41c12cd3314b02b7ea7c87d8e225d7b9b6508663f6eca84af"
   },
   "example": "gpu-prepared-lifecycle",
-  "fingerprint": "d7464547dc9807c91775a248fe989e7df0fa32feecddc569f4e8603838518f22",
+  "fingerprint": "1512228c2a4576cf44f13294ffc4df2343f854431a17734d80d2451531911a20",
   "source": "docs/examples/gpu/prepared/gpu_prepared_lifecycle.py",
   "revision": "da142e3dfcf190010d21f1ac07aca1a12e4c9fd0",
   "package_dirty": false,
@@ -50,7 +51,8 @@
   "historical_run": {
     "revision": "da142e3dfcf190010d21f1ac07aca1a12e4c9fd0",
     "study_revision": "535d02b7b06ba782aa2bd5d1c60890e06adbb654",
-    "data_sha256": "d48c6313d8e85f2d4538d621e3984d0de27551562473a4f40d46640294d4913c"
+    "data_sha256": "d48c6313d8e85f2d4538d621e3984d0de27551562473a4f40d46640294d4913c",
+    "package_source_sha256": "1d2bf0708c00d6e34107e200c143eb76cae07571fd4e691f1ce7cb88cd95a134"
   },
   "render_versions": {
     "particula": "0.3.2",
@@ -70,7 +72,7 @@
     "scripts/gpu_studies/validation.py": "816f83d10024feef14daa05112688ea7d26faa3ddde8e05ba12e8dc29f6a4a45",
     "scripts/gpu_studies/trajectories.py": "41d64b0ef3351bb41c12cd3314b02b7ea7c87d8e225d7b9b6508663f6eca84af"
   },
-  "rendered_at": "2026-11-19T15:09:58.772391+00:00",
-  "render_revision": "0d602f8a0cf13a18f9a3581b4cbdfb1346f18d9f",
-  "render_elapsed_seconds": 3.822164210025221
+  "rendered_at": "2026-11-19T19:37:31.843278+00:00",
+  "render_revision": "f5be504b2ecb3d768eb5a41a2be1be19b0d2d96d",
+  "render_elapsed_seconds": 3.5118622279260308
 }

@@ -5,7 +5,7 @@
   "package_source_sha256": "497407730cbc76793fb12405a106766432bb18a77fc6a4bc730d36c0531e33d0",
   "input_sha256": {},
   "example": "figure-styles",
-  "fingerprint": "07a96f5be91c3ca6fc7ba98ada141aaf63c96327f852fc4b369bac19e4bf338d",
+  "fingerprint": "ad37763529e591143e3445bea137bf9aa899b2bb8279ac84e7f0ab516b801416",
   "source": "docs/examples/fundamentals/figure_styles.py",
   "revision": "141a0e74983c9ee190d161e8bbd9c12e2070f3c2",
   "package_dirty": false,

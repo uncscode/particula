@@ -3,6 +3,7 @@
   "figure_dpi": 300,
   "elapsed_seconds": 3139.7880682679825,
   "package_source_sha256": "bbe6cb05017e86b19f7dc166c18cac96c0d762b5300c03990d91cd1a4e08ce8b",
+  "scientific_source_sha256": "bbe6cb05017e86b19f7dc166c18cac96c0d762b5300c03990d91cd1a4e08ce8b",
   "input_sha256": {
     "scripts/docs_gpu_figures.py": "3aeac1a9de599df908d6951e21c60b1d331bdd4f977125af5fcc6ed5d85925fb",
     "scripts/gpu_studies/__init__.py": "530c51f7c7f432a895623c9ba4548b7cf3e053a1a0f328a36ae8ae9e50cec9c4",
@@ -11,7 +12,7 @@
     "scripts/gpu_studies/adaptive_trajectories.py": "ec4aed0025824b8c8c1c2e19373c9e6e90596c937c5172b2c6d96cf498c9c934"
   },
   "example": "gpu-prepared-forcing",
-  "fingerprint": "d59cb9db9a13e03f2e340e96d97b0580faa2feb32de39c28aa5bf960c60006e9",
+  "fingerprint": "f64c851739598f016499dbf5a6b399837dc6be38db5ca1ce8c10f736487c4ac7",
   "source": "docs/examples/gpu/prepared/gpu_prepared_forcing.py",
   "revision": "480ecf2c1aa95da42985098c53e4ecdc66133d7b",
   "package_dirty": false,
@@ -49,7 +50,8 @@
   "simulation_fingerprint": "d8235887c58cacda66aa728b7e059c5d1fe828d93d64397d5afa3e1cf117b0ea",
   "historical_run": {
     "revision": "480ecf2c1aa95da42985098c53e4ecdc66133d7b",
-    "data_sha256": "0733f192493bd2bda1bf37521296593018e4c16bd2df4b7cf233094c0573e0c6"
+    "data_sha256": "0733f192493bd2bda1bf37521296593018e4c16bd2df4b7cf233094c0573e0c6",
+    "package_source_sha256": "bbe6cb05017e86b19f7dc166c18cac96c0d762b5300c03990d91cd1a4e08ce8b"
   },
   "render_versions": {
     "particula": "0.3.2",
@@ -69,7 +71,7 @@
     "scripts/gpu_studies/validation.py": "816f83d10024feef14daa05112688ea7d26faa3ddde8e05ba12e8dc29f6a4a45",
     "scripts/gpu_studies/adaptive_trajectories.py": "ec4aed0025824b8c8c1c2e19373c9e6e90596c937c5172b2c6d96cf498c9c934"
   },
-  "rendered_at": "2026-11-19T15:01:37.292154+00:00",
-  "render_revision": "9ab2fa66ef3d5e94551cc8942cc955990b732397",
-  "render_elapsed_seconds": 5.745285706943832
+  "rendered_at": "2026-11-19T19:37:22.592647+00:00",
+  "render_revision": "f5be504b2ecb3d768eb5a41a2be1be19b0d2d96d",
+  "render_elapsed_seconds": 4.533280248986557
 }

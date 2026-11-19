@@ -3,11 +3,12 @@
   "figure_dpi": 300,
   "elapsed_seconds": 20.615242874948308,
   "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
+  "scientific_source_sha256": "c491d38a0f3b014be11117e77bf7f5ed27e4a834ba024ddbac813c1eefd5b6db",
   "input_sha256": {
     "docs/data/thermodynamics/marsh2017-citric-acid.csv": "8f32cf31349ddf3b420b230186a70190c0b7ce40f026b12414b0b96b97117a20"
   },
   "example": "citric-acid-hygroscopicity",
-  "fingerprint": "b0f4d376209bf7fa6d5246fd597fb8eba09e8dc8dbe038d4678c393237618698",
+  "fingerprint": "5f0ce396c1d1bde46dfe530aef168057957fe873ac1b5e52f89a2a22939a0552",
   "source": "docs/examples/thermodynamics/activity/citric_acid_hygroscopicity.py",
   "revision": "6af97152d1570464ac5ccae56e3110001657e170",
   "package_dirty": false,

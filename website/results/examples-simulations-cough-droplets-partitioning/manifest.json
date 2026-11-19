@@ -5,7 +5,7 @@
   "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "examples-simulations-cough-droplets-partitioning",
-  "fingerprint": "ccc2cce2488b72aa7a2858735e07659411151d488aa30174f030f29726922731",
+  "fingerprint": "f1bbd87bed9f3d03ba581a0929634300541860fd769e7aeb072de6d4e49fa4d0",
   "source": "docs/examples/simulations/cough_droplets_partitioning.py",
   "revision": "adbacebcb9e41726b29abf99278b8980a62b18fe",
   "package_dirty": false,

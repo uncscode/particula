@@ -3,6 +3,7 @@
   "figure_dpi": 300,
   "elapsed_seconds": 6054.078859924979,
   "package_source_sha256": "98021107918d76caafbd800e6f8ab4c66bb0905e1950a2fc7075c622655abf5a",
+  "scientific_source_sha256": "98021107918d76caafbd800e6f8ab4c66bb0905e1950a2fc7075c622655abf5a",
   "input_sha256": {
     "scripts/gpu_studies/__init__.py": "530c51f7c7f432a895623c9ba4548b7cf3e053a1a0f328a36ae8ae9e50cec9c4",
     "scripts/gpu_studies/environment_sweep.py": "729a5a5b6d90faca83218b37c5add4bff4ad62e19572a4a68ec97560b93265db",
@@ -10,7 +11,7 @@
     "scripts/gpu_studies/population_figures.py": "feef0f0c388e86ebc86b202663c47bfb079d75496f35f588ea5cb68f03395df9"
   },
   "example": "gpu-environment-sweep",
-  "fingerprint": "76668cb5f83155b16799e0dac360d8da6dae6a9d853670612f129ed3b61f307d",
+  "fingerprint": "516a3d790693204fcfc9263b071524e72bfc64b905ee2acf567298c6d47e6c8d",
   "source": "docs/examples/gpu/prepared/gpu_environment_sweep.py",
   "revision": "54edfe13b7c99ec01b3a5f853e3ee45e6454ab61",
   "package_dirty": false,
@@ -82,7 +83,8 @@
   "simulation_fingerprint": "3853f2cd6e471b6db5640f9282847a9f7f4b85bab5377278efe625affbfde371",
   "historical_run": {
     "revision": "54edfe13b7c99ec01b3a5f853e3ee45e6454ab61",
-    "data_sha256": "a36f8b3dc9a1d8d5979e050442aa6fb2886ffb43b27b09733645059eefd044b1"
+    "data_sha256": "a36f8b3dc9a1d8d5979e050442aa6fb2886ffb43b27b09733645059eefd044b1",
+    "package_source_sha256": "98021107918d76caafbd800e6f8ab4c66bb0905e1950a2fc7075c622655abf5a"
   },
   "render_versions": {
     "particula": "0.3.2",
@@ -101,7 +103,7 @@
     "scripts/gpu_studies/population_diagnostics.py": "8a91762a4321fd10751f580a1ab6a624566eb22ee7b38e65aad70d98f4718e35",
     "scripts/gpu_studies/population_figures.py": "ad1b167df0aff538516b03cce7de1f1db22126bfd83a2df642ba161229f1d5f9"
   },
-  "rendered_at": "2026-11-19T15:30:42.526281+00:00",
-  "render_revision": "4a13e64de43a6687fb76ed724d6881aaa94a227b",
-  "render_elapsed_seconds": 15.242096663103439
+  "rendered_at": "2026-11-19T19:37:48.755854+00:00",
+  "render_revision": "f5be504b2ecb3d768eb5a41a2be1be19b0d2d96d",
+  "render_elapsed_seconds": 13.836834955960512
 }
