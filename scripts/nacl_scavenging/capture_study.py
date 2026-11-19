@@ -174,6 +174,9 @@ def main():
         ("refined", TARGETS, dict(parts=128, stride=4)),
         ("archived_4nm_scan", (4.0,), scan),
         ("single_size", TARGETS, dict(ideal=True)),
+        ("single_branch", (4.0,), dict(max_z=1)),
+        ("small_collector_source", (4.0,), dict(parent=0.7)),
+        ("large_collector_source", (4.0,), dict(parent=1.6)),
         ("ions_elevated", (4.0,), dict(ion=100)),
         ("tube_transmission", (4.0,), dict(tube=1.0)),
     ]
