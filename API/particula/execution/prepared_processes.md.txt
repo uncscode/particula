@@ -164,7 +164,7 @@ def _compile_coagulation(plan, context: BuiltinPreparationContext)
 
 Retain the common collision sampler with optional ion rate work.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L439-L521)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L455-L540)
 
 ## particula.execution.prepared_processes._compile_dilution
 
@@ -176,7 +176,7 @@ def _compile_dilution(plan: _ProcessPlan, context: BuiltinPreparationContext)
 
 Bind the native exponential dilution operation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L374-L395)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L390-L411)
 
 ## particula.execution.prepared_processes._compile_process
 
@@ -188,7 +188,7 @@ def _compile_process(plan: _ProcessPlan, context: BuiltinPreparationContext)
 
 Prepare a built-in through its explicit adapter contract.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L366-L371)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L382-L387)
 
 ## particula.execution.prepared_processes._compile_wall_loss
 
@@ -200,7 +200,7 @@ def _compile_wall_loss(plan: _ProcessPlan, context: BuiltinPreparationContext)
 
 Bind the admitted neutral or charged wall-loss operation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L398-L436)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L414-L452)
 
 ## particula.execution.prepared_processes._plan_coagulation
 
@@ -212,7 +212,7 @@ def _plan_coagulation(process: Any, aerosol: Aerosol) -> _ProcessPlan
 
 Freeze supported collision laws and equal represented counts.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L226-L296)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L226-L312)
 
 ## particula.execution.prepared_processes._plan_dilution
 
@@ -248,7 +248,7 @@ def _plan_wall_loss(process: Any, aerosol: Aerosol) -> _ProcessPlan
 
 Freeze neutral/charged chamber geometry and explicit electric fields.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L299-L363)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_processes.py#L315-L379)
 
 ## particula.execution.prepared_processes.configure_coagulation_work
 

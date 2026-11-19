@@ -15,3 +15,4 @@ Builder utilities for coagulation models.
 - `particula.dynamics.coagulation.coagulation_builder.sedimentation_coagulation_builder`
 - `particula.dynamics.coagulation.coagulation_builder.turbulent_dns_coagulation_builder`
 - `particula.dynamics.coagulation.coagulation_builder.turbulent_shear_coagulation_builder`
+- `particula.dynamics.coagulation.coagulation_builder.van_der_waals_coagulation_builder`

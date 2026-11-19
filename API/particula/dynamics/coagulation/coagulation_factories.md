@@ -11,7 +11,7 @@ Coagulation Factory Module.
 *class*
 
 ```python
-class CoagulationFactory(StrategyFactoryABC[Union[BrownianCoagulationBuilder, ChargedCoagulationBuilder, TurbulentShearCoagulationBuilder, TurbulentDNSCoagulationBuilder, CombineCoagulationStrategyBuilder], CoagulationStrategyABC])
+class CoagulationFactory(StrategyFactoryABC[Union[BrownianCoagulationBuilder, ChargedCoagulationBuilder, VanDerWaalsCoagulationBuilder, TurbulentShearCoagulationBuilder, TurbulentDNSCoagulationBuilder, CombineCoagulationStrategyBuilder], CoagulationStrategyABC])
 ```
 
 Bases: ``
@@ -32,7 +32,7 @@ based on a given type string. Supported types include:
         'brownian', 'charged', 'turbulent_shear', 'turbulent_dns', or
         'combine'.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_factories.py#L27-L69)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_factories.py#L30-L74)
 
 ### particula.dynamics.coagulation.coagulation_factories.CoagulationFactory.get_builders
 
@@ -48,4 +48,4 @@ Return the mapping of strategy types to builder instances.
 
 - (`Dict[str, Any]`) — Dictionary mapping strategy names to their corresponding builders.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_factories.py#L57-L69)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_factories.py#L61-L74)

@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 6.1908899650443345,
+  "package_source_sha256": "c0aba71344f0a8eb95e7085aec155af949bd08d8f60d964eaa1eca1a7fa901a8",
+  "input_sha256": {},
+  "example": "gpu-van-der-waals",
+  "fingerprint": "8f614249471dd7b03c2e95bf7bbb33d3dc6282b5125188208b48a0f097522fc5",
+  "source": "docs/examples/gpu/prepared/van_der_waals.py",
+  "revision": "9a8ade0d28a7a358a7d9ed8330ab892808b2edaf",
+  "package_dirty": false,
+  "executed_at": "2026-11-19T02:29:41.626607+00:00",
+  "device": "cuda:0: NVIDIA GeForce RTX 5060",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.2",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [
+      {
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\nModule particula.gpu.kernels.coagulation 907b9eb load on device 'cuda:0' took 0.43 ms  (cached)\nModule particula.gpu.kernels.coagulation 583acfc load on device 'cuda:0' took 0.29 ms  (cached)\nModule particula.gpu.kernels.coagulation 33bf240 load on device 'cuda:0' took 0.35 ms  (cached)\nModule particula.gpu.kernels.environment e11375e load on device 'cuda:0' took 0.28 ms  (cached)\nModule particula.gpu.kernels.coagulation cd001e3 load on device 'cuda:0' took 0.48 ms  (cached)\nModule particula.gpu.kernels._coagulation_native f93a244 load on device 'cuda:0' took 0.27 ms  (cached)\n"
+      },
+      {
+        "text": "Module particula.gpu.kernels._brownian_parallel 5433dfc load on device 'cuda:0' took 1.28 ms  (cached)\nModule particula.gpu.kernels._brownian_parallel f84feee load on device 'cuda:0' took 2.17 ms  (cached)\nModule particula.gpu.kernels._coagulation_budget b4a3978 load on device 'cuda:0' took 0.46 ms  (cached)\nModule warp.utils f35afd3 load on device 'cuda:0' took 0.45 ms  (cached)\nModule warp.math edde159 load on device 'cuda:0' took 0.21 ms  (cached)\nModule warp.marching_cubes fb6e712 load on device 'cuda:0' took 0.59 ms  (cached)\nModule particula.gpu.properties.gas_properties edde159 load on device 'cuda:0' took 0.28 ms  (cached)\nModule particula.gpu.properties.particle_properties edde159 load on device 'cuda:0' took 0.25 ms  (cached)\nModule particula.gpu.dynamics.coagulation_funcs edde159 load on device 'cuda:0' took 0.18 ms  (cached)\nModule particula.gpu.dynamics.condensation_funcs edde159 load on device 'cuda:0' took 0.16 ms  (cached)\nModule particula.gpu.dynamics.ion_pair_data edde159 load on device 'cuda:0' took 0.15 ms  (cached)\nModule particula.gpu.dynamics.van_der_waals edde159 load on device 'cuda:0' took 0.15 ms  (cached)\nModule particula.gpu.warp_types edde159 load on device 'cuda:0' took 0.16 ms  (cached)\nModule particula.execution.communication 2909959 load on device 'cuda:0' took 0.31 ms  (cached)\nModule particula.gpu.kernels._population_validation edde159 load on device 'cuda:0' took 0.17 ms  (cached)\nModule particula.gpu.kernels.communication ac9b2a2 load on device 'cuda:0' took 1.23 ms  (cached)\nModule particula.gpu.kernels._condensation_native edde159 load on device 'cuda:0' took 0.63 ms  (cached)\nModule particula.gpu.kernels._condensation_parallel edde159 load on device 'cuda:0' took 0.18 ms  (cached)\nModule particula.gpu.kernels.thermodynamics edde159 load on device 'cuda:0' took 1.19 ms  (cached)\nModule particula.gpu.kernels.condensation edde159 load on device 'cuda:0' took 0.16 ms  (cached)\nModule particula.gpu.kernels.exhaustion 616f81d load on device 'cuda:0' took 1.27 ms  (cached)\nModule particula.gpu.kernels.slot_management 0375e2c load on device 'cuda:0' took 0.41 ms  (cached)\nModule particula.gpu.kernels.nucleation 1124f09 load on device 'cuda:0' took 1.73 ms  (cached)\nModule particula.execution.gpu_resources 30f296c load on device 'cuda:0' took 0.23 ms  (cached)\nModule particula.execution.prepared_diagnostics ca06582 load on device 'cuda:0' took 0.25 ms  (cached)\nModule particula.execution.prepared_guards c5e1f2e load on device 'cuda:0' took 0.24 ms  (cached)\nModule particula.gpu.kernels._brownian_parallel 923d9cf load on device 'cuda:0' took 3.38 ms  (cached)\nModule particula.gpu.kernels.coagulation 8b4575c load on device 'cuda:0' took 0.54 ms  (cached)\nModule particula.gpu.kernels.coagulation c5b8475 load on device 'cuda:0' took 0.49 ms  (cached)\n"
+      },
+      {
+        "image": "figure-4-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "figure-4-1.png": "9bd2b3c0b8374f9d747e0544f7022eca3e418b6d6b3dc993ccbd347c4eb70ea3",
+    "data.json": "3e3508456b4d6f65ed94fbdcd7377f3d421cc421b99a41dd8acaee6803cfec2f",
+    "source.py": "f355c1cc4812efc5c6a2ddb7b700f9678e74f548c32fefab9f151b87eca3fff4"
+  },
+  "simulation_fingerprint": "8d77d9d53174b8798e5cf75ca6a13fe50db8833e95a4b1e31b4ddd49ef9f815e"
+}

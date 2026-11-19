@@ -26,7 +26,7 @@ Size-dependent composition can produce persistent per-species inventory
 defects. This accepted PMF/PDF limitation is documented separately from
 the resolved merge's species/charge conservation contract.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/_native_step.py#L262-L290)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/_native_step.py#L263-L291)
 
 ## particula.dynamics.coagulation.coagulation_strategy._native_step._direct_kernel
 
@@ -38,7 +38,7 @@ def _direct_kernel(strategy: Any, particle: ParticleData, temp: float, press: fl
 
 Retain the existing charged-model direct callback and fallback policy.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/_native_step.py#L166-L204)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/_native_step.py#L167-L205)
 
 ## particula.dynamics.coagulation.coagulation_strategy._native_step._merge
 
@@ -50,7 +50,7 @@ def _merge(particle: ParticleData, active: NDArray[np.int64], pairs: Any, extens
 
 Validate selector output, stage the merge, then publish in place.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/_native_step.py#L207-L259)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/_native_step.py#L208-L260)
 
 ## particula.dynamics.coagulation.coagulation_strategy._native_step._validate_storage
 
@@ -62,7 +62,7 @@ def _validate_storage(particle: ParticleData, resolved: bool) -> None
 
 Reject unwritable or overlapping destinations before draws.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/_native_step.py#L143-L163)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/_native_step.py#L144-L164)
 
 ## particula.dynamics.coagulation.coagulation_strategy._native_step.binned_kernel_data
 
@@ -78,7 +78,7 @@ Counts and species inventories are preserved across occupied bins. Charge
 retains the existing median approximation for kernel evaluation only; this
 temporary charge is never used for the authoritative merge bookkeeping.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/_native_step.py#L94-L140)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/_native_step.py#L95-L141)
 
 ## particula.dynamics.coagulation.coagulation_strategy._native_step.kernel_edges
 
@@ -90,7 +90,7 @@ def kernel_edges(particle: ParticleData, edges: Any, total_bins: Any, bins_per_d
 
 Generate the existing logarithmic grid from active native slots.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/_native_step.py#L68-L91)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/_native_step.py#L69-L92)
 
 ## particula.dynamics.coagulation.coagulation_strategy._native_step.step_native
 
@@ -102,7 +102,7 @@ def step_native(strategy: Any, particle: ParticleData, temperature: float, press
 
 Apply an admitted native step without changing process/RNG ownership.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/_native_step.py#L293-L384)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/_native_step.py#L294-L408)
 
 ## particula.dynamics.coagulation.coagulation_strategy._native_step.validate_bin_controls
 
@@ -114,7 +114,7 @@ def validate_bin_controls(edges: Any, total_bins: Any, bins_per_decade: Any) -> 
 
 Validate mutable bin controls even on a zero-work step.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/_native_step.py#L48-L65)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/_native_step.py#L49-L66)
 
 ## particula.dynamics.coagulation.coagulation_strategy._native_step.validate_edges
 
@@ -126,4 +126,4 @@ def validate_edges(edges: Any) -> NDArray[np.float64]
 
 Require real, positive, strictly increasing kernel radius edges.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/_native_step.py#L32-L45)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/_native_step.py#L33-L46)

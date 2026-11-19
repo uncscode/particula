@@ -17,3 +17,4 @@ Coagulation kernel strategy implementations.
 - `particula.dynamics.coagulation.coagulation_strategy.sedimentation_coagulation_strategy`
 - `particula.dynamics.coagulation.coagulation_strategy.turbulent_dns_coagulation_strategy`
 - `particula.dynamics.coagulation.coagulation_strategy.turbulent_shear_coagulation_strategy`
+- `particula.dynamics.coagulation.coagulation_strategy.van_der_waals_coagulation_strategy`

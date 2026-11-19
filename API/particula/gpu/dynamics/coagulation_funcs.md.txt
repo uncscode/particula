@@ -346,7 +346,7 @@ IDs: hard sphere, Dyachkov 2007, Gatti 2008, Gopalakrishnan 2012,
 Chahl 2019. The dimensional Coulomb enhancement is applied by the caller.
 References and fitted domains follow charged_dimensionless_kernel.py.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/dynamics/coagulation_funcs.py#L540-L636)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/dynamics/coagulation_funcs.py#L567-L663)
 
 ## particula.gpu.dynamics.coagulation_funcs.charged_hard_sphere_wp
 
@@ -358,7 +358,7 @@ def charged_hard_sphere_wp(radius_i: wp.float64, radius_j: wp.float64, mass_i: w
 
 Evaluate the backwards-compatible charged hard-sphere pair rate.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/dynamics/coagulation_funcs.py#L918-L956)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/dynamics/coagulation_funcs.py#L925-L963)
 
 ## particula.gpu.dynamics.coagulation_funcs.charged_kernel_wp
 
@@ -439,7 +439,7 @@ cutoff when its enhancement is below ``1e-80``.
 > *Aerosol Science and Technology*, 53, 933-957.
 > https://doi.org/10.1080/02786826.2019.1614522
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/dynamics/coagulation_funcs.py#L639-L915)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/dynamics/coagulation_funcs.py#L666-L922)
 
 ## particula.gpu.dynamics.coagulation_funcs.coulomb_continuum_limit_wp
 
@@ -606,6 +606,18 @@ the Fuchs form for the collection enhancement term.
 - (`wp.float64`) — Collection term ``g`` as a dimensionless quantity.
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/gpu/dynamics/coagulation_funcs.py#L204-L232)
+
+## particula.gpu.dynamics.coagulation_funcs.hard_sphere_transition_wp
+
+*function*
+
+```python
+def hard_sphere_transition_wp(diffusive_knudsen: wp.float64)
+```
+
+Dimensionless hard-sphere transition kernel H(Kn_D).
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/dynamics/coagulation_funcs.py#L540-L564)
 
 ## particula.gpu.dynamics.coagulation_funcs.kinematic_viscosity_wp
 

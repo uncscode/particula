@@ -24,17 +24,17 @@ BROWNIAN_MECHANISM = 'brownian'
 BROWNIAN_MECHANISM_FLAG = 1
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_config.py#L18-L18)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_config.py#L22-L22)
 
 ## particula.gpu.kernels._coagulation_config.CANONICAL_COAGULATION_MECHANISMS
 
 *attribute* · *module attribute*
 
 ```python
-CANONICAL_COAGULATION_MECHANISMS = (BROWNIAN_MECHANISM, CHARGED_HARD_SPHERE_MECHANISM, SEDIMENTATION_SP2016_MECHANISM, TURBULENT_SHEAR_ST1956_MECHANISM)
+CANONICAL_COAGULATION_MECHANISMS = (BROWNIAN_MECHANISM, VAN_DER_WAALS_MECHANISM, CHARGED_HARD_SPHERE_MECHANISM, SEDIMENTATION_SP2016_MECHANISM, TURBULENT_SHEAR_ST1956_MECHANISM)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_config.py#L11-L16)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_config.py#L14-L20)
 
 ## particula.gpu.kernels._coagulation_config.CHARGED_HARD_SPHERE_MECHANISM
 
@@ -54,7 +54,7 @@ CHARGED_HARD_SPHERE_MECHANISM = 'charged_hard_sphere'
 CHARGED_HARD_SPHERE_MECHANISM_FLAG = 2
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_config.py#L19-L19)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_config.py#L23-L23)
 
 ## particula.gpu.kernels._coagulation_config.SEDIMENTATION_SP2016_MECHANISM
 
@@ -74,7 +74,7 @@ SEDIMENTATION_SP2016_MECHANISM = 'sedimentation_sp2016'
 SEDIMENTATION_SP2016_MECHANISM_FLAG = 4
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_config.py#L20-L20)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_config.py#L24-L24)
 
 ## particula.gpu.kernels._coagulation_config.TURBULENT_SHEAR_ST1956_MECHANISM
 
@@ -94,17 +94,37 @@ TURBULENT_SHEAR_ST1956_MECHANISM = 'turbulent_shear_st1956'
 TURBULENT_SHEAR_ST1956_MECHANISM_FLAG = 8
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_config.py#L21-L21)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_config.py#L25-L25)
+
+## particula.gpu.kernels._coagulation_config.VAN_DER_WAALS_MECHANISM
+
+*attribute* · *module attribute*
+
+```python
+VAN_DER_WAALS_MECHANISM = 'van_der_waals'
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_config.py#L11-L11)
+
+## particula.gpu.kernels._coagulation_config.VAN_DER_WAALS_MECHANISM_FLAG
+
+*attribute* · *module attribute*
+
+```python
+VAN_DER_WAALS_MECHANISM_FLAG = 16
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_config.py#L12-L12)
 
 ## particula.gpu.kernels._coagulation_config._COAGULATION_MECHANISM_FLAGS
 
 *attribute* · *module attribute*
 
 ```python
-_COAGULATION_MECHANISM_FLAGS = MappingProxyType({BROWNIAN_MECHANISM: BROWNIAN_MECHANISM_FLAG, CHARGED_HARD_SPHERE_MECHANISM: CHARGED_HARD_SPHERE_MECHANISM_FLAG, SEDIMENTATION_SP2016_MECHANISM: SEDIMENTATION_SP2016_MECHANISM_FLAG, TURBULENT_SHEAR_ST1956_MECHANISM: TURBULENT_SHEAR_ST1956_MECHANISM_FLAG})
+_COAGULATION_MECHANISM_FLAGS = MappingProxyType({VAN_DER_WAALS_MECHANISM: VAN_DER_WAALS_MECHANISM_FLAG, BROWNIAN_MECHANISM: BROWNIAN_MECHANISM_FLAG, CHARGED_HARD_SPHERE_MECHANISM: CHARGED_HARD_SPHERE_MECHANISM_FLAG, SEDIMENTATION_SP2016_MECHANISM: SEDIMENTATION_SP2016_MECHANISM_FLAG, TURBULENT_SHEAR_ST1956_MECHANISM: TURBULENT_SHEAR_ST1956_MECHANISM_FLAG})
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_config.py#L23-L30)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_config.py#L27-L35)
 
 ## particula.gpu.kernels._coagulation_config.CoagulationMechanismConfig
 
@@ -121,8 +141,10 @@ Configure host-side coagulation mechanism selection.
 - `mechanisms` (`tuple[str, ...] | None`) — Requested identifiers, or ``None`` for Brownian.
 - `distribution_type` (`str`) — Required representation; only ``"particle_resolved"`` is structurally supported.
 - `charged_model` (`str`) — Alternative charged Brownian fit: hard_sphere, dyachkov2007, gatti2008, gopalakrishnan2012 or chahl2019. Nondefault selection requires the charged mechanism.
+- `hamaker_constant` (`float | None`) — Effective dispersion constant across air [J].
+- `relative_permittivity` (`float | None`) — Static relative permittivity of both spheres.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_config.py#L33-L48)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_config.py#L38-L57)
 
 ### particula.gpu.kernels._coagulation_config.CoagulationMechanismConfig.charged_model
 
@@ -132,7 +154,7 @@ Configure host-side coagulation mechanism selection.
 charged_model: str = 'hard_sphere'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_config.py#L48-L48)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_config.py#L55-L55)
 
 ### particula.gpu.kernels._coagulation_config.CoagulationMechanismConfig.distribution_type
 
@@ -142,7 +164,17 @@ charged_model: str = 'hard_sphere'
 distribution_type: str = 'particle_resolved'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_config.py#L47-L47)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_config.py#L54-L54)
+
+### particula.gpu.kernels._coagulation_config.CoagulationMechanismConfig.hamaker_constant
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+hamaker_constant: float | None = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_config.py#L56-L56)
 
 ### particula.gpu.kernels._coagulation_config.CoagulationMechanismConfig.mechanisms
 
@@ -152,14 +184,24 @@ distribution_type: str = 'particle_resolved'
 mechanisms: tuple[str, ...] | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_config.py#L46-L46)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_config.py#L53-L53)
+
+### particula.gpu.kernels._coagulation_config.CoagulationMechanismConfig.relative_permittivity
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+relative_permittivity: float | None = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_config.py#L57-L57)
 
 ### particula.gpu.kernels._coagulation_config.CoagulationMechanismConfig.__init__
 
 *method*
 
 ```python
-def __init__(mechanisms: tuple[str, ...] | None = None, distribution_type: str = 'particle_resolved', charged_model: str = 'hard_sphere') -> None
+def __init__(mechanisms: tuple[str, ...] | None = None, distribution_type: str = 'particle_resolved', charged_model: str = 'hard_sphere', hamaker_constant: float | None = None, relative_permittivity: float | None = None) -> None
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_config.py#L0-L0)
@@ -174,7 +216,7 @@ class _ResolvedCoagulationMechanismConfig
 
 Store a normalized, structurally valid mechanism configuration.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_config.py#L51-L58)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_config.py#L60-L67)
 
 ### particula.gpu.kernels._coagulation_config._ResolvedCoagulationMechanismConfig.charged_model
 
@@ -184,7 +226,7 @@ Store a normalized, structurally valid mechanism configuration.
 charged_model: int = 0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_config.py#L58-L58)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_config.py#L67-L67)
 
 ### particula.gpu.kernels._coagulation_config._ResolvedCoagulationMechanismConfig.distribution_type
 
@@ -194,7 +236,7 @@ charged_model: int = 0
 distribution_type: str
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_config.py#L56-L56)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_config.py#L65-L65)
 
 ### particula.gpu.kernels._coagulation_config._ResolvedCoagulationMechanismConfig.mask
 
@@ -204,7 +246,7 @@ distribution_type: str
 mask: int
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_config.py#L57-L57)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_config.py#L66-L66)
 
 ### particula.gpu.kernels._coagulation_config._ResolvedCoagulationMechanismConfig.mechanisms
 
@@ -214,7 +256,7 @@ mask: int
 mechanisms: tuple[str, ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_config.py#L55-L55)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_config.py#L64-L64)
 
 ### particula.gpu.kernels._coagulation_config._ResolvedCoagulationMechanismConfig.__init__
 
@@ -225,6 +267,18 @@ def __init__(mechanisms: tuple[str, ...], distribution_type: str, mask: int, cha
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_config.py#L0-L0)
+
+## particula.gpu.kernels._coagulation_config._validate_dispersion_config
+
+*function*
+
+```python
+def _validate_dispersion_config(config, seen)
+```
+
+Check explicit material inputs and overlapping thermal mechanisms.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_config.py#L70-L86)
 
 ## particula.gpu.kernels._coagulation_config.resolve_coagulation_mechanism_config
 
@@ -249,7 +303,7 @@ Resolve a configuration through host-side structural validation.
 - `ValueError` — If the distribution type is unsupported, mechanisms are not
 a non-empty tuple of strings, a mechanism is duplicated or unknown.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_config.py#L61-L129)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_config.py#L89-L158)
 
 ## particula.gpu.kernels._coagulation_config.validate_coagulation_mechanism_capabilities
 
@@ -273,4 +327,4 @@ Enforce the executable and deferred mechanism-mask boundary.
 
 - `ValueError` — If the mechanism mask is a deferred three-way combination.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_config.py#L132-L148)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_coagulation_config.py#L161-L177)

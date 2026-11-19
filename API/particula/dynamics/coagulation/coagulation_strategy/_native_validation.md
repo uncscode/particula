@@ -26,7 +26,7 @@ _KernelMethod = TypeVar('_KernelMethod', bound=Callable[..., Any])
 *function*
 
 ```python
-def _evaluate_material_kernel(strategy: Any, material: ParticleData, temperature: float, pressure: float) -> Any
+def _evaluate_material_kernel(strategy: Any, material: ParticleData, temperature: float, pressure: float, **options: Any) -> Any
 ```
 
 Evaluate an admitted combination's child without public re-admission.
@@ -35,7 +35,19 @@ Decorated built-ins expose their material law privately. Custom kernels
 retain their existing direct material-input contract. This helper is used
 only inside a combined kernel after the outer population/control checks.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/_native_validation.py#L195-L208)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/_native_validation.py#L233-L252)
+
+## particula.dynamics.coagulation.coagulation_strategy._native_validation._thermal_mechanisms
+
+*function*
+
+```python
+def _thermal_mechanisms(strategy)
+```
+
+Yield thermal encounter laws inside a validated, acyclic combination.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/_native_validation.py#L68-L84)
 
 ## particula.dynamics.coagulation.coagulation_strategy._native_validation.native_kernel
 
@@ -47,7 +59,7 @@ def native_kernel(method: _KernelMethod) -> _KernelMethod
 
 Admit native state and retain the full kernel slot layout.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/_native_validation.py#L118-L163)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/_native_validation.py#L151-L201)
 
 ## particula.dynamics.coagulation.coagulation_strategy._native_validation.positive_scalar
 
@@ -71,7 +83,7 @@ def rate_radius(particle: ParticleData) -> NDArray[np.float64]
 
 Use the explicit PDF coordinate, otherwise the physical particle size.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/_native_validation.py#L186-L192)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/_native_validation.py#L224-L230)
 
 ## particula.dynamics.coagulation.coagulation_strategy._native_validation.validate_controls
 
@@ -83,7 +95,7 @@ def validate_controls(strategy: Any, kind: str, visiting: set[int] | None = None
 
 Revalidate mutable mechanism controls and composed distribution modes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/_native_validation.py#L68-L115)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/_native_validation.py#L87-L148)
 
 ## particula.dynamics.coagulation.coagulation_strategy._native_validation.validate_particle
 
@@ -107,4 +119,4 @@ def validate_rate_kernel(particle: ParticleData, kernel: Any) -> NDArray[np.floa
 
 Require one finite nonnegative pair value per original slot pair.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/_native_validation.py#L166-L183)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/_native_validation.py#L204-L221)

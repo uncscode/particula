@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 4.104343532002531,
+  "package_source_sha256": "c0aba71344f0a8eb95e7085aec155af949bd08d8f60d964eaa1eca1a7fa901a8",
+  "input_sha256": {
+    "docs/data/coagulation/van-der-waals-measurements.json": "3a71041539a09b562d6ee5ad3992e3aaaa9f812e48d9f8430789a4117ebbdf39"
+  },
+  "example": "van-der-waals",
+  "fingerprint": "43908ad60a929e598696daf44f681bfbd63a0b58f78a871be65607cb4d58d917",
+  "source": "docs/examples/processes/coagulation/van_der_waals.py",
+  "revision": "9a8ade0d28a7a358a7d9ed8330ab892808b2edaf",
+  "package_dirty": false,
+  "executed_at": "2026-11-19T02:29:40.054846+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.2",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [
+      {
+        "image": "figure-4-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "figure-4-1.png": "b728cd20f91ca72ba884a8fd692e0320bdcf723440813cdefed4e88d480cc636",
+    "data.json": "a5917c3be0b417de1f67968b503dcb728a6b0c2168f13b358376d588dc14f8d0",
+    "source.py": "cb7d083173f8689aa80124aba39faedd9d41367a440fd1ed740e28c13c51123a"
+  },
+  "simulation_fingerprint": "47423545fdf34a9e923c48c5fd9c95a8ff2e24692126e2689bf33f6c608d3752"
+}

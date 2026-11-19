@@ -22,7 +22,7 @@ and aggregates multiple strategies.
 logger = logging.getLogger('particula')
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/combine_coagulation_strategy.py#L23-L23)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/combine_coagulation_strategy.py#L28-L28)
 
 ## particula.dynamics.coagulation.coagulation_strategy.combine_coagulation_strategy.CombineCoagulationStrategy
 
@@ -72,7 +72,7 @@ k_value = combined_strategy.kernel(
 >
 > - No specific references. Summation approach is straightforward.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/combine_coagulation_strategy.py#L26-L158)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/combine_coagulation_strategy.py#L31-L174)
 
 ### particula.dynamics.coagulation.coagulation_strategy.combine_coagulation_strategy.CombineCoagulationStrategy.strategies
 
@@ -82,7 +82,7 @@ k_value = combined_strategy.kernel(
 strategies = strategies
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/combine_coagulation_strategy.py#L91-L91)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/combine_coagulation_strategy.py#L96-L96)
 
 ### particula.dynamics.coagulation.coagulation_strategy.combine_coagulation_strategy.CombineCoagulationStrategy.distribution_type
 
@@ -179,7 +179,7 @@ Initialize the combined coagulation strategy.
 - `ValueError` — If no strategies are provided or if they have
 mismatched distribution types.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/combine_coagulation_strategy.py#L66-L91)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/combine_coagulation_strategy.py#L71-L97)
 
 ### particula.dynamics.coagulation.coagulation_strategy.combine_coagulation_strategy.CombineCoagulationStrategy.dimensionless_kernel
 
@@ -205,14 +205,14 @@ strategies. This method logs an error and raises NotImplementedError.
 - `NotImplementedError` — This method is not supported in the
 combined strategy.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/combine_coagulation_strategy.py#L93-L119)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/combine_coagulation_strategy.py#L99-L125)
 
 ### particula.dynamics.coagulation.coagulation_strategy.combine_coagulation_strategy.CombineCoagulationStrategy.kernel
 
 *method*
 
 ```python
-def kernel(particle: ParticleData, temperature: float, pressure: float) -> Union[float, NDArray[np.float64]]
+def kernel(particle: ParticleData, temperature: float, pressure: float, *, exclude_self_pairs: bool = False) -> Union[float, NDArray[np.float64]]
 ```
 
 Compute the total coagulation kernel by summing the kernels from all
@@ -223,6 +223,7 @@ underlying strategies.
 - `particle` (`ParticleData`) — The particle data instance containing particle data (radii, distribution, etc.).
 - `temperature` (`float`) — The temperature in Kelvin [K].
 - `pressure` (`float`) — The pressure in Pascals [Pa].
+- `exclude_self_pairs` (`bool`) (default: `False`) — Omit a resolved slot paired with itself.
 
 **Returns**
 
@@ -240,7 +241,7 @@ k_combined = combined_strategy.kernel(
 # combined_strategy
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/combine_coagulation_strategy.py#L121-L158)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/combine_coagulation_strategy.py#L127-L174)
 
 ### particula.dynamics.coagulation.coagulation_strategy.combine_coagulation_strategy.CombineCoagulationStrategy.coulomb_potential_ratio
 

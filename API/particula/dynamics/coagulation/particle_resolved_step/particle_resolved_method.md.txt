@@ -29,7 +29,7 @@ Calculate coagulation probabilities for sampled particle pairs.
 - (`Union[float, NDArray[np.float64]]`) — Probability (or array of probabilities) that collisions occur during
 - (`Union[float, NDArray[np.float64]]`) — the step.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method.py#L316-L336)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method.py#L358-L378)
 
 ## particula.dynamics.coagulation.particle_resolved_step.particle_resolved_method._final_coagulation_state
 
@@ -54,7 +54,7 @@ remaps merges so each small particle maps to one final large particle.
 
 - (`Tuple[NDArray[np.int64], NDArray[np.int64]]`) — Tuple of ``(small_indices, large_indices)`` with conflicts resolved.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method.py#L339-L373)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method.py#L381-L415)
 
 ## particula.dynamics.coagulation.particle_resolved_step.particle_resolved_method._interpolate_kernel
 
@@ -80,14 +80,14 @@ extrapolation outside the tabulated radius range.
 - (`RegularGridInterpolator`) — RegularGridInterpolator that maps ``[r_small, r_large]`` pairs to
 - (`RegularGridInterpolator`) — kernel values with safe bounds handling.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method.py#L285-L313)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method.py#L327-L355)
 
 ## particula.dynamics.coagulation.particle_resolved_step.particle_resolved_method.get_particle_resolved_coagulation_step
 
 *function*
 
 ```python
-def get_particle_resolved_coagulation_step(particle_radius: NDArray[np.float64], kernel: NDArray[np.float64], kernel_radius: NDArray[np.float64], volume: float, time_step: float, random_generator: np.random.Generator, kernel_func: Optional[Callable[[NDArray[np.float64], NDArray[np.float64]], NDArray[np.float64]]] = None, kernel_index_func: Optional[Callable[[NDArray[np.int64], NDArray[np.int64]], NDArray[np.float64]]] = None) -> NDArray[np.int64]
+def get_particle_resolved_coagulation_step(particle_radius: NDArray[np.float64], kernel: NDArray[np.float64], kernel_radius: NDArray[np.float64], volume: float, time_step: float, random_generator: np.random.Generator, kernel_func: Optional[Callable[[NDArray[np.float64], NDArray[np.float64]], NDArray[np.float64]]] = None, kernel_index_func: Optional[Callable[[NDArray[np.int64], NDArray[np.int64]], NDArray[np.float64]]] = None, *, exact_pair_rates: Optional[NDArray[np.float64]] = None) -> NDArray[np.int64]
 ```
 
 Perform one stochastic coagulation step for a particle population.
@@ -105,6 +105,7 @@ indices describe which small particles merged into which large particles.
 - `time_step` (`float`) — Duration of the coagulation step in seconds.
 - `random_generator` (`np.random.Generator`) — NumPy random generator used for sampling.
 - `kernel_func` (`Optional[Callable[[NDArray[np.float64], NDArray[np.float64]], NDArray[np.float64]]]`) (default: `None`) — Optional callable for direct kernel evaluation. When provided, it is called with ``(r_small, r_large)`` inputs and should return a 1D array of kernel values.
+- `exact_pair_rates` (`Optional[NDArray[np.float64]]`) (default: `None`) — Optional actual slot-pair matrix for both trial bounds and acceptance, with zero diagonal and units m³/s.
 - `kernel_index_func` (`Optional[Callable[[NDArray[np.int64], NDArray[np.int64]], NDArray[np.float64]]]`) (default: `None`) — Optional callable for direct kernel evaluation using particle indices. When provided, it is called with ``(small_index, large_index)`` arrays and should return a 1D array of kernel values. Takes precedence over ``kernel_func``.
 
 **Returns**
@@ -112,7 +113,7 @@ indices describe which small particles merged into which large particles.
 - (`NDArray[np.int64]`) — Array of shape ``(n, 2)`` with ``[small_index, large_index]`` pairs
 - (`NDArray[np.int64]`) — describing coagulation events.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method.py#L57-L282)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method.py#L57-L324)
 
 ## particula.dynamics.coagulation.particle_resolved_step.particle_resolved_method.get_particle_resolved_update_step
 

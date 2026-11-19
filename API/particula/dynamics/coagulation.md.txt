@@ -8,6 +8,7 @@ Coagulation dynamics sub-package.
 
 **Modules**
 
+- `particula.dynamics.coagulation._pair_potential`
 - `particula.dynamics.coagulation.brownian_kernel`
 - `particula.dynamics.coagulation.charged_dimensional_kernel`
 - `particula.dynamics.coagulation.charged_dimensionless_kernel`
@@ -20,3 +21,4 @@ Coagulation dynamics sub-package.
 - `particula.dynamics.coagulation.sedimentation_kernel`
 - `particula.dynamics.coagulation.turbulent_dns_kernel`
 - `particula.dynamics.coagulation.turbulent_shear_kernel`
+- `particula.dynamics.coagulation.van_der_waals_kernel`
