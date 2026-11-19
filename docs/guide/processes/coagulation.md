@@ -649,7 +649,10 @@ duplicates the thermal encounter and raises an error.
 Discrete bins and radius PDFs retain their existing fixed composition and
 prescribed charge per bin. For evolving charge distributions, resolved
 collisions use actual slot pairs and merge their signed charges. The CPU
-resolved path computes a dense pair matrix for exact bin bounds. The CUDA
+resolved path computes a dense pair matrix for exact bin bounds. It checks
+the capture domain for every pair of distinct active slots, including slots
+with identical material properties. To inspect that matrix for an active
+population, pass `exclude_self_pairs=True` to the strategy’s `kernel`. The CUDA
 resolved sampler uses tiled pair scans and equal positive counts per box.
 [Pair calculation and measurements](../../examples/processes/coagulation/van_der_waals.py) ·
 [Theory and assumptions](../../theory/dynamics/interparticle-forces.md) ·

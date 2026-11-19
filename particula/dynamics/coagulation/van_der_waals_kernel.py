@@ -158,6 +158,8 @@ def get_van_der_waals_kernel_via_system_state(
     pressure,
     hamaker_constant,
     relative_permittivity,
+    *,
+    exclude_self_pairs=False,
 ):
     """Return the symmetric thermal encounter matrix in m³/s.
 
@@ -169,6 +171,8 @@ def get_van_der_waals_kernel_via_system_state(
         pressure: Gas pressure [Pa].
         hamaker_constant: Effective dispersion constant across air [J].
         relative_permittivity: Relative static permittivity of both particles.
+        exclude_self_pairs: For actual resolved slots, omit a slot paired
+            with itself. Distinct slots with equal properties still interact.
 
     Returns:
         Square kernel array for compact polarizable spheres with unit sticking.
@@ -196,8 +200,11 @@ def get_van_der_waals_kernel_via_system_state(
         raise ValueError("radius and mass must be positive")
     # Repeated resolved material states have identical pair rates. Evaluate
     # the distinct states once, then restore the requested slot layout.
-    states, slot = np.unique(
-        np.column_stack((radius, mass, charge)), axis=0, return_inverse=True
+    states, slot, counts = np.unique(
+        np.column_stack((radius, mass, charge)),
+        axis=0,
+        return_inverse=True,
+        return_counts=True,
     )
     radius, mass, charge = states.T
     viscosity = get_dynamic_viscosity(temperature)
@@ -206,9 +213,11 @@ def get_van_der_waals_kernel_via_system_state(
     )
     slip = get_cunningham_slip_correction(get_knudsen_number(path, radius))
     friction = get_friction_factor(radius, viscosity, slip)
-    result = np.empty((len(radius), len(radius)))
+    result = np.zeros((len(radius), len(radius)))
     for i in range(len(radius)):
-        for j in range(i + 1):
+        # A same-state pair exists only when two slots share that state.
+        pair_count = i if exclude_self_pairs and counts[i] == 1 else i + 1
+        for j in range(pair_count):
             contact = radius[i] + radius[j]
             if (COULOMB_LENGTH_T / (contact * temperature)) * charge[
                 i
@@ -234,4 +243,7 @@ def get_van_der_waals_kernel_via_system_state(
             result[i, j] = result[j, i] = (
                 drag * contact**3 / mu * (ef**2 / ec) * h
             )
-    return result[np.ix_(slot, slot)]
+    matrix = result[np.ix_(slot, slot)]
+    if exclude_self_pairs:
+        np.fill_diagonal(matrix, 0.0)
+    return matrix

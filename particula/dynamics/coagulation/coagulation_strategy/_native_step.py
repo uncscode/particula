@@ -355,8 +355,9 @@ def step_native(  # noqa: C901
             raise ValueError(
                 "kernel radius edges must cover every active particle"
             )
-        actual = strategy.kernel(material, temperature, pressure)
-        np.fill_diagonal(actual, 0)
+        actual = strategy.kernel(
+            material, temperature, pressure, exclude_self_pairs=True
+        )
         if time_step == 0:
             return particle
         pairs = particle_resolved_method.get_particle_resolved_coagulation_step(

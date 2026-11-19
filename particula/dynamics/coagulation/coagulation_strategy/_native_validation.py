@@ -153,7 +153,11 @@ def native_kernel(method: _KernelMethod) -> _KernelMethod:
 
     @wraps(method)
     def evaluate(
-        self: Any, particle: Any, temperature: float, pressure: float
+        self: Any,
+        particle: Any,
+        temperature: float,
+        pressure: float,
+        **options: Any,
     ) -> Any:
         validate_particle(particle, self.distribution_type)
         positive_scalar(temperature, "temperature")
@@ -176,7 +180,8 @@ def native_kernel(method: _KernelMethod) -> _KernelMethod:
             volume=particle.volume,
         )
         values = np.asarray(
-            method(self, material, temperature, pressure), dtype=np.float64
+            method(self, material, temperature, pressure, **options),
+            dtype=np.float64,
         )
         if (
             values.shape != (indices.size, indices.size)
@@ -226,7 +231,11 @@ def rate_radius(particle: ParticleData) -> NDArray[np.float64]:
 
 
 def _evaluate_material_kernel(
-    strategy: Any, material: ParticleData, temperature: float, pressure: float
+    strategy: Any,
+    material: ParticleData,
+    temperature: float,
+    pressure: float,
+    **options: Any,
 ) -> Any:
     """Evaluate an admitted combination's child without public re-admission.
 
@@ -237,5 +246,7 @@ def _evaluate_material_kernel(
     method = strategy.kernel
     law = getattr(method, "_coagulation_material_kernel", None)
     if law is not None:
-        return law(strategy, material, temperature, pressure)
-    return method(particle=material, temperature=temperature, pressure=pressure)
+        return law(strategy, material, temperature, pressure, **options)
+    return method(
+        particle=material, temperature=temperature, pressure=pressure, **options
+    )

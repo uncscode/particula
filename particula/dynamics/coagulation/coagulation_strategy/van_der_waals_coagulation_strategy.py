@@ -50,8 +50,10 @@ class VanDerWaalsCoagulationStrategy(CoagulationStrategyABC):
         particle: ParticleData,
         temperature: float,
         pressure: float,
+        *,
+        exclude_self_pairs: bool = False,
     ) -> np.ndarray:
-        """Return the thermal pair kernel [m³/s] in the native slot layout."""
+        """Return pair rates [m³/s], optionally excluding slot self-pairs."""
         return get_van_der_waals_kernel_via_system_state(
             _get_radius(particle),
             _get_mass(particle),
@@ -60,4 +62,5 @@ class VanDerWaalsCoagulationStrategy(CoagulationStrategyABC):
             pressure,
             self.hamaker_constant,
             self.relative_permittivity,
+            exclude_self_pairs=exclude_self_pairs,
         )

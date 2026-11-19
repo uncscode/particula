@@ -141,3 +141,69 @@ def test_native_rejection_and_composition():
     k = s.kernel(p, 298.0, 101325.0)
     assert k[0, 0] > 0
     np.testing.assert_array_equal(k[1, :], 0)
+
+
+@pytest.mark.parametrize("combine", [False, True])
+def test_resolved_domain_only_checks_distinct_slots(combine):
+    """A singleton charged state may collide with a larger neutral sphere."""
+    radii = np.array([5.0, 50.0]) * 1e-9
+    density = 2000.0
+    masses = 4 * np.pi / 3 * density * radii**3
+    particles = ParticleData(
+        masses=masses[None, :, None],
+        density=np.array([density]),
+        charge=np.array([[4.0, 0.0]]),
+        concentration=np.ones((1, 2)),
+        volume=np.ones(1),
+        distribution_type="particle_resolved",
+    )
+    capture = dyn.VanDerWaalsCoagulationStrategy("particle_resolved", 0.0, 1.0)
+    # With zero dispersion and permittivity one, this charged-neutral pair
+    # is exactly hard-sphere. Only the hypothetical small self-pair is invalid.
+    expected = dyn.get_hard_sphere_kernel_via_system_state(
+        radii, masses, np.zeros(2), 298.0, 101325.0
+    )[0, 1]
+    strategy = capture
+    if combine:
+        settling = dyn.SedimentationCoagulationStrategy("particle_resolved")
+        expected += settling.kernel(particles, 298.0, 101325.0)[0, 1]
+        strategy = dyn.CombineCoagulationStrategy(
+            [dyn.CombineCoagulationStrategy([capture]), settling]
+        )
+    strategy.random_generator = np.random.default_rng(42)
+    strategy.step(particles, 298.0, 101325.0, 0.999999 / expected)
+    assert np.count_nonzero(particles.concentration) == 1
+    assert particles.masses.sum() == pytest.approx(masses.sum(), abs=0)
+    assert particles.charge.sum() == 4
+
+
+def test_real_pairs_between_repeated_charged_states_keep_domain_checks():
+    """Identical material in distinct slots is still a real encounter."""
+    mass = 4 * np.pi / 3 * 2000 * (5e-9) ** 3
+    particles = ParticleData(
+        masses=np.full((1, 2, 1), mass),
+        density=np.array([2000.0]),
+        charge=np.full((1, 2), 4.0),
+        concentration=np.ones((1, 2)),
+        volume=np.ones(1),
+        distribution_type="particle_resolved",
+    )
+    capture = dyn.VanDerWaalsCoagulationStrategy("particle_resolved", 0.0, 1.0)
+    rng = copy.deepcopy(capture.random_generator.bit_generator.state)
+    with pytest.raises(ValueError, match="capture table domain"):
+        capture.step(particles, 298.0, 101325.0, 1.0)
+    assert capture.random_generator.bit_generator.state == rng
+    np.testing.assert_array_equal(particles.concentration, [[1.0, 1.0]])
+
+
+def test_resolved_identical_material_retains_cross_slot_rates():
+    """A duplicate material keeps the physical rate on off-diagonal slots."""
+    radii = np.array([10.0, 40.0, 10.0]) * 1e-9
+    masses = 4 * np.pi / 3 * 2000 * radii**3
+    inputs = radii, masses, [1.0, 0.0, 1.0], 298.0, 101325.0, 8.9e-20, 5.9
+    evaluate = dyn.get_van_der_waals_kernel_via_system_state
+    full = evaluate(*inputs)
+    distinct = evaluate(*inputs, exclude_self_pairs=True)
+    assert full[0, 0] == full[0, 2] > 0
+    np.fill_diagonal(full, 0)
+    np.testing.assert_array_equal(distinct, full)
