@@ -1010,5 +1010,20 @@
       "docs/data/nacl-scavenging/pulse-kernels-summary.csv",
       "docs/data/nacl-scavenging/pulse-smps-spectrum.csv"
     ]
+  },
+  "spherical-wall-loss-theory": {
+    "title": "CUDA wall loss agrees with spherical deposition theory",
+    "source": "docs/examples/processes/wall-loss/spherical_wall_loss_theory.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 600,
+    "inputs": [],
+    "invoke": "result = simulate()\nfigure = plot_results(result)\nplt.show()",
+    "data_expression": "result",
+    "replot_invoke": "result = saved_data\nfigure = plot_results(result)\nplt.show()",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": []
   }
 }

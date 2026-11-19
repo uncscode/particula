@@ -6,6 +6,7 @@ budget before fitting a combined model to measurements.
 
 | Question | Example | What to inspect |
 | --- | --- | --- |
+| Does CUDA particle removal reproduce the published spherical theory? | [CUDA theory comparison](spherical_wall_loss_theory.py) | Agreement with theory, sampling uncertainty and the untested measurement comparison |
 | Did I enter chamber dimensions and coefficients in the right units? | [Builders and factory](wall_loss_builders_factory.py) | Converted geometry and the distinction between s⁻¹ coefficients and concentration rates |
 | How does size-dependent removal change a spherical chamber spectrum? | [Spherical wall loss](spherical_wall_loss_strategy.py) | 100-minute decay, per-bin removal, unchanged individual masses |
 | How is a rectangular decay step checked? | [Rectangular wall loss](rectangular_wall_loss_strategy.py) | 30-minute trajectory, positivity substeps, repeated-Euler reference |

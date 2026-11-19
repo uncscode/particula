@@ -524,6 +524,10 @@
               {
                 "label": "Wall Loss Tutorial: Spherical vs Rectangular Chambers",
                 "slug": "examples/processes/wall-loss/wall_loss_tutorial"
+              },
+              {
+                "label": "CUDA comparison with spherical theory",
+                "slug": "examples/processes/wall-loss/spherical_wall_loss_theory"
               }
             ]
           }
@@ -1113,6 +1117,10 @@
                     "slug": "contribute/validation/gpu/legacy-benchmarks/gpu_benchmarks"
                   }
                 ]
+              },
+              {
+                "label": "Spherical wall-loss theory comparison",
+                "slug": "contribute/validation/gpu/spherical-wall-loss"
               }
             ]
           },

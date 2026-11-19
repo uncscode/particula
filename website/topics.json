@@ -2696,6 +2696,26 @@
       ],
       "role": "Contribute",
       "start_here": false
+    },
+    {
+      "source": "docs/examples/processes/wall-loss/spherical_wall_loss_theory.py",
+      "title": "CUDA wall loss agrees with spherical deposition theory",
+      "topic": "losses-deposition",
+      "also": [
+        "verification"
+      ],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/contribute/validation/gpu/spherical-wall-loss.md",
+      "title": "CUDA wall loss agrees with spherical deposition theory",
+      "topic": "losses-deposition",
+      "also": [
+        "verification"
+      ],
+      "role": "Contribute",
+      "start_here": false
     }
   ],
   "supporting": [
@@ -2838,6 +2858,10 @@
     {
       "source": "docs/guide/topics/index.md",
       "reason": "Offline entry to the generated topic explorer; avoids a self-referential resource."
+    },
+    {
+      "source": "docs/contribute/validation/gpu/spherical-wall-loss-specification.md",
+      "reason": "Frozen inputs and acceptance criteria supporting the spherical wall-loss validation record."
     }
   ]
 }
