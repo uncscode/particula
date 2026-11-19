@@ -1141,6 +1141,10 @@
             "slug": "contribute/validation/thermodynamics/pi-chamber"
           },
           {
+            "label": "Π Chamber species and organic vapor",
+            "slug": "contribute/validation/thermodynamics/pi-chamber-species"
+          },
+          {
             "label": "CCN retrieval study",
             "slug": "contribute/validation/thermodynamics/ccn-retrieval"
           },

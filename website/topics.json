@@ -1899,6 +1899,17 @@
       "start_here": false
     },
     {
+      "source": "docs/contribute/validation/thermodynamics/pi-chamber-species.md",
+      "title": "Seed chemistry and organic vapor in the Π Chamber",
+      "topic": "chambers",
+      "also": [
+        "condensation",
+        "condensation-reservoirs"
+      ],
+      "role": "Contribute",
+      "start_here": false
+    },
+    {
       "source": "docs/contribute/validation/thermodynamics/pi-chamber.md",
       "title": "Haze and cloud partitioning in the Π Chamber",
       "topic": "chambers",

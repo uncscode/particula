@@ -40,6 +40,8 @@ A separate synthetic experiment held dry constituent volumes fixed at each size 
 
 ![Particle-specific and instrument-detected activation across three mixing states and three mean supersaturations for the synthetic continental source.](../../../images/thermodynamics/pi-chamber-mixtures.png)
 
+The [species and organic vapor companion](pi-chamber-species.md) compares NaCl and ammonium sulfate at 130 nm and tests semivolatile organic uptake and evaporation with BAT.
+
 ## Inputs, uncertainties and reproduction
 
 The steady-state process and mixture calculations used Particula revision `c76cfb5993`. The subsequent 68-case inverse study used `4d6fcba740`, including the differentiable inversion work in PR #1676. The original adjoint recovery control reproduced the synthetic initial radii within 0.61 nm. The chamber fit differentiated a piecewise-linear interpolation of log observations from the aqueous particle model. Each of its intervals has a bounded quadratic minimum, which the downloadable example recomputes from the archived grid. Haze number and two log ratios of haze bins receive equal weight. There is no experimental covariance estimate for this objective. [Inversion qualification](../numerics/initial-size-inversion.md) · [Optical grid](https://github.com/uncscode/particula/blob/main/docs/data/pi-chamber/haze-grid.csv)
