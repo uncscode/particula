@@ -1,19 +1,19 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 286.81698172399774,
-  "package_source_sha256": "cab2ecf96c60a0d1d005885793a221697dc3037bb3be50d8438b4de458423cbc",
+  "elapsed_seconds": 287.7732127889758,
+  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "examples-simulations-cough-droplets-partitioning",
-  "fingerprint": "28b5c886b2900b2c14503fd15fd5b60695f5e912407287bb3fe575f86d8abcd2",
+  "fingerprint": "ccc2cce2488b72aa7a2858735e07659411151d488aa30174f030f29726922731",
   "source": "docs/examples/simulations/cough_droplets_partitioning.py",
-  "revision": "9c548d9d617a93cd23a45773426f751e9e6ed9ec",
+  "revision": "adbacebcb9e41726b29abf99278b8980a62b18fe",
   "package_dirty": false,
-  "executed_at": "2026-11-16T14:41:48.416131+00:00",
+  "executed_at": "2026-11-19T15:16:41.195316+00:00",
   "device": "cuda:0: NVIDIA GeForce RTX 5060",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.3.1",
+    "particula": "0.3.2",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
@@ -68,205 +68,202 @@
         "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\n"
       },
       {
-        "text": "Module particula.execution._condensation_ode_kernels 9425cdf load on device 'cuda:0' took 3.52 ms  (cached)\nModule particula.gpu.kernels.thermodynamics 10b2126 load on device 'cuda:0' took 5.94 ms  (cached)\nModule particula.gpu.kernels.condensation ad8087d load on device 'cuda:0' took 5.99 ms  (cached)\nModule particula.execution._adaptive_condensation_physics a3e6636 load on device 'cuda:0' took 5.43 ms  (cached)\nModule particula.execution._condensation_reservoirs b231d81 load on device 'cuda:0' took 5.95 ms  (cached)\nModule particula.execution._condensation_device_control 053a506 load on device 'cuda:0' took 3.92 ms  (cached)\nModule particula.execution._condensation_ros3_kernels d88df3a load on device 'cuda:0' took 5.17 ms  (cached)\nModule particula.execution._condensation_block_kernels d2447a5 load on device 'cuda:0' took 5.08 ms  (cached)\n"
+        "text": "Module particula.execution._condensation_ode_kernels b6cefee load on device 'cuda:0' took 5.28 ms  (cached)\nModule particula.gpu.kernels.thermodynamics 10b2126 load on device 'cuda:0' took 5.70 ms  (cached)\nModule particula.gpu.kernels.condensation ad8087d load on device 'cuda:0' took 5.81 ms  (cached)\nModule particula.execution._adaptive_condensation_physics 5bb51fa load on device 'cuda:0' took 4.78 ms  (cached)\nModule particula.execution._condensation_reservoirs b231d81 load on device 'cuda:0' took 5.58 ms  (cached)\nModule particula.execution._condensation_device_control 053a506 load on device 'cuda:0' took 0.85 ms  (cached)\nModule particula.execution._condensation_ros3_kernels d88df3a load on device 'cuda:0' took 4.55 ms  (cached)\nModule particula.execution._condensation_block_kernels d2447a5 load on device 'cuda:0' took 4.26 ms  (cached)\n"
       },
       {
         "text": "\rRunning Sim:   0%|          | 0/201 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rRunning Sim:   1%|          | 2/201 [03:03<5:03:58, 91.65s/it]"
+        "text": "\rRunning Sim:   1%|          | 2/201 [03:02<5:02:39, 91.25s/it]"
       },
       {
-        "text": "\rRunning Sim:   1%|\u258f         | 3/201 [03:18<3:16:40, 59.60s/it]"
+        "text": "\rRunning Sim:   1%|\u258f         | 3/201 [03:17<3:15:48, 59.34s/it]"
       },
       {
-        "text": "\rRunning Sim:   2%|\u258f         | 4/201 [03:27<2:13:54, 40.79s/it]"
+        "text": "\rRunning Sim:   2%|\u258f         | 4/201 [03:26<2:13:19, 40.61s/it]"
       },
       {
-        "text": "\rRunning Sim:   2%|\u258f         | 5/201 [03:33<1:34:05, 28.81s/it]"
+        "text": "\rRunning Sim:   2%|\u258f         | 5/201 [03:32<1:33:40, 28.67s/it]"
       },
       {
-        "text": "\rRunning Sim:   3%|\u258e         | 6/201 [03:36<1:05:49, 20.25s/it]"
+        "text": "\rRunning Sim:   3%|\u258e         | 6/201 [03:35<1:05:30, 20.15s/it]"
       },
       {
-        "text": "\rRunning Sim:   3%|\u258e         | 7/201 [03:40<48:21, 14.95s/it]  "
+        "text": "\rRunning Sim:   3%|\u258e         | 7/201 [03:39<48:06, 14.88s/it]  "
       },
       {
-        "text": "\rRunning Sim:   4%|\u258d         | 8/201 [03:42<35:28, 11.03s/it]"
+        "text": "\rRunning Sim:   4%|\u258d         | 8/201 [03:41<35:16, 10.97s/it]"
       },
       {
-        "text": "\rRunning Sim:   4%|\u258d         | 9/201 [03:44<25:32,  7.98s/it]"
+        "text": "\rRunning Sim:   4%|\u258d         | 9/201 [03:43<25:24,  7.94s/it]"
       },
       {
-        "text": "\rRunning Sim:   5%|\u258d         | 10/201 [03:46<20:29,  6.44s/it]"
+        "text": "\rRunning Sim:   5%|\u258d         | 10/201 [03:45<20:21,  6.40s/it]"
       },
       {
-        "text": "\rRunning Sim:   5%|\u258c         | 11/201 [03:49<16:42,  5.28s/it]"
+        "text": "\rRunning Sim:   5%|\u258c         | 11/201 [03:48<16:36,  5.24s/it]"
       },
       {
-        "text": "\rRunning Sim:   6%|\u258c         | 12/201 [03:52<14:12,  4.51s/it]"
+        "text": "\rRunning Sim:   6%|\u258c         | 12/201 [03:51<14:07,  4.48s/it]"
       },
       {
-        "text": "\rRunning Sim:   6%|\u258b         | 13/201 [03:54<12:00,  3.83s/it]"
+        "text": "\rRunning Sim:   6%|\u258b         | 13/201 [03:53<11:55,  3.81s/it]"
       },
       {
-        "text": "\rRunning Sim:   7%|\u258b         | 14/201 [03:55<08:52,  2.85s/it]"
+        "text": "\rRunning Sim:   7%|\u258b         | 14/201 [03:54<08:48,  2.83s/it]"
       },
       {
-        "text": "\rRunning Sim:   7%|\u258b         | 15/201 [03:56<07:25,  2.39s/it]"
+        "text": "\rRunning Sim:   7%|\u258b         | 15/201 [03:55<07:21,  2.37s/it]"
       },
       {
-        "text": "\rRunning Sim:   8%|\u258a         | 16/201 [03:58<06:30,  2.11s/it]"
+        "text": "\rRunning Sim:   8%|\u258a         | 16/201 [03:56<06:27,  2.10s/it]"
       },
       {
-        "text": "\rRunning Sim:   9%|\u2589         | 18/201 [03:58<04:01,  1.32s/it]"
+        "text": "\rRunning Sim:   9%|\u2589         | 18/201 [03:57<03:59,  1.31s/it]"
       },
       {
-        "text": "\rRunning Sim:  10%|\u2589         | 20/201 [03:59<02:49,  1.07it/s]"
+        "text": "\rRunning Sim:  10%|\u2589         | 20/201 [03:58<02:47,  1.08it/s]"
       },
       {
-        "text": "\rRunning Sim:  10%|\u2588         | 21/201 [04:00<02:33,  1.17it/s]"
+        "text": "\rRunning Sim:  10%|\u2588         | 21/201 [03:58<02:32,  1.18it/s]"
       },
       {
-        "text": "\rRunning Sim:  11%|\u2588         | 22/201 [04:01<02:48,  1.06it/s]"
+        "text": "\rRunning Sim:  11%|\u2588         | 22/201 [04:00<02:46,  1.07it/s]"
       },
       {
-        "text": "\rRunning Sim:  11%|\u2588\u258f        | 23/201 [04:02<03:12,  1.08s/it]"
+        "text": "\rRunning Sim:  11%|\u2588\u258f        | 23/201 [04:01<03:11,  1.07s/it]"
       },
       {
-        "text": "\rRunning Sim:  12%|\u2588\u258f        | 25/201 [04:03<02:18,  1.27it/s]"
+        "text": "\rRunning Sim:  12%|\u2588\u258f        | 25/201 [04:02<02:17,  1.28it/s]"
       },
       {
-        "text": "\rRunning Sim:  13%|\u2588\u258e        | 27/201 [04:04<02:10,  1.34it/s]"
+        "text": "\rRunning Sim:  13%|\u2588\u258e        | 27/201 [04:03<02:09,  1.34it/s]"
       },
       {
-        "text": "\rRunning Sim:  14%|\u2588\u258d        | 28/201 [04:06<02:31,  1.14it/s]"
+        "text": "\rRunning Sim:  14%|\u2588\u258d        | 28/201 [04:05<02:29,  1.15it/s]"
       },
       {
-        "text": "\rRunning Sim:  14%|\u2588\u258d        | 29/201 [04:06<02:15,  1.27it/s]"
+        "text": "\rRunning Sim:  15%|\u2588\u258d        | 30/201 [04:05<01:56,  1.47it/s]"
       },
       {
-        "text": "\rRunning Sim:  16%|\u2588\u258c        | 32/201 [04:07<01:26,  1.96it/s]"
+        "text": "\rRunning Sim:  16%|\u2588\u258b        | 33/201 [04:06<01:20,  2.10it/s]"
       },
       {
-        "text": "\rRunning Sim:  17%|\u2588\u258b        | 35/201 [04:08<01:04,  2.55it/s]"
+        "text": "\rRunning Sim:  18%|\u2588\u258a        | 36/201 [04:07<01:03,  2.60it/s]"
       },
       {
-        "text": "\rRunning Sim:  18%|\u2588\u258a        | 37/201 [04:08<01:00,  2.69it/s]"
+        "text": "\rRunning Sim:  19%|\u2588\u2589        | 38/201 [04:08<01:05,  2.48it/s]"
       },
       {
-        "text": "\rRunning Sim:  19%|\u2588\u2589        | 39/201 [04:10<01:15,  2.13it/s]"
+        "text": "\rRunning Sim:  20%|\u2588\u2589        | 40/201 [04:09<01:20,  1.99it/s]"
       },
       {
-        "text": "\rRunning Sim:  20%|\u2588\u2588        | 41/201 [04:11<01:21,  1.96it/s]"
+        "text": "\rRunning Sim:  21%|\u2588\u2588        | 42/201 [04:10<01:24,  1.89it/s]"
       },
       {
-        "text": "\rRunning Sim:  21%|\u2588\u2588\u258f       | 43/201 [04:12<01:25,  1.85it/s]"
+        "text": "\rRunning Sim:  22%|\u2588\u2588\u258f       | 44/201 [04:11<01:19,  1.98it/s]"
       },
       {
-        "text": "\rRunning Sim:  22%|\u2588\u2588\u258f       | 45/201 [04:13<01:12,  2.15it/s]"
+        "text": "\rRunning Sim:  23%|\u2588\u2588\u258e       | 46/201 [04:12<01:06,  2.32it/s]"
       },
       {
-        "text": "\rRunning Sim:  23%|\u2588\u2588\u258e       | 47/201 [04:13<01:06,  2.32it/s]"
+        "text": "\rRunning Sim:  24%|\u2588\u2588\u258d       | 48/201 [04:13<01:09,  2.21it/s]"
       },
       {
-        "text": "\rRunning Sim:  24%|\u2588\u2588\u258d       | 49/201 [04:15<01:13,  2.06it/s]"
+        "text": "\rRunning Sim:  25%|\u2588\u2588\u258d       | 50/201 [04:14<01:14,  2.03it/s]"
       },
       {
-        "text": "\rRunning Sim:  25%|\u2588\u2588\u258c       | 51/201 [04:16<01:19,  1.89it/s]"
+        "text": "\rRunning Sim:  26%|\u2588\u2588\u258c       | 52/201 [04:15<01:20,  1.85it/s]"
       },
       {
-        "text": "\rRunning Sim:  26%|\u2588\u2588\u258b       | 53/201 [04:17<01:17,  1.92it/s]"
+        "text": "\rRunning Sim:  27%|\u2588\u2588\u258b       | 54/201 [04:16<01:08,  2.13it/s]"
       },
       {
-        "text": "\rRunning Sim:  28%|\u2588\u2588\u258a       | 56/201 [04:17<00:56,  2.57it/s]"
+        "text": "\rRunning Sim:  29%|\u2588\u2588\u2589       | 58/201 [04:16<00:45,  3.12it/s]"
       },
       {
-        "text": "\rRunning Sim:  30%|\u2588\u2588\u2589       | 60/201 [04:18<00:39,  3.56it/s]"
+        "text": "\rRunning Sim:  31%|\u2588\u2588\u2588       | 62/201 [04:17<00:34,  4.01it/s]"
       },
       {
-        "text": "\rRunning Sim:  32%|\u2588\u2588\u2588\u258f      | 64/201 [04:19<00:33,  4.08it/s]"
+        "text": "\rRunning Sim:  32%|\u2588\u2588\u2588\u258f      | 65/201 [04:18<00:35,  3.88it/s]"
       },
       {
-        "text": "\rRunning Sim:  33%|\u2588\u2588\u2588\u258e      | 67/201 [04:20<00:44,  2.99it/s]"
+        "text": "\rRunning Sim:  34%|\u2588\u2588\u2588\u258d      | 68/201 [04:20<00:48,  2.76it/s]"
       },
       {
-        "text": "\rRunning Sim:  34%|\u2588\u2588\u2588\u258d      | 69/201 [04:21<00:47,  2.76it/s]"
+        "text": "\rRunning Sim:  35%|\u2588\u2588\u2588\u258d      | 70/201 [04:20<00:44,  2.92it/s]"
       },
       {
-        "text": "\rRunning Sim:  36%|\u2588\u2588\u2588\u258c      | 72/201 [04:22<00:40,  3.17it/s]"
+        "text": "\rRunning Sim:  36%|\u2588\u2588\u2588\u258b      | 73/201 [04:21<00:40,  3.18it/s]"
       },
       {
-        "text": "\rRunning Sim:  37%|\u2588\u2588\u2588\u258b      | 74/201 [04:23<00:41,  3.06it/s]"
+        "text": "\rRunning Sim:  37%|\u2588\u2588\u2588\u258b      | 75/201 [04:22<00:43,  2.91it/s]"
       },
       {
-        "text": "\rRunning Sim:  38%|\u2588\u2588\u2588\u258a      | 76/201 [04:24<00:44,  2.78it/s]"
+        "text": "\rRunning Sim:  38%|\u2588\u2588\u2588\u258a      | 77/201 [04:23<00:44,  2.80it/s]"
       },
       {
-        "text": "\rRunning Sim:  39%|\u2588\u2588\u2588\u2589      | 78/201 [04:24<00:42,  2.90it/s]"
+        "text": "\rRunning Sim:  40%|\u2588\u2588\u2588\u2589      | 80/201 [04:23<00:35,  3.38it/s]"
       },
       {
-        "text": "\rRunning Sim:  41%|\u2588\u2588\u2588\u2588\u258f     | 83/201 [04:25<00:27,  4.23it/s]"
+        "text": "\rRunning Sim:  42%|\u2588\u2588\u2588\u2588\u258f     | 85/201 [04:24<00:24,  4.82it/s]"
       },
       {
-        "text": "\rRunning Sim:  44%|\u2588\u2588\u2588\u2588\u258d     | 88/201 [04:25<00:20,  5.52it/s]"
+        "text": "\rRunning Sim:  45%|\u2588\u2588\u2588\u2588\u258d     | 90/201 [04:24<00:18,  6.04it/s]"
       },
       {
-        "text": "\rRunning Sim:  46%|\u2588\u2588\u2588\u2588\u258b     | 93/201 [04:26<00:16,  6.59it/s]"
+        "text": "\rRunning Sim:  47%|\u2588\u2588\u2588\u2588\u258b     | 95/201 [04:25<00:15,  7.03it/s]"
       },
       {
-        "text": "\rRunning Sim:  49%|\u2588\u2588\u2588\u2588\u2589     | 98/201 [04:26<00:13,  7.45it/s]"
+        "text": "\rRunning Sim:  50%|\u2588\u2588\u2588\u2588\u2589     | 100/201 [04:25<00:12,  7.80it/s]"
       },
       {
-        "text": "\rRunning Sim:  51%|\u2588\u2588\u2588\u2588\u2588     | 103/201 [04:27<00:12,  8.10it/s]"
+        "text": "\rRunning Sim:  53%|\u2588\u2588\u2588\u2588\u2588\u258e    | 106/201 [04:26<00:11,  8.49it/s]"
       },
       {
-        "text": "\rRunning Sim:  54%|\u2588\u2588\u2588\u2588\u2588\u258e    | 108/201 [04:27<00:11,  8.44it/s]"
+        "text": "\rRunning Sim:  55%|\u2588\u2588\u2588\u2588\u2588\u258c    | 111/201 [04:26<00:11,  7.82it/s]"
       },
       {
-        "text": "\rRunning Sim:  56%|\u2588\u2588\u2588\u2588\u2588\u258c    | 113/201 [04:28<00:12,  6.84it/s]"
+        "text": "\rRunning Sim:  58%|\u2588\u2588\u2588\u2588\u2588\u258a    | 116/201 [04:28<00:15,  5.31it/s]"
       },
       {
-        "text": "\rRunning Sim:  58%|\u2588\u2588\u2588\u2588\u2588\u258a    | 117/201 [04:30<00:17,  4.90it/s]"
+        "text": "\rRunning Sim:  60%|\u2588\u2588\u2588\u2588\u2588\u2589    | 120/201 [04:29<00:16,  5.05it/s]"
       },
       {
-        "text": "\rRunning Sim:  60%|\u2588\u2588\u2588\u2588\u2588\u2588    | 121/201 [04:31<00:15,  5.12it/s]"
+        "text": "\rRunning Sim:  63%|\u2588\u2588\u2588\u2588\u2588\u2588\u258e   | 127/201 [04:30<00:11,  6.63it/s]"
       },
       {
-        "text": "\rRunning Sim:  64%|\u2588\u2588\u2588\u2588\u2588\u2588\u258e   | 128/201 [04:31<00:10,  6.85it/s]"
+        "text": "\rRunning Sim:  67%|\u2588\u2588\u2588\u2588\u2588\u2588\u258b   | 134/201 [04:30<00:08,  8.13it/s]"
       },
       {
-        "text": "\rRunning Sim:  67%|\u2588\u2588\u2588\u2588\u2588\u2588\u258b   | 135/201 [04:32<00:07,  8.36it/s]"
+        "text": "\rRunning Sim:  70%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588   | 141/201 [04:31<00:06,  9.40it/s]"
       },
       {
-        "text": "\rRunning Sim:  71%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588   | 142/201 [04:32<00:06,  9.62it/s]"
+        "text": "\rRunning Sim:  74%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258e  | 148/201 [04:31<00:05, 10.44it/s]"
       },
       {
-        "text": "\rRunning Sim:  74%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258d  | 149/201 [04:33<00:04, 10.63it/s]"
+        "text": "\rRunning Sim:  77%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b  | 155/201 [04:32<00:04, 11.26it/s]"
       },
       {
-        "text": "\rRunning Sim:  78%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a  | 156/201 [04:33<00:03, 11.41it/s]"
+        "text": "\rRunning Sim:  81%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588  | 162/201 [04:32<00:03, 11.88it/s]"
       },
       {
-        "text": "\rRunning Sim:  81%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588  | 163/201 [04:34<00:03, 11.99it/s]"
+        "text": "\rRunning Sim:  84%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258d | 169/201 [04:33<00:02, 12.39it/s]"
       },
       {
-        "text": "\rRunning Sim:  85%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258d | 170/201 [04:34<00:02, 12.42it/s]"
+        "text": "\rRunning Sim:  88%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a | 176/201 [04:33<00:01, 12.71it/s]"
       },
       {
-        "text": "\rRunning Sim:  88%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a | 177/201 [04:35<00:01, 12.73it/s]"
+        "text": "\rRunning Sim:  91%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 | 183/201 [04:34<00:01, 12.95it/s]"
       },
       {
-        "text": "\rRunning Sim:  92%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f| 184/201 [04:35<00:01, 12.96it/s]"
+        "text": "\rRunning Sim:  95%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258d| 190/201 [04:34<00:00, 13.12it/s]"
       },
       {
-        "text": "\rRunning Sim:  95%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258c| 191/201 [04:36<00:00, 13.12it/s]"
+        "text": "\rRunning Sim:  98%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a| 197/201 [04:35<00:00, 13.29it/s]"
       },
       {
-        "text": "\rRunning Sim:  99%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a| 198/201 [04:36<00:00, 13.24it/s]"
-      },
-      {
-        "text": "\rRunning Sim: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 201/201 [04:36<00:00,  1.38s/it]"
+        "text": "\rRunning Sim: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 201/201 [04:35<00:00,  1.37s/it]"
       },
       {
         "text": "Final gas concentration (kg/m^3): [[6.91103209e-03 9.99999850e-31 9.99999848e-31 9.99999847e-31\n  9.99999848e-31 9.99999849e-31 4.18285543e-13 1.90984831e-14\n  1.55679389e-24 5.12376933e-28 6.26522875e-18 9.74225658e-20]]\nAdaptive condensation work: StepStatistics(accepted=8921, rejected=1, domain_rejected=0, rate_calls=446100, jacobian_calls=8922, time_derivative_calls=0, factorizations=8922, linear_solves=26766)\n"
@@ -297,11 +294,11 @@
     ]
   ],
   "files": {
-    "figure-14-1.png": "a0a80367c4667f379d148331528accc13f58d42542b90a83c18e8d5f83f4b5df",
-    "figure-13-1.png": "176eca4110df5cccfaa1fcff065c60b4aea3d427a583d2326ffba05fa3d95729",
-    "figure-12-1.png": "c0436833e06ac0c5e2c31c725b33935f2e8623d1688127cfe7a76b5c9a1da7dc",
-    "figure-11-1.png": "e9d0cc82acc60e8068842d72dfe91ad000c85bdacbdc2297237757f4f372927f",
-    "figure-7-1.png": "7e9dee8243c7f19978a3bd0935388d89a19b8459c3b11515acfe06cb5798f842",
-    "source.py": "bc1980bbd159570f82984a88352da2b15b19015f4623a886dac6d9e6838b23bd"
+    "figure-14-1.png": "1e17ada018442cd72c7d24060551404b5bdc7bd8bc7b3d08930cf7159e12799e",
+    "figure-13-1.png": "be98c06e384dcd8a9d1641e124fd121ed19fedd4b2b5effdfee0b37aa0bafc84",
+    "figure-12-1.png": "ccb961d81635675a90d2b9a4f5a4bb033e3459ea9ed2d77c2f07cd669d1d7a4e",
+    "figure-11-1.png": "2b1747b3581a5c450345928404a9dce598d1dba7f2582cfd5130ba099c0916a9",
+    "figure-7-1.png": "4bb5a7b6c5e7721e6010041505f147471f7451502dbecf6efbb14cb00ac38dd7",
+    "source.py": "059366fcc5c57c86306f6d3f6d0aad4cfd3bf31eb08dc200500e98e2fdb76cb9"
   }
 }
