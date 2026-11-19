@@ -13,6 +13,7 @@ import pytest
 ROOT = Path(__file__).resolve().parents[3]
 
 SUPPORTED_STEP_SYMBOLS = (
+    "adaptive_coagulation_step_gpu",
     "coagulation_step_gpu",
     "activate_slots_gpu",
     "condensation_step_gpu",
@@ -60,7 +61,10 @@ def test_public_kernels_package_exports_supported_step_function(
     pytest.importorskip("warp")
 
     import particula.gpu.kernels as kernels
-    from particula.gpu.kernels.coagulation import coagulation_step_gpu
+    from particula.gpu.kernels.coagulation import (
+        adaptive_coagulation_step_gpu,
+        coagulation_step_gpu,
+    )
     from particula.gpu.kernels.condensation import condensation_step_gpu
     from particula.gpu.kernels.dilution import dilution_step_gpu
     from particula.gpu.kernels.exhaustion import resampling_step_gpu
@@ -69,6 +73,7 @@ def test_public_kernels_package_exports_supported_step_function(
     from particula.gpu.kernels.wall_loss import wall_loss_step_gpu
 
     concrete_symbol_map = {
+        "adaptive_coagulation_step_gpu": adaptive_coagulation_step_gpu,
         "coagulation_step_gpu": coagulation_step_gpu,
         "activate_slots_gpu": activate_slots_gpu,
         "condensation_step_gpu": condensation_step_gpu,
@@ -89,6 +94,7 @@ def test_kernels_package_all_is_exact_supported_surface() -> None:
     import particula.gpu.kernels as kernels
 
     assert kernels.__all__ == [
+        "adaptive_coagulation_step_gpu",
         "coagulation_step_gpu",
         "activate_slots_gpu",
         "condensation_step_gpu",
