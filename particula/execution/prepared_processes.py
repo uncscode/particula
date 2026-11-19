@@ -35,7 +35,7 @@ class _ProcessPlan:
         return dict(self.parameters)
 
 
-def configure_coagulation_work(plans, config=None):
+def configure_coagulation_work(plans, config=None, subcycling=None):
     """Freeze resource policy and sampler version in built-in process plans."""
     from dataclasses import replace
 
@@ -46,6 +46,17 @@ def configure_coagulation_work(plans, config=None):
         raise ValueError(
             "coagulation_work_config must be a CoagulationWorkConfig"
         )
+    if subcycling is not None:
+        from particula.gpu.kernels.coagulation import (
+            CoagulationSubcyclingConfig,
+        )
+
+        if not isinstance(subcycling, CoagulationSubcyclingConfig):
+            raise TypeError("expected CoagulationSubcyclingConfig")
+        if not any(p.family == "coagulation" for p in plans):
+            raise ValueError("adaptive policy requires coagulation")
+        if any(type(p) is not _ProcessPlan for p in plans):
+            raise ValueError("atomic subcycling requires built-in processes")
     result = []
     for plan in plans:
         if type(plan) is _ProcessPlan and plan.family == "coagulation":
@@ -57,6 +68,13 @@ def configure_coagulation_work(plans, config=None):
                     config.max_collision_buffer_bytes
                 ),
             )
+            if subcycling:
+                values["subcycling"] = (
+                    1,
+                    subcycling.min_substep,
+                    subcycling.max_subcycles,
+                    subcycling.max_device_bytes,
+                )
             plan = replace(plan, parameters=tuple(values.items()))
         result.append(plan)
     return tuple(result)
@@ -479,8 +497,20 @@ def _compile_coagulation(plan, context: BuiltinPreparationContext):
     )
     from particula.gpu.kernels.coagulation import _resolve_collision_capacity
 
+    requested_capacity = max(1, session.dimensions.n_particles // 2)
+    policy = plan.values.get("subcycling")
+    if policy:
+        from particula.gpu.kernels._coagulation_subcycling import (
+            adaptive_capacity,
+        )
+
+        requested_capacity = adaptive_capacity(
+            session.dimensions.n_boxes,
+            session.dimensions.n_particles,
+            work_config.max_collision_buffer_bytes,
+        )
     capacity = _resolve_collision_capacity(
-        max(1, session.dimensions.n_particles // 2),
+        requested_capacity,
         session.dimensions.n_boxes,
         session.dimensions.n_particles,
         work_config.max_collision_buffer_bytes,
@@ -524,6 +554,18 @@ def _compile_coagulation(plan, context: BuiltinPreparationContext):
         )
 
         prepared = configure_atmospheric(plan, context, prepared)
+    if policy:
+        from particula.gpu.kernels._coagulation_subcycling import (
+            AdaptiveInterval,
+            CoagulationSubcyclingConfig,
+        )
+
+        controller = AdaptiveInterval(
+            prepared,
+            CoagulationSubcyclingConfig(*policy[1:]),
+            context.time_step,
+        )
+        prepared = replace(prepared, adaptive=controller)
     context.bindings[plan.family] = prepared
     counts, failure = context.particles.concentration, context.failure
     wp = context.wp

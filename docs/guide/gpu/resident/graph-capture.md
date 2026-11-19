@@ -1,5 +1,10 @@
 # GPU resident graph capture
 
+The prepared adaptive coagulation policy records a bounded number of guarded
+passes. It reads one status word per outer replay and keeps array identities
+stable across recoverable rejections. The canonical resident graph below
+continues to use fixed work admission. [Adaptive prepared execution](../prepared.md#adaptive-coagulation-intervals)
+
 For the public runnable workflow, use
 [`PreparedSimulation.capture()`](../prepared.md#capture-and-random-streams).
 The contract below describes the separate concrete canonical resident scheduler.

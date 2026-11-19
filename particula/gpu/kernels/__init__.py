@@ -22,6 +22,7 @@ from importlib import import_module
 from typing import Any
 
 __all__ = [
+    "adaptive_coagulation_step_gpu",
     "coagulation_step_gpu",
     "activate_slots_gpu",
     "condensation_step_gpu",
@@ -32,6 +33,7 @@ __all__ = [
 ]
 
 _SYMBOL_TO_MODULE = {
+    "adaptive_coagulation_step_gpu": "particula.gpu.kernels.coagulation",
     "coagulation_step_gpu": "particula.gpu.kernels.coagulation",
     "activate_slots_gpu": "particula.gpu.kernels.slot_management",
     "condensation_step_gpu": "particula.gpu.kernels.condensation",

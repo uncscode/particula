@@ -25,6 +25,7 @@ these execution choices back to growth, collisions, charge, and verification.
 | --- | --- |
 | [CPU → CUDA → CPU quick start](prepared/gpu_prepared_quick_start.py) | How do eight aerosol boxes evolve, change forcing, capture and resume? |
 | [Custom process backends](prepared/custom_process_backends.py) | Can an imposed warming law agree with an analytic solution across CPU, CUDA, transfer, and restart? |
+| [Adaptive cloud coagulation](prepared/adaptive_coagulation.py) | How many collision passes complete a 600 s trajectory as the cloud changes? |
 | [Charged Brownian models](prepared/gpu_charged_models.py) | How do five charged fits compare on CUDA against their CPU implementations? |
 | [Explicit atmospheric ion balance](prepared/gpu_ion_balance.py) | Do ion production, recombination and neutral-product export reproduce finite-population balance on CUDA? |
 | [Ground to mesopause and high pressure](prepared/gpu_dry_environment_sweep.py) | How do dry charged-aerosol size, charge and collision histories change from 0–86 km and from 1–10 atm? |
