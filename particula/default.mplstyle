@@ -11,6 +11,8 @@ xtick.labelsize: 12
 ytick.labelsize: 12
 legend.fontsize: 12
 legend.frameon: False
+legend.handlelength: 1.6
+legend.handletextpad: 0.5
 lines.linewidth: 2
 text.color: 18322d
 axes.labelcolor: 18322d

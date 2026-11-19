@@ -223,8 +223,9 @@ def plot_results(report):
     from particula import plotting
 
     fig, axes = plotting.subplots(2, 1)
+    colors = tuple(plotting.COLORS.values())
     for index, case in enumerate(report["cases"]):
-        color = f"C{index}"
+        color = colors[index % len(colors)]
         label = f"{case['initial_vapor_ug_m3']:g} µg m⁻³ initial vapor"
         minutes = np.asarray(case["time_s"]) / 60
         axes[0].plot(minutes, case["radius_nm"], color=color, label=label)

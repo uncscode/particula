@@ -135,7 +135,7 @@ for center, color in zip(
         diameter, profile(center), color=str(gray), label=f"{center} nm"
     )
 ax.set(xlabel="Particle diameter (nm)", ylabel="Normalized count")
-plotting.legend(ax)
+plotting.legend(ax, placement="right")
 plotting.fit(fig)
 plt.show()
 

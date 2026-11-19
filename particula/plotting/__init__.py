@@ -47,13 +47,16 @@ def subplots(nrows=1, ncols=1, *, size="square", **kwargs):
         A Matplotlib figure and its axes with ordinary subplots semantics.
     """
     width, height = _SIZES[size]
-    return plt.subplots(
+    engine = _PaperLayout(width, height, nrows, ncols)
+    fig, axes = plt.subplots(
         nrows,
         ncols,
         figsize=(ncols * (width + 1), nrows * (height + 1)),
-        layout=_PaperLayout(width, height, nrows, ncols),
+        layout=engine,
         **kwargs,
     )
+    engine.axes = np.asarray(axes).ravel()
+    return fig, axes
 
 
 class _PaperLayout(ConstrainedLayoutEngine):
@@ -109,6 +112,18 @@ def legend(ax, *, placement="auto", **kwargs):
     return entry
 
 
+def _check_panel_aspect(ax, panel):
+    """Reject incompatible data and box aspect constraints before resizing."""
+    aspect = ax.get_aspect()
+    ratio = ax.get_box_aspect()
+    if aspect != "auto" and ax.get_adjustable() == "box":
+        ratio = float(aspect) * ax.get_data_ratio()
+    if ratio is not None and not np.isclose(
+        ratio, panel[1] / panel[0], rtol=0.0001
+    ):
+        raise ValueError("Data aspect is incompatible with the panel size")
+
+
 def fit(fig):
     """Size the canvas to labels, legends and colorbars at fixed panel size.
 
@@ -120,8 +135,9 @@ def fit(fig):
     engine = fig.get_layout_engine()
     if not isinstance(engine, _PaperLayout):
         raise ValueError("fit requires a figure created by plotting.subplots")
-    # Colorbars have a separate subplot or no subplot in constrained layout.
-    axes = [ax for ax in fig.axes if ax.get_subplotspec() is not None]
+    axes = engine.axes
+    for ax in axes:
+        _check_panel_aspect(ax, engine.panel)
     # Give outside legends room before the first constrained-layout pass.
     gutters = np.zeros(engine.grid[0])
     for ax, entry in engine.outside.items():
@@ -133,21 +149,19 @@ def fit(fig):
     if fig.get_figwidth() < minimum_width and not engine.finished:
         fig.set_figwidth(minimum_width)
     engine.finished = False
-    try:
-        for _ in range(16):
-            fig.draw_without_rendering()
-            canvas = fig.get_size_inches()
-            sizes = np.array([ax.get_position().size * canvas for ax in axes])
-            errors = engine.panel - sizes
-            if np.max(np.abs(errors)) < 0.002:
-                return fig
-            correction = errors.mean(axis=0) * engine.grid
-            if np.max(np.abs(correction)) < 0.001:
-                break
-            fig.set_size_inches(canvas + correction)
-        raise ValueError(
-            "Panel sizes did not converge. Use an equal-cell grid and a "
-            "data aspect compatible with the panel size."
-        )
-    finally:
-        engine.finished = True
+    for _ in range(16):
+        fig.draw_without_rendering()
+        canvas = fig.get_size_inches()
+        sizes = np.array([ax.get_position().size * canvas for ax in axes])
+        errors = engine.panel - sizes
+        if np.max(np.abs(errors)) < 0.002:
+            engine.finished = True
+            return fig
+        correction = errors.mean(axis=0) * engine.grid
+        if np.max(np.abs(correction)) < 0.001:
+            break
+        fig.set_size_inches(canvas + correction)
+    raise ValueError(
+        "Panel sizes did not converge. Use an equal-cell grid and a "
+        "data aspect compatible with the panel size."
+    )

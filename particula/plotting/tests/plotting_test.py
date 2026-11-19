@@ -109,3 +109,16 @@ def test_placement():
             assert entry.get_window_extent().x1 < ax.bbox.x1
     with pytest.raises(ValueError, match="placement"):
         plotting.legend(ax, placement="left")
+
+
+def test_aspect_error_can_be_corrected():
+    """Keep the native figure usable after requesting conflicting geometry."""
+    fig, ax = plotting.subplots(size="wide")
+    ax.imshow([[1, 2], [3, 4]], aspect="equal")
+    with pytest.raises(ValueError, match="aspect"):
+        plotting.fit(fig)
+    ax.set_aspect("auto")
+    plotting.fit(fig)
+    np.testing.assert_allclose(
+        ax.get_position().size * fig.get_size_inches(), [5, 3.5], atol=0.01
+    )

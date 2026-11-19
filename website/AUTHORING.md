@@ -98,8 +98,8 @@ when installed distribution metadata differs, it is retained separately as
 `particula-distribution` rather than used to label the executed source.
 
 For styled scientific figures, follow the
-[figure style guide](../docs/guide/getting-started/figure-styles.md) and
-[gallery](../docs/examples/fundamentals/figure_styles.py). Use one PNG per
+[figure style guide](https://uncscode.github.io/particula/guide/getting-started/figure-styles/) and
+[gallery](https://uncscode.github.io/particula/examples/fundamentals/figure_styles/). Use one PNG per
 figure for both website themes. Set `"full_canvas": true` in the example
 registry for Particula preset figures. This preserves their physical canvas
 and fingerprints the shared style and layout code. Call `plotting.fit(fig)`
