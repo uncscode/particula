@@ -1,25 +1,26 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 3.785886393976398,
-  "package_source_sha256": "6501d9940d7e5c883bfc0aeee62213fed01c4e3de1f17133b03100d0ef124f17",
+  "elapsed_seconds": 5.4801458129659295,
+  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "timed-box-chemistry",
-  "fingerprint": "0e2ccdf1703b13a18eadf18f35e915a1c7427b516db531041c50c65109abc181",
+  "fingerprint": "66bf39f806f30393a7fae2cb9972e6394e80e2e6b33a224d6bef6b59ddaa80f6",
   "source": "docs/examples/processes/customization/timed_box_chemistry.py",
-  "revision": "8d108f4543d98d493c4816b059a48ceb9d981aca",
+  "revision": "6af97152d1570464ac5ccae56e3110001657e170",
   "package_dirty": false,
-  "executed_at": "2026-11-15T16:48:42.616865+00:00",
+  "executed_at": "2026-11-19T14:34:20.709770+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.2.14",
+    "particula": "0.3.2",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
     "nbclient": "0.10.2",
     "jupytext": "1.17.3",
-    "warp-lang": "1.11.1"
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
   },
   "outputs": [
     [],
@@ -32,24 +33,25 @@
     ]
   ],
   "files": {
-    "source.py": "1fa09ba4f98fc573977679bff70160be6717bfbd81cd58ec1c64461ef441ba6e",
+    "figure-4-1.png": "0d488d365f9c5597d7415a804f0331c909a35d52b438809aa4b8cfd33127fb79",
+    "executed_source.py": "2792f2d01b943a55dc79c96405301022fb720030ec18c47eda77f8c3a926eaa8",
     "data.json": "571a5aaec79741723846ef073e258be3e55b2c14db6ec203d3bbc52abb856520",
-    "executed_source.py": "1fa09ba4f98fc573977679bff70160be6717bfbd81cd58ec1c64461ef441ba6e",
-    "figure-4-1.png": "4bc27bdcd65856857ccaad8d60719a4f33033f5f0884943e9214f39a4e7c4078"
+    "source.py": "9bb7089367b762dbf685c35cbfb46a7da77998fcf163e9934f7cafebcbb743dc"
   },
-  "simulation_fingerprint": "e5fc9c8fac5be7c6566757bf3b1073e98c5ea8a994e2a6f071e965eb61e860ea",
+  "simulation_fingerprint": "cab53b290a84e5b2ca529bc991202cbd6bc1328e90ee1f9225b837634ef20844",
   "render_versions": {
-    "particula": "0.2.14",
+    "particula": "0.3.2",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
     "nbclient": "0.10.2",
     "jupytext": "1.17.3",
-    "warp-lang": "1.11.1"
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
   },
   "render_device": "CPU",
   "execution_input_sha256": {},
-  "rendered_at": "2026-11-15T16:49:13.742523+00:00",
-  "render_revision": "8d108f4543d98d493c4816b059a48ceb9d981aca",
-  "render_elapsed_seconds": 3.9083880350226536
+  "rendered_at": "2026-11-19T14:47:24.822526+00:00",
+  "render_revision": "e6d8de004d68d2f8054a7654be48430a2af02cb9",
+  "render_elapsed_seconds": 4.096593367983587
 }

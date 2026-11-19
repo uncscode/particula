@@ -1,25 +1,26 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 3.7643231409601867,
-  "package_source_sha256": "8340db23fd0f933d97cccca5043297b3b1382b94bbaa2249dcaeb9fe1dc62879",
+  "elapsed_seconds": 4.075692359940149,
+  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "examples-fundamentals-gas-environment-data",
-  "fingerprint": "5c92af63f6f1e4fd1ecc027ce2a20bfd5973689168977d1f61a563895f2b216a",
+  "fingerprint": "01fc029f744d7616fde573cc8dbd5c4d921491eda9eb5c54142d9c447ccae48a",
   "source": "docs/examples/fundamentals/gas/environment_data.py",
-  "revision": "277ccafb82ee7ed32af4ea96bec6ae301ce67df5",
+  "revision": "e6d8de004d68d2f8054a7654be48430a2af02cb9",
   "package_dirty": false,
-  "executed_at": "2026-11-15T19:29:12.322257+00:00",
+  "executed_at": "2026-11-19T14:47:18.860526+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.2.14",
+    "particula": "0.3.2",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
     "nbclient": "0.10.2",
     "jupytext": "1.17.3",
-    "warp-lang": "1.11.1"
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
   },
   "outputs": [
     [],
@@ -35,7 +36,7 @@
     ]
   ],
   "files": {
-    "source.py": "8de786babdb911ddb5e239b1af0776b0cf4899dadb17619fc353600dfb226ee7",
-    "figure-3-1.png": "0681d521402af7e0d4cfd27fe0e0e59ea492a617cea0c4b0797f3ea2668aff30"
+    "figure-3-1.png": "f3f2a050c7191f7b885be3337b5eb10205dd9866ac122f6adb6d20219410518a",
+    "source.py": "5b4e961339b4fad2010bdf31a8a8dea75e29ec900c4f3fd8ec98e3b5ebe8b171"
   }
 }

@@ -1,25 +1,26 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 10.49038206494879,
-  "package_source_sha256": "79b3c10633e7c9d63f57a936a1bb4aefdf058d431b139220b3852cba351c30ee",
+  "elapsed_seconds": 11.13885945698712,
+  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {},
   "example": "cuda-optics",
-  "fingerprint": "99a849e62fc4f3159be24a918cd1f8d0f5f901bf9f23f188116723c0330643c1",
+  "fingerprint": "51b0568ed72ada4f5b4058345d02055086594ea66e2ea8302ccefcf4f3e3a025",
   "source": "docs/examples/optics/cuda_optics.py",
-  "revision": "4ce93ae09a015c9d42047ced8174f77e809a0684",
+  "revision": "e6d8de004d68d2f8054a7654be48430a2af02cb9",
   "package_dirty": false,
-  "executed_at": "2026-11-15T16:01:31.756532+00:00",
+  "executed_at": "2026-11-19T14:53:15.354972+00:00",
   "device": "cuda:0: NVIDIA GeForce RTX 5060",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.2.14",
+    "particula": "0.3.2",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
     "nbclient": "0.10.2",
     "jupytext": "1.17.3",
-    "warp-lang": "1.11.1"
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
   },
   "outputs": [
     [],
@@ -27,19 +28,16 @@
     [],
     [
       {
-        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     /tmp/optics-stream-evidence-cache/warp/1.11.1\n"
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\n"
       },
       {
-        "text": "Module particula.optics.gpu.mie 36c0414 load on device 'cuda:0' took 531.82 ms  (compiled)\n"
+        "text": "Module particula.optics.gpu.mie 36c0414 load on device 'cuda:0' took 1000.17 ms  (cached)\nModule particula.optics.gpu.angular 91aee41 load on device 'cuda:0' took 4.48 ms  (cached)\n"
       },
       {
-        "text": "Module particula.optics.gpu.angular 91aee41 load on device 'cuda:0' took 501.12 ms  (compiled)\n"
+        "text": "Module particula.optics.gpu._bulk 8686aab load on device 'cuda:0' took 244.49 ms  (cached)\n"
       },
       {
-        "text": "Module particula.optics.gpu._bulk 8686aab load on device 'cuda:0' took 445.49 ms  (compiled)\n"
-      },
-      {
-        "text": "Device: NVIDIA GeForce RTX 5060 Warp 1.11.1\nModule compile/cache load [s]: {'mie': 0.600302426959388, 'angular': 0.5027199620380998, '_bulk': 0.4470886969938874}\n64 cases, x\u226410: upload=0.000408508s, prepare=0.000428676s, download=2.2652e-05s, max Q error=1.55e-15\n512 cases, x\u2264100: upload=0.000135982s, prepare=0.000155299s, download=3.1438e-05s, max Q error=2e-15\n2048 cases, x\u22641000: upload=0.000237081s, prepare=0.000453121s, download=6.3468e-05s, max Q error=5.33e-15\nAll particle efficiencies and full bulk Mueller matrices pass the declared CPU/CUDA comparisons.\n"
+        "text": "Device: NVIDIA GeForce RTX 5060 Warp 1.11.1\nModule compile/cache load [s]: {'mie': 1.1134952140273526, 'angular': 0.0059049190022051334, '_bulk': 0.24581330607179552}\n64 cases, x\u226410: upload=0.00175078s, prepare=0.00445826s, download=2.6449e-05s, max Q error=1.55e-15\n512 cases, x\u2264100: upload=0.00102711s, prepare=0.00221057s, download=2.5527e-05s, max Q error=2e-15\n2048 cases, x\u22641000: upload=0.00118738s, prepare=0.00221427s, download=5.54931e-05s, max Q error=5.33e-15\nAll particle efficiencies and full bulk Mueller matrices pass the declared CPU/CUDA comparisons.\n"
       },
       {
         "image": "figure-4-1.png"
@@ -50,10 +48,10 @@
     ]
   ],
   "files": {
-    "figure-4-2.png": "4dd0fb1e16fbaf4c0380b07c230645fb20ceaa06718fd8643534567a00e725ae",
-    "figure-4-1.png": "e6b6d664a376dec2b3b66b90423884db7c8ef442e18bf12ed27ddaf959d7c995",
-    "data.json": "775b98ce7ca73dd6e2080f72729ffa0dc721f36cecd2f571b60afbaab65d2e4e",
-    "source.py": "4f42c5e68c0f82a6d43ae98cc8bc3d5fa9c1090d7219db6a8e124004c63b6222"
+    "figure-4-2.png": "f2684afee8bcdf38ed50092e5dd9885c4990d8ff87655b064727008b9cebd6c6",
+    "figure-4-1.png": "c1d37ee9a191241d2744424a1b2b8bc139dd1c89439d59ed0d6bf15e3145f9bd",
+    "data.json": "e94cd22b7e9cc7efb1014690a6385c326b290c7abec155a7bffcf47d0a7a523c",
+    "source.py": "f5d3ab7e4e9ec93468587e60137d19ff5102e523f639b97775d79c646ef5430b"
   },
-  "simulation_fingerprint": "454b3b6eaddf926208589a14b32c0af015f2e8fd32287999c75d25d124f1b970"
+  "simulation_fingerprint": "23b90c14a942761d581db5e32aea67fc76dc7d3e043b47123fb1869368ccf0cc"
 }

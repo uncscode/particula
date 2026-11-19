@@ -9,7 +9,7 @@
     "scripts/gpu_studies/validation.py": "816f83d10024feef14daa05112688ea7d26faa3ddde8e05ba12e8dc29f6a4a45"
   },
   "example": "gpu-prepared-cyclic-chamber",
-  "fingerprint": "0de6f99486510f814e2102b67b8e61e1bdef35a4bb31daca697a3a99e9fa85fa",
+  "fingerprint": "e4c36a4794852a4687e360b97dbe4dbf42c628ae0c10af7e00bbef5b884fee02",
   "source": "docs/examples/gpu/prepared/gpu_prepared_cyclic_chamber.py",
   "revision": "3d3753d2be9973c94b4064047fa8452e717f1311",
   "package_dirty": false,
@@ -37,14 +37,18 @@
     ]
   ],
   "files": {
-    "figure-4-1.png": "e48daebe4638e5a3b52611ea16c0fe2df4c0c1dd328581253e87495ce7a17da3",
+    "figure-4-1.png": "67b5ffb389ba61689bce67ca8e678369f4b4255e5f5652332328ec1baf5d77ec",
     "executed_source.py": "d5ad43e1d7d28ae24a5bc8ab65749e175de5bcda4d4372d44b9d0fbc5f307089",
     "data.json": "3bb6c13e674f95c5f5ee38b0e4eb5ce27a39f4437359edf4d1cdea0e8e8f4883",
-    "source.py": "ace2676be353c876cdaf7044c2ef40ae5b81a6c424556b073d9eeeb1c3099616"
+    "source.py": "934eb659bb8c7f58b6c37e4b810ce9a537bbde0450bf9111b1a317ce8f6b9916"
   },
   "simulation_fingerprint": "eedd8c327de95c03589f34946c21bfe34c26863795c194e2442344da34dd9156",
+  "historical_run": {
+    "revision": "3d3753d2be9973c94b4064047fa8452e717f1311",
+    "data_sha256": "3bb6c13e674f95c5f5ee38b0e4eb5ce27a39f4437359edf4d1cdea0e8e8f4883"
+  },
   "render_versions": {
-    "particula": "0.3.1",
+    "particula": "0.3.2",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
@@ -59,7 +63,7 @@
     "scripts/gpu_studies/cases.py": "8728bdc1bb583d849d7228055c5bbc27606c021e1564f2d531b8c9a9e93787ec",
     "scripts/gpu_studies/validation.py": "816f83d10024feef14daa05112688ea7d26faa3ddde8e05ba12e8dc29f6a4a45"
   },
-  "rendered_at": "2026-11-16T18:57:59.921482+00:00",
-  "render_revision": "3d3753d2be9973c94b4064047fa8452e717f1311",
-  "render_elapsed_seconds": 4.357211210997775
+  "rendered_at": "2026-11-19T14:54:12.337803+00:00",
+  "render_revision": "d918c3f7cb549a4baa1d5a35e674171ff72570fa",
+  "render_elapsed_seconds": 5.8381534710060805
 }

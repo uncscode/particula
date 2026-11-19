@@ -32,6 +32,8 @@ from types import SimpleNamespace
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
+from matplotlib import style as mplstyle
+from particula import plotting
 
 if TYPE_CHECKING:
     from particula.gas import EnvironmentData, GasData
@@ -561,6 +563,7 @@ def run_example() -> ExampleRun:  # noqa: C901
 
 
 # %%
+@mplstyle.context("particula.default")
 def run_publication():
     """Require native CUDA capture and visualize the replayed box states."""
     import matplotlib.pyplot as plt
@@ -572,21 +575,24 @@ def run_publication():
     if result.gas_snapshot is None or result.saturation_snapshot is None:
         raise RuntimeError("CUDA capture produced no diagnostic snapshots")
     boxes = np.arange(result.gas_snapshot.shape[0]) + 1
-    fig, axes = plt.subplots(1, 2, figsize=(9, 3.5), constrained_layout=True)
-    axes[0].bar(boxes, result.gas_snapshot[:, 0], color="#287a90")
+    fig, axes = plotting.subplots(1, 2, size="wide")
+    axes[0].bar(boxes, result.gas_snapshot[:, 0], color=plotting.COLORS["teal"])
     axes[0].set(
         xlabel="Box",
         ylabel="Water gas after replay (kg m$^{-3}$)",
         xticks=boxes,
     )
-    axes[1].bar(boxes, result.saturation_snapshot[:, 0], color="#be6c39")
+    axes[1].bar(
+        boxes, result.saturation_snapshot[:, 0], color=plotting.COLORS["rust"]
+    )
     axes[1].axhline(1, color="0.5", linestyle="--", label="Saturation")
     axes[1].set(
         xlabel="Box", ylabel="Saturation ratio after replay", xticks=boxes
     )
-    axes[1].legend()
+    plotting.legend(axes[1])
     fig.suptitle("Two native graph replays · " + wp.get_device("cuda:0").name)
     print("\n".join(result.output))
+    plotting.fit(fig)
     plt.show()
     return result
 

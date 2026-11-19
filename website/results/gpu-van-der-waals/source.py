@@ -17,6 +17,8 @@ import time
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import style as mplstyle
+from particula import plotting
 from particula.aerosol import Aerosol
 from particula.dynamics import Coagulation, VanDerWaalsCoagulationStrategy
 from particula.gas import EnvironmentData, GasData
@@ -161,9 +163,10 @@ def simulate():
 
 
 # %%
+@mplstyle.context("particula.default")
 def plot_results(report):
     """Compare merger fractions with the known two-particle survival law."""
-    fig, ax = plt.subplots(figsize=(6.6, 4.1), layout="constrained")
+    fig, ax = plotting.subplots(size="wide")
     t = np.linspace(0, 1, 160)
     p = -np.expm1(-t)
     band = 1.96 * np.sqrt(p * (1 - p) / report["boxes"])
@@ -184,7 +187,8 @@ def plot_results(report):
         ylabel="Fraction of boxes with one survivor",
         ylim=(0, 0.75),
     )
-    ax.legend(fontsize=8)
+    plotting.legend(ax)
+    plotting.fit(fig)
     plt.show()
 
 

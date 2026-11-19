@@ -1,28 +1,29 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 5.191039106925018,
-  "package_source_sha256": "6501d9940d7e5c883bfc0aeee62213fed01c4e3de1f17133b03100d0ef124f17",
+  "elapsed_seconds": 5.8281130290124565,
+  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
   "input_sha256": {
     "scripts/gpu_studies/__init__.py": "530c51f7c7f432a895623c9ba4548b7cf3e053a1a0f328a36ae8ae9e50cec9c4",
     "scripts/gpu_studies/extension_kernels.py": "65fd62e0f916fc827f352493da3650f2971322e3d89c9881403ee0943d291932"
   },
   "example": "custom-process-backends",
-  "fingerprint": "d98a3086fea6dbaf3caa866266894018e31902fe5189dc3f17654bcff23b89a3",
+  "fingerprint": "87ec67c53555806eeaf5c0365a6f9fe0e982b9f7d45a3bd12959120e3f5f8e5b",
   "source": "docs/examples/gpu/prepared/custom_process_backends.py",
-  "revision": "8d108f4543d98d493c4816b059a48ceb9d981aca",
+  "revision": "e6d8de004d68d2f8054a7654be48430a2af02cb9",
   "package_dirty": false,
-  "executed_at": "2026-11-15T16:48:53.916598+00:00",
+  "executed_at": "2026-11-19T14:53:02.837402+00:00",
   "device": "cuda:0: NVIDIA GeForce RTX 5060",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.2.14",
+    "particula": "0.3.2",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
     "nbclient": "0.10.2",
     "jupytext": "1.17.3",
-    "warp-lang": "1.11.1"
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
   },
   "outputs": [
     [],
@@ -30,32 +31,386 @@
     [],
     [
       {
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 514.64it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 619.63it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 689.85it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 626.11it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 654.75it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 631.48it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 634.44it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 659.38it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 767.06it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 748.05it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 749.92it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 682.56it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 714.78it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 662.08it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 604.45it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 692.13it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 634.83it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 643.30it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 665.55it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 638.89it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 655.77it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 667.46it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 695.00it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 665.55it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 740.78it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 654.64it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 681.00it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 701.74it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 659.90it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 631.58it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 631.29it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 645.08it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 656.80it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 656.08it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 658.34it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 653.22it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 734.04it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 743.41it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 657.62it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
+      },
+      {
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 670.34it/s]"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "Module particula.gpu.kernels.dilution 0472484 load on device 'cuda:0' took 2.63 ms  (cached)\nModule particula.gpu.kernels._population_validation 65eaa49 load on device 'cuda:0' took 1.38 ms  (cached)\nModule scripts.gpu_studies.extension_kernels aaaeba0 load on device 'cuda:0' took 2.52 ms  (cached)\nModule particula.execution.extension_guards deaab5f load on device 'cuda:0' took 1.65 ms  (cached)\nModule particula.execution.prepared_guards c5e1f2e load on device 'cuda:0' took 1.34 ms  (cached)\nModule warp.utils f35afd3 load on device 'cuda:0' took 2.59 ms  (cached)\nModule warp.math edde159 load on device 'cuda:0' took 2.15 ms  (cached)\nModule warp.marching_cubes fb6e712 load on device 'cuda:0' took 2.17 ms  (cached)\nModule particula.gpu.kernels._coagulation_budget b4a3978 load on device 'cuda:0' took 1.65 ms  (cached)\nModule particula.execution.communication 2909959 load on device 'cuda:0' took 1.48 ms  (cached)\nModule particula.gpu.kernels.environment e11375e load on device 'cuda:0' took 2.01 ms  (cached)\nModule particula.gpu.kernels.communication ac9b2a2 load on device 'cuda:0' took 2.56 ms  (cached)\nModule particula.gpu.properties.gas_properties edde159 load on device 'cuda:0' took 2.16 ms  (cached)\nModule particula.gpu.properties.particle_properties edde159 load on device 'cuda:0' took 2.20 ms  (cached)\nModule particula.gpu.dynamics.coagulation_funcs edde159 load on device 'cuda:0' took 2.20 ms  (cached)\nModule particula.gpu.dynamics.condensation_funcs edde159 load on device 'cuda:0' took 2.20 ms  (cached)\nModule particula.gpu.kernels._condensation_native edde159 load on device 'cuda:0' took 2.18 ms  (cached)\nModule particula.gpu.kernels._condensation_parallel edde159 load on device 'cuda:0' took 2.19 ms  (cached)\nModule particula.gpu.kernels.thermodynamics edde159 load on device 'cuda:0' took 2.21 ms  (cached)\nModule particula.gpu.kernels.condensation edde159 load on device 'cuda:0' took 2.17 ms  (cached)\n"
+      },
+      {
+        "text": "Module particula.gpu.kernels.exhaustion 616f81d load on device 'cuda:0' took 1.59 ms  (cached)\nModule particula.gpu.kernels.slot_management 0375e2c load on device 'cuda:0' took 0.95 ms  (cached)\nModule particula.gpu.kernels.nucleation 1124f09 load on device 'cuda:0' took 2.52 ms  (cached)\nModule particula.execution.gpu_resources 30f296c load on device 'cuda:0' took 2.03 ms  (cached)\nModule particula.gpu.warp_types edde159 load on device 'cuda:0' took 2.19 ms  (cached)\nModule particula.execution.prepared_diagnostics ca06582 load on device 'cuda:0' took 1.85 ms  (cached)\n"
+      },
+      {
+        "text": "CUDA device: NVIDIA GeForce RTX 5060\nNumPy/Warp parity, detached snapshots, capture and restart passed.\n"
+      },
+      {
         "image": "figure-4-1.png"
       }
     ]
   ],
   "files": {
-    "source.py": "4b8456ec455cfc263ee50a70ba1539b7a24282cb48f732726aced79e768cb68b",
+    "figure-4-1.png": "9d9410fdf41cbcd5b55c00e4d54660ac088418537fac100ab0db3e56d987cdfa",
     "data.json": "0887d3ce22a2baf536ce0cad4b83f134c6961db4c5dfea5f90619765bcabf854",
-    "executed_source.py": "4b8456ec455cfc263ee50a70ba1539b7a24282cb48f732726aced79e768cb68b",
-    "figure-4-1.png": "da415e6009a4aba0e902075a61f5613088bc119eed8ce5f32368bf5eb4eb3903"
+    "source.py": "0baf901b5bd2ae39920d869e00ac1a634de4a57f260497583ac033e33b5a1ee3"
   },
-  "simulation_fingerprint": "aa86a98a56a3e01d5984ceda66143136425acaeedd8c33b340f806b153f2edb9",
-  "render_versions": {
-    "particula": "0.2.14",
-    "numpy": "2.3.4",
-    "scipy": "1.16.2",
-    "matplotlib": "3.10.7",
-    "nbclient": "0.10.2",
-    "jupytext": "1.17.3",
-    "warp-lang": "1.11.1"
-  },
-  "render_device": "CPU",
-  "execution_input_sha256": {
-    "scripts/gpu_studies/__init__.py": "530c51f7c7f432a895623c9ba4548b7cf3e053a1a0f328a36ae8ae9e50cec9c4",
-    "scripts/gpu_studies/extension_kernels.py": "65fd62e0f916fc827f352493da3650f2971322e3d89c9881403ee0943d291932"
-  },
-  "rendered_at": "2026-11-15T16:49:25.176490+00:00",
-  "render_revision": "8d108f4543d98d493c4816b059a48ceb9d981aca",
-  "render_elapsed_seconds": 4.528772757039405
+  "simulation_fingerprint": "8fa7c591a6a334d51148de8e42b697e5457fb3edf78b931be69f8d593eb4d1d8"
 }

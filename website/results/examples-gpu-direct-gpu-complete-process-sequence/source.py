@@ -36,6 +36,8 @@ from types import SimpleNamespace
 from typing import Any
 
 import numpy as np
+from matplotlib import style as mplstyle
+from particula import plotting
 from particula.gas import EnvironmentData, GasData
 from particula.particles import ParticleData
 
@@ -610,6 +612,7 @@ def run_example(device: str = "cpu") -> ExampleRun:
 
 
 # %%
+@mplstyle.context("particula.default")
 def run_publication():
     """Run all five direct boundaries on CUDA and plot restored state."""
     import matplotlib.pyplot as plt
@@ -621,7 +624,7 @@ def run_publication():
     result = run_example(device="cuda:0")
     if result.particle_data is None or result.gas_data is None:
         raise RuntimeError("CUDA produced no complete snapshot")
-    fig, axes = plt.subplots(1, 2, figsize=(9, 3.8), constrained_layout=True)
+    fig, axes = plotting.subplots(1, 2)
     x = np.arange(2)
     for offset, p, g, label in (
         (-0.18, particles, gas, "Initial"),
@@ -635,7 +638,7 @@ def run_publication():
         )
     for ax in axes:
         ax.set(xticks=x, xticklabels=gas.name)
-        ax.legend()
+        plotting.legend(ax)
     axes[0].set(ylabel="Particle mass density (µg m$^{-3}$)")
     axes[1].set(ylabel="Gas mass density (µg m$^{-3}$)")
     fig.suptitle("Combined direct sequence · " + wp.get_device("cuda:0").name)
@@ -645,6 +648,7 @@ def run_publication():
         particles.concentration.sum(),
         result.particle_data.concentration.sum(),
     )
+    plotting.fit(fig)
     plt.show()
     return result
 

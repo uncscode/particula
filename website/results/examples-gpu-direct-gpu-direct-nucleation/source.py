@@ -1,6 +1,12 @@
 # %% [markdown]
 # # Direct CUDA nucleation with explicit species mapping
 #
+# Why does a larger simulated volume create more particles without changing the
+# formation rate per cubic metre? This deliberately tiny example separates unit
+# events, represented counts, and gas mass density. Read
+# [CPU nucleation](../../processes/nucleation/cpu_nucleation.py) for the source law
+# before following explicit device storage and species binding.
+#
 # Map precursor gas to particle material and inject unit-count neutral
 # particles into free slots. Counts and gas density use different units.
 # Run this script with `--cuda` to reproduce the published figures.
@@ -17,6 +23,8 @@ Warp is required; this example intentionally has no CPU-physics fallback.
 import numpy as np
 import numpy.testing as npt
 import warp as wp
+from matplotlib import style as mplstyle
+from particula import plotting
 from particula.dynamics.nucleation.species_mapping import NucleationSpeciesMap
 from particula.gas import EnvironmentData, GasData
 from particula.gpu import (
@@ -244,6 +252,7 @@ def run_example(
 
 
 # %%
+@mplstyle.context("particula.default")
 def run_publication():
     """Require CUDA and compare one- and two-cubic-metre source events."""
     import matplotlib.pyplot as plt
@@ -254,15 +263,17 @@ def run_publication():
     count = np.array([p.concentration.sum() for p, _, _ in results])
     volumes = np.array([1.0, 2.0])
     npt.assert_array_equal(count, volumes)
-    fig, axes = plt.subplots(1, 2, figsize=(8, 3.5), constrained_layout=True)
-    axes[0].bar(volumes, count, color="#287a90", width=0.6)
+    fig, axes = plotting.subplots(1, 2)
+    axes[0].bar(volumes, count, color=plotting.COLORS["teal"], width=0.6)
     axes[0].set(
         xlabel="Represented volume (m³)",
         ylabel="Injected count",
         xticks=volumes,
         yticks=[0, 1, 2],
     )
-    axes[1].bar(volumes, count / volumes, color="#be6c39", width=0.6)
+    axes[1].bar(
+        volumes, count / volumes, color=plotting.COLORS["rust"], width=0.6
+    )
     axes[1].set(
         xlabel="Represented volume (m³)",
         ylabel="Injected number density (m$^{-3}$)",
@@ -271,6 +282,7 @@ def run_publication():
     fig.suptitle("Unit-event nucleation · " + wp.get_device("cuda:0").name)
     print("Counts:", count, "Number densities (m^-3):", count / volumes)
     print("Per-species particle + gas inventory checks passed.")
+    plotting.fit(fig)
     plt.show()
     return results
 
@@ -283,3 +295,21 @@ if __name__ == "__main__":
     else:
         run_example()
         print("Direct Warp nucleation example completed on device=cpu.")
+
+# %% [markdown]
+# ## Read the two bars together
+#
+# The 1 and 2 m³ cases inject one and two unit-count particles, respectively;
+# both give 1 m⁻³ after the one-second update. The coefficient and 1 kg m⁻³ gas
+# reservoir are chosen for this count-scaling demonstration. One precursor molecule
+# per nucleus is bookkeeping here, not a validated nanoparticle formation model.
+# The configuration's formation diameter should not be read as a measured output
+# size; material mass and density determine the represented particle radius.
+#
+# Each injected molecule is tiny compared with that reservoir. The aggregate
+# inventory tolerance alone cannot resolve its depletion, so do not use this case
+# as strong evidence of small gas-consumption accuracy. For a nucleation study,
+# choose a defensible rate and nucleus composition, compare event demand with
+# available gas and free slots, and test per-species source accounting at a
+# resolvable scale. The [prepared lifecycle](../prepared/gpu_prepared_lifecycle.py)
+# adds active source pulses to an evolving population.

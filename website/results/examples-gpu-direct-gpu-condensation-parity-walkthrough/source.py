@@ -1,6 +1,17 @@
 # %% [markdown]
 # # Check CUDA condensation against independent equations
 #
+# Would a perfectly conserved mass budget detect an incorrect transfer rate?
+# Not by itself. This walkthrough gives you three separate diagnostics and an
+# independent implementation of the specified update. Start with the
+# [direct condensation workflow](gpu_direct_kernels_quick_start.py), then follow
+# proposal, availability limiting, and gas update in that order.
+#
+# The two boxes use 298.15 and 305.15 K and a total interval of 0.08 s, split into
+# four 0.02 s updates. Both gases have an illustrative constant pure vapor pressure
+# of 0.01 Pa. The labels Water and Organic identify material lanes, not calibrated
+# vapor-pressure models for those temperatures.
+#
 # Two boxes have different temperatures, particle compositions and gas
 # inventories. Water uptake and organic evaporation occur in the same call.
 # An independent NumPy calculation evaluates four equal substeps before the
@@ -36,6 +47,8 @@ from dataclasses import dataclass
 from typing import Any, Literal
 
 import numpy as np
+from matplotlib import style as mplstyle
+from particula import plotting
 from particula.dynamics.condensation.mass_transfer import (
     get_first_order_mass_transport_k,
     get_mass_transfer_rate_latent_heat,
@@ -879,6 +892,7 @@ def run_example(device: str = "cpu") -> ExampleRun:
 
 
 # %%
+@mplstyle.context("particula.default")
 def run_publication():
     """Require successful CUDA acceptance before rendering the comparison."""
     import matplotlib.pyplot as plt
@@ -889,7 +903,7 @@ def run_publication():
     result = run_example(device="cuda:0")
     if any(item.status != "passed" for item in result.acceptance):
         raise AssertionError("CUDA condensation acceptance failed")
-    fig, axes = plt.subplots(1, 2, figsize=(10, 3.8), constrained_layout=True)
+    fig, axes = plotting.subplots(1, 2, size="wide")
     labels = [
         f"B{b + 1} P{p + 1} {s}"
         for b in range(2)
@@ -914,7 +928,7 @@ def run_publication():
     )
     axes[0].tick_params(axis="x", rotation=65)
     axes[0].axhline(0, color="0.5", linewidth=0.8)
-    axes[0].legend()
+    plotting.legend(axes[0])
     x = np.arange(4)
     axes[1].plot(
         x,
@@ -936,11 +950,12 @@ def run_publication():
     )
     axes[1].tick_params(axis="x", rotation=35)
     axes[1].axhline(0, color="0.5", linewidth=0.8)
-    axes[1].legend()
+    plotting.legend(axes[1])
     fig.suptitle(
         "Independent condensation check · " + wp.get_device("cuda:0").name
     )
     print("\n".join(result.output))
+    plotting.fit(fig)
     plt.show()
     return result
 
@@ -960,3 +975,21 @@ if __name__ == "__main__":
         run_publication()
     else:
         raise SystemExit(main())
+
+# %% [markdown]
+# ## Explain agreement at the right level
+#
+# Matching signed bars checks the transfer calculation; matching energy markers
+# checks count-weighted transfer times latent heat. The conservation check tests
+# material exchange with gas separately. The category called `physics` in the
+# printed report means agreement with this implemented oracle, not experimental
+# validation. The oracle uses shared scalar property functions but independently
+# organizes the proposal, bounds, and four-substep update; it is not an independent
+# validation of those shared property laws.
+#
+# The prescribed temperatures do not evolve with the energy diagnostic. For a
+# thermally coupled study, add an explicit heat budget and an independent limiting
+# solution. For a transfer study, vary gas availability and timestep while retaining
+# species-wise checks, so that clipping and integration errors cannot hide behind
+# a conserved total. See [latent-heat condensation](../../processes/condensation/condensation_latent_heat.py)
+# for the meaning of the heat-resistance correction.

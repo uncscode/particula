@@ -34,6 +34,8 @@ from dataclasses import dataclass
 from typing import Any
 
 import numpy as np
+from matplotlib import style as mplstyle
+from particula import plotting
 from particula.particles import ParticleData
 
 _FORCE_NO_WARP_ENV = "PARTICULA_EXAMPLE_FORCE_NO_WARP"
@@ -286,6 +288,7 @@ def run_example(device: str = "cpu") -> ExampleRun:
 
 
 # %%
+@mplstyle.context("particula.default")
 def run_publication():
     """Require CUDA and show particle-number change alongside conserved mass."""
     import matplotlib.pyplot as plt
@@ -298,7 +301,7 @@ def run_publication():
     final = result.particle_data
     if final is None:
         raise RuntimeError("CUDA produced no particle snapshot")
-    fig, axes = plt.subplots(1, 2, figsize=(9, 3.6), constrained_layout=True)
+    fig, axes = plotting.subplots(1, 2)
     edges = np.geomspace(1, 30, 16)
     for data, label in ((initial, "Initial"), (final, "After two calls")):
         volume = np.sum(data.masses / data.density, axis=2)[0]
@@ -312,7 +315,7 @@ def run_publication():
         xlabel="Radius (nm)",
         ylabel="Number density per bin (m$^{-3}$)",
     )
-    axes[0].legend()
+    plotting.legend(axes[0])
     initial_mass = np.sum(initial.masses * initial.concentration[..., None])
     final_mass = np.sum(final.masses * final.concentration[..., None])
     fraction = [
@@ -322,12 +325,13 @@ def run_publication():
     axes[1].bar(
         ["Represented number", "Represented mass"],
         fraction,
-        color=["#be6c39", "#287a90"],
+        color=[plotting.COLORS["rust"], plotting.COLORS["teal"]],
     )
     axes[1].axhline(1, color="0.5", linestyle="--")
     axes[1].set(ylabel="Final / initial", ylim=(0, 1.1))
     fig.suptitle("Brownian collisions · " + wp.get_device("cuda:0").name)
     print("\n".join(result.output))
+    plotting.fit(fig)
     plt.show()
     return result
 

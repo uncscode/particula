@@ -1,6 +1,18 @@
 # %% [markdown]
 # # Multibox resident timesteps and continuation
 #
+# Why can a quantity called a conservation residual change even when the model
+# is working as configured? This example makes gas replacement and particle loss
+# visible alongside resident ownership. It is intended for readers examining the
+# low-level scheduler; begin with [session ownership](gpu_resident_session.py) or
+# use the [prepared interface](../prepared/gpu_prepared_quick_start.py) for a study.
+#
+# The three boxes have volumes 1, 2, and 3 m³ and prescribed gas densities
+# 0.25, 0.5, and 0.75 kg m⁻³. The sole lane is named water but uses an illustrative
+# constant pure vapor pressure of 800 Pa. These are test inputs, not a calibrated
+# water-cloud state. The request builds dependencies, binds physical state and
+# scratch arrays, then observes diagnostics after two one-second steps.
+#
 # Run the complete low-level resident schedule across three heterogeneous
 # boxes, inspect CPU diagnostics, and explicitly resume a checkpoint.
 # Run with `--cuda` to reproduce the saved figures. CUDA is required
@@ -27,6 +39,8 @@ from types import SimpleNamespace
 from typing import Any
 
 import numpy as np
+from matplotlib import style as mplstyle
+from particula import plotting
 from particula.gas import EnvironmentData, GasData
 from particula.particles import ParticleData
 
@@ -872,6 +886,7 @@ def run_example(device: str = "cpu") -> ExampleRun:
 
 
 # %%
+@mplstyle.context("particula.default")
 def run_publication():
     """Require CUDA and plot heterogeneous gas and open-system inventories."""
     import matplotlib.pyplot as plt
@@ -884,7 +899,7 @@ def run_publication():
     if result.gas_snapshot is None or result.conservation_residual is None:
         raise RuntimeError("CUDA produced no diagnostic snapshots")
     boxes = np.arange(3) + 1
-    fig, axes = plt.subplots(1, 2, figsize=(9, 3.6), constrained_layout=True)
+    fig, axes = plotting.subplots(1, 2)
     axes[0].bar(
         boxes - 0.18,
         initial_gas.concentration[:, 0],
@@ -898,10 +913,10 @@ def run_publication():
         label="After two steps",
     )
     axes[0].set(xlabel="Box", ylabel="Water gas (kg m$^{-3}$)", xticks=boxes)
-    axes[0].legend()
+    plotting.legend(axes[0])
     relative = np.asarray(result.conservation_residual).reshape(3, -1)[:, 0]
     relative = relative / result.initial_total_mass[:, 0]
-    axes[1].bar(boxes, relative, color="#be6c39")
+    axes[1].bar(boxes, relative, color=plotting.COLORS["rust"])
     axes[1].set(
         xlabel="Box", ylabel="Net inventory change / initial", xticks=boxes
     )
@@ -911,6 +926,7 @@ def run_publication():
     )
     print("\n".join(result.output))
     print("Checkpoint forcing matched exactly before continuation.")
+    plotting.fit(fig)
     plt.show()
     return result
 
@@ -928,3 +944,21 @@ if __name__ == "__main__":
         run_publication()
     else:
         main()
+
+# %% [markdown]
+# ## Explain the source and sink before the residual
+#
+# Each source step restores the prescribed gas, so particle uptake can be followed
+# by external vapor replenishment. Wall loss can export particle material. The
+# residual buffer uses the initial inventory and zero source/sink ledger arrays;
+# its plotted change consequently is not an accounted conservation error.
+# Communication has zero edges, prescribed volumes stay fixed, and nucleation has
+# a zero coefficient. Listing those schedule nodes does not mean they transport
+# material or create particles in this run.
+#
+# The restart check verifies gas and temperature before its additional step; the
+# plotted bars describe the original two-step state. There is no uninterrupted
+# three-step comparison here. For a coupled-box research model, add actual transfer
+# edges and an external-exchange ledger, then compare a complete resumed trajectory
+# with an uninterrupted control. The [prepared lifecycle](../prepared/gpu_prepared_lifecycle.py)
+# provides that stronger continuation and process-accounting example.
