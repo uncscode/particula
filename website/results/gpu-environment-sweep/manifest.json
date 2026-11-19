@@ -8,10 +8,10 @@
     "scripts/gpu_studies/__init__.py": "530c51f7c7f432a895623c9ba4548b7cf3e053a1a0f328a36ae8ae9e50cec9c4",
     "scripts/gpu_studies/environment_sweep.py": "729a5a5b6d90faca83218b37c5add4bff4ad62e19572a4a68ec97560b93265db",
     "scripts/gpu_studies/population_diagnostics.py": "8a91762a4321fd10751f580a1ab6a624566eb22ee7b38e65aad70d98f4718e35",
-    "scripts/gpu_studies/population_figures.py": "feef0f0c388e86ebc86b202663c47bfb079d75496f35f588ea5cb68f03395df9"
+    "scripts/gpu_studies/population_figures.py": "3f2f5199abbee90be50cdfcf4adc4bd0b3f5afa8bb4c9211d29cfc9e501803be"
   },
   "example": "gpu-environment-sweep",
-  "fingerprint": "516a3d790693204fcfc9263b071524e72bfc64b905ee2acf567298c6d47e6c8d",
+  "fingerprint": "b2a2289e12b383100d769e0b38415b7eb52af614e4ec227032eb9c9a4f12909d",
   "source": "docs/examples/gpu/prepared/gpu_environment_sweep.py",
   "revision": "54edfe13b7c99ec01b3a5f853e3ee45e6454ab61",
   "package_dirty": false,
@@ -71,7 +71,7 @@
     "figure-4-8.png": "896b2871657e401f21e4b2f608c27390585a78247b8e5aaba6249680911e629b",
     "figure-4-7.png": "68faea063167e4220f39306c6f633f55f6b1107b650e98195db0e08c2ab11fa7",
     "figure-4-6.png": "a5cf52930d25ac053832db8bd657085ab56989e2d5efbd616371b9b326bc8488",
-    "figure-4-5.png": "0931f1a43b5c16bbebbb558ff6c0b5cc1eda48217ce1092f2e2620bc919b7777",
+    "figure-4-5.png": "edd17b2ab652e3a57e8b2e3a34a44b2de3ea8b3fa1ebd665853dfc32f7e62f61",
     "figure-4-4.png": "304ab2372579a56aa3d90444eee038b43c6fd9aa784f09696551d04e28dd7d85",
     "figure-4-3.png": "f70d5a517f02a79c74d6729ed694a49e0267f30b0587936f44a212726e3cb38d",
     "figure-4-2.png": "1a796cba740daa5c2805406c49b2408717d1bf23b369c159e16bef48b1da2c46",
@@ -103,7 +103,7 @@
     "scripts/gpu_studies/population_diagnostics.py": "8a91762a4321fd10751f580a1ab6a624566eb22ee7b38e65aad70d98f4718e35",
     "scripts/gpu_studies/population_figures.py": "ad1b167df0aff538516b03cce7de1f1db22126bfd83a2df642ba161229f1d5f9"
   },
-  "rendered_at": "2026-11-19T19:37:48.755854+00:00",
-  "render_revision": "f5be504b2ecb3d768eb5a41a2be1be19b0d2d96d",
-  "render_elapsed_seconds": 13.836834955960512
+  "rendered_at": "2026-11-19T20:15:15.905426+00:00",
+  "render_revision": "f8d85aa0fe0f6df4943956fcf7b6c251828523fc",
+  "render_elapsed_seconds": 13.83048442506697
 }

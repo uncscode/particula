@@ -788,7 +788,7 @@
     "invoke": "result = run_example()",
     "full_canvas": true,
     "data_expression": "plot_data(result)",
-    "replot_invoke": "result = saved_data\nplot_results(result)\nplt.show()",
+    "replot_invoke": "result = saved_data\nfigure = plot_results(result)",
     "render_functions": [
       "plot_results",
       "plot_data"
