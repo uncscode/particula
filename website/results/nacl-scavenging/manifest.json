@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 3.339950605062768,
+  "package_source_sha256": "9c32ac1e3330a07adc687b53840485972efe598748cdfbe8fa6ca29669f0e8ff",
+  "input_sha256": {
+    "docs/data/nacl-scavenging/comparison.csv": "2045ce2175f2c5d3331c214421c2e6d7e4089548a17e990580ae8f11b4770e76"
+  },
+  "example": "nacl-scavenging",
+  "fingerprint": "75974af34893c51a518cc94b665f19975fac54ca9dda7fddf60e22a6912472b9",
+  "source": "docs/examples/processes/coagulation/charge/nacl_scavenging.py",
+  "revision": "d092dbde6fc1654db3b27542314a5ea1902f0a31",
+  "package_dirty": false,
+  "executed_at": "2026-11-19T01:59:06.225997+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.2",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [
+      {
+        "text": "4 nm\n  -1 e    1.732%\n  +0 e   97.513%\n  +1 e    1.486%\n100 nm\n  -2 e    5.608%\n  -1 e   27.932%\n  +0 e   42.589%\n  +1 e   21.380%\n  +2 e    3.171%\n"
+      }
+    ],
+    [
+      {
+        "text": "4 nm channel, +1/+2/+3 centers (nm): [4.   5.67 6.96]\n100 nm channel, +1/+2/+3 centers (nm): [100.   151.91 197.19]\n"
+      }
+    ],
+    [
+      {
+        "image": "figure-3-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "figure-3-1.png": "700a4dd723e8166314716ca3d8a1440f462cf5e6eea79518aa247f4ebca9498c",
+    "source.py": "2579acc2f93ea900301b3a541d42cc5dcf40e54c35e6bd4b24a6825a59136cdb"
+  }
+}

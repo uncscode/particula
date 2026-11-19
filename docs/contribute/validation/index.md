@@ -6,6 +6,7 @@ Results are specific to their recorded revision, workload, and device.
 
 | Question | Record |
 | --- | --- |
+| Can bipolar charge and mobility selection explain NaCl capture rates? | [NaCl chamber scavenging](coagulation/nacl-scavenging.md) |
 | How well does direct BAT reproduce the published activity curves? | [Binary BAT reference checks](thermodynamics/bat-activity.md) |
 | How well does BAT reproduce measured citric acid water activity? | [Citric acid droplet hygroscopicity](thermodynamics/citric-acid-comparison.md) |
 | How well does a CCN-derived κ transfer across sizes and humidities? | [Size-resolved CCN retrieval study](thermodynamics/ccn-retrieval.md) |

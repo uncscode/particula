@@ -2564,6 +2564,27 @@
       "also": [],
       "role": "Contribute",
       "start_here": false
+    },
+    {
+      "source": "docs/examples/processes/coagulation/charge/nacl_scavenging.py",
+      "title": "Estimate bipolar charges and multiply charged diameters",
+      "topic": "charged",
+      "also": [
+        "brownian"
+      ],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/contribute/validation/coagulation/nacl-scavenging.md",
+      "title": "NaCl nanoparticle scavenging in a chamber",
+      "topic": "verification-scientific",
+      "also": [
+        "charged",
+        "brownian"
+      ],
+      "role": "Contribute",
+      "start_here": false
     }
   ],
   "supporting": [

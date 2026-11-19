@@ -945,5 +945,15 @@
       "plot_results"
     ],
     "plot_inputs": []
+  },
+  "nacl-scavenging": {
+    "title": "What passes through a 100 nm mobility channel?",
+    "source": "docs/examples/processes/coagulation/charge/nacl_scavenging.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 300,
+    "inputs": [
+      "docs/data/nacl-scavenging/comparison.csv"
+    ]
   }
 }
