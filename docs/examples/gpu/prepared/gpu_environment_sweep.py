@@ -1,6 +1,8 @@
 # %% [markdown]
 # # Charged aerosols and ions across sixteen environments
 #
+# Each humidity, pressure and temperature condition starts with 131,072 aerosols.
+#
 # How can we distinguish humidity-driven size growth from changes caused by
 # particle collisions and ion attachment? This controlled factorial study
 # compares size, number, and charge diagnostics across temperature, pressure,
@@ -140,7 +142,7 @@ def plot_results(report):
     ax.set_xlim(0, max(mergers.max() * 1.1, 1))
     ax.set(
         xlabel="Accepted mergers in 3 ms",
-        title="Rare collisions across 131,072 initial aerosols per condition",
+        title="Mergers by condition",
     )
     ax.bar_label(ax.containers[0], fontsize=12)
     print(f"Device: {report['device']}")
@@ -166,7 +168,8 @@ def plot_results(report):
     labels = [
         f"{t:.2f} K · {p / 1000:g} kPa · RH {rh:.0%}" for t, p, rh in grid
     ]
-    population_figures(report, labels, time_scale=1000, time_unit="ms")
+    panel_labels = [label.replace(" · RH ", "\nRH ") for label in labels]
+    population_figures(report, panel_labels, time_scale=1000, time_unit="ms")
     describe_population(report, labels)
     ion_figures(report, labels)
     plotting.fit(fig)

@@ -805,7 +805,11 @@
     "plot_inputs": [
       "scripts/gpu_studies/population_figures.py"
     ],
-    "full_canvas": true
+    "full_canvas": true,
+    "historical_run": {
+      "revision": "54edfe13b7c99ec01b3a5f853e3ee45e6454ab61",
+      "data_sha256": "a36f8b3dc9a1d8d5979e050442aa6fb2886ffb43b27b09733645059eefd044b1"
+    }
   },
   "gpu-dry-environment-sweep": {
     "title": "Dry charged aerosols: ground level, mesopause and pressurized chambers",
