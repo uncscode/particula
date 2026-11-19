@@ -128,6 +128,7 @@ def evaluate(
     cutoff=0.0,
     neutral=False,
     atomizer_multi=1.0,
+    pair_models=None,
 ):
     """Retrieve steady coefficients for one tracer channel and scenario."""
     p = probs(bound)
@@ -215,11 +216,22 @@ def evaluate(
     baseline_signal = readout @ blank.sum(axis=1)
     loss0 = (readout @ sw) / baseline_signal
     results = []
-    for name, k in [
+    models = [
         ("native", kernel),
         ("dispersion", kernel + extra[:, None]),
         ("published_anchor", (kernel + extra[:, None]) * anchor[:, None]),
-    ]:
+    ]
+    metrics = {}
+    if pair_models is not None:
+        models, metrics = pair_models(
+            D[si],
+            D[li],
+            small_z,
+            large,
+            kernels,
+            np.exp(dispersion_interpolator()(query)),
+        )
+    for name, k in models:
         state = solve(si, small_z, ions, bound, source, background + k * 1e4)
         sensor = scan.T @ state.sum(axis=1)
         apparent = (baseline_signal / sensor.sum() - 1) * loss0 / 1e4
@@ -228,6 +240,10 @@ def evaluate(
                 case=case,
                 model=name,
                 target_nm=d,
+                **{
+                    key: (value * state).sum() / state.sum()
+                    for key, value in metrics.items()
+                },
                 apparent_cm3_s=apparent,
                 true_capture_cm3_s=(k * state).sum() / state.sum(),
                 blank_loss_h=loss0 * 3600,
