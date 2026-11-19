@@ -85,7 +85,8 @@ a worktree. On restart, reconcile the register with existing worktrees and PRs.
    in the shared location. Record refinement, uncertainty and applicable
    budgets. Keep bulky or restricted data in suitable storage and record their
    location and reuse conditions. If a budget is exhausted, save progress and
-   the outstanding check.
+   the outstanding check. Write the packet's [researcher-facing review](#writing-reviewmd)
+   in `review.md` and link it from the handoff.
 3. **Review the science with the researcher.** Deliver the packet path and a
    short discussion of what was tested, what the evidence supports and what
    would resolve the main uncertainty. Record the researcher's decision to
@@ -101,6 +102,52 @@ a worktree. On restart, reconcile the register with existing worktrees and PRs.
    and figure. Follow the [example authoring workflow](../website/AUTHORING.md).
    After validation and diff review, open one PR for that study and record its
    URL. Material changes to the scientific result return to research review.
+
+## Writing `review.md`
+
+Write a short technical note for a researcher who knows aerosol science and
+has not read the paper. Give each review one scientific question. Open with
+what the authors measured or modeled, what Particula compared, and what the
+result means for someone designing an experiment or interpreting data. If
+the evidence leaves the question open, say what remains unresolved and why
+it matters.
+
+Use the title and section headings to state findings. For example,
+“Particula assigns 102 nm to a 100.7 nm dry PSL standard near atmospheric
+pressure” names the quantity, reference and conditions. In the text, spell
+out polystyrene latex (PSL) and explain how electrical mobility is converted
+to diameter. The +1.3% is a shift in **inferred dry diameter** relative to
+the reference sphere. A claim about hygroscopicity would require a separate
+comparison. Define symbols where they first affect the interpretation, such
+as the Knudsen number (Kn), the ratio of gas mean free path to particle radius.
+
+Build the narrative around the evidence and the decision it supports.
+
+- **Put a number in context.** Give the reference and comparison values,
+  units, direction and conditions for the main result. For a percentage,
+  identify the denominator. Use “uncertainty” for a quantified uncertainty
+  estimate and “shift” or “difference” for a change between calculations.
+- **Explain when the effect matters.** Show where it is small or large
+  relative to a stated measurement uncertainty or experimental tolerance,
+  when available. Explain the physical reason if known. Identify which
+  assumptions came from the authors and which the Particula analysis added.
+  For example, in a chamber study, say whether the authors used size-dependent
+  wall loss, a constant rate, or left the treatment unspecified. Explain how
+  that limits what particle decay can tell the reader about collisions.
+- **Label the evidence where it appears.** Distinguish observations,
+  quantities inferred from observations, and synthetic predictions in the
+  prose and figure captions. Use a table or figure when it makes a comparison
+  easier to read. Its caption should identify the observable, conditions and
+  reference that give the pattern meaning.
+- **Close with a research decision.** Say what the reader can do with the
+  result, where it applies, and which next measurement or calculation could
+  resolve the main uncertainty. Put reproduction commands and supporting
+  files at the end. Link the paper's specific table, figure or equation
+  beside the claim it supports.
+
+Before handing off, read just the title, headings and first paragraph. A
+researcher skimming those lines should be able to say what changed, under
+which conditions, and why it matters.
 
 ## Diagnosing a Particula limitation
 
