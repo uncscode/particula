@@ -1888,6 +1888,27 @@
       "start_here": false
     },
     {
+      "source": "docs/examples/simulations/pi_chamber_spectra.py",
+      "title": "When do two Π Chamber size distributions converge?",
+      "topic": "chambers",
+      "also": [
+        "condensation",
+        "losses-deposition"
+      ],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/contribute/validation/thermodynamics/pi-chamber.md",
+      "title": "Haze and cloud partitioning in the Π Chamber",
+      "topic": "chambers",
+      "also": [
+        "verification-scientific"
+      ],
+      "role": "Contribute",
+      "start_here": false
+    },
+    {
       "source": "docs/examples/simulations/cloud_chamber_single_cycle.py",
       "title": "Follow droplets through one wet–dry chamber cycle",
       "topic": "chambers",
