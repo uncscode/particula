@@ -3599,6 +3599,7 @@ invalid.
 - `particula.execution.gpu_restart`
 - `particula.execution.gpu_session`
 - `particula.execution.graph_capture`
+- `particula.execution.inverse_condensation`
 - `particula.execution.ode`
 - `particula.execution.particle_field_kernels`
 - `particula.execution.preparation_context`
