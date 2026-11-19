@@ -20,7 +20,7 @@ hidden particle transfer, box subdivision or weight change is performed.
 MAX_COLLISION_PAIR_BUFFER_BYTES = 256 * 1024 * 1024
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L108-L108)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L114-L114)
 
 ## particula.gpu.kernels.coagulation.MAX_SCHEDULED_TRIALS_PER_BOX
 
@@ -30,7 +30,69 @@ MAX_COLLISION_PAIR_BUFFER_BYTES = 256 * 1024 * 1024
 MAX_SCHEDULED_TRIALS_PER_BOX = 65536
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L109-L109)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L115-L115)
+
+## particula.gpu.kernels.coagulation.AdaptiveCoagulationResult
+
+*class* · *dataclass*
+
+```python
+class AdaptiveCoagulationResult
+```
+
+Outer interval output with ordered pairs and per-box boundaries.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2958-L2965)
+
+### particula.gpu.kernels.coagulation.AdaptiveCoagulationResult.collision_pairs
+
+*attribute* · *instance attribute*
+
+```python
+collision_pairs: Any
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2963-L2963)
+
+### particula.gpu.kernels.coagulation.AdaptiveCoagulationResult.diagnostics
+
+*attribute* · *instance attribute*
+
+```python
+diagnostics: dict[str, Any]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2965-L2965)
+
+### particula.gpu.kernels.coagulation.AdaptiveCoagulationResult.n_collisions
+
+*attribute* · *instance attribute*
+
+```python
+n_collisions: Any
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2964-L2964)
+
+### particula.gpu.kernels.coagulation.AdaptiveCoagulationResult.particles
+
+*attribute* · *instance attribute*
+
+```python
+particles: Any
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2962-L2962)
+
+### particula.gpu.kernels.coagulation.AdaptiveCoagulationResult.__init__
+
+*method*
+
+```python
+def __init__(particles: Any, collision_pairs: Any, n_collisions: Any, diagnostics: dict[str, Any]) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L0-L0)
 
 ## particula.gpu.kernels.coagulation._PreparedCoagulationCall
 
@@ -61,7 +123,17 @@ already prepared writer.
 - `device` (`Any`) — Active Warp device for all launches.
 - `selector_inputs` (`tuple[Any, ...]`) — Frozen arguments for the selector kernel.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2364-L2413)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2370-L2420)
+
+### particula.gpu.kernels.coagulation._PreparedCoagulationCall.adaptive
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+adaptive: Any = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2406-L2406)
 
 ### particula.gpu.kernels.coagulation._PreparedCoagulationCall.brownian_parallel
 
@@ -71,7 +143,7 @@ already prepared writer.
 brownian_parallel: Any = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2398-L2398)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2404-L2404)
 
 ### particula.gpu.kernels.coagulation._PreparedCoagulationCall.budget_failure
 
@@ -81,7 +153,7 @@ brownian_parallel: Any = None
 budget_failure: Any = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2401-L2401)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2408-L2408)
 
 ### particula.gpu.kernels.coagulation._PreparedCoagulationCall.budget_report
 
@@ -91,7 +163,7 @@ budget_failure: Any = None
 budget_report: Any = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2400-L2400)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2407-L2407)
 
 ### particula.gpu.kernels.coagulation._PreparedCoagulationCall.charge
 
@@ -101,7 +173,7 @@ budget_report: Any = None
 charge: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2390-L2390)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2396-L2396)
 
 ### particula.gpu.kernels.coagulation._PreparedCoagulationCall.collision_pairs
 
@@ -111,7 +183,7 @@ charge: Any
 collision_pairs: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2391-L2391)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2397-L2397)
 
 ### particula.gpu.kernels.coagulation._PreparedCoagulationCall.concentration
 
@@ -121,7 +193,7 @@ collision_pairs: Any
 concentration: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2389-L2389)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2395-L2395)
 
 ### particula.gpu.kernels.coagulation._PreparedCoagulationCall.device
 
@@ -131,7 +203,7 @@ concentration: Any
 device: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2395-L2395)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2401-L2401)
 
 ### particula.gpu.kernels.coagulation._PreparedCoagulationCall.failure
 
@@ -141,7 +213,7 @@ device: Any
 failure: Any = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2397-L2397)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2403-L2403)
 
 ### particula.gpu.kernels.coagulation._PreparedCoagulationCall.masses
 
@@ -151,7 +223,7 @@ failure: Any = None
 masses: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2388-L2388)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2394-L2394)
 
 ### particula.gpu.kernels.coagulation._PreparedCoagulationCall.max_collisions
 
@@ -161,7 +233,7 @@ masses: Any
 max_collisions: int
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2394-L2394)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2400-L2400)
 
 ### particula.gpu.kernels.coagulation._PreparedCoagulationCall.n_boxes
 
@@ -171,7 +243,7 @@ max_collisions: int
 n_boxes: int
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2393-L2393)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2399-L2399)
 
 ### particula.gpu.kernels.coagulation._PreparedCoagulationCall.n_collisions
 
@@ -181,7 +253,7 @@ n_boxes: int
 n_collisions: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2392-L2392)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2398-L2398)
 
 ### particula.gpu.kernels.coagulation._PreparedCoagulationCall.particles
 
@@ -191,7 +263,7 @@ n_collisions: Any
 particles: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2387-L2387)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2393-L2393)
 
 ### particula.gpu.kernels.coagulation._PreparedCoagulationCall.rng_pending
 
@@ -201,7 +273,7 @@ particles: Any
 rng_pending: Any = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2402-L2402)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2409-L2409)
 
 ### particula.gpu.kernels.coagulation._PreparedCoagulationCall.rng_seed
 
@@ -211,7 +283,7 @@ rng_pending: Any = None
 rng_seed: int = 0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2403-L2403)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2410-L2410)
 
 ### particula.gpu.kernels.coagulation._PreparedCoagulationCall.selector_inputs
 
@@ -221,7 +293,7 @@ rng_seed: int = 0
 selector_inputs: tuple[Any, ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2396-L2396)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2402-L2402)
 
 ### particula.gpu.kernels.coagulation._PreparedCoagulationCall.work_config
 
@@ -231,7 +303,7 @@ selector_inputs: tuple[Any, ...]
 work_config: Any = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2399-L2399)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2405-L2405)
 
 ### particula.gpu.kernels.coagulation._PreparedCoagulationCall.work_counts
 
@@ -241,14 +313,14 @@ work_config: Any = None
 work_counts: Any = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2404-L2404)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2411-L2411)
 
 ### particula.gpu.kernels.coagulation._PreparedCoagulationCall.__init__
 
 *method*
 
 ```python
-def __init__(particles: Any, masses: Any, concentration: Any, charge: Any, collision_pairs: Any, n_collisions: Any, n_boxes: int, max_collisions: int, device: Any, selector_inputs: tuple[Any, ...], failure: Any = None, brownian_parallel: Any = None, work_config: Any = None, budget_report: Any = None, budget_failure: Any = None, rng_pending: Any = None, rng_seed: int = 0, work_counts: Any = None) -> None
+def __init__(particles: Any, masses: Any, concentration: Any, charge: Any, collision_pairs: Any, n_collisions: Any, n_boxes: int, max_collisions: int, device: Any, selector_inputs: tuple[Any, ...], failure: Any = None, brownian_parallel: Any = None, work_config: Any = None, adaptive: Any = None, budget_report: Any = None, budget_failure: Any = None, rng_pending: Any = None, rng_seed: int = 0, work_counts: Any = None) -> None
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L0-L0)
@@ -263,7 +335,7 @@ def check_admission() -> None
 
 Observe compact diagnostics at an explicit host boundary.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2406-L2413)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2413-L2420)
 
 ## particula.gpu.kernels.coagulation._bound_scheduled_trials
 
@@ -275,7 +347,7 @@ def _bound_scheduled_trials(expected_trials: Any) -> Any
 
 Retain the legacy trial clamp for diagnostic oracles, not production.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L114-L124)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L120-L130)
 
 ## particula.gpu.kernels.coagulation._charged_majorant_from_active_pairs
 
@@ -317,7 +389,7 @@ nonpositive candidates contribute zero.
 - (`Any`) — Finite, nonnegative maximum charged hard-sphere rate for the selected
 - (`Any`) — box, or zero when no positive finite selected-pair rate exists.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L330-L413)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L336-L419)
 
 ## particula.gpu.kernels.coagulation._checked_positive_finite_add
 
@@ -332,7 +404,7 @@ Add two sanitized fp64 terms, failing closed on invalid arithmetic.
 Additive mechanism terms are independently optional, but an overflowing
 aggregate cannot safely be used as a selector rate or majorant.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L140-L151)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L146-L157)
 
 ## particula.gpu.kernels.coagulation._coagulation_selector_impl
 
@@ -387,7 +459,7 @@ candidate/acceptance path. Production obtains maxima from tiled reductions.
 - `collision_capacity` (`Any`) — Maximum accepted collisions per box for this call.
 - `box_idx` (`int`) — Box index supplied by the kernel launch entry point.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L901-L1202)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L907-L1208)
 
 ## particula.gpu.kernels.coagulation._compact_applied_collision_pairs_guarded
 
@@ -399,7 +471,7 @@ def _compact_applied_collision_pairs_guarded(collision_pairs: Any, n_collisions:
 
 Remove rejected collision entries after the apply pass.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1701-L1723)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1707-L1729)
 
 ## particula.gpu.kernels.coagulation._compact_applied_collision_pairs_kernel
 
@@ -411,7 +483,7 @@ def _compact_applied_collision_pairs_kernel(collision_pairs: Any, n_collisions: 
 
 Remove rejected collision entries after the apply pass.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1678-L1698)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1684-L1704)
 
 ## particula.gpu.kernels.coagulation._enqueue_prepared_coagulation_call
 
@@ -429,7 +501,7 @@ returning; private prepared owners call check_admission explicitly.
 Failure preserves caller particle/output/RNG arrays for this operation;
 earlier successful operations are not rolled back.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2730-L2793)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2737-L2803)
 
 ## particula.gpu.kernels.coagulation._ensure_turbulent_input_array
 
@@ -465,7 +537,7 @@ ST1956 turbulent shear.
 same-device ``wp.float64`` Warp array with shape ``(n_boxes,)``
 and positive finite values.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2234-L2266)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2240-L2272)
 
 ## particula.gpu.kernels.coagulation._ensure_volume_array
 
@@ -496,7 +568,7 @@ Ensure a GPU volume array is available.
 > Valid Warp arrays are returned unchanged so launch code can reuse
 > caller-owned per-box volume buffers.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2316-L2361)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2322-L2367)
 
 ## particula.gpu.kernels.coagulation._initialize_rng_states
 
@@ -513,7 +585,7 @@ Initialize or reset per-box RNG states from a seed.
 - `seed` (`Any`) — RNG seed value.
 - `rng_states` (`Any`) — RNG state buffer ``(n_boxes,)`` written in place.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L727-L738)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L733-L744)
 
 ## particula.gpu.kernels.coagulation._native_coagulation_kernel
 
@@ -525,7 +597,7 @@ def _native_coagulation_kernel(masses: Any, concentration: Any, density: Any, vo
 
 Schedule every native mechanism with its common raw particle count.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1415-L1482)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1421-L1488)
 
 ## particula.gpu.kernels.coagulation._native_coagulation_kernel_guarded
 
@@ -537,7 +609,7 @@ def _native_coagulation_kernel_guarded(masses: Any, concentration: Any, density:
 
 Skip this resident writer after a latched simulation failure.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1485-L1555)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1491-L1561)
 
 ## particula.gpu.kernels.coagulation._normalize_turbulent_input_array
 
@@ -551,7 +623,7 @@ Normalize an already-validated turbulent numerical validation input.
 
 This helper does not repeat validation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2269-L2280)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2275-L2286)
 
 ## particula.gpu.kernels.coagulation._preflight_enabled_coagulation_terms
 
@@ -563,7 +635,7 @@ def _preflight_enabled_coagulation_terms(resolved: _ResolvedCoagulationMechanism
 
 Run enabled-term validation before executable resource preparation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1969-L2013)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1975-L2019)
 
 ## particula.gpu.kernels.coagulation._prepare_coagulation_step_gpu
 
@@ -595,7 +667,7 @@ masks containing shear. Configuration validation precedes particle access.
 - (`_PreparedCoagulationCall`) — A frozen binding owning reusable property, reduction, admission and
 - (`_PreparedCoagulationCall`) — RNG-initialization scratch alongside caller-owned simulation arrays.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2416-L2727)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2423-L2734)
 
 ## particula.gpu.kernels.coagulation._remove_active_pair_by_rank_swap_pop
 
@@ -607,7 +679,7 @@ def _remove_active_pair_by_rank_swap_pop(active_indices: Any, box_idx: Any, acti
 
 Remove two active ranks from a compact active-index buffer.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L669-L694)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L675-L700)
 
 ## particula.gpu.kernels.coagulation._resolve_active_pair_by_rank
 
@@ -619,7 +691,7 @@ def _resolve_active_pair_by_rank(active_indices: Any, box_idx: Any, n_particles:
 
 Resolve two active-set ranks to particle indices in one scan.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L697-L724)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L703-L730)
 
 ## particula.gpu.kernels.coagulation._resolve_collision_capacity
 
@@ -648,7 +720,7 @@ Resolve a bounded accepted-collision capacity for one call.
 > Allocation is also bounded by an explicit buffer-byte budget so invalid
 > requests cannot trigger unbounded internal allocation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2155-L2188)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2161-L2194)
 
 ## particula.gpu.kernels.coagulation._safe_acceptance_probability
 
@@ -665,7 +737,7 @@ tolerance; that narrow case maps exactly to one. Material violations and
 non-finite tolerance arithmetic fail closed before the caller draws an
 acceptance variate. Candidate-selection draws precede this calculation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L154-L189)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L160-L195)
 
 ## particula.gpu.kernels.coagulation._sanitize_positive_finite
 
@@ -680,7 +752,7 @@ Return a finite, strictly positive term or zero for safe accumulation.
 Invalid, zero, and negative terms make no contribution to an additive
 pair-rate or majorant total.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L127-L137)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L133-L143)
 
 ## particula.gpu.kernels.coagulation._sedimentation_majorant_from_active_pairs
 
@@ -709,7 +781,7 @@ Invalid, zero, and nonpositive rates contribute zero.
 - (`Any`) — Finite, nonnegative maximum sedimentation rate for the selected box,
 - (`Any`) — or zero when no positive finite selected-pair rate exists.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L416-L461)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L422-L467)
 
 ## particula.gpu.kernels.coagulation._select_active_pair_by_rank
 
@@ -721,7 +793,7 @@ def _select_active_pair_by_rank(active_indices: Any, box_idx: Any, rank_i: Any, 
 
 Resolve two active-set ranks from a compact active-index buffer.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L654-L666)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L660-L672)
 
 ## particula.gpu.kernels.coagulation._select_coagulation_pairs_impl
 
@@ -733,7 +805,7 @@ def _select_coagulation_pairs_impl(masses: Any, concentration: Any, density: Any
 
 Preserve sequential pair selection and the exact persistent RNG path.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1205-L1412)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1211-L1418)
 
 ## particula.gpu.kernels.coagulation._total_majorant
 
@@ -753,7 +825,7 @@ its dispatch does not make three-way masks executable. Brownian-containing
 production selection instead uses one exact active-pair scan through
 ``_total_pair_rate``.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L513-L651)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L519-L657)
 
 ## particula.gpu.kernels.coagulation._total_pair_rate
 
@@ -772,7 +844,7 @@ overflowing aggregate returns zero. This helper's bit dispatch does not
 itself grant sampler support; the entry-point capability gate admits only
 approved singleton, two-way, and four-way masks.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L192-L327)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L198-L333)
 
 ## particula.gpu.kernels.coagulation._turbulent_majorant_from_active_radii
 
@@ -801,7 +873,7 @@ term is monotonic, making this O(A) compact-rank scan a safe majorant.
 - (`Any`) — Finite, nonnegative ST1956 majorant for the selected box, or zero when
 - (`Any`) — fewer than two active particles exist or no finite positive rate exists.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L464-L510)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L470-L516)
 
 ## particula.gpu.kernels.coagulation._validate_charge_finite
 
@@ -829,7 +901,7 @@ scalar. It neither copies nor mutates the caller-owned charge array.
 
 - `ValueError` — If any charge value is NaN or infinite.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1797-L1829)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1803-L1835)
 
 ## particula.gpu.kernels.coagulation._validate_charge_finite_kernel
 
@@ -846,7 +918,7 @@ Record non-finite charge in a private status buffer without mutation.
 - `charge` (`Any`) — Caller-owned particle charge array ``(n_boxes, n_particles)`` read without modification.
 - `invalid` (`Any`) — Private one-element ``wp.int32`` status buffer set to one when any charge value is non-finite.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L741-L755)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L747-L761)
 
 ## particula.gpu.kernels.coagulation._validate_charged_density_kernel
 
@@ -858,7 +930,7 @@ def _validate_charged_density_kernel(density: Any, invalid: Any) -> None
 
 Record invalid charged species densities without mutation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L793-L801)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L799-L807)
 
 ## particula.gpu.kernels.coagulation._validate_charged_particle_physics
 
@@ -873,7 +945,7 @@ Reject invalid charged particle state before allocating writer resources.
 Mass and concentration must be finite and nonnegative; density must be
 finite and positive. Physical population size is independent of work tiles.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1832-L1875)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1838-L1881)
 
 ## particula.gpu.kernels.coagulation._validate_charged_particle_physics_kernel
 
@@ -889,7 +961,7 @@ Masses and concentrations may be zero for inactive slots, but all particle
 state must be finite and nonnegative; species density must be finite and
 strictly positive.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L758-L790)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L764-L796)
 
 ## particula.gpu.kernels.coagulation._validate_collision_counts
 
@@ -911,7 +983,7 @@ Validate collision count buffer shape and device.
 
 - `ValueError` — If the buffer shape or device mismatches.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2043-L2065)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2049-L2071)
 
 ## particula.gpu.kernels.coagulation._validate_collision_pairs
 
@@ -933,7 +1005,7 @@ Validate collision pair buffer shape and device.
 
 - `ValueError` — If the buffer shape or device mismatches.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2016-L2040)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2022-L2046)
 
 ## particula.gpu.kernels.coagulation._validate_device_arrays
 
@@ -954,7 +1026,7 @@ Validate particle arrays, including charge, share one Warp device.
 
 - `ValueError` — If any particle array is on a different device.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1778-L1794)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1784-L1800)
 
 ## particula.gpu.kernels.coagulation._validate_device_match
 
@@ -976,7 +1048,7 @@ Validate that a Warp array is on the expected device.
 
 - `ValueError` — If the array is not on the expected device.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1762-L1775)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1768-L1781)
 
 ## particula.gpu.kernels.coagulation._validate_max_collisions
 
@@ -1000,7 +1072,7 @@ Validate the supported collision-buffer length before allocation.
 
 - `ValueError` — If ``max_collisions`` is not a supported positive integer.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2119-L2152)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2125-L2158)
 
 ## particula.gpu.kernels.coagulation._validate_particle_arrays
 
@@ -1024,7 +1096,7 @@ Validate particle array shapes, including the charge schema.
 - `ValueError` — If particle arrays do not match expected shapes, or charge
 is not ``wp.float64``.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1726-L1759)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1732-L1765)
 
 ## particula.gpu.kernels.coagulation._validate_rng_states
 
@@ -1046,7 +1118,7 @@ Validate RNG state buffer shape and device.
 
 - `ValueError` — If the buffer shape or device mismatches.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2068-L2090)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2074-L2096)
 
 ## particula.gpu.kernels.coagulation._validate_sedimentation_particle_physics
 
@@ -1062,7 +1134,7 @@ Reject nonfinite charge, invalid mass/density/counts, unequal positive
 counts and invalid derived mass or volume. No active-population cap is
 imposed. Only compact error status is transferred to the host.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1878-L1928)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1884-L1934)
 
 ## particula.gpu.kernels.coagulation._validate_sedimentation_particle_physics_kernel
 
@@ -1074,7 +1146,7 @@ def _validate_sedimentation_particle_physics_kernel(masses: Any, concentration: 
 
 Validate all SP2016 inputs with one box-local read-only reduction.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L846-L898)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L852-L904)
 
 ## particula.gpu.kernels.coagulation._validate_time_step
 
@@ -1098,7 +1170,7 @@ Validate the coagulation time step before any mutation.
 
 - `ValueError` — If ``time_step`` is not a finite nonnegative real value.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2093-L2116)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2099-L2122)
 
 ## particula.gpu.kernels.coagulation._validate_turbulent_input
 
@@ -1114,7 +1186,7 @@ Validate a turbulent-shear numerical validation input without scalar
 This validation-only boundary checks turbulent requests before allocating
 private broadcast storage.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2283-L2313)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2289-L2319)
 
 ## particula.gpu.kernels.coagulation._validate_turbulent_particle_physics
 
@@ -1134,7 +1206,7 @@ totals before rate sanitization could turn them into no-collision behavior.
 This read-only scan runs before time, environment, output, or RNG
 processing.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1931-L1966)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1937-L1972)
 
 ## particula.gpu.kernels.coagulation._validate_turbulent_particle_physics_kernel
 
@@ -1146,7 +1218,24 @@ def _validate_turbulent_particle_physics_kernel(masses: Any, concentration: Any,
 
 Record invalid ST1956 particle state without mutating caller inputs.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L804-L843)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L810-L849)
+
+## particula.gpu.kernels.coagulation.adaptive_coagulation_step_gpu
+
+*function*
+
+```python
+def adaptive_coagulation_step_gpu(particles: Any, temperature: float | Any | None, pressure: float | Any | None, time_step: float, *, subcycling: CoagulationSubcyclingConfig, work_config: CoagulationWorkConfig | None = None, **kwargs: Any) -> AdaptiveCoagulationResult
+```
+
+Run a synchronous, atomic direct interval on the particle device.
+
+Accepts the fixed call's optional inputs. Supplied collision and work
+buffers hold the final accepted pass. Returned device pairs span the whole
+interval in application order. Each diagnostics pair_end_offsets row gives
+the exclusive end of that pass per box. Reuse rng_states for continuation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2968-L3076)
 
 ## particula.gpu.kernels.coagulation.apply_coagulation_kernel
 
@@ -1158,7 +1247,7 @@ def apply_coagulation_kernel(masses: Any, concentration: Any, charge: Any, colli
 
 Run the shared device operation through the direct kernel API.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1631-L1650)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1637-L1656)
 
 ## particula.gpu.kernels.coagulation.apply_coagulation_kernel_body
 
@@ -1184,7 +1273,7 @@ removed from the collision output during the following compaction pass.
 - `collision_pairs` (`Any`) — Collision index buffer ``(n_boxes, max_collisions, 2)``.
 - `n_collisions` (`Any`) — Collision counts ``(n_boxes,)``.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1558-L1628)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1564-L1634)
 
 ## particula.gpu.kernels.coagulation.apply_coagulation_kernel_guarded
 
@@ -1196,7 +1285,7 @@ def apply_coagulation_kernel_guarded(masses: Any, concentration: Any, charge: An
 
 Skip this resident writer after a latched simulation failure.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1653-L1675)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L1659-L1681)
 
 ## particula.gpu.kernels.coagulation.coagulation_preflight_gpu
 
@@ -1223,7 +1312,7 @@ this is bound storage, not an estimate of incremental allocation.
 - (`dict[str, Any]`) — budget-admissible timestep [s], per-box admission and workspace bytes.
 - (`dict[str, Any]`) — The admissible timestep is a resource bound, not an accuracy estimate.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2857-L2945)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2867-L2955)
 
 ## particula.gpu.kernels.coagulation.coagulation_step_gpu
 
@@ -1249,7 +1338,7 @@ Admission rejection preserves it; successful calls overwrite every box.
 - (`Any`) — The particle container, collision-pair output, and per-box collision
 - (`Any`) — counts returned by the direct kernel.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2796-L2854)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2806-L2864)
 
 ## particula.gpu.kernels.coagulation.initialize_coagulation_rng_states
 
@@ -1276,4 +1365,4 @@ Initialize a caller-owned coagulation RNG state buffer from a seed.
 - `ValueError` — If ``rng_states`` is not a one-dimensional ``wp.uint32``
 buffer or if the provided device mismatches the buffer device.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2191-L2231)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/coagulation.py#L2197-L2237)

@@ -21,7 +21,7 @@ class _PreparedBrownianWork
 
 Retain all parallel scratch and exact launch inputs during setup.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L548-L643)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L552-L648)
 
 ### particula.gpu.kernels._brownian_parallel._PreparedBrownianWork.active
 
@@ -31,7 +31,7 @@ Retain all parallel scratch and exact launch inputs during setup.
 active: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L554-L554)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L558-L558)
 
 ### particula.gpu.kernels._brownian_parallel._PreparedBrownianWork.capture
 
@@ -41,7 +41,7 @@ active: Any
 capture: Any = field(default_factory=CaptureData)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L561-L561)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L565-L565)
 
 ### particula.gpu.kernels._brownian_parallel._PreparedBrownianWork.counts
 
@@ -51,7 +51,7 @@ capture: Any = field(default_factory=CaptureData)
 counts: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L555-L555)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L559-L559)
 
 ### particula.gpu.kernels._brownian_parallel._PreparedBrownianWork.device
 
@@ -61,7 +61,7 @@ counts: Any
 device: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L558-L558)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L562-L562)
 
 ### particula.gpu.kernels._brownian_parallel._PreparedBrownianWork.ion_data
 
@@ -71,7 +71,7 @@ device: Any
 ion_data: Any = field(default_factory=IonPairData)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L560-L560)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L564-L564)
 
 ### particula.gpu.kernels._brownian_parallel._PreparedBrownianWork.ion_setup
 
@@ -81,7 +81,7 @@ ion_data: Any = field(default_factory=IonPairData)
 ion_setup: Callable | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L562-L562)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L566-L566)
 
 ### particula.gpu.kernels._brownian_parallel._PreparedBrownianWork.majorants
 
@@ -91,7 +91,7 @@ ion_setup: Callable | None = None
 majorants: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L557-L557)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L561-L561)
 
 ### particula.gpu.kernels._brownian_parallel._PreparedBrownianWork.mean_density
 
@@ -101,7 +101,7 @@ majorants: Any
 mean_density: Any = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L563-L563)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L567-L567)
 
 ### particula.gpu.kernels._brownian_parallel._PreparedBrownianWork.partials
 
@@ -111,7 +111,7 @@ mean_density: Any = None
 partials: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L556-L556)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L560-L560)
 
 ### particula.gpu.kernels._brownian_parallel._PreparedBrownianWork.property_inputs
 
@@ -121,7 +121,7 @@ partials: Any
 property_inputs: tuple[Any, ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L553-L553)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L557-L557)
 
 ### particula.gpu.kernels._brownian_parallel._PreparedBrownianWork.selector_inputs
 
@@ -131,7 +131,7 @@ property_inputs: tuple[Any, ...]
 selector_inputs: tuple[Any, ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L552-L552)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L556-L556)
 
 ### particula.gpu.kernels._brownian_parallel._PreparedBrownianWork.work_counts
 
@@ -141,7 +141,7 @@ selector_inputs: tuple[Any, ...]
 work_counts: Any = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L559-L559)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L563-L563)
 
 ### particula.gpu.kernels._brownian_parallel._PreparedBrownianWork.__init__
 
@@ -163,7 +163,7 @@ def enqueue(failure)
 
 Prepare rates and select using the legacy internal entry point.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L640-L643)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L645-L648)
 
 ### particula.gpu.kernels._brownian_parallel._PreparedBrownianWork.prepare_rates
 
@@ -175,19 +175,19 @@ def prepare_rates(failure)
 
 Enqueue retained work without allocation or observation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L565-L621)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L569-L625)
 
 ### particula.gpu.kernels._brownian_parallel._PreparedBrownianWork.select
 
 *method*
 
 ```python
-def select(failure)
+def select(failure, selected_dt=None)
 ```
 
 Select pairs only after all boxes pass budget admission.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L623-L638)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L627-L643)
 
 ## particula.gpu.kernels._brownian_parallel._additive_pair_maxima
 
@@ -199,7 +199,7 @@ def _additive_pair_maxima(masses: Any, concentration: Any, density: Any, volume:
 
 Reduce exact additive rates with bounded scratch and int64 pair ranks.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L428-L545)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L432-L549)
 
 ## particula.gpu.kernels._brownian_parallel._charged_pair_maxima
 
@@ -278,12 +278,12 @@ Evaluate the original transport formulas independently per slot.
 *function*
 
 ```python
-def _select_brownian(masses: Any, concentration: Any, density: Any, volume: Any, temperature: Any, pressure: Any, gas_constant: Any, boltzmann_constant: Any, molecular_weight_air: Any, ref_viscosity: Any, ref_temperature: Any, sutherland_constant: Any, elementary_charge_value: Any, electric_permittivity: Any, time_step: Any, radii: Any, diffusivities: Any, g_terms: Any, speeds: Any, settling_velocities: Any, turbulent_dissipation: Any, fluid_density: Any, total_masses: Any, charge: Any, active_indices: Any, collision_pairs: Any, n_collisions: Any, rng_states: Any, mechanism_mask: Any, collision_capacity: Any, active_counts: wp.array(dtype=wp.int32), majorants: wp.array(dtype=wp.float64), failure: wp.array(dtype=wp.int32), ion_data: IonPairData, capture: CaptureData, work_counts: wp.array2d(dtype=wp.int32)) -> None
+def _select_brownian(masses: Any, concentration: Any, density: Any, volume: Any, temperature: Any, pressure: Any, gas_constant: Any, boltzmann_constant: Any, molecular_weight_air: Any, ref_viscosity: Any, ref_temperature: Any, sutherland_constant: Any, elementary_charge_value: Any, electric_permittivity: Any, time_step: Any, radii: Any, diffusivities: Any, g_terms: Any, speeds: Any, settling_velocities: Any, turbulent_dissipation: Any, fluid_density: Any, total_masses: Any, charge: Any, active_indices: Any, collision_pairs: Any, n_collisions: Any, rng_states: Any, mechanism_mask: Any, collision_capacity: Any, active_counts: wp.array(dtype=wp.int32), majorants: wp.array(dtype=wp.float64), failure: wp.array(dtype=wp.int32), ion_data: IonPairData, capture: CaptureData, work_counts: wp.array2d(dtype=wp.int32), selected_dt: wp.array(dtype=wp.float64)) -> None
 ```
 
 Select from parallel properties and maxima with the original RNG code.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L329-L425)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L329-L429)
 
 ## particula.gpu.kernels._brownian_parallel.prepare_brownian_work
 
@@ -295,4 +295,4 @@ def prepare_brownian_work(selector_inputs, device, work_counts=None, capture=Non
 
 Allocate O(BN) flags and at most 4096 fp64 maxima per box.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L646-L669)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_brownian_parallel.py#L651-L674)

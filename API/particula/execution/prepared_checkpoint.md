@@ -28,7 +28,7 @@ def _preflight(processes, saved, backend, device, process_registry=None)
 
 Reject schema/configuration/device drift before any allocation/upload.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_checkpoint.py#L98-L219)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_checkpoint.py#L154-L256)
 
 ## particula.execution.prepared_checkpoint._restore_after_binding
 
@@ -45,7 +45,19 @@ direct adapters initialize shared registry buffers and thermodynamics at
 setup, so restore their exact checkpoint contents after compilation. Keep
 staging alive until the dedicated stream finishes every copy.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_checkpoint.py#L287-L330)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_checkpoint.py#L324-L368)
+
+## particula.execution.prepared_checkpoint._restore_work_policy
+
+*function*
+
+```python
+def _restore_work_policy(plans, saved)
+```
+
+Recover the exact sampler and optional adaptive controller versions.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_checkpoint.py#L98-L151)
 
 ## particula.execution.prepared_checkpoint._validate_auxiliary
 
@@ -57,7 +69,7 @@ def _validate_auxiliary(saved, plans)
 
 Validate the optional last-step energy before setup or upload.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_checkpoint.py#L222-L284)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_checkpoint.py#L259-L321)
 
 ## particula.execution.prepared_checkpoint.checkpoint
 
@@ -76,9 +88,9 @@ Observe errors before saving canonical bytes and last-step results.
 *function*
 
 ```python
-def resume_simulation(processes: tuple[Any, ...], saved: SimulationCheckpoint, *, backend: Backend = Backend.WARP, device: str | None = None, process_registry=None)
+def resume_simulation(processes: tuple[Any, ...], saved: SimulationCheckpoint, *, backend: Backend = Backend.WARP, device: str | None = None, process_registry=None, retry_subcycling=None)
 ```
 
 Restore owned arrays and counters on the exact checkpoint device.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_checkpoint.py#L333-L379)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_checkpoint.py#L371-L461)

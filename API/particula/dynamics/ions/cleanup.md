@@ -129,7 +129,7 @@ combined_process = process1 | process2
 final_aerosol = combined_process.execute(aerosol, time_step=1.0)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L265-L286)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L272-L293)
 
 ### particula.dynamics.ions.cleanup.IonNeutralCleanup._advance_box
 
@@ -234,7 +234,7 @@ Declare numeric destinations for transactional publication.
 *method*
 
 ```python
-def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, coagulation_work_config=None, time: float = 0.0) -> PreparedSimulation
+def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, coagulation_work_config=None, coagulation_subcycling=None, time: float = 0.0) -> PreparedSimulation
 ```
 
 Inherited from: `particula.runnable.RunnableABC`
@@ -251,6 +251,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `logical_box_ids` (default: `None`) — Optional stable identities in physical box order.
 - `process_registry` (default: `None`) — Exact-type custom GPU adapter registrations.
 - `coagulation_work_config` (default: `None`) — Optional coagulation resource budgets.
+- `coagulation_subcycling` (default: `None`) — Optional bounded adaptive policy.
 - `time` (`float`) (default: `0.0`) — Absolute initial simulation time [s].
 
 **Returns**
@@ -263,7 +264,7 @@ Upload native state once and prepare supported resident GPU physics.
 - `ValueError` — If process physics or state cannot be represented.
 - `RuntimeError` — If the requested runtime/device is unavailable.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L179-L227)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L179-L230)
 
 ### particula.dynamics.ions.cleanup.IonNeutralCleanup.rate
 
@@ -284,7 +285,7 @@ Evaluate detached box hooks and retain a leading box axis.
 *method*
 
 ```python
-def resume(checkpoint: SimulationCheckpoint, *, backend: Backend | None = None, device: str | None = None, process_registry=None) -> PreparedSimulation
+def resume(checkpoint: SimulationCheckpoint, *, backend: Backend | None = None, device: str | None = None, process_registry=None, retry_subcycling=None) -> PreparedSimulation
 ```
 
 Inherited from: `particula.runnable.RunnableABC`
@@ -297,6 +298,7 @@ Resume exact saved state using the same process configuration.
 - `backend` (`Backend | None`) (default: `None`) — Backend.WARP by default.
 - `device` (`str | None`) (default: `None`) — Exact checkpoint device by default; migration rejects.
 - `process_registry` (default: `None`) — Compatible caller-supplied GPU implementations.
+- `retry_subcycling` (default: `None`) — Explicitly relax a saved adaptive coagulation policy while retaining the outer timestep and random streams.
 
 **Returns**
 
@@ -309,4 +311,4 @@ Resume exact saved state using the same process configuration.
 current population cannot be admitted (e.g. unequal Brownian
 counts after a later process injected new particles).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L229-L263)
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L232-L270)

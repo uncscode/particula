@@ -43,7 +43,7 @@ Lazily resolve a supported public direct-kernel entry point.
 
 - `AttributeError` — If ``name`` is not a supported public entry point.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/__init__.py#L45-L64)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/__init__.py#L47-L66)
 
 **Modules**
 
@@ -51,6 +51,7 @@ Lazily resolve a supported public direct-kernel entry point.
 - `particula.gpu.kernels._coagulation_budget`
 - `particula.gpu.kernels._coagulation_config`
 - `particula.gpu.kernels._coagulation_native`
+- `particula.gpu.kernels._coagulation_subcycling`
 - `particula.gpu.kernels._condensation_native`
 - `particula.gpu.kernels._condensation_parallel`
 - `particula.gpu.kernels._population_validation`
