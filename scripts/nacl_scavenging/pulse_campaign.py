@@ -21,8 +21,7 @@ def cases():
     for dt, models in [(5.0, MODELS), (2.5, REFINED)]:
         for model in models:
             yield dt, model, False
-            if model in REFINED:
-                yield dt, model, True
+            yield dt, model, True
 
 
 def label(dt, model, seed, conditioned):

@@ -30,6 +30,14 @@ from particula.gpu.properties.particle_properties import (
 from particula.util import constants as const
 from study import DENSITY, PRESSURE, TEMP
 
+ELEMENTARY_CHARGE_VALUE = wp.constant(wp.float64(const.ELEMENTARY_CHARGE_VALUE))
+ELECTRIC_PERMITTIVITY = wp.constant(wp.float64(const.ELECTRIC_PERMITTIVITY))
+GAS_CONSTANT = wp.constant(wp.float64(const.GAS_CONSTANT))
+MOLECULAR_WEIGHT_AIR = wp.constant(wp.float64(const.MOLECULAR_WEIGHT_AIR))
+REF_VISCOSITY_AIR_STP = wp.constant(wp.float64(const.REF_VISCOSITY_AIR_STP))
+REF_TEMPERATURE_STP = wp.constant(wp.float64(const.REF_TEMPERATURE_STP))
+SUTHERLAND_CONSTANT = wp.constant(wp.float64(const.SUTHERLAND_CONSTANT))
+RADIUS_CUBED_PER_KG = wp.constant(wp.float64(3 / (4 * np.pi * DENSITY)))
 UINT32_SCALE = wp.constant(wp.float64(2**-32))
 T = wp.constant(wp.float64(TEMP))
 P = wp.constant(wp.float64(PRESSURE))
@@ -57,9 +65,14 @@ MODELS = {
     "fuchs_neutral": (-2, 0, 1, False, 0, False),
     "dyachkov": (1, 0, 1, False, 0, False),
     "gatti": (2, 0, 1, False, 0, False),
-    "gatti_neutral": (2, 0, 1, False, 0, False),
     "gopalakrishnan": (3, 0, 1, False, 0, False),
     "chahl": (4, 0, 1, False, 0, False),
+    **{
+        f"{name}_neutral": (law, 0, 1, False, 0, False)
+        for law, name in enumerate(
+            ("bare", "dyachkov", "gatti", "gopalakrishnan", "chahl")
+        )
+    },
 }
 
 
@@ -96,8 +109,8 @@ def pair_rates(
     ao: wp.array2d(dtype=wp.float64),
 ):
     """Return thermal, mechanical and fallback pair rates in m³/s."""
-    ri = wp.cbrt(mi * wp.float64(3.0 / (4.0 * np.pi * DENSITY)))
-    rj = wp.cbrt(mj * wp.float64(3.0 / (4.0 * np.pi * DENSITY)))
+    ri = wp.cbrt(mi * RADIUS_CUBED_PER_KG)
+    rj = wp.cbrt(mj * RADIUS_CUBED_PER_KG)
     zero = wp.float64(0.0)
     thermal = wp.float64(-1.0)
     tail = zero
@@ -141,13 +154,13 @@ def pair_rates(
             T,
             P,
             KB,
-            wp.float64(const.ELEMENTARY_CHARGE_VALUE),
-            wp.float64(const.ELECTRIC_PERMITTIVITY),
-            wp.float64(const.GAS_CONSTANT),
-            wp.float64(const.MOLECULAR_WEIGHT_AIR),
-            wp.float64(const.REF_VISCOSITY_AIR_STP),
-            wp.float64(const.REF_TEMPERATURE_STP),
-            wp.float64(const.SUTHERLAND_CONSTANT),
+            ELEMENTARY_CHARGE_VALUE,
+            ELECTRIC_PERMITTIVITY,
+            GAS_CONSTANT,
+            MOLECULAR_WEIGHT_AIR,
+            REF_VISCOSITY_AIR_STP,
+            REF_TEMPERATURE_STP,
+            SUTHERLAND_CONSTANT,
         )
     if settling:
         vi = settling_velocity_stokes_from_transport_wp(ri, RHO, VISC, PATH)
@@ -285,7 +298,7 @@ class PulsePairs:
         law, a, eps, settling, shear, ao = MODELS[model]
         self.options = [
             law,
-            int(model == "gatti_neutral"),
+            int(model.endswith("_neutral")),
             material(a, eps),
             int(settling),
             shear,
