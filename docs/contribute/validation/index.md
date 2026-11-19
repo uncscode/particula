@@ -7,6 +7,8 @@ Results are specific to their recorded revision, workload, and device.
 | Question | Record |
 | --- | --- |
 | Can final size constrain initial radius? | [Closed-box size inversion](numerics/initial-size-inversion.md) |
+| Can humidity constrained by haze reproduce Π Chamber cloud counts? | [Chamber spectra and startup sensitivity](thermodynamics/pi-chamber.md) |
+| How do salt type and organic vapor change wet size? | [Π Chamber seed chemistry and BAT vapor transfer](thermodynamics/pi-chamber-species.md) |
 | Does CUDA wall loss reproduce spherical deposition theory? | [Theory comparison and evidence limits](gpu/spherical-wall-loss.md) |
 | Can bipolar charge and mobility selection explain NaCl capture rates? | [NaCl chamber scavenging](coagulation/nacl-scavenging.md) |
 | How accurately does the slip law recover a dry PSL diameter? | [Mobility sizing against 49 published measurements](transport/psl-mobility.md) |
