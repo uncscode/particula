@@ -11,6 +11,7 @@ Particle property utilities.
 - `particula.particles.properties.activity_module`
 - `particula.particles.properties.aerodynamic_mobility_module`
 - `particula.particles.properties.aerodynamic_size`
+- `particula.particles.properties.bipolar_charge`
 - `particula.particles.properties.collision_radius_module`
 - `particula.particles.properties.convert_kappa_volumes`
 - `particula.particles.properties.convert_mass_concentration`
