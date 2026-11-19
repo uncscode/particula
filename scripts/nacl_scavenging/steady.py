@@ -14,6 +14,7 @@ from instrument import (
     aliases,
     archive_table,
     attachment_coefficient,
+    condition_scan,
     fit_walls,
     ion_density,
     probabilities,
@@ -129,6 +130,7 @@ def evaluate(
     neutral=False,
     atomizer_multi=1.0,
     pair_models=None,
+    condition_on_scan=False,
 ):
     """Retrieve steady coefficients for one tracer channel and scenario."""
     p = probs(bound)
@@ -156,6 +158,10 @@ def evaluate(
         max_z=max_z,
         blur=blur,
     )
+    if condition_on_scan:
+        if d != 4.0:
+            raise ValueError("Only the 4 nm scan has measured channel counts")
+        ss, _ = condition_scan(ss, p, tube)
     small_z = np.arange(-3, 4)
     si, sw, sp, smix = split(ss, p, small_z, tube, parts)
     li, lw, lp, lmix = split(ls, p, STATES, 1.0, parts)

@@ -236,3 +236,99 @@ plt.show()
 # gets closer, but the increase also appears when both collision charges
 # are set to zero. The [validation record](../../../../contribute/validation/coagulation/nacl-scavenging.md)
 # reports both controls along with the cloud-turbulence extrapolation.
+
+# %% [markdown]
+# ## What do individual particles do under the recorded SMPS settings?
+#
+# Compare the seven measured channel fractions with the simulated signals
+# at injection. The second tracer distribution adjusts one size parameter
+# to match the mean detected channel in the pooled scans. The right panel
+# shows capture events per detector-weighted exposure in 300 s GPU pulses,
+# with 95% Monte Carlo intervals across four seeds at a 2.5 s time step.
+
+# %%
+pulse = np.genfromtxt(
+    "docs/data/nacl-scavenging/pulse-kernels-summary.csv",
+    names=True,
+    delimiter=",",
+    dtype=None,
+    encoding="utf-8",
+)
+spectrum = np.genfromtxt(
+    "docs/data/nacl-scavenging/pulse-smps-spectrum.csv",
+    names=True,
+    delimiter=",",
+    dtype=None,
+    encoding="utf-8",
+)
+inlet = spectrum[
+    (spectrum["model"] == "full")
+    & (spectrum["dt_s"] == 2.5)
+    & (spectrum["time_s"] == 0)
+    & (spectrum["loading_cm3"] > 0)
+]
+readout = pulse[(pulse["readout"] == "archived_scan") & (pulse["dt_s"] == 2.5)]
+fig, (channels_ax, rates_ax) = plt.subplots(
+    1, 2, figsize=(10, 4.3), layout="constrained"
+)
+data = inlet[inlet["source"] == "reference"]
+channels_ax.plot(
+    data["channel_nm"],
+    100 * data["observed_pooled_fraction"],
+    "ko-",
+    label="Measured, 103 scans",
+)
+models = ["bare", "dispersion_only", "full", "full_settling_shear_10", "gatti"]
+for source, label, color, marker, shift in [
+    ("reference", "Reference source", "tab:blue", "o", -0.1),
+    ("smps_conditioned", "Fit to mean channel", "tab:orange", "s", 0.1),
+]:
+    subset = inlet[inlet["source"] == source]
+    channels_ax.plot(
+        subset["channel_nm"],
+        100 * subset["signal_fraction"],
+        marker=marker,
+        color=color,
+        label=label,
+    )
+    subset = readout[readout["source"] == source]
+    rows = [subset[subset["model"] == model][0] for model in models]
+    rates_ax.errorbar(
+        np.arange(len(rows)) + shift,
+        [r["beta_cm3_s"] * 1e7 for r in rows],
+        yerr=[r["mc95_halfwidth"] * 1e7 for r in rows],
+        fmt=marker,
+        color=color,
+        capsize=3,
+        label=label,
+    )
+channels_ax.set(
+    xlabel="SMPS channel diameter (nm)",
+    ylabel="Share of seven-channel signal (%)",
+)
+channels_ax.legend(fontsize=8)
+rates_ax.axhline(
+    1.76, color="black", linestyle="--", label="Steady measurement"
+)
+rates_ax.set(
+    ylabel="Pulse capture coefficient (10⁻⁷ cm³/s)",
+    xticks=np.arange(5),
+    xticklabels=[
+        "Bare",
+        "vdW",
+        "vdW +\ndielectric",
+        "Plus settling\nand shear",
+        "Gatti",
+    ],
+)
+rates_ax.tick_params(axis="x", labelsize=8)
+rates_ax.legend(fontsize=8)
+plt.show()
+
+# %% [markdown]
+# Giving the larger tracer channels more weight lowers the pulse capture
+# coefficient. Adding settling and shear leaves the sampled capture counts
+# unchanged in the matched 4 nm runs. The spectra combine 103 scans spanning
+# different chamber conditions. They constrain the shape seen by the instrument;
+# the true collector size distribution and the experimental blank-to-loaded
+# retrieval require separate information.
