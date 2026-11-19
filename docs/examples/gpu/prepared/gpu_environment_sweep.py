@@ -171,7 +171,7 @@ def plot_results(report):
     panel_labels = [label.replace(" · RH ", "\nRH ") for label in labels]
     population_figures(report, panel_labels, time_scale=1000, time_unit="ms")
     describe_population(report, labels)
-    ion_figures(report, labels)
+    ion_figures(report, panel_labels)
     plotting.fit(fig)
     return report
 
