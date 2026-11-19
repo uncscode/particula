@@ -1,10 +1,10 @@
-"""Run the CPU-focused 0.2.x release suite against an installed package.
+"""Run the CPU-focused release suites against an installed package.
 
 By default, build a wheel and test it in a fresh virtual environment. Conda
 recipes use ``--installed`` to validate their already-installed package instead.
 The default package workspace contains no documentation. ``--suite examples``
-separately stages three declared CPU examples and their tests. Review the GPU
-exclusions for v0.3.
+separately stages three CPU examples. The coupled-cpu suite exercises Warp
+CPU rejection and restart using its study fixture.
 """
 
 from __future__ import annotations
@@ -29,6 +29,18 @@ CPU_EXAMPLE_TESTS = (
     "examples_tests/nucleation_example_test.py",
     "examples_tests/condensation_latent_heat_example_test.py",
 )
+COUPLED_TEST = "particula/execution/tests/gpu_coupled_test.py"
+COUPLED_FIXTURE = "scripts/gpu_studies/cases.py"
+COUPLED_RESTART = (
+    f"{COUPLED_TEST}::"
+    "test_disk_restart_preserves_events_physics_and_random_words"
+)
+COUPLED_CPU_NODES = (
+    COUPLED_TEST + "::test_rejection_cannot_repeat_stochastic_events[cpu]",
+    f"{COUPLED_RESTART}[cpu-False]",
+    f"{COUPLED_RESTART}[cpu-True]",
+)
+SUITES = ("package", "examples", "coupled-cpu")
 RELEASE_MARKERS = (
     "not slow and not performance and not benchmark "
     "and not warp and not cuda and not gpu_parity"
@@ -47,7 +59,7 @@ def stage_test_inputs(
     source: Path, destination: Path, suite: str = "package"
 ) -> None:
     """Copy explicit inputs without copying importable application sources."""
-    if suite not in {"package", "examples"}:
+    if suite not in SUITES:
         raise ValueError(f"Unknown release suite: {suite}")
     if suite == "package":
         if not (source / "particula").is_dir():
@@ -64,10 +76,12 @@ def stage_test_inputs(
             target = destination / relative
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(path, target)
-    examples = (
-        (*CPU_EXAMPLES, *CPU_EXAMPLE_TESTS) if suite == "examples" else ()
-    )
-    for relative in ("conftest.py", "pyproject.toml", *examples):
+    inputs = {
+        "package": (),
+        "examples": (*CPU_EXAMPLES, *CPU_EXAMPLE_TESTS),
+        "coupled-cpu": (COUPLED_FIXTURE, COUPLED_TEST),
+    }[suite]
+    for relative in ("conftest.py", "pyproject.toml", *inputs):
         target = destination / relative
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(source / relative, target)
@@ -96,10 +110,10 @@ class Report:
         )
         if not session.items:
             raise pytest.UsageError("Release selection is empty")
-        domains = (
-            CPU_EXAMPLE_TESTS
-            if self.suite == "examples"
-            else (
+        domains = {
+            "examples": CPU_EXAMPLE_TESTS,
+            "coupled-cpu": COUPLED_CPU_NODES,
+            "package": (
                 "dynamics/condensation/",
                 "dynamics/coagulation/",
                 "dynamics/nucleation/",
@@ -107,8 +121,8 @@ class Report:
                 "particles/",
                 "integration_tests/",
                 "execution/",
-            )
-        )
+            ),
+        }[self.suite]
         for domain in domains:
             if not any(domain in item.nodeid for item in session.items):
                 raise pytest.UsageError(f"No release tests for {domain}")
@@ -153,6 +167,18 @@ def installed_test_main(
         [sys.executable, "-m", "pip", "check"], check=True
     )
 
+    selections = {
+        "package": [
+            "-m",
+            RELEASE_MARKERS,
+            *(f"--ignore={path}" for path in RELEASE_IGNORES),
+            "particula",
+        ],
+        "examples": ["-m", RELEASE_MARKERS, *CPU_EXAMPLE_TESTS],
+        # Only test inputs live here. The isolated interpreter has already
+        # verified that particula resolves to the installed distribution.
+        "coupled-cpu": ["-o", f"pythonpath={workspace}", *COUPLED_CPU_NODES],
+    }
     # Configuration and warning bootstrap stay identical to source CI.
     return int(
         pytest.main(
@@ -166,14 +192,7 @@ def installed_test_main(
                 "--import-mode=importlib",
                 "--strict-markers",
                 "-Werror",
-                "-m",
-                RELEASE_MARKERS,
-                *(
-                    [f"--ignore={path}" for path in RELEASE_IGNORES]
-                    if suite == "package"
-                    else []
-                ),
-                *(CPU_EXAMPLE_TESTS if suite == "examples" else ("particula",)),
+                *selections[suite],
             ],
             plugins=[Report(suite)],
         )
@@ -206,7 +225,7 @@ def run_installed(source: Path, suite: str = "package") -> int:
         log_path = artifacts / (
             "release-tests.log"
             if suite == "package"
-            else "release-examples.log"
+            else f"release-{suite}.log"
         )
         with log_path.open("w", encoding="utf-8") as log:
             with subprocess.Popen(  # noqa: S603 - fixed runner, no shell
@@ -232,9 +251,7 @@ def main() -> int:
         "--source", type=Path, default=Path(__file__).resolve().parents[1]
     )
     parser.add_argument("--installed", action="store_true")
-    parser.add_argument(
-        "--suite", choices=("package", "examples"), default="package"
-    )
+    parser.add_argument("--suite", choices=SUITES, default="package")
     parser.add_argument("--test-workspace", type=Path, help=argparse.SUPPRESS)
     args = parser.parse_args()
     source = args.source.resolve()

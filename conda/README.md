@@ -30,6 +30,31 @@ All 13 source example test modules live in `examples_tests/`, with their
 existing basenames. The marker-policy regression lives in
 `scripts/tests/pytest_marker_policy_test.py`, not in the package suite.
 
+## Conda-forge handoff for 0.3.3
+
+Conda-forge is skipping 0.3.2. In [feedstock PR #58](https://github.com/conda-forge/particula-feedstock/pull/58),
+the package built, but the external recipe copied only `particula/`. Three
+Warp CPU parameterizations then failed while importing the study case from
+`scripts/gpu_studies/cases.py`.
+
+After the v0.3.3 tag is published, apply `conda/feedstock-v0.3.3.patch` from
+this repository to the bot’s **0.3.3** feedstock branch. The patch preserves
+the bot’s release archive URL and SHA-256. It aligns the Flit build requirement
+and runs the installed package, CPU examples and coupled Warp CPU checks.
+The coupled suite stages the study fixture and tests stochastic event rejection
+and disk restart. CUDA graph capture is covered separately on a CUDA device.
+
+From the feedstock checkout, with `PARTICULA_SRC` pointing to this repository:
+
+```bash
+git apply --check "$PARTICULA_SRC/conda/feedstock-v0.3.3.patch"
+git apply "$PARTICULA_SRC/conda/feedstock-v0.3.3.patch"
+python "$PARTICULA_SRC/scripts/check_feedstock_contract.py" --external-recipe recipe/meta.yaml
+```
+
+Confirm the external Linux build passes against the published 0.3.3 archive
+before merging the feedstock PR.
+
 ## External feedstock drift gate
 
 The independent `feedstock-contract` job fetches
@@ -93,11 +118,12 @@ With `conda-build` installed in the active conda environment:
 python scripts/conda_feedstock.py
 ```
 
-For installed-wheel checks without conda, run both suites:
+For installed-wheel checks without conda, run the three suites:
 
 ```bash
 python scripts/run_release_tests.py
 python scripts/run_release_tests.py --suite examples
+python scripts/run_release_tests.py --suite coupled-cpu
 ```
 
 Each wheel command creates a disposable virtual environment and installs the

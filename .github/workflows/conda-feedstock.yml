@@ -14,6 +14,8 @@ on:
       - scripts/conda_feedstock.py
       - scripts/check_feedstock_contract.py
       - scripts/run_release_tests.py
+      - scripts/gpu_studies/cases.py
+      - particula/execution/tests/gpu_coupled_test.py
       - scripts/release.py
       - scripts/tests/**
       - docs/**
