@@ -1,0 +1,47 @@
+[
+  {
+    "diameter_nm": 3.6,
+    "reported_kn": 1.72,
+    "measured_m3_s": 1.89e-13,
+    "model_m3_s": 1.1489831858368864e-13,
+    "model_enhancement": 1.205646598844518,
+    "alam_enhancement": 1.4436593289078223,
+    "sceats_enhancement": 1.4972106237092038
+  },
+  {
+    "diameter_nm": 3.7,
+    "reported_kn": 1.7,
+    "measured_m3_s": 1.74e-13,
+    "model_m3_s": 1.103568730419413e-13,
+    "model_enhancement": 1.208443502936211,
+    "alam_enhancement": 1.4464134850240524,
+    "sceats_enhancement": 1.500277779262517
+  },
+  {
+    "diameter_nm": 4.0,
+    "reported_kn": 1.63,
+    "measured_m3_s": 1.7599999999999998e-13,
+    "model_m3_s": 9.839092485476033e-14,
+    "model_enhancement": 1.2164583763237868,
+    "alam_enhancement": 1.4529831802393236,
+    "sceats_enhancement": 1.5074929914039983
+  },
+  {
+    "diameter_nm": 5.0,
+    "reported_kn": 1.45,
+    "measured_m3_s": 1.22e-13,
+    "model_m3_s": 7.082581681400125e-14,
+    "model_enhancement": 1.2396845542121597,
+    "alam_enhancement": 1.4713943480436997,
+    "sceats_enhancement": 1.526698290074684
+  },
+  {
+    "diameter_nm": 10.0,
+    "reported_kn": 0.99,
+    "measured_m3_s": 4.2499999999999996e-14,
+    "model_m3_s": 2.5475505395937638e-14,
+    "model_enhancement": 1.3093070202632704,
+    "alam_enhancement": 1.5143172563742793,
+    "sceats_enhancement": 1.5561151278246024
+  }
+]

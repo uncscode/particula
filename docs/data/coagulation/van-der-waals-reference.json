@@ -1,0 +1,970 @@
+[
+  {
+    "radius_ratio": 1.0,
+    "charge": [
+      0,
+      0
+    ],
+    "hamaker_over_kT": 0.0,
+    "coupling": 1.0,
+    "relative_permittivity": 1.0,
+    "reference": [
+      1.0,
+      0.9999999999999998
+    ],
+    "production": [
+      1.0,
+      1.0
+    ],
+    "relative_error": [
+      0.0,
+      2.220446049250313e-16
+    ]
+  },
+  {
+    "radius_ratio": 1.0,
+    "charge": [
+      0,
+      0
+    ],
+    "hamaker_over_kT": 0.001,
+    "coupling": 1.0,
+    "relative_permittivity": 5.9,
+    "reference": [
+      1.000309322165677,
+      1.0155983945444114
+    ],
+    "production": [
+      1.000333941331634,
+      1.015700270701231
+    ],
+    "relative_error": [
+      2.4611553057996005e-05,
+      0.00010031145910316397
+    ]
+  },
+  {
+    "radius_ratio": 1.0,
+    "charge": [
+      0,
+      0
+    ],
+    "hamaker_over_kT": 200.0,
+    "coupling": 1.0,
+    "relative_permittivity": 100.0,
+    "reference": [
+      1.6322808025650093,
+      3.798276347122529
+    ],
+    "production": [
+      1.6323109329493852,
+      3.7990979668464684
+    ],
+    "relative_error": [
+      1.8459069253573546e-05,
+      0.00021631383523779135
+    ]
+  },
+  {
+    "radius_ratio": 1.0,
+    "charge": [
+      1,
+      0
+    ],
+    "hamaker_over_kT": 0.0,
+    "coupling": 6.0,
+    "relative_permittivity": 5.9,
+    "reference": [
+      1.0586701760933317,
+      1.333329033716823
+    ],
+    "production": [
+      1.058681511813621,
+      1.3333377866660072
+    ],
+    "relative_error": [
+      1.0707508859120196e-05,
+      6.564733057379257e-06
+    ]
+  },
+  {
+    "radius_ratio": 1.0,
+    "charge": [
+      1,
+      0
+    ],
+    "hamaker_over_kT": 16.0,
+    "coupling": 3.0,
+    "relative_permittivity": 5.9,
+    "reference": [
+      1.2612909973193713,
+      2.1753818594617003
+    ],
+    "production": [
+      1.2613377687025866,
+      2.1756939139404996
+    ],
+    "relative_error": [
+      3.708215099829104e-05,
+      0.00014344813874500595
+    ]
+  },
+  {
+    "radius_ratio": 1.0,
+    "charge": [
+      0,
+      1
+    ],
+    "hamaker_over_kT": 16.0,
+    "coupling": 3.0,
+    "relative_permittivity": 5.9,
+    "reference": [
+      1.2612909973193713,
+      2.1753818594617003
+    ],
+    "production": [
+      1.2613377687025866,
+      2.1756939139404996
+    ],
+    "relative_error": [
+      3.708215099829104e-05,
+      0.00014344813874500595
+    ]
+  },
+  {
+    "radius_ratio": 1.0,
+    "charge": [
+      1,
+      1
+    ],
+    "hamaker_over_kT": 16.0,
+    "coupling": 2.5,
+    "relative_permittivity": 5.9,
+    "reference": [
+      0.39067750754500347,
+      0.35582323857400594
+    ],
+    "production": [
+      0.39070907114546927,
+      0.3559236663605846
+    ],
+    "relative_error": [
+      8.079195719279397e-05,
+      0.0002822406624736207
+    ]
+  },
+  {
+    "radius_ratio": 1.0,
+    "charge": [
+      1,
+      -1
+    ],
+    "hamaker_over_kT": 16.0,
+    "coupling": 0.5,
+    "relative_permittivity": 5.9,
+    "reference": [
+      1.5216487901158742,
+      2.8274774339615263
+    ],
+    "production": [
+      1.5216853300439956,
+      2.8278329915565483
+    ],
+    "relative_error": [
+      2.40133783555585e-05,
+      0.00012575081616961192
+    ]
+  },
+  {
+    "radius_ratio": 1.0,
+    "charge": [
+      1,
+      1
+    ],
+    "hamaker_over_kT": 0.0,
+    "coupling": 20.0,
+    "relative_permittivity": 1.0,
+    "reference": [
+      4.1223072533738225e-08,
+      2.0611536224385566e-09
+    ],
+    "production": [
+      4.1223072533738245e-08,
+      2.061153622438558e-09
+    ],
+    "relative_error": [
+      4.440892098500626e-16,
+      6.661338147750939e-16
+    ]
+  },
+  {
+    "radius_ratio": 1.0,
+    "charge": [
+      1,
+      1
+    ],
+    "hamaker_over_kT": 0.01,
+    "coupling": 59.0,
+    "relative_permittivity": 100.0,
+    "reference": [
+      7.155893944214725e-22,
+      2.2894098511762743e-23
+    ],
+    "production": [
+      7.158318239074255e-22,
+      2.295516583793159e-23
+    ],
+    "relative_error": [
+      0.0003387829498913142,
+      0.0026673828688852375
+    ]
+  },
+  {
+    "radius_ratio": 1.0,
+    "charge": [
+      1,
+      0
+    ],
+    "hamaker_over_kT": 0.0,
+    "coupling": 0.05,
+    "relative_permittivity": 100.0,
+    "reference": [
+      1.0008571636860155,
+      1.0077022533015685
+    ],
+    "production": [
+      1.0008574667233712,
+      1.0076895758636393
+    ],
+    "relative_error": [
+      3.0277782547827314e-07,
+      -1.2580539427875514e-05
+    ]
+  },
+  {
+    "radius_ratio": 3.17,
+    "charge": [
+      0,
+      0
+    ],
+    "hamaker_over_kT": 0.0,
+    "coupling": 1.0,
+    "relative_permittivity": 1.0,
+    "reference": [
+      1.0,
+      0.9999999999999998
+    ],
+    "production": [
+      1.0,
+      1.0
+    ],
+    "relative_error": [
+      0.0,
+      2.220446049250313e-16
+    ]
+  },
+  {
+    "radius_ratio": 3.17,
+    "charge": [
+      0,
+      0
+    ],
+    "hamaker_over_kT": 0.001,
+    "coupling": 1.0,
+    "relative_permittivity": 5.9,
+    "reference": [
+      1.0002279879184186,
+      1.0132395327746058
+    ],
+    "production": [
+      1.0002503431887069,
+      1.0133422058498112
+    ],
+    "relative_error": [
+      2.2350174718521743e-05,
+      0.00010133149357516302
+    ]
+  },
+  {
+    "radius_ratio": 3.17,
+    "charge": [
+      0,
+      0
+    ],
+    "hamaker_over_kT": 200.0,
+    "coupling": 1.0,
+    "relative_permittivity": 100.0,
+    "reference": [
+      1.4934759565281996,
+      3.1287859612986266
+    ],
+    "production": [
+      1.493513931269358,
+      3.1294326947791036
+    ],
+    "relative_error": [
+      2.542708571384722e-05,
+      0.00020670428993119216
+    ]
+  },
+  {
+    "radius_ratio": 3.17,
+    "charge": [
+      1,
+      0
+    ],
+    "hamaker_over_kT": 0.0,
+    "coupling": 6.0,
+    "relative_permittivity": 5.9,
+    "reference": [
+      1.2465985121757837,
+      2.221926572904881
+    ],
+    "production": [
+      1.246648003975185,
+      2.222076096850165
+    ],
+    "relative_error": [
+      3.97014747874902e-05,
+      6.72947284159342e-05
+    ]
+  },
+  {
+    "radius_ratio": 3.17,
+    "charge": [
+      1,
+      0
+    ],
+    "hamaker_over_kT": 16.0,
+    "coupling": 3.0,
+    "relative_permittivity": 5.9,
+    "reference": [
+      1.265046979225619,
+      2.2097652056172685
+    ],
+    "production": [
+      1.2650961293454992,
+      2.2100427931212585
+    ],
+    "relative_error": [
+      3.885240681755775e-05,
+      0.00012561855136650202
+    ]
+  },
+  {
+    "radius_ratio": 3.17,
+    "charge": [
+      0,
+      1
+    ],
+    "hamaker_over_kT": 16.0,
+    "coupling": 3.0,
+    "relative_permittivity": 5.9,
+    "reference": [
+      1.1895865369698042,
+      1.8737816092508253
+    ],
+    "production": [
+      1.189635689926138,
+      1.8740652468757186
+    ],
+    "relative_error": [
+      4.131936164886163e-05,
+      0.00015137176258583906
+    ]
+  },
+  {
+    "radius_ratio": 3.17,
+    "charge": [
+      1,
+      1
+    ],
+    "hamaker_over_kT": 16.0,
+    "coupling": 2.5,
+    "relative_permittivity": 5.9,
+    "reference": [
+      0.37647862214691796,
+      0.3329667050634885
+    ],
+    "production": [
+      0.37651106354512615,
+      0.3330558496601783
+    ],
+    "relative_error": [
+      8.617062510274387e-05,
+      0.0002677282603160691
+    ]
+  },
+  {
+    "radius_ratio": 3.17,
+    "charge": [
+      1,
+      -1
+    ],
+    "hamaker_over_kT": 16.0,
+    "coupling": 0.5,
+    "relative_permittivity": 5.9,
+    "reference": [
+      1.4723573141809576,
+      2.5926909672463507
+    ],
+    "production": [
+      1.472396945387484,
+      2.593011648425607
+    ],
+    "relative_error": [
+      2.691684018851781e-05,
+      0.0001236866187708241
+    ]
+  },
+  {
+    "radius_ratio": 3.17,
+    "charge": [
+      1,
+      1
+    ],
+    "hamaker_over_kT": 0.0,
+    "coupling": 20.0,
+    "relative_permittivity": 1.0,
+    "reference": [
+      4.1223072533738225e-08,
+      2.0611536224385566e-09
+    ],
+    "production": [
+      4.1223072533738245e-08,
+      2.061153622438558e-09
+    ],
+    "relative_error": [
+      4.440892098500626e-16,
+      6.661338147750939e-16
+    ]
+  },
+  {
+    "radius_ratio": 3.17,
+    "charge": [
+      1,
+      1
+    ],
+    "hamaker_over_kT": 0.01,
+    "coupling": 59.0,
+    "relative_permittivity": 100.0,
+    "reference": [
+      8.582520718270234e-17,
+      1.6237580899330116e-17
+    ],
+    "production": [
+      8.587295844596705e-17,
+      1.626584490942505e-17
+    ],
+    "relative_error": [
+      0.0005563780715736044,
+      0.0017406539970556967
+    ]
+  },
+  {
+    "radius_ratio": 3.17,
+    "charge": [
+      1,
+      0
+    ],
+    "hamaker_over_kT": 0.0,
+    "coupling": 0.05,
+    "relative_permittivity": 100.0,
+    "reference": [
+      1.0042145755357428,
+      1.0401551063745342
+    ],
+    "production": [
+      1.0042164468695554,
+      1.0400925775025573
+    ],
+    "relative_error": [
+      1.8634800351691183e-06,
+      -6.0114949773981685e-05
+    ]
+  },
+  {
+    "radius_ratio": 5.0,
+    "charge": [
+      0,
+      0
+    ],
+    "hamaker_over_kT": 0.0,
+    "coupling": 1.0,
+    "relative_permittivity": 1.0,
+    "reference": [
+      1.0,
+      0.9999999999999998
+    ],
+    "production": [
+      1.0,
+      1.0
+    ],
+    "relative_error": [
+      0.0,
+      2.220446049250313e-16
+    ]
+  },
+  {
+    "radius_ratio": 5.0,
+    "charge": [
+      0,
+      0
+    ],
+    "hamaker_over_kT": 0.001,
+    "coupling": 1.0,
+    "relative_permittivity": 5.9,
+    "reference": [
+      1.0001750409477985,
+      1.0114912769977806
+    ],
+    "production": [
+      1.0001967008738508,
+      1.0115953421999513
+    ],
+    "relative_error": [
+      2.1656135341885374e-05,
+      0.00010288294574278822
+    ]
+  },
+  {
+    "radius_ratio": 5.0,
+    "charge": [
+      0,
+      0
+    ],
+    "hamaker_over_kT": 200.0,
+    "coupling": 1.0,
+    "relative_permittivity": 100.0,
+    "reference": [
+      1.396203655582986,
+      2.6893488280708326
+    ],
+    "production": [
+      1.3962459748261993,
+      2.689887850362182
+    ],
+    "relative_error": [
+      3.031022232624636e-05,
+      0.00020042855196900078
+    ]
+  },
+  {
+    "radius_ratio": 5.0,
+    "charge": [
+      1,
+      0
+    ],
+    "hamaker_over_kT": 0.0,
+    "coupling": 6.0,
+    "relative_permittivity": 5.9,
+    "reference": [
+      1.332731878939707,
+      2.5687248372942015
+    ],
+    "production": [
+      1.3327784674578014,
+      2.568909748252702
+    ],
+    "relative_error": [
+      3.4957157422743634e-05,
+      7.198550651121849e-05
+    ]
+  },
+  {
+    "radius_ratio": 5.0,
+    "charge": [
+      1,
+      0
+    ],
+    "hamaker_over_kT": 16.0,
+    "coupling": 3.0,
+    "relative_permittivity": 5.9,
+    "reference": [
+      1.2709903197109913,
+      2.2495746881518497
+    ],
+    "production": [
+      1.2710377996746631,
+      2.2498173513023794
+    ],
+    "relative_error": [
+      3.7356668210142274e-05,
+      0.00010787067964801444
+    ]
+  },
+  {
+    "radius_ratio": 5.0,
+    "charge": [
+      0,
+      1
+    ],
+    "hamaker_over_kT": 16.0,
+    "coupling": 3.0,
+    "relative_permittivity": 5.9,
+    "reference": [
+      1.148963332016711,
+      1.7065896560412284
+    ],
+    "production": [
+      1.1490127563993864,
+      1.706848922865312
+    ],
+    "relative_error": [
+      4.30165013087791e-05,
+      0.00015192100993099977
+    ]
+  },
+  {
+    "radius_ratio": 5.0,
+    "charge": [
+      1,
+      1
+    ],
+    "hamaker_over_kT": 16.0,
+    "coupling": 2.5,
+    "relative_permittivity": 5.9,
+    "reference": [
+      0.3733940882311436,
+      0.33148369730440785
+    ],
+    "production": [
+      0.3734254311111239,
+      0.3315607106142391
+    ],
+    "relative_error": [
+      8.394048263804521e-05,
+      0.00023232910232828807
+    ]
+  },
+  {
+    "radius_ratio": 5.0,
+    "charge": [
+      1,
+      -1
+    ],
+    "hamaker_over_kT": 16.0,
+    "coupling": 0.5,
+    "relative_permittivity": 5.9,
+    "reference": [
+      1.4416396413677202,
+      2.448089981884777
+    ],
+    "production": [
+      1.4416804032991357,
+      2.4483816986185722
+    ],
+    "relative_error": [
+      2.8274702114083894e-05,
+      0.00011916095239716817
+    ]
+  },
+  {
+    "radius_ratio": 5.0,
+    "charge": [
+      1,
+      1
+    ],
+    "hamaker_over_kT": 0.0,
+    "coupling": 20.0,
+    "relative_permittivity": 1.0,
+    "reference": [
+      4.1223072533738225e-08,
+      2.0611536224385566e-09
+    ],
+    "production": [
+      4.1223072533738245e-08,
+      2.061153622438558e-09
+    ],
+    "relative_error": [
+      4.440892098500626e-16,
+      6.661338147750939e-16
+    ]
+  },
+  {
+    "radius_ratio": 5.0,
+    "charge": [
+      1,
+      1
+    ],
+    "hamaker_over_kT": 0.01,
+    "coupling": 59.0,
+    "relative_permittivity": 100.0,
+    "reference": [
+      2.6725387596933753e-15,
+      5.938976555856142e-16
+    ],
+    "production": [
+      2.6728931877462896e-15,
+      5.948971497226376e-16
+    ],
+    "relative_error": [
+      0.00013261848930290476,
+      0.0016829400278366435
+    ]
+  },
+  {
+    "radius_ratio": 5.0,
+    "charge": [
+      1,
+      0
+    ],
+    "hamaker_over_kT": 0.0,
+    "coupling": 0.05,
+    "relative_permittivity": 100.0,
+    "reference": [
+      1.00656902610791,
+      1.0648552337634525
+    ],
+    "production": [
+      1.0065717858048697,
+      1.0647863353082836
+    ],
+    "relative_error": [
+      2.741686747853578e-06,
+      -6.470218015020013e-05
+    ]
+  },
+  {
+    "radius_ratio": 31.9,
+    "charge": [
+      0,
+      0
+    ],
+    "hamaker_over_kT": 0.0,
+    "coupling": 1.0,
+    "relative_permittivity": 1.0,
+    "reference": [
+      1.0,
+      0.9999999999999998
+    ],
+    "production": [
+      1.0,
+      1.0
+    ],
+    "relative_error": [
+      0.0,
+      2.220446049250313e-16
+    ]
+  },
+  {
+    "radius_ratio": 31.9,
+    "charge": [
+      0,
+      0
+    ],
+    "hamaker_over_kT": 0.001,
+    "coupling": 1.0,
+    "relative_permittivity": 5.9,
+    "reference": [
+      1.0000380659814803,
+      1.0050760190509704
+    ],
+    "production": [
+      1.0000658317522688,
+      1.0051872483253486
+    ],
+    "relative_error": [
+      2.7764713897537874e-05,
+      0.00011066752391841739
+    ]
+  },
+  {
+    "radius_ratio": 31.9,
+    "charge": [
+      0,
+      0
+    ],
+    "hamaker_over_kT": 200.0,
+    "coupling": 1.0,
+    "relative_permittivity": 100.0,
+    "reference": [
+      1.1027962363992958,
+      1.4827575037343523
+    ],
+    "production": [
+      1.1028459060833007,
+      1.483032455386826
+    ],
+    "relative_error": [
+      4.503976561176515e-05,
+      0.0001854326494934444
+    ]
+  },
+  {
+    "radius_ratio": 31.9,
+    "charge": [
+      1,
+      0
+    ],
+    "hamaker_over_kT": 0.0,
+    "coupling": 6.0,
+    "relative_permittivity": 5.9,
+    "reference": [
+      1.5074798815262933,
+      3.2885655330782435
+    ],
+    "production": [
+      1.5075095149929814,
+      3.288907994494779
+    ],
+    "relative_error": [
+      1.9657620012880628e-05,
+      0.00010413702056144558
+    ]
+  },
+  {
+    "radius_ratio": 31.9,
+    "charge": [
+      1,
+      0
+    ],
+    "hamaker_over_kT": 16.0,
+    "coupling": 3.0,
+    "relative_permittivity": 5.9,
+    "reference": [
+      1.3530022887840196,
+      2.6094796864076533
+    ],
+    "production": [
+      1.3530364397772994,
+      2.6097068961625354
+    ],
+    "relative_error": [
+      2.5240898380518573e-05,
+      8.707090385318139e-05
+    ]
+  },
+  {
+    "radius_ratio": 31.9,
+    "charge": [
+      0,
+      1
+    ],
+    "hamaker_over_kT": 16.0,
+    "coupling": 3.0,
+    "relative_permittivity": 5.9,
+    "reference": [
+      1.0357729105977458,
+      1.2231586943486648
+    ],
+    "production": [
+      1.0358230479607031,
+      1.2233535790449102
+    ],
+    "relative_error": [
+      4.840574844577894e-05,
+      0.00015932903649029662
+    ]
+  },
+  {
+    "radius_ratio": 31.9,
+    "charge": [
+      1,
+      1
+    ],
+    "hamaker_over_kT": 16.0,
+    "coupling": 2.5,
+    "relative_permittivity": 5.9,
+    "reference": [
+      0.4156094271694738,
+      0.42059008346726734
+    ],
+    "production": [
+      0.4156321076508485,
+      0.420659600413702
+    ],
+    "relative_error": [
+      5.457162396238502e-05,
+      0.00016528432116502678
+    ]
+  },
+  {
+    "radius_ratio": 31.9,
+    "charge": [
+      1,
+      -1
+    ],
+    "hamaker_over_kT": 16.0,
+    "coupling": 0.5,
+    "relative_permittivity": 5.9,
+    "reference": [
+      1.3929009447364618,
+      2.2528770617695755
+    ],
+    "production": [
+      1.3929134040219766,
+      2.2530366621088493
+    ],
+    "relative_error": [
+      8.944846768832448e-06,
+      7.084289772496533e-05
+    ]
+  },
+  {
+    "radius_ratio": 31.9,
+    "charge": [
+      1,
+      1
+    ],
+    "hamaker_over_kT": 0.0,
+    "coupling": 20.0,
+    "relative_permittivity": 1.0,
+    "reference": [
+      4.1223072533738225e-08,
+      2.0611536224385566e-09
+    ],
+    "production": [
+      4.1223072533738245e-08,
+      2.061153622438558e-09
+    ],
+    "relative_error": [
+      4.440892098500626e-16,
+      6.661338147750939e-16
+    ]
+  },
+  {
+    "radius_ratio": 31.9,
+    "charge": [
+      1,
+      1
+    ],
+    "hamaker_over_kT": 0.01,
+    "coupling": 59.0,
+    "relative_permittivity": 100.0,
+    "reference": [
+      4.275125763106132e-13,
+      1.1983138530133717e-13
+    ],
+    "production": [
+      4.2753520434862345e-13,
+      1.2006413567344719e-13
+    ],
+    "relative_error": [
+      5.292952596991363e-05,
+      0.0019423156256161977
+    ]
+  },
+  {
+    "radius_ratio": 31.9,
+    "charge": [
+      1,
+      0
+    ],
+    "hamaker_over_kT": 0.0,
+    "coupling": 0.05,
+    "relative_permittivity": 100.0,
+    "reference": [
+      1.020674214919045,
+      1.2073245672889361
+    ],
+    "production": [
+      1.0206361069576007,
+      1.2071924667879514
+    ],
+    "relative_error": [
+      -3.7336067559512465e-05,
+      -0.00010941589740143254
+    ]
+  }
+]

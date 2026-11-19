@@ -1,0 +1,180 @@
+{
+  "acid": {
+    "figure": "https://ars.els-cdn.com/content/image/1-s2.0-S0021850200000811-gr5.gif",
+    "method": "Manually read 23 distinguishable marker centers and bar caps in the 559 x 344 raster. Several overlapping symbols are excluded. Radii scaled at x=50 (20 nm), 112.6 px per 10 nm. Baseline y=308 to 305 across width, 86 px per unit of 1e-9 cm3/s. Multiply by two for the identical-particle pair kernel. Bars are approximate one sigma. Digitizing precision about 1 px (0.18 nm diameter, 0.023e-15 m3/s).",
+    "points": [
+      {
+        "diameter_nm": 48.9,
+        "kernel_m3_s": 4.156e-15,
+        "error_m3_s": 3.49e-16
+      },
+      {
+        "diameter_nm": 49.4,
+        "kernel_m3_s": 5.365000000000001e-15,
+        "error_m3_s": 1.047e-15
+      },
+      {
+        "diameter_nm": 54.7,
+        "kernel_m3_s": 5.105000000000001e-15,
+        "error_m3_s": 1.047e-15
+      },
+      {
+        "diameter_nm": 57.6,
+        "kernel_m3_s": 3.1720000000000003e-15,
+        "error_m3_s": 3.3700000000000005e-16
+      },
+      {
+        "diameter_nm": 64.9,
+        "kernel_m3_s": 2.632e-15,
+        "error_m3_s": 1.9800000000000001e-16
+      },
+      {
+        "diameter_nm": 65.4,
+        "kernel_m3_s": 3.2830000000000003e-15,
+        "error_m3_s": 9.77e-16
+      },
+      {
+        "diameter_nm": 68.2,
+        "kernel_m3_s": 3.304e-15,
+        "error_m3_s": 4.19e-16
+      },
+      {
+        "diameter_nm": 68.8,
+        "kernel_m3_s": 3.1640000000000005e-15,
+        "error_m3_s": 5.81e-16
+      },
+      {
+        "diameter_nm": 70.2,
+        "kernel_m3_s": 2.883e-15,
+        "error_m3_s": 4.770000000000001e-16
+      },
+      {
+        "diameter_nm": 72.5,
+        "kernel_m3_s": 2.9280000000000002e-15,
+        "error_m3_s": 2.7900000000000005e-16
+      },
+      {
+        "diameter_nm": 76.6,
+        "kernel_m3_s": 2.5530000000000003e-15,
+        "error_m3_s": 2.0900000000000002e-16
+      },
+      {
+        "diameter_nm": 77.5,
+        "kernel_m3_s": 2.227e-15,
+        "error_m3_s": 2.2100000000000002e-16
+      },
+      {
+        "diameter_nm": 80.0,
+        "kernel_m3_s": 2.713e-15,
+        "error_m3_s": 3.14e-16
+      },
+      {
+        "diameter_nm": 83.0,
+        "kernel_m3_s": 2.106e-15,
+        "error_m3_s": 2.44e-16
+      },
+      {
+        "diameter_nm": 84.6,
+        "kernel_m3_s": 3.0120000000000004e-15,
+        "error_m3_s": 7.910000000000001e-16
+      },
+      {
+        "diameter_nm": 85.1,
+        "kernel_m3_s": 1.7320000000000001e-15,
+        "error_m3_s": 6.4e-16
+      },
+      {
+        "diameter_nm": 87.1,
+        "kernel_m3_s": 2.01e-15,
+        "error_m3_s": 1.74e-16
+      },
+      {
+        "diameter_nm": 90.6,
+        "kernel_m3_s": 2.4960000000000003e-15,
+        "error_m3_s": 3.49e-16
+      },
+      {
+        "diameter_nm": 96.0,
+        "kernel_m3_s": 2.0259999999999998e-15,
+        "error_m3_s": 1.63e-16
+      },
+      {
+        "diameter_nm": 102.5,
+        "kernel_m3_s": 1.928e-15,
+        "error_m3_s": 1.5100000000000001e-16
+      },
+      {
+        "diameter_nm": 108.7,
+        "kernel_m3_s": 1.784e-15,
+        "error_m3_s": 1.5100000000000001e-16
+      },
+      {
+        "diameter_nm": 114.6,
+        "kernel_m3_s": 2.0120000000000004e-15,
+        "error_m3_s": 3.14e-16
+      },
+      {
+        "diameter_nm": 127.0,
+        "kernel_m3_s": 2.0019999999999998e-15,
+        "error_m3_s": 3.0200000000000003e-16
+      }
+    ]
+  },
+  "borenn": {
+    "figure": "https://ars.els-cdn.com/content/image/1-s2.0-S002185022600039X-gr2_lrg.jpg",
+    "method": "Fig. 2d, lower curve, neutral 20 nm NaCl. Right lower panel resized to 900 px wide. y=453 at zero, 29.26 px per 1e-9 cm3/s. Errors are half the plotted cap span. Pixel readout about 0.04e-15 m3/s.",
+    "points": [
+      {
+        "diameter_nm": 40,
+        "kernel_m3_s": 4.22e-15,
+        "error_m3_s": 3.6000000000000003e-16
+      },
+      {
+        "diameter_nm": 60,
+        "kernel_m3_s": 6.360000000000001e-15,
+        "error_m3_s": 1.4000000000000003e-16
+      },
+      {
+        "diameter_nm": 80,
+        "kernel_m3_s": 7.79e-15,
+        "error_m3_s": 3.8e-16
+      },
+      {
+        "diameter_nm": 100,
+        "kernel_m3_s": 9.300000000000002e-15,
+        "error_m3_s": 3.9000000000000003e-16
+      }
+    ]
+  },
+  "borenc": {
+    "figure": "https://ars.els-cdn.com/content/image/1-s2.0-S002185022600039X-gr4_lrg.jpg",
+    "method": "Fig. 4a, 20 nm singly charged particle with neutral partner. Left panel resized to 900 px wide. y=522.5 at zero, 26.55 px per 1e-9 cm3/s. Errors are half the plotted cap span. Pixel readout about 0.04e-15 m3/s. The sign of the single charge is immaterial for this pairing.",
+    "points": [
+      {
+        "diameter_nm": 40,
+        "kernel_m3_s": 4.76e-15,
+        "error_m3_s": 1.7000000000000003e-16
+      },
+      {
+        "diameter_nm": 60,
+        "kernel_m3_s": 6.72e-15,
+        "error_m3_s": 2.3000000000000004e-16
+      },
+      {
+        "diameter_nm": 80,
+        "kernel_m3_s": 8.68e-15,
+        "error_m3_s": 5.600000000000001e-16
+      },
+      {
+        "diameter_nm": 100,
+        "kernel_m3_s": 1.0640000000000001e-14,
+        "error_m3_s": 1.0900000000000002e-15
+      },
+      {
+        "diameter_nm": 140,
+        "kernel_m3_s": 1.475e-14,
+        "error_m3_s": 1.02e-15
+      }
+    ]
+  }
+}

@@ -362,7 +362,8 @@
       ],
       "related": [
         "transport",
-        "verification"
+        "verification",
+        "interparticle-forces"
       ],
       "context": "Diffusive collisions merge particles, reducing number while ideally retaining material. PMF, PDF, and particle-resolved methods express the population differently, so compare integrated number and mass before interpreting spectra. Similar number-decay curves alone do not establish numerical convergence or identical mixing state.",
       "investigation": "How does a predicted number-loss time change under grid, sample-size, and timestep refinement when physical concentration is held fixed?"
@@ -385,7 +386,8 @@
         "brownian"
       ],
       "related": [
-        "atmosphere"
+        "atmosphere",
+        "interparticle-forces"
       ],
       "context": "Electrical interactions can alter collisions, while ion attachment and recombination evolve charge populations. A prescribed charge-versus-size curve is distinct from a coupled charging calculation. Interpret pair kernels, particle number, material inventory, and charge inventory according to the processes actually enabled.",
       "investigation": "Does a charge-dependent collision effect survive comparison with neutral particles at the same sizes and abundances, and does evolving the charge change the answer?"
@@ -1062,6 +1064,32 @@
       "related": [],
       "context": "Wall deposition depends on transport, particle size, and chamber geometry. A changing spectrum can combine removal with coagulation or growth, so separate process contributions are needed.",
       "investigation": "How do spherical and rectangular chamber models change size-resolved loss under comparable conditions?"
+    },
+    {
+      "id": "interparticle-forces",
+      "label": "Interparticle forces",
+      "description": "Explore how dispersion, charge and dielectric polarization change aerosol encounter rates.",
+      "parent": "collisions",
+      "order": 3,
+      "icon": "interparticle-forces",
+      "aliases": [
+        "Interparticle potentials"
+      ],
+      "search_phrases": [
+        "van der Waals attraction",
+        "Hamaker constant",
+        "image force",
+        "collision barrier"
+      ],
+      "prerequisites": [
+        "brownian"
+      ],
+      "related": [
+        "brownian",
+        "charged"
+      ],
+      "context": "Particle geometry and surface separation set the energy landscape of an encounter. Its barrier can suppress collisions even when the energy becomes attractive close to contact.",
+      "investigation": "At fixed sizes, how does charging the smaller sphere change the measured and predicted rate?"
     }
   ],
   "resources": [
@@ -1125,7 +1153,9 @@
       "source": "docs/contribute/validation/gpu/bat-humidity-pulse.md",
       "title": "BAT humidity-pulse ensemble on CPU and CUDA",
       "topic": "verification-performance",
-      "also": ["verification-qualification"],
+      "also": [
+        "verification-qualification"
+      ],
       "role": "Contribute",
       "start_here": false
     },
@@ -1925,7 +1955,9 @@
       "source": "docs/examples/thermodynamics/activity/bat_humidity_pulse.py",
       "title": "Water uptake and evaporation after a humidity pulse",
       "topic": "activity-nonideal",
-      "also": ["condensation-reservoirs"],
+      "also": [
+        "condensation-reservoirs"
+      ],
       "role": "Examples",
       "start_here": false
     },
@@ -2562,6 +2594,49 @@
       "title": "Cloud activation in the BAT publication",
       "topic": "verification-scientific",
       "also": [],
+      "role": "Contribute",
+      "start_here": false
+    },
+    {
+      "source": "docs/theory/dynamics/interparticle-forces.md",
+      "title": "From sphere interactions to an aerosol kernel",
+      "topic": "interparticle-forces",
+      "also": [
+        "brownian",
+        "charged"
+      ],
+      "role": "Theory",
+      "start_here": true
+    },
+    {
+      "source": "docs/examples/processes/coagulation/van_der_waals.py",
+      "title": "Compare kernels with measured droplet and salt rates",
+      "topic": "interparticle-forces",
+      "also": [
+        "brownian",
+        "charged"
+      ],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/examples/gpu/prepared/van_der_waals.py",
+      "title": "Follow bipolar coagulation through a CUDA restart",
+      "topic": "interparticle-forces",
+      "also": [
+        "charged",
+        "brownian-resolved"
+      ],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/contribute/validation/coagulation/van-der-waals.md",
+      "title": "Dispersion and dielectric capture validation",
+      "topic": "interparticle-forces",
+      "also": [
+        "verification"
+      ],
       "role": "Contribute",
       "start_here": false
     }

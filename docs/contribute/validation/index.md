@@ -28,3 +28,7 @@ Results are specific to their recorded revision, workload, and device.
 
 Missing reviewed artifacts are unavailable and unmeasured. A passing source
 test or closed implementation plan cannot populate a missing measurement row.
+
+[Dispersion and dielectric capture](coagulation/van-der-waals.md) compares
+CPU and CUDA pair kernels with orbit integrals, independent Langevin
+trajectories, and neutral and charged chamber measurements.

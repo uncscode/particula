@@ -1,0 +1,2250 @@
+{
+  "device": "NVIDIA GeForce RTX 5060",
+  "warp": "1.11.1",
+  "cases": [
+    {
+      "ratio": 1.0,
+      "charges": [
+        0,
+        0
+      ],
+      "coupling": 1.0,
+      "epsilon": 1.0,
+      "attraction": 0.0,
+      "q": 1e-05,
+      "expected": 8.341331275148161e-20,
+      "hard": 8.341331275148161e-20,
+      "cuda": 8.341331275148158e-20,
+      "error_relative": -4.440892098500626e-16,
+      "error_normalized": 4.329187424176395e-16,
+      "passed": true
+    },
+    {
+      "ratio": 1.0,
+      "charges": [
+        0,
+        0
+      ],
+      "coupling": 1.0,
+      "epsilon": 1.0,
+      "attraction": 0.0,
+      "q": 1.0,
+      "expected": 2.7394288138763105e-15,
+      "hard": 2.7394288138763113e-15,
+      "cuda": 2.7394288138763105e-15,
+      "error_relative": 0.0,
+      "error_normalized": 0.0,
+      "passed": true
+    },
+    {
+      "ratio": 1.0,
+      "charges": [
+        0,
+        0
+      ],
+      "coupling": 1.0,
+      "epsilon": 1.0,
+      "attraction": 0.0,
+      "q": 100000.0,
+      "expected": 3.3277517331552166e-15,
+      "hard": 3.3277517331552186e-15,
+      "cuda": 3.3277517331552174e-15,
+      "error_relative": 2.220446049250313e-16,
+      "error_normalized": 2.3705521579671774e-16,
+      "passed": true
+    },
+    {
+      "ratio": 1.0,
+      "charges": [
+        1,
+        1
+      ],
+      "coupling": 20.0,
+      "epsilon": 1.0,
+      "attraction": 0.0,
+      "q": 1e-05,
+      "expected": 7.686726543446154e-28,
+      "hard": 1.8651783754076277e-20,
+      "cuda": 7.686726543446162e-28,
+      "error_relative": 1.1102230246251565e-15,
+      "error_normalized": 4.3274569665472105e-23,
+      "passed": true
+    },
+    {
+      "ratio": 1.0,
+      "charges": [
+        1,
+        1
+      ],
+      "coupling": 20.0,
+      "epsilon": 1.0,
+      "attraction": 0.0,
+      "q": 1.0,
+      "expected": 1.5197527760469588e-24,
+      "hard": 6.12554904734905e-16,
+      "cuda": 1.5197527760469592e-24,
+      "error_relative": 2.220446049250313e-16,
+      "error_normalized": 5.996882594400892e-25,
+      "passed": true
+    },
+    {
+      "ratio": 1.0,
+      "charges": [
+        1,
+        1
+      ],
+      "coupling": 20.0,
+      "epsilon": 1.0,
+      "attraction": 0.0,
+      "q": 100000.0,
+      "expected": 1.533723385598912e-24,
+      "hard": 7.441079087577807e-16,
+      "cuda": 1.5337233855989132e-24,
+      "error_relative": 8.881784197001252e-16,
+      "error_normalized": 1.7278366901895035e-24,
+      "passed": true
+    },
+    {
+      "ratio": 3.17,
+      "charges": [
+        0,
+        0
+      ],
+      "coupling": 1.0,
+      "epsilon": 1.0,
+      "attraction": 0.0,
+      "q": 1e-05,
+      "expected": 1.8033971914735115e-19,
+      "hard": 1.8033971914735118e-19,
+      "cuda": 1.8033971914735118e-19,
+      "error_relative": 2.220446049250313e-16,
+      "error_normalized": 1.3349318951289966e-16,
+      "passed": true
+    },
+    {
+      "ratio": 3.17,
+      "charges": [
+        0,
+        0
+      ],
+      "coupling": 1.0,
+      "epsilon": 1.0,
+      "attraction": 0.0,
+      "q": 1.0,
+      "expected": 5.922649594202098e-15,
+      "hard": 5.922649594202099e-15,
+      "cuda": 5.922649594202099e-15,
+      "error_relative": 2.220446049250313e-16,
+      "error_normalized": 1.3319391813982325e-16,
+      "passed": true
+    },
+    {
+      "ratio": 3.17,
+      "charges": [
+        0,
+        0
+      ],
+      "coupling": 1.0,
+      "epsilon": 1.0,
+      "attraction": 0.0,
+      "q": 100000.0,
+      "expected": 7.194604711807988e-15,
+      "hard": 7.194604711807992e-15,
+      "cuda": 7.19460471180799e-15,
+      "error_relative": 2.220446049250313e-16,
+      "error_normalized": 2.1929235498548257e-16,
+      "passed": true
+    },
+    {
+      "ratio": 3.17,
+      "charges": [
+        1,
+        1
+      ],
+      "coupling": 20.0,
+      "epsilon": 1.0,
+      "attraction": 0.0,
+      "q": 1e-05,
+      "expected": 1.6618715409824642e-27,
+      "hard": 4.0325187105669763e-20,
+      "cuda": 1.6618715409824645e-27,
+      "error_relative": 2.220446049250313e-16,
+      "error_normalized": 8.895988651636412e-24,
+      "passed": true
+    },
+    {
+      "ratio": 3.17,
+      "charges": [
+        1,
+        1
+      ],
+      "coupling": 20.0,
+      "epsilon": 1.0,
+      "attraction": 0.0,
+      "q": 1.0,
+      "expected": 3.285707997502446e-24,
+      "hard": 1.3243447099547435e-15,
+      "cuda": 3.2857079975024477e-24,
+      "error_relative": 6.661338147750939e-16,
+      "error_normalized": 1.3868820627694353e-24,
+      "passed": true
+    },
+    {
+      "ratio": 3.17,
+      "charges": [
+        1,
+        1
+      ],
+      "coupling": 20.0,
+      "epsilon": 1.0,
+      "attraction": 0.0,
+      "q": 100000.0,
+      "expected": 3.3159124782958534e-24,
+      "hard": 1.6087625206842955e-15,
+      "cuda": 3.315912478295856e-24,
+      "error_relative": 6.661338147750939e-16,
+      "error_normalized": 1.3700293731695615e-24,
+      "passed": true
+    },
+    {
+      "ratio": 5.0,
+      "charges": [
+        0,
+        0
+      ],
+      "coupling": 1.0,
+      "epsilon": 1.0,
+      "attraction": 0.0,
+      "q": 1e-05,
+      "expected": 3.077035592364078e-19,
+      "hard": 3.0770355923640786e-19,
+      "cuda": 3.077035592364078e-19,
+      "error_relative": 0.0,
+      "error_normalized": 0.0,
+      "passed": true
+    },
+    {
+      "ratio": 5.0,
+      "charges": [
+        0,
+        0
+      ],
+      "coupling": 1.0,
+      "epsilon": 1.0,
+      "attraction": 0.0,
+      "q": 1.0,
+      "expected": 1.0105485185750993e-14,
+      "hard": 1.0105485185750996e-14,
+      "cuda": 1.0105485185750994e-14,
+      "error_relative": 2.220446049250313e-16,
+      "error_normalized": 1.5612529051713949e-16,
+      "passed": true
+    },
+    {
+      "ratio": 5.0,
+      "charges": [
+        0,
+        0
+      ],
+      "coupling": 1.0,
+      "epsilon": 1.0,
+      "attraction": 0.0,
+      "q": 100000.0,
+      "expected": 1.2275750941552157e-14,
+      "hard": 1.2275750941552165e-14,
+      "cuda": 1.227575094155216e-14,
+      "error_relative": 2.220446049250313e-16,
+      "error_normalized": 2.5704689154316356e-16,
+      "passed": true
+    },
+    {
+      "ratio": 5.0,
+      "charges": [
+        1,
+        1
+      ],
+      "coupling": 20.0,
+      "epsilon": 1.0,
+      "attraction": 0.0,
+      "q": 1e-05,
+      "expected": 2.835558303915152e-27,
+      "hard": 6.88046075371241e-20,
+      "cuda": 2.8355583039151545e-27,
+      "error_relative": 8.881784197001252e-16,
+      "error_normalized": 3.649649257450052e-23,
+      "passed": true
+    },
+    {
+      "ratio": 5.0,
+      "charges": [
+        1,
+        1
+      ],
+      "coupling": 20.0,
+      "epsilon": 1.0,
+      "attraction": 0.0,
+      "q": 1.0,
+      "expected": 5.606219474130099e-24,
+      "hard": 2.2596551820956317e-15,
+      "cuda": 5.6062194741301004e-24,
+      "error_relative": 2.220446049250313e-16,
+      "error_normalized": 6.502620179266244e-25,
+      "passed": true
+    },
+    {
+      "ratio": 5.0,
+      "charges": [
+        1,
+        1
+      ],
+      "coupling": 20.0,
+      "epsilon": 1.0,
+      "attraction": 0.0,
+      "q": 100000.0,
+      "expected": 5.657755687499851e-24,
+      "hard": 2.744941358016769e-15,
+      "cuda": 5.657755687499855e-24,
+      "error_relative": 6.661338147750939e-16,
+      "error_normalized": 1.3382507555548323e-24,
+      "passed": true
+    },
+    {
+      "ratio": 31.9,
+      "charges": [
+        0,
+        0
+      ],
+      "coupling": 1.0,
+      "epsilon": 1.0,
+      "attraction": 0.0,
+      "q": 1e-05,
+      "expected": 3.935282500369703e-18,
+      "hard": 3.935282500369703e-18,
+      "cuda": 3.935282500369702e-18,
+      "error_relative": -4.440892098500626e-16,
+      "error_normalized": 3.915205465846587e-16,
+      "passed": true
+    },
+    {
+      "ratio": 31.9,
+      "charges": [
+        0,
+        0
+      ],
+      "coupling": 1.0,
+      "epsilon": 1.0,
+      "attraction": 0.0,
+      "q": 1.0,
+      "expected": 1.2924107575459526e-13,
+      "hard": 1.292410757545953e-13,
+      "cuda": 1.292410757545953e-13,
+      "error_relative": 2.220446049250313e-16,
+      "error_normalized": 1.953214086131964e-16,
+      "passed": true
+    },
+    {
+      "ratio": 31.9,
+      "charges": [
+        0,
+        0
+      ],
+      "coupling": 1.0,
+      "epsilon": 1.0,
+      "attraction": 0.0,
+      "q": 100000.0,
+      "expected": 1.5699703955023737e-13,
+      "hard": 1.5699703955023745e-13,
+      "cuda": 1.5699703955023745e-13,
+      "error_relative": 4.440892098500626e-16,
+      "error_normalized": 4.823699040323884e-16,
+      "passed": true
+    },
+    {
+      "ratio": 31.9,
+      "charges": [
+        1,
+        1
+      ],
+      "coupling": 20.0,
+      "epsilon": 1.0,
+      "attraction": 0.0,
+      "q": 1e-05,
+      "expected": 3.626452355594002e-26,
+      "hard": 8.799559181491998e-19,
+      "cuda": 3.626452355594002e-26,
+      "error_relative": 0.0,
+      "error_normalized": 0.0,
+      "passed": true
+    },
+    {
+      "ratio": 31.9,
+      "charges": [
+        1,
+        1
+      ],
+      "coupling": 20.0,
+      "epsilon": 1.0,
+      "attraction": 0.0,
+      "q": 1.0,
+      "expected": 7.169906465991121e-23,
+      "hard": 2.8899183087247496e-14,
+      "cuda": 7.169906465991124e-23,
+      "error_relative": 2.220446049250313e-16,
+      "error_normalized": 8.135138957204672e-25,
+      "passed": true
+    },
+    {
+      "ratio": 31.9,
+      "charges": [
+        1,
+        1
+      ],
+      "coupling": 20.0,
+      "epsilon": 1.0,
+      "attraction": 0.0,
+      "q": 100000.0,
+      "expected": 7.235817162348548e-23,
+      "hard": 3.5105605270055396e-14,
+      "cuda": 7.235817162348553e-23,
+      "error_relative": 6.661338147750939e-16,
+      "error_normalized": 1.3393808103060605e-24,
+      "passed": true
+    },
+    {
+      "ratio": 1.0,
+      "charges": [
+        1,
+        0
+      ],
+      "coupling": 6.0,
+      "epsilon": 5.9,
+      "attraction": 0.0,
+      "q": 1e-05,
+      "expected": 3.6051365310446486e-20,
+      "hard": 3.40533423327199e-20,
+      "cuda": 3.6051751329045115e-20,
+      "error_relative": 1.0707461293169018e-05,
+      "error_normalized": 1.133570369856479e-05,
+      "passed": true
+    },
+    {
+      "ratio": 1.0,
+      "charges": [
+        1,
+        0
+      ],
+      "coupling": 6.0,
+      "epsilon": 5.9,
+      "attraction": 0.0,
+      "q": 1.0,
+      "expected": 1.4101686103435616e-15,
+      "hard": 1.1183671301124517e-15,
+      "cuda": 1.410179469093492e-15,
+      "error_relative": 7.700320267201022e-06,
+      "error_normalized": 9.709468061090376e-06,
+      "passed": true
+    },
+    {
+      "ratio": 1.0,
+      "charges": [
+        1,
+        0
+      ],
+      "coupling": 6.0,
+      "epsilon": 5.9,
+      "attraction": 0.0,
+      "q": 100000.0,
+      "expected": 1.811391904511468e-15,
+      "hard": 1.358548956148775e-15,
+      "cuda": 1.811403795833118e-15,
+      "error_relative": 6.56474262705764e-06,
+      "error_normalized": 8.752957776072714e-06,
+      "passed": true
+    },
+    {
+      "ratio": 3.17,
+      "charges": [
+        1,
+        0
+      ],
+      "coupling": 6.0,
+      "epsilon": 5.9,
+      "attraction": 0.0,
+      "q": 1e-05,
+      "expected": 9.17793810746272e-20,
+      "hard": 7.36233820446393e-20,
+      "cuda": 9.178302487195606e-20,
+      "error_relative": 3.970169864064843e-05,
+      "error_normalized": 4.949239260219562e-05,
+      "passed": true
+    },
+    {
+      "ratio": 3.17,
+      "charges": [
+        1,
+        0
+      ],
+      "coupling": 6.0,
+      "epsilon": 5.9,
+      "attraction": 0.0,
+      "q": 1.0,
+      "expected": 4.530595468721655e-15,
+      "hard": 2.4179115718494994e-15,
+      "cuda": 4.530851641800336e-15,
+      "error_relative": 5.654291592582794e-05,
+      "error_normalized": 0.00010594807587839726,
+      "passed": true
+    },
+    {
+      "ratio": 3.17,
+      "charges": [
+        1,
+        0
+      ],
+      "coupling": 6.0,
+      "epsilon": 5.9,
+      "attraction": 0.0,
+      "q": 100000.0,
+      "expected": 6.526200195117939e-15,
+      "hard": 2.9371850741588676e-15,
+      "cuda": 6.5266393733985406e-15,
+      "error_relative": 6.72946381463646e-05,
+      "error_normalized": 0.00014952353001708993,
+      "passed": true
+    },
+    {
+      "ratio": 5.0,
+      "charges": [
+        1,
+        0
+      ],
+      "coupling": 6.0,
+      "epsilon": 5.9,
+      "attraction": 0.0,
+      "q": 1e-05,
+      "expected": 1.6741821319057678e-19,
+      "hard": 1.256194520279095e-19,
+      "cuda": 1.6742406570191804e-19,
+      "error_relative": 3.4957435214089116e-05,
+      "error_normalized": 4.6589212472898465e-05,
+      "passed": true
+    },
+    {
+      "ratio": 5.0,
+      "charges": [
+        1,
+        0
+      ],
+      "coupling": 6.0,
+      "epsilon": 5.9,
+      "attraction": 0.0,
+      "q": 1.0,
+      "expected": 8.6588799458126e-15,
+      "hard": 4.125547051390737e-15,
+      "cuda": 8.65936912455642e-15,
+      "error_relative": 5.64944596626038e-05,
+      "error_normalized": 0.00011857306139713662,
+      "passed": true
+    },
+    {
+      "ratio": 5.0,
+      "charges": [
+        1,
+        0
+      ],
+      "coupling": 6.0,
+      "epsilon": 5.9,
+      "attraction": 0.0,
+      "q": 100000.0,
+      "expected": 1.2873282186082527e-14,
+      "hard": 5.01155433604883e-15,
+      "cuda": 1.2874208874135079e-14,
+      "error_relative": 7.198537553643192e-05,
+      "error_normalized": 0.00018491030734443022,
+      "passed": true
+    },
+    {
+      "ratio": 31.9,
+      "charges": [
+        1,
+        0
+      ],
+      "coupling": 6.0,
+      "epsilon": 5.9,
+      "attraction": 0.0,
+      "q": 1e-05,
+      "expected": 2.421894468065584e-18,
+      "hard": 1.6065723532682876e-18,
+      "cuda": 2.421942078102843e-18,
+      "error_relative": 1.9658179944093135e-05,
+      "error_normalized": 2.9634542858915824e-05,
+      "passed": true
+    },
+    {
+      "ratio": 31.9,
+      "charges": [
+        1,
+        0
+      ],
+      "coupling": 6.0,
+      "epsilon": 5.9,
+      "attraction": 0.0,
+      "q": 1.0,
+      "expected": 1.3423056279206324e-13,
+      "hard": 5.2762448234524127e-14,
+      "cuda": 1.3423927088094761e-13,
+      "error_relative": 6.487411438382829e-05,
+      "error_normalized": 0.00016504330590706018,
+      "passed": true
+    },
+    {
+      "ratio": 31.9,
+      "charges": [
+        1,
+        0
+      ],
+      "coupling": 6.0,
+      "epsilon": 5.9,
+      "attraction": 0.0,
+      "q": 100000.0,
+      "expected": 2.1077611575961265e-13,
+      "hard": 6.409377300427193e-14,
+      "cuda": 2.1079806528501952e-13,
+      "error_relative": 0.0001041366823169021,
+      "error_normalized": 0.00034245956163949184,
+      "passed": true
+    },
+    {
+      "ratio": 1.0,
+      "charges": [
+        0,
+        0
+      ],
+      "coupling": 1.0,
+      "epsilon": 5.9,
+      "attraction": 0.001,
+      "q": 1e-05,
+      "expected": 8.343913250156728e-20,
+      "hard": 8.341331275148161e-20,
+      "cuda": 8.344118615815702e-20,
+      "error_relative": 2.4612631126075257e-05,
+      "error_normalized": 2.4620249717963584e-05,
+      "passed": true
+    },
+    {
+      "ratio": 1.0,
+      "charges": [
+        0,
+        0
+      ],
+      "coupling": 1.0,
+      "epsilon": 5.9,
+      "attraction": 0.001,
+      "q": 1.0,
+      "expected": 2.773141166861054e-15,
+      "hard": 2.7394288138763113e-15,
+      "cuda": 2.7733740219168823e-15,
+      "error_relative": 8.396797776155651e-05,
+      "error_normalized": 8.500131656966464e-05,
+      "passed": true
+    },
+    {
+      "ratio": 1.0,
+      "charges": [
+        0,
+        0
+      ],
+      "coupling": 1.0,
+      "epsilon": 5.9,
+      "attraction": 0.001,
+      "q": 100000.0,
+      "expected": 3.379659222835123e-15,
+      "hard": 3.3277517331552186e-15,
+      "cuda": 3.3799982409063014e-15,
+      "error_relative": 0.0001003113180428894,
+      "error_normalized": 0.00010187601070135926,
+      "passed": true
+    },
+    {
+      "ratio": 3.17,
+      "charges": [
+        0,
+        0
+      ],
+      "coupling": 1.0,
+      "epsilon": 5.9,
+      "attraction": 0.001,
+      "q": 1e-05,
+      "expected": 1.8038086791943415e-19,
+      "hard": 1.8033971914735118e-19,
+      "cuda": 1.8038489966669574e-19,
+      "error_relative": 2.2351302042755705e-05,
+      "error_normalized": 2.235640202086487e-05,
+      "passed": true
+    },
+    {
+      "ratio": 3.17,
+      "charges": [
+        0,
+        0
+      ],
+      "coupling": 1.0,
+      "epsilon": 5.9,
+      "attraction": 0.001,
+      "q": 1.0,
+      "expected": 5.984505125065949e-15,
+      "hard": 5.922649594202099e-15,
+      "cuda": 5.985009754554306e-15,
+      "error_relative": 8.432267628011303e-05,
+      "error_normalized": 8.520333346266238e-05,
+      "passed": true
+    },
+    {
+      "ratio": 3.17,
+      "charges": [
+        0,
+        0
+      ],
+      "coupling": 1.0,
+      "epsilon": 5.9,
+      "attraction": 0.001,
+      "q": 100000.0,
+      "expected": 7.289857742655489e-15,
+      "hard": 7.194604711807992e-15,
+      "cuda": 7.290596433758023e-15,
+      "error_relative": 0.00010133134672996036,
+      "error_normalized": 0.00010267292396499034,
+      "passed": true
+    },
+    {
+      "ratio": 5.0,
+      "charges": [
+        0,
+        0
+      ],
+      "coupling": 1.0,
+      "epsilon": 5.9,
+      "attraction": 0.001,
+      "q": 1e-05,
+      "expected": 3.0775746974652298e-19,
+      "hard": 3.0770355923640786e-19,
+      "cuda": 3.077641349413431e-19,
+      "error_relative": 2.1657296655153147e-05,
+      "error_normalized": 2.1661091073025404e-05,
+      "passed": true
+    },
+    {
+      "ratio": 5.0,
+      "charges": [
+        0,
+        0
+      ],
+      "coupling": 1.0,
+      "epsilon": 5.9,
+      "attraction": 0.001,
+      "q": 1.0,
+      "expected": 1.019707914386001e-14,
+      "hard": 1.0105485185750996e-14,
+      "cuda": 1.0197950214785472e-14,
+      "error_relative": 8.542357210061802e-05,
+      "error_normalized": 8.619783310248542e-05,
+      "passed": true
+    },
+    {
+      "ratio": 5.0,
+      "charges": [
+        0,
+        0
+      ],
+      "coupling": 1.0,
+      "epsilon": 5.9,
+      "attraction": 0.001,
+      "q": 100000.0,
+      "expected": 1.241681473815326e-14,
+      "hard": 1.2275750941552165e-14,
+      "cuda": 1.241809221475821e-14,
+      "error_relative": 0.00010288279497516761,
+      "error_normalized": 0.0001040650475096856,
+      "passed": true
+    },
+    {
+      "ratio": 31.9,
+      "charges": [
+        0,
+        0
+      ],
+      "coupling": 1.0,
+      "epsilon": 5.9,
+      "attraction": 0.001,
+      "q": 1e-05,
+      "expected": 3.9354325860062676e-18,
+      "hard": 3.935282500369703e-18,
+      "cuda": 3.935541856859778e-18,
+      "error_relative": 2.7765906573717913e-05,
+      "error_normalized": 2.7766965522865684e-05,
+      "passed": true
+    },
+    {
+      "ratio": 31.9,
+      "charges": [
+        0,
+        0
+      ],
+      "coupling": 1.0,
+      "epsilon": 5.9,
+      "attraction": 0.001,
+      "q": 1.0,
+      "expected": 1.2975826463791342e-13,
+      "hard": 1.292410757545953e-13,
+      "cuda": 1.297703286322202e-13,
+      "error_relative": 9.297283945985946e-05,
+      "error_normalized": 9.334489237522378e-05,
+      "passed": true
+    },
+    {
+      "ratio": 31.9,
+      "charges": [
+        0,
+        0
+      ],
+      "coupling": 1.0,
+      "epsilon": 5.9,
+      "attraction": 0.001,
+      "q": 100000.0,
+      "expected": 1.5779395805507517e-13,
+      "hard": 1.5699703955023745e-13,
+      "cuda": 1.578114206975719e-13,
+      "error_relative": 0.00011066737099429957,
+      "error_normalized": 0.00011122911964941488,
+      "passed": true
+    },
+    {
+      "ratio": 1.0,
+      "charges": [
+        1,
+        0
+      ],
+      "coupling": 3.0,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 1e-05,
+      "expected": 6.074250202849825e-20,
+      "hard": 4.815869857106634e-20,
+      "cuda": 6.07447545452936e-20,
+      "error_relative": 3.708304268212892e-05,
+      "error_normalized": 4.677279208485663e-05,
+      "passed": true
+    },
+    {
+      "ratio": 1.0,
+      "charges": [
+        1,
+        0
+      ],
+      "coupling": 3.0,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 1.0,
+      "expected": 2.9383296312136466e-15,
+      "hard": 1.5816099631173054e-15,
+      "cuda": 2.938633044419461e-15,
+      "error_relative": 0.00010326043837682874,
+      "error_normalized": 0.0001918381983485632,
+      "passed": true
+    },
+    {
+      "ratio": 1.0,
+      "charges": [
+        1,
+        0
+      ],
+      "coupling": 3.0,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 100000.0,
+      "expected": 4.179508530129179e-15,
+      "hard": 1.9212783589334094e-15,
+      "cuda": 4.180108071441411e-15,
+      "error_relative": 0.00014344780203456864,
+      "error_normalized": 0.0003120533312853359,
+      "passed": true
+    },
+    {
+      "ratio": 1.0,
+      "charges": [
+        0,
+        1
+      ],
+      "coupling": 3.0,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 1e-05,
+      "expected": 6.074250202849825e-20,
+      "hard": 4.815869857106634e-20,
+      "cuda": 6.074475454529361e-20,
+      "error_relative": 3.7083042682350964e-05,
+      "error_normalized": 4.677279208510658e-05,
+      "passed": true
+    },
+    {
+      "ratio": 1.0,
+      "charges": [
+        0,
+        1
+      ],
+      "coupling": 3.0,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 1.0,
+      "expected": 2.9383296312136466e-15,
+      "hard": 1.5816099631173054e-15,
+      "cuda": 2.93863304441946e-15,
+      "error_relative": 0.00010326043837638466,
+      "error_normalized": 0.00019183819834781504,
+      "passed": true
+    },
+    {
+      "ratio": 1.0,
+      "charges": [
+        0,
+        1
+      ],
+      "coupling": 3.0,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 100000.0,
+      "expected": 4.179508530129179e-15,
+      "hard": 1.9212783589334094e-15,
+      "cuda": 4.18010807144141e-15,
+      "error_relative": 0.0001434478020343466,
+      "error_normalized": 0.0003120533312849253,
+      "passed": true
+    },
+    {
+      "ratio": 1.0,
+      "charges": [
+        1,
+        1
+      ],
+      "coupling": 2.5,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 1e-05,
+      "expected": 2.061024518774013e-20,
+      "hard": 5.2755211094929674e-20,
+      "cuda": 2.0611910395691578e-20,
+      "error_relative": 8.079515485048816e-05,
+      "error_normalized": 3.1564805009524364e-05,
+      "passed": true
+    },
+    {
+      "ratio": 1.0,
+      "charges": [
+        1,
+        1
+      ],
+      "coupling": 2.5,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 1.0,
+      "expected": 6.281967513813298e-16,
+      "hard": 1.7325669079485233e-15,
+      "cuda": 6.28349900590616e-16,
+      "error_relative": 0.00024379178808131563,
+      "error_normalized": 8.839439826744411e-05,
+      "passed": true
+    },
+    {
+      "ratio": 1.0,
+      "charges": [
+        1,
+        1
+      ],
+      "coupling": 2.5,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 100000.0,
+      "expected": 7.488852782574863e-16,
+      "hard": 2.10465499286867e-15,
+      "cuda": 7.490966438823239e-16,
+      "error_relative": 0.00028224032568702206,
+      "error_normalized": 0.00010042768318502757,
+      "passed": true
+    },
+    {
+      "ratio": 1.0,
+      "charges": [
+        1,
+        -1
+      ],
+      "coupling": 0.5,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 1e-05,
+      "expected": 1.7950133904131943e-19,
+      "hard": 1.179642381756139e-19,
+      "cuda": 1.7950564961698942e-19,
+      "error_relative": 2.4014169994535095e-05,
+      "error_normalized": 3.654137674817851e-05,
+      "passed": true
+    },
+    {
+      "ratio": 1.0,
+      "charges": [
+        1,
+        -1
+      ],
+      "coupling": 0.5,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 1.0,
+      "expected": 9.086085744299346e-15,
+      "hard": 3.87413738173952e-15,
+      "cuda": 9.086854065295084e-15,
+      "error_relative": 8.456017446456521e-05,
+      "error_normalized": 0.0001983205343620591,
+      "passed": true
+    },
+    {
+      "ratio": 1.0,
+      "charges": [
+        1,
+        -1
+      ],
+      "coupling": 0.5,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 100000.0,
+      "expected": 1.3306516587056348e-14,
+      "hard": 4.7061516332386825e-15,
+      "cuda": 1.3308189887760536e-14,
+      "error_relative": 0.00012575046919605093,
+      "error_normalized": 0.00035555605398891065,
+      "passed": true
+    },
+    {
+      "ratio": 3.17,
+      "charges": [
+        1,
+        0
+      ],
+      "coupling": 3.0,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 1e-05,
+      "expected": 1.3171647523316362e-19,
+      "hard": 1.0411918539530471e-19,
+      "cuda": 1.317215928298432e-19,
+      "error_relative": 3.8853125021054424e-05,
+      "error_normalized": 4.915133229432208e-05,
+      "passed": true
+    },
+    {
+      "ratio": 3.17,
+      "charges": [
+        1,
+        0
+      ],
+      "coupling": 3.0,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 1.0,
+      "expected": 6.42198723706258e-15,
+      "hard": 3.419443337528411e-15,
+      "cuda": 6.422580890337949e-15,
+      "error_relative": 9.24407435665131e-05,
+      "error_normalized": 0.00017361108717716642,
+      "passed": true
+    },
+    {
+      "ratio": 3.17,
+      "charges": [
+        1,
+        0
+      ],
+      "coupling": 3.0,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 100000.0,
+      "expected": 9.178925526863077e-15,
+      "hard": 4.153806967075296e-15,
+      "cuda": 9.180078567637554e-15,
+      "error_relative": 0.00012561827319590435,
+      "error_normalized": 0.00027758650886209533,
+      "passed": true
+    },
+    {
+      "ratio": 3.17,
+      "charges": [
+        0,
+        1
+      ],
+      "coupling": 3.0,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 1e-05,
+      "expected": 1.238594351626108e-19,
+      "hard": 1.0411918539530471e-19,
+      "cuda": 1.2386455308052736e-19,
+      "error_relative": 4.1320371837905157e-05,
+      "error_normalized": 4.915441757564128e-05,
+      "passed": true
+    },
+    {
+      "ratio": 3.17,
+      "charges": [
+        0,
+        1
+      ],
+      "coupling": 3.0,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 1.0,
+      "expected": 5.654472797741466e-15,
+      "hard": 3.419443337528411e-15,
+      "cuda": 5.65511343511116e-15,
+      "error_relative": 0.00011329745364574428,
+      "error_normalized": 0.00018735136291419632,
+      "passed": true
+    },
+    {
+      "ratio": 3.17,
+      "charges": [
+        0,
+        1
+      ],
+      "coupling": 3.0,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 100000.0,
+      "expected": 7.783318887745596e-15,
+      "hard": 4.153806967075296e-15,
+      "cuda": 7.784497059967995e-15,
+      "error_relative": 0.0001513714444172365,
+      "error_normalized": 0.0002836367293274347,
+      "passed": true
+    },
+    {
+      "ratio": 3.17,
+      "charges": [
+        1,
+        1
+      ],
+      "coupling": 2.5,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 1e-05,
+      "expected": 4.2939885730549154e-20,
+      "hard": 1.1405685302014166e-19,
+      "cuda": 4.294358601478463e-20,
+      "error_relative": 8.617359297824478e-05,
+      "error_normalized": 3.244245424538718e-05,
+      "passed": true
+    },
+    {
+      "ratio": 3.17,
+      "charges": [
+        1,
+        1
+      ],
+      "coupling": 2.5,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 1.0,
+      "expected": 1.2779441970840008e-15,
+      "hard": 3.745812500150124e-15,
+      "cuda": 1.2782435165723106e-15,
+      "error_relative": 0.00023421952929769674,
+      "error_normalized": 7.99077605453726e-05,
+      "passed": true
+    },
+    {
+      "ratio": 3.17,
+      "charges": [
+        1,
+        1
+      ],
+      "coupling": 2.5,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 100000.0,
+      "expected": 1.515087914900865e-15,
+      "hard": 4.550267550778515e-15,
+      "cuda": 1.5154935463059883e-15,
+      "error_relative": 0.00026772796557472667,
+      "error_normalized": 8.914451745896179e-05,
+      "passed": true
+    },
+    {
+      "ratio": 3.17,
+      "charges": [
+        1,
+        -1
+      ],
+      "coupling": 0.5,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 1e-05,
+      "expected": 3.755107017793767e-19,
+      "hard": 2.55038876652739e-19,
+      "cuda": 3.755208096392971e-19,
+      "error_relative": 2.691763476381226e-05,
+      "error_normalized": 3.963262406509015e-05,
+      "passed": true
+    },
+    {
+      "ratio": 3.17,
+      "charges": [
+        1,
+        -1
+      ],
+      "coupling": 0.5,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 1.0,
+      "expected": 1.8399546005888486e-14,
+      "hard": 8.375891381304117e-15,
+      "cuda": 1.8401135770097672e-14,
+      "error_relative": 8.640236061685513e-05,
+      "error_normalized": 0.00018980239079204533,
+      "passed": true
+    },
+    {
+      "ratio": 3.17,
+      "charges": [
+        1,
+        -1
+      ],
+      "coupling": 0.5,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 100000.0,
+      "expected": 2.6379835545717034e-14,
+      "hard": 1.0174707559352235e-14,
+      "cuda": 2.6383098370128972e-14,
+      "error_relative": 0.0001236863060152249,
+      "error_normalized": 0.0003206799205681849,
+      "passed": true
+    },
+    {
+      "ratio": 5.0,
+      "charges": [
+        1,
+        0
+      ],
+      "coupling": 3.0,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 1e-05,
+      "expected": 2.2579632392399566e-19,
+      "hard": 1.7765273275574603e-19,
+      "cuda": 2.2580475905242187e-19,
+      "error_relative": 3.7357244261571054e-05,
+      "error_normalized": 4.7480994496199536e-05,
+      "passed": true
+    },
+    {
+      "ratio": 5.0,
+      "charges": [
+        1,
+        0
+      ],
+      "coupling": 3.0,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 1.0,
+      "expected": 1.1098510650403354e-14,
+      "hard": 5.8344045922851126e-15,
+      "cuda": 1.109940488782122e-14,
+      "error_relative": 8.057274043649088e-05,
+      "error_normalized": 0.00015326969594260933,
+      "passed": true
+    },
+    {
+      "ratio": 5.0,
+      "charges": [
+        1,
+        0
+      ],
+      "coupling": 3.0,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 100000.0,
+      "expected": 1.5943631361818184e-14,
+      "hard": 7.087408110609946e-15,
+      "cuda": 1.5945351208517087e-14,
+      "error_relative": 0.00010787045058124889,
+      "error_normalized": 0.0002426622923445928,
+      "passed": true
+    },
+    {
+      "ratio": 5.0,
+      "charges": [
+        0,
+        1
+      ],
+      "coupling": 3.0,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 1e-05,
+      "expected": 2.0411744018857013e-19,
+      "hard": 1.7765273275574603e-19,
+      "cuda": 2.0412622082308943e-19,
+      "error_relative": 4.301756141567026e-05,
+      "error_normalized": 4.94258342277893e-05,
+      "passed": true
+    },
+    {
+      "ratio": 5.0,
+      "charges": [
+        0,
+        1
+      ],
+      "coupling": 3.0,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 1.0,
+      "expected": 8.962106776104889e-15,
+      "hard": 5.8344045922851126e-15,
+      "cuda": 8.963150025429054e-15,
+      "error_relative": 0.00011640670550217003,
+      "error_normalized": 0.00017880990384947363,
+      "passed": true
+    },
+    {
+      "ratio": 5.0,
+      "charges": [
+        0,
+        1
+      ],
+      "coupling": 3.0,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 100000.0,
+      "expected": 1.209528659661344e-14,
+      "hard": 7.087408110609946e-15,
+      "cuda": 1.209712412117758e-14,
+      "error_relative": 0.00015192071303671284,
+      "error_normalized": 0.00025926608648217306,
+      "passed": true
+    },
+    {
+      "ratio": 5.0,
+      "charges": [
+        1,
+        1
+      ],
+      "coupling": 2.5,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 1e-05,
+      "expected": 7.266564940842182e-20,
+      "hard": 1.9460881826551797e-19,
+      "cuda": 7.26717491737111e-20,
+      "error_relative": 8.394289927826648e-05,
+      "error_normalized": 3.1343725035967626e-05,
+      "passed": true
+    },
+    {
+      "ratio": 5.0,
+      "charges": [
+        1,
+        1
+      ],
+      "coupling": 2.5,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 1.0,
+      "expected": 2.16926280655931e-15,
+      "hard": 6.391270009612576e-15,
+      "cuda": 2.1697071257937227e-15,
+      "error_relative": 0.00020482499080753946,
+      "error_normalized": 6.951970950128435e-05,
+      "passed": true
+    },
+    {
+      "ratio": 5.0,
+      "charges": [
+        1,
+        1
+      ],
+      "coupling": 2.5,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 100000.0,
+      "expected": 2.5735957337061544e-15,
+      "hard": 7.763866592852273e-15,
+      "cuda": 2.5741936542704408e-15,
+      "error_relative": 0.00023232886053370372,
+      "error_normalized": 7.701324554403136e-05,
+      "passed": true
+    },
+    {
+      "ratio": 5.0,
+      "charges": [
+        1,
+        -1
+      ],
+      "coupling": 0.5,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 1e-05,
+      "expected": 6.273455405888141e-19,
+      "hard": 4.35158546662601e-19,
+      "cuda": 6.273632790825744e-19,
+      "error_relative": 2.827547597394897e-05,
+      "error_normalized": 4.076328937209761e-05,
+      "passed": true
+    },
+    {
+      "ratio": 5.0,
+      "charges": [
+        1,
+        -1
+      ],
+      "coupling": 0.5,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 1.0,
+      "expected": 3.005358949654272e-14,
+      "hard": 1.4291314204049455e-14,
+      "cuda": 3.0056153868707713e-14,
+      "error_relative": 8.53266517559792e-05,
+      "error_normalized": 0.000179435713775354,
+      "passed": true
+    },
+    {
+      "ratio": 5.0,
+      "charges": [
+        1,
+        -1
+      ],
+      "coupling": 0.5,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 100000.0,
+      "expected": 4.2500093615860526e-14,
+      "hard": 1.7360533469857366e-14,
+      "cuda": 4.2505157955453897e-14,
+      "error_relative": 0.00011916066913042478,
+      "error_normalized": 0.00029171566658154914,
+      "passed": true
+    },
+    {
+      "ratio": 31.9,
+      "charges": [
+        1,
+        0
+      ],
+      "coupling": 3.0,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 1e-05,
+      "expected": 3.0740918679144348e-18,
+      "hard": 2.2720364109256717e-18,
+      "cuda": 3.074169462179866e-18,
+      "error_relative": 2.5241361925720796e-05,
+      "error_normalized": 3.415185824396387e-05,
+      "passed": true
+    },
+    {
+      "ratio": 31.9,
+      "charges": [
+        1,
+        0
+      ],
+      "coupling": 3.0,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 1.0,
+      "expected": 1.5905196130522307e-13,
+      "hard": 7.46173698772724e-14,
+      "cuda": 1.5906169347885154e-13,
+      "error_relative": 6.118864268378488e-05,
+      "error_normalized": 0.0001304277227203788,
+      "passed": true
+    },
+    {
+      "ratio": 31.9,
+      "charges": [
+        1,
+        0
+      ],
+      "coupling": 3.0,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 100000.0,
+      "expected": 2.3652879322530835e-13,
+      "hard": 9.064228304630392e-14,
+      "cuda": 2.365493879493546e-13,
+      "error_relative": 8.707068499114179e-05,
+      "error_normalized": 0.00022720879653616207,
+      "passed": true
+    },
+    {
+      "ratio": 31.9,
+      "charges": [
+        0,
+        1
+      ],
+      "coupling": 3.0,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 1e-05,
+      "expected": 2.3533189795513702e-18,
+      "hard": 2.2720364109256717e-18,
+      "cuda": 2.353432896913929e-18,
+      "error_relative": 4.8407106536974e-05,
+      "error_normalized": 5.013888070229758e-05,
+      "passed": true
+    },
+    {
+      "ratio": 31.9,
+      "charges": [
+        0,
+        1
+      ],
+      "coupling": 3.0,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 1.0,
+      "expected": 8.779580402175322e-14,
+      "hard": 7.46173698772724e-14,
+      "cuda": 8.780730366545505e-14,
+      "error_relative": 0.00013098170043490676,
+      "error_normalized": 0.0001541148357377781,
+      "passed": true
+    },
+    {
+      "ratio": 31.9,
+      "charges": [
+        0,
+        1
+      ],
+      "coupling": 3.0,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 100000.0,
+      "expected": 1.1086985977310453e-13,
+      "hard": 9.064228304630392e-14,
+      "cuda": 1.1088752453438232e-13,
+      "error_relative": 0.00015932879606705974,
+      "error_normalized": 0.00019488433746489667,
+      "passed": true
+    },
+    {
+      "ratio": 31.9,
+      "charges": [
+        1,
+        1
+      ],
+      "coupling": 2.5,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 1e-05,
+      "expected": 1.0344068178426056e-18,
+      "hard": 2.4888911874741354e-18,
+      "cuda": 1.0344632687387017e-18,
+      "error_relative": 5.4573205746866194e-05,
+      "error_normalized": 2.2681142663107017e-05,
+      "passed": true
+    },
+    {
+      "ratio": 31.9,
+      "charges": [
+        1,
+        1
+      ],
+      "coupling": 2.5,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 1.0,
+      "expected": 3.429132369974226e-14,
+      "hard": 8.173923332697717e-14,
+      "cuda": 3.4296174845147914e-14,
+      "error_relative": 0.00014146859561714464,
+      "error_normalized": 5.934904461665851e-05,
+      "passed": true
+    },
+    {
+      "ratio": 31.9,
+      "charges": [
+        1,
+        1
+      ],
+      "coupling": 2.5,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 100000.0,
+      "expected": 4.1761922014647264e-14,
+      "hard": 9.929364617645749e-14,
+      "cuda": 4.176882459699013e-14,
+      "error_relative": 0.0001652841155261875,
+      "error_normalized": 6.951685841606593e-05,
+      "passed": true
+    },
+    {
+      "ratio": 31.9,
+      "charges": [
+        1,
+        -1
+      ],
+      "coupling": 0.5,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 1e-05,
+      "expected": 7.751996042113457e-18,
+      "hard": 5.565329883792339e-18,
+      "cuda": 7.752065386819847e-18,
+      "error_relative": 8.945400128412828e-06,
+      "error_normalized": 1.2460125066762374e-05,
+      "passed": true
+    },
+    {
+      "ratio": 31.9,
+      "charges": [
+        1,
+        -1
+      ],
+      "coupling": 0.5,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 1.0,
+      "expected": 3.600327461569473e-13,
+      "hard": 1.8277448214783723e-13,
+      "cuda": 3.6005033820944557e-13,
+      "error_relative": 4.886236789869436e-05,
+      "error_normalized": 9.625004700620922e-05,
+      "passed": true
+    },
+    {
+      "ratio": 31.9,
+      "charges": [
+        1,
+        -1
+      ],
+      "coupling": 0.5,
+      "epsilon": 5.9,
+      "attraction": 16.0,
+      "q": 100000.0,
+      "expected": 5.001997404369634e-13,
+      "hard": 2.22027342584371e-13,
+      "cuda": 5.002351759441098e-13,
+      "error_relative": 7.084271398349884e-05,
+      "error_normalized": 0.00015959974449049984,
+      "passed": true
+    },
+    {
+      "ratio": 1.0,
+      "charges": [
+        1,
+        0
+      ],
+      "coupling": 0.05,
+      "epsilon": 100.0,
+      "attraction": 0.0,
+      "q": 1e-05,
+      "expected": 3.733554643883326e-19,
+      "hard": 3.7303567508152564e-19,
+      "cuda": 3.733555773630059e-19,
+      "error_relative": 3.025927943767215e-07,
+      "error_normalized": 3.028521957626095e-07,
+      "passed": true
+    },
+    {
+      "ratio": 1.0,
+      "charges": [
+        1,
+        0
+      ],
+      "coupling": 0.05,
+      "epsilon": 100.0,
+      "attraction": 0.0,
+      "q": 1.0,
+      "expected": 1.232754634108934e-14,
+      "hard": 1.2251098094698098e-14,
+      "cuda": 1.232742521780052e-14,
+      "error_relative": -9.825417440767481e-06,
+      "error_normalized": 9.886729163793674e-06,
+      "passed": true
+    },
+    {
+      "ratio": 1.0,
+      "charges": [
+        1,
+        0
+      ],
+      "coupling": 0.05,
+      "epsilon": 100.0,
+      "attraction": 0.0,
+      "q": 100000.0,
+      "expected": 1.499678413886312e-14,
+      "hard": 1.4882158175155616e-14,
+      "cuda": 1.4996595471585956e-14,
+      "error_relative": -1.2580515623694666e-05,
+      "error_normalized": 1.2677413782543342e-05,
+      "passed": true
+    },
+    {
+      "ratio": 3.17,
+      "charges": [
+        1,
+        0
+      ],
+      "coupling": 0.05,
+      "epsilon": 100.0,
+      "attraction": 0.0,
+      "q": 1e-05,
+      "expected": 8.099032177151401e-19,
+      "hard": 8.065037421133951e-19,
+      "cuda": 8.099047262528061e-19,
+      "error_relative": 1.8626147333389298e-06,
+      "error_normalized": 1.8704657984815418e-06,
+      "passed": true
+    },
+    {
+      "ratio": 3.17,
+      "charges": [
+        1,
+        0
+      ],
+      "coupling": 0.05,
+      "epsilon": 100.0,
+      "attraction": 0.0,
+      "q": 1.0,
+      "expected": 2.7341546917306412e-14,
+      "hard": 2.6486894199094874e-14,
+      "cuda": 2.734027743593789e-14,
+      "error_relative": -4.6430488090498656e-05,
+      "error_normalized": 4.79286608304655e-05,
+      "passed": true
+    },
+    {
+      "ratio": 3.17,
+      "charges": [
+        1,
+        0
+      ],
+      "coupling": 0.05,
+      "epsilon": 100.0,
+      "attraction": 0.0,
+      "q": 100000.0,
+      "expected": 3.346724881848482e-14,
+      "hard": 3.217525041368591e-14,
+      "cuda": 3.346523694044566e-14,
+      "error_relative": -6.011483196821654e-05,
+      "error_normalized": 6.252874533355285e-05,
+      "passed": true
+    },
+    {
+      "ratio": 5.0,
+      "charges": [
+        1,
+        0
+      ],
+      "coupling": 0.05,
+      "epsilon": 100.0,
+      "attraction": 0.0,
+      "q": 1e-05,
+      "expected": 1.3851328323298846e-18,
+      "hard": 1.3760921507424819e-18,
+      "cuda": 1.3851366286532224e-18,
+      "error_relative": 2.7407648199861967e-06,
+      "error_normalized": 2.758771159171433e-06,
+      "passed": true
+    },
+    {
+      "ratio": 5.0,
+      "charges": [
+        1,
+        0
+      ],
+      "coupling": 0.05,
+      "epsilon": 100.0,
+      "attraction": 0.0,
+      "q": 1.0,
+      "expected": 4.7534223658888546e-14,
+      "hard": 4.519310364191262e-14,
+      "cuda": 4.753187294962539e-14,
+      "error_relative": -4.9452985285358686e-05,
+      "error_normalized": 5.201477822325383e-05,
+      "passed": true
+    },
+    {
+      "ratio": 5.0,
+      "charges": [
+        1,
+        0
+      ],
+      "coupling": 0.05,
+      "epsilon": 100.0,
+      "attraction": 0.0,
+      "q": 100000.0,
+      "expected": 5.84592972167061e-14,
+      "hard": 5.489882716033538e-14,
+      "cuda": 5.84555147803803e-14,
+      "error_relative": -6.470204921871225e-05,
+      "error_normalized": 6.889830842399425e-05,
+      "passed": true
+    },
+    {
+      "ratio": 31.9,
+      "charges": [
+        1,
+        0
+      ],
+      "coupling": 0.05,
+      "epsilon": 100.0,
+      "attraction": 0.0,
+      "q": 1e-05,
+      "expected": 1.7963006474869868e-17,
+      "hard": 1.7599118362983996e-17,
+      "cuda": 1.7962335791017304e-17,
+      "error_relative": -3.7336948773170064e-05,
+      "error_normalized": 3.810894606938026e-05,
+      "passed": true
+    },
+    {
+      "ratio": 31.9,
+      "charges": [
+        1,
+        0
+      ],
+      "coupling": 0.05,
+      "epsilon": 100.0,
+      "attraction": 0.0,
+      "q": 1.0,
+      "expected": 6.709757359067261e-13,
+      "hard": 5.779836617449498e-13,
+      "cuda": 6.709147006646501e-13,
+      "error_relative": -9.096490202220586e-05,
+      "error_normalized": 0.00010560028962020836,
+      "passed": true
+    },
+    {
+      "ratio": 31.9,
+      "charges": [
+        1,
+        0
+      ],
+      "coupling": 0.05,
+      "epsilon": 100.0,
+      "attraction": 0.0,
+      "q": 100000.0,
+      "expected": 8.476769093567848e-13,
+      "hard": 7.021121054011079e-13,
+      "cuda": 8.47584160159668e-13,
+      "error_relative": -0.00010941574094203155,
+      "error_normalized": 0.00013210026775388779,
+      "passed": true
+    },
+    {
+      "ratio": 1.0,
+      "charges": [
+        1,
+        1
+      ],
+      "coupling": 59.0,
+      "epsilon": 100.0,
+      "attraction": 0.01,
+      "q": 1e-05,
+      "expected": 7.76753646396734e-42,
+      "hard": 1.0859488348418257e-20,
+      "cuda": 7.770176124593125e-42,
+      "error_relative": 0.000339832408644547,
+      "error_normalized": 2.430741247739371e-25,
+      "passed": true
+    },
+    {
+      "ratio": 1.0,
+      "charges": [
+        1,
+        1
+      ],
+      "coupling": 59.0,
+      "epsilon": 100.0,
+      "attraction": 0.01,
+      "q": 1.0,
+      "expected": 9.860618714216239e-39,
+      "hard": 3.5664325398804693e-16,
+      "cuda": 9.886786110462998e-39,
+      "error_relative": 0.0026537276214761985,
+      "error_normalized": 7.337134785013118e-26,
+      "passed": true
+    },
+    {
+      "ratio": 1.0,
+      "charges": [
+        1,
+        1
+      ],
+      "coupling": 59.0,
+      "epsilon": 100.0,
+      "attraction": 0.01,
+      "q": 100000.0,
+      "expected": 9.918573849117971e-39,
+      "hard": 4.332363741540271e-16,
+      "cuda": 9.945030481727663e-39,
+      "error_relative": 0.002667382731847523,
+      "error_normalized": 6.106743151784833e-26,
+      "passed": true
+    },
+    {
+      "ratio": 3.17,
+      "charges": [
+        1,
+        1
+      ],
+      "coupling": 59.0,
+      "epsilon": 100.0,
+      "attraction": 0.01,
+      "q": 1e-05,
+      "expected": 2.0148992323366193e-36,
+      "hard": 2.3478231642381275e-20,
+      "cuda": 2.0160204602340427e-36,
+      "error_relative": 0.0005564684721841573,
+      "error_normalized": 4.7756062488086243e-20,
+      "passed": true
+    },
+    {
+      "ratio": 3.17,
+      "charges": [
+        1,
+        1
+      ],
+      "coupling": 59.0,
+      "epsilon": 100.0,
+      "attraction": 0.01,
+      "q": 1.0,
+      "expected": 1.4692444237793567e-32,
+      "hard": 7.710633007901898e-16,
+      "cuda": 1.471741518718152e-32,
+      "error_relative": 0.0016995776185231293,
+      "error_normalized": 3.238508351047489e-20,
+      "passed": true
+    },
+    {
+      "ratio": 3.17,
+      "charges": [
+        1,
+        1
+      ],
+      "coupling": 59.0,
+      "epsilon": 100.0,
+      "attraction": 0.01,
+      "q": 100000.0,
+      "expected": 1.5209078660237127e-32,
+      "hard": 9.366577523677866e-16,
+      "cuda": 1.5235552397537443e-32,
+      "error_relative": 0.0017406535853832228,
+      "error_normalized": 2.8264045467400176e-20,
+      "passed": true
+    },
+    {
+      "ratio": 5.0,
+      "charges": [
+        1,
+        1
+      ],
+      "coupling": 59.0,
+      "epsilon": 100.0,
+      "attraction": 0.01,
+      "q": 1e-05,
+      "expected": 1.0705539231685109e-34,
+      "hard": 4.0059591281911356e-20,
+      "cuda": 1.0706960062363465e-34,
+      "error_relative": 0.00013271920709523322,
+      "error_normalized": 3.546792747727616e-19,
+      "passed": true
+    },
+    {
+      "ratio": 5.0,
+      "charges": [
+        1,
+        1
+      ],
+      "coupling": 59.0,
+      "epsilon": 100.0,
+      "attraction": 0.01,
+      "q": 1.0,
+      "expected": 9.113695557381309e-31,
+      "hard": 1.3156221112657704e-15,
+      "cuda": 9.128455551277237e-31,
+      "error_relative": 0.0016195399333889249,
+      "error_normalized": 1.121902236936976e-18,
+      "passed": true
+    },
+    {
+      "ratio": 5.0,
+      "charges": [
+        1,
+        1
+      ],
+      "coupling": 59.0,
+      "epsilon": 100.0,
+      "attraction": 0.01,
+      "q": 100000.0,
+      "expected": 9.491487794281038e-31,
+      "hard": 1.5981666465524995e-15,
+      "cuda": 9.507461393003367e-31,
+      "error_relative": 0.0016829393945967386,
+      "error_normalized": 9.99495187613047e-19,
+      "passed": true
+    },
+    {
+      "ratio": 31.9,
+      "charges": [
+        1,
+        1
+      ],
+      "coupling": 59.0,
+      "epsilon": 100.0,
+      "attraction": 0.01,
+      "q": 1e-05,
+      "expected": 2.1901944768193554e-31,
+      "hard": 5.123301431250254e-19,
+      "cuda": 2.19031061584064e-31,
+      "error_relative": 5.302680767127477e-05,
+      "error_normalized": 2.2668785517167854e-17,
+      "passed": true
+    },
+    {
+      "ratio": 31.9,
+      "charges": [
+        1,
+        1
+      ],
+      "coupling": 59.0,
+      "epsilon": 100.0,
+      "attraction": 0.01,
+      "q": 1.0,
+      "expected": 2.3267238880261993e-27,
+      "hard": 1.6825754906480925e-14,
+      "cuda": 2.3310144770337362e-27,
+      "error_relative": 0.0018440473446879047,
+      "error_normalized": 2.550012781824262e-16,
+      "passed": true
+    },
+    {
+      "ratio": 31.9,
+      "charges": [
+        1,
+        1
+      ],
+      "coupling": 59.0,
+      "epsilon": 100.0,
+      "attraction": 0.01,
+      "q": 100000.0,
+      "expected": 2.4492697058024276e-27,
+      "hard": 2.043927360625875e-14,
+      "cuda": 2.4540269582383714e-27,
+      "error_relative": 0.0019423146518628975,
+      "error_normalized": 2.327505628422666e-16,
+      "passed": true
+    },
+    {
+      "ratio": 1.0,
+      "charges": [
+        0,
+        0
+      ],
+      "coupling": 1.0,
+      "epsilon": 100.0,
+      "attraction": 200.0,
+      "q": 1e-05,
+      "expected": 1.3615507181633795e-19,
+      "hard": 8.341331275148161e-20,
+      "cuda": 1.3615758527960822e-19,
+      "error_relative": 1.8460298516487228e-05,
+      "error_normalized": 3.0132639351652552e-05,
+      "passed": true
+    },
+    {
+      "ratio": 1.0,
+      "charges": [
+        0,
+        0
+      ],
+      "coupling": 1.0,
+      "epsilon": 100.0,
+      "attraction": 200.0,
+      "q": 1.0,
+      "expected": 7.805405020266658e-15,
+      "hard": 2.7394288138763113e-15,
+      "cuda": 7.806338020470477e-15,
+      "error_relative": 0.00011953258048702509,
+      "error_normalized": 0.0003405820217312484,
+      "passed": true
+    },
+    {
+      "ratio": 1.0,
+      "charges": [
+        0,
+        0
+      ],
+      "coupling": 1.0,
+      "epsilon": 100.0,
+      "attraction": 200.0,
+      "q": 100000.0,
+      "expected": 1.2639689915874045e-14,
+      "hard": 3.3277517331552186e-15,
+      "cuda": 1.264242404499411e-14,
+      "error_relative": 0.00021631299013358252,
+      "error_normalized": 0.0008216145131333829,
+      "passed": true
+    },
+    {
+      "ratio": 3.17,
+      "charges": [
+        0,
+        0
+      ],
+      "coupling": 1.0,
+      "epsilon": 100.0,
+      "attraction": 200.0,
+      "q": 1e-05,
+      "expected": 2.6933507013778553e-19,
+      "hard": 1.8033971914735118e-19,
+      "cuda": 2.693419188806419e-19,
+      "error_relative": 2.5428336728916534e-05,
+      "error_normalized": 3.797689654138708e-05,
+      "passed": true
+    },
+    {
+      "ratio": 3.17,
+      "charges": [
+        0,
+        0
+      ],
+      "coupling": 1.0,
+      "epsilon": 100.0,
+      "attraction": 200.0,
+      "q": 1.0,
+      "expected": 1.460315442561341e-14,
+      "hard": 5.922649594202099e-15,
+      "cuda": 1.460498290109319e-14,
+      "error_relative": 0.00012521099390494506,
+      "error_normalized": 0.00030872592590461674,
+      "passed": true
+    },
+    {
+      "ratio": 3.17,
+      "charges": [
+        0,
+        0
+      ],
+      "coupling": 1.0,
+      "epsilon": 100.0,
+      "attraction": 200.0,
+      "q": 100000.0,
+      "expected": 2.251033298475997e-14,
+      "hard": 7.194604711807992e-15,
+      "cuda": 2.2514985951464088e-14,
+      "error_relative": 0.00020670359284635786,
+      "error_normalized": 0.00064672999984009,
+      "passed": true
+    },
+    {
+      "ratio": 5.0,
+      "charges": [
+        0,
+        0
+      ],
+      "coupling": 1.0,
+      "epsilon": 100.0,
+      "attraction": 200.0,
+      "q": 1e-05,
+      "expected": 4.2961982138704847e-19,
+      "hard": 3.0770355923640786e-19,
+      "cuda": 4.2963284380792827e-19,
+      "error_relative": 3.0311499217505755e-05,
+      "error_normalized": 4.232132027372419e-05,
+      "passed": true
+    },
+    {
+      "ratio": 5.0,
+      "charges": [
+        0,
+        0
+      ],
+      "coupling": 1.0,
+      "epsilon": 100.0,
+      "attraction": 200.0,
+      "q": 1.0,
+      "expected": 2.2211736208495506e-14,
+      "hard": 1.0105485185750996e-14,
+      "cuda": 2.221460800058485e-14,
+      "error_relative": 0.00012929165295272327,
+      "error_normalized": 0.00028418151494533057,
+      "passed": true
+    },
+    {
+      "ratio": 5.0,
+      "charges": [
+        0,
+        0
+      ],
+      "coupling": 1.0,
+      "epsilon": 100.0,
+      "attraction": 200.0,
+      "q": 100000.0,
+      "expected": 3.3013720293180334e-14,
+      "hard": 1.2275750941552165e-14,
+      "cuda": 3.3020337165477267e-14,
+      "error_relative": 0.0002004279505056772,
+      "error_normalized": 0.0005390197576048111,
+      "passed": true
+    },
+    {
+      "ratio": 31.9,
+      "charges": [
+        0,
+        0
+      ],
+      "coupling": 1.0,
+      "epsilon": 100.0,
+      "attraction": 200.0,
+      "q": 1e-05,
+      "expected": 4.33983081160071e-18,
+      "hard": 3.935282500369703e-18,
+      "cuda": 4.340026283114978e-18,
+      "error_relative": 4.504127528326407e-05,
+      "error_normalized": 4.9671532920411894e-05,
+      "passed": true
+    },
+    {
+      "ratio": 31.9,
+      "charges": [
+        0,
+        0
+      ],
+      "coupling": 1.0,
+      "epsilon": 100.0,
+      "attraction": 200.0,
+      "q": 1.0,
+      "expected": 1.778917534871367e-13,
+      "hard": 1.292410757545953e-13,
+      "cuda": 1.7791739725075687e-13,
+      "error_relative": 0.00014415375146681342,
+      "error_normalized": 0.00019841806074765345,
+      "passed": true
+    },
+    {
+      "ratio": 31.9,
+      "charges": [
+        0,
+        0
+      ],
+      "coupling": 1.0,
+      "epsilon": 100.0,
+      "attraction": 200.0,
+      "q": 100000.0,
+      "expected": 2.3278839126233755e-13,
+      "hard": 1.5699703955023745e-13,
+      "cuda": 2.3283155774984563e-13,
+      "error_relative": 0.00018543230301992786,
+      "error_normalized": 0.00027495096488278434,
+      "passed": true
+    }
+  ]
+}

@@ -634,3 +634,23 @@ Particle-resolved mode bins a kernel radius grid, draws collision pairs stochast
 - [Wall Loss Strategy System](wall-loss.md)
 - [Condensation Strategy System](condensation.md)
 - [Dynamics overview](../../index.md)
+
+## Dispersion and dielectric polarization
+
+Select `van_der_waals` in the coagulation factory or construct
+`VanDerWaalsCoagulationStrategy(distribution_type, hamaker_constant,
+relative_permittivity)`. The constant is in joules for the material pair
+across air. The second parameter is the common static relative permittivity.
+The strategy uses signed numbers of elementary charges from the native state.
+It supplies one complete thermal collision rate. Supported companions are
+differential settling and turbulent shear. Adding another Brownian law
+duplicates the thermal encounter and raises an error.
+
+Discrete bins and radius PDFs retain their existing fixed composition and
+prescribed charge per bin. For evolving charge distributions, resolved
+collisions use actual slot pairs and merge their signed charges. The CPU
+resolved path computes a dense pair matrix for exact bin bounds. The CUDA
+resolved sampler uses tiled pair scans and equal positive counts per box.
+[Pair calculation and measurements](../../examples/processes/coagulation/van_der_waals.py) ·
+[Theory and assumptions](../../theory/dynamics/interparticle-forces.md) ·
+[Qualified ranges](../../contribute/validation/coagulation/van-der-waals.md)
