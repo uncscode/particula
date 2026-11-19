@@ -13,34 +13,20 @@
 # ---
 
 # %% [markdown]
-# # Soot Formation in Flames
+# # Follow organic uptake onto seeds during imposed cooling
 #
-# Welcome to the **Soot Formation in Flames** notebook — a practical walkthrough to simulate the **partitioning and growth of soot precursors** using the [**Particula**](https://github.com/uncscode/particula) Python package.
+# How can cooling alter gas–particle partitioning while collisions change particle
+# size? This example follows 24 organic species around a supplied seed population,
+# applying condensation and Brownian coagulation under a prescribed temperature
+# history. It connects volatility assumptions to mass and size diagnostics.
 #
-# This example models the transformation of flame-emitted **aromatic compounds** into **condensed-phase particles** (e.g. PAHs and soot) during **cooling of combustion plumes**.
-#
-# ### 🔥 What This Notebook Covers
-#
-# In this notebook, you'll learn how to:
-#
-# 1. **Define a realistic suite of aromatic and polyaromatic hydrocarbons (PAHs)** from combustion
-# 2. **Set up temperature-dependent vapor pressure and partitioning**
-# 3. **Simulate a two-stage cooling profile** of a flame parcel
-# 4. **Track gas-to-particle conversion and coagulation** for soot growth
-# 5. **Visualize mass transfer and particle-phase evolution**
-#
-# ### 💡 Why It Matters
-#
-# Understanding soot formation is critical for:
-#
-# * Assessing **air pollution and climate impacts** of combustion emissions
-# * Evaluating **combustion efficiency and emissions**
-# * Connecting with **health exposure** and regulatory metrics
-#
-# ### 🚀 Getting Started
-#
-# This example is beginner-friendly. It walks through every step of simulating a **cooling and condensing parcel** from a flame. No prior experience with **Particula** or advanced aerosol thermodynamics is required.
-#
+# Despite the historical filename, this is **not a soot-formation chemistry
+# model**. There is no nucleation, reaction network, carbonization, oxidation,
+# or aggregate morphology. Fullerene-labeled seeds already exist at the start.
+# Material tables and cooling are illustrative, not a calibrated flame or plume.
+# Read [organic partitioning](../thermodynamics/equilibria/equilibria_part1.py)
+# and [resolved coagulation](../processes/coagulation/coagulation_3_particle_resolved_pattern.py)
+# for the separate mechanisms.
 
 # %%
 # 🚧 Install Particula if you're running this in Google Colab
@@ -56,28 +42,17 @@ import numpy as np  # numerical tools
 import particula as par  # the main Particula package
 from matplotlib.colors import LogNorm
 from numpy.typing import NDArray
+from particula import plotting
 from particula.dynamics.condensation.species_mapping import (
     CondensationSpeciesMap,
 )
 from tqdm import tqdm  # optional: for progress bars during simulation
 
+plt.style.use("particula.default")
+
 # 🎨 Set default plot styling using Tailwind-inspired colors from Particula
 TAILWIND = par.util.colors.TAILWIND
-base_color = TAILWIND["gray"]["600"]
 
-plt.rcParams.update(
-    {
-        "text.color": base_color,
-        "axes.labelcolor": base_color,
-        "figure.figsize": (5, 4),
-        "font.size": 14,
-        "axes.edgecolor": base_color,
-        "xtick.color": base_color,
-        "ytick.color": base_color,
-        "pdf.fonttype": 42,
-        "ps.fonttype": 42,
-    }
-)
 
 # 🌌 Define the colors for the chemical species involved in the simulation
 color_list = (
@@ -125,34 +100,18 @@ color_list = (
 )
 
 # %% [markdown]
-# ## 🧪 Defining the Chemical Inventory and Properties
+# ## Define the species and audit the property lookup
 #
-# To model soot formation from combustion emissions, we start by specifying a **realistic chemical inventory** of aromatic hydrocarbons. These include both **gas-phase precursors** and **low-volatility polycyclic aromatic hydrocarbons (PAHs)** responsible for early-stage particle growth and soot inception.
+# The list spans small aromatics, PAHs, and a fullerene seed label. Supplied gas
+# mass fractions are normalized to one; they are not tied here to a measured
+# emission profile. The utility resolves names before retrieving properties.
+# A returned numerical value does not establish a correct identity or validity
+# at flame temperatures; inspect the resolved identifiers and property methods
+# before using this as a material model.
 #
-# We also assign **mass fractions** that approximate real-world emission ratios, for primary combustion aerosols.
-#
-# **📋 Chemical List**
-#
-# Our inventory includes:
-#
-# * **1–2 ring aromatics** (e.g. benzene, toluene) – highly volatile gas-phase precursors
-# * **2–4 ring PAHs** (e.g. naphthalene, pyrene) – semi-volatile and early particle growth contributors
-# * **5–7 ring PAHs** (e.g. benzo\[a]pyrene, coronene) – low volatility, soot-nucleating species
-# * **Optional soot seed** (e.g. fullerene) – inert core for modeling inception
-#
-# **⚖️ Assigning Mass Fractions**
-#
-# Mass fractions are allocated to approximate emission contributions, with normalization to ensure the total sums to 1:
-#
-# > Note: 65% is distributed among volatile aromatics and 35% among PAHs.
-#
-# **Fetching Thermophysical Properties**
-#
-# For each chemical, we use `particula.util.get_chemical_search()` to retrieve the database entry, then fetch properties at standard temperature and pressure using `get_chemical_stp_properties()`.
-#
-# This builds the core property arrays required for simulation, including **molar mass**, **density**, and **surface tension** — key inputs for modeling **evaporation**, **condensation**, and **partitioning**.
-#
-#
+# Molar masses are kg/mol and densities kg/m³. The displayed standard-condition
+# properties initialize part of the model; they do not mean all properties are
+# updated consistently during cooling.
 
 # %%
 # Define species list grouped by volatility
@@ -255,41 +214,19 @@ for chem, props in chemical_dict.items():
     print(f"  Vapor Pressure: {props['pure_vapor_pressure']} Pa\n")
 
 # %% [markdown]
+# ## Build temperature-dependent tables and expose their limits
 #
-# ## 🌡️ Thermodynamic Setup and Property Tables
+# There are 5000 sampled particles at 10⁷ cm⁻³, represented in 5×10⁻¹⁰ m³.
+# The total initial organic gas concentration is 5×10⁻⁵ kg/m³. These chosen
+# conditions are not qualified as a particular combustion source.
 #
-# To accurately simulate gas-to-particle transitions during cooling, we need to initialize:
-#
-# * **Reproducible random sampling**
-# * **Simulation volume and particle number density**
-# * **Temperature-dependent vapor pressure and surface tension** for each species
-#
-# This allows us to model how each chemical transitions between gas and particle phases over a realistic cooling profile (e.g. flame exhaust).
-#
-# **🔢 Global Simulation Settings**
-#
-# We define a **parcel volume**, **particle number concentration**, and a representative **initial temperature**. These choices reflect typical combustion plume environments.
-#
-# * **Total particle number**: 10⁷ particles/cm³
-# * **Sampled particles**: 25,000
-# * **Simulation volume**: adjusted to match real concentration
-# * **Initial gas temperature**: 1200 K     *# we override this later with a cooling profile*
-# * **Temperature sweep**: 200–1500 K for vapor pressure and surface tension
-#
-#
-# **📈 Build Property Tables Over Temperature**
-#
-# Using the `particula.util` and `particula.gas.TableVaporPressureBuilder`, we compute:
-#
-# * A **vapor pressure table** for each species over 200–1500 K
-# * A corresponding **surface tension table**
-# * Vapor pressure strategies for the simulation
-#
-# Missing or extreme values are safely clipped to avoid numerical issues.
-#
-# **📊 Plotting Thermophysical Properties**
-#
-# Finally, we plot how vapor pressure and surface tension change with temperature for all species — a key step in diagnosing volatility trends and ensuring proper simulation input.
+# Vapor-pressure and surface-tension tables use 200 points from 200–1500 K.
+# Surface tensions replace NaNs and impose a 0.02 N/m floor. Those numerical
+# substitutions are model assumptions, not measurements at high temperature.
+# The separately plotted vapor-pressure array is clipped after the strategies
+# are constructed; that display operation should not be read as proof of the
+# strategies' underlying property validity. The charts help locate strong trends
+# and questionable extrapolations; they do not establish chemical stability.
 
 # %%
 # Reproducible initial sampling. Coagulation owns a separate random generator;
@@ -349,7 +286,7 @@ surface_tension_table = np.clip(surface_tension_table, a_min=2e-2, a_max=None)
 vapor_pressure_table = np.clip(vapor_pressure_table, a_min=1e-50, a_max=1e100)
 
 # 🔍 Plot property tables
-fig, ax = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
+fig, ax = plotting.subplots(2, 1, sharex=True, size="wide")
 
 for i, chem in enumerate(list_of_chemicals):
     ax[0].plot(
@@ -369,53 +306,27 @@ for i, chem in enumerate(list_of_chemicals):
 
 ax[0].set_ylabel("Surface Tension (N/m)")
 ax[0].set_title("Surface Tension vs Temperature")
-ax[0].grid()
+ax[0].grid(True, axis="y")
 
 ax[1].set_yscale("log")
 ax[1].set_ylabel("Vapor Pressure (Pa)")
 ax[1].set_xlabel("Temperature (K)")
 ax[1].set_title("Vapor Pressure vs Temperature")
-ax[1].grid()
+ax[1].grid(True, axis="y")
 
 # Combined legend
-fig.legend(
-    list_of_chemicals,
-    loc="center left",
-    bbox_to_anchor=(1.02, 0.5),
-    title="Chemicals",
-    fontsize="small",
-)
-plt.tight_layout(rect=(0, 0, 1, 1))
+plotting.legend(ax[0], title="Chemicals", placement="right", ncols=2)
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
-# ## 🌫️ Initializing the Gas Phase and Atmospheric Conditions
+# ## Put the available material into a closed gas inventory
 #
-# With our chemical properties and concentrations ready, the next step is to **construct the gas phase** and **define the surrounding atmosphere**.
-#
-# This is where vapor-phase species, thermodynamic conditions, and **partitioning logic** are encoded — setting the stage for subsequent evaporation or condensation processes as the system cools.
-#
-# **🧱 Build Gas Species**
-#
-# We define the gas phase using native `GasData`:
-#
-# * Each species is initialized with:
-#
-#   * **Name**
-#   * **Molar mass**
-#   * **Initial gas-phase concentration** (from `initial_mass_fractions × total_mass_gas_phase`)
-#   * **Partitioning enabled**
-#   * **Custom vapor pressure strategy** (temperature-dependent)
-#
-# **🌍 Set Atmospheric Properties**
-#
-# Using separate `EnvironmentData`, we define:
-#
-# * **Temperature**: initial gas temperature (e.g. 1200 K)
-# * **Pressure**: atmospheric (1 atm)
-# * The atmosphere wraps around the gas and supports **gas-particle equilibrium calculations** throughout the simulation.
-#
-#
+# Each normalized fraction multiplies the total gas mass concentration. Native
+# `GasData` stores that ordered inventory, while `EnvironmentData` stores pressure
+# and temperature. The initial 1200 K value is replaced by the forcing below.
+# The parcel volume and pressure remain fixed: prescribed cooling here does not
+# also simulate expansion, entrainment, or dilution of material.
 
 # %%
 # Compute gas-phase concentration [kg/m³]
@@ -435,53 +346,18 @@ environment = par.gas.EnvironmentData(
 )
 
 # %% [markdown]
-# ## 💠 Defining the Particle Phase: Seeds and Composition
+# ## Supply the condensation sites rather than create them
 #
-# With the **gas-phase** and **atmospheric environment** set up, we now define the **initial aerosol particles** in the system. These represent potential **condensation sites** for PAHs and soot-forming species.
+# Two lognormal seed-radius modes at 1 and 5 nm, both with geometric standard
+# deviation 1.8, populate the resolved sample. All initial particle mass occupies
+# the final, fullerene-labeled lane. The initial histogram counts particles per
+# log-radius bin; it does not show a nucleation rate.
 #
-#
-# **🌱 Seed Particle Distribution**
-#
-# We use a **bi-modal lognormal distribution** to represent:
-#
-# * **Nucleation mode** (\~1 nm)
-# * **And a bit larger mode** (\~5 nm)
-#
-# All particles are assumed to be **pure fullerene seeds** at the beginning, serving as a placeholder for previous **soot nucleation cores** in the flame.
-#
-#
-# **📦 Mass and Composition Setup**
-#
-# Each particle's mass is computed using:
-#
-# * Volume from radius
-# * Fullerene density
-#
-# A **mass speciation matrix** is initialized with zeroes, and all mass is assigned to the last species (Fullerene).
-#
-#
-# **⚗️ Particle Thermodynamic Strategies**
-#
-# We define strategies for:
-#
-# * **Activity coefficients**: Ideal molar activity using molar masses
-# * **Surface tension**: Temperature-dependent and species-specific
-# * **Phase states**: All in the same condensed phase except for the inert seed
-#
-#
-# **🧱 Building the Particle Object**
-#
-# We store masses, density, unit represented counts, and neutral charge in native `ParticleData`. The `Aerosol` also holds ordered `GasData` and `EnvironmentData`; thermodynamic strategies belong to the condensation process.
-#
-#
-#
-# **📊 Plot Initial Size Distribution**
-#
-# A histogram shows the **initial particle size distribution**, highlighting the multi-modal nature of soot-seeding aerosols.
-#
-#
-# >✅ You're getting closer to simulate **gas-particle interactions** under dynamic temperature conditions.
-#
+# Ideal molar activity and a mass-weighted surface treatment are imposed. The
+# seed has a separate phase label from the other organics. At the smallest sizes,
+# continuum surface and transport assumptions themselves need scrutiny. The
+# species-inventory helper includes gas mass times represented volume, so later
+# closed material comparisons use kg per species.
 
 # %%
 # Generate bi-modal seed particle distribution [m]
@@ -543,41 +419,22 @@ initial_inventory = species_inventory(aerosol)
 print(aerosol)
 
 # 📊 Plot the initial size distribution
-fig, ax = plt.subplots()
+fig, ax = plotting.subplots()
 ax.hist(np.log10(resolved_masses.radii[0]), bins=50, alpha=0.5)
 ax.set_xlabel("log10(Radius [m])")
 ax.set_ylabel("Bin counts")
-ax.set_title("Initial Particle Size Distribution")
+ax.set_title("Initial size distribution")
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
-# ## 🔁 Dynamics Setup: Condensation and Coagulation
+# ## Apply mass transfer and collisions as separate operations
 #
-# With the **gas phase**, **atmosphere**, and **initial particle population** defined, we now configure the **physical processes** that drive aerosol evolution:
-#
-# * **Condensation** — gas-phase species depositing onto particles
-# * **Coagulation** — particles merging through Brownian motion
-#
-# These are essential for modeling **soot aging**, **mass transfer**, and **particle growth** in a dynamic combustion environment.
-#
-# **💧 Condensation Strategy**
-#
-# We use `CondensationIsothermal` to simulate species uptake based on:
-#
-# * **Species molar mass**
-# * **Diffusion coefficient** (assumed constant)
-# * **Accommodation coefficient** (mass transfer efficiency)
-# * **Excluded indices**: we **skip partitioning** to the seed species (index `23` = "Fullerene")
-#
-# > This reflects a system where **Fullerene acts only as a passive core**, with no vapor partitioning.
-#
-#
-# **⚫ Coagulation Strategy**
-#
-# Coagulation is handled via `BrownianCoagulationBuilder`, applied to a **particle-resolved distribution** — matching our earlier setup.
-#
-# Together, these strategies are bundled into `MassCondensation` and `Coagulation` process objects, ready to be passed into the simulation loop.
-#
+# Condensation uses a common diffusivity 2×10⁻⁵ m²/s and accommodation one.
+# The fullerene lane (index 23) is excluded from partitioning, so its gas and
+# particle inventories do not exchange through that process. Brownian coagulation
+# can merge the existing resolved particles. Neither operation creates new
+# chemical species or new seed particles.
 
 # %%
 # 🌀 Condensation strategy setup (isothermal)
@@ -610,54 +467,18 @@ coagulation_process = par.dynamics.Coagulation(coagulation_strategy)
 
 
 # %% [markdown]
-# ## 🔥 Modeling the Temperature Profile After Combustion
+# ## Read the cooling equation before naming its temperatures
 #
-# Below is an **illustrative two-exponential temperature forcing**, retained from the original example. It imposes two cooling timescales; it is not a calibrated combustion model:
+# The two exponential contributions add:
 #
-# * A **fast entrainment/mixing stage** (sub-second), and
-# * A **slow ambient dilution stage** (multi-second)
+# $$T(t)=T_\infty+(T_0-T_\infty)e^{-t/\tau_1}
+#  +(T_\mathrm{mix}-T_\infty)e^{-t/\tau_2}.$$
 #
-# ...while remaining smooth, differentiable, and easy to integrate into kinetic solvers.
-#
-# **🧮 Functional Form**
-#
-# $$
-# T(t) = T_\infty +
-# (T_0 - T_\infty) \cdot \exp\left(-\frac{t}{\tau_1}\right) +
-# (T_\mathrm{mix} - T_\infty) \cdot \exp\left(-\frac{t}{\tau_2}\right)
-# $$
-#
-# Where:
-#
-# * **T₀** = fast-component reference temperature (not the initial value)
-# * **T∞** = ambient background temperature (≈ 298 K)
-# * **Tₘᵢₓ** = slow-component reference temperature
-# * **τ₁** = fast cooling timescale (e.g. 0.05–0.3 s)
-# * **τ₂** = slow dilution or mixing timescale (e.g. 2–10 s)
-#
-#
-# The components add: at zero time, `T(0) = T₀ + Tₘᵢₓ - T∞`.
-# With the parameters below the simulation starts at **1600 K**, not 1200 K.
-# The vapor-pressure tables end at 1500 K; the configured table strategy
-# clamps to its endpoint outside that range. These choices are illustrative.
-#
-# **📊 Illustrative Parameter Values (not validated scenario fits)**
-#
-# | Scenario                     | T₀ (K) | Tₘᵢₓ (K) | τ₁ (s) | τ₂ (s) |
-# | ---------------------------- | ------ | -------- | ------ | ------ |
-# | Diesel tailpipe (idle)       | 750    | 550      | 0.10   | 4.0    |
-# | Wick or candle flame         | 1200   | 700      | 0.05   | 6.0    |
-# | Lab methane burner           | 1450   | 650      | 0.03   | 2.0    |
-# | Small wood stove in room air | 1050   | 600      | 0.15   | 8.0    |
-#
-#
-# 🧠 **Why use two exponentials?**
-#
-# * Captures the **supersaturation spike** critical for soot nucleation
-# * Smooth and differentiable for **ODE solvers**
-# * Easily fit from real **thermocouple data**
-# * Matches behavior in **combustion and indoor air** scenarios
-#
+# Thus $T(0)=T_0+T_\mathrm{mix}-T_\infty$, not $T_0$. With the values used
+# below, the initial stored state is 1600 K. The two terms impose timescales;
+# they do not solve entrainment or an energy balance. The vapor-pressure table
+# ends at 1500 K and its strategy clamps outside the table domain. This must be
+# considered when changing the forcing or time grid.
 
 # %%
 # %% Temperature cooling setup
@@ -696,38 +517,17 @@ def temperature_profile(
 
 
 # %% [markdown]
-# ## 🕒 Time Setup and Temperature Evolution
+# ## Resolve the forcing separately from process substeps
 #
-# We now define the **time vector** and compute the **temperature profile** over the course of the simulation.
+# Store 500 states from 0 to 19.96 s, with 499 updates of 0.04 s. The forcing
+# uses fast and slow time constants 0.05 and 6 s and approaches 300 K. The
+# first state is recorded at 1600 K without a process advance; subsequent updates
+# use their newly assigned temperatures.
 #
-# This temperature is used to update the atmospheric state at each step — controlling **condensation rates** and **vapor pressures** as the parcel cools and mixes with ambient air.
-#
-#
-# **⏱️ Simulation Time Setup**
-#
-# * **Stored time range**: 0–19.96 seconds (499 updates)
-# * **Steps**: 500 (⇒ 0.04 s per step)
-# * **Substeps**:
-#
-#   * **Condensation**: 100 per main step
-#   * **Coagulation**: 1 per main step
-#
-# > You can optionally use a `logspace` time grid if high temporal resolution is needed near `t = 0`.
-#
-# **🌡️ Compute the Temperature Profile**
-#
-# We call the `temperature_profile()` function with illustrative component parameters:
-#
-# * `T₀ = 1200 K` (fast-component reference)
-# * `Tₘᵢₓ = 700 K` (slow-component reference)
-# * `T∞ = 300 K` (ambient)
-# * `τ₁ = 0.05 s`, `τ₂ = 6.0 s` (cooling timescales)
-#
-# **📈 Plot the Temperature Evolution**
-#
-# We visualize the cooling curve to verify that it captures the **sharp initial drop** and **gradual ambient approach** expected in realistic post-combustion environments.
-#
-#
+# Each condensation call uses 100 substeps, but temperature is held at the
+# outer-step value during that call. Increasing condensation substeps alone does
+# not refine the imposed cooling history. The plotted temperature is an input,
+# not evidence of simulated thermal feedback.
 
 # %%
 # Show initial aerosol state
@@ -764,7 +564,7 @@ temperature_array = temperature_profile(
 aerosol_process.environment.temperature[0] = temperature_array[0]
 
 # Plot the cooling profile
-fig, ax = plt.subplots(figsize=(7, 5))
+fig, ax = plotting.subplots(size="wide")
 ax.plot(
     time_array,
     temperature_array,
@@ -776,33 +576,22 @@ ax.plot(
 ax.set_xlabel("Time (s)")
 ax.set_ylabel("Temperature (K)")
 ax.set_title("Flame Emission Temperature Profile")
-ax.grid()
-plt.tight_layout()
+ax.grid(True, axis="y")
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
-# ## 🧪 Running the Simulation: Condensation + Coagulation
+# ## Compare material accounting with evolving size
 #
-# Now we execute the full simulation loop over time, updating the **atmosphere's temperature** at each step and applying the previously defined physical processes:
+# For each update, set temperature, execute condensation, then execute one
+# Brownian coagulation step. Record radius-bin counts, total particle mass
+# density, particle species masses, and the mean positive radius. The variable
+# `mode_diameter` actually stores that mean radius; plotting doubles it to produce
+# a mean diameter, not a modal diameter.
 #
-# * **Condensation** (temperature- and species-dependent mass uptake)
-# * **Coagulation** (Brownian coagulation of particles)
-#
-# **🔢 What the Loop Tracks**
-#
-# At each time step, we record:
-#
-# 1. **Radius distribution histogram** (log-binned)
-# 2. **Total particle-phase mass concentration**
-# 3. **Mean (mode) particle diameter**
-# 4. **Species-specific particle-phase mass** (per chemical)
-#
-# **🧊 Notes on Performance**
-#
-# * **Condensation** is the most computationally intensive.
-# * You can disable it (comment it out) to isolate the effect of coagulation.
-# * Results are stored in arrays for easy plotting after the run.
-#
+# Every stored state checks the closed species inventories at rtol=10⁻¹² and
+# atol=10⁻³⁰ kg. This is a stringent accounting check, but does not establish
+# outer-step, stochastic, or property-table convergence.
 
 # %%
 # Set up histogram bins for radius distribution
@@ -874,41 +663,22 @@ species_mass = species_mass / simulation_volume
 print(aerosol_process)
 
 # %% [markdown]
-# ## 📈 Results: Growth and Cooling Dynamics
+# ## Distinguish mass uptake from a changing mean size
 #
-# We now visualize the output from the simulation loop — focusing on:
+# The first plot reports particle mass concentration with imposed temperature on
+# a separate axis. Condensation can change that mass by drawing from the finite
+# gas reservoir; coagulation alone conserves it. The second plot's mean diameter
+# can change under either process, so it cannot isolate their contributions.
 #
-# 1. **Total aerosol mass concentration** (growth from condensation)
-# 2. **Mean particle diameter** (radius evolution from coagulation + condensation)
-# 3. **Cooling temperature trajectory** for reference
-#
-#
-# **🧪 Interpreting the Results**
-#
-# * **Mass increases** as condensable vapors partition into the particle phase.
-# * **Mean diameter grows** from both **condensation** and **coagulation**.
-# * Some **numerical wiggles** may appear due to the **Euler stepping scheme** — which is simple but not adaptive or error-controlled.
-#
-# > 🔍 You can reduce wiggle artifacts by:
-# >
-# > * Increasing `total_steps`
-# > * Switching to adaptive integrators in future Particula versions (or add your own!)
-#
-#
-# **📊 Plot 1: Total Mass Concentration**
-#
-# This plot shows how much gas-phase material is transferred to particles over time.
-#
-# **📏 Plot 2: Mean Particle Diameter**
-#
-# This shows how particle size evolves, usually increasing due to condensation and merging.
-#
+# Any rapid variation must be assessed against the forcing resolution and process
+# ordering before being interpreted physically. This run supplies no timestep
+# sweep or matched process-off comparison that could attribute every feature.
 
 # %%
 dp_in_nm = 2 * 1e9  # Convert radius [m] → diameter [nm]
 
 # Plot 1: Mass concentration over time
-fig, ax = plt.subplots(figsize=(7, 5))
+fig, ax = plotting.subplots(size="wide")
 ax.plot(
     time_array,
     mass_concentration,
@@ -918,7 +688,7 @@ ax.plot(
 ax.set_xlabel("Time (s)")
 ax.set_ylabel("Mass Concentration (kg/m³)")
 ax.set_title("Mass Concentration Over Time")
-ax.grid()
+ax.grid(True, axis="y")
 
 # Add temperature on second axis
 twinx = ax.twinx()
@@ -933,11 +703,11 @@ twinx.set_ylabel("Temperature (K)", color=TAILWIND["rose"]["500"])
 twinx.tick_params(axis="y", labelcolor=TAILWIND["rose"]["500"])
 
 plt.xticks(rotation=45)
-plt.tight_layout()
+plotting.fit(fig)
 plt.show()
 
 # Plot 2: Mean diameter over time
-fig, ax = plt.subplots(figsize=(7, 5))
+fig, ax = plotting.subplots(size="wide")
 ax.plot(
     time_array,
     mode_diameter * dp_in_nm,  # mean diameter [nm]
@@ -947,7 +717,7 @@ ax.plot(
 ax.set_xlabel("Time (s)")
 ax.set_ylabel("Mean Diameter (nm)")
 ax.set_title("Mean Particle Diameter Over Time")
-ax.grid()
+ax.grid(True, axis="y")
 
 # Add temperature on second axis
 twinx = ax.twinx()
@@ -963,44 +733,25 @@ twinx.set_ylabel("Temperature (K)", color=TAILWIND["rose"]["500"])
 twinx.tick_params(axis="y", labelcolor=TAILWIND["rose"]["500"])
 
 plt.xticks(rotation=45)
-plt.tight_layout()
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
-# ## 🧪 Where the Mass Is: Species-Level Partitioning
+# ## Read absolute species mass before normalized composition
 #
-# In this section, we explore **how different chemical species contribute** to the particle-phase mass throughout the simulation.
+# The first stack plot shows particle species mass concentrations in kg/m³.
+# The second divides each by total particle mass concentration. These are **bulk
+# mass fractions**, not arithmetic means of particle-by-particle fractions,
+# despite the retained “Mean” label. A rising fraction can result from another
+# species leaving, so inspect absolute masses as well.
 #
-# We plot:
-#
-# 1. **Absolute species mass concentrations** — more stable and interpretable
-# 2. **Mass fractions** — show relative speciation but may exaggerate numerical wiggles
-#
-# > ⚠️ Mass fractions are **sensitive to numerical artifacts**, especially when the denominator (total mass) is small or fluctuating.
-#
-#
-# **📊 Plot 1: Species Mass Concentration (kg/m³)**
-#
-# This stack plot shows how much of each species has condensed into the particle phase.
-#
-# * The y-axis is the total particle-phase concentration of each compound.
-# * The plot grows as vapor species condense onto seeds.
-#
-#
-# **📊 Plot 2: Particle Mass Fraction**
-#
-# This plot shows the **relative speciation** of the condensed-phase.
-#
-# * Each band represents the **mean mass fraction** of a species in particles.
-# * The temperature overlay helps relate supersaturation to species uptake.
-#
-#
-# > ✅ These plots let you **diagnose volatility**, **partitioning trends**, and **multicomponent interactions**.
-#
+# The temperature overlay helps relate the imposed forcing to uptake, but no
+# reaction converts one species into another. A change in the condensed mixture
+# therefore describes partitioning of the supplied inventory, not soot chemistry.
 
 # %%
 # 📊 Plot 1: Absolute species mass concentration [kg/m³]
-fig, ax = plt.subplots(figsize=(8, 6))
+fig, ax = plotting.subplots(size="wide")
 
 # stackplot expects shape (n_series, n_times), so transpose
 ax.stackplot(
@@ -1012,7 +763,7 @@ ax.stackplot(
 )
 
 ax.set_xlabel("Time (s)")
-ax.set_ylabel("Species Mass Concentration (kg/m³)")
+ax.set_ylabel("Species mass concentration\n(kg/m³)")
 ax.set_title("Particle-Phase Species Mass Over Time")
 ax.grid(True)
 
@@ -1030,20 +781,16 @@ twinx.set_ylabel("Temperature (K)", color=TAILWIND["rose"]["500"])
 twinx.tick_params(axis="y", labelcolor=TAILWIND["rose"]["500"])
 
 # External legend
-fig.legend(
-    list_of_chemicals,
-    loc="center left",
-    bbox_to_anchor=(1.02, 0.5),
-    title="Chemicals",
-    fontsize="small",
+plotting.legend(
+    ax, title="Chemicals", placement="right", ncols=2, borderaxespad=4.5
 )
-plt.tight_layout(rect=(0, 0, 1, 1))
+plotting.fit(fig)
 plt.show()
 
 # 📊 Plot 2: Mass fraction (normalized by total particle mass)
 mass_fraction = species_mass / np.sum(species_mass, axis=1, keepdims=True)
 
-fig, ax = plt.subplots(figsize=(8, 6))
+fig, ax = plotting.subplots(size="wide")
 ax.stackplot(
     time_array,
     mass_fraction.T,
@@ -1070,44 +817,32 @@ twinx.plot(
 twinx.set_ylabel("Temperature (K)", color=TAILWIND["rose"]["500"])
 twinx.tick_params(axis="y", labelcolor=TAILWIND["rose"]["500"])
 
-fig.legend(
-    list_of_chemicals,
-    loc="center left",
-    bbox_to_anchor=(1.02, 0.5),
-    title="Chemicals",
-    fontsize="small",
+plotting.legend(
+    ax, title="Chemicals", placement="right", ncols=2, borderaxespad=4.5
 )
-plt.tight_layout(rect=(0, 0, 1, 1))
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
+# ## Retain size information alongside bulk mass
 #
-# ## 📉 Final Plot: Particle Size Distribution Over Time
+# The final map shows number concentration per radius bin, in m⁻³, on a
+# logarithmic color scale. It is not dN/dr. Empty merged slots fall outside the
+# positive-radius histogram. Use this map with the mean-diameter plot: a single
+# mean can hide a changing width or a sparse large-particle tail.
 #
-# The last plot shows the **evolution of particle number concentration** across the **radius spectrum** throughout the simulation.
-#
-# * It reveals **growth dynamics** from \~1 nm up to submicron scale
-# * Shows how condensation **fills out the distribution**
-# * Captures coagulation **shifting mass toward larger sizes**
-#
-# **🔬 What It Shows**
-#
-# * X-axis: Time after emission \[s]
-# * Y-axis: Particle radius \[m] (log scale)
-# * Color: Number concentration \[#/m³] in each size bin
-#
-# > ⚠️ Interpolation artifacts can occur if `sub_steps` is too low or if the system is stiff — increase resolution or use adaptive solvers for higher precision.
-#
-# ✅ This completes your simulation visualization pipeline: from gas-phase precursor evolution to fully resolved, dynamic aerosol size and composition.
-#
+# The initial nanometre seeds and modeled growth are not evidence of resolved
+# molecular-cluster formation. The representation and property assumptions still
+# bound interpretation of the smallest sizes.
 
 # %%
-fig, ax = plt.subplots(figsize=(7, 5))
+fig, ax = plotting.subplots(size="wide")
 
 # Create mesh grid: time vs radius bins (left edges only)
 X, Y = np.meshgrid(time_array, edges[:-1])
 
 # Plot number concentration on a log scale
+ax.grid(False)
 mesh = ax.pcolormesh(
     X,
     Y,
@@ -1117,6 +852,7 @@ mesh = ax.pcolormesh(
         vmin=concentrations[concentrations > 0].min(),
         vmax=concentrations.max(),
     ),
+    cmap=plotting.colormap("magnitude"),
 )
 
 ax.set_yscale("log")
@@ -1128,50 +864,20 @@ ax.set_title("Time-Evolving Particle Size Distribution")
 # Colorbar for number concentration
 fig.colorbar(mesh, label="Number Concentration (#/m³)")
 
-plt.tight_layout()
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
-# ## ✅ Summary: Modeling Soot Formation and Growth Using Particula
+# ## Use cooling-driven uptake as a testable model component
 #
-# In this notebook, we used **Particula** to simulate the **formation and transformation of soot precursors** in a post-combustion environment. We built a fully coupled system combining:
+# The calculation couples an imposed temperature history to organic mass transfer
+# and collisions among existing seeds, with closed per-species accounting.
+# It does not model how a flame creates soot or predict a real emission spectrum.
+# That distinction makes the example useful as one component of a larger study.
 #
-# * A **multicomponent gas-phase mixture** of aromatic and polycyclic hydrocarbons
-# * A **lognormal seed particle distribution**, representing incipient soot cores
-# * A **two-stage cooling temperature profile**, capturing entrainment and dilution dynamics
-# * **Condensation and coagulation processes**, applied step-by-step to resolve mass transfer and particle growth
-#
-# The simulation tracked the evolution of particle **mass concentration**, **mean diameter**, **size distribution**, and **species-level mass partitioning** over time.
-#
-# With this illustrative cooling forcing, low-volatility material can condense on existing seeds. Condensation increases particle mass while coagulation can reduce particle number. There is no new-particle nucleation or combustion chemistry in this sequence, and no calibrated soot-inception claim.
-#
-# ---
-#
-# ## 🧠 Take-Home Points
-#
-# 1. **Post-flame condensation drives rapid aerosol mass growth**
-#    The imposed temperature drop from 1600 K toward ambient creates sharp vapor pressure gradients, allowing semi-volatile PAHs to condense onto seed particles almost immediately.
-#
-# 2. **Soot-forming chemistry is driven by low-volatility species**
-#    Larger PAHs (e.g., benzo\[a]pyrene, coronene) dominate particle-phase mass over time, particularly once smaller aromatics remain in the vapor phase.
-#
-# 3. **Euler time-stepping is simple but introduces wiggles**
-#    Our choice of fixed-step Euler integration creates slight numerical noise in mass fraction plots — highlighting the tradeoff between speed and precision. Higher number of steps or adaptive stepping may improve accuracy.
-#
-# 4. **Particula’s modular design supports combustion plume modeling**
-#    Native `GasData`, `ParticleData`, and `EnvironmentData` containers plus
-#    process-owned physics support bounded plume illustrations. The soot
-#    property assumptions and numerical limitations documented above remain;
-#    this example does not qualify real-world exposure predictions.
-#
-# ---
-#
-# This notebook serves as a **foundational framework** for modeling **soot dynamics in cooling combustion plumes**. From here, you can extend it to explore:
-#
-# * Different **burn conditions** (diesel, wood smoke, indoor flames)
-# * Effects of **ventilation, dilution rate**, or **ambient pressure**
-# * **Nucleation kinetics**, **oxidation**, or **secondary organic aerosol (SOA)** formation
-# * Integration with **exposure models** for health and climate impact studies
-#
-#
-#
+# A next comparison could hold the initial population fixed, vary the two cooling
+# timescales, and separate condensation-only from condensation-plus-coagulation
+# runs. Compare condensed species mass, number density, and size quantiles while
+# refining the outer time grid. Validate property identities, temperature domains,
+# and chemical stability before comparing with measured post-flame uptake; add
+# reaction or nucleation physics only when the research question requires it.

@@ -126,7 +126,12 @@ def use_historical_package(science_root, renderer_root):
     from matplotlib import style
 
     sys.path.insert(0, science_root)
-    import particula
+    try:
+        import particula
+    finally:
+        # The package retains its own archive path. Other example imports
+        # must use the same checkout whose inputs are hashed by the runner.
+        sys.path.remove(science_root)
 
     if (
         Path(particula.__file__).resolve().parent

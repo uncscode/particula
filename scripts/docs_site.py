@@ -224,6 +224,23 @@ def result_notice(state, manifest):
     return "Matching saved results", "note"
 
 
+def render_credit(manifest):
+    """Describe the source of a historical run or saved-data redraw."""
+    if "plot_source_revision" in manifest:
+        return (
+            "This native execution used the archived scientific package "
+            "and the example and plotting code from "
+            f"revision `{manifest['plot_source_revision'][:9]}`.\n\n"
+        )
+    if "rendered_at" in manifest:
+        return (
+            f"Plots rendered from saved data on {manifest['rendered_at'][:10]} "
+            f"UTC (revision `{manifest['render_revision'][:9]}`); "
+            "simulation not rerun.\n\n"
+        )
+    return ""
+
+
 def render_example(key, config):
     """Render current source and saved output without execution."""
     directory, manifest = bundle(key)
@@ -238,19 +255,7 @@ def render_example(key, config):
         executed_source = (
             "executed_source.py" if "rendered_at" in manifest else "source.py"
         )
-        rendering = (
-            f"Plots rendered from saved data on {manifest['rendered_at'][:10]} "
-            f"UTC (revision `{manifest['render_revision'][:9]}`); "
-            "simulation not rerun.\n\n"
-            if "rendered_at" in manifest
-            else ""
-        )
-        if "plot_source_revision" in manifest:
-            rendering = (
-                "This native execution used the archived scientific package "
-                f"and the example and plotting code from "
-                f"revision `{manifest['plot_source_revision'][:9]}`.\n\n"
-            )
+        rendering = render_credit(manifest)
         data_link = (
             f"[Numerical plot data]({url}/data.json).\n\n"
             if "data.json" in manifest.get("files", {})

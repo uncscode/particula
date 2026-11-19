@@ -576,3 +576,28 @@ def test_historical_replot_checks_original_inputs_and_pinned_data(tmp_path):
     (science / "study.py").write_text("value = 4\n")
     with pytest.raises(ValueError, match="Simulation inputs changed"):
         examples.load_historical_data("demo", current, science, results)
+
+
+def test_archived_science_uses_only_current_plotting_module(tmp_path):
+    """The isolated kernel can use old science with the current plot style."""
+    package = tmp_path / "particula"
+    package.mkdir()
+    (package / "__init__.py").write_text("archive_marker = True\n")
+    code = (
+        "from scripts.docs_examples import ROOT, use_historical_package\n"
+        "import sys\n"
+        f"use_historical_package({str(tmp_path)!r}, str(ROOT))\n"
+        "import particula\n"
+        "import matplotlib.pyplot as plt\n"
+        "from pathlib import Path\n"
+        "assert particula.archive_marker\n"
+        f"assert {str(tmp_path)!r} not in sys.path\n"
+        "assert Path(particula.plotting.__file__) == "
+        "ROOT / 'particula/plotting/__init__.py'\n"
+        "with plt.style.context('particula.default'):\n"
+        "    fig, ax = particula.plotting.subplots()\n"
+        "    assert not ax.spines['top'].get_visible()\n"
+    )
+    subprocess.run(  # noqa: S603 -- isolated fixed test program
+        [sys.executable, "-c", code], cwd=examples.ROOT, check=True
+    )
