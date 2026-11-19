@@ -76,6 +76,7 @@ def fingerprint(config, root=ROOT):
         "replot_invoke",
         "render_functions",
         "plot_inputs",
+        "historical_run",
     ):
         if key in config:
             payload[key] = config[key]
@@ -285,8 +286,10 @@ def write_plot_data(path, data):
         raise
 
 
-def load_replot_data(example_id, config, root, results):
+def load_replot_data(example_id, config, root, results, *, science_root=None):
     """Reject missing, altered or scientifically stale numerical data."""
+    if science_root is not None:
+        return load_historical_data(example_id, config, science_root, results)
     directory, original = bundle(example_id, results)
     if not original or "data.json" not in original["files"]:
         raise ValueError(
@@ -307,6 +310,31 @@ def load_replot_data(example_id, config, root, results):
     data = json.loads((directory / "data.json").read_text())
     if not isinstance(data, (dict, list)):
         raise ValueError("Plot data must be a JSON object or array")
+    return directory, original, data
+
+
+def load_historical_data(example_id, config, science_root, results):
+    """Check saved observations against their original scientific checkout."""
+    pin = config.get("historical_run")
+    if not pin:
+        raise ValueError("This example has no pinned historical run")
+    revision = subprocess.check_output(  # noqa: S603 -- Git argv without a shell
+        [GIT, "rev-parse", "HEAD"], cwd=science_root, text=True
+    ).strip()
+    if revision != pin["revision"]:
+        raise ValueError(
+            "Historical checkout does not match the pinned revision"
+        )
+    historical_config = json.loads(
+        (science_root / "website/examples.json").read_text()
+    )[example_id]
+    directory, original, data = load_replot_data(
+        example_id, historical_config, science_root, results
+    )
+    if original["revision"] != revision or (
+        original["files"]["data.json"] != pin["data_sha256"]
+    ):
+        raise ValueError("Saved data does not match the pinned historical run")
     return directory, original, data
 
 
@@ -354,7 +382,43 @@ def validate_render(config, root, source, initial_fingerprint, cells, data):
         )
 
 
-def refresh(example_id, config, root=ROOT, results=RESULTS, *, replot=False):
+def retain_execution_metadata(
+    manifest, original, config, science_root, device, revision, elapsed
+):
+    """Identify the rendering separately from the original simulation."""
+    if science_root is not None:
+        manifest["historical_run"] = config["historical_run"]
+        manifest["simulation_fingerprint"] = original["simulation_fingerprint"]
+    manifest["render_versions"] = manifest["versions"]
+    manifest["render_device"] = device
+    for key in (
+        "elapsed_seconds",
+        "package_source_sha256",
+        "revision",
+        "package_dirty",
+        "executed_at",
+        "device",
+        "python",
+        "versions",
+    ):
+        manifest[key] = original[key]
+    manifest["execution_input_sha256"] = original.get(
+        "execution_input_sha256", original["input_sha256"]
+    )
+    manifest["rendered_at"] = datetime.now(timezone.utc).isoformat()
+    manifest["render_revision"] = revision
+    manifest["render_elapsed_seconds"] = elapsed
+
+
+def refresh(
+    example_id,
+    config,
+    root=ROOT,
+    results=RESULTS,
+    *,
+    replot=False,
+    science_root=None,
+):
     """Publish a complete result generation only after successful execution."""
     source = (root / config["source"]).read_bytes()
     initial_fingerprint = fingerprint(config, root)
@@ -365,7 +429,7 @@ def refresh(example_id, config, root=ROOT, results=RESULTS, *, replot=False):
     data = None
     if replot:
         directory, original, data = load_replot_data(
-            example_id, config, root, results
+            example_id, config, root, results, science_root=science_root
         )
     started = time.monotonic()
     cells, device = (
@@ -435,25 +499,15 @@ def refresh(example_id, config, root=ROOT, results=RESULTS, *, replot=False):
                 config, root
             )
         if replot:
-            manifest["render_versions"] = manifest["versions"]
-            manifest["render_device"] = device
-            for key in (
-                "elapsed_seconds",
-                "package_source_sha256",
-                "revision",
-                "package_dirty",
-                "executed_at",
-                "device",
-                "python",
-                "versions",
-            ):
-                manifest[key] = original[key]
-            manifest["execution_input_sha256"] = original.get(
-                "execution_input_sha256", original["input_sha256"]
+            retain_execution_metadata(
+                manifest,
+                original,
+                config,
+                science_root,
+                device,
+                revision,
+                elapsed,
             )
-            manifest["rendered_at"] = datetime.now(timezone.utc).isoformat()
-            manifest["render_revision"] = revision
-            manifest["render_elapsed_seconds"] = elapsed
         (pending / "manifest.json").write_text(
             json.dumps(manifest, indent=2) + "\n"
         )
@@ -632,6 +686,11 @@ def main():
     run.add_argument("example")
     replot = sub.add_parser("replot")
     replot.add_argument("example")
+    replot.add_argument(
+        "--science-checkout",
+        type=Path,
+        help="Verify archived data against its original scientific checkout.",
+    )
     sub.add_parser("migrate-results")
     check = sub.add_parser("check")
     check.add_argument("--changed", action="store_true")
@@ -646,7 +705,10 @@ def main():
         if args.example not in configs:
             parser.error(f"Unknown example: {args.example}")
         refresh(
-            args.example, configs[args.example], replot=args.command == "replot"
+            args.example,
+            configs[args.example],
+            replot=args.command == "replot",
+            science_root=getattr(args, "science_checkout", None),
         )
         return
     selected = (

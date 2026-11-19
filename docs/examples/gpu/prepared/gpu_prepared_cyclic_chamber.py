@@ -1,6 +1,11 @@
 # %% [markdown]
 # # Repeated source pulses in a cooling and warming aerosol
 #
+# The figures use the archived November 16 CUDA run. At its one-second
+# coagulation interval, current Particula requests 275,911 collision trials
+# in the first box and has capacity for 3,136. The current simulation stops
+# at that check. The archived arrays retain the original interval and model.
+#
 # What must be saved to reproduce a simulation driven by repeated external
 # pulses? This example separates the evolving aerosol from the forcing schedule
 # and its source ledger. Start with the [prepared quick start](gpu_prepared_quick_start.py)

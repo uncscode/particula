@@ -700,6 +700,10 @@
       "plot_history"
     ],
     "plot_inputs": [],
+    "historical_run": {
+      "revision": "3d3753d2be9973c94b4064047fa8452e717f1311",
+      "data_sha256": "3bb6c13e674f95c5f5ee38b0e4eb5ce27a39f4437359edf4d1cdea0e8e8f4883"
+    },
     "full_canvas": true
   },
   "gpu-scaling-results": {

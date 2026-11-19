@@ -48,7 +48,9 @@ def execution_inventory():
                 "source": config["source"],
                 "policy": config["policy"],
                 "bundle": str(directory.relative_to(ROOT)),
-                "state": "current",
+                "state": "historical"
+                if manifest.get("historical_run")
+                else "current",
                 **{name: manifest[name] for name in required},
                 "figures": sum(
                     "image" in item

@@ -519,3 +519,60 @@ def test_full_canvas_fingerprints_style_without_invalidating_legacy(example):
         assert examples.fingerprint(styled, root) != initial
         (root / name).write_text("original")
     assert examples.fingerprint(config, root) == legacy
+
+
+def test_historical_replot_checks_original_inputs_and_pinned_data(tmp_path):
+    """An archive must match the original source, library and observations."""
+    science = tmp_path / "original"
+    science.mkdir()
+    (science / "website").mkdir()
+    config = {"source": "study.py", "device": "cuda"}
+    (science / "study.py").write_text("value = 3\n")
+    (science / "website/examples.json").write_text(json.dumps({"demo": config}))
+
+    def git(*args):
+        return subprocess.check_output(  # noqa: S603 -- local test repository
+            [examples.GIT, *args], cwd=science, text=True
+        ).strip()
+
+    git("init", "-q")
+    git("add", ".")
+    git(
+        "-c",
+        "user.name=Test",
+        "-c",
+        "user.email=test@example.org",
+        "commit",
+        "-qm",
+        "Original study",
+    )
+    revision = git("rev-parse", "HEAD")
+    results = tmp_path / "results"
+    directory = results / "demo"
+    directory.mkdir(parents=True)
+    data = b'{"observation": 3}'
+    (directory / "data.json").write_bytes(data)
+    digest = hashlib.sha256(data).hexdigest()
+    manifest = {
+        "revision": revision,
+        "files": {"data.json": digest},
+        "simulation_fingerprint": examples.simulation_fingerprint(
+            config, science
+        ),
+        "package_source_sha256": examples.package_source_hash(science),
+    }
+    (directory / "manifest.json").write_text(json.dumps(manifest))
+    pin = {"revision": revision, "data_sha256": digest}
+    current = {**config, "historical_run": pin}
+    assert examples.load_historical_data("demo", current, science, results)[
+        2
+    ] == {"observation": 3}
+    with pytest.raises(ValueError, match="no pinned"):
+        examples.load_historical_data("demo", config, science, results)
+    pin["data_sha256"] = "0" * 64
+    with pytest.raises(ValueError, match="pinned historical run"):
+        examples.load_historical_data("demo", current, science, results)
+    pin["data_sha256"] = digest
+    (science / "study.py").write_text("value = 4\n")
+    with pytest.raises(ValueError, match="Simulation inputs changed"):
+        examples.load_historical_data("demo", current, science, results)

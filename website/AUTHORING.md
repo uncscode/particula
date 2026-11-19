@@ -53,6 +53,19 @@ JSON has a **10 MiB hard limit per example**, enforced while writing. This limit
 saved plot data, not simulation RAM or figure size. Oversized data fails clearly
 and preserves the previous successful bundle; it is never silently truncated.
 
+A historical study can pin its original scientific revision and the SHA-256
+of its published `data.json` in the registry under `historical_run`. To redraw
+it, point the same verification checks at a checkout of the executed revision:
+
+```bash
+python scripts/docs_examples.py replot gpu-prepared-cyclic-chamber --science-checkout ../particula-original
+```
+
+The current checkout supplies the renderer. The historical checkout supplies
+the scientific source and inputs for verification. The page identifies the
+historical simulation and links its executed source, arrays and original
+device. To publish a result from the current model, run a full refresh.
+
 ## Validate changes
 
 ```bash

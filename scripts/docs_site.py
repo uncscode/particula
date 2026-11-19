@@ -215,6 +215,15 @@ def example_downloads(key, config, source):
     return " · ".join(links)
 
 
+def result_notice(state, manifest):
+    """Describe the evidence behind the displayed figures."""
+    if state != "current":
+        return "Results from an earlier run—refresh needed", "caution"
+    if manifest.get("historical_run"):
+        return "Historical simulation, updated figures", "caution"
+    return "Matching saved results", "note"
+
+
 def render_example(key, config):
     """Render current source and saved output without execution."""
     directory, manifest = bundle(key)
@@ -225,12 +234,7 @@ def render_example(key, config):
     if directory:
         destination = SITE / "public/results" / key
         shutil.copytree(directory, destination, dirs_exist_ok=True)
-        status = (
-            "Matching saved results"
-            if state == "current"
-            else "Results from an earlier run—refresh needed"
-        )
-        kind = "note" if state == "current" else "caution"
+        status, kind = result_notice(state, manifest)
         executed_source = (
             "executed_source.py" if "rendered_at" in manifest else "source.py"
         )
