@@ -6,6 +6,7 @@ from docs.examples.processes.customization import glyoxal_chamber as case
 
 
 def test_vector_measurements_and_held_out_rate():
+    """Preserve digitized observations and the independent laboratory rate."""
     observed = case.observations()
     assert [len(series) for series in observed.values()] == [2214, 780, 773]
     for series in observed.values():
@@ -19,6 +20,7 @@ def test_vector_measurements_and_held_out_rate():
 
 @pytest.mark.parametrize("device", ["numpy", "cuda:0"])
 def test_vapor_forcing_and_nitrogen_control(device):
+    """Verify the forced budget and finite nitrogen requirement."""
     if device == "cuda:0":
         import warp as wp
 
