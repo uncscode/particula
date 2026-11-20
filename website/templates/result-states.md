@@ -24,4 +24,4 @@ perform no hidden CPU fallback or execution during the site build.
 :::
 
 [See a real saved CPU run](/particula/studies/tutorials/condensation/condensation_1_bin/)
-or [the explicit CUDA example](/particula/studies/examples/particle-processes/coagulation/gpu_coagulation_direct/).
+or [the explicit CUDA example](/particula/studies/validation/coagulation/direct-coagulation/gpu_coagulation_direct/).

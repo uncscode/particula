@@ -11,12 +11,13 @@ from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
+import docs_studies
 import docs_topics
 import markdown
 
-SECTIONS = ("Guide", "Examples", "Theory", "API", "Contribute")
+SECTIONS = ("Guide", "Studies", "Theory", "API", "Contribute")
 NAVIGATION = ("Explore topics", *SECTIONS)
-OWNERS = {"guide", "examples", "theory", "contribute", "API"}
+OWNERS = {"guide", "studies", "theory", "contribute", "API"}
 
 
 class Links(HTMLParser):
@@ -137,21 +138,42 @@ def source_for_slug(slug, docs):
     return slug + ".md"
 
 
+def study_navigation(root):
+    """Resolve generated menu entries and their companion pages."""
+    docs = root / "docs"
+    reachable = set()
+    navigation = json.loads((root / "website/navigation.json").read_text())
+    catalog = None
+    if (root / "website/topics.json").exists():
+        catalog = docs_studies.StudyCatalog.load(root, docs_topics.load(root))
+        for group in navigation:
+            if group["label"] == "Studies":
+                group["items"] = catalog.navigation()
+    if catalog:
+        reachable.update(
+            root / source for source in catalog.collections.values()
+        )
+        for study in catalog.studies:
+            record = study["study"]
+            reachable.update(root / p for p in record.get("companions", []))
+            reachable.update(
+                root / catalog.runs[key]["source"]
+                for key in record.get("runs", [])
+                if key in catalog.runs
+            )
+    return source_navigation(navigation, docs), reachable
+
+
 def check(root, site=None):
     """Return actionable errors for the complete authored documentation tree."""
     root = root.resolve()
     docs = root / "docs"
 
-    config = {
-        "nav": source_navigation(
-            json.loads((root / "website/navigation.json").read_text()), docs
-        )
-    }
+    nav, study_pages = study_navigation(root)
     errors = [
         f"retired notebook publication source: {p.relative_to(root)}"
         for p in sorted(docs.rglob("*.ipynb"))
     ]
-    nav = config["nav"]
     if tuple(next(iter(item)) for item in nav) != NAVIGATION:
         errors.append("navigation must have " + ", ".join(NAVIGATION))
     manifest = json.loads((docs / ".assets/relocations.json").read_text())
@@ -184,6 +206,7 @@ def check(root, site=None):
     navigation_pages, navigation_errors = check_navigation(nav, docs, pages)
     reachable.update(navigation_pages)
     errors.extend(navigation_errors)
+    reachable.update(study_pages)
     graph, _, link_errors = check_links(root, pages, parsed, manifest)
     errors.extend(link_errors)
     pending = list(reachable)
@@ -195,7 +218,13 @@ def check(root, site=None):
         errors.append(f"unreachable authored page: {path.relative_to(root)}")
     errors.extend(check_script_coverage(root, pages))
     if (root / "website/topics.json").exists():
-        errors.extend(docs_topics.validate(docs_topics.load(root), root))
+        data = docs_topics.load(root)
+        errors.extend(docs_topics.validate(data, root))
+        errors.extend(
+            docs_studies.offline_indexes(
+                docs_studies.StudyCatalog.load(root, data)
+            )
+        )
     if site is not None:
         errors.extend(check_published(root, site.resolve(), pages, manifest))
         errors.extend(check_rendered_links(root, site.resolve(), pages))
@@ -212,6 +241,8 @@ def check_navigation(nav, docs, pages):
         landing = (
             "guide/topics/index.md"
             if title == "Explore topics"
+            else "studies/scripts.md"
+            if title == "Studies"
             else title.lower() + "/index.md"
         )
         if title != "API" and first != landing:
@@ -293,7 +324,9 @@ def check_published(root, site, pages, manifest):
         if not (site / published_path(source)).is_file():
             errors.append(f"missing published page: {source}")
     for old, new in manifest["moves"].items():
-        if not old.endswith((".md", ".ipynb")) or not new.startswith("docs/"):
+        if not old.endswith((".md", ".py", ".ipynb")) or not new.startswith(
+            "docs/"
+        ):
             continue
         redirect = site / published_path(old)
         target = site / published_path(new)
@@ -317,7 +350,7 @@ def check_search(site, manifest):
     errors = []
     for source in manifest.get("retired", {}):
         path = site / published_path(source)
-        if source.endswith((".md", ".ipynb")) and path.exists():
+        if source.endswith((".md", ".py", ".ipynb")) and path.exists():
             # A retired source may also have an explicitly retained redirect.
             # check_published verifies its destination; noindex keeps the old
             # route out of search. Do not exempt ordinary archived content.

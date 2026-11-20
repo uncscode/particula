@@ -1,6 +1,7 @@
 """Topic graph invariants and publication adapters."""
 
 import copy
+import json
 import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
@@ -89,8 +90,9 @@ def test_generated_topics_have_stable_distinct_routes():
 
 def test_topic_associations_link_to_primary_and_related_topics():
     """A single article stays canonical while connecting across topic branches."""
+    runs = json.loads((docs_topics.ROOT / "website/examples.json").read_text())
     text = docs_topics.page_links(
-        "docs/examples/gpu/prepared/gpu_environment_sweep.py",
+        runs["gpu-environment-sweep"]["source"],
         docs_topics.load(),
         "/particula/",
     )

@@ -2,7 +2,7 @@
 import DefaultHead from '@astrojs/starlight/components/Head.astro';
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const directory = Astro.url.pathname.slice(base.length).split('/').filter(Boolean)[0]?.toLowerCase();
-const labels: Record<string, string> = { guide: 'Guide', examples: 'Examples', theory: 'Theory', api: 'API', contribute: 'Contribute' };
+const labels: Record<string, string> = { guide: 'Guide', studies: 'Studies', theory: 'Theory', api: 'API', contribute: 'Contribute' };
 const section = labels[directory ?? ''] ?? 'Home';
 ---
 <DefaultHead><slot /></DefaultHead>

@@ -9,7 +9,7 @@ export default function watchSources() {
   return {
     name: 'particula-source-watch',
     configureServer(server) {
-      const roots = ['docs', 'particula', 'website/results', 'website/templates', 'website/examples.json', 'website/topics.json', 'scripts/docs_topics.py', 'website/AUTHORING.md', 'scripts/docs_site.py', 'scripts/docs_examples.py']
+      const roots = ['docs', 'particula', 'website/results', 'website/templates', 'website/examples.json', 'website/topics.json', 'scripts/docs_topics.py', 'scripts/docs_studies.py', 'website/AUTHORING.md', 'scripts/docs_site.py', 'scripts/docs_examples.py']
         .map((p) => path.join(repo, p));
       server.watcher.add(roots);
       let timer;

@@ -1,5 +1,7 @@
 ---
 import SidebarSublist from '@astrojs/starlight/components/SidebarSublist.astro';
+import StudySidebar from './StudySidebar.astro';
+import catalog from '../../.cache/studies.json';
 import MobileMenuFooter from '@astrojs/starlight/components/MobileMenuFooter.astro';
 
 const { sidebar } = Astro.locals.starlightRoute;
@@ -12,5 +14,7 @@ function collapseGroups(entries: typeof sidebar): typeof sidebar {
 }
 ---
 
-<SidebarSublist sublist={collapseGroups(sidebar)} />
+{collapseGroups(sidebar).map((entry) => entry.label === 'Studies'
+  ? <StudySidebar entry={{ label: 'Studies', slug: 'studies', items: catalog.navigation }} />
+  : <SidebarSublist sublist={[entry]} />)}
 <div class="md:sl-hidden"><MobileMenuFooter /></div>

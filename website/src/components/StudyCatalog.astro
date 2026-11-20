@@ -1,0 +1,64 @@
+---
+import catalog from '../../.cache/studies.json';
+import { resourcePath } from './topic-model.mjs';
+const { rows, topics, categories } = catalog;
+const base = import.meta.env.BASE_URL;
+const usedTopics = new Set(rows.flatMap((row) => row.topics));
+---
+<study-catalog>
+  <form hidden role="search" aria-label="Filter runnable Python scripts">
+    <label>Find a script<input name="q" type="search" /></label>
+    <label>Category<select name="category"><option value="">All categories</option>{Object.entries(categories).map(([id, label]) => <option value={id}>{label}</option>)}</select></label>
+    <label>Scientific topic<select name="topic"><option value="">All topics</option>{Object.entries(topics).filter(([id]) => usedTopics.has(id)).sort((a,b) => a[1].localeCompare(b[1])).map(([id,label]) => <option value={id}>{label}</option>)}</select></label>
+    <label>Required device<select name="device"><option value="">All devices</option><option value="cpu">CPU</option><option value="cuda">CUDA</option></select></label>
+    <button type="reset">Clear filters</button>
+    <output aria-live="polite"></output>
+  </form>
+  <ul>
+    {rows.map((row) => <li data-execution={row.key} data-category={[row.category,row.secondary].filter(Boolean).join(' ')} data-topic={row.topics.join(' ')} data-device={row.device}>
+      <a href={resourcePath(row.source, base)}>{row.title}</a>
+      <span>{categories[row.category]} · {row.device.toUpperCase()} · {row.topics.map((id) => topics[id]).join(', ')}</span>
+    </li>)}
+  </ul>
+</study-catalog>
+<script>
+  class StudyCatalog extends HTMLElement {
+    connectedCallback() {
+      const form = this.querySelector('form')!;
+      const fields = [...form.querySelectorAll<HTMLInputElement | HTMLSelectElement>('input, select')];
+      const rows = [...this.querySelectorAll<HTMLElement>('[data-execution]')];
+      const update = (restore: boolean) => {
+        const url = new URL(location.href);
+        for (const field of fields) {
+          if (restore) field.value = url.searchParams.get(field.name) || '';
+          if (field.value) url.searchParams.set(field.name, field.value);
+          else url.searchParams.delete(field.name);
+        }
+        for (const row of rows) {
+          row.hidden = !fields.every(({name, value}) => {
+            if (!value) return true;
+            if (name === 'q') return (row.textContent + ' ' + row.dataset.execution).toLowerCase().includes(value.trim().toLowerCase());
+            return row.dataset[name]?.split(' ').includes(value);
+          });
+        }
+        form.querySelector('output')!.value = `${rows.filter((row) => !row.hidden).length} of ${rows.length} scripts`;
+        if (!restore) history.replaceState(null, '', url);
+      };
+      form.hidden = false;
+      form.addEventListener('input', () => update(false));
+      form.addEventListener('reset', () => setTimeout(() => update(false)));
+      form.addEventListener('submit', (event) => { event.preventDefault(); update(false); });
+      window.addEventListener('popstate', () => update(true));
+      update(true);
+    }
+  }
+  if (!customElements.get('study-catalog')) customElements.define('study-catalog', StudyCatalog);
+</script>
+<style>
+  form:not([hidden]) { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr)); gap: .75rem; align-items: end; }
+  label { display: grid; gap: .25rem; font-size: .9em; }
+  select, input, button { padding: .45rem .6rem; min-width: 0; font: inherit; color: var(--sl-color-text); background: var(--sl-color-bg); border: 1px solid var(--sl-color-gray-4); border-radius: .35rem; }
+  button { cursor: pointer; }
+  li span { display: block; font-size: .85em; color: var(--sl-color-gray-2); }
+  li[hidden], form[hidden] { display: none; }
+</style>

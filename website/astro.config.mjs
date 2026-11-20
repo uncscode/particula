@@ -10,6 +10,12 @@ import rehypeMathjax from 'rehype-mathjax';
 import remarkMermaid from './scripts/remark-mermaid.mjs';
 import watchSources from './scripts/watch-sources.mjs';
 import navigation from './navigation.json';
+import catalog from './.cache/studies.json';
+function sidebarItem(entry) {
+  return entry.items
+    ? { label: entry.label, collapsed: true, items: entry.items.map(sidebarItem) }
+    : entry;
+}
 
 export default defineConfig({
   site: 'https://uncscode.github.io',
@@ -31,6 +37,7 @@ export default defineConfig({
     customCss: ['./src/styles/custom.css'],
     components: {
       Head: './src/components/Head.astro',
+      MarkdownContent: './src/components/MarkdownContent.astro',
       Header: './src/components/Header.astro',
       Hero: './src/components/Hero.astro',
       Sidebar: './src/components/Sidebar.astro',
@@ -48,6 +55,6 @@ export default defineConfig({
     })],
     sidebar: navigation.map((group) => group.label === 'API'
       ? { label: 'API', collapsed: true, items: [{ label: 'API overview', slug: 'api' }, pydocsSidebarGroup] }
-      : group),
+      : group.label === 'Studies' ? sidebarItem({ label: 'Studies', items: catalog.navigation }) : group),
   })],
 });

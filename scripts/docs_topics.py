@@ -5,8 +5,10 @@ import re
 from collections import Counter
 from pathlib import Path
 
+import docs_studies
+
 ROOT = Path(__file__).resolve().parents[1]
-ROLES = {"Guide", "Examples", "Theory", "API", "Contribute"}
+ROLES = {"Guide", "Studies", "Theory", "API", "Contribute"}
 
 
 def load(root=ROOT):
@@ -180,6 +182,8 @@ def validate(data, root=ROOT):
     errors.extend(check_paths(by_id))
     errors.extend(check_resources(data, root, by_id))
     errors.extend(check_destinations(data, root, children))
+    if (root / "docs/studies").is_dir():
+        errors.extend(docs_studies.StudyCatalog.load(root, data).errors)
     return errors
 
 
