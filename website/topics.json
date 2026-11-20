@@ -1779,6 +1779,14 @@
       "start_here": false
     },
     {
+      "source": "docs/examples/processes/customization/resolved_reactive_uptake.py",
+      "title": "How two particle sizes share a reactive gas",
+      "topic": "custom",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
       "source": "docs/examples/processes/customization/timed_box_chemistry.py",
       "title": "Distinguish chemical conversion from a timed emission and dilution",
       "topic": "custom",
@@ -2579,8 +2587,24 @@
       "start_here": false
     },
     {
+      "source": "docs/guide/processes/resolved-chemistry.md",
+      "title": "React gas and particle materials in a resolved box",
+      "topic": "processes",
+      "also": [],
+      "role": "Guide",
+      "start_here": false
+    },
+    {
       "source": "docs/contribute/validation/numerics/gas-chemistry.md",
       "title": "Native gas chemistry qualification",
+      "topic": "verification-scientific",
+      "also": [],
+      "role": "Contribute",
+      "start_here": false
+    },
+    {
+      "source": "docs/contribute/validation/numerics/resolved-chemistry.md",
+      "title": "Resolved chemistry qualification",
       "topic": "verification-scientific",
       "also": [],
       "role": "Contribute",

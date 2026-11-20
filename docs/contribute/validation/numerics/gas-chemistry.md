@@ -95,6 +95,10 @@ division during kernel compilation. All 32 chemistry and chamber tests
 passed with Warp 1.11.1 and again with 1.19.0 on the RTX 5060 host,
 including the Warp CPU and CUDA cases.
 
+The sparse resident update at revision `b90bab07a9` reproduced all four
+Robertson refinement rows and both chamber errors reported above.
+[Stiff ensemble timing and workspace](resolved-chemistry.md#worked-chamber-and-full-workload-cost)
+
 ## Reproduce
 
 From the checked-out repository in a CUDA-capable environment:

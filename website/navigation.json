@@ -162,6 +162,10 @@
             "slug": "guide/processes/gas-chemistry"
           },
           {
+            "label": "Resolved particle chemistry",
+            "slug": "guide/processes/resolved-chemistry"
+          },
+          {
             "label": "Numerical integration and splitting",
             "slug": "guide/processes/numerical-integration"
           },
@@ -492,6 +496,10 @@
               {
                 "label": "Native gas chemistry on CPU and CUDA",
                 "slug": "examples/processes/customization/native_gas_chemistry"
+              },
+              {
+                "label": "Reactive uptake and particle aging",
+                "slug": "examples/processes/customization/resolved_reactive_uptake"
               },
               {
                 "label": "Timed custom CPU chemistry",
@@ -1187,6 +1195,10 @@
               {
                 "label": "Native gas chemistry qualification",
                 "slug": "contribute/validation/numerics/gas-chemistry"
+              },
+              {
+                "label": "Resolved chemistry qualification",
+                "slug": "contribute/validation/numerics/resolved-chemistry"
               },
               {
                 "label": "Initial-size inversion",

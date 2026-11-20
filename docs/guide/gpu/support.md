@@ -15,6 +15,7 @@ hardware/runtime requirement; requesting CUDA never selects Warp CPU silently.
 | Native CPU dynamics | Five batched runnables through the shared box loop | Direct strategy methods remain single-box. |
 | Prepared runnables | Ordered subsets of condensation, Brownian/charged/settling/shear coagulation, dilution, wall loss, nucleation, atmospheric ion collisions, ion-pair production and neutral ion-product cleanup | One occurrence per family; exact supported configuration, fixed capacity and timestep. |
 | Native gas chemistry | Registered resident RK23 and ROS3 for closed gas reactions | Explicit layout binding, bounded per-box scratch, prescribed temperature, same-device restart. [Setup and units](../processes/gas-chemistry.md) |
+| Resolved particle chemistry | Registered resident RK23 with bulk reactions and finite shared gas uptake | Explicit material bindings, same-device checkpoint and CUDA graph replay. [Setup and units](../processes/resolved-chemistry.md) |
 | CPU → CUDA | `runnable.prepare(aerosol, device="cuda:0", time_step=...)` | Validates, uploads once, owns private resources; initial CPU state is unchanged. |
 | CUDA → CPU | `simulation.snapshot()` or reduced `diagnostics()` | Explicit synchronized, detached observations; full snapshots preserve native names and measures. |
 | Forcing | Environment and full-gas updates between segments | Explicit uploads; condensation owns derived saturation. |
