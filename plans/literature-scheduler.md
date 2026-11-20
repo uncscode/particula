@@ -124,10 +124,11 @@ a worktree. On restart, reconcile the register with existing worktrees and PRs.
    publish, revise or archive. A revision resumes the same study. A measured
    disagreement can merit publication, and an inconclusive comparison can
    still identify the next experiment. Pending drafts stay in `.artifacts/`.
-4. **Publish the approved comparison.** Promote the reviewed script into the
-   relevant topic under [docs/examples/](../docs/examples/). Put durable
-   evidence and limitations in [docs/contribute/validation/](../docs/contribute/validation/)
-   and any compact, redistributable inputs in [docs/data/](../docs/data/).
+4. **Publish the approved comparison.** Publish the reviewed report and its script
+   together under [Literature analyses](../docs/studies/literature/index.md).
+   Keep the observable, comparison, provenance and limitations with the report.
+   Link its run key, topics and supporting evidence from the canonical study
+   record. Put compact, redistributable inputs in [docs/data/](../docs/data/).
    Register the example, refresh its saved results in `website/results/`, and
    verify that the documented workflow reproduces the reviewed principal metric
    and figure. Follow the [example authoring workflow](../website/AUTHORING.md).
@@ -206,7 +207,7 @@ uncertainty of the effect. Attribute choices to the team that made them, name
 plausible explanations as hypotheses, and identify one concrete next test and
 who could use its result. State what received human review when applicable.
 
-The [citric-acid comparison](../docs/contribute/validation/thermodynamics/citric-acid-comparison.md)
+The [citric-acid comparison](../docs/studies/literature/particle-water-uptake/citric-acid/index.md)
 illustrates this tone. “Marsh and colleagues reported uncertainties in both
 composition and water activity, which let us test the model across all 12
 measured compositions. Our BAT calculation gives higher water activity at

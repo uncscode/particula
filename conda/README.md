@@ -182,11 +182,11 @@ release example-test allowlist; `CPU_EXAMPLES` declares the matching scripts.
 The examples workspace contains only these three pairs plus root
 `conftest.py` and `pyproject.toml`:
 
-| Test under `examples_tests/` | Script under `docs/examples/` |
+| Test under `examples_tests/` | Script under `docs/studies/` |
 | --- | --- |
-| `dilution_example_test.py` | `cpu_dilution.py` |
-| `nucleation_example_test.py` | `processes/nucleation/cpu_nucleation.py` |
-| `condensation_latent_heat_example_test.py` | `processes/condensation/condensation_latent_heat.py` |
+| `dilution_example_test.py` | `examples/particle-processes/sources-and-dilution/cpu_dilution.py` |
+| `nucleation_example_test.py` | `examples/particle-processes/sources-and-dilution/cpu_nucleation.py` |
+| `condensation_latent_heat_example_test.py` | `examples/particle-processes/condensation/condensation_latent_heat.py` |
 
 Each declared example test module must contribute selected tests. The conda
 recipe lists inputs for both suites, but the runner stages them separately;
@@ -195,7 +195,7 @@ it never copies the full documentation tree into either workspace.
 Documentation wording/link, notebook publication-state, and planning-reference
 assertions were intentionally removed at the maintainer's request, superseding
 the original issue's proposal to retain them in source CI. Documentation
-rendering remains in the existing MkDocs source-checkout workflow. Executable
+rendering remains in the Astro/Starlight source-checkout workflow. Executable
 CPU example checks retain numerical/runtime and public API-boundary coverage;
 they require only the explicitly listed Python examples, not publication prose,
 notebooks, or planning records.

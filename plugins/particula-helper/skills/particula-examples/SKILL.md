@@ -29,8 +29,9 @@ for the adaptable format and visual requirements. Use
    mechanisms or information flow. A qualitative example can use a meaningful
    schematic instead. Follow the reference's visual and accessibility guidance;
    never present an illustrative diagram as computed or measured evidence.
-4. Author maintained percent-cell Python under `docs/examples/` (or an existing
-   theory calculation in `docs/theory/`). Do not create paired notebooks or edit
+4. Author maintained percent-cell Python in its primary collection under
+   `docs/studies/`. Link a Theory equation to its runnable comparison and
+   link the result back to the derivation. Do not create paired notebooks or edit
    generated Starlight pages. Separate simulation and plotting where feasible
    so results can be replotted from compact saved data. Use supported APIs and
    independent scientific checks; read `../../references/scientific-boundaries.md`
@@ -55,8 +56,9 @@ for the adaptable format and visual requirements. Use
   pictures. Register helper inputs and keep downloads runnable after extraction.
 - Update the example's resource entry in `website/topics.json` with one primary
   scientific topic, useful optional associations and the correct page role.
-  Maintain `website/navigation.json` and relevant index/prerequisite/follow-on
-  links. Review `start_here` placement when it helps the topic's reading path.
+  Give the main resource one study record with its run keys, companions and
+  explicit guide, derivation, API or evidence links. The site generates
+  category listings and backlinks. Maintain useful offline landing links. Review `start_here` placement when it helps the topic's reading path.
   Prefer existing concepts; follow the topic reference if a new concept is needed.
   Renames/moves need the existing relocation mechanism and updated links.
 - Run topic and structure checks, applicable example tests and the website build.

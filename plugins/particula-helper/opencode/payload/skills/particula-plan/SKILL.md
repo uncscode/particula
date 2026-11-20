@@ -29,7 +29,8 @@ where they actually matter. Preserve numerical and qualification gates.
 Return the plan in the requested place or chat. If a repository artifact is
 requested without a destination, use a descriptive file under `plans/`; public
 roadmap entries contain pending outcomes and durable scientific evidence belongs
-in `docs/contribute/validation/`. Do not require a workflow engine, generate
+with its owning study under `docs/studies/`. Contribute owns qualification
+procedures and release decisions. Do not require a workflow engine, generate
 agent-state files, assign automation labels, post issues or launch implementation
 unless requested. When planning is part of an implementation request, continue
 within the user's authorized scope rather than stopping at the plan.

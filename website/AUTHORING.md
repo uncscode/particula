@@ -2,6 +2,23 @@ Keep an ordinary Python script as the only maintained executable source.
 Use `# %%` for code sections and `# %% [markdown]` for explanatory comments.
 The source remains downloadable and executable with Python.
 
+## Register a study
+
+Choose one primary home below `docs/studies/`: `examples/`, `tutorials/`,
+`literature/`, `validation/`, or `benchmarks/`. The main resource in
+`website/topics.json` owns its stable study ID, topics, script keys and
+companion sources. A report can own several runs or have no code. Register
+each runnable Python source once in `website/examples.json`, preserving its
+execution key when moving or renaming a source. Use precise relationships
+for supporting guides, equations, API symbols and evidence. Verify the reverse
+link at the target. Theory pages retain derivations and link at the equation;
+the result page links back to that equation.
+
+Keep a report, its script and a frozen specification together as one sidebar
+choice. A collection with seven choices merits review for subject or task
+groups. Make each group landing meaningful in the installed Markdown bundle.
+Check the generated catalog and the source and ZIP downloads on the built site.
+
 ## Refresh results deliberately
 
 From the repository root, in the development Python environment:
@@ -145,7 +162,7 @@ when installed distribution metadata differs, it is retained separately as
 
 For styled scientific figures, follow the
 [figure style guide](https://uncscode.github.io/particula/guide/getting-started/figure-styles/) and
-[gallery](https://uncscode.github.io/particula/examples/fundamentals/figure_styles/). Use one PNG per
+[gallery](https://uncscode.github.io/particula/studies/tutorials/figure_styles/). Use one PNG per
 figure for both website themes. Set `"full_canvas": true` in the example
 registry for Particula preset figures. This preserves their physical canvas
 and fingerprints the shared style and layout code. Call `plotting.fit(fig)`

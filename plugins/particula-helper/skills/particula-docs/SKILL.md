@@ -26,11 +26,12 @@ complete topic/navigation integration. For other scientific explanations, use
 proportional.
 
 Choose the reader's task and extend its owning topic before creating a page:
-Guide for supported usage, Examples for calculations, Theory for scientific
-basis, API generated from docstrings, Contribute for development/evidence.
+Guide for supported usage, Studies for runnable calculations and scientific
+comparisons, Theory for derivations, API for symbol reference, and Contribute
+for contributor procedures, qualification gates and release decisions.
 Implementation phases are not public features. Put requested plans in `plans/`
-and durable scientific evidence in `docs/contribute/validation/` with revision,
-device, limitations and outstanding gates.
+and durable scientific evidence with its canonical study in `docs/studies/`.
+Preserve revision, device, reference, limitations and links to outstanding gates.
 
 Example execution and saved-result handling follow particula-examples and the
 checkout's `website/AUTHORING.md`. Scientific changes require a full refresh;

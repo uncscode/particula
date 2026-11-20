@@ -87,7 +87,8 @@ Read `docs/guide/gpu/prepared.md`, `support.md`, `transfers.md`,
 
 ## Evidence
 
-Use the maintained records in `docs/contribute/validation/`, especially
+Read the scientific comparisons and measured benchmarks in `docs/studies/`
+alongside their contributor qualification records in `docs/contribute/validation/`, including
 `gpu/prepared-rtx5060.md`, `gpu/graph-capture-qualification.md`,
 `gpu/resident-benchmarks.md`,
 `gpu/graph-capture-profiling.md`, `numerics/mass-precision.md`, and
