@@ -1,8 +1,16 @@
 # Stage 6: Configurable chemistry on CPU and GPU
 
-Status: proposed later-stage development, based on the supplied chemistry
-design discussion. API names and solver defaults remain open; no mechanism
-implementation or numerical qualification is claimed by this plan.
+The Stage 6 delivery is implemented and qualified on the branch in
+[PR #1687](https://github.com/uncscode/particula/pull/1687). The milestones
+below refer to implemented behavior and its independent reference.
+
+| Milestone | Delivered behavior | Evidence |
+| --- | --- | --- |
+| Species and mechanisms | Load Python, JSON and YAML. Bind gas names and explicit material columns, validate units and closed budgets, and compile signed reaction entries for resident execution. | [Gas schema](../docs/guide/processes/gas-chemistry.md) · [Resolved schema](../docs/guide/processes/resolved-chemistry.md) |
+| Gas reactions and interchange | Run RK23 and stiff ROS3 on NumPy and CUDA. Import the closed NCAR 1.3.0 Arrhenius subset. | [Analytical trajectories, source rates and stiff references](../docs/studies/validation/condensation/gas-chemistry.md) |
+| Bulk particle reactions | Integrate molar mass action using the changing material volume of each resolved particle. | [Equal- and unequal-density volume integrals](../docs/studies/validation/condensation/resolved-chemistry.md#bulk-material-conversion) |
+| Coupled uptake | Share each gas reservoir among particles and pathways using a prescribed collision probability. Preserve represented counts and track both reservoirs through condensation and near depletion. | [Independent radial growth and inventory checks](../docs/studies/validation/condensation/resolved-chemistry.md#competition-and-near-depletion) |
+| Continuation, cost and example | Resume exact same-backend histories, capture a compatible resolved CUDA sequence, measure complete workloads and publish executed cases. | [Work and continuation](../docs/studies/validation/condensation/resolved-chemistry.md) · [Uptake and aging example](../docs/studies/examples/custom-processes/resolved_reactive_uptake.py) |
 
 Dependencies: [Stage 1 accounting and verification](stage-01-scientific-correctness.md),
 [Stage 2A solver assessment](stage-02a-numerical-integration.md),
@@ -13,9 +21,8 @@ autodiff is not a prerequisite, and chemistry gradients are not an initial goal.
 
 ## Execution and delivery
 
-Create a dedicated worktree and `codex/stage-06-chemistry-model` branch when
-starting this plan. Develop and validate there, then commit, push, and create
-a PR when the plan's acceptance criteria are met. Follow the shared
+The Stage 6 worktree is `/tmp/particula-stage-06` on branch
+`codex/stage-06-chemistry-model`, based on `ebabce042e`. Follow the shared
 [worktree, branch, and PR workflow](README.md#worktree-branch-and-pr-workflow).
 
 ## Outcome
@@ -29,7 +36,32 @@ definitions.
 Reuse existing execution extension points. CPU `BoxProcess` supports staged
 native updates; explicit GPU adapters support prepared resources, a clock,
 failure signaling, and declared continuation state. These are integration
-points, not an existing general chemistry engine.
+points for the gas and resolved chemistry implementations.
+
+## First delivery design and acceptance criteria
+
+Use the existing two-box example to specify A → B at 0.3 s⁻¹. A and B each
+have molar mass 0.1 kg/mol. The boxes have volumes 1 and 2 m³, initial A
+concentrations of 2 × 10⁻⁹ and 5 × 10⁻⁹ kg/m³ respectively, zero B, and an inert gas
+at 10⁻⁶ kg/m³. The example implements this reaction in a custom CPU callback
+using SciPy. Start the configurable mechanism with the reaction alone. For each
+box check A(t) = A(0) exp(−kt), B(t) = B(0) + A(0) − A(t), the inert species,
+and total A+B inventory in kg. Then restore the example's 4 s pulse and
+dilution, including the external mass ledger, and compare all 41 recorded
+times with its analytical solution. Retain its trajectory tolerances
+(`rtol=2e-9`, `atol=1e-20` kg/m³) and inventory tolerances
+(`rtol=1e-12`, `atol=1e-22` kg). [Timed chemistry example](../docs/studies/examples/custom-processes/timed_box_chemistry.py)
+
+| Starting point | Gas milestone acceptance criterion |
+| --- | --- |
+| CPU `BoxProcess` stages changes and publishes declared writes after all boxes succeed. | Compile phase-qualified names against the gas layout, run the same mechanism after an explicit rebind to reordered columns, and reject stale bindings before mutation. [Box process](../particula/box_process.py) |
+| `ODEProblem` and `AdaptiveSolver` accept continuous rates and admissibility checks. CPU ROS2/ROS3 also require a Jacobian and an explicit time derivative. | Reuse these contracts for a numerical CPU implementation. Compare to the exponential trajectory before selecting a solver default. Use the dimensionless Robertson case for a separate stiffness test. [Solver](../particula/execution/ode.py) · [Assessment cases](../scripts/assess_numerical_methods.py) |
+| The custom GPU example runs prescribed warming through a prepared adapter. Resident ROS3 device kernels implement condensation-specific algebra. | Declare the mechanism's immutable configuration, supported device operation and any persistent state through the adapter contract. Compare the new chemistry path on actual CUDA with the analytical time series, then check same-device restart. [Adapter contract](../particula/execution/process_extensions.py) · [Warming example](../docs/studies/examples/custom-processes/custom_process_backends.py) · [Condensation solver support](../docs/guide/processes/numerical-integration.md) |
+
+The gas milestone passed binding, analytical trajectory and continuation
+checks on NumPy and resident CUDA. The [qualification record](../docs/studies/validation/condensation/gas-chemistry.md) gives the measured errors.
+The resolved milestones below extend this qualification to changing material
+volume and a shared gas reservoir.
 
 ## Initial scope and exclusions
 
@@ -70,17 +102,51 @@ consumed species. A consumed oxidant must appear in the material balance.
 The condensation partitioning mask must not act as a chemistry reactivity mask.
 Two independent reaction sets in different phases are not cross-phase coupling.
 
-Start with Python configuration objects and a versioned serializable dictionary
-schema; YAML may later use the same schema. Compile supported mechanisms into
+Python objects, JSON and YAML share one versioned native schema. Compile supported mechanisms into
 species indices, sparse stoichiometry, orders, rate identifiers, and parameters.
 Keep solver choice replaceable. Arbitrary Python rate callbacks remain CPU-only
 unless an explicit supported GPU implementation is supplied.
 
-Cantera provides a precedent for separating phase/species/reaction definitions
-and explicit units; this plan does not adopt Cantera's entire thermodynamic
-model or imply file-format compatibility. See its
-[mechanism guide](https://www.cantera.org/stable/userguide/creating-mechanisms.html)
-and [reaction-rate definitions](https://www.cantera.org/stable/reference/kinetics/reaction-rates.html).
+### Import an external gas mechanism
+
+The converter translates **NCAR Mechanism Configuration
+1.3.0** to native Particula v1 JSON or YAML. The output goes through
+`ReactionMechanism.from_dict`, `save`, and the existing gas binding. Users can
+inspect it and run it on either backend without the NCAR parser or a compiler.
+The source fixture is pinned at NCAR revision `2069f9c97f`.
+[Pinned example](https://github.com/NCAR/MechanismConfiguration/blob/2069f9c97f08399b34ca3dcb104d3a5bf596ce40/examples/v1/full_configuration.yaml)
+· [Source rate law and defaults](https://github.com/NCAR/MechanismConfiguration/blob/2069f9c97f08399b34ca3dcb104d3a5bf596ce40/docs/source/v1/reactions/arrhenius.rst)
+
+1. **Define the supported input.** Use a minimal, single-gas-phase fixture in
+   both JSON and YAML, with ordinary evolving species and closed, irreversible
+   `ARRHENIUS` reactions. Map species names to existing gas columns, checking
+   any supplied molecular weights against simulation metadata. Start with
+   unit reactant coefficients and positive integer product stoichiometry.
+   Treat the full upstream example as a rejection fixture. It includes fixed
+   reservoirs, nonzero pressure dependence and other reaction types.
+2. **Translate and validate before writing.** Keep the reader in the chemistry
+   package, separate from the solver. Map NCAR's temperature exponent and
+   reference temperature directly. Convert activation energy in joules per
+   molecule to J/mol by multiplying by Avogadro's constant. For the alternative
+   temperature parameter `C` in kelvin, use molar activation energy `−R C`.
+   Apply the source defaults and require compatible native parameter values.
+   Units of the prefactor are s⁻¹ for one reactant and m³/(mol s) for two.
+   Reject both activation parameters together, a nonzero pressure coefficient,
+   fixed reservoirs, unsupported versions and unknown scientific fields. An
+   error identifies the source field and reaction or species and leaves the
+   requested output untouched.
+3. **Verify conversion independently.** Hand-author native counterparts for
+   A → B and A + B → C. Evaluate both source equations directly at 298 and
+   318 K with nonzero activation and exponent. Require relative rate agreement
+   within 10⁻¹². Bind the imported mechanisms to reordered gas columns and
+   compare NumPy and actual CUDA to the analytical exponential and equal-molar
+   bimolecular solutions using the existing gas qualification tolerances. Check
+   every species, inert gas and total kg per box. Verify each unsupported
+   fixture fails before export. Publish one source file, its generated native
+   file and the conversion command alongside the worked example.
+
+The converter targets the gas mechanism. Resolved chemistry uses the native
+version 2 mechanism and explicit particle bindings.
 
 ## Units, budgets, and shared gas availability
 
@@ -127,16 +193,16 @@ counting a gas transfer twice. Fixed-count chemistry must preserve positive
 total mass in active particles; complete particle removal needs a later
 retirement contract.
 
-## Reviewable implementation increments
+## Delivery criteria by increment
 
 1. **Species/schema and compilation.** Resolve bindings and units, validate
    reaction balances and dependencies, and compile one canonical mechanism.
    Reject missing species, invalid layouts, unsupported phase laws, and
    unbalanced closed reactions before any state changes. Demonstrate schema
    round trips and binding invalidation independently of a numerical solver.
-2. **Gas-only and particle-only chemistry.** Add the CPU process and explicit
-   CUDA adapter for the bounded rate families. Use the Stage 2A assessment to
-   select methods suitable for the case's stiffness, with error control,
+2. **Gas-only, then particle-only chemistry.** Complete the gas delivery above
+   before extending the CPU process and CUDA adapter to particle material lanes.
+   Use the Stage 2A assessment to select methods suitable for the case's stiffness, with error control,
    positivity, and budget checks. First-order transformations and a small
    coupled reaction system provide independent analytical/reference cases.
 3. **Coupled heterogeneous chemistry.** Implement one specified uptake/reaction
@@ -169,15 +235,56 @@ retirement contract.
   must not be invented from forward kinetics alone.
 
 [KPP Rosenbrock methods](https://kpp.readthedocs.io/en/stable/num_methods/rosenbrock-methods.html)
-are one reference for stiff kinetics and embedded error estimates. Selecting
-one for Particula remains conditional on the Stage 2A study and the mechanism's
-invariants; stiff stability alone is not a positivity or conservation proof.
+are one reference for stiff kinetics and embedded error estimates. Stage 2A
+already assessed these methods. Select a chemistry method by measuring
+its trajectory errors, admissibility, conservation and cost for the compiled
+mechanism. [Stage 2A assessment](../docs/studies/validation/condensation/adaptive/index.md)
+
+## Proposed follow-on: condensation and particle aging of the same vapor
+
+The current [coupling test](../particula/dynamics/chemistry/tests/resolved_test.py)
+condenses one vapor and then consumes a different gas on the enlarged surface.
+It leaves a practical question open. When a semivolatile vapor condenses and
+its particle material reacts, how accurately does the split simulation predict
+the gas left over, material available to evaporate and retained product?
+
+1. **Define a closed reference case.** In one isothermal box with two
+   differently sized, weighted seed populations, map gas X to particle X
+   through reversible kinetic condensation. Convert particle X to a
+   nonvolatile isomer Y by first-order bulk chemistry. Use equal molar masses,
+   fixed counts and explicit densities. Condensation owns every transfer of X
+   across the interface. Chemistry debits particle X and credits Y once.
+   Start with a condensation case and a separate undersaturated case with
+   particle X initially present so evaporation competes with conversion.
+2. **Establish the independent reference.** Integrate the gas and both
+   populations' X and Y together with a high-accuracy reference ODE. Evaluate
+   the documented condensation flux and composition-dependent equilibrium
+   vapor pressure independently of the production step functions. Check the
+   zero-reaction and zero-transfer limits before comparing coupled runs.
+   Tighten reference tolerances until the change in every reservoir is below
+   one tenth of the trajectory acceptance threshold.
+3. **Measure process-order error on NumPy and resident CUDA.** Compare both
+   sequential orders and a symmetric schedule at four successively halved
+   outer timesteps, using identical observation times and tighter internal
+   solver controls. Track gas X and each population's X and Y separately.
+   Require nonnegative reservoirs, invariant counts and inert seed mass, and
+   total X+Y closure within the existing relative budget of 10⁻¹². At the
+   finest step require every reservoir to agree with the reference within
+   10⁻⁴ of initial total X inventory. Report error versus timestep for each
+   ordering and the largest tested step meeting this target on both backends.
+4. **Publish the operating range.** Put the runnable regression beside the
+   existing coupling test and the reference, tested timescales and measured
+   errors in the [resolved qualification record](../docs/studies/validation/condensation/resolved-chemistry.md).
+   Link the measured timestep guidance from the process guide. Stage 2A owns
+   reusable splitting schedules, Stage 3A owns activity models, and Stage 6
+   owns this coupling test. The first case uses the existing ideal activity
+   model and existing condensation and bulk-reaction laws.
 
 ## Owning implementation and evidence
 
 - [Gas metadata](../particula/gas/gas_data.py),
-  [particle state](../particula/particles/particle_data.py), and a proposed
-  chemistry module whose public exports will be decided during schema design.
+  [particle state](../particula/particles/particle_data.py), and the
+  [native chemistry package](../particula/dynamics/chemistry/).
 - [CPU box process](../particula/box_process.py),
   [GPU process adapters](../particula/execution/process_extensions.py), and
   [prepared checkpoint integration](../particula/execution/prepared_checkpoint.py).
@@ -207,4 +314,4 @@ invariants; stiff stability alone is not a positivity or conservation proof.
   multiphase chemistry claim is inferred from a simple demonstration.
 
 Use the [repository validation reference](../plugins/particula-helper/references/repository-validation.md)
-for focused CPU/CUDA, lifecycle, example, and packaging checks when implemented.
+for focused CPU/CUDA, lifecycle, example, and packaging checks.

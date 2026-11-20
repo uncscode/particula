@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 5.854572725016624,
+  "package_source_sha256": "2df7dcde6398d5b91e3a0a89e8884aedd26b42c8e4f99a046a283efb7e9ebdb2",
+  "scientific_source_sha256": "87d7d3a385dd76533121ee0900f4fb033e0273c7faf316a4ea445df684b16c3d",
+  "input_sha256": {},
+  "example": "resolved-reactive-uptake",
+  "fingerprint": "9c1d28e454d6d553e3a93985c6d00f43ce863268712aa7ff8a2331d7238157c3",
+  "source": "docs/examples/processes/customization/resolved_reactive_uptake.py",
+  "revision": "b90bab07a9a25b4182e957c33ed9dc9a1548e817",
+  "package_dirty": false,
+  "executed_at": "2026-11-20T04:14:51.540907+00:00",
+  "device": "cuda:0: NVIDIA GeForce RTX 5060",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.3",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [],
+    [
+      {
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     /tmp/stage06-resolved-warp\nModule warp.utils f35afd3 load on device 'cuda:0' took 1.00 ms  (cached)\nModule warp.math edde159 load on device 'cuda:0' took 2.13 ms  (cached)\n"
+      },
+      {
+        "text": "Module warp.marching_cubes fb6e712 load on device 'cuda:0' took 96.42 ms  (cached)\nModule particula.dynamics.chemistry.resolved_device 98bbb06 load on device 'cuda:0' took 2.30 ms  (cached)\nModule particula.gpu.kernels._coagulation_budget b4a3978 load on device 'cuda:0' took 1.64 ms  (cached)\nModule particula.execution.communication 2909959 load on device 'cuda:0' took 1.52 ms  (cached)\nModule particula.gpu.kernels.environment e11375e load on device 'cuda:0' took 2.04 ms  (cached)\nModule particula.gpu.kernels._population_validation edde159 load on device 'cuda:0' took 2.19 ms  (cached)\nModule particula.gpu.kernels.communication ac9b2a2 load on device 'cuda:0' took 2.86 ms  (cached)\nModule particula.gpu.properties.gas_properties edde159 load on device 'cuda:0' took 2.18 ms  (cached)\nModule particula.gpu.properties.particle_properties edde159 load on device 'cuda:0' took 2.19 ms  (cached)\nModule particula.gpu.dynamics.coagulation_funcs edde159 load on device 'cuda:0' took 2.19 ms  (cached)\nModule particula.gpu.dynamics.condensation_funcs edde159 load on device 'cuda:0' took 1.47 ms  (cached)\nModule particula.gpu.kernels._condensation_native edde159 load on device 'cuda:0' took 0.15 ms  (cached)\nModule particula.gpu.kernels._condensation_parallel edde159 load on device 'cuda:0' took 0.14 ms  (cached)\nModule particula.gpu.kernels.thermodynamics edde159 load on device 'cuda:0' took 0.14 ms  (cached)\nModule particula.gpu.kernels.condensation edde159 load on device 'cuda:0' took 0.14 ms  (cached)\nModule particula.gpu.kernels.exhaustion 616f81d load on device 'cuda:0' took 2.39 ms  (cached)\nModule particula.gpu.kernels.slot_management 0375e2c load on device 'cuda:0' took 1.11 ms  (cached)\nModule particula.gpu.kernels.nucleation 1124f09 load on device 'cuda:0' took 3.05 ms  (cached)\nModule particula.execution.gpu_resources 30f296c load on device 'cuda:0' took 29.88 ms  (cached)\nModule particula.gpu.warp_types edde159 load on device 'cuda:0' took 2.08 ms  (cached)\nModule particula.execution.prepared_diagnostics ca06582 load on device 'cuda:0' took 1.83 ms  (cached)\nModule particula.execution.extension_guards deaab5f load on device 'cuda:0' took 1.92 ms  (cached)\nModule particula.execution.prepared_guards c5e1f2e load on device 'cuda:0' took 1.66 ms  (cached)\n"
+      },
+      {
+        "image": "figure-5-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "figure-5-1.png": "144e224874129fe32dc83b2c728e83f78525316a36c0d762d6f2a2ac5eb04e02",
+    "data.json": "2796039ca916118504906ffcd9504af42bc45d336556765483261eae3b9a488e",
+    "source.py": "004cb5c97caf397bad4e6e682ff00272599f6af309c174e08e57b8bd561c37d4"
+  },
+  "simulation_fingerprint": "7aa335681ae73d37a469e98c5d7739501ad9584c346ead491d6fe6801aaca507"
+}

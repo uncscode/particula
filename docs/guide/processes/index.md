@@ -5,6 +5,8 @@ Choose a process guide for practical setup and an executable example:
 - [Dry PSL mobility sizing](psl-mobility.md)
 - [Activity](activity.md)
 - [Designing a size-resolved CCN experiment](ccn-retrieval.md)
+- [Native gas reaction mechanisms](gas-chemistry.md)
+- [React gas and particle materials in a resolved box](resolved-chemistry.md)
 - [Condensation](condensation.md)
 - [Numerical integration and process splitting](numerical-integration.md)
 - [Coagulation](coagulation.md)

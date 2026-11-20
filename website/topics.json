@@ -4478,6 +4478,118 @@
       "also": [],
       "role": "Studies",
       "start_here": true
+    },
+    {
+      "source": "docs/studies/examples/custom-processes/native_gas_chemistry.py",
+      "title": "Track a gas reaction through a chamber pulse",
+      "topic": "custom",
+      "also": [],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "native-gas-chemistry",
+        "runs": [
+          "native-gas-chemistry"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/gas-chemistry.md",
+            "label": "How to use this"
+          },
+          {
+            "target": "docs/studies/validation/condensation/gas-chemistry.md",
+            "label": "Qualification evidence"
+          },
+          {
+            "target": "api:particula.dynamics.chemistry.process.GasChemistry",
+            "label": "Process API"
+          }
+        ]
+      }
+    },
+    {
+      "source": "docs/studies/examples/custom-processes/resolved_reactive_uptake.py",
+      "title": "How two particle sizes share a reactive gas",
+      "topic": "custom",
+      "also": [],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "resolved-reactive-uptake",
+        "runs": [
+          "resolved-reactive-uptake"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/resolved-chemistry.md",
+            "label": "How to use this"
+          },
+          {
+            "target": "docs/studies/validation/condensation/resolved-chemistry.md",
+            "label": "Qualification evidence"
+          },
+          {
+            "target": "api:particula.dynamics.chemistry.resolved.ResolvedChemistry",
+            "label": "Process API"
+          }
+        ]
+      }
+    },
+    {
+      "source": "docs/guide/processes/gas-chemistry.md",
+      "title": "Define a gas reaction mechanism",
+      "topic": "processes",
+      "also": [],
+      "role": "Guide",
+      "start_here": false
+    },
+    {
+      "source": "docs/guide/processes/resolved-chemistry.md",
+      "title": "React gas and particle materials in a resolved box",
+      "topic": "processes",
+      "also": [],
+      "role": "Guide",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/validation/condensation/gas-chemistry.md",
+      "title": "Native gas chemistry qualification",
+      "topic": "verification-scientific",
+      "also": [],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "native-gas-chemistry-qualification",
+        "runs": [],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/gas-chemistry.md",
+            "label": "How to use this"
+          }
+        ]
+      }
+    },
+    {
+      "source": "docs/studies/validation/condensation/resolved-chemistry.md",
+      "title": "Resolved chemistry qualification",
+      "topic": "verification-scientific",
+      "also": [],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "resolved-reactive-uptake-qualification",
+        "runs": [],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/resolved-chemistry.md",
+            "label": "How to use this"
+          }
+        ]
+      }
     }
   ],
   "supporting": [

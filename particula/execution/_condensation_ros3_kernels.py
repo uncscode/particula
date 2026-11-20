@@ -15,6 +15,18 @@ from particula.execution._condensation_ode_kernels import (
     FloatVector,
     IntVector,
 )
+from particula.execution._ros3_coefficients import (
+    C21,
+    C31,
+    C32,
+    E2,
+    E3,
+    GAMMA,
+    GAMMA2,
+    GAMMA3,
+    M2,
+    M3,
+)
 
 
 @wp.kernel
@@ -174,20 +186,6 @@ def solve_remaining(
         solution[i] = rhs[i] / inverse_step_gamma
     if not wp.isfinite(solution[i]):
         wp.atomic_max(invalid, 0, 1)
-
-
-# Typed constants avoid rounding Python literals through float32 in Warp.
-# KPP Ros3, int/rosenbrock.f90 blob baf1ef64538a5128db5e1154ac7fd1b39c41f665.
-GAMMA = wp.constant(wp.float64(0.43586652150845899941601945119356))
-GAMMA2 = wp.constant(wp.float64(0.24291996454816804366592249683314))
-GAMMA3 = wp.constant(wp.float64(2.1851380027664058511513169485832))
-C21 = wp.constant(wp.float64(1.0156171083877702092))
-C31 = wp.constant(wp.float64(4.0759956452537699825))
-C32 = wp.constant(wp.float64(9.2076794298330791242))
-M2 = wp.constant(wp.float64(6.1697947043828245593))
-M3 = wp.constant(wp.float64(0.4277225654321857333))
-E2 = wp.constant(wp.float64(2.9079558716805469822))
-E3 = wp.constant(wp.float64(0.2235406989781156963))
 
 
 @wp.kernel

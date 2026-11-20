@@ -341,7 +341,11 @@
     "docs/contribute/validation/optics/delivery.md": "docs/studies/validation/material-properties/cuda-optics/qualification.md",
     "docs/contribute/validation/numerics/simulation-workflow.md": "docs/studies/validation/workflows-and-releases/recording-and-restart.md",
     "docs/contribute/validation/releases/v0.3.0.md": "docs/studies/validation/workflows-and-releases/native-api-v0.3.0.md",
-    "docs/contribute/validation/index.md": "docs/studies/validation/index.md"
+    "docs/contribute/validation/index.md": "docs/studies/validation/index.md",
+    "docs/contribute/validation/numerics/gas-chemistry.md": "docs/studies/validation/condensation/gas-chemistry.md",
+    "docs/contribute/validation/numerics/resolved-chemistry.md": "docs/studies/validation/condensation/resolved-chemistry.md",
+    "docs/examples/processes/customization/native_gas_chemistry.py": "docs/studies/examples/custom-processes/native_gas_chemistry.py",
+    "docs/examples/processes/customization/resolved_reactive_uptake.py": "docs/studies/examples/custom-processes/resolved_reactive_uptake.py"
   },
   "fragments": {
     "docs/Features/data-containers-and-gpu-foundations.md#data-containers-and-gpu-foundations": "docs/guide/data-model/index.md#data-model",

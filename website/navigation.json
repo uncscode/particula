@@ -150,6 +150,14 @@
             "slug": "guide/processes/condensation"
           },
           {
+            "label": "Native gas mechanisms",
+            "slug": "guide/processes/gas-chemistry"
+          },
+          {
+            "label": "Resolved particle chemistry",
+            "slug": "guide/processes/resolved-chemistry"
+          },
+          {
             "label": "Numerical integration and splitting",
             "slug": "guide/processes/numerical-integration"
           },
