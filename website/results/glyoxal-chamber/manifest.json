@@ -1,22 +1,22 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 245.5101843739394,
+  "elapsed_seconds": 265.3735476480797,
   "package_source_sha256": "de9c4fa23fbd4833d9eeae22e97ffd8e2496acae8432510149eed8ada42f4ee3",
   "scientific_source_sha256": "1ac66c614e80ae7a0f6aae70e885469d5f8609ca95421966dfcd08ebcf41597f",
   "input_sha256": {
-    "docs/data/glyoxal-chamber/README.txt": "ce3bf0dceb51bd5c112a314e60fb12312cf05d7b1c43d67434fa4fa9d16b47e2",
+    "docs/data/glyoxal-chamber/README.txt": "8636a0de7e62468c00284ce4bf1580429f0727bcd4f6a82dee3c2cf17ecebb77",
     "docs/data/glyoxal-chamber/gas_ppbv.csv": "239b623b305ae7fd0336a8bc81eeb9f16f7b42bfd0eefe4f9a1385b4d9909473",
     "docs/data/glyoxal-chamber/marker68_per_sulfate.csv": "88635c9aa40650b42ef5f4b1d28e2b6cc4e29cdcbf98da313d2209e6b1d773d1",
     "docs/data/glyoxal-chamber/mechanism.json": "589c726aac390ff528c87888df9ac5847be31a06845db005aa2c9dcb2516d0f7",
     "docs/data/glyoxal-chamber/organic_per_sulfate.csv": "00e0a1e8e06d8d33beb72602ea84722bb027a09ae48282a507ec854a6e771332"
   },
   "example": "glyoxal-chamber",
-  "fingerprint": "c686d6f62a07e3f11b587a30fea770eb8e90d8606283d6f97b766dab0141a9e2",
+  "fingerprint": "19936f859d746ef3e23d7c35efecde48d8ae872a9d47fe6b38cb08e0b64ba1dc",
   "source": "docs/examples/processes/customization/glyoxal_chamber.py",
-  "revision": "76609f3c0b3e23ef9830f24ce8da5e3a2c17346f",
+  "revision": "8a26a530a8ce68af351d590f32ba55eaf63deaa0",
   "package_dirty": false,
-  "executed_at": "2026-11-20T13:17:46.953960+00:00",
+  "executed_at": "2026-11-20T13:56:06.266974+00:00",
   "device": "cuda:0: NVIDIA GeForce RTX 5060",
   "python": "3.12.12",
   "versions": {
@@ -34,22 +34,23 @@
     [],
     [],
     [],
+    [],
     [
       {
-        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\nModule particula.gpu.kernels.condensation 14a649a load on device 'cuda:0' took 0.55 ms  (cached)\nModule particula.gpu.kernels.condensation 2c7d291 load on device 'cuda:0' took 0.31 ms  (cached)\nModule particula.gpu.kernels.environment e11375e load on device 'cuda:0' took 0.28 ms  (cached)\nModule particula.gpu.kernels._condensation_native 34375de load on device 'cuda:0' took 0.32 ms  (cached)\nModule particula.gpu.kernels.thermodynamics 563d292 load on device 'cuda:0' took 0.32 ms  (cached)\nModule particula.execution.prepared_guards c5e1f2e load on device 'cuda:0' took 0.37 ms  (cached)\nModule particula.gpu.kernels.condensation c7ee7df load on device 'cuda:0' took 0.31 ms  (cached)\nModule particula.gpu.kernels.condensation 57dfed0 load on device 'cuda:0' took 0.37 ms  (cached)\nModule particula.gpu.kernels.condensation e60be0e load on device 'cuda:0' took 0.80 ms  (cached)\nModule particula.gpu.kernels._condensation_native 9623455 load on device 'cuda:0' took 0.29 ms  (cached)\nModule particula.gpu.kernels.condensation 016bbb1 load on device 'cuda:0' took 0.75 ms  (cached)\nModule particula.gpu.kernels._condensation_native 76403ad load on device 'cuda:0' took 0.35 ms  (cached)\nModule particula.gpu.kernels.condensation b9ed110 load on device 'cuda:0' took 0.66 ms  (cached)\nModule particula.gpu.kernels._condensation_native c295a4d load on device 'cuda:0' took 0.38 ms  (cached)\nModule particula.gpu.kernels._condensation_native a80ebff load on device 'cuda:0' took 0.45 ms  (cached)\nModule particula.gpu.kernels.condensation c3b7b3c load on device 'cuda:0' took 0.78 ms  (cached)\nModule particula.gpu.kernels.condensation 328f7a7 load on device 'cuda:0' took 0.68 ms  (cached)\nModule particula.gpu.kernels.condensation e2db3ba load on device 'cuda:0' took 0.76 ms  (cached)\nModule particula.gpu.kernels._condensation_native ff4cf87 load on device 'cuda:0' took 0.82 ms  (cached)\nModule particula.dynamics.chemistry.resolved_device 98bbb06 load on device 'cuda:0' took 2.38 ms  (cached)\nModule particula.execution.extension_guards deaab5f load on device 'cuda:0' took 11.32 ms  (cached)\n"
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\nModule particula.gpu.kernels.condensation 14a649a load on device 'cuda:0' took 0.52 ms  (cached)\nModule particula.gpu.kernels.condensation 2c7d291 load on device 'cuda:0' took 0.32 ms  (cached)\nModule particula.gpu.kernels.environment e11375e load on device 'cuda:0' took 0.39 ms  (cached)\nModule particula.gpu.kernels._condensation_native 34375de load on device 'cuda:0' took 0.34 ms  (cached)\nModule particula.gpu.kernels.thermodynamics 563d292 load on device 'cuda:0' took 0.31 ms  (cached)\nModule particula.execution.prepared_guards c5e1f2e load on device 'cuda:0' took 0.39 ms  (cached)\nModule particula.gpu.kernels.condensation c7ee7df load on device 'cuda:0' took 0.30 ms  (cached)\nModule particula.gpu.kernels.condensation 57dfed0 load on device 'cuda:0' took 0.35 ms  (cached)\nModule particula.gpu.kernels.condensation e60be0e load on device 'cuda:0' took 0.67 ms  (cached)\nModule particula.gpu.kernels._condensation_native 9623455 load on device 'cuda:0' took 0.29 ms  (cached)\nModule particula.gpu.kernels.condensation 016bbb1 load on device 'cuda:0' took 0.69 ms  (cached)\nModule particula.gpu.kernels._condensation_native 76403ad load on device 'cuda:0' took 0.32 ms  (cached)\nModule particula.gpu.kernels.condensation b9ed110 load on device 'cuda:0' took 1.00 ms  (cached)\nModule particula.gpu.kernels._condensation_native c295a4d load on device 'cuda:0' took 0.55 ms  (cached)\nModule particula.gpu.kernels._condensation_native a80ebff load on device 'cuda:0' took 0.45 ms  (cached)\nModule particula.gpu.kernels.condensation c3b7b3c load on device 'cuda:0' took 0.65 ms  (cached)\nModule particula.gpu.kernels.condensation 328f7a7 load on device 'cuda:0' took 0.68 ms  (cached)\nModule particula.gpu.kernels.condensation e2db3ba load on device 'cuda:0' took 0.79 ms  (cached)\nModule particula.gpu.kernels._condensation_native ff4cf87 load on device 'cuda:0' took 0.55 ms  (cached)\nModule particula.dynamics.chemistry.resolved_device 98bbb06 load on device 'cuda:0' took 1.43 ms  (cached)\nModule particula.execution.extension_guards deaab5f load on device 'cuda:0' took 11.63 ms  (cached)\n"
       },
       {
-        "text": "Measured organic/sulfate fell 10.20%.\nnumpy \u00b7 Reversible pools \u00b7 organic/sulfate rose 32.13%; refinement 0.041 percentage points; maximum relative inventory error 1.7e-15.\nnumpy \u00b7 With IC \u00b7 organic/sulfate rose 86.97%; refinement 0.253 percentage points; maximum relative inventory error 2.1e-14.\nCumulative modeled evaporation 4.65 \u00b5g/m\u00b3; final ammonium sulfate molality 11.25 mol/kg.\ncuda:0 \u00b7 Reversible pools \u00b7 organic/sulfate rose 32.15%; refinement 0.022 percentage points; maximum relative inventory error 1.8e-15.\ncuda:0 \u00b7 With IC \u00b7 organic/sulfate rose 87.10%; refinement 0.116 percentage points; maximum relative inventory error 1.2e-14.\nCumulative modeled evaporation 4.56 \u00b5g/m\u00b3; final ammonium sulfate molality 11.25 mol/kg.\nFinal IC / sulfate (kg/kg), prescribed pH: {'1.9': 0.004790933020216215, '2.8': 0.050865663611216076, '3.5': 0.3154372602061464, '4.0': 0.33839552215565943, '4.5': 0.4220766273890115}\nDigitization allowance: 0.320 percentage points.\n"
+        "text": "Measured organic/sulfate fell 10.20%.\nChamber fit: K = 0.0208 per ppbv, response time 6.88 h. Predicted organic/sulfate 3.01 to 2.81, a 6.71% decline.\nnumpy \u00b7 Reversible pools \u00b7 organic/sulfate rose 32.13%; refinement 0.041 percentage points; maximum relative inventory error 1.7e-15.\nnumpy \u00b7 With IC \u00b7 organic/sulfate rose 86.97%; refinement 0.253 percentage points; maximum relative inventory error 2.1e-14.\nCumulative modeled evaporation 4.65 \u00b5g/m\u00b3; final ammonium sulfate molality 11.25 mol/kg.\ncuda:0 \u00b7 Reversible pools \u00b7 organic/sulfate rose 32.15%; refinement 0.022 percentage points; maximum relative inventory error 1.8e-15.\ncuda:0 \u00b7 With IC \u00b7 organic/sulfate rose 87.10%; refinement 0.116 percentage points; maximum relative inventory error 1.2e-14.\nCumulative modeled evaporation 4.56 \u00b5g/m\u00b3; final ammonium sulfate molality 11.25 mol/kg.\nFinal IC / sulfate (kg/kg), prescribed pH: {'1.9': 0.004790933020216215, '2.8': 0.050865663611216076, '3.5': 0.3154372602061464, '4.0': 0.33839552215565943, '4.5': 0.4220766273890115}\nDigitization allowance: 0.320 percentage points.\n"
       },
       {
-        "image": "figure-6-1.png"
+        "image": "figure-7-1.png"
       }
     ]
   ],
   "files": {
-    "figure-6-1.png": "787350e65c9c85fa20761d21a54b97331b74172212093d2e474be854f042662f",
-    "data.json": "86cb4f4bfecb1b8df5f3f2c1f7a60dad779cff851ffbe0c9def4cb83ca482b0e",
-    "source.py": "3e4b0e47e65395a0b2ac7818636662cb31165aaa6ab8e919363b5d297e69623d"
+    "figure-7-1.png": "1987ea2d993d9f447c06df7e365411bcd30f77ba7b868728195e2cc97a17773b",
+    "data.json": "86925a963c9aa6f10b541226f93cd33b0a075623f84ed0cf69792b12df910e37",
+    "source.py": "d27c1b44504db192d8e16e7ab2aa0f299d243fe3017a03155deb045c2c9c09a8"
   },
-  "simulation_fingerprint": "556dd9933bd46a6182525b722bee8cc58c5f38cb978dea9f2d48bb9b2cbb7ac2"
+  "simulation_fingerprint": "7dbbba000f8c25515e52c88b4d0b41f49ee526bc64b3fdf62f1c741d4988419d"
 }

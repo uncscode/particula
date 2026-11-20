@@ -35,7 +35,8 @@ from particula.dynamics.chemistry.resolved_adapter import (
 from particula.dynamics.condensation.species_mapping import (
     CondensationSpeciesMap,
 )
-from scipy.optimize import brentq
+from scipy.optimize import brentq, least_squares
+from scipy.signal import lfilter
 
 TEMPERATURE = 293.0
 PRESSURE = 101325.0
@@ -381,6 +382,78 @@ def independent_checks():
     }
 
 
+# %% [markdown]
+# ## Estimate a reversible response from chamber growth
+#
+# At dilution the measured organic/sulfate ratio is about 3.07. With the
+# assumed water and sulfate, the literature-based reversible run has reached
+# only 0.65. Even at equilibrium with the measured 174 ppbv of vapor, its
+# capacity would be about 1.47. Its two initial relaxation times are 12 and
+# 13 hours, comparable to the time between seed injection and dilution.
+#
+# How well can one reversible reservoir describe this chamber? Let $q$ be
+# organic/sulfate and $G(t)$ the measured vapor in ppbv. Model the response
+# as $dq/dt=(K G(t)-q)/\tau$, starting with clean seed at $q(0)=0$.
+# Estimate positive capacity $K$ and response time $\tau$ by least squares
+# on particle observations from injection to the dilution line. Each marker
+# has equal weight. Continue from the fitted state with both parameters fixed
+# and the measured vapor as input. Particle observations after dilution
+# enter only the comparison. This empirical calculation describes the total
+# organic response and makes no prediction of IC abundance.
+
+
+# %%
+def chamber_response(gas, organic):
+    """Fit one reversible pool before dilution and predict through the end."""
+    sample_time, ratio = organic.T
+    growth = (sample_time >= 0) & (sample_time <= DILUTION)
+    dt_min = 0.25
+    grid = np.arange(0, END + dt_min, dt_min)
+    vapor = np.interp(grid, *gas.T)
+    mean_vapor = (vapor[:-1] + vapor[1:]) / 2
+
+    def trajectory(log_params, interval_vapor):
+        capacity, tau_min = np.exp(log_params)
+        # Relax exactly to the interval-mean vapor target over 15 seconds.
+        fraction = -np.expm1(-dt_min / tau_min)
+        response = lfilter(
+            [capacity * fraction], [1, fraction - 1], interval_vapor
+        )
+        return np.r_[0.0, response]
+
+    stop = np.searchsorted(grid, sample_time[growth][-1]) + 1
+
+    def residual(params):
+        q = trajectory(params, mean_vapor[: stop - 1])
+        return np.interp(sample_time[growth], grid[:stop], q) - ratio[growth]
+
+    fit = least_squares(residual, np.log([0.02, 200.0]))
+    if not fit.success:
+        raise RuntimeError(f"Chamber response fit failed: {fit.message}")
+    capacity, tau_min = np.exp(fit.x)
+    q = trajectory(fit.x, mean_vapor)
+    predicted = np.interp(sample_time, grid, q)
+    windows = [(DILUTION - 20, DILUTION), (END - 20, END)]
+    medians = [
+        float(np.median(predicted[(sample_time >= lo) & (sample_time <= hi)]))
+        for lo, hi in windows
+    ]
+    # Keep five-minute plot samples plus the exact split point in the download.
+    plot_time = np.union1d(grid[::20], [DILUTION])
+    return {
+        "capacity_ratio_per_ppbv": float(capacity),
+        "tau_hours": float(tau_min / 60),
+        "fit_end_min": DILUTION,
+        "fit_count": int(growth.sum()),
+        "fit_rmse": float(np.sqrt(np.mean(fit.fun**2))),
+        "window_ratios": medians,
+        "decline_pct": decline(np.column_stack((sample_time, predicted))),
+        "history": np.column_stack(
+            (plot_time, np.interp(plot_time, grid, q))
+        ).tolist(),
+    }
+
+
 def simulate():
     """Qualify a replay using the same observation windows on both devices."""
     obs = observations()
@@ -395,6 +468,7 @@ def simulate():
     report = {
         "observed": {k: v.tolist() for k, v in obs.items()},
         "measured_decline_pct": measured,
+        "chamber_fit": chamber_response(gas, obs["organic_per_sulfate"]),
         "digitizing_pp": float(resolution),
         "checks": independent_checks(),
         "runs": {},
@@ -483,6 +557,20 @@ def plot_results(report):
     ):
         h = np.array(report["runs"]["numpy"][key]["history"])
         axes[1].plot(h[:, 0] / 60, h[:, 1], label=label, color=color, lw=2)
+    fit = report["chamber_fit"]
+    time, ratio = np.transpose(fit["history"])
+    for mask, style, label in (
+        (time <= fit["fit_end_min"], "-", "Chamber fit · growth"),
+        (time >= fit["fit_end_min"], "--", "Prediction · dilution"),
+    ):
+        axes[1].plot(
+            time[mask] / 60,
+            ratio[mask],
+            ls=style,
+            color="#554990",
+            label=label,
+            lw=2,
+        )
     marker = obs["marker68_per_sulfate"].copy()
     t, y = marker.T
     marker[:, 1] /= np.median(y[(t >= DILUTION - 20) & (t <= DILUTION)])
@@ -507,6 +595,14 @@ def plot_results(report):
         ax.set_ylabel(label)
         ax.spines[["right", "top"]].set_visible(False)
         ax.legend(frameon=False, loc="best", fontsize=8)
+    axes[1].legend(
+        loc="lower left",
+        bbox_to_anchor=(0, 1.01),
+        ncol=3,
+        frameon=False,
+        fontsize=8,
+        borderaxespad=0,
+    )
     axes[0].set_title(
         "Glyoxal in a dark chamber with wet ammonium sulfate", loc="left"
     )
@@ -523,6 +619,14 @@ def plot_results(report):
 def summarize(report):
     print(
         f"Measured organic/sulfate fell {report['measured_decline_pct']:.2f}%."
+    )
+    fit = report["chamber_fit"]
+    before, after = fit["window_ratios"]
+    print(
+        f"Chamber fit: K = {fit['capacity_ratio_per_ppbv']:.4f} per ppbv, "
+        f"response time {fit['tau_hours']:.2f} h. "
+        f"Predicted organic/sulfate {before:.2f} to {after:.2f}, "
+        f"a {fit['decline_pct']:.2f}% decline."
     )
     for device, runs in report["runs"].items():
         for key in ("reversible_75", "IC_75"):
@@ -558,7 +662,11 @@ def summarize(report):
 #
 # The chamber organic/sulfate ratio falls from 3.066 to 2.753 in the
 # selected windows, a 10.20% decline. Its uncalibrated nitrogen marker
-# approximately doubles. Both modeled organic ratios rise across these same
+# approximately doubles. The chamber fit predicts a 6.7% decline from
+# 3.01 to 2.81. Its 6.9-hour response recovers the direction and part of the
+# magnitude using the growth data alone to set its parameters. Water content,
+# reversible chemical storage and instrument response can all affect the
+# fitted capacity. Both literature-based organic ratios rise across these same
 # windows. The reaction run can release vapor during individual intervals
 # while ending with more total organic mass. The reversible pools are still
 # filling at dilution, and transferring organic carbon into IC also
