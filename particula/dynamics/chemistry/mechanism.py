@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from math import isfinite
 from pathlib import Path
 
-import yaml
+import yaml  # type: ignore[import-untyped]
 
 
 def _unique(pairs):

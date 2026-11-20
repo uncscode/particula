@@ -58,11 +58,13 @@ class BoundMechanism:
         for reaction in mechanism.reactions:
             lhs, rhs = dict(reaction.reactants), dict(reaction.products)
             coeffs = tuple(rhs.get(n, 0) - lhs.get(n, 0) for n in species)
+            # A large catalyst present on both sides must not mask an
+            # imbalance in the species actually consumed and produced.
             mass_in = sum(
-                m * lhs.get(n, 0) for n, m in zip(species, masses, strict=True)
+                m * -v for m, v in zip(masses, coeffs, strict=True) if v < 0
             )
             mass_out = sum(
-                m * rhs.get(n, 0) for n, m in zip(species, masses, strict=True)
+                m * v for m, v in zip(masses, coeffs, strict=True) if v > 0
             )
             if not np.isclose(mass_in, mass_out, rtol=1e-12, atol=0):
                 raise ValueError(
