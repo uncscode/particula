@@ -388,12 +388,15 @@ def test_capture_and_configuration_identity():
 def test_failed_trials_and_preflight_budget():
     """A failure in the second box leaves the input intact."""
     state, process, _ = experiment(
-        "uptake", solver=ChemistrySolver(max_trials=1)
+        "uptake", solver=ChemistrySolver(first_step=1.0, max_trials=1)
     )
+    state.gas.concentration[0, 1] = 1e-30
+    original_gas = state.gas.concentration.copy()
     original = state.particles.masses.copy()
-    with pytest.raises(RuntimeError, match="trial budget"):
+    with pytest.raises(RuntimeError, match="maximum trial count"):
         process.execute(state, 1.0)
     np.testing.assert_array_equal(state.particles.masses, original)
+    np.testing.assert_array_equal(state.gas.concentration, original_gas)
     with pytest.raises(ValueError, match="scratch bytes"):
         ResolvedChemistryAdapter(workspace_bytes=1).plan(process, state)
     state.particles.concentration[1, 2] = 1
@@ -521,7 +524,7 @@ def test_combined_network_and_empty_population(device):
 def test_resident_trial_failure(device):
     """A failed multi-box device interval marks the owner unusable."""
     state, process, _ = experiment(
-        "uptake", solver=ChemistrySolver(max_trials=1)
+        "uptake", solver=ChemistrySolver(first_step=1.0, max_trials=1)
     )
     owner, _ = owner_for(state, process, device, 1.0)
     with owner as sim:
@@ -530,3 +533,42 @@ def test_resident_trial_failure(device):
             sim.synchronize()
         with pytest.raises((ValueError, RuntimeError)):
             sim.snapshot()
+
+
+@pytest.mark.parametrize("device", ["numpy", "cpu", "cuda:0"])
+def test_rebind_reordered_materials(device):
+    """Physical species follow explicit mappings across a storage permutation."""
+    original, process, lanes = experiment("bulk")
+    state, _, _ = experiment("bulk")
+    order = [2, 0, 3, 1]
+    state.particles.masses = state.particles.masses[:, :, order].copy()
+    state.particles.density = state.particles.density[order].copy()
+    with pytest.raises(ValueError, match="rebind"):
+        process.validate(state)
+    # Reorder the two gas columns as well as changing every particle lane.
+    state.gas.name.reverse()
+    state.gas.molar_mass = state.gas.molar_mass[::-1].copy()
+    state.gas.concentration = state.gas.concentration[:, ::-1].copy()
+    rebound = ResolvedChemistry(
+        process.bound.mechanism.bind_resolved(
+            state, {n: order.index(i) for n, i in lanes.items()}
+        ),
+        process.solver,
+    )
+    expected_gas, expected_mass = reference(original, "bulk", 0.5)
+    owner, _ = owner_for(state, rebound, device, 0.5)
+    with owner as sim:
+        if device == "numpy":
+            sim.step(0.5)
+        else:
+            sim.step()
+        actual = sim.snapshot()
+    np.testing.assert_array_equal(
+        actual.gas.concentration, expected_gas[:, ::-1]
+    )
+    np.testing.assert_allclose(
+        actual.particles.masses,
+        expected_mass[:, :, order],
+        rtol=4e-8,
+        atol=1e-32,
+    )

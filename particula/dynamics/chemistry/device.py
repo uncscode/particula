@@ -26,7 +26,9 @@ class DeviceMechanism:
     lanes: wp.array(dtype=int)
     masses: wp.array(dtype=wp.float64)
     active: wp.array(dtype=int)
-    net: wp.array2d(dtype=int)
+    offsets: wp.array(dtype=int)
+    columns: wp.array(dtype=int)
+    coefficients_net: wp.array(dtype=int)
     orders: wp.array2d(dtype=int)
     coefficients: wp.array2d(dtype=wp.float64)
     atol: wp.array(dtype=wp.float64)
@@ -96,12 +98,15 @@ def _rate(m: DeviceMechanism, w: Work, box: int, slot: int, target: int):
         if not wp.isfinite(x) or x < 0:
             return False
         w.vectors[box, target, i] = wp.float64(0)
-    for r in range(m.net.shape[0]):
+    for r in range(m.orders.shape[0]):
         flux = _product(m, w, box, slot, r, -1)
         if not wp.isfinite(flux):
             return False
-        for i in range(m.lanes.shape[0]):
-            w.vectors[box, target, i] += flux * wp.float64(m.net[r, i])
+        for term in range(m.offsets[r], m.offsets[r + 1]):
+            i = m.columns[term]
+            w.vectors[box, target, i] += flux * wp.float64(
+                m.coefficients_net[term]
+            )
     return True
 
 
@@ -149,10 +154,13 @@ def _factor(m: DeviceMechanism, w: Work, b: int, h: wp.float64):  # noqa: C901
         for i in range(n):
             w.matrix[b, i, j] = wp.float64(0)
         w.matrix[b, j, j] = wp.float64(1) / (GAMMA * h)
-        for r in range(m.net.shape[0]):
+        for r in range(m.orders.shape[0]):
             partial = _product(m, w, b, Y, r, j)
-            for i in range(n):
-                w.matrix[b, i, j] -= partial * wp.float64(m.net[r, i])
+            for term in range(m.offsets[r], m.offsets[r + 1]):
+                i = m.columns[term]
+                w.matrix[b, i, j] -= partial * wp.float64(
+                    m.coefficients_net[term]
+                )
         for i in range(n):
             w.lu[b, i, j] = w.matrix[b, i, j]
     for k in range(n):
@@ -259,7 +267,7 @@ def integrate_boxes(  # noqa: C901
     if failure[0] != 0:
         return
     temp = temperature[b]
-    for r in range(m.net.shape[0]):
+    for r in range(m.orders.shape[0]):
         k = (
             m.coefficients[r, 0]
             * wp.pow(temp / m.coefficients[r, 3], m.coefficients[r, 1])

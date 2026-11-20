@@ -38,6 +38,14 @@ def _resolve_species(mechanism, gas, overrides):
     return names, species, indices, masses
 
 
+def _sparse_stoichiometry(rows):
+    """Compile reaction offsets, affected columns and signed coefficients."""
+    values = np.asarray(rows, dtype=np.int64)
+    reactions, columns = values.nonzero()
+    offsets = np.r_[0, np.cumsum(np.bincount(reactions, minlength=len(rows)))]
+    return offsets, columns, values[reactions, columns]
+
+
 def _compile_network(mechanism, species, masses):
     stoichiometry, orders, parameters = [], [], []
     for reaction in mechanism.reactions:
