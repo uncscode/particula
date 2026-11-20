@@ -1238,5 +1238,21 @@
     ],
     "plot_inputs": [],
     "full_canvas": true
+  },
+  "native-gas-chemistry": {
+    "title": "Track a gas reaction through a chamber pulse",
+    "source": "docs/examples/processes/customization/native_gas_chemistry.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 240,
+    "inputs": [],
+    "invoke": "report = simulate()\nfigure = plot_results(report)\nplt.show()",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\nfigure = plot_results(report)\nplt.show()",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": [],
+    "full_canvas": true
   }
 }

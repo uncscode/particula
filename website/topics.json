@@ -1771,6 +1771,14 @@
       "start_here": false
     },
     {
+      "source": "docs/examples/processes/customization/native_gas_chemistry.py",
+      "title": "Track a gas reaction through a chamber pulse",
+      "topic": "custom",
+      "also": [],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
       "source": "docs/examples/processes/customization/timed_box_chemistry.py",
       "title": "Distinguish chemical conversion from a timed emission and dilution",
       "topic": "custom",
@@ -2557,6 +2565,22 @@
     {
       "source": "docs/contribute/validation/numerics/scientific-correctness.md",
       "title": "Scientific correctness reference baseline",
+      "topic": "verification-scientific",
+      "also": [],
+      "role": "Contribute",
+      "start_here": false
+    },
+    {
+      "source": "docs/guide/processes/gas-chemistry.md",
+      "title": "Define a gas reaction mechanism",
+      "topic": "processes",
+      "also": [],
+      "role": "Guide",
+      "start_here": false
+    },
+    {
+      "source": "docs/contribute/validation/numerics/gas-chemistry.md",
+      "title": "Native gas chemistry qualification",
       "topic": "verification-scientific",
       "also": [],
       "role": "Contribute",
