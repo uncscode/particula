@@ -4,7 +4,7 @@
 # If two collision formulas agree on a GPU, does that make them the same physical
 # model? Here you will separate implementation agreement from model disagreement
 # by holding the dimensionless inputs fixed. The
-# [charged coagulation examples](../../../../examples/processes/coagulation/charge/coagulation_with_charge_functional.py)
+# [charged coagulation examples](../../../examples/particle-processes/coagulation/charged-particles/coagulation_with_charge_functional.py)
 # connect these inputs to particle size and charge.
 #
 # A charged Brownian kernel is a complete collision model, not a correction

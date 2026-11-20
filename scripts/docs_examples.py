@@ -36,6 +36,12 @@ def registry():
     return json.loads(CONFIG.read_text())
 
 
+def import_study(key):
+    """Import a published Python study using its stable execution key."""
+    source = Path(registry()[key]["source"])
+    return importlib.import_module(".".join(source.with_suffix("").parts))
+
+
 def sections(source):
     """Read percent sections without creating a notebook file."""
     import jupytext

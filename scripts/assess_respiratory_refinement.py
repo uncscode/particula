@@ -27,7 +27,10 @@ from particula.execution.gpu_resident_condensation import (
 from scripts.docs_examples import GIT, package_source_hash, package_versions
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = "docs/examples/simulations/cough_droplets_partitioning.py"
+SOURCE = (
+    "docs/studies/examples/coupled-populations/emissions/"
+    "cough_droplets_partitioning.py"
+)
 # Prospective consistency targets, not bounds on global or physical error.
 TARGETS = {"radius_relative": 1e-3, "phase_inventory_fraction": 1e-3}
 

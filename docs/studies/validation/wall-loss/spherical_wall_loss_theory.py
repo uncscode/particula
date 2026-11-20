@@ -377,4 +377,4 @@ if __name__ == "__main__":
 # a proposed next investigation.
 #
 # Continue with the [wall-loss guide](../../../guide/processes/wall-loss.md)
-# or [spherical strategy example](../../../examples/processes/wall-loss/spherical_wall_loss_strategy.py).
+# or [spherical strategy example](../../examples/particle-processes/wall-loss/spherical_wall_loss_strategy.py).

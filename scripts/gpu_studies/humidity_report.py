@@ -117,7 +117,9 @@ def metadata():
             Path("scripts/gpu_studies") / f"humidity_{name}.py"
             for name in ("campaign", "matrix", "references", "restart")
         ),
-        Path("docs/examples/thermodynamics/activity/bat_humidity_pulse.py"),
+        Path(
+            "docs/studies/benchmarks/bat-humidity-pulse/bat_humidity_pulse.py"
+        ),
     ]
     return dict(
         revision=subprocess.check_output(  # noqa: S603, S607

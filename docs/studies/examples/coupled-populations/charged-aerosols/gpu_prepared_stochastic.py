@@ -9,7 +9,7 @@
 # Would a second simulation tell the same physical story if only its collision
 # seed changed? This experiment isolates process randomness from initial sampling.
 # It teaches you to compare an ensemble spread with a proposed model effect.
-# Start with [particle-resolved coagulation](../../../../examples/processes/coagulation/coagulation_3_particle_resolved_pattern.py)
+# Start with [particle-resolved coagulation](../../../tutorials/coagulation-populations/coagulation_3_particle_resolved_pattern.py)
 # for the number-loss and material-conservation distinction.
 #
 # Sixteen boxes each begin with 1,024 active, mixed-material particles.

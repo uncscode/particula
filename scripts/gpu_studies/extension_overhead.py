@@ -65,7 +65,9 @@ def run(args):
         example = runpy.run_path(
             str(
                 args.source_root
-                / ("docs/examples/gpu/prepared/custom_process_backends.py")
+                / (
+                    "docs/studies/examples/custom-processes/custom_process_backends.py"
+                )
             )
         )
         process_type = example["PrescribedWarming"]
