@@ -6,7 +6,8 @@ and irreversible mass action with constant or Arrhenius rates. NumPy and
 resident CUDA qualified the analytical and stiff cases with same-backend
 restart. See the [mechanism guide](../docs/guide/processes/gas-chemistry.md)
 and [qualification evidence](../docs/contribute/validation/numerics/gas-chemistry.md).
-The optional converter, particle reactions and coupled uptake remain open.
+The NCAR 1.3.0 gas converter passed the analytical cases on both backends.
+Particle reactions and coupled uptake remain open.
 
 Dependencies: [Stage 1 accounting and verification](stage-01-scientific-correctness.md),
 [Stage 2A solver assessment](stage-02a-numerical-integration.md),
@@ -103,10 +104,10 @@ species indices, sparse stoichiometry, orders, rate identifiers, and parameters.
 Keep solver choice replaceable. Arbitrary Python rate callbacks remain CPU-only
 unless an explicit supported GPU implementation is supplied.
 
-### Next gap: import an external gas mechanism
+### Import an external gas mechanism
 
 A researcher with an NCAR mechanism currently has to transcribe its reactions
-and rate units. Plan a one-way converter from **NCAR Mechanism Configuration
+and rate units. The implemented converter translates **NCAR Mechanism Configuration
 1.3.0** to native Particula v1 JSON or YAML. The output goes through
 `ReactionMechanism.from_dict`, `save`, and the existing gas binding. Users can
 inspect it and run it on either backend without the NCAR parser or a compiler.

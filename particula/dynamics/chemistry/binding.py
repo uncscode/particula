@@ -29,6 +29,12 @@ def _resolve_species(mechanism, gas, overrides):
     masses = tuple(float(gas.molar_mass[i]) for i in indices)
     if not all(np.isfinite(m) and m > 0 for m in masses):
         raise ValueError("bound species need finite positive gas molar masses")
+    declared = dict(mechanism.declared_masses)
+    for name, mass in zip(species, masses, strict=True):
+        if name in declared and not np.isclose(
+            mass, declared[name], rtol=1e-12, atol=0
+        ):
+            raise ValueError(f"{name}: gas molar mass disagrees with mechanism")
     return names, species, indices, masses
 
 

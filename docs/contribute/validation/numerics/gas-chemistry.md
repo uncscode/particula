@@ -75,6 +75,18 @@ rounding of those constants to float32 produced an error floor near
 checks the refined solution. This study establishes no GPU speedup or
 large-network scaling claim.
 
+## NCAR gas mechanism import
+
+The converter tests an A → C exponential and an A + B → C bimolecular
+trajectory at 298 and 318 K. The source documents use nonzero temperature
+exponents, per-molecule activation energy or its kelvin equivalent, and a
+different species order from the simulation. Rates from the imported and
+independently authored native mechanisms meet the 10⁻¹² relative bound.
+Both boxes meet the analytical trajectory and inventory checks on NumPy,
+Warp CPU and an RTX 5060. Fourteen conversion cases passed, including
+rejections that preserve the destination file. The pinned NCAR full example
+also rejected its unsupported emissions section.
+
 ## Warp compatibility
 
 The ROS3 back substitution uses an explicit read, divide and store for its

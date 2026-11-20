@@ -1,0 +1,19 @@
+version: 1.3.0
+name: Closed gas combination
+species:
+  - {name: A, "molecular weight [kg mol-1]": 0.01}
+  - {name: B, "molecular weight [kg mol-1]": 0.02}
+  - {name: C, "molecular weight [kg mol-1]": 0.03}
+phases:
+  - name: gas
+    species: [{name: A}, {name: B}, {name: C}]
+reactions:
+  - name: combine
+    type: ARRHENIUS
+    gas phase: gas
+    reactants: [{species name: A}, {species name: B}]
+    products: [{species name: C}]
+    A: 2.0
+    B: 1.0
+    C: -120.0
+    D: 298.0

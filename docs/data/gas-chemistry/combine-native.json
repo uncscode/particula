@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "basis": "mol/m^3-air",
+  "species": {
+    "gas:A": {
+      "molar_mass_kg_per_mol": 0.01
+    },
+    "gas:B": {
+      "molar_mass_kg_per_mol": 0.02
+    },
+    "gas:C": {
+      "molar_mass_kg_per_mol": 0.03
+    }
+  },
+  "reactions": [
+    {
+      "id": "combine",
+      "reactants": {
+        "gas:A": 1,
+        "gas:B": 1
+      },
+      "products": {
+        "gas:C": 1
+      },
+      "orders": {
+        "gas:A": 1,
+        "gas:B": 1
+      },
+      "rate": {
+        "type": "arrhenius",
+        "units": "m^3/mol/s",
+        "A": 2.0,
+        "b": 1.0,
+        "Ea_J_per_mol": 997.7355141783887,
+        "T_ref_K": 298.0
+      }
+    }
+  ]
+}
