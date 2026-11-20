@@ -4,9 +4,17 @@ At 20 °C in the CERN CLOUD chamber, raising relative humidity (RH) from 7% to 7
 
 ![At 70% humidity the measured 1,768 ions per cubic centimetre exceed the loss ceiling of 394. The proposed experiment clears ions for 120 seconds and samples recovery after release.](../../../images/cloud-ion-humidity/graphical-abstract.svg)
 
-## A well-mixed chamber explains the dry concentration
+## Where does the ion balance reproduce the humidity series?
 
 Franchin and colleagues varied ion production with a particle beam in a 26.1 m³ chamber. Their spectrometer sampled positive and negative cluster ions. Figure 5d gives the mean concentration of the two signs, averaged over the final 10–15 minutes of each setting. The dry and humid measurements came from separate runs. [Experimental method and Figure 5d](https://acp.copernicus.org/articles/15/7203/2015/)
+
+![Across ion production rates, the humidity-specific curves follow most observations at 0%, 7% and 40% relative humidity. At 70%, five of six measured concentrations lie above the shaded range.](../../../images/cloud-ion-humidity/humidity-sweep.png)
+
+*Mean ion concentration per polarity at 20 °C. Open circles and vertical bars are the measurements and scatter digitized from Franchin et al., Figure 5d. The dashed curve uses a fixed recombination coefficient of 1.7 × 10⁻⁶ cm³ s⁻¹. Each solid curve uses the coefficient fitted for that humidity in Table A2. Shading spans the reported ranges of recombination and first-order loss. Diamonds show Particula CUDA ensemble means at 2, 20 and 65 ion pairs cm⁻³ s⁻¹, with 95% Monte Carlo intervals.* [Franchin et al., Figure 5d](https://acp.copernicus.org/articles/15/7203/2015/acp-15-7203-2015.pdf#page=6) · [Table A2](https://acp.copernicus.org/articles/15/7203/2015/acp-15-7203-2015.pdf#page=10)
+
+Using the humidity-specific coefficients puts **21 of 23 measured concentrations** inside the shaded range across 0%, 7% and 40% RH. At **70% RH, only one of six** falls inside. The other five remain above the band even at the lower ends of their plotted bars. The 0% series ends near 22 ion pairs cm⁻³ s⁻¹, so the curves at higher production in that panel are extrapolations.
+
+## Comparing dry and humid air at the same production rate
 
 | RH | Measured source (ion pairs cm⁻³ s⁻¹) | Measured concentration and plotted bar (ions cm⁻³) | Particula ten-minute mean and 95% Monte Carlo interval (ions cm⁻³) |
 | --- | ---: | ---: | ---: |
@@ -16,7 +24,7 @@ Franchin and colleagues varied ion production with a particle beam in a 26.1 m³
 
 ![At high production the 7% measurement and simulated concentration coincide while the 70% reading lies above the simulation. At low production even the lower measurement bar is well above the loss ceiling.](../../../../website/results/cloud-ion-humidity/figure-2-1.png)
 
-The measured bars describe scatter in the steady readings. The simulation intervals describe sampling across independent boxes at fixed physical inputs. The two high-source simulations use 68 ion pairs cm⁻³ s⁻¹. Their independent standard errors add in quadrature for the humidity contrast. [Runnable comparison with all three figures](cloud_ion_humidity.py)
+The measured bars describe scatter in the steady readings. The simulation intervals describe sampling across independent boxes at fixed physical inputs. The two high-source simulations use 68 ion pairs cm⁻³ s⁻¹. Their independent standard errors add in quadrature for the humidity contrast. [Runnable matched-condition and clearing comparisons](cloud_ion_humidity.py)
 
 ## The low-source point sets a bound on losses
 
