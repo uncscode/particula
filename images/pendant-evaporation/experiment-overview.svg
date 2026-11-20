@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="640" viewBox="0 0 1120 640" role="img" aria-labelledby="title desc">
+  <title id="title">Testing heat and mass transfer around a continuously fed pentane drop</title>
+  <desc id="desc">Conceptual diagram, not to scale. Warm dry air passes a suspended drop replenished through a supply tube. Evaporation removes latent heat. The experiment measures the liquid feed needed to keep the drop size steady and the drop temperature. The model compares mass transport with heat supplied by convection. Feed, support and radiation heat inputs need separate constraints.</desc>
+  <defs>
+    <marker id="orange" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8" fill="#bd7319"/></marker>
+    <marker id="blue" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8" fill="#2463a6"/></marker>
+    <marker id="purple" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8" fill="#795398"/></marker>
+    <style>text{font-family:Arial,Helvetica,sans-serif;fill:#243344}.title{font-size:25px;font-weight:bold}.head{font-size:20px;font-weight:bold}.body{font-size:17px}.small{font-size:15px}.blue{fill:#2463a6}.orange{fill:#9c5b0e}.purple{fill:#795398}</style>
+  </defs>
+  <rect width="1120" height="640" rx="14" fill="#f8fafc"/>
+  <text x="32" y="44" class="title">A steady drop links the evaporation rate to its heat supply</text>
+  <text x="32" y="72" class="small">Conceptual overview of the fed-drop experiment • geometry and flow direction are schematic</text>
+
+  <rect x="32" y="96" width="640" height="370" rx="12" fill="white" stroke="#d6dfe9"/>
+  <path d="M340 120 L340 212 L366 212 L366 120" fill="#dce5ed" stroke="#63758b" stroke-width="2"/>
+  <path d="M350 130 L350 198" stroke="#2463a6" stroke-width="3" marker-end="url(#blue)"/>
+  <text x="389" y="132" class="head">Liquid supply</text>
+  <text x="389" y="157" class="body">Adjusted to keep</text>
+  <text x="389" y="181" class="body">the drop size steady</text>
+  <path d="M340 212 C338 250 290 275 290 322 C290 367 316 394 353 394 C392 394 420 365 420 322 C420 276 370 251 366 212 Z" fill="#dcecf8" stroke="#2463a6" stroke-width="3"/>
+  <text x="353" y="317" text-anchor="middle" class="head">Pentane</text>
+  <text x="353" y="342" text-anchor="middle" class="body">263.6 K</text>
+  <text x="353" y="449" text-anchor="middle" class="small">Reported horizontal diameter: 1.61 mm</text>
+
+  <text x="60" y="202" class="head orange">Warm dry air</text>
+  <text x="60" y="229" class="body orange">326 K</text>
+  <path d="M65 268 L285 268 M65 311 L275 311 M65 355 L280 355" stroke="#bd7319" stroke-width="3" marker-end="url(#orange)"/>
+  <text x="60" y="397" class="body orange">Convection supplies heat</text>
+  <path d="M421 284 C460 265 494 262 550 267 M435 319 L568 319 M420 354 C463 372 500 377 553 369" fill="none" stroke="#2463a6" stroke-width="3" marker-end="url(#blue)"/>
+  <text x="459" y="229" class="head blue">Vapor leaves</text>
+  <text x="455" y="400" class="small blue">Evaporation consumes</text>
+  <text x="455" y="422" class="small blue">latent heat</text>
+
+  <rect x="697" y="96" width="391" height="176" rx="12" fill="#ecf3f9" stroke="#ccdce9"/>
+  <text x="720" y="128" class="head">What the experiment measures</text>
+  <text x="720" y="161" class="body">• Feed rate needed to maintain drop size</text>
+  <text x="720" y="190" class="body">• Drop temperature and gas temperature</text>
+  <text x="720" y="219" class="body">• Drop dimensions and air velocity</text>
+  <text x="720" y="250" class="small">This case uses a reported dimensionless flux.</text>
+
+  <rect x="697" y="291" width="391" height="175" rx="12" fill="#ecf6f2" stroke="#c6e0d5"/>
+  <text x="720" y="323" class="head">What the model tests</text>
+  <text x="720" y="357" class="body">1. Can vapor transport explain the flux?</text>
+  <text x="720" y="388" class="body">2. Can convection supply its latent heat?</text>
+  <text x="720" y="427" class="small">The two predictions must agree at the</text>
+  <text x="720" y="449" class="small">same temperature for a steady solution.</text>
+
+  <rect x="32" y="489" width="1056" height="119" rx="12" fill="#f1edf6" stroke="#ded3e9"/>
+  <text x="54" y="520" class="head purple">Heat paths that need separate evidence</text>
+  <text x="54" y="551" class="body">Liquid feed enthalpy • conduction through the support tube • radiation from the surroundings</text>
+  <text x="54" y="580" class="small">These net inputs are set to zero in the convection-only baseline. The experiment may have nonzero inputs.</text>
+</svg>
