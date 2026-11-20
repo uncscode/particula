@@ -3,7 +3,7 @@
   <desc id="desc">At 20 degrees Celsius and 70 percent relative humidity, the low-source measurement was 1,768 ions per cubic centimetre. Even without recombination the linear-loss ceiling was 394. A proposed test clears the chamber, then measures the signal during recovery.</desc>
   <rect width="820" height="268" rx="12" fill="#f5f7f6"/>
   <g font-family="DejaVu Sans, sans-serif" fill="#243849">
-    <text x="28" y="38" font-size="23" font-weight="bold">Why are there so many ions in humid air?</text>
+    <text x="28" y="38" font-size="23" font-weight="bold">Humid CLOUD ion counts exceed the modeled loss ceiling</text>
     <text x="28" y="66" font-size="16">CERN CLOUD · 20 °C · 70% relative humidity · 2.64 ion pairs cm⁻³ s⁻¹</text>
     <path d="M28 82H792" stroke="#bccbcf"/>
     <text x="28" y="112" font-size="17" font-weight="bold">Measured ions per polarity</text>

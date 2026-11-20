@@ -149,7 +149,7 @@ result means for someone designing an experiment or interpreting data. If
 the evidence leaves the question open, say what remains unresolved and why
 it matters.
 
-Use the title and section headings to state findings. For example,
+Use [particula-studies-literature](../plugins/particula-helper/skills/particula-studies-literature/SKILL.md) for the analysis and write-up. Answer the study question in the title. A measured contrast, its direction and the condition where it appears give readers a reason to open the report. Carry that claim through the section headings. For example,
 “Particula assigns 102 nm to a 100.7 nm dry PSL standard near atmospheric
 pressure” names the quantity, reference and conditions. In the text, spell
 out polystyrene latex (PSL) and explain how electrical mobility is converted

@@ -10,6 +10,8 @@ documentation, example authoring and review. It packages instructions and Python
 assistant supplies the tools to read files and execute Python. No hosted
 simulation service or MCP server is included.
 
+Use `particula-studies-literature` for simulation analysis and literature reports. In plugin versions through 0.3.4, the analysis skill is named `particula-analyze`.
+
 ## Find documentation from an assistant
 
 The [LLM documentation index](https://uncscode.github.io/particula/llms.txt)

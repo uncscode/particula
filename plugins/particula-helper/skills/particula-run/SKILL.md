@@ -10,7 +10,7 @@ description: "Execute local Particula simulations and parameter sweeps reproduci
 4. Preserve logs, exit status, version/parameter metadata and outputs. A failed run is not a completed simulation even if partial files exist. The example writes run.json only after its numerical checks pass.
 5. Inspect time_series.csv, distribution.csv, result.png and run.json. Confirm relevant physical budgets and compare a smaller time step when drawing quantitative conclusions.
 6. For sweeps use separate run directories and an explicit parameter matrix. Summarize success/failure per case and do not discard inconvenient outcomes.
-Report what actually ran, scientific assumptions, numerical checks, output links and limitations. Use particula-analyze for interpretation. Never upload research data or start a hosted job unless requested.
+Report what actually ran, scientific assumptions, numerical checks, output links and limitations. Use particula-studies-literature for interpretation. Never upload research data or start a hosted job unless requested.
 
 ## Shared operating rules
 Use the selected interpreter’s `python -m particula_docs --json` to locate and search version-matched installed docs before relying on the live site; see `../../references/sources.md` for commands and older-version fallback.

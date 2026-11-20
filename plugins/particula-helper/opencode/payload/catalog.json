@@ -1,9 +1,5 @@
 [
   {
-    "description": "Analyze and visualize Particula simulation results or compare them with observations; use for plots, conservation checks, convergence, uncertainty, and reproducibility reports.",
-    "name": "particula-analyze"
-  },
-  {
     "description": "Design and write Particula aerosol simulations; use for scripts, notebooks, process selection, parameter sweeps, or translating a research question into a model.",
     "name": "particula-build"
   },
@@ -46,6 +42,10 @@
   {
     "description": "Set up and inspect a local Particula Python environment; use for installation, dependency problems, environment selection, or first-run verification.",
     "name": "particula-setup"
+  },
+  {
+    "description": "Analyze Particula simulations and write literature studies comparing model predictions with published measurements or theory. Use for quantitative figures, conservation, convergence, uncertainty and finding-led research reports.",
+    "name": "particula-studies-literature"
   },
   {
     "description": "Write or run Particula repository tests, numerical parity and conservation checks, lint/type checks, or release validation; use to choose the correct package, example, infrastructure, or GPU suite.",

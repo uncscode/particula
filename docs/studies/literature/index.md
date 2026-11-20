@@ -9,7 +9,7 @@ Follow comparisons with published measurements, reference calculations and datas
 - [Evaporation and reactive uptake](evaporation-and-uptake/index.md)
 - [NaCl nanoparticle scavenging in a chamber](nacl-scavenging/index.md)
 - [Particle water uptake and activation](particle-water-uptake/index.md)
-- [What can CLOUD measurements tell us about ion loss in humid air?](cloud-ion-humidity/index.md)
+- [Particula predicts half the rise in ion concentration CLOUD measured from 7% to 70% humidity](cloud-ion-humidity/index.md)
 - [Π Chamber experiments and modeling](pi-chamber/index.md)
 - [CUDA wall loss agrees with spherical deposition theory](../validation/wall-loss/index.md)
 <!-- STUDY_LIST_END -->
