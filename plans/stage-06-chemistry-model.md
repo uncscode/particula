@@ -240,6 +240,46 @@ already assessed these methods. Select a chemistry method by measuring
 its trajectory errors, admissibility, conservation and cost for the compiled
 mechanism. [Stage 2A assessment](../docs/contribute/validation/numerics/adaptive-methods.md)
 
+## Proposed follow-on: condensation and particle aging of the same vapor
+
+The current [coupling test](../particula/dynamics/chemistry/tests/resolved_test.py)
+condenses one vapor and then consumes a different gas on the enlarged surface.
+It leaves a practical question open. When a semivolatile vapor condenses and
+its particle material reacts, how accurately does the split simulation predict
+the gas left over, material available to evaporate and retained product?
+
+1. **Define a closed reference case.** In one isothermal box with two
+   differently sized, weighted seed populations, map gas X to particle X
+   through reversible kinetic condensation. Convert particle X to a
+   nonvolatile isomer Y by first-order bulk chemistry. Use equal molar masses,
+   fixed counts and explicit densities. Condensation owns every transfer of X
+   across the interface. Chemistry debits particle X and credits Y once.
+   Start with a condensation case and a separate undersaturated case with
+   particle X initially present so evaporation competes with conversion.
+2. **Establish the independent reference.** Integrate the gas and both
+   populations' X and Y together with a high-accuracy reference ODE. Evaluate
+   the documented condensation flux and composition-dependent equilibrium
+   vapor pressure independently of the production step functions. Check the
+   zero-reaction and zero-transfer limits before comparing coupled runs.
+   Tighten reference tolerances until the change in every reservoir is below
+   one tenth of the trajectory acceptance threshold.
+3. **Measure process-order error on NumPy and resident CUDA.** Compare both
+   sequential orders and a symmetric schedule at four successively halved
+   outer timesteps, using identical observation times and tighter internal
+   solver controls. Track gas X and each population's X and Y separately.
+   Require nonnegative reservoirs, invariant counts and inert seed mass, and
+   total X+Y closure within the existing relative budget of 10⁻¹². At the
+   finest step require every reservoir to agree with the reference within
+   10⁻⁴ of initial total X inventory. Report error versus timestep for each
+   ordering and the largest tested step meeting this target on both backends.
+4. **Publish the operating range.** Put the runnable regression beside the
+   existing coupling test and the reference, tested timescales and measured
+   errors in the [resolved qualification record](../docs/contribute/validation/numerics/resolved-chemistry.md).
+   Link the measured timestep guidance from the process guide. Stage 2A owns
+   reusable splitting schedules, Stage 3A owns activity models, and Stage 6
+   owns this coupling test. The first case uses the existing ideal activity
+   model and existing condensation and bulk-reaction laws.
+
 ## Owning implementation and evidence
 
 - [Gas metadata](../particula/gas/gas_data.py),
