@@ -57,6 +57,7 @@ def test_corrected_external_handoff_passes_despite_release_metadata(
     "missing",
     [
         "pyproject.toml",
+        "scripts/gpu_studies/cases.py",
         "conftest.py",
         "docs/examples/processes/dilution/cpu_dilution.py",
         "examples_tests/dilution_example_test.py",

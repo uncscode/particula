@@ -36,6 +36,7 @@ test:
     - pyproject.toml
     - conftest.py
     - scripts/run_release_tests.py
+    - scripts/gpu_studies/cases.py
     - docs/examples/processes/dilution/cpu_dilution.py
     - docs/examples/processes/nucleation/cpu_nucleation.py
     - docs/examples/processes/condensation/condensation_latent_heat.py
@@ -45,6 +46,7 @@ test:
   commands:
     - python scripts/run_release_tests.py --installed
     - python scripts/run_release_tests.py --installed --suite examples
+    - python scripts/run_release_tests.py --installed --suite coupled-cpu
 
 about:
   home: https://uncscode.github.io/particula

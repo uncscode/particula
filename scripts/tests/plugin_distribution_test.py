@@ -153,7 +153,7 @@ def test_workflow_release_version_gate(
 ):
     """Run CI's actual gate against version bumps, reruns and non-push events."""
     workflow = yaml.safe_load(
-        (builder.ROOT / ".github/workflows/assistant-plugins.yml").read_text()
+        (builder.ROOT / ".github/workflows/pypi.yml").read_text()
     )
     step = next(
         step
@@ -197,10 +197,43 @@ def test_workflow_release_version_gate(
         assert values["artifact"] == f"particula-helper-{current}-{'b' * 40}"
 
 
+def test_plugin_release_waits_for_all_contracts_on_version_bumps():
+    """A successful smoke alone cannot authorize plugin-only publication."""
+    workflow = yaml.safe_load(
+        (builder.ROOT / ".github/workflows/pypi.yml").read_text()
+    )
+    jobs = workflow["jobs"]
+    assert jobs["plugin-release"]["needs"] == "validate"
+    steps = jobs["validate"]["steps"]
+    gate = next(
+        i for i, step in enumerate(steps) if step.get("id") == "package"
+    )
+    smoke = next(
+        i
+        for i, step in enumerate(steps)
+        if "::test_relocated_archives_smoke" in step.get("run", "")
+    )
+    contracts = next(
+        i
+        for i, step in enumerate(steps)
+        if '-k "not relocated_archives_smoke"' in step.get("run", "")
+    )
+    upload = next(
+        i for i, step in enumerate(steps) if step.get("id") == "upload"
+    )
+    assert gate < contracts < upload
+    assert smoke < upload and "if" not in steps[smoke]
+    assert steps[contracts]["if"] == (
+        "github.event_name == 'workflow_dispatch' || "
+        "steps.package.outputs.version-increased == 'true'"
+    )
+    assert not steps[contracts].get("continue-on-error")
+
+
 def test_workflow_builds_every_main_merge_without_path_filters():
     """Library-only merges and merge queues must also check plugin packages."""
     workflow = yaml.safe_load(
-        (builder.ROOT / ".github/workflows/assistant-plugins.yml").read_text(),
+        (builder.ROOT / ".github/workflows/pypi.yml").read_text(),
     )
     # PyYAML's YAML 1.1 parser treats the unquoted GitHub key `on` as True.
     triggers = workflow.get("on", workflow.get(True))
@@ -221,10 +254,12 @@ def test_workflow_publishes_or_preserves_release(
 ):
     """Execute the release shell with a fake CLI, never contacting GitHub."""
     workflow = yaml.safe_load(
-        (builder.ROOT / ".github/workflows/assistant-plugins.yml").read_text()
+        (builder.ROOT / ".github/workflows/pypi.yml").read_text()
     )
     job = workflow["jobs"]["plugin-release"]
-    step = next(step for step in job["steps"] if "run" in step)
+    step = next(
+        step for step in job["steps"] if "gh release" in step.get("run", "")
+    )
     assets = tmp_path / "plugin-dist"
     assets.mkdir()
     names = [
@@ -355,7 +390,7 @@ def test_publication_requires_validated_upstream_version_bump(
 ):
     """Forks, other events/branches and same-version pushes cannot publish."""
     workflow = yaml.safe_load(
-        (builder.ROOT / ".github/workflows/assistant-plugins.yml").read_text()
+        (builder.ROOT / ".github/workflows/pypi.yml").read_text()
     )
     job = workflow["jobs"]["plugin-release"]
     assert job["needs"] == "validate"
@@ -372,14 +407,11 @@ def test_plugin_release_does_not_publish_python_or_reattach_assets(
     tag, expected
 ):
     """Published plugin tags skip PyPI and the library asset attachment job."""
-    for filename, job_name in [
-        ("pypi.yml", "release-plan"),
-        ("assistant-plugins.yml", "release-assets"),
-        ("assistant-plugins.yml", "validate"),
-    ]:
-        workflow = yaml.safe_load(
-            (builder.ROOT / ".github/workflows" / filename).read_text()
-        )
+    workflow = yaml.safe_load(
+        (builder.ROOT / ".github/workflows/pypi.yml").read_text()
+    )
+    assert "release-assets" not in workflow["jobs"]
+    for job_name in ("release-plan", "validate", "testing"):
         assert (
             _workflow_condition(
                 workflow["jobs"][job_name]["if"],
@@ -447,21 +479,31 @@ def test_skills_relocate_with_their_references(tmp_path):
                         pending.append(target)
 
 
-@pytest.mark.skipif(
-    importlib.util.find_spec("matplotlib") is None,
-    reason="Plotting smoke runs in assistant-plugins CI with Matplotlib",
-)
-def test_archives_reproducible_and_relocated_smoke(tmp_path):
-    """Every shipped helper works after extraction without the source tree."""
+def test_archives_reproducible(tmp_path):
+    """Two builds from the same source have identical archives."""
     manifest, _ = builder.validate()
     first, second = tmp_path / "first", tmp_path / "second"
     builder.build(first, manifest)
     builder.build(second, manifest)
-    for archive_path in first.glob("*.zip"):
-        assert (
-            archive_path.read_bytes()
-            == (second / archive_path.name).read_bytes()
-        )
+    for path in first.glob("*.zip"):
+        assert path.read_bytes() == (second / path.name).read_bytes()
+
+
+@pytest.mark.skipif(
+    importlib.util.find_spec("matplotlib") is None,
+    reason="The archive smoke test requires Matplotlib",
+)
+def test_relocated_archives_smoke(tmp_path):
+    """Exercise the actual release ZIPs when supplied by the packaging job."""
+    directory = os.environ.get("PARTICULA_PLUGIN_DIST")
+    if directory:
+        archives = Path(directory)
+    else:
+        archives = tmp_path / "archives"
+        manifest, _ = builder.validate()
+        builder.build(archives, manifest)
+    for host in ("codex", "claude", "opencode"):
+        archive_path = archives / f"particula-helper-{host}.zip"
         destination = tmp_path / archive_path.stem
         with zipfile.ZipFile(archive_path) as archive:
             names = archive.namelist()
