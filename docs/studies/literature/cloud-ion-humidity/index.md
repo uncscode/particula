@@ -1,6 +1,6 @@
 # Particula predicts half the rise in ion concentration CLOUD measured from 7% to 70% humidity
 
-![Relative humidity increases to the right and ion concentration per polarity (ions/cm³) increases upward. The measured rise exceeds the model prediction. A beam produces positive and negative ions.](../../../images/cloud-ion-humidity/graphical-abstract.svg)
+![The horizontal axis runs from dry to humid air, and ion concentration per polarity (ions/cm³) increases upward. The measured rise exceeds the model prediction. A beam produces positive and negative ions.](../../../images/cloud-ion-humidity/graphical-abstract.svg)
 
 At 20 °C in the CERN CLOUD chamber, raising relative humidity (RH) from 7% to 70% at nearly the same ion production rate increased the measured concentration by **3,399 ions cm⁻³ per polarity**. A particle-resolved Particula simulation using the published recombination coefficients and a shared wall loss reproduced **1,691 ± 25 ions cm⁻³** of that increase. The strongest constraint comes from a second, low-production measurement. Even if recombination stopped entirely, the humid chamber reading would exceed the modeled ceiling by more than a factor of four. [Franchin et al. (2015), Figure 5d and Table A2](https://acp.copernicus.org/articles/15/7203/2015/acp-15-7203-2015.pdf)
 
