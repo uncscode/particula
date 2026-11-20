@@ -37,4 +37,9 @@
   <circle cx="34" cy="215" r="7.5" fill="#f7f2e7" stroke="#163e46" stroke-width="4.5"/>
   <circle cx="211" cy="109" r="11" fill="#114d5a" stroke="#fff6df" stroke-width="6"/>
   <path d="M211 150 L223 162 L211 174 L199 162Z" fill="#ffaf71"/>
+  <g font-family="sans-serif" font-size="17" font-weight="600">
+    <text x="184" y="91" text-anchor="middle" fill="#fff6df">CLOUD</text>
+    <text x="210" y="194" text-anchor="middle" fill="#ffcfac">Particula</text>
+    <text x="292" y="249" text-anchor="end" fill="#344d58">Beam</text>
+  </g>
 </svg>
