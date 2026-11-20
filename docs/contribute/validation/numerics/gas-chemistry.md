@@ -75,6 +75,14 @@ rounding of those constants to float32 produced an error floor near
 checks the refined solution. This study establishes no GPU speedup or
 large-network scaling claim.
 
+## Warp compatibility
+
+The ROS3 back substitution uses an explicit read, divide and store for its
+three-dimensional work array. Warp 1.19.0 rejected the earlier in-place
+division during kernel compilation. All 32 chemistry and chamber tests
+passed with Warp 1.11.1 and again with 1.19.0 on the RTX 5060 host,
+including the Warp CPU and CUDA cases.
+
 ## Reproduce
 
 From the checked-out repository in a CUDA-capable environment:

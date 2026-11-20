@@ -201,7 +201,7 @@ def _solve(m: DeviceMechanism, w: Work, b: int, target: int):  # noqa: C901
             i = n - 1 - reverse
             for j in range(i + 1, n):
                 w.vectors[b, DELTA, i] -= w.lu[b, i, j] * w.vectors[b, DELTA, j]
-            w.vectors[b, DELTA, i] /= w.lu[b, i, i]
+            w.vectors[b, DELTA, i] = w.vectors[b, DELTA, i] / w.lu[b, i, i]
             w.vectors[b, target, i] += w.vectors[b, DELTA, i]
         w.counts[b, 3] += wp.int64(1)
 
