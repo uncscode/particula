@@ -132,6 +132,8 @@ a worktree. On restart, reconcile the register with existing worktrees and PRs.
 4. **Publish the approved comparison.** Publish the reviewed report and its script
    together under [Literature analyses](../docs/studies/literature/index.md).
    Keep the observable, comparison, provenance and limitations with the report.
+   For a table-of-contents figure, pair the report title with a square graphic
+   using [particula-toc](../plugins/particula-helper/skills/particula-toc/SKILL.md).
    Link its run key, topics and supporting evidence from the canonical study
    record. Put compact, redistributable inputs in [docs/data/](../docs/data/).
    Register the example, refresh its saved results in `website/results/`, and

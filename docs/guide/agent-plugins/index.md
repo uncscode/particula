@@ -3,14 +3,16 @@
 <a id="ai-assistants"></a>
 <a id="agentic-plugins"></a>
 
-Particula Helper provides seven researcher workflows: environment setup,
-guidance, simulation design, execution, analysis, debugging and issue reporting,
+Particula Helper provides eight researcher workflows: environment setup,
+guidance, simulation design, execution, analysis, TOC figure design, debugging and issue reporting,
 plus six repository development skills for planning, implementation, testing,
 documentation, example authoring and review. It packages instructions and Python examples; your
 assistant supplies the tools to read files and execute Python. No hosted
 simulation service or MCP server is included.
 
 Use `particula-studies-literature` for simulation analysis and literature reports. In plugin versions through 0.3.4, the analysis skill is named `particula-analyze`.
+
+Use `particula-toc` to design a 3 × 3 inch graphical abstract around one relationship from the study.
 
 ## Find documentation from an assistant
 

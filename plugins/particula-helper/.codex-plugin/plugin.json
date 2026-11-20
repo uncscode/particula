@@ -16,7 +16,7 @@
     "displayName": "Particula Helper",
     "logo": "./assets/icon.png",
     "logoDark": "./assets/icon-dark.png",
-    "longDescription": "Seven researcher workflows for setup, guidance, simulation design, execution, analysis, debugging and issue reporting, plus six Particula repository skills for planning, development, testing, documentation, illustrated example authoring and review. Uses the selected checkout and environment. Reports require researcher review before posting. No hosted service, automatic Python installation or MCP server is included.",
+    "longDescription": "Eight researcher workflows for setup, guidance, simulation design, execution, analysis, TOC figure design, debugging and issue reporting, plus six Particula repository skills for planning, development, testing, documentation, illustrated example authoring and review. Uses the selected checkout and environment. Reports require researcher review before posting. No hosted service, automatic Python installation or MCP server is included.",
     "shortDescription": "Learn, run, analyze aerosols"
   },
   "requires_local_executor": true

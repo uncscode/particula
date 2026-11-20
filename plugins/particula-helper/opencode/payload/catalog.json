@@ -50,5 +50,9 @@
   {
     "description": "Write or run Particula repository tests, numerical parity and conservation checks, lint/type checks, or release validation; use to choose the correct package, example, infrastructure, or GPU suite.",
     "name": "particula-test"
+  },
+  {
+    "description": "Design or revise a square scientific table-of-contents (TOC) figure or graphical abstract to accompany a study title. Use for thumbnail composition, scientific visual metaphors, accessible descriptions and print-ready export.",
+    "name": "particula-toc"
   }
 ]

@@ -30,6 +30,7 @@ SKILLS = {
     "particula-plan",
     "particula-develop",
     "particula-test",
+    "particula-toc",
     "particula-docs",
     "particula-examples",
     "particula-review",
