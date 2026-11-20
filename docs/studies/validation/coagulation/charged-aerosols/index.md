@@ -1,5 +1,7 @@
 # Charged coagulation and atmospheric ion validation
 
+For a measured chamber comparison, see how the same ion processes reconstruct the humidity response in the CERN CLOUD experiment. [CLOUD humidity study](../../../literature/cloud-ion-humidity/index.md)
+
 ## Current corrected-model qualification
 
 The corrected CPU/GPU charged Knudsen normalization passed a fresh twenty-case

@@ -1312,5 +1312,24 @@
     ],
     "plot_inputs": [],
     "full_canvas": false
+  },
+  "cloud-ion-humidity": {
+    "title": "Reproduce the CLOUD ion balance and clearing test",
+    "source": "docs/studies/literature/cloud-ion-humidity/cloud_ion_humidity.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 600,
+    "inputs": [
+      "scripts/cloud_ion_humidity/study.py",
+      "scripts/cloud_ion_humidity/plots.py",
+      "docs/data/cloud-ion-humidity/figure5d.csv",
+      "docs/data/cloud-ion-humidity/two-inlet-design.csv"
+    ],
+    "data_expression": "report",
+    "render_functions": [],
+    "plot_inputs": [
+      "scripts/cloud_ion_humidity/plots.py"
+    ],
+    "full_canvas": true
   }
 }

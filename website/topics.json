@@ -4655,6 +4655,39 @@
           }
         ]
       }
+    },
+    {
+      "source": "docs/studies/literature/cloud-ion-humidity/cloud_ion_humidity.py",
+      "title": "Reproduce the CLOUD ion balance and clearing test",
+      "topic": "charged",
+      "also": [
+        "gpu"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/cloud-ion-humidity/index.md",
+      "title": "What can CLOUD measurements tell us about ion loss in humid air?",
+      "topic": "charged",
+      "also": [
+        "verification-scientific"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "cloud-ion-humidity",
+        "runs": [
+          "cloud-ion-humidity"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/studies/validation/coagulation/charged-aerosols/gpu_ion_balance.py",
+            "label": "Native atmospheric ion balance"
+          }
+        ]
+      }
     }
   ],
   "supporting": [
@@ -4914,5 +4947,8 @@
       "source": "docs/studies/literature/evaporation-and-uptake/index.md",
       "reason": "Landing page for literature comparisons of evaporation and reactive uptake."
     }
-  ]
+  ],
+  "study_group_exceptions": {
+    "docs/studies/literature": "Six primary choices cover distinct measurement or process families. The seventh is a cross-listed validation against wall loss theory."
+  }
 }
