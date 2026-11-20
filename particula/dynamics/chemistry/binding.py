@@ -48,21 +48,12 @@ def _sparse_stoichiometry(rows):
 
 def _compile_network(mechanism, species, masses):
     stoichiometry, orders, parameters = [], [], []
+    mass_by_name = dict(zip(species, masses, strict=True))
     for reaction in mechanism.reactions:
         lhs, rhs = dict(reaction.reactants), dict(reaction.products)
-        coeffs = tuple(rhs.get(n, 0) - lhs.get(n, 0) for n in species)
-        # A large catalyst present on both sides must not mask an
-        # imbalance in the species actually consumed and produced.
-        mass_in = sum(
-            m * -v for m, v in zip(masses, coeffs, strict=True) if v < 0
-        )
-        mass_out = sum(
-            m * v for m, v in zip(masses, coeffs, strict=True) if v > 0
-        )
-        if not np.isclose(mass_in, mass_out, rtol=1e-12, atol=0):
-            raise ValueError(
-                f"reaction {reaction.name}: molar masses do not balance"
-            )
+        signed = reaction.signed_coefficients()
+        reaction.validate_masses(signed, mass_by_name)
+        coeffs = tuple(signed.get(n, 0) for n in species)
         participants = lhs.keys() | rhs.keys()
         if all(species[n] for n in participants):
             atoms: dict[str, int] = {}

@@ -2,7 +2,7 @@
 
 import json
 from dataclasses import dataclass
-from math import isfinite
+from math import isclose, isfinite
 from pathlib import Path
 
 import yaml  # type: ignore[import-untyped]
@@ -152,6 +152,25 @@ class Reaction:
             reference,
         )
 
+    def signed_coefficients(self):
+        """Return affected species and net molecular counts per reaction."""
+        lhs, rhs = dict(self.reactants), dict(self.products)
+        return {
+            name: rhs.get(name, 0) - lhs.get(name, 0)
+            for name in sorted(lhs.keys() | rhs.keys())
+            if rhs.get(name, 0) != lhs.get(name, 0)
+        }
+
+    def validate_masses(self, signed, masses):
+        """Check closed mass balance when every net participant has a mass."""
+        if signed.keys() <= masses.keys():
+            consumed = sum(-v * masses[n] for n, v in signed.items() if v < 0)
+            produced = sum(v * masses[n] for n, v in signed.items() if v > 0)
+            if not isclose(consumed, produced, rel_tol=1e-12):
+                raise ValueError(
+                    f"reaction {self.name}: molar masses do not balance"
+                )
+
     def to_dict(self):
         """Serialize reaction orders and rate parameters."""
         rate = {
@@ -275,6 +294,7 @@ class ReactionMechanism:
             self, "declared_masses", _declared_masses(record["species"])
         )
         catalog = dict(species)
+        known_masses = dict(self.declared_masses)
         if not isinstance(record["reactions"], list) or not record["reactions"]:
             raise ValueError("reactions must be a nonempty list")
         reactions = []
@@ -282,6 +302,9 @@ class ReactionMechanism:
         for idx, item in enumerate(record["reactions"]):
             try:
                 reaction = Reaction.parse(item, catalog)
+                reaction.validate_masses(
+                    reaction.signed_coefficients(), known_masses
+                )
                 if version == 2:
                     _check_phases(reaction)
                 elif reaction.law == "reactive_uptake":

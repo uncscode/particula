@@ -67,8 +67,9 @@ python -m particula.dynamics.chemistry.ncar docs/data/gas-chemistry/combine-ncar
 ```
 
 Load the output with `ReactionMechanism.load` and bind it as above.
-Source molecular weights in kg/mol are checked against the actual gas
-columns at bind time. This converter supports irreversible Arrhenius reactions
+When the source supplies molecular weights for all species with a net gain
+or loss, the converter checks reaction mass balance before writing. Binding
+checks the supplied weights in kg/mol against the simulation gas columns. This converter supports irreversible Arrhenius reactions
 with one or two distinct unit-coefficient reactants, positive integer product
 coefficients and ordinary evolving species. It accepts either `C` in kelvin or
 `Ea` in joules per molecule. Pressure-dependent rates, fixed reservoirs,
