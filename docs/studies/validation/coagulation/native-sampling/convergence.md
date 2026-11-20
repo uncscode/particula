@@ -1,10 +1,5 @@
 # Coagulation convergence against a Gillespie reference
 
-Status: validation in progress on the Stage 1 branch based on `894f60350`.
-Measurements below use Python 3.12, float64 CPU calculations; CUDA checks use
-an NVIDIA RTX 5060 with driver 615.78.08. They verify implementation and
-numerical limits, not agreement with independent laboratory measurements.
-
 ## Scalable native coagulation: issue 1661
 
 This separate validation uses the issue-1661 implementation based on

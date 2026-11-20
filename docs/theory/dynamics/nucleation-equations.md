@@ -237,7 +237,7 @@ The exponential expresses the competition between growth (**GR**, escape to safe
 
 For supported execution, see the [CPU nucleation example](https://github.com/uncscode/particula/blob/main/docs/studies/examples/particle-processes/sources-and-dilution/cpu_nucleation.py)
 and [CPU Nucleation Strategy System](../../guide/processes/nucleation.md).
-The hand-built [custom single-species notebook](../../studies/examples/particle-processes/sources-and-dilution/custom_nucleation_single_species.py)
+The hand-built [custom single-species calculation](../../studies/examples/particle-processes/sources-and-dilution/custom_nucleation_single_species.py)
 is illustrative only and is not the supported API.
 
 ## Nucleation as a Source Term in Aerosol Dynamics

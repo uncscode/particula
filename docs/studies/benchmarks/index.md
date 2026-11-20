@@ -4,6 +4,7 @@ Use these reports to compare measured computational costs. Check the hardware, w
 
 <!-- STUDY_LIST_START -->
 - [BAT humidity-pulse ensemble on CPU and CUDA](bat-humidity-pulse/index.md)
+- [Cost of custom processes and particle fields on the RTX 5060](process-field-overhead.md)
 - [Historical coagulation benchmarks](historical-coagulation/index.md)
 - [Measured CUDA scaling on an RTX 5060](prepared-scaling/gpu_scaling_results.py)
 <!-- STUDY_LIST_END -->

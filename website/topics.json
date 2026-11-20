@@ -4424,6 +4424,33 @@
       "also": [],
       "role": "Contribute",
       "start_here": false
+    },
+    {
+      "source": "docs/studies/benchmarks/process-field-overhead.md",
+      "title": "Cost of custom processes and particle fields on the RTX 5060",
+      "topic": "verification-performance",
+      "also": [
+        "gpu-prepared",
+        "custom"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "process-field-overhead",
+        "runs": [],
+        "companions": [],
+        "relations": [
+          {
+            "label": "Performance protocol and qualification",
+            "target": "docs/contribute/validation/gpu/process-field-extensions.md",
+            "fragment": "performance-protocol"
+          },
+          {
+            "label": "Implementing a custom process",
+            "target": "docs/studies/examples/custom-processes/custom_process_backends.py"
+          }
+        ]
+      }
     }
   ],
   "supporting": [
