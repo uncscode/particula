@@ -1,0 +1,122 @@
+{
+  "nitrogen": {
+    "VaporPressure": {
+      "method": "HEOS_FIT",
+      "limits_K": [
+        63.151,
+        126.192
+      ]
+    },
+    "EnthalpyVaporization": {
+      "method": "HEOS_FIT",
+      "limits_K": [
+        63.151,
+        124.29911999999999
+      ]
+    },
+    "HeatCapacityGas": {
+      "method": "HEOS_FIT",
+      "limits_K": [
+        63.151,
+        2000.0
+      ]
+    },
+    "ThermalConductivityGas": {
+      "method": "REFPROP_FIT",
+      "limits_K": [
+        63.151,
+        2000.0
+      ]
+    }
+  },
+  "oxygen": {
+    "VaporPressure": {
+      "method": "HEOS_FIT",
+      "limits_K": [
+        54.361,
+        154.581
+      ]
+    },
+    "EnthalpyVaporization": {
+      "method": "HEOS_FIT",
+      "limits_K": [
+        54.361,
+        152.262285
+      ]
+    },
+    "HeatCapacityGas": {
+      "method": "HEOS_FIT",
+      "limits_K": [
+        54.361,
+        2000.0
+      ]
+    },
+    "ThermalConductivityGas": {
+      "method": "REFPROP_FIT",
+      "limits_K": [
+        54.361,
+        2000.0
+      ]
+    }
+  },
+  "argon": {
+    "VaporPressure": {
+      "method": "HEOS_FIT",
+      "limits_K": [
+        83.8058,
+        150.687
+      ]
+    },
+    "EnthalpyVaporization": {
+      "method": "HEOS_FIT",
+      "limits_K": [
+        83.8058,
+        148.42669500000002
+      ]
+    },
+    "HeatCapacityGas": {
+      "method": "HEOS_FIT",
+      "limits_K": [
+        83.8058,
+        2000.0
+      ]
+    },
+    "ThermalConductivityGas": {
+      "method": "REFPROP_FIT",
+      "limits_K": [
+        83.8058,
+        2000.0
+      ]
+    }
+  },
+  "pentane": {
+    "VaporPressure": {
+      "method": "HEOS_FIT",
+      "limits_K": [
+        143.47,
+        469.7
+      ]
+    },
+    "EnthalpyVaporization": {
+      "method": "HEOS_FIT",
+      "limits_K": [
+        143.47,
+        462.6545
+      ]
+    },
+    "HeatCapacityGas": {
+      "method": "HEOS_FIT",
+      "limits_K": [
+        143.47,
+        650.0
+      ]
+    },
+    "ThermalConductivityGas": {
+      "method": "REFPROP_FIT",
+      "limits_K": [
+        143.47,
+        650.0
+      ]
+    }
+  }
+}

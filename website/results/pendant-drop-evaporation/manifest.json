@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 69.67415063700173,
+  "package_source_sha256": "e7a8dec04ec165d4dd632a008f2c0bcbb2eeeefb92d0cacb704ceb94f8bd3be3",
+  "scientific_source_sha256": "a3ab2110331b437c679cb2b93c8ac67790e4239e684691704b25f61cc5640285",
+  "input_sha256": {
+    "scripts/pendant_evaporation/study.py": "9d9a379f924b63e503470d789339bfb7eb1749973e9a460b96c6fcd159acb3e3",
+    "scripts/pendant_evaporation/plots.py": "981d73c68a0b1c8ebc49507ed9102cd1c486d48f45f0961dd85e3f869eb8230d"
+  },
+  "example": "pendant-drop-evaporation",
+  "fingerprint": "dc21aa796c1e3ca39cc9e28b6faba2cbbbb830b3b57fe9922fd1d9be9dcc3878",
+  "source": "docs/examples/processes/condensation/pendant_drop_evaporation.py",
+  "revision": "ebabce042edb929b9ebcf0dcce388e278c08be83",
+  "package_dirty": false,
+  "executed_at": "2026-11-20T14:04:05.983016+00:00",
+  "device": "cuda:0: NVIDIA GeForce RTX 5060",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.3",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [
+      {
+        "text": "{'device': 'NVIDIA GeForce RTX 5060', 'CUDA_curve_points': 5136, 'CPU_CUDA_relative_error': 1.1102230246251565e-15, 'finest_grid_error_K': 9.44796909152501e-05}\n"
+      }
+    ],
+    [
+      {
+        "image": "figure-2-1.png"
+      }
+    ],
+    [
+      {
+        "image": "figure-3-1.png"
+      }
+    ],
+    [
+      {
+        "image": "figure-4-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "figure-4-1.png": "aba08a4e6dc81a518801506061df954d3f61a86083bfce69e59baf64cb7f2390",
+    "figure-3-1.png": "11eaf9085477e8dec8937ef012ae65666279db0c4e4a87510c2b7a48f92ded85",
+    "figure-2-1.png": "ccbecdc400981924d48ef4b66fd425521732a768ef7946384b5d7b8ae793f7da",
+    "executed_source.py": "0e02aada55537e553921dd71179211f0f680df952a3a7910b703ead04d9e7534",
+    "data.json": "e07266bf79fb0cdf3742761c1e814c41065f380483554bdf7f766b67aab5ac6c",
+    "source.py": "0e02aada55537e553921dd71179211f0f680df952a3a7910b703ead04d9e7534"
+  },
+  "simulation_fingerprint": "2c36578933279a1ef6ca5b030d29beaa237036d28250bc0efdc3bffcacc870cc",
+  "render_versions": {
+    "particula": "0.3.3",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "render_device": "CPU",
+  "execution_input_sha256": {
+    "scripts/pendant_evaporation/study.py": "9d9a379f924b63e503470d789339bfb7eb1749973e9a460b96c6fcd159acb3e3",
+    "scripts/pendant_evaporation/plots.py": "981d73c68a0b1c8ebc49507ed9102cd1c486d48f45f0961dd85e3f869eb8230d"
+  },
+  "rendered_at": "2026-11-20T14:04:28.832648+00:00",
+  "render_revision": "ebabce042edb929b9ebcf0dcce388e278c08be83",
+  "render_elapsed_seconds": 1.925763019011356
+}

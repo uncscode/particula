@@ -77,6 +77,9 @@ documented examples in individual PRs. Diagnosed Particula gaps go through
 issue review. A useful outcome clarifies a published result, tests its reach,
 or identifies a follow-up that matters to aerosol researchers.
 
+The [aerosol and cloud data catalog](datasources.md) links published papers to
+chamber runs, field measurements and model output for candidate studies.
+
 ## Worktree, branch, and PR workflow
 
 Apply this workflow whenever executing any plan in this folder:

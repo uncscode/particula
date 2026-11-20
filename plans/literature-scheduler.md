@@ -45,6 +45,11 @@ size distribution. That comparison quantifies sensitivity within the model.
   topic you can infer from their comparison target. Changing a parameter in
   the same experiment belongs in that study. Record the selected family,
   observable and reason for choosing it in the register.
+- Use the [aerosol and cloud data catalog](datasources.md) to find candidate
+  papers by process or observable. Follow the paper to the specific run,
+  flight, station interval or data table. Check the units, any corrections
+  applied by the authors, and whether the file contains the quantity the
+  proposed study would compare. Continue the wider search when needed.
 - Report up to three strong candidates. For each, identify the paper and data
   sources, specific comparison target, original contribution, proposed
   question, scientific value, available inputs and uncertainties, reuse terms,
