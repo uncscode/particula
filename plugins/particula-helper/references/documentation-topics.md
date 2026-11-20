@@ -3,7 +3,7 @@
 Use this reference when reviewing a documentation collection, adding a page, or
 changing topic navigation. Work in the selected checkout, not installed payloads.
 The current `website/topics.json` owns concepts, page associations, and explicit
-supporting-page dispositions. Existing Guide, Examples, Theory, API, and
+supporting-page dispositions. The Guide, Studies, Theory, API, and
 Contribute sections describe document roles; the topic graph connects them.
 
 The persistent top-level Explore topics menu folder contains the explorer and
@@ -19,6 +19,27 @@ The explorer shows illustrated cards for immediate children and compact links
 for their subtopics. Selecting a topic opens its own next choices; do not expand
 a recursive tree inside the cards. This two-level preview does not limit how
 deeply concepts can be organized. Keep each branch to 2–4 meaningful choices.
+
+## Studies and their scientific topics
+
+Choose the primary category by the reader's question. A worked example applies
+a calculation, a tutorial teaches a workflow, a literature analysis compares a
+paper or dataset, a validation study tests a stated claim, and a benchmark
+reports measured cost for a specified workload. Its canonical source under
+`docs/studies/` owns the study record in `website/topics.json`. Register
+scripts in `website/examples.json` with stable execution keys.
+
+Keep reports, code and frozen specifications together as one browsing choice.
+Use topic membership for discovery. Identify a guide, equation, public API
+symbol, evidence record or qualification procedure with an explicit relationship
+when the study relies on it. The same records drive the sidebar, collection
+landings, script catalog and backlinks. Regenerate the corresponding installed
+Markdown lists with `python scripts/docs_studies.py sync` and verify with
+`python scripts/docs_studies.py check`.
+
+Review a collection at six immediate choices. At seven, look for meaningful
+subject or task groups with their own landings. Record the editorial reason
+for a longer sequence. The complete searchable code index can list every run.
 
 ## Review a collection
 

@@ -28,7 +28,7 @@ def test_cpu_extension_download_runs_outside_checkout(
     tmp_path, filename, message
 ):
     """Complete downloadable scripts retain their independent scientific checks."""
-    source = ROOT / "docs/examples/processes/customization" / filename
+    source = ROOT / "docs/studies/examples/custom-processes" / filename
     shutil.copy2(source, tmp_path / "example.py")
     environment = os.environ.copy()
     environment.update(

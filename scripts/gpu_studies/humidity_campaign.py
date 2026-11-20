@@ -8,10 +8,12 @@ from resource import RUSAGE_SELF, getrusage
 from time import perf_counter
 
 import numpy as np
-from docs.examples.thermodynamics.activity import bat_humidity_pulse as pulse
 from particula import Aerosol
 from particula.gas import EnvironmentData, GasData
 from particula.particles import ParticleData
+from scripts.docs_examples import import_study
+
+pulse = import_study("bat-humidity-pulse")
 
 
 def chamber(boxes, factors=None):

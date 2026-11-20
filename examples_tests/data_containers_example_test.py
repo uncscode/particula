@@ -15,7 +15,7 @@ from particula.gpu import WARP_AVAILABLE
 
 EXAMPLE_PATH = (
     Path(__file__).resolve().parents[1]
-    / "docs/examples/fundamentals/data_containers.py"
+    / "docs/studies/tutorials/building-an-aerosol/containers/data_containers.py"
 )
 EXAMPLES_ROOT = EXAMPLE_PATH.parent
 

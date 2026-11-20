@@ -25,7 +25,7 @@ CUDA skips do not establish capture, performance or cross-device equivalence.
 
 ## Python source and saved results
 
-Create percent-cell Python under `docs/examples/` in the owning topic. Use
+Create percent-cell Python in the owning collection under `docs/studies/`. Use
 `# %% [markdown]` cells for prose and equations and `# %%` for executable code.
 Python is the maintained source; do not create a paired notebook.
 
@@ -34,8 +34,8 @@ CPU/CUDA requirement, timeout, and every helper or data input. Historical result
 viewers must declare their recorded input data rather than rerun benchmarks.
 
 ```bash
-ruff check docs/examples/path/example.py --fix
-ruff format docs/examples/path/example.py
+ruff check docs/studies/examples/subject/example.py --fix
+ruff format docs/studies/examples/subject/example.py
 .venv/bin/python scripts/docs_examples.py refresh EXAMPLE_KEY
 npm --prefix website run build
 ```
@@ -46,8 +46,9 @@ and commit the Python source and successful result bundle together. Failed runs
 preserve prior results and block acceptance. Do not reduce scientific parameters
 or substitute CPU execution for a required CUDA run.
 
-Add a topic-index link and navigation entry in `website/navigation.json`.
-Generated pages show results with collapsed code and a Python download.
+Add the run key to the canonical study record in `website/topics.json`.
+Identify its subjects and its specific guide, Theory, evidence or API links.
+Verify the generated category listing, topic links, downloads and backlinks.
 Documentation builds render saved bundles without executing simulations.
 CI validates all bundles and executes changed ordinary CPU examples without
 rewriting published results. CUDA and long-running changes require an explicit

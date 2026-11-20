@@ -1,0 +1,27 @@
+---
+interface Entry { label: string; slug: string; items?: Entry[] }
+interface Props { entry: Entry }
+const { entry } = Astro.props;
+const href = import.meta.env.BASE_URL.replace(/\/$/, '') + '/' + entry.slug + '/';
+const current = Astro.url.pathname === href;
+---
+{entry.items ?
+  <div class="study-group">
+    <a class="landing" {href} aria-current={current ? 'page' : undefined}>{entry.label}</a>
+    <details open={Astro.url.pathname.startsWith(href)}>
+      <summary aria-label={`Toggle ${entry.label} menu`}><span aria-hidden="true">›</span></summary>
+      <ul>{entry.items.map((child) => <li><Astro.self entry={child} /></li>)}</ul>
+    </details>
+  </div> : <a {href} data-study-home={entry.slug} aria-current={current ? 'page' : undefined}>{entry.label}</a>}
+<style>
+  .study-group { position: relative; }
+  a { display: block; padding: .3rem .5rem; color: var(--sl-color-gray-2); text-decoration: none; line-height: 1.4; }
+  a:hover, a:focus-visible { color: var(--sl-color-text-accent); }
+  a[aria-current="page"] { font-weight: 650; color: var(--sl-color-text-accent); }
+  .landing { margin-inline-end: 2rem; font-weight: 650; }
+  summary { position: absolute; top: 0; inset-inline-end: 0; width: 2rem; min-height: 1.8rem; display: grid; place-items: center; cursor: pointer; list-style: none; }
+  summary::-webkit-details-marker { display: none; }
+  summary span { font-size: 1.35em; }
+  details[open] > summary span { transform: rotate(90deg); }
+  ul { padding-inline-start: .7rem; margin: .2rem 0 .4rem .5rem; border-inline-start: 1px solid var(--sl-color-gray-5); list-style: none; font-size: var(--sl-text-sm); }
+</style>

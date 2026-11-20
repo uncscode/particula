@@ -29,10 +29,12 @@ production build served by `preview`. The Python launcher uses the repository's
 
 - `docs/`: canonical narrative, homepage, scientific Python and shared assets.
 - `website/navigation.json`: Explore topics and the five content sections.
+- `website/topics.json`: scientific topics, canonical studies, script keys,
+  companion resources and relationships used to generate Studies navigation.
 - `website/examples.json`: all runnable sources, entry points, CPU/CUDA policy,
   timeouts and declared helper/data dependencies.
 - `website/results/`: saved figures, tables, text, executed source and provenance.
-  `current.json` selects the latest successful generation.
+  Each stable run key owns a manifest and its published outputs.
 - `website/templates/`: generated API overview text.
 - `website/src/content/docs/`, `public/results/`, `public/downloads/`,
   `public/images/`, `.cache/`, and `dist/`: disposable generated outputs.

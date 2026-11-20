@@ -1,22 +1,22 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 21.850231859018095,
-  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
-  "scientific_source_sha256": "c491d38a0f3b014be11117e77bf7f5ed27e4a834ba024ddbac813c1eefd5b6db",
+  "elapsed_seconds": 11.629048782982863,
+  "package_source_sha256": "e7a8dec04ec165d4dd632a008f2c0bcbb2eeeefb92d0cacb704ceb94f8bd3be3",
+  "scientific_source_sha256": "a3ab2110331b437c679cb2b93c8ac67790e4239e684691704b25f61cc5640285",
   "input_sha256": {
-    "docs/examples/simulations/adaptive_reservoir_depletion.py": "b92f76d6fecb5e2e342687a7cf40a2d7e938271cb6f1ce023a2fbab45c2b3f86"
+    "docs/studies/validation/condensation/adaptive/adaptive_reservoir_depletion.py": "b92f76d6fecb5e2e342687a7cf40a2d7e938271cb6f1ce023a2fbab45c2b3f86"
   },
   "example": "adaptive-reservoir-depletion-cuda",
-  "fingerprint": "30fbf25b0a2c08a424c6f0357771187e698729a5827d64b675cabe08f80bb186",
-  "source": "docs/examples/simulations/adaptive_reservoir_depletion_cuda.py",
-  "revision": "e6d8de004d68d2f8054a7654be48430a2af02cb9",
+  "fingerprint": "8d6b28a2f0936c85a087ca603f0ecb392611423fac2851ff4e4d0be2e1c83efe",
+  "source": "docs/studies/validation/condensation/adaptive/adaptive_reservoir_depletion_cuda.py",
+  "revision": "0c3ca2f65a88378fb2d3874d6e034880b027cd19",
   "package_dirty": false,
-  "executed_at": "2026-11-19T14:53:38.564227+00:00",
+  "executed_at": "2026-11-20T13:00:01.620225+00:00",
   "device": "cuda:0: NVIDIA GeForce RTX 5060",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.3.2",
+    "particula": "0.3.3",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
@@ -33,7 +33,7 @@
         "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\nCUDA device: NVIDIA GeForce RTX 5060\n"
       },
       {
-        "text": "Module particula.execution._condensation_ode_kernels b6cefee load on device 'cuda:0' took 1.63 ms  (cached)\nModule particula.gpu.kernels.thermodynamics 10b2126 load on device 'cuda:0' took 1.37 ms  (cached)\nModule particula.gpu.kernels.condensation ad8087d load on device 'cuda:0' took 1.62 ms  (cached)\nModule particula.execution._adaptive_condensation_physics 5bb51fa load on device 'cuda:0' took 0.93 ms  (cached)\nModule particula.execution._condensation_reservoirs b231d81 load on device 'cuda:0' took 1.46 ms  (cached)\n"
+        "text": "Module particula.execution._condensation_ode_kernels b6cefee load on device 'cuda:0' took 0.92 ms  (cached)\nModule particula.gpu.kernels.thermodynamics 10b2126 load on device 'cuda:0' took 0.33 ms  (cached)\nModule particula.gpu.kernels.condensation ad8087d load on device 'cuda:0' took 0.29 ms  (cached)\nModule particula.execution._adaptive_condensation_physics 5bb51fa load on device 'cuda:0' took 0.42 ms  (cached)\nModule particula.execution._condensation_reservoirs b231d81 load on device 'cuda:0' took 0.50 ms  (cached)\n"
       },
       {
         "text": "Fixed 0.5 s radius error: 0.013104491968154663 vapor error / initial vapor: 0.051724928104230926 mass residual: 1.3348093070485667e-16 work: {'fixed_steps': 20}\nFixed 0.005 s radius error: 0.00012153195858566335 vapor error / initial vapor: 0.00047126688190263693 mass residual: 5.339237228194267e-16 work: {'fixed_steps': 2000}\nCPU RK23 1e-4 radius error: 1.820119292772482e-05 vapor error / initial vapor: 6.736678437977377e-05 mass residual: 4.0044279211457e-16 work: {'accepted': 62, 'rejected': 1, 'domain_rejected': 0, 'rate_calls': 252, 'jacobian_calls': 0, 'time_derivative_calls': 0, 'factorizations': 0, 'linear_solves': 0}\nCPU RK23 1e-7 radius error: 2.573387414273043e-08 vapor error / initial vapor: 9.152069530558079e-08 mass residual: 8.0088558422914e-16 work: {'accepted': 430, 'rejected': 2, 'domain_rejected': 0, 'rate_calls': 1728, 'jacobian_calls': 0, 'time_derivative_calls': 0, 'factorizations': 0, 'linear_solves': 0}\nCPU ROS2 1e-5 radius error: 7.743971802698368e-07 vapor error / initial vapor: 2.8580766376794065e-06 mass residual: 2.2691758219825635e-15 work: {'accepted': 2574, 'rejected': 1, 'domain_rejected': 0, 'rate_calls': 5150, 'jacobian_calls': 2575, 'time_derivative_calls': 2575, 'factorizations': 2575, 'linear_solves': 15450}\nCUDA RK23 1e-4 radius error: 1.819961694282668e-05 vapor error / initial vapor: 6.736250729474167e-05 mass residual: 2.6696186140971333e-16 work: {'accepted': 62, 'rejected': 1, 'domain_rejected': 0, 'rate_calls': 252, 'jacobian_calls': 0, 'time_derivative_calls': 0, 'factorizations': 0, 'linear_solves': 0}\nCUDA RK23 1e-7 radius error: 2.5733596586974272e-08 vapor error / initial vapor: 9.151970898865327e-08 mass residual: 1.4682902377534233e-15 work: {'accepted': 430, 'rejected': 2, 'domain_rejected': 0, 'rate_calls': 1728, 'jacobian_calls': 0, 'time_derivative_calls': 0, 'factorizations': 0, 'linear_solves': 0}\n"
@@ -46,7 +46,7 @@
   "files": {
     "figure-3-1.png": "56f39d9b228de4f2194fb14b5084719754faa7a9fccf1568d4620b17baca2c05",
     "data.json": "6169ac6cc861cd484e1d509a2436578f2ffb82b3b168d4373aba82b0f2e9abea",
-    "source.py": "131f67052c2bc69fd5bf57a1acde303dffadf80bed929dacaa6dd52137208ad0"
+    "source.py": "6455e8b9dc9356c2edde51f3e7037d280efc5c4b6a4711732b6b569a552377e6"
   },
-  "simulation_fingerprint": "1dfe88e190676befc4e2462760608618461f12fc50da2de40ca1839e924d8063"
+  "simulation_fingerprint": "c3317892856996d3395e0c1be322a485a691db9e5b56a67a335812c4ecdfaf3a"
 }

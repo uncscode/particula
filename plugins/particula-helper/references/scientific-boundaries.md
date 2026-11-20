@@ -87,12 +87,12 @@ Read `docs/guide/gpu/prepared.md`, `support.md`, `transfers.md`,
 
 ## Evidence
 
-Use the maintained records in `docs/contribute/validation/`, especially
-`gpu/prepared-rtx5060.md`, `gpu/graph-capture-qualification.md`,
-`gpu/resident-benchmarks.md`,
-`gpu/graph-capture-profiling.md`, `numerics/mass-precision.md`, and
-`releases/v0.3.0.md`. Implementation validation, release approval and performance
-qualification are separate. Missing measurements remain unavailable.
+Read the scientific comparison and its qualification record together. Under
+`docs/studies/`, the prepared GPU campaign lives in `benchmarks/prepared-scaling/`,
+the mass-precision decision in `validation/material-properties/mass-precision/`,
+and the graph-capture gates, profiling protocol and native API release record in
+`validation/workflows-and-releases/`. Each record identifies its evidence and
+open gates. Missing measurements remain unavailable.
 
 The controlled coagulation output is
 `.artifacts/benchmarks/gpu_benchmark_results.json`, an ignored generated output

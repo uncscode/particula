@@ -6,7 +6,7 @@ contracts below retain their own, sometimes broader, capabilities.
 
 ## Complete direct-process context
 
-The direct coagulation call is part of the illustrative [explicit-transfer sequence](https://github.com/Gorkowski/particula/blob/main/docs/examples/gpu/direct/gpu_complete_process_sequence.py), with [direct-process validation evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py) and a [example regression](https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_complete_process_sequence_example_test.py). Persistent RNG remains caller-owned; the example is not a backend selector, scheduler, `Runnable`, resident loop, or CPU fallback.
+The direct coagulation call is part of the illustrative [explicit-transfer sequence](https://github.com/Gorkowski/particula/blob/main/docs/studies/tutorials/working-with-gpu/direct-kernels/gpu_complete_process_sequence.py), with [direct-process validation evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py) and a [example regression](https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_complete_process_sequence_example_test.py). Persistent RNG remains caller-owned; the example is not a backend selector, scheduler, `Runnable`, resident loop, or CPU fallback.
 
 > Strategy-based coagulation kernels with unified builders, factory selection, runnable integration, and particle-resolved support.
 
@@ -612,7 +612,7 @@ resolved_particles = particle_resolved.step(
 
 - **Wall loss strategies**: [wall_loss_strategy_system.md](wall-loss.md)
 - **Condensation strategies**: [condensation_strategy_system.md](condensation.md)
-- **GPU direct example**: [gpu_coagulation_direct.py](https://github.com/Gorkowski/particula/blob/main/docs/examples/gpu/direct/gpu_coagulation_direct.py)
+- **GPU direct example**: [gpu_coagulation_direct.py](https://github.com/Gorkowski/particula/blob/main/docs/studies/validation/coagulation/direct-coagulation/gpu_coagulation_direct.py)
 - **GPU roadmap**: [Pending initial-state optimization](../../contribute/roadmap.md)
 
 ## FAQ
@@ -654,6 +654,6 @@ the capture domain for every pair of distinct active slots, including slots
 with identical material properties. To inspect that matrix for an active
 population, pass `exclude_self_pairs=True` to the strategy’s `kernel`. The CUDA
 resolved sampler uses tiled pair scans and equal positive counts per box.
-[Pair calculation and measurements](../../examples/processes/coagulation/van_der_waals.py) ·
+[Pair calculation and measurements](../../studies/validation/coagulation/dispersion/van_der_waals.py) ·
 [Theory and assumptions](../../theory/dynamics/interparticle-forces.md) ·
-[Qualified ranges](../../contribute/validation/coagulation/van-der-waals.md)
+[Qualified ranges](../../studies/validation/coagulation/dispersion/index.md)

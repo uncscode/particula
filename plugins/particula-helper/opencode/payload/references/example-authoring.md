@@ -69,9 +69,11 @@ checkout, using the current schemas and a comparable neighboring example:
 - `website/topics.json` associates the source with one primary scientific topic,
   appropriate additional topics and its role. Reconsider `start_here` placement;
   do not make every new example a starting resource.
-- `website/navigation.json` exposes its route in the appropriate Examples or
-  Theory section. Relevant index pages and related material link to it without
-  creating duplicate articles. Preserve existing URLs or add supported redirects.
+- Its main topic resource owns one study record and primary browsing home
+  under `docs/studies/`. Register run keys, companion material, and specific
+  guide, equation, evidence or API relationships there. Check the generated
+  category landing, code index and backlinks. Preserve meaningful old routes
+  and fragments with the relocation table.
 - Topic prerequisites and next-reading links lead to useful destinations. New
   concepts follow the branching, relationship and icon rules in
   [documentation-topics.md](documentation-topics.md); do not invent categories

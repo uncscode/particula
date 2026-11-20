@@ -5,7 +5,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-from docs.examples.fundamentals.first_cpu_workflow import simulate
+from docs.studies.tutorials.first_cpu_workflow import simulate
 
 
 @pytest.fixture(scope="module")
@@ -47,7 +47,7 @@ def test_published_reload_and_resume_snippets(workflow, monkeypatch):
     snippets = re.findall(r"```python\n(.*?)\n```", page.read_text(), re.DOTALL)
     assert len(snippets) == 2
     monkeypatch.chdir(directory)
-    monkeypatch.syspath_prepend(str(root / "docs/examples/fundamentals"))
+    monkeypatch.syspath_prepend(str(root / "docs/studies/tutorials"))
     namespace = {}
     for snippet in snippets:
         exec(compile(snippet, str(page), "exec"), namespace)  # noqa: S102

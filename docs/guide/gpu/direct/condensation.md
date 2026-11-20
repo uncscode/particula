@@ -46,7 +46,7 @@ The standalone private inventory-finalization test helper remains legacy-only;
 it is not a mapped native entry point. Untagged legacy direct/prepared callers
 retain the same-width contract described below. Native transfer does not
 establish resident/checkpoint support by itself. See the separately exercised
-[resident walkthrough](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/resident/gpu_resident_multi_timestep.py) for explicit
+[resident walkthrough](https://github.com/uncscode/particula/blob/main/docs/studies/tutorials/working-with-gpu/resident/gpu_resident_multi_timestep.py) for explicit
 exact-device restart and fresh species bindings.
 
 Native scientific evidence is in
@@ -127,17 +127,17 @@ gas transfer through its stated inventory-limited direct coupling, but does not 
 `Runnable` integration, adaptive stepping, graph capture/replay, autodiff
 guarantees, or complete condensation parity cross-device certification.
 
-The [GPU condensation parity walkthrough](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/direct/gpu_condensation_parity_walkthrough.py)
+The [GPU condensation parity walkthrough](https://github.com/uncscode/particula/blob/main/docs/studies/validation/condensation/direct-kernel/gpu_condensation_parity_walkthrough.py)
 separately reports physics, conservation, and energy evidence for this
 fixed-four-substep low-level direct-kernel comparison. Its
-[condensation parity walkthrough ownership record](../../../contribute/validation/gpu/condensation-parity.md)
+[condensation parity walkthrough ownership record](../../../studies/validation/condensation/direct-kernel/qualification.md)
 keeps deferred capabilities explicit. Warp CPU is the installed-Warp baseline;
 CUDA is optional additive evidence. The caller-owned, write-only
 `energy_transfer` output is a diagnostic, not a return value and not temperature
 feedback.
 
 Focused fixed-four-substep direct-kernel evidence commands are:
-`python docs/examples/gpu/direct/gpu_condensation_parity_walkthrough.py` and
+`python docs/studies/validation/condensation/direct-kernel/gpu_condensation_parity_walkthrough.py` and
 `pytest examples_tests/gpu_condensation_parity_walkthrough_test.py -q -Werror`.
 
 #### Direct-condensation evidence

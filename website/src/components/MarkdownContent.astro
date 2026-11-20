@@ -1,0 +1,23 @@
+---
+import DefaultMarkdownContent from '@astrojs/starlight/components/MarkdownContent.astro';
+import catalog from '../../.cache/studies.json';
+import { apiStudySections } from './study-api.mjs';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '') + '/';
+const route = Astro.url.pathname.slice(base.length);
+const links = catalog.apiBacklinks[route];
+const sections = links ? apiStudySections(await Astro.slots.render('default'), links) : [];
+---
+<DefaultMarkdownContent>
+  {links ? sections.map(({ html, related }) => <>
+    <Fragment set:html={html} />
+    {related.length > 0 && <aside class="api-related" aria-label={`Related studies for ${related[0].symbol}`}>
+      <strong>Related studies</strong>
+      <ul>{related.map(({ title, url }) => <li><a href={base + url}>{title}</a></li>)}</ul>
+    </aside>}
+  </>) : <slot />}
+</DefaultMarkdownContent>
+<style>
+  .api-related { border-inline-start: .2rem solid var(--sl-color-accent); padding-inline: .8rem; margin-block: .8rem; }
+  .api-related ul { margin: .2rem 0; }
+</style>

@@ -20,11 +20,11 @@ qualified and published, including the full resident CUDA reruns.
 The first Stage 3A, 3B and 4 deliveries are on main. Stage 5 qualified
 closed-box initial-size recovery on CPU and CUDA in
 [PR #1676](https://github.com/uncscode/particula/pull/1676).
-**Stage 6 is qualified on its delivery branch.** It covers native gas reactions,
+Stage 6 chemistry is now on main. It covers native gas reactions,
 NCAR gas import, resolved bulk reactions, reactive uptake, restart and CUDA
 capture for resolved chemistry. [PR #1687](https://github.com/uncscode/particula/pull/1687)
-· [Gas evidence](../docs/contribute/validation/numerics/gas-chemistry.md)
-· [Particle and coupled evidence](../docs/contribute/validation/numerics/resolved-chemistry.md)
+· [Gas evidence](../docs/studies/validation/condensation/gas-chemistry.md)
+· [Particle and coupled evidence](../docs/studies/validation/condensation/resolved-chemistry.md)
 
 ## Staged development
 
@@ -45,24 +45,24 @@ capture for resolved chemistry. [PR #1687](https://github.com/uncscode/particula
   available in kinetic condensation on CPU and CUDA. The citric-acid study
   compares water activity with measurements and a separate AIOMFAC-web
   calculation. Kinetic phase separation and a native AIOMFAC activity model
-  remain follow-ons. Viscosity is deferred. [BAT qualification](../docs/contribute/validation/thermodynamics/bat-activity.md)
-  · [Citric-acid comparison](../docs/contribute/validation/thermodynamics/citric-acid-comparison.md)
+  remain follow-ons. Viscosity is deferred. [BAT qualification](../docs/studies/validation/material-properties/binary-bat.md)
+  · [Citric-acid comparison](../docs/studies/literature/particle-water-uptake/citric-acid/index.md)
 - **GPU workloads.** Stage 4 measured direct-BAT CPU and tabulated-BAT CUDA
   humidity pulses through 128 boxes, including restart across a vapor reset.
   The finer tested timestep met the radius and water-transfer targets at every
-  batch size. [Campaign record](../docs/contribute/validation/gpu/bat-humidity-pulse.md)
+  batch size. [Campaign record](../docs/studies/benchmarks/bat-humidity-pulse/index.md)
 - **Observation models.** The CCN retrieval and NaCl chamber studies show how
   instrument selection and observation uncertainty affect the quantity being
   fitted. Stage 5 used synthetic size observations and fixed process
-  parameters. [Initial-size recovery and resolution](../docs/contribute/validation/numerics/initial-size-inversion.md)
-  · [CCN retrieval](../docs/contribute/validation/thermodynamics/ccn-retrieval.md)
-  · [NaCl scavenging](../docs/contribute/validation/coagulation/nacl-scavenging.md)
+  parameters. [Initial-size recovery and resolution](../docs/studies/validation/condensation/initial-size/index.md)
+  · [CCN retrieval](../docs/studies/literature/particle-water-uptake/ccn-retrieval/index.md)
+  · [NaCl scavenging](../docs/studies/literature/nacl-scavenging/index.md)
 - **Chemistry numerics.** Stage 2A delivered CPU stiff solvers and a Robertson
   assessment. The existing first-order gas chemistry example supplies a
   separate check on native species binding and mass accounting. The Stage 6
   gas milestone now covers resident CUDA and same-backend continuation.
-  [Solver assessment](../docs/contribute/validation/numerics/adaptive-methods.md)
-  · [Timed chemistry example](../docs/examples/processes/customization/timed_box_chemistry.py)
+  [Solver assessment](../docs/studies/validation/condensation/adaptive/index.md)
+  · [Timed chemistry example](../docs/studies/examples/custom-processes/timed_box_chemistry.py)
 
 ## Continuous literature discovery, outside the stages
 
@@ -133,8 +133,9 @@ it must not accumulate different studies on one long-lived scheduler branch.
 - Preserve established state ownership and failure boundaries. New public APIs,
   checkpoint formats, and numerical policies need an explicit compatibility
   decision; proposed names in a plan are not approved interfaces.
-- Keep durable results in [validation records](../docs/contribute/validation/)
-  and executable examples in the maintained documentation workflow. Plans
+- Keep scientific evidence and executable calculations with their owning
+  [studies](../docs/studies/index.md). Keep qualification procedures and release
+  gates in the corresponding [study records](../docs/studies/validation/index.md). Plans
   describe pending outcomes rather than accumulating execution logs.
 - Follow the [validation reference](../plugins/particula-helper/references/repository-validation.md).
   Missing CUDA or experimental evidence remains missing; do not substitute

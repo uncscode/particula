@@ -44,7 +44,11 @@ Pass `aerosol.particles`, `aerosol.gas`, and scalar values from
 
 ```python
 import particula as par
-from docs.examples.fundamentals.native_state_access import build_aerosol, build_condensation
+from runpy import run_path
+
+example = run_path("docs/studies/tutorials/building-an-aerosol/native_state_access.py")
+build_aerosol = example["build_aerosol"]
+build_condensation = example["build_condensation"]
 
 # Run from the repository root; the fixture includes ordered inert gas.
 aerosol = build_aerosol()
@@ -148,7 +152,7 @@ Native runnable composition, execution adapters, dilution/nucleation and
 resident/checkpoint integration are available under their bounded contracts.
 See the source, communication and resident sections below, the
 [migration guide](../migration/v0.3.0/index.md), and the
-[complete direct sequence](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/direct/gpu_complete_process_sequence.py).
+[complete direct sequence](https://github.com/uncscode/particula/blob/main/docs/studies/tutorials/working-with-gpu/direct-kernels/gpu_complete_process_sequence.py).
 Temporary facades and untagged compatibility dispatch remain until v0.3.0; these
 examples do not authorize deletion, a release, or GPU performance claims.
 
@@ -176,7 +180,7 @@ species mass and charge under its existing bounded moment checks.
 Each source attempt stages before writing, retains array identities, and
 restores attempted particle/gas writes if a CPU writer fails. Earlier committed
 substeps remain applied when a later attempt fails. The small
-`docs/examples/processes/nucleation/cpu_nucleation.py` example exercises this native API
+`docs/studies/examples/particle-processes/sources-and-dilution/cpu_nucleation.py` example exercises this native API
 at non-unit volume with inert gas in the unified container. The former
 `LegacyNucleation` compatibility runnable has been removed. Construct
 `Nucleation(source_config, commit_config)` and keep environmental state on
@@ -339,7 +343,7 @@ separate capability.
 
 Wrap a `BoxProcess` or `FunctionProcess` in `CPUTransfer` to select a host round
 trip inside a prepared GPU sequence. The
-[custom CPU/CUDA process example](../../examples/gpu/prepared/custom_process_backends.py)
+[custom CPU/CUDA process example](../../studies/examples/custom-processes/custom_process_backends.py)
 demonstrates explicit CUDA preparation, transfer execution and checkpoint/resume
 on a GPU. The ordinary CPU examples on this page require no GPU.
 
@@ -373,9 +377,9 @@ Legacy custom dilution strategies retain their original delegation path and
 cannot accept an execution context. `Equilibria` still uses auxiliary inputs
 and result attachments; native inventory mapping is a separate migration gap.
 
-See the [Aerosol Tutorial](../../examples/fundamentals/native_aerosol.ipynb) for
+See the [Aerosol Tutorial](../../studies/tutorials/building-an-aerosol/native_aerosol.py) for
 an executed two-box example with distinct volumes and stable box IDs.
 
-Run the [timed CPU chemistry example](../../examples/processes/customization/timed_box_chemistry.py)
+Run the [timed CPU chemistry example](../../studies/examples/custom-processes/timed_box_chemistry.py)
 for a complete two-box SciPy process, a scheduled function callback, registered
 source accounting and analytical checks.

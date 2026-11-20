@@ -11,14 +11,14 @@ boundaries.
 
 For a runnable walkthrough of native single-box container construction and
 optional Warp CPU-backend round trips, see the
-[Data Containers example](../../examples/fundamentals/data-containers.md) and run:
+[Data Containers example](../../studies/tutorials/building-an-aerosol/containers/data-containers.md) and run:
 
 ```bash
-python docs/examples/fundamentals/data_containers.py
+python docs/studies/tutorials/building-an-aerosol/containers/data_containers.py
 ```
 
 For the low-level direct-kernel path, use the canonical quick-start at
-[`docs/examples/gpu/direct/gpu_direct_kernels_quick_start.py`](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/direct/gpu_direct_kernels_quick_start.py).
+[`docs/studies/tutorials/working-with-gpu/direct-kernels/gpu_direct_kernels_quick_start.py`](https://github.com/uncscode/particula/blob/main/docs/studies/tutorials/working-with-gpu/direct-kernels/gpu_direct_kernels_quick_start.py).
 That example keeps direct step imports explicit through `particula.gpu.kernels`
 while top-level `particula.gpu` stays focused on `WARP_AVAILABLE` and the
 `to_warp_*` / `from_warp_*` transfer helpers.
@@ -370,14 +370,14 @@ environment = EnvironmentData(
 ## Related references
 
 The fixed-four-substep low-level direct-kernel walkthrough can be run with
-`python docs/examples/gpu/direct/gpu_condensation_parity_walkthrough.py`. Its focused
+`python docs/studies/validation/condensation/direct-kernel/gpu_condensation_parity_walkthrough.py`. Its focused
 runtime regression command is
 `pytest examples_tests/gpu_condensation_parity_walkthrough_test.py -q -Werror`.
 
-- [Data Containers example](../../examples/fundamentals/data-containers.md)
+- [Data Containers example](../../studies/tutorials/building-an-aerosol/containers/data-containers.md)
 - [Particle & Gas Data Migration](../migration/v0.3.0/index.md)
 - [Pending initial-state optimization](../../contribute/roadmap.md)
-- [Mass Precision Recommendation Report](../../contribute/validation/numerics/mass-precision.md)
+- [Mass Precision Recommendation Report](../../studies/validation/material-properties/mass-precision/decisions.md)
 
 ## Related execution guides
 
@@ -456,9 +456,9 @@ automatically manage field population events. See the
 [prepared GPU contract](../gpu/prepared.md#registered-particle-fields) for its
 admission boundaries.
 
-Run the [particle tracer example](../../examples/processes/customization/particle_tracers.py)
+Run the [particle tracer example](../../studies/examples/custom-processes/particle_tracers.py)
 for merger/removal budgets and a hand-checked resampling/source case. The
-[timed chemistry example](../../examples/processes/customization/timed_box_chemistry.py)
+[timed chemistry example](../../studies/examples/custom-processes/timed_box_chemistry.py)
 uses a per-box field for custom source accounting, and the
-[CPU/CUDA extension example](../../examples/gpu/prepared/custom_process_backends.py)
+[CPU/CUDA extension example](../../studies/examples/custom-processes/custom_process_backends.py)
 shows field continuation through explicit transfer, capture and restart.

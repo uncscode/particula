@@ -5,9 +5,10 @@ from types import SimpleNamespace
 
 import matplotlib.pyplot as plt
 import numpy as np
-from docs.examples.gpu.prepared import gpu_prepared_cyclic_chamber as example
-from scripts.docs_examples import write_plot_data
+from scripts.docs_examples import import_study, write_plot_data
 from scripts.gpu_studies.cases import StudyCase, build_case
+
+example = import_study("gpu-prepared-cyclic-chamber")
 
 
 def test_chamber_observations_save_and_replot_without_gpu(

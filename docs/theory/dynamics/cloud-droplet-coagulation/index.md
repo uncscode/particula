@@ -12,10 +12,10 @@ The geometric collision kernel from the paper is outlined in [Ayala et al. (2008
 
 ## Validations
 
-We validate our implementation of the geometric collision kernel against the results from Ayala et al. (2008) via jupyter notebooks. The notebooks cover comparison graphs and tables from the original paper and Direct Numerical Simulations (DNS) results.
+We validate our implementation of the geometric collision kernel against the results from Ayala et al. (2008) using runnable calculations. The comparisons cover comparison graphs and tables from the original paper and Direct Numerical Simulations (DNS) results.
 
-- [DNS Fluid and Particle Properties](dns-fluid-and-particle-properties-comparison.ipynb)
-- [DNS Horizontal Velocity](dns-horizontal-velocity-comparison.ipynb)
-- [DNS Radial Relative Velocity](dns-radial-distribution-comparison.ipynb)
-- [DNS Radial Distribution](dns-radial-distribution-comparison.ipynb)
-- [DNS Kernel Comparison](dns-kernel-comparison.ipynb)
+- [DNS Fluid and Particle Properties](../../../studies/validation/cloud-droplet-collisions/dns-fluid-and-particle-properties-comparison.py)
+- [DNS Horizontal Velocity](../../../studies/validation/cloud-droplet-collisions/dns-horizontal-velocity-comparison.py)
+- [DNS Radial Relative Velocity](../../../studies/validation/cloud-droplet-collisions/dns-radial-relative-velocity-comparison.py)
+- [DNS Radial Distribution](../../../studies/validation/cloud-droplet-collisions/dns-radial-distribution-comparison.py)
+- [DNS Kernel Comparison](../../../studies/validation/cloud-droplet-collisions/dns-kernel-comparison.py)

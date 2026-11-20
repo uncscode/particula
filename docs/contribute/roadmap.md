@@ -3,7 +3,7 @@
 ## Differentiability and initial-state optimization (Epic I)
 
 **The smooth single-material condensation inversion has been qualified on CPU
-and CUDA.** The [validation record](validation/numerics/initial-size-inversion.md)
+and CUDA.** The [validation record](../studies/validation/condensation/initial-size/index.md)
 covers multi-box recovery, global and gradient-based fits, memory recomputation
 and captured observation noise. Composition, hygroscopicity and stochastic
 collision gradients remain open.

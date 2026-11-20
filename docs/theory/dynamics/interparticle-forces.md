@@ -76,7 +76,7 @@ for singular attractive potentials. Like-sign barriers and strong opposite-sign
 attraction require independent trajectory checks. The validation record gives
 the observed departures and the implemented boundary on opposite charges.
 [Ouyang et al. (2012)](https://doi.org/10.1063/1.4742064) ·
-[Trajectory and measurement comparisons](../../contribute/validation/coagulation/van-der-waals.md)
+[Trajectory and measurement comparisons](../../studies/validation/coagulation/dispersion/index.md)
 
 ## Applying the model
 
@@ -86,5 +86,5 @@ constant single-particle mobilities and nonretarded dispersion delimit the
 interpretation. Near-contact hydrodynamic resistance, large-separation
 retardation, aggregate shape and mixed-material dielectric evolution require
 additional physics. The reference hard-sphere transition curve here is $H(q)$;
-the Fuchs Brownian strategy has a different interpolation. [CPU example](../../examples/processes/coagulation/van_der_waals.py) ·
-[Prepared CUDA example](../../examples/gpu/prepared/van_der_waals.py)
+the Fuchs Brownian strategy has a different interpolation. [CPU example](../../studies/validation/coagulation/dispersion/van_der_waals.py) ·
+[Prepared CUDA example](../../studies/validation/coagulation/dispersion/gpu_van_der_waals.py)

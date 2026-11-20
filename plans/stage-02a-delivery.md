@@ -63,7 +63,7 @@ kernel; ordinary steps do not evaluate CPU physical rates or download states.
 Snapshots explicitly download accepted state. Full active-slot evaporation,
 native GPU ROS2, PDF on GPU and adaptive CUDA capture are rejected/excluded.
 
-The [method assessment](../docs/contribute/validation/numerics/adaptive-methods.md)
+The [method assessment](../docs/studies/validation/condensation/adaptive/index.md)
 is the durable decision record. Its retained data include original preliminary
 reports and the source-hashed native CUDA assessment. The
 [method guide](../docs/guide/processes/numerical-integration.md) owns usage,

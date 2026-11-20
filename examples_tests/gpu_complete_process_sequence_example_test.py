@@ -29,7 +29,10 @@ _BOUNDARY_STEPS = (
 @pytest.fixture
 def example_module(monkeypatch: pytest.MonkeyPatch) -> Any:
     """Import a fresh example module without requiring Warp."""
-    examples = Path(__file__).resolve().parents[1] / "docs/examples/gpu/direct"
+    examples = (
+        Path(__file__).resolve().parents[1]
+        / "docs/studies/tutorials/working-with-gpu/direct-kernels"
+    )
     monkeypatch.syspath_prepend(str(examples))
     sys.modules.pop("gpu_complete_process_sequence", None)
     module = importlib.import_module("gpu_complete_process_sequence")
@@ -87,7 +90,7 @@ def test_forced_disabled_script_is_a_successful_no_kernel_subprocess() -> None:
     """The standalone disabled route succeeds without an optional Warp import."""
     example_path = (
         Path(__file__).resolve().parents[1]
-        / "docs/examples/gpu/direct/gpu_complete_process_sequence.py"
+        / "docs/studies/tutorials/working-with-gpu/direct-kernels/gpu_complete_process_sequence.py"
     )
 
     process = subprocess.run(  # noqa: S603

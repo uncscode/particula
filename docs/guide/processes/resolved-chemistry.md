@@ -1,6 +1,6 @@
 # React gas and particle materials in a resolved box
 
-The [glyoxal chamber example](../../examples/processes/customization/glyoxal_chamber.py)
+The [glyoxal chamber example](../../studies/literature/evaporation-and-uptake/glyoxal_chamber.py)
 uses reversible condensation and particle chemistry to compare organic loss
 and imidazole formation during a measured chamber dilution.
 
@@ -8,7 +8,7 @@ Use a version 2 mechanism to transform material inside resolved particles or
 to consume a gas through irreversible reactive uptake. Every particle in a
 box draws from its own box's shared gas. Homogeneous gas reactions, bulk
 material reactions and uptake channels can run in the same coupled solve.
-The [worked uptake and aging example](../../examples/processes/customization/resolved_reactive_uptake.py)
+The [worked uptake and aging example](../../studies/examples/custom-processes/resolved_reactive_uptake.py)
 starts from a complete aerosol and compares its history with a radius model.
 
 ## Describe the reactions and bind existing lanes
@@ -125,4 +125,4 @@ limit covers six trial vectors, two slot arrays and rates per box. A budget
 error during preparation reports the required bytes. A failed interval
 signals device code 110, and an invalid initial geometry or rate signals
 111. Concentrations and masses publish together only after all boxes finish.
-[Qualification, costs and limitations](../../contribute/validation/numerics/resolved-chemistry.md)
+[Qualification, costs and limitations](../../studies/validation/condensation/resolved-chemistry.md)

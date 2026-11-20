@@ -84,7 +84,7 @@ and the extracted CUDA download executed successfully. The 558-page website
 build and rendered structure check passed. Tooling/examples excluding the
 separately running native-cloud module passed 552 tests with one skip. Durable
 numerical evidence is in
-[the method record](../docs/contribute/validation/numerics/adaptive-methods.md).
+[the method record](../docs/studies/validation/condensation/adaptive/index.md).
 
 Three new registered examples have completed full refreshes with compact data
 and visually inspected figures:

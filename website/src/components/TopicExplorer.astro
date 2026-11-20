@@ -11,7 +11,7 @@ const parent = topics.get(topic.parent);
 const resources = graph.resources.filter((r) => r.topic === topicId || r.also.includes(topicId));
 const starters = resources.filter((r) => r.start_here &&
   (r.topic === topicId || ancestors(r.topic).some((item) => item.id === topicId)));
-const groups = ['Guide', 'Examples', 'Theory', 'API', 'Contribute'];
+const groups = ['Guide', 'Studies', 'Theory', 'API', 'Contribute'];
 const icon = (id) => `${base.replace(/\/$/, '')}/topic-icons/${id}.svg`;
 ---
 <topic-explorer data-topic={topicId} data-base={base}>
@@ -63,7 +63,7 @@ const icon = (id) => `${base.replace(/\/$/, '')}/topic-icons/${id}.svg`;
   </div>}
   {resources.length > 0 && <section class="topic-resources" aria-label="Topic resources"><h3>Read, calculate, investigate</h3>
     <div class="topic-resource-groups">{groups.map((role) => {
-      const entries = resources.filter((r) => r.role === role);
+      const entries = resources.filter((r) => r.role === role && (role !== 'Studies' || r.study));
       return entries.length > 0 && <section><h4>{role}</h4><ul>{entries.map((r) => <li><a href={resourcePath(r.source, base)}>{r.title}</a></li>)}</ul></section>;
     })}</div>
   </section>}

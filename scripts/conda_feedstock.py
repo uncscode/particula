@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import ast
 import importlib.util
+import json
 import os
 import shutil
 import subprocess
@@ -32,6 +33,8 @@ RELEASE_PATHS = {
     ".github/workflows/conda-feedstock.yml",
     ".github/workflows/pypi.yml",
     "scripts/conda_feedstock.py",
+    "scripts/study_downloads.py",
+    "website/examples.json",
     "scripts/check_feedstock_contract.py",
     "scripts/run_release_tests.py",
     "scripts/release.py",
@@ -47,10 +50,21 @@ RELEASE_PATHS = {
 }
 
 
+def study_inputs(source: Path) -> set[str]:
+    """Return registered helper and data paths needed by offline study ZIPs."""
+    registry = json.loads((source / "website/examples.json").read_text())
+    return {
+        name
+        for config in registry.values()
+        for name in config.get("inputs", [])
+    }
+
+
 def release_inputs_changed(paths: list[str]) -> bool:
     """Recognize edits that require rebuilding the release test environment."""
+    required = RELEASE_PATHS | study_inputs(ROOT)
     return any(
-        path in RELEASE_PATHS
+        path in required
         or path.startswith(("conda/", "scripts/tests/", "docs/"))
         for path in paths
     )
@@ -141,6 +155,9 @@ def stage_source(source: Path, destination: Path) -> None:
         "license",
         "conftest.py",
         "scripts/run_release_tests.py",
+        "scripts/study_downloads.py",
+        "website/examples.json",
+        *sorted(study_inputs(source)),
         COUPLED_FIXTURE,
         *CPU_EXAMPLES,
         *CPU_EXAMPLE_TESTS,

@@ -4,7 +4,7 @@ Use a native mechanism when a gas can react even though it does not condense.
 Each reaction specifies the molecules consumed and produced and the kinetic
 law that advances it. A binding connects these names to the gas columns in
 your aerosol. The same mechanism and binding drive NumPy and resident CUDA.
-The [chamber pulse example](../../examples/processes/customization/native_gas_chemistry.py)
+The [chamber pulse example](../../studies/examples/custom-processes/native_gas_chemistry.py)
 contains a complete two-box simulation.
 
 ## Write and bind a mechanism
@@ -58,7 +58,7 @@ always undergo molar mass balance validation.
 ## Import an NCAR mechanism
 
 Convert a single gas phase in NCAR Mechanism Configuration 1.3.0 to a
-native file. The [gas example](../../examples/processes/customization/native_gas_chemistry.py)
+native file. The [gas example](../../studies/examples/custom-processes/native_gas_chemistry.py)
 download bundle includes both the A + B → C input and its converted JSON.
 Run from the extracted bundle or repository root to reproduce the conversion.
 
@@ -148,7 +148,7 @@ Each process interval starts a fresh adaptive controller. NumPy continuation
 uses `CPUSimulation.checkpoint()` and `CPUSimulation.resume()`. Prepared
 CUDA continuation requires the same device, compatible mechanism, binding,
 solver, and adapter. Both profiles resume at completed outer steps. The
-[qualification record](../../contribute/validation/numerics/gas-chemistry.md)
+[qualification record](../../studies/validation/condensation/gas-chemistry.md)
 covers irreversible gas reactions at prescribed temperature. For bulk
 particle reactions and shared gas uptake, see the [resolved chemistry
 guide](resolved-chemistry.md).

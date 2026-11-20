@@ -76,4 +76,4 @@ for mobility scaling, fixed recombination, and omitted physical processes.
 Direct and prepared CUDA also support the complete dispersion and dielectric
 thermal mechanism, alone or with settling and shear. The tested range and
 strong opposite-charge boundary are recorded in the
-[dielectric capture validation](../../contribute/validation/coagulation/van-der-waals.md).
+[dielectric capture validation](../../studies/validation/coagulation/dispersion/index.md).

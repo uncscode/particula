@@ -12,10 +12,12 @@ import re
 import shutil
 import subprocess
 import sys
+from collections import Counter
 from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
+import docs_studies
 import docs_topics
 import yaml
 from docs_examples import (
@@ -25,6 +27,7 @@ from docs_examples import (
     result_state,
     sections,
 )
+from study_downloads import write_study_zip
 
 SITE = ROOT / "website"
 CONTENT = SITE / "src/content/docs"
@@ -32,16 +35,14 @@ BASE = "/particula/"
 PUBLISHED = "https://uncscode.github.io/particula/"
 PAGES = sorted(
     str(p.relative_to(ROOT / "docs"))
-    for section in ("guide", "examples", "theory", "contribute")
+    for section in ("guide", "studies", "theory", "contribute")
     for p in (ROOT / "docs" / section).rglob("*.md")
 )
 
 
 def route(path):
     """Map a source path to a stable directory route."""
-    path = Path(str(path).removeprefix("docs/"))
-    path = path.parent if path.name == "index.md" else path.with_suffix("")
-    return "" if str(path) == "." else str(path)
+    return docs_studies.route(path)
 
 
 def local_routes():
@@ -171,48 +172,13 @@ def output_markdown(outputs, url, title):
 
 def example_downloads(key, config, source):
     """Publish source and a runnable bundle when helpers are needed."""
-    import zipfile
-
     download = SITE / "public/downloads" / f"{key}.py"
     download.parent.mkdir(parents=True, exist_ok=True)
     download.write_text(source)
-    links = [f"[Download Python script]({BASE}downloads/{key}.py)"]
     if config.get("inputs"):
         archive = download.with_suffix(".zip")
-        flag = " --cuda" if config.get("device") == "cuda" else ""
-        with zipfile.ZipFile(
-            archive, "w", compression=zipfile.ZIP_DEFLATED
-        ) as bundle:
-            bundle.writestr("example.py", source)
-            bundle.writestr(
-                "README.txt",
-                "Extract this entire archive into one directory. Install the "
-                "Particula version documented on the example page and its "
-                "optional dependencies. From the extracted directory run:\n\n"
-                f"python example.py{flag}\n\n"
-                "Helper/data paths are preserved below that directory. CUDA "
-                "examples require an available NVIDIA GPU and Warp.\n",
-            )
-            used_names = {"example.py", "README.txt"}
-            for name in config["inputs"]:
-                destination = Path(
-                    config.get("input_destinations", {}).get(name, name)
-                )
-                if destination.is_absolute() or ".." in destination.parts:
-                    raise ValueError(
-                        "Example bundle input must be a relative contained path"
-                    )
-                if destination.as_posix() in used_names:
-                    raise ValueError(
-                        "Example input collides with a bundle entry"
-                    )
-                used_names.add(destination.as_posix())
-                bundle.write(ROOT / name, destination.as_posix())
-        links.append(
-            f"[Download script with helper and data files (.zip)]"
-            f"({BASE}downloads/{key}.zip)"
-        )
-    return " · ".join(links)
+        write_study_zip(archive, ROOT, config, source)
+    return docs_studies.download_links(key, bool(config.get("inputs")), BASE)
 
 
 def result_notice(state, manifest):
@@ -242,12 +208,16 @@ def render_credit(manifest):
     return credit
 
 
-def render_example(key, config):
+def render_example(key, config, study_links="", breadcrumb=""):
     """Render current source and saved output without execution."""
     directory, manifest = bundle(key)
     state = result_state(config, manifest)
     source = (ROOT / config["source"]).read_text()
-    chunks = [example_downloads(key, config, source)]
+    chunks = [
+        breadcrumb
+        + "[View code](#python-source) · "
+        + example_downloads(key, config, source)
+    ]
     url = BASE + f"results/{key}"
     if directory:
         destination = SITE / "public/results" / key
@@ -285,6 +255,7 @@ def render_example(key, config):
             "explicit; building this page does not run it.\n:::"
         )
     code_index = 0
+    code_anchor = '<span id="python-source"></span>\n\n'
     invocation_index = len(chunks)
     for cell in sections(source):
         if cell.cell_type == "markdown":
@@ -294,8 +265,9 @@ def render_example(key, config):
             chunks.append(
                 "<details>\n<summary>Python · "
                 f"section {code_index + 1}</summary>\n\n"
-                f"```python\n{cell.source}\n```\n\n</details>"
+                f"{code_anchor}```python\n{cell.source}\n```\n\n</details>"
             )
+            code_anchor = ""
             if state == "current" and code_index < len(manifest["outputs"]):
                 chunks.append(
                     output_markdown(
@@ -329,6 +301,7 @@ def render_example(key, config):
             output_markdown(o, url, config["title"])
             for o in manifest["outputs"]
         )
+    chunks.append(study_links)
     write_page(
         route(config["source"]) + ".md",
         config["title"],
@@ -431,9 +404,83 @@ def generate_api():
     )
 
 
+def write_catalog(catalog):
+    """Save the resolved catalog for Astro components."""
+    (SITE / ".cache").mkdir(exist_ok=True)
+    api_backlinks = {}
+    for target, links in catalog.backlinks.items():
+        if target.startswith("api:"):
+            symbol = target.removeprefix("api:")
+            module = docs_studies.api_route(symbol, ROOT).split("#")[0]
+            api_backlinks.setdefault(module, []).extend(
+                {"symbol": symbol, "title": title, "url": url}
+                for title, url in links
+            )
+    (SITE / ".cache/studies.json").write_text(
+        json.dumps(
+            {
+                "rows": catalog.rows,
+                "topics": catalog.topics,
+                "categories": docs_studies.CATEGORIES,
+                "navigation": catalog.navigation(),
+                "apiBacklinks": api_backlinks,
+            },
+            ensure_ascii=False,
+        )
+    )
+
+
+def prepare_article(page, catalog):
+    """Render Markdown prose with its collection links and study resources."""
+    source = ROOT / "docs" / page
+    text = re.sub(r"\A---\n.*?\n---\n", "", source.read_text(), flags=re.S)
+    heading = re.search(r"^# (.+)$", text, re.M)
+    title = heading[1] if heading else source.stem.replace("-", " ").title()
+    if heading:
+        anchor = re.sub(r"[^\w -]", "", title.lower()).replace(" ", "-")
+        text = (
+            text[: heading.start()]
+            + f'<a id="{anchor}"></a>\n'
+            + text[heading.end() :]
+        )
+    key = "docs/" + page
+    if key in catalog.collections.values() or key == docs_studies.SCRIPT_INDEX:
+        text = re.sub(
+            r"<!-- STUDY_LIST_START -->.*?<!-- STUDY_LIST_END -->",
+            "",
+            text,
+            flags=re.S,
+        )
+    text = rewrite_links(text, key).strip()
+    if key == docs_studies.SCRIPT_INDEX:
+        # The index contains ordinary links before filters initialize.
+        text = (
+            "import StudyCatalog from '@components/StudyCatalog.astro';\n\n"
+            + text
+            + "\n\n<StudyCatalog />"
+        )
+        page = str(Path(page).with_suffix(".mdx"))
+    if key in catalog.collections.values():
+        folder = str(Path(key).parent)
+        text += "\n\n" + "\n".join(
+            f"- [{catalog.title(child)}]({BASE}{route(child)}/)"
+            for child in catalog.children(folder)
+        )
+    elif key in {r["source"] for r in catalog.studies}:
+        text = catalog.run_links(key, BASE) + text
+    write_page(
+        page,
+        title,
+        catalog.breadcrumb(key, BASE) + text + catalog.links(key, BASE),
+        key,
+    )
+
+
 def prepare():
     """Prepare documentation pages from source files and saved outputs."""
     topic_graph = docs_topics.require_valid()
+    catalog = docs_studies.StudyCatalog.load(ROOT, topic_graph)
+    write_catalog(catalog)
     if CONTENT.exists():
         shutil.rmtree(CONTENT)
     CONTENT.mkdir(parents=True)
@@ -445,21 +492,14 @@ def prepare():
     for page in PAGES:
         if page == "guide/topics/index.md":
             continue  # The maintained offline entry has a generated explorer.
-        source = ROOT / "docs" / page
-        text = re.sub(r"\A---\n.*?\n---\n", "", source.read_text(), flags=re.S)
-        heading = re.search(r"^# (.+)$", text, re.M)
-        title = heading[1] if heading else source.stem.replace("-", " ").title()
-        if heading:
-            anchor = re.sub(r"[^\w -]", "", title.lower()).replace(" ", "-")
-            text = (
-                text[: heading.start()]
-                + f'<a id="{anchor}"></a>\n'
-                + text[heading.end() :]
-            )
-        text = rewrite_links(text, "docs/" + page)
-        write_page(page, title, text.strip(), "docs/" + page)
+        prepare_article(page, catalog)
     for key, config in registry().items():
-        render_example(key, config)
+        render_example(
+            key,
+            config,
+            catalog.links(config["source"], BASE),
+            catalog.breadcrumb(config["source"], BASE),
+        )
     # Replace the Material-specific home template with native Starlight.
     home = rewrite_links((ROOT / "docs/index.md").read_text(), "docs/index.md")
     write_page(
@@ -517,6 +557,9 @@ class Links(HTMLParser):
         self.links = []
         self.ids = set()
         self.is_redirect = False
+        self.downloads = set()
+        self.executions = []
+        self.study_homes = []
         self.feed(text)
 
     def handle_starttag(self, tag, attrs):
@@ -524,6 +567,12 @@ class Links(HTMLParser):
         attrs = dict(attrs)
         if "data-particula-redirect" in attrs:
             self.is_redirect = True
+        if "data-study-home" in attrs:
+            self.study_homes.append(attrs["data-study-home"])
+        if "data-execution" in attrs:
+            self.executions.append(attrs["data-execution"])
+        if tag == "a" and "download" in attrs:
+            self.downloads.add(attrs.get("href"))
         if "id" in attrs:
             self.ids.add(attrs["id"])
         if tag in {"a", "img", "script", "link"}:
@@ -545,33 +594,42 @@ def redirects(dist):
         "<title>API reference</title></head><body>"
         f'<a href="{BASE}api/">Open API reference</a></body></html>'
     )
-    count = 1
+    destinations = {}
+    fragments = {}
     for old, new in records["moves"].items():
         if (
             old == new
             or not new.startswith("docs/")
-            or not old.endswith((".md", ".ipynb"))
+            or not old.endswith((".md", ".py", ".ipynb"))
         ):
             continue
         target = route(new)
         if target not in local_routes():
             continue
+        alias = route(old)
+        if alias == target:
+            continue
+        if alias in destinations and destinations[alias] != target:
+            raise ValueError(f"Conflicting redirect destinations for {alias}")
+        destinations[alias] = target
+    for key, value in records["fragments"].items():
+        old, fragment = key.split("#", 1)
+        page, anchor = value.split("#", 1)
+        mapping = fragments.setdefault(route(old), {})
+        destination = BASE + route(page) + "/#" + anchor
+        if fragment in mapping and mapping[fragment] != destination:
+            raise ValueError(f"Conflicting redirect fragments for {key}")
+        mapping[fragment] = destination
+    for alias, target in destinations.items():
         destination = BASE + target + "/"
-        output = dist / route(old) / "index.html"
+        output = dist / alias / "index.html"
         if (
             output.exists()
             and "data-particula-redirect" not in output.read_text()
         ):
-            raise ValueError(f"Redirect collision: {old}")
+            raise ValueError(f"Redirect collision: {alias}")
         output.parent.mkdir(parents=True, exist_ok=True)
-        mapping = {
-            key.split("#", 1)[1]: BASE
-            + route(value.split("#", 1)[0])
-            + "/#"
-            + value.split("#", 1)[1]
-            for key, value in records["fragments"].items()
-            if key.startswith(old + "#")
-        }
+        mapping = fragments.get(alias, {})
         output.write_text(
             "<!doctype html><html data-particula-redirect><head>"
             '<meta name="robots" content="noindex">'
@@ -582,8 +640,7 @@ def redirects(dist):
             "location.replace(map[decodeURIComponent(location.hash.slice(1))]"
             f"||{json.dumps(destination)}+location.hash)</script></body></html>"
         )
-        count += 1
-    return count
+    return 1 + len(destinations)
 
 
 def check_rendered_links(dist, pages):
@@ -627,6 +684,27 @@ def check_rendered_links(dist, pages):
     return errors
 
 
+def check_study_catalog(dist, pages):
+    """Count rendered catalog keys and canonical sidebar homes by identity."""
+    errors = []
+    catalog = docs_studies.StudyCatalog.load(ROOT, docs_topics.load(ROOT))
+    home = dist / "studies/index.html"
+    expected = [route(r["source"]) for r in catalog.studies]
+    expected.append(route(docs_studies.SCRIPT_INDEX))
+    if home not in pages or Counter(pages[home].study_homes) != Counter(
+        expected
+    ):
+        errors.append("Each study must appear once in the primary Studies menu")
+    script_index = dist / "studies/scripts/index.html"
+    if script_index not in pages or Counter(
+        pages[script_index].executions
+    ) != Counter(list(registry())):
+        errors.append(
+            "Script catalog must contain every execution key exactly once"
+        )
+    return errors
+
+
 def check_inventory(dist, pages):
     """Validate complete page, fragment, and source-download coverage."""
     errors = []
@@ -639,14 +717,15 @@ def check_inventory(dist, pages):
         target = dist / route(source) / "index.html"
         if target not in pages or anchor not in pages[target].ids:
             errors.append(f"Missing relocated anchor {old} -> {destination}")
+    errors.extend(check_study_catalog(dist, pages))
     for key, config in registry().items():
-        if not (dist / "downloads" / f"{key}.py").is_file():
-            errors.append(f"Missing source download {key}")
-        if (
-            config.get("inputs")
-            and not (dist / "downloads" / f"{key}.zip").is_file()
-        ):
-            errors.append(f"Missing helper/data download {key}")
+        page = pages.get(dist / route(config["source"]) / "index.html")
+        for suffix in ["py", "zip"] if config.get("inputs") else ["py"]:
+            path = f"downloads/{key}.{suffix}"
+            if not (dist / path).is_file():
+                errors.append(f"Missing study download {path}")
+            if not page or BASE + path not in page.downloads:
+                errors.append(f"Missing download link for {path}")
     if any(".trash" in p.relative_to(dist).parts for p in dist.rglob("*")):
         errors.append("Archived files leaked into the published site")
     return errors
@@ -686,7 +765,20 @@ def check_llms_index(dist):
     return errors
 
 
-def check_discovery(dist, pages):
+def check_searchable_studies(urls, study_routes):
+    """Each canonical study has exactly one actual Pagefind entry."""
+    errors = []
+    indexed = Counter(
+        unquote(urlsplit(url).path).removeprefix(BASE).strip("/")
+        for url in urls
+    )
+    for study in study_routes:
+        if indexed[study] != 1:
+            errors.append(f"Expected one searchable entry for {study}")
+    return errors
+
+
+def check_discovery(dist, pages, study_routes=()):
     """Inspect actual search fragments and sitemap URLs for retired content."""
     errors = []
     fragments = list((dist / "pagefind").rglob("*.pf_fragment"))
@@ -700,6 +792,7 @@ def check_discovery(dist, pages):
             errors.append(f"Unknown search fragment format: {fragment.name}")
             continue
         urls.append(json.loads(data[len(prefix) :])["url"])
+    errors.extend(check_searchable_studies(urls, study_routes))
     for sitemap in dist.glob("sitemap-*.xml"):
         urls.extend(re.findall(r"<loc>(.*?)</loc>", sitemap.read_text()))
     for url in urls:
@@ -810,7 +903,12 @@ def verify():
     errors = check_rendered_links(dist, pages)
     errors.extend(api_errors)
     errors.extend(check_inventory(dist, pages))
-    errors.extend(check_discovery(dist, pages))
+    studies = (
+        route(r["source"])
+        for r in docs_topics.load()["resources"]
+        if "study" in r
+    )
+    errors.extend(check_discovery(dist, pages, studies))
     errors.extend(check_llms_index(dist))
     data = json.loads((SITE / ".cache/griffe.json").read_text())
     modules = []

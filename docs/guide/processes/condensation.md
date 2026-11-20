@@ -1,6 +1,6 @@
 # Condensation Strategy System
 
-The [glyoxal chamber example](../../examples/processes/customization/glyoxal_chamber.py)
+The [glyoxal chamber example](../../studies/literature/evaporation-and-uptake/glyoxal_chamber.py)
 uses reversible condensation and particle chemistry to compare organic loss
 and imidazole formation during a measured chamber dilution.
 
@@ -13,7 +13,7 @@ see [native scientific process calls](index.md).
 
 ## Complete direct-process context
 
-The direct condensation call begins the illustrative [explicit-transfer sequence](https://github.com/Gorkowski/particula/blob/main/docs/examples/gpu/direct/gpu_complete_process_sequence.py). The [direct-process validation evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py) and [example regression](https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_complete_process_sequence_example_test.py) preserve caller-owned sidecars and do not claim a high-level coordinator, resident loop, hidden transfer, or CPU fallback.
+The direct condensation call begins the illustrative [explicit-transfer sequence](https://github.com/Gorkowski/particula/blob/main/docs/studies/tutorials/working-with-gpu/direct-kernels/gpu_complete_process_sequence.py). The [direct-process validation evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py) and [example regression](https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_complete_process_sequence_example_test.py) preserve caller-owned sidecars and do not claim a high-level coordinator, resident loop, hidden transfer, or CPU fallback.
 
 > Strategy-based condensation and evaporation with unified dynamics APIs, staggered Gauss-Seidel updates for stability, and runnable integration.
 
@@ -880,8 +880,8 @@ particle, gas = selective.step(
 ## Related Documentation
 
 - **Dynamics overview**: [Wall loss strategy system](wall-loss.md)
-- **Examples**: [docs/examples/simulations/index.md](../../examples/simulations/index.md)
-- **Latent-heat example (latent-heat example)**: [CPU latent-heat condensation bookkeeping](../../examples/processes/condensation/condensation_latent_heat.ipynb)
+- **Examples**: [docs/studies/examples/coupled-populations/index.md](../../studies/examples/coupled-populations/index.md)
+- **Latent-heat example (latent-heat example)**: [CPU latent-heat condensation bookkeeping](../../studies/examples/particle-processes/condensation/condensation_latent_heat.py)
 - **CPU integration baseline**: `particula/integration_tests/condensation_latent_heat_conservation_test.py`
 - **Theory**: [docs/theory/index.md](../../theory/index.md)
 
@@ -909,5 +909,5 @@ sanitized before computing dm/dt.
 ## See Also
 
 - [Wall loss strategy system](wall-loss.md)
-- [Particle phase examples](../../examples/fundamentals/particles/index.md)
-- [Simulations overview](../../examples/simulations/index.md)
+- [Particle phase examples](../../studies/tutorials/building-an-aerosol/particles/index.md)
+- [Simulations overview](../../studies/examples/coupled-populations/index.md)

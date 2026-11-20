@@ -275,6 +275,6 @@ require a matching explicitly supplied registry. See
 configuration restrictions.
 
 Preserve study outputs separately from published documentation bundles. The
-[first CPU experiment](../../examples/fundamentals/first_cpu_workflow.py)
+[first CPU experiment](../../studies/tutorials/first_cpu_workflow.py)
 demonstrates plotting and an exact future-state check after restart; its
 publication retains compact plot data rather than full particle states.

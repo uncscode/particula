@@ -7,10 +7,10 @@ below refer to implemented behavior and its independent reference.
 | Milestone | Delivered behavior | Evidence |
 | --- | --- | --- |
 | Species and mechanisms | Load Python, JSON and YAML. Bind gas names and explicit material columns, validate units and closed budgets, and compile signed reaction entries for resident execution. | [Gas schema](../docs/guide/processes/gas-chemistry.md) · [Resolved schema](../docs/guide/processes/resolved-chemistry.md) |
-| Gas reactions and interchange | Run RK23 and stiff ROS3 on NumPy and CUDA. Import the closed NCAR 1.3.0 Arrhenius subset. | [Analytical trajectories, source rates and stiff references](../docs/contribute/validation/numerics/gas-chemistry.md) |
-| Bulk particle reactions | Integrate molar mass action using the changing material volume of each resolved particle. | [Equal- and unequal-density volume integrals](../docs/contribute/validation/numerics/resolved-chemistry.md#bulk-material-conversion) |
-| Coupled uptake | Share each gas reservoir among particles and pathways using a prescribed collision probability. Preserve represented counts and track both reservoirs through condensation and near depletion. | [Independent radial growth and inventory checks](../docs/contribute/validation/numerics/resolved-chemistry.md#competition-and-near-depletion) |
-| Continuation, cost and example | Resume exact same-backend histories, capture a compatible resolved CUDA sequence, measure complete workloads and publish executed cases. | [Work and continuation](../docs/contribute/validation/numerics/resolved-chemistry.md) · [Uptake and aging example](../docs/examples/processes/customization/resolved_reactive_uptake.py) |
+| Gas reactions and interchange | Run RK23 and stiff ROS3 on NumPy and CUDA. Import the closed NCAR 1.3.0 Arrhenius subset. | [Analytical trajectories, source rates and stiff references](../docs/studies/validation/condensation/gas-chemistry.md) |
+| Bulk particle reactions | Integrate molar mass action using the changing material volume of each resolved particle. | [Equal- and unequal-density volume integrals](../docs/studies/validation/condensation/resolved-chemistry.md#bulk-material-conversion) |
+| Coupled uptake | Share each gas reservoir among particles and pathways using a prescribed collision probability. Preserve represented counts and track both reservoirs through condensation and near depletion. | [Independent radial growth and inventory checks](../docs/studies/validation/condensation/resolved-chemistry.md#competition-and-near-depletion) |
+| Continuation, cost and example | Resume exact same-backend histories, capture a compatible resolved CUDA sequence, measure complete workloads and publish executed cases. | [Work and continuation](../docs/studies/validation/condensation/resolved-chemistry.md) · [Uptake and aging example](../docs/studies/examples/custom-processes/resolved_reactive_uptake.py) |
 
 Dependencies: [Stage 1 accounting and verification](stage-01-scientific-correctness.md),
 [Stage 2A solver assessment](stage-02a-numerical-integration.md),
@@ -50,16 +50,16 @@ and total A+B inventory in kg. Then restore the example's 4 s pulse and
 dilution, including the external mass ledger, and compare all 41 recorded
 times with its analytical solution. Retain its trajectory tolerances
 (`rtol=2e-9`, `atol=1e-20` kg/m³) and inventory tolerances
-(`rtol=1e-12`, `atol=1e-22` kg). [Timed chemistry example](../docs/examples/processes/customization/timed_box_chemistry.py)
+(`rtol=1e-12`, `atol=1e-22` kg). [Timed chemistry example](../docs/studies/examples/custom-processes/timed_box_chemistry.py)
 
 | Starting point | Gas milestone acceptance criterion |
 | --- | --- |
 | CPU `BoxProcess` stages changes and publishes declared writes after all boxes succeed. | Compile phase-qualified names against the gas layout, run the same mechanism after an explicit rebind to reordered columns, and reject stale bindings before mutation. [Box process](../particula/box_process.py) |
 | `ODEProblem` and `AdaptiveSolver` accept continuous rates and admissibility checks. CPU ROS2/ROS3 also require a Jacobian and an explicit time derivative. | Reuse these contracts for a numerical CPU implementation. Compare to the exponential trajectory before selecting a solver default. Use the dimensionless Robertson case for a separate stiffness test. [Solver](../particula/execution/ode.py) · [Assessment cases](../scripts/assess_numerical_methods.py) |
-| The custom GPU example runs prescribed warming through a prepared adapter. Resident ROS3 device kernels implement condensation-specific algebra. | Declare the mechanism's immutable configuration, supported device operation and any persistent state through the adapter contract. Compare the new chemistry path on actual CUDA with the analytical time series, then check same-device restart. [Adapter contract](../particula/execution/process_extensions.py) · [Warming example](../docs/examples/gpu/prepared/custom_process_backends.py) · [Condensation solver support](../docs/guide/processes/numerical-integration.md) |
+| The custom GPU example runs prescribed warming through a prepared adapter. Resident ROS3 device kernels implement condensation-specific algebra. | Declare the mechanism's immutable configuration, supported device operation and any persistent state through the adapter contract. Compare the new chemistry path on actual CUDA with the analytical time series, then check same-device restart. [Adapter contract](../particula/execution/process_extensions.py) · [Warming example](../docs/studies/examples/custom-processes/custom_process_backends.py) · [Condensation solver support](../docs/guide/processes/numerical-integration.md) |
 
 The gas milestone passed binding, analytical trajectory and continuation
-checks on NumPy and resident CUDA. The [qualification record](../docs/contribute/validation/numerics/gas-chemistry.md) gives the measured errors.
+checks on NumPy and resident CUDA. The [qualification record](../docs/studies/validation/condensation/gas-chemistry.md) gives the measured errors.
 The resolved milestones below extend this qualification to changing material
 volume and a shared gas reservoir.
 
@@ -238,7 +238,7 @@ retirement contract.
 are one reference for stiff kinetics and embedded error estimates. Stage 2A
 already assessed these methods. Select a chemistry method by measuring
 its trajectory errors, admissibility, conservation and cost for the compiled
-mechanism. [Stage 2A assessment](../docs/contribute/validation/numerics/adaptive-methods.md)
+mechanism. [Stage 2A assessment](../docs/studies/validation/condensation/adaptive/index.md)
 
 ## Proposed follow-on: condensation and particle aging of the same vapor
 
@@ -274,7 +274,7 @@ the gas left over, material available to evaporate and retained product?
    ordering and the largest tested step meeting this target on both backends.
 4. **Publish the operating range.** Put the runnable regression beside the
    existing coupling test and the reference, tested timescales and measured
-   errors in the [resolved qualification record](../docs/contribute/validation/numerics/resolved-chemistry.md).
+   errors in the [resolved qualification record](../docs/studies/validation/condensation/resolved-chemistry.md).
    Link the measured timestep guidance from the process guide. Stage 2A owns
    reusable splitting schedules, Stage 3A owns activity models, and Stage 6
    owns this coupling test. The first case uses the existing ideal activity
@@ -289,11 +289,11 @@ the gas left over, material available to evaporate and retained product?
   [GPU process adapters](../particula/execution/process_extensions.py), and
   [prepared checkpoint integration](../particula/execution/prepared_checkpoint.py).
 - [Custom-process guide](../docs/guide/processes/index.md),
-  [timed chemistry example](../docs/examples/processes/customization/timed_box_chemistry.py),
-  and [CPU/GPU extension example](../docs/examples/gpu/prepared/custom_process_backends.py).
+  [timed chemistry example](../docs/studies/examples/custom-processes/timed_box_chemistry.py),
+  and [CPU/GPU extension example](../docs/studies/examples/custom-processes/custom_process_backends.py).
 - [Extension tests](../particula/execution/tests/process_extensions_test.py),
   new adjacent mechanism tests, and
-  [scientific validation records](../docs/contribute/validation/).
+  [scientific validation records](../docs/studies/validation/index.md).
 
 ## Acceptance
 

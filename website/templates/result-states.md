@@ -23,5 +23,5 @@ Display the current source and prerequisites. Publish no substitute figure and
 perform no hidden CPU fallback or execution during the site build.
 :::
 
-[See a real saved CPU run](/particula/examples/processes/condensation/condensation_1_bin/)
-or [the explicit CUDA example](/particula/examples/gpu/direct/gpu_coagulation_direct/).
+[See a real saved CPU run](/particula/studies/tutorials/condensation/condensation_1_bin/)
+or [the explicit CUDA example](/particula/studies/validation/coagulation/direct-coagulation/gpu_coagulation_direct/).

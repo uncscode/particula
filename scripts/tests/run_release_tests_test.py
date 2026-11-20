@@ -14,9 +14,9 @@ import pytest
 
 SCRIPTS = Path(__file__).resolve().parents[1]
 EXAMPLE_SCRIPTS = (
-    "docs/examples/processes/dilution/cpu_dilution.py",
-    "docs/examples/processes/nucleation/cpu_nucleation.py",
-    "docs/examples/processes/condensation/condensation_latent_heat.py",
+    "docs/studies/examples/particle-processes/sources-and-dilution/cpu_dilution.py",
+    "docs/studies/examples/particle-processes/sources-and-dilution/cpu_nucleation.py",
+    "docs/studies/examples/particle-processes/condensation/condensation_latent_heat.py",
 )
 EXAMPLE_TESTS = (
     "examples_tests/dilution_example_test.py",
@@ -56,7 +56,7 @@ def source(tmp_path):
         "particula/tests/runtime_test.py",
         *EXAMPLE_SCRIPTS,
         *EXAMPLE_TESTS,
-        "docs/examples/unlisted.py",
+        "docs/studies/unlisted.py",
         "docs/prose.md",
         "examples_tests/unlisted_test.py",
     ):

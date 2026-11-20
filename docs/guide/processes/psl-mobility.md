@@ -6,7 +6,7 @@ Kim, Mulholland, Kukuck and Pui measured the electrical mobility of dry polystyr
 
 A differential mobility analyzer selects electrical mobility. To assign a diameter to that selection, the inversion assumes a charge, a gas viscosity and a slip correction. The particle Knudsen number, Kn = 2λ/D, compares the gas mean free path λ with the particle radius D/2. In the first near-atmospheric 100.7 nm run the measured slip factor was 2.897, so the sphere was nearly three times as mobile as the no-slip Stokes expression predicts at the same diameter and charge. Slip increases as the gas mean free path becomes large relative to the particle radius, for example at smaller size or lower pressure. Two slip laws can nevertheless give similar diameters in this regime. In that same run Particula's law gave 102.02 nm for the 100.7 nm reference at matched gas properties, a +1.31% diameter shift. A large slip factor by itself does not imply a large disagreement between slip laws. [Kim et al., Table 7a](https://nvlpubs.nist.gov/nistpubs/jres/110/1/j110-1kim.pdf)
 
-The [runnable example](../../examples/fundamentals/particles/psl_mobility.py) reconstructs the mobility of each published sphere and solves for its diameter.
+The [runnable example](../../studies/literature/dry-psl-mobility/psl_mobility.py) reconstructs the mobility of each published sphere and solves for its diameter.
 
 ## Particula assigned 102 nm to a 100.7 nm reference near atmospheric pressure
 
@@ -39,4 +39,4 @@ The gray region above 261 nm extends beyond the measured Knudsen-number range. F
 
 The primary result isolates the slip law by using λ = Kn × D/2 from the table and the paper's temperature-dependent air viscosity. Using Particula's default air viscosity and mean free path evaluated from pressure and temperature answers a different practical question. Across the 26 pressure-consistent 100.7 nm rows, the average diameter shift changes from +0.66% to −0.17%. Across the 19 small-sphere rows it changes from +0.33% to −0.55%. A laboratory comparing two software packages should record the gas model together with the slip law. A small net difference can arise from cancellation.
 
-Two of the four 269 nm rows have inconsistent pressure and Knudsen number entries. The [validation record](../../contribute/validation/transport/psl-mobility.md) shows how excluding them changes the comparison and identifies the inputs needed to reproduce each result.
+Two of the four 269 nm rows have inconsistent pressure and Knudsen number entries. The [validation record](../../studies/literature/dry-psl-mobility/index.md) shows how excluding them changes the comparison and identifies the inputs needed to reproduce each result.

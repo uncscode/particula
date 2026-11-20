@@ -16,8 +16,8 @@ import particula as par
 import pytest
 from particula.particles.slot_management import activate_slots
 
-EXAMPLES = Path(__file__).resolve().parents[1] / "docs/examples"
-SIMULATIONS = EXAMPLES / "simulations"
+EXAMPLES = Path(__file__).resolve().parents[1] / "docs/studies/examples"
+SIMULATIONS = EXAMPLES / "coupled-populations"
 
 
 def _setup_through(path, target):
@@ -56,21 +56,36 @@ def _inventory(aerosol):
     "filename,process_name,aerosol_name,width",
     [
         (
-            "biomass_burning_cloud_interactions",
+            "emissions/biomass_burning_cloud_interactions",
             "condensation_process",
             "aerosol",
             3,
         ),
-        ("cough_droplets_partitioning", "condensation_process", "aerosol", 12),
         (
-            "organic_partitioning_and_coagulation",
+            "emissions/cough_droplets_partitioning",
+            "condensation_process",
+            "aerosol",
+            12,
+        ),
+        (
+            "emissions/organic_partitioning_and_coagulation",
             "condensation_process",
             "aerosol",
             11,
         ),
-        ("soot_formation_in_flames", "condensation_process", "aerosol", 24),
-        ("cloud_chamber_single_cycle", "condensation", "aerosol", 3),
-        ("cloud_chamber_multi_cycle", "condensation_as", "aerosol_as", 2),
+        (
+            "emissions/soot_formation_in_flames",
+            "condensation_process",
+            "aerosol",
+            24,
+        ),
+        ("chambers/cloud_chamber_single_cycle", "condensation", "aerosol", 3),
+        (
+            "chambers/cloud_chamber_multi_cycle",
+            "condensation_as",
+            "aerosol_as",
+            2,
+        ),
     ],
 )
 def test_simulation_species_inventory_and_storage(
@@ -92,7 +107,7 @@ def test_simulation_species_inventory_and_storage(
             gas=aerosol.gas,
             environment=aerosol.environment,
         )
-    if filename == "soot_formation_in_flames":
+    if filename == "emissions/soot_formation_in_flames":
         # The hot precursor has no uptake; exercise the cooled parcel.
         aerosol.environment.temperature[0] = 300.0
     assert aerosol.particles.n_species == width
@@ -121,7 +136,7 @@ def test_particle_injection_counts_inventory_and_exhaustion(monkeypatch):
     values = runpy.run_path(
         str(
             EXAMPLES
-            / "processes/customization/adding_particles_during_simulation.py"
+            / "particle-processes/sources-and-dilution/adding_particles_during_simulation.py"
         )
     )
     aerosol = values["aerosol"]
@@ -154,7 +169,7 @@ def test_particle_injection_counts_inventory_and_exhaustion(monkeypatch):
 
 def test_cloud_cycle_diagnostics_track_dry_identity_and_each_peak():
     """Changing wet size cannot masquerade as deposited dry material."""
-    path = SIMULATIONS / "cloud_chamber_multi_cycle.py"
+    path = SIMULATIONS / "chambers/cloud_chamber_multi_cycle.py"
     wanted = {
         "masses_to_diameter_generic",
         "cumulative_loss_by_bin",
@@ -195,7 +210,8 @@ def test_cooled_soot_condensation_then_coagulation_inventory(monkeypatch):
     """The retained process order conserves material along a cooling path."""
     monkeypatch.setattr(plt, "show", lambda *args, **kwargs: None)
     values = _setup_through(
-        SIMULATIONS / "soot_formation_in_flames.py", "coagulation_process"
+        SIMULATIONS / "emissions/soot_formation_in_flames.py",
+        "coagulation_process",
     )
     source = values["aerosol"]
     aerosol = par.Aerosol(
@@ -255,7 +271,8 @@ def _check_chamber_cycle(
     """Check the published integrator, material budgets, phases and clock."""
     monkeypatch.setattr(plt, "show", lambda *args, **kwargs: None)
     values = _setup_through(
-        SIMULATIONS / "cloud_chamber_multi_cycle.py", "condensation_mixed"
+        SIMULATIONS / "chambers/cloud_chamber_multi_cycle.py",
+        "condensation_mixed",
     )
     for suffix, water_index in (("as", 1), ("sucrose", 1), ("mixed", 2)):
         source = values[f"aerosol_{suffix}"]

@@ -113,9 +113,9 @@ faults the owner. Earlier successful processes or steps are not rolled back.
 Checkpoints retain budget configuration and sampler compatibility; incompatible
 older sampler checkpoints reject rather than silently changing continuation.
 
-The [worked resource-admission example](../../../examples/gpu/direct/scalable_coagulation.py)
+The [worked resource-admission example](../../../studies/validation/coagulation/native-sampling/scalable_coagulation.py)
 uses explicit Warp CPU and can be run on requested native CUDA. The
-[validation record](../../../contribute/validation/gpu/coagulation.md) distinguishes
+[validation record](../../../studies/validation/coagulation/direct-coagulation/qualification.md) distinguishes
 historical qualification from new checks. Native CUDA capture and performance
 claims require actual CUDA evidence; Warp CPU is not a substitute.
 
@@ -137,7 +137,7 @@ current radii, masses and signed charges determine the rate. Preparation
 uploads a dimensionless dielectric geometry table. The exact tiled maximum
 and the sampler use the same fp64 pair calculation. An out-of-domain pair
 rejects the step before collision outputs, particle storage or RNG change.
-[Validation and ranges](../../../contribute/validation/coagulation/van-der-waals.md)
+[Validation and ranges](../../../studies/validation/coagulation/dispersion/index.md)
 
 
 ## Adaptive direct intervals

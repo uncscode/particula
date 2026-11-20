@@ -31,7 +31,24 @@ def tree(tmp_path):
         }
     ]
     for title in structure.SECTIONS:
-        if title == "API":
+        if title == "Studies":
+            write(
+                tmp_path,
+                "docs/studies/scripts.md",
+                "# Scripts\n[Studies](index.md)\n",
+            )
+            nav.append(
+                {
+                    "label": title,
+                    "items": [
+                        {
+                            "label": "All runnable Python scripts",
+                            "slug": "studies/scripts",
+                        }
+                    ],
+                }
+            )
+        elif title == "API":
             nav.append({"label": title})
         else:
             path = f"{title.lower()}/index.md"
@@ -46,7 +63,7 @@ def tree(tmp_path):
     write(
         tmp_path,
         "website/examples.json",
-        json.dumps({"run": {"source": "docs/examples/run.py"}}),
+        json.dumps({"run": {"source": "docs/studies/run.py"}}),
     )
     write(tmp_path, "docs/index.md", "# Home\n")
     write(
@@ -64,10 +81,10 @@ def tree(tmp_path):
     )
     write(tmp_path, "docs/guide/index.md", "# Guide\n[child](child.md#after)\n")
     write(tmp_path, "docs/guide/child.md", "# After\n")
-    write(tmp_path, "docs/examples/index.md", "# Examples\n[run](run.ipynb)\n")
+    write(tmp_path, "docs/studies/index.md", "# Examples\n[run](run.ipynb)\n")
     write(
         tmp_path,
-        "docs/examples/run.py",
+        "docs/studies/run.py",
         "# %% [markdown]\n# # Run\n# %%\nresult = 1\n",
     )
     return tmp_path
@@ -102,7 +119,7 @@ def test_structural_regressions_are_rejected(tree, change, expected):
         "anchor": ("docs/guide/child.md", "# Renamed"),
         "stale": ("docs/guide/child.md", "# After\n[old](../old.md)"),
         "registry": ("website/examples.json", "{}"),
-        "source": ("docs/examples/hidden.py", "result = 1"),
+        "source": ("docs/studies/hidden.py", "result = 1"),
     }
     path, text = changes[change]
     if text is None:
@@ -116,7 +133,7 @@ def test_percent_source_prose_links_are_checked_independently(tree):
     """Valid notebook prose must not hide stale links in its paired source."""
     write(
         tree,
-        "docs/examples/run.py",
+        "docs/studies/run.py",
         "# %% [markdown]\n"
         "# [old](../old.md)\n"
         "# [missing](missing.md)\n"
@@ -133,7 +150,7 @@ def test_percent_source_prose_links_are_checked_independently(tree):
 
     write(
         tree,
-        "docs/examples/run.py",
+        "docs/studies/run.py",
         "# %% [markdown]\n"
         "# [current](../guide/child.md#after)\n"
         "# %%\nresult = 1\n",
@@ -184,15 +201,15 @@ def test_topic_navigation_rejects_unregistered_generated_routes(tree):
 def test_rendered_notebook_urls_and_project_mount(tree):
     """Source-correct notebook links can still be broken in rendered HTML."""
     site = tree / "site"
-    page = tree / "docs/examples/run.py"
-    write(site, "examples/run/index.html", '<a href="../target.md">bad</a>')
+    page = tree / "docs/studies/run.py"
+    write(site, "studies/run/index.html", '<a href="../target.md">bad</a>')
     assert any(
         "broken rendered link" in e
         for e in structure.check_rendered_links(tree, site, {page})
     )
     write(
         site,
-        "examples/run/index.html",
+        "studies/run/index.html",
         '<a href="/particula/guide/child/#after">ok</a>',
     )
     write(site, "guide/child/index.html", '<h1 id="after">After</h1>')
@@ -201,7 +218,7 @@ def test_rendered_notebook_urls_and_project_mount(tree):
 
 def test_notebook_publication_sources_cannot_return(tree):
     """Original notebooks belong only in the excluded reference archive."""
-    write(tree, "docs/examples/run.ipynb", "{}")
+    write(tree, "docs/studies/run.ipynb", "{}")
     assert any(
         "retired notebook publication source" in e
         for e in structure.check(tree)
@@ -235,3 +252,27 @@ def test_retired_content_allows_only_declared_redirects(
     }
     errors = structure.check_search(tmp_path, manifest)
     assert (errors == []) is allowed
+
+
+def test_validation_collection_has_one_home_under_studies():
+    """Old validation bookmarks resolve to Studies and have no Contribute menu."""
+    root = Path(__file__).resolve().parents[2]
+    nav = json.loads((root / "website/navigation.json").read_text())
+    contribute = next(group for group in nav if group["label"] == "Contribute")
+
+    def labels(group):
+        yield group["label"]
+        for child in group.get("items", []):
+            yield from labels(child)
+
+    assert "Validation" not in set(labels(contribute))
+    legacy = "docs/contribute/validation/"
+    assert not list((root / legacy).rglob("*.md"))
+    moves = json.loads((root / "docs/.assets/relocations.json").read_text())[
+        "moves"
+    ]
+    assert moves[legacy + "index.md"] == "docs/studies/validation/index.md"
+    for old, destination in moves.items():
+        if old.startswith(legacy):
+            assert destination.startswith("docs/studies/")
+            assert (root / destination).is_file()

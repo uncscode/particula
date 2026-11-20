@@ -8,7 +8,7 @@ import pytest
 
 SOURCE = (
     Path(__file__).resolve().parents[1]
-    / "docs/examples/gpu/prepared/gpu_ion_balance.py"
+    / "docs/studies/validation/coagulation/charged-aerosols/gpu_ion_balance.py"
 )
 
 

@@ -1,7 +1,7 @@
 # Stage 4: GPU scientific usefulness and reliability
 
 Status: first campaign qualified on CPU and actual CUDA at 1, 8, 32 and 128 boxes.
-[Measurements, figures and reproduction](../docs/contribute/validation/gpu/bat-humidity-pulse.md).
+[Measurements, figures and reproduction](../docs/studies/benchmarks/bat-humidity-pulse/index.md).
 Entry dependency: a supported forward workflow with relevant
 [verification](stage-01-scientific-correctness.md),
 [numerical accuracy](stage-02a-numerical-integration.md), and
@@ -41,8 +41,8 @@ at 293 K. Hold dry size, composition and box volume fixed. Measure wet radius
 in metres, vapor and condensed water in kg/m³, and signed transfer during each
 leg. Record both sides of the vapor reset at 80 ms. The one-box pilot found
 that the water-transfer history was more sensitive to timestep than wet radius.
-[Pulse implementation](../docs/examples/thermodynamics/activity/bat_humidity_pulse.py)
-· [Pilot measurements](../docs/contribute/validation/thermodynamics/bat-activity.md#one-box-humidity-pulse-timing-and-refinement)
+[Pulse implementation](../docs/studies/benchmarks/bat-humidity-pulse/bat_humidity_pulse.py)
+· [Pilot measurements](../docs/studies/validation/material-properties/binary-bat.md#one-box-humidity-pulse-timing-and-refinement)
 
 | Candidate | Evidence available | Role in this campaign |
 | --- | --- | --- |
@@ -94,7 +94,7 @@ speedup or accuracy target.
    Identify the first measured batch size with an advantage and report any
    overlap or slower cases. Profile the largest cost before suggesting
    consolidation. The full curve may favor one backend throughout.
-   [Historical RTX campaign](../docs/contribute/validation/gpu/prepared-rtx5060.md)
+   [Historical RTX campaign](../docs/studies/benchmarks/prepared-scaling/qualification.md)
    · [NVIDIA timing guidance](https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/#timing)
 4. **Repeatable CUDA checks.** On a designated CUDA host, use the strict
    [qualification runner](../scripts/qualify_gpu.py) with explicit BAT test
@@ -108,7 +108,7 @@ speedup or accuracy target.
 The existing binary BAT capture/restart test passed on the RTX 5060 at
 `92615153d2` (one pass, zero skips, 9.72 s of pytest time). It changes
 temperature and pressure during replay and resumes a saved checkpoint. The
-[ensemble restart check](../docs/contribute/validation/gpu/bat-humidity-pulse.md#restart-and-capture)
+[ensemble restart check](../docs/studies/benchmarks/bat-humidity-pulse/index.md#restart-and-capture)
 subsequently verified exact continuation across the vapor replacement at all four sizes.
 Reproduce the short regression from the repository root:
 
@@ -151,8 +151,8 @@ python scripts/qualify_gpu.py \
   [GPU kernels](../particula/gpu/kernels/).
 - [GPU study helpers](../scripts/gpu_studies/) and
   [prepared examples](../docs/examples/gpu/prepared/).
-- [Prepared RTX evidence](../docs/contribute/validation/gpu/prepared-rtx5060.md),
-  [capture qualification](../docs/contribute/validation/gpu/graph-capture-qualification.md),
+- [Prepared RTX evidence](../docs/studies/benchmarks/prepared-scaling/qualification.md),
+  [capture qualification](../docs/studies/validation/workflows-and-releases/graph-capture/index.md),
   and [GPU support](../docs/guide/gpu/support.md).
 
 ## Acceptance and validation

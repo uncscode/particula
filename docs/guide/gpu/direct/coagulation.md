@@ -57,7 +57,7 @@ performs no allocation, readback, synchronization, reset or host configuration
 resolution. Callers keep arrays alive and state compatible between enqueues;
 new bindings or semantics require preparation again. This is direct/prepared
 science evidence. Native resident continuation is illustrated in the
-[resident walkthrough](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/resident/gpu_resident_multi_timestep.py); it requires
+[resident walkthrough](https://github.com/uncscode/particula/blob/main/docs/studies/tutorials/working-with-gpu/resident/gpu_resident_multi_timestep.py); it requires
 fresh exact-device containers and bindings after explicit restart.
 
 Native regression coverage uses resolved volumes 0.25/1/4 m³, common counts
@@ -78,7 +78,7 @@ suites skip cleanly when it is unavailable. This path provides no performance,
 broad CPU/GPU parity, graph-capture, broad autodiff, DNS/general-turbulence
 support, unsupported-mechanism, or unsupported-distribution claim. See the
 [canonical ownership contract](../../data-model/index.md)
-and [evidence/command record](../../../contribute/validation/gpu/coagulation.md).
+and [evidence/command record](../../../studies/validation/coagulation/direct-coagulation/qualification.md).
 
 Focused baseline commands:
 
@@ -152,7 +152,7 @@ resident-session lifecycle, resident scheduling scheduling, and resident RNG and
 stream policy remain explicitly deferred.
 
 For a runnable selected-Brownian introduction, see the
-[GPU coagulation example](https://github.com/Gorkowski/particula/blob/main/docs/examples/gpu/direct/gpu_coagulation_direct.py). It
+[GPU coagulation example](https://github.com/Gorkowski/particula/blob/main/docs/studies/validation/coagulation/direct-coagulation/gpu_coagulation_direct.py). It
 keeps explicit conversion, synchronization, restoration, and caller-owned
 collision/RNG sidecars; it is not a CPU fallback or a high-level `Runnable`
 workflow. The direct-kernel evidence/command record above remains the complete

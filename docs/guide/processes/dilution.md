@@ -7,7 +7,7 @@ contracts below retain their own, sometimes broader, capabilities.
 ## Complete direct-process context
 
 CPU dilution remains the semantic source. The direct GPU step is one call in the
-illustrative [explicit-transfer sequence](https://github.com/Gorkowski/particula/blob/main/docs/examples/gpu/direct/gpu_complete_process_sequence.py), backed by [direct-process validation evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py) and its [example regression](https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_complete_process_sequence_example_test.py). It does not create public coordination, hidden transfer, CPU fallback, or a resident loop.
+illustrative [explicit-transfer sequence](https://github.com/Gorkowski/particula/blob/main/docs/studies/tutorials/working-with-gpu/direct-kernels/gpu_complete_process_sequence.py), backed by [direct-process validation evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py) and its [example regression](https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_complete_process_sequence_example_test.py). It does not create public coordination, hidden transfer, CPU fallback, or a resident loop.
 
 The CPU dilution system provides a bounded chamber-loss process for a single
 `Aerosol`. It is the completed CPU contract from parent **GPU process completeness**. **GPU dilution** is a
@@ -92,8 +92,8 @@ runnable above for supported execution.
 
 The deterministic, hardware-free example uses only this public API:
 
-- Source: <https://github.com/Gorkowski/particula/blob/main/docs/examples/processes/dilution/cpu_dilution.py>
-- Run: `python docs/examples/processes/dilution/cpu_dilution.py`
+- Source: <https://github.com/Gorkowski/particula/blob/main/docs/studies/examples/particle-processes/sources-and-dilution/cpu_dilution.py>
+- Run: `python docs/studies/examples/particle-processes/sources-and-dilution/cpu_dilution.py`
 
 Focused regression commands are:
 

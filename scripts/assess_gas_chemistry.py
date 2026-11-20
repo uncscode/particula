@@ -10,18 +10,18 @@ import json
 from dataclasses import replace
 
 import numpy as np
-from docs.examples.processes.customization.native_gas_chemistry import chamber
 from particula import ProcessRegistry
 from particula.dynamics.chemistry import ReactionMechanism
 from particula.dynamics.chemistry.adapter import GasChemistryAdapter
 from particula.dynamics.chemistry.process import ChemistrySolver, GasChemistry
 from scipy.integrate import solve_ivp
 from scripts.assess_numerical_methods import cases
+from scripts.docs_examples import import_study
 
 
 def benchmark():
     """Give the dimensionless Robertson reference explicit benchmark scales."""
-    state = chamber()
+    state = import_study("native-gas-chemistry").chamber()
     gas = state.gas
     gas.name[:] = ["A", "B", "C"]
     gas.molar_mass[:] = 0.1

@@ -4,8 +4,8 @@ The closed-box CPU and CUDA milestone merged in
 [PR #1676](https://github.com/uncscode/particula/pull/1676). The delivery used `/tmp/particula-stage-05` on
 `codex/stage-05-inverse-modeling`, based on upstream `c76cfb5993`.
 The executed implementation revision is `9fa5880745`.
-[Validation and representation decisions](../docs/contribute/validation/numerics/initial-size-inversion.md)
-· [Worked example](../docs/examples/processes/condensation/infer_initial_radius.py)
+[Validation and representation decisions](../docs/studies/validation/condensation/initial-size/index.md)
+· [Worked example](../docs/studies/validation/condensation/initial-size/infer_initial_radius.py)
 
 Planning baseline reviewed at `5ec711e600` on 2026-11-19. Entry dependency: a scientifically supported forward case
 with validated [numerics](stage-02a-numerical-integration.md), reproducible
@@ -42,7 +42,7 @@ the Sutherland viscosity from the adaptive assessment. The proposed observable
 is final wet radius at 1.4 s. Reserve vapor concentration and intermediate
 radii for independent trajectory checks. [Case inputs](../scripts/assess_native_condensation.py)
 · [Independent radius reference](../scripts/assess_native_adaptive.py)
-· [Forward validation](../docs/contribute/validation/numerics/adaptive-methods.md)
+· [Forward validation](../docs/studies/validation/condensation/adaptive/index.md)
 
 A planning calculation with the independent radius equation gave the following
 values. In `local_reference`, pass initial radius divided by 1 µm, the fixed
@@ -63,7 +63,7 @@ The three slopes support trying a scalar inversion. At the center, a synthetic
 test noisy recovery directly. This observation model applies to a synthetic
 monodisperse population. The existing CCN study fits an effective κ from
 activation data and illustrates how to retain a held-out observable if the
-study later moves to measurements. [CCN retrieval study](../docs/contribute/validation/thermodynamics/ccn-retrieval.md)
+study later moves to measurements. [CCN retrieval study](../docs/studies/literature/particle-water-uptake/ccn-retrieval/index.md)
 
 ## Reviewable work packages
 
@@ -128,7 +128,7 @@ study later moves to measurements. [CCN retrieval study](../docs/contribute/vali
 
 Publish the case, reference, derivative sweep, recovery failures, timed
 comparators and software/device revisions with a percent-format Python
-example and a [validation record](../docs/contribute/validation/). The Stage 4
+example and a [validation record](../docs/studies/validation/index.md). The Stage 4
 campaign supplies the timing protocol. Its BAT tables, humidity reset and
 captured forward timings need their own gradient qualification if used later.
 

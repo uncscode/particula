@@ -15,7 +15,7 @@ the same revision. Python examples may require dependencies, helper files or
 CUDA; consult their prerequisites before execution. Published example pages
 include saved outputs that are not embedded in the Python sources.
 
-## Documentation and examples
+## Documentation and studies
 
 - [Installation](https://raw.githubusercontent.com/uncscode/particula/main/docs/guide/getting-started/installation/index.md): Choose an installation method.
 - [First simulation](https://raw.githubusercontent.com/uncscode/particula/main/docs/guide/getting-started/first-simulation.md): Build and run a small simulation.
@@ -23,8 +23,9 @@ include saved outputs that are not embedded in the Python sources.
 - [Processes](https://raw.githubusercontent.com/uncscode/particula/main/docs/guide/processes/index.md): Supported physical processes.
 - [GPU support](https://raw.githubusercontent.com/uncscode/particula/main/docs/guide/gpu/support.md): Supported devices, operations and limitations.
 - [Migration to 0.3.0](https://raw.githubusercontent.com/uncscode/particula/main/docs/guide/migration/v0.3.0/index.md): Changes from older APIs.
-- [Native aerosol example](https://raw.githubusercontent.com/uncscode/particula/main/docs/examples/fundamentals/native_aerosol.py): Executable Python source.
-- [Particle data example](https://raw.githubusercontent.com/uncscode/particula/main/docs/examples/fundamentals/particles/particle_data.py): Executable Python source for particle state.
+- [All runnable Python scripts](https://raw.githubusercontent.com/uncscode/particula/main/docs/studies/scripts.md): Find study sources across topics and devices.
+- [Native aerosol example](https://raw.githubusercontent.com/uncscode/particula/main/docs/studies/tutorials/building-an-aerosol/native_aerosol.py): Executable Python source.
+- [Particle data example](https://raw.githubusercontent.com/uncscode/particula/main/docs/studies/tutorials/building-an-aerosol/particles/particle_data.py): Executable Python source for particle state.
 - [Agent plugins](https://raw.githubusercontent.com/uncscode/particula/main/docs/guide/agent-plugins/index.md): Install and use Particula Helper.
 - [Particula Helper](https://raw.githubusercontent.com/uncscode/particula/main/plugins/particula-helper/README.md): Scientific workflows and repository skills.
 - [Source discovery](https://raw.githubusercontent.com/uncscode/particula/main/plugins/particula-helper/references/sources.md): Find documentation matching the selected environment.

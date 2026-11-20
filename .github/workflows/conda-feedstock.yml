@@ -11,13 +11,9 @@ on:
       - _particula_build.py
       - particula_docs.py
       - conda/**
-      - scripts/conda_feedstock.py
-      - scripts/check_feedstock_contract.py
-      - scripts/run_release_tests.py
-      - scripts/gpu_studies/cases.py
+      - scripts/**
+      - website/examples.json
       - particula/execution/tests/gpu_coupled_test.py
-      - scripts/release.py
-      - scripts/tests/**
       - docs/**
       - examples_tests/dilution_example_test.py
       - examples_tests/nucleation_example_test.py

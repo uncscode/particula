@@ -160,7 +160,7 @@ condensed_organic = inventory * result.partition_coefficients
 print(condensed_organic, result.water_content, result.error)
 ```
 
-The concrete `particula.equilibria.partitioning.liquid_vapor_partitioning` function also returns the underlying optimizer result for diagnostics. [Worked equilibrium examples](../../examples/thermodynamics/equilibria/index.md)
+The concrete `particula.equilibria.partitioning.liquid_vapor_partitioning` function also returns the underlying optimizer result for diagnostics. [Worked equilibrium examples](../../studies/examples/thermodynamics/equilibria/index.md)
 
 For a species-by-species mass balance and optimizer status, request the individual organic and aqueous arrays from the functional solver at the same conditions.
 

@@ -11,7 +11,10 @@ import numpy.testing as npt
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
-EXAMPLE = ROOT / "docs/examples/processes/nucleation/cpu_nucleation.py"
+EXAMPLE = (
+    ROOT
+    / "docs/studies/examples/particle-processes/sources-and-dilution/cpu_nucleation.py"
+)
 EXAMPLE_TIMEOUT_SECONDS = 30
 
 

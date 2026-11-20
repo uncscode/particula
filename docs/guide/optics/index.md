@@ -5,7 +5,7 @@ NumPy CPU, Warp CPU and CUDA. Import numerical CPU functions from
 `particula.optics`; import device workspaces explicitly from
 `particula.optics.gpu`. No PyMieScatt installation is needed.
 
-Start with the executed [spectra, polarization and cloud example](../../examples/optics/sphere_optics.py).
+Start with the executed [spectra, polarization and cloud example](../../studies/validation/material-properties/sphere-optics/sphere_optics.py).
 This feature supplies optical properties for later radiation and microphysics
 models. It does not update particle mass, temperature, gas or environment state.
 
@@ -30,7 +30,7 @@ is positive and real. Normalize exactly once:
 The supported size-parameter domain is `0 <= x <= 10000`. Finite input
 validation and bounded numerical convergence are separate: a numerically
 unresolved calculation raises an error or sets a device failure status.
-The [validation record](../../contribute/validation/optics/reference-corpus.md)
+The [validation record](../../studies/validation/material-properties/sphere-optics/index.md)
 identifies tested cases, reference discrepancies and acceptance criteria.
 
 ## Particle spectra and retained absorption
@@ -120,7 +120,7 @@ it is not total flux transmission through a multiply scattering cloud.
 
 ## Device calculations
 
-Run the [CUDA optics example](../../examples/optics/cuda_optics.py) for explicit
+Run the [CUDA optics example](../../studies/validation/material-properties/cuda-optics/cuda_optics.py) for explicit
 transfers, timed particle batches and a streamed cloud spectrum. It requires
 native CUDA and verifies results against CPU calculations.
 

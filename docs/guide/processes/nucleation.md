@@ -6,7 +6,7 @@ contracts below retain their own, sometimes broader, capabilities.
 
 ## Complete direct-process context
 
-The direct nucleation boundary is shown last in the illustrative [explicit-transfer sequence](https://github.com/Gorkowski/particula/blob/main/docs/examples/gpu/direct/gpu_complete_process_sequence.py). Its [direct-process validation evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py) and [example regression](https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_complete_process_sequence_example_test.py) do not turn the example into a public coordinator, GPU `Runnable`, backend selector, resident loop, or CPU fallback.
+The direct nucleation boundary is shown last in the illustrative [explicit-transfer sequence](https://github.com/Gorkowski/particula/blob/main/docs/studies/tutorials/working-with-gpu/direct-kernels/gpu_complete_process_sequence.py). Its [direct-process validation evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py) and [example regression](https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_complete_process_sequence_example_test.py) do not turn the example into a public coordinator, GPU `Runnable`, backend selector, resident loop, or CPU fallback.
 
 > Convert partitioning precursor gas into fixed-capacity particle slots with a
 > public, conservation-accounted CPU runnable.
@@ -93,7 +93,7 @@ source = NucleationSourceConfig(
 
 ## Getting started
 
-Use the [supported CPU example](https://github.com/uncscode/particula/blob/main/docs/examples/processes/nucleation/cpu_nucleation.py) as
+Use the [supported CPU example](https://github.com/uncscode/particula/blob/main/docs/studies/examples/particle-processes/sources-and-dilution/cpu_nucleation.py) as
 the runnable starting point.
 It constructs native `Aerosol`, unified `GasData` with precursor and inert lanes,
 fixed resolved particle capacity, aligned `EnvironmentData`, and
@@ -160,7 +160,7 @@ Kerminen--Kulmala calculation.
 
 See [Fixed-Capacity Slot Exhaustion Primitives](../gpu/slot-exhaustion.md),
 the [equations](../../theory/dynamics/nucleation-equations.md), and the
-[supported CPU example](https://github.com/uncscode/particula/blob/main/docs/examples/processes/nucleation/cpu_nucleation.py).
+[supported CPU example](https://github.com/uncscode/particula/blob/main/docs/studies/examples/particle-processes/sources-and-dilution/cpu_nucleation.py).
 
 ## Direct-Warp low-level step
 
@@ -219,14 +219,14 @@ resize/compaction, GPU `Runnable`, scheduler/backend selection, direct-process i
 orchestration, expanded physics, graph capture, autodiff, and performance
 guarantees. Fixed-slot management fixed-slot activation, slot exhaustion primitives, and CPU nucleation are dependencies; direct-process integration is only a downstream explicit-transfer
 integration consumer. See the [equations](../../theory/dynamics/nucleation-equations.md),
-[direct example](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/direct/gpu_direct_nucleation.py), and
+[direct example](https://github.com/uncscode/particula/blob/main/docs/studies/tutorials/working-with-gpu/direct-kernels/gpu_direct_nucleation.py), and
 [GPU roadmap](../../contribute/roadmap.md).
 
 Focused validation:
 
 ```bash
-python docs/examples/processes/nucleation/cpu_nucleation.py
-python -Werror docs/examples/gpu/direct/gpu_direct_nucleation.py
+python docs/studies/examples/particle-processes/sources-and-dilution/cpu_nucleation.py
+python -Werror docs/studies/tutorials/working-with-gpu/direct-kernels/gpu_direct_nucleation.py
 pytest examples_tests/nucleation_example_test.py -q -Werror
 pytest examples_tests/gpu_direct_nucleation_example_test.py -q -Werror
 pytest particula/dynamics/nucleation/tests/ \

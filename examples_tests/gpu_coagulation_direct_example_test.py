@@ -15,7 +15,7 @@ import pytest
 
 EXAMPLE_PATH = (
     Path(__file__).resolve().parents[1]
-    / "docs/examples/gpu/direct/gpu_coagulation_direct.py"
+    / "docs/studies/validation/coagulation/direct-coagulation/gpu_coagulation_direct.py"
 )
 EXAMPLES_ROOT = EXAMPLE_PATH.parent
 LAZY_IMPORTS = (
@@ -400,12 +400,21 @@ def test_real_warp_selected_adapter_reuses_rng_and_preserves_identity(
 
 def test_numerical_walkthroughs_import_without_matplotlib():
     """Core users can import GPU walkthroughs before choosing to plot."""
-    gpu = EXAMPLES_ROOT.parent
-    sources = [
-        *sorted((gpu / "direct").glob("gpu_*.py")),
-        *sorted((gpu / "resident").glob("gpu_*.py")),
-        gpu / "prepared/gpu_prepared_quick_start.py",
-    ]
+    from scripts.docs_examples import ROOT, registry
+
+    runs = registry()
+    keys = (
+        "gpu-coagulation",
+        "examples-gpu-direct-gpu-complete-process-sequence",
+        "examples-gpu-direct-gpu-condensation-parity-walkthrough",
+        "examples-gpu-direct-gpu-direct-kernels-quick-start",
+        "examples-gpu-direct-gpu-direct-nucleation",
+        "examples-gpu-resident-gpu-resident-graph-capture",
+        "examples-gpu-resident-gpu-resident-multi-timestep",
+        "examples-gpu-resident-gpu-resident-session",
+        "gpu-prepared-quick-start",
+    )
+    sources = [ROOT / runs[key]["source"] for key in keys]
     subprocess.run(  # noqa: S603
         [
             sys.executable,

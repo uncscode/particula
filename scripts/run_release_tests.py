@@ -20,9 +20,9 @@ import venv
 from pathlib import Path
 
 CPU_EXAMPLES = (
-    "docs/examples/processes/dilution/cpu_dilution.py",
-    "docs/examples/processes/nucleation/cpu_nucleation.py",
-    "docs/examples/processes/condensation/condensation_latent_heat.py",
+    "docs/studies/examples/particle-processes/sources-and-dilution/cpu_dilution.py",
+    "docs/studies/examples/particle-processes/sources-and-dilution/cpu_nucleation.py",
+    "docs/studies/examples/particle-processes/condensation/condensation_latent_heat.py",
 )
 CPU_EXAMPLE_TESTS = (
     "examples_tests/dilution_example_test.py",

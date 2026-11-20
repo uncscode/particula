@@ -7,7 +7,7 @@ For the shipped container, transfer, and runnable-example baseline that this
 follow-on differentiability work builds on, start with the
 [Data Containers and GPU Foundations](../../../guide/data-model/index.md)
 guide and the
-[Data Containers example](../../../examples/fundamentals/data-containers.md).
+[Data Containers example](../../../studies/tutorials/building-an-aerosol/containers/data-containers.md).
 
 This page records how NVIDIA Warp automatic differentiation works, the
 constraints it imposes on kernel authoring, and the options for making
@@ -352,7 +352,7 @@ parameters are fixed.
 
 ## Particula-Specific Assessment
 
-The [closed-box inversion](../../validation/numerics/initial-size-inversion.md)
+The [closed-box inversion](../../../studies/validation/condensation/initial-size/index.md)
 uses dedicated fp64 gradient arrays. Ordinary forward execution keeps its
 existing allocation policy. The physics building blocks
 are already gradient-friendly; the stochastic control flow is not.

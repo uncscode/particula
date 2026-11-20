@@ -7,10 +7,10 @@ extend an existing topic before adding another page.
 | Section | Audience and purpose | Owner |
 | --- | --- | --- |
 | Guide | Users installing, constructing state, choosing a process, or migrating | `docs/guide/` |
-| Examples | Users running a concrete scientific calculation | `docs/examples/` |
+| Studies | Readers running calculations, learning workflows, or evaluating literature, validation and benchmark evidence | `docs/studies/` |
 | Theory | Readers looking for equations, assumptions, units, and literature | `docs/theory/` |
 | API | Call signatures and implementation reference | Generated from package docstrings |
-| Contribute | Developers changing the package, validating results, or setting up assistants | `docs/contribute/` |
+| Contribute | Developers setting up the project, proposing changes and maintaining the package | `docs/contribute/` |
 
 ## Topic organization and scientific narratives
 
@@ -42,21 +42,22 @@ without duplicating the interactive map or editing generated pages.
    could change a scientific interpretation.
 3. Use topic folders and descriptive lowercase filenames. Python sources
    use snake_case stems so the source remains importable.
-4. Add the page to its content section in `website/navigation.json` and link it
-   from its owning index. Keep Explore topics as a separate top-level folder
+4. Register a study on its main resource in `website/topics.json`; the site
+   generates its category and topic listings. For other sections, update
+   `website/navigation.json`. Link the page from its offline landing. Keep Explore topics as a separate top-level folder
    for the explorer and main topic categories.
 5. Add purpose, prerequisites, units, device requirements, and version context.
    Keep CPU tutorials separate from optional Warp and native-CUDA-only examples.
 
 Implementation plans and task closeouts belong in `plans/`, not in
-public feature pages. Durable scientific evidence belongs under
-`contribute/validation/` with revision/device provenance, limits, and open gates.
+public feature pages. A study owns its scientific evidence, reference, revision, device and limits.
+Keep validation records with the study they qualify. Place benchmark protocols beside their performance results. File cross-cutting workflow and release qualifications under [Validation studies](../studies/validation/index.md).
 The public roadmap contains active or pending work only.
 
 ## Move, merge, or retire
 
 Update links, percent-cell Markdown, source imports/loaders, tests, CI selectors,
-release allowlists, and assistant instructions together. Move Python sources and declared data together. Follow [Add Examples](Feature_Workflow/Details/Add_Example.md)
+release allowlists, and assistant instructions together. Verify declared dependencies and their destinations in the downloaded ZIP. Follow [Add Examples](Feature_Workflow/Details/Add_Example.md)
 for full-workload execution and retained outputs.
 
 Record meaningful old routes and split-section anchors in
@@ -101,8 +102,8 @@ in a temporary source tree, then delegate packaging to Flit. Builds do not
 create a second maintained copy in the checkout. Editable installs resolve the
 locator to this source tree instead of copying docs.
 
-The bundle includes `index.md`, guides, theory, contributor guidance, Python
-examples, and supporting data/images with their original relative paths and
+The bundle includes `index.md`, guides, theory, contributor guidance, scientific studies
+with runnable Python, and supporting data/images with their original relative paths and
 bytes. Generated API pages, hidden directories, caches, build output, temporary
 files, website output and `.trash/` are excluded. The generated manifest records
 the package version and each source file's size and SHA-256 hash. Locate it with

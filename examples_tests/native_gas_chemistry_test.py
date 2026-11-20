@@ -2,15 +2,13 @@
 
 import numpy as np
 import pytest
-from docs.examples.processes.customization.native_gas_chemistry import (
-    chamber,
-    chemistry,
-    simulate,
-)
 from particula import ProcessRegistry
 from particula.dynamics.chemistry.adapter import GasChemistryAdapter
 from particula.dynamics.chemistry.process import GasChemistry
 from particula.execution.cpu_simulation import CPUSimulation
+from scripts.docs_examples import import_study
+
+example = import_study("native-gas-chemistry")
 
 
 @pytest.mark.parametrize("device", ["numpy", "cpu", "cuda:0"])
@@ -20,8 +18,8 @@ def test_closed_first_order_case(device):
 
     if device.startswith("cuda") and not wp.is_cuda_available():
         pytest.skip("CUDA device unavailable")
-    state = chamber()
-    process = chemistry(state)
+    state = example.chamber()
+    process = example.chemistry(state)
     initial = state.gas.concentration.copy()
     if device == "numpy":
         owner = CPUSimulation(state, process, time_step=1.0)
@@ -57,7 +55,7 @@ def test_41_observations_and_restart():
 
     if not wp.is_cuda_available():
         pytest.skip("CUDA device unavailable")
-    report = simulate()
+    report = example.simulate()
     assert len(report["time_s"]) == 41
     assert set(report["backends"]) == {"numpy", "cuda:0"}
 

@@ -7,7 +7,7 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = (
-    ROOT / "docs/examples/processes/wall-loss/spherical_wall_loss_theory.py"
+    ROOT / "docs/studies/validation/wall-loss/spherical_wall_loss_theory.py"
 )
 
 

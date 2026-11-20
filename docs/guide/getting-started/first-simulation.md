@@ -1,7 +1,7 @@
 # First CPU simulation
 
 Follow a finite vapor reservoir as it grows 100 nm organic particles over ten
-minutes. The [complete executable example](../../examples/fundamentals/first_cpu_workflow.py)
+minutes. The [complete executable example](../../studies/tutorials/first_cpu_workflow.py)
 creates native state, records a time series, saves and reloads results, and
 checks an exact restart at five minutes. Its published page includes the plots.
 This workflow requires a development checkout containing the new concrete
@@ -19,7 +19,7 @@ python first_cpu_workflow.py
 In a repository checkout, the equivalent command is:
 
 ```bash
-python docs/examples/fundamentals/first_cpu_workflow.py
+python docs/studies/tutorials/first_cpu_workflow.py
 ```
 
 The script creates `first-cpu-results/` containing a growth figure, an analysis
@@ -75,7 +75,7 @@ real organic aerosol or an independent numerical reference.
 ## Resume the five-minute checkpoint
 
 Place the downloaded example beside your script so its explicit physics setup
-can be imported. From a checkout, add `docs/examples/fundamentals` to the Python
+can be imported. From a checkout, add `docs/studies/tutorials` to the Python
 module search path, or run this beside that source file with an absolute result
 path. Keep the same physical configuration and subsequent output boundaries:
 
@@ -119,3 +119,5 @@ Next: [recording, forcing and restart](recording-restart.md),
 [ownership](../data-model/ownership.md), and
 [condensation](../processes/condensation.md). Process combinations and broader
 size distributions need their own numerical and scientific checks.
+
+Browse [all runnable Python scripts](../../studies/scripts.md) to find another workflow by topic or required device.

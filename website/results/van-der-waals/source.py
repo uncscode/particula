@@ -67,7 +67,7 @@ def simulate():
         path = Path(filename)
     if not path.is_file():
         path = (
-            Path(__file__).resolve().parents[3] / "data/coagulation" / filename
+            Path(__file__).resolve().parents[4] / "data/coagulation" / filename
         )
     observations = json.loads(path.read_text())
     grid = np.geomspace(10, 200, 26)

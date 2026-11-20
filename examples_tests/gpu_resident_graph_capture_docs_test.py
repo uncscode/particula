@@ -17,8 +17,11 @@ import pytest
 pytestmark = pytest.mark.warp
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = ROOT / "docs/examples/gpu/resident/gpu_resident_graph_capture.py"
-MODULE_NAME = "docs.examples.gpu.resident.gpu_resident_graph_capture"
+SOURCE = (
+    ROOT
+    / "docs/studies/tutorials/working-with-gpu/resident/gpu_resident_graph_capture.py"
+)
+MODULE_NAME = ".".join(SOURCE.relative_to(ROOT).with_suffix("").parts)
 
 
 @pytest.fixture(autouse=True)

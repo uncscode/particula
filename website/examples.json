@@ -1,7 +1,7 @@
 {
   "distributions": {
     "title": "Aerosol size distributions",
-    "source": "docs/examples/fundamentals/particles/aerosol_distributions.py",
+    "source": "docs/studies/tutorials/building-an-aerosol/particles/aerosol_distributions.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 300,
@@ -10,7 +10,7 @@
   },
   "condensation": {
     "title": "Condensation in radius bins",
-    "source": "docs/examples/processes/condensation/condensation_1_bin.py",
+    "source": "docs/studies/tutorials/condensation/condensation_1_bin.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 300,
@@ -19,7 +19,7 @@
   },
   "pendant-drop-evaporation": {
     "title": "Can warm air explain the measured evaporation of a pentane drop?",
-    "source": "docs/examples/processes/condensation/pendant_drop_evaporation.py",
+    "source": "docs/studies/literature/evaporation-and-uptake/pendant-drop/pendant_drop_evaporation.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 600,
@@ -36,7 +36,7 @@
   },
   "gpu-coagulation": {
     "title": "Direct Brownian coagulation on CUDA",
-    "source": "docs/examples/gpu/direct/gpu_coagulation_direct.py",
+    "source": "docs/studies/validation/coagulation/direct-coagulation/gpu_coagulation_direct.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 300,
@@ -45,8 +45,8 @@
     "full_canvas": true
   },
   "theory-dns-fluid-and-particle-properties-comparison": {
-    "title": "Dns Fluid And Particle Properties Comparison",
-    "source": "docs/theory/dynamics/cloud-droplet-coagulation/dns-fluid-and-particle-properties-comparison.py",
+    "title": "Fluid and particle properties in the DNS comparison",
+    "source": "docs/studies/validation/cloud-droplet-collisions/dns-fluid-and-particle-properties-comparison.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -54,8 +54,8 @@
     "full_canvas": true
   },
   "theory-dns-horizontal-velocity-comparison": {
-    "title": "Dns Horizontal Velocity Comparison",
-    "source": "docs/theory/dynamics/cloud-droplet-coagulation/dns-horizontal-velocity-comparison.py",
+    "title": "Horizontal droplet velocities in turbulence",
+    "source": "docs/studies/validation/cloud-droplet-collisions/dns-horizontal-velocity-comparison.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -63,8 +63,8 @@
     "full_canvas": true
   },
   "theory-dns-kernel-comparison": {
-    "title": "Dns Kernel Comparison",
-    "source": "docs/theory/dynamics/cloud-droplet-coagulation/dns-kernel-comparison.py",
+    "title": "Cloud-droplet collision kernel against DNS",
+    "source": "docs/studies/validation/cloud-droplet-collisions/dns-kernel-comparison.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -72,8 +72,8 @@
     "full_canvas": true
   },
   "theory-dns-radial-distribution-comparison": {
-    "title": "Dns Radial Distribution Comparison",
-    "source": "docs/theory/dynamics/cloud-droplet-coagulation/dns-radial-distribution-comparison.py",
+    "title": "Radial distribution of droplet pairs",
+    "source": "docs/studies/validation/cloud-droplet-collisions/dns-radial-distribution-comparison.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -81,8 +81,8 @@
     "full_canvas": true
   },
   "theory-dns-radial-relative-velocity-comparison": {
-    "title": "Dns Radial Relative Velocity Comparison",
-    "source": "docs/theory/dynamics/cloud-droplet-coagulation/dns-radial-relative-velocity-comparison.py",
+    "title": "Radial relative velocity of droplet pairs",
+    "source": "docs/studies/validation/cloud-droplet-collisions/dns-radial-relative-velocity-comparison.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -90,8 +90,8 @@
     "full_canvas": true
   },
   "theory-ionparticle-coagulation": {
-    "title": "Ionparticle Coagulation",
-    "source": "docs/theory/dynamics/ionparticle-coagulation.py",
+    "title": "Ion–particle collision kernels",
+    "source": "docs/studies/examples/particle-processes/coagulation/charged-particles/ionparticle-coagulation.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -100,7 +100,7 @@
   },
   "theory-dynamic-viscosity": {
     "title": "Dynamic Viscosity",
-    "source": "docs/theory/properties/dynamic-viscosity.py",
+    "source": "docs/studies/examples/gas-transport/dynamic-viscosity.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -108,7 +108,7 @@
   },
   "theory-mean-free-path": {
     "title": "Mean Free Path",
-    "source": "docs/theory/properties/mean-free-path.py",
+    "source": "docs/studies/examples/gas-transport/mean-free-path.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -116,7 +116,7 @@
   },
   "examples-fundamentals-data-containers": {
     "title": "What survives a data transfer?",
-    "source": "docs/examples/fundamentals/data_containers.py",
+    "source": "docs/studies/tutorials/building-an-aerosol/containers/data_containers.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -124,7 +124,7 @@
   },
   "examples-fundamentals-gas-environment-data": {
     "title": "Cooling a gas: saturation without a parcel model",
-    "source": "docs/examples/fundamentals/gas/environment_data.py",
+    "source": "docs/studies/tutorials/building-an-aerosol/gas/environment_data.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -133,7 +133,7 @@
   },
   "examples-fundamentals-gas-gas-data": {
     "title": "From stored vapor mass to saturation",
-    "source": "docs/examples/fundamentals/gas/gas_data.py",
+    "source": "docs/studies/tutorials/building-an-aerosol/gas/gas_data.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -142,7 +142,7 @@
   },
   "examples-fundamentals-gas-vapor-pressure": {
     "title": "Does heating make a fixed vapor inventory less saturated?",
-    "source": "docs/examples/fundamentals/gas/vapor_pressure.py",
+    "source": "docs/studies/tutorials/building-an-aerosol/gas/vapor_pressure.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -151,7 +151,7 @@
   },
   "examples-fundamentals-native-aerosol": {
     "title": "From a population to an evolving aerosol",
-    "source": "docs/examples/fundamentals/native_aerosol.py",
+    "source": "docs/studies/tutorials/building-an-aerosol/native_aerosol.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -159,7 +159,7 @@
   },
   "examples-fundamentals-native-state-access": {
     "title": "Change a model state without losing its meaning",
-    "source": "docs/examples/fundamentals/native_state_access.py",
+    "source": "docs/studies/tutorials/building-an-aerosol/native_state_access.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -167,7 +167,7 @@
   },
   "examples-fundamentals-particles-distribution-tutorial": {
     "title": "Separate particle properties from population weights",
-    "source": "docs/examples/fundamentals/particles/distribution_tutorial.py",
+    "source": "docs/studies/tutorials/building-an-aerosol/particles/distribution_tutorial.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -175,7 +175,7 @@
   },
   "examples-fundamentals-particles-particle-data": {
     "title": "Turn measurements into particle state",
-    "source": "docs/examples/fundamentals/particles/particle_data.py",
+    "source": "docs/studies/tutorials/building-an-aerosol/particles/particle_data.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -184,7 +184,7 @@
   },
   "examples-gpu-direct-gpu-complete-process-sequence": {
     "title": "Five direct CUDA process boundaries",
-    "source": "docs/examples/gpu/direct/gpu_complete_process_sequence.py",
+    "source": "docs/studies/tutorials/working-with-gpu/direct-kernels/gpu_complete_process_sequence.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 1800,
@@ -194,7 +194,7 @@
   },
   "examples-gpu-direct-gpu-condensation-parity-walkthrough": {
     "title": "Check CUDA condensation against independent equations",
-    "source": "docs/examples/gpu/direct/gpu_condensation_parity_walkthrough.py",
+    "source": "docs/studies/validation/condensation/direct-kernel/gpu_condensation_parity_walkthrough.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 1800,
@@ -204,7 +204,7 @@
   },
   "examples-gpu-direct-gpu-direct-kernels-quick-start": {
     "title": "Direct CUDA condensation: upload, calculate, download",
-    "source": "docs/examples/gpu/direct/gpu_direct_kernels_quick_start.py",
+    "source": "docs/studies/tutorials/working-with-gpu/direct-kernels/gpu_direct_kernels_quick_start.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 1800,
@@ -214,7 +214,7 @@
   },
   "examples-gpu-direct-gpu-direct-nucleation": {
     "title": "Direct CUDA nucleation with explicit species mapping",
-    "source": "docs/examples/gpu/direct/gpu_direct_nucleation.py",
+    "source": "docs/studies/tutorials/working-with-gpu/direct-kernels/gpu_direct_nucleation.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 1800,
@@ -224,19 +224,19 @@
   },
   "examples-gpu-resident-gpu-resident-graph-capture": {
     "title": "Capture and replay a native CUDA schedule",
-    "source": "docs/examples/gpu/resident/gpu_resident_graph_capture.py",
+    "source": "docs/studies/tutorials/working-with-gpu/resident/gpu_resident_graph_capture.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 1800,
     "inputs": [
-      "docs/examples/gpu/resident/gpu_resident_multi_timestep.py"
+      "docs/studies/tutorials/working-with-gpu/resident/gpu_resident_multi_timestep.py"
     ],
     "invoke": "result = run_publication()",
     "full_canvas": true
   },
   "examples-gpu-resident-gpu-resident-multi-timestep": {
     "title": "Multibox resident timesteps and continuation",
-    "source": "docs/examples/gpu/resident/gpu_resident_multi_timestep.py",
+    "source": "docs/studies/tutorials/working-with-gpu/resident/gpu_resident_multi_timestep.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 1800,
@@ -246,7 +246,7 @@
   },
   "examples-gpu-resident-gpu-resident-session": {
     "title": "CUDA resident ownership and checkpoint restart",
-    "source": "docs/examples/gpu/resident/gpu_resident_session.py",
+    "source": "docs/studies/tutorials/working-with-gpu/resident/gpu_resident_session.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 1800,
@@ -256,7 +256,7 @@
   },
   "examples-processes-coagulation-charge-coagulation-with-charge-functional": {
     "title": "Map charged collision rates with a factory",
-    "source": "docs/examples/processes/coagulation/charge/coagulation_with_charge_functional.py",
+    "source": "docs/studies/examples/particle-processes/coagulation/charged-particles/coagulation_with_charge_functional.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -265,7 +265,7 @@
   },
   "examples-processes-coagulation-charge-coagulation-with-charge-objects": {
     "title": "Map charged collision rates with a builder",
-    "source": "docs/examples/processes/coagulation/charge/coagulation_with_charge_objects.py",
+    "source": "docs/studies/examples/particle-processes/coagulation/charged-particles/coagulation_with_charge_objects.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -274,7 +274,7 @@
   },
   "examples-processes-coagulation-coagulation-1-pmf-pattern": {
     "title": "Brownian coagulation in a PMF population",
-    "source": "docs/examples/processes/coagulation/coagulation_1_pmf_pattern.py",
+    "source": "docs/studies/tutorials/coagulation-populations/coagulation_1_pmf_pattern.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -283,7 +283,7 @@
   },
   "examples-processes-coagulation-coagulation-2-pdf-pattern": {
     "title": "Brownian coagulation in a PDF population",
-    "source": "docs/examples/processes/coagulation/coagulation_2_pdf_pattern.py",
+    "source": "docs/studies/tutorials/coagulation-populations/coagulation_2_pdf_pattern.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -292,7 +292,7 @@
   },
   "examples-processes-coagulation-coagulation-3-particle-resolved-pattern": {
     "title": "Follow collisions through individual particles",
-    "source": "docs/examples/processes/coagulation/coagulation_3_particle_resolved_pattern.py",
+    "source": "docs/studies/tutorials/coagulation-populations/coagulation_3_particle_resolved_pattern.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -301,7 +301,7 @@
   },
   "examples-processes-coagulation-coagulation-4-compared": {
     "title": "Compare coagulation after matching distribution units",
-    "source": "docs/examples/processes/coagulation/coagulation_4_compared.py",
+    "source": "docs/studies/tutorials/coagulation-populations/coagulation_4_compared.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -310,7 +310,7 @@
   },
   "examples-processes-coagulation-coagulation-5-time-evolution": {
     "title": "Does particle-number decay depend on representation?",
-    "source": "docs/examples/processes/coagulation/coagulation_5_time_evolution.py",
+    "source": "docs/studies/tutorials/coagulation-populations/coagulation_5_time_evolution.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -319,7 +319,7 @@
   },
   "examples-processes-coagulation-functional-coagulation-basic-1-pmf": {
     "title": "A compact PMF coagulation calculation",
-    "source": "docs/examples/processes/coagulation/functional/coagulation_basic_1_pmf.py",
+    "source": "docs/studies/examples/particle-processes/coagulation/kernel-functions/coagulation_basic_1_pmf.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -328,7 +328,7 @@
   },
   "examples-processes-coagulation-functional-coagulation-basic-2-pdf": {
     "title": "A compact PDF coagulation calculation",
-    "source": "docs/examples/processes/coagulation/functional/coagulation_basic_2_pdf.py",
+    "source": "docs/studies/examples/particle-processes/coagulation/kernel-functions/coagulation_basic_2_pdf.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -337,7 +337,7 @@
   },
   "examples-processes-coagulation-functional-coagulation-basic-3-compared": {
     "title": "A compact comparison of bin totals and radius densities",
-    "source": "docs/examples/processes/coagulation/functional/coagulation_basic_3_compared.py",
+    "source": "docs/studies/examples/particle-processes/coagulation/kernel-functions/coagulation_basic_3_compared.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -346,7 +346,7 @@
   },
   "examples-processes-coagulation-functional-coagulation-basic-4-particleresolved": {
     "title": "A compact particle-resolved collision calculation",
-    "source": "docs/examples/processes/coagulation/functional/coagulation_basic_4_particleresolved.py",
+    "source": "docs/studies/examples/particle-processes/coagulation/kernel-functions/coagulation_basic_4_particleresolved.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -355,7 +355,7 @@
   },
   "examples-processes-condensation-condensation-2-massbin": {
     "title": "Water uptake from a maintained vapor reservoir",
-    "source": "docs/examples/processes/condensation/condensation_2_massbin.py",
+    "source": "docs/studies/tutorials/condensation/condensation_2_massbin.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -364,7 +364,7 @@
   },
   "examples-processes-condensation-condensation-3-massresolved": {
     "title": "Competition for a finite water-vapor reservoir",
-    "source": "docs/examples/processes/condensation/condensation_3_massresolved.py",
+    "source": "docs/studies/tutorials/condensation/condensation_3_massresolved.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -373,7 +373,7 @@
   },
   "examples-processes-condensation-condensation-latent-heat": {
     "title": "How much energy accompanies a condensation step?",
-    "source": "docs/examples/processes/condensation/condensation_latent_heat.py",
+    "source": "docs/studies/examples/particle-processes/condensation/condensation_latent_heat.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -381,7 +381,7 @@
   },
   "examples-processes-condensation-staggered-condensation-example": {
     "title": "Does update ordering change a condensation calculation?",
-    "source": "docs/examples/processes/condensation/staggered_condensation_example.py",
+    "source": "docs/studies/examples/particle-processes/condensation/staggered_condensation_example.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -390,7 +390,7 @@
   },
   "examples-processes-customization-adding-particles-during-simulation": {
     "title": "Add an external population without changing existing particles",
-    "source": "docs/examples/processes/customization/adding_particles_during_simulation.py",
+    "source": "docs/studies/examples/particle-processes/sources-and-dilution/adding_particles_during_simulation.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -399,7 +399,7 @@
   },
   "examples-processes-dilution-cpu-dilution": {
     "title": "Dilution changes abundance without shrinking particles",
-    "source": "docs/examples/processes/dilution/cpu_dilution.py",
+    "source": "docs/studies/examples/particle-processes/sources-and-dilution/cpu_dilution.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -407,7 +407,7 @@
   },
   "examples-processes-nucleation-cpu-nucleation": {
     "title": "Create particles by transferring a bounded precursor source",
-    "source": "docs/examples/processes/nucleation/cpu_nucleation.py",
+    "source": "docs/studies/examples/particle-processes/sources-and-dilution/cpu_nucleation.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -415,7 +415,7 @@
   },
   "examples-processes-nucleation-custom-nucleation-single-species": {
     "title": "Couple an illustrative particle source to growth and collisions",
-    "source": "docs/examples/processes/nucleation/custom_nucleation_single_species.py",
+    "source": "docs/studies/examples/particle-processes/sources-and-dilution/custom_nucleation_single_species.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -424,7 +424,7 @@
   },
   "examples-processes-wall-loss-chamber-forward-simulation": {
     "title": "Explain a chamber spectrum using separate rate contributions",
-    "source": "docs/examples/processes/wall-loss/chamber_forward_simulation.py",
+    "source": "docs/studies/examples/particle-processes/wall-loss/chamber_forward_simulation.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -433,7 +433,7 @@
   },
   "examples-processes-wall-loss-rectangular-wall-loss-strategy": {
     "title": "Track removal in a rectangular chamber",
-    "source": "docs/examples/processes/wall-loss/rectangular_wall_loss_strategy.py",
+    "source": "docs/studies/examples/particle-processes/wall-loss/rectangular_wall_loss_strategy.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -441,7 +441,7 @@
   },
   "examples-processes-wall-loss-spherical-wall-loss-strategy": {
     "title": "Separate size-selective removal from particle growth",
-    "source": "docs/examples/processes/wall-loss/spherical_wall_loss_strategy.py",
+    "source": "docs/studies/examples/particle-processes/wall-loss/spherical_wall_loss_strategy.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -450,7 +450,7 @@
   },
   "examples-processes-wall-loss-wall-loss-builders-factory": {
     "title": "Configure chamber loss without a unit mismatch",
-    "source": "docs/examples/processes/wall-loss/wall_loss_builders_factory.py",
+    "source": "docs/studies/examples/particle-processes/wall-loss/wall_loss_builders_factory.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -458,7 +458,7 @@
   },
   "examples-processes-wall-loss-wall-loss-tutorial": {
     "title": "Compare chamber geometry and competing particle processes",
-    "source": "docs/examples/processes/wall-loss/wall_loss_tutorial.py",
+    "source": "docs/studies/examples/particle-processes/wall-loss/wall_loss_tutorial.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -467,7 +467,7 @@
   },
   "examples-simulations-biomass-burning-cloud-interactions": {
     "title": "How do collision models change a water-grown mixed aerosol?",
-    "source": "docs/examples/simulations/biomass_burning_cloud_interactions.py",
+    "source": "docs/studies/examples/coupled-populations/emissions/biomass_burning_cloud_interactions.py",
     "policy": "long",
     "device": "cuda",
     "timeout": 14400,
@@ -476,7 +476,7 @@
   },
   "examples-simulations-cloud-chamber-multi-cycle": {
     "title": "Separate water cycling from seed loss in a chamber",
-    "source": "docs/examples/simulations/cloud_chamber_multi_cycle.py",
+    "source": "docs/studies/examples/coupled-populations/chambers/cloud_chamber_multi_cycle.py",
     "policy": "long",
     "device": "cpu",
     "timeout": 7200,
@@ -484,8 +484,8 @@
     "full_canvas": true
   },
   "examples-simulations-cloud-chamber-single-cycle": {
-    "title": "Follow droplets through one wet\u2013dry chamber cycle",
-    "source": "docs/examples/simulations/cloud_chamber_single_cycle.py",
+    "title": "Follow droplets through one wet–dry chamber cycle",
+    "source": "docs/studies/examples/coupled-populations/chambers/cloud_chamber_single_cycle.py",
     "policy": "long",
     "device": "cpu",
     "timeout": 7200,
@@ -494,7 +494,7 @@
   },
   "examples-simulations-cough-droplets-partitioning": {
     "title": "Audit a respiratory-droplet illustration before using its predictions",
-    "source": "docs/examples/simulations/cough_droplets_partitioning.py",
+    "source": "docs/studies/examples/coupled-populations/emissions/cough_droplets_partitioning.py",
     "policy": "long",
     "device": "cuda",
     "timeout": 7200,
@@ -503,7 +503,7 @@
   },
   "examples-simulations-organic-partitioning-and-coagulation": {
     "title": "When a size-distribution plot hides a composition error",
-    "source": "docs/examples/simulations/organic_partitioning_and_coagulation.py",
+    "source": "docs/studies/examples/coupled-populations/emissions/organic_partitioning_and_coagulation.py",
     "policy": "long",
     "device": "cpu",
     "timeout": 7200,
@@ -512,7 +512,7 @@
   },
   "examples-simulations-soot-formation-in-flames": {
     "title": "Follow organic uptake onto seeds during imposed cooling",
-    "source": "docs/examples/simulations/soot_formation_in_flames.py",
+    "source": "docs/studies/examples/coupled-populations/emissions/soot_formation_in_flames.py",
     "policy": "long",
     "device": "cpu",
     "timeout": 7200,
@@ -521,7 +521,7 @@
   },
   "examples-thermodynamics-activity-activity-tutorial": {
     "title": "Choose an activity model by the comparison it enables",
-    "source": "docs/examples/thermodynamics/activity/activity_tutorial.py",
+    "source": "docs/studies/examples/thermodynamics/activity/activity_tutorial.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -530,7 +530,7 @@
   },
   "examples-thermodynamics-activity-bat-activity-example": {
     "title": "Compare ideal and nonideal organic activity",
-    "source": "docs/examples/thermodynamics/activity/bat_activity_example.py",
+    "source": "docs/studies/examples/thermodynamics/activity/bat_activity_example.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -538,7 +538,7 @@
   },
   "examples-thermodynamics-activity-equilibria-example": {
     "title": "Separate water uptake from organic partitioning",
-    "source": "docs/examples/thermodynamics/activity/equilibria_example.py",
+    "source": "docs/studies/examples/thermodynamics/equilibria/equilibria_example.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -546,7 +546,7 @@
   },
   "examples-thermodynamics-activity-ideal-activity-example": {
     "title": "Equal mass does not mean equal activity",
-    "source": "docs/examples/thermodynamics/activity/ideal_activity_example.py",
+    "source": "docs/studies/examples/thermodynamics/activity/ideal_activity_example.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -554,15 +554,15 @@
   },
   "examples-thermodynamics-activity-kappa-activity-example": {
     "title": "Connect water content to hygroscopicity",
-    "source": "docs/examples/thermodynamics/activity/kappa_activity_example.py",
+    "source": "docs/studies/examples/thermodynamics/activity/kappa_activity_example.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
     "inputs": []
   },
   "examples-thermodynamics-equilibria-activity-part1": {
-    "title": "Follow water\u2013organic mixing from composition to water activity",
-    "source": "docs/examples/thermodynamics/equilibria/activity_part1.py",
+    "title": "Follow water–organic mixing from composition to water activity",
+    "source": "docs/studies/examples/thermodynamics/equilibria/activity_part1.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -571,7 +571,7 @@
   },
   "examples-thermodynamics-equilibria-equilibria-part1": {
     "title": "How does water uptake change organic aerosol partitioning?",
-    "source": "docs/examples/thermodynamics/equilibria/equilibria_part1.py",
+    "source": "docs/studies/examples/thermodynamics/equilibria/equilibria_part1.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -580,7 +580,7 @@
   },
   "examples-thermodynamics-particle-properties-activity-functions": {
     "title": "Compare activity rules along a composition path",
-    "source": "docs/examples/thermodynamics/particle-properties/activity_functions.py",
+    "source": "docs/studies/examples/thermodynamics/particle-properties/activity_functions.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -589,7 +589,7 @@
   },
   "examples-thermodynamics-particle-properties-activity-tutorial": {
     "title": "Which composition rule controls equilibrium pressure?",
-    "source": "docs/examples/thermodynamics/particle-properties/activity_tutorial.py",
+    "source": "docs/studies/examples/thermodynamics/particle-properties/activity_tutorial.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -598,7 +598,7 @@
   },
   "examples-thermodynamics-particle-properties-particle-surface-tutorial": {
     "title": "How strongly does curvature raise equilibrium vapor pressure?",
-    "source": "docs/examples/thermodynamics/particle-properties/particle_surface_tutorial.py",
+    "source": "docs/studies/examples/thermodynamics/particle-properties/particle_surface_tutorial.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -607,7 +607,7 @@
   },
   "contribute-validation-gpu-legacy-benchmarks-gpu-benchmarks": {
     "title": "Recorded GPU benchmark viewer",
-    "source": "docs/contribute/validation/gpu/legacy-benchmarks/gpu_benchmarks.py",
+    "source": "docs/studies/benchmarks/historical-coagulation/gpu_benchmarks.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -621,7 +621,7 @@
   },
   "gpu-prepared-quick-start": {
     "title": "Build on the CPU, evolve on CUDA, analyze on the CPU",
-    "source": "docs/examples/gpu/prepared/gpu_prepared_quick_start.py",
+    "source": "docs/studies/tutorials/working-with-gpu/gpu_prepared_quick_start.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 600,
@@ -631,7 +631,7 @@
   },
   "gpu-prepared-multibox": {
     "title": "Sixty-four heterogeneous aerosol boxes on one GPU",
-    "source": "docs/examples/gpu/prepared/gpu_prepared_multibox.py",
+    "source": "docs/studies/examples/coupled-populations/forcing/gpu_prepared_multibox.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 7200,
@@ -647,7 +647,7 @@
   },
   "gpu-prepared-forcing": {
     "title": "Cooling, heating and vapor pulses across sixteen boxes",
-    "source": "docs/examples/gpu/prepared/gpu_prepared_forcing.py",
+    "source": "docs/studies/examples/coupled-populations/forcing/gpu_prepared_forcing.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 7200,
@@ -660,7 +660,7 @@
     ],
     "invoke": "result = run_example()",
     "data_expression": "result",
-    "replot_invoke": "result = saved_data\nhistory_figures(result, \"Cooling and vapor pulses \u00b7 saved CUDA results\", forcing=True)\nplt.show()",
+    "replot_invoke": "result = saved_data\nhistory_figures(result, \"Cooling and vapor pulses · saved CUDA results\", forcing=True)\nplt.show()",
     "render_functions": [],
     "plot_inputs": [
       "scripts/docs_gpu_figures.py"
@@ -674,7 +674,7 @@
   },
   "gpu-prepared-stochastic": {
     "title": "Separate stochastic coagulation from initial-state variability",
-    "source": "docs/examples/gpu/prepared/gpu_prepared_stochastic.py",
+    "source": "docs/studies/examples/coupled-populations/charged-aerosols/gpu_prepared_stochastic.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 7200,
@@ -704,7 +704,7 @@
   },
   "gpu-prepared-lifecycle": {
     "title": "A million-particle source, collision and loss lifecycle",
-    "source": "docs/examples/gpu/prepared/gpu_prepared_lifecycle.py",
+    "source": "docs/studies/examples/coupled-populations/forcing/gpu_prepared_lifecycle.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 7200,
@@ -734,7 +734,7 @@
   },
   "gpu-prepared-cyclic-chamber": {
     "title": "Repeated source pulses in a cooling and warming aerosol",
-    "source": "docs/examples/gpu/prepared/gpu_prepared_cyclic_chamber.py",
+    "source": "docs/studies/examples/coupled-populations/chambers/gpu_prepared_cyclic_chamber.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 14400,
@@ -759,7 +759,7 @@
   },
   "gpu-scaling-results": {
     "title": "Measured CUDA scaling on an RTX 5060",
-    "source": "docs/examples/gpu/prepared/gpu_scaling_results.py",
+    "source": "docs/studies/benchmarks/prepared-scaling/gpu_scaling_results.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 300,
@@ -774,7 +774,7 @@
   },
   "gpu-charged-models": {
     "title": "Charge-dependent Brownian collisions on CUDA",
-    "source": "docs/examples/gpu/prepared/gpu_charged_models.py",
+    "source": "docs/studies/validation/coagulation/charged-aerosols/gpu_charged_models.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 600,
@@ -784,7 +784,7 @@
   },
   "gpu-ion-balance": {
     "title": "Explicit atmospheric ion balance on CUDA",
-    "source": "docs/examples/gpu/prepared/gpu_ion_balance.py",
+    "source": "docs/studies/validation/coagulation/charged-aerosols/gpu_ion_balance.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 1200,
@@ -794,7 +794,7 @@
   },
   "gpu-lucky-few": {
     "title": "The lucky few: growth, charging and background capture",
-    "source": "docs/examples/gpu/prepared/gpu_lucky_few.py",
+    "source": "docs/studies/examples/coupled-populations/charged-aerosols/gpu_lucky_few.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 7200,
@@ -818,7 +818,7 @@
   },
   "gpu-environment-sweep": {
     "title": "Charged aerosols and ions across sixteen humid environments",
-    "source": "docs/examples/gpu/prepared/gpu_environment_sweep.py",
+    "source": "docs/studies/examples/coupled-populations/environment/gpu_environment_sweep.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 10800,
@@ -846,7 +846,7 @@
   },
   "gpu-dry-environment-sweep": {
     "title": "Dry charged aerosols: ground level, mesopause and pressurized chambers",
-    "source": "docs/examples/gpu/prepared/gpu_dry_environment_sweep.py",
+    "source": "docs/studies/examples/coupled-populations/environment/gpu_dry_environment_sweep.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 7200,
@@ -874,7 +874,7 @@
   },
   "timed-box-chemistry": {
     "title": "Distinguish chemical conversion from a timed emission and dilution",
-    "source": "docs/examples/processes/customization/timed_box_chemistry.py",
+    "source": "docs/studies/examples/custom-processes/timed_box_chemistry.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 120,
@@ -890,7 +890,7 @@
   },
   "custom-process-backends": {
     "title": "Extend a process on CPU and CUDA",
-    "source": "docs/examples/gpu/prepared/custom_process_backends.py",
+    "source": "docs/studies/examples/custom-processes/custom_process_backends.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 300,
@@ -909,7 +909,7 @@
   },
   "particle-tracers": {
     "title": "Follow a source marker through collisions and removal",
-    "source": "docs/examples/processes/customization/particle_tracers.py",
+    "source": "docs/studies/examples/custom-processes/particle_tracers.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 180,
@@ -925,7 +925,7 @@
   },
   "sphere-optics": {
     "title": "From one sphere to a cloud's optical signal",
-    "source": "docs/examples/optics/sphere_optics.py",
+    "source": "docs/studies/validation/material-properties/sphere-optics/sphere_optics.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 300,
@@ -941,7 +941,7 @@
   },
   "cuda-optics": {
     "title": "Qualify CUDA optics before interpreting a cloud spectrum",
-    "source": "docs/examples/optics/cuda_optics.py",
+    "source": "docs/studies/validation/material-properties/cuda-optics/cuda_optics.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 600,
@@ -957,7 +957,7 @@
   },
   "first-cpu-workflow": {
     "title": "Run, save and resume a closed aerosol growth experiment",
-    "source": "docs/examples/fundamentals/first_cpu_workflow.py",
+    "source": "docs/studies/tutorials/first_cpu_workflow.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 120,
@@ -973,7 +973,7 @@
   },
   "adaptive-cloud-relaxation": {
     "title": "Distinguish dry-phase oscillation from physical droplet relaxation",
-    "source": "docs/examples/simulations/adaptive_cloud_relaxation.py",
+    "source": "docs/studies/validation/condensation/adaptive/adaptive_cloud_relaxation.py",
     "policy": "long",
     "device": "cpu",
     "timeout": 1800,
@@ -989,7 +989,7 @@
   },
   "adaptive-reservoir-depletion": {
     "title": "Resolve growth as a finite vapor reservoir is depleted",
-    "source": "docs/examples/simulations/adaptive_reservoir_depletion.py",
+    "source": "docs/studies/validation/condensation/adaptive/adaptive_reservoir_depletion.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -1005,12 +1005,12 @@
   },
   "adaptive-reservoir-depletion-cuda": {
     "title": "Check adaptive CUDA growth against an independent depletion reference",
-    "source": "docs/examples/simulations/adaptive_reservoir_depletion_cuda.py",
+    "source": "docs/studies/validation/condensation/adaptive/adaptive_reservoir_depletion_cuda.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 1800,
     "inputs": [
-      "docs/examples/simulations/adaptive_reservoir_depletion.py"
+      "docs/studies/validation/condensation/adaptive/adaptive_reservoir_depletion.py"
     ],
     "invoke": "report = run_cuda()\nfigure = plot_results(report)",
     "data_expression": "report",
@@ -1020,13 +1020,13 @@
     "full_canvas": true
   },
   "adaptive-cloud-relaxation-cuda": {
-    "title": "Resolve stiff wet\u2013dry droplet relaxation on CUDA",
-    "source": "docs/examples/simulations/adaptive_cloud_relaxation_cuda.py",
+    "title": "Resolve stiff wet–dry droplet relaxation on CUDA",
+    "source": "docs/studies/validation/condensation/adaptive/adaptive_cloud_relaxation_cuda.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 1800,
     "inputs": [
-      "docs/examples/simulations/adaptive_cloud_relaxation.py"
+      "docs/studies/validation/condensation/adaptive/adaptive_cloud_relaxation.py"
     ],
     "invoke": "report = run_cuda()\nfigure = plot_results(report)",
     "data_expression": "report",
@@ -1037,7 +1037,7 @@
   },
   "scalable-coagulation": {
     "title": "Native coagulation work budgets",
-    "source": "docs/examples/gpu/direct/scalable_coagulation.py",
+    "source": "docs/studies/validation/coagulation/native-sampling/scalable_coagulation.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 600,
@@ -1052,7 +1052,7 @@
   },
   "bat-humidity-pulse": {
     "title": "Water uptake and evaporation after a humidity pulse",
-    "source": "docs/examples/thermodynamics/activity/bat_humidity_pulse.py",
+    "source": "docs/studies/benchmarks/bat-humidity-pulse/bat_humidity_pulse.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 600,
@@ -1068,7 +1068,7 @@
   },
   "citric-acid-hygroscopicity": {
     "title": "Citric acid droplet hygroscopicity",
-    "source": "docs/examples/thermodynamics/activity/citric_acid_hygroscopicity.py",
+    "source": "docs/studies/literature/particle-water-uptake/citric-acid/citric_acid_hygroscopicity.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 300,
@@ -1086,7 +1086,7 @@
   },
   "ccn-kappa-retrieval": {
     "title": "Fit hygroscopicity to an activation measurement",
-    "source": "docs/examples/thermodynamics/activity/ccn_kappa_retrieval.py",
+    "source": "docs/studies/literature/particle-water-uptake/ccn-retrieval/ccn_kappa_retrieval.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 300,
@@ -1102,7 +1102,7 @@
   },
   "psl-mobility": {
     "title": "Dry PSL mobility sizing",
-    "source": "docs/examples/fundamentals/particles/psl_mobility.py",
+    "source": "docs/studies/literature/dry-psl-mobility/psl_mobility.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 300,
@@ -1120,7 +1120,7 @@
   },
   "van-der-waals": {
     "title": "How does attraction change a Brownian collision rate?",
-    "source": "docs/examples/processes/coagulation/van_der_waals.py",
+    "source": "docs/studies/validation/coagulation/dispersion/van_der_waals.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 600,
@@ -1140,7 +1140,7 @@
   },
   "gpu-van-der-waals": {
     "title": "Follow bipolar coagulation through a CUDA restart",
-    "source": "docs/examples/gpu/prepared/van_der_waals.py",
+    "source": "docs/studies/validation/coagulation/dispersion/gpu_van_der_waals.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 600,
@@ -1155,7 +1155,7 @@
   },
   "nacl-scavenging": {
     "title": "What passes through a 100 nm mobility channel?",
-    "source": "docs/examples/processes/coagulation/charge/nacl_scavenging.py",
+    "source": "docs/studies/literature/nacl-scavenging/nacl_scavenging.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 300,
@@ -1171,7 +1171,7 @@
   },
   "spherical-wall-loss-theory": {
     "title": "CUDA wall loss agrees with spherical deposition theory",
-    "source": "docs/examples/processes/wall-loss/spherical_wall_loss_theory.py",
+    "source": "docs/studies/validation/wall-loss/spherical_wall_loss_theory.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 600,
@@ -1187,7 +1187,7 @@
   },
   "infer-initial-radius": {
     "title": "Recovering initial particle sizes after condensation",
-    "source": "docs/examples/processes/condensation/infer_initial_radius.py",
+    "source": "docs/studies/validation/condensation/initial-size/infer_initial_radius.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 600,
@@ -1209,7 +1209,7 @@
   },
   "figure-styles": {
     "title": "Figure styles and paper layouts",
-    "source": "docs/examples/fundamentals/figure_styles.py",
+    "source": "docs/studies/tutorials/figure_styles.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 120,
@@ -1217,8 +1217,8 @@
     "full_canvas": true
   },
   "pi-chamber-spectra": {
-    "title": "Time-resolved wet-size spectra in the \u03a0 Chamber",
-    "source": "docs/examples/simulations/pi_chamber_spectra.py",
+    "title": "Time-resolved wet-size spectra in the Π Chamber",
+    "source": "docs/studies/literature/pi-chamber/haze-and-cloud/pi_chamber_spectra.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 900,
@@ -1242,7 +1242,7 @@
   },
   "adaptive-coagulation": {
     "title": "Adaptive cloud coagulation on CUDA",
-    "source": "docs/examples/gpu/prepared/adaptive_coagulation.py",
+    "source": "docs/studies/validation/coagulation/adaptive/adaptive_coagulation.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 600,
@@ -1258,7 +1258,7 @@
   },
   "native-gas-chemistry": {
     "title": "Track a gas reaction through a chamber pulse",
-    "source": "docs/examples/processes/customization/native_gas_chemistry.py",
+    "source": "docs/studies/examples/custom-processes/native_gas_chemistry.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 240,
@@ -1277,7 +1277,7 @@
   },
   "resolved-reactive-uptake": {
     "title": "How two particle sizes share a reactive gas",
-    "source": "docs/examples/processes/customization/resolved_reactive_uptake.py",
+    "source": "docs/studies/examples/custom-processes/resolved_reactive_uptake.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 240,
@@ -1293,7 +1293,7 @@
   },
   "glyoxal-chamber": {
     "title": "Glyoxal uptake and imidazole formation in wet aerosol",
-    "source": "docs/examples/processes/customization/glyoxal_chamber.py",
+    "source": "docs/studies/literature/evaporation-and-uptake/glyoxal_chamber.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 1800,

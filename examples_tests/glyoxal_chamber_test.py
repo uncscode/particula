@@ -2,7 +2,9 @@
 
 import numpy as np
 import pytest
-from docs.examples.processes.customization import glyoxal_chamber as case
+from scripts.docs_examples import import_study
+
+case = import_study("glyoxal-chamber")
 
 
 def test_vector_measurements_and_held_out_rate():

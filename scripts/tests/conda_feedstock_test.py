@@ -102,7 +102,7 @@ def test_version_gate_writes_action_output(runner, monkeypatch, tmp_path):
         "docs/guide/data-model/index.md",
         "conftest.py",
         "particula/conftest.py",
-        "docs/examples/processes/dilution/cpu_dilution.py",
+        "docs/studies/examples/particle-processes/sources-and-dilution/cpu_dilution.py",
         "examples_tests/dilution_example_test.py",
         "examples_tests/nucleation_example_test.py",
         "examples_tests/condensation_latent_heat_example_test.py",
@@ -150,6 +150,7 @@ def test_workflow_triggers_cover_release_gate_inputs(runner):
     patterns = events["pull_request"]["paths"]
     for path in (
         *runner.RELEASE_PATHS,
+        *runner.study_inputs(SCRIPTS.parent),
         runner.VERSION_PATH,
         "conda/recipe/meta.yaml",
         "scripts/tests/new_test.py",
@@ -174,8 +175,11 @@ def test_recipe_declared_inputs_exist_in_staged_source(runner, tmp_path):
         "_particula_build.py",
         "particula_docs.py",
         "docs/guide/index.md",
-        "docs/examples/unlisted.py",
+        "docs/studies/unlisted.py",
         "docs/data/reference.csv",
+        "scripts/fixture.py",
+        "scripts/study_downloads.py",
+        "website/examples.json",
         "scripts/run_release_tests.py",
         runner.COUPLED_FIXTURE,
         *runner.CPU_EXAMPLES,
@@ -185,6 +189,9 @@ def test_recipe_declared_inputs_exist_in_staged_source(runner, tmp_path):
         path = source / relative
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text("fixture")
+    (source / "website/examples.json").write_text(
+        '{"demo": {"inputs": ["scripts/fixture.py", "docs/data/reference.csv"]}}'
+    )
     excluded = (
         "docs/Features/planning.md",
         "docs/guide/__pycache__/cache.pyc",

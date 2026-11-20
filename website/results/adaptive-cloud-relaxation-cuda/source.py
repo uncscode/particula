@@ -17,7 +17,7 @@
 # %%
 import numpy as np
 import warp as wp
-from docs.examples.simulations.adaptive_cloud_relaxation import (
+from docs.studies.validation.condensation.adaptive.adaptive_cloud_relaxation import (
     C_SAT,
     DRY_VOLUME,
     NUMBER,
@@ -155,9 +155,9 @@ def run_cuda():
 # both profiles must satisfy a 2×10⁻⁵ relative radius target. The separate mass
 # check does not substitute for that trajectory comparison.
 # In the retained RTX 5060 run, tightening rtol from 10⁻⁵ to 10⁻⁷ reduces the
-# maximum radius error from 4.07×10⁻⁶ to 3.24×10⁻⁸. Accepted steps increase
-# from 330 to 1,251, with zero and two rejected trials. Closed-phase mass
-# residuals stay below 4×10⁻¹⁵; the humidity reset is an external exchange.
+# maximum radius error from 4.07×10⁻⁶ to 3.40×10⁻⁸. Accepted steps increase
+# from 330 to 1,247, with zero and two rejected trials. Closed-phase mass
+# residuals stay below 6×10⁻¹⁵; the humidity reset is an external exchange.
 #
 # To extend this experiment, vary dry size and composition while retaining an
 # independent reference, or resolve a heterogeneous population and record the

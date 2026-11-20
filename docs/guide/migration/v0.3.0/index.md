@@ -9,7 +9,7 @@ full ordered `GasData`, and `EnvironmentData`. V0.3.0 removes the legacy APIs
 and validates the resulting native-only
 execution boundaries after the v0.3.0 handoff.
 
-See the [v0.3.0 closeout record](../../../contribute/validation/releases/v0.3.0.md) for
+See the [v0.3.0 closeout record](../../../studies/validation/workflows-and-releases/native-api-v0.3.0.md) for
 revision-specific validation and outstanding readiness gates.
 
 ## Migration topics

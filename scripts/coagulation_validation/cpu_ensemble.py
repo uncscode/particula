@@ -5,7 +5,10 @@ import json
 from pathlib import Path
 
 import numpy as np
-from docs.examples.gpu.prepared.van_der_waals import initial_state, inventory
+from docs.studies.validation.coagulation.dispersion.gpu_van_der_waals import (
+    initial_state,
+    inventory,
+)
 from particula.dynamics import VanDerWaalsCoagulationStrategy
 
 
