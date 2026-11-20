@@ -59,6 +59,32 @@ class ChemistrySolver:
 _DEFAULT_SOLVER = ChemistrySolver()
 
 
+def _integrate_problem(problem, state, duration, settings, label):
+    """Apply one trial budget across the full interval."""
+    ode = AdaptiveSolver(
+        problem,
+        state,
+        method=settings.method,
+        rtol=settings.rtol,
+        atol=settings.atol,
+        first_step=settings.first_step,
+        min_step=settings.min_step,
+        max_step=settings.max_step,
+        max_trials=settings.max_trials,
+    )
+    while ode.time < duration:
+        remaining = (
+            settings.max_trials
+            - ode.statistics.accepted
+            - ode.statistics.rejected
+        )
+        if remaining <= 0:
+            raise RuntimeError(f"{label} trial budget exceeded")
+        ode.max_trials = remaining
+        ode.step(duration)
+    return ode.state, ode.statistics
+
+
 class GasChemistry(BoxProcess):
     """Advance bound gas concentrations in kg/m³ with staged box updates.
 
@@ -131,28 +157,9 @@ class GasChemistry(BoxProcess):
             kinetics.jacobian,
             lambda t, y: np.zeros_like(y),
         )
-        ode = AdaptiveSolver(
-            problem,
-            state,
-            method=settings.method,
-            rtol=settings.rtol,
-            atol=settings.atol,
-            first_step=settings.first_step,
-            min_step=settings.min_step,
-            max_step=settings.max_step,
-            max_trials=settings.max_trials,
+        return _integrate_problem(
+            problem, state, duration, settings, "gas chemistry"
         )
-        while ode.time < duration:
-            remaining = (
-                settings.max_trials
-                - ode.statistics.accepted
-                - ode.statistics.rejected
-            )
-            if remaining <= 0:
-                raise RuntimeError("gas chemistry trial budget exceeded")
-            ode.max_trials = remaining
-            ode.step(duration)
-        return ode.state, ode.statistics
 
     def advance(self, aerosol, *, time, time_step, context):
         """Convert bound columns to molar units and publish accepted mass."""
