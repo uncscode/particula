@@ -1,14 +1,31 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
   <title id="title">Ion concentrations diverge in humid air</title>
-  <desc id="desc">Two traces share a dry starting point. Inside a droplet representing higher humidity, the open circle for the CLOUD measurement rises farther than the diamond for the Particula prediction. The connecting strokes show the comparison between conditions.</desc>
+  <desc id="desc">A narrow particle beam enters from the right, creating positive and negative ions in the chamber air. Two concentration traces share a dry starting point. Inside a droplet representing higher humidity, the open circle for the CLOUD measurement rises farther than the diamond for the Particula prediction. The connecting strokes show the comparison between conditions.</desc>
   <defs>
     <path id="drop" d="M181 23 C163 62 96 119 90 174 C84 230 123 268 177 269 C232 270 271 230 269 178 C267 128 209 67 181 23Z"/>
     <clipPath id="humid"><use href="#drop"/></clipPath>
+    <linearGradient id="beam" gradientUnits="userSpaceOnUse" x1="120" y1="0" x2="264" y2="0">
+      <stop stop-color="#d4d8ff" stop-opacity="0"/>
+      <stop offset=".42" stop-color="#d4d8ff" stop-opacity=".75"/>
+      <stop offset="1" stop-color="#dde1ff"/>
+    </linearGradient>
     <path id="observed" d="M34 215 L211 109"/>
     <path id="modeled" d="M34 215 L211 162"/>
   </defs>
   <rect width="300" height="300" rx="16" fill="#f7f2e7"/>
   <use href="#drop" fill="#114d5a"/>
+  <!-- Beam port and one symbolic ion pair, below the concentration traces. -->
+  <path d="M120 219 H265" fill="none" stroke="url(#beam)" stroke-width="4"/>
+  <g fill="#62747d" stroke="#344d58" stroke-width="2" stroke-linejoin="round">
+    <path d="M264 214 H284 V224 H264 Z"/>
+    <rect x="260" y="209" width="6" height="20" rx="1.5"/>
+  </g>
+  <g fill="#c7dce3">
+    <circle cx="160" cy="203" r="12"/>
+    <circle cx="182" cy="237" r="12"/>
+  </g>
+  <path d="M154 203h12 M160 197v12 M176 237h12" fill="none"
+        stroke="#163e46" stroke-width="3.5" stroke-linecap="round"/>
   <g fill="none" stroke-linecap="round" stroke-width="6">
     <use href="#observed" stroke="#163e46"/>
     <use href="#modeled" stroke="#a84625" stroke-dasharray="11 8"/>

@@ -2,7 +2,7 @@
 
 Follow comparisons with published measurements, reference calculations and datasets. Each report identifies the observable, experimental or model conditions, and the limits of the comparison.
 
-[![Two traces start together. Inside a humidity droplet, the measured ion concentration rises farther than the model prediction.](../../images/cloud-ion-humidity/graphical-abstract.svg)\
+[![A particle beam produces positive and negative ions. Within a humidity droplet, the measured ion concentration rises farther than the model prediction.](../../images/cloud-ion-humidity/graphical-abstract.svg)\
 Particula predicts half the rise in ion concentration CLOUD measured from 7% to 70% humidity](cloud-ion-humidity/index.md)
 
 <!-- STUDY_LIST_START -->
