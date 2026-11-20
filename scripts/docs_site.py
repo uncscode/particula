@@ -175,15 +175,10 @@ def example_downloads(key, config, source):
     download = SITE / "public/downloads" / f"{key}.py"
     download.parent.mkdir(parents=True, exist_ok=True)
     download.write_text(source)
-    links = [f"[Download Python script]({BASE}downloads/{key}.py)"]
     if config.get("inputs"):
         archive = download.with_suffix(".zip")
         write_study_zip(archive, ROOT, config, source)
-        links.append(
-            f"[Download script with helper and data files (.zip)]"
-            f"({BASE}downloads/{key}.zip)"
-        )
-    return " · ".join(links)
+    return docs_studies.download_links(key, bool(config.get("inputs")), BASE)
 
 
 def result_notice(state, manifest):
@@ -562,6 +557,7 @@ class Links(HTMLParser):
         self.links = []
         self.ids = set()
         self.is_redirect = False
+        self.downloads = set()
         self.executions = []
         self.study_homes = []
         self.feed(text)
@@ -575,6 +571,8 @@ class Links(HTMLParser):
             self.study_homes.append(attrs["data-study-home"])
         if "data-execution" in attrs:
             self.executions.append(attrs["data-execution"])
+        if tag == "a" and "download" in attrs:
+            self.downloads.add(attrs.get("href"))
         if "id" in attrs:
             self.ids.add(attrs["id"])
         if tag in {"a", "img", "script", "link"}:
@@ -721,13 +719,13 @@ def check_inventory(dist, pages):
             errors.append(f"Missing relocated anchor {old} -> {destination}")
     errors.extend(check_study_catalog(dist, pages))
     for key, config in registry().items():
-        if not (dist / "downloads" / f"{key}.py").is_file():
-            errors.append(f"Missing source download {key}")
-        if (
-            config.get("inputs")
-            and not (dist / "downloads" / f"{key}.zip").is_file()
-        ):
-            errors.append(f"Missing helper/data download {key}")
+        page = pages.get(dist / route(config["source"]) / "index.html")
+        for suffix in ["py", "zip"] if config.get("inputs") else ["py"]:
+            path = f"downloads/{key}.{suffix}"
+            if not (dist / path).is_file():
+                errors.append(f"Missing study download {path}")
+            if not page or BASE + path not in page.downloads:
+                errors.append(f"Missing download link for {path}")
     if any(".trash" in p.relative_to(dist).parts for p in dist.rglob("*")):
         errors.append("Archived files leaked into the published site")
     return errors

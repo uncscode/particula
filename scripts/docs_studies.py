@@ -26,6 +26,18 @@ def route(source):
     return "" if str(path) == "." else path.as_posix()
 
 
+def download_links(key, has_inputs, base):
+    """Offer downloads that also save plain-text Python files on click."""
+    files = [(f"{key}.py", "Download Python script")]
+    if has_inputs:
+        files.append((f"{key}.zip", "Download complete ZIP"))
+    return " · ".join(
+        f'<a href="{base}downloads/{html.escape(name)}" '
+        f'download="{html.escape(name)}">{label}</a>'
+        for name, label in files
+    )
+
+
 def api_route(symbol, root):
     """Find the module page exposing a public symbol or class member."""
     parts = symbol.split(".")
@@ -305,16 +317,10 @@ class StudyCatalog:
         for row in rows:
             key = row["key"]
             run = self.runs[key]
-            links = [
-                f"[View code]({base}{route(row['source'])}/#python-source)",
-                f"[Download Python script]({base}downloads/{key}.py)",
-            ]
-            if run.get("inputs"):
-                links.append(
-                    f"[Download complete ZIP]({base}downloads/{key}.zip)"
-                )
+            code = f"[View code]({base}{route(row['source'])}/#python-source)"
+            downloads = download_links(key, bool(run.get("inputs")), base)
             prefix = f"{row['title']} · " if len(rows) > 1 else ""
-            output.append(prefix + " · ".join(links))
+            output.append(f"{prefix}{code} · {downloads}")
         return "\n\n".join(output) + "\n\n" if output else ""
 
     def links(self, source, base):
