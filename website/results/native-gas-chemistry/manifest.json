@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 7.017963801044971,
+  "package_source_sha256": "755e1d2ca764bb07d1c614e2112530c09de58806eea2f342824c720740566689",
+  "scientific_source_sha256": "0eb53bf488295a2a1ba2005d4f0ed86a7dc779622638787bf0a6b4c9555e0a5b",
+  "input_sha256": {},
+  "example": "native-gas-chemistry",
+  "fingerprint": "bf2dd01dfd420490b43c2b59db9e5630d35dec1fdaa175588b54c6437cefc5c3",
+  "source": "docs/examples/processes/customization/native_gas_chemistry.py",
+  "revision": "4825b85fbd2252343147a8b215956694fb95f91b",
+  "package_dirty": false,
+  "executed_at": "2026-11-20T03:10:45.643179+00:00",
+  "device": "cuda:0: NVIDIA GeForce RTX 5060",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.3",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [],
+    [
+      {
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     /tmp/particula-stage06-warp\nModule particula.gpu.kernels.dilution 0472484 load on device 'cuda:0' took 0.57 ms  (cached)\nModule particula.gpu.kernels._population_validation 65eaa49 load on device 'cuda:0' took 0.32 ms  (cached)\nModule particula.dynamics.chemistry.device 115d815 load on device 'cuda:0' took 3.14 ms  (cached)\nModule particula.execution.extension_guards deaab5f load on device 'cuda:0' took 5.00 ms  (cached)\nModule particula.execution.prepared_guards c5e1f2e load on device 'cuda:0' took 0.26 ms  (cached)\n"
+      },
+      {
+        "image": "figure-5-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "figure-5-1.png": "a81603cad8ec8a72585b93c7903ac6770dbc7dbd100eb07e6ea6ae2b6d410115",
+    "data.json": "30673a000cec90c1663bde543cb9aa8d37428ce9dc5b8911e8a9c30c91553ada",
+    "source.py": "6da80a3098365887159d3ed59a156343fa30a62c6cbf771bb24b2ee7c18fd9f2"
+  },
+  "simulation_fingerprint": "58713877310b5001bca32230fed9dc7244ad7367c190fdbe59fa3c0dada93c10"
+}

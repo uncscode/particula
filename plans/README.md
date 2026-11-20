@@ -1,6 +1,6 @@
 # Particula development plans
 
-Updated: 2026-11-17. Status: staged development and delivery tracking.
+Reviewed against upstream `main` at `ebabce042e` on 2026-11-19.
 
 These eight plans organize the next development work into six stages. The
 previous six plans are completed and retired; they are removed rather than
@@ -17,10 +17,12 @@ Stages 1, 2A and 2B are merged through
 [PR #1660](https://github.com/uncscode/particula/pull/1660), respectively, with
 [cloud/droplet integration examples](stage-02-cloud-droplet-examples.md) now
 qualified and published, including the full resident CUDA reruns.
-Stage 3A has a qualified homogeneous BAT implementation on its delivery branch. Stage 3B covers one published-study comparison. Stage 4 qualified the [BAT humidity-pulse ensemble](../docs/contribute/validation/gpu/bat-humidity-pulse.md) through 128 boxes. Stage 5 now qualifies closed-box initial-size recovery on CPU and CUDA.
-[Recovery, resolution and memory evidence](../docs/contribute/validation/numerics/initial-size-inversion.md).
-Stage 6 chemistry remains proposed.
-AIOMFAC activity is a separate follow-on; viscosity remains deferred.
+The first Stage 3A, 3B and 4 deliveries are on main. Stage 5 qualified
+closed-box initial-size recovery on CPU and CUDA in
+[PR #1676](https://github.com/uncscode/particula/pull/1676).
+**Stage 6 gas chemistry is qualified on its delivery branch.** The native
+mechanism passed analytical and stiff-network tests on NumPy and CUDA.
+[Gas chemistry qualification](../docs/contribute/validation/numerics/gas-chemistry.md)
 
 ## Staged development
 
@@ -35,25 +37,30 @@ AIOMFAC activity is a separate follow-on; viscosity remains deferred.
 | 5 | [Inverse modeling and automatic differentiation](stage-05-inverse-modeling.md) | Recover supported initial-state quantities with tested inference and gradient methods. |
 | 6 | [Configurable chemistry model](stage-06-chemistry-model.md) | Bind reactions to user species with shared CPU/GPU configuration, then qualify gas, particle, and coupled chemistry. |
 
-The [Stage 3A validation record](../docs/contribute/validation/thermodynamics/bat-activity.md)
-tracks direct BAT verification, CPU/CUDA transfer, capture, restart and phase
-limits. Stage 3B owns comparison data, observation mapping and independent
-reproduction. Its separate branch carries the citric-acid study.
+## Evidence available to the next stages
 
-Stage 4 owns the broader GPU workload qualification campaign. CUDA correctness
-checks belong in every earlier plan that changes GPU behavior. Stage 5 depends
-on a qualified forward workflow for its chosen problem, not on finishing every
-possible physics extension or GPU benchmark.
-
-Stage 2A begins with an assessment of error estimation, higher-order methods,
-stiff methods, and conservative alternatives before selecting production
-solvers. Its small chemistry benchmark informs Stage 6 without bringing the
-full chemistry feature into the early stages.
-
-Stage 6 is a later development priority. Its technical prerequisites are
-verified state/accounting, suitable numerical methods, recording/restart, and
-the thermodynamics required by the selected mechanism. It does not depend on
-finishing autodiff; chemistry gradients are outside its initial scope.
+- **Thermodynamics and observations.** Homogeneous binary BAT activity is
+  available in kinetic condensation on CPU and CUDA. The citric-acid study
+  compares water activity with measurements and a separate AIOMFAC-web
+  calculation. Kinetic phase separation and a native AIOMFAC activity model
+  remain follow-ons. Viscosity is deferred. [BAT qualification](../docs/contribute/validation/thermodynamics/bat-activity.md)
+  · [Citric-acid comparison](../docs/contribute/validation/thermodynamics/citric-acid-comparison.md)
+- **GPU workloads.** Stage 4 measured direct-BAT CPU and tabulated-BAT CUDA
+  humidity pulses through 128 boxes, including restart across a vapor reset.
+  The finer tested timestep met the radius and water-transfer targets at every
+  batch size. [Campaign record](../docs/contribute/validation/gpu/bat-humidity-pulse.md)
+- **Observation models.** The CCN retrieval and NaCl chamber studies show how
+  instrument selection and observation uncertainty affect the quantity being
+  fitted. Stage 5 used synthetic size observations and fixed process
+  parameters. [Initial-size recovery and resolution](../docs/contribute/validation/numerics/initial-size-inversion.md)
+  · [CCN retrieval](../docs/contribute/validation/thermodynamics/ccn-retrieval.md)
+  · [NaCl scavenging](../docs/contribute/validation/coagulation/nacl-scavenging.md)
+- **Chemistry numerics.** Stage 2A delivered CPU stiff solvers and a Robertson
+  assessment. The existing first-order gas chemistry example supplies a
+  separate check on native species binding and mass accounting. The Stage 6
+  gas milestone now covers resident CUDA and same-backend continuation.
+  [Solver assessment](../docs/contribute/validation/numerics/adaptive-methods.md)
+  · [Timed chemistry example](../docs/examples/processes/customization/timed_box_chemistry.py)
 
 ## Continuous literature discovery, outside the stages
 
@@ -128,16 +135,15 @@ it must not accumulate different studies on one long-lived scheduler branch.
   Missing CUDA or experimental evidence remains missing; do not substitute
   CPU parity or conserved mass for the required evidence.
 
-## Decisions to settle during refinement
+## Decisions for the next deliveries
 
-1. Select the first shared case: chamber growth/loss, organic partitioning, or
-   another case with sufficiently specified inputs and an independent reference.
-2. Choose initial error tolerances and observable quantities for that case
-   before choosing a default solver or reporting a speedup.
-3. Agree on analysis-output and exact-restart requirements before committing to
-   a storage format or a new simulation interface.
-4. Choose the first thermodynamic connection needed by the selected case.
-   Refine Stage 6's species binding and reaction schema separately from the
-   solver choice; choose one small mechanism for its first qualification case.
-5. Set the literature scheduler's cadence and time when activating it; those
-   settings are independent of the development stages.
+1. For [Stage 6](stage-06-chemistry-model.md), select a bulk particle
+   conversion and its independent reference, including a case with unequal
+   material densities.
+2. Qualify the [NCAR 1.3.0 gas converter](stage-06-chemistry-model.md#next-gap-import-an-external-gas-mechanism)
+   against analytical first- and second-order reactions and verify rejection of
+   pressure dependence and fixed reservoirs.
+3. Select an uptake law and independent reference before adding chemistry
+   in which particles compete for the same gas. Stage 5 follow-ons for
+   composition and hygroscopicity can proceed independently.
+4. Choose the literature scheduler's cadence and compute budget at activation.

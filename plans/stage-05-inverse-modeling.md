@@ -1,6 +1,7 @@
 # Stage 5: Inverse modeling and automatic differentiation
 
-The closed-box delivery used `/tmp/particula-stage-05` on
+The closed-box CPU and CUDA milestone merged in
+[PR #1676](https://github.com/uncscode/particula/pull/1676). The delivery used `/tmp/particula-stage-05` on
 `codex/stage-05-inverse-modeling`, based on upstream `c76cfb5993`.
 The executed implementation revision is `9fa5880745`.
 [Validation and representation decisions](../docs/contribute/validation/numerics/initial-size-inversion.md)
@@ -12,12 +13,12 @@ with validated [numerics](stage-02a-numerical-integration.md), reproducible
 [observation comparison](stage-03b-scientific-comparisons.md).
 GPU-specific claims also require relevant [Stage 4 evidence](stage-04-gpu-qualification.md).
 
-## Execution and delivery
+## Scope of the delivered milestone
 
-Create a dedicated worktree and `codex/stage-05-inverse-modeling` branch when
-starting this plan. Develop and validate there, then commit, push, and create
-a PR when the plan's acceptance criteria are met. Follow the shared
-[worktree, branch, and PR workflow](README.md#worktree-branch-and-pr-workflow).
+The original plan below records the case selection and acceptance criteria.
+The validation record above reports scalar and multi-box recovery, gradient
+checks and the effect of observation resolution. Initial composition,
+hygroscopicity and stochastic collision gradients remain open.
 
 ## Outcome
 

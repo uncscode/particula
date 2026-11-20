@@ -158,6 +158,10 @@
             "slug": "guide/processes/condensation"
           },
           {
+            "label": "Native gas mechanisms",
+            "slug": "guide/processes/gas-chemistry"
+          },
+          {
             "label": "Numerical integration and splitting",
             "slug": "guide/processes/numerical-integration"
           },
@@ -484,6 +488,10 @@
               {
                 "label": "Adding Particles During Simulation",
                 "slug": "examples/processes/customization/adding_particles_during_simulation"
+              },
+              {
+                "label": "Native gas chemistry on CPU and CUDA",
+                "slug": "examples/processes/customization/native_gas_chemistry"
               },
               {
                 "label": "Timed custom CPU chemistry",
@@ -1175,6 +1183,10 @@
               {
                 "label": "Condensation Stiffness Study and Recommendation Record",
                 "slug": "contribute/validation/numerics/condensation-stiffness"
+              },
+              {
+                "label": "Native gas chemistry qualification",
+                "slug": "contribute/validation/numerics/gas-chemistry"
               },
               {
                 "label": "Initial-size inversion",
