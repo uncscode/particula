@@ -39,7 +39,7 @@ if TYPE_CHECKING:
 
 _FORCE_NO_NATIVE_CAPTURE_ENV = "PARTICULA_EXAMPLE_FORCE_NO_NATIVE_CAPTURE"
 _UNAVAILABLE_OUTPUT = (
-    "Canonical path: docs/examples/gpu/resident/gpu_resident_graph_capture.py",
+    "Canonical path: docs/studies/tutorials/working-with-gpu/resident/gpu_resident_graph_capture.py",
     "Native CUDA graph capture is unavailable or disabled.",
     "No CPU or Warp-CPU fallback ran; no fixture, upload, or capture ran.",
 )
@@ -149,7 +149,7 @@ def _load_enabled_runtime() -> SimpleNamespace:
     }
     # The maintained resident example owns the identical bounded composition.
     loaded["resident_example"] = importlib.import_module(
-        "docs.examples.gpu.resident.gpu_resident_multi_timestep"
+        "docs.studies.tutorials.working-with-gpu.resident.gpu_resident_multi_timestep"
     )
     return SimpleNamespace(**loaded)
 
@@ -635,5 +635,5 @@ if __name__ == "__main__":
 # For a long simulation, compare captured and ordinary final states and random
 # continuation before benchmarking replay. Recreate captures after a checkpoint
 # restart rather than treating an opaque graph handle as portable scientific
-# state. See [prepared lifecycle checks](../prepared/gpu_prepared_lifecycle.py) and
-# [measured scaling](../prepared/gpu_scaling_results.py) for those two comparisons.
+# state. See [prepared lifecycle checks](../../../examples/coupled-populations/forcing/gpu_prepared_lifecycle.py) and
+# [measured scaling](../../../benchmarks/prepared-scaling/gpu_scaling_results.py) for those two comparisons.

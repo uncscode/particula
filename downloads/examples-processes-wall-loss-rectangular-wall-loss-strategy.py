@@ -27,7 +27,7 @@
 # Use Python 3.12 or newer with Particula and its example dependencies installed.
 # The example prints diagnostics; the plotting cell is commented out and may be
 # enabled locally. For the distinction between removal and particle shrinkage,
-# see [CPU dilution](../dilution/cpu_dilution.py).
+# see [CPU dilution](../sources-and-dilution/cpu_dilution.py).
 
 # %% [markdown]
 # ## Keep units visible

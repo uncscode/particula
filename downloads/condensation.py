@@ -22,8 +22,8 @@
 # This CPU example constructs a glycerol population and evaluates its initial
 # rate at 298.15 K. It does not advance time. The aim is to distinguish the
 # population's initial size distribution from its tendency to gain or lose mass.
-# Read [size distributions](../../fundamentals/particles/aerosol_distributions.py)
-# and [vapor pressure](../../fundamentals/gas/vapor_pressure.py) for prerequisites.
+# Read [size distributions](../building-an-aerosol/particles/aerosol_distributions.py)
+# and [vapor pressure](../building-an-aerosol/gas/vapor_pressure.py) for prerequisites.
 
 # %%
 # In Colab uncomment the following command to install particula:
@@ -195,6 +195,6 @@ plt.show()
 # not a scan executed here.
 #
 # For an actual time history, continue to the
-# [staggered condensation example](staggered_condensation_example.py).
+# [staggered condensation example](../../examples/particle-processes/condensation/staggered_condensation_example.py).
 # Check gas-plus-particle inventories and timestep sensitivity separately:
 # conservation alone does not establish trajectory accuracy.

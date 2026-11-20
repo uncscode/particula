@@ -39,7 +39,7 @@ Example:
 #
 # Start with [PMF evolution](coagulation_1_pmf_pattern.py),
 # [PDF evolution](coagulation_2_pdf_pattern.py), or the
-# [distribution conversion example](../../fundamentals/particles/aerosol_distributions.py).
+# [distribution conversion example](../building-an-aerosol/particles/aerosol_distributions.py).
 
 # %%
 # In Colab uncomment the following command to install particula:

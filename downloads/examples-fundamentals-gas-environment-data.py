@@ -146,5 +146,5 @@ plt.show()
 # measured conditions, evolve vapor depletion alongside particles, and account for
 # thermal feedback where needed. Compare this fixed-vapor diagnostic with the
 # coupled calculation to separate thermodynamic forcing from vapor consumption.
-# The [staggered condensation example](../../processes/condensation/staggered_condensation_example.py)
+# The [staggered condensation example](../../../examples/particle-processes/condensation/staggered_condensation_example.py)
 # is a next step toward that coupled question.

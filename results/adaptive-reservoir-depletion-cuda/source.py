@@ -15,7 +15,7 @@
 # %%
 import matplotlib.pyplot as plt
 import warp as wp
-from docs.examples.simulations.adaptive_reservoir_depletion import (
+from docs.studies.validation.condensation.adaptive.adaptive_reservoir_depletion import (
     plot_results,
     simulate,
 )

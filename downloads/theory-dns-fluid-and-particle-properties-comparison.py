@@ -583,3 +583,6 @@ display(percent_errors_sv_df)
 # - **Stokes Velocity (Sv):** The Stokes velocities also match closely with the paper values, with percent errors typically less than 1.86%. The maximum error observed is around 1.86%.
 #
 # These results validate the `Particula` library's capability to simulate particle dynamics accurately, with discrepancies observed in some cases.
+
+# %% [markdown]
+# Return to the [equation and assumptions](../../../theory/dynamics/cloud-droplet-coagulation/droplet-coagulation-kernel-ayala2008.md#fluid-and-particle-timescales) used in this comparison.

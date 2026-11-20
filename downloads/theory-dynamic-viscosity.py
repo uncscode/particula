@@ -45,7 +45,6 @@
 # #!pip install particula[extra] --quiet
 import particula as par
 
-
 air_dynamic_viscosity = par.gas.get_dynamic_viscosity(
     temperature=298.15
 )  # will produce approx 1.84e-5 kg/m/s
@@ -65,10 +64,13 @@ print(
 # A Brownian diffusion calculation also depends on temperature and, for small
 # particles, a slip correction. Consequently, viscosity alone cannot determine
 # the full temperature dependence of an aerosol process. Follow this connection
-# to [mean free path](mean-free-path.py) and [Brownian coagulation](../../examples/processes/coagulation/coagulation_1_pmf_pattern.py).
+# to [mean free path](mean-free-path.py) and [Brownian coagulation](../../tutorials/coagulation-populations/coagulation_1_pmf_pattern.py).
 #
 # For a temperature-dependent experiment, a useful extension is to compare the
 # correlation over the experimental range with an appropriate reference dataset,
 # then propagate the property change into the chosen transport calculation.
 # Keep other changing gas properties explicit and establish the correlation's
 # validity for the gas and conditions; that comparison is not performed here.
+
+# %% [markdown]
+# [Return to the equation and its assumptions](../../../theory/properties/air-transport.md#air-viscosity).

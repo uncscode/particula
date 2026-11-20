@@ -6,7 +6,7 @@
 # The sparse mode contains 10% water droplets. Smaller aerosol particles and
 # droplets each carry one represented particle. The sampler combines Brownian
 # motion, differential settling (SP2016) and turbulent shear (ST1956).
-# Run on a CUDA device. See the [prepared quick start](gpu_prepared_quick_start.py)
+# Run on a CUDA device. See the [prepared quick start](../../../tutorials/working-with-gpu/gpu_prepared_quick_start.py)
 # for the upload and checkpoint lifecycle.
 
 # %%

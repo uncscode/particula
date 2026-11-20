@@ -1,22 +1,22 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 69.52776940201875,
-  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
-  "scientific_source_sha256": "c491d38a0f3b014be11117e77bf7f5ed27e4a834ba024ddbac813c1eefd5b6db",
+  "elapsed_seconds": 6.4653028580360115,
+  "package_source_sha256": "e7a8dec04ec165d4dd632a008f2c0bcbb2eeeefb92d0cacb704ceb94f8bd3be3",
+  "scientific_source_sha256": "a3ab2110331b437c679cb2b93c8ac67790e4239e684691704b25f61cc5640285",
   "input_sha256": {
-    "docs/examples/simulations/adaptive_cloud_relaxation.py": "957aa1b2193a07694123345e554ac96cc73978ed65b0b20000796020be411446"
+    "docs/studies/validation/condensation/adaptive/adaptive_cloud_relaxation.py": "957aa1b2193a07694123345e554ac96cc73978ed65b0b20000796020be411446"
   },
   "example": "adaptive-cloud-relaxation-cuda",
-  "fingerprint": "18e29a175152e6914f8d8f104899b4623135933fe92aefdd422364cec3ad1ac8",
-  "source": "docs/examples/simulations/adaptive_cloud_relaxation_cuda.py",
-  "revision": "d918c3f7cb549a4baa1d5a35e674171ff72570fa",
+  "fingerprint": "7145d3861acab16bb664cdcbb05bd696c8db7ae5bd4496ed802d3dd690a2f5c4",
+  "source": "docs/studies/validation/condensation/adaptive/adaptive_cloud_relaxation_cuda.py",
+  "revision": "0c3ca2f65a88378fb2d3874d6e034880b027cd19",
   "package_dirty": false,
-  "executed_at": "2026-11-19T14:54:49.511421+00:00",
+  "executed_at": "2026-11-20T13:00:08.189603+00:00",
   "device": "cuda:0: NVIDIA GeForce RTX 5060",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.3.2",
+    "particula": "0.3.3",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
@@ -34,7 +34,7 @@
         "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\n"
       },
       {
-        "text": "Module particula.execution._condensation_ode_kernels b6cefee load on device 'cuda:0' took 1.63 ms  (cached)\nModule particula.gpu.kernels.thermodynamics 10b2126 load on device 'cuda:0' took 1.61 ms  (cached)\nModule particula.gpu.kernels.condensation ad8087d load on device 'cuda:0' took 1.68 ms  (cached)\nModule particula.execution._adaptive_condensation_physics 5bb51fa load on device 'cuda:0' took 0.90 ms  (cached)\nModule particula.execution._condensation_reservoirs b231d81 load on device 'cuda:0' took 1.26 ms  (cached)\nModule particula.execution._condensation_ros3_kernels d88df3a load on device 'cuda:0' took 0.88 ms  (cached)\n"
+        "text": "Module particula.execution._condensation_ode_kernels b6cefee load on device 'cuda:0' took 0.82 ms  (cached)\nModule particula.gpu.kernels.thermodynamics 10b2126 load on device 'cuda:0' took 0.28 ms  (cached)\nModule particula.gpu.kernels.condensation ad8087d load on device 'cuda:0' took 0.26 ms  (cached)\nModule particula.execution._adaptive_condensation_physics 5bb51fa load on device 'cuda:0' took 0.34 ms  (cached)\nModule particula.execution._condensation_reservoirs b231d81 load on device 'cuda:0' took 0.47 ms  (cached)\nModule particula.execution._condensation_ros3_kernels d88df3a load on device 'cuda:0' took 0.67 ms  (cached)\n"
       },
       {
         "text": "CUDA device: NVIDIA GeForce RTX 5060\nCUDA ROS3 1e-05 max radius error: 4.06940316399762e-06 mass residual: 7.090447494683783e-16 work: {'accepted': 330, 'rejected': 0, 'domain_rejected': 0, 'rate_calls': 1980, 'jacobian_calls': 330, 'time_derivative_calls': 0, 'factorizations': 0, 'linear_solves': 990, 'control_readbacks': 6270}\nCUDA ROS3 1e-07 max radius error: 3.4004336013637726e-08 mass residual: 5.495096808556928e-15 work: {'accepted': 1247, 'rejected': 2, 'domain_rejected': 0, 'rate_calls': 7494, 'jacobian_calls': 1249, 'time_derivative_calls': 0, 'factorizations': 0, 'linear_solves': 3747, 'control_readbacks': 23731}\n"
@@ -47,7 +47,7 @@
   "files": {
     "figure-4-1.png": "81a0f9af6f773828e1b5c0caef7f7fc5b00ed9d7b9ed5778ed5479c4792a6960",
     "data.json": "3ba3e84b6104bcc2f1de0cb13a14d7046447fb039a4c662472178ae36af9e9df",
-    "source.py": "6c64791d0d4ab184998e0a7a82fb96e9cd28362349800953fd8b651d0784df99"
+    "source.py": "35f4822a7a786a12089d5fe43831633025e89d538cd48f86e0a1d58e074ff5d5"
   },
-  "simulation_fingerprint": "7a8637d5d5218c43e8c5292627768175ee12a6024e5bf7177180eab46093cba1"
+  "simulation_fingerprint": "f0ef06ee883dd79d3dd439e79589c61d70fc37a4b8d62e2bfd62c321de59e44e"
 }

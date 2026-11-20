@@ -13,7 +13,7 @@
 # does not use temperature to change its coefficient.
 #
 # Gas concentration is kg m⁻³, particle weights are represented counts, volume
-# is m³, and time is s. The [dilution reference](../dilution/cpu_dilution.py)
+# is m³, and time is s. The [dilution reference](../particle-processes/sources-and-dilution/cpu_dilution.py)
 # provides the simplest limiting case. Here 0.5 s outer steps each contain two
 # substeps, and the pulse is deliberately aligned with a substep boundary.
 
@@ -283,5 +283,5 @@ if __name__ == "__main__":
 # To adapt the pattern to a measured emission history, split steps at every forcing
 # discontinuity and compare cumulative input, chemical transfers, and removals.
 # Then refine timesteps and solver tolerances for the actual mechanism. The
-# [custom backend example](../../gpu/prepared/custom_process_backends.py) explains
+# [custom backend example](custom_process_backends.py) explains
 # what additional work is needed before assuming a Python callback can run on CUDA.

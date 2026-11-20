@@ -14,7 +14,7 @@
 # Read the construction helpers first, then `run_example()`. The printed shapes
 # make the axes visible. On restoration, the caller supplies gas names explicitly;
 # vapor pressure is device helper data rather than restored CPU gas storage.
-# See [distribution measures](particles/aerosol_distributions.py) for the count and
+# See [distribution measures](../particles/aerosol_distributions.py) for the count and
 # density distinction.
 
 # %%
@@ -172,5 +172,5 @@ if __name__ == "__main__":
 # weights, charge, volume, and ordered species explicitly. Then check number and
 # material inventories using the declared representation. Only after these checks
 # should a difference be attributed to the process solver. Continue to the
-# [direct condensation example](../gpu/direct/gpu_direct_kernels_quick_start.py)
+# [direct condensation example](../../working-with-gpu/direct-kernels/gpu_direct_kernels_quick_start.py)
 # to see transfers combined with a physical update.

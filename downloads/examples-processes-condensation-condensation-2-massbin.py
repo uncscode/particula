@@ -22,7 +22,7 @@
 # can increase without a matching decrease in the stored gas concentration.
 #
 # Begin with the [initial-rate example](condensation_1_bin.py) and
-# [activity models](../../thermodynamics/activity/index.md). Here each moving bin
+# [activity models](../../examples/thermodynamics/activity/index.md). Here each moving bin
 # stores a component-mass vector and a number concentration. Different bins may
 # have different compositions; the model does not represent a composition
 # distribution within one bin.

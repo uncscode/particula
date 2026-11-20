@@ -28,7 +28,7 @@
 # they must not be interpreted as quantitative respiratory-droplet or exposure
 # predictions.
 #
-# Read [condensation and evaporation](../processes/condensation/condensation_3_massresolved.py)
+# Read [condensation and evaporation](../../../tutorials/condensation/condensation_3_massresolved.py)
 # for the mass-transfer mechanism. The useful question here is what additional
 # checks are required before adapting that mechanism to a material mixture.
 

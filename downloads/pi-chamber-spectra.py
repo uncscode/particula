@@ -148,7 +148,7 @@ def plot_separation(report):
 # most of its sensitivity to the starting wet sizes. Agreement between starts can coexist
 # with a bias against measured haze. A time-resolved wet spectrum following an injection change would
 # test the relaxation time. The [chamber comparison and uncertainty
-# analysis](../../contribute/validation/thermodynamics/pi-chamber.md)
+# analysis](index.md)
 # gives the steady-state counts, the mixing-state extension and the
 # assumptions used to reconstruct the initial population.
 

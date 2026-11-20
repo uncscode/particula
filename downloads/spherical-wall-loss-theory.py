@@ -365,7 +365,7 @@ if __name__ == "__main__":
 # case. Across the scanned diameters its largest difference is 13.361 points
 # at kₑ=36 s⁻¹. Original timestep and population refinement shifts were at most
 # 0.504 and 0.359 points, respectively, including independent sampling noise.
-# See the [validation record](../../../contribute/validation/gpu/spherical-wall-loss.md)
+# See the [validation record](index.md)
 # for the full evidence and provenance. Current saved outputs above record
 # the deliberate publication rerun separately from the original study.
 #
@@ -377,4 +377,4 @@ if __name__ == "__main__":
 # a proposed next investigation.
 #
 # Continue with the [wall-loss guide](../../../guide/processes/wall-loss.md)
-# or [spherical strategy example](spherical_wall_loss_strategy.py).
+# or [spherical strategy example](../../examples/particle-processes/wall-loss/spherical_wall_loss_strategy.py).

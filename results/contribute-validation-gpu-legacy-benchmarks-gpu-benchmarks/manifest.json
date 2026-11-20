@@ -1,21 +1,22 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 4.574643497006036,
-  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
+  "elapsed_seconds": 4.346271433052607,
+  "package_source_sha256": "e7a8dec04ec165d4dd632a008f2c0bcbb2eeeefb92d0cacb704ceb94f8bd3be3",
+  "scientific_source_sha256": "a3ab2110331b437c679cb2b93c8ac67790e4239e684691704b25f61cc5640285",
   "input_sha256": {
     "docs/data/gpu_benchmark_results.json": "8352b7bae01663a01d9cf451a5ed48be2095750b9807105d94392c675f5df44e"
   },
   "example": "contribute-validation-gpu-legacy-benchmarks-gpu-benchmarks",
-  "fingerprint": "36b87c337fb4bb88d6de74a93405c55844f77435365828910a20455a8781b7d1",
-  "source": "docs/contribute/validation/gpu/legacy-benchmarks/gpu_benchmarks.py",
-  "revision": "6af97152d1570464ac5ccae56e3110001657e170",
+  "fingerprint": "0e7cf73bcaaddad6dce82ca9511f7cdd988d6529fb32172c7af90b2f662bd8bf",
+  "source": "docs/studies/benchmarks/historical-coagulation/gpu_benchmarks.py",
+  "revision": "55bcd4b90372b20b091a8f28a8af5c3a56e355e4",
   "package_dirty": false,
-  "executed_at": "2026-11-19T14:34:14.008450+00:00",
+  "executed_at": "2026-11-20T13:00:31.876697+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.3.2",
+    "particula": "0.3.3",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
@@ -54,6 +55,6 @@
   ],
   "files": {
     "figure-6-1.png": "84641966861330d62035c622ebb1e36cd3a70a774cd9a7d498bef99bd991ca6b",
-    "source.py": "a619fc141b1bd20a9a638b6ae121d7a5842599e3f52f12e1130e453352ae93e0"
+    "source.py": "27eb8698065b034a904fe9c510d4d3c93d46cecd5b35c74bda4e8fcc69c0a1a4"
   }
 }

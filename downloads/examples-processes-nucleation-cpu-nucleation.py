@@ -7,7 +7,7 @@
 # needed to connect a formation-rate model to a finite gas reservoir and finite
 # storage capacity.
 #
-# Read [native state and counts](../../fundamentals/native_state_access.py) first.
+# Read [native state and counts](../../../tutorials/building-an-aerosol/native_state_access.py) first.
 # This is a deterministic API and inventory example, not a calibration of
 # atmospheric nucleation kinetics.
 #

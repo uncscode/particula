@@ -18,7 +18,7 @@
 # How should a simulation represent an incoming particle pulse? This example
 # inserts two populations into reserved slots and checks the added material
 # explicitly. It distinguishes an external particle source from
-# [nucleation](../nucleation/cpu_nucleation.py), which transfers material from a
+# [nucleation](cpu_nucleation.py), which transfers material from a
 # modeled precursor reservoir.
 #
 # The example uses particle-resolved storage, fixed capacity, and unit represented
@@ -259,5 +259,5 @@ plt.show()
 # collision interval between pulses. Compare surviving small-particle number,
 # material inventory, and required slot capacity while refining the interval.
 # For a tracer or source label, define its birth and merging behavior using the
-# [registered-field example](particle_tracers.py), rather than assuming array
+# [registered-field example](../../custom-processes/particle_tracers.py), rather than assuming array
 # position remains a particle identity.

@@ -1,7 +1,34 @@
+# %% [markdown]
+# # Dilution changes abundance without shrinking particles
+#
+# If a chamber is flushed with clean air, what should change in the aerosol
+# state? This deterministic example applies a first-order removal law equally
+# to particle counts and gas concentrations. It checks against the analytic
+# solution C(t) = C(0) exp(−kt), making a useful reference before combining
+# transport with [condensation](../../../tutorials/condensation/condensation_1_bin.py) or
+# [coagulation](../../../tutorials/coagulation-populations/coagulation_1_pmf_pattern.py).
+#
+# ## Choose a diagnostic that distinguishes removal from evaporation
+#
+# The two particle slots represent counts 4 and 8 in 2 m³, giving number
+# densities 2 and 4 m⁻³. Their individual masses and charges should stay fixed;
+# dilution reduces how many particles they represent. The three gas species have
+# illustrative concentrations 3, 5, and 7 kg m⁻³, selected for transparent arithmetic
+# rather than a realistic atmospheric mixture. Both partitioning and gas-only
+# species are diluted.
+#
+# `_build_aerosol` defines that controlled state. `run_example` advances 4 s at
+# k = 0.25 s⁻¹ in two substeps, verifies the identity of the held containers,
+# and checks unchanged individual masses, charges, and volume. Its detached
+# snapshots then compare every concentration domain with the same decay factor.
+# `main` prints those comparisons; the result wrapper protects the saved metadata
+# from reassignment.
+
+# %%
 """Run deterministic CPU dilution with the public Particula API.
 
 Run from the repository root:
-    python docs/examples/processes/dilution/cpu_dilution.py
+    python docs/studies/examples/particle-processes/sources-and-dilution/cpu_dilution.py
 """
 
 from __future__ import annotations
@@ -172,3 +199,19 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+# %% [markdown]
+# ## What the output establishes
+#
+# The expected factor is exp(−1), approximately 0.367879: every tracked
+# concentration retains about 36.8% of its initial value. Matching this factor
+# while particle mass per slot stays fixed distinguishes removal from evaporation.
+# The modeled inventory decreases because this is an open system; a closed-system
+# mass-conservation assertion would be the wrong test.
+#
+# To interpret a chamber experiment, propose k from flow divided by chamber volume
+# under a well-mixed assumption, then compare size-resolved fractional losses.
+# Size-dependent departures suggest additional processes such as
+# [wall deposition](../wall-loss/index.md), but this idealized run alone cannot
+# identify their cause. Add mechanisms one at a time and retain the analytic
+# dilution case as a diagnostic.

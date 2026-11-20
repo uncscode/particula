@@ -321,3 +321,6 @@ plt.show()
 # Overall we have a similar comparison as Ayala et al. (2008) for the horizontal velocity of particles in a turbulent flow. The model predictions align well with the DNS data, confirming the validity of the model.
 #
 # The curves are very sensitive to the temperature, and you can increase the temperature to move the curves up.
+
+# %% [markdown]
+# Return to the [equation and assumptions](../../../theory/dynamics/cloud-droplet-coagulation/droplet-coagulation-kernel-ayala2008.md#horizontal-velocity-correlation) used in this comparison.

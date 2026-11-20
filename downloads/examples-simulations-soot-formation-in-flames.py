@@ -24,8 +24,8 @@
 # model**. There is no nucleation, reaction network, carbonization, oxidation,
 # or aggregate morphology. Fullerene-labeled seeds already exist at the start.
 # Material tables and cooling are illustrative, not a calibrated flame or plume.
-# Read [organic partitioning](../thermodynamics/equilibria/equilibria_part1.py)
-# and [resolved coagulation](../processes/coagulation/coagulation_3_particle_resolved_pattern.py)
+# Read [organic partitioning](../../thermodynamics/equilibria/equilibria_part1.py)
+# and [resolved coagulation](../../../tutorials/coagulation-populations/coagulation_3_particle_resolved_pattern.py)
 # for the separate mechanisms.
 
 # %%

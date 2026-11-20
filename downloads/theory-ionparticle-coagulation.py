@@ -426,3 +426,6 @@ plt.show()
 #     - Plotted the dimensional kernels for ion attachment to other particles.
 #
 # The analysis provided insights into how different coagulation approximations affect the collision frequencies and coagulation rates of charged particles. The results can be used to better understand and model aerosol dynamics in various environmental and industrial applications.
+
+# %% [markdown]
+# Read the [dimensional collision kernel equation](../../../../../theory/dynamics/ion-particle-encounters.md#dimensional-collision-kernel) to recover the units and enhancement factors used in the comparison.

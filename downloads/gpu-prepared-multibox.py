@@ -4,7 +4,7 @@
 # What does an ensemble average hide when every box starts under different
 # conditions? Here you will compare per-box inventories and distributions without
 # mistaking co-varying inputs for isolated causes. Read the
-# [prepared quick start](gpu_prepared_quick_start.py) for state ownership first.
+# [prepared quick start](../../../tutorials/working-with-gpu/gpu_prepared_quick_start.py) for state ownership first.
 #
 # Each box contains 4,096 slots, with 75% initially active: **196,608 resolved
 # particles** in total. Temperature varies from 275 to 310 K, pressure from
@@ -89,5 +89,5 @@ if __name__ == "__main__":
 # For a temperature-sensitivity study, keep initial number density, composition,
 # pressure, and saturation definition controlled while varying temperature.
 # Compare the water uptake per box and size-resolved growth, then refine both
-# timestep and parameter spacing. The [environment sweep](gpu_environment_sweep.py)
+# timestep and parameter spacing. The [environment sweep](../environment/gpu_environment_sweep.py)
 # provides a more controlled route through environmental comparisons.

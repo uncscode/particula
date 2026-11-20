@@ -28,3 +28,6 @@ mean_free_path = par.gas.get_molecule_mean_free_path(
 )
 print(mean_free_path)
 
+
+# %% [markdown]
+# [Return to the equation and its assumptions](../../../theory/properties/air-transport.md#molecular-mean-free-path).

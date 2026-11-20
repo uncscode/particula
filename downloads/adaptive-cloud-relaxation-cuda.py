@@ -17,7 +17,7 @@
 # %%
 import numpy as np
 import warp as wp
-from docs.examples.simulations.adaptive_cloud_relaxation import (
+from docs.studies.validation.condensation.adaptive.adaptive_cloud_relaxation import (
     C_SAT,
     DRY_VOLUME,
     NUMBER,

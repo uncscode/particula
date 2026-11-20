@@ -227,6 +227,6 @@ plt.show()
 # Compare ratios only where the reference is finite and nonzero, inspect limiting
 # behavior, and document the model's applicable regime. Then use an independently
 # specified size/charge population to compute collision rates. The
-# [Brownian time-evolution example](../coagulation_5_time_evolution.py) provides
+# [Brownian time-evolution example](../../../../tutorials/coagulation-populations/coagulation_5_time_evolution.py) provides
 # a neutral population baseline; coupling charging dynamics would require
 # additional physics and validation.

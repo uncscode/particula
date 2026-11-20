@@ -4,7 +4,7 @@
 # Why does a larger simulated volume create more particles without changing the
 # formation rate per cubic metre? This deliberately tiny example separates unit
 # events, represented counts, and gas mass density. Read
-# [CPU nucleation](../../processes/nucleation/cpu_nucleation.py) for the source law
+# [CPU nucleation](../../../examples/particle-processes/sources-and-dilution/cpu_nucleation.py) for the source law
 # before following explicit device storage and species binding.
 #
 # Map precursor gas to particle material and inject unit-count neutral
@@ -310,5 +310,5 @@ if __name__ == "__main__":
 # as strong evidence of small gas-consumption accuracy. For a nucleation study,
 # choose a defensible rate and nucleus composition, compare event demand with
 # available gas and free slots, and test per-species source accounting at a
-# resolvable scale. The [prepared lifecycle](../prepared/gpu_prepared_lifecycle.py)
+# resolvable scale. The [prepared lifecycle](../../../examples/coupled-populations/forcing/gpu_prepared_lifecycle.py)
 # adds active source pulses to an evolving population.

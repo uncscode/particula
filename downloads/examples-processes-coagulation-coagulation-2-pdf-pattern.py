@@ -37,7 +37,7 @@ Example:
 #
 # Here the stored concentration has units m⁻⁴, number per volume per metre of radius. To obtain total
 # number density, integrate concentration over radius. Review
-# [distribution measures](../../fundamentals/particles/aerosol_distributions.py)
+# [distribution measures](../building-an-aerosol/particles/aerosol_distributions.py)
 # before comparing this plot with another representation.
 
 # %%

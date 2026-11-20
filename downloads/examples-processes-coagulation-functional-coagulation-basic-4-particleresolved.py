@@ -21,9 +21,9 @@
 # the surviving count-weighted mass. It introduces the bookkeeping needed for
 # later composition-resolved studies.
 #
-# Start with [represented counts and volume](../../../fundamentals/particles/distribution_tutorial.py).
+# Start with [represented counts and volume](../../../../tutorials/building-an-aerosol/particles/distribution_tutorial.py).
 # For a longer trajectory and a larger sample, see the
-# [particle-resolved pattern](../coagulation_3_particle_resolved_pattern.py).
+# [particle-resolved pattern](../../../../tutorials/coagulation-populations/coagulation_3_particle_resolved_pattern.py).
 
 # %%
 # In Colab uncomment the following command to install particula:
@@ -186,5 +186,5 @@ plt.show()
 # To study how mixing state develops, add separate material lanes for two initial
 # populations and track composition conditional on radius. Check each material's
 # inventory, count the collision-driven number loss, and repeat seeds while
-# refining substeps. The [matched time comparison](../coagulation_5_time_evolution.py)
+# refining substeps. The [matched time comparison](../../../../tutorials/coagulation-populations/coagulation_5_time_evolution.py)
 # provides a route to comparing aggregate behavior across representations.

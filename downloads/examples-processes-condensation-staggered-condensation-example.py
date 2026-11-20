@@ -21,7 +21,7 @@
 # larger-step trajectory and several batch counts.
 #
 # The useful question is how to separate conservation from trajectory accuracy.
-# Start with [finite-reservoir condensation](condensation_3_massresolved.py).
+# Start with [finite-reservoir condensation](../../../tutorials/condensation/condensation_3_massresolved.py).
 # The comparisons below provide bounded evidence for these initial conditions;
 # they do not rank methods universally or replace a timestep-convergence study.
 
@@ -432,6 +432,6 @@ plt.show()
 # particle-mass quantiles, and the time of a defined growth event. Repeat seeded
 # runs where random ordering matters and report both sensitivity and runtime.
 # Only then select settings for a scientific question. See the
-# [condensation strategy guide](../../../guide/processes/condensation.md) for
-# supported behavior and the [numerical-methods topic](../../../guide/topics/index.md)
+# [condensation strategy guide](../../../../guide/processes/condensation.md) for
+# supported behavior and the [numerical-methods topic](../../../../guide/topics/index.md)
 # for connections to other validation examples.

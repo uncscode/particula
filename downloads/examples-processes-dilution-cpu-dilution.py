@@ -5,8 +5,8 @@
 # state? This deterministic example applies a first-order removal law equally
 # to particle counts and gas concentrations. It checks against the analytic
 # solution C(t) = C(0) exp(−kt), making a useful reference before combining
-# transport with [condensation](../condensation/condensation_1_bin.py) or
-# [coagulation](../coagulation/coagulation_1_pmf_pattern.py).
+# transport with [condensation](../../../tutorials/condensation/condensation_1_bin.py) or
+# [coagulation](../../../tutorials/coagulation-populations/coagulation_1_pmf_pattern.py).
 #
 # ## Choose a diagnostic that distinguishes removal from evaporation
 #
@@ -28,7 +28,7 @@
 """Run deterministic CPU dilution with the public Particula API.
 
 Run from the repository root:
-    python docs/examples/processes/dilution/cpu_dilution.py
+    python docs/studies/examples/particle-processes/sources-and-dilution/cpu_dilution.py
 """
 
 from __future__ import annotations

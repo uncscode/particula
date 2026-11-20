@@ -403,4 +403,4 @@ plt.show()
 # range, propagate its uncertainty, and compare resulting mass-transfer rates with
 # a particle calculation. Include surface activity and curvature, and allow vapor
 # inventory to evolve if the reservoir is finite. Continue with
-# [gas storage](gas_data.py) or the [initial condensation-rate example](../../processes/condensation/condensation_1_bin.py).
+# [gas storage](gas_data.py) or the [initial condensation-rate example](../../condensation/condensation_1_bin.py).

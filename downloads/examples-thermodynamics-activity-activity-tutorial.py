@@ -27,7 +27,7 @@
 # Activity is dimensionless and relates a component to a specified reference
 # state. Evaporation or uptake depends on ambient vapor relative to the resulting
 # surface equilibrium pressure; activity alone does not determine the direction
-# of transfer. Read [vapor pressure](../../fundamentals/gas/vapor_pressure.py)
+# of transfer. Read [vapor pressure](../../../tutorials/building-an-aerosol/gas/vapor_pressure.py)
 # for that distinction. The [configuration example](../particle-properties/activity_tutorial.py)
 # focuses separately on strategies, builders, and factories.
 
@@ -502,10 +502,10 @@ plt.show()
 # or condensed organic mass—and compare models with matched inputs. Check the
 # model domain, numerical residuals, and material accounting, then seek an
 # independent reference. If timescale matters, connect the endpoint to a
-# [condensation trajectory](../../processes/condensation/condensation_3_massresolved.py)
+# [condensation trajectory](../../../tutorials/condensation/condensation_3_massresolved.py)
 # with the same reservoir and surface assumptions.
 #
-# See [activity theory](../../../theory/thermodynamics/activity-theory.md),
-# [phase-equilibrium theory](../../../theory/thermodynamics/equilibria-theory.md),
-# and the [supported activity interfaces](../../../guide/processes/activity.md)
+# See [activity theory](../../../../theory/thermodynamics/activity-theory.md),
+# [phase-equilibrium theory](../../../../theory/thermodynamics/equilibria-theory.md),
+# and the [supported activity interfaces](../../../../guide/processes/activity.md)
 # for the equations and implementation contracts.

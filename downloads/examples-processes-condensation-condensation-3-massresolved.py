@@ -22,8 +22,8 @@
 # conditions rather than forming a direct numerical comparison.
 #
 # The goal is to read size-distribution evolution together with water depletion
-# and particle mass. Familiarity with [represented counts and volume](../../fundamentals/particles/distribution_tutorial.py)
-# and [κ activity](../../thermodynamics/activity/kappa_activity_example.py) helps
+# and particle mass. Familiarity with [represented counts and volume](../building-an-aerosol/particles/distribution_tutorial.py)
+# and [κ activity](../../examples/thermodynamics/activity/kappa_activity_example.py) helps
 # interpret the bookkeeping.
 
 # %%
@@ -387,5 +387,5 @@ plt.show()
 # track individual radius histories alongside the vapor budget. Repeat the initial
 # sampling and halve the timestep before interpreting a transient peak. To study
 # feedback from heating, add a thermal model rather than interpreting the
-# isothermal trajectory as adiabatic. The [latent-heat bookkeeping example](condensation_latent_heat.py)
+# isothermal trajectory as adiabatic. The [latent-heat bookkeeping example](../../examples/particle-processes/condensation/condensation_latent_heat.py)
 # shows the energy signal that such a model would need.

@@ -291,4 +291,4 @@ plt.show()
 # $K_i$ at a fixed 20 nm radius under mass-, mole-, and volume-weighted surface
 # tension rules. Keep the condensing species fixed. Measured mixture surface
 # tension and phase behavior would be needed to choose among those approximations
-# before using them in a [condensation calculation](../../processes/condensation/condensation_1_bin.py).
+# before using them in a [condensation calculation](../../../tutorials/condensation/condensation_1_bin.py).

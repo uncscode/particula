@@ -8,8 +8,8 @@
 #
 # Requires native CUDA, Warp, and Particula's development optics API. CPU runs
 # are explicit comparison oracles; there is no CPU fallback. Start with the
-# [sphere-to-cloud walkthrough](sphere_optics.py) for the physical quantities and
-# the [optics guide](../../guide/optics/index.md) for units and reference frames.
+# [sphere-to-cloud walkthrough](../sphere-optics/sphere_optics.py) for the physical quantities and
+# the [optics guide](../../../../guide/optics/index.md) for units and reference frames.
 #
 # The physics assumes independent homogeneous spheres with a fixed illustrative
 # refractive index. Population Mueller matrices share one scattering-plane frame.

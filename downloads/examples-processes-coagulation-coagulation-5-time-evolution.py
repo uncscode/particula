@@ -443,6 +443,6 @@ print(f"  Resolved: {number_resolved[-1]:.2e} m^-3 ({res_pct:.1f}% remaining)")
 # For example, to estimate whether coagulation substantially changes a chamber's
 # particle lifetime, repeat this design over initial concentration while holding
 # size distribution fixed. Compare the time to a specified number-loss fraction
-# and its uncertainty, then introduce [wall loss](../wall-loss/index.md) as a
+# and its uncertainty, then introduce [wall loss](../../examples/particle-processes/wall-loss/index.md) as a
 # separate mechanism. That extension is proposed; it is not established by these
 # three curves.

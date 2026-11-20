@@ -126,5 +126,5 @@ print("Material inventory [kg]:", resolved.species_mass_inventory)
 # each material inventory, then compare those quantities before and after. Changing
 # only `distribution_type` cannot supply the missing bin widths or physical volume.
 # Use [particle construction](particle_data.py) to prepare realistic inputs, then
-# [compare coagulation representations](../../processes/coagulation/coagulation_4_compared.py)
+# [compare coagulation representations](../../coagulation-populations/coagulation_4_compared.py)
 # to see why equal initial totals still do not guarantee identical trajectories.

@@ -261,5 +261,5 @@ if __name__ == "__main__":
 # 100.7 nm observations. In the synthetic transfer test, matching at 100 nm
 # leaves a −0.46% shift at 20 nm. A second independently sized standard at
 # the working pressure can test whether a calibration transfers. The
-# [validation record](../../../contribute/validation/transport/psl-mobility.md)
+# [validation record](index.md)
 # explains how to interpret the two pressure-inconsistent rows.

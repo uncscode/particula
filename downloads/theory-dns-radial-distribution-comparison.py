@@ -285,3 +285,6 @@ plt.show()
 # ## Summary
 #
 # Overall the comparison is good, and the curves are visually similar to Figure 16 in Ayala et al. (2008).
+
+# %% [markdown]
+# Return to the [equation and assumptions](../../../theory/dynamics/cloud-droplet-coagulation/droplet-coagulation-kernel-ayala2008.md#radial-distribution-function) used in this comparison.

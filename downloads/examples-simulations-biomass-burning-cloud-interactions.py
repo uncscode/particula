@@ -24,8 +24,8 @@
 # The organics–soot–water mixture is inspired by biomass-burning aerosol, but its
 # properties and concentrations are illustrative. It is not a validated smoke
 # plume or cloud parcel: temperature stays fixed, and there is no spatial flow,
-# chemical aging, or wall removal. Use [resolved coagulation](../processes/coagulation/coagulation_3_particle_resolved_pattern.py)
-# and [condensation](../processes/condensation/condensation_3_massresolved.py)
+# chemical aging, or wall removal. Use [resolved coagulation](../../../tutorials/coagulation-populations/coagulation_3_particle_resolved_pattern.py)
+# and [condensation](../../../tutorials/condensation/condensation_3_massresolved.py)
 # first if the separate process contracts are unfamiliar.
 
 # %%
@@ -611,7 +611,7 @@ plt.show()
 # Brownian alone and turbulent shear each finished every interval in one pass,
 # with 240 and 448 mergers respectively. The settling branch ended with 681
 # occupied slots. All four branches conserved the three species inventories.
-# [Comparison with the archived run](../../contribute/validation/numerics/simulation-workflow.md#biomass-rerun-with-adaptive-gpu-coagulation)
+# [Comparison with the archived run](biomass-evidence.md#biomass-rerun-with-adaptive-gpu-coagulation)
 #
 # All branches share their initial material inventory and retain the same
 # condensation model. Their differing spectra therefore motivate a collision-model

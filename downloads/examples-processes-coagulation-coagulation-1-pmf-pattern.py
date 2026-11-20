@@ -37,7 +37,7 @@ Example:
 #
 # Here the stored concentration has units m⁻³ per bin. To obtain total
 # number density, sum the bin concentrations. Review
-# [distribution measures](../../fundamentals/particles/aerosol_distributions.py)
+# [distribution measures](../building-an-aerosol/particles/aerosol_distributions.py)
 # before comparing this plot with another representation.
 
 # %%

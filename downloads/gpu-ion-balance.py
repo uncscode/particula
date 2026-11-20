@@ -5,7 +5,7 @@
 # adequate reference? You will compare a stochastic particle ensemble with both a
 # finite-population master equation and a continuum equation, then account for
 # supplied and exported mass. This is the prerequisite for interpreting the
-# [seed-survival experiment](gpu_lucky_few.py).
+# [seed-survival experiment](../../../examples/coupled-populations/charged-aerosols/gpu_lucky_few.py).
 #
 # Before asking whether charging helps a rare seed survive, check the ion
 # population itself. Here every ion is a unit-count particle of diameter

@@ -9,7 +9,7 @@
 #
 # This review examines one reported pentane condition accompanying a measured gas-temperature profile. We use its surface temperature, flow descriptors and dimensionless evaporation rate to test heat–mass consistency. We do not compare calculated spatial temperature profiles with the measured profile, or claim validation against the paper's full evaporation dataset.
 #
-# ![Conceptual experiment: a continuously fed pentane drop receives heat from warm air while vapor leaves its surface. The model tests vapor transport and latent heat supply separately.](../../../images/pendant-evaporation/experiment-overview.svg)
+# ![Conceptual experiment: a continuously fed pentane drop receives heat from warm air while vapor leaves its surface. The model tests vapor transport and latent heat supply separately.](../../../../images/pendant-evaporation/experiment-overview.svg)
 #
 # *The illustration explains the experiment and model comparison. It is not an apparatus drawing to scale. Feed enthalpy, tube conduction and radiation are possible net heat inputs that must be constrained separately.*
 #
@@ -227,7 +227,7 @@ plt.show()
 #
 # The experiment is documented in *Experimental Study of Evaporation of a Volatile Pendant Drop under High Mass Flux Conditions* ([1984 experimental paper](https://doi.org/10.1252/jcej.17.7), methods on pp. 8–9 and selected pentane condition on p. 9). The retained [experimental paper](https://doi.org/10.1252/jcej.17.7) and [companion theory paper](https://doi.org/10.1252/jcej.17.1) provide the source equations and measurement context.
 #
-# The [computational evidence and reproduction instructions](../../../contribute/validation/thermodynamics/pendant-evaporation.md) record the source checkout, property methods, actual RTX 5060 CUDA execution, CPU comparison, derivative checks, refinement and retained data. This is an algebraic correlation study with CPU property calculations and CUDA evaluations; it does not resolve the fluid field or simulate a time-dependent pendant drop. The registered example refresh runs the full calculation on CUDA; later figure-only replots reuse its verified saved data.
+# The [computational evidence and reproduction instructions](index.md) record the source checkout, property methods, actual RTX 5060 CUDA execution, CPU comparison, derivative checks, refinement and retained data. This is an algebraic correlation study with CPU property calculations and CUDA evaluations; it does not resolve the fluid field or simulate a time-dependent pendant drop. The registered example refresh runs the full calculation on CUDA; later figure-only replots reuse its verified saved data.
 #
 # ## What this means for interpreting evaporation measurements
 #

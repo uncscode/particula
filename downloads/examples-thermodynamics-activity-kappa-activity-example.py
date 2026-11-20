@@ -129,5 +129,5 @@ for kappa in kappa_test_values:
 # To study a material, choose κ and density supported for its phase and conditions,
 # solve for water content at specified humidity, and include curvature when needed.
 # Compare the resulting growth factor with data or another activity model. The
-# [finite-vapor condensation example](../../processes/condensation/condensation_3_massresolved.py)
+# [finite-vapor condensation example](../../../tutorials/condensation/condensation_3_massresolved.py)
 # adds competition for a limited reservoir, where initial humidity is not maintained.

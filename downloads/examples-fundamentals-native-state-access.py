@@ -22,7 +22,7 @@
 """Inspect and replace native CPU aerosol state without facade conversions.
 
 Run from the repository root with
-``python docs/examples/fundamentals/native_state_access.py``. This single-box example uses
+``python docs/studies/tutorials/building-an-aerosol/native_state_access.py``. This single-box example uses
 resolved counts in 0.25 m³ and full ordered gas storage including inert gas.
 Replacement selects supplied state; it neither conserves the old inventory
 automatically nor rebinds a prepared GPU or resident session.
@@ -164,4 +164,4 @@ if __name__ == "__main__":
 # from the new ordered names and compare inventories separately for each material.
 # A useful failure check is to swap two map entries deliberately in a disposable
 # copy and confirm that a species-specific comparison detects the error. See
-# [state ownership](../../guide/data-model/ownership.md) before coupling a solver.
+# [state ownership](../../../guide/data-model/ownership.md) before coupling a solver.

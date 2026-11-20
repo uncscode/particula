@@ -250,4 +250,4 @@ print("Native radius-PDF number density [m^-3]:", native_pdf.number_density)
 # and after conversion, and test sensitivity to the grid and measurement range.
 # These would be additional checks, not results established by this example.
 # Continue to [population storage](distribution_tutorial.py) or use the same
-# representation distinction in [coagulation comparisons](../../processes/coagulation/coagulation_4_compared.py).
+# representation distinction in [coagulation comparisons](../../coagulation-populations/coagulation_4_compared.py).

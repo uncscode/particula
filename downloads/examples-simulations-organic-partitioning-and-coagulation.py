@@ -28,8 +28,8 @@
 # −59% to +35%. Those are observed defects, not acceptable tolerances, and a
 # smaller timestep cannot supply the missing species transport.
 #
-# Read the [coagulation contract](../../guide/processes/coagulation.md). Use a
-# [supported resolved representation](../processes/coagulation/coagulation_3_particle_resolved_pattern.py)
+# Read the [coagulation contract](../../../../guide/processes/coagulation.md). Use a
+# [supported resolved representation](../../../tutorials/coagulation-populations/coagulation_3_particle_resolved_pattern.py)
 # when collisions must mix size-dependent species composition.
 
 # %% [markdown]

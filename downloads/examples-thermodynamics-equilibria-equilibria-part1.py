@@ -220,7 +220,7 @@ plt.show()
 # species ratios, then compare the fraction condensed at each water activity.
 # Record solver success and residuals as well as mass bounds; compare the result
 # with a measured humidity-dependent partitioning curve. A time-dependent
-# [condensation example](../../processes/condensation/condensation_1_bin.py)
+# [condensation example](../../../tutorials/condensation/condensation_1_bin.py)
 # would address the separate question of approaching those equilibria.
 
 # %%

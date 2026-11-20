@@ -133,5 +133,5 @@ for org_frac in mass_fractions:
 # and composition fixed, then compare predicted equilibrium partial pressures.
 # Check the chosen descriptor range against the model's domain and independent
 # data. The [activity comparison](activity_tutorial.py) includes such a sweep;
-# [partitioning](equilibria_example.py) connects thermodynamics to an equilibrium
+# [partitioning](../equilibria/equilibria_example.py) connects thermodynamics to an equilibrium
 # inventory rather than just a component activity.

@@ -268,3 +268,6 @@ plt.show()
 # This notebook provides a comparison of the radial relative velocities between DNS data and model predictions.
 #
 # There are non-realistic jumps in the `particula` library predictions, which are not present in the DNS data. These are due to errors in the calculation of the settling velocity, which should be improved in future versions of the library.
+
+# %% [markdown]
+# Return to the [equation and assumptions](../../../theory/dynamics/cloud-droplet-coagulation/droplet-coagulation-kernel-ayala2008.md#radial-relative-velocity) used in this comparison.

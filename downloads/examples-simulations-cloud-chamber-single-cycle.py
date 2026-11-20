@@ -28,8 +28,8 @@
 # interval. Its local error control is distinct from convergence of the outer
 # stochastic wall-loss schedule and from a quantitative activation threshold.
 #
-# Start with [condensation](../processes/condensation/condensation_1_bin.py) and
-# [rectangular wall loss](../processes/wall-loss/rectangular_wall_loss_strategy.py)
+# Start with [condensation](../../../tutorials/condensation/condensation_1_bin.py) and
+# [rectangular wall loss](../../particle-processes/wall-loss/rectangular_wall_loss_strategy.py)
 # if either process is unfamiliar. This example adds their interaction, not a
 # validation against chamber measurements.
 
@@ -505,7 +505,7 @@ print("Simulation completed successfully.")
 # The calculation connects a humidity change to particle water exchange while
 # wall removal reduces the surviving population. The adaptive result resolves
 # smooth dry-phase relaxation. The independent
-# [wet–dry accuracy comparison](adaptive_cloud_relaxation.py) shows why mass
+# [wet–dry accuracy comparison](../../../validation/condensation/adaptive/adaptive_cloud_relaxation.py) shows why mass
 # conservation alone cannot establish temporal accuracy, and compares ROS2 and
 # ROS3 work at the same tolerances.
 #

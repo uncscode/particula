@@ -21,7 +21,7 @@
 # and a finite vapor reservoir in 10⁻⁶ m³. Initial water saturation is 1.03 at
 # 298.15 K. The energy is diagnostic only and never updates temperature.
 #
-# Read [the finite-reservoir example](condensation_3_massresolved.py) for coupled
+# Read [the finite-reservoir example](../../../tutorials/condensation/condensation_3_massresolved.py) for coupled
 # mass transfer. Here the constant latent heat is 2.26 × 10⁶ J kg⁻¹. Follow
 # `run_example()` from copied initial state through mass transfer to per-call and
 # cumulative energy density. Positive energy denotes net condensation; negative

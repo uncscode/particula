@@ -201,4 +201,4 @@ print("Number densities after wall loss [m^-3]:", box_particles.number_density)
 # density, then compare normalized losses across repeated wall-loss realizations.
 # That requires adjusting represented counts and checking material inventories,
 # not merely changing `volume`. Continue with [state access and replacement](native_state_access.py)
-# or the [wall-loss examples](../processes/wall-loss/index.md).
+# or the [wall-loss examples](../../examples/particle-processes/wall-loss/index.md).

@@ -10,7 +10,7 @@
 # The calculation uses homogeneous independent spheres in a nonabsorbing medium,
 # with radius and vacuum wavelength in metres and angles in radians. The constant
 # complex refractive indices are illustrative, not measured spectral material data.
-# See the [optics guide](../../guide/optics/index.md) for conventions and exclusions.
+# See the [optics guide](../../../../guide/optics/index.md) for conventions and exclusions.
 # The calculation changes no particle mass, temperature, or gas composition.
 
 # %%
@@ -223,5 +223,5 @@ if __name__ == "__main__":
 # material. The absorption spectrum could also feed a heating calculation, but
 # that extension needs incident irradiance, thermal properties, emission and an
 # energy balance; evaporation additionally needs mass transfer and latent heat.
-# For large batches, the [CUDA optics example](cuda_optics.py) tests the same
+# For large batches, the [CUDA optics example](../cuda-optics/cuda_optics.py) tests the same
 # optical quantities against CPU calculations.

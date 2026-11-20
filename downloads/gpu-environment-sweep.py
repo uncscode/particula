@@ -9,8 +9,8 @@
 # and initial humidity. It illustrates how several observables can separate
 # mechanisms that a size spectrum alone cannot identify.
 #
-# Use the [condensation](../../processes/condensation/condensation_1_bin.py)
-# and [prepared GPU guide](../../../guide/gpu/prepared.md) as prerequisites.
+# Use the [condensation](../../../tutorials/condensation/condensation_1_bin.py)
+# and [prepared GPU guide](../../../../guide/gpu/prepared.md) as prerequisites.
 # The intended outcome is to read these diagnostics together and design a
 # controlled follow-up, rather than infer atmospheric rates from the example.
 #
@@ -87,7 +87,7 @@ from scripts.gpu_studies.population_figures import (
 #
 # The charged hard-sphere model uses Coulomb-modified Brownian collision
 # rates. No empirical ion-attachment fit is extrapolated to these conditions.
-# The [Lucky Few example](gpu_lucky_few.py) retains LF2013 at its fixed
+# The [Lucky Few example](../charged-aerosols/gpu_lucky_few.py) retains LF2013 at its fixed
 # reference conditions. This study selects the separate mobility model.
 
 
@@ -256,7 +256,7 @@ def run_example():
 #   κ value here is illustrative, not assigned to a measured material.
 # - [Gopalakrishnan and Hogan (2012)](https://doi.org/10.1103/PhysRevE.85.026410):
 #   hard-sphere transition-regime fit and charged collision scaling.
-# - The [prepared execution guide](../../../guide/gpu/prepared.md) documents
+# - The [prepared execution guide](../../../../guide/gpu/prepared.md) documents
 #   resident ownership, CUDA capture and supported process contracts.
 
 # %%

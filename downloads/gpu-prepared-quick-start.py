@@ -5,7 +5,7 @@
 # GPU? Follow construction, physical evolution, and detached analysis as separate
 # stages. You will learn which evidence comes from inventory checks, timestep
 # refinement, and checkpoint replay. Begin with
-# [native aerosol assembly](../../fundamentals/native_aerosol.py) if counts, volume,
+# [native aerosol assembly](../building-an-aerosol/native_aerosol.py) if counts, volume,
 # or species ordering are unfamiliar.
 #
 # A prepared simulation owns the complete aerosol state on one GPU. Construct
@@ -325,5 +325,5 @@ if __name__ == "__main__":
 # For a cooling-rate question, add an otherwise identical uncooled control and
 # compare size-resolved water uptake at the same physical times. Keep gas/material
 # mapping explicit and refine any rapid forcing transitions. Continue with the
-# [heterogeneous ensemble](gpu_prepared_multibox.py) for more boxes or
-# [custom process example](custom_process_backends.py) to supply a new forcing law.
+# [heterogeneous ensemble](../../examples/coupled-populations/forcing/gpu_prepared_multibox.py) for more boxes or
+# [custom process example](../../examples/custom-processes/custom_process_backends.py) to supply a new forcing law.

@@ -6,7 +6,7 @@
 # Here the binary activity thermodynamics (BAT) model supplies a synthetic
 # reference for a miscible organic. Fit κ at 100 nm, leave the other dry
 # diameters out of the fit, and predict their critical supersaturations.
-# The [experiment guide](../../../guide/processes/ccn-retrieval.md) explains
+# The [experiment guide](../../../../guide/processes/ccn-retrieval.md) explains
 # how finite growth time and organic uptake change the measured pair.
 
 # %% [markdown]
@@ -180,7 +180,7 @@ if __name__ == "__main__":
 # the prediction falls about 9% below BAT and the required supersaturation
 # exceeds 11%. To test the fitted κ on a different observable, measure wet
 # diameter below saturation and compare growth at the same dry size and RH.
-# The [technical note](../../../guide/processes/ccn-retrieval.md) carries
+# The [technical note](../../../../guide/processes/ccn-retrieval.md) carries
 # that comparison through to an experimental decision.
 #
 # ## Choose a supersaturation scan
@@ -192,7 +192,7 @@ if __name__ == "__main__":
 # deviation from 1.10 to 1.20 widens the interval from 0.54–0.77% to
 # 0.46–0.90% supersaturation.
 #
-# ![Five-second supersaturation scan planner for 10–200 nm particles at two selection widths.](../../../images/thermodynamics/ccn-retrieval/lab-scan-planner.png)
+# ![Five-second supersaturation scan planner for 10–200 nm particles at two selection widths.](../../../../images/thermodynamics/ccn-retrieval/lab-scan-planner.png)
 #
 # ## Check whether residence time changes the fit
 #
@@ -200,7 +200,7 @@ if __name__ == "__main__":
 # signed relative error in the Eq. 10 retrieval. In the gray region a droplet
 # can reach the 1 µm optical gate before crossing its equilibrium maximum.
 #
-# ![Signed error in retrieved κ at the optical midpoint for one- and five-second exposures.](../../../images/thermodynamics/ccn-retrieval/lab-kappa-error.png)
+# ![Signed error in retrieved κ at the optical midpoint for one- and five-second exposures.](../../../../images/thermodynamics/ccn-retrieval/lab-kappa-error.png)
 #
 # ## Test the effect of organic vapor
 #
@@ -209,7 +209,7 @@ if __name__ == "__main__":
 # points. Supplying 10 µg/m³ of organic vapor raises the BAT count by 36
 # percentage points. Read each panel against its own color scale.
 #
-# ![Count differences from BAT nonideality and from organic co-condensation at five seconds.](../../../images/thermodynamics/ccn-retrieval/bat-design-contrast.png)
+# ![Count differences from BAT nonideality and from organic co-condensation at five seconds.](../../../../images/thermodynamics/ccn-retrieval/bat-design-contrast.png)
 #
 # ## Compare an ambient population
 #
@@ -218,9 +218,9 @@ if __name__ == "__main__":
 # Averaging composition within narrow size bands gives 45.25%. The right
 # panel shows where the count is most sensitive to that assumption.
 #
-# ![Particle-resolved ambient scan and change in counts when size-band composition is averaged.](../../../images/thermodynamics/ccn-retrieval/ambient-cuda-reference.png)
+# ![Particle-resolved ambient scan and change in counts when size-band composition is averaged.](../../../../images/thermodynamics/ccn-retrieval/ambient-cuda-reference.png)
 #
 # An experiment can test the mixing assumption by measuring composition
 # within the mobility bands where these count curves diverge. See the
-# [study methods](../../../contribute/validation/thermodynamics/ccn-retrieval.md)
+# [study methods](index.md)
 # for the population, numerical checks and scripts behind these figures.

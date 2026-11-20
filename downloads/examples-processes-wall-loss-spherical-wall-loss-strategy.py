@@ -25,7 +25,7 @@
 # ## Prepare the reference calculation
 #
 # Use Python 3.12 or newer, Particula, NumPy, and Matplotlib. Begin with
-# [distribution measures](../../fundamentals/particles/aerosol_distributions.py)
+# [distribution measures](../../../tutorials/building-an-aerosol/particles/aerosol_distributions.py)
 # if a bin total and a density per radius are unfamiliar. The
 # [combined chamber example](chamber_forward_simulation.py) adds other mechanisms.
 
@@ -241,9 +241,8 @@ wall_loss = par.dynamics.SphericalWallLossStrategy(
 )
 
 # Condensation uses native gas/environment data and explicit process
-# configuration. For a complete
-# example that includes gas-particle condensation, see the condensation
-# tutorials in docs/examples/Dynamics/.
+# configuration. For a complete gas-particle calculation, see the
+# condensation sequence under docs/studies/tutorials/condensation/.
 
 for _ in range(10):
     # Apply wall loss to the particle distribution
@@ -265,6 +264,6 @@ for _ in range(10):
 #
 # A research extension is to infer size-dependent survival from repeated chamber
 # measurements and compare it with the modeled coefficients. First test timestep
-# refinement, then account for [dilution](../dilution/cpu_dilution.py) and possible
-# [coagulation](../coagulation/coagulation_5_time_evolution.py). Those mechanisms
+# refinement, then account for [dilution](../sources-and-dilution/cpu_dilution.py) and possible
+# [coagulation](../../../tutorials/coagulation-populations/coagulation_5_time_evolution.py). Those mechanisms
 # can lower number for different reasons and should be separated by their budgets.

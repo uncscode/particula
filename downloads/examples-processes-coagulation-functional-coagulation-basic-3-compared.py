@@ -21,8 +21,8 @@
 # each for 200 s, and converts units before comparing. It is a small starting
 # point for learning how representation enters a numerical comparison.
 #
-# The [distribution-measure example](../../../fundamentals/particles/aerosol_distributions.py)
-# explains why bin width matters. The [longer coagulation comparison](../coagulation_4_compared.py)
+# The [distribution-measure example](../../../../tutorials/building-an-aerosol/particles/aerosol_distributions.py)
+# explains why bin width matters. The [longer coagulation comparison](../../../../tutorials/coagulation-populations/coagulation_4_compared.py)
 # uses a broader grid and a higher abundance to make evolution more visible.
 
 # %%
@@ -277,7 +277,7 @@ plt.show()
 #
 # If your research concerns the survival of a size-selected population, compare
 # integrated number within that radius interval rather than only the total.
-# The [time-evolution example](../coagulation_5_time_evolution.py) shows how to
+# The [time-evolution example](../../../../tutorials/coagulation-populations/coagulation_5_time_evolution.py) shows how to
 # extend a matched comparison through time.
 
 # %% [markdown]

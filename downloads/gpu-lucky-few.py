@@ -3,7 +3,7 @@
 #
 # The useful outcome is a defensible comparison of first-passage probabilities,
 # including unresolved lineages and uncertainty. Work through
-# [ion-only balance](gpu_ion_balance.py) first so that source and recombination
+# [ion-only balance](../../../validation/coagulation/charged-aerosols/gpu_ion_balance.py) first so that source and recombination
 # errors are not mistaken for an effect on aerosol survival.
 #
 # A large ensemble makes a rare survival fraction measurable. Each independent
@@ -19,7 +19,7 @@
 #
 # Both omitted-rate assumptions are explicit sensitivity cases. The default
 # workload uses 8192 independent boxes per case; numerical qualification is
-# documented in the [validation record](../../../contribute/validation/gpu/charged-coagulation.md).
+# documented in the [validation record](../../../validation/coagulation/charged-aerosols/index.md).
 # Each case starts with 270,336 aerosol particles and allocates 1,048,576
 # particle slots, including space for injected ions. The five cases execute
 # sequentially on the GPU.

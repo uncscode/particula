@@ -12,7 +12,7 @@
 # The Wiedensohler approximation gives a separate fit for each signed charge.
 # Use metres for diameter and elementary charges for charge. The raw fractions
 # below are evaluated independently. The population model in the
-# [study record](../../../../contribute/validation/coagulation/nacl-scavenging.md)
+# [study record](index.md)
 # also represents higher states and normalizes before drawing particles.
 
 # %%
@@ -237,7 +237,7 @@ plt.show()
 # The largest mechanical increment falls several orders of magnitude below
 # the residual at every size. The alternative Gatti–Kortshagen thermal fit
 # gets closer, but the increase also appears when both collision charges
-# are set to zero. The [validation record](../../../../contribute/validation/coagulation/nacl-scavenging.md)
+# are set to zero. The [validation record](index.md)
 # reports both controls along with the cloud-turbulence extrapolation.
 
 # %% [markdown]

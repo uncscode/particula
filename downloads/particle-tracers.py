@@ -14,8 +14,8 @@
 # removed inventory while preserving each survivor's per-particle tag.
 #
 # The second, independent case forces fixed-capacity resampling during nucleation
-# and assigns newborn tags. Read [represented counts](../../fundamentals/particles/distribution_tutorial.py)
-# and [bounded sources](../nucleation/cpu_nucleation.py) first. These cases check
+# and assigns newborn tags. Read [represented counts](../../tutorials/building-an-aerosol/particles/distribution_tutorial.py)
+# and [bounded sources](../particle-processes/sources-and-dilution/cpu_nucleation.py) first. These cases check
 # CPU bookkeeping; they make no CPU/GPU stochastic-trajectory claim.
 
 # %%

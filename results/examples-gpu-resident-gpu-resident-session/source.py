@@ -3,7 +3,7 @@
 #
 # What makes a saved state sufficient for restarting, rather than merely plotting?
 # This example separates detached inspection values, canonical continuation state,
-# and new device ownership. Use the [prepared workflow](../prepared/gpu_prepared_quick_start.py)
+# and new device ownership. Use the [prepared workflow](../gpu_prepared_quick_start.py)
 # for ordinary simulations; this lower-level example explains the underlying
 # lifecycle contract.
 #
@@ -150,7 +150,7 @@ def _disabled_output() -> list[str]:
         Status lines confirming that no CPU fixture or resident session exists.
     """
     return [
-        "Canonical path: docs/examples/gpu/resident/gpu_resident_session.py",
+        "Canonical path: docs/studies/tutorials/working-with-gpu/resident/gpu_resident_session.py",
         "CPU fixture: not constructed because Warp is unavailable or disabled.",
         "Warp is unavailable or disabled; no resident session was created.",
     ]
@@ -206,7 +206,7 @@ def run_example(device: str = "cpu") -> ExampleRun:
     assert session.finalize(registry, guard) is terminal_checkpoint
     return ExampleRun(
         output=[
-            "Canonical path: docs/examples/gpu/resident/gpu_resident_session.py",
+            "Canonical path: docs/studies/tutorials/working-with-gpu/resident/gpu_resident_session.py",
             "Finalization terminalizes its source; returned checkpoint is ACTIVE "
             "and cached.",
             "Restart is explicit, same-device, and never automatic.",
@@ -325,5 +325,5 @@ if __name__ == "__main__":
 # continuation and external forcing position in the comparison. A matching final
 # mass total can conceal a different size distribution or random trajectory.
 # The [multi-timestep example](gpu_resident_multi_timestep.py) adds evolving physics,
-# while the [prepared cyclic study](../prepared/gpu_prepared_cyclic_chamber.py)
+# while the [prepared cyclic study](../../../examples/coupled-populations/chambers/gpu_prepared_cyclic_chamber.py)
 # shows why an application must retain its forcing schedule as well.

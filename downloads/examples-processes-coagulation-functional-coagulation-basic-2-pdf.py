@@ -21,7 +21,7 @@
 # coagulation. Its 200 s horizon is intended to make the workflow easy to inspect;
 # a subtle before/after difference is not evidence that coagulation is absent.
 #
-# Read [distribution measures](../../../fundamentals/particles/aerosol_distributions.py)
+# Read [distribution measures](../../../../tutorials/building-an-aerosol/particles/aerosol_distributions.py)
 # to connect these concentrations with measurements. The companion
 # [alternative representation](coagulation_basic_1_pmf.py) uses different initial parameters,
 # so the two pages are not a controlled solver comparison.

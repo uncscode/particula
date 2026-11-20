@@ -5,7 +5,7 @@
 # is working as configured? This example makes gas replacement and particle loss
 # visible alongside resident ownership. It is intended for readers examining the
 # low-level scheduler; begin with [session ownership](gpu_resident_session.py) or
-# use the [prepared interface](../prepared/gpu_prepared_quick_start.py) for a study.
+# use the [prepared interface](../gpu_prepared_quick_start.py) for a study.
 #
 # The three boxes have volumes 1, 2, and 3 m³ and prescribed gas densities
 # 0.25, 0.5, and 0.75 kg m⁻³. The sole lane is named water but uses an illustrative
@@ -118,7 +118,7 @@ def _warp_enabled() -> bool:
 def _disabled_output() -> list[str]:
     """Return deterministic guidance for the intentional no-Warp path."""
     return [
-        "Canonical path: docs/examples/gpu/resident/gpu_resident_multi_timestep.py",
+        "Canonical path: docs/studies/tutorials/working-with-gpu/resident/gpu_resident_multi_timestep.py",
         "Warp is unavailable or disabled; install warp-lang or enable Warp.",
         "No CPU fallback ran; no fixture, upload, diagnostics, or restart ran.",
     ]
@@ -961,5 +961,5 @@ if __name__ == "__main__":
 # plotted bars describe the original two-step state. There is no uninterrupted
 # three-step comparison here. For a coupled-box research model, add actual transfer
 # edges and an external-exchange ledger, then compare a complete resumed trajectory
-# with an uninterrupted control. The [prepared lifecycle](../prepared/gpu_prepared_lifecycle.py)
+# with an uninterrupted control. The [prepared lifecycle](../../../examples/coupled-populations/forcing/gpu_prepared_lifecycle.py)
 # provides that stronger continuation and process-accounting example.
