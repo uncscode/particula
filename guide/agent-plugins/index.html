@@ -233,7 +233,7 @@ only the Python library changes. A failed check prevents package upload and
 release publication. Maintainers can require the workflow’s <code dir="auto">validate</code> check
 in branch protection; this source change does not modify repository rules.</p>
 <p>After each successful merge build, open the latest successful <code dir="auto">main</code> push in
-<a href="https://github.com/uncscode/particula/actions/workflows/assistant-plugins.yml?query=branch%3Amain+event%3Apush">Assistant plugins</a>
+<a href="https://github.com/uncscode/particula/actions/workflows/pypi.yml?query=branch%3Amain+event%3Apush">Python CI and releases</a>
 and follow <strong>Download tested plugin packages</strong> in the run summary. The artifact
 contains the Codex, Claude and OpenCode ZIPs, checksums, and <code dir="auto">GITHUB-RELEASE.md</code>
 with installation instructions. Artifacts are named by version and source
