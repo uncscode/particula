@@ -6,6 +6,7 @@ import numpy as np
 import warp as wp
 
 from particula.dynamics.chemistry import resolved_device as kernels
+from particula.dynamics.chemistry.binding import _sparse_stoichiometry
 from particula.execution.extension_registry import (
     PreparedOperation,
     ProcessCapabilities,
@@ -74,7 +75,11 @@ class ResolvedChemistryAdapter:
             setattr(
                 m, name, wp.array(data[name], dtype=wp.float64, device=target)
             )
-        for name in ("net", "orders", "kinds", "sources"):
+        m.offsets, m.columns, m.coefficients_net = (
+            wp.array(array, dtype=int, device=target)
+            for array in _sparse_stoichiometry(data["net"])
+        )
+        for name in ("orders", "kinds", "sources"):
             setattr(m, name, wp.array(data[name], dtype=int, device=target))
         _, m.rtol, m.atol, m.first, m.minimum, m.maximum, m.limit = data[
             "solver"

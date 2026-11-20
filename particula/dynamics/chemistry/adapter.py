@@ -6,6 +6,7 @@ import numpy as np
 import warp as wp
 
 from particula.dynamics.chemistry import device
+from particula.dynamics.chemistry.binding import _sparse_stoichiometry
 from particula.execution.extension_registry import (
     PreparedOperation,
     ProcessCapabilities,
@@ -75,7 +76,10 @@ class GasChemistryAdapter:
         m = device.DeviceMechanism()
         m.lanes = wp.array(values["indices"], dtype=int, device=target)
         m.masses = wp.array(values["masses"], dtype=wp.float64, device=target)
-        m.net = wp.array(values["net"], dtype=int, device=target)
+        m.offsets, m.columns, m.coefficients_net = (
+            wp.array(array, dtype=int, device=target)
+            for array in _sparse_stoichiometry(values["net"])
+        )
         m.active = wp.array(
             np.any(values["net"], axis=0), dtype=int, device=target
         )
@@ -105,7 +109,7 @@ class GasChemistryAdapter:
         w.lu = wp.zeros_like(w.matrix)
         w.pivots = wp.zeros((boxes, size), dtype=int, device=target)
         w.rates = wp.zeros(
-            (boxes, m.net.shape[0]), dtype=wp.float64, device=target
+            (boxes, m.orders.shape[0]), dtype=wp.float64, device=target
         )
         w.counts = context.state["work_counts"]
         gas = context.arrays["gas.concentration"]

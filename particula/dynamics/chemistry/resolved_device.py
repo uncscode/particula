@@ -22,7 +22,9 @@ class Network:
     gm: wp.array(dtype=wp.float64)
     pm: wp.array(dtype=wp.float64)
     density: wp.array(dtype=wp.float64)
-    net: wp.array2d(dtype=int)
+    offsets: wp.array(dtype=int)
+    columns: wp.array(dtype=int)
+    coefficients_net: wp.array(dtype=int)
     orders: wp.array2d(dtype=int)
     params: wp.array2d(dtype=wp.float64)
     kinds: wp.array(dtype=int)
@@ -61,8 +63,10 @@ def _evaluate(m: Network, w: Stages, b: int, target: int):  # noqa: C901
             for i in range(ng):
                 if m.orders[r, i] > 0:
                     flux *= wp.pow(w.v[b, 1, i], wp.float64(m.orders[r, i]))
-            for i in range(ng):
-                w.v[b, target, i] += wp.float64(m.net[r, i]) * flux
+            for term in range(m.offsets[r], m.offsets[r + 1]):
+                w.v[b, target, m.columns[term]] += (
+                    wp.float64(m.coefficients_net[term]) * flux
+                )
     for slot in range(w.reference.shape[1]):
         ref = w.reference[b, slot]
         if ref > 0:
@@ -92,10 +96,13 @@ def _evaluate(m: Network, w: Stages, b: int, target: int):  # noqa: C901
                     extent = w.rates[b, r] * area * w.v[b, 1, source]
                     w.v[b, target, source] -= w.weights[b, slot] * extent
                     flux = extent / ref
-                for j in range(ns):
-                    w.v[b, target, start + j] += (
-                        wp.float64(m.net[r, ng + j]) * flux
-                    )
+                if kind != 0:
+                    for term in range(m.offsets[r], m.offsets[r + 1]):
+                        j = m.columns[term] - ng
+                        if j >= 0:
+                            w.v[b, target, start + j] += (
+                                wp.float64(m.coefficients_net[term]) * flux
+                            )
     return True
 
 
