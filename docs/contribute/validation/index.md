@@ -38,3 +38,7 @@ test or closed implementation plan cannot populate a missing measurement row.
 [Dispersion and dielectric capture](coagulation/van-der-waals.md) compares
 CPU and CUDA pair kernels with orbit integrals, independent Langevin
 trajectories, and neutral and charged chamber measurements.
+
+## Evaporation heat and mass consistency
+
+The [fed pentane drop comparison](thermodynamics/pendant-evaporation.md) records CUDA correlation checks, temperature-grid refinement, property sensitivity and the limits of reconstructing a published experiment.

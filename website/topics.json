@@ -2792,6 +2792,24 @@
       ],
       "role": "Contribute",
       "start_here": false
+    },
+    {
+      "source": "docs/examples/processes/condensation/pendant_drop_evaporation.py",
+      "title": "Can warm air explain the measured evaporation of a pentane drop?",
+      "topic": "condensation-energy",
+      "also": [
+        "condensation"
+      ],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
+      "source": "docs/contribute/validation/thermodynamics/pendant-evaporation.md",
+      "title": "Pentane drop heat and mass consistency: numerical evidence",
+      "topic": "condensation-energy",
+      "also": [],
+      "role": "Contribute",
+      "start_here": false
     }
   ],
   "supporting": [
