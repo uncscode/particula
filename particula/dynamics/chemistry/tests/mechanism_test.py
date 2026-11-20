@@ -103,3 +103,45 @@ def test_invalid_chemistry():
         meta["elements"] = {"H": 1}
     with pytest.raises(ValueError, match="elemental"):
         ReactionMechanism(record).bind(gas(), {"gas:B": "precursor"})
+
+
+def test_format_and_reference_errors(tmp_path):
+    """Identify invalid versions, reaction fields and unknown identifiers."""
+    record = conversion()
+    record["version"] = 2
+    with pytest.raises(ValueError, match="version"):
+        ReactionMechanism(record)
+    record = conversion()
+    record["reactions"][0]["undeclared"] = 1
+    with pytest.raises(ValueError, match="combine.*undeclared"):
+        ReactionMechanism(record)
+    record = conversion()
+    record["reactions"][0]["orders"] = {"gas:missing": 1}
+    with pytest.raises(ValueError, match="unknown species"):
+        ReactionMechanism(record)
+    mech = ReactionMechanism(conversion())
+    bound = mech.bind(gas(), {"gas:B": "precursor"})
+    changed = gas()
+    changed.molar_mass[1] *= 2
+    with pytest.raises(ValueError, match="rebind"):
+        bound.validate(changed)
+
+
+def test_stiff_jacobian_at_interior_and_zero():
+    """Check the full nonlinear Jacobian against an independent formula."""
+    from particula.dynamics.chemistry.tests.process_test import (
+        state_and_process,
+    )
+
+    _, process = state_and_process("stiff", "ros3")
+    kinetics = process.bound.kinetics(300.0)
+    for y in (np.array([1.0, 0.0, 0.0]), np.array([0.8, 1e-5, 0.19999])):
+        _, b, c = y
+        expected = [
+            [-0.04, 1e4 * c, 1e4 * b],
+            [0.04, -1e4 * c - 6e7 * b, -1e4 * b],
+            [0.0, 6e7 * b, 0.0],
+        ]
+        np.testing.assert_allclose(
+            kinetics.jacobian(0, y), expected, rtol=2e-15, atol=0.0
+        )

@@ -157,10 +157,14 @@ class GasChemistry(BoxProcess):
     def advance(self, aerosol, *, time, time_step, context):
         """Convert bound columns to molar units and publish accepted mass."""
         gas = aerosol.gas.concentration[0]
-        idx = list(self.bound.indices)
+        idx = np.asarray(self.bound.indices)
+        initial = gas[idx] / self.bound.molar_masses
         state, _ = self.integrate(
-            gas[idx] / self.bound.molar_masses,
+            initial,
             aerosol.environment.temperature[0],
             time_step,
         )
-        gas[idx] = state * self.bound.molar_masses
+        changed = (state != initial) & np.any(self.bound.stoichiometry, axis=0)
+        gas[idx[changed]] = (
+            state[changed] * np.asarray(self.bound.molar_masses)[changed]
+        )

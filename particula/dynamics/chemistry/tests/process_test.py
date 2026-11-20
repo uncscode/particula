@@ -142,3 +142,26 @@ def test_robertson_cpu():
         )
     np.testing.assert_allclose(np.sum(history, axis=1), 1.0, rtol=1e-12)
     assert np.min(history) >= 0
+
+
+def test_cpu_resume_rejects_changed_binding_mechanism_or_solver():
+    """A same-shaped network still needs the checkpoint's scientific identity."""
+    from dataclasses import replace
+
+    state, process = state_and_process("stiff", "ros3")
+    saved = CPUSimulation(state, process, time_step=1.0).checkpoint()
+    record = process.bound.mechanism.to_dict()
+    record["reactions"][0]["rate"]["k"] *= 2
+    changed = (
+        GasChemistry(ReactionMechanism(record).bind(state.gas), process.solver),
+        GasChemistry(process.bound, replace(process.solver, method="rk23")),
+        GasChemistry(
+            process.bound.mechanism.bind(
+                state.gas, {"gas:A": "B", "gas:B": "A"}
+            ),
+            process.solver,
+        ),
+    )
+    for alternative in changed:
+        with pytest.raises(ValueError, match="configuration/order"):
+            CPUSimulation.resume(saved, alternative)
