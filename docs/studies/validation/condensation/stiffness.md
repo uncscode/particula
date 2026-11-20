@@ -148,15 +148,15 @@ does ship gas coupling, but these candidates remain historical evidence only.
 
 ### Historical Phase Boundary Decision
 
-[Read the contributor decision and qualification details.](../../../contribute/validation/numerics/direct-condensation-decision.md#historical-phase-boundary-decision)
+[Read the contributor decision and qualification details.](stiffness/method-decision.md#historical-phase-boundary-decision)
 
 ## Final Recommendation
 
-[Read the contributor decision and qualification details.](../../../contribute/validation/numerics/direct-condensation-decision.md#final-recommendation)
+[Read the contributor decision and qualification details.](stiffness/method-decision.md#final-recommendation)
 
 ### Shipped fixed-four implementation
 
-[Read the contributor decision and qualification details.](../../../contribute/validation/numerics/direct-condensation-decision.md#shipped-fixed-four-implementation)
+[Read the contributor decision and qualification details.](stiffness/method-decision.md#shipped-fixed-four-implementation)
 
 ### Production-hook evidence boundary
 
@@ -215,7 +215,7 @@ completed earlier substeps rather than rolling back the whole call.
 
 ### Downstream gates and dependency boundaries
 
-[Read the contributor decision and qualification details.](../../../contribute/validation/numerics/direct-condensation-decision.md#downstream-gates-and-dependency-boundaries)
+[Read the contributor decision and qualification details.](stiffness/method-decision.md#downstream-gates-and-dependency-boundaries)
 
 ## What This Record Does Not Publish
 

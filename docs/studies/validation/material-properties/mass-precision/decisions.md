@@ -28,19 +28,19 @@ change.
 
 ## Deterministic cases
 
-[Deterministic cases in the study](../../../studies/validation/material-properties/mass-precision.md#deterministic-cases)
+[Deterministic cases in the study](../mass-precision.md#deterministic-cases)
 
 ## Density assumptions
 
-[Density assumptions in the study](../../../studies/validation/material-properties/mass-precision.md#density-assumptions)
+[Density assumptions in the study](../mass-precision.md#density-assumptions)
 
 ## Volume-fraction assumptions
 
-[Volume-fraction assumptions in the study](../../../studies/validation/material-properties/mass-precision.md#volume-fraction-assumptions)
+[Volume-fraction assumptions in the study](../mass-precision.md#volume-fraction-assumptions)
 
 ## Construction rule
 
-[Construction rule in the study](../../../studies/validation/material-properties/mass-precision.md#construction-rule)
+[Construction rule in the study](../mass-precision.md#construction-rule)
 
 ## Shipped evidence summary
 
@@ -52,7 +52,7 @@ change.
 <a id="candidate-evaluation-clamp-accounting"></a>
 <a id="candidate-evaluation-memory-footprint-examples"></a>
 <a id="candidate-evaluation-throughput-evidence-availability"></a>
-[Shipped evidence summary in the study](../../../studies/validation/material-properties/mass-precision.md#shipped-evidence-summary)
+[Shipped evidence summary in the study](../mass-precision.md#shipped-evidence-summary)
 
 ## Executed but not recommended candidates
 
@@ -99,7 +99,7 @@ Any future proposal that changes production defaults must, at minimum:
 
 ## Reproducibility
 
-[Reproducibility in the study](../../../studies/validation/material-properties/mass-precision.md#reproducibility)
+[Reproducibility in the study](../mass-precision.md#reproducibility)
 
 ## Documentation cross-check checklist
 

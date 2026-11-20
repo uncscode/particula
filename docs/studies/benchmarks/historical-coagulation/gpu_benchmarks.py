@@ -31,7 +31,7 @@
 # revision, command, Warp version, device, and workload before comparing runs.
 # The file is mutable and may differ from the dated evidence linked below.
 # It does not contain the reviewed resident/capture evidence required by the
-# [qualification gates](../../../contribute/validation/gpu/graph-capture-qualification.md).
+# [qualification gates](../../validation/workflows-and-releases/graph-capture/index.md).
 
 # %%
 import json
@@ -344,4 +344,4 @@ else:
 # for its specific machine-bounded timings and caution band. Those historical
 # observations are not measurements of the current v0.3.0 tree or necessarily
 # the artifact loaded above. Current resident timing and memory qualification
-# remains [unavailable](../../../contribute/validation/gpu/resident-benchmarks.md).
+# remains [unavailable](../../validation/workflows-and-releases/graph-capture/benchmark-protocol.md).

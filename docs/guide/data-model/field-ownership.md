@@ -29,7 +29,7 @@ Scientific configuration belongs to processes; physical state belongs to the
 containers. Single-box storage keeps its leading dimension. Multi-box storage
 does not imply multi-box CPU strategy execution. Keep fp64 absolute per-species
 masses unless an approved numerical study supports a representation change; see
-[mass precision](../../contribute/validation/numerics/mass-precision.md).
+[mass precision](../../studies/validation/material-properties/mass-precision/decisions.md).
 
 Source: ownership decision table at repository revision `7b064295037c3c9a137f5dd13c03f4a40da3f11b`,
 originally `docs/Features/Roadmap/data-oriented-gpu.md`.

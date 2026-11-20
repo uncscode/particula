@@ -1,6 +1,6 @@
 # Fixed-four-substep condensation reference
 
-See the [qualification record](../../../../contribute/validation/gpu/condensation-parity.md) for the associated implementation decision and reproduction gates.
+See the [qualification record](qualification.md) for the associated implementation decision and reproduction gates.
 
 ## Supported evidence boundary
 

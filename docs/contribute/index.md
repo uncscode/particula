@@ -10,7 +10,6 @@ Start with [contributing](CONTRIBUTING.md) and
 | Understand the architecture | [Code concepts](architecture/index.md) |
 | Work on Warp internals | [Warp teaching material](architecture/warp/index.md) |
 | Organize or add documentation | [Documentation rules](documentation.md) |
-| Inspect numerical evidence | [Validation records](validation/index.md) |
 | Inspect current development direction | [Roadmap](roadmap.md) |
 
 Follow the [code of conduct](CODE_OF_CONDUCT.md). Implementation plans belong

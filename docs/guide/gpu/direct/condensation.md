@@ -130,7 +130,7 @@ guarantees, or complete condensation parity cross-device certification.
 The [GPU condensation parity walkthrough](https://github.com/uncscode/particula/blob/main/docs/studies/validation/condensation/direct-kernel/gpu_condensation_parity_walkthrough.py)
 separately reports physics, conservation, and energy evidence for this
 fixed-four-substep low-level direct-kernel comparison. Its
-[condensation parity walkthrough ownership record](../../../contribute/validation/gpu/condensation-parity.md)
+[condensation parity walkthrough ownership record](../../../studies/validation/condensation/direct-kernel/qualification.md)
 keeps deferred capabilities explicit. Warp CPU is the installed-Warp baseline;
 CUDA is optional additive evidence. The caller-owned, write-only
 `energy_transfer` output is a diagnostic, not a return value and not temperature

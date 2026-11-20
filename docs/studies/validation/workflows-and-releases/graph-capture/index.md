@@ -7,7 +7,7 @@ Missing results are unavailable and unmeasured, not zero or passing.
 This is the current evidence authority extracted from the 2026-09-07 snapshot
 at revision `7b064295037c3c9a137f5dd13c03f4a40da3f11b`. The historical plan closure on 2026-09-27
 did not supply measurements. Historical implementation blockers are not current
-implementation status. Use the [operator runbook](../../../guide/gpu/resident/graph-capture.md)
+implementation status. Use the [operator runbook](../../../../guide/gpu/resident/graph-capture.md)
 for the supported runtime contract.
 
 ## Qualification metadata
@@ -31,9 +31,9 @@ Future producers must inspect the capture capability, enqueue, preallocation,
 capture/replay, parity, benchmark, and profiling implementations and their final
 executable diff. Exclude tests, documentation, internal plans, and artifacts;
 then freeze a sorted, deduplicated repository-relative production-module list.
-Use the [operator runbook](../../../guide/gpu/resident/graph-capture.md),
-[benchmark record](resident-benchmarks.md), and
-[profiling record](graph-capture-profiling.md) to locate the supported
+Use the [operator runbook](../../../../guide/gpu/resident/graph-capture.md),
+[benchmark record](benchmark-protocol.md), and
+[profiling record](profiling.md) to locate the supported
 boundaries and their evidence requirements. These are static refresh inputs,
 not a live dependency of this record or its test.
 

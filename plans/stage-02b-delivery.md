@@ -46,7 +46,7 @@ coupled checks. Concrete imports preserve existing public runnable APIs.
 
 The [workflow guide](../docs/guide/getting-started/recording-restart.md) owns
 supported usage, output timing, forcing, transfer costs and restart boundaries.
-The [qualification record](../docs/contribute/validation/numerics/simulation-workflow.md)
+The [qualification record](../docs/studies/validation/workflows-and-releases/recording-and-restart.md)
 retains the requirement-to-test matrix, format decision, scientific reference
 limits, commands and results. The
 [first CPU experiment](../docs/studies/tutorials/first_cpu_workflow.py)
@@ -109,7 +109,7 @@ creation claim a merge, release or production documentation deployment.
 
 The earlier transferred-execution gate at revision `2b4bddefd8` passed 10,810 tests
 with 91.34% unfiltered coverage, including actual CUDA. The
-[workflow qualification record](../docs/contribute/validation/numerics/simulation-workflow.md)
+[workflow qualification record](../docs/studies/validation/workflows-and-releases/recording-and-restart.md)
 owns the commands, skips and subsequent full forcing results; the
 [method record](../docs/studies/validation/condensation/adaptive/index.md)
 owns the independent numerical references and CPU cloud/droplet results.

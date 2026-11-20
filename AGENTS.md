@@ -99,7 +99,7 @@ Use ordinary search for documentation, configuration, or unavailable coverage.
 - [Topic organization](plugins/particula-helper/references/documentation-topics.md):
   topic graph ownership and the persistent Explore topics navigation folder.
 - [Conda release checks](conda/README.md) and
-  [release evidence](docs/contribute/validation/releases/v0.3.0.md): validation
+  [release evidence](docs/studies/validation/workflows-and-releases/native-api-v0.3.0.md): validation
   is distinct from release approval and external feedstock success.
 
 **Last updated:** 2026-11-17

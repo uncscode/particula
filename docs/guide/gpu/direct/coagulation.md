@@ -78,7 +78,7 @@ suites skip cleanly when it is unavailable. This path provides no performance,
 broad CPU/GPU parity, graph-capture, broad autodiff, DNS/general-turbulence
 support, unsupported-mechanism, or unsupported-distribution claim. See the
 [canonical ownership contract](../../data-model/index.md)
-and [evidence/command record](../../../contribute/validation/gpu/coagulation.md).
+and [evidence/command record](../../../studies/validation/coagulation/direct-coagulation/qualification.md).
 
 Focused baseline commands:
 

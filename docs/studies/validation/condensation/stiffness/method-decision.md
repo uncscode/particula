@@ -1,6 +1,6 @@
 # Direct condensation method decision and downstream gates
 
-The [scientific comparison](../../../studies/validation/condensation/stiffness.md) describes the workload, assumptions and results supporting these decisions.
+The [scientific comparison](../stiffness.md) describes the workload, assumptions and results supporting these decisions.
 
 ### Historical Phase Boundary Decision
 

@@ -28,7 +28,8 @@ proportional.
 Choose the reader's task and extend its owning topic before creating a page:
 Guide for supported usage, Studies for runnable calculations and scientific
 comparisons, Theory for derivations, API for symbol reference, and Contribute
-for contributor procedures, qualification gates and release decisions.
+for project development procedures. Put validation protocols, qualification
+gates and release evidence with the relevant study or benchmark.
 Implementation phases are not public features. Put requested plans in `plans/`
 and durable scientific evidence with its canonical study in `docs/studies/`.
 Preserve revision, device, reference, limitations and links to outstanding gates.

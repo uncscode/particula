@@ -127,7 +127,7 @@ study later moves to measurements. [CCN retrieval study](../docs/studies/literat
 
 Publish the case, reference, derivative sweep, recovery failures, timed
 comparators and software/device revisions with a percent-format Python
-example and a [validation record](../docs/contribute/validation/). The Stage 4
+example and a [validation record](../docs/studies/validation/index.md). The Stage 4
 campaign supplies the timing protocol. Its BAT tables, humidity reset and
 captured forward timings need their own gradient qualification if used later.
 

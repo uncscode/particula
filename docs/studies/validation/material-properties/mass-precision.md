@@ -1,6 +1,6 @@
 # Particle mass precision across four size scales
 
-See the [qualification record](../../../contribute/validation/numerics/mass-precision.md) for the associated implementation decision and reproduction gates.
+See the [qualification record](mass-precision/decisions.md) for the associated implementation decision and reproduction gates.
 
 ## Deterministic cases
 

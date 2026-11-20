@@ -10,7 +10,7 @@ All five work packages are included. The selected baseline is closed-box
 monodisperse growth with dilution, complemented by constant-reservoir growth,
 exact dilution, constant-kernel coagulation and stochastic removal references.
 Durable results, input regimes, limits and validation commands belong to the
-[scientific correctness record](../docs/contribute/validation/numerics/scientific-correctness.md).
+[scientific correctness record](../docs/studies/validation/material-properties/process-references/qualification.md).
 
 | Work package | Delivery |
 | --- | --- |

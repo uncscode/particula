@@ -3,7 +3,7 @@
 The selected development methods are RK3(2) for the measured continuous
 condensation regimes, CPU ROS2/ROS3 and multi-material GPU ROS3 for supported
 stiff continuous systems, and sequential/Strang composition of declared
-deterministic flows. The [resident workflow qualification](../../../../contribute/validation/numerics/simulation-workflow.md#cuda-resident-material-solvers-and-respiratory-refinement)
+deterministic flows. The [resident workflow qualification](../../workflows-and-releases/recording-and-restart.md#cuda-resident-material-solvers-and-respiratory-refinement)
 owns the subsequent multi-material and device-controlled adaptation evidence;
 the earlier single-exchange assessments below retain their original scope. Existing
 finite-step strategies and fixed-four GPU condensation remain available.
@@ -161,7 +161,7 @@ hardware occupancy statistic or native aerosol throughput result.
 
 ## Method decisions
 
-[Read the contributor decision and qualification details.](../../../../contribute/validation/numerics/adaptive-method-decision.md#method-decisions)
+[Read the contributor decision and qualification details.](method-decisions.md#method-decisions)
 
 ## Splitting and failure qualification
 
@@ -403,12 +403,12 @@ This first integration added ROS3 to `GPUCondensationODE`, including
 stage-time forcing and exact same-device disk restart. Its qualified profile
 had exactly one exchanging material and rejected multiple exchanges before
 device allocation. The later multi-material extension is qualified in the
-[resident workflow record](../../../../contribute/validation/numerics/simulation-workflow.md#cuda-resident-material-solvers-and-respiratory-refinement). The stage solve uses conservative arrowhead
+[resident workflow record](../../workflows-and-releases/recording-and-restart.md#cuda-resident-material-solvers-and-respiratory-refinement). The stage solve uses conservative arrowhead
 elimination, with linear scratch storage and no dense factorization. This
 supersedes the prototype-only status above for the isolated condensation owner.
 Coupled source/collision ownership was subsequently implemented and tested;
 its separate full-workload evidence and remaining cyclic-chamber gate are in
-the [workflow record](../../../../contribute/validation/numerics/simulation-workflow.md#coupled-gpu-event-boundaries).
+the [workflow record](../../workflows-and-releases/coupled-gpu-events.md#coupled-gpu-event-boundaries).
 
 Independent dense-matrix tests cover scaled, reversed species maps, non-unit
 volumes, discrete/resolved measures and inactive slots on Warp CPU and CUDA.
@@ -448,7 +448,7 @@ with zero rendered structure errors. Logs are in `.artifacts/ros3-gpu-*` and
 These isolated-method results do not qualify the original fixed stochastic
 event schedule under adaptive deterministic condensation. The full forcing
 workload and refinement subsequently completed; see the
-[forcing publication](../../../../contribute/validation/numerics/simulation-workflow.md#full-cuda-forcing-publication).
+[forcing publication](../../../examples/coupled-populations/forcing/forcing-refinement.md#full-cuda-forcing-publication).
 The full coupled GPU cyclic chamber remains required.
 
 The corrected **full multi-cycle CPU chamber** subsequently completed in

@@ -252,3 +252,27 @@ def test_retired_content_allows_only_declared_redirects(
     }
     errors = structure.check_search(tmp_path, manifest)
     assert (errors == []) is allowed
+
+
+def test_validation_collection_has_one_home_under_studies():
+    """Old validation bookmarks resolve to Studies and have no Contribute menu."""
+    root = Path(__file__).resolve().parents[2]
+    nav = json.loads((root / "website/navigation.json").read_text())
+    contribute = next(group for group in nav if group["label"] == "Contribute")
+
+    def labels(group):
+        yield group["label"]
+        for child in group.get("items", []):
+            yield from labels(child)
+
+    assert "Validation" not in set(labels(contribute))
+    legacy = "docs/contribute/validation/"
+    assert not list((root / legacy).rglob("*.md"))
+    moves = json.loads((root / "docs/.assets/relocations.json").read_text())[
+        "moves"
+    ]
+    assert moves[legacy + "index.md"] == "docs/studies/validation/index.md"
+    for old, destination in moves.items():
+        if old.startswith(legacy):
+            assert destination.startswith("docs/studies/")
+            assert (root / destination).is_file()

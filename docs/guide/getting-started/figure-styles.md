@@ -6,7 +6,7 @@ contour map the same type sizes and color conventions. The
 five rendered examples and a downloadable Python script. The curves and fields
 in that gallery are illustrative.
 
-For examples with scientific data, compare the [neutralizer and chamber measurements](../../studies/literature/nacl-scavenging/nacl_scavenging.py), the [GPU convergence panels](../../contribute/validation/numerics/scientific-correctness.md), and the [CCN retrieval contour maps](../processes/ccn-retrieval.md).
+For examples with scientific data, compare the [neutralizer and chamber measurements](../../studies/literature/nacl-scavenging/nacl_scavenging.py), the [GPU convergence panels](../../studies/validation/material-properties/process-references/qualification.md), and the [CCN retrieval contour maps](../processes/ccn-retrieval.md).
 
 ## Start with a paper-sized panel
 

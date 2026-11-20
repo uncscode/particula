@@ -1,5 +1,12 @@
 # Organize published calculations and evidence under Studies
 
+**Final placement decision.** The full former Contribute validation collection
+belongs in Studies. Split records by the question they answer, keep method and
+qualification details with the owning scientific study, and put timing protocols
+beside their benchmarks. The [workflow and release qualification collection](../docs/studies/validation/workflows-and-releases/index.md)
+covers cross-cutting checks. The original inventory and provisional dispositions
+below document the planning baseline.
+
 Planning baseline: upstream main at `ebabce042e`, November 19, 2026. The counts below describe the source at that revision. The proposed destinations are editorial choices for the migration.
 
 ## What readers should see

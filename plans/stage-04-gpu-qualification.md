@@ -94,7 +94,7 @@ speedup or accuracy target.
    Identify the first measured batch size with an advantage and report any
    overlap or slower cases. Profile the largest cost before suggesting
    consolidation. The full curve may favor one backend throughout.
-   [Historical RTX campaign](../docs/contribute/validation/gpu/prepared-rtx5060.md)
+   [Historical RTX campaign](../docs/studies/benchmarks/prepared-scaling/qualification.md)
    · [NVIDIA timing guidance](https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/#timing)
 4. **Repeatable CUDA checks.** On a designated CUDA host, use the strict
    [qualification runner](../scripts/qualify_gpu.py) with explicit BAT test
@@ -151,8 +151,8 @@ python scripts/qualify_gpu.py \
   [GPU kernels](../particula/gpu/kernels/).
 - [GPU study helpers](../scripts/gpu_studies/) and
   [prepared examples](../docs/examples/gpu/prepared/).
-- [Prepared RTX evidence](../docs/contribute/validation/gpu/prepared-rtx5060.md),
-  [capture qualification](../docs/contribute/validation/gpu/graph-capture-qualification.md),
+- [Prepared RTX evidence](../docs/studies/benchmarks/prepared-scaling/qualification.md),
+  [capture qualification](../docs/studies/validation/workflows-and-releases/graph-capture/index.md),
   and [GPU support](../docs/guide/gpu/support.md).
 
 ## Acceptance and validation

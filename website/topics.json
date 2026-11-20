@@ -1221,26 +1221,26 @@
         "companions": [],
         "relations": [
           {
-            "target": "docs/contribute/validation/gpu/resident-benchmarks.md",
+            "target": "docs/studies/validation/workflows-and-releases/graph-capture/benchmark-protocol.md",
             "label": "Benchmark procedure"
           }
         ]
       }
     },
     {
-      "source": "docs/contribute/validation/gpu/coagulation.md",
+      "source": "docs/studies/validation/coagulation/direct-coagulation/qualification.md",
       "title": "GPU Coagulation Validation Record",
       "topic": "verification-scientific",
       "also": [],
-      "role": "Contribute",
+      "role": "Studies",
       "start_here": false
     },
     {
-      "source": "docs/contribute/validation/gpu/condensation-parity.md",
+      "source": "docs/studies/validation/condensation/direct-kernel/qualification.md",
       "title": "Condensation Parity Walkthrough Ownership Record",
       "topic": "verification-scientific",
       "also": [],
-      "role": "Contribute",
+      "role": "Studies",
       "start_here": false
     },
     {
@@ -1270,20 +1270,34 @@
       }
     },
     {
-      "source": "docs/contribute/validation/gpu/graph-capture-profiling.md",
+      "source": "docs/studies/validation/workflows-and-releases/graph-capture/profiling.md",
       "title": "GPU graph-capture profiling record",
       "topic": "verification-performance",
       "also": [],
-      "role": "Contribute",
+      "role": "Studies",
       "start_here": false
     },
     {
-      "source": "docs/contribute/validation/gpu/graph-capture-qualification.md",
+      "source": "docs/studies/validation/workflows-and-releases/graph-capture/index.md",
       "title": "Graph-capture qualification gates",
       "topic": "verification-qualification",
       "also": [],
-      "role": "Contribute",
-      "start_here": true
+      "role": "Studies",
+      "start_here": true,
+      "study": {
+        "id": "graph-capture-qualification",
+        "runs": [],
+        "companions": [
+          "docs/studies/validation/workflows-and-releases/graph-capture/profiling.md",
+          "docs/studies/validation/workflows-and-releases/graph-capture/benchmark-protocol.md"
+        ],
+        "relations": [
+          {
+            "target": "docs/guide/gpu/resident/graph-capture.md",
+            "label": "Usage guide"
+          }
+        ]
+      }
     },
     {
       "source": "docs/studies/benchmarks/historical-coagulation/gpu_benchmarks.py",
@@ -1294,36 +1308,28 @@
       "start_here": false
     },
     {
-      "source": "docs/contribute/validation/gpu/prepared-rtx5060.md",
+      "source": "docs/studies/benchmarks/prepared-scaling/qualification.md",
       "title": "Prepared simulations: RTX 5060 qualification",
       "topic": "verification-qualification",
       "also": [],
-      "role": "Contribute",
+      "role": "Studies",
       "start_here": false
     },
     {
-      "source": "docs/contribute/validation/gpu/process-field-extensions.md",
+      "source": "docs/studies/benchmarks/process-field-overhead/protocol.md",
       "title": "Custom processes and fields: qualification",
       "topic": "verification-qualification",
       "also": [],
-      "role": "Contribute",
+      "role": "Studies",
       "start_here": false
     },
     {
-      "source": "docs/contribute/validation/gpu/resident-benchmarks.md",
+      "source": "docs/studies/validation/workflows-and-releases/graph-capture/benchmark-protocol.md",
       "title": "Resident benchmark and memory-budget record",
       "topic": "verification-performance",
       "also": [],
-      "role": "Contribute",
+      "role": "Studies",
       "start_here": false
-    },
-    {
-      "source": "docs/contribute/validation/index.md",
-      "title": "Validation records",
-      "topic": "verification",
-      "also": [],
-      "role": "Contribute",
-      "start_here": true
     },
     {
       "source": "docs/studies/validation/condensation/stiffness.md",
@@ -1335,25 +1341,23 @@
       "study": {
         "id": "condensation-stiffness",
         "runs": [],
-        "companions": [],
+        "companions": [
+          "docs/studies/validation/condensation/stiffness/method-decision.md"
+        ],
         "relations": [
           {
             "target": "docs/guide/processes/numerical-integration.md",
             "label": "How to use this"
-          },
-          {
-            "target": "docs/contribute/validation/numerics/direct-condensation-decision.md",
-            "label": "Contributor decision and qualification"
           }
         ]
       }
     },
     {
-      "source": "docs/contribute/validation/numerics/mass-precision.md",
+      "source": "docs/studies/validation/material-properties/mass-precision/decisions.md",
       "title": "Mass Precision Recommendation Report",
       "topic": "verification-scientific",
       "also": [],
-      "role": "Contribute",
+      "role": "Studies",
       "start_here": false
     },
     {
@@ -1370,15 +1374,13 @@
         "runs": [
           "cuda-optics"
         ],
-        "companions": [],
+        "companions": [
+          "docs/studies/validation/material-properties/cuda-optics/qualification.md"
+        ],
         "relations": [
           {
             "target": "docs/guide/optics/index.md",
             "label": "How to use this"
-          },
-          {
-            "target": "docs/contribute/validation/optics/delivery.md",
-            "label": "Contributor decision and qualification"
           }
         ]
       }
@@ -1405,12 +1407,23 @@
       }
     },
     {
-      "source": "docs/contribute/validation/releases/v0.3.0.md",
+      "source": "docs/studies/validation/workflows-and-releases/native-api-v0.3.0.md",
       "title": "Native API migration validation and release gates",
       "topic": "verification-qualification",
       "also": [],
-      "role": "Contribute",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "native-api-migration-qualification",
+        "runs": [],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/migration/v0.3.0/index.md",
+            "label": "Usage guide"
+          }
+        ]
+      }
     },
     {
       "source": "docs/studies/tutorials/building-an-aerosol/containers/data-containers.md",
@@ -1657,16 +1670,13 @@
           "gpu-coagulation"
         ],
         "companions": [
-          "docs/studies/validation/coagulation/direct-coagulation/reference.md"
+          "docs/studies/validation/coagulation/direct-coagulation/reference.md",
+          "docs/studies/validation/coagulation/direct-coagulation/qualification.md"
         ],
         "relations": [
           {
             "target": "docs/guide/gpu/direct/coagulation.md",
             "label": "How to use this"
-          },
-          {
-            "target": "docs/contribute/validation/gpu/coagulation.md",
-            "label": "Qualification record"
           }
         ]
       }
@@ -1706,16 +1716,13 @@
           "examples-gpu-direct-gpu-condensation-parity-walkthrough"
         ],
         "companions": [
-          "docs/studies/validation/condensation/direct-kernel/reference.md"
+          "docs/studies/validation/condensation/direct-kernel/reference.md",
+          "docs/studies/validation/condensation/direct-kernel/qualification.md"
         ],
         "relations": [
           {
             "target": "docs/guide/gpu/direct/condensation.md",
             "label": "How to use this"
-          },
-          {
-            "target": "docs/contribute/validation/gpu/condensation-parity.md",
-            "label": "Qualification record"
           }
         ]
       }
@@ -1883,7 +1890,7 @@
             "label": "How to use this"
           },
           {
-            "target": "docs/contribute/validation/numerics/simulation-workflow.md",
+            "target": "docs/studies/validation/workflows-and-releases/recording-and-restart.md",
             "label": "Workflow qualification"
           }
         ]
@@ -1910,7 +1917,7 @@
             "label": "How to use this"
           },
           {
-            "target": "docs/contribute/validation/numerics/simulation-workflow.md",
+            "target": "docs/studies/validation/workflows-and-releases/recording-and-restart.md",
             "label": "Workflow qualification"
           }
         ]
@@ -2014,16 +2021,13 @@
           "gpu-scaling-results"
         ],
         "companions": [
-          "docs/studies/benchmarks/prepared-scaling/campaign.md"
+          "docs/studies/benchmarks/prepared-scaling/campaign.md",
+          "docs/studies/benchmarks/prepared-scaling/qualification.md"
         ],
         "relations": [
           {
             "target": "docs/guide/gpu/prepared.md",
             "label": "How to use this"
-          },
-          {
-            "target": "docs/contribute/validation/gpu/prepared-rtx5060.md",
-            "label": "Qualification record"
           }
         ]
       }
@@ -2746,7 +2750,7 @@
             "label": "How to use this"
           },
           {
-            "target": "docs/contribute/validation/numerics/simulation-workflow.md",
+            "target": "docs/studies/validation/workflows-and-releases/recording-and-restart.md",
             "label": "Workflow qualification"
           }
         ]
@@ -2881,7 +2885,7 @@
             "label": "How to use this"
           },
           {
-            "target": "docs/contribute/validation/numerics/simulation-workflow.md",
+            "target": "docs/studies/validation/workflows-and-releases/recording-and-restart.md",
             "label": "Workflow qualification"
           }
         ]
@@ -3855,11 +3859,11 @@
       }
     },
     {
-      "source": "docs/contribute/validation/numerics/scientific-correctness.md",
+      "source": "docs/studies/validation/material-properties/process-references/qualification.md",
       "title": "Scientific correctness reference baseline",
       "topic": "verification-scientific",
       "also": [],
-      "role": "Contribute",
+      "role": "Studies",
       "start_here": false
     },
     {
@@ -3891,15 +3895,13 @@
           "adaptive-reservoir-depletion-cuda",
           "adaptive-cloud-relaxation-cuda"
         ],
-        "companions": [],
+        "companions": [
+          "docs/studies/validation/condensation/adaptive/method-decisions.md"
+        ],
         "relations": [
           {
             "target": "docs/guide/processes/numerical-integration.md",
             "label": "How to use this"
-          },
-          {
-            "target": "docs/contribute/validation/numerics/adaptive-method-decision.md",
-            "label": "Contributor decision and qualification"
           }
         ]
       }
@@ -3973,12 +3975,25 @@
       "start_here": false
     },
     {
-      "source": "docs/contribute/validation/numerics/simulation-workflow.md",
+      "source": "docs/studies/validation/workflows-and-releases/recording-and-restart.md",
       "title": "Simulation workflow qualification",
       "topic": "verification-qualification",
       "also": [],
-      "role": "Contribute",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "simulation-workflow-qualification",
+        "runs": [],
+        "companions": [
+          "docs/studies/validation/workflows-and-releases/coupled-gpu-events.md"
+        ],
+        "relations": [
+          {
+            "target": "docs/guide/getting-started/recording-restart.md",
+            "label": "Usage guide"
+          }
+        ]
+      }
     },
     {
       "source": "docs/studies/validation/condensation/adaptive/adaptive_cloud_relaxation.py",
@@ -4042,7 +4057,7 @@
             "label": "How to use this"
           },
           {
-            "target": "docs/contribute/validation/gpu/coagulation.md",
+            "target": "docs/studies/validation/coagulation/direct-coagulation/qualification.md",
             "label": "Qualification record"
           }
         ]
@@ -4069,7 +4084,7 @@
             "label": "How to use this"
           },
           {
-            "target": "docs/contribute/validation/numerics/scientific-correctness.md",
+            "target": "docs/studies/validation/material-properties/process-references/qualification.md",
             "label": "Qualification record"
           }
         ]
@@ -4325,13 +4340,10 @@
       "study": {
         "id": "process-references",
         "runs": [],
-        "companions": [],
-        "relations": [
-          {
-            "target": "docs/contribute/validation/numerics/scientific-correctness.md",
-            "label": "Qualification record"
-          }
-        ]
+        "companions": [
+          "docs/studies/validation/material-properties/process-references/qualification.md"
+        ],
+        "relations": []
       }
     },
     {
@@ -4344,13 +4356,10 @@
       "study": {
         "id": "mass-precision",
         "runs": [],
-        "companions": [],
-        "relations": [
-          {
-            "target": "docs/contribute/validation/numerics/mass-precision.md",
-            "label": "Qualification record"
-          }
-        ]
+        "companions": [
+          "docs/studies/validation/material-properties/mass-precision/decisions.md"
+        ],
+        "relations": []
       }
     },
     {
@@ -4402,27 +4411,27 @@
       "start_here": false
     },
     {
-      "source": "docs/contribute/validation/optics/delivery.md",
+      "source": "docs/studies/validation/material-properties/cuda-optics/qualification.md",
       "title": "CUDA optics delivery qualification",
       "topic": "verification-qualification",
       "also": [],
-      "role": "Contribute",
+      "role": "Studies",
       "start_here": false
     },
     {
-      "source": "docs/contribute/validation/numerics/direct-condensation-decision.md",
+      "source": "docs/studies/validation/condensation/stiffness/method-decision.md",
       "title": "Direct condensation method decision and downstream gates",
       "topic": "verification-qualification",
       "also": [],
-      "role": "Contribute",
+      "role": "Studies",
       "start_here": false
     },
     {
-      "source": "docs/contribute/validation/numerics/adaptive-method-decision.md",
+      "source": "docs/studies/validation/condensation/adaptive/method-decisions.md",
       "title": "Adaptive integration method decisions",
       "topic": "verification-qualification",
       "also": [],
-      "role": "Contribute",
+      "role": "Studies",
       "start_here": false
     },
     {
@@ -4438,11 +4447,13 @@
       "study": {
         "id": "process-field-overhead",
         "runs": [],
-        "companions": [],
+        "companions": [
+          "docs/studies/benchmarks/process-field-overhead/protocol.md"
+        ],
         "relations": [
           {
             "label": "Performance protocol and qualification",
-            "target": "docs/contribute/validation/gpu/process-field-extensions.md",
+            "target": "docs/studies/benchmarks/process-field-overhead/protocol.md",
             "fragment": "performance-protocol"
           },
           {
@@ -4451,6 +4462,22 @@
           }
         ]
       }
+    },
+    {
+      "source": "docs/studies/validation/workflows-and-releases/coupled-gpu-events.md",
+      "title": "Coupled GPU event boundaries",
+      "topic": "verification-qualification",
+      "also": [],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/validation/index.md",
+      "title": "Validation studies",
+      "topic": "verification",
+      "also": [],
+      "role": "Studies",
+      "start_here": true
     }
   ],
   "supporting": [
@@ -4647,10 +4674,6 @@
       "reason": "Browsing directory for the published studies."
     },
     {
-      "source": "docs/studies/validation/index.md",
-      "reason": "Browsing directory for the published studies."
-    },
-    {
       "source": "docs/studies/tutorials/index.md",
       "reason": "Browsing directory for the published studies."
     },
@@ -4705,6 +4728,10 @@
     {
       "source": "docs/studies/examples/coupled-populations/emissions/index.md",
       "reason": "Browsing directory for the published studies."
+    },
+    {
+      "source": "docs/studies/validation/workflows-and-releases/index.md",
+      "reason": "Browsing directory for workflow and release qualification."
     }
   ]
 }

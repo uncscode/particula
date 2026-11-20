@@ -7,7 +7,7 @@ does not authorize a release.
 
 ## Machine and executable provenance
 
-[Machine and executable provenance in the study](../../../studies/benchmarks/prepared-scaling/campaign.md#machine-and-executable-provenance)
+[Machine and executable provenance in the study](campaign.md#machine-and-executable-provenance)
 
 ## Reproduce the campaign
 
@@ -56,15 +56,15 @@ Both admission and observed-allocation gates must pass.
 
 ## Measured cost of residency
 
-[Measured cost of residency in the study](../../../studies/benchmarks/prepared-scaling/campaign.md#measured-cost-of-residency)
+[Measured cost of residency in the study](campaign.md#measured-cost-of-residency)
 
 ## Scientific acceptance
 
-[Scientific acceptance in the study](../../../studies/benchmarks/prepared-scaling/campaign.md#scientific-acceptance)
+[Scientific acceptance in the study](campaign.md#scientific-acceptance)
 
 ## Profiling findings and limits
 
-[Profiling findings and limits in the study](../../../studies/benchmarks/prepared-scaling/campaign.md#profiling-findings-and-limits)
+[Profiling findings and limits in the study](campaign.md#profiling-findings-and-limits)
 
 ## Final validation ledger
 

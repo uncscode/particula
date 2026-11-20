@@ -1,6 +1,6 @@
 # Deterministic, conservation and stochastic coagulation checks
 
-See the [qualification record](../../../../contribute/validation/gpu/coagulation.md) for the associated implementation decision and reproduction gates.
+See the [qualification record](qualification.md) for the associated implementation decision and reproduction gates.
 
 ## Supported Evidence Matrix
 

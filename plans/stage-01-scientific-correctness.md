@@ -3,7 +3,7 @@
 Status: implemented and locally validated; delivered in
 [PR #1658](https://github.com/uncscode/particula/pull/1658).
 Entry dependency: none. See the [delivery record](stage-01-delivery.md) and
-[scientific evidence](../docs/contribute/validation/numerics/scientific-correctness.md).
+[scientific evidence](../docs/studies/validation/material-properties/process-references/qualification.md).
 
 ## Execution and delivery
 
@@ -68,7 +68,7 @@ exist. Existing evidence must be assessed for its actual scope and revision.
   [integration tests](../particula/integration_tests/) for shared defects.
 - [Package configuration](../pyproject.toml),
   [CI workflows](../.github/workflows/), and
-  [release evidence](../docs/contribute/validation/releases/v0.3.0.md).
+  [release evidence](../docs/studies/validation/workflows-and-releases/native-api-v0.3.0.md).
 
 ## Acceptance and validation
 

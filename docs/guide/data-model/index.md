@@ -377,7 +377,7 @@ runtime regression command is
 - [Data Containers example](../../studies/tutorials/building-an-aerosol/containers/data-containers.md)
 - [Particle & Gas Data Migration](../migration/v0.3.0/index.md)
 - [Pending initial-state optimization](../../contribute/roadmap.md)
-- [Mass Precision Recommendation Report](../../contribute/validation/numerics/mass-precision.md)
+- [Mass Precision Recommendation Report](../../studies/validation/material-properties/mass-precision/decisions.md)
 
 ## Related execution guides
 

@@ -611,7 +611,7 @@ plt.show()
 # Brownian alone and turbulent shear each finished every interval in one pass,
 # with 240 and 448 mergers respectively. The settling branch ended with 681
 # occupied slots. All four branches conserved the three species inventories.
-# [Comparison with the archived run](../../../../contribute/validation/numerics/simulation-workflow.md#biomass-rerun-with-adaptive-gpu-coagulation)
+# [Comparison with the archived run](biomass-evidence.md#biomass-rerun-with-adaptive-gpu-coagulation)
 #
 # All branches share their initial material inventory and retain the same
 # condensation model. Their differing spectra therefore motivate a collision-model

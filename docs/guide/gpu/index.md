@@ -20,6 +20,6 @@ is explicit. Direct kernels remain available for manual resource control.
 | Diagnose rejected calls | [Troubleshooting](troubleshooting.md) |
 
 Use the [GPU examples](../../studies/tutorials/working-with-gpu/index.md) for runnable entry points.
-CUDA capture has no CPU fallback. [Qualification gates](../../contribute/validation/gpu/graph-capture-qualification.md)
+CUDA capture has no CPU fallback. [Qualification gates](../../studies/validation/workflows-and-releases/graph-capture/index.md)
 remain separate from implementation support and do not provide measured
 performance recommendations.

@@ -186,7 +186,7 @@ invariants; stiff stability alone is not a positivity or conservation proof.
   and [CPU/GPU extension example](../docs/studies/examples/custom-processes/custom_process_backends.py).
 - [Extension tests](../particula/execution/tests/process_extensions_test.py),
   new adjacent mechanism tests, and
-  [scientific validation records](../docs/contribute/validation/).
+  [scientific validation records](../docs/studies/validation/index.md).
 
 ## Acceptance
 

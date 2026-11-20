@@ -21,7 +21,7 @@ numerical limits, not agreement with independent laboratory measurements.
 
 ## Independent reference definitions
 
-[Independent reference definitions in the study](../../../studies/validation/material-properties/process-references.md#independent-reference-definitions)
+[Independent reference definitions in the study](../process-references.md#independent-reference-definitions)
 
 ## Reproduction and remaining gates
 
@@ -83,4 +83,4 @@ Their absence does not support a claim of accuracy beyond the cases above.
 ## Scalable native coagulation: issue 1661
 
 <a id="cuda-population-boundaries-and-resource-scaling"></a>
-[Scalable native coagulation: issue 1661 in the study](../../../studies/validation/coagulation/native-sampling/convergence.md#scalable-native-coagulation-issue-1661)
+[Scalable native coagulation: issue 1661 in the study](../../coagulation/native-sampling/convergence.md#scalable-native-coagulation-issue-1661)

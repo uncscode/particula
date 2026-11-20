@@ -115,7 +115,7 @@ older sampler checkpoints reject rather than silently changing continuation.
 
 The [worked resource-admission example](../../../studies/validation/coagulation/native-sampling/scalable_coagulation.py)
 uses explicit Warp CPU and can be run on requested native CUDA. The
-[validation record](../../../contribute/validation/gpu/coagulation.md) distinguishes
+[validation record](../../../studies/validation/coagulation/direct-coagulation/qualification.md) distinguishes
 historical qualification from new checks. Native CUDA capture and performance
 claims require actual CUDA evidence; Warp CPU is not a substitute.
 

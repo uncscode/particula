@@ -101,7 +101,7 @@ This is additive to the required Warp `device="cpu"` baseline and skips
 cleanly when CUDA is unavailable.
 
 The [GPU condensation parity walkthrough](https://github.com/uncscode/particula/blob/main/docs/studies/validation/condensation/direct-kernel/gpu_condensation_parity_walkthrough.py)
-and its [condensation parity walkthrough ownership record](../../contribute/validation/gpu/condensation-parity.md)
+and its [condensation parity walkthrough ownership record](../../studies/validation/condensation/direct-kernel/qualification.md)
 document bounded physics, conservation, and energy evidence only. They retain
 the fixed-four-substep low-level direct-kernel boundary: Warp CPU is the
 installed-Warp baseline and CUDA is optional additive evidence, not required

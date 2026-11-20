@@ -1,6 +1,6 @@
 # CUDA optics delivery qualification
 
-The [scientific comparison](../../../studies/validation/material-properties/cuda-optics/index.md) describes the workload, assumptions and results supporting these decisions.
+The [scientific comparison](index.md) describes the workload, assumptions and results supporting these decisions.
 
 ## Delivery validation
 

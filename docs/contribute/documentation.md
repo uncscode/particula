@@ -10,7 +10,7 @@ extend an existing topic before adding another page.
 | Studies | Readers running calculations, learning workflows, or evaluating literature, validation and benchmark evidence | `docs/studies/` |
 | Theory | Readers looking for equations, assumptions, units, and literature | `docs/theory/` |
 | API | Call signatures and implementation reference | Generated from package docstrings |
-| Contribute | Developers following contributor procedures, qualification gates or release decisions | `docs/contribute/` |
+| Contribute | Developers setting up the project, proposing changes and maintaining the package | `docs/contribute/` |
 
 ## Topic organization and scientific narratives
 
@@ -51,7 +51,7 @@ without duplicating the interactive map or editing generated pages.
 
 Implementation plans and task closeouts belong in `plans/`, not in
 public feature pages. A study owns its scientific evidence, reference, revision, device and limits.
-Link to any qualification procedure or release decision in Contribute.
+Keep validation records with the study they qualify. Place benchmark protocols beside their performance results. File cross-cutting workflow and release qualifications under [Validation studies](../studies/validation/index.md).
 The public roadmap contains active or pending work only.
 
 ## Move, merge, or retire

@@ -122,8 +122,8 @@ it must not accumulate different studies on one long-lived scheduler branch.
   checkpoint formats, and numerical policies need an explicit compatibility
   decision; proposed names in a plan are not approved interfaces.
 - Keep scientific evidence and executable calculations with their owning
-  [studies](../docs/studies/index.md). Link to contributor procedures and release
-  gates in [Contribute](../docs/contribute/validation/index.md). Plans
+  [studies](../docs/studies/index.md). Keep qualification procedures and release
+  gates in the corresponding [study records](../docs/studies/validation/index.md). Plans
   describe pending outcomes rather than accumulating execution logs.
 - Follow the [validation reference](../plugins/particula-helper/references/repository-validation.md).
   Missing CUDA or experimental evidence remains missing; do not substitute

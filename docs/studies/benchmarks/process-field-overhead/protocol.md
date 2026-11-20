@@ -84,7 +84,7 @@ rerun passed. Neither run was counted as a successful final package gate.
 
 ## Timing results
 
-[Read the measured timings and their scope](../../../studies/benchmarks/process-field-overhead.md#timing-results).
+[Read the measured timings and their scope](../process-field-overhead.md#timing-results).
 
 For each source tree, reproduce the native case with:
 

@@ -7,7 +7,7 @@ autodiff, adaptive stepping, or a performance claim.
 
 ## Supported Evidence Matrix
 
-[Supported Evidence Matrix in the study](../../../studies/validation/coagulation/direct-coagulation/reference.md#supported-evidence-matrix)
+[Supported Evidence Matrix in the study](reference.md#supported-evidence-matrix)
 
 ## Deferred Masks
 
@@ -17,7 +17,7 @@ other combination.
 
 ## Evidence Boundaries
 
-[Evidence Boundaries in the study](../../../studies/validation/coagulation/direct-coagulation/reference.md#evidence-boundaries)
+[Evidence Boundaries in the study](reference.md#evidence-boundaries)
 
 ## Warning-Clean Reproduction Commands
 
@@ -33,10 +33,10 @@ skips. A skip is not CPU/Warp or CUDA parity evidence.
 
 ## Historical performance context
 
-[Recorded coagulation benchmark evidence](../../../studies/benchmarks/historical-coagulation/index.md) describes
+[Recorded coagulation benchmark evidence](../../../benchmarks/historical-coagulation/index.md) describes
 a dated, machine-specific tradeoff. It is separate from the physics validation
 above and from current resident/capture qualification.
 
 ## Adaptive outer intervals on native CUDA
 
-[Adaptive outer intervals on native CUDA in the study](../../../studies/validation/coagulation/adaptive/trajectories.md#adaptive-outer-intervals-on-native-cuda)
+[Adaptive outer intervals on native CUDA in the study](../adaptive/trajectories.md#adaptive-outer-intervals-on-native-cuda)

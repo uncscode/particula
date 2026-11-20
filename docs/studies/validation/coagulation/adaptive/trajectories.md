@@ -1,6 +1,6 @@
 # Adaptive CUDA coagulation trajectories
 
-See the [qualification record](../../../../contribute/validation/gpu/coagulation.md) for the associated implementation decision and reproduction gates.
+See the [qualification record](../direct-coagulation/qualification.md) for the associated implementation decision and reproduction gates.
 
 ## Adaptive outer intervals on native CUDA
 

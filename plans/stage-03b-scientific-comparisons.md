@@ -130,7 +130,7 @@ changes; rerun the physical workload when scientific inputs or code change.
 
 - Reusable workflows in [scientific examples](../docs/examples/) with regression
   coverage in [example tests](../examples_tests/).
-- Durable findings in [validation records](../docs/contribute/validation/).
+- Durable findings in [validation records](../docs/studies/validation/index.md).
 - Compact, permitted data under [documentation data](../docs/data/) where
   appropriate; large raw data and full particle states remain outside Git.
 - [Documentation authoring](../website/AUTHORING.md) and

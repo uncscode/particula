@@ -67,4 +67,4 @@ chunk independence and independent angular integrals through x=10000.
 
 ## Delivery validation
 
-[Read the contributor decision and qualification details.](../../../../contribute/validation/optics/delivery.md#delivery-validation)
+[Read the contributor decision and qualification details.](qualification.md#delivery-validation)

@@ -1,6 +1,6 @@
 # Adaptive integration method decisions
 
-The [scientific comparison](../../../studies/validation/condensation/adaptive/index.md) describes the workload, assumptions and results supporting these decisions.
+The [scientific comparison](index.md) describes the workload, assumptions and results supporting these decisions.
 
 ## Method decisions
 

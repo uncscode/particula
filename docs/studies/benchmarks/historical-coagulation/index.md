@@ -64,5 +64,5 @@ decision.
 
 
 The [legacy viewer](gpu_benchmarks.py) reads a locally
-recorded artifact. [Resident benchmark qualification](../../../contribute/validation/gpu/resident-benchmarks.md)
+recorded artifact. [Resident benchmark qualification](../../validation/workflows-and-releases/graph-capture/benchmark-protocol.md)
 requires its separate schema and reviewed evidence.
