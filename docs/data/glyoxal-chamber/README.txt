@@ -55,3 +55,10 @@ and bound glyoxal/sulfate (kg/kg), net imposed gas, cumulative imposed gas
 addition, removal, and cumulative evaporation (all kg/m³ of chamber air), followed by
 remaining ammonium sulfate molality (mol/kg water).
 Sulfate is SO4 mass including sulfate carried in acid equivalents.
+
+The saved chamber_fit record is an empirical one-pool diagnostic. Its input
+is the digitized gas history in ppbv. Its least-squares target is the
+organic/sulfate ratio at native sampling times between seed injection and
+710.04 min. The dilution observations are held out. Capacity is ratio per
+ppbv, time constant is in hours, and fit RMSE is in organic/sulfate units.
+The saved fitted/predicted history is time in minutes and organic/sulfate.

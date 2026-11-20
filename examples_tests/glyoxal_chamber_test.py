@@ -71,3 +71,15 @@ def test_evaporation_from_equilibrated_seed(device):
         assert result.particles.masses[0, 0, 0] < before
         assert result.gas.concentration[0, 0] > case.gas_kg(50.0)
         np.testing.assert_allclose(case.ledger(result), baseline, rtol=2e-13)
+
+
+def test_chamber_response_predicts_held_out_dilution():
+    """Changing the dilution observations must not alter the fitted trajectory."""
+    obs = case.observations()
+    organic = obs["organic_per_sulfate"].copy()
+    fit = case.chamber_response(obs["gas_ppbv"], organic)
+    assert fit["tau_hours"] == pytest.approx(6.89, abs=0.02)
+    assert fit["capacity_ratio_per_ppbv"] == pytest.approx(0.0208, abs=0.0001)
+    assert fit["decline_pct"] == pytest.approx(6.71, abs=0.03)
+    organic[organic[:, 0] > case.DILUTION, 1] *= 10
+    assert case.chamber_response(obs["gas_ppbv"], organic) == fit
