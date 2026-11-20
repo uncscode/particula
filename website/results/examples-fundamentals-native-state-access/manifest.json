@@ -1,25 +1,27 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 2.8172884469968267,
-  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "elapsed_seconds": 3.232431956916116,
+  "package_source_sha256": "e7a8dec04ec165d4dd632a008f2c0bcbb2eeeefb92d0cacb704ceb94f8bd3be3",
+  "scientific_source_sha256": "a3ab2110331b437c679cb2b93c8ac67790e4239e684691704b25f61cc5640285",
   "input_sha256": {},
   "example": "examples-fundamentals-native-state-access",
-  "fingerprint": "d140f596f7c4bb779d2a2dfc91e15dcde10621f6aed856d7a3fdc34195b4bb58",
-  "source": "docs/examples/fundamentals/native_state_access.py",
-  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "fingerprint": "dc41e4ee03d453be56e1f176d089b626df3f731f0657e5c707021e4fed2c3093",
+  "source": "docs/studies/tutorials/building-an-aerosol/native_state_access.py",
+  "revision": "0c3ca2f65a88378fb2d3874d6e034880b027cd19",
   "package_dirty": false,
-  "executed_at": "2026-11-13T14:59:57.563539+00:00",
+  "executed_at": "2026-11-20T12:59:09.732733+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.2.14",
+    "particula": "0.3.3",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
     "nbclient": "0.10.2",
     "jupytext": "1.17.3",
-    "warp-lang": "1.11.1"
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
   },
   "outputs": [
     [
@@ -29,6 +31,6 @@
     ]
   ],
   "files": {
-    "source.py": "2ac445c246adb4fefb44a49ea6f2b9069dafa43383863a70617aff5991ebf68b"
+    "source.py": "825203ca13e1892cd64c397260287c7e85026f3941b86e6e3720ae45ef435148"
   }
 }

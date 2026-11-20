@@ -4,7 +4,7 @@
 # How can number fall while particle material remains in the box? Follow the
 # count-weighted inventory through two collision calls, including inactive slots
 # that retain old values. This is a useful bridge from
-# [resolved CPU coagulation](../../processes/coagulation/coagulation_3_particle_resolved_pattern.py)
+# [resolved CPU coagulation](../../../tutorials/coagulation-populations/coagulation_3_particle_resolved_pattern.py)
 # to direct device execution.
 #
 # Six active particles and two inactive slots make the bookkeeping visible:
@@ -162,7 +162,7 @@ def _admitted_timestep(particles: Any, capacity: int) -> float:
 def _output_prefix(particle_data: ParticleData) -> list[str]:
     """Build deterministic metadata describing the CPU fixture."""
     return [
-        "Canonical path: docs/examples/gpu/direct/gpu_coagulation_direct.py",
+        "Canonical path: docs/studies/validation/coagulation/direct-coagulation/gpu_coagulation_direct.py",
         (
             "ParticleData constructed: "
             f"masses={particle_data.masses.shape}, "
@@ -365,5 +365,5 @@ if __name__ == "__main__":
 # illustrate storage and stochastic continuation rather than a resolved kinetic
 # history. For a research comparison, vary timestep and independent seeds, check
 # charge as well as each material inventory, and compare distributions with the
-# [stochastic ensemble](../prepared/gpu_prepared_stochastic.py). Reinitializing the
+# [stochastic ensemble](../../../examples/coupled-populations/charged-aerosols/gpu_prepared_stochastic.py). Reinitializing the
 # random stream at every call would change that experiment.

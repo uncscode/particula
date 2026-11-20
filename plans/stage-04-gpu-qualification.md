@@ -1,7 +1,7 @@
 # Stage 4: GPU scientific usefulness and reliability
 
 Status: first campaign qualified on CPU and actual CUDA at 1, 8, 32 and 128 boxes.
-[Measurements, figures and reproduction](../docs/contribute/validation/gpu/bat-humidity-pulse.md).
+[Measurements, figures and reproduction](../docs/studies/benchmarks/bat-humidity-pulse/index.md).
 Entry dependency: a supported forward workflow with relevant
 [verification](stage-01-scientific-correctness.md),
 [numerical accuracy](stage-02a-numerical-integration.md), and
@@ -41,8 +41,8 @@ at 293 K. Hold dry size, composition and box volume fixed. Measure wet radius
 in metres, vapor and condensed water in kg/m³, and signed transfer during each
 leg. Record both sides of the vapor reset at 80 ms. The one-box pilot found
 that the water-transfer history was more sensitive to timestep than wet radius.
-[Pulse implementation](../docs/examples/thermodynamics/activity/bat_humidity_pulse.py)
-· [Pilot measurements](../docs/contribute/validation/thermodynamics/bat-activity.md#one-box-humidity-pulse-timing-and-refinement)
+[Pulse implementation](../docs/studies/benchmarks/bat-humidity-pulse/bat_humidity_pulse.py)
+· [Pilot measurements](../docs/studies/validation/material-properties/binary-bat.md#one-box-humidity-pulse-timing-and-refinement)
 
 | Candidate | Evidence available | Role in this campaign |
 | --- | --- | --- |
@@ -108,7 +108,7 @@ speedup or accuracy target.
 The existing binary BAT capture/restart test passed on the RTX 5060 at
 `92615153d2` (one pass, zero skips, 9.72 s of pytest time). It changes
 temperature and pressure during replay and resumes a saved checkpoint. The
-[ensemble restart check](../docs/contribute/validation/gpu/bat-humidity-pulse.md#restart-and-capture)
+[ensemble restart check](../docs/studies/benchmarks/bat-humidity-pulse/index.md#restart-and-capture)
 subsequently verified exact continuation across the vapor replacement at all four sizes.
 Reproduce the short regression from the repository root:
 

@@ -4,7 +4,7 @@
 # Would a perfectly conserved mass budget detect an incorrect transfer rate?
 # Not by itself. This walkthrough gives you three separate diagnostics and an
 # independent implementation of the specified update. Start with the
-# [direct condensation workflow](gpu_direct_kernels_quick_start.py), then follow
+# [direct condensation workflow](../../../tutorials/working-with-gpu/direct-kernels/gpu_direct_kernels_quick_start.py), then follow
 # proposal, availability limiting, and gas update in that order.
 #
 # The two boxes use 298.15 and 305.15 K and a total interval of 0.08 s, split into
@@ -30,7 +30,7 @@ substep NumPy calculation, then optionally runs the low-level Warp route.  If
 Warp is unavailable, or ``PARTICULA_EXAMPLE_FORCE_NO_WARP=1``, it reports the
 completed oracle and does not import a kernel or allocate device state.
 
-Run ``python docs/examples/gpu/direct/gpu_condensation_parity_walkthrough.py`` or
+Run ``python docs/studies/validation/condensation/direct-kernel/gpu_condensation_parity_walkthrough.py`` or
 ``pytest examples_tests/gpu_condensation_parity_walkthrough_test.py -q
 -Werror``. Warp outputs are mutable caller-owned state. ``energy_transfer``
 is caller-owned ``(n_boxes, n_species)`` storage, mutated in place with signed
@@ -990,5 +990,5 @@ if __name__ == "__main__":
 # thermally coupled study, add an explicit heat budget and an independent limiting
 # solution. For a transfer study, vary gas availability and timestep while retaining
 # species-wise checks, so that clipping and integration errors cannot hide behind
-# a conserved total. See [latent-heat condensation](../../processes/condensation/condensation_latent_heat.py)
+# a conserved total. See [latent-heat condensation](../../../examples/particle-processes/condensation/condensation_latent_heat.py)
 # for the meaning of the heat-resistance correction.

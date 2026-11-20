@@ -367,7 +367,7 @@ def _output_prefix(
         User-facing lines describing ordering, ownership, and exclusions.
     """
     return [
-        "Canonical path: docs/examples/gpu/direct/gpu_complete_process_sequence.py",
+        "Canonical path: docs/studies/tutorials/working-with-gpu/direct-kernels/gpu_complete_process_sequence.py",
         (
             "CPU fixture: "
             f"particles={particle_data.masses.shape}, "
@@ -397,7 +397,7 @@ def _disabled_output() -> list[str]:
         User-facing lines describing the lazy no-Warp contract.
     """
     return [
-        "Canonical path: docs/examples/gpu/direct/gpu_complete_process_sequence.py",
+        "Canonical path: docs/studies/tutorials/working-with-gpu/direct-kernels/gpu_complete_process_sequence.py",
         "CPU fixture: not constructed because Warp is unavailable or disabled.",
         (
             "Exclusions: no scheduler, backend selection, resident loop, "
@@ -689,5 +689,5 @@ if __name__ == "__main__":
 # a response, observe inventories after each process and compare matched controls.
 # For a continuous simulation, define a consistent splitting schedule and test
 # its timestep and ordering. Continue with the
-# [prepared lifecycle](../prepared/gpu_prepared_lifecycle.py), which supplies a
+# [prepared lifecycle](../../../examples/coupled-populations/forcing/gpu_prepared_lifecycle.py), which supplies a
 # per-process ledger and checkpoint continuation for an evolving population.

@@ -17,6 +17,8 @@ the result page links back to that equation.
 Keep a report, its script and a frozen specification together as one sidebar
 choice. A collection with seven choices merits review for subject or task
 groups. Make each group landing meaningful in the installed Markdown bundle.
+Run `python scripts/docs_studies.py sync` to regenerate the marked lists in the
+installed Markdown. Verify them with `python scripts/docs_studies.py check`.
 Check the generated catalog and the source and ZIP downloads on the built site.
 
 ## Refresh results deliberately

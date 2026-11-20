@@ -1,7 +1,28 @@
+# %% [markdown]
+# # Change a model state without losing its meaning
+#
+# How can a simulation add a gas species without silently changing which material
+# receives its condensate? This CPU example separates live arrays, detached derived
+# properties, and explicit replacement of a compatible set of containers. Start
+# with [native aerosol assembly](native_aerosol.py).
+#
+# The test population has two material lanes, two slots with counts of two, and
+# volume 0.25 m³: its number density is 16 m⁻³. The three initial gas lanes have a
+# different order from the particle materials. Follow `run_example()` through
+# three checks: modifying a derived density leaves raw counts unchanged; replacing
+# state retains the supplied objects; rebuilding the species map after adding an
+# inert tracer directs water and organic vapor to the intended materials.
+#
+# The final condensation calculation uses zero pure vapor pressure and a long
+# illustrative timestep to exercise bookkeeping. Its assertion compares each
+# mapped gas-plus-particle material inventory, rather than an aggregate that could
+# hide transfers into the wrong species.
+
+# %%
 """Inspect and replace native CPU aerosol state without facade conversions.
 
 Run from the repository root with
-``python docs/examples/fundamentals/native_state_access.py``. This single-box example uses
+``python docs/studies/tutorials/building-an-aerosol/native_state_access.py``. This single-box example uses
 resolved counts in 0.25 m³ and full ordered gas storage including inert gas.
 Replacement selects supplied state; it neither conserves the old inventory
 automatically nor rebinds a prepared GPU or resident session.
@@ -130,3 +151,17 @@ def run_example() -> par.Aerosol:
 if __name__ == "__main__":
     run_example()
     print("Native access, replacement and mapped condensation checks passed.")
+
+# %% [markdown]
+# ## Interpret the successful checks
+#
+# The printed success message establishes the tested ownership and mapping
+# behavior. Replacement itself does not conserve the previous state; the later
+# condensation assertion checks conservation for the newly supplied state. Nor
+# does CPU replacement update an existing prepared GPU simulation.
+#
+# To adapt this to a chemistry mechanism with reordered gases, construct the map
+# from the new ordered names and compare inventories separately for each material.
+# A useful failure check is to swap two map entries deliberately in a disposable
+# copy and confirm that a species-specific comparison detects the error. See
+# [state ownership](../../../guide/data-model/ownership.md) before coupling a solver.

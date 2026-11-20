@@ -4,7 +4,7 @@
 # Which quantities must be weighted before a particle's mass gain can be compared
 # with gas depletion? You will follow two resolved slots through explicit upload,
 # physical update, and download, distinguishing per-particle quantities from
-# box totals. Read [native particle storage](../../fundamentals/particles/distribution_tutorial.py)
+# box totals. Read [native particle storage](../../building-an-aerosol/particles/distribution_tutorial.py)
 # for the count convention.
 #
 # Build particles and gas on the CPU, upload each once, reuse the same device
@@ -191,7 +191,7 @@ def _output_prefix(particle_data: ParticleData, gas_data: GasData) -> list[str]:
         Human-readable fixture metadata in its printed order.
     """
     return [
-        "Canonical path: docs/examples/gpu/direct/gpu_direct_kernels_quick_start.py",
+        "Canonical path: docs/studies/tutorials/working-with-gpu/direct-kernels/gpu_direct_kernels_quick_start.py",
         (
             "ParticleData constructed: "
             f"masses={particle_data.masses.shape}, "
@@ -457,7 +457,7 @@ if __name__ == "__main__":
 #
 # For a real water-growth calculation, supply a justified vapor-pressure law and
 # material properties, verify species inventories, and refine the timestep. The
-# [independent condensation comparison](gpu_condensation_parity_walkthrough.py)
+# [independent condensation comparison](../../../validation/condensation/direct-kernel/gpu_condensation_parity_walkthrough.py)
 # shows how to separate transfer, inventory, and energy checks; the
-# [prepared quick start](../prepared/gpu_prepared_quick_start.py) supplies an evolving
+# [prepared quick start](../gpu_prepared_quick_start.py) supplies an evolving
 # water example with a Buck reference and a refinement comparison.

@@ -34,6 +34,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from IPython.display import display
 from particula import plotting
 from particula.dynamics import (
     get_turbulent_dns_kernel_ao2008,
@@ -289,6 +290,8 @@ plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
+# [Read the geometric collision kernel derivation](../../../theory/dynamics/cloud-droplet-coagulation/droplet-coagulation-kernel-ayala2008.md#geometric-collision-kernel) to trace the terms used in the plotted comparison.
+#
 # ## Calculate Percent Error
 #
 # We calculate the percent error between the model predictions and the DNS data to assess the accuracy of our implementation.

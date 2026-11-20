@@ -142,7 +142,7 @@ formal order must not be substituted for the stated observable accuracy target.
 - [Prepared execution](../particula/execution/prepared.py),
   [prepared condensation](../particula/execution/prepared_condensation.py),
   and [direct kernels](../particula/gpu/kernels/).
-- [Condensation stiffness evidence](../docs/contribute/validation/numerics/condensation-stiffness.md).
+- [Condensation stiffness evidence](../docs/studies/validation/condensation/stiffness.md).
 
 ## Acceptance and validation
 

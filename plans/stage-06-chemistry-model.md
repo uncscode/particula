@@ -182,8 +182,8 @@ invariants; stiff stability alone is not a positivity or conservation proof.
   [GPU process adapters](../particula/execution/process_extensions.py), and
   [prepared checkpoint integration](../particula/execution/prepared_checkpoint.py).
 - [Custom-process guide](../docs/guide/processes/index.md),
-  [timed chemistry example](../docs/examples/processes/customization/timed_box_chemistry.py),
-  and [CPU/GPU extension example](../docs/examples/gpu/prepared/custom_process_backends.py).
+  [timed chemistry example](../docs/studies/examples/custom-processes/timed_box_chemistry.py),
+  and [CPU/GPU extension example](../docs/studies/examples/custom-processes/custom_process_backends.py).
 - [Extension tests](../particula/execution/tests/process_extensions_test.py),
   new adjacent mechanism tests, and
   [scientific validation records](../docs/contribute/validation/).

@@ -134,7 +134,7 @@ def simulate(output_directory=None):
     times = np.linspace(0, 600, 61)
     source = globals().get("__file__")
     identity = {
-        "example": "docs/examples/fundamentals/first_cpu_workflow.py",
+        "example": "docs/studies/tutorials/first_cpu_workflow.py",
         "study_version": 1,
         "source_sha256": (
             hashlib.sha256(Path(source).read_bytes()).hexdigest()

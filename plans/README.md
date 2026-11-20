@@ -17,8 +17,8 @@ Stages 1, 2A and 2B are merged through
 [PR #1660](https://github.com/uncscode/particula/pull/1660), respectively, with
 [cloud/droplet integration examples](stage-02-cloud-droplet-examples.md) now
 qualified and published, including the full resident CUDA reruns.
-Stage 3A has a qualified homogeneous BAT implementation on its delivery branch. Stage 3B covers one published-study comparison. Stage 4 qualified the [BAT humidity-pulse ensemble](../docs/contribute/validation/gpu/bat-humidity-pulse.md) through 128 boxes. Stage 5 now qualifies closed-box initial-size recovery on CPU and CUDA.
-[Recovery, resolution and memory evidence](../docs/contribute/validation/numerics/initial-size-inversion.md).
+Stage 3A has a qualified homogeneous BAT implementation on its delivery branch. Stage 3B covers one published-study comparison. Stage 4 qualified the [BAT humidity-pulse ensemble](../docs/studies/benchmarks/bat-humidity-pulse/index.md) through 128 boxes. Stage 5 now qualifies closed-box initial-size recovery on CPU and CUDA.
+[Recovery, resolution and memory evidence](../docs/studies/validation/condensation/initial-size/index.md).
 Stage 6 chemistry remains proposed.
 AIOMFAC activity is a separate follow-on; viscosity remains deferred.
 
@@ -35,7 +35,7 @@ AIOMFAC activity is a separate follow-on; viscosity remains deferred.
 | 5 | [Inverse modeling and automatic differentiation](stage-05-inverse-modeling.md) | Recover supported initial-state quantities with tested inference and gradient methods. |
 | 6 | [Configurable chemistry model](stage-06-chemistry-model.md) | Bind reactions to user species with shared CPU/GPU configuration, then qualify gas, particle, and coupled chemistry. |
 
-The [Stage 3A validation record](../docs/contribute/validation/thermodynamics/bat-activity.md)
+The [Stage 3A validation record](../docs/studies/validation/material-properties/binary-bat.md)
 tracks direct BAT verification, CPU/CUDA transfer, capture, restart and phase
 limits. Stage 3B owns comparison data, observation mapping and independent
 reproduction. Its separate branch carries the citric-acid study.
@@ -121,8 +121,9 @@ it must not accumulate different studies on one long-lived scheduler branch.
 - Preserve established state ownership and failure boundaries. New public APIs,
   checkpoint formats, and numerical policies need an explicit compatibility
   decision; proposed names in a plan are not approved interfaces.
-- Keep durable results in [validation records](../docs/contribute/validation/)
-  and executable examples in the maintained documentation workflow. Plans
+- Keep scientific evidence and executable calculations with their owning
+  [studies](../docs/studies/index.md). Link to contributor procedures and release
+  gates in [Contribute](../docs/contribute/validation/index.md). Plans
   describe pending outcomes rather than accumulating execution logs.
 - Follow the [validation reference](../plugins/particula-helper/references/repository-validation.md).
   Missing CUDA or experimental evidence remains missing; do not substitute

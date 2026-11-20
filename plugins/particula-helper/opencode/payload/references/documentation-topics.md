@@ -33,7 +33,9 @@ Keep reports, code and frozen specifications together as one browsing choice.
 Use topic membership for discovery. Identify a guide, equation, public API
 symbol, evidence record or qualification procedure with an explicit relationship
 when the study relies on it. The same records drive the sidebar, collection
-landings, script catalog and backlinks. Keep useful links in installed Markdown.
+landings, script catalog and backlinks. Regenerate the corresponding installed
+Markdown lists with `python scripts/docs_studies.py sync` and verify with
+`python scripts/docs_studies.py check`.
 
 Review a collection at six immediate choices. At seven, look for meaningful
 subject or task groups with their own landings. Record the editorial reason

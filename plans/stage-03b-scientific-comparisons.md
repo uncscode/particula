@@ -1,7 +1,7 @@
 # Stage 3B: Scientific and experimental comparisons
 
 Status: the aqueous citric-acid study at 293.15 K, its kinetic checks, and the downloadable example are complete on the study branch. The independent model comparison is complete using McGill AIOMFAC-web 3.15. The
-[comparison specification](../docs/contribute/validation/thermodynamics/citric-acid-comparison.md)
+[comparison specification](../docs/studies/literature/particle-water-uptake/citric-acid/index.md)
 records the target data, fixed inputs, metrics and numerical checks before evaluation.
 Stages 1, 2A and 2B are merged. Reuse their verified processes,
 numerical controls and reproducibility workflow, qualifying the actual study
