@@ -65,4 +65,4 @@ def cpu_process_identity(process)
 
 Retain native configuration without imposing GPU capability limits.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_configuration.py#L140-L144)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_configuration.py#L140-L154)

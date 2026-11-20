@@ -32,6 +32,7 @@ helpers remain concrete-only.
 
 **Modules**
 
+- `particula.dynamics.chemistry`
 - `particula.dynamics.coagulation`
 - `particula.dynamics.condensation`
 - `particula.dynamics.dilution`

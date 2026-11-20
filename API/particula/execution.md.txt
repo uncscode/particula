@@ -3569,6 +3569,7 @@ invalid.
 - `particula.execution._gpu_condensation_block_ros3`
 - `particula.execution._gpu_condensation_ros3`
 - `particula.execution._gpu_gas_forcing`
+- `particula.execution._ros3_coefficients`
 - `particula.execution.adapters`
 - `particula.execution.analysis_io`
 - `particula.execution.archive`
