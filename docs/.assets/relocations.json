@@ -345,7 +345,10 @@
     "docs/contribute/validation/numerics/gas-chemistry.md": "docs/studies/validation/condensation/gas-chemistry.md",
     "docs/contribute/validation/numerics/resolved-chemistry.md": "docs/studies/validation/condensation/resolved-chemistry.md",
     "docs/examples/processes/customization/native_gas_chemistry.py": "docs/studies/examples/custom-processes/native_gas_chemistry.py",
-    "docs/examples/processes/customization/resolved_reactive_uptake.py": "docs/studies/examples/custom-processes/resolved_reactive_uptake.py"
+    "docs/examples/processes/customization/resolved_reactive_uptake.py": "docs/studies/examples/custom-processes/resolved_reactive_uptake.py",
+    "docs/examples/processes/condensation/pendant_drop_evaporation.py": "docs/studies/literature/evaporation-and-uptake/pendant-drop/pendant_drop_evaporation.py",
+    "docs/contribute/validation/thermodynamics/pendant-evaporation.md": "docs/studies/literature/evaporation-and-uptake/pendant-drop/index.md",
+    "docs/examples/processes/customization/glyoxal_chamber.py": "docs/studies/literature/evaporation-and-uptake/glyoxal_chamber.py"
   },
   "fragments": {
     "docs/Features/data-containers-and-gpu-foundations.md#data-containers-and-gpu-foundations": "docs/guide/data-model/index.md#data-model",
@@ -539,7 +542,8 @@
     "docs/contribute/validation/numerics/simulation-workflow.md#full-resident-biomass-publication": "docs/studies/examples/coupled-populations/emissions/biomass-evidence.md#full-resident-biomass-publication",
     "docs/contribute/validation/numerics/simulation-workflow.md#biomass-rerun-with-adaptive-gpu-coagulation": "docs/studies/examples/coupled-populations/emissions/biomass-evidence.md#biomass-rerun-with-adaptive-gpu-coagulation",
     "docs/contribute/validation/index.md#contributor-procedures-and-decisions": "docs/studies/validation/workflows-and-releases/index.md#qualification-records",
-    "docs/contribute/validation/numerics/simulation-workflow.md#full-resident-cyclic-trajectory-and-output-recovery": "docs/studies/examples/coupled-populations/chambers/cyclic-chamber-evidence.md#full-resident-cyclic-trajectory-and-output-recovery"
+    "docs/contribute/validation/numerics/simulation-workflow.md#full-resident-cyclic-trajectory-and-output-recovery": "docs/studies/examples/coupled-populations/chambers/cyclic-chamber-evidence.md#full-resident-cyclic-trajectory-and-output-recovery",
+    "docs/contribute/validation/index.md#evaporation-heat-and-mass-consistency": "docs/studies/literature/evaporation-and-uptake/pendant-drop/index.md#experimental-facts-and-reconstruction-boundaries"
   },
   "source_revision": "9e024234f2f6401313981e8e3c85a772d675f795",
   "retired": {

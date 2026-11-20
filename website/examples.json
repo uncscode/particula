@@ -17,6 +17,23 @@
     "inputs": [],
     "full_canvas": true
   },
+  "pendant-drop-evaporation": {
+    "title": "Can warm air explain the measured evaporation of a pentane drop?",
+    "source": "docs/studies/literature/evaporation-and-uptake/pendant-drop/pendant_drop_evaporation.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 600,
+    "inputs": [
+      "scripts/pendant_evaporation/study.py",
+      "scripts/pendant_evaporation/plots.py"
+    ],
+    "data_expression": "report",
+    "render_functions": [],
+    "plot_inputs": [
+      "scripts/pendant_evaporation/plots.py"
+    ],
+    "full_canvas": true
+  },
   "gpu-coagulation": {
     "title": "Direct Brownian coagulation on CUDA",
     "source": "docs/studies/validation/coagulation/direct-coagulation/gpu_coagulation_direct.py",
@@ -1273,5 +1290,27 @@
     ],
     "plot_inputs": [],
     "full_canvas": true
+  },
+  "glyoxal-chamber": {
+    "title": "Glyoxal uptake and imidazole formation in wet aerosol",
+    "source": "docs/studies/literature/evaporation-and-uptake/glyoxal_chamber.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 1800,
+    "inputs": [
+      "docs/data/glyoxal-chamber/README.txt",
+      "docs/data/glyoxal-chamber/gas_ppbv.csv",
+      "docs/data/glyoxal-chamber/marker68_per_sulfate.csv",
+      "docs/data/glyoxal-chamber/mechanism.json",
+      "docs/data/glyoxal-chamber/organic_per_sulfate.csv"
+    ],
+    "invoke": "report = simulate()\nsummarize(report)\nfigure = plot_results(report)\nplt.show()",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\nfigure = plot_results(report)\nplt.show()",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": [],
+    "full_canvas": false
   }
 }

@@ -1,5 +1,9 @@
 # Condensation Strategy System
 
+The [glyoxal chamber example](../../studies/literature/evaporation-and-uptake/glyoxal_chamber.py)
+uses reversible condensation and particle chemistry to compare organic loss
+and imidazole formation during a measured chamber dilution.
+
 For the supported CUDA configuration of this runnable, use
 [prepared GPU simulations](../gpu/prepared.md). The CPU and direct-kernel
 contracts below retain their own, sometimes broader, capabilities.

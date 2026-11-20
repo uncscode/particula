@@ -4590,6 +4590,71 @@
           }
         ]
       }
+    },
+    {
+      "source": "docs/studies/literature/evaporation-and-uptake/glyoxal_chamber.py",
+      "title": "Glyoxal uptake and imidazole formation in wet aerosol",
+      "topic": "custom",
+      "also": [
+        "condensation"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "glyoxal-chamber",
+        "runs": [
+          "glyoxal-chamber"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/resolved-chemistry.md",
+            "label": "Reactive uptake and aging"
+          },
+          {
+            "target": "docs/guide/processes/condensation.md",
+            "label": "Reversible vapor transfer"
+          },
+          {
+            "target": "api:particula.dynamics.chemistry.resolved.ResolvedChemistry",
+            "label": "Resolved chemistry process"
+          }
+        ]
+      }
+    },
+    {
+      "source": "docs/studies/literature/evaporation-and-uptake/pendant-drop/pendant_drop_evaporation.py",
+      "title": "Can warm air explain the measured evaporation of a pentane drop?",
+      "topic": "condensation-energy",
+      "also": [
+        "condensation"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/evaporation-and-uptake/pendant-drop/index.md",
+      "title": "Pentane drop heat and mass consistency: numerical evidence",
+      "topic": "condensation-energy",
+      "also": [
+        "condensation",
+        "verification-scientific"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "pendant-drop-evaporation",
+        "runs": [
+          "pendant-drop-evaporation"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "api:particula.util.chemical.chemical_vapor_pressure.get_chemical_vapor_pressure",
+            "label": "Pentane vapor pressure"
+          }
+        ]
+      }
     }
   ],
   "supporting": [
@@ -4844,6 +4909,10 @@
     {
       "source": "docs/studies/validation/workflows-and-releases/index.md",
       "reason": "Browsing directory for workflow and release qualification."
+    },
+    {
+      "source": "docs/studies/literature/evaporation-and-uptake/index.md",
+      "reason": "Landing page for literature comparisons of evaporation and reactive uptake."
     }
   ]
 }
