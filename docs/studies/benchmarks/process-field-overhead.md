@@ -2,6 +2,8 @@
 
 On an NVIDIA GeForce RTX 5060, eight boxes of 256 slots each underwent native dilution at 0.01 s⁻¹ with a 0.001 s timestep. The extension-free workload compares pre-feature revision `a73fa19741885844ffeebbf76723a8b60ab39223` with the feature revision. Each resident measurement used 20 warm-up steps and seven batches of 2,000 steps. The explicit-transfer case used 200 steps per batch. Preparation and compilation were outside the timing boundary.
 
+The [benchmark protocol](process-field-overhead/protocol.md) gives the reproduction commands, correctness checks and delivery gates for these timings.
+
 ## Timing results
 
 Measured on revision `8d108f454` with Warp 1.11.1, NumPy 2.3.4 and Python
