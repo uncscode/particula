@@ -11,9 +11,9 @@ const { default: plugin, loadSkills } = await import(
 );
 
 const expectedSkills = [
-  "particula-analyze", "particula-build", "particula-debug", "particula-develop",
+  "particula-build", "particula-debug", "particula-develop",
   "particula-docs", "particula-examples", "particula-guide", "particula-plan", "particula-report", "particula-review",
-  "particula-run", "particula-setup", "particula-test",
+  "particula-run", "particula-setup", "particula-studies-literature", "particula-test",
 ];
 
 test("installed package loads science and repository skills with supporting files", async () => {

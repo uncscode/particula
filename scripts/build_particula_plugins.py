@@ -24,7 +24,7 @@ SKILLS = {
     "particula-guide",
     "particula-build",
     "particula-run",
-    "particula-analyze",
+    "particula-studies-literature",
     "particula-debug",
     "particula-report",
     "particula-plan",

@@ -1,9 +1,12 @@
 ---
-name: particula-analyze
-description: "Analyze and visualize Particula simulation results or compare them with observations; use for plots, conservation checks, convergence, uncertainty, and reproducibility reports."
+name: particula-studies-literature
+description: "Analyze Particula simulations and write literature studies comparing model predictions with published measurements or theory. Use for quantitative figures, conservation, convergence, uncertainty and finding-led research reports."
 ---
 
-# Analyze aerosol results
+# Analyze aerosol studies and write literature reports
+
+## Analyze the results
+
 1. Read run metadata and numerical outputs before interpreting plots. Establish units, distribution representation, radius/diameter convention, species and process configuration.
 2. Check NaN/Inf, negative concentrations/masses, number and mass trends, and the correct open/closed-system inventory. Condensation exchanges gas/particle mass; coagulation changes number while conserving mass in the ideal closed model. Boundary losses or sources require explicit budgets.
 3. Distinguish per-bin counts, PDFs and dN/dlogD; integrate with appropriate widths and Jacobians. Never sum a continuous density as though it were per-bin counts.
@@ -11,6 +14,14 @@ description: "Analyze and visualize Particula simulation results or compare them
 5. Label axes and units; use logarithmic size axes where appropriate. Preserve numerical observations and export plots plus a short report of inputs, versions, checks and limitations. Reuse saved data for plotting-only changes; do not rerun physics or reconstruct values from images. Mark sampled observations explicitly rather than implying exact event times. Registered repository examples follow `../particula-docs/SKILL.md` for stable folders, bounded plot data and replot provenance.
 6. For observations align units, sampling windows, instrument response and uncertainties; do not conflate calibration and independent validation. Separate numerical, parameter and structural uncertainty.
 Deliver key findings, linked plots/data, quantitative check results and justified next steps. A successful bundled smoke test is not evidence that a model predicts a particular experiment.
+
+## Write a literature report
+
+Open with what the paper measured, what Particula predicted under comparable conditions, and why the difference matters. Link the specific figure, table or equation beside the comparison. Use a figure that lets readers see the underlying series when a matched pair or summary could hide where the model succeeds or fails.
+
+Write the headline as the answer you would give a researcher. Lead with a surprising, defensible comparison and name the observable, direction and decisive condition. A longer title earns its length when the added detail changes the interpretation. For example, “Particula predicts half the rise in ion concentration CLOUD measured from 7% to 70% humidity.” The counts establish a concentration discrepancy. Its cause could involve wall loss, production or sampling. When several explanations fit, the headline can say what the data constrain or which test would distinguish them.
+
+Use section headings to carry that argument from the evidence to its limits and the next test. For an approved runnable example in the Particula repository, use `../particula-examples/SKILL.md`.
 
 ## Shared operating rules
 Use the selected interpreter’s `python -m particula_docs --json` to locate and search version-matched installed docs before relying on the live site; see `../../references/sources.md` for commands and older-version fallback.

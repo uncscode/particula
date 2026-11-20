@@ -38,6 +38,10 @@ installs include local guides, theory, contributor guidance, Python examples,
 and data/images; editable installs point to the maintained repository docs.
 See `references/sources.md` for search commands and older-version fallback.
 
+## Analyze a study or write a literature comparison
+
+Use [particula-studies-literature](https://github.com/uncscode/particula/blob/main/plugins/particula-helper/skills/particula-studies-literature/SKILL.md) to check simulation outputs, compare them with published measurements and write a report whose title states the scientific finding.
+
 ## Report a research concern
 
 Use [particula-report](https://github.com/uncscode/particula/blob/main/plugins/particula-helper/skills/particula-report/SKILL.md)
