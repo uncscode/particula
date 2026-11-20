@@ -19,7 +19,9 @@
 
 # %%
 import json
+from copy import deepcopy
 from pathlib import Path
+from typing import NamedTuple
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -128,7 +130,10 @@ def gas_kg(ppbv):
 # seed the initial salt molality exceeds 12 mol/kg water. Following Kampf et
 # al. and the implementation in Knote et al., cap salting-in at 12, assign a
 # bound/dissolved equilibrium ratio of 0.5 and use relaxation times of 44,000
-# and 47,000 s. Divide total Henry capacity between the pools once. Dissolved
+# and 47,000 s initially. Recompute the remaining salt molality as chemistry
+# consumes ammonium sulfate and releases water. Below 12 mol/kg the ratio is
+# one and the two times are 250 and 5500 s. The contribution of residual
+# acid to salting-in is uncharacterized here. Divide total Henry capacity between the pools once. Dissolved
 # masses count glyoxal equivalents, including rapid hydration implicitly.
 # [Partitioning measurements](https://doi.org/10.1021/es400083d) ·
 # [Two-pool parameterization, equations 1–4](https://doi.org/10.5194/acp-14-6213-2014)
@@ -136,9 +141,10 @@ def gas_kg(ppbv):
 # Convert the water-volume Henry law into an effective pressure for the native
 # mole-fraction activity strategy at the beginning of each outer step. As a
 # result the equilibrium surface pressure is dissolved moles divided by water
-# volume and Henry capacity. Match the native initial condensation flux to the
+# volume and Henry capacity. Match the native condensation flux slope to the
 # measured monomer relaxation time by solving for an effective accommodation
-# coefficient. This coefficient includes condensed-phase resistance. Use a flat
+# coefficient at the current size and composition. This coefficient includes
+# condensed-phase resistance. Use a flat
 # interface limit for this bulk-solution equilibrium comparison.
 #
 # The second pathway uses finite ammonium sulfate. Per mole of IC, two glyoxal
@@ -152,10 +158,26 @@ def gas_kg(ppbv):
 # the coefficient. This extrapolation to concentrated aerosol is uncertain.
 # [Product kinetics and initial rates](https://doi.org/10.1021/es200989n)
 
+
 # %%
-SALT_MOLAL = 0.63 * DENSITY[2] / (MW[2] * 0.37 * DENSITY[4])
-H_TOTAL = 4.19e5 * 10 ** (0.24 * min(12.0, SALT_MOLAL))  # M/atm
-H_DISSOLVED = H_TOTAL / 1.5
+class Partition(NamedTuple):
+    """Equilibrium and relaxation parameters for the current solution."""
+
+    salt_molal: float
+    henry: float
+    ratio: float
+    tau_monomer: float
+    tau_bound: float
+
+
+def partition(state):
+    mass = state.particles.masses[0, 0]
+    salt = mass[2] / MW[2] / mass[4]
+    ratio, tau1, tau2 = (
+        (0.5, 44000.0, 47000.0) if salt >= 12 else (1.0, 250.0, 5500.0)
+    )
+    henry = 4.19e5 * 10 ** (0.24 * min(12.0, salt)) / (1 + ratio)
+    return Partition(salt, henry, ratio, tau1, tau2)
 
 
 def product_k(ph):
@@ -164,9 +186,12 @@ def product_k(ph):
     return rate * 1e-8 / gly**2 / 1000**3
 
 
-def chemistry(state, ph, enabled):
+def chemistry(state, ph, enabled, high_salt=True):
     record = json.loads((inputs() / "mechanism.json").read_text())
     record["reactions"][-1]["rate"]["k"] = product_k(ph) if enabled else 0.0
+    if not high_salt:
+        for reaction in record["reactions"][:2]:
+            reaction["rate"]["k"] = 1 / 5500.0
     mechanism = ReactionMechanism.from_dict(record)
     bound = mechanism.bind_resolved(
         state, {"particle:" + s: i for i, s in enumerate(LANES)}
@@ -177,7 +202,9 @@ def chemistry(state, ph, enabled):
 def condensation(state, alpha):
     mass = state.particles.masses[0, 0]
     water_liters = 1000 * mass[4] / DENSITY[4]
-    reference_pa = PRESSURE * (mass / MW).sum() / (water_liters * H_DISSOLVED)
+    reference_pa = (
+        PRESSURE * (mass / MW).sum() / (water_liters * partition(state).henry)
+    )
     return par.dynamics.CondensationIsothermal(
         molar_mass=MW[:1].copy(),
         accommodation_coefficient=alpha,
@@ -198,10 +225,24 @@ def flux(state, alpha):
     )[0, 0]
 
 
-def exchange_coefficient(state, ppbv):
-    water_liters = state.particles.masses[0, 0, 4]  # water density = 1 kg/L
-    expected = H_DISSOLVED * ppbv * 1e-9 * water_liters * MW[0] / 44000
-    return brentq(lambda a: flux(state, a) / expected - 1, 1e-12, 1, xtol=1e-15)
+def exchange_coefficient(state):
+    """Match the native slope d(flux)/d(partial pressure) to the measured pool time."""
+    mass = state.particles.masses[0, 0]
+    params = partition(state)
+    capacity = params.henry * mass[4] * MW[0]  # kg per atm at 1 kg/L water
+    probe = deepcopy(state.gas)
+    # A prescribed 100 ppbv excess above equilibrium gives a well-conditioned
+    # slope even when the actual atmosphere is at or below equilibrium.
+    probe.concentration[0, 0] = gas_kg(100.0 + mass[0] / capacity * 1e9)
+    expected = capacity * 1e-7 / params.tau_monomer
+
+    def residual(alpha):
+        rate = condensation(state, alpha).mass_transfer_rate(
+            state.particles, probe, TEMPERATURE, PRESSURE
+        )[0, 0]
+        return rate / expected - 1
+
+    return brentq(residual, 1e-13, 1, xtol=1e-15)
 
 
 def ledger(state):
@@ -240,8 +281,10 @@ def decline(trace):
 
 def replay(gas, device, dt, ph=3.5, enabled=True, nitrogen=True, end=END):
     state = initial_state(np.interp(0, *gas.T), nitrogen)
-    alpha = exchange_coefficient(state, np.interp(0, *gas.T))
-    reaction = chemistry(state, ph, enabled)
+    initial_alpha = exchange_coefficient(state)
+    reactions = {
+        high: chemistry(state, ph, enabled, high) for high in (True, False)
+    }
     registry = par.ProcessRegistry()
     registry.register(ResolvedChemistry, ResolvedChemistryAdapter())
     baseline = ledger(state)
@@ -251,8 +294,10 @@ def replay(gas, device, dt, ph=3.5, enabled=True, nitrogen=True, end=END):
     supplied = removed = evaporated = 0.0
     worst = 0.0
     rows = []
-    for step in range(round(end * 60 / dt) + 1):
-        minutes = step * dt / 60
+    seconds = 0.0
+    while True:
+        params = partition(state)
+        minutes = seconds / 60
         mass = state.particles.masses[0, 0]
         if np.any(mass < 0) or state.gas.concentration.min() < 0:
             raise ValueError("Negative gas or particle inventory")
@@ -268,41 +313,48 @@ def replay(gas, device, dt, ph=3.5, enabled=True, nitrogen=True, end=END):
                     supplied,
                     removed,
                     evaporated,
+                    params.salt_molal,
                 ]
             )
         balance = ledger(state) - baseline - forced * gas_unit
         scale = np.maximum(np.abs(baseline) + np.abs(forced * gas_unit), 1e-30)
         worst = max(worst, float(np.max(np.abs(balance) / scale)))
-        if step == round(end * 60 / dt):
+        if seconds >= end * 60:
             break
-        target = gas_kg(np.interp(minutes + dt / 120, *gas.T))
+        # Resolve the change to the faster pool times over the same saved mesh.
+        h = min(dt if params.salt_molal >= 12.5 else dt / 8, end * 60 - seconds)
+        target = gas_kg(np.interp(minutes + h / 120, *gas.T))
         delta = target - state.gas.concentration[0, 0]
         supplied += max(delta, 0.0)
         removed += max(-delta, 0.0)
         forced += delta
         state.gas.concentration[0, 0] = target
-        transfer = par.dynamics.MassCondensation(condensation(state, alpha))
+        transfer = par.dynamics.MassCondensation(
+            condensation(state, exchange_coefficient(state))
+        )
+        reaction = reactions[params.salt_molal >= 12]
         if device == "numpy":
-            transfer.execute(state, dt)
-            reaction.execute(state, dt)
+            transfer.execute(state, h)
+            reaction.execute(state, h)
         else:
             with (transfer | reaction).prepare(
-                state, device=device, time_step=dt, process_registry=registry
+                state, device=device, time_step=h, process_registry=registry
             ) as sim:
                 sim.step()
                 state = sim.snapshot()
+        seconds += h
         evaporated += max(state.gas.concentration[0, 0] - target, 0.0)
     if worst > 2e-10:
         raise AssertionError(f"Relative forced inventory error {worst}")
-    return np.array(rows), worst, alpha
+    return np.array(rows), worst, initial_alpha
 
 
 def independent_checks():
     """Test the Henry zero, evaporation and a held-out Yu laboratory rate."""
     state = initial_state(100.0)
     mass = state.particles.masses[0, 0]
-    alpha = exchange_coefficient(state, 100.0)
-    mass[0] = H_DISSOLVED * 100e-9 * mass[4] * MW[0]
+    alpha = exchange_coefficient(state)
+    mass[0] = partition(state).henry * 100e-9 * mass[4] * MW[0]
     equilibrium_flux = flux(state, alpha)
     state.gas.concentration[0, 0] *= 0.5
     negative_flux = flux(state, alpha)
@@ -352,7 +404,7 @@ def simulate():
         backend = {}
         for name in ("reversible", "IC"):
             previous = None
-            for dt in (300, 150):
+            for dt in (150, 75):
                 rows, err, alpha = replay(gas, device, dt, enabled=name == "IC")
                 predicted = decline(
                     np.column_stack((ot, np.interp(ot, rows[:, 0], rows[:, 1])))
@@ -378,11 +430,11 @@ def simulate():
         report["runs"][device] = backend
     for ph in YU:
         if ph == 3.5:
-            history = np.array(report["runs"]["numpy"]["IC_150"]["history"])
+            history = np.array(report["runs"]["numpy"]["IC_75"]["history"])
         else:
-            history, _, _ = replay(gas, "numpy", 150, ph=ph)
+            history, _, _ = replay(gas, "numpy", 75, ph=ph)
         report["pH_sensitivity"][str(ph)] = float(history[-1, 2])
-    for name in ("reversible_150", "IC_150"):
+    for name in ("reversible_75", "IC_75"):
         cpu = np.array(report["runs"]["numpy"][name]["history"])
         gpu = np.array(report["runs"]["cuda:0"][name]["history"])
         diff = abs(
@@ -426,8 +478,8 @@ def plot_results(report):
     markers(axes[0], obs["gas_ppbv"], "Figure 6 · prescribed")
     markers(axes[1], obs["organic_per_sulfate"], "Figure 6 · observed")
     for key, label, color in (
-        ("reversible_150", "Reversible exchange", "#19717b"),
-        ("IC_150", "Exchange and IC formation", "#a04c22"),
+        ("reversible_75", "Reversible exchange", "#19717b"),
+        ("IC_75", "Exchange and IC formation", "#a04c22"),
     ):
         h = np.array(report["runs"]["numpy"][key]["history"])
         axes[1].plot(h[:, 0] / 60, h[:, 1], label=label, color=color, lw=2)
@@ -470,16 +522,29 @@ def plot_results(report):
 
 def summarize(report):
     print(
-        f"Organic/sulfate decline over matched windows (positive = loss): "
-        f"measured {report['measured_decline_pct']:.2f}%."
+        f"Measured organic/sulfate fell {report['measured_decline_pct']:.2f}%."
     )
     for device, runs in report["runs"].items():
-        for key in ("reversible_150", "IC_150"):
+        for key in ("reversible_75", "IC_75"):
             run = runs[key]
+            change = run["decline_pct"]
+            direction = "fell" if change > 0 else "rose"
+            name = (
+                "Reversible pools"
+                if key.startswith("reversible")
+                else "With IC"
+            )
+            coarse = runs[key.replace("75", "150")]["decline_pct"]
             print(
-                f"{device}, {key}: {run['decline_pct']:.2f}% decline; "
+                f"{device} · {name} · organic/sulfate {direction} {abs(change):.2f}%; "
+                f"refinement {abs(coarse - change):.3f} percentage points; "
                 f"maximum relative inventory error {run['balance']:.2g}."
             )
+        final = runs["IC_75"]["history"][-1]
+        print(
+            f"Cumulative modeled evaporation {final[8] * 1e9:.2f} µg/m³; "
+            f"final ammonium sulfate molality {final[9]:.2f} mol/kg."
+        )
     print(
         "Final IC / sulfate (kg/kg), prescribed pH:", report["pH_sensitivity"]
     )
@@ -491,12 +556,14 @@ def summarize(report):
 # %% [markdown]
 # ## What the comparison tells us
 #
-# Compare the signs of the printed declines. The chamber loses particle
-# organics after dilution while the measured nitrogen-containing marker
-# persists. A timescale inferred from a separate sulfate study can leave the
-# simulated particles still filling when dilution starts. The comparison
-# tests that prediction directly. The IC signal is especially sensitive to
-# the prescribed pH and ammonium activity. A measurement of particle acidity
+# The chamber organic/sulfate ratio falls from 3.066 to 2.753 in the
+# selected windows, a 10.20% decline. Its uncalibrated nitrogen marker
+# approximately doubles. Both modeled organic ratios rise across these same
+# windows. The reaction run can release vapor during individual intervals
+# while ending with more total organic mass. The reversible pools are still
+# filling at dilution, and transferring organic carbon into IC also
+# changes how much glyoxal the particle can take up. The IC signal is
+# especially sensitive to the prescribed pH and ammonium activity. A measurement of particle acidity
 # together with a calibrated product abundance would test that extrapolation.
 
 # %%

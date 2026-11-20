@@ -35,3 +35,37 @@ def test_vapor_forcing_and_nitrogen_control(device):
         np.testing.assert_allclose(
             rows[:, 5], rows[:, 6] - rows[:, 7], atol=1e-21
         )
+
+
+@pytest.mark.parametrize("device", ["numpy", "cuda:0"])
+def test_evaporation_from_equilibrated_seed(device):
+    """A halved gas pressure releases previously dissolved glyoxal."""
+    if device == "cuda:0":
+        import warp as wp
+
+        if not wp.is_cuda_available():
+            pytest.skip("CUDA device unavailable")
+    state = case.initial_state(100.0)
+    mass = state.particles.masses[0, 0]
+    # Check both experimental salting regimes with an independently specified
+    # monomer concentration for an imposed partial pressure of 100 ppbv.
+    for molal, ratio in [(14.0, 0.5), (8.0, 1.0)]:
+        mass[2] = molal * case.MW[2] * mass[4]
+        h = 4.19e5 * 10 ** (0.24 * min(molal, 12.0)) / (1.0 + ratio)
+        mass[0] = h * 1e-7 * mass[4] * case.MW[0]
+        state.gas.concentration[0, 0] = case.gas_kg(50.0)
+        before = mass[0]
+        baseline = case.ledger(state)
+        transfer = case.par.dynamics.MassCondensation(
+            case.condensation(state, case.exchange_coefficient(state))
+        )
+        if device == "numpy":
+            transfer.execute(state, 10.0)
+            result = state
+        else:
+            with transfer.prepare(state, device=device, time_step=10.0) as sim:
+                sim.step()
+                result = sim.snapshot()
+        assert result.particles.masses[0, 0, 0] < before
+        assert result.gas.concentration[0, 0] > case.gas_kg(50.0)
+        np.testing.assert_allclose(case.ledger(result), baseline, rtol=2e-13)

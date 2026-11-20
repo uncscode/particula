@@ -31,9 +31,11 @@ model inputs. Only glyoxal exchanges with the gas.
 
 Kampf et al. 2013 https://doi.org/10.1021/es400083d
 Knote et al. 2014 https://doi.org/10.5194/acp-14-6213-2014 equations 1–4.
-Compute initial AS molality from salt moles per kg of initial water. Fix
-the high-salt branch for both runs. Initial matching of the native flux to
-tau1 defines an effective accommodation; subsequent area evolves.
+Compute AS molality from remaining salt moles per kg of current water.
+At or above 12 mol/kg use times 44000 and 47000 s and bound/monomer 0.5;
+below use 250 and 5500 s and ratio one. Acid equivalents conserve sulfur
+but their salting effect is outside this AS relation. At each step match
+the native transfer slope to tau1 at current size and composition.
 The equilibrium relation is in mol per litre of aerosol water per atm.
 A bound equivalent represents averaged reversible oligomer storage.
 
@@ -50,5 +52,6 @@ mechanism.json is the native nominal-pH configuration, used by the example.
 
 Saved history rows contain minutes, organic/sulfate, IC/sulfate, dissolved
 and bound glyoxal/sulfate (kg/kg), net imposed gas, cumulative imposed gas
-addition, removal, and cumulative evaporation (all kg/m³ of chamber air).
+addition, removal, and cumulative evaporation (all kg/m³ of chamber air), followed by
+remaining ammonium sulfate molality (mol/kg water).
 Sulfate is SO4 mass including sulfate carried in acid equivalents.
