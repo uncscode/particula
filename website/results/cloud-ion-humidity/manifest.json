@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 75.84924976399634,
+  "package_source_sha256": "de9c4fa23fbd4833d9eeae22e97ffd8e2496acae8432510149eed8ada42f4ee3",
+  "scientific_source_sha256": "1ac66c614e80ae7a0f6aae70e885469d5f8609ca95421966dfcd08ebcf41597f",
+  "input_sha256": {
+    "scripts/cloud_ion_humidity/study.py": "cce7f61db1024621628f961c90c118379fe791697350eefea9993e05dd0ae618",
+    "scripts/cloud_ion_humidity/plots.py": "91af4c75b084a83f504fd6e6e07d8fc2c72b2bf726e41a8681fc9541b2a16b4f",
+    "docs/data/cloud-ion-humidity/figure5d.csv": "ee9d6a9aec2819c0e240d81508a336f49ae811c0e75e861cd98efb5fde4c7970",
+    "docs/data/cloud-ion-humidity/two-inlet-design.csv": "d05ea7d2d67e66d5f89d78f9fa757a9053cf40a50f3cb444e38fdf9ea96a64cc"
+  },
+  "example": "cloud-ion-humidity",
+  "fingerprint": "ccf90e2d1ce3997a9d715a1dd824fc89cb68b86d7ed7c08463b3b6b288d40934",
+  "source": "docs/studies/literature/cloud-ion-humidity/cloud_ion_humidity.py",
+  "revision": "573dda5b4e826313fbb6a9296e201381dbd78855",
+  "package_dirty": false,
+  "executed_at": "2026-11-20T23:08:34.630697+00:00",
+  "device": "cuda:0: NVIDIA GeForce RTX 5060",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.3",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [
+      {
+        "text": "Device: NVIDIA GeForce RTX 5060\nObserved humidity increase: 3399 ions/cm\u00b3\nSimulated increase: 1691 \u00b1 25 ions/cm\u00b3\n"
+      }
+    ],
+    [
+      {
+        "image": "figure-2-1.png"
+      }
+    ],
+    [
+      {
+        "image": "figure-3-1.png"
+      }
+    ],
+    [
+      {
+        "image": "figure-4-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "figure-4-1.png": "5732ad427fd924d1e68d0aa3c69a92b4fd90fe0aded0355a40f3cec99142dabd",
+    "figure-3-1.png": "76060b68e4828e1ed7782475605bd7f0485af3ca41e5c5a6d11009ce6bc5acba",
+    "figure-2-1.png": "b02e0d1858faf09bf20d3d7522b62e9fda88f4ec94b3fc9d9b7b1275d318c615",
+    "executed_source.py": "2bb8cc0b8b18f10e5b6c71b81249c7211f000d9967768b1fbb41eb5c7656e3ec",
+    "data.json": "c11dc3160e1dd2c1600104cb5a759713d03321976a41e75599102f71c84ea467",
+    "source.py": "b867bae81c26f479cbca4976c495c31a05daf01c4af57a2bf200763e1ddc7911"
+  },
+  "simulation_fingerprint": "01def3219b125afbba217f7fe4d04d3d55bd6856db067ec6d714711ef64088ad",
+  "render_versions": {
+    "particula": "0.3.3",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "render_device": "CPU",
+  "execution_input_sha256": {
+    "scripts/cloud_ion_humidity/study.py": "cce7f61db1024621628f961c90c118379fe791697350eefea9993e05dd0ae618",
+    "scripts/cloud_ion_humidity/plots.py": "91af4c75b084a83f504fd6e6e07d8fc2c72b2bf726e41a8681fc9541b2a16b4f",
+    "docs/data/cloud-ion-humidity/figure5d.csv": "ee9d6a9aec2819c0e240d81508a336f49ae811c0e75e861cd98efb5fde4c7970",
+    "docs/data/cloud-ion-humidity/two-inlet-design.csv": "d05ea7d2d67e66d5f89d78f9fa757a9053cf40a50f3cb444e38fdf9ea96a64cc"
+  },
+  "rendered_at": "2026-11-20T23:11:12.696615+00:00",
+  "render_revision": "573dda5b4e826313fbb6a9296e201381dbd78855",
+  "render_elapsed_seconds": 1.8267532410100102
+}

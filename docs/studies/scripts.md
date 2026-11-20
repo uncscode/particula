@@ -93,6 +93,7 @@ The catalog lists each registered Python script once. Each entry leads to its so
 - [Recorded GPU benchmark viewer](benchmarks/historical-coagulation/gpu_benchmarks.py)
 - [Recovering initial particle sizes after condensation](validation/condensation/initial-size/infer_initial_radius.py)
 - [Repeated source pulses in a cooling and warming aerosol](examples/coupled-populations/chambers/gpu_prepared_cyclic_chamber.py)
+- [Reproduce the CLOUD ion balance and clearing test](literature/cloud-ion-humidity/cloud_ion_humidity.py)
 - [Resolve growth as a finite vapor reservoir is depleted](validation/condensation/adaptive/adaptive_reservoir_depletion.py)
 - [Resolve stiff wet–dry droplet relaxation on CUDA](validation/condensation/adaptive/adaptive_cloud_relaxation_cuda.py)
 - [Run, save and resume a closed aerosol growth experiment](tutorials/first_cpu_workflow.py)
