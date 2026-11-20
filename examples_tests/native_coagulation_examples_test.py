@@ -8,7 +8,8 @@ import numpy as np
 import pytest
 
 EXAMPLES = (
-    Path(__file__).resolve().parents[1] / "docs/examples/processes/coagulation"
+    Path(__file__).resolve().parents[1]
+    / "docs/studies/tutorials/coagulation-populations"
 )
 
 

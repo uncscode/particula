@@ -5,9 +5,9 @@ repos:
       - id: ruff-check
         name: Ruff fix
         args: [--fix]
-        files: '^(particula/|docs/examples/).*\.py$'
+        files: '^(particula/|docs/studies/).*\.py$'
       - id: ruff-format
-        files: '^(particula/|docs/examples/).*\.py$'
+        files: '^(particula/|docs/studies/).*\.py$'
       - id: ruff-check
         name: Ruff check
-        files: '^(particula/|docs/examples/).*\.py$'
+        files: '^(particula/|docs/studies/).*\.py$'

@@ -12,7 +12,7 @@ import pytest
 
 EXAMPLE_PATH = (
     Path(__file__).resolve().parents[1]
-    / "docs/examples/processes/dilution/cpu_dilution.py"
+    / "docs/studies/examples/particle-processes/sources-and-dilution/cpu_dilution.py"
 )
 
 

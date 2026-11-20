@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
-ROOT = Path(__file__).resolve().parents[1] / "docs/examples"
+ROOT = Path(__file__).resolve().parents[1] / "docs/studies/examples"
 
 
 @pytest.mark.parametrize(
@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1] / "docs/examples"
     [
         "thermodynamics/activity/activity_tutorial.py",
         "thermodynamics/activity/bat_activity_example.py",
-        "thermodynamics/activity/equilibria_example.py",
+        "thermodynamics/equilibria/equilibria_example.py",
         "thermodynamics/activity/ideal_activity_example.py",
         "thermodynamics/activity/kappa_activity_example.py",
         "thermodynamics/equilibria/activity_part1.py",

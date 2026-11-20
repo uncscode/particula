@@ -16,7 +16,10 @@ import pytest
 pytestmark = pytest.mark.warp
 
 _ROOT = Path(__file__).resolve().parents[1]
-_EXAMPLE = _ROOT / "docs/examples/gpu/resident/gpu_resident_session.py"
+_EXAMPLE = (
+    _ROOT
+    / "docs/studies/tutorials/working-with-gpu/resident/gpu_resident_session.py"
+)
 
 
 @pytest.fixture

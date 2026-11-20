@@ -12,7 +12,7 @@ import importlib.util
 import json
 from pathlib import Path
 
-DOC_ROOTS = ("guide", "theory", "contribute", "examples", "data", "images")
+DOC_ROOTS = ("guide", "theory", "contribute", "studies", "data", "images")
 DOC_EXCLUDED_PARTS = {
     "__pycache__",
     "node_modules",

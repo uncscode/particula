@@ -61,8 +61,8 @@ backend-path = ["."]
 [tool.ruff]
 line-length = 80
 fix = true
-src = ["particula", "docs/examples"]
-include = ["particula/**/*.py", "docs/examples/**/*.py", "scripts/**/*.py", "examples_tests/**/*.py", "_particula_build.py", "particula_docs.py"]
+src = ["particula", "docs/studies"]
+include = ["particula/**/*.py", "docs/studies/**/*.py", "scripts/**/*.py", "examples_tests/**/*.py", "_particula_build.py", "particula_docs.py"]
 extend-exclude = [
   ".trash/**",
   "**/*.ipynb",    # ignore every .ipynb anywhere in the project
@@ -89,7 +89,7 @@ extend-ignore = [
 [tool.ruff.lint.per-file-ignores]
 # Ignore assert‐usage (S101) in any file ending with _test.py
 "*_test.py" = ["S101", "E721", "B008", "E501"]
-"docs/examples/**/*.py" = ["D100", "D103", "INP001", "E501", "B905", "N816", "E402", "S101"]
+"docs/studies/**/*.py" = ["D100", "D103", "INP001", "E501", "B905", "N816", "E402", "S101"]
 
 
 [tool.ruff.lint.pydocstyle]
@@ -159,11 +159,11 @@ exclude = [
 include = [
     "_particula_build.py", "particula_docs.py",
     "docs/index.md", "docs/guide/", "docs/theory/", "docs/contribute/",
-    "docs/examples/", "docs/data/", "docs/images/",
-    "scripts/", "examples_tests/", "conda/", "conftest.py",
+    "docs/studies/", "docs/data/", "docs/images/",
+    "website/examples.json", "scripts/", "examples_tests/", "conda/", "conftest.py",
 ]
 exclude = [
-    ".trash/**", "website/**", "**/__pycache__/**", "**/*.pyc",
+    ".trash/**", "**/__pycache__/**", "**/*.pyc",
     "**/*.bak", "**/*.pyo", "**/*.tmp", "**/*.log",
     "**/.ipynb_checkpoints/**", "**/.pytest_cache/**",
     "docs/API/**", "docs/**/API/**", "docs/**/api/**", "docs/**/build/**",

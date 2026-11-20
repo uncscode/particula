@@ -27,12 +27,12 @@ REPRESENTATIVES = (
     "guide/data-model/index.md",
     "theory/index.md",
     "contribute/CONTRIBUTING.md",
-    "examples/fundamentals/native_aerosol.py",
+    "studies/tutorials/building-an-aerosol/native_aerosol.py",
     "data/gpu_benchmark_results.json",
     "images/icon_dark.svg",
 )
 # Independent inclusion policy: do not validate the backend using its selector.
-SECTIONS = {"guide", "theory", "contribute", "examples", "data", "images"}
+SECTIONS = {"guide", "theory", "contribute", "studies", "data", "images"}
 EXCLUDED = {
     "__pycache__",
     "API",
@@ -81,6 +81,49 @@ def hashes(source: Path) -> dict:
             }
     if not result:
         raise ValueError("Empty documentation source inventory")
+    return result
+
+
+def study_archives(wheel: Path, source: Path) -> dict:
+    """Verify every installed study ZIP against its registered input bytes."""
+    registry = json.loads((source / "website/examples.json").read_text())
+    result = {}
+    with zipfile.ZipFile(wheel) as package:
+        for key, config in registry.items():
+            script = Path(config["source"])
+            relative = script.relative_to("docs")
+            if (source / script).read_bytes() != package.read(
+                DOC_PREFIX + relative.as_posix()
+            ):
+                raise ValueError(f"Installed study source differs: {key}")
+            if not config.get("inputs"):
+                continue
+            name = relative.with_suffix(".zip").as_posix()
+            content = package.read(DOC_PREFIX + name)
+            files = {"example.py": script}
+            for item in config["inputs"]:
+                destination = config.get("input_destinations", {}).get(
+                    item, item
+                )
+                files[destination] = Path(item)
+            with zipfile.ZipFile(io.BytesIO(content)) as archive:
+                members = archive.namelist()
+                if len(members) != len(set(members)) or set(members) != {
+                    "README.txt",
+                    *files,
+                }:
+                    raise ValueError(
+                        f"Study download has incorrect members: {key}"
+                    )
+                for member, path in files.items():
+                    if archive.read(member) != (source / path).read_bytes():
+                        raise ValueError(
+                            f"Study download differs: {key}/{member}"
+                        )
+            result[name] = {
+                "sha256": hashlib.sha256(content).hexdigest(),
+                "size_bytes": len(content),
+            }
     return result
 
 
@@ -257,7 +300,9 @@ def check(wheel: Path, sdist: Path, source: Path) -> dict:
     """Verify published artifacts and an offline, Git-free rebuilt wheel."""
     import build
 
-    expected = hashes(source)
+    sources = hashes(source)
+    archives = study_archives(wheel, source)
+    expected = {**sources, **archives}
     manifest = verify_wheel(wheel, expected)
     with tempfile.TemporaryDirectory(prefix="particula-docs-check-") as temp:
         root = Path(temp)
@@ -273,8 +318,10 @@ def check(wheel: Path, sdist: Path, source: Path) -> dict:
         }
         if (
             (project / ".git").exists()
-            or actual_docs != set(expected)
-            or hashes(project) != expected
+            or actual_docs != set(sources)
+            or hashes(project) != sources
+            or (project / "website/examples.json").read_bytes()
+            != (source / "website/examples.json").read_bytes()
         ):
             raise ValueError(
                 "Source archive differs from documentation sources"
@@ -312,6 +359,7 @@ def check(wheel: Path, sdist: Path, source: Path) -> dict:
             if info["version"] != manifest["version"]:
                 raise ValueError("Installed locator version mismatch")
     return {
+        "study_download_zips": len(archives),
         "version": manifest["version"],
         "file_count": len(expected),
         "documentation_size_bytes": manifest["size_bytes"],

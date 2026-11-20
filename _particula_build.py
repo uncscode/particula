@@ -19,6 +19,7 @@ from pathlib import Path
 
 from flit_core import buildapi as flit
 from particula_docs import MANIFEST, source_files, source_version
+from scripts.study_downloads import write_study_zip
 
 get_requires_for_build_wheel = flit.get_requires_for_build_wheel
 get_requires_for_build_sdist = flit.get_requires_for_build_sdist
@@ -53,14 +54,28 @@ def stage_docs(root: Path) -> None:
     destination = root / "particula/docs"
     if destination.exists():
         raise ValueError("particula/docs must be generated, not maintained")
-    files = {}
     for path in source_files(source):
-        relative = path.relative_to(source)
-        content = path.read_bytes()
-        target = destination / relative
+        target = destination / path.relative_to(source)
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_bytes(content)
-        files[relative.as_posix()] = {
+        target.write_bytes(path.read_bytes())
+
+    registry = json.loads((root / "website/examples.json").read_text())
+    for config in registry.values():
+        if config.get("inputs"):
+            script = root / config["source"]
+            archive = destination / script.relative_to(source).with_suffix(
+                ".zip"
+            )
+            if archive.exists():
+                raise ValueError(
+                    f"Study ZIP collides with a source file: {archive}"
+                )
+            write_study_zip(archive, root, config, script.read_bytes())
+
+    files = {}
+    for path in source_files(destination):
+        content = path.read_bytes()
+        files[path.relative_to(destination).as_posix()] = {
             "sha256": hashlib.sha256(content).hexdigest(),
             "size_bytes": len(content),
         }

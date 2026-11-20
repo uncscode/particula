@@ -9,7 +9,7 @@ import pytest
 
 SOURCE = (
     Path(__file__).resolve().parents[1]
-    / "docs/examples/fundamentals/native_state_access.py"
+    / "docs/studies/tutorials/building-an-aerosol/native_state_access.py"
 )
 
 

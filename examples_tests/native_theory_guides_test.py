@@ -46,7 +46,7 @@ def test_linked_ideal_activity_molar_fractions():
     """The functional activity entrypoint remains independent of native state."""
     import runpy
 
-    index = ROOT / "docs/examples/thermodynamics/activity/index.md"
+    index = ROOT / "docs/studies/examples/thermodynamics/activity/index.md"
     assert "(ideal_activity_example.py)" in index.read_text()
     namespace = runpy.run_path(
         str(index.with_name("ideal_activity_example.py"))

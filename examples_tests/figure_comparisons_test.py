@@ -27,7 +27,10 @@ def assert_five_styles(lines):
 
 def test_survival_cohort_styles():
     """The interval estimates reuse their cohort's curve color and marker."""
-    source = ROOT / "docs/examples/gpu/prepared/gpu_lucky_few.py"
+    source = (
+        ROOT
+        / "docs/studies/examples/coupled-populations/charged-aerosols/gpu_lucky_few.py"
+    )
     data = json.loads((RESULTS / "gpu-lucky-few/data.json").read_text())
     fig = runpy.run_path(str(source))["plot_results"](data)
     try:

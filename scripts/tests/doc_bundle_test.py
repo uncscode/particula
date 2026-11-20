@@ -28,8 +28,8 @@ EXCLUDED = (
     "docs/guide/api/generated.md",
     "docs/guide/build/generated.html",
     "docs/theory/site/index.html",
-    "docs/examples/__pycache__/example.pyc",
-    "docs/examples/backup.py.bak",
+    "docs/studies/__pycache__/example.pyc",
+    "docs/studies/backup.py.bak",
     "docs/data/cache.pyo",
     "docs/data/temporary.tmp",
     "docs/data/run.log",
@@ -119,7 +119,7 @@ def test_wheel_and_offline_sdist_installations(artifacts):
     assert report["offline_sdist_rebuild"] == "passed"
     assert report["isolated_installations"] == "passed"
     assert report["documentation_size_bytes"] > 0
-    expected = CHECK.hashes(source)
+    expected = {**CHECK.hashes(source), **CHECK.study_archives(wheel, source)}
     assert report["file_count"] == len(expected)
     with zipfile.ZipFile(wheel) as archive:
         names = archive.namelist()
@@ -199,7 +199,29 @@ def test_corrupt_bundles_fail_verification(artifacts, tmp_path, target):
                     content += b"corrupted"
             out.writestr(entry, content)
     with pytest.raises(ValueError, match="differs|versions differ"):
-        CHECK.verify_wheel(corrupted, CHECK.hashes(source))
+        CHECK.verify_wheel(
+            corrupted,
+            {**CHECK.hashes(source), **CHECK.study_archives(wheel, source)},
+        )
+
+
+def test_mismatched_registered_helper_fails_verification(artifacts, tmp_path):
+    """A correctly packaged script cannot conceal a stale helper in its ZIP."""
+    _, source, wheel, _ = artifacts
+    registry = json.loads((source / "website/examples.json").read_text())
+    config = next(item for item in registry.values() if item.get("inputs"))
+    check_source = tmp_path / "source"
+    (check_source / "website").mkdir(parents=True)
+    (check_source / "website/examples.json").write_text(
+        json.dumps({"probe": config})
+    )
+    for relative in (config["source"], *config["inputs"]):
+        target = check_source / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes((source / relative).read_bytes())
+    (check_source / config["inputs"][0]).write_bytes(b"Changed helper")
+    with pytest.raises(ValueError, match="Study download differs"):
+        CHECK.study_archives(wheel, check_source)
 
 
 @pytest.mark.parametrize(

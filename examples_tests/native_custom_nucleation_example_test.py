@@ -9,7 +9,7 @@ import pytest
 
 EXAMPLE = (
     Path(__file__).resolve().parents[1]
-    / "docs/examples/processes/nucleation/custom_nucleation_single_species.py"
+    / "docs/studies/examples/particle-processes/sources-and-dilution/custom_nucleation_single_species.py"
 )
 
 
