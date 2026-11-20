@@ -133,6 +133,8 @@ def import_ncar(path) -> ReactionMechanism:
     """
     data = _read_mapping(path)
     _fields(data, ("version", "name", "species", "phases", "reactions"))
+    if not isinstance(data["name"], str) or not data["name"].strip():
+        raise ValueError("mechanism name must be a nonempty string")
     if data["version"] != "1.3.0":
         raise ValueError("expected NCAR version 1.3.0")
     catalog, phase = _catalog(data["species"], data["phases"])

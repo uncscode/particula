@@ -76,8 +76,8 @@ trial budget. The resident solver checks all trials before its separate
 publication kernel. An unsuccessful device interval faults the owner and
 rejects a subsequent snapshot. Resident checkpoints carry accepted and
 rejected work counts per box. Warp CPU tests exercise resident code generation.
-The full 75-case chemistry and example suite passed using Warp 1.19.0
-on the RTX 5060 host. The published outputs use Warp 1.11.1.
+All 76 chemistry and worked-example checks passed on the RTX 5060 host
+with both Warp 1.11.1 and Warp 1.19.0. The published outputs use Warp 1.11.1.
 
 ## Worked chamber and full-workload cost
 

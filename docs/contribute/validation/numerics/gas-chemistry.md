@@ -83,8 +83,9 @@ exponents, per-molecule activation energy or its kelvin equivalent, and a
 different species order from the simulation. Rates from the imported and
 independently authored native mechanisms meet the 10⁻¹² relative bound.
 Both boxes meet the analytical trajectory and inventory checks on NumPy,
-Warp CPU and an RTX 5060. Fourteen conversion cases passed, including
-rejections that preserve the destination file. The pinned NCAR full example
+Warp CPU and an RTX 5060. Fifteen conversion cases passed. A known imbalance in reacting molecular
+weights rejected before export even when an inert weight was absent. The
+rejection preserved the existing destination file. The pinned NCAR full example
 also rejected its unsupported emissions section.
 
 ## Warp compatibility

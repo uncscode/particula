@@ -191,3 +191,20 @@ def test_unsupported_preserves_output(tmp_path, location, change, match):
     with pytest.raises(ValueError, match=match):
         convert_ncar(input_file, target)
     assert target.read_text() == "existing output"
+
+
+def test_known_weight_imbalance_rejects_before_export(tmp_path):
+    """Reject a known unbalanced channel even when an inert weight is absent."""
+    record = source(2)
+    record["species"][0]["molecular weight [kg mol-1]"] = 0.04
+    record["species"].append({"name": "inert"})
+    record["phases"][0]["species"].append({"name": "inert"})
+    source_file = tmp_path / "unbalanced.json"
+    source_file.write_text(json.dumps(record))
+    output = tmp_path / "existing.yaml"
+    output.write_text("preserve")
+    with pytest.raises(
+        ValueError, match="convert.*molar masses do not balance"
+    ):
+        convert_ncar(source_file, output)
+    assert output.read_text() == "preserve"
