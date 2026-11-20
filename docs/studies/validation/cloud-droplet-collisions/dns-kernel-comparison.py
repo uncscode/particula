@@ -34,6 +34,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
+from IPython.display import display
 from particula import plotting
 from particula.dynamics import (
     get_turbulent_dns_kernel_ao2008,

@@ -81,36 +81,21 @@ def _find_benchmark_results() -> Path:
     current = Path.cwd().resolve()
     rejected_candidates: list[str] = []
 
-    for parent in [current, *current.parents]:
-        artifact_candidate = parent / BENCHMARK_ARTIFACT_PATH
-        if artifact_candidate.exists():
-            try:
-                _validate_benchmark_candidate(artifact_candidate)
-            except (OSError, json.JSONDecodeError, ValueError) as exc:
-                rejected_candidates.append(
-                    f"{artifact_candidate}: {type(exc).__name__}: {exc}"
-                )
-            else:
-                return artifact_candidate
-
-        if (parent / "pyproject.toml").exists():
-            break
-
-    for parent in [current, *current.parents]:
-        export_candidate = parent / BENCHMARK_FILENAME
-        if export_candidate.exists():
-            try:
-                _validate_benchmark_candidate(export_candidate)
-            except (OSError, json.JSONDecodeError, ValueError) as exc:
-                rejected_candidates.append(
-                    f"{export_candidate}: {type(exc).__name__}: {exc}"
-                )
-            else:
-                return export_candidate
-
-        # Stop at the repo root (contains pyproject.toml)
-        if (parent / "pyproject.toml").exists():
-            break
+    # Prefer controlled artifacts at any level before considering exported files.
+    for relative in (BENCHMARK_ARTIFACT_PATH, Path(BENCHMARK_FILENAME)):
+        for parent in [current, *current.parents]:
+            candidate = parent / relative
+            if candidate.exists():
+                try:
+                    _validate_benchmark_candidate(candidate)
+                except (OSError, json.JSONDecodeError, ValueError) as exc:
+                    rejected_candidates.append(
+                        f"{candidate}: {type(exc).__name__}: {exc}"
+                    )
+                else:
+                    return candidate
+            if (parent / "pyproject.toml").exists():
+                break
 
     msg = (
         "Could not find benchmark results at either "

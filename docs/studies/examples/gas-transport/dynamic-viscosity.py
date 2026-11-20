@@ -45,7 +45,6 @@
 # #!pip install particula[extra] --quiet
 import particula as par
 
-
 air_dynamic_viscosity = par.gas.get_dynamic_viscosity(
     temperature=298.15
 )  # will produce approx 1.84e-5 kg/m/s
