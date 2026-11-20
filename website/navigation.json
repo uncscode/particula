@@ -502,6 +502,10 @@
                 "slug": "examples/processes/customization/resolved_reactive_uptake"
               },
               {
+                "label": "Glyoxal chamber dilution",
+                "slug": "examples/processes/customization/glyoxal_chamber"
+              },
+              {
                 "label": "Timed custom CPU chemistry",
                 "slug": "examples/processes/customization/timed_box_chemistry"
               },

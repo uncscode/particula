@@ -1,0 +1,105 @@
+{
+  "version": 2,
+  "basis": "mol/m^3-phase",
+  "species": {
+    "particle:dissolved": {
+      "molar_mass_kg_per_mol": 0.058036,
+      "elements": {
+        "C": 2,
+        "H": 2,
+        "O": 2
+      }
+    },
+    "particle:bound": {
+      "molar_mass_kg_per_mol": 0.058036,
+      "elements": {
+        "C": 2,
+        "H": 2,
+        "O": 2
+      }
+    },
+    "particle:salt": {
+      "molar_mass_kg_per_mol": 0.132134,
+      "elements": {
+        "N": 2,
+        "H": 8,
+        "S": 1,
+        "O": 4
+      }
+    },
+    "particle:acid": {
+      "molar_mass_kg_per_mol": 0.098072,
+      "elements": {
+        "H": 2,
+        "S": 1,
+        "O": 4
+      }
+    },
+    "particle:water": {
+      "molar_mass_kg_per_mol": 0.018015,
+      "elements": {
+        "H": 2,
+        "O": 1
+      }
+    },
+    "particle:IC": {
+      "molar_mass_kg_per_mol": 0.096089,
+      "elements": {
+        "C": 4,
+        "H": 4,
+        "N": 2,
+        "O": 1
+      }
+    }
+  },
+  "reactions": [
+    {
+      "id": "bind",
+      "reactants": {
+        "particle:dissolved": 1
+      },
+      "products": {
+        "particle:bound": 1
+      },
+      "rate": {
+        "type": "constant",
+        "k": 1.0638297872340426e-05,
+        "units": "1/s"
+      }
+    },
+    {
+      "id": "release",
+      "reactants": {
+        "particle:bound": 1
+      },
+      "products": {
+        "particle:dissolved": 1
+      },
+      "rate": {
+        "type": "constant",
+        "k": 2.1276595744680852e-05,
+        "units": "1/s"
+      }
+    },
+    {
+      "id": "imidazole_carboxaldehyde",
+      "reactants": {
+        "particle:dissolved": 2,
+        "particle:salt": 1
+      },
+      "products": {
+        "particle:IC": 1,
+        "particle:water": 3,
+        "particle:acid": 1
+      },
+      "rate": {
+        "type": "constant",
+        "k": 4.54e-17,
+        "units": "m^9/mol^3/s"
+      },
+      "orders": {
+        "particle:salt": 2
+      }
+    }
+  ]
+}
