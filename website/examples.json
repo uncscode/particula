@@ -1290,5 +1290,27 @@
     ],
     "plot_inputs": [],
     "full_canvas": true
+  },
+  "glyoxal-chamber": {
+    "title": "Glyoxal uptake and imidazole formation in wet aerosol",
+    "source": "docs/examples/processes/customization/glyoxal_chamber.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 1800,
+    "inputs": [
+      "docs/data/glyoxal-chamber/README.txt",
+      "docs/data/glyoxal-chamber/gas_ppbv.csv",
+      "docs/data/glyoxal-chamber/marker68_per_sulfate.csv",
+      "docs/data/glyoxal-chamber/mechanism.json",
+      "docs/data/glyoxal-chamber/organic_per_sulfate.csv"
+    ],
+    "invoke": "report = simulate()\nsummarize(report)\nfigure = plot_results(report)\nplt.show()",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\nfigure = plot_results(report)\nplt.show()",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": [],
+    "full_canvas": false
   }
 }

@@ -1787,6 +1787,16 @@
       "start_here": false
     },
     {
+      "source": "docs/examples/processes/customization/glyoxal_chamber.py",
+      "title": "Glyoxal uptake and imidazole formation in wet aerosol",
+      "topic": "custom",
+      "also": [
+        "condensation"
+      ],
+      "role": "Examples",
+      "start_here": false
+    },
+    {
       "source": "docs/examples/processes/customization/timed_box_chemistry.py",
       "title": "Distinguish chemical conversion from a timed emission and dilution",
       "topic": "custom",

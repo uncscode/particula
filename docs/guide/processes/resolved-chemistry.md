@@ -1,5 +1,9 @@
 # React gas and particle materials in a resolved box
 
+The [glyoxal chamber example](../../examples/processes/customization/glyoxal_chamber.py)
+uses reversible condensation and particle chemistry to compare organic loss
+and imidazole formation during a measured chamber dilution.
+
 Use a version 2 mechanism to transform material inside resolved particles or
 to consume a gas through irreversible reactive uptake. Every particle in a
 box draws from its own box's shared gas. Homogeneous gas reactions, bulk
