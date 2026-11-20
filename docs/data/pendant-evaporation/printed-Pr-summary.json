@@ -1,0 +1,35 @@
+{
+  "backend": "NumPy/SciPy CPU",
+  "fixed_Pr": 0.86,
+  "root_ranges_K": {
+    "paper_mass_no_blow_heat": [
+      260.489200666319,
+      262.74318930789974
+    ],
+    "paper_mass_paper_heat": [
+      258.8948066830702,
+      261.0860691690866
+    ],
+    "paper_mass_film_heat": [
+      259.20757838628066,
+      261.4111014006115
+    ],
+    "film_mass_no_blow_heat": [
+      259.9193582183627,
+      262.0676731025753
+    ],
+    "film_mass_paper_heat": [
+      258.3673569882941,
+      260.46185795154685
+    ],
+    "film_mass_film_heat": [
+      258.6720396680456,
+      260.77708886665033
+    ]
+  },
+  "wall_seconds": 7.566617087926716,
+  "extra_heat_printed_flux_W_m2": [
+    9601.76520724888,
+    10793.40971317206
+  ]
+}

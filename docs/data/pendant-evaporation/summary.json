@@ -1,0 +1,261 @@
+{
+  "device": "NVIDIA GeForce RTX 5060",
+  "CUDA_curve_points": 5136,
+  "CUDA_root_points": 16,
+  "reverse_launches": 1,
+  "cpu_cuda_relative_error": 1.1102230246251565e-15,
+  "gradient_max_relative_error": 1.4660644698238912e-08,
+  "grid_max_temperature_error_K": {
+    "81": 0.0015203767068783236,
+    "161": 0.0003739200094514672,
+    "321": 9.44796909152501e-05
+  },
+  "root_ranges": {
+    "paper_mass_no_blow_heat": {
+      "temperature_K": [
+        260.2053214852866,
+        262.0121286939002
+      ],
+      "flux_kg_m2_s": [
+        0.012493845524646566,
+        0.013459168061638162
+      ]
+    },
+    "paper_mass_paper_heat": {
+      "temperature_K": [
+        258.59316327161895,
+        260.35715953218676
+      ],
+      "flux_kg_m2_s": [
+        0.011409226013170619,
+        0.012256027081828961
+      ]
+    },
+    "paper_mass_film_heat": {
+      "temperature_K": [
+        258.9093858048774,
+        260.6817623469615
+      ],
+      "flux_kg_m2_s": [
+        0.011615063095388628,
+        0.01248413535632137
+      ]
+    },
+    "film_mass_no_blow_heat": {
+      "temperature_K": [
+        259.63893275194545,
+        261.3657538226636
+      ],
+      "flux_kg_m2_s": [
+        0.01258465301584477,
+        0.013543067945881355
+      ]
+    },
+    "film_mass_paper_heat": {
+      "temperature_K": [
+        258.0697537264366,
+        259.76028264662017
+      ],
+      "flux_kg_m2_s": [
+        0.011479330321071889,
+        0.012319257411140773
+      ]
+    },
+    "film_mass_film_heat": {
+      "temperature_K": [
+        258.37778020232776,
+        260.07543514833185
+      ],
+      "flux_kg_m2_s": [
+        0.011688891588398866,
+        0.012551057584051388
+      ]
+    }
+  },
+  "radiation_blackbody_at_326K_W_m2": 366.6707080544574,
+  "observed_ranges": {
+    "speed_m_s": [
+      0.2898278151491553,
+      0.30395705109792875
+    ],
+    "Pr": [
+      0.6943638948241746,
+      0.7974462573299189
+    ],
+    "k_W_m_K": [
+      0.01958845553966317,
+      0.02145074248614731
+    ],
+    "cp_J_kg_K": [
+      1164.1953050949944,
+      1164.1953050949944
+    ],
+    "latent_J_kg": [
+      391653.86554099596,
+      391653.86554099596
+    ],
+    "mass_paper_kg_m2_s": [
+      0.014415637975966787,
+      0.015430027475408553
+    ],
+    "mass_film_kg_m2_s": [
+      0.015127445985130827,
+      0.01619192349117475
+    ],
+    "heat_no_blow_kg_m2_s": [
+      0.012099844244813637,
+      0.013121388216950317
+    ],
+    "heat_paper_kg_m2_s": [
+      0.010870721638960046,
+      0.011788495449793629
+    ],
+    "heat_film_kg_m2_s": [
+      0.011099618162285154,
+      0.012036716838705006
+    ],
+    "printed_proxy_kg_m2_s": [
+      0.03814336269930018,
+      0.04000286873456702
+    ],
+    "q_convection_no_blow_W_m2": [
+      4738.950770925234,
+      5139.042416432668
+    ],
+    "extra_for_mass_paper_W_m2": [
+      561.61889594892,
+      1252.7729874263487
+    ],
+    "extra_for_printed_proxy_W_m2": [
+      9854.674004335102,
+      10876.821253901038
+    ]
+  },
+  "configurations": [
+    [
+      "local_default",
+      "thermo_Wilke",
+      "Neufeld",
+      "LINDSAY_BROMLEY"
+    ],
+    [
+      "local_default",
+      "thermo_Wilke",
+      "Neufeld",
+      "LINEAR"
+    ],
+    [
+      "local_default",
+      "thermo_Wilke",
+      "Kim_Monroe",
+      "LINDSAY_BROMLEY"
+    ],
+    [
+      "local_default",
+      "thermo_Wilke",
+      "Kim_Monroe",
+      "LINEAR"
+    ],
+    [
+      "local_default",
+      "kinetic_Wilke",
+      "Neufeld",
+      "LINDSAY_BROMLEY"
+    ],
+    [
+      "local_default",
+      "kinetic_Wilke",
+      "Neufeld",
+      "LINEAR"
+    ],
+    [
+      "local_default",
+      "kinetic_Wilke",
+      "Kim_Monroe",
+      "LINDSAY_BROMLEY"
+    ],
+    [
+      "local_default",
+      "kinetic_Wilke",
+      "Kim_Monroe",
+      "LINEAR"
+    ],
+    [
+      "all_Poling",
+      "thermo_Wilke",
+      "Neufeld",
+      "LINDSAY_BROMLEY"
+    ],
+    [
+      "all_Poling",
+      "thermo_Wilke",
+      "Neufeld",
+      "LINEAR"
+    ],
+    [
+      "all_Poling",
+      "thermo_Wilke",
+      "Kim_Monroe",
+      "LINDSAY_BROMLEY"
+    ],
+    [
+      "all_Poling",
+      "thermo_Wilke",
+      "Kim_Monroe",
+      "LINEAR"
+    ],
+    [
+      "all_Poling",
+      "kinetic_Wilke",
+      "Neufeld",
+      "LINDSAY_BROMLEY"
+    ],
+    [
+      "all_Poling",
+      "kinetic_Wilke",
+      "Neufeld",
+      "LINEAR"
+    ],
+    [
+      "all_Poling",
+      "kinetic_Wilke",
+      "Kim_Monroe",
+      "LINDSAY_BROMLEY"
+    ],
+    [
+      "all_Poling",
+      "kinetic_Wilke",
+      "Kim_Monroe",
+      "LINEAR"
+    ]
+  ],
+  "versions": {
+    "thermo": "0.4.2",
+    "chemicals": "1.3.3",
+    "warp-lang": "1.11.1",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7"
+  },
+  "python": "3.12.12",
+  "particula_source_version": "0.3.3",
+  "property_sources": "Local installed thermo and chemicals only",
+  "property_methods": {
+    "vapor_pressure": "HEOS_FIT",
+    "latent_heat": "HEOS_FIT",
+    "gas_heat_capacity": "LINEAR mixture, pure HEOS_FIT",
+    "conductivity": [
+      "LINDSAY_BROMLEY",
+      "LINEAR"
+    ]
+  },
+  "fixed": {
+    "Tinf_K": 326.0,
+    "pressure_Pa": 101325.0,
+    "diameter_m": 0.00161,
+    "anchor_Ts_K": 263.6,
+    "anchor_Re": 60,
+    "printed_phi": 0.08
+  },
+  "wall_seconds": 60.51173121202737
+}

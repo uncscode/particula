@@ -8,6 +8,8 @@ different combinations.
 
 ## Growth and evaporation
 
+[Can warm air explain a fed pentane drop’s evaporation?](condensation/pendant_drop_evaporation.py) compares reported temperature and evaporation with independent heat and mass constraints, including an actual CUDA correlation calculation.
+
 Start with [the initial condensation rate](condensation/condensation_1_bin.py)
 to connect activity, curvature, and vapor pressure to mass transfer. Then choose
 the reservoir appropriate to your question:

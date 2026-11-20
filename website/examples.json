@@ -17,6 +17,23 @@
     "inputs": [],
     "full_canvas": true
   },
+  "pendant-drop-evaporation": {
+    "title": "Can warm air explain the measured evaporation of a pentane drop?",
+    "source": "docs/examples/processes/condensation/pendant_drop_evaporation.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 600,
+    "inputs": [
+      "scripts/pendant_evaporation/study.py",
+      "scripts/pendant_evaporation/plots.py"
+    ],
+    "data_expression": "report",
+    "render_functions": [],
+    "plot_inputs": [
+      "scripts/pendant_evaporation/plots.py"
+    ],
+    "full_canvas": true
+  },
   "gpu-coagulation": {
     "title": "Direct Brownian coagulation on CUDA",
     "source": "docs/examples/gpu/direct/gpu_coagulation_direct.py",
