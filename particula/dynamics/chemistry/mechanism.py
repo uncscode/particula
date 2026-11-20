@@ -30,6 +30,21 @@ _MechanismLoader.add_constructor(
 )
 
 
+def _read_mapping(path):
+    """Read JSON or YAML without silently discarding duplicate keys."""
+    path = Path(path)
+    with path.open(encoding="utf-8") as stream:
+        if path.suffix.lower() == ".json":
+            return json.load(stream, object_pairs_hook=_unique)
+        if path.suffix.lower() in (".yaml", ".yml"):
+            loader = _MechanismLoader(stream)
+            try:
+                return loader.get_single_data()
+            finally:
+                loader.dispose()
+    raise ValueError("mechanism file must use .json, .yaml or .yml")
+
+
 def _fields(value, required, optional=()):
     if not isinstance(value, dict):
         raise ValueError("expected a mapping")
@@ -167,7 +182,7 @@ def _catalog(catalog):
             or not name[4:].strip()
         ):
             raise ValueError(f"invalid gas species {name!r}")
-        _fields(meta, (), ("elements",))
+        _fields(meta, (), ("elements", "molar_mass_kg_per_mol"))
         elements = meta.get("elements", {})
         if not isinstance(elements, dict) or any(
             not isinstance(key, str)
@@ -191,6 +206,7 @@ class ReactionMechanism:
 
     species: tuple
     reactions: tuple[Reaction, ...]
+    declared_masses: tuple
 
     def __init__(self, record: dict):
         """Validate the v1 fields and copy the reaction definitions."""
@@ -200,6 +216,18 @@ class ReactionMechanism:
         if record["basis"] != "mol/m^3-air":
             raise ValueError("basis must be mol/m^3-air")
         species = _catalog(record["species"])
+        declared_masses = []
+        for name, meta in record["species"].items():
+            if "molar_mass_kg_per_mol" in meta:
+                mass = _number(
+                    meta["molar_mass_kg_per_mol"], f"{name} molar mass"
+                )
+                if mass <= 0:
+                    raise ValueError(f"{name} molar mass must be positive")
+                declared_masses.append((name, mass))
+        object.__setattr__(
+            self, "declared_masses", tuple(sorted(declared_masses))
+        )
         catalog = dict(species)
         if not isinstance(record["reactions"], list) or not record["reactions"]:
             raise ValueError("reactions must be a nonempty list")
@@ -225,30 +253,23 @@ class ReactionMechanism:
 
     def to_dict(self):
         """Return a detached, normalized representation for interchange."""
+        catalog = {
+            name: {"elements": dict(elements)} if elements else {}
+            for name, elements in self.species
+        }
+        for name, mass in self.declared_masses:
+            catalog[name]["molar_mass_kg_per_mol"] = mass
         return {
             "version": 1,
             "basis": "mol/m^3-air",
-            "species": {
-                name: {"elements": dict(elements)} if elements else {}
-                for name, elements in self.species
-            },
+            "species": catalog,
             "reactions": [r.to_dict() for r in self.reactions],
         }
 
     @classmethod
     def load(cls, path):
         """Read a native .json, .yaml or .yml file with unique mapping keys."""
-        path = Path(path)
-        with path.open(encoding="utf-8") as stream:
-            if path.suffix.lower() == ".json":
-                return cls(json.load(stream, object_pairs_hook=_unique))
-            if path.suffix.lower() in (".yaml", ".yml"):
-                loader = _MechanismLoader(stream)
-                try:
-                    return cls(loader.get_single_data())
-                finally:
-                    loader.dispose()
-        raise ValueError("mechanism file must use .json, .yaml or .yml")
+        return cls(_read_mapping(path))
 
     def save(self, path):
         """Write a normalized native mechanism file."""

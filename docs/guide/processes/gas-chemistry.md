@@ -55,6 +55,26 @@ an optional `elements` mapping such as `{"H": 2, "O": 1}` for elemental
 balance checks on reactions with complete compositions. Closed reactions
 always undergo molar mass balance validation.
 
+## Import an NCAR mechanism
+
+Convert a single gas phase in NCAR Mechanism Configuration 1.3.0 to a
+native file. Run this from the repository root to reproduce the published
+[A + B → C input](../../data/gas-chemistry/combine-ncar.yaml) and its
+[converted mechanism](../../data/gas-chemistry/combine-native.json).
+
+```bash
+python -m particula.dynamics.chemistry.ncar docs/data/gas-chemistry/combine-ncar.yaml combine-native.json
+```
+
+Load the output with `ReactionMechanism.load` and bind it as above.
+Source molecular weights in kg/mol are checked against the actual gas
+columns at bind time. This converter supports irreversible Arrhenius reactions
+with one or two distinct unit-coefficient reactants, positive integer product
+coefficients and ordinary evolving species. It accepts either `C` in kelvin or
+`Ea` in joules per molecule. Pressure-dependent rates, fixed reservoirs,
+other reaction types and unrecognized fields produce an error before export.
+[NCAR rate definition](https://github.com/NCAR/MechanismConfiguration/blob/2069f9c97f08399b34ca3dcb104d3a5bf596ce40/docs/source/v1/reactions/arrhenius.rst)
+
 ## Rates, units and temperature
 
 For reaction $r$ the molar extent rate per volume of air is

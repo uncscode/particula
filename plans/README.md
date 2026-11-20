@@ -140,9 +140,9 @@ it must not accumulate different studies on one long-lived scheduler branch.
 1. For [Stage 6](stage-06-chemistry-model.md), select a bulk particle
    conversion and its independent reference, including a case with unequal
    material densities.
-2. Qualify the [NCAR 1.3.0 gas converter](stage-06-chemistry-model.md#next-gap-import-an-external-gas-mechanism)
-   against analytical first- and second-order reactions and verify rejection of
-   pressure dependence and fixed reservoirs.
+2. The [NCAR 1.3.0 gas converter](stage-06-chemistry-model.md#import-an-external-gas-mechanism)
+   now passes both analytical cases and rejects unsupported reservoir and
+   pressure-dependent definitions.
 3. Select an uptake law and independent reference before adding chemistry
    in which particles compete for the same gas. Stage 5 follow-ons for
    composition and hygroscopicity can proceed independently.
