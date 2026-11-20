@@ -1,16 +1,19 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 7.017963801044971,
-  "package_source_sha256": "755e1d2ca764bb07d1c614e2112530c09de58806eea2f342824c720740566689",
-  "scientific_source_sha256": "0eb53bf488295a2a1ba2005d4f0ed86a7dc779622638787bf0a6b4c9555e0a5b",
-  "input_sha256": {},
+  "elapsed_seconds": 7.6730800330406055,
+  "package_source_sha256": "2df7dcde6398d5b91e3a0a89e8884aedd26b42c8e4f99a046a283efb7e9ebdb2",
+  "scientific_source_sha256": "87d7d3a385dd76533121ee0900f4fb033e0273c7faf316a4ea445df684b16c3d",
+  "input_sha256": {
+    "docs/data/gas-chemistry/combine-ncar.yaml": "8dcee4f19f219f163bb0ca901391f9128db3ac4273387f37c20760fb62acf06d",
+    "docs/data/gas-chemistry/combine-native.json": "abdd5e1222a14ac5d95b31a2a66db84be2274fe45e3c47fa5874c0797b90c39f"
+  },
   "example": "native-gas-chemistry",
-  "fingerprint": "bf2dd01dfd420490b43c2b59db9e5630d35dec1fdaa175588b54c6437cefc5c3",
+  "fingerprint": "62c616407a107dfa43173a9005e5a33dd444ebb4c92c7ea3aa96ada3e27213cf",
   "source": "docs/examples/processes/customization/native_gas_chemistry.py",
-  "revision": "4825b85fbd2252343147a8b215956694fb95f91b",
+  "revision": "b90bab07a9a25b4182e957c33ed9dc9a1548e817",
   "package_dirty": false,
-  "executed_at": "2026-11-20T03:10:45.643179+00:00",
+  "executed_at": "2026-11-20T04:15:00.681550+00:00",
   "device": "cuda:0: NVIDIA GeForce RTX 5060",
   "python": "3.12.12",
   "versions": {
@@ -29,7 +32,7 @@
     [],
     [
       {
-        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     /tmp/particula-stage06-warp\nModule particula.gpu.kernels.dilution 0472484 load on device 'cuda:0' took 0.57 ms  (cached)\nModule particula.gpu.kernels._population_validation 65eaa49 load on device 'cuda:0' took 0.32 ms  (cached)\nModule particula.dynamics.chemistry.device 115d815 load on device 'cuda:0' took 3.14 ms  (cached)\nModule particula.execution.extension_guards deaab5f load on device 'cuda:0' took 5.00 ms  (cached)\nModule particula.execution.prepared_guards c5e1f2e load on device 'cuda:0' took 0.26 ms  (cached)\n"
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     /tmp/stage06-resolved-warp\nModule particula.gpu.kernels.dilution 0472484 load on device 'cuda:0' took 1.84 ms  (cached)\nModule particula.gpu.kernels._population_validation 65eaa49 load on device 'cuda:0' took 1.55 ms  (cached)\nModule particula.dynamics.chemistry.device 1168b3d load on device 'cuda:0' took 4.01 ms  (cached)\nModule particula.execution.extension_guards deaab5f load on device 'cuda:0' took 11.04 ms  (cached)\nModule particula.execution.prepared_guards c5e1f2e load on device 'cuda:0' took 1.24 ms  (cached)\n"
       },
       {
         "image": "figure-5-1.png"
@@ -39,7 +42,7 @@
   "files": {
     "figure-5-1.png": "a81603cad8ec8a72585b93c7903ac6770dbc7dbd100eb07e6ea6ae2b6d410115",
     "data.json": "30673a000cec90c1663bde543cb9aa8d37428ce9dc5b8911e8a9c30c91553ada",
-    "source.py": "6da80a3098365887159d3ed59a156343fa30a62c6cbf771bb24b2ee7c18fd9f2"
+    "source.py": "505c5ab9402444fd63ff10e6f81db17cf02c81f3629f50e574d9ad53bcfc8fed"
   },
-  "simulation_fingerprint": "58713877310b5001bca32230fed9dc7244ad7367c190fdbe59fa3c0dada93c10"
+  "simulation_fingerprint": "a3c032a0bb0e28f4056b171dc3efa4d10b5ba2040eaa7f4009bee0792b5d76a2"
 }

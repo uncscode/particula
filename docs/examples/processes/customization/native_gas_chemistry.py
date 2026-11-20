@@ -15,6 +15,11 @@
 # `ReactionMechanism.load(path)`. The file contains chemistry, while the
 # binding below supplies the gas names used in this particular chamber.
 
+# The example download also includes a bimolecular NCAR 1.3.0 source file
+# and its converted native JSON. From the extracted bundle or repository,
+# run `python -m particula.dynamics.chemistry.ncar docs/data/gas-chemistry/combine-ncar.yaml combine.json`
+# to reproduce that conversion. Both mechanisms bind to user-provided gases.
+
 # %%
 from contextlib import nullcontext
 

@@ -1,13 +1,16 @@
 # Stage 6: Configurable chemistry on CPU and GPU
 
-The native gas milestone is implemented on the Stage 6 branch. Version 1
-supports Python, JSON and YAML, exact gas names with optional overrides,
-and irreversible mass action with constant or Arrhenius rates. NumPy and
-resident CUDA qualified the analytical and stiff cases with same-backend
-restart. See the [mechanism guide](../docs/guide/processes/gas-chemistry.md)
-and [qualification evidence](../docs/contribute/validation/numerics/gas-chemistry.md).
-The NCAR 1.3.0 gas converter passed the analytical cases on both backends.
-Particle reactions and coupled uptake remain open.
+The Stage 6 delivery is implemented and qualified on the branch in
+[PR #1687](https://github.com/uncscode/particula/pull/1687). The milestones
+below refer to implemented behavior and its independent reference.
+
+| Milestone | Delivered behavior | Evidence |
+| --- | --- | --- |
+| Species and mechanisms | Load Python, JSON and YAML. Bind gas names and explicit material columns, validate units and closed budgets, and compile signed reaction entries for resident execution. | [Gas schema](../docs/guide/processes/gas-chemistry.md) · [Resolved schema](../docs/guide/processes/resolved-chemistry.md) |
+| Gas reactions and interchange | Run RK23 and stiff ROS3 on NumPy and CUDA. Import the closed NCAR 1.3.0 Arrhenius subset. | [Analytical trajectories, source rates and stiff references](../docs/contribute/validation/numerics/gas-chemistry.md) |
+| Bulk particle reactions | Integrate molar mass action using the changing material volume of each resolved particle. | [Equal- and unequal-density volume integrals](../docs/contribute/validation/numerics/resolved-chemistry.md#bulk-material-conversion) |
+| Coupled uptake | Share each gas reservoir among particles and pathways using a prescribed collision probability. Preserve represented counts and track both reservoirs through condensation and near depletion. | [Independent radial growth and inventory checks](../docs/contribute/validation/numerics/resolved-chemistry.md#competition-and-near-depletion) |
+| Continuation, cost and example | Resume exact same-backend histories, capture a compatible resolved CUDA sequence, measure complete workloads and publish executed cases. | [Work and continuation](../docs/contribute/validation/numerics/resolved-chemistry.md) · [Uptake and aging example](../docs/examples/processes/customization/resolved_reactive_uptake.py) |
 
 Dependencies: [Stage 1 accounting and verification](stage-01-scientific-correctness.md),
 [Stage 2A solver assessment](stage-02a-numerical-integration.md),
@@ -33,7 +36,7 @@ definitions.
 Reuse existing execution extension points. CPU `BoxProcess` supports staged
 native updates; explicit GPU adapters support prepared resources, a clock,
 failure signaling, and declared continuation state. These are integration
-points, not an existing general chemistry engine.
+points for the gas and resolved chemistry implementations.
 
 ## First delivery design and acceptance criteria
 
@@ -57,8 +60,8 @@ times with its analytical solution. Retain its trajectory tolerances
 
 The gas milestone passed binding, analytical trajectory and continuation
 checks on NumPy and resident CUDA. The [qualification record](../docs/contribute/validation/numerics/gas-chemistry.md) gives the measured errors.
-Particle reaction volume, heterogeneous uptake and competition for gas each
-require the additional evidence below.
+The resolved milestones below extend this qualification to changing material
+volume and a shared gas reservoir.
 
 ## Initial scope and exclusions
 
@@ -106,8 +109,7 @@ unless an explicit supported GPU implementation is supplied.
 
 ### Import an external gas mechanism
 
-A researcher with an NCAR mechanism currently has to transcribe its reactions
-and rate units. The implemented converter translates **NCAR Mechanism Configuration
+The converter translates **NCAR Mechanism Configuration
 1.3.0** to native Particula v1 JSON or YAML. The output goes through
 `ReactionMechanism.from_dict`, `save`, and the existing gas binding. Users can
 inspect it and run it on either backend without the NCAR parser or a compiler.
@@ -143,8 +145,8 @@ The source fixture is pinned at NCAR revision `2069f9c97f`.
    fixture fails before export. Publish one source file, its generated native
    file and the conversion command alongside the worked example.
 
-Particle material binding and heterogeneous gas uptake have their own milestones.
-The converter can be delivered using the qualified gas solver alone.
+The converter targets the gas mechanism. Resolved chemistry uses the native
+version 2 mechanism and explicit particle bindings.
 
 ## Units, budgets, and shared gas availability
 
@@ -191,7 +193,7 @@ counting a gas transfer twice. Fixed-count chemistry must preserve positive
 total mass in active particles; complete particle removal needs a later
 retirement contract.
 
-## Reviewable implementation increments
+## Delivery criteria by increment
 
 1. **Species/schema and compilation.** Resolve bindings and units, validate
    reaction balances and dependencies, and compile one canonical mechanism.
@@ -241,8 +243,8 @@ mechanism. [Stage 2A assessment](../docs/contribute/validation/numerics/adaptive
 ## Owning implementation and evidence
 
 - [Gas metadata](../particula/gas/gas_data.py),
-  [particle state](../particula/particles/particle_data.py), and a proposed
-  chemistry module whose public exports will be decided during schema design.
+  [particle state](../particula/particles/particle_data.py), and the
+  [native chemistry package](../particula/dynamics/chemistry/).
 - [CPU box process](../particula/box_process.py),
   [GPU process adapters](../particula/execution/process_extensions.py), and
   [prepared checkpoint integration](../particula/execution/prepared_checkpoint.py).
@@ -272,4 +274,4 @@ mechanism. [Stage 2A assessment](../docs/contribute/validation/numerics/adaptive
   multiphase chemistry claim is inferred from a simple demonstration.
 
 Use the [repository validation reference](../plugins/particula-helper/references/repository-validation.md)
-for focused CPU/CUDA, lifecycle, example, and packaging checks when implemented.
+for focused CPU/CUDA, lifecycle, example, and packaging checks.

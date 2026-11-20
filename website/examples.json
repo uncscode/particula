@@ -1245,6 +1245,25 @@
     "policy": "cuda",
     "device": "cuda",
     "timeout": 240,
+    "inputs": [
+      "docs/data/gas-chemistry/combine-ncar.yaml",
+      "docs/data/gas-chemistry/combine-native.json"
+    ],
+    "invoke": "report = simulate()\nfigure = plot_results(report)\nplt.show()",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\nfigure = plot_results(report)\nplt.show()",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": [],
+    "full_canvas": true
+  },
+  "resolved-reactive-uptake": {
+    "title": "How two particle sizes share a reactive gas",
+    "source": "docs/examples/processes/customization/resolved_reactive_uptake.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 240,
     "inputs": [],
     "invoke": "report = simulate()\nfigure = plot_results(report)\nplt.show()",
     "data_expression": "report",

@@ -58,9 +58,9 @@ always undergo molar mass balance validation.
 ## Import an NCAR mechanism
 
 Convert a single gas phase in NCAR Mechanism Configuration 1.3.0 to a
-native file. Run this from the repository root to reproduce the published
-[A + B → C input](../../data/gas-chemistry/combine-ncar.yaml) and its
-[converted mechanism](../../data/gas-chemistry/combine-native.json).
+native file. The [gas example](../../examples/processes/customization/native_gas_chemistry.py)
+download bundle includes both the A + B → C input and its converted JSON.
+Run from the extracted bundle or repository root to reproduce the conversion.
 
 ```bash
 python -m particula.dynamics.chemistry.ncar docs/data/gas-chemistry/combine-ncar.yaml combine-native.json
@@ -148,6 +148,6 @@ uses `CPUSimulation.checkpoint()` and `CPUSimulation.resume()`. Prepared
 CUDA continuation requires the same device, compatible mechanism, binding,
 solver, and adapter. Both profiles resume at completed outer steps. The
 [qualification record](../../contribute/validation/numerics/gas-chemistry.md)
-covers irreversible gas reactions at prescribed temperature. Particle
-reactions, heterogeneous uptake and external mechanism imports remain future
-extensions.
+covers irreversible gas reactions at prescribed temperature. For bulk
+particle reactions and shared gas uptake, see the [resolved chemistry
+guide](resolved-chemistry.md).

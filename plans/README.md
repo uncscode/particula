@@ -20,9 +20,11 @@ qualified and published, including the full resident CUDA reruns.
 The first Stage 3A, 3B and 4 deliveries are on main. Stage 5 qualified
 closed-box initial-size recovery on CPU and CUDA in
 [PR #1676](https://github.com/uncscode/particula/pull/1676).
-**Stage 6 gas chemistry is qualified on its delivery branch.** The native
-mechanism passed analytical and stiff-network tests on NumPy and CUDA.
-[Gas chemistry qualification](../docs/contribute/validation/numerics/gas-chemistry.md)
+**Stage 6 is qualified on its delivery branch.** It covers native gas reactions,
+NCAR gas import, resolved bulk reactions, reactive uptake, restart and CUDA
+capture for resolved chemistry. [PR #1687](https://github.com/uncscode/particula/pull/1687)
+· [Gas evidence](../docs/contribute/validation/numerics/gas-chemistry.md)
+· [Particle and coupled evidence](../docs/contribute/validation/numerics/resolved-chemistry.md)
 
 ## Staged development
 
@@ -137,13 +139,7 @@ it must not accumulate different studies on one long-lived scheduler branch.
 
 ## Decisions for the next deliveries
 
-1. For [Stage 6](stage-06-chemistry-model.md), select a bulk particle
-   conversion and its independent reference, including a case with unequal
-   material densities.
-2. The [NCAR 1.3.0 gas converter](stage-06-chemistry-model.md#import-an-external-gas-mechanism)
-   now passes both analytical cases and rejects unsupported reservoir and
-   pressure-dependent definitions.
-3. Select an uptake law and independent reference before adding chemistry
-   in which particles compete for the same gas. Stage 5 follow-ons for
-   composition and hygroscopicity can proceed independently.
-4. Choose the literature scheduler's cadence and compute budget at activation.
+1. Select the next Stage 5 inverse problem for composition or hygroscopicity.
+   The [Stage 6 delivery](stage-06-chemistry-model.md) records the qualified
+   chemistry cases and the physical limits of its uptake law.
+2. Choose the literature scheduler's cadence and compute budget at activation.

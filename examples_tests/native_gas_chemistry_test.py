@@ -60,3 +60,17 @@ def test_41_observations_and_restart():
     report = simulate()
     assert len(report["time_s"]) == 41
     assert set(report["backends"]) == {"numpy", "cuda:0"}
+
+
+def test_published_conversion_pair(tmp_path):
+    """Reproduce the native file supplied in the worked example download."""
+    from pathlib import Path
+
+    from particula.dynamics.chemistry.ncar import convert_ncar
+
+    data = Path(__file__).resolve().parents[1] / "docs/data/gas-chemistry"
+    destination = tmp_path / "combine.json"
+    convert_ncar(data / "combine-ncar.yaml", destination)
+    assert (
+        destination.read_bytes() == (data / "combine-native.json").read_bytes()
+    )
