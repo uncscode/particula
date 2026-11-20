@@ -108,4 +108,4 @@ result = positions.numpy()
 - Examples
   - [Aerosol Dynamics](teaching/fluids.md) - Coagulation, condensation, diffusion
   - [Particle Interactions](teaching/geometry.md) - Collisions, wall losses
-  - [GPU Benchmarks](../../validation/gpu/legacy-benchmarks/gpu_benchmarks.ipynb) - Condensation & coagulation scaling results
+  - [GPU Benchmarks](../../../studies/benchmarks/historical-coagulation/gpu_benchmarks.py) - Condensation & coagulation scaling results

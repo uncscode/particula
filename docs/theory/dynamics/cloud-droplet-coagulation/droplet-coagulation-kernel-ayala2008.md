@@ -23,7 +23,11 @@ The output is the collision kernel Γ₁₂
 
 This is valid under the conditions when a_k ≪ η, ρ_w ≫ ρ, and Sv > 1, the geometric collision kernel can be calculated as follows:
 
+<a id="geometric-collision-kernel"></a>
+
 Γ₁₂ = 2πR² ⟨|wᵣ|⟩ g₁₂
+
+[Run the kernel comparison](../../../studies/validation/cloud-droplet-collisions/dns-kernel-comparison.py)
 
 ## ⟨|wᵣ|⟩: Radial Relative Velocity
 

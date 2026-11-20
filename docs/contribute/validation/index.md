@@ -7,14 +7,14 @@ Results are specific to their recorded revision, workload, and device.
 | Question | Record |
 | --- | --- |
 | Can final size constrain initial radius? | [Closed-box size inversion](numerics/initial-size-inversion.md) |
-| Can humidity constrained by haze reproduce Π Chamber cloud counts? | [Chamber spectra and startup sensitivity](thermodynamics/pi-chamber.md) |
-| How do salt type and organic vapor change wet size? | [Π Chamber seed chemistry and BAT vapor transfer](thermodynamics/pi-chamber-species.md) |
-| Does CUDA wall loss reproduce spherical deposition theory? | [Theory comparison and evidence limits](gpu/spherical-wall-loss.md) |
+| Can humidity constrained by haze reproduce Π Chamber cloud counts? | [Chamber spectra and startup sensitivity](../../studies/literature/pi-chamber/haze-and-cloud/index.md) |
+| How do salt type and organic vapor change wet size? | [Π Chamber seed chemistry and BAT vapor transfer](../../studies/literature/pi-chamber/seed-chemistry.md) |
+| Does CUDA wall loss reproduce spherical deposition theory? | [Theory comparison and evidence limits](../../studies/validation/wall-loss/index.md) |
 | Can bipolar charge and mobility selection explain NaCl capture rates? | [NaCl chamber scavenging](coagulation/nacl-scavenging.md) |
-| How accurately does the slip law recover a dry PSL diameter? | [Mobility sizing against 49 published measurements](transport/psl-mobility.md) |
+| How accurately does the slip law recover a dry PSL diameter? | [Mobility sizing against 49 published measurements](../../studies/literature/dry-psl-mobility/index.md) |
 | How well does direct BAT reproduce the published activity curves? | [Binary BAT reference checks](thermodynamics/bat-activity.md) |
-| How well does BAT reproduce measured citric acid water activity? | [Citric acid droplet hygroscopicity](thermodynamics/citric-acid-comparison.md) |
-| How well does a CCN-derived κ transfer across sizes and humidities? | [Size-resolved CCN retrieval study](thermodynamics/ccn-retrieval.md) |
+| How well does BAT reproduce measured citric acid water activity? | [Citric acid droplet hygroscopicity](../../studies/literature/particle-water-uptake/citric-acid/index.md) |
+| How well does a CCN-derived κ transfer across sizes and humidities? | [Size-resolved CCN retrieval study](../../studies/literature/particle-water-uptake/ccn-retrieval/index.md) |
 | How does CPU/CUDA cost scale for a humidity sensitivity study? | [BAT humidity-pulse ensemble](gpu/bat-humidity-pulse.md) |
 | What supports the scientific baseline? | [Scientific correctness](numerics/scientific-correctness.md) |
 | Which adaptive method and splitting choices are qualified? | [Adaptive integration assessment](numerics/adaptive-methods.md) |
@@ -25,8 +25,8 @@ Results are specific to their recorded revision, workload, and device.
 | What supports the fixed-four-substep condensation method? | [Stiffness study](numerics/condensation-stiffness.md) and [direct parity](gpu/condensation-parity.md) |
 | What supports the two-million-particle environmental example? | [Environmental sweep](gpu/environment-sweep.md) |
 | Which direct coagulation mechanisms were validated? | [Coagulation physics](gpu/coagulation.md) |
-| How closely do published BAT predictions match 30 measured CCN hygroscopicities? | [Cloud activation comparison](thermodynamics/bat-ccn.md) |
-| What do historical one-thread-per-box timings show? | [Dated coagulation benchmarks](gpu/coagulation-benchmarks.md) and [legacy viewer](gpu/legacy-benchmarks/gpu_benchmarks.ipynb) |
+| How closely do published BAT predictions match 30 measured CCN hygroscopicities? | [Cloud activation comparison](../../studies/literature/particle-water-uptake/bat-ccn.md) |
+| What do historical one-thread-per-box timings show? | [Dated coagulation benchmarks](../../studies/benchmarks/historical-coagulation/index.md) and [legacy viewer](../../studies/benchmarks/historical-coagulation/gpu_benchmarks.py) |
 | Is resident capture performance qualified? | [Qualification gates](gpu/graph-capture-qualification.md): UNSHIPPED/BLOCKED |
 | How must resident timing and memory be measured? | [Benchmark/memory record](gpu/resident-benchmarks.md) |
 | How must capture profiling be collected? | [Profiling record](gpu/graph-capture-profiling.md) |

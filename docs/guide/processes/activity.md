@@ -390,7 +390,7 @@ result = partitioning.solve(
 - **Theory**: [Activity Theory](../../theory/thermodynamics/activity-theory.md) - Mathematical foundations
 - **Theory**: [Equilibria Theory](../../theory/thermodynamics/equilibria-theory.md) - Partitioning equations
 - **Examples**: [Activity Examples](../../examples/thermodynamics/activity/index.md) - Working code examples
-- **Tutorial**: [Activity Tutorial](../../examples/thermodynamics/particle-properties/activity_tutorial.ipynb) - Interactive notebook
+- **Tutorial**: [Activity Tutorial](../../examples/thermodynamics/particle-properties/activity_tutorial.py) - Interactive notebook
 
 ## FAQ
 

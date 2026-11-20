@@ -87,7 +87,7 @@ from scripts.gpu_studies.population_figures import (
 #
 # The charged hard-sphere model uses Coulomb-modified Brownian collision
 # rates. No empirical ion-attachment fit is extrapolated to these conditions.
-# The [Lucky Few example](gpu_lucky_few.py) retains LF2013 at its fixed
+# The [Lucky Few example](../../../studies/examples/coupled-populations/charged-aerosols/gpu_lucky_few.py) retains LF2013 at its fixed
 # reference conditions. This study selects the separate mobility model.
 
 

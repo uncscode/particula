@@ -5,7 +5,7 @@
 # is working as configured? This example makes gas replacement and particle loss
 # visible alongside resident ownership. It is intended for readers examining the
 # low-level scheduler; begin with [session ownership](gpu_resident_session.py) or
-# use the [prepared interface](../prepared/gpu_prepared_quick_start.py) for a study.
+# use the [prepared interface](../../../studies/tutorials/working-with-gpu/gpu_prepared_quick_start.py) for a study.
 #
 # The three boxes have volumes 1, 2, and 3 m³ and prescribed gas densities
 # 0.25, 0.5, and 0.75 kg m⁻³. The sole lane is named water but uses an illustrative

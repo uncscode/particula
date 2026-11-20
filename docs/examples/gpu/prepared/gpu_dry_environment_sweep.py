@@ -5,7 +5,7 @@
 # starting aerosol abundance? This scan keeps the dry population controlled and
 # separates an atmospheric temperature-pressure path from a pressure-only chamber
 # comparison. Use it to design a sensitivity study, after reviewing the
-# [charged collision models](gpu_charged_models.py).
+# [charged collision models](../../../studies/validation/coagulation/charged-aerosols/gpu_charged_models.py).
 #
 # This controlled CUDA scan starts with **2,490,368 resolved particles** across
 # 19 environments: sixteen reference altitudes from 0 to 86 km, followed by

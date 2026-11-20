@@ -5,7 +5,7 @@
 # meaning? An exactly integrable forcing law provides a reference independent of
 # either implementation. You will compare numerical trajectories, state ownership,
 # and restart behavior before attempting a more complex physical extension.
-# Read the [prepared workflow](gpu_prepared_quick_start.py) first.
+# Read the [prepared workflow](../../../studies/tutorials/working-with-gpu/gpu_prepared_quick_start.py) first.
 #
 # This Particula 0.3 development example implements the same prescribed warming
 # law in NumPy and Warp: dT/dt = a t, with a in K s⁻² and absolute time t in s.

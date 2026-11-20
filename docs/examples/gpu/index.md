@@ -23,17 +23,17 @@ these execution choices back to growth, collisions, charge, and verification.
 
 | Example | Scientific or workflow question |
 | --- | --- |
-| [CPU → CUDA → CPU quick start](prepared/gpu_prepared_quick_start.py) | How do eight aerosol boxes evolve, change forcing, capture and resume? |
+| [CPU → CUDA → CPU quick start](../../studies/tutorials/working-with-gpu/gpu_prepared_quick_start.py) | How do eight aerosol boxes evolve, change forcing, capture and resume? |
 | [Custom process backends](prepared/custom_process_backends.py) | Can an imposed warming law agree with an analytic solution across CPU, CUDA, transfer, and restart? |
 | [Adaptive cloud coagulation](prepared/adaptive_coagulation.py) | How many collision passes complete a 600 s trajectory as the cloud changes? |
-| [Charged Brownian models](prepared/gpu_charged_models.py) | How do five charged fits compare on CUDA against their CPU implementations? |
-| [Explicit atmospheric ion balance](prepared/gpu_ion_balance.py) | Do ion production, recombination and neutral-product export reproduce finite-population balance on CUDA? |
+| [Charged Brownian models](../../studies/validation/coagulation/charged-aerosols/gpu_charged_models.py) | How do five charged fits compare on CUDA against their CPU implementations? |
+| [Explicit atmospheric ion balance](../../studies/validation/coagulation/charged-aerosols/gpu_ion_balance.py) | Do ion production, recombination and neutral-product export reproduce finite-population balance on CUDA? |
 | [Ground to mesopause and high pressure](prepared/gpu_dry_environment_sweep.py) | How do dry charged-aerosol size, charge and collision histories change from 0–86 km and from 1–10 atm? |
 | [Humid aerosols and explicit ions](prepared/gpu_environment_sweep.py) | How do 2.6 million aerosols and ions exchange water, charge, attach and coagulate across sixteen environments? |
-| [The lucky few](prepared/gpu_lucky_few.py) | How often does a 3 nm seed reach 50 nm before background capture, under two explicit ion-attachment assumptions? |
+| [The lucky few](../../studies/examples/coupled-populations/charged-aerosols/gpu_lucky_few.py) | How often does a 3 nm seed reach 50 nm before background capture, under two explicit ion-attachment assumptions? |
 | [Heterogeneous boxes](prepared/gpu_prepared_multibox.py) | How do 64 boxes with different thermodynamic conditions, volume and composition respond? |
 | [Cooling, heating and vapor forcing](prepared/gpu_prepared_forcing.py) | How does a four-material/five-gas population respond to an external schedule? |
-| [Stochastic coagulation ensemble](prepared/gpu_prepared_stochastic.py) | How much does evolution vary across sixteen random seeds? |
+| [Stochastic coagulation ensemble](../../studies/examples/coupled-populations/charged-aerosols/gpu_prepared_stochastic.py) | How much does evolution vary across sixteen random seeds? |
 | [Million-particle lifecycle](prepared/gpu_prepared_lifecycle.py) | Can 1,572,864 active particles use all five processes with exact capture/restart agreement? |
 | [Repeated source pulses](prepared/gpu_prepared_cyclic_chamber.py) | How do new cohorts, Brownian collisions and cyclic condensation interact over 600 seconds? |
 
@@ -63,7 +63,7 @@ not model states or image arrays.
 For the public introduction, run:
 
 ```bash
-python docs/examples/gpu/prepared/gpu_prepared_quick_start.py
+python docs/studies/tutorials/working-with-gpu/gpu_prepared_quick_start.py
 ```
 
 For the illustrated CUDA path in an older direct/resident source, pass `--cuda`:

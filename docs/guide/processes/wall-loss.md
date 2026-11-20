@@ -502,8 +502,8 @@ This pattern matches how other dynamics strategies are combined in chamber simul
 
 ## Related Documentation
 
-- **Hands-on guide**: [Wall loss tutorial](../../examples/processes/wall-loss/wall_loss_tutorial.ipynb)
-- **Notebooks**: [Spherical wall loss strategy](../../examples/processes/wall-loss/spherical_wall_loss_strategy.ipynb)
+- **Hands-on guide**: [Wall loss tutorial](../../examples/processes/wall-loss/wall_loss_tutorial.py)
+- **Notebooks**: [Spherical wall loss strategy](../../examples/processes/wall-loss/spherical_wall_loss_strategy.py)
 - **Dynamics overview**:
   [Wall loss strategies](index.md#scientific-processes)
 

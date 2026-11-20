@@ -3,7 +3,7 @@
 #
 # What makes a saved state sufficient for restarting, rather than merely plotting?
 # This example separates detached inspection values, canonical continuation state,
-# and new device ownership. Use the [prepared workflow](../prepared/gpu_prepared_quick_start.py)
+# and new device ownership. Use the [prepared workflow](../../../studies/tutorials/working-with-gpu/gpu_prepared_quick_start.py)
 # for ordinary simulations; this lower-level example explains the underlying
 # lifecycle contract.
 #

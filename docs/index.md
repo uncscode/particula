@@ -18,7 +18,7 @@ your coding agent.
 
 <CardGrid>
   <LinkCard title="Guide" description="Construction, ownership, and the CPU/GPU support boundary." href="/particula/guide/" />
-  <LinkCard title="Examples" description="Follow the code from a physical question to its result." href="/particula/examples/" />
+  <LinkCard title="Studies" description="Find runnable Python scripts, literature comparisons, validation evidence and benchmarks." href="/particula/studies/" />
   <LinkCard title="Theory" description="Equations and assumptions behind the processes." href="/particula/theory/" />
   <LinkCard title="API reference" description="Signatures and docstrings extracted directly with Griffe." href="/particula/api/" />
   <LinkCard title="Contribute" description="Develop models and maintain reproducible examples." href="/particula/contribute/" />

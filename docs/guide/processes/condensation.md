@@ -877,7 +877,7 @@ particle, gas = selective.step(
 
 - **Dynamics overview**: [Wall loss strategy system](wall-loss.md)
 - **Examples**: [docs/examples/simulations/index.md](../../examples/simulations/index.md)
-- **Latent-heat example (latent-heat example)**: [CPU latent-heat condensation bookkeeping](../../examples/processes/condensation/condensation_latent_heat.ipynb)
+- **Latent-heat example (latent-heat example)**: [CPU latent-heat condensation bookkeeping](../../examples/processes/condensation/condensation_latent_heat.py)
 - **CPU integration baseline**: `particula/integration_tests/condensation_latent_heat_conservation_test.py`
 - **Theory**: [docs/theory/index.md](../../theory/index.md)
 

@@ -9,7 +9,7 @@
 # Can a multi-process run explain why particles disappear while also preserving
 # its exact continuation after a restart? Follow the first-cycle process ledger
 # before reading the final size distribution. This connects physical source and
-# sink accounting with the [prepared simulation interface](gpu_prepared_quick_start.py).
+# sink accounting with the [prepared simulation interface](../../../studies/tutorials/working-with-gpu/gpu_prepared_quick_start.py).
 #
 # **4,096 boxes × 512 slots × 75% occupancy = 1,572,864 active particles.**
 # Each particle has water and dry material; gas has an inert lane, a precursor

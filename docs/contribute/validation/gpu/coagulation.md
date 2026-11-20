@@ -74,7 +74,7 @@ skips. A skip is not CPU/Warp or CUDA parity evidence.
 
 ## Historical performance context
 
-[Recorded coagulation benchmark evidence](coagulation-benchmarks.md) describes
+[Recorded coagulation benchmark evidence](../../../studies/benchmarks/historical-coagulation/index.md) describes
 a dated, machine-specific tradeoff. It is separate from the physics validation
 above and from current resident/capture qualification.
 

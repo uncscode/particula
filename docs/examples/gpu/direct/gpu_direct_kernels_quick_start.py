@@ -459,5 +459,5 @@ if __name__ == "__main__":
 # material properties, verify species inventories, and refine the timestep. The
 # [independent condensation comparison](gpu_condensation_parity_walkthrough.py)
 # shows how to separate transfer, inventory, and energy checks; the
-# [prepared quick start](../prepared/gpu_prepared_quick_start.py) supplies an evolving
+# [prepared quick start](../../../studies/tutorials/working-with-gpu/gpu_prepared_quick_start.py) supplies an evolving
 # water example with a Buck reference and a refinement comparison.

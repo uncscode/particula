@@ -4,7 +4,7 @@
 # When vapor and temperature change externally, how can you distinguish a
 # particle response from mass supplied by the forcing? This example builds an
 # open-system inventory and compares response histories across boxes. Start with
-# the [prepared interface](gpu_prepared_quick_start.py); the key scientific step
+# the [prepared interface](../../../studies/tutorials/working-with-gpu/gpu_prepared_quick_start.py); the key scientific step
 # is recording each imposed gas replacement before interpreting condensation.
 #
 # This study uses **49,152 active resolved particles**, four particle materials

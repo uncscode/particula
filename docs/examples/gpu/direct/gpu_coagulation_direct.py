@@ -365,5 +365,5 @@ if __name__ == "__main__":
 # illustrate storage and stochastic continuation rather than a resolved kinetic
 # history. For a research comparison, vary timestep and independent seeds, check
 # charge as well as each material inventory, and compare distributions with the
-# [stochastic ensemble](../prepared/gpu_prepared_stochastic.py). Reinitializing the
+# [stochastic ensemble](../../../studies/examples/coupled-populations/charged-aerosols/gpu_prepared_stochastic.py). Reinitializing the
 # random stream at every call would change that experiment.

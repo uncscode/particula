@@ -1163,20 +1163,47 @@
       "start_here": false
     },
     {
-      "source": "docs/contribute/validation/gpu/charged-coagulation.md",
+      "source": "docs/studies/validation/coagulation/charged-aerosols/index.md",
       "title": "Charged coagulation and atmospheric ion validation",
       "topic": "verification-scientific",
       "also": [],
-      "role": "Contribute",
-      "start_here": true
+      "role": "Studies",
+      "start_here": true,
+      "study": {
+        "id": "charged-coagulation",
+        "runs": [
+          "gpu-charged-models",
+          "gpu-ion-balance"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/coagulation.md",
+            "label": "How to use this"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/contribute/validation/gpu/coagulation-benchmarks.md",
+      "source": "docs/studies/benchmarks/historical-coagulation/index.md",
       "title": "Historical coagulation benchmark evidence",
       "topic": "verification-performance",
       "also": [],
-      "role": "Contribute",
-      "start_here": true
+      "role": "Studies",
+      "start_here": true,
+      "study": {
+        "id": "contribute-validation-gpu-legacy-benchmarks-gpu-benchmarks",
+        "runs": [
+          "contribute-validation-gpu-legacy-benchmarks-gpu-benchmarks"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/contribute/validation/gpu/resident-benchmarks.md",
+            "label": "Benchmark procedure"
+          }
+        ]
+      }
     },
     {
       "source": "docs/contribute/validation/gpu/coagulation.md",
@@ -1219,11 +1246,11 @@
       "start_here": true
     },
     {
-      "source": "docs/contribute/validation/gpu/legacy-benchmarks/gpu_benchmarks.py",
+      "source": "docs/studies/benchmarks/historical-coagulation/gpu_benchmarks.py",
       "title": "Recorded GPU benchmark viewer",
       "topic": "verification-performance",
       "also": [],
-      "role": "Contribute",
+      "role": "Studies",
       "start_here": false
     },
     {
@@ -1461,13 +1488,13 @@
       "start_here": false
     },
     {
-      "source": "docs/examples/gpu/prepared/gpu_charged_models.py",
+      "source": "docs/studies/validation/coagulation/charged-aerosols/gpu_charged_models.py",
       "title": "Charge-dependent Brownian collisions on CUDA",
       "topic": "charged",
       "also": [
         "gpu"
       ],
-      "role": "Examples",
+      "role": "Studies",
       "start_here": false
     },
     {
@@ -1493,25 +1520,38 @@
       "start_here": true
     },
     {
-      "source": "docs/examples/gpu/prepared/gpu_ion_balance.py",
+      "source": "docs/studies/validation/coagulation/charged-aerosols/gpu_ion_balance.py",
       "title": "Explicit atmospheric ion balance on CUDA",
       "topic": "charged",
       "also": [
         "gpu"
       ],
-      "role": "Examples",
+      "role": "Studies",
       "start_here": false
     },
     {
-      "source": "docs/examples/gpu/prepared/gpu_lucky_few.py",
+      "source": "docs/studies/examples/coupled-populations/charged-aerosols/gpu_lucky_few.py",
       "title": "The lucky few: growth, charging and background capture",
       "topic": "atmosphere",
       "also": [
         "gpu",
         "charged"
       ],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "gpu-lucky-few",
+        "runs": [
+          "gpu-lucky-few"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/gpu/prepared.md",
+            "label": "How to use this"
+          }
+        ]
+      }
     },
     {
       "source": "docs/examples/gpu/prepared/gpu_prepared_cyclic_chamber.py",
@@ -1549,20 +1589,47 @@
       "start_here": false
     },
     {
-      "source": "docs/examples/gpu/prepared/gpu_prepared_quick_start.py",
+      "source": "docs/studies/tutorials/working-with-gpu/gpu_prepared_quick_start.py",
       "title": "Build on the CPU, evolve on CUDA, analyze on the CPU",
       "topic": "gpu-prepared",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "gpu-prepared-quick-start",
+        "runs": [
+          "gpu-prepared-quick-start"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/gpu/prepared.md",
+            "label": "How to use this"
+          }
+        ],
+        "order": 19
+      }
     },
     {
-      "source": "docs/examples/gpu/prepared/gpu_prepared_stochastic.py",
+      "source": "docs/studies/examples/coupled-populations/charged-aerosols/gpu_prepared_stochastic.py",
       "title": "Separate stochastic coagulation from initial-state variability",
       "topic": "gpu-prepared",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "gpu-prepared-stochastic",
+        "runs": [
+          "gpu-prepared-stochastic"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/gpu/prepared.md",
+            "label": "How to use this"
+          }
+        ]
+      }
     },
     {
       "source": "docs/examples/gpu/prepared/gpu_scaling_results.py",
@@ -1888,36 +1955,60 @@
       "start_here": false
     },
     {
-      "source": "docs/examples/simulations/pi_chamber_spectra.py",
+      "source": "docs/studies/literature/pi-chamber/haze-and-cloud/pi_chamber_spectra.py",
       "title": "When do two Π Chamber size distributions converge?",
       "topic": "chambers",
       "also": [
         "condensation",
         "losses-deposition"
       ],
-      "role": "Examples",
+      "role": "Studies",
       "start_here": false
     },
     {
-      "source": "docs/contribute/validation/thermodynamics/pi-chamber-species.md",
+      "source": "docs/studies/literature/pi-chamber/seed-chemistry.md",
       "title": "Seed chemistry and organic vapor in the Π Chamber",
       "topic": "chambers",
       "also": [
         "condensation",
         "condensation-reservoirs"
       ],
-      "role": "Contribute",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "pi-chamber-species",
+        "runs": [],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/activity.md",
+            "label": "How to use this"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/contribute/validation/thermodynamics/pi-chamber.md",
+      "source": "docs/studies/literature/pi-chamber/haze-and-cloud/index.md",
       "title": "Haze and cloud partitioning in the Π Chamber",
       "topic": "chambers",
       "also": [
         "verification-scientific"
       ],
-      "role": "Contribute",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "pi-chamber-spectra",
+        "runs": [
+          "pi-chamber-spectra"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/ccn-retrieval.md",
+            "label": "How to use this"
+          }
+        ]
+      }
     },
     {
       "source": "docs/examples/simulations/cloud_chamber_single_cycle.py",
@@ -1979,11 +2070,11 @@
       "start_here": true
     },
     {
-      "source": "docs/examples/thermodynamics/activity/citric_acid_hygroscopicity.py",
+      "source": "docs/studies/literature/particle-water-uptake/citric-acid/citric_acid_hygroscopicity.py",
       "title": "Citric acid droplet hygroscopicity",
       "topic": "activity-nonideal",
       "also": [],
-      "role": "Examples",
+      "role": "Studies",
       "start_here": true
     },
     {
@@ -2283,25 +2374,38 @@
       "start_here": false
     },
     {
-      "source": "docs/examples/fundamentals/particles/psl_mobility.py",
+      "source": "docs/studies/literature/dry-psl-mobility/psl_mobility.py",
       "title": "Diameter from measured PSL mobility",
       "topic": "size",
       "also": [
         "transport"
       ],
-      "role": "Examples",
+      "role": "Studies",
       "start_here": false
     },
     {
-      "source": "docs/contribute/validation/transport/psl-mobility.md",
-      "title": "Dry PSL mobility validation",
-      "topic": "verification-scientific",
+      "source": "docs/studies/literature/dry-psl-mobility/index.md",
+      "title": "Dry PSL mobility sizing against 49 measured slip factors",
+      "topic": "size",
       "also": [
         "transport",
-        "size"
+        "verification-scientific"
       ],
-      "role": "Contribute",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "psl-mobility",
+        "runs": [
+          "psl-mobility"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/psl-mobility.md",
+            "label": "How to use this"
+          }
+        ]
+      }
     },
     {
       "source": "docs/guide/processes/ccn-retrieval.md",
@@ -2315,24 +2419,37 @@
       "start_here": false
     },
     {
-      "source": "docs/examples/thermodynamics/activity/ccn_kappa_retrieval.py",
+      "source": "docs/studies/literature/particle-water-uptake/ccn-retrieval/ccn_kappa_retrieval.py",
       "title": "Fit hygroscopicity to an activation measurement",
       "topic": "activity-kappa",
       "also": [
         "activity-nonideal"
       ],
-      "role": "Examples",
+      "role": "Studies",
       "start_here": false
     },
     {
-      "source": "docs/contribute/validation/thermodynamics/ccn-retrieval.md",
+      "source": "docs/studies/literature/particle-water-uptake/ccn-retrieval/index.md",
       "title": "CCN retrieval study",
       "topic": "verification-scientific",
       "also": [
         "activity-kappa"
       ],
-      "role": "Contribute",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "ccn-kappa-retrieval",
+        "runs": [
+          "ccn-kappa-retrieval"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/ccn-retrieval.md",
+            "label": "How to use this"
+          }
+        ]
+      }
     },
     {
       "source": "docs/guide/processes/activity.md",
@@ -2415,12 +2532,26 @@
       "start_here": false
     },
     {
-      "source": "docs/theory/dynamics/cloud-droplet-coagulation/dns-kernel-comparison.py",
+      "source": "docs/studies/validation/cloud-droplet-collisions/dns-kernel-comparison.py",
       "title": "Dns Kernel Comparison",
       "topic": "turbulent",
       "also": [],
-      "role": "Theory",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "theory-dns-kernel-comparison",
+        "runs": [
+          "theory-dns-kernel-comparison"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/theory/dynamics/cloud-droplet-coagulation/droplet-coagulation-kernel-ayala2008.md",
+            "label": "Underlying theory",
+            "fragment": "geometric-collision-kernel"
+          }
+        ]
+      }
     },
     {
       "source": "docs/theory/dynamics/cloud-droplet-coagulation/dns-radial-distribution-comparison.py",
@@ -2545,14 +2676,27 @@
       "start_here": false
     },
     {
-      "source": "docs/contribute/validation/thermodynamics/citric-acid-comparison.md",
+      "source": "docs/studies/literature/particle-water-uptake/citric-acid/index.md",
       "title": "Citric acid droplet hygroscopicity",
       "topic": "verification-scientific",
       "also": [
         "activity-nonideal"
       ],
-      "role": "Contribute",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "citric-acid-hygroscopicity",
+        "runs": [
+          "citric-acid-hygroscopicity"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/activity.md",
+            "label": "How to use this"
+          }
+        ]
+      }
     },
     {
       "source": "docs/contribute/validation/numerics/scientific-correctness.md",
@@ -2597,14 +2741,32 @@
       "start_here": false
     },
     {
-      "source": "docs/examples/fundamentals/first_cpu_workflow.py",
+      "source": "docs/studies/tutorials/first_cpu_workflow.py",
       "title": "Run, save and resume a closed aerosol growth experiment",
       "topic": "cpu",
       "also": [
         "condensation"
       ],
-      "role": "Examples",
-      "start_here": true
+      "role": "Studies",
+      "start_here": true,
+      "study": {
+        "id": "first-cpu-workflow",
+        "runs": [
+          "first-cpu-workflow"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/getting-started/first-simulation.md",
+            "label": "How to use this"
+          },
+          {
+            "target": "docs/guide/getting-started/recording-restart.md",
+            "label": "How to use this"
+          }
+        ],
+        "order": 1
+      }
     },
     {
       "source": "docs/guide/getting-started/recording-restart.md",
@@ -2667,7 +2829,9 @@
       "source": "docs/examples/gpu/prepared/adaptive_coagulation.py",
       "title": "Adaptive cloud coagulation on CUDA",
       "topic": "gpu-prepared",
-      "also": ["gpu-direct"],
+      "also": [
+        "gpu-direct"
+      ],
       "role": "Examples",
       "start_here": false
     },
@@ -2680,12 +2844,23 @@
       "start_here": false
     },
     {
-      "source": "docs/contribute/validation/thermodynamics/bat-ccn.md",
+      "source": "docs/studies/literature/particle-water-uptake/bat-ccn.md",
       "title": "Cloud activation in the BAT publication",
       "topic": "verification-scientific",
       "also": [],
-      "role": "Contribute",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "bat-ccn",
+        "runs": [],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/activity.md",
+            "label": "How to use this"
+          }
+        ]
+      }
     },
     {
       "source": "docs/theory/dynamics/interparticle-forces.md",
@@ -2754,24 +2929,44 @@
       "start_here": false
     },
     {
-      "source": "docs/examples/processes/wall-loss/spherical_wall_loss_theory.py",
+      "source": "docs/studies/validation/wall-loss/spherical_wall_loss_theory.py",
       "title": "CUDA wall loss agrees with spherical deposition theory",
       "topic": "losses-deposition",
       "also": [
         "verification"
       ],
-      "role": "Examples",
+      "role": "Studies",
       "start_here": false
     },
     {
-      "source": "docs/contribute/validation/gpu/spherical-wall-loss.md",
+      "source": "docs/studies/validation/wall-loss/index.md",
       "title": "CUDA wall loss agrees with spherical deposition theory",
       "topic": "losses-deposition",
       "also": [
         "verification"
       ],
-      "role": "Contribute",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "spherical-wall-loss-theory",
+        "runs": [
+          "spherical-wall-loss-theory"
+        ],
+        "companions": [
+          "docs/studies/validation/wall-loss/spherical-wall-loss-specification.md"
+        ],
+        "relations": [
+          {
+            "target": "docs/guide/processes/wall-loss.md",
+            "label": "How to use this"
+          },
+          {
+            "target": "api:particula.dynamics.wall_loss.SphericalWallLossStrategy",
+            "label": "API used in this comparison"
+          }
+        ],
+        "secondary_category": "literature"
+      }
     },
     {
       "source": "docs/examples/processes/condensation/infer_initial_radius.py",
@@ -2936,8 +3131,64 @@
       "reason": "Offline entry to the generated topic explorer; avoids a self-referential resource."
     },
     {
-      "source": "docs/contribute/validation/gpu/spherical-wall-loss-specification.md",
+      "source": "docs/studies/validation/wall-loss/spherical-wall-loss-specification.md",
       "reason": "Frozen inputs and acceptance criteria supporting the spherical wall-loss validation record."
+    },
+    {
+      "source": "docs/studies/examples/index.md",
+      "reason": "Browsing directory for the published studies."
+    },
+    {
+      "source": "docs/studies/literature/particle-water-uptake/index.md",
+      "reason": "Browsing directory for the published studies."
+    },
+    {
+      "source": "docs/studies/literature/pi-chamber/index.md",
+      "reason": "Browsing directory for the published studies."
+    },
+    {
+      "source": "docs/studies/validation/cloud-droplet-collisions/index.md",
+      "reason": "Browsing directory for the published studies."
+    },
+    {
+      "source": "docs/studies/index.md",
+      "reason": "Browsing directory for the published studies."
+    },
+    {
+      "source": "docs/studies/examples/coupled-populations/index.md",
+      "reason": "Browsing directory for the published studies."
+    },
+    {
+      "source": "docs/studies/scripts.md",
+      "reason": "Browsing directory for the published studies."
+    },
+    {
+      "source": "docs/studies/literature/index.md",
+      "reason": "Browsing directory for the published studies."
+    },
+    {
+      "source": "docs/studies/examples/coupled-populations/charged-aerosols/index.md",
+      "reason": "Browsing directory for the published studies."
+    },
+    {
+      "source": "docs/studies/validation/index.md",
+      "reason": "Browsing directory for the published studies."
+    },
+    {
+      "source": "docs/studies/validation/coagulation/index.md",
+      "reason": "Browsing directory for the published studies."
+    },
+    {
+      "source": "docs/studies/tutorials/working-with-gpu/index.md",
+      "reason": "Browsing directory for the published studies."
+    },
+    {
+      "source": "docs/studies/tutorials/index.md",
+      "reason": "Browsing directory for the published studies."
+    },
+    {
+      "source": "docs/studies/benchmarks/index.md",
+      "reason": "Browsing directory for the published studies."
     }
   ]
 }

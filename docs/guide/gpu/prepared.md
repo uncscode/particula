@@ -6,7 +6,7 @@ to upload its particle, gas and environment state once. The returned
 device; `snapshot()` returns a detached CPU aerosol for analysis and plotting.
 The initial aerosol remains unchanged.
 
-The [complete quick start](../../examples/gpu/prepared/gpu_prepared_quick_start.py)
+The [complete quick start](../../studies/tutorials/working-with-gpu/gpu_prepared_quick_start.py)
 constructs all inputs and plots the resulting distributions. With an existing
 native `aerosol` and configured `condensation` and `dilution` runnables:
 
@@ -77,8 +77,8 @@ particles or RNG. Excessive demand latches a failure; `synchronize()`,
 `snapshot()` or another observation boundary reports it. Reduce the configured
 timestep and prepare a fresh owner. Adaptive admission is available through the optional policy below. See
 [direct configuration and preflight](direct/coagulation-configuration.md).
-See the [charged model comparison](../../examples/gpu/prepared/gpu_charged_models.py).
-The [charged coagulation validation record](../../contribute/validation/gpu/charged-coagulation.md)
+See the [charged model comparison](../../studies/validation/coagulation/charged-aerosols/gpu_charged_models.py).
+The [charged coagulation validation record](../../studies/validation/coagulation/charged-aerosols/index.md)
 lists actual CUDA checks and remaining scientific boundaries.
 For explicit atmospheric ions, use the separate
 [atmospheric collision configuration](#atmospheric-ion-collisions) below.
@@ -222,11 +222,11 @@ material masses until cleanup exports them; neutralized aerosols remain active.
 The collision law supports CUDA capture and checkpoint continuation. Derived
 classifications and rates are rebuilt from physical state each step.
 
-The [ion-balance example](../../examples/gpu/prepared/gpu_ion_balance.py)
+The [ion-balance example](../../studies/validation/coagulation/charged-aerosols/gpu_ion_balance.py)
 checks production, recombination and export against an independent finite-box
-reference. The [validation record](../../contribute/validation/gpu/charged-coagulation.md)
+reference. The [validation record](../../studies/validation/coagulation/charged-aerosols/index.md)
 distinguishes pair-law, conservation and finite-population decay evidence from
-the [Lucky Few sensitivity study](../../examples/gpu/prepared/gpu_lucky_few.py).
+the [Lucky Few sensitivity study](../../studies/examples/coupled-populations/charged-aerosols/gpu_lucky_few.py).
 Its rate assumptions do not guarantee bounds on survival probability.
 The coefficients follow
 [López-Yglesias and Flagan (2013)](https://doi.org/10.1080/02786826.2013.783684).

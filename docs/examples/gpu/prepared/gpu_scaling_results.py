@@ -3,7 +3,7 @@
 #
 # Would a faster timestep make your whole study faster? Use these measurements
 # to distinguish particle scaling, box scaling, and setup/transfer cost before
-# choosing an execution path. The [prepared quick start](gpu_prepared_quick_start.py)
+# choosing an execution path. The [prepared quick start](../../../studies/tutorials/working-with-gpu/gpu_prepared_quick_start.py)
 # explains the workflow whose costs are separated here.
 #
 # This CPU plotting script reads saved, qualified measurements. It does not

@@ -8,7 +8,7 @@
 #
 # What must be saved to reproduce a simulation driven by repeated external
 # pulses? This example separates the evolving aerosol from the forcing schedule
-# and its source ledger. Start with the [prepared quick start](gpu_prepared_quick_start.py)
+# and its source ledger. Start with the [prepared quick start](../../../studies/tutorials/working-with-gpu/gpu_prepared_quick_start.py)
 # and [refined forcing example](gpu_prepared_forcing.py) before using this larger
 # composition and restart demonstration.
 #

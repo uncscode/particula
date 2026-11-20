@@ -47,7 +47,7 @@
   },
   "theory-dns-kernel-comparison": {
     "title": "Dns Kernel Comparison",
-    "source": "docs/theory/dynamics/cloud-droplet-coagulation/dns-kernel-comparison.py",
+    "source": "docs/studies/validation/cloud-droplet-collisions/dns-kernel-comparison.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -467,7 +467,7 @@
     "full_canvas": true
   },
   "examples-simulations-cloud-chamber-single-cycle": {
-    "title": "Follow droplets through one wet\u2013dry chamber cycle",
+    "title": "Follow droplets through one wet–dry chamber cycle",
     "source": "docs/examples/simulations/cloud_chamber_single_cycle.py",
     "policy": "long",
     "device": "cpu",
@@ -544,7 +544,7 @@
     "inputs": []
   },
   "examples-thermodynamics-equilibria-activity-part1": {
-    "title": "Follow water\u2013organic mixing from composition to water activity",
+    "title": "Follow water–organic mixing from composition to water activity",
     "source": "docs/examples/thermodynamics/equilibria/activity_part1.py",
     "policy": "cpu",
     "device": "cpu",
@@ -590,7 +590,7 @@
   },
   "contribute-validation-gpu-legacy-benchmarks-gpu-benchmarks": {
     "title": "Recorded GPU benchmark viewer",
-    "source": "docs/contribute/validation/gpu/legacy-benchmarks/gpu_benchmarks.py",
+    "source": "docs/studies/benchmarks/historical-coagulation/gpu_benchmarks.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 1800,
@@ -604,7 +604,7 @@
   },
   "gpu-prepared-quick-start": {
     "title": "Build on the CPU, evolve on CUDA, analyze on the CPU",
-    "source": "docs/examples/gpu/prepared/gpu_prepared_quick_start.py",
+    "source": "docs/studies/tutorials/working-with-gpu/gpu_prepared_quick_start.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 600,
@@ -643,7 +643,7 @@
     ],
     "invoke": "result = run_example()",
     "data_expression": "result",
-    "replot_invoke": "result = saved_data\nhistory_figures(result, \"Cooling and vapor pulses \u00b7 saved CUDA results\", forcing=True)\nplt.show()",
+    "replot_invoke": "result = saved_data\nhistory_figures(result, \"Cooling and vapor pulses · saved CUDA results\", forcing=True)\nplt.show()",
     "render_functions": [],
     "plot_inputs": [
       "scripts/docs_gpu_figures.py"
@@ -657,7 +657,7 @@
   },
   "gpu-prepared-stochastic": {
     "title": "Separate stochastic coagulation from initial-state variability",
-    "source": "docs/examples/gpu/prepared/gpu_prepared_stochastic.py",
+    "source": "docs/studies/examples/coupled-populations/charged-aerosols/gpu_prepared_stochastic.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 7200,
@@ -757,7 +757,7 @@
   },
   "gpu-charged-models": {
     "title": "Charge-dependent Brownian collisions on CUDA",
-    "source": "docs/examples/gpu/prepared/gpu_charged_models.py",
+    "source": "docs/studies/validation/coagulation/charged-aerosols/gpu_charged_models.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 600,
@@ -767,7 +767,7 @@
   },
   "gpu-ion-balance": {
     "title": "Explicit atmospheric ion balance on CUDA",
-    "source": "docs/examples/gpu/prepared/gpu_ion_balance.py",
+    "source": "docs/studies/validation/coagulation/charged-aerosols/gpu_ion_balance.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 1200,
@@ -777,7 +777,7 @@
   },
   "gpu-lucky-few": {
     "title": "The lucky few: growth, charging and background capture",
-    "source": "docs/examples/gpu/prepared/gpu_lucky_few.py",
+    "source": "docs/studies/examples/coupled-populations/charged-aerosols/gpu_lucky_few.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 7200,
@@ -940,7 +940,7 @@
   },
   "first-cpu-workflow": {
     "title": "Run, save and resume a closed aerosol growth experiment",
-    "source": "docs/examples/fundamentals/first_cpu_workflow.py",
+    "source": "docs/studies/tutorials/first_cpu_workflow.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 120,
@@ -1003,7 +1003,7 @@
     "full_canvas": true
   },
   "adaptive-cloud-relaxation-cuda": {
-    "title": "Resolve stiff wet\u2013dry droplet relaxation on CUDA",
+    "title": "Resolve stiff wet–dry droplet relaxation on CUDA",
     "source": "docs/examples/simulations/adaptive_cloud_relaxation_cuda.py",
     "policy": "cuda",
     "device": "cuda",
@@ -1051,7 +1051,7 @@
   },
   "citric-acid-hygroscopicity": {
     "title": "Citric acid droplet hygroscopicity",
-    "source": "docs/examples/thermodynamics/activity/citric_acid_hygroscopicity.py",
+    "source": "docs/studies/literature/particle-water-uptake/citric-acid/citric_acid_hygroscopicity.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 300,
@@ -1069,7 +1069,7 @@
   },
   "ccn-kappa-retrieval": {
     "title": "Fit hygroscopicity to an activation measurement",
-    "source": "docs/examples/thermodynamics/activity/ccn_kappa_retrieval.py",
+    "source": "docs/studies/literature/particle-water-uptake/ccn-retrieval/ccn_kappa_retrieval.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 300,
@@ -1085,7 +1085,7 @@
   },
   "psl-mobility": {
     "title": "Dry PSL mobility sizing",
-    "source": "docs/examples/fundamentals/particles/psl_mobility.py",
+    "source": "docs/studies/literature/dry-psl-mobility/psl_mobility.py",
     "policy": "cpu",
     "device": "cpu",
     "timeout": 300,
@@ -1154,7 +1154,7 @@
   },
   "spherical-wall-loss-theory": {
     "title": "CUDA wall loss agrees with spherical deposition theory",
-    "source": "docs/examples/processes/wall-loss/spherical_wall_loss_theory.py",
+    "source": "docs/studies/validation/wall-loss/spherical_wall_loss_theory.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 600,
@@ -1200,8 +1200,8 @@
     "full_canvas": true
   },
   "pi-chamber-spectra": {
-    "title": "Time-resolved wet-size spectra in the \u03a0 Chamber",
-    "source": "docs/examples/simulations/pi_chamber_spectra.py",
+    "title": "Time-resolved wet-size spectra in the Π Chamber",
+    "source": "docs/studies/literature/pi-chamber/haze-and-cloud/pi_chamber_spectra.py",
     "policy": "cuda",
     "device": "cuda",
     "timeout": 900,

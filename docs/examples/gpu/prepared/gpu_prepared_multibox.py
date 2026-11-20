@@ -4,7 +4,7 @@
 # What does an ensemble average hide when every box starts under different
 # conditions? Here you will compare per-box inventories and distributions without
 # mistaking co-varying inputs for isolated causes. Read the
-# [prepared quick start](gpu_prepared_quick_start.py) for state ownership first.
+# [prepared quick start](../../../studies/tutorials/working-with-gpu/gpu_prepared_quick_start.py) for state ownership first.
 #
 # Each box contains 4,096 slots, with 75% initially active: **196,608 resolved
 # particles** in total. Temperature varies from 275 to 310 K, pressure from

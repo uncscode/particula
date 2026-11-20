@@ -30,4 +30,4 @@ The scripts preserve complete workloads and saved outputs. Where a study needs
 a material property, convergence result, or experimental comparison that an
 example does not supply, its closing section identifies a concrete next test.
 
-Follow the [time-resolved Π Chamber spectra](pi_chamber_spectra.py) to compare dry and wet starts under continuous NaCl injection.
+Follow the [time-resolved Π Chamber spectra](../../studies/literature/pi-chamber/haze-and-cloud/pi_chamber_spectra.py) to compare dry and wet starts under continuous NaCl injection.
