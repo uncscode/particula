@@ -197,6 +197,39 @@ def test_workflow_release_version_gate(
         assert values["artifact"] == f"particula-helper-{current}-{'b' * 40}"
 
 
+def test_plugin_release_waits_for_all_contracts_on_version_bumps():
+    """A successful smoke alone cannot authorize plugin-only publication."""
+    workflow = yaml.safe_load(
+        (builder.ROOT / ".github/workflows/pypi.yml").read_text()
+    )
+    jobs = workflow["jobs"]
+    assert jobs["plugin-release"]["needs"] == "validate"
+    steps = jobs["validate"]["steps"]
+    gate = next(
+        i for i, step in enumerate(steps) if step.get("id") == "package"
+    )
+    smoke = next(
+        i
+        for i, step in enumerate(steps)
+        if "::test_relocated_archives_smoke" in step.get("run", "")
+    )
+    contracts = next(
+        i
+        for i, step in enumerate(steps)
+        if '-k "not relocated_archives_smoke"' in step.get("run", "")
+    )
+    upload = next(
+        i for i, step in enumerate(steps) if step.get("id") == "upload"
+    )
+    assert gate < contracts < upload
+    assert smoke < upload and "if" not in steps[smoke]
+    assert steps[contracts]["if"] == (
+        "github.event_name == 'workflow_dispatch' || "
+        "steps.package.outputs.version-increased == 'true'"
+    )
+    assert not steps[contracts].get("continue-on-error")
+
+
 def test_workflow_builds_every_main_merge_without_path_filters():
     """Library-only merges and merge queues must also check plugin packages."""
     workflow = yaml.safe_load(
