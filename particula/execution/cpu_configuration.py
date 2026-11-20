@@ -139,6 +139,15 @@ def condensation_identity(strategy):
 
 def cpu_process_identity(process):
     """Retain native configuration without imposing GPU capability limits."""
+    from particula.dynamics.chemistry.process import GasChemistry
+
+    if type(process) is GasChemistry:
+        return (
+            "particula.gas_chemistry",
+            process.version,
+            process.name,
+            process.configuration(),
+        )
     if type(process) not in NATIVE_PROCESSES:
         raise TypeError("CPU restart requires a supported native runnable")
     return _freeze(process)
